@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, hap
 
 #include "emu.h"
 
@@ -7,6 +7,7 @@
 #include "speaker.h"
 
 #include "cpu/nec/nec.h"
+#include "machine/nvram.h"
 
 class chesskng_state : public driver_device
 {
@@ -196,6 +197,8 @@ void chesskng_state::chesskng(machine_config &config)
 	// 16160
 	// S2RB
 	// 94.10
+
+	NVRAM(config, "mainram", nvram_device::DEFAULT_ALL_0);
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
