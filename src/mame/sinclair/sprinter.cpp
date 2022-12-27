@@ -199,6 +199,7 @@ private:
 	u16 m_ata_data_latch;
 
 	// Accelerator
+	bool m_skip_wr;
 	u8 m_prf_d;
 	u16 m_accel_buffer_size;
 	u8 m_accel_buffer[256] = {};
@@ -761,7 +762,7 @@ void sprinter_state::accel_w(u16 offset, u8 &data)
 
 	if (adjust_icount)
 	{
-		data = sprinter_mem_r(offset);
+		m_skip_wr = true;
 		int icount = 6 * m_accel_buffer_size * m_maincpu->clock() / X_SP; // 6 42Mhz clocks each
 		m_maincpu->adjust_icount(-icount);
 	}
@@ -806,24 +807,31 @@ u8 sprinter_state::vram_r(offs_t offset)
 
 template <u8 Bank> void sprinter_state::vram_w(offs_t offset, u8 data)
 {
-	u8 page = m_pages[Bank] & 0xff;
-
-	u16 vaddr = (offset & 0x03ff);
-	u8* line = m_vram + (m_port_y * 1024);
-
-	if (BIT(~page, 2))
-		m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)] = data;
-	if (!(BIT(page, 3) && (data == 0xff)))
+	if (m_skip_wr)
 	{
-		m_screen->update_now();
-		line[vaddr] = data;
+		m_skip_wr = false;
 	}
-
-	if (vaddr >= 0x3e0)
+	else
 	{
-		u8 pal_num = BIT(vaddr, 2, 3);
-		u16 p_red = 0x3e0 + pal_num * 4;
-		m_palette->set_pen_color(m_port_y + pal_num * 256, rgb_t(line[p_red], line[p_red + 1], line[p_red + 2]));
+		u8 page = m_pages[Bank] & 0xff;
+
+		u16 vaddr = (offset & 0x03ff);
+		u8* line = m_vram + (m_port_y * 1024);
+
+		if (BIT(~page, 2))
+			m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)] = data;
+		if (!(BIT(page, 3) && (data == 0xff)))
+		{
+			m_screen->update_now();
+			line[vaddr] = data;
+		}
+
+		if (vaddr >= 0x3e0)
+		{
+			u8 pal_num = BIT(vaddr, 2, 3);
+			u16 p_red = 0x3e0 + pal_num * 4;
+			m_palette->set_pen_color(m_port_y + pal_num * 256, rgb_t(line[p_red], line[p_red + 1], line[p_red + 2]));
+		}
 	}
 }
 
@@ -920,18 +928,6 @@ void sprinter_state::init_taps()
 	});
 
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
-	prg.install_read_tap(0x0000, 0xffff, "accel_read", [this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (machine().side_effects_disabled() || (m_accel_state == DISABLED) || (m_accel_state == OFF) || (m_accel_state == DOUBLE))
-			return;
-		accel_r(offset, data);
-	});
-	prg.install_write_tap(0x0000, 0xffff, "accel_write", [this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if ((m_accel_state == DISABLED) || (m_accel_state == OFF) || (m_accel_state == DOUBLE))
-			return;
-		accel_w(offset, data);
-	});
 	prg.install_write_tap(0x0000, 0xffff, "spectrum_scr_write", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
 		u8 bank = offset >> 14;
@@ -950,6 +946,18 @@ void sprinter_state::init_taps()
 			m_screen->update_now();
 			m_vram[addr] = data;
 		}
+	});
+	prg.install_read_tap(0x0000, 0xffff, "accel_read", [this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (machine().side_effects_disabled() || (m_accel_state == DISABLED) || (m_accel_state == OFF) || (m_accel_state == DOUBLE))
+			return;
+		accel_r(offset, data);
+	});
+	prg.install_write_tap(0x0000, 0xffff, "accel_write", [this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if ((m_accel_state == DISABLED) || (m_accel_state == OFF) || (m_accel_state == DOUBLE))
+			return;
+		accel_w(offset, data);
 	});
 }
 
@@ -1013,6 +1021,7 @@ void sprinter_state::machine_reset()
 
 	m_prf_d = false;
 	m_accel_state = OFF;
+	m_skip_wr = false;
 
 	m_ata_selected = 0;
 	m_ata_data_flip = false;
