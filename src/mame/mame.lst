@@ -40266,6 +40266,9 @@ sprint4a                        // 008716           1977/12 [6502]
 sprint8                         // ??????           1977/05 [6800]
 sprint8a                        // ??????           1977/05 [6800]
 
+@source:sinclair/sprinter.cpp
+sprinter                        //
+
 @source:konami/spy.cpp
 spy                             // GX857 (c) 1989 (World)
 spyu                            // GX857 (c) 1989 (US)

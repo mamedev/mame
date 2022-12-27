@@ -773,6 +773,7 @@ sinclair/scorpion.cpp
 sinclair/spec128.cpp
 sinclair/specpls3.cpp
 sinclair/spectrum.cpp
+sinclair/sprinter.cpp
 sinclair/timex.cpp
 sinclair/tsconf.cpp
 sinclair/zx.cpp
