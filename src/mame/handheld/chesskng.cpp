@@ -8,6 +8,7 @@
 
 #include "cpu/nec/nec.h"
 #include "machine/nvram.h"
+#include "sound/beep.h"
 
 class chesskng_state : public driver_device
 {
@@ -16,37 +17,55 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_mainram(*this, "mainram")
+		m_mainram(*this, "mainram"),
+		m_beeper(*this, "beeper")
 	{ }
 
 	void chesskng(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	// Devices
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_mainram;
+	required_device<beep_device> m_beeper;
 
 	void chesskng_map(address_map &map);
 	void chesskng_io(address_map &map);
 
+	void update_beeper();
 
 	void unk_1f_w(uint8_t data);
 	void unk_2f_w(uint8_t data);
 	uint8_t unk_3f_r();
-	void unk_3f_w(uint8_t data);
-	void unk_4f_w(uint8_t data);
+	void beeper_enable_w(uint8_t data);
+	void irq_clear_w(uint8_t data);
 	void unk_5f_w(uint8_t data);
 	void unk_6f_w(uint8_t data);
 	void unk_7f_w(uint8_t data);
-	void unk_8f_w(uint8_t data);
-	void unk_9f_w(uint8_t data);
+	void beeper_freq_low_w(uint8_t data);
+	void beeper_freq_high_w(uint8_t data);
 	void unk_af_w(uint8_t data);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	uint8_t m_3f_data;
+	uint16_t m_beeper_freq;
 };
+
+void chesskng_state::machine_start()
+{
+	m_3f_data = 0;
+	m_beeper_freq = 0;
+
+	save_item(NAME(m_3f_data));
+	save_item(NAME(m_beeper_freq));
+}
 
 void chesskng_state::unk_1f_w(uint8_t data)
 {
@@ -60,15 +79,16 @@ void chesskng_state::unk_2f_w(uint8_t data)
 
 uint8_t chesskng_state::unk_3f_r()
 {
-	return machine().rand();
+	return m_3f_data;
 }
 
-void chesskng_state::unk_3f_w(uint8_t data)
+void chesskng_state::beeper_enable_w(uint8_t data)
 {
-	logerror("%s: 3f write %02x\n", machine().describe_context(), data);
+	//logerror("%s: 3f write %02x\n", machine().describe_context(), data);
+	m_beeper->set_state(BIT(data, 3));
 }
 
-void chesskng_state::unk_4f_w(uint8_t data)
+void chesskng_state::irq_clear_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -88,14 +108,18 @@ void chesskng_state::unk_7f_w(uint8_t data)
 	logerror("%s: 7f write %02x\n", machine().describe_context(), data);
 }
 
-void chesskng_state::unk_8f_w(uint8_t data)
+void chesskng_state::beeper_freq_low_w(uint8_t data)
 {
-	logerror("%s: 8f write %02x\n", machine().describe_context(), data);
+	//logerror("%s: 8f write %02x\n", machine().describe_context(), data);
+	m_beeper_freq = (m_beeper_freq & 0xff00) | data;
+	update_beeper();
 }
 
-void chesskng_state::unk_9f_w(uint8_t data)
+void chesskng_state::beeper_freq_high_w(uint8_t data)
 {
-	logerror("%s: 9f write %02x\n", machine().describe_context(), data);
+	//logerror("%s: 9f write %02x\n", machine().describe_context(), data);
+	m_beeper_freq = (m_beeper_freq & 0x00ff) | data << 8;
+	update_beeper();
 }
 
 
@@ -104,6 +128,11 @@ void chesskng_state::unk_af_w(uint8_t data)
 	logerror("%s: af write %02x\n", machine().describe_context(), data);
 }
 
+void chesskng_state::update_beeper()
+{
+	double step = (9.6_MHz_XTAL).dvalue() / 0x100000;
+	m_beeper->set_clock(((0xffff ^ m_beeper_freq) + 1) * step);
+}
 
 void chesskng_state::chesskng_map(address_map &map)
 {
@@ -120,17 +149,16 @@ void chesskng_state::chesskng_io(address_map &map)
 
 	map(0x1f, 0x1f).w(FUNC(chesskng_state::unk_1f_w)); // start-up only
 	map(0x2f, 0x2f).w(FUNC(chesskng_state::unk_2f_w)); // start-up only
-	map(0x3f, 0x3f).w(FUNC(chesskng_state::unk_3f_w)); // frequently, at the same times as 7f/8f/9f/af writes, note address is also read
-	map(0x4f, 0x4f).w(FUNC(chesskng_state::unk_4f_w)); // irq clear?
+	map(0x3f, 0x3f).w(FUNC(chesskng_state::beeper_enable_w)); // frequently, at the same times as 7f/8f/9f/af writes, note address is also read
+	map(0x4f, 0x4f).w(FUNC(chesskng_state::irq_clear_w)); // irq clear?
 	map(0x5f, 0x5f).w(FUNC(chesskng_state::unk_5f_w)); // start-up only
 	map(0x6f, 0x6f).w(FUNC(chesskng_state::unk_6f_w)); // less frequently than below
 
 	// are these all sound related? they all occur when sounds might be expected
-	// what are they? frequencies? addresses? (could the other large chip contain samples?)
-	map(0x7f, 0x7f).w(FUNC(chesskng_state::unk_7f_w)); // often written with 01 along with other writes below
-	map(0x8f, 0x8f).w(FUNC(chesskng_state::unk_8f_w)); // frequently written, audio?
-	map(0x9f, 0x9f).w(FUNC(chesskng_state::unk_9f_w)); // often written with ff/fe before a pair of writes to af?
-	map(0xaf, 0xaf).w(FUNC(chesskng_state::unk_af_w)); // frequently written, audio?
+	map(0x7f, 0x7f).w(FUNC(chesskng_state::unk_7f_w)); // often written with 01 along with other writes below, but also sometimes 02/03 (seems like a high byte)
+	map(0x8f, 0x8f).w(FUNC(chesskng_state::beeper_freq_low_w)); // beeper freq low?
+	map(0x9f, 0x9f).w(FUNC(chesskng_state::beeper_freq_high_w)); // beeper freq high?
+	map(0xaf, 0xaf).w(FUNC(chesskng_state::unk_af_w)); // frequently written at a similar time to the audio (seems like a low byte?)
 }
 
 uint32_t chesskng_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -179,10 +207,10 @@ INTERRUPT_GEN_MEMBER(chesskng_state::interrupt)
 void chesskng_state::chesskng(machine_config &config)
 {
 	// Basic machine hardware
-	V20(config, m_maincpu, XTAL(9'600'000)); // D70108HG-10 V20
+	V20(config, m_maincpu, 9.6_MHz_XTAL); // D70108HG-10 V20
 	m_maincpu->set_addrmap(AS_PROGRAM, &chesskng_state::chesskng_map);
 	m_maincpu->set_addrmap(AS_IO, &chesskng_state::chesskng_io);
-	m_maincpu->set_periodic_int(FUNC(chesskng_state::interrupt), attotime::from_hz(XTAL(9'600'000) / (float)0x10000)); // gives approximate seconds on timer
+	m_maincpu->set_periodic_int(FUNC(chesskng_state::interrupt), attotime::from_hz(9.6_MHz_XTAL / 0x10000)); // gives approximate seconds on timer
 
 	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
@@ -203,6 +231,9 @@ void chesskng_state::chesskng(machine_config &config)
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
+	BEEP(config, m_beeper, 0);
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 1.0);
+
 	// Has a cartridge slot
 }
 
@@ -213,4 +244,4 @@ ROM_START( chesskng )
 	// there is also a CCH01 ET-MATE F3X0 713 near the CPU, what is it?
 ROM_END
 
-CONS( 1994, chesskng,         0, 0, chesskng, chesskng, chesskng_state, empty_init, "I-Star Co.,Ltd", "Chess King (Model ET-6)", MACHINE_NO_SOUND )
+CONS( 1994, chesskng, 0, 0, chesskng, chesskng, chesskng_state, empty_init, "I-Star Co.,Ltd", "Chess King (Model ET-6)", MACHINE_IMPERFECT_SOUND ) // sound not 100% verified against device output
