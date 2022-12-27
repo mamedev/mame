@@ -89,7 +89,7 @@ static INPUT_PORTS_START( macadb )
 	PORT_START("MOUSE2") /* Mouse - Y AXIS */
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
-	/* This handles the standard (not Extended) Apple ADB keyboard, which is similar to the IIgs keyboard */
+	/* This handles most of the Apple Extended ADB keyboard except HELP and DEL.  F12 defaults to the RESET/POWER key, but real F12 is avaiable to be mapped too. */
 	PORT_START("KEY0")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)             PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)             PORT_CHAR('s') PORT_CHAR('S')
@@ -195,6 +195,38 @@ static INPUT_PORTS_START( macadb )
 	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)             PORT_CHAR(UCHAR_MAMEKEY(9_PAD)) // 0x5c
 	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset / Power")           PORT_CODE(KEYCODE_F12)          // 0x5d (converted to 0x7f7f)
 	PORT_BIT(0xc000, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("KEY6")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5)          PORT_CHAR(UCHAR_MAMEKEY(F5))  // 60
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6)          PORT_CHAR(UCHAR_MAMEKEY(F6))  // 61
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7)          PORT_CHAR(UCHAR_MAMEKEY(F7))  // 62
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3)          PORT_CHAR(UCHAR_MAMEKEY(F3))  // 63
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8)          PORT_CHAR(UCHAR_MAMEKEY(F8))  // 64
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F9)          PORT_CHAR(UCHAR_MAMEKEY(F9))  // 65
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F11)         PORT_CHAR(UCHAR_MAMEKEY(F11)) // 67
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F13)         PORT_CHAR(UCHAR_MAMEKEY(F13)) // 69
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F14)         PORT_CHAR(UCHAR_MAMEKEY(F14)) // 6b
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F10)         PORT_CHAR(UCHAR_MAMEKEY(F10)) // 6d
+	PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F12)         PORT_CHAR(UCHAR_MAMEKEY(F12)) // 6f
+
+	PORT_START("KEY7")
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F15)         PORT_CHAR(UCHAR_MAMEKEY(F15)) // 71
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_HOME)        PORT_CHAR(UCHAR_MAMEKEY(HOME))    // 73
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGUP)        PORT_CHAR(UCHAR_MAMEKEY(PGUP))    // 74
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4)          PORT_CHAR(UCHAR_MAMEKEY(F4))  // 76
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_END)         PORT_CHAR(UCHAR_MAMEKEY(END)) // 77
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2)          PORT_CHAR(UCHAR_MAMEKEY(F2))  // 78
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_PGDN)        PORT_CHAR(UCHAR_MAMEKEY(PGDN)) // 79
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1)          PORT_CHAR(UCHAR_MAMEKEY(F1))  // 7a
+	PORT_BIT(0xf800, IP_ACTIVE_HIGH, IPT_UNUSED)    // 7b-7f are unused
 INPUT_PORTS_END
 
 macadb_device::macadb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -294,7 +326,7 @@ int macadb_device::adb_pollkbd(int update)
 	codes[0] = codes[1] = 0xff; // key up
 	report = result = 0;
 
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		int keybuf = m_keys[i]->read();
 
@@ -695,6 +727,7 @@ void macadb_device::adb_talk()
 					LOGMASKED(LOG_TALK_LISTEN, "ADB: talking to unconnected device %d (K %d M %d)\n", addr, m_adb_keybaddr, m_adb_mouseaddr);
 					m_adb_buffer[0] = m_adb_buffer[1] = 0;
 					m_adb_datasize = 0;
+					m_adb_srqflag = true;
 				}
 				break;
 		}
@@ -1026,7 +1059,7 @@ void macadb_device::device_reset()
 	m_adb_keybinitialized = 0;
 	m_adb_currentkeys[0] = m_adb_currentkeys[1] = 0xff;
 	m_adb_modifiers = 0xff;
-	for (i=0; i<7; i++)
+	for (i=0; i<9; i++)
 	{
 		m_key_matrix[i] = 0;
 	}
@@ -1163,41 +1196,43 @@ WRITE_LINE_MEMBER(macadb_device::adb_linechange_w)
 				m_adb_srqflag = false;
 				adb_talk();
 
-				if (!m_adb_srqflag)
+				if (m_adb_srqflag)
 				{
-					set_adb_line(ASSERT_LINE);
+					set_adb_line(CLEAR_LINE);
+					m_adb_linestate = LST_SRQNODATA;
+					m_adb_timer->adjust(attotime::from_ticks(adb_srq, adb_timebase)); // SRQ time
 				}
 				else
 				{
-					set_adb_line(CLEAR_LINE);
-				}
+					set_adb_line(ASSERT_LINE);
 
-				if (m_adb_datasize > 0)
-				{
-					LOGMASKED(LOG_TALK_LISTEN, "Device has %d bytes of data:\n", m_adb_datasize);
-					for (int i = 0; i < m_adb_datasize; i++)
+					if (m_adb_datasize > 0)
 					{
-						LOGMASKED(LOG_TALK_LISTEN, "  %02x", m_adb_buffer[i]);
+						LOGMASKED(LOG_TALK_LISTEN, "Device has %d bytes of data:\n", m_adb_datasize);
+						for (int i = 0; i < m_adb_datasize; i++)
+						{
+							LOGMASKED(LOG_TALK_LISTEN, "  %02x", m_adb_buffer[i]);
+						}
+						LOGMASKED(LOG_TALK_LISTEN, "\n");
+						m_adb_linestate = LST_TSTOPSTART; // T1t
+						m_adb_timer->adjust(attotime::from_ticks(324 / 4, adb_timebase));
+						m_adb_stream_ptr = 0;
 					}
-					LOGMASKED(LOG_TALK_LISTEN, "\n");
-					m_adb_linestate = LST_TSTOPSTART;   // T1t
-					m_adb_timer->adjust(attotime::from_ticks(324/4, adb_timebase));
-					m_adb_stream_ptr = 0;
-				}
-				else if (m_adb_direction)   // if direction is set, we LISTENed to a valid device
-				{
-					m_adb_linestate = LST_WAITT1T;
-				}
-				else    // no valid device targetted, time out
-				{
-					if (m_adb_srqflag)
+					else if (m_adb_direction)   // if direction is set, we LISTENed to a valid device
 					{
-						m_adb_linestate = LST_SRQNODATA;
-						m_adb_timer->adjust(attotime::from_ticks(adb_srq, adb_timebase));   // SRQ time
+						m_adb_linestate = LST_WAITT1T;
 					}
-					else
+					else    // no valid device targetted, time out
 					{
-						m_adb_linestate = LST_IDLE;
+						if (m_adb_srqflag)
+						{
+							m_adb_linestate = LST_SRQNODATA;
+							m_adb_timer->adjust(attotime::from_ticks(adb_srq, adb_timebase));   // SRQ time
+						}
+						else
+						{
+							m_adb_linestate = LST_IDLE;
+						}
 					}
 				}
 			}
