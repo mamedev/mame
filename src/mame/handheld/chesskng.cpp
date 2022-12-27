@@ -76,7 +76,7 @@ uint32_t chesskng_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 				uint8_t pix = (data >> (7 - xx)) & 1;
 				pix |= ((data2 >> (7 - xx)) & 1)<<1;
 
-				rgb_t pens[4] = { rgb_t::black(), rgb_t(0x40,0x40,0x40), rgb_t(0xc0,0xc0,0xc0),	rgb_t::white() };
+				rgb_t pens[4] = { rgb_t::black(), rgb_t(0xc0,0xc0,0xc0), rgb_t(0x40,0x40,0x40),	rgb_t::white() };
 				dst[x * 8 + xx] = pens[pix];
 			}
 		}
@@ -108,7 +108,8 @@ void chesskng_state::chesskng(machine_config &config)
 	V20(config, m_maincpu, XTAL(9'600'000)); // D70108HG-10 V20
 	m_maincpu->set_addrmap(AS_PROGRAM, &chesskng_state::chesskng_map);
 	m_maincpu->set_addrmap(AS_IO, &chesskng_state::chesskng_io);
-	m_maincpu->set_vblank_int("screen", FUNC(chesskng_state::interrupt)); // source?
+	//m_maincpu->set_vblank_int("screen", FUNC(chesskng_state::interrupt)); // source?
+	m_maincpu->set_periodic_int(FUNC(chesskng_state::interrupt), attotime::from_hz(146)); // gives approximate seconds on timer
 
 	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
