@@ -140,32 +140,30 @@ uint32_t chesskng_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		int offset = y * 256 / 8;
 
 		uint32_t *dst = &bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x / 8; x++)
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			// seem to be 2 256x256 images (160x160 area used) one at c000, one at e000, maybe 2bpp graphics?
-			uint8_t data = m_mainram[0xc000 + offset + x];	
-			uint8_t data2 = m_mainram[0xe000 + offset + x];				
+			uint8_t data = m_mainram[0xc000 + offset + x/8];
+			uint8_t data2 = m_mainram[0xe000 + offset + x/8];
 
-			for (int xx = 0; xx < 8; xx++)
-			{
-				uint8_t pix = (data >> (7 - xx)) & 1;
-				pix |= ((data2 >> (7 - xx)) & 1)<<1;
+			int xx = x % 8;
 
-				rgb_t pens[4] = { rgb_t::black(), rgb_t(0xc0,0xc0,0xc0), rgb_t(0x40,0x40,0x40),	rgb_t::white() };
-				dst[x * 8 + xx] = pens[pix];
-			}
+			uint8_t pix = (data >> (7 - xx)) & 1;
+			pix |= ((data2 >> (7 - xx)) & 1) << 1;
+
+			rgb_t pens[4] = { rgb_t::white(), rgb_t(0x40,0x40,0x40), rgb_t(0xc0,0xc0,0xc0), rgb_t::black() };
+			dst[x] = pens[pix];
 		}
 	}
 	return 0;
 }
 
 static INPUT_PORTS_START( chesskng )
-	// UP,DOWN,LEFT,RIGHT,A,B,START,SELECT
 	PORT_START("BUTTONS") // if this port returns 0x0f (all 4 directions pressed assuming ACTIVE_LOW? - they're buttons not a dpad) the unit enters a test/data clear mode of sorts
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) // start?
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SELECT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) // A
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) // B
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY
@@ -183,8 +181,7 @@ void chesskng_state::chesskng(machine_config &config)
 	V20(config, m_maincpu, XTAL(9'600'000)); // D70108HG-10 V20
 	m_maincpu->set_addrmap(AS_PROGRAM, &chesskng_state::chesskng_map);
 	m_maincpu->set_addrmap(AS_IO, &chesskng_state::chesskng_io);
-	//m_maincpu->set_vblank_int("screen", FUNC(chesskng_state::interrupt)); // source?
-	m_maincpu->set_periodic_int(FUNC(chesskng_state::interrupt), attotime::from_hz(146)); // gives approximate seconds on timer
+	m_maincpu->set_periodic_int(FUNC(chesskng_state::interrupt), attotime::from_hz(XTAL(9'600'000) / (float)0x10000)); // gives approximate seconds on timer
 
 	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
@@ -213,4 +210,4 @@ ROM_START( chesskng )
 	// there is also a CCH01 ET-MATE F3X0 713 near the CPU, what is it?
 ROM_END
 
-CONS( 1994, chesskng,         0, 0, chesskng, chesskng, chesskng_state, empty_init, "I-Star Co.,Ltd", "Chess King (Model ET-6)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1994, chesskng,         0, 0, chesskng, chesskng, chesskng_state, empty_init, "I-Star Co.,Ltd", "Chess King (Model ET-6)", MACHINE_NO_SOUND )
