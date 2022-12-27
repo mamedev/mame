@@ -29,23 +29,80 @@ private:
 	void chesskng_map(address_map &map);
 	void chesskng_io(address_map &map);
 
+
+	void unk_1f_w(uint8_t data);
+	void unk_2f_w(uint8_t data);
 	uint8_t unk_3f_r();
+	void unk_3f_w(uint8_t data);
 	void unk_4f_w(uint8_t data);
+	void unk_5f_w(uint8_t data);
+	void unk_6f_w(uint8_t data);
+	void unk_7f_w(uint8_t data);
+	void unk_8f_w(uint8_t data);
+	void unk_9f_w(uint8_t data);
+	void unk_af_w(uint8_t data);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
+void chesskng_state::unk_1f_w(uint8_t data)
+{
+	logerror("%s: 1f write %02x\n", machine().describe_context(), data);
+}
+
+void chesskng_state::unk_2f_w(uint8_t data)
+{
+	logerror("%s: 2f write %02x\n", machine().describe_context(), data);
+}
+
 uint8_t chesskng_state::unk_3f_r()
 {
 	return machine().rand();
+}
+
+void chesskng_state::unk_3f_w(uint8_t data)
+{
+	logerror("%s: 3f write %02x\n", machine().describe_context(), data);
 }
 
 void chesskng_state::unk_4f_w(uint8_t data)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
+
+void chesskng_state::unk_5f_w(uint8_t data)
+{
+	logerror("%s: 5f write %02x\n", machine().describe_context(), data);
+}
+
+void chesskng_state::unk_6f_w(uint8_t data)
+{
+	logerror("%s: 6f write %02x\n", machine().describe_context(), data);
+}
+
+void chesskng_state::unk_7f_w(uint8_t data)
+{
+	logerror("%s: 7f write %02x\n", machine().describe_context(), data);
+}
+
+void chesskng_state::unk_8f_w(uint8_t data)
+{
+	logerror("%s: 8f write %02x\n", machine().describe_context(), data);
+}
+
+void chesskng_state::unk_9f_w(uint8_t data)
+{
+	logerror("%s: 9f write %02x\n", machine().describe_context(), data);
+}
+
+
+void chesskng_state::unk_af_w(uint8_t data)
+{
+	logerror("%s: af write %02x\n", machine().describe_context(), data);
+}
+
 
 void chesskng_state::chesskng_map(address_map &map)
 {
@@ -60,16 +117,19 @@ void chesskng_state::chesskng_io(address_map &map)
 	map(0x0f, 0x0f).portr("BUTTONS");
 	map(0x3f, 0x3f).r(FUNC(chesskng_state::unk_3f_r));
 
-	map(0x1f, 0x1f).nopw();
-	map(0x2f, 0x2f).nopw();
-	map(0x3f, 0x3f).nopw();
+	map(0x1f, 0x1f).w(FUNC(chesskng_state::unk_1f_w)); // start-up only
+	map(0x2f, 0x2f).w(FUNC(chesskng_state::unk_2f_w)); // start-up only
+	map(0x3f, 0x3f).w(FUNC(chesskng_state::unk_3f_w)); // frequently, at the same times as 7f/8f/9f/af writes, note address is also read
 	map(0x4f, 0x4f).w(FUNC(chesskng_state::unk_4f_w)); // irq clear?
-	map(0x5f, 0x5f).nopw();
-	map(0x6f, 0x6f).nopw();
-	map(0x7f, 0x7f).nopw(); // beeper?
-	map(0x8f, 0x8f).nopw();
-	map(0x9f, 0x9f).nopw();
-	map(0xaf, 0xaf).nopw();
+	map(0x5f, 0x5f).w(FUNC(chesskng_state::unk_5f_w)); // start-up only
+	map(0x6f, 0x6f).w(FUNC(chesskng_state::unk_6f_w)); // less frequently than below
+
+	// are these all sound related? they all occur when sounds might be expected
+	// what are they? frequencies? addresses? (could the other large chip contain samples?)
+	map(0x7f, 0x7f).w(FUNC(chesskng_state::unk_7f_w)); // often written with 01 along with other writes below
+	map(0x8f, 0x8f).w(FUNC(chesskng_state::unk_8f_w)); // frequently written, audio?
+	map(0x9f, 0x9f).w(FUNC(chesskng_state::unk_9f_w)); // often written with ff/fe before a pair of writes to af?
+	map(0xaf, 0xaf).w(FUNC(chesskng_state::unk_af_w)); // frequently written, audio?
 }
 
 uint32_t chesskng_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
