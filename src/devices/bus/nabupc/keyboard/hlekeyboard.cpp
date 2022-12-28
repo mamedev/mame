@@ -334,10 +334,15 @@ uint8_t hle_keyboard_device::translate(uint8_t row, uint8_t column)
 	uint8_t const modifiers(m_modifiers->read());
 
 	bool const ctrl(modifiers & 0x01);
-	bool const shift(bool(modifiers & 0x02) || (bool(modifiers & 0x04)));
+	bool const shift(bool(modifiers & 0x02));
 	unsigned const map(ctrl ? 2 : shift ? 1 : 0);
+	uint8_t scancode = TRANSLATION_TABLE[map][row][column];
 
-	return TRANSLATION_TABLE[map][row][column];
+	if ((scancode >= 0x61 && scancode <= 0x7A) && (modifiers & 0x04)) {
+		scancode -= 0x20;
+	}
+
+	return scancode;
 }
 
 void hle_keyboard_device::scan_complete()
