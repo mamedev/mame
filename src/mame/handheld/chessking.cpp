@@ -9,7 +9,8 @@ TODO:
 - lots of unknown writes
 - sound emulation is guessed
 - LCD chip(s) is not emulated, maybe the I/O chip does a DMA from RAM to the LCD?
-- chess game makes an illegal move sometimes, BTANB?
+- chess game is buggy, assume that's just the way it is, aka BTANB
+  eg. sometimes it makes an illegal move, or castling doesn't erase the king
 
 Hardware notes:
 
@@ -125,11 +126,7 @@ uint32_t chessking_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 			// 2 256x256 images (160x160 area used) one at c000, one at e000 to form 2bpp graphics
 			uint8_t data = m_videoram[0x4000 + offset + x/8];
 			uint8_t data2 = m_videoram[0x6000 + offset + x/8];
-
-			int xx = x % 8;
-
-			uint8_t pix = (data >> (7 - xx)) & 1;
-			pix |= ((data2 >> (7 - xx)) & 1) << 1;
+			uint8_t pix = BIT(data, ~x & 7) | BIT(data2, ~x & 7) << 1;
 
 			rgb_t pens[4] = { rgb_t::white(), rgb_t(0x55,0x55,0x55), rgb_t(0xaa,0xaa,0xaa), rgb_t::black() };
 			dst[x] = pens[pix];
