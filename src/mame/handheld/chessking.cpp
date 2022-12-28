@@ -9,7 +9,7 @@ TODO:
 - lots of unknown writes
 - sound emulation is guessed
 - LCD chip(s) is not emulated, maybe the I/O chip does a DMA from main RAM to the LCD?
-- cartridge, probably at 0x20000
+- simplify cartridge, no need to go through address map bank
 
 Hardware notes:
 
@@ -148,7 +148,7 @@ uint32_t chessking_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 			uint8_t pix = (data >> (7 - xx)) & 1;
 			pix |= ((data2 >> (7 - xx)) & 1) << 1;
 
-			rgb_t pens[4] = { rgb_t::white(), rgb_t(0x40,0x40,0x40), rgb_t(0xc0,0xc0,0xc0), rgb_t::black() };
+			rgb_t pens[4] = { rgb_t::white(), rgb_t(0x55,0x55,0x55), rgb_t(0xaa,0xaa,0xaa), rgb_t::black() };
 			dst[x] = pens[pix];
 		}
 	}
@@ -252,10 +252,11 @@ void chessking_state::update_beeper()
 
 void chessking_state::chesskng_map(address_map &map)
 {
-	map(0x00000, 0x07fff).ram().share(m_mainram);  // 2x SRM20256 RAM
-	map(0x08000, 0x0ffff).ram().share(m_videoram); //  
+	map(0x00000, 0x07fff).ram().share(m_mainram); // SRM20256, battery-backed
+	map(0x08000, 0x0ffff).ram().share(m_videoram); // SRM20256
 
 	map(0x20000, 0x9ffff).m(m_mainbank, FUNC(address_map_bank_device::amap8));
+
 	// gap in memory space?
 	map(0xe0000, 0xfffff).rom().region("maincpu", 0x20000);
 }
@@ -293,7 +294,7 @@ void chessking_state::mainbank_map(address_map &map)
 	map(0x360000, 0x37ffff).rom().region("cart", 0x100000);
 
 	map(0x380000, 0x3dffff).rom().region("cart", 0x1a0000);
-   	map(0x3e0000, 0x3fffff).rom().region("cart", 0x180000);                            
+   	map(0x3e0000, 0x3fffff).rom().region("cart", 0x180000);
 }
 
 
@@ -349,6 +350,7 @@ void chessking_state::chesskng(machine_config &config)
 	BEEP(config, m_beeper, 0);
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.5);
 
+	// Cartridge
 	ADDRESS_MAP_BANK(config, "mainbank").set_map(&chessking_state::mainbank_map).set_options(ENDIANNESS_LITTLE, 8, 26, 0x80000);
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "chessking_cart");
@@ -379,4 +381,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT        COMPANY             FULLNAME                   FLAGS
-CONS( 1994, chesskng, 0,      0,      chesskng, chesskng, chessking_state, empty_init, "I-Star Co., Ltd.", "Chess King (Model ET-6)", MACHINE_IMPERFECT_SOUND ) // sound not 100% verified against device output
+CONS( 1994, chesskng, 0,      0,      chesskng, chesskng, chessking_state, empty_init, "I-Star Co., Ltd.", "Chess King (Model ET-6)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // sound not 100% verified against device output
