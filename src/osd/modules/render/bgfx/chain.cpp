@@ -78,9 +78,8 @@ void bgfx_chain::repopulate_targets()
 	}
 }
 
-void bgfx_chain::process(chain_manager::screen_prim &prim, int view, int screen, texture_manager& textures, osd_window& window, uint64_t blend)
+void bgfx_chain::process(chain_manager::screen_prim &prim, int view, int screen, texture_manager& textures, osd_window& window)
 {
-	printf("    Screen %d with chain %s is now processing\n", screen, m_name.c_str());
 	screen_device_enumerator screen_iterator(window.machine().root_device());
 	screen_device* screen_device = screen_iterator.byindex(screen);
 
@@ -108,14 +107,13 @@ void bgfx_chain::process(chain_manager::screen_prim &prim, int view, int screen,
 		screen_offset_y = -screen_container.yoffset();
 	}
 
-	printf("    Screen %d size: %d,%d with scale %f,%f and offset %f,%f\n", screen, (int)screen_width, (int)screen_height, 1.0f / screen_scale_x, 1.0f / screen_scale_y, screen_offset_x, screen_offset_y);
 	int current_view = view;
 	for (size_t i = 0; i < m_entries.size(); i++)
 	{
 		if (!m_entries[i]->skip())
 		{
 			m_entries[i]->submit(current_view, prim, textures, screen_count, screen_width, screen_height, screen_scale_x, screen_scale_y, screen_offset_x, screen_offset_y,
-				rotation_type, swap_xy, ~0ULL, screen);
+				rotation_type, swap_xy, screen);
 			current_view++;
 		}
 	}
@@ -172,7 +170,6 @@ void bgfx_chain::insert_effect(uint32_t index, bgfx_effect *effect, const bool a
 
 	const uint32_t screen_width = chains.targets().width(TARGET_STYLE_GUEST, m_screen_index);
 	const uint32_t screen_height = chains.targets().height(TARGET_STYLE_GUEST, m_screen_index);
-	printf("Inserting effect for screen index %d with screen width/height %d,%d\n", (int)m_screen_index, (int)screen_width, (int)screen_height);
 	m_targets.destroy_target("screen", m_screen_index);
 	m_targets.create_target("screen", bgfx::TextureFormat::BGRA8, screen_width, screen_height, 1, 1, TARGET_STYLE_GUEST, true, false, 1, m_screen_index);
 }

@@ -39,7 +39,7 @@ public:
 	~bgfx_chain_entry();
 
 	void submit(int view, chain_manager::screen_prim &prim, texture_manager& textures, uint16_t screen_count, uint16_t screen_width, uint16_t screen_height,
-		float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, uint64_t blend, int32_t screen);
+		float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, int32_t screen);
 
 	// Getters
 	std::string name() const { return m_name; }

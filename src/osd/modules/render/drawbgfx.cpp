@@ -354,7 +354,6 @@ int renderer_bgfx::create()
 	}
 
 	uint32_t max_prescale_size = std::min(2u * std::max(width, height), s_max_texture_size);
-	printf("max_prescale_size is %d, std::min(2 * std::max(%d, %d), %d)\n", (int)max_prescale_size, (int)width, (int)height, (int)s_max_texture_size);
 	m_chains = new chain_manager(win->machine(), m_options, *m_textures, *m_targets, *m_effects, win->index(), *this, win->prescale(), max_prescale_size);
 	m_sliders_dirty = true;
 
@@ -573,7 +572,6 @@ void renderer_bgfx::render_post_screen_quad(int view, render_primitive* prim, bg
 		inv_view_dims->upload();
 	}
 
-	printf("Rendering post-screen quad for screen %d using blend mode %d\n", screen, (int)blend);
 	m_screen_effect[blend]->submit(m_ortho_view->get_index());
 }
 
@@ -673,7 +671,6 @@ void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::Transient
 		inv_view_dims->upload();
 	}
 
-	printf("Rendering a textured quad using blend mode %d and tint %08x\n", (int)blend, rgba);
 	effects[blend]->submit(m_ortho_view->get_index());
 
 	if (is_screen)
@@ -1075,7 +1072,6 @@ bool renderer_bgfx::update_dimensions()
 			bgfx::setViewFrameBuffer(s_current_view, m_framebuffer->target());
 		}
 
-		printf("Touching clear to %08x\n", 0xff000000);
 		bgfx::setViewClear(s_current_view, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, 0x000000ff, 1.0f, 0);
 		bgfx::setViewMode(s_current_view, bgfx::ViewMode::Sequential);
 		bgfx::touch(s_current_view);

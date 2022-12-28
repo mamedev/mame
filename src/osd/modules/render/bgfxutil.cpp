@@ -96,7 +96,7 @@ uint64_t bgfx_util::get_blend_state(uint32_t blend)
 		case BLENDMODE_ALPHA:
 			return BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA);
 		case BLENDMODE_RGB_MULTIPLY:
-			return BGFX_STATE_BLEND_FUNC_SEPARATE(BGFX_STATE_BLEND_DST_COLOR, BGFX_STATE_BLEND_ZERO, BGFX_STATE_BLEND_DST_ALPHA, BGFX_STATE_BLEND_ZERO);
+			return BGFX_STATE_BLEND_FUNC_SEPARATE(BGFX_STATE_BLEND_DST_COLOR, BGFX_STATE_BLEND_INV_SRC_COLOR, BGFX_STATE_BLEND_ONE, BGFX_STATE_BLEND_ZERO);
 		case BLENDMODE_ADD:
 			return BGFX_STATE_BLEND_FUNC(BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_ONE);
 		default:
@@ -107,8 +107,6 @@ uint64_t bgfx_util::get_blend_state(uint32_t blend)
 
 void bgfx_util::find_prescale_factor(uint16_t width, uint16_t height, uint16_t max_prescale_size, uint16_t &xprescale, uint16_t &yprescale)
 {
-	printf("x,y prescale: %d,%d\n", (int)xprescale, (int)yprescale);
-	printf("prescaled starting: %d,%d vs. %d\n", (int)(width * xprescale), (int)(height * yprescale), (int)max_prescale_size);
 	while (xprescale > 1 && width * xprescale > max_prescale_size)
 	{
 		xprescale--;

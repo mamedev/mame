@@ -50,7 +50,6 @@ void bgfx_ortho_view::setup() {
 		flags |= (m_do_clear_color ? BGFX_CLEAR_COLOR : 0);
 		flags |= (m_do_clear_depth ? BGFX_CLEAR_DEPTH : 0);
 		flags |= (m_do_clear_stencil ? BGFX_CLEAR_STENCIL : 0);
-		printf("Clearing view to %08x\n", m_clear_color);
 		bgfx::setViewClear(m_index, flags, m_clear_color, m_clear_depth, m_clear_stencil);
 		bgfx::setViewMode(m_index, bgfx::ViewMode::Sequential);
 	}

@@ -63,13 +63,12 @@ bgfx_chain_entry::~bgfx_chain_entry()
 }
 
 void bgfx_chain_entry::submit(int view, chain_manager::screen_prim &prim, texture_manager& textures, uint16_t screen_count, uint16_t screen_width, uint16_t screen_height,
-	float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, uint64_t blend, int32_t screen)
+	float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, int32_t screen)
 {
 	uint16_t view_width = screen_width;
 	uint16_t view_height = screen_height;
 	if (!setup_view(textures, view, screen_width, screen_height, screen, view_width, view_height))
 	{
-		printf("        Chain entry %s is being skipped, unable to setup view\n", m_name.c_str());
 		return;
 	}
 
@@ -87,7 +86,6 @@ void bgfx_chain_entry::submit(int view, chain_manager::screen_prim &prim, textur
 		const uint8_t b = (uint8_t)std::round(prim.m_prim->color.b * 255);
 		tint = (a << 24) | (b << 16) | (g << 8) | r;
 	}
-	printf("            Chain entry %s is using tint %08x\n", m_name.c_str(), tint);
 
 	bgfx::TransientVertexBuffer buffer;
 	put_screen_buffer(view_width, view_height, tint, &buffer);
@@ -104,7 +102,7 @@ void bgfx_chain_entry::submit(int view, chain_manager::screen_prim &prim, textur
 		}
 	}
 
-	m_effect->submit(view, blend);
+	m_effect->submit(view);
 
 	if (m_targets.target(screen, m_output) != nullptr)
 	{
@@ -134,7 +132,6 @@ void bgfx_chain_entry::setup_viewsize_uniforms(uint16_t view_width, uint16_t vie
 {
 	float width(view_width);
 	float height(view_height);
-	printf("Setting up view size uniforms: %f, %f\n", width, height);
 	bgfx_uniform* view_dims = m_effect->uniform("u_view_dims");
 	if (view_dims != nullptr)
 	{
@@ -299,10 +296,8 @@ bool bgfx_chain_entry::setup_view(texture_manager &textures, int view, uint16_t 
 		handle = output->target();
 		width = output->width();
 		height = output->height();
-		printf("Outputing to target of size %d,%d\n", (int)width, (int)height);
 	}
 
-	printf("Setting view rect to %d,%d\n", (int)width, (int)height);
 	bgfx::setViewFrameBuffer(view, handle);
 	bgfx::setViewRect(view, 0, 0, width, height);
 	out_view_width = width;
@@ -344,11 +339,6 @@ void bgfx_chain_entry::put_screen_buffer(uint16_t screen_width, uint16_t screen_
 	{
 		v[0] = v[1] = 1;
 		v[2] = v[3] = 0;
-	}
-
-	for (int i = 0; i < 4; i++)
-	{
-		printf("                Screen vertex %d: %f,%f : %f,%f\n", i, x[i] * screen_width, y[i] * screen_height, u[i] * screen_width, v[i] * screen_height);
 	}
 
 	vertex[0].m_x = x[0];

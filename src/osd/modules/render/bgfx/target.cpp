@@ -38,7 +38,6 @@ bgfx_target::bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uin
 		uint32_t filter_mode = filter ? (BGFX_SAMPLER_MIN_ANISOTROPIC | BGFX_SAMPLER_MAG_ANISOTROPIC) : (BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT);
 		uint32_t depth_flags = wrap_mode | (BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT);
 
-		printf("Creating %sfiltered target %s, for screen %d, %dx%d\n", filter ? "" : "un", m_name.c_str(), (int)screen, (int)width, (int)height);
 		m_textures = new bgfx::TextureHandle[m_page_count * 2];
 		m_targets = new bgfx::FrameBufferHandle[m_page_count];
 		for (int page = 0; page < m_page_count; page++)
@@ -80,7 +79,6 @@ bgfx_target::bgfx_target(void *handle, uint16_t width, uint16_t height)
 	m_targets = new bgfx::FrameBufferHandle[1];
 	m_targets[0] = bgfx::createFrameBuffer(handle, width, height, bgfx::TextureFormat::Count, bgfx::TextureFormat::D32F);
 
-	printf("Creating backbuffer target, %dx%d\n", (int)width, (int)height);
 	// No backing texture
 }
 

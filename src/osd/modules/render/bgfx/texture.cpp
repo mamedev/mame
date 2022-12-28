@@ -44,7 +44,6 @@ bgfx_texture::bgfx_texture(std::string name, bgfx::TextureFormat::Enum format, u
 	, m_width_div_factor(width_div_factor)
 	, m_width_mul_factor(width_mul_factor)
 {
-	printf("Creating %d,%d texture\n", (int)width, (int)height);
 	int adjusted_width = (m_rowpixels * m_width_mul_factor) / m_width_div_factor;
 	bgfx::TextureInfo info;
 	bgfx::calcTextureSize(info, adjusted_width, height, 1, false, false, 1, format);

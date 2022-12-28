@@ -48,41 +48,8 @@ void bgfx_effect::submit(int view, uint64_t blend)
 	{
 		(uniform_pair.second)->upload();
 	}
+
 	const uint64_t final_state = (blend != ~0ULL) ? ((m_state & ~BGFX_STATE_BLEND_MASK) | blend) : m_state;
-	printf("                Effect %s is submitting with final state %08x%08x (m_state %08x%08x)\n", m_name.c_str(), (uint32_t)(final_state >> 32), (uint32_t)final_state, (uint32_t)(m_state >> 32), (uint32_t)m_state);
-
-	static const char* const BLEND_NAMES[16] =
-	{
-		"N/A (0)",
-		"ZERO",
-		"ONE",
-		"SRC_COLOR",
-		"INV_SRC_COLOR",
-		"SRC_ALPHA",
-		"INV_SRC_ALPHA",
-		"DST_ALPHA",
-		"INV_DST_ALPHA",
-		"DST_COLOR",
-		"INV_DST_COLOR",
-		"SRC_ALPHA_SAT",
-		"FACTOR",
-		"INV_FACTOR",
-		"N/A (E)",
-		"N/A (F)"
-	};
-	uint16_t blend_info = uint16_t(final_state >> 12);
-	if (blend_info == 0)
-	{
-		printf("                    Blending is disabled (direct copy to output)\n");
-	}
-	else
-	{
-		printf("                    Src Color: %s\n", BLEND_NAMES[blend_info & 0x000f]);
-		printf("                    Dst Color: %s\n", BLEND_NAMES[(blend_info >> 4) & 0x000f]);
-		printf("                    Src Alpha: %s\n", BLEND_NAMES[(blend_info >> 8) & 0x000f]);
-		printf("                    Dst Alpha: %s\n", BLEND_NAMES[(blend_info >> 12) & 0x000f]);
-	}
-
 	bgfx::setState(final_state);
 	bgfx::submit(view, m_program_handle);
 }

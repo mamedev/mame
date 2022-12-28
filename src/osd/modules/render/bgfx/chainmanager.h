@@ -103,6 +103,7 @@ private:
 
 	void init_texture_converters();
 
+	void get_default_chain_info(std::string &out_chain_name, int32_t &out_chain_index);
 	void refresh_available_chains();
 	void destroy_unloaded_chains();
 	void find_available_chains(std::string root, std::string path);
@@ -128,6 +129,7 @@ private:
 	uint16_t                    m_max_prescale_size;
 	slider_dirty_notifier&      m_slider_notifier;
 	uint32_t                    m_screen_count;
+	int32_t                     m_default_chain_index;
 	std::vector<chain_desc>     m_available_chains;
 	std::vector<bgfx_chain*>    m_screen_chains;
 	std::vector<std::string>    m_chain_names;

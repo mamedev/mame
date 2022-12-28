@@ -68,6 +68,7 @@ chain_manager::chain_manager(running_machine& machine, osd_options& options, tex
 	, m_max_prescale_size(max_prescale_size)
 	, m_slider_notifier(slider_notifier)
 	, m_screen_count(0)
+	, m_default_chain_index(-1)
 {
 	m_converters.clear();
 	refresh_available_chains();
@@ -90,6 +91,20 @@ void chain_manager::init_texture_converters()
 	m_adjuster = m_effects.get_or_load_effect(m_options, "misc/bcg_adjust");
 }
 
+void chain_manager::get_default_chain_info(std::string &out_chain_name, int32_t &out_chain_index)
+{
+	if (m_default_chain_index == -1)
+	{
+		out_chain_index = CHAIN_NONE;
+		out_chain_name = "";
+		return;
+	}
+
+	out_chain_index = m_default_chain_index;
+	out_chain_name = "default";
+	return;
+}
+
 void chain_manager::refresh_available_chains()
 {
 	m_available_chains.clear();
@@ -97,6 +112,16 @@ void chain_manager::refresh_available_chains()
 
 	const std::string chains_path  = util::string_format("%s" PATH_SEPARATOR "chains", m_options.bgfx_path());
 	find_available_chains(chains_path, "");
+	if (m_default_chain_index == -1)
+	{
+		for (size_t i = 0; i < m_available_chains.size(); i++)
+		{
+			if (m_available_chains[i].m_name == "default")
+			{
+				m_default_chain_index = int32_t(i);
+			}
+		}
+	}
 
 	destroy_unloaded_chains();
 }
@@ -115,8 +140,7 @@ void chain_manager::destroy_unloaded_chains()
 				{
 					delete m_screen_chains[i];
 					m_screen_chains[i] = nullptr;
-					m_chain_names[i] = "";
-					m_current_chain[i] = CHAIN_NONE;
+					get_default_chain_info(m_chain_names[i], m_current_chain[i]);
 					break;
 				}
 			}
@@ -335,7 +359,7 @@ void chain_manager::process_screen_quad(uint32_t view, uint32_t screen, screen_p
 	}
 
 	bgfx_chain* chain = screen_chain(screen);
-	chain->process(prim, view, screen, m_textures, window, bgfx_util::get_blend_state(PRIMFLAG_GET_BLENDMODE(prim.m_flags)));
+	chain->process(prim, view, screen, m_textures, window);
 	view += chain->applicable_passes();
 }
 
@@ -384,8 +408,12 @@ void chain_manager::update_screen_count(uint32_t screen_count)
 		while (m_screen_chains.size() < m_screen_count)
 		{
 			m_screen_chains.push_back(nullptr);
-			m_chain_names.push_back("");
-			m_current_chain.push_back(CHAIN_NONE);
+
+			int32_t chain_index = CHAIN_NONE;
+			std::string chain_name = "";
+			get_default_chain_info(chain_name, chain_index);
+			m_chain_names.push_back(chain_name);
+			m_current_chain.push_back(chain_index);
 		}
 
 		// Ensure we have a screen chain selection slider per screen
@@ -550,17 +578,16 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 			}
 		}
 
-		const bool has_tint = (prim.m_prim->color.a != 1.0f) || (prim.m_prim->color.r != 1.0f) || (prim.m_prim->color.g != 1.0f) || (prim.m_prim->color.b != 1.0f);
 		bgfx_chain* chain = screen_chain(screen);
 		if (chain && needs_adjust && !chain->has_adjuster())
 		{
-			const bool apply_tint = !needs_conversion && has_tint;
+			const bool apply_tint = !needs_conversion;
 			chain->insert_effect(chain->has_converter() ? 1 : 0, m_adjuster, apply_tint, "XXadjust", needs_conversion ? "screen" : "source", *this);
 			chain->set_has_adjuster(true);
 		}
 		if (chain && needs_conversion && !chain->has_converter())
 		{
-			chain->insert_effect(0, m_converters[src_format], has_tint, "XXconvert", "source", *this);
+			chain->insert_effect(0, m_converters[src_format], true, "XXconvert", "source", *this);
 			chain->set_has_converter(true);
 		}
 	}
@@ -570,7 +597,6 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 
 uint32_t chain_manager::process_screen_chains(uint32_t view, osd_window& window)
 {
-	printf("\nProcessing screen chains\n");
 	// Process each screen as necessary
 	uint32_t used_views = 0;
 	uint32_t screen_index = 0;
@@ -578,12 +604,9 @@ uint32_t chain_manager::process_screen_chains(uint32_t view, osd_window& window)
 	{
 		if (m_current_chain[screen_index] == CHAIN_NONE || screen_chain(screen_index) == nullptr)
 		{
-			printf("    Screen %d has no chain, skipping it\n", (int)screen_index);
 			screen_index++;
 			continue;
 		}
-
-		printf("\nProcessing screen %d\n\n", (int)screen_index);
 
 		uint16_t screen_width = prim.m_screen_width;
 		uint16_t screen_height = prim.m_screen_height;

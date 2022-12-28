@@ -54,7 +54,6 @@ bgfx_target* target_manager::create_target(std::string name, bgfx::TextureFormat
 	if (iter != m_targets.end())
 		destroy_target(name, screen);
 
-	printf("target_manager creating %sfiltered target %s, for screen %d, %dx%d\n", filter ? "" : "un", name.c_str(), (int)screen, (int)width, (int)height);
 	bgfx_target *target = new bgfx_target(name, format, width, height, xprescale, yprescale, style, double_buffer, filter, scale, screen);
 	m_targets[full_name] = target;
 	m_textures.add_provider(full_name, target);

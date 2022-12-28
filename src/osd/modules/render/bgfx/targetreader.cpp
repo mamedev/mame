@@ -55,7 +55,6 @@ bgfx_target* target_reader::read_from_value(const Value& value, std::string pref
 			{
 				xprescale = user_prescale;
 				yprescale = user_prescale;
-				printf("max prescale size: %d\n", (int)max_prescale_size);
 				bgfx_util::find_prescale_factor(width, height, max_prescale_size, xprescale, yprescale);
 			}
 			break;
