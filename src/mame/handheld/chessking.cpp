@@ -31,11 +31,15 @@ LCD module:
 
 #include "emu.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/nec/nec.h"
+#include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "sound/beep.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 namespace {
@@ -48,7 +52,10 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_mainram(*this, "mainram"),
-		m_beeper(*this, "beeper")
+		m_videoram(*this, "videoram"),
+		m_beeper(*this, "beeper"),
+		m_mainbank(*this, "mainbank"),
+		m_cart(*this, "cartslot")
 	{ }
 
 	void chesskng(machine_config &config);
@@ -60,10 +67,16 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_mainram;
+	required_shared_ptr<uint8_t> m_videoram;
 	required_device<beep_device> m_beeper;
+	required_device<address_map_bank_device> m_mainbank;
+	required_device<generic_slot_device> m_cart;
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void chesskng_map(address_map &map);
 	void chesskng_io(address_map &map);
+	void mainbank_map(address_map &map);
 
 	void update_beeper();
 
@@ -91,8 +104,25 @@ void chessking_state::machine_start()
 {
 	save_item(NAME(m_3f_data));
 	save_item(NAME(m_beeper_freq));
+
+	m_mainbank->set_bank(0);
 }
 
+DEVICE_IMAGE_LOAD_MEMBER(chessking_state::cart_load)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+	uint8_t* base = memregion("cart")->base();
+
+	if (size != 0x200000)
+	{
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
+		return image_init_result::FAIL;
+	}
+
+	m_cart->common_load_rom(base, size, "rom");
+
+	return image_init_result::PASS;
+}
 
 
 /******************************************************************************
@@ -110,8 +140,8 @@ uint32_t chessking_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			// 2 256x256 images (160x160 area used) one at c000, one at e000 to form 2bpp graphics
-			uint8_t data = m_mainram[0xc000 + offset + x/8];
-			uint8_t data2 = m_mainram[0xe000 + offset + x/8];
+			uint8_t data = m_videoram[0x4000 + offset + x/8];
+			uint8_t data2 = m_videoram[0x6000 + offset + x/8];
 
 			int xx = x % 8;
 
@@ -181,6 +211,7 @@ void chessking_state::cart_bank_w(uint8_t data)
 {
 	// writes values from 0x07 to 0x00 before checking cartridge
 	//logerror("%s: 7f write %02x\n", machine().describe_context(), data);
+	m_mainbank->set_bank(data & 0x7);
 }
 
 
@@ -221,9 +252,11 @@ void chessking_state::update_beeper()
 
 void chessking_state::chesskng_map(address_map &map)
 {
-	map(0x00000, 0x0ffff).ram().share(m_mainram);
-	map(0x80000, 0x9ffff).rom().region("maincpu", 0x00000);
-	// gap in ROM space?
+	map(0x00000, 0x07fff).ram().share(m_mainram);  // 2x SRM20256 RAM
+	map(0x08000, 0x0ffff).ram().share(m_videoram); //  
+
+	map(0x20000, 0x9ffff).m(m_mainbank, FUNC(address_map_bank_device::amap8));
+	// gap in memory space?
 	map(0xe0000, 0xfffff).rom().region("maincpu", 0x20000);
 }
 
@@ -242,6 +275,26 @@ void chessking_state::chesskng_io(address_map &map)
 	map(0xaf, 0xaf).w(FUNC(chessking_state::beeper_enable_w));
 }
 
+void chessking_state::mainbank_map(address_map &map)
+{
+//	map(0x000000, 0x07ffff);
+//  map(0x060000, 0x07ffff).rom().region("maincpu", 0x000000);
+
+//	map(0x080000, 0x0fffff);
+  	map(0x0e0000, 0x0fffff).rom().region("maincpu", 0x000000);
+
+	map(0x200000, 0x25ffff).rom().region("cart", 0x020000);
+	map(0x260000, 0x27ffff).rom().region("cart", 0x000000);
+
+	map(0x280000, 0x2dffff).rom().region("cart", 0x0a0000);
+	map(0x2e0000, 0x2fffff).rom().region("cart", 0x080000);
+
+	map(0x300000, 0x35ffff).rom().region("cart", 0x120000);
+	map(0x360000, 0x36ffff).rom().region("cart", 0x100000);
+
+	map(0x380000, 0x3dffff).rom().region("cart", 0x1a0000);
+   	map(0x3e0000, 0x3fffff).rom().region("cart", 0x180000);                            
+}
 
 
 /******************************************************************************
@@ -296,7 +349,12 @@ void chessking_state::chesskng(machine_config &config)
 	BEEP(config, m_beeper, 0);
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	// Has a cartridge slot
+	ADDRESS_MAP_BANK(config, "mainbank").set_map(&chessking_state::mainbank_map).set_options(ENDIANNESS_LITTLE, 8, 26, 0x80000);
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "chessking_cart");
+	m_cart->set_device_load(FUNC(chessking_state::cart_load));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("chessking_cart");
 }
 
 
@@ -308,6 +366,8 @@ void chessking_state::chesskng(machine_config &config)
 ROM_START( chesskng )
 	ROM_REGION( 0x040000, "maincpu", 0 )
 	ROM_LOAD( "etmate-cch.u6", 0x000000, 0x040000, CRC(a4d1764b) SHA1(ccfae1e985f6ad316ff192206fbc0f8bcd4e44d5) )
+
+	ROM_REGION( 0x200000, "cart", ROMREGION_ERASE00 )
 ROM_END
 
 } // anonymous namespace
