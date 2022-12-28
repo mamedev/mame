@@ -9,7 +9,6 @@ TODO:
 - lots of unknown writes
 - sound emulation is guessed
 - LCD chip(s) is not emulated, maybe the I/O chip does a DMA from main RAM to the LCD?
-- simplify cartridge, no need to go through address map bank
 
 Hardware notes:
 
@@ -34,7 +33,6 @@ LCD module:
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/nec/nec.h"
-#include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "sound/beep.h"
 
@@ -51,10 +49,10 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
+		m_mainrom(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
 		m_videoram(*this, "videoram"),
 		m_beeper(*this, "beeper"),
-		m_mainbank(*this, "mainbank"),
 		m_cart(*this, "cartslot")
 	{ }
 
@@ -66,63 +64,47 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_region_ptr<uint8_t> m_mainrom;
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_device<beep_device> m_beeper;
-	required_device<address_map_bank_device> m_mainbank;
 	required_device<generic_slot_device> m_cart;
-
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void chesskng_map(address_map &map);
 	void chesskng_io(address_map &map);
-	void mainbank_map(address_map &map);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+	uint8_t cartridge_r(offs_t offset);
+	void cart_bank_w(uint8_t data);
 
 	void update_beeper();
-
-	void unk_1f_w(uint8_t data);
-	void unk_2f_w(uint8_t data);
-	uint8_t unk_3f_r();
-	void unk_3f_w(uint8_t data);
-	void irq_clear_w(uint8_t data);
-	void unk_5f_w(uint8_t data);
-	void unk_6f_w(uint8_t data);
-	void cart_bank_w(uint8_t data);
 	void beeper_freq_low_w(uint8_t data);
 	void beeper_freq_high_w(uint8_t data);
 	void beeper_enable_w(uint8_t data);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
+	void irq_clear_w(uint8_t data);
+	void unk_1f_w(uint8_t data);
+	void unk_2f_w(uint8_t data);
+	uint8_t unk_3f_r();
+	void unk_3f_w(uint8_t data);
+	void unk_5f_w(uint8_t data);
+	void unk_6f_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint8_t m_3f_data = 0;
+	uint8_t m_cart_bank = 0;
 	uint16_t m_beeper_freq = 0;
 };
 
 void chessking_state::machine_start()
 {
 	save_item(NAME(m_3f_data));
+	save_item(NAME(m_cart_bank));
 	save_item(NAME(m_beeper_freq));
-
-	m_mainbank->set_bank(0);
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(chessking_state::cart_load)
-{
-	uint32_t size = m_cart->common_get_size("rom");
-	uint8_t* base = memregion("cart")->base();
-
-	if (size != 0x200000)
-	{
-		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
-
-	m_cart->common_load_rom(base, size, "rom");
-
-	return image_init_result::PASS;
-}
 
 
 /******************************************************************************
@@ -159,63 +141,8 @@ uint32_t chessking_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 
 
 /******************************************************************************
-    I/O
+    Sound
 ******************************************************************************/
-
-// misc/unknown
-
-void chessking_state::unk_1f_w(uint8_t data)
-{
-	// writes at start-up only
-	logerror("%s: 1f write %02x\n", machine().describe_context(), data);
-}
-
-void chessking_state::unk_2f_w(uint8_t data)
-{
-	// writes at start-up only
-	logerror("%s: 2f write %02x\n", machine().describe_context(), data);
-}
-
-uint8_t chessking_state::unk_3f_r()
-{
-	// could this be the volume dial? gets used for writes to 0xaf
-	// - unlikely as there's little reason for it to work this way
-	return m_3f_data;
-}
-
-void chessking_state::unk_3f_w(uint8_t data)
-{
-	// writes frequently, at the same times as 7f/8f/9f/af writes, note address is also read
-	//logerror("%s: 3f write %02x\n", machine().describe_context(), data);
-	m_3f_data = data;
-}
-
-void chessking_state::irq_clear_w(uint8_t data)
-{
-	// writes here at the start of irq routine
-	m_maincpu->set_input_line(0, CLEAR_LINE);
-}
-
-void chessking_state::unk_5f_w(uint8_t data)
-{
-	// writes at start-up only
-	logerror("%s: 5f write %02x\n", machine().describe_context(), data);
-}
-
-void chessking_state::unk_6f_w(uint8_t data)
-{
-	logerror("%s: 6f write %02x\n", machine().describe_context(), data);
-}
-
-void chessking_state::cart_bank_w(uint8_t data)
-{
-	// writes values from 0x07 to 0x00 before checking cartridge
-	//logerror("%s: 7f write %02x\n", machine().describe_context(), data);
-	m_mainbank->set_bank(data & 0x7);
-}
-
-
-// sound
 
 void chessking_state::beeper_freq_low_w(uint8_t data)
 {
@@ -240,8 +167,93 @@ void chessking_state::beeper_enable_w(uint8_t data)
 
 void chessking_state::update_beeper()
 {
+	uint16_t freq = (~m_beeper_freq & 0x1ff) + 1;
 	double step = (9.6_MHz_XTAL).dvalue() / 0x100000;
-	m_beeper->set_clock(((0xffff ^ m_beeper_freq) + 1) * step);
+	m_beeper->set_clock(freq * step);
+}
+
+
+
+/******************************************************************************
+    Cartridge
+******************************************************************************/
+
+DEVICE_IMAGE_LOAD_MEMBER(chessking_state::cart_load)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
+uint8_t chessking_state::cartridge_r(offs_t offset)
+{
+	// bank 1 selects main rom
+	if (m_cart_bank == 1)
+		return m_mainrom[offset & 0x1ffff];
+
+	else if (m_cart_bank & 4)
+		return m_cart->read_rom(offset | (m_cart_bank & 3) << 19);
+
+	return 0;
+}
+
+void chessking_state::cart_bank_w(uint8_t data)
+{
+	m_cart_bank = data & 0x7;
+}
+
+
+
+/******************************************************************************
+    Misc I/O
+******************************************************************************/
+
+INTERRUPT_GEN_MEMBER(chessking_state::interrupt)
+{
+	device.execute().set_input_line_and_vector(0, ASSERT_LINE, 0x20/4);
+}
+
+void chessking_state::irq_clear_w(uint8_t data)
+{
+	// writes here at the start of irq routine
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
+void chessking_state::unk_1f_w(uint8_t data)
+{
+	// writes at start-up only
+	logerror("%s: 1f write %02x\n", machine().describe_context(), data);
+}
+
+void chessking_state::unk_2f_w(uint8_t data)
+{
+	// writes at start-up only
+	logerror("%s: 2f write %02x\n", machine().describe_context(), data);
+}
+
+uint8_t chessking_state::unk_3f_r()
+{
+	return m_3f_data;
+}
+
+void chessking_state::unk_3f_w(uint8_t data)
+{
+	// writes frequently, at the same times as 7f/8f/9f/af writes, note address is also read
+	//logerror("%s: 3f write %02x\n", machine().describe_context(), data);
+	m_3f_data = data;
+}
+
+void chessking_state::unk_5f_w(uint8_t data)
+{
+	// writes at start-up only
+	logerror("%s: 5f write %02x\n", machine().describe_context(), data);
+}
+
+void chessking_state::unk_6f_w(uint8_t data)
+{
+	logerror("%s: 6f write %02x\n", machine().describe_context(), data);
 }
 
 
@@ -252,12 +264,12 @@ void chessking_state::update_beeper()
 
 void chessking_state::chesskng_map(address_map &map)
 {
+	map(0x00000, 0x7ffff).mirror(0x80000).r(FUNC(chessking_state::cartridge_r));
+	map(0x00000, 0x1ffff).unmapr();
+
 	map(0x00000, 0x07fff).ram().share(m_mainram); // SRM20256, battery-backed
 	map(0x08000, 0x0ffff).ram().share(m_videoram); // SRM20256
 
-	map(0x20000, 0x9ffff).m(m_mainbank, FUNC(address_map_bank_device::amap8));
-
-	// gap in memory space?
 	map(0xe0000, 0xfffff).rom().region("maincpu", 0x20000);
 }
 
@@ -276,26 +288,6 @@ void chessking_state::chesskng_io(address_map &map)
 	map(0xaf, 0xaf).w(FUNC(chessking_state::beeper_enable_w));
 }
 
-void chessking_state::mainbank_map(address_map &map)
-{
-//	map(0x000000, 0x07ffff);
-//  map(0x060000, 0x07ffff).rom().region("maincpu", 0x000000);
-
-//	map(0x080000, 0x0fffff);
-  	map(0x0e0000, 0x0fffff).rom().region("maincpu", 0x000000);
-
-	map(0x200000, 0x25ffff).rom().region("cart", 0x020000);
-	map(0x260000, 0x27ffff).rom().region("cart", 0x000000);
-
-	map(0x280000, 0x2dffff).rom().region("cart", 0x0a0000);
-	map(0x2e0000, 0x2fffff).rom().region("cart", 0x080000);
-
-	map(0x300000, 0x35ffff).rom().region("cart", 0x120000);
-	map(0x360000, 0x37ffff).rom().region("cart", 0x100000);
-
-	map(0x380000, 0x3dffff).rom().region("cart", 0x1a0000);
-   	map(0x3e0000, 0x3fffff).rom().region("cart", 0x180000);
-}
 
 
 /******************************************************************************
@@ -319,11 +311,6 @@ INPUT_PORTS_END
 /******************************************************************************
     Machine Configs
 ******************************************************************************/
-
-INTERRUPT_GEN_MEMBER(chessking_state::interrupt)
-{
-	device.execute().set_input_line_and_vector(0, ASSERT_LINE, 0x20/4);
-}
 
 void chessking_state::chesskng(machine_config &config)
 {
@@ -351,9 +338,7 @@ void chessking_state::chesskng(machine_config &config)
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	// Cartridge
-	ADDRESS_MAP_BANK(config, "mainbank").set_map(&chessking_state::mainbank_map).set_options(ENDIANNESS_LITTLE, 8, 26, 0x80000);
-
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "chessking_cart");
+	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "chessking_cart");
 	m_cart->set_device_load(FUNC(chessking_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("chessking_cart");
@@ -368,8 +353,6 @@ void chessking_state::chesskng(machine_config &config)
 ROM_START( chesskng )
 	ROM_REGION( 0x040000, "maincpu", 0 )
 	ROM_LOAD( "etmate-cch.u6", 0x000000, 0x040000, CRC(a4d1764b) SHA1(ccfae1e985f6ad316ff192206fbc0f8bcd4e44d5) )
-
-	ROM_REGION( 0x200000, "cart", ROMREGION_ERASE00 )
 ROM_END
 
 } // anonymous namespace
