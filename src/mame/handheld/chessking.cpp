@@ -166,7 +166,7 @@ void chessking_state::beeper_enable_w(uint8_t data)
 void chessking_state::update_beeper()
 {
 	uint16_t freq = (~m_beeper_freq & 0x1ff) + 1;
-	double step = (9.6_MHz_XTAL).dvalue() / 0x100000;
+	double step = (9.6_MHz_XTAL).dvalue() / 0x200000;
 	m_beeper->set_clock(freq * step);
 }
 
