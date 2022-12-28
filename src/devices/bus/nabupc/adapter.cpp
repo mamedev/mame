@@ -276,14 +276,6 @@ void network_adapter::postload()
 image_init_result network_adapter::call_load()
 {
 	if (is_filetype("pak")) {
-/*
-		std::error_condition err = m_cache.read_archive(image_core_file(), 1);
-		if (!err) {
-			printf("Segment Opened: %s size: %d\n", "000001.nabu", m_cache.size());
-		} else {
-			printf("Segment Opened Failed: %d\n", err.value());
-		}
-		*/
 		return image_init_result::PASS;
 	}
 	seterror(image_error::INVALIDIMAGE);
