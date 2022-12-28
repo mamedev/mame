@@ -290,7 +290,7 @@ void chessking_state::mainbank_map(address_map &map)
 	map(0x2e0000, 0x2fffff).rom().region("cart", 0x080000);
 
 	map(0x300000, 0x35ffff).rom().region("cart", 0x120000);
-	map(0x360000, 0x36ffff).rom().region("cart", 0x100000);
+	map(0x360000, 0x37ffff).rom().region("cart", 0x100000);
 
 	map(0x380000, 0x3dffff).rom().region("cart", 0x1a0000);
    	map(0x3e0000, 0x3fffff).rom().region("cart", 0x180000);                            
