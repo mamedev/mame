@@ -174,7 +174,8 @@ shaders::shaders() :
 	post_fx_enable(false),
 	oversampling_enable(false),
 	num_screens(0),
-	curr_screen(0),
+	num_targets(0),
+	curr_target(0),
 	acc_t(0),
 	delta_t(0),
 	shadow_texture(nullptr),
@@ -213,6 +214,7 @@ shaders::shaders() :
 	curr_poly(nullptr),
 	d3dx_create_effect_from_file_ptr(nullptr)
 {
+	std::fill(std::begin(target_to_screen), std::end(target_to_screen), 0);
 }
 
 
@@ -496,8 +498,6 @@ bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 	this->machine = machine;
 	this->d3d = renderer;
 
-	enumerate_screens();
-
 	auto &winoptions = downcast<windows_options &>(machine->options());
 
 	post_fx_enable = winoptions.d3d_hlsl_enable();
@@ -613,11 +613,51 @@ bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 
 
 //============================================================
+//  shaders::begin_frame
+//
+//  Enumerates the total number of screen textures present.
+//
+//  Additionally, ensures the presence of necessary post-
+//  processing geometry.
+//
+//============================================================
+
+void shaders::begin_frame(render_primitive_list *primlist)
+{
+	init_fsfx_quad();
+
+	std::fill(std::begin(target_to_screen), std::end(target_to_screen), 0);
+	std::fill(std::begin(targets_per_screen), std::end(targets_per_screen), 0);
+	render_container *containers[std::size(target_to_screen)];
+
+	// Maximum potential runtime O(max_num_targets^2)
+	num_targets = 0;
+	num_screens = 0;
+	curr_target = 0;
+	for (render_primitive &prim : *primlist)
+	{
+		if (PRIMFLAG_GET_SCREENTEX(prim.flags))
+		{
+			containers[num_targets] = prim.container;
+			int screen_index = 0;
+			for (; screen_index < num_screens && containers[screen_index] != prim.container; screen_index++);
+			target_to_screen[num_targets] = screen_index;
+			targets_per_screen[screen_index]++;
+			if (screen_index >= num_screens)
+				num_screens++;
+			num_targets++;
+		}
+	}
+}
+
+
+//============================================================
 //  shaders::init_fsfx_quad
 //
 //  Called always at the start of each frame so that the two
 //  triangles used for the post-processing effects are always
-//  at the beginning of the vertex buffer
+//  at the beginning of the vertex buffer.
+//
 //============================================================
 
 void shaders::init_fsfx_quad()
@@ -940,7 +980,7 @@ void shaders::begin_draw()
 		return;
 	}
 
-	curr_screen = 0;
+	curr_target = 0;
 	curr_effect = default_effect;
 	// Update for delta_time
 	t = machine->time().as_double();
@@ -1114,6 +1154,9 @@ int shaders::color_convolution_pass(d3d_render_target *rt, int source_index, pol
 
 	curr_effect = color_effect;
 	curr_effect->update_uniforms();
+	uint32_t tint = (uint32_t)poly->tint();
+	float prim_tint[3] = { ((tint >> 16) & 0xff) / 255.0f, ((tint >> 8) & 0xff) / 255.0f, (tint & 0xff) / 255.0f };
+	curr_effect->set_vector("PrimTint", 3, prim_tint);
 
 	// initial "Diffuse" texture is set in shaders::set_texture() or the result of shaders::ntsc_pass()
 
@@ -1170,7 +1213,7 @@ int shaders::scanline_pass(d3d_render_target *rt, int source_index, poly_info *p
 
 	auto win = d3d->assert_window();
 	screen_device_enumerator screen_iterator(machine->root_device());
-	screen_device *screen = screen_iterator.byindex(curr_screen);
+	screen_device *screen = screen_iterator.byindex(target_to_screen[curr_target]);
 	render_container &screen_container = screen->container();
 	float xscale = 1.0f / screen_container.xscale();
 	float yscale = 1.0f / screen_container.yscale();
@@ -1251,7 +1294,7 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 	auto win = d3d->assert_window();
 
 	screen_device_enumerator screen_iterator(machine->root_device());
-	screen_device *screen = screen_iterator.byindex(curr_screen);
+	screen_device *screen = screen_iterator.byindex(target_to_screen[curr_target]);
 	render_container &screen_container = screen->container();
 
 	float xscale = 1.0f / screen_container.xscale();
@@ -1508,9 +1551,9 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 			return;
 		}
 
-		curr_screen = curr_screen < num_screens ? curr_screen : 0;
+		curr_target = curr_target < num_targets ? curr_target : 0;
 
-		curr_render_target = find_render_target(curr_texture->get_width(), curr_texture->get_height(), curr_screen);
+		curr_render_target = find_render_target(curr_texture->get_width(), curr_texture->get_height(), curr_target);
 
 		d3d_render_target *rt = curr_render_target;
 		if (rt == nullptr)
@@ -1551,11 +1594,11 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		curr_texture->increment_frame_count();
 		curr_texture->mask_frame_count(options->yiq_phase_count);
 
-		curr_screen++;
+		curr_target++;
 	}
 	else if (PRIMFLAG_GET_VECTOR(poly->flags()))
 	{
-		curr_screen = curr_screen < num_screens ? curr_screen : 0;
+		curr_target = curr_target < num_targets ? curr_target : 0;
 
 		int source_width = int(poly->prim_width() + 0.5f);
 		int source_height = int(poly->prim_height() + 0.5f);
@@ -1563,7 +1606,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		{
 			std::swap(source_width, source_height);
 		}
-		curr_render_target = find_render_target(source_width, source_height, curr_screen);
+		curr_render_target = find_render_target(source_width, source_height, curr_target);
 
 		d3d_render_target *rt = curr_render_target;
 		if (rt == nullptr)
@@ -1582,11 +1625,11 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 		}
 
-		curr_screen++;
+		curr_target++;
 	}
 	else if (PRIMFLAG_GET_VECTORBUF(poly->flags()))
 	{
-		curr_screen = curr_screen < num_screens ? curr_screen : 0;
+		curr_target = curr_target < num_targets ? curr_target : 0;
 
 		int source_width = int(poly->prim_width() + 0.5f);
 		int source_height = int(poly->prim_height() + 0.5f);
@@ -1594,7 +1637,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		{
 			std::swap(source_width, source_height);
 		}
-		curr_render_target = find_render_target(source_width, source_height, curr_screen);
+		curr_render_target = find_render_target(source_width, source_height, curr_target);
 
 		d3d_render_target *rt = curr_render_target;
 		if (rt == nullptr)
@@ -1629,7 +1672,7 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		next_index = screen_pass(rt, next_index, poly, vertnum);
 		d3d->set_wrap(PRIMFLAG_GET_TEXWRAP(curr_texture->get_flags()) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
 
-		curr_screen++;
+		curr_target++;
 	}
 	else
 	{
@@ -1792,16 +1835,6 @@ bool shaders::add_render_target(renderer_d3d9* d3d, render_primitive *prim, int 
 	m_render_target_list.push_back(std::move(target));
 
 	return true;
-}
-
-
-//============================================================
-//  shaders::enumerate_screens
-//============================================================
-void shaders::enumerate_screens()
-{
-	screen_device_enumerator iter(machine->root_device());
-	num_screens = iter.count();
 }
 
 

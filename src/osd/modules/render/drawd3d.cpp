@@ -667,7 +667,7 @@ void renderer_d3d9::begin_frame()
 		osd_printf_verbose("Direct3D: Error %08lX during device BeginScene call\n", result);
 
 	if (m_shaders->enabled())
-		m_shaders->init_fsfx_quad();
+		m_shaders->begin_frame(win->m_primlist);
 }
 
 void renderer_d3d9::process_primitives()
@@ -1412,6 +1412,7 @@ void renderer_d3d9::batch_vectors(int vector_count)
 	int triangle_count = vector_count * 2;
 	m_vectorbatch = mesh_alloc(vertex_count);
 	m_batchindex = 0;
+	uint32_t tint = 0xffffffff;
 
 	uint32_t cached_flags = 0;
 	for (render_primitive &prim : *win->m_primlist)
@@ -1423,6 +1424,12 @@ void renderer_d3d9::batch_vectors(int vector_count)
 				{
 					batch_vector(prim);
 					cached_flags = prim.flags;
+
+					const uint8_t a = (uint8_t)std::round(prim.color.a * 255);
+					const uint8_t r = (uint8_t)std::round(prim.color.r * 255);
+					const uint8_t g = (uint8_t)std::round(prim.color.g * 255);
+					const uint8_t b = (uint8_t)std::round(prim.color.b * 255);
+					tint = (a << 24) | (b << 16) | (g << 8) | r;
 				}
 				break;
 
@@ -1433,6 +1440,12 @@ void renderer_d3d9::batch_vectors(int vector_count)
 					quad_height = prim.get_quad_height();
 					target_width = prim.get_full_quad_width();
 					target_height = prim.get_full_quad_height();
+
+					const uint8_t a = (uint8_t)std::round(prim.color.a * 255);
+					const uint8_t r = (uint8_t)std::round(prim.color.r * 255);
+					const uint8_t g = (uint8_t)std::round(prim.color.g * 255);
+					const uint8_t b = (uint8_t)std::round(prim.color.b * 255);
+					tint = (a << 24) | (b << 16) | (g << 8) | r;
 				}
 				break;
 
@@ -1510,7 +1523,7 @@ void renderer_d3d9::batch_vectors(int vector_count)
 	}
 
 	// now add a polygon entry
-	m_poly[m_numpolys].init(D3DPT_TRIANGLELIST, triangle_count, vertex_count, cached_flags, nullptr, D3DTOP_MODULATE, quad_width, quad_height);
+	m_poly[m_numpolys].init(D3DPT_TRIANGLELIST, triangle_count, vertex_count, cached_flags, nullptr, D3DTOP_MODULATE, quad_width, quad_height, tint);
 	m_numpolys++;
 }
 
@@ -1652,10 +1665,10 @@ void renderer_d3d9::draw_line(const render_primitive &prim)
 	vertex[3].v0 = stop.c.y;
 
 	// determine the color of the line
-	auto r = (int32_t)(prim.color.r * 255.0f);
-	auto g = (int32_t)(prim.color.g * 255.0f);
-	auto b = (int32_t)(prim.color.b * 255.0f);
-	auto a = (int32_t)(prim.color.a * 255.0f);
+	auto r = (int32_t)std::round(prim.color.r * 255.0f);
+	auto g = (int32_t)std::round(prim.color.g * 255.0f);
+	auto b = (int32_t)std::round(prim.color.b * 255.0f);
+	auto a = (int32_t)std::round(prim.color.a * 255.0f);
 	DWORD color = D3DCOLOR_ARGB(a, r, g, b);
 
 	// set the color, Z parameters to standard values
@@ -1667,7 +1680,7 @@ void renderer_d3d9::draw_line(const render_primitive &prim)
 	}
 
 	// now add a polygon entry
-	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, nullptr, D3DTOP_MODULATE, 0.0f, 0.0f);
+	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, nullptr, D3DTOP_MODULATE, 0.0f, 0.0f, (uint32_t)color);
 	m_numpolys++;
 }
 
@@ -1738,7 +1751,7 @@ void renderer_d3d9::draw_quad(const render_primitive &prim)
 	}
 
 	// now add a polygon entry
-	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, texture, D3DTOP_MODULATE, quad_width, quad_height);
+	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, texture, D3DTOP_MODULATE, quad_width, quad_height, (uint32_t)color);
 	m_numpolys++;
 }
 

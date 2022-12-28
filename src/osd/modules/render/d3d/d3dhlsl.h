@@ -305,6 +305,8 @@ public:
 	bool enabled() { return post_fx_enable && d3dintf->post_fx_available; }
 	void toggle() { post_fx_enable = initialized && !post_fx_enable; }
 
+	void begin_frame(render_primitive_list *primlist);
+
 	void begin_draw();
 	void end_draw();
 
@@ -337,7 +339,6 @@ public:
 
 private:
 	void                    blit(IDirect3DSurface9 *dst, bool clear_dst, D3DPRIMITIVETYPE prim_type, uint32_t prim_index, uint32_t prim_count);
-	void                    enumerate_screens();
 
 	void                    render_snapshot(IDirect3DSurface9 *surface);
 	// Time since last call, only updates once per render of all screens
@@ -372,7 +373,10 @@ private:
 	bool                    post_fx_enable;             // overall enable flag
 	bool                    oversampling_enable;        // oversampling enable flag
 	int                     num_screens;                // number of emulated physical screens
-	int                     curr_screen;                // current screen for render target operations
+	int                     num_targets;                // number of emulated screen targets (can be different from above; cf. artwork and Laserdisc games)
+	int                     curr_target;                // current target index for render target operations
+	int                     targets_per_screen[256];    // screen target count per screen device/container index; estimated maximum count for array size
+	int                     target_to_screen[256];      // lookup from target index to screen device/container index; estimated maximum count for array size
 	double                  acc_t;                      // accumulated machine time
 	double                  delta_t;                    // data for delta_time
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
