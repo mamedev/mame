@@ -2,20 +2,21 @@
 // copyright-holders:David Haywood, hap
 /*
 
-Chess King, LCD handheld presumably from Taiwan
+Chess King (棋王之王), LCD handheld presumably from Taiwan.
 Hold down u+d+l+r buttons at boot to enter a test/data clear mode of sorts.
 
 TODO:
 - lots of unknown writes
 - sound emulation is guessed
-- LCD chip(s) is not emulated, maybe the I/O chip does a DMA from main RAM to the LCD?
+- LCD chip(s) is not emulated, maybe the I/O chip does a DMA from RAM to the LCD?
+- chess game makes an illegal move sometimes, BTANB?
 
 Hardware notes:
 
 Main:
 - PCB label: TD-24
 - NEC D70108HG-10 V20, 9.600MHz XTAL
-- 64KB ROM (2*SRM20256), 256KB ROM (custom label)
+- 64KB RAM (2*SRM20256), 256KB ROM (custom label)
 - unknown 80 pin QFP, label CCH01 ET-MATE F3X0 713, assume custom I/O chip
 - 1-bit sound
 - cartridge slot
@@ -296,10 +297,10 @@ void chessking_state::chesskng_io(address_map &map)
 
 static INPUT_PORTS_START( chesskng )
 	PORT_START("BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SELECT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) // A
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) // B
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SELECT ) // SELECT / 選擇
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START ) // START / 啓動
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) // A / 確認 (confirm)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) // B / 回位 (return)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_16WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY
