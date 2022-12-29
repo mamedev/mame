@@ -2,12 +2,13 @@
 // copyright-holders:David Haywood, hap
 /*
 
-Chess King (棋王之王), LCD handheld presumably from Taiwan.
+Chess King (棋王之王), LCD handheld console presumably from Taiwan.
 Hold down u+d+l+r buttons at boot to enter a test/data clear mode of sorts.
 
 TODO:
 - lots of unknown writes
 - sound emulation is guessed
+- dump/add more cartridges? considering how unknown the handheld is, maybe only a handful were released
 - LCD chip(s) is not emulated, maybe the I/O chip does a DMA from RAM to the LCD?
 - chess game is buggy, assume that's just the way it is, aka BTANB
   eg. sometimes it makes an illegal move, or castling doesn't erase the king from its original spot
@@ -191,9 +192,11 @@ uint8_t chessking_state::cartridge_r(offs_t offset)
 	if (m_cart_bank == 1)
 		return m_mainrom[offset & 0x1ffff];
 
-	else if (m_cart_bank & 4)
+	// banks 4-7 go to cartridge
+	else if (m_cart_bank >= 4)
 		return m_cart->read_rom(offset | (m_cart_bank & 3) << 19);
 
+	// other banks: maybe cartridge too?
 	return 0;
 }
 
