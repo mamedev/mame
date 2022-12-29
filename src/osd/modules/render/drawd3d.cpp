@@ -242,7 +242,12 @@ int renderer_d3d9::draw(const int update)
 		return check;
 
 	begin_frame();
+
+	// reset blend mode
+	set_blendmode(BLENDMODE_NONE);
+
 	process_primitives();
+
 	end_frame();
 
 	return 0;
@@ -254,8 +259,12 @@ void renderer_d3d9::set_texture(texture_info *texture)
 	{
 		m_last_texture = texture;
 		m_last_texture_flags = (texture == nullptr ? 0 : texture->get_flags());
+		if (m_shaders->enabled())
+		{
+			m_shaders->set_texture(texture);
+		}
+
 		HRESULT result = m_device->SetTexture(0, (texture == nullptr) ? get_default_texture()->get_finaltex() : texture->get_finaltex());
-		m_shaders->set_texture(texture);
 		if (FAILED(result))
 			osd_printf_verbose("Direct3D: Error %08lX during device set_texture call\n", result);
 	}
@@ -353,15 +362,20 @@ void renderer_d3d9::set_blendmode(int blendmode)
 	}
 
 	// adjust the bits that changed
+	bool new_blend_enable = false;
 	if (blendenable != m_last_blendenable)
 	{
 		m_last_blendenable = blendenable;
+		if (blendenable)
+		{
+			new_blend_enable  = true;
+		}
 		HRESULT result = m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, blendenable);
 		if (FAILED(result))
 			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderState call\n", result);
 	}
 
-	if (blendop != m_last_blendop)
+	if (blendop != m_last_blendop || new_blend_enable)
 	{
 		m_last_blendop = blendop;
 		HRESULT result = m_device->SetRenderState(D3DRS_BLENDOP, blendop);
@@ -369,7 +383,7 @@ void renderer_d3d9::set_blendmode(int blendmode)
 			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderState call\n", result);
 	}
 
-	if (blendsrc != m_last_blendsrc)
+	if (blendsrc != m_last_blendsrc || new_blend_enable)
 	{
 		m_last_blendsrc = blendsrc;
 		HRESULT result = m_device->SetRenderState(D3DRS_SRCBLEND, blendsrc);
@@ -377,7 +391,7 @@ void renderer_d3d9::set_blendmode(int blendmode)
 			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderState call\n", result);
 	}
 
-	if (blenddst != m_last_blenddst)
+	if (blenddst != m_last_blenddst || new_blend_enable)
 	{
 		m_last_blenddst = blenddst;
 		HRESULT result = m_device->SetRenderState(D3DRS_DESTBLEND, blenddst);
@@ -722,6 +736,9 @@ void renderer_d3d9::end_frame()
 
 	// flush any pending polygons
 	primitive_flush_pending();
+
+	if (m_shaders->enabled())
+		m_shaders->end_frame();
 
 	// finish the scene
 	HRESULT result = m_device->EndScene();
@@ -1839,9 +1856,17 @@ void renderer_d3d9::primitive_flush_pending()
 			newfilter = FALSE;
 			if (PRIMFLAG_GET_SCREENTEX(flags))
 				newfilter = video_config.filter;
-			set_filter(newfilter);
-			set_wrap(PRIMFLAG_GET_TEXWRAP(flags) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
-			set_modmode(m_poly[polynum].modmode());
+
+			if (m_shaders->enabled())
+			{
+				m_shaders->set_filter(newfilter);
+			}
+			else
+			{
+				set_filter(newfilter);
+				set_wrap(PRIMFLAG_GET_TEXWRAP(flags) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
+				set_modmode(m_poly[polynum].modmode());
+			}
 		}
 
 		if (vertnum + m_poly[polynum].numverts() > m_numverts)
@@ -1854,9 +1879,6 @@ void renderer_d3d9::primitive_flush_pending()
 
 		if(m_shaders->enabled())
 		{
-			// reset blend mode (handled by shader passes)
-			set_blendmode(BLENDMODE_NONE);
-
 			m_shaders->render_quad(&m_poly[polynum], vertnum);
 		}
 		else

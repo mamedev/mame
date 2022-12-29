@@ -9,10 +9,12 @@
 #ifndef __WIN_D3DHLSL__
 #define __WIN_D3DHLSL__
 
-#include <vector>
 #include "../frontend/mame/ui/menuitem.h"
 #include "../frontend/mame/ui/slider.h"
 #include "modules/lib/osdlib.h"
+
+#include <vector>
+#include <map>
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -133,11 +135,8 @@ public:
 	effect(shaders *shadersys, IDirect3DDevice9 *dev, const char *name, const char *path);
 	~effect();
 
-	void        begin(UINT *passes, DWORD flags);
-	void        begin_pass(UINT pass);
-
+	void        begin(DWORD flags);
 	void        end();
-	void        end_pass();
 
 	void        set_technique(const char *name);
 
@@ -145,7 +144,6 @@ public:
 	void        set_float(D3DXHANDLE param, float value);
 	void        set_int(D3DXHANDLE param, int value);
 	void        set_bool(D3DXHANDLE param, bool value);
-	void        set_matrix(D3DXHANDLE param, D3DXMATRIX *matrix);
 	void        set_texture(D3DXHANDLE param, IDirect3DTexture9 *tex);
 
 	void        add_uniform(const char *name, uniform::uniform_type type, int id);
@@ -154,16 +152,26 @@ public:
 	D3DXHANDLE  get_parameter(D3DXHANDLE param, const char *name);
 
 	shaders*    get_shaders() { return m_shaders; }
+	uint32_t    num_passes() { return m_num_passes; }
 
 	bool        is_valid() { return m_valid; }
+	bool        is_active() { return m_active; }
 
 private:
 	std::vector<std::unique_ptr<uniform>> m_uniform_list;
 
 	ID3DXEffect *m_effect;
 	shaders     *m_shaders;
+	uint32_t     m_num_passes;
+
+	std::map<D3DXHANDLE, D3DXVECTOR4> m_vecs;
+	std::map<D3DXHANDLE, float> m_floats;
+	std::map<D3DXHANDLE, int> m_ints;
+	std::map<D3DXHANDLE, bool> m_bools;
+	std::map<D3DXHANDLE, void*> m_textures;
 
 	bool        m_valid;
+	bool        m_active;
 };
 
 class d3d_render_target;
@@ -306,6 +314,7 @@ public:
 	void toggle() { post_fx_enable = initialized && !post_fx_enable; }
 
 	void begin_frame(render_primitive_list *primlist);
+	void end_frame();
 
 	void begin_draw();
 	void end_draw();
@@ -325,6 +334,7 @@ public:
 	void init_fsfx_quad();
 
 	void set_texture(texture_info *info);
+	void set_filter(bool filter_screens);
 	void remove_render_target(int source_width, int source_height, uint32_t screen_index);
 	void remove_render_target(d3d_render_target *rt);
 
@@ -338,6 +348,7 @@ public:
 	void *get_slider_option(int id, int index = 0);
 
 private:
+	void                    set_curr_effect(effect *curr_effect);
 	void                    blit(IDirect3DSurface9 *dst, bool clear_dst, D3DPRIMITIVETYPE prim_type, uint32_t prim_index, uint32_t prim_count);
 
 	void                    render_snapshot(IDirect3DSurface9 *surface);
@@ -407,7 +418,11 @@ private:
 	IDirect3DSurface9 *     backbuffer;                 // pointer to our device's backbuffer
 	effect *                curr_effect;                // pointer to the currently active effect object
 	effect *                default_effect;             // pointer to the primary-effect object
+	effect *                ui_effect;                  // pointer to the UI-element effect object
+	effect *                ui_wrap_effect;             // pointer to the UI-element effect object with texture wrapping
+	effect *                vector_buffer_effect;       // pointer to the vector-buffering effect object
 	effect *                prescale_effect;            // pointer to the prescale-effect object
+	effect *                prescale_point_effect;      // pointer to the prescale-effect object with point filtering
 	effect *                post_effect;                // pointer to the post-effect object
 	effect *                distortion_effect;          // pointer to the distortion-effect object
 	effect *                scanline_effect;
@@ -421,6 +436,8 @@ private:
 	effect *                vector_effect;              // pointer to the vector-effect object
 	effect *                chroma_effect;
 
+	texture_info *          diffuse_texture;
+	bool                    filter_screens;
 	texture_info *          curr_texture;
 	d3d_render_target *     curr_render_target;
 	poly_info *             curr_poly;
