@@ -18,6 +18,9 @@ TODO:
 #include "emu.h"
 
 #include "beta_m.h"
+#include "spec128.h"
+#include "speaker.h"
+
 #include "bus/ata/atapicdr.h"
 #include "bus/ata/ataintf.h"
 #include "bus/ata/idehd.h"
@@ -29,8 +32,6 @@ TODO:
 #include "cpu/z80/tmpz84c015.h"
 #include "machine/ds128x.h"
 #include "sound/ay8910.h"
-#include "spec128.h"
-#include "speaker.h"
 
 #define LOG_IO    (1U << 1)
 #define LOG_MEM   (1U << 2)
@@ -82,8 +83,6 @@ public:
 		, m_fastram(*this, "fastram", 0x10000, ENDIANNESS_LITTLE)
 		, m_bank0_fastram(*this, "bank0_fastram")
 		, m_bank_view0(*this, "bank_view0")
-		, m_bank_view1(*this, "bank_view1")
-		, m_bank_view2(*this, "bank_view2")
 		, m_bank_view3(*this, "bank_view3")
 	{ }
 
@@ -112,6 +111,10 @@ protected:
 
 private:
 
+	static constexpr u16 BANK_RAM_MASK     = 1 << 8;
+	static constexpr u16 BANK_FASTRAM_MASK = 1 << 9;
+	static constexpr u16 BANK_ISA_MASK     = 1 << 10;
+	static constexpr u16 BANK_WRDISBL_MASK = 1 << 12;
 	enum accel_state : u8
 	{
 		DISABLED   = 0x00,
@@ -139,22 +142,14 @@ private:
 	u8 *m_dcp_location;
 	u8 m_dcpp_data[0x100];
 
-	static constexpr u16 BANK_RAM_MASK     = 1 << 8;
-	static constexpr u16 BANK_FASTRAM_MASK = 1 << 9;
-	static constexpr u16 BANK_ISA_MASK     = 1 << 10;
-	static constexpr u16 BANK_WRDISBL_MASK = 1 << 12;
 	u16 m_pages[4] = {}; // internal state for faster calculations
-	u8 sprinter_mem_r(u16 offset);
-	void sprinter_mem_w(u16 offset, u8 data);
-	u8 vram_r(offs_t offset);
-	template <u8 Bank> void vram_w(offs_t offset, u8 data);
-	template <u8 Bank> u8 ram_r(offs_t offset);
-	template <u8 Bank> void ram_w(offs_t offset, u8 data);
+	u8 ram_r(offs_t offset);
+	void ram_w(offs_t offset, u8 data);
 
 	void accel_control_r(u8 data);
+	void accel_r_tap(offs_t offset, u8 &data);
+	void accel_w_tap(offs_t offset, u8 &data);
 	void update_accel_buffer(u8 idx, u8 data);
-	u8 accel_r(u16 offset);
-	void accel_w(u16 offset, u8 data);
 
 	required_device<ds12885_device> m_rtc;
 	required_device_array<ata_interface_device, 2> m_ata;
@@ -170,10 +165,10 @@ private:
 	memory_share_creator<u8> m_fastram;
 	memory_bank_creator m_bank0_fastram;
 	memory_view m_bank_view0;
-	memory_view m_bank_view1;
-	memory_view m_bank_view2;
 	memory_view m_bank_view3;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+
+	bool m_z80_m1;
 
 	bool m_starting;
 	bool m_dos; // 0-on, 1-off
@@ -201,6 +196,7 @@ private:
 	u16 m_ata_data_latch;
 
 	// Accelerator
+	bool m_skip_write;
 	u8 m_prf_d;
 	u16 m_accel_buffer_size;
 	u8 m_accel_buffer[256] = {};
@@ -210,25 +206,38 @@ private:
 
 void sprinter_state::update_memory()
 {
-	bool pre_rom = m_rom_sys || m_cash_on;
-	bool pre_cash = !m_cash_on;
+	const bool pre_rom = m_rom_sys || m_cash_on;
+	const bool pre_cash = !m_cash_on;
 	if (!pre_rom && pre_cash)
+	{
 		m_pages[0] = (m_rom_rg & 0x0f) ^ (!m_sys_pg << 3);
+		m_bank_rom[0]->set_entry(m_pages[0]);
+		m_bank_view0.select(1);
+	}
 	else if (pre_rom && !pre_cash)
+	{
 		m_pages[0] = BANK_FASTRAM_MASK | (m_rom_rg & 3);
+		m_bank0_fastram->set_entry(m_pages[0] & 0xff);
+		m_bank_view0.select(2);
+	}
 	else
 	{
-		bool sc0 = BIT(m_sc, 0);
-		bool sc_lc = !(sc0 && m_ram_sys) && !m_cash_on;
-		bool nmi_ena = 1;
-		u8 spr_ = BIT(m_sc, 1) ? 0 : ((m_dos << 1) | (BIT(m_pn, 4) || !m_dos));
-		u8 pg0 = 0xe0
+		const bool sc0 = BIT(m_sc, 0);
+		const bool sc_lc = !(sc0 && m_ram_sys) && !m_cash_on;
+		const bool nmi_ena = 1;
+		const u8 spr_ = BIT(m_sc, 1) ? 0 : ((m_dos << 1) | (BIT(m_pn, 4) || !m_dos));
+		const u8 pg0 = 0xe0
 			| ((sc0 || !m_ram_sys || m_cash_on || !nmi_ena) << 3)
 			| (((m_arom16 && !(sc0 && m_ram_sys)) || (m_cash_on && nmi_ena)) << 2)
 			| (((BIT(spr_, 1) && sc_lc) || !m_ram_sys || !nmi_ena) << 1)
 			| ((BIT(spr_, 0) && sc_lc) || !m_ram_sys || !nmi_ena);
 
 		m_pages[0] = BANK_RAM_MASK | (sc0 ? 0 : BANK_WRDISBL_MASK) | m_dcpp_data[pg0];
+		m_bank_ram[0]->set_entry(m_pages[0] & 0xff);
+		if (sc0)
+			m_bank_view0.disable();
+		else
+			m_bank_view0.select(0);
 	}
 
 	m_pages[1] = BANK_RAM_MASK | m_ram1;
@@ -240,42 +249,15 @@ void sprinter_state::update_memory()
 	m_pages[3] = (m_starting ? 0x40 : m_dcpp_data[m_pg3]);
 	m_bank_ram[3]->set_entry(m_pages[3] & 0xff);
 	if (BIT(m_sc, 4) && ((m_pages[3] & 0xf9) == 0xd0))
-		m_pages[3] |= BANK_ISA_MASK;
-	else
-		m_pages[3] |= BANK_RAM_MASK;
-
-	using views_link = std::reference_wrapper<memory_view>;
-	views_link views[] = { m_bank_view0, m_bank_view1, m_bank_view2, m_bank_view3 };
-	for(auto i = 0; i < 4; i++)
 	{
-		u8 page = m_pages[i] & 0xff;
-		if (m_pages[i] & BANK_RAM_MASK)
-		{
-			m_bank_ram[i]->set_entry(page);
-			if ((page & 0xf0) == 0x50)
-				views[i].get().select(0);
-			else
-				views[i].get().disable();
-
-			if (m_pages[i] & BANK_WRDISBL_MASK)
-				m_bank_view0.select(1);
-		}
-		else if (m_pages[i] & BANK_FASTRAM_MASK)
-		{
-			m_bank0_fastram->set_entry(page);
-			m_bank_view0.select(3);
-		}
-		else if (m_pages[i] & BANK_ISA_MASK)
-		{
-			m_bank_view3.select(1);
-		}
-		else if (~m_pages[i] >> 8)
-		{
-			m_bank_rom[0]->set_entry(page);
-			m_bank_view0.select(2);
-		}
-		else
-			assert(false);
+		m_pages[3] |= BANK_ISA_MASK;
+		m_bank_view3.select(0);
+	}
+	else
+	{
+		m_bank_ram[3]->set_entry(m_pages[3]);
+		m_bank_view3.disable();
+		m_pages[3] |= BANK_RAM_MASK;
 	}
 
 	LOGMEM("MEM: %x %x %x %x\n", m_pages[0], m_pages[1], m_pages[2], m_pages[3]);
@@ -283,7 +265,7 @@ void sprinter_state::update_memory()
 
 void sprinter_state::sprinter_palette(palette_device &palette) const
 {
-	rgb_t colors[256 * 8] = {0};
+	const rgb_t colors[256 * 8] = { palette_device::BLACK };
 	palette.set_pen_colors(0, colors);
 }
 
@@ -297,12 +279,12 @@ u32 sprinter_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 void sprinter_state::screen_update_txt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bool flash = BIT(screen.frame_number(), 4);
-	s8 dy = 7 - (m_hold >> 4);
-	s8 dx = (7 - (m_hold & 0x0f)) * 2;
+	const bool flash = BIT(screen.frame_number(), 4);
+	const s8 dy = 7 - (m_hold >> 4);
+	const s8 dx = (7 - (m_hold & 0x0f)) * 2;
 	for(u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
-		u16 b8 = (SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT;
+		const u16 b8 = (SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT;
 
 		u8* line1 = nullptr;
 		u8* mode = nullptr;
@@ -310,11 +292,11 @@ void sprinter_state::screen_update_txt(screen_device &screen, bitmap_ind16 &bitm
 		u16 *pix = &(bitmap.pix(vpos, cliprect.left()));
 		for(u16 hpos = cliprect.left(); hpos <= cliprect.right(); hpos++)
 		{
-			u16 a16 = (SPRINT_WIDTH + hpos - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
+			const u16 a16 = (SPRINT_WIDTH + hpos - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
 			if ((line1 == nullptr) || (a16 & 7) == 0)
 			{
 				// 16x8 block descriptor
-				bool do_init = line1 == nullptr;
+				const bool do_init = line1 == nullptr;
 				if (do_init || ((a16 & 15) == 0))
 				{
 					line1 = m_vram + (1 + (a16 >> 4) * 2 + 0x80 * (m_rgmod & 1)) * 1024 + 0x300;
@@ -339,11 +321,14 @@ void sprinter_state::screen_update_txt(screen_device &screen, bitmap_ind16 &bitm
 				u16 pal;
 				if (BIT(mode[0], 5, 3) == 7)
 				{
-					pal = 0x400 | ((m_border & 0x07) << 3) | (m_border & 0x07);
+					if ((mode[0] & 0x0c) == 0x0c)
+						pal = 0x400;
+					else
+						pal = 0x400 | ((m_border & 0x07) << 3) | (m_border & 0x07);
 				}
 				else
 				{
-					u8 bit = 1 << (7 - ((a16 >> BIT(mode[0], 5)) & 7));
+					const u8 bit = 1 << (7 - ((a16 >> BIT(mode[0], 5)) & 7));
 					pal = attr + 0x400 + 0x100 * bool(symb & bit) + 0x200 * flash;
 				}
 				*pix++ = pal;
@@ -355,20 +340,20 @@ void sprinter_state::screen_update_txt(screen_device &screen, bitmap_ind16 &bitm
 
 void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	s8 dy = 7 - (m_hold >> 4);
-	s8 dx = (7 - (m_hold & 0x0f)) * 2;
+	const s8 dy = 7 - (m_hold >> 4);
+	const s8 dx = (7 - (m_hold & 0x0f)) * 2;
 	for(u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
-		u16 b8 = (SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT;
+		const u16 b8 = (SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT;
 
 		u8* line1 = nullptr;
 		u8* mode = nullptr;
-		u16 a16, pal, x;
+		u16 pal, x;
 		u8 y;
 		u16 *pix = &(bitmap.pix(vpos, cliprect.left()));
 		for(u16 hpos = cliprect.left(); hpos <= cliprect.right(); hpos++)
 		{
-			a16 = (SPRINT_WIDTH + hpos - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
+			const u16 a16 = (SPRINT_WIDTH + hpos - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
 			if ((line1 == nullptr) || ((a16 & 15) == 0))
 			{
 				// 16x8 block descriptor
@@ -389,7 +374,7 @@ void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bi
 			}
 			else
 			{
-				u8 color = m_vram[(y + (b8 & 7)) * 1024 + x + ((a16 & 15) >> 1)];
+				const u8 color = m_vram[(y + (b8 & 7)) * 1024 + x + ((a16 & 15) >> 1)];
 				*pix++ = pal + (BIT(mode[0], 5) ? color : ((a16 & 1) ? (color & 0x0f) : (color >> 4)));
 			}
 		}
@@ -403,14 +388,14 @@ u8 sprinter_state::dcp_r(offs_t offset)
 	if ((offset & 0xfe) == 0xee)
 		return 0;
 
-	if ((offset & 0x7f) == 0x7b)
+	if (!machine().side_effects_disabled() && ((offset & 0x7f) == 0x7b))
 	{
 		m_cash_on = BIT(offset, 7);
 		update_memory();
 	}
 
-	u16 dcp_offset = (BIT(m_cnf, 3, 2) << 12) | (0 << 11) | (m_dos << 10) | (1 << 9) | (BIT(offset, 14, 2) << 7) | (BIT(offset, 13) << 4) | (BIT(offset, 7) << 3) | (offset & 0x67);
-	u8 dcpp = m_dcp_location[dcp_offset];
+	const u16 dcp_offset = (BIT(m_cnf, 3, 2) << 12) | (0 << 11) | (m_dos << 10) | (1 << 9) | (BIT(offset, 14, 2) << 7) | (BIT(offset, 13) << 4) | (BIT(offset, 7) << 3) | (offset & 0x67);
+	const u8 dcpp = m_dcp_location[dcp_offset];
 
 	u8 data = m_dcpp_data[dcpp];
 	switch (dcpp)
@@ -510,7 +495,7 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 	}
 
 
-	u16 dcp_offset = (BIT(m_cnf, 3, 2) << 12) | (0 << 11) | (m_dos << 10) | (0 << 9) | (BIT(offset, 14, 2) << 7) | (BIT(offset, 13) << 4) | (BIT(offset, 7) << 3) | (offset & 0x67);
+	const u16 dcp_offset = (BIT(m_cnf, 3, 2) << 12) | (0 << 11) | (m_dos << 10) | (0 << 9) | (BIT(offset, 14, 2) << 7) | (BIT(offset, 13) << 4) | (BIT(offset, 7) << 3) | (offset & 0x67);
 	u8 dcpp = m_dcp_location[dcp_offset];
 	if (dcpp >= 0xf0) dcpp = 0xf0 | m_pg3;
 	m_dcpp_data[dcpp] = data;
@@ -640,15 +625,18 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 
 u8 sprinter_state::ata_data_r()
 {
-	m_ata_data_flip ^= true;
-	if (m_ata_data_flip)
+	if (!machine().side_effects_disabled())
 	{
-		u16 data = m_ata[m_ata_selected]->cs0_r(0);
-		m_ata_data_latch = data >> 8;
-		return data;
+		m_ata_data_flip ^= true;
+		if (m_ata_data_flip)
+		{
+			const u16 data = m_ata[m_ata_selected]->cs0_r(0);
+			m_ata_data_latch = data >> 8;
+			return data;
+		}
 	}
-	else
-		return m_ata_data_latch;
+
+	return m_ata_data_latch;
 }
 
 void sprinter_state::ata_data_w(u8 data)
@@ -658,6 +646,135 @@ void sprinter_state::ata_data_w(u8 data)
 		m_ata_data_latch = data;
 	else
 		m_ata[m_ata_selected]->cs0_w(0, (data << 8) | m_ata_data_latch);
+}
+
+void sprinter_state::accel_control_r(u8 data)
+{
+	const bool is_prefix = (data == 0xcb) || (data == 0xdd) || (data == 0xed) || (data == 0xfd);
+	if (!is_prefix && !m_prf_d) // neither prefix nor prefixed
+	{
+		const accel_state state_candidate = static_cast<accel_state>(data);
+		switch(state_candidate)
+		{
+		case OFF_HALT:
+		case OFF:
+			m_accel_state = OFF;
+			LOGACCEL("Accel: OFF\n");
+			break;
+
+		case SET_BUFFER:
+		case FILL:
+		case FILL_VERT:
+		case COPY:
+		case COPY_VERT:
+		case DOUBLE:
+			m_accel_state = state_candidate;
+			m_accel_mode = MODE_NOP;
+			break;
+
+		case MODE_AND:
+		case MODE_XOR:
+		case MODE_OR:
+			m_accel_mode = state_candidate;
+			break;
+
+		default:
+			break;
+		}
+	}
+	m_prf_d = is_prefix;
+}
+
+void sprinter_state::accel_r_tap(offs_t offset, u8 &data)
+{
+	const std::string m = m_accel_mode == MODE_AND ? "&" : m_accel_mode == MODE_OR ? "|" : m_accel_mode == MODE_XOR ? "^" : "";
+	if (m_accel_state == SET_BUFFER)
+	{
+		m_accel_buffer_size = data ? data : 256;
+		LOGACCEL("Accel buffer: %d\n", m_accel_buffer_size);
+	}
+	else if (m_pages[offset >> 14] & BANK_RAM_MASK) // block ops RAM only
+	{
+		if (m_accel_state == COPY)
+		{
+			LOGACCEL("Accel rCOPY: %s%02x\n", m, offset);
+			for (auto i = 0; i < m_accel_buffer_size; i++)
+			{
+				data = ram_r(offset + i);
+				update_accel_buffer(i, data);
+			}
+		}
+		else if (m_accel_state == COPY_VERT)
+		{
+			LOGACCEL("Accel rCOPY_GR: %s%02x (%x)\n", m, offset, m_port_y);
+			for (auto i = 0; i < m_accel_buffer_size; i++)
+			{
+				data = ram_r(offset);
+				update_accel_buffer(i, data);
+				m_port_y++;
+			}
+		}
+		else
+			return;
+
+		const int icount = 6 * m_accel_buffer_size * m_maincpu->clock() / X_SP; // 6 42Mhz clocks each
+		m_maincpu->adjust_icount(-icount);
+	}
+}
+
+void sprinter_state::accel_w_tap(offs_t offset, u8 &data)
+{
+	if (m_accel_state == SET_BUFFER)
+	{
+		m_accel_buffer_size = data ? data : 256;
+		LOGACCEL("Accel buffer: %d\n", m_accel_buffer_size);
+	}
+	else if (m_pages[offset >> 14] & BANK_RAM_MASK) // block ops RAM only
+	{
+		u16 ops = m_accel_buffer_size;
+		if (m_accel_state == FILL)
+		{
+			LOGACCEL("Accel wFILL: %02x\n", offset);
+			for (auto i = 0; i < m_accel_buffer_size; i++)
+				ram_w(offset + i, data);
+		}
+		else if (m_accel_state == FILL_VERT)
+		{
+			LOGACCEL("Accel wFILL_VERT: %02x (%x)\n", offset, m_port_y);
+			for (auto i = 0; i < m_accel_buffer_size; i++)
+			{
+				ram_w(offset, data);
+				m_port_y++;
+			}
+		}
+		else if (m_accel_state == DOUBLE)
+		{
+			ram_w(offset & 0xfffe, data);
+			ram_w(offset | 0x0001, data);
+			ops = 2;
+		}
+		else if (m_accel_state == COPY)
+		{
+			LOGACCEL("Accel wCOPY: %02x\n", offset);
+			for (auto i = 0; i < m_accel_buffer_size; i++)
+				ram_w(offset + i, m_accel_buffer[i]);
+		}
+		else if (m_accel_state == COPY_VERT)
+		{
+			LOGACCEL("Accel wCOPY_VERT: %02x (%x)\n", offset, m_port_y);
+			for (auto i = 0; i < m_accel_buffer_size; i++)
+			{
+				ram_w(offset, m_accel_buffer[i]);
+				m_port_y++;
+			}
+		}
+		else
+			return;
+
+		m_skip_write = true;
+		const int icount = 6 * ops * m_maincpu->clock() / X_SP; // 6 42Mhz clocks each
+		m_maincpu->adjust_icount(-icount);
+	}
 }
 
 void sprinter_state::update_accel_buffer(u8 idx, u8 data)
@@ -681,206 +798,67 @@ void sprinter_state::update_accel_buffer(u8 idx, u8 data)
 	}
 }
 
-u8 sprinter_state::accel_r(u16 offset)
+u8 sprinter_state::ram_r(offs_t offset)
 {
-	if (machine().side_effects_disabled() || m_accel_state == DISABLED || m_accel_state == OFF)
-		return sprinter_mem_r(offset);
-
-	std::string m = m_accel_mode == MODE_AND ? "&" : m_accel_mode == MODE_OR ? "|" : m_accel_mode == MODE_XOR ? "^" : "";
-	u8 data;
-	if (m_accel_state == SET_BUFFER)
-	{
-		data = sprinter_mem_r(offset);
-		m_accel_buffer_size = data ? data : 256;
-		LOGACCEL("Accel buffer: %d\n", m_accel_buffer_size);
-	}
-	else if (m_accel_state == COPY)
-	{
-		LOGACCEL("Accel rCOPY: %s%02x\n", m, offset);
-		for (auto i = 0; i < m_accel_buffer_size; i++)
-		{
-			data = sprinter_mem_r(offset + i);
-			update_accel_buffer(i, data);
-		}
-		int icount = 6 * m_accel_buffer_size * m_maincpu->clock() / X_SP; // 6 42Mhz clocks each
-		m_maincpu->adjust_icount(-icount);
-	}
-	else if (m_accel_state == COPY_VERT)
-	{
-		LOGACCEL("Accel rCOPY_GR: %s%02x (%x)\n", m, offset, m_port_y);
-		for (auto i = 0; i < m_accel_buffer_size; i++)
-		{
-			data = sprinter_mem_r(offset);
-			update_accel_buffer(i, data);
-			m_port_y++;
-		}
-		int icount = 6 * m_accel_buffer_size * m_maincpu->clock() / X_SP; // 6 42Mhz clocks each
-		m_maincpu->adjust_icount(-icount);
-	}
+	const u8 bank = offset >> 14;
+	if ((m_pages[bank] & 0xf0) == 0x50)
+		return m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)];
 	else
-		data = sprinter_mem_r(offset);
-
-	return data;
+		return reinterpret_cast<u8 *>(m_bank_ram[bank]->base())[offset & 0x3fff];
 }
 
-void sprinter_state::accel_w(u16 offset, u8 data)
+void sprinter_state::ram_w(offs_t offset, u8 data)
 {
-	if (m_accel_state == DISABLED || m_accel_state == OFF)
+	if (m_skip_write)
 	{
-		sprinter_mem_w(offset, data);
+		m_skip_write = false;
 		return;
 	}
 
-	bool adjust_icount = true;
-	if (m_accel_state == SET_BUFFER)
+	const u8 bank = offset >> 14;
+	const u8 page = m_pages[bank] & 0xff;
+	if (~m_pages[bank] & BANK_RAM_MASK)
+		assert(false);
+	if ((page & 0xf0) == 0x50)
 	{
-		m_accel_buffer_size = data ? data : 256;
-		LOGACCEL("Accel buffer: %d\n", m_accel_buffer_size);
-		adjust_icount = false;
-	}
-	else if (m_accel_state == FILL)
-	{
-		LOGACCEL("Accel wFILL: %02x\n", offset);
-		for (auto i = 0; i < m_accel_buffer_size; i++)
-			sprinter_mem_w(offset + i, data);
-	}
-	else if (m_accel_state == FILL_VERT)
-	{
-		LOGACCEL("Accel wFILL_VERT: %02x (%x)\n", offset, m_port_y);
-		for (auto i = 0; i < m_accel_buffer_size; i++)
+		const u16 vaddr = (offset & 0x03ff);
+		u8* line = m_vram + (m_port_y * 1024);
+
+		if (BIT(~page, 2))
+			m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)] = data;
+		if (!(BIT(page, 3) && (data == 0xff)))
 		{
-			sprinter_mem_w(offset, data);
-			m_port_y++;
-		}
-	}
-	else if (m_accel_state == COPY)
-	{
-		LOGACCEL("Accel wCOPY: %02x\n", offset);
-		for (auto i = 0; i < m_accel_buffer_size; i++)
-			sprinter_mem_w(offset + i, m_accel_buffer[i]);
-	}
-	else if (m_accel_state == COPY_VERT)
-	{
-		LOGACCEL("Accel wCOPY_VERT: %02x (%x)\n", offset, m_port_y);
-		for (auto i = 0; i < m_accel_buffer_size; i++)
-		{
-			sprinter_mem_w(offset, m_accel_buffer[i]);
-			m_port_y++;
-		}
-	}
-	else
-		adjust_icount = false;
-
-	if (!adjust_icount)
-		sprinter_mem_w(offset, data);
-	else
-	{
-		int icount = 6 * m_accel_buffer_size * m_maincpu->clock() / X_SP; // 6 42Mhz clocks each
-		m_maincpu->adjust_icount(-icount);
-	}
-}
-
-void sprinter_state::accel_control_r(u8 data)
-{
-	accel_state state_candidate = static_cast<accel_state>(data);
-	switch(state_candidate)
-	{
-	case OFF_HALT:
-	case OFF:
-		m_accel_state = OFF;
-		LOGACCEL("Accel: OFF\n");
-		break;
-
-	case SET_BUFFER:
-	case FILL:
-	case FILL_VERT:
-	case COPY:
-	case COPY_VERT:
-		m_accel_state = state_candidate;
-		m_accel_mode = MODE_NOP;
-		break;
-
-	case MODE_AND:
-	case MODE_XOR:
-	case MODE_OR:
-		m_accel_mode = state_candidate;
-		break;
-
-	default:
-		m_accel_mode = MODE_NOP;
-		break;
-	}
-}
-
-u8 sprinter_state::vram_r(offs_t offset)
-{
-	return m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)];
-}
-
-template <u8 Bank> void sprinter_state::vram_w(offs_t offset, u8 data)
-{
-	u8 page = m_pages[Bank] & 0xff;
-	u16 vaddr = (offset & 0x03ff);
-	u8* line = m_vram + (m_port_y * 1024);
-
-	if (BIT(~page, 2))
-		m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)] = data;
-	if (!(BIT(page, 3) && (data == 0xff)))
-	{
-		m_screen->update_now();
-		line[vaddr] = data;
-	}
-
-	if (vaddr >= 0x3e0)
-	{
-		u8 pal_num = BIT(vaddr, 2, 3);
-		u16 p_red = 0x3e0 + pal_num * 4;
-		m_palette->set_pen_color(m_port_y + pal_num * 256, rgb_t(line[p_red], line[p_red + 1], line[p_red + 2]));
-	}
-}
-
-template <u8 Bank> u8 sprinter_state::ram_r(offs_t offset)
-{
-	return reinterpret_cast<u8 *>(m_bank_ram[Bank]->base())[offset];
-}
-
-template <u8 Bank> void sprinter_state::ram_w(offs_t offset, u8 data)
-{
-	if (~m_all_mode & 1)
-	{
-		bool sp_scr = BIT(Bank, 0) && (BIT(~Bank, 1) || ((m_pg3 & 0x3d) == 0x35)); // B"1101X1"
-		bool zx_screen = sp_scr && !(BIT(offset, 13) && !BIT(m_port_y, 7)) && !BIT(m_port_y, 6) && !BIT(m_port_y, 0);
-		if (zx_screen)
-		{
-			u8 sp_sa = BIT(Bank, 1) ? BIT(m_pg3, 1) : 0;
-			u32 addr = ((offset & 0xff) << 10)
-				| (((m_port_y & 0x1f) ^ sp_sa ^ BIT(offset, 13)) << 5)
-				| (BIT(offset, 8, 5));
-
 			m_screen->update_now();
-			m_vram[addr] = data;
+			line[vaddr] = data;
+		}
+
+		if (vaddr >= 0x3e0)
+		{
+			const u8 pal_num = BIT(vaddr, 2, 3);
+			const u16 p_red = 0x3e0 + pal_num * 4;
+			m_palette->set_pen_color(m_port_y + pal_num * 256, rgb_t(line[p_red], line[p_red + 1], line[p_red + 2]));
 		}
 	}
+	else
+	{
+		if (~m_all_mode & 1)
+		{
+			const bool sp_scr = BIT(offset, 14) && (BIT(~offset, 15) || ((m_pg3 & 0x3d) == 0x35)); // B"1101X1"
+			const bool zx_screen = sp_scr && !(BIT(offset, 13) && !BIT(m_port_y, 7)) && !BIT(m_port_y, 6) && !BIT(m_port_y, 0);
+			if (zx_screen)
+			{
+				const u8 sp_sa = BIT(offset, 15) ? BIT(m_pg3, 1) : 0;
+				const u32 addr = ((offset & 0xff) << 10)
+					| (((m_port_y & 0x1f) ^ sp_sa ^ BIT(offset, 13)) << 5)
+					| (BIT(offset, 8, 5));
 
-	reinterpret_cast<u8 *>(m_bank_ram[Bank]->base())[offset] = data;
-}
+				m_screen->update_now();
+				m_vram[addr] = data;
+			}
+		}
 
-u8 sprinter_state::sprinter_mem_r(u16 offset)
-{
-	accel_state state = m_accel_state;
-	m_accel_state = DISABLED;
-	u8 data = m_program.read_byte(offset);
-	m_accel_state = state;
-
-	return data;
-}
-
-void sprinter_state::sprinter_mem_w(u16 offset, u8 data)
-{
-	accel_state state = m_accel_state;
-	m_accel_state = DISABLED;
-	m_program.write_byte(offset, data);
-	m_accel_state = state;
+		reinterpret_cast<u8 *>(m_bank_ram[bank]->base())[offset & 0x3fff] = data;
+	}
 }
 
 void sprinter_state::map_fetch(address_map &map)
@@ -888,7 +866,10 @@ void sprinter_state::map_fetch(address_map &map)
 	// Overlap with previous because we want real addresses on the 3e00-3fff range
 	map(0x0000, 0x3fff).lr8(NAME([this](u16 offset)
 	{
-		return sprinter_mem_r(offset);
+		m_z80_m1 = 1;
+		const u8 data = m_program.read_byte(offset);
+		m_z80_m1 = 0;
+		return data;
 	}));
 	map(0x3d00, 0x3dff).lr8(NAME([this](u16 offset)
 	{
@@ -898,7 +879,10 @@ void sprinter_state::map_fetch(address_map &map)
 			update_memory();
 		}
 
-		return sprinter_mem_r(offset + 0x3d00);
+		m_z80_m1 = 1;
+		u8 data = m_program.read_byte(offset + 0x3d00);
+		m_z80_m1 = 0;
+		return data;
 	}));
 	map(0x4000, 0xffff).lr8(NAME([this](u16 offset)
 	{
@@ -908,51 +892,24 @@ void sprinter_state::map_fetch(address_map &map)
 			update_memory();
 		}
 
-		return sprinter_mem_r(offset + 0x4000);
+		m_z80_m1 = 1;
+		u8 data = m_program.read_byte(offset + 0x4000);
+		m_z80_m1 = 0;
+		return data;
 	}));
 }
 
 void sprinter_state::map_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).lrw8(
-		NAME([this](offs_t offset) { return (m_accel_state != DISABLED) ? accel_r(offset) : ram_r<0>(offset); }),
-		NAME([this](offs_t offset, u8 data) { (m_accel_state != DISABLED) ? accel_w(offset, data) : ram_w<0>(offset, data); }));
+	map(0x0000, 0xffff).lrw8(NAME([this](offs_t offset) { return ram_r(offset); }), NAME([this](offs_t offset, u8 data) { ram_w(offset, data); }));
+
 	map(0x0000, 0x3fff).view(m_bank_view0);
-	m_bank_view0[0](0x0000, 0x3fff).lrw8(
-		NAME([this](offs_t offset) { return (m_accel_state != DISABLED) ? accel_r(offset) : vram_r(offset); }),
-		NAME([this](offs_t offset, u8 data) { (m_accel_state != DISABLED) ? accel_w(offset, data) : vram_w<0>(offset, data); }));
-	m_bank_view0[1](0x0000, 0x3fff).nopw(); // RAM RO
-	m_bank_view0[2](0x0000, 0x3fff).nopw().lr8(
-		NAME([this](offs_t offset) { return (m_accel_state != DISABLED) ? accel_r(offset) : (reinterpret_cast<u8 *>(m_bank_rom[0]->base())[offset]); }));
-	//m_bank_view0[3](0x0000, 0x3fff).bankrw(m_bank0_fastram);
-	m_bank_view0[3](0x0000, 0x3fff).lrw8(
-		NAME([this](offs_t offset) { return (m_accel_state != DISABLED) ? accel_r(offset) : (reinterpret_cast<u8 *>(m_bank0_fastram->base())[offset]); }),
-		NAME([this](offs_t offset, u8 data) { if (m_accel_state != DISABLED) accel_w(offset, data); else (reinterpret_cast<u8 *>(m_bank0_fastram->base())[offset]) = data; }));
+	m_bank_view0[0](0x0000, 0x3fff).nopw(); // RAM RO
+	m_bank_view0[1](0x0000, 0x3fff).nopw().bankr(m_bank_rom[0]);
+	m_bank_view0[2](0x0000, 0x3fff).bankrw(m_bank0_fastram);
 
-	map(0x4000, 0x7fff).lrw8(
-		NAME([this](offs_t offset) { return (m_accel_state != DISABLED) ? accel_r(0x4000 + offset) :ram_r<1>(offset); }),
-		NAME([this](offs_t offset, u8 data) { (m_accel_state != DISABLED) ? accel_w(0x4000 + offset, data) : ram_w<1>(offset, data); }));
-	map(0x4000, 0x7fff).view(m_bank_view1);
-	m_bank_view1[0](0x4000, 0x7fff).lrw8(
-		NAME([this](offs_t offset) { return (m_accel_state != DISABLED) ? accel_r(0x4000 + offset) : vram_r(offset); }),
-		NAME([this](offs_t offset, u8 data) { (m_accel_state != DISABLED) ? accel_w(0x4000 + offset, data) : vram_w<1>(offset, data); }));
-
-	map(0x8000, 0xbfff).lrw8(
-		NAME([this](offs_t offset) { return (m_accel_state != DISABLED) ? accel_r(0x8000 + offset) : ram_r<2>(offset); }),
-		NAME([this](offs_t offset, u8 data) { (m_accel_state != DISABLED) ? accel_w(0x8000 + offset, data) : ram_w<2>(offset, data); }));
-	map(0x8000, 0xbfff).view(m_bank_view2);
-	m_bank_view2[0](0x8000, 0xbfff).lrw8(
-		NAME([this](offs_t offset) { return (m_accel_state != DISABLED) ? accel_r(0x8000 + offset) : vram_r(offset); }),
-		NAME([this](offs_t offset, u8 data) { (m_accel_state != DISABLED) ? accel_w(0x8000 + offset, data) : vram_w<2>(offset, data); }));
-
-	map(0xc000, 0xffff).lrw8(
-		NAME([this](offs_t offset) { return (m_accel_state != DISABLED) ? accel_r(0xc000 + offset) : ram_r<3>(offset); }),
-		NAME([this](offs_t offset, u8 data) { (m_accel_state != DISABLED) ? accel_w(0xc000 + offset, data) : ram_w<3>(offset, data); }));
 	map(0xc000, 0xffff).view(m_bank_view3);
-	m_bank_view3[0](0xc000, 0xffff).lrw8(
-		NAME([this](offs_t offset) { return (m_accel_state != DISABLED) ? accel_r(0xc000 + offset) : vram_r(offset); }),
-		NAME([this](offs_t offset, u8 data) { (m_accel_state != DISABLED) ? accel_w(0xc000 + offset, data) : vram_w<3>(offset, data); }));
-	m_bank_view3[1](0xc000, 0xffff).noprw(); // ISA
+	m_bank_view3[0](0xc000, 0xffff).noprw(); // ISA
 }
 
 void sprinter_state::map_io(address_map &map)
@@ -966,14 +923,20 @@ void sprinter_state::init_taps()
 	address_space &op = m_maincpu->space(AS_OPCODES); // z80 M1
 	op.install_read_tap(0x0000, 0xffff, "accel_control", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
-		if (machine().side_effects_disabled() || (m_accel_state == DISABLED))
-			return;
-
-		bool is_prefix = (data == 0xcb) || (data == 0xdd) || (data == 0xed) || (data == 0xfd);
-		if (!is_prefix && !m_prf_d) // neither prefix nor prefixed
+		if (!machine().side_effects_disabled() && (m_accel_state != DISABLED))
 			accel_control_r(data);
+	});
 
-		m_prf_d = is_prefix;
+	address_space &prg = m_maincpu->space(AS_PROGRAM);
+	prg.install_read_tap(0x0000, 0xffff, "accel_read", [this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!machine().side_effects_disabled() && !m_z80_m1 && (m_accel_state != DISABLED) && (m_accel_state != OFF))
+			accel_r_tap(offset, data);
+	});
+	prg.install_write_tap(0x0000, 0xffff, "accel_write", [this](offs_t offset, u8 &data, u8 mem_mask)
+	{
+		if (!m_z80_m1 && (m_accel_state != DISABLED) && (m_accel_state != OFF))
+			accel_w_tap(offset, data);
 	});
 }
 
@@ -1035,6 +998,7 @@ void sprinter_state::machine_reset()
 	m_rom_rg = 0x00;
 	m_cash_on = 0;
 
+	m_skip_write = false;
 	m_prf_d = false;
 	m_accel_state = OFF;
 

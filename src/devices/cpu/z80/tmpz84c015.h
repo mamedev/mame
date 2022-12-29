@@ -28,6 +28,8 @@ public:
 	tmpz84c015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
 
 	// configuration helpers
+	template <int Channel> void set_clk_trg(u32 clock) { if (m_ctc) m_ctc->set_clk<Channel>(clock); else subdevice<z80ctc_device>(m_ctc.finder_tag())->set_clk<Channel>(clock); }
+	template <int Channel> void set_clk_trg(const XTAL &xtal) { if (m_ctc) m_ctc->set_clk<Channel>(xtal); else subdevice<z80ctc_device>(m_ctc.finder_tag())->set_clk<Channel>(xtal); }
 
 	// SIO callbacks
 	auto out_txda_callback() { return m_out_txda_cb.bind(); }
@@ -80,9 +82,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( trg1 ) { m_ctc->trg1(state); }
 	DECLARE_WRITE_LINE_MEMBER( trg2 ) { m_ctc->trg2(state); }
 	DECLARE_WRITE_LINE_MEMBER( trg3 ) { m_ctc->trg3(state); }
-
-	template <int Channel> void set_clk_trg(u32 clock) { if (m_ctc) m_ctc->set_clk<Channel>(clock); else subdevice<z80ctc_device>(m_ctc.finder_tag())->set_clk<Channel>(clock); }
-	template <int Channel> void set_clk_trg(const XTAL &xtal) { if (m_ctc) m_ctc->set_clk<Channel>(xtal); else subdevice<z80ctc_device>(m_ctc.finder_tag())->set_clk<Channel>(xtal); }
 
 	// PIO public interface
 	DECLARE_READ_LINE_MEMBER( rdy_a ) { return m_pio->rdy_a(); }
