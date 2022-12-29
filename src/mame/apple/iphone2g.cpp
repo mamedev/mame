@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "machine/bankdev.h"
 #include "machine/vic_pl192.h"
 #include "screen.h"
 

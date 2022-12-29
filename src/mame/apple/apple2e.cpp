@@ -122,7 +122,6 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "machine/applefdintf.h"
-#include "machine/bankdev.h"
 #include "machine/ds1315.h"
 #include "machine/iwm.h"
 #include "machine/kb3600.h"
