@@ -825,10 +825,10 @@ void pengo_state::init_pengo6()
 
 // World / Export releases do the pre-maze curtain effect instantly, draw the maze more quickly, have a short demo, and do not feature the 'popcorn' music.
 GAME( 1982, pengo,    0,        pengou,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (World, not encrypted, rev A)",    MACHINE_SUPPORTS_SAVE ) // Sega game ID# 834-5092 PENGO REV.A
-GAME( 1982, pengoa,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (World, 315-5010 type) (set 1)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengob,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (World, 315-5010 type) (set 2)",   MACHINE_SUPPORTS_SAVE ) // for Bally?
+GAME( 1982, pengoa,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (World, 315-5010 type, set 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pengob,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (World, 315-5010 type, set 2)",    MACHINE_SUPPORTS_SAVE ) // for Bally?
 // this set is closest to the Japanese sets, with longer demo mode, and slower 'curtain draw' before the maze draw
-GAME( 1982, pengoc,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (World, 315-5010 type) (set 3)",   MACHINE_SUPPORTS_SAVE ) // Sega game ID# 834-5081 PENGO
+GAME( 1982, pengoc,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (World, 315-5010 type, set 3)",    MACHINE_SUPPORTS_SAVE ) // Sega game ID# 834-5081 PENGO
 
 
 // Japan releases draw the maze slowly, use the better known 'popcorn' music and have default high score of 20,000. Most bootlegs were based off these versions.
@@ -836,7 +836,7 @@ GAME( 1982, pengoj,   pengo,    pengou,   pengo,    pengo_state, empty_init,  RO
 // sets below have high score names spelling out AKIRA and use 'ACT' instead of 'RD'
 GAME( 1982, pengoja,  pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (Japan, 315-5010 type, rev C)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pengojb,  pengo,    pengo,    pengo,    pengo_state, init_pengo6, ROT90, "Sega",                     "Pengo (Japan, 315-5007 type, rev A)",    MACHINE_SUPPORTS_SAVE ) // Sega game ID# 834-5078 PENGO REV.A
-GAME( 1982, pengojbl, pengo,    pengo,    pengo,    pengo_state, init_pengo6, ROT90, "bootleg",                  "Pengo (Japan) (bootleg)",                MACHINE_SUPPORTS_SAVE ) // bootleg of pengojb with cloned encryption
+GAME( 1982, pengojbl, pengo,    pengo,    pengo,    pengo_state, init_pengo6, ROT90, "bootleg",                  "Pengo (Japan, bootleg)",                 MACHINE_SUPPORTS_SAVE ) // bootleg of pengojb with cloned encryption
 GAME( 1982, penta,    pengo,    pengo,    pengo,    pengo_state, init_pengo6, ROT90, "bootleg (Grinbee Shouji)", "Penta (bootleg)",                        MACHINE_SUPPORTS_SAVE ) // Grinbee Shouji was a subsidiary of Orca
 
-GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, pengo_state, empty_init,  ROT90, "bootleg",                  "Jr. Pac-Man (Pengo hardware) (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, pengo_state, empty_init,  ROT90, "bootleg",                  "Jr. Pac-Man (Pengo hardware, bootleg)",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
