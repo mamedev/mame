@@ -18,7 +18,7 @@
     TODO:
         * (Tickee) gun sometimes misfires
         * maletmad some animation seems to run unthrottled (eg. the turtle rum barrels level),
-          though rate of game timer and music is ok
+          though rate of game timer and music is ok, suspect tms34010 gfxcycles timing
 
 ***************************************************************************/
 
