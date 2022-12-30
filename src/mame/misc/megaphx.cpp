@@ -171,6 +171,7 @@ void megaphx_state::megaphx_68k_map(address_map &map)
 	map(0x050002, 0x050003).r(m_indersb, FUNC(inder_sb_device::megaphx_0x050002_r));
 	map(0x060000, 0x060007).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x800000, 0x8fffff).rom().region("data", 0x00000);
+	map(0xfc0000, 0xffffff).rom().region("boot", 0x00000);
 }
 
 
@@ -285,6 +286,25 @@ static INPUT_PORTS_START( hamboy )
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "SW2:!7")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:!8")
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( yoyospel )
+	PORT_INCLUDE(megaphx)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME(0x01, 0x00, DEF_STR( Demo_Sounds )) PORT_DIPLOCATION("SW2:!1")
+	PORT_DIPSETTING(   0x01, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x00, DEF_STR( On ))
+	PORT_SERVICE_DIPLOC(0x02, IP_ACTIVE_HIGH, "SW2:!2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "SW2:!3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "SW2:!4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "SW2:!5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "SW2:!6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "SW2:!7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:!8")
+INPUT_PORTS_END
+
+
 
 
 // pic port a
@@ -472,5 +492,40 @@ ROM_START( hamboy )
 	ROM_FILL(0x2c, 1, 0x01) // patch timer length or it's too slow (pic issue?)
 ROM_END
 
+
+ROM_START( yoyospel )
+	ROM_REGION16_BE( 0x40000, "boot", 0 )
+	ROM_LOAD16_BYTE( "yoyo9.010", 0x000000, 0x20000, CRC(7de27e36) SHA1(a32e79ab5a6c55df0056710c05ef714e25eda3d4) )
+	ROM_LOAD16_BYTE( "yoyo8.010", 0x000001, 0x20000, CRC(9f350036) SHA1(be42ced534faf850f0b2780d77dda7df9b08cdcc) )
+
+	ROM_REGION16_BE( 0x100000, "data", 0 )
+	ROM_LOAD16_BYTE( "yoyo1.010", 0x000001, 0x20000, CRC(3f09bbf3) SHA1(842a1d11090c91f8b1d14b209d51da4323c82894) )
+	ROM_LOAD16_BYTE( "yoyo0.010", 0x000000, 0x20000, CRC(5aeeac9a) SHA1(a3b149fb92075d19aaf9bcd3319d9ae32208fac2) )
+	ROM_LOAD16_BYTE( "yoyo3.010", 0x040001, 0x20000, CRC(1af108b9) SHA1(36e2d6044781e2b0d37003418eae02b949d3758a) )
+	ROM_LOAD16_BYTE( "yoyo2.010", 0x040000, 0x20000, CRC(f578e99b) SHA1(026b6a243ef3ab345ff6be8bad679f64a081b768) )
+	ROM_LOAD16_BYTE( "yoyo5.010", 0x080001, 0x20000, CRC(d1ebd4a4) SHA1(c19bbd39456394acc4d72c0d6cb5eeda50701def) )
+	ROM_LOAD16_BYTE( "yoyo4.010", 0x080000, 0x20000, CRC(7e3219c6) SHA1(15c9bb1a3ff8e48e1d9a3fb50293d083a54b705c) )
+	ROM_LOAD16_BYTE( "yoyo7.010", 0x0c0001, 0x20000, CRC(3139630c) SHA1(39992169bc65590edb209b516af59206ab9f550a) )
+	ROM_LOAD16_BYTE( "yoyo6.010", 0x0c0000, 0x20000, CRC(b1066c4c) SHA1(eb0c95eeaf1e4b57d1bb08b110951ba044300361) )
+
+	ROM_REGION( 0x200000, "inder_sb:user2", 0 )
+	ROM_LOAD( "yoyo-som1.010", 0x00000, 0x20000, CRC(a075806e) SHA1(e0cf67cd22651a450646a35c87dffbf057dc5c21) )
+	ROM_LOAD( "yoyo-som2.010", 0x20000, 0x20000, CRC(b31ad4a1) SHA1(a464301cf8ca152c23fb206eb52ba0910e1fd02e) )
+
+	ROM_REGION( 0x100000, "inder_sb:audiocpu", 0 )
+	ROM_LOAD( "yoyo-som0.064", 0x000000, 0x2000,  CRC(7f9a2dcf) SHA1(37a28fedc690e0486c13eb85c20610e695d7dce3) )
+
+	ROM_REGION( 0x100000, "pic", 0 )
+	ROM_LOAD( "pic16c54-xt.bin", 0x000000, 0x430,  CRC(21f396fb) SHA1(c8badb9b3681e684bced0ced1de4c3a15641de8b) )
+	ROM_FILL(0x2c, 1, 0x01) // patch timer length or it's too slow (pic issue?)
+
+	ROM_REGION( 0x1000, "pals", 0 ) // protected
+	ROM_LOAD( "p31_u31_palce16v8h-25.jed", 0x000, 0xbd4, NO_DUMP )
+	ROM_LOAD( "p40_u29_palce16v8h-25.jed", 0x000, 0xbd4, NO_DUMP )
+ROM_END
+
+
 GAME( 1991, megaphx,  0,        megaphx, megaphx, megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Mega Phoenix", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1990, hamboy,   0,        megaphx, hamboy,  hamboy_state,  empty_init, ROT0, "Dinamic / Inder", "Hammer Boy",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// This game would later become Little Robin, although this early version has significant design differences.  The game has no music, probably not an emulation problem.
+GAME( 1992, yoyospel, littlerb, megaphx, yoyospel,megaphx_state, empty_init, ROT0, "Inder", "YoYo Spell (prototype)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
