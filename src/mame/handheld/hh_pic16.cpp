@@ -31,9 +31,10 @@ known chips:
  *192     1650    19??, <unknown> phone dialer (have dump)
  *255     1655    19??, <unknown> talking clock (have dump)
  *518     1650A   19??, GI Teleview Control Chip (features differ per program)
- *519     1650A   19??, "
- *532     1650A   19??, "
- *533     1650A   19??, "
+ *519     1650A   19??, GI Teleview Control Chip
+ @522     1655A   1981, Electroplay Sound FX Phasor
+ *532     1650A   19??, GI Teleview Control Chip
+ *533     1650A   19??, GI Teleview Control Chip
  *536     1650    1982, GI Teleview Autodialer/Terminal Identifier
 
   (* means undumped unless noted, @ denotes it's in this driver)
@@ -48,6 +49,8 @@ ROM source notes when dumped from another title, but confident it's the same:
 TODO:
 - tweak MCU frequency for games when video/audio recording surfaces(YouTube etc.)
 - ttfball: discrete sound part, for volume gating?
+- sfxphasor default music mode should have volume decay, I can't get it working
+  without breaking sound effects or command C (volume decay with values 15 and up)
 - what's the relation between drdunk and hccbaskb? Probably made by the same
   Hong Kong subcontractor? I presume Toytronic.
 - uspbball and pabball internal artwork
@@ -60,6 +63,7 @@ TODO:
 #include "video/pwm.h"
 #include "machine/clock.h"
 #include "machine/timer.h"
+#include "sound/dac.h"
 #include "sound/flt_vol.h"
 #include "sound/spkrdev.h"
 
@@ -92,7 +96,8 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	DECLARE_INPUT_CHANGED_MEMBER(power_button);
 
 protected:
 	virtual void machine_start() override;
@@ -113,6 +118,7 @@ protected:
 
 	u16 read_inputs(int columns, u16 colmask = ~0);
 	u8 read_rotated_inputs(int columns, u8 rowmask = ~0);
+	void set_power(bool state);
 };
 
 
@@ -130,6 +136,7 @@ void hh_pic16_state::machine_start()
 
 void hh_pic16_state::machine_reset()
 {
+	set_power(true);
 }
 
 
@@ -173,6 +180,19 @@ INPUT_CHANGED_MEMBER(hh_pic16_state::reset_button)
 {
 	// when an input is directly wired to MCU MCLR pin
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
+INPUT_CHANGED_MEMBER(hh_pic16_state::power_button)
+{
+	set_power((bool)param);
+}
+
+void hh_pic16_state::set_power(bool state)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+
+	if (m_display && !state)
+		m_display->clear();
 }
 
 
@@ -390,7 +410,7 @@ static INPUT_PORTS_START( pabball )
 	PORT_CONFSETTING(    0x20, "2" )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_pic16_state, reset_button, 0) PORT_NAME("P1 Reset")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, pabball_state, reset_button, 0) PORT_NAME("P1 Reset")
 INPUT_PORTS_END
 
 void pabball_state::pabball(machine_config &config)
@@ -417,6 +437,169 @@ void pabball_state::pabball(machine_config &config)
 ROM_START( pabball )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "pic_1655a-043", 0x0000, 0x0400, CRC(43c9b765) SHA1(888a431bab9bcb241c14f33f70863fa2ad89c96b) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Electroplay Sound FX Phasor
+  * PIC 1655A-522
+  * 3-bit sound with volume decay
+
+  It's a toy synthesizer. When in music mode, the user can create custom
+  sounds with the F key, other keys are music notes. To put it briefly,
+  commands A,B are for vibrato, C is for volume decay, and D,E,F change
+  the timbre.
+
+  Paste example (must be in music mode): F11A F3B F4C F3D F3E F6F
+
+***************************************************************************/
+
+class sfxphasor_state : public hh_pic16_state
+{
+public:
+	sfxphasor_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_pic16_state(mconfig, type, tag),
+		m_dac(*this, "dac"),
+		m_volume(*this, "volume")
+	{ }
+
+	void sfxphasor(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_device<dac_3bit_r2r_device> m_dac;
+	required_device<filter_volume_device> m_volume;
+
+	void write_b(u8 data);
+	void write_c(u8 data);
+	u8 read_c();
+
+	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
+	double m_speaker_volume = 0.0;
+};
+
+void sfxphasor_state::machine_start()
+{
+	hh_pic16_state::machine_start();
+	save_item(NAME(m_speaker_volume));
+}
+
+// handlers
+
+TIMER_DEVICE_CALLBACK_MEMBER(sfxphasor_state::speaker_decay_sim)
+{
+	m_speaker_volume = std::clamp(m_speaker_volume, 0.0001, 1.0);
+	m_volume->flt_volume_set_volume(m_speaker_volume);
+
+	// volume goes down while B3 is low
+	if (~m_b & 8)
+		m_speaker_volume /= 1.0001;
+
+	// volume goes up while B3 is high
+	else
+		m_speaker_volume *= 1.0013;
+}
+
+void sfxphasor_state::write_b(u8 data)
+{
+	// B2: trigger power off
+	if (~m_b & data & 4)
+		set_power(false);
+
+	// B0: trigger speaker on
+	if (~m_b & data & 1)
+		m_volume->flt_volume_set_volume(m_speaker_volume = 1.0);
+
+	// B5-B7: speaker out via 68K, 12K, 1K resistors
+	m_dac->write(data >> 5 & 7);
+
+	m_b = data;
+}
+
+void sfxphasor_state::write_c(u8 data)
+{
+	m_c = data;
+}
+
+u8 sfxphasor_state::read_c()
+{
+	// C0-C3: multiplexed inputs from C4-C7
+	m_inp_mux = m_c >> 4 & 0xf;
+	u8 lo = read_inputs(4, 0xf);
+
+	// C4-C7: multiplexed inputs from C0-C3
+	m_inp_mux = m_c & 0xf;
+	u8 hi = read_rotated_inputs(4, 0xf);
+
+	return lo | hi << 4;
+}
+
+// config
+
+static INPUT_PORTS_START( sfxphasor )
+	PORT_START("IN.0") // C4 port C
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('4') PORT_NAME("4 / Locomotive")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0') PORT_NAME("0 / Helicopter")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('8')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+
+	PORT_START("IN.1") // C5 port C
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('5') PORT_NAME("5 / Bee")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1') PORT_NAME("1 / Telephone")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR('9')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+
+	PORT_START("IN.3") // C7 port C
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('6') PORT_NAME("6 / Boat")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('2') PORT_NAME("2 / Race Car")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+
+	PORT_START("IN.2") // C6 port C
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('7') PORT_NAME("7 / Police Car")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR('3') PORT_NAME("3 / UFO")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR('F') PORT_CHAR(13) PORT_NAME("F / Enter")
+
+	PORT_START("IN.4") // port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x02, 0x02, "Auto Power Off" ) // MCU pin, not a switch
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_NAME("On / Sounds") PORT_CHANGED_MEMBER(DEVICE_SELF, sfxphasor_state, power_button, true)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("On / Music") PORT_CHANGED_MEMBER(DEVICE_SELF, sfxphasor_state, power_button, true)
+INPUT_PORTS_END
+
+void sfxphasor_state::sfxphasor(machine_config &config)
+{
+	// basic machine hardware
+	PIC1655(config, m_maincpu, 1000000); // approximation - RC osc. R=10K+VR, C=47pF
+	m_maincpu->read_a().set_ioport("IN.4");
+	m_maincpu->write_b().set(FUNC(sfxphasor_state::write_b));
+	m_maincpu->write_c().set(FUNC(sfxphasor_state::write_c));
+	m_maincpu->read_c().set(FUNC(sfxphasor_state::read_c));
+
+	// no visual feedback!
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	DAC_3BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "volume", 0.25);
+	FILTER_VOLUME(config, m_volume).add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	TIMER(config, "speaker_decay").configure_periodic(FUNC(sfxphasor_state::speaker_decay_sim), attotime::from_usec(10));
+}
+
+// roms
+
+ROM_START( sfxphasor )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "pic_1655a-522", 0x0000, 0x0400, CRC(0af77e83) SHA1(49b089681149254041c14a740cad19a619725c3c) )
 ROM_END
 
 
@@ -1943,6 +2126,8 @@ ROM_END
 CONS( 1979, touchme,   0,       0, touchme,   touchme,   touchme_state,   empty_init, "Atari", "Touch Me (handheld, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1979, pabball,   0,       0, pabball,   pabball,   pabball_state,   empty_init, "Caprice / Calfax", "Pro-Action Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+
+CONS( 1981, sfxphasor, 0,       0, sfxphasor, sfxphasor, sfxphasor_state, empty_init, "Electroplay", "Sound FX Phasor", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 CONS( 1980, melodym,   0,       0, melodym,   melodym,   melodym_state,   empty_init, "GAF", "Melody Madness", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
