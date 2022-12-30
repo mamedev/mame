@@ -234,7 +234,7 @@ int i386_device::i386_limit_check(int seg, uint32_t offset)
 			if(offset > m_sreg[seg].limit)
 			{
 				logerror("Limit check at 0x%08x failed. Segment %04x, limit %08x, offset %08x\n",m_pc,m_sreg[seg].selector,m_sreg[seg].limit,offset);
-				machine().debug_break();
+				//machine().debug_break();
 				return 1;
 			}
 		}
