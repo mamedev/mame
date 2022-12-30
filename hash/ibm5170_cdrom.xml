@@ -3006,7 +3006,7 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 	<!-- Pentium class 75 MHz -->
 	<software name="quake" supported="partial">
 		<description>Quake (shareware v1.01)</description>
-		<year>YEAR</year>
+		<year>1996</year>
 		<publisher>id Software</publisher>
 		<notes><![CDATA[
 Untested multiplayer options
