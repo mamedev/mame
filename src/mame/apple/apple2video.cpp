@@ -588,109 +588,43 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		for (int row = startrow; row < stoprow; row += 8)
 		{
+			/* calculate address */
+			uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5));
+
+			uint8_t prev_code = (startcol == 0) ? 0 : m_ram_ptr[address + startcol - 1];
+
 			for (int col = 0; col < 40; col++)
 			{
-				uint8_t bits, abits;
-
-				/* calculate adderss */
-				uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
-
 				/* perform the lookup */
-				uint8_t const code = m_ram_ptr[address];
-				uint8_t const auxcode = m_aux_ptr[address];
-
-				bits = (code >> 0) & 0x0F;
-				abits = (auxcode >> 0) & 0x0F;
+				uint8_t const code = m_ram_ptr[address + col];
+				uint8_t const auxcode = m_aux_ptr[address + col];
 
 				/* and now draw */
-				for (int y = 0; y < 4; y++)
+				for (int y = 0; y < 8; y++)
 				{
 					if (((row + y) >= beginrow) && ((row + y) <= endrow))
 					{
 						uint16_t *vram = &bitmap.pix(row + y, (col * 14));
 
-						if (col & 1)
+						unsigned const color1 = (auxcode >> (y & 4)) & 0x0F;
+						unsigned const color2 = (code >> (y & 4)) & 0x0F;
+						unsigned allbits = (((color1 * 0x111) >> ((col * 14) & 3)) & 0x007f)
+						                 + (((color2 * 0x8880) >> ((col * 14) & 3)) & 0x3f80);
+
+						// Workaround for Github issue #10760: shift everything right by one pixel
+						// (losing the last pixel of each row) so that the NTSC shader sees what
+						// it expects. This should be removed when there is a better fix.
+						unsigned const prev_bit = (prev_code >> ((y & 4) + ((col * 14) & 3))) & 1;
+						allbits = allbits * 2 + prev_bit;
+
+						for (int x = 0; x < 14; x++)
 						{
-							*vram++ = abits & (1 << 2) ? fg : 0;
-							*vram++ = abits & (1 << 3) ? fg : 0;
-							*vram++ = abits & (1 << 0) ? fg : 0;
-							*vram++ = abits & (1 << 1) ? fg : 0;
-							*vram++ = abits & (1 << 2) ? fg : 0;
-							*vram++ = abits & (1 << 3) ? fg : 0;
-							*vram++ = abits & (1 << 0) ? fg : 0;
-							*vram++ = bits & (1 << 1) ? fg : 0;
-							*vram++ = bits & (1 << 2) ? fg : 0;
-							*vram++ = bits & (1 << 3) ? fg : 0;
-							*vram++ = bits & (1 << 0) ? fg : 0;
-							*vram++ = bits & (1 << 1) ? fg : 0;
-							*vram++ = bits & (1 << 2) ? fg : 0;
-							*vram++ = bits & (1 << 3) ? fg : 0;
-						}
-						else
-						{
-							*vram++ = abits & (1 << 0) ? fg : 0;
-							*vram++ = abits & (1 << 1) ? fg : 0;
-							*vram++ = abits & (1 << 2) ? fg : 0;
-							*vram++ = abits & (1 << 3) ? fg : 0;
-							*vram++ = abits & (1 << 0) ? fg : 0;
-							*vram++ = abits & (1 << 1) ? fg : 0;
-							*vram++ = abits & (1 << 2) ? fg : 0;
-							*vram++ = bits & (1 << 0) ? fg : 0;
-							*vram++ = bits & (1 << 1) ? fg : 0;
-							*vram++ = bits & (1 << 2) ? fg : 0;
-							*vram++ = bits & (1 << 3) ? fg : 0;
-							*vram++ = bits & (1 << 0) ? fg : 0;
-							*vram++ = bits & (1 << 1) ? fg : 0;
-							*vram++ = bits & (1 << 2) ? fg : 0;
+							*vram++ = allbits & (1 << x) ? fg : 0;
 						}
 					}
 				}
 
-				bits = (code >> 4) & 0x0F;
-				abits = (auxcode >> 4) & 0x0F;
-
-				for (int y = 4; y < 8; y++)
-				{
-					if (((row + y) >= beginrow) && ((row + y) <= endrow))
-					{
-						uint16_t *vram = &bitmap.pix(row + y, (col * 14));
-
-						if (col & 1)
-						{
-							*vram++ = abits & (1 << 2) ? fg : 0;
-							*vram++ = abits & (1 << 3) ? fg : 0;
-							*vram++ = abits & (1 << 0) ? fg : 0;
-							*vram++ = abits & (1 << 1) ? fg : 0;
-							*vram++ = abits & (1 << 2) ? fg : 0;
-							*vram++ = abits & (1 << 3) ? fg : 0;
-							*vram++ = abits & (1 << 0) ? fg : 0;
-							*vram++ = bits & (1 << 1) ? fg : 0;
-							*vram++ = bits & (1 << 2) ? fg : 0;
-							*vram++ = bits & (1 << 3) ? fg : 0;
-							*vram++ = bits & (1 << 0) ? fg : 0;
-							*vram++ = bits & (1 << 1) ? fg : 0;
-							*vram++ = bits & (1 << 2) ? fg : 0;
-							*vram++ = bits & (1 << 3) ? fg : 0;
-						}
-						else
-						{
-							*vram++ = abits & (1 << 0) ? fg : 0;
-							*vram++ = abits & (1 << 1) ? fg : 0;
-							*vram++ = abits & (1 << 2) ? fg : 0;
-							*vram++ = abits & (1 << 3) ? fg : 0;
-							*vram++ = abits & (1 << 0) ? fg : 0;
-							*vram++ = abits & (1 << 1) ? fg : 0;
-							*vram++ = abits & (1 << 2) ? fg : 0;
-							*vram++ = bits & (1 << 0) ? fg : 0;
-							*vram++ = bits & (1 << 1) ? fg : 0;
-							*vram++ = bits & (1 << 2) ? fg : 0;
-							*vram++ = bits & (1 << 3) ? fg : 0;
-							*vram++ = bits & (1 << 0) ? fg : 0;
-							*vram++ = bits & (1 << 1) ? fg : 0;
-							*vram++ = bits & (1 << 2) ? fg : 0;
-						}
-					}
-				}
+				prev_code = code;
 			}
 		}
 	}
@@ -1251,6 +1185,9 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					break;
 
 				case 1:
+					// Shifting by 6 instead of 7 here shifts the entire DHGR screen right one pixel, so the leftmost pixel is
+					// always black and the rightmost pixel is not shown. This is to work around a problem with the HLSL NTSC
+					// shader. See Github issues #6308 and #10759. This should be changed when there is a better solution.
 					w >>= 6;
 					for (int b = 0; b < 7; b++)
 					{
@@ -1261,6 +1198,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					break;
 
 				case 2:
+					// See case 1
 					w >>= 6;
 					for (int b = 0; b < 7; b++)
 					{
@@ -1271,6 +1209,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					break;
 
 				case 3:
+					// See case 1
 					w >>= 6;
 					for (int b = 0; b < 7; b++)
 					{
