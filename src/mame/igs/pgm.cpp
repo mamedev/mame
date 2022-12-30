@@ -205,6 +205,14 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
+#define LOG_Z80     (1U <<  1)
+
+#define LOG_ALL     (LOG_Z80)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+#define LOGZ80(...) LOGMASKED(LOG_Z80, __VA_ARGS__)
 
 u16 pgm_state::videoram_r(offs_t offset)
 {

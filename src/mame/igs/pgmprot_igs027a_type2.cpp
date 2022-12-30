@@ -36,6 +36,14 @@
 #include "pgm.h"
 #include "pgmprot_igs027a_type2.h"
 
+#define LOG_PROT    (1U <<  1)
+#define LOG_ALL     (LOG_PROT)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+#define LOGPROT(...) LOGMASKED(LOG_PROT, __VA_ARGS__)
+
 u32 pgm_arm_type2_state::arm7_latch_arm_r(offs_t offset, u32 mem_mask)
 {
 	if (!machine().side_effects_disabled())

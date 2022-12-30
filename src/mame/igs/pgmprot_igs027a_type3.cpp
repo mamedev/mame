@@ -47,6 +47,14 @@
 #include "pgm.h"
 #include "pgmprot_igs027a_type3.h"
 
+#define LOG_PROT    (1U <<  1)
+#define LOG_ALL     (LOG_PROT)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+#define LOGPROT(...) LOGMASKED(LOG_PROT, __VA_ARGS__)
+
 void pgm_arm_type3_state::svg_arm7_ram_sel_w(u32 data)
 {
 //  printf("svg_arm7_ram_sel_w %08x\n", data);

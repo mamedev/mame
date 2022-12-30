@@ -62,6 +62,13 @@
 
 #include "screen.h"
 
+#define LOG_PROT    (1U <<  1)
+#define LOG_ALL     (LOG_PROT)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+#define LOGPROT(...) LOGMASKED(LOG_PROT, __VA_ARGS__)
 
 /**************************** EMULATION *******************************/
 /* used by photoy2k, kovsh */
