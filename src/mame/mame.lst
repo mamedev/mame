@@ -15287,6 +15287,7 @@ galaga3m                        // (c) 1984
 gaplus                          // (c) 1984
 gaplusa                         // (c) 1984
 gaplusd                         // (c) 1984
+gapluse                         // (c) 1984
 gaplust                         // (c) 1984
 
 @source:gametron/gatron.cpp
