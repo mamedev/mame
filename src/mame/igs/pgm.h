@@ -22,7 +22,16 @@
 #include "emupal.h"
 #include "tilemap.h"
 
-#define PGMARM7LOGERROR 0
+#define LOG_Z80     (1U <<  1)
+#define LOG_PROT    (1U <<  2)
+#define LOG_ALL     (LOG_Z80 | LOG_PROT)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+#define LOGZ80(...) LOGMASKED(LOG_Z80, __VA_ARGS__)
+#define LOGPROT(...) LOGMASKED(LOG_PROT, __VA_ARGS__)
+
 
 class pgm_state : public driver_device
 {
