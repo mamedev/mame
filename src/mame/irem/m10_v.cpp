@@ -120,7 +120,6 @@ void m15_state::video_start()
 uint32_t m10_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static const int color[4]= { 3, 3, 5, 5 };
-	static const int xpos[4] = { 4*8, 26*8, 7*8, 6*8};
 
 	bitmap.fill(0, cliprect);
 

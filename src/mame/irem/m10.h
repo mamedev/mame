@@ -133,6 +133,8 @@ private:
 
 	void m10_main(address_map &map);
 	void m11_main(address_map &map);
+
+	int xpos[4];
 };
 
 class m15_state : public m1x_state
