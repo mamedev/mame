@@ -20,7 +20,6 @@ static const uint32_t extyoffs[] =
 	STEP256(0, 8)
 };
 
-
 static const gfx_layout backlayout =
 {
 	8,8*32, // 8*(8*32) characters

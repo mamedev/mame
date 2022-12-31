@@ -81,14 +81,11 @@ protected:
 	// video-related
 	tilemap_t * m_tx_tilemap;
 
-	// this is currently unused, because it is needed by gfx_layout (which has no machine)
-	uint32_t extyoffs[32 * 8];
-
 	// video state
-	uint8_t m_flip;
+	uint8_t m_flip = 0;
 
 	// misc
-	int m_last;
+	int m_last = 0;
 	emu_timer *m_interrupt_timer;
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
