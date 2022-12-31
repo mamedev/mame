@@ -23374,8 +23374,9 @@ sarc110
 sarc110a
 
 @source:misc/megaphx.cpp
-megaphx                         // (c) 1991 Dinamic / Inder
 hamboy                          // (c) 1990 Dinamic / Inder
+megaphx                         // (c) 1991 Dinamic / Inder
+yoyospel
 
 @source:sega/megaplay.cpp
 megaplay                        //
