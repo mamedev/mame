@@ -119,15 +119,13 @@ void m15_state::video_start()
 
 uint32_t m10_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	static const int color[4]= { 3, 3, 5, 5 };
-
 	bitmap.fill(0, cliprect);
 
 	for (int i = 0; i < 4; i++)
 		if (m_flip)
-				m_back_gfx->opaque(bitmap,cliprect, i, color[i], 1, 1, 31 * 8 - xpos[i], 0);
+				m_back_gfx->opaque(bitmap,cliprect, i, m_back_color[i], 1, 1, 31 * 8 - m_back_xpos[i], 0);
 		else
-				m_back_gfx->opaque(bitmap,cliprect, i, color[i], 0, 0, xpos[i], 0);
+				m_back_gfx->opaque(bitmap,cliprect, i, m_back_color[i], 0, 0, m_back_xpos[i], 0);
 
 	if (m_bottomline)
 	{
