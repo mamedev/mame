@@ -16,7 +16,7 @@
 #include "screen.h"
 #include "tilemap.h"
 
-#define IREMM10_MASTER_CLOCK        (12500000)
+#define IREMM10_MASTER_CLOCK    (12500000)
 
 #define IREMM10_CPU_CLOCK       (IREMM10_MASTER_CLOCK/16)
 #define IREMM10_PIXEL_CLOCK     (IREMM10_MASTER_CLOCK/2)
@@ -29,7 +29,7 @@
 
 #define IREMM15_MASTER_CLOCK    (11730000)
 
-#define IREMM15_CPU_CLOCK       (IREMM15_MASTER_CLOCK/10)
+#define IREMM15_CPU_CLOCK       (IREMM15_MASTER_CLOCK/16)
 #define IREMM15_PIXEL_CLOCK     (IREMM15_MASTER_CLOCK/2)
 #define IREMM15_HTOTAL          (372)
 #define IREMM15_HBSTART         (256)
@@ -145,7 +145,6 @@ public:
 	{ }
 
 	void m15(machine_config &config);
-	void headoni(machine_config &config);
 
 protected:
 	virtual void video_start() override;

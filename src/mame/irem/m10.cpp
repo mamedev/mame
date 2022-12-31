@@ -14,7 +14,9 @@ Notes:
 - The bitmap strips in IPM Invader might be slightly misplaced
 
 TODO:
-- Dip switches
+- DIP switches
+- M-11 XTAL is 11.73MHz
+- andromed M-29S starfield
 
 Head On
 -------
@@ -51,7 +53,7 @@ Notes:
       All IC's are listed
       All ROMs type 2708 (1K x8)
 
-      6502 clock: 1.173MHz
+      6502 clock: 733kHz
                *: These 2 IC's piggybacked. 74S04 on top
          VR1/2/3: 5K potentiometers
             2114: 1K x4 SRAM
@@ -112,12 +114,14 @@ Notes (couriersud)
     been a prototype or eventually the famous "capsule invader".
 
 ***************************************************************************/
+
 #include "emu.h"
 #include "m10.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/rescap.h"
 #include "sound/samples.h"
+
 #include "speaker.h"
 
 
@@ -139,7 +143,7 @@ WRITE_LINE_MEMBER(m10_state::ic8j1_output_changed)
 
 WRITE_LINE_MEMBER(m10_state::ic8j2_output_changed)
 {
-	// written from /Q to A with slight delight
+	// written from /Q to A with slight delay
 	LOG(("ic8j2: %d\n", state));
 	m_ic8j2->a_w(state);
 	m_ic8j1->a_w(state);
@@ -185,6 +189,7 @@ void m10_state::machine_reset()
 	m1x_state::machine_reset();
 	m_bottomline = 0;
 }
+
 /*************************************
  *
  *  I/O handling
@@ -930,12 +935,6 @@ void m15_state::m15(machine_config &config)
 	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void m15_state::headoni(machine_config &config)
-{
-	m15(config);
-	m_maincpu->set_clock(11730000/16);
-}
-
 
 /***************************************************************************
 
@@ -1046,10 +1045,10 @@ ROM_START( greenber )
 	ROM_LOAD( "gb9", 0x3000, 0x0400, CRC(c27b9ba3) SHA1(a2f4f0c4b61eb03bba13ae5d25dc01009a4f86ee) )
 ROM_END
 
-GAME( 1979, ipminvad,  0,        m10,     ipminvad, m10_state, empty_init,    ROT270, "IPM",  "IPM Invader (set 1)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, ipminvad1, ipminvad, m10,     ipminvad, m10_state, empty_init,    ROT270, "IPM",  "IPM Invader (set 2)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump
-GAME( 1980, andromed,  0,        m11,     andromed, m10_state, empty_init,    ROT270, "Irem", "Andromeda SS (Japan?)",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // export version known as simply "Andromeda"
-GAME( 1980, skychut,   0,        m11,     skychut,  m10_state, empty_init,    ROT270, "Irem", "Sky Chuter",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headoni,   0,        headoni, headoni,  m15_state, empty_init,    ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spacbeam,  0,        m15,     spacbeam, m15_state, empty_init,    ROT270, "Irem", "Space Beam",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
-GAME( 1980, greenber,  0,        m15,     greenber, m15_state, empty_init,    ROT270, "Irem", "Green Beret (Irem)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ipminvad,  0,        m10, ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (set 1)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ipminvad1, ipminvad, m10, ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (set 2)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump
+GAME( 1980, andromed,  0,        m11, andromed, m10_state, empty_init, ROT270, "Irem", "Andromeda SS (Japan?)",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // export version known as simply "Andromeda"
+GAME( 1980, skychut,   0,        m11, skychut,  m10_state, empty_init, ROT270, "Irem", "Sky Chuter",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headoni,   0,        m15, headoni,  m15_state, empty_init, ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spacbeam,  0,        m15, spacbeam, m15_state, empty_init, ROT270, "Irem", "Space Beam",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
+GAME( 1980, greenber,  0,        m15, greenber, m15_state, empty_init, ROT270, "Irem", "Green Beret (Irem)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
