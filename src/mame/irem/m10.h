@@ -18,7 +18,7 @@
 #include "screen.h"
 #include "tilemap.h"
 
-#define IREMM10_MASTER_CLOCK    (12500000)
+#define IREMM10_MASTER_CLOCK    12.5_MHz_XTAL
 
 #define IREMM10_CPU_CLOCK       (IREMM10_MASTER_CLOCK/16)
 #define IREMM10_PIXEL_CLOCK     (IREMM10_MASTER_CLOCK/2)
@@ -29,16 +29,16 @@
 #define IREMM10_VBSTART         (240)
 #define IREMM10_VBEND           (16)
 
-#define IREMM15_MASTER_CLOCK    (11730000)
+#define IREMM11_MASTER_CLOCK    11.73_MHz_XTAL
 
-#define IREMM15_CPU_CLOCK       (IREMM15_MASTER_CLOCK/16)
-#define IREMM15_PIXEL_CLOCK     (IREMM15_MASTER_CLOCK/2)
-#define IREMM15_HTOTAL          (372)
-#define IREMM15_HBSTART         (256)
-#define IREMM15_HBEND           (0)
-#define IREMM15_VTOTAL          (262)
-#define IREMM15_VBSTART         (240)
-#define IREMM15_VBEND           (16)
+#define IREMM11_CPU_CLOCK       (IREMM11_MASTER_CLOCK/16)
+#define IREMM11_PIXEL_CLOCK     (IREMM11_MASTER_CLOCK/2)
+#define IREMM11_HTOTAL          (372)
+#define IREMM11_HBSTART         (256)
+#define IREMM11_HBEND           (0)
+#define IREMM11_VTOTAL          (262)
+#define IREMM11_VBSTART         (240)
+#define IREMM11_VBEND           (16)
 
 class m1x_state : public driver_device
 {

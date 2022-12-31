@@ -2,7 +2,7 @@
 // copyright-holders:Lee Taylor, Couriersud
 /***************************************************************************
 
-    Irem M10/M11/M15 hardware
+    Irem M-10 / M-11 / M-15 hardware
 
 ****************************************************************************
 
@@ -15,7 +15,6 @@ Notes:
 
 TODO:
 - DIP switches
-- M-11 XTAL is 11.73MHz, what about M-10? is 12.5MHz verified?
 - andromed M-29S starfield
 - andromed coin is always 2 credits?
 
@@ -88,16 +87,15 @@ Notes:
             C1815: Transistor (x9)
            TA7222: Power Amp
 
-***************************************************************************/
+****************************************************************************
 
-/***************************************************************************
 Notes (couriersud)
 
     From http://www.crazykong.com/tech/IremBoardList.txt
 
+    ipminvad:       M-10L + M-10S (also exists on M-11 hw)
+    andromed:       M-11L + M-11S + M-29S
     skychut:        M-11 (?)
-    andromed:       N/A
-    ipminvad:       N/A
     spacbeam:       not listed
     headon:         not listed
     greenber:       M-15T, M-24S
@@ -884,6 +882,9 @@ void m10_state::m11(machine_config &config)
 {
 	m10(config);
 
+	m_maincpu->set_clock(IREMM11_CPU_CLOCK);
+	m_screen->set_raw(IREMM11_PIXEL_CLOCK, IREMM11_HTOTAL, IREMM11_HBEND, IREMM11_HBSTART, IREMM11_VTOTAL, IREMM11_VBEND, IREMM11_VBSTART);
+
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &m10_state::m11_main);
 
@@ -894,13 +895,13 @@ void m10_state::m11(machine_config &config)
 void m15_state::m15(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, IREMM15_CPU_CLOCK);
+	M6502(config, m_maincpu, IREMM11_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m15_state::m15_main);
 	m_maincpu->set_vblank_int("screen", FUNC(m15_state::interrupt));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(IREMM15_PIXEL_CLOCK, IREMM15_HTOTAL, IREMM15_HBEND, IREMM15_HBSTART, IREMM15_VTOTAL, IREMM15_VBEND, IREMM15_VBSTART);
+	m_screen->set_raw(IREMM11_PIXEL_CLOCK, IREMM11_HTOTAL, IREMM11_HBEND, IREMM11_HBSTART, IREMM11_VTOTAL, IREMM11_VBEND, IREMM11_VBSTART);
 	m_screen->set_screen_update(FUNC(m15_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -1030,8 +1031,10 @@ ROM_END
 //    YEAR  NAME       PARENT    MACHINE INPUT     CLASS      INIT        ROT     COMPANY FULLNAME, FLAGS
 GAME( 1979, ipminvad,  0,        m10,    ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, ipminvad1, ipminvad, m10,    ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump
+
 GAME( 1980, andromed,  0,        m11,    andromed, m10_state, empty_init, ROT270, "Irem", "Andromeda SS (Japan?)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // export version known as simply "Andromeda"
 GAME( 1980, skychut,   0,        m11,    skychut,  m10_state, empty_init, ROT270, "Irem", "Sky Chuter", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+
 GAME( 1979, headoni,   0,        m15,    headoni,  m15_state, empty_init, ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, spacbeam,  0,        m15,    spacbeam, m15_state, empty_init, ROT270, "Irem", "Space Beam", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
 GAME( 1980, greenber,  0,        m15,    greenber, m15_state, empty_init, ROT270, "Irem", "Green Beret (Irem)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
