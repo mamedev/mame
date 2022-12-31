@@ -10,8 +10,10 @@
 
 #pragma once
 
-#include "sound/samples.h"
 #include "machine/74123.h"
+#include "machine/rescap.h"
+#include "sound/samples.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -107,6 +109,8 @@ public:
 	void m10(machine_config &config);
 	void m11(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(set_vr1) { m_ic8j2->set_resistor_value(RES_K(10 + newval / 5.0)); }
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -126,7 +130,6 @@ private:
 	void m10_a500_w(uint8_t data);
 	void m11_a100_w(uint8_t data);
 	uint8_t m10_a700_r();
-	uint8_t m11_a700_r();
 	void chargen_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(ic8j1_output_changed);

@@ -15,8 +15,9 @@ Notes:
 
 TODO:
 - DIP switches
-- M-11 XTAL is 11.73MHz
+- M-11 XTAL is 11.73MHz, what about M-10? is 12.5MHz verified?
 - andromed M-29S starfield
+- andromed coin is always 2 credits?
 
 Head On
 -------
@@ -119,8 +120,6 @@ Notes (couriersud)
 #include "m10.h"
 
 #include "cpu/m6502/m6502.h"
-#include "machine/rescap.h"
-#include "sound/samples.h"
 
 #include "speaker.h"
 
@@ -148,6 +147,7 @@ WRITE_LINE_MEMBER(m10_state::ic8j2_output_changed)
 	m_ic8j2->a_w(state);
 	m_ic8j1->a_w(state);
 }
+
 
 /*************************************
  *
@@ -189,6 +189,7 @@ void m10_state::machine_reset()
 	m1x_state::machine_reset();
 	m_bottomline = 0;
 }
+
 
 /*************************************
  *
@@ -455,15 +456,6 @@ uint8_t m10_state::m10_a700_r()
 	return 0x00;
 }
 
-uint8_t m10_state::m11_a700_r()
-{
-	//LOG(("rd:%d\n",m_screen->vpos()));
-	//m_maincpu->set_input_line(0, CLEAR_LINE);
-	LOG(("clear\n"));
-	m_ic8j1->clear_w(0);
-	m_ic8j1->clear_w(1);
-	return 0x00;
-}
 
 /*************************************
  *
@@ -513,6 +505,7 @@ INTERRUPT_GEN_MEMBER(m15_state::interrupt)
 	m_interrupt_timer->adjust(m_screen->time_until_pos(IREMM10_VBSTART + 1, 80), -1);
 }
 
+
 /*************************************
  *
  *  Main CPU memory handlers
@@ -545,7 +538,7 @@ void m10_state::m11_main(address_map &map)
 	map(0xa200, 0xa200).portr("DSW");
 	map(0xa300, 0xa300).portr("INPUTS");
 	map(0xa400, 0xa400).w(FUNC(m10_state::m11_ctrl_w));   // line at bottom of screen?, sound, flip screen
-	map(0xa700, 0xa700).r(FUNC(m10_state::m11_a700_r));
+	map(0xa700, 0xa700).r(FUNC(m10_state::m10_a700_r));
 	map(0xfc00, 0xffff).rom(); // for the reset / interrupt vectors
 }
 
@@ -564,75 +557,27 @@ void m15_state::m15_main(address_map &map)
 	map(0xfc00, 0xffff).rom(); // for the reset / interrupt vectors
 }
 
+
 /*************************************
  *
  *  Port definitions
  *
  *************************************/
 
-#define CAB_PORTENV \
-	/* fake port for cabinet type */                    \
-	PORT_START("CAB")                               \
-	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )     \
-	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )     \
-	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )    \
-	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )     \
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )     \
-	PORT_CONFSETTING(    0x02, DEF_STR( On ) )  \
+static INPUT_PORTS_START( cabinet )
+	PORT_START("CAB") // fake port for cabinet type
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
+	PORT_CONFNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-
-static INPUT_PORTS_START( skychut )
-	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
-
-	PORT_START("DSW")
-	PORT_DIPNAME(0x03, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING (  0x00, "3" )
-	PORT_DIPSETTING (  0x01, "4" )
-	PORT_DIPSETTING (  0x02, "5" )
-	PORT_DIPNAME( 0x04, 0x00, "Unknown 1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Unknown 2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Unknown 3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Unknown 4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Unknown 5" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Unknown 6" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state, coin_inserted, 0)
-
-	CAB_PORTENV
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( andromed )
-	PORT_INCLUDE( skychut )
-	PORT_MODIFY("DSW")
-
-	PORT_DIPNAME( 0x20, 0x20, "Power On Credits" )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPSETTING(    0x20, DEF_STR(None) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ipminvad )
+	PORT_INCLUDE( cabinet )
+
 	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -644,10 +589,10 @@ static INPUT_PORTS_START( ipminvad )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
 
 	PORT_START("DSW")
-	PORT_DIPNAME(0x03, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING (  0x00, "3" )
-	PORT_DIPSETTING (  0x01, "4" )
-	PORT_DIPSETTING (  0x02, "5" )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING (   0x00, "3" )
+	PORT_DIPSETTING (   0x01, "4" )
+	PORT_DIPSETTING (   0x02, "5" )
 	PORT_DIPNAME( 0x04, 0x00, "Capsules" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
@@ -670,10 +615,47 @@ static INPUT_PORTS_START( ipminvad )
 	PORT_START("FAKE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state, coin_inserted, 0)
 
-	CAB_PORTENV
+	PORT_START("VR1") // VR1 20K variable resistor on main PCB
+	PORT_ADJUSTER(30, "IRQ Frequency") PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state, set_vr1, 0)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( skychut )
+	PORT_INCLUDE( ipminvad )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME(0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING (  0x00, "3" )
+	PORT_DIPSETTING (  0x01, "4" )
+	PORT_DIPSETTING (  0x02, "5" )
+	PORT_DIPUNKNOWN( 0x04, 0x00 )
+	PORT_DIPUNKNOWN( 0x08, 0x00 )
+	PORT_DIPUNKNOWN( 0x10, 0x00 )
+	PORT_DIPUNKNOWN( 0x20, 0x00 )
+	PORT_DIPUNKNOWN( 0x40, 0x00 )
+	PORT_DIPUNKNOWN( 0x80, 0x00 )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( andromed )
+	PORT_INCLUDE( ipminvad )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING (   0x00, "3" )
+	PORT_DIPSETTING (   0x01, "4" )
+	PORT_DIPSETTING (   0x02, "5" )
+	PORT_DIPUNKNOWN( 0x04, 0x00 )
+	PORT_DIPUNKNOWN( 0x08, 0x00 )
+	PORT_DIPUNKNOWN( 0x10, 0x00 )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x40, 0x00 )
+	PORT_DIPUNKNOWN( 0x80, 0x00 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spacbeam )
+	PORT_INCLUDE( cabinet )
+
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -703,11 +685,11 @@ static INPUT_PORTS_START( spacbeam )
 
 	PORT_START("FAKE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state, coin_inserted, 0)
-
-	CAB_PORTENV
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( headoni )
+	PORT_INCLUDE( cabinet )
+
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -758,11 +740,11 @@ static INPUT_PORTS_START( headoni )
 
 	PORT_START("FAKE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state, coin_inserted, 0)
-
-	CAB_PORTENV
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( greenber )
+	PORT_INCLUDE( cabinet )
+
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
@@ -796,8 +778,6 @@ static INPUT_PORTS_START( greenber )
 
 	PORT_START("FAKE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state, coin_inserted, 0)
-
-	CAB_PORTENV
 INPUT_PORTS_END
 
 
@@ -847,6 +827,7 @@ static const char *const m10_sample_names[] =
 	nullptr
 };
 
+
 /*************************************
  *
  *  Machine driver
@@ -880,7 +861,7 @@ void m10_state::m10(machine_config &config)
 	TTL74123(config, m_ic8j2, 0);
 	m_ic8j2->set_connection_type(TTL74123_NOT_GROUNDED_DIODE);  // the hook up type
 	// 10k + 20k variable resistor
-	m_ic8j2->set_resistor_value(RES_K(22));                     // resistor connected to RCext
+	m_ic8j2->set_resistor_value(RES_K(10 + 6));                 // resistor connected to RCext
 	m_ic8j2->set_capacitor_value(CAP_U(2.2));                   // capacitor connected to Cext and RCext
 	m_ic8j2->set_a_pin_value(1);                                // A pin - driven by the CRTC
 	m_ic8j2->set_b_pin_value(1);                                // B pin - pulled high
@@ -1045,10 +1026,12 @@ ROM_START( greenber )
 	ROM_LOAD( "gb9", 0x3000, 0x0400, CRC(c27b9ba3) SHA1(a2f4f0c4b61eb03bba13ae5d25dc01009a4f86ee) )
 ROM_END
 
-GAME( 1979, ipminvad,  0,        m10, ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (set 1)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, ipminvad1, ipminvad, m10, ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (set 2)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump
-GAME( 1980, andromed,  0,        m11, andromed, m10_state, empty_init, ROT270, "Irem", "Andromeda SS (Japan?)",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // export version known as simply "Andromeda"
-GAME( 1980, skychut,   0,        m11, skychut,  m10_state, empty_init, ROT270, "Irem", "Sky Chuter",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, headoni,   0,        m15, headoni,  m15_state, empty_init, ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spacbeam,  0,        m15, spacbeam, m15_state, empty_init, ROT270, "Irem", "Space Beam",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
-GAME( 1980, greenber,  0,        m15, greenber, m15_state, empty_init, ROT270, "Irem", "Green Beret (Irem)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+
+//    YEAR  NAME       PARENT    MACHINE INPUT     CLASS      INIT        ROT     COMPANY FULLNAME, FLAGS
+GAME( 1979, ipminvad,  0,        m10,    ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ipminvad1, ipminvad, m10,    ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // incomplete dump
+GAME( 1980, andromed,  0,        m11,    andromed, m10_state, empty_init, ROT270, "Irem", "Andromeda SS (Japan?)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // export version known as simply "Andromeda"
+GAME( 1980, skychut,   0,        m11,    skychut,  m10_state, empty_init, ROT270, "Irem", "Sky Chuter", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headoni,   0,        m15,    headoni,  m15_state, empty_init, ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spacbeam,  0,        m15,    spacbeam, m15_state, empty_init, ROT270, "Irem", "Space Beam", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
+GAME( 1980, greenber,  0,        m15,    greenber, m15_state, empty_init, ROT270, "Irem", "Green Beret (Irem)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
