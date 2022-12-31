@@ -51,12 +51,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dhires_w);
 	DECLARE_WRITE_LINE_MEMBER(an2_w);
 
-	template<bool iie, bool invert, bool flip>
+	// Models with different text-mode behavior. II includes the II+ and IIE includes the IIc and IIc Plus.
+	enum class model { II, IIE, IIGS, II_J_PLUS, IVEL_ULTRA };
+
+	template <model Model, bool Invert, bool Flip>
 	void text_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 
-	void text_update_ultr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-	void text_update_jplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-	void text_updateGS(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void lores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void dlores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
@@ -73,11 +73,8 @@ protected:
 	void init_palette();
 
 private:
-	template <bool iie, bool invert, bool flip>
+	template <model Model, bool Invert, bool Flip>
 	void plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, int fg, int bg);
-	void plot_text_character_ultr(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, int fg, int bg);
-	void plot_text_character_jplus(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, int fg, int bg);
-	void plot_text_characterGS(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, int fg, int bg);
 };
 
 // device type definition
