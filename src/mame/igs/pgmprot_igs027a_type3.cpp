@@ -47,6 +47,14 @@
 #include "pgm.h"
 #include "pgmprot_igs027a_type3.h"
 
+#define LOG_PROT    (1U <<  1)
+#define LOG_ALL     (LOG_PROT)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+#define LOGPROT(...) LOGMASKED(LOG_PROT, __VA_ARGS__)
+
 void pgm_arm_type3_state::svg_arm7_ram_sel_w(u32 data)
 {
 //  printf("svg_arm7_ram_sel_w %08x\n", data);
@@ -95,31 +103,27 @@ void pgm_arm_type3_state::svg_68k_nmi_w(u16 data)
 
 void pgm_arm_type3_state::svg_latch_68k_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (PGMARM7LOGERROR)
-		logerror("M68K: Latch write: %04x (%04x) %s\n", data & 0x0000ffff, mem_mask, machine().describe_context());
+	LOGPROT("M68K: Latch write: %04x (%04x) %s\n", data & 0x0000ffff, mem_mask, machine().describe_context());
 	COMBINE_DATA(&m_svg_latchdata_68k_w);
 }
 
 
 u16 pgm_arm_type3_state::svg_latch_68k_r(offs_t offset, u16 mem_mask)
 {
-	if (PGMARM7LOGERROR)
-		logerror("M68K: Latch read: %04x (%04x) %s\n", m_svg_latchdata_arm_w & 0x0000ffff, mem_mask, machine().describe_context());
+	LOGPROT("M68K: Latch read: %04x (%04x) %s\n", m_svg_latchdata_arm_w & 0x0000ffff, mem_mask, machine().describe_context());
 	return m_svg_latchdata_arm_w;
 }
 
 
 u32 pgm_arm_type3_state::svg_latch_arm_r(offs_t offset, u32 mem_mask)
 {
-	if (PGMARM7LOGERROR)
-		logerror("ARM7: Latch read: %08x (%08x) %s\n", m_svg_latchdata_68k_w, mem_mask, machine().describe_context());
+	LOGPROT("ARM7: Latch read: %08x (%08x) %s\n", m_svg_latchdata_68k_w, mem_mask, machine().describe_context());
 	return m_svg_latchdata_68k_w;
 }
 
 void pgm_arm_type3_state::svg_latch_arm_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	if (PGMARM7LOGERROR)
-		logerror("ARM7: Latch write: %08x (%08x) %s\n", data, mem_mask, machine().describe_context());
+	LOGPROT("ARM7: Latch write: %08x (%08x) %s\n", data, mem_mask, machine().describe_context());
 
 	COMBINE_DATA(&m_svg_latchdata_arm_w);
 }
