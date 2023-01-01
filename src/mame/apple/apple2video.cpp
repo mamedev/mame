@@ -195,10 +195,10 @@ WRITE_LINE_MEMBER(a2_video_device::an2_w)
 	m_an2 = state;
 }
 
-template<bool iie, bool invert, bool flip>
+template <a2_video_device::model Model, bool Invert, bool Flip>
 void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, int fg, int bg)
 {
-	if (iie)    // IIe/IIc/IIgs
+	if (Model == model::IIE || Model == model::IIGS)
 	{
 		if (!m_altcharset)
 		{
@@ -212,6 +212,10 @@ void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int yp
 					swap(fg, bg);
 				}
 			}
+		}
+		else if (Model == model::IIGS)
+		{
+			code |= 0x100;
 		}
 		else
 		{
@@ -227,79 +231,31 @@ void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int yp
 	{
 		if ((code >= 0x40) && (code <= 0x7f))
 		{
+			if (Model == model::II_J_PLUS)
+			{
+				code &= 0x3f;
+			}
 			if (m_flash)
 			{
 				using std::swap;
 				swap(fg, bg);
 			}
 		}
-		else if (code < 0x40) // inverse: flip FG and BG
+		else if (code < 0x40 && Model != model::IVEL_ULTRA) // inverse: flip FG and BG
 		{
 			using std::swap;
 			swap(fg, bg);
 		}
-	}
 
-	/* look up the character data */
-	u8 const *const chardata = &m_char_ptr[(code * 8)];
-
-	for (int y = 0; y < 8; y++)
-	{
-		for (int x = 0; x < 7; x++)
+		if (Model == model::II_J_PLUS && m_an2)
 		{
-			u16 color;
-			// flip and invert are template parameters, so the compiler will boil this down appropriately
-			if (flip)
-			{
-				if (invert)
-				{
-					color = (chardata[y] & (1 << (6 - x))) ? fg : bg;
-				}
-				else
-				{
-					color = (chardata[y] & (1 << (6 - x))) ? bg : fg;
-				}
-			}
-			else
-			{
-				if (invert)
-				{
-					color = (chardata[y] & (1 << x)) ? fg : bg;
-				}
-				else
-				{
-					color = (chardata[y] & (1 << x)) ? bg : fg;
-				}
-			}
-
-			for (int i = 0; i < xscale; i++)
-			{
-				bitmap.pix(ypos + y, xpos + (x * xscale) + i) = color;
-			}
+			code |= 0x80;
 		}
 	}
-}
 
-void a2_video_device::plot_text_character_jplus(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, int fg, int bg)
-{
-	if ((code >= 0x40) && (code <= 0x7f))
+	if (Invert)
 	{
-		code &= 0x3f;
-		if (m_flash)
-		{
-			using std::swap;
-			swap(fg, bg);
-		}
-	}
-	else if (code < 0x40)   // inverse: flip FG and BG
-	{
-		using std::swap;
-		swap(fg, bg);
-	}
-
-	if (m_an2)
-	{
-		code |= 0x80;
+		std::swap(fg, bg);
 	}
 
 	/* look up the character data */
@@ -309,72 +265,9 @@ void a2_video_device::plot_text_character_jplus(bitmap_ind16 &bitmap, int xpos, 
 	{
 		for (int x = 0; x < 7; x++)
 		{
-			uint16_t const color = (chardata[y] & (1 << (6-x))) ? fg : bg;
-
-			for (int i = 0; i < xscale; i++)
-			{
-				bitmap.pix(ypos + y, xpos + (x * xscale) + i) = color;
-			}
-		}
-	}
-}
-
-void a2_video_device::plot_text_character_ultr(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, int fg, int bg)
-{
-	if ((code >= 0x40) && (code <= 0x7f))
-	{
-		if (m_flash)
-		{
-			using std::swap;
-			swap(fg, bg);
-		}
-	}
-
-	/* look up the character data */
-	uint8_t const *const chardata = &m_char_ptr[(code * 8)];
-
-	for (int y = 0; y < 8; y++)
-	{
-		for (int x = 1; x < 8; x++)
-		{
-			uint16_t const color = (chardata[y] & (1 << x)) ? fg : bg;
-
-			for (int i = 0; i < xscale; i++)
-			{
-				bitmap.pix(ypos + y, xpos + ((x-1) * xscale) + i) = color;
-			}
-		}
-	}
-}
-
-void a2_video_device::plot_text_characterGS(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, int fg, int bg)
-{
-	if (!m_altcharset)
-	{
-		if ((code >= 0x40) && (code <= 0x7f))
-		{
-			code &= 0x3f;
-
-			if (m_flash)
-			{
-				using std::swap;
-				swap(fg, bg);
-			}
-		}
-	}
-	else
-	{
-		code |= 0x100;
-	}
-
-	/* look up the character data */
-	uint8_t const *const chardata = &m_char_ptr[(code * 8)];
-
-	for (int y = 0; y < 8; y++)
-	{
-		for (int x = 0; x < 7; x++)
-		{
-			uint16_t const color = (chardata[y] & (1 << x)) ? bg : fg;
+			// Model and Flip are template parameters, so the compiler will boil this down appropriately
+			unsigned const bit = (Model == model::IVEL_ULTRA) ? (2 << x) : Flip ? (64 >> x) : (1 << x);
+			uint16_t const color = (chardata[y] & bit) ? bg : fg;
 
 			for (int i = 0; i < xscale; i++)
 			{
@@ -696,7 +589,7 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 	}
 }
 
-template<bool iie, bool invert, bool flip>
+template <a2_video_device::model Model, bool Invert, bool Flip>
 void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
 	uint8_t const *const aux_page = m_aux_ptr ? m_aux_ptr : m_ram_ptr;
@@ -713,38 +606,34 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	// printf("TXT: row %d startcol %d stopcol %d left %d right %d\n", beginrow, startcol, stopcol, cliprect.left(), cliprect.right());
 
-	int fg = 0;
-	int bg = 0;
-	switch (m_sysconfig & 0x03)
+	int fg, bg;
+	if (Model == model::IIGS)
 	{
-	case 0:
-	case 4:
-		fg = WHITE;
-		break;
-	case 1:
-		fg = WHITE;
-		break;
-	case 2:
-		fg = GREEN;
-		break;
-	case 3:
-		fg = ORANGE;
-		break;
+		fg = m_GSfg;
+		bg = m_GSbg;
+	}
+	else
+	{
+		switch (m_sysconfig & 0x03)
+		{
+			case 2: fg = GREEN; break;
+			case 3: fg = ORANGE; break;
+			default: fg = WHITE; break;
+		}
+		bg = 0;
 	}
 
 	for (int row = startrow; row < stoprow; row += 8)
 	{
-		if ((iie) && (m_80col))
+		if ((Model == model::IIE || Model == model::IIGS) && m_80col)
 		{
 			for (int col = startcol; col < stopcol; col++)
 			{
 				/* calculate address */
 				uint32_t const address = start_address + ((((row / 8) & 0x07) << 7) | (((row / 8) & 0x18) * 5 + col));
-
-				plot_text_character<true, invert, flip>(bitmap, col * 14, row, 1, aux_page[address & m_aux_mask],
-									fg, bg);
-				plot_text_character<true, invert, flip>(bitmap, col * 14 + 7, row, 1, m_ram_ptr[address],
-									fg, bg);
+				uint32_t const aux_address = (Model == model::IIGS) ? address : (address & m_aux_mask);
+				plot_text_character<Model, Invert, Flip>(bitmap, col * 14, row, 1, aux_page[aux_address], fg, bg);
+				plot_text_character<Model, Invert, Flip>(bitmap, col * 14 + 7, row, 1, m_ram_ptr[address], fg, bg);
 			}
 		}
 		else
@@ -753,93 +642,30 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 			{
 				/* calculate address */
 				uint32_t const address = start_address + ((((row / 8) & 0x07) << 7) | (((row / 8) & 0x18) * 5 + col));
-				if (((m_sysconfig & 7) == 4) && (m_dhires))
+				if ((Model == model::II || Model == model::IIE) && (m_sysconfig & 7) == 4 && m_dhires)
 				{
 					u8 tmp = aux_page[address];
 					fg = tmp >> 4;
 					bg = tmp & 0xf;
 				}
 
-				plot_text_character<iie, invert, flip>(bitmap, col * 14, row, 2, m_ram_ptr[address], fg, bg);
+				plot_text_character<Model, Invert, Flip>(bitmap, col * 14, row, 2, m_ram_ptr[address], fg, bg);
 			}
 		}
 	}
 }
 
-template void a2_video_device::text_update<false, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-template void a2_video_device::text_update<false, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-template void a2_video_device::text_update<false, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-template void a2_video_device::text_update<false, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-template void a2_video_device::text_update<true, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-template void a2_video_device::text_update<true, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-template void a2_video_device::text_update<true, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-template void a2_video_device::text_update<true, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-
-void a2_video_device::text_update_jplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
-{
-	int row, col;
-	uint32_t start_address = m_page2 ? 0x800 : 0x400;
-	uint32_t address;
-	int fg = 0;
-	int bg = 0;
-
-	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
-	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
-
-	const int startrow = (beginrow / 8) * 8;
-	const int stoprow = ((endrow / 8) + 1) * 8;
-
-	switch (m_sysconfig & 0x03)
-	{
-		case 0: fg = WHITE; break;
-		case 1: fg = WHITE; break;
-		case 2: fg = GREEN; break;
-		case 3: fg = ORANGE; break;
-	}
-
-	for (row = startrow; row <= stoprow; row += 8)
-	{
-		for (col = 0; col < 40; col++)
-		{
-			/* calculate address */
-			address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
-			plot_text_character_jplus(bitmap, col * 14, row, 2, m_ram_ptr[address], fg, bg);
-		}
-	}
-}
-
-void a2_video_device::text_update_ultr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
-{
-	int row, col;
-	uint32_t start_address = m_page2 ? 0x800 : 0x400;
-	uint32_t address;
-	int fg = 0;
-	int bg = 0;
-
-	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
-	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
-
-	const int startrow = (beginrow / 8) * 8;
-	const int stoprow = ((endrow / 8) + 1) * 8;
-
-	switch (m_sysconfig & 0x03)
-	{
-		case 0: fg = WHITE; break;
-		case 1: fg = WHITE; break;
-		case 2: fg = GREEN; break;
-		case 3: fg = ORANGE; break;
-	}
-
-	for (row = startrow; row <= stoprow; row += 8)
-	{
-		for (col = 0; col < 40; col++)
-		{
-			/* calculate address */
-			address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
-			plot_text_character_ultr(bitmap, col * 14, row, 2, m_ram_ptr[address], fg, bg);
-		}
-	}
-}
+template void a2_video_device::text_update<a2_video_device::model::II, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<a2_video_device::model::II, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<a2_video_device::model::II, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<a2_video_device::model::II, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<a2_video_device::model::IIE, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<a2_video_device::model::IIE, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<a2_video_device::model::IIE, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<a2_video_device::model::IIE, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<a2_video_device::model::IIGS, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<a2_video_device::model::II_J_PLUS, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 
 void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
@@ -1439,7 +1265,7 @@ uint32_t a2_video_device::screen_update_GS_8bit(screen_device &screen, bitmap_in
 				{
 					hgr_update(screen, bitmap, cliprect, 0, 159);
 				}
-				text_updateGS(screen, bitmap, cliprect, 160, 191);
+				text_update<model::IIGS, false, false>(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -1466,7 +1292,7 @@ uint32_t a2_video_device::screen_update_GS_8bit(screen_device &screen, bitmap_in
 					lores_update(screen, bitmap, cliprect, 0, 159);
 				}
 
-				text_updateGS(screen, bitmap, cliprect, 160, 191);
+				text_update<model::IIGS, false, false>(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -1483,54 +1309,10 @@ uint32_t a2_video_device::screen_update_GS_8bit(screen_device &screen, bitmap_in
 	}
 	else
 	{
-		text_updateGS(screen, bitmap, cliprect, cliprect.top(), cliprect.bottom());
+		text_update<model::IIGS, false, false>(screen, bitmap, cliprect, cliprect.top(), cliprect.bottom());
 	}
 
 	m_page2 = old_page2;
 
 	return 0;
-}
-
-void a2_video_device::text_updateGS(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
-{
-	uint8_t const *const aux_page = m_aux_ptr ? m_aux_ptr : m_ram_ptr;
-
-	uint32_t const start_address = m_page2 ? 0x800 : 0x400;
-
-	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
-	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
-
-	const int startrow = (beginrow / 8) * 8;
-	const int stoprow = ((endrow / 8) + 1) * 8;
-	const int startcol = (cliprect.left() / 14);
-	const int stopcol = ((cliprect.right() / 14) + 1);
-
-	//printf("TXT: row %d startcol %d stopcol %d left %d right %d\n", beginrow, startcol, stopcol, cliprect.left(), cliprect.right());
-
-	for (int row = startrow; row < stoprow; row += 8)
-	{
-		if (m_80col)
-		{
-			for (int col = startcol; col < stopcol; col++)
-			{
-				/* calculate address */
-				uint32_t const address = start_address + ((((row / 8) & 0x07) << 7) | (((row / 8) & 0x18) * 5 + col));
-
-				plot_text_characterGS(bitmap, col * 14, row, 1, aux_page[address],
-									m_GSfg, m_GSbg);
-				plot_text_characterGS(bitmap, col * 14 + 7, row, 1, m_ram_ptr[address],
-									m_GSfg, m_GSbg);
-			}
-		}
-		else
-		{
-			for (int col = startcol; col < stopcol; col++)
-			{
-				/* calculate address */
-				uint32_t const address = start_address + ((((row / 8) & 0x07) << 7) | (((row / 8) & 0x18) * 5 + col));
-
-				plot_text_characterGS(bitmap, col * 14, row, 2, m_ram_ptr[address], m_GSfg, m_GSbg);
-			}
-		}
-	}
 }
