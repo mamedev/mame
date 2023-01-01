@@ -77,6 +77,7 @@ public:
 	void rom_10(address_map &map);
 	void rom_11(address_map &map);
 	void rom_9(address_map &map);
+
 protected:
 	// construction/destruction
 	pic16c5x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, int picmodel);
@@ -119,7 +120,7 @@ private:
 
 	/******************** CPU Internal Registers *******************/
 	uint16_t  m_PC;
-	uint16_t  m_PREVPC;     /* previous program counter */
+	uint16_t  m_PREVPC;     // previous program counter
 	uint8_t   m_W;
 	uint8_t   m_OPTION;
 	uint16_t  m_CONFIG;
@@ -129,20 +130,20 @@ private:
 	uint8_t   m_TRISB;
 	uint8_t   m_TRISC;
 	uint16_t  m_STACK[2];
-	uint16_t  m_prescaler;  /* Note: this is really an 8-bit register */
-	PAIR    m_opcode;
+	uint16_t  m_prescaler;  // Note: this is really an 8-bit register
+	PAIR      m_opcode;
 	uint8_t   *m_internalram;
 
-	int     m_icount;
-	int     m_reset_vector;
-	int     m_picmodel;
-	int     m_delay_timer;
+	int       m_icount;
+	int       m_reset_vector;
+	int       m_picmodel;
+	int       m_delay_timer;
 	uint16_t  m_temp_config;
-	int     m_rtcc;
-	bool    m_count_pending;
+	int       m_rtcc;
+	bool      m_count_pending;
 	int8_t    m_old_data;
 	uint8_t   m_picRAMmask;
-	int     m_inst_cycles;
+	int       m_inst_cycles;
 
 	memory_access<11, 1, -1, ENDIANNESS_LITTLE>::cache m_program;
 	memory_access< 7, 0,  0, ENDIANNESS_LITTLE>::specific m_data;
@@ -160,7 +161,7 @@ private:
 	// For debugger
 	int m_debugger_temp;
 
-	/* opcode table entry */
+	// opcode table entry
 	typedef void (pic16c5x_device::*pic16c5x_ophandler)();
 	struct pic16c5x_opcode
 	{
