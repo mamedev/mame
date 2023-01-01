@@ -53,13 +53,6 @@ void a2_video_device::device_start()
 		BLACK,  PURPLE, GREEN,  WHITE,
 		BLACK,  BLUE,   ORANGE, WHITE
 	};
-	static const uint8_t dhires_artifact_color_table[] =
-	{
-		BLACK,      DKGREEN,    BROWN,  GREEN,
-		DKRED,      DKGRAY,     ORANGE, YELLOW,
-		DKBLUE,     BLUE,       GRAY,   AQUA,
-		PURPLE,     LTBLUE,     PINK,   WHITE
-	};
 
 	// generate hi-res artifact data
 	int i, j;
@@ -90,15 +83,6 @@ void a2_video_device::device_start()
 			m_hires_artifact_map[ 0 + j*8 + i] = hires_artifact_color_table[(c + 0) % 8];
 			m_hires_artifact_map[16 + j*8 + i] = hires_artifact_color_table[(c + 4) % 8];
 		}
-	}
-
-	/* 2^4 dependent pixels */
-	m_dhires_artifact_map = std::make_unique<uint16_t[]>(16);
-
-	/* build double hires artifact map */
-	for (i = 0; i < 16; i++)
-	{
-		m_dhires_artifact_map[i] = dhires_artifact_color_table[i];
 	}
 
 	// initialise for device_palette_interface
@@ -921,7 +905,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 						{
 							for (int b = 0; b < 4; b++)
 							{
-								v = m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
+								v = ((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (-(col*7+b) & 0x03)) & 0x0F;
 								*(p++) = v;
 							}
 						}
@@ -939,7 +923,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 						{
 							for (int b = 4; b < 7; b++)
 							{
-								v = m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
+								v = ((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (-(col*7+b) & 0x03)) & 0x0F;
 								*(p++) = v;
 							}
 						}
@@ -960,7 +944,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 						{
 							for (int b = 0; b < 7; b++)
 							{
-								v = m_dhires_artifact_map[((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (((2-(col*7+b))) & 0x03)) & 0x0F];
+								v = ((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (-(col*7+b) & 0x03)) & 0x0F;
 								*(p++) = v;
 							}
 						}
