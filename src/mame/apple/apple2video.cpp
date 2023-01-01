@@ -263,7 +263,7 @@ void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int yp
 
 void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	uint32_t const start_address = m_80store ? 0x400 : m_page2 ? 0x0800 : 0x0400;
+	uint32_t const start_address = m_page2 ? 0x0800 : 0x0400;
 	int fg = 0;
 
 	switch (m_sysconfig & 0x03)
@@ -638,18 +638,6 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		}
 	}
 }
-
-template void a2_video_device::text_update<a2_video_device::model::II, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-template void a2_video_device::text_update<a2_video_device::model::II, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-template void a2_video_device::text_update<a2_video_device::model::II, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-template void a2_video_device::text_update<a2_video_device::model::II, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-template void a2_video_device::text_update<a2_video_device::model::IIE, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-template void a2_video_device::text_update<a2_video_device::model::IIE, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-template void a2_video_device::text_update<a2_video_device::model::IIE, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-template void a2_video_device::text_update<a2_video_device::model::IIE, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-template void a2_video_device::text_update<a2_video_device::model::IIGS, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-template void a2_video_device::text_update<a2_video_device::model::II_J_PLUS, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-template void a2_video_device::text_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 
 void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
@@ -1180,7 +1168,7 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 		if (beamy >= BORDER_TOP)
 		{
 			rectangle const new_cliprect(0, 559, cliprect.top() - BORDER_TOP, cliprect.bottom() - BORDER_TOP);
-			screen_update_GS_8bit(screen, *m_8bit_graphics, new_cliprect);
+			screen_update<model::IIGS, false, false>(screen, *m_8bit_graphics, new_cliprect);
 		}
 
 		if ((beamy < (BORDER_TOP+4)) || (beamy >= (192+4+BORDER_TOP)))
@@ -1217,17 +1205,18 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-uint32_t a2_video_device::screen_update_GS_8bit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+template <a2_video_device::model Model, bool Invert, bool Flip>
+uint32_t a2_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool old_page2 = m_page2;
 
-	if (cliprect.bottom() > 191)
+	if (Model == model::IIGS && cliprect.bottom() > 191)
 	{
 		return 0;
 	}
 
 	// don't display page2 if 80store is set (we just saved the previous value, don't worry)
-	if (m_80store)
+	if ((Model == model::IIE || Model == model::IIGS) && m_80store)
 	{
 		m_page2 = false;
 	}
@@ -1235,68 +1224,54 @@ uint32_t a2_video_device::screen_update_GS_8bit(screen_device &screen, bitmap_in
 	// always update the flash timer here so it's smooth regardless of mode switches
 	m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
 
+	int text_start_row = 0;
+
 	if (m_graphics)
 	{
+		text_start_row = m_mix ? 160 : 192;
+
 		if (m_hires)
 		{
-			if (m_mix)
+			if ((Model == model::IIE || Model == model::IIGS) && m_dhires && m_80col)
 			{
-				if ((m_dhires) && (m_80col))
-				{
-					dhgr_update(screen, bitmap, cliprect, 0, 159);
-				}
-				else
-				{
-					hgr_update(screen, bitmap, cliprect, 0, 159);
-				}
-				text_update<model::IIGS, false, false>(screen, bitmap, cliprect, 160, 191);
+				dhgr_update(screen, bitmap, cliprect, 0, text_start_row - 1);
 			}
 			else
 			{
-				if ((m_dhires) && (m_80col))
-				{
-					dhgr_update(screen, bitmap, cliprect, cliprect.top(), cliprect.bottom());
-				}
-				else
-				{
-					hgr_update(screen, bitmap, cliprect, cliprect.top(), cliprect.bottom());
-				}
+				hgr_update(screen, bitmap, cliprect, 0, text_start_row - 1);
 			}
 		}
 		else    // lo-res
 		{
-			if (m_mix)
+			if ((Model == model::IIE || Model == model::IIGS) && m_dhires && m_80col)
 			{
-				if ((m_dhires) && (m_80col))
-				{
-					dlores_update(screen, bitmap, cliprect, 0, 159);
-				}
-				else
-				{
-					lores_update(screen, bitmap, cliprect, 0, 159);
-				}
-
-				text_update<model::IIGS, false, false>(screen, bitmap, cliprect, 160, 191);
+				dlores_update(screen, bitmap, cliprect, 0, text_start_row - 1);
 			}
 			else
 			{
-				if ((m_dhires) && (m_80col))
-				{
-					dlores_update(screen, bitmap, cliprect, cliprect.top(), cliprect.bottom());
-				}
-				else
-				{
-					lores_update(screen, bitmap, cliprect, cliprect.top(), cliprect.bottom());
-				}
+				lores_update(screen, bitmap, cliprect, 0, text_start_row - 1);
 			}
 		}
 	}
-	else
+
+	if (text_start_row < 192)
 	{
-		text_update<model::IIGS, false, false>(screen, bitmap, cliprect, cliprect.top(), cliprect.bottom());
+		text_update<Model, Invert, Flip>(screen, bitmap, cliprect, text_start_row, 191);
 	}
 
 	m_page2 = old_page2;
 
 	return 0;
 }
+
+template uint32_t a2_video_device::screen_update<a2_video_device::model::II, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::II, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::II, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::II, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::IIGS, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::II_J_PLUS, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
