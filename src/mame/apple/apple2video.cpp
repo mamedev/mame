@@ -224,9 +224,11 @@ void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int yp
 	}
 }
 
+inline bool a2_video_device::use_page_2() { return m_page2 && !m_80store; }
+
 void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	uint32_t const start_address = m_page2 ? 0x0800 : 0x0400;
+	uint32_t const start_address = use_page_2() ? 0x0800 : 0x0400;
 	int fg = 0;
 
 	switch (m_sysconfig & 0x03)
@@ -342,7 +344,7 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	uint32_t const start_address = m_page2 ? 0x0800 : 0x0400;
+	uint32_t const start_address = use_page_2() ? 0x0800 : 0x0400;
 	static const int aux_colors[16] = { 0, 2, 4, 6, 8, 0xa, 0xc, 0xe, 1, 3, 5, 7, 9, 0xb, 0xd, 0xf };
 	int fg = 0;
 
@@ -541,7 +543,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 {
 	uint8_t const *const aux_page = m_aux_ptr ? m_aux_ptr : m_ram_ptr;
 
-	uint32_t const start_address = m_page2 ? 0x800 : 0x400;
+	uint32_t const start_address = use_page_2() ? 0x0800 : 0x0400;
 
 	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
 	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
@@ -703,7 +705,7 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 		case 3: fg = ORANGE; break;
 	}
 
-	uint8_t const *const vram = &m_ram_ptr[(m_page2 ? 0x4000 : 0x2000)];
+	uint8_t const *const vram = &m_ram_ptr[use_page_2() ? 0x4000 : 0x2000];
 
 	// verified on h/w: setting dhires w/o 80col emulates a rev. 0 Apple ][ with no orange/blue
 	uint8_t const bit7_mask = m_dhires ? 0x7f : 0xff;
@@ -756,7 +758,7 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
 	uint16_t v;
-	int const page = m_page2 ? 0x4000 : 0x2000;
+	int const page = use_page_2() ? 0x4000 : 0x2000;
 	int mon_type = m_sysconfig & 0x03;
 	bool const bIsRGB = ((m_sysconfig & 7) == 4);
 	bool const bIsRGBMixed = ((bIsRGB) && (m_rgbmode == 1));
@@ -1161,17 +1163,9 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 template <a2_video_device::model Model, bool Invert, bool Flip>
 uint32_t a2_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bool old_page2 = m_page2;
-
 	if (Model == model::IIGS && cliprect.bottom() > 191)
 	{
 		return 0;
-	}
-
-	// don't display page2 if 80store is set (we just saved the previous value, don't worry)
-	if ((Model == model::IIE || Model == model::IIGS) && m_80store)
-	{
-		m_page2 = false;
 	}
 
 	// always update the flash timer here so it's smooth regardless of mode switches
@@ -1211,8 +1205,6 @@ uint32_t a2_video_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 	{
 		text_update<Model, Invert, Flip>(screen, bitmap, cliprect, text_start_row, 191);
 	}
-
-	m_page2 = old_page2;
 
 	return 0;
 }
