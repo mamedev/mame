@@ -362,6 +362,7 @@ static void count_partition_mismatch_bits(
 	unsigned int mismatch_counts[BLOCK_MAX_PARTITIONINGS]
 ) {
 	unsigned int active_count = bsd.partitioning_count_selected[partition_count - 1];
+	promise(active_count > 0);
 
 	if (partition_count == 2)
 	{
@@ -400,6 +401,7 @@ static unsigned int get_partition_ordering_by_mismatch_bits(
 	const unsigned int mismatch_count[BLOCK_MAX_PARTITIONINGS],
 	unsigned int partition_ordering[BLOCK_MAX_PARTITIONINGS]
 ) {
+	promise(partitioning_count > 0);
 	unsigned int mscount[256] { 0 };
 
 	// Create the histogram of mismatch counts
@@ -488,7 +490,7 @@ static unsigned int compute_kmeans_partition_ordering(
 /**
  * @brief Insert a partitioning into an order list of results, sorted by error.
  *
- * @param      max_values      The max number of entries in the best result arrays/
+ * @param      max_values      The max number of entries in the best result arrays.
  * @param      this_error      The error of the new entry.
  * @param      this_partition  The partition ID of the new entry.
  * @param[out] best_errors     The array of best error values.
@@ -501,6 +503,8 @@ static void insert_result(
 	float* best_errors,
 	unsigned int* best_partitions)
 {
+	promise(max_values > 0);
+
 	// Don't bother searching if the current worst error beats the new error
 	if (this_error >= best_errors[max_values - 1])
 	{
@@ -508,7 +512,7 @@ static void insert_result(
 	}
 
 	// Else insert into the list in error-order
-	for (unsigned int i = 0; i < max_values;  i++)
+	for (unsigned int i = 0; i < max_values; i++)
 	{
 		// Existing result is better - move on ...
 		if (this_error > best_errors[i])

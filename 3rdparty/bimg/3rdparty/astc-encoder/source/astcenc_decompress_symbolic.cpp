@@ -286,7 +286,7 @@ void decompress_symbolic_block(
 	unpack_weights(bsd, scb, di, is_dual_plane, plane1_weights, plane2_weights);
 
 	// Now that we have endpoint colors and weights, we can unpack texel colors
-	int plane2_component = is_dual_plane ? scb.plane2_component : -1;
+	int plane2_component = scb.plane2_component;
 	vmask4 plane2_mask = vint4::lane_id() == vint4(plane2_component);
 
 	for (int i = 0; i < partition_count; i++)

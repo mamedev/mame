@@ -1008,9 +1008,6 @@ struct dt_init_working_buffers
 */
 struct quant_and_transfer_table
 {
-	/** @brief The quantization level used. */
-	quant_method method;
-
 	/** @brief The unscrambled unquantized value. */
 	int8_t quant_to_unquant[32];
 
