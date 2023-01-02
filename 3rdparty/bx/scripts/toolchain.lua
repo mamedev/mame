@@ -501,9 +501,9 @@ function toolchain(_buildDir, _libDir)
 			"-Wno-tautological-constant-compare",
 		}
 
-	configuration { "vs*", "x32" }
+	configuration { "vs*", "not NX32", "not NX64" }
 		flags {
-			"EnableSSE2",
+			"EnableAVX",
 		}
 
 	configuration { "vs*", "not orbis", "not NX32", "not NX64" }
@@ -602,7 +602,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wunused-value",
 			"-fdata-sections",
 			"-ffunction-sections",
-			"-msse2",
+			"-msse4.2",
 			"-Wunused-value",
 			"-Wundef",
 		}
@@ -669,7 +669,7 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "linux-gcc* or linux-clang*" }
 		buildoptions {
-			"-msse2",
+			"-msse4.2",
 --			"-Wdouble-promotion",
 --			"-Wduplicated-branches",
 --			"-Wduplicated-cond",
@@ -809,7 +809,7 @@ function toolchain(_buildDir, _libDir)
 			"--target=i686-none-linux-android" .. androidApiLevel,
 			"-mtune=atom",
 			"-mstackrealign",
-			"-msse3",
+			"-msse4.2",
 			"-mfpmath=sse",
 		}
 		linkoptions {
@@ -917,7 +917,7 @@ function toolchain(_buildDir, _libDir)
 		}
 		buildoptions {
 			"-arch x86_64",
-			"-msse2",
+			"-msse4.2",
 			"-target x86_64-apple-macos" .. (#macosPlatform > 0 and macosPlatform or "10.11"),
 		}
 
