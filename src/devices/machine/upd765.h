@@ -241,7 +241,7 @@ protected:
 	live_info cur_live, checkpoint_live;
 	devcb_write_line intrq_cb, drq_cb, hdl_cb, idx_cb;
 	devcb_write8 us_cb;
-	bool cur_irq, other_irq, data_irq, drq, internal_drq, tc, tc_done, locked, mfm, scan_done;
+	bool cur_irq, irq, drq, internal_drq, tc, tc_done, locked, mfm, scan_done;
 	floppy_info flopi[4];
 
 	int fifo_pos, fifo_expected, command_pos, result_pos, sectors_read;

@@ -925,6 +925,8 @@ WRITE_LINE_MEMBER( i8255_device::pc4_w )
 			// set input buffer flag
 			set_ibf(PORT_A, 1);
 		}
+
+		set_pc_bit(4, state);
 	}
 }
 
@@ -941,6 +943,8 @@ WRITE_LINE_MEMBER( i8255_device::pc6_w )
 			// clear output buffer flag
 			set_obf(PORT_A, 1);
 		}
+
+		set_pc_bit(6, state);
 	}
 }
 

@@ -39,11 +39,11 @@ public:
 
 private:
 	struct PIC16C5xOpcode  {
-		u16 mask;          /* instruction mask */
-		u16 bits;          /* constant bits */
-		u16 extcode;       /* value that gets extension code */
-		const char *parse;  /* how to parse bits */
-		const char *fmt;    /* instruction format */
+		u16 mask;          // instruction mask
+		u16 bits;          // constant bits
+		u16 extcode;       // value that gets extension code
+		const char *parse; // how to parse bits
+		const char *fmt;   // instruction format
 
 		PIC16C5xOpcode(u16 m, u16 b, u16 e, const char *p, const char *f) : mask(m), bits(b), extcode(e), parse(p), fmt(f) {}
 	};
