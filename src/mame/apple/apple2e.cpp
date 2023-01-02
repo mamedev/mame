@@ -122,7 +122,6 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "machine/applefdintf.h"
-#include "machine/bankdev.h"
 #include "machine/ds1315.h"
 #include "machine/iwm.h"
 #include "machine/kb3600.h"
@@ -291,7 +290,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	template <bool invert, bool flip>
+	template <bool Invert, bool Flip>
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	u32 screen_update_ff(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<false, false>(screen, bitmap, cliprect); }
@@ -1352,7 +1351,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 	}
 }
 
-template<bool invert, bool flip>
+template <bool Invert, bool Flip>
 u32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool old_page2 = m_video->m_page2;
@@ -1381,7 +1380,7 @@ u32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 					m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
 				}
 
-				m_video->text_update<true, invert, flip>(screen, bitmap, cliprect, 160, 191);
+				m_video->text_update<a2_video_device::model::IIE, Invert, Flip>(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -1408,7 +1407,7 @@ u32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 					m_video->lores_update(screen, bitmap, cliprect, 0, 159);
 				}
 
-				m_video->text_update<true, invert, flip>(screen, bitmap, cliprect, 160, 191);
+				m_video->text_update<a2_video_device::model::IIE, Invert, Flip>(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -1425,7 +1424,7 @@ u32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	}
 	else
 	{
-		m_video->text_update<true, invert, flip>(screen, bitmap, cliprect, 0, 191);
+		m_video->text_update<a2_video_device::model::IIE, Invert, Flip>(screen, bitmap, cliprect, 0, 191);
 	}
 
 	m_video->m_page2 = old_page2;

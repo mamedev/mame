@@ -5,7 +5,6 @@
 #include "mdconsole.h"
 
 #include "bus/generic/carts.h"
-#include "bus/generic/slot.h"
 #include "bus/sms_ctrl/controllers.h"
 #include "imagedev/chd_cd.h"
 #include "sound/sn76496.h"

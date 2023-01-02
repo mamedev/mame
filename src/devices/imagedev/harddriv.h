@@ -41,6 +41,9 @@ protected:
 class harddisk_image_device : public harddisk_image_base_device
 {
 public:
+	typedef device_delegate<image_init_result (device_image_interface &)> load_delegate;
+	typedef device_delegate<void (device_image_interface &)> unload_delegate;
+
 	// construction/destruction
 	harddisk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intf)
 		: harddisk_image_device(mconfig, tag, owner, (uint32_t)0)

@@ -36,7 +36,6 @@ public:
 	u32 m_GSborder_colors[16]{}, m_shr_palette[256]{};
 	std::unique_ptr<bitmap_ind16> m_8bit_graphics;
 	std::unique_ptr<uint16_t[]> m_hires_artifact_map;
-	std::unique_ptr<uint16_t[]> m_dhires_artifact_map;
 
 	u8 *m_ram_ptr = nullptr, *m_aux_ptr = nullptr, *m_char_ptr = nullptr;
 	u16 m_aux_mask = 0xffff;
@@ -51,16 +50,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dhires_w);
 	DECLARE_WRITE_LINE_MEMBER(an2_w);
 
-	template<bool iie, bool invert, bool flip>
+	// Models with different text-mode behavior. II includes the II+ and IIE includes the IIc and IIc Plus.
+	enum class model { II, IIE, IIGS, II_J_PLUS, IVEL_ULTRA };
+
+	template <model Model, bool Invert, bool Flip>
 	void text_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 
-	void text_update_ultr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-	void text_update_jplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-	void text_updateGS(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void lores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void dlores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-	void hgr_update_tk2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 
 	uint32_t screen_update_GS(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -74,11 +72,8 @@ protected:
 	void init_palette();
 
 private:
-	template <bool iie, bool invert, bool flip>
+	template <model Model, bool Invert, bool Flip>
 	void plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, int fg, int bg);
-	void plot_text_character_ultr(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, int fg, int bg);
-	void plot_text_character_jplus(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, int fg, int bg);
-	void plot_text_characterGS(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, int fg, int bg);
 };
 
 // device type definition

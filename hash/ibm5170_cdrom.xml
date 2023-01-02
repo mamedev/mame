@@ -188,6 +188,24 @@ black screen/hangs when launching a demo play in 640x480 resolution, [8514] ibm8
 		</part>
 	</software>
 
+	<software name="actuasoc">
+		<description>Actua Soccer (OEM v1.29)</description>
+		<year>1996</year>
+		<publisher>Gremlin</publisher>
+		<notes><![CDATA[
+Black colored OEM CD with no id whatsoever
+]]></notes>
+		<info name="language" value="English/French/German/Spanish/Norwegian/Portuguese" />
+		<info name="region" value="Europe" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sw6lfull" sha1="362044da3185e971785f2c99250bbeb6617797c2"/>
+			</diskarea>
+		</part>
+	</software>
+
+
 	<!-- Direct X 3.0 -->
 	<software name="acmidway2">
 		<description>Arcade's Greatest Hits - The Midway Collection 2</description>
@@ -907,6 +925,25 @@ Runs in 16-bit High Color, has [8514] bugs
 		<part name="cdrom2" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="battle isle 3 - shadow of the empire (1995)(blue byte)(disc 2 of 2)" sha1="587eba131db7eb9652025d8810b303a6e9382d26" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 -->
+	<!-- 486DX33 -->
+	<!-- Runs off CD, no install -->
+	<software name="bnbhvs" supported="no">
+		<description>Beavis and Butthead - Virtual Stupidity</description>
+		<year>1995</year>
+		<publisher>Viacom New Media</publisher>
+		<notes><![CDATA[
+Randomly crashes with main sprites going out of screen (verify)
+Some samples have audio crackling [SB16]
+]]></notes>
+		<!-- label: B&B_vs -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="beavis_and_butthead_-_virtual_stupidity_(1995)(viacom_new_media)" sha1="0c5169899f8ccc5e02df1bebc7e814d6945aa915"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2053,6 +2090,22 @@ Untested (and likely unsupported) Spawned Diablo and multi player mode
 	</software>
 
 	<!-- DOS -->
+	<software name="duke3d" supported="partial">
+		<description>Duke Nukem 3D (shareware v1.1)</description>
+		<year>1996</year>
+		<publisher>FormGen</publisher>
+		<notes><![CDATA[
+Duke Nukem 3d: untested multiplayer options
+Terminal Velocity: incompatible with Windows 95 (verify), has unsupported options for [CH Flight Pro], [Joy/Throt]
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="3d_realms_-_duke_nukem_3d_(shareware_version)" sha1="60ac890bd8269b2dbaed687bff45aa009b48cab3" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
 	<software name="dungkrem">
 		<description>Dungeons of Kremlin (English, Russia)</description>
 		<year>1995</year>
@@ -2908,6 +2961,8 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 	</software>
 
 	<!-- Windows 95 -->
+	<!-- TODO: checkout full name -->
+	<!-- Should be Yuugen Gaisha Poipon Kensetsu (有)ポイポン建設 -->
 	<software name="poipon">
 		<description>PoiPon (Japan)</description>
 		<year>1997</year>
@@ -2943,6 +2998,23 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 			<feature name="disk_label" value="Prototype" />
 			<diskarea name="cdrom">
 				<disk name="prototyp" sha1="0cdfabab37e5e9b219b3c8a381c937ae52749bb1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS 5.0 / Windows 95/98 -->
+	<!-- Pentium class 75 MHz -->
+	<software name="quake" supported="partial">
+		<description>Quake (shareware v1.01)</description>
+		<year>1996</year>
+		<publisher>id Software</publisher>
+		<notes><![CDATA[
+Untested multiplayer options
+Looks too dark on s3_764 (verify)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="quake" sha1="b32fa2c83512819f3c36d052d591cc2f26a0fdeb" />
 			</diskarea>
 		</part>
 	</software>
@@ -3128,7 +3200,7 @@ Bit of desync when Rosalind Chao starts talking at beginning of an attract cycle
 		</part>
 	</software>
 
-	<!-- Windows 95 & Macintosh -->
+	<!-- Windows 95 / Macintosh -->
 	<software name="silicon" supported="partial">
 		<description>Silicon Scream (Japan)</description>
 		<year>1995</year>
@@ -3168,6 +3240,53 @@ Bit of desync when Rosalind Chao starts talking at beginning of an attract cycle
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="silkroad" sha1="e1b532b3acaf6dfb16d7165e6cbebbf92e98ee49" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 -->
+	<software name="simcity" supported="partial">
+		<description>SimCity Classic (v2.0)</description>
+		<year>1995</year>
+		<publisher>Maxis</publisher>
+		<notes><![CDATA[
+Minor [8514] issues, cfr. other entries
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sc_classic" sha1="0e76c55926803a3fb9c6de9650902965d025847e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<software name="simcit2k" supported="yes">
+		<!-- unknown version, v1.01 but on CD-ROM?  -->
+		<description>SimCity 2000</description>
+		<year>1994</year>
+		<publisher>Maxis</publisher>
+		<notes><![CDATA[
+Seemingly incompatible with Windows 95, tries to read from floppy if launched from desktop, rebooting as DOS will detect just first 1MB from install (verify)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="simcity_2000_dos" sha1="a8c90e9cb27d3bb8e265bfc96cd31f4e9a04a034"/>
+			</diskarea>
+		</part>
+	</software>
+
+
+	<!-- Windows 3.1 / 3.11 / 95 -->
+	<!-- 486 66 MHz -->
+	<!-- SVGA 256 colors -->
+	<software name="slamdtyp" supported="yes">
+		<description>Slam Dunk Typing</description>
+		<year>1997</year>
+		<publisher>Creative Wonders</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="slamdunktyping" sha1="0a1fa31c6d9d2a3bf7cfb6bc24e870d7c666a9f6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3229,6 +3348,22 @@ Optional [pc_joy] 4-button joystick, work around by mapping b3 and b4 to player 
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- Windows 3.1 / 95 -->
+	<software name="strmrisk" supported="partial">
+		<description>Sturmtruppen: Risiken? (Italy)</description>
+		<year>1997</year>
+		<publisher>G&amp;T Multimedia</publisher>
+		<notes><![CDATA[
+Draws video without colors if run thru autorun in Win95, works if st_95.exe is manually executed and from movie player, [SVGA] palette desync?
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sturmtruppen_risiken" sha1="e8b4884c95df5101beee68dbc5b45c92ddc08c3e"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 	<!-- Source: redump.org/disc/31189/ -->
 	<!-- <rom name="Supaplex (Europe).cue" size="83" crc="f269e8fe" sha1="69b054d67351fe37d5ad3c640ce0c74f416ae8ee"/> -->
@@ -3512,6 +3647,67 @@ Shows Phantagram logo with bottom red strip (DOS 6.22)
 		</part>
 	</software>
 
+	<!--                                         -->
+	<!--               Applications              -->
+	<!--                                         -->
+
+	<!-- Windows 95 -->
+	<software name="cdraw6" supported="no">
+		<description>Corel DRAW! 6</description>
+		<year>1995</year>
+		<publisher>Corel Corporation</publisher>
+		<notes><![CDATA[
+Install screen blanks out the background in several places [8514]
+Don't display icons in help, font master, probably others [8514]
+Draw: forgets fill colors on canvas when moving or zooming, leaves trails when moving toolkit panes, curves don't seem very accurate [8514]
+Draw: cannot color fill a bezier shape (verify)
+Photo Paint: cannot fill shapes, has artifacts with drawing [8514]
+Other stuff untested
+]]></notes>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="corel_draw_6_cd1" sha1="db1f485ff98d9e80bd3c0d4b61945c7f6290ae1f" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="corel_draw_6_cd2" sha1="bcee744ad708dcf1b25c56a6e5b0be1709d1389b" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="corel_draw_6_cd3" sha1="cccb1d014ed22aa60ae1af9f43f979e630c0f3a0" />
+			</diskarea>
+		</part>
+		<part name="cdrom4" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="corel_draw_6_cd4" sha1="7e88e8537ee0587554e60a77aeb4b2ecaad62f71" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!--                                         -->
+	<!--                Multimedia               -->
+	<!--                                         -->
+
+	<!-- DOS 5.0+, Windows 3.1+ -->
+	<software name="uffvmus" supported="no">
+		<description>Uffizi Virtual Museums</description>
+		<year>1995</year>
+		<!-- also on credited on disk: -->
+		<!-- "Scala" (for photographs) -->
+		<!-- "Le Scienze" (text?) -->
+		<publisher>Opera Multimedia</publisher>
+		<notes><![CDATA[
+Crashes on Windows 95 with Mtb30run general protection fault
+Has setup menu glitch with text [8514]
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="uffizi_e1_09" sha1="5121f95753bdf9ffdc5e564259d153088953ac67" />
+			</diskarea>
+		</part>
+	</software>
 
 	<!--                                         -->
 	<!-- Drivers / Utilities / Operating Systems -->
@@ -4256,5 +4452,7 @@ Shows Phantagram logo with bottom red strip (DOS 6.22)
 			</diskarea>
 		</part>
 	</software>
+
+
 
 </softwarelist>

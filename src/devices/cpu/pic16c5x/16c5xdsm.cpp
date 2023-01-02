@@ -30,10 +30,12 @@
 #include <stdexcept>
 
 
-const char *const pic16c5x_disassembler::regfile[32] = { "Reg$00 (IND)",    "Reg$01 (TMR)",    "Reg$02 (PCL)",  "Reg$03 (ST)", "Reg$04 (FSR)", "Reg$05 (PTA)", "Reg$06 (PTB)", "Reg$07 (PTC)",
-									"Reg$08", "Reg$09", "Reg$0A", "Reg$0B", "Reg$0C", "Reg$0D", "Reg$0E", "Reg$0F",
-									"Reg$10", "Reg$11", "Reg$12", "Reg$13", "Reg$14", "Reg$15", "Reg$16", "Reg$17",
-									"Reg$18", "Reg$19", "Reg$1A", "Reg$1B", "Reg$1C", "Reg$1D", "Reg$1E", "Reg$1F" };
+const char *const pic16c5x_disassembler::regfile[32] = {
+	"Reg$00 (IND)", "Reg$01 (TMR)", "Reg$02 (PCL)", "Reg$03 (ST)", "Reg$04 (FSR)", "Reg$05 (PTA)", "Reg$06 (PTB)", "Reg$07 (PTC)",
+	"Reg$08", "Reg$09", "Reg$0A", "Reg$0B", "Reg$0C", "Reg$0D", "Reg$0E", "Reg$0F",
+	"Reg$10", "Reg$11", "Reg$12", "Reg$13", "Reg$14", "Reg$15", "Reg$16", "Reg$17",
+	"Reg$18", "Reg$19", "Reg$1A", "Reg$1B", "Reg$1C", "Reg$1D", "Reg$1E", "Reg$1F"
+};
 
 const char *const pic16c5x_disassembler::dest[2] = { "W", "Reg" };
 
@@ -119,17 +121,17 @@ pic16c5x_disassembler::pic16c5x_disassembler()
 
 offs_t pic16c5x_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	int a, b, d, f, k;  /* these can all be filled in by parsing an instruction */
+	int a, b, d, f, k; // these can all be filled in by parsing an instruction
 	int i;
 	int op;
 	int cnt = 1;
 	int code;
 	int bit;
 	//char *buffertmp;
-	const char *cp;             /* character pointer in OpFormats */
+	const char *cp; // character pointer in OpFormats
 	uint32_t flags = 0;
 
-	op = -1;                /* no matching opcode */
+	op = -1; // no matching opcode
 	code = opcodes.r16(pc);
 	for ( i = 0; i < int(Op.size()); i++)
 	{
@@ -149,7 +151,7 @@ offs_t pic16c5x_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		return cnt | SUPPORTED;
 	}
 	//buffertmp = buffer;
-	if (Op[op].extcode)     /* Actually, theres no double length opcodes */
+	if (Op[op].extcode) // Actually, theres no double length opcodes
 	{
 		bit = 27;
 		code <<= 16;
@@ -161,13 +163,13 @@ offs_t pic16c5x_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		bit = 11;
 	}
 
-	/* shift out operands */
+	// shift out operands
 	cp = Op[op].parse;
 	a = b = d = f = k = 0;
 
 	while (bit >= 0)
 	{
-		/* osd_printf_debug("{%c/%d}",*cp,bit); */
+		// osd_printf_debug("{%c/%d}",*cp,bit);
 		switch (*cp)
 		{
 		case 'a': a <<=1; a |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
@@ -182,7 +184,7 @@ offs_t pic16c5x_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		cp++;
 	}
 
-	/* now traverse format string */
+	// now traverse format string
 	cp = Op[op].fmt;
 	if (!strncmp(cp, "call", 4))
 		flags = STEP_OVER;

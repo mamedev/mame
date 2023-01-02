@@ -449,6 +449,7 @@ private:
 	// Key GLU variables
 	u8 m_glu_regs[12]{}, m_glu_bus = 0;
 	bool m_glu_mcu_read_kgs = false, m_glu_816_read_dstat = false, m_glu_mouse_read_stat = false;
+	u16 m_glu_mouse_first_read;
 	int m_glu_kbd_y = 0;
 
 	u8 *m_ram_ptr = nullptr;
@@ -689,6 +690,9 @@ void apple2gs_state::machine_start()
 	m_inh_bank = 0;
 	std::fill(std::begin(m_megaii_ram), std::end(m_megaii_ram), 0);
 
+	std::fill(std::begin(m_glu_regs), std::end(m_glu_regs), 0);
+	m_glu_mouse_first_read = 0;
+
 	// setup speaker toggle volumes.  this should be done mathematically probably,
 	// but these ad-hoc values aren't too bad.
 #define LVL(x) (double(x) / 32768.0)
@@ -800,11 +804,13 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_accel_speed));
 	save_item(NAME(m_motoroff_time));
 	save_item(NAME(m_newvideo));
+	save_item(NAME(m_glu_mouse_first_read));
 }
 
 void apple2gs_state::machine_reset()
 {
 	m_adb_p2_last = m_adb_p3_last = 0;
+	m_glu_mouse_first_read = 3;
 	m_adb_reset_freeze = 0;
 	m_page2 = false;
 	m_romswitch = false;
@@ -3548,6 +3554,21 @@ u8 apple2gs_state::keyglu_816_read(u8 offset)
 				m_glu_regs[GLU_SYSSTAT] &= ~GLU_STATUS_MOUSEIRQ;
 				keyglu_regen_irqs();
 				return m_glu_regs[GLU_MOUSEX];
+			}
+			// HACK: the MCU doesn't properly populate the mouse registers until they're read once,
+			// but the Event Manager assumes the first read is valid and thinks the mouse button is down.
+			// TODO: how does this work on hardware?
+			if (m_glu_mouse_first_read > 0)
+			{
+				m_glu_mouse_first_read--;
+				if (m_glu_mouse_first_read & 1)
+				{
+					return 0x80 | m_glu_regs[GLU_MOUSEY];
+				}
+				else
+				{
+					return m_glu_regs[GLU_MOUSEY] & 0x7f;
+				}
 			}
 			return m_glu_regs[GLU_MOUSEY];
 

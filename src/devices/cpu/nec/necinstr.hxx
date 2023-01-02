@@ -655,7 +655,7 @@ OP( 0xf3, i_repe     ) { uint32_t next = fetchop(); uint16_t c = Wreg(CW);
 	}
 	m_seg_prefix=false;
 }
-OP( 0xf4, i_hlt ) { logerror("%06x: HALT\n",PC()); m_halted=1; m_icount=0; }
+OP( 0xf4, i_hlt ) { m_halted=1; m_icount=0; }
 OP( 0xf5, i_cmc ) { m_CarryVal = !CF; CLK(2); }
 OP( 0xf6, i_f6pre ) { uint32_t tmp; uint32_t uresult,uresult2; int32_t result,result2;
 	GetModRM; tmp = GetRMByte(ModRM);

@@ -31,7 +31,7 @@ public:
 	auto adb_irq_callback() { return write_adb_irq.bind(); }
 
 	required_ioport m_mouse0, m_mouse1, m_mouse2;
-	required_ioport_array<6> m_keys;
+	required_ioport_array<8> m_keys;
 	devcb_write_line write_via_clock, write_via_data, write_adb_data, write_adb_irq;
 
 	DECLARE_WRITE_LINE_MEMBER(adb_data_w);
@@ -55,7 +55,7 @@ private:
 	emu_timer *m_adb_timer;
 
 	/* keyboard matrix to detect transition */
-	int m_key_matrix[7];
+	u16 m_key_matrix[9];
 
 	// ADB HLE state
 	int32_t m_adb_state, m_adb_waiting_cmd, m_adb_datasize, m_adb_buffer[257];

@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "machine/bankdev.h"
 #include "cpu/m6502/m3745x.h"
 
 DECLARE_DEVICE_TYPE(NAMCOC68, namcoc68_device)

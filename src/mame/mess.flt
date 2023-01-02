@@ -289,6 +289,7 @@ gamepark/gp2x.cpp
 gamepark/gp32.cpp
 gridcomp/gridcomp.cpp
 grundy/newbrain.cpp
+handheld/chessking.cpp
 handheld/gameking.cpp
 handheld/gmaster.cpp
 handheld/hh_cop400.cpp
