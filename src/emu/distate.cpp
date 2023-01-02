@@ -410,7 +410,7 @@ std::string device_state_entry::to_string() const
 int device_state_entry::max_length() const
 {
 	// ask the entry to format itself maximally
-	return format("", value(), true).length();
+	return format("", 0, true).length();
 }
 
 
