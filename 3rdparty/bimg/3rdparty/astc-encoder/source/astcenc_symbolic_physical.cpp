@@ -371,12 +371,15 @@ void physical_to_symbolic(
 	const auto& di = bsd.get_decimation_info(bm.decimation_mode);
 
 	int weight_count = di.weight_count;
+	promise(weight_count > 0);
+
 	quant_method weight_quant_method = static_cast<quant_method>(bm.quant_mode);
 	int is_dual_plane = bm.is_dual_plane;
 
 	int real_weight_count = is_dual_plane ? 2 * weight_count : weight_count;
 
 	int partition_count = read_bits(2, 11, pcb.data) + 1;
+	promise(partition_count > 0);
 
 	scb.block_mode = static_cast<uint16_t>(block_mode);
 	scb.partition_count = static_cast<uint8_t>(partition_count);
@@ -523,6 +526,7 @@ void physical_to_symbolic(
 	}
 
 	// Fetch component for second-plane in the case of dual plane of weights.
+	scb.plane2_component = -1;
 	if (is_dual_plane)
 	{
 		scb.plane2_component = static_cast<int8_t>(read_bits(2, below_weights_pos - 2, pcb.data));

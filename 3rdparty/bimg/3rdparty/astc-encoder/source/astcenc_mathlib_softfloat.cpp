@@ -15,12 +15,12 @@
 // under the License.
 // ----------------------------------------------------------------------------
 
+#include "astcenc_mathlib.h"
+
 /**
  * @brief Soft-float library for IEEE-754.
  */
 #if (ASTCENC_F16C == 0) && (ASTCENC_NEON == 0)
-
-#include "astcenc_mathlib.h"
 
 /*	sized soft-float types. These are mapped to the sized integer
     types of C99, instead of C's floating-point types; this is because

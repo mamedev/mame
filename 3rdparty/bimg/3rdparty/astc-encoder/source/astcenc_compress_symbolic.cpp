@@ -82,7 +82,7 @@ static bool realign_weights_undecimated(
 	const quant_and_transfer_table& qat = quant_and_xfer_tables[weight_quant_level];
 
 	unsigned int max_plane = bm.is_dual_plane;
-	int plane2_component = bm.is_dual_plane ? scb.plane2_component : -1;
+	int plane2_component = scb.plane2_component;
 	vmask4 plane_mask = vint4::lane_id() == vint4(plane2_component);
 
 	// Decode the color endpoints
@@ -206,7 +206,7 @@ static bool realign_weights_decimated(
 	assert(weight_count != bsd.texel_count);
 
 	unsigned int max_plane = bm.is_dual_plane;
-	int plane2_component = bm.is_dual_plane ? scb.plane2_component : -1;
+	int plane2_component = scb.plane2_component;
 	vmask4 plane_mask = vint4::lane_id() == vint4(plane2_component);
 
 	// Decode the color endpoints
@@ -1279,13 +1279,13 @@ void compress_block(
 	// compression and slightly reduces image quality.
 
 	float errorval_mult[2] {
-		1.0f / ctx.config.tune_mode0_mse_overshoot,
+		1.0f / ctx.config.tune_mse_overshoot,
 		1.0f
 	};
 
-	static const float errorval_overshoot = 1.0f / ctx.config.tune_refinement_mse_overshoot;
+	static const float errorval_overshoot = 1.0f / ctx.config.tune_mse_overshoot;
 
-	// Only enable MODE0 fast path (trial 0) if 2D and more than 25 texels
+	// Only enable MODE0 fast path (trial 0) if 2D, and more than 25 texels
 	int start_trial = 1;
 	if ((bsd.texel_count >= TUNE_MIN_TEXELS_MODE0_FASTPATH) && (bsd.zdim == 1))
 	{
