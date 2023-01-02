@@ -96,6 +96,8 @@ protected:
 	void map_io(address_map &map);
 	void map_mem(address_map &map);
 	void map_fetch(address_map &map);
+	u8 m1_r(offs_t offset);
+
 	void init_taps();
 
 	void update_memory();
@@ -117,7 +119,6 @@ private:
 	static constexpr u16 BANK_WRDISBL_MASK = 1 << 12;
 	enum accel_state : u8
 	{
-		DISABLED   = 0x00,
 		OFF_HALT   = 0x76, // halt
 		OFF        = 0x40, // ld b,b
 		SET_BUFFER = 0x52, // ld d,d
@@ -222,13 +223,14 @@ void sprinter_state::update_memory()
 	}
 	else
 	{
-		const bool sc0 = BIT(m_sc, 0);
-		const bool sc_lc = !(sc0 && m_ram_sys) && !m_cash_on;
+		const bool cash_on = 0;
 		const bool nmi_ena = 1;
+		const bool sc0 = BIT(m_sc, 0);
+		const bool sc_lc = !(sc0 && m_ram_sys) && !cash_on;
 		const u8 spr_ = BIT(m_sc, 1) ? 0 : ((m_dos << 1) | (BIT(m_pn, 4) || !m_dos));
 		const u8 pg0 = 0xe0
-			| ((sc0 || !m_ram_sys || m_cash_on || !nmi_ena) << 3)
-			| (((m_arom16 && !(sc0 && m_ram_sys)) || (m_cash_on && nmi_ena)) << 2)
+			| ((sc0 || !m_ram_sys || cash_on || !nmi_ena) << 3)
+			| (((m_arom16 && !(sc0 && m_ram_sys)) || (cash_on && nmi_ena)) << 2)
 			| (((BIT(spr_, 1) && sc_lc) || !m_ram_sys || !nmi_ena) << 1)
 			| ((BIT(spr_, 0) && sc_lc) || !m_ram_sys || !nmi_ena);
 
@@ -307,7 +309,7 @@ void sprinter_state::screen_update_txt(screen_device &screen, bitmap_ind16 &bitm
 					if (!BIT(mode[0], 5) && (((a16 & 15) == 8) || (do_init && (a16 & 8))))
 						mode = mode + 1024;
 					attr = m_vram[(mode[2] << 10) | (BIT(mode[0], 0, 4) << 6) | (BIT(m_pn, 3) << 5) | 0b11000 | BIT(mode[0], 6, 2)];
-					symb = m_vram[(b8 & 7) + ((mode[1] << 10) | (BIT(mode[0], 0, 4) << 6) | (BIT(m_pn, 3) << 5) | (BIT(mode[0], 6, 2) << 3))];
+					symb = m_vram[((mode[1] << 10) | (BIT(mode[0], 0, 4) << 6) | (BIT(m_pn, 3) << 5) | (BIT(mode[0], 6, 2) << 3) | (b8 & 7))];
 				}
 			}
 
@@ -439,6 +441,13 @@ u8 sprinter_state::dcp_r(offs_t offset)
 
 	case 0x40:
 		data = spectrum_ula_r(offset);
+		if (BIT(m_dcpp_data[0x89], 7))
+		{
+			if (m_screen->vpos() < (SPRINT_BORDER_TOP + SPRINT_SCREEN_YSIZE))
+				data &= ~0x20;
+			else
+				data |= 0x20;
+		}
 		break;
 
 	case 0x52: // AY8910
@@ -533,9 +542,11 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		m_ata[m_ata_selected]->cs1_w(6, data);
 		break;
 	case 0x2a: // HDD1 - secondary
+		m_ata_data_flip = false;
 		m_ata_selected = 1;
 		break;
 	case 0x2b: // HDD2 - primary
+		m_ata_data_flip = false;
 		m_ata_selected = 0;
 		break;
 
@@ -558,10 +569,13 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 
 	case 0xc0: // 1FFD
 		m_sc = data;
+		if (BIT(m_cnf, 6)) m_sc = 0;      // CNF_SC_RESET
 		update_memory();
 		break;
 	case 0xc1: // 7FFD
 		m_pn = data;
+		if (BIT(m_cnf, 5)) m_pn &= 0xc0;  // CNF_PN[5..0]_RESET
+		if (BIT(~m_cnf, 7)) m_pn &= 0x1f; // CNF_PN[7..6]_RESET
 		update_memory();
 		break;
 	case 0xc2:
@@ -700,7 +714,8 @@ void sprinter_state::accel_r_tap(offs_t offset, u8 &data)
 			LOGACCEL("Accel rCOPY: %s%02x\n", m, offset);
 			for (auto i = 0; i < m_accel_buffer_size; i++)
 			{
-				data = ram_r(offset + i);
+				const u16 addr = offset + i;
+				data = (m_pages[addr >> 14] & BANK_RAM_MASK) ? ram_r(addr) : 0xff;
 				update_accel_buffer(i, data);
 			}
 		}
@@ -736,7 +751,11 @@ void sprinter_state::accel_w_tap(offs_t offset, u8 &data)
 		{
 			LOGACCEL("Accel wFILL: %02x\n", offset);
 			for (auto i = 0; i < m_accel_buffer_size; i++)
-				ram_w(offset + i, data);
+			{
+				const u16 addr = offset + i;
+				if ((m_pages[addr >> 14] & BANK_RAM_MASK) && (~m_pages[addr >> 14] & BANK_WRDISBL_MASK))
+					ram_w(addr, data);
+			}
 		}
 		else if (m_accel_state == FILL_VERT)
 		{
@@ -749,15 +768,22 @@ void sprinter_state::accel_w_tap(offs_t offset, u8 &data)
 		}
 		else if (m_accel_state == DOUBLE)
 		{
-			ram_w(offset & 0xfffe, data);
-			ram_w(offset | 0x0001, data);
+			ram_w(offset, data);
+			u16 addr = offset ^ 1;
+			if ((m_pages[addr >> 14] & BANK_RAM_MASK) && (~m_pages[addr >> 14] & BANK_WRDISBL_MASK))
+				ram_w(addr, data);
 			ops = 2;
 		}
 		else if (m_accel_state == COPY)
 		{
 			LOGACCEL("Accel wCOPY: %02x\n", offset);
 			for (auto i = 0; i < m_accel_buffer_size; i++)
-				ram_w(offset + i, m_accel_buffer[i]);
+			{
+				u16 addr = offset + i;
+				if ((m_pages[addr >> 14] & BANK_RAM_MASK) && (~m_pages[addr >> 14] & BANK_WRDISBL_MASK))
+					ram_w(addr, m_accel_buffer[i]);
+
+			}
 		}
 		else if (m_accel_state == COPY_VERT)
 		{
@@ -844,16 +870,15 @@ void sprinter_state::ram_w(offs_t offset, u8 data)
 		if (~m_all_mode & 1)
 		{
 			const bool sp_scr = BIT(offset, 14) && (BIT(~offset, 15) || ((m_pg3 & 0x3d) == 0x35)); // B"1101X1"
-			const bool zx_screen = sp_scr && !(BIT(offset, 13) && !BIT(m_port_y, 7)) && !BIT(m_port_y, 6) && !BIT(m_port_y, 0);
+			const bool zx_screen = sp_scr && !(BIT(offset, 13) && BIT(~m_port_y, 7)) && BIT(~m_port_y, 6);
 			if (zx_screen)
 			{
-				const u8 sp_sa = BIT(offset, 15) ? BIT(m_pg3, 1) : 0;
-				const u32 addr = ((offset & 0xff) << 10)
-					| (((m_port_y & 0x1f) ^ sp_sa ^ BIT(offset, 13)) << 5)
-					| (BIT(offset, 8, 5));
+				const bool zxa15 = BIT(offset, 15) ? BIT(m_pg3, 1) : 0; // SP_SA
+				const u8 zxs = m_port_y & 0x3f;
+				const u32 vxa = (BIT(offset, 0, 8) << 10) | (BIT(zxs, 1, 4) << 6) | ((BIT(zxs, 0) ^ zxa15 ^ BIT(offset, 13)) << 5) | BIT(offset, 8, 5);
 
 				m_screen->update_now();
-				m_vram[addr] = data;
+				m_vram[vxa] = data;
 			}
 		}
 
@@ -861,28 +886,33 @@ void sprinter_state::ram_w(offs_t offset, u8 data)
 	}
 }
 
+u8 sprinter_state::m1_r(offs_t offset)
+{
+	m_z80_m1 = 1;
+	u8 data = m_program.read_byte(offset);
+	m_z80_m1 = 0;
+
+	if (!machine().side_effects_disabled() && (m_all_mode & 1))
+		accel_control_r(data);
+
+	return data;
+}
+
 void sprinter_state::map_fetch(address_map &map)
 {
 	// Overlap with previous because we want real addresses on the 3e00-3fff range
 	map(0x0000, 0x3fff).lr8(NAME([this](u16 offset)
 	{
-		m_z80_m1 = 1;
-		const u8 data = m_program.read_byte(offset);
-		m_z80_m1 = 0;
-		return data;
+		return m1_r(offset);
 	}));
 	map(0x3d00, 0x3dff).lr8(NAME([this](u16 offset)
 	{
-		if (!machine().side_effects_disabled() && m_dos)
+		if (!machine().side_effects_disabled() && m_dos && BIT(m_pn, 4))
 		{
 			m_dos = 0;
 			update_memory();
 		}
-
-		m_z80_m1 = 1;
-		u8 data = m_program.read_byte(offset + 0x3d00);
-		m_z80_m1 = 0;
-		return data;
+		return m1_r(offset + 0x3d00);
 	}));
 	map(0x4000, 0xffff).lr8(NAME([this](u16 offset)
 	{
@@ -891,11 +921,7 @@ void sprinter_state::map_fetch(address_map &map)
 			m_dos = 1;
 			update_memory();
 		}
-
-		m_z80_m1 = 1;
-		u8 data = m_program.read_byte(offset + 0x4000);
-		m_z80_m1 = 0;
-		return data;
+		return m1_r(offset + 0x4000);
 	}));
 }
 
@@ -920,22 +946,15 @@ void sprinter_state::map_io(address_map &map)
 
 void sprinter_state::init_taps()
 {
-	address_space &op = m_maincpu->space(AS_OPCODES); // z80 M1
-	op.install_read_tap(0x0000, 0xffff, "accel_control", [this](offs_t offset, u8 &data, u8 mem_mask)
-	{
-		if (!machine().side_effects_disabled() && (m_accel_state != DISABLED))
-			accel_control_r(data);
-	});
-
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
 	prg.install_read_tap(0x0000, 0xffff, "accel_read", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
-		if (!machine().side_effects_disabled() && !m_z80_m1 && (m_accel_state != DISABLED) && (m_accel_state != OFF))
+		if (!machine().side_effects_disabled() && !m_z80_m1 && (m_all_mode & 1) && (m_accel_state != OFF))
 			accel_r_tap(offset, data);
 	});
 	prg.install_write_tap(0x0000, 0xffff, "accel_write", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
-		if (!m_z80_m1 && (m_accel_state != DISABLED) && (m_accel_state != OFF))
+		if (!m_z80_m1 && (m_all_mode & 1) && (m_accel_state != OFF))
 			accel_w_tap(offset, data);
 	});
 }
@@ -1039,7 +1058,8 @@ static void sprinter_ata_devices(device_slot_interface &device)
 
 INTERRUPT_GEN_MEMBER(sprinter_state::sprinter_int)
 {
-	irq_on(0);
+	// Pentagon's INT for now
+	m_irq_on_timer->adjust(attotime(0, m_screen->time_until_pos(287, 375 * 2).as_attoseconds()));
 }
 
 INPUT_PORTS_START( sprinter )
@@ -1097,8 +1117,8 @@ void sprinter_state::sprinter(machine_config &config)
 	m_maincpu->zc_callback<2>().set(m_maincpu, FUNC(tmpz84c015_device::trg3));
 
 	DS12885(config, m_rtc, XTAL(32'768)); // should be DS12887A
-	ATA_INTERFACE(config, m_ata[0]).options(sprinter_ata_devices, "hdd", "hdd", false);;
-	ATA_INTERFACE(config, m_ata[1]).options(sprinter_ata_devices, "hdd", "hdd", false);;
+	ATA_INTERFACE(config, m_ata[0]).options(sprinter_ata_devices, "hdd", "hdd", false);
+	ATA_INTERFACE(config, m_ata[1]).options(sprinter_ata_devices, "hdd", "hdd", false);
 
 	BETA_DISK(config, m_beta, 0);
 
