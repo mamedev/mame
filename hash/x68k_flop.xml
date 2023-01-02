@@ -16352,7 +16352,7 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 	</software>
 
 	<software name="sxwin31a" cloneof="sxwin31">
-		<description>SX-Window v3.1 (Alt)</description>
+		<description>SX-Window v3.1 (alt)</description>
 		<year>1993</year>
 		<publisher>Sharp</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -16383,6 +16383,54 @@ Typing "CD PACMAN" and enter key, Typing "PAC" (or "PAC.BAT") and enter key. The
 			<feature name="part_id" value="Kakuchou Disk" />
 			<dataarea name="flop" size="1261824">
 				<rom name="sx-window v3.1 (1993)(sharp)(disk 5 of 5)(kakuchou).dim" size="1261824" crc="88f569ac" sha1="514142fca57d05938770ef32b279a9dd2b7f667b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sxwin31b" cloneof="sxwin31">
+		<description>SX-Window v3.1 (alt 2)</description>
+		<year>1994</year>
+		<publisher>Sharp</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="SX-Window System Disk" />
+			<dataarea name="flop" size="1261824">
+				<rom name="sxwindow-31-system-disk.dim" size="1261824" crc="23ed2194" sha1="c8283da6b63de6c84e708b3cd886ca78ff344f4d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Human68k System Disk" />
+			<dataarea name="flop" size="1261824">
+				<rom name="sxwindow-31-human-68k-system-disk.dim" size="1261824" crc="5c75926c" sha1="17f12907bccdc90a8a5ca7771973f4379d4dd01b" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Application Disk 1" />
+			<dataarea name="flop" size="1261824">
+				<rom name="sxwindow-31-application-disk-1.dim" size="1261824" crc="0d4da5ec" sha1="8ecc69fee353bad716a9c885559a9c1c7128244f" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Application Disk 2" />
+			<dataarea name="flop" size="1261824">
+				<rom name="sxwindow-31-application-disk-2.dim" size="1261824" crc="de2642dd" sha1="087fc8effe96b696f1463f7595cd726756b195b8" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Application Disk 3" />
+			<dataarea name="flop" size="1261824">
+				<rom name="sxwindow-31-application-disk-3.dim" size="1261824" crc="47eaed0b" sha1="c5ac4f5e275da7e357c24789f1a031a44b044b27" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Kakuchou Disk" />
+			<dataarea name="flop" size="1261824">
+				<rom name="sxwindow-31-expansion-disk.dim" size="1261824" crc="049cbf8b" sha1="e10ccb9636baa56efb9415e6db10c03f9f5c5d6b" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Jisho Disk" />
+			<dataarea name="flop" size="1261824">
+				<rom name="sxwindow-31-dictionary-disk.dim" size="1261824" crc="0c1a44bd" sha1="95071af45e005e9f9dbf2b521cf67f37b6ea7251" />
 			</dataarea>
 		</part>
 	</software>

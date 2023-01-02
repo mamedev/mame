@@ -3295,8 +3295,12 @@ void ibm8514a_device::ibm8514_write_fg(uint32_t offset)
 		src = ibm8514.fgcolour;
 		break;
 	case 0x0040:
-		src = ibm8514.pixel_xfer;
+	{
+		// Windows 95 in svga 8bpp mode wants this (start logo, moving icons around, games etc.)
+		u32 shift_values[4] = { 0, 8, 16, 24 };
+		src = (ibm8514.pixel_xfer >> shift_values[(ibm8514.curr_x - ibm8514.prev_x) & 3]) & 0xff;
 		break;
+	}
 	case 0x0060:
 		// video memory - presume the memory is sourced from the current X/Y co-ords
 		src = m_vga->mem_linear_r(((ibm8514.curr_y * IBM8514_LINE_LENGTH) + ibm8514.curr_x));
@@ -4996,18 +5000,27 @@ void s3_vga_device::mem_w(offs_t offset, uint8_t data)
 
 /******************************************
 
-gamtor.c implementation (TODO: identify the video card)
+gamtor.cpp implementation
 
 ******************************************/
 
-uint8_t gamtor_vga_device::mem_r(offs_t offset)
+// TODO: Chips & Technologies 65550 with swapped address lines? Move to separate file regardless
+// 65550 is used by Apple PowerBook 2400c
+// 65535 is used by IBM PC-110
+
+uint8_t gamtor_vga_device::mem_linear_r(offs_t offset)
 {
+	if (!machine().side_effects_disabled())
+		logerror("Reading gamtor SVGA memory %08x\n", offset);
 	return vga.memory[offset];
 }
 
-void gamtor_vga_device::mem_w(offs_t offset, uint8_t data)
+void gamtor_vga_device::mem_linear_w(offs_t offset, uint8_t data)
 {
-	vga.memory[offset] = data;
+	if (offset & 2)
+		vga.memory[(offset >> 2) + 0x20000] = data;
+	else
+		vga.memory[(offset & 1) | (offset >> 1)] = data;
 }
 
 
@@ -5081,6 +5094,12 @@ void gamtor_vga_device::port_03d0_w(offs_t offset, uint8_t data)
 			vga_device::port_03d0_w(offset ^ 3,data);
 			break;
 	}
+}
+
+uint16_t gamtor_vga_device::offset()
+{
+	// TODO: pinpoint whatever extra register that wants this shifted by 1
+	return vga_device::offset() << 1;
 }
 
 uint16_t ati_vga_device::offset()

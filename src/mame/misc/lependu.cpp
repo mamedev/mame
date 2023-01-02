@@ -77,7 +77,6 @@
 
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
-#include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "sound/discrete.h"
 #include "video/mc6845.h"

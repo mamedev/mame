@@ -12,8 +12,8 @@
 #pragma once
 
 class mc68328_lcd_device : public device_t,
-                           public device_palette_interface,
-                           public device_video_interface
+						   public device_palette_interface,
+						   public device_video_interface
 {
 public:
 	mc68328_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

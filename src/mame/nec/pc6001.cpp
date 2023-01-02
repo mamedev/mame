@@ -1843,7 +1843,7 @@ void pc6001mk2sr_state::pc6001mk2sr(machine_config &config)
 	pc6601_fdc_config(config);
 
 	config.device_remove("aysnd");
-	YM2203(config, m_ym, PC6001_MAIN_CLOCK/4);
+	YM2203(config, m_ym, 4_MHz_XTAL);
 	m_ym->port_a_read_callback().set(FUNC(pc6001mk2sr_state::joystick_r));
 	m_ym->port_b_read_callback().set(FUNC(pc6001mk2sr_state::joystick_out_r));
 	m_ym->port_b_write_callback().set(FUNC(pc6001mk2sr_state::joystick_out_w));

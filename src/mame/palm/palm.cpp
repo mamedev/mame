@@ -100,11 +100,11 @@ protected:
 
 	enum : int
 	{
-		PORTF_Y_VCCN_BIT		= 0,
-		PORTF_Y_GND_BIT			= 1,
-		PORTF_X_VCCN_BIT		= 2,
-		PORTF_X_GND_BIT			= 3,
-		PORTF_ADC_CSN_BIT		= 7
+		PORTF_Y_VCCN_BIT        = 0,
+		PORTF_Y_GND_BIT         = 1,
+		PORTF_X_VCCN_BIT        = 2,
+		PORTF_X_GND_BIT         = 3,
+		PORTF_ADC_CSN_BIT       = 7
 	};
 
 	required_device<mc68328_lcd_device> m_lcdctrl;

@@ -289,6 +289,7 @@ gamepark/gp2x.cpp
 gamepark/gp32.cpp
 gridcomp/gridcomp.cpp
 grundy/newbrain.cpp
+handheld/chessking.cpp
 handheld/gameking.cpp
 handheld/gmaster.cpp
 handheld/hh_cop400.cpp
@@ -521,6 +522,7 @@ msx/msx1_v9938.cpp
 msx/msx2.cpp
 multitech/mkit09.cpp
 multitech/mpf1.cpp
+multitech/mpf1_88.cpp
 mupid/mdisk.cpp
 mupid/mupid2.cpp
 nakajima/nakajies.cpp

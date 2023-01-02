@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "tceptor.h"
 
+#include "cpu/m6502/r65c02.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6801.h"
 #include "cpu/m68000/m68000.h"
@@ -101,22 +102,22 @@ uint8_t tceptor_state::fix_input1(uint8_t in1, uint8_t in2)
 
 uint8_t tceptor_state::dsw0_r()
 {
-	return fix_input0(ioport("DSW1")->read(), ioport("DSW2")->read());
+	return fix_input0(m_dsw[0]->read(), m_dsw[1]->read());
 }
 
 uint8_t tceptor_state::dsw1_r()
 {
-	return fix_input1(ioport("DSW1")->read(), ioport("DSW2")->read());
+	return fix_input1(m_dsw[0]->read(), m_dsw[1]->read());
 }
 
 uint8_t tceptor_state::input0_r()
 {
-	return fix_input0(ioport("BUTTONS")->read(), ioport("SERVICE")->read());
+	return fix_input0(m_inp[0]->read(), m_inp[1]->read());
 }
 
 uint8_t tceptor_state::input1_r()
 {
-	return fix_input1(ioport("BUTTONS")->read(), ioport("SERVICE")->read());
+	return fix_input1(m_inp[0]->read(), m_inp[1]->read());
 }
 
 /*******************************************************************/
@@ -199,6 +200,20 @@ void tceptor_state::mcu_map(address_map &map)
 /*******************************************************************/
 
 static INPUT_PORTS_START( tceptor )
+	PORT_START("IN0") // Memory Mapped Port
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // shot
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // bomb
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) // shot
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // bomb
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1") // Memory Mapped Port
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_SERVICE( 0x04, IP_ACTIVE_LOW ) // TEST SW
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 	PORT_START("DSW1") // DSW 1
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
@@ -229,20 +244,6 @@ static INPUT_PORTS_START( tceptor )
 	PORT_DIPSETTING(    0x01, "C" )
 	PORT_DIPSETTING(    0x00, "D" )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("BUTTONS") // Memory Mapped Port
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // shot
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // bomb
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) // shot
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // bomb
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("SERVICE") // Memory Mapped Port
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW ) // TEST SW
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("PEDAL") // ADC0809 - 8 CHANNEL ANALOG - CHANNEL 1
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xd6) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_CODE_INC(KEYCODE_Z)
@@ -317,10 +318,10 @@ void tceptor_state::tceptor(machine_config &config)
 	MC6809E(config, m_maincpu, XTAL(49'152'000)/32);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tceptor_state::m6809_map);
 
-	M65C02(config, m_audiocpu[0], XTAL(49'152'000)/24);
+	R65C02(config, m_audiocpu[0], XTAL(49'152'000)/24);
 	m_audiocpu[0]->set_addrmap(AS_PROGRAM, &tceptor_state::m6502_a_map);
 
-	M65C02(config, m_audiocpu[1], XTAL(49'152'000)/24);
+	R65C02(config, m_audiocpu[1], XTAL(49'152'000)/24);
 	m_audiocpu[1]->set_addrmap(AS_PROGRAM, &tceptor_state::m6502_b_map);
 
 	M68000(config, m_subcpu, XTAL(49'152'000)/4);
@@ -333,7 +334,7 @@ void tceptor_state::tceptor(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	adc0809_device &adc(ADC0809(config, "adc", 1000000)); // unknown clock (needs to >640khz or the wait loop is too fast)
+	adc0809_device &adc(ADC0809(config, "adc", 768000)); // unknown clock
 	adc.in_callback<0>().set_constant(0); // unknown
 	adc.in_callback<1>().set_ioport("PEDAL");
 	adc.in_callback<2>().set_ioport("STICKX");
@@ -360,7 +361,9 @@ void tceptor_state::tceptor(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	YM2151(config, "ymsnd", XTAL(14'318'181)/4).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	ym2151_device &ym(YM2151(config, "ymsnd", XTAL(14'318'181)/4));
+	ym.add_route(0, "lspeaker", 1.0);
+	ym.add_route(1, "rspeaker", 1.0);
 
 	NAMCO_CUS30(config, m_cus30, XTAL(49'152'000)/2048);
 	m_cus30->set_voices(8);
@@ -384,10 +387,10 @@ ROM_START( tceptor )
 	ROM_REGION( 0x10000, "maincpu", 0 )         // 68A09EP
 	ROM_LOAD( "tc1-1.10f",  0x08000, 0x08000, CRC(4c6b063e) SHA1(d9701657186f8051391084f51a720037f9f418b1) )
 
-	ROM_REGION( 0x10000, "audiocpu1", 0 )            // RC65C02
+	ROM_REGION( 0x10000, "audiocpu1", 0 )            // RP65C02
 	ROM_LOAD( "tc1-21.1m",  0x08000, 0x08000, CRC(2d0b2fa8) SHA1(16ecd70954e52a8661642b15a5cf1db51783e444) )
 
-	ROM_REGION( 0x10000, "audiocpu2", 0 )          // RC65C02
+	ROM_REGION( 0x10000, "audiocpu2", 0 )          // RP65C02
 	ROM_LOAD( "tc1-22.3m",  0x08000, 0x08000, CRC(9f5a3e98) SHA1(2b2ffe39fe647a3039b92721817bddc9e9a92d82) )
 
 	ROM_REGION( 0x110000, "sub", 0 )            // MC68000-12
@@ -440,10 +443,10 @@ ROM_START( tceptor2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )         // 68A09EP
 	ROM_LOAD( "tc2-1.10f",  0x08000, 0x08000, CRC(f953f153) SHA1(f4cd0a133d23b4bf3c24c70c28c4ecf8ad4daf6f) )
 
-	ROM_REGION( 0x10000, "audiocpu1", 0 )            // RC65C02
+	ROM_REGION( 0x10000, "audiocpu1", 0 )            // RP65C02
 	ROM_LOAD( "tc1-21.1m",  0x08000, 0x08000, CRC(2d0b2fa8) SHA1(16ecd70954e52a8661642b15a5cf1db51783e444) )
 
-	ROM_REGION( 0x10000, "audiocpu2", 0 )          // RC65C02
+	ROM_REGION( 0x10000, "audiocpu2", 0 )          // RP65C02
 	ROM_LOAD( "tc1-22.3m",  0x08000, 0x08000, CRC(9f5a3e98) SHA1(2b2ffe39fe647a3039b92721817bddc9e9a92d82) )
 
 	ROM_REGION( 0x110000, "sub", 0 )            // MC68000-12

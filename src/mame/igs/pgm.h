@@ -22,7 +22,6 @@
 #include "emupal.h"
 #include "tilemap.h"
 
-#define PGMARM7LOGERROR 0
 
 class pgm_state : public driver_device
 {

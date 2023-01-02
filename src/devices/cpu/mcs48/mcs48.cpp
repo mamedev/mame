@@ -709,7 +709,7 @@ OPHANDLER( in_a_p2 )        { burn_cycles(2); m_a = port_r(2) & m_p2; }
 OPHANDLER( ins_a_bus )      { burn_cycles(2); m_a = bus_r(); }
 OPHANDLER( in_a_dbb )
 {
-	burn_cycles(2);
+	burn_cycles(1);
 
 	// acknowledge the IBF IRQ and clear the bit in STS
 	if ((m_sts & STS_IBF) != 0)
@@ -850,7 +850,7 @@ OPHANDLER( outl_p1_a )      { burn_cycles(2); port_w(1, m_p1 = m_a); }
 OPHANDLER( outl_p2_a )      { burn_cycles(2); uint8_t mask = p2_mask(); port_w(2, m_p2 = (m_p2 & ~mask) | (m_a & mask)); }
 OPHANDLER( out_dbb_a )
 {
-	burn_cycles(2);
+	burn_cycles(1);
 
 	// copy to the DBBO and update the bit in STS
 	m_dbbo = m_a;

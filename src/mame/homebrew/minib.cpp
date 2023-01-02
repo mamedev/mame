@@ -90,11 +90,11 @@ void minib_state::machine_reset()
 
 //uint8_t minib_state::pa_r()
 //{
-//	uint8_t data = 0x00;
+//  uint8_t data = 0x00;
 //
-//	data |= m_kbd->data_signal() << 1;
+//  data |= m_kbd->data_signal() << 1;
 //
-//	return data;
+//  return data;
 //}
 
 void minib_state::pa_w(uint8_t data)

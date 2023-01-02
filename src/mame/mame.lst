@@ -116,6 +116,7 @@ sprtdart                        // (c) 1993 Compumatic / Desarrollos y Recambios
 @source:misc/4enraya.cpp
 4enraya                         // (c) 1990 IDSA
 4enrayaa                        //
+bowlgum
 chicgum
 strker
 tourpgum
@@ -10600,6 +10601,7 @@ f1gpstar2                       // (c) 1991 Jaleco
 f1gpstr2                        // (c) 1993 Jaleco
 scudhamm                        // (c) 1994 Jaleco
 scudhamma                       // (c) 1994 Jaleco
+vscaptfl                        // (c) 1993 Jaleco
 wildplt                         // (c) 1992 Jaleco
 
 @source:citoh/cit101.cpp
@@ -11740,8 +11742,9 @@ ddpdfk10                        // (c) 2008 Cave (AMI license) - 2008/05/16  MAS
 deathsml                        // (c) 2007 Cave (AMI license) - 2007/10/09 MASTER VER
 dfkbl                           // (c) 2010 Cave (AMI license) - 2010/1/18 BLACK LABEL
 dsmbl                           // (c) 2008 Cave (AMI license) - 2008/10/06 MEGABLACK LABEL VER
-espgal2                         // (c) 2005 Cave (AMI license) - 2005/11/14 MASTER VER
+espgal2                         // (c) 2005 Cave (AMI license) - 2005/11/14.MASTER VER.
 espgal2a                        // (c) 2005 Cave (AMI license) - 2005/11/14 MASTER VER
+espgal2b                        // (c) 2005 Cave (AMI license) - 2005/11/14 MASTER VER
 futari10                        // (c) 2006 Cave (AMI license) - 2006/10/23 MASTER VER.
 futari15                        // (c) 2006 Cave (AMI license) - 2006/12/8.MASTER VER. 1.54.
 futari15a                       // (c) 2006 Cave (AMI license) - 2006/12/8 MASTER VER 1.54
@@ -15063,6 +15066,9 @@ gcus                            // (c) 2001 Nintendo
 gceu                            // (c) 2002 Nintendo
 gcbr                            // (c) 2002 Nintendo
 
+@source:handheld/chessking.cpp
+chesskng                        //
+
 @source:handheld/gameking.cpp
 gamekin3                        //
 gameking                        //
@@ -15283,6 +15289,7 @@ galaga3m                        // (c) 1984
 gaplus                          // (c) 1984
 gaplusa                         // (c) 1984
 gaplusd                         // (c) 1984
+gapluse                         // (c) 1984
 gaplust                         // (c) 1984
 
 @source:gametron/gatron.cpp
@@ -16657,6 +16664,7 @@ melodym                         // GAF
 matchme                         // Kingsford
 pabball                         // Caprice
 rockpin                         // Tiger Electronics
+sfxphasor                       // Electroplay
 touchme                         // Atari
 ttfball                         // Toytronic
 ttfballa                        // Toytronic
@@ -17262,8 +17270,10 @@ hp700_92                        //
 hp95lx                          //
 
 @source:hp/hp9825.cpp
+hp9825a                         // HP 9825A
 hp9825b                         // HP 9825B
 hp9825t                         // HP 9825T
+hp9831                          // HP 9831A
 
 @source:hp/hp9845.cpp
 hp9835a                         //
@@ -23364,8 +23374,9 @@ sarc110
 sarc110a
 
 @source:misc/megaphx.cpp
-megaphx                         // (c) 1991 Dinamic / Inder
 hamboy                          // (c) 1990 Dinamic / Inder
+megaphx                         // (c) 1991 Dinamic / Inder
+yoyospel
 
 @source:sega/megaplay.cpp
 megaplay                        //
@@ -24571,6 +24582,9 @@ mpc60
 mpf1                            // 1979 Multitech Micro Professor 1
 mpf1b                           // 1979 Multitech Micro Professor 1B
 mpf1p                           //
+
+@source:multitech/mpf1_88.cpp
+mpf1_88                         // 1985 Multitech Micro-Professor I/88
 
 @source:commodore/mps1230.cpp
 mps1000                         // 1986 Commodore MPS-1000 (dot matrix printer)
@@ -34896,13 +34910,13 @@ pengadvb2                       // (c) 1988 Comet
 @source:pacman/pengo.cpp
 jrpacmbl                        // bootleg on Pengo HW
 pengo                           // 834-0386 (c) 1982 Sega
-pengo2                          // 834-0386 (c) 1982 Sega
-pengo2u                         // 834-0386 (c) 1982 Sega
-pengo3u                         // 834-0386 (c) 1982 Sega
-pengo4                          // 834-0386 (c) 1982 Sega
-pengo5                          // 834-0386 (c) 1982 Sega
-pengo6                          // 834-0386 (c) 1982 Sega
-pengob                          // bootleg
+pengoa                          // 834-0386 (c) 1982 Sega
+pengob                          // 834-0386 (c) 1982 Sega
+pengoc                          // 834-0386 (c) 1982 Sega
+pengoj                          // 834-0386 (c) 1982 Sega
+pengoja                         // 834-0386 (c) 1982 Sega
+pengojb                         // 834-0386 (c) 1982 Sega
+pengojbl                        // bootleg
 penta                           // bootleg
 
 @source:handheld/pensebem.cpp
@@ -38664,6 +38678,7 @@ dinokich                        // 2010.05 Konglongwang - D-Kids VS Alpha Yaosai
 dinoki4                         // 2008.08 Kodai Ouja Kyouryuu King - Mezame yo! Arata-naru Chikara!! (Japan, Ver 4.000) (MDA-C0061)
 dinoking                        // 2005.09 Kodai Ouja Kyouryuu King / Ancient Ruler Dinosaur King
 dinokior                        //
+huhimage                        // 2019.01 Heat Up Hockey Image (Ver.1.003R)
 kingyo                          // 2009.10 Yataimura Kingyosukui (1-player, Japan, Ver 1.005)
 kingyoch                        // 2009.03 Yataimura Kingyosukui (4-player, China, Ver 1.000)
 loveber3                        //
@@ -38676,6 +38691,7 @@ mirworld                        // 2007.06 Mirage World (satellite)
 ochaken                         //
 puyomedal                       // 2009.03 Puyo Puyo! The Medal Edition
 segasp                          //
+shateki                         // 2010.07 Yataimura Shateki (1-player, Japan, Ver 1.000)
 tetgiano                        //
 tetgiant                        //
 unomedal                        // 2009.01 UNO the Medal

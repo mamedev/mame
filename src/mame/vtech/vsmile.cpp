@@ -120,18 +120,18 @@ uint16_t vsmile_state::portb_r()
 	//bit 1 : Set to 0 to enable cartridge ROM (TODO) -> getCS2
 	//bit 2 : Set to 0 to enable internal ROM (TODO)
 	//bit 3 : restart (see dipswitch)
-	//		VSMILE_PORTB_RESET
+	//      VSMILE_PORTB_RESET
 	//bit 4 : ADC (TODO)
 	//bit 5 : Voltage detect (TODO)
 	//bit 6 : ON button, active low (see dipswitch)
-	//		VSMILE_PORTB_ON_SW
+	//      VSMILE_PORTB_ON_SW
 	//bit 7 : OFF button, active low (see dipswitch)
-	//		VSMILE_PORTB_OFF_SW
-	
+	//      VSMILE_PORTB_OFF_SW
+
 	//LOG("%s: portb_r: %04x\n", machine().describe_context(), data);
-	
+
 	//On Vsmile, VSMILE_PORTB_RESET, VSMILE_PORTB_OFF_SW and VSMILE_PORTB_ON_SW actives will trigger BIOS test screen
-	return data; 
+	return data;
 }
 
 void vsmile_state::portb_w(offs_t offset, uint16_t data, uint16_t mem_mask)

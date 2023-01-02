@@ -39,6 +39,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_pedal(*this, "PEDAL")
+		, m_dsw(*this, "DSW%u", 1U)
 		, m_digits(*this, "digit%u", 0U)
 		, m_lamp(*this, "lamp")
 	{ }
@@ -55,7 +56,6 @@ protected:
 
 	required_region_ptr<uint8_t> m_spriteroms;
 	required_region_ptr<uint8_t> m_proms;
-
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_sprite_position;
 
@@ -66,6 +66,7 @@ protected:
 	required_device<screen_device> m_screen;
 
 	optional_ioport m_pedal;
+	optional_ioport_array<3> m_dsw;
 	output_finder<32> m_digits;
 	output_finder<> m_lamp;
 
@@ -108,7 +109,6 @@ public:
 		, m_spriteram(*this, "spriteram")
 		, m_bitmap_ram(*this, "bitmap_ram", 0xe000, ENDIANNESS_LITTLE)
 		, m_bgcolorrom(*this, "bgcolor")
-		, m_dsw(*this, "DSW%u", 1U)
 	{ }
 
 	void buckrog(machine_config &config);
@@ -126,7 +126,6 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 	memory_share_creator<uint8_t> m_bitmap_ram;
 	required_region_ptr<uint8_t> m_bgcolorrom;
-	required_ioport_array<2> m_dsw;
 
 	uint8_t m_fchg;
 	uint8_t m_mov;
@@ -211,9 +210,8 @@ public:
 	turbo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: turbo_base_state(mconfig, type, tag)
 		, m_roadroms(*this, "road")
-		, m_alt_spriteram(*this, "alt_spriteram", 0x80, ENDIANNESS_LITTLE)
+		, m_spriteram(*this, "spriteram", 0x80, ENDIANNESS_LITTLE)
 		, m_vr(*this, "VR%u", 1U)
-		, m_dsw3(*this, "DSW3")
 		, m_dial(*this, "DIAL")
 		, m_tachometer(*this, "tachometer")
 		, m_speed(*this, "speed")
@@ -229,9 +227,8 @@ protected:
 
 private:
 	required_region_ptr<uint8_t> m_roadroms;
-	memory_share_creator<uint8_t> m_alt_spriteram;
+	memory_share_creator<uint8_t> m_spriteram;
 	required_ioport_array<2> m_vr;
-	required_ioport m_dsw3;
 	required_ioport m_dial;
 	output_finder<> m_tachometer;
 	output_finder<> m_speed;

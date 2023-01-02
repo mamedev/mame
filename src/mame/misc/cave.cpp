@@ -4320,11 +4320,11 @@ Notes:
             U3       : 27C1001 EPROM
             U82      : 27C040 EPROM
             U42-45   : 27C040 EPROMs
-			U81, U89 : 8M 42 pin mask ROM (read as 27C800)
+            U81, U89 : 8M 42 pin mask ROM (read as 27C800)
             ALL other ROMs are soldered-in 16M 42 pin mask ROM (read as 27C160)
 */
 
-ROM_START( pwrinst2 )	/* 94.04.08 */
+ROM_START( pwrinst2 )   /* 94.04.08 */
 	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 code */
 	ROM_LOAD16_BYTE( "g02.u45a", 0x000000, 0x80000, CRC(ddfff811) SHA1(720f577dc77fc12aeb67511251e995169df754b6) )
 	ROM_LOAD16_BYTE( "g02.u44a", 0x000001, 0x80000, CRC(5561f620) SHA1(3241ccc47e909930d79ad0a1a1b11a11879b17be) )
@@ -4374,7 +4374,7 @@ ROM_START( pwrinst2 )	/* 94.04.08 */
 	ROM_LOAD( "peel18cv8p-15.u25", 0x02aa, 0x0155, CRC(61b414df) SHA1(f12c5e62f83114f83108895ee58ceea31cdcb9fd) ) /* PEEL18CV8P-15 */
 ROM_END
 
-ROM_START( pwrinst2a )	/* also 94.04.08 like pwrinst2, but different program roms */
+ROM_START( pwrinst2a )  /* also 94.04.08 like pwrinst2, but different program roms */
 	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 code */
 	ROM_LOAD16_BYTE( "g02.u45", 0x000000, 0x80000, CRC(7b33bc43) SHA1(a68eb94e679f03c354932b8c5cd1bb2922fec0aa) )
 	ROM_LOAD16_BYTE( "g02.u44", 0x000001, 0x80000, CRC(8f6f6637) SHA1(024b12c0fe40e27c79e38bd7601a9183a62d75fd) )

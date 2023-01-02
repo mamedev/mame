@@ -119,7 +119,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	template <bool invert, bool flip>
+	template <bool Invert, bool Flip>
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_ultr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -373,7 +373,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
 	}
 }
 
-template <bool invert, bool flip>
+template <bool Invert, bool Flip>
 u32 apple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// always update the flash timer here so it's smooth regardless of mode switches
@@ -386,7 +386,7 @@ u32 apple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 			if (m_video->m_mix)
 			{
 				m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update<false, invert, flip>(screen, bitmap, cliprect, 160, 191);
+				m_video->text_update<a2_video_device::model::II, Invert, Flip>(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -398,7 +398,7 @@ u32 apple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 			if (m_video->m_mix)
 			{
 				m_video->lores_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update<false, invert, flip>(screen, bitmap, cliprect, 160, 191);
+				m_video->text_update<a2_video_device::model::II, Invert, Flip>(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -408,7 +408,7 @@ u32 apple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	}
 	else
 	{
-		m_video->text_update<false, invert, flip>(screen, bitmap, cliprect, 0, 191);
+		m_video->text_update<a2_video_device::model::II, Invert, Flip>(screen, bitmap, cliprect, 0, 191);
 	}
 
 	return 0;
@@ -426,7 +426,7 @@ u32 apple2_state::screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, 
 			if (m_video->m_mix)
 			{
 				m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update_jplus(screen, bitmap, cliprect, 160, 191);
+				m_video->text_update<a2_video_device::model::II_J_PLUS, true, true>(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -438,7 +438,7 @@ u32 apple2_state::screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, 
 			if (m_video->m_mix)
 			{
 				m_video->lores_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update_jplus(screen, bitmap, cliprect, 160, 191);
+				m_video->text_update<a2_video_device::model::II_J_PLUS, true, true>(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -448,7 +448,7 @@ u32 apple2_state::screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, 
 	}
 	else
 	{
-		m_video->text_update_jplus(screen, bitmap, cliprect, 0, 191);
+		m_video->text_update<a2_video_device::model::II_J_PLUS, true, true>(screen, bitmap, cliprect, 0, 191);
 	}
 
 	return 0;
@@ -466,7 +466,7 @@ u32 apple2_state::screen_update_ultr(screen_device &screen, bitmap_ind16 &bitmap
 			if (m_video->m_mix)
 			{
 				m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update_ultr(screen, bitmap, cliprect, 160, 191);
+				m_video->text_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -478,7 +478,7 @@ u32 apple2_state::screen_update_ultr(screen_device &screen, bitmap_ind16 &bitmap
 			if (m_video->m_mix)
 			{
 				m_video->lores_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update_ultr(screen, bitmap, cliprect, 160, 191);
+				m_video->text_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -488,7 +488,7 @@ u32 apple2_state::screen_update_ultr(screen_device &screen, bitmap_ind16 &bitmap
 	}
 	else
 	{
-		m_video->text_update_ultr(screen, bitmap, cliprect, 0, 191);
+		m_video->text_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen, bitmap, cliprect, 0, 191);
 	}
 
 	return 0;
