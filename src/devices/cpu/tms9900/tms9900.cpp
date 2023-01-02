@@ -341,7 +341,7 @@ void tms99xx_device::state_import(const device_state_entry &entry)
 			break;
 		default:
 			// Workspace registers
-			if (index <= TMS9900_R15 && started())
+			if (index <= TMS9900_R15)
 				write_workspace_register_debug(index-TMS9900_R0, (uint16_t)m_state_any);
 			break;
 	}
@@ -373,7 +373,7 @@ void tms99xx_device::state_export(const device_state_entry &entry)
 		default:
 			// Workspace registers
 			if (index <= TMS9900_R15)
-				m_state_any = started() ? read_workspace_register_debug(index-TMS9900_R0) : 0;
+				m_state_any = read_workspace_register_debug(index-TMS9900_R0);
 			break;
 	}
 }
