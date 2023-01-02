@@ -815,6 +815,13 @@ floatx80 m68000_musashi_device::READ_EA_PACK(int ea)
 			break;
 		}
 
+		case 5:     // (d16,An)
+		{
+			u32 ea = REG_A()[reg] + MAKE_INT_16(m68ki_read_imm_16());
+			fpr = load_pack_float80(ea);
+			break;
+		}
+
 		case 7: // extended modes
 		{
 			switch (reg)
