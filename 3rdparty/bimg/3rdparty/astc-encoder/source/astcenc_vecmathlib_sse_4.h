@@ -1275,7 +1275,11 @@ ASTCENC_SIMD_INLINE vfloat4 dot3(vfloat4 a, vfloat4 b)
  */
 ASTCENC_SIMD_INLINE int popcount(uint64_t v)
 {
+#if defined(__MINGW32__)
+	return static_cast<int>(__builtin_popcountll(v));
+#else
 	return static_cast<int>(_mm_popcnt_u64(v));
+#endif // defined(__MINGW32__)
 }
 
 #endif // ASTCENC_POPCNT >= 1
