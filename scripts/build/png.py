@@ -148,10 +148,7 @@ from __future__ import generators,print_function
 __version__ = "0.0.17"
 
 from array import array
-try:
-    from itertools import imap
-except ImportError:
-    imap = map
+import itertools
 import math
 # http://www.python.org/doc/2.4.4/lib/module-operator.html
 import operator
@@ -1654,7 +1651,7 @@ class Reader:
             for o in raw:
                 out.extend(list(map(lambda i: mask&(o>>i), shifts)))
             return out[:width]
-        return itertools.imap(asvalues, rows)
+        return map(asvalues, rows)
 
     def serialtoflat(self, bytes, width=None):
         """Convert serial format (byte stream) pixel data to flat row
@@ -1951,7 +1948,7 @@ class Reader:
             arraycode = 'BH'[self.bitdepth>8]
             # Like :meth:`group` but producing an array.array object for
             # each row.
-            pixels = itertools.imap(lambda *row: array(arraycode, row),
+            pixels = map(lambda *row: array(arraycode, row),
                        *[iter(self.deinterlace(raw))]*self.width*self.planes)
         else:
             pixels = self.iterboxed(self.iterstraight(raw))
@@ -2362,22 +2359,6 @@ except NameError:
         l.reverse()
         for x in l:
             yield x
-
-try:
-    itertools
-except NameError:
-    class _dummy_itertools:
-        pass
-    itertools = _dummy_itertools()
-    def _itertools_imap(f, seq):
-        for x in seq:
-            yield f(x)
-    itertools.imap = _itertools_imap
-    def _itertools_chain(*iterables):
-        for it in iterables:
-            for element in it:
-                yield element
-    itertools.chain = _itertools_chain
 
 
 # === Support for users without Cython ===
