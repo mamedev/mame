@@ -3,7 +3,8 @@
 /*
 
 Chess King (棋王之王), LCD handheld console presumably from Taiwan.
-Hold down u+d+l+r buttons at boot to enter a test/data clear mode of sorts.
+Hold down U+D+L+R buttons at boot to enter factory reset mode.
+Hold down START at boot to enter test mode.
 
 TODO:
 - lots of unknown writes
@@ -190,7 +191,7 @@ uint8_t chessking_state::cartridge_r(offs_t offset)
 {
 	// bank 1 selects main rom
 	if (m_cart_bank == 1)
-		return m_mainrom[offset & 0x1ffff];
+		return m_mainrom[offset & 0x3ffff];
 
 	// banks 4-7 go to cartridge
 	else if (m_cart_bank >= 4)
