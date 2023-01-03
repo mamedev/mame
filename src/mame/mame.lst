@@ -3391,6 +3391,7 @@ bdesignm
 
 @source:sanritsu/bankp.cpp
 bankp                           // (c) 1984 Sega,  made by Sanritsu
+bankpt                          // bootleg (Tecfri)
 combh                           // (c) 1987 Sega,  made by Sanritsu
 
 @source:seibu/banprestoms.cpp
