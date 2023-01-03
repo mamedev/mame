@@ -2850,7 +2850,7 @@ ROM_START(suprbowl)
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("suprbowl.snd", 0xf000, 0x1000, CRC(97fc0f7a) SHA1(595aa080a6d2c1ab7e718974c4d01e846e142cc1))
+	ROM_LOAD("suprbowl.snd", 0xf000, 0x1000, CRC(04f37a2a) SHA1(9d07661e67593e865364f5883be4dcd2ca084060))
 ROM_END
 
 } // anonymous namespace
