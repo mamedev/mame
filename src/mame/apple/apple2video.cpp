@@ -224,7 +224,7 @@ void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int yp
 	}
 }
 
-inline bool a2_video_device::use_page_2() { return m_page2 && !m_80store; }
+inline bool a2_video_device::use_page_2() const { return m_page2 && !m_80store; }
 
 void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
