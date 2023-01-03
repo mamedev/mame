@@ -231,8 +231,6 @@ private:
 };
 
 
-// video
-
 /*******************************************************************************
  Write Handlers
 ********************************************************************************
@@ -250,6 +248,7 @@ void wwfsstar_state::bg0_videoram_w(offs_t offset, uint16_t data, uint16_t mem_m
 	COMBINE_DATA(&m_bg0_videoram[offset]);
 	m_bg0_tilemap->mark_tile_dirty(offset / 2);
 }
+
 
 /*******************************************************************************
  Tilemap Related Functions
@@ -273,12 +272,9 @@ TILE_GET_INFO_MEMBER(wwfsstar_state::get_fg0_tile_info)
 	**- End of Comments -*/
 
 	uint16_t *tilebase =  &m_fg0_videoram[tile_index * 2];
-	int tileno =  (tilebase[1] & 0x00ff) | ((tilebase[0] & 0x000f) << 8);
+	int tileno = (tilebase[1] & 0x00ff) | ((tilebase[0] & 0x000f) << 8);
 	int colbank = (tilebase[0] & 0x00f0) >> 4;
-	tileinfo.set(0,
-			tileno,
-			colbank,
-			0);
+	tileinfo.set(0, tileno, colbank, 0);
 }
 
 TILEMAP_MAPPER_MEMBER(wwfsstar_state::bg0_scan)
@@ -305,14 +301,12 @@ TILE_GET_INFO_MEMBER(wwfsstar_state::get_bg0_tile_info)
 	**- End of Comments -*/
 
 	uint16_t *tilebase =  &m_bg0_videoram[tile_index * 2];
-	int tileno =  (tilebase[1] & 0x00ff) | ((tilebase[0] & 0x000f) << 8);
+	int tileno = (tilebase[1] & 0x00ff) | ((tilebase[0] & 0x000f) << 8);
 	int colbank = (tilebase[0] & 0x0070) >> 4;
-	int flipx   = (tilebase[0] & 0x0080) >> 7;
-	tileinfo.set(2,
-			tileno,
-			colbank,
-			flipx ? TILE_FLIPX : 0);
+	int flipx = (tilebase[0] & 0x0080) >> 7;
+	tileinfo.set(2, tileno, colbank, flipx ? TILE_FLIPX : 0);
 }
+
 
 /*******************************************************************************
  Sprite Related Functions
@@ -324,7 +318,7 @@ void wwfsstar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	/*- SPR RAM Format -**
 
-	  0x3FF sized region (1024 bytes)
+	  0x400 sized region (1024 bytes)
 
 	  10 bytes per sprite
 
@@ -344,25 +338,24 @@ void wwfsstar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	**- End of Comments -*/
 
 	gfx_element *gfx = m_gfxdecode->gfx(1);
-	uint16_t *source = m_spriteram;
-	uint16_t *finish = source + 0x3ff / 2;
 
-	while (source < finish)
+	for (int offset = 0; offset <= m_spriteram.length() - 5; offset += 5)
 	{
-		int const enable = (source [1] & 0x0001);
+		const uint16_t *source = m_spriteram + offset;
+		int const enable = (source[1] & 0x0001);
 
 		if (enable)
 		{
-			int ypos = ((source [0] & 0x00ff) | ((source [1] & 0x0004) << 6) );
+			int ypos = ((source[0] & 0x00ff) | ((source[1] & 0x0004) << 6));
 			ypos = (((256 - ypos) & 0x1ff) - 16) ;
-			int xpos = ((source [4] & 0x00ff) | ((source [1] & 0x0008) << 5) );
+			int xpos = ((source[4] & 0x00ff) | ((source[1] & 0x0008) << 5));
 			xpos = (((256 - xpos) & 0x1ff) - 16);
-			int flipx = (source [2] & 0x0080 ) >> 7;
-			int flipy = (source [2] & 0x0040 ) >> 6;
-			int chain = (source [1] & 0x0002 ) >> 1;
+			int flipx = (source[2] & 0x0080 ) >> 7;
+			int flipy = (source[2] & 0x0040 ) >> 6;
+			int chain = (source[1] & 0x0002 ) >> 1;
 			chain += 1;
-			int number = (source [3] & 0x00ff) | ((source [2] & 0x003f) << 8);
-			int const colourbank = (source [1] & 0x00f0) >> 4;
+			int number = (source[3] & 0x00ff) | ((source[2] & 0x003f) << 8);
+			int const colourbank = (source[1] & 0x00f0) >> 4;
 
 			number &= ~(chain - 1);
 
@@ -374,36 +367,27 @@ void wwfsstar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 				xpos = 240 - xpos;
 			}
 
-			for (int count=0; count < chain; count++)
+			for (int count = 0; count < chain; count++)
 			{
 				if (flip_screen())
 				{
 					if (!flipy)
-					{
 						gfx->transpen(bitmap, cliprect, number + count, colourbank, flipx, flipy, xpos, ypos + 16 * count, 0);
-					}
 					else
-					{
 						gfx->transpen(bitmap, cliprect, number + count, colourbank, flipx, flipy, xpos, ypos + (16 * (chain - 1)) - (16 * count), 0);
-					}
 				}
 				else
 				{
 					if (!flipy)
-					{
 						gfx->transpen(bitmap, cliprect, number + count, colourbank, flipx, flipy, xpos, ypos - (16 * (chain - 1)) + (16 * count), 0);
-					}
 					else
-					{
 						gfx->transpen(bitmap, cliprect, number + count, colourbank, flipx, flipy, xpos, ypos - 16 * count, 0);
-					}
 				}
 			}
 		}
-
-		source += 5;
 	}
 }
+
 
 /*******************************************************************************
  Video Start and Refresh Functions
@@ -413,7 +397,6 @@ void wwfsstar_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
  SPR - Middle
  FG0 - Front
 *******************************************************************************/
-
 
 void wwfsstar_state::video_start()
 {
@@ -440,8 +423,6 @@ uint32_t wwfsstar_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*******************************************************************************
  Memory Maps
@@ -511,6 +492,7 @@ void wwfsstar_state::irqack_w(offs_t offset, uint16_t data)
 		m_maincpu->set_input_line(5, CLEAR_LINE);
 }
 
+
 /*
     Interrupt behaviour verified from actual PCB.
 
@@ -559,6 +541,7 @@ READ_LINE_MEMBER(wwfsstar_state::vblank_r)
 {
 	return m_vblank;
 }
+
 
 /*******************************************************************************
  Input Ports
@@ -646,6 +629,7 @@ static INPUT_PORTS_START( wwfsstar )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
+
 /*******************************************************************************
  Graphic Decoding
 ********************************************************************************
@@ -690,12 +674,8 @@ GFXDECODE_END
 
 void wwfsstar_state::wwfsstar(machine_config &config)
 {
-	static constexpr XTAL MASTER_CLOCK = 20_MHz_XTAL;
-	static constexpr XTAL CPU_CLOCK = MASTER_CLOCK / 2;
-	static constexpr XTAL PIXEL_CLOCK = MASTER_CLOCK / 4;
-
 	// basic machine hardware
-	M68000(config, m_maincpu, CPU_CLOCK);
+	M68000(config, m_maincpu, 20_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wwfsstar_state::main_map);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(wwfsstar_state::scanline), "screen", 0, 1);
@@ -705,7 +685,7 @@ void wwfsstar_state::wwfsstar(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(PIXEL_CLOCK, 320, 0, 256, 272, 8, 248);   // HTOTAL and VTOTAL are guessed
+	m_screen->set_raw(20_MHz_XTAL / 4, 320, 0, 256, 272, 8, 248); // HTOTAL and VTOTAL are guessed
 	m_screen->set_screen_update(FUNC(wwfsstar_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -728,6 +708,7 @@ void wwfsstar_state::wwfsstar(machine_config &config)
 	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.47);
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.47);
 }
+
 
 /*******************************************************************************
  Rom Loaders / Game Drivers
@@ -942,7 +923,6 @@ ROM_END
 
 
 // There is only 1 ROM difference between US revision 6 & 7.  Rev 7 has a patch to the way the 2nd coin slot works
-
 
 GAME( 1989, wwfsstar,   0,        wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (Europe)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1989, wwfsstaru7, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, empty_init, ROT0, "Technos Japan", "WWF Superstars (US revision 7)", MACHINE_SUPPORTS_SAVE )
