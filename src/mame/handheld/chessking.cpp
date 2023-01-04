@@ -337,7 +337,7 @@ void chessking_state::chesskng(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	BEEP(config, m_beeper, 0);
-	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.5);
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// Cartridge
 	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "chessking_cart");
