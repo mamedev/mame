@@ -38,7 +38,7 @@ editwin_info::editwin_info(debugger_windows_interface &debugger, bool is_main_co
 	m_edit_defstr(),
 	m_original_editproc(nullptr),
 	m_history(),
-	m_last_history(0)
+	m_last_history(-1)
 {
 	if (window() == nullptr)
 		return;
@@ -127,10 +127,7 @@ void editwin_info::restore_configuration_from_node(util::xml::data_node const &n
 			item = item->get_next_sibling(NODE_HISTORY_ITEM);
 		}
 	}
-	if (m_history.empty())
-		m_last_history = 0;
-	else
-		m_last_history = m_history.size() - 1;
+	m_last_history = -1;
 
 	debugwin_info::restore_configuration_from_node(node);
 }
@@ -238,7 +235,7 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 								m_history.pop_back();
 							m_history.emplace_front(buffer);
 						}
-						m_last_history = m_history.size() - 1;
+						m_last_history = -1;
 
 						// process
 						{
