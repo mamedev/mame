@@ -473,8 +473,8 @@ int macadb_device::adb_pollmouse()
 	}
 
 	NewButton = m_mouse0->read() & 0x01;
-	NewX = m_mouse2->read();
-	NewY = m_mouse1->read();
+	NewX = m_mouse1->read();
+	NewY = m_mouse2->read();
 
 	if ((NewX != m_adb_lastmousex) || (NewY != m_adb_lastmousey) || (NewButton != m_adb_lastbutton))
 	{
@@ -489,8 +489,8 @@ void macadb_device::adb_accummouse( uint8_t *MouseX, uint8_t *MouseY )
 	int MouseCountX = 0, MouseCountY = 0;
 	int NewX, NewY;
 
-	NewX = m_mouse2->read();
-	NewY = m_mouse1->read();
+	NewX = m_mouse1->read();
+	NewY = m_mouse2->read();
 
 //  printf("pollmouse: X %d Y %d\n", NewX, NewY);
 
@@ -612,8 +612,8 @@ void macadb_device::adb_talk()
 							}
 							//printf("X %x Y %x\n", mouseX, mouseY);
 							m_adb_buffer[0] = (m_adb_lastbutton & 0x01) ? 0x00 : 0x80;
-							m_adb_buffer[0] |= mouseX & 0x7f;
-							m_adb_buffer[1] = mouseY & 0x7f;
+							m_adb_buffer[0] |= mouseY & 0x7f;
+							m_adb_buffer[1] = (mouseX & 0x7f) | 0x80;
 							m_adb_datasize = 2;
 							break;
 
