@@ -6,6 +6,14 @@
 
 **********************************************************************/
 
+/*
+[:mac] ':3f' (005BA) TASK W 03 (TASK 3 BOOTE 1 MAGIC 1)
+[:mac] ':3f' (08058) BUS ERROR R fefe4:0007e4 (NONX 1 WP 0 TASK 3 FC 1 MAGIC 1)
+
+[:mac] TASK 3 SEGMENT 31 PAGE 13 MEM fe800-fefff 000000-0007ff X W[:mac]  000000-0007ff X W
+[:mac] TASK 3 SEGMENT 31 PAGE 15 MEM ff800-fffff 07d800-07dfff    [:mac]  07d800-07dfff    
+*/
+
 #include "emu.h"
 #include "abc1600mac.h"
 
@@ -39,7 +47,7 @@ DEFINE_DEVICE_TYPE(ABC1600_MAC, abc1600_mac_device, "abc1600mac", "ABC 1600 MAC"
 
 void abc1600_mac_device::program_map(address_map &map)
 {
-	// populated in drivers/abc1600.cpp
+	// populated in src/mame/luxor/abc1600.cpp
 }
 
 void abc1600_mac_device::mac_map(address_map &map)
@@ -239,7 +247,7 @@ uint8_t abc1600_mac_device::read(offs_t offset)
 		{
 			logerror("%s BUS ERROR R %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
 				machine().describe_context(), offset, virtual_offset, nonx, wp, task, fc, m_magic);
-			dump();
+			machine().debug_break();
 			m_write_buserr(offset, 1);
 		}
 	}
@@ -282,14 +290,14 @@ void abc1600_mac_device::write(offs_t offset, uint8_t data)
 		{
 			logerror("%s BUS ERROR W %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
 				machine().describe_context(), offset, virtual_offset, nonx, wp, task, fc, m_magic);
-			dump();
+			machine().debug_break();
 			m_write_buserr(offset, 0);
 		}
 		if (!wp)
 		{
 			logerror("%s BUS ERROR W %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
 				machine().describe_context(), offset, virtual_offset, nonx, wp, task, fc, m_magic);
-			dump();
+			machine().debug_break();
 			m_write_buserr(offset, 0);
 		}
 	}
