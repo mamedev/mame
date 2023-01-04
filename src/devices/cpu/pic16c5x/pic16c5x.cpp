@@ -772,8 +772,8 @@ void pic16c5x_device::subwf()
 
 void pic16c5x_device::swapf()
 {
-	m_ALU  = ((GET_REGFILE(ADDR) << 4) & 0xf0);
-	m_ALU |= ((GET_REGFILE(ADDR) >> 4) & 0x0f);
+	uint8_t reg = GET_REGFILE(ADDR);
+	m_ALU = reg << 4 | reg >> 4;
 	STORE_RESULT(ADDR, m_ALU);
 }
 
