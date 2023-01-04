@@ -221,7 +221,6 @@ void pic16c5x_device::update_internalram_ptr()
 #define ADDR_MASK       0x7ff
 
 
-
 #define TMR0    m_internalram[1]
 #define PCL     m_internalram[2]
 #define STATUS  m_internalram[3]
@@ -233,6 +232,7 @@ void pic16c5x_device::update_internalram_ptr()
 #define INDF    M_RDRAM(FSR)
 
 #define ADDR    (m_opcode.b.l & 0x1f)
+#define BITPOS  ((m_opcode.b.l >> 5) & 7)
 
 
 // ******** The following is the Status Flag register definition. ********
@@ -283,13 +283,7 @@ void pic16c5x_device::update_internalram_ptr()
  ************************************************************************/
 
 #define CLR(flagreg, flag) ( flagreg &= uint8_t(~flag) )
-#define SET(flagreg, flag) ( flagreg |=  flag )
-
-
-// Easy bit position selectors
-#define POS  ((m_opcode.b.l >> 5) & 7)
-static const unsigned int bit_clr[8] = { 0xfe, 0xfd, 0xfb, 0xf7, 0xef, 0xdf, 0xbf, 0x7f };
-static const unsigned int bit_set[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
+#define SET(flagreg, flag) ( flagreg |= flag )
 
 
 
@@ -347,6 +341,7 @@ uint16_t pic16c5x_device::POP_STACK()
 	m_STACK[1] = m_STACK[0];
 	return (data & ADDR_MASK);
 }
+
 void pic16c5x_device::PUSH_STACK(uint16_t data)
 {
 	m_STACK[0] = m_STACK[1];
@@ -580,20 +575,20 @@ void pic16c5x_device::andlw()
 void pic16c5x_device::bcf()
 {
 	m_ALU = GET_REGFILE(ADDR);
-	m_ALU &= bit_clr[POS];
+	m_ALU &= ~(1 << BITPOS);
 	STORE_REGFILE(ADDR, m_ALU);
 }
 
 void pic16c5x_device::bsf()
 {
 	m_ALU = GET_REGFILE(ADDR);
-	m_ALU |= bit_set[POS];
+	m_ALU |= 1 << BITPOS;
 	STORE_REGFILE(ADDR, m_ALU);
 }
 
 void pic16c5x_device::btfss()
 {
-	if ((GET_REGFILE(ADDR) & bit_set[POS]) == bit_set[POS]) {
+	if (BIT(GET_REGFILE(ADDR), BITPOS)) {
 		m_PC++;
 		PCL = m_PC & 0xff;
 		m_inst_cycles += 1; // Add NOP cycles
@@ -602,7 +597,7 @@ void pic16c5x_device::btfss()
 
 void pic16c5x_device::btfsc()
 {
-	if ((GET_REGFILE(ADDR) & bit_set[POS]) == 0) {
+	if (!BIT(GET_REGFILE(ADDR), BITPOS)) {
 		m_PC++;
 		PCL = m_PC & 0xff;
 		m_inst_cycles += 1; // Add NOP cycles
