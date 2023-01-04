@@ -86,7 +86,7 @@ void menu_simple_game_options::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Save Settings"), 0, (void *)(uintptr_t)SAVE_CONFIG);
 
-	custombottom = 2.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
+	custombottom = 2.0f * line_height() + 3.0f * tb_border();
 }
 
 //-------------------------------------------------

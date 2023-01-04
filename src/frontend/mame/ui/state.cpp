@@ -225,7 +225,7 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 		item_append(_("Cancel"), 0, nullptr);
 
 	// set up custom render proc
-	custombottom = (2.0f * ui().get_line_height()) + (3.0f * ui().box_tb_border());
+	custombottom = (2.0f * line_height()) + (3.0f * tb_border());
 
 	// get ready to poll inputs
 	m_switch_poller.reset();
@@ -446,9 +446,9 @@ void menu_load_save_state_base::custom_render(void *selectedref, float top, floa
 	{
 		draw_text_box(
 				std::begin(text), std::next(std::begin(text), count),
-				origx1, origx2, origy2 + ui().box_tb_border(), origy2 + (count * ui().get_line_height()) + (3.0f * ui().box_tb_border()),
+				origx1, origx2, origy2 + tb_border(), origy2 + (count * line_height()) + (3.0f * tb_border()),
 				text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
-				ui().colors().text_color(), ui().colors().background_color(), 1.0f);
+				ui().colors().text_color(), ui().colors().background_color());
 	}
 
 	// draw the confirmation prompt if necessary

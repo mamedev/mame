@@ -153,7 +153,7 @@ void menu_file_manager::populate(float &customtop, float &custombottom)
 	if (m_warnings.empty() || !missing_mandatory)
 		item_append(m_warnings.empty() ? _("Reset System") : _("Start System"), 0, (void *)1);
 
-	custombottom = ui().get_line_height() + 3.0f * ui().box_tb_border();
+	custombottom = line_height() + 3.0f * tb_border();
 }
 
 

@@ -126,6 +126,7 @@ protected:
 	void launch_system(game_driver const &driver, ui_software_info const &swinfo) { launch_system(ui(), driver, &swinfo, nullptr, nullptr); }
 	void launch_system(game_driver const &driver, ui_software_info const &swinfo, std::string const &part) { launch_system(ui(), driver, &swinfo, &part, nullptr); }
 
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 	// handlers
@@ -134,7 +135,7 @@ protected:
 
 	// draw arrow
 	void draw_common_arrow(float origx1, float origy1, float origx2, float origy2, int current, int dmin, int dmax, float title);
-	void draw_info_arrow(int ub, float origx1, float origx2, float oy1, float line_height, float text_size, float ud_arrow_width);
+	void draw_info_arrow(int ub, float origx1, float origx2, float oy1, float line_height, float ud_arrow_width);
 
 	bool draw_error_text();
 
@@ -284,11 +285,11 @@ private:
 	void get_title_search(std::string &title, std::string &search);
 
 	// event handling
-	virtual void handle_keys(uint32_t flags, int &iptkey) override;
-	virtual void handle_events(uint32_t flags, event &ev) override;
+	virtual void handle_keys(u32 flags, int &iptkey) override;
+	virtual void handle_events(u32 flags, event &ev) override;
 
 	// draw game list
-	virtual void draw(uint32_t flags) override;
+	virtual void draw(u32 flags) override;
 
 	// draw right panel
 	void draw_right_panel(float origx1, float origy1, float origx2, float origy2);
@@ -323,19 +324,19 @@ private:
 	std::string                 m_info_buffer;
 	std::optional<text_layout>  m_info_layout;
 
-	cache                   &m_cache;
-	bool                    m_is_swlist;
-	focused_menu            m_focus;
-	bool                    m_pressed;              // mouse button held down
-	osd_ticks_t             m_repeat;
+	cache                       &m_cache;
+	bool                        m_is_swlist;
+	focused_menu                m_focus;
+	bool                        m_pressed;              // mouse button held down
+	osd_ticks_t                 m_repeat;
 
-	int                     m_right_visible_lines;  // right box lines
+	int                         m_right_visible_lines;  // right box lines
 
-	uint8_t                 m_right_panel;
-	bool                    m_has_icons;
-	bool                    m_switch_image;
-	uint8_t                 m_image_view;
-	flags_cache             m_flags;
+	u8                          m_right_panel;
+	bool                        m_has_icons;
+	bool                        m_switch_image;
+	u8                          m_image_view;
+	flags_cache                 m_flags;
 };
 
 } // namespace ui

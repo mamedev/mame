@@ -333,8 +333,8 @@ void menu_add_change_folder::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 
 	// configure the custom rendering
-	customtop = 2.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
-	custombottom = 1.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
+	customtop = 2.0f * line_height() + 3.0f * tb_border();
+	custombottom = 1.0f * line_height() + 3.0f * tb_border();
 }
 
 //-------------------------------------------------
@@ -351,17 +351,17 @@ void menu_add_change_folder::custom_render(void *selectedref, float top, float b
 			m_current_path };
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
-			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
+			origx1, origx2, origy1 - top, origy1 - tb_border(),
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
-			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
+			ui().colors().text_color(), UI_GREEN_COLOR);
 
 	// bottom text
 	char const *const bottomtext[] = { _("Press TAB to set") };
 	draw_text_box(
 			std::begin(bottomtext), std::end(bottomtext),
-			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
+			origx1, origx2, origy2 + tb_border(), origy2 + bottom,
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
-			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
+			ui().colors().text_color(), ui().colors().background_color());
 }
 
 //-------------------------------------------------
@@ -522,7 +522,7 @@ void menu_display_actual::populate(float &customtop, float &custombottom)
 
 	item_append(menu_item_type::SEPARATOR);
 
-	customtop = (m_folders.size() + 1) * ui().get_line_height() + 6.0f * ui().box_tb_border();
+	customtop = (m_folders.size() + 1) * line_height() + 6.0f * tb_border();
 }
 
 //-------------------------------------------------
@@ -531,17 +531,16 @@ void menu_display_actual::populate(float &customtop, float &custombottom)
 
 void menu_display_actual::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	float const lineheight(ui().get_line_height());
 	float const maxwidth(draw_text_box(
 			std::begin(m_folders), std::end(m_folders),
-			origx1, origx2, origy1 - (3.0f * ui().box_tb_border()) - (m_folders.size() * lineheight), origy1 - ui().box_tb_border(),
+			origx1, origx2, origy1 - (3.0f * tb_border()) - (m_folders.size() * line_height()), origy1 - tb_border(),
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
-			ui().colors().text_color(), ui().colors().background_color(), 1.0f));
+			ui().colors().text_color(), ui().colors().background_color()));
 	draw_text_box(
 			std::begin(m_heading), std::end(m_heading),
-			0.5f * (1.0f - maxwidth), 0.5f * (1.0f + maxwidth), origy1 - top, origy1 - top + lineheight + (2.0f * ui().box_tb_border()),
+			0.5f * (1.0f - maxwidth), 0.5f * (1.0f + maxwidth), origy1 - top, origy1 - top + line_height() + (2.0f * tb_border()),
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
-			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
+			ui().colors().text_color(), UI_GREEN_COLOR);
 }
 
 } // anonymous namespace

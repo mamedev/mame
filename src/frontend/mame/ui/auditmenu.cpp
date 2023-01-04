@@ -83,9 +83,9 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 		{
 			draw_text_box(
 					&m_prompt, &m_prompt + 1,
-					x, x2, y2 + ui().box_tb_border(), y2 + bottom,
+					x, x2, y2 + tb_border(), y2 + bottom,
 					text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
-					ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
+					ui().colors().text_color(), UI_GREEN_COLOR);
 		}
 		break;
 
@@ -139,7 +139,7 @@ void menu_audit::populate(float &customtop, float &custombottom)
 		item_append(util::string_format(_("Audit media for %1$u systems marked unavailable"), m_unavailable), 0, ITEMREF_START_FAST);
 	item_append(util::string_format(_("Audit media for all %1$u systems"), m_availablesorted.size()), 0, ITEMREF_START_FULL);
 	item_append(menu_item_type::SEPARATOR, 0);
-	custombottom = (ui().get_line_height() * 1.0f) + (ui().box_tb_border() * 3.0f);
+	custombottom = (line_height() * 1.0f) + (tb_border() * 3.0f);
 }
 
 void menu_audit::handle(event const *ev)

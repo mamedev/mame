@@ -126,6 +126,19 @@ menu_select_game::~menu_select_game()
 	ui().save_ui_options();
 }
 
+
+//-------------------------------------------------
+//  recompute metrics
+//-------------------------------------------------
+
+void menu_select_game::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu_select_launch::recompute_metrics(width, height, aspect);
+
+	m_icons.clear();
+}
+
+
 //-------------------------------------------------
 //  menu_activated
 //-------------------------------------------------
@@ -461,8 +474,8 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 	}
 
 	// configure the custom rendering
-	customtop = 3.0f * ui().get_line_height() + 5.0f * ui().box_tb_border();
-	custombottom = 4.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
+	customtop = 3.0f * line_height() + 5.0f * tb_border();
+	custombottom = 4.0f * line_height() + 3.0f * tb_border();
 
 	// reselect prior game launched, if any
 	if (old_item_selected != -1)
@@ -938,6 +951,10 @@ render_texture *menu_select_game::get_icon_texture(int linenum, void *selectedre
 	return icon->second.bitmap.valid() ? icon->second.texture.get() : nullptr;
 }
 
+
+//-------------------------------------------------
+//  export displayed list
+//-------------------------------------------------
 
 void menu_select_game::inkey_export()
 {

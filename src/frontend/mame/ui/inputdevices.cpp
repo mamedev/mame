@@ -47,16 +47,14 @@ protected:
 			case ITEM_CLASS_RELATIVE:
 				{
 					// draw the outer box
-					ui().draw_outlined_box(container(), x, y2 + ui().box_tb_border(), x2, y2 + bottom, ui().colors().background_color());
+					ui().draw_outlined_box(container(), x, y2 + tb_border(), x2, y2 + bottom, ui().colors().background_color());
 
 					// draw the indicator
 					rgb_t const fgcolor(ui().colors().text_color());
-					float const border = ui().box_lr_border() * machine().render().ui_aspect(&container());
-					float const lineheight = ui().get_line_height();
-					float const indleft = x + border;
-					float const indright = x2 - border;
-					float const indtop = y2 + (ui().box_tb_border() * 2.0F) + (lineheight * 0.2F);
-					float const indbottom = y2 + (ui().box_tb_border() * 2.0F) + (lineheight * 0.8F);
+					float const indleft = x + lr_border();
+					float const indright = x2 - lr_border();
+					float const indtop = y2 + (tb_border() * 2.0F) + (line_height() * 0.2F);
+					float const indbottom = y2 + (tb_border() * 2.0F) + (line_height() * 0.8F);
 					float const indcentre = (x + x2) * 0.5F;
 					s32 const value = (input.itemclass() == ITEM_CLASS_ABSOLUTE) ? input.read_as_absolute(ITEM_MODIFIER_NONE) : input.read_as_relative(ITEM_MODIFIER_NONE);
 					if (0 < value)
@@ -110,7 +108,7 @@ private:
 		item_append(menu_item_type::SEPARATOR);
 
 		if (haveanalog)
-			custombottom = ui().get_line_height() + (ui().box_tb_border() * 3.0F);
+			custombottom = line_height() + (tb_border() * 3.0F);
 	}
 
 	virtual void handle(event const *ev) override

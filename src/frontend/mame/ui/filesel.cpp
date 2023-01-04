@@ -79,7 +79,7 @@ menu_file_selector::~menu_file_selector()
 void menu_file_selector::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	// lay out extra text
-	auto layout = ui().create_layout(container());
+	auto layout = create_layout();
 	layout.add_text(m_current_directory);
 
 	// position this extra text
@@ -90,8 +90,8 @@ void menu_file_selector::custom_render(void *selectedref, float top, float botto
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 
 	// take off the borders
-	x1 += ui().box_lr_border() * machine().render().ui_aspect(&container());
-	y1 += ui().box_tb_border();
+	x1 += lr_border();
+	y1 += tb_border();
 
 	size_t hit_start = 0, hit_span = 0;
 	if (is_mouse_hit()
@@ -428,7 +428,7 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 		set_selection((void *)selected_entry);
 
 	// set up custom render proc
-	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
+	customtop = line_height() + 3.0f * tb_border();
 }
 
 

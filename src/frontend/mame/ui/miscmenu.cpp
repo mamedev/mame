@@ -231,7 +231,7 @@ void menu_bookkeeping::populate_text(std::optional<text_layout> &layout, float &
 	if (!layout || (layout->width() != width))
 	{
 		rgb_t const color = ui().colors().text_color();
-		layout.emplace(ui().create_layout(container(), width));
+		layout.emplace(create_layout(width));
 
 		// show total time first
 		prevtime = machine().time();

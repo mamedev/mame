@@ -446,7 +446,7 @@ void submenu::populate(float &customtop, float &custombottom)
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-	custombottom = ui().get_line_height() + (3.0f * ui().box_tb_border());
+	custombottom = ui().get_line_height() + (3.0f * tb_border());
 }
 
 //-------------------------------------------------
@@ -463,9 +463,9 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 			char const *const bottomtext[] = { selected_sm_option.entry->description() };
 			draw_text_box(
 					std::begin(bottomtext), std::end(bottomtext),
-					origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
+					origx1, origx2, origy2 + tb_border(), origy2 + bottom,
 					text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
-					ui().colors().text_color(), ui().colors().background_color(), 1.0f);
+					ui().colors().text_color(), ui().colors().background_color());
 		}
 	}
 }

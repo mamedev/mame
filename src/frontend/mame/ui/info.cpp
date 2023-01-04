@@ -541,7 +541,7 @@ void menu_game_info::populate_text(std::optional<text_layout> &layout, float &wi
 	if (!layout || (layout->width() != width))
 	{
 		rgb_t const color = ui().colors().text_color();
-		layout.emplace(ui().create_layout(container(), width));
+		layout.emplace(create_layout(width));
 		layout->add_text(ui().machine_info().game_info_string(), color);
 		lines = layout->lines();
 	}
@@ -606,7 +606,7 @@ void menu_warn_info::populate_text(std::optional<text_layout> &layout, float &wi
 		}
 
 		rgb_t const color(ui().colors().text_color());
-		layout.emplace(ui().create_layout(container(), width));
+		layout.emplace(create_layout(width));
 		layout->add_text(std::move(buf).str(), color);
 		lines = layout->lines();
 	}

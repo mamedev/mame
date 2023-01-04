@@ -607,8 +607,8 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 
 	// configure the custom rendering
 	m_skip_main_items = 0;
-	customtop = 4.0f * ui().get_line_height() + 5.0f * ui().box_tb_border();
-	custombottom = 4.0f * ui().get_line_height() + 4.0f * ui().box_tb_border();
+	customtop = 4.0f * line_height() + 5.0f * tb_border();
+	custombottom = 4.0f * line_height() + 4.0f * tb_border();
 
 	if (old_software != -1)
 	{
