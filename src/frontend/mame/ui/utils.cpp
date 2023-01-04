@@ -1956,9 +1956,6 @@ uint8_t ui_globals::cur_sw_dats_total = 0;
 uint8_t ui_globals::curdats_total = 0;
 uint8_t ui_globals::cur_sw_dats_view = 0;
 bool ui_globals::reset = false;
-int ui_globals::visible_main_lines = 0;
-int ui_globals::visible_sw_lines = 0;
-uint16_t ui_globals::panels_status = 0;
 
 char* chartrimcarriage(char str[])
 {

@@ -112,7 +112,6 @@ void editwin_info::draw_contents(HDC dc)
 void editwin_info::restore_configuration_from_node(util::xml::data_node const &node)
 {
 	m_history.clear();
-	m_last_history = 0;
 	util::xml::data_node const *const hist = node.get_child(NODE_WINDOW_HISTORY);
 	if (hist)
 	{
@@ -128,6 +127,10 @@ void editwin_info::restore_configuration_from_node(util::xml::data_node const &n
 			item = item->get_next_sibling(NODE_HISTORY_ITEM);
 		}
 	}
+	if (m_history.empty())
+		m_last_history = 0;
+	else
+		m_last_history = m_history.size() - 1;
 
 	debugwin_info::restore_configuration_from_node(node);
 }

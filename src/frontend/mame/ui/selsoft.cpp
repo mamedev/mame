@@ -613,7 +613,7 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 	if (old_software != -1)
 	{
 		set_selected_index(old_software);
-		top_line = selected_index() - (ui_globals::visible_sw_lines / 2);
+		centre_selection();
 	}
 
 	reselect_last::reset();

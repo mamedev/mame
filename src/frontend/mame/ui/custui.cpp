@@ -78,6 +78,7 @@ menu_custom_ui::menu_custom_ui(mame_ui_manager &mui, render_container &container
 	, m_handler(std::move(handler))
 	, m_currlang(0)
 	, m_currsysnames(0)
+	, m_currpanels(ui().options().hide_panels())
 {
 	set_process_flags(PROCESS_LR_REPEAT);
 	set_heading(_("Customize UI"));
@@ -92,7 +93,7 @@ menu_custom_ui::menu_custom_ui(mame_ui_manager &mui, render_container &container
 
 void menu_custom_ui::menu_dismissed()
 {
-	ui().options().set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE);
+	ui().options().set_value(OPTION_HIDE_PANELS, m_currpanels, OPTION_PRIORITY_CMDLINE);
 
 	machine().options().set_value(OPTION_LANGUAGE, m_currlang ? m_languages[m_currlang] : "", OPTION_PRIORITY_CMDLINE);
 	load_translation(machine().options());
@@ -178,23 +179,23 @@ void menu_custom_ui::handle(event const *ev)
 			if ((ev->iptkey == IPT_UI_LEFT) || (ev->iptkey == IPT_UI_RIGHT) || (ev->iptkey == IPT_UI_CLEAR))
 			{
 				if (ev->iptkey == IPT_UI_LEFT)
-					--ui_globals::panels_status;
+					--m_currpanels;
 				else if (ev->iptkey == IPT_UI_RIGHT)
-					++ui_globals::panels_status;
+					++m_currpanels;
 				else
-					ui_globals::panels_status = 0;
-				ev->item->set_subtext(_(HIDE_STATUS[ui_globals::panels_status]));
-				ev->item->set_flags(get_arrow_flags<uint16_t>(0, HIDE_BOTH, ui_globals::panels_status));
+					m_currpanels = 0;
+				ev->item->set_subtext(_(HIDE_STATUS[m_currpanels]));
+				ev->item->set_flags(get_arrow_flags<uint16_t>(0, HIDE_BOTH, m_currpanels));
 			}
 			else if (ev->iptkey == IPT_UI_SELECT)
 			{
 				std::vector<std::string> s_sel(std::size(HIDE_STATUS));
 				std::transform(std::begin(HIDE_STATUS), std::end(HIDE_STATUS), s_sel.begin(), [](auto &s) { return _(s); });
 				menu::stack_push<menu_selector>(
-						ui(), container(), _("Show Side Panels"), std::move(s_sel), ui_globals::panels_status,
-						[item = ev->item] (int selection)
+						ui(), container(), _("Show Side Panels"), std::move(s_sel), m_currpanels,
+						[this, item = ev->item] (int selection)
 						{
-							ui_globals::panels_status = selection;
+							m_currpanels = selection;
 							item->set_subtext(_(HIDE_STATUS[selection]));
 							item->set_flags(get_arrow_flags<uint16_t>(0, HIDE_BOTH, selection));
 						});
@@ -220,8 +221,8 @@ void menu_custom_ui::populate(float &customtop, float &custombottom)
 	arrow_flags = get_arrow_flags<std::size_t>(0, m_sysnames.size() - 1, m_currsysnames);
 	item_append(_("System Names"), m_sysnames[m_currsysnames], arrow_flags, (void *)(uintptr_t)SYSNAMES_MENU);
 
-	arrow_flags = get_arrow_flags<uint16_t>(0, HIDE_BOTH, ui_globals::panels_status);
-	item_append(_("Show Side Panels"), _(HIDE_STATUS[ui_globals::panels_status]), arrow_flags, (void *)(uintptr_t)HIDE_MENU);
+	arrow_flags = get_arrow_flags<uint16_t>(0, HIDE_BOTH, m_currpanels);
+	item_append(_("Show Side Panels"), _(HIDE_STATUS[m_currpanels]), arrow_flags, (void *)(uintptr_t)HIDE_MENU);
 
 	item_append(menu_item_type::SEPARATOR);
 }
@@ -328,6 +329,7 @@ menu_font_ui::menu_font_ui(mame_ui_manager &mui, render_container &container, st
 	, m_info_min(parse_number<float>(mui.options().get_entry(OPTION_INFOS_SIZE)->minimum()))
 	, m_info_max(parse_number<float>(mui.options().get_entry(OPTION_INFOS_SIZE)->maximum()))
 	, m_info_size(mui.options().infos_size())
+	, m_face_changed(false)
 	, m_changed(false)
 	, m_actual(0U)
 {
@@ -374,17 +376,20 @@ void menu_font_ui::menu_dismissed()
 	{
 		ui_options &moptions = ui().options();
 
-		std::string name(m_fonts[m_actual].first);
-#ifdef UI_WINDOWS
-		if (name != "default")
+		if (m_face_changed)
 		{
-			if (m_italic)
-				name.insert(0, "[I]");
-			if (m_bold)
-				name.insert(0, "[B]");
-		}
+			std::string name(m_fonts[m_actual].first);
+#ifdef UI_WINDOWS
+			if (name != "default")
+			{
+				if (m_italic)
+					name.insert(0, "[I]");
+				if (m_bold)
+					name.insert(0, "[B]");
+			}
 #endif
-		machine().options().set_value(OPTION_UI_FONT, name, OPTION_PRIORITY_CMDLINE);
+			machine().options().set_value(OPTION_UI_FONT, name, OPTION_PRIORITY_CMDLINE);
+		}
 		moptions.set_value(OPTION_INFOS_SIZE, m_info_size, OPTION_PRIORITY_CMDLINE);
 		moptions.set_value(OPTION_FONT_ROWS, m_font_size, OPTION_PRIORITY_CMDLINE);
 
@@ -440,6 +445,7 @@ void menu_font_ui::handle(event const *ev)
 			case MUI_FNT:
 				if ((ev->iptkey == IPT_UI_LEFT) || (ev->iptkey == IPT_UI_RIGHT) || (ev->iptkey == IPT_UI_CLEAR))
 				{
+					m_face_changed = true;
 					m_changed = true;
 					if (ev->iptkey == IPT_UI_LEFT)
 						--m_actual;
@@ -459,6 +465,7 @@ void menu_font_ui::handle(event const *ev)
 							ui(), container(), _("UI Font"), std::move(display_names), m_actual,
 							[this] (int selection)
 							{
+								m_face_changed = true;
 								m_changed = true;
 								m_actual = selection;
 								reset(reset_options::REMEMBER_REF);
@@ -471,6 +478,7 @@ void menu_font_ui::handle(event const *ev)
 			case MUI_ITALIC:
 				if ((ev->iptkey == IPT_UI_LEFT) || (ev->iptkey == IPT_UI_RIGHT) || (ev->iptkey == IPT_UI_SELECT) || (ev->iptkey == IPT_UI_CLEAR))
 				{
+					m_face_changed = true;
 					m_changed = true;
 					bool &val = ((uintptr_t)ev->itemref == MUI_BOLD) ? m_bold : m_italic;
 					if (ev->iptkey == IPT_UI_CLEAR)

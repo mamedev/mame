@@ -44,6 +44,7 @@ private:
 	std::vector<std::string>    m_sysnames;
 	std::size_t                 m_currlang;
 	std::size_t                 m_currsysnames;
+	u8                          m_currpanels;
 };
 
 //-------------------------------------------------
@@ -71,6 +72,7 @@ private:
 	int m_font_size;
 	float const m_info_min, m_info_max;
 	float m_info_size;
+	bool m_face_changed;
 	bool m_changed;
 
 	std::uint16_t m_actual;
