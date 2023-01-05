@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #include "test.h"
@@ -13,7 +13,6 @@ BX_STATIC_ASSERT(false
 	|| BX_CRT_LIBCXX
 	|| BX_CRT_MINGW
 	|| BX_CRT_MSVC
-	|| BX_CRT_MUSL
 	|| BX_CRT_NEWLIB
 	);
 
@@ -48,4 +47,30 @@ TEST(macros)
 	CHECK_EQUAL(6, BX_VA_ARGS_COUNT(1, 2, 3, 4, 5, 6) );
 
 	CHECK_EQUAL(0, bx::strCmp(BX_STRINGIZE(TEST 1234 %^&*), "TEST 1234 %^&*") );
+
+	{
+		struct PodStruct { int32_t x, y, z; };
+		CHECK_EQUAL(0, BX_OFFSETOF(PodStruct, x) );
+		CHECK_EQUAL(4, BX_OFFSETOF(PodStruct, y) );
+		CHECK_EQUAL(8, BX_OFFSETOF(PodStruct, z) );
+	}
+
+	{
+		union PodUnion { int32_t x, y, z; };
+		CHECK_EQUAL(BX_OFFSETOF(PodUnion, x), BX_OFFSETOF(PodUnion, y) );
+		CHECK_EQUAL(BX_OFFSETOF(PodUnion, y), BX_OFFSETOF(PodUnion, z) );
+	}
+
+	{
+		struct NonPodStruct { NonPodStruct() { } int32_t x, y, z; };
+		CHECK_EQUAL(0, BX_OFFSETOF(NonPodStruct, x) );
+		CHECK_EQUAL(4, BX_OFFSETOF(NonPodStruct, y) );
+		CHECK_EQUAL(8, BX_OFFSETOF(NonPodStruct, z) );
+	}
+
+	{
+		union NonPodUnion { NonPodUnion() { } int32_t x, y, z; };
+		CHECK_EQUAL(BX_OFFSETOF(NonPodUnion, x), BX_OFFSETOF(NonPodUnion, y) );
+		CHECK_EQUAL(BX_OFFSETOF(NonPodUnion, y), BX_OFFSETOF(NonPodUnion, z) );
+	}
 }
