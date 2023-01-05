@@ -27,7 +27,8 @@
 
     One video line is: 6 cycles of right border, 13 cycles of hblank, 6 cycles of left border, and 40 cycles of active video
 
-    640 + 96 + 96 = 832 (make borders each 38 pixels wider in A2 modes)
+    ((6*14)*2) + 560 = 728 (total for A2 modes)  htotal = 910 (65 * 14)
+    ((6*16)*2) + 640 = 832 (total for SHR)       htotal = 1040 (65 * 16)
 
     FF6ACF is speed test in ROM
     Diags:
@@ -1521,7 +1522,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 		case 0x10:  // read any key down, reset keyboard strobe
 			keyglu_816_write(GLU_C010, 0);
-			return uKeyboardC010;
+			return uKeyboardC010 | (uKeyboard & 0x7f);
 
 		case 0x11:  // read LCRAM2 (LC Dxxx bank)
 			return (uKeyboardC010 & 0x7f) | (m_lcram2 ? 0x80 : 0x00);
