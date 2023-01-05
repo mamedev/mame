@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014 Dario Manesku. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include <string>
@@ -548,7 +548,7 @@ void submit(bgfx::ViewId _id, bgfx::ProgramHandle _handle, int32_t _depth = 0)
 {
 	bgfx::submit(_id, _handle, _depth);
 
-	// Keep track of submitted view ids.
+	// Keep track of submited view ids.
 	s_viewMask |= 1 << _id;
 }
 
@@ -764,10 +764,6 @@ struct Group
 		m_numEdges = 0;
 		m_edges = NULL;
 		m_edgePlanesUnalignedPtr = NULL;
-		m_edgePlanes = NULL;
-		m_aabb={};
-		m_sphere={};
-		m_obb={};
 		m_prims.clear();
 	}
 
@@ -923,9 +919,9 @@ struct Group
 	uint8_t* m_vertices;
 	uint32_t m_numIndices;
 	uint16_t* m_indices;
-	bx::Sphere m_sphere;
-	bx::Aabb   m_aabb;
-	bx::Obb    m_obb;
+	Sphere m_sphere;
+	Aabb m_aabb;
+	Obb m_obb;
 	PrimitiveArray m_prims;
 	uint32_t m_numEdges;
 	Edge* m_edges;
@@ -994,9 +990,9 @@ struct Mesh
 			group.m_ibh = bgfx::createIndexBuffer(mem);
 
 			group.m_sphere = it->m_sphere;
-			group.m_aabb   = it->m_aabb;
-			group.m_obb    = it->m_obb;
-			group.m_prims  = it->m_prims;
+			group.m_aabb = it->m_aabb;
+			group.m_obb = it->m_obb;
+			group.m_prims = it->m_prims;
 
 			m_groups.push_back(group);
 		}
@@ -1071,6 +1067,7 @@ struct Model
 			::setRenderState(_renderState);
 
 			// Submit
+			BX_ASSERT(bgfx::kInvalidHandle != m_program, "Error, program is not set.");
 			::submit(_viewId, m_program);
 		}
 	}
@@ -1689,7 +1686,7 @@ bool clipTest(const float* _planes, uint8_t _planeNum, const Mesh& _mesh, const 
 	{
 		const Group& group = *it;
 
-		bx::Sphere sphere = group.m_sphere;
+		Sphere sphere = group.m_sphere;
 		sphere.center.x = sphere.center.x * scale + _translate[0];
 		sphere.center.y = sphere.center.y * scale + _translate[1];
 		sphere.center.z = sphere.center.z * scale + _translate[2];
@@ -1784,8 +1781,6 @@ public:
 		bgfx::Init init;
 		init.type     = args.m_type;
 		init.vendorId = args.m_pciId;
-		init.platformData.nwh  = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
-		init.platformData.ndt  = entry::getNativeDisplayHandle();
 		init.resolution.width  = m_viewState.m_width;
 		init.resolution.height = m_viewState.m_height;
 		init.resolution.reset  = m_reset;

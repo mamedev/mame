@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include <bx/easing.h>
@@ -65,27 +65,19 @@ public:
 		}
 	}
 
-	static void remapIndices(uint32_t* _indices, uint32_t _num)
-	{
-		uint32_t target = 0;
-		for (uint32_t i = 0; i < _num; i++) {
-			uint32_t map = _indices[i];
-			if (i != map) {
-				_indices[i] = _indices[map];
-			} else {
-				_indices[i] = target;
-				++target;
-			}
-		}
-	}
-
 	static const bgfx::Memory* mergeVertices(const uint8_t* _vb, uint16_t _stride, const uint32_t* _indices, uint32_t _num, uint32_t _numMerged)
 	{
 		const bgfx::Memory* mem = bgfx::alloc(_stride * _numMerged);
 
+		uint32_t target = 0;
+
 		for (uint32_t ii = 0; ii < _num; ++ii)
 		{
-			bx::memCopy(mem->data + _indices[ii]*_stride, _vb + ii*_stride, _stride);
+			if (_indices[ii] == target)
+			{
+				bx::memCopy(mem->data + target*_stride, _vb + ii*_stride, _stride);
+				++target;
+			}
 		}
 
 		return mem;
@@ -151,7 +143,6 @@ public:
 			m_cacheWeld = (uint32_t*)BX_ALLOC(entry::getAllocator(), numVertices * sizeof(uint32_t) );
 
 			m_totalVertices	= bgfx::weldVertices(m_cacheWeld, _mesh->m_layout, vbData, numVertices, true, 0.00001f);
-			remapIndices(m_cacheWeld, numVertices);
 		}
 
 		const bgfx::Memory* vb = mergeVertices(
@@ -197,25 +188,21 @@ public:
 		m_cachePermutation = NULL;
 		m_originalVertices = 0;
 
-		bx::Error err;
-
 		bx::FileReader reader;
 
 		if (bx::open(&reader, kCacheFilePath) )
 		{
-			bx::read(&reader, m_originalVertices, &err);
-			bx::read(&reader, m_totalVertices, &err);
+			bx::read(&reader, m_originalVertices);
+			bx::read(&reader, m_totalVertices);
 			m_cacheWeld = (uint32_t*)BX_ALLOC(entry::getAllocator(), m_originalVertices * sizeof(uint32_t) );
 
-			bx::read(&reader, m_cacheWeld, m_originalVertices * sizeof(uint32_t), &err);
+			bx::read(&reader, m_cacheWeld, m_originalVertices * sizeof(uint32_t) );
 			m_cachePermutation = (uint32_t*)BX_ALLOC(entry::getAllocator(), m_totalVertices * sizeof(uint32_t) );
 
-			bx::read(&reader, m_cachePermutation, m_totalVertices * sizeof(uint32_t), &err);
+			bx::read(&reader, m_cachePermutation, m_totalVertices * sizeof(uint32_t) );
 			m_map = (uint32_t*)BX_ALLOC(entry::getAllocator(), m_totalVertices * sizeof(uint32_t) );
 
-			bx::read(&reader, m_map, m_totalVertices * sizeof(uint32_t), &err);
-
-			if (!err.isOk() )
+			if (bx::read(&reader, m_map, m_totalVertices * sizeof(uint32_t) ) != int32_t(m_totalVertices * sizeof(uint32_t) ) )
 			{
 				// read fail
 				BX_FREE(entry::getAllocator(), m_cacheWeld);
@@ -238,14 +225,11 @@ public:
 
 		if (bx::open(&writer, kCacheFilePath) )
 		{
-			bx::Error err;
-
-			bx::write(&writer, m_originalVertices, &err);
-			bx::write(&writer, m_totalVertices, &err);
-			bx::write(&writer, m_cacheWeld, m_originalVertices * sizeof(uint32_t), &err);
-			bx::write(&writer, m_cachePermutation, m_totalVertices * sizeof(uint32_t), &err);
-			bx::write(&writer, m_map, m_totalVertices * sizeof(uint32_t), &err);
-
+			bx::write(&writer, m_originalVertices);
+			bx::write(&writer, m_totalVertices);
+			bx::write(&writer, m_cacheWeld, m_originalVertices * sizeof(uint32_t) );
+			bx::write(&writer, m_cachePermutation, m_totalVertices * sizeof(uint32_t) );
+			bx::write(&writer, m_map, m_totalVertices * sizeof(uint32_t) );
 			bx::close(&writer);
 		}
 	}
@@ -262,8 +246,6 @@ public:
 		bgfx::Init init;
 		init.type     = args.m_type;
 		init.vendorId = args.m_pciId;
-		init.platformData.nwh  = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
-		init.platformData.ndt  = entry::getNativeDisplayHandle();
 		init.resolution.width  = m_width;
 		init.resolution.height = m_height;
 		init.resolution.reset  = m_reset;

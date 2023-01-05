@@ -14,7 +14,6 @@
 
 #include "source/opt/strip_debug_info_pass.h"
 #include "source/opt/ir_context.h"
-#include "source/util/string_utils.h"
 
 namespace spvtools {
 namespace opt {
@@ -22,8 +21,9 @@ namespace opt {
 Pass::Status StripDebugInfoPass::Process() {
   bool uses_non_semantic_info = false;
   for (auto& inst : context()->module()->extensions()) {
-    const std::string ext_name = inst.GetInOperand(0).AsString();
-    if (ext_name == "SPV_KHR_non_semantic_info") {
+    const char* ext_name =
+        reinterpret_cast<const char*>(&inst.GetInOperand(0).words[0]);
+    if (0 == std::strcmp(ext_name, "SPV_KHR_non_semantic_info")) {
       uses_non_semantic_info = true;
     }
   }
@@ -46,10 +46,9 @@ Pass::Status StripDebugInfoPass::Process() {
                 if (use->opcode() == SpvOpExtInst) {
                   auto ext_inst_set =
                       def_use->GetDef(use->GetSingleWordInOperand(0u));
-                  const std::string extension_name =
-                      ext_inst_set->GetInOperand(0).AsString();
-                  if (spvtools::utils::starts_with(extension_name,
-                                                   "NonSemantic.")) {
+                  const char* extension_name = reinterpret_cast<const char*>(
+                      &ext_inst_set->GetInOperand(0).words[0]);
+                  if (0 == std::strncmp(extension_name, "NonSemantic.", 12)) {
                     // found a non-semantic use, return false as we cannot
                     // remove this OpString
                     return false;

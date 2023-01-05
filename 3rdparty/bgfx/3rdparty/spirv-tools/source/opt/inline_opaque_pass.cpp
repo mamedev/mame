@@ -105,7 +105,7 @@ Pass::Status InlineOpaquePass::ProcessImpl() {
     status = CombineStatus(status, InlineOpaque(fp));
     return false;
   };
-  context()->ProcessReachableCallTree(pfn);
+  context()->ProcessEntryPointCallTree(pfn);
   return status;
 }
 

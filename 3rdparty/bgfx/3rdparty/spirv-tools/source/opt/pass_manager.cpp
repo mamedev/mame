@@ -35,18 +35,10 @@ Pass::Status PassManager::Run(IRContext* context) {
     if (print_all_stream_) {
       std::vector<uint32_t> binary;
       context->module()->ToBinary(&binary, false);
-      SpirvTools t(target_env_);
-      t.SetMessageConsumer(consumer());
+      SpirvTools t(SPV_ENV_UNIVERSAL_1_2);
       std::string disassembly;
-      std::string pass_name = (pass ? pass->name() : "");
-      if (!t.Disassemble(binary, &disassembly)) {
-        std::string msg = "Disassembly failed before pass ";
-        msg += pass_name + "\n";
-        spv_position_t null_pos{0, 0, 0};
-        consumer()(SPV_MSG_WARNING, "", null_pos, msg.c_str());
-        return;
-      }
-      *print_all_stream_ << preamble << pass_name << "\n"
+      t.Disassemble(binary, &disassembly, 0);
+      *print_all_stream_ << preamble << (pass ? pass->name() : "") << "\n"
                          << disassembly << std::endl;
     }
   };

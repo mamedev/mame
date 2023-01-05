@@ -210,8 +210,7 @@ public:
 		buffer_capacity = N;
 	}
 
-	template <typename U>
-	SmallVector(const U *arg_list_begin, const U *arg_list_end) SPIRV_CROSS_NOEXCEPT : SmallVector()
+	SmallVector(const T *arg_list_begin, const T *arg_list_end) SPIRV_CROSS_NOEXCEPT : SmallVector()
 	{
 		auto count = size_t(arg_list_end - arg_list_begin);
 		reserve(count);
@@ -220,13 +219,7 @@ public:
 		this->buffer_size = count;
 	}
 
-	template <typename U>
-	SmallVector(std::initializer_list<U> init) SPIRV_CROSS_NOEXCEPT : SmallVector(init.begin(), init.end())
-	{
-	}
-
-	template <typename U, size_t M>
-	SmallVector(const U (&init)[M]) SPIRV_CROSS_NOEXCEPT : SmallVector(init, init + M)
+	SmallVector(std::initializer_list<T> init) SPIRV_CROSS_NOEXCEPT : SmallVector(init.begin(), init.end())
 	{
 	}
 
@@ -334,8 +327,8 @@ public:
 
 	void reserve(size_t count) SPIRV_CROSS_NOEXCEPT
 	{
-		if ((count > (std::numeric_limits<size_t>::max)() / sizeof(T)) ||
-		    (count > (std::numeric_limits<size_t>::max)() / 2))
+		if ((count > std::numeric_limits<size_t>::max() / sizeof(T)) ||
+		    (count > std::numeric_limits<size_t>::max() / 2))
 		{
 			// Only way this should ever happen is with garbage input, terminate.
 			std::terminate();
@@ -553,7 +546,7 @@ class ObjectPoolBase
 {
 public:
 	virtual ~ObjectPoolBase() = default;
-	virtual void deallocate_opaque(void *ptr) = 0;
+	virtual void free_opaque(void *ptr) = 0;
 };
 
 template <typename T>
@@ -587,15 +580,15 @@ public:
 		return ptr;
 	}
 
-	void deallocate(T *ptr)
+	void free(T *ptr)
 	{
 		ptr->~T();
 		vacants.push_back(ptr);
 	}
 
-	void deallocate_opaque(void *ptr) override
+	void free_opaque(void *ptr) override
 	{
-		deallocate(static_cast<T *>(ptr));
+		free(static_cast<T *>(ptr));
 	}
 
 	void clear()

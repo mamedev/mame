@@ -1,6 +1,6 @@
 /*
  * Copyright 2018 Eric Arnebäck. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 /*
@@ -13,6 +13,7 @@
 #include "bgfx_utils.h"
 #include "imgui/imgui.h"
 #include "camera.h"
+#include "bounds.h"
 
 namespace
 {
@@ -178,10 +179,10 @@ void screenSpaceQuad(float _textureWidth, float _textureHeight, float _texelHalf
 	}
 }
 
-class ExampleBloom : public entry::AppI
+class ExampleDeferred : public entry::AppI
 {
 public:
-	ExampleBloom(const char* _name, const char* _description, const char* _url)
+	ExampleDeferred(const char* _name, const char* _description, const char* _url)
 		: entry::AppI(_name, _description, _url)
 	{
 	}
@@ -196,10 +197,9 @@ public:
 		m_reset  = BGFX_RESET_VSYNC;
 
 		bgfx::Init init;
+
 		init.type     = args.m_type;
 		init.vendorId = args.m_pciId;
-		init.platformData.nwh  = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
-		init.platformData.ndt  = entry::getNativeDisplayHandle();
 		init.resolution.width  = m_width;
 		init.resolution.height = m_height;
 		init.resolution.reset  = m_reset;
@@ -397,9 +397,11 @@ public:
 							bgfx::destroy(m_texChainFb[ii]);
 						}
 
+						const float dim = float(1 << ii);
+
 						m_texChainFb[ii]  = bgfx::createFrameBuffer(
-							  (uint16_t)(m_width  >> ii)
-							, (uint16_t)(m_height >> ii)
+							  (uint16_t)(m_width  / dim)
+							, (uint16_t)(m_height / dim)
 							, bgfx::TextureFormat::RGBA32F
 							, tsFlags
 							);
@@ -445,19 +447,21 @@ public:
 
 					for (uint16_t ii = 0; ii < TEX_CHAIN_LEN-1; ++ii)
 					{
-						const uint16_t shift = ii + 1;
+						const float dim = float(1 << (ii + 1) );
+
 						bgfx::setViewRect(RENDER_PASS_DOWNSAMPLE0_ID + ii, 0, 0
-							, uint16_t(m_width  >> shift)
-							, uint16_t(m_height >> shift)
+							, uint16_t(m_width  / dim)
+							, uint16_t(m_height / dim)
 							);
 					}
 
 					for (uint16_t ii = 0; ii < TEX_CHAIN_LEN-1; ++ii)
 					{
-						const uint16_t shift = TEX_CHAIN_LEN - ii - 2;
+						const float dim = float(1 << (TEX_CHAIN_LEN - ii - 2) );
+
 						bgfx::setViewRect(RENDER_PASS_UPSAMPLE0_ID + ii, 0, 0
-							, uint16_t(m_width  >> shift)
-							, uint16_t(m_height >> shift)
+							, uint16_t(m_width  / dim)
+							, uint16_t(m_height / dim)
 							);
 					}
 
@@ -536,11 +540,11 @@ public:
 				// Now downsample.
 				for (uint16_t ii = 0; ii < TEX_CHAIN_LEN-1; ++ii)
 				{
-					const uint16_t shift = ii + 1;
+					const float dim = float(1 << (ii + 1) );
 					const float pixelSize[4] =
 					{
-						1.0f / (float)(m_width  >> shift),
-						1.0f / (float)(m_height >> shift),
+						1.0f / (m_width  / dim),
+						1.0f / (m_height / dim),
 						0.0f,
 						0.0f,
 					};
@@ -560,11 +564,12 @@ public:
 				// Now upsample.
 				for (uint16_t ii = 0; ii < TEX_CHAIN_LEN - 1; ++ii)
 				{
-					const uint16_t shift = TEX_CHAIN_LEN - 2 - ii;
+					const float dim = float(1 << (TEX_CHAIN_LEN - 2 - ii) );
+
 					const float pixelSize[4] =
 					{
-						1.0f / (float)(m_width  >> shift),
-						1.0f / (float)(m_height >> shift),
+						1.0f / (float)(m_width  / dim),
+						1.0f / (float)(m_height / dim),
 						0.0f,
 						0.0f,
 					};
@@ -654,7 +659,7 @@ public:
 } // namespace
 
 ENTRY_IMPLEMENT_MAIN(
-	  ExampleBloom
+	  ExampleDeferred
 	, "38-bloom"
 	, "Bloom."
 	, "https://bkaradzic.github.io/bgfx/examples.html#bloom"

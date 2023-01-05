@@ -54,26 +54,26 @@ ParsedIR::ParsedIR()
 // Should have been default-implemented, but need this on MSVC 2013.
 ParsedIR::ParsedIR(ParsedIR &&other) SPIRV_CROSS_NOEXCEPT
 {
-	*this = std::move(other);
+	*this = move(other);
 }
 
 ParsedIR &ParsedIR::operator=(ParsedIR &&other) SPIRV_CROSS_NOEXCEPT
 {
 	if (this != &other)
 	{
-		pool_group = std::move(other.pool_group);
-		spirv = std::move(other.spirv);
-		meta = std::move(other.meta);
+		pool_group = move(other.pool_group);
+		spirv = move(other.spirv);
+		meta = move(other.meta);
 		for (int i = 0; i < TypeCount; i++)
-			ids_for_type[i] = std::move(other.ids_for_type[i]);
-		ids_for_constant_undef_or_type = std::move(other.ids_for_constant_undef_or_type);
-		ids_for_constant_or_variable = std::move(other.ids_for_constant_or_variable);
-		declared_capabilities = std::move(other.declared_capabilities);
-		declared_extensions = std::move(other.declared_extensions);
-		block_meta = std::move(other.block_meta);
-		continue_block_to_loop_header = std::move(other.continue_block_to_loop_header);
-		entry_points = std::move(other.entry_points);
-		ids = std::move(other.ids);
+			ids_for_type[i] = move(other.ids_for_type[i]);
+		ids_for_constant_or_type = move(other.ids_for_constant_or_type);
+		ids_for_constant_or_variable = move(other.ids_for_constant_or_variable);
+		declared_capabilities = move(other.declared_capabilities);
+		declared_extensions = move(other.declared_extensions);
+		block_meta = move(other.block_meta);
+		continue_block_to_loop_header = move(other.continue_block_to_loop_header);
+		entry_points = move(other.entry_points);
+		ids = move(other.ids);
 		addressing_model = other.addressing_model;
 		memory_model = other.memory_model;
 
@@ -83,7 +83,6 @@ ParsedIR &ParsedIR::operator=(ParsedIR &&other) SPIRV_CROSS_NOEXCEPT
 		loop_iteration_depth_soft = other.loop_iteration_depth_soft;
 
 		meta_needing_name_fixup = std::move(other.meta_needing_name_fixup);
-		load_type_width = std::move(other.load_type_width);
 	}
 	return *this;
 }
@@ -102,7 +101,7 @@ ParsedIR &ParsedIR::operator=(const ParsedIR &other)
 		meta = other.meta;
 		for (int i = 0; i < TypeCount; i++)
 			ids_for_type[i] = other.ids_for_type[i];
-		ids_for_constant_undef_or_type = other.ids_for_constant_undef_or_type;
+		ids_for_constant_or_type = other.ids_for_constant_or_type;
 		ids_for_constant_or_variable = other.ids_for_constant_or_variable;
 		declared_capabilities = other.declared_capabilities;
 		declared_extensions = other.declared_extensions;
@@ -116,9 +115,7 @@ ParsedIR &ParsedIR::operator=(const ParsedIR &other)
 		addressing_model = other.addressing_model;
 		memory_model = other.memory_model;
 
-
 		meta_needing_name_fixup = other.meta_needing_name_fixup;
-		load_type_width = other.load_type_width;
 
 		// Very deliberate copying of IDs. There is no default copy constructor, nor a simple default constructor.
 		// Construct object first so we have the correct allocator set-up, then we can copy object into our new pool group.
@@ -330,10 +327,6 @@ void ParsedIR::fixup_reserved_names()
 {
 	for (uint32_t id : meta_needing_name_fixup)
 	{
-		// Don't rename remapped variables like 'gl_LastFragDepthARM'.
-		if (ids[id].get_type() == TypeVariable && get<SPIRVariable>(id).remapped_variable)
-			continue;
-
 		auto &m = meta[id];
 		sanitize_identifier(m.decoration.alias, false, false);
 		for (auto &memb : m.members)
@@ -353,7 +346,7 @@ void ParsedIR::set_name(ID id, const string &name)
 void ParsedIR::set_member_name(TypeID id, uint32_t index, const string &name)
 {
 	auto &m = meta[id];
-	m.members.resize(max(m.members.size(), size_t(index) + 1));
+	m.members.resize(max(meta[id].members.size(), size_t(index) + 1));
 	m.members[index].alias = name;
 	if (!is_valid_identifier(name) || is_reserved_identifier(name, true, false))
 		meta_needing_name_fixup.insert(id);
@@ -455,9 +448,8 @@ void ParsedIR::set_decoration(ID id, Decoration decoration, uint32_t argument)
 
 void ParsedIR::set_member_decoration(TypeID id, uint32_t index, Decoration decoration, uint32_t argument)
 {
-	auto &m = meta[id];
-	m.members.resize(max(m.members.size(), size_t(index) + 1));
-	auto &dec = m.members[index];
+	meta[id].members.resize(max(meta[id].members.size(), size_t(index) + 1));
+	auto &dec = meta[id].members[index];
 	dec.decoration_flags.set(decoration);
 
 	switch (decoration)
@@ -797,8 +789,7 @@ const Bitset &ParsedIR::get_decoration_bitset(ID id) const
 
 void ParsedIR::set_member_decoration_string(TypeID id, uint32_t index, Decoration decoration, const string &argument)
 {
-	auto &m = meta[id];
-	m.members.resize(max(m.members.size(), size_t(index) + 1));
+	meta[id].members.resize(max(meta[id].members.size(), size_t(index) + 1));
 	auto &dec = meta[id].members[index];
 	dec.decoration_flags.set(decoration);
 
@@ -934,7 +925,7 @@ void ParsedIR::add_typed_id(Types type, ID id)
 		{
 		case TypeConstant:
 			ids_for_constant_or_variable.push_back(id);
-			ids_for_constant_undef_or_type.push_back(id);
+			ids_for_constant_or_type.push_back(id);
 			break;
 
 		case TypeVariable:
@@ -943,8 +934,7 @@ void ParsedIR::add_typed_id(Types type, ID id)
 
 		case TypeType:
 		case TypeConstantOp:
-		case TypeUndef:
-			ids_for_constant_undef_or_type.push_back(id);
+			ids_for_constant_or_type.push_back(id);
 			break;
 
 		default:
@@ -1006,7 +996,7 @@ ParsedIR::LoopLock::LoopLock(uint32_t *lock_)
 
 ParsedIR::LoopLock::LoopLock(LoopLock &&other) SPIRV_CROSS_NOEXCEPT
 {
-	*this = std::move(other);
+	*this = move(other);
 }
 
 ParsedIR::LoopLock &ParsedIR::LoopLock::operator=(LoopLock &&other) SPIRV_CROSS_NOEXCEPT

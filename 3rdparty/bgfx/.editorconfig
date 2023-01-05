@@ -18,7 +18,3 @@ indent_style = space
 [*.md]
 trim_trailing_whitespace = false
 max_line_length = 80
-
-[.github/workflows/*.yml]
-indent_style = space
-indent_size  = 2

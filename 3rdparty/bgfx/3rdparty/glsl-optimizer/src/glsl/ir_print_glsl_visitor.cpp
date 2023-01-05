@@ -449,9 +449,7 @@ void ir_print_glsl_visitor::visit(ir_variable *ir)
 	
 	const char *const interp[] = { "", "smooth ", "flat ", "noperspective " };
 	
-	bool built_in = (strstr(ir->name, "gl_") == ir->name);
-
-	if (this->state->language_version >= 300 && ir->data.explicit_location && !built_in)
+	if (this->state->language_version >= 300 && ir->data.explicit_location)
 	{
 		const int binding_base = (this->state->stage == MESA_SHADER_VERTEX ? (int)VERT_ATTRIB_GENERIC0 : (int)FRAG_RESULT_DATA0);
 		const int location = ir->data.location - binding_base;
@@ -490,7 +488,7 @@ void ir_print_glsl_visitor::visit(ir_variable *ir)
 	}
 	
 	// keep invariant declaration for builtin variables
-	if (built_in) {
+	if (strstr(ir->name, "gl_") == ir->name) {
 		buffer.asprintf_append ("%s", inv);
 		print_var_name (ir);
 		return;
@@ -757,16 +755,6 @@ void ir_print_glsl_visitor::visit(ir_expression *ir)
 		if (ir->operation == ir_unop_rcp) {
 			buffer.asprintf_append (")");
 		}
-	}
-	else if (ir->operation == ir_triop_csel)
-	{
-		buffer.asprintf_append ("mix(");
-		ir->operands[2]->accept(this);
-		buffer.asprintf_append (", ");
-		ir->operands[1]->accept(this);
-		buffer.asprintf_append (", bvec%d(", ir->operands[1]->type->vector_elements);
-		ir->operands[0]->accept(this);
-		buffer.asprintf_append ("))");
 	}
 	else if (ir->operation == ir_binop_vector_extract)
 	{

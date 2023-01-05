@@ -105,8 +105,6 @@ enum TStorageQualifier {
     EvqCallableData,
     EvqCallableDataIn,
 
-    EvqtaskPayloadSharedEXT,
-
     // parameters
     EvqIn,            // also, for 'in' in the grammar before we know if it's a pipeline input or an 'in' parameter
     EvqOut,           // also, for 'out' in the grammar before we know if it's a pipeline output or an 'out' parameter
@@ -130,7 +128,6 @@ enum TStorageQualifier {
     // built-ins written by fragment shader
     EvqFragColor,
     EvqFragDepth,
-    EvqFragStencil,
 
     // end of list
     EvqLast
@@ -266,7 +263,6 @@ enum TBuiltInVariable {
     EbvObjectRayDirection,
     EbvRayTmin,
     EbvRayTmax,
-    EbvCullMask,
     EbvHitT,
     EbvHitKind,
     EbvObjectToWorld,
@@ -278,8 +274,6 @@ enum TBuiltInVariable {
     // barycentrics
     EbvBaryCoordNV,
     EbvBaryCoordNoPerspNV,
-    EbvBaryCoordEXT,
-    EbvBaryCoordNoPerspEXT,
     // mesh shaders
     EbvTaskCountNV,
     EbvPrimitiveCountNV,
@@ -289,11 +283,6 @@ enum TBuiltInVariable {
     EbvLayerPerViewNV,
     EbvMeshViewCountNV,
     EbvMeshViewIndicesNV,
-    //GL_EXT_mesh_shader
-    EbvPrimitivePointIndicesEXT,
-    EbvPrimitiveLineIndicesEXT,
-    EbvPrimitiveTriangleIndicesEXT,
-    EbvCullPrimitiveEXT,
 
     // sm builtins
     EbvWarpsPerSM,
@@ -361,13 +350,11 @@ __inline const char* GetStorageQualifierString(TStorageQualifier q)
     case EvqPointCoord:     return "gl_PointCoord";  break;
     case EvqFragColor:      return "fragColor";      break;
     case EvqFragDepth:      return "gl_FragDepth";   break;
-    case EvqFragStencil:    return "gl_FragStencilRefARB"; break;
     case EvqPayload:        return "rayPayloadNV";     break;
     case EvqPayloadIn:      return "rayPayloadInNV";   break;
     case EvqHitAttr:        return "hitAttributeNV";   break;
     case EvqCallableData:   return "callableDataNV";   break;
     case EvqCallableDataIn: return "callableDataInNV"; break;
-    case EvqtaskPayloadSharedEXT: return "taskPayloadSharedEXT"; break;
     default:                return "unknown qualifier";
     }
 }
@@ -491,10 +478,8 @@ __inline const char* GetBuiltInVariableString(TBuiltInVariable v)
     case EbvWorldToObject:              return "WorldToObjectNV";
     case EbvCurrentRayTimeNV:           return "CurrentRayTimeNV";
 
-    case EbvBaryCoordEXT:
-    case EbvBaryCoordNV:                return "BaryCoordKHR";
-    case EbvBaryCoordNoPerspEXT:
-    case EbvBaryCoordNoPerspNV:         return "BaryCoordNoPerspKHR";
+    case EbvBaryCoordNV:                return "BaryCoordNV";
+    case EbvBaryCoordNoPerspNV:         return "BaryCoordNoPerspNV";
 
     case EbvTaskCountNV:                return "TaskCountNV";
     case EbvPrimitiveCountNV:           return "PrimitiveCountNV";
@@ -504,11 +489,6 @@ __inline const char* GetBuiltInVariableString(TBuiltInVariable v)
     case EbvLayerPerViewNV:             return "LayerPerViewNV";
     case EbvMeshViewCountNV:            return "MeshViewCountNV";
     case EbvMeshViewIndicesNV:          return "MeshViewIndicesNV";
-    // GL_EXT_mesh_shader
-    case EbvPrimitivePointIndicesEXT:    return "PrimitivePointIndicesEXT";
-    case EbvPrimitiveLineIndicesEXT:     return "PrimitiveLineIndicesEXT";
-    case EbvPrimitiveTriangleIndicesEXT: return "PrimitiveTriangleIndicesEXT";
-    case EbvCullPrimitiveEXT:            return "CullPrimitiveEXT";
 
     case EbvWarpsPerSM:                 return "WarpsPerSMNV";
     case EbvSMCount:                    return "SMCountNV";

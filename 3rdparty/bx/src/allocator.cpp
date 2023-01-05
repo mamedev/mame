@@ -1,8 +1,9 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
+#include "bx_p.h"
 #include <bx/allocator.h>
 
 #include <malloc.h>
@@ -37,7 +38,7 @@ namespace bx
 				BX_UNUSED(_file, _line);
 				_aligned_free(_ptr);
 #	else
-				alignedFree(this, _ptr, _align, _file, _line);
+				bx::alignedFree(this, _ptr, _align, _file, _line);
 #	endif // BX_
 			}
 
@@ -54,7 +55,7 @@ namespace bx
 			BX_UNUSED(_file, _line);
 			return _aligned_malloc(_size, _align);
 #	else
-			return alignedAlloc(this, _size, _align, _file, _line);
+			return bx::alignedAlloc(this, _size, _align, _file, _line);
 #	endif // BX_
 		}
 
@@ -67,7 +68,7 @@ namespace bx
 		BX_UNUSED(_file, _line);
 		return _aligned_realloc(_ptr, _size, _align);
 #	else
-		return alignedRealloc(this, _ptr, _size, _align, _file, _line);
+		return bx::alignedRealloc(this, _ptr, _size, _align, _file, _line);
 #	endif // BX_
 	}
 

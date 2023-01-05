@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_FILE_H_HEADER_GUARD
@@ -124,19 +124,19 @@ namespace bx
 
 	/// Creates a directory named `_filePath`.
 	///
-	bool make(const FilePath& _filePath, Error* _err = bx::ErrorIgnore{});
+	bool make(const FilePath& _filePath, Error* _err = NULL);
 
 	/// Creates a directory named `_filePath` along with all necessary parents.
 	///
-	bool makeAll(const FilePath& _filePath, Error* _err = bx::ErrorIgnore{});
+	bool makeAll(const FilePath& _filePath, Error* _err = NULL);
 
 	/// Removes file or directory.
 	///
-	bool remove(const FilePath& _filePath, Error* _err = bx::ErrorIgnore{});
+	bool remove(const FilePath& _filePath, Error* _err = NULL);
 
-	/// Removes file or directory recursively.
+	/// Removes file or directory recursivelly.
 	///
-	bool removeAll(const FilePath& _filePath, Error* _err = bx::ErrorIgnore{});
+	bool removeAll(const FilePath& _filePath, Error* _err = NULL);
 
 } // namespace bx
 

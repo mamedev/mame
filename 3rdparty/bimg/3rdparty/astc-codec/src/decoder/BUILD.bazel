@@ -1,0 +1,246 @@
+# Copyright 2018 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+licenses(["notice"])
+
+cc_library(
+    name = "footprint",
+    srcs = ["footprint.cc"],
+    hdrs = ["footprint.h"],
+    deps = [
+        "//:api",
+        "//src/base",
+    ],
+)
+
+cc_library(
+    name = "astc_utils",
+    srcs = [
+        "astc_file.cc",
+        "endpoint_codec.cc",
+        "integer_sequence_codec.cc",
+        "intermediate_astc_block.cc",
+        "logical_astc_block.cc",
+        "partition.cc",
+        "physical_astc_block.cc",
+        "quantization.cc",
+        "weight_infill.cc",
+    ],
+    hdrs = [
+        "astc_file.h",
+        "endpoint_codec.h",
+        "integer_sequence_codec.h",
+        "intermediate_astc_block.h",
+        "logical_astc_block.h",
+        "partition.h",
+        "physical_astc_block.h",
+        "quantization.h",
+        "types.h",
+        "weight_infill.h",
+    ],
+    copts = [
+        "-Wno-unused-variable",
+        "-O3",
+    ],
+    deps = [
+        ":footprint",
+        "//src/base",
+    ],
+)
+
+cc_library(
+    name = "codec",
+    srcs = ["codec.cc"],
+    hdrs = ["codec.h"],
+    visibility = ["//:__pkg__"],
+    deps = [
+        ":astc_utils",
+        ":footprint",
+        "//src/base",
+    ],
+)
+
+cc_binary(
+    name = "astc_inspector_cli",
+    srcs = ["tools/astc_inspector_cli.cc"],
+    deps = [
+        ":astc_utils",
+        "//src/base",
+    ],
+)
+
+################################################################################
+##
+## Testing
+##
+################################################################################
+
+cc_library(
+    name = "test",
+    testonly = 1,
+    hdrs = ["test/image_utils.h"],
+    deps = ["@gtest//:gtest"],
+)
+
+cc_test(
+    name = "physical_astc_block_test",
+    size = "small",
+    srcs = ["test/physical_astc_block_test.cc"],
+    deps = [
+        ":astc_utils",
+        "@gtest//:gtest_main",
+        "//src/base",
+    ],
+)
+
+cc_test(
+    name = "partition_test",
+    size = "medium",
+    srcs = ["test/partition_test.cc"],
+    deps = [
+        ":astc_utils",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "integer_sequence_codec_test",
+    size = "small",
+    srcs = ["test/integer_sequence_codec_test.cc"],
+    deps = [
+        ":astc_utils",
+        "@gtest//:gtest_main",
+        "//src/base",
+    ],
+)
+
+cc_test(
+    name = "intermediate_astc_block_test",
+    size = "small",
+    srcs = ["test/intermediate_astc_block_test.cc"],
+    data = glob([
+        "testdata/checkered_*.astc",
+    ]),
+    deps = [
+        ":astc_utils",
+        ":test",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "quantization_test",
+    size = "medium",
+    srcs = ["test/quantization_test.cc"],
+    deps = [
+        ":astc_utils",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "weight_infill_test",
+    size = "small",
+    srcs = ["test/weight_infill_test.cc"],
+    deps = [
+        ":astc_utils",
+        ":footprint",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "endpoint_codec_test",
+    size = "small",
+    srcs = ["test/endpoint_codec_test.cc"],
+    data = [
+        ":testdata/checkerboard.astc",
+    ],
+    deps = [
+        ":astc_utils",
+        ":test",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "logical_astc_block_test",
+    size = "large",
+    srcs = ["test/logical_astc_block_test.cc"],
+    data = glob([
+        "testdata/atlas_small_*.astc",
+        "testdata/atlas_small_*.bmp",
+        "testdata/footprint_*.astc",
+        "testdata/footprint_*.bmp",
+        "testdata/rgb_*.astc",
+        "testdata/rgb_*.bmp",
+    ]),
+    deps = [
+        ":astc_utils",
+        ":test",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "codec_test",
+    size = "large",
+    srcs = ["test/codec_test.cc"],
+    data = glob([
+        "testdata/atlas_small_*.astc",
+        "testdata/atlas_small_*.bmp",
+    ]),
+    deps = [
+        ":codec",
+        ":test",
+        "@gtest//:gtest_main",
+        "//:api",
+    ],
+)
+
+cc_test(
+    name = "footprint_test",
+    size = "small",
+    srcs = ["test/footprint_test.cc"],
+    deps = [
+        ":footprint",
+        "@gtest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "astc_fuzzer",
+    srcs = ["test/astc_fuzzer.cc"],
+    copts = select({
+        # Clang-only flags.  TODO: Find a better way to detect GCC/clang.
+        "@bazel_tools//src/conditions:darwin_x86_64": [
+            "-fsanitize-coverage=trace-pc-guard,indirect-calls,trace-cmp",
+            "-fsanitize-coverage=bb",
+        ],
+        "@bazel_tools//src/conditions:darwin": [
+            "-fsanitize-coverage=trace-pc-guard,indirect-calls,trace-cmp",
+            "-fsanitize-coverage=bb",
+        ],
+        # GCC-only flags.
+        "//conditions:default": [
+            "-finstrument-functions"
+        ],
+    }),
+    deps = [
+        ":codec",
+        "@honggfuzz//:honggfuzz",
+        "@benchmark//:benchmark",
+    ],
+    linkstatic = 1,
+)

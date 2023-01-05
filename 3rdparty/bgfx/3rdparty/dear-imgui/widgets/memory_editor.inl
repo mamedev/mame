@@ -1,5 +1,3 @@
-#include <bx/string.h>
-
 #ifdef _MSC_VER
 #   define snprintf _snprintf
 #endif
@@ -144,7 +142,7 @@ namespace ImGui
                     if (HexII)
                     {
                         unsigned char byte = mem_data[addr];
-                        if (bx::isPrint(byte) )
+                        if (isprint(byte) )
                         {
                             Text(".%c ", byte);
                         }

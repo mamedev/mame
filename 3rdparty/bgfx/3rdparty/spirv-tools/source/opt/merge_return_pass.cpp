@@ -111,9 +111,7 @@ bool MergeReturnPass::ProcessStructured(
   }
 
   RecordImmediateDominators(function);
-  if (!AddSingleCaseSwitchAroundFunction()) {
-    return false;
-  }
+  AddSingleCaseSwitchAroundFunction();
 
   std::list<BasicBlock*> order;
   cfg()->ComputeStructuredOrder(function, &*function->begin(), &order);
@@ -431,7 +429,6 @@ bool MergeReturnPass::BreakFromConstruct(
     std::list<BasicBlock*>* order, Instruction* break_merge_inst) {
   // Make sure the CFG is build here.  If we don't then it becomes very hard
   // to know which new blocks need to be updated.
-  context()->InvalidateAnalyses(IRContext::kAnalysisCFG);
   context()->BuildInvalidAnalyses(IRContext::kAnalysisCFG);
 
   // When predicating, be aware of whether this block is a header block, a
@@ -773,7 +770,7 @@ void MergeReturnPass::InsertAfterElement(BasicBlock* element,
   list->insert(pos, new_element);
 }
 
-bool MergeReturnPass::AddSingleCaseSwitchAroundFunction() {
+void MergeReturnPass::AddSingleCaseSwitchAroundFunction() {
   CreateReturnBlock();
   CreateReturn(final_return_block_);
 
@@ -781,10 +778,7 @@ bool MergeReturnPass::AddSingleCaseSwitchAroundFunction() {
     cfg()->RegisterBlock(final_return_block_);
   }
 
-  if (!CreateSingleCaseSwitch(final_return_block_)) {
-    return false;
-  }
-  return true;
+  CreateSingleCaseSwitch(final_return_block_);
 }
 
 BasicBlock* MergeReturnPass::CreateContinueTarget(uint32_t header_label_id) {
@@ -819,7 +813,7 @@ BasicBlock* MergeReturnPass::CreateContinueTarget(uint32_t header_label_id) {
   return new_block;
 }
 
-bool MergeReturnPass::CreateSingleCaseSwitch(BasicBlock* merge_target) {
+void MergeReturnPass::CreateSingleCaseSwitch(BasicBlock* merge_target) {
   // Insert the switch before any code is run.  We have to split the entry
   // block to make sure the OpVariable instructions remain in the entry block.
   BasicBlock* start_block = &*function_->begin();
@@ -836,17 +830,13 @@ bool MergeReturnPass::CreateSingleCaseSwitch(BasicBlock* merge_target) {
       context(), start_block,
       IRContext::kAnalysisDefUse | IRContext::kAnalysisInstrToBlockMapping);
 
-  uint32_t const_zero_id = builder.GetUintConstantId(0u);
-  if (const_zero_id == 0) {
-    return false;
-  }
-  builder.AddSwitch(const_zero_id, old_block->id(), {}, merge_target->id());
+  builder.AddSwitch(builder.GetUintConstantId(0u), old_block->id(), {},
+                    merge_target->id());
 
   if (context()->AreAnalysesValid(IRContext::kAnalysisCFG)) {
     cfg()->RegisterBlock(old_block);
     cfg()->AddEdges(start_block);
   }
-  return true;
 }
 
 bool MergeReturnPass::HasNontrivialUnreachableBlocks(Function* function) {

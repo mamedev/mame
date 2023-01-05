@@ -30,7 +30,7 @@ class LoopUnswitchPass : public Pass {
 
   // Processes the given |module|. Returns Status::Failure if errors occur when
   // processing. Returns the corresponding Status::Success if processing is
-  // successful to indicate whether changes have been made to the module.
+  // succesful to indicate whether changes have been made to the modue.
   Pass::Status Process() override;
 
  private:

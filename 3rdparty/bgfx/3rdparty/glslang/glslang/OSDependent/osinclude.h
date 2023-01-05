@@ -54,6 +54,8 @@ void ReleaseGlobalLock();
 
 typedef unsigned int (*TThreadEntrypoint)(void*);
 
+void OS_CleanupThreadData(void);
+
 void OS_DumpMemoryCounters();
 
 } // end namespace glslang

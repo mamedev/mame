@@ -33,7 +33,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 //
 
-#if !defined(GLSLANG_WEB)
+#if !defined(GLSLANG_WEB) && !defined(GLSLANG_ANGLE)
 
 #ifndef _IOMAPPER_INCLUDED
 #define _IOMAPPER_INCLUDED
@@ -61,15 +61,6 @@ struct TVarEntryInfo {
     int newComponent;
     int newIndex;
     EShLanguage stage;
-
-    void clearNewAssignments() {
-        newBinding = -1;
-        newSet = -1;
-        newLocation = -1;
-        newComponent = -1;
-        newIndex = -1;
-    }
-
     struct TOrderById {
         inline bool operator()(const TVarEntryInfo& l, const TVarEntryInfo& r) { return l.id < r.id; }
     };
@@ -174,7 +165,7 @@ public:
 protected:
     TDefaultIoResolverBase(TDefaultIoResolverBase&);
     TDefaultIoResolverBase& operator=(TDefaultIoResolverBase&);
-    const TIntermediate& referenceIntermediate;
+    const TIntermediate& intermediate;
     int nextUniformLocation;
     int nextInputLocation;
     int nextOutputLocation;
@@ -331,8 +322,8 @@ public:
                 intermediates[stage] = nullptr;
         }
     }
-    // If set, the uniform block with the given name will be changed to be backed by
-    // push_constant if it's size is <= maxSize
+	// If set, the uniform block with the given name will be changed to be backed by
+	// push_constant if it's size is <= maxSize
     void setAutoPushConstantBlock(const char* name, unsigned int maxSize, TLayoutPacking packing) {
         autoPushConstantBlockName = name;
         autoPushConstantMaxSize = maxSize;
@@ -358,4 +349,4 @@ private:
 
 #endif // _IOMAPPER_INCLUDED
 
-#endif // !GLSLANG_WEB
+#endif // !GLSLANG_WEB && !GLSLANG_ANGLE

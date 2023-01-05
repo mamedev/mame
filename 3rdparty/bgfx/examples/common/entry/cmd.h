@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef CMD_H_HEADER_GUARD
@@ -17,9 +17,6 @@ void cmdShutdown();
 
 ///
 void cmdAdd(const char* _name, ConsoleFn _fn, void* _userData = NULL);
-
-///
-void cmdRemove(const char* _name);
 
 ///
 void cmdExec(const char* _format, ...);

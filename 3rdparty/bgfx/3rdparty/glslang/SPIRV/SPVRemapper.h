@@ -118,10 +118,6 @@ public:
    virtual ~spirvbin_t() { }
 
    // remap on an existing binary in memory
-   void remap(std::vector<std::uint32_t>& spv, const std::vector<std::string>& whiteListStrings,
-              std::uint32_t opts = DO_EVERYTHING);
-
-   // remap on an existing binary in memory - legacy interface without white list
    void remap(std::vector<std::uint32_t>& spv, std::uint32_t opts = DO_EVERYTHING);
 
    // Type for error/log handler functions
@@ -183,8 +179,6 @@ private:
    range_t  constRange(spv::Op opCode)     const;
    unsigned typeSizeInWords(spv::Id id)    const;
    unsigned idTypeSizeInWords(spv::Id id)  const;
-
-   bool isStripOp(spv::Op opCode, unsigned start) const;
 
    spv::Id&        asId(unsigned word)                { return spv[word]; }
    const spv::Id&  asId(unsigned word)          const { return spv[word]; }
@@ -254,8 +248,6 @@ private:
    void        strip();               // remove debug symbols
 
    std::vector<spirword_t> spv;      // SPIR words
-
-   std::vector<std::string> stripWhiteList;
 
    namemap_t               nameMap;  // ID names from OpName
 

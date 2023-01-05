@@ -28,13 +28,6 @@
 #include "spirv-tools/libspirv.hpp"
 #include "types.h"
 
-// Avoid unused variable warning/error on Linux
-#ifndef NDEBUG
-#define USE_ASSERT(x) assert(x)
-#else
-#define USE_ASSERT(x) ((void)(x))
-#endif
-
 namespace spvtools {
 namespace opt {
 
@@ -136,7 +129,7 @@ class Pass {
 
   // Processes the given |module|. Returns Status::Failure if errors occur when
   // processing. Returns the corresponding Status::Success if processing is
-  // successful to indicate whether changes are made to the module.
+  // succesful to indicate whether changes are made to the module.
   virtual Status Process() = 0;
 
   // Return the next available SSA id and increment it.

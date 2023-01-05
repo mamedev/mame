@@ -1,18 +1,16 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_CONFIG_H_HEADER_GUARD
 #define BX_CONFIG_H_HEADER_GUARD
 
-#ifndef BX_CONFIG_DEBUG
-#	error "BX_CONFIG_DEBUG must be defined in build script!"
-#endif // BX_CONFIG_DEBUG
+#include "bx.h"
 
 #ifndef BX_CONFIG_ALLOCATOR_DEBUG
-#	define BX_CONFIG_ALLOCATOR_DEBUG BX_CONFIG_DEBUG
-#endif // BX_CONFIG_ALLOCATOR_DEBUG
+#	define BX_CONFIG_ALLOCATOR_DEBUG 0
+#endif // BX_CONFIG_DEBUG_ALLOC
 
 #ifndef BX_CONFIG_SUPPORTS_THREADING
 #	define BX_CONFIG_SUPPORTS_THREADING !(0 \

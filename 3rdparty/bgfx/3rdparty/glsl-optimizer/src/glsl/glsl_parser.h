@@ -1,9 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.5.1.  */
+/* A Bison parser, made by GNU Bison 3.0.2.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2020 Free Software Foundation,
-   Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,9 +29,6 @@
 
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
-
-/* Undocumented macros, especially those whose name start with YY_,
-   are private implementation details.  Do not rely on them.  */
 
 #ifndef YY__MESA_GLSL_SRC_GLSL_GLSL_PARSER_H_INCLUDED
 # define YY__MESA_GLSL_SRC_GLSL_GLSL_PARSER_H_INCLUDED
@@ -284,9 +280,10 @@ extern int _mesa_glsl_debug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
+typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 99 "src/glsl/glsl_parser.yy"
+#line 99 "src/glsl/glsl_parser.yy" /* yacc.c:1909  */
 
    int n;
    float real;
@@ -323,10 +320,8 @@ union YYSTYPE
       ast_node *else_statement;
    } selection_rest_statement;
 
-#line 327 "src/glsl/glsl_parser.h"
-
+#line 324 "src/glsl/glsl_parser.h" /* yacc.c:1909  */
 };
-typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif

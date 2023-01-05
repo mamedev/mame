@@ -67,7 +67,6 @@ class TIntermediate;
 enum TOperator {
     EOpNull,            // if in a node, should only mean a node is still being built
     EOpSequence,        // denotes a list of statements, or parameters, etc.
-    EOpScope,           // Used by debugging to denote a scoped list of statements
     EOpLinkerObjects,   // for aggregate node of objects the linker may need, if not reference by the rest of the AST
     EOpFunctionCall,
     EOpFunction,        // For function definition
@@ -91,8 +90,6 @@ enum TOperator {
     EOpPreDecrement,
 
     EOpCopyObject,
-
-    EOpDeclare,        // Used by debugging to force declaration of variable in correct scope
 
     // (u)int* -> bool
     EOpConvInt8ToBool,
@@ -937,8 +934,6 @@ enum TOperator {
     EOpExecuteCallableNV,
     EOpExecuteCallableKHR,
     EOpWritePackedPrimitiveIndices4x8NV,
-    EOpEmitMeshTasksEXT,
-    EOpSetMeshOutputsEXT,
 
     //
     // GL_EXT_ray_query operations
@@ -1160,7 +1155,7 @@ public:
     virtual bool isIntegerDomain() const { return type.isIntegerDomain(); }
     bool isAtomic() const { return type.isAtomic(); }
     bool isReference() const { return type.isReference(); }
-    TString getCompleteString(bool enhanced = false) const { return type.getCompleteString(enhanced); }
+    TString getCompleteString() const { return type.getCompleteString(); }
 
 protected:
     TIntermTyped& operator=(const TIntermTyped&);

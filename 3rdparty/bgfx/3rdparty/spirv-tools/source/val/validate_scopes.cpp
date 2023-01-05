@@ -144,16 +144,14 @@ spv_result_t ValidateExecutionScope(ValidationState_t& _,
               [errorVUID](SpvExecutionModel model, std::string* message) {
                 if (model != SpvExecutionModelTaskNV &&
                     model != SpvExecutionModelMeshNV &&
-                    model != SpvExecutionModelTaskEXT &&
-                    model != SpvExecutionModelMeshEXT &&
                     model != SpvExecutionModelTessellationControl &&
                     model != SpvExecutionModelGLCompute) {
                   if (message) {
                     *message =
                         errorVUID +
                         "in Vulkan environment, Workgroup execution scope is "
-                        "only for TaskNV, MeshNV, TaskEXT, MeshEXT, "
-                        "TessellationControl, and GLCompute execution models";
+                        "only for TaskNV, MeshNV, TessellationControl, and "
+                        "GLCompute execution models";
                   }
                   return false;
                 }
@@ -222,23 +220,30 @@ spv_result_t ValidateMemoryScope(ValidationState_t& _, const Instruction* inst,
 
   // Vulkan Specific rules
   if (spvIsVulkanEnv(_.context()->target_env)) {
-    if (value != SpvScopeDevice && value != SpvScopeWorkgroup &&
-        value != SpvScopeSubgroup && value != SpvScopeInvocation &&
-        value != SpvScopeShaderCallKHR && value != SpvScopeQueueFamily) {
+    if (value == SpvScopeCrossDevice) {
       return _.diag(SPV_ERROR_INVALID_DATA, inst)
              << _.VkErrorID(4638) << spvOpcodeString(opcode)
-             << ": in Vulkan environment Memory Scope is limited to Device, "
-                "QueueFamily, Workgroup, ShaderCallKHR, Subgroup, or "
-                "Invocation";
-    } else if (_.context()->target_env == SPV_ENV_VULKAN_1_0 &&
-               value == SpvScopeSubgroup &&
-               !_.HasCapability(SpvCapabilitySubgroupBallotKHR) &&
-               !_.HasCapability(SpvCapabilitySubgroupVoteKHR)) {
+             << ": in Vulkan environment, Memory Scope cannot be CrossDevice";
+    }
+    // Vulkan 1.0 specifc rules
+    if (_.context()->target_env == SPV_ENV_VULKAN_1_0 &&
+        value != SpvScopeDevice && value != SpvScopeWorkgroup &&
+        value != SpvScopeInvocation) {
       return _.diag(SPV_ERROR_INVALID_DATA, inst)
-             << _.VkErrorID(6997) << spvOpcodeString(opcode)
-             << ": in Vulkan 1.0 environment Memory Scope is can not be "
-                "Subgroup without SubgroupBallotKHR or SubgroupVoteKHR "
-                "declared";
+             << _.VkErrorID(4638) << spvOpcodeString(opcode)
+             << ": in Vulkan 1.0 environment Memory Scope is limited to "
+             << "Device, Workgroup and Invocation";
+    }
+    // Vulkan 1.1 specifc rules
+    if ((_.context()->target_env == SPV_ENV_VULKAN_1_1 ||
+         _.context()->target_env == SPV_ENV_VULKAN_1_2) &&
+        value != SpvScopeDevice && value != SpvScopeWorkgroup &&
+        value != SpvScopeSubgroup && value != SpvScopeInvocation &&
+        value != SpvScopeShaderCallKHR) {
+      return _.diag(SPV_ERROR_INVALID_DATA, inst)
+             << _.VkErrorID(4638) << spvOpcodeString(opcode)
+             << ": in Vulkan 1.1 and 1.2 environment Memory Scope is limited "
+             << "to Device, Workgroup, Invocation, and ShaderCall";
     }
 
     if (value == SpvScopeShaderCallKHR) {
@@ -265,44 +270,22 @@ spv_result_t ValidateMemoryScope(ValidationState_t& _, const Instruction* inst,
     }
 
     if (value == SpvScopeWorkgroup) {
-      std::string errorVUID = _.VkErrorID(7321);
+      std::string errorVUID = _.VkErrorID(4639);
       _.function(inst->function()->id())
           ->RegisterExecutionModelLimitation(
               [errorVUID](SpvExecutionModel model, std::string* message) {
                 if (model != SpvExecutionModelGLCompute &&
-                    model != SpvExecutionModelTessellationControl &&
                     model != SpvExecutionModelTaskNV &&
-                    model != SpvExecutionModelMeshNV &&
-                    model != SpvExecutionModelTaskEXT &&
-                    model != SpvExecutionModelMeshEXT) {
+                    model != SpvExecutionModelMeshNV) {
                   if (message) {
                     *message = errorVUID +
                                "Workgroup Memory Scope is limited to MeshNV, "
-                               "TaskNV, MeshEXT, TaskEXT, TessellationControl, "
-                               "and GLCompute execution model";
+                               "TaskNV, and GLCompute execution model";
                   }
                   return false;
                 }
                 return true;
               });
-
-      if (_.memory_model() == SpvMemoryModelGLSL450) {
-        errorVUID = _.VkErrorID(7320);
-        _.function(inst->function()->id())
-            ->RegisterExecutionModelLimitation(
-                [errorVUID](SpvExecutionModel model, std::string* message) {
-                  if (model == SpvExecutionModelTessellationControl) {
-                    if (message) {
-                      *message =
-                          errorVUID +
-                          "Workgroup Memory Scope can't be used with "
-                          "TessellationControl using GLSL450 Memory Model";
-                    }
-                    return false;
-                  }
-                  return true;
-                });
-      }
     }
   }
 

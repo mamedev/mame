@@ -72,16 +72,12 @@ spv_result_t spvOperandTableNameLookup(spv_target_env env,
       // Note that the second rule assumes the extension enabling this operand
       // is indeed requested in the SPIR-V code; checking that should be
       // validator's work.
-      if (nameLength == strlen(entry.name) &&
+      if (((version >= entry.minVersion && version <= entry.lastVersion) ||
+           entry.numExtensions > 0u || entry.numCapabilities > 0u) &&
+          nameLength == strlen(entry.name) &&
           !strncmp(entry.name, name, nameLength)) {
-        if ((version >= entry.minVersion && version <= entry.lastVersion) ||
-            entry.numExtensions > 0u || entry.numCapabilities > 0u) {
-          *pEntry = &entry;
-          return SPV_SUCCESS;
-        } else {
-          // if there is no extension/capability then the version is wrong
-          return SPV_ERROR_WRONG_VERSION;
-        }
+        *pEntry = &entry;
+        return SPV_SUCCESS;
       }
     }
   }

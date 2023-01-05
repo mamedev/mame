@@ -2,7 +2,7 @@ $input a_position, i_data0, i_data1, i_data2, i_data3, i_data4
 
 /*
  * Copyright 2018 Kostas Anagnostou. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "../common/common.sh"

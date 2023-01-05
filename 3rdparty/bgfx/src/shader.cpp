@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "bgfx_p.h"
@@ -121,10 +121,8 @@ namespace bgfx
 		bx::WriterI* writer = reinterpret_cast<bx::WriterI*>(_userData);
 		char temp[512];
 		toString(temp, sizeof(temp), _instruction);
-
-		bx::Error err;
-		bx::write(writer, temp, (int32_t)bx::strLen(temp), &err);
-		bx::write(writer, '\n', &err);
+		bx::write(writer, temp, (int32_t)bx::strLen(temp) );
+		bx::write(writer, '\n');
 		return true;
 	}
 
@@ -134,10 +132,8 @@ namespace bgfx
 		bx::WriterI* writer = reinterpret_cast<bx::WriterI*>(_userData);
 		char temp[512];
 		toString(temp, sizeof(temp), _instruction);
-
-		bx::Error err;
-		bx::write(writer, temp, (int32_t)bx::strLen(temp), &err);
-		bx::write(writer, '\n', &err);
+		bx::write(writer, temp, (int32_t)bx::strLen(temp) );
+		bx::write(writer, '\n');
 		return true;
 	}
 
@@ -147,17 +143,15 @@ namespace bgfx
 		bx::WriterI* writer = reinterpret_cast<bx::WriterI*>(_userData);
 		char temp[512];
 		toString(temp, sizeof(temp), _instruction);
-
-		bx::Error err;
-		bx::write(writer, temp, (int32_t)bx::strLen(temp), &err);
-		bx::write(writer, '\n', &err);
+		bx::write(writer, temp, (int32_t)bx::strLen(temp) );
+		bx::write(writer, '\n');
 		return true;
 	}
 
 	void disassembleByteCode(bx::WriterI* _writer, bx::ReaderSeekerI* _reader, bx::Error* _err)
 	{
 		uint32_t magic;
-		bx::peek(_reader, magic, _err);
+		bx::peek(_reader, magic);
 
 		if (magic == SPV_CHUNK_HEADER)
 		{
@@ -184,14 +178,14 @@ namespace bgfx
 		BX_ERROR_SCOPE(_err);
 
 		uint32_t magic;
-		bx::peek(_reader, magic, _err);
+		bx::peek(_reader, magic);
 
 		if (isShaderBin(magic) )
 		{
-			bx::read(_reader, magic, _err);
+			bx::read(_reader, magic);
 
 			uint32_t hashIn;
-			bx::read(_reader, hashIn, _err);
+			bx::read(_reader, hashIn);
 
 			uint32_t hashOut;
 
@@ -201,7 +195,7 @@ namespace bgfx
 			}
 			else
 			{
-				bx::read(_reader, hashOut, _err);
+				bx::read(_reader, hashOut);
 			}
 
 			uint16_t count;

@@ -1,8 +1,9 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
+#include "bx_p.h"
 #include <bx/os.h>
 #include <bx/thread.h>
 
@@ -21,12 +22,11 @@
 	|| BX_PLATFORM_IOS     \
 	|| BX_PLATFORM_OSX     \
 	|| BX_PLATFORM_PS4     \
-	|| BX_PLATFORM_RPI     \
-	|| BX_PLATFORM_NX
+	|| BX_PLATFORM_RPI
 #	include <pthread.h>
-#	if BX_PLATFORM_BSD
+#	if defined(__FreeBSD__)
 #		include <pthread_np.h>
-#	endif // BX_PLATFORM_BSD
+#	endif
 #	if BX_PLATFORM_LINUX && (BX_CRT_GLIBC < 21200)
 #		include <sys/prctl.h>
 #	endif // BX_PLATFORM_
@@ -34,9 +34,6 @@
 	|| BX_PLATFORM_WINRT   \
 	|| BX_PLATFORM_XBOXONE \
 	|| BX_PLATFORM_WINRT
-#	ifndef WIN32_LEAN_AND_MEAN
-#		define WIN32_LEAN_AND_MEAN
-#	endif // WIN32_LEAN_AND_MEAN
 #	include <windows.h>
 #	include <limits.h>
 #	include <errno.h>
@@ -267,7 +264,7 @@ namespace bx
 
 		if (NULL != SetThreadDescription)
 		{
-			uint32_t length = (uint32_t)strLen(_name)+1;
+			uint32_t length = (uint32_t)bx::strLen(_name)+1;
 			uint32_t size = length*sizeof(wchar_t);
 			wchar_t* name = (wchar_t*)alloca(size);
 			mbstowcs(name, _name, size-2);

@@ -1,0 +1,10 @@
+glcpp
+glcpp-parse.output
+
+*.o
+*.lo
+*.la
+.libs
+*~
+
+tests/*.out

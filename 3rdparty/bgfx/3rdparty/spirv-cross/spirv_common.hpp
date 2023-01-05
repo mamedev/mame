@@ -24,11 +24,7 @@
 #ifndef SPIRV_CROSS_COMMON_HPP
 #define SPIRV_CROSS_COMMON_HPP
 
-#ifndef SPV_ENABLE_UTILITY_CODE
-#define SPV_ENABLE_UTILITY_CODE
-#endif
 #include "spirv.hpp"
-
 #include "spirv_cross_containers.hpp"
 #include "spirv_cross_error_handling.hpp"
 #include <functional>
@@ -213,28 +209,6 @@ template <typename T, typename std::enable_if<!std::is_floating_point<T>::value,
 inline std::string convert_to_string(const T &t)
 {
 	return std::to_string(t);
-}
-
-static inline std::string convert_to_string(int32_t value)
-{
-	// INT_MIN is ... special on some backends. If we use a decimal literal, and negate it, we
-	// could accidentally promote the literal to long first, then negate.
-	// To workaround it, emit int(0x80000000) instead.
-	if (value == std::numeric_limits<int32_t>::min())
-		return "int(0x80000000)";
-	else
-		return std::to_string(value);
-}
-
-static inline std::string convert_to_string(int64_t value, const std::string &int64_type, bool long_long_literal_suffix)
-{
-	// INT64_MIN is ... special on some backends.
-	// If we use a decimal literal, and negate it, we might overflow the representable numbers.
-	// To workaround it, emit int(0x80000000) instead.
-	if (value == std::numeric_limits<int64_t>::min())
-		return join(int64_type, "(0x8000000000000000u", (long_long_literal_suffix ? "ll" : "l"), ")");
-	else
-		return std::to_string(value) + (long_long_literal_suffix ? "ll" : "l");
 }
 
 // Allow implementations to set a convenient standard precision
@@ -642,9 +616,7 @@ struct SPIRExtension : IVariant
 		SPV_AMD_shader_ballot,
 		SPV_AMD_shader_explicit_vertex_parameter,
 		SPV_AMD_shader_trinary_minmax,
-		SPV_AMD_gcn_shader,
-		NonSemanticDebugPrintf,
-		NonSemanticShaderDebugInfo
+		SPV_AMD_gcn_shader
 	};
 
 	explicit SPIRExtension(Extension ext_)
@@ -678,12 +650,10 @@ struct SPIREntryPoint
 	struct WorkgroupSize
 	{
 		uint32_t x = 0, y = 0, z = 0;
-		uint32_t id_x = 0, id_y = 0, id_z = 0;
 		uint32_t constant = 0; // Workgroup size can be expressed as a constant/spec-constant instead.
 	} workgroup_size;
 	uint32_t invocations = 0;
 	uint32_t output_vertices = 0;
-	uint32_t output_primitives = 0;
 	spv::ExecutionModel model = spv::ExecutionModelMax;
 	bool geometry_passthrough = false;
 };
@@ -697,7 +667,7 @@ struct SPIRExpression : IVariant
 
 	// Only created by the backend target to avoid creating tons of temporaries.
 	SPIRExpression(std::string expr, TypeID expression_type_, bool immutable_)
-	    : expression(std::move(expr))
+	    : expression(move(expr))
 	    , expression_type(expression_type_)
 	    , immutable(immutable_)
 	{
@@ -778,8 +748,7 @@ struct SPIRBlock : IVariant
 		Unreachable, // Noop
 		Kill, // Discard
 		IgnoreIntersection, // Ray Tracing
-		TerminateRay, // Ray Tracing
-		EmitMeshTasks // Mesh shaders
+		TerminateRay // Ray Tracing
 	};
 
 	enum Merge
@@ -841,13 +810,6 @@ struct SPIRBlock : IVariant
 	BlockID false_block = 0;
 	BlockID default_block = 0;
 
-	// If terminator is EmitMeshTasksEXT.
-	struct
-	{
-		ID groups[3];
-		ID payload;
-	} mesh = {};
-
 	SmallVector<Instruction> ops;
 
 	struct Phi
@@ -870,11 +832,10 @@ struct SPIRBlock : IVariant
 
 	struct Case
 	{
-		uint64_t value;
+		uint32_t value;
 		BlockID block;
 	};
-	SmallVector<Case> cases_32bit;
-	SmallVector<Case> cases_64bit;
+	SmallVector<Case> cases;
 
 	// If we have tried to optimize code for this block but failed,
 	// keep track of this.
@@ -1087,6 +1048,7 @@ struct SPIRVariable : IVariant
 
 	// Temporaries which can remain forwarded as long as this variable is not modified.
 	SmallVector<ID> dependees;
+	bool forwardable = true;
 
 	bool deferred_declaration = false;
 	bool phi_variable = false;
@@ -1415,7 +1377,7 @@ public:
 	~Variant()
 	{
 		if (holder)
-			group->pools[type]->deallocate_opaque(holder);
+			group->pools[type]->free_opaque(holder);
 	}
 
 	// Marking custom move constructor as noexcept is important.
@@ -1434,7 +1396,7 @@ public:
 		if (this != &other)
 		{
 			if (holder)
-				group->pools[type]->deallocate_opaque(holder);
+				group->pools[type]->free_opaque(holder);
 			holder = other.holder;
 			group = other.group;
 			type = other.type;
@@ -1458,7 +1420,7 @@ public:
 		if (this != &other)
 		{
 			if (holder)
-				group->pools[type]->deallocate_opaque(holder);
+				group->pools[type]->free_opaque(holder);
 
 			if (other.holder)
 				holder = other.holder->clone(group->pools[other.type].get());
@@ -1474,13 +1436,13 @@ public:
 	void set(IVariant *val, Types new_type)
 	{
 		if (holder)
-			group->pools[type]->deallocate_opaque(holder);
+			group->pools[type]->free_opaque(holder);
 		holder = nullptr;
 
 		if (!allow_type_rewrite && type != TypeNone && type != new_type)
 		{
 			if (val)
-				group->pools[new_type]->deallocate_opaque(val);
+				group->pools[new_type]->free_opaque(val);
 			SPIRV_CROSS_THROW("Overwriting a variant with new type.");
 		}
 
@@ -1535,7 +1497,7 @@ public:
 	void reset()
 	{
 		if (holder)
-			group->pools[type]->deallocate_opaque(holder);
+			group->pools[type]->free_opaque(holder);
 		holder = nullptr;
 		type = TypeNone;
 	}
@@ -1578,7 +1540,6 @@ struct AccessChainMeta
 	bool storage_is_packed = false;
 	bool storage_is_invariant = false;
 	bool flattened_struct = false;
-	bool relaxed_precision = false;
 };
 
 enum ExtendedDecorations
@@ -1645,12 +1606,6 @@ enum ExtendedDecorations
 	// must be applied to the result, since pull-model interpolants in MSL cannot be swizzled directly, but the
 	// results of interpolation can.
 	SPIRVCrossDecorationInterpolantComponentExpr,
-
-	// Apply to any struct type that is used in the Workgroup storage class.
-	// This causes matrices in MSL prior to Metal 3.0 to be emitted using a special
-	// class that is convertible to the standard matrix type, to work around the
-	// lack of constructors in the 'threadgroup' address space.
-	SPIRVCrossDecorationWorkgroupStruct,
 
 	SPIRVCrossDecorationCount
 };
@@ -1790,33 +1745,6 @@ static inline bool opcode_is_sign_invariant(spv::Op opcode)
 	case spv::OpBitwiseOr:
 	case spv::OpBitwiseXor:
 	case spv::OpBitwiseAnd:
-		return true;
-
-	default:
-		return false;
-	}
-}
-
-static inline bool opcode_can_promote_integer_implicitly(spv::Op opcode)
-{
-	switch (opcode)
-	{
-	case spv::OpSNegate:
-	case spv::OpNot:
-	case spv::OpBitwiseAnd:
-	case spv::OpBitwiseOr:
-	case spv::OpBitwiseXor:
-	case spv::OpShiftLeftLogical:
-	case spv::OpShiftRightLogical:
-	case spv::OpShiftRightArithmetic:
-	case spv::OpIAdd:
-	case spv::OpISub:
-	case spv::OpIMul:
-	case spv::OpSDiv:
-	case spv::OpUDiv:
-	case spv::OpSRem:
-	case spv::OpUMod:
-	case spv::OpSMod:
 		return true;
 
 	default:

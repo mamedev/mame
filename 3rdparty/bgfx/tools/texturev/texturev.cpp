@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "common.h"
@@ -800,7 +800,7 @@ struct View
 		bx::FileReader reader;
 		if (bx::open(&reader, filePath) )
 		{
-			bx::read(&reader, settings, bx::ErrorAssert{});
+			bx::read(&reader, settings);
 			bx::close(&reader);
 
 			if (!bx::fromString(&m_transitionTime, settings.get("view/transition") ) )
@@ -849,7 +849,7 @@ struct View
 			bx::FileWriter writer;
 			if (bx::open(&writer, filePath) )
 			{
-				bx::write(&writer, settings, bx::ErrorAssert{});
+				bx::write(&writer, settings);
 				bx::close(&writer);
 			}
 		}
@@ -1152,21 +1152,6 @@ void keyBindingHelp(const char* _bindings, const char* _description)
 	ImGui::Text("%s", _description);
 }
 
-inline std::string replaceAll(const char* _str, const char* _from, const char* _to)
-{
-	std::string str = _str;
-	size_t startPos = 0;
-	const size_t fromLen = bx::strLen(_from);
-	const size_t toLen   = bx::strLen(_to);
-	while ( (startPos = str.find(_from, startPos) ) != std::string::npos)
-	{
-		str.replace(startPos, fromLen, _to);
-		startPos += toLen;
-	}
-
-	return str;
-}
-
 void associate()
 {
 #if BX_PLATFORM_WINDOWS
@@ -1175,7 +1160,7 @@ void associate()
 	char exec[bx::kMaxFilePath];
 	GetModuleFileNameA(GetModuleHandleA(NULL), exec, sizeof(exec) );
 
-	std::string strExec = replaceAll(exec, "\\", "\\\\");
+	std::string strExec = bx::replaceAll<std::string>(exec, "\\", "\\\\");
 
 	std::string value;
 	bx::stringPrintf(value, "@=\"\\\"%s\\\" \\\"%%1\\\"\"\r\n\r\n", strExec.c_str() );
@@ -1263,8 +1248,8 @@ void help(const char* _error = NULL)
 
 	bx::printf(
 		  "texturev, bgfx texture viewer tool, version %d.%d.%d.\n"
-		  "Copyright 2011-2022 Branimir Karadzic. All rights reserved.\n"
-		  "License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE\n\n"
+		  "Copyright 2011-2021 Branimir Karadzic. All rights reserved.\n"
+		  "License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause\n\n"
 		, BGFX_TEXTUREV_VERSION_MAJOR
 		, BGFX_TEXTUREV_VERSION_MINOR
 		, BGFX_API_VERSION
@@ -1326,13 +1311,11 @@ int _main_(int _argc, char** _argv)
 	View view;
 	cmdAdd("view", cmdView, &view);
 
-	entry::setWindowFlags(entry::kDefaultWindowHandle, ENTRY_WINDOW_FLAG_ASPECT_RATIO, false);
-	entry::setWindowSize(entry::kDefaultWindowHandle, view.m_width, view.m_height);
+	entry::setWindowFlags(entry::WindowHandle{0}, ENTRY_WINDOW_FLAG_ASPECT_RATIO, false);
+	entry::setWindowSize(entry::WindowHandle{0}, view.m_width, view.m_height);
 
 	bgfx::Init init;
 	init.type = view.m_rendererType;
-	init.platformData.nwh  = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
-	init.platformData.ndt  = entry::getNativeDisplayHandle();
 	init.resolution.width  = view.m_width;
 	init.resolution.height = view.m_height;
 	init.resolution.reset  = BGFX_RESET_VSYNC;
@@ -1878,11 +1861,8 @@ int _main_(int _argc, char** _argv)
 						{
 							const int32_t itemCount = int32_t(view.m_fileList.size() );
 
-							ImGuiListClipper clipper;
-							clipper.Begin(itemCount, itemHeight);
-
-							int32_t start = clipper.DisplayStart;
-							int32_t end   = clipper.DisplayEnd;
+							int32_t start, end;
+							ImGui::CalcListClipping(itemCount, itemHeight, &start, &end);
 
 							const int32_t index = int32_t(view.m_fileIndex);
 							if (index <= start)
@@ -1893,6 +1873,9 @@ int _main_(int _argc, char** _argv)
 							{
 								ImGui::SetScrollY(ImGui::GetScrollY() + (index-end+1)*itemHeight);
 							}
+
+							ImGuiListClipper clipper;
+							clipper.Begin(itemCount, itemHeight);
 
 							while (clipper.Step() )
 							{
@@ -1929,8 +1912,8 @@ int _main_(int _argc, char** _argv)
 
 				ImGui::Text(
 					"texturev, bgfx texture viewer tool " ICON_KI_WRENCH ", version %d.%d.%d.\n"
-					"Copyright 2011-2022 Branimir Karadzic. All rights reserved.\n"
-					"License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE\n"
+					"Copyright 2011-2021 Branimir Karadzic. All rights reserved.\n"
+					"License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause\n"
 					, BGFX_TEXTUREV_VERSION_MAJOR
 					, BGFX_TEXTUREV_VERSION_MINOR
 					, BGFX_API_VERSION
@@ -2081,7 +2064,8 @@ int _main_(int _argc, char** _argv)
 					bx::stringPrintf(title, "Failed to load %s!", filePath);
 				}
 
-				entry::setWindowTitle(entry::kDefaultWindowHandle, title.c_str() );
+				entry::WindowHandle handle = { 0 };
+				entry::setWindowTitle(handle, title.c_str() );
 			}
 
 			int64_t now = bx::getHPCounter();

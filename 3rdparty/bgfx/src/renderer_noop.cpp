@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "bgfx_p.h"
@@ -252,7 +252,6 @@ namespace bgfx { namespace noop
 			perfStats.gpuTimeBegin  = 0;
 			perfStats.gpuTimeEnd    = 0;
 			perfStats.gpuTimerFreq  = 1000000000;
-			perfStats.gpuFrameNum   = 0;
 
 			bx::memSet(perfStats.numPrims, 0, sizeof(perfStats.numPrims) );
 

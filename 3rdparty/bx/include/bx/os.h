@@ -1,11 +1,12 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_OS_H_HEADER_GUARD
 #define BX_OS_H_HEADER_GUARD
 
+#include "debug.h"
 #include "filepath.h"
 
 #if BX_PLATFORM_OSX
@@ -54,9 +55,6 @@ namespace bx
 
 	///
 	void* exec(const char* const* _argv);
-
-	///
-	BX_NO_RETURN void exit(int32_t _exitCode);
 
 } // namespace bx
 

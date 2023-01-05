@@ -42,7 +42,7 @@ class CFA {
 
   /// Returns true if a block with @p id is found in the @p work_list vector
   ///
-  /// @param[in] work_list  Set of blocks visited in the depth first
+  /// @param[in] work_list  Set of blocks visited in the the depth first
   /// traversal
   ///                       of the CFG
   /// @param[in] id         The ID of the block being checked
@@ -56,33 +56,8 @@ class CFA {
   ///
   /// This function performs a depth first traversal from the \p entry
   /// BasicBlock and calls the pre/postorder functions when it needs to process
-  /// the node in pre order, post order.
-  ///
-  /// @param[in] entry      The root BasicBlock of a CFG
-  /// @param[in] successor_func  A function which will return a pointer to the
-  ///                            successor nodes
-  /// @param[in] preorder   A function that will be called for every block in a
-  ///                       CFG following preorder traversal semantics
-  /// @param[in] postorder  A function that will be called for every block in a
-  ///                       CFG following postorder traversal semantics
-  /// @param[in] terminal   A function that will be called to determine if the
-  ///                       search should stop at the given node.
-  /// NOTE: The @p successor_func and predecessor_func each return a pointer to
-  /// a collection such that iterators to that collection remain valid for the
-  /// lifetime of the algorithm.
-  static void DepthFirstTraversal(const BB* entry,
-                                  get_blocks_func successor_func,
-                                  std::function<void(cbb_ptr)> preorder,
-                                  std::function<void(cbb_ptr)> postorder,
-                                  std::function<bool(cbb_ptr)> terminal);
-
-  /// @brief Depth first traversal starting from the \p entry BasicBlock
-  ///
-  /// This function performs a depth first traversal from the \p entry
-  /// BasicBlock and calls the pre/postorder functions when it needs to process
   /// the node in pre order, post order. It also calls the backedge function
-  /// when a back edge is encountered. The backedge function can be empty.  The
-  /// runtime of the algorithm is improved if backedge is empty.
+  /// when a back edge is encountered.
   ///
   /// @param[in] entry      The root BasicBlock of a CFG
   /// @param[in] successor_func  A function which will return a pointer to the
@@ -92,18 +67,16 @@ class CFA {
   /// @param[in] postorder  A function that will be called for every block in a
   ///                       CFG following postorder traversal semantics
   /// @param[in] backedge   A function that will be called when a backedge is
-  ///                       encountered during a traversal.
-  /// @param[in] terminal   A function that will be called to determine if the
-  ///                       search should stop at the given node.
+  ///                       encountered during a traversal
   /// NOTE: The @p successor_func and predecessor_func each return a pointer to
-  /// a collection such that iterators to that collection remain valid for the
+  /// a
+  /// collection such that iterators to that collection remain valid for the
   /// lifetime of the algorithm.
   static void DepthFirstTraversal(
       const BB* entry, get_blocks_func successor_func,
       std::function<void(cbb_ptr)> preorder,
       std::function<void(cbb_ptr)> postorder,
-      std::function<void(cbb_ptr, cbb_ptr)> backedge,
-      std::function<bool(cbb_ptr)> terminal);
+      std::function<void(cbb_ptr, cbb_ptr)> backedge);
 
   /// @brief Calculates dominator edges for a set of blocks
   ///
@@ -161,27 +134,11 @@ bool CFA<BB>::FindInWorkList(const std::vector<block_info>& work_list,
 }
 
 template <class BB>
-void CFA<BB>::DepthFirstTraversal(const BB* entry,
-                                  get_blocks_func successor_func,
-                                  std::function<void(cbb_ptr)> preorder,
-                                  std::function<void(cbb_ptr)> postorder,
-                                  std::function<bool(cbb_ptr)> terminal) {
-  DepthFirstTraversal(entry, successor_func, preorder, postorder,
-                      /* backedge = */ {}, terminal);
-}
-
-template <class BB>
 void CFA<BB>::DepthFirstTraversal(
     const BB* entry, get_blocks_func successor_func,
     std::function<void(cbb_ptr)> preorder,
     std::function<void(cbb_ptr)> postorder,
-    std::function<void(cbb_ptr, cbb_ptr)> backedge,
-    std::function<bool(cbb_ptr)> terminal) {
-  assert(successor_func && "The successor function cannot be empty.");
-  assert(preorder && "The preorder function cannot be empty.");
-  assert(postorder && "The postorder function cannot be empty.");
-  assert(terminal && "The terminal function cannot be empty.");
-
+    std::function<void(cbb_ptr, cbb_ptr)> backedge) {
   std::unordered_set<uint32_t> processed;
 
   /// NOTE: work_list is the sequence of nodes from the root node to the node
@@ -195,13 +152,13 @@ void CFA<BB>::DepthFirstTraversal(
 
   while (!work_list.empty()) {
     block_info& top = work_list.back();
-    if (terminal(top.block) || top.iter == end(*successor_func(top.block))) {
+    if (top.iter == end(*successor_func(top.block))) {
       postorder(top.block);
       work_list.pop_back();
     } else {
       BB* child = *top.iter;
       top.iter++;
-      if (backedge && FindInWorkList(work_list, child->id())) {
+      if (FindInWorkList(work_list, child->id())) {
         backedge(top.block, child);
       }
       if (processed.count(child->id()) == 0) {
@@ -275,16 +232,10 @@ std::vector<std::pair<BB*, BB*>> CFA<BB>::CalculateDominators(
 
   std::vector<std::pair<bb_ptr, bb_ptr>> out;
   for (auto idom : idoms) {
-    // At this point if there is no dominator for the node, just make it
-    // reflexive.
-    auto dominator = std::get<1>(idom).dominator;
-    if (dominator == undefined_dom) {
-      dominator = std::get<1>(idom).postorder_index;
-    }
     // NOTE: performing a const cast for convenient usage with
     // UpdateImmediateDominators
     out.push_back({const_cast<BB*>(std::get<0>(idom)),
-                   const_cast<BB*>(postorder[dominator])});
+                   const_cast<BB*>(postorder[std::get<1>(idom).dominator])});
   }
 
   // Sort by postorder index to generate a deterministic ordering of edges.
@@ -314,12 +265,12 @@ std::vector<BB*> CFA<BB>::TraversalRoots(const std::vector<BB*>& blocks,
 
   auto mark_visited = [&visited](const BB* b) { visited.insert(b); };
   auto ignore_block = [](const BB*) {};
-  auto no_terminal_blocks = [](const BB*) { return false; };
+  auto ignore_blocks = [](const BB*, const BB*) {};
 
   auto traverse_from_root = [&mark_visited, &succ_func, &ignore_block,
-                             &no_terminal_blocks](const BB* entry) {
+                             &ignore_blocks](const BB* entry) {
     DepthFirstTraversal(entry, succ_func, mark_visited, ignore_block,
-                        no_terminal_blocks);
+                        ignore_blocks);
   };
 
   std::vector<BB*> result;
