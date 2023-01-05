@@ -26,7 +26,7 @@
  * with that is available at compile time. The current vector width is
  * accessible for e.g. loop strides via the ASTCENC_SIMD_WIDTH constant.
  *
- * Explicit scalar types are acessible via the vint1, vfloat1, vmask1 types.
+ * Explicit scalar types are accessible via the vint1, vfloat1, vmask1 types.
  * These are provided primarily for prototyping and algorithm debug of VLA
  * implementations.
  *
@@ -402,7 +402,7 @@ static ASTCENC_SIMD_INLINE vint4 clz(vint4 a)
 	// the original integer value into a 2^N encoding we can recover easily.
 
 	// Convert to float without risk of rounding up by keeping only top 8 bits.
-	// This trick is is guranteed to keep top 8 bits and clear the 9th.
+	// This trick is is guaranteed to keep top 8 bits and clear the 9th.
 	a = (~lsr<8>(a)) & a;
 	a = float_as_int(int_to_float(a));
 

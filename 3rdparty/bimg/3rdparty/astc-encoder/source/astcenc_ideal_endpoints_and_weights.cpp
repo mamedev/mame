@@ -692,6 +692,7 @@ float compute_error_of_weight_set_1plane(
 ) {
 	vfloatacc error_summav = vfloatacc::zero();
 	unsigned int texel_count = di.texel_count;
+	promise(texel_count > 0);
 
 	// Process SIMD-width chunks, safe to over-fetch - the extra space is zero initialized
 	if (di.max_texel_weight_count > 2)
@@ -757,6 +758,7 @@ float compute_error_of_weight_set_2planes(
 ) {
 	vfloatacc error_summav = vfloatacc::zero();
 	unsigned int texel_count = di.texel_count;
+	promise(texel_count > 0);
 
 	// Process SIMD-width chunks, safe to over-fetch - the extra space is zero initialized
 	if (di.max_texel_weight_count > 2)
@@ -861,8 +863,7 @@ void compute_ideal_weights_for_decimation(
 	// zero-initialized SIMD over-fetch region
 	if (is_direct)
 	{
-		unsigned int texel_count_simd = round_up_to_simd_multiple_vla(texel_count);
-		for (unsigned int i = 0; i < texel_count_simd; i += ASTCENC_SIMD_WIDTH)
+		for (unsigned int i = 0; i < texel_count; i += ASTCENC_SIMD_WIDTH)
 		{
 			vfloat weight(ei.weights + i);
 			storea(weight, dec_weight_ideal_value + i);
@@ -970,7 +971,7 @@ void compute_ideal_weights_for_decimation(
 		vfloat step = (error_change1 * chd_scale) / error_change0;
 		step = clamp(-stepsize, stepsize, step);
 
-		// Update the weight; note this can store negative values.
+		// Update the weight; note this can store negative values
 		storea(weight_val + step, dec_weight_ideal_value + i);
 	}
 }
@@ -1215,7 +1216,7 @@ void recompute_ideal_colors_1plane(
 		// Only compute a partition mean if more than one partition
 		if (partition_count > 1)
 		{
-			rgba_sum = vfloat4(1e-17f);
+			rgba_sum = vfloat4::zero();
 			promise(texel_count > 0);
 			for (unsigned int j = 0; j < texel_count; j++)
 			{
@@ -1251,7 +1252,6 @@ void recompute_ideal_colors_1plane(
 		for (unsigned int j = 0; j < texel_count; j++)
 		{
 			unsigned int tix = texel_indexes[j];
-
 			vfloat4 rgba = blk.texel(tix);
 
 			float idx0 = undec_weight_ref[tix];
@@ -1283,9 +1283,6 @@ void recompute_ideal_colors_1plane(
 		vfloat4 middle_sum = vfloat4(middle_sum_s) * color_weight;
 		vfloat4 right_sum  = vfloat4(right_sum_s) * color_weight;
 		vfloat4 lmrs_sum   = vfloat3(left_sum_s, middle_sum_s, right_sum_s) * ls_weight;
-
-		vfloat4 weight_weight_sum = vfloat4(weight_weight_sum_s) * color_weight;
-		float psum = right_sum_s * hadd_rgb_s(color_weight);
 
 		color_vec_x = color_vec_x * color_weight;
 		color_vec_y = color_vec_y * color_weight;
@@ -1349,26 +1346,32 @@ void recompute_ideal_colors_1plane(
 			}
 		}
 
-		// Calculations specific to mode #7, the HDR RGB-scale mode
-		vfloat4 rgbq_sum = color_vec_x + color_vec_y;
-		rgbq_sum.set_lane<3>(hadd_rgb_s(color_vec_y));
-
-		vfloat4 rgbovec = compute_rgbo_vector(rgba_weight_sum, weight_weight_sum, rgbq_sum, psum);
-		rgbo_vectors[i] = rgbovec;
-
-		// We can get a failure due to the use of a singular (non-invertible) matrix
-		// If it failed, compute rgbo_vectors[] with a different method ...
-		if (astc::isnan(dot_s(rgbovec, rgbovec)))
+		// Calculations specific to mode #7, the HDR RGB-scale mode - skip if known LDR
+		if (blk.rgb_lns[0] || blk.alpha_lns[0])
 		{
-			vfloat4 v0 = ep.endpt0[i];
-			vfloat4 v1 = ep.endpt1[i];
+			vfloat4 weight_weight_sum = vfloat4(weight_weight_sum_s) * color_weight;
+			float psum = right_sum_s * hadd_rgb_s(color_weight);
 
-			float avgdif = hadd_rgb_s(v1 - v0) * (1.0f / 3.0f);
-			avgdif = astc::max(avgdif, 0.0f);
+			vfloat4 rgbq_sum = color_vec_x + color_vec_y;
+			rgbq_sum.set_lane<3>(hadd_rgb_s(color_vec_y));
 
-			vfloat4 avg = (v0 + v1) * 0.5f;
-			vfloat4 ep0 = avg - vfloat4(avgdif) * 0.5f;
-			rgbo_vectors[i] = vfloat4(ep0.lane<0>(), ep0.lane<1>(), ep0.lane<2>(), avgdif);
+			vfloat4 rgbovec = compute_rgbo_vector(rgba_weight_sum, weight_weight_sum, rgbq_sum, psum);
+			rgbo_vectors[i] = rgbovec;
+
+			// We can get a failure due to the use of a singular (non-invertible) matrix
+			// If it failed, compute rgbo_vectors[] with a different method ...
+			if (astc::isnan(dot_s(rgbovec, rgbovec)))
+			{
+				vfloat4 v0 = ep.endpt0[i];
+				vfloat4 v1 = ep.endpt1[i];
+
+				float avgdif = hadd_rgb_s(v1 - v0) * (1.0f / 3.0f);
+				avgdif = astc::max(avgdif, 0.0f);
+
+				vfloat4 avg = (v0 + v1) * 0.5f;
+				vfloat4 ep0 = avg - vfloat4(avgdif) * 0.5f;
+				rgbo_vectors[i] = vfloat4(ep0.lane<0>(), ep0.lane<1>(), ep0.lane<2>(), avgdif);
+			}
 		}
 	}
 }
@@ -1516,7 +1519,7 @@ void recompute_ideal_colors_2planes(
 		color_vec_x += cwprod - cwiprod;
 
 		scale_vec += vfloat2(om_idx0, idx0) * (ls_weight * scale);
-		weight_weight_sum += (color_weight * color_idx);
+		weight_weight_sum += color_idx;
 	}
 
 	vfloat4 left1_sum   = vfloat4(left1_sum_s) * color_weight;
@@ -1527,8 +1530,6 @@ void recompute_ideal_colors_2planes(
 	vfloat4 left2_sum   = vfloat4(left2_sum_s) * color_weight;
 	vfloat4 middle2_sum = vfloat4(middle2_sum_s) * color_weight;
 	vfloat4 right2_sum  = vfloat4(right2_sum_s) * color_weight;
-
-	float psum = dot3_s(select(right1_sum, right2_sum, p2_mask), color_weight);
 
 	color_vec_x = color_vec_x * color_weight;
 	color_vec_y = color_vec_y * color_weight;
@@ -1630,26 +1631,32 @@ void recompute_ideal_colors_2planes(
 		ep.endpt1[0] = select(ep.endpt1[0], ep1, full_mask);
 	}
 
-	// Calculations specific to mode #7, the HDR RGB-scale mode
-	vfloat4 rgbq_sum = color_vec_x + color_vec_y;
-	rgbq_sum.set_lane<3>(hadd_rgb_s(color_vec_y));
-
-	rgbo_vector = compute_rgbo_vector(rgba_weight_sum, weight_weight_sum, rgbq_sum, psum);
-
-	// We can get a failure due to the use of a singular (non-invertible) matrix
-	// If it failed, compute rgbo_vectors[] with a different method ...
-	if (astc::isnan(dot_s(rgbo_vector, rgbo_vector)))
+	// Calculations specific to mode #7, the HDR RGB-scale mode - skip if known LDR
+	if (blk.rgb_lns[0] || blk.alpha_lns[0])
 	{
-		vfloat4 v0 = ep.endpt0[0];
-		vfloat4 v1 = ep.endpt1[0];
+		weight_weight_sum = weight_weight_sum * color_weight;
+		float psum = dot3_s(select(right1_sum, right2_sum, p2_mask), color_weight);
 
-		float avgdif = hadd_rgb_s(v1 - v0) * (1.0f / 3.0f);
-		avgdif = astc::max(avgdif, 0.0f);
+		vfloat4 rgbq_sum = color_vec_x + color_vec_y;
+		rgbq_sum.set_lane<3>(hadd_rgb_s(color_vec_y));
 
-		vfloat4 avg = (v0 + v1) * 0.5f;
-		vfloat4 ep0 = avg - vfloat4(avgdif) * 0.5f;
+		rgbo_vector = compute_rgbo_vector(rgba_weight_sum, weight_weight_sum, rgbq_sum, psum);
 
-		rgbo_vector = vfloat4(ep0.lane<0>(), ep0.lane<1>(), ep0.lane<2>(), avgdif);
+		// We can get a failure due to the use of a singular (non-invertible) matrix
+		// If it failed, compute rgbo_vectors[] with a different method ...
+		if (astc::isnan(dot_s(rgbo_vector, rgbo_vector)))
+		{
+			vfloat4 v0 = ep.endpt0[0];
+			vfloat4 v1 = ep.endpt1[0];
+
+			float avgdif = hadd_rgb_s(v1 - v0) * (1.0f / 3.0f);
+			avgdif = astc::max(avgdif, 0.0f);
+
+			vfloat4 avg = (v0 + v1) * 0.5f;
+			vfloat4 ep0 = avg - vfloat4(avgdif) * 0.5f;
+
+			rgbo_vector = vfloat4(ep0.lane<0>(), ep0.lane<1>(), ep0.lane<2>(), avgdif);
+		}
 	}
 }
 

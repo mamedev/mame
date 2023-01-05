@@ -5805,7 +5805,7 @@ namespace bimg
 			return total;
 		}
 
-		for (uint8_t side = 0, numSides = _imageContainer.m_numLayers * (_imageContainer.m_cubeMap ? 6 : 1); side < numSides && _err->isOk(); ++side)
+		for (uint8_t side = 0, numSides = uint8_t(_imageContainer.m_numLayers * (_imageContainer.m_cubeMap ? 6 : 1) ); side < numSides && _err->isOk(); ++side)
 		{
 			for (uint8_t lod = 0, num = _imageContainer.m_numMips; lod < num && _err->isOk(); ++lod)
 			{

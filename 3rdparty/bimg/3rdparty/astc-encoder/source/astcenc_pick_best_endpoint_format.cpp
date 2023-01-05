@@ -325,11 +325,7 @@ static void compute_color_error_for_every_integer_count_and_quant_level(
 ) {
 	int partition_size = pi.partition_texel_count[partition_index];
 
-	static const float baseline_quant_error[21] {
-		(65536.0f * 65536.0f / 18.0f),				// 2 values, 1 step
-		(65536.0f * 65536.0f / 18.0f) / (2 * 2),	// 3 values, 2 steps
-		(65536.0f * 65536.0f / 18.0f) / (3 * 3),	// 4 values, 3 steps
-		(65536.0f * 65536.0f / 18.0f) / (4 * 4),	// 5 values
+	static const float baseline_quant_error[21 - QUANT_6] {
 		(65536.0f * 65536.0f / 18.0f) / (5 * 5),
 		(65536.0f * 65536.0f / 18.0f) / (7 * 7),
 		(65536.0f * 65536.0f / 18.0f) / (9 * 9),
@@ -528,7 +524,7 @@ static void compute_color_error_for_every_integer_count_and_quant_level(
 			// The base_quant_error should depend on the scale-factor that would be used during
 			// actual encode of the color value
 
-			float base_quant_error = baseline_quant_error[i] * static_cast<float>(partition_size);
+			float base_quant_error = baseline_quant_error[i - QUANT_6] * static_cast<float>(partition_size);
 			float rgb_quantization_error = error_weight_rgbsum * base_quant_error * 2.0f;
 			float alpha_quantization_error = error_weight.lane<3>() * base_quant_error * 2.0f;
 			float rgba_quantization_error = rgb_quantization_error + alpha_quantization_error;
@@ -591,7 +587,7 @@ static void compute_color_error_for_every_integer_count_and_quant_level(
 				error_scale_oe_rgb = 1.0f;
 			}
 
-			float base_quant_error = baseline_quant_error[i];
+			float base_quant_error = baseline_quant_error[i - QUANT_6];
 			float quant_error_rgb  = base_quant_error_rgb * base_quant_error;
 			float quant_error_rgba = base_quant_error_rgba * base_quant_error;
 
@@ -1136,22 +1132,19 @@ unsigned int compute_ideal_endpoint_formats(
 	uint8_t (&best_ep_formats)[WEIGHTS_MAX_BLOCK_MODES][BLOCK_MAX_PARTITIONS] = tmpbuf.best_ep_formats;
 
 	// Ensure that the first iteration understep contains data that will never be picked
+	vfloat clear_error(ERROR_CALC_DEFAULT);
+	vint clear_quant(0);
+
 	unsigned int packed_start_block_mode = round_down_to_simd_multiple_vla(start_block_mode);
-	for (unsigned int i = packed_start_block_mode; i < start_block_mode; i++)
-	{
-		errors_of_best_combination[i] = ERROR_CALC_DEFAULT;
-		best_quant_levels[i] = QUANT_2;
-		best_quant_levels_mod[i] = QUANT_2;
-	}
+	storea(clear_error, errors_of_best_combination + packed_start_block_mode);
+	store_nbytes(clear_quant, best_quant_levels + packed_start_block_mode);
+	store_nbytes(clear_quant, best_quant_levels_mod + packed_start_block_mode);
 
 	// Ensure that last iteration overstep contains data that will never be picked
-	const unsigned int packed_end_block_mode = round_up_to_simd_multiple_vla(end_block_mode);
-	for (unsigned int i = end_block_mode; i < packed_end_block_mode; i++)
-	{
-		errors_of_best_combination[i] = ERROR_CALC_DEFAULT;
-		best_quant_levels[i] = QUANT_2;
-		best_quant_levels_mod[i] = QUANT_2;
-	}
+	unsigned int packed_end_block_mode = round_down_to_simd_multiple_vla(end_block_mode - 1);
+	storea(clear_error, errors_of_best_combination + packed_end_block_mode);
+	store_nbytes(clear_quant, best_quant_levels + packed_end_block_mode);
+	store_nbytes(clear_quant, best_quant_levels_mod + packed_end_block_mode);
 
 	// Track a scalar best to avoid expensive search at least once ...
 	float error_of_best_combination = ERROR_CALC_DEFAULT;

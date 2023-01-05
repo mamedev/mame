@@ -106,7 +106,7 @@ struct vfloat4
 	 */
 	template <int l> ASTCENC_SIMD_INLINE void set_lane(float a)
 	{
-		m = vld1q_lane_f32(&a, m, l);
+		m = vsetq_lane_f32(a, m, l);
 	}
 
 	/**
@@ -122,7 +122,7 @@ struct vfloat4
 	 */
 	static ASTCENC_SIMD_INLINE vfloat4 load1(const float* p)
 	{
-		return vfloat4(vdupq_n_f32(*p));
+		return vfloat4(vld1q_dup_f32(p));
 	}
 
 	/**
@@ -202,9 +202,8 @@ struct vint4
 	 */
 	ASTCENC_SIMD_INLINE explicit vint4(const uint8_t *p)
 	{
-		uint32x2_t t8 {};
 		// Cast is safe - NEON loads are allowed to be unaligned
-		t8 = vld1_lane_u32(reinterpret_cast<const uint32_t*>(p), t8, 0);
+		uint32x2_t t8 = vld1_dup_u32(reinterpret_cast<const uint32_t*>(p));
 		uint16x4_t t16 = vget_low_u16(vmovl_u8(vreinterpret_u8_u32(t8)));
 		m = vreinterpretq_s32_u32(vmovl_u16(t16));
 	}
@@ -251,7 +250,7 @@ struct vint4
 	 */
 	template <int l> ASTCENC_SIMD_INLINE void set_lane(int a)
 	{
-		m = vld1q_lane_s32(&a, m, l);
+		m = vsetq_lane_s32(a, m, l);
 	}
 
 	/**
