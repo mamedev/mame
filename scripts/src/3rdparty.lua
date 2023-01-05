@@ -1248,6 +1248,13 @@ project "bimg"
 		"BX_CONFIG_DEBUG=0",
 	}
 
+	configuration { "mingw*" }
+		defines {
+			"ASTCENC_AVX=0",
+			"ASTCENC_SSE=2",
+		}
+	configuration { }
+
 	includedirs {
 		MAME_DIR .. "3rdparty/bimg/include",
 		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/include",
