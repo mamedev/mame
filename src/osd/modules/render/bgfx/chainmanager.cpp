@@ -181,8 +181,9 @@ bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 
 	int32_t size(bx::getSize(&reader));
 
+	bx::ErrorAssert err;
 	char* data = new char[size + 1];
-	bx::read(&reader, reinterpret_cast<void*>(data), size);
+	bx::read(&reader, reinterpret_cast<void*>(data), size, &err);
 	bx::close(&reader);
 	data[size] = 0;
 

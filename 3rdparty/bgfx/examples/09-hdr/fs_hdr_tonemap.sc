@@ -1,8 +1,8 @@
 $input v_texcoord0, v_texcoord1, v_texcoord2, v_texcoord3, v_texcoord4
 
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "common.sh"
@@ -20,7 +20,7 @@ void main()
 
 	float middleGray = u_tonemap.x;
 	float whiteSqr   = u_tonemap.y;
-	float treshold   = u_tonemap.z;
+	float threshold  = u_tonemap.z;
 	float offset     = u_tonemap.w;
 
 	float lp = Yxy.x * middleGray / (lum + 0.0001);

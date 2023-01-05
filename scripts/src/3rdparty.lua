@@ -1117,6 +1117,7 @@ project "bx"
 		"__STDC_LIMIT_MACROS",
 		"__STDC_FORMAT_MACROS",
 		"__STDC_CONSTANT_MACROS",
+		"BX_CONFIG_DEBUG=0",
 	}
 
 	configuration { "vs*" }
@@ -1141,6 +1142,11 @@ project "bx"
 	configuration { "netbsd" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
+		}
+
+	configuration { "linux*" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/linux",
 		}
 
 	configuration { }
@@ -1211,9 +1217,18 @@ project "bimg"
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
 		}
 
+	configuration { "linux*" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bx/include/compat/linux",
+		}
+
 	configuration { "gmake or ninja" }
 		buildoptions {
 			"-Wno-unused-but-set-variable",
+			"-Wno-undef",
+		}
+		buildoptions_c {
+			"-Wno-strict-prototypes",
 		}
 
 	configuration { }
@@ -1230,29 +1245,44 @@ project "bimg"
 		"__STDC_LIMIT_MACROS",
 		"__STDC_FORMAT_MACROS",
 		"__STDC_CONSTANT_MACROS",
+		"BX_CONFIG_DEBUG=0",
 	}
 
 	includedirs {
 		MAME_DIR .. "3rdparty/bimg/include",
-		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec",
-		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/include",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/include",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/tinyexr/deps/miniz",
 	}
 
 	files {
 		MAME_DIR .. "3rdparty/bimg/src/image.cpp",
 		MAME_DIR .. "3rdparty/bimg/src/image_gnf.cpp",
 
-		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/astc_file.cc",
-		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/codec.cc",
-		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/endpoint_codec.cc",
-		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/footprint.cc",
-		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/integer_sequence_codec.cc",
-		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/intermediate_astc_block.cc",
-		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/logical_astc_block.cc",
-		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/partition.cc",
-		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/physical_astc_block.cc",
-		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/quantization.cc",
-		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-codec/src/decoder/weight_infill.cc",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_averages_and_directions.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_block_sizes.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_color_quantize.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_color_unquantize.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_compress_symbolic.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_compute_variance.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_decompress_symbolic.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_diagnostic_trace.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_entry.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_find_best_partitioning.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_ideal_endpoints_and_weights.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_image.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_integer_sequence.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_mathlib.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_mathlib_softfloat.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_partition_tables.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_percentile_tables.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_pick_best_endpoint_format.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_platform_isa_detection.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_quantization.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_symbolic_physical.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_weight_align.cpp",
+		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_weight_quant_xfer_tables.cpp",
+		
+		MAME_DIR .. "3rdparty/bimg/3rdparty/tinyexr/deps/miniz/miniz.c",
 	}
 
 
@@ -1287,7 +1317,7 @@ end
 		MAME_DIR .. "3rdparty/bgfx/3rdparty",
 		MAME_DIR .. "3rdparty/bx/include",
 		MAME_DIR .. "3rdparty/bimg/include",
-		MAME_DIR .. "3rdparty/bgfx/3rdparty/dxsdk/include",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/directx-headers/include/directx",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 	}
 
@@ -1318,6 +1348,12 @@ end
 	configuration { "netbsd" }
 		includedirs {
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
+		}
+
+	configuration { "linux*" }
+		includedirs {
+			MAME_DIR .. "3rdparty/bgfx/3rdparty/directx-headers/include/wsl/stubs",
+			MAME_DIR .. "3rdparty/bx/include/compat/linux",
 		}
 
 	configuration { "gmake or ninja" }
@@ -1371,6 +1407,7 @@ end
 		"__STDC_LIMIT_MACROS",
 		"__STDC_FORMAT_MACROS",
 		"__STDC_CONSTANT_MACROS",
+		"BX_CONFIG_DEBUG=0",
 		"BGFX_CONFIG_MAX_FRAME_BUFFERS=128",
 	}
 
