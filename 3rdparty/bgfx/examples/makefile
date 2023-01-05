@@ -1,6 +1,6 @@
 #
-# Copyright 2011-2022 Branimir Karadzic. All rights reserved.
-# License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+# Copyright 2011-2021 Branimir Karadzic. All rights reserved.
+# License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 #
 
 all:
@@ -49,10 +49,6 @@ all:
 	@make -s --no-print-directory build -C 43-denoise
 	@make -s --no-print-directory build -C 44-sss
 	@make -s --no-print-directory build -C 45-bokeh
-	@make -s --no-print-directory build -C 46-fsr
-	@make -s --no-print-directory build -C 47-pixelformats
-	@make -s --no-print-directory build -C 48-drawindirect
-	@make -s --no-print-directory build -C 49-hextile
 
 rebuild:
 	@make -s --no-print-directory rebuild -C 01-cubes
@@ -100,10 +96,6 @@ rebuild:
 	@make -s --no-print-directory rebuild -C 43-denoise
 	@make -s --no-print-directory rebuild -C 44-sss
 	@make -s --no-print-directory rebuild -C 45-bokeh
-	@make -s --no-print-directory rebuild -C 46-fsr
-	@make -s --no-print-directory rebuild -C 47-pixelformats
-	@make -s --no-print-directory rebuild -C 48-drawindirect
-	@make -s --no-print-directory rebuild -C 49-hextile
 
 rebuild-embedded:
 	@make -s --no-print-directory rebuild -C 02-metaballs

@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_MATH_H_HEADER_GUARD
@@ -11,11 +11,27 @@
 
 namespace bx
 {
+	constexpr float kPi         = 3.1415926535897932384626433832795f;
+	constexpr float kPi2        = 6.2831853071795864769252867665590f;
+	constexpr float kInvPi      = 1.0f/kPi;
+	constexpr float kPiHalf     = 1.5707963267948966192313216916398f;
+	constexpr float kPiQuarter  = 0.7853981633974483096156608458199f;
+	constexpr float kSqrt2      = 1.4142135623730950488016887242097f;
+	constexpr float kLogNat10   = 2.3025850929940456840179914546844f;
+	constexpr float kInvLogNat2 = 1.4426950408889634073599246810019f;
+	constexpr float kLogNat2Hi  = 0.6931471805599453094172321214582f;
+	constexpr float kLogNat2Lo  = 1.90821492927058770002e-10f;
+	constexpr float kE          = 2.7182818284590452353602874713527f;
+	constexpr float kNearZero   = 1.0f/float(1 << 28);
+	constexpr float kFloatMin   = 1.175494e-38f;
+	constexpr float kFloatMax   = 3.402823e+38f;
+	extern const float kInfinity;
+
 	///
 	typedef float (*LerpFn)(float _a, float _b, float _t);
 
 	///
-	struct Handedness
+	struct Handness
 	{
 		enum Enum
 		{
@@ -39,18 +55,18 @@ namespace bx
 	{
 		/// Fields are left uninitialized.
 		///
-		struct    NoneTag {};
-		constexpr NoneTag None;
+		struct NoneType {};
+		constexpr NoneType None;
 
 		/// Fields are initialized to zero.
 		///
-		struct    ZeroTag {};
-		constexpr ZeroTag Zero;
+		struct ZeroType {};
+		constexpr ZeroType Zero;
 
 		/// Fields are initialized to identity value.
 		///
-		struct    IdentityTag {};
-		constexpr IdentityTag Identity;
+		struct IdentityType {};
+		constexpr IdentityType Identity;
 	}
 
 	///
@@ -59,13 +75,13 @@ namespace bx
 		Vec3() = delete;
 
 		///
-		Vec3(init::NoneTag);
+		Vec3(init::NoneType);
 
 		///
-		constexpr Vec3(init::ZeroTag);
+		constexpr Vec3(init::ZeroType);
 
 		///
-		constexpr Vec3(init::IdentityTag);
+		constexpr Vec3(init::IdentityType);
 
 		///
 		explicit constexpr Vec3(float _v);
@@ -82,13 +98,13 @@ namespace bx
 		Plane() = delete;
 
 		///
-		Plane(init::NoneTag);
+		Plane(init::NoneType);
 
 		///
-		constexpr Plane(init::ZeroTag);
+		constexpr Plane(init::ZeroType);
 
 		///
-		constexpr Plane(init::IdentityTag);
+		constexpr Plane(init::IdentityType);
 
 		///
 		constexpr Plane(Vec3 _normal, float _dist);
@@ -103,13 +119,13 @@ namespace bx
 		Quaternion() = delete;
 
 		///
-		Quaternion(init::NoneTag);
+		Quaternion(init::NoneType);
 
 		///
-		constexpr Quaternion(init::ZeroTag);
+		constexpr Quaternion(init::ZeroType);
 
 		///
-		constexpr Quaternion(init::IdentityTag);
+		constexpr Quaternion(init::IdentityType);
 
 		///
 		constexpr Quaternion(float _x, float _y, float _z, float _w);
@@ -189,11 +205,7 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float invLerp(float _a, float _b, float _value);
 
-	/// Extracts the sign of value `_a`.
-	///
-	/// @param[in] _a Value.
-	///
-	/// @returns -1 if `_a` less than zero, 0 if `_a` is equal to 0, or +1 if `_a` is greater than zero.
+	/// Returns the sign of _a.
 	///
 	BX_CONSTEXPR_FUNC float sign(float _a);
 
@@ -241,7 +253,7 @@ namespace bx
 	///
 	BX_CONST_FUNC float atan(float _a);
 
-	/// Returns the inverse tangent of _y/_x.
+	/// Retruns the inverse tangent of _y/_x.
 	///
 	BX_CONST_FUNC float atan2(float _y, float _x);
 
@@ -292,15 +304,15 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float fract(float _a);
 
-	/// Returns result of negated multiply-sub operation -(_a * _b - _c) -> _c - _a * _b.
+	/// Returns result of negated multiply-sub operation -(_a * _b - _c).
 	///
 	BX_CONSTEXPR_FUNC float nms(float _a, float _b, float _c);
 
-	/// Returns result of addition (_a + _b).
+	/// Returns resul of addition (_a + _b).
 	///
 	BX_CONSTEXPR_FUNC float add(float _a, float _b);
 
-	/// Returns result of subtracion (_a - _b).
+	/// Returns resul of subtracion (_a - _b).
 	///
 	BX_CONSTEXPR_FUNC float sub(float _a, float _b);
 
@@ -321,10 +333,10 @@ namespace bx
 	BX_CONST_FUNC float mod(float _a, float _b);
 
 	///
-	BX_CONSTEXPR_FUNC bool isEqual(float _a, float _b, float _epsilon);
+	BX_CONSTEXPR_FUNC bool equal(float _a, float _b, float _epsilon);
 
 	///
-	BX_CONST_FUNC bool isEqual(const float* _a, const float* _b, uint32_t _num, float _epsilon);
+	BX_CONST_FUNC bool equal(const float* _a, const float* _b, uint32_t _num, float _epsilon);
 
 	///
 	BX_CONST_FUNC float wrap(float _a, float _wrap);
@@ -395,14 +407,6 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC Vec3 div(const Vec3 _a, float _b);
 
-	/// Returns result of negated multiply-sub operation -(_a * _b - _c) -> _c - _a * _b.
-	///
-	BX_CONSTEXPR_FUNC Vec3 nms(const Vec3 _a, const float _b, const Vec3 _c);
-
-	/// Returns result of negated multiply-sub operation -(_a * _b - _c) -> _c - _a * _b.
-	///
-	BX_CONSTEXPR_FUNC Vec3 nms(const Vec3 _a, const Vec3 _b, const Vec3 _c);
-
 	///
 	BX_CONSTEXPR_FUNC Vec3 mad(const Vec3 _a, const float _b, const Vec3 _c);
 
@@ -442,9 +446,6 @@ namespace bx
 	/// Returns component wise reciprocal of _a.
 	///
 	BX_CONSTEXPR_FUNC Vec3 rcp(const Vec3 _a);
-
-	///
-	BX_CONSTEXPR_FUNC bool isEqual(const Vec3 _a, const Vec3 _b, float _epsilon);
 
 	///
 	void calcTangentFrame(Vec3& _outT, Vec3& _outB, const Vec3 _n);
@@ -489,9 +490,6 @@ namespace bx
 	BX_CONSTEXPR_FUNC Quaternion lerp(const Quaternion _a, const Quaternion _b, float _t);
 
 	///
-	BX_CONST_FUNC Quaternion fromEuler(const Vec3 _euler);
-
-	///
 	BX_CONST_FUNC Vec3 toEuler(const Quaternion _a);
 
 	///
@@ -504,10 +502,7 @@ namespace bx
 	BX_CONST_FUNC Vec3 toZAxis(const Quaternion _a);
 
 	///
-	BX_CONST_FUNC Quaternion fromAxisAngle(const Vec3 _axis, float _angle);
-
-	///
-	void toAxisAngle(Vec3& _outAxis, float& _outAngle, const Quaternion _a);
+	BX_CONST_FUNC Quaternion rotateAxis(const Vec3 _axis, float _angle);
 
 	///
 	BX_CONST_FUNC Quaternion rotateX(float _ax);
@@ -517,9 +512,6 @@ namespace bx
 
 	///
 	BX_CONST_FUNC Quaternion rotateZ(float _az);
-
-	///
-	BX_CONSTEXPR_FUNC bool isEqual(const Quaternion _a, const Quaternion _b, float _epsilon);
 
 	///
 	void mtxIdentity(float* _result);
@@ -551,10 +543,13 @@ namespace bx
 		);
 
 	///
-	void mtxFromQuaternion(float* _result, const Quaternion& _rotation);
+	void mtxQuat(float* _result, const Quaternion& _quat);
 
 	///
-	void mtxFromQuaternion(float* _result, const Quaternion& _rotation, const Vec3& _translation);
+	void mtxQuatTranslation(float* _result, const Quaternion& _quat, const Vec3& _translation);
+
+	///
+	void mtxQuatTranslationHMD(float* _result, const Quaternion& _quat, const Vec3& _translation);
 
 	///
 	void mtxLookAt(
@@ -562,7 +557,7 @@ namespace bx
 		, const Vec3& _eye
 		, const Vec3& _at
 		, const Vec3& _up = { 0.0f, 1.0f, 0.0f }
-		, Handedness::Enum _handedness = Handedness::Left
+		, Handness::Enum _handness = Handness::Left
 		);
 
 	///
@@ -575,7 +570,7 @@ namespace bx
 		, float _near
 		, float _far
 		, bool _homogeneousNdc
-		, Handedness::Enum _handedness = Handedness::Left
+		, Handness::Enum _handness = Handness::Left
 		);
 
 	///
@@ -585,7 +580,7 @@ namespace bx
 		, float _near
 		, float _far
 		, bool _homogeneousNdc
-		, Handedness::Enum _handedness = Handedness::Left
+		, Handness::Enum _handness = Handness::Left
 		);
 
 	///
@@ -596,7 +591,7 @@ namespace bx
 		, float _near
 		, float _far
 		, bool _homogeneousNdc
-		, Handedness::Enum _handedness = Handedness::Left
+		, Handness::Enum _handness = Handness::Left
 		);
 
 	///
@@ -605,7 +600,7 @@ namespace bx
 		, const float _fov[4]
 		, float _near
 		, bool _homogeneousNdc
-		, Handedness::Enum _handedness = Handedness::Left
+		, Handness::Enum _handness = Handness::Left
 		, NearFar::Enum _nearFar = NearFar::Default
 		);
 
@@ -618,7 +613,7 @@ namespace bx
 		, float _rt
 		, float _near
 		, bool _homogeneousNdc
-		, Handedness::Enum _handedness = Handedness::Left
+		, Handness::Enum _handness = Handness::Left
 		, NearFar::Enum _nearFar = NearFar::Default
 		);
 
@@ -629,7 +624,7 @@ namespace bx
 		, float _aspect
 		, float _near
 		, bool _homogeneousNdc
-		, Handedness::Enum _handedness = Handedness::Left
+		, Handness::Enum _handness = Handness::Left
 		, NearFar::Enum _nearFar = NearFar::Default
 		);
 
@@ -644,7 +639,7 @@ namespace bx
 		, float _far
 		, float _offset
 		, bool _homogeneousNdc
-		, Handedness::Enum _handedness = Handedness::Left
+		, Handness::Enum _handness = Handness::Left
 		);
 
 	///
@@ -719,10 +714,7 @@ namespace bx
 	void calcPlane(Plane& _outPlane, const Vec3& _normal, const Vec3& _pos);
 
 	///
-	BX_CONSTEXPR_FUNC float distance(const Plane& _plane, const Vec3& _pos);
-
-	///
-	BX_CONSTEXPR_FUNC bool isEqual(const Plane& _a, const Plane& _b, float _epsilon);
+	float distance(const Plane& _plane, const Vec3& _pos);
 
 	///
 	void calcLinearFit2D(float _result[2], const void* _points, uint32_t _stride, uint32_t _numPoints);

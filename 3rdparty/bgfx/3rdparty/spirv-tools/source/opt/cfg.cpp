@@ -74,12 +74,6 @@ void CFG::RemoveNonExistingEdges(uint32_t blk_id) {
 
 void CFG::ComputeStructuredOrder(Function* func, BasicBlock* root,
                                  std::list<BasicBlock*>* order) {
-  ComputeStructuredOrder(func, root, nullptr, order);
-}
-
-void CFG::ComputeStructuredOrder(Function* func, BasicBlock* root,
-                                 BasicBlock* end,
-                                 std::list<BasicBlock*>* order) {
   assert(module_->context()->get_feature_mgr()->HasCapability(
              SpvCapabilityShader) &&
          "This only works on structured control flow");
@@ -87,8 +81,7 @@ void CFG::ComputeStructuredOrder(Function* func, BasicBlock* root,
   // Compute structured successors and do DFS.
   ComputeStructuredSuccessors(func);
   auto ignore_block = [](cbb_ptr) {};
-  auto terminal = [end](cbb_ptr bb) { return bb == end; };
-
+  auto ignore_edge = [](cbb_ptr, cbb_ptr) {};
   auto get_structured_successors = [this](const BasicBlock* b) {
     return &(block2structured_succs_[b]);
   };
@@ -99,7 +92,7 @@ void CFG::ComputeStructuredOrder(Function* func, BasicBlock* root,
     order->push_front(const_cast<BasicBlock*>(b));
   };
   CFA<BasicBlock>::DepthFirstTraversal(root, get_structured_successors,
-                                       ignore_block, post_order, terminal);
+                                       ignore_block, post_order, ignore_edge);
 }
 
 void CFG::ForEachBlockInPostOrder(BasicBlock* bb,
@@ -212,7 +205,7 @@ BasicBlock* CFG::SplitLoopHeader(BasicBlock* bb) {
   // Find the back edge
   BasicBlock* latch_block = nullptr;
   Function::iterator latch_block_iter = header_it;
-  for (; latch_block_iter != fn->end(); ++latch_block_iter) {
+  while (++latch_block_iter != fn->end()) {
     // If blocks are in the proper order, then the only branch that appears
     // after the header is the latch.
     if (std::find(pred.begin(), pred.end(), latch_block_iter->id()) !=
@@ -243,15 +236,6 @@ BasicBlock* CFG::SplitLoopHeader(BasicBlock* bb) {
   new_header->ForEachInst([new_header, context](Instruction* inst) {
     context->set_instr_block(inst, new_header);
   });
-
-  // If |bb| was the latch block, the branch back to the header is not in
-  // |new_header|.
-  if (latch_block == bb) {
-    if (new_header->ContinueBlockId() == bb->id()) {
-      new_header->GetLoopMergeInst()->SetInOperand(1, {new_header_id});
-    }
-    latch_block = new_header;
-  }
 
   // Adjust the OpPhi instructions as needed.
   bb->ForEachPhiInst([latch_block, bb, new_header, context](Instruction* phi) {

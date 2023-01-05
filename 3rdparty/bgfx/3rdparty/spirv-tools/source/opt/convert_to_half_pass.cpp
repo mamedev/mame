@@ -177,21 +177,18 @@ bool ConvertToHalfPass::GenHalfArith(Instruction* inst) {
   return modified;
 }
 
-bool ConvertToHalfPass::ProcessPhi(Instruction* inst, uint32_t from_width,
-                                   uint32_t to_width) {
-  // Add converts of any float operands to to_width if they are of from_width.
-  // If converting to 16, change type of phi to float16 equivalent and remember
-  // result id. Converts need to be added to preceding blocks.
+bool ConvertToHalfPass::ProcessPhi(Instruction* inst) {
+  // Add float16 converts of any float32 operands and change type
+  // of phi to float16 equivalent. Operand converts need to be added to
+  // preceeding blocks.
   uint32_t ocnt = 0;
   uint32_t* prev_idp;
-  bool modified = false;
-  inst->ForEachInId([&ocnt, &prev_idp, &from_width, &to_width, &modified,
-                     this](uint32_t* idp) {
+  inst->ForEachInId([&ocnt, &prev_idp, this](uint32_t* idp) {
     if (ocnt % 2 == 0) {
       prev_idp = idp;
     } else {
       Instruction* val_inst = get_def_use_mgr()->GetDef(*prev_idp);
-      if (IsFloat(val_inst, from_width)) {
+      if (IsFloat(val_inst, 32)) {
         BasicBlock* bp = context()->get_instr_block(*idp);
         auto insert_before = bp->tail();
         if (insert_before != bp->begin()) {
@@ -200,19 +197,15 @@ bool ConvertToHalfPass::ProcessPhi(Instruction* inst, uint32_t from_width,
               insert_before->opcode() != SpvOpLoopMerge)
             ++insert_before;
         }
-        GenConvert(prev_idp, to_width, &*insert_before);
-        modified = true;
+        GenConvert(prev_idp, 16, &*insert_before);
       }
     }
     ++ocnt;
   });
-  if (to_width == 16u) {
-    inst->SetResultType(EquivFloatTypeId(inst->type_id(), 16u));
-    converted_ids_.insert(inst->result_id());
-    modified = true;
-  }
-  if (modified) get_def_use_mgr()->AnalyzeInstUse(inst);
-  return modified;
+  inst->SetResultType(EquivFloatTypeId(inst->type_id(), 16));
+  get_def_use_mgr()->AnalyzeInstUse(inst);
+  converted_ids_.insert(inst->result_id());
+  return true;
 }
 
 bool ConvertToHalfPass::ProcessConvert(Instruction* inst) {
@@ -249,10 +242,9 @@ bool ConvertToHalfPass::ProcessImageRef(Instruction* inst) {
 }
 
 bool ConvertToHalfPass::ProcessDefault(Instruction* inst) {
+  bool modified = false;
   // If non-relaxed instruction has changed operands, need to convert
   // them back to float32
-  if (inst->opcode() == SpvOpPhi) return ProcessPhi(inst, 16u, 32u);
-  bool modified = false;
   inst->ForEachInId([&inst, &modified, this](uint32_t* idp) {
     if (converted_ids_.count(*idp) == 0) return;
     uint32_t old_id = *idp;
@@ -270,7 +262,7 @@ bool ConvertToHalfPass::GenHalfInst(Instruction* inst) {
   if (IsArithmetic(inst) && inst_relaxed)
     modified = GenHalfArith(inst);
   else if (inst->opcode() == SpvOpPhi && inst_relaxed)
-    modified = ProcessPhi(inst, 32u, 16u);
+    modified = ProcessPhi(inst);
   else if (inst->opcode() == SpvOpFConvert)
     modified = ProcessConvert(inst);
   else if (image_ops_.count(inst->opcode()) != 0)
@@ -348,7 +340,7 @@ Pass::Status ConvertToHalfPass::ProcessImpl() {
   Pass::ProcessFunction pfn = [this](Function* fp) {
     return ProcessFunction(fp);
   };
-  bool modified = context()->ProcessReachableCallTree(pfn);
+  bool modified = context()->ProcessEntryPointCallTree(pfn);
   // If modified, make sure module has Float16 capability
   if (modified) context()->AddCapability(SpvCapabilityFloat16);
   // Remove all RelaxedPrecision decorations from instructions and globals

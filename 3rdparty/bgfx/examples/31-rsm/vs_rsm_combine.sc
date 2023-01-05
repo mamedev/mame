@@ -3,7 +3,7 @@ $output v_texcoord0
 
 /*
  * Copyright 2016 Joseph Cherlin. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "../common/common.sh"

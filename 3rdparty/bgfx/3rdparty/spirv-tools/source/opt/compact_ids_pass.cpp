@@ -44,11 +44,6 @@ Pass::Status CompactIdsPass::Process() {
   bool modified = false;
   std::unordered_map<uint32_t, uint32_t> result_id_mapping;
 
-  // Disable automatic DebugInfo analysis for the life of the CompactIds pass.
-  // The DebugInfo manager requires the SPIR-V to be valid to run, but this is
-  // not true at all times in CompactIds as it remaps all ids.
-  context()->InvalidateAnalyses(IRContext::kAnalysisDebugInfo);
-
   context()->module()->ForEachInst(
       [&result_id_mapping, &modified](Instruction* inst) {
         auto operand = inst->begin();
@@ -91,8 +86,7 @@ Pass::Status CompactIdsPass::Process() {
       },
       true);
 
-  if (context()->module()->id_bound() != result_id_mapping.size() + 1) {
-    modified = true;
+  if (modified) {
     context()->module()->SetIdBound(
         static_cast<uint32_t>(result_id_mapping.size() + 1));
     // There are ids in the feature manager that could now be invalid

@@ -15,8 +15,10 @@
 #ifndef SOURCE_OPT_DEF_USE_MANAGER_H_
 #define SOURCE_OPT_DEF_USE_MANAGER_H_
 
+#include <list>
 #include <set>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "source/opt/instruction.h"
@@ -49,17 +51,15 @@ inline bool operator<(const Use& lhs, const Use& rhs) {
   return lhs.operand_index < rhs.operand_index;
 }
 
+// Definition and user pair.
+//
+// The first element of the pair is the definition.
+// The second element of the pair is the user.
+//
 // Definition should never be null. User can be null, however, such an entry
 // should be used only for searching (e.g. all users of a particular definition)
 // and never stored in a container.
-struct UserEntry {
-  Instruction* def;
-  Instruction* user;
-};
-
-inline bool operator==(const UserEntry& lhs, const UserEntry& rhs) {
-  return lhs.def == rhs.def && lhs.user == rhs.user;
-}
+using UserEntry = std::pair<Instruction*, Instruction*>;
 
 // Orders UserEntry for use in associative containers (i.e. less than ordering).
 //
@@ -72,24 +72,24 @@ inline bool operator==(const UserEntry& lhs, const UserEntry& rhs) {
 // definition (i.e. using {def, nullptr}).
 struct UserEntryLess {
   bool operator()(const UserEntry& lhs, const UserEntry& rhs) const {
-    // If lhs.def and rhs.def are both null, fall through to checking the
+    // If lhs.first and rhs.first are both null, fall through to checking the
     // second entries.
-    if (!lhs.def && rhs.def) return true;
-    if (lhs.def && !rhs.def) return false;
+    if (!lhs.first && rhs.first) return true;
+    if (lhs.first && !rhs.first) return false;
 
     // If neither definition is null, then compare unique ids.
-    if (lhs.def && rhs.def) {
-      if (lhs.def->unique_id() < rhs.def->unique_id()) return true;
-      if (rhs.def->unique_id() < lhs.def->unique_id()) return false;
+    if (lhs.first && rhs.first) {
+      if (lhs.first->unique_id() < rhs.first->unique_id()) return true;
+      if (rhs.first->unique_id() < lhs.first->unique_id()) return false;
     }
 
     // Return false on equality.
-    if (!lhs.user && !rhs.user) return false;
-    if (!lhs.user) return true;
-    if (!rhs.user) return false;
+    if (!lhs.second && !rhs.second) return false;
+    if (!lhs.second) return true;
+    if (!rhs.second) return false;
 
     // If neither user is null then compare unique ids.
-    return lhs.user->unique_id() < rhs.user->unique_id();
+    return lhs.second->unique_id() < rhs.second->unique_id();
   }
 };
 
@@ -97,6 +97,7 @@ struct UserEntryLess {
 class DefUseManager {
  public:
   using IdToDefMap = std::unordered_map<uint32_t, Instruction*>;
+  using IdToUsersMap = std::set<UserEntry, UserEntryLess>;
 
   // Constructs a def-use manager from the given |module|. All internal messages
   // will be communicated to the outside via the given message |consumer|. This
@@ -190,12 +191,14 @@ class DefUseManager {
   // Returns the annotation instrunctions which are a direct use of the given
   // |id|. This means when the decorations are applied through decoration
   // group(s), this function will just return the OpGroupDecorate
-  // instruction(s) which refer to the given id as an operand. The OpDecorate
+  // instrcution(s) which refer to the given id as an operand. The OpDecorate
   // instructions which decorate the decoration group will not be returned.
   std::vector<Instruction*> GetAnnotations(uint32_t id) const;
 
   // Returns the map from ids to their def instructions.
   const IdToDefMap& id_to_defs() const { return id_to_def_; }
+  // Returns the map from instructions to their users.
+  const IdToUsersMap& id_to_users() const { return id_to_users_; }
 
   // Clear the internal def-use record of the given instruction |inst|. This
   // method will update the use information of the operand ids of |inst|. The
@@ -207,15 +210,16 @@ class DefUseManager {
   // Erases the records that a given instruction uses its operand ids.
   void EraseUseRecordsOfOperandIds(const Instruction* inst);
 
-  friend bool CompareAndPrintDifferences(const DefUseManager&,
-                                         const DefUseManager&);
+  friend bool operator==(const DefUseManager&, const DefUseManager&);
+  friend bool operator!=(const DefUseManager& lhs, const DefUseManager& rhs) {
+    return !(lhs == rhs);
+  }
 
-  // If |inst| has not already been analysed, then analyses its definition and
+  // If |inst| has not already been analysed, then analyses its defintion and
   // uses.
   void UpdateDefUse(Instruction* inst);
 
  private:
-  using IdToUsersMap = std::set<UserEntry, UserEntryLess>;
   using InstToUsedIdsMap =
       std::unordered_map<const Instruction*, std::vector<uint32_t>>;
 

@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "bgfx_p.h"
@@ -183,20 +183,12 @@ namespace bgfx { namespace d3d9
 		{ D3DFMT_UNKNOWN       }, // ATC,
 		{ D3DFMT_UNKNOWN       }, // ATCE,
 		{ D3DFMT_UNKNOWN       }, // ATCI,
-		{ D3DFMT_UNKNOWN       }, // ASTC4x4
-		{ D3DFMT_UNKNOWN       }, // ASTC5x4
-		{ D3DFMT_UNKNOWN       }, // ASTC5x5
-		{ D3DFMT_UNKNOWN       }, // ASTC6x5
-		{ D3DFMT_UNKNOWN       }, // ASTC6x6
-		{ D3DFMT_UNKNOWN       }, // ASTC8x5
-		{ D3DFMT_UNKNOWN       }, // ASTC8x6
-		{ D3DFMT_UNKNOWN       }, // ASTC8x8
-		{ D3DFMT_UNKNOWN       }, // ASTC10x5
-		{ D3DFMT_UNKNOWN       }, // ASTC10x6
-		{ D3DFMT_UNKNOWN       }, // ASTC10x8
-		{ D3DFMT_UNKNOWN       }, // ASTC10x10
-		{ D3DFMT_UNKNOWN       }, // ASTC12x10
-		{ D3DFMT_UNKNOWN       }, // ASTC12x12
+		{ D3DFMT_UNKNOWN       }, // ASTC4x4,
+		{ D3DFMT_UNKNOWN       }, // ASTC5x5,
+		{ D3DFMT_UNKNOWN       }, // ASTC6x6,
+		{ D3DFMT_UNKNOWN       }, // ASTC8x5,
+		{ D3DFMT_UNKNOWN       }, // ASTC8x6,
+		{ D3DFMT_UNKNOWN       }, // ASTC10x5,
 		{ D3DFMT_UNKNOWN       }, // Unknown
 		{ D3DFMT_A1            }, // R1
 		{ D3DFMT_A8            }, // A8
@@ -242,11 +234,8 @@ namespace bgfx { namespace d3d9
 		{ D3DFMT_UNKNOWN       }, // RGBA32I
 		{ D3DFMT_UNKNOWN       }, // RGBA32U
 		{ D3DFMT_A32B32G32R32F }, // RGBA32F
-		{ D3DFMT_R5G6B5        }, // B5G6R5
 		{ D3DFMT_R5G6B5        }, // R5G6B5
-		{ D3DFMT_A4R4G4B4      }, // BGRA4
 		{ D3DFMT_A4R4G4B4      }, // RGBA4
-		{ D3DFMT_A1R5G5B5      }, // BGR5A1
 		{ D3DFMT_A1R5G5B5      }, // RGB5A1
 		{ D3DFMT_A2B10G10R10   }, // RGB10A2
 		{ D3DFMT_UNKNOWN       }, // RG11B10F
@@ -463,37 +452,32 @@ namespace bgfx { namespace d3d9
 			// Reference(s):
 			// - https://web.archive.org/web/20190207230309/https://docs.microsoft.com/en-us/windows/desktop/direct3d9/d3dpresent-parameters
 			bx::memSet(&m_params, 0, sizeof(m_params) );
-			m_params.BackBufferWidth        = _init.resolution.width;
-			m_params.BackBufferHeight       = _init.resolution.height;
-			m_params.BackBufferFormat       = adapterFormat;
-			m_params.BackBufferCount        = bx::clamp<uint8_t>(_init.resolution.numBackBuffers, 2, BGFX_CONFIG_MAX_BACK_BUFFERS);
-			m_params.MultiSampleType        = D3DMULTISAMPLE_NONE;
-			m_params.MultiSampleQuality     = 0;
+			m_params.BackBufferWidth  = _init.resolution.width;
+			m_params.BackBufferHeight = _init.resolution.height;
+			m_params.BackBufferFormat = adapterFormat;
+			m_params.BackBufferCount  = bx::clamp<uint8_t>(_init.resolution.numBackBuffers, 2, BGFX_CONFIG_MAX_BACK_BUFFERS);
+			m_params.MultiSampleType  = D3DMULTISAMPLE_NONE;
+			m_params.MultiSampleQuality = 0;
 			m_params.EnableAutoDepthStencil = TRUE;
 			m_params.AutoDepthStencilFormat = D3DFMT_D24S8;
-			m_params.Flags                  = D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL;
+			m_params.Flags = D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL;
 
 			m_params.FullScreen_RefreshRateInHz = 0;
-			m_params.PresentationInterval       = D3DPRESENT_INTERVAL_IMMEDIATE;
-			m_params.SwapEffect                 = D3DSWAPEFFECT_DISCARD;
-			m_params.hDeviceWindow              = NULL;
-			m_params.Windowed                   = true;
-			m_params.BackBufferWidth            = _init.resolution.width;
-			m_params.BackBufferHeight           = _init.resolution.height;
+			m_params.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+			m_params.SwapEffect = D3DSWAPEFFECT_DISCARD;
+			m_params.hDeviceWindow = NULL;
+			m_params.Windowed = true;
 
-			const char* d3d9DllName =
-#if BX_PLATFORM_LINUX
-				"d3d9.so"
-#else
-				"d3d9.dll"
-#endif // BX_PLATFORM_LINUX
-				;
+			RECT rect;
+			GetWindowRect( (HWND)g_platformData.nwh, &rect);
+			m_params.BackBufferWidth  = rect.right-rect.left;
+			m_params.BackBufferHeight = rect.bottom-rect.top;
 
-			m_d3d9Dll = bx::dlopen(d3d9DllName);
+			m_d3d9Dll = bx::dlopen("d3d9.dll");
 
 			if (NULL == m_d3d9Dll)
 			{
-				BX_TRACE("Init error: Failed to load %s.", d3d9DllName);
+				BX_TRACE("Init error: Failed to load d3d9.dll.");
 				goto error;
 			}
 
@@ -729,7 +713,6 @@ namespace bgfx { namespace d3d9
 				| ( (m_caps.DevCaps2 & D3DDEVCAPS2_CAN_STRETCHRECT_FROM_TEXTURES) ? BGFX_CAPS_TEXTURE_BLIT : 0)
 				| BGFX_CAPS_TEXTURE_READ_BACK
 				| (m_occlusionQuerySupport ? BGFX_CAPS_OCCLUSION_QUERY : 0)
-				| ((m_caps.MaxVertexIndex > UINT16_MAX) ? BGFX_CAPS_INDEX32 : 0)
 				);
 
 			m_caps.NumSimultaneousRTs = bx::uint32_min(m_caps.NumSimultaneousRTs, BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS);
@@ -1151,7 +1134,7 @@ namespace bgfx { namespace d3d9
 
 			bx::StaticMemoryBlockWriter writer(mem->data, mem->size);
 			uint32_t magic = BGFX_CHUNK_MAGIC_TEX;
-			bx::write(&writer, magic, bx::ErrorAssert{});
+			bx::write(&writer, magic);
 
 			TextureCreate tc;
 			tc.m_width     = _width;
@@ -1162,7 +1145,7 @@ namespace bgfx { namespace d3d9
 			tc.m_format    = TextureFormat::Enum(texture.m_requestedFormat);
 			tc.m_cubeMap   = false;
 			tc.m_mem       = NULL;
-			bx::write(&writer, tc, bx::ErrorAssert{});
+			bx::write(&writer, tc);
 
 			texture.destroy(true);
 			texture.create(mem, texture.m_flags, 0);
@@ -1245,7 +1228,6 @@ namespace bgfx { namespace d3d9
 
 		void requestScreenShot(FrameBufferHandle _handle, const char* _filePath) override
 		{
-#if BX_PLATFORM_WINDOWS
 			IDirect3DSwapChain9* swapChain = isValid(_handle)
 				? m_frameBuffers[_handle.idx].m_swapChain
 				: m_swapChain
@@ -1309,10 +1291,6 @@ namespace bgfx { namespace d3d9
 
 			DX_CHECK(surface->UnlockRect() );
 			DX_RELEASE(surface, 0);
-#else
-			BX_TRACE("Screenshot not supported!");
-			BX_UNUSED(_handle, _filePath);
-#endif // BX_PLATFORM_WINDOWS
 		}
 
 		void updateViewName(ViewId _id, const char* _name) override
@@ -1587,6 +1565,11 @@ namespace bgfx { namespace d3d9
 		{
 			if (NULL != m_swapChain)
 			{
+				if (NULL != m_deviceEx)
+				{
+					DX_CHECK(m_deviceEx->WaitForVBlank(0) );
+				}
+
 				for (uint32_t ii = 0, num = m_numWindows; ii < num; ++ii)
 				{
 					HRESULT hr = S_OK;
@@ -2414,15 +2397,13 @@ namespace bgfx { namespace d3d9
 	{
 		bx::MemoryReader reader(_mem->data, _mem->size);
 
-		bx::ErrorAssert err;
-
 		uint32_t magic;
-		bx::read(&reader, magic, &err);
+		bx::read(&reader, magic);
 
 		const bool fragment = isShaderType(magic, 'F');
 
 		uint32_t hashIn;
-		bx::read(&reader, hashIn, &err);
+		bx::read(&reader, hashIn);
 
 		uint32_t hashOut;
 
@@ -2432,11 +2413,11 @@ namespace bgfx { namespace d3d9
 		}
 		else
 		{
-			bx::read(&reader, hashOut, &err);
+			bx::read(&reader, hashOut);
 		}
 
 		uint16_t count;
-		bx::read(&reader, count, &err);
+		bx::read(&reader, count);
 
 		m_numPredefined = 0;
 
@@ -2449,34 +2430,34 @@ namespace bgfx { namespace d3d9
 			for (uint32_t ii = 0; ii < count; ++ii)
 			{
 				uint8_t nameSize = 0;
-				bx::read(&reader, nameSize, &err);
+				bx::read(&reader, nameSize);
 
 				char name[256] = {};
-				bx::read(&reader, &name, nameSize, &err);
+				bx::read(&reader, &name, nameSize);
 				name[nameSize] = '\0';
 
 				uint8_t type = 0;
-				bx::read(&reader, type, &err);
+				bx::read(&reader, type);
 
 				uint8_t num = 0;
-				bx::read(&reader, num, &err);
+				bx::read(&reader, num);
 
 				uint16_t regIndex = 0;
-				bx::read(&reader, regIndex, &err);
+				bx::read(&reader, regIndex);
 
 				uint16_t regCount = 0;
-				bx::read(&reader, regCount, &err);
+				bx::read(&reader, regCount);
 
 				if (!isShaderVerLess(magic, 8) )
 				{
 					uint16_t texInfo = 0;
-					bx::read(&reader, texInfo, &err);
+					bx::read(&reader, texInfo);
 				}
 
 				if (!isShaderVerLess(magic, 10) )
 				{
 					uint16_t texFormat = 0;
-					bx::read(&reader, texFormat, &err);
+					bx::read(&reader, texFormat);
 				}
 
 				const char* kind = "invalid";
@@ -2529,7 +2510,7 @@ namespace bgfx { namespace d3d9
 		}
 
 		uint32_t shaderSize;
-		bx::read(&reader, shaderSize, &err);
+		bx::read(&reader, shaderSize);
 
 		const DWORD* code = (const DWORD*)reader.getDataPtr();
 
@@ -3054,16 +3035,8 @@ namespace bgfx { namespace d3d9
 							uint32_t size = useMipSize ? mip.m_size : mipSize;
 							switch (m_textureFormat)
 							{
-							case TextureFormat::R5G6B5:
-								bimg::imageConvert(bits, 16, bx::packB5G6R5, mip.m_data, bx::unpackR5G6B5, size);
-								break;
-
 							case TextureFormat::RGBA4:
 								bimg::imageConvert(bits, 16, bx::packBgra4, mip.m_data, bx::unpackRgba4, size);
-								break;
-
-							case TextureFormat::RGB5A1:
-								bimg::imageConvert(bits, 16, bx::packBgr5a1, mip.m_data, bx::unpackRgb5a1, size);
 								break;
 
 							default:
@@ -3123,16 +3096,8 @@ namespace bgfx { namespace d3d9
 			{
 				switch (m_textureFormat)
 				{
-				case TextureFormat::R5G6B5:
-					bimg::imageConvert(dst, 16, bx::packB5G6R5, src, bx::unpackR5G6B5, rectpitch);
-					break;
-
 				case TextureFormat::RGBA4:
 					bimg::imageConvert(dst, 16, bx::packBgra4, src, bx::unpackRgba4, rectpitch);
-					break;
-
-				case TextureFormat::RGB5A1:
-					bimg::imageConvert(dst, 16, bx::packBgr5a1, src, bx::unpackRgb5a1, rectpitch);
 					break;
 
 				default:
@@ -3551,7 +3516,7 @@ namespace bgfx { namespace d3d9
 		}
 	}
 
-	uint32_t TimerQueryD3D9::begin(uint32_t _resultIdx, uint32_t _frameNum)
+	uint32_t TimerQueryD3D9::begin(uint32_t _resultIdx)
 	{
 		while (0 == m_control.reserve(1) )
 		{
@@ -3565,7 +3530,6 @@ namespace bgfx { namespace d3d9
 		Query& query = m_query[idx];
 		query.m_resultIdx = _resultIdx;
 		query.m_ready     = false;
-		query.m_frameNum  = _frameNum;
 
 		query.m_disjoint->Issue(D3DISSUE_BEGIN);
 		query.m_begin->Issue(D3DISSUE_END);
@@ -3616,7 +3580,6 @@ namespace bgfx { namespace d3d9
 
 				Result& result = m_result[query.m_resultIdx];
 				--result.m_pending;
-				result.m_frameNum = query.m_frameNum;
 
 				result.m_frequency = freq;
 				result.m_begin     = timeBegin;
@@ -3767,7 +3730,7 @@ namespace bgfx { namespace d3d9
 		device->BeginScene();
 		if (m_timerQuerySupport)
 		{
-			frameQueryIdx = m_gpuTimer.begin(BGFX_CONFIG_MAX_VIEWS, _render->m_frameNum);
+			frameQueryIdx = m_gpuTimer.begin(BGFX_CONFIG_MAX_VIEWS);
 		}
 
 		if (0 < _render->m_iboffset)
@@ -4027,7 +3990,6 @@ namespace bgfx { namespace d3d9
 
 				if ( (0
 					 | BGFX_STATE_CULL_MASK
-//					 | BGFX_STATE_FRONT_CCW
 					 | BGFX_STATE_WRITE_Z
 					 | BGFX_STATE_DEPTH_TEST_MASK
 					 | BGFX_STATE_WRITE_RGB
@@ -4463,7 +4425,6 @@ namespace bgfx { namespace d3d9
 		perfStats.numCompute    = statsKeyType[1];
 		perfStats.numBlit       = _render->m_numBlitItems;
 		perfStats.maxGpuLatency = maxGpuLatency;
-		perfStats.gpuFrameNum   = result.m_frameNum;
 		bx::memCopy(perfStats.numPrims, statsNumPrimsRendered, sizeof(perfStats.numPrims) );
 		m_nvapi.getMemoryInfo(perfStats.gpuMemoryUsed, perfStats.gpuMemoryMax);
 

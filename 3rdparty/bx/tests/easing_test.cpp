@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #include "test.h"
@@ -42,7 +42,7 @@ TEST_CASE("easing", "")
 					if (vv >= ys
 					&&  vv <  ye)
 					{
-						bx::write(writer, &err, "*");
+						bx::write(writer, "*");
 						break;
 					}
 				}

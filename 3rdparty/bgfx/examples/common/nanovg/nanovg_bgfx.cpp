@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 //
@@ -762,24 +762,12 @@ namespace
 
 		if (gl->ncalls > 0)
 		{
-			int avail = bgfx::getAvailTransientVertexBuffer(gl->nverts, s_nvgLayout);
-			if (avail < gl->nverts)
-			{
-				gl->nverts = avail;
-				BX_WARN(true, "Vertex number truncated due to transient vertex buffer overflow");
-				if (gl->nverts < 2)
-				{
-					goto _cleanup;
-				}
-			}
-
 			bgfx::allocTransientVertexBuffer(&gl->tvb, gl->nverts, s_nvgLayout);
 
 			int allocated = gl->tvb.size/gl->tvb.stride;
 
 			if (allocated < gl->nverts)
 			{
-				// this branch should never be taken as we've already checked the transient vertex buffer size
 				gl->nverts = allocated;
 				BX_WARN(true, "Vertex number truncated due to transient vertex buffer overflow");
 			}
@@ -817,7 +805,6 @@ namespace
 			}
 		}
 
-_cleanup:
 		// Reset calls
 		gl->nverts    = 0;
 		gl->npaths    = 0;

@@ -1,0 +1,8 @@
+glsl_compiler
+glsl_parser.output
+builtincompiler
+glsl_test
+subtest-cr/
+subtest-lf/
+subtest-cr-lf/
+subtest-lf-cr/

@@ -1,6 +1,6 @@
 /*
  * Copyright 2021 elven cache. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 /*
@@ -249,10 +249,9 @@ public:
 		m_reset  = BGFX_RESET_VSYNC;
 
 		bgfx::Init init;
-		init.type     = args.m_type;
-		init.vendorId = args.m_pciId;
-		init.platformData.nwh  = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
-		init.platformData.ndt  = entry::getNativeDisplayHandle();
+		init.type = args.m_type;
+
+		init.vendorId          = args.m_pciId;
 		init.resolution.width  = m_width;
 		init.resolution.height = m_height;
 		init.resolution.reset  = m_reset;
@@ -824,7 +823,7 @@ public:
 				ImGui::Combo("spatial sample extent", &m_spatialSampleType, "three\0five\0\0");
 				if (ImGui::IsItemHovered() )
 				{
-					ImGui::SetTooltip("select 3x3 or 5x5 filter kernel");
+					ImGui::SetTooltip("select 3x3 or 5x5 filter kernal");
 				}
 
 				ImGui::SliderFloat("sigma z", &m_sigmaDepth, 0.0f, 0.1f, "%.5f");
@@ -1062,7 +1061,7 @@ public:
 	// Shader uniforms
 	Uniforms m_uniforms;
 
-	// Uniforms to identify texture samplers
+	// Uniforms to indentify texture samplers
 	bgfx::UniformHandle s_albedo;
 	bgfx::UniformHandle s_color;
 	bgfx::UniformHandle s_normal;

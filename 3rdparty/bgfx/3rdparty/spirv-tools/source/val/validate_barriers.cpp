@@ -50,8 +50,7 @@ spv_result_t BarriersPass(ValidationState_t& _, const Instruction* inst) {
                       *message =
                           "OpControlBarrier requires one of the following "
                           "Execution "
-                          "Models: TessellationControl, GLCompute, Kernel, "
-                          "MeshNV or TaskNV";
+                          "Models: TessellationControl, GLCompute or Kernel";
                     }
                     return false;
                   }

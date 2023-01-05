@@ -1,13 +1,11 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_ERROR_H_HEADER_GUARD
 #	error "Must be included from bx/error!"
 #endif // BX_ERROR_H_HEADER_GUARD
-
-#include <bx/debug.h>
 
 namespace bx
 {
@@ -61,47 +59,10 @@ namespace bx
 		return _rhs.code != m_code;
 	}
 
-	inline ErrorIgnore::operator Error*()
-	{
-		return this;
-	}
-
-	inline ErrorAssert::~ErrorAssert()
-	{
-		BX_ASSERT(isOk(), "Error: 0x%08x `%S`"
-			, get().code
-			, &getMessage()
-			);
-	}
-
-	inline ErrorFatal::operator Error*()
-	{
-		return this;
-	}
-
-	inline ErrorFatal::~ErrorFatal()
-	{
-		if (!isOk() )
-		{
-			printf("Error: 0x%08x `%S`"
-				, get().code
-				, &getMessage()
-				);
-
-			exit(kExitFailure);
-		}
-	}
-
-	inline ErrorAssert::operator Error*()
-	{
-		return this;
-	}
-
 	inline ErrorScope::ErrorScope(Error* _err, const StringView& _name)
 		: m_err(_err)
 		, m_name(_name)
 	{
-		BX_UNUSED(m_err);
 		BX_ASSERT(NULL != _err, "_err can't be NULL");
 	}
 
@@ -109,17 +70,20 @@ namespace bx
 	{
 		if (m_name.isEmpty() )
 		{
-			BX_ASSERT(m_err->isOk(), "Error: 0x%08x `%S`"
+			BX_ASSERT(m_err->isOk(), "Error: 0x%08x `%.*s`"
 				, m_err->get().code
-				, &m_err->getMessage()
+				, m_err->getMessage().getLength()
+				, m_err->getMessage().getPtr()
 				);
 		}
 		else
 		{
-			BX_ASSERT(m_err->isOk(), "Error: %S - 0x%08x `%S`"
-				, &m_name
+			BX_ASSERT(m_err->isOk(), "Error: %.*s - 0x%08x `%.*s`"
+				, m_name.getLength()
+				, m_name.getPtr()
 				, m_err->get().code
-				, &m_err->getMessage()
+				, m_err->getMessage().getLength()
+				, m_err->getMessage().getPtr()
 				);
 		}
 	}

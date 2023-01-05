@@ -1,6 +1,6 @@
 /*
  * Copyright 2018 Ales Mlakar. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
  /*
@@ -17,6 +17,7 @@
 #include "bgfx_utils.h"
 #include "imgui/imgui.h"
 #include "camera.h"
+#include "bounds.h"
 #include "vt.h"
 
 namespace
@@ -78,13 +79,12 @@ public:
 		m_reset = BGFX_RESET_VSYNC;
 
 		bgfx::Init init;
-		init.type     = args.m_type;
+
+		init.type = args.m_type;
 		init.vendorId = args.m_pciId;
-		init.platformData.nwh  = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
-		init.platformData.ndt  = entry::getNativeDisplayHandle();
-		init.resolution.width  = m_width;
+		init.resolution.width = m_width;
 		init.resolution.height = m_height;
-		init.resolution.reset  = m_reset;
+		init.resolution.reset = m_reset;
 		bgfx::init(init);
 
 		// Enable m_debug text.

@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef BGFX_GLCONTEXT_HTML5_H_HEADER_GUARD
@@ -17,11 +17,10 @@ namespace bgfx { namespace gl
 		GlContext()
 			: m_current(NULL)
 			, m_primary(NULL)
-			, m_msaaContext(false)
 		{
 		}
 
-		void create(uint32_t _width, uint32_t _height, uint32_t _flags);
+		void create(uint32_t _width, uint32_t _height);
 		void destroy();
 		void resize(uint32_t _width, uint32_t _height, uint32_t _flags);
 
@@ -40,8 +39,6 @@ namespace bgfx { namespace gl
 
         SwapChainGL* m_current;
 		SwapChainGL* m_primary;
-		// true when MSAA is handled by the context instead of using MSAA FBO
-		bool m_msaaContext;
 	};
 } /* namespace gl */ } // namespace bgfx
 

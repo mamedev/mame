@@ -1,6 +1,6 @@
 /*
 * Copyright 2013 Jeremie Roy. All rights reserved.
-* License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+* License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 */
 
 #include "text_metrics.h"

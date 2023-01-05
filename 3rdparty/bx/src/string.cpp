@@ -1,8 +1,9 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
+#include "bx_p.h"
 #include <bx/allocator.h>
 #include <bx/file.h>
 #include <bx/hash.h>
@@ -134,7 +135,7 @@ namespace bx
 	{
 		for (int32_t ii = 0; ii < _len; ++ii)
 		{
-			_inOutStr[ii] = toLower(_inOutStr[ii]);
+			*_inOutStr = toLower(*_inOutStr);
 		}
 	}
 
@@ -153,7 +154,7 @@ namespace bx
 	{
 		for (int32_t ii = 0; ii < _len; ++ii)
 		{
-			_inOutStr[ii] = toUpper(_inOutStr[ii]);
+			*_inOutStr = toUpper(*_inOutStr);
 		}
 	}
 
@@ -412,7 +413,7 @@ namespace bx
 				++ptr;
 				--stringLen;
 
-				// Search pattern length can't be longer than the string.
+				// Search pattern lenght can't be longer than the string.
 				if (findLen > stringLen)
 				{
 					return NULL;
@@ -480,7 +481,7 @@ namespace bx
 			}
 		}
 
-		return StringView(_str.getTerm(), _str.getTerm() );
+		return _str;
 	}
 
 	StringView strLTrimSpace(const StringView& _str)
@@ -523,9 +524,7 @@ namespace bx
 				{
 					return StringView(ptr, ii + 1);
 				}
-		}
-
-			return StringView(_str.getPtr(), _str.getPtr());
+			}
 		}
 
 		return _str;
@@ -544,8 +543,6 @@ namespace bx
 					return StringView(ptr, ii + 1);
 				}
 			}
-			
-			return StringView(_str.getPtr(), _str.getPtr());
 		}
 
 		return _str;
@@ -816,11 +813,6 @@ namespace bx
 			return write(_writer, _str, _param.prec, _param, _err);
 		}
 
-		static int32_t write(WriterI* _writer, const StringView& _str, const Param& _param, Error* _err)
-		{
-			return write(_writer, _str.getPtr(), min(_param.prec, _str.getLength() ), _param, _err);
-		}
-
 		static int32_t write(WriterI* _writer, int32_t _i, const Param& _param, Error* _err)
 		{
 			char str[33];
@@ -883,39 +875,30 @@ namespace bx
 				return 0;
 			}
 
+			if (_param.upper)
+			{
+				toUpperUnsafe(str, len);
+			}
+
 			const char* dot = strFind(str, INT32_MAX, '.');
 			if (NULL != dot)
 			{
-				const int32_t prec   = INT32_MAX == _param.prec ? 6 : _param.prec;
-				const char* strEnd   = str + len;
-				const char* exponent = strFind(str, INT32_MAX, 'e');
-				const char* fracEnd  = NULL != exponent ? exponent : strEnd;
-
-				char* fracBegin = &str[dot - str + min(prec + _param.spec, 1)];
-				const int32_t curPrec = int32_t(fracEnd - fracBegin);
-
-				// Move exponent to its final location after trimming or adding extra 0s.
-				if (fracEnd != strEnd)
+				const int32_t prec = INT32_MAX == _param.prec ? 6 : _param.prec;
+				const int32_t precLen = int32_t(
+						dot
+						+ uint32_min(prec + _param.spec, 1)
+						+ prec
+						- str
+						);
+				if (precLen > len)
 				{
-					const int32_t exponentLen = int32_t(strEnd - fracEnd);
-					char* finalExponentPtr = &fracBegin[prec];
-					memMove(finalExponentPtr, fracEnd, exponentLen);
-
-					finalExponentPtr[exponentLen] = '\0';
-					len = int32_t(&finalExponentPtr[exponentLen] - str);
-				}
-				else
-				{
-					len = (int32_t)(fracBegin + prec - str);
-				}
-
-				if (curPrec < prec)
-				{
-					for (int32_t ii = curPrec; ii < prec; ++ii)
+					for (int32_t ii = len; ii < precLen; ++ii)
 					{
-						fracBegin[ii] = '0';
+						str[ii] = '0';
 					}
+					str[precLen] = '\0';
 				}
+				len = precLen;
 			}
 
 			return write(_writer, str, len, _param, _err);
@@ -956,22 +939,17 @@ namespace bx
 			}
 			else if ('%' == ch)
 			{
-				// %[Flags][Width][.Precision][Leegth]Type
-				read(&reader, ch, &err);
+				// %[flags][width][.precision][length sub-specifier]specifier
+				read(&reader, ch);
 
 				Param param;
 
-				// Reference(s):
-				//  - Flags field
-				//    https://en.wikipedia.org/wiki/Printf_format_string#Flags_field
-				//
-				while (err.isOk()
-				&& (   ' ' == ch
+				// flags
+				while (' ' == ch
 				||     '-' == ch
 				||     '+' == ch
 				||     '0' == ch
 				||     '#' == ch)
-				   )
 				{
 					switch (ch)
 					{
@@ -983,7 +961,7 @@ namespace bx
 						case '#': param.spec = true; break;
 					}
 
-					read(&reader, ch, &err);
+					read(&reader, ch);
 				}
 
 				if (param.left)
@@ -991,13 +969,10 @@ namespace bx
 					param.fill = ' ';
 				}
 
-				// Reference(s):
-				//  - Width field
-				//    https://en.wikipedia.org/wiki/Printf_format_string#Width_field
-				//
+				// width
 				if ('*' == ch)
 				{
-					read(&reader, ch, &err);
+					read(&reader, ch);
 					param.width = va_arg(_argList, int32_t);
 
 					if (0 > param.width)
@@ -1009,57 +984,49 @@ namespace bx
 				}
 				else
 				{
-					while (err.isOk()
-					&&     isNumeric(ch) )
+					while (isNumeric(ch) )
 					{
 						param.width = param.width * 10 + ch - '0';
-						read(&reader, ch, &err);
+						read(&reader, ch);
 					}
 				}
 
-				// Reference(s):
-				//  - Precision field
-				//    https://en.wikipedia.org/wiki/Printf_format_string#Precision_field
+				// .precision
 				if ('.' == ch)
 				{
-					read(&reader, ch, &err);
+					read(&reader, ch);
 
 					if ('*' == ch)
 					{
-						read(&reader, ch, &err);
+						read(&reader, ch);
 						param.prec = va_arg(_argList, int32_t);
 					}
 					else
 					{
 						param.prec = 0;
-						while (err.isOk()
-						&&     isNumeric(ch) )
+						while (isNumeric(ch) )
 						{
 							param.prec = param.prec * 10 + ch - '0';
-							read(&reader, ch, &err);
+							read(&reader, ch);
 						}
 					}
 				}
 
-				// Reference(s):
-				//  - Length field
-				//    https://en.wikipedia.org/wiki/Printf_format_string#Length_field
-				while (err.isOk()
-				&& (   'h' == ch
+				// length sub-specifier
+				while ('h' == ch
 				||     'I' == ch
 				||     'l' == ch
 				||     'j' == ch
 				||     't' == ch
 				||     'z' == ch)
-				   )
 				{
 					switch (ch)
 					{
 						default: break;
 
 						case 'j': param.bits = sizeof(intmax_t )*8; break;
-						case 't': param.bits = sizeof(ptrdiff_t)*8; break;
-						case 'z': param.bits = sizeof(size_t   )*8; break;
+						case 't': param.bits = sizeof(size_t   )*8; break;
+						case 'z': param.bits = sizeof(ptrdiff_t)*8; break;
 
 						case 'h': case 'I': case 'l':
 							switch (ch)
@@ -1069,14 +1036,14 @@ namespace bx
 								default: break;
 							}
 
-							read(&reader, ch, &err);
+							read(&reader, ch);
 							switch (ch)
 							{
 								case 'h': param.bits = sizeof(signed char  )*8; break;
 								case 'l': param.bits = sizeof(long long int)*8; break;
 								case '3':
 								case '6':
-									read(&reader, ch, &err);
+									read(&reader, ch);
 									switch (ch)
 									{
 										case '2': param.bits = sizeof(int32_t)*8; break;
@@ -1090,18 +1057,11 @@ namespace bx
 							break;
 					}
 
-					read(&reader, ch, &err);
+					read(&reader, ch);
 				}
 
-				if (!err.isOk() )
-				{
-					break;
-				}
-
-				// Reference(s):
-				//  - Type field
-				//    https://en.wikipedia.org/wiki/Printf_format_string#Type_field
-				switch (ch)
+				// specifier
+				switch (toLower(ch) )
 				{
 					case 'c':
 						size += write(_writer, char(va_arg(_argList, int32_t) ), param, _err);
@@ -1109,10 +1069,6 @@ namespace bx
 
 					case 's':
 						size += write(_writer, va_arg(_argList, const char*), param, _err);
-						break;
-
-					case 'S':
-						size += write(_writer, *va_arg(_argList, const StringView*), param, _err);
 						break;
 
 					case 'o':
@@ -1135,11 +1091,8 @@ namespace bx
 						break;
 
 					case 'e':
-					case 'E':
 					case 'f':
-					case 'F':
 					case 'g':
-					case 'G':
 						param.upper = isUpper(ch);
 						size += write(_writer, va_arg(_argList, double), param, _err);
 						break;
@@ -1149,7 +1102,6 @@ namespace bx
 						break;
 
 					case 'x':
-					case 'X':
 						param.base  = 16;
 						param.upper = isUpper(ch);
 						switch (param.bits)
@@ -1166,10 +1118,6 @@ namespace bx
 						default: size += write(_writer, va_arg(_argList, uint32_t), param, _err); break;
 						case 64: size += write(_writer, va_arg(_argList, uint64_t), param, _err); break;
 						}
-						break;
-
-					case 'n':
-						*va_arg(_argList, int32_t*) = size;
 						break;
 
 					default:

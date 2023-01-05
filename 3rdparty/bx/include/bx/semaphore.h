@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_SEM_H_HEADER_GUARD
@@ -15,6 +15,7 @@ namespace bx
 	{
 		BX_CLASS(Semaphore
 			, NO_COPY
+			, NO_ASSIGNMENT
 			);
 
 	public:

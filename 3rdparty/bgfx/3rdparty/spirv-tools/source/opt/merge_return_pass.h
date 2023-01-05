@@ -118,6 +118,8 @@ class MergeReturnPass : public MemPass {
     StructuredControlState(Instruction* break_merge, Instruction* merge)
         : break_merge_(break_merge), current_merge_(merge) {}
 
+    StructuredControlState(const StructuredControlState&) = default;
+
     bool InBreakable() const { return break_merge_; }
     bool InStructuredFlow() const { return CurrentMergeId() != 0; }
 
@@ -245,7 +247,7 @@ class MergeReturnPass : public MemPass {
 
   // Add new phi nodes for any id that no longer dominate all of it uses.  A phi
   // node is added to a block |bb| for an id if the id is defined between the
-  // original immediate dominator of |bb| and its new immediate dominator.  It
+  // original immediate dominator of |bb| and its new immidiate dominator.  It
   // is assumed that at this point there are no unreachable blocks in the
   // control flow graph.
   void AddNewPhiNodes();
@@ -271,11 +273,11 @@ class MergeReturnPass : public MemPass {
   void InsertAfterElement(BasicBlock* element, BasicBlock* new_element,
                           std::list<BasicBlock*>* list);
 
-  // Creates a single case switch around all of the executable code of the
+  // Creates a single case switch around all of the exectuable code of the
   // current function where the switch and case value are both zero and the
   // default is the merge block. Returns after the switch is executed. Sets
   // |final_return_block_|.
-  bool AddSingleCaseSwitchAroundFunction();
+  void AddSingleCaseSwitchAroundFunction();
 
   // Creates a new basic block that branches to |header_label_id|.  Returns the
   // new basic block.  The block will be the second last basic block in the
@@ -284,7 +286,7 @@ class MergeReturnPass : public MemPass {
 
   // Creates a one case switch around the executable code of the function with
   // |merge_target| as the merge node.
-  bool CreateSingleCaseSwitch(BasicBlock* merge_target);
+  void CreateSingleCaseSwitch(BasicBlock* merge_target);
 
   // Returns true if |function| has an unreachable block that is not a continue
   // target that simply branches back to the header, or a merge block containing

@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bimg/blob/master/LICENSE
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bimg#license-bsd-2-clause
  */
 
 #include "bimg_p.h"
@@ -491,6 +491,7 @@ namespace bimg
 				if (UINT8_MAX != idxR)
 				{
 					const bool asFloat = exrHeader.pixel_types[idxR] == TINYEXR_PIXELTYPE_FLOAT;
+					uint32_t srcBpp = 32;
 					uint32_t dstBpp = asFloat ? 32 : 16;
 					format = asFloat ? TextureFormat::R32F : TextureFormat::R16F;
 					uint32_t stepR = 1;
@@ -500,6 +501,7 @@ namespace bimg
 
 					if (UINT8_MAX != idxG)
 					{
+						srcBpp += 32;
 						dstBpp = asFloat ? 64 : 32;
 						format = asFloat ? TextureFormat::RG32F : TextureFormat::RG16F;
 						stepG  = 1;
@@ -507,6 +509,7 @@ namespace bimg
 
 					if (UINT8_MAX != idxB)
 					{
+						srcBpp += 32;
 						dstBpp = asFloat ? 128 : 64;
 						format = asFloat ? TextureFormat::RGBA32F : TextureFormat::RGBA16F;
 						stepB  = 1;
@@ -514,6 +517,7 @@ namespace bimg
 
 					if (UINT8_MAX != idxA)
 					{
+						srcBpp += 32;
 						dstBpp = asFloat ? 128 : 64;
 						format = asFloat ? TextureFormat::RGBA32F : TextureFormat::RGBA16F;
 						stepA  = 1;

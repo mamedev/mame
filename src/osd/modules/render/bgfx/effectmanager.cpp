@@ -43,10 +43,9 @@ static bool prepare_effect_document(std::string &name, osd_options &options, rap
 		return false;
 	}
 
-	bx::ErrorAssert err;
 	int32_t size (bx::getSize(&reader));
 	char* data = new char[size + 1];
-	bx::read(&reader, reinterpret_cast<void*>(data), size, &err);
+	bx::read(&reader, reinterpret_cast<void*>(data), size);
 	bx::close(&reader);
 	data[size] = 0;
 

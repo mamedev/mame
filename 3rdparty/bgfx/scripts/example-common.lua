@@ -1,12 +1,13 @@
 --
--- Copyright 2010-2022 Branimir Karadzic. All rights reserved.
--- License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+-- Copyright 2010-2021 Branimir Karadzic. All rights reserved.
+-- License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 --
 
 project ("example-glue")
 	kind "StaticLib"
 
 	includedirs {
+		path.join(BX_DIR,   "include"),
 		path.join(BIMG_DIR, "include"),
 		path.join(BGFX_DIR, "include"),
 		path.join(BGFX_DIR, "3rdparty"),
@@ -16,14 +17,11 @@ project ("example-glue")
 		path.join(BGFX_DIR, "examples/common/example-glue.cpp"),
 	}
 
-	using_bx()
-
-	configuration {}
-
 project ("example-common")
 	kind "StaticLib"
 
 	includedirs {
+		path.join(BX_DIR,   "include"),
 		path.join(BIMG_DIR, "include"),
 		path.join(BGFX_DIR, "include"),
 		path.join(BGFX_DIR, "3rdparty"),
@@ -37,8 +35,6 @@ project ("example-common")
 		path.join(BGFX_DIR, "examples/common/**.cpp"),
 		path.join(BGFX_DIR, "examples/common/**.h"),
 	}
-
-	using_bx()
 
 	if filesexist(BGFX_DIR, path.join(BGFX_DIR, "../bgfx-gnm"),
 		{ path.join(BGFX_DIR, "../bgfx-gnm/examples/common/entry/entry_orbis.cpp") }) then
@@ -81,11 +77,6 @@ project ("example-common")
 		}
 	end
 
-	configuration { "android-*" }
-		includedirs {
-			path.join(BGFX_DIR, "3rdparty/native_app_glue")
-		}
-
 	configuration { "osx* or ios* or tvos*" }
 		files {
 			path.join(BGFX_DIR, "examples/common/**.mm"),
@@ -99,5 +90,3 @@ project ("example-common")
 			"/ignore:4264" -- LNK4264: archiving object file compiled with /ZW into a static library; note that when authoring Windows Runtime types it is not recommended to link with a static library that contains Windows Runtime metadata
 		}
 		premake.vstudio.splashpath = "../../../examples/runtime/images/SplashScreen.png"
-
-	configuration {}

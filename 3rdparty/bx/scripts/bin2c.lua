@@ -1,17 +1,23 @@
 --
--- Copyright 2010-2022 Branimir Karadzic. All rights reserved.
--- License: https://github.com/bkaradzic/bx/blob/master/LICENSE
+-- Copyright 2010-2021 Branimir Karadzic. All rights reserved.
+-- License: https://github.com/bkaradzic/bx#license-bsd-2-clause
 --
 
 project "bin2c"
 	kind "ConsoleApp"
+
+	includedirs {
+		"../include",
+	}
 
 	files {
 		"../tools/bin2c/**.cpp",
 		"../tools/bin2c/**.h",
 	}
 
-	using_bx()
+	links {
+		"bx",
+	}
 
 	configuration { "mingw-*" }
 		targetextension ".exe"
@@ -19,10 +25,6 @@ project "bin2c"
 	configuration { "linux-*" }
 		links {
 			"pthread",
-		}
-	configuration { "osx-*" }
-		linkoptions {
-			"-framework Foundation"
 		}
 
 	configuration { "vs20* or mingw*" }

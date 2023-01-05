@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "entry_p.h"
@@ -65,17 +65,6 @@ namespace entry
 	void setMouseLock(WindowHandle _handle, bool _lock)
 	{
 		BX_UNUSED(_handle, _lock);
-	}
-
-	void* getNativeWindowHandle(WindowHandle _handle)
-	{
-		BX_UNUSED(_handle);
-		return NULL;
-	}
-
-	void* getNativeDisplayHandle()
-	{
-		return NULL;
 	}
 
 } // namespace entry

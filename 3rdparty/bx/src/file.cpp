@@ -1,8 +1,9 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
+ * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
+#include "bx_p.h"
 #include <bx/file.h>
 
 #ifndef BX_CONFIG_CRT_FILE_READER_WRITER
@@ -279,7 +280,7 @@ namespace bx
 				return false;
 			}
 
-			m_fd = crt0::open(_filePath.getCPtr(), crt0::Open::Read, 0);
+			m_fd = crt0::open(_filePath.get(), crt0::Open::Read, 0);
 
 			if (0 >= m_fd)
 			{
@@ -360,7 +361,7 @@ namespace bx
 				return false;
 			}
 
-			m_fd = crt0::open(_filePath.getCPtr(), _append ? crt0::Open::Append : crt0::Open::Write, 0600);
+			m_fd = crt0::open(_filePath.get(), _append ? crt0::Open::Append : crt0::Open::Write, 0600);
 
 			if (0 >= m_fd)
 			{
@@ -922,7 +923,7 @@ namespace bx
 		Error err;
 		DirectoryReader dr;
 
-		if (!open(&dr, _filePath, &err) )
+		if (!bx::open(&dr, _filePath) )
 		{
 			BX_ERROR_SET(_err, kErrorNotDirectory, "File already exist, and is not directory.");
 			return false;
@@ -930,7 +931,7 @@ namespace bx
 
 		while (err.isOk() )
 		{
-			read(&dr, fi, &err);
+			bx::read(&dr, fi, &err);
 
 			if (err.isOk() )
 			{
@@ -950,7 +951,7 @@ namespace bx
 			}
 		}
 
-		close(&dr);
+		bx::close(&dr);
 
 		return remove(_filePath, _err);
 	}

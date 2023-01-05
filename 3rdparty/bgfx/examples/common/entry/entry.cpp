@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include <bx/bx.h>
@@ -443,27 +443,12 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		return bx::kExitFailure;
 	}
 
-	struct AppInternal
-	{
-		AppI* m_next;
-		const char* m_name;
-		const char* m_description;
-		const char* m_url;
-	};
-
-	static ptrdiff_t s_offset = 0;
-
 	AppI::AppI(const char* _name, const char* _description, const char* _url)
 	{
-		BX_STATIC_ASSERT(sizeof(AppInternal) <= sizeof(m_internal) );
-		s_offset = BX_OFFSETOF(AppI, m_internal);
-
-		AppInternal* ai = (AppInternal*)m_internal;
-
-		ai->m_name        = _name;
-		ai->m_description = _description;
-		ai->m_url         = _url;
-		ai->m_next        = s_apps;
+		m_name        = _name;
+		m_description = _description;
+		m_url         = _url;
+		m_next        = s_apps;
 
 		s_apps = this;
 		s_numApps++;
@@ -479,8 +464,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 			{
 				if (NULL != prev)
 				{
-					AppInternal* ai = bx::addressOf<AppInternal>(prev, s_offset);
-					ai->m_next = next;
+					prev->m_next = next;
 				}
 				else
 				{
@@ -496,26 +480,22 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 	const char* AppI::getName() const
 	{
-		AppInternal* ai = (AppInternal*)m_internal;
-		return ai->m_name;
+		return m_name;
 	}
 
 	const char* AppI::getDescription() const
 	{
-		AppInternal* ai = (AppInternal*)m_internal;
-		return ai->m_description;
+		return m_description;
 	}
 
 	const char* AppI::getUrl() const
 	{
-		AppInternal* ai = (AppInternal*)m_internal;
-		return ai->m_url;
+		return m_url;
 	}
 
 	AppI* AppI::getNext()
 	{
-		AppInternal* ai = (AppInternal*)m_internal;
-		return ai->m_next;
+		return m_next;
 	}
 
 	AppI* getFirstApp()
@@ -533,7 +513,8 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		_app->init(_argc, _argv, s_width, s_height);
 		bgfx::frame();
 
-		setWindowSize(kDefaultWindowHandle, s_width, s_height);
+		WindowHandle defaultWindow = { 0 };
+		setWindowSize(defaultWindow, s_width, s_height);
 
 #if BX_PLATFORM_EMSCRIPTEN
 		s_app = _app;
@@ -579,15 +560,9 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		for (ii = 1; ii < s_numApps; ++ii)
 		{
 			AppI* app = apps[ii-1];
-
-			AppInternal* ai = bx::addressOf<AppInternal>(app, s_offset);
-			ai->m_next = apps[ii];
+			app->m_next = apps[ii];
 		}
-
-		{
-			AppInternal* ai = bx::addressOf<AppInternal>(apps[s_numApps-1], s_offset);
-			ai->m_next = NULL;
-		}
+		apps[s_numApps-1]->m_next = NULL;
 
 		BX_FREE(g_allocator, apps);
 	}
@@ -608,12 +583,14 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		inputInit();
 		inputAddBindings("bindings", s_bindings);
 
+		entry::WindowHandle defaultWindow = { 0 };
+
 		bx::FilePath fp(_argv[0]);
 		char title[bx::kMaxFilePath];
 		bx::strCopy(title, BX_COUNTOF(title), fp.getBaseName() );
 
-		entry::setWindowTitle(kDefaultWindowHandle, title);
-		setWindowSize(kDefaultWindowHandle, ENTRY_DEFAULT_WIDTH, ENTRY_DEFAULT_HEIGHT);
+		entry::setWindowTitle(defaultWindow, title);
+		setWindowSize(defaultWindow, ENTRY_DEFAULT_WIDTH, ENTRY_DEFAULT_HEIGHT);
 
 		sortApps();
 
@@ -1026,14 +1003,4 @@ restart:
 extern "C" bool entry_process_events(uint32_t* _width, uint32_t* _height, uint32_t* _debug, uint32_t* _reset)
 {
 	return entry::processEvents(*_width, *_height, *_debug, *_reset, NULL);
-}
-
-extern "C" void* entry_get_default_native_window_handle()
-{
-	return entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
-}
-
-extern "C" void* entry_get_native_display_handle()
-{
-	return entry::getNativeDisplayHandle();
 }

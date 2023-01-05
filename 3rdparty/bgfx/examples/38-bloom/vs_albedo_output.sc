@@ -3,7 +3,7 @@ $output v_wpos, v_view, v_normal, v_tangent, v_bitangent, v_texcoord0
 
 /*
  * Copyright 2018 Eric Arnebäck. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "../common/common.sh"

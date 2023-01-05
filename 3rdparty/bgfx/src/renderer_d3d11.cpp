@@ -1,13 +1,12 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "bgfx_p.h"
 
 #if BGFX_CONFIG_RENDERER_DIRECT3D11
 #	include "renderer_d3d11.h"
-#	include <bx/pixelformat.h>
 
 namespace bgfx { namespace d3d11
 {
@@ -224,19 +223,11 @@ namespace bgfx { namespace d3d11
 		{ DXGI_FORMAT_UNKNOWN,            DXGI_FORMAT_UNKNOWN,               DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // ATCE
 		{ DXGI_FORMAT_UNKNOWN,            DXGI_FORMAT_UNKNOWN,               DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // ATCI
 		{ DXGI_FORMAT_ASTC_4X4_UNORM,     DXGI_FORMAT_ASTC_4X4_UNORM,        DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_ASTC_4X4_UNORM_SRGB  }, // ASTC4x4
-		{ DXGI_FORMAT_ASTC_5X4_UNORM,     DXGI_FORMAT_ASTC_5X4_UNORM,        DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_ASTC_5X4_UNORM_SRGB  }, // ASTC5x4
 		{ DXGI_FORMAT_ASTC_5X5_UNORM,     DXGI_FORMAT_ASTC_5X5_UNORM,        DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_ASTC_5X5_UNORM_SRGB  }, // ASTC5x5
-		{ DXGI_FORMAT_ASTC_6X5_UNORM,     DXGI_FORMAT_ASTC_6X5_UNORM,        DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_ASTC_6X5_UNORM_SRGB  }, // ASTC6x5
 		{ DXGI_FORMAT_ASTC_6X6_UNORM,     DXGI_FORMAT_ASTC_6X6_UNORM,        DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_ASTC_6X6_UNORM_SRGB  }, // ASTC6x6
 		{ DXGI_FORMAT_ASTC_8X5_UNORM,     DXGI_FORMAT_ASTC_8X5_UNORM,        DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_ASTC_8X5_UNORM_SRGB  }, // ASTC8x5
 		{ DXGI_FORMAT_ASTC_8X6_UNORM,     DXGI_FORMAT_ASTC_8X6_UNORM,        DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_ASTC_8X6_UNORM_SRGB  }, // ASTC8x6
-		{ DXGI_FORMAT_ASTC_8X8_UNORM,     DXGI_FORMAT_ASTC_8X8_UNORM,        DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_ASTC_8X8_UNORM_SRGB  }, // ASTC8x8
 		{ DXGI_FORMAT_ASTC_10X5_UNORM,    DXGI_FORMAT_ASTC_10X5_UNORM,       DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_ASTC_10X5_UNORM_SRGB }, // ASTC10x5
-		{ DXGI_FORMAT_ASTC_10X6_UNORM,    DXGI_FORMAT_ASTC_10X6_UNORM,       DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_ASTC_10X6_UNORM_SRGB }, // ASTC10x6
-		{ DXGI_FORMAT_ASTC_10X8_UNORM,    DXGI_FORMAT_ASTC_10X8_UNORM,       DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_ASTC_10X8_UNORM_SRGB }, // ASTC10x8
-		{ DXGI_FORMAT_ASTC_10X10_UNORM,   DXGI_FORMAT_ASTC_10X10_UNORM,      DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_ASTC_10X10_UNORM_SRGB}, // ASTC10x10
-		{ DXGI_FORMAT_ASTC_12X10_UNORM,   DXGI_FORMAT_ASTC_12X10_UNORM,      DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_ASTC_12X10_UNORM_SRGB}, // ASTC12x10
-		{ DXGI_FORMAT_ASTC_12X12_UNORM,   DXGI_FORMAT_ASTC_12X12_UNORM,      DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_ASTC_12X12_UNORM_SRGB}, // ASTC12x12
 		{ DXGI_FORMAT_UNKNOWN,            DXGI_FORMAT_UNKNOWN,               DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // Unknown
 		{ DXGI_FORMAT_R1_UNORM,           DXGI_FORMAT_R1_UNORM,              DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // R1
 		{ DXGI_FORMAT_A8_UNORM,           DXGI_FORMAT_A8_UNORM,              DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // A8
@@ -282,11 +273,8 @@ namespace bgfx { namespace d3d11
 		{ DXGI_FORMAT_R32G32B32A32_SINT,  DXGI_FORMAT_R32G32B32A32_SINT,     DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // RGBA32I
 		{ DXGI_FORMAT_R32G32B32A32_UINT,  DXGI_FORMAT_R32G32B32A32_UINT,     DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // RGBA32U
 		{ DXGI_FORMAT_R32G32B32A32_FLOAT, DXGI_FORMAT_R32G32B32A32_FLOAT,    DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // RGBA32F
-		{ DXGI_FORMAT_B5G6R5_UNORM,       DXGI_FORMAT_B5G6R5_UNORM,          DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // B5G6R5
 		{ DXGI_FORMAT_B5G6R5_UNORM,       DXGI_FORMAT_B5G6R5_UNORM,          DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // R5G6B5
-		{ DXGI_FORMAT_B4G4R4A4_UNORM,     DXGI_FORMAT_B4G4R4A4_UNORM,        DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // BGRA4
 		{ DXGI_FORMAT_B4G4R4A4_UNORM,     DXGI_FORMAT_B4G4R4A4_UNORM,        DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // RGBA4
-		{ DXGI_FORMAT_B5G5R5A1_UNORM,     DXGI_FORMAT_B5G5R5A1_UNORM,        DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // BGR5A1
 		{ DXGI_FORMAT_B5G5R5A1_UNORM,     DXGI_FORMAT_B5G5R5A1_UNORM,        DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // RGB5A1
 		{ DXGI_FORMAT_R10G10B10A2_UNORM,  DXGI_FORMAT_R10G10B10A2_UNORM,     DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // RGB10A2
 		{ DXGI_FORMAT_R11G11B10_FLOAT,    DXGI_FORMAT_R11G11B10_FLOAT,       DXGI_FORMAT_UNKNOWN,           DXGI_FORMAT_UNKNOWN              }, // RG11B10F
@@ -552,13 +540,11 @@ namespace bgfx { namespace d3d11
 		{
 			uint8_t temp[28];
 
-			bx::ErrorAssert err;
-
 			bx::StaticMemoryBlockWriter writer(&temp, sizeof(temp) );
-			bx::write(&writer, "INTCEXTNCAPSFUNC", 16, &err);
-			bx::write(&writer, kIntelExtensionInterfaceVersion, &err);
-			bx::write(&writer, uint32_t(0), &err);
-			bx::write(&writer, uint32_t(0), &err);
+			bx::write(&writer, "INTCEXTNCAPSFUNC", 16);
+			bx::write(&writer, kIntelExtensionInterfaceVersion);
+			bx::write(&writer, UINT32_C(0) );
+			bx::write(&writer, UINT32_C(0) );
 
 			if (SUCCEEDED(setIntelExtension(_device, temp, sizeof(temp) ) ) )
 			{
@@ -566,10 +552,10 @@ namespace bgfx { namespace d3d11
 				bx::skip(&reader, 16);
 
 				uint32_t version;
-				bx::read(&reader, version, &err);
+				bx::read(&reader, version);
 
 				uint32_t driverVersion;
-				bx::read(&reader, driverVersion, &err);
+				bx::read(&reader, driverVersion);
 
 				return version <= driverVersion;
 			}
@@ -819,19 +805,11 @@ namespace bgfx { namespace d3d11
 			m_nvapi.init();
 
 #if USE_D3D11_DYNAMIC_LIB
-			const char* d3d11DllName =
-#if BX_PLATFORM_LINUX
-				"d3d11.so"
-#else
-				"d3d11.dll"
-#endif // BX_PLATFORM_LINUX
-				;
-
-			m_d3d11Dll = bx::dlopen(d3d11DllName);
+			m_d3d11Dll = bx::dlopen("d3d11.dll");
 
 			if (NULL == m_d3d11Dll)
 			{
-				BX_TRACE("Init error: Failed to load %s.", d3d11DllName);
+				BX_TRACE("Init error: Failed to load d3d11.dll.");
 				goto error;
 			}
 
@@ -883,20 +861,7 @@ namespace bgfx { namespace d3d11
 
 			errorState = ErrorState::LoadedDXGI;
 
-			if (NULL != m_device)
-			{
-				m_device->AddRef();
-				m_device->GetImmediateContext(&m_deviceCtx);
-
-				if (NULL == m_deviceCtx)
-				{
-					BX_TRACE("Init error: Unable to retrieve Direct3D11 ImmediateContext.");
-					goto error;
-				}
-
-				m_featureLevel = m_device->GetFeatureLevel();
-			}
-			else
+			if (NULL == m_device)
 			{
 				if (NULL != m_renderDocDll)
 				{
@@ -977,6 +942,18 @@ namespace bgfx { namespace d3d11
 					goto error;
 				}
 			}
+			else
+			{
+				m_device->GetImmediateContext(&m_deviceCtx);
+
+				if (NULL == m_deviceCtx)
+				{
+					BX_TRACE("Init error: Unable to retrieve Direct3D11 ImmediateContext.");
+					goto error;
+				}
+
+				m_featureLevel = m_device->GetFeatureLevel();
+			}
 
 			m_dxgi.update(m_device);
 
@@ -1021,11 +998,11 @@ namespace bgfx { namespace d3d11
 					HRESULT hr = S_OK;
 
 					m_swapEffect =
-#if BX_PLATFORM_LINUX || BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS
 						DXGI_SWAP_EFFECT_FLIP_DISCARD
 #else
 						DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL
-#endif // BX_PLATFORM_LINUX || BX_PLATFORM_WINDOWS
+#endif // !BX_PLATFORM_WINDOWS
 						;
 
 					m_swapBufferCount = bx::clamp<uint8_t>(_init.resolution.numBackBuffers, 2, BGFX_CONFIG_MAX_BACK_BUFFERS);
@@ -1056,12 +1033,7 @@ namespace bgfx { namespace d3d11
 						: DXGI_SCALING_STRETCH
 						;
 					m_scd.swapEffect = m_swapEffect;
-
-					m_scd.alphaMode = (_init.resolution.reset & BGFX_RESET_TRANSPARENT_BACKBUFFER)
-						? DXGI_ALPHA_MODE_PREMULTIPLIED
-						: DXGI_ALPHA_MODE_IGNORE
-						;
-
+					m_scd.alphaMode  = DXGI_ALPHA_MODE_IGNORE;
 					m_scd.flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 					m_scd.maxFrameLatency = bx::min<uint8_t>(_init.resolution.maxFrameLatency, BGFX_CONFIG_MAX_FRAME_LATENCY);
@@ -1365,7 +1337,7 @@ namespace bgfx { namespace d3d11
 
 					if (DXGI_FORMAT_UNKNOWN != fmt)
 					{
-						if (BX_ENABLED(BX_PLATFORM_LINUX || BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT) )
+						if (BX_ENABLED(BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT) )
 						{
 							D3D11_FEATURE_DATA_FORMAT_SUPPORT data;
 							data.InFormat = fmt;
@@ -1494,7 +1466,7 @@ namespace bgfx { namespace d3d11
 
 					if (DXGI_FORMAT_UNKNOWN != fmtSrgb)
 					{
-						if (BX_ENABLED(BX_PLATFORM_LINUX || BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT) )
+						if (BX_ENABLED(BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT) )
 						{
 							struct D3D11_FEATURE_DATA_FORMAT_SUPPORT
 							{
@@ -1878,7 +1850,7 @@ namespace bgfx { namespace d3d11
 
 			bx::StaticMemoryBlockWriter writer(mem->data, mem->size);
 			uint32_t magic = BGFX_CHUNK_MAGIC_TEX;
-			bx::write(&writer, magic, bx::ErrorAssert{});
+			bx::write(&writer, magic);
 
 			TextureCreate tc;
 			tc.m_width     = _width;
@@ -1889,7 +1861,7 @@ namespace bgfx { namespace d3d11
 			tc.m_format    = TextureFormat::Enum(texture.m_requestedFormat);
 			tc.m_cubeMap   = false;
 			tc.m_mem       = NULL;
-			bx::write(&writer, tc, bx::ErrorAssert{});
+			bx::write(&writer, tc);
 
 			texture.destroy();
 			texture.create(mem, texture.m_flags, 0);
@@ -2467,7 +2439,7 @@ namespace bgfx { namespace d3d11
 				uint32_t flags = _resolution.reset & (~BGFX_RESET_INTERNAL_FORCE);
 
 				bool resize = true
-					&& !BX_ENABLED(BX_PLATFORM_XBOXONE)
+					&& !BX_ENABLED(BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT) // can't use ResizeBuffers on Windows Phone
 					&& (m_resolution.reset&BGFX_RESET_MSAA_MASK) == (flags&BGFX_RESET_MSAA_MASK)
 					;
 
@@ -2938,10 +2910,10 @@ namespace bgfx { namespace d3d11
 		{
 			_state &= 0
 				| BGFX_STATE_CULL_MASK
-				| BGFX_STATE_FRONT_CCW
 				| BGFX_STATE_MSAA
 				| BGFX_STATE_LINEAA
 				| BGFX_STATE_CONSERVATIVE_RASTER
+				| BGFX_STATE_FRONT_CCW
 				;
 			_state |= _wireframe ? BGFX_STATE_PT_LINES : BGFX_STATE_NONE;
 			_state |= _scissor   ? BGFX_STATE_RESERVED_MASK : 0;
@@ -3255,10 +3227,22 @@ namespace bgfx { namespace d3d11
 					break;
 
 				case TextureD3D11::TextureCube:
-					desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
-					desc.TextureCube.MostDetailedMip = _mip;
-					desc.TextureCube.MipLevels       = 1;
+					if (_compute)
+					{
+						desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+						desc.Texture2DArray.MostDetailedMip = _mip;
+						desc.Texture2DArray.MipLevels       = 1;
+						desc.Texture2DArray.FirstArraySlice = 0;
+						desc.Texture2DArray.ArraySize       = 6;
+					}
+					else
+					{
+						desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+						desc.TextureCube.MostDetailedMip = _mip;
+						desc.TextureCube.MipLevels       = 1;
+					}
 					break;
+
 				case TextureD3D11::Texture3D:
 					desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
 					desc.Texture3D.MostDetailedMip = _mip;
@@ -4094,15 +4078,13 @@ namespace bgfx { namespace d3d11
 	{
 		bx::MemoryReader reader(_mem->data, _mem->size);
 
-		bx::ErrorAssert err;
-
 		uint32_t magic;
-		bx::read(&reader, magic, &err);
+		bx::read(&reader, magic);
 
 		const bool fragment = isShaderType(magic, 'F');
 
 		uint32_t hashIn;
-		bx::read(&reader, hashIn, &err);
+		bx::read(&reader, hashIn);
 
 		uint32_t hashOut;
 
@@ -4112,11 +4094,11 @@ namespace bgfx { namespace d3d11
 		}
 		else
 		{
-			bx::read(&reader, hashOut, &err);
+			bx::read(&reader, hashOut);
 		}
 
 		uint16_t count;
-		bx::read(&reader, count, &err);
+		bx::read(&reader, count);
 
 		m_numPredefined = 0;
 		m_numUniforms = count;
@@ -4133,34 +4115,34 @@ namespace bgfx { namespace d3d11
 			for (uint32_t ii = 0; ii < count; ++ii)
 			{
 				uint8_t nameSize = 0;
-				bx::read(&reader, nameSize, &err);
+				bx::read(&reader, nameSize);
 
 				char name[256] = { '\0' };
-				bx::read(&reader, &name, nameSize, &err);
+				bx::read(&reader, &name, nameSize);
 				name[nameSize] = '\0';
 
 				uint8_t type = 0;
-				bx::read(&reader, type, &err);
+				bx::read(&reader, type);
 
 				uint8_t num = 0;
-				bx::read(&reader, num, &err);
+				bx::read(&reader, num);
 
 				uint16_t regIndex = 0;
-				bx::read(&reader, regIndex, &err);
+				bx::read(&reader, regIndex);
 
 				uint16_t regCount = 0;
-				bx::read(&reader, regCount, &err);
+				bx::read(&reader, regCount);
 
 				if (!isShaderVerLess(magic, 8) )
 				{
 					uint16_t texInfo = 0;
-					bx::read(&reader, texInfo, &err);
+					bx::read(&reader, texInfo);
 				}
 
 				if (!isShaderVerLess(magic, 10) )
 				{
 					uint16_t texFormat = 0;
-					bx::read(&reader, texFormat, &err);
+					bx::read(&reader, texFormat);
 				}
 
 				const char* kind = "invalid";
@@ -4213,7 +4195,7 @@ namespace bgfx { namespace d3d11
 		}
 
 		uint32_t shaderSize;
-		bx::read(&reader, shaderSize, &err);
+		bx::read(&reader, shaderSize);
 
 		const void* code = reader.getDataPtr();
 		bx::skip(&reader, shaderSize+1);
@@ -4225,7 +4207,8 @@ namespace bgfx { namespace d3d11
 			bx::MemoryReader rd(code, shaderSize);
 
 			DxbcContext dxbc;
-			read(&rd, dxbc, bx::ErrorAssert{});
+			bx::Error err;
+			read(&rd, dxbc, &err);
 
 			bool patchShader = !dxbc.shader.aon9;
 			if (patchShader)
@@ -4265,14 +4248,14 @@ namespace bgfx { namespace d3d11
 		}
 
 		uint8_t numAttrs = 0;
-		bx::read(&reader, numAttrs, bx::ErrorAssert{});
+		bx::read(&reader, numAttrs);
 
 		bx::memSet(m_attrMask, 0, sizeof(m_attrMask) );
 
 		for (uint32_t ii = 0; ii < numAttrs; ++ii)
 		{
 			uint16_t id;
-			bx::read(&reader, id, bx::ErrorAssert{});
+			bx::read(&reader, id);
 
 			Attrib::Enum attr = idToAttrib(id);
 
@@ -4283,7 +4266,7 @@ namespace bgfx { namespace d3d11
 		}
 
 		uint16_t size;
-		bx::read(&reader, size, bx::ErrorAssert{});
+		bx::read(&reader, size);
 
 		if (0 < size)
 		{
@@ -4436,7 +4419,6 @@ namespace bgfx { namespace d3d11
 				, swizzle ? " (swizzle BGRA8 -> RGBA8)" : ""
 				);
 
-			uint8_t* temp = NULL;
 			for (uint16_t side = 0; side < numSides; ++side)
 			{
 				for (uint8_t lod = 0, num = ti.numMips; lod < num; ++lod)
@@ -4449,7 +4431,7 @@ namespace bgfx { namespace d3d11
 						if (convert)
 						{
 							uint32_t srcpitch = mip.m_width*bpp/8;
-							temp = (uint8_t*)BX_ALLOC(g_allocator, srcpitch*mip.m_height);
+							uint8_t* temp = (uint8_t*)BX_ALLOC(g_allocator, srcpitch*mip.m_height);
 							bimg::imageDecodeToBgra8(g_allocator, temp, mip.m_data, mip.m_width, mip.m_height, srcpitch, mip.m_format);
 
 							srd[kk].pSysMem = temp;
@@ -4463,25 +4445,6 @@ namespace bgfx { namespace d3d11
 						else
 						{
 							srd[kk].SysMemPitch = mip.m_width*mip.m_bpp/8;
-
-							switch (m_textureFormat)
-							{
-							case TextureFormat::R5G6B5:
-								temp = (uint8_t*)BX_ALLOC(g_allocator, srd[kk].SysMemPitch*mip.m_height);
-								bimg::imageConvert(temp, 16, bx::packB5G6R5, mip.m_data, bx::unpackR5G6B5, srd[kk].SysMemPitch*mip.m_height);
-								srd[kk].pSysMem = temp;
-								break;
-							case TextureFormat::RGBA4:
-								temp = (uint8_t*)BX_ALLOC(g_allocator, srd[kk].SysMemPitch*mip.m_height);
-								bimg::imageConvert(temp, 16, bx::packBgra4, mip.m_data, bx::unpackRgba4, srd[kk].SysMemPitch*mip.m_height);
-								srd[kk].pSysMem = temp;
-								break;
-							case TextureFormat::RGB5A1:
-								temp = (uint8_t*)BX_ALLOC(g_allocator, srd[kk].SysMemPitch*mip.m_height);
-								bimg::imageConvert(temp, 16, bx::packBgr5a1, mip.m_data, bx::unpackRgb5a1, srd[kk].SysMemPitch*mip.m_height);
-								srd[kk].pSysMem = temp;
-								break;
-							}
 						}
 
 						srd[kk].SysMemSlicePitch = mip.m_height*srd[kk].SysMemPitch;
@@ -4706,7 +4669,8 @@ namespace bgfx { namespace d3d11
 				DX_CHECK(s_renderD3D11->m_device->CreateUnorderedAccessView(m_ptr, NULL, &m_uav) );
 			}
 
-			if (temp != NULL)
+			if (convert
+			&&  0 != kk)
 			{
 				kk = 0;
 				for (uint16_t side = 0; side < numSides; ++side)
@@ -4740,10 +4704,8 @@ namespace bgfx { namespace d3d11
 	void TextureD3D11::overrideInternal(uintptr_t _ptr)
 	{
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-
 		const bool readable = (m_srv != NULL);
-		if (readable)
-		{
+		if (readable) {
 			m_srv->GetDesc(&srvDesc);
 		}
 
@@ -4751,8 +4713,7 @@ namespace bgfx { namespace d3d11
 		m_flags |= BGFX_SAMPLER_INTERNAL_SHARED;
 		m_ptr = (ID3D11Resource*)_ptr;
 
-		if (readable)
-		{
+		if (readable) {
 			s_renderD3D11->m_device->CreateShaderResourceView(m_ptr, &srvDesc, &m_srv);
 		}
 	}
@@ -4781,16 +4742,15 @@ namespace bgfx { namespace d3d11
 			box.back  = 1;
 		}
 
-		const bimg::ImageBlockInfo& blockInfo = bimg::getBlockInfo(bimg::TextureFormat::Enum(m_textureFormat) );
-		const uint16_t bpp    = blockInfo.bitsPerPixel;
 		const uint32_t subres = _mip + ( (layer + _side) * m_numMips);
 		const bool     depth  = bimg::isDepth(bimg::TextureFormat::Enum(m_textureFormat) );
+		const uint32_t bpp    = bimg::getBitsPerPixel(bimg::TextureFormat::Enum(m_textureFormat) );
 		uint32_t rectpitch  = _rect.m_width*bpp/8;
-		if (bimg::isCompressed(bimg::TextureFormat::Enum(m_textureFormat) ) )
+		if (bimg::isCompressed(bimg::TextureFormat::Enum(m_textureFormat)))
 		{
+			const bimg::ImageBlockInfo& blockInfo = bimg::getBlockInfo(bimg::TextureFormat::Enum(m_textureFormat));
 			rectpitch = (_rect.m_width / blockInfo.blockWidth)*blockInfo.blockSize;
 		}
-
 		const uint32_t srcpitch   = UINT16_MAX == _pitch ? rectpitch : _pitch;
 		const uint32_t slicepitch = rectpitch*_rect.m_height;
 
@@ -4804,9 +4764,6 @@ namespace bgfx { namespace d3d11
 			temp = (uint8_t*)BX_ALLOC(g_allocator, slicepitch);
 			bimg::imageDecodeToBgra8(g_allocator, temp, data, _rect.m_width, _rect.m_height, srcpitch, bimg::TextureFormat::Enum(m_requestedFormat) );
 			data = temp;
-
-			box.right  = bx::max(1u, m_width  >> _mip);
-			box.bottom = bx::max(1u, m_height >> _mip);
 		}
 
 		deviceCtx->UpdateSubresource(
@@ -5332,7 +5289,7 @@ namespace bgfx { namespace d3d11
 		}
 	}
 
-	uint32_t TimerQueryD3D11::begin(uint32_t _resultIdx, uint32_t _frameNum)
+	uint32_t TimerQueryD3D11::begin(uint32_t _resultIdx)
 	{
 		ID3D11DeviceContext* deviceCtx = s_renderD3D11->m_deviceCtx;
 
@@ -5348,7 +5305,6 @@ namespace bgfx { namespace d3d11
 		Query& query = m_query[idx];
 		query.m_resultIdx = _resultIdx;
 		query.m_ready     = false;
-		query.m_frameNum  = _frameNum;
 
 		deviceCtx->Begin(query.m_disjoint);
 		deviceCtx->End(query.m_begin);
@@ -5405,7 +5361,6 @@ namespace bgfx { namespace d3d11
 
 				Result& result = m_result[query.m_resultIdx];
 				--result.m_pending;
-				result.m_frameNum = query.m_frameNum;
 
 				result.m_frequency = disjoint.Frequency;
 				result.m_begin     = timeBegin;
@@ -5592,7 +5547,7 @@ namespace bgfx { namespace d3d11
 
 		if (m_timerQuerySupport)
 		{
-			frameQueryIdx = m_gpuTimer.begin(BGFX_CONFIG_MAX_VIEWS, _render->m_frameNum);
+			frameQueryIdx = m_gpuTimer.begin(BGFX_CONFIG_MAX_VIEWS);
 		}
 
 		if (0 < _render->m_iboffset)
@@ -6016,7 +5971,6 @@ namespace bgfx { namespace d3d11
 
 				if ( (0
 					 | BGFX_STATE_CULL_MASK
-					 | BGFX_STATE_FRONT_CCW
 					 | BGFX_STATE_ALPHA_REF_MASK
 					 | BGFX_STATE_PT_MASK
 					 | BGFX_STATE_POINT_SIZE_MASK
@@ -6027,7 +5981,6 @@ namespace bgfx { namespace d3d11
 				{
 					if ( (0
 						 | BGFX_STATE_CULL_MASK
-						 | BGFX_STATE_FRONT_CCW
 						 | BGFX_STATE_MSAA
 						 | BGFX_STATE_LINEAA
 						 | BGFX_STATE_CONSERVATIVE_RASTER
@@ -6513,7 +6466,6 @@ namespace bgfx { namespace d3d11
 		perfStats.numCompute    = statsKeyType[1];
 		perfStats.numBlit       = _render->m_numBlitItems;
 		perfStats.maxGpuLatency = maxGpuLatency;
-		perfStats.gpuFrameNum   = result.m_frameNum;
 		bx::memCopy(perfStats.numPrims, statsNumPrimsRendered, sizeof(perfStats.numPrims) );
 		m_nvapi.getMemoryInfo(perfStats.gpuMemoryUsed, perfStats.gpuMemoryMax);
 

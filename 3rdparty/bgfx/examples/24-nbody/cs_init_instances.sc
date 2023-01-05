@@ -1,6 +1,6 @@
 /*
  * Copyright 2014 Stanlo Slasinski. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "bgfx_compute.sh"

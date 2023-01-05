@@ -65,7 +65,7 @@ Pass::Status InlineExhaustivePass::ProcessImpl() {
     status = CombineStatus(status, InlineExhaustive(fp));
     return false;
   };
-  context()->ProcessReachableCallTree(pfn);
+  context()->ProcessEntryPointCallTree(pfn);
   return status;
 }
 

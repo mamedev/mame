@@ -1,6 +1,6 @@
 /*
  * Copyright 2013 Jeremie Roy. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "common.h"
@@ -54,8 +54,6 @@ public:
 		bgfx::Init init;
 		init.type     = args.m_type;
 		init.vendorId = args.m_pciId;
-		init.platformData.nwh  = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
-		init.platformData.ndt  = entry::getNativeDisplayHandle();
 		init.resolution.width  = m_width;
 		init.resolution.height = m_height;
 		init.resolution.reset  = m_reset;
@@ -255,10 +253,7 @@ public:
 			float view[16];
 			bx::mtxLookAt(view, eye, at);
 
-			float centering = 0.0f;
-			if (bgfx::getRendererType() == bgfx::RendererType::Direct3D9) {
-				centering = -0.5f;
-			}
+			const float centering = 0.5f;
 
 			// Setup a top-left ortho matrix for screen space drawing.
 			const bgfx::Caps* caps = bgfx::getCaps();

@@ -1,6 +1,6 @@
 --
--- Copyright 2010-2022 Branimir Karadzic. All rights reserved.
--- License: https://github.com/bkaradzic/bx/blob/master/LICENSE
+-- Copyright 2010-2021 Branimir Karadzic. All rights reserved.
+-- License: https://github.com/bkaradzic/bx#license-bsd-2-clause
 --
 
 local function userdefines()
@@ -13,28 +13,6 @@ local function userdefines()
 	end
 
 	return defines
-end
-
-function using_bx()
-	includedirs {
-		path.join(BX_DIR, "include"),
-	}
-
-	links {
-		"bx",
-	}
-
-	configuration { "Debug" }
-		defines {
-			"BX_CONFIG_DEBUG=1",
-		}
-
-	configuration { "Release" }
-		defines {
-			"BX_CONFIG_DEBUG=0",
-		}
-
-	configuration {}
 end
 
 project "bx"
@@ -54,6 +32,11 @@ project "bx"
 
 	defines (userdefines())
 
+	configuration { "Debug" }
+		defines {
+			"BX_CONFIG_DEBUG=1",
+		}
+
 	configuration { "linux-*" }
 		buildoptions {
 			"-fPIC",
@@ -64,7 +47,6 @@ project "bx"
 	if _OPTIONS["with-amalgamated"] then
 		excludes {
 			path.join(BX_DIR, "src/allocator.cpp"),
-			path.join(BX_DIR, "src/bounds.cpp"),
 			path.join(BX_DIR, "src/bx.cpp"),
 			path.join(BX_DIR, "src/commandline.cpp"),
 			path.join(BX_DIR, "src/crtnone.cpp"),
@@ -91,15 +73,5 @@ project "bx"
 			path.join(BX_DIR, "src/amalgamated.**"),
 		}
 	end
-
-	configuration { "Debug" }
-		defines {
-			"BX_CONFIG_DEBUG=1",
-		}
-
-	configuration { "Release" }
-		defines {
-			"BX_CONFIG_DEBUG=0",
-		}
 
 	configuration {}

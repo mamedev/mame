@@ -26,20 +26,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **/
 
-#include "glslang/Public/resource_limits_c.h"
-#include "glslang/Public/ResourceLimits.h"
+#include "resource_limits_c.h"
+#include "ResourceLimits.h"
 #include <stdlib.h>
 #include <string.h>
 #include <string>
 
-glslang_resource_t* glslang_resource(void)
-{
-    return reinterpret_cast<glslang_resource_t*>(GetResources());
-}
-
 const glslang_resource_t* glslang_default_resource(void)
 {
-    return reinterpret_cast<const glslang_resource_t*>(GetDefaultResources());
+    return reinterpret_cast<const glslang_resource_t*>(&glslang::DefaultTBuiltInResource);
 }
 
 #if defined(__clang__) || defined(__GNUC__)
@@ -52,7 +47,7 @@ const glslang_resource_t* glslang_default_resource(void)
 
 const char* glslang_default_resource_string()
 {
-    std::string cpp_str = GetDefaultTBuiltInResourceString();
+    std::string cpp_str = glslang::GetDefaultTBuiltInResourceString();
     char* c_str = (char*)malloc(cpp_str.length() + 1);
     strcpy(c_str, cpp_str.c_str());
     return c_str;
@@ -66,5 +61,5 @@ const char* glslang_default_resource_string()
 
 void glslang_decode_resource_limits(glslang_resource_t* resources, char* config)
 {
-    DecodeResourceLimits(reinterpret_cast<TBuiltInResource*>(resources), config);
+    glslang::DecodeResourceLimits(reinterpret_cast<TBuiltInResource*>(resources), config);
 }

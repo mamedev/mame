@@ -1,6 +1,6 @@
 ﻿/*
  * Copyright 2013 Jeremie Roy. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef CUBE_ATLAS_H_HEADER_GUARD
@@ -135,6 +135,8 @@ public:
 	}
 
 private:
+	void init();
+
 	struct PackedLayer;
 	PackedLayer* m_layers;
 	AtlasRegion* m_regions;
@@ -146,6 +148,7 @@ private:
 	bgfx::TextureHandle m_textureHandle;
 	uint16_t m_textureSize;
 	float m_texelSize;
+	float m_texelOffset[2];
 
 	uint16_t m_regionCount;
 	uint16_t m_maxRegionCount;
