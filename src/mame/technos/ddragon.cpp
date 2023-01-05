@@ -1751,7 +1751,7 @@ ROM_START( ddragon2j )
 	ROM_LOAD( "26j7-0.bin",   0x20000, 0x20000, CRC(bc6a48d5) SHA1(04c434f8cd42a8f82a263548183569396f9b684d) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* Layer priority (same as ddragon) */
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, BAD_DUMP CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* Layer priority (same as ddragon) */
 	ROM_LOAD( "prom.16",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon)  */
 ROM_END
 
@@ -1788,7 +1788,7 @@ ROM_START( ddragon2u )
 	ROM_LOAD( "26j7-0.bin",   0x20000, 0x20000, CRC(bc6a48d5) SHA1(04c434f8cd42a8f82a263548183569396f9b684d) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* Layer priority (same as ddragon) */
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, BAD_DUMP CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* Layer priority (same as ddragon) */
 	ROM_LOAD( "prom.16",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon)  */
 ROM_END
 
@@ -1835,7 +1835,7 @@ ROM_START( ddragon2b )
 	ROM_LOAD( "10",  0x30000, 0x10000, CRC(ae2fc028) SHA1(94fea9088b7b412706b6aaf7aac856709649fb63) )
 
 	ROM_REGION( 0x0300, "proms", 0 ) // wasn't in this set, is it still present?
-	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* Layer priority (same as ddragon) */
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, BAD_DUMP CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )    /* Layer priority (same as ddragon) */
 	ROM_LOAD( "prom.16",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )    /* sprite timing (same as ddragon)  */
 ROM_END
 
