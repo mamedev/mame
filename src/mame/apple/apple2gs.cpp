@@ -420,7 +420,6 @@ private:
 
 	bool m_romswitch = false;
 
-	bool m_page2 = false;
 	bool m_an0 = false, m_an1 = false, m_an2 = false, m_an3 = false;
 
 	bool m_vbl = false;
@@ -428,7 +427,6 @@ private:
 	int m_irqmask = 0;
 
 	bool m_intcxrom = false;
-	bool m_80store = false;
 	bool m_slotc3rom = false;
 	bool m_altzp = false;
 	bool m_ramrd = false, m_ramwrt = false;
@@ -437,7 +435,7 @@ private:
 	bool m_rombank = false;
 
 	u8 m_shadow = 0, m_speed = 0, m_textcol = 0;
-	u8 m_motors_active = 0, m_slotromsel = 0, m_intflag = 0, m_vgcint = 0, m_inten = 0, m_newvideo = 0;
+	u8 m_motors_active = 0, m_slotromsel = 0, m_intflag = 0, m_vgcint = 0, m_inten = 0;
 
 	bool m_last_speed = false;
 
@@ -714,15 +712,13 @@ void apple2gs_state::machine_start()
 	}
 
 	// setup video pointers
-	m_video->m_ram_ptr = m_megaii_ram;
-	m_video->m_aux_ptr = &m_megaii_ram[0x10000];
-	m_video->m_char_ptr = memregion("gfx1")->base();
-	m_video->m_char_size = memregion("gfx1")->bytes();
-	m_video->m_8bit_graphics = std::make_unique<bitmap_ind16>(560, 192);
+	m_video->set_ram_pointers(m_megaii_ram, &m_megaii_ram[0x10000]);
+	m_video->set_char_pointer(memregion("gfx1")->base(), memregion("gfx1")->bytes());
+	m_video->setup_GS_graphics();
 
 	m_textcol = 0xf2;
-	m_video->m_GSfg = (m_textcol >> 4) & 0xf;
-	m_video->m_GSbg = m_textcol & 0xf;
+	m_video->set_GS_foreground((m_textcol >> 4) & 0xf);
+	m_video->set_GS_background(m_textcol & 0xf);
 
 	m_inh_slot = -1;
 	m_cnxx_slot = CNXX_UNCLAIMED;
@@ -743,7 +739,6 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_inh_slot));
 	save_item(NAME(m_inh_bank));
 	save_item(NAME(m_cnxx_slot));
-	save_item(NAME(m_page2));
 	save_item(NAME(m_romswitch));
 	save_item(NAME(m_an0));
 	save_item(NAME(m_an1));
@@ -751,7 +746,6 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_an3));
 	save_item(NAME(m_intcxrom));
 	save_item(NAME(m_rombank));
-	save_item(NAME(m_80store));
 	save_item(NAME(m_slotc3rom));
 	save_item(NAME(m_altzp));
 	save_item(NAME(m_ramrd));
@@ -803,7 +797,6 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_accel_temp_slowdown));
 	save_item(NAME(m_accel_speed));
 	save_item(NAME(m_motoroff_time));
-	save_item(NAME(m_newvideo));
 	save_item(NAME(m_glu_mouse_first_read));
 }
 
@@ -812,12 +805,11 @@ void apple2gs_state::machine_reset()
 	m_adb_p2_last = m_adb_p3_last = 0;
 	m_glu_mouse_first_read = 3;
 	m_adb_reset_freeze = 0;
-	m_page2 = false;
 	m_romswitch = false;
-	m_video->m_page2 = false;
-	m_video->m_GSborder = 0x02;
-	m_video->m_GSbg = 0x02;
-	m_video->m_GSfg = 0x0f;
+	m_video->page2_w(false);
+	m_video->set_GS_border(0x02);
+	m_video->set_GS_background(0x02);
+	m_video->set_GS_foreground(0x0f);
 	m_an0 = m_an1 = m_an2 = m_an3 = false;
 	m_gameio->an0_w(0);
 	m_gameio->an1_w(0);
@@ -828,13 +820,12 @@ void apple2gs_state::machine_reset()
 	m_irqmask = 0;
 	m_intcxrom = false;
 	m_rombank = false;
-	m_80store = false;
-	m_video->m_80store = false;
+	m_video->a80store_w(false);
 	m_altzp = false;
 	m_ramrd = false;
 	m_ramwrt = false;
 	m_ioudis = true;
-	m_newvideo = 0x01;      // verified on ROM03 hardware
+	m_video->set_newvideo(0x01);      // verified on ROM03 hardware
 	m_clock_frame = 0;
 	m_slot_irq = false;
 	m_clkdata = 0;
@@ -1009,7 +1000,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	m_screen->update_partial(scanline);
 
 	/* check scanline interrupt bits if we're in super hi-res and the current scanline is within the active display area */
-	if ((m_video->m_newvideo & 0x80) && (scanline >= (BORDER_TOP-1)) && (scanline < (200+BORDER_TOP-1)))
+	if ((m_video->get_newvideo() & 0x80) && (scanline >= (BORDER_TOP-1)) && (scanline < (200+BORDER_TOP-1)))
 	{
 		u8 scb;
 		const int shrline = scanline - BORDER_TOP + 1;
@@ -1050,7 +1041,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 		}
 
 		m_adbmicro->set_input_line(0, ASSERT_LINE);
-		m_video->m_sysconfig = 0;
+		m_video->set_sysconfig(0);
 
 		m_clock_frame++;
 
@@ -1123,7 +1114,7 @@ void apple2gs_state::palette_init(palette_device &palette)
 			apple2gs_palette[(3*i)+1]*17,
 			apple2gs_palette[(3*i)+2]*17);
 
-		m_video->m_GSborder_colors[i] = rgb_t(apple2gs_palette[(3*i)]*17, apple2gs_palette[(3*i)+1]*17, apple2gs_palette[(3*i)+2]*17);
+		m_video->set_GS_border_color(i, rgb_t(apple2gs_palette[(3*i)]*17, apple2gs_palette[(3*i)+1]*17, apple2gs_palette[(3*i)+2]*17));
 	}
 }
 
@@ -1144,9 +1135,9 @@ void apple2gs_state::auxbank_update()
 	m_b0_0200bank.select(ramwr);
 	m_e0_0200bank.select(ramwr);
 
-	if (m_80store)
+	if (m_video->get_80store())
 	{
-		if (m_page2)
+		if (m_video->get_page2())
 		{
 			m_b0_0400bank.select(3);
 			m_e0_0400bank.select(3);
@@ -1166,9 +1157,9 @@ void apple2gs_state::auxbank_update()
 	m_b0_0800bank.select(ramwr);
 	m_e0_0800bank.select(ramwr);
 
-	if ((m_80store) && (m_video->m_hires))
+	if ((m_video->get_80store()) && (m_video->get_hires()))
 	{
-		if (m_page2)
+		if (m_video->get_page2())
 		{
 			m_b0_2000bank.select(3);
 			m_e0_2000bank.select(3);
@@ -1360,13 +1351,13 @@ void apple2gs_state::do_io(int offset)
 			break;
 
 		case 0x54:  // set page 1
-			m_page2 = false;
+			m_video->page2_w(false);
 			m_video->scr_w(0);
 			auxbank_update();
 			break;
 
 		case 0x55:  // set page 2
-			m_page2 = true;
+			m_video->page2_w(true);
 			m_video->scr_w(1);
 			auxbank_update();
 			break;
@@ -1558,28 +1549,28 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return (uKeyboardC010 & 0x7f) | (m_slotc3rom ? 0x80 : 0x00);
 
 		case 0x18:  // read 80STORE
-			return (uKeyboardC010 & 0x7f) | (m_80store ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_80store() ? 0x80 : 0x00);
 
 		case 0x19:  // read VBLBAR
 			return (uKeyboardC010 & 0x7f) | (m_screen->vblank() ? 0x00 : 0x80);
 
 		case 0x1a:  // read TEXT
-			return (uKeyboardC010 & 0x7f) | (m_video->m_graphics ? 0x00 : 0x80);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_graphics() ? 0x00 : 0x80);
 
 		case 0x1b:  // read MIXED
-			return (uKeyboardC010 & 0x7f) | (m_video->m_mix ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_mix() ? 0x80 : 0x00);
 
 		case 0x1c:  // read PAGE2
-			return (uKeyboardC010 & 0x7f) | (m_page2 ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_page2() ? 0x80 : 0x00);
 
 		case 0x1d:  // read HIRES
-			return (uKeyboardC010 & 0x7f) | (m_video->m_hires ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_hires() ? 0x80 : 0x00);
 
 		case 0x1e:  // read ALTCHARSET
-			return (uKeyboardC010 & 0x7f) | (m_video->m_altcharset ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_altcharset() ? 0x80 : 0x00);
 
 		case 0x1f:  // read 80COL
-			return (uKeyboardC010 & 0x7f) | (m_video->m_80col ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_80col() ? 0x80 : 0x00);
 
 		case 0x22:  // TEXTCOL
 			return m_textcol;
@@ -1600,7 +1591,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return keyglu_816_read(GLU_SYSSTAT);
 
 		case 0x29:  // NEWVIDEO
-			return m_newvideo;
+			return m_video->get_newvideo();
 
 		case 0x2d:  // SLOTROMSEL
 			return m_slotromsel;
@@ -1631,7 +1622,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return m_clkdata;
 
 		case 0x34:  // BORDERCOL
-			return (m_clock_control & 0xf0) | (m_video->m_GSborder & 0xf);
+			return (m_clock_control & 0xf0) | (m_video->get_GS_border() & 0xf);
 
 		case 0x35:  // SHADOW
 			return m_shadow;
@@ -1722,7 +1713,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 		case 0x68: // STATEREG, synthesizes all the IIe state regs
 			return  (m_altzp ? 0x80 : 0x00) |
-					(m_page2 ? 0x40 : 0x00) |
+					(m_video->get_page2() ? 0x40 : 0x00) |
 					(m_ramrd ? 0x20 : 0x00) |
 					(m_ramwrt ? 0x10 : 0x00) |
 					(m_lcram ? 0x00 : 0x08) |
@@ -1820,14 +1811,12 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 	switch (offset)
 	{
 		case 0x00:  // 80STOREOFF
-			m_80store = false;
-			m_video->m_80store = false;
+			m_video->a80store_w(false);
 			auxbank_update();
 			break;
 
 		case 0x01:  // 80STOREON
-			m_80store = true;
-			m_video->m_80store = true;
+			m_video->a80store_w(true);
 			auxbank_update();
 			break;
 
@@ -1882,19 +1871,19 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x0c:  // 80COLOFF
-			m_video->m_80col = false;
+			m_video->a80col_w(false);
 			break;
 
 		case 0x0d:  // 80COLON
-			m_video->m_80col = true;
+			m_video->a80col_w(true);
 			break;
 
 		case 0x0e:  // ALTCHARSETOFF
-			m_video->m_altcharset = false;
+			m_video->altcharset_w(false);
 			break;
 
 		case 0x0f:  // ALTCHARSETON
-			m_video->m_altcharset = true;
+			m_video->altcharset_w(true);
 			break;
 
 		case 0x10:  // clear keyboard latch
@@ -1905,7 +1894,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x21:  // MONOCHROME
-			m_video->m_monochrome = data;
+			m_video->set_GS_monochrome(data);
 			break;
 
 		case 0x22:  // TEXTCOL
@@ -1914,8 +1903,8 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 				m_screen->update_now();
 			}
 			m_textcol = data;
-			m_video->m_GSfg = (data >> 4) & 0xf;
-			m_video->m_GSbg = data & 0xf;
+			m_video->set_GS_foreground((data >> 4) & 0xf);
+			m_video->set_GS_background(data & 0xf);
 			break;
 
 		case 0x23:  // VGCINT
@@ -1956,7 +1945,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x29:  // NEWVIDEO
-			m_video->m_newvideo = m_newvideo = data;
+			m_video->set_newvideo(data);
 			break;
 
 		case 0x2d:  // SLOTROMSEL
@@ -2002,12 +1991,12 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x34:  // CLOCKCTL
-			if ((data & 0xf) != (m_video->m_GSborder & 0xf))
+			if ((data & 0xf) != (m_video->get_GS_border() & 0xf))
 			{
 				m_screen->update_now();
 			}
 			m_clock_control = data & 0x7f;
-			m_video->m_GSborder = data & 0xf;
+			m_video->set_GS_border(data & 0xf);
 			m_rtc->ce_w(BIT(data, 7) ^ 1);
 			if (data & 0x80)
 			{
@@ -2172,7 +2161,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 
 		case 0x68: // STATEREG
 			m_altzp = (data & 0x80);
-			m_page2 = (data & 0x40);
+			m_video->page2_w(data & 0x40);
 			m_ramrd = (data & 0x20);
 			m_ramwrt = (data & 0x10);
 			m_lcram = (data & 0x08) ? false : true;
@@ -2792,10 +2781,10 @@ u8 apple2gs_state::read_floatingbus()
 
 	// machine state switches
 	//
-	Hires    = (m_video->m_hires && m_video->m_graphics) ? 1 : 0;
-	Mixed    = m_video->m_mix ? 1 : 0;
-	Page2    = m_page2 ? 1 : 0;
-	_80Store = m_80store ? 1 : 0;
+	Hires    = (m_video->get_hires() && m_video->get_graphics()) ? 1 : 0;
+	Mixed    = m_video->get_mix() ? 1 : 0;
+	Page2    = m_video->get_page2() ? 1 : 0;
+	_80Store = m_video->get_80store() ? 1 : 0;
 
 	// calculate video parameters according to display standard
 	//
@@ -2929,7 +2918,7 @@ template void apple2gs_state::e1ram_w<0x4000>(offs_t offset, u8 data);
 u8 apple2gs_state::auxram0000_r(offs_t offset)
 {
 	slow_cycle();
-	if ((offset >= 0x2000) && (offset < 0xa000) && ((m_newvideo & 0xc0) != 0))
+	if ((offset >= 0x2000) && (offset < 0xa000) && ((m_video->get_newvideo() & 0xc0) != 0))
 	{
 		if (offset & 1)
 		{
@@ -2949,7 +2938,7 @@ void apple2gs_state::auxram0000_w(offs_t offset, u8 data)
 
 	slow_cycle();
 
-	if ((offset >= 0x2000) && (offset < 0xa000) && ((m_newvideo & 0xc0) != 0))
+	if ((offset >= 0x2000) && (offset < 0xa000) && ((m_video->get_newvideo() & 0xc0) != 0))
 	{
 		if (offset & 1)
 		{
@@ -2966,11 +2955,10 @@ void apple2gs_state::auxram0000_w(offs_t offset, u8 data)
 	if ((orig_addr >= 0x9e00) && (orig_addr <= 0x9fff))
 	{
 		int color = (orig_addr - 0x9e00) >> 1;
-
-		m_video->m_shr_palette[color] = rgb_t(
+		m_video->set_SHR_color(color, rgb_t(
 			((m_megaii_ram[0x19f00 + color] >> 0) & 0x0f) * 17,
 			((m_megaii_ram[0x15f00 + color] >> 4) & 0x0f) * 17,
-			((m_megaii_ram[0x15f00 + color] >> 0) & 0x0f) * 17);
+			((m_megaii_ram[0x15f00 + color] >> 0) & 0x0f) * 17));
 	}
 }
 
@@ -3397,7 +3385,7 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 	{
 		m_adb_reset_freeze = 2;
 		m_maincpu->reset();
-		m_video->m_newvideo = m_newvideo = 0x41;
+		m_video->set_newvideo(0x41);
 	}
 
 	if (!(data & 0x10))

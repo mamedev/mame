@@ -151,10 +151,8 @@ void tk2000_state::machine_start()
 	save_item(NAME(m_ctrl_key));
 
 	// setup video pointers
-	m_video->m_ram_ptr = m_ram_ptr;
-	m_video->m_aux_ptr = m_ram_ptr;
-	m_video->m_char_ptr = nullptr;
-	m_video->m_char_size = 0;
+	m_video->set_ram_pointers(m_ram_ptr, m_ram_ptr);
+	m_video->set_char_pointer(nullptr, 0);  // no text modes on this machine
 }
 
 void tk2000_state::machine_reset()
@@ -176,7 +174,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tk2000_state::apple2_interrupt)
 	// update the video system's shadow copy of the system config at the end of the frame
 	if (scanline == 192)
 	{
-		m_video->m_sysconfig = m_sysconfig->read();
+		m_video->set_sysconfig(m_sysconfig->read());
 	}
 }
 
@@ -344,9 +342,9 @@ uint8_t tk2000_state::read_floatingbus()
 
 	// machine state switches
 	//
-	Hires    = 1; //m_video->m_hires ? 1 : 0;
-	Mixed    = 0; //m_video->m_mix ? 1 : 0;
-	Page2    = m_video->m_page2 ? 1 : 0;
+	Hires    = 1;
+	Mixed    = 0;
+	Page2 = m_video->get_page2() ? 1 : 0;
 	_80Store = 0;
 
 	// calculate video parameters according to display standard

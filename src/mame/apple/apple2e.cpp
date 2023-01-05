@@ -422,7 +422,6 @@ private:
 
 	int m_inh_slot, m_cnxx_slot;
 
-	bool m_page2;
 	bool m_an0, m_an1, m_an2, m_an3;
 
 	bool m_vbl, m_vblmask;
@@ -433,7 +432,6 @@ private:
 	int last_mx, last_my, count_x, count_y;
 
 	bool m_intcxrom;
-	bool m_80store;
 	bool m_slotc3rom;
 	bool m_altzp;
 	bool m_ramrd, m_ramwrt;
@@ -941,11 +939,9 @@ void apple2e_state::machine_start()
 	}
 
 	// setup video pointers
-	m_video->m_ram_ptr = m_ram_ptr;
-	m_video->m_aux_ptr = m_aux_ptr;
-	m_video->m_aux_mask = m_aux_mask;
-	m_video->m_char_ptr = memregion("gfx1")->base();
-	m_video->m_char_size = memregion("gfx1")->bytes();
+	m_video->set_ram_pointers(m_ram_ptr, m_aux_ptr);
+	m_video->set_aux_mask(m_aux_mask);
+	m_video->set_char_pointer(memregion("gfx1")->base(), memregion("gfx1")->bytes());
 
 	int ram_size = 0x10000;
 	if (m_ram_size < 0x10000)
@@ -1011,7 +1007,7 @@ void apple2e_state::machine_start()
 
 		// remap cec gfx1 rom
 		// for ALTCHARSET
-		u8 *rom = m_video->m_char_ptr;
+		u8 *rom = memregion("gfx1")->base();
 		for(int i=0; i<0x1000; i++)
 		{
 			rom[i+0x1000] = rom[i];
@@ -1051,13 +1047,11 @@ void apple2e_state::machine_start()
 	save_item(NAME(m_inh_slot));
 	save_item(NAME(m_inh_bank));
 	save_item(NAME(m_cnxx_slot));
-	save_item(NAME(m_page2));
 	save_item(NAME(m_an0));
 	save_item(NAME(m_an1));
 	save_item(NAME(m_an2));
 	save_item(NAME(m_an3));
 	save_item(NAME(m_intcxrom));
-	save_item(NAME(m_80store));
 	save_item(NAME(m_slotc3rom));
 	save_item(NAME(m_altzp));
 	save_item(NAME(m_ramrd));
@@ -1119,10 +1113,8 @@ void apple2e_state::machine_start()
 
 void apple2e_state::machine_reset()
 {
-	m_page2 = false;
-	m_video->m_page2 = false;
-	m_video->m_monohgr = false;
-	if(m_iscecm)    m_video->m_monohgr = true;
+	m_video->page2_w(false);
+	m_video->monohgr_w(m_iscecm);
 	m_an0 = m_an1 = m_an2 = m_an3 = false;
 	m_gameio->an0_w(0);
 	m_gameio->an1_w(0);
@@ -1217,8 +1209,7 @@ void apple2e_state::machine_reset()
 
 	}
 
-	m_80store = false;
-	m_video->m_80store = false;
+	m_video->a80store_w(false);
 	m_altzp = false;
 	m_ramrd = false;
 	m_ramwrt = false;
@@ -1304,7 +1295,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 		m_vbl = true;
 
 		// update the video system's shadow copy of the system config
-		m_video->m_sysconfig = m_sysconfig->read();
+		m_video->set_sysconfig(m_sysconfig->read());
 
 		if (m_vblmask)
 		{
@@ -1386,9 +1377,9 @@ void apple2e_state::auxbank_update()
 		m_0000bank.select(m_altzp ? 1 : 0);
 		m_0200bank.select(ramwr);
 
-		if (m_80store)
+		if (m_video->get_80store())
 		{
-			if (m_page2)
+			if (m_video->get_page2())
 			{
 				m_0400bank.select(3);
 			}
@@ -1404,9 +1395,9 @@ void apple2e_state::auxbank_update()
 
 		m_0800bank.select(ramwr);
 
-		if ((m_80store) && (m_video->m_hires))
+		if ((m_video->get_80store()) && (m_video->get_hires()))
 		{
-			if (m_page2)
+			if (m_video->get_page2())
 			{
 				m_2000bank.select(3);
 			}
@@ -1771,13 +1762,13 @@ void apple2e_state::do_io(int offset, bool is_iic)
 			break;
 
 		case 0x54:  // set page 1
-			m_page2 = false;
+			m_video->page2_w(false);
 			m_video->scr_w(0);
 			auxbank_update();
 			break;
 
 		case 0x55:  // set page 2
-			m_page2 = true;
+			m_video->page2_w(true);
 			m_video->scr_w(1);
 			auxbank_update();
 			break;
@@ -1918,28 +1909,28 @@ u8 apple2e_state::c000_r(offs_t offset)
 			return (m_slotc3rom ? 0x80 : 0x00) | m_transchar;
 
 		case 0x18:  // read 80STORE
-			return (m_80store ? 0x80 : 0x00) | m_transchar;
+			return (m_video->get_80store() ? 0x80 : 0x00) | m_transchar;
 
 		case 0x19:  // read VBLBAR
 			return (m_screen->vblank() ? 0x00 : 0x80) | m_transchar;
 
 		case 0x1a:  // read TEXT
-			return (m_video->m_graphics ? 0x00 : 0x80) | m_transchar;
+			return (m_video->get_graphics() ? 0x00 : 0x80) | m_transchar;
 
 		case 0x1b:  // read MIXED
-			return (m_video->m_mix ? 0x80 : 0x00) | m_transchar;
+			return (m_video->get_mix() ? 0x80 : 0x00) | m_transchar;
 
 		case 0x1c:  // read PAGE2
-			return (m_page2 ? 0x80 : 0x00) | m_transchar;
+			return (m_video->get_page2() ? 0x80 : 0x00) | m_transchar;
 
 		case 0x1d:  // read HIRES
-			return (m_video->m_hires ? 0x80 : 0x00) | m_transchar;
+			return (m_video->get_hires() ? 0x80 : 0x00) | m_transchar;
 
 		case 0x1e:  // read ALTCHARSET
-			return (m_video->m_altcharset ? 0x80 : 0x00) | m_transchar;
+			return (m_video->get_altcharset() ? 0x80 : 0x00) | m_transchar;
 
 		case 0x1f:  // read 80COL
-			return (m_video->m_80col ? 0x80 : 0x00) | m_transchar;
+			return (m_video->get_80col() ? 0x80 : 0x00) | m_transchar;
 
 		case 0x26:  // Ace 2x00 DIP switches
 			if (m_isace2200)
@@ -2002,7 +1993,7 @@ u8 apple2e_state::c000_r(offs_t offset)
 			return (m_ioudis ? 0x00 : 0x80) | uFloatingBus7;
 
 		case 0x7f:  // read DHIRES
-			return (m_video->m_dhires ? 0x00 : 0x80) | uFloatingBus7;
+			return (m_video->get_dhires() ? 0x00 : 0x80) | uFloatingBus7;
 
 		default:
 			do_io(offset, false);
@@ -2148,14 +2139,12 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 	switch (offset)
 	{
 		case 0x00:  // 80STOREOFF
-			m_80store = false;
-			m_video->m_80store = false;
+			m_video->a80store_w(false);
 			auxbank_update();
 			break;
 
 		case 0x01:  // 80STOREON
-			m_80store = true;
-			m_video->m_80store = true;
+			m_video->a80store_w(true);
 			auxbank_update();
 			break;
 
@@ -2218,19 +2207,19 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x0c:  // 80COLOFF
-			m_video->m_80col = false;
+			m_video->a80col_w(false);
 			break;
 
 		case 0x0d:  // 80COLON
-			m_video->m_80col = true;
+			m_video->a80col_w(true);
 			break;
 
 		case 0x0e:  // ALTCHARSETOFF
-			m_video->m_altcharset = false;
+			m_video->altcharset_w(false);
 			break;
 
 		case 0x0f:  // ALTCHARSETON
-			m_video->m_altcharset = true;
+			m_video->altcharset_w(true);
 			break;
 
 		case 0x20:  // cassette output
@@ -2371,28 +2360,28 @@ u8 apple2e_state::c000_iic_r(offs_t offset)
 			return (m_yirq ? 0x80 : 0x00) | m_transchar;
 
 		case 0x18:  // read 80STORE
-			return (m_80store ? 0x80 : 0x00) | m_transchar;
+			return (m_video->get_80store() ? 0x80 : 0x00) | m_transchar;
 
 		case 0x19:  // read VBL
 			return (m_vbl ? 0x80 : 0x00) | m_transchar;
 
 		case 0x1a:  // read TEXT
-			return (m_video->m_graphics ? 0x00 : 0x80) | m_transchar;
+			return (m_video->get_graphics() ? 0x00 : 0x80) | m_transchar;
 
 		case 0x1b:  // read MIXED
-			return (m_video->m_mix ? 0x80 : 0x00) | m_transchar;
+			return (m_video->get_mix() ? 0x80 : 0x00) | m_transchar;
 
 		case 0x1c:  // read PAGE2
-			return (m_page2 ? 0x80 : 0x00) | m_transchar;
+			return (m_video->get_page2() ? 0x80 : 0x00) | m_transchar;
 
 		case 0x1d:  // read HIRES
-			return (m_video->m_hires ? 0x80 : 0x00) | m_transchar;
+			return (m_video->get_hires() ? 0x80 : 0x00) | m_transchar;
 
 		case 0x1e:  // read ALTCHARSET
-			return (m_video->m_altcharset ? 0x80 : 0x00) | m_transchar;
+			return (m_video->get_altcharset() ? 0x80 : 0x00) | m_transchar;
 
 		case 0x1f:  // read 80COL
-			return (m_video->m_80col ? 0x80 : 0x00) | m_transchar;
+			return (m_video->get_80col() ? 0x80 : 0x00) | m_transchar;
 
 		case 0x40:  // read XYMask (IIc only)
 			return m_xy ? 0x80 : 0x00;
@@ -2443,7 +2432,7 @@ u8 apple2e_state::c000_iic_r(offs_t offset)
 			return (m_ioudis ? 0x00 : 0x80) | uFloatingBus7;
 
 		case 0x7f:  // read DHIRES
-			return (m_video->m_dhires ? 0x00 : 0x80) | uFloatingBus7;
+			return (m_video->get_dhires() ? 0x00 : 0x80) | uFloatingBus7;
 
 		default:
 			do_io(offset, true);
@@ -2470,14 +2459,12 @@ void apple2e_state::c000_iic_w(offs_t offset, u8 data)
 	switch (offset)
 	{
 		case 0x00:  // 80STOREOFF
-			m_80store = false;
-			m_video->m_80store = false;
+			m_video->a80store_w(false);
 			auxbank_update();
 			break;
 
 		case 0x01:  // 80STOREON
-			m_80store = true;
-			m_video->m_80store = true;
+			m_video->a80store_w(true);
 			auxbank_update();
 			break;
 
@@ -2532,19 +2519,19 @@ void apple2e_state::c000_iic_w(offs_t offset, u8 data)
 			break;
 
 		case 0x0c:  // 80COLOFF
-			m_video->m_80col = false;
+			m_video->a80col_w(false);
 			break;
 
 		case 0x0d:  // 80COLON
-			m_video->m_80col = true;
+			m_video->a80col_w(true);
 			break;
 
 		case 0x0e:  // ALTCHARSETOFF
-			m_video->m_altcharset = false;
+			m_video->altcharset_w(false);
 			break;
 
 		case 0x0f:  // ALTCHARSETON
-			m_video->m_altcharset = true;
+			m_video->altcharset_w(true);
 			break;
 
 		case 0x5a:  // IIC+ accelerator unlock
@@ -2877,11 +2864,11 @@ void apple2e_state::c080_w(offs_t offset, u8 data)
 					m_cec_bank = data;
 					if (data & 0x10)
 					{
-						m_video->m_monohgr = false;
+						m_video->monohgr_w(false);
 					}
 					else
 					{
-						m_video->m_monohgr = true;
+						m_video->monohgr_w(true);
 					}
 
 					auxbank_update();
@@ -3385,10 +3372,10 @@ u8 apple2e_state::read_floatingbus()
 
 	// machine state switches
 	//
-	Hires    = (m_video->m_hires && m_video->m_graphics) ? 1 : 0;
-	Mixed    = m_video->m_mix ? 1 : 0;
-	Page2    = m_page2 ? 1 : 0;
-	_80Store = m_80store ? 1 : 0;
+	Hires = (m_video->get_hires() && m_video->get_graphics()) ? 1 : 0;
+	Mixed = m_video->get_mix() ? 1 : 0;
+	Page2 = m_video->get_page2() ? 1 : 0;
+	_80Store = m_video->get_80store() ? 1 : 0;
 
 	// calculate video parameters according to display standard
 	// we call this "PAL", but it's also for SECAM

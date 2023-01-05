@@ -102,11 +102,9 @@ void superga2_state::machine_start()
 	save_item(NAME(m_speaker_state));
 
 	// setup video pointers
-	m_video->m_ram_ptr = m_ram_ptr;
-	m_video->m_aux_ptr = m_ram_ptr;
-	m_video->m_char_ptr = memregion("gfx1")->base();
-	m_video->m_char_size = memregion("gfx1")->bytes();
-	m_video->m_sysconfig = 0;
+	m_video->set_ram_pointers(m_ram_ptr, m_ram_ptr);
+	m_video->set_char_pointer(memregion("gfx1")->base(), memregion("gfx1")->bytes());
+	m_video->set_sysconfig(0);
 }
 
 void superga2_state::machine_reset()

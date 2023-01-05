@@ -309,10 +309,8 @@ void apple2_state::machine_start()
 	save_item(NAME(m_anykeydown));
 
 	// setup video pointers
-	m_video->m_ram_ptr = m_ram_ptr;
-	m_video->m_aux_ptr = m_ram_ptr;
-	m_video->m_char_ptr = memregion("gfx1")->base();
-	m_video->m_char_size = memregion("gfx1")->bytes();
+	m_video->set_ram_pointers(m_ram_ptr, m_ram_ptr);
+	m_video->set_char_pointer(memregion("gfx1")->base(), memregion("gfx1")->bytes());
 }
 
 void apple2_state::machine_reset()
@@ -333,7 +331,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
 	// update the video system's shadow copy of the system config at the end of the frame
 	if (scanline == 192)
 	{
-		m_video->m_sysconfig = m_sysconfig->read();
+		m_video->set_sysconfig(m_sysconfig->read());
 
 		// check reset
 		if (m_resetdip.found()) // if reset DIP is present, use it
@@ -678,9 +676,9 @@ u8 apple2_state::read_floatingbus()
 
 	// machine state switches
 	//
-	Hires    = (m_video->m_hires && m_video->m_graphics) ? 1 : 0;
-	Mixed    = m_video->m_mix ? 1 : 0;
-	Page2    = m_video->m_page2 ? 1 : 0;
+	Hires    = (m_video->get_hires() && m_video->get_graphics()) ? 1 : 0;
+	Mixed    = m_video->get_mix() ? 1 : 0;
+	Page2    = m_video->get_page2() ? 1 : 0;
 	_80Store = 0;
 
 	// calculate video parameters according to display standard
