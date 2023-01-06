@@ -1623,6 +1623,14 @@ void sparc_base_device::execute_rdsr(uint32_t op)
 {
 	// The SPARC Instruction Manual: Version 8, page 182, "Appendix C - ISP Descriptions - Read State Register Instructions" (SPARCv8.pdf, pg. 179)
 
+	if (RDASR && RS1 == 15 && RD == 0)
+	{
+		// Store Barrier instruction - not implemented, as stores are always consistent in the context of MAME
+		PC = nPC;
+		nPC = nPC + 4;
+		return;
+	}
+
 	if (((RDPSR || RDWIM || RDTBR) || (RDASR && m_privileged_asr[RS1])) && IS_USER)
 	{
 		m_trap = 1;
