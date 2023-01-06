@@ -68,7 +68,7 @@ Cybernaut                        0B42        Cheap Squeak
 Eight Ball Deluxe (reissue)      0B87
 Big Bat (BY133)                  ----        AS-2518-61 (Squawk & Talk)
 **** Bell ****
-Cosmic Flash
+Cosmic Flash                                 Modified Bally's Squawk & Talk
 Fantasy
 Fireball II
 Flash Gordon
@@ -99,7 +99,7 @@ Space Rider
 **** Grand Products ****
 301/Bullseye
 **** Arkon Automaten ****
-Sexy Girl
+Sexy Girl (ROMs are same as Bally's Playboy, uses an additional image projector)
 **** Elbos Electronics ****
 Genesis
 **** Zaccaria ****
@@ -2414,8 +2414,8 @@ ROM_START(cosflash)
 	ROM_CONTINUE( 0x5800, 0x0800)
 	ROM_RELOAD( 0x7000, 0x1000)
 	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("834-20_2.532", 0xc000, 0x1000, CRC(2f8ced3e) SHA1(ecdeb07c31c22ec313b55774f4358a9923c5e9e7))
-	ROM_LOAD("834-18_5.532", 0xf000, 0x1000, CRC(8799e80e) SHA1(f255b4e7964967c82cfc2de20ebe4b8d501e3cb0))
+	// This ROM contains an illegal opcode at $9B0 (02 instead of C6, LDI immediate). However it works correctly on real PCB. Marked bad until verified.
+	ROM_LOAD("cf-sound.532", 0xb000, 0x1000, BAD_DUMP CRC(7fda4f13) SHA1(9993ba890e91613014bad0950511bcff522b8dbd))
 ROM_END
 
 /*--------------------------------
