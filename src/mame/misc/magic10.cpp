@@ -880,7 +880,6 @@ static INPUT_PORTS_START( spetrix )
 	PORT_DIPNAME( 0x8000,   0x0000, "DIP8" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(        0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(        0x0000, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 
@@ -1901,8 +1900,8 @@ void magic102_state::init_altaten()
 	// patching the boot protection...
 	uint8_t *rom = memregion("maincpu")->base();
 
-		rom[0x7668] = 0x71;
-		rom[0x7669] = 0x4e;
+	rom[0x7668] = 0x71;
+	rom[0x7669] = 0x4e;
 }
 
 } // Anonymous namespace
@@ -1927,4 +1926,4 @@ GAMEL( 1996, sgsafari,  0,        sgsafari, sgsafari, magic10_state,  init_sgsaf
 GAMEL( 1995, musicsrt,  0,        magic10a, musicsrt, magic10_state,  init_magic10,  ROT0, "ABM Games",            "Music Sort (ver. 2.02)",         MACHINE_SUPPORTS_SAVE,                        layout_musicsrt )
 GAME(  1998, lunaprk,   0,        magic102, magic102, magic102_state, init_suprpool, ROT0, "ABM Games",            "Luna Park (ver. 1.2)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME(  1999, altaten,   0,        magic102, magic102, magic102_state, init_altaten,  ROT0, "<unknown>",            "Alta Tensione (ver. 2.01a)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME(  199?, spetrix,   0,        spetrix,  spetrix,  spetrix_state,  init_spetrix,  ROT0, "<unknown>",            "Super Petrix ver 1P",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME(  199?, spetrix,   0,        spetrix,  spetrix,  spetrix_state,  init_spetrix,  ROT0, "<unknown>",            "Super Petrix (ver. 1P)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
