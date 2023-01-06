@@ -49,8 +49,6 @@ ROM source notes when dumped from another title, but confident it's the same:
 
 TODO:
 - tweak MCU frequency for games when video/audio recording surfaces(YouTube etc.)
-- sfxphasor default music mode should have volume decay, I can't get it working
-  without breaking sound effects or command C (volume decay with values 15 and up)
 - what's the relation between drdunk and hccbaskb? Probably made by the same
   Hong Kong subcontractor? I presume Toytronic.
 - uspbball and pabball internal artwork
@@ -63,12 +61,15 @@ TODO:
 #include "video/pwm.h"
 #include "machine/clock.h"
 #include "machine/input_merger.h"
+#include "machine/netlist.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/flt_vol.h"
 #include "sound/spkrdev.h"
 
 #include "speaker.h"
+
+#include "nl_sfxphasor.h"
 
 // internal artwork
 #include "drdunk.lh"
@@ -448,7 +449,7 @@ ROM_END
 
   Electroplay Sound FX Phasor
   * PIC 1655A-522
-  * 3-bit sound with volume decay
+  * 3-bit sound with volume envelope
 
   It's a toy synthesizer. It included keypad overlays with nursery rhymes.
 
@@ -465,48 +466,20 @@ class sfxphasor_state : public hh_pic16_state
 public:
 	sfxphasor_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_pic16_state(mconfig, type, tag),
-		m_dac(*this, "dac"),
-		m_volume(*this, "volume")
+		m_sound_nl(*this, "sound_nl:p%02u", 10U)
 	{ }
 
 	void sfxphasor(machine_config &config);
 
-protected:
-	virtual void machine_start() override;
-
 private:
-	required_device<dac_3bit_r2r_device> m_dac;
-	required_device<filter_volume_device> m_volume;
+	optional_device_array<netlist_mame_logic_input_device, 8> m_sound_nl;
 
 	void write_b(u8 data);
 	void write_c(u8 data);
 	u8 read_c();
-
-	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
-	double m_speaker_volume = 0.0;
 };
 
-void sfxphasor_state::machine_start()
-{
-	hh_pic16_state::machine_start();
-	save_item(NAME(m_speaker_volume));
-}
-
 // handlers
-
-TIMER_DEVICE_CALLBACK_MEMBER(sfxphasor_state::speaker_decay_sim)
-{
-	m_speaker_volume = std::clamp(m_speaker_volume, 0.0001, 1.0);
-	m_volume->flt_volume_set_volume(m_speaker_volume);
-
-	// volume goes down while B3 is low
-	if (~m_b & 8)
-		m_speaker_volume /= 1.0001;
-
-	// volume goes up while B3 is high
-	else
-		m_speaker_volume *= 1.0013;
-}
 
 void sfxphasor_state::write_b(u8 data)
 {
@@ -514,12 +487,13 @@ void sfxphasor_state::write_b(u8 data)
 	if (~m_b & data & 4)
 		set_power(false);
 
-	// B0: trigger speaker on
-	if (~m_b & data & 1)
-		m_volume->flt_volume_set_volume(m_speaker_volume = 1.0);
+	// B0,B3: envelope param
+	m_sound_nl[0]->write_line(BIT(data, 0));
+	m_sound_nl[3]->write_line(BIT(data, 3));
 
-	// B5-B7: speaker out via 68K, 12K, 1K resistors
-	m_dac->write(data >> 5 & 7);
+	// B5-B7: sound out
+	for (int i = 5; i < 8; i++)
+		m_sound_nl[i]->write_line(BIT(data, i));
 
 	m_b = data;
 }
@@ -591,10 +565,14 @@ void sfxphasor_state::sfxphasor(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	DAC_3BIT_R2R(config, m_dac).add_route(ALL_OUTPUTS, "volume", 0.25);
-	FILTER_VOLUME(config, m_volume).add_route(ALL_OUTPUTS, "mono", 1.0);
+	NETLIST_SOUND(config, "sound_nl", 48000).set_source(NETLIST_NAME(sfxphasor)).add_route(ALL_OUTPUTS, "mono", 0.25);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "SPK1.1").set_mult_offset(1.0, 0.0);
 
-	TIMER(config, "speaker_decay").configure_periodic(FUNC(sfxphasor_state::speaker_decay_sim), attotime::from_usec(10));
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p10", "P10.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p13", "P13.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p15", "P15.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p16", "P16.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p17", "P17.IN", 0);
 }
 
 // roms
