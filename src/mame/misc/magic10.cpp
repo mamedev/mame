@@ -94,9 +94,11 @@
 
   The game will now boot into Super Petrix.
   There is a hidden poker game which can be selected in various ways.
-  1. Toggle the BOOT TO POKER input. From now on the game will only run Poker.
+  1. Toggle the "Switch to Poker Mode" input. From now on the game will only run Poker.
   2. The player can select Poker from Tetris by pressing HOLD1, HOLD2, HOLD3, HOLD4, START
      in sequence.
+  3. The operator can use a hidden test to enable other methods of entering Poker such
+     as completing one line of Tetris, completing one level of Tetris and other methods.
 
   There is a hidden test menu which allows various settings to be changed, this
   includes ticket payout, changing the player sequence to enter Poker etc.
@@ -455,7 +457,7 @@ void spetrix_state::out_w(uint16_t data)
 
 */
 
-	m_ticket->motor_w(BIT(data, 9) );
+	m_ticket->motor_w(BIT(data, 9));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 10));
 }
 
@@ -835,8 +837,8 @@ static INPUT_PORTS_START( spetrix )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 )        PORT_NAME("Select - Start / Collect")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET )    PORT_NAME("Rotate Right - Bet / Collect")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )         PORT_NAME("Coin 1")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )         PORT_NAME("Coin 2")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START2 )        PORT_NAME("Petrix Start")
 	PORT_SERVICE_NO_TOGGLE( 0x1000, IP_ACTIVE_LOW )
@@ -849,7 +851,7 @@ static INPUT_PORTS_START( spetrix )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_BUTTON1 )      PORT_NAME("Boot to Poker")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_SERVICE1 )     PORT_NAME("Switch to Poker Mode")
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1925,4 +1927,4 @@ GAMEL( 1996, sgsafari,  0,        sgsafari, sgsafari, magic10_state,  init_sgsaf
 GAMEL( 1995, musicsrt,  0,        magic10a, musicsrt, magic10_state,  init_magic10,  ROT0, "ABM Games",            "Music Sort (ver. 2.02)",         MACHINE_SUPPORTS_SAVE,                        layout_musicsrt )
 GAME(  1998, lunaprk,   0,        magic102, magic102, magic102_state, init_suprpool, ROT0, "ABM Games",            "Luna Park (ver. 1.2)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME(  1999, altaten,   0,        magic102, magic102, magic102_state, init_altaten,  ROT0, "<unknown>",            "Alta Tensione (ver. 2.01a)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME(  199?, spetrix,   0,        spetrix,  spetrix,  spetrix_state,  init_spetrix,  ROT0, "<unknown>",            "Super Petrix ver 1P",            MACHINE_SUPPORTS_SAVE )
+GAME(  199?, spetrix,   0,        spetrix,  spetrix,  spetrix_state,  init_spetrix,  ROT0, "<unknown>",            "Super Petrix ver 1P",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
