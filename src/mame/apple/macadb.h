@@ -58,11 +58,12 @@ private:
 	u16 m_key_matrix[9];
 
 	// ADB HLE state
-	int32_t m_adb_state, m_adb_waiting_cmd, m_adb_datasize, m_adb_buffer[257];
+	int32_t m_adb_state, m_adb_waiting_cmd, m_adb_datasize;
 	int32_t m_adb_command, m_adb_send, m_adb_timer_ticks, m_adb_extclock, m_adb_direction;
 	int32_t m_adb_listenreg, m_adb_listenaddr, m_adb_last_talk, m_adb_srq_switch;
 	int32_t m_adb_stream_ptr;
 	int32_t m_adb_linestate;
+	u8 m_adb_buffer[257], m_last_kbd[2], m_last_mouse[2];
 	bool  m_adb_srqflag;
 	int m_adb_linein;
 

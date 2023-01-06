@@ -614,7 +614,22 @@ void macadb_device::adb_talk()
 							m_adb_buffer[0] = (m_adb_lastbutton & 0x01) ? 0x00 : 0x80;
 							m_adb_buffer[0] |= mouseY & 0x7f;
 							m_adb_buffer[1] = (mouseX & 0x7f) | 0x80;
-							m_adb_datasize = 2;
+
+							if ((m_adb_buffer[0] != m_last_mouse[0]) || (m_adb_buffer[1] != m_last_mouse[1]))
+							{
+								m_adb_datasize = 2;
+								m_last_mouse[0] = m_adb_buffer[0];
+								m_last_mouse[1] = m_adb_buffer[1];
+							}
+							else
+							{
+								m_adb_datasize = 0;
+
+								if (adb_pollkbd(0)) //&& (!m_bIsIIGSMode))
+								{
+									m_adb_srqflag = true;
+								}
+							}
 							break;
 
 						// get ID/handler
@@ -629,15 +644,10 @@ void macadb_device::adb_talk()
 						default:
 							break;
 					}
-
-					if ((adb_pollkbd(0)) && (!m_bIsIIGSMode))
-					{
-						m_adb_srqflag = true;
-					}
 				}
 				else if (addr == m_adb_keybaddr)
 				{
-					int kbd_has_data = 1;
+//                  int kbd_has_data = 1;
 					LOGMASKED(LOG_TALK_LISTEN, "Talking to keyboard, register %x\n", reg);
 
 					switch (reg)
@@ -650,47 +660,44 @@ void macadb_device::adb_talk()
 							}
 							else
 							{
-								kbd_has_data = this->adb_pollkbd(1);
+								adb_pollkbd(1);
 							}
 
-/*                            if (m_adb_currentkeys[0] != 0xff)
-                            {
-                                printf("Keys[0] = %02x\n", m_adb_currentkeys[0]);
-                            }
-                            if (m_adb_currentkeys[1] != 0xff)
-                            {
-                                printf("Keys[1] = %02x\n", m_adb_currentkeys[1]);
-                            }*/
-
-							if(kbd_has_data)
+							if (m_adb_keybuf_start == m_adb_keybuf_end)
 							{
-								if (m_adb_keybuf_start == m_adb_keybuf_end)
-								{
-	//                              printf("%s: buffer empty\n", __func__);
-									m_adb_buffer[0] = 0xff;
-									m_adb_buffer[1] = 0xff;
-								}
-								else
-								{
-									m_adb_buffer[1] = m_adb_keybuf[m_adb_keybuf_start];
-									m_adb_keybuf_start = (m_adb_keybuf_start+1) % kADBKeyBufSize;
-									if(m_adb_keybuf_start != m_adb_keybuf_end)
-									{
-										m_adb_buffer[0] = m_adb_keybuf[m_adb_keybuf_start];
-										m_adb_keybuf_start = (m_adb_keybuf_start+1) % kADBKeyBufSize;
-									}
-									else
-									{
-										m_adb_buffer[0] = 0xff;
-									}
-								}
-								m_adb_datasize = 2;
+//                              printf("%s: buffer empty\n", __func__);
+								m_adb_buffer[0] = 0xff;
+								m_adb_buffer[1] = 0xff;
 							}
 							else
 							{
-								m_adb_buffer[0] = 0xff;
-								m_adb_buffer[1] = 0xff;
+								m_adb_buffer[1] = m_adb_keybuf[m_adb_keybuf_start];
+								m_adb_keybuf_start = (m_adb_keybuf_start+1) % kADBKeyBufSize;
+								if(m_adb_keybuf_start != m_adb_keybuf_end)
+								{
+									m_adb_buffer[0] = m_adb_keybuf[m_adb_keybuf_start];
+									m_adb_keybuf_start = (m_adb_keybuf_start+1) % kADBKeyBufSize;
+								}
+								else
+								{
+									m_adb_buffer[0] = 0xff;
+								}
+							}
+
+							if ((m_adb_buffer[0] != m_last_kbd[0]) || (m_adb_buffer[1] != m_last_kbd[1]))
+							{
 								m_adb_datasize = 2;
+								m_last_kbd[0] = m_adb_buffer[0];
+								m_last_kbd[1] = m_adb_buffer[1];
+							}
+							else
+							{
+								m_adb_datasize = 0;
+
+								if ((adb_pollmouse()) && (!m_bIsIIGSMode))
+								{
+									m_adb_srqflag = true;
+								}
 							}
 							break;
 
@@ -715,11 +722,6 @@ void macadb_device::adb_talk()
 
 						default:
 							break;
-					}
-
-					if ((adb_pollmouse()) && (!m_bIsIIGSMode))
-					{
-						m_adb_srqflag = true;
 					}
 				}
 				else
