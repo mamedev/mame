@@ -142,6 +142,11 @@ WRITE_LINE_MEMBER(a2_video_device::an2_w)
 	m_an2 = state;
 }
 
+// 4-bit left rotate. Bits 4-6 of n must be a copy of bits 0-2.
+static inline unsigned rotl4b(unsigned n, unsigned count) { return (n >> (-count & 3)) & 0x0F; }
+// 4-bit left rotate. Bits 4-6 of n must be zero.
+static inline unsigned rotl4(unsigned n, unsigned count) { return rotl4b(n * 0x11, count); }
+
 // This table implements a colorization scheme defined by one's complement and mirror symmetries
 // and the following rules:
 //
@@ -670,7 +675,7 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 				{
 					if (((col * 14 + b) >= cliprect.left()) && ((col * 14 + b) <= cliprect.right()))
 					{
-						*p = uint8_t(artifact_color_lut[(w >> b) & 0x7f] << ((col * 14 + b) & 3)) >> 4;
+						*p = rotl4b(artifact_color_lut[(w >> b) & 0x7f], col * 14 + b);
 					}
 					p++;
 				}
@@ -695,9 +700,8 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 {
 	uint16_t v;
 	int const page = use_page_2() ? 0x4000 : 0x2000;
-	int mon_type = m_sysconfig & 0x03;
-	bool const bIsRGB = ((m_sysconfig & 7) == 4);
-	bool const bIsRGBMixed = ((bIsRGB) && (m_rgbmode == 1));
+	int mon_type = m_sysconfig & 7;
+	bool const bIsRGB160 = (mon_type == 4 && m_rgbmode == 2);
 
 	// IIgs force-monochrome-DHR setting
 	if (m_newvideo & 0x20)
@@ -706,7 +710,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 
 	// IIe RGB card monochrome DHR
-	if ((bIsRGB) && (m_rgbmode == 0))
+	if (mon_type == 4 && m_rgbmode == 0)
 	{
 		mon_type = 1;
 	}
@@ -737,10 +741,32 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 		uint16_t *p = &bitmap.pix(row);
 
-		// RGB DHR 160-wide mode
-		if ((bIsRGB) && (m_rgbmode == 2))
+		if (bIsRGB160)
 		{
-			mon_type = 4;
+			// RGB 160-wide mode (which has a much simpler VRAM layout).
+			// Center a 480-wide image in the 560-wide display.
+			// Aspect ratio won't be perfect, but it's in range.
+			for (int b = 0; b < 40; b++)
+			{
+				*p++ = BLACK;
+			}
+			for (int col = 0; col < 80; col++)
+			{
+				v = vram_row[col+1];
+				*p++ = v & 0xf;
+				*p++ = v & 0xf;
+				*p++ = v & 0xf;
+				v >>= 4;
+				*p++ = v & 0xf;
+				*p++ = v & 0xf;
+				*p++ = v & 0xf;
+			}
+			for (int b = 0; b < 40; b++)
+			{
+				*p++ = BLACK;
+			}
+
+			continue;
 		}
 
 		for (int col = 0; col < 80; col++)
@@ -749,85 +775,11 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 						|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
 						|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
 
-			/*
-			    DHGR pixel layout:
-			    column & 3 =  0        1        2        3
-			               nBBBAAAA nDDCCCCB nFEEEEDD nGGGGFFF
-
-			    n is don't care on the stock hardware's NTSC output.
-
-			    On RGB cards, in mixed mode (DHGR with special mode value == 1), n
-			    controls if a pixel quad starting in that byte is color or monochrome.
-			    Pixel quads A&B are controlled by n in byte 0, C&D by n in byte 1,
-			    E&F by n in byte 2, and G by n in byte 3.
-			*/
-
 			switch (mon_type)
 			{
 				case 0:
-					// every 3rd column, the first pixel quad is controlled by the previous
-					// byte's MSB, because we always draw 2 quads per column.
-					if ((bIsRGBMixed) && ((col & 3) == 3))
-					{
-						uint32_t tw = (w >> 6);
-
-						if (!(vram_row[col-1] & 0x80))
-						{
-							for (int b = 0; b < 4; b++)
-							{
-								v = (tw & 1);
-								tw >>= 1;
-								*(p++) = v ? WHITE : BLACK;
-							}
-						}
-						else
-						{
-							for (int b = 0; b < 4; b++)
-							{
-								v = ((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (-(col*7+b) & 0x03)) & 0x0F;
-								*(p++) = v;
-							}
-						}
-
-						if (!(vram_row[col] & 0x80))
-						{
-							for (int b = 4; b < 7; b++)
-							{
-								v = (tw & 1);
-								tw >>= 1;
-								*(p++) = v ? WHITE : BLACK;
-							}
-						}
-						else
-						{
-							for (int b = 4; b < 7; b++)
-							{
-								v = ((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (-(col*7+b) & 0x03)) & 0x0F;
-								*(p++) = v;
-							}
-						}
-					}
-					else
-					{
-						if ((bIsRGBMixed) && !(vram_row[col] & 0x80))
-						{
-							uint32_t tw = (w >> 6);
-							for (int b = 0; b < 7; b++)
-							{
-								v = (tw & 1);
-								tw >>= 1;
-								*(p++) = v ? WHITE : BLACK;
-							}
-						}
-						else
-						{
-							for (int b = 0; b < 7; b++)
-							{
-								v = ((((w >> (b + 7-1)) & 0x0F) * 0x11) >> (-(col*7+b) & 0x03)) & 0x0F;
-								*(p++) = v;
-							}
-						}
-					}
+					for (int b = 0; b < 7; b++)
+						*p++ = rotl4((w >> (b + 7-1)) & 0x0F, col * 7 + b);
 					break;
 
 				case 1:
@@ -865,34 +817,37 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					}
 					break;
 
-				// RGB 160-wide mode (which has a much simpler VRAM layout)
 				case 4:
-					if (col == 0)
-					{
-						// Center the 480-wide image in the 560-wide display.
-						// Aspect ratio won't be perfect, but it's in range.
-						for (int b = 0; b < 40; b++)
-						{
-							*(p++) = BLACK;
-						}
-					}
-					v = vram_row[col];
-					*(p++) = v & 0xf;
-					*(p++) = v & 0xf;
-					*(p++) = v & 0xf;
-					v >>= 4;
-					*(p++) = v & 0xf;
-					*(p++) = v & 0xf;
-					*(p++) = v & 0xf;
-					break;
-			}
-		}
+					// Video-7 RGB with m_rgbmode == 1 (mixed) or 3 (color). In color mode, the card
+					// seems to produce just 7 wide pixels per 4 bytes:
+					//   column & 3 =  0        1        2        3
+					//              nBBBAAAA nDDCCCCB nFEEEEDD nGGGGFFF
+					//
+					// In mixed mode, the Video-7 User's Manual says:
+					//
+					// "When [the MSB is 0] the hardware displays the remaining seven bits as bit-mapped
+					// video; a logic 'one' will instruct the hardware to display the next seven bits
+					// as color pixels. [...] color aberrations will occur at the leading and trailing
+					// edges of the transitions from one mode to the other. The aberrations may be
+					// eliminated by blanking enough bytes at the beginning and end of each transition
+					// to guarantee the four bit integrity of the corresponding color pixels."
+					//
+					// It's impossible to know the nature of the aberrations without hardware to test,
+					// but hopefully this warning means software was designed so that it doesn't matter.
 
-		if (mon_type == 4)
-		{
-			for (int b = 0; b < 40; b++)
-			{
-				*(p++) = BLACK;
+					if (m_rgbmode == 1 && !(vram_row[col+1] & 0x80))  // monochrome
+					{
+						for (int b = 0; b < 7; b++)
+							*p++ = ((w >> (b + 7)) & 1) ? WHITE : BLACK;
+					}
+					else  // color
+					{
+						// In column 0 get the color from w bits 7-10 or 11-14,
+						// in column 1 get the color from w bits 4-7 or 8-11, etc.
+						for (int b = 0; b < 7; b++)
+							*p++ = rotl4((w >> (b - ((b - col) & 3) + 7)) & 0x0F, 1);
+					}
+					break;
 			}
 		}
 	}
