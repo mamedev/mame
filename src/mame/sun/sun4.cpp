@@ -666,12 +666,12 @@ protected:
 
 	void fcodes_command(int ref, const std::vector<std::string_view> &params);
 
-	static constexpr u32 LOG_TIMER_COUNT_WRITES[2] = { LOG_TMR0_COUNT_WRITES, LOG_TMR1_COUNT_WRITES };
-	static constexpr u32 LOG_TIMER_LIMIT_WRITES[2] = { LOG_TMR0_LIMIT_WRITES, LOG_TMR1_LIMIT_WRITES };
-	static constexpr u32 LOG_TIMER_COUNT_READS[2] = { LOG_TMR0_COUNT_READS, LOG_TMR1_COUNT_READS };
-	static constexpr u32 LOG_TIMER_LIMIT_READS[2] = { LOG_TMR0_LIMIT_READS, LOG_TMR1_LIMIT_READS };
-	static constexpr int TIMER_IRQ_LINES[2] = { SPARC_IRQ10, SPARC_IRQ14 };
-	static constexpr u8 TIMER_IRQ_MASKS[2] = { 0x21, 0x81 };
+	static constexpr inline u32 LOG_TIMER_COUNT_WRITES[2] = { LOG_TMR0_COUNT_WRITES, LOG_TMR1_COUNT_WRITES };
+	static constexpr inline u32 LOG_TIMER_LIMIT_WRITES[2] = { LOG_TMR0_LIMIT_WRITES, LOG_TMR1_LIMIT_WRITES };
+	static constexpr inline u32 LOG_TIMER_COUNT_READS[2] = { LOG_TMR0_COUNT_READS, LOG_TMR1_COUNT_READS };
+	static constexpr inline u32 LOG_TIMER_LIMIT_READS[2] = { LOG_TMR0_LIMIT_READS, LOG_TMR1_LIMIT_READS };
+	static constexpr inline int TIMER_IRQ_LINES[2] = { SPARC_IRQ10, SPARC_IRQ14 };
+	static constexpr inline u8 TIMER_IRQ_MASKS[2] = { 0x21, 0x81 };
 };
 
 class sun4_state : public sun4_base_state
