@@ -921,8 +921,8 @@ void sun4_base_state::machine_reset()
 
 	m_timer_count[0] = 0;
 	m_timer_count[1] = 0;
-	m_timer_limit[2] = 0;
-	m_timer_limit[3] = 0;
+	m_timer_limit[0] = 0;
+	m_timer_limit[1] = 0;
 
 	m_dma_ctrl = 0;
 	m_dma_addr = 0;
