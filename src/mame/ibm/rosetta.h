@@ -36,19 +36,27 @@ public:
 
 	// rsc_cpu_interface overrides
 	virtual bool fetch(u32 address, u16 &data, rsc_mode const mode) override;
-	virtual bool ior(u32 address, u32 &data) override;
-	virtual bool iow(u32 address, u32 data) override;
 
 	// rsc_bus_interface overrides
-	virtual bool load(u32 address, u8 &data, rsc_mode const mode, bool sp) override { return load<u8>(address, data, mode, sp); }
-	virtual bool load(u32 address, u16 &data, rsc_mode const mode, bool sp) override { return load<u16>(address, data, mode, sp); }
-	virtual bool load(u32 address, u32 &data, rsc_mode const mode, bool sp) override { return load<u32>(address, data, mode, sp); }
-	virtual bool store(u32 address, u8 data, rsc_mode const mode, bool sp) override { return store<u8>(address, data, mode, sp); }
-	virtual bool store(u32 address, u16 data, rsc_mode const mode, bool sp) override { return store<u16>(address, data, mode, sp); }
-	virtual bool store(u32 address, u32 data, rsc_mode const mode, bool sp) override { return store<u32>(address, data, mode, sp); }
-	virtual bool modify(u32 address, std::function<u8(u8)> f, rsc_mode const mode) override { return modify<u8>(address, f, mode); }
-	virtual bool modify(u32 address, std::function<u16(u16)> f, rsc_mode const mode) override { return modify<u16>(address, f, mode); }
-	virtual bool modify(u32 address, std::function<u32(u32)> f, rsc_mode const mode) override { return modify<u32>(address, f, mode); }
+	virtual bool mem_load(u32 address, u8 &data, rsc_mode const mode, bool sp) override { return load<u8>(address, data, mode, sp); }
+	virtual bool mem_load(u32 address, u16 &data, rsc_mode const mode, bool sp) override { return load<u16>(address, data, mode, sp); }
+	virtual bool mem_load(u32 address, u32 &data, rsc_mode const mode, bool sp) override { return load<u32>(address, data, mode, sp); }
+	virtual bool mem_store(u32 address, u8 data, rsc_mode const mode, bool sp) override { return store<u8>(address, data, mode, sp); }
+	virtual bool mem_store(u32 address, u16 data, rsc_mode const mode, bool sp) override { return store<u16>(address, data, mode, sp); }
+	virtual bool mem_store(u32 address, u32 data, rsc_mode const mode, bool sp) override { return store<u32>(address, data, mode, sp); }
+	virtual bool mem_modify(u32 address, std::function<u8(u8)> f, rsc_mode const mode) override { return modify<u8>(address, f, mode); }
+	virtual bool mem_modify(u32 address, std::function<u16(u16)> f, rsc_mode const mode) override { return modify<u16>(address, f, mode); }
+	virtual bool mem_modify(u32 address, std::function<u32(u32)> f, rsc_mode const mode) override { return modify<u32>(address, f, mode); }
+
+	virtual bool pio_load(u32 address, u8 &data, rsc_mode const mode) override { return false; }
+	virtual bool pio_load(u32 address, u16 &data, rsc_mode const mode) override { return false; }
+	virtual bool pio_load(u32 address, u32 &data, rsc_mode const mode) override { return ior(address, data); }
+	virtual bool pio_store(u32 address, u8 data, rsc_mode const mode) override { return false; }
+	virtual bool pio_store(u32 address, u16 data, rsc_mode const mode) override { return false; }
+	virtual bool pio_store(u32 address, u32 data, rsc_mode const mode) override { return iow(address, data); }
+	virtual bool pio_modify(u32 address, std::function<u8(u8)> f, rsc_mode const mode) override { return false; }
+	virtual bool pio_modify(u32 address, std::function<u16(u16)> f, rsc_mode const mode) override { return false; }
+	virtual bool pio_modify(u32 address, std::function<u32(u32)> f, rsc_mode const mode) override { return false; }
 
 protected:
 	// device_t overrides
@@ -64,6 +72,8 @@ protected:
 	template <typename T> bool load(u32 address, T &data, rsc_mode const mode, bool sp);
 	template <typename T> bool store(u32 address, T data, rsc_mode const mode, bool sp);
 	template <typename T> bool modify(u32 address, std::function<T(T)> f, rsc_mode const mode);
+	bool ior(u32 address, u32 &data);
+	bool iow(u32 address, u32 data);
 
 	// register read handlers
 	u32 segment_r(offs_t offset);

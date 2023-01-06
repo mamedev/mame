@@ -19,6 +19,14 @@ public:
 	auto out_int() { return m_out_int.bind(); }
 	auto out_rst() { return m_out_rst.bind(); }
 
+	enum pio_flags : u16
+	{
+		PIO_B    = 0x0000,
+		PIO_W    = 0x0001,
+
+		PIO_SIZE = 0x0001,
+	};
+
 	enum ccr_mask : u8
 	{
 		CCR_RFE = 0x02, // refresh enable
@@ -67,22 +75,29 @@ public:
 
 	using rsc_mode = rsc_bus_interface::rsc_mode;
 
-	// rsc_pio_interface overrides
-	virtual bool load(u32 address, u8 &data, rsc_mode const mode, bool sp) override { return load<u8>(address, data, mode); }
-	virtual bool load(u32 address, u16 &data, rsc_mode const mode, bool sp) override { return load<u16>(address, data, mode); }
-	virtual bool load(u32 address, u32 &data, rsc_mode const mode, bool sp) override { return load<u32>(address, data, mode); }
-	virtual bool store(u32 address, u8 data, rsc_mode const mode, bool sp) override { return store<u8>(address, data, mode); }
-	virtual bool store(u32 address, u16 data, rsc_mode const mode, bool sp) override { return store<u16>(address, data, mode); }
-	virtual bool store(u32 address, u32 data, rsc_mode const mode, bool sp) override { return store<u32>(address, data, mode); }
-	virtual bool modify(u32 address, std::function<u8(u8)> f, rsc_mode const mode) override { return modify<u8>(address, f, mode); }
-	virtual bool modify(u32 address, std::function<u16(u16)> f, rsc_mode const mode) override { return modify<u16>(address, f, mode); }
-	virtual bool modify(u32 address, std::function<u32(u32)> f, rsc_mode const mode) override { return modify<u32>(address, f, mode); }
+	// rsc_bus_interface overrides
+	virtual bool mem_load(u32 address, u8 &data, rsc_mode const mode, bool sp) override { return mem_load<u8>(address, data, mode); }
+	virtual bool mem_load(u32 address, u16 &data, rsc_mode const mode, bool sp) override { return mem_load<u16>(address, data, mode); }
+	virtual bool mem_load(u32 address, u32 &data, rsc_mode const mode, bool sp) override { return mem_load<u32>(address, data, mode); }
+	virtual bool mem_store(u32 address, u8 data, rsc_mode const mode, bool sp) override { return mem_store<u8>(address, data, mode); }
+	virtual bool mem_store(u32 address, u16 data, rsc_mode const mode, bool sp) override { return mem_store<u16>(address, data, mode); }
+	virtual bool mem_store(u32 address, u32 data, rsc_mode const mode, bool sp) override { return mem_store<u32>(address, data, mode); }
+	virtual bool mem_modify(u32 address, std::function<u8(u8)> f, rsc_mode const mode) override { return mem_modify<u8>(address, f, mode); }
+	virtual bool mem_modify(u32 address, std::function<u16(u16)> f, rsc_mode const mode) override { return mem_modify<u16>(address, f, mode); }
+	virtual bool mem_modify(u32 address, std::function<u32(u32)> f, rsc_mode const mode) override { return mem_modify<u32>(address, f, mode); }
+
+	virtual bool pio_load(u32 address, u8 &data, rsc_mode const mode) override { return pio_load<u8>(address, data, mode); }
+	virtual bool pio_load(u32 address, u16 &data, rsc_mode const mode) override { return pio_load<u16>(address, data, mode); }
+	virtual bool pio_load(u32 address, u32 &data, rsc_mode const mode) override { return pio_load<u32>(address, data, mode); }
+	virtual bool pio_store(u32 address, u8 data, rsc_mode const mode) override { return pio_store<u8>(address, data, mode); }
+	virtual bool pio_store(u32 address, u16 data, rsc_mode const mode) override { return pio_store<u16>(address, data, mode); }
+	virtual bool pio_store(u32 address, u32 data, rsc_mode const mode) override { return pio_store<u32>(address, data, mode); }
+	virtual bool pio_modify(u32 address, std::function<u8(u8)> f, rsc_mode const mode) override { return pio_modify<u8>(address, f, mode); }
+	virtual bool pio_modify(u32 address, std::function<u16(u16)> f, rsc_mode const mode) override { return pio_modify<u16>(address, f, mode); }
+	virtual bool pio_modify(u32 address, std::function<u32(u32)> f, rsc_mode const mode) override { return pio_modify<u32>(address, f, mode); }
 
 	u8 ccr_r() { return m_ccr; }
 	void ccr_w(u8 data) { m_ccr = data; }
-
-	template <unsigned Word> u16 csr_r() { return u16((m_csr | CSR_RSV) >> (16 * Word)); }
-	void csr_w(u16 data) { set_int(false); m_csr = 0; }
 
 	u8 dma_b_r(offs_t offset);
 	u8 dma_w_r(offs_t offset);
@@ -93,9 +108,6 @@ public:
 	u8 dbr_r() { return m_dbr; }
 	void dmr_w(u8 data) { m_dmr = data; }
 	void dbr_w(u8 data) { m_dbr = data; }
-
-	u16 tcw_r(offs_t offset) { return m_tcw[offset]; }
-	void tcw_w(offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_tcw[offset]); }
 
 	template <unsigned Channel> void dack_w(int state) { if (!state) m_adc = Channel; }
 
@@ -111,9 +123,12 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 	//virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
 
-	template <typename T> bool load(u32 address, T &data, rsc_mode const mode);
-	template <typename T> bool store(u32 address, T data, rsc_mode const mode);
-	template <typename T> bool modify(u32 address, std::function<T(T)> f, rsc_mode const mode);
+	template <typename T> bool mem_load(u32 address, T &data, rsc_mode const mode);
+	template <typename T> bool mem_store(u32 address, T data, rsc_mode const mode);
+	template <typename T> bool mem_modify(u32 address, std::function<T(T)> f, rsc_mode const mode);
+	template <typename T> bool pio_load(u32 address, T &data, rsc_mode const mode);
+	template <typename T> bool pio_store(u32 address, T data, rsc_mode const mode);
+	template <typename T> bool pio_modify(u32 address, std::function<T(T)> f, rsc_mode const mode);
 
 	void set_int(bool state)
 	{
@@ -121,38 +136,22 @@ protected:
 		{
 			if (state)
 				m_csr |= CSR_INTP;
+
 			m_out_int_state = state;
 			m_out_int(!m_out_int_state);
 		}
 	}
 
-	unsigned target_size(u32 const address) const
-	{
-		if (address < 0xf000'8000U)
-		{
-			if (address == 0xf000'0110U || address == 0xf000'0112U)
-				return 2;
-			else
-				// FIXME: get size from isa bus
-				return 1;
-		}
-		else if (address == 0xf000'80e0U)
-			// exception for i/o delay register
-			return 4;
-		else if (address == 0xf000'8400U)
-			// exception for kls
-			return 2;
-		else if (address < 0xf001'0000U)
-			return 1;
-		else if (address < 0xf001'0800U)
-			return 2;
-		else
-			return 4;
-	}
-
 private:
+	static constexpr u32 REG_MASK = 0xffff'f800U; // on-chip register mask
+	static constexpr u32 TCW_BASE = 0xf001'0000U; // translation control registers base address
+	static constexpr u32 CSR_ADDR = 0xf001'0800U; // channel status register address
+
 	address_space_config m_mem_config;
 	address_space_config m_pio_config;
+
+	memory_access<24, 1, 0, ENDIANNESS_LITTLE>::specific m_mem;
+	memory_access<24, 1, 0, ENDIANNESS_LITTLE>::specific m_pio;
 
 	devcb_write_line m_out_int;
 	devcb_write_line m_out_rst;
