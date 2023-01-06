@@ -21049,7 +21049,9 @@ madalienb                       // (c) 1980
 madmotor                        // (c) [1989] Mitchell
 
 @source:misc/magic10.cpp
+altaten                         // 1999 unknown
 hotslot                         // (c) 1996 ABM Games
+lunaprk                         // (c) 1998 ABM Games
 magic10                         // (c) 1995 A.W.P. Games
 magic102                        // (c) 1997 ABM Games
 magic102a                       // (c) 1997 ABM Games
@@ -21060,9 +21062,8 @@ mcolors                         // (c) 1999 ABM Games
 mcolorsa                        // (c) 1999 ABM Games
 musicsrt                        // (c) 1995 ABM Games
 sgsafari                        // (c) 1996 New Impeuropex Corp.
+spetrix                         // 199? unknown
 suprpool                        // (c) 1998 ABM Games
-lunaprk                         // (c) 1998 ABM Games
-altaten                         // 1999 unknown
 
 @source:misc/magicard.cpp
 belslots                        // (c) 1999 Impera
