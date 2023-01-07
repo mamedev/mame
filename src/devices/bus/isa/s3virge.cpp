@@ -1035,6 +1035,12 @@ uint32_t s3virge_vga_device::GetROP(uint8_t rop, uint32_t src, uint32_t dst, uin
 		case 0x00:  // 0
 			ret = 0;
 			break;
+		case 0x0a:  // DPna
+			ret = (dst & (~pat));
+			break;
+		case 0x22:  // DSna
+			ret = (dst & (~src));
+			break;
 		case 0x55:  // Dn
 			ret = ~dst;
 			break;
@@ -1049,10 +1055,18 @@ uint32_t s3virge_vga_device::GetROP(uint8_t rop, uint32_t src, uint32_t dst, uin
 			break;
 		case 0xb8:  // PSDPxax
 			ret = ((dst ^ pat) & src) ^ pat;
-//          machine().debug_break();
+			break;
+		case 0xbb:  // DSno
+			ret = (dst | (~src));
 			break;
 		case 0xcc:
 			ret = src;
+			break;
+		case 0xe2:  // DSPDxax
+			ret = ((pat ^ dst) & src) ^ dst;
+			break;
+		case 0xee:  // DSo
+			ret = (dst | src);
 			break;
 		case 0xf0:
 			ret = pat;
@@ -1061,7 +1075,7 @@ uint32_t s3virge_vga_device::GetROP(uint8_t rop, uint32_t src, uint32_t dst, uin
 			ret = 0xffffffff;
 			break;
 		default:
-			popmessage("Unimplemented ROP 0x%02x",rop);
+			popmessage("bus/isa/s3virge.cpp: Unimplemented ROP 0x%02x",rop);
 	}
 
 	return ret;
