@@ -37,7 +37,7 @@ https://www.bitsavers.org/pdf/vectorGraphic/vector_4/7100-0001_Vector_4_Users_Ma
 
 TODO:
 - keyboard mcu
-- S-100
+- S-100 interrupts and ready
 - parallel port
 - WAIT CPU states
 - CPM-86 and MS-DOS 2.0 don't boot
@@ -46,10 +46,11 @@ TODO:
 
 #include "emu.h"
 
-#include "dualmodedisk.h"
 #include "sbcvideo.h"
 
 #include "bus/rs232/rs232.h"
+#include "bus/s100/s100.h"
+#include "bus/s100/vectordualmode.h"
 #include "cpu/i86/i86.h"
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
@@ -75,6 +76,7 @@ public:
 		, m_ram(*this, "mainram")
 		, m_romenbl(*this, "romenbl")
 		, m_sbc_video(*this, "video")
+		, m_s100(*this, "s100")
 	{ }
 
 	void vector4(machine_config &config);
@@ -87,6 +89,8 @@ private:
 	uint8_t msc_r();
 	void msc_w(uint8_t data) { machine_reset(); }
 	void addrmap_w(offs_t offset, uint8_t data);
+	uint8_t s100_r(offs_t offset) { return m_s100->sinp_r(offset+0x20); }
+	void s100_w(offs_t offset, uint8_t data) { m_s100->sout_w(offset+0x20, data); }
 	void machine_start() override;
 	void machine_reset() override;
 
@@ -97,6 +101,7 @@ private:
 	required_shared_ptr<uint8_t> m_ram;
 	memory_view m_romenbl;
 	required_device<vector_sbc_video_device> m_sbc_video;
+	required_device<s100_bus_device> m_s100;
 };
 
 
@@ -134,7 +139,12 @@ void vector4_state::vector4_io(address_map &map)
 	map(0x16, 0x17).select(0xff00).w(FUNC(vector4_state::addrmap_w)); // RAM address map
 	map(0x18, 0x19).mirror(0xff00).w("sn", FUNC(sn76489_device::write)); // tone generator
 	map(0x1c, 0x1f).mirror(0xff00).w(m_sbc_video, FUNC(vector_sbc_video_device::res320_mapping_ram_w)); // resolution 320 mapping RAM
-	map(0xc0, 0xc3).mirror(0xff00).rw("dualmode", FUNC(vector_dualmode_device::read), FUNC(vector_dualmode_device::write)); // disk controller
+	map(0x20, 0xff).mirror(0xff00).rw(FUNC(vector4_state::s100_r), FUNC(vector4_state::s100_w));
+}
+
+static void vector4_s100_devices(device_slot_interface &device)
+{
+	device.option_add("dualmodedisk", S100_VECTOR_DUALMODE);
 }
 
 static INPUT_PORTS_START( vector4 )
@@ -172,9 +182,13 @@ void vector4_state::vector4(machine_config &config)
 	m_sbc_video->set_chrromr("chargenr");
 
 	/* i/o */
-	VECTOR_DUALMODE(config, "dualmode", 0);
-
 	XTAL _2mclk(2'000'000); // 7200-0001 page 210 (VI A-7) D13
+
+	S100_BUS(config, m_s100, _2mclk);
+	S100_SLOT(config, "s100:1", vector4_s100_devices, "dualmodedisk");
+	S100_SLOT(config, "s100:2", vector4_s100_devices, nullptr);
+	S100_SLOT(config, "s100:3", vector4_s100_devices, nullptr);
+
 	pit8253_device &pit(PIT8253(config, "pit", 0));
 	// 7200-0001 page 210 D7, 208 (VI A-5) A1
 	pit.set_clk<0>(_2mclk);

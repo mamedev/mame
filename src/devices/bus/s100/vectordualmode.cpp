@@ -18,7 +18,6 @@ https://www.bitsavers.org/pdf/vectorGraphic/hardware/7200-1200-02-1_Dual-Mode_Di
 https://archive.org/details/7200-0001-vector-4-technical-information-sep-82
 
 TODO:
-- connect via S-100
 - use floppy subsystem
 - HDD support
 - ECC
@@ -27,7 +26,7 @@ TODO:
 
 #include "emu.h"
 
-#include "dualmodedisk.h"
+#include "bus/s100/vectordualmode.h"
 
 #include "logmacro.h"
 
@@ -52,8 +51,9 @@ image_init_result vector_micropolis_image_device::call_load()
 	return image_init_result::PASS;
 }
 
-vector_dualmode_device::vector_dualmode_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, VECTOR_DUALMODE, tag, owner, clock)
+s100_vector_dualmode_device::s100_vector_dualmode_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, S100_VECTOR_DUALMODE, tag, owner, clock)
+	, device_s100_card_interface(mconfig, *this)
 	, m_floppy(*this, "floppy%u", 0U)
 	, m_ram{0}
 	, m_cmar(0)
@@ -65,11 +65,11 @@ vector_dualmode_device::vector_dualmode_device(const machine_config &mconfig, co
 {
 }
 
-uint8_t vector_dualmode_device::read(offs_t offset)
+uint8_t s100_vector_dualmode_device::s100_sinp_r(offs_t offset)
 {
 	// 7200-1200-02-1 page 16 (1-10)
 	uint8_t data;
-	if (offset == 0) { // status (0) port
+	if (offset == 0xc0) { // status (0) port
 		bool write_protect = !m_floppy[m_drive]->is_open() || m_floppy[m_drive]->is_readonly(); // FDD
 		bool ready = false; // HDD
 		bool track0 = m_floppy[m_drive]->is_open() && m_track == 0;
@@ -80,17 +80,17 @@ uint8_t vector_dualmode_device::read(offs_t offset)
 		data = write_protect | (ready << 1) | (track0 << 2)
 		    | (write_fault << 3) | (seek_complete << 4) | (loss_of_sync << 5)
 			| 0xc0;
-	} else if (offset == 1) { // status (1) port
+	} else if (offset == 0xc1) { // status (1) port
 		bool floppy_disk_selected = true;
 		bool controller_busy = false;
 		bool motor_on = m_motor_on_timer->enabled(); // FDD
 		bool type_of_hard_disk = false;
 		data = floppy_disk_selected | (controller_busy << 1) | (motor_on << 2)
 		    | (type_of_hard_disk << 3) | 0xf0;
-	} else if (offset == 2) { // data port
+	} else if (offset == 0xc2) { // data port
 		data = m_ram[m_cmar++];
 		m_cmar &= 0x1ff;
-	} else if (offset == 3) { // reset port
+	} else if (offset == 0xc3) { // reset port
 		m_cmar = 0;
 		data = 0xff;
 	} else {
@@ -99,10 +99,10 @@ uint8_t vector_dualmode_device::read(offs_t offset)
 	return data;
 }
 
-void vector_dualmode_device::write(offs_t offset, uint8_t data)
+void s100_vector_dualmode_device::s100_sout_w(offs_t offset, uint8_t data)
 {
 	// 7200-1200-02-1 page 14 (1-8)
-	if (offset == 0) { // control (0) port
+	if (offset == 0xc0) { // control (0) port
 		m_drive = BIT(data, 0, 2);
 		m_head = BIT(data, 2, 3);
 		uint8_t step = BIT(data, 5);
@@ -116,13 +116,13 @@ void vector_dualmode_device::write(offs_t offset, uint8_t data)
 		}
 		// WR0| triggers U60, a 74LS123 with 100uF cap and 100k res
 		m_motor_on_timer->adjust(attotime::from_usec(2819600));
-	} else if (offset == 1) { // control (1) port
+	} else if (offset == 0xc1) { // control (1) port
 		m_sector = BIT(data, 0, 5);
 		m_read = BIT(data, 5);
-	} else if (offset == 2) { // data port
+	} else if (offset == 0xc2) { // data port
 		m_ram[m_cmar++] = data;
 		m_cmar &= 0x1ff;
-	} else if (offset == 3) { // start port
+	} else if (offset == 0xc3) { // start port
 		// Read and write use cmar, so if it is not 0 you get weird results.
 		// It is always supposed to be reset before read/write
 		if (m_cmar != 0 || !m_floppy[m_drive]->is_open() || m_track >= 77)
@@ -166,7 +166,7 @@ void vector_dualmode_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-void vector_dualmode_device::device_start()
+void s100_vector_dualmode_device::device_start()
 {
 	m_motor_on_timer = timer_alloc();
 
@@ -179,7 +179,7 @@ void vector_dualmode_device::device_start()
 	save_item(NAME(m_read));
 }
 
-void vector_dualmode_device::device_reset()
+void s100_vector_dualmode_device::device_reset()
 {
 	// POC| resets
 	// U9
@@ -192,7 +192,7 @@ void vector_dualmode_device::device_reset()
 	m_motor_on_timer->enable(false);
 }
 
-void vector_dualmode_device::device_add_mconfig(machine_config &config)
+void s100_vector_dualmode_device::device_add_mconfig(machine_config &config)
 {
 	MICROPOLIS_IMAGE(config, m_floppy[0], 0);
 	MICROPOLIS_IMAGE(config, m_floppy[1], 0);
@@ -201,4 +201,4 @@ void vector_dualmode_device::device_add_mconfig(machine_config &config)
 }
 
 DEFINE_DEVICE_TYPE(MICROPOLIS_IMAGE, vector_micropolis_image_device, "micropolisimage", "Micropolis Image (VGI)")
-DEFINE_DEVICE_TYPE(VECTOR_DUALMODE, vector_dualmode_device, "vectordualmodedisk", "Vector Dual-Mode Disk Controller")
+DEFINE_DEVICE_TYPE(S100_VECTOR_DUALMODE, s100_vector_dualmode_device, "vectordualmode", "Vector Dual-Mode Disk Controller")

@@ -1,9 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Eric Anderson
-#ifndef MAME_VECTORGRAPHIC_DUALMODEDISK_H
-#define MAME_VECTORGRAPHIC_DUALMODEDISK_H
+#ifndef MAME_BUS_S100_VECTORDUALMODE_H
+#define MAME_BUS_S100_VECTORDUALMODE_H
 
 #pragma once
+
+#include "bus/s100/s100.h"
 
 class vector_micropolis_image_device :
 		public device_t,
@@ -28,18 +30,20 @@ protected:
 	void device_start() override;
 };
 
-class vector_dualmode_device : public device_t
+class s100_vector_dualmode_device :
+		public device_t,
+		public device_s100_card_interface
 {
 public:
-	vector_dualmode_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	s100_vector_dualmode_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	void device_start() override;
 	void device_reset() override;
 	void device_add_mconfig(machine_config &config) override;
+
+	uint8_t s100_sinp_r(offs_t offset) override;
+	void s100_sout_w(offs_t offset, uint8_t data) override;
 
 private:
 	required_device_array<vector_micropolis_image_device, 4> m_floppy;
@@ -54,6 +58,6 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(MICROPOLIS_IMAGE, vector_micropolis_image_device)
-DECLARE_DEVICE_TYPE(VECTOR_DUALMODE, vector_dualmode_device)
+DECLARE_DEVICE_TYPE(S100_VECTOR_DUALMODE, s100_vector_dualmode_device)
 
-#endif // MAME_VECTORGRAPHIC_DUALMODEDISK_H
+#endif // MAME_BUS_S100_VECTORDUALMODE_H
