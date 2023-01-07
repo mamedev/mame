@@ -141,9 +141,8 @@ void vector_sbc_video_device::device_add_mconfig(machine_config &config)
 	crtc.set_update_row_callback(FUNC(vector_sbc_video_device::update_row));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_raw(32'640'000, 1600, 0, 1280, 340, 0, 312);
 	screen.set_screen_update(crtc, FUNC(c6545_1_device::screen_update));
-	screen.set_size(1280, 312);
 }
 
 void vector_sbc_video_device::device_start()
