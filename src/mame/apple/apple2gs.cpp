@@ -3534,12 +3534,13 @@ u8 apple2gs_state::keyglu_816_read(u8 offset)
 		case GLU_MOUSEY:
 			if (!m_glu_mouse_read_stat)
 			{
-				m_glu_mouse_read_stat = 1;
-				m_glu_regs[GLU_KG_STATUS] &= ~KGS_MOUSEX_FULL;
-				m_glu_regs[GLU_SYSSTAT] &= ~GLU_STATUS_MOUSEIRQ;
-				keyglu_regen_irqs();
+				m_glu_mouse_read_stat = true;
 				return m_glu_regs[GLU_MOUSEX];
 			}
+			m_glu_mouse_read_stat = false;
+			m_glu_regs[GLU_KG_STATUS] &= ~KGS_MOUSEX_FULL;
+			m_glu_regs[GLU_SYSSTAT] &= ~GLU_STATUS_MOUSEIRQ;
+			keyglu_regen_irqs();
 			return m_glu_regs[GLU_MOUSEY];
 
 		case GLU_SYSSTAT:
@@ -3550,7 +3551,7 @@ u8 apple2gs_state::keyglu_816_read(u8 offset)
 				{
 					sysstat |= GLU_STATUS_CMDFULL;
 				}
-				if (m_glu_regs[GLU_KG_STATUS] & m_glu_mouse_read_stat)
+				if (m_glu_mouse_read_stat)
 				{
 					sysstat |= GLU_STATUS_MOUSEXY;
 				}
