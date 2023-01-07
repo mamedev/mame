@@ -56,10 +56,11 @@ MC6845_UPDATE_ROW(vector_sbc_video_device::update_row)
 	bool color = (m_io_sbc_video_conf->read() & 0x1) == 0x1;
 	// video never uses MA17. 7200-0001 209 B5
 	uint32_t addr = BIT(ma, 0, 10); // U82 U100
+	uint8_t jumper_c = (m_io_sbc_video_conf->read() >> 1) & 0x7;
 	if (graph)
 		addr |= (ra | (BIT(ma, 11, 2) << 4)) << 10; // U81
 	else
-		addr |= (BIT(ma, 10, 4) | 0x10) << 10; // U99
+		addr |= (BIT(ma, 10, 4) | (jumper_c << 4)) << 10; // U99
 	addr <<= 1;
 
 	// The display is always 312 scanlines.
@@ -158,9 +159,16 @@ void vector_sbc_video_device::device_reset()
 
 INPUT_PORTS_START( sbc_video )
 	PORT_START("SBC_VIDEO_CONF")
-	PORT_CONFNAME( 0x001, 0x000, "Color Monitor" )
-	PORT_CONFSETTING(     0x000, DEF_STR(No)     )
-	PORT_CONFSETTING(     0x001, DEF_STR(Yes)    )
+	PORT_CONFNAME(0x001, 0x000, "Color Monitor")
+	PORT_CONFSETTING(0x000, DEF_STR(No))
+	PORT_CONFSETTING(0x001, DEF_STR(Yes))
+
+	PORT_CONFNAME(0x00e, 0x002, "Alpha Graphic Memory Block")
+	PORT_CONFSETTING(0x000, "0x00000-0x07FFFF")
+	PORT_CONFSETTING(0x002, "0x08000-0x0FFFFF")
+	PORT_CONFSETTING(0x004, "0x10000-0x17FFFF")
+	PORT_CONFSETTING(0x006, "0x18000-0x1FFFFF")
+	// TODO: 256k
 INPUT_PORTS_END
 
 ioport_constructor vector_sbc_video_device::device_input_ports() const
