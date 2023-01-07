@@ -1,15 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Tony La Porta
-	/**************************************************************************\
-	*                      Microchip PIC16C5x Emulator                         *
-	*                                                                          *
-	*                    Copyright Tony La Porta                               *
-	*                 Originally written for the MAME project.                 *
-	*                                                                          *
-	*                                                                          *
-	*      Addressing architecture is based on the Harvard addressing scheme.  *
-	*                                                                          *
-	\**************************************************************************/
+/*
+
+  Microchip PIC16C5x Emulator
+
+  Copyright Tony La Porta
+  Originally written for the MAME project.
+
+*/
 
 #ifndef MAME_CPU_PIC16C5X_PIC16C5X_H
 #define MAME_CPU_PIC16C5X_PIC16C5X_H

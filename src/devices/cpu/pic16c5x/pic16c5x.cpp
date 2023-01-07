@@ -1,77 +1,96 @@
 // license:BSD-3-Clause
 // copyright-holders:Tony La Porta
-	/**************************************************************************\
-	*                      Microchip PIC16C5x Emulator                         *
-	*                                                                          *
-	*                    Copyright Tony La Porta                               *
-	*                 Originally written for the MAME project.                 *
-	*                                                                          *
-	*                                                                          *
-	*      Addressing architecture is based on the Harvard addressing scheme.  *
-	*                                                                          *
-	*                                                                          *
-	*  **** Change Log ****                                                    *
-	*  TLP (06-Apr-2003)                                                       *
-	*   - First Public release.                                                *
-	*  BO  (07-Apr-2003) Ver 1.01                                              *
-	*   - Renamed 'sleep' function to 'sleepic' to avoid C conflicts.          *
-	*  TLP (09-Apr-2003) Ver 1.10                                              *
-	*   - Fixed modification of file register $03 (Status).                    *
-	*   - Corrected support for 7FFh (12-bit) size ROMs.                       *
-	*   - The 'call' and 'goto' instructions weren't correctly handling the    *
-	*     STATUS page info correctly.                                          *
-	*   - The FSR register was incorrectly oring the data with 0xe0 when read. *
-	*   - Prescaler masking information was set to 3 instead of 7.             *
-	*   - Prescaler assign bit was set to 4 instead of 8.                      *
-	*   - Timer source and edge select flags/masks were wrong.                 *
-	*   - Corrected the memory bank selection in GET/SET_REGFILE and also the  *
-	*     indirect register addressing.                                        *
-	*  BMP (18-May-2003) Ver 1.11                                              *
-	*   - pic16c5x_get_reg functions were missing 'returns'.                   *
-	*  TLP (27-May-2003) Ver 1.12                                              *
-	*   - Fixed the WatchDog timer count.                                      *
-	*   - The Prescaler rate was incorrectly being zeroed, instead of the      *
-	*     actual Prescaler counter in the CLRWDT and SLEEP instructions.       *
-	*   - Added masking to the FSR register. Upper unused bits are always 1.   *
-	*  TLP (27-Aug-2009) Ver 1.13                                              *
-	*   - Indirect addressing was not taking into account special purpose      *
-	*     memory mapped locations.                                             *
-	*   - 'iorlw' instruction was saving the result to memory instead of       *
-	*     the W register.                                                      *
-	*   - 'tris' instruction no longer modifies Port-C on PIC models that      *
-	*     do not have Port-C implemented.                                      *
-	*  TLP (07-Sep-2009) Ver 1.14                                              *
-	*   - Edge sense control for the T0 count input was incorrectly reversed   *
-	*  LE (05-Feb-2017) Ver 1.15                                               *
-	*   - Allow writing all bits of the status register except TO and PD.      *
-	*     This enables e.g. bcf, bsf or clrf to change the flags when the      *
-	*     status register is the destination.                                  *
-	*   - Changed rlf and rrf to update the carry flag in the last step.       *
-	*     Fixes the case where the status register is the destination.         *
-	*  hap (12-Feb-2017) Ver 1.16                                              *
-	*   - Added basic support for the old GI PIC1650 and PIC1655.              *
-	*   - Made RTCC(aka T0CKI) pin an inputline handler.                       *
-	*  pa (12-Jun-2022) Ver 1.17                                               *
-	*   - Port callback functions pass tristate value in mem_mask.             *
-	*                                                                          *
-	*                                                                          *
-	*  **** Notes: ****                                                        *
-	*  PIC WatchDog Timer has a separate internal clock. For the moment, we're *
-	*     basing the count on a 4MHz input clock, since 4MHz is the typical    *
-	*     input frequency (but by no means always).                            *
-	*  A single scaler is available for the Counter/Timer or WatchDog Timer.   *
-	*     When connected to the Counter/Timer, it functions as a Prescaler,    *
-	*     hence prescale overflows, tick the Counter/Timer.                    *
-	*     When connected to the WatchDog Timer, it functions as a Postscaler   *
-	*     hence WatchDog Timer overflows, tick the Postscaler. This scenario   *
-	*     means that the WatchDog timeout occurs when the Postscaler has       *
-	*     reached the scaler rate value, not when the WatchDog reaches zero.   *
-	*  CLRWDT should prevent the WatchDog Timer from timing out and generating *
-	*     a device reset, but how is not known. The manual also mentions that  *
-	*     the WatchDog Timer can only be disabled during ROM programming, and  *
-	*     no other means seem to exist???                                      *
-	*                                                                          *
-	\**************************************************************************/
+/************************************************************************
+
+  Microchip PIC16C5x Emulator
+
+  Copyright Tony La Porta
+  Originally written for the MAME project.
+
+
+**** Notes: ****
+
+Addressing architecture is based on the Harvard addressing scheme.
+
+Initially meant to be an interface chip to GI's CP1600, but pretty quickly
+marketed as a more generic MCU.
+
+A single scaler is available for the Counter/Timer or WatchDog Timer.
+When connected to the Counter/Timer, it functions as a Prescaler,
+hence prescale overflows, tick the Counter/Timer.
+When connected to the WatchDog Timer, it functions as a Postscaler
+hence WatchDog Timer overflows, tick the Postscaler. This scenario
+means that the WatchDog timeout occurs when the Postscaler has
+reached the scaler rate value, not when the WatchDog reaches zero.
+
+
+**** TODO: ****
+
+- PIC WatchDog Timer has a separate internal clock. For the moment, we're
+  basing the count on a 4MHz input clock, since 4MHz is the typical
+  input frequency (but by no means always).
+- CLRWDT should prevent the WatchDog Timer from timing out and generating
+  a device reset, but how is not known. The manual also mentions that
+  the WatchDog Timer can only be disabled during ROM programming, and
+  no other means seem to exist???
+- get rid of m_picmodel checks (use virtual function overrides in subclasses)
+
+
+**** Change Log: ****
+
+TLP (06-Apr-2003)
+- First Public release.
+
+BO  (07-Apr-2003) Ver 1.01
+- Renamed 'sleep' function to 'sleepic' to avoid C conflicts.
+
+TLP (09-Apr-2003) Ver 1.10
+- Fixed modification of file register $03 (Status).
+- Corrected support for 7FFh (12-bit) size ROMs.
+- The 'call' and 'goto' instructions weren't correctly handling the
+  STATUS page info correctly.
+- The FSR register was incorrectly oring the data with 0xe0 when read.
+- Prescaler masking information was set to 3 instead of 7.
+- Prescaler assign bit was set to 4 instead of 8.
+- Timer source and edge select flags/masks were wrong.
+- Corrected the memory bank selection in GET/SET_REGFILE and also the
+  indirect register addressing.
+
+BMP (18-May-2003) Ver 1.11
+- pic16c5x_get_reg functions were missing 'returns'.
+
+TLP (27-May-2003) Ver 1.12
+- Fixed the WatchDog timer count.
+- The Prescaler rate was incorrectly being zeroed, instead of the
+  actual Prescaler counter in the CLRWDT and SLEEP instructions.
+- Added masking to the FSR register. Upper unused bits are always 1.
+
+TLP (27-Aug-2009) Ver 1.13
+- Indirect addressing was not taking into account special purpose
+  memory mapped locations.
+- 'iorlw' instruction was saving the result to memory instead of
+  the W register.
+- 'tris' instruction no longer modifies Port-C on PIC models that
+  do not have Port-C implemented.
+
+TLP (07-Sep-2009) Ver 1.14
+- Edge sense control for the T0 count input was incorrectly reversed
+
+LE (05-Feb-2017) Ver 1.15
+- Allow writing all bits of the status register except TO and PD.
+  This enables e.g. bcf, bsf or clrf to change the flags when the
+  status register is the destination.
+- Changed rlf and rrf to update the carry flag in the last step.
+  Fixes the case where the status register is the destination.
+
+hap (12-Feb-2017) Ver 1.16
+- Added basic support for the old GI PIC1650 and PIC1655.
+- Made RTCC(aka T0CKI) pin an inputline handler.
+
+pa (12-Jun-2022) Ver 1.17
+- Port callback functions pass tristate value in mem_mask.
+
+************************************************************************/
 
 #include "emu.h"
 #include "pic16c5x.h"
