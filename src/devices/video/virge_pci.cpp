@@ -31,6 +31,9 @@ void virge_pci_device::mmio_map(address_map& map)
 	map(0x1000000,0x1007fff).w(m_vga, FUNC(s3virge_vga_device::image_xfer));
 
 	// MMIO address map
+	map(0x10083b0,0x10083bf).rw(FUNC(virge_pci_device::vga_3b0_r), FUNC(virge_pci_device::vga_3b0_w));
+	map(0x10083c0,0x10083df).rw(FUNC(virge_pci_device::vga_3c0_r), FUNC(virge_pci_device::vga_3c0_w));
+	map(0x10083d0,0x10083df).rw(FUNC(virge_pci_device::vga_3d0_r), FUNC(virge_pci_device::vga_3d0_w));
 	map(0x1008504,0x1008507).rw(m_vga, FUNC(s3virge_vga_device::s3d_sub_status_r), FUNC(s3virge_vga_device::s3d_sub_control_w));
 	map(0x100850c,0x100850f).r(m_vga, FUNC(s3virge_vga_device::s3d_func_ctrl_r));
 
