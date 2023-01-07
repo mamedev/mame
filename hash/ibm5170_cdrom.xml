@@ -552,6 +552,24 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
+	<!-- DOS (recommended), Windows 95 -->
+	<software name="archdyn" supported="no">
+		<!-- 24/10/1996 RE -->
+		<description>Archimedean Dynasty (v1.115)</description>
+		<year>1996</year>
+		<publisher>Blue Byte</publisher>
+		<notes><![CDATA[
+[SB16] No sound after title screen, hangs on every video (bypass by pressing mouse left button)
+Cannot read sound configuration from Windows 95
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ad" sha1="95040b06a50373ef052c37261ca6b91d42fa5af7"/>
+			</diskarea>
+		</part>
+	</software>
+
+
 	<!-- OS/2 -->
 	<software name="apak_os2">
 		<description>IBM AttachPak for OS/2 Warp Connect</description>
@@ -1269,9 +1287,11 @@ Some samples have audio crackling [SB16]
 	<!-- DOS -->
 	<!-- TODO: 384k of EMS memory? -->
 	<software name="bsdracula" supported="partial">
-		<description>Bram Stoker's Dracula (Multi 5)</description>
+		<description>Bram Stoker's Dracula (Europe)</description>
 		<year>1995</year>
 		<publisher>Psygnosis</publisher>
+		<!-- Multi 5 language support -->
+		<info name="language" value="English/German/French/Italian/Spanish" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1281,11 +1301,12 @@ Some samples have audio crackling [SB16]
 	</software>
 
 	<!-- DOS -->
-	<!-- Multi 5 language support -->
 	<software name="bssky">
-		<description>Beneath a Steel Sky (Multi 5)</description>
+		<description>Beneath a Steel Sky (Europe)</description>
 		<year>1995</year>
 		<publisher>Virgin / Revolution</publisher>
+		<!-- Multi 5 language support -->
+		<info name="language" value="English/German/French/Italian/Spanish" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1597,6 +1618,25 @@ Some samples have audio crackling [SB16]
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- Windows 3.1 / 95 (WinG) -->
+	<!-- Suggested minimum resolution 800x600 -->
+	<software name="civ2" supported="partial">
+		<description>Sid Meier's Civilization II (Europe)</description>
+		<year>1996</year>
+		<publisher>MicroProse</publisher>
+		<notes><![CDATA[
+Offset [CDDA] audio, does not stop when exiting game (including getting to Windows shutdown screen)
+]]></notes>
+		<info name="language" value="English/German/French" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="civilization2pc" sha1="253fba35b28c7a8d121365383ad46873ade921ac"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 	<software name="civilwar">
 		<description>The Civil War</description>
@@ -2012,6 +2052,29 @@ Some samples have audio crackling [SB16]
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Delphine Classic Collection (Europe) (En,De)" sha1="e910498db33534ad63ab62108069e7eda17bd8de" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS 6.0 / Windows 95 -->
+	<!-- Pentium class 90 MHz -->
+	<!-- DirectDraw 2 -->
+	<!-- Polish version known to exist -->
+	<software name="dd2" supported="no">
+		<description>Destruction Derby 2 (Europe)</description>
+		<year>1996</year>
+		<publisher>Psygnosis</publisher>
+		<notes><![CDATA[
+Doesn't have brake lights for default car (rookie) at least
+Main menu shows a 3d backface that shouldn't be there during rotation transitions on submenu selections
+Offset [CDDA] audio, does not stop when exiting game (including getting to Windows shutdown screen)
+Unplayable without a Pentium CPU class
+Unemulated optional [Matrox Mystique] GPU
+https://www.pcgamingwiki.com/wiki/Destruction_Derby_2
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dd2_pc" sha1="934d21c1172848110c3198463f5a5261175263a3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2631,6 +2694,29 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
+	<software name="jagdead" supported="no">
+		<description>Jagged Alliance: Deadly Games (v1.00)</description>
+		<year>1996</year>
+		<!-- Virgin Interactive for Europe -->
+		<publisher>Sir-Tech</publisher>
+		<notes><![CDATA[
+Has no [SB16] voices/SFXs in-game
+Nemesis demo untested
+Untested multiplayer options
+]]></notes>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jagged_alliance_deadly_games_(sir-tech_software)(version_1.0)(master_cd)" sha1="084200cf87bc3f3f6d4bff4d9b5e5d9da9975aff"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jagged_alliance_deadly_games_(sir-tech_software)(version_1.0)(multiplayer_cd)" sha1="8e4b601266c597a4dfe4b261c773b07dab4bc5bf"/>
+			</diskarea>
+		</part>
+	</software>
+
+
 	<!-- Windows 95 -->
 	<!-- Pentium class 60 MHz minimum -->
 	<software name="jakebrstj" supported="no">
@@ -2775,6 +2861,29 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
+	<!-- Windows 95 -->
+	<!-- Pentium class 100 MHz -->
+	<!-- US version known to exist as "The Adventures of Lomax" -->
+	<software name="lomax" supported="no">
+		<description>Lomax (Europe)</description>
+		<year>1997</year>
+		<publisher>Psygnosis</publisher>
+		<notes><![CDATA[
+Glitchy icons in 256 color mode for setup menu and for PS1 icons on password screen [8514]
+Serious color issues if run windowed on 256 color mode (color works if set to full screen)
+Offset [CDDA] audio
+https://www.pcgamingwiki.com/wiki/The_Adventures_of_Lomax
+]]></notes>
+		<!-- Multi 5 language support -->
+		<info name="language" value="English/German/French/Italian/Spanish" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="lomax" sha1="d2a24858266e0d906d93d3027bfc89634c125556"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<!-- Also known as "The Manager", originally released as floppy format in 1991 -->
 	<!-- TODO: choosing a team at new game then pressing the top bar causes shuffled team flags? -->
@@ -2847,6 +2956,24 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- Windows 3.1 -->
+	<!-- 386DX 33 MHz -->
+	<!-- Later "Masterpiece Edition" known to exist (has 3rd tab for help on status bar) -->
+	<software name="myst" supported="yes">
+		<description>Myst (v1.0.3)</description>
+		<year>1995</year>
+		<publisher>Brøderbund</publisher>
+		<notes><![CDATA[
+https://www.pcgamingwiki.com/wiki/Myst
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="myst" sha1="de9e11e5b52753229d64a6940a9de866aaf26791"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 	<!-- Source: redump.org/disc/31951/ -->
 	<!-- <rom name="Network Q RAC Rally (USA).cue" size="91" crc="4d252589" sha1="c22a126dfeb6e46c88a4098e6c9aeb0089c1c945"/> -->
@@ -2988,6 +3115,20 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- Windows 3.1J / 95J -->
+	<!-- English prototype known to exist -->
+	<software name="prinmak2">
+		<description>Princess Maker 2 (Japan)</description>
+		<year>1995</year>
+		<publisher>Gainax</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="princess_maker_2_(win31)" sha1="5f7d1af8f9f4c9841893c50c48d765d66a84013d"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 	<software name="prototyp">
 		<description>Prototype</description>
@@ -3324,6 +3465,24 @@ Optional [pc_joy] 4-button joystick, work around by mapping b3 and b4 to player 
 		</part>
 	</software>
 
+	<!-- Windows 95 -->
+	<!-- Pentium class 75 MHz -->
+	<!-- DirectX 3.0 -->
+	<software name="sk" supported="partial">
+		<description>Sonic &amp; Knuckles Collection</description>
+		<year>1997</year>
+		<publisher>Sega / Expert Software</publisher>
+		<notes><![CDATA[
+Not extensively tested for the high requirements
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sonic_and_knuckles_collection" sha1="09c2d79046710745bc122b3b326ef572af988b3e"/>
+			</diskarea>
+		</part>
+	</software>
+
+
 	<!-- Windows 3.1 / 95 -->
 	<software name="spaceinv" supported="yes">
 		<description>Space Invaders for Windows</description>
@@ -3350,6 +3509,7 @@ Optional [pc_joy] 4-button joystick, work around by mapping b3 and b4 to player 
 	</software>
 
 	<!-- Windows 3.1 / 95 -->
+	<!-- Runs off CD, no install -->
 	<software name="strmrisk" supported="partial">
 		<description>Sturmtruppen: Risiken? (Italy)</description>
 		<year>1997</year>
@@ -3448,6 +3608,26 @@ Draws video without colors if run thru autorun in Win95, works if st_95.exe is m
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="rampage" sha1="cb91ee2e34e3b7391169079d6787c75712b1d97f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 -->
+	<!-- Pentium class 90 MHz -->
+	<!-- DirectX 3.0 (VESA 2.0)  -->
+	<software name="tplay98" supported="no">
+		<description>Triple Play '98</description>
+		<year>1997</year>
+		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+Has serious [8514] issues on main menu
+Has serious geometry issues during gameplay
+[SB16] has clicking noises thru the DAC
+Unemulated optional [Gravis Gamepad], [Gravis Gamepad Pro], [Gravis Grip 4-player adapter]
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ea-tripleplay98-win95" sha1="304492fab8e65add0ae3516633fcbd4ed7755902"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3551,6 +3731,27 @@ Has [8514] icon glitch
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- Windows 95 -->
+	<!-- Pentium class 90 MHz -->
+	<software name="vf" supported="no">
+		<!-- alias for Virtua Fighter Remix -->
+		<description>Virtua Fighter PC</description>
+		<year>1996</year>
+		<publisher>Sega / Expert Software</publisher>
+		<notes><![CDATA[
+Unsupported [NV1] video card
+Does not recognize [pc_joy] joystick in
+Offset [CDDA] audio
+https://www.pcgamingwiki.com/wiki/Virtua_Fighter_PC
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="virtua_fighter_pc" sha1="bfba831a59114475082953ff189b957e8ca1ca96"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 	<!-- DOS -->
 	<!-- TODO: playback doesn't work properly, needs mouse left button user pressed? Eventually hangs anyway. -->
