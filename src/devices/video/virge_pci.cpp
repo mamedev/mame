@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 
+
 #include "emu.h"
 #include "virge_pci.h"
 
@@ -95,7 +96,8 @@ uint32_t virge_pci_device::base_address_r()
 void virge_pci_device::base_address_w(offs_t offset, uint32_t data)
 {
 	pci_device::address_base_w(offset,data);
-	downcast<s3virge_vga_device *>(m_vga.target())->set_linear_address(data & 0xffff0000);
+	// only bits 31-26 are changed here, cfr. page 25-4
+	downcast<s3virge_vga_device *>(m_vga.target())->set_linear_address(data & 0xfc000000);
 	refresh_linear_window();
 }
 
@@ -124,9 +126,16 @@ void virge_pci_device::vga_3b0_w(offs_t offset, uint32_t data, uint32_t mem_mask
 	if (ACCESSING_BITS_8_15)
 	{
 		downcast<s3_vga_device *>(m_vga.target())->port_03b0_w(offset * 4 + 1, data >> 8);
+		// TODO: make this more transparent
+		// it shouldn't expose the S3 CRTC regs directly and don't repeat on 0x3d0 I/O below.
 		if(offset == 1 && downcast<s3virge_vga_device *>(m_vga.target())->get_crtc_port() == 0x3b0)
 		{
-			if(m_current_crtc_reg == 0x58)
+			if (m_current_crtc_reg == 0x53)
+			{
+				refresh_linear_window();
+				remap_cb();
+			}
+			else if(m_current_crtc_reg == 0x58)
 			{
 				refresh_linear_window();
 				remap_cb();
@@ -197,9 +206,20 @@ void virge_pci_device::vga_3d0_w(offs_t offset, uint32_t data, uint32_t mem_mask
 		downcast<s3_vga_device *>(m_vga.target())->port_03d0_w(offset * 4 + 1, data >> 8);
 		if(offset == 1 && downcast<s3virge_vga_device *>(m_vga.target())->get_crtc_port() == 0x3d0)
 		{
-			if(m_current_crtc_reg >= 0x58 && m_current_crtc_reg <= 0x5a)
+			if (m_current_crtc_reg == 0x53)
 			{
 				refresh_linear_window();
+				remap_cb();
+			}
+			else if(m_current_crtc_reg == 0x58)
+			{
+				refresh_linear_window();
+				remap_cb();
+			}
+			else if(m_current_crtc_reg == 0x59 || m_current_crtc_reg == 0x5a)
+			{
+				refresh_linear_window();
+				remap_cb();
 			}
 		}
 	}
