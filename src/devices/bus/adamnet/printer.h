@@ -13,8 +13,10 @@
 
 #include "adamnet.h"
 #include "cpu/m6800/m6801.h"
+#include "machine/bitmap_printer.h"
+#include "machine/steppers.h"
 
-
+#include "util/png.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -42,6 +44,8 @@ protected:
 
 private:
 	required_device<m6801_cpu_device> m_maincpu;
+	required_device<bitmap_printer_device> m_bitmap_printer;
+	required_device<stepper_device> m_daisywheel_stepper;
 
 	void p1_w(uint8_t data);
 	uint8_t p2_r();
@@ -51,8 +55,30 @@ private:
 	void p4_w(uint8_t data);
 
 	void adam_prn_mem(address_map &map);
-};
 
+	TIMER_CALLBACK_MEMBER(platen_motor_timer);
+	emu_timer *m_platen_motor_timer = nullptr;
+
+	uint16_t m_platen_counter = 0;
+	uint8_t m_p4_data = 0;
+
+	const std::string m_daisywheel = "w\x7f ,W.MZBFCA:RSETHONILDUGYPQKJV;X1234056789-$+#%={>]~['_`<)|(*@\\^?/}!&\"mjvgxdlbcorneaithsfpuqkyz";
+
+	int mod_positive(uint16_t num, uint16_t mod_value)
+	{
+		int retvalue = num % mod_value;  if (retvalue < 0) retvalue += mod_value; return retvalue;
+	}
+
+	const int wheel_home_sensor_pos = 0;      // can set arbitrarily as long as you calculate wheel_offset() with function below
+	const int wheel_home_sensor_offset = 10;  // determined empirically  (in half steps)
+	int wheel_offset() { return (wheel_home_sensor_pos - wheel_home_sensor_offset) / (-2); }
+	// sensor 0  offset = 5    (decreasing sensor by step of 2, increment offset by 1)
+	// sensor 6  offset = 2
+	// sensor 10 offset = 0
+
+	bitmap_argb32 m_typesheet;
+
+};
 
 // device type definition
 DECLARE_DEVICE_TYPE(ADAM_PRN, adam_printer_device)

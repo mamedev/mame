@@ -64,6 +64,8 @@ public:
 	int m_xpos;
 	int m_ypos;
 
+	bitmap_rgb32& get_bitmap() { return m_page_bitmap; }
+
 protected:
 	bitmap_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
