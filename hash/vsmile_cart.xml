@@ -599,7 +599,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 <softwarelist name="vsmile_cart" description="VTech V.Smile cartridges">
 
-	<software name="aladdinit">
+	<software name="aladdinit" cloneof="aladdinuk">
 		<description>Disney Aladdin - Il magico mondo di Aladdin (Italy)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -613,7 +613,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="aladdinnl" cloneof="aladdinit">
+	<software name="aladdinnl" cloneof="aladdinuk">
 		<description>Disney's Aladdin - De wonderwereld van Aladdin (Netherlands)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
@@ -630,7 +630,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="aladdinuk" cloneof="aladdinit">
+	<!-- Parent until the USA version is found and dumped. -->
+	<software name="aladdinuk">
 		<description>Disney's Aladdin - Aladdin's Wonders of the World (UK)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
@@ -645,7 +646,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="aladdinge" cloneof="aladdinit">
+	<software name="aladdinge" cloneof="aladdinuk">
 		<description>Disneys Aladdin - Aladdins Welt der Wunder (Germany)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -662,7 +663,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="aladdinfr" cloneof="aladdinit">
+	<software name="aladdinfr" cloneof="aladdinuk">
 		<description>Disney Aladdin - Les fabuleuses aventures d'Aladdin (France)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
@@ -677,7 +678,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="aladdinsp" cloneof="aladdinit">
+	<software name="aladdinsp" cloneof="aladdinuk">
 		<description>Disney Aladdin - El Maravilloso Mundo de Aladdin (Spain)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
