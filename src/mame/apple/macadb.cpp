@@ -239,7 +239,10 @@ macadb_device::macadb_device(const machine_config &mconfig, const char *tag, dev
 		write_via_data(*this),
 		write_adb_data(*this),
 		write_adb_irq(*this),
-		m_bIsMCUMode(true)
+		m_bIsMCUMode(true),
+		m_bIsIIGSMode(false),
+		m_last_kbd{0, 0},
+		m_last_mouse{0, 0}
 {
 }
 
@@ -295,6 +298,8 @@ void macadb_device::device_start()
 	save_item(NAME(m_adb_currentkeys));
 	save_item(NAME(m_adb_modifiers));
 	save_item(NAME(m_adb_linein));
+	save_item(NAME(m_last_kbd));
+	save_item(NAME(m_last_mouse));
 }
 
 WRITE_LINE_MEMBER(macadb_device::adb_data_w)
@@ -627,6 +632,7 @@ void macadb_device::adb_talk()
 
 								if (adb_pollkbd(0)) //&& (!m_bIsIIGSMode))
 								{
+									LOGMASKED(LOG_TALK_LISTEN, "Keyboard requesting service\n");
 									m_adb_srqflag = true;
 								}
 							}
@@ -696,6 +702,7 @@ void macadb_device::adb_talk()
 
 								if ((adb_pollmouse()) && (!m_bIsIIGSMode))
 								{
+									LOGMASKED(LOG_TALK_LISTEN, "Mouse requesting service\n");
 									m_adb_srqflag = true;
 								}
 							}
