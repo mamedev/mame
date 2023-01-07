@@ -423,7 +423,9 @@ int32_t chain_manager::slider_changed(int id, std::string *str, int32_t newval)
 void chain_manager::create_selection_slider(uint32_t screen_index)
 {
 	if (screen_index < m_selection_sliders.size())
+	{
 		return;
+	}
 
 	int32_t minval = 0;
 	int32_t defval = m_current_chain[screen_index];
@@ -815,11 +817,13 @@ std::vector<ui::menu_item> chain_manager::get_slider_list()
 	std::vector<ui::menu_item> sliders;
 
 	if (!needs_sliders())
+	{
 		return sliders;
+	}
 
 	for (size_t index = 0; index < m_screen_chains.size() && index < m_screen_count; index++)
 	{
-		bgfx_chain *const chain = m_screen_chains[index];
+		bgfx_chain* chain = m_screen_chains[index];
 		sliders.push_back(m_selection_sliders[index]);
 
 		if (chain == nullptr)
@@ -827,7 +831,7 @@ std::vector<ui::menu_item> chain_manager::get_slider_list()
 			continue;
 		}
 
-		std::vector<bgfx_chain_entry *> chain_entries = chain->entries();
+		std::vector<bgfx_chain_entry*> chain_entries = chain->entries();
 		for (bgfx_chain_entry* entry : chain_entries)
 		{
 			std::vector<bgfx_input_pair*> entry_inputs = entry->inputs();
