@@ -779,7 +779,9 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 			{
 				case 0:
 					for (int b = 0; b < 7; b++)
+					{
 						*p++ = rotl4((w >> (b + 7-1)) & 0x0F, col * 7 + b);
+					}
 					break;
 
 				case 1:
@@ -838,14 +840,18 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 					if (m_rgbmode == 1 && !(vram_row[col+1] & 0x80))  // monochrome
 					{
 						for (int b = 0; b < 7; b++)
+						{
 							*p++ = ((w >> (b + 7)) & 1) ? WHITE : BLACK;
+						}
 					}
 					else  // color
 					{
 						// In column 0 get the color from w bits 7-10 or 11-14,
 						// in column 1 get the color from w bits 4-7 or 8-11, etc.
 						for (int b = 0; b < 7; b++)
+						{
 							*p++ = rotl4((w >> (b - ((b - col) & 3) + 7)) & 0x0F, 1);
+						}
 					}
 					break;
 			}
