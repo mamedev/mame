@@ -135,14 +135,17 @@ private:
 	uint8_t   *m_internalram;
 
 	int       m_icount;
-	int       m_reset_vector;
 	int       m_picmodel;
+	int       m_data_width;
+	int       m_program_width;
 	int       m_delay_timer;
 	uint16_t  m_temp_config;
 	int       m_rtcc;
 	bool      m_count_pending;
-	int8_t    m_old_data;
-	uint8_t   m_picRAMmask;
+	uint8_t   m_old_data;
+	uint8_t   m_data_mask;
+	uint16_t  m_program_mask;
+	uint8_t   m_status_mask;
 	int       m_inst_cycles;
 
 	memory_access<11, 1, -1, ENDIANNESS_LITTLE>::cache m_program;
@@ -179,6 +182,7 @@ private:
 	void CALCULATE_SUB_DIGITCARRY();
 	uint16_t POP_STACK();
 	void PUSH_STACK(uint16_t data);
+	void SET_PC(offs_t addr);
 	uint8_t GET_REGFILE(offs_t addr);
 	void STORE_REGFILE(offs_t addr, uint8_t data);
 	void STORE_RESULT(offs_t addr, uint8_t data);
