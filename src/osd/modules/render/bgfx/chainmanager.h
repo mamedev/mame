@@ -9,18 +9,21 @@
 //
 //============================================================
 
+#ifndef MAME_RENDER_BGFX_CHAINMANAGER_H
+#define MAME_RENDER_BGFX_CHAINMANAGER_H
+
 #pragma once
 
-#ifndef __DRAWBGFX_CHAIN_MANAGER__
-#define __DRAWBGFX_CHAIN_MANAGER__
-
-#include "texturemanager.h"
-#include "targetmanager.h"
 #include "effectmanager.h"
+#include "targetmanager.h"
+#include "texturemanager.h"
+
+#include "util/utilfwd.h"
 
 #include <map>
 #include <string>
 #include <vector>
+
 
 class running_machine;
 class osd_window;
@@ -49,6 +52,24 @@ public:
 class chain_manager
 {
 public:
+	class screen_prim
+	{
+	public:
+		screen_prim() = default;
+		screen_prim(render_primitive *prim);
+
+		render_primitive *m_prim = nullptr;
+		uint16_t m_screen_width = 0;
+		uint16_t m_screen_height = 0;
+		uint16_t m_quad_width = 0;
+		uint16_t m_quad_height = 0;
+		float m_tex_width = 0.0F;
+		float m_tex_height = 0.0F;
+		int m_rowpixels = 0;
+		uint32_t m_palette_length = 0;
+		uint32_t m_flags = 0;
+	};
+
 	chain_manager(running_machine& machine, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index, slider_dirty_notifier& slider_notifier);
 	~chain_manager();
 
@@ -73,27 +94,8 @@ public:
 	// Setters
 	void restore_slider_settings(int32_t id, std::vector<std::vector<float>>& settings);
 
-	class screen_prim
-	{
-	public:
-		screen_prim() : m_prim(nullptr), m_screen_width(0), m_screen_height(0), m_quad_width(0), m_quad_height(0)
-			, m_tex_width(0), m_tex_height(0), m_rowpixels(0), m_palette_length(0), m_flags(0)
-		{
-		}
-
-		screen_prim(render_primitive *prim);
-
-		render_primitive *m_prim;
-		uint16_t m_screen_width;
-		uint16_t m_screen_height;
-		uint16_t m_quad_width;
-		uint16_t m_quad_height;
-		float m_tex_width;
-		float m_tex_height;
-		int m_rowpixels;
-		uint32_t m_palette_length;
-		uint32_t m_flags;
-	};
+	void load_config(util::xml::data_node const &screennode);
+	void save_config(util::xml::data_node &parentnode);
 
 private:
 	void load_chains();
@@ -138,7 +140,7 @@ private:
 	std::vector<screen_prim>    m_screen_prims;
 	std::vector<uint8_t>        m_palette_temp;
 
-	static const uint32_t       CHAIN_NONE;
+	static inline constexpr uint32_t CHAIN_NONE = 0;
 };
 
-#endif // __DRAWBGFX_CHAIN_MANAGER__
+#endif // MAME_RENDER_BGFX_CHAINMANAGER_H

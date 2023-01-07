@@ -6,16 +6,16 @@
 //
 //============================================================
 
+#ifndef MAME_RENDER_BGFX_CHAIN_H
+#define MAME_RENDER_BGFX_CHAIN_H
+
 #pragma once
 
-#ifndef __DRAWBGFX_CHAIN__
-#define __DRAWBGFX_CHAIN__
+#include "chainentry.h"
 
 #include <string>
 #include <vector>
 #include <map>
-
-#include "chainentry.h"
 
 class bgfx_slider;
 class bgfx_parameter;
@@ -34,6 +34,7 @@ public:
 	void repopulate_targets();
 
 	// Getters
+	const std::string &name() const { return m_name; }
 	std::vector<bgfx_slider*>& sliders() { return m_sliders; }
 	std::vector<bgfx_chain_entry*>& entries() { return m_entries; }
 	uint32_t applicable_passes();
@@ -63,4 +64,4 @@ private:
 	bool                                m_has_adjuster;
 };
 
-#endif // __DRAWBGFX_CHAIN__
+#endif // MAME_RENDER_BGFX_CHAIN_H
