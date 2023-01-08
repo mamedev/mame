@@ -137,15 +137,21 @@ void s3virgedx_rev1_vga_device::device_start()
 
 void s3virge_vga_device::device_reset()
 {
-	vga_device::device_reset();
+	s3_vga_device::device_reset();
 	// Power-on strapping bits.  Sampled at reset, but can be modified later.
 	// These are just assumed defaults.
 	s3.strapping = 0x000f0912;
+
+	s3virge.s3d.state = S3D_STATE_IDLE;
+	s3virge.s3d.cmd_fifo_current_ptr = 0;
+	s3virge.s3d.cmd_fifo_slots_free = 16;
+	s3virge.s3d.busy = false;
+	//m_draw_timer->adjust(attotime::never);
 }
 
 void s3virgedx_vga_device::device_reset()
 {
-	vga_device::device_reset();
+	s3virge_vga_device::device_reset();
 	// Power-on strapping bits.  Sampled at reset, but can be modified later.
 	// These are just assumed defaults.
 	s3.strapping = 0x000f0912;
@@ -153,7 +159,7 @@ void s3virgedx_vga_device::device_reset()
 
 void s3virgedx_rev1_vga_device::device_reset()
 {
-	vga_device::device_reset();
+	s3virgedx_vga_device::device_reset();
 	// Power-on strapping bits.  Sampled at reset, but can be modified later.
 	// These are based on results from a Diamond Stealth 3D 2000 Pro (Virge/DX based)
 	// bits 8-15 are still unknown, S3ID doesn't show config register 2 (CR37)
