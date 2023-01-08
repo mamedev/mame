@@ -587,7 +587,6 @@ void macadb_device::adb_talk()
 				{
 					LOGMASKED(LOG_TALK_LISTEN, "ADB LISTEN to unknown device %d, timing out\n", addr);
 					m_adb_direction = 0;
-					machine().debug_break();
 				}
 				break;
 
