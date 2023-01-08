@@ -466,13 +466,14 @@ void pic16c5x_device::STORE_REGFILE(offs_t addr, uint8_t data) // Write to inter
 			break;
 
 		case 1:
-			m_delay_timer = 2; // Timer starts after next two instructions
+			m_delay_timer = 2; // Timer increment is inhibited for 2 cycles
 			if (PSA == 0) m_prescaler = 0; // Must clear the Prescaler
 			TMR0 = data;
 			break;
 
 		case 2:
 			SET_PC(((STATUS & PA_REG) << 4) | data);
+			m_inst_cycles++;
 			break;
 
 		case 3:
@@ -606,7 +607,7 @@ void pic16c5x_device::btfss()
 {
 	if (BIT(GET_REGFILE(ADDR), BITPOS)) {
 		SET_PC(m_PC + 1);
-		m_inst_cycles += 1; // Add NOP cycles
+		m_inst_cycles++; // Add NOP cycles
 	}
 }
 
@@ -614,7 +615,7 @@ void pic16c5x_device::btfsc()
 {
 	if (!BIT(GET_REGFILE(ADDR), BITPOS)) {
 		SET_PC(m_PC + 1);
-		m_inst_cycles += 1; // Add NOP cycles
+		m_inst_cycles++; // Add NOP cycles
 	}
 }
 
@@ -664,7 +665,7 @@ void pic16c5x_device::decfsz()
 	STORE_RESULT(ADDR, m_ALU);
 	if (m_ALU == 0) {
 		SET_PC(m_PC + 1);
-		m_inst_cycles += 1; // Add NOP cycles
+		m_inst_cycles++; // Add NOP cycles
 	}
 }
 
@@ -686,7 +687,7 @@ void pic16c5x_device::incfsz()
 	STORE_RESULT(ADDR, m_ALU);
 	if (m_ALU == 0) {
 		SET_PC(m_PC + 1);
-		m_inst_cycles += 1; // Add NOP cycles
+		m_inst_cycles++; // Add NOP cycles
 	}
 }
 
