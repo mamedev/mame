@@ -142,6 +142,8 @@ void s3virge_vga_device::device_reset()
 	// These are just assumed defaults.
 	s3.strapping = 0x000f0912;
 
+	// TODO: fix soft reset state
+	// On Windows 98 shutdown message sometimes leads to an hang the next boot around
 	s3virge.s3d.state = S3D_STATE_IDLE;
 	s3virge.s3d.cmd_fifo_current_ptr = 0;
 	s3virge.s3d.cmd_fifo_slots_free = 16;
@@ -1187,7 +1189,7 @@ void s3virge_vga_device::bitblt_colour_step()
 				if(current_command & 0x80)
 					src = s3virge.s3d.image_xfer >> (x*8);
 				else
-					src = read_pixel8(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current);
+					src = read_pixel8(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current, src_stride());
 				if(current_command & 0x100)
 				{
 					pat = (s3virge.s3d.bitblt_mono_pattern & (1 << ((s3virge.s3d.bitblt_pat_y*8) + (7-s3virge.s3d.bitblt_pat_x)))
@@ -1195,7 +1197,7 @@ void s3virge_vga_device::bitblt_colour_step()
 				}
 				else
 					pat = (s3virge.s3d.pattern[(s3virge.s3d.bitblt_pat_y*8) + s3virge.s3d.bitblt_pat_x]) << 8;
-				dst = read_pixel8(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current);
+				dst = read_pixel8(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current, dest_stride());
 				write_pixel8(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, src, dst, pat) & 0xff);
 				done = advance_pixel();
 				if(done)
@@ -1221,8 +1223,8 @@ void s3virge_vga_device::bitblt_colour_step()
 			if(current_command & 0x80)
 				src = s3virge.s3d.image_xfer;
 			else
-				src = read_pixel16(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current);
-			dst = read_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current);
+				src = read_pixel16(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current, src_stride());
+			dst = read_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current, dest_stride());
 			if(current_command & 0x100)
 			{
 				pat = (s3virge.s3d.bitblt_mono_pattern & (1 << ((s3virge.s3d.bitblt_pat_y*8) + (7-s3virge.s3d.bitblt_pat_x)))
@@ -1242,8 +1244,8 @@ void s3virge_vga_device::bitblt_colour_step()
 			if(current_command & 0x80)
 				src = s3virge.s3d.image_xfer >> 16;
 			else
-				src = read_pixel16(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current);
-			dst = read_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current);
+				src = read_pixel16(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current, src_stride());
+			dst = read_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current, dest_stride());
 			if(current_command & 0x100)
 			{
 				pat = (s3virge.s3d.bitblt_mono_pattern & (1 << ((s3virge.s3d.bitblt_pat_y*8) + (7-s3virge.s3d.bitblt_pat_x)))
@@ -1266,7 +1268,7 @@ void s3virge_vga_device::bitblt_colour_step()
 					if(s3virge.s3d.bitblt_pixel_pos > 2)
 					{
 						s3virge.s3d.bitblt_pixel_pos = 0;
-						dst = read_pixel24(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current);
+						dst = read_pixel24(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current, dest_stride());
 						if(current_command & 0x100)
 						{
 							pat = (s3virge.s3d.bitblt_mono_pattern & (1 << ((s3virge.s3d.bitblt_pat_y*8) + (7-s3virge.s3d.bitblt_pat_x)))
@@ -1298,8 +1300,8 @@ void s3virge_vga_device::bitblt_colour_step()
 			}
 			else
 			{
-				src = read_pixel24(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current);
-				dst = read_pixel24(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current);
+				src = read_pixel24(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current, src_stride());
+				dst = read_pixel24(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current, dest_stride());
 				if(current_command & 0x100)
 				{
 					pat = (s3virge.s3d.bitblt_mono_pattern & (1 << ((s3virge.s3d.bitblt_pat_y*8) + (7-s3virge.s3d.bitblt_pat_x)))
@@ -1344,8 +1346,8 @@ void s3virge_vga_device::bitblt_monosrc_step()
 				if(current_command & 0x80)
 					src = bitswap<32>(s3virge.s3d.image_xfer,7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8,23,22,21,20,19,18,17,16,31,30,29,28,27,26,25,24);
 				else
-					src = read_pixel8(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current);
-				dst = read_pixel8(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current);
+					src = read_pixel8(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current, src_stride());
+				dst = read_pixel8(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current, dest_stride());
 
 				if(src & (1 << x))
 					write_pixel8(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_SRC_FG_CLR], dst, pat) & 0xff);
@@ -1381,8 +1383,8 @@ void s3virge_vga_device::bitblt_monosrc_step()
 				if(current_command & 0x80)
 					src = bitswap<32>(s3virge.s3d.image_xfer,7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8,23,22,21,20,19,18,17,16,31,30,29,28,27,26,25,24);
 				else
-					src = read_pixel16(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current);
-				dst = read_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current);
+					src = read_pixel16(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current, src_stride());
+				dst = read_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current, dest_stride());
 
 				if(src & (1 << x))
 					write_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_SRC_FG_CLR], dst, pat) & 0xffff);
@@ -1418,8 +1420,8 @@ void s3virge_vga_device::bitblt_monosrc_step()
 				if(current_command & 0x80)
 					src = bitswap<32>(s3virge.s3d.image_xfer,7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8,23,22,21,20,19,18,17,16,31,30,29,28,27,26,25,24);
 				else
-					src = read_pixel24(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current);
-				dst = read_pixel24(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current);
+					src = read_pixel24(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current, src_stride());
+				dst = read_pixel24(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current, dest_stride());
 
 				if(src & (1 << x))
 					write_pixel24(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_SRC_FG_CLR], dst, pat));
@@ -1518,30 +1520,30 @@ inline void s3virge_vga_device::write_pixel8(uint32_t base, uint16_t x, uint16_t
 	vga.memory[(base + x + (y*dest_stride())) % vga.svga_intf.vram_size] = val;
 }
 
-inline uint32_t s3virge_vga_device::read_pixel32(uint32_t base, uint16_t x, uint16_t y)
+inline uint32_t s3virge_vga_device::read_pixel32(uint32_t base, uint16_t x, uint16_t y, u16 stride_select)
 {
-	return (vga.memory[(base + (x * 4) + (y * src_stride())) % vga.svga_intf.vram_size] << 24) |
-		   (vga.memory[(base + 1 + (x * 4) + (y * src_stride())) % vga.svga_intf.vram_size] << 16) |
-		   (vga.memory[(base + 2 + (x * 4) + (y * src_stride())) % vga.svga_intf.vram_size] << 8) |
-		   vga.memory[(base + 3 + (x * 4) + (y * src_stride())) % vga.svga_intf.vram_size];
+	return (vga.memory[(base + (x * 4) + (y * stride_select)) % vga.svga_intf.vram_size] << 24) |
+		   (vga.memory[(base + 1 + (x * 4) + (y * stride_select)) % vga.svga_intf.vram_size] << 16) |
+		   (vga.memory[(base + 2 + (x * 4) + (y * stride_select)) % vga.svga_intf.vram_size] << 8) |
+		   vga.memory[(base + 3 + (x * 4) + (y * stride_select)) % vga.svga_intf.vram_size];
 }
 
-inline uint32_t s3virge_vga_device::read_pixel24(uint32_t base, uint16_t x, uint16_t y)
+inline uint32_t s3virge_vga_device::read_pixel24(uint32_t base, uint16_t x, uint16_t y, u16 stride_select)
 {
-	return (vga.memory[(base + (x * 3) + (y * src_stride())) % vga.svga_intf.vram_size]) |
-		   (vga.memory[(base + 1 + (x * 3) + (y * src_stride())) % vga.svga_intf.vram_size] << 8) |
-		   (vga.memory[(base + 2 + (x * 3) + (y * src_stride())) % vga.svga_intf.vram_size] << 16);
+	return (vga.memory[(base + (x * 3) + (y * stride_select)) % vga.svga_intf.vram_size]) |
+		   (vga.memory[(base + 1 + (x * 3) + (y * stride_select)) % vga.svga_intf.vram_size] << 8) |
+		   (vga.memory[(base + 2 + (x * 3) + (y * stride_select)) % vga.svga_intf.vram_size] << 16);
 }
 
-inline uint16_t s3virge_vga_device::read_pixel16(uint32_t base, uint16_t x, uint16_t y)
+inline uint16_t s3virge_vga_device::read_pixel16(uint32_t base, uint16_t x, uint16_t y, u16 stride_select)
 {
-	return (vga.memory[(base + (x * 2) + (y * src_stride()) % vga.svga_intf.vram_size)]) |
-		   (vga.memory[(base + 1 + (x * 2) + (y * src_stride())) % vga.svga_intf.vram_size] << 8);
+	return (vga.memory[(base + (x * 2) + (y * stride_select) % vga.svga_intf.vram_size)]) |
+		   (vga.memory[(base + 1 + (x * 2) + (y * stride_select)) % vga.svga_intf.vram_size] << 8);
 }
 
-inline uint8_t s3virge_vga_device::read_pixel8(uint32_t base, uint16_t x, uint16_t y)
+inline uint8_t s3virge_vga_device::read_pixel8(uint32_t base, uint16_t x, uint16_t y, u16 stride_select)
 {
-	return vga.memory[(base + x + (y * src_stride())) % vga.svga_intf.vram_size];
+	return vga.memory[(base + x + (y * stride_select)) % vga.svga_intf.vram_size];
 }
 
 // 2D command register format - A500 (BitBLT), A900 (2D line), AD00 (2D Polygon)

@@ -188,10 +188,10 @@ protected:
 	inline void write_pixel24(uint32_t base, uint16_t x, uint16_t y, uint32_t val);
 	inline void write_pixel16(uint32_t base, uint16_t x, uint16_t y, uint16_t val);
 	inline void write_pixel8(uint32_t base, uint16_t x, uint16_t y, uint8_t val);
-	inline uint32_t read_pixel32(uint32_t base, uint16_t x, uint16_t y);
-	inline uint32_t read_pixel24(uint32_t base, uint16_t x, uint16_t y);
-	inline uint16_t read_pixel16(uint32_t base, uint16_t x, uint16_t y);
-	inline uint8_t read_pixel8(uint32_t base, uint16_t x, uint16_t y);
+	inline uint32_t read_pixel32(uint32_t base, uint16_t x, uint16_t y, u16 stride_select);
+	inline uint32_t read_pixel24(uint32_t base, uint16_t x, uint16_t y, u16 stride_select);
+	inline uint16_t read_pixel16(uint32_t base, uint16_t x, uint16_t y, u16 stride_select);
+	inline uint8_t read_pixel8(uint32_t base, uint16_t x, uint16_t y, u16 stride_select);
 
 	uint32_t GetROP(uint8_t rop, uint32_t src, uint32_t dst, uint32_t pat);
 	bool advance_pixel();
