@@ -3775,7 +3775,6 @@ void apple2gs_state::apple2gs(machine_config &config)
 
 	MACADB(config, m_macadb, A2GS_MASTER_CLOCK/8);
 	m_macadb->set_mcu_mode(true);
-	m_macadb->set_iigs_mode(true);
 	m_macadb->adb_data_callback().set(FUNC(apple2gs_state::set_adb_line));
 
 	RTC3430042(config, m_rtc, XTAL(32'768));
