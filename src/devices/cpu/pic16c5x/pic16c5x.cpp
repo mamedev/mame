@@ -301,7 +301,7 @@ void pic16c5x_device::update_internalram_ptr()
 
 
 
-void pic16c5x_device::CALCULATE_Z_FLAG()
+void pic16c5x_device::calc_zero_flag()
 {
 	if (m_ALU == 0) SET(STATUS, Z_FLAG);
 	else CLR(STATUS, Z_FLAG);
@@ -349,20 +349,20 @@ void pic16c5x_device::CALCULATE_SUB_DIGITCARRY()
 
 
 
-void pic16c5x_device::SET_PC(offs_t addr)
+void pic16c5x_device::set_pc(offs_t addr)
 {
 	m_PC = addr & m_program_mask;
 	PCL = m_PC & 0xff;
 }
 
-uint16_t pic16c5x_device::POP_STACK()
+uint16_t pic16c5x_device::pop_stack()
 {
 	uint16_t data = m_STACK[1];
 	m_STACK[1] = m_STACK[0];
 	return data & m_program_mask;
 }
 
-void pic16c5x_device::PUSH_STACK(uint16_t data)
+void pic16c5x_device::push_stack(uint16_t data)
 {
 	m_STACK[0] = m_STACK[1];
 	m_STACK[1] = data & m_program_mask;
@@ -370,7 +370,7 @@ void pic16c5x_device::PUSH_STACK(uint16_t data)
 
 
 
-uint8_t pic16c5x_device::GET_REGFILE(offs_t addr) // Read from internal memory
+uint8_t pic16c5x_device::get_regfile(offs_t addr) // Read from internal memory
 {
 	uint8_t data = 0;
 
@@ -451,7 +451,7 @@ uint8_t pic16c5x_device::GET_REGFILE(offs_t addr) // Read from internal memory
 	return data;
 }
 
-void pic16c5x_device::STORE_REGFILE(offs_t addr, uint8_t data) // Write to internal memory
+void pic16c5x_device::store_regfile(offs_t addr, uint8_t data) // Write to internal memory
 {
 	if (addr == 0) { // Indirect addressing
 		addr = FSR & m_data_mask;
@@ -476,7 +476,7 @@ void pic16c5x_device::STORE_REGFILE(offs_t addr, uint8_t data) // Write to inter
 			break;
 
 		case 2:
-			SET_PC(((STATUS & PA_REG) << 4) | data);
+			set_pc(((STATUS & PA_REG) << 4) | data);
 			m_inst_cycles++;
 			break;
 
@@ -542,10 +542,10 @@ void pic16c5x_device::STORE_REGFILE(offs_t addr, uint8_t data) // Write to inter
 }
 
 
-void pic16c5x_device::STORE_RESULT(offs_t addr, uint8_t data)
+void pic16c5x_device::store_result(offs_t addr, uint8_t data)
 {
 	if (m_opcode.b.l & 0x20)
-		STORE_REGFILE(addr, data);
+		store_regfile(addr, data);
 	else
 		m_W = data;
 }
@@ -571,62 +571,62 @@ void pic16c5x_device::illegal()
 
 void pic16c5x_device::addwf()
 {
-	m_old_data = GET_REGFILE(ADDR);
+	m_old_data = get_regfile(ADDR);
 	m_ALU = m_old_data + m_W;
-	STORE_RESULT(ADDR, m_ALU);
-	CALCULATE_Z_FLAG();
+	store_result(ADDR, m_ALU);
+	calc_zero_flag();
 	CALCULATE_ADD_CARRY();
 	CALCULATE_ADD_DIGITCARRY();
 }
 
 void pic16c5x_device::andwf()
 {
-	m_ALU = GET_REGFILE(ADDR) & m_W;
-	STORE_RESULT(ADDR, m_ALU);
-	CALCULATE_Z_FLAG();
+	m_ALU = get_regfile(ADDR) & m_W;
+	store_result(ADDR, m_ALU);
+	calc_zero_flag();
 }
 
 void pic16c5x_device::andlw()
 {
 	m_ALU = m_opcode.b.l & m_W;
 	m_W = m_ALU;
-	CALCULATE_Z_FLAG();
+	calc_zero_flag();
 }
 
 void pic16c5x_device::bcf()
 {
-	m_ALU = GET_REGFILE(ADDR);
+	m_ALU = get_regfile(ADDR);
 	m_ALU &= ~(1 << BITPOS);
-	STORE_REGFILE(ADDR, m_ALU);
+	store_regfile(ADDR, m_ALU);
 }
 
 void pic16c5x_device::bsf()
 {
-	m_ALU = GET_REGFILE(ADDR);
+	m_ALU = get_regfile(ADDR);
 	m_ALU |= 1 << BITPOS;
-	STORE_REGFILE(ADDR, m_ALU);
+	store_regfile(ADDR, m_ALU);
 }
 
 void pic16c5x_device::btfss()
 {
-	if (BIT(GET_REGFILE(ADDR), BITPOS)) {
-		SET_PC(m_PC + 1);
+	if (BIT(get_regfile(ADDR), BITPOS)) {
+		set_pc(m_PC + 1);
 		m_inst_cycles++; // Add NOP cycles
 	}
 }
 
 void pic16c5x_device::btfsc()
 {
-	if (!BIT(GET_REGFILE(ADDR), BITPOS)) {
-		SET_PC(m_PC + 1);
+	if (!BIT(get_regfile(ADDR), BITPOS)) {
+		set_pc(m_PC + 1);
 		m_inst_cycles++; // Add NOP cycles
 	}
 }
 
 void pic16c5x_device::call()
 {
-	PUSH_STACK(m_PC);
-	SET_PC((((STATUS & PA_REG) << 4) | m_opcode.b.l) & 0x6ff);
+	push_stack(m_PC);
+	set_pc((((STATUS & PA_REG) << 4) | m_opcode.b.l) & 0x6ff);
 }
 
 void pic16c5x_device::clrw()
@@ -637,7 +637,7 @@ void pic16c5x_device::clrw()
 
 void pic16c5x_device::clrf()
 {
-	STORE_REGFILE(ADDR, 0);
+	store_regfile(ADDR, 0);
 	SET(STATUS, Z_FLAG);
 }
 
@@ -651,46 +651,46 @@ void pic16c5x_device::clrwdt()
 
 void pic16c5x_device::comf()
 {
-	m_ALU = uint8_t(~(GET_REGFILE(ADDR)));
-	STORE_RESULT(ADDR, m_ALU);
-	CALCULATE_Z_FLAG();
+	m_ALU = uint8_t(~(get_regfile(ADDR)));
+	store_result(ADDR, m_ALU);
+	calc_zero_flag();
 }
 
 void pic16c5x_device::decf()
 {
-	m_ALU = GET_REGFILE(ADDR) - 1;
-	STORE_RESULT(ADDR, m_ALU);
-	CALCULATE_Z_FLAG();
+	m_ALU = get_regfile(ADDR) - 1;
+	store_result(ADDR, m_ALU);
+	calc_zero_flag();
 }
 
 void pic16c5x_device::decfsz()
 {
-	m_ALU = GET_REGFILE(ADDR) - 1;
-	STORE_RESULT(ADDR, m_ALU);
+	m_ALU = get_regfile(ADDR) - 1;
+	store_result(ADDR, m_ALU);
 	if (m_ALU == 0) {
-		SET_PC(m_PC + 1);
+		set_pc(m_PC + 1);
 		m_inst_cycles++; // Add NOP cycles
 	}
 }
 
 void pic16c5x_device::goto_op()
 {
-	SET_PC(((STATUS & PA_REG) << 4) | (m_opcode.w.l & 0x1ff));
+	set_pc(((STATUS & PA_REG) << 4) | (m_opcode.w.l & 0x1ff));
 }
 
 void pic16c5x_device::incf()
 {
-	m_ALU = GET_REGFILE(ADDR) + 1;
-	STORE_RESULT(ADDR, m_ALU);
-	CALCULATE_Z_FLAG();
+	m_ALU = get_regfile(ADDR) + 1;
+	store_result(ADDR, m_ALU);
+	calc_zero_flag();
 }
 
 void pic16c5x_device::incfsz()
 {
-	m_ALU = GET_REGFILE(ADDR) + 1;
-	STORE_RESULT(ADDR, m_ALU);
+	m_ALU = get_regfile(ADDR) + 1;
+	store_result(ADDR, m_ALU);
 	if (m_ALU == 0) {
-		SET_PC(m_PC + 1);
+		set_pc(m_PC + 1);
 		m_inst_cycles++; // Add NOP cycles
 	}
 }
@@ -699,21 +699,21 @@ void pic16c5x_device::iorlw()
 {
 	m_ALU = m_opcode.b.l | m_W;
 	m_W = m_ALU;
-	CALCULATE_Z_FLAG();
+	calc_zero_flag();
 }
 
 void pic16c5x_device::iorwf()
 {
-	m_ALU = GET_REGFILE(ADDR) | m_W;
-	STORE_RESULT(ADDR, m_ALU);
-	CALCULATE_Z_FLAG();
+	m_ALU = get_regfile(ADDR) | m_W;
+	store_result(ADDR, m_ALU);
+	calc_zero_flag();
 }
 
 void pic16c5x_device::movf()
 {
-	m_ALU = GET_REGFILE(ADDR);
-	STORE_RESULT(ADDR, m_ALU);
-	CALCULATE_Z_FLAG();
+	m_ALU = get_regfile(ADDR);
+	store_result(ADDR, m_ALU);
+	calc_zero_flag();
 }
 
 void pic16c5x_device::movlw()
@@ -723,7 +723,7 @@ void pic16c5x_device::movlw()
 
 void pic16c5x_device::movwf()
 {
-	STORE_REGFILE(ADDR, m_W);
+	store_regfile(ADDR, m_W);
 }
 
 void pic16c5x_device::nop()
@@ -739,27 +739,27 @@ void pic16c5x_device::option()
 void pic16c5x_device::retlw()
 {
 	m_W = m_opcode.b.l;
-	SET_PC(POP_STACK());
+	set_pc(pop_stack());
 }
 
 void pic16c5x_device::rlf()
 {
-	m_ALU = GET_REGFILE(ADDR);
+	m_ALU = get_regfile(ADDR);
 	uint8_t bit7 = m_ALU & 0x80;
 	m_ALU <<= 1;
 	if (STATUS & C_FLAG) m_ALU |= 1;
-	STORE_RESULT(ADDR, m_ALU);
+	store_result(ADDR, m_ALU);
 	if (bit7) SET(STATUS, C_FLAG);
 	else CLR(STATUS, C_FLAG);
 }
 
 void pic16c5x_device::rrf()
 {
-	m_ALU = GET_REGFILE(ADDR);
+	m_ALU = get_regfile(ADDR);
 	uint8_t bit0 = m_ALU & 1;
 	m_ALU >>= 1;
 	if (STATUS & C_FLAG) m_ALU |= 0x80;
-	STORE_RESULT(ADDR, m_ALU);
+	store_result(ADDR, m_ALU);
 	if (bit0) SET(STATUS, C_FLAG);
 	else CLR(STATUS, C_FLAG);
 }
@@ -774,19 +774,19 @@ void pic16c5x_device::sleepic()
 
 void pic16c5x_device::subwf()
 {
-	m_old_data = GET_REGFILE(ADDR);
+	m_old_data = get_regfile(ADDR);
 	m_ALU = m_old_data - m_W;
-	STORE_RESULT(ADDR, m_ALU);
-	CALCULATE_Z_FLAG();
+	store_result(ADDR, m_ALU);
+	calc_zero_flag();
 	CALCULATE_SUB_CARRY();
 	CALCULATE_SUB_DIGITCARRY();
 }
 
 void pic16c5x_device::swapf()
 {
-	uint8_t reg = GET_REGFILE(ADDR);
+	uint8_t reg = get_regfile(ADDR);
 	m_ALU = reg << 4 | reg >> 4;
-	STORE_RESULT(ADDR, m_ALU);
+	store_result(ADDR, m_ALU);
 }
 
 void pic16c5x_device::tris()
@@ -829,14 +829,14 @@ void pic16c5x_device::xorlw()
 {
 	m_ALU = m_W ^ m_opcode.b.l;
 	m_W = m_ALU;
-	CALCULATE_Z_FLAG();
+	calc_zero_flag();
 }
 
 void pic16c5x_device::xorwf()
 {
-	m_ALU = GET_REGFILE(ADDR) ^ m_W;
-	STORE_RESULT(ADDR, m_ALU);
-	CALCULATE_Z_FLAG();
+	m_ALU = get_regfile(ADDR) ^ m_W;
+	store_result(ADDR, m_ALU);
+	calc_zero_flag();
 }
 
 
@@ -1119,7 +1119,7 @@ void pic16c5x_device::pic16c5x_reset_regs()
 	m_TRISB = 0xff;
 	m_TRISC = 0xff;
 	m_OPTION = T0CS_FLAG | T0SE_FLAG | PSA_FLAG | PS_REG;
-	SET_PC(m_program_mask);
+	set_pc(m_program_mask);
 	m_PREVPC = m_PC;
 
 	m_prescaler = 0;
@@ -1146,8 +1146,8 @@ void pic16c5x_device::device_reset()
 	pic16c5x_reset_regs();
 	CLR(STATUS, PA_REG);
 	SET(STATUS, TO_FLAG | PD_FLAG);
-	STORE_REGFILE(3, STATUS);
-	STORE_REGFILE(4, FSR);
+	store_regfile(3, STATUS);
+	store_regfile(4, FSR);
 }
 
 
@@ -1259,7 +1259,7 @@ void pic16c5x_device::execute_run()
 			debugger_instruction_hook(m_PC);
 
 			m_opcode.d = m_program.read_word(m_PC);
-			SET_PC(m_PC + 1);
+			set_pc(m_PC + 1);
 
 			if (m_picmodel == 0x1650 || m_picmodel == 0x1654 || m_picmodel == 0x1655 || (m_opcode.w.l & 0xff0) != 0x000) { // Do all opcodes except the 00? ones
 				m_inst_cycles = s_opcode_main[((m_opcode.w.l >> 4) & 0xff)].cycles;

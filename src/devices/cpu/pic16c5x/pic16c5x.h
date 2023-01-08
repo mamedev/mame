@@ -173,17 +173,17 @@ private:
 	static const pic16c5x_opcode s_opcode_00x[16];
 
 	void update_internalram_ptr();
-	void CALCULATE_Z_FLAG();
+	void calc_zero_flag();
 	void CALCULATE_ADD_CARRY();
 	void CALCULATE_ADD_DIGITCARRY();
 	void CALCULATE_SUB_CARRY();
 	void CALCULATE_SUB_DIGITCARRY();
-	uint16_t POP_STACK();
-	void PUSH_STACK(uint16_t data);
-	void SET_PC(offs_t addr);
-	uint8_t GET_REGFILE(offs_t addr);
-	void STORE_REGFILE(offs_t addr, uint8_t data);
-	void STORE_RESULT(offs_t addr, uint8_t data);
+	uint16_t pop_stack();
+	void push_stack(uint16_t data);
+	void set_pc(offs_t addr);
+	uint8_t get_regfile(offs_t addr);
+	void store_regfile(offs_t addr, uint8_t data);
+	void store_result(offs_t addr, uint8_t data);
 	void illegal();
 	void addwf();
 	void andwf();
