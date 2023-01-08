@@ -1513,28 +1513,28 @@ inline void s3virge_vga_device::write_pixel8(uint32_t base, uint16_t x, uint16_t
 
 inline uint32_t s3virge_vga_device::read_pixel32(uint32_t base, uint16_t x, uint16_t y)
 {
-	return (vga.memory[(base + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] << 24) |
-		   (vga.memory[(base + 1 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] << 16) |
-		   (vga.memory[(base + 2 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size] << 8) |
-		   vga.memory[(base + 3 + (x*4) + (y*dest_stride())) % vga.svga_intf.vram_size];
+	return (vga.memory[(base + (x * 4) + (y * src_stride())) % vga.svga_intf.vram_size] << 24) |
+		   (vga.memory[(base + 1 + (x * 4) + (y * src_stride())) % vga.svga_intf.vram_size] << 16) |
+		   (vga.memory[(base + 2 + (x * 4) + (y * src_stride())) % vga.svga_intf.vram_size] << 8) |
+		   vga.memory[(base + 3 + (x * 4) + (y * src_stride())) % vga.svga_intf.vram_size];
 }
 
 inline uint32_t s3virge_vga_device::read_pixel24(uint32_t base, uint16_t x, uint16_t y)
 {
-	return (vga.memory[(base + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size]) |
-		   (vga.memory[(base + 1 + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size] << 8) |
-		   (vga.memory[(base + 2 + (x*3) + (y*dest_stride())) % vga.svga_intf.vram_size] << 16);
+	return (vga.memory[(base + (x * 3) + (y * src_stride())) % vga.svga_intf.vram_size]) |
+		   (vga.memory[(base + 1 + (x * 3) + (y * src_stride())) % vga.svga_intf.vram_size] << 8) |
+		   (vga.memory[(base + 2 + (x * 3) + (y * src_stride())) % vga.svga_intf.vram_size] << 16);
 }
 
 inline uint16_t s3virge_vga_device::read_pixel16(uint32_t base, uint16_t x, uint16_t y)
 {
-	return (vga.memory[(base + (x*2) + (y*dest_stride()) % vga.svga_intf.vram_size)]) |
-		   (vga.memory[(base + 1 + (x*2) + (y*dest_stride())) % vga.svga_intf.vram_size] << 8);
+	return (vga.memory[(base + (x * 2) + (y * src_stride()) % vga.svga_intf.vram_size)]) |
+		   (vga.memory[(base + 1 + (x * 2) + (y * src_stride())) % vga.svga_intf.vram_size] << 8);
 }
 
 inline uint8_t s3virge_vga_device::read_pixel8(uint32_t base, uint16_t x, uint16_t y)
 {
-	return vga.memory[(base + x + (y*dest_stride())) % vga.svga_intf.vram_size];
+	return vga.memory[(base + x + (y * src_stride())) % vga.svga_intf.vram_size];
 }
 
 // 2D command register format - A500 (BitBLT), A900 (2D line), AD00 (2D Polygon)

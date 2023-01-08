@@ -59,6 +59,10 @@ public:
 	uint32_t get_linear_address_size_full() { return s3virge.linear_address_size_full; }
 	bool is_linear_address_active() { return s3virge.linear_address_enable; }
 	bool is_new_mmio_active() { return s3.cr53 & 0x08; }
+	uint16_t src_stride()
+	{
+		return (s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_DEST_SRC_STR] >> 0) & 0xfff8;
+	}
 	uint16_t dest_stride()
 	{
 //      if((s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND] & 0x0000001c) == 0x08)
