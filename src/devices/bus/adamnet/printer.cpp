@@ -73,10 +73,12 @@ function fillstylepad(x)
     ctx.fillStyle="#"+num;
 }
 
+// pass the origin in pixels 0 and 1
 ctx.fillStyle = fillstylepad(x0)
 ctx.fillRect(0,0,1,1)
 ctx.fillStyle = fillstylepad(y0)
 ctx.fillRect(1,0,1,1)
+// pass the size in pixels 2 and 3
 ctx.fillStyle = fillstylepad(hsize)
 ctx.fillRect(2,0,1,1)
 ctx.fillStyle = fillstylepad(vsize)
@@ -148,13 +150,10 @@ void adam_printer_device::device_add_mconfig(machine_config &config)
 	m_maincpu->in_p3_cb().set(FUNC(adam_printer_device::p3_r));
 	m_maincpu->in_p4_cb().set(FUNC(adam_printer_device::p4_r));
 	m_maincpu->out_p4_cb().set(FUNC(adam_printer_device::p4_w));
-	//m_maincpu->set_disable(); // TODO
 
-	BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT, 300, 300);  // do 300 dpi
+	DAISYWHEEL_BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT, 300, 300, "artwork/adam_printer.png");
 	m_bitmap_printer->set_pf_stepper_ratio(3,1);  // 3 pixels per step
 	m_bitmap_printer->set_cr_stepper_ratio(8,1);  // 8 pixels per step
-
-	STEPPER(config, m_daisywheel_stepper);
 }
 
 
@@ -171,8 +170,7 @@ adam_printer_device::adam_printer_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, ADAM_PRN, tag, owner, clock),
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG),
-		m_bitmap_printer(*this, "bitmap_printer"),
-		m_daisywheel_stepper(*this, "daisywheel")
+		m_bitmap_printer(*this, "bitmap_printer")
 {
 }
 
@@ -185,23 +183,6 @@ void adam_printer_device::device_start()
 {
 	m_platen_motor_timer = timer_alloc(FUNC(adam_printer_device::platen_motor_timer), this);
 	m_platen_motor_timer->adjust(attotime::from_double(1.0/2400));
-
-	std::string fullname;
-	std::error_condition filerr;
-	util::core_file::ptr file;
-
-	/* get the filename for the image */
-	fullname = "artwork/adam_printer.png";
-	/* open the file */
-	filerr = util::core_file::open(fullname, OPEN_FLAG_READ, file);
-
-	/* if that worked, load the file */
-	if (!filerr)
-	{
-			util::png_read_bitmap(*file, m_typesheet);
-			file.reset();
-	}
-
 }
 
 
@@ -236,18 +217,8 @@ void adam_printer_device::p1_w(uint8_t data)
 
 	*/
 
-	//printf("p1 = %x    cr_stepper=%x  daisywheel=%d\n",data, m_bitmap_printer->m_xpos, m_daisywheel_stepper->get_absolute_position());
-
 	m_bitmap_printer->update_cr_stepper(bitswap<4>(data, 1, 3, 2, 0));
-
-	m_daisywheel_stepper->update(bitswap<4>(data, 5, 7, 6, 4));
-
-	// wrap daisywheel around
-	if (m_daisywheel_stepper->get_absolute_position() >= 96 * 2)
-		m_daisywheel_stepper->set_absolute_position(m_daisywheel_stepper->get_absolute_position() - 96 * 2);
-
-	if (m_daisywheel_stepper->get_absolute_position() < 0)
-		m_daisywheel_stepper->set_absolute_position(m_daisywheel_stepper->get_absolute_position() + 96 * 2);
+	m_bitmap_printer->update_dw_stepper(bitswap<4>(data, 5, 7, 6, 4));
 }
 
 
@@ -332,7 +303,7 @@ uint8_t adam_printer_device::p4_r()
 	return  0x80 |  // make this 0x0 for self test  (active low = self test)
 			(m_bitmap_printer->m_xpos < 4)                         << 4 |  // 1 if we are at left margin
 			(m_platen_counter > 72 && m_platen_counter < 144)      << 5 |  // 1 is open, 0 is closed
-			(m_daisywheel_stepper->get_absolute_position() == wheel_home_sensor_pos) << 6;
+			(m_bitmap_printer->m_wheelpos == wheel_home_sensor_pos) << 6;
 }
 
 
@@ -343,16 +314,18 @@ uint8_t adam_printer_device::p4_r()
 void adam_printer_device::p4_w(uint8_t data)
 {
 	/*
+
 	    bit     description
 
-	    0       print hammer solenoid    // active low
-	    1       ribbon advance solenoid  // active low
+	    0       print hammer solenoid    (active low)
+	    1       ribbon advance solenoid  (active low)
 	    2       platen motor advance  0 = motor on
 	    3       platen motor break    1 = brake is off
 	    4
 	    5
 	    6
 	    7
+
 	*/
 	m_p4_data = data;
 }
@@ -374,41 +347,10 @@ TIMER_CALLBACK_MEMBER(adam_printer_device::platen_motor_timer)
 
 	if (!BIT(m_p4_data, 0))  // active low solenoid engaged
 	{
-		const int wheelpos = mod_positive(m_daisywheel_stepper->get_absolute_position() / 2 + wheel_offset(), 96);
-		int wheelchar = m_daisywheel.at(wheelpos);
-
-
-		if (m_typesheet.width() != 0)
-		{
-			int horigin = ((u32 *) m_typesheet.raw_pixptr(0,0))[0] & 0xffffff;
-			int vorigin = ((u32 *) m_typesheet.raw_pixptr(0,0))[1] & 0xffffff;
-			int hsize =   ((u32 *) m_typesheet.raw_pixptr(0,0))[2] & 0xffffff;
-			int vsize =   ((u32 *) m_typesheet.raw_pixptr(0,0))[3] & 0xffffff;
-	/*
-	        int horigin = 35;
-	        int vorigin = 14;
-	        int vsize = 50;  // at 300dpi 66 lines = 6 lpi = 50 pixels vert
-	        int hsize = 34;  // at 300dpi 80 char = 10 cpi = 30 pixels horiz
-	*/
-			int i = wheelchar;
-
-			int srcx1 = hsize * ((i-32) % 16) + horigin;
-			int srcy1 = vsize * ((i-32) / 16) + vorigin;
-
-			int destx1 = m_bitmap_printer->m_xpos;
-			int destx2 = destx1 + hsize - 1;
-			if (destx2 > m_bitmap_printer->get_bitmap().width()) destx2 = m_bitmap_printer->get_bitmap().width();
-			int desty1 = m_bitmap_printer->m_ypos;
-			int desty2 = desty1 + vsize;
-			if (desty2 > m_bitmap_printer->get_bitmap().height()) desty2 = m_bitmap_printer->get_bitmap().height();
-
-			rectangle m_clip(destx1, destx2, desty1, desty2);
-			copybitmap_trans(m_bitmap_printer->get_bitmap(), (bitmap_rgb32&) m_typesheet, 0, 0,
-				destx1 - srcx1, desty1 - srcy1, m_clip, 0xfffffffe);  // FFFFFFFF treated as no transparency special case
-		}
+		const int wheelpos = mod_positive(m_bitmap_printer->m_wheelpos / 2 + wheel_offset(), 96);
+		int wheelchar = m_daisywheel.at(wheelpos) ;
+		m_bitmap_printer->stamp(wheelchar);
 	}
 
 	m_platen_motor_timer->adjust(attotime::from_double(1.0/2400));
-
-
 }

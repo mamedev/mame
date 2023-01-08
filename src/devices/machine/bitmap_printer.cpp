@@ -22,6 +22,7 @@
 ***************************************************************************/
 
 DEFINE_DEVICE_TYPE(BITMAP_PRINTER, bitmap_printer_device, "bitmap_printer", "Bitmap Printer Device")
+DEFINE_DEVICE_TYPE(DAISYWHEEL_BITMAP_PRINTER, daisywheel_bitmap_printer_device, "daisywheel_bitmap_printer", "Daisywheel Bitmap Printer Device")
 
 //**************************************************************************
 //    INPUT PORTS

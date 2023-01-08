@@ -44,8 +44,8 @@ protected:
 
 private:
 	required_device<m6801_cpu_device> m_maincpu;
-	required_device<bitmap_printer_device> m_bitmap_printer;
-	required_device<stepper_device> m_daisywheel_stepper;
+	required_device<daisywheel_bitmap_printer_device> m_bitmap_printer;
+//  required_device<stepper_device> m_daisywheel_stepper;
 
 	void p1_w(uint8_t data);
 	uint8_t p2_r();
