@@ -1,9 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*********************************\
-
  ARCompact Core
-
 \*********************************/
 
 #ifndef MAME_CPU_ARCOMPACT_ARCOMPACT_H
@@ -20,51 +18,7 @@ enum
 
 };
 
-#define ARCOMPACT_RETTYPE uint32_t
-#define OPS_32 uint32_t op
-#define OPS_16 uint16_t op
-#define PARAMS op
 #define LIMM_REG 62
-#define ARCOMPACT_OPERATION ((op & 0xf800) >> 11)
-
-
-#define ARCOMPACT_HANDLER04_P11_TYPE(name) \
-ARCOMPACT_RETTYPE arcompact_handle##name##_p11(OPS_32) \
-{ \
-	int M = (op & 0x00000020) >> 5; \
-		\
-	switch (M) \
-	{ \
-		case 0x00: return arcompact_handle##name##_p11_m0(PARAMS); \
-		case 0x01: return arcompact_handle##name##_p11_m1(PARAMS); \
-	} \
-		\
-	return 0; \
-}
-#define ARCOMPACT_HANDLER04_TYPE(name) \
-ARCOMPACT_RETTYPE arcompact_handle##name(OPS_32) \
-{ \
-	int p = (op & 0x00c00000) >> 22; \
-	\
-	switch (p) \
-	{ \
-		case 0x00: return arcompact_handle##name##_p00(PARAMS); \
-		case 0x01: return arcompact_handle##name##_p01(PARAMS); \
-		case 0x02: return arcompact_handle##name##_p10(PARAMS); \
-		case 0x03: return arcompact_handle##name##_p11(PARAMS); \
-	} \
-	\
-	return 0; \
-}
-
-#define ARCOMPACT_HANDLER04_TYPE_PM(name) \
-	ARCOMPACT_RETTYPE arcompact_handle##name##_p00(OPS_32); \
-	ARCOMPACT_RETTYPE arcompact_handle##name##_p01(OPS_32); \
-	ARCOMPACT_RETTYPE arcompact_handle##name##_p10(OPS_32); \
-	ARCOMPACT_RETTYPE arcompact_handle##name##_p11_m0(OPS_32); \
-	ARCOMPACT_RETTYPE arcompact_handle##name##_p11_m1(OPS_32); \
-	ARCOMPACT_HANDLER04_P11_TYPE(name); \
-	ARCOMPACT_HANDLER04_TYPE(name);
 
 class arcompact_device : public cpu_device
 {
@@ -72,17 +26,6 @@ public:
 	// construction/destruction
 	arcompact_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint32_t arcompact_auxreg002_LPSTART_r();
-	void arcompact_auxreg002_LPSTART_w(uint32_t data);
-	uint32_t arcompact_auxreg003_LPEND_r();
-	void arcompact_auxreg003_LPEND_w(uint32_t data);
-
-	uint32_t arcompact_auxreg00a_STATUS32_r();
-	uint32_t arcompact_auxreg025_INTVECTORBASE_r();
-	void arcompact_auxreg025_INTVECTORBASE_w(uint32_t data);
-
-
-	void arcompact_auxreg_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -105,719 +48,503 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+private:
+	void arcompact_auxreg_map(address_map &map);
 
+	uint32_t arcompact_auxreg002_LPSTART_r();
+	void arcompact_auxreg002_LPSTART_w(uint32_t data);
+	uint32_t arcompact_auxreg003_LPEND_r();
+	void arcompact_auxreg003_LPEND_w(uint32_t data);
+
+	uint32_t arcompact_auxreg00a_STATUS32_r();
+	uint32_t arcompact_auxreg025_INTVECTORBASE_r();
+	void arcompact_auxreg025_INTVECTORBASE_w(uint32_t data);
 
 	// Dispatch
-	ARCOMPACT_RETTYPE arcompact_handle00(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_00(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_00(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_01(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05(OPS_32);
+	uint32_t arcompact_handle00(uint32_t op);
+	uint32_t arcompact_handle01(uint32_t op);
+	uint32_t arcompact_handle01_00(uint32_t op);
+	uint32_t arcompact_handle01_01(uint32_t op);
+	uint32_t arcompact_handle01_01_00(uint32_t op);
+	uint32_t arcompact_handle01_01_01(uint32_t op);
+	uint32_t arcompact_handle04(uint32_t op);
+	uint32_t arcompact_handle04_2f(uint32_t op);
+	uint32_t arcompact_handle04_2f_3f(uint32_t op);
+	uint32_t arcompact_handle05(uint32_t op);
 
-	ARCOMPACT_RETTYPE arcompact_handle05_2f(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f(OPS_32);
+	uint32_t arcompact_handle05_2f(uint32_t op);
+	uint32_t arcompact_handle05_2f_3f(uint32_t op);
 
-	ARCOMPACT_RETTYPE arcompact_handle0c(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0d(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0e(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_00(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_00_07(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle17(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_05(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle19(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1c(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1d(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1e(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1e_03(OPS_16);
-
-	// Handler
-
-	ARCOMPACT_RETTYPE arcompact_handle00_00(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle00_01(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_00_00dasm(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_00_01dasm(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_00_00(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_00_01(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_00_02(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_00_03(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_00_04(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_00_05(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_00_0e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_00_0f(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_01_00(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_01_01(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_01_02(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_01_03(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_01_04(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_01_05(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_01_0e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_01_0f(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle02(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle03(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_00(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_01(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_02(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_03(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_04(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_05(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_06(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_07(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_08(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_09(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_0a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_0b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_0c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_0d(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_0e(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_0f(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_10(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_11(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_12(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_13(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_14(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_15(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_16(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_17(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_18(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_19(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_1a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_1b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_1c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_1d(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_20(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_21(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_22(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_23(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_28(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_29(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_2a(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_2b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_00(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_01(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_2f_02(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_2f_03(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_04(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_05(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_06(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_2f_07(OPS_32);
-//  ARCOMPACT_RETTYPE arcompact_handle04_2f_08(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_09(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_0a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_0b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_0c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_01(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_02(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_03(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_04(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_05(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_30(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_31(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_32(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_33(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_34(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_35(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_36(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_37(OPS_32);
-	//ARCOMPACT_RETTYPE arcompact_handle05_00(OPS_32);
-	//ARCOMPACT_RETTYPE arcompact_handle05_01(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_02(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_03(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_04(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_05(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_06(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_07(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_08(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_0a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_0b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_28(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_29(OPS_32);
-
-	ARCOMPACT_RETTYPE arcompact_handle06(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle07(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle08(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle09(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle0a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle0b(OPS_32);
-
-	ARCOMPACT_RETTYPE arcompact_handle0c_00(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0c_01(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0c_02(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0c_03(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0d_00(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0d_01(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0d_02(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0d_03(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0e_00(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0e_01(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0e_02(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0e_03(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_00_00(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_00_01(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_00_02(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_00_03(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_00_06(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_00_07_00(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_00_07_01(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_00_07_04(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_00_07_05(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_00_07_06(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_00_07_07(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_02(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_04(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_05(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_06(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_07(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_0b(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_0c(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_0d(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_0e(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_0f(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_10(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_11(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_12(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_13(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_14(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_15(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_16(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_18(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_19(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_1a(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_1b(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_1c(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_1d(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_1e(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_1f(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle10(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle11(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle12(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle13(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle14(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle15(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle16(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle17_00(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle17_01(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle17_02(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle17_03(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle17_04(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle17_05(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle17_06(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle17_07(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_00(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_01(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_02(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_03(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_04(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_05_00(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_05_01(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_01(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_11(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_01(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_11(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle19_00(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle19_01(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle19_02(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle19_03(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1a(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1b(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1c_00(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1c_01(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1d_00(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1d_01(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1e_00(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1e_01(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1e_02(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1e_03_00(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1e_03_01(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1e_03_02(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1e_03_03(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1e_03_04(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1e_03_05(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1e_03_06(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1e_03_07(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle1f(OPS_16);
+	uint32_t arcompact_handle0c(uint16_t op);
+	uint32_t arcompact_handle0d(uint16_t op);
+	uint32_t arcompact_handle0e(uint16_t op);
+	uint32_t arcompact_handle0f(uint16_t op);
+	uint32_t arcompact_handle0f_00(uint16_t op);
+	uint32_t arcompact_handle0f_00_07(uint16_t op);
+	uint32_t arcompact_handle17(uint16_t op);
+	uint32_t arcompact_handle18(uint16_t op);
+	uint32_t arcompact_handle18_05(uint16_t op);
+	uint32_t arcompact_handle18_06(uint16_t op);
+	uint32_t arcompact_handle18_07(uint16_t op);
+	uint32_t arcompact_handle19(uint16_t op);
+	uint32_t arcompact_handle1c(uint16_t op);
+	uint32_t arcompact_handle1d(uint16_t op);
+	uint32_t arcompact_handle1e(uint16_t op);
+	uint32_t arcompact_handle1e_03(uint16_t op);
 
 	/************************************************************************************************************************************
 	*                                                                                                                                   *
-	* illegal opcode handlers (disassembly)                                                                                             *
+	* 32-bit opcode handlers                                                                                                            *
 	*                                                                                                                                   *
 	************************************************************************************************************************************/
 
-	ARCOMPACT_RETTYPE arcompact_handle01_01_00_06(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_00_07(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_00_08(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_00_09(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_00_0a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_00_0b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_00_0c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_00_0d(OPS_32);
+	uint32_t handleop32_B_cc_D_s21(uint32_t op);
+	uint32_t handleop32_B_D_s25(uint32_t op);
+	uint32_t handleop32_BL_cc_d_s21(uint32_t op);
+	uint32_t handleop32_BL_d_s25(uint32_t op);
+	uint32_t handleop32_BREQ_reg_reg(uint32_t op);
+	uint32_t handleop32_BRNE_reg_reg(uint32_t op);
+	uint32_t handleop32_BRLT_reg_reg(uint32_t op);
+	uint32_t handleop32_BRGE_reg_reg(uint32_t op);
+	uint32_t handleop32_BRLO_reg_reg(uint32_t op);
+	uint32_t handleop32_BRHS_reg_reg(uint32_t op);
+	uint32_t handleop32_BBIT0_reg_reg(uint32_t op);
+	uint32_t handleop32_BBIT1_reg_reg(uint32_t op);
+	uint32_t handleop32_BREQ_reg_imm(uint32_t op);
+	uint32_t handleop32_BRNE_reg_imm(uint32_t op);
+	uint32_t handleop32_BRLT_reg_imm(uint32_t op);
+	uint32_t handleop32_BRGE_reg_imm(uint32_t op);
+	uint32_t handleop32_BRLO_reg_imm(uint32_t op);
+	uint32_t handleop32_BRHS_reg_imm(uint32_t op);
+	uint32_t handleop32_BBIT0_reg_imm(uint32_t op);
+	uint32_t handleop32_BBIT1_reg_imm(uint32_t op);
+	uint32_t handleop32_LD_r_o(uint32_t op);
+	uint32_t handleop32_ST_r_o(uint32_t op);
+	uint32_t handleop32_ADC(uint32_t op);
+	uint32_t handleop32_SBC(uint32_t op);
+	uint32_t handleop32_MAX(uint32_t op);
+	uint32_t handleop32_MIN(uint32_t op);
+	uint32_t handleop32_TST(uint32_t op);
+	uint32_t handleop32_CMP(uint32_t op);
+	uint32_t handleop32_RCMP(uint32_t op);
+	uint32_t handleop32_BCLR(uint32_t op);
+	uint32_t handleop32_BTST(uint32_t op);
+	uint32_t handleop32_BXOR(uint32_t op);
+	uint32_t handleop32_MPY(uint32_t op);
+	uint32_t handleop32_MPYH(uint32_t op);
+	uint32_t handleop32_MPYHU(uint32_t op);
+	uint32_t handleop32_MPYU(uint32_t op);
+	uint32_t handleop32_JLcc(uint32_t op);
+	uint32_t handleop32_JLcc_D(uint32_t op);
+	uint32_t handleop32_LP(uint32_t op);
+	uint32_t handleop32_FLAG(uint32_t op);
+	uint32_t handleop32_ASL_single(uint32_t op);
+	uint32_t handleop32_ASR_single(uint32_t op);
+	uint32_t handleop32_RRC(uint32_t op);
+	uint32_t handleop32_SEXB(uint32_t op);
+	uint32_t handleop32_SEXW(uint32_t op);
+	uint32_t handleop32_ABS(uint32_t op);
+	uint32_t handleop32_NOT(uint32_t op);
+	uint32_t handleop32_RLC(uint32_t op);
+	uint32_t handleop32_EX(uint32_t op);
+	uint32_t handleop32_SLEEP(uint32_t op);
+	uint32_t handleop32_SWI(uint32_t op);
+	uint32_t handleop32_SYNC(uint32_t op);
+	uint32_t handleop32_RTIE(uint32_t op);
+	uint32_t handleop32_BRK(uint32_t op);
+	uint32_t handleop32_LD_0(uint32_t op);
+	uint32_t handleop32_LD_1(uint32_t op);
+	uint32_t handleop32_LD_2(uint32_t op);
+	uint32_t handleop32_LD_3(uint32_t op);
+	uint32_t handleop32_LD_4(uint32_t op);
+	uint32_t handleop32_LD_5(uint32_t op);
+	uint32_t handleop32_LD_6(uint32_t op);
+	uint32_t handleop32_LD_7(uint32_t op);
+	uint32_t handleop32_ASR_multiple(uint32_t op);
+	uint32_t handleop32_ROR_multiple(uint32_t op);
+	uint32_t handleop32_MUL64(uint32_t op);
+	uint32_t handleop32_MULU64(uint32_t op);
+	uint32_t handleop32_ADDS(uint32_t op);
+	uint32_t handleop32_SUBS(uint32_t op);
+	uint32_t handleop32_DIVAW(uint32_t op);
+	uint32_t handleop32_ASLS(uint32_t op);
+	uint32_t handleop32_ASRS(uint32_t op);
+	uint32_t handleop32_ADDSDW(uint32_t op);
+	uint32_t handleop32_SUBSDW(uint32_t op);
+	uint32_t handleop32_SWAP(uint32_t op);
+	uint32_t handleop32_NORM(uint32_t op);
+	uint32_t handleop32_SAT16(uint32_t op);
+	uint32_t handleop32_RND16(uint32_t op);
+	uint32_t handleop32_ABSSW(uint32_t op);
+	uint32_t handleop32_ABSS(uint32_t op);
+	uint32_t handleop32_NEGSW(uint32_t op);
+	uint32_t handleop32_NEGS(uint32_t op);
+	uint32_t handleop32_NORMW(uint32_t op);
 
-	ARCOMPACT_RETTYPE arcompact_handle01_01_01_06(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_01_07(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_01_08(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_01_09(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_01_0a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_01_0b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_01_0c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle01_01_01_0d(OPS_32);
+	uint32_t handleop32_ARC_EXT06(uint32_t op);
+	uint32_t handleop32_USER_EXT07(uint32_t op);
+	uint32_t handleop32_USER_EXT08(uint32_t op);
+	uint32_t handleop32_MARKET_EXT09(uint32_t op);
+	uint32_t handleop32_MARKET_EXT0a(uint32_t op);
+	uint32_t handleop32_MARKET_EXT0b(uint32_t op);
 
+	/************************************************************************************************************************************
+	*                                                                                                                                   *
+	* 16-bit opcode handlers                                                                                                            *
+	*                                                                                                                                   *
+	************************************************************************************************************************************/
 
-	ARCOMPACT_RETTYPE arcompact_handle04_1e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_1f(OPS_32);
+	uint32_t handleop_LD_S_a_b_c(uint16_t op);
+	uint32_t handleop_LDB_S_a_b_c(uint16_t op);
+	uint32_t handleop_LDW_S_a_b_c(uint16_t op);
+	uint32_t handleop_ADD_S_a_b_c(uint16_t op);
+	uint32_t handleop_ADD_S_c_b_u3(uint16_t op);
+	uint32_t handleop_SUB_S_c_b_u3(uint16_t op);
+	uint32_t handleop_ASL_S_c_b_u3(uint16_t op);
+	uint32_t handleop_ASR_S_c_b_u3(uint16_t op);
+	uint32_t handleop_ADD_S_b_b_h_or_limm(uint16_t op);
+	uint32_t handleop_MOV_S_b_h_or_limm(uint16_t op);
+	uint32_t handleop_CMP_S_b_h_or_limm(uint16_t op);
+	uint32_t handleop_MOV_S_hob(uint16_t op);
+	uint32_t handleop_J_S_b(uint16_t op);
+	uint32_t handleop_J_S_D_b(uint16_t op);
+	uint32_t handleop_JL_S_b(uint16_t op);
+	uint32_t handleop_JL_S_D_b(uint16_t op);
+	uint32_t handleop_SUB_S_NE_b_b_b(uint16_t op);
+	uint32_t handleop_NOP_S(uint16_t op);
+	uint32_t handleop_UNIMP_S(uint16_t op);
+	uint32_t handleop_JEQ_S_blink(uint16_t op);
+	uint32_t handleop_JNE_S_blink(uint16_t op);
+	uint32_t handleop_J_S_blink(uint16_t op);
+	uint32_t handleop_J_S_D_blink(uint16_t op);
+	uint32_t handleop_SUB_S_b_b_c(uint16_t op);
+	uint32_t handleop_AND_S_b_b_c(uint16_t op);
+	uint32_t handleop_OR_S_b_b_c(uint16_t op);
+	uint32_t handleop_BIC_S_b_b_c(uint16_t op);
+	uint32_t handleop_XOR_S_b_b_c(uint16_t op);
+	uint32_t handleop_TST_S_b_c(uint16_t op);
+	uint32_t handleop_MUL64_S_0_b_c(uint16_t op);
+	uint32_t handleop_SEXB_S_b_c(uint16_t op);
+	uint32_t handleop_SEXW_S_b_c(uint16_t op);
+	uint32_t handleop_EXTB_S_b_c(uint16_t op);
+	uint32_t handleop_EXTW_S_b_c(uint16_t op);
+	uint32_t handleop_ABS_S_b_c(uint16_t op);
+	uint32_t handleop_NOT_S_b_c(uint16_t op);
+	uint32_t handleop_NEG_S_b_c(uint16_t op);
+	uint32_t handleop_ADD1_S_b_b_c(uint16_t op);
+	uint32_t handleop_ADD2_S_b_b_c(uint16_t op);
+	uint32_t handleop_ADD3_S_b_b_c(uint16_t op);
+	uint32_t handleop_ASL_S_b_b_c_multiple(uint16_t op);
+	uint32_t handleop_LSR_S_b_b_c_multiple(uint16_t op);
+	uint32_t handleop_ASR_S_b_b_c_multiple(uint16_t op);
+	uint32_t handleop_ASL_S_b_c_single(uint16_t op);
+	uint32_t handleop_ASR_S_b_c_single(uint16_t op);
+	uint32_t handleop_LSR_S_b_c_single(uint16_t op);
+	uint32_t handleop_TRAP_S_u6(uint16_t op);
+	uint32_t handleop_BRK_S(uint16_t op);
+	uint32_t handleop_LD_S_c_b_u7(uint16_t op);
+	uint32_t handleop_LDB_S_c_b_u5(uint16_t op);
+	uint32_t handleop_LDW_S_c_b_u6(uint16_t op);
+	uint32_t handleop_LDW_S_X_c_b_u6(uint16_t op);
+	uint32_t handleop_ST_S_c_b_u7(uint16_t op);
+	uint32_t handleop_STB_S_c_b_u5(uint16_t op);
+	uint32_t handleop_STW_S_c_b_u6(uint16_t op);
+	uint32_t handleop_ASL_S_b_b_u5(uint16_t op);
+	uint32_t handleop_LSR_S_b_b_u5(uint16_t op);
+	uint32_t handleop_ASR_S_b_b_u5(uint16_t op);
+	uint32_t handleop_SUB_S_b_b_u5(uint16_t op);
+	uint32_t handleop_BSET_S_b_b_u5(uint16_t op);
+	uint32_t handleop_BCLR_S_b_b_u5(uint16_t op);
+	uint32_t handleop_BMSK_S_b_b_u5(uint16_t op);
+	uint32_t handleop_BTST_S_b_u5(uint16_t op);
+	uint32_t handleop_LD_S_b_sp_u7(uint16_t op);
+	uint32_t handleop_LDB_S_b_sp_u7(uint16_t op);
+	uint32_t handleop_ST_S_b_sp_u7(uint16_t op);
+	uint32_t handleop_STB_S_b_sp_u7(uint16_t op);
+	uint32_t handleop_ADD_S_b_sp_u7(uint16_t op);
+	uint32_t handleop_ADD_S_sp_sp_u7(uint16_t op);
+	uint32_t handleop_SUB_S_sp_sp_u7(uint16_t op);
+	uint32_t handleop_POP_S_b(uint16_t op);
+	uint32_t handleop_POP_S_blink(uint16_t op);
+	uint32_t handleop_PUSH_S_b(uint16_t op);
+	uint32_t handleop_PUSH_S_blink(uint16_t op);
+	uint32_t handleop_LD_S_r0_gp_s11(uint16_t op);
+	uint32_t handleop_LDB_S_r0_gp_s9(uint16_t op);
+	uint32_t handleop_LDW_S_r0_gp_s10(uint16_t op);
+	uint32_t handleop_ADD_S_r0_gp_s11(uint16_t op);
+	uint32_t handleop_LD_S_b_pcl_u10(uint16_t op);
+	uint32_t handleop_MOV_S_b_u8(uint16_t op);
+	uint32_t handleop_ADD_S_b_b_u7(uint16_t op);
+	uint32_t handleop_CMP_S_b_u7(uint16_t op);
+	uint32_t handleop_BREQ_S_b_0_s8(uint16_t op);
+	uint32_t handleop_BRNE_S_b_0_s8(uint16_t op);
+	uint32_t handleop_B_S_s10(uint16_t op);
+	uint32_t handleop_BEQ_S_s10(uint16_t op);
+	uint32_t handleop_BNE_S_s10(uint16_t op);
+	uint32_t handleop_BGT_S_s7(uint16_t op);
+	uint32_t handleop_BGE_S_s7(uint16_t op);
+	uint32_t handleop_BLT_S_s7(uint16_t op);
+	uint32_t handleop_BLE_S_s7(uint16_t op);
+	uint32_t handleop_BHI_S_s7(uint16_t op);
+	uint32_t handleop_BHS_S_s7(uint16_t op);
+	uint32_t handleop_BLO_S_s7(uint16_t op);
+	uint32_t handleop_BLS_S_s7(uint16_t op);
+	uint32_t handleop_BL_S_s13(uint16_t op);
 
-	ARCOMPACT_RETTYPE arcompact_handle04_24(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_25(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_26(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_27(OPS_32);
+	/************************************************************************************************************************************
+	*                                                                                                                                   *
+	* illegal opcode handlers                                                                                                           *
+	*                                                                                                                                   *
+	************************************************************************************************************************************/
 
-	ARCOMPACT_RETTYPE arcompact_handle04_2c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2e(OPS_32);
+	uint32_t arcompact_handle_illegal(uint8_t param1, uint8_t param2, uint16_t op);
+	uint32_t arcompact_handle_illegal(uint8_t param1, uint8_t param2, uint8_t param3, uint16_t op);
+	uint32_t arcompact_handle_illegal(uint8_t param1, uint8_t param2, uint8_t param3, uint8_t param4, uint16_t op);
 
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_0d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_0e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_0f(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_10(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_11(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_12(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_13(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_14(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_15(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_16(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_17(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_18(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_19(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_1a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_1b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_1c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_1d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_1e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_1f(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_20(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_21(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_22(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_23(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_24(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_25(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_26(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_27(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_28(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_29(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_2a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_2b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_2c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_2d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_2e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_2f(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_30(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_31(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_32(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_33(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_34(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_35(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_36(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_37(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_38(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_39(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3e(OPS_32);
+	uint32_t arcompact_handle_illegal(uint8_t param1, uint8_t param2, uint32_t op);
+	uint32_t arcompact_handle_illegal(uint8_t param1, uint8_t param2, uint8_t param3, uint32_t op);
+	uint32_t arcompact_handle_illegal(uint8_t param1, uint8_t param2, uint8_t param3, uint8_t param4, uint32_t op);
 
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_00(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_06(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_07(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_08(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_09(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_0a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_0b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_0c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_0d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_0e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_0f(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_10(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_11(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_12(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_13(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_14(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_15(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_16(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_17(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_18(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_19(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_1a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_1b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_1c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_1d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_1e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_1f(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_20(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_21(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_22(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_23(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_24(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_25(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_26(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_27(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_28(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_29(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_2a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_2b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_2c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_2d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_2e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_2f(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_30(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_31(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_32(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_33(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_34(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_35(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_36(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_37(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_38(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_39(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_3a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_3b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_3c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_3d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_3e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_3f_3f(OPS_32);
+	uint32_t arcompact_handle_reserved(uint8_t param1, uint8_t param2, uint8_t param3, uint8_t param4, uint32_t op);
 
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_00(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_01(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_02(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_03(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_04(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_05(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_06(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_07(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_08(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_09(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_0a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_0b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_0c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_0d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_0e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_0f(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_10(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_11(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_12(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_13(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_14(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_15(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_16(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_17(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_18(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_19(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_1a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_1b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_1c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_1d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_1e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_1f(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_20(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_21(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_22(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_23(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_24(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_25(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_26(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_27(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_28(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_29(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_2a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_2b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_2c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_2d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_2e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_2f(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_30(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_31(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_32(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_33(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_34(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_35(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_36(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_37(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_38(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_39(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3e(OPS_32);
+	/************************************************************************************************************************************
+	*                                                                                                                                   *
+	* helpers                                                                                                                           *
+	*                                                                                                                                   *
+	************************************************************************************************************************************/
 
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_00(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_01(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_02(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_03(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_04(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_05(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_06(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_07(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_08(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_09(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_0a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_0b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_0c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_0d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_0e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_0f(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_10(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_11(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_12(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_13(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_14(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_15(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_16(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_17(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_18(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_19(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_1a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_1b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_1c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_1d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_1e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_1f(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_20(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_21(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_22(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_23(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_24(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_25(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_26(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_27(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_28(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_29(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_2a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_2b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_2c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_2d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_2e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_2f(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_30(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_31(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_32(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_33(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_34(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_35(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_36(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_37(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_38(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_39(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_3a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_3b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_3c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_3d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_3e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_3f_3f(OPS_32);
+	uint32_t handleop32_ADD_p11(uint32_t op);
+	uint32_t handleop32_ADD(uint32_t op);
+	uint32_t handleop32_ADD_p00(uint32_t op);
+	uint32_t handleop32_ADD_p01(uint32_t op);
+	uint32_t handleop32_ADD_p10(uint32_t op);
+	uint32_t handleop32_ADD_p11_m0(uint32_t op);
+	uint32_t handleop32_ADD_p11_m1(uint32_t op);
 
+	uint32_t handleop32_SUB_p11(uint32_t op);
+	uint32_t handleop32_SUB(uint32_t op);
+	uint32_t handleop32_SUB_p00(uint32_t op);
+	uint32_t handleop32_SUB_p01(uint32_t op);
+	uint32_t handleop32_SUB_p10(uint32_t op);
+	uint32_t handleop32_SUB_p11_m0(uint32_t op);
+	uint32_t handleop32_SUB_p11_m1(uint32_t op);
 
-	ARCOMPACT_RETTYPE arcompact_handle04_38(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_39(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_3a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_3b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_3c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_3d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_3e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle04_3f(OPS_32);
+	uint32_t handleop32_AND_p11(uint32_t op);
+	uint32_t handleop32_AND(uint32_t op);
+	uint32_t handleop32_AND_p00(uint32_t op);
+	uint32_t handleop32_AND_p01(uint32_t op);
+	uint32_t handleop32_AND_p10(uint32_t op);
+	uint32_t handleop32_AND_p11_m0(uint32_t op);
+	uint32_t handleop32_AND_p11_m1(uint32_t op);
 
-	ARCOMPACT_RETTYPE arcompact_handle05_09(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_0c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_0d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_0e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_0f(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_10(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_11(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_12(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_13(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_14(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_15(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_16(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_17(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_18(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_19(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_1a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_1b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_1c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_1d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_1e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_1f(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_20(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_21(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_22(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_23(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_24(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_25(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_26(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_27(OPS_32);
+	uint32_t handleop32_OR_p11(uint32_t op);
+	uint32_t handleop32_OR(uint32_t op);
+	uint32_t handleop32_OR_p00(uint32_t op);
+	uint32_t handleop32_OR_p01(uint32_t op);
+	uint32_t handleop32_OR_p10(uint32_t op);
+	uint32_t handleop32_OR_p11_m0(uint32_t op);
+	uint32_t handleop32_OR_p11_m1(uint32_t op);
 
-	ARCOMPACT_RETTYPE arcompact_handle05_2a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_2e(OPS_32);
+	uint32_t handleop32_BIC_p11(uint32_t op);
+	uint32_t handleop32_BIC(uint32_t op);
+	uint32_t handleop32_BIC_p00(uint32_t op);
+	uint32_t handleop32_BIC_p01(uint32_t op);
+	uint32_t handleop32_BIC_p10(uint32_t op);
+	uint32_t handleop32_BIC_p11_m0(uint32_t op);
+	uint32_t handleop32_BIC_p11_m1(uint32_t op);
 
-	ARCOMPACT_RETTYPE arcompact_handle05_30(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_31(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_32(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_33(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_34(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_35(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_36(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_37(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_38(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_39(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_3a(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_3b(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_3c(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_3d(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_3e(OPS_32);
-	ARCOMPACT_RETTYPE arcompact_handle05_3f(OPS_32);
+	uint32_t handleop32_XOR_p11(uint32_t op);
+	uint32_t handleop32_XOR(uint32_t op);
+	uint32_t handleop32_XOR_p00(uint32_t op);
+	uint32_t handleop32_XOR_p01(uint32_t op);
+	uint32_t handleop32_XOR_p10(uint32_t op);
+	uint32_t handleop32_XOR_p11_m0(uint32_t op);
+	uint32_t handleop32_XOR_p11_m1(uint32_t op);
 
-	ARCOMPACT_RETTYPE arcompact_handle0f_00_04(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_00_05(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_00_07_02(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_00_07_03(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_01(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_03(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_08(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_09(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_0a(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle0f_17(OPS_16);
+	uint32_t handleop32_MOV_p11(uint32_t op);
+	uint32_t handleop32_MOV(uint32_t op);
+	uint32_t handleop32_MOV_p00(uint32_t op);
+	uint32_t handleop32_MOV_p01(uint32_t op);
+	uint32_t handleop32_MOV_p10(uint32_t op);
+	uint32_t handleop32_MOV_p11_m0(uint32_t op);
+	uint32_t handleop32_MOV_p11_m1(uint32_t op);
 
-	ARCOMPACT_RETTYPE arcompact_handle18_05_02(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_05_03(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_05_04(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_05_05(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_05_06(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_05_07(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_00(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_02(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_03(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_04(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_05(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_06(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_07(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_08(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_09(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_0a(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_0b(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_0c(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_0d(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_0e(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_0f(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_10(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_12(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_13(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_14(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_15(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_16(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_17(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_18(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_19(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_1a(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_1b(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_1c(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_1d(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_1e(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_06_1f(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_00(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_02(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_03(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_04(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_05(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_06(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_07(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_08(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_09(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_0a(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_0b(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_0c(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_0d(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_0e(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_0f(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_10(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_12(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_13(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_14(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_15(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_16(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_17(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_18(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_19(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_1a(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_1b(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_1c(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_1d(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_1e(OPS_16);
-	ARCOMPACT_RETTYPE arcompact_handle18_07_1f(OPS_16);
+	uint32_t handleop32_RSUB_p11(uint32_t op);
+	uint32_t handleop32_RSUB(uint32_t op);
+	uint32_t handleop32_RSUB_p00(uint32_t op);
+	uint32_t handleop32_RSUB_p01(uint32_t op);
+	uint32_t handleop32_RSUB_p10(uint32_t op);
+	uint32_t handleop32_RSUB_p11_m0(uint32_t op);
+	uint32_t handleop32_RSUB_p11_m1(uint32_t op);
 
-	ARCOMPACT_RETTYPE arcompact_01_01_00_helper(OPS_32, const char* optext);
-	ARCOMPACT_RETTYPE arcompact_01_01_01_helper(OPS_32, const char* optext);
-	ARCOMPACT_RETTYPE arcompact_handle04_helper(OPS_32, const char* optext, int ignore_dst, int b_reserved);
-	ARCOMPACT_RETTYPE arcompact_handle04_2f_helper(OPS_32, const char* optext);
-	ARCOMPACT_RETTYPE arcompact_handle04_3x_helper(OPS_32, int dsize, int extend);
-	ARCOMPACT_RETTYPE arcompact_handle05_2f_0x_helper(OPS_32, const char* optext);
-	ARCOMPACT_RETTYPE arcompact_handle0c_helper(OPS_16, const char* optext);
-	ARCOMPACT_RETTYPE arcompact_handle0d_helper(OPS_16, const char* optext);
-	ARCOMPACT_RETTYPE arcompact_handle0e_0x_helper(OPS_16, const char* optext, int revop);
-	ARCOMPACT_RETTYPE arcompact_handle0f_00_0x_helper(OPS_16, const char* optext);
-	ARCOMPACT_RETTYPE arcompact_handle0f_0x_helper(OPS_16, const char* optext, int nodst);
-	ARCOMPACT_RETTYPE arcompact_handle_ld_helper(OPS_16, const char* optext, int shift, int swap);
-	ARCOMPACT_RETTYPE arcompact_handle_l7_0x_helper(OPS_16, const char* optext);
-	ARCOMPACT_RETTYPE arcompact_handle18_0x_helper(OPS_16, const char* optext, int st);
-	ARCOMPACT_RETTYPE arcompact_handle19_0x_helper(OPS_16, const char* optext, int shift, int format);
-	ARCOMPACT_RETTYPE arcompact_handle1e_0x_helper(OPS_16, const char* optext);
-	ARCOMPACT_RETTYPE arcompact_handle1e_03_0x_helper(OPS_16, const char* optext);
+	uint32_t handleop32_BSET_p11(uint32_t op);
+	uint32_t handleop32_BSET(uint32_t op);
+	uint32_t handleop32_BSET_p00(uint32_t op);
+	uint32_t handleop32_BSET_p01(uint32_t op);
+	uint32_t handleop32_BSET_p10(uint32_t op);
+	uint32_t handleop32_BSET_p11_m0(uint32_t op);
+	uint32_t handleop32_BSET_p11_m1(uint32_t op);
+
+	uint32_t handleop32_BMSK_p11(uint32_t op);
+	uint32_t handleop32_BMSK(uint32_t op);
+	uint32_t handleop32_BMSK_p00(uint32_t op);
+	uint32_t handleop32_BMSK_p01(uint32_t op);
+	uint32_t handleop32_BMSK_p10(uint32_t op);
+	uint32_t handleop32_BMSK_p11_m0(uint32_t op);
+	uint32_t handleop32_BMSK_p11_m1(uint32_t op);
+
+	uint32_t handleop32_ADD1_p11(uint32_t op);
+	uint32_t handleop32_ADD1(uint32_t op);
+	uint32_t handleop32_ADD1_p00(uint32_t op);
+	uint32_t handleop32_ADD1_p01(uint32_t op);
+	uint32_t handleop32_ADD1_p10(uint32_t op);
+	uint32_t handleop32_ADD1_p11_m0(uint32_t op);
+	uint32_t handleop32_ADD1_p11_m1(uint32_t op);
+
+	uint32_t handleop32_ADD2_p11(uint32_t op);
+	uint32_t handleop32_ADD2(uint32_t op);
+	uint32_t handleop32_ADD2_p00(uint32_t op);
+	uint32_t handleop32_ADD2_p01(uint32_t op);
+	uint32_t handleop32_ADD2_p10(uint32_t op);
+	uint32_t handleop32_ADD2_p11_m0(uint32_t op);
+	uint32_t handleop32_ADD2_p11_m1(uint32_t op);
+
+	uint32_t handleop32_ADD3_p11(uint32_t op);
+	uint32_t handleop32_ADD3(uint32_t op);
+	uint32_t handleop32_ADD3_p00(uint32_t op);
+	uint32_t handleop32_ADD3_p01(uint32_t op);
+	uint32_t handleop32_ADD3_p10(uint32_t op);
+	uint32_t handleop32_ADD3_p11_m0(uint32_t op);
+	uint32_t handleop32_ADD3_p11_m1(uint32_t op);
+
+	uint32_t handleop32_SUB1_p11(uint32_t op);
+	uint32_t handleop32_SUB1(uint32_t op);
+	uint32_t handleop32_SUB1_p00(uint32_t op);
+	uint32_t handleop32_SUB1_p01(uint32_t op);
+	uint32_t handleop32_SUB1_p10(uint32_t op);
+	uint32_t handleop32_SUB1_p11_m0(uint32_t op);
+	uint32_t handleop32_SUB1_p11_m1(uint32_t op);
+
+	uint32_t handleop32_SUB2_p11(uint32_t op);
+	uint32_t handleop32_SUB2(uint32_t op);
+	uint32_t handleop32_SUB2_p00(uint32_t op);
+	uint32_t handleop32_SUB2_p01(uint32_t op);
+	uint32_t handleop32_SUB2_p10(uint32_t op);
+	uint32_t handleop32_SUB2_p11_m0(uint32_t op);
+	uint32_t handleop32_SUB2_p11_m1(uint32_t op);
+
+	uint32_t handleop32_SUB3_p11(uint32_t op);
+	uint32_t handleop32_SUB3(uint32_t op);
+	uint32_t handleop32_SUB3_p00(uint32_t op);
+	uint32_t handleop32_SUB3_p01(uint32_t op);
+	uint32_t handleop32_SUB3_p10(uint32_t op);
+	uint32_t handleop32_SUB3_p11_m0(uint32_t op);
+	uint32_t handleop32_SUB3_p11_m1(uint32_t op);
+
+	uint32_t handleop32_Jcc_p11(uint32_t op);
+	uint32_t handleop32_Jcc(uint32_t op);
+	uint32_t handleop32_Jcc_p00(uint32_t op);
+	uint32_t handleop32_Jcc_p01(uint32_t op);
+	uint32_t handleop32_Jcc_p10(uint32_t op);
+	uint32_t handleop32_Jcc_p11_m0(uint32_t op);
+	uint32_t handleop32_Jcc_p11_m1(uint32_t op);
+
+	uint32_t handleop32_Jcc_D_p11(uint32_t op);
+	uint32_t handleop32_Jcc_D(uint32_t op);
+	uint32_t handleop32_Jcc_D_p00(uint32_t op);
+	uint32_t handleop32_Jcc_D_p01(uint32_t op);
+	uint32_t handleop32_Jcc_D_p10(uint32_t op);
+	uint32_t handleop32_Jcc_D_p11_m0(uint32_t op);
+	uint32_t handleop32_Jcc_D_p11_m1(uint32_t op);
+
+	uint32_t handleop32_LR_p11(uint32_t op);
+	uint32_t handleop32_LR(uint32_t op);
+	uint32_t handleop32_LR_p00(uint32_t op);
+	uint32_t handleop32_LR_p01(uint32_t op);
+	uint32_t handleop32_LR_p10(uint32_t op);
+	uint32_t handleop32_LR_p11_m0(uint32_t op);
+	uint32_t handleop32_LR_p11_m1(uint32_t op);
+
+	uint32_t handleop32_SR_p11(uint32_t op);
+	uint32_t handleop32_SR(uint32_t op);
+	uint32_t handleop32_SR_p00(uint32_t op);
+	uint32_t handleop32_SR_p01(uint32_t op);
+	uint32_t handleop32_SR_p10(uint32_t op);
+	uint32_t handleop32_SR_p11_m0(uint32_t op);
+	uint32_t handleop32_SR_p11_m1(uint32_t op);
+
+	uint32_t handleop32_LSR_single_p11(uint32_t op);
+	uint32_t handleop32_LSR_single(uint32_t op);
+	uint32_t handleop32_LSR_single_p00(uint32_t op);
+	uint32_t handleop32_LSR_single_p01(uint32_t op);
+	uint32_t handleop32_LSR_single_p10(uint32_t op);
+	uint32_t handleop32_LSR_single_p11_m0(uint32_t op);
+	uint32_t handleop32_LSR_single_p11_m1(uint32_t op);
+
+	uint32_t handleop32_ROR_single_p11(uint32_t op);
+	uint32_t handleop32_ROR_single(uint32_t op);
+	uint32_t handleop32_ROR_single_p00(uint32_t op);
+	uint32_t handleop32_ROR_single_p01(uint32_t op);
+	uint32_t handleop32_ROR_single_p10(uint32_t op);
+	uint32_t handleop32_ROR_single_p11_m0(uint32_t op);
+	uint32_t handleop32_ROR_single_p11_m1(uint32_t op);
+
+	uint32_t handleop32_EXTB_p11(uint32_t op);
+	uint32_t handleop32_EXTB(uint32_t op);
+	uint32_t handleop32_EXTB_p00(uint32_t op);
+	uint32_t handleop32_EXTB_p01(uint32_t op);
+	uint32_t handleop32_EXTB_p10(uint32_t op);
+	uint32_t handleop32_EXTB_p11_m0(uint32_t op);
+	uint32_t handleop32_EXTB_p11_m1(uint32_t op);
+
+	uint32_t handleop32_EXTW_p11(uint32_t op);
+	uint32_t handleop32_EXTW(uint32_t op);
+	uint32_t handleop32_EXTW_p00(uint32_t op);
+	uint32_t handleop32_EXTW_p01(uint32_t op);
+	uint32_t handleop32_EXTW_p10(uint32_t op);
+	uint32_t handleop32_EXTW_p11_m0(uint32_t op);
+	uint32_t handleop32_EXTW_p11_m1(uint32_t op);
+
+	uint32_t handleop32_ASL_multiple_p11(uint32_t op);
+	uint32_t handleop32_ASL_multiple(uint32_t op);
+	uint32_t handleop32_ASL_multiple_p00(uint32_t op);
+	uint32_t handleop32_ASL_multiple_p01(uint32_t op);
+	uint32_t handleop32_ASL_multiple_p10(uint32_t op);
+	uint32_t handleop32_ASL_multiple_p11_m0(uint32_t op);
+	uint32_t handleop32_ASL_multiple_p11_m1(uint32_t op);
+
+	uint32_t handleop32_LSR_multiple_p11(uint32_t op);
+	uint32_t handleop32_LSR_multiple(uint32_t op);
+	uint32_t handleop32_LSR_multiple_p00(uint32_t op);
+	uint32_t handleop32_LSR_multiple_p01(uint32_t op);
+	uint32_t handleop32_LSR_multiple_p10(uint32_t op);
+	uint32_t handleop32_LSR_multiple_p11_m0(uint32_t op);
+	uint32_t handleop32_LSR_multiple_p11_m1(uint32_t op);
+
+	uint32_t arcompact_01_01_00_helper(uint32_t op, const char* optext);
+	uint32_t arcompact_01_01_01_helper(uint32_t op, const char* optext);
+	uint32_t arcompact_handle04_helper(uint32_t op, const char* optext, int ignore_dst, int b_reserved);
+	uint32_t arcompact_handle04_2f_helper(uint32_t op, const char* optext);
+	uint32_t arcompact_handle04_3x_helper(uint32_t op, int dsize, int extend);
+	uint32_t arcompact_handle05_2f_0x_helper(uint32_t op, const char* optext);
+	uint32_t arcompact_handle0c_helper(uint16_t op, const char* optext);
+	uint32_t arcompact_handle0d_helper(uint16_t op, const char* optext);
+	uint32_t arcompact_handle0e_0x_helper(uint16_t op, const char* optext, int revop);
+	uint32_t arcompact_handle0f_00_0x_helper(uint16_t op, const char* optext);
+	uint32_t arcompact_handle0f_0x_helper(uint16_t op, const char* optext, int nodst);
+	uint32_t arcompact_handle_ld_helper(uint16_t op, const char* optext, int shift, int swap);
+	uint32_t arcompact_handle_l7_0x_helper(uint16_t op, const char* optext);
+	uint32_t arcompact_handle18_0x_helper(uint16_t op, const char* optext, int st);
+	uint32_t arcompact_handle19_0x_helper(uint16_t op, const char* optext, int shift, int format);
+	uint32_t arcompact_handle1e_0x_helper(uint16_t op, const char* optext);
+	uint32_t arcompact_handle1e_03_0x_helper(uint16_t op, const char* optext);
 
 
 	uint32_t handle_jump_to_addr(int delay, int link, uint32_t address, uint32_t next_addr);
 	uint32_t handle_jump_to_register(int delay, int link, uint32_t reg, uint32_t next_addr, int flag);
 
-	ARCOMPACT_RETTYPE get_insruction(OPS_32);
+	uint32_t get_instruction(uint32_t op);
 
-	ARCOMPACT_HANDLER04_TYPE_PM(04_00)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_02)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_04)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_05)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_06)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_07)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_0a)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_0e)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_0f)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_13)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_14)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_15)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_16)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_17)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_18)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_19)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_20)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_21)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_2a)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_2b)
-
-	ARCOMPACT_HANDLER04_TYPE_PM(04_2f_02)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_2f_03)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_2f_07)
-	ARCOMPACT_HANDLER04_TYPE_PM(04_2f_08)
-
-	ARCOMPACT_HANDLER04_TYPE_PM(05_00)
-	ARCOMPACT_HANDLER04_TYPE_PM(05_01)
-
-
-private:
 	const address_space_config m_program_config;
 	const address_space_config m_io_config;
 

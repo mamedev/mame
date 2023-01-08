@@ -286,7 +286,7 @@ void leapster_state::leapster(machine_config &config)
 {
 	// Basic machine hardware
 	// CPU is ArcTangent-A5 '5.1' (ARCompact core)
-	ARCA5(config, m_maincpu, 96000000/10);
+	ARCA5(config, m_maincpu, 96000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &leapster_state::leapster_map);
 	m_maincpu->set_addrmap(AS_IO, &leapster_state::leapster_aux);
 
@@ -322,12 +322,12 @@ ROM_START(leapster)
 	ROM_SYSTEM_BIOS( 2, "uk21",  "UK v2.1" )        // 152-11452 Leapster BaseROM UK v2.1        - Aug 30 2005 16:01:46
 	ROM_LOAD_BIOS( 2, "leapster2_1004.bin", 0x00000, 0x800000, CRC(b466e14d) SHA1(910c234f03e76b7de55b8aa0a0c62fd1daae4910) )
 	ROM_SYSTEM_BIOS( 3, "ger21", "German v2.1" )    // 152-11435 Leapster BaseROM German v2.1    - Oct 21 2005 18:53:59
-	ROM_LOAD_BIOS( 3, "leapster2_1006.bin", 0x00000, 0x800000, CRC(a69ed8ca) SHA1(e6aacba0c39b1465f344c2b07ff1cbd8a395adac) )
+	ROM_LOAD_BIOS( 3, "leapster2_1006.bin", 0x00000, 0x800000, BAD_DUMP CRC(a69ed8ca) SHA1(e6aacba0c39b1465f344c2b07ff1cbd8a395adac) ) // BADADDR xxx-xxxxxxxxxxxxxxxxxxx
 	ROM_SYSTEM_BIOS( 4, "sp10",  "Spanish v1.0" )   // 152-11546 Leapster Baserom SP v1.0        - Apr 03 2006 06:26:00
 	ROM_LOAD_BIOS( 4, "leapster2_1008.bin", 0x00000, 0x800000, CRC(b43345e7) SHA1(31c27e79568115bf36e5ef668f528e3005054152) )
 	ROM_SYSTEM_BIOS( 5, "connb5",  "Connected B5" )  // 152-12076 Leapster Connected Baserom B5   - Feb 29 2008 18:11:21
-	ROM_LOAD_BIOS( 5, "152-12076_b5.bin",   0x00000, 0x800000, CRC(4d223022) SHA1(bdc10ad70aa7641716e16fbea16bd0ef35f6e85e) )
-	ROM_DEFAULT_BIOS( "connb5" )
+	ROM_LOAD_BIOS( 5, "152-12076_b5.bin",   0x00000, 0x800000, CRC(4d223022) SHA1(bdc10ad70aa7641716e16fbea16bd0ef35f6e85e) ) // is this a Leapster 2 BIOS or another device called "Leapster Connected"?
+	ROM_DEFAULT_BIOS( "us21" )
 ROM_END
 
 ROM_START(leapstertv)
