@@ -214,6 +214,7 @@ public:
 		m_kbdrom(*this, "keyboard"),
 		m_kbspecial(*this, "keyb_special"),
 		m_sysconfig(*this, "a2_config"),
+		m_vidconfig(*this, "a2_video_config"),
 		m_franklin_fkeys(*this, "franklin_fkeys"),
 		m_speaker(*this, A2_SPEAKER_TAG),
 		m_cassette(*this, A2_CASSETTE_TAG),
@@ -269,7 +270,8 @@ public:
 	optional_ioport m_mouseb, m_mousex, m_mousey;
 	optional_memory_region m_kbdrom;
 	required_ioport m_kbspecial;
-	required_ioport m_sysconfig;
+	optional_ioport m_sysconfig;
+	required_ioport m_vidconfig;
 	optional_ioport m_franklin_fkeys;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<cassette_image_device> m_cassette;
@@ -1294,8 +1296,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 	{
 		m_vbl = true;
 
-		// update the video system's shadow copy of the system config
-		m_video->set_sysconfig(m_sysconfig->read());
+		// update the video system's shadow copy of the video config
+		m_video->set_vidconfig(m_vidconfig->read());
 
 		if (m_vblmask)
 		{
@@ -3748,15 +3750,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::ay3600_repeat)
     INPUT PORTS
 ***************************************************************************/
 
-static INPUT_PORTS_START( apple2_sysconfig )
+static INPUT_PORTS_START( apple2_sysconfig_accel )
 	PORT_START("a2_config")
-	PORT_CONFNAME(0x07, 0x00, "Monitor type")
-	PORT_CONFSETTING(0x00, "Color")
-	PORT_CONFSETTING(0x01, "B&W")
-	PORT_CONFSETTING(0x02, "Green")
-	PORT_CONFSETTING(0x03, "Amber")
-	PORT_CONFSETTING(0x04, "Video-7 RGB")
-
 	PORT_CONFNAME(0x10, 0x00, "CPU type")
 	PORT_CONFSETTING(0x00, "Standard")
 	PORT_CONFSETTING(0x10, "4 MHz Zip Chip")
@@ -3766,23 +3761,8 @@ static INPUT_PORTS_START( apple2_sysconfig )
 	PORT_CONFSETTING(0x20, "4 MHz")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( apple2_sysconfig_no_accel )
-	PORT_START("a2_config")
-	PORT_CONFNAME(0x03, 0x00, "Composite monitor type")
-	PORT_CONFSETTING(0x00, "Color")
-	PORT_CONFSETTING(0x01, "B&W")
-	PORT_CONFSETTING(0x02, "Green")
-	PORT_CONFSETTING(0x03, "Amber")
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( laser128_sysconfig )
 	PORT_START("a2_config")
-	PORT_CONFNAME(0x03, 0x00, "Composite monitor type")
-	PORT_CONFSETTING(0x00, "Color")
-	PORT_CONFSETTING(0x01, "B&W")
-	PORT_CONFSETTING(0x02, "Green")
-	PORT_CONFSETTING(0x03, "Amber")
-
 	PORT_CONFNAME(0x08, 0x00, "Printer type")
 	PORT_CONFSETTING(0x00, "Serial")
 	PORT_CONFSETTING(0x08, "Parallel")
@@ -3790,12 +3770,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2c_sysconfig )
 	PORT_START("a2_config")
-	PORT_CONFNAME(0x07, 0x00, "Composite monitor type")
-	PORT_CONFSETTING(0x00, "Color")
-	PORT_CONFSETTING(0x01, "B&W")
-	PORT_CONFSETTING(0x02, "Green")
-	PORT_CONFSETTING(0x03, "Amber")
-
 	PORT_CONFNAME(0x40, 0x40, "40/80 Columns")
 	PORT_CONFSETTING(0x00, "80 columns")
 	PORT_CONFSETTING(0x40, "40 columns")
@@ -3813,11 +3787,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2cp_sysconfig )
 	PORT_START("a2_config")
-	PORT_CONFNAME(0x03, 0x00, "Composite monitor type")
-	PORT_CONFSETTING(0x00, "Color")
-	PORT_CONFSETTING(0x01, "B&W")
-	PORT_CONFSETTING(0x02, "Green")
-	PORT_CONFSETTING(0x03, "Amber")
 	PORT_CONFNAME(0x04, 0x04, "40/80 Columns")
 	PORT_CONFSETTING(0x00, "80 columns")
 	PORT_CONFSETTING(0x04, "40 columns")
@@ -4105,7 +4074,7 @@ static INPUT_PORTS_START( ceci )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 
-	PORT_INCLUDE( apple2_sysconfig_no_accel )
+	PORT_INCLUDE( apple2_vidconfig )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cecm )
@@ -4218,7 +4187,7 @@ static INPUT_PORTS_START( cecm )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 
-	PORT_INCLUDE( apple2_sysconfig_no_accel )
+	PORT_INCLUDE( apple2_vidconfig )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( zijini )
@@ -4331,18 +4300,20 @@ static INPUT_PORTS_START( zijini )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 
-	PORT_INCLUDE( apple2_sysconfig_no_accel )
+	PORT_INCLUDE( apple2_vidconfig )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2e )
 	PORT_INCLUDE( apple2e_common )
 	PORT_INCLUDE( apple2e_special )
-	PORT_INCLUDE( apple2_sysconfig )
+	PORT_INCLUDE( apple2_vidconfig_rgb )
+	PORT_INCLUDE( apple2_sysconfig_accel )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2c )
 	PORT_INCLUDE( apple2e_common )
 	PORT_INCLUDE( apple2e_special )
+	PORT_INCLUDE( apple2_vidconfig )
 	PORT_INCLUDE( apple2c_sysconfig )
 
 	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
@@ -4357,6 +4328,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( laser128 )
 	PORT_INCLUDE( apple2e_common )
+	PORT_INCLUDE( apple2_vidconfig )
 	PORT_INCLUDE( laser128_sysconfig )
 
 	PORT_START("keyb_special")
@@ -4380,14 +4352,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ace500 )
 	PORT_INCLUDE( apple2e_common )
+	PORT_INCLUDE( apple2_vidconfig )
 
 	PORT_START("a2_config")
-	PORT_CONFNAME(0x03, 0x00, "Composite monitor type")
-	PORT_CONFSETTING(0x00, "Color")
-	PORT_CONFSETTING(0x01, "B&W")
-	PORT_CONFSETTING(0x02, "Green")
-	PORT_CONFSETTING(0x03, "Amber")
-
 	PORT_CONFNAME(0x80, 0x00, "Auto Line Feed for printer")
 	PORT_CONFSETTING(0x80, DEF_STR(On))
 	PORT_CONFSETTING(0x00, DEF_STR(Off))
@@ -4428,6 +4395,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( apple2cp )
 	PORT_INCLUDE( apple2e_common )
 	PORT_INCLUDE( apple2e_special )
+	PORT_INCLUDE( apple2_vidconfig )
 	PORT_INCLUDE( apple2cp_sysconfig )
 
 	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
@@ -4558,7 +4526,8 @@ static INPUT_PORTS_START( apple2euk )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 
-	PORT_INCLUDE(apple2_sysconfig)
+	PORT_INCLUDE(apple2_vidconfig_rgb)
+	PORT_INCLUDE(apple2_sysconfig_accel)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2ees )
@@ -4679,7 +4648,8 @@ static INPUT_PORTS_START( apple2ees )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 
-	PORT_INCLUDE(apple2_sysconfig)
+	PORT_INCLUDE(apple2_vidconfig_rgb)
+	PORT_INCLUDE(apple2_sysconfig_accel)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2efr )   // French AZERTY keyboard (Apple uses the Belgian AZERTY layout in France also)
@@ -4800,7 +4770,8 @@ static INPUT_PORTS_START( apple2efr )   // French AZERTY keyboard (Apple uses th
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 
-	PORT_INCLUDE(apple2_sysconfig)
+	PORT_INCLUDE(apple2_vidconfig_rgb)
+	PORT_INCLUDE(apple2_sysconfig_accel)
 INPUT_PORTS_END
 
 INPUT_PORTS_START( apple2ep )
@@ -4921,7 +4892,8 @@ INPUT_PORTS_START( apple2ep )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 
-	PORT_INCLUDE(apple2_sysconfig)
+	PORT_INCLUDE(apple2_vidconfig_rgb)
+	PORT_INCLUDE(apple2_sysconfig_accel)
 INPUT_PORTS_END
 
 static void apple2eaux_cards(device_slot_interface &device)

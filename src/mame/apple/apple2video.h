@@ -64,7 +64,7 @@ public:
 	void set_ram_pointers(u8 *main, u8 *aux)    { m_ram_ptr = main; m_aux_ptr = aux; }
 	void set_aux_mask(u16 aux_mask)             { m_aux_mask = aux_mask; }
 	void set_char_pointer(u8 *charptr, int size) { m_char_ptr = charptr; m_char_size = size; }
-	void set_sysconfig(int sysconfig)           { m_sysconfig = sysconfig; }
+	void set_vidconfig(int vidconfig)           { m_vidconfig = vidconfig; }
 	void setup_GS_graphics() { m_8bit_graphics = std::make_unique<bitmap_ind16>(560, 192); }
 
 	template <model Model, bool Invert, bool Flip>
@@ -95,10 +95,14 @@ private:
 
 	bool use_page_2() const;
 
+	bool monochrome_monitor() const;
+	bool rgb_monitor() const;
+	int monochrome_hue() const;
+
 	u8 *m_ram_ptr = nullptr, *m_aux_ptr = nullptr, *m_char_ptr = nullptr;
 	u16 m_aux_mask = 0xffff;
 	int m_char_size = 0;
-	int m_sysconfig = 0;
+	int m_vidconfig = 0;
 	bool m_page2 = false;
 	bool m_flash = false;
 	bool m_mix = false;
@@ -115,5 +119,8 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(APPLE2_VIDEO, a2_video_device)
+
+INPUT_PORTS_EXTERN( apple2_vidconfig );
+INPUT_PORTS_EXTERN( apple2_vidconfig_rgb );
 
 #endif // MAME_SHARED_APPLE2VIDEO_H

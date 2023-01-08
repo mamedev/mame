@@ -59,6 +59,7 @@ public:
 		m_row(*this, "ROW%u", 0U),
 		m_kbspecial(*this, "keyb_special"),
 		m_sysconfig(*this, "a2_config"),
+		m_vidconfig(*this, "a2_video_config"),
 		m_speaker(*this, A2_SPEAKER_TAG),
 		m_cassette(*this, A2_CASSETTE_TAG),
 		m_upperbank(*this, A2_UPPERBANK_TAG),
@@ -80,6 +81,7 @@ private:
 	required_ioport_array<8> m_row;
 	required_ioport m_kbspecial;
 	required_ioport m_sysconfig;
+	required_ioport m_vidconfig;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<address_map_bank_device> m_upperbank;
@@ -171,10 +173,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(tk2000_state::apple2_interrupt)
 	if((scanline % 8) == 0)
 		m_screen->update_partial(m_screen->vpos());
 
-	// update the video system's shadow copy of the system config at the end of the frame
+	// update the video system's shadow copy of the video config at the end of the frame
 	if (scanline == 192)
 	{
-		m_video->set_sysconfig(m_sysconfig->read());
+		m_video->set_vidconfig(m_vidconfig->read());
 	}
 }
 
@@ -570,12 +572,7 @@ static INPUT_PORTS_START( tk2000 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("a2_config")
-	PORT_CONFNAME(0x03, 0x00, "Composite monitor type")
-	PORT_CONFSETTING(0x00, "Color")
-	PORT_CONFSETTING(0x01, "B&W")
-	PORT_CONFSETTING(0x02, "Green")
-	PORT_CONFSETTING(0x03, "Amber")
+	PORT_INCLUDE(apple2_vidconfig);
 INPUT_PORTS_END
 
 void tk2000_state::tk2000(machine_config &config)

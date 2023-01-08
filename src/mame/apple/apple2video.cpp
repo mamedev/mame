@@ -81,7 +81,7 @@ void a2_video_device::device_reset()
 	m_dhires = false;
 	m_flash = false;
 	m_mix = false;
-	m_sysconfig = 0;
+	m_vidconfig = 0;
 	m_an2 = false;
 	m_80store = false;
 	m_monohgr = false;
@@ -146,6 +146,22 @@ WRITE_LINE_MEMBER(a2_video_device::an2_w)
 static inline unsigned rotl4b(unsigned n, unsigned count) { return (n >> (-count & 3)) & 0x0F; }
 // 4-bit left rotate. Bits 4-6 of n must be zero.
 static inline unsigned rotl4(unsigned n, unsigned count) { return rotl4b(n * 0x11, count); }
+
+inline bool a2_video_device::use_page_2() const { return m_page2 && !m_80store; }
+
+inline bool a2_video_device::monochrome_monitor() const { return (m_vidconfig & 4) != 0; }
+
+inline bool a2_video_device::rgb_monitor() const { return (m_vidconfig & 7) == 3; }
+
+int a2_video_device::monochrome_hue() const
+{
+	switch (m_vidconfig & 7)
+	{
+		case 5: return GREEN;
+		case 6: return ORANGE;
+		default: return WHITE;
+	}
+}
 
 // This table implements a colorization scheme defined by one's complement and mirror symmetries
 // and the following rules:
@@ -271,20 +287,12 @@ void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int yp
 	}
 }
 
-inline bool a2_video_device::use_page_2() const { return m_page2 && !m_80store; }
-
 void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
 	uint32_t const start_address = use_page_2() ? 0x0800 : 0x0400;
-	int fg = 0;
 
-	switch (m_sysconfig & 0x03)
-	{
-		case 0: case 4: fg = WHITE; break;
-		case 1: fg = WHITE; break;
-		case 2: fg = GREEN; break;
-		case 3: fg = ORANGE; break;
-	}
+	bool const monochrome = monochrome_monitor();
+	int const fg = monochrome_hue();
 
 	/* perform adjustments */
 	beginrow = (std::max)(beginrow, cliprect.top());
@@ -296,7 +304,7 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 	//printf("GR: row %d startcol %d stopcol %d left %d right %d\n", beginrow, startcol, stopcol, cliprect.left(), cliprect.right());
 
-	if (!(m_sysconfig & 0x03))  // color
+	if (!monochrome)
 	{
 		for (int row = startrow; row <= stoprow; row += 8)
 		{
@@ -393,15 +401,9 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 {
 	uint32_t const start_address = use_page_2() ? 0x0800 : 0x0400;
 	static const int aux_colors[16] = { 0, 2, 4, 6, 8, 0xa, 0xc, 0xe, 1, 3, 5, 7, 9, 0xb, 0xd, 0xf };
-	int fg = 0;
 
-	switch (m_sysconfig & 0x03)
-	{
-		case 0: case 4: fg = WHITE; break;
-		case 1: fg = WHITE; break;
-		case 2: fg = GREEN; break;
-		case 3: fg = ORANGE; break;
-	}
+	bool const monochrome = monochrome_monitor();
+	int const fg = monochrome_hue();
 
 	/* perform adjustments */
 	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
@@ -412,7 +414,7 @@ void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap,
 	const int startcol = (cliprect.left() / 14);
 	const int stopcol = ((cliprect.right() / 14) + 1);
 
-	if (!(m_sysconfig & 0x03))
+	if (!monochrome)
 	{
 		for (int row = startrow; row <= stoprow; row += 8)
 		{
@@ -536,22 +538,8 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	// printf("TXT: row %d startcol %d stopcol %d left %d right %d\n", beginrow, startcol, stopcol, cliprect.left(), cliprect.right());
 
-	int fg, bg;
-	if (Model == model::IIGS)
-	{
-		fg = m_GSfg;
-		bg = m_GSbg;
-	}
-	else
-	{
-		switch (m_sysconfig & 0x03)
-		{
-			case 2: fg = GREEN; break;
-			case 3: fg = ORANGE; break;
-			default: fg = WHITE; break;
-		}
-		bg = 0;
-	}
+	int fg = (Model == model::IIGS) ? m_GSfg : monochrome_hue();
+	int bg = (Model == model::IIGS) ? m_GSbg : BLACK;
 
 	for (int row = startrow; row < stoprow; row += 8)
 	{
@@ -572,7 +560,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 			{
 				/* calculate address */
 				uint32_t const address = start_address + ((((row / 8) & 0x07) << 7) | (((row / 8) & 0x18) * 5 + col));
-				if ((Model == model::II || Model == model::IIE) && (m_sysconfig & 7) == 4 && m_dhires)
+				if (Model == model::IIE && rgb_monitor() && m_dhires)
 				{
 					u8 tmp = aux_page[address];
 					fg = tmp >> 4;
@@ -622,29 +610,11 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	if (endrow < beginrow)
 		return;
 
-	int mon_type = m_sysconfig & 0x03;
+	// B&W/Green/Amber monitor, CEC mono HGR mode, or IIgs $C021 monochrome HGR
+	bool const monochrome = monochrome_monitor() || m_monohgr || (m_monochrome & 0x80);
 
-	// CEC mono HGR mode
-	if ((m_monohgr) && (mon_type == 0))
-	{
-		mon_type = 1;
-	}
-
-	// IIgs $C021 monochrome HGR
-	if (m_monochrome & 0x80)
-	{
-		mon_type = 1;
-	}
-
-	int fg;
+	int const fg = monochrome_hue();
 	int const bg = BLACK;
-
-	switch (mon_type)
-	{
-		default: fg = WHITE; break;
-		case 2: fg = GREEN; break;
-		case 3: fg = ORANGE; break;
-	}
 
 	uint8_t const *const vram = &m_ram_ptr[use_page_2() ? 0x4000 : 0x2000];
 
@@ -668,9 +638,8 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 				w |= decode_hires_byte(vram_row[col + 1] & bit7_mask, w >> (3 + 13)) << (3 + 14);
 			}
 
-			switch (mon_type)
+			if (!monochrome)
 			{
-			case 0:
 				for (int b = 0; b < 14; b++)
 				{
 					if (((col * 14 + b) >= cliprect.left()) && ((col * 14 + b) <= cliprect.right()))
@@ -679,9 +648,9 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 					}
 					p++;
 				}
-				break;
-
-			default:  // 1, 2, 3
+			}
+			else
+			{
 				for (int b = 0; b < 14; b++)
 				{
 					if (((col * 14 + b) >= cliprect.left()) && ((col * 14 + b) <= cliprect.right()))
@@ -690,7 +659,6 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 					}
 					p++;
 				}
-				break;
 			}
 		}
 	}
@@ -700,20 +668,11 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 {
 	uint16_t v;
 	int const page = use_page_2() ? 0x4000 : 0x2000;
-	int mon_type = m_sysconfig & 7;
-	bool const bIsRGB160 = (mon_type == 4 && m_rgbmode == 2);
+	int const rgbmode = rgb_monitor() ? m_rgbmode : -1;
 
-	// IIgs force-monochrome-DHR setting
-	if (m_newvideo & 0x20)
-	{
-		mon_type = 1;
-	}
-
-	// IIe RGB card monochrome DHR
-	if (mon_type == 4 && m_rgbmode == 0)
-	{
-		mon_type = 1;
-	}
+	// B&W/Green/Amber monitor, IIgs force-monochrome-DHR setting, or IIe RGB card monochrome DHR
+	bool const monochrome = monochrome_monitor() || (m_newvideo & 0x20) || rgbmode == 0;
+	int const fg = monochrome_hue();
 
 	/* sanity checks */
 	if (beginrow < cliprect.top())
@@ -741,11 +700,12 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 		uint16_t *p = &bitmap.pix(row);
 
-		if (bIsRGB160)
+		if (rgbmode == 2)
 		{
-			// RGB 160-wide mode (which has a much simpler VRAM layout).
+			// Video-7 RGB 160-wide mode (which has a much simpler VRAM layout).
 			// Center a 480-wide image in the 560-wide display.
 			// Aspect ratio won't be perfect, but it's in range.
+
 			for (int b = 0; b < 40; b++)
 			{
 				*p++ = BLACK;
@@ -775,16 +735,8 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 						|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
 						|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
 
-			switch (mon_type)
+			if (monochrome)
 			{
-			case 0:
-				for (int b = 0; b < 7; b++)
-				{
-					*p++ = rotl4((w >> (b + 7-1)) & 0x0F, col * 7 + b);
-				}
-				break;
-
-			case 1:
 				// Shifting by 6 instead of 7 here shifts the entire DHGR screen right one pixel, so the leftmost pixel is
 				// always black and the rightmost pixel is not shown. This is to work around a problem with the HLSL NTSC
 				// shader. See Github issues #6308 and #10759. This should be changed when there is a better solution.
@@ -793,34 +745,19 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				{
 					v = (w & 1);
 					w >>= 1;
-					*(p++) = v ? WHITE : BLACK;
+					*(p++) = v ? fg : BLACK;
 				}
-				break;
-
-			case 2:
-				// See case 1
-				w >>= 6;
+			}
+			else if (rgbmode < 0)
+			{
 				for (int b = 0; b < 7; b++)
 				{
-					v = (w & 1);
-					w >>= 1;
-					*(p++) = v ? GREEN : BLACK;
+					*p++ = rotl4((w >> (b + 7-1)) & 0x0F, col * 7 + b);
 				}
-				break;
-
-			case 3:
-				// See case 1
-				w >>= 6;
-				for (int b = 0; b < 7; b++)
-				{
-					v = (w & 1);
-					w >>= 1;
-					*(p++) = v ? ORANGE : BLACK;
-				}
-				break;
-
-			case 4:
-				// Video-7 RGB with m_rgbmode == 1 (mixed) or 3 (color). In color mode, the card
+			}
+			else
+			{
+				// Video-7 RGB with rgbmode == 1 (mixed) or 3 (color). In color mode, the card
 				// seems to produce just 7 wide pixels per 4 bytes:
 				//   column & 3 =  0        1        2        3
 				//              nBBBAAAA nDDCCCCB nFEEEEDD nGGGGFFF
@@ -837,7 +774,7 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				// It's impossible to know the nature of the aberrations without hardware to test,
 				// but hopefully this warning means software was designed so that it doesn't matter.
 
-				if (m_rgbmode == 1 && !(vram_row[col+1] & 0x80))  // monochrome
+				if (rgbmode == 1 && !(vram_row[col+1] & 0x80))  // monochrome
 				{
 					for (int b = 0; b < 7; b++)
 					{
@@ -853,7 +790,6 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 						*p++ = rotl4((w >> (b - ((b - col) & 3) + 7)) & 0x0F, 1);
 					}
 				}
-				break;
 			}
 		}
 	}
@@ -1122,3 +1058,22 @@ template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, fa
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IIGS, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II_J_PLUS, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+INPUT_PORTS_START( apple2_vidconfig );
+	PORT_START("a2_video_config")
+	PORT_CONFNAME(0x07, 0x00, "Monitor type")
+	PORT_CONFSETTING(0x00, "Color")
+	PORT_CONFSETTING(0x04, "B&W")
+	PORT_CONFSETTING(0x05, "Green")
+	PORT_CONFSETTING(0x06, "Amber")
+INPUT_PORTS_END
+
+INPUT_PORTS_START( apple2_vidconfig_rgb )
+	PORT_START("a2_video_config")
+	PORT_CONFNAME(0x07, 0x00, "Monitor type")
+	PORT_CONFSETTING(0x00, "Color")
+	PORT_CONFSETTING(0x04, "B&W")
+	PORT_CONFSETTING(0x05, "Green")
+	PORT_CONFSETTING(0x06, "Amber")
+	PORT_CONFSETTING(0x03, "Video-7 RGB")
+INPUT_PORTS_END
