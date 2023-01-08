@@ -98,8 +98,6 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);
 
@@ -176,12 +174,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(tk2000_state::apple2_interrupt)
 	{
 		m_video->set_sysconfig(m_sysconfig->read());
 	}
-}
-
-uint32_t tk2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_video->hgr_update(screen, bitmap, cliprect, 0, 191);
-	return 0;
 }
 
 /***************************************************************************
@@ -594,7 +586,7 @@ void tk2000_state::tk2000(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(280*2, 262);
 	m_screen->set_visarea(0, (280*2)-1,0,192-1);
-	m_screen->set_screen_update(FUNC(tk2000_state::screen_update));
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, false, false>)));
 	m_screen->set_palette(m_video);
 
 	/* sound hardware */
