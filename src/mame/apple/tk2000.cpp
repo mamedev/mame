@@ -58,7 +58,6 @@ public:
 		m_video(*this, A2_VIDEO_TAG),
 		m_row(*this, "ROW%u", 0U),
 		m_kbspecial(*this, "keyb_special"),
-		m_sysconfig(*this, "a2_config"),
 		m_vidconfig(*this, "a2_video_config"),
 		m_speaker(*this, A2_SPEAKER_TAG),
 		m_cassette(*this, A2_CASSETTE_TAG),
@@ -80,7 +79,6 @@ private:
 	required_device<a2_video_device> m_video;
 	required_ioport_array<8> m_row;
 	required_ioport m_kbspecial;
-	required_ioport m_sysconfig;
 	required_ioport m_vidconfig;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
