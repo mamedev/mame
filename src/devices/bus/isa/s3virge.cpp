@@ -1174,6 +1174,8 @@ void s3virge_vga_device::bitblt_colour_step()
 	const uint8_t pixel_size = (current_command & 0x0000001c) >> 2;
 	const uint8_t rop = (current_command & 0x01fe0000) >> 17;
 	const int align = (current_command & 0x000000c00) >> 10;
+	//const bool tp = bool(BIT(current_command, 9));
+	const bool de = bool(BIT(current_command, 5));
 
 	uint32_t src = 0;
 	uint32_t dst = 0;
@@ -1196,9 +1198,15 @@ void s3virge_vga_device::bitblt_colour_step()
 						? s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_PAT_FG_CLR] : s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_PAT_BG_CLR]);
 				}
 				else
+				{
+					// TODO: shift << 8?
 					pat = (s3virge.s3d.pattern[(s3virge.s3d.bitblt_pat_y*8) + s3virge.s3d.bitblt_pat_x]) << 8;
+				}
 				dst = read_pixel8(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current, dest_stride());
-				write_pixel8(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, src, dst, pat) & 0xff);
+
+				if (de)
+					write_pixel8(dst_base, s3virge.s3d.bitblt_x_current, s3virge.s3d.bitblt_y_current, GetROP(rop, src, dst, pat) & 0xff);
+
 				done = advance_pixel();
 				if(done)
 				{
@@ -1232,7 +1240,9 @@ void s3virge_vga_device::bitblt_colour_step()
 			}
 			else
 				pat = s3virge.s3d.pattern[(s3virge.s3d.bitblt_pat_y*16) + (s3virge.s3d.bitblt_pat_x*2)] | (s3virge.s3d.pattern[(s3virge.s3d.bitblt_pat_y*16) + (s3virge.s3d.bitblt_pat_x*2) + 1]) << 8;
-			write_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, src, dst, pat) & 0xffff);
+
+			if (de)
+				write_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, src, dst, pat) & 0xffff);
 			done = advance_pixel();
 			if(done)
 			{
@@ -1253,7 +1263,8 @@ void s3virge_vga_device::bitblt_colour_step()
 			}
 			else
 				pat = s3virge.s3d.pattern[(s3virge.s3d.bitblt_pat_y*16) + (s3virge.s3d.bitblt_pat_x*2)] | (s3virge.s3d.pattern[(s3virge.s3d.bitblt_pat_y*16) + (s3virge.s3d.bitblt_pat_x*2) + 1]) << 8;
-			write_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, src, dst, pat) & 0xffff);
+			if (de)
+				write_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, src, dst, pat) & 0xffff);
 			if(advance_pixel())
 				command_finish();
 			break;
@@ -1277,7 +1288,8 @@ void s3virge_vga_device::bitblt_colour_step()
 						else
 							pat = s3virge.s3d.pattern[(s3virge.s3d.bitblt_pat_y*24) + (s3virge.s3d.bitblt_pat_x*3)] | (s3virge.s3d.pattern[(s3virge.s3d.bitblt_pat_y*24) + (s3virge.s3d.bitblt_pat_x*3) + 1]) << 8
 								| (s3virge.s3d.pattern[(s3virge.s3d.bitblt_pat_y*24) + (s3virge.s3d.bitblt_pat_x*3) + 2]) << 16;
-						write_pixel24(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, s3virge.s3d.bitblt_current_pixel, dst, pat));
+						if (de)
+							write_pixel24(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, s3virge.s3d.bitblt_current_pixel, dst, pat));
 						s3virge.s3d.bitblt_current_pixel = 0;
 						done = advance_pixel();
 						if((current_command & 0x80) && s3virge.s3d.bitblt_x_current == s3virge.s3d.bitblt_x_dst)
@@ -1311,7 +1323,8 @@ void s3virge_vga_device::bitblt_colour_step()
 					pat = s3virge.s3d.pattern[(s3virge.s3d.bitblt_pat_y*24) + (s3virge.s3d.bitblt_pat_x*3)] | (s3virge.s3d.pattern[(s3virge.s3d.bitblt_pat_y*24) + (s3virge.s3d.bitblt_pat_x*3) + 1]) << 8
 						| (s3virge.s3d.pattern[(s3virge.s3d.bitblt_pat_y*24) + (s3virge.s3d.bitblt_pat_x*3) + 2]) << 16;
 			}
-			write_pixel24(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, src, dst, pat));
+			if (de)
+				write_pixel24(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, src, dst, pat));
 			if(advance_pixel())
 				command_finish();
 			break;
@@ -1329,7 +1342,8 @@ void s3virge_vga_device::bitblt_monosrc_step()
 	const u32 current_command = s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_COMMAND];
 	const uint8_t pixel_size = (current_command & 0x0000001c) >> 2;
 	const uint8_t rop = (current_command & 0x01fe0000) >> 17;
-	//const bool tp = (bool(BIT(current_command, 9)));
+	//const bool tp = bool(BIT(current_command, 9));
+	const bool de = bool(BIT(current_command, 5));
 	const int align = (current_command & 0x000000c00) >> 10;
 
 	uint32_t src = 0;
@@ -1349,10 +1363,13 @@ void s3virge_vga_device::bitblt_monosrc_step()
 					src = read_pixel8(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current, src_stride());
 				dst = read_pixel8(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current, dest_stride());
 
-				if(src & (1 << x))
-					write_pixel8(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_SRC_FG_CLR], dst, pat) & 0xff);
-				else if(!(current_command & 0x200)) // only draw background colour if transparency is not set
-					write_pixel8(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_SRC_BG_CLR], dst, pat) & 0xff);
+				if (de)
+				{
+					if(src & (1 << x))
+						write_pixel8(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_SRC_FG_CLR], dst, pat) & 0xff);
+					else if(!(current_command & 0x200)) // only draw background colour if transparency is not set
+						write_pixel8(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_SRC_BG_CLR], dst, pat) & 0xff);
+				}
 				//printf("Pixel write(%i): X: %i Y: %i SRC: %04x DST: %04x PAT: %04x ROP: %02x\n",x,s3virge.s3d.bitblt_x_current, s3virge.s3d.bitblt_y_current, src, dst, pat, rop);
 				done = advance_pixel();
 				if((current_command & 0x80) && s3virge.s3d.bitblt_x_current == s3virge.s3d.bitblt_x_dst)
@@ -1386,10 +1403,13 @@ void s3virge_vga_device::bitblt_monosrc_step()
 					src = read_pixel16(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current, src_stride());
 				dst = read_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current, dest_stride());
 
-				if(src & (1 << x))
-					write_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_SRC_FG_CLR], dst, pat) & 0xffff);
-				else if(!(current_command & 0x200)) // only draw background colour if transparency is not set
-					write_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_SRC_BG_CLR], dst, pat) & 0xffff);
+				if (de)
+				{ 
+					if(src & (1 << x))
+						write_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_SRC_FG_CLR], dst, pat) & 0xffff);
+					else if(!(current_command & 0x200)) // only draw background colour if transparency is not set
+						write_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_SRC_BG_CLR], dst, pat) & 0xffff);
+				}
 				//printf("Pixel write(%i): X: %i Y: %i SRC: %04x DST: %04x PAT: %04x ROP: %02x\n",x,s3virge.s3d.bitblt_x_current, s3virge.s3d.bitblt_y_current, src, dst, pat, rop);
 				done = advance_pixel();
 				if((current_command & 0x80) && s3virge.s3d.bitblt_x_current == s3virge.s3d.bitblt_x_dst)
@@ -1423,10 +1443,13 @@ void s3virge_vga_device::bitblt_monosrc_step()
 					src = read_pixel24(src_base,s3virge.s3d.bitblt_x_src_current,s3virge.s3d.bitblt_y_src_current, src_stride());
 				dst = read_pixel24(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current, dest_stride());
 
-				if(src & (1 << x))
-					write_pixel24(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_SRC_FG_CLR], dst, pat));
-				else if(!(current_command & 0x200)) // only draw background colour if transparency is not set
-					write_pixel24(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_SRC_BG_CLR], dst, pat));
+				if (de)
+				{
+					if(src & (1 << x))
+						write_pixel24(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_SRC_FG_CLR], dst, pat));
+					else if(!(current_command & 0x200)) // only draw background colour if transparency is not set
+						write_pixel24(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_SRC_BG_CLR], dst, pat));
+				}
 				//printf("Pixel write(%i): X: %i Y: %i SRC: %04x DST: %04x PAT: %04x ROP: %02x\n",x,s3virge.s3d.bitblt_x_current, s3virge.s3d.bitblt_y_current, src, dst, pat, rop);
 				done = advance_pixel();
 				if((current_command & 0x80) && s3virge.s3d.bitblt_x_current == s3virge.s3d.bitblt_x_dst)
