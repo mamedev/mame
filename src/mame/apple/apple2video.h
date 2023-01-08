@@ -31,15 +31,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dhires_w);
 	DECLARE_WRITE_LINE_MEMBER(an2_w);
 
-	const bool get_graphics()   { return m_graphics; }
-	const bool get_hires()      { return m_hires; }
-	const bool get_dhires()     { return m_dhires; }
-	const bool get_page2()      { return m_page2; }
-	const bool get_80col()      { return m_80col; }
-	const bool get_80store()    { return m_80store; }
-	const bool get_mix()        { return m_mix; }
-	const bool get_altcharset() { return m_altcharset; }
-	const bool get_monohgr()    { return m_monohgr; }
+	bool get_graphics() const   { return m_graphics; }
+	bool get_hires() const      { return m_hires; }
+	bool get_dhires() const     { return m_dhires; }
+	bool get_page2() const      { return m_page2; }
+	bool get_80col() const      { return m_80col; }
+	bool get_80store() const    { return m_80store; }
+	bool get_mix() const        { return m_mix; }
+	bool get_altcharset() const { return m_altcharset; }
+	bool get_monohgr() const    { return m_monohgr; }
 
 	void a80col_w(bool b80Col)      { m_80col = b80Col; }
 	void a80store_w(bool b80Store)  { m_80store = b80Store; }
