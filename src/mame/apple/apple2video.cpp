@@ -777,83 +777,83 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 			switch (mon_type)
 			{
-				case 0:
+			case 0:
+				for (int b = 0; b < 7; b++)
+				{
+					*p++ = rotl4((w >> (b + 7-1)) & 0x0F, col * 7 + b);
+				}
+				break;
+
+			case 1:
+				// Shifting by 6 instead of 7 here shifts the entire DHGR screen right one pixel, so the leftmost pixel is
+				// always black and the rightmost pixel is not shown. This is to work around a problem with the HLSL NTSC
+				// shader. See Github issues #6308 and #10759. This should be changed when there is a better solution.
+				w >>= 6;
+				for (int b = 0; b < 7; b++)
+				{
+					v = (w & 1);
+					w >>= 1;
+					*(p++) = v ? WHITE : BLACK;
+				}
+				break;
+
+			case 2:
+				// See case 1
+				w >>= 6;
+				for (int b = 0; b < 7; b++)
+				{
+					v = (w & 1);
+					w >>= 1;
+					*(p++) = v ? GREEN : BLACK;
+				}
+				break;
+
+			case 3:
+				// See case 1
+				w >>= 6;
+				for (int b = 0; b < 7; b++)
+				{
+					v = (w & 1);
+					w >>= 1;
+					*(p++) = v ? ORANGE : BLACK;
+				}
+				break;
+
+			case 4:
+				// Video-7 RGB with m_rgbmode == 1 (mixed) or 3 (color). In color mode, the card
+				// seems to produce just 7 wide pixels per 4 bytes:
+				//   column & 3 =  0        1        2        3
+				//              nBBBAAAA nDDCCCCB nFEEEEDD nGGGGFFF
+				//
+				// In mixed mode, the Video-7 User's Manual says:
+				//
+				// "When [the MSB is 0] the hardware displays the remaining seven bits as bit-mapped
+				// video; a logic 'one' will instruct the hardware to display the next seven bits
+				// as color pixels. [...] color aberrations will occur at the leading and trailing
+				// edges of the transitions from one mode to the other. The aberrations may be
+				// eliminated by blanking enough bytes at the beginning and end of each transition
+				// to guarantee the four bit integrity of the corresponding color pixels."
+				//
+				// It's impossible to know the nature of the aberrations without hardware to test,
+				// but hopefully this warning means software was designed so that it doesn't matter.
+
+				if (m_rgbmode == 1 && !(vram_row[col+1] & 0x80))  // monochrome
+				{
 					for (int b = 0; b < 7; b++)
 					{
-						*p++ = rotl4((w >> (b + 7-1)) & 0x0F, col * 7 + b);
+						*p++ = ((w >> (b + 7)) & 1) ? WHITE : BLACK;
 					}
-					break;
-
-				case 1:
-					// Shifting by 6 instead of 7 here shifts the entire DHGR screen right one pixel, so the leftmost pixel is
-					// always black and the rightmost pixel is not shown. This is to work around a problem with the HLSL NTSC
-					// shader. See Github issues #6308 and #10759. This should be changed when there is a better solution.
-					w >>= 6;
+				}
+				else  // color
+				{
+					// In column 0 get the color from w bits 7-10 or 11-14,
+					// in column 1 get the color from w bits 4-7 or 8-11, etc.
 					for (int b = 0; b < 7; b++)
 					{
-						v = (w & 1);
-						w >>= 1;
-						*(p++) = v ? WHITE : BLACK;
+						*p++ = rotl4((w >> (b - ((b - col) & 3) + 7)) & 0x0F, 1);
 					}
-					break;
-
-				case 2:
-					// See case 1
-					w >>= 6;
-					for (int b = 0; b < 7; b++)
-					{
-						v = (w & 1);
-						w >>= 1;
-						*(p++) = v ? GREEN : BLACK;
-					}
-					break;
-
-				case 3:
-					// See case 1
-					w >>= 6;
-					for (int b = 0; b < 7; b++)
-					{
-						v = (w & 1);
-						w >>= 1;
-						*(p++) = v ? ORANGE : BLACK;
-					}
-					break;
-
-				case 4:
-					// Video-7 RGB with m_rgbmode == 1 (mixed) or 3 (color). In color mode, the card
-					// seems to produce just 7 wide pixels per 4 bytes:
-					//   column & 3 =  0        1        2        3
-					//              nBBBAAAA nDDCCCCB nFEEEEDD nGGGGFFF
-					//
-					// In mixed mode, the Video-7 User's Manual says:
-					//
-					// "When [the MSB is 0] the hardware displays the remaining seven bits as bit-mapped
-					// video; a logic 'one' will instruct the hardware to display the next seven bits
-					// as color pixels. [...] color aberrations will occur at the leading and trailing
-					// edges of the transitions from one mode to the other. The aberrations may be
-					// eliminated by blanking enough bytes at the beginning and end of each transition
-					// to guarantee the four bit integrity of the corresponding color pixels."
-					//
-					// It's impossible to know the nature of the aberrations without hardware to test,
-					// but hopefully this warning means software was designed so that it doesn't matter.
-
-					if (m_rgbmode == 1 && !(vram_row[col+1] & 0x80))  // monochrome
-					{
-						for (int b = 0; b < 7; b++)
-						{
-							*p++ = ((w >> (b + 7)) & 1) ? WHITE : BLACK;
-						}
-					}
-					else  // color
-					{
-						// In column 0 get the color from w bits 7-10 or 11-14,
-						// in column 1 get the color from w bits 4-7 or 8-11, etc.
-						for (int b = 0; b < 7; b++)
-						{
-							*p++ = rotl4((w >> (b - ((b - col) & 3) + 7)) & 0x0F, 1);
-						}
-					}
-					break;
+				}
+				break;
 			}
 		}
 	}
