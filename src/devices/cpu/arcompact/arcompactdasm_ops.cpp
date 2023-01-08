@@ -80,7 +80,11 @@
 
 #define LIMM_REG 62
 #define GET_LIMM \
-	limm = opcodes.r32(pc+2);
+	limm = (opcodes.r16(pc+4) << 16) | opcodes.r16(pc+6);
+
+#define GET_LIMM16 \
+	limm = (opcodes.r16(pc+2) << 16) | opcodes.r16(pc+4);
+
 #define PC_ALIGNED32 \
 	(pc&0xfffffffc)
 
@@ -1699,7 +1703,7 @@ int arcompact_disassembler::handle0e_0x_helper_dasm(std::ostream &stream, offs_t
 	if (h == LIMM_REG)
 	{
 		uint32_t limm;
-		GET_LIMM;
+		GET_LIMM16;
 		size = 6;
 		if (!revop) util::stream_format( stream, "%s %s <- 0x%08x", optext, regnames[breg], limm);
 		else util::stream_format( stream, "%s 0x%08x <- %s", optext, limm, regnames[breg]);
