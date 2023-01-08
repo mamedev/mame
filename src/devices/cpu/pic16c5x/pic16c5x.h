@@ -140,7 +140,6 @@ private:
 	u16       m_temp_config;
 	int       m_rtcc;
 	int       m_count_cycles;
-	u8        m_old_data;
 	u8        m_data_mask;
 	u16       m_program_mask;
 	u8        m_status_mask;
@@ -174,10 +173,8 @@ private:
 
 	void update_internalram_ptr();
 	void calc_zero_flag();
-	void CALCULATE_ADD_CARRY();
-	void CALCULATE_ADD_DIGITCARRY();
-	void CALCULATE_SUB_CARRY();
-	void CALCULATE_SUB_DIGITCARRY();
+	void calc_add_flags(u8 augend);
+	void calc_sub_flags(u8 minuend);
 	u16 pop_stack();
 	void push_stack(u16 data);
 	void set_pc(offs_t addr);

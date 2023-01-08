@@ -309,44 +309,35 @@ void pic16c5x_device::calc_zero_flag()
 		CLR(STATUS, Z_FLAG);
 }
 
-void pic16c5x_device::CALCULATE_ADD_CARRY()
+void pic16c5x_device::calc_add_flags(u8 augend)
 {
-	if (m_old_data > m_ALU) {
+	calc_zero_flag();
+
+	if (augend > m_ALU)
 		SET(STATUS, C_FLAG);
-	}
-	else {
+	else
 		CLR(STATUS, C_FLAG);
-	}
-}
 
-void pic16c5x_device::CALCULATE_ADD_DIGITCARRY()
-{
-	if ((m_old_data & 0x0f) > (m_ALU & 0x0f)) {
+	if ((augend & 0x0f) > (m_ALU & 0x0f))
 		SET(STATUS, DC_FLAG);
-	}
-	else {
+	else
 		CLR(STATUS, DC_FLAG);
-	}
+
 }
 
-void pic16c5x_device::CALCULATE_SUB_CARRY()
+void pic16c5x_device::calc_sub_flags(u8 minuend)
 {
-	if (m_old_data < m_ALU) {
+	calc_zero_flag();
+
+	if (minuend < m_ALU)
 		CLR(STATUS, C_FLAG);
-	}
-	else {
+	else
 		SET(STATUS, C_FLAG);
-	}
-}
 
-void pic16c5x_device::CALCULATE_SUB_DIGITCARRY()
-{
-	if ((m_old_data & 0x0f) < (m_ALU & 0x0f)) {
+	if ((minuend & 0x0f) < (m_ALU & 0x0f))
 		CLR(STATUS, DC_FLAG);
-	}
-	else {
+	else
 		SET(STATUS, DC_FLAG);
-	}
 }
 
 
@@ -573,12 +564,10 @@ void pic16c5x_device::illegal()
 
 void pic16c5x_device::addwf()
 {
-	m_old_data = get_regfile(ADDR);
-	m_ALU = m_old_data + m_W;
+	u8 augend = get_regfile(ADDR);
+	m_ALU = augend + m_W;
 	store_result(ADDR, m_ALU);
-	calc_zero_flag();
-	CALCULATE_ADD_CARRY();
-	CALCULATE_ADD_DIGITCARRY();
+	calc_add_flags(augend);
 }
 
 void pic16c5x_device::andwf()
@@ -747,12 +736,12 @@ void pic16c5x_device::retlw()
 void pic16c5x_device::rlf()
 {
 	m_ALU = get_regfile(ADDR);
-	u8 bit7 = m_ALU & 0x80;
+	int carry = BIT(m_ALU, 7);
 	m_ALU <<= 1;
 	if (STATUS & C_FLAG) m_ALU |= 1;
 	store_result(ADDR, m_ALU);
 
-	if (bit7)
+	if (carry)
 		SET(STATUS, C_FLAG);
 	else
 		CLR(STATUS, C_FLAG);
@@ -761,12 +750,12 @@ void pic16c5x_device::rlf()
 void pic16c5x_device::rrf()
 {
 	m_ALU = get_regfile(ADDR);
-	u8 bit0 = m_ALU & 1;
+	int carry = BIT(m_ALU, 0);
 	m_ALU >>= 1;
 	if (STATUS & C_FLAG) m_ALU |= 0x80;
 	store_result(ADDR, m_ALU);
 
-	if (bit0)
+	if (carry)
 		SET(STATUS, C_FLAG);
 	else
 		CLR(STATUS, C_FLAG);
@@ -782,12 +771,10 @@ void pic16c5x_device::sleepic()
 
 void pic16c5x_device::subwf()
 {
-	m_old_data = get_regfile(ADDR);
-	m_ALU = m_old_data - m_W;
+	u8 minuend = get_regfile(ADDR);
+	m_ALU = minuend - m_W;
 	store_result(ADDR, m_ALU);
-	calc_zero_flag();
-	CALCULATE_SUB_CARRY();
-	CALCULATE_SUB_DIGITCARRY();
+	calc_sub_flags(minuend);
 }
 
 void pic16c5x_device::swapf()
