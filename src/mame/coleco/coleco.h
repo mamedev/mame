@@ -9,39 +9,37 @@
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
 #include "machine/ram.h"
+#include "sound/ay8910.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 #include "coleco_m.h"
 #include "bus/coleco/cartridge/exp.h"
 
-class coleco_state : public driver_device
+class coleco_base_state : public driver_device
 {
 public:
-	coleco_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_cart(*this, COLECOVISION_CARTRIDGE_SLOT_TAG),
-			m_ctrlsel(*this, "CTRLSEL"),
-			m_std_keypad1(*this, "STD_KEYPAD1"),
-			m_std_joy1(*this, "STD_JOY1"),
-			m_std_keypad2(*this, "STD_KEYPAD2"),
-			m_std_joy2(*this, "STD_JOY2"),
-			m_sac_keypad1(*this, "SAC_KEYPAD1"),
-			m_sac_joy1(*this, "SAC_JOY1"),
-			m_sac_slide1(*this, "SAC_SLIDE1"),
-			m_sac_keypad2(*this, "SAC_KEYPAD2"),
-			m_sac_joy2(*this, "SAC_JOY2"),
-			m_sac_slide2(*this, "SAC_SLIDE2"),
-			m_driv_wheel1(*this, "DRIV_WHEEL1"),
-			m_driv_pedal1(*this, "DRIV_PEDAL1"),
-			m_driv_wheel2(*this, "DRIV_WHEEL2"),
-			m_driv_pedal2(*this, "DRIV_PEDAL2"),
-			m_roller_x(*this, "ROLLER_X"),
-			m_roller_y(*this, "ROLLER_Y")
+	coleco_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cart(*this, COLECOVISION_CARTRIDGE_SLOT_TAG)
+		, m_ctrlsel(*this, "CTRLSEL")
+		, m_std_keypad1(*this, "STD_KEYPAD1")
+		, m_std_joy1(*this, "STD_JOY1")
+		, m_std_keypad2(*this, "STD_KEYPAD2")
+		, m_std_joy2(*this, "STD_JOY2")
+		, m_sac_keypad1(*this, "SAC_KEYPAD1")
+		, m_sac_joy1(*this, "SAC_JOY1")
+		, m_sac_slide1(*this, "SAC_SLIDE1")
+		, m_sac_keypad2(*this, "SAC_KEYPAD2")
+		, m_sac_joy2(*this, "SAC_JOY2")
+		, m_sac_slide2(*this, "SAC_SLIDE2")
+		, m_driv_wheel1(*this, "DRIV_WHEEL1")
+		, m_driv_pedal1(*this, "DRIV_PEDAL1")
+		, m_driv_wheel2(*this, "DRIV_WHEEL2")
+		, m_driv_pedal2(*this, "DRIV_PEDAL2")
+		, m_roller_x(*this, "ROLLER_X")
+		, m_roller_y(*this, "ROLLER_Y")
 	{ }
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	uint8_t cart_r(offs_t offset);
 	uint8_t paddle_1_r();
@@ -58,14 +56,17 @@ public:
 	uint8_t coleco_paddle_read(int port, int joy_mode, uint8_t joy_status);
 	uint8_t coleco_scan_paddles(uint8_t *joy_status0, uint8_t *joy_status1);
 
-	void colecop(machine_config &config);
-	void coleco(machine_config &config);
+	void coleco_base(machine_config &config);
 	void czz50(machine_config &config);
 	void dina(machine_config &config);
-	void coleco_io_map(address_map &map);
 	void coleco_map(address_map &map);
+	void coleco_io_map(address_map &map);
 	void czz50_map(address_map &map);
+
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<colecovision_cartridge_slot_device> m_cart;
 
@@ -101,18 +102,44 @@ protected:
 	optional_ioport m_roller_y;
 };
 
-class bit90_state : public coleco_state
+class coleco_state : public coleco_base_state
+{
+public:
+	coleco_state(const machine_config &mconfig, device_type type, const char *tag)
+		: coleco_base_state(mconfig, type, tag)
+		, m_ay8910(*this, "ay8910")
+		, m_sgmconf(*this, "SGMCONF")
+		, m_sgm_ram8k(*this, "sgm_ram8k")
+		, m_sgm_ram24k(*this, "sgm_ram24k")
+		, m_sgm_io(*this, "sgm_io")
+	{ }
+
+	void coleco(machine_config &config);
+	void colecop(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+
+private:
+	void sgm_map(address_map &map);
+	void sgm_io_map(address_map &map);
+
+	required_device<ay8910_device> m_ay8910;
+	required_ioport m_sgmconf;
+	memory_view m_sgm_ram8k;
+	memory_view m_sgm_ram24k;
+	memory_view m_sgm_io;
+};
+
+class bit90_state : public coleco_base_state
 {
 public:
 	bit90_state(const machine_config &mconfig, device_type type, const char *tag)
-		: coleco_state(mconfig, type, tag),
-			m_bank(*this, "bank"),
-			m_ram(*this, RAM_TAG),
-			m_io_keyboard(*this, {"ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7"})
-		{}
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+		: coleco_base_state(mconfig, type, tag)
+		, m_bank(*this, "bank")
+		, m_ram(*this, RAM_TAG)
+		, m_io_keyboard(*this, "ROW%u", 0U)
+	{ }
 
 	void bit90(machine_config &config);
 
@@ -124,6 +151,9 @@ public:
 	void init();
 
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	required_memory_bank m_bank;
 	required_device<ram_device> m_ram;
 	required_ioport_array<8> m_io_keyboard;
@@ -136,4 +166,4 @@ private:
 	uint8_t m_unknown = 0U;
 };
 
-#endif
+#endif // MAME_INCLUDES_COLECO_H
