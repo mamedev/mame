@@ -33,6 +33,10 @@ reached the scaler rate value, not when the WatchDog reaches zero.
   a device reset, but how is not known. The manual also mentions that
   the WatchDog Timer can only be disabled during ROM programming, and
   no other means seem to exist???
+- RTCC/T0CKI frequency should be limited by internal clock. In other words:
+  It shouldn't be able to detect all pulses if the frequency on the pin is
+  higher than the CLKOUT frequency. On 4 clocks-per-cycle, the pin state is
+  sensed at clock #2 and clock #4.
 - get rid of m_picmodel checks (use virtual function overrides in subclasses)
 
 
@@ -967,7 +971,7 @@ void pic16c5x_device::device_start()
 
 	m_delay_timer = 0;
 	m_rtcc = 0;
-	m_count_pending = false;
+	m_count_cycles = 0;
 	m_inst_cycles = 0;
 
 	// save states
@@ -988,7 +992,7 @@ void pic16c5x_device::device_start()
 	save_item(NAME(m_delay_timer));
 	save_item(NAME(m_temp_config));
 	save_item(NAME(m_rtcc));
-	save_item(NAME(m_count_pending));
+	save_item(NAME(m_count_cycles));
 	save_item(NAME(m_inst_cycles));
 
 	// debugger
@@ -1121,7 +1125,7 @@ void pic16c5x_device::pic16c5x_reset_regs()
 	m_prescaler = 0;
 	m_delay_timer = 0;
 	m_inst_cycles = 0;
-	m_count_pending = false;
+	m_count_cycles = 0;
 }
 
 void pic16c5x_device::pic16c5x_soft_reset()
@@ -1195,6 +1199,15 @@ void pic16c5x_device::pic16c5x_update_watchdog(int counts)
 
 void pic16c5x_device::pic16c5x_update_timer(int counts)
 {
+	if (m_delay_timer > 0) { // Timer increment is inhibited
+		int dt = m_delay_timer;
+		m_delay_timer -= m_inst_cycles;
+		counts -= dt;
+	}
+
+	if (m_delay_timer > 0 || counts <= 0)
+		return;
+
 	if (PSA == 0) {
 		m_prescaler += counts;
 		if (m_prescaler >= (2 << PS)) { // Prescale values from 2 to 256
@@ -1215,7 +1228,7 @@ void pic16c5x_device::execute_set_input(int line, int state)
 		case PIC16C5x_RTCC:
 			if (T0CS && state != m_rtcc) { // Count mode, edge triggered
 				if ((T0SE && !state) || (!T0SE && state))
-					m_count_pending = true;
+					m_count_cycles++;
 			}
 			m_rtcc = state;
 			break;
@@ -1236,19 +1249,11 @@ void pic16c5x_device::execute_run()
 
 	do {
 		if (PD == 0) { // Sleep Mode
-			m_count_pending = false;
+			m_count_cycles = 0;
 			m_inst_cycles = 1;
 			debugger_instruction_hook(m_PC);
-			if (WDTE) {
-				pic16c5x_update_watchdog(1);
-			}
 		}
 		else {
-			if (m_count_pending) { // RTCC/T0CKI clocked while in Count mode
-				m_count_pending = false;
-				pic16c5x_update_timer(1);
-			}
-
 			m_PREVPC = m_PC;
 
 			debugger_instruction_hook(m_PC);
@@ -1265,20 +1270,14 @@ void pic16c5x_device::execute_run()
 				(this->*s_opcode_00x[(m_opcode.b.l & 0x1f)].function)();
 			}
 
-			if (!T0CS) { // Timer mode
-				if (m_delay_timer) {
-					m_delay_timer--;
-				}
-				else {
-					pic16c5x_update_timer(m_inst_cycles);
-				}
-			}
-			if (WDTE) {
-				pic16c5x_update_watchdog(m_inst_cycles);
-			}
+			pic16c5x_update_timer(T0CS ? m_count_cycles : m_inst_cycles);
+			m_count_cycles = 0;
+		}
+
+		if (WDTE) {
+			pic16c5x_update_watchdog(m_inst_cycles);
 		}
 
 		m_icount -= m_inst_cycles;
-
 	} while (m_icount > 0);
 }
