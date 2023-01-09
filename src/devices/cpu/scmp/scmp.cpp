@@ -28,7 +28,7 @@ scmp_device::scmp_device(const machine_config &mconfig, const char *tag, device_
 
 scmp_device::scmp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
+	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_AC(0), m_ER(0), m_SR(0), m_icount(0)
 	, m_flag_out_func(*this)
 	, m_sout_func(*this)
