@@ -14,9 +14,6 @@
 #include "adamnet.h"
 #include "cpu/m6800/m6801.h"
 #include "machine/bitmap_printer.h"
-#include "machine/steppers.h"
-
-#include "util/png.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -45,7 +42,6 @@ protected:
 private:
 	required_device<m6801_cpu_device> m_maincpu;
 	required_device<daisywheel_bitmap_printer_device> m_bitmap_printer;
-//  required_device<stepper_device> m_daisywheel_stepper;
 
 	void p1_w(uint8_t data);
 	uint8_t p2_r();
@@ -70,14 +66,11 @@ private:
 	}
 
 	const int wheel_home_sensor_pos = 0;      // can set arbitrarily as long as you calculate wheel_offset() with function below
-	const int wheel_home_sensor_offset = 10;  // determined empirically  (in half steps)
-	int wheel_offset() { return (wheel_home_sensor_pos - wheel_home_sensor_offset) / (-2); }
-	// sensor 0  offset = 5    (decreasing sensor by step of 2, increment offset by 1)
-	// sensor 6  offset = 2
-	// sensor 10 offset = 0
-
-	bitmap_argb32 m_typesheet;
-
+	const int wheel_home_sensor_origin = 10;  // determined empirically  (in half steps)
+	int wheel_offset() { return (wheel_home_sensor_pos - wheel_home_sensor_origin) / (-2); }
+	// sensor 0  wheel_offset = 5    (decreasing sensor by step of 2, increment offset by 1)
+	// sensor 6  wheel_offset = 2
+	// sensor 10 wheel_offset = 0
 };
 
 // device type definition

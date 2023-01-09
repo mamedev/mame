@@ -71,8 +71,6 @@ public:
 	int m_xpos;
 	int m_ypos;
 
-	bitmap_rgb32& get_bitmap() { return m_page_bitmap; }
-
 protected:
 	bitmap_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -83,8 +81,6 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	bitmap_rgb32 m_page_bitmap; // page bitmap
-
 private:
 	required_device<screen_device> m_screen;
 	required_device<stepper_device> m_pf_stepper;
@@ -94,6 +90,10 @@ private:
 	required_ioport m_bottom_margin_ioport;
 	required_ioport m_draw_marks_ioport;
 
+protected:
+	bitmap_rgb32 m_page_bitmap; // page bitmap
+
+private:
 	static constexpr int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
 	static constexpr int m_distfrombottom = 50;  // print position from bottom of screen
 	static constexpr int MAX_LEDS = 5;
@@ -136,7 +136,6 @@ private:
 class daisywheel_bitmap_printer_device : public bitmap_printer_device
 {
 public:
-
 	daisywheel_bitmap_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: bitmap_printer_device(mconfig, type, tag, owner, clock)
 	, m_dw_stepper(*this, "daisywheel_stepper")
@@ -156,18 +155,16 @@ public:
 	{
 	}
 
-	daisywheel_bitmap_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, int paper_width, int paper_height, int hdpi, int vdpi, std::string typesheet_path)
+	daisywheel_bitmap_printer_device(const machine_config &mconfig, const char *tag, device_t *owner,
+		int paper_width, int paper_height, int hdpi, int vdpi, std::string typesheet_path)
 	: daisywheel_bitmap_printer_device(mconfig, tag, owner, u32(0))
 	{
-
 		m_paper_width = paper_width;
 		m_paper_height = paper_height;
 		m_hdpi = hdpi;
 		m_vdpi = vdpi;
-
 		m_typesheet_path = typesheet_path;
 	}
-
 
 	virtual void device_start() override
 	{
@@ -191,11 +188,6 @@ private:
 	required_device<stepper_device> m_dw_stepper;
 	bitmap_argb32 m_typesheet;
 
-
-	int mod_positive(uint16_t num, uint16_t mod_value)
-	{
-		int retvalue = num % mod_value;  if (retvalue < 0) retvalue += mod_value; return retvalue;
-	}
 public:
 	int m_wheelpos;
 private:
