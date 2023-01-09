@@ -719,8 +719,12 @@ void sprinter_state::ata_data_w(u8 data)
 
 void sprinter_state::covox_w(u8 left, u8 right)
 {
+	m_centronics->write_strobe(1);
+	m_centronics->write_autofd(0);
 	m_cent_data_out->write(left);
-	// TODO stereo
+	m_centronics->write_strobe(0);
+	m_centronics->write_autofd(1);
+	m_cent_data_out->write(right);
 }
 
 void sprinter_state::accel_control_r(u8 data)
@@ -1127,7 +1131,7 @@ static void sprinter_ata_devices(device_slot_interface &device)
 
 u8 sprinter_state::cbl_data_r()
 {
-	const u8 cbl_mode16 = BIT(m_cbl_xx, 5);
+	const bool cbl_mode16 = BIT(m_cbl_xx, 5);
 	if (cbl_mode16)
 		m_cbl_data_r_pos++;
 	u8 data = m_cbl_data[m_cbl_data_r_pos++] ^ (cbl_mode16 << 7);
@@ -1219,7 +1223,7 @@ void sprinter_state::sprinter(machine_config &config)
 	ay8910.add_route(1, "rspeaker", 0.25);
 	ay8910.add_route(2, "rspeaker", 0.50);
 
-	CENTRONICS(config, m_centronics, centronics_devices, "covox");
+	CENTRONICS(config, m_centronics, centronics_devices, "covox_stereo");
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, m_cent_data_out));
 	m_centronics->set_output_latch(cent_data_out);
 
