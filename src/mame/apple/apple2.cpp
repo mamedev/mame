@@ -89,7 +89,6 @@ public:
 		m_kbrepeat(*this, "keyb_repeat"),
 		m_resetdip(*this, "reset_dip"),
 		m_sysconfig(*this, "a2_config"),
-		m_vidconfig(*this, "a2_video_config"),
 		m_speaker(*this, A2_SPEAKER_TAG),
 		m_cassette(*this, A2_CASSETTE_TAG),
 		m_softlatch(*this, "softlatch"),
@@ -101,7 +100,7 @@ public:
 	required_device<timer_device> m_scantimer;
 	required_device<ram_device> m_ram;
 	required_device<ay3600_device> m_ay3600;
-	required_device<a2_video_device> m_video;
+	required_device<a2_video_device_composite> m_video;
 	required_device<apple2_common_device> m_a2common;
 	required_device<a2bus_device> m_a2bus;
 	required_device<apple2_gameio_device> m_gameio;
@@ -109,7 +108,6 @@ public:
 	required_ioport m_kbrepeat;
 	optional_ioport m_resetdip;
 	required_ioport m_sysconfig;
-	required_ioport m_vidconfig;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<addressable_latch_device> m_softlatch;
@@ -330,11 +328,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
 {
 	int scanline = param;
 
-	// update the video system's shadow copy of the video config at the end of the frame
 	if (scanline == 192)
 	{
-		m_video->set_vidconfig(m_vidconfig->read());
-
 		// check reset
 		if (m_resetdip.found()) // if reset DIP is present, use it
 		{
@@ -1083,7 +1078,6 @@ static INPUT_PORTS_START( apple2 )
 	PORT_START("keyb_repeat")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REPT")         PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\')
 
-	PORT_INCLUDE(apple2_vidconfig)
 	PORT_INCLUDE(apple2_sysconfig)
 INPUT_PORTS_END
 
@@ -1107,7 +1101,7 @@ void apple2_state::apple2_common(machine_config &config)
 	m_scantimer->configure_scanline(FUNC(apple2_state::apple2_interrupt), "screen", 0, 1);
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	APPLE2_VIDEO(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
+	APPLE2_VIDEO_COMPOSITE(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

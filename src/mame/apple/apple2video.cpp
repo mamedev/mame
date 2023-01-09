@@ -34,17 +34,27 @@
 #define WHITE   15
 
 DEFINE_DEVICE_TYPE(APPLE2_VIDEO, a2_video_device, "a2video", "Apple II video")
+DEFINE_DEVICE_TYPE(APPLE2_VIDEO_COMPOSITE, a2_video_device_composite, "a2video_comp", "Apple II video (composite)")
+DEFINE_DEVICE_TYPE(APPLE2_VIDEO_COMPOSITE_RGB, a2_video_device_composite_rgb, "a2video_comprgb", "Apple II video (composite/RGB)")
 
 //-------------------------------------------------
 //  a2_video_device - constructor
 //-------------------------------------------------
 
-a2_video_device::a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, APPLE2_VIDEO, tag, owner, clock)
+a2_video_device::a2_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
-{
-}
+	, m_vidconfig(*this, "a2_video_config") {}
+
+a2_video_device::a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a2_video_device(mconfig, APPLE2_VIDEO, tag, owner, clock) {}
+
+a2_video_device_composite::a2_video_device_composite(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a2_video_device(mconfig, APPLE2_VIDEO_COMPOSITE, tag, owner, clock) {}
+
+a2_video_device_composite_rgb::a2_video_device_composite_rgb(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: a2_video_device(mconfig, APPLE2_VIDEO_COMPOSITE_RGB, tag, owner, clock) {}
 
 void a2_video_device::device_start()
 {
@@ -81,7 +91,6 @@ void a2_video_device::device_reset()
 	m_dhires = false;
 	m_flash = false;
 	m_mix = false;
-	m_vidconfig = 0;
 	m_an2 = false;
 	m_80store = false;
 	m_monohgr = false;
@@ -149,13 +158,13 @@ static inline unsigned rotl4(unsigned n, unsigned count) { return rotl4b(n * 0x1
 
 inline bool a2_video_device::use_page_2() const { return m_page2 && !m_80store; }
 
-inline bool a2_video_device::monochrome_monitor() const { return (m_vidconfig & 4) != 0; }
+inline bool a2_video_device::monochrome_monitor() { return (m_vidconfig.read_safe(0) & 4) != 0; }
 
-inline bool a2_video_device::rgb_monitor() const { return (m_vidconfig & 7) == 3; }
+inline bool a2_video_device::rgb_monitor() { return (m_vidconfig.read_safe(0) & 7) == 3; }
 
-int a2_video_device::monochrome_hue() const
+int a2_video_device::monochrome_hue()
 {
-	switch (m_vidconfig & 7)
+	switch (m_vidconfig.read_safe(0) & 7)
 	{
 		case 5: return GREEN;
 		case 6: return ORANGE;
@@ -1059,7 +1068,7 @@ template uint32_t a2_video_device::screen_update<a2_video_device::model::IIGS, f
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II_J_PLUS, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-INPUT_PORTS_START( apple2_vidconfig );
+static INPUT_PORTS_START( a2_vidconfig_composite );
 	PORT_START("a2_video_config")
 	PORT_CONFNAME(0x07, 0x00, "Monitor type")
 	PORT_CONFSETTING(0x00, "Color")
@@ -1068,7 +1077,7 @@ INPUT_PORTS_START( apple2_vidconfig );
 	PORT_CONFSETTING(0x06, "Amber")
 INPUT_PORTS_END
 
-INPUT_PORTS_START( apple2_vidconfig_rgb )
+static INPUT_PORTS_START( a2_vidconfig_composite_rgb )
 	PORT_START("a2_video_config")
 	PORT_CONFNAME(0x07, 0x00, "Monitor type")
 	PORT_CONFSETTING(0x00, "Color")
@@ -1077,3 +1086,6 @@ INPUT_PORTS_START( apple2_vidconfig_rgb )
 	PORT_CONFSETTING(0x06, "Amber")
 	PORT_CONFSETTING(0x03, "Video-7 RGB")
 INPUT_PORTS_END
+
+ioport_constructor a2_video_device_composite::device_input_ports() const { return INPUT_PORTS_NAME(a2_vidconfig_composite); }
+ioport_constructor a2_video_device_composite_rgb::device_input_ports() const { return INPUT_PORTS_NAME(a2_vidconfig_composite_rgb); }

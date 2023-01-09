@@ -214,7 +214,6 @@ public:
 		m_kbdrom(*this, "keyboard"),
 		m_kbspecial(*this, "keyb_special"),
 		m_sysconfig(*this, "a2_config"),
-		m_vidconfig(*this, "a2_video_config"),
 		m_franklin_fkeys(*this, "franklin_fkeys"),
 		m_speaker(*this, A2_SPEAKER_TAG),
 		m_cassette(*this, A2_CASSETTE_TAG),
@@ -271,7 +270,6 @@ public:
 	optional_memory_region m_kbdrom;
 	required_ioport m_kbspecial;
 	optional_ioport m_sysconfig;
-	required_ioport m_vidconfig;
 	optional_ioport m_franklin_fkeys;
 	required_device<speaker_sound_device> m_speaker;
 	optional_device<cassette_image_device> m_cassette;
@@ -533,6 +531,8 @@ private:
 	}
 
 	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
+
+	void apple2e_common(machine_config &config, bool enhanced, bool rgb_option);
 };
 
 
@@ -1295,9 +1295,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 	if (scanline == 192)
 	{
 		m_vbl = true;
-
-		// update the video system's shadow copy of the video config
-		m_video->set_vidconfig(m_vidconfig->read());
 
 		if (m_vblmask)
 		{
@@ -4073,8 +4070,6 @@ static INPUT_PORTS_START( ceci )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
-
-	PORT_INCLUDE( apple2_vidconfig )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cecm )
@@ -4186,8 +4181,6 @@ static INPUT_PORTS_START( cecm )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
-
-	PORT_INCLUDE( apple2_vidconfig )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( zijini )
@@ -4299,21 +4292,17 @@ static INPUT_PORTS_START( zijini )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
-
-	PORT_INCLUDE( apple2_vidconfig )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2e )
 	PORT_INCLUDE( apple2e_common )
 	PORT_INCLUDE( apple2e_special )
-	PORT_INCLUDE( apple2_vidconfig_rgb )
 	PORT_INCLUDE( apple2_sysconfig_accel )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2c )
 	PORT_INCLUDE( apple2e_common )
 	PORT_INCLUDE( apple2e_special )
-	PORT_INCLUDE( apple2_vidconfig )
 	PORT_INCLUDE( apple2c_sysconfig )
 
 	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
@@ -4328,7 +4317,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( laser128 )
 	PORT_INCLUDE( apple2e_common )
-	PORT_INCLUDE( apple2_vidconfig )
 	PORT_INCLUDE( laser128_sysconfig )
 
 	PORT_START("keyb_special")
@@ -4352,7 +4340,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ace500 )
 	PORT_INCLUDE( apple2e_common )
-	PORT_INCLUDE( apple2_vidconfig )
 
 	PORT_START("a2_config")
 	PORT_CONFNAME(0x80, 0x00, "Auto Line Feed for printer")
@@ -4395,7 +4382,6 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( apple2cp )
 	PORT_INCLUDE( apple2e_common )
 	PORT_INCLUDE( apple2e_special )
-	PORT_INCLUDE( apple2_vidconfig )
 	PORT_INCLUDE( apple2cp_sysconfig )
 
 	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
@@ -4526,7 +4512,6 @@ static INPUT_PORTS_START( apple2euk )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 
-	PORT_INCLUDE(apple2_vidconfig_rgb)
 	PORT_INCLUDE(apple2_sysconfig_accel)
 INPUT_PORTS_END
 
@@ -4648,7 +4633,6 @@ static INPUT_PORTS_START( apple2ees )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 
-	PORT_INCLUDE(apple2_vidconfig_rgb)
 	PORT_INCLUDE(apple2_sysconfig_accel)
 INPUT_PORTS_END
 
@@ -4770,7 +4754,6 @@ static INPUT_PORTS_START( apple2efr )   // French AZERTY keyboard (Apple uses th
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 
-	PORT_INCLUDE(apple2_vidconfig_rgb)
 	PORT_INCLUDE(apple2_sysconfig_accel)
 INPUT_PORTS_END
 
@@ -4892,7 +4875,6 @@ INPUT_PORTS_START( apple2ep )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Apple")  PORT_CODE(KEYCODE_RALT)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
 
-	PORT_INCLUDE(apple2_vidconfig_rgb)
 	PORT_INCLUDE(apple2_sysconfig_accel)
 INPUT_PORTS_END
 
@@ -4903,10 +4885,17 @@ static void apple2eaux_cards(device_slot_interface &device)
 	device.option_add("rw3", A2EAUX_RAMWORKS3);  // Applied Engineering RamWorks III
 }
 
-void apple2e_state::apple2e(machine_config &config)
+void apple2e_state::apple2e_common(machine_config &config, bool enhanced, bool rgb_option)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, 1021800);
+	if (enhanced)
+	{
+		M65C02(config, m_maincpu, 1021800);
+	}
+	else
+	{
+		M6502(config, m_maincpu, 1021800);
+	}
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
@@ -4915,7 +4904,15 @@ void apple2e_state::apple2e(machine_config &config)
 
 	TIMER(config, m_acceltimer, 0).configure_generic(FUNC(apple2e_state::accel_timer));
 
-	APPLE2_VIDEO(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
+	if (rgb_option)
+	{
+		APPLE2_VIDEO_COMPOSITE_RGB(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
+	}
+	else
+	{
+		APPLE2_VIDEO_COMPOSITE(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
+	}
+
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -4979,12 +4976,17 @@ void apple2e_state::apple2e(machine_config &config)
 	/* softlist config for baseline A2E
 	By default, filter lists where possible to compatible disks for A2E */
 	SOFTWARE_LIST(config, "flop_a2_clean").set_original("apple2_flop_clcracked");
-	SOFTWARE_LIST(config, "flop_a2_orig").set_compatible("apple2_flop_orig").set_filter("A2E");
+	SOFTWARE_LIST(config, "flop_a2_orig").set_compatible("apple2_flop_orig").set_filter(enhanced ? "A2EE" : "A2E");
 	SOFTWARE_LIST(config, "flop_a2_misc").set_compatible("apple2_flop_misc");
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+}
+
+void apple2e_state::apple2e(machine_config &config)
+{
+	apple2e_common(config, false, true);
 }
 
 void apple2e_state::apple2epal(machine_config &config)
@@ -5005,12 +5007,7 @@ void apple2e_state::mprof3(machine_config &config)
 
 void apple2e_state::apple2ee(machine_config &config)
 {
-	apple2e(config);
-	subdevice<software_list_device>("flop_a2_orig")->set_filter("A2EE");  // Filter list to compatible disks for this machine.
-
-	M65C02(config.replace(), m_maincpu, 1021800);
-	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
-	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+	apple2e_common(config, true, true);
 }
 
 void apple2e_state::apple2eepal(machine_config &config)
@@ -5054,7 +5051,7 @@ void apple2e_state::apple2ep(machine_config &config)
 
 void apple2e_state::apple2c(machine_config &config)
 {
-	apple2ee(config);
+	apple2e_common(config, true, false);
 	subdevice<software_list_device>("flop_a2_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
 
 	M65C02(config.replace(), m_maincpu, 1021800);
@@ -5256,7 +5253,7 @@ void apple2e_state::laser128ex2(machine_config &config)
 
 void apple2e_state::ace500(machine_config &config)
 {
-	apple2ee(config);
+	apple2e_common(config, true, false);
 	subdevice<software_list_device>("flop_a2_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
 
 	M65C02(config.replace(), m_maincpu, 1021800);
@@ -5300,7 +5297,7 @@ void apple2e_state::ace500(machine_config &config)
 
 void apple2e_state::ace2200(machine_config &config)
 {
-	apple2e(config);
+	apple2e_common(config, false, false);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::ace2200_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
@@ -5333,7 +5330,7 @@ void apple2e_state::ace2200(machine_config &config)
 
 void apple2e_state::cec(machine_config &config)
 {
-	apple2e(config);
+	apple2e_common(config, false, false);
 
 	config.device_remove("sl3");
 	config.device_remove("sl6");

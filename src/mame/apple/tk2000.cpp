@@ -58,7 +58,6 @@ public:
 		m_video(*this, A2_VIDEO_TAG),
 		m_row(*this, "ROW%u", 0U),
 		m_kbspecial(*this, "keyb_special"),
-		m_vidconfig(*this, "a2_video_config"),
 		m_speaker(*this, A2_SPEAKER_TAG),
 		m_cassette(*this, A2_CASSETTE_TAG),
 		m_upperbank(*this, A2_UPPERBANK_TAG),
@@ -76,10 +75,9 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<screen_device> m_screen;
-	required_device<a2_video_device> m_video;
+	required_device<a2_video_device_composite> m_video;
 	required_ioport_array<8> m_row;
 	required_ioport m_kbspecial;
-	required_ioport m_vidconfig;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<address_map_bank_device> m_upperbank;
@@ -170,12 +168,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(tk2000_state::apple2_interrupt)
 
 	if((scanline % 8) == 0)
 		m_screen->update_partial(m_screen->vpos());
-
-	// update the video system's shadow copy of the video config at the end of the frame
-	if (scanline == 192)
-	{
-		m_video->set_vidconfig(m_vidconfig->read());
-	}
 }
 
 uint32_t tk2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -569,8 +561,6 @@ static INPUT_PORTS_START( tk2000 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_INCLUDE(apple2_vidconfig);
 INPUT_PORTS_END
 
 void tk2000_state::tk2000(machine_config &config)
@@ -582,7 +572,7 @@ void tk2000_state::tk2000(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(tk2000_state::apple2_interrupt), "screen", 0, 1);
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	APPLE2_VIDEO(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
+	APPLE2_VIDEO_COMPOSITE(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
