@@ -464,17 +464,17 @@ u8 sprinter_state::dcp_r(offs_t offset)
 	case 0x58: // Kempston Mouse
 		switch (offset >> 8)
 		{
-			case 0xfa:
-				data = m_io_mouse[2]->read();
-				break;
-			case 0xfb:
-				data = m_io_mouse[0]->read();
-				break;
-			case 0xff:
-				data = m_io_mouse[1]->read();
-				break;
-			default:
-				data = 0xff;
+		case 0xfa:
+			data = m_io_mouse[2]->read();
+			break;
+		case 0xfb:
+			data = m_io_mouse[0]->read();
+			break;
+		case 0xff:
+			data = m_io_mouse[1]->read();
+			break;
+		default:
+			data = 0xff;
 		}
 		break;
 
