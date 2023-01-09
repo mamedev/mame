@@ -1151,7 +1151,7 @@ void apple2e_state::machine_reset()
 	m_35sel = false;
 
 	// is Zip enabled?
-	if (m_sysconfig->read() & 0x10)
+	if (m_sysconfig.read_safe(0) & 0x10)
 	{
 		m_accel_present = true;
 	}
@@ -1183,7 +1183,7 @@ void apple2e_state::machine_reset()
 		m_isiicplus = false;
 	}
 
-	if (((m_sysconfig->read() & 0x30) == 0x30) || (m_isiicplus))
+	if (((m_sysconfig.read_safe(0) & 0x30) == 0x30) || (m_isiicplus))
 	{
 		m_accel_speed = 4000000;    // Zip speed
 		accel_full_speed();
@@ -2230,7 +2230,7 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x5a:  // Zip accelerator unlock
-			if (m_sysconfig->read() & 0x10)
+			if (m_sysconfig.read_safe(0) & 0x10)
 			{
 				if (data == 0x5a)
 				{
