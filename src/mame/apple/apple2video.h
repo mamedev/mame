@@ -31,15 +31,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dhires_w);
 	DECLARE_WRITE_LINE_MEMBER(an2_w);
 
-	const bool get_graphics()   { return m_graphics; }
-	const bool get_hires()      { return m_hires; }
-	const bool get_dhires()     { return m_dhires; }
-	const bool get_page2()      { return m_page2; }
-	const bool get_80col()      { return m_80col; }
-	const bool get_80store()    { return m_80store; }
-	const bool get_mix()        { return m_mix; }
-	const bool get_altcharset() { return m_altcharset; }
-	const bool get_monohgr()    { return m_monohgr; }
+	bool get_graphics() const   { return m_graphics; }
+	bool get_hires() const      { return m_hires; }
+	bool get_dhires() const     { return m_dhires; }
+	bool get_page2() const      { return m_page2; }
+	bool get_80col() const      { return m_80col; }
+	bool get_80store() const    { return m_80store; }
+	bool get_mix() const        { return m_mix; }
+	bool get_altcharset() const { return m_altcharset; }
+	bool get_monohgr() const    { return m_monohgr; }
 
 	void a80col_w(bool b80Col)      { m_80col = b80Col; }
 	void a80store_w(bool b80Store)  { m_80store = b80Store; }
@@ -71,9 +71,6 @@ public:
 
 	uint32_t screen_update_GS(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	// This is called directly by the superga2 and tk2000 drivers.
-	void hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
-
 protected:
 	a2_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
@@ -92,6 +89,7 @@ private:
 
 	void lores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void dlores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+	void hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 
 	bool use_page_2() const;

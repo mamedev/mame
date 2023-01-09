@@ -38,8 +38,8 @@ const input_item_id xinput_axis_ids[] =
 {
 	ITEM_ID_XAXIS,
 	ITEM_ID_YAXIS,
-	ITEM_ID_RXAXIS,
-	ITEM_ID_RYAXIS
+	ITEM_ID_ZAXIS,
+	ITEM_ID_RZAXIS
 };
 
 const USHORT xinput_pov_dir[] = {
@@ -63,10 +63,10 @@ const USHORT xinput_buttons[] = {
 	XINPUT_GAMEPAD_Y,
 	XINPUT_GAMEPAD_LEFT_SHOULDER,
 	XINPUT_GAMEPAD_RIGHT_SHOULDER,
-	XINPUT_GAMEPAD_START,
-	XINPUT_GAMEPAD_BACK,
 	XINPUT_GAMEPAD_LEFT_THUMB,
 	XINPUT_GAMEPAD_RIGHT_THUMB,
+	XINPUT_GAMEPAD_START,
+	XINPUT_GAMEPAD_BACK
 };
 
 const char *const xinput_button_names[] = {
@@ -76,10 +76,23 @@ const char *const xinput_button_names[] = {
 	"Y",
 	"LB",
 	"RB",
-	"Start",
-	"Back",
 	"LS",
-	"RS"
+	"RS",
+	"Start",
+	"Back"
+};
+
+const input_item_id xinput_button_ids[] = {
+	ITEM_ID_BUTTON1,
+	ITEM_ID_BUTTON2,
+	ITEM_ID_BUTTON3,
+	ITEM_ID_BUTTON4,
+	ITEM_ID_BUTTON5,
+	ITEM_ID_BUTTON6,
+	ITEM_ID_BUTTON7,
+	ITEM_ID_BUTTON8,
+	ITEM_ID_START,
+	ITEM_ID_SELECT
 };
 
 
@@ -266,7 +279,7 @@ void xinput_joystick_device::configure()
 	{
 		device()->add_item(
 			xinput_pov_names[povnum],
-			ITEM_ID_OTHER_SWITCH,
+			input_item_id(ITEM_ID_HAT1UP + povnum), // matches up/down/left/right order
 			generic_button_get_state<BYTE>,
 			&gamepad.povs[povnum]);
 	}
@@ -276,20 +289,20 @@ void xinput_joystick_device::configure()
 	{
 		device()->add_item(
 			xinput_button_names[butnum],
-			static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum),
+			xinput_button_ids[butnum],
 			generic_button_get_state<BYTE>,
 			&gamepad.buttons[butnum]);
 	}
 
 	device()->add_item(
 		"RT",
-		ITEM_ID_ZAXIS,
+		ITEM_ID_ADD_ABSOLUTE1,
 		generic_axis_get_state<LONG>,
 		&gamepad.right_trigger);
 
 	device()->add_item(
 		"LT",
-		ITEM_ID_RZAXIS,
+		ITEM_ID_ADD_ABSOLUTE2,
 		generic_axis_get_state<LONG>,
 		&gamepad.left_trigger);
 

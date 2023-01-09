@@ -555,7 +555,7 @@ INPUT_PORTS_END
 void sfxphasor_state::sfxphasor(machine_config &config)
 {
 	// basic machine hardware
-	PIC1655(config, m_maincpu, 1000000); // approximation - RC osc. R=10K+VR, C=47pF
+	PIC1655(config, m_maincpu, 950000); // approximation - RC osc. R=10K+VR, C=47pF
 	m_maincpu->read_a().set_ioport("IN.4");
 	m_maincpu->write_b().set(FUNC(sfxphasor_state::write_b));
 	m_maincpu->write_c().set(FUNC(sfxphasor_state::write_c));

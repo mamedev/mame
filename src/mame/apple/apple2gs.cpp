@@ -3358,7 +3358,12 @@ u8 apple2gs_state::adbmicro_p3_in()
 {
 	if (m_is_rom3)
 	{
-		return 0x00;    // TODO: 0x40 to remove Control Panel from the Control-Open Apple-Esc menu
+		// Check the jumper to remove the Control Panel from the Control-Open Apple-Esc CDA menu
+		if (m_sysconfig->read() & 0x08)
+		{
+			return 0x40;
+		}
+		return 0x00;
 	}
 	else
 	{
@@ -3732,6 +3737,15 @@ INPUT_PORTS_START( apple2gs )
 	PORT_CONFSETTING(0x07, "16 MHz ZipGS")
 INPUT_PORTS_END
 
+INPUT_PORTS_START( apple2gsrom3 )
+	PORT_INCLUDE( apple2gs )
+
+	PORT_MODIFY("a2_config")
+	PORT_CONFNAME(0x08, 0x00, "Disable CDA Control Panel")
+	PORT_CONFSETTING(0x00, DEF_STR(No))
+	PORT_CONFSETTING(0x08, DEF_STR(Yes))
+INPUT_PORTS_END
+
 void apple2gs_state::apple2gs(machine_config &config)
 {
 	/* basic machine hardware */
@@ -3760,7 +3774,6 @@ void apple2gs_state::apple2gs(machine_config &config)
 
 	MACADB(config, m_macadb, A2GS_MASTER_CLOCK/8);
 	m_macadb->set_mcu_mode(true);
-	m_macadb->set_iigs_mode(true);
 	m_macadb->adb_data_callback().set(FUNC(apple2gs_state::set_adb_line));
 
 	RTC3430042(config, m_rtc, XTAL(32'768));
@@ -3954,8 +3967,8 @@ ROM_END
 
 
 /*    YEAR  NAME            PARENT    COMPAT    MACHINE     INPUT     CLASS        INIT  COMPANY           FULLNAME */
-COMP( 1989, apple2gs,     0,        apple2, apple2gs,   apple2gs, apple2gs_state, rom3_init, "Apple Computer", "Apple IIgs (ROM03)", MACHINE_SUPPORTS_SAVE )
-COMP( 198?, apple2gsr3p,  apple2gs, 0,      apple2gs,   apple2gs, apple2gs_state, rom3_init, "Apple Computer", "Apple IIgs (ROM03 prototype)", MACHINE_NOT_WORKING )
+COMP( 1989, apple2gs,     0,        apple2, apple2gs,   apple2gsrom3, apple2gs_state, rom3_init, "Apple Computer", "Apple IIgs (ROM03)", MACHINE_SUPPORTS_SAVE )
+COMP( 198?, apple2gsr3p,  apple2gs, 0,      apple2gs,   apple2gsrom3, apple2gs_state, rom3_init, "Apple Computer", "Apple IIgs (ROM03 prototype)", MACHINE_NOT_WORKING )
 COMP( 1987, apple2gsr1,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, rom1_init, "Apple Computer", "Apple IIgs (ROM01)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, apple2gsr0,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, rom1_init, "Apple Computer", "Apple IIgs (ROM00)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, apple2gsr0p,  apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, rom1_init, "Apple Computer", "Apple IIgs (ROM00 prototype 6/19/1986)", MACHINE_SUPPORTS_SAVE )

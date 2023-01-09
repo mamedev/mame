@@ -2923,6 +2923,7 @@ void taitof2_state::megab(machine_config &config)
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,megab)
 	m_screen->set_screen_update(FUNC(taitof2_state::screen_update_pri));
+	m_screen->screen_vblank().set(FUNC(taitof2_state::screen_vblank_partial_buffer_delayed));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_offsets(3, 0);

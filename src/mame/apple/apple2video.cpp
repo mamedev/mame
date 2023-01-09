@@ -83,9 +83,10 @@ void a2_video_device::device_start()
 
 void a2_video_device::device_reset()
 {
+	// Start in fullscreen hires if there is no character ROM. This is used
+	// by the superga2 and tk2000 drivers, which support no other modes.
+	m_graphics = m_hires = (m_char_ptr == nullptr);
 	m_page2 = false;
-	m_graphics = false;
-	m_hires = false;
 	m_80col = false;
 	m_altcharset = false;
 	m_dhires = false;

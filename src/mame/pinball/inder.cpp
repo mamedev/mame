@@ -1592,6 +1592,12 @@ ROM_END
 
 /*-------------------------------------------------------------------
 / Mundial 90 (1990)
+/ Soon after the launch of Mundial 90, Inder detected a bug on the
+/ program ROM that could cause the catapult frame to break, so they
+/ sent a letter (dated June 1990) with an updated program ROM and
+/ recalling the buggy one. It is unclear if the supported set is the
+/ fixed or the older one, as it matches one dumped from an EEPROM
+/ with an original Inder label dated 18-June-1990.
 /-------------------------------------------------------------------*/
 ROM_START(mundial)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
