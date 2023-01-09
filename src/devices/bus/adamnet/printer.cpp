@@ -13,7 +13,7 @@
 // Run the following code in a web browser to build the typesheet and save the file as artwork/adam_printer.png
 
 /*
-<canvas id="canvas" width="1920" height="1080"></canvas>
+<canvas id="canvas" width="600" height="350"></canvas>
 
 <script>
 const canvas = document.getElementById('canvas');
