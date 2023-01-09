@@ -8,7 +8,6 @@ TODO:
 ----------:hi:----------
 	- mem contention
 ----------:med:---------
-	- COVOX Bluster (CBL)
 ----------:low:---------
 	- gfx_layouts
 	- spectrum parentless
@@ -103,6 +102,7 @@ protected:
 	void update_memory();
 
 	INTERRUPT_GEN_MEMBER(sprinter_int);
+	TIMER_CALLBACK_MEMBER(cbl_tick);
 
 	void sprinter_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -147,6 +147,9 @@ private:
 	u8 ram_r(offs_t offset);
 	void ram_w(offs_t offset, u8 data);
 
+	u8 cbl_data_r();
+	void covox_w(u8 left, u8 right);
+
 	void accel_control_r(u8 data);
 	void accel_r_tap(offs_t offset, u8 &data);
 	void accel_w_tap(offs_t offset, u8 &data);
@@ -183,7 +186,6 @@ private:
 	u8 m_rom_rg;
 	u8 m_pn;
 	u8 m_sc;
-	u8 m_border;
 	u8 m_all_mode;
 	u8 m_port_y;
 	u8 m_rgmod;
@@ -203,6 +205,13 @@ private:
 	u8 m_accel_buffer[256] = {};
 	accel_state m_accel_state;
 	accel_state m_accel_mode;
+
+	// Covox Blaster
+	u8 m_cbl_xx;
+	u8 m_cbl_data[256] = {};
+	u8 m_cbl_data_r_pos;
+	u8 m_cbl_data_w_pos;
+	emu_timer *m_cbl_timer = nullptr;
 };
 
 void sprinter_state::update_memory()
@@ -234,12 +243,15 @@ void sprinter_state::update_memory()
 			| (((BIT(spr_, 1) && sc_lc) || !m_ram_sys || !nmi_ena) << 1)
 			| ((BIT(spr_, 0) && sc_lc) || !m_ram_sys || !nmi_ena);
 
-		m_pages[0] = BANK_RAM_MASK | (sc0 ? 0 : BANK_WRDISBL_MASK) | m_dcpp_data[pg0];
+		m_pages[0] = BANK_RAM_MASK | m_dcpp_data[pg0];
 		m_bank_ram[0]->set_entry(m_pages[0] & 0xff);
-		if (sc0)
+		if (sc0 && m_ram_sys)
 			m_bank_view0.disable();
 		else
+		{
+			m_pages[0] |= BANK_WRDISBL_MASK;
 			m_bank_view0.select(0);
+		}
 	}
 
 	m_pages[1] = BANK_RAM_MASK | m_ram1;
@@ -326,7 +338,7 @@ void sprinter_state::screen_update_txt(screen_device &screen, bitmap_ind16 &bitm
 					if ((mode[0] & 0x0c) == 0x0c)
 						pal = 0x400;
 					else
-						pal = 0x400 | ((m_border & 0x07) << 3) | (m_border & 0x07);
+						pal = 0x400 | ((m_port_fe_data & 0x07) << 3) | (m_port_fe_data & 0x07);
 				}
 				else
 				{
@@ -440,14 +452,9 @@ u8 sprinter_state::dcp_r(offs_t offset)
 		break;
 
 	case 0x40:
-		data = spectrum_ula_r(offset);
-		if (BIT(m_dcpp_data[0x89], 7))
-		{
-			if (m_screen->vpos() < (SPRINT_BORDER_TOP + SPRINT_SCREEN_YSIZE))
-				data &= ~0x20;
-			else
-				data |= 0x20;
-		}
+		data = spectrum_ula_r(offset) & ~0xa0;
+		data |= (BIT(m_cbl_xx, 7) && (m_screen->vpos() >= (SPRINT_BORDER_TOP + SPRINT_SCREEN_YSIZE))) << 5;
+		data |= m_cbl_data_r_pos & 0x80;
 		break;
 
 	case 0x52: // AY8910
@@ -469,6 +476,10 @@ u8 sprinter_state::dcp_r(offs_t offset)
 			default:
 				data = 0xff;
 		}
+		break;
+
+	case 0x89:
+		data = m_cbl_xx;
 		break;
 
 	// value ports
@@ -551,7 +562,51 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		break;
 
 	case 0x88:
-		m_cent_data_out->write(data);
+		m_cbl_data[m_cbl_data_w_pos++] = data;
+		if (BIT(~m_cbl_xx, 7))
+			covox_w(data, data);
+		break;
+
+	case 0x89:
+		m_cbl_xx = data;
+		if (BIT(m_cbl_xx, 7))
+		{
+			XTAL freq = 16_kHz_XTAL; // 0 + undefined (2..7)
+			switch (m_cbl_xx & 0x0f)
+			{
+			case 1:
+				freq = 22_kHz_XTAL;
+				break;
+			case 8:
+				freq = 7.8125_kHz_XTAL;
+				break;
+			case 9:
+				freq = 10.9375_kHz_XTAL;
+				break;
+			case 10:
+				freq = 15.625_kHz_XTAL;
+				break;
+			case 11:
+				freq = 21.875_kHz_XTAL;
+				break;
+			case 12:
+				freq = 31.25_kHz_XTAL;
+				break;
+			case 13:
+				freq = 43.75_kHz_XTAL;
+				break;
+			case 14:
+				freq = 54.6875_kHz_XTAL;
+				break;
+			case 15:
+				freq = 109.375_kHz_XTAL;
+				break;
+			}
+			m_cbl_data_r_pos = 0;
+			m_cbl_timer->adjust(attotime::zero, 0, attotime::from_hz(freq));
+		}
+		else
+			m_cbl_timer->adjust(attotime::never);
 		break;
 
 	case 0x8f: // rom & fastram page
@@ -580,7 +635,7 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		break;
 	case 0xc2:
 		m_screen->update_now();
-		m_border = data;
+		spectrum_ula_w(offset, data);
 		break;
 	case 0xc3:
 		m_all_mode = data;
@@ -660,6 +715,12 @@ void sprinter_state::ata_data_w(u8 data)
 		m_ata_data_latch = data;
 	else
 		m_ata[m_ata_selected]->cs0_w(0, (data << 8) | m_ata_data_latch);
+}
+
+void sprinter_state::covox_w(u8 left, u8 right)
+{
+	m_cent_data_out->write(left);
+	// TODO stereo
 }
 
 void sprinter_state::accel_control_r(u8 data)
@@ -782,7 +843,6 @@ void sprinter_state::accel_w_tap(offs_t offset, u8 &data)
 				u16 addr = offset + i;
 				if ((m_pages[addr >> 14] & BANK_RAM_MASK) && (~m_pages[addr >> 14] & BANK_WRDISBL_MASK))
 					ram_w(addr, m_accel_buffer[i]);
-
 			}
 		}
 		else if (m_accel_state == COPY_VERT)
@@ -843,8 +903,6 @@ void sprinter_state::ram_w(offs_t offset, u8 data)
 
 	const u8 bank = offset >> 14;
 	const u8 page = m_pages[bank] & 0xff;
-	if (~m_pages[bank] & BANK_RAM_MASK)
-		assert(false);
 	if ((page & 0xf0) == 0x50)
 	{
 		const u16 vaddr = (offset & 0x03ff);
@@ -881,6 +939,9 @@ void sprinter_state::ram_w(offs_t offset, u8 data)
 				m_vram[vxa] = data;
 			}
 		}
+
+		if (page == 0xfd)
+			m_cbl_data[offset & 0xff] = data;
 
 		reinterpret_cast<u8 *>(m_bank_ram[bank]->base())[offset & 0x3fff] = data;
 	}
@@ -927,7 +988,7 @@ void sprinter_state::map_fetch(address_map &map)
 
 void sprinter_state::map_mem(address_map &map)
 {
-	map(0x0000, 0xffff).lrw8(NAME([this](offs_t offset) { return ram_r(offset); }), NAME([this](offs_t offset, u8 data) { ram_w(offset, data); }));
+	map(0x0000, 0xffff).rw(FUNC(sprinter_state::ram_r), FUNC(sprinter_state::ram_w));
 
 	map(0x0000, 0x3fff).view(m_bank_view0);
 	m_bank_view0[0](0x0000, 0x3fff).nopw(); // RAM RO
@@ -971,6 +1032,8 @@ void sprinter_state::machine_start()
 	//save_item(NAME(m_accel_state));
 	//save_item(NAME(m_accel_mode));
 
+	save_item(NAME(m_cbl_data));
+
 	m_beta->enable();
 
 	// reconfigure ROMs
@@ -992,7 +1055,6 @@ void sprinter_state::machine_start()
 	for (u8 i = 0; i < 16*4; i++)
 		m_dcpp_data[0xc0 + i] = port_default[i];
 
-	m_border   = 0x00; // c2
 	m_all_mode = 0x00; // c3
 	m_port_y   = 0x00; // c4
 	m_rgmod    = 0x00; // c5
@@ -1003,6 +1065,8 @@ void sprinter_state::machine_start()
 
 void sprinter_state::machine_reset()
 {
+	m_cbl_timer->adjust(attotime::never);
+
 	spectrum_128_state::machine_reset();
 
 	m_starting = 1;
@@ -1020,6 +1084,9 @@ void sprinter_state::machine_reset()
 	m_skip_write = false;
 	m_prf_d = false;
 	m_accel_state = OFF;
+
+	m_cbl_xx = 0;
+	m_cbl_data_r_pos = m_cbl_data_w_pos = 0;
 
 	m_ata_selected = 0;
 	m_ata_data_flip = false;
@@ -1048,12 +1115,33 @@ void sprinter_state::video_start()
 
 	m_contention_pattern = {};
 	init_taps();
+
+	m_cbl_timer = timer_alloc(FUNC(sprinter_state::cbl_tick), this);
 }
 
 static void sprinter_ata_devices(device_slot_interface &device)
 {
 	device.option_add("hdd", IDE_HARDDISK);
 	device.option_add("cdrom", ATAPI_CDROM);
+}
+
+u8 sprinter_state::cbl_data_r()
+{
+	const u8 cbl_mode16 = BIT(m_cbl_xx, 5);
+	if (cbl_mode16)
+		m_cbl_data_r_pos++;
+	u8 data = m_cbl_data[m_cbl_data_r_pos++] ^ (cbl_mode16 << 7);
+	return data;
+}
+
+TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
+{
+	u8 left = cbl_data_r();
+	u8 right = BIT(m_cbl_xx, 6) ? cbl_data_r() : left;
+	covox_w(left, right);
+
+	if (BIT(m_cbl_xx, 4) && !(m_cbl_data_r_pos & 0x7f)) // CBL_INT_ENA
+		irq_on(0);
 }
 
 INTERRUPT_GEN_MEMBER(sprinter_state::sprinter_int)
