@@ -307,10 +307,37 @@ int bfm_bda_device::write_char(int data)
 							std::fill_n(m_attrs + m_window_start, m_window_size, 0);
 						}
 						break;
-					}
-				}
-				break;
 
+					case 0x02:  // clr outside window
+						if (m_window_size > 0)
+						{
+							if (m_window_start > 0)
+							{
+								for (int i = 0; i < m_window_start; i++)
+								{
+									memset(m_chars+i,0,i);
+									memset(m_attrs+i,0,i);
+								}
+							}
+
+							if (m_window_end < 15)
+							{
+								for (int i = m_window_end; i < 15- m_window_end ; i++)
+								{
+									memset(m_chars+i,0,i);
+									memset(m_attrs+i,0,i);
+								}
+							}
+						}
+						break;
+
+					case 0x03:  // clr entire display
+						std::fill(std::begin(m_chars), std::end(m_chars), 0);
+						std::fill(std::begin(m_attrs), std::end(m_attrs), 0);
+					}
+					break;
+			}
+			break;
 			case 0xc0:
 				if (data == 0xc8)
 				{
