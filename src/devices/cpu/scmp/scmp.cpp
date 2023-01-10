@@ -4,7 +4,8 @@
  *
  *   scmp.c
  *
- *   National Semiconductor SC/MP CPU Disassembly
+ *   National Semiconductor SC/MP CPU emulation
+ *   (SC/MP = Simple-to-use, Cost-effective MicroProcessor)
  *
  *****************************************************************************/
 
@@ -16,7 +17,7 @@
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(SCMP,    scmp_device,    "ins8050", "National Semiconductor INS 8050 SC/MP")
+DEFINE_DEVICE_TYPE(SCMP,    scmp_device,    "ins8050", "National Semiconductor ISP-8A/500D SC/MP")
 DEFINE_DEVICE_TYPE(INS8060, ins8060_device, "ins8060", "National Semiconductor INS 8060 SC/MP II")
 
 

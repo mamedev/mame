@@ -583,7 +583,7 @@ void next_state::scsictrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 				scsictrl & 0x08 ? "read" : "write",
 				scsictrl & 0x04 ? " flush" : "",
 				scsictrl & 0x02 ? " reset" : "",
-				scsictrl & 0x01 ? "wd3392" : "ncr5390",
+				scsictrl & 0x01 ? "wd3392" : "ncr53c90",
 				maincpu->pc());
 	}
 	if(ACCESSING_BITS_16_23) {
@@ -912,7 +912,7 @@ void next_state::next_mem(address_map &map)
 	map(0x0200e000, 0x0200e00b).mirror(0x300000).m(keyboard, FUNC(nextkbd_device::amap));
 //  map(0x0200f000, 0x0200f003).mirror(0x300000); printer
 //  map(0x02010000, 0x02010003).mirror(0x300000); brightness
-	map(0x02014000, 0x0201400f).mirror(0x300000).m(scsi, FUNC(ncr5390_device::map));
+	map(0x02014000, 0x0201400f).mirror(0x300000).m(scsi, FUNC(ncr53c90_device::map));
 	map(0x02014020, 0x02014023).mirror(0x300000).rw(FUNC(next_state::scsictrl_r), FUNC(next_state::scsictrl_w));
 	map(0x02016000, 0x02016003).mirror(0x300000).rw(FUNC(next_state::timer_data_r), FUNC(next_state::timer_data_w));
 	map(0x02016004, 0x02016007).mirror(0x300000).rw(FUNC(next_state::timer_ctrl_r), FUNC(next_state::timer_ctrl_w));
@@ -1015,12 +1015,12 @@ static void next_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("ncr5390", NCR5390);
+	device.option_add_internal("ncr53c90", NCR53C90);
 }
 
-void next_state::ncr5390(device_t *device)
+void next_state::ncr53c90(device_t *device)
 {
-	ncr5390_device &adapter = downcast<ncr5390_device &>(*device);
+	ncr53c90_device &adapter = downcast<ncr53c90_device &>(*device);
 
 	adapter.set_clock(10000000);
 	adapter.irq_handler_cb().set(*this, FUNC(next_state::scsi_irq));
@@ -1058,7 +1058,7 @@ void next_state::next_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:4", next_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:5", next_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", next_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:7", next_scsi_devices, "ncr5390", true).set_option_machine_config("ncr5390", [this] (device_t *device) { ncr5390(device); });
+	NSCSI_CONNECTOR(config, "scsibus:7", next_scsi_devices, "ncr53c90", true).set_option_machine_config("ncr53c90", [this] (device_t *device) { ncr53c90(device); });
 
 	MB8795(config, net, 0);
 	net->tx_irq().set(FUNC(next_state::net_tx_irq));
