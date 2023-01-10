@@ -1,16 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_NCR5390_H
-#define MAME_MACHINE_NCR5390_H
+#ifndef MAME_MACHINE_NCR53C90_H
+#define MAME_MACHINE_NCR53C90_H
 
 #pragma once
 
 #include "machine/nscsi_bus.h"
 
-class ncr5390_device : public nscsi_device, public nscsi_slot_card_interface
+class ncr53c90_device : public nscsi_device, public nscsi_slot_card_interface
 {
 public:
-	ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ncr53c90_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
 	auto irq_handler_cb() { return m_irq_handler.bind(); }
@@ -48,7 +48,7 @@ public:
 	void dma_w(uint8_t val);
 
 protected:
-	ncr5390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ncr53c90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -237,7 +237,7 @@ protected:
 	devcb_write_line m_drq_handler;
 };
 
-class ncr53c90a_device : public ncr5390_device
+class ncr53c90a_device : public ncr53c90_device
 {
 public:
 	ncr53c90a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -333,9 +333,9 @@ public:
 	ncr53cf94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-DECLARE_DEVICE_TYPE(NCR5390, ncr5390_device)
+DECLARE_DEVICE_TYPE(NCR53C90, ncr53c90_device)
 DECLARE_DEVICE_TYPE(NCR53C90A, ncr53c90a_device)
 DECLARE_DEVICE_TYPE(NCR53C94, ncr53c94_device)
 DECLARE_DEVICE_TYPE(NCR53CF94, ncr53cf94_device)
 
-#endif // MAME_MACHINE_NCR5390_H
+#endif // MAME_MACHINE_NCR53C90_H

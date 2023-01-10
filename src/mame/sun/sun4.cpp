@@ -422,7 +422,7 @@
 #include "imagedev/floppy.h"
 #include "machine/am79c90.h"
 #include "machine/bankdev.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 #include "machine/nscsi_bus.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
@@ -558,7 +558,7 @@ public:
 		, m_floppy(*this, "fdc:0")
 		, m_lance(*this, "lance")
 		, m_scsibus(*this, "scsibus")
-		, m_scsi(*this, "scsibus:7:ncr53c90a")
+		, m_scsi(*this, "scsibus:7:ncr53c90")
 		, m_type1space(*this, "type1")
 		, m_ram(*this, RAM_TAG)
 		, m_rom(*this, "user1")
@@ -601,7 +601,7 @@ protected:
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 
-	void ncr53c90a(device_t *device);
+	void ncr53c90(device_t *device);
 
 	void debugger_map(address_map &map);
 	void system_asi_map(address_map &map);
@@ -636,7 +636,7 @@ protected:
 	required_device<floppy_connector> m_floppy;
 	required_device<am79c90_device> m_lance;
 	required_device<nscsi_bus_device> m_scsibus;
-	required_device<ncr53c90a_device> m_scsi;
+	required_device<ncr53c90_device> m_scsi;
 
 	required_device<address_map_bank_device> m_type1space;
 	required_device<ram_device> m_ram;
@@ -776,7 +776,7 @@ void sun4_base_state::type1space_base_map(address_map &map)
 	map(0x08400000, 0x08400003).rw(FUNC(sun4_base_state::dma_ctrl_r), FUNC(sun4_base_state::dma_ctrl_w));
 	map(0x08400004, 0x08400007).rw(FUNC(sun4_base_state::dma_addr_r), FUNC(sun4_base_state::dma_addr_w));
 	map(0x08400008, 0x0840000b).rw(FUNC(sun4_base_state::dma_count_r), FUNC(sun4_base_state::dma_count_w));
-	map(0x08800000, 0x0880002f).m(m_scsi, FUNC(ncr53c90a_device::map)).umask32(0xff000000);
+	map(0x08800000, 0x0880002f).m(m_scsi, FUNC(ncr53c90_device::map)).umask32(0xff000000);
 	map(0x08c00000, 0x08c00003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w));
 }
 
@@ -1244,7 +1244,7 @@ u32 sun4_base_state::dma_ctrl_r()
 		dma_check_interrupts();
 	}
 	LOGMASKED(LOG_DMA_CTRL_READS, "%s: dma_ctrl_r: %08x\n", machine().describe_context(), m_dma_ctrl);
-	return m_dma_ctrl;
+	return (m_dma_ctrl & ~(DMA_WRITE_ONLY | DMA_BYTE_ADDR)) | DMA_DEV_ID;
 }
 
 u32 sun4_base_state::dma_addr_r()
@@ -1292,6 +1292,7 @@ void sun4_base_state::dma_ctrl_w(offs_t offset, u32 data, u32 mem_mask)
 			m_dma_addr++;
 		}
 		m_dma_pack_register = 0;
+
 		m_dma_ctrl &= ~DMA_PACK_CNT;
 	}
 
@@ -1369,13 +1370,13 @@ static void sun_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("ncr53c90a", NCR53C90A);
+	device.option_add_internal("ncr53c90", NCR53C90);
 	device.set_option_machine_config("cdrom", sun4_cdrom);
 }
 
-void sun4_base_state::ncr53c90a(device_t *device)
+void sun4_base_state::ncr53c90(device_t *device)
 {
-	ncr53c90a_device &adapter = downcast<ncr53c90a_device &>(*device);
+	ncr53c90_device &adapter = downcast<ncr53c90_device &>(*device);
 
 	adapter.set_clock(10000000);
 	adapter.irq_handler_cb().set(*this, FUNC(sun4_base_state::scsi_irq));
@@ -1443,7 +1444,7 @@ void sun4_base_state::sun4_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:4", sun_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:5", sun_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", sun_scsi_devices, "cdrom");
-	NSCSI_CONNECTOR(config, "scsibus:7", sun_scsi_devices, "ncr53c90a", true).set_option_machine_config("ncr53c90a", [this] (device_t *device) { ncr53c90a(device); });
+	NSCSI_CONNECTOR(config, "scsibus:7", sun_scsi_devices, "ncr53c90", true).set_option_machine_config("ncr53c90", [this] (device_t *device) { ncr53c90(device); });
 }
 
 void sun4_state::sun4(machine_config &config)

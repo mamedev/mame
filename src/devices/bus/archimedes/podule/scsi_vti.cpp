@@ -16,7 +16,7 @@
 #include "scsi_vti.h"
 #include "machine/6522via.h"
 #include "machine/eepromser.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 #include "bus/bbc/userport/userport.h"
 #include "bus/nscsi/devices.h"
 
