@@ -4034,13 +4034,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/ncr5390.h,MACHINES["NCR5390"] = true
+--@src/devices/machine/ncr53c90.h,MACHINES["NCR53C90"] = true
 ---------------------------------------------------
 
-if (MACHINES["NCR5390"]~=null) then
+if (MACHINES["NCR53C90"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/machine/ncr5390.cpp",
-		MAME_DIR .. "src/devices/machine/ncr5390.h",
+		MAME_DIR .. "src/devices/machine/ncr53c90.cpp",
+		MAME_DIR .. "src/devices/machine/ncr53c90.h",
 	}
 end
 

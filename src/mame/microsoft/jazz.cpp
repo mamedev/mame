@@ -68,7 +68,7 @@
 #include "machine/dp83932c.h"
 #include "machine/mc146818.h"
 #include "machine/ins8250.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 #include "machine/upd765.h"
 #include "machine/at_keybc.h"
 #include "machine/pc_lpt.h"

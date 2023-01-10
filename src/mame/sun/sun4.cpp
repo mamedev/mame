@@ -422,7 +422,7 @@
 #include "imagedev/floppy.h"
 #include "machine/am79c90.h"
 #include "machine/bankdev.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 #include "machine/nscsi_bus.h"
 #include "machine/nvram.h"
 #include "machine/ram.h"
@@ -636,7 +636,7 @@ protected:
 	required_device<floppy_connector> m_floppy;
 	required_device<am79c90_device> m_lance;
 	required_device<nscsi_bus_device> m_scsibus;
-	required_device<ncr5390_device> m_scsi;
+	required_device<ncr53c90_device> m_scsi;
 
 	required_device<address_map_bank_device> m_type1space;
 	required_device<ram_device> m_ram;
@@ -776,7 +776,7 @@ void sun4_base_state::type1space_base_map(address_map &map)
 	map(0x08400000, 0x08400003).rw(FUNC(sun4_base_state::dma_ctrl_r), FUNC(sun4_base_state::dma_ctrl_w));
 	map(0x08400004, 0x08400007).rw(FUNC(sun4_base_state::dma_addr_r), FUNC(sun4_base_state::dma_addr_w));
 	map(0x08400008, 0x0840000b).rw(FUNC(sun4_base_state::dma_count_r), FUNC(sun4_base_state::dma_count_w));
-	map(0x08800000, 0x0880002f).m(m_scsi, FUNC(ncr5390_device::map)).umask32(0xff000000);
+	map(0x08800000, 0x0880002f).m(m_scsi, FUNC(ncr53c90_device::map)).umask32(0xff000000);
 	map(0x08c00000, 0x08c00003).rw(m_lance, FUNC(am79c90_device::regs_r), FUNC(am79c90_device::regs_w));
 }
 
@@ -1370,13 +1370,13 @@ static void sun_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("ncr53c90", NCR5390);
+	device.option_add_internal("ncr53c90", NCR53C90);
 	device.set_option_machine_config("cdrom", sun4_cdrom);
 }
 
 void sun4_base_state::ncr53c90(device_t *device)
 {
-	ncr5390_device &adapter = downcast<ncr5390_device &>(*device);
+	ncr53c90_device &adapter = downcast<ncr53c90_device &>(*device);
 
 	adapter.set_clock(10000000);
 	adapter.irq_handler_cb().set(*this, FUNC(sun4_base_state::scsi_irq));
