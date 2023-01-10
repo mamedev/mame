@@ -1199,8 +1199,7 @@ void s3virge_vga_device::bitblt_colour_step()
 				}
 				else
 				{
-					// TODO: shift << 8?
-					pat = (s3virge.s3d.pattern[(s3virge.s3d.bitblt_pat_y*8) + s3virge.s3d.bitblt_pat_x]) << 8;
+					pat = s3virge.s3d.pattern[(s3virge.s3d.bitblt_pat_y * 8) + s3virge.s3d.bitblt_pat_x];
 				}
 				dst = read_pixel8(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current, dest_stride());
 
@@ -1348,7 +1347,7 @@ void s3virge_vga_device::bitblt_monosrc_step()
 
 	uint32_t src = 0;
 	uint32_t dst = 0;
-	// Windows 98 cares about this being initialized to non-zero for:
+	// Windows 98 cares about this being initialized to non-zero for
 	// greyed back/forward icons in Explorer, system icons and right click disabled Paste command.
 	uint32_t pat = s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_PAT_FG_CLR];
 	int x;
