@@ -30,6 +30,11 @@ void virge_pci_device::mmio_map(address_map& map)
 	// image transfer ports
 	map(0x1000000,0x1007fff).w(m_vga, FUNC(s3virge_vga_device::image_xfer));
 
+	//map(0x1008180,0x10081ff) primary/secondary stream control
+
+	//map(0x1008200,0x100821f) memory port controller
+	//map(0x1008220,0x1008227) DMA control
+
 	// MMIO address map
 	map(0x10083b0,0x10083bf).rw(FUNC(virge_pci_device::vga_3b0_r), FUNC(virge_pci_device::vga_3b0_w));
 	map(0x10083c0,0x10083df).rw(FUNC(virge_pci_device::vga_3c0_r), FUNC(virge_pci_device::vga_3c0_w));
@@ -37,12 +42,16 @@ void virge_pci_device::mmio_map(address_map& map)
 	map(0x1008504,0x1008507).rw(m_vga, FUNC(s3virge_vga_device::s3d_sub_status_r), FUNC(s3virge_vga_device::s3d_sub_control_w));
 	map(0x100850c,0x100850f).r(m_vga, FUNC(s3virge_vga_device::s3d_func_ctrl_r));
 
+	//map(0x1008580,0x100858b) video DMA
+	//map(0x1008590,0x100859f) command DMA
+
 	// S3D engine registers
 	map(0x100a000,0x100b7ff).rw(m_vga, FUNC(s3virge_vga_device::s3d_register_r), FUNC(s3virge_vga_device::s3d_register_w));
 
 	// alternate image transfer ports
 	map(0x100d000,0x100efff).w(m_vga, FUNC(s3virge_vga_device::image_xfer));
 
+	//map(0x100ff00, 0x100ff43) LPB control
 }
 
 void virge_pci_device::lfb_map(address_map& map)

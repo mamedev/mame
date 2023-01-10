@@ -9,6 +9,19 @@
  *  - Working on getting VESA video modes working better - 800x600 and higher skip every other line at
  *    8-bit depth, but are fine at 15/16-bit depth.
  *  - S3D is not implemented at all, so no 2D/3D acceleration yet.
+ *
+ * TODO:
+ * - Proper FIFOs;
+ * - Implement 3d commands;
+ * - Implement remaining ROP commands;
+ * - Secondary stream mixing;
+ * - S3 Scenic Highway i/f (SAA7110 + S3 Scenic/MX2 MPEG-1);
+ * - DMAs;
+ * - interrupts;
+ * - big endian support for non-x86 machines;
+ * - DDC/I2C i/f, cfr. serial port on MMFF20
+ * - win98se: doesn't show transparent layer on shut down screen;
+ *
  */
 
 #include "emu.h"
@@ -1610,6 +1623,13 @@ void s3virge_vga_device::s3d_sub_control_w(uint32_t data)
 	LOGMMIO("Sub control = %08x\n", data);
 }
 
+/*
+ * Advanced Function Control Register (MM850C)
+ * ---- --xx xx-- ---- command fifo status
+ * ---- ---- ---x ---- LA ENB Linear Addressing Enable (mirror of CR58 bit 4)
+ * ---- ---- ---- --x- RST DM Reset read DMA
+ * ---- ---- ---- ---x ENB EHFC Enable enhanced functions (mirror of CR66 bit 0)
+ */
 uint32_t s3virge_vga_device::s3d_func_ctrl_r()
 {
 	uint32_t ret = 0;
