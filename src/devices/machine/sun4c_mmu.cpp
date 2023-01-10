@@ -533,7 +533,7 @@ uint32_t sun4_mmu_base_device::insn_data_r(const uint32_t offset, const uint32_t
 	}
 
 	// it's translation time
-	const uint32_t pmeg = m_curr_segmap_masked[(offset >> 16) & 0xfff];// & m_pmeg_mask;
+	const uint32_t pmeg = m_curr_segmap_masked[(offset >> 16) & 0xfff];
 	const uint32_t entry_index = pmeg | ((offset >> m_seg_entry_shift) & m_seg_entry_mask);
 
 	if (m_page_valid[entry_index])
@@ -684,21 +684,16 @@ void sun4_mmu_base_device::insn_data_w(const uint32_t offset, const uint32_t dat
 
 void sun4_mmu_base_device::l2p_command(const std::vector<std::string_view> &params)
 {
-	uint64_t addr, offset;
-
+	uint64_t addr;
 	if (!machine().debugger().console().validate_number_parameter(params[0], addr)) return;
 
 	addr &= 0xffffffff;
-	offset = addr >> 2;
+	uint64_t offset = addr >> 2;
 
-	uint8_t pmeg = 0;
-	uint32_t entry_index = 0, tmp = 0;
-	uint32_t entry_value = 0;
-
-	pmeg = m_curr_segmap_masked[(offset >> 16) & 0xfff];
-	entry_index = pmeg | ((offset >> m_seg_entry_shift) & m_seg_entry_mask);
-	tmp = m_pagemap[entry_index].page | (offset & m_page_mask);
-	entry_value = page_entry_to_uint(entry_index);
+	const uint32_t pmeg = m_curr_segmap_masked[(offset >> 16) & 0xfff];
+	const uint32_t entry_index = pmeg | ((offset >> m_seg_entry_shift) & m_seg_entry_mask);
+	const uint32_t tmp = m_pagemap[entry_index].page | (offset & m_page_mask);
+	const uint32_t entry_value = page_entry_to_uint(entry_index);
 
 	if (m_page_valid[entry_index])
 	{
@@ -706,7 +701,7 @@ void sun4_mmu_base_device::l2p_command(const std::vector<std::string_view> &para
 	}
 	else
 	{
-		machine().debugger().console().printf("logical %08x points to an invalid PTE! (pmeg %d, entry %d PTE %08x)\n", addr, tmp << 2, pmeg, entry_index, entry_value);
+		machine().debugger().console().printf("logical %08x points to an invalid PTE! (tmp %08x, pmeg %d, entry %d PTE %08x)\n", addr, tmp << 2, pmeg, entry_index, entry_value);
 	}
 }
 
