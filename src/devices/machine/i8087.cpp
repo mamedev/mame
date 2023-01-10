@@ -154,17 +154,6 @@ static inline floatx80 floatx80_abs(floatx80 fx)
 	return fx;
 }
 
-static inline double fx80_to_double(floatx80 fx)
-{
-	uint64_t d = floatx80_to_float64(fx);
-	return *(double*)&d;
-}
-
-static inline floatx80 double_to_fx80(double in)
-{
-	return float64_to_floatx80(*(uint64_t*)&in);
-}
-
 DEFINE_DEVICE_TYPE(I8087, i8087_device, "i8087", "Intel 8087")
 
 i8087_device::i8087_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
