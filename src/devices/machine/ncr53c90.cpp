@@ -549,7 +549,7 @@ void ncr53c90_device::step(bool timeout)
 				break;
 
 			// if it's the last message byte, deassert ATN before sending
-			if (xfr_phase == S_PHASE_MSG_OUT && fifo_pos == 1)
+			if (xfr_phase == S_PHASE_MSG_OUT && ((!dma_command && fifo_pos == 1) || (dma_command && tcounter == 1)))
 				scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
 
 			send_byte();
