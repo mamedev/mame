@@ -48,6 +48,7 @@ Need For Speed Underground                       2005
 Operation Blockade                               200?
 Paradise Lost                                    2007
 Puck Off                                         2007
+Redline Rampage - Gas Guzzlers                   2014
 Sin                                              1999
 Sky Bandits                                      2008
 Split The Uprights                               200?
