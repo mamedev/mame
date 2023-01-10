@@ -465,7 +465,7 @@ void ncr53c90_device::step(bool timeout)
 			function_complete();
 			break;
 		}
-		if(c == CD_SELECT_ATN || c == CD_SELECT_ATN_STOP)
+		if(c == CD_SELECT_ATN)
 			scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
 		state = DISC_SEL_ATN_SEND_BYTE;
 		send_byte();
@@ -541,19 +541,23 @@ void ncr53c90_device::step(bool timeout)
 		switch(xfr_phase) {
 		case S_PHASE_DATA_OUT:
 		case S_PHASE_COMMAND:
-		case S_PHASE_MSG_OUT:
+		case S_PHASE_MSG_OUT: {
 			state = INIT_XFR_SEND_BYTE;
 
 			// can't send if the fifo is empty
 			if (fifo_pos == 0)
 				break;
 
+			// determine remaining bytes to transfer, accounting for fifo level plus potential incoming DMA bytes
+			int remaining_bytes = fifo_pos + (dma_command ? tcounter : 0);
+
 			// if it's the last message byte, deassert ATN before sending
-			if (xfr_phase == S_PHASE_MSG_OUT && ((!dma_command && fifo_pos == 1) || (dma_command && tcounter == 1)))
+			if (xfr_phase == S_PHASE_MSG_OUT && remaining_bytes == 1)
 				scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
 
 			send_byte();
 			break;
+		}
 
 		case S_PHASE_DATA_IN:
 		case S_PHASE_STATUS:
