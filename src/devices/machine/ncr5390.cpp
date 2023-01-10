@@ -465,7 +465,7 @@ void ncr5390_device::step(bool timeout)
 			function_complete();
 			break;
 		}
-		if(c == CD_SELECT_ATN)
+		if(c == CD_SELECT_ATN || c == CD_SELECT_ATN_STOP)
 			scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
 		state = DISC_SEL_ATN_SEND_BYTE;
 		send_byte();
@@ -474,7 +474,7 @@ void ncr5390_device::step(bool timeout)
 	case DISC_SEL_ATN_SEND_BYTE:
 		command_length--;
 		if(c == CD_SELECT_ATN_STOP) {
-			seq = 1;
+			seq = 2;
 			function_bus_complete();
 		} else {
 			state = DISC_SEL_WAIT_REQ;
@@ -549,7 +549,7 @@ void ncr5390_device::step(bool timeout)
 				break;
 
 			// if it's the last message byte, deassert ATN before sending
-			if (xfr_phase == S_PHASE_MSG_OUT && ((!dma_command && fifo_pos == 1) || (dma_command && tcounter == 1)))
+			if (xfr_phase == S_PHASE_MSG_OUT && fifo_pos == 1)
 				scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
 
 			send_byte();
@@ -622,7 +622,6 @@ void ncr5390_device::step(bool timeout)
 		// wait for dma transfer to complete or fifo to drain
 		if (dma_command && !(status & S_TC0) && fifo_pos)
 			break;
-
 		bus_complete();
 		break;
 
@@ -941,7 +940,7 @@ void ncr5390_device::start_command()
 		// arbirary 1 here makes InterPro happy. Also in the InterPro case (perhaps typical),
 		// after ACK is asserted the device disconnects and the INIT_MSG_WAIT_REQ state is never
 		// entered, meaning we end up with I_DISCONNECT instead of I_BUS interrupt status.
-		seq = 1;
+		seq = 2;
 		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
 		step(false);
 		break;
