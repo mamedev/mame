@@ -17,10 +17,9 @@ are on the PCB, but not used for sound.
 Noise source (used for explosion sound) is a zener diode, this is partially
 HLE'd, as I don't think MAME's netlist simulates that.
 
-Things to look out for when tweaking SOLVER frequency: Most notably the sweep
-sound when you fire (Load/Go switch in Go mode, simply press Fire to test).
-Small tweaks can alter the sound a lot, and it's hard to get everything right.
-At 165000, P2 beeps sound wrong, but overall it's pretty good.
+Things to look out for when tweaking solver minimum time step: Most notably the
+sweep sound when you fire (Load/Go switch in Go mode, simply press Fire to test).
+Small tweaks can alter the sound a lot, it's hard to get everything right.
 
 */
 
@@ -31,8 +30,11 @@ At 165000, P2 beeps sound wrong, but overall it's pretty good.
 
 NETLIST_START(bship)
 {
-	SOLVER(Solver, 165000)
+	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-7)
+	PARAM(Solver.DYNAMIC_TS, 1)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 4.82e-6)
+
 	ANALOG_INPUT(VBATT1, 9)
 	ANALOG_INPUT(VBATT2, 9)
 
