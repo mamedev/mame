@@ -1252,7 +1252,7 @@ project "bimg"
 	configuration { "mingw*" }
 		defines {
 			"ASTCENC_AVX=0",
-			"ASTCENC_SSE=2",
+			"ASTCENC_SSE=20",
 		}
 	configuration { }
 
