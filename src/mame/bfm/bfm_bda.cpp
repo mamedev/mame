@@ -186,17 +186,9 @@ void bfm_bda_device::blank(int data)
 	case 0x02:  // blank outside window
 		if (m_window_size > 0)
 		{
-			if ( m_window_start > 0 )
+			for (int i = 0; i < 15; i++)
 			{
-				for (int i = 0; i < m_window_start; i++)
-				{
-					m_attrs[i] = AT_BLANK;
-				}
-			}
-
-			if (m_window_end < 15 )
-			{
-				for (int i = m_window_end; i < 15- m_window_end ; i++)
+				if ((i < m_window_start) || (i > m_window_end))
 				{
 					m_attrs[i] = AT_BLANK;
 				}
@@ -311,21 +303,12 @@ int bfm_bda_device::write_char(int data)
 					case 0x02:  // clr outside window
 						if (m_window_size > 0)
 						{
-							if (m_window_start > 0)
+							for (int i = 0; i < 15; i++)
 							{
-								for (int i = 0; i < m_window_start; i++)
+								if ((i < m_window_start) || (i > m_window_end))
 								{
-									memset(m_chars+i,0,i);
-									memset(m_attrs+i,0,i);
-								}
-							}
-
-							if (m_window_end < 15)
-							{
-								for (int i = m_window_end; i < 15- m_window_end ; i++)
-								{
-									memset(m_chars+i,0,i);
-									memset(m_attrs+i,0,i);
+									memset(m_chars+i, 0 ,i);
+									memset(m_attrs+i, 0, i);
 								}
 							}
 						}
@@ -336,8 +319,9 @@ int bfm_bda_device::write_char(int data)
 						std::fill(std::begin(m_attrs), std::end(m_attrs), 0);
 					}
 					break;
-			}
-			break;
+				}
+				break;
+
 			case 0xc0:
 				if (data == 0xc8)
 				{
