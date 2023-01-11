@@ -1,9 +1,13 @@
 // license:CC0-1.0
 // copyright-holders:hap
+// thanks-to:=CO=Windler
 /*
 
 Electroplay Sound FX Phasor (hh_pic16.cpp)
 3-bit sound with volume envelope
+
+TODO:
+- transistors should be BC183
 
 */
 
@@ -45,9 +49,9 @@ NETLIST_START(sfxphasor)
 	DIODE(D3, "1N4002")
 	DIODE(D4, "1N4002")
 
-	QBJT_EB(T2, "2N3904") // BC183
-	QBJT_EB(T3, "2N3904") // BC183
-	QBJT_EB(T4, "2N3904") // BC183
+	QBJT_EB(T2, "2N3904") // BC183 NPN
+	QBJT_EB(T3, "2N3904") // BC183 NPN
+	QBJT_EB(T4, "2N3904") // BC183 NPN
 
 	// pin 10
 	NET_C(P10.Q, R7.1, C2.1)
