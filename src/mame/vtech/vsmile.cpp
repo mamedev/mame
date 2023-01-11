@@ -279,7 +279,7 @@ static INPUT_PORTS_START( vsmilem )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POWER_ON )
-	PORT_BIT( 0xBF, 0x00, IPT_UNUSED )
+	PORT_BIT( 0xbf, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
 /************************************
