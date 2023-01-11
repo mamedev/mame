@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, Farfetch'd
+// copyright-holders: David Haywood, Farfetch'd
+
 /*** DRIVER INFO & NOTES ******************************************************
  Speed Spin (c)1994 TCH
   driver by David Haywood & Farfetch'd
@@ -20,14 +21,6 @@ TODO:
   etc.
 
 ******************************************************************************/
-
-#include "emu.h"
-#include "speedspn.h"
-
-#include "cpu/z80/z80.h"
-#include "screen.h"
-#include "speaker.h"
-
 
 /*** README INFO **************************************************************
 
@@ -59,10 +52,188 @@ TCH-SS9.u34     "     /               AB2Bh
 
 ******************************************************************************/
 
+#include "emu.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "sound/okim6295.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+#include "tilemap.h"
+
+
+// configurable logging
+#define LOG_PRGBANK    (1U << 1)
+#define LOG_VIDRAMBANK (1U << 2)
+#define LOG_VIDEOFLAGS (1U << 3)
+
+//#define VERBOSE (LOG_GENERAL | LOG_PRGBANK | LOG_VIDRAMBANK | LOG_VIDEOFLAGS)
+
+#include "logmacro.h"
+
+#define LOGPRGBANK(...)    LOGMASKED(LOG_PRGBANK,    __VA_ARGS__)
+#define LOGVIDRAMBANK(...) LOGMASKED(LOG_VIDRAMBANK, __VA_ARGS__)
+#define LOGVIDEOFLAGS(...) LOGMASKED(LOG_VIDEOFLAGS, __VA_ARGS__)
+
+
+namespace {
+
+class speedspn_state : public driver_device
+{
+public:
+	speedspn_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_prgbank(*this, "prgbank"),
+		m_okibank(*this, "okibank"),
+		m_videoview(*this, "videoview"),
+		m_attram(*this, "attram"),
+		m_spriteram(*this, "spriteram"),
+		m_tileram(*this, "tileram")
+	{ }
+
+	void speedspn(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_memory_bank m_prgbank;
+	required_memory_bank m_okibank;
+	memory_view m_videoview;
+	required_shared_ptr<uint8_t> m_attram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_tileram;
+
+	tilemap_t *m_tilemap = nullptr;
+	bool m_display_disable = false;
+	uint8_t irq_ack_r();
+	void rombank_w(uint8_t data);
+	void tileram_w(offs_t offset, uint8_t data);
+	void attram_w(offs_t offset, uint8_t data);
+	void vidram_bank_w(uint8_t data);
+	void display_disable_w(uint8_t data);
+	void okibank_w(uint8_t data);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_io_map(address_map &map);
+	void oki_map(address_map &map);
+	void main_program_map(address_map &map);
+	void sound_map(address_map &map);
+};
+
+// video
+
+TILE_GET_INFO_MEMBER(speedspn_state::get_tile_info)
+{
+	int const code = m_tileram[tile_index * 2 + 1] | (m_tileram[tile_index * 2] << 8);
+	int const attr = m_attram[tile_index ^ 0x400];
+
+	tileinfo.set(0, code, attr & 0x3f, (attr & 0x80) ? TILE_FLIPX : 0);
+}
+
+void speedspn_state::video_start()
+{
+	m_display_disable = false;
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(speedspn_state::get_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+
+	save_item(NAME(m_display_disable));
+}
+
+void speedspn_state::tileram_w(offs_t offset, uint8_t data)
+{
+	m_tileram[offset] = data;
+
+	m_tilemap->mark_tile_dirty(offset / 2);
+}
+
+void speedspn_state::attram_w(offs_t offset, uint8_t data)
+{
+	m_attram[offset] = data;
+
+	m_tilemap->mark_tile_dirty(offset ^ 0x400);
+}
+
+void speedspn_state::vidram_bank_w(uint8_t data)
+{
+	LOGVIDRAMBANK("VidRam bank: %04x\n", data);
+	m_videoview.select(data & 1);
+}
+
+void speedspn_state::display_disable_w(uint8_t data)
+{
+	LOGVIDEOFLAGS("Global display: %u\n", data);
+	m_display_disable = data & 1;
+}
+
+
+void speedspn_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
+{
+	gfx_element *gfx = m_gfxdecode->gfx(1);
+	uint8_t *source = &m_spriteram[0];
+	uint8_t *finish = source + 0x1000;
+
+	while (source < finish)
+	{
+		int xpos = source[0];
+		int tileno = source[1];
+		int const attr = source[2];
+		int const ypos = source[3];
+
+		if (!attr && xpos) break; // end of sprite list marker?
+
+		if (attr & 0x10) xpos += 0x100;
+
+		xpos = 0x1f8 - xpos;
+		tileno += ((attr & 0xe0) >> 5) * 0x100;
+		int const color = attr & 0x0f;
+
+		gfx->transpen(bitmap, cliprect,
+				tileno,
+				color,
+				0, 0,
+				xpos, ypos, 15);
+
+		source += 4;
+	}
+}
+
+
+uint32_t speedspn_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (m_display_disable)
+	{
+		bitmap.fill(m_palette->black_pen(), cliprect);
+		return 0;
+	}
+
+	m_tilemap->set_scrollx(0, 0x100); // verify
+	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect);
+	return 0;
+}
+
+
+// machine
+
 uint8_t speedspn_state::irq_ack_r()
 {
 	// I think this simply acknowledges the IRQ #0, it's read within the handler and the
-	//  value is discarded
+	// value is discarded
+
 	return 0;
 }
 
@@ -70,19 +241,13 @@ void speedspn_state::rombank_w(uint8_t data)
 {
 	if (data > 8)
 	{
-		popmessage ("Unmapped Bank Write %02x", data);
+		LOGPRGBANK("Unmapped bank write %02x", data);
 		data = 0;
 	}
 	m_prgbank->set_entry(data);
 }
 
 /*** SOUND RELATED ***********************************************************/
-
-void speedspn_state::sound_w(uint8_t data)
-{
-	m_soundlatch->write(data);
-	m_audiocpu->set_input_line(0, HOLD_LINE);
-}
 
 void speedspn_state::okibank_w(uint8_t data)
 {
@@ -91,48 +256,50 @@ void speedspn_state::okibank_w(uint8_t data)
 
 /*** MEMORY MAPS *************************************************************/
 
-/* main cpu */
+// main CPU
 
-void speedspn_state::program_map(address_map &map)
+void speedspn_state::main_program_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x87ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); /* RAM COLOUR */
-	map(0x8800, 0x8fff).ram().w(FUNC(speedspn_state::attram_w)).share("attram");
-	map(0x9000, 0x9fff).rw(FUNC(speedspn_state::vidram_r), FUNC(speedspn_state::vidram_w));  /* RAM FIX / RAM OBJECTS (selected by bit 0 of port 17) */
+	map(0x8000, 0x87ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette"); // RAM COLOUR
+	map(0x8800, 0x8fff).ram().w(FUNC(speedspn_state::attram_w)).share(m_attram);
+	map(0x9000, 0x9fff).view(m_videoview); // RAM FIX / RAM OBJECTS (selected by bit 0 of port 17)
+	m_videoview[0](0x9000, 0x9fff).ram().w(FUNC(speedspn_state::tileram_w)).share(m_tileram);
+	m_videoview[1](0x9000, 0x9fff).ram().share(m_spriteram);
 	map(0xa000, 0xa7ff).ram();
 	map(0xa800, 0xafff).ram();
-	map(0xb000, 0xbfff).ram();                                             /* RAM PROGRAM */
-	map(0xc000, 0xffff).bankr("prgbank");                              /* banked ROM */
+	map(0xb000, 0xbfff).ram(); // RAM PROGRAM
+	map(0xc000, 0xffff).bankr(m_prgbank);
 }
 
-void speedspn_state::io_map(address_map &map)
+void speedspn_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x07, 0x07).w(FUNC(speedspn_state::display_disable_w));
 	map(0x10, 0x10).portr("SYSTEM");
 	map(0x11, 0x11).portr("P1");
 	map(0x12, 0x12).portr("P2").w(FUNC(speedspn_state::rombank_w));
-	map(0x13, 0x13).portr("DSW1").w(FUNC(speedspn_state::sound_w));
+	map(0x13, 0x13).portr("DSW1").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x14, 0x14).portr("DSW2");
 	map(0x16, 0x16).r(FUNC(speedspn_state::irq_ack_r)); // @@@ could be watchdog, value is discarded
 	map(0x17, 0x17).w(FUNC(speedspn_state::vidram_bank_w));
 }
 
-/* sound cpu */
+// sound CPU
 
 void speedspn_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
 	map(0x9000, 0x9000).w(FUNC(speedspn_state::okibank_w));
-	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x9800, 0x9800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
 }
 
 void speedspn_state::oki_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
-	map(0x20000, 0x3ffff).bankr("okibank");
+	map(0x20000, 0x3ffff).bankr(m_okibank);
 }
 
 /*** INPUT PORT **************************************************************/
@@ -255,15 +422,15 @@ static const gfx_layout speedspn_spritelayout =
 
 
 static GFXDECODE_START( gfx_speedspn )
-	GFXDECODE_ENTRY( "gfx1", 0, speedspn_charlayout,   0x000, 0x40 )
-	GFXDECODE_ENTRY( "gfx2", 0, speedspn_spritelayout, 0x000, 0x40 )
+	GFXDECODE_ENTRY( "tiles",   0, speedspn_charlayout,   0x000, 0x40 )
+	GFXDECODE_ENTRY( "sprites", 0, speedspn_spritelayout, 0x000, 0x40 )
 GFXDECODE_END
 
 /*** MACHINE DRIVER **********************************************************/
 
 void speedspn_state::machine_start()
 {
-	/* is this weird banking some form of protection? */
+	// is this weird banking some form of protection? TODO: 0x20000 isn't empty but isn't banked anywhere?
 	uint8_t *rom = memregion("maincpu")->base();
 	m_prgbank->configure_entry(0, &rom[0x28000]);
 	m_prgbank->configure_entry(1, &rom[0x14000]);
@@ -283,16 +450,16 @@ void speedspn_state::machine_start()
 
 void speedspn_state::speedspn(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 6000000);      /* 6 MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &speedspn_state::program_map);
-	m_maincpu->set_addrmap(AS_IO, &speedspn_state::io_map);
+	// basic machine hardware
+	Z80(config, m_maincpu, 12_MHz_XTAL / 2); // 6 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &speedspn_state::main_program_map);
+	m_maincpu->set_addrmap(AS_IO, &speedspn_state::main_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(speedspn_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 6000000);        /* 6 MHz */
+	Z80(config, m_audiocpu, 12_MHz_XTAL / 2); // 6 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &speedspn_state::sound_map);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -304,40 +471,40 @@ void speedspn_state::speedspn(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_speedspn);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x400);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	OKIM6295(config, m_oki, 1122000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
-	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
-	m_oki->set_addrmap(0, &speedspn_state::oki_map);
+	okim6295_device &oki(OKIM6295(config, "oki", 1'122'000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
+	oki.set_addrmap(0, &speedspn_state::oki_map);
 }
 
 /*** ROM LOADING *************************************************************/
 
 ROM_START( speedspn )
-	ROM_REGION( 0x080000, "maincpu", 0 )    /* CPU1 code */
-	/* most of this is probably actually banked */
-	ROM_LOAD( "tch-ss1.u78", 0x00000, 0x080000, CRC(41b6b45b) SHA1(d969119959db4cc3be50f188bfa41e4b4896eaca) )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "tch-ss1.u78", 0x00000, 0x80000, CRC(41b6b45b) SHA1(d969119959db4cc3be50f188bfa41e4b4896eaca) ) // banked
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* CPU2 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "tch-ss2.u96", 0x00000, 0x10000, CRC(4611fd0c) SHA1(b49ad6a8be6ccfef0b2ed187fb3b008fb7eeb2b5) ) // FIRST AND SECOND HALF IDENTICAL
 
-	ROM_REGION( 0x080000, "oki", 0 )  /* Samples */
-	ROM_LOAD( "tch-ss3.u95", 0x00000, 0x080000, CRC(1c9deb5e) SHA1(89f01a8e8bdb0eee47e9195b312d2e65d41d3548) )
+	ROM_REGION( 0x80000, "oki", 0 )  // samples, banked
+	ROM_LOAD( "tch-ss3.u95", 0x00000, 0x80000, CRC(1c9deb5e) SHA1(89f01a8e8bdb0eee47e9195b312d2e65d41d3548) )
 
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT ) /* GFX */
-	ROM_LOAD( "tch-ss4.u70", 0x00000, 0x020000, CRC(41517859) SHA1(3c5102e41c5a70e02ed88ea43ca63edf13f4c1b9) )
-	ROM_LOAD( "tch-ss5.u69", 0x20000, 0x020000, CRC(832b2f34) SHA1(7a3060869a9698c9ed4187b239a70e273de64e3c) )
-	ROM_LOAD( "tch-ss6.u60", 0x40000, 0x020000, CRC(f1fd7289) SHA1(8950ef58efdffc45d68152257ca36aedf5ddf677) )
-	ROM_LOAD( "tch-ss7.u59", 0x60000, 0x020000, CRC(c4958543) SHA1(c959b440801707c30a8968a1f44abe5442d03eff) )
+	ROM_REGION( 0x80000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "tch-ss4.u70", 0x00000, 0x20000, CRC(41517859) SHA1(3c5102e41c5a70e02ed88ea43ca63edf13f4c1b9) )
+	ROM_LOAD( "tch-ss5.u69", 0x20000, 0x20000, CRC(832b2f34) SHA1(7a3060869a9698c9ed4187b239a70e273de64e3c) )
+	ROM_LOAD( "tch-ss6.u60", 0x40000, 0x20000, CRC(f1fd7289) SHA1(8950ef58efdffc45d68152257ca36aedf5ddf677) )
+	ROM_LOAD( "tch-ss7.u59", 0x60000, 0x20000, CRC(c4958543) SHA1(c959b440801707c30a8968a1f44abe5442d03eff) )
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_INVERT ) /* GFX */
-	ROM_LOAD( "tch-ss8.u39", 0x00000, 0x020000, CRC(2f27b16d) SHA1(7cc017fa08573f8a9d94d017abb987f8288bcd29) )
-	ROM_LOAD( "tch-ss9.u34", 0x20000, 0x020000, CRC(c372f8ec) SHA1(514bef0859c0adfd9cdd22864230fc83e9b1962d) )
+	ROM_REGION( 0x40000, "sprites", ROMREGION_INVERT )
+	ROM_LOAD( "tch-ss8.u39", 0x00000, 0x20000, CRC(2f27b16d) SHA1(7cc017fa08573f8a9d94d017abb987f8288bcd29) )
+	ROM_LOAD( "tch-ss9.u34", 0x20000, 0x20000, CRC(c372f8ec) SHA1(514bef0859c0adfd9cdd22864230fc83e9b1962d) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*** GAME DRIVERS ************************************************************/
