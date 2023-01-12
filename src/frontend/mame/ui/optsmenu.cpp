@@ -71,7 +71,7 @@ void menu_simple_game_options::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void menu_simple_game_options::populate(float &customtop, float &custombottom)
+void menu_simple_game_options::populate()
 {
 	item_append(_(submenu::video_options()[0].description), 0, (void *)(uintptr_t)DISPLAY_MENU);
 	item_append(_("Sound Options"), 0, (void *)(uintptr_t)SOUND_MENU);
@@ -85,8 +85,6 @@ void menu_simple_game_options::populate(float &customtop, float &custombottom)
 	item_append(_("Input Devices"), 0, (void *)(uintptr_t)INPUTDEV_MENU);
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Save Settings"), 0, (void *)(uintptr_t)SAVE_CONFIG);
-
-	custombottom = 2.0f * line_height() + 3.0f * tb_border();
 }
 
 //-------------------------------------------------
@@ -174,7 +172,7 @@ void menu_game_options::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void menu_game_options::populate(float &customtop, float &custombottom)
+void menu_game_options::populate()
 {
 	// set filter arrow
 	std::string fbuff;
@@ -198,7 +196,7 @@ void menu_game_options::populate(float &customtop, float &custombottom)
 	item_append(_("Configure Folders"), 0, (void *)(uintptr_t)CONF_DIR);
 
 	// add the options that don't relate to the UI
-	menu_simple_game_options::populate(customtop, custombottom);
+	menu_simple_game_options::populate();
 }
 
 //-------------------------------------------------

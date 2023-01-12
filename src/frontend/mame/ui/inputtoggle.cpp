@@ -35,7 +35,7 @@ void menu_input_toggles::menu_activated()
 }
 
 
-void menu_input_toggles::populate(float &customtop, float &custombottom)
+void menu_input_toggles::populate()
 {
 	// find toggle fields
 	if (m_fields.empty())

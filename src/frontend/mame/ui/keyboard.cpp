@@ -35,7 +35,7 @@ void menu_keyboard_mode::menu_activated()
 	reset(reset_options::REMEMBER_POSITION);
 }
 
-void menu_keyboard_mode::populate(float &customtop, float &custombottom)
+void menu_keyboard_mode::populate()
 {
 	natural_keyboard &natkbd(machine().natkeyboard());
 

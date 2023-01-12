@@ -89,7 +89,7 @@ void menu_confswitch::menu_activated()
 }
 
 
-void menu_confswitch::populate(float &customtop, float &custombottom)
+void menu_confswitch::populate()
 {
 	// locate relevant fields if necessary
 	if (m_fields.empty())
@@ -320,6 +320,18 @@ menu_settings_dip_switches::~menu_settings_dip_switches()
 }
 
 
+void menu_settings_dip_switches::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu_confswitch::recompute_metrics(width, height, aspect);
+
+	set_custom_space(
+			0.0f,
+			m_visible_switch_groups
+				? ((m_visible_switch_groups * (DIP_SWITCH_HEIGHT * line_height())) + ((m_visible_switch_groups - 1) * (DIP_SWITCH_SPACING * line_height())) + (tb_border() * 3.0f))
+				: 0.0f);
+}
+
+
 void menu_settings_dip_switches::custom_render(void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
 {
 	// catch if no DIP locations have to be drawn
@@ -470,10 +482,10 @@ bool menu_settings_dip_switches::custom_mouse_down()
 }
 
 
-void menu_settings_dip_switches::populate(float &customtop, float &custombottom)
+void menu_settings_dip_switches::populate()
 {
 	// let the base class add items
-	menu_confswitch::populate(customtop, custombottom);
+	menu_confswitch::populate();
 
 	// use up to about 70% of height for DIP switch display
 	if (active_switch_groups())
@@ -485,12 +497,12 @@ void menu_settings_dip_switches::populate(float &customtop, float &custombottom)
 			m_visible_switch_groups = unsigned(0.7f / (groupheight + groupspacing));
 		else
 			m_visible_switch_groups = active_switch_groups();
-		custombottom = (m_visible_switch_groups * groupheight) + ((m_visible_switch_groups - 1) * groupspacing) + (tb_border() * 3.0f);
+		set_custom_space(0.0f, (m_visible_switch_groups * groupheight) + ((m_visible_switch_groups - 1) * groupspacing) + (tb_border() * 3.0f));
 	}
 	else
 	{
 		m_visible_switch_groups = 0U;
-		custombottom = 0.0f;
+		set_custom_space(0.0f, 0.0f);
 	}
 }
 

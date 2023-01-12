@@ -25,7 +25,7 @@ public:
 	virtual ~menu_tape_control() override;
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	static void get_time_string(std::string &dest, cassette_image_device *cassette, int *curpos, int *endpos);

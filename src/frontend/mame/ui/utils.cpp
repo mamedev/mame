@@ -403,7 +403,7 @@ private:
 			ADD_FILTER
 		};
 
-		virtual void populate(float &customtop, float &custombottom) override;
+		virtual void populate() override;
 		virtual void handle(event const *ev) override;
 
 		bool set_filter_type(unsigned pos, typename Base::type n)
@@ -529,7 +529,7 @@ void composite_filter_impl_base<Impl, Base, Type>::show_ui(
 
 
 template <class Impl, class Base, typename Base::type Type>
-void composite_filter_impl_base<Impl, Base, Type>::menu_configure::populate(float &customtop, float &custombottom)
+void composite_filter_impl_base<Impl, Base, Type>::menu_configure::populate()
 {
 	// add items for each active filter
 	unsigned i = 0;
@@ -995,7 +995,7 @@ private:
 			INCLUDE_CLONES
 		};
 
-		virtual void populate(float &customtop, float &custombottom) override;
+		virtual void populate() override;
 		virtual void handle(event const *ev) override;
 
 		category_machine_filter &m_parent;
@@ -1047,7 +1047,7 @@ void category_machine_filter::show_ui(mame_ui_manager &mui, render_container &co
 }
 
 
-void category_machine_filter::menu_configure::populate(float &customtop, float &custombottom)
+void category_machine_filter::menu_configure::populate()
 {
 	inifile_manager const &mgr(mame_machine_manager::instance()->inifile());
 	unsigned const filecnt(mgr.get_file_count());

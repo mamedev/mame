@@ -74,6 +74,14 @@ menu_audit::~menu_audit()
 }
 
 
+void menu_audit::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	set_custom_space(0.0F, (line_height() * 1.0F) + (tb_border() * 3.0F));
+}
+
+
 void menu_audit::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
 {
 	switch (m_phase)
@@ -107,7 +115,7 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 					container(),
 					std::move(text).str(),
 					text_layout::text_justify::CENTER,
-					0.5f, 0.5f,
+					0.5F, 0.5F,
 					ui().colors().background_color());
 		}
 		break;
@@ -120,7 +128,7 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 					ui().get_general_input_setting(IPT_UI_SELECT),
 					ui().get_general_input_setting(IPT_UI_CANCEL)),
 				text_layout::text_justify::CENTER,
-				0.5f, 0.5f,
+				0.5F, 0.5F,
 				UI_RED_COLOR);
 		break;
 	}
@@ -133,13 +141,12 @@ bool menu_audit::custom_ui_cancel()
 }
 
 
-void menu_audit::populate(float &customtop, float &custombottom)
+void menu_audit::populate()
 {
 	if (m_unavailable && (m_availablesorted.size() != m_unavailable))
 		item_append(util::string_format(_("Audit media for %1$u systems marked unavailable"), m_unavailable), 0, ITEMREF_START_FAST);
 	item_append(util::string_format(_("Audit media for all %1$u systems"), m_availablesorted.size()), 0, ITEMREF_START_FULL);
 	item_append(menu_item_type::SEPARATOR, 0);
-	custombottom = (line_height() * 1.0f) + (tb_border() * 3.0f);
 }
 
 void menu_audit::handle(event const *ev)

@@ -32,7 +32,7 @@ public:
 	virtual ~menu_plugin();
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	std::vector<std::string> &m_plugins;
@@ -48,7 +48,7 @@ protected:
 	virtual bool custom_ui_cancel() override { return true; }
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	std::string const m_menu;

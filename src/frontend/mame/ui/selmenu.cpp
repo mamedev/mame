@@ -172,7 +172,7 @@ public:
 	virtual ~software_parts() override;
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	ui_software_info const &m_uiinfo;
@@ -189,7 +189,7 @@ public:
 private:
 	bios_selection(mame_ui_manager &mui, render_container &container, s_bios &&biosname, void const *driver, bool software, bool inlist);
 
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	void const  *m_driver;
@@ -280,7 +280,7 @@ menu_select_launch::software_parts::~software_parts()
 //  populate
 //-------------------------------------------------
 
-void menu_select_launch::software_parts::populate(float &customtop, float &custombottom)
+void menu_select_launch::software_parts::populate()
 {
 	std::vector<s_parts::const_iterator> parts;
 	parts.reserve(m_parts.size());
@@ -350,7 +350,7 @@ menu_select_launch::bios_selection::~bios_selection()
 //  populate
 //-------------------------------------------------
 
-void menu_select_launch::bios_selection::populate(float &customtop, float &custombottom)
+void menu_select_launch::bios_selection::populate()
 {
 	for (auto &elem : m_bios)
 		item_append(elem.first, 0, (void *)&elem.first);

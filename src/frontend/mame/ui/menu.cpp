@@ -374,6 +374,18 @@ void menu::item_append_on_off(const std::string &text, bool state, uint32_t flag
 
 
 //-------------------------------------------------
+//  set_custom_space - set space required for
+//  custom rendering above and below menu
+//-------------------------------------------------
+
+void menu::set_custom_space(float top, float bottom)
+{
+	m_customtop = top;
+	m_custombottom = bottom;
+}
+
+
+//-------------------------------------------------
 //  process - process a menu, drawing it
 //  and returning any interesting events
 //-------------------------------------------------
@@ -1260,7 +1272,7 @@ void menu::do_handle()
 				item_append(_("Return to Previous Menu"), 0, nullptr);
 
 			// let implementation add other items
-			populate(m_customtop, m_custombottom);
+			populate();
 		}
 		catch (...)
 		{
