@@ -7,19 +7,15 @@ Milton Bradley Electronic Battleship model 4750A (hh_tms1k.cpp)
 
 TODO:
 - OPENDRAIN parameters are not fully known
-- Q2 should be a 2N3703
+- Q2 should be a 2N3703 (same, just different max voltage)
 - D6 should be a 1K60? (germanium, type unknown, but looks like 1K60)
 - move 1N754A to netlist library?
 
-There are no labels on the PCB for the components. The commented-out ones
-are on the PCB, but not used for sound.
+There are no labels on the PCB for the components. The commented-out ones are
+on the PCB, but not used for sound.
 
 Noise source (used for explosion sound) is a zener diode, this is partially
 HLE'd, as I don't think MAME's netlist simulates that.
-
-Things to look out for when tweaking solver minimum time step: Most notably the
-sweep sound when you fire (Load/Go switch in Go mode, simply press Fire to test).
-Small tweaks can alter the sound a lot, it's hard to get everything right.
 
 */
 
@@ -33,7 +29,7 @@ NETLIST_START(bship)
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-7)
 	PARAM(Solver.DYNAMIC_TS, 1)
-	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 4.82e-6)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-6)
 
 	ANALOG_INPUT(VBATT1, 9)
 	ANALOG_INPUT(VBATT2, 9)
