@@ -1850,6 +1850,16 @@ public:
 					SDL_GameControllerGetProduct(ctrl),
 					SDL_GameControllerGetProductVersion(ctrl),
 					serial ? serial : "<nullptr>");
+			char *const mapping = SDL_GameControllerMapping(ctrl);
+			if (mapping)
+			{
+				osd_printf_verbose("Game Controller:   ...  mapping [%s]\n", mapping);
+				SDL_free(mapping);
+			}
+			else
+			{
+				osd_printf_verbose("Game Controller:   ...  no mapping\n");
+			}
 
 			devinfo->configure();
 		}
@@ -1862,7 +1872,7 @@ public:
 
 		sdl_event_manager::instance().subscribe(event_types, this);
 
-		osd_printf_verbose("Joystick: End initialization\n");
+		osd_printf_verbose("Game Controller: End initialization\n");
 	}
 
 	virtual void handle_event(SDL_Event &sdlevent) override
