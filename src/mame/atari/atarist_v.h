@@ -29,10 +29,10 @@
 #define ATARIST_VBDEND_NTSC     34
 #define ATARIST_VBDSTART_NTSC   234
 
-class st_video_device : public device_t, public device_palette_interface, public device_video_interface
+class stx_video_device : public device_t, public device_palette_interface, public device_video_interface
 {
 public:
-	st_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	stx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename T> void set_ram_space(T &&tag, int spacenum) { m_ram_space.set_tag(tag, spacenum); }
 	auto de_callback() { return m_de_callback.bind(); }
@@ -51,7 +51,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	st_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	stx_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
@@ -101,7 +101,7 @@ protected:
 	int m_shifter_vblank_start = 0;
 };
 
-class ste_video_device : public st_video_device
+class ste_video_device : public stx_video_device
 {
 public:
 	ste_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -126,7 +126,7 @@ private:
 	uint8_t m_shifter_pixelofs = 0U;
 };
 
-DECLARE_DEVICE_TYPE(ST_VIDEO, st_video_device)
+DECLARE_DEVICE_TYPE(STX_VIDEO, stx_video_device)
 DECLARE_DEVICE_TYPE(STE_VIDEO, ste_video_device)
 //DECLARE_DEVICE_TYPE(STBOOK_VIDEO, stbook_video_device)
 //DECLARE_DEVICE_TYPE(TT_VIDEO, tt_video_device)

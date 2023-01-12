@@ -6,6 +6,7 @@
 #include "atarist_v.h"
 #include "stkbd.h"
 #include "stmmu.h"
+#include "stvideo.h"
 
 #include "bus/centronics/ctronics.h"
 #include "bus/generic/slot.h"
@@ -118,6 +119,7 @@ public:
 			m_config(*this, "config"),
 			m_monochrome(1),
 			m_video(*this, "video"),
+			m_videox(*this, "videox"),
 			m_screen(*this, "screen")
 	{ }
 
@@ -151,7 +153,8 @@ protected:
 	static void floppy_formats(format_registration &fr);
 
 	int m_monochrome;
-	required_device<st_video_device> m_video;
+	optional_device<st_video_device> m_video;
+	optional_device<stx_video_device> m_videox;
 	required_device<screen_device> m_screen;
 
 	void common(machine_config &config);
@@ -800,14 +803,12 @@ void st_state::st_super_map(address_map &map)
 	//map(0xfa0000, 0xfbffff)      // mapped by the cartslot
 	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0);
 	map(0xfc0000, 0xfeffff).before_delay(NAME([](offs_t) { return 64; })).w(m_maincpu, FUNC(m68000_device::berr_w));
+
+	// Do a bus error if nothing answers
+	map(0xff0000, 0xffffff).before_delay(NAME([](offs_t) { return 64; })).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
+
 	map(0xff8000, 0xff8fff).m(m_mmu, FUNC(st_mmu_device::map));
-
-	map(0xff8200, 0xff8203).rw(m_video, FUNC(st_video_device::shifter_base_r), FUNC(st_video_device::shifter_base_w)).umask16(0x00ff);
-	map(0xff8204, 0xff8209).r(m_video, FUNC(st_video_device::shifter_counter_r)).umask16(0x00ff);
-	map(0xff820a, 0xff820a).rw(m_video, FUNC(st_video_device::shifter_sync_r), FUNC(st_video_device::shifter_sync_w));
-	map(0xff8240, 0xff825f).rw(m_video, FUNC(st_video_device::shifter_palette_r), FUNC(st_video_device::shifter_palette_w));
-	map(0xff8260, 0xff8260).rw(m_video, FUNC(st_video_device::shifter_mode_r), FUNC(st_video_device::shifter_mode_w));
-
+	map(0xff8000, 0xff8fff).m(m_video, FUNC(st_video_device::map));
 	map(0xff8800, 0xff8800).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0xfc);
 	map(0xff8802, 0xff8802).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w)).mirror(0xfc);
 
@@ -842,11 +843,14 @@ void st_state::megast_super_map(address_map &map)
 	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0);
 //  map(0xff7f30, 0xff7f31).rw(m_stb, FUNC(st_blitter_device::dst_inc_y_r), FUNC(st_blitter_device::dst_inc_y_w) // for TOS 1.02
 	map(0xff8000, 0xff8fff).m(m_mmu, FUNC(st_mmu_device::map));
-	map(0xff8200, 0xff8203).rw(m_video, FUNC(st_video_device::shifter_base_r), FUNC(st_video_device::shifter_base_w)).umask16(0x00ff);
-	map(0xff8204, 0xff8209).r(m_video, FUNC(st_video_device::shifter_counter_r)).umask16(0x00ff);
-	map(0xff820a, 0xff820a).rw(m_video, FUNC(st_video_device::shifter_sync_r), FUNC(st_video_device::shifter_sync_w));
-	map(0xff8240, 0xff825f).rw(m_video, FUNC(st_video_device::shifter_palette_r), FUNC(st_video_device::shifter_palette_w));
-	map(0xff8260, 0xff8260).rw(m_video, FUNC(st_video_device::shifter_mode_r), FUNC(st_video_device::shifter_mode_w));
+	map(0xff8000, 0xff8fff).m(m_video, FUNC(st_video_device::map));
+#if 0
+	map(0xff8200, 0xff8203).rw(m_videox, FUNC(stx_video_device::shifter_base_r), FUNC(stx_video_device::shifter_base_w)).umask16(0x00ff);
+	map(0xff8204, 0xff8209).r(m_videox, FUNC(stx_video_device::shifter_counter_r)).umask16(0x00ff);
+	map(0xff820a, 0xff820a).rw(m_videox, FUNC(stx_video_device::shifter_sync_r), FUNC(stx_video_device::shifter_sync_w));
+	map(0xff8240, 0xff825f).rw(m_videox, FUNC(stx_video_device::shifter_palette_r), FUNC(stx_video_device::shifter_palette_w));
+	map(0xff8260, 0xff8260).rw(m_videox, FUNC(stx_video_device::shifter_mode_r), FUNC(stx_video_device::shifter_mode_w));
+#endif
 	map(0xff8800, 0xff8800).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0xff8802, 0xff8802).w(YM2149_TAG, FUNC(ay8910_device::data_w));
 	map(0xff8a00, 0xff8a1f).rw(m_stb, FUNC(st_blitter_device::halftone_r), FUNC(st_blitter_device::halftone_w));
@@ -875,8 +879,17 @@ void st_state::megast_super_map(address_map &map)
 
 void ste_state::ste_super_map(address_map &map)
 {
-	st_super_map(map);
+	// Ram mapped by the mmu
+	map.unmap_value_high();
+	map(0x000000, 0x000007).rom().region(M68000_TAG, 0);
+	map(0x000000, 0x000007).before_delay(NAME([](offs_t) { return 64; })).w(m_maincpu, FUNC(m68000_device::berr_w));
+	map(0x400000, 0xf9ffff).before_delay(NAME([](offs_t) { return 64; })).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
+	//map(0xfa0000, 0xfbffff)      // mapped by the cartslot
 	map(0xe00000, 0xe3ffff).rom().region(M68000_TAG, 0);
+
+	map(0xff8000, 0xff8fff).m(m_mmu, FUNC(st_mmu_device::map));
+	map(0xff8800, 0xff8800).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0xfc);
+	map(0xff8802, 0xff8802).rw(YM2149_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w)).mirror(0xfc);
 	map(0xff8901, 0xff8901).rw(FUNC(ste_state::sound_dma_control_r), FUNC(ste_state::sound_dma_control_w));
 	map(0xff8902, 0xff8907).rw(FUNC(ste_state::sound_dma_base_r), FUNC(ste_state::sound_dma_base_w)).umask16(0x00ff);
 	map(0xff8908, 0xff890d).r(FUNC(ste_state::sound_dma_counter_r)).umask16(0x00ff);
@@ -904,6 +917,9 @@ void ste_state::ste_super_map(address_map &map)
 	map(0xff9216, 0xff9217).portr("PADDLE1Y");
 	map(0xff9220, 0xff9221).portr("GUNX");
 	map(0xff9222, 0xff9223).portr("GUNY");
+	map(0xfffa00, 0xfffa3f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
+	map(0xfffc00, 0xfffc03).rw(m_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
+	map(0xfffc04, 0xfffc07).rw(m_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
 }
 
 
@@ -913,16 +929,6 @@ void ste_state::ste_super_map(address_map &map)
 
 void megaste_state::megaste_super_map(address_map &map)
 {
-	megast_super_map(map);
-	map(0xe00000, 0xe3ffff).rom().region(M68000_TAG, 0);
-	map(0xff8c80, 0xff8c87).rw(Z8530_TAG, FUNC(scc8530_legacy_device::reg_r), FUNC(scc8530_legacy_device::reg_w)).umask16(0x00ff);
-	map(0xff8901, 0xff8901).rw(FUNC(megaste_state::sound_dma_control_r), FUNC(megaste_state::sound_dma_control_w));
-	map(0xff8902, 0xff8907).rw(FUNC(megaste_state::sound_dma_base_r), FUNC(megaste_state::sound_dma_base_w)).umask16(0x00ff);
-	map(0xff8908, 0xff890d).r(FUNC(megaste_state::sound_dma_counter_r)).umask16(0x00ff);
-	map(0xff890e, 0xff8913).rw(FUNC(megaste_state::sound_dma_end_r), FUNC(megaste_state::sound_dma_end_w)).umask16(0x00ff);
-	map(0xff8921, 0xff8921).rw(FUNC(megaste_state::sound_mode_r), FUNC(megaste_state::sound_mode_w));
-	map(0xff8922, 0xff8923).rw(FUNC(megaste_state::microwire_data_r), FUNC(megaste_state::microwire_data_w));
-	map(0xff8924, 0xff8925).rw(FUNC(megaste_state::microwire_mask_r), FUNC(megaste_state::microwire_mask_w));
 }
 
 
@@ -940,15 +946,15 @@ void stbook_state::stbook_map(address_map &map)
 	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0);
 /*  map(0xf00000, 0xf1ffff).rw(FUNC(stbook_state::stbook_ide_r), FUNC(stbook_state::stbook_ide_w));
     map(0xff8000, 0xff8001).rw(FUNC(stbook_state::stbook_mmu_r), FUNC(stbook_state::stbook_mmu_w));
-    map(0xff8200, 0xff8203).rw(m_video, FUNC(stbook_video_device::stbook_shifter_base_r), FUNC(stbook_video_device::stbook_shifter_base_w));
-    map(0xff8204, 0xff8209).rw(m_video, FUNC(stbook_video_device::stbook_shifter_counter_r), FUNC(stbook_video_device::stbook_shifter_counter_w));
-    map(0xff820a, 0xff820a).rw(m_video, FUNC(stbook_video_device::stbook_shifter_sync_r), FUNC(stbook_video_device::stbook_shifter_sync_w));
-    map(0xff820c, 0xff820d).rw(m_video, FUNC(stbook_video_device::stbook_shifter_base_low_r), FUNC(stbook_video_device::stbook_shifter_base_low_w));
-    map(0xff820e, 0xff820f).rw(m_video, FUNC(stbook_video_device::stbook_shifter_lineofs_r), FUNC(stbook_video_device::stbook_shifter_lineofs_w));
-    map(0xff8240, 0xff8241).rw(m_video, FUNC(stbook_video_device::stbook_shifter_palette_r), FUNC(stbook_video_device::stbook_shifter_palette_w));
-    map(0xff8260, 0xff8260).rw(m_video, FUNC(stbook_video_device::stbook_shifter_mode_r), FUNC(stbook_video_device::stbook_shifter_mode_w));
-    map(0xff8264, 0xff8265).rw(m_video, FUNC(stbook_video_device::stbook_shifter_pixelofs_r), FUNC(stbook_video_device::stbook_shifter_pixelofs_w));
-    map(0xff827e, 0xff827f).w(m_video, FUNC(stbook_video_device::lcd_control_w));*/
+    map(0xff8200, 0xff8203).rw(m_videox, FUNC(stbook_video_device::stbook_shifter_base_r), FUNC(stbook_video_device::stbook_shifter_base_w));
+    map(0xff8204, 0xff8209).rw(m_videox, FUNC(stbook_video_device::stbook_shifter_counter_r), FUNC(stbook_video_device::stbook_shifter_counter_w));
+    map(0xff820a, 0xff820a).rw(m_videox, FUNC(stbook_video_device::stbook_shifter_sync_r), FUNC(stbook_video_device::stbook_shifter_sync_w));
+    map(0xff820c, 0xff820d).rw(m_videox, FUNC(stbook_video_device::stbook_shifter_base_low_r), FUNC(stbook_video_device::stbook_shifter_base_low_w));
+    map(0xff820e, 0xff820f).rw(m_videox, FUNC(stbook_video_device::stbook_shifter_lineofs_r), FUNC(stbook_video_device::stbook_shifter_lineofs_w));
+    map(0xff8240, 0xff8241).rw(m_videox, FUNC(stbook_video_device::stbook_shifter_palette_r), FUNC(stbook_video_device::stbook_shifter_palette_w));
+    map(0xff8260, 0xff8260).rw(m_videox, FUNC(stbook_video_device::stbook_shifter_mode_r), FUNC(stbook_video_device::stbook_shifter_mode_w));
+    map(0xff8264, 0xff8265).rw(m_videox, FUNC(stbook_video_device::stbook_shifter_pixelofs_r), FUNC(stbook_video_device::stbook_shifter_pixelofs_w));
+    map(0xff827e, 0xff827f).w(m_videox, FUNC(stbook_video_device::lcd_control_w));*/
 	map(0xff8800, 0xff8800).rw(YM3439_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0xff8802, 0xff8802).w(YM3439_TAG, FUNC(ay8910_device::data_w));
 /*  map(0xff8901, 0xff8901).rw(FUNC(stbook_state::sound_dma_control_r), FUNC(stbook_state::sound_dma_control_w));
@@ -1197,8 +1203,10 @@ void st_state::machine_start()
 {
 	m_mmu->set_ram_size(m_ramcfg->size());
 
-	if (m_cart->exists())
+	if (m_cart->exists()) {
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
+		m_maincpu->space(m68000_device::AS_USER_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
+	}
 
 	/// TODO: get callbacks to trigger these.
 	m_mfp->i0_w(1);
@@ -1413,12 +1421,14 @@ void st_state::st(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update(m_video, FUNC(st_video_device::screen_update));
-	m_screen->set_raw(Y2/2, ATARIST_HTOT_PAL*2, ATARIST_HBEND_PAL*2, ATARIST_HBSTART_PAL*2, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL);
 
 	ST_VIDEO(config, m_video, Y2);
 	m_video->set_screen(m_screen);
-	m_video->set_ram_space(m_maincpu, AS_PROGRAM);
-	m_video->de_callback().set(m_mfp, FUNC(mc68901_device::tbi_w));
+	m_video->set_ram(m_mainram);
+	m_video->set_mmu(m_mmu);
+	m_video->de_cb().set(m_mfp, FUNC(mc68901_device::tbi_w));
+	m_video->hsync_cb().set_inputline(m_maincpu, 2);
+	m_video->vsync_cb().set_inputline(m_maincpu, 4);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1449,12 +1459,14 @@ void megast_state::megast(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update(m_video, FUNC(st_video_device::screen_update));
-	m_screen->set_raw(Y2/4, ATARIST_HTOT_PAL, ATARIST_HBEND_PAL, ATARIST_HBSTART_PAL, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL);
 
 	ST_VIDEO(config, m_video, Y2);
 	m_video->set_screen(m_screen);
-	m_video->set_ram_space(m_maincpu, AS_PROGRAM);
-	m_video->de_callback().set(m_mfp, FUNC(mc68901_device::tbi_w));
+	m_video->set_ram(m_mainram);
+	m_video->set_mmu(m_mmu);
+	m_video->de_cb().set(m_mfp, FUNC(mc68901_device::tbi_w));
+	m_video->hsync_cb().set_inputline(m_maincpu, 2);
+	m_video->vsync_cb().set_inputline(m_maincpu, 4);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1487,13 +1499,13 @@ void ste_state::ste(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_screen_update(m_video, FUNC(ste_video_device::screen_update));
+	m_screen->set_screen_update(m_videox, FUNC(ste_video_device::screen_update));
 	m_screen->set_raw(Y2/4, ATARIST_HTOT_PAL, ATARIST_HBEND_PAL, ATARIST_HBSTART_PAL, ATARIST_VTOT_PAL, ATARIST_VBEND_PAL, ATARIST_VBSTART_PAL);
 
-	STE_VIDEO(config, m_video, Y2);
-	m_video->set_screen(m_screen);
-	m_video->set_ram_space(m_maincpu, AS_PROGRAM);
-	m_video->de_callback().set(m_mfp, FUNC(mc68901_device::tbi_w));
+	STE_VIDEO(config, m_videox, Y2);
+	m_videox->set_screen(m_screen);
+	m_videox->set_ram_space(m_maincpu, AS_PROGRAM);
+	m_videox->de_callback().set(m_mfp, FUNC(mc68901_device::tbi_w));
 
 	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
@@ -1550,15 +1562,15 @@ void stbook_state::stbook(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
-	m_screen->set_screen_update(m_video, FUNC(stbook_video_device::screen_update));
+	m_screen->set_screen_update(m_videox, FUNC(stbook_video_device::screen_update));
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(640, 400);
 	m_screen->set_visarea(0, 639, 0, 399);
 
-	STBOOK_VIDEO(config, m_video, Y2);
-	m_video->set_screen(m_screen);
-	m_video->set_ram_space(m_maincpu, AS_PROGRAM);
-	m_video->de_callback().set(m_mfp, FUNC(mc68901_device::tbi_w));
+	STBOOK_VIDEO(config, m_videox, Y2);
+	m_videox->set_screen(m_screen);
+	m_videox->set_ram_space(m_maincpu, AS_PROGRAM);
+	m_videox->de_callback().set(m_mfp, FUNC(mc68901_device::tbi_w));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
