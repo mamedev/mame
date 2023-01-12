@@ -169,10 +169,10 @@ char const *const CONTROLLER_BUTTON_XBOX360[]{
 		"Touchpad" };
 
 [[maybe_unused]] char const *const CONTROLLER_BUTTON_SWITCH[]{
-		"B",
 		"A",
+		"B",
+		"X",
 		"Y",
-		"Z",
 		"-",
 		"Home",
 		"+",
