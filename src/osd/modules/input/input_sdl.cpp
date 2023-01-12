@@ -138,7 +138,7 @@ char const *const CONTROLLER_BUTTON_XBOX360[]{
 		"D-pad Down",
 		"D-pad Left",
 		"D-pad Right",
-		"Microphone",
+		"Mute",
 		"P1",
 		"P2",
 		"P3",
@@ -161,7 +161,30 @@ char const *const CONTROLLER_BUTTON_XBOX360[]{
 		"D-pad Down",
 		"D-pad Left",
 		"D-pad Right",
-		"Microphone",
+		"Mute",
+		"P1",
+		"P2",
+		"P3",
+		"P4",
+		"Touchpad" };
+
+[[maybe_unused]] char const *const CONTROLLER_BUTTON_PS5[]{
+		"Cross",
+		"Circle",
+		"Square",
+		"Triangle",
+		"Create",
+		"PS",
+		"Options",
+		"L3",
+		"R3",
+		"L1",
+		"R1",
+		"D-pad Up",
+		"D-pad Down",
+		"D-pad Left",
+		"D-pad Right",
+		"Mute",
 		"P1",
 		"P2",
 		"P3",
@@ -1149,7 +1172,11 @@ public:
 			break;
 #if SDL_VERSION_ATLEAST(2, 0, 14) // TODO: support more controller types
 		//case SDL_CONTROLLER_TYPE_VIRTUAL:
-		//case SDL_CONTROLLER_TYPE_PS5:
+		case SDL_CONTROLLER_TYPE_PS5:
+			osd_printf_verbose("Game Controller:   ...  PlayStation 5 type\n");
+			axisnames = CONTROLLER_AXIS_PS;
+			buttonnames = CONTROLLER_BUTTON_PS5;
+			break;
 		//case SDL_CONTROLLER_TYPE_AMAZON_LUNA:
 		//case SDL_CONTROLLER_TYPE_GOOGLE_STADIA:
 		//case SDL_CONTROLLER_TYPE_SWITCH_JOYCON_LEFT:
