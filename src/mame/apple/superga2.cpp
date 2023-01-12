@@ -102,7 +102,6 @@ void superga2_state::machine_start()
 	// setup video pointers
 	m_video->set_ram_pointers(m_ram_ptr, m_ram_ptr);
 	m_video->set_char_pointer(nullptr, 0);  // no text modes on this machine
-	m_video->set_sysconfig(0);
 }
 
 void superga2_state::machine_reset()

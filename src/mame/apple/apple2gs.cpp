@@ -1038,7 +1038,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 		}
 
 		m_adbmicro->set_input_line(0, ASSERT_LINE);
-		m_video->set_sysconfig(0);
 
 		m_clock_frame++;
 

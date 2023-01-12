@@ -64,7 +64,6 @@ public:
 	void set_ram_pointers(u8 *main, u8 *aux)    { m_ram_ptr = main; m_aux_ptr = aux; }
 	void set_aux_mask(u16 aux_mask)             { m_aux_mask = aux_mask; }
 	void set_char_pointer(u8 *charptr, int size) { m_char_ptr = charptr; m_char_size = size; }
-	void set_sysconfig(int sysconfig)           { m_sysconfig = sysconfig; }
 	void setup_GS_graphics() { m_8bit_graphics = std::make_unique<bitmap_ind16>(560, 192); }
 
 	template <model Model, bool Invert, bool Flip>
@@ -73,6 +72,8 @@ public:
 	uint32_t screen_update_GS(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
+	a2_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	virtual void device_reset() override;
 	virtual void device_start() override;
 
@@ -93,10 +94,13 @@ private:
 
 	bool use_page_2() const;
 
+	bool monochrome_monitor();
+	bool rgb_monitor();
+	int monochrome_hue();
+
 	u8 *m_ram_ptr = nullptr, *m_aux_ptr = nullptr, *m_char_ptr = nullptr;
 	u16 m_aux_mask = 0xffff;
 	int m_char_size = 0;
-	int m_sysconfig = 0;
 	bool m_page2 = false;
 	bool m_flash = false;
 	bool m_mix = false;
@@ -109,9 +113,30 @@ private:
 	bool m_80store = false;
 	bool m_monohgr = false;
 	u8 m_GSfg = 0, m_GSbg = 0, m_GSborder = 0, m_newvideo = 0, m_monochrome = 0, m_rgbmode = 0;
+	optional_ioport m_vidconfig;
+};
+
+// a2_video_device with composite monitor dip switch settings
+class a2_video_device_composite : public a2_video_device
+{
+public:
+	a2_video_device_composite(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+protected:
+	virtual ioport_constructor device_input_ports() const override;
+};
+
+// a2_video_device with composite settings plus Video-7 RGB card option
+class a2_video_device_composite_rgb : public a2_video_device
+{
+public:
+	a2_video_device_composite_rgb(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+protected:
+	virtual ioport_constructor device_input_ports() const override;
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(APPLE2_VIDEO, a2_video_device)
+DECLARE_DEVICE_TYPE(APPLE2_VIDEO_COMPOSITE, a2_video_device_composite)
+DECLARE_DEVICE_TYPE(APPLE2_VIDEO_COMPOSITE_RGB, a2_video_device_composite_rgb)
 
 #endif // MAME_SHARED_APPLE2VIDEO_H
