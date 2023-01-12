@@ -980,6 +980,7 @@ project "sqlite3"
 			"-Wno-discarded-qualifiers",
 			"-Wno-undef",
 			"-Wno-unused-but-set-variable",
+			"-Wno-unused-variable",
 		}
 if _OPTIONS["gcc"]~=nil then
 	if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
