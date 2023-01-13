@@ -1012,6 +1012,7 @@ sony/smc777.cpp
 sony/umatic.cpp
 sord/m5.cpp
 stm/pp.cpp
+stm/stmpc.cpp
 sun/sun1.cpp
 sun/sun2.cpp
 sun/sun3.cpp

@@ -36361,6 +36361,10 @@ powerstk                        // Motorola Powerstack II
 @source:stm/pp.cpp
 pp                              // STM Pied Piper Communicator 1
 
+@source:stm/stmpc.cpp
+stmpc                           // STM PC portable
+stmpcp                          // STM PC portable (prototype?)
+
 @source:zvt/pp01.cpp
 pp01                            //
 
