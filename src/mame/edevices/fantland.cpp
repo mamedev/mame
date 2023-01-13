@@ -29,7 +29,6 @@ Year + Game             Main CPU  Sound CPU  Sound                         Video
 
 - The year of creation isn't displayed, but it's no sooner than 1987 since
   embedded in the roms is: "MS Run-Time Library - Copyright (c) 1987, Microsoft Corp".
-  The Vifico licensed clone of 'borntofi' shows 1989 on screen.
 
 [fantland]
 
@@ -1344,9 +1343,9 @@ ROM_END
 // Found on a PCB with Vifico stickers, but does not show Vifico on screen
 ROM_START( borntofia )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // V20
-	ROM_LOAD( "3.3",    0x10000, 0x10000, CRC(b81cea79) SHA1(1c274c67e2390c854c13b15e8c6f436b9d3dcec5) )
-	ROM_LOAD( "2.2",    0x20000, 0x10000, CRC(5d2b3395) SHA1(ac87f352f380b67802c26232824663063549ac7b) )
-	ROM_LOAD( "1a.bin", 0x70000, 0x10000, CRC(0a65ab53) SHA1(10da49a32d8898b6e11aed7a483a83fe8153dc80) )
+	ROM_LOAD( "3.3",   0x10000, 0x10000, CRC(b81cea79) SHA1(1c274c67e2390c854c13b15e8c6f436b9d3dcec5) )
+	ROM_LOAD( "2.2",   0x20000, 0x10000, CRC(5d2b3395) SHA1(ac87f352f380b67802c26232824663063549ac7b) )
+	ROM_LOAD( "1.bin", 0x70000, 0x10000, CRC(0a65ab53) SHA1(10da49a32d8898b6e11aed7a483a83fe8153dc80) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // 8088
 	ROM_LOAD( "suoni.5", 0x08000, 0x08000, CRC(b5d587ce) SHA1(07687abd264ec80a6eb473cb3f3ab97ec6b365a2) )
