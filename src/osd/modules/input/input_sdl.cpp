@@ -209,10 +209,10 @@ char const *const CONTROLLER_BUTTON_XBOX360[]{
 		"D-pad Left",
 		"D-pad Right",
 		"Capture",
-		"P1",
-		"P2",
-		"P3",
-		"P4",
+		"RSR",
+		"LSL",
+		"RSL",
+		"LSR",
 		"Touchpad" };
 
 [[maybe_unused]] char const *const CONTROLLER_BUTTON_STADIA[]{
@@ -1213,7 +1213,12 @@ public:
 			break;
 		//case SDL_CONTROLLER_TYPE_SWITCH_JOYCON_LEFT:
 		//case SDL_CONTROLLER_TYPE_SWITCH_JOYCON_RIGHT:
-		//case SDL_CONTROLLER_TYPE_SWITCH_JOYCON_PAIR:
+		case SDL_CONTROLLER_TYPE_SWITCH_JOYCON_PAIR:
+			osd_printf_verbose("Game Controller:   ...  Joy-Con pair type\n");
+			axisnames = CONTROLLER_AXIS_SWITCH;
+			buttonnames = CONTROLLER_BUTTON_SWITCH;
+			digitaltriggers = true;
+			break;
 #endif
 		default: // default to Xbox 360 names
 			osd_printf_verbose("Game Controller:   ...  unrecognized type (%d)\n", int(ctrltype));
@@ -1223,12 +1228,12 @@ public:
 
 		// add axes
 		std::tuple<SDL_GameControllerAxis, input_item_id, bool> axes[]{
-				{ SDL_CONTROLLER_AXIS_LEFTX,           ITEM_ID_XAXIS,   false },
-				{ SDL_CONTROLLER_AXIS_LEFTY,           ITEM_ID_YAXIS,   false },
-				{ SDL_CONTROLLER_AXIS_RIGHTX,          ITEM_ID_ZAXIS,   false },
-				{ SDL_CONTROLLER_AXIS_RIGHTY,          ITEM_ID_RZAXIS,  false },
-				{ SDL_CONTROLLER_AXIS_TRIGGERLEFT,     ITEM_ID_SLIDER1, true },
-				{ SDL_CONTROLLER_AXIS_TRIGGERRIGHT,    ITEM_ID_SLIDER2, true } };
+				{ SDL_CONTROLLER_AXIS_LEFTX,        ITEM_ID_XAXIS,   false },
+				{ SDL_CONTROLLER_AXIS_LEFTY,        ITEM_ID_YAXIS,   false },
+				{ SDL_CONTROLLER_AXIS_RIGHTX,       ITEM_ID_ZAXIS,   false },
+				{ SDL_CONTROLLER_AXIS_RIGHTY,       ITEM_ID_RZAXIS,  false },
+				{ SDL_CONTROLLER_AXIS_TRIGGERLEFT,  ITEM_ID_SLIDER1, true },
+				{ SDL_CONTROLLER_AXIS_TRIGGERRIGHT, ITEM_ID_SLIDER2, true } };
 		for (auto [axis, item, buttontest] : axes)
 		{
 			bool avail = !buttontest || !digitaltriggers;
