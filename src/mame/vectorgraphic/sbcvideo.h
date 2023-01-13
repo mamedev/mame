@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "machine/ram.h"
 #include "video/mc6845.h"
 
 
@@ -30,7 +31,7 @@ private:
 	MC6845_UPDATE_ROW(update_row);
 
 	required_ioport m_io_sbc_video_conf;
-	required_shared_ptr<uint8_t> m_buffer;
+	required_device<ram_device> m_buffer;
 	required_region_ptr<uint8_t> m_chrroml;
 	required_region_ptr<uint8_t> m_chrromr;
 	uint8_t m_spr;

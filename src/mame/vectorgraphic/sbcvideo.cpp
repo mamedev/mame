@@ -76,7 +76,7 @@ MC6845_UPDATE_ROW(vector_sbc_video_device::update_row)
 			// 7200-0001 page 83 (II 3-20)
 			if (res320) {
 				for (uint16_t x = 0; x < x_count*2; x++) {
-					uint8_t cell = m_buffer[x+addr];
+					uint8_t cell = m_buffer->read(x+addr);
 					rgb_t px1 = raw_4bit_to_rgb(m_res320_ram[BIT(cell, 0, 2)], color);
 					for (int i = 0; i < 4; i++)
 						*p++ = px1;
@@ -92,7 +92,7 @@ MC6845_UPDATE_ROW(vector_sbc_video_device::update_row)
 				}
 			} else { // 160
 				for (uint16_t x = 0; x < x_count*2; x++) {
-					uint8_t cell = m_buffer[x+addr];
+					uint8_t cell = m_buffer->read(x+addr);
 					rgb_t px1 = raw_4bit_to_rgb(BIT(cell, 0, 4), color);
 					for (int i = 0; i < 8; i++)
 						*p++ = px1;
@@ -103,7 +103,7 @@ MC6845_UPDATE_ROW(vector_sbc_video_device::update_row)
 			}
 		} else { // DIG
 			for (uint16_t x = 0; x < x_count*2; x++) {
-				uint8_t cell = m_buffer[x+addr];
+				uint8_t cell = m_buffer->read(x+addr);
 				for (int i = 0; i < 8; i++) {
 					*p++ = BIT(cell, i) ? monochrome_color : 0;
 					*p++ = BIT(cell, i) ? monochrome_color : 0;
@@ -113,7 +113,7 @@ MC6845_UPDATE_ROW(vector_sbc_video_device::update_row)
 	} else { // ALPHA
 		for (uint16_t x = 0; x < x_count*2; x++) {
 			// Character Generators. 7200-0001 page 69 (II 3-6) C4
-			uint8_t cell = m_buffer[x+addr];
+			uint8_t cell = m_buffer->read(x+addr);
 			uint8_t chr = cell & 0x7F;
 			uint8_t invert = BIT(cell, 7);
 			uint8_t gfxl = m_chrroml[chr | (ra << 7) | (chr1 << 11)];
@@ -169,7 +169,10 @@ INPUT_PORTS_START( sbc_video )
 	PORT_CONFSETTING(0x002, "0x08000-0x0FFFFF")
 	PORT_CONFSETTING(0x004, "0x10000-0x17FFFF")
 	PORT_CONFSETTING(0x006, "0x18000-0x1FFFFF")
-	// TODO: 256k
+	PORT_CONFSETTING(0x008, "0x20000-0x27FFFF")
+	PORT_CONFSETTING(0x00a, "0x28000-0x2FFFFF")
+	PORT_CONFSETTING(0x00c, "0x30000-0x37FFFF")
+	PORT_CONFSETTING(0x00e, "0x38000-0x3FFFFF")
 INPUT_PORTS_END
 
 ioport_constructor vector_sbc_video_device::device_input_ports() const

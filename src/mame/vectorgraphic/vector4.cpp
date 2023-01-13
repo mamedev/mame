@@ -57,6 +57,7 @@ TODO:
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
+#include "machine/ram.h"
 #include "machine/pit8253.h"
 #include "sound/sn76496.h"
 
@@ -73,7 +74,7 @@ public:
 		, m_8088cpu(*this, "8088cpu")
 		, m_rambanks(*this, "rambank%u", 0U)
 		, m_256k(false)
-		, m_ram(*this, "mainram")
+		, m_ram(*this, RAM_TAG)
 		, m_romenbl(*this, "romenbl")
 		, m_sbc_video(*this, "video")
 		, m_s100(*this, "s100")
@@ -98,7 +99,7 @@ private:
 	required_device<cpu_device> m_8088cpu;
 	required_memory_bank_array<32> m_rambanks;
 	bool m_256k;
-	required_shared_ptr<uint8_t> m_ram;
+	required_device<ram_device> m_ram;
 	memory_view m_romenbl;
 	required_device<vector_sbc_video_device> m_sbc_video;
 	required_device<s100_bus_device> m_s100;
@@ -118,10 +119,8 @@ void vector4_state::vector4_z80mem(address_map &map)
 
 void vector4_state::vector4_8088mem(address_map &map)
 {
-	const uint32_t high_addr = m_256k ? 0x3ffff : 0x1ffff;
 	map.unmap_value_high();
-	map.global_mask(high_addr);
-	map(0x0000, high_addr).ram().share(m_ram);
+	map.global_mask(0x3ffff);
 }
 
 void vector4_state::vector4_io(address_map &map)
@@ -174,6 +173,8 @@ void vector4_state::vector4(machine_config &config)
 	I8088(config, m_8088cpu, 5'100'000);
 	m_8088cpu->set_addrmap(AS_PROGRAM, &vector4_state::vector4_8088mem);
 	m_8088cpu->set_addrmap(AS_IO, &vector4_state::vector4_io);
+
+	RAM(config, m_ram).set_default_size("128K").set_extra_options("256K");
 
 	/* video hardware */
 	SBC_VIDEO(config, m_sbc_video, _32m);
@@ -243,8 +244,10 @@ void vector4_state::vector4(machine_config &config)
 
 void vector4_state::machine_start()
 {
+	m_256k = (m_ram->size() == 256 * 1024);
+	m_8088cpu->space(AS_PROGRAM).install_ram(0, m_ram->mask(), m_ram->size() & 0x20000, m_ram->pointer());
 	for (int bank = 0; bank < (1<<5); bank++)
-		m_rambanks[bank]->configure_entries(0, 1<<7, &m_ram[0], 1<<11);
+		m_rambanks[bank]->configure_entries(0, 1<<7, m_ram->pointer(), 1<<11);
 }
 
 void vector4_state::machine_reset()
