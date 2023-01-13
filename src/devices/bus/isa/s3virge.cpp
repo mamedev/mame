@@ -29,7 +29,10 @@
 
 #include "screen.h"
 
+//#include <iostream>
+
 #define VERBOSE (LOG_REG | LOG_CMD | LOG_MMIO)
+//#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
 
@@ -1061,6 +1064,9 @@ uint32_t s3virge_vga_device::GetROP(uint8_t rop, uint32_t src, uint32_t dst, uin
 			break;
 		case 0x22:  // DSna
 			ret = (dst & (~src));
+			break;
+		case 0x33:  // Sn
+			ret = ~src;
 			break;
 		case 0x55:  // Dn
 			ret = ~dst;
