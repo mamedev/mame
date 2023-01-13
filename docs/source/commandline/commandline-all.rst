@@ -1,10 +1,10 @@
 .. _mame-commandline-universal:
 
-Universal Commandline Options
-=============================
+Universal Command-line Options
+==============================
 
 This section contains configuration options that are applicable to *all* MAME
-sub-builds (both SDL and Windows native).
+configurations (both including both SDL and Windows native).
 
 .. contents:: :local:
 
@@ -450,7 +450,7 @@ overwritten.
 
 .. _mame-commandline-romident:
 
-**-romident** [*path\\to\\romstocheck.zip*]
+**-romident** [*path/to/romstocheck.zip*]
 
     Attempts to identify ROM files, if they are known to MAME, in the specified
     .zip file or directory. This command can be used to try and identify ROM
@@ -692,6 +692,31 @@ OSD-related Options
         .. code-block:: bash
 
             mame ibm5150 -uimodekey DEL
+
+.. _mame-commandline-controllermap:
+
+**-controller_map** / **-ctrlmap** *<filename>*
+
+    Path to a text file containing game controller button and axis mappings in
+    the format used by SDL2 and Steam.  Must use an ASCII-compatible text
+    encoding with native line endings (e.g. CRLF on Windows).  Currently only
+    supported when using the ``sdlgame`` joystick provider.
+
+    A `community-sourced list of game controller mappings
+    <https://github.com/gabomdq/SDL_GameControllerDB>`_ can be found on GitHub.
+    Besides using a text editor, several tools are available for creating game
+    controller mappings, including `SDL2 Gamepad Mapper
+    <https://gitlab.com/ryochan7/sdl2-gamepad-mapper/-/releases>`_ and SDL2
+    ControllerMap which is `supplied with SDL
+    <https://github.com/libsdl-org/SDL/releases/latest>`_.  You can also
+    configure your controller in Steam’s Big Picture mode, then copy the
+    mappings from ``SDL_GamepadBind`` entries in the **config.vdf** file found
+    in the **config** folder inside your Steam installation folder.
+
+    Example:
+        .. code-bock:: bash
+
+            mame -controller_map gamecontrollerdb.txt sf2ce
 
 .. _mame-commandline-uifontprovider:
 
@@ -1058,7 +1083,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -homepath c:\mame\lua
+            mame -homepath C:\mame\lua
 
 .. _mame-commandline-rompath:
 
@@ -1073,7 +1098,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -rompath c:\mame\roms;c:\roms\another
+            mame -rompath C:\mame\roms;C:\roms\another
 
 .. _mame-commandline-hashpath:
 
@@ -1088,7 +1113,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -hashpath c:\mame\hash;c:\roms\softlists
+            mame -hashpath C:\mame\hash;C:\roms\softlists
 
 .. _mame-commandline-samplepath:
 
@@ -1103,7 +1128,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -samplepath c:\mame\samples;c:\roms\samples
+            mame -samplepath C:\mame\samples;C:\roms\samples
 
 .. _mame-commandline-artpath:
 
@@ -1118,7 +1143,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -artpath c:\mame\artwork;c:\emu\shared-artwork
+            mame -artpath C:\mame\artwork;C:\emu\shared-artwork
 
 .. _mame-commandline-ctrlrpath:
 
@@ -1134,7 +1159,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -ctrlrpath c:\mame\ctrlr;c:\emu\controllers
+            mame -ctrlrpath C:\mame\ctrlr;C:\emu\controllers
 
 .. _mame-commandline-inipath:
 
@@ -1163,7 +1188,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -inipath c:\users\thisuser\documents\mameini
+            mame -inipath C:\Users\thisuser\documents\mameini
 
 .. _mame-commandline-fontpath:
 
@@ -1178,7 +1203,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -fontpath c:\mame\;c:\emu\artwork\mamefonts
+            mame -fontpath C:\mame\;C:\emu\artwork\mamefonts
 
 .. _mame-commandline-cheatpath:
 
@@ -1193,7 +1218,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -cheatpath c:\mame\cheat;c:\emu\cheats
+            mame -cheatpath C:\mame\cheat;C:\emu\cheats
 
 .. _mame-commandline-crosshairpath:
 
@@ -1208,7 +1233,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -crosshairpath c:\mame\crsshair;c:\emu\artwork\crosshairs
+            mame -crosshairpath C:\mame\crsshair;C:\emu\artwork\crosshairs
 
 .. _mame-commandline-pluginspath:
 
@@ -1222,7 +1247,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -pluginspath c:\mame\plugins;c:\emu\lua
+            mame -pluginspath C:\mame\plugins;C:\emu\lua
 
 .. _mame-commandline-languagepath:
 
@@ -1237,7 +1262,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -languagepath c:\mame\language;c:\emu\mame-languages
+            mame -languagepath C:\mame\language;C:\emu\mame-languages
 
 .. _mame-commandline-swpath:
 
@@ -1251,7 +1276,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -swpath c:\mame\software;c:\emu\mydisks
+            mame -swpath C:\mame\software;C:\emu\mydisks
 
 
 .. _mame-commandline-coreoutdir:
@@ -1276,7 +1301,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame -cfg_directory c:\mame\cfg
+            mame -cfg_directory C:\mame\cfg
 
 .. _mame-commandline-nvramdirectory:
 
@@ -1294,7 +1319,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame -nvram_directory c:\mame\nvram
+            mame -nvram_directory C:\mame\nvram
 
 .. _mame-commandline-inputdirectory:
 
@@ -1311,7 +1336,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame -input_directory c:\mame\inp
+            mame -input_directory C:\mame\inp
 
 .. _mame-commandline-statedirectory:
 
@@ -1328,7 +1353,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame -state_directory c:\mame\sta
+            mame -state_directory C:\mame\sta
 
 .. _mame-commandline-snapshotdirectory:
 
@@ -1344,7 +1369,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame -snapshot_directory c:\mame\snap
+            mame -snapshot_directory C:\mame\snap
 
 .. _mame-commandline-diffdirectory:
 
@@ -1363,7 +1388,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame -diff_directory c:\mame\diff
+            mame -diff_directory C:\mame\diff
 
 .. _mame-commandline-commentdirectory:
 
@@ -1380,7 +1405,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame -comment_directory c:\mame\comments
+            mame -comment_directory C:\mame\comments
 
 
 .. _mame-commandline-savestate:
@@ -4015,7 +4040,7 @@ HTTP Server Options
     Example:
         .. code-block:: bash
 
-            mame apple2 -http -http_port 6502 -http_root c:\users\me\appleweb\root
+            mame apple2 -http -http_port 6502 -http_root C:\Users\me\appleweb\root
 
 
 .. _mame-commandline-portaudio:

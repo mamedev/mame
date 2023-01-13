@@ -44,6 +44,19 @@ RSB             Button          Button^         Button^         Button^         
 ^ optional
 
 
+At least the vast majority of controllers report 8-bit trigger
+resolution and 10-bit stick resolution, even when the physical controls
+use digital switches.  Resolution can't be used to reliably detect
+nominal analog axes controlled by switches.
+
+Some arcade sticks report unknown or gamepad subtype, but have a single
+digital joystick with a switch to select between controlling the D-pad,
+left stick and right stick.  You can't assume that all three can be
+controlled at the same time.
+
+Many controllers don't correctly report the absence of analog sticks.
+
+
 There are multiple physical button layouts for arcade sticks, for
 example:
 
@@ -68,17 +81,26 @@ Hori Real Arcade Pro VX-SA Kai, Razer Atrox
  B  X  Y  LB
 A  LT RT RB
 
-Hori Real Arcade Pro.V Kai, Mayflash F300, Mayflash F500
+Hori Real Arcade Pro.V Kai, Mad Catz EGO Arcade Stick, Mayflash F300, Mayflash F500
  X  Y  RB LB
 A  B  RT LT
 
-Mad Catz Brawl Stick
+Mad Catz WWE All Stars Brawl Stick
  X  Y  LB LT
 A  B  RB RT
 
 Arcade pads typically have six face buttons, and come with different
 layouts corresponding to the latter two arcade stick layouts, with the
-rightmost column on the shoulder buttons.
+rightmost column on the shoulder buttons.  Examples of face button
+layouts:
+
+Mad Catz Street Fighter IV FightPad, PowerA FUSION Wired FightPad
+X  Y  RB
+A  B  RT
+
+Hori Pad EX Turbo 2, Mad Catz WWE All Stars BrawlPad, Mortal Kombat X Fight Pad, PDP Versus Fighting Pad
+X  Y  LB
+A  B  RB
 
 
 Dance mats usually have this layout:

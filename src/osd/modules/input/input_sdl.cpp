@@ -35,6 +35,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cstddef>
+#include <cstring>
 #include <iterator>
 #include <memory>
 #include <optional>
@@ -523,7 +524,7 @@ int lookup_sdl_code(const char *scode)
 
 	while (sdl_lookup_table[i].code >= 0)
 	{
-		if (!strcmp(scode, sdl_lookup_table[i].name))
+		if (!std::strcmp(scode, sdl_lookup_table[i].name))
 			return sdl_lookup_table[i].code;
 		i++;
 	}
@@ -1939,17 +1940,32 @@ public:
 	{
 		SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 
+		auto &sdlopts = downcast<sdl_options const &>(*options());
+		bool const sixaxis_mode = sdlopts.sixaxis();
+
 		init_joystick();
 		if (!have_joystick())
 			return;
 
 		m_initialized_game_controller = !SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
-		if (!m_initialized_game_controller)
+		if (m_initialized_game_controller)
+		{
+			char const *const mapfile = sdlopts.controller_mapping_file();
+			if (mapfile && *mapfile && std::strcmp(mapfile, OSDOPTVAL_NONE))
+			{
+				auto const count = SDL_GameControllerAddMappingsFromFile(mapfile);
+				if (0 <= count)
+					osd_printf_verbose("Game Controller: %d controller mapping(s) added from file [%s].\n", count, mapfile);
+				else
+					osd_printf_error("Game Controller: Error adding mappings from file [%s]: %s.\n", mapfile, SDL_GetError());
+			}
+		}
+		else
+		{
 			osd_printf_warning("Could not initialize SDL Game Controller: %s.\n", SDL_GetError());
+		}
 
 		sdl_joystick_module_base::input_init(machine);
-
-		bool const sixaxis_mode = downcast<const sdl_options *>(options())->sixaxis();
 
 		osd_printf_verbose("Game Controller: Start initialization\n");
 		for (int physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
@@ -1970,6 +1986,14 @@ public:
 				create_game_controller_device(machine, physical_stick, ctrl);
 		}
 
+		static int const joy_event_types[] = {
+				int(SDL_JOYAXISMOTION),
+				int(SDL_JOYBALLMOTION),
+				int(SDL_JOYHATMOTION),
+				int(SDL_JOYBUTTONDOWN),
+				int(SDL_JOYBUTTONUP),
+				int(SDL_JOYDEVICEADDED),
+				int(SDL_JOYDEVICEREMOVED) };
 		static int const event_types[] = {
 				int(SDL_JOYAXISMOTION),
 				int(SDL_JOYBALLMOTION),
@@ -1983,7 +2007,10 @@ public:
 				int(SDL_CONTROLLERBUTTONUP),
 				int(SDL_CONTROLLERDEVICEADDED),
 				int(SDL_CONTROLLERDEVICEREMOVED) };
-		sdl_event_manager::instance().subscribe(event_types, this);
+		if (m_initialized_game_controller)
+			sdl_event_manager::instance().subscribe(event_types, this);
+		else
+			sdl_event_manager::instance().subscribe(joy_event_types, this);
 
 		osd_printf_verbose("Game Controller: End initialization\n");
 	}
@@ -2036,6 +2063,7 @@ public:
 
 		// for devices supported by the game controller API, this is received before the corresponding SDL_JOYDEVICEADDED
 		case SDL_CONTROLLERDEVICEADDED:
+			if (m_initialized_game_controller)
 			{
 				SDL_GameController *const ctrl = SDL_GameControllerOpen(sdlevent.cdevice.which);
 				if (!ctrl)
