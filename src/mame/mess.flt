@@ -733,6 +733,7 @@ sega/svmu.cpp
 sequential/prophet600.cpp
 sfrj/galaxy.cpp
 sfrj/galeb.cpp
+sfrj/idpartner.cpp
 sfrj/lola8a.cpp
 sfrj/orao.cpp
 sfrj/pecom.cpp

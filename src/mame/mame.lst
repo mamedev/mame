@@ -17416,6 +17416,10 @@ icecold                         //
 icecoldf                        //
 zekepeak                        //
 
+@source:sfrj/idpartner.cpp
+partner1fg                      // Iskra Delta Partner 1F/G
+partnerwfg                      // Iskra Delta Partner WF/G
+
 @source:pinball/idsa.cpp
 bsktbllp                        //
 v1                              //

@@ -5,9 +5,9 @@
 
     ef9365.c
 
-    Thomson EF9365/EF9366 video controller emulator code
+    Thomson EF9365/EF9366/EF9367 video controller emulator code
 
-    The EF9365/EF9366 is a video controller driving a frame buffer
+    The EF9365/EF9366/EF9367 is a video controller driving a frame buffer
     and having built-in vectors and characters drawing engines.
     This is natively a "black and white" chip (1 bitplane),
     but it is possible to add more bitplanes to have colors with a
@@ -65,7 +65,7 @@
 
 #include "screen.h"
 
-//#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 
@@ -260,6 +260,13 @@ void ef9365_device::set_display_mode(int display_mode)
 		vsync_scanline_pos = 62;
 		overflow_mask_x = 0xffc0;
 		overflow_mask_y = 0xffc0;
+		break;
+	case DISPLAY_MODE_1024x512:
+		bitplane_xres = 1024;
+		bitplane_yres = 512;
+		vsync_scanline_pos = 506;
+		overflow_mask_x = 0xfc00;
+		overflow_mask_y = 0xfe00;
 		break;
 	default:
 		logerror("Invalid EF9365 Display mode: %02x\n", display_mode);
