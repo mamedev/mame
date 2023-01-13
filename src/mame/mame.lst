@@ -13956,7 +13956,8 @@ famibox                         // 1986
 famistat                        // 1986
 
 @source:edevices/fantland.cpp
-borntofi                        // (c) International Games?
+borntofi                        // (c) International Games
+borntofia                       // (c) International Games
 borntofiv                       // (c) International Games (Vifico license)
 fantland                        // (c) 198? Electronic Devices Italy
 fantlanda                       // (c) 198? Electronic Devices Italy
