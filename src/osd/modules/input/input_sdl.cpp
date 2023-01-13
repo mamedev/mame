@@ -1198,19 +1198,23 @@ public:
 			buttonnames = CONTROLLER_BUTTON_SWITCH;
 			digitaltriggers = true;
 			break;
-#if SDL_VERSION_ATLEAST(2, 0, 14) // TODO: support more controller types
+#if SDL_VERSION_ATLEAST(2, 0, 14)
 		//case SDL_CONTROLLER_TYPE_VIRTUAL:
 		case SDL_CONTROLLER_TYPE_PS5:
 			osd_printf_verbose("Game Controller:   ...  PlayStation 5 type\n");
 			axisnames = CONTROLLER_AXIS_PS;
 			buttonnames = CONTROLLER_BUTTON_PS5;
 			break;
+#endif
+#if SDL_VERSION_ATLEAST(2, 0, 16)
 		//case SDL_CONTROLLER_TYPE_AMAZON_LUNA:
 		case SDL_CONTROLLER_TYPE_GOOGLE_STADIA:
 			osd_printf_verbose("Game Controller:   ...  Google Stadia type\n");
 			axisnames = CONTROLLER_AXIS_PS;
 			buttonnames = CONTROLLER_BUTTON_STADIA;
 			break;
+#endif
+#if SDL_VERSION_ATLEAST(2, 24, 0)
 		//case SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_JOYCON_LEFT:
 		//case SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_JOYCON_RIGHT:
 		case SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_JOYCON_PAIR:
