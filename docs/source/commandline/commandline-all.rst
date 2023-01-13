@@ -923,23 +923,23 @@ Example:
       - winhybrid
       - dinput
       - xinput
-      - none
-      - sdljoy
       - sdlgame
+      - sdljoy
+      - none
     * - **SDL**
       - auto [#JIPAutoSDL]_.
       -
       -
       -
-      - none
-      - sdljoy
       - sdlgame
+      - sdljoy
+      - none
 
 ..  rubric:: Footnotes
 
-..  [#JIPAutoWindows] On Windows, auto will default to ``dinput``.
+..  [#JIPAutoWindows] On Windows, auto will default to ``winhybrid``.
 
-..  [#JIPAutoSDL] On SDL, auto will default to ``sdljoy``.
+..  [#JIPAutoSDL] On SDL, auto will default to ``sdlgame``.
 
 .. Tip:: Note that Microsoft Xbox 360 and Xbox One controllers connected to
          Windows will work best with ``winhybrid`` or ``xinput``. The
