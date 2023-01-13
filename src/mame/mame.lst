@@ -45171,3 +45171,6 @@ vl1
 
 @source:ddr/sprachmg.cpp
 sprachmg                        // 1985 Institut für Kosmosforschung
+
+@source:skeleton/tnshc08.cpp
+tnshc08                         // JZD Slušovice TNS HC-08
