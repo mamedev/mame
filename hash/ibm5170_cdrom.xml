@@ -3202,18 +3202,17 @@ https://www.pcgamingwiki.com/wiki/Myst
 	<software name="ppersia2">
 		<description>Prince of Persia 2 - The Shadow and the Flame (USA)</description>
 		<year>1998</year>
-		<publisher>Brøderbund Software</publisher>
+		<publisher>Red Orb Entertainment</publisher>
 		<notes><![CDATA[
-CD contents:
-Prince of Persia 2: The Shadow and the Flame
-Playable Demos:
+Prince of Persia 2 - The Shadow and the Flame
+Playable demos:
 Journeyman Project 3, The: Legacy of Time
 Riven: The Sequel to Myst
 Warlords III: Darklords Rising
 ]]></notes>
-
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<info name="version" value="2.0 September 30, 1998" />
 		<sharedfeat name="platform" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
@@ -3231,11 +3230,9 @@ Warlords III: Darklords Rising
 		<year>1995</year>
 		<publisher>Brøderbund Software</publisher>
 		<notes><![CDATA[
-CD contents:
-Prince of Persia v1.3
-Prince of Persia 2: The Shadow and the Flame v1.0
+Prince of Persia (v1.3)
+Prince of Persia 2 - The Shadow and the Flame (v1.0)
 ]]></notes>
-
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
 		<sharedfeat name="platform" value="DOS" />
@@ -3255,11 +3252,9 @@ Prince of Persia 2: The Shadow and the Flame v1.0
 		<year>1995</year>
 		<publisher>Brøderbund Software</publisher>
 		<notes><![CDATA[
-CD contents:
-Prince of Persia v1.3
-Prince of Persia 2: The Shadow and the Flame v1.0
+Prince of Persia (v1.3)
+Prince of Persia 2 - The Shadow and the Flame (v1.0)
 ]]></notes>
-
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
 		<sharedfeat name="platform" value="DOS" />
@@ -3279,22 +3274,20 @@ Prince of Persia 2: The Shadow and the Flame v1.0
 		<year>1999</year>
 		<publisher>Red Orb Entertainment</publisher>
 		<notes><![CDATA[
-CD contents:
-Games:
-Prince of Persia v1.4
-Prince of Persia 2: The Shadow and the Flame v1.1
+Prince of Persia (v1.4)
+Prince of Persia 2 - The Shadow and the Flame (v1.1)
 Extras:
 The Making of Prince of Persia 3D
 Manual / User's Guide (PDF, 28 pages) (English)
-Demos:
+Playable Demos:
 The Journeyman Project 3: Legacy of Time
 Riven: The Sequel to Myst
 Warlords III: Darklords Rising
 ]]></notes>
-
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="version" value="1.0 September 11, 1998" />
+		<sharedfeat name="platform" value="Windows95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3311,22 +3304,20 @@ Warlords III: Darklords Rising
 		<year>1999</year>
 		<publisher>Red Orb Entertainment</publisher>
 		<notes><![CDATA[
-CD contents:
-Games:
-Prince of Persia v1.4
-Prince of Persia 2: The Shadow and the Flame v1.1
+Prince of Persia (v1.4)
+Prince of Persia 2 - The Shadow and the Flame (v1.1)
 Extras:
 The Making of Prince of Persia 3D
 Manual / User's Guide (PDF, 28 pages) (English)
-Demos:
+Playable Demos:
 The Journeyman Project 3: Legacy of Time
 Riven: The Sequel to Myst
 Warlords III: Darklords Rising
 ]]></notes>
-
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="version" value="1.0 September 11, 1998" />
+		<sharedfeat name="platform" value="Windows95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3343,22 +3334,19 @@ Warlords III: Darklords Rising
 		<year>1999</year>
 		<publisher>Red Orb Entertainment</publisher>
 		<notes><![CDATA[
-CD contents:
-Games:
 Prince of Persia (v1.4)
-Prince of Persia 2: The Shadow and the Flame (v1.1)
-Playable Demos:
+Prince of Persia 2 - The Shadow and the Flame (v1.1)
+Playable demos:
 The Journeyman Project 3: Legacy of Time
 Riven: The Sequel to Myst
 Warlords III: Darklords Rising
 Videos:
 The Making of Prince of Persia 3D
-The Journeyman Project 3: Legacy of Time (included in demo)
 ]]></notes>
-
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="version" value="1.0 September 11, 1998" />
+		<sharedfeat name="platform" value="Windows95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3375,21 +3363,19 @@ The Journeyman Project 3: Legacy of Time (included in demo)
 		<year>1999</year>
 		<publisher>Red Orb Entertainment</publisher>
 		<notes><![CDATA[
-CD contents:
-Games:
-Prince of Persia v1.4
-Prince of Persia 2: The Shadow and the Flame v1.1
+Prince of Persia (v1.4)
+Prince of Persia 2 - The Shadow and the Flame (v1.1)
 Extras:
 The Making of Prince of Persia 3D
-Demos:
+Playable demos:
 The Journeyman Project 3: Legacy of Time
 Riven: The Sequel to Myst
 Warlords III: Darklords Rising
 ]]></notes>
-
 		<info name="language" value="English" />
 		<info name="region" value="Netherlands" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="version" value="1.0 September 11, 1998" />
+		<sharedfeat name="platform" value="Windows95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3402,19 +3388,23 @@ Warlords III: Darklords Rising
 	<!-- <rom name="Prince of Persia Collection - Limited Edition (Brazil).cue" size="120" crc="85690e68" sha1="dd3383110fc7bb22c2e460429c111b6302d26e57"/> -->
 	<!-- <rom name="Prince of Persia Collection - Limited Edition (Brazil).bin" size="722470896" crc="3a246980" sha1="c662dcdd6b10e73bce65e7344fd989f55ed347f3"/> -->
 	<software name="ppersiale_br" cloneof="ppersiale">
-		<description>Prince of Persia Collection: Limited Edition (Brazil)</description>
+		<description>Prince of Persia Collection: Limited Edition (Brazil, Senha Pôster Ano 1 № 1)</description>
 		<year>1999</year>
-		<publisher>Red Orb Entertainment</publisher>
+		<publisher>Senha Pôster</publisher>
 		<notes><![CDATA[
-CD contents:
-Prince of Persia - The Original Adventure
-Prince of Persia 2 - The Shadow and The Flame
-Making of Prince of Persia 3D
+Prince of Persia (v1.4)
+Prince of Persia 2 - The Shadow and the Flame (v1.1)
+Extras:
+The Making of Prince of Persia 3D
+Playable demos:
+The Journeyman Project 3: Legacy of Time
+Riven: The Sequel to Myst
+Warlords III: Darklords Rising
 ]]></notes>
-
 		<info name="language" value="English" />
 		<info name="region" value="Brazil" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="version" value="1.0 September 11, 1998" />
+		<sharedfeat name="platform" value="Windows95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3870,7 +3860,6 @@ Draws video without colors if run thru autorun in Win95, works if st_95.exe is m
 		<year>1993</year>
 		<publisher>Telstar Fun &amp; Games</publisher>
 		<notes><![CDATA[
-CD contents:
 Battlestorm
 The Blues Brothers
 The Blues Brothers: Jukebox Adventure
