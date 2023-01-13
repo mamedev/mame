@@ -294,11 +294,11 @@ private:
 		AXIS_TOTAL
 	};
 
-	uint32_t const            m_player_index;
-	XINPUT_CAPABILITIES const m_capabilities;
-	XINPUT_STATE              m_xinput_state;
-	uint8_t                   m_switches[SWITCH_TOTAL];
-	int32_t                   m_axes[AXIS_TOTAL];
+	uint32_t const      m_player_index;
+	XINPUT_CAPABILITIES m_capabilities;
+	XINPUT_STATE        m_xinput_state;
+	uint8_t             m_switches[SWITCH_TOTAL];
+	int32_t             m_axes[AXIS_TOTAL];
 
 	std::shared_ptr<xinput_api_helper> m_xinput_helper;
 };
@@ -429,6 +429,14 @@ void xinput_joystick_device::configure()
 		break;
 	}
 
+	// detect invalid capabilities - the Retro-Bit Sega Saturn Control Pad reports garbage
+	bool const ltcap_bad = m_capabilities.Gamepad.bLeftTrigger && count_leading_zeros_32(m_capabilities.Gamepad.bLeftTrigger << 24);
+	bool const rtcap_bad = m_capabilities.Gamepad.bRightTrigger && count_leading_zeros_32(m_capabilities.Gamepad.bRightTrigger << 24);
+	bool const lsxcap_bad = m_capabilities.Gamepad.sThumbLX && count_leading_zeros_32(m_capabilities.Gamepad.sThumbLX << 16);
+	bool const lsycap_bad = m_capabilities.Gamepad.sThumbLY && count_leading_zeros_32(m_capabilities.Gamepad.sThumbLY << 16);
+	bool const rsxcap_bad = m_capabilities.Gamepad.sThumbRX && count_leading_zeros_32(m_capabilities.Gamepad.sThumbRX << 16);
+	bool const rsycap_bad = m_capabilities.Gamepad.sThumbRY && count_leading_zeros_32(m_capabilities.Gamepad.sThumbRY << 16);
+
 	// log some diagnostic information
 	osd_printf_verbose(
 			"Configuring XInput player %d type 0x%02X (%s) sub type 0x%02X (%s)\n",
@@ -454,19 +462,38 @@ void xinput_joystick_device::configure()
 			(m_capabilities.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT) ? 1 : 0,
 			(m_capabilities.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT) ? 1 : 0);
 	osd_printf_verbose(
-			"XInput axis capabilities LT=0x%02X (%d-bit) RT=0x%02X (%d-bit) LSX=0x%04X (%d-bit) LSY=0x%04X (%d-bit) RSX=0x%04X (%d-bit) RSY=0x%04X (%d-bit)\n",
+			"XInput axis capabilities LT=0x%02X (%d-bit%s) RT=0x%02X (%d-bit%s) LSX=0x%04X (%d-bit%s) LSY=0x%04X (%d-bit%s) RSX=0x%04X (%d-bit%s) RSY=0x%04X (%d-bit%s)\n",
 			m_capabilities.Gamepad.bLeftTrigger,
 			count_leading_ones_32(uint32_t(m_capabilities.Gamepad.bLeftTrigger) << 24),
+			ltcap_bad ? ", invalid" : "",
 			m_capabilities.Gamepad.bRightTrigger,
 			count_leading_ones_32(uint32_t(m_capabilities.Gamepad.bRightTrigger) << 24),
+			rtcap_bad ? ", invalid" : "",
 			m_capabilities.Gamepad.sThumbLX,
 			count_leading_ones_32(uint32_t(uint16_t(m_capabilities.Gamepad.sThumbLX)) << 16),
+			lsxcap_bad ? ", invalid" : "",
 			m_capabilities.Gamepad.sThumbLY,
 			count_leading_ones_32(uint32_t(uint16_t(m_capabilities.Gamepad.sThumbLY)) << 16),
+			lsycap_bad ? ", invalid" : "",
 			m_capabilities.Gamepad.sThumbRX,
 			count_leading_ones_32(uint32_t(uint16_t(m_capabilities.Gamepad.sThumbRX)) << 16),
+			rsxcap_bad ? ", invalid" : "",
 			m_capabilities.Gamepad.sThumbRY,
-			count_leading_ones_32(uint32_t(uint16_t(m_capabilities.Gamepad.sThumbRY)) << 16));
+			count_leading_ones_32(uint32_t(uint16_t(m_capabilities.Gamepad.sThumbRY)) << 16),
+			rsycap_bad ? ", invalid" : "");
+
+	// ignore capabilities if invalid
+	if (ltcap_bad || rtcap_bad || lsxcap_bad || lsycap_bad || rsxcap_bad || rsycap_bad)
+	{
+		osd_printf_verbose("Ignoring invalid XInput capabilities\n");
+		m_capabilities.Gamepad.wButtons = 0xf3ff;
+		m_capabilities.Gamepad.bLeftTrigger = 0xff;
+		m_capabilities.Gamepad.bRightTrigger = 0xff;
+		m_capabilities.Gamepad.sThumbLX = s16(u16(0xffc0));
+		m_capabilities.Gamepad.sThumbLY = s16(u16(0xffc0));
+		m_capabilities.Gamepad.sThumbRX = s16(u16(0xffc0));
+		m_capabilities.Gamepad.sThumbRY = s16(u16(0xffc0));
+	}
 
 	// add full-precision axes
 	for (unsigned i = 0; ((rstick_hat ? AXIS_LSY : AXIS_RSY) - AXIS_LSX) >= i; ++i)
