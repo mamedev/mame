@@ -32,8 +32,7 @@ motherboard bioses.
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "emupal.h"
-#include "screen.h"
+#include "machine/pci.h"
 
 
 class gaelcopc_state : public driver_device
@@ -47,26 +46,12 @@ public:
 	void gaelcopc(machine_config &config);
 
 private:
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void gaelcopc_map(address_map &map);
 
 	// devices
-	required_device<cpu_device> m_maincpu;
-
-	// driver_device overrides
-	virtual void video_start() override;
+	required_device<pentium3_device> m_maincpu;
 };
 
-
-void gaelcopc_state::video_start()
-{
-}
-
-uint32_t gaelcopc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
 
 void gaelcopc_state::gaelcopc_map(address_map &map)
 {
@@ -83,25 +68,24 @@ void gaelcopc_state::gaelcopc(machine_config &config)
 {
 	/* basic machine hardware */
 	// bios mentions Socket 370, so at very least a Celeron or a Pentium 3 class CPU
-	PENTIUM3(config, m_maincpu, XTAL(100'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &gaelcopc_state::gaelcopc_map);
+	// TODO: lowered rate for debugging aid, needs a slot option anyway
+	PENTIUM3(config, m_maincpu, 100'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gaelcopc_state::gaelcopc_map); // TODO: remove me
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_screen_update(FUNC(gaelcopc_state::screen_update));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
-	screen.set_palette("palette");
-
-	PALETTE(config, "palette").set_entries(0x100);
+	PCI_ROOT(config, "pci", 0);
+	// TODO: everything else
 }
 
+// TODO: All of the provided BIOSes just have different ACFG table configs at $10000, investigate
 
 ROM_START(tokyocop)
 	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
-	ROM_LOAD("al1.u10", 0x000000, 0x80000, CRC(e426e030) SHA1(52bdb6d46c12150077169ac3add8c450326ad4af) )
+	// $40 Award 6.00 PG 12/19/2002
+	// $7413c Intel 815 Hardware version v0.0 08/13/1999
+	ROM_SYSTEM_BIOS(0, "default", "v0.0 08/13/1999")
+	ROMX_LOAD("al1.u10", 0x000000, 0x80000, CRC(e426e030) SHA1(52bdb6d46c12150077169ac3add8c450326ad4af), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "alt_acfg", "v0.0 08/13/1999 (alt ACFG)")
+	ROMX_LOAD("al1 49lf004a.u10", 0x00000, 0x80000, CRC(db8e4a37) SHA1(9ef4bf1d72955a89e7dc9b984e76ce86c824b461), ROM_BIOS(1) )
 
 /* Dumper's note: The drive was ordered from Gaelco and they used a 250 GB drive that apparently used to have something
 else on it because when I ripped the entire drive and compressed it, the compressed image was 30 GB which is too much for me
@@ -114,6 +98,8 @@ ROM_END
 
 ROM_START(tokyocopk)
 	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
+	// $40 6.00 PG 12/19/2002
+	// $7413c v0.0 08/13/1999
 	ROM_LOAD("al1.u10", 0x000000, 0x80000, CRC(e426e030) SHA1(52bdb6d46c12150077169ac3add8c450326ad4af) )
 
 	DISK_REGION( "disks" ) // Maxtor 2F040J0310613 VAM051JJ0
@@ -122,8 +108,8 @@ ROM_END
 
 ROM_START(tokyocopi)
 	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
-	// undumped from this version, assume same
-	ROM_LOAD("al1.u10", 0x000000, 0x80000, BAD_DUMP CRC(e426e030) SHA1(52bdb6d46c12150077169ac3add8c450326ad4af) )
+	// Not specifically provided, assume "works right" with same BIOS.
+	ROM_LOAD("al1.u10", 0x000000, 0x80000, CRC(e426e030) SHA1(52bdb6d46c12150077169ac3add8c450326ad4af) )
 
 	DISK_REGION( "disks" )
 	DISK_IMAGE( "tokyocopi", 0, SHA1(a3cf011c8ef8ec80724c28e1534191b40ae8515d) )
@@ -131,6 +117,8 @@ ROM_END
 
 ROM_START(rriders)
 	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
+	// $40 6.00 PG 12/19/2002
+	// $7413c v0.0 08/13/1999
 	ROM_LOAD("22-03.u10", 0x000000, 0x80000, CRC(0ccae12f) SHA1(a8878fa73d5a4f5e9b6e3f35994fddea08cd3c2d) )
 
 	DISK_REGION( "disks" ) // 250 MB compact flash card
@@ -139,6 +127,8 @@ ROM_END
 
 ROM_START(tuningrc)
 	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
+	// $40 6.00 PG 12/19/2002
+	// $7413c v0.0 08/13/1999
 	ROM_LOAD("310j.u10", 0x000000, 0x80000, CRC(70b0797a) SHA1(696f602e83359d5d36798d4d2962ee85171e3622) )
 
 	DISK_REGION( "disks" ) // Hitachi HDS728080PLAT20 ATA/IDE
