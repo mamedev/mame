@@ -214,6 +214,29 @@ char const *const CONTROLLER_BUTTON_XBOX360[]{
 		"P4",
 		"Touchpad" };
 
+[[maybe_unused]] char const *const CONTROLLER_BUTTON_STADIA[]{
+		"A",
+		"B",
+		"X",
+		"Y",
+		"Options",
+		"Logo",
+		"Menu",
+		"L3",
+		"R3",
+		"L1",
+		"R1",
+		"D-pad Up",
+		"D-pad Down",
+		"D-pad Left",
+		"D-pad Right",
+		"Capture",
+		"P1",
+		"P2",
+		"P3",
+		"P4",
+		"Touchpad" };
+
 struct key_lookup_table
 {
 	int code;
@@ -785,6 +808,14 @@ public:
 
 	bool is_instance(SDL_JoystickID instance) const { return m_instance == instance; }
 
+	bool reconnect_match(std::string_view g, char const *s) const
+	{
+		return
+				(0 > m_instance) &&
+				(id() == g) &&
+				((s && serial() && (*serial() == s)) || (!s && !serial()));
+	}
+
 protected:
 	sdl_joystick_device_base(
 			running_machine &machine,
@@ -1006,7 +1037,7 @@ public:
 			break;
 
 		case SDL_JOYDEVICEREMOVED:
-			osd_printf_verbose("Joystick: %s [GUID %s] disconnected\n", name(), id());
+			osd_printf_verbose("Joystick: %s [ID %s] disconnected\n", name(), id());
 			clear_instance();
 			reset();
 			if (m_joydevice)
@@ -1028,14 +1059,6 @@ public:
 		return m_hapdevice != nullptr;
 	}
 
-	bool reconnect_match(std::string_view g, char const *s) const
-	{
-		return
-				!m_joydevice &&
-				(id() == g) &&
-				((s && serial() && (*serial() == s)) || (!s && !serial()));
-	}
-
 	void attach_device(SDL_Joystick *joy)
 	{
 		assert(joy);
@@ -1044,6 +1067,8 @@ public:
 		set_instance(SDL_JoystickInstanceID(joy));
 		m_joydevice = joy;
 		m_hapdevice = SDL_HapticOpenFromJoystick(joy);
+
+		osd_printf_verbose("Joystick: %s [ID %s] reconnected\n", name(), id());
 	}
 
 protected:
@@ -1138,6 +1163,7 @@ public:
 	{
 		char const *const *axisnames = CONTROLLER_AXIS_XBOX;
 		char const *const *buttonnames = CONTROLLER_BUTTON_XBOX360;
+		bool digitaltriggers = false;
 #if SDL_VERSION_ATLEAST(2, 0, 12)
 		auto const ctrltype = SDL_GameControllerGetType(m_ctrldevice);
 		switch (ctrltype)
@@ -1169,6 +1195,7 @@ public:
 			osd_printf_verbose("Game Controller:   ...  Switch Pro Controller type\n");
 			axisnames = CONTROLLER_AXIS_SWITCH;
 			buttonnames = CONTROLLER_BUTTON_SWITCH;
+			digitaltriggers = true;
 			break;
 #if SDL_VERSION_ATLEAST(2, 0, 14) // TODO: support more controller types
 		//case SDL_CONTROLLER_TYPE_VIRTUAL:
@@ -1178,13 +1205,17 @@ public:
 			buttonnames = CONTROLLER_BUTTON_PS5;
 			break;
 		//case SDL_CONTROLLER_TYPE_AMAZON_LUNA:
-		//case SDL_CONTROLLER_TYPE_GOOGLE_STADIA:
+		case SDL_CONTROLLER_TYPE_GOOGLE_STADIA:
+			osd_printf_verbose("Game Controller:   ...  Google Stadia type\n");
+			axisnames = CONTROLLER_AXIS_PS;
+			buttonnames = CONTROLLER_BUTTON_STADIA;
+			break;
 		//case SDL_CONTROLLER_TYPE_SWITCH_JOYCON_LEFT:
 		//case SDL_CONTROLLER_TYPE_SWITCH_JOYCON_RIGHT:
 		//case SDL_CONTROLLER_TYPE_SWITCH_JOYCON_PAIR:
 #endif
 		default: // default to Xbox 360 names
-			osd_printf_verbose("Game Controller:   ...  unrecognised type (%d)\n", int(ctrltype));
+			osd_printf_verbose("Game Controller:   ...  unrecognized type (%d)\n", int(ctrltype));
 			break;
 		}
 #endif
@@ -1199,9 +1230,9 @@ public:
 				{ SDL_CONTROLLER_AXIS_TRIGGERRIGHT,    ITEM_ID_SLIDER2, true } };
 		for (auto [axis, item, buttontest] : axes)
 		{
-			bool avail = true;
+			bool avail = !buttontest || !digitaltriggers;
 #if SDL_VERSION_ATLEAST(2, 0, 14)
-			avail = SDL_GameControllerHasAxis(m_ctrldevice, axis);
+			avail = avail && SDL_GameControllerHasAxis(m_ctrldevice, axis);
 #endif
 			if (avail)
 			{
@@ -1293,10 +1324,13 @@ public:
 					auto const binding = SDL_GameControllerGetBindForAxis(m_ctrldevice, axis);
 					switch (binding.bindType)
 					{
+					case SDL_CONTROLLER_BINDTYPE_NONE:
+						avail = false;
+						break;
 					case SDL_CONTROLLER_BINDTYPE_BUTTON:
 						break;
 					default:
-						avail = false;
+						avail = digitaltriggers;
 					}
 				}
 				if (avail)
@@ -1381,7 +1415,7 @@ public:
 			break;
 
 		case SDL_CONTROLLERDEVICEREMOVED:
-			osd_printf_verbose("Game Controller: %s [GUID %s] disconnected\n", name(), id());
+			osd_printf_verbose("Game Controller: %s [ID %s] disconnected\n", name(), id());
 			clear_instance();
 			reset();
 			if (m_ctrldevice)
@@ -1391,6 +1425,17 @@ public:
 			}
 			break;
 		}
+	}
+
+	void attach_device(SDL_GameController *ctrl)
+	{
+		assert(ctrl);
+		assert(!m_ctrldevice);
+
+		set_instance(SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(ctrl)));
+		m_ctrldevice = ctrl;
+
+		osd_printf_verbose("Game Controller: %s [ID %s] reconnected\n", name(), id());
 	}
 
 private:
@@ -1633,99 +1678,190 @@ public:
 
 
 //============================================================
-//  sdl_joystick_module
+//  sdl_joystick_module_base
 //============================================================
 
-class sdl_joystick_module : public sdl_input_module
+class sdl_joystick_module_base : public sdl_input_module
 {
-public:
-	sdl_joystick_module() :
-		sdl_input_module(OSD_JOYSTICKINPUT_PROVIDER, "sdljoy"),
+protected:
+	sdl_joystick_module_base(char const *name) :
+		sdl_input_module(OSD_JOYSTICKINPUT_PROVIDER, name),
 		m_initialized_joystick(false),
 		m_initialized_haptic(false)
 	{
 	}
 
-	virtual void exit() override
+	virtual ~sdl_joystick_module_base()
 	{
-		sdl_input_module::exit();
+		assert(!m_initialized_joystick);
+		assert(!m_initialized_haptic);
+	}
 
+	bool have_joystick() const { return m_initialized_joystick; }
+	bool have_haptic() const { return m_initialized_haptic; }
+
+	void init_joystick()
+	{
+		assert(!m_initialized_joystick);
+		assert(!m_initialized_haptic);
+
+		m_initialized_joystick = !SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+		if (!m_initialized_joystick)
+		{
+			osd_printf_error("Could not initialize SDL Joystick subsystem: %s.\n", SDL_GetError());
+			return;
+		}
+
+		m_initialized_haptic = !SDL_InitSubSystem(SDL_INIT_HAPTIC);
+		if (!m_initialized_haptic)
+			osd_printf_verbose("Could not initialize SDL Haptic subsystem: %s.\n", SDL_GetError());
+	}
+
+	void quit_joystick()
+	{
 		if (m_initialized_joystick)
+		{
 			SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+			m_initialized_joystick = false;
+		}
 
 		if (m_initialized_haptic)
+		{
 			SDL_QuitSubSystem(SDL_INIT_HAPTIC);
+			m_initialized_haptic = false;
+		}
+	}
+
+	sdl_joystick_device *create_joystick_device(running_machine &machine, int index, bool sixaxis)
+	{
+		// open the joystick device
+		SDL_Joystick *const joy = SDL_JoystickOpen(index);
+		if (!joy)
+		{
+			osd_printf_error("Joystick: Could not open SDL joystick %d: %s.\n", index, SDL_GetError());
+			return nullptr;
+		}
+
+		// get basic info
+		char const *const name = SDL_JoystickName(joy);
+		SDL_JoystickGUID guid = SDL_JoystickGetGUID(joy);
+		char guid_str[256];
+		guid_str[0] = '\0';
+		SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str) - 1);
+		char const *serial = nullptr;
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+		serial = SDL_JoystickGetSerial(joy);
+#endif
+		std::string id(guid_str);
+		if (serial)
+			id.append(1, '-').append(serial);
+
+		// instantiate device
+		sdl_joystick_device &devinfo = sixaxis
+				? devicelist().create_device<sdl_sixaxis_joystick_device>(machine, name ? name : guid_str, guid_str, *this, joy, serial)
+				: devicelist().create_device<sdl_joystick_device>(machine, name ? name : guid_str, guid_str, *this, joy, serial);
+
+		// print some diagnostic info
+		osd_printf_verbose("Joystick: %s [GUID %s] Vendor ID %04X, Product ID %04X, Revision %04X, Serial %s\n",
+				name ? name : "<nullptr>",
+				guid_str,
+				SDL_JoystickGetVendor(joy),
+				SDL_JoystickGetProduct(joy),
+				SDL_JoystickGetProductVersion(joy),
+				serial ? serial : "<nullptr>");
+		osd_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats %d balls\n",
+				SDL_JoystickNumAxes(joy),
+				SDL_JoystickNumButtons(joy),
+				SDL_JoystickNumHats(joy),
+				SDL_JoystickNumBalls(joy));
+		if (devinfo.has_haptic())
+			osd_printf_verbose("Joystick:   ...  Has haptic capability\n");
+		else
+			osd_printf_verbose("Joystick:   ...  Does not have haptic capability\n");
+		if (SDL_JoystickNumButtons(joy) > MAX_BUTTONS)
+			osd_printf_verbose("Joystick:   ...  Has %d buttons which exceeds supported %d buttons\n", SDL_JoystickNumButtons(joy), MAX_BUTTONS);
+
+		// let it add controls
+		devinfo.configure();
+		return &devinfo;
+	}
+
+	void dispatch_joystick_event(SDL_Event const &event)
+	{
+		// figure out which joystick this event is destined for
+		sdl_joystick_device_base *const target_device = find_joystick(event.jdevice.which); // FIXME: this depends on SDL_JoystickID being the same size as Sint32
+
+		// if we find a matching joystick, dispatch the event to the joystick
+		if (target_device)
+			target_device->queue_events(&event, 1);
+	}
+
+	device_info *find_reconnect_match(SDL_JoystickGUID const &guid, char const *serial)
+	{
+		char guid_str[256];
+		guid_str[0] = '\0';
+		SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str) - 1);
+		auto target_device = std::find_if(
+				devicelist().begin(),
+				devicelist().end(),
+				[&guid_str, &serial] (auto const &device)
+				{
+					auto &devinfo = downcast<sdl_joystick_device_base &>(*device);
+					return devinfo.reconnect_match(guid_str, serial);
+				});
+		return (devicelist().end() != target_device) ? target_device->get() : nullptr;
+	}
+
+	sdl_joystick_device_base *find_joystick(SDL_JoystickID instance)
+	{
+		for (auto &ptr : devicelist())
+		{
+			sdl_joystick_device_base *const device = downcast<sdl_joystick_device_base *>(ptr.get());
+			if (device->is_instance(instance))
+				return device;
+		}
+		return nullptr;
+	}
+
+private:
+	bool m_initialized_joystick;
+	bool m_initialized_haptic;
+};
+
+
+//============================================================
+//  sdl_joystick_module
+//============================================================
+
+class sdl_joystick_module : public sdl_joystick_module_base
+{
+public:
+	sdl_joystick_module() : sdl_joystick_module_base("sdljoy")
+	{
+	}
+
+	virtual void exit() override
+	{
+		sdl_joystick_module_base::exit();
+
+		quit_joystick();
 	}
 
 	virtual void input_init(running_machine &machine) override
 	{
 		SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 
-		m_initialized_joystick = !SDL_InitSubSystem(SDL_INIT_JOYSTICK);
-		if (!m_initialized_joystick)
-		{
-			osd_printf_error("Could not initialize SDL Joystick: %s.\n", SDL_GetError());
+		init_joystick();
+		if (!have_joystick())
 			return;
-		}
 
-		m_initialized_haptic = !SDL_InitSubSystem(SDL_INIT_HAPTIC);
-		if (!m_initialized_haptic)
-		{
-			osd_printf_verbose("Could not initialize SDL Haptic subsystem: %s.\n", SDL_GetError());
-		}
-
-		sdl_input_module::input_init(machine);
+		sdl_joystick_module_base::input_init(machine);
 
 		bool const sixaxis_mode = downcast<const sdl_options *>(options())->sixaxis();
 
 		osd_printf_verbose("Joystick: Start initialization\n");
 		for (int physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
-		{
-			SDL_Joystick *const joy = SDL_JoystickOpen(physical_stick);
-			char const *const name = SDL_JoystickName(joy);
-			SDL_JoystickGUID guid = SDL_JoystickGetGUID(joy);
-			char guid_str[256];
-			guid_str[0] = '\0';
-			SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str) - 1);
-			char const *serial = nullptr;
-#if SDL_VERSION_ATLEAST(2, 0, 14)
-			serial = SDL_JoystickGetSerial(joy);
-#endif
-			std::string id(guid_str);
-			if (serial)
-				id.append(1, '-').append(serial);
-
-			sdl_joystick_device *const devinfo = sixaxis_mode
-					? &devicelist().create_device<sdl_sixaxis_joystick_device>(machine, name ? name : guid_str, guid_str, *this, joy, serial)
-					: &devicelist().create_device<sdl_joystick_device>(machine, name ? name : guid_str, guid_str, *this, joy, serial);
-
-			if (!devinfo)
-			{
-				SDL_JoystickClose(joy);
-				continue;
-			}
-
-			osd_printf_verbose("Joystick: %s [GUID %s] Vendor ID %04X, Product ID %04X, Revision %04X, Serial %s\n",
-					name ? name : "<nullptr>",
-					guid_str,
-					SDL_JoystickGetVendor(joy),
-					SDL_JoystickGetProduct(joy),
-					SDL_JoystickGetProductVersion(joy),
-					serial ? serial : "<nullptr>");
-			osd_printf_verbose("Joystick:   ...  %d axes, %d buttons %d hats %d balls\n",
-					SDL_JoystickNumAxes(joy),
-					SDL_JoystickNumButtons(joy),
-					SDL_JoystickNumHats(joy),
-					SDL_JoystickNumBalls(joy));
-			if (devinfo->has_haptic())
-				osd_printf_verbose("Joystick:   ...  Has haptic capability\n");
-			else
-				osd_printf_verbose("Joystick:   ...  Does not have haptic capability\n");
-			if (SDL_JoystickNumButtons(joy) > MAX_BUTTONS)
-				osd_printf_verbose("Joystick:   ...  Has %d buttons which exceeds supported %d buttons\n", SDL_JoystickNumButtons(joy), MAX_BUTTONS);
-
-			devinfo->configure();
-		}
+			create_joystick_device(machine, physical_stick, sixaxis_mode);
 
 		static int const event_types[] = {
 				int(SDL_JOYAXISMOTION),
@@ -1735,7 +1871,6 @@ public:
 				int(SDL_JOYBUTTONUP),
 				int(SDL_JOYDEVICEADDED),
 				int(SDL_JOYDEVICEREMOVED) };
-
 		sdl_event_manager::instance().subscribe(event_types, this);
 
 		osd_printf_verbose("Joystick: End initialization\n");
@@ -1746,29 +1881,22 @@ public:
 		if (SDL_JOYDEVICEADDED == sdlevent.type)
 		{
 			SDL_Joystick *const joy = SDL_JoystickOpen(sdlevent.jdevice.which);
-			if (joy)
+			if (!joy)
+			{
+				osd_printf_error("Joystick: Could not open SDL joystick %d: %s.\n", sdlevent.jdevice.which, SDL_GetError());
+			}
+			else
 			{
 				SDL_JoystickGUID guid = SDL_JoystickGetGUID(joy);
-				char guid_str[256];
-				guid_str[0] = '\0';
-				SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str) - 1);
 				char const *serial = nullptr;
 #if SDL_VERSION_ATLEAST(2, 0, 14)
 				serial = SDL_JoystickGetSerial(joy);
 #endif
-				auto target_device = std::find_if(
-						devicelist().begin(),
-						devicelist().end(),
-						[&guid_str, &serial] (auto const &device)
-						{
-							auto &devinfo = downcast<sdl_joystick_device &>(*device);
-							return devinfo.reconnect_match(guid_str, serial);
-						});
-				if (devicelist().end() != target_device)
+				auto *const target_device = find_reconnect_match(guid, serial);
+				if (target_device)
 				{
-					auto &devinfo = downcast<sdl_joystick_device &>(**target_device);
+					auto &devinfo = downcast<sdl_joystick_device &>(*target_device);
 					devinfo.attach_device(joy);
-					osd_printf_verbose("Joystick: %s [GUID %s] reconnected\n", devinfo.name(), guid_str);
 				}
 				else
 				{
@@ -1778,29 +1906,9 @@ public:
 		}
 		else
 		{
-			// figure out which joystick this event is destined for
-			sdl_joystick_device *const target_device = find_joystick(sdlevent.jdevice.which); // FIXME: this depends on SDL_JoystickID being the same size as Sint32
-
-			// if we find a matching joystick, dispatch the event to the joystick
-			if (target_device)
-				target_device->queue_events(&sdlevent, 1);
+			dispatch_joystick_event(sdlevent);
 		}
 	}
-
-private:
-	sdl_joystick_device *find_joystick(SDL_JoystickID instance)
-	{
-		for (auto &ptr : devicelist())
-		{
-			sdl_joystick_device *const device = downcast<sdl_joystick_device *>(ptr.get());
-			if (device->is_instance(instance))
-				return device;
-		}
-		return nullptr;
-	}
-
-	bool m_initialized_joystick;
-	bool m_initialized_haptic;
 };
 
 
@@ -1808,11 +1916,11 @@ private:
 //  sdl_game_controller_module
 //============================================================
 
-class sdl_game_controller_module : public sdl_input_module
+class sdl_game_controller_module : public sdl_joystick_module_base
 {
 public:
 	sdl_game_controller_module() :
-		sdl_input_module(OSD_JOYSTICKINPUT_PROVIDER, "sdlgame"),
+		sdl_joystick_module_base("sdlgame"),
 		m_initialized_game_controller(false)
 	{
 	}
@@ -1823,80 +1931,58 @@ public:
 
 		if (m_initialized_game_controller)
 			SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
+
+		quit_joystick();
 	}
 
 	virtual void input_init(running_machine &machine) override
 	{
+		SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
+
+		init_joystick();
+		if (!have_joystick())
+			return;
+
 		m_initialized_game_controller = !SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
 		if (!m_initialized_game_controller)
-		{
-			osd_printf_error("Could not initialize SDL Game Controller: %s.\n", SDL_GetError());
-			return;
-		}
+			osd_printf_warning("Could not initialize SDL Game Controller: %s.\n", SDL_GetError());
 
-		sdl_input_module::input_init(machine);
+		sdl_joystick_module_base::input_init(machine);
+
+		bool const sixaxis_mode = downcast<const sdl_options *>(options())->sixaxis();
 
 		osd_printf_verbose("Game Controller: Start initialization\n");
 		for (int physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
 		{
-			if (!SDL_IsGameController(physical_stick))
-				continue;
-
-			SDL_GameController *const ctrl = SDL_GameControllerOpen(physical_stick);
-			char const *const name = SDL_GameControllerName(ctrl);
-			SDL_JoystickGUID guid = SDL_JoystickGetDeviceGUID(physical_stick);
-			char guid_str[256];
-			guid_str[0] = '\0';
-			SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str) - 1);
-			char const *serial = nullptr;
-#if SDL_VERSION_ATLEAST(2, 0, 14)
-			serial = SDL_GameControllerGetSerial(ctrl);
-#endif
-			std::string id(guid_str);
-			if (serial)
-				id.append(1, '-').append(serial);
-
-			sdl_game_controller_device *const devinfo = &devicelist().create_device<sdl_game_controller_device>(
-					machine,
-					name ? name : guid_str,
-					guid_str,
-					*this,
-					ctrl,
-					serial);
-
-			if (!devinfo)
+			// try to open as a game controller
+			SDL_GameController *ctrl = nullptr;
+			if (m_initialized_game_controller && SDL_IsGameController(physical_stick))
 			{
-				SDL_GameControllerClose(ctrl);
-				continue;
+				ctrl = SDL_GameControllerOpen(physical_stick);
+				if (!ctrl)
+					osd_printf_warning("Game Controller: Could not open SDL game controller %d: %s.\n", physical_stick, SDL_GetError());
 			}
 
-			osd_printf_verbose("Game Controller: %s [GUID %s] Vendor ID %04X, Product ID %04X, Revision %04X, Serial %s\n",
-					name ? name : "<nullptr>",
-					guid_str,
-					SDL_GameControllerGetVendor(ctrl),
-					SDL_GameControllerGetProduct(ctrl),
-					SDL_GameControllerGetProductVersion(ctrl),
-					serial ? serial : "<nullptr>");
-			char *const mapping = SDL_GameControllerMapping(ctrl);
-			if (mapping)
-			{
-				osd_printf_verbose("Game Controller:   ...  mapping [%s]\n", mapping);
-				SDL_free(mapping);
-			}
+			// fall back to joystick API if necessary
+			if (!ctrl)
+				create_joystick_device(machine, physical_stick, sixaxis_mode);
 			else
-			{
-				osd_printf_verbose("Game Controller:   ...  no mapping\n");
-			}
-
-			devinfo->configure();
+				create_game_controller_device(machine, physical_stick, ctrl);
 		}
 
 		static int const event_types[] = {
+				int(SDL_JOYAXISMOTION),
+				int(SDL_JOYBALLMOTION),
+				int(SDL_JOYHATMOTION),
+				int(SDL_JOYBUTTONDOWN),
+				int(SDL_JOYBUTTONUP),
+				int(SDL_JOYDEVICEADDED),
+				int(SDL_JOYDEVICEREMOVED),
 				int(SDL_CONTROLLERAXISMOTION),
 				int(SDL_CONTROLLERBUTTONDOWN),
 				int(SDL_CONTROLLERBUTTONUP),
+				int(SDL_CONTROLLERDEVICEADDED),
 				int(SDL_CONTROLLERDEVICEREMOVED) };
-
 		sdl_event_manager::instance().subscribe(event_types, this);
 
 		osd_printf_verbose("Game Controller: End initialization\n");
@@ -1904,24 +1990,135 @@ public:
 
 	virtual void handle_event(SDL_Event &sdlevent) override
 	{
-		// figure out which game controller this event is destined for
-		sdl_game_controller_device *const target_device = find_controller(sdlevent.jdevice.which); // FIXME: this depends on SDL_JoystickID being the same size as Sint32
+		switch (sdlevent.type)
+		{
+		case SDL_JOYDEVICEADDED:
+			{
+				// make sure this isn't an event for a reconnected game controller
+				auto const controller = find_joystick(SDL_JoystickGetDeviceInstanceID(sdlevent.jdevice.which));
+				if (find_joystick(SDL_JoystickGetDeviceInstanceID(sdlevent.jdevice.which)))
+				{
+					osd_printf_verbose(
+							"Game Controller: Got SDL joystick added event for reconnected game controller %s [ID %s]\n",
+							controller->name(),
+							controller->id());
+					break;
+				}
 
-		// if we find a matching controller, dispatch the event to the game controller
-		if (target_device)
-			target_device->queue_events(&sdlevent, 1);
+				SDL_Joystick *const joy = SDL_JoystickOpen(sdlevent.jdevice.which);
+				if (!joy)
+				{
+					osd_printf_error("Joystick: Could not open SDL joystick %d: %s.\n", sdlevent.jdevice.which, SDL_GetError());
+					break;
+				}
+
+				SDL_JoystickGUID guid = SDL_JoystickGetGUID(joy);
+				char const *serial = nullptr;
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+				serial = SDL_JoystickGetSerial(joy);
+#endif
+				auto *const target_device = find_reconnect_match(guid, serial);
+				if (target_device)
+				{
+					// if this downcast fails, opening as a game controller worked initially but failed on reconnection
+					auto *const devinfo = dynamic_cast<sdl_joystick_device *>(target_device);
+					if (devinfo)
+						devinfo->attach_device(joy);
+					else
+						SDL_JoystickClose(joy);
+				}
+				else
+				{
+					SDL_JoystickClose(joy);
+				}
+			}
+			break;
+
+		// for devices supported by the game controller API, this is received before the corresponding SDL_JOYDEVICEADDED
+		case SDL_CONTROLLERDEVICEADDED:
+			{
+				SDL_GameController *const ctrl = SDL_GameControllerOpen(sdlevent.cdevice.which);
+				if (!ctrl)
+				{
+					osd_printf_error("Game Controller: Could not open SDL game controller %d: %s.\n", sdlevent.cdevice.which, SDL_GetError());
+					break;
+				}
+
+				SDL_JoystickGUID guid = SDL_JoystickGetDeviceGUID(sdlevent.cdevice.which);
+				char const *serial = nullptr;
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+				serial = SDL_GameControllerGetSerial(ctrl);
+#endif
+				auto *const target_device = find_reconnect_match(guid, serial);
+				if (target_device)
+				{
+					// downcast can fail if there was an error opening the device as a game controller the first time
+					auto *const devinfo = dynamic_cast<sdl_game_controller_device *>(target_device);
+					if (devinfo)
+						devinfo->attach_device(ctrl);
+					else
+						SDL_GameControllerClose(ctrl);
+				}
+				else
+				{
+					SDL_GameControllerClose(ctrl);
+				}
+			}
+			break;
+
+		default:
+			dispatch_joystick_event(sdlevent);
+		}
 	}
 
 private:
-	sdl_game_controller_device *find_controller(SDL_JoystickID instance)
+	sdl_game_controller_device *create_game_controller_device(running_machine &machine, int index, SDL_GameController *ctrl)
 	{
-		for (auto &ptr : devicelist())
+		// get basic info
+		char const *const name = SDL_GameControllerName(ctrl);
+		SDL_JoystickGUID guid = SDL_JoystickGetDeviceGUID(index);
+		char guid_str[256];
+		guid_str[0] = '\0';
+		SDL_JoystickGetGUIDString(guid, guid_str, sizeof(guid_str) - 1);
+		char const *serial = nullptr;
+#if SDL_VERSION_ATLEAST(2, 0, 14)
+		serial = SDL_GameControllerGetSerial(ctrl);
+#endif
+		std::string id(guid_str);
+		if (serial)
+			id.append(1, '-').append(serial);
+
+		// instantiate device
+		sdl_game_controller_device &devinfo = devicelist().create_device<sdl_game_controller_device>(
+				machine,
+				name ? name : guid_str,
+				guid_str,
+				*this,
+				ctrl,
+				serial);
+
+		// print some diagnostic info
+		osd_printf_verbose("Game Controller: %s [GUID %s] Vendor ID %04X, Product ID %04X, Revision %04X, Serial %s\n",
+				name ? name : "<nullptr>",
+				guid_str,
+				SDL_GameControllerGetVendor(ctrl),
+				SDL_GameControllerGetProduct(ctrl),
+				SDL_GameControllerGetProductVersion(ctrl),
+				serial ? serial : "<nullptr>");
+		char *const mapping = SDL_GameControllerMapping(ctrl);
+		if (mapping)
 		{
-			sdl_game_controller_device *const device = downcast<sdl_game_controller_device *>(ptr.get());
-			if (device->is_instance(instance))
-				return device;
+			osd_printf_verbose("Game Controller:   ...  mapping [%s]\n", mapping);
+			SDL_free(mapping);
 		}
-		return nullptr;
+		else
+		{
+			osd_printf_verbose("Game Controller:   ...  no mapping\n");
+		}
+
+		// let it add controls
+		devinfo.configure();
+		return &devinfo;
 	}
 
 	bool m_initialized_game_controller;
