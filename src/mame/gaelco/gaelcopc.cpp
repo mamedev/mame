@@ -3,16 +3,22 @@
 /* Gaelco PC based hardware
 
 TODO:
-- tokyocop can't be emulated without proper mb bios
+- Implement all of the components listed below, notice that we need to consolidate
+  PCI individual interfaces before even attempting to emulate this;
+- Analyze OS images;
+- Reportedly requires a special monitor with a very specific refresh rate (very Gaelco like),
+  likely gonna play with monitor DDC;
 
 Custom motherboard with
-82815
-82801
-82562 (LAN)
+Intel 82815 (host + bridge + AGP devices)
+Intel 82801 (PCI 2.3 + integrated LAN + IDE + USB 2.0 + AC'97 + LPC +
+             ACPI 2.0 + Flash BIOS control + SMBus + GPIO)
+Intel 82562 (LAN)
 RTM 560-25R (Audio)
-TI4200 128Mb AGP
+nVidia GeForce 4 TI4200 128Mb AGP
 256 Mb PC133
-Pentium 4 (??? XXXXMhz)
+Pentium 4 (??? XXXXMhz), <- contradicts 82815 datasheet and an internal BIOS string at $ce (Socket 370),
+                            expect Celeron or Pentium 3 at very least.
 
 I/O Board with Altera Flex EPF15K50EQC240-3
 
@@ -64,7 +70,9 @@ uint32_t gaelcopc_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void gaelcopc_state::gaelcopc_map(address_map &map)
 {
-	map(0x00000000, 0x0001ffff).rom();
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0x60000);
+	map(0xfff80000, 0xffffffff).rom().region("bios", 0);
 }
 
 static INPUT_PORTS_START( gaelcopc )
@@ -74,7 +82,8 @@ INPUT_PORTS_END
 void gaelcopc_state::gaelcopc(machine_config &config)
 {
 	/* basic machine hardware */
-	PENTIUM(config, m_maincpu, 2000000000); /* Pentium4? */
+	// bios mentions Socket 370, so at very least a Celeron or a Pentium 3 class CPU
+	PENTIUM3(config, m_maincpu, XTAL(100'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelcopc_state::gaelcopc_map);
 
 	/* video hardware */
@@ -91,7 +100,7 @@ void gaelcopc_state::gaelcopc(machine_config &config)
 
 
 ROM_START(tokyocop)
-	ROM_REGION32_LE(0x80000, "maincpu", 0)  /* motherboard bios */
+	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
 	ROM_LOAD("al1.u10", 0x000000, 0x80000, CRC(e426e030) SHA1(52bdb6d46c12150077169ac3add8c450326ad4af) )
 
 /* Dumper's note: The drive was ordered from Gaelco and they used a 250 GB drive that apparently used to have something
@@ -104,7 +113,7 @@ tested working on the real hardware. It uses the same hardware and bios as the k
 ROM_END
 
 ROM_START(tokyocopk)
-	ROM_REGION32_LE(0x80000, "maincpu", 0)  /* motherboard bios */
+	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
 	ROM_LOAD("al1.u10", 0x000000, 0x80000, CRC(e426e030) SHA1(52bdb6d46c12150077169ac3add8c450326ad4af) )
 
 	DISK_REGION( "disks" ) // Maxtor 2F040J0310613 VAM051JJ0
@@ -112,15 +121,16 @@ ROM_START(tokyocopk)
 ROM_END
 
 ROM_START(tokyocopi)
-	ROM_REGION32_LE(0x80000, "maincpu", 0)  /* motherboard bios */
-	ROM_LOAD("tokyocopi.pcbios", 0x000000, 0x80000, NO_DUMP )
+	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
+	// undumped from this version, assume same
+	ROM_LOAD("al1.u10", 0x000000, 0x80000, BAD_DUMP CRC(e426e030) SHA1(52bdb6d46c12150077169ac3add8c450326ad4af) )
 
 	DISK_REGION( "disks" )
 	DISK_IMAGE( "tokyocopi", 0, SHA1(a3cf011c8ef8ec80724c28e1534191b40ae8515d) )
 ROM_END
 
 ROM_START(rriders)
-	ROM_REGION32_LE(0x80000, "maincpu", 0)  /* motherboard bios */
+	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
 	ROM_LOAD("22-03.u10", 0x000000, 0x80000, CRC(0ccae12f) SHA1(a8878fa73d5a4f5e9b6e3f35994fddea08cd3c2d) )
 
 	DISK_REGION( "disks" ) // 250 MB compact flash card
@@ -128,7 +138,7 @@ ROM_START(rriders)
 ROM_END
 
 ROM_START(tuningrc)
-	ROM_REGION32_LE(0x80000, "maincpu", 0)  /* motherboard bios */
+	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
 	ROM_LOAD("310j.u10", 0x000000, 0x80000, CRC(70b0797a) SHA1(696f602e83359d5d36798d4d2962ee85171e3622) )
 
 	DISK_REGION( "disks" ) // Hitachi HDS728080PLAT20 ATA/IDE
