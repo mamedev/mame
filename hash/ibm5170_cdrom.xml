@@ -3287,7 +3287,7 @@ Warlords III: Darklords Rising
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
 		<info name="version" value="1.0 September 11, 1998" />
-		<sharedfeat name="platform" value="Windows95" />
+		<sharedfeat name="platform" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3317,7 +3317,7 @@ Warlords III: Darklords Rising
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
 		<info name="version" value="1.0 September 11, 1998" />
-		<sharedfeat name="platform" value="Windows95" />
+		<sharedfeat name="platform" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3346,7 +3346,7 @@ The Making of Prince of Persia 3D
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
 		<info name="version" value="1.0 September 11, 1998" />
-		<sharedfeat name="platform" value="Windows95" />
+		<sharedfeat name="platform" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3375,7 +3375,7 @@ Warlords III: Darklords Rising
 		<info name="language" value="English" />
 		<info name="region" value="Netherlands" />
 		<info name="version" value="1.0 September 11, 1998" />
-		<sharedfeat name="platform" value="Windows95" />
+		<sharedfeat name="platform" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3404,7 +3404,7 @@ Warlords III: Darklords Rising
 		<info name="language" value="English" />
 		<info name="region" value="Brazil" />
 		<info name="version" value="1.0 September 11, 1998" />
-		<sharedfeat name="platform" value="Windows95" />
+		<sharedfeat name="platform" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3852,7 +3852,7 @@ Draws video without colors if run thru autorun in Win95, works if st_95.exe is m
 		</part>
 	</software>
 
-	<!-- Source: http://redump.org/disc/51015/ -->
+	<!-- Source: http://redump.org/disc/34461/ -->
 	<!-- <rom name="10 Game CD ROM (Europe).cue" size="112" crc="1d4f23a1" sha1="5eeee536fd8a8a2f146c5ac99c01610497875122"/> -->
 	<!-- <rom name="10 Game CD ROM (Europe).bin" size="9066960" crc="fdba9775" sha1="b96b29c2bcfcae073c07eb52f24b8eb7d6d2a208"/> -->
 	<software name="telstar10">
