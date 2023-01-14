@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -196,7 +196,7 @@ void help(const char* _error = NULL)
 
 	bx::write(stdOut, &err
 		, "bin2c, binary to C\n"
-		  "Copyright 2011-2022 Branimir Karadzic. All rights reserved.\n"
+		  "Copyright 2011-2023 Branimir Karadzic. All rights reserved.\n"
 		  "License: https://github.com/bkaradzic/bx/blob/master/LICENSE\n\n"
 		);
 
