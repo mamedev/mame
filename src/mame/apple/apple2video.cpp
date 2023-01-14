@@ -152,16 +152,55 @@ WRITE_LINE_MEMBER(a2_video_device::an2_w)
 	m_an2 = state;
 }
 
+
 // 4-bit left rotate. Bits 4-6 of n must be a copy of bits 0-2.
 static inline unsigned rotl4b(unsigned n, unsigned count) { return (n >> (-count & 3)) & 0x0F; }
 // 4-bit left rotate. Bits 4-6 of n must be zero.
 static inline unsigned rotl4(unsigned n, unsigned count) { return rotl4b(n * 0x11, count); }
 
+static constexpr class bit_doubler
+{
+	uint16_t a[128];
+
+public:
+	constexpr bit_doubler() : a{}
+	{
+		for (unsigned i = 1; i < 128; i++)
+		{
+			a[i] = a[i >> 1] * 4 + (i & 1) * 3;
+		}
+	}
+	unsigned operator[](unsigned i) const { return a[i]; }
+
+} double_7_bits;
+
+static constexpr class bit_reverser
+{
+	uint8_t a[128];
+
+public:
+	constexpr bit_reverser() : a{}
+	{
+		for (unsigned i = 1; i < 128; i++)
+		{
+			a[i] = (a[i >> 1] >> 1) + ((i & 1) << 6);
+		}
+	}
+	unsigned operator[](unsigned i) const { return a[i]; }
+
+} reverse_7_bits;
+
+
 inline bool a2_video_device::use_page_2() const { return m_page2 && !m_80store; }
 
+inline bool a2_video_device::composite_monitor() { return (m_vidconfig.read_safe(0) & 7) == 0; }
 inline bool a2_video_device::monochrome_monitor() { return (m_vidconfig.read_safe(0) & 4) != 0; }
-
 inline bool a2_video_device::rgb_monitor() { return (m_vidconfig.read_safe(0) & 7) == 3; }
+
+inline int a2_video_device::composite_color_mode() { return (m_vidconfig.read_safe(0) >> 4) & 7; }
+inline bool a2_video_device::composite_lores_artifacts() { return (m_vidconfig.read_safe(0) & 0x80) != 0; }
+inline bool a2_video_device::composite_text_color(bool is_80_column) { return (m_vidconfig.read_safe(0) & (is_80_column ? 0x200 : 0x100)) != 0; }
+inline bool a2_video_device::monochrome_dhr_shift() { return (m_vidconfig.read_safe(0) & 7) == 7; }
 
 int a2_video_device::monochrome_hue()
 {
@@ -173,6 +212,8 @@ int a2_video_device::monochrome_hue()
 	}
 }
 
+
+static uint8_t const artifact_color_lut[2][1<<7] = {
 // This table implements a colorization scheme defined by one's complement and mirror symmetries
 // and the following rules:
 //
@@ -189,7 +230,7 @@ int a2_video_device::monochrome_hue()
 //
 // A window size of 7 is enough to find the length of the middle pixel's run to a maximum of 4.
 // Each color is duplicated in both nibbles to slightly simplify the 4-bit rotation logic.
-static uint8_t const artifact_color_lut[1<<7] = {
+{
 	0x00,0x00,0x00,0x00,0x88,0x00,0x00,0x00,0x11,0x11,0x55,0x11,0x99,0x99,0xDD,0xFF,
 	0x22,0x22,0x66,0x66,0xAA,0xAA,0xEE,0xEE,0x33,0x33,0x33,0x33,0xBB,0xBB,0xFF,0xFF,
 	0x00,0x00,0x44,0x44,0xCC,0xCC,0xCC,0xCC,0x55,0x55,0x55,0x55,0x99,0x99,0xDD,0xFF,
@@ -198,26 +239,115 @@ static uint8_t const artifact_color_lut[1<<7] = {
 	0x00,0x22,0x66,0x66,0xAA,0xAA,0xAA,0xAA,0x33,0x33,0x33,0x33,0xBB,0xBB,0xFF,0xFF,
 	0x00,0x00,0x44,0x44,0xCC,0xCC,0xCC,0xCC,0x11,0x11,0x55,0x55,0x99,0x99,0xDD,0xDD,
 	0x00,0x22,0x66,0x66,0xEE,0xAA,0xEE,0xEE,0xFF,0xFF,0xFF,0x77,0xFF,0xFF,0xFF,0xFF
-};
-
+},
 // This alternate table colors 0110000 as a permutation of 0110, so that runs of medium colors
-// against black or white produce 4n colored pixels instead of 4n-2. It is disabled because it
-// makes colorized 40-column text annoying to read. The 0010000 rule causes problems for
-// 80-column text, but that's a lost cause anyway.
-// static uint8_t const artifact_color_lut[1<<7] = {
-// 	0x00,0x00,0x00,0x00,0x88,0x00,0xCC,0x00,0x11,0x11,0x55,0x11,0x99,0x99,0xDD,0xFF,
-// 	0x22,0x22,0x66,0x66,0xAA,0xAA,0xEE,0xEE,0x33,0x33,0x33,0x33,0xBB,0xBB,0xFF,0xFF,
-// 	0x00,0x00,0x44,0x44,0xCC,0xCC,0xCC,0xCC,0x55,0x55,0x55,0x55,0x99,0x99,0xDD,0xFF,
-// 	0x66,0x22,0x66,0x66,0xEE,0xAA,0xEE,0xEE,0x77,0x77,0x77,0x77,0xFF,0xFF,0xFF,0xFF,
-// 	0x00,0x00,0x00,0x00,0x88,0x88,0x88,0x88,0x11,0x11,0x55,0x11,0x99,0x99,0xDD,0x99,
-// 	0x00,0x22,0x66,0x66,0xAA,0xAA,0xAA,0xAA,0x33,0x33,0x33,0x33,0xBB,0xBB,0xFF,0xFF,
-// 	0x00,0x00,0x44,0x44,0xCC,0xCC,0xCC,0xCC,0x11,0x11,0x55,0x55,0x99,0x99,0xDD,0xDD,
-// 	0x00,0x22,0x66,0x66,0xEE,0xAA,0xEE,0xEE,0xFF,0x33,0xFF,0x77,0xFF,0xFF,0xFF,0xFF,
-// };
+// against black or white produce 4n colored pixels instead of 4n-2. The disadvantage is it makes
+// colorized 40-column text uglier. The 0010000 rule causes problems for 80-column text, but
+// that's a lost cause anyway.
+{
+	0x00,0x00,0x00,0x00,0x88,0x00,0xCC,0x00,0x11,0x11,0x55,0x11,0x99,0x99,0xDD,0xFF,
+	0x22,0x22,0x66,0x66,0xAA,0xAA,0xEE,0xEE,0x33,0x33,0x33,0x33,0xBB,0xBB,0xFF,0xFF,
+	0x00,0x00,0x44,0x44,0xCC,0xCC,0xCC,0xCC,0x55,0x55,0x55,0x55,0x99,0x99,0xDD,0xFF,
+	0x66,0x22,0x66,0x66,0xEE,0xAA,0xEE,0xEE,0x77,0x77,0x77,0x77,0xFF,0xFF,0xFF,0xFF,
+	0x00,0x00,0x00,0x00,0x88,0x88,0x88,0x88,0x11,0x11,0x55,0x11,0x99,0x99,0xDD,0x99,
+	0x00,0x22,0x66,0x66,0xAA,0xAA,0xAA,0xAA,0x33,0x33,0x33,0x33,0xBB,0xBB,0xFF,0xFF,
+	0x00,0x00,0x44,0x44,0xCC,0xCC,0xCC,0xCC,0x11,0x11,0x55,0x55,0x99,0x99,0xDD,0xDD,
+	0x00,0x22,0x66,0x66,0xEE,0xAA,0xEE,0xEE,0xFF,0x33,0xFF,0x77,0xFF,0xFF,0xFF,0xFF,
+}};
+
+template<int ContextBits, class F>
+static void render_line_pixel_window(uint16_t *out, uint16_t const *in, int startcol, int stopcol, F const &color_function)
+{
+	static_assert(ContextBits >= 0 && ContextBits <= 4);  // uint32_t has room for 4+14+14 bits
+
+	if (startcol >= stopcol)
+		return;  // to avoid OOB read
+
+	// w holds ContextBits bits of the previous 14-pixel group and the current and next groups.
+	uint32_t w = (ContextBits && startcol > 0) ? (in[startcol - 1] >> (14 - ContextBits)) : 0;
+	w += in[startcol] << ContextBits;
+
+	for (int col = startcol; col < stopcol; col++)
+	{
+		if (col + 1 < 40)
+			w += in[col + 1] << (14 + ContextBits);
+
+		for (int b = 0; b < 14; b++)
+		{
+			out[col * 14 + b] = color_function(w, col * 14 + b);
+			w >>= 1;
+		}
+	}
+}
+
+static void render_line_monochrome(uint16_t *out, uint16_t const *in, int startcol, int stopcol, int fg, int bg)
+{
+	render_line_pixel_window<0>(out, in, startcol, stopcol, [=](uint32_t w, int x) { return (w & 1) ? fg : bg; });
+}
+
+static void render_line_artifact_color(uint16_t *out, uint16_t const *in, int startcol, int stopcol, bool is_80_column, uint8_t const *lut)
+{
+	render_line_pixel_window<3>(out, in, startcol, stopcol, [=](uint32_t w, int x) { return rotl4b(lut[w & 0x7F], x + is_80_column); });
+}
+
+void a2_video_device::render_line(uint16_t *out, uint16_t const *in, int startcol, int stopcol, bool monochrome, bool is_80_column)
+{
+	if (monochrome)
+	{
+		int const fg = monochrome_hue();
+
+		if (is_80_column && monochrome_dhr_shift())
+		{
+			// There is no way to communicate the chroma phase of the first pixel to the NTSC shader, and it
+			// differs between Apple II modes. As a workaround, shift some modes right by one pixel (losing
+			// the rightmost pixel). This should be removed when there is a way to pass parameters to shaders.
+			render_line_pixel_window<1>(out, in, startcol, stopcol, [=](uint32_t w, int x) { return (w & 1) ? fg : BLACK; });
+		}
+		else
+		{
+			render_line_monochrome(out, in, startcol, stopcol, fg, BLACK);
+		}
+	}
+	else
+	{
+		switch (int color_mode = composite_color_mode())
+		{
+		default:
+			color_mode = 0;
+			// fall through
+		case 0: case 1:
+			// Pixel-run coloring
+			render_line_artifact_color(out, in, startcol, stopcol, is_80_column, artifact_color_lut[color_mode]);
+			break;
+		case 2:
+			// 4-bit square filter
+			render_line_pixel_window<1>(out, in, startcol, stopcol, [=](uint32_t w, int x) { return rotl4(w & 0x0F, x + is_80_column - 1); });
+			break;
+		}
+	}
+}
+
+// Render with a different color for each 14-pixel group. Used by two RGB card modes.
+static void render_line_color_array(uint16_t *out, uint16_t const *in, int startcol, int stopcol, uint8_t const *fg_bg_array)
+{
+	for (int col = startcol; col < stopcol; ++col)
+	{
+		unsigned w = in[col] * 4;
+		unsigned const fg_bg = fg_bg_array[col];
+		for (int b = 0; b < 14; ++b)
+		{
+			out[col * 14 + b] = (fg_bg >> (w & 4)) & 0x0F;
+			w >>= 1;
+		}
+	}
+}
+
 
 template <a2_video_device::model Model, bool Invert, bool Flip>
-void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, int fg, int bg)
+unsigned a2_video_device::get_text_character(uint32_t code, int row)
 {
+	unsigned invert_mask = Invert ? 0 : 0x7F;
+
 	if (Model == model::IIE || Model == model::IIGS)
 	{
 		if (!m_altcharset)
@@ -228,8 +358,7 @@ void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int yp
 
 				if (m_flash)
 				{
-					using std::swap;
-					swap(fg, bg);
+					invert_mask ^= 0x7F;
 				}
 			}
 		}
@@ -242,8 +371,7 @@ void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int yp
 			if ((code >= 0x60) && (code <= 0x7f))
 			{
 				code |= 0x80;    // map to lowercase normal
-				using std::swap; // and flip the color
-				std::swap(fg, bg);
+				invert_mask ^= 0x7F;  // and flip the color
 			}
 		}
 	}
@@ -257,14 +385,12 @@ void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int yp
 			}
 			if (m_flash)
 			{
-				using std::swap;
-				swap(fg, bg);
+				invert_mask ^= 0x7F;
 			}
 		}
 		else if (code < 0x40 && Model != model::IVEL_ULTRA) // inverse: flip FG and BG
 		{
-			using std::swap;
-			swap(fg, bg);
+			invert_mask ^= 0x7F;
 		}
 
 		if (Model == model::II_J_PLUS && m_an2)
@@ -273,36 +399,17 @@ void a2_video_device::plot_text_character(bitmap_ind16 &bitmap, int xpos, int yp
 		}
 	}
 
-	if (Invert)
-	{
-		std::swap(fg, bg);
-	}
-
 	/* look up the character data */
-	uint8_t const *const chardata = &m_char_ptr[(code * 8)];
-
-	for (int y = 0; y < 8; y++)
-	{
-		for (int x = 0; x < 7; x++)
-		{
-			// Model and Flip are template parameters, so the compiler will boil this down appropriately
-			unsigned const bit = (Model == model::IVEL_ULTRA) ? (2 << x) : Flip ? (64 >> x) : (1 << x);
-			uint16_t const color = (chardata[y] & bit) ? bg : fg;
-
-			for (int i = 0; i < xscale; i++)
-			{
-				bitmap.pix(ypos + y, xpos + (x * xscale) + i) = color;
-			}
-		}
-	}
+	unsigned bits = m_char_ptr[code * 8 + row];
+	bits = (Model == model::IVEL_ULTRA) ? (bits >> 1) : (bits & 0x7F);
+	bits ^= invert_mask;
+	return Flip ? reverse_7_bits[bits] : bits;
 }
 
+template<bool Double>
 void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
 	uint32_t const start_address = use_page_2() ? 0x0800 : 0x0400;
-
-	bool const monochrome = monochrome_monitor();
-	int const fg = monochrome_hue();
 
 	/* perform adjustments */
 	beginrow = (std::max)(beginrow, cliprect.top());
@@ -312,220 +419,71 @@ void a2_video_device::lores_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	const int startcol = (cliprect.left() / 14);
 	const int stopcol = ((cliprect.right() / 14) + 1);
 
+	bool const monochrome = monochrome_monitor();
+	bool const render_perfect_blocks = !monochrome && (rgb_monitor() || !composite_lores_artifacts());
+
 	//printf("GR: row %d startcol %d stopcol %d left %d right %d\n", beginrow, startcol, stopcol, cliprect.left(), cliprect.right());
 
-	if (!monochrome)
+	for (int row = startrow; row <= stoprow; row += 4)
 	{
-		for (int row = startrow; row <= stoprow; row += 8)
+		/* calculate address */
+		uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5));
+		uint8_t const *const vram = m_ram_ptr + address;
+		uint8_t const *const vaux = Double ? (m_aux_ptr + address) : nullptr;
+
+#define NIBBLE(byte) (((byte) >> (row & 4)) & 0x0F)
+		if (render_perfect_blocks)
 		{
+			uint16_t *p = &bitmap.pix(row, startcol * 14);
+
 			for (int col = startcol; col < stopcol; col++)
 			{
-				/* calculate adderss */
-				uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
-
-				/* perform the lookup */
-				uint8_t const code = m_ram_ptr[address];
-
-				/* and now draw */
-				for (int y = 0; y < 4; y++)
+				if (Double)
 				{
-					if (((row + y) >= beginrow) && ((row + y) <= endrow))
+					unsigned c = rotl4(NIBBLE(vaux[col]), 1);
+					for (int b = 0; b < 7; b++)
 					{
-						for (int x = 0; x < 14; x++)
-						{
-							bitmap.pix(row + y, col * 14 + x) = (code >> 0) & 0x0F;
-						}
+						*p++ = c;
 					}
 				}
-				for (int y = 4; y < 8; y++)
+				unsigned c = NIBBLE(vram[col]);
+				for (int b = 0; b < (Double ? 7 : 14); b++)
 				{
-					if (((row + y) >= beginrow) && ((row + y) <= endrow))
-					{
-						for (int x = 0; x < 14; x++)
-						{
-							bitmap.pix(row + y, col * 14 + x) = (code >> 4) & 0x0F;
-						}
-					}
+					*p++ = c;
 				}
 			}
 		}
-	}
-	else
-	{
-		for (int row = startrow; row <= stoprow; row += 8)
+		else
 		{
-			for (int col = startcol; col < stopcol; col++)
+			uint16_t words[40];
+
+			// bounds must be even, include at least one extra column on each side, and be in [0,40]
+			int const startcol2 = (startcol - 1) / 2 * 2;
+			int const stopcol2 = (stopcol < 40) ? ((stopcol | 1) + 1) : 40;
+
+			for (int col = startcol2; col < stopcol2; col += 2)
 			{
-				uint8_t bits;
-
-				/* calculate adderss */
-				uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
-
-				/* perform the lookup */
-				uint8_t const code = m_ram_ptr[address];
-
-				bits = (code >> 0) & 0x0F;
-				/* and now draw */
-				for (int y = 0; y < 4; y++)
+				if (Double)
 				{
-					if (((row + y) >= beginrow) && ((row + y) <= endrow))
-					{
-						for (int x = 0; x < 14; x++)
-						{
-							if (col & 1)
-							{
-								bitmap.pix(row + y, col * 14 + x) = bits & (1 << ((x+2) % 4)) ? fg : 0;
-							}
-							else
-							{
-								bitmap.pix(row + y, col * 14 + x) = bits & (1 << (x % 4)) ? fg : 0;
-							}
-						}
-					}
+					words[col+0] = (((NIBBLE(vaux[col+0]) * 0x111)     ) & 0x007f) + ((NIBBLE(vram[col+0]) * 0x0880) & 0x3f80);
+					words[col+1] = (((NIBBLE(vaux[col+1]) * 0x111) >> 2) & 0x007f) + ((NIBBLE(vram[col+1]) * 0x2220) & 0x3f80);
 				}
-
-				bits = (code >> 4) & 0x0F;
-				for (int y = 4; y < 8; y++)
+				else
 				{
-					if (((row + y) >= beginrow) && ((row + y) <= endrow))
-					{
-						for (int x = 0; x < 14; x++)
-						{
-							if (col & 1)
-							{
-								bitmap.pix(row + y, col * 14 + x) = bits & (1 << ((x+2) % 4)) ? fg : 0;
-							}
-							else
-							{
-								bitmap.pix(row + y, col * 14 + x) = bits & (1 << (x % 4)) ? fg : 0;
-							}
-						}
-					}
+					words[col+0] = (NIBBLE(vram[col+0]) * 0x1111) & 0x3FFF;
+					words[col+1] = (NIBBLE(vram[col+1]) * 0x1111) >> 2;
 				}
 			}
+
+			render_line(&bitmap.pix(row), words, startcol, stopcol, monochrome, Double);
 		}
-	}
-}
+#undef NIBBLE
 
-void a2_video_device::dlores_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
-{
-	uint32_t const start_address = use_page_2() ? 0x0800 : 0x0400;
-	static const int aux_colors[16] = { 0, 2, 4, 6, 8, 0xa, 0xc, 0xe, 1, 3, 5, 7, 9, 0xb, 0xd, 0xf };
-
-	bool const monochrome = monochrome_monitor();
-	int const fg = monochrome_hue();
-
-	/* perform adjustments */
-	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
-	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
-
-	const int startrow = (beginrow / 8) * 8;
-	const int stoprow = ((endrow / 8) + 1) * 8;
-	const int startcol = (cliprect.left() / 14);
-	const int stopcol = ((cliprect.right() / 14) + 1);
-
-	if (!monochrome)
-	{
-		for (int row = startrow; row <= stoprow; row += 8)
+		if (startcol < stopcol)
 		{
-			for (int col = startcol; col < stopcol; col++)
+			for (int y = 1; y < 4; y++)
 			{
-				/* calculate adderss */
-				uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
-
-				/* perform the lookup */
-				uint8_t const code = m_ram_ptr[address];
-				uint8_t const auxcode = m_aux_ptr[address];
-
-				/* and now draw */
-				for (int y = 0; y < 4; y++)
-				{
-					if (((row + y) >= beginrow) && ((row + y) <= endrow))
-					{
-						uint16_t *vram = &bitmap.pix(row + y, (col * 14));
-
-						*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
-						*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
-						*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
-						*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
-						*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
-						*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
-						*vram++ = aux_colors[(auxcode >> 0) & 0x0F];
-						*vram++ = (code >> 0) & 0x0F;
-						*vram++ = (code >> 0) & 0x0F;
-						*vram++ = (code >> 0) & 0x0F;
-						*vram++ = (code >> 0) & 0x0F;
-						*vram++ = (code >> 0) & 0x0F;
-						*vram++ = (code >> 0) & 0x0F;
-						*vram++ = (code >> 0) & 0x0F;
-					}
-				}
-				for (int y = 4; y < 8; y++)
-				{
-					if (((row + y) >= beginrow) && ((row + y) <= endrow))
-					{
-						uint16_t *vram = &bitmap.pix(row + y, (col * 14));
-
-						*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
-						*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
-						*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
-						*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
-						*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
-						*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
-						*vram++ = aux_colors[(auxcode >> 4) & 0x0F];
-						*vram++ = (code >> 4) & 0x0F;
-						*vram++ = (code >> 4) & 0x0F;
-						*vram++ = (code >> 4) & 0x0F;
-						*vram++ = (code >> 4) & 0x0F;
-						*vram++ = (code >> 4) & 0x0F;
-						*vram++ = (code >> 4) & 0x0F;
-						*vram++ = (code >> 4) & 0x0F;
-					}
-				}
-			}
-		}
-	}
-	else
-	{
-		for (int row = startrow; row < stoprow; row += 8)
-		{
-			/* calculate address */
-			uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5));
-
-			uint8_t prev_code = (startcol == 0) ? 0 : m_ram_ptr[address + startcol - 1];
-
-			for (int col = 0; col < 40; col++)
-			{
-				/* perform the lookup */
-				uint8_t const code = m_ram_ptr[address + col];
-				uint8_t const auxcode = m_aux_ptr[address + col];
-
-				/* and now draw */
-				for (int y = 0; y < 8; y++)
-				{
-					if (((row + y) >= beginrow) && ((row + y) <= endrow))
-					{
-						uint16_t *vram = &bitmap.pix(row + y, (col * 14));
-
-						unsigned const color1 = (auxcode >> (y & 4)) & 0x0F;
-						unsigned const color2 = (code >> (y & 4)) & 0x0F;
-						unsigned allbits = (((color1 * 0x111) >> ((col * 14) & 3)) & 0x007f)
-										 + (((color2 * 0x8880) >> ((col * 14) & 3)) & 0x3f80);
-
-						// Workaround for Github issue #10760: shift everything right by one pixel
-						// (losing the last pixel of each row) so that the NTSC shader sees what
-						// it expects. This should be removed when there is a better fix.
-						unsigned const prev_bit = (prev_code >> ((y & 4) + ((col * 14) & 3))) & 1;
-						allbits = allbits * 2 + prev_bit;
-
-						for (int x = 0; x < 14; x++)
-						{
-							*vram++ = allbits & (1 << x) ? fg : 0;
-						}
-					}
-				}
-
-				prev_code = code;
+				memcpy(&bitmap.pix(row + y, startcol * 14), &bitmap.pix(row, startcol * 14), (stopcol - startcol) * 14 * (bitmap.bpp() / 8));
 			}
 		}
 	}
@@ -548,37 +506,40 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	// printf("TXT: row %d startcol %d stopcol %d left %d right %d\n", beginrow, startcol, stopcol, cliprect.left(), cliprect.right());
 
-	int fg = (Model == model::IIGS) ? m_GSfg : monochrome_hue();
-	int bg = (Model == model::IIGS) ? m_GSbg : BLACK;
+	bool const is_80_column = (Model == model::IIE || Model == model::IIGS) && m_80col;
+	bool const monochrome = !(m_graphics && composite_monitor() && composite_text_color(is_80_column));
 
-	for (int row = startrow; row < stoprow; row += 8)
+	for (int row = startrow; row < stoprow; row++)
 	{
-		if ((Model == model::IIE || Model == model::IIGS) && m_80col)
+		uint32_t const address = start_address + ((((row / 8) & 0x07) << 7) | (((row / 8) & 0x18) * 5));
+		uint32_t const aux_address = (Model == model::IIGS) ? address : (address & m_aux_mask);
+		uint16_t words[40];
+
+		for (int col = std::max(0, startcol-1); col < std::min(stopcol+1, 40); col++)
 		{
-			for (int col = startcol; col < stopcol; col++)
+			if (is_80_column)
 			{
-				/* calculate address */
-				uint32_t const address = start_address + ((((row / 8) & 0x07) << 7) | (((row / 8) & 0x18) * 5 + col));
-				uint32_t const aux_address = (Model == model::IIGS) ? address : (address & m_aux_mask);
-				plot_text_character<Model, Invert, Flip>(bitmap, col * 14, row, 1, aux_page[aux_address], fg, bg);
-				plot_text_character<Model, Invert, Flip>(bitmap, col * 14 + 7, row, 1, m_ram_ptr[address], fg, bg);
+				words[col] = get_text_character<Model, Invert, Flip>(aux_page[aux_address + col], row & 7)
+				          + (get_text_character<Model, Invert, Flip>(m_ram_ptr[address + col], row & 7) << 7);
 			}
+			else
+			{
+				words[col] = double_7_bits[get_text_character<Model, Invert, Flip>(m_ram_ptr[address + col], row & 7)];
+			}
+		}
+
+		if (Model == model::IIE && rgb_monitor() && m_dhires && !m_80col)
+		{
+			// Video-7 foreground-background mode
+			render_line_color_array(&bitmap.pix(row), words, startcol, stopcol, &aux_page[aux_address]);
+		}
+		else if (Model == model::IIGS)
+		{
+			render_line_monochrome(&bitmap.pix(row), words, startcol, stopcol, m_GSfg, m_GSbg);
 		}
 		else
 		{
-			for (int col = startcol; col < stopcol; col++)
-			{
-				/* calculate address */
-				uint32_t const address = start_address + ((((row / 8) & 0x07) << 7) | (((row / 8) & 0x18) * 5 + col));
-				if (Model == model::IIE && rgb_monitor() && m_dhires)
-				{
-					u8 tmp = aux_page[address];
-					fg = tmp >> 4;
-					bg = tmp & 0xf;
-				}
-
-				plot_text_character<Model, Invert, Flip>(bitmap, col * 14, row, 2, m_ram_ptr[address], fg, bg);
-			}
+			render_line(&bitmap.pix(row), words, startcol, stopcol, monochrome, is_80_column);
 		}
 	}
 }
@@ -595,118 +556,80 @@ template void a2_video_device::text_update<a2_video_device::model::IIGS, false, 
 template void a2_video_device::text_update<a2_video_device::model::II_J_PLUS, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 template void a2_video_device::text_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 
-static unsigned decode_hires_byte(uint8_t byte, unsigned last_output_bit) {
-	// duplicate the bottom 7 bits by bit twiddling
-	unsigned word = byte;
-	word = (word ^ (word << 4)) & 0x70F;
-	word = (word ^ (word << 2)) & 0x1333;
-	word = (word ^ (word << 1)) & 0x1555;
-	word *= 3;
-	// shift right on the screen (left in the word) if the high bit is set
-	if (byte & 0x80)
-	{
-		word = (word * 2 + last_output_bit) & 0x3FFF;
-	}
-	return word;
-}
-
 void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	/* sanity checks */
-	if (beginrow < cliprect.top())
-		beginrow = cliprect.top();
-	if (endrow > cliprect.bottom())
-		endrow = cliprect.bottom();
-	if (endrow < beginrow)
-		return;
+	beginrow = (std::max)(beginrow, cliprect.top());
+	endrow = (std::min)(endrow, cliprect.bottom());
+	int const startcol = (cliprect.left() / 14);
+	int const stopcol = (cliprect.right() / 14) + 1;
 
 	// B&W/Green/Amber monitor, CEC mono HGR mode, or IIgs $C021 monochrome HGR
 	bool const monochrome = monochrome_monitor() || m_monohgr || (m_monochrome & 0x80);
 
-	int const fg = monochrome_hue();
-	int const bg = BLACK;
-
-	uint8_t const *const vram = &m_ram_ptr[use_page_2() ? 0x4000 : 0x2000];
+	unsigned const start_address = use_page_2() ? 0x4000 : 0x2000;
 
 	// verified on h/w: setting dhires w/o 80col emulates a rev. 0 Apple ][ with no orange/blue
-	uint8_t const bit7_mask = m_dhires ? 0x7f : 0xff;
+	uint8_t const bit7_mask = m_dhires ? 0 : 0x80;
 
 	for (int row = beginrow; row <= endrow; row++)
 	{
-		uint8_t const *const vram_row = vram + (((row/8) & 0x07) << 7) + (((row/8) & 0x18) * 5) + ((row & 7) << 10);
+		unsigned const address = start_address + (((row/8) & 0x07) << 7) + (((row/8) & 0x18) * 5) + ((row & 7) << 10);
+		uint8_t const *const vram_row = &m_ram_ptr[address];
 
-		// w holds 3+14+14=31 bits: 3 bits of the previous 14-pixel group and the current and next groups.
-		uint32_t w = decode_hires_byte(vram_row[0] & bit7_mask, 0) << (3 + 14);
+		uint16_t words[40];
 
-		uint16_t *p = &bitmap.pix(row);
+		unsigned last_output_bit = 0;
 
-		for (int col = 0; col < 40; col++)
+		for (int col = std::max(0, startcol-1); col < std::min(stopcol+1, 40); col++)
 		{
-			w >>= 14;
-			if (col + 1 < 40)
-			{
-				w |= decode_hires_byte(vram_row[col + 1] & bit7_mask, w >> (3 + 13)) << (3 + 14);
-			}
+			unsigned word = double_7_bits[vram_row[col] & 0x7F];
+			if (vram_row[col] & bit7_mask)
+				word = (word * 2 + last_output_bit) & 0x3FFF;
+			words[col] = word;
+			last_output_bit = word >> 13;
+		}
 
-			if (!monochrome)
+		if (rgb_monitor())
+		{
+			if (m_dhires)
 			{
-				for (int b = 0; b < 14; b++)
-				{
-					if (((col * 14 + b) >= cliprect.left()) && ((col * 14 + b) <= cliprect.right()))
-					{
-						*p = rotl4b(artifact_color_lut[(w >> b) & 0x7f], col * 14 + b);
-					}
-					p++;
-				}
+				// Video-7 foreground-background mode
+				render_line_color_array(&bitmap.pix(row), words, startcol, stopcol, &m_aux_ptr[address]);
 			}
 			else
 			{
-				for (int b = 0; b < 14; b++)
-				{
-					if (((col * 14 + b) >= cliprect.left()) && ((col * 14 + b) <= cliprect.right()))
-					{
-						*p = (w & (8 << b)) ? fg : bg;
-					}
-					p++;
-				}
+				// Use the "color bias" table as that seems to be closest to what this card does (youtu.be/4lDRv2MudvI?t=666)
+				render_line_artifact_color(&bitmap.pix(row), words, startcol, stopcol, false, artifact_color_lut[1]);
 			}
+		}
+		else
+		{
+			render_line(&bitmap.pix(row), words, startcol, stopcol, monochrome, false);
 		}
 	}
 }
 
 void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	uint16_t v;
 	int const page = use_page_2() ? 0x4000 : 0x2000;
 	int const rgbmode = rgb_monitor() ? m_rgbmode : -1;
 
 	// B&W/Green/Amber monitor, IIgs force-monochrome-DHR setting, or IIe RGB card monochrome DHR
 	bool const monochrome = monochrome_monitor() || (m_newvideo & 0x20) || rgbmode == 0;
-	int const fg = monochrome_hue();
 
-	/* sanity checks */
-	if (beginrow < cliprect.top())
-		beginrow = cliprect.top();
-	if (endrow > cliprect.bottom())
-		endrow = cliprect.bottom();
-	if (endrow < beginrow)
-		return;
+	beginrow = (std::max)(beginrow, cliprect.top());
+	endrow = (std::min)(endrow, cliprect.bottom());
+	int const startcol = (cliprect.left() / 14);
+	int const stopcol = (cliprect.right() / 14) + 1;
 
 	uint8_t const *const vram = &m_ram_ptr[page];
 	uint8_t const *const vaux = (m_aux_ptr ? m_aux_ptr : vram) + page;
 
-	uint8_t vram_row[82];
-	vram_row[0] = 0;
-	vram_row[81] = 0;
-
 	for (int row = beginrow; row <= endrow; row++)
 	{
-		for (int col = 0; col < 40; col++)
-		{
-			int const offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col)) | ((row & 7) << 10);
-			vram_row[1+(col*2)+0] = vaux[offset];
-			vram_row[1+(col*2)+1] = vram[offset];
-		}
+		int const offset = ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5)) | ((row & 7) << 10);
+		uint8_t const *const vram_row = vram + offset;
+		uint8_t const *const vaux_row = vaux + offset;
 
 		uint16_t *p = &bitmap.pix(row);
 
@@ -720,50 +643,34 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 			{
 				*p++ = BLACK;
 			}
-			for (int col = 0; col < 80; col++)
+			for (int col = 0; col < 40; col++)
 			{
-				v = vram_row[col+1];
-				*p++ = v & 0xf;
-				*p++ = v & 0xf;
-				*p++ = v & 0xf;
-				v >>= 4;
-				*p++ = v & 0xf;
-				*p++ = v & 0xf;
-				*p++ = v & 0xf;
+				unsigned v = vaux_row[col] + (vram_row[col] << 8);
+				for (int i = 0; i < 4; i++)
+				{
+					*p++ = v & 0xf;
+					*p++ = v & 0xf;
+					*p++ = v & 0xf;
+					v >>= 4;
+				}
 			}
 			for (int b = 0; b < 40; b++)
 			{
 				*p++ = BLACK;
 			}
-
-			continue;
 		}
-
-		for (int col = 0; col < 80; col++)
+		else
 		{
-			uint32_t w =    (((uint32_t) vram_row[col+0] & 0x7f) <<  0)
-						|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
-						|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
+			uint16_t words[40];
 
-			if (monochrome)
+			for (int col = std::max(0, startcol-1); col < std::min(stopcol+1, 40); col++)
 			{
-				// Shifting by 6 instead of 7 here shifts the entire DHGR screen right one pixel, so the leftmost pixel is
-				// always black and the rightmost pixel is not shown. This is to work around a problem with the HLSL NTSC
-				// shader. See Github issues #6308 and #10759. This should be changed when there is a better solution.
-				w >>= 6;
-				for (int b = 0; b < 7; b++)
-				{
-					v = (w & 1);
-					w >>= 1;
-					*(p++) = v ? fg : BLACK;
-				}
+				words[col] = (vaux_row[col] & 0x7F) + ((vram_row[col] & 0x7F) << 7);
 			}
-			else if (rgbmode < 0)
+
+			if (rgbmode < 0)
 			{
-				for (int b = 0; b < 7; b++)
-				{
-					*p++ = rotl4((w >> (b + 7-1)) & 0x0F, col * 7 + b);
-				}
+				render_line(p, words, startcol, stopcol, monochrome, true);
 			}
 			else
 			{
@@ -784,20 +691,17 @@ void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				// It's impossible to know the nature of the aberrations without hardware to test,
 				// but hopefully this warning means software was designed so that it doesn't matter.
 
-				if (rgbmode == 1 && !(vram_row[col+1] & 0x80))  // monochrome
+				for (int col = 0; col < 40; col += 2)
 				{
-					for (int b = 0; b < 7; b++)
+					unsigned const w = words[col] + (words[col+1] << 14);
+
+					unsigned const color_mask = (rgbmode == 3) ? -1u :
+							(vaux_row[col] >> 7) * 0x7F + (vram_row[col] >> 7) * 0x3F80
+							+ (vaux_row[col+1] >> 7) * 0x1FC000 + (vram_row[col+1] >> 7) * 0xFE00000;
+
+					for (int b = 0; b < 28; ++b)
 					{
-						*p++ = ((w >> (b + 7)) & 1) ? WHITE : BLACK;
-					}
-				}
-				else  // color
-				{
-					// In column 0 get the color from w bits 7-10 or 11-14,
-					// in column 1 get the color from w bits 4-7 or 8-11, etc.
-					for (int b = 0; b < 7; b++)
-					{
-						*p++ = rotl4((w >> (b - ((b - col) & 3) + 7)) & 0x0F, 1);
+						*p++ = (color_mask & (1 << b)) ? rotl4((w >> (b & ~3u)) & 0x0F, 1) : (w & (1 << b)) ? WHITE : BLACK;
 					}
 				}
 			}
@@ -1040,11 +944,11 @@ uint32_t a2_video_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 		{
 			if ((Model == model::IIE || Model == model::IIGS) && m_dhires && m_80col)
 			{
-				dlores_update(screen, bitmap, cliprect, 0, text_start_row - 1);
+				lores_update<true>(screen, bitmap, cliprect, 0, text_start_row - 1);
 			}
 			else
 			{
-				lores_update(screen, bitmap, cliprect, 0, text_start_row - 1);
+				lores_update<false>(screen, bitmap, cliprect, 0, text_start_row - 1);
 			}
 		}
 	}
@@ -1076,16 +980,33 @@ static INPUT_PORTS_START( a2_vidconfig_composite );
 	PORT_CONFSETTING(0x04, "B&W")
 	PORT_CONFSETTING(0x05, "Green")
 	PORT_CONFSETTING(0x06, "Amber")
+	PORT_CONFSETTING(0x07, "B&W for NTSC shader")
+
+	PORT_CONFNAME(0x70, 0x00, "Color algorithm")
+	PORT_CONFSETTING(0x00, "Pixel-run (B&W bias)")
+	PORT_CONFSETTING(0x10, "Pixel-run (color bias)")
+	PORT_CONFSETTING(0x20, "Box filter")
+
+	PORT_CONFNAME(0x80, 0x00, "Lores artifacts")
+	PORT_CONFSETTING(0x00, "Off")
+	PORT_CONFSETTING(0x80, "On")
+
+	PORT_CONFNAME(0x300, 0x000, "Text color")
+	PORT_CONFSETTING(0x000, "Off")
+	PORT_CONFSETTING(0x100, "40-column only")
+	PORT_CONFSETTING(0x300, "On")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( a2_vidconfig_composite_rgb )
-	PORT_START("a2_video_config")
+	PORT_INCLUDE(a2_vidconfig_composite)
+	PORT_MODIFY("a2_video_config")
 	PORT_CONFNAME(0x07, 0x00, "Monitor type")
 	PORT_CONFSETTING(0x00, "Color")
+	PORT_CONFSETTING(0x03, "Video-7 RGB")
 	PORT_CONFSETTING(0x04, "B&W")
 	PORT_CONFSETTING(0x05, "Green")
 	PORT_CONFSETTING(0x06, "Amber")
-	PORT_CONFSETTING(0x03, "Video-7 RGB")
+	PORT_CONFSETTING(0x07, "B&W for NTSC shader")
 INPUT_PORTS_END
 
 ioport_constructor a2_video_device_composite::device_input_ports() const { return INPUT_PORTS_NAME(a2_vidconfig_composite); }
