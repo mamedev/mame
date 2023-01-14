@@ -10,9 +10,9 @@ https://www.arcade-museum.com/game_detail.php?game_id=13327
 - Nvidia GeForce 2 MX200
 No other info about the MB used, most notable folders in the HDD dump:
 - C:\bh:
-\- *.gci files in data/* folder
+\- *.gci files in data folder
   "Global Challanger Image Data Ver1.0.0 Copyright (C) 2002 by GC-Tech CO, LTD"
-\- Several logs for *.pro files in data/* folder, generated with
+\- Several logs for *.pro files in data folder, generated with
    "3D Studio MAX PowerRender Exporter v1.05"
 - C:\drv:
 \- Korean setup files for Windows 98SE
