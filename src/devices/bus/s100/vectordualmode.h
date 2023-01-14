@@ -46,6 +46,8 @@ protected:
 	void s100_sout_w(offs_t offset, uint8_t data) override;
 
 private:
+	bool hdd_selected();
+
 	required_device_array<vector_micropolis_image_device, 4> m_floppy;
 	uint8_t m_ram[512];
 	uint16_t m_cmar;

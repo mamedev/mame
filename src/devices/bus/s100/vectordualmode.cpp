@@ -65,26 +65,53 @@ s100_vector_dualmode_device::s100_vector_dualmode_device(const machine_config &m
 {
 }
 
+bool s100_vector_dualmode_device::hdd_selected()
+{
+	return m_drive == 0 && false;
+}
+
 uint8_t s100_vector_dualmode_device::s100_sinp_r(offs_t offset)
 {
 	// 7200-1200-02-1 page 16 (1-10)
 	uint8_t data;
 	if (offset == 0xc0) { // status (0) port
-		bool write_protect = !m_floppy[m_drive]->is_open() || m_floppy[m_drive]->is_readonly(); // FDD
-		bool ready = false; // HDD
-		bool track0 = m_floppy[m_drive]->is_open() && m_track == 0;
+		bool write_protect; // FDD
+		bool ready; // HDD
+		bool track0;
 		bool write_fault = false; // HDD
-		bool seek_complete = false; // HDD
-		bool loss_of_sync = false; // HDD
+		bool seek_complete; // HDD
+		bool loss_of_sync; // HDD
+		if (hdd_selected()) {
+			write_protect = false;
+			ready = true;
+			track0 = false;
+			seek_complete = true;
+			loss_of_sync = true;
+		} else {
+			write_protect = !m_floppy[m_drive]->is_open() || m_floppy[m_drive]->is_readonly();
+			ready = false;
+			track0 = m_floppy[m_drive]->is_open() && m_track == 0;
+			seek_complete = false;
+			loss_of_sync = false;
+		}
 
 		data = write_protect | (ready << 1) | (track0 << 2)
 		    | (write_fault << 3) | (seek_complete << 4) | (loss_of_sync << 5)
 			| 0xc0;
 	} else if (offset == 0xc1) { // status (1) port
-		bool floppy_disk_selected = true;
-		bool controller_busy = false;
-		bool motor_on = m_motor_on_timer->enabled(); // FDD
-		bool type_of_hard_disk = false;
+		bool floppy_disk_selected;
+		bool controller_busy;
+		bool motor_on; // FDD
+		bool type_of_hard_disk = true;
+		if (hdd_selected()) {
+			floppy_disk_selected = false;
+			controller_busy = false;
+			motor_on = false;
+		} else {
+			floppy_disk_selected = true;
+			controller_busy = false;
+			motor_on = m_motor_on_timer->enabled();
+		}
 		data = floppy_disk_selected | (controller_busy << 1) | (motor_on << 2)
 		    | (type_of_hard_disk << 3) | 0xf0;
 	} else if (offset == 0xc2) { // data port
