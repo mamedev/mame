@@ -106,7 +106,7 @@ char const *const CONTROLLER_BUTTON_XBOX360[]{
 		"X",
 		"Y",
 		"View",
-		"Guide",
+		"Logo",
 		"Menu",
 		"LSB",
 		"RSB",
@@ -232,6 +232,29 @@ char const *const CONTROLLER_BUTTON_XBOX360[]{
 		"D-pad Left",
 		"D-pad Right",
 		"Capture",
+		"P1",
+		"P2",
+		"P3",
+		"P4",
+		"Touchpad" };
+
+[[maybe_unused]] char const *const CONTROLLER_BUTTON_SHIELD[]{
+		"A",
+		"B",
+		"X",
+		"Y",
+		"Back",
+		"Logo",
+		"Start",
+		"LSB",
+		"RSB",
+		"LB",
+		"RB",
+		"D-pad Up",
+		"D-pad Down",
+		"D-pad Left",
+		"D-pad Right",
+		"Share",
 		"P1",
 		"P2",
 		"P3",
@@ -1215,6 +1238,11 @@ public:
 			break;
 #endif
 #if SDL_VERSION_ATLEAST(2, 24, 0)
+		case SDL_CONTROLLER_TYPE_NVIDIA_SHIELD:
+			osd_printf_verbose("Game Controller:   ...  NVIDIA Shield type\n");
+			axisnames = CONTROLLER_AXIS_XBOX;
+			buttonnames = CONTROLLER_BUTTON_SHIELD;
+			break;
 		//case SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_JOYCON_LEFT:
 		//case SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_JOYCON_RIGHT:
 		case SDL_CONTROLLER_TYPE_NINTENDO_SWITCH_JOYCON_PAIR:
