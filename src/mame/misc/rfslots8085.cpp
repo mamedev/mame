@@ -51,6 +51,7 @@ public:
 	{
 	}
 
+	void rf53_3297(machine_config &config);
 	void unkrfslt(machine_config &config);
 
 protected:
@@ -125,6 +126,25 @@ void rfslots8085_state::unkrfslt(machine_config &config)
 	AY8910(config, "ay1", 6_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.50); // divider unknown
 }
 
+// Recreativos Franco PCB Ref. 53/3297 
+void rfslots8085_state::rf53_3297(machine_config &config)
+{
+	I8085A(config, m_maincpu, 6_MHz_XTAL);
+
+	I8035(config, m_audiocpu, 6_MHz_XTAL / 2); // divider unknown
+
+	I8155(config, "i8155", 0);
+
+	I8255(config, "i8255");
+
+	I8212(config, "i8212");
+
+	I8279(config, "i8279", 0);
+
+	SPEAKER(config, "mono").front_center();
+}
+
+
 /* Unknown Recreativos Franco slot machine. May be "Limon y Baby 100"
    __________________________________________________________________________________________________________________
   |  ....A7.....   ....A8.....   ....A9.....   ....A10....   ....A11....   ....A12....   ....A13....   ....A14....  |
@@ -181,11 +201,50 @@ ROM_START(unkrfslt)
 	ROM_LOAD("m1-31_b_1704.ic32", 0x0000, 0x4000, CRC(a74a85b7) SHA1(f562495a6b97f34165cc9fd5c750664701cac21f))
 
 	ROM_REGION(0x1000, "audiocpu", 0)
-	ROM_LOAD( "8a.ic44", 0x0000, 0x1000, CRC(51b564b6) SHA1(8992a5cb4dff8c6b38b77a7e0199a71f2969b496) )
-	ROM_IGNORE(                  0x3000 ) // 0xff filled and it's outside of the 8035's global address mask (fff)
+	ROM_LOAD("8a.ic44", 0x0000, 0x1000, CRC(51b564b6) SHA1(8992a5cb4dff8c6b38b77a7e0199a71f2969b496))
+	ROM_IGNORE(                 0x3000) // 0xff filled and it's outside of the 8035's global address mask (fff)
+ROM_END
+
+/* Baby Formula 2.
+ Runs on RF PCB 53/3297, with similar components:
+
+CPU side:
+  - TC1157
+  - EEPROM
+  - 74LS138
+  - 8212
+  - 74LS245
+  - 8085
+  - 74125
+  - LM339
+PIAs:
+  - 8155
+  - 8279
+  - 8255
+Sound side:
+  - 8035
+  - 8910 x 2
+  - 74LS373
+  - EEPROM
+  - LM380
+
+Uses also the following Recreativos Franco boards:
+  - 53/3378 for hoppers.
+  - 53/3379 for the mechanical "bingo roller".
+  - 53/3385 and 53/3380 for displays.
+
+A complete manual with schematics can be downloaded from https://www.recreativas.org/manuales
+*/
+ROM_START(bformula2)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("recreativos_franco_m-000031-b_001744_90_pc.ic32", 0x0000, 0x8000, CRC(b593c6bc) SHA1(c01b61b4ea60b9f2bca3200b4b90af1c4027f9df))
+
+	ROM_REGION(0x8000, "audiocpu", 0)
+	ROM_LOAD("recreativos_franco_m-000031-b_001744_90_pa.ic44", 0x0000, 0x8000, CRC(3c4ae129) SHA1(e68e7a403596a9f2d34e6b8d2631d2716010e982))
 ROM_END
 
 } // anonymous namespace
 
-// Date "25-05-87" engraved on the PCB
-GAME( 1987?, unkrfslt, 0, unkrfslt, unkrfslt, rfslots8085_state, empty_init, ROT0, "Recreativos Franco", "unknown Recreativos Franco slot machine", MACHINE_IS_SKELETON_MECHANICAL )
+//   YEAR   NAME       PARENT MACHINE    INPUT     CLASS               INIT        ROT   COMPANY               FULLNAME                                   FLAGS
+GAME(1988,  bformula2, 0,     rf53_3297, unkrfslt, rfslots8085_state,  empty_init, ROT0, "Recreativos Franco", "Baby Formula 2",                          MACHINE_IS_SKELETON_MECHANICAL) // Year from legal registry date
+GAME(1987?, unkrfslt,  0,     unkrfslt,  unkrfslt, rfslots8085_state,  empty_init, ROT0, "Recreativos Franco", "unknown Recreativos Franco slot machine", MACHINE_IS_SKELETON_MECHANICAL) // Date "25-05-87" engraved on the PCB
