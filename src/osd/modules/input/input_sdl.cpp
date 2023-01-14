@@ -1862,7 +1862,7 @@ public:
 		auto &sdlopts = downcast<sdl_options const &>(*options());
 		bool const sixaxis_mode = sdlopts.sixaxis();
 
-		if (!machine().options().debug && sdlopts.background_input())
+		if (!machine.options().debug() && sdlopts.background_input())
 			SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
 		SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 
@@ -1953,7 +1953,7 @@ public:
 		auto &sdlopts = downcast<sdl_options const &>(*options());
 		bool const sixaxis_mode = sdlopts.sixaxis();
 
-		if (!machine().options().debuge() && sdlopts.background_input())
+		if (!machine.options().debug() && sdlopts.background_input())
 			SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
 		SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 
