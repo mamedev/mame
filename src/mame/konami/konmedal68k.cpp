@@ -456,6 +456,18 @@ static INPUT_PORTS_START( spcpokan )
 	PORT_DIPSETTING(    0x3000, "18 sec" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pikkaric )
+	PORT_INCLUDE( kzaurus )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x1000, 0x1000, "Chance Game" )      PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, "Play Timer" )       PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(      0x0000, "15" )
+	PORT_DIPSETTING(      0x2000, "20" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( crossmg2 )
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x0001, 0x0001, "IN0")
@@ -880,7 +892,7 @@ GAME( 1998, kattobas, 0, koropens, kattobas, konmedal68k_state, empty_init, ROT0
 GAME( 1999, pwrchanc, 0, pwrchanc, kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Powerful Chance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, ymcapsul, 0, kzaurus,  kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Yu-Gi-Oh Monster Capsule", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, spcpokan, 0, spcpokan, spcpokan, konmedal68k_state, empty_init, ROT0, "Konami", "Space Pokan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 2000, pikkaric, 0, kzaurus,  kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Pikkari Chance", MACHINE_IMPERFECT_GRAPHICS)
+GAME( 2000, pikkaric, 0, kzaurus,  pikkaric, konmedal68k_state, empty_init, ROT0, "Konami", "Pikkari Chance", MACHINE_IMPERFECT_GRAPHICS)
 
 // Higher resolution display.  These are Pachinko / Pachislot machines, will require simulation of mechanical parts / ball sensors.
 GAME( 1996, crossmg2,  0, slot,     crossmg2, konmedal68k_slot_state, empty_init, ROT0, "Konami", "Cross Magic Mark 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL )
