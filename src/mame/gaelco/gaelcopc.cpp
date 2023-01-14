@@ -15,14 +15,14 @@ Intel 82801 (PCI 2.3 + integrated LAN + IDE + USB 2.0 + AC'97 + LPC +
              ACPI 2.0 + Flash BIOS control + SMBus + GPIO)
 Intel 82562 (LAN)
 RTM 560-25R (Audio)
-nVidia GeForce 4 TI4200 128Mb AGP
+Nvidia GeForce 4 TI4200 128Mb AGP
 256 Mb PC133
 Pentium 4 (??? XXXXMhz), <- contradicts 82815 datasheet and an internal BIOS string at $ce (Socket 370),
                             expect Celeron or Pentium 3 at very least.
 
 I/O Board with Altera Flex EPF15K50EQC240-3
 
-The graphics cards are swappable between nVidia cards from
+The graphics cards are swappable between Nvidia cards from
 the era. There is no protection on the games, you can just swap out
 hard drives to change games, though they do seem to have their own
 motherboard bioses.
@@ -73,7 +73,7 @@ void gaelcopc_state::gaelcopc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelcopc_state::gaelcopc_map); // TODO: remove me
 
 	PCI_ROOT(config, "pci", 0);
-	// TODO: everything else
+	// ...
 }
 
 // TODO: All of the provided BIOSes just have different ACFG table configs at $10000, investigate
