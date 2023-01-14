@@ -37099,6 +37099,7 @@ rex6000                         //
 rf51w14cg                       // (c) 2003 Recreativos Franco
 
 @source:misc/rfslots8085.cpp
+bformula2                       // (c) 1988 Recreativos Franco
 unkrfslt                        //
 
 @source:misc/rfslotsmcs48.cpp
