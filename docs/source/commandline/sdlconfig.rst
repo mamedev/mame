@@ -1,10 +1,8 @@
 SDL-Specific Commandline Options
 ================================
 
-
 This section contains configuration options that are specific to any build
-supported by SDL (including Windows where compiled as SDL instead of
-native).
+supported by SDL (including Windows when built with SDL instead of native).
 
 
 

@@ -29,13 +29,14 @@
 
 const options_entry osd_options::s_option_entries[] =
 {
-	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD KEYBOARD MAPPING OPTIONS" },
+	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD INPUT MAPPING OPTIONS" },
 #if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
 	{ OSDOPTION_UIMODEKEY,                       "DEL",            core_options::option_type::STRING,    "key to enable/disable MAME controls when emulated system has keyboard inputs" },
 #else
 	{ OSDOPTION_UIMODEKEY,                       "auto",           core_options::option_type::STRING,    "key to enable/disable MAME controls when emulated system has keyboard inputs" },
 #endif  // SDLMAME_MACOSX
 	{ OSDOPTION_CONTROLLER_MAP_FILE ";ctrlmap",  OSDOPTVAL_NONE,   core_options::option_type::PATH,      "game controller mapping file" },
+	{ OSDOPTION_BACKGROUND_INPUT,                "0",              core_options::option_type::BOOLEAN,   "don't ignore input when losing UI focus" },
 
 	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD FONT OPTIONS" },
 	{ OSD_FONT_PROVIDER,                         OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "provider for UI font: " },

@@ -4,7 +4,7 @@ Universal Command-line Options
 ==============================
 
 This section contains configuration options that are applicable to *all* MAME
-configurations (both including both SDL and Windows native).
+configurations (including both SDL and Windows native).
 
 .. contents:: :local:
 
@@ -698,9 +698,10 @@ OSD-related Options
 **-controller_map** / **-ctrlmap** *<filename>*
 
     Path to a text file containing game controller button and axis mappings in
-    the format used by SDL2 and Steam.  Must use an ASCII-compatible text
-    encoding with native line endings (e.g. CRLF on Windows).  Currently only
-    supported when using the ``sdlgame`` joystick provider.
+    the format used by SDL2 and Steam, or ``none`` to use only built-in
+    mappings.  Must use an ASCII-compatible text encoding with native line
+    endings (e.g. CRLF on Windows).  Currently only supported when using the
+    ``sdlgame`` joystick provider.  The default setting is ``none``.
 
     A `community-sourced list of game controller mappings
     <https://github.com/gabomdq/SDL_GameControllerDB>`_ can be found on GitHub.
@@ -714,9 +715,23 @@ OSD-related Options
     in the **config** folder inside your Steam installation folder.
 
     Example:
-        .. code-bock:: bash
+        .. code-block:: bash
 
             mame -controller_map gamecontrollerdb.txt sf2ce
+
+.. _mame-commandline-backgroundinput:
+
+**-[no]background_input**
+
+    Sets whether input is accepted or ignored when MAME does not have UI focus.
+    Currently supported for RawInput mouse/keyboard input on Windows, and SDL
+    game controller/joystick input.  This setting is ignored when the debugger
+    is enabled.  The default is OFF (**-nobackground_input**).
+
+    Example:
+        .. code-block:: bash
+
+            mame -background_input ssf2tb
 
 .. _mame-commandline-uifontprovider:
 
@@ -912,7 +927,8 @@ Example:
 
 **-joystickprovider** *<module>*
 
-    Chooses how MAME will get joystick input. The default is ``auto``.
+    Chooses how MAME will get joystick and other game controller input. The
+    default is ``auto``.
 
 .. list-table:: Supported joystick input providers per-platform
     :header-rows: 0
@@ -941,18 +957,31 @@ Example:
 
 ..  [#JIPAutoSDL] On SDL, auto will default to ``sdlgame``.
 
-.. Tip:: Note that Microsoft Xbox 360 and Xbox One controllers connected to
-         Windows will work best with ``winhybrid`` or ``xinput``. The
-         ``winhybrid`` option supports a mix of DirectInput and XInput
-         controllers at the same time.
+winhybrid
+    Uses XInput for compatible game controllers, falling back to DirectInput for
+    other game controllers.  Typically provides the best experience on Windows.
+dinput
+    Uses DirectInput for all game controllers.  May be useful if you want to use
+    more than four XInput game controllers simultaneously.  Note that LT and RT
+    controls are combined with using XInput game controllers via DirectInput.
+xinput
+    Supports up to four XInput game controllers.
+sdlgame
+    Uses the SDL game controller API for game controllers with button/axis
+    mappings available, falling back to the SDL joystick API for other game
+    controllers.  Provides consistent button and axis assignment and meaningful
+    control names for popular game controllers.  Use the :ref:`controller_map
+    option <mame-commandline-controllermap>` to supply mappings for additional
+    game controllers or override built-in mappings.
+sdljoy
+    Uses the SDL joystick API for all game controllers.
+none
+    Ignores all game controllers.
 
 Example:
     .. code-block:: bash
 
         mame mk2 -joystickprovider winhybrid
-
-.. Tip:: On Windows, winhybrid is likely to give the best experience by
-         supporting both XInput and DirectInput controllers.
 
 
 .. _mame-commandline-cliverbs:

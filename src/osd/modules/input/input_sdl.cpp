@@ -1859,6 +1859,11 @@ public:
 
 	virtual void input_init(running_machine &machine) override
 	{
+		auto &sdlopts = downcast<sdl_options const &>(*options());
+		bool const sixaxis_mode = sdlopts.sixaxis();
+
+		if (!machine().options().debug && sdlopts.background_input())
+			SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
 		SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 
 		init_joystick();
@@ -1866,8 +1871,6 @@ public:
 			return;
 
 		sdl_joystick_module_base::input_init(machine);
-
-		bool const sixaxis_mode = downcast<const sdl_options *>(options())->sixaxis();
 
 		osd_printf_verbose("Joystick: Start initialization\n");
 		for (int physical_stick = 0; physical_stick < SDL_NumJoysticks(); physical_stick++)
@@ -1947,10 +1950,12 @@ public:
 
 	virtual void input_init(running_machine &machine) override
 	{
-		SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
-
 		auto &sdlopts = downcast<sdl_options const &>(*options());
 		bool const sixaxis_mode = sdlopts.sixaxis();
+
+		if (!machine().options().debuge() && sdlopts.background_input())
+			SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
+		SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
 
 		init_joystick();
 		if (!have_joystick())
