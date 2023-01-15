@@ -141,7 +141,7 @@ void rfslots8085_state::sound_io_map(address_map &map)
 {
 }
 
-static INPUT_PORTS_START(unkrfslt)
+static INPUT_PORTS_START(rf53_3297)
 	PORT_START("DSW") // 1 x 6-dips bank
 	PORT_BIT(0x20, 0x20, IPT_UNKNOWN)
 	PORT_BIT(0x10, 0x10, IPT_UNKNOWN)
@@ -203,6 +203,6 @@ ROM_END
 
 } // anonymous namespace
 
-//   YEAR   NAME       PARENT MACHINE    INPUT     CLASS               INIT        ROT   COMPANY               FULLNAME           FLAGS
-GAME(1987?, bbombo,    0,     rf53_3297, unkrfslt, rfslots8085_state,  empty_init, ROT0, "Recreativos Franco", "Baby & Bombo",    MACHINE_IS_SKELETON_MECHANICAL) // Date "25-05-87" engraved on the PCB
-GAME(1988,  bformula2, 0,     rf53_3297, unkrfslt, rfslots8085_state,  empty_init, ROT0, "Recreativos Franco", "Baby Formula 2",  MACHINE_IS_SKELETON_MECHANICAL) // Year from legal registry date
+//   YEAR   NAME       PARENT MACHINE    INPUT      CLASS               INIT        ROT   COMPANY               FULLNAME           FLAGS
+GAME(1987?, bbombo,    0,     rf53_3297, rf53_3297, rfslots8085_state,  empty_init, ROT0, "Recreativos Franco", "Baby & Bombo",    MACHINE_IS_SKELETON_MECHANICAL) // Date "25-05-87" engraved on the PCB
+GAME(1988,  bformula2, 0,     rf53_3297, rf53_3297, rfslots8085_state,  empty_init, ROT0, "Recreativos Franco", "Baby Formula 2",  MACHINE_IS_SKELETON_MECHANICAL) // Year from legal registry date
