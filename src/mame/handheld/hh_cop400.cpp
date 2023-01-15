@@ -8,7 +8,6 @@ devices, mostly LED electronic games/toys.
 
 TODO:
 - why does h2hbaskbc(and clones) need a workaround on writing L pins?
-- plus1: which sensor position is which colour?
 - vidchal: Add screen and gun cursor with brightness detection callback,
   and softwarelist for the video tapes. We'd also need a VHS player device.
   The emulated lightgun itself appears to be working fine(eg. add a 30hz
@@ -1674,22 +1673,22 @@ u8 plus1_state::read_l()
 static INPUT_PORTS_START( plus1 )
 	PORT_START("IN.0") // port G
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Sensor Position 3")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Sensor Position 1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Green Sensor Position")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Red Sensor Position")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN.1") // port L
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Sensor Position 4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Blue Sensor Position")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Sensor Position 2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Yellow Sensor Position")
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 void plus1_state::plus1(machine_config &config)
 {
 	// basic machine hardware
-	COP410(config, m_maincpu, 1000000); // approximation - RC osc. R=51K, C=100pF
+	COP410(config, m_maincpu, 850000); // approximation - RC osc. R=51K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
 	m_maincpu->write_d().set(FUNC(plus1_state::write_d));
 	m_maincpu->read_g().set_ioport("IN.0");
@@ -1707,7 +1706,7 @@ void plus1_state::plus1(machine_config &config)
 
 ROM_START( plus1 )
 	ROM_REGION( 0x0200, "maincpu", 0 )
-	ROM_LOAD( "cop410l_b_nne", 0x0000, 0x0200, CRC(d861b80c) SHA1(4652f8ee0dd4c3c48b625285bb4f094d96434071) )
+	ROM_LOAD( "cop410l_b_nne", 0x0000, 0x0200, CRC(dbde3864) SHA1(8e7284b526dc6b99b9d921c9ad608972a761dc36) )
 ROM_END
 
 
