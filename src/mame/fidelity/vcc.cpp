@@ -3,12 +3,12 @@
 /******************************************************************************
 
 Fidelity Voice Chess Challenger series hardware
-- Voice Chess Challenger (VCC) (version A and B?)
+- Voice Chess Challenger (VCC) (2 revisions)
 - Advanced Voice Chess Challenger (UVC)
-- *Grandmaster Voice Chess Challenger (Fidelity Deutschland product)
-- *Decorator Challenger (FCC)
+- Grandmaster Voice Chess Challenger (Fidelity Deutschland product)
+- Decorator Challenger (FCC)
 
-*: not dumped yet
+Grandmaster and FCC are verified to be the same PCB + ROMs as UVC.
 
 *******************************************************************************
 
@@ -28,7 +28,7 @@ number, but the contents are identical.
 
 Memory map (VCC):
 -----------
-0000-0FFF: 4K 2332 ROM 101-32013
+0000-0FFF: 4K 2332 ROM VCC1 or 101-32013
 1000-1FFF: 4K 2332 ROM VCC2
 2000-2FFF: 4K 2332 ROM VCC3
 4000-5FFF: 1K RAM (2114 SRAM x2)

@@ -7,6 +7,8 @@ Milton Bradley Electronic Battleship model 4750A (hh_tms1k.cpp)
 
 TODO:
 - OPENDRAIN parameters are not fully known
+- DYNAMIC_MIN_TIMESTEP 1e-6 is a bit better, but too taxing for MAME,
+  maybe it could be made faster with OPTIMIZE_FRONTIER
 - Q2 should be a 2N3703 (same, just different max voltage)
 - D6 should be a 1K60? (germanium, type unknown, but looks like 1K60)
 - move 1N754A to netlist library?
