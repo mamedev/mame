@@ -1903,12 +1903,12 @@ msgstr "［有効な入力デバイスがありません］"
 #: src/frontend/mame/ui/inputtoggle.cpp:22
 msgctxt "menu-inputtoggle"
 msgid "Toggle Inputs"
-msgstr "入力切り替え"
+msgstr "トグル入力"
 
 #: src/frontend/mame/ui/inputtoggle.cpp:107
 msgctxt "menu-inputtoggle"
 msgid "[no toggle inputs are enabled]"
-msgstr "［有効な入力切り替えがありません］"
+msgstr "［有効なトグル入力がありません］"
 
 #: src/frontend/mame/ui/tapectrl.cpp:42
 msgid "Tape Control"
@@ -1977,7 +1977,7 @@ msgstr "キーボード選択"
 #: src/frontend/mame/ui/inputopts.cpp:103
 msgctxt "menu-inputopts"
 msgid "Toggle Inputs"
-msgstr "入力切り替え"
+msgstr "トグル入力"
 
 #: src/frontend/mame/ui/inputopts.cpp:108
 msgctxt "menu-inputopts"
@@ -5387,7 +5387,7 @@ msgstr "デバッガーで停止"
 #: src/emu/inpttype.ipp:876
 msgctxt "input-name"
 msgid "Config Menu"
-msgstr "メニュー設定"
+msgstr "メニュー"
 
 #: src/emu/inpttype.ipp:877
 msgctxt "input-name"
@@ -5782,7 +5782,7 @@ msgstr "オンスクリーンメニュー時に自動でポーズを切り替え
 
 #: plugins/cheatfind/init.lua:543
 msgid "All slots cleared and current state saved to Slot 1"
-msgstr "全てのスロットを消去し、現在の状態をスロット 1に保存しました"
+msgstr "全てのバッファを消去し、現在の状態をバッファ 1に保存しました"
 
 #: plugins/cheatfind/init.lua:555
 msgid "Start new search"
@@ -5791,12 +5791,12 @@ msgstr "新規に検索を開始"
 #: plugins/cheatfind/init.lua:566
 #, lua-format
 msgid "Memory state saved to Slot %d"
-msgstr "メモリの状態をスロット %dに保存しました"
+msgstr "メモリの状態をバッファ %dに保存しました"
 
 #: plugins/cheatfind/init.lua:583
 #, lua-format
 msgid "Save current memory state to Slot %d"
-msgstr "現在のメモリの状態をスロット %dに保存"
+msgstr "現在のメモリの状態をバッファ %dに保存"
 
 #: plugins/cheatfind/init.lua:614
 #, lua-format
@@ -5806,27 +5806,27 @@ msgstr "%d個の一致が見つかりました"
 #: plugins/cheatfind/init.lua:623
 #, lua-format
 msgid "Perform Compare : Slot %d %s Slot %d"
-msgstr "比較を実行 : スロット %d %s スロット %d"
+msgstr "比較を実行 : バッファ %d %s バッファ %d"
 
 #: plugins/cheatfind/init.lua:624
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s Slot %d %s %d"
-msgstr "比較を実行  :  スロット %d %s スロット %d %s %d"
+msgstr "比較を実行  :  バッファ %d %s バッファ %d %s %d"
 
 #: plugins/cheatfind/init.lua:625
 #, lua-format
 msgid "Perform Compare  :  Slot %d BITWISE%s Slot %d"
-msgstr "比較を実行  :  スロット %d BITWISE%s スロット %d"
+msgstr "比較を実行  :  バッファ %d BITWISE%s バッファ %d"
 
 #: plugins/cheatfind/init.lua:626
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s %d"
-msgstr "比較を実行  :  スロット %d %s %d"
+msgstr "比較を実行  :  バッファ %d %s %d"
 
 #: plugins/cheatfind/init.lua:667 plugins/cheatfind/init.lua:709
 #, lua-format
 msgid "Slot %d"
-msgstr "スロット %d"
+msgstr "バッファ %d"
 
 #: plugins/cheatfind/init.lua:678
 msgid "Left less than right"
@@ -5886,11 +5886,11 @@ msgstr "データフォーマット"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Slot 1 Value"
-msgstr "スロット 1の値"
+msgstr "バッファ 1の値"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Last Slot Value"
-msgstr "最後のスロットの値"
+msgstr "最後のバッファの値"
 
 #: plugins/cheatfind/init.lua:740
 msgid "Test/Write Poke Value"
@@ -5901,7 +5901,7 @@ msgid ""
 "Use this if you want to poke the Slot 1 value (eg. You started with "
 "something but lost it)"
 msgstr ""
-"スロット 1の値を格納するにはこれを使用（例：何かと共に開始するが"
+"バッファ 1の値を格納するにはこれを使用（例：何かと共に開始するが"
 "それを失う場合）"
 
 #: plugins/cheatfind/init.lua:749
@@ -5909,7 +5909,7 @@ msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
 msgstr ""
-"最後のスロットの値を格納するにはこれを使用（例：アイテムなしで開始するが"
+"最後のバッファの値を格納するにはこれを使用（例：アイテムなしで開始するが"
 "最終的にそれを得る場合）"
 
 #: plugins/cheatfind/init.lua:751
