@@ -188,9 +188,9 @@ ROM_END
 
 /* Baby Formula 2.
 Uses also the following Recreativos Franco boards:
-  - 53/3378 for hoppers.
-  - 53/3379 for the mechanical "bingo roller".
-  - 53/3385 and 53/3380 for displays.
+  -53/3378 for hoppers.
+  -53/3379 for the mechanical "bingo roller".
+  -53/3385 and 53/3380 for displays.
 A complete manual with schematics can be downloaded from https://www.recreativas.org/manuales
 */
 ROM_START(bformula2)
