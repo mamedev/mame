@@ -198,10 +198,19 @@ void menu_dats_view::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void menu_dats_view::populate(float &customtop, float &custombottom)
+void menu_dats_view::populate()
 {
-	customtop = 2.0f * line_height() + 4.0f * tb_border();
-	custombottom = line_height() + 3.0f * tb_border();
+}
+
+//-------------------------------------------------
+//  recompute metrics
+//-------------------------------------------------
+
+void menu_dats_view::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu_textbox::recompute_metrics(width, height, aspect);
+
+	set_custom_space(2.0F * line_height() + 4.0F * tb_border(), line_height() + 3.0F * tb_border());
 }
 
 //-------------------------------------------------
@@ -219,10 +228,10 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	maxwidth = std::max(maxwidth, width);
 
 	// compute our bounds
-	float x1 = 0.5f - 0.5f * maxwidth;
+	float x1 = 0.5F - 0.5F * maxwidth;
 	float x2 = x1 + maxwidth;
 	float y1 = origy1 - top;
-	float y2 = origy1 - 2.0f * tb_border() - line_height();
+	float y2 = origy1 - 2.0F * tb_border() - line_height();
 
 	// draw a box
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
@@ -245,13 +254,13 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 		maxwidth += width;
 	}
 
-	float space = (1.0f - maxwidth) / (m_items_list.size() * 2);
+	float space = (1.0F - maxwidth) / (m_items_list.size() * 2);
 
 	// compute our bounds
 	x1 -= lr_border();
 	x2 += lr_border();
 	y1 = y2 + tb_border();
-	y2 += line_height() + 2.0f * tb_border();
+	y2 += line_height() + 2.0F * tb_border();
 
 	// draw a box
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
@@ -283,7 +292,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 		ui().draw_text_full(
 				container(),
 				elem.label,
-				x1, y1, 1.0f,
+				x1, y1, 1.0F,
 				text_layout::text_justify::LEFT, text_layout::word_wrapping::NEVER,
 				mame_ui_manager::NORMAL, fcolor, bcolor,
 				&width, nullptr,
@@ -298,13 +307,13 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 		std::string const revision(util::string_format(_("Revision: %1$s"), m_items_list[m_actual].revision));
 		width = get_text_width(
 				revision,
-				0.0f, 0.0f, 1.0f,
+				0.0F, 0.0F, 1.0F,
 				text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE);
 		width += 2 * lr_border();
 		maxwidth = std::max(origx2 - origx1, width);
 
 		// compute our bounds
-		x1 = 0.5f - 0.5f * maxwidth;
+		x1 = 0.5F - 0.5F * maxwidth;
 		x2 = x1 + maxwidth;
 		y1 = origy2 + tb_border();
 		y2 = origy2 + bottom;

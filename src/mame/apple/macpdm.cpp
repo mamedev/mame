@@ -11,7 +11,7 @@
 #include "cuda.h"
 #include "macadb.h"
 #include "machine/mv_sonora.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 #include "machine/ram.h"
 #include "machine/swim3.h"
 #include "machine/timer.h"

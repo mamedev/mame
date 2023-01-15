@@ -71,10 +71,10 @@ void sdl_event_manager::process_events(running_machine &machine)
 		auto subscribers = m_subscription_index.equal_range(sdlevent.type);
 
 		// Dispatch the events
-		std::for_each(subscribers.first, subscribers.second, [&sdlevent](auto sub)
-		{
-			sub.second->handle_event(sdlevent);
-		});
+		std::for_each(
+				subscribers.first,
+				subscribers.second,
+				[&sdlevent] (auto sub) { sub.second->handle_event(sdlevent); });
 	}
 }
 

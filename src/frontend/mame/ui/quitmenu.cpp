@@ -45,7 +45,7 @@ void menu_confirm_quit::custom_render(void *selectedref, float top, float bottom
 }
 
 
-void menu_confirm_quit::populate(float &customtop, float &custombottom)
+void menu_confirm_quit::populate()
 {
 }
 

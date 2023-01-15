@@ -8,7 +8,7 @@
  */
 
 #include "emu.h"
-#include "ncr5390.h"
+#include "ncr53c90.h"
 
 #define LOG_GENERAL (1U << 0)
 #define LOG_STATE   (1U << 1)
@@ -20,27 +20,27 @@
 
 #define DELAY_HACK
 
-DEFINE_DEVICE_TYPE(NCR5390, ncr5390_device, "ncr5390", "NCR 5390 SCSI Controller")
+DEFINE_DEVICE_TYPE(NCR53C90, ncr53c90_device, "ncr53c90", "NCR 53C90 SCSI Controller")
 DEFINE_DEVICE_TYPE(NCR53C90A, ncr53c90a_device, "ncr53c90a", "NCR 53C90A Advanced SCSI Controller")
 DEFINE_DEVICE_TYPE(NCR53C94, ncr53c94_device, "ncr53c94", "NCR 53C94 Advanced SCSI Controller")
 DEFINE_DEVICE_TYPE(NCR53CF94, ncr53cf94_device, "ncr53cf94", "NCR 53CF94-2 Fast SCSI Controller") // TODO: differences not emulated
 
-void ncr5390_device::map(address_map &map)
+void ncr53c90_device::map(address_map &map)
 {
-	map(0x0, 0x0).rw(FUNC(ncr5390_device::tcounter_lo_r), FUNC(ncr5390_device::tcount_lo_w));
-	map(0x1, 0x1).rw(FUNC(ncr5390_device::tcounter_hi_r), FUNC(ncr5390_device::tcount_hi_w));
-	map(0x2, 0x2).rw(FUNC(ncr5390_device::fifo_r), FUNC(ncr5390_device::fifo_w));
-	map(0x3, 0x3).rw(FUNC(ncr5390_device::command_r), FUNC(ncr5390_device::command_w));
-	map(0x4, 0x4).rw(FUNC(ncr5390_device::status_r), FUNC(ncr5390_device::bus_id_w));
-	map(0x5, 0x5).rw(FUNC(ncr5390_device::istatus_r), FUNC(ncr5390_device::timeout_w));
-	map(0x6, 0x6).rw(FUNC(ncr5390_device::seq_step_r), FUNC(ncr5390_device::sync_period_w));
-	map(0x7, 0x7).rw(FUNC(ncr5390_device::fifo_flags_r), FUNC(ncr5390_device::sync_offset_w));
-	map(0x8, 0x8).rw(FUNC(ncr5390_device::conf_r), FUNC(ncr5390_device::conf_w));
-	map(0xa, 0xa).w(FUNC(ncr5390_device::test_w));
-	map(0x9, 0x9).w(FUNC(ncr5390_device::clock_w));
+	map(0x0, 0x0).rw(FUNC(ncr53c90_device::tcounter_lo_r), FUNC(ncr53c90_device::tcount_lo_w));
+	map(0x1, 0x1).rw(FUNC(ncr53c90_device::tcounter_hi_r), FUNC(ncr53c90_device::tcount_hi_w));
+	map(0x2, 0x2).rw(FUNC(ncr53c90_device::fifo_r), FUNC(ncr53c90_device::fifo_w));
+	map(0x3, 0x3).rw(FUNC(ncr53c90_device::command_r), FUNC(ncr53c90_device::command_w));
+	map(0x4, 0x4).rw(FUNC(ncr53c90_device::status_r), FUNC(ncr53c90_device::bus_id_w));
+	map(0x5, 0x5).rw(FUNC(ncr53c90_device::istatus_r), FUNC(ncr53c90_device::timeout_w));
+	map(0x6, 0x6).rw(FUNC(ncr53c90_device::seq_step_r), FUNC(ncr53c90_device::sync_period_w));
+	map(0x7, 0x7).rw(FUNC(ncr53c90_device::fifo_flags_r), FUNC(ncr53c90_device::sync_offset_w));
+	map(0x8, 0x8).rw(FUNC(ncr53c90_device::conf_r), FUNC(ncr53c90_device::conf_w));
+	map(0xa, 0xa).w(FUNC(ncr53c90_device::test_w));
+	map(0x9, 0x9).w(FUNC(ncr53c90_device::clock_w));
 }
 
-uint8_t ncr5390_device::read(offs_t offset)
+uint8_t ncr53c90_device::read(offs_t offset)
 {
 	switch (offset)
 	{
@@ -57,7 +57,7 @@ uint8_t ncr5390_device::read(offs_t offset)
 	}
 }
 
-void ncr5390_device::write(offs_t offset, uint8_t data)
+void ncr53c90_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -78,7 +78,7 @@ void ncr5390_device::write(offs_t offset, uint8_t data)
 
 void ncr53c90a_device::map(address_map &map)
 {
-	ncr5390_device::map(map);
+	ncr53c90_device::map(map);
 
 	map(0xb, 0xb).rw(FUNC(ncr53c90a_device::conf2_r), FUNC(ncr53c90a_device::conf2_w));
 }
@@ -87,14 +87,14 @@ uint8_t ncr53c90a_device::read(offs_t offset)
 {
 	if (offset == 11)
 		return conf2_r();
-	return ncr5390_device::read(offset);
+	return ncr53c90_device::read(offset);
 }
 
 void ncr53c90a_device::write(offs_t offset, uint8_t data)
 {
 	if (offset == 11)
 		return conf2_w(data);
-	ncr5390_device::write(offset, data);
+	ncr53c90_device::write(offset, data);
 }
 
 void ncr53c94_device::map(address_map &map)
@@ -122,7 +122,7 @@ void ncr53c94_device::write(offs_t offset, uint8_t data)
 		ncr53c90a_device::write(offset, data);
 }
 
-ncr5390_device::ncr5390_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+ncr53c90_device::ncr53c90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: nscsi_device(mconfig, type, tag, owner, clock)
 	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 	, tm(nullptr), config(0), status(0), istatus(0), clock_conv(0), sync_offset(0), sync_period(0), bus_id(0)
@@ -133,13 +133,13 @@ ncr5390_device::ncr5390_device(const machine_config &mconfig, device_type type, 
 }
 
 ncr53c90a_device::ncr53c90a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: ncr5390_device(mconfig, type, tag, owner, clock)
+	: ncr53c90_device(mconfig, type, tag, owner, clock)
 	, config2(0)
 {
 }
 
-ncr5390_device::ncr5390_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ncr5390_device(mconfig, NCR5390, tag, owner, clock)
+ncr53c90_device::ncr53c90_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ncr53c90_device(mconfig, NCR53C90, tag, owner, clock)
 {
 }
 
@@ -165,7 +165,7 @@ ncr53cf94_device::ncr53cf94_device(const machine_config &mconfig, const char *ta
 {
 }
 
-void ncr5390_device::device_start()
+void ncr53c90_device::device_start()
 {
 	nscsi_device::device_start();
 
@@ -199,10 +199,10 @@ void ncr5390_device::device_start()
 	config = 0;
 	bus_id = 0;
 	select_timeout = 0;
-	tm = timer_alloc(FUNC(ncr5390_device::update_tick), this);
+	tm = timer_alloc(FUNC(ncr53c90_device::update_tick), this);
 }
 
-void ncr5390_device::device_reset()
+void ncr53c90_device::device_reset()
 {
 	fifo_pos = 0;
 	memset(fifo, 0, sizeof(fifo));
@@ -230,7 +230,7 @@ void ncr5390_device::device_reset()
 	reset_disconnect();
 }
 
-void ncr5390_device::reset_disconnect()
+void ncr53c90_device::reset_disconnect()
 {
 	scsi_bus->ctrl_w(scsi_refid, 0, ~S_RST);
 
@@ -240,7 +240,7 @@ void ncr5390_device::reset_disconnect()
 	mode = MODE_D;
 }
 
-void ncr5390_device::scsi_ctrl_changed()
+void ncr53c90_device::scsi_ctrl_changed()
 {
 	uint32_t ctrl = scsi_bus->ctrl_r();
 	if(ctrl & S_RST) {
@@ -251,12 +251,12 @@ void ncr5390_device::scsi_ctrl_changed()
 	step(false);
 }
 
-TIMER_CALLBACK_MEMBER(ncr5390_device::update_tick)
+TIMER_CALLBACK_MEMBER(ncr53c90_device::update_tick)
 {
 	step(true);
 }
 
-void ncr5390_device::step(bool timeout)
+void ncr53c90_device::step(bool timeout)
 {
 	uint32_t ctrl = scsi_bus->ctrl_r();
 	uint32_t data = scsi_bus->data_r();
@@ -296,7 +296,7 @@ void ncr5390_device::step(bool timeout)
 		if(win != scsi_id) {
 			scsi_bus->data_w(scsi_refid, 0);
 			scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
-			fatalerror("ncr5390_device::step need to wait for bus free\n");
+			fatalerror("ncr53c90_device::step need to wait for bus free\n");
 		}
 		state = (state & STATE_MASK) | (ARB_ASSERT_SEL << SUB_SHIFT);
 		scsi_bus->ctrl_w(scsi_refid, S_SEL, S_SEL);
@@ -474,7 +474,7 @@ void ncr5390_device::step(bool timeout)
 	case DISC_SEL_ATN_SEND_BYTE:
 		command_length--;
 		if(c == CD_SELECT_ATN_STOP) {
-			seq = 1;
+			seq = 2;
 			function_bus_complete();
 		} else {
 			state = DISC_SEL_WAIT_REQ;
@@ -541,19 +541,23 @@ void ncr5390_device::step(bool timeout)
 		switch(xfr_phase) {
 		case S_PHASE_DATA_OUT:
 		case S_PHASE_COMMAND:
-		case S_PHASE_MSG_OUT:
+		case S_PHASE_MSG_OUT: {
 			state = INIT_XFR_SEND_BYTE;
 
 			// can't send if the fifo is empty
 			if (fifo_pos == 0)
 				break;
 
+			// determine remaining bytes to transfer, accounting for fifo level plus potential incoming DMA bytes
+			int remaining_bytes = fifo_pos + (dma_command ? tcounter : 0);
+
 			// if it's the last message byte, deassert ATN before sending
-			if (xfr_phase == S_PHASE_MSG_OUT && ((!dma_command && fifo_pos == 1) || (dma_command && tcounter == 1)))
+			if (xfr_phase == S_PHASE_MSG_OUT && remaining_bytes == 1)
 				scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
 
 			send_byte();
 			break;
+		}
 
 		case S_PHASE_DATA_IN:
 		case S_PHASE_STATUS:
@@ -622,7 +626,6 @@ void ncr5390_device::step(bool timeout)
 		// wait for dma transfer to complete or fifo to drain
 		if (dma_command && !(status & S_TC0) && fifo_pos)
 			break;
-
 		bus_complete();
 		break;
 
@@ -678,10 +681,10 @@ void ncr5390_device::step(bool timeout)
 	}
 }
 
-void ncr5390_device::send_byte()
+void ncr53c90_device::send_byte()
 {
 	if(!fifo_pos)
-		fatalerror("ncr5390_device::send_byte - !fifo_pos\n");
+		fatalerror("ncr53c90_device::send_byte - !fifo_pos\n");
 
 	state = (state & STATE_MASK) | (SEND_WAIT_SETTLE << SUB_SHIFT);
 	if((state & STATE_MASK) != INIT_XFR_SEND_PAD &&
@@ -696,14 +699,14 @@ void ncr5390_device::send_byte()
 	delay_cycles(sync_period);
 }
 
-void ncr5390_device::recv_byte()
+void ncr53c90_device::recv_byte()
 {
 	scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
 	state = (state & STATE_MASK) | (RECV_WAIT_REQ_1 << SUB_SHIFT);
 	step(false);
 }
 
-void ncr5390_device::function_bus_complete()
+void ncr53c90_device::function_bus_complete()
 {
 	LOG("function_bus_complete\n");
 	state = IDLE;
@@ -713,7 +716,7 @@ void ncr5390_device::function_bus_complete()
 	check_irq();
 }
 
-void ncr5390_device::function_complete()
+void ncr53c90_device::function_complete()
 {
 	LOG("function_complete\n");
 	state = IDLE;
@@ -723,7 +726,7 @@ void ncr5390_device::function_complete()
 	check_irq();
 }
 
-void ncr5390_device::bus_complete()
+void ncr53c90_device::bus_complete()
 {
 	LOG("bus_complete\n");
 	state = IDLE;
@@ -733,7 +736,7 @@ void ncr5390_device::bus_complete()
 	check_irq();
 }
 
-void ncr5390_device::delay(int cycles)
+void ncr53c90_device::delay(int cycles)
 {
 	if(!clock_conv)
 		return;
@@ -741,36 +744,36 @@ void ncr5390_device::delay(int cycles)
 	tm->adjust(clocks_to_attotime(cycles));
 }
 
-void ncr5390_device::delay_cycles(int cycles)
+void ncr53c90_device::delay_cycles(int cycles)
 {
 	tm->adjust(clocks_to_attotime(cycles));
 }
 
-uint8_t ncr5390_device::tcounter_lo_r()
+uint8_t ncr53c90_device::tcounter_lo_r()
 {
 	LOG("tcounter_lo_r %02x (%s)\n", tcounter & 0xff, machine().describe_context());
 	return tcounter;
 }
 
-void ncr5390_device::tcount_lo_w(uint8_t data)
+void ncr53c90_device::tcount_lo_w(uint8_t data)
 {
 	tcount = (tcount & 0xff00) | data;
 	LOG("tcount_lo_w %02x (%s)\n", data, machine().describe_context());
 }
 
-uint8_t ncr5390_device::tcounter_hi_r()
+uint8_t ncr53c90_device::tcounter_hi_r()
 {
 	LOG("tcounter_hi_r %02x (%s)\n", tcounter >> 8, machine().describe_context());
 	return tcounter >> 8;
 }
 
-void ncr5390_device::tcount_hi_w(uint8_t data)
+void ncr53c90_device::tcount_hi_w(uint8_t data)
 {
 	tcount = (tcount & 0x00ff) | (data << 8);
 	LOG("tcount_hi_w %02x (%s)\n", data, machine().describe_context());
 }
 
-uint8_t ncr5390_device::fifo_pop()
+uint8_t ncr53c90_device::fifo_pop()
 {
 	uint8_t r = fifo[0];
 	fifo_pos--;
@@ -779,13 +782,13 @@ uint8_t ncr5390_device::fifo_pop()
 	return r;
 }
 
-void ncr5390_device::fifo_push(uint8_t val)
+void ncr53c90_device::fifo_push(uint8_t val)
 {
 	fifo[fifo_pos++] = val;
 	check_drq();
 }
 
-uint8_t ncr5390_device::fifo_r()
+uint8_t ncr53c90_device::fifo_r()
 {
 	uint8_t r;
 	if(fifo_pos) {
@@ -798,20 +801,20 @@ uint8_t ncr5390_device::fifo_r()
 	return r;
 }
 
-void ncr5390_device::fifo_w(uint8_t data)
+void ncr53c90_device::fifo_w(uint8_t data)
 {
 	LOGMASKED(LOG_FIFO, "fifo_w 0x%02x fifo_pos %d (%s)\n", data, fifo_pos, machine().describe_context());
 	if(fifo_pos != 16)
 		fifo[fifo_pos++] = data;
 }
 
-uint8_t ncr5390_device::command_r()
+uint8_t ncr53c90_device::command_r()
 {
 	LOG("command_r (%s)\n", machine().describe_context());
 	return command[0];
 }
 
-void ncr5390_device::command_w(uint8_t data)
+void ncr53c90_device::command_w(uint8_t data)
 {
 	LOG("command_w %02x command_pos %d (%s)\n", data, command_pos, machine().describe_context());
 	if(command_pos == 2) {
@@ -831,7 +834,7 @@ void ncr5390_device::command_w(uint8_t data)
 		start_command();
 }
 
-void ncr5390_device::command_pop_and_chain()
+void ncr53c90_device::command_pop_and_chain()
 {
 	if(command_pos) {
 		command_pos--;
@@ -842,7 +845,7 @@ void ncr5390_device::command_pop_and_chain()
 	}
 }
 
-void ncr5390_device::start_command()
+void ncr53c90_device::start_command()
 {
 	uint8_t c = command[0] & 0x7f;
 	if(!check_valid_command(c)) {
@@ -941,7 +944,7 @@ void ncr5390_device::start_command()
 		// arbirary 1 here makes InterPro happy. Also in the InterPro case (perhaps typical),
 		// after ACK is asserted the device disconnects and the INIT_MSG_WAIT_REQ state is never
 		// entered, meaning we end up with I_DISCONNECT instead of I_BUS interrupt status.
-		seq = 1;
+		seq = 2;
 		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
 		step(false);
 		break;
@@ -970,11 +973,11 @@ void ncr5390_device::start_command()
 		break;
 
 	default:
-		fatalerror("ncr5390_device::start_command unimplemented command %02x\n", c);
+		fatalerror("ncr53c90_device::start_command unimplemented command %02x\n", c);
 	}
 }
 
-bool ncr5390_device::check_valid_command(uint8_t cmd)
+bool ncr53c90_device::check_valid_command(uint8_t cmd)
 {
 	int subcmd = cmd & 15;
 	switch((cmd >> 4) & 7) {
@@ -986,7 +989,7 @@ bool ncr5390_device::check_valid_command(uint8_t cmd)
 	return false;
 }
 
-void ncr5390_device::arbitrate()
+void ncr53c90_device::arbitrate()
 {
 	state = (state & STATE_MASK) | (ARB_COMPLETE << SUB_SHIFT);
 	scsi_bus->data_w(scsi_refid, 1 << scsi_id);
@@ -994,7 +997,7 @@ void ncr5390_device::arbitrate()
 	delay(11);
 }
 
-void ncr5390_device::check_irq()
+void ncr53c90_device::check_irq()
 {
 	bool oldirq = irq;
 	irq = istatus != 0;
@@ -1003,7 +1006,7 @@ void ncr5390_device::check_irq()
 
 }
 
-uint8_t ncr5390_device::status_r()
+uint8_t ncr53c90_device::status_r()
 {
 	uint32_t ctrl = scsi_bus->ctrl_r();
 	uint8_t res = status | (ctrl & S_MSG ? 4 : 0) | (ctrl & S_CTL ? 2 : 0) | (ctrl & S_INP ? 1 : 0);
@@ -1012,13 +1015,13 @@ uint8_t ncr5390_device::status_r()
 	return res;
 }
 
-void ncr5390_device::bus_id_w(uint8_t data)
+void ncr53c90_device::bus_id_w(uint8_t data)
 {
 	bus_id = data & 7;
 	LOG("bus_id=%d\n", bus_id);
 }
 
-uint8_t ncr5390_device::istatus_r()
+uint8_t ncr53c90_device::istatus_r()
 {
 	uint8_t res = istatus;
 
@@ -1036,39 +1039,39 @@ uint8_t ncr5390_device::istatus_r()
 	return res;
 }
 
-void ncr5390_device::timeout_w(uint8_t data)
+void ncr53c90_device::timeout_w(uint8_t data)
 {
 	LOG("timeout_w 0x%02x\n", data);
 	select_timeout = data;
 }
 
-uint8_t ncr5390_device::seq_step_r()
+uint8_t ncr53c90_device::seq_step_r()
 {
 	LOG("seq_step_r %d (%s)\n", seq, machine().describe_context());
 	return seq;
 }
 
-void ncr5390_device::sync_period_w(uint8_t data)
+void ncr53c90_device::sync_period_w(uint8_t data)
 {
 	sync_period = data & 0x1f;
 }
 
-uint8_t ncr5390_device::fifo_flags_r()
+uint8_t ncr53c90_device::fifo_flags_r()
 {
 	return fifo_pos;
 }
 
-void ncr5390_device::sync_offset_w(uint8_t data)
+void ncr53c90_device::sync_offset_w(uint8_t data)
 {
 	sync_offset = data & 0x0f;
 }
 
-uint8_t ncr5390_device::conf_r()
+uint8_t ncr53c90_device::conf_r()
 {
 	return config;
 }
 
-void ncr5390_device::conf_w(uint8_t data)
+void ncr53c90_device::conf_w(uint8_t data)
 {
 	config = data;
 	scsi_id = data & 7;
@@ -1078,18 +1081,18 @@ void ncr5390_device::conf_w(uint8_t data)
 		test_mode = true;
 }
 
-void ncr5390_device::test_w(uint8_t data)
+void ncr53c90_device::test_w(uint8_t data)
 {
 	if (test_mode)
 		logerror("test_w %d (%s) - test mode not implemented\n", data, machine().describe_context());
 }
 
-void ncr5390_device::clock_w(uint8_t data)
+void ncr53c90_device::clock_w(uint8_t data)
 {
 	clock_conv = data & 0x07;
 }
 
-void ncr5390_device::dma_set(int dir)
+void ncr53c90_device::dma_set(int dir)
 {
 	dma_dir = dir;
 
@@ -1098,7 +1101,7 @@ void ncr5390_device::dma_set(int dir)
 		decrement_tcounter(fifo_pos);
 }
 
-void ncr5390_device::dma_w(uint8_t val)
+void ncr53c90_device::dma_w(uint8_t val)
 {
 	fifo_push(val);
 	decrement_tcounter();
@@ -1106,7 +1109,7 @@ void ncr5390_device::dma_w(uint8_t val)
 	step(false);
 }
 
-uint8_t ncr5390_device::dma_r()
+uint8_t ncr53c90_device::dma_r()
 {
 	uint8_t r = fifo_pop();
 	decrement_tcounter();
@@ -1115,7 +1118,7 @@ uint8_t ncr5390_device::dma_r()
 	return r;
 }
 
-void ncr5390_device::check_drq()
+void ncr53c90_device::check_drq()
 {
 	bool drq_state = drq;
 
@@ -1139,7 +1142,7 @@ void ncr5390_device::check_drq()
 	}
 }
 
-void ncr5390_device::decrement_tcounter(int count)
+void ncr53c90_device::decrement_tcounter(int count)
 {
 	if (!dma_command)
 		return;
@@ -1174,14 +1177,14 @@ void ncr53c90a_device::device_start()
 
 	config2 = 0;
 
-	ncr5390_device::device_start();
+	ncr53c90_device::device_start();
 }
 
 void ncr53c90a_device::device_reset()
 {
 	config2 = 0;
 
-	ncr5390_device::device_reset();
+	ncr53c90_device::device_reset();
 }
 
 uint8_t ncr53c90a_device::status_r()
@@ -1285,5 +1288,5 @@ void ncr53c94_device::check_drq()
 		}
 	}
 	else
-		ncr5390_device::check_drq();
+		ncr53c90_device::check_drq();
 }

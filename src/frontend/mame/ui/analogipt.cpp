@@ -66,6 +66,15 @@ menu_analog::~menu_analog()
 }
 
 
+void menu_analog::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	// space for live display
+	set_custom_space(0.0f, (line_height() * m_visible_fields) + (tb_border() * 3.0f));
+}
+
+
 void menu_analog::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
 {
 	// work out how much space to use for field names
@@ -331,7 +340,7 @@ void menu_analog::handle(event const *ev)
 }
 
 
-void menu_analog::populate(float &customtop, float &custombottom)
+void menu_analog::populate()
 {
 	// loop over input ports
 	if (m_item_data.empty())
@@ -401,7 +410,7 @@ void menu_analog::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 
 	// space for live display
-	custombottom = (line_height() * m_visible_fields) + (tb_border() * 3.0f);
+	set_custom_space(0.0f, (line_height() * m_visible_fields) + (tb_border() * 3.0f));
 }
 
 

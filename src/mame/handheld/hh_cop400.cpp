@@ -31,7 +31,7 @@ TODO:
 #include "speaker.h"
 
 // internal artwork
-#include "bship82.lh" // clickable
+#include "bshipg.lh" // clickable
 #include "ctstein.lh" // clickable
 #include "einvaderc.lh"
 #include "funjacks.lh" // clickable
@@ -542,11 +542,11 @@ ROM_END
   * COP421 (likely a development chip)
   * 36+9 LEDs, 1-bit sound
 
-  This game is presumedly unreleased. The title is unknown, the patent simply names
-  it "Hand-held electronic game". There is no mass-manufacture company assigned
-  to it either. The game seems unfinished(no scorekeeping, some bugs), and the design
-  is very complex. Player ship and bullets are on a moving "wand", a 2-way mirror
-  makes it appear on the same plane as the enemies and barriers.
+  This game is presumedly unreleased. The title is unknown, the patent simply
+  names it "Hand-held electronic game". There is no mass-manufacture company
+  assigned to it either. The game seems unfinished(no scorekeeping, some bugs),
+  and the design is very complex. Player ship and bullets are on a moving "wand",
+  a 2-way mirror makes it appear on the same plane as the enemies and barriers.
 
 ***************************************************************************/
 
@@ -1855,22 +1855,23 @@ ROM_END
 
 /***************************************************************************
 
-  Milton Bradley Electronic Battleship (1982 version)
+  Milton Bradley Electronic Battleship (model 4750G)
+  * PCB label: 7924750G02 REV A
   * COP420 MCU label COP420-JWE/N
 
   see hh_tms1k.cpp bship driver for more information
 
 ***************************************************************************/
 
-class bship82_state : public hh_cop400_state
+class bshipg_state : public hh_cop400_state
 {
 public:
-	bship82_state(const machine_config &mconfig, device_type type, const char *tag) :
+	bshipg_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_cop400_state(mconfig, type, tag),
 		m_dac(*this, "dac")
 	{ }
 
-	void bship82(machine_config &config);
+	void bshipg(machine_config &config);
 
 private:
 	required_device<dac_3bit_r2r_device> m_dac;
@@ -1884,32 +1885,32 @@ private:
 
 // handlers
 
-void bship82_state::write_d(u8 data)
+void bshipg_state::write_d(u8 data)
 {
 	// D: input mux
 	m_inp_mux = data;
 }
 
-void bship82_state::write_g(u8 data)
+void bshipg_state::write_g(u8 data)
 {
 	// G0-G2: speaker out via 3.9K, 2.2K, 1.0K resistors
 	// G3: enable speaker
 	m_dac->write((data & 8) ? (data & 7) : 0);
 }
 
-u8 bship82_state::read_l()
+u8 bshipg_state::read_l()
 {
 	// L: multiplexed inputs
 	return read_inputs(4, 0xff);
 }
 
-u8 bship82_state::read_in()
+u8 bshipg_state::read_in()
 {
 	// IN: multiplexed inputs
 	return read_inputs(4, 0xf00) >> 8;
 }
 
-WRITE_LINE_MEMBER(bship82_state::write_so)
+WRITE_LINE_MEMBER(bshipg_state::write_so)
 {
 	// SO: led
 	m_display->matrix(1, state);
@@ -1917,7 +1918,7 @@ WRITE_LINE_MEMBER(bship82_state::write_so)
 
 // config
 
-static INPUT_PORTS_START( bship82 )
+static INPUT_PORTS_START( bshipg )
 	PORT_START("IN.0") // D0 ports L,IN
 	PORT_BIT( 0x001, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("P1 Clear Last Entry") // CLE
 	PORT_BIT( 0x002, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("P1 A")
@@ -1978,21 +1979,21 @@ static INPUT_PORTS_START( bship82 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_TOGGLE PORT_CODE(KEYCODE_F1) PORT_NAME("Load/Go") // switch
 INPUT_PORTS_END
 
-void bship82_state::bship82(machine_config &config)
+void bshipg_state::bshipg(machine_config &config)
 {
 	// basic machine hardware
-	COP420(config, m_maincpu, 750000); // approximation - RC osc. R=14K, C=100pF
+	COP420(config, m_maincpu, 800000); // approximation - RC osc. R=14K, C=100pF
 	m_maincpu->set_config(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false); // guessed
-	m_maincpu->write_d().set(FUNC(bship82_state::write_d));
-	m_maincpu->write_g().set(FUNC(bship82_state::write_g));
-	m_maincpu->read_l().set(FUNC(bship82_state::read_l));
-	m_maincpu->read_in().set(FUNC(bship82_state::read_in));
-	m_maincpu->write_so().set(FUNC(bship82_state::write_so));
+	m_maincpu->write_d().set(FUNC(bshipg_state::write_d));
+	m_maincpu->write_g().set(FUNC(bshipg_state::write_g));
+	m_maincpu->read_l().set(FUNC(bshipg_state::read_l));
+	m_maincpu->read_in().set(FUNC(bshipg_state::read_in));
+	m_maincpu->write_so().set(FUNC(bshipg_state::write_so));
 	m_maincpu->read_si().set_ioport("IN.4");
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(1, 1);
-	config.set_default_layout(layout_bship82);
+	config.set_default_layout(layout_bshipg);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2001,7 +2002,7 @@ void bship82_state::bship82(machine_config &config)
 
 // roms
 
-ROM_START( bship82 )
+ROM_START( bshipg )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "cop420-jwe_n", 0x0000, 0x0400, CRC(5ea8111a) SHA1(34931463b806b48dce4f8ae2361512510bae0ebf) )
 ROM_END
@@ -2493,7 +2494,7 @@ CONS( 1981, mdallas,    0,         0, mdallas,    mdallas,    mdallas_state,   e
 
 CONS( 1980, plus1,      0,         0, plus1,      plus1,      plus1_state,     empty_init, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS ) // ***
 CONS( 1981, lightfgt,   0,         0, lightfgt,   lightfgt,   lightfgt_state,  empty_init, "Milton Bradley", "Electronic Lightfight - The Games of Dueling Lights", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1982, bship82,    bship,     0, bship82,    bship82,    bship82_state,   empty_init, "Milton Bradley", "Electronic Battleship (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
+CONS( 1982, bshipg,     bship,     0, bshipg,     bshipg,     bshipg_state,    empty_init, "Milton Bradley", "Electronic Battleship (COP420 version, Rev. G)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
 CONS( 1979, qkracer,    0,         0, qkracer,    qkracer,    qkracer_state,   empty_init, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1982, copspa,     0,         0, mdallas,    copspa,     mdallas_state,   empty_init, "National Semiconductor", "COPS Pocket Assistant", MACHINE_SUPPORTS_SAVE )

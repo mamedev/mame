@@ -236,7 +236,7 @@ void simple_menu_select_game::inkey_special(const event &menu_event)
 //  populate - populate the game select menu
 //-------------------------------------------------
 
-void simple_menu_select_game::populate(float &customtop, float &custombottom)
+void simple_menu_select_game::populate()
 {
 	int matchcount;
 	int curitem;
@@ -282,10 +282,19 @@ void simple_menu_select_game::populate(float &customtop, float &custombottom)
 	{
 		item_append(_("Return to Previous Menu"), 0, nullptr);
 	}
+}
+
+
+//-------------------------------------------------
+//  recompute_metrics - recompute metrics
+//-------------------------------------------------
+
+void simple_menu_select_game::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
 
 	// configure the custom rendering
-	customtop = line_height() + 3.0f * tb_border();
-	custombottom = 4.0f * line_height() + 3.0f * tb_border();
+	set_custom_space(line_height() + 3.0f * tb_border(), 4.0f * line_height() + 3.0f * tb_border());
 }
 
 

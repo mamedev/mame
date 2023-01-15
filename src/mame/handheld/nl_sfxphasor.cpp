@@ -1,9 +1,13 @@
 // license:CC0-1.0
 // copyright-holders:hap
+// thanks-to:=CO=Windler
 /*
 
 Electroplay Sound FX Phasor (hh_pic16.cpp)
 3-bit sound with volume envelope
+
+TODO:
+- transistors should be BC183
 
 */
 
@@ -16,7 +20,7 @@ NETLIST_START(sfxphasor)
 	PARAM(Solver.ACCURACY, 1e-7)
 	ANALOG_INPUT(VBATT, 5)
 
-	NET_MODEL("OPENDRAIN FAMILY(TYPE=MOS OVL=0.0 OVH=0.0 ORL=1.0 ORH=1e12)")
+	NET_MODEL("OPENDRAIN FAMILY(TYPE=MOS OVL=0.4 OVH=2.4 ORL=1.0 ORH=1e12)")
 
 	LOGIC_INPUT(P10, 0, "OPENDRAIN")
 	LOGIC_INPUT(P13, 0, "OPENDRAIN")
@@ -26,7 +30,7 @@ NETLIST_START(sfxphasor)
 	NET_C(VBATT, P10.VDD, P13.VDD, P15.VDD, P16.VDD, P17.VDD)
 	NET_C(GND, P10.VSS, P13.VSS, P15.VSS, P16.VSS, P17.VSS)
 
-	RES(R7, 270)
+	RES(R7, RES_K(2.7))
 	RES(R8, RES_K(6.8))
 	RES(R9, RES_K(18))
 	RES(R10, RES_K(5.6))
@@ -45,9 +49,9 @@ NETLIST_START(sfxphasor)
 	DIODE(D3, "1N4002")
 	DIODE(D4, "1N4002")
 
-	QBJT_EB(T2, "BC237B") // BC183
-	QBJT_EB(T3, "BC237B") // BC183
-	QBJT_EB(T4, "BC237B") // BC183
+	QBJT_EB(T2, "2N3904") // BC183 NPN
+	QBJT_EB(T3, "2N3904") // BC183 NPN
+	QBJT_EB(T4, "2N3904") // BC183 NPN
 
 	// pin 10
 	NET_C(P10.Q, R7.1, C2.1)

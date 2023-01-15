@@ -345,6 +345,10 @@ ROM_END
   * PIC 1655A-043
   * 1 7seg LED + 36 other LEDs, CD4028, 1-bit sound
 
+  The box says (C) Calfax, Inc. 1979. Manufactured in Hong Kong for Caprice
+  Electronics, exclusively for Kmart Corporation. Calfax / Caprice is basically
+  the same company.
+
 ***************************************************************************/
 
 class pabball_state : public hh_pic16_state
@@ -555,7 +559,7 @@ INPUT_PORTS_END
 void sfxphasor_state::sfxphasor(machine_config &config)
 {
 	// basic machine hardware
-	PIC1655(config, m_maincpu, 1000000); // approximation - RC osc. R=10K+VR, C=47pF
+	PIC1655(config, m_maincpu, 950000); // approximation - RC osc. R=10K+VR, C=47pF
 	m_maincpu->read_a().set_ioport("IN.4");
 	m_maincpu->write_b().set(FUNC(sfxphasor_state::write_b));
 	m_maincpu->write_c().set(FUNC(sfxphasor_state::write_c));
@@ -2163,9 +2167,9 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME       PARENT  CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, touchme,   0,       0, touchme,   touchme,   touchme_state,   empty_init, "Atari", "Touch Me (handheld, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, touchme,   0,       0, touchme,   touchme,   touchme_state,   empty_init, "Atari", "Touch Me (handheld, Rev. 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, pabball,   0,       0, pabball,   pabball,   pabball_state,   empty_init, "Caprice / Calfax", "Pro-Action Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1979, pabball,   0,       0, pabball,   pabball,   pabball_state,   empty_init, "Calfax / Caprice Electronics", "Pro-Action Electronic-Computerized Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 CONS( 1981, sfxphasor, 0,       0, sfxphasor, sfxphasor, sfxphasor_state, empty_init, "Electroplay", "Sound FX Phasor", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
@@ -2176,7 +2180,7 @@ CONS( 1980, flash,     0,       0, flash,     flash,     flash_state,     empty_
 
 CONS( 1980, matchme,   0,       0, matchme,   matchme,   matchme_state,   empty_init, "Kingsford", "Match Me", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, drdunk,    0,       0, drdunk,    drdunk,    drdunk_state,    empty_init, "Kmart", "Dr. Dunk", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, drdunk,    0,       0, drdunk,    drdunk,    drdunk_state,    empty_init, "Kmart Corporation", "Dr. Dunk", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, leboom,    0,       0, leboom,    leboom,    leboom_state,    empty_init, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 

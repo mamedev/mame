@@ -82,7 +82,7 @@ public:
 	menu_remove_folder(mame_ui_manager &mui, render_container &container, int ref);
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	std::string  m_searchpath;
@@ -145,7 +145,7 @@ void menu_remove_folder::handle(event const *ev)
 //  populate menu
 //-------------------------------------------------
 
-void menu_remove_folder::populate(float &customtop, float &custombottom)
+void menu_remove_folder::populate()
 {
 	int folders_count = 0;
 	for (auto & elem : m_folders)
@@ -165,12 +165,13 @@ public:
 	menu_add_change_folder(mame_ui_manager &mui, render_container &container, int ref, bool multipath);
 
 protected:
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 	virtual bool custom_ui_cancel() override { return !m_search.empty(); }
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	void update_search();
@@ -296,7 +297,7 @@ void menu_add_change_folder::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void menu_add_change_folder::populate(float &customtop, float &custombottom)
+void menu_add_change_folder::populate()
 {
 	int folders_count = 0;
 
@@ -331,10 +332,18 @@ void menu_add_change_folder::populate(float &customtop, float &custombottom)
 		item_append(name, "[DIR]", 0, (void *)(uintptr_t)++folders_count);
 
 	item_append(menu_item_type::SEPARATOR);
+}
+
+//-------------------------------------------------
+//  recompute metrics
+//-------------------------------------------------
+
+void menu_add_change_folder::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
 
 	// configure the custom rendering
-	customtop = 2.0f * line_height() + 3.0f * tb_border();
-	custombottom = 1.0f * line_height() + 3.0f * tb_border();
+	set_custom_space(2.0f * line_height() + 3.0f * tb_border(), 1.0f * line_height() + 3.0f * tb_border());
 }
 
 //-------------------------------------------------
@@ -431,6 +440,7 @@ public:
 	}
 
 protected:
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
@@ -440,7 +450,7 @@ private:
 		REMOVE,
 	};
 
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	bool is_multipath(std::string_view folder) const;
@@ -492,7 +502,7 @@ void menu_display_actual::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void menu_display_actual::populate(float &customtop, float &custombottom)
+void menu_display_actual::populate()
 {
 	auto const &folder = f_folders[m_ref];
 	auto option = ui().options().get_entry(folder.option);
@@ -522,7 +532,18 @@ void menu_display_actual::populate(float &customtop, float &custombottom)
 
 	item_append(menu_item_type::SEPARATOR);
 
-	customtop = (m_folders.size() + 1) * line_height() + 6.0f * tb_border();
+	set_custom_space((m_folders.size() + 1) * line_height() + 6.0f * tb_border(), 0.0f);
+}
+
+//-------------------------------------------------
+//  recompute metrics
+//-------------------------------------------------
+
+void menu_display_actual::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	set_custom_space((m_folders.size() + 1) * line_height() + 6.0f * tb_border(), 0.0f);
 }
 
 //-------------------------------------------------
@@ -579,7 +600,7 @@ void menu_directory::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void menu_directory::populate(float &customtop, float &custombottom)
+void menu_directory::populate()
 {
 	for (auto & elem : f_folders)
 		item_append(_("path-option", elem.name), 0, this); // need a non-null reference pointer - value is immaterial

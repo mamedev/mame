@@ -1601,7 +1601,7 @@ CONS( 1979, ftri1,     0,       0, ftri1,     ftri1,    ftri1_state,    empty_in
 CONS( 1979, mastmind,  0,       0, mastmind,  mastmind, mastmind_state, empty_init, "Invicta", "Electronic Master Mind (Invicta)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 CONS( 1979, smastmind, 0,       0, smastmind, mastmind, mastmind_state, empty_init, "Invicta", "Super-Sonic Electronic Master Mind", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1979, dunksunk,  0,       0, dunksunk,  dunksunk, dunksunk_state, empty_init, "Kmart", "Dunk 'n Sunk", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, dunksunk,  0,       0, dunksunk,  dunksunk, dunksunk_state, empty_init, "Kmart Corporation", "Dunk 'n Sunk", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1978, memoquiz,  0,       0, memoquiz,  memoquiz, memoquiz_state, empty_init, "M.E.M. Belgium", "Memoquiz", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 

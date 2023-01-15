@@ -1,10 +1,8 @@
 SDL-Specific Commandline Options
 ================================
 
-
 This section contains configuration options that are specific to any build
-supported by SDL (including Windows where compiled as SDL instead of
-native).
+supported by SDL (including Windows when built with SDL instead of native).
 
 
 
@@ -70,8 +68,9 @@ SDL Joystick Mapping
 
 **-sixaxis**
 
-    Use special handling for PlayStation 3 SixAxis controllers. Default is OFF
-    (**-nosixaxis**)
+    Use special handling for PlayStation 3 SixAxis controllers.  May cause
+    undesirable behaviour with other controllers.  Only affects the ``sdljoy``
+    joystick provider.  Default is OFF (**-nosixaxis**)
 
 
 SDL Lightgun Mapping

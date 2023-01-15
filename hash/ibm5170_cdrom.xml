@@ -315,6 +315,19 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
+	<software name="advdudan" supported="yes">
+		<description>The Adventures of Down Under Dan (v1.1)</description>
+		<year>1995</year>
+		<publisher>Guildsoft Games</publisher>
+
+		<info name="developer" value="PowerVision"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="adventures_of_down_under_dan,_the_(1995)(guildsoft)" sha1="d76706ca2e75df32d0e508b3b14217ae96c69c3c"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS / Windows 3.1 -->
 	<!-- TODO: cannot setup emm386.exe for this in any way or form, might be a bug? -->
 	<software name="aeurope" supported="no">

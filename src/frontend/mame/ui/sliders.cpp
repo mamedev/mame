@@ -160,7 +160,7 @@ void menu_sliders::handle(event const *ev)
 //  menu
 //-------------------------------------------------
 
-void menu_sliders::populate(float &customtop, float &custombottom)
+void menu_sliders::populate()
 {
 	std::string tempstring;
 
@@ -224,8 +224,18 @@ void menu_sliders::populate(float &customtop, float &custombottom)
 		if (ref)
 			set_selection(ref);
 	}
+}
 
-	custombottom = 2.0f * line_height() + 2.0f * tb_border();
+
+//-------------------------------------------------
+//  recompute_metrics - recompute metrics
+//-------------------------------------------------
+
+void menu_sliders::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	set_custom_space(0.0f, 2.0f * line_height() + 2.0f * tb_border());
 }
 
 

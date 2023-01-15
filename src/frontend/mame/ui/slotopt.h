@@ -25,6 +25,10 @@ public:
 	menu_slot_devices(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_slot_devices() override;
 
+protected:
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
+	virtual void custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override;
+
 private:
 	enum class step_t
 	{
@@ -32,8 +36,7 @@ private:
 		PREVIOUS
 	};
 
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	device_slot_interface::slot_option const *get_current_option(device_slot_interface &slot) const;

@@ -733,6 +733,7 @@ sega/svmu.cpp
 sequential/prophet600.cpp
 sfrj/galaxy.cpp
 sfrj/galeb.cpp
+sfrj/idpartner.cpp
 sfrj/lola8a.cpp
 sfrj/orao.cpp
 sfrj/pecom.cpp
@@ -975,6 +976,7 @@ skeleton/testpat.cpp
 skeleton/textelcomp.cpp
 skeleton/ti630.cpp
 skeleton/tk635.cpp
+skeleton/tnshc08.cpp
 skeleton/tr175.cpp
 skeleton/tsispch.cpp
 skeleton/tulip1.cpp
@@ -1012,6 +1014,7 @@ sony/smc777.cpp
 sony/umatic.cpp
 sord/m5.cpp
 stm/pp.cpp
+stm/stmpc.cpp
 sun/sun1.cpp
 sun/sun2.cpp
 sun/sun3.cpp

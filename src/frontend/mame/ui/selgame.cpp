@@ -135,6 +135,9 @@ void menu_select_game::recompute_metrics(uint32_t width, uint32_t height, float 
 	menu_select_launch::recompute_metrics(width, height, aspect);
 
 	m_icons.clear();
+
+	// configure the custom rendering
+	set_custom_space(3.0F * line_height() + 5.0F * tb_border(), 4.0F * line_height() + 3.0F * tb_border());
 }
 
 
@@ -346,7 +349,7 @@ void menu_select_game::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void menu_select_game::populate(float &customtop, float &custombottom)
+void menu_select_game::populate()
 {
 	for (auto &icon : m_icons) // TODO: why is this here?  maybe better on resize or setting change?
 		icon.second.texture.reset();
@@ -467,10 +470,6 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 	{
 		m_skip_main_items = 0;
 	}
-
-	// configure the custom rendering
-	customtop = 3.0f * line_height() + 5.0f * tb_border();
-	custombottom = 4.0f * line_height() + 3.0f * tb_border();
 
 	// reselect prior game launched, if any
 	if (old_item_selected != -1)
