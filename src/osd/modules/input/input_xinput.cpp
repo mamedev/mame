@@ -429,7 +429,7 @@ void xinput_joystick_device::configure()
 		break;
 	}
 
-	// detect invalid capabilities - the Retro-Bit Sega Saturn Control Pad reports garbage
+	// detect invalid axis resolutions
 	bool const ltcap_bad = m_capabilities.Gamepad.bLeftTrigger && count_leading_zeros_32(m_capabilities.Gamepad.bLeftTrigger << 24);
 	bool const rtcap_bad = m_capabilities.Gamepad.bRightTrigger && count_leading_zeros_32(m_capabilities.Gamepad.bRightTrigger << 24);
 	bool const lsxcap_bad = m_capabilities.Gamepad.sThumbLX && count_leading_zeros_32(m_capabilities.Gamepad.sThumbLX << 16);
@@ -483,9 +483,21 @@ void xinput_joystick_device::configure()
 			rsycap_bad ? ", invalid" : "");
 
 	// ignore capabilities if invalid
+	bool ignore_caps = false;
 	if (ltcap_bad || rtcap_bad || lsxcap_bad || lsycap_bad || rsxcap_bad || rsycap_bad)
 	{
-		osd_printf_verbose("Ignoring invalid XInput capabilities\n");
+		// Retro-Bit Sega Saturn Control Pad reports garbage for axis resolutions and absence of several buttons
+		osd_printf_verbose("Ignoring invalid XInput capabilities (invalid axis resolution)\n");
+		ignore_caps = true;
+	}
+	else if (!m_capabilities.Gamepad.wButtons && !m_capabilities.Gamepad.bLeftTrigger && !m_capabilities.Gamepad.bRightTrigger && !m_capabilities.Gamepad.sThumbLX && !m_capabilities.Gamepad.sThumbLY && !m_capabilities.Gamepad.sThumbRX && !m_capabilities.Gamepad.sThumbRY)
+	{
+		// 8BitDo SN30 Pro V1 reports no controls at all, which would be completely useless
+		osd_printf_verbose("Ignoring invalid XInput capabilities (no controls reported)\n");
+		ignore_caps = true;
+	}
+	if (ignore_caps)
+	{
 		m_capabilities.Gamepad.wButtons = 0xf3ff;
 		m_capabilities.Gamepad.bLeftTrigger = 0xff;
 		m_capabilities.Gamepad.bRightTrigger = 0xff;
