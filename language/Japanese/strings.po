@@ -1620,13 +1620,13 @@ msgstr "移動時のみ"
 #, c-format
 msgctxt "menu-crosshair"
 msgid "P%1$d Visibility"
-msgstr "P%1$d 視認性"
+msgstr "%1$dP 視認性"
 
 #: src/frontend/mame/ui/miscmenu.cpp:549
 #, c-format
 msgctxt "menu-crosshair"
 msgid "P%1$d Crosshair"
-msgstr "P%1$d 照準"
+msgstr "%1$dP 照準"
 
 #: src/frontend/mame/ui/miscmenu.cpp:571
 msgctxt "menu-crosshair"
@@ -1804,7 +1804,7 @@ msgstr "ユーザーインターフェイス"
 #: src/frontend/mame/ui/inputmap.cpp:42
 #, c-format
 msgid "Player %1$d Controls"
-msgstr "プレイヤー %1$d コントロール"
+msgstr "%1$dプレイヤー コントロール"
 
 #: src/frontend/mame/ui/inputmap.cpp:45
 msgid "Other Controls"
@@ -2260,7 +2260,7 @@ msgstr "アートワークのプレビュー"
 #: src/frontend/mame/ui/dirmenu.cpp:69
 msgctxt "path-option"
 msgid "Select"
-msgstr "選択"
+msgstr "選択画像"
 
 #: src/frontend/mame/ui/dirmenu.cpp:70
 msgctxt "path-option"
@@ -4510,7 +4510,7 @@ msgstr "コイン12"
 #: src/emu/inpttype.ipp:583
 msgctxt "input-name"
 msgid "Bill 1"
-msgstr "払い出し1"
+msgstr "紙幣1"
 
 #: src/emu/inpttype.ipp:588
 msgctxt "input-name"
@@ -5017,152 +5017,152 @@ msgstr "トラックY軸10"
 #: src/emu/inpttype.ipp:770
 msgctxt "input-name"
 msgid "AD Stick X"
-msgstr "ADスティックX軸"
+msgstr "アナログスティックX軸"
 
 #: src/emu/inpttype.ipp:771
 msgctxt "input-name"
 msgid "AD Stick X 2"
-msgstr "ADスティックX軸2"
+msgstr "アナログスティックX軸2"
 
 #: src/emu/inpttype.ipp:772
 msgctxt "input-name"
 msgid "AD Stick X 3"
-msgstr "ADスティックX軸3"
+msgstr "アナログスティックX軸3"
 
 #: src/emu/inpttype.ipp:773
 msgctxt "input-name"
 msgid "AD Stick X 4"
-msgstr "ADスティックX軸4"
+msgstr "アナログスティックX軸4"
 
 #: src/emu/inpttype.ipp:774
 msgctxt "input-name"
 msgid "AD Stick X 5"
-msgstr "ADスティックX軸5"
+msgstr "アナログスティックX軸5"
 
 #: src/emu/inpttype.ipp:775
 msgctxt "input-name"
 msgid "AD Stick X 6"
-msgstr "ADスティックX軸6"
+msgstr "アナログスティックX軸6"
 
 #: src/emu/inpttype.ipp:776
 msgctxt "input-name"
 msgid "AD Stick X 7"
-msgstr "ADスティックX軸7"
+msgstr "アナログスティックX軸7"
 
 #: src/emu/inpttype.ipp:777
 msgctxt "input-name"
 msgid "AD Stick X 8"
-msgstr "ADスティックX軸8"
+msgstr "アナログスティックX軸8"
 
 #: src/emu/inpttype.ipp:778
 msgctxt "input-name"
 msgid "AD Stick X 9"
-msgstr "ADスティックX軸9"
+msgstr "アナログスティックX軸9"
 
 #: src/emu/inpttype.ipp:779
 msgctxt "input-name"
 msgid "AD Stick X 10"
-msgstr "ADスティックX軸10"
+msgstr "アナログスティックX軸10"
 
 #: src/emu/inpttype.ipp:784
 msgctxt "input-name"
 msgid "AD Stick Y"
-msgstr "ADスティックY軸"
+msgstr "アナログスティックY軸"
 
 #: src/emu/inpttype.ipp:785
 msgctxt "input-name"
 msgid "AD Stick Y 2"
-msgstr "ADスティックY軸2"
+msgstr "アナログスティックY軸2"
 
 #: src/emu/inpttype.ipp:786
 msgctxt "input-name"
 msgid "AD Stick Y 3"
-msgstr "ADスティックY軸3"
+msgstr "アナログスティックY軸3"
 
 #: src/emu/inpttype.ipp:787
 msgctxt "input-name"
 msgid "AD Stick Y 4"
-msgstr "ADスティックY軸4"
+msgstr "アナログスティックY軸4"
 
 #: src/emu/inpttype.ipp:788
 msgctxt "input-name"
 msgid "AD Stick Y 5"
-msgstr "ADスティックY軸5"
+msgstr "アナログスティックY軸5"
 
 #: src/emu/inpttype.ipp:789
 msgctxt "input-name"
 msgid "AD Stick Y 6"
-msgstr "ADスティックY軸6"
+msgstr "アナログスティックY軸6"
 
 #: src/emu/inpttype.ipp:790
 msgctxt "input-name"
 msgid "AD Stick Y 7"
-msgstr "ADスティックY軸7"
+msgstr "アナログスティックY軸7"
 
 #: src/emu/inpttype.ipp:791
 msgctxt "input-name"
 msgid "AD Stick Y 8"
-msgstr "ADスティックY軸8"
+msgstr "アナログスティックY軸8"
 
 #: src/emu/inpttype.ipp:792
 msgctxt "input-name"
 msgid "AD Stick Y 9"
-msgstr "ADスティックY軸9"
+msgstr "アナログスティックY軸9"
 
 #: src/emu/inpttype.ipp:793
 msgctxt "input-name"
 msgid "AD Stick Y 10"
-msgstr "ADスティックY軸10"
+msgstr "アナログスティックY軸10"
 
 #: src/emu/inpttype.ipp:798
 msgctxt "input-name"
 msgid "AD Stick Z"
-msgstr "ADスティックZ軸"
+msgstr "アナログスティックZ軸"
 
 #: src/emu/inpttype.ipp:799
 msgctxt "input-name"
 msgid "AD Stick Z 2"
-msgstr "ADスティックZ軸2"
+msgstr "アナログスティックZ軸2"
 
 #: src/emu/inpttype.ipp:800
 msgctxt "input-name"
 msgid "AD Stick Z 3"
-msgstr "ADスティックZ軸3"
+msgstr "アナログスティックZ軸3"
 
 #: src/emu/inpttype.ipp:801
 msgctxt "input-name"
 msgid "AD Stick Z 4"
-msgstr "ADスティックZ軸4"
+msgstr "アナログスティックZ軸4"
 
 #: src/emu/inpttype.ipp:802
 msgctxt "input-name"
 msgid "AD Stick Z 5"
-msgstr "ADスティックZ軸5"
+msgstr "アナログスティックZ軸5"
 
 #: src/emu/inpttype.ipp:803
 msgctxt "input-name"
 msgid "AD Stick Z 6"
-msgstr "ADスティックZ軸6"
+msgstr "アナログスティックZ軸6"
 
 #: src/emu/inpttype.ipp:804
 msgctxt "input-name"
 msgid "AD Stick Z 7"
-msgstr "ADスティックZ軸7"
+msgstr "アナログスティックZ軸7"
 
 #: src/emu/inpttype.ipp:805
 msgctxt "input-name"
 msgid "AD Stick Z 8"
-msgstr "ADスティックZ軸8"
+msgstr "アナログスティックZ軸8"
 
 #: src/emu/inpttype.ipp:806
 msgctxt "input-name"
 msgid "AD Stick Z 9"
-msgstr "ADスティックZ軸9"
+msgstr "アナログスティックZ軸9"
 
 #: src/emu/inpttype.ipp:807
 msgctxt "input-name"
 msgid "AD Stick Z 10"
-msgstr "ADスティックZ軸10"
+msgstr "アナログスティックZ軸10"
 
 #: src/emu/inpttype.ipp:812
 msgctxt "input-name"
@@ -6287,7 +6287,7 @@ msgstr "ステップを削除"
 #: plugins/inputmacro/inputmacro_menu.lua:428
 msgctxt "plugin-inputmacro"
 msgid "Add step at position"
-msgstr "ここにステップを追加"
+msgstr "次の位置にステップを追加"
 
 #: plugins/inputmacro/inputmacro_menu.lua:474
 msgctxt "plugin-inputmacro"
