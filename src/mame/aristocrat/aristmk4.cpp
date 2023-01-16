@@ -349,8 +349,8 @@
 #include "gunnrose.lh" // Video poker
 #include "wildone.lh"  // Video poker
 
-uint8_t crtc_cursor_index = 0;
-uint8_t crtc_reg = 0;
+
+namespace {
 
 class aristmk4_state : public driver_device
 {
@@ -2513,6 +2513,9 @@ ROM_START( 86lions )
 	//  ROM_REGION( 0x200, "proms", 0 )
 	//  ROM_LOAD( "prom.x", 0x00, 0x20, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 GAMEL( 1985, 86lions,  0,        _86lions,       aristmk4, aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "86 Lions", MACHINE_NOT_WORKING, layout_topgear )
 GAMEL( 1996, eforest,  0,        aristmk4,       eforest,  aristmk4_state, init_aristmk4, ROT0, "Aristocrat", "Enchanted Forest (12XF528902, US)",         0, layout_eforest  ) // 92.778%

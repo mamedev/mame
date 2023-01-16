@@ -27,6 +27,9 @@ Keyboard: P8035L CPU, undumped 2716 labelled "358_2758", XTAL marked "4608-300-1
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class altos2_state : public driver_device
 {
 public:
@@ -182,5 +185,8 @@ ROM_START( altos2 )
 	ROM_REGION( 0x0800, "keyboard", 0 )
 	ROM_LOAD( "358_7258", 0x0000, 0x0800, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1983, altos2, 0, 0, altos2, altos2, altos2_state, empty_init, "Altos Computer Systems", "Altos II Terminal", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)

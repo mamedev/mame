@@ -707,6 +707,9 @@
 #include "swhr2u.lh"          // 5      1, 2, 3, 4, 5   25
 #include "wnpost.lh"          // 5      1, 2, 3, 5, 10  50
 
+
+namespace {
+
 #define MASTER_CLOCK        72_MHz_XTAL      /* confirmed */
 
 class aristmk5_state : public driver_device
@@ -8629,6 +8632,8 @@ ROM_START( yukongl5 )
 	ROM_LOAD32_WORD( "03j00191.u9",  0x200000, 0x80000, CRC(8ccbbec3) SHA1(cd0a3d2c3437f1a00cee5b992e7365e7df10b8b7) )
 	ROM_LOAD32_WORD( "03j00191.u13", 0x200002, 0x80000, CRC(e514b87f) SHA1(5423215bc03ab8468d5ebec0dba6ba7820cdcd50) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************

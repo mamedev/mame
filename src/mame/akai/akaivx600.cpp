@@ -14,6 +14,9 @@
 #include "machine/pit8253.h"
 //#include "screen.h"
 
+
+namespace {
+
 class akaivx600_state : public driver_device
 {
 public:
@@ -95,6 +98,9 @@ ROM_START(vx600)
 	ROM_REGION(0x2000, "program2", 0)
 	ROM_LOAD("vx600_-2-_v1.12.ic47", 0x0000, 0x2000, CRC(1b3ee178) SHA1(20a319392824f9f3074f370d9d9eb2f312d69ac4)) // 27C64
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1988, vx600, 0, 0, vx600, vx600, akaivx600_state, empty_init, "Akai", "VX600 Programmable Matrix Synthesizer", MACHINE_IS_SKELETON)
 

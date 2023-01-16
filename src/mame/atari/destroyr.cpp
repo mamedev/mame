@@ -25,6 +25,8 @@ TODO:
 #include "destroyr.lh"
 
 
+namespace {
+
 class destroyr_state : public driver_device
 {
 public:
@@ -564,6 +566,8 @@ ROM_START( destroyr1 )
 	ROM_REGION( 0x0100, "syncprom", 0 )    /* used for vsync/vblank signals */
 	ROM_LOAD( "030131-01.m1", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAMEL( 1977, destroyr,  0,        destroyr, destroyr, destroyr_state, empty_init, ORIENTATION_FLIP_X, "Atari", "Destroyer (version O2)", MACHINE_SUPPORTS_SAVE, layout_destroyr )
