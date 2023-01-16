@@ -17,7 +17,7 @@ Sega 2005-2009
 This is a "PC-based" arcade system. Different configurations have different colored boxes.
 The version documented here is the red box. The PC part of it is mostly just the CPU,
 Intel North/South-bridge chipset and AGP/PCI card slots etc. The main board is still
-a typically custom-made Sega arcade PCB using a custom nVIDIA GeForce video card.
+a typically custom-made Sega arcade PCB using a custom nVidia GeForce video card.
 The main board also has a slot for a compact flash card. Primary storage media is HDD.
 Games are installed from a DVD. Both the CF and HDD are locked and unreadable on a regular PC.
 

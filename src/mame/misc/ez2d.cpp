@@ -96,7 +96,7 @@ ROM_START( ez2d2m )
 	ROM_LOAD("ez2dancer2ndmove_motherboard_v29c51002t_award_bios", 0x00000, 0x40000, CRC(02a5e84b) SHA1(94b341d268ce9d42597c68bc98c3b8b62e137205) ) // 29f020
 
 	ROM_REGION( 0x10000, "vbios", 0 )
-	// NVIDIA TNT2 Model 64 video BIOS (not from provided dump)
+	// nVidia TNT2 Model 64 video BIOS (not from provided dump)
 	// TODO: move to PCI device once we have one
 	ROM_LOAD( "62090211.rom", 0x000000, 0x00b000, CRC(5669135b) SHA1(b704ce0d20b71e40563d12bcc45bd1240227be74) )
 

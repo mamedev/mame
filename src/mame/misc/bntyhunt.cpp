@@ -7,7 +7,7 @@ Ending can be seen at: https://www.youtube.com/watch?v=xa7GQC8Phfk
 
 https://www.arcade-museum.com/game_detail.php?game_id=13327
 - Pentium III 1 GHz
-- Nvidia GeForce 2 MX200
+- nVidia GeForce 2 MX200
 No other info about the MB used, most notable folders in the HDD dump:
 - C:\bh:
 \- *.gci files in data folder
@@ -25,7 +25,7 @@ No other info about the MB used, most notable folders in the HDD dump:
    "VIA Power Management Controller" / "VIA PCI to PCI Bridge Controller" /
    "VIA I/O APIC Interrupt Controller"
 \- viaudio.inf / viaudoem.inf "VIA AC'97 Enhanced Audio Controller (WDM)"
-\- nvaml.inf "NVIDIA Windows 95/98/ME Display Drivers"
+\- nvaml.inf "nVidia Windows 95/98/ME Display Drivers"
 \- monitor.pnf (custom DDC setup?)
 
 Running this in pcipc will successfully boot a custom Korean Windows 98SE (no Microsoft splash boot screen), will try to install drivers, punts to a DOS sub-window requiring at least a 256 color mode.

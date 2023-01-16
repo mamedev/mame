@@ -12,8 +12,8 @@
         · Microtel w/ASRock N68C-GS FX AM3+ motherboard.
     - Video GeForce GT730.
       * Other supported setups are:
-        · Nvidia 8400GS (256MB+).
-        · Nvidia 7300GS.
+        · nVidia 8400GS (256MB+).
+        · nVidia 7300GS.
     -Custom I/O boards (outside the PC, depending on each game).
     -Security dongle (HASP, USB or parallel port).
 */

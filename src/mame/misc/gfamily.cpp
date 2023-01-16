@@ -18,7 +18,7 @@ SiS651/SiS962 based chipset plus an additional PCB for JAMMA, inputs and basic c
  Altera Max EPM7128SQC100-10 CPLD
 
 TODO:
-- Move to sis630.cpp or a derived state (kinda boots with existing driver)
+- Move to sis630.cpp or a derived state (BIOS kinda boots with existing driver)
 
 */
 

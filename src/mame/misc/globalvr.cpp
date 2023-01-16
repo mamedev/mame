@@ -16,7 +16,7 @@ The nfsgt is a Windows XP HDD image, containing:
 \- Ligos Indeo XP codec package (Indeo Video 5.2)
 \- ALi USB2.0 Driver
 - C:\temp
-\- NVIDIA Display Driver 45.23 for Windows 2000 to XP (GeForce 256 up to GeForce 4)
+\- nVidia Display Driver 45.23 for Windows 2000 to XP (GeForce 256 up to GeForce 4)
 \- DirectX 9.0
 - C:\windows:
 \- aksubs.inf: Aladdin Knowledge Systems HASP/Hardlock USB driver
