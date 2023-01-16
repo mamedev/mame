@@ -6,13 +6,14 @@
 This driver is a collection of simple dedicated handheld and tabletop
 toys based around the TMS1000 MCU series. Anything more complex or clearly
 part of a series is (or will be) in its own driver, see:
-- eva: Chrysler EVA-11 (and EVA-24)
-- microvsn: Milton Bradley Microvision
-- sag: Entex Select-A-Game Machine
+- entex/sag.cpp: Entex Select-A-Game Machine
+- miltonbradley/microvsn.cpp: Milton Bradley Microvision
+- misc/eva.cpp: Chrysler EVA-11 (and EVA-24)
+- tiger/k28m2.cpp: Tiger K28: Talking Learning Computer (model 7-232)
 
 (contd.) hh_tms1k child drivers:
-- tispellb: TI Spelling B series gen. 1
-- tispeak: TI Speak & Spell series gen. 1
+- tispellb.cpp: TI Spelling B series gen. 1
+- tispeak.cpp: TI Speak & Spell series gen. 1
 
 About the approximated MCU frequency everywhere: The RC osc. is not that
 stable on most of these handhelds. When comparing multiple video recordings
@@ -183,7 +184,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
  @MP7314   TMS1400   1980, Parker Brothers Split Second
-  MP7324   TMS1400   1985, Tiger K28/Coleco Talking Teacher -> tispeak.cpp
+  MP7324   TMS1400   1985, Tiger K28/Coleco Talking Teacher -> tiger/k28m2.cpp
  @MP7332   TMS1400   1981, Milton Bradley Dark Tower
  @MP7334   TMS1400   1981, Coleco Total Control 4
  @MP7351   TMS1400   1982, Parker Brothers Master Merlin

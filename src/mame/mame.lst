@@ -19623,7 +19623,10 @@ movmastr                        //
 k1003                           //
 
 @source:tiger/k28.cpp
-k28                             // Tiger Electronics
+k28
+
+@source:tiger/k28m2.cpp
+k28m2
 
 @source:robotron/k8915.cpp
 k8915                           //
@@ -42118,7 +42121,6 @@ ts2068                          // 1983 TS2068
 uk2086                          // 1986 UK2086
 
 @source:handheld/tispeak.cpp
-k28m2                           // Tiger Electronics
 lanteach                        //
 lantrans                        //
 lantransp                       //

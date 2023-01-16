@@ -8,7 +8,9 @@ Fidelity Voice Chess Challenger series hardware
 - Grandmaster Voice Chess Challenger (Fidelity Deutschland product)
 - Decorator Challenger (FCC)
 
-Grandmaster and FCC are verified to be the same PCB + ROMs as UVC.
+Grandmaster and FCC are verified to be the same PCB + ROMs as UVC. So even though
+they have a large wooden chessboard attached instead of a small plastic one, from
+MAME's perspective there's nothing to emulate on top of UVC.
 
 *******************************************************************************
 

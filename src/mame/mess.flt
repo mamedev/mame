@@ -1083,6 +1083,7 @@ ti/ti990_4.cpp
 ti/tm990189.cpp
 tiger/gamecom.cpp
 tiger/k28.cpp
+tiger/k28m2.cpp
 tigertel/gizmondo.cpp
 tiki/tiki100.cpp
 tomy/tomy_princ.cpp
