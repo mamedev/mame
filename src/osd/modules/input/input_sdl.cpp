@@ -1259,7 +1259,7 @@ public:
 #endif
 
 		// add axes
-		std::tuple<SDL_GameControllerAxis, input_item_id, bool> axes[]{
+		std::tuple<SDL_GameControllerAxis, input_item_id, bool> const axes[]{
 				{ SDL_CONTROLLER_AXIS_LEFTX,        ITEM_ID_XAXIS,   false },
 				{ SDL_CONTROLLER_AXIS_LEFTY,        ITEM_ID_YAXIS,   false },
 				{ SDL_CONTROLLER_AXIS_RIGHTX,       ITEM_ID_ZAXIS,   false },
@@ -1299,7 +1299,7 @@ public:
 		}
 
 		// add automatically numbered buttons
-		std::pair<SDL_GameControllerButton, SDL_GameControllerAxis> numberedbuttons[]{
+		std::pair<SDL_GameControllerButton, SDL_GameControllerAxis> const numberedbuttons[]{
 				{ SDL_CONTROLLER_BUTTON_A,             SDL_CONTROLLER_AXIS_INVALID },
 				{ SDL_CONTROLLER_BUTTON_B,             SDL_CONTROLLER_AXIS_INVALID },
 				{ SDL_CONTROLLER_BUTTON_X,             SDL_CONTROLLER_AXIS_INVALID },
@@ -1386,7 +1386,7 @@ public:
 		}
 
 		// add buttons with fixed item IDs
-		std::pair<SDL_GameControllerButton, input_item_id> fixedbuttons[]{
+		std::pair<SDL_GameControllerButton, input_item_id> const fixedbuttons[]{
 				{ SDL_CONTROLLER_BUTTON_BACK,       ITEM_ID_SELECT },
 				{ SDL_CONTROLLER_BUTTON_START,      ITEM_ID_START },
 				{ SDL_CONTROLLER_BUTTON_DPAD_UP,    ITEM_ID_HAT1UP },
