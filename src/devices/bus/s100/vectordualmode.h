@@ -6,29 +6,8 @@
 #pragma once
 
 #include "bus/s100/s100.h"
-
-class vector_micropolis_image_device :
-		public device_t,
-		public device_image_interface
-{
-public:
-	vector_micropolis_image_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock);
-
-	// device_image_interface implementation
-	bool is_readable()  const noexcept override { return true; }
-	bool is_writeable() const noexcept override { return true; }
-	bool is_creatable() const noexcept override { return true; }
-	const char *image_type_name() const noexcept override { return "micropolisimage"; }
-	const char *image_brief_type_name() const noexcept override { return "flop"; }
-	const char *image_interface() const noexcept override { return "micropolis_image"; }
-	const char *file_extensions() const noexcept override { return "vgi"; }
-	image_init_result call_load() override;
-	bool is_reset_on_load() const noexcept override { return false; }
-
-protected:
-	// device_t implementation
-	void device_start() override;
-};
+#include "imagedev/floppy.h"
+#include "machine/fdc_pll.h"
 
 class s100_vector_dualmode_device :
 		public device_t,
@@ -46,20 +25,31 @@ protected:
 	void s100_sout_w(offs_t offset, uint8_t data) override;
 
 private:
+	TIMER_CALLBACK_MEMBER(motor_off);
+	TIMER_CALLBACK_MEMBER(sector_cb);
+	TIMER_CALLBACK_MEMBER(byte_cb);
 	bool hdd_selected();
+	bool get_next_bit(attotime &tm, const attotime &limit);
 
-	required_device_array<vector_micropolis_image_device, 4> m_floppy;
+	required_device_array<floppy_connector, 4> m_floppy;
 	uint8_t m_ram[512];
 	uint16_t m_cmar;
 	uint8_t m_drive;
-	uint8_t m_head;
-	uint8_t m_track;
 	uint8_t m_sector;
 	bool m_read;
 	emu_timer *m_motor_on_timer;
+
+	enum sector_timer_state {
+		SECTOR_START,
+		SECTOR_END,
+	};
+	fdc_pll_t m_pll;
+	emu_timer *m_byte_timer;
+	emu_timer *m_sector_timer;
+	uint16_t m_pending_byte;
+	unsigned int m_pending_size;
 };
 
-DECLARE_DEVICE_TYPE(MICROPOLIS_IMAGE, vector_micropolis_image_device)
 DECLARE_DEVICE_TYPE(S100_VECTOR_DUALMODE, s100_vector_dualmode_device)
 
 #endif // MAME_BUS_S100_VECTORDUALMODE_H

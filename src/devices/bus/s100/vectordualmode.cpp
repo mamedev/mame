@@ -18,7 +18,6 @@ https://www.bitsavers.org/pdf/vectorGraphic/hardware/7200-1200-02-1_Dual-Mode_Di
 https://archive.org/details/7200-0001-vector-4-technical-information-sep-82
 
 TODO:
-- use floppy subsystem
 - HDD support
 - ECC
 
@@ -27,28 +26,35 @@ TODO:
 #include "emu.h"
 
 #include "bus/s100/vectordualmode.h"
+#include "formats/vgi_dsk.h"
 
-#include "logmacro.h"
+static const attotime half_bitcell_size = attotime::from_usec(2);
 
-vector_micropolis_image_device::vector_micropolis_image_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MICROPOLIS_IMAGE, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+/* Interleave 8 bits with zeros. abcdefgh -> 0a0b0c0d0e0f0g0h */
+static int deposit8(int data)
 {
+	int d = data;
+	d = ((d & 0xf0) << 4) | (d & 0x0f);
+	d = ((d << 2) | d) & 0x3333;
+	d = ((d << 1) | d) & 0x5555;
+	return d;
 }
 
-void vector_micropolis_image_device::device_start()
+static uint16_t mfm_byte(uint8_t data, unsigned int prev_data)
 {
+	const unsigned int ext_data = data | (prev_data << 8);
+	const unsigned int clock = ~(ext_data | (ext_data >> 1));
+	return (deposit8(clock) << 1) | deposit8(ext_data);
 }
 
-image_init_result vector_micropolis_image_device::call_load()
+static uint8_t unmfm_byte(uint16_t mfm)
 {
-	uint64_t length;
-	image_core_file().length(length);
-	if (length % 275 != 0) {// TODO
-		m_err_message = "Unexpected file size. Expected a multiple of 275";
-		return image_init_result::FAIL;
-	}
-	return image_init_result::PASS;
+	unsigned int d = mfm;
+	d &= 0x5555;
+	d = ((d >> 1) | d) & 0x3333;
+	d = ((d >> 2) | d) & 0x0f0f;
+	d = ((d >> 4) | d) & 0x00ff;
+	return d;
 }
 
 s100_vector_dualmode_device::s100_vector_dualmode_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -58,11 +64,23 @@ s100_vector_dualmode_device::s100_vector_dualmode_device(const machine_config &m
 	, m_ram{0}
 	, m_cmar(0)
 	, m_drive(0)
-	, m_head(0)
-	, m_track(0)
 	, m_sector(0)
 	, m_read(false)
+	, m_pll()
+	, m_byte_timer(nullptr)
+	, m_sector_timer(nullptr)
+	, m_pending_byte(0)
+	, m_pending_size(0)
 {
+}
+
+TIMER_CALLBACK_MEMBER(s100_vector_dualmode_device::motor_off)
+{
+	for (int i = 0; i < m_floppy.size(); i++) {
+		floppy_image_device* flop = m_floppy[m_drive]->get_device();
+		if (flop)
+			flop->mon_w(1);
+	}
 }
 
 bool s100_vector_dualmode_device::hdd_selected()
@@ -88,9 +106,10 @@ uint8_t s100_vector_dualmode_device::s100_sinp_r(offs_t offset)
 			seek_complete = true;
 			loss_of_sync = true;
 		} else {
-			write_protect = !m_floppy[m_drive]->is_open() || m_floppy[m_drive]->is_readonly();
+			floppy_image_device* flop = m_floppy[m_drive]->get_device();
+			write_protect = flop && flop->wpt_r();
 			ready = false;
-			track0 = m_floppy[m_drive]->is_open() && m_track == 0;
+			track0 = flop && !flop->trk00_r();
 			seek_complete = false;
 			loss_of_sync = false;
 		}
@@ -100,16 +119,14 @@ uint8_t s100_vector_dualmode_device::s100_sinp_r(offs_t offset)
 			| 0xc0;
 	} else if (offset == 0xc1) { // status (1) port
 		bool floppy_disk_selected;
-		bool controller_busy;
+		bool controller_busy = m_sector_timer->enabled();
 		bool motor_on; // FDD
 		bool type_of_hard_disk = true;
 		if (hdd_selected()) {
 			floppy_disk_selected = false;
-			controller_busy = false;
 			motor_on = false;
 		} else {
 			floppy_disk_selected = true;
-			controller_busy = false;
 			motor_on = m_motor_on_timer->enabled();
 		}
 		data = floppy_disk_selected | (controller_busy << 1) | (motor_on << 2)
@@ -128,21 +145,33 @@ uint8_t s100_vector_dualmode_device::s100_sinp_r(offs_t offset)
 
 void s100_vector_dualmode_device::s100_sout_w(offs_t offset, uint8_t data)
 {
+	// TODO: check actual behavior when controller is busy
+	if (m_sector_timer->enabled()) {
+		return;
+	}
 	// 7200-1200-02-1 page 14 (1-8)
 	if (offset == 0xc0) { // control (0) port
 		m_drive = BIT(data, 0, 2);
-		m_head = BIT(data, 2, 3);
-		uint8_t step = BIT(data, 5);
-		uint8_t step_in = BIT(data, 6);
+		const uint8_t head = BIT(data, 2, 3);
+		const bool step = BIT(data, 5);
+		const bool step_in = BIT(data, 6);
 		//uint8_t low_current = BIT(data, 7);
-		if (step) {
-			if (step_in && m_track != 80)
-				m_track += 1;
-			else if (!step_in && m_track != 0)
-				m_track -= 1;
+
+		for (int i = 0; i < m_floppy.size(); i++) {
+			floppy_image_device* flop = m_floppy[m_drive]->get_device();
+			if (flop)
+				flop->mon_w(0);
 		}
 		// WR0| triggers U60, a 74LS123 with 100uF cap and 100k res
 		m_motor_on_timer->adjust(attotime::from_usec(2819600));
+
+		floppy_image_device* flop = m_floppy[m_drive]->get_device();
+		if (flop) {
+			flop->ss_w(head & 1);
+			// Software should not change other bits when pulsing step
+			flop->stp_w(!step);
+			flop->dir_w(!step_in);
+		}
 	} else if (offset == 0xc1) { // control (1) port
 		m_sector = BIT(data, 0, 5);
 		m_read = BIT(data, 5);
@@ -150,60 +179,106 @@ void s100_vector_dualmode_device::s100_sout_w(offs_t offset, uint8_t data)
 		m_ram[m_cmar++] = data;
 		m_cmar &= 0x1ff;
 	} else if (offset == 0xc3) { // start port
-		// Read and write use cmar, so if it is not 0 you get weird results.
-		// It is always supposed to be reset before read/write
-		if (m_cmar != 0 || !m_floppy[m_drive]->is_open() || m_track >= 77)
+		floppy_image_device* flop = m_floppy[m_drive]->get_device();
+		if (!flop || flop->time_next_index().is_never())
 			return;
-		uint64_t file_pos = 275*(m_sector+16*(m_track+77*m_head));
-		util::core_file &file = m_floppy[m_drive]->image_core_file();
-		if (m_read) {
-			std::size_t toread = 275;
-			std::size_t actual;
-			std::error_condition err = file.read_at(file_pos, m_ram, toread, actual);
-			if (err) {
-				LOG_OUTPUT_FUNC("Error: dual-mode read error %s:%d %s\n", err.category().name(), err.value(), err.message());
-			} else if (toread != actual) {
-				LOG_OUTPUT_FUNC("Error: dual-mode read error: unexpected amount read %d", actual);
-			}
-			memset(m_ram+275, 0, 128); // Postamble
-			m_cmar += 275+128; // CMAR is trashed
+		const attotime rot_time = attotime::from_msec(200);
+		attotime sector_time = flop->time_next_index() - machine().time() + (rot_time / 16) * m_sector;
+		if (sector_time > rot_time)
+			sector_time -= rot_time;
+		m_sector_timer->adjust(sector_time, SECTOR_START);
+	}
+}
 
-			m_ram[274] = 0; // Ignore ECC
-		} else if (!m_floppy[m_drive]->is_readonly()) {
-			// The hardware doesn't care what it is writing, except when ECC is
-			// enabled and even then it just inserts the ECC into the
-			// pre-defined position. When reading it cares little. It will sync
-			// to the first one bit as the first bit of the first byte and needs
-			// a preceding string of zeros for the PLL and MPM alignment. It
-			// also inserts the ECC result into the pre-defined position when
-			// enabled.
-			//
-			// Assume standard preamble of 40 bytes.
-			m_cmar += 40;
-			std::size_t towrite = 275;
-			std::size_t actual;
-			std::error_condition err = file.write_at(file_pos, &m_ram[m_cmar], towrite, actual);
-			if (err) {
-				LOG_OUTPUT_FUNC("Error: dual-mode write error %s:%d %s\n", err.category().name(), err.value(), err.message());
-			} else if (towrite != actual) {
-				LOG_OUTPUT_FUNC("Error: dual-mode write error: unexpected amount written %d", actual);
+bool s100_vector_dualmode_device::get_next_bit(attotime &tm, const attotime &limit)
+{
+	int bit = m_pll.get_next_bit(tm, m_floppy[m_drive]->get_device(), limit);
+	if (bit < 0)
+		return false;
+	m_pending_byte <<= 1;
+	m_pending_byte |= bit;
+	m_pending_size++;
+	return true;
+}
+
+TIMER_CALLBACK_MEMBER(s100_vector_dualmode_device::sector_cb)
+{
+	switch (static_cast<sector_timer_state>(param)) {
+	case SECTOR_START:
+		if (m_read) {
+			m_pll.set_clock(half_bitcell_size);
+			m_pll.read_reset(machine().time());
+			attotime tm;
+			attotime limit = machine().time() + half_bitcell_size*512;
+			while (get_next_bit(tm, limit)) {} // init PLL
+			limit += half_bitcell_size*16*30;
+			while (get_next_bit(tm, limit) && m_pending_byte != 0x5554) {}
+			if (m_pending_byte == 0x5554) {
+				m_pending_size = 1;
+				m_byte_timer->adjust(tm - machine().time());
 			}
-			m_cmar += 275+128; // CMAR is trashed
+		} else {
+			m_pending_size = 0;
+			m_byte_timer->adjust(attotime::zero);
 		}
+		m_sector_timer->adjust(attotime::from_msec(200)/16, SECTOR_END);
+		break;
+
+	case SECTOR_END:
+		m_byte_timer->enable(false);
+		if (m_read)
+			m_ram[274] = 0; // Ignore ECC
+		break;
+	}
+}
+
+TIMER_CALLBACK_MEMBER(s100_vector_dualmode_device::byte_cb)
+{
+	if (m_read) {
+		if (m_pending_size == 16) {
+			m_pending_size = 0;
+			m_ram[m_cmar++] = unmfm_byte(m_pending_byte);
+			m_cmar &= 0x1ff;
+		}
+		attotime tm;
+		while (m_pending_size != 16 && get_next_bit(tm, attotime::never)) {}
+		m_byte_timer->adjust(tm - machine().time());
+	} else {
+		if (m_pending_size == 16) {
+			attotime start_time = machine().time() - half_bitcell_size*m_pending_size;
+			attotime tm = start_time + attotime::from_usec(1);
+			attotime buf[8];
+			int pos = 0;
+			while (m_pending_size) {
+				if (m_pending_byte & (1 << --m_pending_size))
+					buf[pos++] = tm;
+				tm += half_bitcell_size;
+			}
+			floppy_image_device *floppy = m_floppy[m_drive]->get_device();
+			if (floppy)
+				floppy->write_flux(start_time, machine().time(), pos, buf);
+		}
+		uint8_t last = m_cmar ? m_ram[m_cmar-1] : 0;
+		m_pending_byte = mfm_byte(m_ram[m_cmar++], last);
+		m_pending_size = 16;
+		m_cmar &= 0x1ff;
+		m_byte_timer->adjust(half_bitcell_size*16);
 	}
 }
 
 void s100_vector_dualmode_device::device_start()
 {
-	m_motor_on_timer = timer_alloc();
+	m_motor_on_timer = timer_alloc(FUNC(s100_vector_dualmode_device::motor_off), this);
+	m_byte_timer = timer_alloc(FUNC(s100_vector_dualmode_device::byte_cb), this);
+	m_sector_timer = timer_alloc(FUNC(s100_vector_dualmode_device::sector_cb), this);
 
 	save_item(NAME(m_ram));
 	save_item(NAME(m_cmar));
 	save_item(NAME(m_drive));
-	save_item(NAME(m_head));
-	save_item(NAME(m_track));
 	save_item(NAME(m_sector));
 	save_item(NAME(m_read));
+	save_item(NAME(m_pending_byte));
+	save_item(NAME(m_pending_size));
 }
 
 void s100_vector_dualmode_device::device_reset()
@@ -211,7 +286,6 @@ void s100_vector_dualmode_device::device_reset()
 	// POC| resets
 	// U9
 	m_drive = 0;
-	m_head = 0;
 	// U18
 	m_sector = 0;
 	m_read = false;
@@ -219,13 +293,23 @@ void s100_vector_dualmode_device::device_reset()
 	m_motor_on_timer->enable(false);
 }
 
-void s100_vector_dualmode_device::device_add_mconfig(machine_config &config)
+static void vector4_floppies(device_slot_interface &device)
 {
-	MICROPOLIS_IMAGE(config, m_floppy[0], 0);
-	MICROPOLIS_IMAGE(config, m_floppy[1], 0);
-	MICROPOLIS_IMAGE(config, m_floppy[2], 0);
-	MICROPOLIS_IMAGE(config, m_floppy[3], 0);
+	device.option_add("525", FLOPPY_525_QD);
 }
 
-DEFINE_DEVICE_TYPE(MICROPOLIS_IMAGE, vector_micropolis_image_device, "micropolisimage", "Micropolis Image (VGI)")
+static void vector4_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_VGI_FORMAT);
+}
+
+void s100_vector_dualmode_device::device_add_mconfig(machine_config &config)
+{
+	FLOPPY_CONNECTOR(config, m_floppy[0], vector4_floppies, "525", vector4_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], vector4_floppies, "525", vector4_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[2], vector4_floppies, "525", vector4_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[3], vector4_floppies, "525", vector4_formats).enable_sound(true);
+}
+
 DEFINE_DEVICE_TYPE(S100_VECTOR_DUALMODE, s100_vector_dualmode_device, "vectordualmode", "Vector Dual-Mode Disk Controller")

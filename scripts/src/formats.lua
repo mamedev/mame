@@ -2042,6 +2042,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/vgi_dsk.h,FORMATS["VGI_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "VGI_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/vgi_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/vgi_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/victor9k_dsk.h,FORMATS["VICTOR9K_DSK"] = true
 --------------------------------------------------
 
