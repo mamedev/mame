@@ -42,6 +42,9 @@ TODO:
   Notice you can't neither enter in Safe Mode nor install from CD-Rom since there's no
   CD drive installed. Also that the main program will kick in if you try to auto PnP the missing
   devices.
+  The ICRP/E-3R error appears if "C:\Play.Center\RPCDR.dat" is newer than 24 hours, it contains
+  the number of reboots and if it's >= 3 it shows the message.
+  Error '2' appears if Windows is set on anything that isn't 800x600x16bpp.
 
 **************************************************************************************************/
 
