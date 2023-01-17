@@ -6,12 +6,14 @@
 
     All-in-One IBM PC compatible portable computer
 
-    Hardware:
+    Hardware (incomplete):
     - Intel 186 at 8 MHz
     - 256 KB RAM (expandable to 512 KB)
+    - SCN2674B
+    - NEC D8251AC
     - Monochrome LCD display with 80x16 lines (512x128 resolution)
     - External monitor support (RGB, composite)
-    - 2x 5.25" QHD drives
+    - Canon MDD413 dual 5.25" QD drive
     - SCSI interface
     - 2x RS232 port
     - Centronics port
