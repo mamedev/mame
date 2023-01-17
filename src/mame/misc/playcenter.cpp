@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:
-/*******************************************************************************
+/**************************************************************************************************
 
     Skeleton driver for "PlayCenter" PC-based touch games
 
@@ -24,12 +24,26 @@
     replaceble by the user / operator).
 
 Dump contains a raw image for a (c) 1998 Trident video card (C:\videorom.bin)
+The EPoX EP-MVP4F is a Socket 7 MB with VIA Apollo MVP4 AGP, built-in Trident AGP,
+VT82C686A, built-in SoundBlaster Pro with AC'97 codec support
 
 TODO:
 - HDD image doesn't boot in neither shutms11 nor pcipc. The dump contains a
-  windows partition (named "u") and no autoexec.bat / config.sys ...
+  Spanish windows partition (named "u") and no autoexec.bat / config.sys.
+  The CHD has -chs 3644,16,58 but WinImage reports back a ~4 GB partition.
+- In pcipc it shows a '1' logo then on first boot it tries to install basically
+  everything it can possibly install from scratch. Once done it tries to boot the
+  main program but it either do one of the following things:
+  - fails with a '2', resets the machine;
+  - fails with a Spanish popup: "Detected a problem with the machine.
+    Please call tech service Ref.: ICRP/E-3R" then it shows a '2' and reset;
+  - fails with above but instead of resetting will show a '3' and hangs there,
+    with a Spanish message about detecting a power failure;
+  Notice you can't neither enter in Safe Mode nor install from CD-Rom since there's no
+  CD drive installed. Also that the main program will kick in if you try to auto PnP the missing
+  devices.
 
-*******************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i386/i386.h"

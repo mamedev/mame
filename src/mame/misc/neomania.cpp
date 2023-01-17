@@ -23,7 +23,8 @@ C:\Windows has driver installs for a PCI Sound Blaster and an ATI mach 64 / Bt82
 
 
 TODO:
-- HDD image doesn't boot in neither shutms11 nor pcipc, mangled MBR boot record;
+- HDD image doesn't boot in neither shutms11 nor pcipc, mangled MBR boot record or geometry params (has -chs 3532,16,38 but WinImage reports back ~20 GB partition?);
+- (With manually c&p files in a CHD that works) SIGABRT in pcipc trying to execute ppm.exe, in shutms11 will draw "Parallel Port Manager v4.0" then fail on device check;
 - Extract "Guard.zip" and understand what is for;
 
 
