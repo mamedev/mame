@@ -1675,9 +1675,9 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
 
     if to_dbin:
         if no_high_byte:
-            code_to_sort.append(["=8h", R.dbin, R.edb])
-        elif no_low_byte:
             code_to_sort.append(["=8", R.dbin, R.edb])
+        elif no_low_byte:
+            code_to_sort.append(["=8h", R.dbin, R.edb])
         else:
             code_to_sort.append(["=", R.dbin, R.edb])
 
