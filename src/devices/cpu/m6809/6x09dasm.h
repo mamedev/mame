@@ -41,6 +41,7 @@ public:
 	enum m6x09_instruction_level
 	{
 		M6x09_GENERAL,
+		M6809_UNDOCUMENTED,
 		HD6309_EXCLUSIVE
 	};
 
