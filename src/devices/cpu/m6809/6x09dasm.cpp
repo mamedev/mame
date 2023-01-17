@@ -61,12 +61,13 @@ const m6x09_base_disassembler::opcodeinfo *m6x09_base_disassembler::fetch_opcode
 	{
 		// retrieve the opcode
 		uint16_t opcode = page | opcodes.r8(p++);
+		m6x09_instruction_level level = m_level;
 
 		// perform the lookup
 		auto iter = std::find_if(
 			m_opcodes.begin(),
 			m_opcodes.end(),
-			[opcode](const opcodeinfo &info) { return info.opcode() == opcode; });
+			[opcode,level](const opcodeinfo &info) { return (info.opcode() == opcode) && (info.level() <= level); });
 
 		// did we find something?
 		if (iter == m_opcodes.end())
@@ -75,11 +76,11 @@ const m6x09_base_disassembler::opcodeinfo *m6x09_base_disassembler::fetch_opcode
 		// was this a $10 or $11 page?
 		switch (iter->mode())
 		{
-		case PG1:
+		case PG2:
 			page = 0x1000;
 			break;
 
-		case PG2:
+		case PG3:
 			page = 0x1100;
 			break;
 
@@ -89,8 +90,12 @@ const m6x09_base_disassembler::opcodeinfo *m6x09_base_disassembler::fetch_opcode
 		}
 	};
 
-	// is this an HD6309 exclusive instruction, and we're not HD6309?  if so, reject it
+	// is this an HD6309 exclusive instruction, and we're not HD6309? if so, reject it
 	if (op && (op->level() > m_level))
+		op = nullptr;
+
+	// is this a M6809 undocumented instruction and we're in HD6309 mode? if so, reject it
+	if (op && (op->level() == M6809_UNDOCUMENTED) && (m_level == HD6309_EXCLUSIVE))
 		op = nullptr;
 
 	return op;
@@ -314,8 +319,8 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 	{ 0x0E, 2, "JMP",   DIR,    M6x09_GENERAL },
 	{ 0x0F, 2, "CLR",   DIR,    M6x09_GENERAL },
 
-	{ 0x10, 1, "page1", PG1,    M6x09_GENERAL },
-	{ 0x11, 1, "page2", PG2,    M6x09_GENERAL },
+	{ 0x10, 1, "page2", PG2,    M6x09_GENERAL },
+	{ 0x11, 1, "page3", PG3,    M6x09_GENERAL },
 	{ 0x12, 1, "NOP",   INH,    M6x09_GENERAL },
 	{ 0x13, 1, "SYNC",  INH,    M6x09_GENERAL },
 	{ 0x14, 1, "XHCF",  INH,    M6809_UNDOCUMENTED },
@@ -323,10 +328,10 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 	{ 0x15, 1, "XHCF",  INH,    M6809_UNDOCUMENTED },
 	{ 0x16, 3, "LBRA",  LREL,   M6x09_GENERAL },
 	{ 0x17, 3, "LBSR",  LREL,   M6x09_GENERAL, STEP_OVER },
-	{ 0x18, 1, "X18",   INH,    M6809_UNDOCUMENTED },
+	{ 0x18, 3, "X18",   INH,    M6809_UNDOCUMENTED },
 	{ 0x19, 1, "DAA",   INH,    M6x09_GENERAL },
 	{ 0x1A, 2, "ORCC",  IMM,    M6x09_GENERAL },
-	{ 0x1B, 1, "NOP",   INH,    M6809_UNDOCUMENTED },
+	{ 0x1B, 2, "NOP",   INH,    M6809_UNDOCUMENTED },
 	{ 0x1C, 2, "ANDCC", IMM,    M6x09_GENERAL },
 	{ 0x1D, 1, "SEX",   INH,    M6x09_GENERAL },
 	{ 0x1E, 2, "EXG",   IMM_RR, M6x09_GENERAL },
@@ -349,21 +354,22 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 	{ 0x2E, 2, "BGT",   REL,    M6x09_GENERAL, STEP_COND },
 	{ 0x2F, 2, "BLE",   REL,    M6x09_GENERAL, STEP_COND },
 
-	{ 0x30, 2, "LEAX",  IND,    M6x09_GENERAL },
-	{ 0x31, 2, "LEAY",  IND,    M6x09_GENERAL },
-	{ 0x32, 2, "LEAS",  IND,    M6x09_GENERAL },
-	{ 0x33, 2, "LEAU",  IND,    M6x09_GENERAL },
-	{ 0x34, 2, "PSHS",  PSHS,   M6x09_GENERAL },
-	{ 0x35, 2, "PULS",  PULS,   M6x09_GENERAL },
-	{ 0x36, 2, "PSHU",  PSHU,   M6x09_GENERAL },
-	{ 0x37, 2, "PULU",  PULU,   M6x09_GENERAL },
-	{ 0x39, 1, "RTS",   INH ,   M6x09_GENERAL, STEP_OUT },
-	{ 0x3A, 1, "ABX",   INH,    M6x09_GENERAL },
-	{ 0x3B, 1, "RTI",   INH,    M6x09_GENERAL, STEP_OUT },
-	{ 0x3C, 2, "CWAI",  IMM,    M6x09_GENERAL },
-	{ 0x3D, 1, "MUL",   INH,    M6x09_GENERAL },
-	{ 0x3E, 1, "XRES",  INH,    M6809_UNDOCUMENTED },
-	{ 0x3F, 1, "SWI",   INH,    M6x09_GENERAL },
+	{ 0x30, 2, "LEAX",   IND,   M6x09_GENERAL },
+	{ 0x31, 2, "LEAY",   IND,   M6x09_GENERAL },
+	{ 0x32, 2, "LEAS",   IND,   M6x09_GENERAL },
+	{ 0x33, 2, "LEAU",   IND,   M6x09_GENERAL },
+	{ 0x34, 2, "PSHS",   PSHS,  M6x09_GENERAL },
+	{ 0x35, 2, "PULS",   PULS,  M6x09_GENERAL },
+	{ 0x36, 2, "PSHU",   PSHU,  M6x09_GENERAL },
+	{ 0x37, 2, "PULU",   PULU,  M6x09_GENERAL },
+	{ 0x38, 4, "XANDCC", IMM,   M6809_UNDOCUMENTED },
+	{ 0x39, 1, "RTS",    INH,   M6x09_GENERAL, STEP_OUT },
+	{ 0x3A, 1, "ABX",    INH,   M6x09_GENERAL },
+	{ 0x3B, 1, "RTI",    INH,   M6x09_GENERAL, STEP_OUT },
+	{ 0x3C, 2, "CWAI",   IMM,   M6x09_GENERAL },
+	{ 0x3D, 1, "MUL",    INH,   M6x09_GENERAL },
+	{ 0x3E, 1, "XRES",   INH,   M6809_UNDOCUMENTED },
+	{ 0x3F, 1, "SWI",    INH,   M6x09_GENERAL },
 
 	{ 0x40, 1, "NEGA",  INH,    M6x09_GENERAL },
 	{ 0x41, 1, "NEGA",  INH,    M6809_UNDOCUMENTED },
@@ -456,7 +462,7 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 	{ 0x8C, 3, "CMPX",  IMM,    M6x09_GENERAL },
 	{ 0x8D, 2, "BSR",   REL,    M6x09_GENERAL, STEP_OVER },
 	{ 0x8E, 3, "LDX",   IMM,    M6x09_GENERAL },
-	{ 0x8F, 3, "XSTX",  IMM,    M6809_UNDOCUMENTED },
+	{ 0x8F, 3, "XSTX",  IMM, M6809_UNDOCUMENTED },
 
 	{ 0x90, 2, "SUBA",  DIR,    M6x09_GENERAL },
 	{ 0x91, 2, "CMPA",  DIR,    M6x09_GENERAL },
@@ -578,7 +584,7 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 	{ 0xFE, 3, "LDU",   EXT,    M6x09_GENERAL },
 	{ 0xFF, 3, "STU",   EXT,    M6x09_GENERAL },
 
-	// Page 1 opcodes (0x10 0x..)
+	// Page 2 opcodes (0x10 0x..)
 	{ 0x1020, 5, "XLBRA", LREL, M6809_UNDOCUMENTED },
 	{ 0x1021, 4, "LBRN",  LREL, M6x09_GENERAL },
 	{ 0x1022, 4, "LBHI",  LREL, M6x09_GENERAL },
@@ -604,14 +610,12 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 	{ 0x1035, 3, "ORR",   IMM_RR, HD6309_EXCLUSIVE },
 	{ 0x1036, 3, "EORR",  IMM_RR, HD6309_EXCLUSIVE },
 	{ 0x1037, 3, "CMPR",  IMM_RR, HD6309_EXCLUSIVE },
-
-	{ 0x1038, 2, "PSHSW", INH,  HD6309_EXCLUSIVE },
-	{ 0x1039, 2, "PULSW", INH,  HD6309_EXCLUSIVE },
-	{ 0x103A, 2, "PSHUW", INH,  HD6309_EXCLUSIVE },
-	{ 0x103B, 2, "PULUW", INH,  HD6309_EXCLUSIVE },
-
-	{ 0x103E, 3, "XSWI2", INH,  M6809_UNDOCUMENTED },
-	{ 0x103F, 2, "SWI2",  INH,  M6x09_GENERAL },
+	{ 0x1038, 2, "PSHSW", INH,    HD6309_EXCLUSIVE },
+	{ 0x1039, 2, "PULSW", INH,    HD6309_EXCLUSIVE },
+	{ 0x103A, 2, "PSHUW", INH,    HD6309_EXCLUSIVE },
+	{ 0x103B, 2, "PULUW", INH,    HD6309_EXCLUSIVE },
+	{ 0x103E, 2, "XSWI2", INH,    M6809_UNDOCUMENTED },
+	{ 0x103F, 2, "SWI2",  INH,    M6x09_GENERAL },
 
 	{ 0x1040, 2, "NEGD",  INH,  HD6309_EXCLUSIVE },
 	{ 0x1043, 2, "COMD",  INH,  HD6309_EXCLUSIVE },
@@ -634,12 +638,11 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 	{ 0x105C, 2, "INCW",  INH,  HD6309_EXCLUSIVE },
 	{ 0x105D, 2, "TSTW",  INH,  HD6309_EXCLUSIVE },
 	{ 0x105F, 2, "CLRW",  INH,  HD6309_EXCLUSIVE },
-	{ 0x1080, 4, "SUBW",  IMM,  HD6309_EXCLUSIVE },
-	{ 0x1081, 4, "CMPW",  IMM,  HD6309_EXCLUSIVE },
-	{ 0x1082, 4, "SBCD",  IMM,  HD6309_EXCLUSIVE },
 
-	{ 0x1083, 4, "CMPD",  IMM,  M6x09_GENERAL },
-
+	{ 0x1080, 4, "SUBW",  IMM,    HD6309_EXCLUSIVE },
+	{ 0x1081, 4, "CMPW",  IMM,    HD6309_EXCLUSIVE },
+	{ 0x1082, 4, "SBCD",  IMM,    HD6309_EXCLUSIVE },
+	{ 0x1083, 4, "CMPD",  IMM,    M6x09_GENERAL },
 	{ 0x1084, 4, "ANDD",  IMM,    HD6309_EXCLUSIVE },
 	{ 0x1085, 4, "BITD",  IMM,    HD6309_EXCLUSIVE },
 	{ 0x1086, 4, "LDW",   IMM,    HD6309_EXCLUSIVE },
@@ -648,17 +651,14 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 	{ 0x1089, 4, "ADCD",  IMM,    HD6309_EXCLUSIVE },
 	{ 0x108A, 4, "ORD",   IMM,    HD6309_EXCLUSIVE },
 	{ 0x108B, 4, "ADDW",  IMM,    HD6309_EXCLUSIVE },
-	{ 0x108F, 4, "XSTY",  IMM_16, M6809_UNDOCUMENTED },
-
-	{ 0x108C, 4, "CMPY",  IMM,  M6x09_GENERAL },
-	{ 0x108E, 4, "LDY",   IMM,  M6x09_GENERAL },
+	{ 0x108C, 4, "CMPY",  IMM,    M6x09_GENERAL },
+	{ 0x108E, 4, "LDY",   IMM,    M6x09_GENERAL },
+	{ 0x108F, 4, "XSTY",  IMM, M6809_UNDOCUMENTED },
 
 	{ 0x1090, 3, "SUBW",  DIR,  HD6309_EXCLUSIVE },
 	{ 0x1091, 3, "CMPW",  DIR,  HD6309_EXCLUSIVE },
 	{ 0x1092, 3, "SBCD",  DIR,  HD6309_EXCLUSIVE },
-
 	{ 0x1093, 3, "CMPD",  DIR,  M6x09_GENERAL },
-
 	{ 0x1094, 3, "ANDD",  DIR,  HD6309_EXCLUSIVE },
 	{ 0x1095, 3, "BITD",  DIR,  HD6309_EXCLUSIVE },
 	{ 0x1096, 3, "LDW",   DIR,  HD6309_EXCLUSIVE },
@@ -667,7 +667,6 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 	{ 0x1099, 3, "ADCD",  DIR,  HD6309_EXCLUSIVE },
 	{ 0x109A, 3, "ORD",   DIR,  HD6309_EXCLUSIVE },
 	{ 0x109B, 3, "ADDW",  DIR,  HD6309_EXCLUSIVE },
-
 	{ 0x109C, 3, "CMPY",  DIR,  M6x09_GENERAL },
 	{ 0x109E, 3, "LDY",   DIR,  M6x09_GENERAL },
 	{ 0x109F, 3, "STY",   DIR,  M6x09_GENERAL },
@@ -675,19 +674,15 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 	{ 0x10A0, 3, "SUBW",  IND,  HD6309_EXCLUSIVE },
 	{ 0x10A1, 3, "CMPW",  IND,  HD6309_EXCLUSIVE },
 	{ 0x10A2, 3, "SBCD",  IND,  HD6309_EXCLUSIVE },
-
 	{ 0x10A3, 3, "CMPD",  IND,  M6x09_GENERAL },
-
 	{ 0x10A4, 3, "ANDD",  IND,  HD6309_EXCLUSIVE },
 	{ 0x10A5, 3, "BITD",  IND,  HD6309_EXCLUSIVE },
-
 	{ 0x10A6, 3, "LDW",   IND,  HD6309_EXCLUSIVE },
 	{ 0x10A7, 3, "STW",   IND,  HD6309_EXCLUSIVE },
 	{ 0x10A8, 3, "EORD",  IND,  HD6309_EXCLUSIVE },
 	{ 0x10A9, 3, "ADCD",  IND,  HD6309_EXCLUSIVE },
 	{ 0x10AA, 3, "ORD",   IND,  HD6309_EXCLUSIVE },
 	{ 0x10AB, 3, "ADDW",  IND,  HD6309_EXCLUSIVE },
-
 	{ 0x10AC, 3, "CMPY",  IND,  M6x09_GENERAL },
 	{ 0x10AE, 3, "LDY",   IND,  M6x09_GENERAL },
 	{ 0x10AF, 3, "STY",   IND,  M6x09_GENERAL },
@@ -695,9 +690,7 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 	{ 0x10B0, 4, "SUBW",  EXT,  HD6309_EXCLUSIVE },
 	{ 0x10B1, 4, "CMPW",  EXT,  HD6309_EXCLUSIVE },
 	{ 0x10B2, 4, "SBCD",  EXT,  HD6309_EXCLUSIVE },
-
 	{ 0x10B3, 4, "CMPD",  EXT,  M6x09_GENERAL },
-
 	{ 0x10B4, 4, "ANDD",  EXT,  HD6309_EXCLUSIVE },
 	{ 0x10B5, 4, "BITD",  EXT,  HD6309_EXCLUSIVE },
 	{ 0x10B6, 4, "LDW",   EXT,  HD6309_EXCLUSIVE },
@@ -706,35 +699,34 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 	{ 0x10B9, 4, "ADCD",  EXT,  HD6309_EXCLUSIVE },
 	{ 0x10BA, 4, "ORD",   EXT,  HD6309_EXCLUSIVE },
 	{ 0x10BB, 4, "ADDW",  EXT,  HD6309_EXCLUSIVE },
-
 	{ 0x10BC, 4, "CMPY",  EXT,  M6x09_GENERAL },
 	{ 0x10BE, 4, "LDY",   EXT,  M6x09_GENERAL },
 	{ 0x10BF, 4, "STY",   EXT,  M6x09_GENERAL },
 
-	{ 0x10C3, 3, "XADD",  IMM_16, M6x09_GENERAL },
+	{ 0x10C3, 5, "XADDD", IMM, M6809_UNDOCUMENTED },
 	{ 0x10C7, 3, "XSTB",  IMM,    M6809_UNDOCUMENTED },
 	{ 0x10CE, 4, "LDS",   IMM,    M6x09_GENERAL },
-	{ 0x10CF, 4, "XSTS",  IMM_16, M6809_UNDOCUMENTED },
+	{ 0x10CF, 4, "XSTS",  IMM, M6809_UNDOCUMENTED },
 
-	{ 0x10D3, 3, "XADD",  DIR,  M6809_UNDOCUMENTED },
+	{ 0x10D3, 7, "XADDD", DIR,  M6809_UNDOCUMENTED },
 	{ 0x10DC, 3, "LDQ",   DIR,  HD6309_EXCLUSIVE },
 	{ 0x10DD, 3, "STQ",   DIR,  HD6309_EXCLUSIVE },
 	{ 0x10DE, 3, "LDS",   DIR,  M6x09_GENERAL },
 	{ 0x10DF, 3, "STS",   DIR,  M6x09_GENERAL },
 
-	{ 0x10E3, 3, "XADD",  IND,  M6809_UNDOCUMENTED },
+	{ 0x10E3, 7, "XADDD", IND,  M6809_UNDOCUMENTED },
 	{ 0x10EC, 3, "LDQ",   IND,  HD6309_EXCLUSIVE },
 	{ 0x10ED, 3, "STQ",   IND,  HD6309_EXCLUSIVE },
 	{ 0x10EE, 3, "LDS",   IND,  M6x09_GENERAL },
 	{ 0x10EF, 3, "STS",   IND,  M6x09_GENERAL },
 
-	{ 0x10F3, 3, "XADD",  EXT,  M6809_UNDOCUMENTED },
+	{ 0x10F3, 8, "XADDD", EXT,  M6809_UNDOCUMENTED },
 	{ 0x10FC, 4, "LDQ",   EXT,  HD6309_EXCLUSIVE },
 	{ 0x10FD, 4, "STQ",   EXT,  HD6309_EXCLUSIVE },
 	{ 0x10FE, 4, "LDS",   EXT,  M6x09_GENERAL },
 	{ 0x10FF, 4, "STS",   EXT,  M6x09_GENERAL },
 
-	// Page 2 opcodes (0x11 0x..)
+	// Page 3 opcodes (0x11 0x..)
 	{ 0x1130, 4, "BAND",  IMM_BW,   HD6309_EXCLUSIVE },
 	{ 0x1131, 4, "BIAND", IMM_BW,   HD6309_EXCLUSIVE },
 	{ 0x1132, 4, "BOR",   IMM_BW,   HD6309_EXCLUSIVE },
@@ -775,7 +767,7 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 	{ 0x118C, 4, "CMPS",  IMM,    M6x09_GENERAL },
 	{ 0x118D, 3, "DIVD",  IMM,    HD6309_EXCLUSIVE },
 	{ 0x118E, 4, "DIVQ",  IMM,    HD6309_EXCLUSIVE },
-	{ 0x118F, 4, "XSTX",  IMM_16, M6809_UNDOCUMENTED },
+	{ 0x118F, 4, "XSTX",  IMM, M6809_UNDOCUMENTED },
 	{ 0x118F, 4, "MULD",  IMM,    HD6309_EXCLUSIVE },
 
 	{ 0x1190, 3, "SUBE",  DIR,  HD6309_EXCLUSIVE },
@@ -813,11 +805,11 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 
 	{ 0x11C0, 3, "SUBF",  IMM,    HD6309_EXCLUSIVE },
 	{ 0x11C1, 3, "CMPF",  IMM,    HD6309_EXCLUSIVE },
-	{ 0x11C3, 3, "XADDU", IMM_16, M6809_UNDOCUMENTED },
+	{ 0x11C3, 3, "XADDU", IMM, M6809_UNDOCUMENTED },
 	{ 0x11C6, 3, "LDF",   IMM,    HD6309_EXCLUSIVE },
 	{ 0x11C7, 3, "XSTB",  IMM,    M6809_UNDOCUMENTED },
 	{ 0x11CB, 3, "ADDF",  IMM,    HD6309_EXCLUSIVE },
-	{ 0x11CF, 4, "XSTU",  IMM_16, M6809_UNDOCUMENTED },
+	{ 0x11CF, 4, "XSTU",  IMM, M6809_UNDOCUMENTED },
 
 	{ 0x11D0, 3, "SUBF",  DIR,  HD6309_EXCLUSIVE },
 	{ 0x11D1, 3, "CMPF",  DIR,  HD6309_EXCLUSIVE },
@@ -1033,7 +1025,7 @@ const char m6809_disassembler::m6809_teregs[16][4] =
 };
 
 
-m6809_disassembler::m6809_disassembler() : m6x09_disassembler(M6x09_GENERAL, m6809_teregs)
+m6809_disassembler::m6809_disassembler() : m6x09_disassembler(M6809_UNDOCUMENTED, m6809_teregs)
 {
 }
 
@@ -1063,10 +1055,10 @@ const m6x09_base_disassembler::opcodeinfo konami_disassembler::konami_opcodes[] 
 	{ 0x09, 2, "LEAY",  IND,    M6x09_GENERAL },
 	{ 0x0A, 2, "LEAU",  IND,    M6x09_GENERAL },
 	{ 0x0B, 2, "LEAS",  IND,    M6x09_GENERAL },
-	{ 0x0C, 2, "PUSHS",  PSHS,  M6x09_GENERAL },
-	{ 0x0D, 2, "PUSHU",  PSHU,  M6x09_GENERAL },
-	{ 0x0E, 2, "PULLS",  PULS,  M6x09_GENERAL },
-	{ 0x0F, 2, "PULLU",  PULU,  M6x09_GENERAL },
+	{ 0x0C, 2, "PUSHS", PSHS,   M6x09_GENERAL },
+	{ 0x0D, 2, "PUSHU", PSHU,   M6x09_GENERAL },
+	{ 0x0E, 2, "PULLS", PULS,   M6x09_GENERAL },
+	{ 0x0F, 2, "PULLU", PULU,   M6x09_GENERAL },
 
 	{ 0x10, 2, "LDA",   IMM,    M6x09_GENERAL },
 	{ 0x11, 2, "LDB",   IMM,    M6x09_GENERAL },
@@ -1102,16 +1094,16 @@ const m6x09_base_disassembler::opcodeinfo konami_disassembler::konami_opcodes[] 
 	{ 0x2E, 2, "EORA",  IND,    M6x09_GENERAL },
 	{ 0x2F, 2, "EORB",  IND,    M6x09_GENERAL },
 
-	{ 0x30, 2, "ORA",   IMM,    M6x09_GENERAL },
-	{ 0x31, 2, "ORB",   IMM,    M6x09_GENERAL },
-	{ 0x32, 2, "ORA",   IND,    M6x09_GENERAL },
-	{ 0x33, 2, "ORB",   IND,    M6x09_GENERAL },
-	{ 0x34, 2, "CMPA",  IMM,    M6x09_GENERAL },
-	{ 0x35, 2, "CMPB",  IMM,    M6x09_GENERAL },
-	{ 0x36, 2, "CMPA",  IND,    M6x09_GENERAL },
-	{ 0x37, 2, "CMPB",  IND,    M6x09_GENERAL },
-	{ 0x38, 2, "SETLINES",  IMM,    M6x09_GENERAL },
-	{ 0x39, 2, "SETLINES",  IND,    M6x09_GENERAL },
+	{ 0x30, 2, "ORA",      IMM, M6x09_GENERAL },
+	{ 0x31, 2, "ORB",      IMM, M6x09_GENERAL },
+	{ 0x32, 2, "ORA",      IND, M6x09_GENERAL },
+	{ 0x33, 2, "ORB",      IND, M6x09_GENERAL },
+	{ 0x34, 2, "CMPA",     IMM, M6x09_GENERAL },
+	{ 0x35, 2, "CMPB",     IMM, M6x09_GENERAL },
+	{ 0x36, 2, "CMPA",     IND, M6x09_GENERAL },
+	{ 0x37, 2, "CMPB",     IND, M6x09_GENERAL },
+	{ 0x38, 2, "SETLINES", IMM, M6x09_GENERAL },
+	{ 0x39, 2, "SETLINES", IND, M6x09_GENERAL },
 	{ 0x3A, 2, "STA",   IND,    M6x09_GENERAL },
 	{ 0x3B, 2, "STB",   IND,    M6x09_GENERAL },
 	{ 0x3C, 2, "ANDCC", IMM,    M6x09_GENERAL },
@@ -1218,21 +1210,21 @@ const m6x09_base_disassembler::opcodeinfo konami_disassembler::konami_opcodes[] 
 	{ 0x9E, 2, "ASL",   IND,    M6x09_GENERAL },
 	{ 0x9F, 1, "RTI",   INH ,   M6x09_GENERAL, STEP_OUT },
 
-	{ 0xA0, 1, "ROLA",  INH,    M6x09_GENERAL },
-	{ 0xA1, 1, "ROLB",  INH,    M6x09_GENERAL },
-	{ 0xA2, 2, "ROL",   IND,    M6x09_GENERAL },
-	{ 0xA3, 2, "LSRW",  IND,    M6x09_GENERAL },
-	{ 0xA4, 2, "RORW",  IND,    M6x09_GENERAL },
-	{ 0xA5, 2, "ASRW",  IND,    M6x09_GENERAL },
-	{ 0xA6, 2, "ASLW",  IND,    M6x09_GENERAL },
-	{ 0xA7, 2, "ROLW",  IND,    M6x09_GENERAL },
-	{ 0xA8, 2, "JMP",   IND,    M6x09_GENERAL },
-	{ 0xA9, 2, "JSR",   IND,    M6x09_GENERAL, STEP_OVER },
-	{ 0xAA, 2, "BSR",   REL,    M6x09_GENERAL, STEP_OVER },
-	{ 0xAB, 3, "LBSR",  LREL,   M6x09_GENERAL, STEP_OVER },
-	{ 0xAC, 2, "DECB,JNZ",   REL,   M6x09_GENERAL },
-	{ 0xAD, 2, "DECX,JNZ",   REL,   M6x09_GENERAL },
-	{ 0xAE, 1, "NOP",   INH,    M6x09_GENERAL },
+	{ 0xA0, 1, "ROLA",     INH,  M6x09_GENERAL },
+	{ 0xA1, 1, "ROLB",     INH,  M6x09_GENERAL },
+	{ 0xA2, 2, "ROL",      IND,  M6x09_GENERAL },
+	{ 0xA3, 2, "LSRW",     IND,  M6x09_GENERAL },
+	{ 0xA4, 2, "RORW",     IND,  M6x09_GENERAL },
+	{ 0xA5, 2, "ASRW",     IND,  M6x09_GENERAL },
+	{ 0xA6, 2, "ASLW",     IND,  M6x09_GENERAL },
+	{ 0xA7, 2, "ROLW",     IND,  M6x09_GENERAL },
+	{ 0xA8, 2, "JMP",      IND,  M6x09_GENERAL },
+	{ 0xA9, 2, "JSR",      IND,  M6x09_GENERAL, STEP_OVER },
+	{ 0xAA, 2, "BSR",      REL,  M6x09_GENERAL, STEP_OVER },
+	{ 0xAB, 3, "LBSR",     LREL, M6x09_GENERAL, STEP_OVER },
+	{ 0xAC, 2, "DECB,JNZ", REL,  M6x09_GENERAL },
+	{ 0xAD, 2, "DECX,JNZ", REL,  M6x09_GENERAL },
+	{ 0xAE, 1, "NOP",      INH,  M6x09_GENERAL },
 
 	{ 0xB0, 1, "ABX",   INH,    M6x09_GENERAL },
 	{ 0xB1, 1, "DAA",   INH,    M6x09_GENERAL },
@@ -1240,8 +1232,8 @@ const m6x09_base_disassembler::opcodeinfo konami_disassembler::konami_opcodes[] 
 	{ 0xB3, 1, "MUL",   INH,    M6x09_GENERAL },
 	{ 0xB4, 1, "LMUL",   INH,   M6x09_GENERAL },
 	{ 0xB5, 1, "DIV X,B",   INH,    M6x09_GENERAL },
-	{ 0xB6, 1, "BMOVE Y,X,U", INH , M6x09_GENERAL },
-	{ 0xB7, 1, "MOVE Y,X,U", INH ,  M6x09_GENERAL },
+	{ 0xB6, 1, "BMOVE Y,X,U", INH, M6x09_GENERAL },
+	{ 0xB7, 1, "MOVE Y,X,U", INH,  M6x09_GENERAL },
 	{ 0xB8, 2, "LSRD",   IMM,   M6x09_GENERAL },
 	{ 0xB9, 2, "LSRD",   IND,   M6x09_GENERAL },
 	{ 0xBA, 2, "RORD",   IMM,   M6x09_GENERAL },

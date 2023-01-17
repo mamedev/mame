@@ -68,8 +68,8 @@ protected:
 		IMM_RR,             // Register-to-register
 		IMM_BW,             // Bitwise operations (6309 only)
 		IMM_TFM,            // Transfer from memory (6309 only)
-		PG1,                // Switch to page 1 opcodes
-		PG2                 // Switch to page 2 opcodes
+		PG2,                // Switch to page 2 opcodes
+		PG3                 // Switch to page 3 opcodes
 	};
 
 	// Opcode structure
