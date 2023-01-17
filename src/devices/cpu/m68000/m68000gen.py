@@ -630,6 +630,7 @@ class R(IntEnum):
     aluo = auto()
     dcr = auto()
     dcro = auto()
+    dcro8 = auto()
     ftu = auto()
     ir = auto()
     irc = auto()
@@ -664,14 +665,14 @@ regname = [
     None,
     "m_da[rx]", "m_da[rx]", "m_da[ry]", "m_da[ry]", "m_da[map_sp(m_irc >> 12)]", "m_da[m_sp]", "m_da[16]", "m_da[15]", "m_dt", "m_au", "m_at", "m_pc", "m_aob", "m_da[m_movems]",
     "m_da[rx]", "m_da[rx]", "m_da[ry]", "m_da[ry]", "m_da[map_sp(m_irc >> 12)]", "m_da[m_sp]", "m_da[16]", "m_da[15]", "m_dt", "m_au", "m_at", "m_pc", "m_aob", "m_da[m_movems]",
-    "m_alue", "m_alub", "m_dbin", "m_dbout", "m_aluo", "m_dcr", "m_dcro", "m_ftu", "m_ir", "m_irc", "m_ird", "m_edb", "m_sr", "m_movemr"
+    "m_alue", "m_alub", "m_dbin", "m_dbout", "m_aluo", "m_dcr", "m_dcro", "m_dcro8", "m_ftu", "m_ir", "m_irc", "m_ird", "m_edb", "m_sr", "m_movemr"
     ]
 
 regdep = [
     None,
     DEP.aregl, DEP.dregl, DEP.aregl, DEP.dregl, DEP.aregl|DEP.dregl|DEP.irc, DEP.aregl, DEP.aregl, DEP.aregl, DEP.dt, DEP.au, DEP.atl, DEP.pc, DEP.aob, DEP.aregl|DEP.dregl,
     DEP.aregh, DEP.dregh, DEP.aregh, DEP.dregh, DEP.aregh|DEP.dregh|DEP.irc, DEP.aregh, DEP.aregh, DEP.aregh, DEP.dt, DEP.au, DEP.ath, DEP.pc, DEP.aob, DEP.aregh|DEP.dregh,
-    DEP.alue, DEP.alub, DEP.dbin, 0, DEP.aluo, DEP.dcr, DEP.dcr, DEP.ftu, DEP.ir, DEP.irc, DEP.ird, 0, DEP.sr, 0
+    DEP.alue, DEP.alub, DEP.dbin, 0, DEP.aluo, DEP.dcr, DEP.dcr, DEP.dcr, DEP.ftu, DEP.ir, DEP.irc, DEP.ird, 0, DEP.sr, 0
     ]
     
 def reg_mergeable(rh, rl):
@@ -1252,7 +1253,7 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
     elif alu_to_dbd:
         dbd_in = R.aluo
     elif dcr_to_dbd:
-        dbd_in = R.dcro
+        dbd_in = R.dcro8 if is_byte else R.dcro
     else:
         dbd_in = None
 
@@ -1989,6 +1990,8 @@ def generate_source_from_code(code, gen_mode):
         if type(ci) != list:
             if ci == R.dcro:
                 return "1 << (m_dcr & 15)"
+            if ci == R.dcro8:
+                return "1 << (m_dcr & 7)"
             if ci == "ftu-i":
                 return "0xfff0 | ((m_next_state >> 23) & 0xe)"
             if ci == "ftu-ssw":
