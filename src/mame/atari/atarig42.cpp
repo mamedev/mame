@@ -13,15 +13,15 @@
 
     Note: Road Riot 4WD sports a communication link with another pcb allowing two players to
     to compete with each other. The way both pcbs communicate depends on the program version.
-        * The kit version use an optional com-link board consisting on an ADSP-2105 (10Mhz XTAL)
-          using the ADSP's serial port
+        * The kit version uses an optional com-link board consisting on an ADSP-2105 (10MHz XTAL)
+          routing game link data through the ADSP's serial port.
         * The dedicated twin cab version uses dual port ram to bridge the two pcbs together (not
           networked).
     
 	TODO:
         * ASIC65 for Road Riot not quite perfect
-        * Hook ADSP-2105 (and serial port) from com-link board for roadriot and roadriota
-        * Hook dual port ram and pcb comms for roadriotb
+        * Hook com-link board ADSP-2105 (and serial port) for roadriot and roadriota
+        * Hook dual port ram and dual pcb comms for roadriotb
 
 ***************************************************************************/
 
@@ -1003,8 +1003,8 @@ void atarig42_0x400_state::init_guardian()
  *
  *************************************/
 
-GAME( 1991, roadriot,  0,        atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (04 Dec 1991, Conversion Kit)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
-GAME( 1991, roadriota, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (13 Nov 1991, Conversion Kit)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
-GAME( 1991, roadriotb, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (04 Jun 1991, Dedicated Twin)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1991, roadriot,  0,        atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (04 Dec 1991, conversion kit)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1991, roadriota, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (13 Nov 1991, conversion kit)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
+GAME( 1991, roadriotb, roadriot, atarig42_0x200, roadriot, atarig42_0x200_state, init_roadriot, ROT0, "Atari Games", "Road Riot 4WD (04 Jun 1991, dedicated twin)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NODEVICE_LAN )
 GAME( 1992, dangerex,  0,        atarig42_0x400, dangerex, atarig42_0x400_state, init_dangerex, ROT0, "Atari Games", "Danger Express (prototype)", 0 )
 GAME( 1992, guardian,  0,        atarig42_0x400, guardian, atarig42_0x400_state, init_guardian, ROT0, "Atari Games", "Guardians of the 'Hood", 0 )
