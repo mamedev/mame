@@ -1806,7 +1806,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 //                                 IIII I       S S
 // LDW_S a,[b,c]                   0110 0bbb ccc1 0aaa
 // #######################################################################################################################
-						return handleop_LDW_S_a_b_c(op);  // a,[b,c]
+						return handleop_LDW_S_a_b_c(op);  // LDW_S a,[b,c]
 					}
 					case 0x03:
 					{
@@ -1852,7 +1852,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 //                                 IIII I       S S
 // ASR_S c,b,u3                    0110 1bbb ccc1 1uuu
 // #######################################################################################################################
-						return handleop_ASR_S_c_b_u3(op);  // ASR_S
+						return handleop_ASR_S_c_b_u3(op);  // ASR_S c,b,u3
 					}
 				}
 			}
@@ -1926,7 +1926,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 //                                 IIII I    sssS SSSS
 // J_S.D [b]                       0111 1bbb 0010 0000
 // #######################################################################################################################
-								return handleop_J_S_D_b(op);  // J_S.D
+								return handleop_J_S_D_b(op);  // J_S.D [b]
 							}
 							case 0x02:
 							{
@@ -1934,7 +1934,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 //                                 IIII I    sssS SSSS
 // JL_S [b]                        0111 1bbb 0100 0000
 // #######################################################################################################################
-								return handleop_JL_S_b(op);  // JL_S
+								return handleop_JL_S_b(op);  // JL_S [b]
 							}
 							case 0x03:
 							{
@@ -1942,7 +1942,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 //                                 IIII I    sssS SSSS
 // JL_S.D [b]                      0111 1bbb 0110 0000
 // #######################################################################################################################
-								return handleop_JL_S_D_b(op);  // JL_S.D
+								return handleop_JL_S_D_b(op);  // JL_S.D [b]
 							}
 							case 0x06:
 							{
@@ -1950,7 +1950,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // SUB_S.NE b,b,b                  0111 1bbb 1100 0000
 //                                 IIII I    sssS SSSS
 // #######################################################################################################################
-								return handleop_SUB_S_NE_b_b_b(op);  // SUB_S.NE
+								return handleop_SUB_S_NE_b_b_b(op);  // SUB_S.NE b,b,b
 							}
 							case 0x07: // ZOPs
 							{

@@ -95,7 +95,7 @@
 *                                                                                                                                   *
 ************************************************************************************************************************************/
 
-int arcompact_disassembler::handle00_00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_B_cc_D_s21(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	int size = 4;
 	// Branch Conditionally
@@ -110,7 +110,7 @@ int arcompact_disassembler::handle00_00_dasm(std::ostream &stream, offs_t pc, ui
 	return size;
 }
 
-int arcompact_disassembler::handle00_01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_B_D_s25(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	int size = 4;
 	// Branch Unconditionally Far
@@ -128,7 +128,7 @@ int arcompact_disassembler::handle00_01_dasm(std::ostream &stream, offs_t pc, ui
 	return size;
 }
 
-int arcompact_disassembler::handle01_00_00dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BL_cc_d_s21(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	int size = 4;
 
@@ -145,7 +145,7 @@ int arcompact_disassembler::handle01_00_00dasm(std::ostream &stream, offs_t pc, 
 	return size;
 }
 
-int arcompact_disassembler::handle01_00_01dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BL_d_s25(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	int size = 4;
 	// Branch and Link Unconditionally Far
@@ -211,42 +211,42 @@ int arcompact_disassembler::handle01_01_00_helper(std::ostream &stream, offs_t p
 
 
 // register - register cases
-int arcompact_disassembler::handle01_01_00_00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BREQ_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_00_helper( stream, pc, op, opcodes, "BREQ");
 }
 
-int arcompact_disassembler::handle01_01_00_01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BRNE_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_00_helper( stream, pc, op, opcodes, "BRNE");
 }
 
-int arcompact_disassembler::handle01_01_00_02_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BRLT_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_00_helper( stream, pc, op, opcodes, "BRLT");
 }
 
-int arcompact_disassembler::handle01_01_00_03_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BRGE_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_00_helper( stream, pc, op, opcodes, "BRGE");
 }
 
-int arcompact_disassembler::handle01_01_00_04_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BRLO_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_00_helper( stream, pc, op, opcodes, "BRLO");
 }
 
-int arcompact_disassembler::handle01_01_00_05_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BRHS_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_00_helper( stream, pc, op, opcodes, "BRHS");
 }
 
-int arcompact_disassembler::handle01_01_00_0e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BBIT0_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_00_helper( stream, pc, op, opcodes, "BBIT0");
 }
 
-int arcompact_disassembler::handle01_01_00_0f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BBIT1_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_00_helper( stream, pc, op, opcodes, "BBIT1");
 }
@@ -275,48 +275,48 @@ int arcompact_disassembler::handle01_01_01_helper(std::ostream &stream, offs_t p
 }
 
 // register -immediate cases
-int arcompact_disassembler::handle01_01_01_00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BREQ_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_01_helper(stream, pc, op, opcodes, "BREQ");
 }
 
-int arcompact_disassembler::handle01_01_01_01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BRNE_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_01_helper(stream, pc, op, opcodes, "BRNE");
 }
 
-int arcompact_disassembler::handle01_01_01_02_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BRLT_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_01_helper(stream, pc, op, opcodes, "BRLT");
 }
 
-int arcompact_disassembler::handle01_01_01_03_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BRGE_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_01_helper(stream, pc, op, opcodes, "BRGE");
 }
 
-int arcompact_disassembler::handle01_01_01_04_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BRLO_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_01_helper(stream, pc, op, opcodes, "BRLO");
 }
 
-int arcompact_disassembler::handle01_01_01_05_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BRHS_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_01_helper(stream, pc, op, opcodes, "BRHS");
 }
 
-int arcompact_disassembler::handle01_01_01_0e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BBIT0_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_01_helper(stream, pc, op, opcodes, "BBIT0");
 }
 
-int arcompact_disassembler::handle01_01_01_0f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BBIT1_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle01_01_01_helper(stream, pc, op, opcodes, "BBIT1");
 }
 
 
-int arcompact_disassembler::handle02_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_LD_r_o(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	// bitpos
 	// 1111 1111 1111 1111 0000 0000 0000 0000
@@ -359,7 +359,7 @@ int arcompact_disassembler::handle02_dasm(std::ostream &stream, offs_t pc, uint3
 	return size;
 }
 
-int arcompact_disassembler::handle03_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ST_r_o(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	int size = 4;
 	uint32_t limm = 0;
@@ -721,177 +721,177 @@ int arcompact_disassembler::handle04_helper_dasm(std::ostream &stream, offs_t pc
 	return 0;
 }
 
-int arcompact_disassembler::handle04_00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ADD(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "ADD", 0,0);
 }
 
-int arcompact_disassembler::handle04_01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ADC(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "ADC", 0,0);
 }
 
-int arcompact_disassembler::handle04_02_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_SUB(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "SUB", 0,0);
 }
 
-int arcompact_disassembler::handle04_03_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_SBC(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "SBC", 0,0);
 }
 
-int arcompact_disassembler::handle04_04_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_AND(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "AND", 0,0);
 }
 
-int arcompact_disassembler::handle04_05_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_OR(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "OR", 0,0);
 }
 
-int arcompact_disassembler::handle04_06_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BIC(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "BIC", 0,0);
 }
 
-int arcompact_disassembler::handle04_07_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_XOR(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "XOR", 0,0);
 }
 
-int arcompact_disassembler::handle04_08_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_MAX(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "MAX", 0,0);
 }
 
-int arcompact_disassembler::handle04_09_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_MIN(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "MIN", 0,0);
 }
 
 
-int arcompact_disassembler::handle04_0a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_MOV(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "MOV", 1,0);
 }
 
-int arcompact_disassembler::handle04_0b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_TST(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "TST", 1,0);
 }
 
-int arcompact_disassembler::handle04_0c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_CMP(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "CMP", 1,0);
 }
 
-int arcompact_disassembler::handle04_0d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_RCMP(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "RCMP", 1,0);
 }
 
-int arcompact_disassembler::handle04_0e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_RSUB(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "RSUB", 0,0);
 }
 
-int arcompact_disassembler::handle04_0f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BSET(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "BSET", 0,0);
 }
 
-int arcompact_disassembler::handle04_10_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BCLR(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "BCLR", 0,0);
 }
 
-int arcompact_disassembler::handle04_11_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BTST(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "BTST", 0,0);
 }
 
-int arcompact_disassembler::handle04_12_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BXOR(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "BXOR", 0,0);
 }
 
-int arcompact_disassembler::handle04_13_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BMSK(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "BMSK", 0,0);
 }
 
-int arcompact_disassembler::handle04_14_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ADD1(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "ADD1", 0,0);
 }
 
-int arcompact_disassembler::handle04_15_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ADD2(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "ADD2", 0,0);
 }
 
-int arcompact_disassembler::handle04_16_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ADD3(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "ADD3", 0,0);
 }
 
-int arcompact_disassembler::handle04_17_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_SUB1(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "SUB1", 0,0);
 }
 
-int arcompact_disassembler::handle04_18_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_SUB2(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "SUB2", 0,0);
 }
 
-int arcompact_disassembler::handle04_19_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_SUB3(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "SUB3", 0,0);
 }
 
-int arcompact_disassembler::handle04_1a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_MPY(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "MPY", 0,0);
 } // *
 
-int arcompact_disassembler::handle04_1b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_MPYH(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "MPYH", 0,0);
 } // *
 
-int arcompact_disassembler::handle04_1c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_MPYHU(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "MPYHU", 0,0);
 } // *
 
-int arcompact_disassembler::handle04_1d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_MPYU(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "MPYU", 0,0);
 } // *
 
 
 
-int arcompact_disassembler::handle04_20_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_Jcc(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "J", 1,1);
 }
 
 
 
-int arcompact_disassembler::handle04_21_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_Jcc_D(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "J.D", 1,1);
 }
 
-int arcompact_disassembler::handle04_22_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_JLcc(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "JL", 1,1);
 }
 
-int arcompact_disassembler::handle04_23_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_JLcc_D(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "JL.D", 1,1);
 }
@@ -899,7 +899,7 @@ int arcompact_disassembler::handle04_23_dasm(std::ostream &stream, offs_t pc, ui
 
 
 
-int arcompact_disassembler::handle04_28_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes) // LPcc (loop setup)
+int arcompact_disassembler::handle_dasm32_LP(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes) // LPcc (loop setup)
 {
 	COMMON32_GET_breg; // breg is reserved
 	COMMON32_GET_p;
@@ -946,7 +946,7 @@ int arcompact_disassembler::handle04_28_dasm(std::ostream &stream, offs_t pc, ui
 		else \
 			util::stream_format(stream, "[%03x]", auxreg);
 
-int arcompact_disassembler::handle04_2a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)  // Load FROM Auxiliary register TO register
+int arcompact_disassembler::handle_dasm32_LR(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)  // Load FROM Auxiliary register TO register
 {
 	//           pp        F
 	// 0010 0bbb 0010 1010 0BBB CCCC CCRR RRRR
@@ -1029,7 +1029,7 @@ int arcompact_disassembler::handle04_2a_dasm(std::ostream &stream, offs_t pc, ui
 	return size;
 }
 
-int arcompact_disassembler::handle04_2b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)  // Store TO Auxiliary register FROM register
+int arcompact_disassembler::handle_dasm32_SR(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)  // Store TO Auxiliary register FROM register
 {
 	// code at ~ 40073DFE in leapster bios is manually setting up a loop this way
 	// rather than using the lPcc opcode
@@ -1119,7 +1119,7 @@ int arcompact_disassembler::handle04_2b_dasm(std::ostream &stream, offs_t pc, ui
 	return size;}
 
 
-int arcompact_disassembler::handle04_29_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_FLAG(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	// leapster bios uses formats for FLAG that are not defined, bug I guess work anyway (P modes 0 / 1)
 	return handle04_helper_dasm(stream, pc, op, opcodes, "FLAG", 1,1);
@@ -1186,101 +1186,101 @@ int arcompact_disassembler::handle04_2f_helper_dasm(std::ostream &stream, offs_t
 }
 
 
-int arcompact_disassembler::handle04_2f_00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ASL_single(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "ASL");
 } // ASL
 
-int arcompact_disassembler::handle04_2f_01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ASR_single(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "ASR");
 } // ASR
 
-int arcompact_disassembler::handle04_2f_02_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_LSR_single(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "LSR");
 } // LSR
 
-int arcompact_disassembler::handle04_2f_03_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ROR_single(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "ROR");
 } // ROR
 
-int arcompact_disassembler::handle04_2f_04_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_RRC(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "RCC");
 } // RCC
 
-int arcompact_disassembler::handle04_2f_05_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_SEXB(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "SEXB");
 } // SEXB
 
-int arcompact_disassembler::handle04_2f_06_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_SEXW(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "SEXW");
 } // SEXW
 
-int arcompact_disassembler::handle04_2f_07_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_EXTB(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "EXTB");
 } // EXTB
 
 
-int arcompact_disassembler::handle04_2f_08_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_EXTW(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "EXTW");
 } // EXTW
 
 
 
-int arcompact_disassembler::handle04_2f_09_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ABS(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "ABS");
 } // ABS
 
-int arcompact_disassembler::handle04_2f_0a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_NOT(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "NOT");
 } // NOT
 
-int arcompact_disassembler::handle04_2f_0b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_RLC(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "RCL");
 } // RLC
 
-int arcompact_disassembler::handle04_2f_0c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_EX(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "EX");
 } // EX
 
 
 
-int arcompact_disassembler::handle04_2f_3f_01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_SLEEP(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	util::stream_format( stream, "SLEEP (%08x)", op);
 	return 4;
 }
 
-int arcompact_disassembler::handle04_2f_3f_02_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_SWI(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	util::stream_format( stream, "SWI / TRAP0 (%08x)", op);
 	return 4;
 }
 
-int arcompact_disassembler::handle04_2f_3f_03_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_SYNC(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	util::stream_format( stream, "SYNC (%08x)", op);
 	return 4;
 }
 
-int arcompact_disassembler::handle04_2f_3f_04_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_RTIE(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	util::stream_format( stream, "RTIE (%08x)", op);
 	return 4;
 }
 
-int arcompact_disassembler::handle04_2f_3f_05_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_BRK(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	util::stream_format( stream, "BRK (%08x)", op);
 	return 4;
@@ -1351,44 +1351,44 @@ int arcompact_disassembler::handle04_3x_helper_dasm(std::ostream &stream, offs_t
 
 }
 
-int arcompact_disassembler::handle04_30_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_LD_0(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_3x_helper_dasm(stream, pc, op, opcodes,0,0);
 }
 
 // ZZ value of 0x0 with X of 1 is illegal
-int arcompact_disassembler::handle04_31_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_LD_1(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_3x_helper_dasm(stream, pc, op, opcodes,0,1);
 }
 
-int arcompact_disassembler::handle04_32_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_LD_2(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_3x_helper_dasm(stream, pc, op, opcodes,1,0);
 }
 
-int arcompact_disassembler::handle04_33_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_LD_3(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_3x_helper_dasm(stream, pc, op, opcodes,1,1);
 }
 
-int arcompact_disassembler::handle04_34_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_LD_4(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_3x_helper_dasm(stream, pc, op, opcodes,2,0);
 }
 
-int arcompact_disassembler::handle04_35_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_LD_5(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_3x_helper_dasm(stream, pc, op, opcodes,2,1);
 }
 
 // ZZ value of 0x3 is illegal
-int arcompact_disassembler::handle04_36_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_LD_6(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_3x_helper_dasm(stream, pc, op, opcodes,3,0);
 }
 
-int arcompact_disassembler::handle04_37_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_LD_7(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_3x_helper_dasm(stream, pc, op, opcodes,3,1);
 }
@@ -1399,47 +1399,47 @@ int arcompact_disassembler::handle04_37_dasm(std::ostream &stream, offs_t pc, ui
 
 
 
-int arcompact_disassembler::handle05_00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ASL_multiple(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "ASL", 0,0);
 }
 
-int arcompact_disassembler::handle05_01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_LSR_multiple(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "LSR", 0,0);
 }
 
-int arcompact_disassembler::handle05_02_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ASR_multiple(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "ASR", 0,0);
 }
 
-int arcompact_disassembler::handle05_03_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ROR_multiple(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "ROR", 0,0);
 }
 
-int arcompact_disassembler::handle05_04_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_MUL64(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "MUL64", 2,0);
 } // special
 
-int arcompact_disassembler::handle05_05_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_MULU64(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "MULU64", 2,0);
 } // special
 
-int arcompact_disassembler::handle05_06_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ADDS(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "ADDS", 0,0);
 }
 
-int arcompact_disassembler::handle05_07_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_SUBS(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "SUBS", 0,0);
 }
 
-int arcompact_disassembler::handle05_08_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_DIVAW(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "DIVAW", 0,0);
 }
@@ -1447,23 +1447,23 @@ int arcompact_disassembler::handle05_08_dasm(std::ostream &stream, offs_t pc, ui
 
 
 
-int arcompact_disassembler::handle05_0a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ASLS(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "ASLS", 0,0);
 }
 
-int arcompact_disassembler::handle05_0b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ASRS(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "ASRS", 0,0);
 }
 
 
-int arcompact_disassembler::handle05_28_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ADDSDW(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "ADDSDW", 0,0);
 }
 
-int arcompact_disassembler::handle05_29_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_SUBSDW(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "SUBSDW", 0,0);
 }
@@ -1527,84 +1527,84 @@ int arcompact_disassembler::handle05_2f_0x_helper_dasm(std::ostream &stream, off
 }
 
 
-int arcompact_disassembler::handle05_2f_00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_SWAP(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle05_2f_0x_helper_dasm(stream, pc, op, opcodes, "SWAP");
 }
 
-int arcompact_disassembler::handle05_2f_01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_NORM(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle05_2f_0x_helper_dasm(stream, pc, op, opcodes, "NORM");
 }
 
-int arcompact_disassembler::handle05_2f_02_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_SAT16(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle05_2f_0x_helper_dasm(stream, pc, op, opcodes, "SAT16");
 }
 
-int arcompact_disassembler::handle05_2f_03_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_RND16(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle05_2f_0x_helper_dasm(stream, pc, op, opcodes, "RND16");
 }
 
-int arcompact_disassembler::handle05_2f_04_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ABSSW(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle05_2f_0x_helper_dasm(stream, pc, op, opcodes, "ABSSW");
 }
 
-int arcompact_disassembler::handle05_2f_05_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ABSS(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle05_2f_0x_helper_dasm(stream, pc, op, opcodes, "ABSS");
 }
 
-int arcompact_disassembler::handle05_2f_06_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_NEGSW(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle05_2f_0x_helper_dasm(stream, pc, op, opcodes, "NEGSW");
 }
 
-int arcompact_disassembler::handle05_2f_07_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_NEGS(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle05_2f_0x_helper_dasm(stream, pc, op, opcodes, "NEGS");
 }
 
-int arcompact_disassembler::handle05_2f_08_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_NORMW(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle05_2f_0x_helper_dasm(stream, pc, op, opcodes, "NORMW");
 }
 
 
 
-int arcompact_disassembler::handle06_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ARC_EXT06(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	util::stream_format( stream, "op a,b,c (06 ARC ext) (%08x)", op );
 	return 4;
 }
 
-int arcompact_disassembler::handle07_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_USER_EXT07(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	util::stream_format( stream, "op a,b,c (07 User ext) (%08x)", op );
 	return 4;
 }
 
-int arcompact_disassembler::handle08_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_USER_EXT08(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	util::stream_format( stream, "op a,b,c (08 User ext) (%08x)", op );
 	return 4;
 }
 
-int arcompact_disassembler::handle09_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_MARKET_EXT09(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	util::stream_format( stream, "op a,b,c (09 Market ext) (%08x)", op );
 	return 4;
 }
 
-int arcompact_disassembler::handle0a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_MARKET_EXT0a(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	util::stream_format( stream, "op a,b,c (0a Market ext) (%08x)",  op );
 	return 4;
 }
 
-int arcompact_disassembler::handle0b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_MARKET_EXT0b(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	util::stream_format( stream, "op a,b,c (0b Market ext) (%08x)",  op );
 	return 4;
@@ -1632,22 +1632,22 @@ int arcompact_disassembler::handle0c_helper_dasm(std::ostream &stream, offs_t pc
 }
 
 
-int arcompact_disassembler::handle0c_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_LD_S_a_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0c_helper_dasm(stream, pc, op, opcodes, "LD_S", 0);
 }
 
-int arcompact_disassembler::handle0c_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_LDB_S_a_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0c_helper_dasm(stream, pc, op, opcodes, "LDB_S", 0);
 }
 
-int arcompact_disassembler::handle0c_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handleop_dasm_LDW_S_a_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0c_helper_dasm(stream, pc, op, opcodes, "LDW_S", 0);
 }
 
-int arcompact_disassembler::handle0c_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ADD_S_a_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0c_helper_dasm(stream, pc, op, opcodes, "ADD_S", 1);
 }
@@ -1669,22 +1669,22 @@ int arcompact_disassembler::handle0d_helper_dasm(std::ostream &stream, offs_t pc
 }
 
 
-int arcompact_disassembler::handle0d_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ADD_S_c_b_u3(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0d_helper_dasm(stream, pc, op, opcodes, "ADD_S");
 }
 
-int arcompact_disassembler::handle0d_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_SUB_S_c_b_u3(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0d_helper_dasm(stream, pc, op, opcodes, "SUB_S");
 }
 
-int arcompact_disassembler::handle0d_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ASL_S_c_b_u3(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0d_helper_dasm(stream, pc, op, opcodes, "ASL_S");
 }
 
-int arcompact_disassembler::handle0d_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ASR_S_c_b_u3(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0d_helper_dasm(stream, pc, op, opcodes, "ASR_S");
 }
@@ -1719,22 +1719,22 @@ int arcompact_disassembler::handle0e_0x_helper_dasm(std::ostream &stream, offs_t
 
 }
 
-int arcompact_disassembler::handle0e_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ADD_S_b_b_h_or_limm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0e_0x_helper_dasm(stream, pc, op, opcodes, "ADD_S", 0);
 }
 
-int arcompact_disassembler::handle0e_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_MOV_S_b_h_or_limm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0e_0x_helper_dasm(stream, pc, op, opcodes, "MOV_S", 0);
 }
 
-int arcompact_disassembler::handle0e_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_CMP_S_b_h_or_limm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0e_0x_helper_dasm(stream, pc, op, opcodes, "CMP_S", 0);
 }
 
-int arcompact_disassembler::handle0e_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_MOV_S_hob(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0e_0x_helper_dasm(stream, pc, op, opcodes, "MOV_S", 1);
 }
@@ -1756,27 +1756,27 @@ int arcompact_disassembler::handle0f_00_0x_helper_dasm(std::ostream &stream, off
 
 
 
-int arcompact_disassembler::handle0f_00_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_J_S_b(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_00_0x_helper_dasm(stream, pc, op, opcodes, "J_S");
 }
 
-int arcompact_disassembler::handle0f_00_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_J_S_D_b(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_00_0x_helper_dasm(stream, pc, op, opcodes, "J_S.D");
 }
 
-int arcompact_disassembler::handle0f_00_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_JL_S_b(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_00_0x_helper_dasm(stream, pc, op, opcodes, "JL_S");
 }
 
-int arcompact_disassembler::handle0f_00_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_JL_S_D_b(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_00_0x_helper_dasm(stream, pc, op, opcodes, "JL_S.D");
 }
 
-int arcompact_disassembler::handle0f_00_06_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_SUB_S_NE_b_b_b(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_00_0x_helper_dasm(stream, pc, op, opcodes, "SUB_S.NE");
 }
@@ -1786,32 +1786,32 @@ int arcompact_disassembler::handle0f_00_06_dasm(std::ostream &stream, offs_t pc,
 
 
 // Zero parameters (ZOP)
-int arcompact_disassembler::handle0f_00_07_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_NOP_S(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	util::stream_format( stream, "NOP_S"); return 2;
 }
 
-int arcompact_disassembler::handle0f_00_07_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_UNIMP_S(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	util::stream_format( stream, "UNIMP_S"); return 2;
 } // Unimplemented Instruction, same as illegal, but recommended to fill blank space
 
-int arcompact_disassembler::handle0f_00_07_04_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_JEQ_S_blink(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	util::stream_format( stream, "JEQ_S [blink]"); return 2;
 }
 
-int arcompact_disassembler::handle0f_00_07_05_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_JNE_S_blink(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	util::stream_format( stream, "JNE_S [blink]"); return 2;
 }
 
-int arcompact_disassembler::handle0f_00_07_06_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_J_S_blink(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	util::stream_format( stream, "J_S [blink]"); return 2;
 }
 
-int arcompact_disassembler::handle0f_00_07_07_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_J_S_D_blink(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	util::stream_format( stream, "J_S.D [blink]"); return 2;
 }
@@ -1838,131 +1838,131 @@ int arcompact_disassembler::handle0f_0x_helper_dasm(std::ostream &stream, offs_t
 	return 2;
 }
 
-int arcompact_disassembler::handle0f_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_SUB_S_b_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "SUB_S",0);
 }
 
-int arcompact_disassembler::handle0f_04_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_AND_S_b_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "AND_S",0);
 }
 
-int arcompact_disassembler::handle0f_05_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_OR_S_b_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "OR_S",0);
 }
 
-int arcompact_disassembler::handle0f_06_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_BIC_S_b_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "BIC_S",0);
 }
 
-int arcompact_disassembler::handle0f_07_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_XOR_S_b_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "XOR_S",0);
 }
 
-int arcompact_disassembler::handle0f_0b_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_TST_S_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "TST_S",1);
 }
 
-int arcompact_disassembler::handle0f_0c_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_MUL64_S_0_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "MUL64_S",2);
 } // actual destination is special multiply registers
 
-int arcompact_disassembler::handle0f_0d_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_SEXB_S_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "SEXB_S",0);
 }
 
-int arcompact_disassembler::handle0f_0e_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_SEXW_S_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "SEXW_S",0);
 }
 
-int arcompact_disassembler::handle0f_0f_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_EXTB_S_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "EXTB_S",0);
 }
 
-int arcompact_disassembler::handle0f_10_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_EXTW_S_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "EXTW_S",0);
 }
 
-int arcompact_disassembler::handle0f_11_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ABS_S_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "ABS_S",0);
 }
 
-int arcompact_disassembler::handle0f_12_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_NOT_S_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "NOT_S",0);
 }
 
-int arcompact_disassembler::handle0f_13_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_NEG_S_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "NEG_S",0);
 }
 
-int arcompact_disassembler::handle0f_14_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ADD1_S_b_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "ADD1_S",0);
 }
 
-int arcompact_disassembler::handle0f_15_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ADD2_S_b_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "ADD2_S",0);
 }
 
-int arcompact_disassembler::handle0f_16_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ADD3_S_b_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "ADD3_S",0);
 }
 
-int arcompact_disassembler::handle0f_18_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ASL_S_b_b_c_multiple(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "ASL_S",0);
 }
 
-int arcompact_disassembler::handle0f_19_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_LSR_S_b_b_c_multiple(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "LSR_S",0);
 }
 
-int arcompact_disassembler::handle0f_1a_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ASR_S_b_b_c_multiple(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "ASR_S",0);
 }
 
-int arcompact_disassembler::handle0f_1b_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ASL_S_b_c_single(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "ASL1_S",0);
 }
 
-int arcompact_disassembler::handle0f_1c_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ASR_S_b_c_single(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "ASR1_S",0);
 }
 
-int arcompact_disassembler::handle0f_1d_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_LSR_S_b_c_single(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "LSR1_S",0);
 }
 
 
 
-int arcompact_disassembler::handle0f_1e_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)  // special
+int arcompact_disassembler::handle_dasm_TRAP_S_u6(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)  // special
 { // 0111 1uuu uuu1 1110
 	int u = (op & 0x07e0)>>5;
 	util::stream_format( stream, "TRAP_S %02x",u);
 	return 2;
 }
 
-int arcompact_disassembler::handle0f_1f_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)  // special
+int arcompact_disassembler::handle_dasm_BRK_S(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)  // special
 {
 	int u = (op & 0x07e0)>>5; op &= ~0x07e0;
 
@@ -1998,37 +1998,37 @@ int arcompact_disassembler::handle_ld_helper_dasm(std::ostream &stream, offs_t p
 }
 
 
-int arcompact_disassembler::handle10_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_LD_S_c_b_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle_ld_helper_dasm(stream, pc, op, opcodes, "LD_S", 2, 0);
 }
 
-int arcompact_disassembler::handle11_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_LDB_S_c_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle_ld_helper_dasm(stream, pc, op, opcodes, "LDB_S", 0, 0);
 }
 
-int arcompact_disassembler::handle12_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_LDW_S_c_b_u6(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle_ld_helper_dasm(stream, pc, op, opcodes, "LDW_S", 1, 0);
 }
 
-int arcompact_disassembler::handle13_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_LDW_S_X_c_b_u6(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle_ld_helper_dasm(stream, pc, op, opcodes, "LDW_S.X", 1, 0);
 }
 
-int arcompact_disassembler::handle14_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ST_S_c_b_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle_ld_helper_dasm(stream, pc, op, opcodes, "ST_S", 2, 1);
 }
 
-int arcompact_disassembler::handle15_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_STB_S_c_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle_ld_helper_dasm(stream, pc, op, opcodes, "STB_S", 0, 1);
 }
 
-int arcompact_disassembler::handle16_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_STW_S_c_b_u6(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle_ld_helper_dasm(stream, pc, op, opcodes, "STW_S", 1, 1);
 }
@@ -2049,42 +2049,42 @@ int arcompact_disassembler::handle_l7_0x_helper_dasm(std::ostream &stream, offs_
 
 }
 
-int arcompact_disassembler::handle17_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ASL_S_b_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle_l7_0x_helper_dasm(stream, pc, op, opcodes, "ASL_S");
 }
 
-int arcompact_disassembler::handle17_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_LSR_S_b_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle_l7_0x_helper_dasm(stream, pc, op, opcodes, "LSR_S");
 }
 
-int arcompact_disassembler::handle17_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ASR_S_b_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle_l7_0x_helper_dasm(stream, pc, op, opcodes, "ASR_S");
 }
 
-int arcompact_disassembler::handle17_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_SUB_S_b_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle_l7_0x_helper_dasm(stream, pc, op, opcodes, "SUB_S");
 }
 
-int arcompact_disassembler::handle17_04_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_BSET_S_b_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle_l7_0x_helper_dasm(stream, pc, op, opcodes, "BSET_S");
 }
 
-int arcompact_disassembler::handle17_05_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_BCLR_S_b_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle_l7_0x_helper_dasm(stream, pc, op, opcodes, "BCLR_S");
 }
 
-int arcompact_disassembler::handle17_06_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_BMSK_S_b_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle_l7_0x_helper_dasm(stream, pc, op, opcodes, "BSMK_S");
 }
 
-int arcompact_disassembler::handle17_07_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_BTST_S_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle_l7_0x_helper_dasm(stream, pc, op, opcodes, "BTST_S");
 }
@@ -2112,33 +2112,33 @@ int arcompact_disassembler::handle18_0x_helper_dasm(std::ostream &stream, offs_t
 	return 2;
 }
 
-int arcompact_disassembler::handle18_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_LD_S_b_sp_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle18_0x_helper_dasm(stream, pc, op, opcodes, "LD_S", 0,0);
 }
 
-int arcompact_disassembler::handle18_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_LDB_S_b_sp_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle18_0x_helper_dasm(stream, pc, op, opcodes, "LDB_S", 0,0);
 }
 
-int arcompact_disassembler::handle18_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ST_S_b_sp_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle18_0x_helper_dasm(stream, pc, op, opcodes, "ST_S", 1,0);
 }
 
-int arcompact_disassembler::handle18_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_STB_S_b_sp_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle18_0x_helper_dasm(stream, pc, op, opcodes, "STB_S", 1,0);
 }
 
-int arcompact_disassembler::handle18_04_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ADD_S_b_sp_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle18_0x_helper_dasm(stream, pc, op, opcodes, "ADD_S", 1,1); // check format
 }
 
 // op bits remaining for 0x18_05_xx subgroups 0x001f
-int arcompact_disassembler::handle18_05_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ADD_S_sp_sp_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	int u;
 	COMMON16_GET_u5;
@@ -2148,7 +2148,7 @@ int arcompact_disassembler::handle18_05_00_dasm(std::ostream &stream, offs_t pc,
 
 }
 
-int arcompact_disassembler::handle18_05_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_SUB_S_sp_sp_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	int u;
 	COMMON16_GET_u5;
@@ -2158,7 +2158,7 @@ int arcompact_disassembler::handle18_05_01_dasm(std::ostream &stream, offs_t pc,
 }
 
 // op bits remaining for 0x18_06_xx subgroups 0x0700
-int arcompact_disassembler::handle18_06_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_POP_S_b(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	int breg;
 	COMMON16_GET_breg
@@ -2169,7 +2169,7 @@ int arcompact_disassembler::handle18_06_01_dasm(std::ostream &stream, offs_t pc,
 	return 2;
 }
 
-int arcompact_disassembler::handle18_06_11_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_POP_S_blink(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	int res = (op & 0x0700) >> 8;
 	op &= ~0x0700; // all bits now used
@@ -2183,7 +2183,7 @@ int arcompact_disassembler::handle18_06_11_dasm(std::ostream &stream, offs_t pc,
 }
 
 // op bits remaining for 0x18_07_xx subgroups 0x0700
-int arcompact_disassembler::handle18_07_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_PUSH_S_b(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	int breg;
 	COMMON16_GET_breg
@@ -2195,7 +2195,7 @@ int arcompact_disassembler::handle18_07_01_dasm(std::ostream &stream, offs_t pc,
 }
 
 
-int arcompact_disassembler::handle18_07_11_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_PUSH_S_blink(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	int res = (op & 0x0700) >> 8;
 	op &= ~0x0700; // all bits now used
@@ -2231,28 +2231,28 @@ int arcompact_disassembler::handle19_0x_helper_dasm(std::ostream &stream, offs_t
 	return 2;
 }
 
-int arcompact_disassembler::handle19_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_LD_S_r0_gp_s11(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle19_0x_helper_dasm(stream, pc, op, opcodes, "LD_S", 2, 0);
 }
 
-int arcompact_disassembler::handle19_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_LDB_S_r0_gp_s9(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle19_0x_helper_dasm(stream, pc, op, opcodes, "LDB_S", 0, 0);
 }
 
-int arcompact_disassembler::handle19_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_LDW_S_r0_gp_s10(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle19_0x_helper_dasm(stream, pc, op, opcodes, "LDW_S", 1, 0);
 }
 
-int arcompact_disassembler::handle19_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ADD_S_r0_gp_s11(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle19_0x_helper_dasm(stream, pc, op, opcodes, "ADD_S", 2, 1);
 }
 
 
-int arcompact_disassembler::handle1a_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_LD_S_b_pcl_u10(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	int breg, u;
 	COMMON16_GET_breg;
@@ -2264,7 +2264,7 @@ int arcompact_disassembler::handle1a_dasm(std::ostream &stream, offs_t pc, uint1
 	return 2;
 }
 
-int arcompact_disassembler::handle1b_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_MOV_S_b_u8(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	int breg, u;
 	COMMON16_GET_breg;
@@ -2275,7 +2275,7 @@ int arcompact_disassembler::handle1b_dasm(std::ostream &stream, offs_t pc, uint1
 	return 2;
 }
 
-int arcompact_disassembler::handle1c_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_ADD_S_b_b_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	int breg, u;
 	COMMON16_GET_breg;
@@ -2286,7 +2286,7 @@ int arcompact_disassembler::handle1c_00_dasm(std::ostream &stream, offs_t pc, ui
 	return 2;
 }
 
-int arcompact_disassembler::handle1c_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_CMP_S_b_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	int breg, u;
 	COMMON16_GET_breg;
@@ -2311,12 +2311,12 @@ int arcompact_disassembler::handle1d_helper_dasm(std::ostream &stream, offs_t pc
 }
 
 
-int arcompact_disassembler::handle1d_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_BREQ_S_b_0_s8(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle1d_helper_dasm(stream, pc, op, opcodes,"BREQ_S");
 }
 
-int arcompact_disassembler::handle1d_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_BRNE_S_b_0_s8(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle1d_helper_dasm(stream, pc, op, opcodes,"BRNE_S");
 }
@@ -2334,17 +2334,17 @@ int arcompact_disassembler::handle1e_0x_helper_dasm(std::ostream &stream, offs_t
 
 
 
-int arcompact_disassembler::handle1e_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_B_S_s10(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle1e_0x_helper_dasm(stream, pc, op, opcodes, "B_S");
 }
 
-int arcompact_disassembler::handle1e_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_BEQ_S_s10(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle1e_0x_helper_dasm(stream, pc, op, opcodes, "BEQ_S");
 }
 
-int arcompact_disassembler::handle1e_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_BNE_S_s10(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle1e_0x_helper_dasm(stream, pc, op, opcodes, "BNE_S");
 }
@@ -2359,48 +2359,48 @@ int arcompact_disassembler::handle1e_03_0x_helper_dasm(std::ostream &stream, off
 	return 2;
 }
 
-int arcompact_disassembler::handle1e_03_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_BGT_S_s7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle1e_03_0x_helper_dasm(stream, pc, op, opcodes, "BGT_S");
 }
 
-int arcompact_disassembler::handle1e_03_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_BGE_S_s7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle1e_03_0x_helper_dasm(stream, pc, op, opcodes, "BGE_S");
 }
 
-int arcompact_disassembler::handle1e_03_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_BLT_S_s7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle1e_03_0x_helper_dasm(stream, pc, op, opcodes, "BLT_S");
 }
 
-int arcompact_disassembler::handle1e_03_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_BLE_S_s7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle1e_03_0x_helper_dasm(stream, pc, op, opcodes, "BLE_S");
 }
 
-int arcompact_disassembler::handle1e_03_04_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_BHI_S_s7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle1e_03_0x_helper_dasm(stream, pc, op, opcodes, "BHI_S");
 }
 
-int arcompact_disassembler::handle1e_03_05_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_BHS_S_s7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle1e_03_0x_helper_dasm(stream, pc, op, opcodes, "BHS_S");
 }
 
-int arcompact_disassembler::handle1e_03_06_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_BLO_S_s7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle1e_03_0x_helper_dasm(stream, pc, op, opcodes, "BLO_S");
 }
 
-int arcompact_disassembler::handle1e_03_07_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_BLS_S_s7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle1e_03_0x_helper_dasm(stream, pc, op, opcodes, "BLS_S");
 }
 
 
-int arcompact_disassembler::handle1f_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_BL_S_s13(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	int s = (op & 0x07ff) >> 0; op &= ~0x07ff;
 	if (s & 0x400) s = -0x400 + (s & 0x3ff);
@@ -2415,2340 +2415,39 @@ int arcompact_disassembler::handle1f_dasm(std::ostream &stream, offs_t pc, uint1
 *                                                                                                                                   *
 ************************************************************************************************************************************/
 
-int arcompact_disassembler::handle01_01_00_06_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 01_01_00_06> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle01_01_00_07_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 01_01_00_07> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle01_01_00_08_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 01_01_00_08> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle01_01_00_09_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 01_01_00_09> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle01_01_00_0a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 01_01_00_0a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle01_01_00_0b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 01_01_00_0b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle01_01_00_0c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 01_01_00_0c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle01_01_00_0d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 01_01_00_0d> (%08x)", op);
-	return 4;
-}
-
-
-int arcompact_disassembler::handle01_01_01_06_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 01_01_01_06> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle01_01_01_07_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 01_01_01_07> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle01_01_01_08_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 01_01_01_08> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle01_01_01_09_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 01_01_01_09> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle01_01_01_0a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 01_01_01_0a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle01_01_01_0b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 01_01_01_0b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle01_01_01_0c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 01_01_01_0c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle01_01_01_0d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 01_01_01_0d> (%08x)", op);
-	return 4;
-}
-
-
-
-int arcompact_disassembler::handle04_1e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_1e> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_1f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_1f> (%08x)", op);
-	return 4;
-}
-
-
-int arcompact_disassembler::handle04_24_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_24> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_25_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_25> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_26_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_26> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_27_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_27> (%08x)", op);
-	return 4;
-}
-
-
-int arcompact_disassembler::handle04_2c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2e> (%08x)", op);
-	return 4;
-}
-
-
-int arcompact_disassembler::handle04_2f_0d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_0d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_0e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_0e> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_0f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_0f> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_10_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_10> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_11_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_11> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_12_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_12> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_13_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_13> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_14_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_14> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_15_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_15> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_16_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_16> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_17_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_17> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_18_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_18> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_19_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_19> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_1a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_1a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_1b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_1b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_1c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_1c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_1d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_1d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_1e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_1e> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_1f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_1f> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_20_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_20> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_21_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_21> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_22_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_22> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_23_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_23> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_24_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_24> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_25_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_25> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_26_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_26> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_27_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_27> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_28_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_28> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_29_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_29> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_2a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_2a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_2b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_2b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_2c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_2c> (%08x)", op);
-	return 4;
-}
 
-int arcompact_disassembler::handle04_2f_2d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_2d> (%08x)", op);
-	return 4;
-}
 
-int arcompact_disassembler::handle04_2f_2e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_illegal(std::ostream& stream, offs_t pc, uint8_t param1, uint8_t param2, uint16_t op, const data_buffer& opcodes)
 {
-	util::stream_format(stream, "<illegal 0x04_2f_2e> (%08x)", op);
-	return 4;
+	return 2;
 }
-
-int arcompact_disassembler::handle04_2f_2f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_illegal(std::ostream& stream, offs_t pc, uint8_t param1, uint8_t param2, uint8_t param3, uint16_t op, const data_buffer& opcodes)
 {
-	util::stream_format(stream, "<illegal 0x04_2f_2f> (%08x)", op);
-	return 4;
+	return 2;
 }
-
-int arcompact_disassembler::handle04_2f_30_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_illegal(std::ostream& stream, offs_t pc, uint8_t param1, uint8_t param2, uint8_t param3, uint8_t param4, uint16_t op, const data_buffer& opcodes)
 {
-	util::stream_format(stream, "<illegal 0x04_2f_30> (%08x)", op);
-	return 4;
+	util::stream_format(stream, "<illegal 0x%02x_%02x_%02x_%02x> (%04x)\n", param1, param2, param3, param4, op);
+	return 2;
 }
 
-int arcompact_disassembler::handle04_2f_31_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_illegal(std::ostream& stream, offs_t pc, uint8_t param1, uint8_t param2, uint32_t op, const data_buffer& opcodes)
 {
-	util::stream_format(stream, "<illegal 0x04_2f_31> (%08x)", op);
 	return 4;
-}
 
-int arcompact_disassembler::handle04_2f_32_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_32> (%08x)", op);
-	return 4;
 }
-
-int arcompact_disassembler::handle04_2f_33_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_illegal(std::ostream& stream, offs_t pc, uint8_t param1, uint8_t param2, uint8_t param3, uint32_t op, const data_buffer& opcodes)
 {
-	util::stream_format(stream, "<illegal 0x04_2f_33> (%08x)", op);
 	return 4;
-}
 
-int arcompact_disassembler::handle04_2f_34_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_34> (%08x)", op);
-	return 4;
 }
-
-int arcompact_disassembler::handle04_2f_35_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_illegal(std::ostream& stream, offs_t pc, uint8_t param1, uint8_t param2, uint8_t param3, uint8_t param4, uint32_t op, const data_buffer& opcodes)
 {
-	util::stream_format(stream, "<illegal 0x04_2f_35> (%08x)", op);
 	return 4;
-}
 
-int arcompact_disassembler::handle04_2f_36_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_36> (%08x)", op);
-	return 4;
 }
 
-int arcompact_disassembler::handle04_2f_37_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_reserved(std::ostream& stream, offs_t pc, uint8_t param1, uint8_t param2, uint8_t param3, uint8_t param4, uint32_t op, const data_buffer& opcodes)
 {
-	util::stream_format(stream, "<illegal 0x04_2f_37> (%08x)", op);
 	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_38_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_38> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_39_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_39> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3e> (%08x)", op);
-	return 4;
-}
-
-
-
-
-int arcompact_disassembler::handle05_2f_09_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_09> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_0a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_0a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_0b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_0b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_0c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_0c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_0d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_0d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_0e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_0e> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_0f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_0f> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_10_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_10> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_11_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_11> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_12_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_12> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_13_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_13> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_14_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_14> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_15_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_15> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_16_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_16> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_17_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_17> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_18_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_18> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_19_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_19> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_1a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_1a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_1b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_1b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_1c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_1c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_1d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_1d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_1e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_1e> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_1f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_1f> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_20_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_20> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_21_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_21> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_22_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_22> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_23_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_23> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_24_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_24> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_25_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_25> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_26_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_26> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_27_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_27> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_28_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_28> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_29_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_29> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_2a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_2a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_2b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_2b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_2c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_2c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_2d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_2d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_2e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_2e> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_2f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_2f> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_30_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_30> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_31_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_31> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_32_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_32> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_33_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_33> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_34_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_34> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_35_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_35> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_36_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_36> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_37_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_37> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_38_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_38> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_39_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_39> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3e> (%08x)", op);
-	return 4;
-}
-
-
-
-int arcompact_disassembler::handle04_2f_3f_00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_00> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_06_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_06> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_07_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_07> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_08_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_08> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_09_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_09> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_0a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_0a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_0b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_0b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_0c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_0c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_0d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_0d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_0e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_0e> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_0f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_0f> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_10_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_10> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_11_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_11> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_12_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_12> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_13_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_13> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_14_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_14> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_15_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_15> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_16_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_16> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_17_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_17> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_18_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_18> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_19_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_19> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_1a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_1a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_1b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_1b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_1c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_1c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_1d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_1d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_1e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_1e> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_1f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_1f> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_20_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_20> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_21_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_21> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_22_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_22> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_23_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_23> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_24_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_24> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_25_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_25> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_26_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_26> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_27_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_27> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_28_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_28> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_29_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_29> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_2a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_2a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_2b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_2b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_2c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_2c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_2d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_2d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_2e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_2e> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_2f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_2f> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_30_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_30> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_31_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_31> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_32_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_32> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_33_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_33> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_34_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_34> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_35_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_35> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_36_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_36> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_37_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_37> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_38_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_38> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_39_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_39> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_3a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_3a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_3b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_3b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_3c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_3c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_3d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_3d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_3e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_3e> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_2f_3f_3f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_2f_3f_3f> (%08x)", op);
-	return 4;
-}
-
-
-int arcompact_disassembler::handle05_2f_3f_00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_00> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_01> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_02_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_02> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_03_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_03> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_04_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_04> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_05_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_05> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_06_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_06> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_07_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_07> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_08_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_08> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_09_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_09> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_0a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_0a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_0b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_0b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_0c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_0c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_0d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_0d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_0e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_0e> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_0f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_0f> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_10_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_10> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_11_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_11> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_12_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_12> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_13_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_13> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_14_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_14> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_15_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_15> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_16_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_16> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_17_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_17> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_18_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_18> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_19_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_19> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_1a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_1a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_1b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_1b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_1c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_1c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_1d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_1d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_1e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_1e> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_1f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_1f> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_20_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_20> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_21_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_21> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_22_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_22> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_23_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_23> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_24_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_24> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_25_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_25> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_26_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_26> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_27_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_27> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_28_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_28> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_29_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_29> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_2a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_2a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_2b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_2b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_2c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_2c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_2d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_2d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_2e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_2e> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_2f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_2f> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_30_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_30> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_31_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_31> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_32_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_32> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_33_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_33> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_34_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_34> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_35_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_35> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_36_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_36> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_37_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_37> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_38_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_38> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_39_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_39> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_3a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_3a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_3b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_3b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_3c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_3c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_3d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_3d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_3e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_3e> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2f_3f_3f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2f_3f_3f> (%08x)", op);
-	return 4;
-}
-
-
-
-
-
-int arcompact_disassembler::handle04_38_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_38> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_39_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_39> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_3a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_3a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_3b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_3b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_3c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_3c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_3d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_3d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_3e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_3e> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle04_3f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x04_3f> (%08x)", op);
-	return 4;
-}
-
-
-
-int arcompact_disassembler::handle05_09_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_09> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_0c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_0c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_0d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_0d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_0e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_0e> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_0f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_0f> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_10_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_10> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_11_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_11> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_12_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_12> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_13_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_13> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_14_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_14> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_15_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_15> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_16_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_16> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_17_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_17> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_18_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_18> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_19_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_19> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_1a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_1a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_1b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_1b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_1c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_1c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_1d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_1d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_1e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_1e> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_1f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_1f> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_20_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_20> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_21_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_21> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_22_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_22> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_23_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_23> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_24_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_24> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_25_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_25> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_26_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_26> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_27_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_27> (%08x)", op);
-	return 4;
-}
-
-
-int arcompact_disassembler::handle05_2a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_2e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_2e> (%08x)", op);
-	return 4;
-}
-
-
-int arcompact_disassembler::handle05_30_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_30> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_31_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_31> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_32_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_32> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_33_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_33> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_34_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_34> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_35_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_35> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_36_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_36> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_37_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_37> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_38_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_38> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_39_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_39> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_3a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_3a> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_3b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_3b> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_3c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_3c> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_3d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_3d> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_3e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_3e> (%08x)", op);
-	return 4;
-}
-
-int arcompact_disassembler::handle05_3f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x05_3f> (%08x)", op);
-	return 4;
-}
-
-
-int arcompact_disassembler::handle0f_00_04_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x0f_00_00> (%08x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle0f_00_05_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x0f_00_00> (%08x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle0f_00_07_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x0f_00_07_02> (%08x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle0f_00_07_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x0f_00_07_03> (%08x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle0f_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x0f_01> (%08x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle0f_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x0f_03> (%08x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle0f_08_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x0f_08> (%08x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle0f_09_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x0f_09> (%08x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle0f_0a_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x0f_0a> (%08x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle0f_17_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x0f_17> (%08x)", op);
-	return 2;
-}
-
-
-int arcompact_disassembler::handle18_05_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_05_02> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_05_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_05_03> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_05_04_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_05_04> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_05_05_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_05_05> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_05_06_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_05_06> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_05_07_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_05_07> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_00> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_02> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_03> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_04_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_04> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_05_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_05> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_06_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_06> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_07_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_07> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_08_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_08> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_09_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_09> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_0a_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_0a> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_0b_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_0b> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_0c_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_0c> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_0d_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_0d> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_0e_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_0e> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_0f_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_0f> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_10_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_10> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_12_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_12> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_13_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_13> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_14_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_14> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_15_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_15> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_16_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_16> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_17_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_17> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_18_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_18> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_19_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_19> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_1a_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_1a> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_1b_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_1b> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_1c_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_1c> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_1d_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_1d> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_1e_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_1e> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_06_1f_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_06_1f> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_00> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_02> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_03> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_04_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_04> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_05_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_05> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_06_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_06> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_07_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_07> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_08_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_08> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_09_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_09> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_0a_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_0a> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_0b_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_0b> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_0c_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_0c> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_0d_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_0d> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_0e_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_0e> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_0f_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_0f> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_10_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_10> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_12_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_12> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_13_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_13> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_14_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_14> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_15_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_15> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_16_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_16> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_17_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_17> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_18_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_18> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_19_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_19> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_1a_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_1a> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_1b_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_1b> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_1c_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_1c> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_1d_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_1d> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_1e_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_1e> (%04x)", op);
-	return 2;
-}
-
-int arcompact_disassembler::handle18_07_1f_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
-{
-	util::stream_format(stream, "<illegal 0x18_07_1f> (%04x)", op);
-	return 2;
 }

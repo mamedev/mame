@@ -129,7 +129,6 @@ end
 if opt_tool(CPUS, "ARCOMPACT") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm.h")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_dispatch.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops.cpp")
 end
 
