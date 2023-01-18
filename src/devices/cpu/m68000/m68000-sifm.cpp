@@ -127124,7 +127124,7 @@ dvum4:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -127528,7 +127528,7 @@ dvum4:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -127936,7 +127936,7 @@ dvum4:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -128346,7 +128346,7 @@ dvum4:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -128772,7 +128772,7 @@ dvum4:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -128917,7 +128917,7 @@ void m68000_device::divu_w_dais_dd_ifm() // 80f0 f1f8
 	int ry = map_sp((m_irdi & 7) | 8);
 	// 1e3 aixl0
 	// alu r=1 c=5 m=.....  i=.l.d... ALU.over a=R.dbin:m_dbin d=0
-	alu_over();
+	alu_over(m_dbin);
 	m_icount -= 2;
 	// 3e2 aixl1
 	m_aob = m_au;
@@ -129236,7 +129236,7 @@ dvum4:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -129661,7 +129661,7 @@ dvum4:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -130107,7 +130107,7 @@ dvum4:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -130532,7 +130532,7 @@ dvum4:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -130676,7 +130676,7 @@ void m68000_device::divu_w_dpci_dd_ifm() // 80fb f1ff
 	int rx = (m_irdi >> 9) & 7;
 	// 1e3 aixl0
 	// alu r=1 c=5 m=.....  i=.l.d... ALU.over a=R.dbin:m_dbin d=0
-	alu_over();
+	alu_over(m_dbin);
 	m_icount -= 2;
 	// 3e2 aixl1
 	m_aob = m_au;
@@ -130995,7 +130995,7 @@ dvum4:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -131398,7 +131398,7 @@ dvum4:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -134513,7 +134513,7 @@ dvuma:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -135052,7 +135052,7 @@ dvuma:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -135595,7 +135595,7 @@ dvuma:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -136140,7 +136140,7 @@ dvuma:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -136701,7 +136701,7 @@ dvuma:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -136923,7 +136923,7 @@ void m68000_device::divs_w_dais_dd_ifm() // 81f0 f1f8
 	int ry = map_sp((m_irdi & 7) | 8);
 	// 1e3 aixl0
 	// alu r=1 c=5 m=.....  i=.l.d... ALU.over a=R.dbin:m_dbin d=0
-	alu_over();
+	alu_over(m_dbin);
 	m_icount -= 2;
 	// 3e2 aixl1
 	m_aob = m_au;
@@ -137300,7 +137300,7 @@ dvuma:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -137860,7 +137860,7 @@ dvuma:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -138441,7 +138441,7 @@ dvuma:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -139001,7 +139001,7 @@ dvuma:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -139222,7 +139222,7 @@ void m68000_device::divs_w_dpci_dd_ifm() // 81fb f1ff
 	int rx = (m_irdi >> 9) & 7;
 	// 1e3 aixl0
 	// alu r=1 c=5 m=.....  i=.l.d... ALU.over a=R.dbin:m_dbin d=0
-	alu_over();
+	alu_over(m_dbin);
 	m_icount -= 2;
 	// 3e2 aixl1
 	m_aob = m_au;
@@ -139599,7 +139599,7 @@ dvuma:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];
@@ -140137,7 +140137,7 @@ dvuma:
 	m_irc = m_edb;
 	m_dbin = m_edb;
 	// alu r=1 c=5 m=.nzvc  i=.l.d.i. ALU.over a=none d=none
-	alu_over();
+	alu_over(0x0000);
 	sr_nzvc();
 	set_ftu_const();
 	m_inst_state = m_next_state ? m_next_state : m_decode_table[m_ird];

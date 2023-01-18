@@ -1708,7 +1708,7 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
                                   "alub" if alu_actrl else "%s:%s" % (abd, regname[abd]) if abd != None else "none", \
                                   ("%s:%s" % (dbd, regname[dbd]) if dbd != None else "none") if alu_dctrl == 0 else "0" if alu_dctrl == 2 else "-1" if alu_dctrl == 3 else "?")])
         if (alu_actrl or abd != None or alu_op == ALU.over) and alu_single_param[alu_op]:
-            code_to_sort.append(["alu", alu_op, alu_mask, alu_info, None if alu_op == ALU.over else R.alub if alu_actrl else abd])            
+            code_to_sort.append(["alu", alu_op, alu_mask, alu_info, (abd if abd else ["c", 0]) if alu_op == ALU.over else R.alub if alu_actrl else abd])            
         elif (alu_actrl or abd != None) and (alu_dctrl == 2 or alu_dctrl == 3 or (alu_dctrl == 0 and dbd != None)):
             code_to_sort.append(["alu", alu_op, alu_mask, alu_info, R.alub if alu_actrl else abd, dbd if alu_dctrl == 0 else ["c", 0] if alu_dctrl == 2 else ["c", 0xffff]])
         elif alu_op == ALU.and_ and alu_dctrl == 2:
@@ -2184,9 +2184,7 @@ def generate_source_from_code(code, gen_mode):
                 source.append("\tset_8xh(%s, %s);" % (regname[ci[1]], make_expression(ci[2:])))
             elif ci[0] == "alu":
                 aname, aflags = aluname(ci[1], ci[2], ci[3])
-                if ci[1] == ALU.over:
-                    source.append("\t%s();" % (aname))
-                elif len(ci) == 5:
+                if len(ci) == 5:
                     source.append("\t%s(%s);" % (aname, make_expression(ci[4])))
                 else:
                     sec = make_expression(ci[5])
