@@ -35,7 +35,7 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "screen.h"
+#include "machine/pci.h"
 
 namespace {
 
@@ -49,56 +49,30 @@ public:
 
 	void rbowlorama(machine_config &config);
 
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 private:
 	required_device<cpu_device> m_maincpu;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void rbowlorama_map(address_map &map);
 };
 
-void rbowlorama_state::video_start()
-{
-}
-
-uint32_t rbowlorama_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
-
 void rbowlorama_state::rbowlorama_map(address_map &map)
 {
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0x60000);
+	map(0xfff80000, 0xffffffff).rom().region("bios", 0);
 }
 
 static INPUT_PORTS_START( rbowlorama )
 INPUT_PORTS_END
 
-
-void rbowlorama_state::machine_start()
-{
-}
-
-void rbowlorama_state::machine_reset()
-{
-}
-
 void rbowlorama_state::rbowlorama(machine_config &config)
 {
 	// Basic machine hardware
-	PENTIUM4(config, m_maincpu, 120000000); // Celeron, socket 478, 800/533MHz
+	PENTIUM4(config, m_maincpu, 120'000'000); // Celeron, socket 478, 800/533MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &rbowlorama_state::rbowlorama_map);
 
-	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(800, 600); // Guess
-	screen.set_visarea(0, 800-1, 0, 600-1);
-	screen.set_screen_update(FUNC(rbowlorama_state::screen_update));
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 /***************************************************************************
@@ -108,7 +82,7 @@ void rbowlorama_state::rbowlorama(machine_config &config)
 ***************************************************************************/
 
 ROM_START( rbowlorama )
-	ROM_REGION(0x80000, "bios", 0)
+	ROM_REGION32_LE(0x80000, "bios", 0)
 	ROM_LOAD("p4m8p478.rom", 0x00000, 0x80000, CRC(a43b33c6) SHA1(1633273f9f06862b63aeb10899006b10fab4f4af) )
 
 	// I/O PCB
@@ -167,4 +141,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(2008, rbowlorama, 0, rbowlorama, rbowlorama, rbowlorama_state, empty_init, ROT0, "Namco / Cosmodog", "Rockin' Bowl-O-Rama (v2.1.1)", MACHINE_IS_SKELETON)
+GAME(2008, rbowlorama, 0, rbowlorama, rbowlorama, rbowlorama_state, empty_init, ROT0, "Namco / Cosmodog", "Rockin' Bowl-O-Rama (v2.1.1)", MACHINE_IS_SKELETON )
