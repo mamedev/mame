@@ -561,6 +561,7 @@ protected:
 
 	inline void alu_over() {
 		m_isr = SR_V|SR_N;
+		m_aluo = 0;
 	}
 
 	inline void alu_asl(u16 a) {
