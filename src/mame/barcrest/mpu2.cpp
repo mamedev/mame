@@ -41,6 +41,8 @@
 #include "cpu/m6800/m6800.h"
 
 
+namespace {
+
 class mpu2_state : public driver_device
 {
 public:
@@ -105,6 +107,9 @@ ROM_START( m2svlite )
 	ROM_REGION( 0x800, "romp1", 0 )
 	ROM_LOAD( "sl1.bin", 0x0000, 0x0800, CRC(afe04b5a) SHA1(3b3385a9b039992279fda5b87926b5089a448581) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME(198?,  m2hilite,  0, mpu2,  mpu2, mpu2_state, empty_init, ROT0,  "Barcrest",    "Hi-Lights (Barcrest) (MPU2)",         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(198?,  m2svlite,  0, mpu2,  mpu2, mpu2_state, empty_init, ROT0,  "Barcrest",    "Silver Lights (Barcrest) (MPU2)",     MACHINE_IS_SKELETON_MECHANICAL)

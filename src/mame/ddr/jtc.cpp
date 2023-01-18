@@ -30,6 +30,9 @@ To Do:
 #include "speaker.h"
 #include "utf8.h"
 
+
+namespace {
+
 #define UB8830D_TAG     "ub8830d"
 #define CENTRONICS_TAG  "centronics"
 
@@ -914,6 +917,9 @@ ROM_START( jtces40 )
 	ROM_LOAD( "u883rom.bin", 0x0000, 0x0800, CRC(2453c8c1) SHA1(816f5d08f8064b69b1779eb6661fde091aa58ba8) )
 	ROM_LOAD( "es40_0800.bin", 0x0800, 0x1800, CRC(770c87ce) SHA1(1a5227ba15917f2a572cb6c27642c456f5b32b90) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* System Drivers */
 

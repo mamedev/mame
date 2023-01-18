@@ -6,8 +6,8 @@
 
  ***********************************************/
 
-#ifndef MAME_MACHINE_CBM_SNQK_H
-#define MAME_MACHINE_CBM_SNQK_H
+#ifndef MAME_COMMODORE_CBM_SNQK_H
+#define MAME_COMMODORE_CBM_SNQK_H
 
 #pragma once
 
@@ -23,4 +23,4 @@ image_init_result general_cbm_loadsnap(
 
 void cbm_quick_sethiaddress(address_space &space, uint16_t hiaddress);
 
-#endif // MAME_MACHINE_CBM_SNQK_H
+#endif // MAME_COMMODORE_CBM_SNQK_H

@@ -358,6 +358,9 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 
 #include "rainbow.lh" // BEZEL - LAYOUT with LEDs for diag 1-7, keyboard 8-11 and floppy 20-23
 
+
+namespace {
+
 #define RD51_MAX_HEAD 8
 #define RD51_MAX_CYLINDER 1024
 #define RD51_SECTORS_PER_TRACK 17
@@ -3457,6 +3460,9 @@ ROM_START(rainbow190)
 	ROM_LOAD("23-090b1.mmi6308-ij.e13", 0x0000, 0x0100, CRC(cac3a7e3) SHA1(2d0468cda36fa287f705364c56dbf62f548d2e4c) ) // MMI 6308-IJ; Silkscreen stamp: "LM8413 // 090B1"; 256x8 Open Collector prom @E13, same prom is @E11 on 100-A
 ROM_END
 //----------------------------------------------------------------------------------------
+
+} // anonymous namespace
+
 
 /* Driver */
 

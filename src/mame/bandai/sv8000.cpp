@@ -36,6 +36,9 @@ Looking at the code of the cartridges it seems there is:
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class sv8000_state : public driver_device
 {
 public:
@@ -419,6 +422,9 @@ void sv8000_state::sv8000(machine_config &config)
 ROM_START( sv8000 )
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

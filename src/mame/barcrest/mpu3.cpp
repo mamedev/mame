@@ -170,6 +170,9 @@ TODO: - Distinguish door switches using manual
 
 #define LOG(x)  do { if (MPU3VERBOSE) logerror x; } while (0)
 
+	
+namespace {
+
 class mpu3_state : public driver_device
 {
 public:
@@ -1562,6 +1565,7 @@ ROM_START( m3winstra )
 	ROM_COPY( "maincpu", 0x0000, 0x8000, 0x8000 )
 ROM_END
 
+} // anonymous namespace
 
 
 /* Barcrest */

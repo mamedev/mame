@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Charles MacDonald
-#ifndef MAME_MACHINE_DECO146_H
-#define MAME_MACHINE_DECO146_H
+#ifndef MAME_DATAEAST_DECO146_H
+#define MAME_DATAEAST_DECO146_H
 
 #pragma once
 
@@ -133,4 +133,4 @@ public:
 
 DECLARE_DEVICE_TYPE(DECO146PROT, deco146_device)
 
-#endif // MAME_MACHINE_DECO146_H
+#endif // MAME_DATAEAST_DECO146_H

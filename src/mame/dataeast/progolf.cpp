@@ -154,6 +154,8 @@ GCM/GBM/GAM - Harris M3 7603-5 Bipolar PROM (compatible with 82S123)
 #include "speaker.h"
 
 
+namespace {
+
 class progolf_state : public driver_device
 {
 public:
@@ -587,6 +589,8 @@ ROM_START( progolfa )
 	ROM_LOAD( "gbm.k4",       0x0020, 0x0020, CRC(1ea3319f) SHA1(809af38e73fa1f30410e7d6b4504fe360ee9b091) )
 	ROM_LOAD( "gam.k11",      0x0040, 0x0020, CRC(b9665de3) SHA1(4c5aba5f6589f4bce4692c0d5bb2811ab8e14aed) )
 ROM_END
+
+} // anonymous namespace
 
 
 // this uses DECO222 style encryption
