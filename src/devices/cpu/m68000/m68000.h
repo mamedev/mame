@@ -559,9 +559,10 @@ protected:
 		m_aluo = r >> 16;
 	}
 
-	inline void alu_over() {
+	// ext with fixed flags result
+	inline void alu_over(u16 a) {
 		m_isr = SR_V|SR_N;
-		m_aluo = 0;
+		m_aluo = s8(a);
 	}
 
 	inline void alu_asl(u16 a) {
