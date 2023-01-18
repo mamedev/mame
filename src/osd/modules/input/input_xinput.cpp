@@ -57,6 +57,16 @@ controlled at the same time.
 Many controllers don't correctly report the absence of analog sticks.
 
 
+Some controllers use capabilities to indicate extended controller type
+information:
+
+                                Type    Sub     LSX     LSY     RSX
+Band Hero Wireless Guitar       0x01    0x07    0x1430  0x0705  0x0001
+Band Hero Wireless Drum Kit     0x01    0x08    0x1430  0x0805  0x0001
+DJ Hero 2 Turntable             0x01    0x17    0x1430  0x1705  0x0001
+Rock Band 3 Wireless Keyboard   0x01    0x0f    0x1bad  0x1330  0x0004
+
+
 There are multiple physical button layouts for arcade sticks, for
 example:
 
@@ -275,18 +285,6 @@ char const *const BUTTON_NAMES_GAMEPAD[]{
 		"LSB",
 		"RSB" };
 
-char const *const BUTTON_NAMES_DRUMKIT[]{
-		"Green",        // floor tom
-		"Red",          // snare
-		"Blue",         // low tom
-		"Yellow",       // Rock Band high tom, Guitar Hero hi-hat
-		nullptr,
-		nullptr,
-		"Orange",       // Guitar Hero crash cymbal
-		"Bass Drum",
-		"LSB",
-		"RSB" };
-
 char const *const BUTTON_NAMES_GUITAR[]{
 		"Fret 1",
 		"Fret 2",
@@ -295,6 +293,26 @@ char const *const BUTTON_NAMES_GUITAR[]{
 		"Fret 5",
 		"Fret Modifier",
 		"RB",
+		"RSB" };
+
+char const *const BUTTON_NAMES_DRUMKIT[]{
+		"Green",        // floor tom
+		"Red",          // snare
+		"Blue",         // low tom
+		"Yellow",       // Rock Band high tom, Guitar Hero hi-hat
+		"Orange",       // Guitar Hero crash cymbal
+		"Bass Drum",
+		"LSB",
+		"RSB" };
+
+char const *const BUTTON_NAMES_KEYBOARD[]{
+		"A",
+		"B",
+		"X",
+		"Y",
+		"LB",
+		"RB",
+		"LSB",
 		"RSB" };
 
 
@@ -338,13 +356,16 @@ protected:
 	SHORT thumb_right_x() const { return m_xinput_state.Gamepad.sThumbRX; }
 	SHORT thumb_right_y() const { return m_xinput_state.Gamepad.sThumbRY; }
 
-	XINPUT_CAPABILITIES const &check_capabilities();
 	bool read_state();
+	void set_reset() { m_reset = true; }
 
 private:
+	bool probe_extended_type();
+
 	uint32_t const      m_player_index;
 	XINPUT_CAPABILITIES m_capabilities;
 	XINPUT_STATE        m_xinput_state;
+	bool                m_reset;
 
 	std::shared_ptr<xinput_api_helper> m_xinput_helper;
 };
@@ -362,6 +383,7 @@ xinput_device_base::xinput_device_base(
 	m_player_index(player),
 	m_capabilities(caps),
 	m_xinput_state{ 0 },
+	m_reset(true),
 	m_xinput_helper(helper)
 {
 	// TODO: some controller types may have different capabilities format (e.g. DJ Hero turntable)
@@ -466,43 +488,98 @@ xinput_device_base::xinput_device_base(
 			rsycap_bad ? ", invalid" : "");
 
 	// ignore capabilities if invalid
-	bool ignore_caps = false;
-	if (ltcap_bad || rtcap_bad || lsxcap_bad || lsycap_bad || rsxcap_bad || rsycap_bad)
+	if (!probe_extended_type())
 	{
-		// Retro-Bit Sega Saturn Control Pad reports garbage for axis resolutions and absence of several buttons
-		osd_printf_verbose("XInput: Ignoring invalid capabilities (invalid axis resolution).\n");
-		ignore_caps = true;
-	}
-	else if (!m_capabilities.Gamepad.wButtons && !m_capabilities.Gamepad.bLeftTrigger && !m_capabilities.Gamepad.bRightTrigger && !m_capabilities.Gamepad.sThumbLX && !m_capabilities.Gamepad.sThumbLY && !m_capabilities.Gamepad.sThumbRX && !m_capabilities.Gamepad.sThumbRY)
-	{
-		// 8BitDo SN30 Pro V1 reports no controls at all, which would be completely useless
-		osd_printf_verbose("XInput: Ignoring invalid capabilities (no controls reported).\n");
-		ignore_caps = true;
-	}
-	if (ignore_caps)
-	{
-		m_capabilities.Gamepad.wButtons = 0xf3ff;
-		m_capabilities.Gamepad.bLeftTrigger = 0xff;
-		m_capabilities.Gamepad.bRightTrigger = 0xff;
-		m_capabilities.Gamepad.sThumbLX = s16(u16(0xffc0));
-		m_capabilities.Gamepad.sThumbLY = s16(u16(0xffc0));
-		m_capabilities.Gamepad.sThumbRX = s16(u16(0xffc0));
-		m_capabilities.Gamepad.sThumbRY = s16(u16(0xffc0));
+		bool ignore_caps = false;
+		if (ltcap_bad || rtcap_bad || lsxcap_bad || lsycap_bad || rsxcap_bad || rsycap_bad)
+		{
+			// Retro-Bit Sega Saturn Control Pad reports garbage for axis resolutions and absence of several buttons
+			osd_printf_verbose("XInput: Ignoring invalid capabilities (invalid axis resolution).\n");
+			ignore_caps = true;
+		}
+		else if (!m_capabilities.Gamepad.wButtons && !m_capabilities.Gamepad.bLeftTrigger && !m_capabilities.Gamepad.bRightTrigger && !m_capabilities.Gamepad.sThumbLX && !m_capabilities.Gamepad.sThumbLY && !m_capabilities.Gamepad.sThumbRX && !m_capabilities.Gamepad.sThumbRY)
+		{
+			// 8BitDo SN30 Pro V1 reports no controls at all, which would be completely useless
+			osd_printf_verbose("XInput: Ignoring invalid capabilities (no controls reported).\n");
+			ignore_caps = true;
+		}
+		if (ignore_caps)
+		{
+			m_capabilities.Gamepad.wButtons = 0xf3ff;
+			m_capabilities.Gamepad.bLeftTrigger = 0xff;
+			m_capabilities.Gamepad.bRightTrigger = 0xff;
+			m_capabilities.Gamepad.sThumbLX = s16(u16(0xffc0));
+			m_capabilities.Gamepad.sThumbLY = s16(u16(0xffc0));
+			m_capabilities.Gamepad.sThumbRX = s16(u16(0xffc0));
+			m_capabilities.Gamepad.sThumbRY = s16(u16(0xffc0));
+		}
 	}
 }
 
 
 bool xinput_device_base::read_state()
 {
-	// when losing focus, the packet number changes and everything is zeroed
-	// when regaining focus, the packet number doesn't change when control states are returned
-
 	// save previous packet number and try to read peripheral state
-	//DWORD const prevpacket = m_xinput_state.dwPacketNumber;
+	DWORD const prevpacket = m_xinput_state.dwPacketNumber;
 	HRESULT const result = m_xinput_helper->xinput_get_state(m_player_index, &m_xinput_state);
 
 	// only update if it succeeded and the packed number changed
-	return !FAILED(result) /*&& (prevpacket != m_xinput_state.dwPacketNumber)*/;
+	if (FAILED(result))
+	{
+		return false;
+	}
+	else if (m_reset)
+	{
+		m_reset = false;
+		return true;
+	}
+	else
+	{
+		return prevpacket != m_xinput_state.dwPacketNumber;
+	}
+}
+
+
+bool xinput_device_base::probe_extended_type()
+{
+	switch (m_capabilities.Gamepad.sThumbLX)
+	{
+	case 0x1430:
+		switch (m_capabilities.Gamepad.sThumbLY)
+		{
+		case 0x0705:
+			osd_printf_verbose("XInput: Detected Band Hero guitar controller.\n");
+			m_capabilities.Gamepad.sThumbLX = s16(u16(0xffc0)); // neck slider
+			m_capabilities.Gamepad.sThumbLY = 0;
+			m_capabilities.Gamepad.sThumbRX = s16(u16(0xffc0)); // whammy bar
+			return true;
+		case 0x0805:
+			osd_printf_verbose("XInput: Detected Band Hero drum kit controller.\n");
+			m_capabilities.Gamepad.sThumbLX = 0;
+			m_capabilities.Gamepad.sThumbLY = s16(u16(0xffc0)); // green/red velocity
+			m_capabilities.Gamepad.sThumbRX = s16(u16(0xffc0)); // blue/yellow velocity
+			return true;
+		case 0x1705:
+			osd_printf_verbose("XInput: Detected DJ Hero turntable controller.\n");
+			m_capabilities.Gamepad.sThumbLX = 0;
+			m_capabilities.Gamepad.sThumbLY = s16(u16(0xffc0)); // turntable
+			m_capabilities.Gamepad.sThumbRX = s16(u16(0xffc0)); // effects dial
+			return true;
+		}
+		break;
+	case 0x1bad:
+		switch (m_capabilities.Gamepad.sThumbLY)
+		{
+		case 0x1330:
+			osd_printf_verbose("XInput: Detected Rock Band keyboard controller.\n");
+			m_capabilities.Gamepad.sThumbLX = 0; // keys, velocity
+			m_capabilities.Gamepad.sThumbLY = 0; // not present?
+			m_capabilities.Gamepad.sThumbRX = 0; // not present?
+			return true;
+		}
+		break;
+	}
+	return false;
 }
 
 
@@ -652,6 +729,7 @@ void xinput_joystick_device::poll()
 
 void xinput_joystick_device::reset()
 {
+	set_reset();
 	std::fill(std::begin(m_switches), std::end(m_switches), 0);
 	std::fill(std::begin(m_axes), std::end(m_axes), 0);
 }
@@ -659,13 +737,12 @@ void xinput_joystick_device::reset()
 
 void xinput_joystick_device::configure()
 {
-	// TODO: proper support for dance mat and drum kit controllers
+	// TODO: proper support for dance mat controllers
 
 	// default characteristics for a gamepad
 	bool lt_rt_button = false;
 	bool lt_rt_fullaxis = false;
 	bool rstick_hat = false;
-	bool button_order_drumkit = false;
 	char const *const *axis_names = AXIS_NAMES_GAMEPAD;
 	input_item_id const *axis_ids = AXIS_IDS_GAMEPAD;
 	char const *const *hat_names = HAT_NAMES_GAMEPAD;
@@ -692,10 +769,6 @@ void xinput_joystick_device::configure()
 			break;
 		case XINPUT_DEVSUBTYPE_DANCE_PAD:
 			// TODO: proper support
-			break;
-		case XINPUT_DEVSUBTYPE_DRUM_KIT:
-			button_order_drumkit = true;
-			button_names = BUTTON_NAMES_DRUMKIT;
 			break;
 		case XINPUT_DEVSUBTYPE_ARCADE_PAD:
 			lt_rt_button = true;
@@ -747,7 +820,7 @@ void xinput_joystick_device::configure()
 	}
 
 	// add buttons
-	std::pair<unsigned, bool> button_caps[]{
+	std::pair<unsigned, bool> const button_caps[]{
 			{ SWITCH_A,   has_button(XINPUT_GAMEPAD_A) },
 			{ SWITCH_B,   has_button(XINPUT_GAMEPAD_B) },
 			{ SWITCH_X,   has_button(XINPUT_GAMEPAD_X) },
@@ -758,11 +831,6 @@ void xinput_joystick_device::configure()
 			{ SWITCH_RB,  has_button(XINPUT_GAMEPAD_RIGHT_SHOULDER) },
 			{ SWITCH_LSB, has_button(XINPUT_GAMEPAD_LEFT_THUMB) },
 			{ SWITCH_RSB, has_button(XINPUT_GAMEPAD_RIGHT_THUMB) } };
-	if (button_order_drumkit)
-	{
-		using std::swap;
-		swap(button_caps[6], button_caps[7]);
-	}
 	input_item_id button_id = ITEM_ID_BUTTON1;
 	for (unsigned i = 0; std::size(button_caps) > i; ++i)
 	{
@@ -912,7 +980,6 @@ xinput_guitar_device::xinput_guitar_device(
 
 
 void xinput_guitar_device::poll()
-
 {
 	// poll the device first, and skip if nothing changed
 	if (!read_state())
@@ -939,6 +1006,7 @@ void xinput_guitar_device::poll()
 
 void xinput_guitar_device::reset()
 {
+	set_reset();
 	std::fill(std::begin(m_switches), std::end(m_switches), 0);
 	std::fill(std::begin(m_axes), std::end(m_axes), 0);
 }
@@ -946,6 +1014,8 @@ void xinput_guitar_device::reset()
 
 void xinput_guitar_device::configure()
 {
+	// TODO: does subtype 0x06 indicate digital neck orientation sensor or lack of three-axis accelerometer?
+
 	// add axes
 	std::tuple<input_item_id, char const *, bool> const axis_caps[]{
 			{ ITEM_ID_RXAXIS,  "Neck Slider",        has_thumb_left_x() },
@@ -1017,6 +1087,199 @@ void xinput_guitar_device::configure()
 
 
 //============================================================
+//  XInput drum kit handler
+//============================================================
+
+class xinput_drumkit_device : public xinput_device_base
+{
+public:
+	xinput_drumkit_device(
+			running_machine &machine,
+			std::string &&name,
+			std::string &&id,
+			input_module &module,
+			uint32_t player,
+			XINPUT_CAPABILITIES const &caps,
+			std::shared_ptr<xinput_api_helper> const &helper);
+
+	virtual void poll() override;
+	virtual void reset() override;
+
+	virtual void configure() override;
+
+private:
+	static inline constexpr USHORT SWITCH_BITS[] =
+	{
+		XINPUT_GAMEPAD_A,
+		XINPUT_GAMEPAD_B,
+		XINPUT_GAMEPAD_X,
+		XINPUT_GAMEPAD_Y,
+		XINPUT_GAMEPAD_RIGHT_SHOULDER,
+		XINPUT_GAMEPAD_LEFT_SHOULDER,
+		XINPUT_GAMEPAD_LEFT_THUMB,
+		XINPUT_GAMEPAD_RIGHT_THUMB,
+		XINPUT_GAMEPAD_START,
+		XINPUT_GAMEPAD_BACK,
+
+		XINPUT_GAMEPAD_DPAD_UP,
+		XINPUT_GAMEPAD_DPAD_DOWN,
+		XINPUT_GAMEPAD_DPAD_LEFT,
+		XINPUT_GAMEPAD_DPAD_RIGHT
+	};
+
+	enum
+	{
+		SWITCH_GREEN,       // button bits
+		SWITCH_RED,
+		SWITCH_BLUE,
+		SWITCH_YELLOW,
+		SWITCH_ORANGE,
+		SWITCH_BASS_DRUM,
+		SWITCH_LSB,
+		SWITCH_RSB,
+		SWITCH_START,
+		SWITCH_BACK,
+
+		SWITCH_DPAD_UP,     // D-pad bits
+		SWITCH_DPAD_DOWN,
+		SWITCH_DPAD_LEFT,
+		SWITCH_DPAD_RIGHT,
+
+		SWITCH_TOTAL
+	};
+
+	enum
+	{
+		AXIS_GREEN,         // LSY low
+		AXIS_RED,           // LSY high
+		AXIS_BLUE,          // RSX high
+		AXIS_YELLOW,        // RSX low
+		AXIS_ORANGE,        // RSY low
+		AXIS_BASS_DRUM,     // RSY high
+
+		AXIS_TOTAL
+	};
+
+	uint8_t m_switches[SWITCH_TOTAL];
+	int32_t m_axes[AXIS_TOTAL];
+};
+
+
+xinput_drumkit_device::xinput_drumkit_device(
+		running_machine &machine,
+		std::string &&name,
+		std::string &&id,
+		input_module &module,
+		uint32_t player,
+		XINPUT_CAPABILITIES const &caps,
+		std::shared_ptr<xinput_api_helper> const &helper) :
+	xinput_device_base(machine, std::move(name), std::move(id), module, player, caps, helper)
+{
+	std::fill(std::begin(m_switches), std::end(m_switches), 0);
+	std::fill(std::begin(m_axes), std::end(m_axes), 0);
+}
+
+
+void xinput_drumkit_device::poll()
+{
+	// poll the device first, and skip if nothing changed
+	if (!read_state())
+		return;
+
+	// translate button bits
+	for (unsigned i = 0; std::size(SWITCH_BITS) > i; ++i)
+		m_switches[SWITCH_GREEN + i] = (buttons() & SWITCH_BITS[i]) ? 0xff : 0x00;
+
+	// translate axes
+	m_axes[AXIS_GREEN] = -normalize_absolute_axis(BIT(u16(thumb_left_y()), 0, 8), -255, 255);
+	m_axes[AXIS_RED] = -normalize_absolute_axis(BIT(u16(thumb_left_y()), 8, 8), -255, 255);
+	m_axes[AXIS_BLUE] = -normalize_absolute_axis(BIT(u16(thumb_right_x()), 8, 8), -255, 255);
+	m_axes[AXIS_YELLOW] = -normalize_absolute_axis(BIT(u16(thumb_right_x()), 0, 8), -255, 255);
+	m_axes[AXIS_ORANGE] = -normalize_absolute_axis(BIT(u16(thumb_right_y()), 0, 8), -255, 255);
+	m_axes[AXIS_BASS_DRUM] = -normalize_absolute_axis(BIT(u16(thumb_right_y()), 8, 8), -255, 255);
+}
+
+
+void xinput_drumkit_device::reset()
+{
+	set_reset();
+	std::fill(std::begin(m_switches), std::end(m_switches), 0);
+	std::fill(std::begin(m_axes), std::end(m_axes), 0);
+}
+
+
+void xinput_drumkit_device::configure()
+{
+	// add axes
+	std::tuple<input_item_id, char const *, bool> const axis_caps[]{
+			{ ITEM_ID_XAXIS,  "Green Velocity",     has_thumb_left_y() },
+			{ ITEM_ID_YAXIS,  "Red Velocity",       has_thumb_left_y() },
+			{ ITEM_ID_ZAXIS,  "Blue Velocity",      has_thumb_right_x() },
+			{ ITEM_ID_RXAXIS, "Yellow Velocity",    has_thumb_right_x() },
+			{ ITEM_ID_RYAXIS, "Orange Velocity",    has_thumb_right_y() },
+			{ ITEM_ID_RZAXIS, "Bass Drum Velocity", has_thumb_right_y() } };
+	for (unsigned i = 0; (AXIS_BASS_DRUM - AXIS_GREEN) >= i; ++i)
+	{
+		auto const [item, name, supported] = axis_caps[i];
+		if (supported)
+		{
+			device()->add_item(
+					name,
+					item,
+					generic_axis_get_state<uint32_t>,
+					&m_axes[AXIS_GREEN + i]);
+		}
+	}
+
+	// add hats
+	for (unsigned i = 0; (SWITCH_DPAD_RIGHT - SWITCH_DPAD_UP) >= i; ++i)
+	{
+		if (has_button(SWITCH_BITS[SWITCH_DPAD_UP + i]))
+		{
+			device()->add_item(
+					HAT_NAMES_GAMEPAD[i],
+					input_item_id(ITEM_ID_HAT1UP + i), // matches up/down/left/right order
+					generic_button_get_state<uint8_t>,
+					&m_switches[SWITCH_DPAD_UP + i]);
+		}
+	}
+
+	// add buttons
+	input_item_id button_id = ITEM_ID_BUTTON1;
+	for (unsigned i = 0; (SWITCH_RSB - SWITCH_GREEN) >= i; ++i)
+	{
+		if (has_button(SWITCH_BITS[i]))
+		{
+			device()->add_item(
+					BUTTON_NAMES_DRUMKIT[i],
+					button_id++,
+					generic_button_get_state<uint8_t>,
+					&m_switches[SWITCH_GREEN + i]);
+		}
+	}
+
+	// add start/back
+	if (has_button(XINPUT_GAMEPAD_START))
+	{
+		device()->add_item(
+				"Start",
+				ITEM_ID_START,
+				generic_button_get_state<uint8_t>,
+				&m_switches[SWITCH_START]);
+	}
+	if (has_button(XINPUT_GAMEPAD_BACK))
+	{
+		device()->add_item(
+				"Back",
+				ITEM_ID_SELECT,
+				generic_button_get_state<uint8_t>,
+				&m_switches[SWITCH_BACK]);
+	}
+}
+
+
+
+//============================================================
 //  XInput keyboard handler
 //============================================================
 
@@ -1044,6 +1307,10 @@ private:
 		XINPUT_GAMEPAD_B,
 		XINPUT_GAMEPAD_X,
 		XINPUT_GAMEPAD_Y,
+		XINPUT_GAMEPAD_LEFT_SHOULDER,
+		XINPUT_GAMEPAD_RIGHT_SHOULDER,
+		XINPUT_GAMEPAD_LEFT_THUMB,
+		XINPUT_GAMEPAD_RIGHT_THUMB,
 		XINPUT_GAMEPAD_START,
 		XINPUT_GAMEPAD_BACK,
 
@@ -1059,6 +1326,10 @@ private:
 		SWITCH_B,
 		SWITCH_X,
 		SWITCH_Y,
+		SWITCH_LB,
+		SWITCH_RB,
+		SWITCH_LSB,
+		SWITCH_RSB,
 		SWITCH_START,
 		SWITCH_BACK,
 
@@ -1104,6 +1375,7 @@ void xinput_keyboard_device::poll()
 {
 	// TODO: how many bits are really velocity?
 	// TODO: how are touch strip and overdrive read?
+	// TODO: how are pedals read (maybe expression on RSY)?
 
 	// poll the device first, and skip if nothing changed
 	if (!read_state())
@@ -1129,6 +1401,7 @@ void xinput_keyboard_device::poll()
 
 void xinput_keyboard_device::reset()
 {
+	set_reset();
 	std::fill(std::begin(m_switches), std::end(m_switches), 0);
 	std::fill(std::begin(m_axes), std::end(m_axes), 0);
 }
@@ -1136,8 +1409,6 @@ void xinput_keyboard_device::reset()
 
 void xinput_keyboard_device::configure()
 {
-	// TODO: button capabilities actually seem sane on this controller but we nuke them due to bad axis capabilities
-
 	// add velocity axis
 	device()->add_item(
 			"Velocity",
@@ -1160,12 +1431,12 @@ void xinput_keyboard_device::configure()
 
 	// add buttons
 	input_item_id button_id = ITEM_ID_BUTTON1;
-	for (unsigned i = 0; (SWITCH_Y - SWITCH_A) >= i; ++i)
+	for (unsigned i = 0; (SWITCH_RSB - SWITCH_A) >= i; ++i)
 	{
 		if (has_button(SWITCH_BITS[i]))
 		{
 			device()->add_item(
-					BUTTON_NAMES_GAMEPAD[i],
+					BUTTON_NAMES_KEYBOARD[i],
 					button_id++,
 					generic_button_get_state<uint8_t>,
 					&m_switches[SWITCH_A + i]);
@@ -1179,7 +1450,7 @@ void xinput_keyboard_device::configure()
 	{
 		device()->add_item(
 				util::string_format(key_formats[i % 12], (i / 12) + 1),
-				button_id++,
+				(ITEM_ID_BUTTON32 >= button_id) ? button_id++ : ITEM_ID_OTHER_SWITCH,
 				generic_button_get_state<uint8_t>,
 				&m_switches[SWITCH_C1 + i]);
 	}
@@ -1298,6 +1569,16 @@ device_info *xinput_api_helper::create_xinput_device(running_machine &machine, U
 		case XINPUT_DEVSUBTYPE_GUITAR_ALTERNATE:
 		case XINPUT_DEVSUBTYPE_GUITAR_BASS:
 			devinfo = &module.devicelist().create_device<xinput_guitar_device>(
+					machine,
+					device_name,
+					device_name,
+					module,
+					index,
+					caps,
+					shared_from_this());
+			break;
+		case XINPUT_DEVSUBTYPE_DRUM_KIT:
+			devinfo = &module.devicelist().create_device<xinput_drumkit_device>(
 					machine,
 					device_name,
 					device_name,
