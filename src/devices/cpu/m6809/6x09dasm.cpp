@@ -57,6 +57,8 @@ const m6x09_base_disassembler::opcodeinfo *m6x09_base_disassembler::fetch_opcode
 {
 	uint16_t page = 0;
 	const opcodeinfo *op = nullptr;
+	const opcodeinfo *page_cache = nullptr;
+
 	while(!op)
 	{
 		// retrieve the opcode
@@ -71,12 +73,24 @@ const m6x09_base_disassembler::opcodeinfo *m6x09_base_disassembler::fetch_opcode
 
 		// did we find something?
 		if (iter == m_opcodes.end())
-			return nullptr;
+		{
+			// on the 6809 an unimplemented page 2 or 3 opcodes fall thru to the first page.
+			if ( (m_level < HD6309_EXCLUSIVE) && (page != 0))
+			{
+				// backup the opcode pointer and emit the page instruction.
+				--p;
+				return page_cache;
+			}
+			else
+				return nullptr;
+		}
 
 		// was this a $10 or $11 page?
 		switch (iter->mode())
 		{
 		case PG2:
+			page_cache = &*iter;
+			// if next opcode is an additional page instruction, emit a page instruction and continue.
 			if (opcodes.r8(p) == 0x10 || opcodes.r8(p) == 0x11)
 				op = &*iter;
 			else
@@ -84,6 +98,8 @@ const m6x09_base_disassembler::opcodeinfo *m6x09_base_disassembler::fetch_opcode
 			break;
 
 		case PG3:
+			page_cache = &*iter;
+			// if next opcode is an additional page instruction, emit a page instruction and continue.
 			if (opcodes.r8(p) == 0x10 || opcodes.r8(p) == 0x11)
 				op = &*iter;
 			else
@@ -143,7 +159,7 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 	if (op->mode() == INH)
 		stream << op->name();
 	else
-		util::stream_format(stream, "%-6s", op->name());
+		util::stream_format(stream, "%-7s", op->name());
 
 	switch (op->mode())
 	{
