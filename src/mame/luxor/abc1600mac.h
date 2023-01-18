@@ -5,8 +5,8 @@
     Luxor ABC 1600 Memory Access Controller emulation
 
 **********************************************************************/
-#ifndef MAME_MACHINE_ABC1600MAC_H
-#define MAME_MACHINE_ABC1600MAC_H
+#ifndef MAME_LUXOR_ABC1600MAC_H
+#define MAME_LUXOR_ABC1600MAC_H
 
 #pragma once
 
@@ -141,4 +141,4 @@ constexpr int AS_MAC = 1;
 DECLARE_DEVICE_TYPE(ABC1600_MAC, abc1600_mac_device)
 
 
-#endif // MAME_MACHINE_ABC1600MAC_H
+#endif // MAME_LUXOR_ABC1600MAC_H

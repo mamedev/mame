@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_HP_IPC_OPTROM_H
-#define MAME_MACHINE_HP_IPC_OPTROM_H
+#ifndef MAME_HP_HP_IPC_OPTROM_H
+#define MAME_HP_HP_IPC_OPTROM_H
 
 #pragma once
 
@@ -49,4 +49,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(HP_IPC_OPTROM, hp_ipc_optrom_device)
 
-#endif // MAME_MACHINE_HP_IPC_OPTROM_H
+#endif // MAME_HP_HP_IPC_OPTROM_H

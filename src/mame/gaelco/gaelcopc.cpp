@@ -30,6 +30,8 @@ motherboard bioses.
 #include "screen.h"
 
 
+namespace {
+
 class gaelcopc_state : public driver_device
 {
 public:
@@ -134,6 +136,8 @@ ROM_START(tuningrc)
 	DISK_REGION( "disks" ) // Hitachi HDS728080PLAT20 ATA/IDE
 	DISK_IMAGE( "tuningrc", 0, SHA1(4055cdc0b0c0e99252b90fbfafc48b693b144d67) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 2003, tokyocop,  0,        gaelcopc, gaelcopc, gaelcopc_state, empty_init, ROT0, "Gaelco", "Tokyo Cop (US, dedicated version)",   MACHINE_IS_SKELETON )

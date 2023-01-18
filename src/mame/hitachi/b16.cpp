@@ -21,6 +21,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class b16_state : public driver_device
 {
 public:
@@ -302,6 +304,9 @@ ROM_START( b16 )
 
 	ROM_REGION( 0x4000/2, "pcg", ROMREGION_ERASE00 )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

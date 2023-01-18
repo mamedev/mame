@@ -12,6 +12,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class igs_fear_state : public driver_device
 {
 public:
@@ -169,5 +171,8 @@ void igs_fear_state::init_igs_fear()
 	//sdwx_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
+
+} // anonymous namespace
+
 
 GAME( 2006, fearless, 0, igs_fear, fear, igs_fear_state, init_igs_fear, ROT0, "IGS", "Fearless Pinocchio (V101US)",   MACHINE_IS_SKELETON )

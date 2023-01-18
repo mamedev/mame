@@ -6,8 +6,8 @@ Jaleco MS32 System Control Unit
 
 ******************************************************************************/
 
-#ifndef MAME_MACHINE_JALECO_MS32_SYSCTRL_H
-#define MAME_MACHINE_JALECO_MS32_SYSCTRL_H
+#ifndef MAME_JALECO_JALECO_MS32_SYSCTRL_H
+#define MAME_JALECO_JALECO_MS32_SYSCTRL_H
 
 #pragma once
 
@@ -112,4 +112,4 @@ DECLARE_DEVICE_TYPE(JALECO_MS32_SYSCTRL, jaleco_ms32_sysctrl_device)
 //**************************************************************************
 
 
-#endif // MAME_MACHINE_JALECO_MS32_SYSCTRL_H
+#endif // MAME_JALECO_JALECO_MS32_SYSCTRL_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Luca Elia
-#ifndef MAME_VIDEO_JALBLEND_H
-#define MAME_VIDEO_JALBLEND_H
+#ifndef MAME_JALECO_JALBLEND_H
+#define MAME_JALECO_JALBLEND_H
 
 #pragma once
 
@@ -36,4 +36,4 @@ private:
 
 DECLARE_DEVICE_TYPE(JALECO_BLEND, jaleco_blend_device)
 
-#endif // MAME_VIDEO_JALBLEND_H
+#endif // MAME_JALECO_JALBLEND_H

@@ -23,6 +23,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class hawk_state : public driver_device
 {
 public:
@@ -148,6 +150,9 @@ ROM_START(hawk)
 	ROMX_LOAD("hawk-v1.01-1.rom", 0x08000, 0x08000, CRC(4f99c76c) SHA1(45ff638277cff7b1fb2e21c4c348dad2b2e779b7), ROM_BIOS(3))
 	ROMX_LOAD("hawk-v1.01-2.rom", 0x10000, 0x08000, CRC(982ed053) SHA1(ab0a860f1204f36f490fdfadfefe2ee4a82ed3be), ROM_BIOS(3))
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY                FULLNAME      FLAGS
 COMP( 1987, hawk,    0,       0,      hawk,    hawk,  hawk_state, init_hawk, "Husky Computers Ltd", "Husky Hawk", MACHINE_IS_SKELETON )

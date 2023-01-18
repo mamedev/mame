@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb, Sergey Svishchev
-#ifndef MAME_MACHINE_GRIDKEYB_H
-#define MAME_MACHINE_GRIDKEYB_H
+#ifndef MAME_GRIDCOMP_GRIDKEYB_H
+#define MAME_GRIDCOMP_GRIDKEYB_H
 
 #pragma once
 
@@ -77,4 +77,4 @@ private:
 	output_delegate m_keyboard_cb;
 };
 
-#endif // MAME_MACHINE_GRIDKEYB_H
+#endif // MAME_GRIDCOMP_GRIDKEYB_H
