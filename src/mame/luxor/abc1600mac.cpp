@@ -245,7 +245,9 @@ uint8_t abc1600_mac_device::read(offs_t offset)
 			logerror("%s BUS ERROR R %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
 				machine().describe_context(), offset, virtual_offset, nonx, wp, task, fc, m_magic);
 			machine().debug_break();
-			m_write_buserr(offset, 1);
+			m_cpu->set_buserror_details(offset, 1, m_cpu->get_fc());
+			m_cpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+			m_cpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		}
 	}
 
@@ -288,14 +290,18 @@ void abc1600_mac_device::write(offs_t offset, uint8_t data)
 			logerror("%s BUS ERROR W %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
 				machine().describe_context(), offset, virtual_offset, nonx, wp, task, fc, m_magic);
 			machine().debug_break();
-			m_write_buserr(offset, 0);
+			m_cpu->set_buserror_details(offset, 0, m_cpu->get_fc());
+			m_cpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+			m_cpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		}
 		if (!wp)
 		{
 			logerror("%s BUS ERROR W %05x:%06x (NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
 				machine().describe_context(), offset, virtual_offset, nonx, wp, task, fc, m_magic);
 			machine().debug_break();
-			m_write_buserr(offset, 0);
+			m_cpu->set_buserror_details(offset, 0, m_cpu->get_fc());
+			m_cpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+			m_cpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 		}
 	}
 
