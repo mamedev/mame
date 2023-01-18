@@ -22,6 +22,8 @@
 #include <wbemcli.h>
 
 
+namespace osd {
+
 namespace {
 
 using namespace Microsoft::WRL;
@@ -420,12 +422,14 @@ private:
 
 } // anonymous namespace
 
+} // namespace osd
+
 #else // defined(OSD_WINDOWS)
 
 #include "input_module.h"
 
-MODULE_NOT_SUPPORTED(winhybrid_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "winhybrid")
+namespace osd { MODULE_NOT_SUPPORTED(winhybrid_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "winhybrid") }
 
 #endif // defined(OSD_WINDOWS)
 
-MODULE_DEFINITION(JOYSTICKINPUT_WINHYBRID, winhybrid_joystick_module)
+MODULE_DEFINITION(JOYSTICKINPUT_WINHYBRID, osd::winhybrid_joystick_module)
