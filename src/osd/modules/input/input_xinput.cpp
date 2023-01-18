@@ -1391,7 +1391,7 @@ void xinput_turntable_device::poll()
 			m_switches[SWITCH_GREEN + i] = BIT(trigger_right(), i) ? 0xff : 0x00;
 
 		// translate axes
-		m_axes[AXIS_TURNTABLE] = thumb_left_y() * INPUT_RELATIVE_PER_PIXEL;
+		m_axes[AXIS_TURNTABLE] = s32(thumb_left_y()) * INPUT_RELATIVE_PER_PIXEL * 2;
 		m_axes[AXIS_CROSSFADE] = normalize_absolute_axis(thumb_right_y(), XINPUT_AXIS_MINVALUE, XINPUT_AXIS_MAXVALUE);
 
 		// convert effect dial value to relative displacement
@@ -1402,7 +1402,7 @@ void xinput_turntable_device::poll()
 				effect_delta -= 0x1'0000;
 			else if (-0x8000 > effect_delta)
 				effect_delta += 0x1'0000;
-			m_axes[AXIS_EFFECT] = effect_delta * INPUT_RELATIVE_PER_PIXEL;
+			m_axes[AXIS_EFFECT] = effect_delta * INPUT_RELATIVE_PER_PIXEL / 128;
 		}
 		m_prev_effect = u16(thumb_right_x());
 	}
