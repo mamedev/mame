@@ -102,6 +102,8 @@ More chips (from eBay auction):
 #include "speaker.h"
 
 
+namespace {
+
 class igt_gameking_state : public driver_device
 {
 public:
@@ -901,6 +903,9 @@ ROM_START( gkkey )
 	ROM_REGION32_LE( 0x200000, "plx", ROMREGION_ERASEFF )
 	ROM_REGION32_LE( 0x200000, "snd", ROMREGION_ERASEFF )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1994, ms3,       0,      igt_gameking, igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 3",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1994, ms72c,     0,      igt_ms72c,    igt_gameking, igt_gameking_state, empty_init, ROT0, "IGT", "Multistar 7 2c",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

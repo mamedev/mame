@@ -21,6 +21,9 @@
 #include "screen.h"
 #include "emupal.h"
 
+
+namespace {
+
 class hunter16_state : public driver_device
 {
 public:
@@ -266,6 +269,9 @@ ROM_START( hunter1680 )
 	ROM_REGION(0x20000, "bios", 0)
 	ROM_LOAD( "v4.05.bin", 0x0000, 0x20000, CRC(e0cfabf4) SHA1(183d5bf7553404302697ac89eed25f2a8bb7695c) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT     CLASS           INIT        COMPANY                FULLNAME              FLAGS */
 COMP( 1989, hunter16,   0,        0,      hunter16,   hunter16, hunter16_state, empty_init, "Husky Computers Ltd", "Husky Hunter 16",    MACHINE_IS_SKELETON )

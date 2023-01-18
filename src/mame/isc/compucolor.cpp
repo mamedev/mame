@@ -33,6 +33,9 @@
 #include "softlist_dev.h"
 #include "utf8.h"
 
+
+namespace {
+
 #define I8080_TAG   "ua2"
 #define TMS5501_TAG "ud2"
 #define CRT5027_TAG "uf9"
@@ -465,5 +468,8 @@ ROM_START( compclr2 )
 	ROM_LOAD( "82s129.ug9", 0x00, 0x20, NO_DUMP ) // Scan Decoder
 	ROM_LOAD( "82s129.ug5", 0x00, 0x20, NO_DUMP ) // Color PROM
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1977, compclr2, 0, 0, compucolor2, compucolor2, compucolor2_state, empty_init, "Intelligent Systems Corporation", "Compucolor II", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

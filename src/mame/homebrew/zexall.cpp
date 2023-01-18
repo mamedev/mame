@@ -28,6 +28,9 @@
 #include "cpu/z80/z80.h"
 #include "machine/terminal.h"
 
+
+namespace {
+
 class zexall_state : public driver_device
 {
 public:
@@ -178,6 +181,8 @@ ROM_START( zexall )
 	ROM_LOAD( "interface.bin", 0x0000, 0x0051, CRC(4292a574) SHA1(d3ed6d84e2b64e51598f36b4f290972963e1eb6d) ) // written directly in machine code
 	ROM_LOAD( "zexall.bin",    0x0100, 0x2189, CRC(b6f869c3) SHA1(14021f75c1bc9f26688969581065a0efff3af59c) )
 ROM_END
+
+} // anonymous namespace
 
 
 /******************************************************************************

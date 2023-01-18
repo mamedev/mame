@@ -44,6 +44,9 @@ TODO: boot tests fail
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 #define HP9816_CHDIMX 8
 #define HP9816_CHDIMY 16
 #define HP9816_ROWX 80
@@ -161,7 +164,7 @@ private:
 	uint16_t leds_r(offs_t offset, uint16_t mem_mask = ~0);
 	void leds_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void kbd_put(uint8_t data);
+	[[maybe_unused]] void kbd_put(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -429,6 +432,9 @@ ROM_START( hp9816 )
 	ROMX_LOAD( "rom30.bin", 0x0000, 0x10000, CRC(05c07e75) SHA1(3066a65e6137482041f9a77d09ee2289fe0974aa), ROM_BIOS(1) )
 
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 
