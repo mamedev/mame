@@ -9,6 +9,10 @@
     SUMA GFX 5600X 128MB (Model SV3MDN0)
     Sound Blaster Live! 5.1 Digital (Model SB0220)
     Samsung SP6003H/OMD REV. A PUMA 60.0 GB
+
+    TODO:
+    - in shutms11 loads Windows 2000 fine but MAME throws "Caught unhandled exception" as soon
+      as progress bar completes.
 */
 
 #include "emu.h"
