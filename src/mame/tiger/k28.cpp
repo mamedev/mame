@@ -13,7 +13,7 @@ Tiger Electronics K28: Talking Learning Computer (model 7-230/7-231)
 3 models exist:
 - 7-230: darkblue case, toy-ish looks
 - 7-231: gray case, hardware is the same
-- 7-232: this one is completely different hw --> driver handheld/tispeak.cpp
+- 7-232: this one is completely different hw --> driver k28m2.cpp
 
 TODO:
 - external module support (no dumps yet)
@@ -21,12 +21,14 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mcs48/mcs48.h"
+#include "machine/timer.h"
+#include "machine/tms6100.h"
 #include "video/mm5445.h"
 #include "video/pwm.h"
-#include "machine/tms6100.h"
-#include "machine/timer.h"
 #include "sound/votrax.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -82,18 +84,8 @@ private:
 	void power_off();
 };
 
-
-// machine start/reset/power
-
 void k28_state::machine_start()
 {
-	// zerofill
-	m_power_on = false;
-	m_inp_mux = 0;
-	m_phoneme = 0x3f;
-	m_speech_strobe = 0;
-	m_vfd_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_power_on));
 	save_item(NAME(m_inp_mux));
@@ -101,6 +93,12 @@ void k28_state::machine_start()
 	save_item(NAME(m_speech_strobe));
 	save_item(NAME(m_vfd_data));
 }
+
+
+
+/******************************************************************************
+    Power
+******************************************************************************/
 
 void k28_state::machine_reset()
 {
@@ -139,7 +137,7 @@ void k28_state::vfd_output_w(u64 data)
 	m_display->matrix(data >> 16, seg_data);
 
 	// O26: power-off request on falling edge
-	if (~data & m_vfd_data & 0x2000000)
+	if (~data & m_vfd_data & 1 << 25)
 		power_off();
 	m_vfd_data = data;
 }
@@ -179,7 +177,7 @@ u8 k28_state::mcu_p1_r()
 
 	// multiplexed inputs (active low)
 	for (int i = 0; i < 7; i++)
-		if (m_inp_mux >> i & 1)
+		if (BIT(m_inp_mux, i))
 		{
 			data |= m_inputs[i]->read();
 

@@ -64,7 +64,7 @@
 #include "decioga.h"
 #include "machine/mc146818.h"
 #include "machine/z80scc.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 //#include "machine/dc7061.h"
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/cd.h"

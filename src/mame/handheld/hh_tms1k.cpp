@@ -6,13 +6,14 @@
 This driver is a collection of simple dedicated handheld and tabletop
 toys based around the TMS1000 MCU series. Anything more complex or clearly
 part of a series is (or will be) in its own driver, see:
-- eva: Chrysler EVA-11 (and EVA-24)
-- microvsn: Milton Bradley Microvision
-- sag: Entex Select-A-Game Machine
+- entex/sag.cpp: Entex Select-A-Game Machine
+- miltonbradley/microvsn.cpp: Milton Bradley Microvision
+- misc/eva.cpp: Chrysler EVA-11 (and EVA-24)
+- tiger/k28m2.cpp: Tiger K28: Talking Learning Computer (model 7-232)
 
 (contd.) hh_tms1k child drivers:
-- tispellb: TI Spelling B series gen. 1
-- tispeak: TI Speak & Spell series gen. 1
+- tispellb.cpp: TI Spelling B series gen. 1
+- tispeak.cpp: TI Speak & Spell series gen. 1
 
 About the approximated MCU frequency everywhere: The RC osc. is not that
 stable on most of these handhelds. When comparing multiple video recordings
@@ -49,8 +50,7 @@ TODO:
 - t7in1ss: in 2-player mode, game select and skill select can be configured after
   selecting a game? Possibly BTANB, players are expected to quickly press the
   "First Up" button after the alarm sound.
-- bship discrete sound, netlist is documented
-- finish bshipb SN76477 sound
+- finish bshipb SN76477 sound (incomplete output PLA)
 - redo internal artwork for the baseball games (embedded SVG for diamond shapes)
 - improve elecbowl driver
 - tithermos temperature sensor comparator (right now just the digital clock works)
@@ -127,7 +127,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP3201   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A)
  @MP3206   TMS1000   1978, Concept 2000 Mr. Mus-I-Cal (model 560)
  *MP3207   TMS1000   1978, Concept 2000 Lite 'n Learn: Electronic Organ (model 554)
- @MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750B)
+ @MP3208   TMS1000   1978, Milton Bradley Electronic Battleship (1977, model 4750B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (Rev A)
  *MP3228   TMS1000   1979, Texas Instruments OEM melody chip
  *MP3232   TMS1000   1979, Fonas 2 Player Baseball (no "MP" on chip label)
@@ -184,7 +184,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
  @MP7314   TMS1400   1980, Parker Brothers Split Second
-  MP7324   TMS1400   1985, Tiger K28/Coleco Talking Teacher -> tispeak.cpp
+  MP7324   TMS1400   1985, Tiger K28/Coleco Talking Teacher -> tiger/k28m2.cpp
  @MP7332   TMS1400   1981, Milton Bradley Dark Tower
  @MP7334   TMS1400   1981, Coleco Total Control 4
  @MP7351   TMS1400   1982, Parker Brothers Master Merlin
@@ -208,6 +208,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 
 #include "machine/clock.h"
 #include "machine/ds8874.h"
+#include "machine/netlist.h"
 #include "machine/timer.h"
 #include "machine/tmc0999.h"
 #include "machine/tms1024.h"
@@ -223,6 +224,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "screen.h"
 #include "speaker.h"
 
+#include "nl_bship.h"
 #include "utf8.h"
 
 // internal artwork
@@ -5578,6 +5580,9 @@ ROM_END
   - USA: 2 Player Baseball, published by Sears
   - Canada: 2 Player Baseball, published by Talbot Electronics
 
+  Calfax / Caprice Pro-Action Strategy Baseball is also suspected to be the
+  same game, even though it looks a bit different.
+
   led translation table: led zz from game PCB = MAME y.x:
 
     0 = -     10 = 2.2   20 = 4.0   30 = 4.4
@@ -5714,6 +5719,10 @@ ROM_END
 
   It's not known if this game has an official title. The current one is
   taken from the handheld front side.
+
+  Calfax / Caprice separate Football / Basketball / Soccer handhelds are
+  suspected to be the same ROM.
+
   MAME external artwork is needed for the switchable overlays.
 
 ***************************************************************************/
@@ -7915,7 +7924,7 @@ ROM_END
 
 /***************************************************************************
 
-  Milton Bradley Electronic Battleship (1977 version, model 4750A)
+  Milton Bradley Electronic Battleship (model 4750A)
   * PCB label: 4750A
   * TMS1000NL MP3201 (die label: 1000C, MP3201)
   * LM324N, MC14016CP/TP4016AN, NE555P, discrete sound
@@ -7924,13 +7933,14 @@ ROM_END
   This is a 2-player electronic board game. It still needs game pieces like the
   original Battleship board game.
 
-  It went through at least 5 hardware revisions (not counting Talking Battleship):
+  It went through at least 6 hardware revisions (not counting Talking Battleship):
   1977: model 4750A, TMS1000 discrete sound, see notes above
-  1977: model 4750B, TMS1000 SN76477 sound, see notes at bshipb (driver below this)
+  1978: model 4750B, TMS1000 SN76477 sound, see notes at bshipb (driver below this)
   1979: model 4750C: cost-reduced single-chip design, lesser quality game board.
         The chip is assumed to be custom, no MCU: 28-pin DIP, label 4750, SCUS 0462
-  1982: similar custom single-chip hardware, chip label MB4750 SCUS 0562
-  1982: back to MCU, COP420 instead of choosing TI, emulated in hh_cop400.cpp
+  1982: model 4750E: similar custom single-chip hardware, chip label MB4750 SCUS 0562
+  1982: model 4750G: back to MCU, COP420 instead of TI, emulated in hh_cop400.cpp
+  1982: model 4750H: unknown hardware, probably also COP420
 
 ***************************************************************************/
 
@@ -7938,12 +7948,15 @@ class bship_state : public hh_tms1k_state
 {
 public:
 	bship_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_tms1k_state(mconfig, type, tag)
+		hh_tms1k_state(mconfig, type, tag),
+		m_sound_nl(*this, "sound_nl:o%u", 0)
 	{ }
 
 	void bship(machine_config &config);
 
 private:
+	optional_device_array<netlist_mame_logic_input_device, 8> m_sound_nl;
+
 	void write_r(u32 data);
 	void write_o(u16 data);
 	u8 read_k();
@@ -7960,9 +7973,11 @@ void bship_state::write_r(u32 data)
 void bship_state::write_o(u16 data)
 {
 	// O4: explosion light bulb
-	m_display->matrix(1, data >> 4 & 1);
+	m_display->matrix(1, BIT(data, 4));
 
 	// other: sound
+	for (int i = 0; i < 8; i++)
+		if (i != 4) m_sound_nl[i]->write_line(BIT(data, i));
 }
 
 u8 bship_state::read_k()
@@ -8060,7 +8075,17 @@ void bship_state::bship(machine_config &config)
 	config.set_default_layout(layout_bship);
 
 	// sound hardware
-	// TODO
+	SPEAKER(config, "mono").front_center();
+	NETLIST_SOUND(config, "sound_nl", 48000).set_source(NETLIST_NAME(bship)).add_route(ALL_OUTPUTS, "mono", 0.125);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "SPK1.1").set_mult_offset(1.0, 0.0);
+
+	NETLIST_LOGIC_INPUT(config, "sound_nl:o0", "O0.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:o1", "O1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:o2", "O2.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:o3", "O3.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:o5", "O5.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:o6", "O6.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:o7", "O7.IN", 0);
 }
 
 // roms
@@ -8081,7 +8106,7 @@ ROM_END
 
 /***************************************************************************
 
-  Milton Bradley Electronic Battleship (1977 version, model 4750B)
+  Milton Bradley Electronic Battleship (model 4750B)
   * PCB label: MB 4750B
   * TMS1000NLL MP3208 (die label: 1000C, MP3208)
   * SN75494N (acting as inverters), SN76477 sound
@@ -8129,30 +8154,23 @@ void bshipb_state::write_o(u16 data)
 
 	// O1: 75494 to R4 100K to SN76477 pin 18
 	// O2: 75494 to R3 150K to SN76477 pin 18
-	double o12 = RES_INF;
-	switch (~data >> 1 & 3)
-	{
-		case 0: o12 = RES_INF; break;
-		case 1: o12 = RES_K(100); break;
-		case 2: o12 = RES_K(150); break;
-		case 3: o12 = RES_2_PARALLEL(RES_K(100), RES_K(150)); break;
-	}
-	m_sn->vco_res_w(o12);
+	const double o12[4] = { RES_INF, RES_K(100), RES_K(150), RES_2_PARALLEL(RES_K(100), RES_K(150)) };
+	m_sn->vco_res_w(o12[~data >> 1 & 3]);
 
 	// O2,O6: (TODO) to SN76477 pin 21
 	//m_sn->slf_cap_w(x);
 
 	// O4: SN76477 pin 22
-	m_sn->vco_w(data >> 4 & 1);
+	m_sn->vco_w(BIT(data, 4));
 
 	// O5: R11 27K to SN76477 pin 23
 	m_sn->one_shot_cap_w((data & 0x20) ? RES_K(27) : 0);
 
 	// O6: SN76477 pin 25
-	m_sn->mixer_b_w(data >> 6 & 1);
+	m_sn->mixer_b_w(BIT(data, 6));
 
 	// O7: 75494 to light bulb
-	m_display->matrix(1, data >> 7 & 1);
+	m_display->matrix(1, BIT(data, 7));
 }
 
 u8 bshipb_state::read_k()
@@ -8180,19 +8198,19 @@ void bshipb_state::bshipb(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SN76477(config, m_sn);
-	m_sn->set_noise_params(RES_K(47), RES_K(100), CAP_P(47));   // R18, R17, C8
-	m_sn->set_decay_res(RES_M(3.3));                            // R16
-	m_sn->set_attack_params(CAP_U(0.47), RES_K(15));            // C7, R20
-	m_sn->set_amp_res(RES_K(100));                              // R19
-	m_sn->set_feedback_res(RES_K(39));                          // R7
-	m_sn->set_vco_params(5.0 * RES_VOLTAGE_DIVIDER(RES_K(47), RES_K(33)), CAP_U(0.01), RES_K(270)); // R15/R14, C5, switchable R5/R3/R4
+	m_sn->set_noise_params(RES_K(47), RES_K(100), CAP_P(47));
+	m_sn->set_decay_res(RES_M(3.3));
+	m_sn->set_attack_params(CAP_U(0.47), RES_K(15));
+	m_sn->set_amp_res(RES_K(100));
+	m_sn->set_feedback_res(RES_K(39));
+	m_sn->set_vco_params(5.0 * RES_VOLTAGE_DIVIDER(RES_K(47), RES_K(33)), CAP_U(0.01), RES_K(270));
 	m_sn->set_pitch_voltage(5.0);
-	m_sn->set_slf_params(CAP_U(22), RES_K(750));    // switchable C4, switchable R13/R12
-	m_sn->set_oneshot_params(0, RES_INF);           // NC, switchable R11
-	m_sn->set_vco_mode(0);                          // switchable
-	m_sn->set_mixer_params(0, 0, 0);                // switchable, GND, GND
-	m_sn->set_envelope_params(1, 0);                // Vreg, GND
-	m_sn->set_enable(0);                            // switchable
+	m_sn->set_slf_params(CAP_U(22), RES_K(750));
+	m_sn->set_oneshot_params(0, RES_INF);
+	m_sn->set_vco_mode(0);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(1, 0);
+	m_sn->set_enable(0);
 	m_sn->add_route(ALL_OUTPUTS, "mono", 0.35);
 }
 
@@ -8205,7 +8223,7 @@ ROM_START( bshipb )
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_bshipb_output.pla", 0, 365, BAD_DUMP CRC(74a9a244) SHA1(479c1f1e37cf8f75352e10226b20322906bee813) ) // part of decap photo was obscured
+	ROM_LOAD( "tms1000_bshipb_output.pla", 0, 365, BAD_DUMP CRC(74a9a244) SHA1(479c1f1e37cf8f75352e10226b20322906bee813) ) // a corner of the die broke off
 ROM_END
 
 
@@ -14597,6 +14615,10 @@ ROM_END
   It's a 2-in-1 handheld, Strategy Football and Space Game. MAME external
   artwork is recommended for the switchable overlays.
 
+  known releases:
+  - USA(1): Space Cruiser, published by U.S. Games
+  - USA(2): Pro-Action Strategy Football, published by Calfax / Caprice
+
 ***************************************************************************/
 
 class scruiser_state : public hh_tms1k_state
@@ -15159,10 +15181,10 @@ COMP( 1979, horseran,   0,         0, horseran,  horseran,  horseran_state,  emp
 CONS( 1980, mdndclab,   0,         0, mdndclab,  mdndclab,  mdndclab_state,  empty_init, "Mattel Electronics", "Dungeons & Dragons - Computer Labyrinth Game", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
 
 CONS( 1977, comp4,      0,         0, comp4,     comp4,     comp4_state,     empty_init, "Milton Bradley", "Comp IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND_HW )
-CONS( 1977, bship,      0,         0, bship,     bship,     bship_state,     empty_init, "Milton Bradley", "Electronic Battleship (1977 version, model 4750A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ***
-CONS( 1977, bshipb,     bship,     0, bshipb,    bship,     bshipb_state,    empty_init, "Milton Bradley", "Electronic Battleship (1977 version, model 4750B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // ***
-CONS( 1978, simon,      0,         0, simon,     simon,     simon_state,     empty_init, "Milton Bradley", "Simon (Rev A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1979, simonf,     simon,     0, simon,     simon,     simon_state,     empty_init, "Milton Bradley", "Simon (Rev F)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1977, bship,      0,         0, bship,     bship,     bship_state,     empty_init, "Milton Bradley", "Electronic Battleship (TMS1000 version, Rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND ) // ***
+CONS( 1978, bshipb,     bship,     0, bshipb,    bship,     bshipb_state,    empty_init, "Milton Bradley", "Electronic Battleship (TMS1000 version, Rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // ***
+CONS( 1978, simon,      0,         0, simon,     simon,     simon_state,     empty_init, "Milton Bradley", "Simon (Rev. A)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, simonf,     simon,     0, simon,     simon,     simon_state,     empty_init, "Milton Bradley", "Simon (Rev. F)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, ssimon,     0,         0, ssimon,    ssimon,    ssimon_state,    empty_init, "Milton Bradley", "Super Simon", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1979, bigtrak,    0,         0, bigtrak,   bigtrak,   bigtrak_state,   empty_init, "Milton Bradley", "Big Trak", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL ) // ***
 CONS( 1981, mbdtower,   0,         0, mbdtower,  mbdtower,  mbdtower_state,  empty_init, "Milton Bradley", "Dark Tower (Milton Bradley)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL ) // ***

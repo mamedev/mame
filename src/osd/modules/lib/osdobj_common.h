@@ -2,30 +2,41 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    osdepend.h
+    osdobj_common.h
 
     OS-dependent code interface.
 
 *******************************************************************c********/
-
-#pragma once
-
 #ifndef MAME_OSD_LIB_OSDOBJ_COMMON_H
 #define MAME_OSD_LIB_OSDOBJ_COMMON_H
 
+#pragma once
+
 #include "osdcore.h"
 #include "osdepend.h"
+
 #include "modules/osdmodule.h"
 #include "modules/output/output_module.h"
+
 #include "emuopts.h"
+
 #include "strformat.h"
+
+#include <iosfwd>
 #include <list>
+#include <string>
+#include <memory>
+#include <unordered_map>
+#include <vector>
+
 
 //============================================================
 //  Defines
 //============================================================
 
 #define OSDOPTION_UIMODEKEY             "uimodekey"
+#define OSDOPTION_CONTROLLER_MAP_FILE   "controller_map"
+#define OSDOPTION_BACKGROUND_INPUT      "background_input"
 
 #define OSDCOMMAND_LIST_MIDI_DEVICES    "listmidi"
 #define OSDCOMMAND_LIST_NETWORK_ADAPTERS "listnetwork"
@@ -98,6 +109,8 @@ public:
 
 	// keyboard mapping
 	const char *ui_mode_key() const { return value(OSDOPTION_UIMODEKEY); }
+	const char *controller_mapping_file() const { return value(OSDOPTION_CONTROLLER_MAP_FILE); }
+	bool background_input() const { return bool_value(OSDOPTION_BACKGROUND_INPUT); }
 
 	// debugging options
 	const char *debugger() const { return value(OSDOPTION_DEBUGGER); }

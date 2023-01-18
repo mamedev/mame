@@ -20,7 +20,6 @@
     *Muscle Ranking Spray Hitter
      Muscle Ranking Struck Out
      Neratte Don Don
-     Pikkari Chance
     *Run Run Puppy / らんらんぱぴぃ
      Soreike! Hanapuu
 

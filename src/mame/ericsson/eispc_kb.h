@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Joakim Larsson Edström
-#ifndef MAME_MACHINE_EISPC_KB_H
-#define MAME_MACHINE_EISPC_KB_H
+#ifndef MAME_ERICSSON_EISPC_KB_H
+#define MAME_ERICSSON_EISPC_KB_H
 
 #pragma once
 
@@ -46,4 +46,4 @@ protected:
 	void eispc_kb_mem(address_map &map);
 };
 
-#endif // MAME_MACHINE_EISPC_KB_H
+#endif // MAME_ERICSSON_EISPC_KB_H

@@ -72,6 +72,8 @@ ToDo:
 #include "speaker.h"
 
 
+namespace {
+
 class dg680_state : public driver_device
 {
 public:
@@ -330,6 +332,9 @@ ROM_START( dg680 )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "82s123.bin", 0x0000, 0x0020, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

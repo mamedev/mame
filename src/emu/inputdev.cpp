@@ -538,17 +538,21 @@ input_device &input_class::add_device(std::unique_ptr<input_device> &&new_device
 
 input_item_class input_class::standard_item_class(input_item_id itemid) const
 {
-	// most everything standard is a switch, apart from the axes
 	if (itemid == ITEM_ID_OTHER_SWITCH || itemid < ITEM_ID_XAXIS || (itemid > ITEM_ID_SLIDER2 && itemid < ITEM_ID_ADD_ABSOLUTE1))
+	{
+		// most everything standard is a switch, apart from the axes
 		return ITEM_CLASS_SWITCH;
-
-	// standard mouse axes are relative
+	}
 	else if (m_devclass == DEVICE_CLASS_MOUSE || itemid == ITEM_ID_OTHER_AXIS_RELATIVE || (itemid >= ITEM_ID_ADD_RELATIVE1 && itemid <= ITEM_ID_ADD_RELATIVE16))
+	{
+		// standard mouse axes are relative
 		return ITEM_CLASS_RELATIVE;
-
-	// all other standard axes are absolute
+	}
 	else
+	{
+		// all other standard axes are absolute
 		return ITEM_CLASS_ABSOLUTE;
+	}
 }
 
 

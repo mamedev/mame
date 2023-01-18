@@ -1,14 +1,17 @@
 .. _index-commandline:
 
-Commandline Index
-=================
+Command-line Index
+==================
 
-This is a complete index of all commandline options and commands for MAME, suitable for quickly finding a given command.
+This is a complete index of all command-line options and verbs for MAME,
+suitable for quickly finding a given option.
 
-Universal Commandline Options
------------------------------
 
-This section contains configuration options that are applicable to *all* MAME sub-builds (both SDL and Windows native).
+Universal Command-line Options
+------------------------------
+
+This section contains configuration options that are applicable to *all* MAME
+configurations (including both SDL and Windows native).
 
 
 Core Verbs
@@ -53,6 +56,8 @@ OSD-related Options
 ~~~~~~~~~~~~~~~~~~~
 
 | :ref:`uimodekey <mame-commandline-uimodekey>`
+| :ref:`controller_map <mame-commandline-controllermap>`
+| :ref:`background_input <mame-commandline-backgroundinput>`
 | :ref:`uifontprovider <mame-commandline-uifontprovider>`
 | :ref:`keyboardprovider <mame-commandline-keyboardprovider>`
 | :ref:`mouseprovider <mame-commandline-mouseprovider>`
@@ -351,8 +356,11 @@ PortAudio Options
 | :ref:`pa_latency <mame-commandline-palatency>`
 
 
-Windows-Specific Commandline Options
-------------------------------------
+Windows-Specific Command-line Options
+-------------------------------------
+
+This section contains configuration options that are specific to the native
+(non-SDL) Windows version of MAME.
 
 
 Windows Performance Options
@@ -377,10 +385,12 @@ Windows Input Device Options
 | :ref:`[no]dual_lightgun <mame-wcommandline-duallightgun>`
 
 
-SDL-Specific Commandline Options
---------------------------------
 
-This section contains configuration options that are specific to any build supported by SDL (including Windows where compiled as SDL instead of native).
+SDL-Specific Command-line Options
+---------------------------------
+
+This section contains configuration options that are specific to any build
+supported by SDL (including Windows when built with SDL instead of native).
 
 
 SDL Performance Options

@@ -74,7 +74,7 @@ menu_confirm_save_as::~menu_confirm_save_as()
 //  populate
 //-------------------------------------------------
 
-void menu_confirm_save_as::populate(float &customtop, float &custombottom)
+void menu_confirm_save_as::populate()
 {
 	item_append(_("File Already Exists - Override?"), FLAG_DISABLE, nullptr);
 	item_append(menu_item_type::SEPARATOR);
@@ -134,14 +134,26 @@ menu_file_create::~menu_file_create()
 
 
 //-------------------------------------------------
+//  recompute_metrics - recompute metrics
+//-------------------------------------------------
+
+void menu_file_create::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	set_custom_space(line_height() + 3.0F * tb_border(), 0.0F);
+}
+
+
+//-------------------------------------------------
 //  custom_render - perform our special rendering
 //-------------------------------------------------
 
 void menu_file_create::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	extra_text_render(top, bottom, origx1, origy1, origx2, origy2,
-		m_current_directory,
-		std::string_view());
+			m_current_directory,
+			std::string_view());
 }
 
 
@@ -149,7 +161,7 @@ void menu_file_create::custom_render(void *selectedref, float top, float bottom,
 //  populate - populates the file creator menu
 //-------------------------------------------------
 
-void menu_file_create::populate(float &customtop, float &custombottom)
+void menu_file_create::populate()
 {
 	std::string buffer;
 	const image_device_format *format;
@@ -178,8 +190,6 @@ void menu_file_create::populate(float &customtop, float &custombottom)
 	// finish up the menu
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Create"), 0, ITEMREF_CREATE);
-
-	customtop = line_height() + 3.0f * tb_border();
 }
 
 
@@ -263,7 +273,7 @@ menu_select_format::~menu_select_format()
 //  populate
 //-------------------------------------------------
 
-void menu_select_format::populate(float &customtop, float &custombottom)
+void menu_select_format::populate()
 {
 	item_append(_("Select image format"), FLAG_DISABLE, nullptr);
 	for (unsigned int i = 0; i != m_formats.size(); i++)
@@ -322,7 +332,7 @@ menu_select_floppy_init::~menu_select_floppy_init()
 //  populate
 //-------------------------------------------------
 
-void menu_select_floppy_init::populate(float &customtop, float &custombottom)
+void menu_select_floppy_init::populate()
 {
 	item_append(_("Select initial contents"), FLAG_DISABLE, nullptr);
 	int id = 0;

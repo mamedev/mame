@@ -323,6 +323,8 @@ routines :
 #include "speaker.h"
 
 
+namespace {
+
 /* set to 0 to use control panel with only buttons (as in quiz games) - joy is default in dispenser setup */
 #define MGPREM11_USE_JOY    1
 #define MGNUMBER_USE_JOY    1
@@ -1363,6 +1365,8 @@ void cubo_state::init_mgprem11()
 	init_cubo();
 	m_input_hack = &cubo_state::mgprem11_input_hack;
 }
+
+} // anonymous namespace
 
 
 GAME( 1993, cubo,      0,    cubo, cubo,     cubo_state, init_cubo,     ROT0, "Commodore",     "Cubo BIOS",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IS_BIOS_ROOT )

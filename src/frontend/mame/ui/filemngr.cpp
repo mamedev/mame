@@ -54,6 +54,18 @@ menu_file_manager::~menu_file_manager()
 
 
 //-------------------------------------------------
+//  recompute_metrics - recompute metrics
+//-------------------------------------------------
+
+void menu_file_manager::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	set_custom_space(0.0F, line_height() + 3.0F * tb_border());
+}
+
+
+//-------------------------------------------------
 //  custom_render - perform our special rendering
 //-------------------------------------------------
 
@@ -101,7 +113,7 @@ void menu_file_manager::fill_image_line(device_image_interface *img, std::string
 //  populate
 //-------------------------------------------------
 
-void menu_file_manager::populate(float &customtop, float &custombottom)
+void menu_file_manager::populate()
 {
 	std::string tmp_inst, tmp_name;
 
@@ -152,8 +164,6 @@ void menu_file_manager::populate(float &customtop, float &custombottom)
 
 	if (m_warnings.empty() || !missing_mandatory)
 		item_append(m_warnings.empty() ? _("Reset System") : _("Start System"), 0, (void *)1);
-
-	custombottom = line_height() + 3.0f * tb_border();
 }
 
 

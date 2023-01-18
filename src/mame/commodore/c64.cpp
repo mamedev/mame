@@ -34,6 +34,9 @@
 #include "sound/mos6581.h"
 #include "video/mos6566.h"
 
+
+namespace {
+
 #define MOS6567_TAG     "u19"
 #define MOS6569_TAG     "u19"
 #define MOS6581_TAG     "u18"
@@ -100,7 +103,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	void check_interrupts();
+	[[maybe_unused]] void check_interrupts();
 	int read_pla(offs_t offset, offs_t va, int rw, int aec, int ba);
 	uint8_t read_memory(offs_t offset, offs_t va, int aec, int ba);
 	void write_memory(offs_t offset, uint8_t data, int aec, int ba);
@@ -2246,6 +2249,7 @@ ROM_START( clipper )
 	ROM_LOAD( "thdr5.bin", 0x0000, 0x1000, CRC(b4296e62) SHA1(4b6edadbb810c409ece77d5834568fcc2e0bbd61) )
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************

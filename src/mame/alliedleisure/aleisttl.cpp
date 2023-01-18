@@ -32,6 +32,9 @@
 #include "video/fixfreq.h"
 #include "screen.h"
 
+
+namespace {
+
 // copied by Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
@@ -130,6 +133,8 @@ ROM_START( sburners )
 	ROM_REGION( 0x0400, "roms", ROMREGION_ERASE00 )
 	ROM_LOAD( "url1.c15",     0x0000, 0x0200, CRC(e7941edb) SHA1(e3661a4b883e827fa8f0e5191007b948159cb3f4) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1975, sburners, 0, sburners, 0, sburners_state, empty_init, ROT0, "Allied Leisure", "Street Burners [TTL]", MACHINE_IS_SKELETON )

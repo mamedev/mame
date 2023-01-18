@@ -92,6 +92,18 @@ void menu_textbox::handle_key(int key)
 
 
 //-------------------------------------------------
+//  recompute_metrics - recompute metrics
+//-------------------------------------------------
+
+void menu_textbox::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	m_layout = std::nullopt;
+}
+
+
+//-------------------------------------------------
 //  custom_mouse_scroll - handle scroll events
 //-------------------------------------------------
 

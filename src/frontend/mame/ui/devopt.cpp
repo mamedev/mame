@@ -355,7 +355,7 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 	width = layout->actual_width();
 }
 
-void menu_device_config::populate(float &customtop, float &custombottom)
+void menu_device_config::populate()
 {
 }
 

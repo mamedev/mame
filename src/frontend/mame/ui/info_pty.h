@@ -24,7 +24,7 @@ public:
 	virtual ~menu_pty_info() override;
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 };
 

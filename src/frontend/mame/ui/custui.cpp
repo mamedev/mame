@@ -209,7 +209,7 @@ void menu_custom_ui::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void menu_custom_ui::populate(float &customtop, float &custombottom)
+void menu_custom_ui::populate()
 {
 	uint32_t arrow_flags;
 	item_append(_("Fonts"), 0, (void *)(uintptr_t)FONT_MENU);
@@ -498,7 +498,7 @@ void menu_font_ui::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void menu_font_ui::populate(float &customtop, float &custombottom)
+void menu_font_ui::populate()
 {
 	// set filter arrow
 	uint32_t arrow_flags;
@@ -523,8 +523,17 @@ void menu_font_ui::populate(float &customtop, float &custombottom)
 	item_append(_("Infos text size"), string_format("%.2f", m_info_size), arrow_flags, (void *)(uintptr_t)INFOS_SIZE);
 
 	item_append(menu_item_type::SEPARATOR);
+}
 
-	custombottom = line_height() + 3.0f * tb_border();
+//-------------------------------------------------
+//  recompute metrics
+//-------------------------------------------------
+
+void menu_font_ui::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	set_custom_space(0.0f, line_height() + 3.0f * tb_border());
 }
 
 //-------------------------------------------------
@@ -612,7 +621,7 @@ void menu_colors_ui::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void menu_colors_ui::populate(float &customtop, float &custombottom)
+void menu_colors_ui::populate()
 {
 	item_append(_("color-option", "Normal text"),                 0, (void *)(uintptr_t)MUI_TEXT_COLOR);
 	item_append(_("color-option", "Selected color"),              0, (void *)(uintptr_t)MUI_SELECTED_COLOR);
@@ -634,8 +643,17 @@ void menu_colors_ui::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 
 	item_append(_("Restore default colors"), 0, (void *)(uintptr_t)MUI_RESTORE);
+}
 
-	custombottom = line_height() + 3.0f * tb_border();
+//-------------------------------------------------
+//  recompute metrics
+//-------------------------------------------------
+
+void menu_colors_ui::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	set_custom_space(0.0f, line_height() + 3.0f * tb_border());
 }
 
 //-------------------------------------------------
@@ -876,7 +894,7 @@ void menu_rgb_ui::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void menu_rgb_ui::populate(float &customtop, float &custombottom)
+void menu_rgb_ui::populate()
 {
 	// set filter arrow
 	std::string s_text = std::string(m_search).append("_");
@@ -917,8 +935,17 @@ void menu_rgb_ui::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Choose from palette"), 0, (void *)(uintptr_t)PALETTE_CHOOSE);
 	item_append(menu_item_type::SEPARATOR);
+}
 
-	custombottom = line_height() + 3.0f * tb_border();
+//-------------------------------------------------
+//  recompute metrics
+//-------------------------------------------------
+
+void menu_rgb_ui::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	set_custom_space(0.0f, line_height() + 3.0f * tb_border());
 }
 
 //-------------------------------------------------
@@ -1065,7 +1092,7 @@ void menu_palette_sel::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void menu_palette_sel::populate(float &customtop, float &custombottom)
+void menu_palette_sel::populate()
 {
 	for (unsigned x = 0; x < std::size(s_palette); ++x)
 		item_append(_("color-preset", s_palette[x].first), s_palette[x].second, FLAG_COLOR_BOX, (void *)(uintptr_t)(x + 1));

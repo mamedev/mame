@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
-#ifndef MAME_MACHINE_AGATKEYB_H
-#define MAME_MACHINE_AGATKEYB_H
+#ifndef MAME_AGAT_AGATKEYB_H
+#define MAME_AGAT_AGATKEYB_H
 
 #pragma once
 
@@ -67,4 +67,4 @@ private:
 	devcb_write_line m_out_reset_cb;
 };
 
-#endif // MAME_MACHINE_AGATKEYB_H
+#endif // MAME_AGAT_AGATKEYB_H

@@ -35,7 +35,7 @@ menu_plugin::menu_plugin(mame_ui_manager &mui, render_container &container) :
 	set_heading(_("Plugin Options"));
 }
 
-void menu_plugin::populate(float &customtop, float &custombottom)
+void menu_plugin::populate()
 {
 	for (auto &curplugin : m_plugins)
 		item_append(curplugin, 0, (void *)curplugin.c_str());
@@ -125,7 +125,7 @@ void menu_plugin_opt::handle(event const *ev)
 	}
 }
 
-void menu_plugin_opt::populate(float &customtop, float &custombottom)
+void menu_plugin_opt::populate()
 {
 	std::vector<std::tuple<std::string, std::string, std::string>> menu_list;
 	std::string flags;

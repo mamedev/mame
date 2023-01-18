@@ -54,7 +54,7 @@ menu_barcode_reader::~menu_barcode_reader()
 //  populate - populates the barcode input menu
 //-------------------------------------------------
 
-void menu_barcode_reader::populate(float &customtop, float &custombottom)
+void menu_barcode_reader::populate()
 {
 	if (current_device())
 	{

@@ -90,6 +90,8 @@ To Do:
 #include "speaker.h"
 
 
+namespace {
+
 class bcs3_state : public driver_device
 {
 public:
@@ -554,6 +556,9 @@ ROM_START( bcs3d )
 	ROM_REGION( 0x0400, "chargen", 0 )
 	ROM_LOAD( "bcs_zg_33.d21", 0x0000, 0x0400, CRC(b27f1c07) SHA1(61c80c585f198370ba5e856839c12b15acdc58ee))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

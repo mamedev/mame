@@ -40,6 +40,9 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
+
+namespace {
+
 class emu3_state : public driver_device
 {
 public:
@@ -292,5 +295,8 @@ ROM_START(emu3)
 	ROM_REGION(0xc00, "scannercpu", 0)
 	ROM_LOAD("im368.ic31", 0x000, 0xc00, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1987, emu3, 0, 0, emu3, emu3, emu3_state, empty_init, "E-mu Systems", "Emulator Three Digital Sound Production System", MACHINE_IS_SKELETON)

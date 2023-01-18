@@ -526,6 +526,18 @@ void menu_select_software::handle(event const *ev)
 }
 
 //-------------------------------------------------
+//  recompute_metrics
+//-------------------------------------------------
+
+void menu_select_software::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu_select_launch::recompute_metrics(width, height, aspect);
+
+	// configure the custom rendering
+	set_custom_space(4.0F * line_height() + 5.0F * tb_border(), 4.0F * line_height() + 4.0F * tb_border());
+}
+
+//-------------------------------------------------
 //  menu_deactivated
 //-------------------------------------------------
 
@@ -545,7 +557,7 @@ void menu_select_software::menu_deactivated()
 //  populate
 //-------------------------------------------------
 
-void menu_select_software::populate(float &customtop, float &custombottom)
+void menu_select_software::populate()
 {
 	for (auto &icon : m_data->icons()) // TODO: why is this here?  maybe better on resize or setting change?
 		icon.second.texture.reset();
@@ -605,10 +617,7 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 				m_displaylist[curitem].get().parentname.empty() ? 0 : FLAG_INVERT, (void *)&m_displaylist[curitem].get());
 	}
 
-	// configure the custom rendering
 	m_skip_main_items = 0;
-	customtop = 4.0f * line_height() + 5.0f * tb_border();
-	custombottom = 4.0f * line_height() + 4.0f * tb_border();
 
 	if (old_software != -1)
 	{

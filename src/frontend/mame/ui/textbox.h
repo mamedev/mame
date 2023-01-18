@@ -31,6 +31,7 @@ protected:
 
 	virtual void populate_text(std::optional<text_layout> &layout, float &width, int &lines) = 0;
 
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual bool custom_mouse_scroll(int lines) override;
 
 private:

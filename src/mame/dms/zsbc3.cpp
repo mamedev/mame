@@ -42,6 +42,8 @@
 #include "bus/rs232/rs232.h"
 
 
+namespace {
+
 class zsbc3_state : public driver_device
 {
 public:
@@ -118,6 +120,9 @@ ROM_START( zsbc3 )
 	ROM_REGION( 0x0400, "hdc", 0 )
 	ROM_LOAD( "54-8622_hdc13.bin", 0x0000, 0x0400, CRC(02c7cd6d) SHA1(494281ba081a0f7fbadfc30a7d2ea18c59e55101))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

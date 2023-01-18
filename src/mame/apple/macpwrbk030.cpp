@@ -127,6 +127,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define C32M (31.3344_MHz_XTAL)
 #define C15M (C32M/2)
 #define C7M (C32M/4)
@@ -1188,6 +1191,9 @@ ROM_START(macpd210)
 
 	ROM_REGION(0x1800, "pmu", ROMREGION_ERASE00)
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1991, macpb140, 0, 0, macpb140, macadb, macpb030_state, init_macpb140, "Apple Computer", "Macintosh PowerBook 140", MACHINE_NOT_WORKING)
 COMP(1991, macpb170, macpb140, 0, macpb170, macadb, macpb030_state, init_macpb140, "Apple Computer", "Macintosh PowerBook 170", MACHINE_NOT_WORKING)

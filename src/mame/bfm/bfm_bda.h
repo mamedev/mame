@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_BFM_BDA_H
-#define MAME_MACHINE_BFM_BDA_H
+#ifndef MAME_BFM_BFM_BDA_H
+#define MAME_BFM_BFM_BDA_H
 
 #pragma once
 
@@ -67,4 +67,4 @@ private:
 
 DECLARE_DEVICE_TYPE(BFM_BDA, bfm_bda_device)
 
-#endif // MAME_MACHINE_BFM_BDA_H
+#endif // MAME_BFM_BFM_BDA_H

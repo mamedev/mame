@@ -104,11 +104,11 @@ pic16c5x_disassembler::pic16c5x_disassembler()
 					throw std::logic_error(util::string_format("Invalid instruction encoding '%s %s'\n", ops[0],ops[1]));
 			}
 		}
-		if (bit != -1 )
+		if (bit != -1)
 		{
 			throw std::logic_error(util::string_format("not enough bits in encoding '%s %s' %d\n", ops[0],ops[1],bit));
 		}
-		while (isspace((uint8_t)*p)) p++;
+		while (isspace((u8)*p)) p++;
 		Op.emplace_back(mask, bits, *p, ops[0], ops[1]);
 
 		ops += 2;
@@ -123,13 +123,12 @@ offs_t pic16c5x_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	int cnt = 1;
 	int code;
 	int bit;
-	//char *buffertmp;
 	const char *cp; // character pointer in OpFormats
-	uint32_t flags = 0;
+	u32 flags = 0;
 
 	op = -1; // no matching opcode
 	code = opcodes.r16(pc);
-	for ( i = 0; i < int(Op.size()); i++)
+	for (i = 0; i < int(Op.size()); i++)
 	{
 		if ((code & Op[i].mask) == Op[i].bits)
 		{
@@ -141,12 +140,13 @@ offs_t pic16c5x_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			op = i;
 		}
 	}
+
 	if (op == -1)
 	{
 		util::stream_format(stream, "???? dw %04Xh",code);
 		return cnt | SUPPORTED;
 	}
-	//buffertmp = buffer;
+
 	if (Op[op].extcode) // Actually, theres no double length opcodes
 	{
 		bit = 27;
@@ -168,14 +168,14 @@ offs_t pic16c5x_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		// osd_printf_debug("{%c/%d}",*cp,bit);
 		switch (*cp)
 		{
-		case 'a': a <<=1; a |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
-		case 'b': b <<=1; b |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
-		case 'd': d <<=1; d |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
-		case 'f': f <<=1; f |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
-		case 'k': k <<=1; k |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
-		case ' ': break;
-		case '1': case '0':  bit--; break;
-		case '\0': throw std::logic_error(util::string_format("premature end of parse string, opcode %x, bit = %d\n",code,bit));
+			case 'a': a <<=1; a |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
+			case 'b': b <<=1; b |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
+			case 'd': d <<=1; d |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
+			case 'f': f <<=1; f |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
+			case 'k': k <<=1; k |= ((code & (1<<bit)) ? 1 : 0); bit--; break;
+			case ' ': break;
+			case '1': case '0':  bit--; break;
+			case '\0': throw std::logic_error(util::string_format("premature end of parse string, opcode %x, bit = %d\n",code,bit));
 		}
 		cp++;
 	}
@@ -213,7 +213,7 @@ offs_t pic16c5x_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	return cnt | flags | SUPPORTED;
 }
 
-uint32_t pic16c5x_disassembler::opcode_alignment() const
+u32 pic16c5x_disassembler::opcode_alignment() const
 {
 	return 1;
 }

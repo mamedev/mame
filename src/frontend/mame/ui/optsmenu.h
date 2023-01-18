@@ -29,7 +29,7 @@ public:
 
 protected:
 	virtual void handle(event const *ev) override;
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 
 	void handle_item_event(event const &menu_event);
 
@@ -63,7 +63,7 @@ public:
 
 protected:
 	virtual void handle(event const *ev) override;
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 
 	void handle_item_event(event const &menu_event);
 

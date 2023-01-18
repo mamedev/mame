@@ -1512,6 +1512,7 @@ apple2gsr0p                     // June 19, 1986 Apple IIgs ROM00 prototype
 apple2gsr0p2                    // March 10, 1986 Apple IIgs ROM00 prototype
 apple2gsr1                      // Sep 1987 Apple IIgs ROM01
 apple2gsr3p                     // ??? 198? Apple IIgs ROM03 prototype
+apple2gsmt						// 1991 "Mark Twain" prototype
 
 @source:apple/apple3.cpp
 apple3                          // May 1980 Apple ///
@@ -10634,6 +10635,9 @@ clayshoo                        // [1979 Allied Leisure]
 @source:commodore/clcd.cpp
 clcd                            // Commodore LCD
 
+@source:misc/cleartone.cpp
+bnstlkr                         //
+
 @source:vtech/clickstart.cpp
 clikstrt                        // (c) 2007 LeapFrog Enterprises
 
@@ -13952,7 +13956,8 @@ famibox                         // 1986
 famistat                        // 1986
 
 @source:edevices/fantland.cpp
-borntofi                        // (c) International Games?
+borntofi                        // (c) International Games
+borntofia                       // (c) International Games
 borntofiv                       // (c) International Games (Vifico license)
 fantland                        // (c) 198? Electronic Devices Italy
 fantlanda                       // (c) 198? Electronic Devices Italy
@@ -15040,6 +15045,7 @@ galpani3k                       // (c) 1995 Kaneko (Korea)
 galpanic                        // (c) 1990 Kaneko
 galpanica                       // (c) 1990 Kaneko
 galpanicb                       // (c) 1990 Kaneko
+galpanicc                       // (c) 1990 Kaneko
 
 @source:kaneko/galpanic_ms.cpp
 galpanicms
@@ -16577,7 +16583,7 @@ hexion                          // GX122 (c) 1992
 hexionb                         // bootleg
 
 @source:handheld/hh_cop400.cpp
-bship82                         // Milton Bradley
+bshipg                          // Milton Bradley
 copspa                          // National Semiconductor
 ctstein                         // Castle Toy
 einvaderc                       // Entex
@@ -17409,6 +17415,10 @@ ice_tbd                         // ICE - Turbo Drive
 icecold                         //
 icecoldf                        //
 zekepeak                        //
+
+@source:sfrj/idpartner.cpp
+partner1fg                      // Iskra Delta Partner 1F/G
+partnerwfg                      // Iskra Delta Partner WF/G
 
 @source:pinball/idsa.cpp
 bsktbllp                        //
@@ -19613,7 +19623,10 @@ movmastr                        //
 k1003                           //
 
 @source:tiger/k28.cpp
-k28                             // Tiger Electronics
+k28
+
+@source:tiger/k28m2.cpp
+k28m2
 
 @source:robotron/k8915.cpp
 k8915                           //
@@ -19953,6 +19966,7 @@ pwrchanc
 spcpokan
 unkkonmd
 ymcapsul
+pikkaric
 
 @source:konami/quickpick5.cpp
 quickp5
@@ -36355,6 +36369,10 @@ powerstk                        // Motorola Powerstack II
 @source:stm/pp.cpp
 pp                              // STM Pied Piper Communicator 1
 
+@source:stm/stmpc.cpp
+stmpc                           // STM PC portable
+stmpcp                          // STM PC portable (prototype?)
+
 @source:zvt/pp01.cpp
 pp01                            //
 
@@ -37084,7 +37102,8 @@ rex6000                         //
 rf51w14cg                       // (c) 2003 Recreativos Franco
 
 @source:misc/rfslots8085.cpp
-unkrfslt                        //
+bbombo                          // (c) 198? Recreativos Franco
+bformula2                       // (c) 1988 Recreativos Franco
 
 @source:misc/rfslotsmcs48.cpp
 ajofrin                         // (c) 1981 Recreativos Franco
@@ -42102,7 +42121,6 @@ ts2068                          // 1983 TS2068
 uk2086                          // 1986 UK2086
 
 @source:handheld/tispeak.cpp
-k28m2                           // Tiger Electronics
 lanteach                        //
 lantrans                        //
 lantransp                       //
@@ -45157,3 +45175,6 @@ vl1
 
 @source:ddr/sprachmg.cpp
 sprachmg                        // 1985 Institut für Kosmosforschung
+
+@source:skeleton/tnshc08.cpp
+tnshc08                         // JZD Slušovice TNS HC-08

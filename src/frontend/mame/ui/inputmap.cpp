@@ -33,7 +33,7 @@ menu_input_groups::~menu_input_groups()
 {
 }
 
-void menu_input_groups::populate(float &customtop, float &custombottom)
+void menu_input_groups::populate()
 {
 	// build up the menu
 	item_append(_("User Interface"), 0, (void *)uintptr_t(IPG_UI + 1));
@@ -82,7 +82,7 @@ void menu_input_general::menu_activated()
 	reset(reset_options::REMEMBER_POSITION);
 }
 
-void menu_input_general::populate(float &customtop, float &custombottom)
+void menu_input_general::populate()
 {
 	if (data.empty())
 	{
@@ -130,7 +130,7 @@ void menu_input_general::populate(float &customtop, float &custombottom)
 	}
 
 	// populate the menu in a standard fashion
-	populate_sorted(customtop, custombottom);
+	populate_sorted();
 	item_append(menu_item_type::SEPARATOR);
 }
 
@@ -164,7 +164,7 @@ void menu_input_specific::menu_activated()
 	reset(reset_options::REMEMBER_POSITION);
 }
 
-void menu_input_specific::populate(float &customtop, float &custombottom)
+void menu_input_specific::populate()
 {
 	if (data.empty())
 	{
@@ -249,7 +249,7 @@ void menu_input_specific::populate(float &customtop, float &custombottom)
 
 	// populate the menu in a standard fashion
 	if (!data.empty())
-		populate_sorted(customtop, custombottom);
+		populate_sorted();
 	else
 		item_append(_("[no assignable inputs are enabled]"), FLAG_DISABLE, nullptr);
 
@@ -310,6 +310,16 @@ void menu_input::toggle_none_default(input_seq &selected_seq, input_seq &origina
 	else // otherwise, toggle to "none"
 		selected_seq.reset();
 }
+
+
+void menu_input::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	// leave space for showing the input sequence below the menu
+	set_custom_space(0.0F, 2.0F * line_height() + 3.0F * tb_border());
+}
+
 
 void menu_input::custom_render(void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
 {
@@ -554,7 +564,7 @@ void menu_input::handle(event const *ev)
 //  menu from them
 //-------------------------------------------------
 
-void menu_input::populate_sorted(float &customtop, float &custombottom)
+void menu_input::populate_sorted()
 {
 	const char *nameformat[INPUT_TYPE_TOTAL] = { nullptr };
 
@@ -608,9 +618,6 @@ void menu_input::populate_sorted(float &customtop, float &custombottom)
 	appendprompt = util::string_format(_("Press %1$s to append\n"), ui().get_general_input_setting(IPT_UI_SELECT));
 	clearprompt = util::string_format(_("Press %1$s to clear\n"), ui().get_general_input_setting(IPT_UI_CLEAR));
 	defaultprompt = util::string_format(_("Press %1$s to restore default\n"), ui().get_general_input_setting(IPT_UI_CLEAR));
-
-	// leave space for showing the input sequence below the menu
-	custombottom = 2.0f * line_height() + 3.0f * tb_border();
 }
 
 } // namespace ui

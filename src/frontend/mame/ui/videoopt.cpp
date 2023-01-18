@@ -46,7 +46,7 @@ menu_video_targets::~menu_video_targets()
 {
 }
 
-void menu_video_targets::populate(float &customtop, float &custombottom)
+void menu_video_targets::populate()
 {
 	// find the targets
 	for (unsigned targetnum = 0; ; targetnum++)
@@ -113,7 +113,7 @@ menu_video_options::~menu_video_options()
 {
 }
 
-void menu_video_options::populate(float &customtop, float &custombottom)
+void menu_video_options::populate()
 {
 	uintptr_t ref;
 

@@ -59,6 +59,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class d6800_state : public driver_device
 {
 public:
@@ -429,6 +431,9 @@ ROM_START( d6800 )
 	ROM_SYSTEM_BIOS(2, "d2m", "Dreamsoft2m")
 	ROMX_LOAD( "d6800d2m.bin",  0x0000, 0x0800, CRC(eec8e56f) SHA1(f587ccbc0872f2982d61120d033f481a862b902b), ROM_BIOS(2) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY          FULLNAME      FLAGS
 COMP( 1979, d6800, 0,      0,      d6800,   d6800, d6800_state, empty_init, "Michael Bauer", "Dream 6800", MACHINE_SUPPORTS_SAVE )
