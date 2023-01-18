@@ -63,6 +63,8 @@ Ports:
 #include "formats/ace_tap.h"
 
 
+namespace {
+
 #define Z80_TAG         "z0"
 #define AY8910_TAG      "ay8910"
 #define I8255_TAG       "i8255"
@@ -839,6 +841,7 @@ ROM_START( jupace )
 	ROM_LOAD( "sp0256-al2.ic1", 0x000, 0x800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) )
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************

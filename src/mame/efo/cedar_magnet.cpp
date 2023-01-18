@@ -286,6 +286,8 @@ MASTER BOARD
 #include "screen.h"
 
 
+namespace {
+
 #define LOG_IC49_PIO_PB 0
 #define LOG_IC48_PIO_PB 0
 #define LOG_IC48_PIO_PA 0
@@ -1155,6 +1157,9 @@ void cedar_magnet_state::kludge_protection()
 		if ((m_ram0[m_address2hack] == 0x3e) && (m_ram0[m_address2hack + 1] == 0xff)) m_ram0[m_address2hack] = 0xc9;
 	}
 }
+
+} // anonymous namespace
+
 
 GAME( 1987, cedmag,   0,      cedar_magnet, cedar_magnet, cedar_magnet_state, empty_init, ROT0,  "EFO SA / Cedar", "Magnet System",                         MACHINE_IS_BIOS_ROOT )
 

@@ -23,6 +23,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class vegaeo_state : public eolith_state
 {
 public:
@@ -297,5 +299,8 @@ void vegaeo_state::init_vegaeo()
 
 	init_speedup();
 }
+
+} // anonymous namespace
+
 
 GAME( 2002, crazywar, 0, vega, crazywar, vegaeo_state, init_vegaeo, ROT0, "Eolith", "Crazy War", MACHINE_SUPPORTS_SAVE )

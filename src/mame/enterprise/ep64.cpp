@@ -166,6 +166,8 @@ Notes: (All IC's shown)
 #include "speaker.h"
 
 
+namespace {
+
 #define Z80_TAG         "u1"
 #define DAVE_TAG        "u3"
 #define NICK_TAG        "u4"
@@ -679,6 +681,7 @@ ROM_START( ep128 )
 	ROM_LOAD( "9256ds-0019_enter08-45-a.u2", 0x0000, 0x8000, CRC(982a3b44) SHA1(55315b20fecb4441a07ee4bc5dc7153f396e0a2e) )
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************

@@ -17,6 +17,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class scv_state : public driver_device
 {
 public:
@@ -687,6 +689,8 @@ ROM_START( scv_pal )
 	ROM_REGION( 0x400, "charrom", 0 )
 	ROM_LOAD( "epochtv.chr", 0, 0x400, BAD_DUMP CRC(db521533) SHA1(40b4e44838c35191f115437a14f200f052e71509) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME                       FLAGS */

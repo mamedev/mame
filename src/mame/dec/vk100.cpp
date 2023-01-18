@@ -140,6 +140,8 @@ state machine and sees if the GO bit ever finishes and goes back to 0
 #include "vk100.lh"
 
 
+namespace {
+
 // named timer IDs
 #define TID_I8251_RX 1
 #define TID_I8251_TX 2
@@ -217,7 +219,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
 	DECLARE_WRITE_LINE_MEMBER(i8251_rxrdy_int);
 	DECLARE_WRITE_LINE_MEMBER(i8251_txrdy_int);
-	DECLARE_WRITE_LINE_MEMBER(i8251_rts);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(i8251_rts);
 	uint8_t vram_read();
 	uint8_t vram_attr_read();
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -1269,6 +1271,9 @@ ROM_START( vk100 )
 	 */
 	ROM_LOAD( "wb8014_297a1.74s288.pr6.ic89", 0x0000, 0x0020, CRC(e2f7c566) SHA1(a4c3dc5d07667141ad799168a862cb3c489b4934)) // label verified from nigwil's and andy's board
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

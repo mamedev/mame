@@ -9,8 +9,8 @@
     Original source (from deco32.cpp) by Bryan McPhail, split by cam900.
 
 **************************************************************************/
-#ifndef MAME_VIDEO_DECO_ACE_H
-#define MAME_VIDEO_DECO_ACE_H
+#ifndef MAME_DATAEAST_DECO_ACE_H
+#define MAME_DATAEAST_DECO_ACE_H
 
 #pragma once
 
@@ -55,4 +55,4 @@ private:
 DECLARE_DEVICE_TYPE(DECO_ACE, deco_ace_device)
 
 
-#endif // MAME_VIDEO_DECO_ACE_H
+#endif // MAME_DATAEAST_DECO_ACE_H

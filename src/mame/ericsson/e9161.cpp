@@ -16,6 +16,8 @@
 #include "video/am8052.h"
 
 
+namespace {
+
 class e9161_state : public driver_device
 {
 public:
@@ -96,6 +98,8 @@ ROM_START(e9161)
 	ROM_LOAD16_BYTE("e3405_87080_7403.bin", 0x0000, 0x2000, CRC(97f72404) SHA1(ced003ce294cd7370051e1f774d5120062390647))
 	ROM_LOAD16_BYTE("e3405_87080_7303.bin", 0x0001, 0x2000, CRC(ec94aec4) SHA1(f41ae1b7f04ca3a2d0def6ff9aad3ff41782589a))
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(198?, e9161, 0, 0, e9161, e9161, e9161_state, empty_init, "Ericsson", "9161 Display Processor Unit", MACHINE_IS_SKELETON)
