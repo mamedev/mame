@@ -629,7 +629,7 @@ protected:
 	u8   m_ivr;         // Interrupt Vector Register
 	u16  m_icr;         // Interrupt Control Register
 	u32  m_imr;         // Interrupt Mask Register
-	u32  m_isr;         // Interrupt Status Register
+	u32  m_gisr;        // (global) Interrupt Status Register
 	u32  m_ipr;         // Interrupt Pending Register
 
 	// $(FF)FFF400
