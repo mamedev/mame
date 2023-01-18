@@ -5,11 +5,6 @@
 // MEDIAGX CPU + 3dFX VooDoo chipset
 /***************************************************************************
 
-driver by Angelo Salese & Phil Bennett
-
-Notes:
--
-
 Funky Ball
 dgPIX, 1998
 
