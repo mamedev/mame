@@ -18,22 +18,22 @@ There were also some standalone machines, eg. Morphy Encore, Odin Encore.
 Cartridge pins are A0-A15, D0-D7, external RAM CS and RAM WR.
 
 The opening/endgame cartridges are meant to be ejected/inserted while playing:
-switch power switch to MEM (internal RAM gets powered by rechargable battery),
-swap cartridge, switch power switch back to ON. In other words, don't power
-cycle the machine (or MAME).
+Press RANK, switch power switch to MEM (internal RAM gets powered by rechargable
+battery), swap cartridge, switch power switch back to ON. In other words, don't
+power cycle the machine (or MAME).
 
 Known chess cartridges (*denotes not dumped):
 - Chess/Boris 2.5 (aka Sargon 2.5)
-- *Gruenfeld Edition - Master Chess Openings
-- Morphy Edition - Master Chess
-- Capablanca Edition - Master Chess Endgame
-- Sandy Edition - Master Chess (German language version of Morphy)
-- Steinitz Edition-4 - Master Chess
-- *Monitor Edition - Master Kriegspiel
+- *Gruenfeld Edition: Master Chess Openings
+- Morphy Edition: Master Chess
+- Capablanca Edition: Master Chess Endgame
+- Sandy Edition: Master Chess (German language version of Morphy)
+- Steinitz Edition-4: Master Chess
+- *Monitor Edition: Master Kriegspiel
 
 Other games:
-- *Borchek Edition - Master Checkers
-- *Odin Edition - Master Reversi
+- *Borchek Edition: Master Checkers
+- *Odin Edition: Master Reversi
 - *Las Vegas 21
 - *Wits End (unreleased?)
 - *Lunar Lander (unreleased?)
@@ -134,6 +134,12 @@ void ggm_state::machine_start()
 	save_item(NAME(m_shift_clock));
 }
 
+
+
+/******************************************************************************
+    Power
+******************************************************************************/
+
 void ggm_state::machine_reset()
 {
 	// it determines whether it's a cold boot or warm boot ("MEM" switch), with CA1
@@ -161,10 +167,8 @@ void ggm_state::update_reset(ioport_value state)
 
 
 /******************************************************************************
-    I/O
+    Cartridge
 ******************************************************************************/
-
-// cartridge
 
 DEVICE_IMAGE_LOAD_MEMBER(ggm_state::load_cart)
 {
@@ -206,7 +210,10 @@ void ggm_state::extram_w(offs_t offset, u8 data)
 }
 
 
-// 6522 ports
+
+/******************************************************************************
+    I/O
+******************************************************************************/
 
 void ggm_state::update_display()
 {
@@ -240,7 +247,8 @@ void ggm_state::select_w(u8 data)
 
 void ggm_state::control_w(u8 data)
 {
-	// PB0: DC/DC converter, toggles once per IRQ (probably for VFD, not needed for emulation)
+	// PB0: DC/DC converter, toggles once per IRQ
+	// (probably for VFD, not needed for emulation)
 
 	// PB7: speaker out
 	m_dac->write(BIT(data, 7));
@@ -434,7 +442,7 @@ INPUT_PORTS_END
 
 void ggm_state::ggm(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, 2_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ggm_state::main_map);
 
@@ -449,17 +457,17 @@ void ggm_state::ggm(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 16);
 	m_display->set_segmask(0xff, 0x3fff);
 	m_display->set_bri_levels(0.05);
 	config.set_default_layout(layout_aci_ggm);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "ggm");
 	m_cart->set_device_load(FUNC(ggm_state::load_cart));
 	m_cart->set_device_unload(FUNC(ggm_state::unload_cart));

@@ -292,7 +292,7 @@ INPUT_PORTS_END
 
 void k28_state::k28(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I8021(config, m_maincpu, 3.579545_MHz_XTAL);
 	m_maincpu->bus_out_cb().set(FUNC(k28_state::mcu_p0_w));
 	m_maincpu->p1_in_cb().set(FUNC(k28_state::mcu_p1_r));
@@ -305,13 +305,13 @@ void k28_state::k28(machine_config &config)
 
 	TIMER(config, "on_button").configure_generic(nullptr);
 
-	/* video hardware */
+	// video hardware
 	MM5445(config, m_vfd).output_cb().set(FUNC(k28_state::vfd_output_w));
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 	m_display->set_segmask(0x1ff, 0x3fff);
 	config.set_default_layout(layout_k28);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	VOTRAX_SC01(config, "speech", 760000).add_route(ALL_OUTPUTS, "mono", 0.5); // measured 760kHz on its RC pin
 }

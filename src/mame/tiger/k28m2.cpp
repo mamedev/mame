@@ -7,14 +7,19 @@ Tiger Electronics K28 (model 7-232) Sold in Hong Kong, distributed in US as:
 - Coleco: Talking Teacher
 - Sears: Talkatron: Learning Computer
 
-K28 model 7-232 (HK), 1985
+1981 K28 models 7-230 and 7-231 are on different hardware, showing a different
+keyboard, VFD, and use the SC-01 speech chip. --> driver k28.cpp
+
+TODO:
+- emulate LCD
+
+-------------------------------------------------------------------------------
+
+Hardware notes:
 - MCU: TMS1400 MP7324 (die label: TMS1400, MP7324, 28L 01D D000 R100)
 - TMS51xx: TMS5110A
 - VSM: 16KB CM62084
 - LCD: SMOS SMC1112 MCU to 8*14-seg display
-
-1981 K28 models 7-230 and 7-231 are on different hardware, showing a different
-keyboard, VFD, and use the SC-01 speech chip. --> driver k28.cpp
 
 K28 modules: (* denotes not dumped)
 - Spelling I: VSM: 16KB CM62086
@@ -28,9 +33,6 @@ K28 modules: (* denotes not dumped)
 - Expansion Module 6: VSM: 16KB CM62219
 
 note: these won't work on the 1981 version(s)
-
-TODO:
-- emulate LCD
 
 ******************************************************************************/
 
@@ -79,7 +81,6 @@ private:
 	optional_device<generic_slot_device> m_cart;
 	required_ioport_array<9> m_inputs;
 
-	void update_display(u8 old, u8 data);
 	u8 read_k();
 	void write_o(u16 data);
 	void write_r(u32 data);
@@ -152,11 +153,6 @@ DEVICE_IMAGE_LOAD_MEMBER(k28m2_state::cart_load)
     I/O
 ******************************************************************************/
 
-void k28m2_state::update_display(u8 old, u8 data)
-{
-	// ?
-}
-
 void k28m2_state::write_r(u32 data)
 {
 	// R1234: TMS5100 CTL8421
@@ -170,7 +166,7 @@ void k28m2_state::write_r(u32 data)
 	m_inp_mux = (m_inp_mux & 0xff) | (data << 3 & 0x100);
 
 	// R7-R10: LCD data
-	update_display(m_r >> 7 & 0xf, data >> 7 & 0xf);
+	//TODO..
 
 	// R6: power-off request, on falling edge
 	if (~data & m_r & 0x40)
