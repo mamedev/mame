@@ -1642,7 +1642,7 @@ int arcompact_disassembler::handle_dasm_LDB_S_a_b_c(std::ostream &stream, offs_t
 	return handle0c_helper_dasm(stream, pc, op, opcodes, "LDB_S", 0);
 }
 
-int arcompact_disassembler::handleop_dasm_LDW_S_a_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_LDW_S_a_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0c_helper_dasm(stream, pc, op, opcodes, "LDW_S", 0);
 }

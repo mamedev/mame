@@ -1698,15 +1698,16 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I      SS SSSS
 // LD<zz><.x><.aa><.di> a,[b,c]    0010 0bbb aa11 0ZZX   DBBB CCCC CCAA AAAA
 // LD<zz><.x><.aa><.di> 0,[b,c]    0010 0bbb aa11 0ZZX   DBBB CCCC CC11 1110
-// PREFETCH<.aa> [b,c]             0010 0bbb aa11 0000   0BBB CCCC CC11 1110    (prefetch is an alias)
+// PREFETCH<.aa> [b,c]             0010 0bbb aa11 0000   0BBB CCCC CC11 1110 (ZZXD is 0) (prefetch is an alias)
 //
-// LD<zz><.x><.aa><.di> a,[b,limm] 0010 0bbb aa11 0ZZX   DBBB 1111 10AA AAAA (+ Limm)
-// LD<zz><.x><.aa><.di> 0,[b,limm] 0010 0bbb aa11 0ZZX   DBBB 1111 1011 1110 (+ Limm)
-// PREFETCH<.aa> [b,limm]          0010 0bbb aa11 0000   0BBB 1111 1011 1110 (+ Limm) (prefetch is an alias)
+// LD<zz><.x><.aa><.di> a,[b,limm] 0010 0bbb aa11 0ZZX   DBBB 1111 10AA AAAA (+ Limm) (C is 62)
+// LD<zz><.x><.aa><.di> 0,[b,limm] 0010 0bbb aa11 0ZZX   DBBB 1111 1011 1110 (+ Limm) (C is 62)
+// PREFETCH<.aa> [b,limm]          0010 0bbb aa11 0000   0BBB 1111 1011 1110 (+ Limm) (C is 62) (ZZXD is 0) (prefetch is an alias)
 //
-// LD<zz><.x><.di> a,[limm,c]      0010 0110 RR11 0ZZX   D111 CCCC CCAA AAAA (+ Limm)
-// LD<zz><.x><.di> 0,[limm,c]      0010 0110 RR11 0ZZX   D111 CCCC CC11 1110 (+ Limm)
-// PREFETCH [limm,c]               0010 0110 RR11 0000   0111 CCCC CC11 1110 (+ Limm) (prefetch is an alias)
+// if b is 62 (Limm) then aa becomes RR (reserved)
+// LD<zz><.x><.di> a,[limm,c]      0010 0110 RR11 0ZZX   D111 CCCC CCAA AAAA (+ Limm) (b is 62)
+// LD<zz><.x><.di> 0,[limm,c]      0010 0110 RR11 0ZZX   D111 CCCC CC11 1110 (+ Limm) (b is 62)
+// PREFETCH [limm,c]               0010 0110 RR11 0000   0111 CCCC CC11 1110 (+ Limm) (b is 62) (ZZXD is 0) (prefetch is an alias)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 					case 0x30: size = handle_dasm32_LD_0(stream, pc, op, opcodes); break; // LD r-r
 					case 0x31: size = handle_dasm32_LD_1(stream, pc, op, opcodes); break; // LD r-r
@@ -2155,7 +2156,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //                                 IIII I       S S
 // LDW_S a,[b,c]                   0110 0bbb ccc1 0aaa
 // #######################################################################################################################
-						size = handleop_dasm_LDW_S_a_b_c(stream, pc, op, opcodes); break; // LDW_S a,[b,c]
+						size = handle_dasm_LDW_S_a_b_c(stream, pc, op, opcodes); break; // LDW_S a,[b,c]
 					}
 					case 0x03:
 					{
