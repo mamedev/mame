@@ -24,7 +24,8 @@ MAIN:
 	switch(m_opcode)
 	{
 		case 0x00:  case 0x01:                          %DIRECT;    %NEG8;      return;
-		case 0x03:  case 0x02:                          %DIRECT;    %COM8;      return;
+		case 0x02:                                      %DIRECT;    %XNC8;      return;
+		case 0x03:                                      %DIRECT;    %COM8;      return;
 		case 0x04:  case 0x05:                          %DIRECT;    %LSR8;      return;
 		case 0x06:                                      %DIRECT;    %ROR8;      return;
 		case 0x07:                                      %DIRECT;    %ASR8;      return;
@@ -77,15 +78,18 @@ MAIN:
 		case 0x35:                                                  %PULS;      return;
 		case 0x36:                                                  %PSHU;      return;
 		case 0x37:                                                  %PULU;      return;
+		case 0x38:                                      set_imm();  %XANDCC;    return;
 		case 0x39:                                                  %RTS;       return;
 		case 0x3A:                                                  %ABX;       return;
 		case 0x3B:                                                  %RTI;       return;
 		case 0x3C:                                                  %CWAI;      return;
 		case 0x3D:                                                  %MUL;       return;
+		case 0x3E:                                                  %XRES;      return;
 		case 0x3F:                                                  %SWI;       return;
 
 		case 0x40:  case 0x41:                          set_a();    %NEG8;      return;
-		case 0x43:  case 0x42:                          set_a();    %COM8;      return;
+		case 0x42:                                      set_a();    %XNC8;      return;
+		case 0x43:                                      set_a();    %COM8;      return;
 		case 0x44:  case 0x45:                          set_a();    %LSR8;      return;
 		case 0x46:                                      set_a();    %ROR8;      return;
 		case 0x47:                                      set_a();    %ASR8;      return;
@@ -98,7 +102,8 @@ MAIN:
 		case 0x4F:                                      set_a();    %CLR8;      return;
 
 		case 0x50:  case 0x51:                          set_b();    %NEG8;      return;
-		case 0x53:  case 0x52:                          set_b();    %COM8;      return;
+		case 0x52:                                      set_b();    %XNC8;      return;
+		case 0x53:                                      set_b();    %COM8;      return;
 		case 0x54:  case 0x55:                          set_b();    %LSR8;      return;
 		case 0x56:                                      set_b();    %ROR8;      return;
 		case 0x57:                                      set_b();    %ASR8;      return;
@@ -111,7 +116,8 @@ MAIN:
 		case 0x5F:                                      set_b();    %CLR8;      return;
 
 		case 0x60:  case 0x61:                          %INDEXED;   %NEG8;      return;
-		case 0x63:  case 0x62:                          %INDEXED;   %COM8;      return;
+		case 0x62:                                      %INDEXED;   %XNC8;      return;
+		case 0x63:                                      %INDEXED;   %COM8;      return;
 		case 0x64:  case 0x65:                          %INDEXED;   %LSR8;      return;
 		case 0x66:                                      %INDEXED;   %ROR8;      return;
 		case 0x67:                                      %INDEXED;   %ASR8;      return;
@@ -124,7 +130,8 @@ MAIN:
 		case 0x6F:                                      %INDEXED;   %CLR8;      return;
 
 		case 0x70:  case 0x71:                          %EXTENDED;  %NEG8;      return;
-		case 0x73:  case 0x72:                          %EXTENDED;  %COM8;      return;
+		case 0x72:                                      %EXTENDED;  %XNC8;      return;
+		case 0x73:                                      %EXTENDED;  %COM8;      return;
 		case 0x74:  case 0x75:                          %EXTENDED;  %LSR8;      return;
 		case 0x76:                                      %EXTENDED;  %ROR8;      return;
 		case 0x77:                                      %EXTENDED;  %ASR8;      return;
@@ -616,6 +623,26 @@ X18:
 	m_temp.b.h = (m_cc & m_temp.b.l) << 1;
 	m_cc = m_temp.b.h | ((m_cc & 0x04) >> 1);
 	return;
+
+XANDCC:
+	@eat(1);
+	goto ANDCC;
+
+XRES:
+	set_ea(VECTOR_RESET_FFFE);
+	standard_irq_callback(M6809_SWI);
+	set_regop16(m_s);
+	m_temp.w = entire_state_registers();
+	@dummy_read_opcode_arg(0);
+	@dummy_vma(1);
+	%PUSH_REGISTERS;
+	goto INTERRUPT_VECTOR;
+
+XNC8:
+	if (m_cc & 01)
+		goto COM8;
+	else
+		goto NEG8;
 
 ILLEGAL:
 	log_illegal();
