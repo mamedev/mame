@@ -86,7 +86,7 @@ HDD image contains remnants of an Actua Soccer Arcade installation.
 
 namespace {
 
-class quakeat_state : public pcat_base_state
+class quakeat_state : public driver_device
 {
 public:
 	quakeat_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -97,6 +97,7 @@ public:
 	void quake(machine_config &config);
 
 private:
+	required_device<cpu_device> m_maincpu;
 
 	void quake_map(address_map &map);
 };
