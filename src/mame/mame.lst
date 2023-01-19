@@ -3304,6 +3304,9 @@ b2mrom                          //
 @source:trainer/babbage.cpp
 babbage                         //
 
+@source:misc/babysuprem.cpp
+bsuprem                         // (c) 198? Andra / Vifico
+
 @source:dataeast/backfire.cpp
 backfire                        // MBZ (c) 1995
 backfirea                       // MBZ (c) 1995
