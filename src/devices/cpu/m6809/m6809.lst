@@ -9,6 +9,8 @@ MAIN:
 		case VECTOR_IRQ:    goto IRQ;
 	}
 
+	if (m_hcf) goto HCF;
+
 	// debugger hook
 	m_ppc = m_pc;
 	debugger_instruction_hook(m_pc.w);
@@ -38,6 +40,7 @@ MAIN:
 		case 0x11:                                                  %DISPATCH11; return;
 		case 0x12:                                                  %NOP;       return;
 		case 0x13:                                                  %SYNC;      return;
+		case 0x14:  case 0x15:                                      %HCF;       return;
 		case 0x16:              set_cond(true);                     %LBRANCH;   return;
 		case 0x17:                                                  %LBSR;      return;
 		case 0x19:                                                  %DAA;       return;
@@ -212,7 +215,7 @@ MAIN:
 		case 0xCA:              set_regop8(m_q.r.b);    set_imm();  %OR8;       return;
 		case 0xCB:              set_regop8(m_q.r.b);    set_imm();  %ADD8;      return;
 		case 0xCC:              set_regop16(m_q.p.d);   set_imm();  %LD16;      return;
-		case 0xCD:              set_regop16(m_q.p.d);   set_imm();  %ST16;      return;
+		case 0xCD:                                                  %HCF;       return;
 		case 0xCE:              set_regop16(m_u);       set_imm();  %LD16;      return;
 		case 0xCF:              set_regop16(m_u);       set_imm();  %ST16;      return;
 
@@ -598,6 +601,12 @@ TFR:
 		}
 	}
 	@dummy_vma(hd6309_native_mode() ? 2 : 4);
+	return;
+
+HCF:
+	// Test mode that increments the address bus until reset.
+	m_hcf = true;
+	@dummy_read_opcode_arg(0);
 	return;
 
 ILLEGAL:
