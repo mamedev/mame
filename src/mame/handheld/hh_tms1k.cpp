@@ -6,13 +6,13 @@
 This driver is a collection of simple dedicated handheld and tabletop
 toys based around the TMS1000 MCU series. Anything more complex or clearly
 part of a series is (or will be) in its own driver, see:
-- entex/sag.cpp: Entex Select-A-Game Machine
+- entex/sag.cpp: Entex Select-A-Game Machine (actually most games are on HMCS40)
 - miltonbradley/microvsn.cpp: Milton Bradley Microvision
 - misc/eva.cpp: Chrysler EVA-11 (and EVA-24)
+- ti/spellb.cpp: TI Spelling B series gen. 1
 - tiger/k28m2.cpp: Tiger K28: Talking Learning Computer (model 7-232)
 
 (contd.) hh_tms1k child drivers:
-- tispellb.cpp: TI Spelling B series gen. 1
 - tispeak.cpp: TI Speak & Spell series gen. 1
 
 About the approximated MCU frequency everywhere: The RC osc. is not that

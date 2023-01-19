@@ -42149,7 +42149,7 @@ tntellp                         //
 tntelluk                        //
 vocaid                          //
 
-@source:handheld/tispellb.cpp
+@source:ti/spellb.cpp
 letterlf                        //
 letterlg                        //
 mrchalgr                        //

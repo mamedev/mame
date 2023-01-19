@@ -44,6 +44,7 @@ LCD module:
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
 namespace {
 
 class chessking_state : public driver_device
