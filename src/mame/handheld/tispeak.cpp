@@ -681,7 +681,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
 	// which one is active(if any). If it matches with the internal ROM or
 	// external module, the game continues.
 
-	// pick overlay code from machine config, see comment section above for reference
+	// pick overlay code from input config, see comment section above for reference
 	m_overlay = m_inputs[10]->read();
 
 	// try to get it from (external) layout

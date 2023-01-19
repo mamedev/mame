@@ -24,7 +24,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="capa">
-		<description>Capablanca Edition - Master Chess Endgame</description>
+		<description>Capablanca Edition: Master Chess Endgame</description>
 		<year>1981</year>
 		<publisher>Applied Concepts</publisher>
 		<part name="cart" interface="ggm">
@@ -38,7 +38,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="morphy">
-		<description>Morphy Edition - Master Chess</description>
+		<description>Morphy Edition: Master Chess</description>
 		<year>1981</year>
 		<publisher>Applied Concepts</publisher>
 		<part name="cart" interface="ggm">
@@ -53,7 +53,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sandy" cloneof="morphy">
-		<description>Sandy Edition - Master Chess</description>
+		<description>Sandy Edition: Master Chess</description>
 		<year>1981</year>
 		<publisher>Sandy Electronic</publisher>
 		<part name="cart" interface="ggm">
@@ -68,7 +68,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="steinitz">
-		<description>Steinitz Edition-4 - Master Chess</description>
+		<description>Steinitz Edition-4: Master Chess</description>
 		<year>1982</year>
 		<publisher>Applied Concepts</publisher>
 		<part name="cart" interface="ggm">
