@@ -69,6 +69,9 @@
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 
+
+namespace {
+
 class odyssey_state : public driver_device
 {
 public:
@@ -157,6 +160,8 @@ ROM_START( odyssey )
 	DISK_IMAGE( "odyssey", 0, NO_DUMP )
 
 ROM_END
+
+} // anonymous namespace
 
 
 /**************************************

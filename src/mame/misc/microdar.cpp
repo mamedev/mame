@@ -83,6 +83,9 @@ ________________________________________________________________________________
 #include "machine/i2cmem.h"
 #include "machine/nvram.h"
 
+
+namespace {
+
 class microdar_state : public driver_device
 {
 public:
@@ -491,6 +494,8 @@ ROM_START(covidarts)
 	ROM_REGION(0x117, "plds", 0)
 	ROM_LOAD("palce16v8h-25.ic7", 0x000, 0x117, BAD_DUMP CRC(3a35a751) SHA1(e39fc8784d94ff09e0ff814f469ce23e52bb35fd)) // Bruteforced and verified OK
 ROM_END
+
+} // anonymous namespace
 
 
 GAME(199?, dibifuca,   0,        microdar,  microdar, microdar_state, empty_init, ROT0, "Compumatic / Bifuca", "Diana Bifuca (v9.25)",                          MACHINE_IS_SKELETON_MECHANICAL)

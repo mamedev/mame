@@ -21,6 +21,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 /*************************************
  *
  *  Structs
@@ -279,6 +281,8 @@ ROM_START( popshot )
 	DISK_REGION( "laserdisc" )
 		DISK_IMAGE_READONLY( "popshot", 0, NO_DUMP ) // unknown disc label?
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

@@ -72,6 +72,8 @@
 #include "formats/mfi_dsk.h"
 
 
+namespace {
+
 class pc100_state : public driver_device
 {
 public:
@@ -700,6 +702,9 @@ ROM_START( pc100 )
 
 	ROM_REGION16_LE( 0x20000*4, "vram", ROMREGION_ERASEFF )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

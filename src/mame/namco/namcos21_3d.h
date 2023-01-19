@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_VIDEO_NAMCOS21_3D_H
-#define MAME_VIDEO_NAMCOS21_3D_H
+#ifndef MAME_NAMCO_NAMCOS21_3D_H
+#define MAME_NAMCO_NAMCOS21_3D_H
 
 #pragma once
 
@@ -68,4 +68,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NAMCOS21_3D, namcos21_3d_device)
 
-#endif // MAME_VIDEO_NAMCOS21_3D_H
+#endif // MAME_NAMCO_NAMCOS21_3D_H

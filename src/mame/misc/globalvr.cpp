@@ -90,6 +90,9 @@ UltraPin                                         2006
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 
+
+namespace {
+
 class globalvr_state : public driver_device
 {
 public:
@@ -243,6 +246,8 @@ ROM_START( nfsug )
 	DISK_REGION( "recovery" )
 	DISK_IMAGE_READONLY( "nfsug-recovery", 0, SHA1(e306bacb3498582a025706ff81a665776b8a18da) )
 ROM_END
+
+} // anonymous namespace
 
 
 // OS/Global VR specific Setup Installers

@@ -1108,6 +1108,8 @@ The lever must be wired to analog port 0 (pin B22 parts side) of the Namco 48-wa
 #include <cstdarg>
 
 
+namespace {
+
 #define VERBOSE_LEVEL ( 0 )
 
 class namcos12_state : public driver_device
@@ -3352,6 +3354,9 @@ ROM_START( aplarail )
 	ROM_REGION( 0x800, "at28c16", 0)    /* pre-calibrated NVRAM */
 	ROM_LOAD( "at28c16",      0x000000, 0x000800, CRC(db1b63c5) SHA1(01fc3386a2d1cb1bed1b7fd9bd2fd59e503832d3) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME       PARENT    MACHINE   INPUT      CLASS                    INIT           ROT   COMPANY            FULLNAME, FLAGS
 GAME( 1996, tekken3,   0,        coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.E1)", 0 ) /* KC006 */

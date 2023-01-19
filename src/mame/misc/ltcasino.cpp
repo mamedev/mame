@@ -83,6 +83,8 @@ Other: Hitachi HD46821P 1MHz NMOS Peripheral Interface Adapter (PIA) x 2
 #include "ltcasinn.lh"
 
 
+namespace {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -627,6 +629,8 @@ ROM_START( ltcasin2a )
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "v17_00_rv.bin", 0x0000, 0x1000, CRC(84cbee7b) SHA1(742831d5ae0db6c7c644a18a837831ee0474d472) )
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

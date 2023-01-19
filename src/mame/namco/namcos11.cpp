@@ -324,6 +324,9 @@ Pin 22 Solder Side - Gun 2 Trigger
 
 #include <cstdarg>
 
+
+namespace {
+
 #define C76_SPEEDUP   ( 1 ) /* sound cpu idle skipping */
 #define VERBOSE_LEVEL ( 0 )
 
@@ -1829,6 +1832,9 @@ ROM_END
 4 = Asia specific
 9 = Location Test
 */
+
+} // anonymous namespace
+
 
 GAME( 1994, tekken,     0,        tekken,     tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken (World, TE2/VER.C)",                    0 )
 GAME( 1994, tekkenac,   tekken,   tekken,     tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken (Asia, TE4/VER.C)",                     0 )

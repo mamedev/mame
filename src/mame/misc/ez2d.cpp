@@ -47,6 +47,9 @@ Ez2DJ series:
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 
+
+namespace {
+
 class ez2d_state : public driver_device
 {
 public:
@@ -103,5 +106,8 @@ ROM_START( ez2d2m )
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "ez2d2m", 0, SHA1(431f0bef3b81f83dad3818bca8994faa8ce9d5b7) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 2001, ez2d2m, 0, ez2d, ez2d, ez2d_state, empty_init, ROT0, "Amuse World", "Ez2dancer 2nd Move",  MACHINE_IS_SKELETON )

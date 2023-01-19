@@ -114,6 +114,9 @@ Stephh's notes (based on the game M68EC020 code and some tests) :
 
 #include <algorithm>
 
+
+namespace {
+
 class dreamwld_state : public driver_device
 {
 public:
@@ -1259,6 +1262,9 @@ ROM_START( gaialast )
 	ROM_REGION( 0x10000, "unknown", 0 )
 	ROM_LOAD( "9", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1997, baryon,   0,        baryon,   baryon,   dreamwld_state, empty_init, ROT270, "SemiCom / Tirano",               "Baryon - Future Assault (set 1)",                            MACHINE_SUPPORTS_SAVE )
 GAME( 1997, baryona,  baryon,   baryon,   baryon,   dreamwld_state, empty_init, ROT270, "SemiCom / Tirano",               "Baryon - Future Assault (set 2)",                            MACHINE_SUPPORTS_SAVE )

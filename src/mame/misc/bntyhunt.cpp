@@ -38,6 +38,8 @@ Running this in pcipc will successfully boot a custom Korean Windows 98SE (no Mi
 #include "machine/pci.h"
 
 
+namespace {
+
 class bntyhunt_state : public driver_device
 {
 public:
@@ -79,6 +81,8 @@ ROM_START(bntyhunt)
 	DISK_REGION( "disks" )
 	DISK_IMAGE( "bntyhunt", 0, SHA1(e50937d14d5c6adfb5e0012db5a7df090eebc2e1) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 2002?, bntyhunt, 0, bntyhunt, bntyhunt, bntyhunt_state, empty_init, ROT0, "GC-Tech Co., LTD", "Bounty Hunter (GC-Tech Co., LTD)", MACHINE_IS_SKELETON )

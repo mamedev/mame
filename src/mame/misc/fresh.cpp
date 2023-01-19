@@ -31,7 +31,8 @@ rom 5 and 6 are prg roms
 #include "tilemap.h"
 
 
-
+namespace {
+	
 class fresh_state : public driver_device
 {
 public:
@@ -624,6 +625,7 @@ ROM_START( fresh )
 	ROM_LOAD( "fruit-fresh4.u46", 0x80000, 0x80000, CRC(9b6c7571) SHA1(649cf3c50e2cd8c02f0f730e5ded59cf0ea37c37) )
 ROM_END
 
+} // anonymous namespace
 
 
 // title shows Fruit Fresh but on resetting you get text strings of 'Dream World V2.41SI 97. 1.28'
