@@ -291,12 +291,8 @@ st_video_device::st_video_device(const machine_config &mconfig, const char *tag,
 
 void st_video_device::device_config_complete()
 {
-	//	screen().set_raw(clock()/2, 512*2, 28*2, 450*2, 313, 34, 292);
-	//	screen().set_raw(clock()/2, 508*2, 24*2, 450*2, 263, 14, 236);
-
-	screen().set_raw(clock()/2, 512*2, 28*2, 450*2, 313, 34, 292);
-
-	//	screen().set_raw(clock(), 1024, 0, 1023, 512, 0, 511);
+	if(has_screen())
+		screen().set_raw(clock()/2, 512*2, 28*2, 450*2, 313, 34, 292);
 }
 
 void st_video_device::device_start()
