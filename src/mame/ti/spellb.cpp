@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Sean Riddle
-/***************************************************************************
+/*******************************************************************************
 
 Texas Instruments Spelling B hardware
 
-The Spelling B was introduced together with the Speak & Spell. It is a
-handheld educational toy with booklet. Two revisions of the hardware exist.
+The Spelling B was introduced together with the Speak & Spell. It is a handheld
+educational toy with booklet. Two revisions of the hardware exist.
 
 1st version:
 
@@ -46,7 +46,7 @@ Letterlogic (France), 1980: different VSM
 Letterlogic (Germany), 1980: different VSM
 - TMC0355 4KB VSM ROM CD2604
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -88,8 +88,8 @@ protected:
 
 private:
 	// devices
-	required_device<tms1k_base_device> m_maincpu;
-	optional_device<tms1k_base_device> m_subcpu;
+	required_device<tms0270_cpu_device> m_maincpu;
+	optional_device<tms1980_cpu_device> m_subcpu;
 	optional_device<tms6100_device> m_tms6100;
 	required_device<pwm_display_device> m_display;
 	optional_device<speaker_sound_device> m_speaker;
@@ -135,9 +135,9 @@ void spellb_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Power
-******************************************************************************/
+*******************************************************************************/
 
 void spellb_state::machine_reset()
 {
@@ -169,9 +169,9 @@ void spellb_state::power_subcpu()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // common
 
@@ -282,9 +282,9 @@ void spellb_state::rev2_write_r(u32 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( spellb )
 	PORT_START("IN.0") // R0
@@ -476,9 +476,9 @@ void spellb_state::rev2(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( spellb )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -582,9 +582,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
 //    YEAR  NAME      PARENT   CMP MACHINE  INPUT     CLASS         INIT        COMPANY, FULLNAME, FLAGS
 COMP( 1980, spellb,   0,        0, rev2,    spellb,   spellb_state, empty_init, "Texas Instruments", "Spelling B (US, 1980 version)", MACHINE_SUPPORTS_SAVE )

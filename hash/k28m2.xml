@@ -4,6 +4,24 @@
 license:CC0-1.0
 -->
 
+<!--
+
+Known modules:
+- Spelling I: VSM: 16KB CM62086
+- Spelling II: VSM: 16KB CM6????
+- Spelling III: VSM: 16KB CM62087
+- Expansion Module 1: VSM: 16KB CM6????
+- Expansion Module 2: VSM: 16KB CM62216
+- Expansion Module 3: VSM: 16KB CM62215
+- Expansion Module 4: VSM: 16KB CM62217
+- Expansion Module 5: VSM: 16KB CM62218
+- Expansion Module 6: VSM: 16KB CM62219
+
+It is assumed that the Spelling modules are the same as the Expansion modules.
+CM62215 was confirmed to be the same as CM62087.
+
+-->
+
 <softwarelist name="k28m2" description="K28 model 7-232 modules">
 
 	<software name="m1">

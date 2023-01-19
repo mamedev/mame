@@ -39,6 +39,8 @@ TODO:
 //#include "hh_cops1_test.lh" // common test-layout - use external artwork
 
 
+namespace {
+
 class hh_cops1_state : public driver_device
 {
 public:
@@ -119,8 +121,6 @@ u8 hh_cops1_state::read_inputs(int columns)
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
-
-namespace {
 
 /***************************************************************************
 
