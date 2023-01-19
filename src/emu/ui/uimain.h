@@ -35,6 +35,8 @@ public:
 
 	virtual void menu_reset() { }
 
+	virtual void draw() = 0;
+
 	template <typename Format, typename... Params> void popup_time(int seconds, Format &&fmt, Params &&... args);
 
 protected:

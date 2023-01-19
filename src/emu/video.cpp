@@ -215,7 +215,7 @@ void video_manager::frame_update(bool from_debugger)
 	bool anything_changed = update_screens && finish_screen_updates();
 
 	// draw the user interface
-	emulator_info::draw_user_interface(machine());
+	machine().ui().draw();
 
 	// let plugins draw over the UI
 	anything_changed = emulator_info::frame_hook() || anything_changed;
