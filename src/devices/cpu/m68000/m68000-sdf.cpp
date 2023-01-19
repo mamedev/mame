@@ -10,6 +10,7 @@ void m68000_device::state_reset_df()
 	m_icount -= 2;
 	// 296 rstp4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_ftu_const();
 	m_icount -= 2;
 	if(m_sr & SR_T)
@@ -139,11 +140,11 @@ void m68000_device::state_reset_df()
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -258,6 +259,7 @@ void m68000_device::state_bus_error_df()
 	// 088 bser6
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA | SSW_N | SSW_CRITICAL;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -416,11 +418,11 @@ void m68000_device::state_bus_error_df()
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -535,6 +537,7 @@ void m68000_device::state_address_error_df()
 	// 088 bser6
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA | SSW_N | SSW_CRITICAL;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -693,11 +696,11 @@ void m68000_device::state_address_error_df()
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -796,10 +799,10 @@ void m68000_device::state_interrupt_df()
 	m_irc = m_edb;
 	// 118 itlx6
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_icount -= 2;
 	// 292 itlx7
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_ftu_const();
 	m_icount -= 2;
 	if(m_sr & SR_T)
@@ -918,11 +921,11 @@ void m68000_device::state_interrupt_df()
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -1101,11 +1104,11 @@ void m68000_device::state_trace_df()
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -1284,11 +1287,11 @@ void m68000_device::state_illegal_df()
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -1467,11 +1470,11 @@ void m68000_device::state_priviledge_df()
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -1650,11 +1653,11 @@ void m68000_device::state_linea_df()
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -1833,11 +1836,11 @@ void m68000_device::state_linef_df()
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R | SSW_N;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -1893,13 +1896,13 @@ void m68000_device::ori_b_imm8_ds_df() // 0000 fff8
 	// 100 roaw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=14 c=2 m=.nzvc  i=b....i. ALU.or_ a=R.dtl:m_dt d=R.dyl:m_da[ry]
 	alu_or8(m_dt, m_da[ry]);
 	sr_nzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -1980,7 +1983,6 @@ void m68000_device::ori_b_imm8_ais_df() // 0010 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -2007,6 +2009,7 @@ void m68000_device::ori_b_imm8_ais_df() // 0010 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -2085,7 +2088,6 @@ void m68000_device::ori_b_imm8_aips_df() // 0018 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -2112,6 +2114,7 @@ void m68000_device::ori_b_imm8_aips_df() // 0018 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -2192,7 +2195,6 @@ void m68000_device::ori_b_imm8_pais_df() // 0020 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -2219,6 +2221,7 @@ void m68000_device::ori_b_imm8_pais_df() // 0020 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -2315,7 +2318,6 @@ void m68000_device::ori_b_imm8_das_df() // 0028 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -2342,6 +2344,7 @@ void m68000_device::ori_b_imm8_das_df() // 0028 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -2478,7 +2481,6 @@ adsw2:
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -2505,6 +2507,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -2600,7 +2603,6 @@ void m68000_device::ori_b_imm8_adr16_df() // 0038 ffff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -2627,6 +2629,7 @@ void m68000_device::ori_b_imm8_adr16_df() // 0038 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -2744,7 +2747,6 @@ void m68000_device::ori_b_imm8_adr32_df() // 0039 ffff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -2771,6 +2773,7 @@ void m68000_device::ori_b_imm8_adr32_df() // 0039 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -2865,12 +2868,12 @@ void m68000_device::ori_imm8_ccr_df() // 003c ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=14 c=0 m=.....  i=b...... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -2927,13 +2930,13 @@ void m68000_device::ori_w_imm16_ds_df() // 0040 fff8
 	// 100 roaw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=14 c=2 m=.nzvc  i=.....i. ALU.or_ a=R.dtl:m_dt d=R.dyl:m_da[ry]
 	alu_or(m_dt, m_da[ry]);
 	sr_nzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -3017,7 +3020,6 @@ void m68000_device::ori_w_imm16_ais_df() // 0050 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -3044,6 +3046,7 @@ void m68000_device::ori_w_imm16_ais_df() // 0050 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -3130,7 +3133,6 @@ void m68000_device::ori_w_imm16_aips_df() // 0058 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -3157,6 +3159,7 @@ void m68000_device::ori_w_imm16_aips_df() // 0058 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -3245,7 +3248,6 @@ void m68000_device::ori_w_imm16_pais_df() // 0060 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -3272,6 +3274,7 @@ void m68000_device::ori_w_imm16_pais_df() // 0060 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -3376,7 +3379,6 @@ void m68000_device::ori_w_imm16_das_df() // 0068 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -3403,6 +3405,7 @@ void m68000_device::ori_w_imm16_das_df() // 0068 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -3547,7 +3550,6 @@ adsw2:
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -3574,6 +3576,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -3677,7 +3680,6 @@ void m68000_device::ori_w_imm16_adr16_df() // 0078 ffff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -3704,6 +3706,7 @@ void m68000_device::ori_w_imm16_adr16_df() // 0078 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -3829,7 +3832,6 @@ void m68000_device::ori_w_imm16_adr32_df() // 0079 ffff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -3856,6 +3858,7 @@ void m68000_device::ori_w_imm16_adr32_df() // 0079 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -3961,12 +3964,12 @@ void m68000_device::ori_i16u_sr_df() // 007c ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=14 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -4045,7 +4048,6 @@ void m68000_device::ori_l_imm32_ds_df() // 0080 fff8
 	// 10c roal1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=14 c=2 m=.nzvc  i=.l...i. ALU.or_ a=R.dtl:m_dt d=R.dyl:m_da[ry]
 	alu_or(m_dt, m_da[ry]);
@@ -4078,6 +4080,7 @@ void m68000_device::ori_l_imm32_ds_df() // 0080 fff8
 	m_icount -= 2;
 	// 25b roal4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=14 c=0 m=.....  i=.l..... ALU.or_ a=R.aluo:m_aluo d=none
@@ -4187,7 +4190,6 @@ void m68000_device::ori_l_imm32_ais_df() // 0090 fff8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -4237,6 +4239,7 @@ void m68000_device::ori_l_imm32_ais_df() // 0090 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -4365,7 +4368,6 @@ void m68000_device::ori_l_imm32_aips_df() // 0098 fff8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -4415,6 +4417,7 @@ void m68000_device::ori_l_imm32_aips_df() // 0098 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -4544,7 +4547,6 @@ void m68000_device::ori_l_imm32_pais_df() // 00a0 fff8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -4594,6 +4596,7 @@ void m68000_device::ori_l_imm32_pais_df() // 00a0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -4740,7 +4743,6 @@ void m68000_device::ori_l_imm32_das_df() // 00a8 fff8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -4790,6 +4792,7 @@ void m68000_device::ori_l_imm32_das_df() // 00a8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -4976,7 +4979,6 @@ adsl2:
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -5026,6 +5028,7 @@ adsl2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -5175,7 +5178,6 @@ void m68000_device::ori_l_imm32_adr16_df() // 00b8 ffff
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -5225,6 +5227,7 @@ void m68000_device::ori_l_imm32_adr16_df() // 00b8 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -5396,7 +5399,6 @@ void m68000_device::ori_l_imm32_adr32_df() // 00b9 ffff
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -5446,6 +5448,7 @@ void m68000_device::ori_l_imm32_adr32_df() // 00b9 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -5479,7 +5482,6 @@ void m68000_device::btst_dd_ds_df() // 0100 f1f8
 	// 3e7 btsr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dcr = m_da[rx];
 	m_at = m_da[rx];
@@ -5517,6 +5519,7 @@ void m68000_device::btst_dd_ds_df() // 0100 f1f8
 bcsr4:
 	// 0c4 bcsr4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	// alu r=13 c=1 m=..z..  i=.....i. ALU.and_ a=alub d=R.dcro:m_dcro
 	alu_and(m_alub, 1 << (m_dcr & 15));
@@ -5530,6 +5533,7 @@ bcsr4:
 btsr3:
 	// 044 btsr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	// alu r=13 c=1 m=..z..  i=.....i. ALU.and_ a=18:m_da[ry] d=R.dcro:m_dcro
 	alu_and(high16(m_da[ry]), 1 << (m_dcr & 15));
 	sr_z();
@@ -5588,7 +5592,6 @@ void m68000_device::movep_w_das_dd_df() // 0108 f1f8
 	// 368 mpiw3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_DATA | SSW_R;
 	m_edb = m_program.read_interruptible(m_aob & ~1, m_aob & 1 ? 0x00ff : 0xff00);
 	if(!(m_aob & 1))
@@ -5608,6 +5611,7 @@ void m68000_device::movep_w_das_dd_df() // 0108 f1f8
 	// 36a mpiw4
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -5666,7 +5670,6 @@ void m68000_device::btst_dd_ais_df() // 0110 f1f8
 	// 215 btsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=13 c=1 m=..z..  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -5674,6 +5677,7 @@ void m68000_device::btst_dd_ais_df() // 0110 f1f8
 	sr_z();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -5734,7 +5738,6 @@ void m68000_device::btst_dd_aips_df() // 0118 f1f8
 	// 215 btsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=13 c=1 m=..z..  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -5742,6 +5745,7 @@ void m68000_device::btst_dd_aips_df() // 0118 f1f8
 	sr_z();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -5804,7 +5808,6 @@ void m68000_device::btst_dd_pais_df() // 0120 f1f8
 	// 215 btsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=13 c=1 m=..z..  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -5812,6 +5815,7 @@ void m68000_device::btst_dd_pais_df() // 0120 f1f8
 	sr_z();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -5890,7 +5894,6 @@ void m68000_device::btst_dd_das_df() // 0128 f1f8
 	// 215 btsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=13 c=1 m=..z..  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -5898,6 +5901,7 @@ void m68000_device::btst_dd_das_df() // 0128 f1f8
 	sr_z();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -6016,7 +6020,6 @@ adsw2:
 	// 215 btsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=13 c=1 m=..z..  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -6024,6 +6027,7 @@ adsw2:
 	sr_z();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -6101,7 +6105,6 @@ void m68000_device::btst_dd_adr16_df() // 0138 f1ff
 	// 215 btsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=13 c=1 m=..z..  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -6109,6 +6112,7 @@ void m68000_device::btst_dd_adr16_df() // 0138 f1ff
 	sr_z();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -6208,7 +6212,6 @@ void m68000_device::btst_dd_adr32_df() // 0139 f1ff
 	// 215 btsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=13 c=1 m=..z..  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -6216,6 +6219,7 @@ void m68000_device::btst_dd_adr32_df() // 0139 f1ff
 	sr_z();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -6293,7 +6297,6 @@ void m68000_device::btst_dd_dpc_df() // 013a f1ff
 	// 215 btsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=13 c=1 m=..z..  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -6301,6 +6304,7 @@ void m68000_device::btst_dd_dpc_df() // 013a f1ff
 	sr_z();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -6418,7 +6422,6 @@ adsw2:
 	// 215 btsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=13 c=1 m=..z..  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -6426,6 +6429,7 @@ adsw2:
 	sr_z();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -6483,7 +6487,6 @@ void m68000_device::btst_dd_imm_df() // 013c f1ff
 	// 0ab btsi1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dcr = m_da[rx];
 	set_16h(m_dt, high16(m_at));
@@ -6519,6 +6522,7 @@ void m68000_device::btst_dd_imm_df() // 013c f1ff
 bcsr4:
 	// 0c4 bcsr4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_dt, m_aluo);
 	// alu r=13 c=1 m=..z..  i=b....i. ALU.and_ a=alub d=R.dcro8:m_dcro8
 	alu_and8(m_alub, 1 << (m_dcr & 7));
@@ -6532,6 +6536,7 @@ bcsr4:
 btsr3:
 	// 044 btsr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	// alu r=13 c=1 m=..z..  i=b....i. ALU.and_ a=23:m_dt d=R.dcro8:m_dcro8
 	alu_and8(high16(m_dt), 1 << (m_dcr & 7));
 	sr_z();
@@ -6550,7 +6555,6 @@ void m68000_device::bchg_dd_ds_df() // 0140 f1f8
 	// 3ef bcsr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dcr = m_da[rx];
 	m_at = m_da[rx];
@@ -6588,6 +6592,7 @@ void m68000_device::bchg_dd_ds_df() // 0140 f1f8
 bcsr4:
 	// 0c4 bcsr4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	// alu r=13 c=1 m=..z..  i=.....i. ALU.and_ a=alub d=R.dcro:m_dcro
 	alu_and(m_alub, 1 << (m_dcr & 15));
@@ -6606,6 +6611,7 @@ bcsr3:
 	m_icount -= 2;
 	// 0a1 bcsr5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	// alu r=13 c=1 m=..z..  i=.....i. ALU.and_ a=alub d=R.dcro:m_dcro
 	alu_and(m_alub, 1 << (m_dcr & 15));
@@ -6702,7 +6708,6 @@ void m68000_device::movep_l_das_dd_df() // 0148 f1f8
 	// 368 mpiw3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_DATA | SSW_R;
 	m_edb = m_program.read_interruptible(m_aob & ~1, m_aob & 1 ? 0x00ff : 0xff00);
 	if(!(m_aob & 1))
@@ -6722,6 +6727,7 @@ void m68000_device::movep_l_das_dd_df() // 0148 f1f8
 	// 36a mpiw4
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -6780,7 +6786,6 @@ void m68000_device::bchg_dd_ais_df() // 0150 f1f8
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -6807,6 +6812,7 @@ void m68000_device::bchg_dd_ais_df() // 0150 f1f8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -6863,7 +6869,6 @@ void m68000_device::bchg_dd_aips_df() // 0158 f1f8
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -6890,6 +6895,7 @@ void m68000_device::bchg_dd_aips_df() // 0158 f1f8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -6948,7 +6954,6 @@ void m68000_device::bchg_dd_pais_df() // 0160 f1f8
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -6975,6 +6980,7 @@ void m68000_device::bchg_dd_pais_df() // 0160 f1f8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -7049,7 +7055,6 @@ void m68000_device::bchg_dd_das_df() // 0168 f1f8
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -7076,6 +7081,7 @@ void m68000_device::bchg_dd_das_df() // 0168 f1f8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -7190,7 +7196,6 @@ adsw2:
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -7217,6 +7222,7 @@ adsw2:
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -7290,7 +7296,6 @@ void m68000_device::bchg_dd_adr16_df() // 0178 f1ff
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -7317,6 +7322,7 @@ void m68000_device::bchg_dd_adr16_df() // 0178 f1ff
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -7412,7 +7418,6 @@ void m68000_device::bchg_dd_adr32_df() // 0179 f1ff
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -7439,6 +7444,7 @@ void m68000_device::bchg_dd_adr32_df() // 0179 f1ff
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -7468,7 +7474,6 @@ void m68000_device::bclr_dd_ds_df() // 0180 f1f8
 	// 3eb bclr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dcr = m_da[rx];
 	m_at = m_da[rx];
@@ -7510,6 +7515,7 @@ bclr4:
 	m_icount -= 2;
 	// 0c4 bcsr4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	// alu r=14 c=1 m=..z..  i=.l...i. ALU.and_ a=alub d=R.dcro:m_dcro
 	alu_and(m_alub, 1 << (m_dcr & 15));
@@ -7532,6 +7538,7 @@ bclr3:
 	m_icount -= 2;
 	// 0a1 bcsr5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	// alu r=14 c=1 m=..z..  i=.l...i. ALU.and_ a=alub d=R.dcro:m_dcro
 	alu_and(m_alub, 1 << (m_dcr & 15));
@@ -7573,7 +7580,6 @@ void m68000_device::movep_w_dd_das_df() // 0188 f1f8
 	// 36d mpow2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xh(m_dbout, m_da[rx]);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -7607,12 +7613,12 @@ void m68000_device::movep_w_dd_das_df() // 0188 f1f8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=14 c=0 m=.....  i=.l..... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -7668,7 +7674,6 @@ void m68000_device::bclr_dd_ais_df() // 0190 f1f8
 	// 069 bclm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_dbin;
 	m_ftu = m_sr;
 	// alu r=14 c=2 m=.....  i=bl..... ALU.or_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -7699,6 +7704,7 @@ void m68000_device::bclr_dd_ais_df() // 0190 f1f8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -7755,7 +7761,6 @@ void m68000_device::bclr_dd_aips_df() // 0198 f1f8
 	// 069 bclm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_dbin;
 	m_ftu = m_sr;
 	// alu r=14 c=2 m=.....  i=bl..... ALU.or_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -7786,6 +7791,7 @@ void m68000_device::bclr_dd_aips_df() // 0198 f1f8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -7844,7 +7850,6 @@ void m68000_device::bclr_dd_pais_df() // 01a0 f1f8
 	// 069 bclm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_dbin;
 	m_ftu = m_sr;
 	// alu r=14 c=2 m=.....  i=bl..... ALU.or_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -7875,6 +7880,7 @@ void m68000_device::bclr_dd_pais_df() // 01a0 f1f8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -7949,7 +7955,6 @@ void m68000_device::bclr_dd_das_df() // 01a8 f1f8
 	// 069 bclm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_dbin;
 	m_ftu = m_sr;
 	// alu r=14 c=2 m=.....  i=bl..... ALU.or_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -7980,6 +7985,7 @@ void m68000_device::bclr_dd_das_df() // 01a8 f1f8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -8094,7 +8100,6 @@ adsw2:
 	// 069 bclm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_dbin;
 	m_ftu = m_sr;
 	// alu r=14 c=2 m=.....  i=bl..... ALU.or_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -8125,6 +8130,7 @@ adsw2:
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -8198,7 +8204,6 @@ void m68000_device::bclr_dd_adr16_df() // 01b8 f1ff
 	// 069 bclm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_dbin;
 	m_ftu = m_sr;
 	// alu r=14 c=2 m=.....  i=bl..... ALU.or_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -8229,6 +8234,7 @@ void m68000_device::bclr_dd_adr16_df() // 01b8 f1ff
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -8324,7 +8330,6 @@ void m68000_device::bclr_dd_adr32_df() // 01b9 f1ff
 	// 069 bclm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_dbin;
 	m_ftu = m_sr;
 	// alu r=14 c=2 m=.....  i=bl..... ALU.or_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -8355,6 +8360,7 @@ void m68000_device::bclr_dd_adr32_df() // 01b9 f1ff
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -8384,7 +8390,6 @@ void m68000_device::bset_dd_ds_df() // 01c0 f1f8
 	// 3ef bcsr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dcr = m_da[rx];
 	m_at = m_da[rx];
@@ -8422,6 +8427,7 @@ void m68000_device::bset_dd_ds_df() // 01c0 f1f8
 bcsr4:
 	// 0c4 bcsr4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	// alu r=14 c=1 m=..z..  i=.....i. ALU.and_ a=alub d=R.dcro:m_dcro
 	alu_and(m_alub, 1 << (m_dcr & 15));
@@ -8440,6 +8446,7 @@ bcsr3:
 	m_icount -= 2;
 	// 0a1 bcsr5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	// alu r=14 c=1 m=..z..  i=.....i. ALU.and_ a=alub d=R.dcro:m_dcro
 	alu_and(m_alub, 1 << (m_dcr & 15));
@@ -8513,7 +8520,6 @@ void m68000_device::movep_l_dd_das_df() // 01c8 f1f8
 	// 36d mpow2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xh(m_dbout, m_da[rx]);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -8547,12 +8553,12 @@ void m68000_device::movep_l_dd_das_df() // 01c8 f1f8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=14 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -8608,7 +8614,6 @@ void m68000_device::bset_dd_ais_df() // 01d0 f1f8
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -8635,6 +8640,7 @@ void m68000_device::bset_dd_ais_df() // 01d0 f1f8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -8691,7 +8697,6 @@ void m68000_device::bset_dd_aips_df() // 01d8 f1f8
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -8718,6 +8723,7 @@ void m68000_device::bset_dd_aips_df() // 01d8 f1f8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -8776,7 +8782,6 @@ void m68000_device::bset_dd_pais_df() // 01e0 f1f8
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -8803,6 +8808,7 @@ void m68000_device::bset_dd_pais_df() // 01e0 f1f8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -8877,7 +8883,6 @@ void m68000_device::bset_dd_das_df() // 01e8 f1f8
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -8904,6 +8909,7 @@ void m68000_device::bset_dd_das_df() // 01e8 f1f8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -9018,7 +9024,6 @@ adsw2:
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -9045,6 +9050,7 @@ adsw2:
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -9118,7 +9124,6 @@ void m68000_device::bset_dd_adr16_df() // 01f8 f1ff
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -9145,6 +9150,7 @@ void m68000_device::bset_dd_adr16_df() // 01f8 f1ff
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -9240,7 +9246,6 @@ void m68000_device::bset_dd_adr32_df() // 01f9 f1ff
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -9267,6 +9272,7 @@ void m68000_device::bset_dd_adr32_df() // 01f9 f1ff
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -9319,13 +9325,13 @@ void m68000_device::andi_b_imm8_ds_df() // 0200 fff8
 	// 100 roaw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=4 c=2 m=.nzvc  i=b....i. ALU.and_ a=R.dtl:m_dt d=R.dyl:m_da[ry]
 	alu_and8(m_dt, m_da[ry]);
 	sr_nzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -9406,7 +9412,6 @@ void m68000_device::andi_b_imm8_ais_df() // 0210 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -9433,6 +9438,7 @@ void m68000_device::andi_b_imm8_ais_df() // 0210 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -9511,7 +9517,6 @@ void m68000_device::andi_b_imm8_aips_df() // 0218 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -9538,6 +9543,7 @@ void m68000_device::andi_b_imm8_aips_df() // 0218 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -9618,7 +9624,6 @@ void m68000_device::andi_b_imm8_pais_df() // 0220 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -9645,6 +9650,7 @@ void m68000_device::andi_b_imm8_pais_df() // 0220 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -9741,7 +9747,6 @@ void m68000_device::andi_b_imm8_das_df() // 0228 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -9768,6 +9773,7 @@ void m68000_device::andi_b_imm8_das_df() // 0228 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -9904,7 +9910,6 @@ adsw2:
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -9931,6 +9936,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -10026,7 +10032,6 @@ void m68000_device::andi_b_imm8_adr16_df() // 0238 ffff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -10053,6 +10058,7 @@ void m68000_device::andi_b_imm8_adr16_df() // 0238 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -10170,7 +10176,6 @@ void m68000_device::andi_b_imm8_adr32_df() // 0239 ffff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -10197,6 +10202,7 @@ void m68000_device::andi_b_imm8_adr32_df() // 0239 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -10291,12 +10297,12 @@ void m68000_device::andi_imm8_ccr_df() // 023c ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=4 c=0 m=.....  i=b...... ALU.and_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -10353,13 +10359,13 @@ void m68000_device::andi_w_imm16_ds_df() // 0240 fff8
 	// 100 roaw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=4 c=2 m=.nzvc  i=.....i. ALU.and_ a=R.dtl:m_dt d=R.dyl:m_da[ry]
 	alu_and(m_dt, m_da[ry]);
 	sr_nzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -10443,7 +10449,6 @@ void m68000_device::andi_w_imm16_ais_df() // 0250 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -10470,6 +10475,7 @@ void m68000_device::andi_w_imm16_ais_df() // 0250 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -10556,7 +10562,6 @@ void m68000_device::andi_w_imm16_aips_df() // 0258 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -10583,6 +10588,7 @@ void m68000_device::andi_w_imm16_aips_df() // 0258 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -10671,7 +10677,6 @@ void m68000_device::andi_w_imm16_pais_df() // 0260 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -10698,6 +10703,7 @@ void m68000_device::andi_w_imm16_pais_df() // 0260 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -10802,7 +10808,6 @@ void m68000_device::andi_w_imm16_das_df() // 0268 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -10829,6 +10834,7 @@ void m68000_device::andi_w_imm16_das_df() // 0268 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -10973,7 +10979,6 @@ adsw2:
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -11000,6 +11005,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -11103,7 +11109,6 @@ void m68000_device::andi_w_imm16_adr16_df() // 0278 ffff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -11130,6 +11135,7 @@ void m68000_device::andi_w_imm16_adr16_df() // 0278 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -11255,7 +11261,6 @@ void m68000_device::andi_w_imm16_adr32_df() // 0279 ffff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -11282,6 +11287,7 @@ void m68000_device::andi_w_imm16_adr32_df() // 0279 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -11387,12 +11393,12 @@ void m68000_device::andi_i16u_sr_df() // 027c ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=4 c=0 m=.....  i=....... ALU.and_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -11471,7 +11477,6 @@ void m68000_device::andi_l_imm32_ds_df() // 0280 fff8
 	// 10c roal1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=4 c=2 m=.nzvc  i=.l...i. ALU.and_ a=R.dtl:m_dt d=R.dyl:m_da[ry]
 	alu_and(m_dt, m_da[ry]);
@@ -11504,6 +11509,7 @@ void m68000_device::andi_l_imm32_ds_df() // 0280 fff8
 	m_icount -= 2;
 	// 25b roal4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=4 c=0 m=.....  i=.l..... ALU.and_ a=R.aluo:m_aluo d=none
@@ -11613,7 +11619,6 @@ void m68000_device::andi_l_imm32_ais_df() // 0290 fff8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -11663,6 +11668,7 @@ void m68000_device::andi_l_imm32_ais_df() // 0290 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -11791,7 +11797,6 @@ void m68000_device::andi_l_imm32_aips_df() // 0298 fff8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -11841,6 +11846,7 @@ void m68000_device::andi_l_imm32_aips_df() // 0298 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -11970,7 +11976,6 @@ void m68000_device::andi_l_imm32_pais_df() // 02a0 fff8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -12020,6 +12025,7 @@ void m68000_device::andi_l_imm32_pais_df() // 02a0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -12166,7 +12172,6 @@ void m68000_device::andi_l_imm32_das_df() // 02a8 fff8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -12216,6 +12221,7 @@ void m68000_device::andi_l_imm32_das_df() // 02a8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -12402,7 +12408,6 @@ adsl2:
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -12452,6 +12457,7 @@ adsl2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -12601,7 +12607,6 @@ void m68000_device::andi_l_imm32_adr16_df() // 02b8 ffff
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -12651,6 +12656,7 @@ void m68000_device::andi_l_imm32_adr16_df() // 02b8 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -12822,7 +12828,6 @@ void m68000_device::andi_l_imm32_adr32_df() // 02b9 ffff
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -12872,6 +12877,7 @@ void m68000_device::andi_l_imm32_adr32_df() // 02b9 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -12927,13 +12933,13 @@ void m68000_device::subi_b_imm8_ds_df() // 0400 fff8
 	// 100 roaw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=5 c=2 m=xnzvc  i=b....i. ALU.sub a=R.dtl:m_dt d=R.dyl:m_da[ry]
 	alu_sub8(m_dt, m_da[ry]);
 	sr_xnzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -13011,7 +13017,6 @@ void m68000_device::subi_b_imm8_ais_df() // 0410 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -13038,6 +13043,7 @@ void m68000_device::subi_b_imm8_ais_df() // 0410 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -13112,7 +13118,6 @@ void m68000_device::subi_b_imm8_aips_df() // 0418 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -13139,6 +13144,7 @@ void m68000_device::subi_b_imm8_aips_df() // 0418 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -13215,7 +13221,6 @@ void m68000_device::subi_b_imm8_pais_df() // 0420 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -13242,6 +13247,7 @@ void m68000_device::subi_b_imm8_pais_df() // 0420 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -13334,7 +13340,6 @@ void m68000_device::subi_b_imm8_das_df() // 0428 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -13361,6 +13366,7 @@ void m68000_device::subi_b_imm8_das_df() // 0428 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -13491,7 +13497,6 @@ adsw2:
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -13518,6 +13523,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -13609,7 +13615,6 @@ void m68000_device::subi_b_imm8_adr16_df() // 0438 ffff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -13636,6 +13641,7 @@ void m68000_device::subi_b_imm8_adr16_df() // 0438 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -13748,7 +13754,6 @@ void m68000_device::subi_b_imm8_adr32_df() // 0439 ffff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -13775,6 +13780,7 @@ void m68000_device::subi_b_imm8_adr32_df() // 0439 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -13824,13 +13830,13 @@ void m68000_device::subi_w_imm16_ds_df() // 0440 fff8
 	// 100 roaw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=5 c=2 m=xnzvc  i=.....i. ALU.sub a=R.dtl:m_dt d=R.dyl:m_da[ry]
 	alu_sub(m_dt, m_da[ry]);
 	sr_xnzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -13911,7 +13917,6 @@ void m68000_device::subi_w_imm16_ais_df() // 0450 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -13938,6 +13943,7 @@ void m68000_device::subi_w_imm16_ais_df() // 0450 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -14020,7 +14026,6 @@ void m68000_device::subi_w_imm16_aips_df() // 0458 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -14047,6 +14052,7 @@ void m68000_device::subi_w_imm16_aips_df() // 0458 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -14131,7 +14137,6 @@ void m68000_device::subi_w_imm16_pais_df() // 0460 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -14158,6 +14163,7 @@ void m68000_device::subi_w_imm16_pais_df() // 0460 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -14258,7 +14264,6 @@ void m68000_device::subi_w_imm16_das_df() // 0468 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -14285,6 +14290,7 @@ void m68000_device::subi_w_imm16_das_df() // 0468 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -14423,7 +14429,6 @@ adsw2:
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -14450,6 +14455,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -14549,7 +14555,6 @@ void m68000_device::subi_w_imm16_adr16_df() // 0478 ffff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -14576,6 +14581,7 @@ void m68000_device::subi_w_imm16_adr16_df() // 0478 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -14696,7 +14702,6 @@ void m68000_device::subi_w_imm16_adr32_df() // 0479 ffff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -14723,6 +14728,7 @@ void m68000_device::subi_w_imm16_adr32_df() // 0479 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -14798,7 +14804,6 @@ void m68000_device::subi_l_imm32_ds_df() // 0480 fff8
 	// 10c roal1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=5 c=2 m=xnzvc  i=.l...i. ALU.sub a=R.dtl:m_dt d=R.dyl:m_da[ry]
 	alu_sub(m_dt, m_da[ry]);
@@ -14830,6 +14835,7 @@ void m68000_device::subi_l_imm32_ds_df() // 0480 fff8
 	m_icount -= 2;
 	// 25b roal4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -14935,7 +14941,6 @@ void m68000_device::subi_l_imm32_ais_df() // 0490 fff8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -14985,6 +14990,7 @@ void m68000_device::subi_l_imm32_ais_df() // 0490 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -15108,7 +15114,6 @@ void m68000_device::subi_l_imm32_aips_df() // 0498 fff8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -15158,6 +15163,7 @@ void m68000_device::subi_l_imm32_aips_df() // 0498 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -15282,7 +15288,6 @@ void m68000_device::subi_l_imm32_pais_df() // 04a0 fff8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -15332,6 +15337,7 @@ void m68000_device::subi_l_imm32_pais_df() // 04a0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -15473,7 +15479,6 @@ void m68000_device::subi_l_imm32_das_df() // 04a8 fff8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -15523,6 +15528,7 @@ void m68000_device::subi_l_imm32_das_df() // 04a8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -15702,7 +15708,6 @@ adsl2:
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -15752,6 +15757,7 @@ adsl2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -15895,7 +15901,6 @@ void m68000_device::subi_l_imm32_adr16_df() // 04b8 ffff
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -15945,6 +15950,7 @@ void m68000_device::subi_l_imm32_adr16_df() // 04b8 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -16109,7 +16115,6 @@ void m68000_device::subi_l_imm32_adr32_df() // 04b9 ffff
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -16159,6 +16164,7 @@ void m68000_device::subi_l_imm32_adr32_df() // 04b9 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -16213,13 +16219,13 @@ void m68000_device::addi_b_imm8_ds_df() // 0600 fff8
 	// 100 roaw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=2 c=2 m=xnzvc  i=b....i. ALU.add a=R.dtl:m_dt d=R.dyl:m_da[ry]
 	alu_add8(m_dt, m_da[ry]);
 	sr_xnzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -16297,7 +16303,6 @@ void m68000_device::addi_b_imm8_ais_df() // 0610 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -16324,6 +16329,7 @@ void m68000_device::addi_b_imm8_ais_df() // 0610 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -16398,7 +16404,6 @@ void m68000_device::addi_b_imm8_aips_df() // 0618 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -16425,6 +16430,7 @@ void m68000_device::addi_b_imm8_aips_df() // 0618 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -16501,7 +16507,6 @@ void m68000_device::addi_b_imm8_pais_df() // 0620 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -16528,6 +16533,7 @@ void m68000_device::addi_b_imm8_pais_df() // 0620 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -16620,7 +16626,6 @@ void m68000_device::addi_b_imm8_das_df() // 0628 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -16647,6 +16652,7 @@ void m68000_device::addi_b_imm8_das_df() // 0628 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -16777,7 +16783,6 @@ adsw2:
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -16804,6 +16809,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -16895,7 +16901,6 @@ void m68000_device::addi_b_imm8_adr16_df() // 0638 ffff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -16922,6 +16927,7 @@ void m68000_device::addi_b_imm8_adr16_df() // 0638 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -17034,7 +17040,6 @@ void m68000_device::addi_b_imm8_adr32_df() // 0639 ffff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -17061,6 +17066,7 @@ void m68000_device::addi_b_imm8_adr32_df() // 0639 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -17110,13 +17116,13 @@ void m68000_device::addi_w_imm16_ds_df() // 0640 fff8
 	// 100 roaw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=2 c=2 m=xnzvc  i=.....i. ALU.add a=R.dtl:m_dt d=R.dyl:m_da[ry]
 	alu_add(m_dt, m_da[ry]);
 	sr_xnzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -17197,7 +17203,6 @@ void m68000_device::addi_w_imm16_ais_df() // 0650 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -17224,6 +17229,7 @@ void m68000_device::addi_w_imm16_ais_df() // 0650 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -17306,7 +17312,6 @@ void m68000_device::addi_w_imm16_aips_df() // 0658 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -17333,6 +17338,7 @@ void m68000_device::addi_w_imm16_aips_df() // 0658 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -17417,7 +17423,6 @@ void m68000_device::addi_w_imm16_pais_df() // 0660 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -17444,6 +17449,7 @@ void m68000_device::addi_w_imm16_pais_df() // 0660 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -17544,7 +17550,6 @@ void m68000_device::addi_w_imm16_das_df() // 0668 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -17571,6 +17576,7 @@ void m68000_device::addi_w_imm16_das_df() // 0668 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -17709,7 +17715,6 @@ adsw2:
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -17736,6 +17741,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -17835,7 +17841,6 @@ void m68000_device::addi_w_imm16_adr16_df() // 0678 ffff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -17862,6 +17867,7 @@ void m68000_device::addi_w_imm16_adr16_df() // 0678 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -17982,7 +17988,6 @@ void m68000_device::addi_w_imm16_adr32_df() // 0679 ffff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -18009,6 +18014,7 @@ void m68000_device::addi_w_imm16_adr32_df() // 0679 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -18084,7 +18090,6 @@ void m68000_device::addi_l_imm32_ds_df() // 0680 fff8
 	// 10c roal1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=2 c=2 m=xnzvc  i=.l...i. ALU.add a=R.dtl:m_dt d=R.dyl:m_da[ry]
 	alu_add(m_dt, m_da[ry]);
@@ -18116,6 +18121,7 @@ void m68000_device::addi_l_imm32_ds_df() // 0680 fff8
 	m_icount -= 2;
 	// 25b roal4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -18221,7 +18227,6 @@ void m68000_device::addi_l_imm32_ais_df() // 0690 fff8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -18271,6 +18276,7 @@ void m68000_device::addi_l_imm32_ais_df() // 0690 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -18394,7 +18400,6 @@ void m68000_device::addi_l_imm32_aips_df() // 0698 fff8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -18444,6 +18449,7 @@ void m68000_device::addi_l_imm32_aips_df() // 0698 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -18568,7 +18574,6 @@ void m68000_device::addi_l_imm32_pais_df() // 06a0 fff8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -18618,6 +18623,7 @@ void m68000_device::addi_l_imm32_pais_df() // 06a0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -18759,7 +18765,6 @@ void m68000_device::addi_l_imm32_das_df() // 06a8 fff8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -18809,6 +18814,7 @@ void m68000_device::addi_l_imm32_das_df() // 06a8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -18988,7 +18994,6 @@ adsl2:
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -19038,6 +19043,7 @@ adsl2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -19181,7 +19187,6 @@ void m68000_device::addi_l_imm32_adr16_df() // 06b8 ffff
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -19231,6 +19236,7 @@ void m68000_device::addi_l_imm32_adr16_df() // 06b8 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -19395,7 +19401,6 @@ void m68000_device::addi_l_imm32_adr32_df() // 06b9 ffff
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -19445,6 +19450,7 @@ void m68000_device::addi_l_imm32_adr32_df() // 06b9 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -19500,7 +19506,6 @@ void m68000_device::btst_imm8_ds_df() // 0800 fff8
 	// 3e7 btsr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dcr = m_dt;
 	m_at = m_dt;
@@ -19538,6 +19543,7 @@ void m68000_device::btst_imm8_ds_df() // 0800 fff8
 bcsr4:
 	// 0c4 bcsr4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	// alu r=13 c=1 m=..z..  i=.....i. ALU.and_ a=alub d=R.dcro:m_dcro
 	alu_and(m_alub, 1 << (m_dcr & 15));
@@ -19551,6 +19557,7 @@ bcsr4:
 btsr3:
 	// 044 btsr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	// alu r=13 c=1 m=..z..  i=.....i. ALU.and_ a=18:m_da[ry] d=R.dcro:m_dcro
 	alu_and(high16(m_da[ry]), 1 << (m_dcr & 15));
 	sr_z();
@@ -19614,7 +19621,6 @@ void m68000_device::btst_imm8_ais_df() // 0810 fff8
 	// 215 btsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=13 c=1 m=..z..  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -19622,6 +19628,7 @@ void m68000_device::btst_imm8_ais_df() // 0810 fff8
 	sr_z();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -19705,7 +19712,6 @@ void m68000_device::btst_imm8_aips_df() // 0818 fff8
 	// 215 btsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=13 c=1 m=..z..  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -19713,6 +19719,7 @@ void m68000_device::btst_imm8_aips_df() // 0818 fff8
 	sr_z();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -19798,7 +19805,6 @@ void m68000_device::btst_imm8_pais_df() // 0820 fff8
 	// 215 btsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=13 c=1 m=..z..  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -19806,6 +19812,7 @@ void m68000_device::btst_imm8_pais_df() // 0820 fff8
 	sr_z();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -19907,7 +19914,6 @@ void m68000_device::btst_imm8_das_df() // 0828 fff8
 	// 215 btsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=13 c=1 m=..z..  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -19915,6 +19921,7 @@ void m68000_device::btst_imm8_das_df() // 0828 fff8
 	sr_z();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -20056,7 +20063,6 @@ adsw2:
 	// 215 btsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=13 c=1 m=..z..  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -20064,6 +20070,7 @@ adsw2:
 	sr_z();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -20164,7 +20171,6 @@ void m68000_device::btst_imm8_adr16_df() // 0838 ffff
 	// 215 btsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=13 c=1 m=..z..  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -20172,6 +20178,7 @@ void m68000_device::btst_imm8_adr16_df() // 0838 ffff
 	sr_z();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -20294,7 +20301,6 @@ void m68000_device::btst_imm8_adr32_df() // 0839 ffff
 	// 215 btsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=13 c=1 m=..z..  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -20302,6 +20308,7 @@ void m68000_device::btst_imm8_adr32_df() // 0839 ffff
 	sr_z();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -20402,7 +20409,6 @@ void m68000_device::btst_imm8_dpc_df() // 083a ffff
 	// 215 btsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=13 c=1 m=..z..  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -20410,6 +20416,7 @@ void m68000_device::btst_imm8_dpc_df() // 083a ffff
 	sr_z();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -20550,7 +20557,6 @@ adsw2:
 	// 215 btsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=13 c=1 m=..z..  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -20558,6 +20564,7 @@ adsw2:
 	sr_z();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -20614,7 +20621,6 @@ void m68000_device::bchg_imm8_ds_df() // 0840 fff8
 	// 3ef bcsr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dcr = m_dt;
 	m_at = m_dt;
@@ -20652,6 +20658,7 @@ void m68000_device::bchg_imm8_ds_df() // 0840 fff8
 bcsr4:
 	// 0c4 bcsr4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	// alu r=13 c=1 m=..z..  i=.....i. ALU.and_ a=alub d=R.dcro:m_dcro
 	alu_and(m_alub, 1 << (m_dcr & 15));
@@ -20670,6 +20677,7 @@ bcsr3:
 	m_icount -= 2;
 	// 0a1 bcsr5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	// alu r=13 c=1 m=..z..  i=.....i. ALU.and_ a=alub d=R.dcro:m_dcro
 	alu_and(m_alub, 1 << (m_dcr & 15));
@@ -20734,7 +20742,6 @@ void m68000_device::bchg_imm8_ais_df() // 0850 fff8
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -20761,6 +20768,7 @@ void m68000_device::bchg_imm8_ais_df() // 0850 fff8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -20840,7 +20848,6 @@ void m68000_device::bchg_imm8_aips_df() // 0858 fff8
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -20867,6 +20874,7 @@ void m68000_device::bchg_imm8_aips_df() // 0858 fff8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -20948,7 +20956,6 @@ void m68000_device::bchg_imm8_pais_df() // 0860 fff8
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -20975,6 +20982,7 @@ void m68000_device::bchg_imm8_pais_df() // 0860 fff8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -21072,7 +21080,6 @@ void m68000_device::bchg_imm8_das_df() // 0868 fff8
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -21099,6 +21106,7 @@ void m68000_device::bchg_imm8_das_df() // 0868 fff8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -21236,7 +21244,6 @@ adsw2:
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -21263,6 +21270,7 @@ adsw2:
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -21359,7 +21367,6 @@ void m68000_device::bchg_imm8_adr16_df() // 0878 ffff
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -21386,6 +21393,7 @@ void m68000_device::bchg_imm8_adr16_df() // 0878 ffff
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -21504,7 +21512,6 @@ void m68000_device::bchg_imm8_adr32_df() // 0879 ffff
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -21531,6 +21538,7 @@ void m68000_device::bchg_imm8_adr32_df() // 0879 ffff
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -21583,7 +21591,6 @@ void m68000_device::bclr_imm8_ds_df() // 0880 fff8
 	// 3eb bclr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dcr = m_dt;
 	m_at = m_dt;
@@ -21625,6 +21632,7 @@ bclr4:
 	m_icount -= 2;
 	// 0c4 bcsr4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	// alu r=14 c=1 m=..z..  i=.l...i. ALU.and_ a=alub d=R.dcro:m_dcro
 	alu_and(m_alub, 1 << (m_dcr & 15));
@@ -21647,6 +21655,7 @@ bclr3:
 	m_icount -= 2;
 	// 0a1 bcsr5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	// alu r=14 c=1 m=..z..  i=.l...i. ALU.and_ a=alub d=R.dcro:m_dcro
 	alu_and(m_alub, 1 << (m_dcr & 15));
@@ -21711,7 +21720,6 @@ void m68000_device::bclr_imm8_ais_df() // 0890 fff8
 	// 069 bclm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_dbin;
 	m_ftu = m_sr;
 	// alu r=14 c=2 m=.....  i=bl..... ALU.or_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -21742,6 +21750,7 @@ void m68000_device::bclr_imm8_ais_df() // 0890 fff8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -21821,7 +21830,6 @@ void m68000_device::bclr_imm8_aips_df() // 0898 fff8
 	// 069 bclm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_dbin;
 	m_ftu = m_sr;
 	// alu r=14 c=2 m=.....  i=bl..... ALU.or_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -21852,6 +21860,7 @@ void m68000_device::bclr_imm8_aips_df() // 0898 fff8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -21933,7 +21942,6 @@ void m68000_device::bclr_imm8_pais_df() // 08a0 fff8
 	// 069 bclm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_dbin;
 	m_ftu = m_sr;
 	// alu r=14 c=2 m=.....  i=bl..... ALU.or_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -21964,6 +21972,7 @@ void m68000_device::bclr_imm8_pais_df() // 08a0 fff8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -22061,7 +22070,6 @@ void m68000_device::bclr_imm8_das_df() // 08a8 fff8
 	// 069 bclm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_dbin;
 	m_ftu = m_sr;
 	// alu r=14 c=2 m=.....  i=bl..... ALU.or_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -22092,6 +22100,7 @@ void m68000_device::bclr_imm8_das_df() // 08a8 fff8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -22229,7 +22238,6 @@ adsw2:
 	// 069 bclm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_dbin;
 	m_ftu = m_sr;
 	// alu r=14 c=2 m=.....  i=bl..... ALU.or_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -22260,6 +22268,7 @@ adsw2:
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -22356,7 +22365,6 @@ void m68000_device::bclr_imm8_adr16_df() // 08b8 ffff
 	// 069 bclm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_dbin;
 	m_ftu = m_sr;
 	// alu r=14 c=2 m=.....  i=bl..... ALU.or_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -22387,6 +22395,7 @@ void m68000_device::bclr_imm8_adr16_df() // 08b8 ffff
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -22505,7 +22514,6 @@ void m68000_device::bclr_imm8_adr32_df() // 08b9 ffff
 	// 069 bclm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_dbin;
 	m_ftu = m_sr;
 	// alu r=14 c=2 m=.....  i=bl..... ALU.or_ a=R.dbin:m_dbin d=R.dcro8:m_dcro8
@@ -22536,6 +22544,7 @@ void m68000_device::bclr_imm8_adr32_df() // 08b9 ffff
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -22588,7 +22597,6 @@ void m68000_device::bset_imm8_ds_df() // 08c0 fff8
 	// 3ef bcsr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dcr = m_dt;
 	m_at = m_dt;
@@ -22626,6 +22634,7 @@ void m68000_device::bset_imm8_ds_df() // 08c0 fff8
 bcsr4:
 	// 0c4 bcsr4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	// alu r=14 c=1 m=..z..  i=.....i. ALU.and_ a=alub d=R.dcro:m_dcro
 	alu_and(m_alub, 1 << (m_dcr & 15));
@@ -22644,6 +22653,7 @@ bcsr3:
 	m_icount -= 2;
 	// 0a1 bcsr5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	// alu r=14 c=1 m=..z..  i=.....i. ALU.and_ a=alub d=R.dcro:m_dcro
 	alu_and(m_alub, 1 << (m_dcr & 15));
@@ -22708,7 +22718,6 @@ void m68000_device::bset_imm8_ais_df() // 08d0 fff8
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -22735,6 +22744,7 @@ void m68000_device::bset_imm8_ais_df() // 08d0 fff8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -22814,7 +22824,6 @@ void m68000_device::bset_imm8_aips_df() // 08d8 fff8
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -22841,6 +22850,7 @@ void m68000_device::bset_imm8_aips_df() // 08d8 fff8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -22922,7 +22932,6 @@ void m68000_device::bset_imm8_pais_df() // 08e0 fff8
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -22949,6 +22958,7 @@ void m68000_device::bset_imm8_pais_df() // 08e0 fff8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -23046,7 +23056,6 @@ void m68000_device::bset_imm8_das_df() // 08e8 fff8
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -23073,6 +23082,7 @@ void m68000_device::bset_imm8_das_df() // 08e8 fff8
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -23210,7 +23220,6 @@ adsw2:
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -23237,6 +23246,7 @@ adsw2:
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -23333,7 +23343,6 @@ void m68000_device::bset_imm8_adr16_df() // 08f8 ffff
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -23360,6 +23369,7 @@ void m68000_device::bset_imm8_adr16_df() // 08f8 ffff
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -23478,7 +23488,6 @@ void m68000_device::bset_imm8_adr32_df() // 08f9 ffff
 	// 081 bcsm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -23505,6 +23514,7 @@ void m68000_device::bset_imm8_adr32_df() // 08f9 ffff
 	// 082 bcsm2
 	m_aob = m_at;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -23557,13 +23567,13 @@ void m68000_device::eori_b_imm8_ds_df() // 0a00 fff8
 	// 100 roaw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=13 c=2 m=.nzvc  i=b....i. ALU.eor a=R.dtl:m_dt d=R.dyl:m_da[ry]
 	alu_eor8(m_dt, m_da[ry]);
 	sr_nzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -23644,7 +23654,6 @@ void m68000_device::eori_b_imm8_ais_df() // 0a10 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -23671,6 +23680,7 @@ void m68000_device::eori_b_imm8_ais_df() // 0a10 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -23749,7 +23759,6 @@ void m68000_device::eori_b_imm8_aips_df() // 0a18 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -23776,6 +23785,7 @@ void m68000_device::eori_b_imm8_aips_df() // 0a18 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -23856,7 +23866,6 @@ void m68000_device::eori_b_imm8_pais_df() // 0a20 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -23883,6 +23892,7 @@ void m68000_device::eori_b_imm8_pais_df() // 0a20 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -23979,7 +23989,6 @@ void m68000_device::eori_b_imm8_das_df() // 0a28 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -24006,6 +24015,7 @@ void m68000_device::eori_b_imm8_das_df() // 0a28 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -24142,7 +24152,6 @@ adsw2:
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -24169,6 +24178,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -24264,7 +24274,6 @@ void m68000_device::eori_b_imm8_adr16_df() // 0a38 ffff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -24291,6 +24300,7 @@ void m68000_device::eori_b_imm8_adr16_df() // 0a38 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -24408,7 +24418,6 @@ void m68000_device::eori_b_imm8_adr32_df() // 0a39 ffff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -24435,6 +24444,7 @@ void m68000_device::eori_b_imm8_adr32_df() // 0a39 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -24529,12 +24539,12 @@ void m68000_device::eori_imm8_ccr_df() // 0a3c ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=13 c=0 m=.....  i=b...... ALU.eor a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -24591,13 +24601,13 @@ void m68000_device::eori_w_imm16_ds_df() // 0a40 fff8
 	// 100 roaw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=13 c=2 m=.nzvc  i=.....i. ALU.eor a=R.dtl:m_dt d=R.dyl:m_da[ry]
 	alu_eor(m_dt, m_da[ry]);
 	sr_nzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -24681,7 +24691,6 @@ void m68000_device::eori_w_imm16_ais_df() // 0a50 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -24708,6 +24717,7 @@ void m68000_device::eori_w_imm16_ais_df() // 0a50 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -24794,7 +24804,6 @@ void m68000_device::eori_w_imm16_aips_df() // 0a58 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -24821,6 +24830,7 @@ void m68000_device::eori_w_imm16_aips_df() // 0a58 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -24909,7 +24919,6 @@ void m68000_device::eori_w_imm16_pais_df() // 0a60 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -24936,6 +24945,7 @@ void m68000_device::eori_w_imm16_pais_df() // 0a60 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -25040,7 +25050,6 @@ void m68000_device::eori_w_imm16_das_df() // 0a68 fff8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -25067,6 +25076,7 @@ void m68000_device::eori_w_imm16_das_df() // 0a68 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -25211,7 +25221,6 @@ adsw2:
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -25238,6 +25247,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -25341,7 +25351,6 @@ void m68000_device::eori_w_imm16_adr16_df() // 0a78 ffff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -25368,6 +25377,7 @@ void m68000_device::eori_w_imm16_adr16_df() // 0a78 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -25493,7 +25503,6 @@ void m68000_device::eori_w_imm16_adr32_df() // 0a79 ffff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -25520,6 +25529,7 @@ void m68000_device::eori_w_imm16_adr32_df() // 0a79 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -25625,12 +25635,12 @@ void m68000_device::eori_i16u_sr_df() // 0a7c ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=13 c=0 m=.....  i=....... ALU.eor a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -25709,7 +25719,6 @@ void m68000_device::eori_l_imm32_ds_df() // 0a80 fff8
 	// 10c roal1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=13 c=2 m=.nzvc  i=.l...i. ALU.eor a=R.dtl:m_dt d=R.dyl:m_da[ry]
 	alu_eor(m_dt, m_da[ry]);
@@ -25742,6 +25751,7 @@ void m68000_device::eori_l_imm32_ds_df() // 0a80 fff8
 	m_icount -= 2;
 	// 25b roal4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=13 c=0 m=.....  i=.l..... ALU.eor a=R.aluo:m_aluo d=none
@@ -25851,7 +25861,6 @@ void m68000_device::eori_l_imm32_ais_df() // 0a90 fff8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -25901,6 +25910,7 @@ void m68000_device::eori_l_imm32_ais_df() // 0a90 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -26029,7 +26039,6 @@ void m68000_device::eori_l_imm32_aips_df() // 0a98 fff8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -26079,6 +26088,7 @@ void m68000_device::eori_l_imm32_aips_df() // 0a98 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -26208,7 +26218,6 @@ void m68000_device::eori_l_imm32_pais_df() // 0aa0 fff8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -26258,6 +26267,7 @@ void m68000_device::eori_l_imm32_pais_df() // 0aa0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -26404,7 +26414,6 @@ void m68000_device::eori_l_imm32_das_df() // 0aa8 fff8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -26454,6 +26463,7 @@ void m68000_device::eori_l_imm32_das_df() // 0aa8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -26640,7 +26650,6 @@ adsl2:
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -26690,6 +26699,7 @@ adsl2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -26839,7 +26849,6 @@ void m68000_device::eori_l_imm32_adr16_df() // 0ab8 ffff
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -26889,6 +26898,7 @@ void m68000_device::eori_l_imm32_adr16_df() // 0ab8 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -27060,7 +27070,6 @@ void m68000_device::eori_l_imm32_adr32_df() // 0ab9 ffff
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -27110,6 +27119,7 @@ void m68000_device::eori_l_imm32_adr32_df() // 0ab9 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -27165,13 +27175,13 @@ void m68000_device::cmpi_b_imm8_ds_df() // 0c00 fff8
 	// 108 rcaw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=6 c=2 m=.nzvc  i=b....i. ALU.sub a=R.dtl:m_dt d=R.dyl:m_da[ry]
 	alu_sub8(m_dt, m_da[ry]);
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -27248,7 +27258,6 @@ void m68000_device::cmpi_b_imm8_ais_df() // 0c10 fff8
 	// 087 cpdw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=b....i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -27256,6 +27265,7 @@ void m68000_device::cmpi_b_imm8_ais_df() // 0c10 fff8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -27335,7 +27345,6 @@ void m68000_device::cmpi_b_imm8_aips_df() // 0c18 fff8
 	// 087 cpdw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=b....i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -27343,6 +27352,7 @@ void m68000_device::cmpi_b_imm8_aips_df() // 0c18 fff8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -27424,7 +27434,6 @@ void m68000_device::cmpi_b_imm8_pais_df() // 0c20 fff8
 	// 087 cpdw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=b....i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -27432,6 +27441,7 @@ void m68000_device::cmpi_b_imm8_pais_df() // 0c20 fff8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -27529,7 +27539,6 @@ void m68000_device::cmpi_b_imm8_das_df() // 0c28 fff8
 	// 087 cpdw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=b....i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -27537,6 +27546,7 @@ void m68000_device::cmpi_b_imm8_das_df() // 0c28 fff8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -27672,7 +27682,6 @@ adsw2:
 	// 087 cpdw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=b....i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -27680,6 +27689,7 @@ adsw2:
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -27776,7 +27786,6 @@ void m68000_device::cmpi_b_imm8_adr16_df() // 0c38 ffff
 	// 087 cpdw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=b....i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -27784,6 +27793,7 @@ void m68000_device::cmpi_b_imm8_adr16_df() // 0c38 ffff
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -27901,7 +27911,6 @@ void m68000_device::cmpi_b_imm8_adr32_df() // 0c39 ffff
 	// 087 cpdw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=b....i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -27909,6 +27918,7 @@ void m68000_device::cmpi_b_imm8_adr32_df() // 0c39 ffff
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -27963,13 +27973,13 @@ void m68000_device::cmpi_w_imm16_ds_df() // 0c40 fff8
 	// 108 rcaw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dtl:m_dt d=R.dyl:m_da[ry]
 	alu_sub(m_dt, m_da[ry]);
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -28049,7 +28059,6 @@ void m68000_device::cmpi_w_imm16_ais_df() // 0c50 fff8
 	// 087 cpdw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -28057,6 +28066,7 @@ void m68000_device::cmpi_w_imm16_ais_df() // 0c50 fff8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -28139,7 +28149,6 @@ void m68000_device::cmpi_w_imm16_aips_df() // 0c58 fff8
 	// 087 cpdw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -28147,6 +28156,7 @@ void m68000_device::cmpi_w_imm16_aips_df() // 0c58 fff8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -28231,7 +28241,6 @@ void m68000_device::cmpi_w_imm16_pais_df() // 0c60 fff8
 	// 087 cpdw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -28239,6 +28248,7 @@ void m68000_device::cmpi_w_imm16_pais_df() // 0c60 fff8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -28339,7 +28349,6 @@ void m68000_device::cmpi_w_imm16_das_df() // 0c68 fff8
 	// 087 cpdw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -28347,6 +28356,7 @@ void m68000_device::cmpi_w_imm16_das_df() // 0c68 fff8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -28485,7 +28495,6 @@ adsw2:
 	// 087 cpdw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -28493,6 +28502,7 @@ adsw2:
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -28592,7 +28602,6 @@ void m68000_device::cmpi_w_imm16_adr16_df() // 0c78 ffff
 	// 087 cpdw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -28600,6 +28609,7 @@ void m68000_device::cmpi_w_imm16_adr16_df() // 0c78 ffff
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -28720,7 +28730,6 @@ void m68000_device::cmpi_w_imm16_adr32_df() // 0c79 ffff
 	// 087 cpdw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -28728,6 +28737,7 @@ void m68000_device::cmpi_w_imm16_adr32_df() // 0c79 ffff
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -28804,7 +28814,6 @@ void m68000_device::cmpi_l_imm32_ds_df() // 0c80 fff8
 	// 104 rcal1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=6 c=2 m=.nzvc  i=.l...i. ALU.sub a=R.dtl:m_dt d=R.dyl:m_da[ry]
 	alu_sub(m_dt, m_da[ry]);
@@ -28833,6 +28842,7 @@ void m68000_device::cmpi_l_imm32_ds_df() // 0c80 fff8
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -28937,7 +28947,6 @@ void m68000_device::cmpi_l_imm32_ais_df() // 0c90 fff8
 	// 08f cpdl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=.l...i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -28945,6 +28954,7 @@ void m68000_device::cmpi_l_imm32_ais_df() // 0c90 fff8
 	sr_nzvc();
 	// 171 cpdl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -29071,7 +29081,6 @@ void m68000_device::cmpi_l_imm32_aips_df() // 0c98 fff8
 	// 08f cpdl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=.l...i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -29079,6 +29088,7 @@ void m68000_device::cmpi_l_imm32_aips_df() // 0c98 fff8
 	sr_nzvc();
 	// 171 cpdl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -29206,7 +29216,6 @@ void m68000_device::cmpi_l_imm32_pais_df() // 0ca0 fff8
 	// 08f cpdl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=.l...i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -29214,6 +29223,7 @@ void m68000_device::cmpi_l_imm32_pais_df() // 0ca0 fff8
 	sr_nzvc();
 	// 171 cpdl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -29358,7 +29368,6 @@ void m68000_device::cmpi_l_imm32_das_df() // 0ca8 fff8
 	// 08f cpdl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=.l...i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -29366,6 +29375,7 @@ void m68000_device::cmpi_l_imm32_das_df() // 0ca8 fff8
 	sr_nzvc();
 	// 171 cpdl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -29548,7 +29558,6 @@ adsl2:
 	// 08f cpdl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=.l...i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -29556,6 +29565,7 @@ adsl2:
 	sr_nzvc();
 	// 171 cpdl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -29702,7 +29712,6 @@ void m68000_device::cmpi_l_imm32_adr16_df() // 0cb8 ffff
 	// 08f cpdl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=.l...i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -29710,6 +29719,7 @@ void m68000_device::cmpi_l_imm32_adr16_df() // 0cb8 ffff
 	sr_nzvc();
 	// 171 cpdl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -29877,7 +29887,6 @@ void m68000_device::cmpi_l_imm32_adr32_df() // 0cb9 ffff
 	// 08f cpdl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=6 c=2 m=.nzvc  i=.l...i. ALU.sub a=R.dtl:m_dt d=R.dbin:m_dbin
@@ -29885,6 +29894,7 @@ void m68000_device::cmpi_l_imm32_adr32_df() // 0cb9 ffff
 	sr_nzvc();
 	// 171 cpdl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -29920,7 +29930,6 @@ void m68000_device::move_b_ds_dd_df() // 1000 f1f8
 	// 121 rrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = m_da[ry];
 	m_au = m_au + 2;
@@ -29929,6 +29938,7 @@ void m68000_device::move_b_ds_dd_df() // 1000 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -29984,7 +29994,6 @@ void m68000_device::move_b_ais_dd_df() // 1010 f1f8
 	// 29b mrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_8(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -29993,6 +30002,7 @@ void m68000_device::move_b_ais_dd_df() // 1010 f1f8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -30050,7 +30060,6 @@ void m68000_device::move_b_aips_dd_df() // 1018 f1f8
 	// 29b mrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_8(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -30059,6 +30068,7 @@ void m68000_device::move_b_aips_dd_df() // 1018 f1f8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -30118,7 +30128,6 @@ void m68000_device::move_b_pais_dd_df() // 1020 f1f8
 	// 29b mrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_8(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -30127,6 +30136,7 @@ void m68000_device::move_b_pais_dd_df() // 1020 f1f8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -30202,7 +30212,6 @@ void m68000_device::move_b_das_dd_df() // 1028 f1f8
 	// 29b mrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_8(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -30211,6 +30220,7 @@ void m68000_device::move_b_das_dd_df() // 1028 f1f8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -30324,7 +30334,6 @@ adsw2:
 	// 29b mrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_8(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -30333,6 +30342,7 @@ adsw2:
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -30407,7 +30417,6 @@ void m68000_device::move_b_adr16_dd_df() // 1038 f1ff
 	// 29b mrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_8(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -30416,6 +30425,7 @@ void m68000_device::move_b_adr16_dd_df() // 1038 f1ff
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -30511,7 +30521,6 @@ void m68000_device::move_b_adr32_dd_df() // 1039 f1ff
 	// 29b mrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_8(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -30520,6 +30529,7 @@ void m68000_device::move_b_adr32_dd_df() // 1039 f1ff
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -30594,7 +30604,6 @@ void m68000_device::move_b_dpc_dd_df() // 103a f1ff
 	// 29b mrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_8(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -30603,6 +30612,7 @@ void m68000_device::move_b_dpc_dd_df() // 103a f1ff
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -30715,7 +30725,6 @@ adsw2:
 	// 29b mrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_8(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -30724,6 +30733,7 @@ adsw2:
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -30779,7 +30789,6 @@ void m68000_device::move_b_imm8_dd_df() // 103c f1ff
 	// 121 rrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = m_dt;
 	m_au = m_au + 2;
@@ -30788,6 +30797,7 @@ void m68000_device::move_b_imm8_dd_df() // 103c f1ff
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -30822,7 +30832,6 @@ void m68000_device::move_b_ds_aid_df() // 1080 f1f8
 	// 2fa rmrw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_da[ry]);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -30843,10 +30852,10 @@ void m68000_device::move_b_ds_aid_df() // 1080 f1f8
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -30919,10 +30928,10 @@ void m68000_device::move_b_ais_aid_df() // 1090 f1f8
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -30999,10 +31008,10 @@ void m68000_device::move_b_aips_aid_df() // 1098 f1f8
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -31081,10 +31090,10 @@ void m68000_device::move_b_pais_aid_df() // 10a0 f1f8
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -31179,10 +31188,10 @@ void m68000_device::move_b_das_aid_df() // 10a8 f1f8
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -31315,10 +31324,10 @@ adsw2:
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -31412,10 +31421,10 @@ void m68000_device::move_b_adr16_aid_df() // 10b8 f1ff
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -31530,10 +31539,10 @@ void m68000_device::move_b_adr32_aid_df() // 10b9 f1ff
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -31627,10 +31636,10 @@ void m68000_device::move_b_dpc_aid_df() // 10ba f1ff
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -31762,10 +31771,10 @@ adsw2:
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -31821,7 +31830,6 @@ void m68000_device::move_b_imm8_aid_df() // 10bc f1ff
 	// 2fa rmrw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_dt);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -31842,10 +31850,10 @@ void m68000_device::move_b_imm8_aid_df() // 10bc f1ff
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -31878,7 +31886,6 @@ void m68000_device::move_b_ds_aipd_df() // 10c0 f1f8
 	// 2fe rmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_da[ry]);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -31899,6 +31906,7 @@ void m68000_device::move_b_ds_aipd_df() // 10c0 f1f8
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -31954,7 +31962,6 @@ void m68000_device::move_b_ais_aipd_df() // 10d0 f1f8
 	// 3af mmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_dbin);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -31975,6 +31982,7 @@ void m68000_device::move_b_ais_aipd_df() // 10d0 f1f8
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -32034,7 +32042,6 @@ void m68000_device::move_b_aips_aipd_df() // 10d8 f1f8
 	// 3af mmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_dbin);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -32055,6 +32062,7 @@ void m68000_device::move_b_aips_aipd_df() // 10d8 f1f8
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -32116,7 +32124,6 @@ void m68000_device::move_b_pais_aipd_df() // 10e0 f1f8
 	// 3af mmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_dbin);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -32137,6 +32144,7 @@ void m68000_device::move_b_pais_aipd_df() // 10e0 f1f8
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -32214,7 +32222,6 @@ void m68000_device::move_b_das_aipd_df() // 10e8 f1f8
 	// 3af mmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_dbin);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -32235,6 +32242,7 @@ void m68000_device::move_b_das_aipd_df() // 10e8 f1f8
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -32350,7 +32358,6 @@ adsw2:
 	// 3af mmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_dbin);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -32371,6 +32378,7 @@ adsw2:
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -32447,7 +32455,6 @@ void m68000_device::move_b_adr16_aipd_df() // 10f8 f1ff
 	// 3af mmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_dbin);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -32468,6 +32475,7 @@ void m68000_device::move_b_adr16_aipd_df() // 10f8 f1ff
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -32565,7 +32573,6 @@ void m68000_device::move_b_adr32_aipd_df() // 10f9 f1ff
 	// 3af mmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_dbin);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -32586,6 +32593,7 @@ void m68000_device::move_b_adr32_aipd_df() // 10f9 f1ff
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -32662,7 +32670,6 @@ void m68000_device::move_b_dpc_aipd_df() // 10fa f1ff
 	// 3af mmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_dbin);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -32683,6 +32690,7 @@ void m68000_device::move_b_dpc_aipd_df() // 10fa f1ff
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -32797,7 +32805,6 @@ adsw2:
 	// 3af mmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_dbin);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -32818,6 +32825,7 @@ adsw2:
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -32875,7 +32883,6 @@ void m68000_device::move_b_imm8_aipd_df() // 10fc f1ff
 	// 2fe rmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_dt);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -32896,6 +32903,7 @@ void m68000_device::move_b_imm8_aipd_df() // 10fc f1ff
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -32930,7 +32938,6 @@ void m68000_device::move_b_ds_paid_df() // 1100 f1f8
 	// 2f8 rmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -32957,6 +32964,7 @@ void m68000_device::move_b_ds_paid_df() // 1100 f1f8
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -33006,7 +33014,6 @@ void m68000_device::move_b_ais_paid_df() // 1110 f1f8
 	// 38b mmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -33033,6 +33040,7 @@ void m68000_device::move_b_ais_paid_df() // 1110 f1f8
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -33086,7 +33094,6 @@ void m68000_device::move_b_aips_paid_df() // 1118 f1f8
 	// 38b mmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -33113,6 +33120,7 @@ void m68000_device::move_b_aips_paid_df() // 1118 f1f8
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -33168,7 +33176,6 @@ void m68000_device::move_b_pais_paid_df() // 1120 f1f8
 	// 38b mmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -33195,6 +33202,7 @@ void m68000_device::move_b_pais_paid_df() // 1120 f1f8
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -33266,7 +33274,6 @@ void m68000_device::move_b_das_paid_df() // 1128 f1f8
 	// 38b mmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -33293,6 +33300,7 @@ void m68000_device::move_b_das_paid_df() // 1128 f1f8
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -33402,7 +33410,6 @@ adsw2:
 	// 38b mmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -33429,6 +33436,7 @@ adsw2:
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -33499,7 +33507,6 @@ void m68000_device::move_b_adr16_paid_df() // 1138 f1ff
 	// 38b mmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -33526,6 +33533,7 @@ void m68000_device::move_b_adr16_paid_df() // 1138 f1ff
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -33617,7 +33625,6 @@ void m68000_device::move_b_adr32_paid_df() // 1139 f1ff
 	// 38b mmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -33644,6 +33651,7 @@ void m68000_device::move_b_adr32_paid_df() // 1139 f1ff
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -33714,7 +33722,6 @@ void m68000_device::move_b_dpc_paid_df() // 113a f1ff
 	// 38b mmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -33741,6 +33748,7 @@ void m68000_device::move_b_dpc_paid_df() // 113a f1ff
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -33849,7 +33857,6 @@ adsw2:
 	// 38b mmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -33876,6 +33883,7 @@ adsw2:
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -33927,7 +33935,6 @@ void m68000_device::move_b_imm8_paid_df() // 113c f1ff
 	// 2f8 rmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -33954,6 +33961,7 @@ void m68000_device::move_b_imm8_paid_df() // 113c f1ff
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -34003,7 +34011,6 @@ void m68000_device::move_b_ds_dad_df() // 1140 f1f8
 	// 2db rmdw2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_da[ry]);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -34023,11 +34030,11 @@ void m68000_device::move_b_ds_dad_df() // 1140 f1f8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -34105,6 +34112,7 @@ void m68000_device::move_b_ais_dad_df() // 1150 f1f8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -34124,11 +34132,11 @@ void m68000_device::move_b_ais_dad_df() // 1150 f1f8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -34210,6 +34218,7 @@ void m68000_device::move_b_aips_dad_df() // 1158 f1f8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -34229,11 +34238,11 @@ void m68000_device::move_b_aips_dad_df() // 1158 f1f8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -34317,6 +34326,7 @@ void m68000_device::move_b_pais_dad_df() // 1160 f1f8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -34336,11 +34346,11 @@ void m68000_device::move_b_pais_dad_df() // 1160 f1f8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -34440,6 +34450,7 @@ void m68000_device::move_b_das_dad_df() // 1168 f1f8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -34459,11 +34470,11 @@ void m68000_device::move_b_das_dad_df() // 1168 f1f8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -34601,6 +34612,7 @@ adsw2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -34620,11 +34632,11 @@ adsw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -34723,6 +34735,7 @@ void m68000_device::move_b_adr16_dad_df() // 1178 f1ff
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -34742,11 +34755,11 @@ void m68000_device::move_b_adr16_dad_df() // 1178 f1ff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -34866,6 +34879,7 @@ void m68000_device::move_b_adr32_dad_df() // 1179 f1ff
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -34885,11 +34899,11 @@ void m68000_device::move_b_adr32_dad_df() // 1179 f1ff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -34988,6 +35002,7 @@ void m68000_device::move_b_dpc_dad_df() // 117a f1ff
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -35007,11 +35022,11 @@ void m68000_device::move_b_dpc_dad_df() // 117a f1ff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -35148,6 +35163,7 @@ adsw2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -35167,11 +35183,11 @@ adsw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -35248,7 +35264,6 @@ void m68000_device::move_b_imm8_dad_df() // 117c f1ff
 	// 2db rmdw2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_dt);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -35268,11 +35283,11 @@ void m68000_device::move_b_imm8_dad_df() // 117c f1ff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -35365,7 +35380,6 @@ rmdw2:
 	// 2db rmdw2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_da[ry]);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -35385,11 +35399,11 @@ rmdw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -35505,6 +35519,7 @@ maww2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -35524,11 +35539,11 @@ maww2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -35648,6 +35663,7 @@ maww2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -35667,11 +35683,11 @@ maww2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -35793,6 +35809,7 @@ maww2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -35812,11 +35829,11 @@ maww2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -35954,6 +35971,7 @@ maww2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -35973,11 +35991,11 @@ maww2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -36153,6 +36171,7 @@ maww2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -36172,11 +36191,11 @@ maww2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -36313,6 +36332,7 @@ maww2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -36332,11 +36352,11 @@ maww2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -36494,6 +36514,7 @@ maww2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -36513,11 +36534,11 @@ maww2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -36654,6 +36675,7 @@ maww2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -36673,11 +36695,11 @@ maww2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -36852,6 +36874,7 @@ maww2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -36871,11 +36894,11 @@ maww2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -36991,7 +37014,6 @@ rmdw2:
 	// 2db rmdw2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_dt);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -37011,11 +37033,11 @@ rmdw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -37072,6 +37094,7 @@ void m68000_device::move_b_ds_adr16_df() // 11c0 fff8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -37091,11 +37114,11 @@ void m68000_device::move_b_ds_adr16_df() // 11c0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -37172,6 +37195,7 @@ void m68000_device::move_b_ais_adr16_df() // 11d0 fff8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -37191,11 +37215,11 @@ void m68000_device::move_b_ais_adr16_df() // 11d0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -37276,6 +37300,7 @@ void m68000_device::move_b_aips_adr16_df() // 11d8 fff8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -37295,11 +37320,11 @@ void m68000_device::move_b_aips_adr16_df() // 11d8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -37382,6 +37407,7 @@ void m68000_device::move_b_pais_adr16_df() // 11e0 fff8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -37401,11 +37427,11 @@ void m68000_device::move_b_pais_adr16_df() // 11e0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -37504,6 +37530,7 @@ void m68000_device::move_b_das_adr16_df() // 11e8 fff8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -37523,11 +37550,11 @@ void m68000_device::move_b_das_adr16_df() // 11e8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -37664,6 +37691,7 @@ adsw2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -37683,11 +37711,11 @@ adsw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -37785,6 +37813,7 @@ void m68000_device::move_b_adr16_adr16_df() // 11f8 ffff
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -37804,11 +37833,11 @@ void m68000_device::move_b_adr16_adr16_df() // 11f8 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -37927,6 +37956,7 @@ void m68000_device::move_b_adr32_adr16_df() // 11f9 ffff
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -37946,11 +37976,11 @@ void m68000_device::move_b_adr32_adr16_df() // 11f9 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -38048,6 +38078,7 @@ void m68000_device::move_b_dpc_adr16_df() // 11fa ffff
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -38067,11 +38098,11 @@ void m68000_device::move_b_dpc_adr16_df() // 11fa ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -38207,6 +38238,7 @@ adsw2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -38226,11 +38258,11 @@ adsw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -38310,6 +38342,7 @@ void m68000_device::move_b_imm8_adr16_df() // 11fc ffff
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -38329,11 +38362,11 @@ void m68000_device::move_b_imm8_adr16_df() // 11fc ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -38411,6 +38444,7 @@ void m68000_device::move_b_ds_adr32_df() // 13c0 fff8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -38430,11 +38464,11 @@ void m68000_device::move_b_ds_adr32_df() // 13c0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -38511,7 +38545,6 @@ void m68000_device::move_b_ais_adr32_df() // 13d0 fff8
 	// 32e malw2
 	m_aob = merge_16_32(high16(m_at), m_dbin);
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -38552,11 +38585,11 @@ void m68000_device::move_b_ais_adr32_df() // 13d0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -38637,7 +38670,6 @@ void m68000_device::move_b_aips_adr32_df() // 13d8 fff8
 	// 32e malw2
 	m_aob = merge_16_32(high16(m_at), m_dbin);
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -38678,11 +38710,11 @@ void m68000_device::move_b_aips_adr32_df() // 13d8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -38765,7 +38797,6 @@ void m68000_device::move_b_pais_adr32_df() // 13e0 fff8
 	// 32e malw2
 	m_aob = merge_16_32(high16(m_at), m_dbin);
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -38806,11 +38837,11 @@ void m68000_device::move_b_pais_adr32_df() // 13e0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -38909,7 +38940,6 @@ void m68000_device::move_b_das_adr32_df() // 13e8 fff8
 	// 32e malw2
 	m_aob = merge_16_32(high16(m_at), m_dbin);
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -38950,11 +38980,11 @@ void m68000_device::move_b_das_adr32_df() // 13e8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -39091,7 +39121,6 @@ adsw2:
 	// 32e malw2
 	m_aob = merge_16_32(high16(m_at), m_dbin);
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -39132,11 +39161,11 @@ adsw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -39234,7 +39263,6 @@ void m68000_device::move_b_adr16_adr32_df() // 13f8 ffff
 	// 32e malw2
 	m_aob = merge_16_32(high16(m_at), m_dbin);
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -39275,11 +39303,11 @@ void m68000_device::move_b_adr16_adr32_df() // 13f8 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -39398,7 +39426,6 @@ void m68000_device::move_b_adr32_adr32_df() // 13f9 ffff
 	// 32e malw2
 	m_aob = merge_16_32(high16(m_at), m_dbin);
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -39439,11 +39466,11 @@ void m68000_device::move_b_adr32_adr32_df() // 13f9 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -39541,7 +39568,6 @@ void m68000_device::move_b_dpc_adr32_df() // 13fa ffff
 	// 32e malw2
 	m_aob = merge_16_32(high16(m_at), m_dbin);
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -39582,11 +39608,11 @@ void m68000_device::move_b_dpc_adr32_df() // 13fa ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -39722,7 +39748,6 @@ adsw2:
 	// 32e malw2
 	m_aob = merge_16_32(high16(m_at), m_dbin);
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -39763,11 +39788,11 @@ adsw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -39868,6 +39893,7 @@ void m68000_device::move_b_imm8_adr32_df() // 13fc ffff
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -39887,11 +39913,11 @@ void m68000_device::move_b_imm8_adr32_df() // 13fc ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -39924,7 +39950,6 @@ void m68000_device::move_l_ds_dd_df() // 2000 f1f8
 	// 129 rrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = m_da[ry];
 	m_au = m_au + 2;
@@ -39933,6 +39958,7 @@ void m68000_device::move_l_ds_dd_df() // 2000 f1f8
 	sr_nzvc();
 	// 278 rrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -39969,7 +39995,6 @@ void m68000_device::move_l_as_dd_df() // 2008 f1f8
 	// 129 rrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = m_da[ry];
 	m_au = m_au + 2;
@@ -39978,6 +40003,7 @@ void m68000_device::move_l_as_dd_df() // 2008 f1f8
 	sr_nzvc();
 	// 278 rrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -40059,7 +40085,6 @@ void m68000_device::move_l_ais_dd_df() // 2010 f1f8
 	// 29f mrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -40068,6 +40093,7 @@ void m68000_device::move_l_ais_dd_df() // 2010 f1f8
 	sr_nzvc();
 	// 36f mrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -40152,7 +40178,6 @@ void m68000_device::move_l_aips_dd_df() // 2018 f1f8
 	// 29f mrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -40161,6 +40186,7 @@ void m68000_device::move_l_aips_dd_df() // 2018 f1f8
 	sr_nzvc();
 	// 36f mrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -40246,7 +40272,6 @@ void m68000_device::move_l_pais_dd_df() // 2020 f1f8
 	// 29f mrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -40255,6 +40280,7 @@ void m68000_device::move_l_pais_dd_df() // 2020 f1f8
 	sr_nzvc();
 	// 36f mrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -40357,7 +40383,6 @@ void m68000_device::move_l_das_dd_df() // 2028 f1f8
 	// 29f mrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -40366,6 +40391,7 @@ void m68000_device::move_l_das_dd_df() // 2028 f1f8
 	sr_nzvc();
 	// 36f mrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -40506,7 +40532,6 @@ adsl2:
 	// 29f mrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -40515,6 +40540,7 @@ adsl2:
 	sr_nzvc();
 	// 36f mrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -40619,7 +40645,6 @@ void m68000_device::move_l_adr16_dd_df() // 2038 f1ff
 	// 29f mrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -40628,6 +40653,7 @@ void m68000_device::move_l_adr16_dd_df() // 2038 f1ff
 	sr_nzvc();
 	// 36f mrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -40753,7 +40779,6 @@ void m68000_device::move_l_adr32_dd_df() // 2039 f1ff
 	// 29f mrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -40762,6 +40787,7 @@ void m68000_device::move_l_adr32_dd_df() // 2039 f1ff
 	sr_nzvc();
 	// 36f mrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -40863,7 +40889,6 @@ void m68000_device::move_l_dpc_dd_df() // 203a f1ff
 	// 29f mrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -40872,6 +40897,7 @@ void m68000_device::move_l_dpc_dd_df() // 203a f1ff
 	sr_nzvc();
 	// 36f mrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -41011,7 +41037,6 @@ adsl2:
 	// 29f mrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -41020,6 +41045,7 @@ adsl2:
 	sr_nzvc();
 	// 36f mrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -41100,7 +41126,6 @@ void m68000_device::move_l_imm32_dd_df() // 203c f1ff
 	// 129 rrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = m_dt;
 	m_au = m_au + 2;
@@ -41109,6 +41134,7 @@ void m68000_device::move_l_imm32_dd_df() // 203c f1ff
 	sr_nzvc();
 	// 278 rrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -41145,7 +41171,6 @@ void m68000_device::movea_l_ds_ad_df() // 2040 f1f8
 	// 129 rrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = m_da[ry];
 	m_au = m_au + 2;
@@ -41153,6 +41178,7 @@ void m68000_device::movea_l_ds_ad_df() // 2040 f1f8
 	alu_and(m_da[ry], 0xffff);
 	// 278 rrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -41188,7 +41214,6 @@ void m68000_device::movea_l_as_ad_df() // 2048 f1f8
 	// 129 rrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = m_da[ry];
 	m_au = m_au + 2;
@@ -41196,6 +41221,7 @@ void m68000_device::movea_l_as_ad_df() // 2048 f1f8
 	alu_and(m_da[ry], 0xffff);
 	// 278 rrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -41276,7 +41302,6 @@ void m68000_device::movea_l_ais_ad_df() // 2050 f1f8
 	// 29f mrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -41284,6 +41309,7 @@ void m68000_device::movea_l_ais_ad_df() // 2050 f1f8
 	alu_and(m_dbin, 0xffff);
 	// 36f mrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -41367,7 +41393,6 @@ void m68000_device::movea_l_aips_ad_df() // 2058 f1f8
 	// 29f mrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -41375,6 +41400,7 @@ void m68000_device::movea_l_aips_ad_df() // 2058 f1f8
 	alu_and(m_dbin, 0xffff);
 	// 36f mrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -41459,7 +41485,6 @@ void m68000_device::movea_l_pais_ad_df() // 2060 f1f8
 	// 29f mrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -41467,6 +41492,7 @@ void m68000_device::movea_l_pais_ad_df() // 2060 f1f8
 	alu_and(m_dbin, 0xffff);
 	// 36f mrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -41568,7 +41594,6 @@ void m68000_device::movea_l_das_ad_df() // 2068 f1f8
 	// 29f mrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -41576,6 +41601,7 @@ void m68000_device::movea_l_das_ad_df() // 2068 f1f8
 	alu_and(m_dbin, 0xffff);
 	// 36f mrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -41715,7 +41741,6 @@ adsl2:
 	// 29f mrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -41723,6 +41748,7 @@ adsl2:
 	alu_and(m_dbin, 0xffff);
 	// 36f mrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -41826,7 +41852,6 @@ void m68000_device::movea_l_adr16_ad_df() // 2078 f1ff
 	// 29f mrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -41834,6 +41859,7 @@ void m68000_device::movea_l_adr16_ad_df() // 2078 f1ff
 	alu_and(m_dbin, 0xffff);
 	// 36f mrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -41958,7 +41984,6 @@ void m68000_device::movea_l_adr32_ad_df() // 2079 f1ff
 	// 29f mrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -41966,6 +41991,7 @@ void m68000_device::movea_l_adr32_ad_df() // 2079 f1ff
 	alu_and(m_dbin, 0xffff);
 	// 36f mrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -42066,7 +42092,6 @@ void m68000_device::movea_l_dpc_ad_df() // 207a f1ff
 	// 29f mrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -42074,6 +42099,7 @@ void m68000_device::movea_l_dpc_ad_df() // 207a f1ff
 	alu_and(m_dbin, 0xffff);
 	// 36f mrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -42212,7 +42238,6 @@ adsl2:
 	// 29f mrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -42220,6 +42245,7 @@ adsl2:
 	alu_and(m_dbin, 0xffff);
 	// 36f mrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -42299,7 +42325,6 @@ void m68000_device::movea_l_imm32_ad_df() // 207c f1ff
 	// 129 rrgl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = m_dt;
 	m_au = m_au + 2;
@@ -42307,6 +42332,7 @@ void m68000_device::movea_l_imm32_ad_df() // 207c f1ff
 	alu_and(m_dt, 0xffff);
 	// 278 rrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -42364,7 +42390,6 @@ void m68000_device::move_l_ds_aid_df() // 2080 f1f8
 	// 23f rmrl2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_da[ry];
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -42389,6 +42414,7 @@ void m68000_device::move_l_ds_aid_df() // 2080 f1f8
 	// 258 rmrl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -42448,7 +42474,6 @@ void m68000_device::move_l_as_aid_df() // 2088 f1f8
 	// 23f rmrl2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_da[ry];
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -42473,6 +42498,7 @@ void m68000_device::move_l_as_aid_df() // 2088 f1f8
 	// 258 rmrl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -42579,7 +42605,6 @@ void m68000_device::move_l_ais_aid_df() // 2090 f1f8
 	// 3aa mmrl2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -42604,10 +42629,10 @@ void m68000_device::move_l_ais_aid_df() // 2090 f1f8
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -42712,7 +42737,6 @@ void m68000_device::move_l_aips_aid_df() // 2098 f1f8
 	// 3aa mmrl2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -42737,10 +42761,10 @@ void m68000_device::move_l_aips_aid_df() // 2098 f1f8
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -42846,7 +42870,6 @@ void m68000_device::move_l_pais_aid_df() // 20a0 f1f8
 	// 3aa mmrl2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -42871,10 +42894,10 @@ void m68000_device::move_l_pais_aid_df() // 20a0 f1f8
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -42997,7 +43020,6 @@ void m68000_device::move_l_das_aid_df() // 20a8 f1f8
 	// 3aa mmrl2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -43022,10 +43044,10 @@ void m68000_device::move_l_das_aid_df() // 20a8 f1f8
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -43186,7 +43208,6 @@ adsl2:
 	// 3aa mmrl2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -43211,10 +43232,10 @@ adsl2:
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -43339,7 +43360,6 @@ void m68000_device::move_l_adr16_aid_df() // 20b8 f1ff
 	// 3aa mmrl2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -43364,10 +43384,10 @@ void m68000_device::move_l_adr16_aid_df() // 20b8 f1ff
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -43513,7 +43533,6 @@ void m68000_device::move_l_adr32_aid_df() // 20b9 f1ff
 	// 3aa mmrl2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -43538,10 +43557,10 @@ void m68000_device::move_l_adr32_aid_df() // 20b9 f1ff
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -43663,7 +43682,6 @@ void m68000_device::move_l_dpc_aid_df() // 20ba f1ff
 	// 3aa mmrl2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -43688,10 +43706,10 @@ void m68000_device::move_l_dpc_aid_df() // 20ba f1ff
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -43851,7 +43869,6 @@ adsl2:
 	// 3aa mmrl2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -43876,10 +43893,10 @@ adsl2:
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -43978,7 +43995,6 @@ void m68000_device::move_l_imm32_aid_df() // 20bc f1ff
 	// 23f rmrl2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_dt;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -44003,6 +44019,7 @@ void m68000_device::move_l_imm32_aid_df() // 20bc f1ff
 	// 258 rmrl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -44062,7 +44079,6 @@ void m68000_device::move_l_ds_aipd_df() // 20c0 f1f8
 	// 23c rmil2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_da[ry];
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -44087,6 +44103,7 @@ void m68000_device::move_l_ds_aipd_df() // 20c0 f1f8
 	// 23d rmil3
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -44146,7 +44163,6 @@ void m68000_device::move_l_as_aipd_df() // 20c8 f1f8
 	// 23c rmil2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_da[ry];
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -44171,6 +44187,7 @@ void m68000_device::move_l_as_aipd_df() // 20c8 f1f8
 	// 23d rmil3
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -44277,7 +44294,6 @@ void m68000_device::move_l_ais_aipd_df() // 20d0 f1f8
 	// 3ae mmil2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -44302,6 +44318,7 @@ void m68000_device::move_l_ais_aipd_df() // 20d0 f1f8
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -44408,7 +44425,6 @@ void m68000_device::move_l_aips_aipd_df() // 20d8 f1f8
 	// 3ae mmil2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -44433,6 +44449,7 @@ void m68000_device::move_l_aips_aipd_df() // 20d8 f1f8
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -44540,7 +44557,6 @@ void m68000_device::move_l_pais_aipd_df() // 20e0 f1f8
 	// 3ae mmil2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -44565,6 +44581,7 @@ void m68000_device::move_l_pais_aipd_df() // 20e0 f1f8
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -44689,7 +44706,6 @@ void m68000_device::move_l_das_aipd_df() // 20e8 f1f8
 	// 3ae mmil2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -44714,6 +44730,7 @@ void m68000_device::move_l_das_aipd_df() // 20e8 f1f8
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -44876,7 +44893,6 @@ adsl2:
 	// 3ae mmil2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -44901,6 +44917,7 @@ adsl2:
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -45027,7 +45044,6 @@ void m68000_device::move_l_adr16_aipd_df() // 20f8 f1ff
 	// 3ae mmil2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -45052,6 +45068,7 @@ void m68000_device::move_l_adr16_aipd_df() // 20f8 f1ff
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -45199,7 +45216,6 @@ void m68000_device::move_l_adr32_aipd_df() // 20f9 f1ff
 	// 3ae mmil2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -45224,6 +45240,7 @@ void m68000_device::move_l_adr32_aipd_df() // 20f9 f1ff
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -45347,7 +45364,6 @@ void m68000_device::move_l_dpc_aipd_df() // 20fa f1ff
 	// 3ae mmil2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -45372,6 +45388,7 @@ void m68000_device::move_l_dpc_aipd_df() // 20fa f1ff
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -45533,7 +45550,6 @@ adsl2:
 	// 3ae mmil2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -45558,6 +45574,7 @@ adsl2:
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -45658,7 +45675,6 @@ void m68000_device::move_l_imm32_aipd_df() // 20fc f1ff
 	// 23c rmil2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_dt;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -45683,6 +45699,7 @@ void m68000_device::move_l_imm32_aipd_df() // 20fc f1ff
 	// 23d rmil3
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -45720,7 +45737,6 @@ void m68000_device::move_l_ds_paid_df() // 2100 f1f8
 	// 2fc rmml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -45770,6 +45786,7 @@ void m68000_device::move_l_ds_paid_df() // 2100 f1f8
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -45803,7 +45820,6 @@ void m68000_device::move_l_as_paid_df() // 2108 f1f8
 	// 2fc rmml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -45853,6 +45869,7 @@ void m68000_device::move_l_as_paid_df() // 2108 f1f8
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -45931,7 +45948,6 @@ void m68000_device::move_l_ais_paid_df() // 2110 f1f8
 	// 38f mmml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -45981,6 +45997,7 @@ void m68000_device::move_l_ais_paid_df() // 2110 f1f8
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -46062,7 +46079,6 @@ void m68000_device::move_l_aips_paid_df() // 2118 f1f8
 	// 38f mmml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -46112,6 +46128,7 @@ void m68000_device::move_l_aips_paid_df() // 2118 f1f8
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -46194,7 +46211,6 @@ void m68000_device::move_l_pais_paid_df() // 2120 f1f8
 	// 38f mmml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -46244,6 +46260,7 @@ void m68000_device::move_l_pais_paid_df() // 2120 f1f8
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -46343,7 +46360,6 @@ void m68000_device::move_l_das_paid_df() // 2128 f1f8
 	// 38f mmml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -46393,6 +46409,7 @@ void m68000_device::move_l_das_paid_df() // 2128 f1f8
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -46530,7 +46547,6 @@ adsl2:
 	// 38f mmml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -46580,6 +46596,7 @@ adsl2:
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -46681,7 +46698,6 @@ void m68000_device::move_l_adr16_paid_df() // 2138 f1ff
 	// 38f mmml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -46731,6 +46747,7 @@ void m68000_device::move_l_adr16_paid_df() // 2138 f1ff
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -46853,7 +46870,6 @@ void m68000_device::move_l_adr32_paid_df() // 2139 f1ff
 	// 38f mmml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -46903,6 +46919,7 @@ void m68000_device::move_l_adr32_paid_df() // 2139 f1ff
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -47001,7 +47018,6 @@ void m68000_device::move_l_dpc_paid_df() // 213a f1ff
 	// 38f mmml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -47051,6 +47067,7 @@ void m68000_device::move_l_dpc_paid_df() // 213a f1ff
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -47187,7 +47204,6 @@ adsl2:
 	// 38f mmml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -47237,6 +47253,7 @@ adsl2:
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -47314,7 +47331,6 @@ void m68000_device::move_l_imm32_paid_df() // 213c f1ff
 	// 2fc rmml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -47364,6 +47380,7 @@ void m68000_device::move_l_imm32_paid_df() // 213c f1ff
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -47442,7 +47459,6 @@ void m68000_device::move_l_ds_dad_df() // 2140 f1f8
 	// 2df rmdl3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_da[ry];
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -47467,6 +47483,7 @@ void m68000_device::move_l_ds_dad_df() // 2140 f1f8
 	// 258 rmrl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -47549,7 +47566,6 @@ void m68000_device::move_l_as_dad_df() // 2148 f1f8
 	// 2df rmdl3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_da[ry];
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -47574,6 +47590,7 @@ void m68000_device::move_l_as_dad_df() // 2148 f1f8
 	// 258 rmrl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -47704,6 +47721,7 @@ void m68000_device::move_l_ais_dad_df() // 2150 f1f8
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -47728,11 +47746,11 @@ void m68000_device::move_l_ais_dad_df() // 2150 f1f8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -47861,6 +47879,7 @@ void m68000_device::move_l_aips_dad_df() // 2158 f1f8
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -47885,11 +47904,11 @@ void m68000_device::move_l_aips_dad_df() // 2158 f1f8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -48019,6 +48038,7 @@ void m68000_device::move_l_pais_dad_df() // 2160 f1f8
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -48043,11 +48063,11 @@ void m68000_device::move_l_pais_dad_df() // 2160 f1f8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -48194,6 +48214,7 @@ void m68000_device::move_l_das_dad_df() // 2168 f1f8
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -48218,11 +48239,11 @@ void m68000_device::move_l_das_dad_df() // 2168 f1f8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -48407,6 +48428,7 @@ adsl2:
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -48431,11 +48453,11 @@ adsl2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -48584,6 +48606,7 @@ void m68000_device::move_l_adr16_dad_df() // 2178 f1ff
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -48608,11 +48631,11 @@ void m68000_device::move_l_adr16_dad_df() // 2178 f1ff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -48782,6 +48805,7 @@ void m68000_device::move_l_adr32_dad_df() // 2179 f1ff
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -48806,11 +48830,11 @@ void m68000_device::move_l_adr32_dad_df() // 2179 f1ff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -48956,6 +48980,7 @@ void m68000_device::move_l_dpc_dad_df() // 217a f1ff
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -48980,11 +49005,11 @@ void m68000_device::move_l_dpc_dad_df() // 217a f1ff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -49168,6 +49193,7 @@ adsl2:
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -49192,11 +49218,11 @@ adsl2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -49318,7 +49344,6 @@ void m68000_device::move_l_imm32_dad_df() // 217c f1ff
 	// 2df rmdl3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_dt;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -49343,6 +49368,7 @@ void m68000_device::move_l_imm32_dad_df() // 217c f1ff
 	// 258 rmrl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -49464,7 +49490,6 @@ rmdl2:
 	// 2df rmdl3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_da[ry];
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -49489,6 +49514,7 @@ rmdl2:
 	// 258 rmrl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -49610,7 +49636,6 @@ rmdl2:
 	// 2df rmdl3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_da[ry];
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -49635,6 +49660,7 @@ rmdl2:
 	// 258 rmrl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -49803,6 +49829,7 @@ mawl2:
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -49827,11 +49854,11 @@ mawl2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -49998,6 +50025,7 @@ mawl2:
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -50022,11 +50050,11 @@ mawl2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -50194,6 +50222,7 @@ mawl2:
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -50218,11 +50247,11 @@ mawl2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -50407,6 +50436,7 @@ mawl2:
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -50431,11 +50461,11 @@ mawl2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -50658,6 +50688,7 @@ mawl2:
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -50682,11 +50713,11 @@ mawl2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -50873,6 +50904,7 @@ mawl2:
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -50897,11 +50929,11 @@ mawl2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -51109,6 +51141,7 @@ mawl2:
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -51133,11 +51166,11 @@ mawl2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -51321,6 +51354,7 @@ mawl2:
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -51345,11 +51379,11 @@ mawl2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -51571,6 +51605,7 @@ mawl2:
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -51595,11 +51630,11 @@ mawl2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -51760,7 +51795,6 @@ rmdl2:
 	// 2df rmdl3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_dt;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -51785,6 +51819,7 @@ rmdl2:
 	// 258 rmrl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -51870,6 +51905,7 @@ void m68000_device::move_l_ds_adr16_df() // 21c0 fff8
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -51894,11 +51930,11 @@ void m68000_device::move_l_ds_adr16_df() // 21c0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -51979,6 +52015,7 @@ void m68000_device::move_l_as_adr16_df() // 21c8 fff8
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -52003,11 +52040,11 @@ void m68000_device::move_l_as_adr16_df() // 21c8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -52132,6 +52169,7 @@ void m68000_device::move_l_ais_adr16_df() // 21d0 fff8
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -52156,11 +52194,11 @@ void m68000_device::move_l_ais_adr16_df() // 21d0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -52288,6 +52326,7 @@ void m68000_device::move_l_aips_adr16_df() // 21d8 fff8
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -52312,11 +52351,11 @@ void m68000_device::move_l_aips_adr16_df() // 21d8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -52445,6 +52484,7 @@ void m68000_device::move_l_pais_adr16_df() // 21e0 fff8
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -52469,11 +52509,11 @@ void m68000_device::move_l_pais_adr16_df() // 21e0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -52619,6 +52659,7 @@ void m68000_device::move_l_das_adr16_df() // 21e8 fff8
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -52643,11 +52684,11 @@ void m68000_device::move_l_das_adr16_df() // 21e8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -52831,6 +52872,7 @@ adsl2:
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -52855,11 +52897,11 @@ adsl2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -53007,6 +53049,7 @@ void m68000_device::move_l_adr16_adr16_df() // 21f8 ffff
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -53031,11 +53074,11 @@ void m68000_device::move_l_adr16_adr16_df() // 21f8 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -53204,6 +53247,7 @@ void m68000_device::move_l_adr32_adr16_df() // 21f9 ffff
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -53228,11 +53272,11 @@ void m68000_device::move_l_adr32_adr16_df() // 21f9 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -53377,6 +53421,7 @@ void m68000_device::move_l_dpc_adr16_df() // 21fa ffff
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -53401,11 +53446,11 @@ void m68000_device::move_l_dpc_adr16_df() // 21fa ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -53588,6 +53633,7 @@ adsl2:
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -53612,11 +53658,11 @@ adsl2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -53741,6 +53787,7 @@ void m68000_device::move_l_imm32_adr16_df() // 21fc ffff
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -53765,11 +53812,11 @@ void m68000_device::move_l_imm32_adr16_df() // 21fc ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -53871,6 +53918,7 @@ void m68000_device::move_l_ds_adr32_df() // 23c0 fff8
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -53895,11 +53943,11 @@ void m68000_device::move_l_ds_adr32_df() // 23c0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -54001,6 +54049,7 @@ void m68000_device::move_l_as_adr32_df() // 23c8 fff8
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -54025,11 +54074,11 @@ void m68000_device::move_l_as_adr32_df() // 23c8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -54153,7 +54202,6 @@ void m68000_device::move_l_ais_adr32_df() // 23d0 fff8
 	// 32a mall3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -54202,11 +54250,11 @@ void m68000_device::move_l_ais_adr32_df() // 23d0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -54333,7 +54381,6 @@ void m68000_device::move_l_aips_adr32_df() // 23d8 fff8
 	// 32a mall3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -54382,11 +54429,11 @@ void m68000_device::move_l_aips_adr32_df() // 23d8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -54514,7 +54561,6 @@ void m68000_device::move_l_pais_adr32_df() // 23e0 fff8
 	// 32a mall3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -54563,11 +54609,11 @@ void m68000_device::move_l_pais_adr32_df() // 23e0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -54712,7 +54758,6 @@ void m68000_device::move_l_das_adr32_df() // 23e8 fff8
 	// 32a mall3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -54761,11 +54806,11 @@ void m68000_device::move_l_das_adr32_df() // 23e8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -54948,7 +54993,6 @@ adsl2:
 	// 32a mall3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -54997,11 +55041,11 @@ adsl2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -55148,7 +55192,6 @@ void m68000_device::move_l_adr16_adr32_df() // 23f8 ffff
 	// 32a mall3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -55197,11 +55240,11 @@ void m68000_device::move_l_adr16_adr32_df() // 23f8 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -55369,7 +55412,6 @@ void m68000_device::move_l_adr32_adr32_df() // 23f9 ffff
 	// 32a mall3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -55418,11 +55460,11 @@ void m68000_device::move_l_adr32_adr32_df() // 23f9 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -55566,7 +55608,6 @@ void m68000_device::move_l_dpc_adr32_df() // 23fa ffff
 	// 32a mall3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -55615,11 +55656,11 @@ void m68000_device::move_l_dpc_adr32_df() // 23fa ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -55801,7 +55842,6 @@ adsl2:
 	// 32a mall3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -55850,11 +55890,11 @@ adsl2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -56000,6 +56040,7 @@ void m68000_device::move_l_imm32_adr32_df() // 23fc ffff
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -56024,11 +56065,11 @@ void m68000_device::move_l_imm32_adr32_df() // 23fc ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -56061,7 +56102,6 @@ void m68000_device::move_w_ds_dd_df() // 3000 f1f8
 	// 121 rrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = m_da[ry];
 	m_au = m_au + 2;
@@ -56070,6 +56110,7 @@ void m68000_device::move_w_ds_dd_df() // 3000 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -56104,7 +56145,6 @@ void m68000_device::move_w_as_dd_df() // 3008 f1f8
 	// 121 rrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = m_da[ry];
 	m_au = m_au + 2;
@@ -56113,6 +56153,7 @@ void m68000_device::move_w_as_dd_df() // 3008 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -56171,7 +56212,6 @@ void m68000_device::move_w_ais_dd_df() // 3010 f1f8
 	// 29b mrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -56180,6 +56220,7 @@ void m68000_device::move_w_ais_dd_df() // 3010 f1f8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -56240,7 +56281,6 @@ void m68000_device::move_w_aips_dd_df() // 3018 f1f8
 	// 29b mrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -56249,6 +56289,7 @@ void m68000_device::move_w_aips_dd_df() // 3018 f1f8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -56311,7 +56352,6 @@ void m68000_device::move_w_pais_dd_df() // 3020 f1f8
 	// 29b mrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -56320,6 +56360,7 @@ void m68000_device::move_w_pais_dd_df() // 3020 f1f8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -56398,7 +56439,6 @@ void m68000_device::move_w_das_dd_df() // 3028 f1f8
 	// 29b mrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -56407,6 +56447,7 @@ void m68000_device::move_w_das_dd_df() // 3028 f1f8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -56523,7 +56564,6 @@ adsw2:
 	// 29b mrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -56532,6 +56572,7 @@ adsw2:
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -56609,7 +56650,6 @@ void m68000_device::move_w_adr16_dd_df() // 3038 f1ff
 	// 29b mrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -56618,6 +56658,7 @@ void m68000_device::move_w_adr16_dd_df() // 3038 f1ff
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -56716,7 +56757,6 @@ void m68000_device::move_w_adr32_dd_df() // 3039 f1ff
 	// 29b mrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -56725,6 +56765,7 @@ void m68000_device::move_w_adr32_dd_df() // 3039 f1ff
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -56802,7 +56843,6 @@ void m68000_device::move_w_dpc_dd_df() // 303a f1ff
 	// 29b mrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -56811,6 +56851,7 @@ void m68000_device::move_w_dpc_dd_df() // 303a f1ff
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -56926,7 +56967,6 @@ adsw2:
 	// 29b mrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	set_16l(m_da[rx], m_dbin);
 	m_au = m_au + 2;
@@ -56935,6 +56975,7 @@ adsw2:
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -56990,7 +57031,6 @@ void m68000_device::move_w_imm16_dd_df() // 303c f1ff
 	// 121 rrgw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = m_dt;
 	m_au = m_au + 2;
@@ -56999,6 +57039,7 @@ void m68000_device::move_w_imm16_dd_df() // 303c f1ff
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -57033,12 +57074,12 @@ void m68000_device::movea_w_ds_ad_df() // 3040 f1f8
 	// 279 rrgm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	m_au = m_au + 2;
 	// 278 rrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -57074,12 +57115,12 @@ void m68000_device::movea_w_as_ad_df() // 3048 f1f8
 	// 279 rrgm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	m_au = m_au + 2;
 	// 278 rrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -57139,12 +57180,12 @@ void m68000_device::movea_w_ais_ad_df() // 3050 f1f8
 	// 158 mrgm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_da[rx] = ext32(m_dbin);
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -57205,12 +57246,12 @@ void m68000_device::movea_w_aips_ad_df() // 3058 f1f8
 	// 158 mrgm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_da[rx] = ext32(m_dbin);
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -57273,12 +57314,12 @@ void m68000_device::movea_w_pais_ad_df() // 3060 f1f8
 	// 158 mrgm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_da[rx] = ext32(m_dbin);
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -57357,12 +57398,12 @@ void m68000_device::movea_w_das_ad_df() // 3068 f1f8
 	// 158 mrgm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_da[rx] = ext32(m_dbin);
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -57479,12 +57520,12 @@ adsw2:
 	// 158 mrgm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_da[rx] = ext32(m_dbin);
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -57562,12 +57603,12 @@ void m68000_device::movea_w_adr16_ad_df() // 3078 f1ff
 	// 158 mrgm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_da[rx] = ext32(m_dbin);
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -57666,12 +57707,12 @@ void m68000_device::movea_w_adr32_ad_df() // 3079 f1ff
 	// 158 mrgm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_da[rx] = ext32(m_dbin);
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -57749,12 +57790,12 @@ void m68000_device::movea_w_dpc_ad_df() // 307a f1ff
 	// 158 mrgm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_da[rx] = ext32(m_dbin);
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -57870,12 +57911,12 @@ adsw2:
 	// 158 mrgm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_da[rx] = ext32(m_dbin);
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -57931,12 +57972,12 @@ void m68000_device::movea_w_imm16_ad_df() // 307c f1ff
 	// 279 rrgm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	m_au = m_au + 2;
 	// 278 rrgl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -57972,7 +58013,6 @@ void m68000_device::move_w_ds_aid_df() // 3080 f1f8
 	// 2fa rmrw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_da[ry];
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -57998,10 +58038,10 @@ void m68000_device::move_w_ds_aid_df() // 3080 f1f8
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -58034,7 +58074,6 @@ void m68000_device::move_w_as_aid_df() // 3088 f1f8
 	// 2fa rmrw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_da[ry];
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -58060,10 +58099,10 @@ void m68000_device::move_w_as_aid_df() // 3088 f1f8
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -58144,10 +58183,10 @@ void m68000_device::move_w_ais_aid_df() // 3090 f1f8
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -58232,10 +58271,10 @@ void m68000_device::move_w_aips_aid_df() // 3098 f1f8
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -58322,10 +58361,10 @@ void m68000_device::move_w_pais_aid_df() // 30a0 f1f8
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -58428,10 +58467,10 @@ void m68000_device::move_w_das_aid_df() // 30a8 f1f8
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -58572,10 +58611,10 @@ adsw2:
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -58677,10 +58716,10 @@ void m68000_device::move_w_adr16_aid_df() // 30b8 f1ff
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -58803,10 +58842,10 @@ void m68000_device::move_w_adr32_aid_df() // 30b9 f1ff
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -58908,10 +58947,10 @@ void m68000_device::move_w_dpc_aid_df() // 30ba f1ff
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -59051,10 +59090,10 @@ adsw2:
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -59110,7 +59149,6 @@ void m68000_device::move_w_imm16_aid_df() // 30bc f1ff
 	// 2fa rmrw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_dt;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -59136,10 +59174,10 @@ void m68000_device::move_w_imm16_aid_df() // 30bc f1ff
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -59172,7 +59210,6 @@ void m68000_device::move_w_ds_aipd_df() // 30c0 f1f8
 	// 2fe rmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_da[ry];
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -59198,6 +59235,7 @@ void m68000_device::move_w_ds_aipd_df() // 30c0 f1f8
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -59232,7 +59270,6 @@ void m68000_device::move_w_as_aipd_df() // 30c8 f1f8
 	// 2fe rmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_da[ry];
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -59258,6 +59295,7 @@ void m68000_device::move_w_as_aipd_df() // 30c8 f1f8
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -59316,7 +59354,6 @@ void m68000_device::move_w_ais_aipd_df() // 30d0 f1f8
 	// 3af mmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_dbin;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -59342,6 +59379,7 @@ void m68000_device::move_w_ais_aipd_df() // 30d0 f1f8
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -59404,7 +59442,6 @@ void m68000_device::move_w_aips_aipd_df() // 30d8 f1f8
 	// 3af mmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_dbin;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -59430,6 +59467,7 @@ void m68000_device::move_w_aips_aipd_df() // 30d8 f1f8
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -59494,7 +59532,6 @@ void m68000_device::move_w_pais_aipd_df() // 30e0 f1f8
 	// 3af mmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_dbin;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -59520,6 +59557,7 @@ void m68000_device::move_w_pais_aipd_df() // 30e0 f1f8
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -59600,7 +59638,6 @@ void m68000_device::move_w_das_aipd_df() // 30e8 f1f8
 	// 3af mmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_dbin;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -59626,6 +59663,7 @@ void m68000_device::move_w_das_aipd_df() // 30e8 f1f8
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -59744,7 +59782,6 @@ adsw2:
 	// 3af mmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_dbin;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -59770,6 +59807,7 @@ adsw2:
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -59849,7 +59887,6 @@ void m68000_device::move_w_adr16_aipd_df() // 30f8 f1ff
 	// 3af mmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_dbin;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -59875,6 +59912,7 @@ void m68000_device::move_w_adr16_aipd_df() // 30f8 f1ff
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -59975,7 +60013,6 @@ void m68000_device::move_w_adr32_aipd_df() // 30f9 f1ff
 	// 3af mmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_dbin;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -60001,6 +60038,7 @@ void m68000_device::move_w_adr32_aipd_df() // 30f9 f1ff
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -60080,7 +60118,6 @@ void m68000_device::move_w_dpc_aipd_df() // 30fa f1ff
 	// 3af mmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_dbin;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -60106,6 +60143,7 @@ void m68000_device::move_w_dpc_aipd_df() // 30fa f1ff
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -60223,7 +60261,6 @@ adsw2:
 	// 3af mmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_dbin;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -60249,6 +60286,7 @@ adsw2:
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -60306,7 +60344,6 @@ void m68000_device::move_w_imm16_aipd_df() // 30fc f1ff
 	// 2fe rmiw1
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_dt;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -60332,6 +60369,7 @@ void m68000_device::move_w_imm16_aipd_df() // 30fc f1ff
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -60366,7 +60404,6 @@ void m68000_device::move_w_ds_paid_df() // 3100 f1f8
 	// 2f8 rmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -60393,6 +60430,7 @@ void m68000_device::move_w_ds_paid_df() // 3100 f1f8
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -60426,7 +60464,6 @@ void m68000_device::move_w_as_paid_df() // 3108 f1f8
 	// 2f8 rmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -60453,6 +60490,7 @@ void m68000_device::move_w_as_paid_df() // 3108 f1f8
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -60510,7 +60548,6 @@ void m68000_device::move_w_ais_paid_df() // 3110 f1f8
 	// 38b mmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -60537,6 +60574,7 @@ void m68000_device::move_w_ais_paid_df() // 3110 f1f8
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -60598,7 +60636,6 @@ void m68000_device::move_w_aips_paid_df() // 3118 f1f8
 	// 38b mmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -60625,6 +60662,7 @@ void m68000_device::move_w_aips_paid_df() // 3118 f1f8
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -60688,7 +60726,6 @@ void m68000_device::move_w_pais_paid_df() // 3120 f1f8
 	// 38b mmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -60715,6 +60752,7 @@ void m68000_device::move_w_pais_paid_df() // 3120 f1f8
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -60794,7 +60832,6 @@ void m68000_device::move_w_das_paid_df() // 3128 f1f8
 	// 38b mmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -60821,6 +60858,7 @@ void m68000_device::move_w_das_paid_df() // 3128 f1f8
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -60938,7 +60976,6 @@ adsw2:
 	// 38b mmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -60965,6 +61002,7 @@ adsw2:
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -61043,7 +61081,6 @@ void m68000_device::move_w_adr16_paid_df() // 3138 f1ff
 	// 38b mmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -61070,6 +61107,7 @@ void m68000_device::move_w_adr16_paid_df() // 3138 f1ff
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -61169,7 +61207,6 @@ void m68000_device::move_w_adr32_paid_df() // 3139 f1ff
 	// 38b mmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -61196,6 +61233,7 @@ void m68000_device::move_w_adr32_paid_df() // 3139 f1ff
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -61274,7 +61312,6 @@ void m68000_device::move_w_dpc_paid_df() // 313a f1ff
 	// 38b mmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -61301,6 +61338,7 @@ void m68000_device::move_w_dpc_paid_df() // 313a f1ff
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -61417,7 +61455,6 @@ adsw2:
 	// 38b mmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -61444,6 +61481,7 @@ adsw2:
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -61500,7 +61538,6 @@ void m68000_device::move_w_imm16_paid_df() // 313c f1ff
 	// 2f8 rmmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -61527,6 +61564,7 @@ void m68000_device::move_w_imm16_paid_df() // 313c f1ff
 	// 34b mmmw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -61581,7 +61619,6 @@ void m68000_device::move_w_ds_dad_df() // 3140 f1f8
 	// 2db rmdw2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_da[ry];
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -61606,11 +61643,11 @@ void m68000_device::move_w_ds_dad_df() // 3140 f1f8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -61664,7 +61701,6 @@ void m68000_device::move_w_as_dad_df() // 3148 f1f8
 	// 2db rmdw2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_da[ry];
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -61689,11 +61725,11 @@ void m68000_device::move_w_as_dad_df() // 3148 f1f8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -61774,6 +61810,7 @@ void m68000_device::move_w_ais_dad_df() // 3150 f1f8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -61798,11 +61835,11 @@ void m68000_device::move_w_ais_dad_df() // 3150 f1f8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -61887,6 +61924,7 @@ void m68000_device::move_w_aips_dad_df() // 3158 f1f8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -61911,11 +61949,11 @@ void m68000_device::move_w_aips_dad_df() // 3158 f1f8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -62002,6 +62040,7 @@ void m68000_device::move_w_pais_dad_df() // 3160 f1f8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -62026,11 +62065,11 @@ void m68000_device::move_w_pais_dad_df() // 3160 f1f8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -62133,6 +62172,7 @@ void m68000_device::move_w_das_dad_df() // 3168 f1f8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -62157,11 +62197,11 @@ void m68000_device::move_w_das_dad_df() // 3168 f1f8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -62302,6 +62342,7 @@ adsw2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -62326,11 +62367,11 @@ adsw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -62432,6 +62473,7 @@ void m68000_device::move_w_adr16_dad_df() // 3178 f1ff
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -62456,11 +62498,11 @@ void m68000_device::move_w_adr16_dad_df() // 3178 f1ff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -62583,6 +62625,7 @@ void m68000_device::move_w_adr32_dad_df() // 3179 f1ff
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -62607,11 +62650,11 @@ void m68000_device::move_w_adr32_dad_df() // 3179 f1ff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -62713,6 +62756,7 @@ void m68000_device::move_w_dpc_dad_df() // 317a f1ff
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -62737,11 +62781,11 @@ void m68000_device::move_w_dpc_dad_df() // 317a f1ff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -62881,6 +62925,7 @@ adsw2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -62905,11 +62950,11 @@ adsw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -62986,7 +63031,6 @@ void m68000_device::move_w_imm16_dad_df() // 317c f1ff
 	// 2db rmdw2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_dt;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -63011,11 +63055,11 @@ void m68000_device::move_w_imm16_dad_df() // 317c f1ff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -63108,7 +63152,6 @@ rmdw2:
 	// 2db rmdw2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_da[ry];
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -63133,11 +63176,11 @@ rmdw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -63230,7 +63273,6 @@ rmdw2:
 	// 2db rmdw2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_da[ry];
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -63255,11 +63297,11 @@ rmdw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -63378,6 +63420,7 @@ maww2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -63402,11 +63445,11 @@ maww2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -63529,6 +63572,7 @@ maww2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -63553,11 +63597,11 @@ maww2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -63682,6 +63726,7 @@ maww2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -63706,11 +63751,11 @@ maww2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -63851,6 +63896,7 @@ maww2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -63875,11 +63921,11 @@ maww2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -64058,6 +64104,7 @@ maww2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -64082,11 +64129,11 @@ maww2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -64226,6 +64273,7 @@ maww2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -64250,11 +64298,11 @@ maww2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -64415,6 +64463,7 @@ maww2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -64439,11 +64488,11 @@ maww2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -64583,6 +64632,7 @@ maww2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -64607,11 +64657,11 @@ maww2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -64789,6 +64839,7 @@ maww2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -64813,11 +64864,11 @@ maww2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -64933,7 +64984,6 @@ rmdw2:
 	// 2db rmdw2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_dt;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -64958,11 +65008,11 @@ rmdw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -65019,6 +65069,7 @@ void m68000_device::move_w_ds_adr16_df() // 31c0 fff8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -65043,11 +65094,11 @@ void m68000_device::move_w_ds_adr16_df() // 31c0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -65104,6 +65155,7 @@ void m68000_device::move_w_as_adr16_df() // 31c8 fff8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -65128,11 +65180,11 @@ void m68000_device::move_w_as_adr16_df() // 31c8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -65212,6 +65264,7 @@ void m68000_device::move_w_ais_adr16_df() // 31d0 fff8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -65236,11 +65289,11 @@ void m68000_device::move_w_ais_adr16_df() // 31d0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -65324,6 +65377,7 @@ void m68000_device::move_w_aips_adr16_df() // 31d8 fff8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -65348,11 +65402,11 @@ void m68000_device::move_w_aips_adr16_df() // 31d8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -65438,6 +65492,7 @@ void m68000_device::move_w_pais_adr16_df() // 31e0 fff8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -65462,11 +65517,11 @@ void m68000_device::move_w_pais_adr16_df() // 31e0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -65568,6 +65623,7 @@ void m68000_device::move_w_das_adr16_df() // 31e8 fff8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -65592,11 +65648,11 @@ void m68000_device::move_w_das_adr16_df() // 31e8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -65736,6 +65792,7 @@ adsw2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -65760,11 +65817,11 @@ adsw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -65865,6 +65922,7 @@ void m68000_device::move_w_adr16_adr16_df() // 31f8 ffff
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -65889,11 +65947,11 @@ void m68000_device::move_w_adr16_adr16_df() // 31f8 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -66015,6 +66073,7 @@ void m68000_device::move_w_adr32_adr16_df() // 31f9 ffff
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -66039,11 +66098,11 @@ void m68000_device::move_w_adr32_adr16_df() // 31f9 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -66144,6 +66203,7 @@ void m68000_device::move_w_dpc_adr16_df() // 31fa ffff
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -66168,11 +66228,11 @@ void m68000_device::move_w_dpc_adr16_df() // 31fa ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -66311,6 +66371,7 @@ adsw2:
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -66335,11 +66396,11 @@ adsw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -66419,6 +66480,7 @@ void m68000_device::move_w_imm16_adr16_df() // 31fc ffff
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -66443,11 +66505,11 @@ void m68000_device::move_w_imm16_adr16_df() // 31fc ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -66525,6 +66587,7 @@ void m68000_device::move_w_ds_adr32_df() // 33c0 fff8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -66549,11 +66612,11 @@ void m68000_device::move_w_ds_adr32_df() // 33c0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -66631,6 +66694,7 @@ void m68000_device::move_w_as_adr32_df() // 33c8 fff8
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -66655,11 +66719,11 @@ void m68000_device::move_w_as_adr32_df() // 33c8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -66739,7 +66803,6 @@ void m68000_device::move_w_ais_adr32_df() // 33d0 fff8
 	// 32e malw2
 	m_aob = merge_16_32(high16(m_at), m_dbin);
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -66785,11 +66848,11 @@ void m68000_device::move_w_ais_adr32_df() // 33d0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -66873,7 +66936,6 @@ void m68000_device::move_w_aips_adr32_df() // 33d8 fff8
 	// 32e malw2
 	m_aob = merge_16_32(high16(m_at), m_dbin);
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -66919,11 +66981,11 @@ void m68000_device::move_w_aips_adr32_df() // 33d8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -67009,7 +67071,6 @@ void m68000_device::move_w_pais_adr32_df() // 33e0 fff8
 	// 32e malw2
 	m_aob = merge_16_32(high16(m_at), m_dbin);
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -67055,11 +67116,11 @@ void m68000_device::move_w_pais_adr32_df() // 33e0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -67161,7 +67222,6 @@ void m68000_device::move_w_das_adr32_df() // 33e8 fff8
 	// 32e malw2
 	m_aob = merge_16_32(high16(m_at), m_dbin);
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -67207,11 +67267,11 @@ void m68000_device::move_w_das_adr32_df() // 33e8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -67351,7 +67411,6 @@ adsw2:
 	// 32e malw2
 	m_aob = merge_16_32(high16(m_at), m_dbin);
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -67397,11 +67456,11 @@ adsw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -67502,7 +67561,6 @@ void m68000_device::move_w_adr16_adr32_df() // 33f8 ffff
 	// 32e malw2
 	m_aob = merge_16_32(high16(m_at), m_dbin);
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -67548,11 +67606,11 @@ void m68000_device::move_w_adr16_adr32_df() // 33f8 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -67674,7 +67732,6 @@ void m68000_device::move_w_adr32_adr32_df() // 33f9 ffff
 	// 32e malw2
 	m_aob = merge_16_32(high16(m_at), m_dbin);
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -67720,11 +67777,11 @@ void m68000_device::move_w_adr32_adr32_df() // 33f9 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -67825,7 +67882,6 @@ void m68000_device::move_w_dpc_adr32_df() // 33fa ffff
 	// 32e malw2
 	m_aob = merge_16_32(high16(m_at), m_dbin);
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -67871,11 +67927,11 @@ void m68000_device::move_w_dpc_adr32_df() // 33fa ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -68014,7 +68070,6 @@ adsw2:
 	// 32e malw2
 	m_aob = merge_16_32(high16(m_at), m_dbin);
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -68060,11 +68115,11 @@ adsw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -68165,6 +68220,7 @@ void m68000_device::move_w_imm16_adr32_df() // 33fc ffff
 	// 389 maww2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -68189,11 +68245,11 @@ void m68000_device::move_w_imm16_adr32_df() // 33fc ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -68225,7 +68281,6 @@ void m68000_device::negx_b_ds_df() // 4000 fff8
 	// 133 nnrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=10 c=2 m=xnzvc  i=b....i. ALU.subx a=R.dyl:m_da[ry] d=0
@@ -68233,6 +68288,7 @@ void m68000_device::negx_b_ds_df() // 4000 fff8
 	sr_xnzvc_u();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -68287,7 +68343,6 @@ void m68000_device::negx_b_ais_df() // 4010 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -68314,6 +68369,7 @@ void m68000_device::negx_b_ais_df() // 4010 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -68365,7 +68421,6 @@ void m68000_device::negx_b_aips_df() // 4018 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -68392,6 +68447,7 @@ void m68000_device::negx_b_aips_df() // 4018 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -68445,7 +68501,6 @@ void m68000_device::negx_b_pais_df() // 4020 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -68472,6 +68527,7 @@ void m68000_device::negx_b_pais_df() // 4020 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -68541,7 +68597,6 @@ void m68000_device::negx_b_das_df() // 4028 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -68568,6 +68623,7 @@ void m68000_device::negx_b_das_df() // 4028 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -68675,7 +68731,6 @@ adsw2:
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -68702,6 +68757,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -68770,7 +68826,6 @@ void m68000_device::negx_b_adr16_df() // 4038 ffff
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -68797,6 +68852,7 @@ void m68000_device::negx_b_adr16_df() // 4038 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -68886,7 +68942,6 @@ void m68000_device::negx_b_adr32_df() // 4039 ffff
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -68913,6 +68968,7 @@ void m68000_device::negx_b_adr32_df() // 4039 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -68939,7 +68995,6 @@ void m68000_device::negx_w_ds_df() // 4040 fff8
 	// 133 nnrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=10 c=2 m=xnzvc  i=.....i. ALU.subx a=R.dyl:m_da[ry] d=0
@@ -68947,6 +69002,7 @@ void m68000_device::negx_w_ds_df() // 4040 fff8
 	sr_xnzvc_u();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -69004,7 +69060,6 @@ void m68000_device::negx_w_ais_df() // 4050 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -69031,6 +69086,7 @@ void m68000_device::negx_w_ais_df() // 4050 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -69090,7 +69146,6 @@ void m68000_device::negx_w_aips_df() // 4058 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -69117,6 +69172,7 @@ void m68000_device::negx_w_aips_df() // 4058 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -69178,7 +69234,6 @@ void m68000_device::negx_w_pais_df() // 4060 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -69205,6 +69260,7 @@ void m68000_device::negx_w_pais_df() // 4060 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -69282,7 +69338,6 @@ void m68000_device::negx_w_das_df() // 4068 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -69309,6 +69364,7 @@ void m68000_device::negx_w_das_df() // 4068 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -69424,7 +69480,6 @@ adsw2:
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -69451,6 +69506,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -69527,7 +69583,6 @@ void m68000_device::negx_w_adr16_df() // 4078 ffff
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -69554,6 +69609,7 @@ void m68000_device::negx_w_adr16_df() // 4078 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -69651,7 +69707,6 @@ void m68000_device::negx_w_adr32_df() // 4079 ffff
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -69678,6 +69733,7 @@ void m68000_device::negx_w_adr32_df() // 4079 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -69709,7 +69765,6 @@ void m68000_device::negx_l_ds_df() // 4080 fff8
 	// 137 nnrl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=10 c=2 m=xnzvc  i=.l...i. ALU.subx a=R.dyl:m_da[ry] d=0
@@ -69740,6 +69795,7 @@ void m68000_device::negx_l_ds_df() // 4080 fff8
 	sr_xnzvc_u();
 	// 25b roal4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -69801,7 +69857,6 @@ void m68000_device::negx_l_ais_df() // 4090 fff8
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -69851,6 +69906,7 @@ void m68000_device::negx_l_ais_df() // 4090 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -69930,7 +69986,6 @@ void m68000_device::negx_l_aips_df() // 4098 fff8
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -69980,6 +70035,7 @@ void m68000_device::negx_l_aips_df() // 4098 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -70060,7 +70116,6 @@ void m68000_device::negx_l_pais_df() // 40a0 fff8
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -70110,6 +70165,7 @@ void m68000_device::negx_l_pais_df() // 40a0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -70207,7 +70263,6 @@ void m68000_device::negx_l_das_df() // 40a8 fff8
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -70257,6 +70312,7 @@ void m68000_device::negx_l_das_df() // 40a8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -70392,7 +70448,6 @@ adsl2:
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -70442,6 +70497,7 @@ adsl2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -70541,7 +70597,6 @@ void m68000_device::negx_l_adr16_df() // 40b8 ffff
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -70591,6 +70646,7 @@ void m68000_device::negx_l_adr16_df() // 40b8 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -70711,7 +70767,6 @@ void m68000_device::negx_l_adr32_df() // 40b9 ffff
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -70761,6 +70816,7 @@ void m68000_device::negx_l_adr32_df() // 40b9 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -70792,7 +70848,6 @@ void m68000_device::move_sr_ds_df() // 40c0 fff8
 	// 3a5 strw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_ftu = m_sr;
 	// 340 strw2
@@ -70817,6 +70872,7 @@ void m68000_device::move_sr_ds_df() // 40c0 fff8
 	m_dbin = m_edb;
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -70856,7 +70912,6 @@ void m68000_device::move_sr_ais_df() // 40d0 fff8
 	// 3a1 stmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_ftu = m_sr;
 	// 324 sftm2
@@ -70884,6 +70939,7 @@ void m68000_device::move_sr_ais_df() // 40d0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -70943,7 +70999,6 @@ void m68000_device::move_sr_aips_df() // 40d8 fff8
 	// 3a1 stmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_ftu = m_sr;
 	// 324 sftm2
@@ -70971,6 +71026,7 @@ void m68000_device::move_sr_aips_df() // 40d8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -71032,7 +71088,6 @@ void m68000_device::move_sr_pais_df() // 40e0 fff8
 	// 3a1 stmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_ftu = m_sr;
 	// 324 sftm2
@@ -71060,6 +71115,7 @@ void m68000_device::move_sr_pais_df() // 40e0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -71137,7 +71193,6 @@ void m68000_device::move_sr_das_df() // 40e8 fff8
 	// 3a1 stmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_ftu = m_sr;
 	// 324 sftm2
@@ -71165,6 +71220,7 @@ void m68000_device::move_sr_das_df() // 40e8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -71280,7 +71336,6 @@ adsw2:
 	// 3a1 stmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_ftu = m_sr;
 	// 324 sftm2
@@ -71308,6 +71363,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -71384,7 +71440,6 @@ void m68000_device::move_sr_adr16_df() // 40f8 ffff
 	// 3a1 stmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_ftu = m_sr;
 	// 324 sftm2
@@ -71412,6 +71467,7 @@ void m68000_device::move_sr_adr16_df() // 40f8 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -71509,7 +71565,6 @@ void m68000_device::move_sr_adr32_df() // 40f9 ffff
 	// 3a1 stmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_ftu = m_sr;
 	// 324 sftm2
@@ -71537,6 +71592,7 @@ void m68000_device::move_sr_adr32_df() // 40f9 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -71734,7 +71790,6 @@ trap1:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -71749,6 +71804,7 @@ chkr3:
 mmrw3:
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -71776,7 +71832,6 @@ chkr4:
 	// 150 chkr4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -71978,7 +72033,6 @@ trap1:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -71993,6 +72047,7 @@ chkr3:
 mmrw3:
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -72020,7 +72075,6 @@ chkr4:
 	// 150 chkr4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -72226,7 +72280,6 @@ trap1:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -72241,6 +72294,7 @@ chkr3:
 mmrw3:
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -72268,7 +72322,6 @@ chkr4:
 	// 150 chkr4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -72476,7 +72529,6 @@ trap1:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -72491,6 +72543,7 @@ chkr3:
 mmrw3:
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -72518,7 +72571,6 @@ chkr4:
 	// 150 chkr4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -72742,7 +72794,6 @@ trap1:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -72757,6 +72808,7 @@ chkr3:
 mmrw3:
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -72784,7 +72836,6 @@ chkr4:
 	// 150 chkr4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -73046,7 +73097,6 @@ trap1:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -73061,6 +73111,7 @@ chkr3:
 mmrw3:
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -73088,7 +73139,6 @@ chkr4:
 	// 150 chkr4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -73311,7 +73361,6 @@ trap1:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -73326,6 +73375,7 @@ chkr3:
 mmrw3:
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -73353,7 +73403,6 @@ chkr4:
 	// 150 chkr4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -73597,7 +73646,6 @@ trap1:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -73612,6 +73660,7 @@ chkr3:
 mmrw3:
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -73639,7 +73688,6 @@ chkr4:
 	// 150 chkr4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -73862,7 +73910,6 @@ trap1:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -73877,6 +73924,7 @@ chkr3:
 mmrw3:
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -73904,7 +73952,6 @@ chkr4:
 	// 150 chkr4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -74165,7 +74212,6 @@ trap1:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -74180,6 +74226,7 @@ chkr3:
 mmrw3:
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -74207,7 +74254,6 @@ chkr4:
 	// 150 chkr4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -74408,7 +74454,6 @@ trap1:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -74423,6 +74468,7 @@ chkr3:
 mmrw3:
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -74450,7 +74496,6 @@ chkr4:
 	// 150 chkr4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	goto mmrw3;
@@ -74463,13 +74508,13 @@ void m68000_device::lea_ais_ad_df() // 41d0 f1f8
 	// 2f1 leaa1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_movemr = m_dbin;
 	m_pc = m_au;
 	m_at = m_da[ry];
 	m_ftu = m_dbin;
 	// 066 leaa2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -74527,11 +74572,11 @@ void m68000_device::lea_das_ad_df() // 41e8 f1f8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -74627,11 +74672,11 @@ leax4:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -74684,11 +74729,11 @@ void m68000_device::lea_adr16_ad_df() // 41f8 f1ff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -74764,11 +74809,11 @@ void m68000_device::lea_adr32_ad_df() // 41f9 f1ff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -74823,11 +74868,11 @@ void m68000_device::lea_dpc_ad_df() // 41fa f1ff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -74922,11 +74967,11 @@ leax4:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -74958,7 +75003,6 @@ void m68000_device::clr_b_ds_df() // 4200 fff8
 	// 133 nnrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=4 c=2 m=.nzvc  i=b....i. ALU.and_ a=R.dyl:m_da[ry] d=0
@@ -74966,6 +75010,7 @@ void m68000_device::clr_b_ds_df() // 4200 fff8
 	sr_nzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -75022,7 +75067,6 @@ void m68000_device::clr_b_ais_df() // 4210 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -75049,6 +75093,7 @@ void m68000_device::clr_b_ais_df() // 4210 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -75103,7 +75148,6 @@ void m68000_device::clr_b_aips_df() // 4218 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -75130,6 +75174,7 @@ void m68000_device::clr_b_aips_df() // 4218 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -75186,7 +75231,6 @@ void m68000_device::clr_b_pais_df() // 4220 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -75213,6 +75257,7 @@ void m68000_device::clr_b_pais_df() // 4220 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -75285,7 +75330,6 @@ void m68000_device::clr_b_das_df() // 4228 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -75312,6 +75356,7 @@ void m68000_device::clr_b_das_df() // 4228 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -75424,7 +75469,6 @@ adsw2:
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -75451,6 +75495,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -75522,7 +75567,6 @@ void m68000_device::clr_b_adr16_df() // 4238 ffff
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -75549,6 +75593,7 @@ void m68000_device::clr_b_adr16_df() // 4238 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -75642,7 +75687,6 @@ void m68000_device::clr_b_adr32_df() // 4239 ffff
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -75669,6 +75713,7 @@ void m68000_device::clr_b_adr32_df() // 4239 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -75696,7 +75741,6 @@ void m68000_device::clr_w_ds_df() // 4240 fff8
 	// 133 nnrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=4 c=2 m=.nzvc  i=.....i. ALU.and_ a=R.dyl:m_da[ry] d=0
@@ -75704,6 +75748,7 @@ void m68000_device::clr_w_ds_df() // 4240 fff8
 	sr_nzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -75763,7 +75808,6 @@ void m68000_device::clr_w_ais_df() // 4250 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -75790,6 +75834,7 @@ void m68000_device::clr_w_ais_df() // 4250 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -75852,7 +75897,6 @@ void m68000_device::clr_w_aips_df() // 4258 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -75879,6 +75923,7 @@ void m68000_device::clr_w_aips_df() // 4258 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -75943,7 +75988,6 @@ void m68000_device::clr_w_pais_df() // 4260 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -75970,6 +76014,7 @@ void m68000_device::clr_w_pais_df() // 4260 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -76050,7 +76095,6 @@ void m68000_device::clr_w_das_df() // 4268 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -76077,6 +76121,7 @@ void m68000_device::clr_w_das_df() // 4268 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -76197,7 +76242,6 @@ adsw2:
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -76224,6 +76268,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -76303,7 +76348,6 @@ void m68000_device::clr_w_adr16_df() // 4278 ffff
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -76330,6 +76374,7 @@ void m68000_device::clr_w_adr16_df() // 4278 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -76431,7 +76476,6 @@ void m68000_device::clr_w_adr32_df() // 4279 ffff
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -76458,6 +76502,7 @@ void m68000_device::clr_w_adr32_df() // 4279 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -76490,7 +76535,6 @@ void m68000_device::clr_l_ds_df() // 4280 fff8
 	// 137 nnrl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=4 c=2 m=.nzvc  i=.l...i. ALU.and_ a=R.dyl:m_da[ry] d=0
@@ -76521,6 +76565,7 @@ void m68000_device::clr_l_ds_df() // 4280 fff8
 	sr_nzvc_u();
 	// 25b roal4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=4 c=0 m=.....  i=.l..... ALU.and_ a=R.aluo:m_aluo d=none
@@ -76584,7 +76629,6 @@ void m68000_device::clr_l_ais_df() // 4290 fff8
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -76634,6 +76678,7 @@ void m68000_device::clr_l_ais_df() // 4290 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -76716,7 +76761,6 @@ void m68000_device::clr_l_aips_df() // 4298 fff8
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -76766,6 +76810,7 @@ void m68000_device::clr_l_aips_df() // 4298 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -76849,7 +76894,6 @@ void m68000_device::clr_l_pais_df() // 42a0 fff8
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -76899,6 +76943,7 @@ void m68000_device::clr_l_pais_df() // 42a0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -76999,7 +77044,6 @@ void m68000_device::clr_l_das_df() // 42a8 fff8
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -77049,6 +77093,7 @@ void m68000_device::clr_l_das_df() // 42a8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -77189,7 +77234,6 @@ adsl2:
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -77239,6 +77283,7 @@ adsl2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -77342,7 +77387,6 @@ void m68000_device::clr_l_adr16_df() // 42b8 ffff
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -77392,6 +77436,7 @@ void m68000_device::clr_l_adr16_df() // 42b8 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -77517,7 +77562,6 @@ void m68000_device::clr_l_adr32_df() // 42b9 ffff
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -77567,6 +77611,7 @@ void m68000_device::clr_l_adr32_df() // 42b9 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -77599,7 +77644,6 @@ void m68000_device::neg_b_ds_df() // 4400 fff8
 	// 133 nnrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=5 c=2 m=xnzvc  i=b....i. ALU.sub a=R.dyl:m_da[ry] d=0
@@ -77607,6 +77651,7 @@ void m68000_device::neg_b_ds_df() // 4400 fff8
 	sr_xnzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -77661,7 +77706,6 @@ void m68000_device::neg_b_ais_df() // 4410 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -77688,6 +77732,7 @@ void m68000_device::neg_b_ais_df() // 4410 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -77739,7 +77784,6 @@ void m68000_device::neg_b_aips_df() // 4418 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -77766,6 +77810,7 @@ void m68000_device::neg_b_aips_df() // 4418 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -77819,7 +77864,6 @@ void m68000_device::neg_b_pais_df() // 4420 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -77846,6 +77890,7 @@ void m68000_device::neg_b_pais_df() // 4420 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -77915,7 +77960,6 @@ void m68000_device::neg_b_das_df() // 4428 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -77942,6 +77986,7 @@ void m68000_device::neg_b_das_df() // 4428 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -78049,7 +78094,6 @@ adsw2:
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -78076,6 +78120,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -78144,7 +78189,6 @@ void m68000_device::neg_b_adr16_df() // 4438 ffff
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -78171,6 +78215,7 @@ void m68000_device::neg_b_adr16_df() // 4438 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -78260,7 +78305,6 @@ void m68000_device::neg_b_adr32_df() // 4439 ffff
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -78287,6 +78331,7 @@ void m68000_device::neg_b_adr32_df() // 4439 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -78313,7 +78358,6 @@ void m68000_device::neg_w_ds_df() // 4440 fff8
 	// 133 nnrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=5 c=2 m=xnzvc  i=.....i. ALU.sub a=R.dyl:m_da[ry] d=0
@@ -78321,6 +78365,7 @@ void m68000_device::neg_w_ds_df() // 4440 fff8
 	sr_xnzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -78378,7 +78423,6 @@ void m68000_device::neg_w_ais_df() // 4450 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -78405,6 +78449,7 @@ void m68000_device::neg_w_ais_df() // 4450 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -78464,7 +78509,6 @@ void m68000_device::neg_w_aips_df() // 4458 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -78491,6 +78535,7 @@ void m68000_device::neg_w_aips_df() // 4458 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -78552,7 +78597,6 @@ void m68000_device::neg_w_pais_df() // 4460 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -78579,6 +78623,7 @@ void m68000_device::neg_w_pais_df() // 4460 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -78656,7 +78701,6 @@ void m68000_device::neg_w_das_df() // 4468 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -78683,6 +78727,7 @@ void m68000_device::neg_w_das_df() // 4468 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -78798,7 +78843,6 @@ adsw2:
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -78825,6 +78869,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -78901,7 +78946,6 @@ void m68000_device::neg_w_adr16_df() // 4478 ffff
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -78928,6 +78972,7 @@ void m68000_device::neg_w_adr16_df() // 4478 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -79025,7 +79070,6 @@ void m68000_device::neg_w_adr32_df() // 4479 ffff
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -79052,6 +79096,7 @@ void m68000_device::neg_w_adr32_df() // 4479 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -79083,7 +79128,6 @@ void m68000_device::neg_l_ds_df() // 4480 fff8
 	// 137 nnrl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=5 c=2 m=xnzvc  i=.l...i. ALU.sub a=R.dyl:m_da[ry] d=0
@@ -79114,6 +79158,7 @@ void m68000_device::neg_l_ds_df() // 4480 fff8
 	sr_xnzvc_u();
 	// 25b roal4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -79175,7 +79220,6 @@ void m68000_device::neg_l_ais_df() // 4490 fff8
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -79225,6 +79269,7 @@ void m68000_device::neg_l_ais_df() // 4490 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -79304,7 +79349,6 @@ void m68000_device::neg_l_aips_df() // 4498 fff8
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -79354,6 +79398,7 @@ void m68000_device::neg_l_aips_df() // 4498 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -79434,7 +79479,6 @@ void m68000_device::neg_l_pais_df() // 44a0 fff8
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -79484,6 +79528,7 @@ void m68000_device::neg_l_pais_df() // 44a0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -79581,7 +79626,6 @@ void m68000_device::neg_l_das_df() // 44a8 fff8
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -79631,6 +79675,7 @@ void m68000_device::neg_l_das_df() // 44a8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -79766,7 +79811,6 @@ adsl2:
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -79816,6 +79860,7 @@ adsl2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -79915,7 +79960,6 @@ void m68000_device::neg_l_adr16_df() // 44b8 ffff
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -79965,6 +80009,7 @@ void m68000_device::neg_l_adr16_df() // 44b8 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -80085,7 +80130,6 @@ void m68000_device::neg_l_adr32_df() // 44b9 ffff
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -80135,6 +80179,7 @@ void m68000_device::neg_l_adr32_df() // 44b9 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -80198,11 +80243,11 @@ void m68000_device::move_ds_ccr_df() // 44c0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -80290,11 +80335,11 @@ void m68000_device::move_ais_ccr_df() // 44d0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -80386,11 +80431,11 @@ void m68000_device::move_aips_ccr_df() // 44d8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -80484,11 +80529,11 @@ void m68000_device::move_pais_ccr_df() // 44e0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -80598,11 +80643,11 @@ void m68000_device::move_das_ccr_df() // 44e8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -80750,11 +80795,11 @@ adsw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -80863,11 +80908,11 @@ void m68000_device::move_adr16_ccr_df() // 44f8 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -80997,11 +81042,11 @@ void m68000_device::move_adr32_ccr_df() // 44f9 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -81110,11 +81155,11 @@ void m68000_device::move_dpc_ccr_df() // 44fa ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -81261,11 +81306,11 @@ adsw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -81352,11 +81397,11 @@ void m68000_device::move_imm8_ccr_df() // 44fc ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -81388,7 +81433,6 @@ void m68000_device::not_b_ds_df() // 4600 fff8
 	// 133 nnrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=11 c=2 m=.nzvc  i=b....i. ALU.not_ a=R.dyl:m_da[ry] d=0
@@ -81396,6 +81440,7 @@ void m68000_device::not_b_ds_df() // 4600 fff8
 	sr_nzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -81450,7 +81495,6 @@ void m68000_device::not_b_ais_df() // 4610 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -81477,6 +81521,7 @@ void m68000_device::not_b_ais_df() // 4610 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -81528,7 +81573,6 @@ void m68000_device::not_b_aips_df() // 4618 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -81555,6 +81599,7 @@ void m68000_device::not_b_aips_df() // 4618 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -81608,7 +81653,6 @@ void m68000_device::not_b_pais_df() // 4620 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -81635,6 +81679,7 @@ void m68000_device::not_b_pais_df() // 4620 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -81704,7 +81749,6 @@ void m68000_device::not_b_das_df() // 4628 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -81731,6 +81775,7 @@ void m68000_device::not_b_das_df() // 4628 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -81838,7 +81883,6 @@ adsw2:
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -81865,6 +81909,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -81933,7 +81978,6 @@ void m68000_device::not_b_adr16_df() // 4638 ffff
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -81960,6 +82004,7 @@ void m68000_device::not_b_adr16_df() // 4638 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -82049,7 +82094,6 @@ void m68000_device::not_b_adr32_df() // 4639 ffff
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -82076,6 +82120,7 @@ void m68000_device::not_b_adr32_df() // 4639 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -82102,7 +82147,6 @@ void m68000_device::not_w_ds_df() // 4640 fff8
 	// 133 nnrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=11 c=2 m=.nzvc  i=.....i. ALU.not_ a=R.dyl:m_da[ry] d=0
@@ -82110,6 +82154,7 @@ void m68000_device::not_w_ds_df() // 4640 fff8
 	sr_nzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -82167,7 +82212,6 @@ void m68000_device::not_w_ais_df() // 4650 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -82194,6 +82238,7 @@ void m68000_device::not_w_ais_df() // 4650 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -82253,7 +82298,6 @@ void m68000_device::not_w_aips_df() // 4658 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -82280,6 +82324,7 @@ void m68000_device::not_w_aips_df() // 4658 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -82341,7 +82386,6 @@ void m68000_device::not_w_pais_df() // 4660 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -82368,6 +82412,7 @@ void m68000_device::not_w_pais_df() // 4660 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -82445,7 +82490,6 @@ void m68000_device::not_w_das_df() // 4668 fff8
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -82472,6 +82516,7 @@ void m68000_device::not_w_das_df() // 4668 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -82587,7 +82632,6 @@ adsw2:
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -82614,6 +82658,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -82690,7 +82735,6 @@ void m68000_device::not_w_adr16_df() // 4678 ffff
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -82717,6 +82761,7 @@ void m68000_device::not_w_adr16_df() // 4678 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -82814,7 +82859,6 @@ void m68000_device::not_w_adr32_df() // 4679 ffff
 	// 2b8 nnmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -82841,6 +82885,7 @@ void m68000_device::not_w_adr32_df() // 4679 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -82872,7 +82917,6 @@ void m68000_device::not_l_ds_df() // 4680 fff8
 	// 137 nnrl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=11 c=2 m=.nzvc  i=.l...i. ALU.not_ a=R.dyl:m_da[ry] d=0
@@ -82903,6 +82947,7 @@ void m68000_device::not_l_ds_df() // 4680 fff8
 	sr_nzvc_u();
 	// 25b roal4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -82964,7 +83009,6 @@ void m68000_device::not_l_ais_df() // 4690 fff8
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -83014,6 +83058,7 @@ void m68000_device::not_l_ais_df() // 4690 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -83093,7 +83138,6 @@ void m68000_device::not_l_aips_df() // 4698 fff8
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -83143,6 +83187,7 @@ void m68000_device::not_l_aips_df() // 4698 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -83223,7 +83268,6 @@ void m68000_device::not_l_pais_df() // 46a0 fff8
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -83273,6 +83317,7 @@ void m68000_device::not_l_pais_df() // 46a0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -83370,7 +83415,6 @@ void m68000_device::not_l_das_df() // 46a8 fff8
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -83420,6 +83464,7 @@ void m68000_device::not_l_das_df() // 46a8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -83555,7 +83600,6 @@ adsl2:
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -83605,6 +83649,7 @@ adsl2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -83704,7 +83749,6 @@ void m68000_device::not_l_adr16_df() // 46b8 ffff
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -83754,6 +83798,7 @@ void m68000_device::not_l_adr16_df() // 46b8 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -83874,7 +83919,6 @@ void m68000_device::not_l_adr32_df() // 46b9 ffff
 	// 2bc nnml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -83924,6 +83968,7 @@ void m68000_device::not_l_adr32_df() // 46b9 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -83993,11 +84038,11 @@ void m68000_device::move_ds_sr_df() // 46c0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -84091,11 +84136,11 @@ void m68000_device::move_ais_sr_df() // 46d0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -84193,11 +84238,11 @@ void m68000_device::move_aips_sr_df() // 46d8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -84297,11 +84342,11 @@ void m68000_device::move_pais_sr_df() // 46e0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -84417,11 +84462,11 @@ void m68000_device::move_das_sr_df() // 46e8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -84575,11 +84620,11 @@ adsw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -84694,11 +84739,11 @@ void m68000_device::move_adr16_sr_df() // 46f8 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -84834,11 +84879,11 @@ void m68000_device::move_adr32_sr_df() // 46f9 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -84953,11 +84998,11 @@ void m68000_device::move_dpc_sr_df() // 46fa ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -85110,11 +85155,11 @@ adsw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -85207,11 +85252,11 @@ void m68000_device::move_i16u_sr_df() // 46fc ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -85243,7 +85288,6 @@ void m68000_device::nbcd_b_ds_df() // 4800 fff8
 	// 13b nbcr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=9 c=2 m=xnzvc  i=b....i. ALU.sbcd a=R.dyl:m_da[ry] d=0
@@ -85272,6 +85316,7 @@ void m68000_device::nbcd_b_ds_df() // 4800 fff8
 	// alu r=9 c=3 m=xnzvc  i=b.....f ALU.sbcd a=R.aluo:m_aluo d=?
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -85309,7 +85354,6 @@ void m68000_device::nbcd_b_ais_df() // 4810 fff8
 	// 15c nbcm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=9 c=2 m=xnzvc  i=b....i. ALU.sbcd a=R.dbin:m_dbin d=0
 	alu_sbcd8(m_dbin, 0x0000);
@@ -85338,6 +85382,7 @@ void m68000_device::nbcd_b_ais_df() // 4810 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -85389,7 +85434,6 @@ void m68000_device::nbcd_b_aips_df() // 4818 fff8
 	// 15c nbcm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=9 c=2 m=xnzvc  i=b....i. ALU.sbcd a=R.dbin:m_dbin d=0
 	alu_sbcd8(m_dbin, 0x0000);
@@ -85418,6 +85462,7 @@ void m68000_device::nbcd_b_aips_df() // 4818 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -85471,7 +85516,6 @@ void m68000_device::nbcd_b_pais_df() // 4820 fff8
 	// 15c nbcm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=9 c=2 m=xnzvc  i=b....i. ALU.sbcd a=R.dbin:m_dbin d=0
 	alu_sbcd8(m_dbin, 0x0000);
@@ -85500,6 +85544,7 @@ void m68000_device::nbcd_b_pais_df() // 4820 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -85569,7 +85614,6 @@ void m68000_device::nbcd_b_das_df() // 4828 fff8
 	// 15c nbcm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=9 c=2 m=xnzvc  i=b....i. ALU.sbcd a=R.dbin:m_dbin d=0
 	alu_sbcd8(m_dbin, 0x0000);
@@ -85598,6 +85642,7 @@ void m68000_device::nbcd_b_das_df() // 4828 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -85705,7 +85750,6 @@ adsw2:
 	// 15c nbcm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=9 c=2 m=xnzvc  i=b....i. ALU.sbcd a=R.dbin:m_dbin d=0
 	alu_sbcd8(m_dbin, 0x0000);
@@ -85734,6 +85778,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -85802,7 +85847,6 @@ void m68000_device::nbcd_b_adr16_df() // 4838 ffff
 	// 15c nbcm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=9 c=2 m=xnzvc  i=b....i. ALU.sbcd a=R.dbin:m_dbin d=0
 	alu_sbcd8(m_dbin, 0x0000);
@@ -85831,6 +85875,7 @@ void m68000_device::nbcd_b_adr16_df() // 4838 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -85920,7 +85965,6 @@ void m68000_device::nbcd_b_adr32_df() // 4839 ffff
 	// 15c nbcm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=9 c=2 m=xnzvc  i=b....i. ALU.sbcd a=R.dbin:m_dbin d=0
 	alu_sbcd8(m_dbin, 0x0000);
@@ -85949,6 +85993,7 @@ void m68000_device::nbcd_b_adr32_df() // 4839 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -85975,7 +86020,6 @@ void m68000_device::swap_ds_df() // 4840 fff8
 	// 341 swap1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[ry];
 	m_pc = m_au;
 	set_16h(m_at, m_da[ry]);
@@ -85984,6 +86028,7 @@ void m68000_device::swap_ds_df() // 4840 fff8
 	sr_nzvc();
 	// 342 swap2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -86020,7 +86065,6 @@ void m68000_device::pea_ais_df() // 4850 fff8
 	// 17c peaa1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -86068,6 +86112,7 @@ void m68000_device::pea_ais_df() // 4850 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -86123,7 +86168,6 @@ void m68000_device::pea_das_df() // 4868 fff8
 	// 17e pead2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_aluo) + m_at;
 	// 17f pead3
@@ -86173,6 +86217,7 @@ void m68000_device::pea_das_df() // 4868 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -86262,7 +86307,6 @@ peax3:
 peax4:
 	// 218 peax4
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_at = m_au;
 	// alu r=9 c=1 m=.....  i=....... ALU.and_ a=R.aul:m_au d=-1
 	alu_and(m_au, 0xffff);
@@ -86314,6 +86358,7 @@ peax4:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -86387,6 +86432,7 @@ void m68000_device::pea_adr16_df() // 4878 ffff
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -86411,11 +86457,11 @@ void m68000_device::pea_adr16_df() // 4878 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -86510,6 +86556,7 @@ void m68000_device::pea_adr32_df() // 4879 ffff
 	// 348 mawl3
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_at;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -86534,11 +86581,11 @@ void m68000_device::pea_adr32_df() // 4879 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -86593,7 +86640,6 @@ void m68000_device::pea_dpc_df() // 487a ffff
 	// 17e pead2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_aluo) + m_at;
 	// 17f pead3
@@ -86643,6 +86689,7 @@ void m68000_device::pea_dpc_df() // 487a ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -86731,7 +86778,6 @@ peax3:
 peax4:
 	// 218 peax4
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_at = m_au;
 	// alu r=9 c=1 m=.....  i=....... ALU.and_ a=R.aul:m_au d=-1
 	alu_and(m_au, 0xffff);
@@ -86783,6 +86829,7 @@ peax4:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -86814,7 +86861,6 @@ void m68000_device::ext_w_ds_df() // 4880 fff8
 	// 133 nnrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=8 c=2 m=.nzvc  i=.l...i. ALU.ext a=R.dyl:m_da[ry] d=0
@@ -86822,6 +86868,7 @@ void m68000_device::ext_w_ds_df() // 4880 fff8
 	sr_nzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -86914,10 +86961,10 @@ mmrw2:
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -87010,11 +87057,11 @@ push3:
 	// 043 push3
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_da[ry] = m_at;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -87128,10 +87175,10 @@ mmrw2:
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -87283,10 +87330,10 @@ mmrw2:
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -87400,10 +87447,10 @@ mmrw2:
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -87538,10 +87585,10 @@ mmrw2:
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -87573,7 +87620,6 @@ void m68000_device::ext_l_ds_df() // 48c0 fff8
 	// 232 extr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=8 c=3 m=.nzvc  i=.....i. ALU.and_ a=R.dyl:m_da[ry] d=-1
@@ -87581,6 +87627,7 @@ void m68000_device::ext_l_ds_df() // 48c0 fff8
 	sr_nzvc();
 	// 233 extr2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -87693,10 +87740,10 @@ mmrw2:
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -87810,11 +87857,11 @@ push3:
 	// 043 push3
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_da[ry] = m_at;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -87948,10 +87995,10 @@ mmrw2:
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -88123,10 +88170,10 @@ mmrw2:
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -88260,10 +88307,10 @@ mmrw2:
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -88418,10 +88465,10 @@ mmrw2:
 	// 025 mmrw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -88453,7 +88500,6 @@ void m68000_device::tst_b_ds_df() // 4a00 fff8
 	// 12d tsrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = m_da[ry];
 	m_au = m_au + 2;
@@ -88462,6 +88508,7 @@ void m68000_device::tst_b_ds_df() // 4a00 fff8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -88516,7 +88563,6 @@ void m68000_device::tst_b_ais_df() // 4a10 fff8
 	// 3c3 tsmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=b....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -88524,6 +88570,7 @@ void m68000_device::tst_b_ais_df() // 4a10 fff8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -88583,7 +88630,6 @@ void m68000_device::tst_b_aips_df() // 4a18 fff8
 	// 3c3 tsmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=b....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -88591,6 +88637,7 @@ void m68000_device::tst_b_aips_df() // 4a18 fff8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -88652,7 +88699,6 @@ void m68000_device::tst_b_pais_df() // 4a20 fff8
 	// 3c3 tsmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=b....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -88660,6 +88706,7 @@ void m68000_device::tst_b_pais_df() // 4a20 fff8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -88737,7 +88784,6 @@ void m68000_device::tst_b_das_df() // 4a28 fff8
 	// 3c3 tsmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=b....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -88745,6 +88791,7 @@ void m68000_device::tst_b_das_df() // 4a28 fff8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -88862,7 +88909,6 @@ adsw2:
 	// 3c3 tsmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=b....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -88870,6 +88916,7 @@ adsw2:
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -88946,7 +88993,6 @@ void m68000_device::tst_b_adr16_df() // 4a38 ffff
 	// 3c3 tsmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=b....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -88954,6 +89000,7 @@ void m68000_device::tst_b_adr16_df() // 4a38 ffff
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -89052,7 +89099,6 @@ void m68000_device::tst_b_adr32_df() // 4a39 ffff
 	// 3c3 tsmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=b....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -89060,6 +89106,7 @@ void m68000_device::tst_b_adr32_df() // 4a39 ffff
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -89092,7 +89139,6 @@ void m68000_device::tst_w_ds_df() // 4a40 fff8
 	// 12d tsrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = m_da[ry];
 	m_au = m_au + 2;
@@ -89101,6 +89147,7 @@ void m68000_device::tst_w_ds_df() // 4a40 fff8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -89158,7 +89205,6 @@ void m68000_device::tst_w_ais_df() // 4a50 fff8
 	// 3c3 tsmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -89166,6 +89212,7 @@ void m68000_device::tst_w_ais_df() // 4a50 fff8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -89228,7 +89275,6 @@ void m68000_device::tst_w_aips_df() // 4a58 fff8
 	// 3c3 tsmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -89236,6 +89282,7 @@ void m68000_device::tst_w_aips_df() // 4a58 fff8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -89300,7 +89347,6 @@ void m68000_device::tst_w_pais_df() // 4a60 fff8
 	// 3c3 tsmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -89308,6 +89354,7 @@ void m68000_device::tst_w_pais_df() // 4a60 fff8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -89388,7 +89435,6 @@ void m68000_device::tst_w_das_df() // 4a68 fff8
 	// 3c3 tsmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -89396,6 +89442,7 @@ void m68000_device::tst_w_das_df() // 4a68 fff8
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -89516,7 +89563,6 @@ adsw2:
 	// 3c3 tsmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -89524,6 +89570,7 @@ adsw2:
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -89603,7 +89650,6 @@ void m68000_device::tst_w_adr16_df() // 4a78 ffff
 	// 3c3 tsmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -89611,6 +89657,7 @@ void m68000_device::tst_w_adr16_df() // 4a78 ffff
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -89712,7 +89759,6 @@ void m68000_device::tst_w_adr32_df() // 4a79 ffff
 	// 3c3 tsmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -89720,6 +89766,7 @@ void m68000_device::tst_w_adr32_df() // 4a79 ffff
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -89752,7 +89799,6 @@ void m68000_device::tst_l_ds_df() // 4a80 fff8
 	// 125 tsrl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = m_da[ry];
 	m_au = m_au + 2;
@@ -89761,6 +89807,7 @@ void m68000_device::tst_l_ds_df() // 4a80 fff8
 	sr_nzvc();
 	// 362 tsrl2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -89841,7 +89888,6 @@ void m68000_device::tst_l_ais_df() // 4a90 fff8
 	// 3cb tsml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=.l...i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -89849,6 +89895,7 @@ void m68000_device::tst_l_ais_df() // 4a90 fff8
 	sr_nzvc();
 	// 361 tsml2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -89933,7 +89980,6 @@ void m68000_device::tst_l_aips_df() // 4a98 fff8
 	// 3cb tsml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=.l...i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -89941,6 +89987,7 @@ void m68000_device::tst_l_aips_df() // 4a98 fff8
 	sr_nzvc();
 	// 361 tsml2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -90026,7 +90073,6 @@ void m68000_device::tst_l_pais_df() // 4aa0 fff8
 	// 3cb tsml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=.l...i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -90034,6 +90080,7 @@ void m68000_device::tst_l_pais_df() // 4aa0 fff8
 	sr_nzvc();
 	// 361 tsml2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -90136,7 +90183,6 @@ void m68000_device::tst_l_das_df() // 4aa8 fff8
 	// 3cb tsml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=.l...i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -90144,6 +90190,7 @@ void m68000_device::tst_l_das_df() // 4aa8 fff8
 	sr_nzvc();
 	// 361 tsml2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -90286,7 +90333,6 @@ adsl2:
 	// 3cb tsml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=.l...i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -90294,6 +90340,7 @@ adsl2:
 	sr_nzvc();
 	// 361 tsml2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -90399,7 +90446,6 @@ void m68000_device::tst_l_adr16_df() // 4ab8 ffff
 	// 3cb tsml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=.l...i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -90407,6 +90453,7 @@ void m68000_device::tst_l_adr16_df() // 4ab8 ffff
 	sr_nzvc();
 	// 361 tsml2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -90534,7 +90581,6 @@ void m68000_device::tst_l_adr32_df() // 4ab9 ffff
 	// 3cb tsml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=1 m=.nzvc  i=.l...i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -90542,6 +90588,7 @@ void m68000_device::tst_l_adr32_df() // 4ab9 ffff
 	sr_nzvc();
 	// 361 tsml2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -90576,13 +90623,13 @@ void m68000_device::tas_ds_df() // 4ac0 fff8
 	// 345 tasr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[ry];
 	m_pc = m_au;
 	// alu r=15 c=2 m=.....  i=b...... ALU.or_ a=R.ftu:m_ftu d=R.dyl:m_da[ry]
 	alu_or8(m_ftu, m_da[ry]);
 	// 346 tasr2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -90668,12 +90715,12 @@ void m68000_device::tas_ais_df() // 4ad0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -90760,12 +90807,12 @@ void m68000_device::tas_aips_df() // 4ad8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -90854,12 +90901,12 @@ void m68000_device::tas_pais_df() // 4ae0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -90964,12 +91011,12 @@ void m68000_device::tas_das_df() // 4ae8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -91114,12 +91161,12 @@ adsw2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -91223,12 +91270,12 @@ void m68000_device::tas_adr16_df() // 4af8 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -91354,12 +91401,12 @@ void m68000_device::tas_adr32_df() // 4af9 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -91473,10 +91520,10 @@ mmaw2:
 	// 328 mmaw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -91531,7 +91578,6 @@ void m68000_device::movem_w_aips_list_df() // 4c98 fff8
 	// 115 popm2
 	m_aob = m_da[ry];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !m_movemr;
 	m_base_ssw = SSW_DATA | SSW_R;
 	m_edb = m_program.read_interruptible(m_aob & ~1);
@@ -91594,6 +91640,7 @@ popm6:
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -91729,10 +91776,10 @@ mmaw2:
 	// 328 mmaw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -91905,10 +91952,10 @@ mmaw2:
 	// 328 mmaw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -92042,10 +92089,10 @@ mmaw2:
 	// 328 mmaw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -92203,10 +92250,10 @@ mmaw2:
 	// 328 mmaw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -92341,10 +92388,10 @@ mmaw2:
 	// 328 mmaw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -92516,10 +92563,10 @@ mmaw2:
 	// 328 mmaw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -92653,10 +92700,10 @@ mmaw2:
 	// 328 mmaw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -92711,7 +92758,6 @@ void m68000_device::movem_l_aips_list_df() // 4cd8 fff8
 	// 115 popm2
 	m_aob = m_da[ry];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !m_movemr;
 	m_base_ssw = SSW_DATA | SSW_R;
 	m_edb = m_program.read_interruptible(m_aob & ~1);
@@ -92795,6 +92841,7 @@ popm6:
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -92951,10 +92998,10 @@ mmaw2:
 	// 328 mmaw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -93148,10 +93195,10 @@ mmaw2:
 	// 328 mmaw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -93306,10 +93353,10 @@ mmaw2:
 	// 328 mmaw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -93488,10 +93535,10 @@ mmaw2:
 	// 328 mmaw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -93647,10 +93694,10 @@ mmaw2:
 	// 328 mmaw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -93843,10 +93890,10 @@ mmaw2:
 	// 328 mmaw2
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -94022,11 +94069,11 @@ void m68000_device::trap_imm4_df() // 4e40 fff0
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -94084,7 +94131,6 @@ void m68000_device::link_as_imm16_df() // 4e50 fff8
 	// 30c link3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = high16(m_at);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -94127,6 +94173,7 @@ void m68000_device::link_as_imm16_df() // 4e50 fff8
 	// 349 mmiw2
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -94183,7 +94230,6 @@ void m68000_device::unlk_as_df() // 4e58 fff8
 	// 1fe unlk2
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_DATA | SSW_R;
 	m_edb = m_program.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -94209,6 +94255,7 @@ void m68000_device::unlk_as_df() // 4e58 fff8
 	m_au = m_pc + 2;
 	// 27d unlk4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -94245,13 +94292,13 @@ void m68000_device::move_as_usp_df() // 4e60 fff8
 	// 2f5 lusp1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_movemr = m_dbin;
 	m_pc = m_au;
 	m_at = m_da[ry];
 	m_ftu = m_dbin;
 	// 066 leaa2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -94289,13 +94336,13 @@ void m68000_device::move_usp_as_df() // 4e68 fff8
 	// 230 susp1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dcr = m_da[15];
 	m_at = m_da[15];
 	m_au = m_da[ry];
 	// 233 extr2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -94331,6 +94378,7 @@ void m68000_device::reset_df() // 4e70 ffff
 	}
 	// 3a6 rset1
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_movemr = m_dbin;
 	m_pc = m_au;
 	m_ftu = m_dbin;
@@ -94340,7 +94388,6 @@ void m68000_device::reset_df() // 4e70 ffff
 	m_icount -= 2;
 	// 27b rset2
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = ext32(m_aluo) - 2;
 	m_icount -= 2;
 	m_reset_cb(1);
@@ -94361,6 +94408,7 @@ rset5:
 	// 064 rset5
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -94392,11 +94440,11 @@ void m68000_device::nop_df() // 4e71 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -94430,6 +94478,7 @@ void m68000_device::stop_i16u_df() // 4e72 ffff
 	}
 	// 3a2 stop1
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_movemr = m_dbin;
 	m_pc = m_au;
 	m_ftu = m_dbin;
@@ -94439,6 +94488,7 @@ void m68000_device::stop_i16u_df() // 4e72 ffff
 	m_icount -= 2;
 	// 327 aaa01
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_sr = m_ftu & (SR_CCR|SR_SR);
 	update_user_super();
@@ -94551,11 +94601,11 @@ void m68000_device::rte_df() // 4e73 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -94650,11 +94700,11 @@ void m68000_device::rts_df() // 4e75 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -94685,7 +94735,6 @@ void m68000_device::trapv_df() // 4e76 ffff
 	// 06d trpv1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_isr & SR_V;
 	m_alub = m_dbin;
 	m_ftu = m_sr;
@@ -94696,6 +94745,7 @@ void m68000_device::trapv_df() // 4e76 ffff
 trpv2:
 	// 0e2 trpv2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -94882,11 +94932,11 @@ trpv3:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -95007,11 +95057,11 @@ void m68000_device::rtr_df() // 4e77 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -95085,7 +95135,6 @@ void m68000_device::jsr_ais_df() // 4e90 fff8
 	// 272 jsaw3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_pc;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -95107,11 +95156,11 @@ void m68000_device::jsr_ais_df() // 4e90 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -95191,7 +95240,6 @@ void m68000_device::jsr_das_df() // 4ea8 fff8
 	// 272 jsaw3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_pc;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -95213,11 +95261,11 @@ void m68000_device::jsr_das_df() // 4ea8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -95317,7 +95365,6 @@ jsrd2:
 	// 272 jsaw3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_pc;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -95339,11 +95386,11 @@ jsrd2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -95419,7 +95466,6 @@ void m68000_device::jsr_adr16_df() // 4eb8 ffff
 	// 272 jsaw3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_pc;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -95441,11 +95487,11 @@ void m68000_device::jsr_adr16_df() // 4eb8 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -95540,7 +95586,6 @@ void m68000_device::jsr_adr32_df() // 4eb9 ffff
 	// 272 jsaw3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_pc;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -95562,11 +95607,11 @@ void m68000_device::jsr_adr32_df() // 4eb9 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -95645,7 +95690,6 @@ void m68000_device::jsr_dpc_df() // 4eba ffff
 	// 272 jsaw3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_pc;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -95667,11 +95711,11 @@ void m68000_device::jsr_dpc_df() // 4eba ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -95770,7 +95814,6 @@ jsrd2:
 	// 272 jsaw3
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_pc;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -95792,11 +95835,11 @@ jsrd2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -95848,11 +95891,11 @@ void m68000_device::jmp_ais_df() // 4ed0 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -95908,11 +95951,11 @@ void m68000_device::jmp_das_df() // 4ee8 fff8
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -95988,11 +96031,11 @@ bbci3:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -96046,11 +96089,11 @@ void m68000_device::jmp_adr16_df() // 4ef8 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -96122,11 +96165,11 @@ void m68000_device::jmp_adr32_df() // 4ef9 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -96181,11 +96224,11 @@ void m68000_device::jmp_dpc_df() // 4efa ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -96260,11 +96303,11 @@ bbci3:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -96296,7 +96339,6 @@ void m68000_device::addq_b_imm3_ds_df() // 5000 f1f8
 	// 2d8 raqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dt = ext32(m_ftu);
 	// alu r=2 c=2 m=xnzvc  i=b....i. ALU.add a=R.ftu:m_ftu d=R.dyl:m_da[ry]
@@ -96304,6 +96346,7 @@ void m68000_device::addq_b_imm3_ds_df() // 5000 f1f8
 	sr_xnzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -96358,7 +96401,6 @@ void m68000_device::addq_b_imm3_ais_df() // 5010 f1f8
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -96386,6 +96428,7 @@ void m68000_device::addq_b_imm3_ais_df() // 5010 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -96437,7 +96480,6 @@ void m68000_device::addq_b_imm3_aips_df() // 5018 f1f8
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -96465,6 +96507,7 @@ void m68000_device::addq_b_imm3_aips_df() // 5018 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -96518,7 +96561,6 @@ void m68000_device::addq_b_imm3_pais_df() // 5020 f1f8
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -96546,6 +96588,7 @@ void m68000_device::addq_b_imm3_pais_df() // 5020 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -96615,7 +96658,6 @@ void m68000_device::addq_b_imm3_das_df() // 5028 f1f8
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -96643,6 +96685,7 @@ void m68000_device::addq_b_imm3_das_df() // 5028 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -96750,7 +96793,6 @@ adsw2:
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -96778,6 +96820,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -96846,7 +96889,6 @@ void m68000_device::addq_b_imm3_adr16_df() // 5038 f1ff
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -96874,6 +96916,7 @@ void m68000_device::addq_b_imm3_adr16_df() // 5038 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -96963,7 +97006,6 @@ void m68000_device::addq_b_imm3_adr32_df() // 5039 f1ff
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -96991,6 +97033,7 @@ void m68000_device::addq_b_imm3_adr32_df() // 5039 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -97017,7 +97060,6 @@ void m68000_device::addq_w_imm3_ds_df() // 5040 f1f8
 	// 2d8 raqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dt = ext32(m_ftu);
 	// alu r=2 c=2 m=xnzvc  i=.....i. ALU.add a=R.ftu:m_ftu d=R.dyl:m_da[ry]
@@ -97025,6 +97067,7 @@ void m68000_device::addq_w_imm3_ds_df() // 5040 f1f8
 	sr_xnzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -97058,7 +97101,6 @@ void m68000_device::addq_w_imm3_as_df() // 5048 f1f8
 	// 2dc raql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dt = ext32(m_ftu);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.ftu:m_ftu d=R.ayl:m_da[ry]
@@ -97089,6 +97131,7 @@ void m68000_device::addq_w_imm3_as_df() // 5048 f1f8
 	m_icount -= 2;
 	// 25b roal4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -97129,7 +97172,6 @@ void m68000_device::addq_w_imm3_ais_df() // 5050 f1f8
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -97157,6 +97199,7 @@ void m68000_device::addq_w_imm3_ais_df() // 5050 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -97216,7 +97259,6 @@ void m68000_device::addq_w_imm3_aips_df() // 5058 f1f8
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -97244,6 +97286,7 @@ void m68000_device::addq_w_imm3_aips_df() // 5058 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -97305,7 +97348,6 @@ void m68000_device::addq_w_imm3_pais_df() // 5060 f1f8
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -97333,6 +97375,7 @@ void m68000_device::addq_w_imm3_pais_df() // 5060 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -97410,7 +97453,6 @@ void m68000_device::addq_w_imm3_das_df() // 5068 f1f8
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -97438,6 +97480,7 @@ void m68000_device::addq_w_imm3_das_df() // 5068 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -97553,7 +97596,6 @@ adsw2:
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -97581,6 +97623,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -97657,7 +97700,6 @@ void m68000_device::addq_w_imm3_adr16_df() // 5078 f1ff
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -97685,6 +97727,7 @@ void m68000_device::addq_w_imm3_adr16_df() // 5078 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -97782,7 +97825,6 @@ void m68000_device::addq_w_imm3_adr32_df() // 5079 f1ff
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -97810,6 +97852,7 @@ void m68000_device::addq_w_imm3_adr32_df() // 5079 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -97841,7 +97884,6 @@ void m68000_device::addq_l_imm3_ds_df() // 5080 f1f8
 	// 2dc raql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dt = ext32(m_ftu);
 	// alu r=2 c=2 m=xnzvc  i=.l...i. ALU.add a=R.ftu:m_ftu d=R.dyl:m_da[ry]
@@ -97874,6 +97916,7 @@ void m68000_device::addq_l_imm3_ds_df() // 5080 f1f8
 	m_icount -= 2;
 	// 25b roal4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -97890,7 +97933,6 @@ void m68000_device::addq_l_imm3_as_df() // 5088 f1f8
 	// 2dc raql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dt = ext32(m_ftu);
 	// alu r=2 c=2 m=.....  i=.l...i. ALU.add a=R.ftu:m_ftu d=R.ayl:m_da[ry]
@@ -97921,6 +97963,7 @@ void m68000_device::addq_l_imm3_as_df() // 5088 f1f8
 	m_icount -= 2;
 	// 25b roal4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -97982,7 +98025,6 @@ void m68000_device::addq_l_imm3_ais_df() // 5090 f1f8
 	// 2f7 maql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -98033,6 +98075,7 @@ void m68000_device::addq_l_imm3_ais_df() // 5090 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -98112,7 +98155,6 @@ void m68000_device::addq_l_imm3_aips_df() // 5098 f1f8
 	// 2f7 maql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -98163,6 +98205,7 @@ void m68000_device::addq_l_imm3_aips_df() // 5098 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -98243,7 +98286,6 @@ void m68000_device::addq_l_imm3_pais_df() // 50a0 f1f8
 	// 2f7 maql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -98294,6 +98336,7 @@ void m68000_device::addq_l_imm3_pais_df() // 50a0 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -98391,7 +98434,6 @@ void m68000_device::addq_l_imm3_das_df() // 50a8 f1f8
 	// 2f7 maql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -98442,6 +98484,7 @@ void m68000_device::addq_l_imm3_das_df() // 50a8 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -98577,7 +98620,6 @@ adsl2:
 	// 2f7 maql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -98628,6 +98670,7 @@ adsl2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -98727,7 +98770,6 @@ void m68000_device::addq_l_imm3_adr16_df() // 50b8 f1ff
 	// 2f7 maql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -98778,6 +98820,7 @@ void m68000_device::addq_l_imm3_adr16_df() // 50b8 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -98898,7 +98941,6 @@ void m68000_device::addq_l_imm3_adr32_df() // 50b9 f1ff
 	// 2f7 maql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -98949,6 +98991,7 @@ void m68000_device::addq_l_imm3_adr32_df() // 50b9 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -98980,7 +99023,6 @@ void m68000_device::st_ds_df() // 50c0 fff8
 	// 384 sccr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = 1;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -98992,6 +99034,7 @@ void m68000_device::st_ds_df() // 50c0 fff8
 roaw2:
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -99043,6 +99086,7 @@ sccr2:
 	alu_or8(m_aluo, 0xff);
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=R.aluo:m_aluo d=none
@@ -99104,6 +99148,7 @@ dbcc2:
 dbcc6:
 	// 0c6 dbcc6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	set_ftu_const();
@@ -99135,12 +99180,12 @@ dbcc6:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -99169,12 +99214,12 @@ dbcc4:
 	// 0c7 dbcc4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -99205,6 +99250,7 @@ dbcc5:
 	// 007 dbcc5
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -99259,7 +99305,6 @@ void m68000_device::st_ais_df() // 50d0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = 1;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -99321,6 +99366,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -99375,7 +99421,6 @@ void m68000_device::st_aips_df() // 50d8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = 1;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -99437,6 +99482,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -99493,7 +99539,6 @@ void m68000_device::st_pais_df() // 50e0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = 1;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -99555,6 +99600,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -99627,7 +99673,6 @@ void m68000_device::st_das_df() // 50e8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = 1;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -99689,6 +99734,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -99801,7 +99847,6 @@ adsw2:
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = 1;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -99863,6 +99908,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -99934,7 +99980,6 @@ void m68000_device::st_adr16_df() // 50f8 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = 1;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -99996,6 +100041,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -100089,7 +100135,6 @@ void m68000_device::st_adr32_df() // 50f9 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = 1;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -100151,6 +100196,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -100178,7 +100224,6 @@ void m68000_device::subq_b_imm3_ds_df() // 5100 f1f8
 	// 2d8 raqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dt = ext32(m_ftu);
 	// alu r=5 c=2 m=xnzvc  i=b....i. ALU.sub a=R.ftu:m_ftu d=R.dyl:m_da[ry]
@@ -100186,6 +100231,7 @@ void m68000_device::subq_b_imm3_ds_df() // 5100 f1f8
 	sr_xnzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -100240,7 +100286,6 @@ void m68000_device::subq_b_imm3_ais_df() // 5110 f1f8
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -100268,6 +100313,7 @@ void m68000_device::subq_b_imm3_ais_df() // 5110 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -100319,7 +100365,6 @@ void m68000_device::subq_b_imm3_aips_df() // 5118 f1f8
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -100347,6 +100392,7 @@ void m68000_device::subq_b_imm3_aips_df() // 5118 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -100400,7 +100446,6 @@ void m68000_device::subq_b_imm3_pais_df() // 5120 f1f8
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -100428,6 +100473,7 @@ void m68000_device::subq_b_imm3_pais_df() // 5120 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -100497,7 +100543,6 @@ void m68000_device::subq_b_imm3_das_df() // 5128 f1f8
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -100525,6 +100570,7 @@ void m68000_device::subq_b_imm3_das_df() // 5128 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -100632,7 +100678,6 @@ adsw2:
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -100660,6 +100705,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -100728,7 +100774,6 @@ void m68000_device::subq_b_imm3_adr16_df() // 5138 f1ff
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -100756,6 +100801,7 @@ void m68000_device::subq_b_imm3_adr16_df() // 5138 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -100845,7 +100891,6 @@ void m68000_device::subq_b_imm3_adr32_df() // 5139 f1ff
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -100873,6 +100918,7 @@ void m68000_device::subq_b_imm3_adr32_df() // 5139 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -100899,7 +100945,6 @@ void m68000_device::subq_w_imm3_ds_df() // 5140 f1f8
 	// 2d8 raqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dt = ext32(m_ftu);
 	// alu r=5 c=2 m=xnzvc  i=.....i. ALU.sub a=R.ftu:m_ftu d=R.dyl:m_da[ry]
@@ -100907,6 +100952,7 @@ void m68000_device::subq_w_imm3_ds_df() // 5140 f1f8
 	sr_xnzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -100940,7 +100986,6 @@ void m68000_device::subq_w_imm3_as_df() // 5148 f1f8
 	// 2dc raql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dt = ext32(m_ftu);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.ftu:m_ftu d=R.ayl:m_da[ry]
@@ -100971,6 +101016,7 @@ void m68000_device::subq_w_imm3_as_df() // 5148 f1f8
 	m_icount -= 2;
 	// 25b roal4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -101011,7 +101057,6 @@ void m68000_device::subq_w_imm3_ais_df() // 5150 f1f8
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -101039,6 +101084,7 @@ void m68000_device::subq_w_imm3_ais_df() // 5150 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -101098,7 +101144,6 @@ void m68000_device::subq_w_imm3_aips_df() // 5158 f1f8
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -101126,6 +101171,7 @@ void m68000_device::subq_w_imm3_aips_df() // 5158 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -101187,7 +101233,6 @@ void m68000_device::subq_w_imm3_pais_df() // 5160 f1f8
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -101215,6 +101260,7 @@ void m68000_device::subq_w_imm3_pais_df() // 5160 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -101292,7 +101338,6 @@ void m68000_device::subq_w_imm3_das_df() // 5168 f1f8
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -101320,6 +101365,7 @@ void m68000_device::subq_w_imm3_das_df() // 5168 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -101435,7 +101481,6 @@ adsw2:
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -101463,6 +101508,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -101539,7 +101585,6 @@ void m68000_device::subq_w_imm3_adr16_df() // 5178 f1ff
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -101567,6 +101612,7 @@ void m68000_device::subq_w_imm3_adr16_df() // 5178 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -101664,7 +101710,6 @@ void m68000_device::subq_w_imm3_adr32_df() // 5179 f1ff
 	// 2f3 maqw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -101692,6 +101737,7 @@ void m68000_device::subq_w_imm3_adr32_df() // 5179 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -101723,7 +101769,6 @@ void m68000_device::subq_l_imm3_ds_df() // 5180 f1f8
 	// 2dc raql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dt = ext32(m_ftu);
 	// alu r=5 c=2 m=xnzvc  i=.l...i. ALU.sub a=R.ftu:m_ftu d=R.dyl:m_da[ry]
@@ -101756,6 +101801,7 @@ void m68000_device::subq_l_imm3_ds_df() // 5180 f1f8
 	m_icount -= 2;
 	// 25b roal4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -101772,7 +101818,6 @@ void m68000_device::subq_l_imm3_as_df() // 5188 f1f8
 	// 2dc raql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dt = ext32(m_ftu);
 	// alu r=5 c=2 m=.....  i=.l...i. ALU.sub a=R.ftu:m_ftu d=R.ayl:m_da[ry]
@@ -101803,6 +101848,7 @@ void m68000_device::subq_l_imm3_as_df() // 5188 f1f8
 	m_icount -= 2;
 	// 25b roal4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -101864,7 +101910,6 @@ void m68000_device::subq_l_imm3_ais_df() // 5190 f1f8
 	// 2f7 maql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -101915,6 +101960,7 @@ void m68000_device::subq_l_imm3_ais_df() // 5190 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -101994,7 +102040,6 @@ void m68000_device::subq_l_imm3_aips_df() // 5198 f1f8
 	// 2f7 maql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -102045,6 +102090,7 @@ void m68000_device::subq_l_imm3_aips_df() // 5198 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -102125,7 +102171,6 @@ void m68000_device::subq_l_imm3_pais_df() // 51a0 f1f8
 	// 2f7 maql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -102176,6 +102221,7 @@ void m68000_device::subq_l_imm3_pais_df() // 51a0 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -102273,7 +102319,6 @@ void m68000_device::subq_l_imm3_das_df() // 51a8 f1f8
 	// 2f7 maql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -102324,6 +102369,7 @@ void m68000_device::subq_l_imm3_das_df() // 51a8 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -102459,7 +102505,6 @@ adsl2:
 	// 2f7 maql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -102510,6 +102555,7 @@ adsl2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -102609,7 +102655,6 @@ void m68000_device::subq_l_imm3_adr16_df() // 51b8 f1ff
 	// 2f7 maql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -102660,6 +102705,7 @@ void m68000_device::subq_l_imm3_adr16_df() // 51b8 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -102780,7 +102826,6 @@ void m68000_device::subq_l_imm3_adr32_df() // 51b9 f1ff
 	// 2f7 maql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -102831,6 +102876,7 @@ void m68000_device::subq_l_imm3_adr32_df() // 51b9 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -102862,7 +102908,6 @@ void m68000_device::sf_ds_df() // 51c0 fff8
 	// 384 sccr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -102874,6 +102919,7 @@ void m68000_device::sf_ds_df() // 51c0 fff8
 roaw2:
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -102925,6 +102971,7 @@ sccr2:
 	alu_or8(m_aluo, 0xff);
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=R.aluo:m_aluo d=none
@@ -102986,6 +103033,7 @@ dbcc2:
 dbcc6:
 	// 0c6 dbcc6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	set_ftu_const();
@@ -103017,12 +103065,12 @@ dbcc6:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -103051,12 +103099,12 @@ dbcc4:
 	// 0c7 dbcc4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -103087,6 +103135,7 @@ dbcc5:
 	// 007 dbcc5
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -103141,7 +103190,6 @@ void m68000_device::sf_ais_df() // 51d0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -103203,6 +103251,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -103257,7 +103306,6 @@ void m68000_device::sf_aips_df() // 51d8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -103319,6 +103367,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -103375,7 +103424,6 @@ void m68000_device::sf_pais_df() // 51e0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -103437,6 +103485,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -103509,7 +103558,6 @@ void m68000_device::sf_das_df() // 51e8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -103571,6 +103619,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -103683,7 +103732,6 @@ adsw2:
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -103745,6 +103793,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -103816,7 +103865,6 @@ void m68000_device::sf_adr16_df() // 51f8 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -103878,6 +103926,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -103971,7 +104020,6 @@ void m68000_device::sf_adr32_df() // 51f9 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -104033,6 +104081,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -104060,7 +104109,6 @@ void m68000_device::shi_ds_df() // 52c0 fff8
 	// 384 sccr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & (SR_C|SR_Z)) == 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -104072,6 +104120,7 @@ void m68000_device::shi_ds_df() // 52c0 fff8
 roaw2:
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -104123,6 +104172,7 @@ sccr2:
 	alu_or8(m_aluo, 0xff);
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=R.aluo:m_aluo d=none
@@ -104184,6 +104234,7 @@ dbcc2:
 dbcc6:
 	// 0c6 dbcc6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	set_ftu_const();
@@ -104215,12 +104266,12 @@ dbcc6:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -104249,12 +104300,12 @@ dbcc4:
 	// 0c7 dbcc4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -104285,6 +104336,7 @@ dbcc5:
 	// 007 dbcc5
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -104339,7 +104391,6 @@ void m68000_device::shi_ais_df() // 52d0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & (SR_C|SR_Z)) == 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -104401,6 +104452,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -104455,7 +104507,6 @@ void m68000_device::shi_aips_df() // 52d8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & (SR_C|SR_Z)) == 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -104517,6 +104568,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -104573,7 +104625,6 @@ void m68000_device::shi_pais_df() // 52e0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & (SR_C|SR_Z)) == 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -104635,6 +104686,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -104707,7 +104759,6 @@ void m68000_device::shi_das_df() // 52e8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & (SR_C|SR_Z)) == 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -104769,6 +104820,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -104881,7 +104933,6 @@ adsw2:
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & (SR_C|SR_Z)) == 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -104943,6 +104994,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -105014,7 +105066,6 @@ void m68000_device::shi_adr16_df() // 52f8 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & (SR_C|SR_Z)) == 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -105076,6 +105127,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -105169,7 +105221,6 @@ void m68000_device::shi_adr32_df() // 52f9 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & (SR_C|SR_Z)) == 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -105231,6 +105282,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -105258,7 +105310,6 @@ void m68000_device::sls_ds_df() // 53c0 fff8
 	// 384 sccr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & (SR_C|SR_Z)) != 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -105270,6 +105321,7 @@ void m68000_device::sls_ds_df() // 53c0 fff8
 roaw2:
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -105321,6 +105373,7 @@ sccr2:
 	alu_or8(m_aluo, 0xff);
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=R.aluo:m_aluo d=none
@@ -105382,6 +105435,7 @@ dbcc2:
 dbcc6:
 	// 0c6 dbcc6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	set_ftu_const();
@@ -105413,12 +105467,12 @@ dbcc6:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -105447,12 +105501,12 @@ dbcc4:
 	// 0c7 dbcc4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -105483,6 +105537,7 @@ dbcc5:
 	// 007 dbcc5
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -105537,7 +105592,6 @@ void m68000_device::sls_ais_df() // 53d0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & (SR_C|SR_Z)) != 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -105599,6 +105653,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -105653,7 +105708,6 @@ void m68000_device::sls_aips_df() // 53d8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & (SR_C|SR_Z)) != 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -105715,6 +105769,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -105771,7 +105826,6 @@ void m68000_device::sls_pais_df() // 53e0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & (SR_C|SR_Z)) != 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -105833,6 +105887,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -105905,7 +105960,6 @@ void m68000_device::sls_das_df() // 53e8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & (SR_C|SR_Z)) != 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -105967,6 +106021,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -106079,7 +106134,6 @@ adsw2:
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & (SR_C|SR_Z)) != 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -106141,6 +106195,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -106212,7 +106267,6 @@ void m68000_device::sls_adr16_df() // 53f8 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & (SR_C|SR_Z)) != 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -106274,6 +106328,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -106367,7 +106422,6 @@ void m68000_device::sls_adr32_df() // 53f9 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & (SR_C|SR_Z)) != 0;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -106429,6 +106483,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -106456,7 +106511,6 @@ void m68000_device::scc_ds_df() // 54c0 fff8
 	// 384 sccr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_C);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -106468,6 +106522,7 @@ void m68000_device::scc_ds_df() // 54c0 fff8
 roaw2:
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -106519,6 +106574,7 @@ sccr2:
 	alu_or8(m_aluo, 0xff);
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=R.aluo:m_aluo d=none
@@ -106580,6 +106636,7 @@ dbcc2:
 dbcc6:
 	// 0c6 dbcc6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	set_ftu_const();
@@ -106611,12 +106668,12 @@ dbcc6:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -106645,12 +106702,12 @@ dbcc4:
 	// 0c7 dbcc4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -106681,6 +106738,7 @@ dbcc5:
 	// 007 dbcc5
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -106735,7 +106793,6 @@ void m68000_device::scc_ais_df() // 54d0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_C);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -106797,6 +106854,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -106851,7 +106909,6 @@ void m68000_device::scc_aips_df() // 54d8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_C);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -106913,6 +106970,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -106969,7 +107027,6 @@ void m68000_device::scc_pais_df() // 54e0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_C);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -107031,6 +107088,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -107103,7 +107161,6 @@ void m68000_device::scc_das_df() // 54e8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_C);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -107165,6 +107222,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -107277,7 +107335,6 @@ adsw2:
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_C);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -107339,6 +107396,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -107410,7 +107468,6 @@ void m68000_device::scc_adr16_df() // 54f8 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_C);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -107472,6 +107529,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -107565,7 +107623,6 @@ void m68000_device::scc_adr32_df() // 54f9 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_C);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -107627,6 +107684,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -107654,7 +107712,6 @@ void m68000_device::scs_ds_df() // 55c0 fff8
 	// 384 sccr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_C;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -107666,6 +107723,7 @@ void m68000_device::scs_ds_df() // 55c0 fff8
 roaw2:
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -107717,6 +107775,7 @@ sccr2:
 	alu_or8(m_aluo, 0xff);
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=R.aluo:m_aluo d=none
@@ -107778,6 +107837,7 @@ dbcc2:
 dbcc6:
 	// 0c6 dbcc6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	set_ftu_const();
@@ -107809,12 +107869,12 @@ dbcc6:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -107843,12 +107903,12 @@ dbcc4:
 	// 0c7 dbcc4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -107879,6 +107939,7 @@ dbcc5:
 	// 007 dbcc5
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -107933,7 +107994,6 @@ void m68000_device::scs_ais_df() // 55d0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_C;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -107995,6 +108055,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -108049,7 +108110,6 @@ void m68000_device::scs_aips_df() // 55d8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_C;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -108111,6 +108171,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -108167,7 +108228,6 @@ void m68000_device::scs_pais_df() // 55e0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_C;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -108229,6 +108289,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -108301,7 +108362,6 @@ void m68000_device::scs_das_df() // 55e8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_C;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -108363,6 +108423,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -108475,7 +108536,6 @@ adsw2:
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_C;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -108537,6 +108597,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -108608,7 +108669,6 @@ void m68000_device::scs_adr16_df() // 55f8 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_C;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -108670,6 +108730,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -108763,7 +108824,6 @@ void m68000_device::scs_adr32_df() // 55f9 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_C;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -108825,6 +108885,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -108852,7 +108913,6 @@ void m68000_device::sne_ds_df() // 56c0 fff8
 	// 384 sccr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_Z);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -108864,6 +108924,7 @@ void m68000_device::sne_ds_df() // 56c0 fff8
 roaw2:
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -108915,6 +108976,7 @@ sccr2:
 	alu_or8(m_aluo, 0xff);
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=R.aluo:m_aluo d=none
@@ -108976,6 +109038,7 @@ dbcc2:
 dbcc6:
 	// 0c6 dbcc6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	set_ftu_const();
@@ -109007,12 +109070,12 @@ dbcc6:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -109041,12 +109104,12 @@ dbcc4:
 	// 0c7 dbcc4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -109077,6 +109140,7 @@ dbcc5:
 	// 007 dbcc5
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -109131,7 +109195,6 @@ void m68000_device::sne_ais_df() // 56d0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_Z);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -109193,6 +109256,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -109247,7 +109311,6 @@ void m68000_device::sne_aips_df() // 56d8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_Z);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -109309,6 +109372,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -109365,7 +109429,6 @@ void m68000_device::sne_pais_df() // 56e0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_Z);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -109427,6 +109490,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -109499,7 +109563,6 @@ void m68000_device::sne_das_df() // 56e8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_Z);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -109561,6 +109624,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -109673,7 +109737,6 @@ adsw2:
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_Z);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -109735,6 +109798,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -109806,7 +109870,6 @@ void m68000_device::sne_adr16_df() // 56f8 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_Z);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -109868,6 +109931,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -109961,7 +110025,6 @@ void m68000_device::sne_adr32_df() // 56f9 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_Z);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -110023,6 +110086,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -110050,7 +110114,6 @@ void m68000_device::seq_ds_df() // 57c0 fff8
 	// 384 sccr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_Z;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -110062,6 +110125,7 @@ void m68000_device::seq_ds_df() // 57c0 fff8
 roaw2:
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -110113,6 +110177,7 @@ sccr2:
 	alu_or8(m_aluo, 0xff);
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=R.aluo:m_aluo d=none
@@ -110174,6 +110239,7 @@ dbcc2:
 dbcc6:
 	// 0c6 dbcc6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	set_ftu_const();
@@ -110205,12 +110271,12 @@ dbcc6:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -110239,12 +110305,12 @@ dbcc4:
 	// 0c7 dbcc4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -110275,6 +110341,7 @@ dbcc5:
 	// 007 dbcc5
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -110329,7 +110396,6 @@ void m68000_device::seq_ais_df() // 57d0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_Z;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -110391,6 +110457,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -110445,7 +110512,6 @@ void m68000_device::seq_aips_df() // 57d8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_Z;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -110507,6 +110573,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -110563,7 +110630,6 @@ void m68000_device::seq_pais_df() // 57e0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_Z;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -110625,6 +110691,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -110697,7 +110764,6 @@ void m68000_device::seq_das_df() // 57e8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_Z;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -110759,6 +110825,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -110871,7 +110938,6 @@ adsw2:
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_Z;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -110933,6 +110999,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -111004,7 +111071,6 @@ void m68000_device::seq_adr16_df() // 57f8 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_Z;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -111066,6 +111132,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -111159,7 +111226,6 @@ void m68000_device::seq_adr32_df() // 57f9 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_Z;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -111221,6 +111287,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -111248,7 +111315,6 @@ void m68000_device::svc_ds_df() // 58c0 fff8
 	// 384 sccr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -111260,6 +111326,7 @@ void m68000_device::svc_ds_df() // 58c0 fff8
 roaw2:
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -111311,6 +111378,7 @@ sccr2:
 	alu_or8(m_aluo, 0xff);
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=R.aluo:m_aluo d=none
@@ -111372,6 +111440,7 @@ dbcc2:
 dbcc6:
 	// 0c6 dbcc6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	set_ftu_const();
@@ -111403,12 +111472,12 @@ dbcc6:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -111437,12 +111506,12 @@ dbcc4:
 	// 0c7 dbcc4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -111473,6 +111542,7 @@ dbcc5:
 	// 007 dbcc5
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -111527,7 +111597,6 @@ void m68000_device::svc_ais_df() // 58d0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -111589,6 +111658,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -111643,7 +111713,6 @@ void m68000_device::svc_aips_df() // 58d8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -111705,6 +111774,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -111761,7 +111831,6 @@ void m68000_device::svc_pais_df() // 58e0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -111823,6 +111892,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -111895,7 +111965,6 @@ void m68000_device::svc_das_df() // 58e8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -111957,6 +112026,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -112069,7 +112139,6 @@ adsw2:
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -112131,6 +112200,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -112202,7 +112272,6 @@ void m68000_device::svc_adr16_df() // 58f8 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -112264,6 +112333,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -112357,7 +112427,6 @@ void m68000_device::svc_adr32_df() // 58f9 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -112419,6 +112488,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -112446,7 +112516,6 @@ void m68000_device::svs_ds_df() // 59c0 fff8
 	// 384 sccr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_V;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -112458,6 +112527,7 @@ void m68000_device::svs_ds_df() // 59c0 fff8
 roaw2:
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -112509,6 +112579,7 @@ sccr2:
 	alu_or8(m_aluo, 0xff);
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=R.aluo:m_aluo d=none
@@ -112570,6 +112641,7 @@ dbcc2:
 dbcc6:
 	// 0c6 dbcc6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	set_ftu_const();
@@ -112601,12 +112673,12 @@ dbcc6:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -112635,12 +112707,12 @@ dbcc4:
 	// 0c7 dbcc4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -112671,6 +112743,7 @@ dbcc5:
 	// 007 dbcc5
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -112725,7 +112798,6 @@ void m68000_device::svs_ais_df() // 59d0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_V;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -112787,6 +112859,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -112841,7 +112914,6 @@ void m68000_device::svs_aips_df() // 59d8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_V;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -112903,6 +112975,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -112959,7 +113032,6 @@ void m68000_device::svs_pais_df() // 59e0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_V;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -113021,6 +113093,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -113093,7 +113166,6 @@ void m68000_device::svs_das_df() // 59e8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_V;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -113155,6 +113227,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -113267,7 +113340,6 @@ adsw2:
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_V;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -113329,6 +113401,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -113400,7 +113473,6 @@ void m68000_device::svs_adr16_df() // 59f8 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_V;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -113462,6 +113534,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -113555,7 +113628,6 @@ void m68000_device::svs_adr32_df() // 59f9 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_V;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -113617,6 +113689,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -113644,7 +113717,6 @@ void m68000_device::spl_ds_df() // 5ac0 fff8
 	// 384 sccr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_N);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -113656,6 +113728,7 @@ void m68000_device::spl_ds_df() // 5ac0 fff8
 roaw2:
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -113707,6 +113780,7 @@ sccr2:
 	alu_or8(m_aluo, 0xff);
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=R.aluo:m_aluo d=none
@@ -113768,6 +113842,7 @@ dbcc2:
 dbcc6:
 	// 0c6 dbcc6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	set_ftu_const();
@@ -113799,12 +113874,12 @@ dbcc6:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -113833,12 +113908,12 @@ dbcc4:
 	// 0c7 dbcc4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -113869,6 +113944,7 @@ dbcc5:
 	// 007 dbcc5
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -113923,7 +113999,6 @@ void m68000_device::spl_ais_df() // 5ad0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_N);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -113985,6 +114060,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -114039,7 +114115,6 @@ void m68000_device::spl_aips_df() // 5ad8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_N);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -114101,6 +114176,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -114157,7 +114233,6 @@ void m68000_device::spl_pais_df() // 5ae0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_N);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -114219,6 +114294,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -114291,7 +114367,6 @@ void m68000_device::spl_das_df() // 5ae8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_N);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -114353,6 +114428,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -114465,7 +114541,6 @@ adsw2:
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_N);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -114527,6 +114602,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -114598,7 +114674,6 @@ void m68000_device::spl_adr16_df() // 5af8 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_N);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -114660,6 +114735,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -114753,7 +114829,6 @@ void m68000_device::spl_adr32_df() // 5af9 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = !(m_sr & SR_N);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -114815,6 +114890,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -114842,7 +114918,6 @@ void m68000_device::smi_ds_df() // 5bc0 fff8
 	// 384 sccr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_N;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -114854,6 +114929,7 @@ void m68000_device::smi_ds_df() // 5bc0 fff8
 roaw2:
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -114905,6 +114981,7 @@ sccr2:
 	alu_or8(m_aluo, 0xff);
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=R.aluo:m_aluo d=none
@@ -114966,6 +115043,7 @@ dbcc2:
 dbcc6:
 	// 0c6 dbcc6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	set_ftu_const();
@@ -114997,12 +115075,12 @@ dbcc6:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -115031,12 +115109,12 @@ dbcc4:
 	// 0c7 dbcc4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -115067,6 +115145,7 @@ dbcc5:
 	// 007 dbcc5
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -115121,7 +115200,6 @@ void m68000_device::smi_ais_df() // 5bd0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_N;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -115183,6 +115261,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -115237,7 +115316,6 @@ void m68000_device::smi_aips_df() // 5bd8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_N;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -115299,6 +115377,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -115355,7 +115434,6 @@ void m68000_device::smi_pais_df() // 5be0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_N;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -115417,6 +115495,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -115489,7 +115568,6 @@ void m68000_device::smi_das_df() // 5be8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_N;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -115551,6 +115629,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -115663,7 +115742,6 @@ adsw2:
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_N;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -115725,6 +115803,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -115796,7 +115875,6 @@ void m68000_device::smi_adr16_df() // 5bf8 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_N;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -115858,6 +115936,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -115951,7 +116030,6 @@ void m68000_device::smi_adr32_df() // 5bf9 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_sr & SR_N;
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -116013,6 +116091,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -116040,7 +116119,6 @@ void m68000_device::sge_ds_df() // 5cc0 fff8
 	// 384 sccr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V)) == (SR_N|SR_V)) || ((m_sr & (SR_N|SR_V)) == 0);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -116052,6 +116130,7 @@ void m68000_device::sge_ds_df() // 5cc0 fff8
 roaw2:
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -116103,6 +116182,7 @@ sccr2:
 	alu_or8(m_aluo, 0xff);
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=R.aluo:m_aluo d=none
@@ -116164,6 +116244,7 @@ dbcc2:
 dbcc6:
 	// 0c6 dbcc6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	set_ftu_const();
@@ -116195,12 +116276,12 @@ dbcc6:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -116229,12 +116310,12 @@ dbcc4:
 	// 0c7 dbcc4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -116265,6 +116346,7 @@ dbcc5:
 	// 007 dbcc5
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -116319,7 +116401,6 @@ void m68000_device::sge_ais_df() // 5cd0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V)) == (SR_N|SR_V)) || ((m_sr & (SR_N|SR_V)) == 0);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -116381,6 +116462,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -116435,7 +116517,6 @@ void m68000_device::sge_aips_df() // 5cd8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V)) == (SR_N|SR_V)) || ((m_sr & (SR_N|SR_V)) == 0);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -116497,6 +116578,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -116553,7 +116635,6 @@ void m68000_device::sge_pais_df() // 5ce0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V)) == (SR_N|SR_V)) || ((m_sr & (SR_N|SR_V)) == 0);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -116615,6 +116696,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -116687,7 +116769,6 @@ void m68000_device::sge_das_df() // 5ce8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V)) == (SR_N|SR_V)) || ((m_sr & (SR_N|SR_V)) == 0);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -116749,6 +116830,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -116861,7 +116943,6 @@ adsw2:
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V)) == (SR_N|SR_V)) || ((m_sr & (SR_N|SR_V)) == 0);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -116923,6 +117004,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -116994,7 +117076,6 @@ void m68000_device::sge_adr16_df() // 5cf8 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V)) == (SR_N|SR_V)) || ((m_sr & (SR_N|SR_V)) == 0);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -117056,6 +117137,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -117149,7 +117231,6 @@ void m68000_device::sge_adr32_df() // 5cf9 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V)) == (SR_N|SR_V)) || ((m_sr & (SR_N|SR_V)) == 0);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -117211,6 +117292,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -117238,7 +117320,6 @@ void m68000_device::slt_ds_df() // 5dc0 fff8
 	// 384 sccr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V)) == SR_N) || ((m_sr & (SR_N|SR_V)) == SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -117250,6 +117331,7 @@ void m68000_device::slt_ds_df() // 5dc0 fff8
 roaw2:
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -117301,6 +117383,7 @@ sccr2:
 	alu_or8(m_aluo, 0xff);
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=R.aluo:m_aluo d=none
@@ -117362,6 +117445,7 @@ dbcc2:
 dbcc6:
 	// 0c6 dbcc6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	set_ftu_const();
@@ -117393,12 +117477,12 @@ dbcc6:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -117427,12 +117511,12 @@ dbcc4:
 	// 0c7 dbcc4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -117463,6 +117547,7 @@ dbcc5:
 	// 007 dbcc5
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -117517,7 +117602,6 @@ void m68000_device::slt_ais_df() // 5dd0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V)) == SR_N) || ((m_sr & (SR_N|SR_V)) == SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -117579,6 +117663,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -117633,7 +117718,6 @@ void m68000_device::slt_aips_df() // 5dd8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V)) == SR_N) || ((m_sr & (SR_N|SR_V)) == SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -117695,6 +117779,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -117751,7 +117836,6 @@ void m68000_device::slt_pais_df() // 5de0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V)) == SR_N) || ((m_sr & (SR_N|SR_V)) == SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -117813,6 +117897,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -117885,7 +117970,6 @@ void m68000_device::slt_das_df() // 5de8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V)) == SR_N) || ((m_sr & (SR_N|SR_V)) == SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -117947,6 +118031,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -118059,7 +118144,6 @@ adsw2:
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V)) == SR_N) || ((m_sr & (SR_N|SR_V)) == SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -118121,6 +118205,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -118192,7 +118277,6 @@ void m68000_device::slt_adr16_df() // 5df8 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V)) == SR_N) || ((m_sr & (SR_N|SR_V)) == SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -118254,6 +118338,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -118347,7 +118432,6 @@ void m68000_device::slt_adr32_df() // 5df9 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V)) == SR_N) || ((m_sr & (SR_N|SR_V)) == SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -118409,6 +118493,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -118436,7 +118521,6 @@ void m68000_device::sgt_ds_df() // 5ec0 fff8
 	// 384 sccr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V|SR_Z)) == (SR_N|SR_V)) || ((m_sr & (SR_N|SR_V|SR_Z)) == 0);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -118448,6 +118532,7 @@ void m68000_device::sgt_ds_df() // 5ec0 fff8
 roaw2:
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -118499,6 +118584,7 @@ sccr2:
 	alu_or8(m_aluo, 0xff);
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=R.aluo:m_aluo d=none
@@ -118560,6 +118646,7 @@ dbcc2:
 dbcc6:
 	// 0c6 dbcc6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	set_ftu_const();
@@ -118591,12 +118678,12 @@ dbcc6:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -118625,12 +118712,12 @@ dbcc4:
 	// 0c7 dbcc4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -118661,6 +118748,7 @@ dbcc5:
 	// 007 dbcc5
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -118715,7 +118803,6 @@ void m68000_device::sgt_ais_df() // 5ed0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V|SR_Z)) == (SR_N|SR_V)) || ((m_sr & (SR_N|SR_V|SR_Z)) == 0);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -118777,6 +118864,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -118831,7 +118919,6 @@ void m68000_device::sgt_aips_df() // 5ed8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V|SR_Z)) == (SR_N|SR_V)) || ((m_sr & (SR_N|SR_V|SR_Z)) == 0);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -118893,6 +118980,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -118949,7 +119037,6 @@ void m68000_device::sgt_pais_df() // 5ee0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V|SR_Z)) == (SR_N|SR_V)) || ((m_sr & (SR_N|SR_V|SR_Z)) == 0);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -119011,6 +119098,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -119083,7 +119171,6 @@ void m68000_device::sgt_das_df() // 5ee8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V|SR_Z)) == (SR_N|SR_V)) || ((m_sr & (SR_N|SR_V|SR_Z)) == 0);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -119145,6 +119232,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -119257,7 +119345,6 @@ adsw2:
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V|SR_Z)) == (SR_N|SR_V)) || ((m_sr & (SR_N|SR_V|SR_Z)) == 0);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -119319,6 +119406,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -119390,7 +119478,6 @@ void m68000_device::sgt_adr16_df() // 5ef8 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V|SR_Z)) == (SR_N|SR_V)) || ((m_sr & (SR_N|SR_V|SR_Z)) == 0);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -119452,6 +119539,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -119545,7 +119633,6 @@ void m68000_device::sgt_adr32_df() // 5ef9 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = ((m_sr & (SR_N|SR_V|SR_Z)) == (SR_N|SR_V)) || ((m_sr & (SR_N|SR_V|SR_Z)) == 0);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -119607,6 +119694,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -119634,7 +119722,6 @@ void m68000_device::sle_ds_df() // 5fc0 fff8
 	// 384 sccr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & SR_Z) || ((m_sr & (SR_N|SR_V)) == SR_N) || ((m_sr & (SR_N|SR_V)) == SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -119646,6 +119733,7 @@ void m68000_device::sle_ds_df() // 5fc0 fff8
 roaw2:
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -119697,6 +119785,7 @@ sccr2:
 	alu_or8(m_aluo, 0xff);
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=b...... ALU.or_ a=R.aluo:m_aluo d=none
@@ -119758,6 +119847,7 @@ dbcc2:
 dbcc6:
 	// 0c6 dbcc6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	set_ftu_const();
@@ -119789,12 +119879,12 @@ dbcc6:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -119823,12 +119913,12 @@ dbcc4:
 	// 0c7 dbcc4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=15 c=0 m=.....  i=....... ALU.or_ a=none d=none
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -119859,6 +119949,7 @@ dbcc5:
 	// 007 dbcc5
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -119913,7 +120004,6 @@ void m68000_device::sle_ais_df() // 5fd0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & SR_Z) || ((m_sr & (SR_N|SR_V)) == SR_N) || ((m_sr & (SR_N|SR_V)) == SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -119975,6 +120065,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -120029,7 +120120,6 @@ void m68000_device::sle_aips_df() // 5fd8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & SR_Z) || ((m_sr & (SR_N|SR_V)) == SR_N) || ((m_sr & (SR_N|SR_V)) == SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -120091,6 +120181,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -120147,7 +120238,6 @@ void m68000_device::sle_pais_df() // 5fe0 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & SR_Z) || ((m_sr & (SR_N|SR_V)) == SR_N) || ((m_sr & (SR_N|SR_V)) == SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -120209,6 +120299,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -120281,7 +120372,6 @@ void m68000_device::sle_das_df() // 5fe8 fff8
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & SR_Z) || ((m_sr & (SR_N|SR_V)) == SR_N) || ((m_sr & (SR_N|SR_V)) == SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -120343,6 +120433,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -120455,7 +120546,6 @@ adsw2:
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & SR_Z) || ((m_sr & (SR_N|SR_V)) == SR_N) || ((m_sr & (SR_N|SR_V)) == SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -120517,6 +120607,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -120588,7 +120679,6 @@ void m68000_device::sle_adr16_df() // 5ff8 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & SR_Z) || ((m_sr & (SR_N|SR_V)) == SR_N) || ((m_sr & (SR_N|SR_V)) == SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -120650,6 +120740,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -120743,7 +120834,6 @@ void m68000_device::sle_adr32_df() // 5ff9 ffff
 	// 380 sccb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = (m_sr & SR_Z) || ((m_sr & (SR_N|SR_V)) == SR_N) || ((m_sr & (SR_N|SR_V)) == SR_V);
 	m_pc = m_au;
 	// alu r=15 c=1 m=.....  i=b...... ALU.and_ a=none d=0
@@ -120805,6 +120895,7 @@ morw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -120839,6 +120930,7 @@ void m68000_device::bra_rel16_df() // 6000 ffff
 bbcw3:
 	// 085 bbcw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -120896,11 +120988,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -120939,6 +121031,7 @@ void m68000_device::bra_rel8_df() // 6000 ff00
 bbci2:
 	// 045 bbci2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -120972,11 +121065,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -121078,11 +121171,11 @@ void m68000_device::bsr_rel16_df() // 6100 ffff
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -121184,11 +121277,11 @@ void m68000_device::bsr_rel8_df() // 6100 ff00
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -121227,6 +121320,7 @@ void m68000_device::bhi_rel16_df() // 6200 ffff
 bbcw3:
 	// 085 bbcw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -121284,11 +121378,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -121327,6 +121421,7 @@ void m68000_device::bhi_rel8_df() // 6200 ff00
 bbci2:
 	// 045 bbci2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -121360,11 +121455,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -121403,6 +121498,7 @@ void m68000_device::bls_rel16_df() // 6300 ffff
 bbcw3:
 	// 085 bbcw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -121460,11 +121556,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -121503,6 +121599,7 @@ void m68000_device::bls_rel8_df() // 6300 ff00
 bbci2:
 	// 045 bbci2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -121536,11 +121633,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -121579,6 +121676,7 @@ void m68000_device::bcc_rel16_df() // 6400 ffff
 bbcw3:
 	// 085 bbcw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -121636,11 +121734,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -121679,6 +121777,7 @@ void m68000_device::bcc_rel8_df() // 6400 ff00
 bbci2:
 	// 045 bbci2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -121712,11 +121811,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -121755,6 +121854,7 @@ void m68000_device::bcs_rel16_df() // 6500 ffff
 bbcw3:
 	// 085 bbcw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -121812,11 +121912,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -121855,6 +121955,7 @@ void m68000_device::bcs_rel8_df() // 6500 ff00
 bbci2:
 	// 045 bbci2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -121888,11 +121989,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -121931,6 +122032,7 @@ void m68000_device::bne_rel16_df() // 6600 ffff
 bbcw3:
 	// 085 bbcw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -121988,11 +122090,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -122031,6 +122133,7 @@ void m68000_device::bne_rel8_df() // 6600 ff00
 bbci2:
 	// 045 bbci2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -122064,11 +122167,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -122107,6 +122210,7 @@ void m68000_device::beq_rel16_df() // 6700 ffff
 bbcw3:
 	// 085 bbcw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -122164,11 +122268,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -122207,6 +122311,7 @@ void m68000_device::beq_rel8_df() // 6700 ff00
 bbci2:
 	// 045 bbci2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -122240,11 +122345,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -122283,6 +122388,7 @@ void m68000_device::bvc_rel16_df() // 6800 ffff
 bbcw3:
 	// 085 bbcw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -122340,11 +122446,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -122383,6 +122489,7 @@ void m68000_device::bvc_rel8_df() // 6800 ff00
 bbci2:
 	// 045 bbci2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -122416,11 +122523,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -122459,6 +122566,7 @@ void m68000_device::bvs_rel16_df() // 6900 ffff
 bbcw3:
 	// 085 bbcw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -122516,11 +122624,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -122559,6 +122667,7 @@ void m68000_device::bvs_rel8_df() // 6900 ff00
 bbci2:
 	// 045 bbci2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -122592,11 +122701,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -122635,6 +122744,7 @@ void m68000_device::bpl_rel16_df() // 6a00 ffff
 bbcw3:
 	// 085 bbcw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -122692,11 +122802,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -122735,6 +122845,7 @@ void m68000_device::bpl_rel8_df() // 6a00 ff00
 bbci2:
 	// 045 bbci2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -122768,11 +122879,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -122811,6 +122922,7 @@ void m68000_device::bmi_rel16_df() // 6b00 ffff
 bbcw3:
 	// 085 bbcw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -122868,11 +122980,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -122911,6 +123023,7 @@ void m68000_device::bmi_rel8_df() // 6b00 ff00
 bbci2:
 	// 045 bbci2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -122944,11 +123057,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -122987,6 +123100,7 @@ void m68000_device::bge_rel16_df() // 6c00 ffff
 bbcw3:
 	// 085 bbcw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -123044,11 +123158,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -123087,6 +123201,7 @@ void m68000_device::bge_rel8_df() // 6c00 ff00
 bbci2:
 	// 045 bbci2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -123120,11 +123235,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -123163,6 +123278,7 @@ void m68000_device::blt_rel16_df() // 6d00 ffff
 bbcw3:
 	// 085 bbcw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -123220,11 +123336,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -123263,6 +123379,7 @@ void m68000_device::blt_rel8_df() // 6d00 ff00
 bbci2:
 	// 045 bbci2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -123296,11 +123413,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -123339,6 +123456,7 @@ void m68000_device::bgt_rel16_df() // 6e00 ffff
 bbcw3:
 	// 085 bbcw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -123396,11 +123514,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -123439,6 +123557,7 @@ void m68000_device::bgt_rel8_df() // 6e00 ff00
 bbci2:
 	// 045 bbci2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -123472,11 +123591,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -123515,6 +123634,7 @@ void m68000_device::ble_rel16_df() // 6f00 ffff
 bbcw3:
 	// 085 bbcw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -123572,11 +123692,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -123615,6 +123735,7 @@ void m68000_device::ble_rel8_df() // 6f00 ff00
 bbci2:
 	// 045 bbci2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -123648,11 +123769,11 @@ b:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -123684,7 +123805,6 @@ void m68000_device::moveq_imm8o_dd_df() // 7000 f100
 	// 23b rlql1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_da[rx] = ext32(m_ftu);
 	m_au = m_au + 2;
@@ -123693,6 +123813,7 @@ void m68000_device::moveq_imm8o_dd_df() // 7000 f100
 	sr_nzvc();
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -123725,7 +123846,6 @@ void m68000_device::or_b_ds_dd_df() // 8000 f1f8
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=14 c=2 m=.nzvc  i=b....i. ALU.or_ a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -123733,6 +123853,7 @@ void m68000_device::or_b_ds_dd_df() // 8000 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -123790,7 +123911,6 @@ void m68000_device::or_b_ais_dd_df() // 8010 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=b....i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -123798,6 +123918,7 @@ void m68000_device::or_b_ais_dd_df() // 8010 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -123860,7 +123981,6 @@ void m68000_device::or_b_aips_dd_df() // 8018 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=b....i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -123868,6 +123988,7 @@ void m68000_device::or_b_aips_dd_df() // 8018 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -123932,7 +124053,6 @@ void m68000_device::or_b_pais_dd_df() // 8020 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=b....i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -123940,6 +124060,7 @@ void m68000_device::or_b_pais_dd_df() // 8020 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -124020,7 +124141,6 @@ void m68000_device::or_b_das_dd_df() // 8028 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=b....i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -124028,6 +124148,7 @@ void m68000_device::or_b_das_dd_df() // 8028 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -124148,7 +124269,6 @@ adsw2:
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=b....i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -124156,6 +124276,7 @@ adsw2:
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -124235,7 +124356,6 @@ void m68000_device::or_b_adr16_dd_df() // 8038 f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=b....i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -124243,6 +124363,7 @@ void m68000_device::or_b_adr16_dd_df() // 8038 f1ff
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -124344,7 +124465,6 @@ void m68000_device::or_b_adr32_dd_df() // 8039 f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=b....i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -124352,6 +124472,7 @@ void m68000_device::or_b_adr32_dd_df() // 8039 f1ff
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -124431,7 +124552,6 @@ void m68000_device::or_b_dpc_dd_df() // 803a f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=b....i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -124439,6 +124559,7 @@ void m68000_device::or_b_dpc_dd_df() // 803a f1ff
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -124558,7 +124679,6 @@ adsw2:
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=b....i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -124566,6 +124686,7 @@ adsw2:
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -124625,7 +124746,6 @@ void m68000_device::or_b_imm8_dd_df() // 803c f1ff
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=14 c=2 m=.nzvc  i=b....i. ALU.or_ a=R.dtl:m_dt d=R.dxl:m_da[rx]
@@ -124633,6 +124753,7 @@ void m68000_device::or_b_imm8_dd_df() // 803c f1ff
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -124668,7 +124789,6 @@ void m68000_device::or_w_ds_dd_df() // 8040 f1f8
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=14 c=2 m=.nzvc  i=.....i. ALU.or_ a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -124676,6 +124796,7 @@ void m68000_device::or_w_ds_dd_df() // 8040 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -124736,7 +124857,6 @@ void m68000_device::or_w_ais_dd_df() // 8050 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=.....i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -124744,6 +124864,7 @@ void m68000_device::or_w_ais_dd_df() // 8050 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -124809,7 +124930,6 @@ void m68000_device::or_w_aips_dd_df() // 8058 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=.....i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -124817,6 +124937,7 @@ void m68000_device::or_w_aips_dd_df() // 8058 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -124884,7 +125005,6 @@ void m68000_device::or_w_pais_dd_df() // 8060 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=.....i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -124892,6 +125012,7 @@ void m68000_device::or_w_pais_dd_df() // 8060 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -124975,7 +125096,6 @@ void m68000_device::or_w_das_dd_df() // 8068 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=.....i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -124983,6 +125103,7 @@ void m68000_device::or_w_das_dd_df() // 8068 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -125106,7 +125227,6 @@ adsw2:
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=.....i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -125114,6 +125234,7 @@ adsw2:
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -125196,7 +125317,6 @@ void m68000_device::or_w_adr16_dd_df() // 8078 f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=.....i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -125204,6 +125324,7 @@ void m68000_device::or_w_adr16_dd_df() // 8078 f1ff
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -125308,7 +125429,6 @@ void m68000_device::or_w_adr32_dd_df() // 8079 f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=.....i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -125316,6 +125436,7 @@ void m68000_device::or_w_adr32_dd_df() // 8079 f1ff
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -125398,7 +125519,6 @@ void m68000_device::or_w_dpc_dd_df() // 807a f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=.....i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -125406,6 +125526,7 @@ void m68000_device::or_w_dpc_dd_df() // 807a f1ff
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -125528,7 +125649,6 @@ adsw2:
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=.....i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -125536,6 +125656,7 @@ adsw2:
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -125595,7 +125716,6 @@ void m68000_device::or_w_imm16_dd_df() // 807c f1ff
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=14 c=2 m=.nzvc  i=.....i. ALU.or_ a=R.dtl:m_dt d=R.dxl:m_da[rx]
@@ -125603,6 +125723,7 @@ void m68000_device::or_w_imm16_dd_df() // 807c f1ff
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -125638,7 +125759,6 @@ void m68000_device::or_l_ds_dd_df() // 8080 f1f8
 	// 1c5 rorl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=14 c=2 m=.nzvc  i=.l...i. ALU.or_ a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -125672,6 +125792,7 @@ void m68000_device::or_l_ds_dd_df() // 8080 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=14 c=0 m=.....  i=.l..... ALU.or_ a=R.aluo:m_aluo d=none
@@ -125736,7 +125857,6 @@ void m68000_device::or_l_ais_dd_df() // 8090 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=.l...i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -125767,6 +125887,7 @@ void m68000_device::or_l_ais_dd_df() // 8090 f1f8
 	sr_nzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=14 c=0 m=.....  i=.l..... ALU.or_ a=R.aluo:m_aluo d=none
@@ -125835,7 +125956,6 @@ void m68000_device::or_l_aips_dd_df() // 8098 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=.l...i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -125866,6 +125986,7 @@ void m68000_device::or_l_aips_dd_df() // 8098 f1f8
 	sr_nzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=14 c=0 m=.....  i=.l..... ALU.or_ a=R.aluo:m_aluo d=none
@@ -125935,7 +126056,6 @@ void m68000_device::or_l_pais_dd_df() // 80a0 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=.l...i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -125966,6 +126086,7 @@ void m68000_device::or_l_pais_dd_df() // 80a0 f1f8
 	sr_nzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=14 c=0 m=.....  i=.l..... ALU.or_ a=R.aluo:m_aluo d=none
@@ -126052,7 +126173,6 @@ void m68000_device::or_l_das_dd_df() // 80a8 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=.l...i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -126083,6 +126203,7 @@ void m68000_device::or_l_das_dd_df() // 80a8 f1f8
 	sr_nzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=14 c=0 m=.....  i=.l..... ALU.or_ a=R.aluo:m_aluo d=none
@@ -126209,7 +126330,6 @@ adsl2:
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=.l...i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -126240,6 +126360,7 @@ adsl2:
 	sr_nzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=14 c=0 m=.....  i=.l..... ALU.or_ a=R.aluo:m_aluo d=none
@@ -126329,7 +126450,6 @@ void m68000_device::or_l_adr16_dd_df() // 80b8 f1ff
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=.l...i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -126360,6 +126480,7 @@ void m68000_device::or_l_adr16_dd_df() // 80b8 f1ff
 	sr_nzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=14 c=0 m=.....  i=.l..... ALU.or_ a=R.aluo:m_aluo d=none
@@ -126471,7 +126592,6 @@ void m68000_device::or_l_adr32_dd_df() // 80b9 f1ff
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=.l...i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -126502,6 +126622,7 @@ void m68000_device::or_l_adr32_dd_df() // 80b9 f1ff
 	sr_nzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=14 c=0 m=.....  i=.l..... ALU.or_ a=R.aluo:m_aluo d=none
@@ -126587,7 +126708,6 @@ void m68000_device::or_l_dpc_dd_df() // 80ba f1ff
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=.l...i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -126618,6 +126738,7 @@ void m68000_device::or_l_dpc_dd_df() // 80ba f1ff
 	sr_nzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=14 c=0 m=.....  i=.l..... ALU.or_ a=R.aluo:m_aluo d=none
@@ -126743,7 +126864,6 @@ adsl2:
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=14 c=2 m=.nzvc  i=.l...i. ALU.or_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -126774,6 +126894,7 @@ adsl2:
 	sr_nzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=14 c=0 m=.....  i=.l..... ALU.or_ a=R.aluo:m_aluo d=none
@@ -126838,7 +126959,6 @@ void m68000_device::or_l_imm32_dd_df() // 80bc f1ff
 	// 1c5 rorl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=14 c=2 m=.nzvc  i=.l...i. ALU.or_ a=R.dtl:m_dt d=R.dxl:m_da[rx]
@@ -126872,6 +126992,7 @@ void m68000_device::or_l_imm32_dd_df() // 80bc f1ff
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=14 c=0 m=.....  i=.l..... ALU.or_ a=R.aluo:m_aluo d=none
@@ -127069,11 +127190,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -127101,10 +127222,10 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -127214,7 +127335,6 @@ dvumd:
 	// 0c0 dvumd
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	m_au = m_pc + 2;
 	// alu r=1 c=6 m=.....  i=.l.d... ALU.sla1 a=R.aluo:m_aluo d=-1
@@ -127224,7 +127344,6 @@ dvumf:
 	// 080 dvumf
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	set_16h(m_da[rx], m_at);
 	m_au = m_pc + 2;
@@ -127234,6 +127353,7 @@ dvumf:
 dvum0:
 	// 212 dvum0
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -127473,11 +127593,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -127505,10 +127625,10 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -127618,7 +127738,6 @@ dvumd:
 	// 0c0 dvumd
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	m_au = m_pc + 2;
 	// alu r=1 c=6 m=.....  i=.l.d... ALU.sla1 a=R.aluo:m_aluo d=-1
@@ -127628,7 +127747,6 @@ dvumf:
 	// 080 dvumf
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	set_16h(m_da[rx], m_at);
 	m_au = m_pc + 2;
@@ -127638,6 +127756,7 @@ dvumf:
 dvum0:
 	// 212 dvum0
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -127881,11 +128000,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -127913,10 +128032,10 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -128026,7 +128145,6 @@ dvumd:
 	// 0c0 dvumd
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	m_au = m_pc + 2;
 	// alu r=1 c=6 m=.....  i=.l.d... ALU.sla1 a=R.aluo:m_aluo d=-1
@@ -128036,7 +128154,6 @@ dvumf:
 	// 080 dvumf
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	set_16h(m_da[rx], m_at);
 	m_au = m_pc + 2;
@@ -128046,6 +128163,7 @@ dvumf:
 dvum0:
 	// 212 dvum0
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -128291,11 +128409,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -128323,10 +128441,10 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -128436,7 +128554,6 @@ dvumd:
 	// 0c0 dvumd
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	m_au = m_pc + 2;
 	// alu r=1 c=6 m=.....  i=.l.d... ALU.sla1 a=R.aluo:m_aluo d=-1
@@ -128446,7 +128563,6 @@ dvumf:
 	// 080 dvumf
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	set_16h(m_da[rx], m_at);
 	m_au = m_pc + 2;
@@ -128456,6 +128572,7 @@ dvumf:
 dvum0:
 	// 212 dvum0
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -128717,11 +128834,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -128749,10 +128866,10 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -128862,7 +128979,6 @@ dvumd:
 	// 0c0 dvumd
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	m_au = m_pc + 2;
 	// alu r=1 c=6 m=.....  i=.l.d... ALU.sla1 a=R.aluo:m_aluo d=-1
@@ -128872,7 +128988,6 @@ dvumf:
 	// 080 dvumf
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	set_16h(m_da[rx], m_at);
 	m_au = m_pc + 2;
@@ -128882,6 +128997,7 @@ dvumf:
 dvum0:
 	// 212 dvum0
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -129181,11 +129297,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -129213,10 +129329,10 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -129326,7 +129442,6 @@ dvumd:
 	// 0c0 dvumd
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	m_au = m_pc + 2;
 	// alu r=1 c=6 m=.....  i=.l.d... ALU.sla1 a=R.aluo:m_aluo d=-1
@@ -129336,7 +129451,6 @@ dvumf:
 	// 080 dvumf
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	set_16h(m_da[rx], m_at);
 	m_au = m_pc + 2;
@@ -129346,6 +129460,7 @@ dvumf:
 dvum0:
 	// 212 dvum0
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -129606,11 +129721,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -129638,10 +129753,10 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -129751,7 +129866,6 @@ dvumd:
 	// 0c0 dvumd
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	m_au = m_pc + 2;
 	// alu r=1 c=6 m=.....  i=.l.d... ALU.sla1 a=R.aluo:m_aluo d=-1
@@ -129761,7 +129875,6 @@ dvumf:
 	// 080 dvumf
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	set_16h(m_da[rx], m_at);
 	m_au = m_pc + 2;
@@ -129771,6 +129884,7 @@ dvumf:
 dvum0:
 	// 212 dvum0
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -130052,11 +130166,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -130084,10 +130198,10 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -130197,7 +130311,6 @@ dvumd:
 	// 0c0 dvumd
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	m_au = m_pc + 2;
 	// alu r=1 c=6 m=.....  i=.l.d... ALU.sla1 a=R.aluo:m_aluo d=-1
@@ -130207,7 +130320,6 @@ dvumf:
 	// 080 dvumf
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	set_16h(m_da[rx], m_at);
 	m_au = m_pc + 2;
@@ -130217,6 +130329,7 @@ dvumf:
 dvum0:
 	// 212 dvum0
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -130477,11 +130590,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -130509,10 +130622,10 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -130622,7 +130735,6 @@ dvumd:
 	// 0c0 dvumd
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	m_au = m_pc + 2;
 	// alu r=1 c=6 m=.....  i=.l.d... ALU.sla1 a=R.aluo:m_aluo d=-1
@@ -130632,7 +130744,6 @@ dvumf:
 	// 080 dvumf
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	set_16h(m_da[rx], m_at);
 	m_au = m_pc + 2;
@@ -130642,6 +130753,7 @@ dvumf:
 dvum0:
 	// 212 dvum0
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -130940,11 +131052,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -130972,10 +131084,10 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -131085,7 +131197,6 @@ dvumd:
 	// 0c0 dvumd
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	m_au = m_pc + 2;
 	// alu r=1 c=6 m=.....  i=.l.d... ALU.sla1 a=R.aluo:m_aluo d=-1
@@ -131095,7 +131206,6 @@ dvumf:
 	// 080 dvumf
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	set_16h(m_da[rx], m_at);
 	m_au = m_pc + 2;
@@ -131105,6 +131215,7 @@ dvumf:
 dvum0:
 	// 212 dvum0
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -131343,11 +131454,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -131375,10 +131486,10 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -131488,7 +131599,6 @@ dvumd:
 	// 0c0 dvumd
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	m_au = m_pc + 2;
 	// alu r=1 c=6 m=.....  i=.l.d... ALU.sla1 a=R.aluo:m_aluo d=-1
@@ -131498,7 +131608,6 @@ dvumf:
 	// 080 dvumf
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_aluo;
 	set_16h(m_da[rx], m_at);
 	m_au = m_pc + 2;
@@ -131508,6 +131617,7 @@ dvumf:
 dvum0:
 	// 212 dvum0
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -131544,7 +131654,6 @@ void m68000_device::sbcd_ds_dd_df() // 8100 f1f8
 	// 1cd rbrb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=9 c=2 m=xnzvc  i=b....i. ALU.sbcd a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -131573,6 +131682,7 @@ void m68000_device::sbcd_ds_dd_df() // 8100 f1f8
 	// alu r=9 c=3 m=xnzvc  i=b.....f ALU.sbcd a=R.aluo:m_aluo d=?
 	// 238 rbrb3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -131617,7 +131727,6 @@ void m68000_device::sbcd_pais_paid_df() // 8108 f1f8
 	// 04e asbb4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_DATA | SSW_R;
 	m_edb = m_program.read_interruptible(m_aob & ~1, m_aob & 1 ? 0x00ff : 0xff00);
 	if(!(m_aob & 1))
@@ -131664,6 +131773,7 @@ void m68000_device::sbcd_pais_paid_df() // 8108 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -131713,7 +131823,6 @@ void m68000_device::or_b_dd_ais_df() // 8110 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -131740,6 +131849,7 @@ void m68000_device::or_b_dd_ais_df() // 8110 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -131795,7 +131905,6 @@ void m68000_device::or_b_dd_aips_df() // 8118 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -131822,6 +131931,7 @@ void m68000_device::or_b_dd_aips_df() // 8118 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -131879,7 +131989,6 @@ void m68000_device::or_b_dd_pais_df() // 8120 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -131906,6 +132015,7 @@ void m68000_device::or_b_dd_pais_df() // 8120 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -131979,7 +132089,6 @@ void m68000_device::or_b_dd_das_df() // 8128 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -132006,6 +132115,7 @@ void m68000_device::or_b_dd_das_df() // 8128 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -132119,7 +132229,6 @@ adsw2:
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -132146,6 +132255,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -132218,7 +132328,6 @@ void m68000_device::or_b_dd_adr16_df() // 8138 f1ff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -132245,6 +132354,7 @@ void m68000_device::or_b_dd_adr16_df() // 8138 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -132339,7 +132449,6 @@ void m68000_device::or_b_dd_adr32_df() // 8139 f1ff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -132366,6 +132475,7 @@ void m68000_device::or_b_dd_adr32_df() // 8139 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -132419,7 +132529,6 @@ void m68000_device::or_w_dd_ais_df() // 8150 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -132446,6 +132555,7 @@ void m68000_device::or_w_dd_ais_df() // 8150 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -132509,7 +132619,6 @@ void m68000_device::or_w_dd_aips_df() // 8158 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -132536,6 +132645,7 @@ void m68000_device::or_w_dd_aips_df() // 8158 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -132601,7 +132711,6 @@ void m68000_device::or_w_dd_pais_df() // 8160 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -132628,6 +132737,7 @@ void m68000_device::or_w_dd_pais_df() // 8160 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -132709,7 +132819,6 @@ void m68000_device::or_w_dd_das_df() // 8168 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -132736,6 +132845,7 @@ void m68000_device::or_w_dd_das_df() // 8168 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -132857,7 +132967,6 @@ adsw2:
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -132884,6 +132993,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -132964,7 +133074,6 @@ void m68000_device::or_w_dd_adr16_df() // 8178 f1ff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -132991,6 +133100,7 @@ void m68000_device::or_w_dd_adr16_df() // 8178 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -133093,7 +133203,6 @@ void m68000_device::or_w_dd_adr32_df() // 8179 f1ff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -133120,6 +133229,7 @@ void m68000_device::or_w_dd_adr32_df() // 8179 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -133199,7 +133309,6 @@ void m68000_device::or_l_dd_ais_df() // 8190 f1f8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -133249,6 +133358,7 @@ void m68000_device::or_l_dd_ais_df() // 8190 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -133332,7 +133442,6 @@ void m68000_device::or_l_dd_aips_df() // 8198 f1f8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -133382,6 +133491,7 @@ void m68000_device::or_l_dd_aips_df() // 8198 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -133466,7 +133576,6 @@ void m68000_device::or_l_dd_pais_df() // 81a0 f1f8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -133516,6 +133625,7 @@ void m68000_device::or_l_dd_pais_df() // 81a0 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -133617,7 +133727,6 @@ void m68000_device::or_l_dd_das_df() // 81a8 f1f8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -133667,6 +133776,7 @@ void m68000_device::or_l_dd_das_df() // 81a8 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -133808,7 +133918,6 @@ adsl2:
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -133858,6 +133967,7 @@ adsl2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -133962,7 +134072,6 @@ void m68000_device::or_l_dd_adr16_df() // 81b8 f1ff
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -134012,6 +134121,7 @@ void m68000_device::or_l_dd_adr16_df() // 81b8 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -134138,7 +134248,6 @@ void m68000_device::or_l_dd_adr32_df() // 81b9 f1ff
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -134188,6 +134297,7 @@ void m68000_device::or_l_dd_adr32_df() // 81b9 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -134408,11 +134518,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -134481,7 +134591,6 @@ dvumz:
 	// 2d5 dvumz
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs09:
@@ -134494,6 +134603,7 @@ dvs09:
 dvuma:
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -134621,7 +134731,6 @@ dvs17:
 	// 04d dvs17
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_isr & SR_N;
 	set_16l(m_at, m_aluo);
 	m_au = m_pc + 2;
@@ -134652,7 +134761,6 @@ dvs1a:
 dvs1f:
 	// 08a dvs1f
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	// alu r=1 c=2 m=.nzvc  i=.l.d.i. ALU.sub a=alub d=0
 	alu_sub(m_alub, 0x0000);
 	sr_nzvc();
@@ -134684,6 +134792,7 @@ dvs1e:
 leaa2:
 	// 066 leaa2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -134713,14 +134822,12 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs1c:
 	// 251 dvs1c
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_at, m_aluo);
 	m_au = m_pc + 2;
 	// alu r=1 c=1 m=.nzvc  i=.l.d.i. ALU.and_ a=alub d=-1
@@ -134947,11 +135054,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -135020,7 +135127,6 @@ dvumz:
 	// 2d5 dvumz
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs09:
@@ -135033,6 +135139,7 @@ dvs09:
 dvuma:
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -135160,7 +135267,6 @@ dvs17:
 	// 04d dvs17
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_isr & SR_N;
 	set_16l(m_at, m_aluo);
 	m_au = m_pc + 2;
@@ -135191,7 +135297,6 @@ dvs1a:
 dvs1f:
 	// 08a dvs1f
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	// alu r=1 c=2 m=.nzvc  i=.l.d.i. ALU.sub a=alub d=0
 	alu_sub(m_alub, 0x0000);
 	sr_nzvc();
@@ -135223,6 +135328,7 @@ dvs1e:
 leaa2:
 	// 066 leaa2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -135252,14 +135358,12 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs1c:
 	// 251 dvs1c
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_at, m_aluo);
 	m_au = m_pc + 2;
 	// alu r=1 c=1 m=.nzvc  i=.l.d.i. ALU.and_ a=alub d=-1
@@ -135490,11 +135594,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -135563,7 +135667,6 @@ dvumz:
 	// 2d5 dvumz
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs09:
@@ -135576,6 +135679,7 @@ dvs09:
 dvuma:
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -135703,7 +135807,6 @@ dvs17:
 	// 04d dvs17
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_isr & SR_N;
 	set_16l(m_at, m_aluo);
 	m_au = m_pc + 2;
@@ -135734,7 +135837,6 @@ dvs1a:
 dvs1f:
 	// 08a dvs1f
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	// alu r=1 c=2 m=.nzvc  i=.l.d.i. ALU.sub a=alub d=0
 	alu_sub(m_alub, 0x0000);
 	sr_nzvc();
@@ -135766,6 +135868,7 @@ dvs1e:
 leaa2:
 	// 066 leaa2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -135795,14 +135898,12 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs1c:
 	// 251 dvs1c
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_at, m_aluo);
 	m_au = m_pc + 2;
 	// alu r=1 c=1 m=.nzvc  i=.l.d.i. ALU.and_ a=alub d=-1
@@ -136035,11 +136136,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -136108,7 +136209,6 @@ dvumz:
 	// 2d5 dvumz
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs09:
@@ -136121,6 +136221,7 @@ dvs09:
 dvuma:
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -136248,7 +136349,6 @@ dvs17:
 	// 04d dvs17
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_isr & SR_N;
 	set_16l(m_at, m_aluo);
 	m_au = m_pc + 2;
@@ -136279,7 +136379,6 @@ dvs1a:
 dvs1f:
 	// 08a dvs1f
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	// alu r=1 c=2 m=.nzvc  i=.l.d.i. ALU.sub a=alub d=0
 	alu_sub(m_alub, 0x0000);
 	sr_nzvc();
@@ -136311,6 +136410,7 @@ dvs1e:
 leaa2:
 	// 066 leaa2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -136340,14 +136440,12 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs1c:
 	// 251 dvs1c
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_at, m_aluo);
 	m_au = m_pc + 2;
 	// alu r=1 c=1 m=.nzvc  i=.l.d.i. ALU.and_ a=alub d=-1
@@ -136596,11 +136694,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -136669,7 +136767,6 @@ dvumz:
 	// 2d5 dvumz
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs09:
@@ -136682,6 +136779,7 @@ dvs09:
 dvuma:
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -136809,7 +136907,6 @@ dvs17:
 	// 04d dvs17
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_isr & SR_N;
 	set_16l(m_at, m_aluo);
 	m_au = m_pc + 2;
@@ -136840,7 +136937,6 @@ dvs1a:
 dvs1f:
 	// 08a dvs1f
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	// alu r=1 c=2 m=.nzvc  i=.l.d.i. ALU.sub a=alub d=0
 	alu_sub(m_alub, 0x0000);
 	sr_nzvc();
@@ -136872,6 +136968,7 @@ dvs1e:
 leaa2:
 	// 066 leaa2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -136901,14 +136998,12 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs1c:
 	// 251 dvs1c
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_at, m_aluo);
 	m_au = m_pc + 2;
 	// alu r=1 c=1 m=.nzvc  i=.l.d.i. ALU.and_ a=alub d=-1
@@ -137195,11 +137290,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -137268,7 +137363,6 @@ dvumz:
 	// 2d5 dvumz
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs09:
@@ -137281,6 +137375,7 @@ dvs09:
 dvuma:
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -137408,7 +137503,6 @@ dvs17:
 	// 04d dvs17
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_isr & SR_N;
 	set_16l(m_at, m_aluo);
 	m_au = m_pc + 2;
@@ -137439,7 +137533,6 @@ dvs1a:
 dvs1f:
 	// 08a dvs1f
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	// alu r=1 c=2 m=.nzvc  i=.l.d.i. ALU.sub a=alub d=0
 	alu_sub(m_alub, 0x0000);
 	sr_nzvc();
@@ -137471,6 +137564,7 @@ dvs1e:
 leaa2:
 	// 066 leaa2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -137500,14 +137594,12 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs1c:
 	// 251 dvs1c
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_at, m_aluo);
 	m_au = m_pc + 2;
 	// alu r=1 c=1 m=.nzvc  i=.l.d.i. ALU.and_ a=alub d=-1
@@ -137755,11 +137847,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -137828,7 +137920,6 @@ dvumz:
 	// 2d5 dvumz
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs09:
@@ -137841,6 +137932,7 @@ dvs09:
 dvuma:
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -137968,7 +138060,6 @@ dvs17:
 	// 04d dvs17
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_isr & SR_N;
 	set_16l(m_at, m_aluo);
 	m_au = m_pc + 2;
@@ -137999,7 +138090,6 @@ dvs1a:
 dvs1f:
 	// 08a dvs1f
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	// alu r=1 c=2 m=.nzvc  i=.l.d.i. ALU.sub a=alub d=0
 	alu_sub(m_alub, 0x0000);
 	sr_nzvc();
@@ -138031,6 +138121,7 @@ dvs1e:
 leaa2:
 	// 066 leaa2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -138060,14 +138151,12 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs1c:
 	// 251 dvs1c
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_at, m_aluo);
 	m_au = m_pc + 2;
 	// alu r=1 c=1 m=.nzvc  i=.l.d.i. ALU.and_ a=alub d=-1
@@ -138336,11 +138425,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -138409,7 +138498,6 @@ dvumz:
 	// 2d5 dvumz
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs09:
@@ -138422,6 +138510,7 @@ dvs09:
 dvuma:
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -138549,7 +138638,6 @@ dvs17:
 	// 04d dvs17
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_isr & SR_N;
 	set_16l(m_at, m_aluo);
 	m_au = m_pc + 2;
@@ -138580,7 +138668,6 @@ dvs1a:
 dvs1f:
 	// 08a dvs1f
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	// alu r=1 c=2 m=.nzvc  i=.l.d.i. ALU.sub a=alub d=0
 	alu_sub(m_alub, 0x0000);
 	sr_nzvc();
@@ -138612,6 +138699,7 @@ dvs1e:
 leaa2:
 	// 066 leaa2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -138641,14 +138729,12 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs1c:
 	// 251 dvs1c
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_at, m_aluo);
 	m_au = m_pc + 2;
 	// alu r=1 c=1 m=.nzvc  i=.l.d.i. ALU.and_ a=alub d=-1
@@ -138896,11 +138982,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -138969,7 +139055,6 @@ dvumz:
 	// 2d5 dvumz
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs09:
@@ -138982,6 +139067,7 @@ dvs09:
 dvuma:
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -139109,7 +139195,6 @@ dvs17:
 	// 04d dvs17
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_isr & SR_N;
 	set_16l(m_at, m_aluo);
 	m_au = m_pc + 2;
@@ -139140,7 +139225,6 @@ dvs1a:
 dvs1f:
 	// 08a dvs1f
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	// alu r=1 c=2 m=.nzvc  i=.l.d.i. ALU.sub a=alub d=0
 	alu_sub(m_alub, 0x0000);
 	sr_nzvc();
@@ -139172,6 +139256,7 @@ dvs1e:
 leaa2:
 	// 066 leaa2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -139201,14 +139286,12 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs1c:
 	// 251 dvs1c
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_at, m_aluo);
 	m_au = m_pc + 2;
 	// alu r=1 c=1 m=.nzvc  i=.l.d.i. ALU.and_ a=alub d=-1
@@ -139494,11 +139577,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -139567,7 +139650,6 @@ dvumz:
 	// 2d5 dvumz
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs09:
@@ -139580,6 +139662,7 @@ dvs09:
 dvuma:
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -139707,7 +139790,6 @@ dvs17:
 	// 04d dvs17
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_isr & SR_N;
 	set_16l(m_at, m_aluo);
 	m_au = m_pc + 2;
@@ -139738,7 +139820,6 @@ dvs1a:
 dvs1f:
 	// 08a dvs1f
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	// alu r=1 c=2 m=.nzvc  i=.l.d.i. ALU.sub a=alub d=0
 	alu_sub(m_alub, 0x0000);
 	sr_nzvc();
@@ -139770,6 +139851,7 @@ dvs1e:
 leaa2:
 	// 066 leaa2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -139799,14 +139881,12 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs1c:
 	// 251 dvs1c
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_at, m_aluo);
 	m_au = m_pc + 2;
 	// alu r=1 c=1 m=.nzvc  i=.l.d.i. ALU.and_ a=alub d=-1
@@ -140032,11 +140112,11 @@ dvur2:
 	// 363 b
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// 34c mmrw3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -140105,7 +140185,6 @@ dvumz:
 	// 2d5 dvumz
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs09:
@@ -140118,6 +140197,7 @@ dvs09:
 dvuma:
 	// 0e6 dvuma
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -140245,7 +140325,6 @@ dvs17:
 	// 04d dvs17
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_t = m_isr & SR_N;
 	set_16l(m_at, m_aluo);
 	m_au = m_pc + 2;
@@ -140276,7 +140355,6 @@ dvs1a:
 dvs1f:
 	// 08a dvs1f
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	// alu r=1 c=2 m=.nzvc  i=.l.d.i. ALU.sub a=alub d=0
 	alu_sub(m_alub, 0x0000);
 	sr_nzvc();
@@ -140308,6 +140386,7 @@ dvs1e:
 leaa2:
 	// 066 leaa2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -140337,14 +140416,12 @@ dvum4:
 	// 2d1 dvum4
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	goto dvuma;
 dvs1c:
 	// 251 dvs1c
 	m_aob = m_pc;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_at, m_aluo);
 	m_au = m_pc + 2;
 	// alu r=1 c=1 m=.nzvc  i=.l.d.i. ALU.and_ a=alub d=-1
@@ -140360,7 +140437,6 @@ void m68000_device::sub_b_ds_dd_df() // 9000 f1f8
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=5 c=2 m=xnzvc  i=b....i. ALU.sub a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -140368,6 +140444,7 @@ void m68000_device::sub_b_ds_dd_df() // 9000 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -140423,7 +140500,6 @@ void m68000_device::sub_b_ais_dd_df() // 9010 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=b....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -140431,6 +140507,7 @@ void m68000_device::sub_b_ais_dd_df() // 9010 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -140490,7 +140567,6 @@ void m68000_device::sub_b_aips_dd_df() // 9018 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=b....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -140498,6 +140574,7 @@ void m68000_device::sub_b_aips_dd_df() // 9018 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -140559,7 +140636,6 @@ void m68000_device::sub_b_pais_dd_df() // 9020 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=b....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -140567,6 +140643,7 @@ void m68000_device::sub_b_pais_dd_df() // 9020 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -140644,7 +140721,6 @@ void m68000_device::sub_b_das_dd_df() // 9028 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=b....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -140652,6 +140728,7 @@ void m68000_device::sub_b_das_dd_df() // 9028 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -140767,7 +140844,6 @@ adsw2:
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=b....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -140775,6 +140851,7 @@ adsw2:
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -140851,7 +140928,6 @@ void m68000_device::sub_b_adr16_dd_df() // 9038 f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=b....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -140859,6 +140935,7 @@ void m68000_device::sub_b_adr16_dd_df() // 9038 f1ff
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -140956,7 +141033,6 @@ void m68000_device::sub_b_adr32_dd_df() // 9039 f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=b....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -140964,6 +141040,7 @@ void m68000_device::sub_b_adr32_dd_df() // 9039 f1ff
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -141040,7 +141117,6 @@ void m68000_device::sub_b_dpc_dd_df() // 903a f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=b....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -141048,6 +141124,7 @@ void m68000_device::sub_b_dpc_dd_df() // 903a f1ff
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -141162,7 +141239,6 @@ adsw2:
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=b....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -141170,6 +141246,7 @@ adsw2:
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -141227,7 +141304,6 @@ void m68000_device::sub_b_imm8_dd_df() // 903c f1ff
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=5 c=2 m=xnzvc  i=b....i. ALU.sub a=R.dtl:m_dt d=R.dxl:m_da[rx]
@@ -141235,6 +141311,7 @@ void m68000_device::sub_b_imm8_dd_df() // 903c f1ff
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -141269,7 +141346,6 @@ void m68000_device::sub_w_ds_dd_df() // 9040 f1f8
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=5 c=2 m=xnzvc  i=.....i. ALU.sub a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -141277,6 +141353,7 @@ void m68000_device::sub_w_ds_dd_df() // 9040 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -141311,7 +141388,6 @@ void m68000_device::sub_w_as_dd_df() // 9048 f1f8
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=5 c=2 m=xnzvc  i=.....i. ALU.sub a=R.ayl:m_da[ry] d=R.dxl:m_da[rx]
@@ -141319,6 +141395,7 @@ void m68000_device::sub_w_as_dd_df() // 9048 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -141377,7 +141454,6 @@ void m68000_device::sub_w_ais_dd_df() // 9050 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -141385,6 +141461,7 @@ void m68000_device::sub_w_ais_dd_df() // 9050 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -141447,7 +141524,6 @@ void m68000_device::sub_w_aips_dd_df() // 9058 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -141455,6 +141531,7 @@ void m68000_device::sub_w_aips_dd_df() // 9058 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -141519,7 +141596,6 @@ void m68000_device::sub_w_pais_dd_df() // 9060 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -141527,6 +141603,7 @@ void m68000_device::sub_w_pais_dd_df() // 9060 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -141607,7 +141684,6 @@ void m68000_device::sub_w_das_dd_df() // 9068 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -141615,6 +141691,7 @@ void m68000_device::sub_w_das_dd_df() // 9068 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -141733,7 +141810,6 @@ adsw2:
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -141741,6 +141817,7 @@ adsw2:
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -141820,7 +141897,6 @@ void m68000_device::sub_w_adr16_dd_df() // 9078 f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -141828,6 +141904,7 @@ void m68000_device::sub_w_adr16_dd_df() // 9078 f1ff
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -141928,7 +142005,6 @@ void m68000_device::sub_w_adr32_dd_df() // 9079 f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -141936,6 +142012,7 @@ void m68000_device::sub_w_adr32_dd_df() // 9079 f1ff
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -142015,7 +142092,6 @@ void m68000_device::sub_w_dpc_dd_df() // 907a f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -142023,6 +142099,7 @@ void m68000_device::sub_w_dpc_dd_df() // 907a f1ff
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -142140,7 +142217,6 @@ adsw2:
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -142148,6 +142224,7 @@ adsw2:
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -142205,7 +142282,6 @@ void m68000_device::sub_w_imm16_dd_df() // 907c f1ff
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=5 c=2 m=xnzvc  i=.....i. ALU.sub a=R.dtl:m_dt d=R.dxl:m_da[rx]
@@ -142213,6 +142289,7 @@ void m68000_device::sub_w_imm16_dd_df() // 907c f1ff
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -142247,7 +142324,6 @@ void m68000_device::sub_l_ds_dd_df() // 9080 f1f8
 	// 1c5 rorl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=5 c=2 m=xnzvc  i=.l...i. ALU.sub a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -142280,6 +142356,7 @@ void m68000_device::sub_l_ds_dd_df() // 9080 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -142297,7 +142374,6 @@ void m68000_device::sub_l_as_dd_df() // 9088 f1f8
 	// 1c5 rorl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=5 c=2 m=xnzvc  i=.l...i. ALU.sub a=R.ayl:m_da[ry] d=R.dxl:m_da[rx]
@@ -142330,6 +142406,7 @@ void m68000_device::sub_l_as_dd_df() // 9088 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -142392,7 +142469,6 @@ void m68000_device::sub_l_ais_dd_df() // 9090 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=.l...i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -142423,6 +142499,7 @@ void m68000_device::sub_l_ais_dd_df() // 9090 f1f8
 	sr_xnzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -142488,7 +142565,6 @@ void m68000_device::sub_l_aips_dd_df() // 9098 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=.l...i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -142519,6 +142595,7 @@ void m68000_device::sub_l_aips_dd_df() // 9098 f1f8
 	sr_xnzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -142585,7 +142662,6 @@ void m68000_device::sub_l_pais_dd_df() // 90a0 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=.l...i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -142616,6 +142692,7 @@ void m68000_device::sub_l_pais_dd_df() // 90a0 f1f8
 	sr_xnzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -142699,7 +142776,6 @@ void m68000_device::sub_l_das_dd_df() // 90a8 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=.l...i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -142730,6 +142806,7 @@ void m68000_device::sub_l_das_dd_df() // 90a8 f1f8
 	sr_xnzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -142851,7 +142928,6 @@ adsl2:
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=.l...i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -142882,6 +142958,7 @@ adsl2:
 	sr_xnzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -142967,7 +143044,6 @@ void m68000_device::sub_l_adr16_dd_df() // 90b8 f1ff
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=.l...i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -142998,6 +143074,7 @@ void m68000_device::sub_l_adr16_dd_df() // 90b8 f1ff
 	sr_xnzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -143104,7 +143181,6 @@ void m68000_device::sub_l_adr32_dd_df() // 90b9 f1ff
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=.l...i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -143135,6 +143211,7 @@ void m68000_device::sub_l_adr32_dd_df() // 90b9 f1ff
 	sr_xnzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -143217,7 +143294,6 @@ void m68000_device::sub_l_dpc_dd_df() // 90ba f1ff
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=.l...i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -143248,6 +143324,7 @@ void m68000_device::sub_l_dpc_dd_df() // 90ba f1ff
 	sr_xnzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -143368,7 +143445,6 @@ adsl2:
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=xnzvc  i=.l...i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -143399,6 +143475,7 @@ adsl2:
 	sr_xnzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -143460,7 +143537,6 @@ void m68000_device::sub_l_imm32_dd_df() // 90bc f1ff
 	// 1c5 rorl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=5 c=2 m=xnzvc  i=.l...i. ALU.sub a=R.dtl:m_dt d=R.dxl:m_da[rx]
@@ -143493,6 +143569,7 @@ void m68000_device::sub_l_imm32_dd_df() // 90bc f1ff
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -143510,7 +143587,6 @@ void m68000_device::suba_w_ds_ad_df() // 90c0 f1f8
 	// 1c9 rorm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dyl:m_da[ry] d=R.axl:m_da[rx]
@@ -143541,6 +143617,7 @@ void m68000_device::suba_w_ds_ad_df() // 90c0 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -143558,7 +143635,6 @@ void m68000_device::suba_w_as_ad_df() // 90c8 f1f8
 	// 1c9 rorm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.ayl:m_da[ry] d=R.axl:m_da[rx]
@@ -143589,6 +143665,7 @@ void m68000_device::suba_w_as_ad_df() // 90c8 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -143630,7 +143707,6 @@ void m68000_device::suba_w_ais_ad_df() // 90d0 f1f8
 	// 1c7 romm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -143661,6 +143737,7 @@ void m68000_device::suba_w_ais_ad_df() // 90d0 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -143706,7 +143783,6 @@ void m68000_device::suba_w_aips_ad_df() // 90d8 f1f8
 	// 1c7 romm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -143737,6 +143813,7 @@ void m68000_device::suba_w_aips_ad_df() // 90d8 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -143784,7 +143861,6 @@ void m68000_device::suba_w_pais_ad_df() // 90e0 f1f8
 	// 1c7 romm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -143815,6 +143891,7 @@ void m68000_device::suba_w_pais_ad_df() // 90e0 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -143878,7 +143955,6 @@ void m68000_device::suba_w_das_ad_df() // 90e8 f1f8
 	// 1c7 romm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -143909,6 +143985,7 @@ void m68000_device::suba_w_das_ad_df() // 90e8 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -144010,7 +144087,6 @@ adsw2:
 	// 1c7 romm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -144041,6 +144117,7 @@ adsw2:
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -144103,7 +144180,6 @@ void m68000_device::suba_w_adr16_ad_df() // 90f8 f1ff
 	// 1c7 romm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -144134,6 +144210,7 @@ void m68000_device::suba_w_adr16_ad_df() // 90f8 f1ff
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -144217,7 +144294,6 @@ void m68000_device::suba_w_adr32_ad_df() // 90f9 f1ff
 	// 1c7 romm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -144248,6 +144324,7 @@ void m68000_device::suba_w_adr32_ad_df() // 90f9 f1ff
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -144310,7 +144387,6 @@ void m68000_device::suba_w_dpc_ad_df() // 90fa f1ff
 	// 1c7 romm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -144341,6 +144417,7 @@ void m68000_device::suba_w_dpc_ad_df() // 90fa f1ff
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -144441,7 +144518,6 @@ adsw2:
 	// 1c7 romm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -144472,6 +144548,7 @@ adsw2:
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -144512,7 +144589,6 @@ void m68000_device::suba_w_imm16_ad_df() // 90fc f1ff
 	// 1c9 rorm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dtl:m_dt d=R.axl:m_da[rx]
@@ -144543,6 +144619,7 @@ void m68000_device::suba_w_imm16_ad_df() // 90fc f1ff
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -144560,7 +144637,6 @@ void m68000_device::subx_b_ds_dd_df() // 9100 f1f8
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=10 c=2 m=xnzvc  i=b....i. ALU.subx a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -144568,6 +144644,7 @@ void m68000_device::subx_b_ds_dd_df() // 9100 f1f8
 	sr_xnzvc_u();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -144629,7 +144706,6 @@ void m68000_device::subx_b_pais_paid_df() // 9108 f1f8
 	// 04a asxw4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_DATA | SSW_R;
 	m_edb = m_program.read_interruptible(m_aob & ~1, m_aob & 1 ? 0x00ff : 0xff00);
 	if(!(m_aob & 1))
@@ -144674,6 +144750,7 @@ void m68000_device::subx_b_pais_paid_df() // 9108 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -144722,7 +144799,6 @@ void m68000_device::sub_b_dd_ais_df() // 9110 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -144749,6 +144825,7 @@ void m68000_device::sub_b_dd_ais_df() // 9110 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -144801,7 +144878,6 @@ void m68000_device::sub_b_dd_aips_df() // 9118 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -144828,6 +144904,7 @@ void m68000_device::sub_b_dd_aips_df() // 9118 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -144882,7 +144959,6 @@ void m68000_device::sub_b_dd_pais_df() // 9120 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -144909,6 +144985,7 @@ void m68000_device::sub_b_dd_pais_df() // 9120 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -144979,7 +145056,6 @@ void m68000_device::sub_b_dd_das_df() // 9128 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -145006,6 +145082,7 @@ void m68000_device::sub_b_dd_das_df() // 9128 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -145114,7 +145191,6 @@ adsw2:
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -145141,6 +145217,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -145210,7 +145287,6 @@ void m68000_device::sub_b_dd_adr16_df() // 9138 f1ff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -145237,6 +145313,7 @@ void m68000_device::sub_b_dd_adr16_df() // 9138 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -145327,7 +145404,6 @@ void m68000_device::sub_b_dd_adr32_df() // 9139 f1ff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -145354,6 +145430,7 @@ void m68000_device::sub_b_dd_adr32_df() // 9139 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -145381,7 +145458,6 @@ void m68000_device::subx_w_ds_dd_df() // 9140 f1f8
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=10 c=2 m=xnzvc  i=.....i. ALU.subx a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -145389,6 +145465,7 @@ void m68000_device::subx_w_ds_dd_df() // 9140 f1f8
 	sr_xnzvc_u();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -145453,7 +145530,6 @@ void m68000_device::subx_w_pais_paid_df() // 9148 f1f8
 	// 04a asxw4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_DATA | SSW_R;
 	m_edb = m_program.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -145501,6 +145577,7 @@ void m68000_device::subx_w_pais_paid_df() // 9148 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -145557,7 +145634,6 @@ void m68000_device::sub_w_dd_ais_df() // 9150 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -145584,6 +145660,7 @@ void m68000_device::sub_w_dd_ais_df() // 9150 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -145644,7 +145721,6 @@ void m68000_device::sub_w_dd_aips_df() // 9158 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -145671,6 +145747,7 @@ void m68000_device::sub_w_dd_aips_df() // 9158 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -145733,7 +145810,6 @@ void m68000_device::sub_w_dd_pais_df() // 9160 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -145760,6 +145836,7 @@ void m68000_device::sub_w_dd_pais_df() // 9160 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -145838,7 +145915,6 @@ void m68000_device::sub_w_dd_das_df() // 9168 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -145865,6 +145941,7 @@ void m68000_device::sub_w_dd_das_df() // 9168 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -145981,7 +146058,6 @@ adsw2:
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -146008,6 +146084,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -146085,7 +146162,6 @@ void m68000_device::sub_w_dd_adr16_df() // 9178 f1ff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -146112,6 +146188,7 @@ void m68000_device::sub_w_dd_adr16_df() // 9178 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -146210,7 +146287,6 @@ void m68000_device::sub_w_dd_adr32_df() // 9179 f1ff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -146237,6 +146313,7 @@ void m68000_device::sub_w_dd_adr32_df() // 9179 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -146269,7 +146346,6 @@ void m68000_device::subx_l_ds_dd_df() // 9180 f1f8
 	// 1c5 rorl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=10 c=2 m=xnzvc  i=.l...i. ALU.subx a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -146302,6 +146378,7 @@ void m68000_device::subx_l_ds_dd_df() // 9180 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -146416,7 +146493,6 @@ void m68000_device::subx_l_pais_paid_df() // 9188 f1f8
 	// 061 asxl7
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -146462,6 +146538,7 @@ void m68000_device::subx_l_pais_paid_df() // 9188 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -146539,7 +146616,6 @@ void m68000_device::sub_l_dd_ais_df() // 9190 f1f8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -146589,6 +146665,7 @@ void m68000_device::sub_l_dd_ais_df() // 9190 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -146669,7 +146746,6 @@ void m68000_device::sub_l_dd_aips_df() // 9198 f1f8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -146719,6 +146795,7 @@ void m68000_device::sub_l_dd_aips_df() // 9198 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -146800,7 +146877,6 @@ void m68000_device::sub_l_dd_pais_df() // 91a0 f1f8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -146850,6 +146926,7 @@ void m68000_device::sub_l_dd_pais_df() // 91a0 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -146948,7 +147025,6 @@ void m68000_device::sub_l_dd_das_df() // 91a8 f1f8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -146998,6 +147074,7 @@ void m68000_device::sub_l_dd_das_df() // 91a8 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -147134,7 +147211,6 @@ adsl2:
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -147184,6 +147260,7 @@ adsl2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -147284,7 +147361,6 @@ void m68000_device::sub_l_dd_adr16_df() // 91b8 f1ff
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -147334,6 +147410,7 @@ void m68000_device::sub_l_dd_adr16_df() // 91b8 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -147455,7 +147532,6 @@ void m68000_device::sub_l_dd_adr32_df() // 91b9 f1ff
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -147505,6 +147581,7 @@ void m68000_device::sub_l_dd_adr32_df() // 91b9 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -147537,7 +147614,6 @@ void m68000_device::suba_l_ds_ad_df() // 91c0 f1f8
 	// 1c5 rorl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dyl:m_da[ry] d=R.axl:m_da[rx]
@@ -147568,6 +147644,7 @@ void m68000_device::suba_l_ds_ad_df() // 91c0 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -147585,7 +147662,6 @@ void m68000_device::suba_l_as_ad_df() // 91c8 f1f8
 	// 1c5 rorl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.ayl:m_da[ry] d=R.axl:m_da[rx]
@@ -147616,6 +147692,7 @@ void m68000_device::suba_l_as_ad_df() // 91c8 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -147678,7 +147755,6 @@ void m68000_device::suba_l_ais_ad_df() // 91d0 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -147707,6 +147783,7 @@ void m68000_device::suba_l_ais_ad_df() // 91d0 f1f8
 	alu_subc(m_alub, high16(m_da[rx]));
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -147772,7 +147849,6 @@ void m68000_device::suba_l_aips_ad_df() // 91d8 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -147801,6 +147877,7 @@ void m68000_device::suba_l_aips_ad_df() // 91d8 f1f8
 	alu_subc(m_alub, high16(m_da[rx]));
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -147867,7 +147944,6 @@ void m68000_device::suba_l_pais_ad_df() // 91e0 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -147896,6 +147972,7 @@ void m68000_device::suba_l_pais_ad_df() // 91e0 f1f8
 	alu_subc(m_alub, high16(m_da[rx]));
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -147979,7 +148056,6 @@ void m68000_device::suba_l_das_ad_df() // 91e8 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -148008,6 +148084,7 @@ void m68000_device::suba_l_das_ad_df() // 91e8 f1f8
 	alu_subc(m_alub, high16(m_da[rx]));
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -148129,7 +148206,6 @@ adsl2:
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -148158,6 +148234,7 @@ adsl2:
 	alu_subc(m_alub, high16(m_da[rx]));
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -148243,7 +148320,6 @@ void m68000_device::suba_l_adr16_ad_df() // 91f8 f1ff
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -148272,6 +148348,7 @@ void m68000_device::suba_l_adr16_ad_df() // 91f8 f1ff
 	alu_subc(m_alub, high16(m_da[rx]));
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -148378,7 +148455,6 @@ void m68000_device::suba_l_adr32_ad_df() // 91f9 f1ff
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -148407,6 +148483,7 @@ void m68000_device::suba_l_adr32_ad_df() // 91f9 f1ff
 	alu_subc(m_alub, high16(m_da[rx]));
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -148489,7 +148566,6 @@ void m68000_device::suba_l_dpc_ad_df() // 91fa f1ff
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -148518,6 +148594,7 @@ void m68000_device::suba_l_dpc_ad_df() // 91fa f1ff
 	alu_subc(m_alub, high16(m_da[rx]));
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -148638,7 +148715,6 @@ adsl2:
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -148667,6 +148743,7 @@ adsl2:
 	alu_subc(m_alub, high16(m_da[rx]));
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -148728,7 +148805,6 @@ void m68000_device::suba_l_imm32_ad_df() // 91fc f1ff
 	// 1c5 rorl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=5 c=2 m=.....  i=.....i. ALU.sub a=R.dtl:m_dt d=R.axl:m_da[rx]
@@ -148759,6 +148835,7 @@ void m68000_device::suba_l_imm32_ad_df() // 91fc f1ff
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -148776,7 +148853,6 @@ void m68000_device::cmp_b_ds_dd_df() // b000 f1f8
 	// 1d1 cprw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=6 c=2 m=.nzvc  i=b....i. ALU.sub a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -148784,6 +148860,7 @@ void m68000_device::cmp_b_ds_dd_df() // b000 f1f8
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -148838,7 +148915,6 @@ void m68000_device::cmp_b_ais_dd_df() // b010 f1f8
 	// 1d3 cpmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=b....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -148846,6 +148922,7 @@ void m68000_device::cmp_b_ais_dd_df() // b010 f1f8
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -148904,7 +148981,6 @@ void m68000_device::cmp_b_aips_dd_df() // b018 f1f8
 	// 1d3 cpmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=b....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -148912,6 +148988,7 @@ void m68000_device::cmp_b_aips_dd_df() // b018 f1f8
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -148972,7 +149049,6 @@ void m68000_device::cmp_b_pais_dd_df() // b020 f1f8
 	// 1d3 cpmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=b....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -148980,6 +149056,7 @@ void m68000_device::cmp_b_pais_dd_df() // b020 f1f8
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -149056,7 +149133,6 @@ void m68000_device::cmp_b_das_dd_df() // b028 f1f8
 	// 1d3 cpmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=b....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -149064,6 +149140,7 @@ void m68000_device::cmp_b_das_dd_df() // b028 f1f8
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -149178,7 +149255,6 @@ adsw2:
 	// 1d3 cpmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=b....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -149186,6 +149262,7 @@ adsw2:
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -149261,7 +149338,6 @@ void m68000_device::cmp_b_adr16_dd_df() // b038 f1ff
 	// 1d3 cpmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=b....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -149269,6 +149345,7 @@ void m68000_device::cmp_b_adr16_dd_df() // b038 f1ff
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -149365,7 +149442,6 @@ void m68000_device::cmp_b_adr32_dd_df() // b039 f1ff
 	// 1d3 cpmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=b....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -149373,6 +149449,7 @@ void m68000_device::cmp_b_adr32_dd_df() // b039 f1ff
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -149448,7 +149525,6 @@ void m68000_device::cmp_b_dpc_dd_df() // b03a f1ff
 	// 1d3 cpmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=b....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -149456,6 +149532,7 @@ void m68000_device::cmp_b_dpc_dd_df() // b03a f1ff
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -149569,7 +149646,6 @@ adsw2:
 	// 1d3 cpmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=b....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -149577,6 +149653,7 @@ adsw2:
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -149633,7 +149710,6 @@ void m68000_device::cmp_b_imm8_dd_df() // b03c f1ff
 	// 1d1 cprw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=6 c=2 m=.nzvc  i=b....i. ALU.sub a=R.dtl:m_dt d=R.dxl:m_da[rx]
@@ -149641,6 +149717,7 @@ void m68000_device::cmp_b_imm8_dd_df() // b03c f1ff
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -149674,7 +149751,6 @@ void m68000_device::cmp_w_ds_dd_df() // b040 f1f8
 	// 1d1 cprw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -149682,6 +149758,7 @@ void m68000_device::cmp_w_ds_dd_df() // b040 f1f8
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -149715,7 +149792,6 @@ void m68000_device::cmp_w_as_dd_df() // b048 f1f8
 	// 1d1 cprw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.ayl:m_da[ry] d=R.dxl:m_da[rx]
@@ -149723,6 +149799,7 @@ void m68000_device::cmp_w_as_dd_df() // b048 f1f8
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -149780,7 +149857,6 @@ void m68000_device::cmp_w_ais_dd_df() // b050 f1f8
 	// 1d3 cpmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -149788,6 +149864,7 @@ void m68000_device::cmp_w_ais_dd_df() // b050 f1f8
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -149849,7 +149926,6 @@ void m68000_device::cmp_w_aips_dd_df() // b058 f1f8
 	// 1d3 cpmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -149857,6 +149933,7 @@ void m68000_device::cmp_w_aips_dd_df() // b058 f1f8
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -149920,7 +149997,6 @@ void m68000_device::cmp_w_pais_dd_df() // b060 f1f8
 	// 1d3 cpmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -149928,6 +150004,7 @@ void m68000_device::cmp_w_pais_dd_df() // b060 f1f8
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -150007,7 +150084,6 @@ void m68000_device::cmp_w_das_dd_df() // b068 f1f8
 	// 1d3 cpmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -150015,6 +150091,7 @@ void m68000_device::cmp_w_das_dd_df() // b068 f1f8
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -150132,7 +150209,6 @@ adsw2:
 	// 1d3 cpmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -150140,6 +150216,7 @@ adsw2:
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -150218,7 +150295,6 @@ void m68000_device::cmp_w_adr16_dd_df() // b078 f1ff
 	// 1d3 cpmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -150226,6 +150302,7 @@ void m68000_device::cmp_w_adr16_dd_df() // b078 f1ff
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -150325,7 +150402,6 @@ void m68000_device::cmp_w_adr32_dd_df() // b079 f1ff
 	// 1d3 cpmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -150333,6 +150409,7 @@ void m68000_device::cmp_w_adr32_dd_df() // b079 f1ff
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -150411,7 +150488,6 @@ void m68000_device::cmp_w_dpc_dd_df() // b07a f1ff
 	// 1d3 cpmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -150419,6 +150495,7 @@ void m68000_device::cmp_w_dpc_dd_df() // b07a f1ff
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -150535,7 +150612,6 @@ adsw2:
 	// 1d3 cpmw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -150543,6 +150619,7 @@ adsw2:
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -150599,7 +150676,6 @@ void m68000_device::cmp_w_imm16_dd_df() // b07c f1ff
 	// 1d1 cprw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dtl:m_dt d=R.dxl:m_da[rx]
@@ -150607,6 +150683,7 @@ void m68000_device::cmp_w_imm16_dd_df() // b07c f1ff
 	sr_nzvc();
 	// 23a rcaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -150640,7 +150717,6 @@ void m68000_device::cmp_l_ds_dd_df() // b080 f1f8
 	// 1d5 cprl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=6 c=2 m=.nzvc  i=.l...i. ALU.sub a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -150670,6 +150746,7 @@ void m68000_device::cmp_l_ds_dd_df() // b080 f1f8
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -150686,7 +150763,6 @@ void m68000_device::cmp_l_as_dd_df() // b088 f1f8
 	// 1d5 cprl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=6 c=2 m=.nzvc  i=.l...i. ALU.sub a=R.ayl:m_da[ry] d=R.dxl:m_da[rx]
@@ -150716,6 +150792,7 @@ void m68000_device::cmp_l_as_dd_df() // b088 f1f8
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -150777,7 +150854,6 @@ void m68000_device::cmp_l_ais_dd_df() // b090 f1f8
 	// 1d7 cpml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.l...i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -150807,6 +150883,7 @@ void m68000_device::cmp_l_ais_dd_df() // b090 f1f8
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -150871,7 +150948,6 @@ void m68000_device::cmp_l_aips_dd_df() // b098 f1f8
 	// 1d7 cpml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.l...i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -150901,6 +150977,7 @@ void m68000_device::cmp_l_aips_dd_df() // b098 f1f8
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -150966,7 +151043,6 @@ void m68000_device::cmp_l_pais_dd_df() // b0a0 f1f8
 	// 1d7 cpml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.l...i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -150996,6 +151072,7 @@ void m68000_device::cmp_l_pais_dd_df() // b0a0 f1f8
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -151078,7 +151155,6 @@ void m68000_device::cmp_l_das_dd_df() // b0a8 f1f8
 	// 1d7 cpml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.l...i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -151108,6 +151184,7 @@ void m68000_device::cmp_l_das_dd_df() // b0a8 f1f8
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -151228,7 +151305,6 @@ adsl2:
 	// 1d7 cpml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.l...i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -151258,6 +151334,7 @@ adsl2:
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -151342,7 +151419,6 @@ void m68000_device::cmp_l_adr16_dd_df() // b0b8 f1ff
 	// 1d7 cpml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.l...i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -151372,6 +151448,7 @@ void m68000_device::cmp_l_adr16_dd_df() // b0b8 f1ff
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -151477,7 +151554,6 @@ void m68000_device::cmp_l_adr32_dd_df() // b0b9 f1ff
 	// 1d7 cpml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.l...i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -151507,6 +151583,7 @@ void m68000_device::cmp_l_adr32_dd_df() // b0b9 f1ff
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -151588,7 +151665,6 @@ void m68000_device::cmp_l_dpc_dd_df() // b0ba f1ff
 	// 1d7 cpml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.l...i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -151618,6 +151694,7 @@ void m68000_device::cmp_l_dpc_dd_df() // b0ba f1ff
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -151737,7 +151814,6 @@ adsl2:
 	// 1d7 cpml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.l...i. ALU.sub a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -151767,6 +151843,7 @@ adsl2:
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -151827,7 +151904,6 @@ void m68000_device::cmp_l_imm32_dd_df() // b0bc f1ff
 	// 1d5 cprl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=6 c=2 m=.nzvc  i=.l...i. ALU.sub a=R.dtl:m_dt d=R.dxl:m_da[rx]
@@ -151857,6 +151933,7 @@ void m68000_device::cmp_l_imm32_dd_df() // b0bc f1ff
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -151873,7 +151950,6 @@ void m68000_device::cmpa_w_ds_ad_df() // b0c0 f1f8
 	// 1d9 cprm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dyl:m_da[ry] d=R.axl:m_da[rx]
@@ -151903,6 +151979,7 @@ void m68000_device::cmpa_w_ds_ad_df() // b0c0 f1f8
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -151919,7 +151996,6 @@ void m68000_device::cmpa_w_as_ad_df() // b0c8 f1f8
 	// 1d9 cprm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.ayl:m_da[ry] d=R.axl:m_da[rx]
@@ -151949,6 +152025,7 @@ void m68000_device::cmpa_w_as_ad_df() // b0c8 f1f8
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -151989,7 +152066,6 @@ void m68000_device::cmpa_w_ais_ad_df() // b0d0 f1f8
 	// 1cf cpmm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -152019,6 +152095,7 @@ void m68000_device::cmpa_w_ais_ad_df() // b0d0 f1f8
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -152063,7 +152140,6 @@ void m68000_device::cmpa_w_aips_ad_df() // b0d8 f1f8
 	// 1cf cpmm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -152093,6 +152169,7 @@ void m68000_device::cmpa_w_aips_ad_df() // b0d8 f1f8
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -152139,7 +152216,6 @@ void m68000_device::cmpa_w_pais_ad_df() // b0e0 f1f8
 	// 1cf cpmm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -152169,6 +152245,7 @@ void m68000_device::cmpa_w_pais_ad_df() // b0e0 f1f8
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -152231,7 +152308,6 @@ void m68000_device::cmpa_w_das_ad_df() // b0e8 f1f8
 	// 1cf cpmm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -152261,6 +152337,7 @@ void m68000_device::cmpa_w_das_ad_df() // b0e8 f1f8
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -152361,7 +152438,6 @@ adsw2:
 	// 1cf cpmm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -152391,6 +152467,7 @@ adsw2:
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -152452,7 +152529,6 @@ void m68000_device::cmpa_w_adr16_ad_df() // b0f8 f1ff
 	// 1cf cpmm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -152482,6 +152558,7 @@ void m68000_device::cmpa_w_adr16_ad_df() // b0f8 f1ff
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -152564,7 +152641,6 @@ void m68000_device::cmpa_w_adr32_ad_df() // b0f9 f1ff
 	// 1cf cpmm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -152594,6 +152670,7 @@ void m68000_device::cmpa_w_adr32_ad_df() // b0f9 f1ff
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -152655,7 +152732,6 @@ void m68000_device::cmpa_w_dpc_ad_df() // b0fa f1ff
 	// 1cf cpmm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -152685,6 +152761,7 @@ void m68000_device::cmpa_w_dpc_ad_df() // b0fa f1ff
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -152784,7 +152861,6 @@ adsw2:
 	// 1cf cpmm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -152814,6 +152890,7 @@ adsw2:
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -152853,7 +152930,6 @@ void m68000_device::cmpa_w_imm16_ad_df() // b0fc f1ff
 	// 1d9 cprm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dtl:m_dt d=R.axl:m_da[rx]
@@ -152883,6 +152959,7 @@ void m68000_device::cmpa_w_imm16_ad_df() // b0fc f1ff
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -152899,13 +152976,13 @@ void m68000_device::eor_b_dd_ds_df() // b100 f1f8
 	// 100 roaw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=13 c=2 m=.nzvc  i=b....i. ALU.eor a=R.dxl:m_da[rx] d=R.dyl:m_da[ry]
 	alu_eor8(m_da[rx], m_da[ry]);
 	sr_nzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -152963,7 +153040,6 @@ void m68000_device::cmpm_b_aips_aipd_df() // b108 f1f8
 	// 122 cmmw3
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_DATA | SSW_R;
 	m_edb = m_program.read_interruptible(m_aob & ~1, m_aob & 1 ? 0x00ff : 0xff00);
 	if(!(m_aob & 1))
@@ -152984,6 +153060,7 @@ void m68000_device::cmpm_b_aips_aipd_df() // b108 f1f8
 	// 170 cmmw4
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -153043,7 +153120,6 @@ void m68000_device::eor_b_dd_ais_df() // b110 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -153070,6 +153146,7 @@ void m68000_device::eor_b_dd_ais_df() // b110 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -153125,7 +153202,6 @@ void m68000_device::eor_b_dd_aips_df() // b118 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -153152,6 +153228,7 @@ void m68000_device::eor_b_dd_aips_df() // b118 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -153209,7 +153286,6 @@ void m68000_device::eor_b_dd_pais_df() // b120 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -153236,6 +153312,7 @@ void m68000_device::eor_b_dd_pais_df() // b120 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -153309,7 +153386,6 @@ void m68000_device::eor_b_dd_das_df() // b128 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -153336,6 +153412,7 @@ void m68000_device::eor_b_dd_das_df() // b128 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -153449,7 +153526,6 @@ adsw2:
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -153476,6 +153552,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -153548,7 +153625,6 @@ void m68000_device::eor_b_dd_adr16_df() // b138 f1ff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -153575,6 +153651,7 @@ void m68000_device::eor_b_dd_adr16_df() // b138 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -153669,7 +153746,6 @@ void m68000_device::eor_b_dd_adr32_df() // b139 f1ff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -153696,6 +153772,7 @@ void m68000_device::eor_b_dd_adr32_df() // b139 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -153724,13 +153801,13 @@ void m68000_device::eor_w_dd_ds_df() // b140 f1f8
 	// 100 roaw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=13 c=2 m=.nzvc  i=.....i. ALU.eor a=R.dxl:m_da[rx] d=R.dyl:m_da[ry]
 	alu_eor(m_da[rx], m_da[ry]);
 	sr_nzvc();
 	// 08b roaw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -153791,7 +153868,6 @@ void m68000_device::cmpm_w_aips_aipd_df() // b148 f1f8
 	// 122 cmmw3
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_DATA | SSW_R;
 	m_edb = m_program.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -153815,6 +153891,7 @@ void m68000_device::cmpm_w_aips_aipd_df() // b148 f1f8
 	// 170 cmmw4
 	m_aob = m_pc;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -153877,7 +153954,6 @@ void m68000_device::eor_w_dd_ais_df() // b150 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -153904,6 +153980,7 @@ void m68000_device::eor_w_dd_ais_df() // b150 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -153967,7 +154044,6 @@ void m68000_device::eor_w_dd_aips_df() // b158 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -153994,6 +154070,7 @@ void m68000_device::eor_w_dd_aips_df() // b158 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -154059,7 +154136,6 @@ void m68000_device::eor_w_dd_pais_df() // b160 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -154086,6 +154162,7 @@ void m68000_device::eor_w_dd_pais_df() // b160 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -154167,7 +154244,6 @@ void m68000_device::eor_w_dd_das_df() // b168 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -154194,6 +154270,7 @@ void m68000_device::eor_w_dd_das_df() // b168 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -154315,7 +154392,6 @@ adsw2:
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -154342,6 +154418,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -154422,7 +154499,6 @@ void m68000_device::eor_w_dd_adr16_df() // b178 f1ff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -154449,6 +154525,7 @@ void m68000_device::eor_w_dd_adr16_df() // b178 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -154551,7 +154628,6 @@ void m68000_device::eor_w_dd_adr32_df() // b179 f1ff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -154578,6 +154654,7 @@ void m68000_device::eor_w_dd_adr32_df() // b179 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -154611,7 +154688,6 @@ void m68000_device::eor_l_dd_ds_df() // b180 f1f8
 	// 10c roal1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	// alu r=13 c=2 m=.nzvc  i=.l...i. ALU.eor a=R.dxl:m_da[rx] d=R.dyl:m_da[ry]
 	alu_eor(m_da[rx], m_da[ry]);
@@ -154644,6 +154720,7 @@ void m68000_device::eor_l_dd_ds_df() // b180 f1f8
 	m_icount -= 2;
 	// 25b roal4
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=13 c=0 m=.....  i=.l..... ALU.eor a=R.aluo:m_aluo d=none
@@ -154708,7 +154785,6 @@ void m68000_device::cmpm_l_aips_aipd_df() // b188 f1f8
 	// 12e cmml4
 	m_aob = m_da[rx];
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_DATA | SSW_R;
 	m_edb = m_program.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -154759,6 +154835,7 @@ void m68000_device::cmpm_l_aips_aipd_df() // b188 f1f8
 	sr_nzvc();
 	// 157 cmml7
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -154840,7 +154917,6 @@ void m68000_device::eor_l_dd_ais_df() // b190 f1f8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -154890,6 +154966,7 @@ void m68000_device::eor_l_dd_ais_df() // b190 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -154973,7 +155050,6 @@ void m68000_device::eor_l_dd_aips_df() // b198 f1f8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -155023,6 +155099,7 @@ void m68000_device::eor_l_dd_aips_df() // b198 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -155107,7 +155184,6 @@ void m68000_device::eor_l_dd_pais_df() // b1a0 f1f8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -155157,6 +155233,7 @@ void m68000_device::eor_l_dd_pais_df() // b1a0 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -155258,7 +155335,6 @@ void m68000_device::eor_l_dd_das_df() // b1a8 f1f8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -155308,6 +155384,7 @@ void m68000_device::eor_l_dd_das_df() // b1a8 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -155449,7 +155526,6 @@ adsl2:
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -155499,6 +155575,7 @@ adsl2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -155603,7 +155680,6 @@ void m68000_device::eor_l_dd_adr16_df() // b1b8 f1ff
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -155653,6 +155729,7 @@ void m68000_device::eor_l_dd_adr16_df() // b1b8 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -155779,7 +155856,6 @@ void m68000_device::eor_l_dd_adr32_df() // b1b9 f1ff
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -155829,6 +155905,7 @@ void m68000_device::eor_l_dd_adr32_df() // b1b9 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -155862,7 +155939,6 @@ void m68000_device::cmpa_l_ds_ad_df() // b1c0 f1f8
 	// 1d5 cprl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dyl:m_da[ry] d=R.axl:m_da[rx]
@@ -155892,6 +155968,7 @@ void m68000_device::cmpa_l_ds_ad_df() // b1c0 f1f8
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -155908,7 +155985,6 @@ void m68000_device::cmpa_l_as_ad_df() // b1c8 f1f8
 	// 1d5 cprl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.ayl:m_da[ry] d=R.axl:m_da[rx]
@@ -155938,6 +156014,7 @@ void m68000_device::cmpa_l_as_ad_df() // b1c8 f1f8
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -155999,7 +156076,6 @@ void m68000_device::cmpa_l_ais_ad_df() // b1d0 f1f8
 	// 1d7 cpml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -156029,6 +156105,7 @@ void m68000_device::cmpa_l_ais_ad_df() // b1d0 f1f8
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -156093,7 +156170,6 @@ void m68000_device::cmpa_l_aips_ad_df() // b1d8 f1f8
 	// 1d7 cpml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -156123,6 +156199,7 @@ void m68000_device::cmpa_l_aips_ad_df() // b1d8 f1f8
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -156188,7 +156265,6 @@ void m68000_device::cmpa_l_pais_ad_df() // b1e0 f1f8
 	// 1d7 cpml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -156218,6 +156294,7 @@ void m68000_device::cmpa_l_pais_ad_df() // b1e0 f1f8
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -156300,7 +156377,6 @@ void m68000_device::cmpa_l_das_ad_df() // b1e8 f1f8
 	// 1d7 cpml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -156330,6 +156406,7 @@ void m68000_device::cmpa_l_das_ad_df() // b1e8 f1f8
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -156450,7 +156527,6 @@ adsl2:
 	// 1d7 cpml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -156480,6 +156556,7 @@ adsl2:
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -156564,7 +156641,6 @@ void m68000_device::cmpa_l_adr16_ad_df() // b1f8 f1ff
 	// 1d7 cpml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -156594,6 +156670,7 @@ void m68000_device::cmpa_l_adr16_ad_df() // b1f8 f1ff
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -156699,7 +156776,6 @@ void m68000_device::cmpa_l_adr32_ad_df() // b1f9 f1ff
 	// 1d7 cpml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -156729,6 +156805,7 @@ void m68000_device::cmpa_l_adr32_ad_df() // b1f9 f1ff
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -156810,7 +156887,6 @@ void m68000_device::cmpa_l_dpc_ad_df() // b1fa f1ff
 	// 1d7 cpml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -156840,6 +156916,7 @@ void m68000_device::cmpa_l_dpc_ad_df() // b1fa f1ff
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -156959,7 +157036,6 @@ adsl2:
 	// 1d7 cpml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -156989,6 +157065,7 @@ adsl2:
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -157049,7 +157126,6 @@ void m68000_device::cmpa_l_imm32_ad_df() // b1fc f1ff
 	// 1d5 cprl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=6 c=2 m=.nzvc  i=.....i. ALU.sub a=R.dtl:m_dt d=R.axl:m_da[rx]
@@ -157079,6 +157155,7 @@ void m68000_device::cmpa_l_imm32_ad_df() // b1fc f1ff
 	sr_nzvc_u();
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -157095,7 +157172,6 @@ void m68000_device::and_b_ds_dd_df() // c000 f1f8
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=4 c=2 m=.nzvc  i=b....i. ALU.and_ a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -157103,6 +157179,7 @@ void m68000_device::and_b_ds_dd_df() // c000 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -157160,7 +157237,6 @@ void m68000_device::and_b_ais_dd_df() // c010 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -157168,6 +157244,7 @@ void m68000_device::and_b_ais_dd_df() // c010 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -157230,7 +157307,6 @@ void m68000_device::and_b_aips_dd_df() // c018 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -157238,6 +157314,7 @@ void m68000_device::and_b_aips_dd_df() // c018 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -157302,7 +157379,6 @@ void m68000_device::and_b_pais_dd_df() // c020 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -157310,6 +157386,7 @@ void m68000_device::and_b_pais_dd_df() // c020 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -157390,7 +157467,6 @@ void m68000_device::and_b_das_dd_df() // c028 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -157398,6 +157474,7 @@ void m68000_device::and_b_das_dd_df() // c028 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -157518,7 +157595,6 @@ adsw2:
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -157526,6 +157602,7 @@ adsw2:
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -157605,7 +157682,6 @@ void m68000_device::and_b_adr16_dd_df() // c038 f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -157613,6 +157689,7 @@ void m68000_device::and_b_adr16_dd_df() // c038 f1ff
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -157714,7 +157791,6 @@ void m68000_device::and_b_adr32_dd_df() // c039 f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -157722,6 +157798,7 @@ void m68000_device::and_b_adr32_dd_df() // c039 f1ff
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -157801,7 +157878,6 @@ void m68000_device::and_b_dpc_dd_df() // c03a f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -157809,6 +157885,7 @@ void m68000_device::and_b_dpc_dd_df() // c03a f1ff
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -157928,7 +158005,6 @@ adsw2:
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=b....i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -157936,6 +158012,7 @@ adsw2:
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -157995,7 +158072,6 @@ void m68000_device::and_b_imm8_dd_df() // c03c f1ff
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=4 c=2 m=.nzvc  i=b....i. ALU.and_ a=R.dtl:m_dt d=R.dxl:m_da[rx]
@@ -158003,6 +158079,7 @@ void m68000_device::and_b_imm8_dd_df() // c03c f1ff
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -158038,7 +158115,6 @@ void m68000_device::and_w_ds_dd_df() // c040 f1f8
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=4 c=2 m=.nzvc  i=.....i. ALU.and_ a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -158046,6 +158122,7 @@ void m68000_device::and_w_ds_dd_df() // c040 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -158106,7 +158183,6 @@ void m68000_device::and_w_ais_dd_df() // c050 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -158114,6 +158190,7 @@ void m68000_device::and_w_ais_dd_df() // c050 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -158179,7 +158256,6 @@ void m68000_device::and_w_aips_dd_df() // c058 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -158187,6 +158263,7 @@ void m68000_device::and_w_aips_dd_df() // c058 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -158254,7 +158331,6 @@ void m68000_device::and_w_pais_dd_df() // c060 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -158262,6 +158338,7 @@ void m68000_device::and_w_pais_dd_df() // c060 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -158345,7 +158422,6 @@ void m68000_device::and_w_das_dd_df() // c068 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -158353,6 +158429,7 @@ void m68000_device::and_w_das_dd_df() // c068 f1f8
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -158476,7 +158553,6 @@ adsw2:
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -158484,6 +158560,7 @@ adsw2:
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -158566,7 +158643,6 @@ void m68000_device::and_w_adr16_dd_df() // c078 f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -158574,6 +158650,7 @@ void m68000_device::and_w_adr16_dd_df() // c078 f1ff
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -158678,7 +158755,6 @@ void m68000_device::and_w_adr32_dd_df() // c079 f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -158686,6 +158762,7 @@ void m68000_device::and_w_adr32_dd_df() // c079 f1ff
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -158768,7 +158845,6 @@ void m68000_device::and_w_dpc_dd_df() // c07a f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -158776,6 +158852,7 @@ void m68000_device::and_w_dpc_dd_df() // c07a f1ff
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -158898,7 +158975,6 @@ adsw2:
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -158906,6 +158982,7 @@ adsw2:
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -158965,7 +159042,6 @@ void m68000_device::and_w_imm16_dd_df() // c07c f1ff
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=4 c=2 m=.nzvc  i=.....i. ALU.and_ a=R.dtl:m_dt d=R.dxl:m_da[rx]
@@ -158973,6 +159049,7 @@ void m68000_device::and_w_imm16_dd_df() // c07c f1ff
 	sr_nzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -159008,7 +159085,6 @@ void m68000_device::and_l_ds_dd_df() // c080 f1f8
 	// 1c5 rorl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=4 c=2 m=.nzvc  i=.l...i. ALU.and_ a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -159042,6 +159118,7 @@ void m68000_device::and_l_ds_dd_df() // c080 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=4 c=0 m=.....  i=.l..... ALU.and_ a=R.aluo:m_aluo d=none
@@ -159106,7 +159183,6 @@ void m68000_device::and_l_ais_dd_df() // c090 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=.l...i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -159137,6 +159213,7 @@ void m68000_device::and_l_ais_dd_df() // c090 f1f8
 	sr_nzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=4 c=0 m=.....  i=.l..... ALU.and_ a=R.aluo:m_aluo d=none
@@ -159205,7 +159282,6 @@ void m68000_device::and_l_aips_dd_df() // c098 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=.l...i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -159236,6 +159312,7 @@ void m68000_device::and_l_aips_dd_df() // c098 f1f8
 	sr_nzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=4 c=0 m=.....  i=.l..... ALU.and_ a=R.aluo:m_aluo d=none
@@ -159305,7 +159382,6 @@ void m68000_device::and_l_pais_dd_df() // c0a0 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=.l...i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -159336,6 +159412,7 @@ void m68000_device::and_l_pais_dd_df() // c0a0 f1f8
 	sr_nzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=4 c=0 m=.....  i=.l..... ALU.and_ a=R.aluo:m_aluo d=none
@@ -159422,7 +159499,6 @@ void m68000_device::and_l_das_dd_df() // c0a8 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=.l...i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -159453,6 +159529,7 @@ void m68000_device::and_l_das_dd_df() // c0a8 f1f8
 	sr_nzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=4 c=0 m=.....  i=.l..... ALU.and_ a=R.aluo:m_aluo d=none
@@ -159579,7 +159656,6 @@ adsl2:
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=.l...i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -159610,6 +159686,7 @@ adsl2:
 	sr_nzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=4 c=0 m=.....  i=.l..... ALU.and_ a=R.aluo:m_aluo d=none
@@ -159699,7 +159776,6 @@ void m68000_device::and_l_adr16_dd_df() // c0b8 f1ff
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=.l...i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -159730,6 +159806,7 @@ void m68000_device::and_l_adr16_dd_df() // c0b8 f1ff
 	sr_nzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=4 c=0 m=.....  i=.l..... ALU.and_ a=R.aluo:m_aluo d=none
@@ -159841,7 +159918,6 @@ void m68000_device::and_l_adr32_dd_df() // c0b9 f1ff
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=.l...i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -159872,6 +159948,7 @@ void m68000_device::and_l_adr32_dd_df() // c0b9 f1ff
 	sr_nzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=4 c=0 m=.....  i=.l..... ALU.and_ a=R.aluo:m_aluo d=none
@@ -159957,7 +160034,6 @@ void m68000_device::and_l_dpc_dd_df() // c0ba f1ff
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=.l...i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -159988,6 +160064,7 @@ void m68000_device::and_l_dpc_dd_df() // c0ba f1ff
 	sr_nzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=4 c=0 m=.....  i=.l..... ALU.and_ a=R.aluo:m_aluo d=none
@@ -160113,7 +160190,6 @@ adsl2:
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=4 c=2 m=.nzvc  i=.l...i. ALU.and_ a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -160144,6 +160220,7 @@ adsl2:
 	sr_nzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=4 c=0 m=.....  i=.l..... ALU.and_ a=R.aluo:m_aluo d=none
@@ -160208,7 +160285,6 @@ void m68000_device::and_l_imm32_dd_df() // c0bc f1ff
 	// 1c5 rorl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=4 c=2 m=.nzvc  i=.l...i. ALU.and_ a=R.dtl:m_dt d=R.dxl:m_da[rx]
@@ -160242,6 +160318,7 @@ void m68000_device::and_l_imm32_dd_df() // c0bc f1ff
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=4 c=0 m=.....  i=.l..... ALU.and_ a=R.aluo:m_aluo d=none
@@ -160260,7 +160337,6 @@ void m68000_device::mulu_w_ds_dd_df() // c0c0 f1f8
 	// 15b mulr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_da[ry];
 	m_at = m_au;
@@ -160318,6 +160394,7 @@ mulm3:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -160363,7 +160440,6 @@ void m68000_device::mulu_w_ais_dd_df() // c0d0 f1f8
 	// 15a mulm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_dbin;
 	m_at = m_au;
@@ -160421,6 +160497,7 @@ mulm3:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -160470,7 +160547,6 @@ void m68000_device::mulu_w_aips_dd_df() // c0d8 f1f8
 	// 15a mulm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_dbin;
 	m_at = m_au;
@@ -160528,6 +160604,7 @@ mulm3:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -160579,7 +160656,6 @@ void m68000_device::mulu_w_pais_dd_df() // c0e0 f1f8
 	// 15a mulm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_dbin;
 	m_at = m_au;
@@ -160637,6 +160713,7 @@ mulm3:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -160704,7 +160781,6 @@ void m68000_device::mulu_w_das_dd_df() // c0e8 f1f8
 	// 15a mulm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_dbin;
 	m_at = m_au;
@@ -160762,6 +160838,7 @@ mulm3:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -160867,7 +160944,6 @@ adsw2:
 	// 15a mulm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_dbin;
 	m_at = m_au;
@@ -160925,6 +161001,7 @@ mulm3:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -160991,7 +161068,6 @@ void m68000_device::mulu_w_adr16_dd_df() // c0f8 f1ff
 	// 15a mulm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_dbin;
 	m_at = m_au;
@@ -161049,6 +161125,7 @@ mulm3:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -161136,7 +161213,6 @@ void m68000_device::mulu_w_adr32_dd_df() // c0f9 f1ff
 	// 15a mulm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_dbin;
 	m_at = m_au;
@@ -161194,6 +161270,7 @@ mulm3:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -161260,7 +161337,6 @@ void m68000_device::mulu_w_dpc_dd_df() // c0fa f1ff
 	// 15a mulm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_dbin;
 	m_at = m_au;
@@ -161318,6 +161394,7 @@ mulm3:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -161422,7 +161499,6 @@ adsw2:
 	// 15a mulm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_dbin;
 	m_at = m_au;
@@ -161480,6 +161556,7 @@ mulm3:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -161524,7 +161601,6 @@ void m68000_device::mulu_w_imm16_dd_df() // c0fc f1ff
 	// 15b mulr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_dt;
 	m_at = m_au;
@@ -161582,6 +161658,7 @@ mulm3:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -161603,7 +161680,6 @@ void m68000_device::abcd_ds_dd_df() // c100 f1f8
 	// 1cd rbrb1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=3 c=2 m=xnzvc  i=b....i. ALU.abcd a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -161632,6 +161708,7 @@ void m68000_device::abcd_ds_dd_df() // c100 f1f8
 	// alu r=3 c=3 m=xnzvc  i=b.....f ALU.add a=R.aluo:m_aluo d=?
 	// 238 rbrb3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -161676,7 +161753,6 @@ void m68000_device::abcd_pais_paid_df() // c108 f1f8
 	// 04e asbb4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_DATA | SSW_R;
 	m_edb = m_program.read_interruptible(m_aob & ~1, m_aob & 1 ? 0x00ff : 0xff00);
 	if(!(m_aob & 1))
@@ -161723,6 +161799,7 @@ void m68000_device::abcd_pais_paid_df() // c108 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -161772,7 +161849,6 @@ void m68000_device::and_b_dd_ais_df() // c110 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -161799,6 +161875,7 @@ void m68000_device::and_b_dd_ais_df() // c110 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -161854,7 +161931,6 @@ void m68000_device::and_b_dd_aips_df() // c118 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -161881,6 +161957,7 @@ void m68000_device::and_b_dd_aips_df() // c118 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -161938,7 +162015,6 @@ void m68000_device::and_b_dd_pais_df() // c120 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -161965,6 +162041,7 @@ void m68000_device::and_b_dd_pais_df() // c120 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -162038,7 +162115,6 @@ void m68000_device::and_b_dd_das_df() // c128 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -162065,6 +162141,7 @@ void m68000_device::and_b_dd_das_df() // c128 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -162178,7 +162255,6 @@ adsw2:
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -162205,6 +162281,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -162277,7 +162354,6 @@ void m68000_device::and_b_dd_adr16_df() // c138 f1ff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -162304,6 +162380,7 @@ void m68000_device::and_b_dd_adr16_df() // c138 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -162398,7 +162475,6 @@ void m68000_device::and_b_dd_adr32_df() // c139 f1ff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -162425,6 +162501,7 @@ void m68000_device::and_b_dd_adr32_df() // c139 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -162453,7 +162530,6 @@ void m68000_device::exg_dd_ds_df() // c140 f1f8
 	// 3e3 exge1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dcr = m_da[rx];
 	m_at = m_da[rx];
@@ -162481,6 +162557,7 @@ void m68000_device::exg_dd_ds_df() // c140 f1f8
 	m_dbin = m_edb;
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -162497,7 +162574,6 @@ void m68000_device::exg_ad_as_df() // c148 f1f8
 	// 3e3 exge1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dcr = m_da[rx];
 	m_at = m_da[rx];
@@ -162525,6 +162601,7 @@ void m68000_device::exg_ad_as_df() // c148 f1f8
 	m_dbin = m_edb;
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -162566,7 +162643,6 @@ void m68000_device::and_w_dd_ais_df() // c150 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -162593,6 +162669,7 @@ void m68000_device::and_w_dd_ais_df() // c150 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -162656,7 +162733,6 @@ void m68000_device::and_w_dd_aips_df() // c158 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -162683,6 +162759,7 @@ void m68000_device::and_w_dd_aips_df() // c158 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -162748,7 +162825,6 @@ void m68000_device::and_w_dd_pais_df() // c160 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -162775,6 +162851,7 @@ void m68000_device::and_w_dd_pais_df() // c160 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -162856,7 +162933,6 @@ void m68000_device::and_w_dd_das_df() // c168 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -162883,6 +162959,7 @@ void m68000_device::and_w_dd_das_df() // c168 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -163004,7 +163081,6 @@ adsw2:
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -163031,6 +163107,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -163111,7 +163188,6 @@ void m68000_device::and_w_dd_adr16_df() // c178 f1ff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -163138,6 +163214,7 @@ void m68000_device::and_w_dd_adr16_df() // c178 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -163240,7 +163317,6 @@ void m68000_device::and_w_dd_adr32_df() // c179 f1ff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -163267,6 +163343,7 @@ void m68000_device::and_w_dd_adr32_df() // c179 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -163300,7 +163377,6 @@ void m68000_device::exg_dd_as_df() // c188 f1f8
 	// 3e3 exge1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_dcr = m_da[rx];
 	m_at = m_da[rx];
@@ -163328,6 +163404,7 @@ void m68000_device::exg_dd_as_df() // c188 f1f8
 	m_dbin = m_edb;
 	// 08d rcal3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	set_ftu_const();
 	m_icount -= 2;
@@ -163390,7 +163467,6 @@ void m68000_device::and_l_dd_ais_df() // c190 f1f8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -163440,6 +163516,7 @@ void m68000_device::and_l_dd_ais_df() // c190 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -163523,7 +163600,6 @@ void m68000_device::and_l_dd_aips_df() // c198 f1f8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -163573,6 +163649,7 @@ void m68000_device::and_l_dd_aips_df() // c198 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -163657,7 +163734,6 @@ void m68000_device::and_l_dd_pais_df() // c1a0 f1f8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -163707,6 +163783,7 @@ void m68000_device::and_l_dd_pais_df() // c1a0 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -163808,7 +163885,6 @@ void m68000_device::and_l_dd_das_df() // c1a8 f1f8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -163858,6 +163934,7 @@ void m68000_device::and_l_dd_das_df() // c1a8 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -163999,7 +164076,6 @@ adsl2:
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -164049,6 +164125,7 @@ adsl2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -164153,7 +164230,6 @@ void m68000_device::and_l_dd_adr16_df() // c1b8 f1ff
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -164203,6 +164279,7 @@ void m68000_device::and_l_dd_adr16_df() // c1b8 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -164329,7 +164406,6 @@ void m68000_device::and_l_dd_adr32_df() // c1b9 f1ff
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -164379,6 +164455,7 @@ void m68000_device::and_l_dd_adr32_df() // c1b9 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -164412,7 +164489,6 @@ void m68000_device::muls_w_ds_dd_df() // c1c0 f1f8
 	// 15b mulr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_da[ry];
 	m_at = m_au;
@@ -164472,6 +164548,7 @@ mulm5:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -164524,7 +164601,6 @@ void m68000_device::muls_w_ais_dd_df() // c1d0 f1f8
 	// 15a mulm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_dbin;
 	m_at = m_au;
@@ -164584,6 +164660,7 @@ mulm5:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -164640,7 +164717,6 @@ void m68000_device::muls_w_aips_dd_df() // c1d8 f1f8
 	// 15a mulm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_dbin;
 	m_at = m_au;
@@ -164700,6 +164776,7 @@ mulm5:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -164758,7 +164835,6 @@ void m68000_device::muls_w_pais_dd_df() // c1e0 f1f8
 	// 15a mulm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_dbin;
 	m_at = m_au;
@@ -164818,6 +164894,7 @@ mulm5:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -164892,7 +164969,6 @@ void m68000_device::muls_w_das_dd_df() // c1e8 f1f8
 	// 15a mulm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_dbin;
 	m_at = m_au;
@@ -164952,6 +165028,7 @@ mulm5:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -165064,7 +165141,6 @@ adsw2:
 	// 15a mulm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_dbin;
 	m_at = m_au;
@@ -165124,6 +165200,7 @@ mulm5:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -165197,7 +165274,6 @@ void m68000_device::muls_w_adr16_dd_df() // c1f8 f1ff
 	// 15a mulm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_dbin;
 	m_at = m_au;
@@ -165257,6 +165333,7 @@ mulm5:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -165351,7 +165428,6 @@ void m68000_device::muls_w_adr32_dd_df() // c1f9 f1ff
 	// 15a mulm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_dbin;
 	m_at = m_au;
@@ -165411,6 +165487,7 @@ mulm5:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -165484,7 +165561,6 @@ void m68000_device::muls_w_dpc_dd_df() // c1fa f1ff
 	// 15a mulm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_dbin;
 	m_at = m_au;
@@ -165544,6 +165620,7 @@ mulm5:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -165655,7 +165732,6 @@ adsw2:
 	// 15a mulm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_dbin;
 	m_at = m_au;
@@ -165715,6 +165791,7 @@ mulm5:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -165766,7 +165843,6 @@ void m68000_device::muls_w_imm16_dd_df() // c1fc f1ff
 	// 15b mulr1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_alub = m_da[rx];
 	m_alue = m_dt;
 	m_at = m_au;
@@ -165826,6 +165902,7 @@ mulm5:
 mulm6:
 	// 020 mulm6
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_pc, high16(m_at));
 	m_da[rx] = merge_16_32(m_aluo, m_alue);
 	m_au = m_at + 2;
@@ -165854,7 +165931,6 @@ void m68000_device::add_b_ds_dd_df() // d000 f1f8
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=2 c=2 m=xnzvc  i=b....i. ALU.add a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -165862,6 +165938,7 @@ void m68000_device::add_b_ds_dd_df() // d000 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -165917,7 +165994,6 @@ void m68000_device::add_b_ais_dd_df() // d010 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=b....i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -165925,6 +166001,7 @@ void m68000_device::add_b_ais_dd_df() // d010 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -165984,7 +166061,6 @@ void m68000_device::add_b_aips_dd_df() // d018 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=b....i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -165992,6 +166068,7 @@ void m68000_device::add_b_aips_dd_df() // d018 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -166053,7 +166130,6 @@ void m68000_device::add_b_pais_dd_df() // d020 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=b....i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -166061,6 +166137,7 @@ void m68000_device::add_b_pais_dd_df() // d020 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -166138,7 +166215,6 @@ void m68000_device::add_b_das_dd_df() // d028 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=b....i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -166146,6 +166222,7 @@ void m68000_device::add_b_das_dd_df() // d028 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -166261,7 +166338,6 @@ adsw2:
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=b....i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -166269,6 +166345,7 @@ adsw2:
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -166345,7 +166422,6 @@ void m68000_device::add_b_adr16_dd_df() // d038 f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=b....i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -166353,6 +166429,7 @@ void m68000_device::add_b_adr16_dd_df() // d038 f1ff
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -166450,7 +166527,6 @@ void m68000_device::add_b_adr32_dd_df() // d039 f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=b....i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -166458,6 +166534,7 @@ void m68000_device::add_b_adr32_dd_df() // d039 f1ff
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -166534,7 +166611,6 @@ void m68000_device::add_b_dpc_dd_df() // d03a f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=b....i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -166542,6 +166618,7 @@ void m68000_device::add_b_dpc_dd_df() // d03a f1ff
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -166656,7 +166733,6 @@ adsw2:
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=b....i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -166664,6 +166740,7 @@ adsw2:
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -166721,7 +166798,6 @@ void m68000_device::add_b_imm8_dd_df() // d03c f1ff
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=2 c=2 m=xnzvc  i=b....i. ALU.add a=R.dtl:m_dt d=R.dxl:m_da[rx]
@@ -166729,6 +166805,7 @@ void m68000_device::add_b_imm8_dd_df() // d03c f1ff
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -166763,7 +166840,6 @@ void m68000_device::add_w_ds_dd_df() // d040 f1f8
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=2 c=2 m=xnzvc  i=.....i. ALU.add a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -166771,6 +166847,7 @@ void m68000_device::add_w_ds_dd_df() // d040 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -166805,7 +166882,6 @@ void m68000_device::add_w_as_dd_df() // d048 f1f8
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=2 c=2 m=xnzvc  i=.....i. ALU.add a=R.ayl:m_da[ry] d=R.dxl:m_da[rx]
@@ -166813,6 +166889,7 @@ void m68000_device::add_w_as_dd_df() // d048 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -166871,7 +166948,6 @@ void m68000_device::add_w_ais_dd_df() // d050 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=.....i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -166879,6 +166955,7 @@ void m68000_device::add_w_ais_dd_df() // d050 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -166941,7 +167018,6 @@ void m68000_device::add_w_aips_dd_df() // d058 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=.....i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -166949,6 +167025,7 @@ void m68000_device::add_w_aips_dd_df() // d058 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -167013,7 +167090,6 @@ void m68000_device::add_w_pais_dd_df() // d060 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=.....i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -167021,6 +167097,7 @@ void m68000_device::add_w_pais_dd_df() // d060 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -167101,7 +167178,6 @@ void m68000_device::add_w_das_dd_df() // d068 f1f8
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=.....i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -167109,6 +167185,7 @@ void m68000_device::add_w_das_dd_df() // d068 f1f8
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -167227,7 +167304,6 @@ adsw2:
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=.....i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -167235,6 +167311,7 @@ adsw2:
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -167314,7 +167391,6 @@ void m68000_device::add_w_adr16_dd_df() // d078 f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=.....i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -167322,6 +167398,7 @@ void m68000_device::add_w_adr16_dd_df() // d078 f1ff
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -167422,7 +167499,6 @@ void m68000_device::add_w_adr32_dd_df() // d079 f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=.....i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -167430,6 +167506,7 @@ void m68000_device::add_w_adr32_dd_df() // d079 f1ff
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -167509,7 +167586,6 @@ void m68000_device::add_w_dpc_dd_df() // d07a f1ff
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=.....i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -167517,6 +167593,7 @@ void m68000_device::add_w_dpc_dd_df() // d07a f1ff
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -167634,7 +167711,6 @@ adsw2:
 	// 1c3 romw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=.....i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -167642,6 +167718,7 @@ adsw2:
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -167699,7 +167776,6 @@ void m68000_device::add_w_imm16_dd_df() // d07c f1ff
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=2 c=2 m=xnzvc  i=.....i. ALU.add a=R.dtl:m_dt d=R.dxl:m_da[rx]
@@ -167707,6 +167783,7 @@ void m68000_device::add_w_imm16_dd_df() // d07c f1ff
 	sr_xnzvc();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -167741,7 +167818,6 @@ void m68000_device::add_l_ds_dd_df() // d080 f1f8
 	// 1c5 rorl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=2 c=2 m=xnzvc  i=.l...i. ALU.add a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -167774,6 +167850,7 @@ void m68000_device::add_l_ds_dd_df() // d080 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -167791,7 +167868,6 @@ void m68000_device::add_l_as_dd_df() // d088 f1f8
 	// 1c5 rorl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=2 c=2 m=xnzvc  i=.l...i. ALU.add a=R.ayl:m_da[ry] d=R.dxl:m_da[rx]
@@ -167824,6 +167900,7 @@ void m68000_device::add_l_as_dd_df() // d088 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -167886,7 +167963,6 @@ void m68000_device::add_l_ais_dd_df() // d090 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=.l...i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -167917,6 +167993,7 @@ void m68000_device::add_l_ais_dd_df() // d090 f1f8
 	sr_xnzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -167982,7 +168059,6 @@ void m68000_device::add_l_aips_dd_df() // d098 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=.l...i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -168013,6 +168089,7 @@ void m68000_device::add_l_aips_dd_df() // d098 f1f8
 	sr_xnzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -168079,7 +168156,6 @@ void m68000_device::add_l_pais_dd_df() // d0a0 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=.l...i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -168110,6 +168186,7 @@ void m68000_device::add_l_pais_dd_df() // d0a0 f1f8
 	sr_xnzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -168193,7 +168270,6 @@ void m68000_device::add_l_das_dd_df() // d0a8 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=.l...i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -168224,6 +168300,7 @@ void m68000_device::add_l_das_dd_df() // d0a8 f1f8
 	sr_xnzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -168345,7 +168422,6 @@ adsl2:
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=.l...i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -168376,6 +168452,7 @@ adsl2:
 	sr_xnzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -168461,7 +168538,6 @@ void m68000_device::add_l_adr16_dd_df() // d0b8 f1ff
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=.l...i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -168492,6 +168568,7 @@ void m68000_device::add_l_adr16_dd_df() // d0b8 f1ff
 	sr_xnzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -168598,7 +168675,6 @@ void m68000_device::add_l_adr32_dd_df() // d0b9 f1ff
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=.l...i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -168629,6 +168705,7 @@ void m68000_device::add_l_adr32_dd_df() // d0b9 f1ff
 	sr_xnzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -168711,7 +168788,6 @@ void m68000_device::add_l_dpc_dd_df() // d0ba f1ff
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=.l...i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -168742,6 +168818,7 @@ void m68000_device::add_l_dpc_dd_df() // d0ba f1ff
 	sr_xnzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -168862,7 +168939,6 @@ adsl2:
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=xnzvc  i=.l...i. ALU.add a=R.dbin:m_dbin d=R.dxl:m_da[rx]
@@ -168893,6 +168969,7 @@ adsl2:
 	sr_xnzvc_u();
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -168954,7 +169031,6 @@ void m68000_device::add_l_imm32_dd_df() // d0bc f1ff
 	// 1c5 rorl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=2 c=2 m=xnzvc  i=.l...i. ALU.add a=R.dtl:m_dt d=R.dxl:m_da[rx]
@@ -168987,6 +169063,7 @@ void m68000_device::add_l_imm32_dd_df() // d0bc f1ff
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -169004,7 +169081,6 @@ void m68000_device::adda_w_ds_ad_df() // d0c0 f1f8
 	// 1c9 rorm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dyl:m_da[ry] d=R.axl:m_da[rx]
@@ -169035,6 +169111,7 @@ void m68000_device::adda_w_ds_ad_df() // d0c0 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -169052,7 +169129,6 @@ void m68000_device::adda_w_as_ad_df() // d0c8 f1f8
 	// 1c9 rorm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.ayl:m_da[ry] d=R.axl:m_da[rx]
@@ -169083,6 +169159,7 @@ void m68000_device::adda_w_as_ad_df() // d0c8 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -169124,7 +169201,6 @@ void m68000_device::adda_w_ais_ad_df() // d0d0 f1f8
 	// 1c7 romm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -169155,6 +169231,7 @@ void m68000_device::adda_w_ais_ad_df() // d0d0 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -169200,7 +169277,6 @@ void m68000_device::adda_w_aips_ad_df() // d0d8 f1f8
 	// 1c7 romm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -169231,6 +169307,7 @@ void m68000_device::adda_w_aips_ad_df() // d0d8 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -169278,7 +169355,6 @@ void m68000_device::adda_w_pais_ad_df() // d0e0 f1f8
 	// 1c7 romm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -169309,6 +169385,7 @@ void m68000_device::adda_w_pais_ad_df() // d0e0 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -169372,7 +169449,6 @@ void m68000_device::adda_w_das_ad_df() // d0e8 f1f8
 	// 1c7 romm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -169403,6 +169479,7 @@ void m68000_device::adda_w_das_ad_df() // d0e8 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -169504,7 +169581,6 @@ adsw2:
 	// 1c7 romm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -169535,6 +169611,7 @@ adsw2:
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -169597,7 +169674,6 @@ void m68000_device::adda_w_adr16_ad_df() // d0f8 f1ff
 	// 1c7 romm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -169628,6 +169704,7 @@ void m68000_device::adda_w_adr16_ad_df() // d0f8 f1ff
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -169711,7 +169788,6 @@ void m68000_device::adda_w_adr32_ad_df() // d0f9 f1ff
 	// 1c7 romm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -169742,6 +169818,7 @@ void m68000_device::adda_w_adr32_ad_df() // d0f9 f1ff
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -169804,7 +169881,6 @@ void m68000_device::adda_w_dpc_ad_df() // d0fa f1ff
 	// 1c7 romm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -169835,6 +169911,7 @@ void m68000_device::adda_w_dpc_ad_df() // d0fa f1ff
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -169935,7 +170012,6 @@ adsw2:
 	// 1c7 romm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -169966,6 +170042,7 @@ adsw2:
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -170006,7 +170083,6 @@ void m68000_device::adda_w_imm16_ad_df() // d0fc f1ff
 	// 1c9 rorm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dtl:m_dt d=R.axl:m_da[rx]
@@ -170037,6 +170113,7 @@ void m68000_device::adda_w_imm16_ad_df() // d0fc f1ff
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -170054,7 +170131,6 @@ void m68000_device::addx_b_ds_dd_df() // d100 f1f8
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=12 c=2 m=xnzvc  i=b....i. ALU.addx a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -170062,6 +170138,7 @@ void m68000_device::addx_b_ds_dd_df() // d100 f1f8
 	sr_xnzvc_u();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -170126,7 +170203,6 @@ void m68000_device::addx_b_pais_paid_df() // d108 f1f8
 	// 04a asxw4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_DATA | SSW_R;
 	m_edb = m_program.read_interruptible(m_aob & ~1, m_aob & 1 ? 0x00ff : 0xff00);
 	if(!(m_aob & 1))
@@ -170172,6 +170248,7 @@ void m68000_device::addx_b_pais_paid_df() // d108 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -170221,7 +170298,6 @@ void m68000_device::add_b_dd_ais_df() // d110 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -170248,6 +170324,7 @@ void m68000_device::add_b_dd_ais_df() // d110 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -170300,7 +170377,6 @@ void m68000_device::add_b_dd_aips_df() // d118 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -170327,6 +170403,7 @@ void m68000_device::add_b_dd_aips_df() // d118 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -170381,7 +170458,6 @@ void m68000_device::add_b_dd_pais_df() // d120 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -170408,6 +170484,7 @@ void m68000_device::add_b_dd_pais_df() // d120 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -170478,7 +170555,6 @@ void m68000_device::add_b_dd_das_df() // d128 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -170505,6 +170581,7 @@ void m68000_device::add_b_dd_das_df() // d128 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -170613,7 +170690,6 @@ adsw2:
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -170640,6 +170716,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -170709,7 +170786,6 @@ void m68000_device::add_b_dd_adr16_df() // d138 f1ff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -170736,6 +170812,7 @@ void m68000_device::add_b_dd_adr16_df() // d138 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -170826,7 +170903,6 @@ void m68000_device::add_b_dd_adr32_df() // d139 f1ff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -170853,6 +170929,7 @@ void m68000_device::add_b_dd_adr32_df() // d139 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8xl(m_dbout, m_aluo);
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout, (m_aob & 1) ? 0x00ff : 0xff00);
@@ -170880,7 +170957,6 @@ void m68000_device::addx_w_ds_dd_df() // d140 f1f8
 	// 1c1 rorw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=12 c=2 m=xnzvc  i=.....i. ALU.addx a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -170888,6 +170964,7 @@ void m68000_device::addx_w_ds_dd_df() // d140 f1f8
 	sr_xnzvc_u();
 	// 27a rrgw2
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -170955,7 +171032,6 @@ void m68000_device::addx_w_pais_paid_df() // d148 f1f8
 	// 04a asxw4
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_DATA | SSW_R;
 	m_edb = m_program.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -171004,6 +171080,7 @@ void m68000_device::addx_w_pais_paid_df() // d148 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -171061,7 +171138,6 @@ void m68000_device::add_w_dd_ais_df() // d150 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -171088,6 +171164,7 @@ void m68000_device::add_w_dd_ais_df() // d150 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -171148,7 +171225,6 @@ void m68000_device::add_w_dd_aips_df() // d158 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -171175,6 +171251,7 @@ void m68000_device::add_w_dd_aips_df() // d158 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -171237,7 +171314,6 @@ void m68000_device::add_w_dd_pais_df() // d160 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -171264,6 +171340,7 @@ void m68000_device::add_w_dd_pais_df() // d160 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -171342,7 +171419,6 @@ void m68000_device::add_w_dd_das_df() // d168 f1f8
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -171369,6 +171445,7 @@ void m68000_device::add_w_dd_das_df() // d168 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -171485,7 +171562,6 @@ adsw2:
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -171512,6 +171588,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -171589,7 +171666,6 @@ void m68000_device::add_w_dd_adr16_df() // d178 f1ff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -171616,6 +171692,7 @@ void m68000_device::add_w_dd_adr16_df() // d178 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -171714,7 +171791,6 @@ void m68000_device::add_w_dd_adr32_df() // d179 f1ff
 	// 299 morw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -171741,6 +171817,7 @@ void m68000_device::add_w_dd_adr32_df() // d179 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -171773,7 +171850,6 @@ void m68000_device::addx_l_ds_dd_df() // d180 f1f8
 	// 1c5 rorl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=12 c=2 m=xnzvc  i=.l...i. ALU.addx a=R.dyl:m_da[ry] d=R.dxl:m_da[rx]
@@ -171807,6 +171883,7 @@ void m68000_device::addx_l_ds_dd_df() // d180 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=12 c=0 m=.....  i=.l..... ALU.addx a=R.aluo:m_aluo d=none
@@ -171926,7 +172003,6 @@ void m68000_device::addx_l_pais_paid_df() // d188 f1f8
 	// 061 asxl7
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -171973,6 +172049,7 @@ void m68000_device::addx_l_pais_paid_df() // d188 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -172051,7 +172128,6 @@ void m68000_device::add_l_dd_ais_df() // d190 f1f8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -172101,6 +172177,7 @@ void m68000_device::add_l_dd_ais_df() // d190 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -172181,7 +172258,6 @@ void m68000_device::add_l_dd_aips_df() // d198 f1f8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -172231,6 +172307,7 @@ void m68000_device::add_l_dd_aips_df() // d198 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -172312,7 +172389,6 @@ void m68000_device::add_l_dd_pais_df() // d1a0 f1f8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -172362,6 +172438,7 @@ void m68000_device::add_l_dd_pais_df() // d1a0 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -172460,7 +172537,6 @@ void m68000_device::add_l_dd_das_df() // d1a8 f1f8
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -172510,6 +172586,7 @@ void m68000_device::add_l_dd_das_df() // d1a8 f1f8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -172646,7 +172723,6 @@ adsl2:
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -172696,6 +172772,7 @@ adsl2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -172796,7 +172873,6 @@ void m68000_device::add_l_dd_adr16_df() // d1b8 f1ff
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -172846,6 +172922,7 @@ void m68000_device::add_l_dd_adr16_df() // d1b8 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -172967,7 +173044,6 @@ void m68000_device::add_l_dd_adr32_df() // d1b9 f1ff
 	// 29d morl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_base_ssw = SSW_PROGRAM | SSW_R;
 	m_edb = m_opcodes.read_interruptible(m_aob & ~1);
 	m_icount -= 4;
@@ -173017,6 +173093,7 @@ void m68000_device::add_l_dd_adr32_df() // d1b9 f1ff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -173049,7 +173126,6 @@ void m68000_device::adda_l_ds_ad_df() // d1c0 f1f8
 	// 1c5 rorl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dyl:m_da[ry] d=R.axl:m_da[rx]
@@ -173080,6 +173156,7 @@ void m68000_device::adda_l_ds_ad_df() // d1c0 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -173097,7 +173174,6 @@ void m68000_device::adda_l_as_ad_df() // d1c8 f1f8
 	// 1c5 rorl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_da[ry]);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.ayl:m_da[ry] d=R.axl:m_da[rx]
@@ -173128,6 +173204,7 @@ void m68000_device::adda_l_as_ad_df() // d1c8 f1f8
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -173190,7 +173267,6 @@ void m68000_device::adda_l_ais_ad_df() // d1d0 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -173219,6 +173295,7 @@ void m68000_device::adda_l_ais_ad_df() // d1d0 f1f8
 	alu_addc(m_alub, high16(m_da[rx]));
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -173284,7 +173361,6 @@ void m68000_device::adda_l_aips_ad_df() // d1d8 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -173313,6 +173389,7 @@ void m68000_device::adda_l_aips_ad_df() // d1d8 f1f8
 	alu_addc(m_alub, high16(m_da[rx]));
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -173379,7 +173456,6 @@ void m68000_device::adda_l_pais_ad_df() // d1e0 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -173408,6 +173484,7 @@ void m68000_device::adda_l_pais_ad_df() // d1e0 f1f8
 	alu_addc(m_alub, high16(m_da[rx]));
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -173491,7 +173568,6 @@ void m68000_device::adda_l_das_ad_df() // d1e8 f1f8
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -173520,6 +173596,7 @@ void m68000_device::adda_l_das_ad_df() // d1e8 f1f8
 	alu_addc(m_alub, high16(m_da[rx]));
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -173641,7 +173718,6 @@ adsl2:
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -173670,6 +173746,7 @@ adsl2:
 	alu_addc(m_alub, high16(m_da[rx]));
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -173755,7 +173832,6 @@ void m68000_device::adda_l_adr16_ad_df() // d1f8 f1ff
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -173784,6 +173860,7 @@ void m68000_device::adda_l_adr16_ad_df() // d1f8 f1ff
 	alu_addc(m_alub, high16(m_da[rx]));
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -173890,7 +173967,6 @@ void m68000_device::adda_l_adr32_ad_df() // d1f9 f1ff
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -173919,6 +173995,7 @@ void m68000_device::adda_l_adr32_ad_df() // d1f9 f1ff
 	alu_addc(m_alub, high16(m_da[rx]));
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -174001,7 +174078,6 @@ void m68000_device::adda_l_dpc_ad_df() // d1fa f1ff
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -174030,6 +174106,7 @@ void m68000_device::adda_l_dpc_ad_df() // d1fa f1ff
 	alu_addc(m_alub, high16(m_da[rx]));
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -174150,7 +174227,6 @@ adsl2:
 	// 1cb roml1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dbin);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dbin:m_dbin d=R.axl:m_da[rx]
@@ -174179,6 +174255,7 @@ adsl2:
 	alu_addc(m_alub, high16(m_da[rx]));
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -174240,7 +174317,6 @@ void m68000_device::adda_l_imm32_ad_df() // d1fc f1ff
 	// 1c5 rorl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_at = ext32(m_dt);
 	// alu r=2 c=2 m=.....  i=.....i. ALU.add a=R.dtl:m_dt d=R.axl:m_da[rx]
@@ -174271,6 +174347,7 @@ void m68000_device::adda_l_imm32_ad_df() // d1fc f1ff
 	m_icount -= 2;
 	// 25d roml3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16h(m_da[rx], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -174287,7 +174364,6 @@ void m68000_device::asr_b_imm3_ds_df() // e000 f1f8
 	// 381 srrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=2 c=1 m=.....  i=b...... ALU.and_ a=18:m_da[ry] d=-1
@@ -174336,6 +174412,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -174352,7 +174429,6 @@ void m68000_device::lsr_b_imm3_ds_df() // e008 f1f8
 	// 381 srrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=5 c=1 m=.....  i=b...... ALU.and_ a=18:m_da[ry] d=-1
@@ -174401,6 +174477,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -174417,7 +174494,6 @@ void m68000_device::roxr_b_imm3_ds_df() // e010 f1f8
 	// 381 srrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=8 c=1 m=.....  i=b...r.. ALU.and_ a=18:m_da[ry] d=-1
@@ -174466,6 +174542,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -174482,7 +174559,6 @@ void m68000_device::ror_b_imm3_ds_df() // e018 f1f8
 	// 381 srrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=10 c=1 m=.....  i=b...... ALU.and_ a=18:m_da[ry] d=-1
@@ -174531,6 +174607,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -174548,7 +174625,6 @@ void m68000_device::asr_b_dd_ds_df() // e020 f1f8
 	// 382 sriw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=2 c=1 m=.....  i=b...... ALU.and_ a=18:m_da[ry] d=-1
@@ -174597,6 +174673,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -174614,7 +174691,6 @@ void m68000_device::lsr_b_dd_ds_df() // e028 f1f8
 	// 382 sriw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=5 c=1 m=.....  i=b...... ALU.and_ a=18:m_da[ry] d=-1
@@ -174663,6 +174739,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -174680,7 +174757,6 @@ void m68000_device::roxr_b_dd_ds_df() // e030 f1f8
 	// 382 sriw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=8 c=1 m=.....  i=b...r.. ALU.and_ a=18:m_da[ry] d=-1
@@ -174729,6 +174805,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -174746,7 +174823,6 @@ void m68000_device::ror_b_dd_ds_df() // e038 f1f8
 	// 382 sriw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=10 c=1 m=.....  i=b...... ALU.and_ a=18:m_da[ry] d=-1
@@ -174795,6 +174871,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -174811,7 +174888,6 @@ void m68000_device::asr_w_imm3_ds_df() // e040 f1f8
 	// 381 srrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=2 c=1 m=.....  i=....... ALU.and_ a=18:m_da[ry] d=-1
@@ -174860,6 +174936,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -174876,7 +174953,6 @@ void m68000_device::lsr_w_imm3_ds_df() // e048 f1f8
 	// 381 srrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=5 c=1 m=.....  i=....... ALU.and_ a=18:m_da[ry] d=-1
@@ -174925,6 +175001,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -174941,7 +175018,6 @@ void m68000_device::roxr_w_imm3_ds_df() // e050 f1f8
 	// 381 srrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=8 c=1 m=.....  i=....r.. ALU.and_ a=18:m_da[ry] d=-1
@@ -174990,6 +175066,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -175006,7 +175083,6 @@ void m68000_device::ror_w_imm3_ds_df() // e058 f1f8
 	// 381 srrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=10 c=1 m=.....  i=....... ALU.and_ a=18:m_da[ry] d=-1
@@ -175055,6 +175131,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -175072,7 +175149,6 @@ void m68000_device::asr_w_dd_ds_df() // e060 f1f8
 	// 382 sriw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=2 c=1 m=.....  i=....... ALU.and_ a=18:m_da[ry] d=-1
@@ -175121,6 +175197,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -175138,7 +175215,6 @@ void m68000_device::lsr_w_dd_ds_df() // e068 f1f8
 	// 382 sriw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=5 c=1 m=.....  i=....... ALU.and_ a=18:m_da[ry] d=-1
@@ -175187,6 +175263,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -175204,7 +175281,6 @@ void m68000_device::roxr_w_dd_ds_df() // e070 f1f8
 	// 382 sriw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=8 c=1 m=.....  i=....r.. ALU.and_ a=18:m_da[ry] d=-1
@@ -175253,6 +175329,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -175270,7 +175347,6 @@ void m68000_device::ror_w_dd_ds_df() // e078 f1f8
 	// 382 sriw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=10 c=1 m=.....  i=....... ALU.and_ a=18:m_da[ry] d=-1
@@ -175319,6 +175395,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -175335,7 +175412,6 @@ void m68000_device::asr_l_imm3_ds_df() // e080 f1f8
 	// 385 srrl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=2 c=1 m=.....  i=.l..... ALU.and_ a=18:m_da[ry] d=-1
@@ -175388,6 +175464,7 @@ srrl4:
 	m_icount -= 2;
 	// 306 srrl5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=2 c=1 m=.nz..  i=.l....f ALU.and_ a=alub d=-1
 	alu_and(m_alub, 0xffff);
@@ -175406,7 +175483,6 @@ void m68000_device::lsr_l_imm3_ds_df() // e088 f1f8
 	// 385 srrl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=5 c=1 m=.....  i=.l..... ALU.and_ a=18:m_da[ry] d=-1
@@ -175459,6 +175535,7 @@ srrl4:
 	m_icount -= 2;
 	// 306 srrl5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=5 c=1 m=.nz..  i=.l....f ALU.and_ a=alub d=-1
 	alu_and(m_alub, 0xffff);
@@ -175477,7 +175554,6 @@ void m68000_device::roxr_l_imm3_ds_df() // e090 f1f8
 	// 385 srrl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=8 c=1 m=.....  i=.l..r.. ALU.and_ a=18:m_da[ry] d=-1
@@ -175530,6 +175606,7 @@ srrl4:
 	m_icount -= 2;
 	// 306 srrl5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=8 c=1 m=.nz..  i=.l..r.f ALU.and_ a=alub d=-1
 	alu_andx(m_alub, 0xffff);
@@ -175548,7 +175625,6 @@ void m68000_device::ror_l_imm3_ds_df() // e098 f1f8
 	// 385 srrl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=10 c=1 m=.....  i=.l..... ALU.and_ a=18:m_da[ry] d=-1
@@ -175601,6 +175677,7 @@ srrl4:
 	m_icount -= 2;
 	// 306 srrl5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=10 c=1 m=.nz..  i=.l....f ALU.and_ a=alub d=-1
 	alu_and(m_alub, 0xffff);
@@ -175620,7 +175697,6 @@ void m68000_device::asr_l_dd_ds_df() // e0a0 f1f8
 	// 386 sril1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=2 c=1 m=.....  i=.l..... ALU.and_ a=18:m_da[ry] d=-1
@@ -175673,6 +175749,7 @@ srrl4:
 	m_icount -= 2;
 	// 306 srrl5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=2 c=1 m=.nz..  i=.l....f ALU.and_ a=alub d=-1
 	alu_and(m_alub, 0xffff);
@@ -175692,7 +175769,6 @@ void m68000_device::lsr_l_dd_ds_df() // e0a8 f1f8
 	// 386 sril1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=5 c=1 m=.....  i=.l..... ALU.and_ a=18:m_da[ry] d=-1
@@ -175745,6 +175821,7 @@ srrl4:
 	m_icount -= 2;
 	// 306 srrl5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=5 c=1 m=.nz..  i=.l....f ALU.and_ a=alub d=-1
 	alu_and(m_alub, 0xffff);
@@ -175764,7 +175841,6 @@ void m68000_device::roxr_l_dd_ds_df() // e0b0 f1f8
 	// 386 sril1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=8 c=1 m=.....  i=.l..r.. ALU.and_ a=18:m_da[ry] d=-1
@@ -175817,6 +175893,7 @@ srrl4:
 	m_icount -= 2;
 	// 306 srrl5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=8 c=1 m=.nz..  i=.l..r.f ALU.and_ a=alub d=-1
 	alu_andx(m_alub, 0xffff);
@@ -175836,7 +175913,6 @@ void m68000_device::ror_l_dd_ds_df() // e0b8 f1f8
 	// 386 sril1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=10 c=1 m=.....  i=.l..... ALU.and_ a=18:m_da[ry] d=-1
@@ -175889,6 +175965,7 @@ srrl4:
 	m_icount -= 2;
 	// 306 srrl5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=10 c=1 m=.nz..  i=.l....f ALU.and_ a=alub d=-1
 	alu_and(m_alub, 0xffff);
@@ -175932,7 +176009,6 @@ void m68000_device::asr_ais_df() // e0d0 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=2 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -175964,6 +176040,7 @@ void m68000_device::asr_ais_df() // e0d0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -176024,7 +176101,6 @@ void m68000_device::asr_aips_df() // e0d8 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=2 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -176056,6 +176132,7 @@ void m68000_device::asr_aips_df() // e0d8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -176118,7 +176195,6 @@ void m68000_device::asr_pais_df() // e0e0 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=2 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -176150,6 +176226,7 @@ void m68000_device::asr_pais_df() // e0e0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -176228,7 +176305,6 @@ void m68000_device::asr_das_df() // e0e8 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=2 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -176260,6 +176336,7 @@ void m68000_device::asr_das_df() // e0e8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -176376,7 +176453,6 @@ adsw2:
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=2 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -176408,6 +176484,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -176485,7 +176562,6 @@ void m68000_device::asr_adr16_df() // e0f8 ffff
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=2 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -176517,6 +176593,7 @@ void m68000_device::asr_adr16_df() // e0f8 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -176615,7 +176692,6 @@ void m68000_device::asr_adr32_df() // e0f9 ffff
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=2 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -176647,6 +176723,7 @@ void m68000_device::asr_adr32_df() // e0f9 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -176678,7 +176755,6 @@ void m68000_device::asl_b_imm3_ds_df() // e100 f1f8
 	// 381 srrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=3 c=1 m=.....  i=b...... ALU.and_ a=18:m_da[ry] d=-1
@@ -176727,6 +176803,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -176743,7 +176820,6 @@ void m68000_device::lsl_b_imm3_ds_df() // e108 f1f8
 	// 381 srrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=4 c=1 m=.....  i=b...... ALU.and_ a=18:m_da[ry] d=-1
@@ -176792,6 +176868,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=4 c=0 m=.....  i=b...... ALU.and_ a=R.aluo:m_aluo d=none
@@ -176809,7 +176886,6 @@ void m68000_device::roxl_b_imm3_ds_df() // e110 f1f8
 	// 381 srrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=11 c=1 m=.....  i=b...r.. ALU.and_ a=18:m_da[ry] d=-1
@@ -176858,6 +176934,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -176874,7 +176951,6 @@ void m68000_device::rol_b_imm3_ds_df() // e118 f1f8
 	// 381 srrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=9 c=1 m=.....  i=b...... ALU.and_ a=18:m_da[ry] d=-1
@@ -176923,6 +176999,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -176940,7 +177017,6 @@ void m68000_device::asl_b_dd_ds_df() // e120 f1f8
 	// 382 sriw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=3 c=1 m=.....  i=b...... ALU.and_ a=18:m_da[ry] d=-1
@@ -176989,6 +177065,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -177006,7 +177083,6 @@ void m68000_device::lsl_b_dd_ds_df() // e128 f1f8
 	// 382 sriw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=4 c=1 m=.....  i=b...... ALU.and_ a=18:m_da[ry] d=-1
@@ -177055,6 +177131,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=4 c=0 m=.....  i=b...... ALU.and_ a=R.aluo:m_aluo d=none
@@ -177073,7 +177150,6 @@ void m68000_device::roxl_b_dd_ds_df() // e130 f1f8
 	// 382 sriw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=11 c=1 m=.....  i=b...r.. ALU.and_ a=18:m_da[ry] d=-1
@@ -177122,6 +177198,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -177139,7 +177216,6 @@ void m68000_device::rol_b_dd_ds_df() // e138 f1f8
 	// 382 sriw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=9 c=1 m=.....  i=b...... ALU.and_ a=18:m_da[ry] d=-1
@@ -177188,6 +177264,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_8(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -177204,7 +177281,6 @@ void m68000_device::asl_w_imm3_ds_df() // e140 f1f8
 	// 381 srrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=3 c=1 m=.....  i=....... ALU.and_ a=18:m_da[ry] d=-1
@@ -177253,6 +177329,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -177269,7 +177346,6 @@ void m68000_device::lsl_w_imm3_ds_df() // e148 f1f8
 	// 381 srrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=4 c=1 m=.....  i=....... ALU.and_ a=18:m_da[ry] d=-1
@@ -177318,6 +177394,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=4 c=0 m=.....  i=....... ALU.and_ a=R.aluo:m_aluo d=none
@@ -177335,7 +177412,6 @@ void m68000_device::roxl_w_imm3_ds_df() // e150 f1f8
 	// 381 srrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=11 c=1 m=.....  i=....r.. ALU.and_ a=18:m_da[ry] d=-1
@@ -177384,6 +177460,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -177400,7 +177477,6 @@ void m68000_device::rol_w_imm3_ds_df() // e158 f1f8
 	// 381 srrw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=9 c=1 m=.....  i=....... ALU.and_ a=18:m_da[ry] d=-1
@@ -177449,6 +177525,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -177466,7 +177543,6 @@ void m68000_device::asl_w_dd_ds_df() // e160 f1f8
 	// 382 sriw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=3 c=1 m=.....  i=....... ALU.and_ a=18:m_da[ry] d=-1
@@ -177515,6 +177591,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -177532,7 +177609,6 @@ void m68000_device::lsl_w_dd_ds_df() // e168 f1f8
 	// 382 sriw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=4 c=1 m=.....  i=....... ALU.and_ a=18:m_da[ry] d=-1
@@ -177581,6 +177657,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	// alu r=4 c=0 m=.....  i=....... ALU.and_ a=R.aluo:m_aluo d=none
@@ -177599,7 +177676,6 @@ void m68000_device::roxl_w_dd_ds_df() // e170 f1f8
 	// 382 sriw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=11 c=1 m=.....  i=....r.. ALU.and_ a=18:m_da[ry] d=-1
@@ -177648,6 +177724,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -177665,7 +177742,6 @@ void m68000_device::rol_w_dd_ds_df() // e178 f1f8
 	// 382 sriw1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=9 c=1 m=.....  i=....... ALU.and_ a=18:m_da[ry] d=-1
@@ -177714,6 +177790,7 @@ srrw3:
 nbcr3:
 	// 253 nbcr3
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	set_16l(m_da[ry], m_aluo);
 	m_au = m_pc + 2;
 	set_ftu_const();
@@ -177730,7 +177807,6 @@ void m68000_device::asl_l_imm3_ds_df() // e180 f1f8
 	// 385 srrl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=3 c=1 m=.....  i=.l..... ALU.and_ a=18:m_da[ry] d=-1
@@ -177783,6 +177859,7 @@ srrl4:
 	m_icount -= 2;
 	// 306 srrl5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=3 c=1 m=.nz..  i=.l....f ALU.and_ a=alub d=-1
 	alu_and(m_alub, 0xffff);
@@ -177801,7 +177878,6 @@ void m68000_device::lsl_l_imm3_ds_df() // e188 f1f8
 	// 385 srrl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=4 c=1 m=.....  i=.l..... ALU.and_ a=18:m_da[ry] d=-1
@@ -177856,6 +177932,7 @@ srrl4:
 	m_icount -= 2;
 	// 306 srrl5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=4 c=1 m=.nz..  i=.l....f ALU.and_ a=alub d=-1
 	alu_and(m_alub, 0xffff);
@@ -177874,7 +177951,6 @@ void m68000_device::roxl_l_imm3_ds_df() // e190 f1f8
 	// 385 srrl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=11 c=1 m=.....  i=.l..r.. ALU.and_ a=18:m_da[ry] d=-1
@@ -177927,6 +178003,7 @@ srrl4:
 	m_icount -= 2;
 	// 306 srrl5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=11 c=1 m=.nz..  i=.l..r.f ALU.and_ a=alub d=-1
 	alu_andx(m_alub, 0xffff);
@@ -177945,7 +178022,6 @@ void m68000_device::rol_l_imm3_ds_df() // e198 f1f8
 	// 385 srrl1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_ftu);
 	// alu r=9 c=1 m=.....  i=.l..... ALU.and_ a=18:m_da[ry] d=-1
@@ -177998,6 +178074,7 @@ srrl4:
 	m_icount -= 2;
 	// 306 srrl5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=9 c=1 m=.nz..  i=.l....f ALU.and_ a=alub d=-1
 	alu_and(m_alub, 0xffff);
@@ -178017,7 +178094,6 @@ void m68000_device::asl_l_dd_ds_df() // e1a0 f1f8
 	// 386 sril1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=3 c=1 m=.....  i=.l..... ALU.and_ a=18:m_da[ry] d=-1
@@ -178070,6 +178146,7 @@ srrl4:
 	m_icount -= 2;
 	// 306 srrl5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=3 c=1 m=.nz..  i=.l....f ALU.and_ a=alub d=-1
 	alu_and(m_alub, 0xffff);
@@ -178089,7 +178166,6 @@ void m68000_device::lsl_l_dd_ds_df() // e1a8 f1f8
 	// 386 sril1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=4 c=1 m=.....  i=.l..... ALU.and_ a=18:m_da[ry] d=-1
@@ -178144,6 +178220,7 @@ srrl4:
 	m_icount -= 2;
 	// 306 srrl5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=4 c=1 m=.nz..  i=.l....f ALU.and_ a=alub d=-1
 	alu_and(m_alub, 0xffff);
@@ -178163,7 +178240,6 @@ void m68000_device::roxl_l_dd_ds_df() // e1b0 f1f8
 	// 386 sril1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=11 c=1 m=.....  i=.l..r.. ALU.and_ a=18:m_da[ry] d=-1
@@ -178216,6 +178292,7 @@ srrl4:
 	m_icount -= 2;
 	// 306 srrl5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=11 c=1 m=.nz..  i=.l..r.f ALU.and_ a=alub d=-1
 	alu_andx(m_alub, 0xffff);
@@ -178235,7 +178312,6 @@ void m68000_device::rol_l_dd_ds_df() // e1b8 f1f8
 	// 386 sril1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = ext32(m_da[rx]);
 	// alu r=9 c=1 m=.....  i=.l..... ALU.and_ a=18:m_da[ry] d=-1
@@ -178288,6 +178364,7 @@ srrl4:
 	m_icount -= 2;
 	// 306 srrl5
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_au = m_pc + 2;
 	// alu r=9 c=1 m=.nz..  i=.l....f ALU.and_ a=alub d=-1
 	alu_and(m_alub, 0xffff);
@@ -178331,7 +178408,6 @@ void m68000_device::asl_ais_df() // e1d0 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=3 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -178363,6 +178439,7 @@ void m68000_device::asl_ais_df() // e1d0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -178423,7 +178500,6 @@ void m68000_device::asl_aips_df() // e1d8 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=3 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -178455,6 +178531,7 @@ void m68000_device::asl_aips_df() // e1d8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -178517,7 +178594,6 @@ void m68000_device::asl_pais_df() // e1e0 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=3 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -178549,6 +178625,7 @@ void m68000_device::asl_pais_df() // e1e0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -178627,7 +178704,6 @@ void m68000_device::asl_das_df() // e1e8 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=3 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -178659,6 +178735,7 @@ void m68000_device::asl_das_df() // e1e8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -178775,7 +178852,6 @@ adsw2:
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=3 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -178807,6 +178883,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -178884,7 +178961,6 @@ void m68000_device::asl_adr16_df() // e1f8 ffff
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=3 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -178916,6 +178992,7 @@ void m68000_device::asl_adr16_df() // e1f8 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -179014,7 +179091,6 @@ void m68000_device::asl_adr32_df() // e1f9 ffff
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=3 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -179046,6 +179122,7 @@ void m68000_device::asl_adr32_df() // e1f9 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -179102,7 +179179,6 @@ void m68000_device::lsr_ais_df() // e2d0 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=5 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -179134,6 +179210,7 @@ void m68000_device::lsr_ais_df() // e2d0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -179194,7 +179271,6 @@ void m68000_device::lsr_aips_df() // e2d8 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=5 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -179226,6 +179302,7 @@ void m68000_device::lsr_aips_df() // e2d8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -179288,7 +179365,6 @@ void m68000_device::lsr_pais_df() // e2e0 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=5 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -179320,6 +179396,7 @@ void m68000_device::lsr_pais_df() // e2e0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -179398,7 +179475,6 @@ void m68000_device::lsr_das_df() // e2e8 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=5 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -179430,6 +179506,7 @@ void m68000_device::lsr_das_df() // e2e8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -179546,7 +179623,6 @@ adsw2:
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=5 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -179578,6 +179654,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -179655,7 +179732,6 @@ void m68000_device::lsr_adr16_df() // e2f8 ffff
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=5 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -179687,6 +179763,7 @@ void m68000_device::lsr_adr16_df() // e2f8 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -179785,7 +179862,6 @@ void m68000_device::lsr_adr32_df() // e2f9 ffff
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=5 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -179817,6 +179893,7 @@ void m68000_device::lsr_adr32_df() // e2f9 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -179874,7 +179951,6 @@ void m68000_device::lsl_ais_df() // e3d0 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=4 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -179906,6 +179982,7 @@ void m68000_device::lsl_ais_df() // e3d0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -179969,7 +180046,6 @@ void m68000_device::lsl_aips_df() // e3d8 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=4 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -180001,6 +180077,7 @@ void m68000_device::lsl_aips_df() // e3d8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -180066,7 +180143,6 @@ void m68000_device::lsl_pais_df() // e3e0 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=4 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -180098,6 +180174,7 @@ void m68000_device::lsl_pais_df() // e3e0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -180179,7 +180256,6 @@ void m68000_device::lsl_das_df() // e3e8 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=4 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -180211,6 +180287,7 @@ void m68000_device::lsl_das_df() // e3e8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -180332,7 +180409,6 @@ adsw2:
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=4 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -180364,6 +180440,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -180444,7 +180521,6 @@ void m68000_device::lsl_adr16_df() // e3f8 ffff
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=4 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -180476,6 +180552,7 @@ void m68000_device::lsl_adr16_df() // e3f8 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -180578,7 +180655,6 @@ void m68000_device::lsl_adr32_df() // e3f9 ffff
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=4 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -180610,6 +180686,7 @@ void m68000_device::lsl_adr32_df() // e3f9 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -180667,7 +180744,6 @@ void m68000_device::roxr_ais_df() // e4d0 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=8 c=1 m=.nzvc  i=....ri. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -180699,6 +180775,7 @@ void m68000_device::roxr_ais_df() // e4d0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -180759,7 +180836,6 @@ void m68000_device::roxr_aips_df() // e4d8 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=8 c=1 m=.nzvc  i=....ri. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -180791,6 +180867,7 @@ void m68000_device::roxr_aips_df() // e4d8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -180853,7 +180930,6 @@ void m68000_device::roxr_pais_df() // e4e0 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=8 c=1 m=.nzvc  i=....ri. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -180885,6 +180961,7 @@ void m68000_device::roxr_pais_df() // e4e0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -180963,7 +181040,6 @@ void m68000_device::roxr_das_df() // e4e8 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=8 c=1 m=.nzvc  i=....ri. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -180995,6 +181071,7 @@ void m68000_device::roxr_das_df() // e4e8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -181111,7 +181188,6 @@ adsw2:
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=8 c=1 m=.nzvc  i=....ri. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -181143,6 +181219,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -181220,7 +181297,6 @@ void m68000_device::roxr_adr16_df() // e4f8 ffff
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=8 c=1 m=.nzvc  i=....ri. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -181252,6 +181328,7 @@ void m68000_device::roxr_adr16_df() // e4f8 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -181350,7 +181427,6 @@ void m68000_device::roxr_adr32_df() // e4f9 ffff
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=8 c=1 m=.nzvc  i=....ri. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -181382,6 +181458,7 @@ void m68000_device::roxr_adr32_df() // e4f9 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -181438,7 +181515,6 @@ void m68000_device::roxl_ais_df() // e5d0 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=11 c=1 m=.nzvc  i=....ri. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -181470,6 +181546,7 @@ void m68000_device::roxl_ais_df() // e5d0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -181530,7 +181607,6 @@ void m68000_device::roxl_aips_df() // e5d8 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=11 c=1 m=.nzvc  i=....ri. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -181562,6 +181638,7 @@ void m68000_device::roxl_aips_df() // e5d8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -181624,7 +181701,6 @@ void m68000_device::roxl_pais_df() // e5e0 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=11 c=1 m=.nzvc  i=....ri. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -181656,6 +181732,7 @@ void m68000_device::roxl_pais_df() // e5e0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -181734,7 +181811,6 @@ void m68000_device::roxl_das_df() // e5e8 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=11 c=1 m=.nzvc  i=....ri. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -181766,6 +181842,7 @@ void m68000_device::roxl_das_df() // e5e8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -181882,7 +181959,6 @@ adsw2:
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=11 c=1 m=.nzvc  i=....ri. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -181914,6 +181990,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -181991,7 +182068,6 @@ void m68000_device::roxl_adr16_df() // e5f8 ffff
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=11 c=1 m=.nzvc  i=....ri. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -182023,6 +182099,7 @@ void m68000_device::roxl_adr16_df() // e5f8 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -182121,7 +182198,6 @@ void m68000_device::roxl_adr32_df() // e5f9 ffff
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=11 c=1 m=.nzvc  i=....ri. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -182153,6 +182229,7 @@ void m68000_device::roxl_adr32_df() // e5f9 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -182209,7 +182286,6 @@ void m68000_device::ror_ais_df() // e6d0 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=10 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -182241,6 +182317,7 @@ void m68000_device::ror_ais_df() // e6d0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -182301,7 +182378,6 @@ void m68000_device::ror_aips_df() // e6d8 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=10 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -182333,6 +182409,7 @@ void m68000_device::ror_aips_df() // e6d8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -182395,7 +182472,6 @@ void m68000_device::ror_pais_df() // e6e0 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=10 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -182427,6 +182503,7 @@ void m68000_device::ror_pais_df() // e6e0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -182505,7 +182582,6 @@ void m68000_device::ror_das_df() // e6e8 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=10 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -182537,6 +182613,7 @@ void m68000_device::ror_das_df() // e6e8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -182653,7 +182730,6 @@ adsw2:
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=10 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -182685,6 +182761,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -182762,7 +182839,6 @@ void m68000_device::ror_adr16_df() // e6f8 ffff
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=10 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -182794,6 +182870,7 @@ void m68000_device::ror_adr16_df() // e6f8 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -182892,7 +182969,6 @@ void m68000_device::ror_adr32_df() // e6f9 ffff
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=10 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -182924,6 +183000,7 @@ void m68000_device::ror_adr32_df() // e6f9 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -182980,7 +183057,6 @@ void m68000_device::rol_ais_df() // e7d0 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=9 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -183012,6 +183088,7 @@ void m68000_device::rol_ais_df() // e7d0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -183072,7 +183149,6 @@ void m68000_device::rol_aips_df() // e7d8 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=9 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -183104,6 +183180,7 @@ void m68000_device::rol_aips_df() // e7d8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -183166,7 +183243,6 @@ void m68000_device::rol_pais_df() // e7e0 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=9 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -183198,6 +183274,7 @@ void m68000_device::rol_pais_df() // e7e0 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -183276,7 +183353,6 @@ void m68000_device::rol_das_df() // e7e8 fff8
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=9 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -183308,6 +183384,7 @@ void m68000_device::rol_das_df() // e7e8 fff8
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -183424,7 +183501,6 @@ adsw2:
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=9 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -183456,6 +183532,7 @@ adsw2:
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -183533,7 +183610,6 @@ void m68000_device::rol_adr16_df() // e7f8 ffff
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=9 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -183565,6 +183641,7 @@ void m68000_device::rol_adr16_df() // e7f8 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);
@@ -183663,7 +183740,6 @@ void m68000_device::rol_adr32_df() // e7f9 ffff
 	// 3c7 sftm1
 	m_aob = m_au;
 	m_ir = m_irc;
-	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_pc = m_au;
 	m_au = m_au + 2;
 	// alu r=9 c=1 m=.nzvc  i=.....i. ALU.and_ a=R.dbin:m_dbin d=-1
@@ -183695,6 +183771,7 @@ void m68000_device::rol_adr32_df() // e7f9 ffff
 	// 38d morw2
 	m_aob = m_au;
 	m_ird = m_ir;
+	if(m_next_state != S_TRACE) m_next_state = m_int_next_state;
 	m_dbout = m_aluo;
 	m_base_ssw = SSW_DATA;
 	m_program.write_interruptible(m_aob & ~1, m_dbout);

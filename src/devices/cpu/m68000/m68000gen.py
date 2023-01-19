@@ -1361,9 +1361,9 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
 
     if ir_to_ird:
         code.append(["=", R.ird, R.ir])
+        code.append(["i", "if(m_next_state != S_TRACE) m_next_state = m_int_next_state;"])
     elif micro & 0x00001:
         code.append(["=", R.ir, R.irc])
-        code.append(["i", "if(m_next_state != S_TRACE) m_next_state = m_int_next_state;"])
 
     if abl_to_ftu:
        # Also used for dbin_to_movem
