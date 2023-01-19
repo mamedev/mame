@@ -53,6 +53,7 @@ BTANB:
 
 #include "gmaster.lh"
 
+
 namespace {
 
 class gmaster_state : public driver_device
