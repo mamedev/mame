@@ -127,6 +127,9 @@ The ROM support is still TODO.
 #include "screen.h"
 #include "render.h"
 
+
+namespace {
+
 #define XTAL_MEKD3 3.579545_MHz_XTAL
 
 class mekd3_state : public driver_device
@@ -1060,6 +1063,9 @@ ROM_START(mekd3)
 	ROM_REGION(0x0400, "chargen",0)
 	ROM_LOAD("mcm6674p.chr", 0x0000, 0x0400, CRC(1c22088a) SHA1(b5f0bd0cfdec0cd5c1cb764506bef3c17d6af0eb))
 ROM_END
+
+} // anonymous namespace
+
 
 /***************************************************************************
 

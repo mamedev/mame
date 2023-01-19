@@ -878,6 +878,8 @@ Notes:
 #include "screen.h"
 
 
+namespace {
+
 class namcops2_state : public driver_device
 {
 public:
@@ -1653,6 +1655,9 @@ ROM_START( motogp )
 	DISK_REGION("dvd")  // actually HDD for this game
 	DISK_IMAGE_READONLY( "mgp1004-na-hdd0-a", 0, SHA1(599940b9fe7fc8e46fd80a32c7e795ae143ee645) )
 ROM_END
+
+} // anonymous namespace
+
 
 // System 246
 GAME(2001, sys246,          0, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "System 246 BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)

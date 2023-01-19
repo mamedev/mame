@@ -15,6 +15,8 @@
 #include "machine/z80sio.h"
 
 
+namespace {
+
 class vdm7932x_state : public driver_device
 {
 public:
@@ -139,6 +141,8 @@ ROM_START( vdm79322 ) // 8k ram // b&w (amber)
 	ROM_REGION( 0x04000, "subcpu", 0 )
 	ROM_LOAD( "27128_w322-3700.bin", 0x00000, 0x04000, CRC(e5e76ca2) SHA1(bb18c9fa29ef9fa0563aa07d2b856cf6594fc020) )
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(1992, vdm79322, 0, 0, vdm7932x, vdm7932x, vdm7932x_state, empty_init, "Mera-Elzab", "VDM 79322/CM 7233", MACHINE_IS_SKELETON)

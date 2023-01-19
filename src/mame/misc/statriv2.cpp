@@ -81,6 +81,8 @@ Issues:
 #include "tilemap.h"
 
 
+namespace {
+
 class statriv2_state : public driver_device
 {
 public:
@@ -1704,6 +1706,7 @@ void statriv2_state::init_laserdisc()
 	);
 }
 
+} // anonymous namespace
 
 
 /*************************************

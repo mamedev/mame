@@ -58,6 +58,8 @@ TODO:
 #include "machine/pci.h"
 
 
+namespace {
+
 class cavepc_state : public driver_device
 {
 public:
@@ -146,6 +148,8 @@ ROM_START(deathsm2)
 	DISK_REGION( "usb" ) // the USB stick used to upgrade the game to Version 4.00 MUST be present for it to run once upgraded
 	DISK_IMAGE( "cave_ds2_usb", 0, SHA1(b601985c7f6e6a20b0b7999167b7ccdd12ab80d0) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*****************************************************************************/

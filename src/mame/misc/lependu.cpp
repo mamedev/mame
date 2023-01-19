@@ -88,6 +88,9 @@
 
 #include "lependu.lh"
 
+
+namespace {
+
 #define MASTER_CLOCK    XTAL(10'000'000)
 #define CPU_CLOCK       (MASTER_CLOCK/16)
 #define PIXEL_CLOCK     (MASTER_CLOCK/2)
@@ -625,6 +628,8 @@ void lependu_state::init_lependu()
 	// fix checksum to avoid RAM clear
 	ROM[0xdd79] = 0xb7;
 }
+
+} // anonymous namespace
 
 
 /*********************************************

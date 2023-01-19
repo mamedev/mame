@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
-#ifndef MAME_MACHINE_MG1_KBD_H
-#define MAME_MACHINE_MG1_KBD_H
+#ifndef MAME_MG1_KBD_H
+#define MAME_MG1_KBD_H
 
 #pragma once
 
@@ -36,4 +36,4 @@ private:
 
 DECLARE_DEVICE_TYPE(MG1_KBD, mg1_kbd_device)
 
-#endif // MAME_MACHINE_MG1_KBD_H
+#endif // MAME_MG1_KBD_H

@@ -191,6 +191,8 @@ TODO:
 #include "machine/pci.h"
 
 
+namespace {
+
 class comebaby_state : public driver_device
 {
 public:
@@ -237,6 +239,8 @@ ROM_START(comebaby)
 	DISK_REGION( "disks" )
 	DISK_IMAGE( "comebaby", 0, BAD_DUMP SHA1(ea57919319c0b6a1d4abd7822cff028855bf082f) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 2000, comebaby, 0, comebaby, comebaby, comebaby_state, empty_init, ROT0, "ExPotato", "Come On Baby", MACHINE_IS_SKELETON )

@@ -69,6 +69,9 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class dominob_state : public driver_device
 {
 public:
@@ -360,6 +363,9 @@ ROM_START( dominobv2 )
 	ROM_LOAD( "u113v2",   0x80000, 0x40000, CRC(0b804675) SHA1(284eb4377f8334ec09be9a9ba9faad854ab5385e) )
 	ROM_LOAD( "u114v2",   0xc0000, 0x40000, CRC(df17ee65) SHA1(1cb434719a8c406726d2c966392be03a2dc1d758) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1996, dominob,   0,       dominob,  dominob, dominob_state, empty_init, ROT0, "Wonwoo Systems", "Domino Block",       MACHINE_SUPPORTS_SAVE )
 GAME( 1996, dominobv2, dominob, dominob,  dominob, dominob_state, empty_init, ROT0, "Wonwoo Systems", "Domino Block ver.2", MACHINE_SUPPORTS_SAVE )

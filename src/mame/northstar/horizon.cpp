@@ -39,9 +39,20 @@ involves replacing the XTAL and reconnecting one jumper.
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "bus/s100/s100.h"
+#include "bus/s100/am310.h"
+//#include "bus/s100/dj2db.h"
+//#include "bus/s100/djdma.h"
+//#include "bus/s100/mm65k16s.h"
+#include "bus/s100/nsmdsa.h"
+#include "bus/s100/nsmdsad.h"
+#include "bus/s100/seals8k.h"
+//#include "bus/s100/wunderbus.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8251.h"
 #include "softlist_dev.h"
+
+
+namespace {
 
 #define Z80_TAG         "z80"
 #define I8251_L_TAG     "3a"
@@ -150,16 +161,6 @@ DEVICE_INPUT_DEFAULTS_END
 //  S100_INTERFACE( s100_intf )
 //-------------------------------------------------
 
-// slot devices
-#include "bus/s100/am310.h"
-//#include "bus/s100/dj2db.h"
-//#include "bus/s100/djdma.h"
-//#include "bus/s100/mm65k16s.h"
-#include "bus/s100/nsmdsa.h"
-#include "bus/s100/nsmdsad.h"
-#include "bus/s100/seals8k.h"
-//#include "bus/s100/wunderbus.h"
-
 static void horizon_s100_cards(device_slot_interface &device)
 {
 	device.option_add("mdsa", S100_MDS_A);
@@ -264,6 +265,7 @@ ROM_START( vector1 ) // This one have different I/O
 	ROM_LOAD( "horizon.bin", 0x0000, 0x0100, CRC(7aafa134) SHA1(bf1552c4818f30473798af4f54e65e1957e0db48))
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************

@@ -281,6 +281,8 @@
 #include "luckybal.lh"
 
 
+namespace {
+
 class luckybal_state : public driver_device
 {
 public:
@@ -721,6 +723,8 @@ void luckybal_state::init_luckybald()
 
 	membank("bank1")->configure_entries(0, 0x40, &rom[0x10000], 0x2000);
 }
+
+} // anonymous namespace
 
 
 /**************************************

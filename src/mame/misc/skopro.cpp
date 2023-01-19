@@ -26,6 +26,9 @@
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 
+
+namespace {
+
 class skopro_state : public driver_device
 {
 public:
@@ -73,6 +76,8 @@ ROM_START( drgdance )
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "dragon_dance", 0, SHA1(73868dd9354d936100ba56f460e872087ede012c) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 2008, drgdance,  0,   skopro, skopro, skopro_state, empty_init, ROT0, "Success", "Dragon Dance (V1.02J)",  MACHINE_IS_SKELETON )
