@@ -19,7 +19,7 @@ The nfsgt is a Windows XP HDD image, containing:
 \- nVidia Display Driver 45.23 for Windows 2000 to XP (GeForce 256 up to GeForce 4)
 \- DirectX 9.0
 - C:\windows:
-\- aksubs.inf: Aladdin Knowledge Systems HASP/Hardlock USB driver
+\- aksusb.inf: Aladdin Knowledge Systems HASP/Hardlock USB driver
 \- akspccard.inf: Aladdin Knowledge Systems Hasp & Hardlock PCMCIA (PC-Card)
 - C:\windows\inf:
 \- 865.inf: driver for 8265
