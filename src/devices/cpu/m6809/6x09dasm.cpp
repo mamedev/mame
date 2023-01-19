@@ -57,7 +57,6 @@ const m6x09_base_disassembler::opcodeinfo *m6x09_base_disassembler::fetch_opcode
 {
 	uint16_t page = 0;
 	const opcodeinfo *op = nullptr;
-	const opcodeinfo *page_cache = nullptr;
 
 	while(!op)
 	{
@@ -77,38 +76,30 @@ const m6x09_base_disassembler::opcodeinfo *m6x09_base_disassembler::fetch_opcode
 			// on the 6809 an unimplemented page 2 or 3 opcodes fall thru to the first page.
 			if ( (m_level < HD6309_EXCLUSIVE) && (page != 0))
 			{
-				// backup the opcode pointer and emit the page instruction.
+				// backup the opcode pointer and disassemble the bare opcode.
 				--p;
-				return page_cache;
+				page = 0;
 			}
 			else
+				// nothing to disassemble.
 				return nullptr;
 		}
-
-		// was this a $10 or $11 page?
-		switch (iter->mode())
+		else
 		{
-		case PG2:
-			page_cache = &*iter;
-			// if next opcode is an additional page instruction, emit a page instruction and continue.
-			if (opcodes.r8(p) == 0x10 || opcodes.r8(p) == 0x11)
-				op = &*iter;
-			else
-				page = 0x1000;
-			break;
+			// was this a $10 or $11 page?
+			switch (iter->mode())
+			{
+			case PG2:
+			case PG3:
+				// remember the page that comes first
+				if (page == 0)
+					page = iter->opcode() << 8;
+				break;
 
-		case PG3:
-			page_cache = &*iter;
-			// if next opcode is an additional page instruction, emit a page instruction and continue.
-			if (opcodes.r8(p) == 0x10 || opcodes.r8(p) == 0x11)
+			default:
 				op = &*iter;
-			else
-				page = 0x1100;
-			break;
-
-		default:
-			op = &*iter;
-			break;
+				break;
+			}
 		}
 	};
 
@@ -609,6 +600,9 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 	{ 0xFF, 3, "STU",   EXT,    M6x09_GENERAL },
 
 	// Page 2 opcodes (0x10 0x..)
+	{ 0x1010, 1, "PAGE2", PG2,    M6x09_GENERAL },
+	{ 0x1011, 1, "PAGE3", PG3,    M6x09_GENERAL },
+
 	{ 0x1020, 4, "XLBRA", LREL, M6809_UNDOCUMENTED },
 	{ 0x1021, 4, "LBRN",  LREL, M6x09_GENERAL },
 	{ 0x1022, 4, "LBHI",  LREL, M6x09_GENERAL },
@@ -751,6 +745,9 @@ const m6x09_base_disassembler::opcodeinfo m6x09_disassembler::m6x09_opcodes[] =
 	{ 0x10FF, 4, "STS",   EXT,  M6x09_GENERAL },
 
 	// Page 3 opcodes (0x11 0x..)
+	{ 0x1110, 1, "PAGE2", PG2,    M6x09_GENERAL },
+	{ 0x1111, 1, "PAGE3", PG3,    M6x09_GENERAL },
+
 	{ 0x1130, 4, "BAND",  IMM_BW,   HD6309_EXCLUSIVE },
 	{ 0x1131, 4, "BIAND", IMM_BW,   HD6309_EXCLUSIVE },
 	{ 0x1132, 4, "BOR",   IMM_BW,   HD6309_EXCLUSIVE },
