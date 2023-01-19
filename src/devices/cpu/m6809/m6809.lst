@@ -9,8 +9,6 @@ MAIN:
 		case VECTOR_IRQ:    goto IRQ;
 	}
 
-	if (m_hcf) goto HCF;
-
 	// debugger hook
 	m_ppc = m_pc;
 	debugger_instruction_hook(m_pc.w);
@@ -19,6 +17,8 @@ MAIN:
 	m_lic_func(ASSERT_LINE);
 	@m_opcode = read_opcode();
 	m_lic_func(CLEAR_LINE);
+
+	if (m_hcf) goto HCF;
 
 	// dispatch opcode
 	switch(m_opcode)
@@ -606,7 +606,6 @@ TFR:
 HCF:
 	// Test mode that increments the address bus until reset.
 	m_hcf = true;
-	@dummy_read_opcode_arg(0);
 	return;
 
 ILLEGAL:
