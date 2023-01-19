@@ -43,8 +43,10 @@ MAIN:
 		case 0x14:  case 0x15:                                      %HCF;       return;
 		case 0x16:              set_cond(true);                     %LBRANCH;   return;
 		case 0x17:                                                  %LBSR;      return;
+		case 0x18:                                                  %X18;       return;
 		case 0x19:                                                  %DAA;       return;
 		case 0x1A:                                      set_imm();  %ORCC;      return;
+		case 0x1B:                                                  %NOP;       return;
 		case 0x1C:                                      set_imm();  %ANDCC;     return;
 		case 0x1D:                                                  %SEX;       return;
 		case 0x1E:                                                  %EXG;       return;
@@ -604,8 +606,15 @@ TFR:
 	return;
 
 HCF:
-	// Test mode that increments the address bus until reset.
+	// A CPU test mode that increments the address bus until reset.
 	m_hcf = true;
+	return;
+
+X18:
+	m_temp.b.l = read_opcode_arg(m_pc.w);
+	m_temp.b.l |= ~0x01;
+	m_temp.b.h = (m_cc & m_temp.b.l) << 1;
+	m_cc = m_temp.b.h | ((m_cc & 0x04) >> 1);
 	return;
 
 ILLEGAL:
