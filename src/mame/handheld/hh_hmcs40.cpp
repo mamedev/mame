@@ -148,6 +148,8 @@ TODO:
 #include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
+namespace {
+
 class hh_hmcs40_state : public driver_device
 {
 public:
@@ -260,8 +262,6 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
-
-namespace {
 
 /***************************************************************************
 

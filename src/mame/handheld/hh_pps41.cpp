@@ -39,6 +39,8 @@ ROM source notes when dumped from another title, but confident it's the same:
 //#include "hh_pps41_test.lh" // common test-layout - use external artwork
 
 
+namespace {
+
 class hh_pps41_state : public driver_device
 {
 public:
@@ -123,8 +125,6 @@ INPUT_CHANGED_MEMBER(hh_pps41_state::reset_button)
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
-
-namespace {
 
 /***************************************************************************
 

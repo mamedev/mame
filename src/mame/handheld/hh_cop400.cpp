@@ -53,6 +53,8 @@ TODO:
 //#include "hh_cop400_test.lh" // common test-layout - use external artwork
 
 
+namespace {
+
 class hh_cop400_state : public driver_device
 {
 public:
@@ -141,8 +143,6 @@ INPUT_CHANGED_MEMBER(hh_cop400_state::reset_button)
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
-
-namespace {
 
 /***************************************************************************
 
