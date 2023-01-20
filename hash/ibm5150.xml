@@ -8603,9 +8603,12 @@ Disk 2: Side Arms / Street Fighter
 	</software>
 
 	<software name="arknoid2">
-		<description>Arkanoid 2: Revenge of Doh (newer, with CMS Sound support)</description>
+		<description>Arkanoid 2: Revenge of Doh (cracked, newer, with CMS Sound support)</description>
 		<year>1989</year>
 		<publisher>Taito Corporation</publisher>
+		<notes><![CDATA[
+Missing copy protection track
+]]></notes>
 		<info name="developer" value="Taito Corporation" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -8615,9 +8618,12 @@ Disk 2: Side Arms / Street Fighter
 	</software>
 
 	<software name="arknoid2a" cloneof="arknoid2">
-		<description>Arkanoid 2: Revenge of Doh (older)</description>
+		<description>Arkanoid 2: Revenge of Doh (cracked, older)</description>
 		<year>1989</year>
 		<publisher>Taito Corporation</publisher>
+		<notes><![CDATA[
+Missing copy protection track
+]]></notes>
 		<info name="developer" value="Taito Corporation" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
