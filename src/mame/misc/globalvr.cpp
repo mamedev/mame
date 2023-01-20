@@ -7,7 +7,7 @@ for Games/Operating System for Global VR produced games.
 Specific hardware outlays are unknown per game at this time.
 
 The install disks contains PowerQuest DeployCenter 5.0 images.
-Those aren't El Torito complaint so they expects at very least a
+Those aren't El Torito compliant so they expect at very least a
 bootable MSDOS 5.0 (according to Pq_debug.txt file found in gvrxpsys).
 The nfsgt is a Windows XP HDD image, containing:
 - C:\Program Files:
@@ -19,7 +19,7 @@ The nfsgt is a Windows XP HDD image, containing:
 \- nVidia Display Driver 45.23 for Windows 2000 to XP (GeForce 256 up to GeForce 4)
 \- DirectX 9.0
 - C:\windows:
-\- aksubs.inf: Aladdin Knowledge Systems HASP/Hardlock USB driver
+\- aksusb.inf: Aladdin Knowledge Systems HASP/Hardlock USB driver
 \- akspccard.inf: Aladdin Knowledge Systems Hasp & Hardlock PCMCIA (PC-Card)
 - C:\windows\inf:
 \- 865.inf: driver for 8265
@@ -78,9 +78,11 @@ Need For Speed Underground                       2005
 Operation Blockade                               200?
 Paradise Lost                                    2007
 Puck Off                                         2007
+Redline Rampage Gas Guzzlers                     2014
 Sin                                              1999
 Sky Bandits                                      2008
 Split The Uprights                               200?
+The Swarm                                        2013
 Twisted - Nitro Stunt Racing                     2009
 UltraPin                                         2006
 */
