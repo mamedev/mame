@@ -619,9 +619,8 @@ HCF:
 
 X18:
 	@m_temp.b.l = read_opcode_arg(m_pc.w);
-	m_temp.b.l |= ~0x01;
-	m_temp.b.h = (m_cc & m_temp.b.l) << 1;
-	m_cc = m_temp.b.h | ((m_cc & 0x04) >> 1);
+	m_temp.b.l = (m_cc & m_temp.b.l) << 1;
+	m_cc = m_temp.b.l | ((m_cc & 0x04) >> 1);
 	return;
 
 XANDCC:
