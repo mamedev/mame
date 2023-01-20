@@ -764,6 +764,7 @@ void mc88100_device::execute(u32 const inst)
 			}
 			break;
 		case 0x340: // divu: unsigned integer divide (register)
+		case 0x348:
 			if (!(m_cr[PSR] & PSR_SFD1))
 			{
 				if (m_r[S2])
@@ -775,6 +776,7 @@ void mc88100_device::execute(u32 const inst)
 				exception(E_SFU1_P);
 			break;
 		case 0x360: // mul: integer multiply (register)
+		case 0x368:
 			if (!(m_cr[PSR] & PSR_SFD1))
 				m_r[D] = m_r[S1] * m_r[S2];
 			else
@@ -869,6 +871,7 @@ void mc88100_device::execute(u32 const inst)
 			}
 			break;
 		case 0x3c0: // div: signed integer divide (register)
+		case 0x3c8:
 			if (!(m_cr[PSR] & PSR_SFD1))
 			{
 				if (m_r[S2] && !BIT(m_r[S1], 31) && !BIT(m_r[S2], 31))
@@ -880,6 +883,7 @@ void mc88100_device::execute(u32 const inst)
 				exception(E_SFU1_P);
 			break;
 		case 0x3e0: // cmp: integer compare (register)
+		case 0x3e8:
 			m_r[D] = cmp(m_r[S1], m_r[S2]);
 			break;
 

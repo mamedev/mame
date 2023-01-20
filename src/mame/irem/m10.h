@@ -86,12 +86,10 @@ protected:
 
 	// misc
 	int m_last = 0;
-	emu_timer *m_interrupt_timer;
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void palette(palette_device &palette) const;
-	TIMER_CALLBACK_MEMBER(interrupt_callback);
 };
 
 class m10_state : public m1x_state
@@ -126,11 +124,9 @@ private:
 	void m11_ctrl_w(uint8_t data);
 	void m10_a500_w(uint8_t data);
 	void m11_a100_w(uint8_t data);
-	uint8_t m10_a700_r();
+	uint8_t clear_74123_r();
 	void chargen_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(ic8j1_output_changed);
-	DECLARE_WRITE_LINE_MEMBER(ic8j2_output_changed);
 	inline void plot_pixel( bitmap_ind16 &bm, int x, int y, int col );
 
 	void m10_main(address_map &map);

@@ -148,6 +148,8 @@ CN1 standard DB15 VGA connector (15KHz)
 #include "screen.h"
 
 
+namespace {
+
 class pntnpuzl_state : public driver_device
 {
 public:
@@ -425,5 +427,8 @@ void pntnpuzl_state::init_pip()
 //  rom[0x26a0/2] = 0x4e71;
 
 }
+
+} // anonymous namespace
+
 
 GAME( 1993, pntnpuzl, 0, pntnpuzl, pntnpuzl, pntnpuzl_state, init_pip, ROT90, "Century Vending", "Paint 'N Puzzle", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

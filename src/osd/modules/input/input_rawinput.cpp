@@ -481,9 +481,9 @@ public:
 		for (int devnum = retrieved - 1; devnum >= 0; devnum--)
 			add_rawinput_device(machine, rawinput_devices[devnum]);
 
-		// don't enable global inputs when debugging
+		// don't enable background input when debugging
 		if (!machine.options().debug())
-			m_global_inputs_enabled = downcast<windows_options &>(machine.options()).global_inputs();
+			m_global_inputs_enabled = options()->background_input();
 
 		// If we added no devices, no need to register for notifications
 		if (devicelist().empty())

@@ -94,7 +94,7 @@ Regular game cartridges
 +========+===================+================================================================================================+
 |        | 80-090120(US)     | <Unknown>                                                                                      |
 +========+===================+================================================================================================+
-|        | 80-090140(US)     | <Unknown>  (Should be My Pet Puppy)                                                            |
+|        | 80-090140(US)     | <Unknown> (Should be My Pet Puppy)                                                             |
 |        | 80-090142(NL)     | Mijn Puppy!                                                                                    |
 |   XX   | 80-090144(GE)     | Mein erster Hund                                                                               |
 |        | 80-090145(FR)     | Mon Toutou Tout Fou!                                                                           |
@@ -140,7 +140,7 @@ Regular game cartridges
 |   XX   | 80-092000-101(US) | Alphabet Park Adventure (rev. 101, blond haired girl version)                                  |
 |   XX   |          (IT)     | Avventura nel parco alfabeto                                                                   |
 |   XX   | 80-092002(NL)     | Alfabet Pretpark                                                                               |
-|        | 80-092003(UK)     | Alphabet Park Adventure (Red Haired Girl Version)                                              |
+|   XX   | 80-092003(UK)     | Alphabet Park Adventure (red haired girl version)                                              |
 |   XX   | 80-092004(GE)     | Abenteuer im ABC Park                                                                          |
 |   XX   | 80-092004(GE)     | Abenteuer im ABC Park (rev. 3, translucent blue cart)                                          |
 |   XX   | 80-092005(FR)     | ABC Land Aventure (same ROM on purple and translucent blue carts)                              |
@@ -157,7 +157,7 @@ Regular game cartridges
 +========+===================+================================================================================================+
 |        | 80-092040(US)     | Learnin' Wheels  (blue car with guy driving)                                                   |
 |        | 80-092043(UK)     | Learnin' Wheels                                                                                |
-|   XX   | 80-092044(GE)     | Freds Zahlen Rally  (note to self, guy in blue car wrong serial#)  80-092924(GE) on label      |
+|   XX   | 80-092044(GE)     | Freds Zahlen Rally  (note to self, guy in blue car wrong serial#) (80-092924(GE) on label)     |
 |   XX   | 80-092045(FR)     | Apprenti' Pilote                                                                               |
 +========+===================+================================================================================================+
 |   XX   | 80-092060(US)     | Winnie The Pooh: The Honey Hunt                                                                |
@@ -165,12 +165,13 @@ Regular game cartridges
 |        | 80-092062(NL)     | Winnie de Poeh - De wonderwereld van Poeh                                                      |
 |   XX   | 80-092062-123(NL) | Winnie de Poeh - De wonderwereld van Poeh (rev. 123, labeled as "My Friends Tigger and Pooh", 52-092062(NL) on back label)
 |        | 80-092063(UK)     | Winnie The Pooh: The Honey Hunt                                                                |
+|   XX   | 80-092063-103(UK) | Winnie The Pooh: The Honey Hunt (52-092063-103(UK) on back label)                              |
 |   XX   | 80-092064(GE)     | Pooh - Die Honigjagd                                                                           |
 |   XX   | 80-092064(GE)     | Winnie Puuh - Winnie Puuh auf der Honigjagd                                                    |
 |        | 80-092064(GE)     | My Friends Tigger and Pooh - Die Honigjagd                                                     |
 |   XX   | 80-092064-104(GE) | My Friends Tigger and Pooh - Die Honigjagd (rev. 104)                                          |
 |   XX   | 80-092065(FR)     | Winnie l'Ourson - La Chasse au miel de Winnie                                                  |
-|   XX   | 80-092065-105(FR) | Winnie l'Ourson - La Chasse au miel de Winnie (rev. 105                                        |
+|   XX   | 80-092065-105(FR) | Winnie l'Ourson - La Chasse au miel de Winnie (rev. 105)                                       |
 |        | 80-092066(PT)     | Winnie the Pooh - Em Busca Do Mel (92076 on cart)                                              |
 |   XX   | 80-092067(SP)     | Winnie the Pooh - En Busca de la Miel (no # on label, 92067 on PCB)                            |
 |   XX   | 80-092067-122(SP) | My Friends Tigger and Pooh - En Busca de la Miel (rev. 122, 092067-1 on PCB)                   |
@@ -185,7 +186,7 @@ Regular game cartridges
 |   XX   | 80-092080(US)     | Mickey Mouse - Mickey's Magical Adventure                                                      |
 |   XX   | 80-092081(IT)     | Topolino - Le Magiche Avventure di Topolino                                                    |
 |   XX   | 80-092082(NL)     | Mickey Mouse - De wonderwereld van Mickey                                                      |
-|        | 80-092083(UK)     | Mickey Mouse - Mickey's Magical Adventure                                                      |
+|   XX   | 80-092083(UK)     | Mickey Mouse - Mickey's Magical Adventure                                                      |
 |   XX   | 80-092084(GE)     | Micky - Mickys magisches Abenteuer                                                             |
 |   XX   | 80-092085(FR)     | Mickey - Mickey à la recherche de Pluto                                                        |
 |        | 80-092086(PT)     | Mickey - A Aventura Mágica de Mickey (EAN is 3417768920964 cart 92096)                         |
@@ -232,7 +233,7 @@ Regular game cartridges
 |   XX   | 80-092141(IT)     | Spider-Man & Friends - Missioni Segrete                                                        |
 |   XX   | 80-092142(NL)     | Spider-Man en Vrienden! - Geheime Missies (white Webs)                                         |
 |   XX   | 80-092142-123(NL) | Spider-Man en Vrienden! - Geheime Missies (rev. 123, Yellow webs)                              |
-|        | 80-092143(UK)     | Spider-Man & Friends - Secret Missions (no # on front label)                                   |
+|   XX   | 80-092143(UK)     | Spider-Man & Friends - Secret Missions (no # on front label)                                   |
 |        | 80-092143-103(UK) | Spider-Man & Friends - Secret Missions (rev. 103)                                              |
 |   XX   | 80-092144(GE)     | Spider-Man & Freunde - Geheime Missionen                                                       |
 |   XX   | 80-092145(FR)     | Spider-Man & ses amis - Missions Secrètes (white webs)                                         |
@@ -248,9 +249,11 @@ Regular game cartridges
 |   XX   | 80-092160-301(US) | Scooby-Doo! - Funland Frenzy (rev. 301)                                                        |
 |   XX   | 80-092161(IT)     | Scooby-Doo! - Avventura a Funland                                                              |
 |   XX   | 80-092162(NL)     | Scooby-Doo! - Griezelen in het pretpark (52-92162(NL) on back label)                           |
-|   XX   | 80-092163(UK)     | Scooby-Doo! - Funland Frenzy                                                                   |
+|   XX   | 80-092163(UK)     | Scooby-Doo! - Funland Frenzy (2004)                                                            |
+|   XX   | 80-092163(UK)     | Scooby-Doo! - Funland Frenzy (2007)                                                            |
+|   XX   | 80-092163(UK)     | Scooby-Doo! - Funland Frenzy (2008)                                                            |
 |        | 80-092163-103(UK) | Scooby-Doo! - Funland Frenzy (rev. 103)                                                        |
-|        | 80-092163-293(UK) | Scooby-Doo! - Funland Frenzy (rev. 293, Yellow, only Scooby on label might be motion version)  |
+|        | 80-092163-293(UK) | Scooby-Doo! - Funland Frenzy (rev. 293, Yellow, only Scooby on label, might be Motion version) |
 |   XX   | 80-092164(GE)     | Scooby-Doo! - Im Lernpark                                                                      |
 |   XX   | 80-092165(FR)     | Scooby-Doo! - Panique à Funland (same ROM on purple and translucent blue carts)                |
 |   XX   | 80-092165-105(FR) | Scooby-Doo! - Panique à Funland (rev. 105)                                                     |
@@ -270,7 +273,7 @@ Regular game cartridges
 |        | 80-092200(US)     | Aladdin - Aladdin's Wonders of the World                                                       |
 |   XX   | 80-092201(IT)     | Aladdin - Il magico mondo di Aladdin                                                           |
 |   XX   | 80-092202(NL)     | Aladdin - De wonderwereld van Aladdin                                                          |
-|        | 80-092203(UK)     | Aladdin - Aladdin's Wonders of the World                                                       |
+|   XX   | 80-092203(UK)     | Aladdin - Aladdin's Wonders of the World                                                       |
 |   XX   | 80-092204(GE)     | Aladdin - Aladdins Welt der Wunder                                                             |
 |   XX   | 80-092205(FR)     | Aladdin - Les fabuleuses aventures d'Aladdin                                                   |
 |   XX   | 80-092207(SP)     | Aladdin - El Maravilloso Mundo de Aladdin (52-92207(SP) on back label)                         |
@@ -307,9 +310,9 @@ Regular game cartridges
 |   XX   | 80-092245-105(FR) | Cendrillon - Le rêve enchanté de Cendrillon (rev. 105)                                         |
 |   XX   | 80-092245-205(FR) | Cendrillon - Le rêve enchanté de Cendrillon (rev. 205)                                         |
 |        | 80-092246(PT)     | Cinderela - Os Sonhos Magicos da Cinderela (Cart#92256)                                        |
-|   XX   | 80-092247(SP)     | La Cenicienta - Los sueños mágicos de Cenicienta (non motion#, but V.Motion in spanish catalog)|
+|   XX   | 80-092247(SP)     | La Cenicienta - Los sueños mágicos de Cenicienta (non Motion#, but V.Motion in spanish catalog)|
 |   XX   | 80-092247-122(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (rev. 122, white/light pink cart label background)
-|   XX   | 80-092247-222(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (rev. 222, no # on front label, 52-092247-222(SP) on back label, non motion#, but V.Motion in Spanish catalog)
+|   XX   | 80-092247-222(SP) | La Cenicienta - Los sueños mágicos de Cenicienta (rev. 222, no # on front label, 52-092247-222(SP) on back label, non Motion#, but V.Motion in Spanish catalog)
 |        | 80-092248(CN)     | 仙蒂                                                                                            |
 |   XX   | 80-092253(DK)     | Cinderella - Askepots magiske ønsker                                                           |
 |   XX   | 80-092254(SE)     | Cinderella - Askungens magiska önskningar                                                      |
@@ -326,7 +329,7 @@ Regular game cartridges
 |   XX   | 80-092280-201(US) | Dora The Explorer - Dora's Fit-it Adventure (rev. 201)                                         |
 |   XX   | 80-092282(NL)     | Dora - Dora's Reparatie Avontuur! (2005, 52-92282(NL) on back label)                           |
 |   XX   | 80-084022(NL)     | Dora - Dora's Reparatie Avontuur! (2009)                                                       |
-|   XX   | 80-092283(UK)     | Dora The Explorer - Dora's Fit-it Adventure (same ROM as "80-092280(US)"                       |
+|   XX   | 80-092283(UK)     | Dora The Explorer - Dora's Fit-it Adventure                                                    |
 |   XX   | 80-092283-103(UK) | Dora The Explorer - Dora's Fit-it Adventure (rev. 103)                                         |
 |        | 80-092284(GE)     | Dora - Doras Reparatur-Abenteuer                                                               |
 |   XX   | 80-092284-104(GE) | Dora - Doras Reparatur-Abenteuer (rev. 104)                                                    |
@@ -376,7 +379,7 @@ Regular game cartridges
 |   XX   | 80-092360(US)     | Zayzoo - My Alien Classmate                                                                    |
 |   XX   | 80-092360-101(US) | Zayzoo: An Earth Adventure (rev. 101)                                                          |
 |        | 80-092362(NL)     | Zayzoo - Mijn Buitenaardse Vriendje                                                            |
-|        | 80-092363(UK)     | Zayzoo - My Alien Classmate (yes, duped#)                                                      |
+|   XX   | 80-092363(UK)     | Zayzoo - My Alien Classmate (52-92363(UK) on back label) (yes, duped#)                         |
 |        | 80-092363(UK)     | Zayzoo: An Earth Adventure (saw it, can't find pic again)                                      |
 |   XX   | 80-092363-103(UK) | Zayzoo: An Earth Adventure (rev. 103)                                                          |
 |   XX   | 80-092364(GE)     | Zayzoos Lernall                                                                                |
@@ -482,6 +485,7 @@ Regular game cartridges
 |        |          (IT)     | Cars - Motori Ruggenti (gpz06755)                                                              |
 |        | 80-092662(NL)     | Cars - Spektakel in Radiator Springs                                                           |
 |   XX   | 80-092663(UK)     | Cars - Rev It Up In Radiator Springs                                                           |
+|   XX   | 80-092663(UK)     | Cars - Rev It Up In Radiator Springs (alt)                                                     |
 |   XX   | 80-092664(GE)     | Cars - Vollgas in Radiator Springs                                                             |
 |   XX   | 80-092665(FR)     | Cars - Quatre Roues                                                                            |
 |   XX   | 80-092665-105(FR) | Cars - Quatre Roues (rev. 105)                                                                 |
@@ -538,9 +542,9 @@ Regular game cartridges
 |   XX   | 80-092885(FR)     | Ratatouille - Les nouvelles recettes de Rémy                                                   |
 |   XX   | 80-092887(SP)     | Ratatouille - Las recetas del Remy (52-092887(SP) on back label)                               |
 +========+===================+================================================================================================+
-|   XX   | 80-092900(US)     | Go Diego Go! - Save the Animal Familes!                                                        |
+|   XX   | 80-092900(US)     | Go Diego Go! - Save the Animal Families!                                                       |
 |        | 80-092902(NL)     | Go Diego Go! - Red de dierenfamilies!                                                          |
-|        | 80-092903(UK)     | Go Diego Go! - Save the Animal Familes!                                                        |
+|   XX   | 80-092903(UK)     | Go Diego Go! - Save the Animal Families! (52-092903(UK) on back label)                         |
 |   XX   | 80-092905(FR)     | Go Diego! - À la rescousse des animaux!                                                        |
 +========+===================+================================================================================================+
 |   XX   | 80-092920(US)     | Cranium - Partyland Park                                                                       |
@@ -556,7 +560,7 @@ Regular game cartridges
 |   XX   | 80-092944(GE)     | Micky Maus Wunderhaus                                                                          |
 |   XX   | 80-092945(FR)     | La Maison de Mickey                                                                            |
 |   XX   | 80-092947(SP)     | La Casa de Mickey Mouse (52-092947(SP) on back label)                                          |
-|        |          (DK)     | Mickey Mouse Clubhouse                                                                         |
+|        | 80-092953(DK)     | Mickey Mouse Clubhouse                                                                         |
 |   XX   | 80-092954(SE)     | Mickey Mouse Clubhouse                                                                         |
 |        |          (NO)     | Mickey Mouse Clubhouse                                                                         |
 |        |          (FI)     | Mickey Mouse Clubhouse                                                                         |
@@ -595,7 +599,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 
 <softwarelist name="vsmile_cart" description="VTech V.Smile cartridges">
 
-	<software name="aladdinit">
+	<software name="aladdinit" cloneof="aladdinuk">
 		<description>Disney Aladdin - Il magico mondo di Aladdin (Italy)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -609,7 +613,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="aladdinnl" cloneof="aladdinit">
+	<software name="aladdinnl" cloneof="aladdinuk">
 		<description>Disney's Aladdin - De wonderwereld van Aladdin (Netherlands)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
@@ -626,7 +630,23 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="aladdinge" cloneof="aladdinit">
+	<!-- Parent until the USA version is found and dumped. -->
+	<software name="aladdinuk">
+		<description>Disney's Aladdin - Aladdin's Wonders of the World (UK)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092203(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92203- Disney Aladdin - Wonders of the World (UK).bin" size="8388608" crc="244eb37a" sha1="c8131f488e563ef1a7f045ef3601670d02ca404e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aladdinge" cloneof="aladdinuk">
 		<description>Disneys Aladdin - Aladdins Welt der Wunder (Germany)</description>
 		<year>2005?</year>
 		<publisher>VTech</publisher>
@@ -643,7 +663,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="aladdinfr" cloneof="aladdinit">
+	<software name="aladdinfr" cloneof="aladdinuk">
 		<description>Disney Aladdin - Les fabuleuses aventures d'Aladdin (France)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
@@ -658,7 +678,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="aladdinsp" cloneof="aladdinit">
+	<software name="aladdinsp" cloneof="aladdinuk">
 		<description>Disney Aladdin - El Maravilloso Mundo de Aladdin (Spain)</description>
 		<year>2005</year>
 		<publisher>VTech</publisher>
@@ -803,6 +823,23 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="80-092002 - Alfabet Pretpark (NL).bin" size="8388608" crc="fe101ad1" sha1="6af191fbd51aef8c8465b586d2a714a82931cb4c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alphaprkuk" cloneof="alphaprkr101">
+		<description>Alphabet Park Adventure (UK)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092003(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
+			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x0800000">
+				<rom name="092003.u1" size="0x0400000" crc="402681b7" sha1="5ff1ba9a016d10e09408b5638aaf759cac2cc97a" offset="0x0000000" /> <!-- U1 is the same as U1 on 80-092000(US) -->
+				<rom name="092003.u2" size="0x0200000" crc="60cfb1b4" sha1="f37ad4dd774c26abb998f616ab7ad0adce83359d" offset="0x0400000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1417,6 +1454,20 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<software name="carsuka" cloneof="carsr201">
+		<description>Disney/Pixar Cars - Rev It Up in Radiator Springs (UK, alt)</description>
+		<year>2006</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092663(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Cars(UK).bin" size="8388608" crc="d88af931" sha1="04dab1eccde66a80fc252b30e91d8718ace5a525" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="carsge" cloneof="carsr201">
 		<description>Disney/Pixar Cars - Vollgas in Radiator Springs (Germany)</description>
 		<year>2006?</year>
@@ -1847,7 +1898,6 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<!-- Same ROM as "80-092283(UK)" -->
 	<software name="dora" cloneof="dorar201">
 		<description>Nick Jr Dora the Explorer - Dora's Fix-it Adventure (USA)</description>
 		<year>2008</year>
@@ -1895,8 +1945,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
-	<software name="dorauk" cloneof="dorar201">
-		<description>Nick Jr. Dora the Explorer - Dora's Fix-it Adventure (USA)</description>
+	<software name="doraukr103" cloneof="dorar201">
+		<description>Nick Jr. Dora the Explorer - Dora's Fix-it Adventure (UK, rev. 103, 2007)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092283-103(UK)" />
@@ -1908,6 +1958,24 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="80-092283-103 - Dora's Fix-it Adventure (UK).bin" size="8388608" crc="3a96b71d" sha1="1ad68250dab5be23b634c5528e28ab5198012ee9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Found also with the same ROM as "80-092280(US)" -->
+	<software name="dorauk" cloneof="dorar201">
+		<description>Nick Jr. Dora the Explorer - Dora's Fix-it Adventure (UK, 2005)</description>
+		<year>2005</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092283(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="707180" />
+			<feature name="pcb_model" value="707180-1" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92283 - Dora's Fix-it Adventure (UK).bin" size="8388608" crc="055e3351" sha1="b9232fd8b9792e1ecd4349924515cc72e27f7af0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2164,7 +2232,7 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<software name="godiegor2">
-		<description>Nick Jr. Go Diego Go! - Save the Animal Familes! (USA, rev. 2?)</description>
+		<description>Nick Jr. Go Diego Go! - Save the Animal Families! (USA, rev. 2?)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092900(US)" />
@@ -2174,6 +2242,21 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="0x800000">
 				<rom name="vsmile92900-2.bin" size="0x800000" crc="c819f626" sha1="8571d37c531018c332ef87e2e4374954f4128357" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="godiegouk" cloneof="godiegor2">
+		<description>Nick Jr. Go Diego Go! - Save the Animal Families! (UK)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092903(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-092903 - Go Diego Go.bin" size="0x800000" crc="c819f626" sha1="8571d37c531018c332ef87e2e4374954f4128357" />
 			</dataarea>
 		</part>
 	</software>
@@ -2631,6 +2714,25 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<dataarea name="rom" size="8388608">
 				<rom name="Mickey Mouse - De wonderwereld van Mickey - 2004.bin" size="8388608" crc="aef4d01c" sha1="afa7193a9a97c41ad2a337f8527b53cc1bcb8758" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickymaguk" cloneof="mickymag">
+		<description>Disney's Mickey Mouse - Mickey's Magical Adventure (UK)</description>
+		<year>2004?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092083(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="pcb" value="706148-5" />
+			<feature name="pcb_model" value="706148-5" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x600000">
+				<rom name="52-92083.u1" size="0x400000" crc="1036ec3b" sha1="78aae01287a10986e10918db1e5dfaab693c1871" offset="0x000000" />
+				<rom name="52-92083.u2" size="0x200000" crc="d2939ca7" sha1="a674aca956dc3d856e34995dae668911523362ee" offset="0x400000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3334,27 +3436,40 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 	</software>
 
 	<software name="scoobydouk" cloneof="scoobydor301">
-		<description>Scooby-Doo! - Funland Frenzy (UK)</description>
+		<description>Scooby-Doo! - Funland Frenzy (UK, 2004)</description>
+		<year>2004</year> <!-- (s04) -->
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092163(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Scooby-Doo - Funland Frenzy - 80-92163 (UK).bin" size="8388608" crc="161ef602" sha1="d4020599c83a64b9f1f972b0b8ebc4c3fcc85970" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scoobydouka" cloneof="scoobydor301">
+		<description>Scooby-Doo! - Funland Frenzy (UK, 2007)</description>
 		<year>2007</year> <!-- (s07) -->
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092163(UK)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
-				<rom name="Scooby-Doo - Funland Frenzy (Europe).bin" size="8388608" crc="3259d26c" sha1="958c00a3af82d4bf897858e54ba8b0f0210da283" />
+				<rom name="Scooby-Doo - Funland Frenzy (UK) (Rev 1).bin" size="8388608" crc="3259d26c" sha1="958c00a3af82d4bf897858e54ba8b0f0210da283" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="scoobydoukr1" cloneof="scoobydor301">
-		<description>Scooby-Doo! - Funland Frenzy (UK, rev. 1?)</description>
+	<software name="scoobydouka2" cloneof="scoobydor301">
+		<description>Scooby-Doo! - Funland Frenzy (UK, 2008)</description>
 		<year>2008</year> <!-- (s08) -->
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-092163(UK)" />
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
-				<rom name="Scooby-Doo - Funland Frenzy (Europe) (Rev 1).bin" size="8388608" crc="5623cf63" sha1="b2a78c471cae0ce7aa05a0f0cf49a3049f1c5143" />
+				<rom name="Scooby-Doo - Funland Frenzy (UK) (Rev 2).bin" size="8388608" crc="5623cf63" sha1="b2a78c471cae0ce7aa05a0f0cf49a3049f1c5143" />
 			</dataarea>
 		</part>
 	</software>
@@ -3888,6 +4003,22 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<dataarea name="rom" size="8388608">
 				<rom name="80-092142-123 - Spider-Man en Vrienden - Geheime Missies (NL) (2008).bin" size="8388608" crc="af58e0d2" sha1="a7e9228819fcebdc9af6532e62b94ef9c7a6f500" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spidermisuk" cloneof="spidermisr101">
+		<description>Marvel Spider-Man &amp; Friends - Secret Missions (UK)</description>
+		<year>2004</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092143(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
+			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
+			<dataarea name="rom" size="0x0800000">
+				<rom name="092143.u1" size="0x0400000" crc="987d99d6" sha1="78901c0029d0c4df7f151c7654c86bc43147e4cd" offset="0x0000000" />
+				<rom name="092143.u2" size="0x0200000" crc="3eae10c6" sha1="1124233305e3b28753007c57ef356a2351cbd117" offset="0x0400000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4673,6 +4804,21 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<software name="poohukr103" cloneof="pooh">
+		<description>Disney's Winnie the Pooh - The Honey Hunt (UK)</description>
+		<year>2004?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092063-103(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Winnie the Pooh - The Honey Hunt - 092063-103 (UK).bin" size="8388608" crc="ecb06a3f" sha1="a92f0dd178f8ab73bc4b805440f89e99a13df264" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="poohge" cloneof="pooh">
 		<description>Disneys Winnie Puuh - Die Honigjagd (Germany)</description>
 		<year>2004?</year>
@@ -5189,6 +5335,19 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<dataarea name="rom" size="8388608">
 				<rom name="Zayzoo - An Earth Adventure (UK).bin" size="8388608" crc="4e94fce2" sha1="b65a446199d390d6b25046fb66fb7e7f329e84c5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zayzaeauk" cloneof="zayzaear101">
+		<description>Zayzoo - My Alien Classmate (UK)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092363(UK)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<dataarea name="rom" size="8388608">
+				<rom name="52-92363(UK) - Zayzoo My Alien Classmate(UK).bin" size="8388608" crc="6ac6206a" sha1="6983b400b869f1193ff0de81af117923a2a5f3f7" />
 			</dataarea>
 		</part>
 	</software>

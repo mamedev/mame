@@ -22,37 +22,45 @@ extern void *GetOSWindow(void *wincontroller);
 #endif
 #endif
 
-// MAMEOS headers
 #include "emu.h"
-#include "window.h"
+#include "drawbgfx.h"
+
+// render/bgfx
+#include "bgfx/effect.h"
+#include "bgfx/effectmanager.h"
+#include "bgfx/shadermanager.h"
+#include "bgfx/slider.h"
+#include "bgfx/target.h"
+#include "bgfx/target.h"
+#include "bgfx/targetmanager.h"
+#include "bgfx/texture.h"
+#include "bgfx/texturemanager.h"
+#include "bgfx/uniform.h"
+#include "bgfx/view.h"
+
+// render
+#include "aviwrite.h"
+#include "bgfxutil.h"
+
+// emu
+#include "config.h"
 #include "render.h"
 #include "rendutil.h"
-#include "aviwrite.h"
+
+// util
+#include "util/xmlfile.h"
+
+// OSD
+#include "modules/lib/osdobj_common.h"
+#include "window.h"
 
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
-#include <algorithm>
-
-#include "drawbgfx.h"
-#include "bgfxutil.h"
-#include "bgfx/texturemanager.h"
-#include "bgfx/targetmanager.h"
-#include "bgfx/shadermanager.h"
-#include "bgfx/effectmanager.h"
-#include "bgfx/chainmanager.h"
-#include "bgfx/effect.h"
-#include "bgfx/texture.h"
-#include "bgfx/target.h"
-#include "bgfx/chain.h"
-#include "bgfx/vertex.h"
-#include "bgfx/uniform.h"
-#include "bgfx/slider.h"
-#include "bgfx/target.h"
-#include "bgfx/view.h"
-
-#include "modules/lib/osdobj_common.h"
 
 #include "imgui/imgui.h"
+
+#include <algorithm>
+
 
 //============================================================
 //  DEBUGGING
@@ -294,9 +302,7 @@ int renderer_bgfx::create()
 	m_dimensions = wdim;
 
 	if (s_bgfx_library_initialized)
-	{
 		exit();
-	}
 
 	if (win->index() == 0)
 	{
@@ -340,9 +346,8 @@ int renderer_bgfx::create()
 #endif
 		bgfx::touch(win->index());
 
-		if (m_ortho_view) {
+		if (m_ortho_view)
 			m_ortho_view->set_backbuffer(m_framebuffer);
-		}
 	}
 
 	m_chains = new chain_manager(win->machine(), m_options, *m_textures, *m_targets, *m_effects, win->index(), *this);
@@ -353,6 +358,12 @@ int renderer_bgfx::create()
 
 	memset(m_white, 0xff, sizeof(uint32_t) * 16 * 16);
 	m_texinfo.push_back(rectangle_packer::packable_rectangle(WHITE_HASH, PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32), 16, 16, 16, nullptr, m_white));
+
+	// Register configuration handlers
+	win->machine().configuration().config_register(
+			"bgfx",
+			configuration_manager::load_delegate(&renderer_bgfx::load_config, this),
+			configuration_manager::save_delegate(&renderer_bgfx::save_config, this));
 
 	return 0;
 }
@@ -883,6 +894,19 @@ int renderer_bgfx::draw(int update)
 
 	if (num_screens)
 	{
+		// Restore config after counting screens the first time
+		// Doing this here is hacky - it means config is restored at the wrong
+		// time if the initial view has no screens and the user switches to a
+		// view with screens.  The trouble is there's no real interface between
+		// the render targets and the renderer so we don't actually know when
+		// we're first called on to render a live view (as opposed to an info
+		// screen).
+		if (m_config)
+		{
+			m_chains->load_config(*m_config->get_first_child());
+			m_config.reset();
+		}
+
 		uint32_t chain_view_count = m_chains->process_screen_chains(s_current_view, *win.get());
 		s_current_view += chain_view_count;
 	}
@@ -1339,11 +1363,44 @@ void renderer_bgfx::set_sliders_dirty()
 	m_sliders_dirty = true;
 }
 
-uint32_t renderer_bgfx::get_window_width(uint32_t index) const {
+uint32_t renderer_bgfx::get_window_width(uint32_t index) const
+{
 	return s_width[index];
 }
 
-uint32_t renderer_bgfx::get_window_height(uint32_t index) const {
+uint32_t renderer_bgfx::get_window_height(uint32_t index) const
+{
 	return s_height[index];
 }
 
+
+void renderer_bgfx::load_config(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
+{
+	if ((cfg_type == config_type::SYSTEM) && parentnode)
+	{
+		auto const win = try_getwindow();
+		if (win)
+		{
+			util::xml::data_node const *windownode = parentnode->get_child("window");
+			while (windownode)
+			{
+				if (windownode->get_attribute_int("index", -1) != win->index())
+				{
+					windownode = windownode->get_next_sibling("window");
+					continue;
+				}
+
+				m_config = util::xml::file::create();
+				windownode->copy_into(*m_config);
+				break;
+			}
+		}
+	}
+}
+
+
+void renderer_bgfx::save_config(config_type cfg_type, util::xml::data_node *parentnode)
+{
+	if (cfg_type == config_type::SYSTEM)
+		m_chains->save_config(*parentnode);
+}

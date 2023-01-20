@@ -24543,7 +24543,7 @@ license:CC0-1.0
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 Side 2"/>
 			<dataarea name="flop" size="235187">
-				<rom name="microzine no. 35 (1990)(scholastic) - disk 1, side 2- what's missing?.woz" size="235187" crc="66c489df" sha1="9aee8cbc689cd52567207f9bb3fed3e5845b8f68"/>
+				<rom name="microzine no. 35 (1990)(scholastic) - disk 1, side 2- what's missing.woz" size="235187" crc="66c489df" sha1="9aee8cbc689cd52567207f9bb3fed3e5845b8f68"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">

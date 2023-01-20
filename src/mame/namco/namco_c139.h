@@ -5,8 +5,8 @@
     Namco C139 - Serial I/F Controller
 
 ***************************************************************************/
-#ifndef MAME_MACHINE_NAMCO_C139_H
-#define MAME_MACHINE_NAMCO_C139_H
+#ifndef MAME_NAMCO_NAMCO_C139_H
+#define MAME_NAMCO_NAMCO_C139_H
 
 #pragma once
 
@@ -62,4 +62,4 @@ DECLARE_DEVICE_TYPE(NAMCO_C139, namco_c139_device)
 
 
 
-#endif // MAME_MACHINE_NAMCO_C139_H
+#endif // MAME_NAMCO_NAMCO_C139_H

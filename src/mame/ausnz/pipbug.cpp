@@ -53,6 +53,8 @@ After load completes, G440 to run.
 #include "speaker.h"
 
 
+namespace {
+
 class pipbug_state : public driver_device
 {
 public:
@@ -241,6 +243,9 @@ ROM_START( pipbug )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "pipbug.rom", 0x0000, 0x0400, CRC(f242b93e) SHA1(f82857cc882e6b5fc9f00b20b375988024f413ff))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

@@ -132,21 +132,6 @@ Notes (couriersud)
 
 #define LOG(x) do { if (M10_DEBUG) printf x; } while (0)
 
-WRITE_LINE_MEMBER(m10_state::ic8j1_output_changed)
-{
-	LOG(("ic8j1: %d %d\n", state, m_screen->vpos()));
-	m_maincpu->set_input_line(0, !state ? CLEAR_LINE : ASSERT_LINE);
-}
-
-WRITE_LINE_MEMBER(m10_state::ic8j2_output_changed)
-{
-	// written from /Q to A with slight delay
-	LOG(("ic8j2: %d\n", state));
-	m_ic8j2->a_w(state);
-	m_ic8j1->a_w(state);
-}
-
-
 /*************************************
  *
  *  Initialization
@@ -164,8 +149,6 @@ void m1x_state::palette(palette_device &palette) const
 
 void m1x_state::machine_start()
 {
-	m_interrupt_timer = timer_alloc(FUNC(m1x_state::interrupt_callback), this);
-
 	save_item(NAME(m_flip));
 	save_item(NAME(m_last));
 }
@@ -445,15 +428,6 @@ void m15_state::a100_w(uint8_t data)
 	m_last = data;
 }
 
-uint8_t m10_state::m10_a700_r()
-{
-	//LOG(("rd:%d\n",m_screen->vpos()));
-	LOG(("clear\n"));
-	m_ic8j1->clear_w(0);
-	m_ic8j1->clear_w(1);
-	return 0x00;
-}
-
 
 /*************************************
  *
@@ -461,46 +435,25 @@ uint8_t m10_state::m10_a700_r()
  *
  *************************************/
 
+uint8_t m10_state::clear_74123_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_ic8j1->clear_w(0);
+		m_ic8j1->clear_w(1);
+	}
+	return 0;
+}
+
 INPUT_CHANGED_MEMBER(m1x_state::coin_inserted)
 {
 	// coin insertion causes an NMI
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
-TIMER_CALLBACK_MEMBER(m1x_state::interrupt_callback)
-{
-	if (param == 0)
-	{
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-		m_interrupt_timer->adjust(m_screen->time_until_pos(IREMM10_VBSTART + 16), 1);
-	}
-	if (param == 1)
-	{
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-		m_interrupt_timer->adjust(m_screen->time_until_pos(IREMM10_VBSTART + 24), 2);
-	}
-	if (param == -1)
-		m_maincpu->set_input_line(0, CLEAR_LINE);
-}
-
-#if 0
-INTERRUPT_GEN_MEMBER(m10_state::m11_interrupt)
-{
-	device.execute().set_input_line(0, ASSERT_LINE);
-	//m_interrupt_timer->adjust(m_screen->time_until_pos(IREMM10_VBEND), -1);
-}
-
-INTERRUPT_GEN_MEMBER(m10_state::m10_interrupt)
-{
-	device.execute().set_input_line(0, ASSERT_LINE);
-}
-#endif
-
 INTERRUPT_GEN_MEMBER(m15_state::interrupt)
 {
-	device.execute().set_input_line(0, ASSERT_LINE);
-	m_interrupt_timer->adjust(m_screen->time_until_pos(IREMM10_VBSTART + 1, 80), -1);
+	device.execute().pulse_input_line(0, m_screen->time_until_pos(IREMM11_VBSTART + 1, 80));
 }
 
 
@@ -521,7 +474,7 @@ void m10_state::m10_main(address_map &map)
 	map(0xa300, 0xa300).portr("INPUTS");
 	map(0xa400, 0xa400).w(FUNC(m10_state::m10_ctrl_w));   // line at bottom of screen?, sound, flip screen
 	map(0xa500, 0xa500).w(FUNC(m10_state::m10_a500_w));   // ???
-	map(0xa700, 0xa700).r(FUNC(m10_state::m10_a700_r));
+	map(0xa700, 0xa700).r(FUNC(m10_state::clear_74123_r));
 	map(0xfc00, 0xffff).rom(); // for the reset / interrupt vectors
 }
 
@@ -536,7 +489,7 @@ void m10_state::m11_main(address_map &map)
 	map(0xa200, 0xa200).portr("DSW");
 	map(0xa300, 0xa300).portr("INPUTS");
 	map(0xa400, 0xa400).w(FUNC(m10_state::m11_ctrl_w));   // line at bottom of screen?, sound, flip screen
-	map(0xa700, 0xa700).r(FUNC(m10_state::m10_a700_r));
+	map(0xa700, 0xa700).r(FUNC(m10_state::clear_74123_r));
 	map(0xfc00, 0xffff).rom(); // for the reset / interrupt vectors
 }
 
@@ -601,15 +554,9 @@ static INPUT_PORTS_START( ipminvad )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) ) // Verified with debugger
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x20, 0x00 ) // Verified with debugger
+	PORT_DIPUNUSED( 0x40, 0x00 )
+	PORT_DIPUNUSED( 0x80, 0x00 )
 
 	PORT_START("FAKE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state, coin_inserted, 0)
@@ -854,20 +801,21 @@ void m10_state::m10(machine_config &config)
 	m_ic8j1->set_connection_type(TTL74123_NOT_GROUNDED_DIODE);  // the hook up type
 	m_ic8j1->set_resistor_value(RES_K(1));                      // resistor connected to RCext
 	m_ic8j1->set_capacitor_value(CAP_U(1));                     // capacitor connected to Cext and RCext
-	m_ic8j1->set_a_pin_value(1);                                // A pin - driven by the CRTC
+	m_ic8j1->set_a_pin_value(1);                                // A pin - driven by #2 /Q
 	m_ic8j1->set_b_pin_value(1);                                // B pin - pulled high
 	m_ic8j1->set_clear_pin_value(1);                            // Clear pin - pulled high
-	m_ic8j1->out_cb().set(FUNC(m10_state::ic8j1_output_changed));
+	m_ic8j1->out_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	TTL74123(config, m_ic8j2, 0);
 	m_ic8j2->set_connection_type(TTL74123_NOT_GROUNDED_DIODE);  // the hook up type
 	// 10k + 20k variable resistor
 	m_ic8j2->set_resistor_value(RES_K(10 + 6));                 // resistor connected to RCext
 	m_ic8j2->set_capacitor_value(CAP_U(2.2));                   // capacitor connected to Cext and RCext
-	m_ic8j2->set_a_pin_value(1);                                // A pin - driven by the CRTC
+	m_ic8j2->set_a_pin_value(1);                                // A pin - driven by #2 /Q
 	m_ic8j2->set_b_pin_value(1);                                // B pin - pulled high
 	m_ic8j2->set_clear_pin_value(1);                            // Clear pin - pulled high
-	m_ic8j2->out_cb().set(FUNC(m10_state::ic8j2_output_changed));
+	m_ic8j2->out_cb().set(m_ic8j2, FUNC(ttl74123_device::a_w));
+	m_ic8j2->out_cb().append(m_ic8j1, FUNC(ttl74123_device::a_w));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -59,6 +59,8 @@
 #include "imagedev/snapquik.h"
 
 
+namespace {
+
 #define MAIN_CLK    15974400
 
 #define RS232_TAG   "rs232"
@@ -1074,6 +1076,9 @@ ROM_START( qx10 )
 //  ROM_LOAD( "qge.2e",   0x0000, 0x1000, BAD_DUMP CRC(eb31a2d5) SHA1(6dc581bf2854a07ae93b23b6dfc9c7abd3c0569e))
 	ROM_LOAD( "qga.2e",   0x0000, 0x1000, CRC(4120b128) SHA1(9b96f6d78cfd402f8aec7c063ffb70a21b78eff0))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

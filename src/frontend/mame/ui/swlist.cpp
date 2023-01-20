@@ -77,7 +77,7 @@ menu_software_parts::~menu_software_parts()
 //  populate
 //-------------------------------------------------
 
-void menu_software_parts::populate(float &customtop, float &custombottom)
+void menu_software_parts::populate()
 {
 	m_entries.clear();
 
@@ -243,7 +243,7 @@ void menu_software_list::update_search(void *selectedref)
 //  populate
 //-------------------------------------------------
 
-void menu_software_list::populate(float &customtop, float &custombottom)
+void menu_software_list::populate()
 {
 	// build up the list of entries for the menu
 	if (m_entrylist.empty())
@@ -368,7 +368,7 @@ menu_software::~menu_software()
 //  populate
 //-------------------------------------------------
 
-void menu_software::populate(float &customtop, float &custombottom)
+void menu_software::populate()
 {
 	bool have_compatible = false;
 

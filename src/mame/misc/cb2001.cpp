@@ -52,6 +52,8 @@ this seems more like 8-bit hardware, maybe it should be v25, not v35...
 #include "tilemap.h"
 
 
+namespace {
+
 class cb2001_state : public driver_device
 {
 public:
@@ -885,6 +887,9 @@ ROM_START( scherrym )
 	ROM_LOAD( "n82s135-1.bin", 0x000, 0x100, CRC(66ed363f) SHA1(65bd37842c441c2e712844b07c0cfe37ef16d0ef) )
 	ROM_LOAD( "n82s135-2.bin", 0x200, 0x100, CRC(a19821db) SHA1(62dda90dd67dfbc0b96f161f1f2b7a46a5805eae) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 2001, cb2001,   0, cb2001, cb2001, cb2001_state, empty_init, ROT0, "Dyna", "Cherry Bonus 2001",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
 GAME( 2001, scherrym, 0, cb2001, cb2001, cb2001_state, empty_init, ROT0, "Dyna", "Super Cherry Master", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)

@@ -27,6 +27,9 @@
 #include "sound/dac.h"
 #include "speaker.h"
 
+
+namespace {
+
 class cubeqst_state : public driver_device
 {
 public:
@@ -748,6 +751,9 @@ ROM_START( cubeqsta )
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY_OPTIONAL( "cubeqst", 0, SHA1(d0e24bb5d0ae424e0816110ec7d6b21189044d57) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*************************************
  *

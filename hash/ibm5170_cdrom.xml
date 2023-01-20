@@ -315,6 +315,19 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
+	<software name="advdudan" supported="yes">
+		<description>The Adventures of Down Under Dan (v1.1)</description>
+		<year>1995</year>
+		<publisher>Guildsoft Games</publisher>
+
+		<info name="developer" value="PowerVision"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="adventures_of_down_under_dan,_the_(1995)(guildsoft)" sha1="d76706ca2e75df32d0e508b3b14217ae96c69c3c"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS / Windows 3.1 -->
 	<!-- TODO: cannot setup emm386.exe for this in any way or form, might be a bug? -->
 	<software name="aeurope" supported="no">
@@ -551,6 +564,24 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- DOS (recommended), Windows 95 -->
+	<software name="archdyn" supported="no">
+		<!-- 24/10/1996 RE -->
+		<description>Archimedean Dynasty (v1.115)</description>
+		<year>1996</year>
+		<publisher>Blue Byte</publisher>
+		<notes><![CDATA[
+[SB16] No sound after title screen, hangs on every video (bypass by pressing mouse left button)
+Cannot read sound configuration from Windows 95
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ad" sha1="95040b06a50373ef052c37261ca6b91d42fa5af7"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 	<!-- OS/2 -->
 	<software name="apak_os2">
@@ -1269,9 +1300,11 @@ Some samples have audio crackling [SB16]
 	<!-- DOS -->
 	<!-- TODO: 384k of EMS memory? -->
 	<software name="bsdracula" supported="partial">
-		<description>Bram Stoker's Dracula (Multi 5)</description>
+		<description>Bram Stoker's Dracula (Europe)</description>
 		<year>1995</year>
 		<publisher>Psygnosis</publisher>
+		<!-- Multi 5 language support -->
+		<info name="language" value="English/German/French/Italian/Spanish" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1281,11 +1314,12 @@ Some samples have audio crackling [SB16]
 	</software>
 
 	<!-- DOS -->
-	<!-- Multi 5 language support -->
 	<software name="bssky">
-		<description>Beneath a Steel Sky (Multi 5)</description>
+		<description>Beneath a Steel Sky (Europe)</description>
 		<year>1995</year>
 		<publisher>Virgin / Revolution</publisher>
+		<!-- Multi 5 language support -->
+		<info name="language" value="English/German/French/Italian/Spanish" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1597,6 +1631,25 @@ Some samples have audio crackling [SB16]
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- Windows 3.1 / 95 (WinG) -->
+	<!-- Suggested minimum resolution 800x600 -->
+	<software name="civ2" supported="partial">
+		<description>Sid Meier's Civilization II (Europe)</description>
+		<year>1996</year>
+		<publisher>MicroProse</publisher>
+		<notes><![CDATA[
+Offset [CDDA] audio, does not stop when exiting game (including getting to Windows shutdown screen)
+]]></notes>
+		<info name="language" value="English/German/French" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="civilization2pc" sha1="253fba35b28c7a8d121365383ad46873ade921ac"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 	<software name="civilwar">
 		<description>The Civil War</description>
@@ -2012,6 +2065,29 @@ Some samples have audio crackling [SB16]
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Delphine Classic Collection (Europe) (En,De)" sha1="e910498db33534ad63ab62108069e7eda17bd8de" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS 6.0 / Windows 95 -->
+	<!-- Pentium class 90 MHz -->
+	<!-- DirectDraw 2 -->
+	<!-- Polish version known to exist -->
+	<software name="dd2" supported="no">
+		<description>Destruction Derby 2 (Europe)</description>
+		<year>1996</year>
+		<publisher>Psygnosis</publisher>
+		<notes><![CDATA[
+Doesn't have brake lights for default car (rookie) at least
+Main menu shows a 3d backface that shouldn't be there during rotation transitions on submenu selections
+Offset [CDDA] audio, does not stop when exiting game (including getting to Windows shutdown screen)
+Unplayable without a Pentium CPU class
+Unemulated optional [Matrox Mystique] GPU
+https://www.pcgamingwiki.com/wiki/Destruction_Derby_2
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="dd2_pc" sha1="934d21c1172848110c3198463f5a5261175263a3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -2501,6 +2577,86 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		</part>
 	</software>
 
+	<!-- Source: http://redump.org/disc/42627/ -->
+	<!-- <rom name="Humans, The (Europe) (En,Fr,De,Es,It).cue" size="126" crc="06c1de50" sha1="d3952c4240fbb945aeb917773d532819ff3a3e49"/> -->
+	<!-- <rom name="Humans, The (Europe) (En,Fr,De,Es,It).bin" size="17477712" crc="07e1b667" sha1="dfbc9df976c4e6d762d6b641ea5ade20fba98feb"/> -->
+	<software name="humans">
+		<description>The Humans (Europe)</description>
+		<year>1993</year>
+		<publisher>GameTek</publisher>
+		<info name="developer" value="Imagitec Design" />
+		<info name="language" value="English/French/German/Spanish/Italian" />
+		<info name="region" value="Europe" />
+		<info name="version" value="0.2 4/10/93" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Humans, The (Europe) (En,Fr,De,Es,It)" sha1="eb442ad703800a643e8e3e6481f7f651c30f2fed" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/61934/ -->
+	<!-- <rom name="Humans, The (USA).cue" size="106" crc="af4ec0d5" sha1="0dcc6353bbcbdbe48e24034833b9fbbe7185f359"/> -->
+	<!-- <rom name="Humans, The (USA).bin" size="7940352" crc="678bb91e" sha1="8460c560b67c084a39dad898979d32221aebf547"/> -->
+	<software name="humans_us" cloneof="humans">
+		<description>The Humans (USA)</description>
+		<year>1993</year>
+		<publisher>GameTek</publisher>
+		<info name="developer" value="Imagitec Design" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="0.01" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Humans, The (USA)" sha1="39cc0d7ff27b7b467768579a1341e92e24a24b93" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/31324/ -->
+	<!-- <rom name="Humans 1 and 2 (Europe) (En,Fr,De,Es,It) (OEM).cue" size="135" crc="4f4abaee" sha1="fe000862c84528ebe411f6f7bed7217d63073fd1"/> -->
+	<!-- <rom name="Humans 1 and 2 (Europe) (En,Fr,De,Es,It) (OEM).bin" size="17482416" crc="4027dd8e" sha1="b1b8e9180c4ec4d61ca728951d43c20b1d8681d0"/> -->
+	<software name="humans12">
+		<description>Humans 1 and 2 (Europe, OEM)</description>
+		<year>1993</year>
+		<publisher>GameTek</publisher>
+		<info name="developer" value="Imagitec Design" />
+		<info name="language" value="English/French/German/Spanish/Italian" />
+		<info name="region" value="Europe" />
+		<info name="version" value="0.2 4/10/93" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Humans 1 and 2 (Europe) (En,Fr,De,Es,It) (OEM)" sha1="8db38e6429216415c79bfa1757a3847b1e4e8c54" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/31325/ -->
+	<!-- <rom name="Humans 1 and 2 (Europe) (En,Fr,De,Es,It) (Rerelease).cue" size="141" crc="84326e1c" sha1="67c822ee63b56476b787fd27a5130894de1e8e54"/> -->
+	<!-- <rom name="Humans 1 and 2 (Europe) (En,Fr,De,Es,It) (Rerelease).bin" size="17510640" crc="67b00cd9" sha1="70965deb2b046e775f8dd6e24de573f27a37ce50"/> -->
+	<software name="humans12a" cloneof="humans12">
+		<description>Humans 1 and 2 (Europe, re-release)</description>
+		<year>1993</year>
+		<publisher>GameTek</publisher>
+		<info name="developer" value="Imagitec Design" />
+		<info name="language" value="English/French/German/Spanish/Italian" />
+		<info name="region" value="Europe" />
+		<info name="version" value="0.2 4/10/93" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Humans 1 and 2 (Europe) (En,Fr,De,Es,It) (Rerelease)" sha1="78117340601a859927ee88f3c5afc4539e78e6a6" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Source: http://redump.org/disc/28673/ -->
 	<!-- Source: http://redump.org/disc/28675/ -->
 	<!-- <rom name="id Anthology (USA) (Disc 1) (Vintage).cue" size="103" crc="f25a3f47" sha1="c4c9b803f8896960d5e622b71f1ea37202824675"/> -->
@@ -2630,6 +2786,29 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 			</diskarea>
 		</part>
 	</software>
+
+	<software name="jagdead" supported="no">
+		<description>Jagged Alliance: Deadly Games (v1.00)</description>
+		<year>1996</year>
+		<!-- Virgin Interactive for Europe -->
+		<publisher>Sir-Tech</publisher>
+		<notes><![CDATA[
+Has no [SB16] voices/SFXs in-game
+Nemesis demo untested
+Untested multiplayer options
+]]></notes>
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jagged_alliance_deadly_games_(sir-tech_software)(version_1.0)(master_cd)" sha1="084200cf87bc3f3f6d4bff4d9b5e5d9da9975aff"/>
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="jagged_alliance_deadly_games_(sir-tech_software)(version_1.0)(multiplayer_cd)" sha1="8e4b601266c597a4dfe4b261c773b07dab4bc5bf"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 	<!-- Windows 95 -->
 	<!-- Pentium class 60 MHz minimum -->
@@ -2775,6 +2954,29 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 		</part>
 	</software>
 
+	<!-- Windows 95 -->
+	<!-- Pentium class 100 MHz -->
+	<!-- US version known to exist as "The Adventures of Lomax" -->
+	<software name="lomax" supported="no">
+		<description>Lomax (Europe)</description>
+		<year>1997</year>
+		<publisher>Psygnosis</publisher>
+		<notes><![CDATA[
+Glitchy icons in 256 color mode for setup menu and for PS1 icons on password screen [8514]
+Serious color issues if run windowed on 256 color mode (color works if set to full screen)
+Offset [CDDA] audio
+https://www.pcgamingwiki.com/wiki/The_Adventures_of_Lomax
+]]></notes>
+		<!-- Multi 5 language support -->
+		<info name="language" value="English/German/French/Italian/Spanish" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="lomax" sha1="d2a24858266e0d906d93d3027bfc89634c125556"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- DOS -->
 	<!-- Also known as "The Manager", originally released as floppy format in 1991 -->
 	<!-- TODO: choosing a team at new game then pressing the top bar causes shuffled team flags? -->
@@ -2847,6 +3049,24 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- Windows 3.1 -->
+	<!-- 386DX 33 MHz -->
+	<!-- Later "Masterpiece Edition" known to exist (has 3rd tab for help on status bar) -->
+	<software name="myst" supported="yes">
+		<description>Myst (v1.0.3)</description>
+		<year>1995</year>
+		<publisher>Brøderbund</publisher>
+		<notes><![CDATA[
+https://www.pcgamingwiki.com/wiki/Myst
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="myst" sha1="de9e11e5b52753229d64a6940a9de866aaf26791"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 	<!-- Source: redump.org/disc/31951/ -->
 	<!-- <rom name="Network Q RAC Rally (USA).cue" size="91" crc="4d252589" sha1="c22a126dfeb6e46c88a4098e6c9aeb0089c1c945"/> -->
@@ -2988,6 +3208,237 @@ CD-ROM 4: "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate DOOM", "Wolfenst
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- Source: http://redump.org/disc/51015/ -->
+	<!-- <rom name="Prince of Persia 2 - The Shadow and the Flame (USA) (Rerelease).cue" size="129" crc="6a96607c" sha1="96c178aed7684b4de25fb697b541e740c029cf4a"/> -->
+	<!-- <rom name="Prince of Persia 2 - The Shadow and the Flame (USA) (Rerelease).bin" size="526351728" crc="a95c014f" sha1="e5628b682914802ed00f8a5925f98b983f7da262"/> -->
+	<software name="ppersia2">
+		<description>Prince of Persia 2 - The Shadow and the Flame (USA)</description>
+		<year>1998</year>
+		<publisher>Red Orb Entertainment</publisher>
+		<notes><![CDATA[
+Prince of Persia 2 - The Shadow and the Flame
+Playable demos:
+Journeyman Project 3, The: Legacy of Time
+Riven: The Sequel to Myst
+Warlords III: Darklords Rising
+]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="2.0 September 30, 1998" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Prince of Persia 2 - The Shadow and the Flame (USA) (Rerelease)" sha1="1fb551690b318cc60b492d4d2c6ab83ea3e83238" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/38188/ -->
+	<!-- <rom name="Prince of Persia CD Collection (Europe).cue" size="128" crc="ea03a55b" sha1="6e17fb43447b03c8c21de18108e82c0bfd859b16"/> -->
+	<!-- <rom name="Prince of Persia CD Collection (Europe).bin" size="34040496" crc="76bfac79" sha1="86babf223c0a6f56b58f82779e69f50b2d500ab4"/> -->
+	<software name="ppersia">
+		<description>Prince of Persia CD Collection (Europe)</description>
+		<year>1995</year>
+		<publisher>Brøderbund Software</publisher>
+		<notes><![CDATA[
+Prince of Persia (v1.3)
+Prince of Persia 2 - The Shadow and the Flame (v1.0)
+]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Prince of Persia CD Collection (Europe)" sha1="970a9bd9e8be6ec9795ea74dee65f721551ac0f1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/45632/ -->
+	<!-- <rom name="Prince of Persia CD Collection (USA).cue" size="125" crc="e4db0968" sha1="02e58809ad60e310cc304db623ed00568bdd48e6"/> -->
+	<!-- <rom name="Prince of Persia CD Collection (USA).bin" size="33682992" crc="4bec8cc0" sha1="ebcb97b72dec16a8302ae788bcf849061ce31f0d"/> -->
+	<software name="ppersiau" cloneof="ppersia">
+		<description>Prince of Persia CD Collection (USA)</description>
+		<year>1995</year>
+		<publisher>Brøderbund Software</publisher>
+		<notes><![CDATA[
+Prince of Persia (v1.3)
+Prince of Persia 2 - The Shadow and the Flame (v1.0)
+]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Prince of Persia CD Collection (USA)" sha1="f608bd49af44e218755c232a1663a74410a67e13" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/31228/ -->
+	<!-- <rom name="Prince of Persia Collection - Limited Edition (Europe).cue" size="120" crc="7b2015e8" sha1="f1f14c3ab626fe65ed2437da24eb46a893e95d52"/> -->
+	<!-- <rom name="Prince of Persia Collection - Limited Edition (Europe).bin" size="730724064" crc="f87436ff" sha1="119959df5abe7fca7aee61769548469bc7a2381f"/> -->
+	<software name="ppersiale">
+		<description>Prince of Persia Collection: Limited Edition (Europe)</description>
+		<year>1999</year>
+		<publisher>Red Orb Entertainment</publisher>
+		<notes><![CDATA[
+Prince of Persia (v1.4)
+Prince of Persia 2 - The Shadow and the Flame (v1.1)
+Extras:
+The Making of Prince of Persia 3D
+Manual / User's Guide (PDF, 28 pages) (English)
+Playable Demos:
+The Journeyman Project 3: Legacy of Time
+Riven: The Sequel to Myst
+Warlords III: Darklords Rising
+]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<info name="version" value="1.0 September 11, 1998" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Prince of Persia Collection - Limited Edition (Europe)" sha1="878acef14a973ef7e988457bfec8bf46d13b7ffb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/31619/ -->
+	<!-- <rom name="Prince of Persia Collection - Limited Edition (Europe) (Alt).cue" size="149" crc="12f45fc9" sha1="d4e3a8dd49c0f505a3a1b5453f55b849f92aa54c"/> -->
+	<!-- <rom name="Prince of Persia Collection - Limited Edition (Europe) (Alt).bin" size="731076864" crc="7aefb11e" sha1="bb84db27e5bceccc0041558f3a1157c77f9e8edd"/> -->
+	<software name="ppersialea" cloneof="ppersiale">
+		<description>Prince of Persia Collection: Limited Edition (Europe, alt)</description>
+		<year>1999</year>
+		<publisher>Red Orb Entertainment</publisher>
+		<notes><![CDATA[
+Prince of Persia (v1.4)
+Prince of Persia 2 - The Shadow and the Flame (v1.1)
+Extras:
+The Making of Prince of Persia 3D
+Manual / User's Guide (PDF, 28 pages) (English)
+Playable Demos:
+The Journeyman Project 3: Legacy of Time
+Riven: The Sequel to Myst
+Warlords III: Darklords Rising
+]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<info name="version" value="1.0 September 11, 1998" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Prince of Persia Collection - Limited Edition (Europe) (Alt)" sha1="182794044998b3fe675c88e49e6fc5ae8da73c4d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/9664/ -->
+	<!-- <rom name="Prince of Persia Collection - Limited Edition (USA).cue" size="117" crc="64ec00ff" sha1="e59aaab8e3da4384cc7d1b24035325b9f4aed1ed"/> -->
+	<!-- <rom name="Prince of Persia Collection - Limited Edition (USA).bin" size="723065952" crc="8030340e" sha1="1625c3d448f432afb06ff96b334278f2b930f942"/> -->
+	<software name="ppersiale_us" cloneof="ppersiale">
+		<description>Prince of Persia Collection: Limited Edition (USA)</description>
+		<year>1999</year>
+		<publisher>Red Orb Entertainment</publisher>
+		<notes><![CDATA[
+Prince of Persia (v1.4)
+Prince of Persia 2 - The Shadow and the Flame (v1.1)
+Playable demos:
+The Journeyman Project 3: Legacy of Time
+Riven: The Sequel to Myst
+Warlords III: Darklords Rising
+Videos:
+The Making of Prince of Persia 3D
+]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<info name="version" value="1.0 September 11, 1998" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Prince of Persia Collection - Limited Edition (USA)" sha1="96a8f1963484af003ce0bd6a964862fdf903cd8b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/9664/ -->
+	<!-- <rom name="Prince of Persia Collection - Limited Edition (Netherlands) (Rerelease).cue" size="137" crc="46432aff" sha1="0fcc71c67522362a55b52140ad7df88782af366d"/> -->
+	<!-- <rom name="Prince of Persia Collection - Limited Edition (Netherlands) (Rerelease).bin" size="733320672" crc="010ab920" sha1="91de6c8bcf4489a3b1e610a2fc4bab7af007eae3"/> -->
+	<software name="ppersiale_nl" cloneof="ppersiale">
+		<description>Prince of Persia Collection: Limited Edition (Netherlands)</description>
+		<year>1999</year>
+		<publisher>Red Orb Entertainment</publisher>
+		<notes><![CDATA[
+Prince of Persia (v1.4)
+Prince of Persia 2 - The Shadow and the Flame (v1.1)
+Extras:
+The Making of Prince of Persia 3D
+Playable demos:
+The Journeyman Project 3: Legacy of Time
+Riven: The Sequel to Myst
+Warlords III: Darklords Rising
+]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="Netherlands" />
+		<info name="version" value="1.0 September 11, 1998" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Prince of Persia Collection - Limited Edition (Netherlands) (Rerelease)" sha1="d36627f993f53deb01907aeddbeb0791f0a5dac8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/10116/ -->
+	<!-- <rom name="Prince of Persia Collection - Limited Edition (Brazil).cue" size="120" crc="85690e68" sha1="dd3383110fc7bb22c2e460429c111b6302d26e57"/> -->
+	<!-- <rom name="Prince of Persia Collection - Limited Edition (Brazil).bin" size="722470896" crc="3a246980" sha1="c662dcdd6b10e73bce65e7344fd989f55ed347f3"/> -->
+	<software name="ppersiale_br" cloneof="ppersiale">
+		<description>Prince of Persia Collection: Limited Edition (Brazil, Senha Pôster Ano 1 № 1)</description>
+		<year>1999</year>
+		<publisher>Senha Pôster</publisher>
+		<notes><![CDATA[
+Prince of Persia (v1.4)
+Prince of Persia 2 - The Shadow and the Flame (v1.1)
+Extras:
+The Making of Prince of Persia 3D
+Playable demos:
+The Journeyman Project 3: Legacy of Time
+Riven: The Sequel to Myst
+Warlords III: Darklords Rising
+]]></notes>
+		<info name="language" value="English" />
+		<info name="region" value="Brazil" />
+		<info name="version" value="1.0 September 11, 1998" />
+		<sharedfeat name="platform" value="Windows 95" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Prince of Persia Collection - Limited Edition (Brazil)" sha1="4c9f759058b9b7575188c85b37847351eb18211e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 3.1J / 95J -->
+	<!-- English prototype known to exist -->
+	<software name="prinmak2">
+		<description>Princess Maker 2 (Japan)</description>
+		<year>1995</year>
+		<publisher>Gainax</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="princess_maker_2_(win31)" sha1="5f7d1af8f9f4c9841893c50c48d765d66a84013d"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 	<software name="prototyp">
 		<description>Prototype</description>
@@ -3324,6 +3775,24 @@ Optional [pc_joy] 4-button joystick, work around by mapping b3 and b4 to player 
 		</part>
 	</software>
 
+	<!-- Windows 95 -->
+	<!-- Pentium class 75 MHz -->
+	<!-- DirectX 3.0 -->
+	<software name="sk" supported="partial">
+		<description>Sonic &amp; Knuckles Collection</description>
+		<year>1997</year>
+		<publisher>Sega / Expert Software</publisher>
+		<notes><![CDATA[
+Not extensively tested for the high requirements
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="sonic_and_knuckles_collection" sha1="09c2d79046710745bc122b3b326ef572af988b3e"/>
+			</diskarea>
+		</part>
+	</software>
+
+
 	<!-- Windows 3.1 / 95 -->
 	<software name="spaceinv" supported="yes">
 		<description>Space Invaders for Windows</description>
@@ -3350,6 +3819,7 @@ Optional [pc_joy] 4-button joystick, work around by mapping b3 and b4 to player 
 	</software>
 
 	<!-- Windows 3.1 / 95 -->
+	<!-- Runs off CD, no install -->
 	<software name="strmrisk" supported="partial">
 		<description>Sturmtruppen: Risiken? (Italy)</description>
 		<year>1997</year>
@@ -3391,6 +3861,37 @@ Draws video without colors if run thru autorun in Win95, works if st_95.exe is m
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tagteam_cd" sha1="33eaebcca48c8a4382dc3ac87e346e393f47b2d8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/34461/ -->
+	<!-- <rom name="10 Game CD ROM (Europe).cue" size="112" crc="1d4f23a1" sha1="5eeee536fd8a8a2f146c5ac99c01610497875122"/> -->
+	<!-- <rom name="10 Game CD ROM (Europe).bin" size="9066960" crc="fdba9775" sha1="b96b29c2bcfcae073c07eb52f24b8eb7d6d2a208"/> -->
+	<software name="telstar10">
+		<description>Telstar 10 CD ROM Box Set</description>
+		<year>1993</year>
+		<publisher>Telstar Fun &amp; Games</publisher>
+		<notes><![CDATA[
+Battlestorm
+The Blues Brothers
+The Blues Brothers: Jukebox Adventure
+Crazy Cars III
+Fire & Forget II
+Prehistorik
+Prehistorik 2
+Super Cauldron
+Titan
+Titus the Fox: To Marrakech and Back
+]]></notes>
+		<info name="alt_title" value="10 Game CD ROM" />
+		<info name="language" value="English" />
+		<info name="region" value="Europe" />
+		<sharedfeat name="platform" value="DOS" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="10 Game CD ROM (Europe)" sha1="1bfe41e2d2b59c8aa640b52ef5ee2aa38e62282d" />
 			</diskarea>
 		</part>
 	</software>
@@ -3448,6 +3949,26 @@ Draws video without colors if run thru autorun in Win95, works if st_95.exe is m
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="rampage" sha1="cb91ee2e34e3b7391169079d6787c75712b1d97f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 -->
+	<!-- Pentium class 90 MHz -->
+	<!-- DirectX 3.0 (VESA 2.0)  -->
+	<software name="tplay98" supported="no">
+		<description>Triple Play '98</description>
+		<year>1997</year>
+		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+Has serious [8514] issues on main menu
+Has serious geometry issues during gameplay
+[SB16] has clicking noises thru the DAC
+Unemulated optional [Gravis Gamepad], [Gravis Gamepad Pro], [Gravis Grip 4-player adapter]
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ea-tripleplay98-win95" sha1="304492fab8e65add0ae3516633fcbd4ed7755902"/>
 			</diskarea>
 		</part>
 	</software>
@@ -3551,6 +4072,27 @@ Has [8514] icon glitch
 			</diskarea>
 		</part>
 	</software>
+
+	<!-- Windows 95 -->
+	<!-- Pentium class 90 MHz -->
+	<software name="vf" supported="no">
+		<!-- alias for Virtua Fighter Remix -->
+		<description>Virtua Fighter PC</description>
+		<year>1996</year>
+		<publisher>Sega / Expert Software</publisher>
+		<notes><![CDATA[
+Unsupported [NV1] video card
+Does not recognize [pc_joy] joystick in
+Offset [CDDA] audio
+https://www.pcgamingwiki.com/wiki/Virtua_Fighter_PC
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="virtua_fighter_pc" sha1="bfba831a59114475082953ff189b957e8ca1ca96"/>
+			</diskarea>
+		</part>
+	</software>
+
 
 	<!-- DOS -->
 	<!-- TODO: playback doesn't work properly, needs mouse left button user pressed? Eventually hangs anyway. -->

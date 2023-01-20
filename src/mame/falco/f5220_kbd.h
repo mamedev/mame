@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_F5220_KBD_H
-#define MAME_MACHINE_F5220_KBD_H
+#ifndef MAME_FALCO_F5220_KBD_H
+#define MAME_FALCO_F5220_KBD_H
 
 #pragma once
 
@@ -58,4 +58,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(F5220_KBD, f5220_kbd_device)
 
-#endif // MAME_MACHINE_F5220_KBD_H
+#endif // MAME_FALCO_F5220_KBD_H

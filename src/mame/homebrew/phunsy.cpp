@@ -37,6 +37,8 @@ Rom banking (in U bank):
 #include "speaker.h"
 
 
+namespace {
+
 #define LOG 1
 
 class phunsy_state : public driver_device
@@ -396,6 +398,9 @@ ROM_START( phunsy )
 	/* 16 x 16KB RAM banks */
 	ROM_REGION( 0x40000, "ram_4000", ROMREGION_ERASEFF )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

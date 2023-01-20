@@ -92,6 +92,18 @@ void menu_textbox::handle_key(int key)
 
 
 //-------------------------------------------------
+//  recompute_metrics - recompute metrics
+//-------------------------------------------------
+
+void menu_textbox::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	m_layout = std::nullopt;
+}
+
+
+//-------------------------------------------------
 //  custom_mouse_scroll - handle scroll events
 //-------------------------------------------------
 
@@ -108,24 +120,20 @@ bool menu_textbox::custom_mouse_scroll(int lines)
 
 void menu_textbox::draw(uint32_t flags)
 {
-	float const aspect = machine().render().ui_aspect(&container());
-	float const line_height = ui().get_line_height();
-	float const ud_arrow_width = line_height * aspect;
-	float const gutter_width = 0.5f * line_height * aspect;
-	float const visible_width = 1.0f - (2.0f * ui().box_lr_border() * aspect);
+	float const visible_width = 1.0f - (2.0f * lr_border());
 	float const visible_left = (1.0f - visible_width) * 0.5f;
-	float const extra_height = 2.0f * line_height;
+	float const extra_height = 2.0f * line_height();
 	float const visible_extra_menu_height = get_customtop() + get_custombottom() + extra_height;
 
 	// determine effective positions
-	float const maximum_width = visible_width - (2.0f * gutter_width);
+	float const maximum_width = visible_width - (2.0f * gutter_width());
 
 	draw_background();
 	map_mouse();
 
 	// account for extra space at the top and bottom and the separator/item for closing
-	float visible_main_menu_height = 1.0f - 2.0f * ui().box_tb_border() - visible_extra_menu_height;
-	m_window_lines = int(std::trunc(visible_main_menu_height / line_height));
+	float visible_main_menu_height = 1.0f - 2.0f * tb_border() - visible_extra_menu_height;
+	m_window_lines = int(std::trunc(visible_main_menu_height / line_height()));
 
 	// lay out the text if necessary
 	if (!m_layout || (m_layout_width != maximum_width))
@@ -135,7 +143,7 @@ void menu_textbox::draw(uint32_t flags)
 		m_layout_width = maximum_width;
 	}
 	m_window_lines = (std::min)(m_desired_lines, m_window_lines);
-	visible_main_menu_height = float(m_window_lines) * line_height;
+	visible_main_menu_height = float(m_window_lines) * line_height();
 
 	// compute top/left of inner menu area by centering, if the menu is at the bottom of the extra, adjust
 	float const visible_top = ((1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f) + get_customtop();
@@ -143,18 +151,18 @@ void menu_textbox::draw(uint32_t flags)
 	// get width required to draw the sole menu item
 	menu_item const &pitem = item(0);
 	std::string_view const itemtext = pitem.text();
-	float const itemwidth = gutter_width + ui().get_string_width(itemtext) + gutter_width;
+	float const itemwidth = gutter_width() + get_string_width(itemtext) + gutter_width();
 	float const draw_width = std::min(maximum_width, std::max(itemwidth, m_desired_width));
 
 	// compute text box size
 	float const x1 = visible_left + ((maximum_width - draw_width) * 0.5f);
-	float const y1 = visible_top - ui().box_tb_border();
+	float const y1 = visible_top - tb_border();
 	float const x2 = visible_left + visible_width - ((maximum_width - draw_width) * 0.5f);
-	float const y2 = visible_top + visible_main_menu_height + ui().box_tb_border() + extra_height;
-	float const effective_left = x1 + gutter_width;
+	float const y2 = visible_top + visible_main_menu_height + tb_border() + extra_height;
+	float const effective_left = x1 + gutter_width();
 	float const line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
 	float const line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
-	float const separator = visible_top + float(m_window_lines) * line_height;
+	float const separator = visible_top + float(m_window_lines) * line_height();
 
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 
@@ -169,37 +177,37 @@ void menu_textbox::draw(uint32_t flags)
 	{
 		// if we're on the top line, display the up arrow
 		rgb_t fgcolor = ui().colors().text_color();
-		if (mouse_in_rect(line_x0, visible_top, line_x1, visible_top + line_height))
+		if (mouse_in_rect(line_x0, visible_top, line_x1, visible_top + line_height()))
 		{
 			fgcolor = ui().colors().mouseover_color();
 			highlight(
 					line_x0, visible_top,
-					line_x1, visible_top + line_height,
+					line_x1, visible_top + line_height(),
 					ui().colors().mouseover_bg_color());
 			set_hover(HOVER_ARROW_UP);
 		}
 		draw_arrow(
-				0.5f * (x1 + x2 - ud_arrow_width), visible_top + (0.25f * line_height),
-				0.5f * (x1 + x2 + ud_arrow_width), visible_top + (0.75f * line_height),
+				0.5f * (x1 + x2 - ud_arrow_width()), visible_top + (0.25f * line_height()),
+				0.5f * (x1 + x2 + ud_arrow_width()), visible_top + (0.75f * line_height()),
 				fgcolor, ROT0);
 	}
 	if ((m_top_line + m_window_lines) < visible_items)
 	{
 		// if we're on the bottom line, display the down arrow
-		float const line_y = visible_top + float(m_window_lines - 1) * line_height;
+		float const line_y = visible_top + float(m_window_lines - 1) * line_height();
 		rgb_t fgcolor = ui().colors().text_color();
-		if (mouse_in_rect(line_x0, line_y, line_x1, line_y + line_height))
+		if (mouse_in_rect(line_x0, line_y, line_x1, line_y + line_height()))
 		{
 			fgcolor = ui().colors().mouseover_color();
 			highlight(
 					line_x0, line_y,
-					line_x1, line_y + line_height,
+					line_x1, line_y + line_height(),
 					ui().colors().mouseover_bg_color());
 			set_hover(HOVER_ARROW_DOWN);
 		}
 		draw_arrow(
-				0.5f * (x1 + x2 - ud_arrow_width), line_y + (0.25f * line_height),
-				0.5f * (x1 + x2 + ud_arrow_width), line_y + (0.75f * line_height),
+				0.5f * (x1 + x2 - ud_arrow_width()), line_y + (0.25f * line_height()),
+				0.5f * (x1 + x2 + ud_arrow_width()), line_y + (0.75f * line_height()),
 				fgcolor, ROT0 ^ ORIENTATION_FLIP_Y);
 	}
 
@@ -208,16 +216,16 @@ void menu_textbox::draw(uint32_t flags)
 	m_layout->emit(
 			container(),
 			m_top_line ? (m_top_line + 1) : 0, text_lines,
-			effective_left, visible_top + (m_top_line ? line_height : 0.0f));
+			effective_left, visible_top + (m_top_line ? line_height() : 0.0f));
 
 	// add visual separator before the "return to prevous menu" item
 	container().add_line(
-			x1, separator + (0.5f * line_height),
-			x2, separator + (0.5f * line_height),
+			x1, separator + (0.5f * line_height()),
+			x2, separator + (0.5f * line_height()),
 			UI_LINE_WIDTH, ui().colors().text_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
-	float const line_y0 = separator + line_height;
-	float const line_y1 = line_y0 + line_height;
+	float const line_y0 = separator + line_height();
+	float const line_y1 = line_y0 + line_height();
 
 	if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1) && is_selectable(pitem))
 		set_hover(0);
@@ -229,7 +237,8 @@ void menu_textbox::draw(uint32_t flags)
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE,
 			mame_ui_manager::NORMAL,
 			ui().colors().selected_color(), ui().colors().selected_bg_color(),
-			nullptr, nullptr);
+			nullptr, nullptr,
+			line_height());
 
 	// if there is something special to add, do it by calling the virtual method
 	custom_render(get_selection_ref(), get_customtop(), get_custombottom(), x1, y1, x2, y2);

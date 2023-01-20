@@ -24,6 +24,9 @@
 #include "machine/ram.h"
 #include "sound/mos6560.h"
 
+
+namespace {
+
 #define M6502_TAG       "ue10"
 #define M6522_1_TAG     "uab3"
 #define M6522_2_TAG     "uab1"
@@ -1023,6 +1026,7 @@ ROM_START( vic20_se )
 	ROM_LOAD( "nec22101.207", 0x0000, 0x1000, CRC(d808551d) SHA1(f403f0b0ce5922bd61bbd768bdd6f0b38e648c9f) )
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************

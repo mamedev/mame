@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
-#ifndef MAME_VIDEO_K052109_H
-#define MAME_VIDEO_K052109_H
+#ifndef MAME_KONAMI_K052109_H
+#define MAME_KONAMI_K052109_H
 
 #pragma once
 
@@ -108,4 +108,4 @@ private:
 
 DECLARE_DEVICE_TYPE(K052109, k052109_device)
 
-#endif // MAME_VIDEO_K052109_H
+#endif // MAME_KONAMI_K052109_H

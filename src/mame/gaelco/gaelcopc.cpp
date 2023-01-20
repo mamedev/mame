@@ -3,16 +3,22 @@
 /* Gaelco PC based hardware
 
 TODO:
-- tokyocop can't be emulated without proper mb bios
+- Implement all of the components listed below, notice that we need to consolidate
+  PCI individual interfaces before even attempting to emulate this;
+- Analyze OS images;
+- Reportedly requires a special monitor with a very specific refresh rate (very Gaelco like),
+  likely gonna play with monitor DDC;
 
 Custom motherboard with
-82815
-82801
-82562 (LAN)
+Intel 82815 (host + bridge + AGP devices)
+Intel 82801 (PCI 2.3 + integrated LAN + IDE + USB 2.0 + AC'97 + LPC +
+             ACPI 2.0 + Flash BIOS control + SMBus + GPIO)
+Intel 82562 (LAN)
 RTM 560-25R (Audio)
-TI4200 128Mb AGP
+nVidia GeForce 4 TI4200 128Mb AGP
 256 Mb PC133
-Pentium 4 (??? XXXXMhz)
+Pentium 4 (??? XXXXMhz), <- contradicts 82815 datasheet and an internal BIOS string at $ce (Socket 370),
+                            expect Celeron or Pentium 3 at very least.
 
 I/O Board with Altera Flex EPF15K50EQC240-3
 
@@ -26,9 +32,10 @@ motherboard bioses.
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "emupal.h"
-#include "screen.h"
+#include "machine/pci.h"
 
+
+namespace {
 
 class gaelcopc_state : public driver_device
 {
@@ -41,30 +48,18 @@ public:
 	void gaelcopc(machine_config &config);
 
 private:
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void gaelcopc_map(address_map &map);
 
 	// devices
-	required_device<cpu_device> m_maincpu;
-
-	// driver_device overrides
-	virtual void video_start() override;
+	required_device<pentium3_device> m_maincpu;
 };
 
 
-void gaelcopc_state::video_start()
-{
-}
-
-uint32_t gaelcopc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
-
 void gaelcopc_state::gaelcopc_map(address_map &map)
 {
-	map(0x00000000, 0x0001ffff).rom();
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0x60000);
+	map(0xfff80000, 0xffffffff).rom().region("bios", 0);
 }
 
 static INPUT_PORTS_START( gaelcopc )
@@ -74,25 +69,25 @@ INPUT_PORTS_END
 void gaelcopc_state::gaelcopc(machine_config &config)
 {
 	/* basic machine hardware */
-	PENTIUM(config, m_maincpu, 2000000000); /* Pentium4? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &gaelcopc_state::gaelcopc_map);
+	// bios mentions Socket 370, so at very least a Celeron or a Pentium 3 class CPU
+	// TODO: lowered rate for debugging aid, needs a slot option anyway
+	PENTIUM3(config, m_maincpu, 100'000'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gaelcopc_state::gaelcopc_map); // TODO: remove me
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_screen_update(FUNC(gaelcopc_state::screen_update));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
-	screen.set_palette("palette");
-
-	PALETTE(config, "palette").set_entries(0x100);
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
+// TODO: All of the provided BIOSes just have different ACFG table configs at $10000, investigate
 
 ROM_START(tokyocop)
-	ROM_REGION32_LE(0x80000, "maincpu", 0)  /* motherboard bios */
-	ROM_LOAD("al1.u10", 0x000000, 0x80000, CRC(e426e030) SHA1(52bdb6d46c12150077169ac3add8c450326ad4af) )
+	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
+	// $40 Award 6.00 PG 12/19/2002
+	// $7413c Intel 815 Hardware version v0.0 08/13/1999
+	ROM_SYSTEM_BIOS(0, "default", "v0.0 08/13/1999")
+	ROMX_LOAD("al1.u10", 0x000000, 0x80000, CRC(e426e030) SHA1(52bdb6d46c12150077169ac3add8c450326ad4af), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1, "alt_acfg", "v0.0 08/13/1999 (alt ACFG)")
+	ROMX_LOAD("al1 49lf004a.u10", 0x00000, 0x80000, CRC(db8e4a37) SHA1(9ef4bf1d72955a89e7dc9b984e76ce86c824b461), ROM_BIOS(1) )
 
 /* Dumper's note: The drive was ordered from Gaelco and they used a 250 GB drive that apparently used to have something
 else on it because when I ripped the entire drive and compressed it, the compressed image was 30 GB which is too much for me
@@ -104,7 +99,9 @@ tested working on the real hardware. It uses the same hardware and bios as the k
 ROM_END
 
 ROM_START(tokyocopk)
-	ROM_REGION32_LE(0x80000, "maincpu", 0)  /* motherboard bios */
+	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
+	// $40 6.00 PG 12/19/2002
+	// $7413c v0.0 08/13/1999
 	ROM_LOAD("al1.u10", 0x000000, 0x80000, CRC(e426e030) SHA1(52bdb6d46c12150077169ac3add8c450326ad4af) )
 
 	DISK_REGION( "disks" ) // Maxtor 2F040J0310613 VAM051JJ0
@@ -112,15 +109,18 @@ ROM_START(tokyocopk)
 ROM_END
 
 ROM_START(tokyocopi)
-	ROM_REGION32_LE(0x80000, "maincpu", 0)  /* motherboard bios */
-	ROM_LOAD("tokyocopi.pcbios", 0x000000, 0x80000, NO_DUMP )
+	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
+	// Not specifically provided, assume "works right" with same BIOS.
+	ROM_LOAD("al1.u10", 0x000000, 0x80000, CRC(e426e030) SHA1(52bdb6d46c12150077169ac3add8c450326ad4af) )
 
 	DISK_REGION( "disks" )
 	DISK_IMAGE( "tokyocopi", 0, SHA1(a3cf011c8ef8ec80724c28e1534191b40ae8515d) )
 ROM_END
 
 ROM_START(rriders)
-	ROM_REGION32_LE(0x80000, "maincpu", 0)  /* motherboard bios */
+	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
+	// $40 6.00 PG 12/19/2002
+	// $7413c v0.0 08/13/1999
 	ROM_LOAD("22-03.u10", 0x000000, 0x80000, CRC(0ccae12f) SHA1(a8878fa73d5a4f5e9b6e3f35994fddea08cd3c2d) )
 
 	DISK_REGION( "disks" ) // 250 MB compact flash card
@@ -128,12 +128,16 @@ ROM_START(rriders)
 ROM_END
 
 ROM_START(tuningrc)
-	ROM_REGION32_LE(0x80000, "maincpu", 0)  /* motherboard bios */
+	ROM_REGION32_LE(0x80000, "bios", 0)  /* motherboard bios */
+	// $40 6.00 PG 12/19/2002
+	// $7413c v0.0 08/13/1999
 	ROM_LOAD("310j.u10", 0x000000, 0x80000, CRC(70b0797a) SHA1(696f602e83359d5d36798d4d2962ee85171e3622) )
 
 	DISK_REGION( "disks" ) // Hitachi HDS728080PLAT20 ATA/IDE
 	DISK_IMAGE( "tuningrc", 0, SHA1(4055cdc0b0c0e99252b90fbfafc48b693b144d67) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 2003, tokyocop,  0,        gaelcopc, gaelcopc, gaelcopc_state, empty_init, ROT0, "Gaelco", "Tokyo Cop (US, dedicated version)",   MACHINE_IS_SKELETON )

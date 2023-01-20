@@ -35,6 +35,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 // System clock definitions, from the MB-6890 servce manual, p.48:
 
 #define MASTER_CLOCK ( 32.256_MHz_XTAL )   // Master clock crystal (X1) frequency, 32.256 MHz.  "fx" in the manual.
@@ -110,8 +113,8 @@ private:
 	void vres_reg_w(u8 data);
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, u8 data);
-	uint8_t psg_latch_r();
-	void psg_latch_w(u8 data);
+	[[maybe_unused]] uint8_t psg_latch_r();
+	[[maybe_unused]] void psg_latch_w(u8 data);
 	uint8_t vram_attr_r();
 	void vram_attr_w(u8 data);
 	uint8_t beep_r();
@@ -130,8 +133,8 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
-	uint8_t ym2203_r();
-	void ym2203_w(u8 data);
+	[[maybe_unused]] uint8_t ym2203_r();
+	[[maybe_unused]] void ym2203_w(u8 data);
 
 	u8 m_hres_reg = 0U;
 	u8 m_crtc_vreg[0x100]{};
@@ -1023,6 +1026,9 @@ ROM_START( bml3mk5 )
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD("font.rom", 0x0000, 0x1000, BAD_DUMP CRC(0b6f2f10) SHA1(dc411b447ca414e94843636d8b5f910c954581fb) ) // handcrafted
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

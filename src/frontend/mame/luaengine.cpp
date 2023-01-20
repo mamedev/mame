@@ -1820,15 +1820,15 @@ void lua_engine::initialize()
 
 	auto ui_type = sol().registry().new_usertype<mame_ui_manager>("ui", sol::no_constructor);
 	// sol converts char32_t to a string
-	ui_type["get_char_width"] = [] (mame_ui_manager &m, uint32_t utf8char) { return m.get_char_width(utf8char); };
-	ui_type["get_string_width"] = &mame_ui_manager::get_string_width;
-	ui_type["set_aggressive_input_focus"] = [](mame_ui_manager &m, bool aggressive_focus) { osd_set_aggressive_input_focus(aggressive_focus); };
+	ui_type.set_function("get_char_width", [] (mame_ui_manager &m, uint32_t utf8char) { return m.get_char_width(utf8char); });
+	ui_type.set_function("get_string_width", static_cast<float (mame_ui_manager::*)(std::string_view)>(&mame_ui_manager::get_string_width));
+	ui_type.set_function("set_aggressive_input_focus", [] (mame_ui_manager &m, bool aggressive_focus) { osd_set_aggressive_input_focus(aggressive_focus); });
 	ui_type["get_general_input_setting"] = sol::overload(
 			// TODO: overload with sequence type string - parser isn't available here
 			[] (mame_ui_manager &ui, ioport_type type, int player) { return ui.get_general_input_setting(type, player, SEQ_TYPE_STANDARD); },
 			[] (mame_ui_manager &ui, ioport_type type) { return ui.get_general_input_setting(type, 0, SEQ_TYPE_STANDARD); });
 	ui_type["options"] = sol::property([] (mame_ui_manager &m) { return static_cast<core_options *>(&m.options()); });
-	ui_type["line_height"] = sol::property(&mame_ui_manager::get_line_height);
+	ui_type["line_height"] = sol::property([] (mame_ui_manager &m) { return m.get_line_height(); });
 	ui_type["menu_active"] = sol::property(&mame_ui_manager::is_menu_active);
 	ui_type["single_step"] = sol::property(&mame_ui_manager::single_step, &mame_ui_manager::set_single_step);
 	ui_type["show_fps"] = sol::property(&mame_ui_manager::show_fps, &mame_ui_manager::set_show_fps);

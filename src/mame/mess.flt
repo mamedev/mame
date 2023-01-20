@@ -311,7 +311,6 @@ handheld/talkingbb.cpp
 handheld/talkingfb.cpp
 handheld/teammate.cpp
 handheld/tispeak.cpp
-handheld/tispellb.cpp
 handheld/wildfire.cpp
 hds/hds200.cpp
 heathkit/et3400.cpp
@@ -733,6 +732,7 @@ sega/svmu.cpp
 sequential/prophet600.cpp
 sfrj/galaxy.cpp
 sfrj/galeb.cpp
+sfrj/idpartner.cpp
 sfrj/lola8a.cpp
 sfrj/orao.cpp
 sfrj/pecom.cpp
@@ -976,6 +976,7 @@ skeleton/testpat.cpp
 skeleton/textelcomp.cpp
 skeleton/ti630.cpp
 skeleton/tk635.cpp
+skeleton/tnshc08.cpp
 skeleton/tr175.cpp
 skeleton/tsispch.cpp
 skeleton/tulip1.cpp
@@ -1013,6 +1014,7 @@ sony/smc777.cpp
 sony/umatic.cpp
 sord/m5.cpp
 stm/pp.cpp
+stm/stmpc.cpp
 sun/sun1.cpp
 sun/sun2.cpp
 sun/sun3.cpp
@@ -1068,6 +1070,7 @@ ti/cc40.cpp
 ti/evmbug.cpp
 ti/exelv.cpp
 ti/geneve.cpp
+ti/spellb.cpp
 ti/ti74.cpp
 ti/ti85.cpp
 ti/ti89.cpp
@@ -1081,6 +1084,7 @@ ti/ti990_4.cpp
 ti/tm990189.cpp
 tiger/gamecom.cpp
 tiger/k28.cpp
+tiger/k28m2.cpp
 tigertel/gizmondo.cpp
 tiki/tiki100.cpp
 tomy/tomy_princ.cpp

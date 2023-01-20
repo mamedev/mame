@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "cpu/i386/i386.h"
 //#include "cpu/mcs51/mcs51.h"
-#include "screen.h"
+#include "machine/pci.h"
 
 namespace {
 
@@ -18,47 +18,31 @@ class newcanasta_state : public driver_device
 {
 public:
 	newcanasta_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void newcanasta(machine_config &config);
 
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 private:
 	required_device<cpu_device> m_maincpu;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void newcanasta_map(address_map &map);
 };
 
-void newcanasta_state::video_start()
-{
-}
 
-uint32_t newcanasta_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
 
 void newcanasta_state::newcanasta_map(address_map &map)
 {
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0x60000);
+	map(0xfff80000, 0xffffffff).rom().region("bios", 0);
 }
 
 static INPUT_PORTS_START( newcanasta )
 INPUT_PORTS_END
 
-void newcanasta_state::machine_start()
-{
-}
 
-void newcanasta_state::machine_reset()
-{
-}
 
 void newcanasta_state::newcanasta(machine_config &config)
 {
@@ -66,13 +50,8 @@ void newcanasta_state::newcanasta(machine_config &config)
 	PENTIUM4(config, m_maincpu, 100'000'000); // 775-pin LGA "Socket T" CPU, exact model unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &newcanasta_state::newcanasta_map);
 
-	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(800, 600);
-	screen.set_visarea(0, 800-1, 0, 600-1);
-	screen.set_screen_update(FUNC(newcanasta_state::screen_update));
+	PCI_ROOT(config, "pci", 0);
+	// ...
 
 	// I/O board
 	//I80C51(config, m_maincpu, 24.0000_MHz_XTAL); // USB-DIO-96 with a CY7C68013A MCU (MCS51 core)
@@ -85,7 +64,7 @@ void newcanasta_state::newcanasta(machine_config &config)
 ***************************************************************************/
 
 ROM_START(newcanasta)
-	ROM_REGION(0x80000, "bios", 0)
+	ROM_REGION32_LE(0x80000, "bios", 0)
 	ROM_SYSTEM_BIOS( 0, "110", "v1.10")
 	ROMX_LOAD("p4f136_1.10.bin", 0x00000, 0x80000, CRC(88e558e7) SHA1(ea4305cf7a6373711dad21e1de0e208b62f2d7de), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "100", "v1.00")

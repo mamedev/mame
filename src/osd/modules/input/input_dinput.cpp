@@ -314,9 +314,9 @@ public:
 //  dinput_device - base directinput device
 //============================================================
 
-dinput_device::dinput_device(running_machine &machine, std::string &&name, std::string &&id, input_device_class deviceclass, input_module &module)
-	: device_info(machine, std::move(name), std::move(id), deviceclass, module),
-		dinput({nullptr})
+dinput_device::dinput_device(running_machine &machine, std::string &&name, std::string &&id, input_device_class deviceclass, input_module &module) :
+	device_info(machine, std::move(name), std::move(id), deviceclass, module),
+	dinput({nullptr})
 {
 }
 
@@ -352,9 +352,9 @@ HRESULT dinput_device::poll_dinput(LPVOID pState) const
 //  dinput_keyboard_device - directinput keyboard device
 //============================================================
 
-dinput_keyboard_device::dinput_keyboard_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module)
-	: dinput_device(machine, std::move(name), std::move(id), DEVICE_CLASS_KEYBOARD, module),
-		keyboard({{0}})
+dinput_keyboard_device::dinput_keyboard_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module) :
+	dinput_device(machine, std::move(name), std::move(id), DEVICE_CLASS_KEYBOARD, module),
+	keyboard({{0}})
 {
 }
 
@@ -377,9 +377,9 @@ void dinput_keyboard_device::reset()
 //  dinput_mouse_device - directinput mouse device
 //============================================================
 
-dinput_mouse_device::dinput_mouse_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module)
-	: dinput_device(machine, std::move(name), std::move(id), DEVICE_CLASS_MOUSE, module),
-		mouse({0})
+dinput_mouse_device::dinput_mouse_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module) :
+	dinput_device(machine, std::move(name), std::move(id), DEVICE_CLASS_MOUSE, module),
+	mouse({0})
 {
 }
 
@@ -404,9 +404,9 @@ void dinput_mouse_device::reset()
 //  dinput_joystick_device - directinput joystick device
 //============================================================
 
-dinput_joystick_device::dinput_joystick_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module)
-	: dinput_device(machine, std::move(name), std::move(id), DEVICE_CLASS_JOYSTICK, module),
-		joystick({{0}})
+dinput_joystick_device::dinput_joystick_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module) :
+	dinput_device(machine, std::move(name), std::move(id), DEVICE_CLASS_JOYSTICK, module),
+	joystick({{0}})
 {
 }
 
@@ -493,19 +493,35 @@ int dinput_joystick_device::configure()
 
 		// left
 		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum).c_str(), "Left");
-		device()->add_item(name, ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<uintptr_t>(povnum * 4 + POVDIR_LEFT)));
+		device()->add_item(
+				name,
+				input_item_id(povnum * 4 + ITEM_ID_HAT1LEFT),
+				dinput_joystick_pov_get_state,
+				reinterpret_cast<void *>(uintptr_t(povnum * 4 + POVDIR_LEFT)));
 
 		// right
 		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum).c_str(), "Right");
-		device()->add_item(name, ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<uintptr_t>(povnum * 4 + POVDIR_RIGHT)));
+		device()->add_item(
+				name,
+				input_item_id(povnum * 4 + ITEM_ID_HAT1RIGHT),
+				dinput_joystick_pov_get_state,
+				reinterpret_cast<void *>(uintptr_t(povnum * 4 + POVDIR_RIGHT)));
 
 		// up
 		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum).c_str(), "Up");
-		device()->add_item(name, ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<uintptr_t>(povnum * 4 + POVDIR_UP)));
+		device()->add_item(
+				name,
+				input_item_id(povnum * 4 + ITEM_ID_HAT1UP),
+				dinput_joystick_pov_get_state,
+				reinterpret_cast<void *>(uintptr_t(povnum * 4 + POVDIR_UP)));
 
 		// down
 		name = dinput_module::device_item_name(this, offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum).c_str(), "Down");
-		device()->add_item(name, ITEM_ID_OTHER_SWITCH, dinput_joystick_pov_get_state, reinterpret_cast<void *>(static_cast<uintptr_t>(povnum * 4 + POVDIR_DOWN)));
+		device()->add_item(
+				name,
+				input_item_id(povnum * 4 + ITEM_ID_HAT1DOWN),
+				dinput_joystick_pov_get_state,
+				reinterpret_cast<void *>(uintptr_t(povnum * 4 + POVDIR_DOWN)));
 	}
 
 	// populate the buttons

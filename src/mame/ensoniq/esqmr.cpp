@@ -212,6 +212,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class esqmr_state : public driver_device
 {
 public:
@@ -360,6 +362,9 @@ ROM_END
 void esqmr_state::init_mr()
 {
 }
+
+} // anonymous namespace
+
 
 CONS( 1996, mr61,   0, 0, mr, mr, esqmr_state, init_mr, "Ensoniq", "MR-61 Workstation", MACHINE_NOT_WORKING )
 CONS( 1996, mrrack, 0, 0, mr, mr, esqmr_state, init_mr, "Ensoniq", "MR-Rack",           MACHINE_NOT_WORKING )

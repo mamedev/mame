@@ -174,6 +174,7 @@ function osdmodulesbuild()
 		"__STDC_LIMIT_MACROS",
 		"__STDC_FORMAT_MACROS",
 		"__STDC_CONSTANT_MACROS",
+		"BX_CONFIG_DEBUG=0",
 	}
 
 	files {

@@ -13,6 +13,9 @@ Skeleton driver for CIE Terminals (C. Itoh) CIT-50+ and CIT-101XL video terminal
 #include "video/scn2674.h"
 #include "screen.h"
 
+
+namespace {
+
 class cit101xl_state : public driver_device
 {
 public:
@@ -108,5 +111,8 @@ ROM_START(cit101xl)
 	ROM_REGION(0x2000, "chargen", 0)
 	ROM_LOAD("tmm2464ap_1104_cit50p_v1.2.u3", 0x0000, 0x2000, CRC(e07723f7) SHA1(466d69382cc75ac0abcda08e1a227da73fc77980)) // Toshiba OTP ROM with silkscreened label
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1987, cit101xl, 0, 0, cit101xl, cit101xl, cit101xl_state, empty_init, "CIE Terminals", "CIT-101XL Video Display Terminal", MACHINE_IS_SKELETON)

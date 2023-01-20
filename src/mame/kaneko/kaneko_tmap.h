@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia, David Haywood
-#ifndef MAME_VIDEO_KANEKO_TMAP_H
-#define MAME_VIDEO_KANEKO_TMAP_H
+#ifndef MAME_KANEKO_KANEKO_TMAP_H
+#define MAME_KANEKO_KANEKO_TMAP_H
 
 #pragma once
 
@@ -93,4 +93,4 @@ private:
 
 DECLARE_DEVICE_TYPE(KANEKO_TMAP, kaneko_view2_tilemap_device)
 
-#endif // MAME_VIDEO_KANEKO_TMAP_H
+#endif // MAME_KANEKO_KANEKO_TMAP_H

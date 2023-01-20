@@ -23,6 +23,8 @@ To diagnose game, turn on service mode and:
 #include "18w.lh"
 
 
+namespace {
+
 class mw18w_state : public driver_device
 {
 public:
@@ -318,6 +320,8 @@ ROM_START( 18w2 )
 	ROM_LOAD( "18w_b3.rom3", 0x1000, 0x0800, CRC(214606f6) SHA1(9a9dc20259b4462661c6be410d98d2be54657a0e) )
 	ROM_LOAD( "18w_b4.rom4", 0x1800, 0x0800, CRC(e88ad6a9) SHA1(ac010aa7e0288197ff9342801522623b64dd2a47) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAMEL( 1979, 18w,  0,   mw18w, mw18w, mw18w_state, empty_init, ROT0, "Midway", "18 Wheeler (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_18w )

@@ -13,6 +13,9 @@
 #include "speaker.h"
 #include "machine/bankdev.h"
 
+
+namespace {
+
 class nes_clone_state : public driver_device
 {
 public:
@@ -1249,6 +1252,8 @@ ROM_END
 void nes_clone_state::init_nes_clone()
 {
 }
+
+} // anonymous namespace
 
 
 // aka 'Atari Flashback' or 'Atari Flashback 1'

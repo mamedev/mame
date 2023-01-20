@@ -210,6 +210,9 @@ iphone2g_timer_device::iphone2g_timer_device(const machine_config &mconfig, cons
 {
 }
 
+
+namespace {
+
 class iphone2g_state : public driver_device
 {
 public:
@@ -320,6 +323,9 @@ ROM_START(iphone2g)
 	ROM_REGION32_LE(0x10000, "bios", 0)
 	ROM_LOAD("s5l8900-bootrom.bin", 0x00000, 0x10000, CRC(beb15cd1) SHA1(079a3acab577eb52cc349ea811af3cbd5d01b8f5))
 ROM_END
+
+} // anonymous namespace
+
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT   STATE       INIT        COMPANY            FULLNAME      FLAGS */
 // console section

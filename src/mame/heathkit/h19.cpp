@@ -61,6 +61,8 @@ Address   Description
 #include "speaker.h"
 
 
+namespace {
+
 // Standard H19 used a 2.048 MHz clock
 #define H19_CLOCK (XTAL(12'288'000) / 6)
 #define MC6845_CLOCK (XTAL(12'288'000) /8)
@@ -627,6 +629,8 @@ ROM_START( ultra19 )
 	ROM_REGION( 0x1000, "keyboard", 0 )
 	ROM_LOAD( "2716_h19_ultra_keyboard.bin", 0x0000, 0x0800, CRC(76130c92) SHA1(ca39c602af48505139d2750a084b5f8f0e662ff7))
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY      FULLNAME                         FLAGS

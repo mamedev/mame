@@ -100,7 +100,7 @@ public:
 	required_device<timer_device> m_scantimer;
 	required_device<ram_device> m_ram;
 	required_device<ay3600_device> m_ay3600;
-	required_device<a2_video_device> m_video;
+	required_device<a2_video_device_composite> m_video;
 	required_device<apple2_common_device> m_a2common;
 	required_device<a2bus_device> m_a2bus;
 	required_device<apple2_gameio_device> m_gameio;
@@ -118,16 +118,6 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-
-	template <bool Invert, bool Flip>
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	u32 screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	u32 screen_update_ultr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	u32 screen_update_ff(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<false, false>(screen, bitmap, cliprect); }
-	u32 screen_update_ft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<false, true>(screen, bitmap, cliprect); }
-	u32 screen_update_tf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<true, false>(screen, bitmap, cliprect); }
-	u32 screen_update_tt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<true, true>(screen, bitmap, cliprect); }
 
 	u8 ram_r(offs_t offset);
 	void ram_w(offs_t offset, u8 data);
@@ -319,10 +309,8 @@ void apple2_state::machine_start()
 	save_item(NAME(m_anykeydown));
 
 	// setup video pointers
-	m_video->m_ram_ptr = m_ram_ptr;
-	m_video->m_aux_ptr = m_ram_ptr;
-	m_video->m_char_ptr = memregion("gfx1")->base();
-	m_video->m_char_size = memregion("gfx1")->bytes();
+	m_video->set_ram_pointers(m_ram_ptr, m_ram_ptr);
+	m_video->set_char_pointer(memregion("gfx1")->base(), memregion("gfx1")->bytes());
 }
 
 void apple2_state::machine_reset()
@@ -340,11 +328,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
 {
 	int scanline = param;
 
-	// update the video system's shadow copy of the system config at the end of the frame
 	if (scanline == 192)
 	{
-		m_video->m_sysconfig = m_sysconfig->read();
-
 		// check reset
 		if (m_resetdip.found()) // if reset DIP is present, use it
 		{
@@ -371,127 +356,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
 			}
 		}
 	}
-}
-
-template <bool Invert, bool Flip>
-u32 apple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	// always update the flash timer here so it's smooth regardless of mode switches
-	m_video->m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
-
-	if (m_video->m_graphics)
-	{
-		if (m_video->m_hires)
-		{
-			if (m_video->m_mix)
-			{
-				m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update<a2_video_device::model::II, Invert, Flip>(screen, bitmap, cliprect, 160, 191);
-			}
-			else
-			{
-				m_video->hgr_update(screen, bitmap, cliprect, 0, 191);
-			}
-		}
-		else    // lo-res
-		{
-			if (m_video->m_mix)
-			{
-				m_video->lores_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update<a2_video_device::model::II, Invert, Flip>(screen, bitmap, cliprect, 160, 191);
-			}
-			else
-			{
-				m_video->lores_update(screen, bitmap, cliprect, 0, 191);
-			}
-		}
-	}
-	else
-	{
-		m_video->text_update<a2_video_device::model::II, Invert, Flip>(screen, bitmap, cliprect, 0, 191);
-	}
-
-	return 0;
-}
-
-u32 apple2_state::screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	// always update the flash timer here so it's smooth regardless of mode switches
-	m_video->m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
-
-	if (m_video->m_graphics)
-	{
-		if (m_video->m_hires)
-		{
-			if (m_video->m_mix)
-			{
-				m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update<a2_video_device::model::II_J_PLUS, true, true>(screen, bitmap, cliprect, 160, 191);
-			}
-			else
-			{
-				m_video->hgr_update(screen, bitmap, cliprect, 0, 191);
-			}
-		}
-		else    // lo-res
-		{
-			if (m_video->m_mix)
-			{
-				m_video->lores_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update<a2_video_device::model::II_J_PLUS, true, true>(screen, bitmap, cliprect, 160, 191);
-			}
-			else
-			{
-				m_video->lores_update(screen, bitmap, cliprect, 0, 191);
-			}
-		}
-	}
-	else
-	{
-		m_video->text_update<a2_video_device::model::II_J_PLUS, true, true>(screen, bitmap, cliprect, 0, 191);
-	}
-
-	return 0;
-}
-
-u32 apple2_state::screen_update_ultr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	// always update the flash timer here so it's smooth regardless of mode switches
-	m_video->m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
-
-	if (m_video->m_graphics)
-	{
-		if (m_video->m_hires)
-		{
-			if (m_video->m_mix)
-			{
-				m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen, bitmap, cliprect, 160, 191);
-			}
-			else
-			{
-				m_video->hgr_update(screen, bitmap, cliprect, 0, 191);
-			}
-		}
-		else // lo-res
-		{
-			if (m_video->m_mix)
-			{
-				m_video->lores_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen, bitmap, cliprect, 160, 191);
-			}
-			else
-			{
-				m_video->lores_update(screen, bitmap, cliprect, 0, 191);
-			}
-		}
-	}
-	else
-	{
-		m_video->text_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen, bitmap, cliprect, 0, 191);
-	}
-
-	return 0;
 }
 
 /***************************************************************************
@@ -809,9 +673,9 @@ u8 apple2_state::read_floatingbus()
 
 	// machine state switches
 	//
-	Hires    = (m_video->m_hires && m_video->m_graphics) ? 1 : 0;
-	Mixed    = m_video->m_mix ? 1 : 0;
-	Page2    = m_video->m_page2 ? 1 : 0;
+	Hires    = (m_video->get_hires() && m_video->get_graphics()) ? 1 : 0;
+	Mixed    = m_video->get_mix() ? 1 : 0;
+	Page2    = m_video->get_page2() ? 1 : 0;
 	_80Store = 0;
 
 	// calculate video parameters according to display standard
@@ -1066,12 +930,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::ay3600_repeat)
 
 INPUT_PORTS_START( apple2_sysconfig )
 	PORT_START("a2_config")
-	PORT_CONFNAME(0x03, 0x00, "Composite monitor type")
-	PORT_CONFSETTING(0x00, "Color")
-	PORT_CONFSETTING(0x01, "B&W")
-	PORT_CONFSETTING(0x02, "Green")
-	PORT_CONFSETTING(0x03, "Amber")
-
 	PORT_CONFNAME(0x04, 0x04, "Shift key mod")  // default to installed
 	PORT_CONFSETTING(0x00, "Not present")
 	PORT_CONFSETTING(0x04, "Installed")
@@ -1243,12 +1101,12 @@ void apple2_state::apple2_common(machine_config &config)
 	m_scantimer->configure_scanline(FUNC(apple2_state::apple2_interrupt), "screen", 0, 1);
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	APPLE2_VIDEO(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
+	APPLE2_VIDEO_COMPOSITE(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
-	m_screen->set_screen_update(FUNC(apple2_state::screen_update_tt));
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, true, true>)));
 	m_screen->set_palette(m_video);
 
 	/* sound hardware */
@@ -1340,25 +1198,25 @@ void apple2_state::space84(machine_config &config)
 void apple2_state::apple2jp(machine_config &config)
 {
 	apple2p(config);
-	m_screen->set_screen_update(FUNC(apple2_state::screen_update_jp));
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II_J_PLUS, true, true>)));
 }
 
 void apple2_state::dodo(machine_config &config)
 {
 	apple2p(config);
-	m_screen->set_screen_update(FUNC(apple2_state::screen_update_tf));
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, true, false>)));
 }
 
 void apple2_state::albert(machine_config &config)
 {
 	apple2p(config);
-	m_screen->set_screen_update(FUNC(apple2_state::screen_update_ft));
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, false, true>)));
 }
 
 void apple2_state::ivelultr(machine_config &config)
 {
 	apple2p(config);
-	m_screen->set_screen_update(FUNC(apple2_state::screen_update_ultr));
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, true, false>)));
 }
 
 #if 0

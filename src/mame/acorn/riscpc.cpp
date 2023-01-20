@@ -30,6 +30,9 @@
 #include "speaker.h"
 #include "debugger.h"
 
+
+namespace {
+
 class riscpc_state : public driver_device
 {
 public:
@@ -321,6 +324,9 @@ ROM_START(sarpc_j233)
 	ROMX_LOAD("1203,261-01.bin", 0x000000, 0x200000, CRC(8e3c570a) SHA1(ffccb52fa8e165d3f64545caae1c349c604386e9), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 	ROMX_LOAD("1203,262-01.bin", 0x000002, 0x200000, CRC(cf4615b4) SHA1(c340f29aeda3557ebd34419fcb28559fc9b620f8), ROM_GROUPWORD | ROM_SKIP(2) | ROM_BIOS(0))
 ROM_END
+
+} // anonymous namespace
+
 
 /***************************************************************************
 

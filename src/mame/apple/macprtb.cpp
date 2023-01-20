@@ -110,6 +110,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define C32M (31.3344_MHz_XTAL)
 #define C15M (C32M/2)
 #define C7M (C32M/4)
@@ -614,6 +617,9 @@ ROM_START(macpb100)
 	ROM_REGION(0xc00, "kybd", 0)
 	ROM_LOAD("342s0743-1.u29", 0x000, 0xc00, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1989, macprtb,  0, 0, macprtb, macadb, macportable_state, init_macprtb, "Apple Computer", "Macintosh Portable", MACHINE_NOT_WORKING)
 COMP(1991, macpb100, 0, 0, macprtb, macadb, macportable_state, init_macprtb, "Apple Computer", "Macintosh PowerBook 100", MACHINE_NOT_WORKING )

@@ -99,6 +99,8 @@ ROMs    : MR96004-10.1  [125661cd] (IC5 - Samples)
 #include "tilemap.h"
 
 
+namespace {
+
 class ms32_bnstars_state : public ms32_base_state
 {
 public:
@@ -800,5 +802,8 @@ void ms32_bnstars_state::init_bnstars()
 
 	configure_banks();
 }
+
+} // anonymous namespace
+
 
 GAME( 1997, bnstars1, 0, bnstars, bnstars, ms32_bnstars_state, init_bnstars, ROT0, "Jaleco", "Vs. Janshi Brandnew Stars", MACHINE_IMPERFECT_GRAPHICS )

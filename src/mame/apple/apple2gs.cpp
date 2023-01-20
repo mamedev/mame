@@ -12,6 +12,9 @@
     - ROM 00/01: original motherboard, 256K of RAM (banks 00/01/E0/E1 only), FPI chip manages fast/slow side
     - ROM 03: revised motherboard, 1M of RAM (banks 00/01/->0F/E0/E1), CYA chip replaces FPI
     - Expanded IIe: ROM 00/01 motherboard in a IIe case with a IIe keyboard rather than ADB
+    - "Mark Twain" prototype: ROM 3 hardware, SWIM1 instead of IWM, built-in floppy, integrated High-Speed SCSI Card
+      and internal SCSI HDD, 2 SIMM slots for RAM expansion instead of the proprietary memory slot of the previous IIgs.
+      Only 5 slots: slots 5 and 7 are missing (5 for the SuperDrive, 7 for the SCSI).
 
     Timing in terms of the 14M 14.3181818 MHz clock (1/2 of the 28.6363636 master clock):
     - 1 2.8 MHz 65816 cycle is 5 14M clocks.
@@ -27,7 +30,8 @@
 
     One video line is: 6 cycles of right border, 13 cycles of hblank, 6 cycles of left border, and 40 cycles of active video
 
-    640 + 96 + 96 = 832 (make borders each 38 pixels wider in A2 modes)
+    ((6*14)*2) + 560 = 728 (total for A2 modes)  htotal = 910 (65 * 14)
+    ((6*16)*2) + 640 = 832 (total for SHR)       htotal = 1040 (65 * 16)
 
     FF6ACF is speed test in ROM
     Diags:
@@ -74,6 +78,7 @@
 
 #include "machine/applefdintf.h"
 #include "machine/iwm.h"
+#include "machine/swim1.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
@@ -169,6 +174,7 @@ public:
 
 	void apple2gs(machine_config &config);
 	void apple2gsr1(machine_config &config);
+	void apple2gsmt(machine_config &config);
 
 	void rom1_init() { m_is_rom3 = false; }
 	void rom3_init() { m_is_rom3 = true; }
@@ -420,7 +426,6 @@ private:
 
 	bool m_romswitch = false;
 
-	bool m_page2 = false;
 	bool m_an0 = false, m_an1 = false, m_an2 = false, m_an3 = false;
 
 	bool m_vbl = false;
@@ -428,7 +433,6 @@ private:
 	int m_irqmask = 0;
 
 	bool m_intcxrom = false;
-	bool m_80store = false;
 	bool m_slotc3rom = false;
 	bool m_altzp = false;
 	bool m_ramrd = false, m_ramwrt = false;
@@ -437,7 +441,7 @@ private:
 	bool m_rombank = false;
 
 	u8 m_shadow = 0, m_speed = 0, m_textcol = 0;
-	u8 m_motors_active = 0, m_slotromsel = 0, m_intflag = 0, m_vgcint = 0, m_inten = 0, m_newvideo = 0;
+	u8 m_motors_active = 0, m_slotromsel = 0, m_intflag = 0, m_vgcint = 0, m_inten = 0;
 
 	bool m_last_speed = false;
 
@@ -449,7 +453,6 @@ private:
 	// Key GLU variables
 	u8 m_glu_regs[12]{}, m_glu_bus = 0;
 	bool m_glu_mcu_read_kgs = false, m_glu_816_read_dstat = false, m_glu_mouse_read_stat = false;
-	u16 m_glu_mouse_first_read;
 	int m_glu_kbd_y = 0;
 
 	u8 *m_ram_ptr = nullptr;
@@ -691,7 +694,6 @@ void apple2gs_state::machine_start()
 	std::fill(std::begin(m_megaii_ram), std::end(m_megaii_ram), 0);
 
 	std::fill(std::begin(m_glu_regs), std::end(m_glu_regs), 0);
-	m_glu_mouse_first_read = 0;
 
 	// setup speaker toggle volumes.  this should be done mathematically probably,
 	// but these ad-hoc values aren't too bad.
@@ -714,15 +716,13 @@ void apple2gs_state::machine_start()
 	}
 
 	// setup video pointers
-	m_video->m_ram_ptr = m_megaii_ram;
-	m_video->m_aux_ptr = &m_megaii_ram[0x10000];
-	m_video->m_char_ptr = memregion("gfx1")->base();
-	m_video->m_char_size = memregion("gfx1")->bytes();
-	m_video->m_8bit_graphics = std::make_unique<bitmap_ind16>(560, 192);
+	m_video->set_ram_pointers(m_megaii_ram, &m_megaii_ram[0x10000]);
+	m_video->set_char_pointer(memregion("gfx1")->base(), memregion("gfx1")->bytes());
+	m_video->setup_GS_graphics();
 
 	m_textcol = 0xf2;
-	m_video->m_GSfg = (m_textcol >> 4) & 0xf;
-	m_video->m_GSbg = m_textcol & 0xf;
+	m_video->set_GS_foreground((m_textcol >> 4) & 0xf);
+	m_video->set_GS_background(m_textcol & 0xf);
 
 	m_inh_slot = -1;
 	m_cnxx_slot = CNXX_UNCLAIMED;
@@ -743,7 +743,6 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_inh_slot));
 	save_item(NAME(m_inh_bank));
 	save_item(NAME(m_cnxx_slot));
-	save_item(NAME(m_page2));
 	save_item(NAME(m_romswitch));
 	save_item(NAME(m_an0));
 	save_item(NAME(m_an1));
@@ -751,7 +750,6 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_an3));
 	save_item(NAME(m_intcxrom));
 	save_item(NAME(m_rombank));
-	save_item(NAME(m_80store));
 	save_item(NAME(m_slotc3rom));
 	save_item(NAME(m_altzp));
 	save_item(NAME(m_ramrd));
@@ -803,21 +801,17 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_accel_temp_slowdown));
 	save_item(NAME(m_accel_speed));
 	save_item(NAME(m_motoroff_time));
-	save_item(NAME(m_newvideo));
-	save_item(NAME(m_glu_mouse_first_read));
 }
 
 void apple2gs_state::machine_reset()
 {
 	m_adb_p2_last = m_adb_p3_last = 0;
-	m_glu_mouse_first_read = 3;
 	m_adb_reset_freeze = 0;
-	m_page2 = false;
 	m_romswitch = false;
-	m_video->m_page2 = false;
-	m_video->m_GSborder = 0x02;
-	m_video->m_GSbg = 0x02;
-	m_video->m_GSfg = 0x0f;
+	m_video->page2_w(false);
+	m_video->set_GS_border(0x02);
+	m_video->set_GS_background(0x02);
+	m_video->set_GS_foreground(0x0f);
 	m_an0 = m_an1 = m_an2 = m_an3 = false;
 	m_gameio->an0_w(0);
 	m_gameio->an1_w(0);
@@ -828,13 +822,12 @@ void apple2gs_state::machine_reset()
 	m_irqmask = 0;
 	m_intcxrom = false;
 	m_rombank = false;
-	m_80store = false;
-	m_video->m_80store = false;
+	m_video->a80store_w(false);
 	m_altzp = false;
 	m_ramrd = false;
 	m_ramwrt = false;
 	m_ioudis = true;
-	m_newvideo = 0x01;      // verified on ROM03 hardware
+	m_video->set_newvideo(0x01);      // verified on ROM03 hardware
 	m_clock_frame = 0;
 	m_slot_irq = false;
 	m_clkdata = 0;
@@ -1009,7 +1002,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	m_screen->update_partial(scanline);
 
 	/* check scanline interrupt bits if we're in super hi-res and the current scanline is within the active display area */
-	if ((m_video->m_newvideo & 0x80) && (scanline >= (BORDER_TOP-1)) && (scanline < (200+BORDER_TOP-1)))
+	if ((m_video->get_newvideo() & 0x80) && (scanline >= (BORDER_TOP-1)) && (scanline < (200+BORDER_TOP-1)))
 	{
 		u8 scb;
 		const int shrline = scanline - BORDER_TOP + 1;
@@ -1050,7 +1043,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 		}
 
 		m_adbmicro->set_input_line(0, ASSERT_LINE);
-		m_video->m_sysconfig = 0;
 
 		m_clock_frame++;
 
@@ -1123,7 +1115,7 @@ void apple2gs_state::palette_init(palette_device &palette)
 			apple2gs_palette[(3*i)+1]*17,
 			apple2gs_palette[(3*i)+2]*17);
 
-		m_video->m_GSborder_colors[i] = rgb_t(apple2gs_palette[(3*i)]*17, apple2gs_palette[(3*i)+1]*17, apple2gs_palette[(3*i)+2]*17);
+		m_video->set_GS_border_color(i, rgb_t(apple2gs_palette[(3*i)]*17, apple2gs_palette[(3*i)+1]*17, apple2gs_palette[(3*i)+2]*17));
 	}
 }
 
@@ -1144,9 +1136,9 @@ void apple2gs_state::auxbank_update()
 	m_b0_0200bank.select(ramwr);
 	m_e0_0200bank.select(ramwr);
 
-	if (m_80store)
+	if (m_video->get_80store())
 	{
-		if (m_page2)
+		if (m_video->get_page2())
 		{
 			m_b0_0400bank.select(3);
 			m_e0_0400bank.select(3);
@@ -1166,9 +1158,9 @@ void apple2gs_state::auxbank_update()
 	m_b0_0800bank.select(ramwr);
 	m_e0_0800bank.select(ramwr);
 
-	if ((m_80store) && (m_video->m_hires))
+	if ((m_video->get_80store()) && (m_video->get_hires()))
 	{
-		if (m_page2)
+		if (m_video->get_page2())
 		{
 			m_b0_2000bank.select(3);
 			m_e0_2000bank.select(3);
@@ -1360,13 +1352,13 @@ void apple2gs_state::do_io(int offset)
 			break;
 
 		case 0x54:  // set page 1
-			m_page2 = false;
+			m_video->page2_w(false);
 			m_video->scr_w(0);
 			auxbank_update();
 			break;
 
 		case 0x55:  // set page 2
-			m_page2 = true;
+			m_video->page2_w(true);
 			m_video->scr_w(1);
 			auxbank_update();
 			break;
@@ -1534,7 +1526,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 		case 0x10:  // read any key down, reset keyboard strobe
 			keyglu_816_write(GLU_C010, 0);
-			return uKeyboardC010;
+			return uKeyboardC010 | (uKeyboard & 0x7f);
 
 		case 0x11:  // read LCRAM2 (LC Dxxx bank)
 			return (uKeyboardC010 & 0x7f) | (m_lcram2 ? 0x80 : 0x00);
@@ -1558,28 +1550,28 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return (uKeyboardC010 & 0x7f) | (m_slotc3rom ? 0x80 : 0x00);
 
 		case 0x18:  // read 80STORE
-			return (uKeyboardC010 & 0x7f) | (m_80store ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_80store() ? 0x80 : 0x00);
 
 		case 0x19:  // read VBLBAR
 			return (uKeyboardC010 & 0x7f) | (m_screen->vblank() ? 0x00 : 0x80);
 
 		case 0x1a:  // read TEXT
-			return (uKeyboardC010 & 0x7f) | (m_video->m_graphics ? 0x00 : 0x80);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_graphics() ? 0x00 : 0x80);
 
 		case 0x1b:  // read MIXED
-			return (uKeyboardC010 & 0x7f) | (m_video->m_mix ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_mix() ? 0x80 : 0x00);
 
 		case 0x1c:  // read PAGE2
-			return (uKeyboardC010 & 0x7f) | (m_page2 ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_page2() ? 0x80 : 0x00);
 
 		case 0x1d:  // read HIRES
-			return (uKeyboardC010 & 0x7f) | (m_video->m_hires ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_hires() ? 0x80 : 0x00);
 
 		case 0x1e:  // read ALTCHARSET
-			return (uKeyboardC010 & 0x7f) | (m_video->m_altcharset ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_altcharset() ? 0x80 : 0x00);
 
 		case 0x1f:  // read 80COL
-			return (uKeyboardC010 & 0x7f) | (m_video->m_80col ? 0x80 : 0x00);
+			return (uKeyboardC010 & 0x7f) | (m_video->get_80col() ? 0x80 : 0x00);
 
 		case 0x22:  // TEXTCOL
 			return m_textcol;
@@ -1600,7 +1592,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return keyglu_816_read(GLU_SYSSTAT);
 
 		case 0x29:  // NEWVIDEO
-			return m_newvideo;
+			return m_video->get_newvideo();
 
 		case 0x2d:  // SLOTROMSEL
 			return m_slotromsel;
@@ -1631,7 +1623,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return m_clkdata;
 
 		case 0x34:  // BORDERCOL
-			return (m_clock_control & 0xf0) | (m_video->m_GSborder & 0xf);
+			return (m_clock_control & 0xf0) | (m_video->get_GS_border() & 0xf);
 
 		case 0x35:  // SHADOW
 			return m_shadow;
@@ -1722,7 +1714,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 		case 0x68: // STATEREG, synthesizes all the IIe state regs
 			return  (m_altzp ? 0x80 : 0x00) |
-					(m_page2 ? 0x40 : 0x00) |
+					(m_video->get_page2() ? 0x40 : 0x00) |
 					(m_ramrd ? 0x20 : 0x00) |
 					(m_ramwrt ? 0x10 : 0x00) |
 					(m_lcram ? 0x00 : 0x08) |
@@ -1820,14 +1812,12 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 	switch (offset)
 	{
 		case 0x00:  // 80STOREOFF
-			m_80store = false;
-			m_video->m_80store = false;
+			m_video->a80store_w(false);
 			auxbank_update();
 			break;
 
 		case 0x01:  // 80STOREON
-			m_80store = true;
-			m_video->m_80store = true;
+			m_video->a80store_w(true);
 			auxbank_update();
 			break;
 
@@ -1882,19 +1872,19 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x0c:  // 80COLOFF
-			m_video->m_80col = false;
+			m_video->a80col_w(false);
 			break;
 
 		case 0x0d:  // 80COLON
-			m_video->m_80col = true;
+			m_video->a80col_w(true);
 			break;
 
 		case 0x0e:  // ALTCHARSETOFF
-			m_video->m_altcharset = false;
+			m_video->altcharset_w(false);
 			break;
 
 		case 0x0f:  // ALTCHARSETON
-			m_video->m_altcharset = true;
+			m_video->altcharset_w(true);
 			break;
 
 		case 0x10:  // clear keyboard latch
@@ -1905,7 +1895,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x21:  // MONOCHROME
-			m_video->m_monochrome = data;
+			m_video->set_GS_monochrome(data);
 			break;
 
 		case 0x22:  // TEXTCOL
@@ -1914,8 +1904,8 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 				m_screen->update_now();
 			}
 			m_textcol = data;
-			m_video->m_GSfg = (data >> 4) & 0xf;
-			m_video->m_GSbg = data & 0xf;
+			m_video->set_GS_foreground((data >> 4) & 0xf);
+			m_video->set_GS_background(data & 0xf);
 			break;
 
 		case 0x23:  // VGCINT
@@ -1956,7 +1946,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x29:  // NEWVIDEO
-			m_video->m_newvideo = m_newvideo = data;
+			m_video->set_newvideo(data);
 			break;
 
 		case 0x2d:  // SLOTROMSEL
@@ -2002,12 +1992,12 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x34:  // CLOCKCTL
-			if ((data & 0xf) != (m_video->m_GSborder & 0xf))
+			if ((data & 0xf) != (m_video->get_GS_border() & 0xf))
 			{
 				m_screen->update_now();
 			}
 			m_clock_control = data & 0x7f;
-			m_video->m_GSborder = data & 0xf;
+			m_video->set_GS_border(data & 0xf);
 			m_rtc->ce_w(BIT(data, 7) ^ 1);
 			if (data & 0x80)
 			{
@@ -2172,7 +2162,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 
 		case 0x68: // STATEREG
 			m_altzp = (data & 0x80);
-			m_page2 = (data & 0x40);
+			m_video->page2_w(data & 0x40);
 			m_ramrd = (data & 0x20);
 			m_ramwrt = (data & 0x10);
 			m_lcram = (data & 0x08) ? false : true;
@@ -2792,10 +2782,10 @@ u8 apple2gs_state::read_floatingbus()
 
 	// machine state switches
 	//
-	Hires    = (m_video->m_hires && m_video->m_graphics) ? 1 : 0;
-	Mixed    = m_video->m_mix ? 1 : 0;
-	Page2    = m_page2 ? 1 : 0;
-	_80Store = m_80store ? 1 : 0;
+	Hires    = (m_video->get_hires() && m_video->get_graphics()) ? 1 : 0;
+	Mixed    = m_video->get_mix() ? 1 : 0;
+	Page2    = m_video->get_page2() ? 1 : 0;
+	_80Store = m_video->get_80store() ? 1 : 0;
 
 	// calculate video parameters according to display standard
 	//
@@ -2929,7 +2919,7 @@ template void apple2gs_state::e1ram_w<0x4000>(offs_t offset, u8 data);
 u8 apple2gs_state::auxram0000_r(offs_t offset)
 {
 	slow_cycle();
-	if ((offset >= 0x2000) && (offset < 0xa000) && ((m_newvideo & 0xc0) != 0))
+	if ((offset >= 0x2000) && (offset < 0xa000) && ((m_video->get_newvideo() & 0xc0) != 0))
 	{
 		if (offset & 1)
 		{
@@ -2949,7 +2939,7 @@ void apple2gs_state::auxram0000_w(offs_t offset, u8 data)
 
 	slow_cycle();
 
-	if ((offset >= 0x2000) && (offset < 0xa000) && ((m_newvideo & 0xc0) != 0))
+	if ((offset >= 0x2000) && (offset < 0xa000) && ((m_video->get_newvideo() & 0xc0) != 0))
 	{
 		if (offset & 1)
 		{
@@ -2966,11 +2956,10 @@ void apple2gs_state::auxram0000_w(offs_t offset, u8 data)
 	if ((orig_addr >= 0x9e00) && (orig_addr <= 0x9fff))
 	{
 		int color = (orig_addr - 0x9e00) >> 1;
-
-		m_video->m_shr_palette[color] = rgb_t(
+		m_video->set_SHR_color(color, rgb_t(
 			((m_megaii_ram[0x19f00 + color] >> 0) & 0x0f) * 17,
 			((m_megaii_ram[0x15f00 + color] >> 4) & 0x0f) * 17,
-			((m_megaii_ram[0x15f00 + color] >> 0) & 0x0f) * 17);
+			((m_megaii_ram[0x15f00 + color] >> 0) & 0x0f) * 17));
 	}
 }
 
@@ -3374,7 +3363,12 @@ u8 apple2gs_state::adbmicro_p3_in()
 {
 	if (m_is_rom3)
 	{
-		return 0x00;    // TODO: 0x40 to remove Control Panel from the Control-Open Apple-Esc menu
+		// Check the jumper to remove the Control Panel from the Control-Open Apple-Esc CDA menu
+		if (m_sysconfig->read() & 0x08)
+		{
+			return 0x40;
+		}
+		return 0x00;
 	}
 	else
 	{
@@ -3397,7 +3391,7 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 	{
 		m_adb_reset_freeze = 2;
 		m_maincpu->reset();
-		m_video->m_newvideo = m_newvideo = 0x41;
+		m_video->set_newvideo(0x41);
 	}
 
 	if (!(data & 0x10))
@@ -3549,27 +3543,13 @@ u8 apple2gs_state::keyglu_816_read(u8 offset)
 		case GLU_MOUSEY:
 			if (!m_glu_mouse_read_stat)
 			{
-				m_glu_mouse_read_stat = 1;
-				m_glu_regs[GLU_KG_STATUS] &= ~KGS_MOUSEX_FULL;
-				m_glu_regs[GLU_SYSSTAT] &= ~GLU_STATUS_MOUSEIRQ;
-				keyglu_regen_irqs();
+				m_glu_mouse_read_stat = true;
 				return m_glu_regs[GLU_MOUSEX];
 			}
-			// HACK: the MCU doesn't properly populate the mouse registers until they're read once,
-			// but the Event Manager assumes the first read is valid and thinks the mouse button is down.
-			// TODO: how does this work on hardware?
-			if (m_glu_mouse_first_read > 0)
-			{
-				m_glu_mouse_first_read--;
-				if (m_glu_mouse_first_read & 1)
-				{
-					return 0x80 | m_glu_regs[GLU_MOUSEY];
-				}
-				else
-				{
-					return m_glu_regs[GLU_MOUSEY] & 0x7f;
-				}
-			}
+			m_glu_mouse_read_stat = false;
+			m_glu_regs[GLU_KG_STATUS] &= ~KGS_MOUSEX_FULL;
+			m_glu_regs[GLU_SYSSTAT] &= ~GLU_STATUS_MOUSEIRQ;
+			keyglu_regen_irqs();
 			return m_glu_regs[GLU_MOUSEY];
 
 		case GLU_SYSSTAT:
@@ -3580,7 +3560,7 @@ u8 apple2gs_state::keyglu_816_read(u8 offset)
 				{
 					sysstat |= GLU_STATUS_CMDFULL;
 				}
-				if (m_glu_regs[GLU_KG_STATUS] & m_glu_mouse_read_stat)
+				if (m_glu_mouse_read_stat)
 				{
 					sysstat |= GLU_STATUS_MOUSEXY;
 				}
@@ -3762,6 +3742,15 @@ INPUT_PORTS_START( apple2gs )
 	PORT_CONFSETTING(0x07, "16 MHz ZipGS")
 INPUT_PORTS_END
 
+INPUT_PORTS_START( apple2gsrom3 )
+	PORT_INCLUDE( apple2gs )
+
+	PORT_MODIFY("a2_config")
+	PORT_CONFNAME(0x08, 0x00, "Disable CDA Control Panel")
+	PORT_CONFSETTING(0x00, DEF_STR(No))
+	PORT_CONFSETTING(0x08, DEF_STR(Yes))
+INPUT_PORTS_END
+
 void apple2gs_state::apple2gs(machine_config &config)
 {
 	/* basic machine hardware */
@@ -3790,7 +3779,6 @@ void apple2gs_state::apple2gs(machine_config &config)
 
 	MACADB(config, m_macadb, A2GS_MASTER_CLOCK/8);
 	m_macadb->set_mcu_mode(true);
-	m_macadb->set_iigs_mode(true);
 	m_macadb->adb_data_callback().set(FUNC(apple2gs_state::set_adb_line));
 
 	RTC3430042(config, m_rtc, XTAL(32'768));
@@ -3903,6 +3891,22 @@ void apple2gs_state::apple2gsr1(machine_config &config)
 	m_adbmicro->write_p<3>().set(FUNC(apple2gs_state::adbmicro_p3_out));
 }
 
+void apple2gs_state::apple2gsmt(machine_config &config)
+{
+	apple2gs(config);
+
+	// SWIM1 344S0061 confirmed on two different Mark Twain boards, with 15.6672 MHz oscillator
+	SWIM1(config.replace(), m_iwm, 15.6672_MHz_XTAL);
+	m_iwm->phases_cb().set(FUNC(apple2gs_state::phases_w));
+	m_iwm->sel35_cb().set(FUNC(apple2gs_state::sel35_w));
+	m_iwm->devsel_cb().set(FUNC(apple2gs_state::devsel_w));
+
+	applefdintf_device::add_525(config, m_floppy[0]);
+	applefdintf_device::add_525(config, m_floppy[1]);
+	applefdintf_device::add_35_hd(config, m_floppy[2]);
+	applefdintf_device::add_35_hd(config, m_floppy[3]);
+}
+
 /***************************************************************************
 
   Game driver(s)
@@ -3916,7 +3920,7 @@ ROM_START(apple2gs)
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
 
-	ROM_REGION(0x40000,"maincpu",0)
+	ROM_REGION(0x80000,"maincpu",0)
 	// 341-0728 is the MASK rom version while 341-0737 is the EPROM version - SAME data.
 	ROM_LOAD("341-0728", 0x00000, 0x20000, CRC(8d410067) SHA1(c0f4704233ead14cb8e1e8a68fbd7063c56afd27) ) /* 341-0728: IIgs ROM03 FC-FD */
 	// 341-0748 is the MASK rom version while 341-0749 is the EPROM version - SAME data.
@@ -3931,7 +3935,7 @@ ROM_START(apple2gsr3p)
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
 
-	ROM_REGION(0x40000,"maincpu",0)
+	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD("341-0728", 0x00000, 0x20000, CRC(8d410067) SHA1(c0f4704233ead14cb8e1e8a68fbd7063c56afd27) ) /* 341-0728: IIgs ROM03 prototype FC-FD - 28 pin MASK rom */
 	ROM_LOAD("341-0729", 0x20000, 0x20000, NO_DUMP) /* 341-0729: IIgs ROM03 prototype FE-FF */
 ROM_END
@@ -3943,7 +3947,7 @@ ROM_START(apple2gsr1)
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
 
-	ROM_REGION(0x40000,"maincpu",0)
+	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD("342-0077-b", 0x20000, 0x20000, CRC(42f124b0) SHA1(e4fc7560b69d062cb2da5b1ffbe11cd1ca03cc37)) /* 342-0077-B: IIgs ROM01 */
 ROM_END
 
@@ -3954,7 +3958,7 @@ ROM_START(apple2gsr0)
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
 
-	ROM_REGION(0x40000,"maincpu",0)
+	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD("342-0077-a", 0x20000, 0x20000, CRC(dfbdd97b) SHA1(ff0c245dd0732ec4413a934fd80efc2defd8a8e3) ) /* 342-0077-A: IIgs ROM00 */
 ROM_END
 
@@ -3965,7 +3969,7 @@ ROM_START(apple2gsr0p)  // 6/19/1986 Cortland prototype
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
 
-	ROM_REGION(0x40000,"maincpu",0)
+	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD( "rombf.bin",    0x020000, 0x020000, CRC(ab04fedf) SHA1(977589a17553956d583a21020080a39dd396df5c) )
 ROM_END
 
@@ -3976,17 +3980,42 @@ ROM_START(apple2gsr0p2)  // 3/10/1986 Cortland prototype, boots as "Apple //'ing
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
 
-	ROM_REGION(0x40000,"maincpu",0)
+	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD( "apple iigs alpha rom 2.0 19860310.bin", 0x020000, 0x020000, CRC(a47d275f) SHA1(c5836adcfc8be69c7351b84afa94c814e8d92b81) )
+ROM_END
+
+ROM_START(apple2gsmt)
+	// 50741 ADB MCU inside the IIgs system unit
+	ROM_REGION(0x1000, "adbmicro", 0)
+	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
+
+	ROM_REGION(0x1000, "gfx1", 0)
+	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
+
+	ROM_REGION(0x80000, "maincpu", 0)
+	// The Mark Twain ROM is 512K, with address bit 16 inverted (same as ROM 3).
+	// The first 256K is filled with 64K of 0xF0, then 0xF1, 0xF2, and 0xF3.  I'm guessing this was meant to be
+	// a small ROM disk at $F00000, like the Mac Classic has.  The second 256K is the firmware we all know from
+	// the "System 6.0.1" source leak.
+	ROM_LOAD( "mtrom.bin", 0x040000, 0x040000, CRC(d75414c5) SHA1(7054915f5e5f9f3bb2cbecf6830d4f80793694a6) )
+	ROM_CONTINUE(0x10000, 0x10000)
+	ROM_CONTINUE(0x00000, 0x10000)
+	ROM_CONTINUE(0x30000, 0x10000)
+	ROM_CONTINUE(0x20000, 0x10000)
+
+	// The firmware for the built-in High-Speed SCSI Card
+	ROM_REGION(0x8000, "hsscsi", 0)
+	ROM_LOAD( "mtscsi.bin",   0x000000, 0x008000, CRC(7426c880) SHA1(1c16310e5c180701a05089d69c6e72e9dc7434f6) )
 ROM_END
 
 } // Anonymous namespace
 
 
 /*    YEAR  NAME            PARENT    COMPAT    MACHINE     INPUT     CLASS        INIT  COMPANY           FULLNAME */
-COMP( 1989, apple2gs,     0,        apple2, apple2gs,   apple2gs, apple2gs_state, rom3_init, "Apple Computer", "Apple IIgs (ROM03)", MACHINE_SUPPORTS_SAVE )
-COMP( 198?, apple2gsr3p,  apple2gs, 0,      apple2gs,   apple2gs, apple2gs_state, rom3_init, "Apple Computer", "Apple IIgs (ROM03 prototype)", MACHINE_NOT_WORKING )
+COMP( 1989, apple2gs,     0,        apple2, apple2gs,   apple2gsrom3, apple2gs_state, rom3_init, "Apple Computer", "Apple IIgs (ROM03)", MACHINE_SUPPORTS_SAVE )
+COMP( 198?, apple2gsr3p,  apple2gs, 0,      apple2gs,   apple2gsrom3, apple2gs_state, rom3_init, "Apple Computer", "Apple IIgs (ROM03 prototype)", MACHINE_NOT_WORKING )
 COMP( 1987, apple2gsr1,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, rom1_init, "Apple Computer", "Apple IIgs (ROM01)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, apple2gsr0,   apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, rom1_init, "Apple Computer", "Apple IIgs (ROM00)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, apple2gsr0p,  apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, rom1_init, "Apple Computer", "Apple IIgs (ROM00 prototype 6/19/1986)", MACHINE_SUPPORTS_SAVE )
 COMP( 1986, apple2gsr0p2, apple2gs, 0,      apple2gsr1, apple2gs, apple2gs_state, rom1_init, "Apple Computer", "Apple IIgs (ROM00 prototype 3/10/1986)", MACHINE_SUPPORTS_SAVE )
+COMP( 1991, apple2gsmt,   apple2gs, 0,      apple2gsmt, apple2gsrom3, apple2gs_state, rom3_init, "Apple Computer", "Apple IIgs (1991 Mark Twain prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

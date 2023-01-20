@@ -16,11 +16,23 @@ The "NEO MANIA ADAPTER BOARD" contains:
     JMP3 (three positions) - Unknown function
    2 x Coin acceptors ports
    1 x Bank of 8 dipswitches (unknown function)
+
+C:\Neomania folder contains ppm.exe, which is the driver for the parallel port device.
+It also contains a password protected "Guard.zip", copy protection?
+C:\Windows has driver installs for a PCI Sound Blaster and an ATI mach 64 / Bt829 derivative.
+
+
+TODO:
+- HDD image doesn't boot in neither shutms11 nor pcipc, mangled MBR boot record or geometry params (has -chs 3532,16,38 but WinImage reports back ~20 GB partition?);
+- (With manually c&p files in a CHD that works) SIGABRT in pcipc trying to execute ppm.exe, in shutms11 will draw "Parallel Port Manager v4.0" then fail on device check;
+- Extract "Guard.zip" and understand what is for;
+
+
 */
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "screen.h"
+#include "machine/pci.h"
 
 namespace {
 
@@ -28,32 +40,19 @@ class neomania_state : public driver_device
 {
 public:
 	neomania_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void neomania(machine_config &config);
 
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void neomania_map(address_map &map);
 };
 
-void neomania_state::video_start()
-{
-}
-
-uint32_t neomania_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
 
 void neomania_state::neomania_map(address_map &map)
 {
@@ -63,27 +62,16 @@ static INPUT_PORTS_START( neomania )
 INPUT_PORTS_END
 
 
-void neomania_state::machine_start()
-{
-}
-
-void neomania_state::machine_reset()
-{
-}
-
 void neomania_state::neomania(machine_config &config)
 {
 	// Basic machine hardware
-	PENTIUM3(config, m_maincpu, 600'000'000); // Exact hardware not specified
+	// Neoemu.exe requires a processor with at least MMX features
+	PENTIUM3(config, m_maincpu, 100'000'000); // Exact hardware not specified
 	m_maincpu->set_addrmap(AS_PROGRAM, &neomania_state::neomania_map);
+	m_maincpu->set_disable();
 
-	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(neomania_state::screen_update));
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 /***************************************************************************
@@ -94,11 +82,11 @@ ROM_START( neomania )
 
 	// Different PC motherboards with different configurations.
 	ROM_REGION(0x80000, "bios", 0)
-	ROM_LOAD("pcbios.bin", 0x00000, 0x80000, NO_DUMP) // MB BIOS
+	ROM_LOAD("pcbios.bin", 0x00000, 0x80000, NO_DUMP)
 
 	// Portuguese version with 48 games, from 2003
 	DISK_REGION( "ide:0:hdd:image" ) // From a Norton Ghost recovery image
-	DISK_IMAGE( "neomania", 0, SHA1(4a865d1ed67901b98b37f94cfdd591fad38b404a) )
+	DISK_IMAGE( "neomania", 0, BAD_DUMP SHA1(4a865d1ed67901b98b37f94cfdd591fad38b404a) )
 ROM_END
 
 } // Anonymous namespace

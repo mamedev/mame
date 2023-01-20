@@ -28,6 +28,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class backfire_state : public driver_device
 {
 public:
@@ -613,6 +615,9 @@ void backfire_state::init_backfire()
 	descramble_sound();
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0170018, 0x017001b, read32smo_delegate(*this, FUNC(backfire_state::backfire_speedup_r)));
 }
+
+} // anonymous namespace
+
 
 GAME( 1995, backfire,  0,        backfire,   backfire, backfire_state, init_backfire, ROT0, "Data East Corporation", "Backfire! (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, backfirea, backfire, backfire,   backfire, backfire_state, init_backfire, ROT0, "Data East Corporation", "Backfire! (Japan, set 2)", MACHINE_SUPPORTS_SAVE ) // defaults to wheel controls, must change to joystick to play

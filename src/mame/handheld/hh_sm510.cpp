@@ -5,7 +5,7 @@
 
 Sharp SM5xx family handhelds.
 List of child drivers:
-- rzone: Tiger R-Zone
+- rzone.cpp: Tiger R-Zone
 
 The LCD screen graphics are provided internally with an SVG file.
 MAME external artwork is recommended for the backgrounds inlays.

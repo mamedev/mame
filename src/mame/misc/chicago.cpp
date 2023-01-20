@@ -24,6 +24,9 @@
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 
+
+namespace {
+
 // copied by Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
@@ -140,6 +143,8 @@ ROM_START( dmodrbcc )
 	ROM_LOAD( "cdi.j10",    0x0000, 0x0020, CRC(e9af4217) SHA1(813e126b1263e13f1684d700c5c4bec34d063b38) )
 	ROM_LOAD( "cdi.r1",     0x0000, 0x0020, CRC(5ed8cdd2) SHA1(d193d819ad634c43d648ce49073799b4df6dfd2f) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1976, dmodrbcc, 0, chicago, 0, chicago_state, empty_init, ROT0, "Chicago Coin", "Demolition Derby [TTL]", MACHINE_IS_SKELETON )

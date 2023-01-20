@@ -137,6 +137,9 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+
+namespace {
+
 class force68k_state : public driver_device
 {
 public:
@@ -727,6 +730,9 @@ ROM_START (fccpu6vb)
 	ROM_REGION (0x1000000, "maincpu", 0)
 ROM_END
 #endif
+
+} // anonymous namespace
+
 
 /* Driver */
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                 FULLNAME          FLAGS */

@@ -5,7 +5,7 @@
  * IBM Research and Office Products Division Microprocessor (ROMP).
  *
  * Sources:
- *   - http://bitsavers.org/pdf/ibm/pc/rt/75X0232_RT_PC_Technical_Reference_Volume_1_Jun87.pdf
+ *   - IBM RT PC Hardware Technical Reference Volume I, 75X0232, March 1987
  *
  * TODO:
  *   - configurable storage channel
@@ -322,7 +322,7 @@ void romp_device::execute_run()
 					m_icount -= 4;
 					break;
 				case 0xcb: // ior: input/output read
-					if (((r3 + i) & 0xff00'0000U) || !m_mmu->ior(r3 + i, m_gpr[R2]))
+					if (((r3 + i) & 0xff00'0000U) || !m_mmu->pio_load(r3 + i, m_gpr[R2]))
 						program_check(PCS_PCK | PCS_DAE);
 					break;
 				case 0xcc: // ti: trap on condition immediate
@@ -433,7 +433,7 @@ void romp_device::execute_run()
 					m_icount -= 4;
 					break;
 				case 0xdb: // iow: input/output write
-					if (((r3 + i) & 0xff00'0000U) || !m_mmu->iow(r3 + i, m_gpr[R2]))
+					if (((r3 + i) & 0xff00'0000U) || !m_mmu->pio_store(r3 + i, m_gpr[R2]))
 						program_check(PCS_PCK | PCS_DAE);
 					m_icount--;
 					break;

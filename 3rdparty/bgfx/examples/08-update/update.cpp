@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "common.h"
@@ -173,18 +173,17 @@ bgfx::TextureHandle loadTextureWithUpdate(const char* _filePath, uint64_t _flags
 					, NULL
 					);
 
-				uint32_t width = imageContainer->m_width;
+				const bimg::ImageBlockInfo& blockInfo = getBlockInfo(imageContainer->m_format);
+				const uint32_t blockWidth  = blockInfo.blockWidth;
+				const uint32_t blockHeight = blockInfo.blockHeight;
+
+				uint32_t width  = imageContainer->m_width;
 				uint32_t height = imageContainer->m_height;
 
 				for (uint8_t lod = 0, num = imageContainer->m_numMips; lod < num; ++lod)
 				{
-					if (width < 4 || height < 4)
-					{
-						break;
-					}
-
-					width  = bx::max(1u, width);
-					height = bx::max(1u, height);
+					width  = bx::max(blockWidth,  width);
+					height = bx::max(blockHeight, height);
 
 					bimg::ImageMip mip;
 
@@ -246,6 +245,8 @@ public:
 		bgfx::Init init;
 		init.type     = args.m_type;
 		init.vendorId = args.m_pciId;
+		init.platformData.nwh  = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
+		init.platformData.ndt  = entry::getNativeDisplayHandle();
 		init.resolution.width  = m_width;
 		init.resolution.height = m_height;
 		init.resolution.reset  = m_reset;
@@ -424,6 +425,16 @@ public:
 
 		m_texture2dData = (uint8_t*)malloc(kTexture2dSize*kTexture2dSize*4);
 
+		if (m_blitSupported)
+		{
+			m_blitTestA = bgfx::createTexture2D(16, 16, false, 1, bgfx::TextureFormat::Enum::RGBA8, BGFX_TEXTURE_BLIT_DST);
+			m_blitTestB = bgfx::createTexture2D(16, 16, false, 1, bgfx::TextureFormat::Enum::RGBA8, BGFX_TEXTURE_BLIT_DST);
+			m_blitTestC = bgfx::createTexture2D(16, 16, false, 1, bgfx::TextureFormat::Enum::RGBA8, BGFX_TEXTURE_BLIT_DST);
+			bgfx::setName(m_blitTestA, "Blit A");
+			bgfx::setName(m_blitTestB, "Blit B");
+			bgfx::setName(m_blitTestC, "Blit C");
+		}
+
 		m_rr = m_rng.gen()%255;
 		m_gg = m_rng.gen()%255;
 		m_bb = m_rng.gen()%255;
@@ -449,6 +460,13 @@ public:
 		// Cleanup.
 		free(m_texture2dData);
 
+		if (m_blitSupported)
+		{
+			bgfx::destroy(m_blitTestA);
+			bgfx::destroy(m_blitTestB);
+			bgfx::destroy(m_blitTestC);
+		}
+
 		for (uint32_t ii = 0; ii < BX_COUNTOF(m_textures); ++ii)
 		{
 			bgfx::destroy(m_textures[ii]);
@@ -461,7 +479,7 @@ public:
 
 		bgfx::destroy(m_texture2d);
 
-		for (uint32_t ii = 0; ii<BX_COUNTOF(m_textureCube); ++ii)
+		for (uint32_t ii = 0; ii < BX_COUNTOF(m_textureCube); ++ii)
 		{
 			if (bgfx::isValid(m_textureCube[ii]))
 			{
@@ -469,7 +487,7 @@ public:
 			}
 		}
 
-		for (uint32_t ii = 0; ii<BX_COUNTOF(m_textureCubeFaceFb); ++ii)
+		for (uint32_t ii = 0; ii < BX_COUNTOF(m_textureCubeFaceFb); ++ii)
 		{
 			if (bgfx::isValid(m_textureCubeFaceFb[ii]))
 			{
@@ -479,15 +497,19 @@ public:
 
 		bgfx::destroy(m_ibh);
 		bgfx::destroy(m_vbh);
+
 		if (bgfx::isValid(m_program3d) )
 		{
 			bgfx::destroy(m_program3d);
 		}
+
 		bgfx::destroy(m_programCmp);
+
 		if (bgfx::isValid(m_programCompute) )
 		{
 			bgfx::destroy(m_programCompute);
 		}
+
 		bgfx::destroy(m_program);
 		bgfx::destroy(u_time);
 		bgfx::destroy(s_texColor);
@@ -909,6 +931,21 @@ public:
 				ImGuiDescription(mtx[12], mtx[13], mtx[14], worldToScreen, descSampler[ii]);
 			}
 
+			if (m_blitSupported)
+			{
+				bgfx::blit(1, m_blitTestA, 0, 0, m_blitTestB, 0, 0);
+				bgfx::blit(1, m_blitTestC, 0, 0, m_blitTestA, 0, 0);
+
+				bgfx::blit(1, m_blitTestA, 0, 0, m_blitTestB, 0, 0);
+				bgfx::blit(1, m_blitTestB, 0, 0, m_blitTestC, 0, 0);
+
+				bgfx::blit(1, m_blitTestA, 0, 0, m_blitTestB, 0, 0);
+				bgfx::blit(1, m_blitTestB, 0, 0, m_blitTestA, 0, 0);
+
+				bgfx::blit(1, m_blitTestB, 0, 0, m_blitTestA, 0, 0);
+				bgfx::blit(1, m_blitTestC, 0, 0, m_blitTestB, 0, 0);
+			}
+
 			imguiEndFrame();
 
 			// Advance to next frame. Rendering thread will be kicked to
@@ -952,6 +989,9 @@ public:
 	bgfx::TextureHandle m_textures3d[3];
 	bgfx::TextureHandle m_texture2d;
 	bgfx::TextureHandle m_textureCube[4];
+	bgfx::TextureHandle m_blitTestA;
+	bgfx::TextureHandle m_blitTestB;
+	bgfx::TextureHandle m_blitTestC;
 	bgfx::FrameBufferHandle m_textureCubeFaceFb[6];
 	bgfx::IndexBufferHandle m_ibh;
 	bgfx::VertexBufferHandle m_vbh;

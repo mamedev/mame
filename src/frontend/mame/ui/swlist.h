@@ -43,7 +43,7 @@ private:
 	};
 	using entry_list = std::list<software_part_menu_entry>;
 
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	// variables
@@ -88,7 +88,7 @@ private:
 	std::string                     m_search;
 	bool                            m_ordered_by_shortname;
 
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	// functions
@@ -104,7 +104,7 @@ class menu_software : public menu
 public:
 	menu_software(mame_ui_manager &mui, render_container &container, const char *interface, software_list_device **result);
 	virtual ~menu_software() override;
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 private:

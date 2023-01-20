@@ -51,8 +51,8 @@ public:
 		, m_romboard(ROM_BOARD_INVALID)
 		, m_custom_io_r(*this)
 		, m_custom_io_w(*this)
-		, m_grayscale_enable(false)
-		, m_vdp_enable(false)
+		, m_grayscale_enable(0)
+		, m_vdp_enable(0)
 		, m_vdp_mixing(0)
 		, m_lghost_value(0)
 		, m_lghost_select(0)
@@ -170,15 +170,15 @@ private:
 	write16sm_delegate  m_custom_io_w;
 
 	// internal state
-	emu_timer *         m_init_boost_timer = nullptr;
-	int                 m_grayscale_enable = 0;
-	int                 m_vdp_enable = 0;
-	uint8_t             m_vdp_mixing = 0;
+	emu_timer *         m_init_boost_timer;
+	int                 m_grayscale_enable;
+	int                 m_vdp_enable;
+	uint8_t             m_vdp_mixing;
 	bitmap_ind16        m_temp_bitmap;
 
 	// game-specific state
-	uint8_t             m_lghost_value = 0;
-	uint8_t             m_lghost_select = 0;
+	uint8_t             m_lghost_value;
+	uint8_t             m_lghost_select;
 };
 
 #endif // MAME_INCLUDES_SEGAS18_H

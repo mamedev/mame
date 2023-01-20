@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_MMBOARD_H
-#define MAME_MACHINE_MMBOARD_H
+#ifndef MAME_HEGENERGLASER_MMBOARD_H
+#define MAME_HEGENERGLASER_MMBOARD_H
 
 #pragma once
 
@@ -87,4 +87,4 @@ DECLARE_DEVICE_TYPE(MEPHISTO_SENSORS_BOARD, mephisto_sensors_board_device)
 DECLARE_DEVICE_TYPE(MEPHISTO_BUTTONS_BOARD, mephisto_buttons_board_device)
 
 
-#endif // MAME_MACHINE_MMBOARD_H
+#endif // MAME_HEGENERGLASER_MMBOARD_H

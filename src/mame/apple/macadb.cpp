@@ -239,7 +239,9 @@ macadb_device::macadb_device(const machine_config &mconfig, const char *tag, dev
 		write_via_data(*this),
 		write_adb_data(*this),
 		write_adb_irq(*this),
-		m_bIsMCUMode(true)
+		m_bIsMCUMode(true),
+		m_last_kbd{0, 0},
+		m_last_mouse{0, 0}
 {
 }
 
@@ -295,6 +297,10 @@ void macadb_device::device_start()
 	save_item(NAME(m_adb_currentkeys));
 	save_item(NAME(m_adb_modifiers));
 	save_item(NAME(m_adb_linein));
+	save_item(NAME(m_last_kbd));
+	save_item(NAME(m_last_mouse));
+	save_item(NAME(m_mouse_handler));
+	save_item(NAME(m_keyboard_handler));
 }
 
 WRITE_LINE_MEMBER(macadb_device::adb_data_w)
@@ -473,8 +479,8 @@ int macadb_device::adb_pollmouse()
 	}
 
 	NewButton = m_mouse0->read() & 0x01;
-	NewX = m_mouse2->read();
-	NewY = m_mouse1->read();
+	NewX = m_mouse1->read();
+	NewY = m_mouse2->read();
 
 	if ((NewX != m_adb_lastmousex) || (NewY != m_adb_lastmousey) || (NewButton != m_adb_lastbutton))
 	{
@@ -489,8 +495,8 @@ void macadb_device::adb_accummouse( uint8_t *MouseX, uint8_t *MouseY )
 	int MouseCountX = 0, MouseCountY = 0;
 	int NewX, NewY;
 
-	NewX = m_mouse2->read();
-	NewY = m_mouse1->read();
+	NewX = m_mouse1->read();
+	NewY = m_mouse2->read();
 
 //  printf("pollmouse: X %d Y %d\n", NewX, NewY);
 
@@ -612,14 +618,30 @@ void macadb_device::adb_talk()
 							}
 							//printf("X %x Y %x\n", mouseX, mouseY);
 							m_adb_buffer[0] = (m_adb_lastbutton & 0x01) ? 0x00 : 0x80;
-							m_adb_buffer[0] |= mouseX & 0x7f;
-							m_adb_buffer[1] = mouseY & 0x7f;
-							m_adb_datasize = 2;
+							m_adb_buffer[0] |= mouseY & 0x7f;
+							m_adb_buffer[1] = (mouseX & 0x7f) | 0x80;
+
+							if ((m_adb_buffer[0] != m_last_mouse[0]) || (m_adb_buffer[1] != m_last_mouse[1]))
+							{
+								m_adb_datasize = 2;
+								m_last_mouse[0] = m_adb_buffer[0];
+								m_last_mouse[1] = m_adb_buffer[1];
+							}
+							else
+							{
+								m_adb_datasize = 0;
+
+								if ((adb_pollkbd(0)) && (m_keyboard_handler & 0x20))
+								{
+									LOGMASKED(LOG_TALK_LISTEN, "Keyboard requesting service\n");
+									m_adb_srqflag = true;
+								}
+							}
 							break;
 
 						// get ID/handler
 						case 3:
-							m_adb_buffer[0] = 0x60 | (m_adb_mouseaddr&0xf); // SRQ enable, no exceptional event
+							m_adb_buffer[0] = m_mouse_handler;
 							m_adb_buffer[1] = 0x01; // handler 1
 							m_adb_datasize = 2;
 
@@ -629,15 +651,9 @@ void macadb_device::adb_talk()
 						default:
 							break;
 					}
-
-					if ((adb_pollkbd(0)) && (!m_bIsIIGSMode))
-					{
-						m_adb_srqflag = true;
-					}
 				}
 				else if (addr == m_adb_keybaddr)
 				{
-					int kbd_has_data = 1;
 					LOGMASKED(LOG_TALK_LISTEN, "Talking to keyboard, register %x\n", reg);
 
 					switch (reg)
@@ -650,47 +666,45 @@ void macadb_device::adb_talk()
 							}
 							else
 							{
-								kbd_has_data = this->adb_pollkbd(1);
+								adb_pollkbd(1);
 							}
 
-/*                            if (m_adb_currentkeys[0] != 0xff)
-                            {
-                                printf("Keys[0] = %02x\n", m_adb_currentkeys[0]);
-                            }
-                            if (m_adb_currentkeys[1] != 0xff)
-                            {
-                                printf("Keys[1] = %02x\n", m_adb_currentkeys[1]);
-                            }*/
-
-							if(kbd_has_data)
+							if (m_adb_keybuf_start == m_adb_keybuf_end)
 							{
-								if (m_adb_keybuf_start == m_adb_keybuf_end)
-								{
-	//                              printf("%s: buffer empty\n", __func__);
-									m_adb_buffer[0] = 0xff;
-									m_adb_buffer[1] = 0xff;
-								}
-								else
-								{
-									m_adb_buffer[1] = m_adb_keybuf[m_adb_keybuf_start];
-									m_adb_keybuf_start = (m_adb_keybuf_start+1) % kADBKeyBufSize;
-									if(m_adb_keybuf_start != m_adb_keybuf_end)
-									{
-										m_adb_buffer[0] = m_adb_keybuf[m_adb_keybuf_start];
-										m_adb_keybuf_start = (m_adb_keybuf_start+1) % kADBKeyBufSize;
-									}
-									else
-									{
-										m_adb_buffer[0] = 0xff;
-									}
-								}
-								m_adb_datasize = 2;
+//                              printf("%s: buffer empty\n", __func__);
+								m_adb_buffer[0] = 0xff;
+								m_adb_buffer[1] = 0xff;
 							}
 							else
 							{
-								m_adb_buffer[0] = 0xff;
-								m_adb_buffer[1] = 0xff;
+								m_adb_buffer[1] = m_adb_keybuf[m_adb_keybuf_start];
+								m_adb_keybuf_start = (m_adb_keybuf_start+1) % kADBKeyBufSize;
+								if(m_adb_keybuf_start != m_adb_keybuf_end)
+								{
+									m_adb_buffer[0] = m_adb_keybuf[m_adb_keybuf_start];
+									m_adb_keybuf_start = (m_adb_keybuf_start+1) % kADBKeyBufSize;
+								}
+								else
+								{
+									m_adb_buffer[0] = 0xff;
+								}
+							}
+
+							if ((m_adb_buffer[0] != m_last_kbd[0]) || (m_adb_buffer[1] != m_last_kbd[1]))
+							{
 								m_adb_datasize = 2;
+								m_last_kbd[0] = m_adb_buffer[0];
+								m_last_kbd[1] = m_adb_buffer[1];
+							}
+							else
+							{
+								m_adb_datasize = 0;
+
+								if ((adb_pollmouse()) && (m_mouse_handler & 0x20))
+								{
+									LOGMASKED(LOG_TALK_LISTEN, "Mouse requesting service\n");
+									m_adb_srqflag = true;
+								}
 							}
 							break;
 
@@ -706,7 +720,7 @@ void macadb_device::adb_talk()
 
 						// get ID/handler
 						case 3:
-							m_adb_buffer[0] = 0x60 | (m_adb_keybaddr&0xf);  // SRQ enable, no exceptional event
+							m_adb_buffer[0] = m_keyboard_handler;
 							m_adb_buffer[1] = 0x01; // handler 1
 							m_adb_datasize = 2;
 
@@ -715,11 +729,6 @@ void macadb_device::adb_talk()
 
 						default:
 							break;
-					}
-
-					if ((adb_pollmouse()) && (!m_bIsIIGSMode))
-					{
-						m_adb_srqflag = true;
 					}
 				}
 				else
@@ -737,24 +746,49 @@ void macadb_device::adb_talk()
 	else
 	{
 		LOGMASKED(LOG_TALK_LISTEN, "Got LISTEN data %02x %02x for device %x reg %x\n", m_adb_command, m_adb_buffer[1], m_adb_listenaddr, m_adb_listenreg);
-
 		m_adb_direction = 0;
 
 		if (m_adb_listenaddr == m_adb_mouseaddr)
 		{
-			if ((m_adb_listenreg == 3) && (m_adb_command > 0) && (m_adb_command < 16))
+			if (m_adb_listenreg == 3)
 			{
-				LOGMASKED(LOG_TALK_LISTEN, "MOUSE: moving to address %x\n", m_adb_command);
-				m_adb_mouseaddr = m_adb_command&0x0f;
-				m_adb_mouse_initialized = 1;
+				switch (m_adb_buffer[1])
+				{
+					case 0x00:  // unconditional set handler & address to value
+						LOGMASKED(LOG_TALK_LISTEN, "MOUSE: moving to address & setting handler bits to %02x\n", m_adb_command);
+						m_mouse_handler = m_adb_command & 0x7f;
+						m_adb_mouseaddr = m_adb_command & 0x0f;
+						break;
+
+					case 0xfe:  // unconditional address change
+						LOGMASKED(LOG_TALK_LISTEN, "MOUSE: moving to address %x\n", m_adb_command);
+						m_adb_mouseaddr = m_adb_command & 0x0f;
+						m_mouse_handler &= 0xf0;
+						m_mouse_handler |= m_adb_mouseaddr;
+						m_adb_mouse_initialized = 1;
+						break;
+				}
 			}
 		}
 		else if (m_adb_listenaddr == m_adb_keybaddr)
 		{
-			if ((m_adb_listenreg == 3) && (m_adb_command > 0) && (m_adb_command < 16))
+			if (m_adb_listenreg == 3)
 			{
-				LOGMASKED(LOG_TALK_LISTEN, "KEYBOARD: moving to address %x\n", m_adb_command);
-				m_adb_keybaddr = m_adb_command&0x0f;
+				switch (m_adb_buffer[1])
+				{
+				case 0x00: // unconditional set handler & address to value
+					LOGMASKED(LOG_TALK_LISTEN, "KEYBOARD: moving to address & setting handler bits to %02x\n", m_adb_command);
+					m_keyboard_handler = m_adb_command & 0x7f;
+					m_adb_keybaddr = m_adb_command & 0x0f;
+					break;
+
+				case 0xfe: // unconditional address change
+					LOGMASKED(LOG_TALK_LISTEN, "KEYBOARD: moving to address %x\n", m_adb_command);
+					m_adb_keybaddr = m_adb_command & 0x0f;
+					m_keyboard_handler &= 0xf0;
+					m_keyboard_handler |= m_adb_keybaddr;
+					break;
+				}
 			}
 		}
 	}
@@ -1051,11 +1085,13 @@ void macadb_device::device_reset()
 
 	// mouse
 	m_adb_mouseaddr = 3;
+	m_mouse_handler = 0x23;
 	m_adb_lastmousex = m_adb_lastmousey = m_adb_lastbutton = 0;
 	m_adb_mouse_initialized = 0;
 
 	// keyboard
 	m_adb_keybaddr = 2;
+	m_keyboard_handler = 0x22;
 	m_adb_keybinitialized = 0;
 	m_adb_currentkeys[0] = m_adb_currentkeys[1] = 0xff;
 	m_adb_modifiers = 0xff;

@@ -47,6 +47,8 @@ TODO:
 #include "speaker.h"
 
 
+namespace {
+
 class pengadvb_state : public driver_device
 {
 public:
@@ -393,6 +395,9 @@ ROM_START( pengadvb2 ) // CBK1029 PCB
 	ROM_LOAD( "7d",  0x10000, 0x8000, CRC(8cb1f223) SHA1(ff5db3c373e6d919b4e8e06c3e4607b150f31964) )
 	ROM_LOAD( "7e",  0x18000, 0x8000, CRC(60764899) SHA1(a75e59c2ecf8cebdb99708cb18390157ad7b6993) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1988, pengadvb,  0,        pengadvb, pengadvb,  pengadvb_state, init_pengadvb,  ROT0, "bootleg (Screen)", "Penguin Adventure (bootleg of MSX version, encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, pengadvb2, pengadvb, pengadvb, pengadvb2, pengadvb_state, init_pengadvb2, ROT0, "bootleg (Comet)", "Penguin Adventure (bootleg of MSX version, not encrypted)", MACHINE_SUPPORTS_SAVE )

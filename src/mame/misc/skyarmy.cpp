@@ -34,6 +34,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 class skyarmy_state : public driver_device
 {
 public:
@@ -373,5 +375,8 @@ ROM_START( skyarmy )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "a6.bin",  0x0000, 0x0020, CRC(c721220b) SHA1(61b3320fb616c0600d56840cb6438616c7e0c6eb) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1982, skyarmy, 0, skyarmy, skyarmy, skyarmy_state, empty_init, ROT90, "Shoei", "Sky Army", MACHINE_SUPPORTS_SAVE )
