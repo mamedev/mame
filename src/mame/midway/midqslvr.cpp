@@ -5,11 +5,10 @@
 Midway Quicksilver II/Graphite skeleton driver
 
 TODO (BIOS):
-- Starts off searching for exact PIIX4 ID 0x7110, punts if not.
-- With BIOS mapped at 0xfff80000 it will ping-pong at I/O $7000, either searching for USB or ACPI 
- (most likely former)
+- Starts off searching for exact PIIX4 ID 0x7110, punts if not equal.
+- With BIOS mapped at 0xfff80000 it will ping-pong at I/O $7000 for SMBus
 - Writes to VGA ports but never ever draw anything, probably needs VGA control to be enabled
-somehow
+  from AGP
 
 TODO:
 - Fix HDD BAD_DUMPs ("primary master hard disk fail" in shutms11):
@@ -276,10 +275,13 @@ Notes:
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
+// TODO: replace me
 #include "machine/i82439hx.h"
-//#include "machine/i82439tx.h"
+// TODO: replace me
 #include "machine/i82371sb.h"
-#include "video/mga2064w.h"
+
+#include "machine/i82371eb_acpi.h"
+#include "machine/i82371eb_usb.h"
 #include "video/virge_pci.h"
 #include "bus/isa/isa_cards.h"
 //#include "bus/rs232/hlemouse.h"
@@ -364,8 +366,8 @@ void midway_quicksilver2_state::midqslvr(machine_config &config)
 	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
 
-	//I82371EB_USB (config, "pci:07.2", 0);
-	//I82371EB_ACPI(config, "pci:07.3", 0);
+	I82371EB_USB (config, "pci:07.2", 0);
+	I82371EB_ACPI(config, "pci:07.3", 0);
 
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
