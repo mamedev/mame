@@ -783,6 +783,9 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 //
 // PREFETCH<.aa> [b,s9]            0001 0bbb ssss ssss   SBBB 0aa0 0011 1110
 // PREFETCH [limm]                 0001 0110 0000 0000   0111 0RR0 0011 1110 (+ Limm)
+//
+// can be used as a POP alias for higher registers
+// 40020310: 1404 3410           LD.AB r16 <- [r28_SP, 004]
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				size = handle_dasm32_LD_r_o(stream, pc, op, opcodes); break; // LD r+o
 			}
@@ -793,6 +796,9 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ST<zz><.aa><.di> c,[b,s9]       0001 1bbb ssss ssss   SBBB CCCC CCDa aZZR
 // ST<zz><.di> c,[limm]            0001 1110 0000 0000   0111 CCCC CCDR RZZR (+ Limm)
 // ST<zz><.aa><.di> limm,[b,s9]    0001 1bbb ssss ssss   SBBB 1111 10Da aZZR (+ Limm)
+//
+// can be used as a PUSH alias for higher registers
+// 400202A6: 1CFC B408           ST.AW [r28_SP, 1fc] <- r16
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				size = handle_dasm32_ST_r_o(stream, pc, op, opcodes); break; // ST r+o
 			}
@@ -805,19 +811,34 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 					case 0x00:
 					{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//                                           PP 
+// General Operations Reg-Reg      0010 0bbb 00ii iiii   FBBB CCCC CCAA AAAA
 // ADD<.f> a,b,c                   0010 0bbb 0000 0000   FBBB CCCC CCAA AAAA
-// ADD<.f> a,b,u6                  0010 0bbb 0100 0000   FBBB uuuu uuAA AAAA
-// ADD<.f> b,b,s12                 0010 0bbb 1000 0000   FBBB ssss ssSS SSSS
-// ADD<.cc><.f> b,b,c              0010 0bbb 1100 0000   FBBB CCCC CC0Q QQQQ
-// ADD<.cc><.f> b,b,u6             0010 0bbb 1100 0000   FBBB uuuu uu1Q QQQQ
 // ADD<.f> a,limm,c                0010 0110 0000 0000   F111 CCCC CCAA AAAA (+ Limm)
 // ADD<.f> a,b,limm                0010 0bbb 0000 0000   FBBB 1111 10AA AAAA (+ Limm)
-// ADD<.cc><.f> b,b,limm           0010 0bbb 1100 0000   FBBB 1111 100Q QQQQ (+ Limm)
-//
 // ADD<.f> 0,b,c                   0010 0bbb 0000 0000   FBBB CCCC CC11 1110
-// ADD<.f> 0,b,u6                  0010 0bbb 0100 0000   FBBB uuuu uu11 1110
 // ADD<.f> 0,b,limm                0010 0bbb 0000 0000   FBBB 1111 1011 1110 (+ Limm)
+//
+//                                           PP 
+// Gen Op Reg+6-bit unsigned Imm   0010 0bbb 01ii iiii   FBBB UUUU UUAA AAAA
+// ADD<.f> a,b,u6                  0010 0bbb 0100 0000   FBBB uuuu uuAA AAAA
+// ADD<.f> 0,b,u6                  0010 0bbb 0100 0000   FBBB uuuu uu11 1110
+//
+//                                           PP 
+// Gen Op Reg+12-bit signed Imm    0010 0bbb 10ii iiii   FBBB ssss ssSS SSSS
+// ADD<.f> b,b,s12                 0010 0bbb 1000 0000   FBBB ssss ssSS SSSS
+//
+// 						                     PP                      M
+// Gen Op Conditional Register     0010 0bbb 11ii iiii   FBBB CCCC CC0Q QQQQ                           
+// ADD<.cc><.f> b,b,c              0010 0bbb 1100 0000   FBBB CCCC CC0Q QQQQ
+// ADD<.cc><.f> b,b,limm           0010 0bbb 1100 0000   FBBB 1111 100Q QQQQ (+ Limm)
 // ADD<.cc><.f> 0,limm,c           0010 0110 1100 0000   F111 CCCC CC0Q QQQQ (+ Limm)
+// 
+// 						                     PP                      M 
+// Gen Op ConReg 6-bit unsign Imm  0010 0bbb 11ii iiii   FBBB UUUU UU1Q QQQQ
+// ADD<.cc><.f> b,b,u6             0010 0bbb 1100 0000   FBBB uuuu uu1Q QQQQ
+//
+// 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 						size = handle_dasm32_ADD(stream, pc, op, opcodes); break; // ADD
 					}
@@ -1001,16 +1022,17 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                                 IIII I      SS SSSS
 // MOV<.f> b,s12                   0010 0bbb 1000 1010   FBBB ssss ssSS SSSS
+// MOV<.f> 0,s12                   0010 0110 1000 1010   F111 ssss ssSS SSSS (is b is 'Limm' there's no destination)
+
 // MOV<.cc><.f> b,c                0010 0bbb 1100 1010   FBBB CCCC CC0Q QQQQ
 // MOV<.cc><.f> b,u6               0010 0bbb 1100 1010   FBBB uuuu uu1Q QQQQ
 // MOV<.cc><.f> b,limm             0010 0bbb 1100 1010   FBBB 1111 100Q QQQQ (+ Limm)
 //
-// MOV<.f> 0,s12                   0010 0110 1000 1010   F111 ssss ssSS SSSS
 // MOV<.cc><.f> 0,c                0010 0110 1100 1010   F111 CCCC CC0Q QQQQ
 // MOV<.cc><.f> 0,u6               0010 0110 1100 1010   F111 uuuu uu1Q QQQQ
 // MOV<.cc><.f> 0,limm             0010 0110 1100 1010   F111 1111 100Q QQQQ (+ Limm)
 //
-// NOP                             0010 0110 0100 1010   0111 0000 0000 0000 (NOP is a custom encoded MOV?)
+// NOP                             0010 0110 0100 1010   0111 0000 0000 0000 (NOP is a custom encoded MOV where b is 'LIMM')
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 						size = handle_dasm32_MOV(stream, pc, op, opcodes); break; // MOV
 					}
@@ -1411,11 +1433,27 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 					{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                                 IIII I      SS SSSS
-// FLAG<.cc> c                     0010 0rrr 1110 1001   0RRR CCCC CC0Q QQQQ
-// FLAG<.cc> u6                    0010 0rrr 1110 1001   0RRR uuuu uu1Q QQQQ
-// FLAG<.cc> limm                  0010 0rrr 1110 1001   0RRR 1111 100Q QQQQ (+ Limm)
+//                                           PP 
+// General Operations Reg-Reg      0010 0bbb 00ii iiii   FBBB CCCC CCAA AAAA
+// FLAG c                          0010 0000 0010 1001   0000 0000 0100 0000 (Leapster BIOS uses this redundant encoding where A is unused?)
+//
+//                                           PP 
+// Gen Op Reg+6-bit unsigned Imm   0010 0bbb 01ii iiii   FBBB UUUU UUAA AAAA
+// no listed FLAG encodings
+//
+//                                           PP 
+// Gen Op Reg+12-bit signed Imm    0010 0bbb 10ii iiii   FBBB ssss ssSS SSSS
 // FLAG s12                        0010 0rrr 1010 1001   0RRR ssss ssSS SSSS
-// FLAG c (unknown format)         0010 0000 0010 1001   0000 0000 0100 0000 (Leapster BIOS encodes like this? unless it's customized and isn't FLAG?)
+//
+// 						                     PP                      M
+// Gen Op Conditional Register     0010 0bbb 11ii iiii   FBBB CCCC CC0Q QQQQ                           
+// FLAG<.cc> c                     0010 0rrr 1110 1001   0RRR CCCC CC0Q QQQQ
+// FLAG<.cc> limm                  0010 0rrr 1110 1001   0RRR 1111 100Q QQQQ (+ Limm)
+//
+// 						                     PP                      M 
+// Gen Op ConReg 6-bit unsign Imm  0010 0bbb 11ii iiii   FBBB UUUU UU1Q QQQQ
+// FLAG<.cc> u6                    0010 0rrr 1110 1001   0RRR uuuu uu1Q QQQQ
+// 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 						size = handle_dasm32_FLAG(stream, pc, op, opcodes); break; // FLAG
 					}

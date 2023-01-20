@@ -20,6 +20,85 @@ enum
 
 #define LIMM_REG 62
 
+#define REG_BLINK (0x1f) // r31
+#define REG_SP (0x1c) // r28
+#define REG_ILINK1 (0x1d) // r29
+#define REG_ILINK2 (0x1e) // r30
+#define REG_LP_COUNT (0x3c) // r60
+
+#define ARCOMPACT_LOGGING 1
+
+#define arcompact_fatal if (ARCOMPACT_LOGGING) fatalerror
+#define arcompact_log if (ARCOMPACT_LOGGING) fatalerror
+
+
+#define GET_01_01_01_BRANCH_ADDR \
+	int32_t address = (op & 0x00fe0000) >> 17; \
+	address |= ((op & 0x00008000) >> 15) << 7; \
+	if (address & 0x80) address = -0x80 + (address & 0x7f);
+
+#define GROUP_0e_GET_h \
+	h =  ((op & 0x0007) << 3); \
+	h |= ((op & 0x00e0) >> 5);
+#define COMMON32_GET_breg \
+	int b_temp = (op & 0x07000000) >> 24; \
+	int B_temp = (op & 0x00007000) >> 12; \
+	int breg = b_temp | (B_temp << 3);
+#define COMMON32_GET_creg \
+	int creg = (op & 0x00000fc0) >> 6;
+#define COMMON32_GET_u6 \
+	int u = (op & 0x00000fc0) >> 6;
+#define COMMON32_GET_areg \
+	int areg = (op & 0x0000003f) >> 0;
+#define COMMON32_GET_areg_reserved \
+	int ares = (op & 0x0000003f) >> 0;
+#define COMMON32_GET_F \
+	int F = (op & 0x00008000) >> 15;
+#define COMMON32_GET_p \
+	int p = (op & 0x00c00000) >> 22;
+
+#define COMMON32_GET_s12 \
+		int S_temp = (op & 0x0000003f) >> 0; \
+		int s_temp = (op & 0x00000fc0) >> 6; \
+		int32_t S = s_temp | (S_temp<<6); \
+		if (S & 0x800) S = -0x800 + (S&0x7ff); /* sign extend */
+#define COMMON32_GET_CONDITION \
+		uint8_t condition = op & 0x0000001f;
+
+
+#define COMMON16_GET_breg \
+	breg =  ((op & 0x0700) >>8);
+#define COMMON16_GET_creg \
+	creg =  ((op & 0x00e0) >>5);
+#define COMMON16_GET_areg \
+	areg =  ((op & 0x0007) >>0);
+#define COMMON16_GET_u3 \
+	u =  ((op & 0x0007) >>0);
+#define COMMON16_GET_u5 \
+	u =  ((op & 0x001f) >>0);
+#define COMMON16_GET_u8 \
+	u =  ((op & 0x00ff) >>0);
+#define COMMON16_GET_u7 \
+	u =  ((op & 0x007f) >>0);
+#define COMMON16_GET_s9 \
+	s =  ((op & 0x01ff) >>0);
+// registers used in 16-bit opcodes have a limited range
+// and can only address registers r0-r3 and r12-r15
+
+#define REG_16BIT_RANGE(_reg_) \
+	if (_reg_>3) _reg_+= 8;
+
+#define GET_LIMM_32 \
+	limm = (READ16((m_pc + 4) >> 1) << 16); \
+	limm |= READ16((m_pc + 6) >> 1);
+#define GET_LIMM_16 \
+	limm = (READ16((m_pc + 2) >> 1) << 16); \
+	limm |= READ16((m_pc + 4) >> 1);
+
+#define PC_ALIGNED32 \
+	(m_pc&0xfffffffc)
+
+
 class arcompact_device : public cpu_device
 {
 public:

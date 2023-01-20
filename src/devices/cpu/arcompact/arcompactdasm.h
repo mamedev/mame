@@ -12,6 +12,84 @@
 
 #pragma once
 
+#define DASM_GET_01_01_01_BRANCH_ADDR \
+	int32_t address = (op & 0x00fe0000) >> 17; \
+	address |= ((op & 0x00008000) >> 15) << 7; \
+	if (address & 0x80) address = -0x80 + (address & 0x7f); \
+	op &= ~ 0x00fe800f;
+
+
+#define DASM_GROUP_0e_GET_h \
+	h =  ((op & 0x0007) << 3); \
+	h |= ((op & 0x00e0) >> 5); \
+	op &= ~0x00e7;
+#define DASM_COMMON32_GET_breg \
+	int b_temp = (op & 0x07000000) >> 24; op &= ~0x07000000; \
+	int B_temp = (op & 0x00007000) >> 12; op &= ~0x00007000; \
+	int breg = b_temp | (B_temp << 3);
+#define DASM_COMMON32_GET_creg \
+	int creg = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0;
+#define DASM_COMMON32_GET_u6 \
+	int u = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0;
+#define DASM_COMMON32_GET_areg \
+	int areg = (op & 0x0000003f) >> 0; op &= ~0x0000003f;
+#define DASM_COMMON32_GET_areg_reserved \
+	int ares = (op & 0x0000003f) >> 0; op &= ~0x0000003f;
+#define DASM_COMMON32_GET_F \
+	int F = (op & 0x00008000) >> 15; op &= ~0x00008000;
+#define DASM_COMMON32_GET_p \
+	int p = (op & 0x00c00000) >> 22; op &= ~0x00c00000;
+
+#define DASM_COMMON32_GET_s12 \
+		int S_temp = (op & 0x0000003f) >> 0; op &= ~0x0000003f; \
+		int s_temp = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0; \
+		int S = s_temp | (S_temp<<6);
+#define DASM_COMMON32_GET_CONDITION \
+		uint8_t condition = op & 0x0000001f;  op &= ~0x0000001f;
+
+
+#define DASM_COMMON16_GET_breg \
+	breg =  ((op & 0x0700) >>8); \
+	op &= ~0x0700;
+#define DASM_COMMON16_GET_creg \
+	creg =  ((op & 0x00e0) >>5); \
+	op &= ~0x00e0;
+#define DASM_COMMON16_GET_areg \
+	areg =  ((op & 0x0007) >>0); \
+	op &= ~0x0007;
+#define DASM_COMMON16_GET_u3 \
+	u =  ((op & 0x0007) >>0); \
+	op &= ~0x0007;
+#define DASM_COMMON16_GET_u5 \
+	u =  ((op & 0x001f) >>0); \
+	op &= ~0x001f;
+#define DASM_COMMON16_GET_u8 \
+	u =  ((op & 0x00ff) >>0); \
+	op &= ~0x00ff;
+#define DASM_COMMON16_GET_u7 \
+	u =  ((op & 0x007f) >>0); \
+	op &= ~0x007f;
+#define DASM_COMMON16_GET_s9 \
+	s =  ((op & 0x01ff) >>0); \
+	op &= ~0x01ff;
+// registers used in 16-bit opcodes hae a limited range
+// and can only address registers r0-r3 and r12-r15
+
+#define DASM_REG_16BIT_RANGE(_reg_) \
+	if (_reg_>3) _reg_+= 8;
+
+// this is as messed up as the rest of the 16-bit alignment in LE mode...
+
+#define DASM_LIMM_REG 62
+#define DASM_GET_LIMM \
+	limm = (opcodes.r16(pc+4) << 16) | opcodes.r16(pc+6);
+
+#define DASM_GET_LIMM16 \
+	limm = (opcodes.r16(pc+2) << 16) | opcodes.r16(pc+4);
+
+#define DASM_PC_ALIGNED32 \
+	(pc&0xfffffffc)
+
 class arcompact_disassembler : public util::disasm_interface
 {
 public:
@@ -80,6 +158,8 @@ private:
 	int handle_dasm32_BBIT1_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
 	int handle_dasm32_LD_r_o(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
 	int handle_dasm32_ST_r_o(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+
+	// ALU Operations, 0x04, [0x00-0x1F]
 	int handle_dasm32_ADD(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
 	int handle_dasm32_ADC(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
 	int handle_dasm32_SUB(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
@@ -110,6 +190,7 @@ private:
 	int handle_dasm32_MPYH(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
 	int handle_dasm32_MPYHU(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
 	int handle_dasm32_MPYU(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	//
 	int handle_dasm32_Jcc(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
 	int handle_dasm32_Jcc_D(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
 	int handle_dasm32_JLcc(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
