@@ -7,7 +7,7 @@ for Games/Operating System for Global VR produced games.
 Specific hardware outlays are unknown per game at this time.
 
 The install disks contains PowerQuest DeployCenter 5.0 images.
-Those aren't El Torito compliant so they expects at very least a
+Those aren't El Torito compliant so they expect at very least a
 bootable MSDOS 5.0 (according to Pq_debug.txt file found in gvrxpsys).
 The nfsgt is a Windows XP HDD image, containing:
 - C:\Program Files:
