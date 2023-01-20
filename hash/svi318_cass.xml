@@ -2634,5 +2634,19 @@ Ballonies (198x)
 	</software>
 
 
+	<!-- Typed in from the Magazine "PC and Office Technology", issue December 1984 -->
+	<!-- See https://archive.org/details/blastar-elon-musk-spectravideo -->
+	<software name="blastar">
+		<description>Blastar</description>
+		<year>1984</year>
+		<publisher>PC and Office Technology</publisher>
+		<info name="author" value="Elon Musk" />
+		<info name="usage" value="Load with CLOAD, enter RUN to start" />
+		<part name="cass1" interface="svi318_cass">
+			<dataarea name="cass" size="1996054">
+				<rom name="blastar.wav" size="1996054" crc="3070219e" sha1="bb649d21c65db02fd5556591575f5c87a615046d" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>
