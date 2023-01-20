@@ -16,8 +16,6 @@ public:
 	template <typename T> void set_cpu(T &&maintag) { m_maincpu.set_tag(std::forward<T>(maintag)); }
 	auto port_r_callback() { return m_port_r_cb.bind(); }
 	void set_rambase(u16* rambase) { m_ram16 = rambase; }
-	void set_delay_scale(int delay_scale) { m_delay_scale = delay_scale; }
-	void set_is_unsafe(int is_unsafe) { m_is_unsafe = is_unsafe; }
 
 	inline u16 READ_NEXT_WORD(offs_t *addr);
 
@@ -47,12 +45,8 @@ public:
 	size_t m_main_ramsize; // type D has double the main ram
 	size_t m_main_rammask;
 
-	int m_is_unsafe;
-	int m_delay_scale;
-
 	void install_handlers(int addr1, int addr2);
 
-	// thread safe mode, with no delays & shadow ram copy
 	u32 blitter_r(offs_t offset, u32 mem_mask = ~0);
 	void blitter_w(address_space &space, offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 m_gfx_addr_shadowcopy;
@@ -68,14 +62,6 @@ public:
 	void gfx_exec(void);
 	u32 gfx_ready_r();
 	void gfx_exec_w(address_space &space, offs_t offset, u32 data, u32 mem_mask = ~0);
-
-	// for thread unsafe mode with blitter delays, no shadow copy of RAM
-	u32 blitter_r_unsafe(offs_t offset, u32 mem_mask = ~0);
-	void blitter_w_unsafe(address_space &space, offs_t offset, u32 data, u32 mem_mask = ~0);
-	u32 gfx_ready_r_unsafe();
-	void gfx_exec_w_unsafe(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void gfx_exec_unsafe(void);
-	static void *blit_request_callback_unsafe(void *param, int threadid);
 
 protected:
 	// The firmware versions
@@ -856,7 +842,7 @@ protected:
 	static u8 colrtable[0x20][0x40];
 	static u8 colrtable_rev[0x20][0x40];
 	static u8 colrtable_add[0x20][0x20];
-	static u64 blit_delay;
+	static u64 m_blit_delay_ns;
 
 	static const blitfunction f0_ti1_tr1_blit_funcs[64];
 	static const blitfunction f0_ti1_tr0_blit_funcs[64];
