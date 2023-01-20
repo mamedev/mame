@@ -162,3 +162,256 @@ int arcompact_disassembler::handle_dasm32_MPYU(std::ostream &stream, offs_t pc, 
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "MPYU", 0,0);
 } // *
+
+
+
+int arcompact_disassembler::handle_dasm32_Jcc(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	return handle04_helper_dasm(stream, pc, op, opcodes, "J", 1,1);
+}
+
+
+
+int arcompact_disassembler::handle_dasm32_Jcc_D(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	return handle04_helper_dasm(stream, pc, op, opcodes, "J.D", 1,1);
+}
+
+int arcompact_disassembler::handle_dasm32_JLcc(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	return handle04_helper_dasm(stream, pc, op, opcodes, "JL", 1,1);
+}
+
+int arcompact_disassembler::handle_dasm32_JLcc_D(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	return handle04_helper_dasm(stream, pc, op, opcodes, "JL.D", 1,1);
+}
+
+
+
+
+int arcompact_disassembler::handle_dasm32_LP(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes) // LPcc (loop setup)
+{
+	DASM_COMMON32_GET_breg; // breg is reserved
+	DASM_COMMON32_GET_p;
+
+	if (p == 0x00)
+	{
+		util::stream_format(stream, "<illegal LPcc, p = 0x00)");
+	}
+	else if (p == 0x01)
+	{
+		util::stream_format(stream, "<illegal LPcc, p = 0x01)");
+	}
+	else if (p == 0x02) // Loop unconditional
+	{ // 0010 0RRR 1010 1000 0RRR ssss ssSS SSSS
+		DASM_COMMON32_GET_s12
+		if (S & 0x800) S = -0x800 + (S&0x7ff);
+
+		util::stream_format(stream, "LP (start %08x, end %08x)", pc + 4, pc + S*2);
+	}
+	else if (p == 0x03) // Loop conditional
+	{ // 0010 0RRR 1110 1000 0RRR uuuu uu1Q QQQQ
+		DASM_COMMON32_GET_u6
+		DASM_COMMON32_GET_CONDITION
+		util::stream_format(stream, "LP<%s> (start %08x, end %08x)", conditions[condition], pc + 4, DASM_PC_ALIGNED32 + u*2);
+
+		int unused = (op & 0x00000020)>>5;
+		if (unused==0)  util::stream_format(stream, "(unused bit not set)");
+
+	}
+
+	if (breg) util::stream_format(stream, "(reseved B bits set %02x)", breg);
+
+	return 4;
+}
+
+#define PRINT_AUX_REGNAME \
+		if ((auxreg >= 0) && (auxreg < 0x420)) \
+		{ \
+			if (strcmp(auxregnames[auxreg],"unusedreg")) \
+				util::stream_format(stream, "[%s]", auxregnames[auxreg]); \
+			else \
+				util::stream_format(stream, "[%03x]", auxreg); \
+		} \
+		else \
+			util::stream_format(stream, "[%03x]", auxreg);
+
+int arcompact_disassembler::handle_dasm32_LR(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)  // Load FROM Auxiliary register TO register
+{
+	//           pp        F
+	// 0010 0bbb 0010 1010 0BBB CCCC CCRR RRRR
+	// 0010 0bbb 0010 1010 0BBB 1111 10RR RRRR
+	// 0010 0bbb 0110 1010 0BBB uuuu uu00 0000
+	// 0010 0bbb 1010 1010 0BBB ssss ssSS SSSS
+
+
+	int size = 4;
+	uint32_t limm = 0;
+	int got_limm = 0;
+
+	DASM_COMMON32_GET_p;
+	DASM_COMMON32_GET_breg;
+	DASM_COMMON32_GET_F
+
+	util::stream_format(stream, "LR");
+	if (F) util::stream_format(stream, ".<F set, illegal>");
+//  util::stream_format(stream, " p(%d)", p);
+
+
+
+	if (breg == DASM_LIMM_REG)
+	{
+		util::stream_format(stream, "<no dest>"); // illegal encoding?
+	}
+	else
+	{
+		util::stream_format(stream, " %s, ", regnames[breg]);
+	}
+
+
+
+	if (p == 0)
+	{
+		DASM_COMMON32_GET_creg
+		DASM_COMMON32_GET_areg_reserved
+
+		if (creg == DASM_LIMM_REG)
+		{
+			if (!got_limm)
+			{
+				DASM_GET_LIMM;
+				size = 8;
+			}
+
+			util::stream_format(stream, "(%08x) ", limm);
+
+		}
+		else
+		{
+			util::stream_format(stream, "C(%s) ", regnames[creg]);
+		}
+
+		if (ares) util::stream_format(stream, "reserved(%02x) ", ares);
+	}
+	else if (p == 1)
+	{
+		DASM_COMMON32_GET_u6
+		DASM_COMMON32_GET_areg_reserved
+
+		int auxreg = u;
+		PRINT_AUX_REGNAME
+
+		if (ares) util::stream_format(stream, "reserved(%02x) ", ares);
+	}
+	else if (p == 2)
+	{
+		DASM_COMMON32_GET_s12;
+
+		int auxreg = S;
+		PRINT_AUX_REGNAME
+
+	}
+	else if (p == 3)
+	{
+		util::stream_format(stream, " <mode 3, illegal>");
+	}
+
+	return size;
+}
+
+int arcompact_disassembler::handle_dasm32_SR(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)  // Store TO Auxiliary register FROM register
+{
+	// code at ~ 40073DFE in leapster bios is manually setting up a loop this way
+	// rather than using the lPcc opcode
+
+	int size = 4;
+	uint32_t limm = 0;
+	int got_limm = 0;
+
+	DASM_COMMON32_GET_p;
+	DASM_COMMON32_GET_breg;
+	DASM_COMMON32_GET_F
+
+	util::stream_format(stream, "SR");
+	if (F) util::stream_format(stream, ".<F set, illegal>");
+//  util::stream_format(stream, " p(%d)", p);
+
+
+
+	if (breg == DASM_LIMM_REG)
+	{
+		DASM_GET_LIMM;
+		size = 8;
+		got_limm = 1;
+		util::stream_format(stream, " %08x -> ", limm);
+
+	}
+	else
+	{
+		util::stream_format(stream, " %s -> ", regnames[breg]);
+	}
+
+
+
+	if (p == 0)
+	{
+		DASM_COMMON32_GET_creg
+		DASM_COMMON32_GET_areg_reserved
+
+		if (creg == DASM_LIMM_REG)
+		{
+			if (!got_limm)
+			{
+				DASM_GET_LIMM;
+				size = 8;
+			}
+
+			util::stream_format(stream, "[%08x]", limm);
+
+		}
+		else
+		{
+			util::stream_format(stream, "[%s]", regnames[creg]);
+
+
+		}
+
+		if (ares) util::stream_format(stream, " (reserved %02x) ", ares);
+
+
+	}
+	else if (p == 1)
+	{
+		DASM_COMMON32_GET_u6
+		DASM_COMMON32_GET_areg_reserved
+
+		int auxreg = u;
+		PRINT_AUX_REGNAME
+
+		if (ares) util::stream_format(stream, " (reserved %02x) ", ares);
+
+
+	}
+	else if (p == 2)
+	{
+		DASM_COMMON32_GET_s12;
+
+		int auxreg = S;
+
+		PRINT_AUX_REGNAME
+
+	}
+	else if (p == 3)
+	{
+		util::stream_format(stream, " <mode 3, illegal>");
+	}
+
+	return size;}
+
+
+int arcompact_disassembler::handle_dasm32_FLAG(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	// leapster bios uses formats for FLAG that are not defined, bug I guess work anyway (P modes 0 / 1)
+	return handle04_helper_dasm(stream, pc, op, opcodes, "FLAG", 1,1);
+}

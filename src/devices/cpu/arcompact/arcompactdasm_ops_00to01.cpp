@@ -1,0 +1,231 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
+/*********************************\
+
+ ARCompact disassembler
+
+\*********************************/
+
+#include "emu.h"
+
+#include "arcompactdasm.h"
+
+int arcompact_disassembler::handle_dasm32_B_cc_D_s21(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	int size = 4;
+	// Branch Conditionally
+	// 0000 0sss ssss sss0 SSSS SSSS SSNQ QQQQ
+	int32_t address = (op & 0x07fe0000) >> 17;
+	address |= ((op & 0x0000ffc0) >> 6) << 10;
+	if (address & 0x80000) address = -0x80000 + (address & 0x7ffff);
+	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
+	DASM_COMMON32_GET_CONDITION
+
+	util::stream_format(stream, "B%s(%s) %08x", delaybit[n], conditions[condition], DASM_PC_ALIGNED32 + (address * 2));
+	return size;
+}
+
+int arcompact_disassembler::handle_dasm32_B_D_s25(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	int size = 4;
+	// Branch Unconditionally Far
+	// 0000 0sss ssss sss1 SSSS SSSS SSNR TTTT
+	int32_t address = (op & 0x07fe0000) >> 17;
+	address |= ((op & 0x0000ffc0) >> 6) << 10;
+	address |= ((op & 0x0000000f) >> 0) << 20;
+	if (address & 0x800000) address = -0x800000 + (address & 0x7fffff);
+	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
+	int res =  (op & 0x00000010) >> 4; op &= ~0x00000010;
+
+	util::stream_format(stream, "B%s %08x", delaybit[n], DASM_PC_ALIGNED32 + (address * 2));
+	if (res)  util::stream_format(stream, "(reserved bit set)");
+
+	return size;
+}
+
+int arcompact_disassembler::handle_dasm32_BL_cc_d_s21(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	int size = 4;
+
+	// Branch and Link Conditionally
+	// 00001 sssssssss 00 SSSSSSSSSS N QQQQQ
+	int32_t address =   (op & 0x07fc0000) >> 17;
+	address |=        ((op & 0x0000ffc0) >> 6) << 10;
+	if (address & 0x800000) address = -0x800000 + (address&0x7fffff);
+	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
+
+	DASM_COMMON32_GET_CONDITION
+
+	util::stream_format(stream, "BL%s(%s) %08x", delaybit[n], conditions[condition], DASM_PC_ALIGNED32 + (address *2));
+	return size;
+}
+
+int arcompact_disassembler::handle_dasm32_BL_d_s25(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	int size = 4;
+	// Branch and Link Unconditionally Far
+	// 00001 sssssssss 10  SSSSSSSSSS N R TTTT
+	int32_t address =   (op & 0x07fc0000) >> 17;
+	address |=        ((op & 0x0000ffc0) >> 6) << 10;
+	address |=        ((op & 0x0000000f) >> 0) << 20;
+	if (address & 0x800000) address = -0x800000 + (address&0x7fffff);
+	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
+	int res =  (op & 0x00000010) >> 4; op &= ~0x00000010;
+
+	util::stream_format(stream, "BL%s %08x", delaybit[n], DASM_PC_ALIGNED32 + (address *2));
+	if (res)  util::stream_format(stream, "(reserved bit set)");
+
+	return size;
+}
+
+
+
+int arcompact_disassembler::handle01_01_00_helper(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext)
+{
+	int size = 4;
+
+	// Branch on Compare / Bit Test - Register-Register
+	// 00001 bbb sssssss 1 S BBB CCCCCC N 0 iiii
+	DASM_GET_01_01_01_BRANCH_ADDR
+
+
+	DASM_COMMON32_GET_creg
+	DASM_COMMON32_GET_breg;
+	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
+
+	op &= ~0x07007fe0;
+
+	if ((breg != DASM_LIMM_REG) && (creg != DASM_LIMM_REG))
+	{
+		util::stream_format( stream, "%s%s %s, %s to 0x%08x", optext, delaybit[n], regnames[breg], regnames[creg], DASM_PC_ALIGNED32 + (address * 2) );
+	}
+	else
+	{
+		uint32_t limm;
+		DASM_GET_LIMM;
+		size = 8;
+
+		if ((breg == DASM_LIMM_REG) && (creg != DASM_LIMM_REG))
+		{
+			util::stream_format( stream, "%s%s 0x%08x, %s to 0x%08x", optext, delaybit[n], limm, regnames[creg], DASM_PC_ALIGNED32 + (address * 2) );
+		}
+		else if ((creg == DASM_LIMM_REG) && (breg != DASM_LIMM_REG))
+		{
+			util::stream_format( stream, "%s%s %s, 0x%08x to 0x%08x", optext, delaybit[n], regnames[breg], limm, DASM_PC_ALIGNED32 + (address * 2) );
+		}
+		else
+		{
+			// b and c are LIMM? invalid??
+			util::stream_format( stream, "%s%s 0x%08x, 0x%08x (illegal?) to 0x%08x", optext, delaybit[n], limm, limm, DASM_PC_ALIGNED32 + (address * 2) );
+
+		}
+	}
+
+	return size;
+}
+
+
+// register - register cases
+int arcompact_disassembler::handle_dasm32_BREQ_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	return handle01_01_00_helper( stream, pc, op, opcodes, "BREQ");
+}
+
+int arcompact_disassembler::handle_dasm32_BRNE_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	return handle01_01_00_helper( stream, pc, op, opcodes, "BRNE");
+}
+
+int arcompact_disassembler::handle_dasm32_BRLT_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	return handle01_01_00_helper( stream, pc, op, opcodes, "BRLT");
+}
+
+int arcompact_disassembler::handle_dasm32_BRGE_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	return handle01_01_00_helper( stream, pc, op, opcodes, "BRGE");
+}
+
+int arcompact_disassembler::handle_dasm32_BRLO_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	return handle01_01_00_helper( stream, pc, op, opcodes, "BRLO");
+}
+
+int arcompact_disassembler::handle_dasm32_BRHS_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	return handle01_01_00_helper( stream, pc, op, opcodes, "BRHS");
+}
+
+int arcompact_disassembler::handle_dasm32_BBIT0_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	return handle01_01_00_helper( stream, pc, op, opcodes, "BBIT0");
+}
+
+int arcompact_disassembler::handle_dasm32_BBIT1_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	return handle01_01_00_helper( stream, pc, op, opcodes, "BBIT1");
+}
+
+
+int arcompact_disassembler::handle01_01_01_helper(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext)
+{
+	int size = 4;
+
+	// using 'b' as limm here makes no sense (comparing a long immediate against a short immediate) so I assume it isn't
+	// valid?
+
+	// Branch on Compare / Bit Test - Register-Immediate
+	// 0000 1bbb ssss sss1 SBBB uuuu uuN1 iiii
+	DASM_GET_01_01_01_BRANCH_ADDR
+
+	DASM_COMMON32_GET_u6
+	DASM_COMMON32_GET_breg;
+	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
+
+	op &= ~0x07007fe0;
+
+	util::stream_format(stream, "%s%s %s, 0x%02x %08x (%08x)", optext, delaybit[n], regnames[breg], u, DASM_PC_ALIGNED32 + (address * 2), op & ~0xf8fe800f);
+
+	return size;
+}
+
+// register -immediate cases
+int arcompact_disassembler::handle_dasm32_BREQ_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	return handle01_01_01_helper(stream, pc, op, opcodes, "BREQ");
+}
+
+int arcompact_disassembler::handle_dasm32_BRNE_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	return handle01_01_01_helper(stream, pc, op, opcodes, "BRNE");
+}
+
+int arcompact_disassembler::handle_dasm32_BRLT_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	return handle01_01_01_helper(stream, pc, op, opcodes, "BRLT");
+}
+
+int arcompact_disassembler::handle_dasm32_BRGE_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	return handle01_01_01_helper(stream, pc, op, opcodes, "BRGE");
+}
+
+int arcompact_disassembler::handle_dasm32_BRLO_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	return handle01_01_01_helper(stream, pc, op, opcodes, "BRLO");
+}
+
+int arcompact_disassembler::handle_dasm32_BRHS_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	return handle01_01_01_helper(stream, pc, op, opcodes, "BRHS");
+}
+
+int arcompact_disassembler::handle_dasm32_BBIT0_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	return handle01_01_01_helper(stream, pc, op, opcodes, "BBIT0");
+}
+
+int arcompact_disassembler::handle_dasm32_BBIT1_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	return handle01_01_01_helper(stream, pc, op, opcodes, "BBIT1");
+}

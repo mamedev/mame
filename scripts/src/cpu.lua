@@ -123,7 +123,15 @@ if CPUS["ARCOMPACT"] then
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact.cpp",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact.h",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_00to01.cpp",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_02to03.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_04.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_04_2f_sop.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_04_2f_3f_zop.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_04_3x.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_05.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_05_2f_sop.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_06to0b.cpp",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_16bit.cpp",
 	}
 end
@@ -132,10 +140,15 @@ if opt_tool(CPUS, "ARCOMPACT") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm.h")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_00to01.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_02to03.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_04_alu.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_04.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_04_2f_sop.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_04_2f_3f_zop.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_04_3x.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_05.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_05_2f_sop.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_06to0b.cpp")	
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_16bit.cpp")
 end
 
