@@ -23,7 +23,6 @@ TODO:
 #include "bus/ata/atapicdr.h"
 #include "bus/ata/ataintf.h"
 #include "bus/ata/idehd.h"
-#include "bus/centronics/ctronics.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/rs232/hlemouse.h"
@@ -31,6 +30,7 @@ TODO:
 #include "cpu/z80/tmpz84c015.h"
 #include "machine/ds128x.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
 
 #define LOG_IO    (1U << 1)
 #define LOG_MEM   (1U << 2)
@@ -47,7 +47,7 @@ TODO:
 
 namespace {
 
-#define X_SP 42_MHz_XTAL // TODO X1 after spectrumless
+#define X_SP  42_MHz_XTAL // TODO X1 after spectrumless
 
 #define SPRINT_WIDTH         896
 #define SPRINT_BORDER_RIGHT  48
@@ -61,6 +61,11 @@ namespace {
 #define SPRINT_BORDER_BOTTOM 16
 #define SPRINT_YVIS          (SPRINT_BORDER_TOP + SPRINT_SCREEN_YSIZE + SPRINT_BORDER_BOTTOM)
 
+#define CBL_MODE    BIT(m_cbl_xx, 7)
+#define CBL_STEREO  BIT(m_cbl_xx, 6)
+#define CBL_MODE16  BIT(m_cbl_xx, 5)
+#define CBL_INT_ENA BIT(m_cbl_xx, 4)
+
 
 class sprinter_state : public spectrum_128_state
 {
@@ -72,8 +77,8 @@ public:
 		, m_ata(*this, "ata%u", 1U)
 		, m_beta(*this, BETA_DISK_TAG)
 		, m_ay8910(*this, "ay8912")
-		, m_centronics(*this, "centronics")
-		, m_cent_data_out(*this, "cent_data_out")
+		, m_ldac(*this, "ldac")
+		, m_rdac(*this, "rdac")
 		, m_kbd(*this, "kbd")
 		, m_io_mouse(*this, "mouse_input%u", 1U)
 		, m_palette(*this, "palette")
@@ -101,6 +106,7 @@ protected:
 
 	void update_memory();
 
+	TIMER_CALLBACK_MEMBER(irq_on) override;
 	INTERRUPT_GEN_MEMBER(sprinter_int);
 	TIMER_CALLBACK_MEMBER(cbl_tick);
 
@@ -141,26 +147,27 @@ private:
 	void ata_data_w(u8 data);
 
 	u8 *m_dcp_location;
-	u8 m_dcpp_data[0x100];
+	u8 m_dcpp_data[0x100] = {};
 
 	u16 m_pages[4] = {}; // internal state for faster calculations
 	u8 ram_r(offs_t offset);
 	void ram_w(offs_t offset, u8 data);
 
-	u8 cbl_data_r();
-	void covox_w(u8 left, u8 right);
+	void dac_w(u16 left, u16 right);
 
 	void accel_control_r(u8 data);
 	void accel_r_tap(offs_t offset, u8 &data);
 	void accel_w_tap(offs_t offset, u8 &data);
 	void update_accel_buffer(u8 idx, u8 data);
 
+	void on_kbd_data(int state);
+
 	required_device<ds12885_device> m_rtc;
 	required_device_array<ata_interface_device, 2> m_ata;
 	required_device<beta_disk_device> m_beta;
 	required_device<ay8910_device> m_ay8910;
-	required_device<centronics_device> m_centronics;
-	required_device<output_latch_device> m_cent_data_out;
+	required_device<dac_word_interface> m_ldac;
+	required_device<dac_word_interface> m_rdac;
 	required_device<pc_kbdc_device> m_kbd;
 	required_ioport_array<3> m_io_mouse;
 	required_device<device_palette_interface> m_palette;
@@ -182,6 +189,7 @@ private:
 	bool m_rom_sys;
 	bool m_ram_sys;
 	bool m_sys_pg;
+	bool m_turbo;
 	bool m_arom16;
 	u8 m_rom_rg;
 	u8 m_pn;
@@ -193,6 +201,7 @@ private:
 	u8 m_ram2;
 	u8 m_pg3;
 	u8 m_hold;
+	u8 m_kbd_data_cnt;
 
 	bool m_ata_selected; // 0-primary, 1-secondary
 	bool m_ata_data_flip;
@@ -208,9 +217,11 @@ private:
 
 	// Covox Blaster
 	u8 m_cbl_xx;
-	u8 m_cbl_data[256] = {};
-	u8 m_cbl_data_r_pos;
-	u8 m_cbl_data_w_pos;
+	u16 m_cbl_data[256] = {};
+	u8 m_cbl_cnt;
+	u8 m_cbl_wa;
+	bool m_cbl_wae;
+	u8 m_cbl_data_latch;
 	emu_timer *m_cbl_timer = nullptr;
 };
 
@@ -260,7 +271,7 @@ void sprinter_state::update_memory()
 	m_bank_ram[2]->set_entry(m_ram2);
 
 	m_pg3 = 0xc0 | (BIT(~m_pn, 7) << 5) | 0x10 | (((BIT(m_sc, 4) && BIT(~m_cnf, 7)) || (BIT(m_cnf, 7) && BIT(m_pn, 6))) << 3) | (m_pn & 0x07);
-	m_pages[3] = (m_starting ? 0x40 : m_dcpp_data[m_pg3]);
+	m_pages[3] = m_starting ? 0x40 : m_dcpp_data[m_pg3];
 	m_bank_ram[3]->set_entry(m_pages[3] & 0xff);
 	if (BIT(m_sc, 4) && ((m_pages[3] & 0xf9) == 0xd0))
 	{
@@ -452,9 +463,13 @@ u8 sprinter_state::dcp_r(offs_t offset)
 		break;
 
 	case 0x40:
-		data = spectrum_ula_r(offset) & ~0xa0;
-		data |= (BIT(m_cbl_xx, 7) && (m_screen->vpos() >= (SPRINT_BORDER_TOP + SPRINT_SCREEN_YSIZE))) << 5;
-		data |= m_cbl_data_r_pos & 0x80;
+		data = spectrum_ula_r(offset);
+		if (CBL_MODE)
+		{
+			data &= ~0xa0;
+			data |= (m_screen->vpos() >= (SPRINT_BORDER_TOP + SPRINT_SCREEN_YSIZE)) << 5;
+			data |= (m_cbl_cnt ^ m_cbl_wa) & 0x80;
+		}
 		break;
 
 	case 0x52: // AY8910
@@ -562,48 +577,58 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		break;
 
 	case 0x88:
-		m_cbl_data[m_cbl_data_w_pos++] = data;
-		if (BIT(~m_cbl_xx, 7))
-			covox_w(data, data);
+		if (CBL_INT_ENA)
+			m_cbl_data[m_cbl_wa++] = data << 8;
+		else
+			m_cbl_data[~offset >> 8] = data << 8;
 		break;
 
 	case 0x89:
 		m_cbl_xx = data;
-		if (BIT(m_cbl_xx, 7))
+		m_cbl_cnt = 0;
+		if (CBL_INT_ENA)
 		{
-			XTAL freq = 16_kHz_XTAL; // 0 + undefined (2..7)
+			m_cbl_wa = 0;
+			m_cbl_wae = CBL_MODE16;
+		}
+
+		if (CBL_MODE)
+		{
+			u8 cbl_tab = 0;
 			switch (m_cbl_xx & 0x0f)
 			{
+			case 0:
+				cbl_tab = 13; // 16 KHz
+				break;
 			case 1:
-				freq = 22_kHz_XTAL;
+				cbl_tab = 9; // 22 KHz
 				break;
 			case 8:
-				freq = 7.8125_kHz_XTAL;
+				cbl_tab = 27; // 7.8125 KHz
 				break;
 			case 9:
-				freq = 10.9375_kHz_XTAL;
+				cbl_tab = 19; // 10.9375 KHz
 				break;
 			case 10:
-				freq = 15.625_kHz_XTAL;
+				cbl_tab = 13; // 15.625 KHz
 				break;
 			case 11:
-				freq = 21.875_kHz_XTAL;
+				cbl_tab = 9; // 21.875  KHz
 				break;
 			case 12:
-				freq = 31.25_kHz_XTAL;
+				cbl_tab = 6; // 31.25 KHz
 				break;
 			case 13:
-				freq = 43.75_kHz_XTAL;
+				cbl_tab = 4; // 43.75 KHz
 				break;
 			case 14:
-				freq = 54.6875_kHz_XTAL;
+				cbl_tab = 3; // 54.6875 KHz
 				break;
 			case 15:
-				freq = 109.375_kHz_XTAL;
+				cbl_tab = 1; // 109.375 KHz
 				break;
 			}
-			m_cbl_data_r_pos = 0;
-			m_cbl_timer->adjust(attotime::zero, 0, attotime::from_hz(freq));
+			m_cbl_timer->adjust(attotime::zero, 0, attotime::from_hz(X_SP / (192 * (cbl_tab + 1))));
 		}
 		else
 			m_cbl_timer->adjust(attotime::never);
@@ -654,7 +679,10 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 	case 0xc6: // CNF/SYS
 		m_ram_sys = BIT(~offset, 6);
 		if (BIT(data, 1))
-			m_maincpu->set_clock(X_SP / (BIT(data, 0) ? 2 : 12)); // 1 - 21MHz, 0 - 3.5MHz
+		{
+			m_turbo = BIT(data, 0);
+			m_maincpu->set_clock(X_SP / (m_turbo ? 2 : 12)); // 1 - 21MHz, 0 - 3.5MHz
+		}
 		else
 			m_arom16 = BIT(data, 0);
 
@@ -717,14 +745,20 @@ void sprinter_state::ata_data_w(u8 data)
 		m_ata[m_ata_selected]->cs0_w(0, (data << 8) | m_ata_data_latch);
 }
 
-void sprinter_state::covox_w(u8 left, u8 right)
+void sprinter_state::dac_w(u16 left, u16 right)
 {
-	m_centronics->write_strobe(1);
-	m_centronics->write_autofd(0);
-	m_cent_data_out->write(left);
-	m_centronics->write_strobe(0);
-	m_centronics->write_autofd(1);
-	m_cent_data_out->write(right);
+	m_ldac->write(left);
+	m_rdac->write(right);
+}
+
+TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
+{
+	u16 left = m_cbl_data[m_cbl_cnt++] ^ (CBL_MODE16 << 15);
+	u16 right = CBL_STEREO ? (m_cbl_data[m_cbl_cnt++] ^ (CBL_MODE16 << 15)) : left;
+	dac_w(left, right);
+
+	if (CBL_INT_ENA && !(m_cbl_cnt & 0x7f))
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 void sprinter_state::accel_control_r(u8 data)
@@ -766,7 +800,7 @@ void sprinter_state::accel_control_r(u8 data)
 
 void sprinter_state::accel_r_tap(offs_t offset, u8 &data)
 {
-	const std::string m = m_accel_mode == MODE_AND ? "&" : m_accel_mode == MODE_OR ? "|" : m_accel_mode == MODE_XOR ? "^" : "";
+	const std::string m = (m_accel_mode == MODE_AND) ? "&" : (m_accel_mode == MODE_OR) ? "|" : (m_accel_mode == MODE_XOR) ? "^" : "";
 	if (m_accel_state == SET_BUFFER)
 	{
 		m_accel_buffer_size = data ? data : 256;
@@ -794,11 +828,10 @@ void sprinter_state::accel_r_tap(offs_t offset, u8 &data)
 				m_port_y++;
 			}
 		}
+		else if (m_accel_state == FILL_VERT)
+			m_port_y += m_accel_buffer_size;
 		else
 			return;
-
-		const int icount = 6 * m_accel_buffer_size * m_maincpu->clock() / X_SP; // 6 42Mhz clocks each
-		m_maincpu->adjust_icount(-icount);
 	}
 }
 
@@ -811,7 +844,6 @@ void sprinter_state::accel_w_tap(offs_t offset, u8 &data)
 	}
 	else if (m_pages[offset >> 14] & BANK_RAM_MASK) // block ops RAM only
 	{
-		u16 ops = m_accel_buffer_size;
 		if (m_accel_state == FILL)
 		{
 			LOGACCEL("Accel wFILL: %02x\n", offset);
@@ -834,19 +866,19 @@ void sprinter_state::accel_w_tap(offs_t offset, u8 &data)
 		else if (m_accel_state == DOUBLE)
 		{
 			ram_w(offset, data);
-			u16 addr = offset ^ 1;
-			if ((m_pages[addr >> 14] & BANK_RAM_MASK) && (~m_pages[addr >> 14] & BANK_WRDISBL_MASK))
-				ram_w(addr, data);
-			ops = 2;
+			ram_w(offset ^ 1, data);
 		}
 		else if (m_accel_state == COPY)
 		{
 			LOGACCEL("Accel wCOPY: %02x\n", offset);
 			for (auto i = 0; i < m_accel_buffer_size; i++)
 			{
-				u16 addr = offset + i;
+				const u16 addr = offset + i;
 				if ((m_pages[addr >> 14] & BANK_RAM_MASK) && (~m_pages[addr >> 14] & BANK_WRDISBL_MASK))
-					ram_w(addr, m_accel_buffer[i]);
+				{
+					data = m_accel_buffer[i];
+					ram_w(addr, data);
+				}
 			}
 		}
 		else if (m_accel_state == COPY_VERT)
@@ -854,7 +886,8 @@ void sprinter_state::accel_w_tap(offs_t offset, u8 &data)
 			LOGACCEL("Accel wCOPY_VERT: %02x (%x)\n", offset, m_port_y);
 			for (auto i = 0; i < m_accel_buffer_size; i++)
 			{
-				ram_w(offset, m_accel_buffer[i]);
+				data = m_accel_buffer[i];
+				ram_w(offset, data);
 				m_port_y++;
 			}
 		}
@@ -862,8 +895,6 @@ void sprinter_state::accel_w_tap(offs_t offset, u8 &data)
 			return;
 
 		m_skip_write = true;
-		const int icount = 6 * ops * m_maincpu->clock() / X_SP; // 6 42Mhz clocks each
-		m_maincpu->adjust_icount(-icount);
 	}
 }
 
@@ -891,10 +922,12 @@ void sprinter_state::update_accel_buffer(u8 idx, u8 data)
 u8 sprinter_state::ram_r(offs_t offset)
 {
 	const u8 bank = offset >> 14;
-	if ((m_pages[bank] & 0xf0) == 0x50)
-		return m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)];
-	else
-		return reinterpret_cast<u8 *>(m_bank_ram[bank]->base())[offset & 0x3fff];
+	if (m_turbo)
+		m_maincpu->adjust_icount(-3);
+
+	return ((m_pages[bank] & 0xf0) == 0x50)
+		? m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)]
+		: reinterpret_cast<u8 *>(m_bank_ram[bank]->base())[offset & 0x3fff];
 }
 
 void sprinter_state::ram_w(offs_t offset, u8 data)
@@ -913,7 +946,11 @@ void sprinter_state::ram_w(offs_t offset, u8 data)
 		u8* line = m_vram + (m_port_y * 1024);
 
 		if (BIT(~page, 2))
+		{
+			if (m_turbo)
+				m_maincpu->adjust_icount(-3);
 			m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)] = data;
+		}
 		if (!(BIT(page, 3) && (data == 0xff)))
 		{
 			m_screen->update_now();
@@ -944,9 +981,22 @@ void sprinter_state::ram_w(offs_t offset, u8 data)
 			}
 		}
 
-		if (page == 0xfd)
-			m_cbl_data[offset & 0xff] = data;
+		if ((m_accel_state != OFF) && (page == 0xfd))
+		{
+			if (!CBL_MODE16)
+				m_cbl_data[m_cbl_wa++] = (data << 8);
+			else
+			{
+				if (m_cbl_wae)
+					m_cbl_data_latch = data;
+				else
+					m_cbl_data[m_cbl_wa++] = (data << 8) | m_cbl_data_latch;
+				m_cbl_wae = !m_cbl_wae;
+			}
+		}
 
+		if (m_turbo)
+			m_maincpu->adjust_icount(-3);
 		reinterpret_cast<u8 *>(m_bank_ram[bank]->base())[offset & 0x3fff] = data;
 	}
 }
@@ -1090,10 +1140,12 @@ void sprinter_state::machine_reset()
 	m_accel_state = OFF;
 
 	m_cbl_xx = 0;
-	m_cbl_data_r_pos = m_cbl_data_w_pos = 0;
+	m_cbl_wa = 0;
 
 	m_ata_selected = 0;
 	m_ata_data_flip = false;
+
+	m_kbd_data_cnt = 0;
 
 	update_memory();
 }
@@ -1129,23 +1181,18 @@ static void sprinter_ata_devices(device_slot_interface &device)
 	device.option_add("cdrom", ATAPI_CDROM);
 }
 
-u8 sprinter_state::cbl_data_r()
+void sprinter_state::on_kbd_data(int state)
 {
-	const bool cbl_mode16 = BIT(m_cbl_xx, 5);
-	if (cbl_mode16)
-		m_cbl_data_r_pos++;
-	u8 data = m_cbl_data[m_cbl_data_r_pos++] ^ (cbl_mode16 << 7);
-	return data;
+	m_kbd_data_cnt++;
+	m_kbd_data_cnt %= 11;
+	if (!m_kbd_data_cnt && (state && ((m_all_mode & 0x09) == 0x09)))
+		irq_on(0);
 }
 
-TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
+TIMER_CALLBACK_MEMBER(sprinter_state::irq_on)
 {
-	u8 left = cbl_data_r();
-	u8 right = BIT(m_cbl_xx, 6) ? cbl_data_r() : left;
-	covox_w(left, right);
-
-	if (BIT(m_cbl_xx, 4) && !(m_cbl_data_r_pos & 0x7f)) // CBL_INT_ENA
-		irq_on(0);
+	m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_irq_off_timer->adjust(attotime::from_hz(3.5_MHz_XTAL / 32));
 }
 
 INTERRUPT_GEN_MEMBER(sprinter_state::sprinter_int)
@@ -1193,6 +1240,7 @@ void sprinter_state::sprinter(machine_config &config)
 	m_kbd->out_data_cb().set(m_maincpu, FUNC(tmpz84c015_device::rxa_w)); // KBD_DATR
 	m_kbd->out_clock_cb().set(m_maincpu, FUNC(tmpz84c015_device::rxca_w)); // KBD_CLKR
 	m_kbd->out_clock_cb().append(m_maincpu, FUNC(tmpz84c015_device::txca_w));
+	m_kbd->out_clock_cb().append(FUNC(sprinter_state::on_kbd_data));
 
 	m_maincpu->set_clk_trg<0>(X_SP / 48);
 	m_maincpu->set_clk_trg<1>(X_SP / 48);
@@ -1223,9 +1271,8 @@ void sprinter_state::sprinter(machine_config &config)
 	ay8910.add_route(1, "rspeaker", 0.25);
 	ay8910.add_route(2, "rspeaker", 0.50);
 
-	CENTRONICS(config, m_centronics, centronics_devices, "covox_stereo");
-	output_latch_device &cent_data_out(OUTPUT_LATCH(config, m_cent_data_out));
-	m_centronics->set_output_latch(cent_data_out);
+	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_sprinter);
 }
