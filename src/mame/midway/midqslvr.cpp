@@ -277,9 +277,9 @@ Notes:
 #include "machine/pci-ide.h"
 // TODO: replace me
 #include "machine/i82439hx.h"
-// TODO: replace me
-#include "machine/i82371sb.h"
 
+#include "machine/i82371eb_isa.h"
+#include "machine/i82371eb_ide.h"
 #include "machine/i82371eb_acpi.h"
 #include "machine/i82371eb_usb.h"
 #include "video/virge_pci.h"
@@ -356,15 +356,13 @@ void midway_quicksilver2_state::midqslvr(machine_config &config)
 	//I82443BX_BRIDGE(config, "pci:01.0", 0, "pci:01.0:00.0");
 	//I82443BX_AGP   (config, "pci:01.0:00.0");
 
-	// TODO: I82371EB (PIIX4E)
-	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0));
-	isa.boot_state_hook().set([this](u8 data) { /* printf("%02x\n", data); */ });
+	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0));
+	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 
-	// TODO: I82371EB_IDE
-	i82371sb_ide_device &ide(I82371SB_IDE(config, "pci:07.1", 0));
-	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
-	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
+	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", 0));
+	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
+	ide.irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_mirq0_w));
 
 	I82371EB_USB (config, "pci:07.2", 0);
 	I82371EB_ACPI(config, "pci:07.3", 0);

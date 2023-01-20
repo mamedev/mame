@@ -57,6 +57,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc_irq15_w);
 
 protected:
+	i82371sb_isa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	// optional information overrides
@@ -216,6 +218,8 @@ public:
 	auto irq_sec() { return m_irq_sec_callback.bind(); }
 
 protected:
+	i82371sb_ide_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	// optional information overrides

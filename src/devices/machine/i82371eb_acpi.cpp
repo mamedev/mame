@@ -4,6 +4,9 @@
 
     PIIX4E ACPI interface
 
+	TODO:
+	- PIIX4 / PIIX4M dispatches
+
 **************************************************************************************************/
 
 #include "emu.h"
@@ -28,7 +31,7 @@ i82371eb_acpi_device::i82371eb_acpi_device(const machine_config &mconfig, const 
 	: pci_device(mconfig, I82371EB_ACPI, tag, owner, clock)
 
 {
-	// 0x0c0310 - Serial Bus Controller, USB, OpenHCI Host
+	// 0x068000 - Bridge devices, other bridge device
 	// rev 0x02 for PIIX4E A-0, rev 0x03 for PIIX4M
 	set_ids(0x80867113, 0x02, 0x068000, 0x00);
 }
@@ -61,6 +64,7 @@ void i82371eb_acpi_device::io_map(address_map &map)
 
 }
 
+// TODO: convert to lpc-smbus
 void i82371eb_acpi_device::smbus_map(address_map &map)
 {
 	map(0x00, 0x00).lr8(NAME([]() { return 0x02; }));

@@ -132,21 +132,27 @@ void i82371sb_isa_device::device_add_mconfig(machine_config &config)
 	m_isabus->iochck_callback().set(FUNC(i82371sb_isa_device::iochck_w));
 }
 
-i82371sb_isa_device::i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	pci_device(mconfig, I82371SB_ISA, tag, owner, clock),
-	m_smi_callback(*this),
-	m_nmi_callback(*this),
-	m_stpclk_callback(*this),
-	m_boot_state_hook(*this),
-	m_maincpu(*this, ":maincpu"),
-	m_pic8259_master(*this, "pic8259_master"),
-	m_pic8259_slave(*this, "pic8259_slave"),
-	m_dma8237_1(*this, "dma8237_1"),
-	m_dma8237_2(*this, "dma8237_2"),
-	m_pit8254(*this, "pit8254"),
-	m_isabus(*this, "isabus"),
-	m_speaker(*this, "speaker"),
-	m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_eisa_irq_mode(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
+i82371sb_isa_device::i82371sb_isa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, type, tag, owner, clock)
+	, m_smi_callback(*this)
+	, m_nmi_callback(*this)
+	, m_stpclk_callback(*this)
+	, m_boot_state_hook(*this)
+	, m_maincpu(*this, ":maincpu")
+	, m_pic8259_master(*this, "pic8259_master")
+	, m_pic8259_slave(*this, "pic8259_slave")
+	, m_dma8237_1(*this, "dma8237_1")
+	, m_dma8237_2(*this, "dma8237_2")
+	, m_pit8254(*this, "pit8254")
+	, m_isabus(*this, "isabus")
+	, m_speaker(*this, "speaker")
+	, m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_eisa_irq_mode(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
+{
+}
+
+
+i82371sb_isa_device::i82371sb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i82371sb_isa_device(mconfig, I82371SB_ISA, tag, owner, clock)
 {
 	set_ids(0x80867000, 0x03, 0x060100, 0x00000000);
 }
@@ -973,8 +979,8 @@ void i82371sb_ide_device::device_add_mconfig(machine_config &config)
 	m_ide2->set_bus_master_space(":maincpu", AS_PROGRAM);
 }
 
-i82371sb_ide_device::i82371sb_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, I82371SB_IDE, tag, owner, clock)
+i82371sb_ide_device::i82371sb_ide_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: pci_device(mconfig, type, tag, owner, clock)
 	, latency_timer(0)
 	, bmiba(1)
 	, idetim_primary(0)
@@ -984,6 +990,11 @@ i82371sb_ide_device::i82371sb_ide_device(const machine_config &mconfig, const ch
 	, m_irq_sec_callback(*this)
 	, m_ide1(*this, "ide1")
 	, m_ide2(*this, "ide2")
+{
+}
+
+i82371sb_ide_device::i82371sb_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i82371sb_ide_device(mconfig, I82371SB_IDE, tag, owner, clock)
 {
 	set_ids(0x80867010, 0, 0x010180, 0x00000000);
 }
