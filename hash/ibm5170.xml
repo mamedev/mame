@@ -10560,6 +10560,7 @@ license:CC0-1.0
 		<year>1991</year>
 		<publisher>Interplay</publisher>
 		<info name="developer" value="Interplay" />
+		<sharedfeat name="platform" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Startup Disk" />
 			<dataarea name="flop" size = "737280">
@@ -10906,6 +10907,25 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="bytesize_149.img" size="1474560" crc="210fc964" sha1="93ed421c783e55f8030cf3074568aabe5c8a3fb1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="caesarpw">
+		<description>Caesars Palace for Windows</description>
+		<year>1994</year>
+		<publisher>Virgin Games</publisher>
+		<notes>This release was dual Windows / Macintosh.</notes>
+		<sharedfeat name="platform" value="Windows 3.x" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Caesars Palace (Windows 3.x) [Virgin Games] [1992] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="b8f024b3" sha1="124c9d51221d11147eed08db44f6275db991a646"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Caesars Palace (Macintosh) [Virgin Games] [1992] [3.5HD] [Disk 2 of 2].img" size="1474560" status="nodump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19495,6 +19515,7 @@ license:CC0-1.0
 		<year>1992</year>
 		<publisher>Maxis</publisher>
 		<info name="usage" value="Requires Windows 3.x" />
+		<sharedfeat name="platform" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="SimAnt (win 3.x release) [Maxis] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="5ec6bb7d" sha1="7666d4e9b3d78ca109481c5225ebc51e286b51f8"/>
@@ -19513,6 +19534,7 @@ license:CC0-1.0
 		<publisher>Maxis</publisher>
 		<info name="usage" value="Requires Windows 3.x" />
 		<info name="version" value="1.1" />
+		<sharedfeat name="platform" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="SimCity Classic (Windows 3.x release) [Maxis] [1993] [3.5DD] [Disk 1 of 2] [Install Disk].img" size="737280" crc="a2a24523" sha1="15970109725d27fce3609f83c367b07b9979df1a"/>
@@ -19531,6 +19553,7 @@ license:CC0-1.0
 		<publisher>Maxis</publisher>
 		<info name="usage" value="Requires Windows 3.x" />
 		<info name="version" value="1.1" />
+		<sharedfeat name="platform" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="SimCity Classic (Windows 3.x release) [Maxis] [1993] [5.25HD] [Disk 1 of 1].img" size="1228800" crc="5a87c7a4" sha1="6d668984561cbec5e2556925910c6275680f438d"/>
@@ -19702,6 +19725,7 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Maxis</publisher>
 		<info name="developer" value="Maxis" />
+		<sharedfeat name="platform" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="SimLife (Windows 3.x release) [Maxis] [1993] [3.5DD] [Disk 1 of 3].img" size="737280" crc="40136c47" sha1="4a80d0ec9c6cc7360bfeb23323b0a520b79a35b4"/>
@@ -20822,10 +20846,11 @@ license:CC0-1.0
 	</software>
 
 	<software name="syndicate">
-		<description>Syndicate</description>
+		<description>Syndicate (Europe)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Bullfrog Productions" />
+		<info name="language" value="English/French/Italian" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Syndicate [Bullfrog] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="1f88694e" sha1="ce392619acc8d00d611d7aee450bc6d34a24e9f4"/>
@@ -20849,6 +20874,98 @@ license:CC0-1.0
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Syndicate [Bullfrog] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="4d3e6946" sha1="85e5cfdf3a5a5a71e3f21d356cc9683afdc7e8b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="syndicatea" cloneof="syndicate">
+		<description>Syndicate (Europe, alt)</description>
+		<year>1993</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Bullfrog Productions" />
+		<info name="language" value="English/French/Italian" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Syndicate 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate (alt) [Bullfrog] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="5acdadad" sha1="c2b5600b01f907e5b8ed7bc9df84aa01dbbc373e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Syndicate 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate (alt) [Bullfrog] [1993] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="407b022f" sha1="54c3cdf275f5e9b76d39757fdeb64ca9ff85b257"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Syndicate 3" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate (alt) [Bullfrog] [1993] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="c470402c" sha1="455586694dca3d2d53ccf4e154eb5136cf084f85"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Syndicate 4" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate (alt) [Bullfrog] [1993] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="9de07a87" sha1="452b398e2c4c0149bc0dea8d2e12d41390dd9b14"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Syndicate 5" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate (alt) [Bullfrog] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="dad9e2fd" sha1="5520001fc9da03492d0ab5ed09fd058c055dbf4f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="syndicatede" cloneof="syndicate">
+		<description>Syndicate (Germany)</description>
+		<year>1993</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Bullfrog Productions" />
+		<info name="language" value="German" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Syndicate 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate (Germany) [Bullfrog] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="4e8fcda4" sha1="b8f5a71cbc0864b3a5253cbef55ad1e2aef86111"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Syndicate 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate (Germany) [Bullfrog] [1993] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="a3ba3bf9" sha1="9150bcdb953f5b324522da3ff3876aec061ce766"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Syndicate 3" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate (Germany) [Bullfrog] [1993] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="a724d555" sha1="e4b7fe3a523dc070b2111d15da75d60df1428676"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Syndicate 4" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate (Germany) [Bullfrog] [1993] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="576d07e1" sha1="2519e3039f667e5b3701dfe957267b527386740f"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Syndicate 5" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate (Germany) [Bullfrog] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="4d3e6946" sha1="85e5cfdf3a5a5a71e3f21d356cc9683afdc7e8b0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="syndictar">
+		<description>Syndicate: American Revolt (Germany)</description>
+		<year>1993</year>
+		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+Add-on pack to Syndicate. It requires the original game and includes 3 new weapons, 21 new single player missions, and 10 multiplayer missions.
+]]></notes>
+		<info name="developer" value="Bullfrog Productions" />
+		<info name="language" value="German" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Syndicate - American Revolt [Bullfrog] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="a5a97355" sha1="d4066839ad8f953084ec9b3ffba1f1514b97f9c1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20912,6 +21029,7 @@ license:CC0-1.0
 		<publisher>Spectrum Holobyte</publisher>
 		<info name="developer" value="Sphere" />
 		<info name="version" value="Version 1.0 10/23/92" />
+		<sharedfeat name="platform" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="Tetris Classic (windows 3.x release) [Spectrum Holobyte] [1992] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="79804dc4" sha1="2ce4e7641a5d9422d79a85d300a7c0f9140ade88"/>
@@ -21408,6 +21526,37 @@ license:CC0-1.0
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="WaxWorks [Accolade] [1992] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="09d0c4c4" sha1="d936e2cd7ae0cab668d5bf7d62ee6e843061d699"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmnspc">
+		<description>Where in Space is Carmen Sandiego? (Deluxe)</description>
+		<year>1993</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="developer" value="Brøderbund Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Where in Space is Carmen Sandiego [Broderbund] [1993] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="53d311aa" sha1="47cf50c7c1b091f50de2338118ef17334b49cb28"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Where in Space is Carmen Sandiego [Broderbund] [1993] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="f8c49d23" sha1="4d533946a67935ce828852986426c5a0d0669cdb"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Where in Space is Carmen Sandiego [Broderbund] [1993] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="c81d89b6" sha1="d0151876f9946bda61ebe0550730b5983e276aba"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="Where in Space is Carmen Sandiego [Broderbund] [1993] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="41d1cc74" sha1="5184133534a4d8d9c8b6cfbdf13ccad122e089b6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22602,6 +22751,69 @@ Disk 2 includes: ""
 			<feature name="part_id" value="SuperDisk 2" />
 			<dataarea name="flop" size="737280">
 				<rom name="PC Plus (Issue 69 - June 1992) [Future] [1992] [3.5DD] [Disk 2 of 2].img" size="737280" status="nodump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcplus9305">
+		<description>PC Plus (Issue 80 - May 1993)</description>
+		<year>1993</year>
+		<publisher>Future Publishing</publisher>
+		<notes><![CDATA[
+Disk includes: 
+"Type Plus": Windows utility for creating your own word designs and logos that can be exported into many graphic and document programs. 
+This useful program (from Serif - the makers of PagePlus) illustrates only some of the features of the full version.
+"WormWorld": Delightful series of puzzles for Windows; the object is to guide a worm safely through an assault course; can you get it past the obstacles? All the puzzles can be solved.
+"Magazine": From this month's issue of PC Plus we have the third part of the Video Library project written in Visual Basic 2 (for Windows).
+From Programmers' Workshop a trio of programs: TBM and SHUFFLE in Basic, and SHOWSIZE in assembly language and COM form.
+]]></notes>
+		<sharedfeat name="platform" value="Windows 3.x" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="SuperDisk" />
+			<dataarea name="flop" size="737280">
+				<rom name="PC Plus (Issue 80 - May 1993) [Future] [1993] [3.5DD] [Disk 1 of 1].img" size="737280" crc="20ca9ce8" sha1="185bf5de8c1625b395a70c3800643582ec0ffe0b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcplus9409">
+		<description>PC Plus (Issue 96 - September 1994)</description>
+		<year>1994</year>
+		<publisher>Future Publishing</publisher>
+		<notes><![CDATA[
+Disk includes: 
+"Locoscript Professional 2 Plus": Create your own documents (one-page limit) using this version of the classic word processor.
+"SinkSub": Windows game in which your frigate, armed with depth charges, must evade and destroy the enemy's best fleet of submarines. 
+"Magazine": Various files, macros, bits and pieces from Help Screen. Use Basic's Draw command from Wilf's Programmers' Workshop. A project and a new utility from Visual Basic Workshop.
+]]></notes>
+		<sharedfeat name="platform" value="Windows 3.x" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="SuperDisk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Plus (Issue 96 - September 1994) [Future] [1994] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="f606a575" sha1="ad9bb3849b9a109c34f04921c71a688042c77c21"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcplus9504">
+		<description>PC Plus (Issue 102 - April 1995)</description>
+		<year>1995</year>
+		<publisher>Future Publishing</publisher>
+		<notes><![CDATA[
+Disk includes: 
+"Medi8or Entree 2.0": A complete commercial multimedia authoring package. Create your own presentations, and enter the PC Plus competition!
+"DOS Bar 1.31": Add a handy toolbar to DOS applications running under Windows.
+"Roblist UK BBS Listing": Comprehensive listing of UK bulletin boards, plus ftp sites and other interesting Internet locations.
+"From PC PLUS Magazine": Files from this month's Hands On section, including Help Screen, Visual  Basic Workshop and Wilf's Programmers' Workshop.
+]]></notes>
+		<sharedfeat name="platform" value="Windows 3.x" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="SuperDisk" />
+			<dataarea name="flop" size="1474560">
+				<rom name="PC Plus (Issue 102 - April 1995) [Future] [1995] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="7417dc79" sha1="4459a5827ef6ff1fcfc9d734969c52052783d6b0"/>
 			</dataarea>
 		</part>
 	</software>
