@@ -795,3 +795,353 @@ uint32_t arcompact_device::handleop_BL_S_s13(uint16_t op) // BL_S s13
 	m_regs[REG_BLINK] = m_pc + (2 >> 0);
 	return realaddress;
 }
+
+
+uint32_t arcompact_device::handleop_ADD_S_c_b_u3(uint16_t op)
+{
+	int u, breg, creg;
+
+	COMMON16_GET_u3;
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	uint32_t result = m_regs[breg] + u;
+	m_regs[creg] = result;
+
+	return m_pc + (2 >> 0);
+}
+
+
+uint32_t arcompact_device::handleop_SUB_S_c_b_u3(uint16_t op)
+{
+	int u, breg, creg;
+
+	COMMON16_GET_u3;
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	uint32_t result = m_regs[breg] - u;
+	m_regs[creg] = result;
+
+	return m_pc + (2 >> 0);
+}
+
+
+uint32_t arcompact_device::handleop_ASL_S_c_b_u3(uint16_t op)
+{
+	int u, breg, creg;
+
+	COMMON16_GET_u3;
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	uint32_t result = m_regs[breg] << u;
+	m_regs[creg] = result;
+
+	return m_pc + (2 >> 0);
+}
+
+
+uint32_t arcompact_device::handleop_SUB_S_b_b_c(uint16_t op)
+{
+	int breg, creg;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	uint32_t result = m_regs[breg] - m_regs[creg];
+	m_regs[breg] = result;
+
+	return m_pc + (2 >> 0);
+}
+
+
+uint32_t arcompact_device::handleop_AND_S_b_b_c(uint16_t op)
+{
+	int breg, creg;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	uint32_t result = m_regs[breg] & m_regs[creg];
+	m_regs[breg] = result;
+
+	return m_pc + (2 >> 0);
+}
+
+
+uint32_t arcompact_device::handleop_OR_S_b_b_c(uint16_t op)
+{
+	int breg, creg;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	uint32_t result = m_regs[breg] | m_regs[creg];
+	m_regs[breg] = result;
+
+	return m_pc + (2 >> 0);
+}
+
+
+uint32_t arcompact_device::handleop_XOR_S_b_b_c(uint16_t op)
+{
+	int breg, creg;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	uint32_t result = m_regs[breg] ^ m_regs[creg];
+	m_regs[breg] = result;
+
+	return m_pc + (2 >> 0);
+}
+
+
+uint32_t arcompact_device::handleop_EXTB_S_b_c(uint16_t op)
+{
+	int breg, creg;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	uint32_t result = m_regs[creg] & 0x000000ff;
+	m_regs[breg] = result;
+
+	return m_pc + (2 >> 0);
+}
+
+
+uint32_t arcompact_device::handleop_EXTW_S_b_c(uint16_t op)
+{
+	int breg, creg;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	uint32_t result = m_regs[creg] & 0x0000ffff;
+	m_regs[breg] = result;
+
+	return m_pc + (2 >> 0);
+}
+
+
+uint32_t arcompact_device::handleop_NEG_S_b_c(uint16_t op)
+{
+	int breg, creg;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	 uint32_t result = 0 - m_regs[creg];
+	m_regs[breg] = result;
+
+	return m_pc + (2 >> 0);
+}
+
+
+uint32_t arcompact_device::handleop_ADD1_S_b_b_c(uint16_t op)
+{
+	int breg, creg;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	 uint32_t result = m_regs[breg] + (m_regs[creg] <<1);
+	m_regs[breg] = result;
+
+	return m_pc + (2 >> 0);
+}
+
+
+uint32_t arcompact_device::handleop_ADD2_S_b_b_c(uint16_t op)
+{
+	int breg, creg;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	 uint32_t result = m_regs[breg] + (m_regs[creg] <<2);
+	m_regs[breg] = result;
+
+	return m_pc + (2 >> 0);
+}
+
+
+uint32_t arcompact_device::handleop_ADD3_S_b_b_c(uint16_t op)
+{
+	int breg, creg;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	 uint32_t result = m_regs[breg] + (m_regs[creg] <<3);
+	m_regs[breg] = result;
+
+	return m_pc + (2 >> 0);
+}
+
+
+uint32_t arcompact_device::handleop_LSR_S_b_b_c_multiple(uint16_t op)
+{
+	int breg, creg;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	uint32_t result = m_regs[breg] >> (m_regs[creg]&0x1f);
+	m_regs[breg] = result;
+
+	return m_pc + (2 >> 0);
+}
+
+
+uint32_t arcompact_device::handleop_ASL_S_b_c_single(uint16_t op)
+{
+	int breg, creg;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_creg;
+
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	uint32_t result = m_regs[creg] << 1;
+	m_regs[breg] = result;
+
+	return m_pc + (2 >> 0);
+}
+
+
+uint32_t arcompact_device::handleop_ASL_S_b_b_u5(uint16_t op)
+{
+	int breg, u;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_u5;
+
+	REG_16BIT_RANGE(breg);
+
+	m_regs[breg] = m_regs[breg] << (u&0x1f);
+
+	return m_pc + (2 >> 0);
+}
+
+
+uint32_t arcompact_device::handleop_LSR_S_b_b_u5(uint16_t op)
+{
+	int breg, u;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_u5;
+
+	REG_16BIT_RANGE(breg);
+
+	m_regs[breg] = m_regs[breg] >> (u&0x1f);
+
+	return m_pc + (2 >> 0);
+}
+
+
+uint32_t arcompact_device::handleop_ASR_S_b_b_u5(uint16_t op)
+{
+	int breg, u;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_u5;
+
+	REG_16BIT_RANGE(breg);
+
+	int32_t temp = (int32_t)m_regs[breg]; m_regs[breg] = temp >> (u&0x1f); // treat it as a signed value, so sign extension occurs during shift
+
+	return m_pc + (2 >> 0);
+}
+
+
+uint32_t arcompact_device::handleop_SUB_S_b_b_u5(uint16_t op)
+{
+	int breg, u;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_u5;
+
+	REG_16BIT_RANGE(breg);
+
+	m_regs[breg] = m_regs[breg] - u;
+
+	return m_pc + (2 >> 0);
+}
+
+
+uint32_t arcompact_device::handleop_BSET_S_b_b_u5(uint16_t op)
+{
+	int breg, u;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_u5;
+
+	REG_16BIT_RANGE(breg);
+
+	m_regs[breg] = m_regs[breg] | (1 << (u & 0x1f));
+
+	return m_pc + (2 >> 0);
+}
+
+
+uint32_t arcompact_device::handleop_BMSK_S_b_b_u5(uint16_t op)
+{
+	int breg, u;
+
+	COMMON16_GET_breg;
+	COMMON16_GET_u5;
+
+	REG_16BIT_RANGE(breg);
+
+	m_regs[breg] = m_regs[breg] | ((1 << (u + 1)) - 1);
+
+	return m_pc + (2 >> 0);
+}
+
+
