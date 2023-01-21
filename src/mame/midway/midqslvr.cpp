@@ -5,10 +5,10 @@
 Midway Quicksilver II/Graphite skeleton driver
 
 TODO (BIOS):
-- Starts off searching for exact PIIX4 ID 0x7110, punts if not equal.
 - With BIOS mapped at 0xfff80000 it will ping-pong at I/O $7000 for SMBus
 - Writes to VGA ports but never ever draw anything, probably needs VGA control to be enabled
-  from AGP
+  from AGP. Neither Virge PCI nor Voodoo should claim VGA ports, they are both disabled in
+  command ...
 
 TODO:
 - Fix HDD BAD_DUMPs ("primary master hard disk fail" in shutms11):
@@ -275,9 +275,7 @@ Notes:
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
-// TODO: replace me
-#include "machine/i82439hx.h"
-
+#include "machine/i82443bx_host.h"
 #include "machine/i82371eb_isa.h"
 #include "machine/i82371eb_ide.h"
 #include "machine/i82371eb_acpi.h"
@@ -313,7 +311,8 @@ public:
 
 private:
 	required_device<pentium2_device> m_maincpu;
-	required_device<voodoo_2_pci_device> m_voodoo2;
+	// optional for debugging ...
+	optional_device<voodoo_2_pci_device> m_voodoo2;
 
 	void midqslvr_map(address_map &map);
 };
@@ -350,10 +349,9 @@ void midway_quicksilver2_state::midqslvr(machine_config &config)
 	m_maincpu->smiact().set("pci:00.0", FUNC(i82439hx_host_device::smi_act_w));
 
 	PCI_ROOT(config, "pci", 0);
-	// TODO: I82443BX (PAC)
-	I82439HX(config, "pci:00.0", 0, "maincpu", 64*1024*1024);
+	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 64*1024*1024);
 	// TODO: Virtual PCI-to-PCI bridge
-	//I82443BX_BRIDGE(config, "pci:01.0", 0, "pci:01.0:00.0");
+	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
 	//I82443BX_AGP   (config, "pci:01.0:00.0");
 
 	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0));
@@ -366,6 +364,7 @@ void midway_quicksilver2_state::midqslvr(machine_config &config)
 
 	I82371EB_USB (config, "pci:07.2", 0);
 	I82371EB_ACPI(config, "pci:07.3", 0);
+	LPC_ACPI     (config, "pci:07.3:acpi", 0);
 
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
@@ -377,14 +376,11 @@ void midway_quicksilver2_state::midqslvr(machine_config &config)
 	// Expansion slots, mapping SVGA for debugging
 	// TODO: all untested, check clock
 	// TODO: confirm Voodoo going in J4D2
+	#if 1
 	VOODOO_2_PCI(config, m_voodoo2, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
 	m_voodoo2->set_fbmem(2);
 	m_voodoo2->set_tmumem(4, 4);
 	m_voodoo2->set_status_cycles(1000);
-
-	// "pci:0d.0" J4D2
-	// "pci:0e.0" J4D1
-	VIRGE_PCI(config, "pci:0e.0", 0); // J4C1
 
 	// TODO: fix legacy raw setup here
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -392,6 +388,10 @@ void midway_quicksilver2_state::midqslvr(machine_config &config)
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
 	screen.set_screen_update(PCI_J4D2_ID, FUNC(voodoo_2_pci_device::screen_update));
+	#endif
+	// "pci:0d.0" J4D2
+	// "pci:0e.0" J4D1
+	//VIRGE_PCI(config, "pci:0e.0", 0); // J4C1
 }
 
 // Graphite runs on incompatible HW, consider splitting if things starts to get hairy ...
