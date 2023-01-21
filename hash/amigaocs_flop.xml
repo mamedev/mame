@@ -13574,7 +13574,7 @@ ATK test: OK
 
 	<software name="dogem" supported="yes">
 		<!-- SPS (CAPS) release 2139 -->
-		<description>Death or Glory - Das Erbe von Morgan (Germany, Hard Disk Version)</description>
+		<description>Death or Glory - Das Erbe von Morgan (Germany, hard disk version)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1994</year>
@@ -13606,7 +13606,7 @@ ATK test: OK
 
 	<software name="dogdk" supported="no">
 		<!-- SPS (CAPS) release 2140 -->
-		<description>Death or Glory - Der dunkle Kaiser (Germany, Hard Disk Version)</description>
+		<description>Death or Glory - Der dunkle Kaiser (Germany, hard disk version)</description>
 		<!-- retail, addon -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1994</year>
@@ -22361,7 +22361,7 @@ ATK test: failed
 
 	<software name="ggiana1" cloneof="ggiana" supported="no">
 		<!-- SPS (CAPS) release 2500 -->
-		<description>The Great Giana Sisters (Europe, Older)</description>
+		<description>The Great Giana Sisters (Europe, older)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
@@ -25493,7 +25493,7 @@ ATK test: OK
 
 	<software name="indycradi" cloneof="indycrad" supported="no">
 		<!-- SPS (CAPS) release 2323 -->
-		<description>Indiana Jones and the Last Crusade: The Graphic Adventure (Italy, Version Amiga Italian v1.5 19891229)</description>
+		<description>Indiana Jones and the Last Crusade: The Graphic Adventure (Italy, v1.5 19891229)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -27803,7 +27803,7 @@ ATK test: failed
 
 	<software name="kickoff2a1200" cloneof="kickoff2" supported="no">
 		<!-- SPS (CAPS) release 761 -->
-		<description>Kick Off 2 (Europe, v1.4e, A1200 Boot Disk)</description>
+		<description>Kick Off 2 (Europe, v1.4e, A1200 boot disk)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
@@ -30139,7 +30139,7 @@ ATK test: failed
 
 	<software name="lemmingsc" cloneof="lemmings" supported="no">
 		<!-- SPS (CAPS) release 270 -->
-		<description>Lemmings (Europe, Free with Commodore Promotion Pack)</description>
+		<description>Lemmings (Europe, free with Commodore Promotion Pack)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
@@ -35730,7 +35730,7 @@ ATK test: C:0 H:U Bad
 
 	<software name="ohnolemm" supported="no">
 		<!-- SPS (CAPS) release 697 -->
-		<description>Oh No! More Lemmings (Europe, Stand Alone)</description>
+		<description>Oh No! More Lemmings (Europe, standalone)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
@@ -35745,9 +35745,9 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="ohnolemdd" cloneof="lemmings" supported="no">
+	<software name="ohnolemdd" cloneof="ohnolemm" supported="no">
 		<!-- SPS (CAPS) release 1898 -->
-		<description>Oh No! More Lemmings (Europe, Data Disk)</description>
+		<description>Oh No! More Lemmings (Europe, data disk)</description>
 		<!-- retail, addon -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
@@ -35763,9 +35763,9 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="ohnolemddu" cloneof="lemmings" supported="no">
+	<software name="ohnolemddu" cloneof="ohnolemm" supported="no">
 		<!-- SPS (CAPS) release 1970 -->
-		<description>Oh No! More Lemmings (USA, Data Disk)</description>
+		<description>Oh No! More Lemmings (USA, data disk)</description>
 		<!-- retail, addon -->
 		<!-- (Amiga, OCS, NTSC) -->
 		<year>1991</year>
@@ -43374,7 +43374,7 @@ ATK test: C:0 H:U Bad
 
 	<software name="swosup" cloneof="swos" supported="no">
 		<!-- SPS (CAPS) release 841 -->
-		<description>Sensible World of Soccer (Europe, v1.1 Update Disk)</description>
+		<description>Sensible World of Soccer (Europe, v1.1 update disk)</description>
 		<!-- retail, addon -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1995</year>
@@ -44220,7 +44220,7 @@ ATK test: OK
 
 	<software name="shuttlea" cloneof="shuttle" supported="no">
 		<!-- SPS (CAPS) release 2468 -->
-		<description>Shuttle - The Space Flight Simulator (Europe, v1.0, No Title Screen)</description>
+		<description>Shuttle - The Space Flight Simulator (Europe, v1.0, no title screen)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1992</year>
