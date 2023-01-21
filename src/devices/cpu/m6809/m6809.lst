@@ -31,7 +31,7 @@ MAIN:
 		case 0x07:                                      %DIRECT;    %ASR8;      return;
 		case 0x08:                                      %DIRECT;    %ASL8;      return;
 		case 0x09:                                      %DIRECT;    %ROL8;      return;
-		case 0x0A:           :                          %DIRECT;    %DEC8;      return;
+		case 0x0A:                                      %DIRECT;    %DEC8;      return;
 		case 0x0B:                                      %DIRECT;    %XDEC8;     return;
 		case 0x0C:                                      %DIRECT;    %INC8;      return;
 		case 0x0D:                                      %DIRECT;    %TST8;      return;
@@ -100,7 +100,7 @@ MAIN:
 		case 0x4B:                                      set_a();    %XDEC8;     return;
 		case 0x4C:                                      set_a();    %INC8;      return;
 		case 0x4D:                                      set_a();    %TST8;      return;
-		case 0x4E:                                      set_a();    %JMP;       return;
+		case 0x4E:                                      set_a();    %XCLR8;     return;
 		case 0x4F:                                      set_a();    %CLR8;      return;
 
 		case 0x50:  case 0x51:                          set_b();    %NEG8;      return;
@@ -115,7 +115,7 @@ MAIN:
 		case 0x5B:                                      set_b();    %XDEC8;     return;
 		case 0x5C:                                      set_b();    %INC8;      return;
 		case 0x5D:                                      set_b();    %TST8;      return;
-		case 0x5E:                                      set_b();    %JMP;       return;
+		case 0x5E:                                      set_b();    %XCLR8;      return;
 		case 0x5F:                                      set_b();    %CLR8;      return;
 
 		case 0x60:  case 0x61:                          %INDEXED;   %NEG8;      return;
@@ -662,6 +662,18 @@ XDEC8:
 		;
 	}
 	@write_operand(m_temp.b.l);
+	return;
+
+XCLR8:
+	@read_operand();
+	m_cc &= ~CC_NZV;
+	m_cc |= CC_Z;
+	if(!hd6309_native_mode() || !is_register_addressing_mode())
+	{
+		@dummy_read_opcode_arg(0);
+		;
+	}
+	@write_operand(0);
 	return;
 
 ILLEGAL:
