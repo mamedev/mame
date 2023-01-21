@@ -31,7 +31,8 @@ MAIN:
 		case 0x07:                                      %DIRECT;    %ASR8;      return;
 		case 0x08:                                      %DIRECT;    %ASL8;      return;
 		case 0x09:                                      %DIRECT;    %ROL8;      return;
-		case 0x0A:  case 0x0B:                          %DIRECT;    %DEC8;      return;
+		case 0x0A:           :                          %DIRECT;    %DEC8;      return;
+		case 0x0B:                                      %DIRECT;    %XDEC8;     return;
 		case 0x0C:                                      %DIRECT;    %INC8;      return;
 		case 0x0D:                                      %DIRECT;    %TST8;      return;
 		case 0x0E:                                      %DIRECT;    %JMP;       return;
@@ -95,7 +96,8 @@ MAIN:
 		case 0x47:                                      set_a();    %ASR8;      return;
 		case 0x48:                                      set_a();    %ASL8;      return;
 		case 0x49:                                      set_a();    %ROL8;      return;
-		case 0x4A:  case 0x4B:                          set_a();    %DEC8;      return;
+		case 0x4A:                                      set_a();    %DEC8;      return;
+		case 0x4B:                                      set_a();    %XDEC8;     return;
 		case 0x4C:                                      set_a();    %INC8;      return;
 		case 0x4D:                                      set_a();    %TST8;      return;
 		case 0x4E:                                      set_a();    %JMP;       return;
@@ -109,7 +111,8 @@ MAIN:
 		case 0x57:                                      set_b();    %ASR8;      return;
 		case 0x58:                                      set_b();    %ASL8;      return;
 		case 0x59:                                      set_b();    %ROL8;      return;
-		case 0x5A:  case 0x5B:                          set_b();    %DEC8;      return;
+		case 0x5A:                                      set_b();    %DEC8;      return;
+		case 0x5B:                                      set_b();    %XDEC8;     return;
 		case 0x5C:                                      set_b();    %INC8;      return;
 		case 0x5D:                                      set_b();    %TST8;      return;
 		case 0x5E:                                      set_b();    %JMP;       return;
@@ -123,7 +126,8 @@ MAIN:
 		case 0x67:                                      %INDEXED;   %ASR8;      return;
 		case 0x68:                                      %INDEXED;   %ASL8;      return;
 		case 0x69:                                      %INDEXED;   %ROL8;      return;
-		case 0x6A:  case 0x6B:                          %INDEXED;   %DEC8;      return;
+		case 0x6A:                                      %INDEXED;   %DEC8;      return;
+		case 0x6B:                                      %INDEXED;   %XDEC8;     return;
 		case 0x6C:                                      %INDEXED;   %INC8;      return;
 		case 0x6D:                                      %INDEXED;   %TST8;      return;
 		case 0x6E:                                      %INDEXED;   %JMP;       return;
@@ -137,7 +141,8 @@ MAIN:
 		case 0x77:                                      %EXTENDED;  %ASR8;      return;
 		case 0x78:                                      %EXTENDED;  %ASL8;      return;
 		case 0x79:                                      %EXTENDED;  %ROL8;      return;
-		case 0x7A:  case 0x7B:                          %EXTENDED;  %DEC8;      return;
+		case 0x7A:                                      %EXTENDED;  %DEC8;      return;
+		case 0x7B:                                      %EXTENDED;  %XDEC8;     return;
 		case 0x7C:                                      %EXTENDED;  %INC8;      return;
 		case 0x7D:                                      %EXTENDED;  %TST8;      return;
 		case 0x7E:                                      %EXTENDED;  %JMP;       return;
@@ -638,7 +643,7 @@ XRES:
 	goto INTERRUPT_VECTOR;
 
 XNC8:
-	if (m_cc & 01)
+	if (m_cc & CC_C)
 		goto COM8;
 	else
 		goto NEG8;
