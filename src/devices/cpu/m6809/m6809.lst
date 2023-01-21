@@ -155,7 +155,7 @@ MAIN:
 		case 0x84:              set_regop8(m_q.r.a);    set_imm();  %AND8;      return;
 		case 0x85:              set_regop8(m_q.r.a);    set_imm();  %BIT8;      return;
 		case 0x86:              set_regop8(m_q.r.a);    set_imm();  %LD8;       return;
-		case 0x87:              set_regop8(m_q.r.a);    set_imm();  %ST8;       return;
+		case 0x87:              set_regop8(m_q.r.a);    set_imm();  %XST8;      return;
 		case 0x88:              set_regop8(m_q.r.a);    set_imm();  %EOR8;      return;
 		case 0x89:              set_regop8(m_q.r.a);    set_imm();  %ADC8;      return;
 		case 0x8A:              set_regop8(m_q.r.a);    set_imm();  %OR8;       return;
@@ -163,7 +163,7 @@ MAIN:
 		case 0x8C:              set_regop16(m_x);       set_imm();  %CMP16;     return;
 		case 0x8D:                                                  %BSR;       return;
 		case 0x8E:              set_regop16(m_x);       set_imm();  %LD16;      return;
-		case 0x8F:              set_regop16(m_x);       set_imm();  %ST16;      return;
+		case 0x8F:              set_regop16(m_x);       set_imm();  %XST16;     return;
 
 		case 0x90:              set_regop8(m_q.r.a);    %DIRECT;    %SUB8;      return;
 		case 0x91:              set_regop8(m_q.r.a);    %DIRECT;    %CMP8;      return;
@@ -223,7 +223,7 @@ MAIN:
 		case 0xC4:              set_regop8(m_q.r.b);    set_imm();  %AND8;      return;
 		case 0xC5:              set_regop8(m_q.r.b);    set_imm();  %BIT8;      return;
 		case 0xC6:              set_regop8(m_q.r.b);    set_imm();  %LD8;       return;
-		case 0xC7:              set_regop8(m_q.r.b);    set_imm();  %ST8;       return;
+		case 0xC7:              set_regop8(m_q.r.b);    set_imm();  %XST8;      return;
 		case 0xC8:              set_regop8(m_q.r.b);    set_imm();  %EOR8;      return;
 		case 0xC9:              set_regop8(m_q.r.b);    set_imm();  %ADC8;      return;
 		case 0xCA:              set_regop8(m_q.r.b);    set_imm();  %OR8;       return;
@@ -231,7 +231,7 @@ MAIN:
 		case 0xCC:              set_regop16(m_q.p.d);   set_imm();  %LD16;      return;
 		case 0xCD:                                                  %HCF;       return;
 		case 0xCE:              set_regop16(m_u);       set_imm();  %LD16;      return;
-		case 0xCF:              set_regop16(m_u);       set_imm();  %ST16;      return;
+		case 0xCF:              set_regop16(m_u);       set_imm();  %XST16;     return;
 
 		case 0xD0:              set_regop8(m_q.r.b);    %DIRECT;    %SUB8;      return;
 		case 0xD1:              set_regop8(m_q.r.b);    %DIRECT;    %CMP8;      return;
@@ -308,6 +308,7 @@ DISPATCH10:
 		case 0x2E:              set_cond(cond_gt());                %LBRANCH;   return;
 		case 0x2F:              set_cond(!cond_gt());               %LBRANCH;   return;
 
+		case 0x3E:                                                  %XSWI2;      return;
 		case 0x3F:                                                  %SWI2;      return;
 
 		case 0x83:              set_regop16(m_q.p.d);   set_imm();  %CMP16;     return;
@@ -327,12 +328,19 @@ DISPATCH10:
 		case 0xBE:              set_regop16(m_y);       %EXTENDED;  %LD16;      return;
 		case 0xBF:              set_regop16(m_y);       %EXTENDED;  %ST16;      return;
 
+		case 0xC3:              set_regop16(m_q.p.d);   set_imm();  %XADD16;    return;
 		case 0xCE:              set_regop16(m_s);       set_imm();  %LD16;      return;
 		case 0xCF:              set_regop16(m_s);       set_imm();  %ST16;      return;
+
+		case 0xD3:              set_regop16(m_q.p.d);   %DIRECT;    %XADD16;    return;
 		case 0xDE:              set_regop16(m_s);       %DIRECT;    %LD16;      return;
 		case 0xDF:              set_regop16(m_s);       %DIRECT;    %ST16;      return;
+
+		case 0xE3:              set_regop16(m_q.p.d);   %INDEXED;   %XADD16;    return;
 		case 0xEE:              set_regop16(m_s);       %INDEXED;   %LD16;      return;
 		case 0xEF:              set_regop16(m_s);       %INDEXED;   %ST16;      return;
+
+		case 0xF3:              set_regop16(m_q.p.d);   %EXTENDED;  %XADD16;    return;
 		case 0xFE:              set_regop16(m_s);       %EXTENDED;  %LD16;      return;
 		case 0xFF:              set_regop16(m_s);       %EXTENDED;  %ST16;      return;
 
@@ -674,6 +682,44 @@ XCLR8:
 		;
 	}
 	@write_operand(0);
+	return;
+
+XST8:
+	// ToDo: Flag setting is much more complex see:
+	// https://github.com/hoglet67/6809Decoder/wiki/Undocumented-6809-Behaviours#store-immediate
+
+	@read_operand();
+	set_flags(CC_NZV, regop8());
+	return;
+
+XST16:
+	// ToDo: Flag setting is much more complex see:
+	// https://github.com/hoglet67/6809Decoder/wiki/Undocumented-6809-Behaviours#store-immediate
+
+	@read_operand();
+	@write_operand(1, regop16().b.l);
+	set_flags(CC_NZV, regop16().w);
+	return;
+
+XSWI2:
+	set_ea(VECTOR_SWI2);
+	standard_irq_callback(M6809_SWI);
+	set_regop16(m_s);
+	m_temp.w = entire_state_registers();
+	@dummy_read_opcode_arg(0);
+	@dummy_vma(1);
+	%PUSH_REGISTERS;
+	goto INTERRUPT_VECTOR;
+
+XADD16:
+	@m_temp.b.h = read_operand(0);
+	@m_temp.b.l = read_operand(1);
+	set_flags(CC_NZVC, regop16().w, m_temp.w, regop16().w + m_temp.w);
+	if(!hd6309_native_mode())
+	{
+		@dummy_read_opcode_arg(0);
+		;
+	}
 	return;
 
 ILLEGAL:
