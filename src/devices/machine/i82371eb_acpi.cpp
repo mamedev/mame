@@ -14,7 +14,7 @@
 
 #define LOG_IO     (1U << 1) // log PCI register accesses
 #define LOG_TODO   (1U << 2) // log unimplemented registers
-#define LOG_MAP    (1U << 3) // log full remaps
+#define LOG_MAP    (1U << 3) // log full remaps (verbose)
 
 #define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO | LOG_MAP)
 #define LOG_OUTPUT_FUNC osd_printf_warning
@@ -29,6 +29,7 @@ DEFINE_DEVICE_TYPE(I82371EB_ACPI, i82371eb_acpi_device, "i82371eb_acpi", "Intel 
 
 i82371eb_acpi_device::i82371eb_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, I82371EB_ACPI, tag, owner, clock)
+	, m_acpi(*this, "acpi")
 
 {
 	// 0x068000 - Bridge devices, other bridge device
@@ -48,20 +49,15 @@ void i82371eb_acpi_device::config_map(address_map &map)
 	map(0x10, 0xd7).unmaprw();
 	map(0x10, 0xd7).rw(FUNC(i82371eb_acpi_device::unmap_log_r), FUNC(i82371eb_acpi_device::unmap_log_w));
 	// I/O space
-	map(0x40, 0x43).lrw32(
-		NAME([this] () { return address_base_r(0); }), 
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { address_base_w(0, data); })
-	);
+	map(0x40, 0x43).rw(FUNC(i82371eb_acpi_device::pmba_r), FUNC(i82371eb_acpi_device::pmba_w));
+	map(0x80, 0x80).rw(FUNC(i82371eb_acpi_device::pmregmisc_r), FUNC(i82371eb_acpi_device::pmregmisc_w));
 	// SMBus space
-	map(0x90, 0x93).lrw32(
-		NAME([this] () { return address_base_r(1); }), 
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { address_base_w(1, data); })
-	);
+	map(0x90, 0x93).rw(FUNC(i82371eb_acpi_device::smbba_r), FUNC(i82371eb_acpi_device::smbba_w));
+	map(0xd2, 0xd2).rw(FUNC(i82371eb_acpi_device::smbhstcfg_r), FUNC(i82371eb_acpi_device::smbhstcfg_w));
 }
 
 void i82371eb_acpi_device::io_map(address_map &map)
 {
-
 }
 
 // TODO: convert to lpc-smbus
@@ -73,16 +69,34 @@ void i82371eb_acpi_device::smbus_map(address_map &map)
 void i82371eb_acpi_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-//	io_space->install_device(0, 0x03ff, *this, &i82371eb_acpi_device::io_map);
+//	printf("%08llx %08llx %08llx %04llx %04llx %04llx\n", memory_window_start, memory_window_end, memory_offset ,io_window_start, io_window_end, io_offset);
+	if (io_offset != 0)
+		throw emu_fatalerror("I82371EB_ACPI io_offset != 0 (%04llx)", io_offset);
+
+	//LOGMAP("PMIOSE %s\n", m_pmiose ? "Enable" : "Disable");
+
+	if (m_pmiose)
+	{
+		LOGMAP("- PMBA %04x-%04x\n", m_pmba, m_pmba + 0x3f);
+		// TODO: subset, should map up to 0x3f only (and current lpc-acpi don't)
+		m_acpi->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, m_pmba + 0x3f, m_pmba, io_space);
+	}
+
+	const bool iose = bool(BIT(command, 0));
+
+	//LOGMAP("IOSE (SMBus) %s\n", m_pmiose ? "Enable" : "Disable");
+
+	// presume if SMB_HST_EN is zero will also remove SMBUS mapping
+	if (iose && BIT(m_smbus_host_config, 0))
+	{
+		LOGMAP("- SMBBA %04x-%04x\n", m_smbba, m_smbba + 0xf);
+		io_space->install_device(m_smbba, m_smbba + 0xf, *this, &i82371eb_acpi_device::smbus_map);
+	}
 }
 
 void i82371eb_acpi_device::device_start()
 {
 	pci_device::device_start();
-
-	// TODO: verify size of these
-	add_map(512, M_IO, FUNC(i82371eb_acpi_device::io_map));
-	add_map(2048, M_IO, FUNC(i82371eb_acpi_device::smbus_map));
 
 #if 0
 	memory_window_start = 0;
@@ -101,6 +115,57 @@ void i82371eb_acpi_device::device_reset()
 	
 	command = 0x0000;
 	status = 0x0280;
+	m_pmiose = false;
+	m_pmba = 0;
+	m_smbba = 0;
+}
+
+u8 i82371eb_acpi_device::pmregmisc_r()
+{
+	return m_pmiose;
+}
+
+void i82371eb_acpi_device::pmregmisc_w(u8 data)
+{
+	m_pmiose = bool(BIT(data, 0));
+	remap_cb();
+}
+
+u32 i82371eb_acpi_device::pmba_r()
+{
+	// RTE bit 0 high (I/O space)
+	return m_pmba | 1;
+}
+
+void i82371eb_acpi_device::pmba_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_pmba);
+	m_pmba &= 0xffc0;
+	remap_cb();
+}
+
+u32 i82371eb_acpi_device::smbba_r()
+{
+	// RTE bit 0 high (I/O space)
+	return m_smbba | 1;
+}
+
+void i82371eb_acpi_device::smbba_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_smbba);
+	m_smbba &= 0xfff0;
+	remap_cb();
+}
+
+u8 i82371eb_acpi_device::smbhstcfg_r()
+{
+	return m_smbus_host_config;
+}
+
+void i82371eb_acpi_device::smbhstcfg_w(u8 data)
+{
+	m_smbus_host_config = data;
+	remap_cb();
 }
 
 /*

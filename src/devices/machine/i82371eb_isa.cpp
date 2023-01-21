@@ -25,7 +25,7 @@
 #define LOGMAP(...)    LOGMASKED(LOG_MAP,  __VA_ARGS__)
 #define LOGTODO(...)   LOGMASKED(LOG_TODO, __VA_ARGS__)
 
-DEFINE_DEVICE_TYPE(I82371EB_ISA, i82371eb_isa_device, "i82371eb_acpi", "Intel 82371EB PIIX4E PCI to ISA southbridge")
+DEFINE_DEVICE_TYPE(I82371EB_ISA, i82371eb_isa_device, "i82371eb_acpi", "Intel 82371EB PIIX4E PCI to ISA/EIO southbridge")
 
 i82371eb_isa_device::i82371eb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i82371sb_isa_device(mconfig, I82371EB_ISA, tag, owner, clock)
@@ -37,4 +37,12 @@ i82371eb_isa_device::i82371eb_isa_device(const machine_config &mconfig, const ch
 	// rev 0x01 PIIX4 B-0
 	// rev 0x02 for PIIX4E A-0 / PIIX4M A-0
 	set_ids(0x80867110, 0x02, 0x060100, 0x00);
+}
+
+void i82371eb_isa_device::config_map(address_map &map)
+{
+	i82371sb_isa_device::config_map(map);
+//	map(0x90, 0x91) PDMACFG
+//	map(0xb0, 0xb0) GENCFG
+
 }

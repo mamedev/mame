@@ -7,6 +7,7 @@
 #pragma once
 
 #include "pci.h"
+#include "lpc-acpi.h"
 
 class i82371eb_acpi_device : public pci_device 
 {
@@ -29,6 +30,25 @@ protected:
 	void smbus_map(address_map &map);
 
 private:
+	required_device<lpc_acpi_device> m_acpi;
+
+	u8 pmregmisc_r();
+	void pmregmisc_w(u8 data);
+
+	u8 smbhstcfg_r();
+	void smbhstcfg_w(u8 data);
+
+	u32 pmba_r();
+	void pmba_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+
+	u32 smbba_r();
+	void smbba_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+
+	bool m_pmiose = false;
+	u32 m_pmba = 0;
+	u32 m_smbba = 0;
+	u8 m_smbus_host_config = 0;
+
 	u8 unmap_log_r(offs_t offset);
 	void unmap_log_w(offs_t offset, u8 data);
 };
