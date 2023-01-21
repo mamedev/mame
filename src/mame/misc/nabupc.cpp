@@ -181,7 +181,7 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_kbduart(*this, "kbduart")
 		, m_hccauart(*this, "hccauart")
-		, m_ram(*this, RAM_TAG)
+		, m_rom_view(*this, "rom")
 		, m_centronics(*this, "centronics")
 		, m_bus(*this, "bus")
 		, m_rom_base(*this, "bios")
@@ -227,7 +227,7 @@ private:
 	required_device<speaker_device> m_speaker;
 	required_device<i8251_device> m_kbduart;
 	required_device<ay31015_device> m_hccauart;
-	required_device<ram_device> m_ram;
+	memory_view m_rom_view;
 	required_device<centronics_device> m_centronics;
 	required_device<bus::nabupc::option_bus_device> m_bus;
 	required_region_ptr<uint8_t> m_rom_base;
@@ -289,9 +289,6 @@ void nabupc_state::nabupc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nabupc_state::memory_map);
 	m_maincpu->set_addrmap(AS_IO, &nabupc_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(nabupc_state::int_ack_cb));
-
-	// RAM
-	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -379,6 +376,7 @@ void nabupc_state::machine_start()
 	save_item(NAME(m_portb));
 	save_item(NAME(m_control));
 	save_item(NAME(m_bios_size));
+
 }
 
 // Machine Reset
@@ -391,6 +389,9 @@ void nabupc_state::machine_reset()
 	m_control = 0;
 	m_bios_size = m_bios_sel->read() == 1 ? 0x2000 : 0x1000;
 	m_leds[0] = 1; // Power LED
+
+	m_rom_view[0].install_rom(0x0000, m_bios_size - 1, m_rom_base);
+	m_rom_view.select(0);
 }
 
 
@@ -405,6 +406,11 @@ void nabupc_state::control_w(uint8_t data)
 	m_centronics->write_strobe(BIT(m_control, 2));
 	for (int i = 3 ; i < 6 ; ++i) {
 		m_leds[6 - i] = BIT(m_control, i);
+	}
+	if ((m_control & 1) == 0) {
+		m_rom_view.select(0);
+	} else {
+		m_rom_view.disable();
 	}
 }
 
@@ -480,7 +486,8 @@ void nabupc_state::update_irq()
 // RAM/ROM
 void nabupc_state::memory_map(address_map &map)
 {
-	map(0x0000, 0xffff).r(FUNC(nabupc_state::read_mem)).w(m_ram, FUNC(ram_device::write));
+	map(0x0000, 0xffff).ram();
+	map(0x0000, 0x2000).view(m_rom_view);
 }
 
 // IO Memory
@@ -501,15 +508,6 @@ void nabupc_state::io_map(address_map &map)
 	map(0xf0, 0xff).rw(m_bus, FUNC(bus::nabupc::option_bus_device::read<3>), FUNC(bus::nabupc::option_bus_device::write<3>));
 }
 
-uint8_t nabupc_state::read_mem(offs_t offset)
-{
-	if (offset < m_bios_size && (m_control & 1) == 0) {
-		return m_rom_base[offset];
-	}
-	return m_ram->read(offset);
-}
-
-
 //**************************************************************************
 //  BIOS ROMS
 //**************************************************************************
@@ -518,6 +516,7 @@ ROM_START( nabupc )
 	ROM_REGION( 0x2000, "bios", 0 )
 	ROM_SYSTEM_BIOS( 0, "reva", "4k BIOS" )
 	ROMX_LOAD( "nabupc-u53-90020060-reva-2732.bin", 0x0000, 0x1000, CRC(8110bde0) SHA1(57e5f34645df06d7cb6c202a6d35a442776af2cb), ROM_BIOS(0) )
+	ROM_RELOAD(0x1000, 0x1000)
 	ROM_SYSTEM_BIOS( 1, "revb", "8k BIOS - Floppy support" )
 	ROMX_LOAD( "nabupc-u53-90020060-revb-2764.bin", 0x0000, 0x2000, CRC(3088f21b) SHA1(bf2f1eb5d9f5a8e9d022ce0056f2a5a8526b830e), ROM_BIOS(1) )
 ROM_END
