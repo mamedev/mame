@@ -44,21 +44,12 @@ enum
 
 
 
-#define COMMON32_GET_u6 \
-	int u = (op & 0x00000fc0) >> 6;
-#define COMMON32_GET_areg \
-	int areg = (op & 0x0000003f) >> 0;
-#define COMMON32_GET_areg_reserved \
-	int ares = (op & 0x0000003f) >> 0;
 
 #define COMMON32_GET_p \
 	int p = (op & 0x00c00000) >> 22;
 
-#define COMMON32_GET_s12 \
-		int S_temp = (op & 0x0000003f) >> 0; \
-		int s_temp = (op & 0x00000fc0) >> 6; \
-		int32_t S = s_temp | (S_temp<<6); \
-		if (S & 0x800) S = -0x800 + (S&0x7ff); /* sign extend */
+
+
 #define COMMON32_GET_CONDITION \
 		uint8_t condition = op & 0x0000001f;
 
@@ -153,6 +144,31 @@ private:
 	}
 
 	uint8_t common32_get_creg(uint32_t op)
+	{
+		return (op & 0x00000fc0) >> 6;
+	}
+
+	uint8_t common32_get_areg(uint32_t op)
+	{
+		return (op & 0x0000003f) >> 0;
+	}
+
+	uint8_t common32_get_areg_reserved(uint32_t op)
+	{
+		return (op & 0x0000003f) >> 0;
+	}
+
+	int32_t common32_get_s12(uint32_t op)
+	{
+		int S_temp = (op & 0x0000003f) >> 0; \
+		int s_temp = (op & 0x00000fc0) >> 6; \
+		int32_t S = s_temp | (S_temp<<6); \
+		if (S & 0x800) S = -0x800 + (S&0x7ff); /* sign extend */
+
+		return S;
+	}
+
+	uint32_t common32_get_u6(uint32_t op)
 	{
 		return (op & 0x00000fc0) >> 6;
 	}

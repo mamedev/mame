@@ -75,7 +75,7 @@ uint32_t arcompact_device::handleop32_LSR_single_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	 //COMMON32_GET_areg; // areg bits already used as opcode select
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as opcode select
 
 	uint32_t c;
 
@@ -106,8 +106,8 @@ uint32_t arcompact_device::handleop32_LSR_single_p01(uint32_t op)
 
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as opcode select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as opcode select
 
 	uint32_t c;
 
@@ -164,7 +164,7 @@ uint32_t arcompact_device::handleop32_ROR_single_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	 //COMMON32_GET_areg; // areg bits already used as opcode select
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as opcode select
 
 	uint32_t c;
 
@@ -195,8 +195,8 @@ uint32_t arcompact_device::handleop32_ROR_single_p01(uint32_t op)
 
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as opcode select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as opcode select
 
 	uint32_t c;
 
@@ -274,7 +274,7 @@ uint32_t arcompact_device::handleop32_EXTW_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	 //COMMON32_GET_areg; // areg bits already used as opcode select
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as opcode select
 
 	uint32_t c;
 
@@ -300,8 +300,8 @@ uint32_t arcompact_device::handleop32_EXTW_p01(uint32_t op)
 
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as opcode select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as opcode select
 
 	uint32_t c;
 
@@ -377,7 +377,7 @@ uint32_t arcompact_device::handleop32_EXTB_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	 //COMMON32_GET_areg; // areg bits already used as opcode select
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as opcode select
 
 	uint32_t c;
 
@@ -403,8 +403,8 @@ uint32_t arcompact_device::handleop32_EXTB_p01(uint32_t op)
 
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as opcode select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as opcode select
 
 	uint32_t c;
 

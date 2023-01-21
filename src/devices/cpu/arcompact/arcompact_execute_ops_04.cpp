@@ -70,15 +70,10 @@ uint32_t arcompact_device::handleop32_ADD_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	COMMON32_GET_areg;
-
-	uint32_t c;
-	uint32_t b;
-
+	uint8_t areg = common32_get_areg(op);
 	int size = check_b_c_limm(breg, creg);
-
-	b = m_regs[breg];
-	c = m_regs[creg];
+	uint32_t b = m_regs[breg];
+	uint32_t c = m_regs[creg];
 
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
@@ -95,17 +90,14 @@ uint32_t arcompact_device::handleop32_ADD_p01(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	COMMON32_GET_areg;
-
-	uint32_t c;
-	uint32_t b;
+	uint32_t u = common32_get_u6(op);
+	uint8_t areg = common32_get_areg(op);
 
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b + c;
@@ -121,7 +113,7 @@ uint32_t arcompact_device::handleop32_ADD_p10(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_s12;
+	int32_t S = common32_get_s12(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -155,8 +147,8 @@ uint32_t arcompact_device::handleop32_ADD_p11_m1(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as condition code select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
 	uint32_t c;
 	uint32_t b;
@@ -239,7 +231,7 @@ uint32_t arcompact_device::handleop32_SUB_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	COMMON32_GET_areg;
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -266,8 +258,8 @@ uint32_t arcompact_device::handleop32_SUB_p01(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	COMMON32_GET_areg;
+	uint32_t u = common32_get_u6(op);
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -293,7 +285,7 @@ uint32_t arcompact_device::handleop32_SUB_p10(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_s12;
+	int32_t S = common32_get_s12(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -328,8 +320,8 @@ uint32_t arcompact_device::handleop32_SUB_p11_m1(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as condition code select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
 	uint32_t c;
 	uint32_t b;
@@ -361,7 +353,7 @@ uint32_t arcompact_device::handleop32_AND_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	COMMON32_GET_areg;
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -391,8 +383,8 @@ uint32_t arcompact_device::handleop32_AND_p01(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	COMMON32_GET_areg;
+	uint32_t u = common32_get_u6(op);
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -418,7 +410,7 @@ uint32_t arcompact_device::handleop32_AND_p10(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_s12;
+	int32_t S = common32_get_s12(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -452,8 +444,8 @@ uint32_t arcompact_device::handleop32_AND_p11_m1(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as condition code select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
 	uint32_t c;
 	uint32_t b;
@@ -484,7 +476,7 @@ uint32_t arcompact_device::handleop32_OR_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	COMMON32_GET_areg;
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -511,8 +503,8 @@ uint32_t arcompact_device::handleop32_OR_p01(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	COMMON32_GET_areg;
+	uint32_t u = common32_get_u6(op);
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -539,7 +531,7 @@ uint32_t arcompact_device::handleop32_OR_p10(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_s12;
+	int32_t S = common32_get_s12(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -574,8 +566,8 @@ uint32_t arcompact_device::handleop32_OR_p11_m1(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as condition code select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
 	uint32_t c;
 	uint32_t b;
@@ -607,7 +599,7 @@ uint32_t arcompact_device::handleop32_BIC_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	COMMON32_GET_areg;
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -634,8 +626,8 @@ uint32_t arcompact_device::handleop32_BIC_p01(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	COMMON32_GET_areg;
+	uint32_t u = common32_get_u6(op);
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -662,7 +654,7 @@ uint32_t arcompact_device::handleop32_BIC_p10(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_s12;
+	int32_t S = common32_get_s12(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -697,8 +689,8 @@ uint32_t arcompact_device::handleop32_BIC_p11_m1(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as condition code select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
 	uint32_t c;
 	uint32_t b;
@@ -730,7 +722,7 @@ uint32_t arcompact_device::handleop32_XOR_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	COMMON32_GET_areg;
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -757,8 +749,8 @@ uint32_t arcompact_device::handleop32_XOR_p01(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	COMMON32_GET_areg;
+	uint32_t u = common32_get_u6(op);
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -785,7 +777,7 @@ uint32_t arcompact_device::handleop32_XOR_p10(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_s12;
+	int32_t S = common32_get_s12(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -820,8 +812,8 @@ uint32_t arcompact_device::handleop32_XOR_p11_m1(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as condition code select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
 	uint32_t c;
 	uint32_t b;
@@ -855,7 +847,7 @@ uint32_t arcompact_device::handleop32_MOV_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	 //COMMON32_GET_areg; // areg is reserved / not used
+	 //uint8_t areg = common32_get_areg(op); // areg is reserved / not used
 
 	uint32_t c;
 
@@ -884,8 +876,8 @@ uint32_t arcompact_device::handleop32_MOV_p01(uint32_t op)
 
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg is reserved / not used
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg is reserved / not used
 
 	uint32_t c;
 
@@ -908,7 +900,7 @@ uint32_t arcompact_device::handleop32_MOV_p10(uint32_t op)
 
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_s12;
+	int32_t S = common32_get_s12(op);
 
 	uint32_t c;
 
@@ -939,8 +931,8 @@ uint32_t arcompact_device::handleop32_MOV_p11_m1(uint32_t op)
 
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as condition code select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
 	uint32_t c;
 
@@ -966,7 +958,7 @@ uint32_t arcompact_device::handleop32_RSUB_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	COMMON32_GET_areg;
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -993,8 +985,8 @@ uint32_t arcompact_device::handleop32_RSUB_p01(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	COMMON32_GET_areg;
+	uint32_t u = common32_get_u6(op);
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -1021,7 +1013,7 @@ uint32_t arcompact_device::handleop32_RSUB_p10(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_s12;
+	int32_t S = common32_get_s12(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -1056,8 +1048,8 @@ uint32_t arcompact_device::handleop32_RSUB_p11_m1(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as condition code select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
 	uint32_t c;
 	uint32_t b;
@@ -1089,7 +1081,7 @@ uint32_t arcompact_device::handleop32_BSET_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	COMMON32_GET_areg;
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -1116,8 +1108,8 @@ uint32_t arcompact_device::handleop32_BSET_p01(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	COMMON32_GET_areg;
+	uint32_t u = common32_get_u6(op);
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -1144,7 +1136,7 @@ uint32_t arcompact_device::handleop32_BSET_p10(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_s12;
+	int32_t S = common32_get_s12(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -1179,8 +1171,8 @@ uint32_t arcompact_device::handleop32_BSET_p11_m1(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as condition code select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
 	uint32_t c;
 	uint32_t b;
@@ -1212,7 +1204,7 @@ uint32_t arcompact_device::handleop32_BMSK_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	COMMON32_GET_areg;
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -1239,8 +1231,8 @@ uint32_t arcompact_device::handleop32_BMSK_p01(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	COMMON32_GET_areg;
+	uint32_t u = common32_get_u6(op);
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -1267,7 +1259,7 @@ uint32_t arcompact_device::handleop32_BMSK_p10(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_s12;
+	int32_t S = common32_get_s12(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -1302,8 +1294,8 @@ uint32_t arcompact_device::handleop32_BMSK_p11_m1(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as condition code select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
 	uint32_t c;
 	uint32_t b;
@@ -1727,7 +1719,7 @@ uint32_t arcompact_device::handleop32_ADD1_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	COMMON32_GET_areg;
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -1754,8 +1746,8 @@ uint32_t arcompact_device::handleop32_ADD1_p01(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	COMMON32_GET_areg;
+	uint32_t u = common32_get_u6(op);
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -1782,7 +1774,7 @@ uint32_t arcompact_device::handleop32_ADD1_p10(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_s12;
+	int32_t S = common32_get_s12(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -1817,8 +1809,8 @@ uint32_t arcompact_device::handleop32_ADD1_p11_m1(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as condition code select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
 	uint32_t c;
 	uint32_t b;
@@ -1850,7 +1842,7 @@ uint32_t arcompact_device::handleop32_ADD2_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	COMMON32_GET_areg;
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -1877,8 +1869,8 @@ uint32_t arcompact_device::handleop32_ADD2_p01(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	COMMON32_GET_areg;
+	uint32_t u = common32_get_u6(op);
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -1905,7 +1897,7 @@ uint32_t arcompact_device::handleop32_ADD2_p10(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_s12;
+	int32_t S = common32_get_s12(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -1940,8 +1932,8 @@ uint32_t arcompact_device::handleop32_ADD2_p11_m1(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as condition code select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
 	uint32_t c;
 	uint32_t b;
@@ -1973,7 +1965,7 @@ uint32_t arcompact_device::handleop32_ADD3_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	COMMON32_GET_areg;
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -2000,8 +1992,8 @@ uint32_t arcompact_device::handleop32_ADD3_p01(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	COMMON32_GET_areg;
+	uint32_t u = common32_get_u6(op);
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -2028,7 +2020,7 @@ uint32_t arcompact_device::handleop32_ADD3_p10(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_s12;
+	int32_t S = common32_get_s12(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -2063,8 +2055,8 @@ uint32_t arcompact_device::handleop32_ADD3_p11_m1(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as condition code select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
 	uint32_t c;
 	uint32_t b;
@@ -2096,7 +2088,7 @@ uint32_t arcompact_device::handleop32_SUB1_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	COMMON32_GET_areg;
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -2123,8 +2115,8 @@ uint32_t arcompact_device::handleop32_SUB1_p01(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	COMMON32_GET_areg;
+	uint32_t u = common32_get_u6(op);
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -2151,7 +2143,7 @@ uint32_t arcompact_device::handleop32_SUB1_p10(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_s12;
+	int32_t S = common32_get_s12(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -2186,8 +2178,8 @@ uint32_t arcompact_device::handleop32_SUB1_p11_m1(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as condition code select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
 	uint32_t c;
 	uint32_t b;
@@ -2219,7 +2211,7 @@ uint32_t arcompact_device::handleop32_SUB2_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	COMMON32_GET_areg;
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -2246,8 +2238,8 @@ uint32_t arcompact_device::handleop32_SUB2_p01(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	COMMON32_GET_areg;
+	uint32_t u = common32_get_u6(op);
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -2274,7 +2266,7 @@ uint32_t arcompact_device::handleop32_SUB2_p10(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_s12;
+	int32_t S = common32_get_s12(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -2309,8 +2301,8 @@ uint32_t arcompact_device::handleop32_SUB2_p11_m1(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as condition code select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
 	uint32_t c;
 	uint32_t b;
@@ -2342,7 +2334,7 @@ uint32_t arcompact_device::handleop32_SUB3_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	COMMON32_GET_areg;
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -2369,8 +2361,8 @@ uint32_t arcompact_device::handleop32_SUB3_p01(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	COMMON32_GET_areg;
+	uint32_t u = common32_get_u6(op);
+	uint8_t areg = common32_get_areg(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -2397,7 +2389,7 @@ uint32_t arcompact_device::handleop32_SUB3_p10(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_s12;
+	int32_t S = common32_get_s12(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -2432,8 +2424,8 @@ uint32_t arcompact_device::handleop32_SUB3_p11_m1(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as condition code select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
 	uint32_t c;
 	uint32_t b;
@@ -2552,7 +2544,7 @@ uint32_t arcompact_device::handleop32_LR_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	 //COMMON32_GET_areg; // areg is reserved / not used
+	 //uint8_t areg = common32_get_areg(op); // areg is reserved / not used
 
 	uint32_t c;
 
@@ -2582,8 +2574,8 @@ uint32_t arcompact_device::handleop32_LR_p01(uint32_t op)
 
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg is reserved / not used
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg is reserved / not used
 
 	uint32_t c;
 
@@ -2607,7 +2599,7 @@ uint32_t arcompact_device::handleop32_LR_p10(uint32_t op)
 
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_s12;
+	int32_t S = common32_get_s12(op);
 
 	uint32_t c;
 
@@ -2639,8 +2631,8 @@ uint32_t arcompact_device::handleop32_LR_p11_m1(uint32_t op)
 
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as condition code select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
 	uint32_t c;
 
@@ -2695,7 +2687,7 @@ uint32_t arcompact_device::handleop32_SR_p00(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	 //COMMON32_GET_areg; // areg is reserved / not used
+	 //uint8_t areg = common32_get_areg(op); // areg is reserved / not used
 
 	uint32_t c;
 	uint32_t b;
@@ -2722,8 +2714,8 @@ uint32_t arcompact_device::handleop32_SR_p01(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg is reserved / not used
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg is reserved / not used
 
 	uint32_t c;
 	uint32_t b;
@@ -2750,7 +2742,7 @@ uint32_t arcompact_device::handleop32_SR_p10(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_s12;
+	int32_t S = common32_get_s12(op);
 
 	uint32_t c;
 	uint32_t b;
@@ -2785,8 +2777,8 @@ uint32_t arcompact_device::handleop32_SR_p11_m1(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	COMMON32_GET_u6;
-	 //COMMON32_GET_areg; // areg bits already used as condition code select
+	uint32_t u = common32_get_u6(op);
+	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
 	uint32_t c;
 	uint32_t b;
@@ -3185,14 +3177,14 @@ uint32_t arcompact_device::handleop32_LP(uint32_t op) // LPcc (loop setup)
 	}
 	else if (p == 0x02) // Loop unconditional
 	{ // 0010 0RRR 1010 1000 0RRR ssss ssSS SSSS
-		COMMON32_GET_s12
+		int32_t S = common32_get_s12(op);
 		if (S & 0x800) S = -0x800 + (S&0x7ff);
 
 		arcompact_fatal("Lp unconditional not supported %d", S);
 	}
 	else if (p == 0x03) // Loop conditional
 	{ // 0010 0RRR 1110 1000 0RRR uuuu uu1Q QQQQ
-		COMMON32_GET_u6
+		uint32_t u = common32_get_u6(op);
 		COMMON32_GET_CONDITION
 		//arcompact_fatal("Lp conditional %s not supported %d", arcompact_disassembler::conditions[condition], u);
 

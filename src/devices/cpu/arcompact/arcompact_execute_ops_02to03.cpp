@@ -13,7 +13,7 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 	if (S) s = -0x100 + s;
 
 	uint8_t breg = common32_get_breg(op);
-	COMMON32_GET_areg
+	uint8_t areg = common32_get_areg(op);
 
 	int X = (op & 0x00000040) >> 6;  //op &= ~0x00000040;
 	int Z = (op & 0x00000180) >> 7;  //op &= ~0x00000180;

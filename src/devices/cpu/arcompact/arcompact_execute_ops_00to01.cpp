@@ -260,7 +260,7 @@ uint32_t arcompact_device::arcompact_01_01_01_helper(uint32_t op, const char* op
 
 #define BR_REGIMM_SETUP \
 	GET_01_01_01_BRANCH_ADDR \
-	COMMON32_GET_u6; \
+	uint32_t u = common32_get_u6(op); \
 	uint8_t breg = common32_get_breg(op); \
 	int n = (op & 0x00000020) >> 5; \
 	uint32_t b,c; \
