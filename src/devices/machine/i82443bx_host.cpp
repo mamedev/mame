@@ -130,7 +130,6 @@ void i82443bx_bridge_device::bridge_control_w(offs_t offset, uint16_t data, uint
 {
 	pci_bridge_device::bridge_control_w(offset, data, mem_mask);
 	LOGMAP("- %s VGA control\n", bridge_control & 8 ? "Enable" : "Disable");
-	printf("%02x\n", data);
 	remap_cb();
 }
 

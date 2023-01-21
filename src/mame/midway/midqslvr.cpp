@@ -9,6 +9,7 @@ TODO (BIOS):
 - Writes to VGA ports but never ever draw anything, probably needs VGA control to be enabled
   from AGP. Neither Virge PCI nor Voodoo should claim VGA ports, they are both disabled in
   command ...
+- Accesses missing keyboard and RTC areas, understand how they maps (ACPI?)
 
 TODO:
 - Fix HDD BAD_DUMPs ("primary master hard disk fail" in shutms11):

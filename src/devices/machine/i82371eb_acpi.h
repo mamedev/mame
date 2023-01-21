@@ -41,6 +41,9 @@ private:
 	u32 pmba_r();
 	void pmba_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
+	u32 devresa_r();
+	void devresa_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+
 	u32 smbba_r();
 	void smbba_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
@@ -48,6 +51,7 @@ private:
 	u32 m_pmba = 0;
 	u32 m_smbba = 0;
 	u8 m_smbus_host_config = 0;
+	u32 m_devresa = 0;
 
 	u8 unmap_log_r(offs_t offset);
 	void unmap_log_w(offs_t offset, u8 data);
