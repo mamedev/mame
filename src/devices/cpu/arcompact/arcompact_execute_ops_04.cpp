@@ -115,14 +115,11 @@ uint32_t arcompact_device::handleop32_ADD_p10(uint32_t op)
 	uint8_t F = common32_get_F(op);
 	int32_t S = common32_get_s12(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = (uint32_t)S;
+	uint32_t b = m_regs[breg];
+	uint32_t c = (uint32_t)S;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b + c;
@@ -150,17 +147,14 @@ uint32_t arcompact_device::handleop32_ADD_p11_m1(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
-	COMMON32_GET_CONDITION;
+	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
 		return m_pc + (size>>0);
 
@@ -233,13 +227,10 @@ uint32_t arcompact_device::handleop32_SUB_p00(uint32_t op)
 	uint8_t creg = common32_get_creg(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	int size = check_b_c_limm(breg, creg);
 
-	b = m_regs[breg];
-	c = m_regs[creg];
+	uint32_t b = m_regs[breg];
+	uint32_t c = m_regs[creg];
 
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
@@ -261,13 +252,10 @@ uint32_t arcompact_device::handleop32_SUB_p01(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b - c;
@@ -287,14 +275,11 @@ uint32_t arcompact_device::handleop32_SUB_p10(uint32_t op)
 	uint8_t F = common32_get_F(op);
 	int32_t S = common32_get_s12(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* breg is also the destination, so this might not fetch LIMM */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = (uint32_t)S;
+	uint32_t b = m_regs[breg];
+	uint32_t c = (uint32_t)S;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b - c;
@@ -323,17 +308,14 @@ uint32_t arcompact_device::handleop32_SUB_p11_m1(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
-	COMMON32_GET_CONDITION;
+	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
 		return m_pc + (size>>0);
 
@@ -355,13 +337,10 @@ uint32_t arcompact_device::handleop32_AND_p00(uint32_t op)
 	uint8_t creg = common32_get_creg(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	int size = check_b_c_limm(breg, creg);
 
-	b = m_regs[breg];
-	c = m_regs[creg];
+	uint32_t b = m_regs[breg];
+	uint32_t c = m_regs[creg];
 	
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
@@ -386,14 +365,11 @@ uint32_t arcompact_device::handleop32_AND_p01(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b & c;
@@ -412,14 +388,11 @@ uint32_t arcompact_device::handleop32_AND_p10(uint32_t op)
 	uint8_t F = common32_get_F(op);
 	int32_t S = common32_get_s12(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = (uint32_t)S;
+	uint32_t b = m_regs[breg];
+	uint32_t c = (uint32_t)S;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b & c;
@@ -447,17 +420,14 @@ uint32_t arcompact_device::handleop32_AND_p11_m1(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
-	COMMON32_GET_CONDITION;
+	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
 		return m_pc + (size>>0);
 
@@ -478,13 +448,10 @@ uint32_t arcompact_device::handleop32_OR_p00(uint32_t op)
 	uint8_t creg = common32_get_creg(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	int size = check_b_c_limm(breg, creg);
 
-	b = m_regs[breg];
-	c = m_regs[creg];
+	uint32_t b = m_regs[breg];
+	uint32_t c = m_regs[creg];
 
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
@@ -506,14 +473,11 @@ uint32_t arcompact_device::handleop32_OR_p01(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b | c;
@@ -533,14 +497,11 @@ uint32_t arcompact_device::handleop32_OR_p10(uint32_t op)
 	uint8_t F = common32_get_F(op);
 	int32_t S = common32_get_s12(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = (uint32_t)S;
+	uint32_t b = m_regs[breg];
+	uint32_t c = (uint32_t)S;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b | c;
@@ -569,17 +530,14 @@ uint32_t arcompact_device::handleop32_OR_p11_m1(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
-	COMMON32_GET_CONDITION;
+	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
 		return m_pc + (size>>0);
 
@@ -601,13 +559,10 @@ uint32_t arcompact_device::handleop32_BIC_p00(uint32_t op)
 	uint8_t creg = common32_get_creg(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	int size = check_b_c_limm(breg, creg);
 
-	b = m_regs[breg];
-	c = m_regs[creg];
+	uint32_t b = m_regs[breg];
+	uint32_t c = m_regs[creg];
 
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
@@ -629,14 +584,11 @@ uint32_t arcompact_device::handleop32_BIC_p01(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b & (~c);
@@ -656,14 +608,11 @@ uint32_t arcompact_device::handleop32_BIC_p10(uint32_t op)
 	uint8_t F = common32_get_F(op);
 	int32_t S = common32_get_s12(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = (uint32_t)S;
+	uint32_t b = m_regs[breg];
+	uint32_t c = (uint32_t)S;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b & (~c);
@@ -692,17 +641,14 @@ uint32_t arcompact_device::handleop32_BIC_p11_m1(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
-	COMMON32_GET_CONDITION;
+	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
 		return m_pc + (size>>0);
 
@@ -724,13 +670,10 @@ uint32_t arcompact_device::handleop32_XOR_p00(uint32_t op)
 	uint8_t creg = common32_get_creg(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	int size = check_b_c_limm(breg, creg);
 
-	b = m_regs[breg];
-	c = m_regs[creg];
+	uint32_t b = m_regs[breg];
+	uint32_t c = m_regs[creg];
 
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
@@ -752,14 +695,11 @@ uint32_t arcompact_device::handleop32_XOR_p01(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b ^ c;
@@ -779,14 +719,11 @@ uint32_t arcompact_device::handleop32_XOR_p10(uint32_t op)
 	uint8_t F = common32_get_F(op);
 	int32_t S = common32_get_s12(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = (uint32_t)S;
+	uint32_t b = m_regs[breg];
+	uint32_t c = (uint32_t)S;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b ^ c;
@@ -815,17 +752,14 @@ uint32_t arcompact_device::handleop32_XOR_p11_m1(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
-	COMMON32_GET_CONDITION;
+	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
 		return m_pc + (size>>0);
 
@@ -849,15 +783,13 @@ uint32_t arcompact_device::handleop32_MOV_p00(uint32_t op)
 	uint8_t creg = common32_get_creg(op);
 	 //uint8_t areg = common32_get_areg(op); // areg is reserved / not used
 
-	uint32_t c;
-
 	if (creg == LIMM_REG)
 	{
 		GET_LIMM_32;
 		size = 8;
 	}
 
-	c = m_regs[creg];
+	uint32_t c = m_regs[creg];
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = c;
@@ -879,9 +811,7 @@ uint32_t arcompact_device::handleop32_MOV_p01(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg is reserved / not used
 
-	uint32_t c;
-
-	c = u;
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = c;
@@ -902,9 +832,7 @@ uint32_t arcompact_device::handleop32_MOV_p10(uint32_t op)
 	uint8_t F = common32_get_F(op);
 	int32_t S = common32_get_s12(op);
 
-	uint32_t c;
-
-	c = (uint32_t)S;
+	uint32_t c = (uint32_t)S;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = c;
@@ -934,12 +862,10 @@ uint32_t arcompact_device::handleop32_MOV_p11_m1(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
-	uint32_t c;
-
-	c = u;
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
-	COMMON32_GET_CONDITION;
+	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
 		return m_pc + (size>>0);
 
@@ -960,13 +886,10 @@ uint32_t arcompact_device::handleop32_RSUB_p00(uint32_t op)
 	uint8_t creg = common32_get_creg(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	int size = check_b_c_limm(breg, creg);
 
-	b = m_regs[breg];
-	c = m_regs[creg];
+	uint32_t b = m_regs[breg];
+	uint32_t c = m_regs[creg];
 
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
@@ -988,14 +911,11 @@ uint32_t arcompact_device::handleop32_RSUB_p01(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = c - b;
@@ -1015,14 +935,11 @@ uint32_t arcompact_device::handleop32_RSUB_p10(uint32_t op)
 	uint8_t F = common32_get_F(op);
 	int32_t S = common32_get_s12(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = (uint32_t)S;
+	uint32_t b = m_regs[breg];
+	uint32_t c = (uint32_t)S;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = c - b;
@@ -1051,17 +968,14 @@ uint32_t arcompact_device::handleop32_RSUB_p11_m1(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
-	COMMON32_GET_CONDITION;
+	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
 		return m_pc + (size>>0);
 
@@ -1083,13 +997,10 @@ uint32_t arcompact_device::handleop32_BSET_p00(uint32_t op)
 	uint8_t creg = common32_get_creg(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	int size = check_b_c_limm(breg, creg);
 
-	b = m_regs[breg];
-	c = m_regs[creg];
+	uint32_t b = m_regs[breg];
+	uint32_t c = m_regs[creg];
 
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
@@ -1111,14 +1022,11 @@ uint32_t arcompact_device::handleop32_BSET_p01(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b | (1 << (c & 0x1f));
@@ -1138,14 +1046,11 @@ uint32_t arcompact_device::handleop32_BSET_p10(uint32_t op)
 	uint8_t F = common32_get_F(op);
 	int32_t S = common32_get_s12(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = (uint32_t)S;
+	uint32_t b = m_regs[breg];
+	uint32_t c = (uint32_t)S;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b | (1 << (c & 0x1f));
@@ -1174,17 +1079,14 @@ uint32_t arcompact_device::handleop32_BSET_p11_m1(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
-	COMMON32_GET_CONDITION;
+	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
 		return m_pc + (size>>0);
 
@@ -1206,13 +1108,10 @@ uint32_t arcompact_device::handleop32_BMSK_p00(uint32_t op)
 	uint8_t creg = common32_get_creg(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	int size = check_b_c_limm(breg, creg);
 
-	b = m_regs[breg];
-	c = m_regs[creg];
+	uint32_t b = m_regs[breg];
+	uint32_t c = m_regs[creg];
 
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
@@ -1234,14 +1133,11 @@ uint32_t arcompact_device::handleop32_BMSK_p01(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b & ((1<<(c+1))-1);
@@ -1261,14 +1157,11 @@ uint32_t arcompact_device::handleop32_BMSK_p10(uint32_t op)
 	uint8_t F = common32_get_F(op);
 	int32_t S = common32_get_s12(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = (uint32_t)S;
+	uint32_t b = m_regs[breg];
+	uint32_t c = (uint32_t)S;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b & ((1<<(c+1))-1);
@@ -1297,17 +1190,14 @@ uint32_t arcompact_device::handleop32_BMSK_p11_m1(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
-	COMMON32_GET_CONDITION;
+	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
 		return m_pc + (size>>0);
 
@@ -1721,13 +1611,10 @@ uint32_t arcompact_device::handleop32_ADD1_p00(uint32_t op)
 	uint8_t creg = common32_get_creg(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	int size = check_b_c_limm(breg, creg);
 
-	b = m_regs[breg];
-	c = m_regs[creg];
+	uint32_t b = m_regs[breg];
+	uint32_t c = m_regs[creg];
 
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
@@ -1749,14 +1636,11 @@ uint32_t arcompact_device::handleop32_ADD1_p01(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b + (c << 1);
@@ -1776,14 +1660,11 @@ uint32_t arcompact_device::handleop32_ADD1_p10(uint32_t op)
 	uint8_t F = common32_get_F(op);
 	int32_t S = common32_get_s12(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = (uint32_t)S;
+	uint32_t b = m_regs[breg];
+	uint32_t c = (uint32_t)S;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b + (c << 1);
@@ -1812,17 +1693,14 @@ uint32_t arcompact_device::handleop32_ADD1_p11_m1(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
-	COMMON32_GET_CONDITION;
+	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
 		return m_pc + (size>>0);
 
@@ -1844,13 +1722,10 @@ uint32_t arcompact_device::handleop32_ADD2_p00(uint32_t op)
 	uint8_t creg = common32_get_creg(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	int size = check_b_c_limm(breg, creg);
 
-	b = m_regs[breg];
-	c = m_regs[creg];
+	uint32_t b = m_regs[breg];
+	uint32_t c = m_regs[creg];
 
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
@@ -1872,14 +1747,11 @@ uint32_t arcompact_device::handleop32_ADD2_p01(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b + (c << 2);
@@ -1899,14 +1771,11 @@ uint32_t arcompact_device::handleop32_ADD2_p10(uint32_t op)
 	uint8_t F = common32_get_F(op);
 	int32_t S = common32_get_s12(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = (uint32_t)S;
+	uint32_t b = m_regs[breg];
+	uint32_t c = (uint32_t)S;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b + (c << 2);
@@ -1935,17 +1804,14 @@ uint32_t arcompact_device::handleop32_ADD2_p11_m1(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
-	COMMON32_GET_CONDITION;
+	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
 		return m_pc + (size>>0);
 
@@ -1967,13 +1833,10 @@ uint32_t arcompact_device::handleop32_ADD3_p00(uint32_t op)
 	uint8_t creg = common32_get_creg(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	int size = check_b_c_limm(breg, creg);
 
-	b = m_regs[breg];
-	c = m_regs[creg];
+	uint32_t b = m_regs[breg];
+	uint32_t c = m_regs[creg];
 
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
@@ -1995,14 +1858,11 @@ uint32_t arcompact_device::handleop32_ADD3_p01(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b + (c << 3);
@@ -2022,14 +1882,11 @@ uint32_t arcompact_device::handleop32_ADD3_p10(uint32_t op)
 	uint8_t F = common32_get_F(op);
 	int32_t S = common32_get_s12(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = (uint32_t)S;
+	uint32_t b = m_regs[breg];
+	uint32_t c = (uint32_t)S;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b + (c << 3);
@@ -2058,17 +1915,14 @@ uint32_t arcompact_device::handleop32_ADD3_p11_m1(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
-	COMMON32_GET_CONDITION;
+	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
 		return m_pc + (size>>0);
 
@@ -2090,13 +1944,10 @@ uint32_t arcompact_device::handleop32_SUB1_p00(uint32_t op)
 	uint8_t creg = common32_get_creg(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	int size = check_b_c_limm(breg, creg);
 
-	b = m_regs[breg];
-	c = m_regs[creg];
+	uint32_t b = m_regs[breg];
+	uint32_t c = m_regs[creg];
 
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
@@ -2118,14 +1969,11 @@ uint32_t arcompact_device::handleop32_SUB1_p01(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b - (c << 1);
@@ -2145,14 +1993,11 @@ uint32_t arcompact_device::handleop32_SUB1_p10(uint32_t op)
 	uint8_t F = common32_get_F(op);
 	int32_t S = common32_get_s12(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = (uint32_t)S;
+	uint32_t b = m_regs[breg];
+	uint32_t c = (uint32_t)S;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b - (c << 1);
@@ -2181,17 +2026,14 @@ uint32_t arcompact_device::handleop32_SUB1_p11_m1(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
-	COMMON32_GET_CONDITION;
+	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
 		return m_pc + (size>>0);
 
@@ -2213,13 +2055,10 @@ uint32_t arcompact_device::handleop32_SUB2_p00(uint32_t op)
 	uint8_t creg = common32_get_creg(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	int size = check_b_c_limm(breg, creg);
 
-	b = m_regs[breg];
-	c = m_regs[creg];
+	uint32_t b = m_regs[breg];
+	uint32_t c = m_regs[creg];
 
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
@@ -2241,14 +2080,11 @@ uint32_t arcompact_device::handleop32_SUB2_p01(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b - (c << 2);
@@ -2268,14 +2104,11 @@ uint32_t arcompact_device::handleop32_SUB2_p10(uint32_t op)
 	uint8_t F = common32_get_F(op);
 	int32_t S = common32_get_s12(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = (uint32_t)S;
+	uint32_t b = m_regs[breg];
+	uint32_t c = (uint32_t)S;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b - (c << 2);
@@ -2304,17 +2137,14 @@ uint32_t arcompact_device::handleop32_SUB2_p11_m1(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
-	COMMON32_GET_CONDITION;
+	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
 		return m_pc + (size>>0);
 
@@ -2336,13 +2166,10 @@ uint32_t arcompact_device::handleop32_SUB3_p00(uint32_t op)
 	uint8_t creg = common32_get_creg(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	int size = check_b_c_limm(breg, creg);
 
-	b = m_regs[breg];
-	c = m_regs[creg];
+	uint32_t b = m_regs[breg];
+	uint32_t c = m_regs[creg];
 
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
@@ -2364,14 +2191,11 @@ uint32_t arcompact_device::handleop32_SUB3_p01(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b - (c << 3);
@@ -2391,14 +2215,11 @@ uint32_t arcompact_device::handleop32_SUB3_p10(uint32_t op)
 	uint8_t F = common32_get_F(op);
 	int32_t S = common32_get_s12(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = (uint32_t)S;
+	uint32_t b = m_regs[breg];
+	uint32_t c = (uint32_t)S;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b - (c << 3);
@@ -2427,17 +2248,14 @@ uint32_t arcompact_device::handleop32_SUB3_p11_m1(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
-	COMMON32_GET_CONDITION;
+	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
 		return m_pc + (size>>0);
 
@@ -2546,15 +2364,13 @@ uint32_t arcompact_device::handleop32_LR_p00(uint32_t op)
 	uint8_t creg = common32_get_creg(op);
 	 //uint8_t areg = common32_get_areg(op); // areg is reserved / not used
 
-	uint32_t c;
-
 	if (creg == LIMM_REG)
 	{
 		GET_LIMM_32;
 		size = 8;
 	}
 
-	c = m_regs[creg];
+	uint32_t c = m_regs[creg];
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	m_regs[breg] = READAUX(c);
@@ -2577,9 +2393,7 @@ uint32_t arcompact_device::handleop32_LR_p01(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg is reserved / not used
 
-	uint32_t c;
-
-	c = u;
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	m_regs[breg] = READAUX(c);
@@ -2601,9 +2415,7 @@ uint32_t arcompact_device::handleop32_LR_p10(uint32_t op)
 	uint8_t F = common32_get_F(op);
 	int32_t S = common32_get_s12(op);
 
-	uint32_t c;
-
-	c = (uint32_t)S;
+	uint32_t c = (uint32_t)S;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	m_regs[breg] = READAUX(c);
@@ -2634,12 +2446,10 @@ uint32_t arcompact_device::handleop32_LR_p11_m1(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
-	uint32_t c;
-
-	c = u;
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
-	COMMON32_GET_CONDITION;
+	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
 		return m_pc + (size>>0);
 
@@ -2689,13 +2499,10 @@ uint32_t arcompact_device::handleop32_SR_p00(uint32_t op)
 	uint8_t creg = common32_get_creg(op);
 	 //uint8_t areg = common32_get_areg(op); // areg is reserved / not used
 
-	uint32_t c;
-	uint32_t b;
-
 	int size = check_b_c_limm(breg, creg);
 
-	b = m_regs[breg];
-	c = m_regs[creg];
+	uint32_t b = m_regs[breg];
+	uint32_t c = m_regs[creg];
 
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
@@ -2717,14 +2524,11 @@ uint32_t arcompact_device::handleop32_SR_p01(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg is reserved / not used
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	WRITEAUX(c,b);
@@ -2744,14 +2548,11 @@ uint32_t arcompact_device::handleop32_SR_p10(uint32_t op)
 	uint8_t F = common32_get_F(op);
 	int32_t S = common32_get_s12(op);
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = (uint32_t)S;
+	uint32_t b = m_regs[breg];
+	uint32_t c = (uint32_t)S;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	WRITEAUX(c,b);
@@ -2780,17 +2581,14 @@ uint32_t arcompact_device::handleop32_SR_p11_m1(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	 //uint8_t areg = common32_get_areg(op); // areg bits already used as condition code select
 
-	uint32_t c;
-	uint32_t b;
-
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
 
-	b = m_regs[breg];
-	c = u;
+	uint32_t b = m_regs[breg];
+	uint32_t c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
-	COMMON32_GET_CONDITION;
+	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
 		return m_pc + (size>>0);
 
@@ -2977,7 +2775,7 @@ uint32_t arcompact_device::handleop32_Jcc_p11_m0(uint32_t op) // Jcc   (no link,
 	int size = 4;
 
 	uint8_t creg = common32_get_creg(op);
-	COMMON32_GET_CONDITION;
+	uint8_t condition = common32_get_condition(op);
 	uint8_t F = common32_get_F(op);
 
 	uint32_t c;
@@ -3090,7 +2888,7 @@ uint32_t arcompact_device::handleop32_Jcc_D_p11_m0(uint32_t op) // Jcc.D   (no l
 	int size = 4;
 
 	uint8_t creg = common32_get_creg(op);
-	COMMON32_GET_CONDITION;
+	uint8_t condition = common32_get_condition(op);
 	uint8_t F = common32_get_F(op);
 
 	//uint32_t c = 0;
@@ -3165,7 +2963,7 @@ uint32_t arcompact_device::handleop32_LP(uint32_t op) // LPcc (loop setup)
 {
 	int size = 4;
 //  uint8_t breg = common32_get_breg(op); // breg is reserved
-	COMMON32_GET_p;
+	int p = common32_get_p(op);
 
 	if (p == 0x00)
 	{
@@ -3185,7 +2983,7 @@ uint32_t arcompact_device::handleop32_LP(uint32_t op) // LPcc (loop setup)
 	else if (p == 0x03) // Loop conditional
 	{ // 0010 0RRR 1110 1000 0RRR uuuu uu1Q QQQQ
 		uint32_t u = common32_get_u6(op);
-		COMMON32_GET_CONDITION
+		uint8_t condition = common32_get_condition(op);
 		//arcompact_fatal("Lp conditional %s not supported %d", arcompact_disassembler::conditions[condition], u);
 
 		// if the loop condition fails then just jump to after the end of the loop, don't set any registers

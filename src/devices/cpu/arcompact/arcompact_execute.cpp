@@ -127,7 +127,7 @@ uint32_t arcompact_device::handle_jump_to_register(int delay, int link, uint32_t
 
 uint32_t arcompact_device::arcompact_handle04_helper(uint32_t op, const char* optext, int ignore_dst, int b_reserved)
 {
-	COMMON32_GET_p;
+	int p = common32_get_p(op);
 	uint8_t breg = common32_get_breg(op);
 	int size = 4;
 

@@ -65,7 +65,7 @@ uint32_t arcompact_device::arcompact_handle0e_0x_helper(uint16_t op, const char*
 	int h;// , breg;
 	int size;
 
-	GROUP_0e_GET_h;
+	h = group_0e_get_h(op);
 
 	if (h == LIMM_REG)
 	{
@@ -88,7 +88,7 @@ uint32_t arcompact_device::handleop_ADD_S_b_b_h_or_limm(uint16_t op) // ADD_s b,
 	int h,breg;
 	int size = 2;
 
-	GROUP_0e_GET_h;
+	h = group_0e_get_h(op);
 	COMMON16_GET_breg;
 	REG_16BIT_RANGE(breg);
 
@@ -109,7 +109,7 @@ uint32_t arcompact_device::handleop_MOV_S_b_h_or_limm(uint16_t op) // MOV_S b <-
 	int h,breg;
 	int size = 2;
 
-	GROUP_0e_GET_h;
+	h = group_0e_get_h(op);
 	COMMON16_GET_breg;
 	REG_16BIT_RANGE(breg);
 
@@ -143,7 +143,7 @@ uint32_t arcompact_device::handleop_MOV_S_hob(uint16_t op) // MOV_S h <- b
 	int h,breg;
 	int size = 2;
 
-	GROUP_0e_GET_h;
+	h = group_0e_get_h(op);
 	COMMON16_GET_breg;
 	REG_16BIT_RANGE(breg);
 

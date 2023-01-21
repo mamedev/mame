@@ -37,21 +37,15 @@ enum
 	address |= ((op & 0x00008000) >> 15) << 7; \
 	if (address & 0x80) address = -0x80 + (address & 0x7f);
 
-#define GROUP_0e_GET_h \
-	h =  ((op & 0x0007) << 3); \
-	h |= ((op & 0x00e0) >> 5);
 
 
 
 
 
-#define COMMON32_GET_p \
-	int p = (op & 0x00c00000) >> 22;
 
 
 
-#define COMMON32_GET_CONDITION \
-		uint8_t condition = op & 0x0000001f;
+
 
 
 #define COMMON16_GET_breg \
@@ -153,6 +147,11 @@ private:
 		return (op & 0x0000003f) >> 0;
 	}
 
+	uint8_t common32_get_p(uint32_t op)
+	{
+		return (op & 0x00c00000) >> 22;
+	}
+
 	uint8_t common32_get_areg_reserved(uint32_t op)
 	{
 		return (op & 0x0000003f) >> 0;
@@ -160,9 +159,9 @@ private:
 
 	int32_t common32_get_s12(uint32_t op)
 	{
-		int S_temp = (op & 0x0000003f) >> 0; \
-		int s_temp = (op & 0x00000fc0) >> 6; \
-		int32_t S = s_temp | (S_temp<<6); \
+		int S_temp = (op & 0x0000003f) >> 0;
+		int s_temp = (op & 0x00000fc0) >> 6;
+		int32_t S = s_temp | (S_temp<<6);
 		if (S & 0x800) S = -0x800 + (S&0x7ff); /* sign extend */
 
 		return S;
@@ -203,37 +202,17 @@ private:
 		return 4;
 	}
 
-	// Dispatch
-	uint32_t arcompact_handle00(uint32_t op);
-	uint32_t arcompact_handle01(uint32_t op);
-	uint32_t arcompact_handle01_00(uint32_t op);
-	uint32_t arcompact_handle01_01(uint32_t op);
-	uint32_t arcompact_handle01_01_00(uint32_t op);
-	uint32_t arcompact_handle01_01_01(uint32_t op);
-	uint32_t arcompact_handle04(uint32_t op);
-	uint32_t arcompact_handle04_2f(uint32_t op);
-	uint32_t arcompact_handle04_2f_3f(uint32_t op);
-	uint32_t arcompact_handle05(uint32_t op);
+	uint8_t group_0e_get_h(uint16_t op)
+	{
+		uint8_t h = ((op & 0x0007) << 3);
+		h |= ((op & 0x00e0) >> 5);
+		return h;
+	}
 
-	uint32_t arcompact_handle05_2f(uint32_t op);
-	uint32_t arcompact_handle05_2f_3f(uint32_t op);
-
-	uint32_t arcompact_handle0c(uint16_t op);
-	uint32_t arcompact_handle0d(uint16_t op);
-	uint32_t arcompact_handle0e(uint16_t op);
-	uint32_t arcompact_handle0f(uint16_t op);
-	uint32_t arcompact_handle0f_00(uint16_t op);
-	uint32_t arcompact_handle0f_00_07(uint16_t op);
-	uint32_t arcompact_handle17(uint16_t op);
-	uint32_t arcompact_handle18(uint16_t op);
-	uint32_t arcompact_handle18_05(uint16_t op);
-	uint32_t arcompact_handle18_06(uint16_t op);
-	uint32_t arcompact_handle18_07(uint16_t op);
-	uint32_t arcompact_handle19(uint16_t op);
-	uint32_t arcompact_handle1c(uint16_t op);
-	uint32_t arcompact_handle1d(uint16_t op);
-	uint32_t arcompact_handle1e(uint16_t op);
-	uint32_t arcompact_handle1e_03(uint16_t op);
+	uint8_t common32_get_condition(uint32_t op)
+	{
+		return op & 0x0000001f;
+	}
 
 	/************************************************************************************************************************************
 	*                                                                                                                                   *

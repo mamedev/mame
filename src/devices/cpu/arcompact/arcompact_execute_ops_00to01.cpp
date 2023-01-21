@@ -10,7 +10,7 @@ uint32_t arcompact_device::handleop32_B_cc_D_s21(uint32_t op)
 {
 	int size = 4;
 
-	COMMON32_GET_CONDITION
+	uint8_t condition = common32_get_condition(op);
 
 	if (!check_condition(condition))
 		return m_pc + (size>>0);
