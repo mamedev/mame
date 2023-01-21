@@ -117,8 +117,8 @@ uint32_t arcompact_device::handleop_MOV_S_b_h_or_limm(uint16_t op) // MOV_S b <-
 	{
 		// opcode        iiii ibbb hhhI Ihhh
 		// MOV_S b, limm 0111 0bbb 1100 1111 [LIMM]   (h == LIMM)
-
 		GET_LIMM_16;
+		size = 6;
 
 		m_regs[breg] = m_regs[h];
 
