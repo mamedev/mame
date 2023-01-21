@@ -89,14 +89,13 @@ public:
 	void rtype2(machine_config &config);
 	void m82(machine_config &config);
 	void rtype(machine_config &config);
-	void imgfightb(machine_config &config);
+	void imgfightjb(machine_config &config);
 	void lohtb(machine_config &config);
 	void imgfight(machine_config &config);
 	void mrheli(machine_config &config);
 	void nspiritj(machine_config &config);
 
 	void init_dkgenm72();
-	void init_bchopper();
 	void init_gallop();
 	void init_m72_8751();
 	void init_dbreedm72();
@@ -176,7 +175,6 @@ private:
 	void protection_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	// game specific
-	void bchopper_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void nspirit_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void loht_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void dbreedm72_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
