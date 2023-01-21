@@ -433,7 +433,7 @@ void i82371sb_isa_device::map_extra(uint64_t memory_window_start, uint64_t memor
 {
 	// assume that map_extra of the southbridge is called before the one of the northbridge
 	m_isabus->remap(AS_PROGRAM, 0, 1 << 24);
-	map_bios(memory_space, 0xfffc0000, 0xffffffff);
+	map_bios(memory_space, 0xffffffff - m_region->bytes() + 1, 0xffffffff);
 	map_bios(memory_space, 0x000e0000, 0x000fffff);
 	m_isabus->remap(AS_IO, 0, 0xffff);
 	io_space->install_device(0, 0xffff, *this, &i82371sb_isa_device::internal_io_map);
