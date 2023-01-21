@@ -31,7 +31,7 @@ namespace bus::nabupc {
 // Load segment file from disk
 std::error_condition network_adapter::segment_file::read_archive(util::core_file &stream, uint32_t segment_id)
 {
-	segment_id &= 0xFFFFFF;
+	segment_id &= 0xffffff;
 
 	util::core_file::ptr proxy;
 	std::error_condition err = util::core_file::open_proxy(stream, proxy);
@@ -83,9 +83,9 @@ std::error_condition network_adapter::segment_file::parse_segment(char *data, si
 		return err;
 
 	memset(current.data, 0, 991);
-	current.segment_id[0] = (m_segment_id & 0xFF0000) >> 16;
-	current.segment_id[1] = (m_segment_id & 0x00FF00) >> 8;
-	current.segment_id[2] = (m_segment_id & 0xF000FF);
+	current.segment_id[0] = (m_segment_id & 0xff0000) >> 16;
+	current.segment_id[1] = (m_segment_id & 0x00ff00) >> 8;
+	current.segment_id[2] = (m_segment_id & 0x0000ff);
 	current.owner         = 0x01;
 	current.tier[0]       = 0x7f;
 	current.tier[1]       = 0xff;
@@ -108,80 +108,18 @@ std::error_condition network_adapter::segment_file::parse_segment(char *data, si
 				current.type |= 0x81;
 			if (actual < 991)
 				current.type |= 0x10;
-			current.offset[0] = ((offset) >> 8) & 0xFF;
-			current.offset[1] = offset & 0xFF;
+			current.offset[0] = ((offset) >> 8) & 0xff;
+			current.offset[1] = offset & 0xff;
 			for (int i = 0; i < 1007; ++i) {
 				crc = update_crc(crc, ((char *)&current)[i]);
 			}
 			crc ^= 0xffff;
-			current.crc[0] = (crc >> 8) & 0xFF;
-			current.crc[1] = crc & 0xFF;
+			current.crc[0] = (crc >> 8) & 0xff;
+			current.crc[1] = crc & 0xff;
 			pak_list.push_back(current);
 			offset = (++npak * 991);
 			memset(current.data, 0, 991);
 			err = fd->read_at(offset, current.data, 991, actual);
-		}
-	} while(actual > 0);
-
-	return err;
-}
-
-std::error_condition network_adapter::segment_file::load(std::string_view local_path, uint32_t segment_id)
-{
-	segment_id &= 0xFFFFFF;
-
-	osd_file::ptr fd;
-	pak current;
-	uint64_t segment_size;
-	uint64_t offset = 0;
-	uint32_t actual;
-	uint16_t crc;
-	uint8_t npak = 0;
-	std::error_condition err;
-	std::string filename = util::string_format("%s/nabu_network/%06d.nabu", osd_subst_env(local_path), segment_id);
-	pak_list.clear();
-	err = osd_file::open(filename, OPEN_FLAG_READ, fd, segment_size);
-	if (err)
-		return err;
-
-	memset(current.data, 0, 991);
-	current.segment_id[0] = (segment_id & 0xFF0000) >> 16;
-	current.segment_id[1] = (segment_id & 0x00FF00) >> 8;
-	current.segment_id[2] = (segment_id & 0xF000FF);
-	current.owner         = 0x01;
-	current.tier[0]       = 0x7f;
-	current.tier[1]       = 0xff;
-	current.tier[2]       = 0xff;
-	current.tier[3]       = 0xff;
-	current.mbytes[0]     = 0x7f;
-	current.mbytes[1]     = 0x80;
-	err = fd->read(current.data, offset, 991, actual);
-	do {
-		crc = 0xffff;
-		if (err) {
-			return err;
-		}
-		if (actual > 0) {
-			current.packet_number = npak;
-			current.pak_number[0] = npak;
-			current.pak_number[1] = 0;
-			current.type = 0x20;
-			if (offset == 0)
-				current.type |= 0x81;
-			if (actual < 991)
-				current.type |= 0x10;
-			current.offset[0] = ((offset) >> 8) & 0xFF;
-			current.offset[1] = offset & 0xFF;
-			for (int i = 0; i < 1007; ++i) {
-				crc = update_crc(crc, ((char *)&current)[i]);
-			}
-			crc ^= 0xffff;
-			current.crc[0] = (crc >> 8) & 0xFF;
-			current.crc[1] = crc & 0xFF;
-			pak_list.push_back(current);
-			offset = (++npak * 991);
-			memset(current.data, 0, 991);
-			err = fd->read(current.data, offset, 991, actual);
 		}
 	} while(actual > 0);
 
@@ -339,14 +277,14 @@ void network_adapter::connect(uint8_t byte, bool channel_request = true)
 	if (byte == 0x83 && m_substate == 0) {
 		transmit_byte(0x10);
 		transmit_byte(0x06);
-		transmit_byte(0xE4);
+		transmit_byte(0xe4);
 	} else if (byte == 0x82 && m_substate == 1) {
 		transmit_byte(0x10);
 		transmit_byte(0x06);
 	} else if (byte == 0x01 && m_substate == 2) {
-		transmit_byte(channel_request ? 0x9F : 0x1F);
+		transmit_byte(channel_request ? 0x9f : 0x1f);
 		transmit_byte(0x10);
-		transmit_byte(0xE1);
+		transmit_byte(0xe1);
 		m_state = state::IDLE;
 	} else {
 		LOG("Unexpected byte: 0x%02X (%d), restarting Adapter.\n", byte, m_substate);
@@ -395,7 +333,7 @@ void network_adapter::idle(uint8_t byte)
 void network_adapter::hex81_request(uint8_t byte)
 {
 	if (m_substate == 1) {
-		transmit_byte(0xE4);
+		transmit_byte(0xe4);
 		m_state = state::IDLE;
 	}
 	++m_substate;
@@ -405,10 +343,10 @@ void network_adapter::hex81_request(uint8_t byte)
 void network_adapter::channel_request(uint8_t byte)
 {
 	if (m_substate == 0) {
-		m_channel = (m_channel & 0xFF00) | (byte);
+		m_channel = (m_channel & 0xff00) | (byte);
 	} else if (m_substate == 1) {
-		m_channel = (m_channel & 0xFF) | (byte << 8);
-		transmit_byte(0xE4);
+		m_channel = (m_channel & 0xff) | (byte << 8);
+		transmit_byte(0xe4);
 		LOG("Channel: 0x%04X\n", m_channel);
 		m_state = state::IDLE;
 	}
@@ -420,12 +358,12 @@ void network_adapter::segment_request(uint8_t byte)
 	if (m_substate == 0) {
 		m_packet = byte;
 	} else if (m_substate == 1) {
-		m_segment = (m_segment & 0xFFFF00) | (byte);
+		m_segment = (m_segment & 0xffff00) | (byte);
 	} else if (m_substate == 2) {
-		m_segment = (m_segment & 0xFF00FF) | (byte << 8);
+		m_segment = (m_segment & 0xff00ff) | (byte << 8);
 	} else if (m_substate == 3) {
-		m_segment = (m_segment & 0xFFFF) | (byte << 16);
-		transmit_byte(0xE4);
+		m_segment = (m_segment & 0xffff) | (byte << 16);
+		transmit_byte(0xe4);
 		transmit_byte(0x91);
 		m_state = state::SEND_SEGMENT;
 		m_substate = 0;
@@ -459,7 +397,7 @@ void network_adapter::send_segment(uint8_t byte)
 			LOG("Failed to find segment: %06d, restarting\n", m_segment);
 			transmit_byte(0x10);
 			transmit_byte(0x06);
-			transmit_byte(0xE4);
+			transmit_byte(0xe4);
 		}
 		m_state = state::IDLE;
 	}
@@ -469,16 +407,16 @@ void network_adapter::send_segment(uint8_t byte)
 
 TIMER_CALLBACK_MEMBER(network_adapter::segment_tick)
 {
-		char * data = (char*)&m_cache[m_packet];
-		if (data[m_pak_offset] == 0x10) {
-			transmit_byte(data[m_pak_offset]);
-		}
-		transmit_byte(data[m_pak_offset++]);
-		if (m_pak_offset >= sizeof(segment_file::pak)) {
-			transmit_byte(0x10);
-			transmit_byte(0xe1);
-			m_segment_timer->reset();
-		}
+	char * data = (char*)&m_cache[m_packet];
+	if (data[m_pak_offset] == 0x10) {
+		transmit_byte(data[m_pak_offset]);
+	}
+	transmit_byte(data[m_pak_offset++]);
+	if (m_pak_offset >= sizeof(segment_file::pak)) {
+		transmit_byte(0x10);
+		transmit_byte(0xe1);
+		m_segment_timer->reset();
+	}
 }
 
 } // bus::nabupc
