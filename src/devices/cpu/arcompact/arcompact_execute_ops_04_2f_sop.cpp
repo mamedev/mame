@@ -10,21 +10,14 @@ uint32_t arcompact_device::arcompact_handle04_2f_helper(uint32_t op, const char*
 	int size;
 
 	COMMON32_GET_p;
-	//uint32_t breg = common32_get_breg(op);
+	//uint8_t breg = common32_get_breg(op);
 
 	if (p == 0)
 	{
-		COMMON32_GET_creg
+		uint8_t creg = common32_get_creg(op);
 
-		if (creg == LIMM_REG)
-		{
-			//uint32_t limm;
-			//GET_LIMM_32;
-			size = 8;
-		}
-		else
-		{
-		}
+		size = check_c_limm(creg);
+
 	}
 	else if (p == 1)
 	{
@@ -79,20 +72,14 @@ uint32_t arcompact_device::handleop32_LSR_single_p11_m1(uint32_t op)
 
 uint32_t arcompact_device::handleop32_LSR_single_p00(uint32_t op)
 {
-	int size = 4;
-
-	uint32_t breg = common32_get_breg(op);
-	COMMON32_GET_F;
-	COMMON32_GET_creg;
+	uint8_t breg = common32_get_breg(op);
+	uint8_t F = common32_get_F(op);
+	uint8_t creg = common32_get_creg(op);
 	 //COMMON32_GET_areg; // areg bits already used as opcode select
 
 	uint32_t c;
 
-	if (creg == LIMM_REG)
-	{
-		GET_LIMM_32;
-		size = 8;
-	}
+	int size = check_c_limm(creg);
 
 	c = m_regs[creg];
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
@@ -117,8 +104,8 @@ uint32_t arcompact_device::handleop32_LSR_single_p01(uint32_t op)
 {
 	int size = 4;
 
-	uint32_t breg = common32_get_breg(op);
-	COMMON32_GET_F;
+	uint8_t breg = common32_get_breg(op);
+	uint8_t F = common32_get_F(op);
 	COMMON32_GET_u6;
 	 //COMMON32_GET_areg; // areg bits already used as opcode select
 
@@ -174,20 +161,14 @@ uint32_t arcompact_device::handleop32_LSR_single(uint32_t op)
 
 uint32_t arcompact_device::handleop32_ROR_single_p00(uint32_t op)
 {
-	int size = 4;
-
-	uint32_t breg = common32_get_breg(op);
-	COMMON32_GET_F;
-	COMMON32_GET_creg;
+	uint8_t breg = common32_get_breg(op);
+	uint8_t F = common32_get_F(op);
+	uint8_t creg = common32_get_creg(op);
 	 //COMMON32_GET_areg; // areg bits already used as opcode select
 
 	uint32_t c;
 
-	if (creg == LIMM_REG)
-	{
-		GET_LIMM_32;
-		size = 8;
-	}
+	int size = check_c_limm(creg);
 
 	c = m_regs[creg];
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
@@ -212,8 +193,8 @@ uint32_t arcompact_device::handleop32_ROR_single_p01(uint32_t op)
 {
 	int size = 4;
 
-	uint32_t breg = common32_get_breg(op);
-	COMMON32_GET_F;
+	uint8_t breg = common32_get_breg(op);
+	uint8_t F = common32_get_F(op);
 	COMMON32_GET_u6;
 	 //COMMON32_GET_areg; // areg bits already used as opcode select
 
@@ -290,20 +271,14 @@ uint32_t arcompact_device::handleop32_ROR_single(uint32_t op)
 
 uint32_t arcompact_device::handleop32_EXTW_p00(uint32_t op)
 {
-	int size = 4;
-
-	uint32_t breg = common32_get_breg(op);
-	COMMON32_GET_F;
-	COMMON32_GET_creg;
+	uint8_t breg = common32_get_breg(op);
+	uint8_t F = common32_get_F(op);
+	uint8_t creg = common32_get_creg(op);
 	 //COMMON32_GET_areg; // areg bits already used as opcode select
 
 	uint32_t c;
 
-	if (creg == LIMM_REG)
-	{
-		GET_LIMM_32;
-		size = 8;
-	}
+	int size = check_c_limm(creg);
 
 	c = m_regs[creg];
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
@@ -323,8 +298,8 @@ uint32_t arcompact_device::handleop32_EXTW_p01(uint32_t op)
 {
 	int size = 4;
 
-	uint32_t breg = common32_get_breg(op);
-	COMMON32_GET_F;
+	uint8_t breg = common32_get_breg(op);
+	uint8_t F = common32_get_F(op);
 	COMMON32_GET_u6;
 	 //COMMON32_GET_areg; // areg bits already used as opcode select
 
@@ -399,20 +374,14 @@ uint32_t arcompact_device::handleop32_EXTW(uint32_t op)
 
 uint32_t arcompact_device::handleop32_EXTB_p00(uint32_t op)
 {
-	int size = 4;
-
-	uint32_t breg = common32_get_breg(op);
-	COMMON32_GET_F;
-	COMMON32_GET_creg;
+	uint8_t breg = common32_get_breg(op);
+	uint8_t F = common32_get_F(op);
+	uint8_t creg = common32_get_creg(op);
 	 //COMMON32_GET_areg; // areg bits already used as opcode select
 
 	uint32_t c;
 
-	if (creg == LIMM_REG)
-	{
-		GET_LIMM_32;
-		size = 8;
-	}
+	int size = check_c_limm(creg);
 
 	c = m_regs[creg];
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
@@ -432,8 +401,8 @@ uint32_t arcompact_device::handleop32_EXTB_p01(uint32_t op)
 {
 	int size = 4;
 
-	uint32_t breg = common32_get_breg(op);
-	COMMON32_GET_F;
+	uint8_t breg = common32_get_breg(op);
+	uint8_t F = common32_get_F(op);
 	COMMON32_GET_u6;
 	 //COMMON32_GET_areg; // areg bits already used as opcode select
 

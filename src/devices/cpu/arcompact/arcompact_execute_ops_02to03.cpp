@@ -8,13 +8,11 @@
 
 uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 {
-	int size = 4;
-
 	int S = (op & 0x00008000) >> 15;// op &= ~0x00008000;
 	int s = (op & 0x00ff0000) >> 16;// op &= ~0x00ff0000;
 	if (S) s = -0x100 + s;
 
-	uint32_t breg = common32_get_breg(op);
+	uint8_t breg = common32_get_breg(op);
 	COMMON32_GET_areg
 
 	int X = (op & 0x00000040) >> 6;  //op &= ~0x00000040;
@@ -22,15 +20,10 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 	int a = (op & 0x00000600) >> 9;  //op &= ~0x00000600;
 //  int D = (op & 0x00000800) >> 11;// op &= ~0x00000800; // we don't use the data cache currently
 
+
+	int size = check_b_limm(breg);
+
 	uint32_t address = m_regs[breg];
-
-	if (breg == LIMM_REG)
-	{
-		GET_LIMM_32;
-		size = 8;
-
-		address = m_regs[LIMM_REG];
-	}
 
 	// address manipulation
 	if ((a == 0) || (a == 1))
@@ -106,24 +99,19 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 
 uint32_t arcompact_device::handleop32_ST_r_o(uint32_t op)
 {
-	int size = 4;
 	int S = (op & 0x00008000) >> 15;
 	int s = (op & 0x00ff0000) >> 16;
 	if (S) s = -0x100 + s;
 
-	uint32_t breg = common32_get_breg(op);
-	COMMON32_GET_creg;
+	uint8_t breg = common32_get_breg(op);
+	uint8_t creg = common32_get_creg(op);
 
 //  int R = (op & 0x00000001) >> 0; // bit 0 is reserved
 	int Z = (op & 0x00000006) >> 1;
 	int a = (op & 0x00000018) >> 3;
 //  int D = (op & 0x00000020) >> 5; // we don't use the data cache currently
 
-	if ((breg == LIMM_REG) || (creg == LIMM_REG))
-	{
-		GET_LIMM_32;
-		size = 8;
-	}
+	int size = check_b_c_limm(breg, creg);
 
 	uint32_t address = m_regs[breg];
 	uint32_t writedata = m_regs[creg];

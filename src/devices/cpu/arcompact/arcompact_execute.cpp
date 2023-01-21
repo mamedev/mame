@@ -127,45 +127,22 @@ uint32_t arcompact_device::handle_jump_to_register(int delay, int link, uint32_t
 
 uint32_t arcompact_device::arcompact_handle04_helper(uint32_t op, const char* optext, int ignore_dst, int b_reserved)
 {
-	int size;
-	//uint32_t limm = 0;
-	int got_limm = 0;
-
 	COMMON32_GET_p;
-	uint32_t breg = common32_get_breg(op);
+	uint8_t breg = common32_get_breg(op);
+	int size = 4;
 
 	if (!b_reserved)
 	{
-		if (breg == LIMM_REG)
-		{
-			//GET_LIMM_32;
-			size = 8;
-			got_limm = 1;
-		}
-		else
-		{
-		}
+		size = check_b_limm(breg);
 	}
 	else
 	{
 	}
 
-
 	if (p == 0)
 	{
-		COMMON32_GET_creg
-
-		if (creg == LIMM_REG)
-		{
-			if (!got_limm)
-			{
-				//GET_LIMM_32;
-				size = 8;
-			}
-		}
-		else
-		{
-		}
+		uint8_t creg = common32_get_creg(op);
+		size = check_c_limm(creg);
 	}
 	else if (p == 1)
 	{
@@ -179,25 +156,12 @@ uint32_t arcompact_device::arcompact_handle04_helper(uint32_t op, const char* op
 
 		if (M == 0)
 		{
-			COMMON32_GET_creg
-
-			if (creg == LIMM_REG)
-			{
-				if (!got_limm)
-				{
-					//GET_LIMM_32;
-					size = 8;
-				}
-			}
-			else
-			{
-			}
-
+			uint8_t creg = common32_get_creg(op);
+			size = check_c_limm(creg);
 		}
 		else if (M == 1)
 		{
 		}
-
 	}
 
 	arcompact_log("unimplemented %s %08x (04 type helper)", optext, op);

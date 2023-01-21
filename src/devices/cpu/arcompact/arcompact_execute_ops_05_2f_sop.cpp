@@ -10,11 +10,11 @@ uint32_t arcompact_device::arcompact_handle05_2f_0x_helper(uint32_t op, const ch
 	int size;
 
 	COMMON32_GET_p;
-	//uint32_t breg = common32_get_breg(op);
+	//uint8_t breg = common32_get_breg(op);
 
 	if (p == 0)
 	{
-		COMMON32_GET_creg
+		uint8_t creg = common32_get_creg(op);
 
 		if (creg == LIMM_REG)
 		{

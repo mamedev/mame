@@ -43,16 +43,14 @@ enum
 
 
 
-#define COMMON32_GET_creg \
-	int creg = (op & 0x00000fc0) >> 6;
+
 #define COMMON32_GET_u6 \
 	int u = (op & 0x00000fc0) >> 6;
 #define COMMON32_GET_areg \
 	int areg = (op & 0x0000003f) >> 0;
 #define COMMON32_GET_areg_reserved \
 	int ares = (op & 0x0000003f) >> 0;
-#define COMMON32_GET_F \
-	int F = (op & 0x00008000) >> 15;
+
 #define COMMON32_GET_p \
 	int p = (op & 0x00c00000) >> 22;
 
@@ -147,6 +145,46 @@ private:
 		int b_temp = (op & 0x07000000) >> 24;
 		int B_temp = (op & 0x00007000) >> 12;
 		return b_temp | (B_temp << 3);
+	}
+
+	uint8_t common32_get_F(uint32_t op)
+	{
+		return (op & 0x00008000) >> 15;
+	}
+
+	uint8_t common32_get_creg(uint32_t op)
+	{
+		return (op & 0x00000fc0) >> 6;
+	}
+
+	int check_c_limm(uint8_t creg)
+	{
+		if (creg == LIMM_REG)
+		{
+			GET_LIMM_32;
+			return 8;
+		}
+		return 4;
+	}
+
+	int check_b_limm(uint8_t breg)
+	{
+		if (breg == LIMM_REG)
+		{
+			GET_LIMM_32;
+			return 8;
+		}
+		return 4;
+	}
+
+	int check_b_c_limm(uint8_t breg, uint8_t creg)
+	{
+		if ((breg == LIMM_REG) || (creg == LIMM_REG))
+		{
+			GET_LIMM_32;
+			return 8;
+		}
+		return 4;
 	}
 
 	// Dispatch

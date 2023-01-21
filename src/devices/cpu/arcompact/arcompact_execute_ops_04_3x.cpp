@@ -8,16 +8,10 @@
 
 uint32_t arcompact_device::arcompact_handle04_3x_helper(uint32_t op, int dsize, int extend)
 {
-	int size;
+	uint8_t breg = common32_get_breg(op);
+	uint8_t creg = common32_get_creg(op);
 
-	uint32_t breg = common32_get_breg(op);
-	COMMON32_GET_creg
-
-	if ((breg == LIMM_REG) || (creg == LIMM_REG))
-	{
-		GET_LIMM_32;
-		size = 8;
-	}
+	int size = check_b_c_limm(breg, creg);
 
 	arcompact_log("unimplemented LD %08x (type 04_3x)", op);
 	return m_pc + (size>>0);
