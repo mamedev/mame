@@ -29,7 +29,7 @@
 
 
 
-namespace  bus::nabupc::keyboard {
+namespace  {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -140,10 +140,10 @@ uint8_t keyboard_device::gameport_r(offs_t offset)
 	return m_gameport[port];
 }
 
-} // bus::nabupc::keyboard
+} // anonymous namespace
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(NABUPC_KEYBOARD, bus::nabupc::keyboard::keyboard_device, "nabu_keyboard", "NABU PC keyboard")
+DEFINE_DEVICE_TYPE_PRIVATE(NABUPC_KEYBOARD, device_rs232_port_interface, keyboard_device, "nabu_keyboard", "NABU PC keyboard")

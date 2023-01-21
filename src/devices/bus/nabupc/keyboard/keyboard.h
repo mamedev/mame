@@ -12,6 +12,8 @@
 
 #pragma once
 
-DECLARE_DEVICE_TYPE_NS(NABUPC_KEYBOARD, bus::nabupc::keyboard, keyboard_device)
+#include "bus/rs232/rs232.h"
+
+DECLARE_DEVICE_TYPE(NABUPC_KEYBOARD, device_rs232_port_interface)
 
 #endif // MAME_BUS_NABUPC_KEYBOARD_H

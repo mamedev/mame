@@ -15,7 +15,7 @@
 
 #include "diserial.h"
 
-namespace bus::nabupc::keyboard {
+namespace {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -363,10 +363,10 @@ void hle_keyboard_device::scan_complete()
 	}
 }
 
-}  // bus::nabupc::keyboard
+}  // anonymous namespace
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(NABUPC_HLE_KEYBOARD, bus::nabupc::keyboard::hle_keyboard_device, "nabu_hle_keyboard", "NABU PC Keyboard (HLE)")
+DEFINE_DEVICE_TYPE_PRIVATE(NABUPC_HLE_KEYBOARD, device_rs232_port_interface, hle_keyboard_device, "nabu_hle_keyboard", "NABU PC Keyboard (HLE)")
