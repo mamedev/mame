@@ -134,8 +134,14 @@ typedef uint64_t GLuint64;
 #		define GL_UNSIGNED_INT_24_8 GL_UNSIGNED_INT_24_8_OES
 #	elif BGFX_CONFIG_RENDERER_OPENGLES >= 30
 #		include <GLES3/gl3platform.h>
-#		include <GLES3/gl3.h>
-#		include <GLES3/gl3ext.h>
+#		if BGFX_CONFIG_RENDERER_OPENGLES >= 32
+#			include <GLES3/gl32.h>
+#		elif BGFX_CONFIG_RENDERER_OPENGLES >= 31
+#			include <GLES3/gl31.h>
+#		else
+#			include <GLES3/gl3.h>
+#		endif // BGFX_CONFIG_RENDERER_OPENGLES
+#		include <GLES2/gl2ext.h>
 #	endif // BGFX_CONFIG_RENDERER_
 
 #endif // BGFX_CONFIG_RENDERER_OPENGL
