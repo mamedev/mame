@@ -2770,6 +2770,8 @@ if (MACHINES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/machine/i82439hx.h",
 		MAME_DIR .. "src/devices/machine/i82439tx.cpp",
 		MAME_DIR .. "src/devices/machine/i82439tx.h",
+		MAME_DIR .. "src/devices/machine/i82443bx_host.cpp",
+		MAME_DIR .. "src/devices/machine/i82443bx_host.h",
 		MAME_DIR .. "src/devices/machine/i82371sb.cpp",
 		MAME_DIR .. "src/devices/machine/i82371sb.h",
 		MAME_DIR .. "src/devices/machine/i82371eb_isa.cpp",
