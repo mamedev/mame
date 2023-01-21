@@ -89,11 +89,12 @@ enum
 	if (_reg_>3) _reg_+= 8;
 
 #define GET_LIMM_32 \
-	limm = (READ16((m_pc + 4) >> 1) << 16); \
-	limm |= READ16((m_pc + 6) >> 1);
+	m_regs[LIMM_REG] = (READ16((m_pc + 4) >> 1) << 16); \
+	m_regs[LIMM_REG] |= READ16((m_pc + 6) >> 1);
+
 #define GET_LIMM_16 \
-	limm = (READ16((m_pc + 2) >> 1) << 16); \
-	limm |= READ16((m_pc + 4) >> 1);
+	m_regs[LIMM_REG] = (READ16((m_pc + 2) >> 1) << 16); \
+	m_regs[LIMM_REG] |= READ16((m_pc + 4) >> 1);
 
 #define PC_ALIGNED32 \
 	(m_pc&0xfffffffc)
@@ -129,6 +130,8 @@ protected:
 
 private:
 	void arcompact_auxreg_map(address_map &map);
+
+	void do_flags(uint32_t result, uint32_t b, uint32_t c);
 
 	uint32_t arcompact_auxreg002_LPSTART_r();
 	void arcompact_auxreg002_LPSTART_w(uint32_t data);

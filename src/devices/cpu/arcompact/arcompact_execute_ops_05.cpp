@@ -41,8 +41,6 @@ uint32_t arcompact_device::handleop32_LSR_multiple_p11(uint32_t op)
 uint32_t arcompact_device::handleop32_ASL_multiple_p00(uint32_t op)
 {
 	int size = 4;
-	uint32_t limm = 0;
-	int got_limm = 0;
 
 	COMMON32_GET_breg;
 	COMMON32_GET_F;
@@ -52,31 +50,15 @@ uint32_t arcompact_device::handleop32_ASL_multiple_p00(uint32_t op)
 	uint32_t c;
 	uint32_t b;
 
-	if (breg == LIMM_REG)
+	if ((breg == LIMM_REG) || (creg == LIMM_REG))
 	{
 		GET_LIMM_32;
 		size = 8;
-		got_limm = 1;
-		b = limm;
-	}
-	else
-	{
-		b = m_regs[breg];
 	}
 
-	if (creg == LIMM_REG)
-	{
-		if (!got_limm)
-		{
-			GET_LIMM_32;
-			size = 8;
-		}
-		c = limm;
-	}
-	else
-	{
-		c = m_regs[creg];
-	}
+	b = m_regs[breg];
+	c = m_regs[creg];
+
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b << (c&0x1f);
@@ -93,8 +75,6 @@ uint32_t arcompact_device::handleop32_ASL_multiple_p00(uint32_t op)
 uint32_t arcompact_device::handleop32_ASL_multiple_p01(uint32_t op)
 {
 	int size = 4;
-	uint32_t limm = 0;
-/*  int got_limm = 0; */
 
 	COMMON32_GET_breg;
 	COMMON32_GET_F;
@@ -109,13 +89,9 @@ uint32_t arcompact_device::handleop32_ASL_multiple_p01(uint32_t op)
 	{
 		GET_LIMM_32;
 		size = 8;
-/*      got_limm = 1; */
-		b = limm;
 	}
-	else
-	{
-		b = m_regs[breg];
-	}
+
+	b = m_regs[breg];
 
 	c = u;
 
@@ -134,8 +110,6 @@ uint32_t arcompact_device::handleop32_ASL_multiple_p01(uint32_t op)
 uint32_t arcompact_device::handleop32_ASL_multiple_p10(uint32_t op)
 {
 	int size = 4;
-	uint32_t limm = 0;
-/*  int got_limm = 0; */
 
 	COMMON32_GET_breg;
 	COMMON32_GET_F;
@@ -149,14 +123,9 @@ uint32_t arcompact_device::handleop32_ASL_multiple_p10(uint32_t op)
 	{
 		GET_LIMM_32;
 		size = 8;
-/*      got_limm = 1; */
-		b = limm;
-	}
-	else
-	{
-		b = m_regs[breg];
 	}
 
+	b = m_regs[breg];
 	c = (uint32_t)S;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
@@ -182,8 +151,6 @@ uint32_t arcompact_device::handleop32_ASL_multiple_p11_m0(uint32_t op)
 uint32_t arcompact_device::handleop32_ASL_multiple_p11_m1(uint32_t op)
 {
 	int size = 4;
-	uint32_t limm = 0;
-/*  int got_limm = 0; */
 
 	COMMON32_GET_breg;
 	COMMON32_GET_F;
@@ -198,14 +165,9 @@ uint32_t arcompact_device::handleop32_ASL_multiple_p11_m1(uint32_t op)
 	{
 		GET_LIMM_32;
 		size = 8;
-/*      got_limm = 1; */
-		b = limm;
-	}
-	else
-	{
-		b = m_regs[breg];
 	}
 
+	b = m_regs[breg];
 	c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
@@ -227,8 +189,6 @@ uint32_t arcompact_device::handleop32_ASL_multiple_p11_m1(uint32_t op)
 uint32_t arcompact_device::handleop32_LSR_multiple_p00(uint32_t op)
 {
 	int size = 4;
-	uint32_t limm = 0;
-	int got_limm = 0;
 
 	COMMON32_GET_breg;
 	COMMON32_GET_F;
@@ -238,31 +198,15 @@ uint32_t arcompact_device::handleop32_LSR_multiple_p00(uint32_t op)
 	uint32_t c;
 	uint32_t b;
 
-	if (breg == LIMM_REG)
+	if ((breg == LIMM_REG) || (creg == LIMM_REG))
 	{
 		GET_LIMM_32;
 		size = 8;
-		got_limm = 1;
-		b = limm;
-	}
-	else
-	{
-		b = m_regs[breg];
 	}
 
-	if (creg == LIMM_REG)
-	{
-		if (!got_limm)
-		{
-			GET_LIMM_32;
-			size = 8;
-		}
-		c = limm;
-	}
-	else
-	{
-		c = m_regs[creg];
-	}
+	b = m_regs[breg];
+	c = m_regs[creg];
+
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = b >> (c&0x1f);
@@ -279,8 +223,6 @@ uint32_t arcompact_device::handleop32_LSR_multiple_p00(uint32_t op)
 uint32_t arcompact_device::handleop32_LSR_multiple_p01(uint32_t op)
 {
 	int size = 4;
-	uint32_t limm = 0;
-/*  int got_limm = 0; */
 
 	COMMON32_GET_breg;
 	COMMON32_GET_F;
@@ -295,14 +237,9 @@ uint32_t arcompact_device::handleop32_LSR_multiple_p01(uint32_t op)
 	{
 		GET_LIMM_32;
 		size = 8;
-/*      got_limm = 1; */
-		b = limm;
-	}
-	else
-	{
-		b = m_regs[breg];
 	}
 
+	b = m_regs[breg];
 	c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
@@ -320,8 +257,6 @@ uint32_t arcompact_device::handleop32_LSR_multiple_p01(uint32_t op)
 uint32_t arcompact_device::handleop32_LSR_multiple_p10(uint32_t op)
 {
 	int size = 4;
-	uint32_t limm = 0;
-/*  int got_limm = 0; */
 
 	COMMON32_GET_breg;
 	COMMON32_GET_F;
@@ -335,14 +270,9 @@ uint32_t arcompact_device::handleop32_LSR_multiple_p10(uint32_t op)
 	{
 		GET_LIMM_32;
 		size = 8;
-/*      got_limm = 1; */
-		b = limm;
-	}
-	else
-	{
-		b = m_regs[breg];
 	}
 
+	b = m_regs[breg];
 	c = (uint32_t)S;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
@@ -368,8 +298,6 @@ uint32_t arcompact_device::handleop32_LSR_multiple_p11_m0(uint32_t op)
 uint32_t arcompact_device::handleop32_LSR_multiple_p11_m1(uint32_t op)
 {
 	int size = 4;
-	uint32_t limm = 0;
-/*  int got_limm = 0; */
 
 	COMMON32_GET_breg;
 	COMMON32_GET_F;
@@ -384,14 +312,9 @@ uint32_t arcompact_device::handleop32_LSR_multiple_p11_m1(uint32_t op)
 	{
 		GET_LIMM_32;
 		size = 8;
-/*      got_limm = 1; */
-		b = limm;
-	}
-	else
-	{
-		b = m_regs[breg];
 	}
 
+	b = m_regs[breg];
 	c = u;
 
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */

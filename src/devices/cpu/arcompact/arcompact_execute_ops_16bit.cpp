@@ -94,17 +94,11 @@ uint32_t arcompact_device::handleop_ADD_S_b_b_h_or_limm(uint16_t op) // ADD_s b,
 
 	if (h == LIMM_REG)
 	{
-		uint32_t limm;
 		GET_LIMM_16;
 		size = 6;
-
-		m_regs[breg] = m_regs[breg] + limm;
-
 	}
-	else
-	{
-		m_regs[breg] = m_regs[breg] + m_regs[h];
-	}
+
+	m_regs[breg] = m_regs[breg] + m_regs[h];
 
 	return m_pc+ (size>>0);
 }
@@ -124,11 +118,9 @@ uint32_t arcompact_device::handleop_MOV_S_b_h_or_limm(uint16_t op) // MOV_S b <-
 		// opcode        iiii ibbb hhhI Ihhh
 		// MOV_S b, limm 0111 0bbb 1100 1111 [LIMM]   (h == LIMM)
 
-		uint32_t limm;
 		GET_LIMM_16;
-		size = 6;
 
-		m_regs[breg] = limm;
+		m_regs[breg] = m_regs[h];
 
 	}
 	else

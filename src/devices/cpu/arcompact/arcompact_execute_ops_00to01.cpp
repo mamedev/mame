@@ -149,27 +149,14 @@ uint32_t arcompact_device::arcompact_01_01_00_helper(uint32_t op, const char* op
 	COMMON32_GET_breg; \
 	int n = (op & 0x00000020) >> 5; \
 	uint32_t b,c; \
-	if ((breg != LIMM_REG) && (creg != LIMM_REG)) \
+	if ((breg == LIMM_REG) || (creg == LIMM_REG)) \
 	{ \
-		b = m_regs[breg]; \
-		c = m_regs[creg]; \
-	} \
-	else \
-	{ \
-		uint32_t limm; \
 		GET_LIMM_32; \
 		size = 8; \
-		\
-		if (breg == LIMM_REG) \
-			b = limm; \
-		else \
-			b = m_regs[breg]; \
-		\
-		if (creg == LIMM_REG) \
-			c = limm; \
-		else \
-			c = m_regs[creg]; \
-	}
+	} \
+	b = m_regs[breg]; \
+	c = m_regs[creg];
+	
 #define BR_TAKEJUMP \
 	/* take jump */ \
 	uint32_t realaddress = PC_ALIGNED32 + (address * 2); \
@@ -283,19 +270,15 @@ uint32_t arcompact_device::arcompact_01_01_01_helper(uint32_t op, const char* op
 	COMMON32_GET_breg; \
 	int n = (op & 0x00000020) >> 5; \
 	uint32_t b,c; \
-	c = u; \
 	/* comparing a LIMM  to an immediate is pointless, is it a valid encoding? */ \
-	if ((breg != LIMM_REG)) \
+	if ((breg == LIMM_REG)) \
 	{ \
-		b = m_regs[breg]; \
-	} \
-	else \
-	{ \
-		uint32_t limm; \
 		GET_LIMM_32; \
 		size = 8; \
-		b = limm; \
-	}
+	} \
+	b = m_regs[breg]; \
+	c = u;
+
 
 // register -immediate cases
 uint32_t arcompact_device::handleop32_BREQ_reg_imm(uint32_t op) // BREQ reg-imm

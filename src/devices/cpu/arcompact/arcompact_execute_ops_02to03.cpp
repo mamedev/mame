@@ -9,7 +9,6 @@
 uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 {
 	int size = 4;
-	uint32_t limm;
 
 	int S = (op & 0x00008000) >> 15;// op &= ~0x00008000;
 	int s = (op & 0x00ff0000) >> 16;// op &= ~0x00ff0000;
@@ -30,7 +29,7 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 		GET_LIMM_32;
 		size = 8;
 
-		address = limm;
+		address = m_regs[LIMM_REG];
 	}
 
 	// address manipulation
@@ -108,8 +107,6 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 uint32_t arcompact_device::handleop32_ST_r_o(uint32_t op)
 {
 	int size = 4;
-	uint32_t limm = 0;
-	int got_limm = 0;
 	int S = (op & 0x00008000) >> 15;
 	int s = (op & 0x00ff0000) >> 16;
 	if (S) s = -0x100 + s;
@@ -122,30 +119,14 @@ uint32_t arcompact_device::handleop32_ST_r_o(uint32_t op)
 	int a = (op & 0x00000018) >> 3;
 //  int D = (op & 0x00000020) >> 5; // we don't use the data cache currently
 
-
-	uint32_t address = m_regs[breg];
-
-	if (breg == LIMM_REG)
+	if ((breg == LIMM_REG) || (creg == LIMM_REG))
 	{
 		GET_LIMM_32;
 		size = 8;
-		got_limm = 1;
-
-		address = limm;
 	}
 
+	uint32_t address = m_regs[breg];
 	uint32_t writedata = m_regs[creg];
-
-	if (creg == LIMM_REG)
-	{
-		if (!got_limm)
-		{
-			GET_LIMM_32;
-			size = 8;
-		}
-
-		writedata = limm;
-	}
 
 	// are LIMM addresses with 's' offset non-0 ('a' mode 0 / 3) legal?
 	// not mentioned in docs..

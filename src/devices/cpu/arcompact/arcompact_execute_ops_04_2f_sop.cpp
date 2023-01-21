@@ -80,8 +80,6 @@ uint32_t arcompact_device::handleop32_LSR_single_p11_m1(uint32_t op)
 uint32_t arcompact_device::handleop32_LSR_single_p00(uint32_t op)
 {
 	int size = 4;
-	uint32_t limm = 0;
-	int got_limm = 0;
 
 	COMMON32_GET_breg;
 	COMMON32_GET_F;
@@ -92,17 +90,11 @@ uint32_t arcompact_device::handleop32_LSR_single_p00(uint32_t op)
 
 	if (creg == LIMM_REG)
 	{
-		if (!got_limm)
-		{
-			GET_LIMM_32;
-			size = 8;
-		}
-		c = limm;
+		GET_LIMM_32;
+		size = 8;
 	}
-	else
-	{
-		c = m_regs[creg];
-	}
+
+	c = m_regs[creg];
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = c >> 1;
@@ -124,7 +116,6 @@ uint32_t arcompact_device::handleop32_LSR_single_p00(uint32_t op)
 uint32_t arcompact_device::handleop32_LSR_single_p01(uint32_t op)
 {
 	int size = 4;
-/*  int got_limm = 0; */
 
 	COMMON32_GET_breg;
 	COMMON32_GET_F;
@@ -184,8 +175,6 @@ uint32_t arcompact_device::handleop32_LSR_single(uint32_t op)
 uint32_t arcompact_device::handleop32_ROR_single_p00(uint32_t op)
 {
 	int size = 4;
-	uint32_t limm = 0;
-	int got_limm = 0;
 
 	COMMON32_GET_breg;
 	COMMON32_GET_F;
@@ -196,17 +185,11 @@ uint32_t arcompact_device::handleop32_ROR_single_p00(uint32_t op)
 
 	if (creg == LIMM_REG)
 	{
-		if (!got_limm)
-		{
-			GET_LIMM_32;
-			size = 8;
-		}
-		c = limm;
+		GET_LIMM_32;
+		size = 8;
 	}
-	else
-	{
-		c = m_regs[creg];
-	}
+
+	c = m_regs[creg];
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	int shift = 1; uint32_t mask = (1 << (shift)) - 1; mask <<= (32-shift); uint32_t result = ((c >> shift) & ~mask) | ((c << (32-shift)) & mask);
@@ -228,7 +211,6 @@ uint32_t arcompact_device::handleop32_ROR_single_p00(uint32_t op)
 uint32_t arcompact_device::handleop32_ROR_single_p01(uint32_t op)
 {
 	int size = 4;
-/*  int got_limm = 0; */
 
 	COMMON32_GET_breg;
 	COMMON32_GET_F;
@@ -309,8 +291,6 @@ uint32_t arcompact_device::handleop32_ROR_single(uint32_t op)
 uint32_t arcompact_device::handleop32_EXTW_p00(uint32_t op)
 {
 	int size = 4;
-	uint32_t limm = 0;
-	int got_limm = 0;
 
 	COMMON32_GET_breg;
 	COMMON32_GET_F;
@@ -321,17 +301,11 @@ uint32_t arcompact_device::handleop32_EXTW_p00(uint32_t op)
 
 	if (creg == LIMM_REG)
 	{
-		if (!got_limm)
-		{
-			GET_LIMM_32;
-			size = 8;
-		}
-		c = limm;
+		GET_LIMM_32;
+		size = 8;
 	}
-	else
-	{
-		c = m_regs[creg];
-	}
+
+	c = m_regs[creg];
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = c & 0x0000ffff;
@@ -348,7 +322,6 @@ uint32_t arcompact_device::handleop32_EXTW_p00(uint32_t op)
 uint32_t arcompact_device::handleop32_EXTW_p01(uint32_t op)
 {
 	int size = 4;
-/*  int got_limm = 0; */
 
 	COMMON32_GET_breg;
 	COMMON32_GET_F;
@@ -427,8 +400,6 @@ uint32_t arcompact_device::handleop32_EXTW(uint32_t op)
 uint32_t arcompact_device::handleop32_EXTB_p00(uint32_t op)
 {
 	int size = 4;
-	uint32_t limm = 0;
-	int got_limm = 0;
 
 	COMMON32_GET_breg;
 	COMMON32_GET_F;
@@ -439,17 +410,11 @@ uint32_t arcompact_device::handleop32_EXTB_p00(uint32_t op)
 
 	if (creg == LIMM_REG)
 	{
-		if (!got_limm)
-		{
-			GET_LIMM_32;
-			size = 8;
-		}
-		c = limm;
+		GET_LIMM_32;
+		size = 8;
 	}
-	else
-	{
-		c = m_regs[creg];
-	}
+
+	c = m_regs[creg];
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
 	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
 	uint32_t result = c & 0x000000ff;
@@ -466,7 +431,6 @@ uint32_t arcompact_device::handleop32_EXTB_p00(uint32_t op)
 uint32_t arcompact_device::handleop32_EXTB_p01(uint32_t op)
 {
 	int size = 4;
-/*  int got_limm = 0; */
 
 	COMMON32_GET_breg;
 	COMMON32_GET_F;
