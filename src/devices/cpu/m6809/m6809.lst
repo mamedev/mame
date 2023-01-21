@@ -13,6 +13,7 @@ MAIN:
 	m_ppc = m_pc;
 	debugger_instruction_hook(m_pc.w);
 
+DISPATCH01:
 	// opcode fetch
 	m_lic_func(ASSERT_LINE);
 	@m_opcode = read_opcode();
@@ -291,6 +292,9 @@ DISPATCH10:
 	@m_opcode = read_opcode();
 	switch(m_opcode)
 	{
+		case 0x10:                                                  %DISPATCH10; return;
+		case 0x11:                                                  %DISPATCH10; return;
+
 		case 0x20:              set_cond(true);                     %LBRANCH;   return;
 		case 0x21:              set_cond(false);                    %LBRANCH;   return;
 		case 0x22:              set_cond(cond_hi());                %LBRANCH;   return;
@@ -312,25 +316,30 @@ DISPATCH10:
 		case 0x3F:                                                  %SWI2;      return;
 
 		case 0x83:              set_regop16(m_q.p.d);   set_imm();  %CMP16;     return;
+		case 0x87:              set_regop8(m_q.r.a);    set_imm();  %XST8;      return;
 		case 0x8C:              set_regop16(m_y);       set_imm();  %CMP16;     return;
 		case 0x8E:              set_regop16(m_y);       set_imm();  %LD16;      return;
-		case 0x8F:              set_regop16(m_y);       set_imm();  %ST16;      return;
+		case 0x8F:              set_regop16(m_y);       set_imm();  %XST16;     return;
+
 		case 0x93:              set_regop16(m_q.p.d);   %DIRECT;    %CMP16;     return;
 		case 0x9C:              set_regop16(m_y);       %DIRECT;    %CMP16;     return;
 		case 0x9E:              set_regop16(m_y);       %DIRECT;    %LD16;      return;
 		case 0x9F:              set_regop16(m_y);       %DIRECT;    %ST16;      return;
+
 		case 0xA3:              set_regop16(m_q.p.d);   %INDEXED;   %CMP16;     return;
 		case 0xAC:              set_regop16(m_y);       %INDEXED;   %CMP16;     return;
 		case 0xAE:              set_regop16(m_y);       %INDEXED;   %LD16;      return;
 		case 0xAF:              set_regop16(m_y);       %INDEXED;   %ST16;      return;
+
 		case 0xB3:              set_regop16(m_q.p.d);   %EXTENDED;  %CMP16;     return;
 		case 0xBC:              set_regop16(m_y);       %EXTENDED;  %CMP16;     return;
 		case 0xBE:              set_regop16(m_y);       %EXTENDED;  %LD16;      return;
 		case 0xBF:              set_regop16(m_y);       %EXTENDED;  %ST16;      return;
 
 		case 0xC3:              set_regop16(m_q.p.d);   set_imm();  %XADD16;    return;
+		case 0xC7:              set_regop8(m_q.r.b);    set_imm();  %XST8;      return;
 		case 0xCE:              set_regop16(m_s);       set_imm();  %LD16;      return;
-		case 0xCF:              set_regop16(m_s);       set_imm();  %ST16;      return;
+		case 0xCF:              set_regop16(m_s);       set_imm();  %XST16;     return;
 
 		case 0xD3:              set_regop16(m_q.p.d);   %DIRECT;    %XADD16;    return;
 		case 0xDE:              set_regop16(m_s);       %DIRECT;    %LD16;      return;
@@ -344,7 +353,7 @@ DISPATCH10:
 		case 0xFE:              set_regop16(m_s);       %EXTENDED;  %LD16;      return;
 		case 0xFF:              set_regop16(m_s);       %EXTENDED;  %ST16;      return;
 
-		default:                                                    %ILLEGAL;   return;
+		default:                                                    %DISPATCH01; return;
 	}
 	return;
 
@@ -352,16 +361,28 @@ DISPATCH11:
 	@m_opcode = read_opcode();
 	switch(m_opcode)
 	{
+		case 0x10:                                                  %DISPATCH11; return;
+		case 0x11:                                                  %DISPATCH11; return;
+
+		case 0x3E:                                                  %XFIRQ;      return;
 		case 0x3F:                                                  %SWI3;      return;
 		case 0x83:              set_regop16(m_u);       set_imm();  %CMP16;     return;
 		case 0x8C:              set_regop16(m_s);       set_imm();  %CMP16;     return;
+		case 0x87:              set_regop8(m_q.r.a);    set_imm();  %XST8;      return;
+		case 0x8F:              set_regop16(m_x);       set_imm();  %XST16;     return;
 		case 0x93:              set_regop16(m_u);       %DIRECT;    %CMP16;     return;
 		case 0x9C:              set_regop16(m_s);       %DIRECT;    %CMP16;     return;
+		case 0xC3:              set_regop16(m_u);       set_imm();  %XADD16;    return;
+		case 0xC7:              set_regop8(m_q.r.b);    set_imm();  %XST8;      return;
+		case 0xCF:              set_regop16(m_u);       set_imm();  %XST16;     return;
 		case 0xA3:              set_regop16(m_u);       %INDEXED;   %CMP16;     return;
 		case 0xAC:              set_regop16(m_s);       %INDEXED;   %CMP16;     return;
 		case 0xB3:              set_regop16(m_u);       %EXTENDED;  %CMP16;     return;
 		case 0xBC:              set_regop16(m_s);       %EXTENDED;  %CMP16;     return;
-		default:                                                    %ILLEGAL;   return;
+		case 0xD3:              set_regop16(m_u);       %DIRECT;    %XADD16;    return;
+		case 0xE3:              set_regop16(m_u);       %INDEXED;   %XADD16;    return;
+		case 0xF3:              set_regop16(m_u);       %EXTENDED;  %XADD16;    return;
+		default:                                                    %DISPATCH01; return;
 	}
 	return;
 
@@ -721,6 +742,16 @@ XADD16:
 		;
 	}
 	return;
+
+XFIRQ:
+	set_ea(VECTOR_FIRQ);
+	standard_irq_callback(M6809_SWI);
+	set_regop16(m_s);
+	m_temp.w = entire_state_registers();
+	@dummy_read_opcode_arg(0);
+	@dummy_vma(1);
+	%PUSH_REGISTERS;
+	goto INTERRUPT_VECTOR;
 
 ILLEGAL:
 	log_illegal();
