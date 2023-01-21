@@ -120,7 +120,7 @@ uint32_t arcompact_device::arcompact_01_01_00_helper(uint32_t op, const char* op
 	// Branch on Compare / Bit Test - Register-Register
 
 	COMMON32_GET_creg
-	COMMON32_GET_breg;
+	uint32_t breg = common32_get_breg(op);
 	//int n = (op & 0x00000020) >> 5;
 
 
@@ -146,7 +146,7 @@ uint32_t arcompact_device::arcompact_01_01_00_helper(uint32_t op, const char* op
 	int size = 4; \
 	GET_01_01_01_BRANCH_ADDR; \
 	COMMON32_GET_creg; \
-	COMMON32_GET_breg; \
+	uint32_t breg = common32_get_breg(op); \
 	int n = (op & 0x00000020) >> 5; \
 	uint32_t b,c; \
 	if ((breg == LIMM_REG) || (creg == LIMM_REG)) \
@@ -267,7 +267,7 @@ uint32_t arcompact_device::arcompact_01_01_01_helper(uint32_t op, const char* op
 	int size = 4; \
 	GET_01_01_01_BRANCH_ADDR \
 	COMMON32_GET_u6; \
-	COMMON32_GET_breg; \
+	uint32_t breg = common32_get_breg(op); \
 	int n = (op & 0x00000020) >> 5; \
 	uint32_t b,c; \
 	/* comparing a LIMM  to an immediate is pointless, is it a valid encoding? */ \

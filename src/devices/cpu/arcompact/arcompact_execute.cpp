@@ -132,7 +132,7 @@ uint32_t arcompact_device::arcompact_handle04_helper(uint32_t op, const char* op
 	int got_limm = 0;
 
 	COMMON32_GET_p;
-	COMMON32_GET_breg;
+	uint32_t breg = common32_get_breg(op);
 
 	if (!b_reserved)
 	{

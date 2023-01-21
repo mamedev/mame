@@ -10,7 +10,7 @@ uint32_t arcompact_device::arcompact_handle04_3x_helper(uint32_t op, int dsize, 
 {
 	int size;
 
-	COMMON32_GET_breg;
+	uint32_t breg = common32_get_breg(op);
 	COMMON32_GET_creg
 
 	if ((breg == LIMM_REG) || (creg == LIMM_REG))

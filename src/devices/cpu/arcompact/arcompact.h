@@ -40,10 +40,9 @@ enum
 #define GROUP_0e_GET_h \
 	h =  ((op & 0x0007) << 3); \
 	h |= ((op & 0x00e0) >> 5);
-#define COMMON32_GET_breg \
-	int b_temp = (op & 0x07000000) >> 24; \
-	int B_temp = (op & 0x00007000) >> 12; \
-	int breg = b_temp | (B_temp << 3);
+
+
+
 #define COMMON32_GET_creg \
 	int creg = (op & 0x00000fc0) >> 6;
 #define COMMON32_GET_u6 \
@@ -132,6 +131,7 @@ private:
 	void arcompact_auxreg_map(address_map &map);
 
 	void do_flags(uint32_t result, uint32_t b, uint32_t c);
+	void do_flags_nz(uint32_t result);
 
 	uint32_t arcompact_auxreg002_LPSTART_r();
 	void arcompact_auxreg002_LPSTART_w(uint32_t data);
@@ -141,6 +141,13 @@ private:
 	uint32_t arcompact_auxreg00a_STATUS32_r();
 	uint32_t arcompact_auxreg025_INTVECTORBASE_r();
 	void arcompact_auxreg025_INTVECTORBASE_w(uint32_t data);
+
+	uint8_t common32_get_breg(uint32_t op)
+	{
+		int b_temp = (op & 0x07000000) >> 24;
+		int B_temp = (op & 0x00007000) >> 12;
+		return b_temp | (B_temp << 3);
+	}
 
 	// Dispatch
 	uint32_t arcompact_handle00(uint32_t op);

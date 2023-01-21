@@ -14,7 +14,7 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 	int s = (op & 0x00ff0000) >> 16;// op &= ~0x00ff0000;
 	if (S) s = -0x100 + s;
 
-	COMMON32_GET_breg;
+	uint32_t breg = common32_get_breg(op);
 	COMMON32_GET_areg
 
 	int X = (op & 0x00000040) >> 6;  //op &= ~0x00000040;
@@ -111,7 +111,7 @@ uint32_t arcompact_device::handleop32_ST_r_o(uint32_t op)
 	int s = (op & 0x00ff0000) >> 16;
 	if (S) s = -0x100 + s;
 
-	COMMON32_GET_breg;
+	uint32_t breg = common32_get_breg(op);
 	COMMON32_GET_creg;
 
 //  int R = (op & 0x00000001) >> 0; // bit 0 is reserved
