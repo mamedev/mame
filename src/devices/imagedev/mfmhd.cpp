@@ -111,6 +111,9 @@
     ST-213: Seagate hard disk drive, 10 MB capacity
     ST-225: Seagate hard disk drive, 20 MB capacity
     ST-251: Seagate hard disk drive, 40 MB capacity
+    ST-406: Seagate hard disk drive, 5 MB capacity
+    ST-412: Seagate hard disk drive, 10 MB capacity
+    ST-506: Seagate hard disk drive, 5 MB capacity
 
     generic: Hard disk with 0 physical cylinders, which can be used for
              all CHDs that can be handled by the controller.
@@ -986,6 +989,45 @@ mfm_hd_st251_device::mfm_hd_st251_device(const machine_config &mconfig, const ch
 }
 
 DEFINE_DEVICE_TYPE(MFMHD_ST251, mfm_hd_st251_device, "mfm_hd_st251", "Seagate ST-251 MFM hard disk")
+
+mfm_hd_st406_device::mfm_hd_st406_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+: mfm_harddisk_device(mconfig, MFMHD_ST406, tag, owner, clock)
+{
+	m_phys_cylinders = 320;
+	m_max_cylinders = 306;
+	m_landing_zone = 319;
+	m_max_heads = 2;
+	m_seeknext_time = 18;
+	m_maxseek_time = 205;
+}
+
+DEFINE_DEVICE_TYPE(MFMHD_ST406, mfm_hd_st406_device, "mfm_hd_st406", "Seagate ST-406 MFM hard disk")
+
+mfm_hd_st412_device::mfm_hd_st412_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+: mfm_harddisk_device(mconfig, MFMHD_ST412, tag, owner, clock)
+{
+	m_phys_cylinders = 320;
+	m_max_cylinders = 306;
+	m_landing_zone = 319;
+	m_max_heads = 4;
+	m_seeknext_time = 18;
+	m_maxseek_time = 205;
+}
+
+DEFINE_DEVICE_TYPE(MFMHD_ST412, mfm_hd_st412_device, "mfm_hd_st412", "Seagate ST-412 MFM hard disk")
+
+mfm_hd_st506_device::mfm_hd_st506_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+: mfm_harddisk_device(mconfig, MFMHD_ST506, tag, owner, clock)
+{
+	m_phys_cylinders = 158;
+	m_max_cylinders = 153;
+	m_landing_zone = 157;
+	m_max_heads = 4;
+	m_seeknext_time = 18;
+	m_maxseek_time = 205;
+}
+
+DEFINE_DEVICE_TYPE(MFMHD_ST506, mfm_hd_st506_device, "mfm_hd_st506", "Seagate ST-506 MFM hard disk")
 
 // ===========================================================
 //   Track cache

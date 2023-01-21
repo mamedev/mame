@@ -184,6 +184,9 @@ private:
     ST-213: 10 MB
     ST-225: 20 MB
     ST-251: 40 MB
+    ST-406: 5 MB
+    ST-412: 10 MB
+    ST-506: 5 MB
 */
 class mfm_hd_generic_device : public mfm_harddisk_device
 {
@@ -216,6 +219,30 @@ public:
 };
 
 DECLARE_DEVICE_TYPE(MFMHD_ST251, mfm_hd_st251_device)
+
+class mfm_hd_st406_device : public mfm_harddisk_device
+{
+public:
+	mfm_hd_st406_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+DECLARE_DEVICE_TYPE(MFMHD_ST406, mfm_hd_st406_device)
+
+class mfm_hd_st412_device : public mfm_harddisk_device
+{
+public:
+	mfm_hd_st412_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+DECLARE_DEVICE_TYPE(MFMHD_ST412, mfm_hd_st412_device)
+
+class mfm_hd_st506_device : public mfm_harddisk_device
+{
+public:
+	mfm_hd_st506_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+DECLARE_DEVICE_TYPE(MFMHD_ST506, mfm_hd_st506_device)
 
 
 /*
@@ -250,7 +277,7 @@ public:
 	        some systems expect the hard disk to be turned on before the
 	        main system, and expect it to be ready when they try to access it
 	    cache = number of cached MFM tracks
-	    format = MFMHD_GEN_FORMAT (see formats/mfm_hd.h; currently the only value)
+	    format = MFMHD_GEN_FORMAT or MFMHD_MICROPOLIS_FORMAT (see formats/mfm_hd.h or micropolis_hd.h)
 	*/
 	void configure(mfmhd_enc_t encoding, int spinupms, int cache, mfmhd_format_type format);
 
