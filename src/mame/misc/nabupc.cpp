@@ -214,14 +214,9 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(hcca_fe_w);
 	DECLARE_WRITE_LINE_MEMBER(hcca_oe_w);
-	DECLARE_WRITE_LINE_MEMBER(rxrdy_w);
-	DECLARE_WRITE_LINE_MEMBER(vdp_int_w);
-	DECLARE_WRITE_LINE_MEMBER(hcca_dr_w);
-	DECLARE_WRITE_LINE_MEMBER(hcca_tbre_w);
-	DECLARE_WRITE_LINE_MEMBER(j9_int_w);
-	DECLARE_WRITE_LINE_MEMBER(j10_int_w);
-	DECLARE_WRITE_LINE_MEMBER(j11_int_w);
-	DECLARE_WRITE_LINE_MEMBER(j12_int_w);
+
+	template <unsigned N>
+	DECLARE_WRITE_LINE_MEMBER(int_w);
 
 	IRQ_CALLBACK_MEMBER(int_ack_cb);
 
@@ -304,7 +299,7 @@ void nabupc_state::nabupc(machine_config &config)
 	TMS9918A(config, m_tms9928a, 10.738635_MHz_XTAL);
 	m_tms9928a->set_screen(m_screen);
 	m_tms9928a->set_vram_size(0x4000);
-	m_tms9928a->int_callback().set(*this, FUNC(nabupc_state::vdp_int_w));
+	m_tms9928a->int_callback().set(*this, FUNC(nabupc_state::int_w<4>));
 
 	// Sound hardware
 	SPEAKER(config, m_speaker).front_center();
@@ -317,7 +312,7 @@ void nabupc_state::nabupc(machine_config &config)
 
 	// Keyboard
 	I8251(config, m_kbduart, 10.738635_MHz_XTAL / 6);
-	m_kbduart->rxrdy_handler().set(*this, FUNC(nabupc_state::rxrdy_w));
+	m_kbduart->rxrdy_handler().set(*this, FUNC(nabupc_state::int_w<5>));
 
 	rs232_port_device &kbd(RS232_PORT(config, "kbd", keyboard_devices, "nabu"));
 	kbd.rxd_handler().set(m_kbduart, FUNC(i8251_device::write_rxd));
@@ -325,8 +320,8 @@ void nabupc_state::nabupc(machine_config &config)
 	// HCCA
 	AY31015(config, m_hccauart);
 	m_hccauart->set_auto_rdav(true);
-	m_hccauart->write_dav_callback().set(FUNC(nabupc_state::hcca_dr_w));
-	m_hccauart->write_tbmt_callback().set(FUNC(nabupc_state::hcca_tbre_w));
+	m_hccauart->write_dav_callback().set(FUNC(nabupc_state::int_w<7>));
+	m_hccauart->write_tbmt_callback().set(FUNC(nabupc_state::int_w<6>));
 	m_hccauart->write_fe_callback().set(FUNC(nabupc_state::hcca_fe_w));
 	m_hccauart->write_or_callback().set(FUNC(nabupc_state::hcca_oe_w));
 	m_hccauart->write_so_callback().set("hcca", FUNC(rs232_port_device::write_txd));
@@ -350,10 +345,10 @@ void nabupc_state::nabupc(machine_config &config)
 
 	// Bus
 	NABUPC_OPTION_BUS(config, m_bus, 10.738635_MHz_XTAL / 3);
-	m_bus->out_int_callback<0>().set(FUNC(nabupc_state::j9_int_w));
-	m_bus->out_int_callback<1>().set(FUNC(nabupc_state::j10_int_w));
-	m_bus->out_int_callback<2>().set(FUNC(nabupc_state::j11_int_w));
-	m_bus->out_int_callback<3>().set(FUNC(nabupc_state::j12_int_w));
+	m_bus->out_int_callback<0>().set(FUNC(nabupc_state::int_w<3>)).invert();
+	m_bus->out_int_callback<1>().set(FUNC(nabupc_state::int_w<2>)).invert();
+	m_bus->out_int_callback<2>().set(FUNC(nabupc_state::int_w<1>)).invert();
+	m_bus->out_int_callback<3>().set(FUNC(nabupc_state::int_w<0>)).invert();
 	NABUPC_OPTION_BUS_SLOT(config, "option1", m_bus, 0, bus::nabupc::option_bus_devices, nullptr);
 	NABUPC_OPTION_BUS_SLOT(config, "option2", m_bus, 1, bus::nabupc::option_bus_devices, nullptr);
 	NABUPC_OPTION_BUS_SLOT(config, "option3", m_bus, 2, bus::nabupc::option_bus_devices, nullptr);
@@ -451,59 +446,10 @@ WRITE_LINE_MEMBER(nabupc_state::hcca_oe_w)
 //  Interrupt Handling
 //**************************************************************************
 
-// IRQ For HCCA Receive
-WRITE_LINE_MEMBER(nabupc_state::hcca_dr_w)
+template <unsigned N>
+WRITE_LINE_MEMBER(nabupc_state::int_w)
 {
-	BIT_SET(m_int_lines, 7, state);
-	update_irq();
-}
-
-// IRQ For HCCA Transmit
-WRITE_LINE_MEMBER(nabupc_state::hcca_tbre_w)
-{
-	BIT_SET(m_int_lines, 6, state);
-	update_irq();
-}
-
-// IRQ For Keyboard
-WRITE_LINE_MEMBER(nabupc_state::rxrdy_w)
-{
-	BIT_SET(m_int_lines, 5, state);
-	update_irq();
-}
-
-// IRQ For TMS9918a
-WRITE_LINE_MEMBER(nabupc_state::vdp_int_w)
-{
-	BIT_SET(m_int_lines, 4, state);
-	update_irq();
-}
-
-// IRQ For Option Slot 1
-WRITE_LINE_MEMBER(nabupc_state::j9_int_w)
-{
-	BIT_SET(m_int_lines, 3, !state);
-	update_irq();
-}
-
-// IRQ For Option Slot 2
-WRITE_LINE_MEMBER(nabupc_state::j10_int_w)
-{
-	BIT_SET(m_int_lines, 2, !state);
-	update_irq();
-}
-
-// IRQ For Option Slot 3
-WRITE_LINE_MEMBER(nabupc_state::j11_int_w)
-{
-	BIT_SET(m_int_lines, 1, !state);
-	update_irq();
-}
-
-// IRQ For Option Slot 4
-WRITE_LINE_MEMBER(nabupc_state::j12_int_w)
-{
-	BIT_SET(m_int_lines, 0, !state);
+	BIT_SET(m_int_lines, N, state);
 	update_irq();
 }
 
