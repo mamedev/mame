@@ -32,6 +32,9 @@ TODO:
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 
+#include <algorithm>
+
+
 #define LOG_IO    (1U << 1)
 #define LOG_MEM   (1U << 2)
 #define LOG_ACCEL (1U << 3)
@@ -161,6 +164,7 @@ private:
 	void update_accel_buffer(u8 idx, u8 data);
 
 	void on_kbd_data(int state);
+	void do_cpu_wait(u8 count);
 
 	required_device<ds12885_device> m_rtc;
 	required_device_array<ata_interface_device, 2> m_ata;
@@ -180,6 +184,7 @@ private:
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 
 	bool m_z80_m1;
+	u16 m_timer_overlap;
 
 	bool m_starting;
 	bool m_dos; // 0-on, 1-off
@@ -552,6 +557,12 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 	case 0x14:
 		m_beta->param_w(data);
 		break;
+	case 0x16:
+		if (data & 2)
+			m_beta->disable();
+		else
+			m_beta->enable();
+		break;
 
 	case 0x1d:
 	case 0x1e:
@@ -580,7 +591,7 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		if (CBL_INT_ENA)
 			m_cbl_data[m_cbl_wa++] = data << 8;
 		else
-			m_cbl_data[~offset >> 8] = data << 8;
+			dac_w(data << 8, data << 8);
 		break;
 
 	case 0x89:
@@ -922,8 +933,8 @@ void sprinter_state::update_accel_buffer(u8 idx, u8 data)
 u8 sprinter_state::ram_r(offs_t offset)
 {
 	const u8 bank = offset >> 14;
-	if (m_turbo)
-		m_maincpu->adjust_icount(-3);
+	if (!machine().side_effects_disabled() && m_turbo)
+		do_cpu_wait(3);
 
 	return ((m_pages[bank] & 0xf0) == 0x50)
 		? m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)]
@@ -948,7 +959,7 @@ void sprinter_state::ram_w(offs_t offset, u8 data)
 		if (BIT(~page, 2))
 		{
 			if (m_turbo)
-				m_maincpu->adjust_icount(-3);
+				do_cpu_wait(3);
 			m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)] = data;
 		}
 		if (!(BIT(page, 3) && (data == 0xff)))
@@ -996,13 +1007,14 @@ void sprinter_state::ram_w(offs_t offset, u8 data)
 		}
 
 		if (m_turbo)
-			m_maincpu->adjust_icount(-3);
+			do_cpu_wait(3);
 		reinterpret_cast<u8 *>(m_bank_ram[bank]->base())[offset & 0x3fff] = data;
 	}
 }
 
 u8 sprinter_state::m1_r(offs_t offset)
 {
+	do_cpu_wait(0); // adjust remaining
 	m_z80_m1 = 1;
 	u8 data = m_program.read_byte(offset);
 	m_z80_m1 = 0;
@@ -1120,6 +1132,7 @@ void sprinter_state::machine_start()
 void sprinter_state::machine_reset()
 {
 	m_cbl_timer->adjust(attotime::never);
+	m_timer_overlap = 0;
 
 	spectrum_128_state::machine_reset();
 
@@ -1187,6 +1200,17 @@ void sprinter_state::on_kbd_data(int state)
 	m_kbd_data_cnt %= 11;
 	if (!m_kbd_data_cnt && (state && ((m_all_mode & 0x09) == 0x09)))
 		irq_on(0);
+}
+
+void sprinter_state::do_cpu_wait(u8 count)
+{
+	m_timer_overlap += count;
+	const int allowed = std::min<int>(m_timer_overlap, m_maincpu->cycles_remaining() - 3);
+	if (allowed > 0)
+	{
+		m_maincpu->adjust_icount(-allowed);
+		m_timer_overlap -= allowed;
+	}
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_on)
