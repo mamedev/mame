@@ -1829,8 +1829,11 @@ void m72_state::imgfightjb(machine_config &config)
 	i80c31_device &mcu(I80C31(config.replace(), m_mcu, XTAL(32'000'000) / 4));
 	mcu.set_addrmap(AS_PROGRAM, &m72_state::i80c31_mem_map);
 	mcu.set_addrmap(AS_IO, &m72_state::mcu_io_map);
+	mcu.port_out_cb<1>().set(m_dac, FUNC(dac_byte_interface::write));
 
 	// TODO: uses 6116 type RAM instead of MB8421 and MB8431
+
+	MCFG_VIDEO_START_OVERRIDE(m72_state, imgfight)
 }
 
 void m72_state::rtype(machine_config &config)
@@ -2763,10 +2766,10 @@ ROM_START( imgfightj )
 ROM_END
 
 ROM_START( imgfightjb ) // mostly identical to imgfightj content-wise, it's a 4 PCB stack bootleg with flying wires
-	ROM_REGION( 0x100000, "maincpu", 0 ) // identical, but ic111.9e (TODO: verify it it's a real change or just a bad dump)
+	ROM_REGION( 0x100000, "maincpu", 0 ) // identical
 	ROM_LOAD16_BYTE( "ic108.9b", 0x00001, 0x10000, CRC(592d2d80) SHA1(d54916a9bfe4b65a972b62202af706135e73518d) )
 	ROM_LOAD16_BYTE( "ic89.7b",  0x00000, 0x10000, CRC(61f89056) SHA1(3e0724dbc2b00a30193ea6cfac8b4331055d4fd4) )
-	ROM_LOAD16_BYTE( "ic111.9e", 0x40001, 0x10000, CRC(da50622e) SHA1(32c75b6270d401a6825632c66f3026cae7b5b81f) ) // slight difference: 99.998474%: 0x1116 from 0x09 to 0x0d
+	ROM_LOAD16_BYTE( "ic111.9e", 0x40001, 0x10000, CRC(6aae3a46) SHA1(87fe2e13b4dd98c6cbec03ec52dfae1980403125) ) // dump had a slight difference: 99.998474%: 0x1116 from 0x09 to 0x0d. Determined to be rot.
 	ROM_RELOAD(                  0xc0001, 0x10000 )
 	ROM_LOAD16_BYTE( "ic110.9d", 0x60001, 0x10000, CRC(0e0aefcd) SHA1(f5056a2d0612d912aff1e0eccb1182de7ae16990) )
 	ROM_RELOAD(                  0xe0001, 0x10000 )
@@ -4663,7 +4666,7 @@ GAME( 1988, nspiritj,    nspirit,  nspiritj,     nspirit,      m72_state, init_m
 
 GAME( 1988, imgfight,    0,        imgfight,     imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, imgfightj,   imgfight, imgfight,     imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, imgfightjb,  imgfight, imgfightjb,   imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // uses an 80c31 MCU, some SFX don't play (bug or just bad bootleg?)
+GAME( 1988, imgfightjb,  imgfight, imgfightjb,   imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan, bootleg)", MACHINE_SUPPORTS_SAVE ) // uses an 80c31 MCU
 
 GAME( 1989, loht,        0,        m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "Irem", "Legend of Hero Tonma (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, lohtj,       loht,     m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "Irem", "Legend of Hero Tonma (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
