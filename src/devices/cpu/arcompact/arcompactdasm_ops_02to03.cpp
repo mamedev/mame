@@ -38,19 +38,28 @@ int arcompact_disassembler::handle_dasm32_LD_r_o(std::ostream &stream, offs_t pc
 		size = 8;
 	}
 
-	util::stream_format(stream, "LD");
-	util::stream_format(stream, "%s", datasize[Z]);
-	util::stream_format(stream, "%s", dataextend[X]);
-	util::stream_format(stream, "%s", addressmode[a]);
-	util::stream_format(stream, "%s", cachebit[D]);
-	util::stream_format(stream, " ");
-	util::stream_format(stream, "%s <- ", regnames[areg]);
-	util::stream_format(stream, "[");
-	if (breg == DASM_LIMM_REG) util::stream_format(stream, "(%08x), ", limm);
-	else util::stream_format(stream, "%s, ", regnames[breg]);
-	util::stream_format(stream, "%03x", sdat);
-	util::stream_format(stream, "]");
 
+	if ((s == 0x04) && (S == 0) && (Z == 0) && (X == 0) & (a == 2) && (D == 0) && (breg == 28))
+	{
+		util::stream_format(stream, "POP");
+		util::stream_format(stream, " ");
+		util::stream_format(stream, "%s", regnames[areg]);
+	}
+	else
+	{
+		util::stream_format(stream, "LD");
+		util::stream_format(stream, "%s", datasize[Z]);
+		util::stream_format(stream, "%s", dataextend[X]);
+		util::stream_format(stream, "%s", addressmode[a]);
+		util::stream_format(stream, "%s", cachebit[D]);
+		util::stream_format(stream, " ");
+		util::stream_format(stream, "%s <- ", regnames[areg]);
+		util::stream_format(stream, "[");
+		if (breg == DASM_LIMM_REG) util::stream_format(stream, "(%08x), ", limm);
+		else util::stream_format(stream, "%s, ", regnames[breg]);
+		util::stream_format(stream, "%03x", sdat);
+		util::stream_format(stream, "]");
+	}
 	return size;
 }
 
@@ -83,35 +92,42 @@ int arcompact_disassembler::handle_dasm32_ST_r_o(std::ostream &stream, offs_t pc
 		got_limm = 1;
 	}
 
-
-	util::stream_format(stream, "ST");
-	util::stream_format(stream, "%s", datasize[Z]);
-	util::stream_format(stream, "%s", addressmode[a]);
-	util::stream_format(stream, "%s", cachebit[D]);
-	util::stream_format(stream, " ");
-
-	util::stream_format(stream, "[");
-	if (breg == DASM_LIMM_REG) util::stream_format(stream, "(%08x), ", limm);
-	else util::stream_format(stream, "%s, ", regnames[breg]);
-	util::stream_format(stream, "%03x", sdat);
-	util::stream_format(stream, "] <- ");
-
-	if (creg == DASM_LIMM_REG)
+	if ((s == 0xfc) && (S == 1) && (Z == 0) && (a == 1) && (D == 0) && (breg == 28))
 	{
-		if (!got_limm)
-		{
-			DASM_GET_LIMM;
-			size = 8;
-		}
-		util::stream_format(stream, "(%08x)", limm);
-
+		util::stream_format(stream, "PUSH");
+		util::stream_format(stream, " ");
+		util::stream_format(stream, "%s", regnames[creg]);
 	}
 	else
 	{
-		util::stream_format(stream, "%s", regnames[creg]);
+		util::stream_format(stream, "ST");
+		util::stream_format(stream, "%s", datasize[Z]);
+		util::stream_format(stream, "%s", addressmode[a]);
+		util::stream_format(stream, "%s", cachebit[D]);
+		util::stream_format(stream, " ");
+
+		util::stream_format(stream, "[");
+		if (breg == DASM_LIMM_REG) util::stream_format(stream, "(%08x), ", limm);
+		else util::stream_format(stream, "%s, ", regnames[breg]);
+		util::stream_format(stream, "%03x", sdat);
+		util::stream_format(stream, "] <- ");
+
+		if (creg == DASM_LIMM_REG)
+		{
+			if (!got_limm)
+			{
+				DASM_GET_LIMM;
+				size = 8;
+			}
+			util::stream_format(stream, "(%08x)", limm);
+
+		}
+		else
+		{
+			util::stream_format(stream, "%s", regnames[creg]);
+		}
+
+		if (R) util::stream_format(stream, "(reserved bit set)");
 	}
-
-	if (R) util::stream_format(stream, "(reserved bit set)");
-
 	return size;
 }

@@ -777,15 +777,16 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                                 IIII I
 // LD<zz><.x><.aa><.di> a,[b,s9]   0001 0bbb ssss ssss   SBBB DaaZ ZXAA AAAA
-// LD<zz><.x><.di> a,[limm]        0001 0110 0000 0000   0111 DRRZ ZXAA AAAA (+ Limm)
 // LD<zz><.x><.aa><.di> 0,[b,s9]   0001 0bbb ssss ssss   SBBB DaaZ ZX11 1110
-// LD<zz><.x><.di> 0,[limm]        0001 0110 0000 0000   0111 DRRZ ZX11 1110 (+ Limm)
-//
 // PREFETCH<.aa> [b,s9]            0001 0bbb ssss ssss   SBBB 0aa0 0011 1110
+//
+// LD<zz><.x><.di> a,[limm]        0001 0110 0000 0000   0111 DRRZ ZXAA AAAA (+ Limm)
+// LD<zz><.x><.di> 0,[limm]        0001 0110 0000 0000   0111 DRRZ ZX11 1110 (+ Limm)
 // PREFETCH [limm]                 0001 0110 0000 0000   0111 0RR0 0011 1110 (+ Limm)
 //
 // can be used as a POP alias for higher registers
-// 40020310: 1404 3410           LD.AB r16 <- [r28_SP, 004]
+// 40020310: 1404 3410
+// LD.AB r16 <- [r28_SP, 004]      0001 0100 0000 0100   0011 0100 0001 0000
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				size = handle_dasm32_LD_r_o(stream, pc, op, opcodes); break; // LD r+o
 			}
@@ -798,7 +799,8 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ST<zz><.aa><.di> limm,[b,s9]    0001 1bbb ssss ssss   SBBB 1111 10Da aZZR (+ Limm)
 //
 // can be used as a PUSH alias for higher registers
-// 400202A6: 1CFC B408           ST.AW [r28_SP, 1fc] <- r16
+// 400202A6: 1CFC B408
+// ST.AW [r28_SP, 1fc] <- r16      0001 1100 1111 1100   1011 0100 0000 1000
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 				size = handle_dasm32_ST_r_o(stream, pc, op, opcodes); break; // ST r+o
 			}
