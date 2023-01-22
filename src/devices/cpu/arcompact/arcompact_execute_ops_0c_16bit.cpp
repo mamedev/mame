@@ -50,9 +50,9 @@ uint32_t arcompact_device::handleop_ADD_S_a_b_c(uint16_t op) // ADD_S a <- b + c
 {
 	int areg, breg, creg;
 
-	COMMON16_GET_areg;
-	COMMON16_GET_breg;
-	COMMON16_GET_creg;
+	areg = common16_get_areg(op);
+	breg = common16_get_breg(op);
+	creg = common16_get_creg(op);
 
 	REG_16BIT_RANGE(areg);
 	REG_16BIT_RANGE(breg);

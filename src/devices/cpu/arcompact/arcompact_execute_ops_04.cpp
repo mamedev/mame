@@ -109,7 +109,7 @@ uint32_t arcompact_device::handleop32_ADD_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	int32_t S = common32_get_s12(op);
+	uint32_t S = common32_get_s12(op);
 
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
@@ -339,7 +339,7 @@ uint32_t arcompact_device::handleop32_SUB_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	int32_t S = common32_get_s12(op);
+	uint32_t S = common32_get_s12(op);
 
 	/* breg is also the destination, so this might not fetch LIMM */
 	int size = check_b_limm(breg);
@@ -566,7 +566,7 @@ uint32_t arcompact_device::handleop32_AND_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	int32_t S = common32_get_s12(op);
+	uint32_t S = common32_get_s12(op);
 
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
@@ -719,7 +719,7 @@ uint32_t arcompact_device::handleop32_OR_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	int32_t S = common32_get_s12(op);
+	uint32_t S = common32_get_s12(op);
 
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
@@ -875,7 +875,7 @@ uint32_t arcompact_device::handleop32_BIC_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	int32_t S = common32_get_s12(op);
+	uint32_t S = common32_get_s12(op);
 
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
@@ -1030,7 +1030,7 @@ uint32_t arcompact_device::handleop32_XOR_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	int32_t S = common32_get_s12(op);
+	uint32_t S = common32_get_s12(op);
 
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
@@ -1340,7 +1340,7 @@ uint32_t arcompact_device::handleop32_MOV_f_b_b_s12(uint32_t op)
 
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	int32_t S = common32_get_s12(op);
+	uint32_t S = common32_get_s12(op);
 
 	uint32_t c = (uint32_t)S;
 
@@ -1696,7 +1696,7 @@ uint32_t arcompact_device::handleop32_RSUB_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	int32_t S = common32_get_s12(op);
+	uint32_t S = common32_get_s12(op);
 
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
@@ -1847,7 +1847,7 @@ uint32_t arcompact_device::handleop32_BSET_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	int32_t S = common32_get_s12(op);
+	uint32_t S = common32_get_s12(op);
 
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
@@ -2202,7 +2202,7 @@ uint32_t arcompact_device::handleop32_BMSK_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	int32_t S = common32_get_s12(op);
+	uint32_t S = common32_get_s12(op);
 
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
@@ -2357,7 +2357,7 @@ uint32_t arcompact_device::handleop32_ADD1_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	int32_t S = common32_get_s12(op);
+	uint32_t S = common32_get_s12(op);
 
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
@@ -2512,7 +2512,7 @@ uint32_t arcompact_device::handleop32_ADD2_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	int32_t S = common32_get_s12(op);
+	uint32_t S = common32_get_s12(op);
 
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
@@ -2665,7 +2665,7 @@ uint32_t arcompact_device::handleop32_ADD3_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	int32_t S = common32_get_s12(op);
+	uint32_t S = common32_get_s12(op);
 
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
@@ -2820,7 +2820,7 @@ uint32_t arcompact_device::handleop32_SUB1_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	int32_t S = common32_get_s12(op);
+	uint32_t S = common32_get_s12(op);
 
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
@@ -2976,7 +2976,7 @@ uint32_t arcompact_device::handleop32_SUB2_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	int32_t S = common32_get_s12(op);
+	uint32_t S = common32_get_s12(op);
 
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
@@ -3131,7 +3131,7 @@ uint32_t arcompact_device::handleop32_SUB3_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	int32_t S = common32_get_s12(op);
+	uint32_t S = common32_get_s12(op);
 
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
@@ -4012,7 +4012,7 @@ uint32_t arcompact_device::handleop32_LP(uint32_t op) // LPcc (loop setup)
 	}
 	else if (p == 0x02) // Loop unconditional
 	{ // 0010 0RRR 1010 1000 0RRR ssss ssSS SSSS
-		int32_t S = common32_get_s12(op);
+		uint32_t S = common32_get_s12(op);
 		if (S & 0x800) S = -0x800 + (S&0x7ff);
 
 		arcompact_fatal("Lp unconditional not supported %d", S);
@@ -4216,7 +4216,7 @@ uint32_t arcompact_device::handleop32_LR_f_b_b_s12(uint32_t op)
 
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	int32_t S = common32_get_s12(op);
+	uint32_t S = common32_get_s12(op);
 
 	uint32_t c = (uint32_t)S;
 
@@ -4357,7 +4357,7 @@ uint32_t arcompact_device::handleop32_SR_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	int32_t S = common32_get_s12(op);
+	uint32_t S = common32_get_s12(op);
 
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);

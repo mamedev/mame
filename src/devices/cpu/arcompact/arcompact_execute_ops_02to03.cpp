@@ -5,6 +5,16 @@
 #include "arcompact.h"
 #include "arcompactdasm.h"
 
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//                                 IIII I
+// LD<zz><.x><.aa><.di> a,[b,s9]   0001 0bbb ssss ssss   SBBB DaaZ ZXAA AAAA
+// LD<zz><.x><.di> a,[limm]        0001 0110 0000 0000   0111 DRRZ ZXAA AAAA (+ Limm)
+// LD<zz><.x><.aa><.di> 0,[b,s9]   0001 0bbb ssss ssss   SBBB DaaZ ZX11 1110
+// LD<zz><.x><.di> 0,[limm]        0001 0110 0000 0000   0111 DRRZ ZX11 1110 (+ Limm)
+//
+// PREFETCH<.aa> [b,s9]            0001 0bbb ssss ssss   SBBB 0aa0 0011 1110
+// PREFETCH [limm]                 0001 0110 0000 0000   0111 0RR0 0011 1110 (+ Limm)
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 {
@@ -96,6 +106,13 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 	return m_pc + (size>>0);
 
 }
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//                                 IIII I
+// ST<zz><.aa><.di> c,[b,s9]       0001 1bbb ssss ssss   SBBB CCCC CCDa aZZR
+// ST<zz><.di> c,[limm]            0001 1110 0000 0000   0111 CCCC CCDR RZZR (+ Limm)
+// ST<zz><.aa><.di> limm,[b,s9]    0001 1bbb ssss ssss   SBBB 1111 10Da aZZR (+ Limm)
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 // can be used as a PUSH when breg is stack register (28), s is -4 (0x1fc) Z is 0, D is 0, and a is 1
 uint32_t arcompact_device::handleop32_ST_r_o(uint32_t op)

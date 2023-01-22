@@ -19,9 +19,9 @@ uint32_t arcompact_device::handleop_ADD_S_c_b_u3(uint16_t op)
 {
 	int u, breg, creg;
 
-	COMMON16_GET_u3;
-	COMMON16_GET_breg;
-	COMMON16_GET_creg;
+	u = common16_get_u3(op);
+	breg = common16_get_breg(op);
+	creg = common16_get_creg(op);
 
 	REG_16BIT_RANGE(breg);
 	REG_16BIT_RANGE(creg);
@@ -40,9 +40,9 @@ uint32_t arcompact_device::handleop_SUB_S_c_b_u3(uint16_t op)
 {
 	int u, breg, creg;
 
-	COMMON16_GET_u3;
-	COMMON16_GET_breg;
-	COMMON16_GET_creg;
+	u = common16_get_u3(op);
+	breg = common16_get_breg(op);
+	creg = common16_get_creg(op);
 
 	REG_16BIT_RANGE(breg);
 	REG_16BIT_RANGE(creg);
@@ -62,9 +62,9 @@ uint32_t arcompact_device::handleop_ASL_S_c_b_u3(uint16_t op)
 {
 	int u, breg, creg;
 
-	COMMON16_GET_u3;
-	COMMON16_GET_breg;
-	COMMON16_GET_creg;
+	u = common16_get_u3(op);
+	breg = common16_get_breg(op);
+	creg = common16_get_creg(op);
 
 	REG_16BIT_RANGE(breg);
 	REG_16BIT_RANGE(creg);

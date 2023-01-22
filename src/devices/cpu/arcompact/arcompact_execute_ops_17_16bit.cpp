@@ -23,8 +23,8 @@ uint32_t arcompact_device::handleop_ASL_S_b_b_u5(uint16_t op)
 {
 	int breg, u;
 
-	COMMON16_GET_breg;
-	COMMON16_GET_u5;
+	breg = common16_get_breg(op);
+	u = common16_get_u5(op);
 
 	REG_16BIT_RANGE(breg);
 
@@ -42,8 +42,8 @@ uint32_t arcompact_device::handleop_LSR_S_b_b_u5(uint16_t op)
 {
 	int breg, u;
 
-	COMMON16_GET_breg;
-	COMMON16_GET_u5;
+	breg = common16_get_breg(op);
+	u = common16_get_u5(op);
 
 	REG_16BIT_RANGE(breg);
 
@@ -61,8 +61,8 @@ uint32_t arcompact_device::handleop_ASR_S_b_b_u5(uint16_t op)
 {
 	int breg, u;
 
-	COMMON16_GET_breg;
-	COMMON16_GET_u5;
+	breg = common16_get_breg(op);
+	u = common16_get_u5(op);
 
 	REG_16BIT_RANGE(breg);
 
@@ -80,8 +80,8 @@ uint32_t arcompact_device::handleop_SUB_S_b_b_u5(uint16_t op)
 {
 	int breg, u;
 
-	COMMON16_GET_breg;
-	COMMON16_GET_u5;
+	breg = common16_get_breg(op);
+	u = common16_get_u5(op);
 
 	REG_16BIT_RANGE(breg);
 
@@ -99,8 +99,8 @@ uint32_t arcompact_device::handleop_BSET_S_b_b_u5(uint16_t op)
 {
 	int breg, u;
 
-	COMMON16_GET_breg;
-	COMMON16_GET_u5;
+	breg = common16_get_breg(op);
+	u = common16_get_u5(op);
 
 	REG_16BIT_RANGE(breg);
 
@@ -128,8 +128,8 @@ uint32_t arcompact_device::handleop_BMSK_S_b_b_u5(uint16_t op)
 {
 	int breg, u;
 
-	COMMON16_GET_breg;
-	COMMON16_GET_u5;
+	breg = common16_get_breg(op);
+	u = common16_get_u5(op);
 
 	REG_16BIT_RANGE(breg);
 

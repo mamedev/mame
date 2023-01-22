@@ -23,8 +23,8 @@ uint32_t arcompact_device::handleop_LD_S_b_sp_u7(uint16_t op)   // LD_S b, [SP, 
 	int breg;
 	uint32_t u;
 
-	COMMON16_GET_breg;
-	COMMON16_GET_u5;
+	breg = common16_get_breg(op);
+	u = common16_get_u5(op);
 
 	REG_16BIT_RANGE(breg);
 
@@ -55,8 +55,8 @@ uint32_t arcompact_device::handleop_ST_S_b_sp_u7(uint16_t op)  // ST_S b, [SP, u
 	int breg;
 	uint32_t u;
 
-	COMMON16_GET_breg;
-	COMMON16_GET_u5;
+	breg = common16_get_breg(op);
+	u = common16_get_u5(op);
 
 	REG_16BIT_RANGE(breg);
 
@@ -87,8 +87,8 @@ uint32_t arcompact_device::handleop_ADD_S_b_sp_u7(uint16_t op)  // ADD_S b, SP, 
 	int breg;
 	uint32_t u;
 
-	COMMON16_GET_breg;
-	COMMON16_GET_u5;
+	breg = common16_get_breg(op);
+	u = common16_get_u5(op);
 
 	REG_16BIT_RANGE(breg);
 
@@ -106,7 +106,7 @@ uint32_t arcompact_device::handleop_ADD_S_b_sp_u7(uint16_t op)  // ADD_S b, SP, 
 uint32_t arcompact_device::handleop_ADD_S_sp_sp_u7(uint16_t op)
 {
 	int u;
-	COMMON16_GET_u5;
+	u = common16_get_u5(op);
 
 	m_regs[REG_SP] = m_regs[REG_SP] + (u << 2);
 
@@ -121,7 +121,7 @@ uint32_t arcompact_device::handleop_ADD_S_sp_sp_u7(uint16_t op)
 uint32_t arcompact_device::handleop_SUB_S_sp_sp_u7(uint16_t op)
 {
 	int u;
-	COMMON16_GET_u5;
+	u = common16_get_u5(op);
 
 	m_regs[REG_SP] = m_regs[REG_SP] - (u << 2);
 
@@ -137,7 +137,7 @@ uint32_t arcompact_device::handleop_SUB_S_sp_sp_u7(uint16_t op)
 uint32_t arcompact_device::handleop_POP_S_b(uint16_t op) // POP_S b
 {
 	int breg;
-	COMMON16_GET_breg;
+	breg = common16_get_breg(op);
 	REG_16BIT_RANGE(breg);
 
 	m_regs[breg] = READ32(m_regs[REG_SP] >> 2);
@@ -170,7 +170,7 @@ uint32_t arcompact_device::handleop_POP_S_blink(uint16_t op) // POP_S blink
 uint32_t arcompact_device::handleop_PUSH_S_b(uint16_t op) // PUSH_S b
 {
 	int breg;
-	COMMON16_GET_breg;
+	breg = common16_get_breg(op);
 	REG_16BIT_RANGE(breg);
 
 	m_regs[REG_SP] -= 4;

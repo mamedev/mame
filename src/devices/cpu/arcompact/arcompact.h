@@ -41,29 +41,6 @@ enum
 
 
 
-
-
-
-
-
-
-
-#define COMMON16_GET_breg \
-	breg =  ((op & 0x0700) >>8);
-#define COMMON16_GET_creg \
-	creg =  ((op & 0x00e0) >>5);
-#define COMMON16_GET_areg \
-	areg =  ((op & 0x0007) >>0);
-#define COMMON16_GET_u3 \
-	u =  ((op & 0x0007) >>0);
-#define COMMON16_GET_u5 \
-	u =  ((op & 0x001f) >>0);
-#define COMMON16_GET_u8 \
-	u =  ((op & 0x00ff) >>0);
-#define COMMON16_GET_u7 \
-	u =  ((op & 0x007f) >>0);
-#define COMMON16_GET_s9 \
-	s =  ((op & 0x01ff) >>0);
 // registers used in 16-bit opcodes have a limited range
 // and can only address registers r0-r3 and r12-r15
 
@@ -125,6 +102,52 @@ private:
 	uint32_t arcompact_auxreg025_INTVECTORBASE_r();
 	void arcompact_auxreg025_INTVECTORBASE_w(uint32_t data);
 
+
+	uint8_t common16_get_breg(uint16_t op)
+	{
+		return ((op & 0x0700) >> 8);
+	}
+
+	uint8_t common16_get_creg(uint16_t op)
+	{
+		return ((op & 0x00e0) >> 5);
+	}
+
+	uint8_t common16_get_areg(uint16_t op)
+	{
+		return ((op & 0x0007) >> 0);
+	}
+
+	uint8_t common16_get_u3(uint16_t op)
+	{
+		return ((op & 0x0007) >> 0);
+	}
+
+	uint8_t common16_get_u5(uint16_t op)
+	{
+		return ((op & 0x001f) >> 0);
+	}
+
+	uint8_t common16_get_u8(uint16_t op)
+	{
+		return ((op & 0x00ff) >>0);
+	}
+
+	uint8_t common16_get_u7(uint16_t op)
+	{
+		return ((op & 0x007f) >>0);
+	}
+
+	uint8_t common16_get_s9(uint16_t op)
+	{
+		uint8_t s = ((op & 0x01ff) >> 0);
+		if (s & 0x100)
+			s |= 0xfe00;
+
+		return s;
+	}
+
+
 	uint8_t common32_get_breg(uint32_t op)
 	{
 		int b_temp = (op & 0x07000000) >> 24;
@@ -157,12 +180,14 @@ private:
 		return (op & 0x0000003f) >> 0;
 	}
 
-	int32_t common32_get_s12(uint32_t op)
+	uint32_t common32_get_s12(uint32_t op)
 	{
 		int S_temp = (op & 0x0000003f) >> 0;
 		int s_temp = (op & 0x00000fc0) >> 6;
-		int32_t S = s_temp | (S_temp<<6);
-		if (S & 0x800) S = -0x800 + (S&0x7ff); /* sign extend */
+		uint32_t S = s_temp | (S_temp<<6);
+
+		if (S & 0x800) // sign extend
+			S |= 0xfffff000;
 
 		return S;
 	}
@@ -543,11 +568,43 @@ private:
 	uint32_t handleop32_FLAG_cc(uint32_t op);
 	uint32_t handleop32_FLAG(uint32_t op);
 
-
-
+	// arcompact_execute_ops_04_2f_sop.cpp
 
 	uint32_t handleop32_ASL_single(uint32_t op);
 	uint32_t handleop32_ASR_single(uint32_t op);
+
+	uint32_t handleop32_LSR_single_cc(uint32_t op);
+	uint32_t handleop32_LSR_single(uint32_t op);
+	uint32_t handleop32_LSR_single_f_a_b_c(uint32_t op);
+	uint32_t handleop32_LSR_single_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_LSR_single_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_LSR_single_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_LSR_single_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_ROR_single_cc(uint32_t op);
+	uint32_t handleop32_ROR_single(uint32_t op);
+	uint32_t handleop32_ROR_single_f_a_b_c(uint32_t op);
+	uint32_t handleop32_ROR_single_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_ROR_single_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_ROR_single_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_ROR_single_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_EXTB_cc(uint32_t op);
+	uint32_t handleop32_EXTB(uint32_t op);
+	uint32_t handleop32_EXTB_f_a_b_c(uint32_t op);
+	uint32_t handleop32_EXTB_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_EXTB_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_EXTB_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_EXTB_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_EXTW_cc(uint32_t op);
+	uint32_t handleop32_EXTW(uint32_t op);
+	uint32_t handleop32_EXTW_f_a_b_c(uint32_t op);
+	uint32_t handleop32_EXTW_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_EXTW_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_EXTW_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_EXTW_cc_f_b_b_u6(uint32_t op);
+
 	uint32_t handleop32_RRC(uint32_t op);
 	uint32_t handleop32_SEXB(uint32_t op);
 	uint32_t handleop32_SEXW(uint32_t op);
@@ -555,11 +612,18 @@ private:
 	uint32_t handleop32_NOT(uint32_t op);
 	uint32_t handleop32_RLC(uint32_t op);
 	uint32_t handleop32_EX(uint32_t op);
+
+	// arcompact_execute_ops_04_2f_3f_zop.cpp
+
 	uint32_t handleop32_SLEEP(uint32_t op);
 	uint32_t handleop32_SWI(uint32_t op);
 	uint32_t handleop32_SYNC(uint32_t op);
 	uint32_t handleop32_RTIE(uint32_t op);
 	uint32_t handleop32_BRK(uint32_t op);
+
+
+
+
 	uint32_t handleop32_LD_0(uint32_t op);
 	uint32_t handleop32_LD_1(uint32_t op);
 	uint32_t handleop32_LD_2(uint32_t op);
@@ -568,6 +632,9 @@ private:
 	uint32_t handleop32_LD_5(uint32_t op);
 	uint32_t handleop32_LD_6(uint32_t op);
 	uint32_t handleop32_LD_7(uint32_t op);
+
+
+
 	uint32_t handleop32_ASR_multiple(uint32_t op);
 	uint32_t handleop32_ROR_multiple(uint32_t op);
 	uint32_t handleop32_MUL64(uint32_t op);
@@ -722,37 +789,6 @@ private:
 	************************************************************************************************************************************/
 
 
-	uint32_t handleop32_LSR_single_cc(uint32_t op);
-	uint32_t handleop32_LSR_single(uint32_t op);
-	uint32_t handleop32_LSR_single_f_a_b_c(uint32_t op);
-	uint32_t handleop32_LSR_single_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_LSR_single_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_LSR_single_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_LSR_single_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_ROR_single_cc(uint32_t op);
-	uint32_t handleop32_ROR_single(uint32_t op);
-	uint32_t handleop32_ROR_single_f_a_b_c(uint32_t op);
-	uint32_t handleop32_ROR_single_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_ROR_single_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_ROR_single_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_ROR_single_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_EXTB_cc(uint32_t op);
-	uint32_t handleop32_EXTB(uint32_t op);
-	uint32_t handleop32_EXTB_f_a_b_c(uint32_t op);
-	uint32_t handleop32_EXTB_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_EXTB_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_EXTB_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_EXTB_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_EXTW_cc(uint32_t op);
-	uint32_t handleop32_EXTW(uint32_t op);
-	uint32_t handleop32_EXTW_f_a_b_c(uint32_t op);
-	uint32_t handleop32_EXTW_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_EXTW_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_EXTW_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_EXTW_cc_f_b_b_u6(uint32_t op);
 
 	uint32_t handleop32_ASL_multiple_cc(uint32_t op);
 	uint32_t handleop32_ASL_multiple(uint32_t op);

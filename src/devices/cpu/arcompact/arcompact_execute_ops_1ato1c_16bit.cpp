@@ -27,8 +27,8 @@ uint32_t arcompact_device::handleop_MOV_S_b_u8(uint16_t op) // MOV_S b, u8
 {
 	int breg;
 	uint32_t u;
-	COMMON16_GET_breg;
-	COMMON16_GET_u8;
+	breg = common16_get_breg(op);
+	u = common16_get_u8(op);
 	REG_16BIT_RANGE(breg);
 
 	m_regs[breg] = u;
@@ -45,8 +45,8 @@ uint32_t arcompact_device::handleop_ADD_S_b_b_u7(uint16_t op) // ADD_S b, b, u7
 {
 	int breg;
 	uint32_t u;
-	COMMON16_GET_breg;
-	COMMON16_GET_u7;
+	breg = common16_get_breg(op);
+	u = common16_get_u7(op);
 	REG_16BIT_RANGE(breg);
 
 	m_regs[breg] = m_regs[breg] + u;
@@ -63,8 +63,8 @@ uint32_t arcompact_device::handleop_CMP_S_b_u7(uint16_t op) // CMP b, u7
 {
 	int breg;
 	uint32_t u;
-	COMMON16_GET_breg;
-	COMMON16_GET_u7;
+	breg = common16_get_breg(op);
+	u = common16_get_u7(op);
 	REG_16BIT_RANGE(breg);
 
 	// flag setting ALWAYS occurs on CMP operations, even 16-bit ones even without a .F opcode type

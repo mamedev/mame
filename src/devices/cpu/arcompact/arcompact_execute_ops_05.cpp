@@ -76,7 +76,7 @@ uint32_t arcompact_device::handleop32_ASL_multiple_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	int32_t S = common32_get_s12(op);
+	uint32_t S = common32_get_s12(op);
 
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
@@ -231,7 +231,7 @@ uint32_t arcompact_device::handleop32_LSR_multiple_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
-	int32_t S = common32_get_s12(op);
+	uint32_t S = common32_get_s12(op);
 
 	/* is having b as LIMM valid here? LIMM vs. fixed u6 value makes no sense */
 	int size = check_b_limm(breg);
