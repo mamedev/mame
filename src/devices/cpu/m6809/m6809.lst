@@ -717,8 +717,8 @@ XST16:
 	// ToDo: Flag setting is much more complex see:
 	// https://github.com/hoglet67/6809Decoder/wiki/Undocumented-6809-Behaviours#store-immediate
 
-	@read_operand();
-	@write_operand(1, regop16().b.l);
+	m_temp.b.h = read_operand(0);
+	write_memory(m_pc.w++, regop16().b.l);
 	set_flags(CC_NZV, regop16().w);
 	return;
 
