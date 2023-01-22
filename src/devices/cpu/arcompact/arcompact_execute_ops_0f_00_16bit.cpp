@@ -24,7 +24,19 @@ uint32_t arcompact_device::handleop_J_S_b(uint16_t op)  { return arcompact_handl
 // J_S.D [b]                       0111 1bbb 0010 0000
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_J_S_D_b(uint16_t op)  { return arcompact_handle0f_00_0x_helper(op, "J_S.D"); }
+uint32_t arcompact_device::handleop_J_S_D_b(uint16_t op)
+{
+	int breg;
+
+	breg = common16_get_breg(op);
+	REG_16BIT_RANGE(breg);
+
+	m_delayactive = 1;
+	m_delayjump = m_regs[breg];
+	m_delaylinks = 0;
+
+	return m_pc + (2 >> 0);
+}
 
 // #######################################################################################################################
 //                                 IIII I    sssS SSSS

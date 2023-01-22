@@ -900,37 +900,38 @@ private:
 #define STATUS32_CHECK_Z (m_status32 &   Z_ZERO_FLAG)
 
 
-// AL / RA - Always
+// 0x00 - AL / RA - Always
 #define CONDITION_AL (1)
-// EQ / Z - Zero
+// 0x01 - EQ / Z - Zero
 #define CONDITION_EQ (STATUS32_CHECK_Z)
-// NE / NZ - Non-Zero
+// 0x02 - NE / NZ - Non-Zero
 #define CONDITION_NE (!STATUS32_CHECK_Z)
-// PL / P - Positive
+// 0x03 - PL / P - Positive
 #define CONDITION_PL (!STATUS32_CHECK_N)
-// MI / N - Negative
+// 0x04 - MI / N - Negative
 #define CONDITION_MI (STATUS32_CHECK_N)
-// CS / C / LO - Carry Set
+// 0x05 - CS / C / LO - Carry Set
 #define CONDITION_CS (STATUS32_CHECK_C)
-// CC / NC / HS - Carry Clear
+// 0x06 - CC / NC / HS - Carry Clear
 #define CONDITION_HS (!STATUS32_CHECK_C)
-// VS / V - Overflow set
-
-// VC / NV - Overflow clear
-
-// GT - Greater than (signed)
-
-// GE - Greater than or equal to (signed)
-
-// LT - Less than (signed)
+// 0x07 - VS / V - Overflow set
+#define CONDITION_VS (STATUS32_CHECK_V)
+// 0x08 - VC / NV - Overflow clear
+#define CONDITION_VC (!STATUS32_CHECK_V)
+// 0x09 GT - Greater than (signed)
+#define CONDITION_GT ((STATUS32_CHECK_N && STATUS32_CHECK_V && !STATUS32_CHECK_Z) || (!STATUS32_CHECK_N && !STATUS32_CHECK_V && !STATUS32_CHECK_Z))
+// 0x0a - GE - Greater than or equal to (signed)
+#define CONDITION_GE ((STATUS32_CHECK_N && STATUS32_CHECK_V) || (!STATUS32_CHECK_N && !STATUS32_CHECK_V))
+// 0x0b - LT - Less than (signed)
 #define CONDITION_LT ((STATUS32_CHECK_N && !STATUS32_CHECK_V) || (!STATUS32_CHECK_N && STATUS32_CHECK_V))
-// LE - Less than or equal (signed)
+// 0x0c - LE - Less than or equal (signed)
 #define CONDITION_LE ((STATUS32_CHECK_Z) || (STATUS32_CHECK_N && !STATUS32_CHECK_V) ||  (!STATUS32_CHECK_N && STATUS32_CHECK_V)) // Z or (N and /V) or (/N and V)
-// HI - Higher than (unsigned)
-
-// LS - Lower than or same (unsigned)
-
-// PNZ - Positive Non Zero
+// 0x0d - HI - Higher than (unsigned)
+#define CONDITION_HI ((!STATUS32_CHECK_C) && (!STATUS32_CHECK_Z))
+// 0x0e - LS - Lower than or same (unsigned)
+#define CONDITION_LS (STATUS32_CHECK_C || STATUS32_CHECK_Z)
+// 0x0f - PNZ - Positive Non Zero
+#define CONDITION_PNZ ((!STATUS32_CHECK_N) && (!STATUS32_CHECK_Z))
 
 
 

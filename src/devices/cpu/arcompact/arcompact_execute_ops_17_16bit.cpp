@@ -116,7 +116,14 @@ uint32_t arcompact_device::handleop_BSET_S_b_b_u5(uint16_t op)
 
 uint32_t arcompact_device::handleop_BCLR_S_b_b_u5(uint16_t op)
 {
-	return arcompact_handle_l7_0x_helper(op, "BCLR_S");
+	uint8_t breg = common16_get_breg(op);
+	uint8_t u = common16_get_u5(op);
+
+	REG_16BIT_RANGE(breg);
+
+	m_regs[breg] = m_regs[breg] &~ (1 << u);
+
+	return m_pc + (2 >> 0);
 }
 
 // #######################################################################################################################
@@ -126,10 +133,8 @@ uint32_t arcompact_device::handleop_BCLR_S_b_b_u5(uint16_t op)
 
 uint32_t arcompact_device::handleop_BMSK_S_b_b_u5(uint16_t op)
 {
-	int breg, u;
-
-	breg = common16_get_breg(op);
-	u = common16_get_u5(op);
+	uint8_t breg = common16_get_breg(op);
+	uint8_t u = common16_get_u5(op);
 
 	REG_16BIT_RANGE(breg);
 

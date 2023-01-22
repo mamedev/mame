@@ -71,12 +71,23 @@ int arcompact_device::check_condition(uint8_t condition)
 {
 	switch (condition & 0x1f)
 	{
-		case 0x00: return 1; // AL
+		case 0x00: return CONDITION_AL; // AL
 		case 0x01: return CONDITION_EQ;
-		case 0x02: return !CONDITION_EQ; // NE
-		case 0x03: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+		case 0x02: return CONDITION_NE; // NE
+		case 0x03: return CONDITION_PL;
 		case 0x04: return CONDITION_MI; // MI (N)
 		case 0x05: return CONDITION_CS; // CS (Carry Set / Lower than)
+		case 0x06: return CONDITION_HS;
+		case 0x07: return CONDITION_VS; 
+		case 0x08: return CONDITION_VC;
+		case 0x09: return CONDITION_GT;
+		case 0x0a: return CONDITION_GE; 
+		case 0x0b: return CONDITION_LT;
+		case 0x0c: return CONDITION_LE;
+		case 0x0d: return CONDITION_HI;
+		case 0x0e: return CONDITION_LS;
+		case 0x0f: return CONDITION_PNZ;
+
 		default: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
 	}
 

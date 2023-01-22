@@ -314,10 +314,8 @@ uint32_t arcompact_device::handleop_ASR_S_b_b_c_multiple(uint16_t op)  { return 
 
 uint32_t arcompact_device::handleop_ASL_S_b_c_single(uint16_t op)
 {
-	int breg, creg;
-
-	breg = common16_get_breg(op);
-	creg = common16_get_creg(op);
+	int breg = common16_get_breg(op);
+	int creg = common16_get_creg(op);
 
 	REG_16BIT_RANGE(breg);
 	REG_16BIT_RANGE(creg);
@@ -340,8 +338,19 @@ uint32_t arcompact_device::handleop_ASR_S_b_c_single(uint16_t op)  { return arco
 // LSR_S b,c                       0111 1bbb ccc1 1101
 // #######################################################################################################################
 
+uint32_t arcompact_device::handleop_LSR_S_b_c_single(uint16_t op)
+{
+	int breg = common16_get_breg(op);
+	int creg = common16_get_creg(op);
 
-uint32_t arcompact_device::handleop_LSR_S_b_c_single(uint16_t op)  { return arcompact_handle0f_0x_helper(op, "LSR1_S",0); }
+	REG_16BIT_RANGE(breg);
+	REG_16BIT_RANGE(creg);
+
+	uint32_t result = m_regs[creg] >> 1;
+	m_regs[breg] = result;
+
+	return m_pc + (2 >> 0);
+}
 
 // #######################################################################################################################
 //                                 IIII I       S SSSS
