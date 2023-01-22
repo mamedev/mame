@@ -135,6 +135,7 @@ if CPUS["ARCOMPACT"] then
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_0c_16bit.cpp",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_0d_16bit.cpp",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_0e_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_0f_16bit.cpp",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_0f_00_16bit.cpp",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_0f_00_07_16bit.cpp",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_12to16_16bit.cpp",
@@ -142,7 +143,7 @@ if CPUS["ARCOMPACT"] then
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_18_16bit.cpp",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_19_16bit.cpp",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_1ato1c_16bit.cpp",
-		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_1dto1f_16bit.cpp",
 	}
 end
 
