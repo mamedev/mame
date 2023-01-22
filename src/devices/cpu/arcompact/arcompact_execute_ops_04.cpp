@@ -65,7 +65,7 @@ void arcompact_device::do_flags_nz(uint32_t result)
 // ADD<.cc><.f> b,b,u6             0010 0bbb 1100 0000   FBBB uuuu uu1Q QQQQ
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ADD_p00(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD_f_a_b_c(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -86,7 +86,7 @@ uint32_t arcompact_device::handleop32_ADD_p00(uint32_t op)
 	return m_pc + (size >> 0);
 }
 
-uint32_t arcompact_device::handleop32_ADD_p01(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD_f_a_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -109,7 +109,7 @@ uint32_t arcompact_device::handleop32_ADD_p01(uint32_t op)
 	return m_pc + (size >> 0);
 }
 
-uint32_t arcompact_device::handleop32_ADD_p10(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -132,15 +132,15 @@ uint32_t arcompact_device::handleop32_ADD_p10(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_ADD_p11_m0(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
-	arcompact_fatal("handleop32_ADD_p11_m0 (ADD)\n");
+	arcompact_fatal("handleop32_ADD_cc_f_b_b_c (ADD)\n");
 	return m_pc + (size >> 0);
 }
 
 
-uint32_t arcompact_device::handleop32_ADD_p11_m1(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD_cc_f_b_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -167,14 +167,14 @@ uint32_t arcompact_device::handleop32_ADD_p11_m1(uint32_t op)
 	return m_pc + (size >> 0);
 }
 
-uint32_t arcompact_device::handleop32_ADD_p11(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD_cc(uint32_t op)
 {
 	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
-		case 0x00: return handleop32_ADD_p11_m0(op);
-		case 0x01: return handleop32_ADD_p11_m1(op);
+		case 0x00: return handleop32_ADD_cc_f_b_b_c(op);
+		case 0x01: return handleop32_ADD_cc_f_b_b_u6(op);
 	}
 
 	return 0;
@@ -186,10 +186,10 @@ uint32_t arcompact_device::handleop32_ADD(uint32_t op)
 
 	switch (p)
 	{
-		case 0x00: return handleop32_ADD_p00(op);
-		case 0x01: return handleop32_ADD_p01(op);
-		case 0x02: return handleop32_ADD_p10(op);
-		case 0x03: return handleop32_ADD_p11(op);
+		case 0x00: return handleop32_ADD_f_a_b_c(op);
+		case 0x01: return handleop32_ADD_f_a_b_u6(op);
+		case 0x02: return handleop32_ADD_f_b_b_s12(op);
+		case 0x03: return handleop32_ADD_cc(op);
 	}
 
 	return 0;
@@ -220,7 +220,7 @@ uint32_t arcompact_device::handleop32_ADC(uint32_t op)
 	return arcompact_handle04_helper(op, arcompact_disassembler::opcodes_04[0x01], /*"ADC"*/ 0,0);
 }
 
-uint32_t arcompact_device::handleop32_SUB_p00(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB_f_a_b_c(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -245,7 +245,7 @@ uint32_t arcompact_device::handleop32_SUB_p00(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_SUB_p01(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB_f_a_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -269,7 +269,7 @@ uint32_t arcompact_device::handleop32_SUB_p01(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_SUB_p10(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -293,15 +293,15 @@ uint32_t arcompact_device::handleop32_SUB_p10(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_SUB_p11_m0(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
-	arcompact_fatal("handleop32_SUB_p11_m0 (SUB)\n");
+	arcompact_fatal("handleop32_SUB_cc_f_b_b_c (SUB)\n");
 	return m_pc + (size >> 0);
 }
 
 
-uint32_t arcompact_device::handleop32_SUB_p11_m1(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB_cc_f_b_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -330,7 +330,7 @@ uint32_t arcompact_device::handleop32_SUB_p11_m1(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_AND_p00(uint32_t op)
+uint32_t arcompact_device::handleop32_AND_f_a_b_c(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -358,7 +358,7 @@ uint32_t arcompact_device::handleop32_AND_p00(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_AND_p01(uint32_t op)
+uint32_t arcompact_device::handleop32_AND_f_a_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -382,7 +382,7 @@ uint32_t arcompact_device::handleop32_AND_p01(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_AND_p10(uint32_t op)
+uint32_t arcompact_device::handleop32_AND_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -405,15 +405,15 @@ uint32_t arcompact_device::handleop32_AND_p10(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_AND_p11_m0(uint32_t op)
+uint32_t arcompact_device::handleop32_AND_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
-	arcompact_fatal("handleop32_AND_p11_m0 (AND)\n");
+	arcompact_fatal("handleop32_AND_cc_f_b_b_c (AND)\n");
 	return m_pc + (size >> 0);
 }
 
 
-uint32_t arcompact_device::handleop32_AND_p11_m1(uint32_t op)
+uint32_t arcompact_device::handleop32_AND_cc_f_b_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -441,7 +441,7 @@ uint32_t arcompact_device::handleop32_AND_p11_m1(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_OR_p00(uint32_t op)
+uint32_t arcompact_device::handleop32_OR_f_a_b_c(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -466,7 +466,7 @@ uint32_t arcompact_device::handleop32_OR_p00(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_OR_p01(uint32_t op)
+uint32_t arcompact_device::handleop32_OR_f_a_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -491,7 +491,7 @@ uint32_t arcompact_device::handleop32_OR_p01(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_OR_p10(uint32_t op)
+uint32_t arcompact_device::handleop32_OR_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -515,15 +515,15 @@ uint32_t arcompact_device::handleop32_OR_p10(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_OR_p11_m0(uint32_t op)
+uint32_t arcompact_device::handleop32_OR_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
-	arcompact_fatal("handleop32_OR_p11_m0 (OR)\n");
+	arcompact_fatal("handleop32_OR_cc_f_b_b_c (OR)\n");
 	return m_pc + (size >> 0);
 }
 
 
-uint32_t arcompact_device::handleop32_OR_p11_m1(uint32_t op)
+uint32_t arcompact_device::handleop32_OR_cc_f_b_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -552,7 +552,7 @@ uint32_t arcompact_device::handleop32_OR_p11_m1(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_BIC_p00(uint32_t op)
+uint32_t arcompact_device::handleop32_BIC_f_a_b_c(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -577,7 +577,7 @@ uint32_t arcompact_device::handleop32_BIC_p00(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_BIC_p01(uint32_t op)
+uint32_t arcompact_device::handleop32_BIC_f_a_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -602,7 +602,7 @@ uint32_t arcompact_device::handleop32_BIC_p01(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_BIC_p10(uint32_t op)
+uint32_t arcompact_device::handleop32_BIC_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -626,15 +626,15 @@ uint32_t arcompact_device::handleop32_BIC_p10(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_BIC_p11_m0(uint32_t op)
+uint32_t arcompact_device::handleop32_BIC_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
-	arcompact_fatal("handleop32_BIC_p11_m0 (BIC)\n");
+	arcompact_fatal("handleop32_BIC_cc_f_b_b_c (BIC)\n");
 	return m_pc + (size >> 0);
 }
 
 
-uint32_t arcompact_device::handleop32_BIC_p11_m1(uint32_t op)
+uint32_t arcompact_device::handleop32_BIC_cc_f_b_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -663,7 +663,7 @@ uint32_t arcompact_device::handleop32_BIC_p11_m1(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_XOR_p00(uint32_t op)
+uint32_t arcompact_device::handleop32_XOR_f_a_b_c(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -688,7 +688,7 @@ uint32_t arcompact_device::handleop32_XOR_p00(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_XOR_p01(uint32_t op)
+uint32_t arcompact_device::handleop32_XOR_f_a_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -713,7 +713,7 @@ uint32_t arcompact_device::handleop32_XOR_p01(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_XOR_p10(uint32_t op)
+uint32_t arcompact_device::handleop32_XOR_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -737,15 +737,15 @@ uint32_t arcompact_device::handleop32_XOR_p10(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_XOR_p11_m0(uint32_t op)
+uint32_t arcompact_device::handleop32_XOR_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
-	arcompact_fatal("handleop32_XOR_p11_m0 (XOR)\n");
+	arcompact_fatal("handleop32_XOR_cc_f_b_b_c (XOR)\n");
 	return m_pc + (size >> 0);
 }
 
 
-uint32_t arcompact_device::handleop32_XOR_p11_m1(uint32_t op)
+uint32_t arcompact_device::handleop32_XOR_cc_f_b_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -774,7 +774,7 @@ uint32_t arcompact_device::handleop32_XOR_p11_m1(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_MOV_p00(uint32_t op)
+uint32_t arcompact_device::handleop32_MOV_f_a_b_c(uint32_t op)
 {
 	int size = 4;
 
@@ -802,7 +802,7 @@ uint32_t arcompact_device::handleop32_MOV_p00(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_MOV_p01(uint32_t op)
+uint32_t arcompact_device::handleop32_MOV_f_a_b_u6(uint32_t op)
 {
 	int size = 4;
 
@@ -824,7 +824,7 @@ uint32_t arcompact_device::handleop32_MOV_p01(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_MOV_p10(uint32_t op)
+uint32_t arcompact_device::handleop32_MOV_f_b_b_s12(uint32_t op)
 {
 	int size = 4;
 
@@ -845,15 +845,15 @@ uint32_t arcompact_device::handleop32_MOV_p10(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_MOV_p11_m0(uint32_t op)
+uint32_t arcompact_device::handleop32_MOV_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
-	arcompact_fatal("handleop32_MOV_p11_m0 (MOV)\n");
+	arcompact_fatal("handleop32_MOV_cc_f_b_b_c (MOV)\n");
 	return m_pc + (size >> 0);
 }
 
 
-uint32_t arcompact_device::handleop32_MOV_p11_m1(uint32_t op)
+uint32_t arcompact_device::handleop32_MOV_cc_f_b_b_u6(uint32_t op)
 {
 	int size = 4;
 
@@ -879,7 +879,7 @@ uint32_t arcompact_device::handleop32_MOV_p11_m1(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_RSUB_p00(uint32_t op)
+uint32_t arcompact_device::handleop32_RSUB_f_a_b_c(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -904,7 +904,7 @@ uint32_t arcompact_device::handleop32_RSUB_p00(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_RSUB_p01(uint32_t op)
+uint32_t arcompact_device::handleop32_RSUB_f_a_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -929,7 +929,7 @@ uint32_t arcompact_device::handleop32_RSUB_p01(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_RSUB_p10(uint32_t op)
+uint32_t arcompact_device::handleop32_RSUB_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -953,15 +953,15 @@ uint32_t arcompact_device::handleop32_RSUB_p10(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_RSUB_p11_m0(uint32_t op)
+uint32_t arcompact_device::handleop32_RSUB_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
-	arcompact_fatal("handleop32_RSUB_p11_m0 (RSUB)\n");
+	arcompact_fatal("handleop32_RSUB_cc_f_b_b_c (RSUB)\n");
 	return m_pc + (size >> 0);
 }
 
 
-uint32_t arcompact_device::handleop32_RSUB_p11_m1(uint32_t op)
+uint32_t arcompact_device::handleop32_RSUB_cc_f_b_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -990,7 +990,7 @@ uint32_t arcompact_device::handleop32_RSUB_p11_m1(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_BSET_p00(uint32_t op)
+uint32_t arcompact_device::handleop32_BSET_f_a_b_c(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1015,7 +1015,7 @@ uint32_t arcompact_device::handleop32_BSET_p00(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_BSET_p01(uint32_t op)
+uint32_t arcompact_device::handleop32_BSET_f_a_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1040,7 +1040,7 @@ uint32_t arcompact_device::handleop32_BSET_p01(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_BSET_p10(uint32_t op)
+uint32_t arcompact_device::handleop32_BSET_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1064,15 +1064,15 @@ uint32_t arcompact_device::handleop32_BSET_p10(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_BSET_p11_m0(uint32_t op)
+uint32_t arcompact_device::handleop32_BSET_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
-	arcompact_fatal("handleop32_BSET_p11_m0 (BSET)\n");
+	arcompact_fatal("handleop32_BSET_cc_f_b_b_c (BSET)\n");
 	return m_pc + (size >> 0);
 }
 
 
-uint32_t arcompact_device::handleop32_BSET_p11_m1(uint32_t op)
+uint32_t arcompact_device::handleop32_BSET_cc_f_b_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1101,7 +1101,7 @@ uint32_t arcompact_device::handleop32_BSET_p11_m1(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_BMSK_p00(uint32_t op)
+uint32_t arcompact_device::handleop32_BMSK_f_a_b_c(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1126,7 +1126,7 @@ uint32_t arcompact_device::handleop32_BMSK_p00(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_BMSK_p01(uint32_t op)
+uint32_t arcompact_device::handleop32_BMSK_f_a_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1151,7 +1151,7 @@ uint32_t arcompact_device::handleop32_BMSK_p01(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_BMSK_p10(uint32_t op)
+uint32_t arcompact_device::handleop32_BMSK_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1175,15 +1175,15 @@ uint32_t arcompact_device::handleop32_BMSK_p10(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_BMSK_p11_m0(uint32_t op)
+uint32_t arcompact_device::handleop32_BMSK_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
-	arcompact_fatal("handleop32_BMSK_p11_m0 (BMSK)\n");
+	arcompact_fatal("handleop32_BMSK_cc_f_b_b_c (BMSK)\n");
 	return m_pc + (size >> 0);
 }
 
 
-uint32_t arcompact_device::handleop32_BMSK_p11_m1(uint32_t op)
+uint32_t arcompact_device::handleop32_BMSK_cc_f_b_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1211,14 +1211,14 @@ uint32_t arcompact_device::handleop32_BMSK_p11_m1(uint32_t op)
 	return m_pc + (size >> 0);
 }
 
-uint32_t arcompact_device::handleop32_SUB_p11(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB_cc(uint32_t op)
 {
 	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
-		case 0x00: return handleop32_SUB_p11_m0(op);
-		case 0x01: return handleop32_SUB_p11_m1(op);
+		case 0x00: return handleop32_SUB_cc_f_b_b_c(op);
+		case 0x01: return handleop32_SUB_cc_f_b_b_u6(op);
 	}
 
 	return 0;
@@ -1230,23 +1230,23 @@ uint32_t arcompact_device::handleop32_SUB(uint32_t op)
 
 	switch (p)
 	{
-		case 0x00: return handleop32_SUB_p00(op);
-		case 0x01: return handleop32_SUB_p01(op);
-		case 0x02: return handleop32_SUB_p10(op);
-		case 0x03: return handleop32_SUB_p11(op);
+		case 0x00: return handleop32_SUB_f_a_b_c(op);
+		case 0x01: return handleop32_SUB_f_a_b_u6(op);
+		case 0x02: return handleop32_SUB_f_b_b_s12(op);
+		case 0x03: return handleop32_SUB_cc(op);
 	}
 
 	return 0;
 }
 
-uint32_t arcompact_device::handleop32_AND_p11(uint32_t op)
+uint32_t arcompact_device::handleop32_AND_cc(uint32_t op)
 {
 	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
-		case 0x00: return handleop32_AND_p11_m0(op);
-		case 0x01: return handleop32_AND_p11_m1(op);
+		case 0x00: return handleop32_AND_cc_f_b_b_c(op);
+		case 0x01: return handleop32_AND_cc_f_b_b_u6(op);
 	}
 
 	return 0;
@@ -1258,23 +1258,23 @@ uint32_t arcompact_device::handleop32_AND(uint32_t op)
 
 	switch (p)
 	{
-		case 0x00: return handleop32_AND_p00(op);
-		case 0x01: return handleop32_AND_p01(op);
-		case 0x02: return handleop32_AND_p10(op);
-		case 0x03: return handleop32_AND_p11(op);
+		case 0x00: return handleop32_AND_f_a_b_c(op);
+		case 0x01: return handleop32_AND_f_a_b_u6(op);
+		case 0x02: return handleop32_AND_f_b_b_s12(op);
+		case 0x03: return handleop32_AND_cc(op);
 	}
 
 	return 0;
 }
 
-uint32_t arcompact_device::handleop32_OR_p11(uint32_t op)
+uint32_t arcompact_device::handleop32_OR_cc(uint32_t op)
 {
 	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
-		case 0x00: return handleop32_OR_p11_m0(op);
-		case 0x01: return handleop32_OR_p11_m1(op);
+		case 0x00: return handleop32_OR_cc_f_b_b_c(op);
+		case 0x01: return handleop32_OR_cc_f_b_b_u6(op);
 	}
 
 	return 0;
@@ -1286,23 +1286,23 @@ uint32_t arcompact_device::handleop32_OR(uint32_t op)
 
 	switch (p)
 	{
-		case 0x00: return handleop32_OR_p00(op);
-		case 0x01: return handleop32_OR_p01(op);
-		case 0x02: return handleop32_OR_p10(op);
-		case 0x03: return handleop32_OR_p11(op);
+		case 0x00: return handleop32_OR_f_a_b_c(op);
+		case 0x01: return handleop32_OR_f_a_b_u6(op);
+		case 0x02: return handleop32_OR_f_b_b_s12(op);
+		case 0x03: return handleop32_OR_cc(op);
 	}
 
 	return 0;
 }
 
-uint32_t arcompact_device::handleop32_BIC_p11(uint32_t op)
+uint32_t arcompact_device::handleop32_BIC_cc(uint32_t op)
 {
 	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
-		case 0x00: return handleop32_BIC_p11_m0(op);
-		case 0x01: return handleop32_BIC_p11_m1(op);
+		case 0x00: return handleop32_BIC_cc_f_b_b_c(op);
+		case 0x01: return handleop32_BIC_cc_f_b_b_u6(op);
 	}
 
 	return 0;
@@ -1314,23 +1314,23 @@ uint32_t arcompact_device::handleop32_BIC(uint32_t op)
 
 	switch (p)
 	{
-		case 0x00: return handleop32_BIC_p00(op);
-		case 0x01: return handleop32_BIC_p01(op);
-		case 0x02: return handleop32_BIC_p10(op);
-		case 0x03: return handleop32_BIC_p11(op);
+		case 0x00: return handleop32_BIC_f_a_b_c(op);
+		case 0x01: return handleop32_BIC_f_a_b_u6(op);
+		case 0x02: return handleop32_BIC_f_b_b_s12(op);
+		case 0x03: return handleop32_BIC_cc(op);
 	}
 
 	return 0;
 }
 
-uint32_t arcompact_device::handleop32_XOR_p11(uint32_t op)
+uint32_t arcompact_device::handleop32_XOR_cc(uint32_t op)
 {
 	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
-		case 0x00: return handleop32_XOR_p11_m0(op);
-		case 0x01: return handleop32_XOR_p11_m1(op);
+		case 0x00: return handleop32_XOR_cc_f_b_b_c(op);
+		case 0x01: return handleop32_XOR_cc_f_b_b_u6(op);
 	}
 
 	return 0;
@@ -1342,23 +1342,23 @@ uint32_t arcompact_device::handleop32_XOR(uint32_t op)
 
 	switch (p)
 	{
-		case 0x00: return handleop32_XOR_p00(op);
-		case 0x01: return handleop32_XOR_p01(op);
-		case 0x02: return handleop32_XOR_p10(op);
-		case 0x03: return handleop32_XOR_p11(op);
+		case 0x00: return handleop32_XOR_f_a_b_c(op);
+		case 0x01: return handleop32_XOR_f_a_b_u6(op);
+		case 0x02: return handleop32_XOR_f_b_b_s12(op);
+		case 0x03: return handleop32_XOR_cc(op);
 	}
 
 	return 0;
 }
 
-uint32_t arcompact_device::handleop32_MOV_p11(uint32_t op)
+uint32_t arcompact_device::handleop32_MOV_cc(uint32_t op)
 {
 	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
-		case 0x00: return handleop32_MOV_p11_m0(op);
-		case 0x01: return handleop32_MOV_p11_m1(op);
+		case 0x00: return handleop32_MOV_cc_f_b_b_c(op);
+		case 0x01: return handleop32_MOV_cc_f_b_b_u6(op);
 	}
 
 	return 0;
@@ -1370,23 +1370,23 @@ uint32_t arcompact_device::handleop32_MOV(uint32_t op)
 
 	switch (p)
 	{
-		case 0x00: return handleop32_MOV_p00(op);
-		case 0x01: return handleop32_MOV_p01(op);
-		case 0x02: return handleop32_MOV_p10(op);
-		case 0x03: return handleop32_MOV_p11(op);
+		case 0x00: return handleop32_MOV_f_a_b_c(op);
+		case 0x01: return handleop32_MOV_f_a_b_u6(op);
+		case 0x02: return handleop32_MOV_f_b_b_s12(op);
+		case 0x03: return handleop32_MOV_cc(op);
 	}
 
 	return 0;
 }
 
-uint32_t arcompact_device::handleop32_RSUB_p11(uint32_t op)
+uint32_t arcompact_device::handleop32_RSUB_cc(uint32_t op)
 {
 	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
-		case 0x00: return handleop32_RSUB_p11_m0(op);
-		case 0x01: return handleop32_RSUB_p11_m1(op);
+		case 0x00: return handleop32_RSUB_cc_f_b_b_c(op);
+		case 0x01: return handleop32_RSUB_cc_f_b_b_u6(op);
 	}
 
 	return 0;
@@ -1398,23 +1398,23 @@ uint32_t arcompact_device::handleop32_RSUB(uint32_t op)
 
 	switch (p)
 	{
-		case 0x00: return handleop32_RSUB_p00(op);
-		case 0x01: return handleop32_RSUB_p01(op);
-		case 0x02: return handleop32_RSUB_p10(op);
-		case 0x03: return handleop32_RSUB_p11(op);
+		case 0x00: return handleop32_RSUB_f_a_b_c(op);
+		case 0x01: return handleop32_RSUB_f_a_b_u6(op);
+		case 0x02: return handleop32_RSUB_f_b_b_s12(op);
+		case 0x03: return handleop32_RSUB_cc(op);
 	}
 
 	return 0;
 }
 
-uint32_t arcompact_device::handleop32_BSET_p11(uint32_t op)
+uint32_t arcompact_device::handleop32_BSET_cc(uint32_t op)
 {
 	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
-		case 0x00: return handleop32_BSET_p11_m0(op);
-		case 0x01: return handleop32_BSET_p11_m1(op);
+		case 0x00: return handleop32_BSET_cc_f_b_b_c(op);
+		case 0x01: return handleop32_BSET_cc_f_b_b_u6(op);
 	}
 
 	return 0;
@@ -1426,23 +1426,23 @@ uint32_t arcompact_device::handleop32_BSET(uint32_t op)
 
 	switch (p)
 	{
-		case 0x00: return handleop32_BSET_p00(op);
-		case 0x01: return handleop32_BSET_p01(op);
-		case 0x02: return handleop32_BSET_p10(op);
-		case 0x03: return handleop32_BSET_p11(op);
+		case 0x00: return handleop32_BSET_f_a_b_c(op);
+		case 0x01: return handleop32_BSET_f_a_b_u6(op);
+		case 0x02: return handleop32_BSET_f_b_b_s12(op);
+		case 0x03: return handleop32_BSET_cc(op);
 	}
 
 	return 0;
 }
 
-uint32_t arcompact_device::handleop32_BMSK_p11(uint32_t op)
+uint32_t arcompact_device::handleop32_BMSK_cc(uint32_t op)
 {
 	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
-		case 0x00: return handleop32_BMSK_p11_m0(op);
-		case 0x01: return handleop32_BMSK_p11_m1(op);
+		case 0x00: return handleop32_BMSK_cc_f_b_b_c(op);
+		case 0x01: return handleop32_BMSK_cc_f_b_b_u6(op);
 	}
 
 	return 0;
@@ -1454,23 +1454,23 @@ uint32_t arcompact_device::handleop32_BMSK(uint32_t op)
 
 	switch (p)
 	{
-		case 0x00: return handleop32_BMSK_p00(op);
-		case 0x01: return handleop32_BMSK_p01(op);
-		case 0x02: return handleop32_BMSK_p10(op);
-		case 0x03: return handleop32_BMSK_p11(op);
+		case 0x00: return handleop32_BMSK_f_a_b_c(op);
+		case 0x01: return handleop32_BMSK_f_a_b_u6(op);
+		case 0x02: return handleop32_BMSK_f_b_b_s12(op);
+		case 0x03: return handleop32_BMSK_cc(op);
 	}
 
 	return 0;
 }
 
-uint32_t arcompact_device::handleop32_ADD1_p11(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD1_cc(uint32_t op)
 {
 	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
-		case 0x00: return handleop32_ADD1_p11_m0(op);
-		case 0x01: return handleop32_ADD1_p11_m1(op);
+		case 0x00: return handleop32_ADD1_cc_f_b_b_c(op);
+		case 0x01: return handleop32_ADD1_cc_f_b_b_u6(op);
 	}
 
 	return 0;
@@ -1482,23 +1482,23 @@ uint32_t arcompact_device::handleop32_ADD1(uint32_t op)
 
 	switch (p)
 	{
-		case 0x00: return handleop32_ADD1_p00(op);
-		case 0x01: return handleop32_ADD1_p01(op);
-		case 0x02: return handleop32_ADD1_p10(op);
-		case 0x03: return handleop32_ADD1_p11(op);
+		case 0x00: return handleop32_ADD1_f_a_b_c(op);
+		case 0x01: return handleop32_ADD1_f_a_b_u6(op);
+		case 0x02: return handleop32_ADD1_f_b_b_s12(op);
+		case 0x03: return handleop32_ADD1_cc(op);
 	}
 
 	return 0;
 }
 
-uint32_t arcompact_device::handleop32_ADD2_p11(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD2_cc(uint32_t op)
 {
 	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
-		case 0x00: return handleop32_ADD2_p11_m0(op);
-		case 0x01: return handleop32_ADD2_p11_m1(op);
+		case 0x00: return handleop32_ADD2_cc_f_b_b_c(op);
+		case 0x01: return handleop32_ADD2_cc_f_b_b_u6(op);
 	}
 
 	return 0;
@@ -1510,23 +1510,23 @@ uint32_t arcompact_device::handleop32_ADD2(uint32_t op)
 
 	switch (p)
 	{
-		case 0x00: return handleop32_ADD2_p00(op);
-		case 0x01: return handleop32_ADD2_p01(op);
-		case 0x02: return handleop32_ADD2_p10(op);
-		case 0x03: return handleop32_ADD2_p11(op);
+		case 0x00: return handleop32_ADD2_f_a_b_c(op);
+		case 0x01: return handleop32_ADD2_f_a_b_u6(op);
+		case 0x02: return handleop32_ADD2_f_b_b_s12(op);
+		case 0x03: return handleop32_ADD2_cc(op);
 	}
 
 	return 0;
 }
 
-uint32_t arcompact_device::handleop32_ADD3_p11(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD3_cc(uint32_t op)
 {
 	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
-		case 0x00: return handleop32_ADD3_p11_m0(op);
-		case 0x01: return handleop32_ADD3_p11_m1(op);
+		case 0x00: return handleop32_ADD3_cc_f_b_b_c(op);
+		case 0x01: return handleop32_ADD3_cc_f_b_b_u6(op);
 	}
 
 	return 0;
@@ -1538,23 +1538,23 @@ uint32_t arcompact_device::handleop32_ADD3(uint32_t op)
 
 	switch (p)
 	{
-		case 0x00: return handleop32_ADD3_p00(op);
-		case 0x01: return handleop32_ADD3_p01(op);
-		case 0x02: return handleop32_ADD3_p10(op);
-		case 0x03: return handleop32_ADD3_p11(op);
+		case 0x00: return handleop32_ADD3_f_a_b_c(op);
+		case 0x01: return handleop32_ADD3_f_a_b_u6(op);
+		case 0x02: return handleop32_ADD3_f_b_b_s12(op);
+		case 0x03: return handleop32_ADD3_cc(op);
 	}
 
 	return 0;
 }
 
-uint32_t arcompact_device::handleop32_SUB1_p11(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB1_cc(uint32_t op)
 {
 	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
-		case 0x00: return handleop32_SUB1_p11_m0(op);
-		case 0x01: return handleop32_SUB1_p11_m1(op);
+		case 0x00: return handleop32_SUB1_cc_f_b_b_c(op);
+		case 0x01: return handleop32_SUB1_cc_f_b_b_u6(op);
 	}
 
 	return 0;
@@ -1566,23 +1566,23 @@ uint32_t arcompact_device::handleop32_SUB1(uint32_t op)
 
 	switch (p)
 	{
-		case 0x00: return handleop32_SUB1_p00(op);
-		case 0x01: return handleop32_SUB1_p01(op);
-		case 0x02: return handleop32_SUB1_p10(op);
-		case 0x03: return handleop32_SUB1_p11(op);
+		case 0x00: return handleop32_SUB1_f_a_b_c(op);
+		case 0x01: return handleop32_SUB1_f_a_b_u6(op);
+		case 0x02: return handleop32_SUB1_f_b_b_s12(op);
+		case 0x03: return handleop32_SUB1_cc(op);
 	}
 
 	return 0;
 }
 
-uint32_t arcompact_device::handleop32_SUB2_p11(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB2_cc(uint32_t op)
 {
 	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
-		case 0x00: return handleop32_SUB2_p11_m0(op);
-		case 0x01: return handleop32_SUB2_p11_m1(op);
+		case 0x00: return handleop32_SUB2_cc_f_b_b_c(op);
+		case 0x01: return handleop32_SUB2_cc_f_b_b_u6(op);
 	}
 
 	return 0;
@@ -1594,17 +1594,17 @@ uint32_t arcompact_device::handleop32_SUB2(uint32_t op)
 
 	switch (p)
 	{
-		case 0x00: return handleop32_SUB2_p00(op);
-		case 0x01: return handleop32_SUB2_p01(op);
-		case 0x02: return handleop32_SUB2_p10(op);
-		case 0x03: return handleop32_SUB2_p11(op);
+		case 0x00: return handleop32_SUB2_f_a_b_c(op);
+		case 0x01: return handleop32_SUB2_f_a_b_u6(op);
+		case 0x02: return handleop32_SUB2_f_b_b_s12(op);
+		case 0x03: return handleop32_SUB2_cc(op);
 	}
 
 	return 0;
 }
 
 
-uint32_t arcompact_device::handleop32_ADD1_p00(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD1_f_a_b_c(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1629,7 +1629,7 @@ uint32_t arcompact_device::handleop32_ADD1_p00(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_ADD1_p01(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD1_f_a_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1654,7 +1654,7 @@ uint32_t arcompact_device::handleop32_ADD1_p01(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_ADD1_p10(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD1_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1678,15 +1678,15 @@ uint32_t arcompact_device::handleop32_ADD1_p10(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_ADD1_p11_m0(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD1_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
-	arcompact_fatal("handleop32_ADD1_p11_m0 (ADD1)\n");
+	arcompact_fatal("handleop32_ADD1_cc_f_b_b_c (ADD1)\n");
 	return m_pc + (size >> 0);
 }
 
 
-uint32_t arcompact_device::handleop32_ADD1_p11_m1(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD1_cc_f_b_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1715,7 +1715,7 @@ uint32_t arcompact_device::handleop32_ADD1_p11_m1(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_ADD2_p00(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD2_f_a_b_c(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1740,7 +1740,7 @@ uint32_t arcompact_device::handleop32_ADD2_p00(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_ADD2_p01(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD2_f_a_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1765,7 +1765,7 @@ uint32_t arcompact_device::handleop32_ADD2_p01(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_ADD2_p10(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD2_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1789,15 +1789,15 @@ uint32_t arcompact_device::handleop32_ADD2_p10(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_ADD2_p11_m0(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD2_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
-	arcompact_fatal("handleop32_ADD2_p11_m0 (ADD2)\n");
+	arcompact_fatal("handleop32_ADD2_cc_f_b_b_c (ADD2)\n");
 	return m_pc + (size >> 0);
 }
 
 
-uint32_t arcompact_device::handleop32_ADD2_p11_m1(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD2_cc_f_b_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1826,7 +1826,7 @@ uint32_t arcompact_device::handleop32_ADD2_p11_m1(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_ADD3_p00(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD3_f_a_b_c(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1851,7 +1851,7 @@ uint32_t arcompact_device::handleop32_ADD3_p00(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_ADD3_p01(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD3_f_a_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1876,7 +1876,7 @@ uint32_t arcompact_device::handleop32_ADD3_p01(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_ADD3_p10(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD3_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1900,15 +1900,15 @@ uint32_t arcompact_device::handleop32_ADD3_p10(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_ADD3_p11_m0(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD3_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
-	arcompact_fatal("handleop32_ADD3_p11_m0 (ADD3)\n");
+	arcompact_fatal("handleop32_ADD3_cc_f_b_b_c (ADD3)\n");
 	return m_pc + (size >> 0);
 }
 
 
-uint32_t arcompact_device::handleop32_ADD3_p11_m1(uint32_t op)
+uint32_t arcompact_device::handleop32_ADD3_cc_f_b_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1937,7 +1937,7 @@ uint32_t arcompact_device::handleop32_ADD3_p11_m1(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_SUB1_p00(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB1_f_a_b_c(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1962,7 +1962,7 @@ uint32_t arcompact_device::handleop32_SUB1_p00(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_SUB1_p01(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB1_f_a_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -1987,7 +1987,7 @@ uint32_t arcompact_device::handleop32_SUB1_p01(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_SUB1_p10(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB1_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -2011,15 +2011,15 @@ uint32_t arcompact_device::handleop32_SUB1_p10(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_SUB1_p11_m0(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB1_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
-	arcompact_fatal("handleop32_SUB1_p11_m0 (SUB1)\n");
+	arcompact_fatal("handleop32_SUB1_cc_f_b_b_c (SUB1)\n");
 	return m_pc + (size >> 0);
 }
 
 
-uint32_t arcompact_device::handleop32_SUB1_p11_m1(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB1_cc_f_b_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -2048,7 +2048,7 @@ uint32_t arcompact_device::handleop32_SUB1_p11_m1(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_SUB2_p00(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB2_f_a_b_c(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -2073,7 +2073,7 @@ uint32_t arcompact_device::handleop32_SUB2_p00(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_SUB2_p01(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB2_f_a_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -2098,7 +2098,7 @@ uint32_t arcompact_device::handleop32_SUB2_p01(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_SUB2_p10(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB2_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -2122,15 +2122,15 @@ uint32_t arcompact_device::handleop32_SUB2_p10(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_SUB2_p11_m0(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB2_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
-	arcompact_fatal("handleop32_SUB2_p11_m0 (SUB2)\n");
+	arcompact_fatal("handleop32_SUB2_cc_f_b_b_c (SUB2)\n");
 	return m_pc + (size >> 0);
 }
 
 
-uint32_t arcompact_device::handleop32_SUB2_p11_m1(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB2_cc_f_b_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -2159,7 +2159,7 @@ uint32_t arcompact_device::handleop32_SUB2_p11_m1(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_SUB3_p00(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB3_f_a_b_c(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -2184,7 +2184,7 @@ uint32_t arcompact_device::handleop32_SUB3_p00(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_SUB3_p01(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB3_f_a_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -2209,7 +2209,7 @@ uint32_t arcompact_device::handleop32_SUB3_p01(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_SUB3_p10(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB3_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -2233,15 +2233,15 @@ uint32_t arcompact_device::handleop32_SUB3_p10(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_SUB3_p11_m0(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB3_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
-	arcompact_fatal("handleop32_SUB3_p11_m0 (SUB3)\n");
+	arcompact_fatal("handleop32_SUB3_cc_f_b_b_c (SUB3)\n");
 	return m_pc + (size >> 0);
 }
 
 
-uint32_t arcompact_device::handleop32_SUB3_p11_m1(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB3_cc_f_b_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -2269,14 +2269,14 @@ uint32_t arcompact_device::handleop32_SUB3_p11_m1(uint32_t op)
 	return m_pc + (size >> 0);
 }
 
-uint32_t arcompact_device::handleop32_SUB3_p11(uint32_t op)
+uint32_t arcompact_device::handleop32_SUB3_cc(uint32_t op)
 {
 	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
-		case 0x00: return handleop32_SUB3_p11_m0(op);
-		case 0x01: return handleop32_SUB3_p11_m1(op);
+		case 0x00: return handleop32_SUB3_cc_f_b_b_c(op);
+		case 0x01: return handleop32_SUB3_cc_f_b_b_u6(op);
 	}
 
 	return 0;
@@ -2288,23 +2288,23 @@ uint32_t arcompact_device::handleop32_SUB3(uint32_t op)
 
 	switch (p)
 	{
-		case 0x00: return handleop32_SUB3_p00(op);
-		case 0x01: return handleop32_SUB3_p01(op);
-		case 0x02: return handleop32_SUB3_p10(op);
-		case 0x03: return handleop32_SUB3_p11(op);
+		case 0x00: return handleop32_SUB3_f_a_b_c(op);
+		case 0x01: return handleop32_SUB3_f_a_b_u6(op);
+		case 0x02: return handleop32_SUB3_f_b_b_s12(op);
+		case 0x03: return handleop32_SUB3_cc(op);
 	}
 
 	return 0;
 }
 
-uint32_t arcompact_device::handleop32_Jcc_p11(uint32_t op)
+uint32_t arcompact_device::handleop32_Jcc_cc(uint32_t op)
 {
 	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
-		case 0x00: return handleop32_Jcc_p11_m0(op);
-		case 0x01: return handleop32_Jcc_p11_m1(op);
+		case 0x00: return handleop32_Jcc_cc_f_b_b_c(op);
+		case 0x01: return handleop32_Jcc_cc_f_b_b_u6(op);
 	}
 
 	return 0;
@@ -2316,23 +2316,23 @@ uint32_t arcompact_device::handleop32_Jcc(uint32_t op)
 
 	switch (p)
 	{
-		case 0x00: return handleop32_Jcc_p00(op);
-		case 0x01: return handleop32_Jcc_p01(op);
-		case 0x02: return handleop32_Jcc_p10(op);
-		case 0x03: return handleop32_Jcc_p11(op);
+		case 0x00: return handleop32_Jcc_f_a_b_c(op);
+		case 0x01: return handleop32_Jcc_f_a_b_u6(op);
+		case 0x02: return handleop32_Jcc_f_b_b_s12(op);
+		case 0x03: return handleop32_Jcc_cc(op);
 	}
 
 	return 0;
 }
 
-uint32_t arcompact_device::handleop32_Jcc_D_p11(uint32_t op)
+uint32_t arcompact_device::handleop32_Jcc_D_cc(uint32_t op)
 {
 	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
-		case 0x00: return handleop32_Jcc_D_p11_m0(op);
-		case 0x01: return handleop32_Jcc_D_p11_m1(op);
+		case 0x00: return handleop32_Jcc_D_cc_f_b_b_c(op);
+		case 0x01: return handleop32_Jcc_D_cc_f_b_b_u6(op);
 	}
 
 	return 0;
@@ -2344,10 +2344,10 @@ uint32_t arcompact_device::handleop32_Jcc_D(uint32_t op)
 
 	switch (p)
 	{
-		case 0x00: return handleop32_Jcc_D_p00(op);
-		case 0x01: return handleop32_Jcc_D_p01(op);
-		case 0x02: return handleop32_Jcc_D_p10(op);
-		case 0x03: return handleop32_Jcc_D_p11(op);
+		case 0x00: return handleop32_Jcc_D_f_a_b_c(op);
+		case 0x01: return handleop32_Jcc_D_f_a_b_u6(op);
+		case 0x02: return handleop32_Jcc_D_f_b_b_s12(op);
+		case 0x03: return handleop32_Jcc_D_cc(op);
 	}
 
 	return 0;
@@ -2355,7 +2355,7 @@ uint32_t arcompact_device::handleop32_Jcc_D(uint32_t op)
 
 
 
-uint32_t arcompact_device::handleop32_LR_p00(uint32_t op)
+uint32_t arcompact_device::handleop32_LR_f_a_b_c(uint32_t op)
 {
 	int size = 4;
 
@@ -2384,7 +2384,7 @@ uint32_t arcompact_device::handleop32_LR_p00(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_LR_p01(uint32_t op)
+uint32_t arcompact_device::handleop32_LR_f_a_b_u6(uint32_t op)
 {
 	int size = 4;
 
@@ -2407,7 +2407,7 @@ uint32_t arcompact_device::handleop32_LR_p01(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_LR_p10(uint32_t op)
+uint32_t arcompact_device::handleop32_LR_f_b_b_s12(uint32_t op)
 {
 	int size = 4;
 
@@ -2429,15 +2429,15 @@ uint32_t arcompact_device::handleop32_LR_p10(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_LR_p11_m0(uint32_t op)
+uint32_t arcompact_device::handleop32_LR_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
-	arcompact_fatal("handleop32_LR_p11_m0 (LR)\n");
+	arcompact_fatal("handleop32_LR_cc_f_b_b_c (LR)\n");
 	return m_pc + (size >> 0);
 }
 
 
-uint32_t arcompact_device::handleop32_LR_p11_m1(uint32_t op)
+uint32_t arcompact_device::handleop32_LR_cc_f_b_b_u6(uint32_t op)
 {
 	int size = 4;
 
@@ -2463,14 +2463,14 @@ uint32_t arcompact_device::handleop32_LR_p11_m1(uint32_t op)
 	return m_pc + (size >> 0);
 }
 
-uint32_t arcompact_device::handleop32_LR_p11(uint32_t op)
+uint32_t arcompact_device::handleop32_LR_cc(uint32_t op)
 {
 	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
-		case 0x00: return handleop32_LR_p11_m0(op);
-		case 0x01: return handleop32_LR_p11_m1(op);
+		case 0x00: return handleop32_LR_cc_f_b_b_c(op);
+		case 0x01: return handleop32_LR_cc_f_b_b_u6(op);
 	}
 
 	return 0;
@@ -2482,17 +2482,17 @@ uint32_t arcompact_device::handleop32_LR(uint32_t op)
 
 	switch (p)
 	{
-		case 0x00: return handleop32_LR_p00(op);
-		case 0x01: return handleop32_LR_p01(op);
-		case 0x02: return handleop32_LR_p10(op);
-		case 0x03: return handleop32_LR_p11(op);
+		case 0x00: return handleop32_LR_f_a_b_c(op);
+		case 0x01: return handleop32_LR_f_a_b_u6(op);
+		case 0x02: return handleop32_LR_f_b_b_s12(op);
+		case 0x03: return handleop32_LR_cc(op);
 	}
 
 	return 0;
 }
 
 
-uint32_t arcompact_device::handleop32_SR_p00(uint32_t op)
+uint32_t arcompact_device::handleop32_SR_f_a_b_c(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -2517,7 +2517,7 @@ uint32_t arcompact_device::handleop32_SR_p00(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_SR_p01(uint32_t op)
+uint32_t arcompact_device::handleop32_SR_f_a_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -2542,7 +2542,7 @@ uint32_t arcompact_device::handleop32_SR_p01(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_SR_p10(uint32_t op)
+uint32_t arcompact_device::handleop32_SR_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -2566,15 +2566,15 @@ uint32_t arcompact_device::handleop32_SR_p10(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_SR_p11_m0(uint32_t op)
+uint32_t arcompact_device::handleop32_SR_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
-	arcompact_fatal("handleop32_SR_p11_m0 (SR)\n");
+	arcompact_fatal("handleop32_SR_cc_f_b_b_c (SR)\n");
 	return m_pc + (size >> 0);
 }
 
 
-uint32_t arcompact_device::handleop32_SR_p11_m1(uint32_t op)
+uint32_t arcompact_device::handleop32_SR_cc_f_b_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t F = common32_get_F(op);
@@ -2602,14 +2602,14 @@ uint32_t arcompact_device::handleop32_SR_p11_m1(uint32_t op)
 	return m_pc + (size >> 0);
 }
 
-uint32_t arcompact_device::handleop32_SR_p11(uint32_t op)
+uint32_t arcompact_device::handleop32_SR_cc(uint32_t op)
 {
 	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
-		case 0x00: return handleop32_SR_p11_m0(op);
-		case 0x01: return handleop32_SR_p11_m1(op);
+		case 0x00: return handleop32_SR_cc_f_b_b_c(op);
+		case 0x01: return handleop32_SR_cc_f_b_b_u6(op);
 	}
 
 	return 0;
@@ -2621,10 +2621,10 @@ uint32_t arcompact_device::handleop32_SR(uint32_t op)
 
 	switch (p)
 	{
-		case 0x00: return handleop32_SR_p00(op);
-		case 0x01: return handleop32_SR_p01(op);
-		case 0x02: return handleop32_SR_p10(op);
-		case 0x03: return handleop32_SR_p11(op);
+		case 0x00: return handleop32_SR_f_a_b_c(op);
+		case 0x01: return handleop32_SR_f_a_b_u6(op);
+		case 0x02: return handleop32_SR_f_b_b_s12(op);
+		case 0x03: return handleop32_SR_cc(op);
 	}
 
 	return 0;
@@ -2697,7 +2697,7 @@ uint32_t arcompact_device::handleop32_MPYU(uint32_t op)
 	return arcompact_handle04_helper(op, arcompact_disassembler::opcodes_04[0x1d], /*"MPYU"*/ 0,0);
 } // *
 
-uint32_t arcompact_device::handleop32_Jcc_p00(uint32_t op)
+uint32_t arcompact_device::handleop32_Jcc_f_a_b_c(uint32_t op)
 {
 	int size;
 
@@ -2751,7 +2751,7 @@ uint32_t arcompact_device::handleop32_Jcc_p00(uint32_t op)
 	return m_pc + (size>>0);
 }
 
-uint32_t arcompact_device::handleop32_Jcc_p01(uint32_t op)
+uint32_t arcompact_device::handleop32_Jcc_f_a_b_u6(uint32_t op)
 {
 	// opcode          iiii i--- ppII IIII F--- uuuu uu-- ----
 	// J u6            0010 0RRR 0110 0000 0RRR uuuu uuRR RRRR
@@ -2760,7 +2760,7 @@ uint32_t arcompact_device::handleop32_Jcc_p01(uint32_t op)
 	return m_pc + (size>>0);
 }
 
-uint32_t arcompact_device::handleop32_Jcc_p10(uint32_t op)
+uint32_t arcompact_device::handleop32_Jcc_f_b_b_s12(uint32_t op)
 {
 	// opcode          iiii i--- ppII IIII F--- ssss ssSS SSSS
 	// J s12           0010 0RRR 1010 0000 0RRR ssss ssSS SSSS
@@ -2770,7 +2770,7 @@ uint32_t arcompact_device::handleop32_Jcc_p10(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_Jcc_p11_m0(uint32_t op) // Jcc   (no link, no delay)
+uint32_t arcompact_device::handleop32_Jcc_cc_f_b_b_c(uint32_t op) // Jcc   (no link, no delay)
 {
 	int size = 4;
 
@@ -2808,7 +2808,7 @@ uint32_t arcompact_device::handleop32_Jcc_p11_m0(uint32_t op) // Jcc   (no link,
 
 		if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
 		{
-			arcompact_fatal ("fatal handleop32_Jcc_p11_m0 J %08x (F not set but ILINK1 or ILINK2 used as dst)", op);
+			arcompact_fatal ("fatal handleop32_Jcc_cc_f_b_b_c J %08x (F not set but ILINK1 or ILINK2 used as dst)", op);
 		}
 		else
 		{
@@ -2823,11 +2823,11 @@ uint32_t arcompact_device::handleop32_Jcc_p11_m0(uint32_t op) // Jcc   (no link,
 
 		if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
 		{
-			arcompact_log("unimplemented handleop32_Jcc_p11_m0 J %08x (F set)", op);
+			arcompact_log("unimplemented handleop32_Jcc_cc_f_b_b_c J %08x (F set)", op);
 		}
 		else
 		{
-			arcompact_fatal ("fatal handleop32_Jcc_p11_m0 J %08x (F set but not ILINK1 or ILINK2 used as dst)", op);
+			arcompact_fatal ("fatal handleop32_Jcc_cc_f_b_b_c J %08x (F set but not ILINK1 or ILINK2 used as dst)", op);
 
 		}
 	}
@@ -2836,17 +2836,17 @@ uint32_t arcompact_device::handleop32_Jcc_p11_m0(uint32_t op) // Jcc   (no link,
 	return m_pc + (size>>0);
 }
 
-uint32_t arcompact_device::handleop32_Jcc_p11_m1(uint32_t op)
+uint32_t arcompact_device::handleop32_Jcc_cc_f_b_b_u6(uint32_t op)
 {
 	// opcode          iiii i--- ppII IIII F--- uuuu uumq qqqq
 	// Jcc u6          0010 0RRR 1110 0000 0RRR uuuu uu1Q QQQQ
 	int size = 4;
-	arcompact_log("unimplemented handleop32_Jcc_p11_m1 J %08x (u6)", op);
+	arcompact_log("unimplemented handleop32_Jcc_cc_f_b_b_u6 J %08x (u6)", op);
 	return m_pc + (size>>0);
 }
 
 
-uint32_t arcompact_device::handleop32_Jcc_D_p00(uint32_t op)
+uint32_t arcompact_device::handleop32_Jcc_D_f_a_b_c(uint32_t op)
 {
 	int size = 4;
 
@@ -2868,14 +2868,14 @@ uint32_t arcompact_device::handleop32_Jcc_D_p00(uint32_t op)
 	return m_pc + (size>>0);
 }
 
-uint32_t arcompact_device::handleop32_Jcc_D_p01(uint32_t op)
+uint32_t arcompact_device::handleop32_Jcc_D_f_a_b_u6(uint32_t op)
 {
 	int size = 4;
 	arcompact_log("unimplemented J.D (u6 type) %08x", op);
 	return m_pc + (size>>0);
 }
 
-uint32_t arcompact_device::handleop32_Jcc_D_p10(uint32_t op)
+uint32_t arcompact_device::handleop32_Jcc_D_f_b_b_s12(uint32_t op)
 {
 	int size = 4;
 	arcompact_log("unimplemented J.D (s12 type) %08x", op);
@@ -2883,7 +2883,7 @@ uint32_t arcompact_device::handleop32_Jcc_D_p10(uint32_t op)
 }
 
 
-uint32_t arcompact_device::handleop32_Jcc_D_p11_m0(uint32_t op) // Jcc.D   (no link, delay)
+uint32_t arcompact_device::handleop32_Jcc_D_cc_f_b_b_c(uint32_t op) // Jcc.D   (no link, delay)
 {
 	int size = 4;
 
@@ -2942,10 +2942,10 @@ uint32_t arcompact_device::handleop32_Jcc_D_p11_m0(uint32_t op) // Jcc.D   (no l
 	return m_pc + (size>>0);
 }
 
-uint32_t arcompact_device::handleop32_Jcc_D_p11_m1(uint32_t op)
+uint32_t arcompact_device::handleop32_Jcc_D_cc_f_b_b_u6(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("unimplemented handleop32_Jcc_D_p11_m1 J.D %08x (u6)", op);
+	arcompact_log("unimplemented handleop32_Jcc_D_cc_f_b_b_u6 J.D %08x (u6)", op);
 	return m_pc + (size>>0);
 }
 

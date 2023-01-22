@@ -18,7 +18,7 @@
 ************************************************************************************************************************************/
 
 
-int arcompact_disassembler::handle04_p00_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int ignore_dst, int b_reserved)
+int arcompact_disassembler::handle04_f_a_b_c_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int ignore_dst, int b_reserved)
 {
 	//           PP
 	// 0010 0bbb 00ii iiii FBBB CCCC CCAA AAAA
@@ -90,7 +90,7 @@ int arcompact_disassembler::handle04_p00_helper_dasm(std::ostream &stream, offs_
 }
 
 // like p00 but with 'u6' istead of C
-int arcompact_disassembler::handle04_p01_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int ignore_dst, int b_reserved)
+int arcompact_disassembler::handle04_f_a_b_u6_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int ignore_dst, int b_reserved)
 {
 	//           PP
 	// 0010 0bbb 01ii iiii FBBB uuuu uuAA AAAA
@@ -150,7 +150,7 @@ int arcompact_disassembler::handle04_p01_helper_dasm(std::ostream &stream, offs_
 }
 
 
-int arcompact_disassembler::handle04_p10_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int b_reserved)
+int arcompact_disassembler::handle04_f_b_b_s12_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int b_reserved)
 {
 	int size = 4;
 	uint32_t limm;
@@ -189,7 +189,7 @@ int arcompact_disassembler::handle04_p10_helper_dasm(std::ostream &stream, offs_
 	return size;
 }
 
-int arcompact_disassembler::handle04_p11_m0_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int b_reserved)
+int arcompact_disassembler::handle04_cc_f_b_b_c_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int b_reserved)
 {
 	int size = 4;
 	uint32_t limm = 0;
@@ -245,7 +245,7 @@ int arcompact_disassembler::handle04_p11_m0_helper_dasm(std::ostream &stream, of
 	return size;
 }
 
-int arcompact_disassembler::handle04_p11_m1_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int b_reserved)
+int arcompact_disassembler::handle04_cc_f_b_b_u6_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int b_reserved)
 {
 	int size = 4;
 	uint32_t limm;
@@ -295,8 +295,8 @@ int arcompact_disassembler::handle04_p11_helper_dasm(std::ostream &stream, offs_
 
 	switch (M)
 	{
-		case 0x00: return handle04_p11_m0_helper_dasm(stream, pc, op, opcodes, optext, b_reserved);
-		case 0x01: return handle04_p11_m1_helper_dasm(stream, pc, op, opcodes, optext, b_reserved);
+		case 0x00: return handle04_cc_f_b_b_c_helper_dasm(stream, pc, op, opcodes, optext, b_reserved);
+		case 0x01: return handle04_cc_f_b_b_u6_helper_dasm(stream, pc, op, opcodes, optext, b_reserved);
 	}
 	return 0;
 }
@@ -308,9 +308,9 @@ int arcompact_disassembler::handle04_helper_dasm(std::ostream &stream, offs_t pc
 
 	switch (p)
 	{
-		case 0x00: return handle04_p00_helper_dasm(stream, pc, op, opcodes, optext, ignore_dst, b_reserved);
-		case 0x01: return handle04_p01_helper_dasm(stream, pc, op, opcodes, optext, ignore_dst, b_reserved);
-		case 0x02: return handle04_p10_helper_dasm(stream, pc, op, opcodes, optext, b_reserved);
+		case 0x00: return handle04_f_a_b_c_helper_dasm(stream, pc, op, opcodes, optext, ignore_dst, b_reserved);
+		case 0x01: return handle04_f_a_b_u6_helper_dasm(stream, pc, op, opcodes, optext, ignore_dst, b_reserved);
+		case 0x02: return handle04_f_b_b_s12_helper_dasm(stream, pc, op, opcodes, optext, b_reserved);
 		case 0x03: return handle04_p11_helper_dasm(stream, pc, op, opcodes, optext, b_reserved);
 	}
 
