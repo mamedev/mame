@@ -30,7 +30,7 @@ DEFINE_DEVICE_TYPE(I82443BX_HOST, i82443bx_host_device, "i82443bx_host", "Intel 
 i82443bx_host_device::i82443bx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i82439hx_host_device(mconfig, I82443BX_HOST, tag, owner, clock)
 {
-	// TODO: DID is 0x7192 when AGP_DIS is '1'
+	// TODO: Device ID (DID) is 0x7192 when AGP_DIS is '1'
 	// rev 0x02 82443BX B-1
 	set_ids_host(0x80867190, 0x02, 0x00000000);
 }

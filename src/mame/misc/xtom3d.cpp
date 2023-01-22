@@ -42,410 +42,136 @@ MX29F1610MC 16M FlashROM (x7)
 
 
 #include "emu.h"
-
-#include "pcshare.h"
-
 #include "cpu/i386/i386.h"
-#include "machine/lpci.h"
-#include "machine/pckeybrd.h"
-#include "machine/idectrl.h"
-#include "video/pc_vga.h"
+#include "machine/pci.h"
+#include "machine/pci-ide.h"
+#include "machine/i82443bx_host.h"
+#include "machine/i82371eb_isa.h"
+#include "machine/i82371eb_ide.h"
+#include "machine/i82371eb_acpi.h"
+#include "machine/i82371eb_usb.h"
+#include "video/virge_pci.h"
+#include "bus/isa/isa_cards.h"
+//#include "bus/rs232/hlemouse.h"
+//#include "bus/rs232/null_modem.h"
+//#include "bus/rs232/rs232.h"
+//#include "bus/rs232/sun_kbd.h"
+//#include "bus/rs232/terminal.h"
+#include "machine/fdc37c93x.h"
+#include "video/voodoo_pci.h"
 
 
 namespace {
 
-class xtom3d_state : public pcat_base_state
+#define PCI_J4D2_ID "pci:0d.0"
+
+class xtom3d_state : public driver_device
 {
 public:
 	xtom3d_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag)
-		, m_pcibus(*this, "pcibus")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_voodoo(*this, PCI_J4D2_ID)
 	{
 	}
 
 	void xtom3d(machine_config &config);
 
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 private:
-	std::unique_ptr<uint32_t[]> m_bios_ram;
-	std::unique_ptr<uint32_t[]> m_bios_ext1_ram;
-	std::unique_ptr<uint32_t[]> m_bios_ext2_ram;
-	std::unique_ptr<uint32_t[]> m_bios_ext3_ram;
-	std::unique_ptr<uint32_t[]> m_bios_ext4_ram;
-	std::unique_ptr<uint32_t[]> m_isa_ram1;
-	std::unique_ptr<uint32_t[]> m_isa_ram2;
-	uint8_t m_mtxc_config_reg[256];
-	uint8_t m_piix4_config_reg[4][256];
+	required_device<pentium2_device> m_maincpu;
+	// TODO: optional for debugging
+	optional_device<voodoo_banshee_pci_device> m_voodoo;
 
-	void isa_ram1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void isa_ram2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-
-	void bios_ext1_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void bios_ext2_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void bios_ext3_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void bios_ext4_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-
-	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void intel82439tx_init();
-
-	void xtom3d_io(address_map &map);
 	void xtom3d_map(address_map &map);
 
-	uint8_t mtxc_config_r(int function, int reg);
-	void mtxc_config_w(int function, int reg, uint8_t data);
-	uint32_t intel82439tx_pci_r(int function, int reg, uint32_t mem_mask);
-	void intel82439tx_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
-	uint8_t piix4_config_r(int function, int reg);
-	void piix4_config_w(int function, int reg, uint8_t data);
-	uint32_t intel82371ab_pci_r(int function, int reg, uint32_t mem_mask);
-	void intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
-
-	required_device<pci_bus_legacy_device> m_pcibus;
+	static void superio_config(device_t *device);
 };
-
-// Intel 82439TX System Controller (MTXC)
-
-uint8_t xtom3d_state::mtxc_config_r(int function, int reg)
-{
-//  osd_printf_debug("MTXC: read %d, %02X\n", function, reg);
-
-	return m_mtxc_config_reg[reg];
-}
-
-void xtom3d_state::mtxc_config_w(int function, int reg, uint8_t data)
-{
-	printf("MTXC: write %d, %02X, %02X\n",  function, reg, data);
-
-	/*
-	memory banking with North Bridge:
-	0x59 (PAM0) xxxx ---- BIOS area 0xf0000-0xfffff
-	            ---- xxxx Reserved
-	0x5a (PAM1) xxxx ---- ISA add-on BIOS 0xc4000 - 0xc7fff
-	            ---- xxxx ISA add-on BIOS 0xc0000 - 0xc3fff
-	0x5b (PAM2) xxxx ---- ISA add-on BIOS 0xcc000 - 0xcffff
-	            ---- xxxx ISA add-on BIOS 0xc8000 - 0xcbfff
-	0x5c (PAM3) xxxx ---- ISA add-on BIOS 0xd4000 - 0xd7fff
-	            ---- xxxx ISA add-on BIOS 0xd0000 - 0xd3fff
-	0x5d (PAM4) xxxx ---- ISA add-on BIOS 0xdc000 - 0xdffff
-	            ---- xxxx ISA add-on BIOS 0xd8000 - 0xdbfff
-	0x5e (PAM5) xxxx ---- BIOS extension 0xe4000 - 0xe7fff
-	            ---- xxxx BIOS extension 0xe0000 - 0xe3fff
-	0x5f (PAM6) xxxx ---- BIOS extension 0xec000 - 0xeffff
-	            ---- xxxx BIOS extension 0xe8000 - 0xebfff
-
-	3210 -> 3 = reserved, 2 = Cache Enable, 1 = Write Enable, 0 = Read Enable
-	*/
-
-	switch(reg)
-	{
-		case 0x59: // PAM0
-		{
-			if (data & 0x10)        // enable RAM access to region 0xf0000 - 0xfffff
-				membank("bios_bank")->set_base(m_bios_ram.get());
-			else                    // disable RAM access (reads go to BIOS ROM)
-				membank("bios_bank")->set_base(memregion("bios")->base() + 0x10000);
-			break;
-		}
-		case 0x5a: // PAM1
-		{
-			if (data & 0x1)
-				membank("video_bank1")->set_base(m_isa_ram1.get());
-			else
-				membank("video_bank1")->set_base(memregion("video_bios")->base() + 0);
-
-			if (data & 0x10)
-				membank("video_bank2")->set_base(m_isa_ram2.get());
-			else
-				membank("video_bank2")->set_base(memregion("video_bios")->base() + 0x4000);
-
-			break;
-		}
-		case 0x5e: // PAM5
-		{
-			if (data & 0x1)
-				membank("bios_ext1")->set_base(m_bios_ext1_ram.get());
-			else
-				membank("bios_ext1")->set_base(memregion("bios")->base() + 0);
-
-			if (data & 0x10)
-				membank("bios_ext2")->set_base(m_bios_ext2_ram.get());
-			else
-				membank("bios_ext2")->set_base(memregion("bios")->base() + 0x4000);
-
-			break;
-		}
-		case 0x5f: // PAM6
-		{
-			if (data & 0x1)
-				membank("bios_ext3")->set_base(m_bios_ext3_ram.get());
-			else
-				membank("bios_ext3")->set_base(memregion("bios")->base() + 0x8000);
-
-			if (data & 0x10)
-				membank("bios_ext4")->set_base(m_bios_ext4_ram.get());
-			else
-				membank("bios_ext4")->set_base(memregion("bios")->base() + 0xc000);
-
-			break;
-		}
-	}
-
-	m_mtxc_config_reg[reg] = data;
-}
-
-void xtom3d_state::intel82439tx_init()
-{
-	m_mtxc_config_reg[0x60] = 0x02;
-	m_mtxc_config_reg[0x61] = 0x02;
-	m_mtxc_config_reg[0x62] = 0x02;
-	m_mtxc_config_reg[0x63] = 0x02;
-	m_mtxc_config_reg[0x64] = 0x02;
-	m_mtxc_config_reg[0x65] = 0x02;
-}
-
-uint32_t xtom3d_state::intel82439tx_pci_r(int function, int reg, uint32_t mem_mask)
-{
-	uint32_t r = 0;
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= mtxc_config_r(function, reg + 3) << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= mtxc_config_r(function, reg + 2) << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= mtxc_config_r(function, reg + 1) << 8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= mtxc_config_r(function, reg + 0) << 0;
-	}
-	return r;
-}
-
-void xtom3d_state::intel82439tx_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		mtxc_config_w(function, reg + 3, (data >> 24) & 0xff);
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		mtxc_config_w(function, reg + 2, (data >> 16) & 0xff);
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		mtxc_config_w(function, reg + 1, (data >> 8) & 0xff);
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		mtxc_config_w(function, reg + 0, (data >> 0) & 0xff);
-	}
-}
-
-// Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
-
-uint8_t xtom3d_state::piix4_config_r(int function, int reg)
-{
-//  osd_printf_debug("PIIX4: read %d, %02X\n", function, reg);
-	return m_piix4_config_reg[function][reg];
-}
-
-void xtom3d_state::piix4_config_w(int function, int reg, uint8_t data)
-{
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
-	m_piix4_config_reg[function][reg] = data;
-}
-
-uint32_t xtom3d_state::intel82371ab_pci_r(int function, int reg, uint32_t mem_mask)
-{
-	uint32_t r = 0;
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= piix4_config_r(function, reg + 3) << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= piix4_config_r(function, reg + 2) << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= piix4_config_r(function, reg + 1) << 8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= piix4_config_r(function, reg + 0) << 0;
-	}
-	return r;
-}
-
-void xtom3d_state::intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		piix4_config_w(function, reg + 3, (data >> 24) & 0xff);
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		piix4_config_w(function, reg + 2, (data >> 16) & 0xff);
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		piix4_config_w(function, reg + 1, (data >> 8) & 0xff);
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		piix4_config_w(function, reg + 0, (data >> 0) & 0xff);
-	}
-}
-
-
-void xtom3d_state::isa_ram1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (m_mtxc_config_reg[0x5a] & 0x2)      // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_isa_ram1.get() + offset);
-	}
-}
-
-void xtom3d_state::isa_ram2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (m_mtxc_config_reg[0x5a] & 0x2)      // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_isa_ram2.get() + offset);
-	}
-}
-
-void xtom3d_state::bios_ext1_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (m_mtxc_config_reg[0x5e] & 0x2)      // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_bios_ext1_ram.get() + offset);
-	}
-}
-
-
-void xtom3d_state::bios_ext2_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (m_mtxc_config_reg[0x5e] & 0x20)     // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_bios_ext2_ram.get() + offset);
-	}
-}
-
-
-void xtom3d_state::bios_ext3_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (m_mtxc_config_reg[0x5f] & 0x2)      // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_bios_ext3_ram.get() + offset);
-	}
-}
-
-
-void xtom3d_state::bios_ext4_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (m_mtxc_config_reg[0x5f] & 0x20)     // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_bios_ext4_ram.get() + offset);
-	}
-}
-
-
-void xtom3d_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (m_mtxc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_bios_ram.get() + offset);
-	}
-}
 
 void xtom3d_state::xtom3d_map(address_map &map)
 {
-	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
-	map(0x000c0000, 0x000c3fff).bankr("video_bank1").w(FUNC(xtom3d_state::isa_ram1_w));
-	map(0x000c4000, 0x000c7fff).bankr("video_bank2").w(FUNC(xtom3d_state::isa_ram2_w));
-	map(0x000e0000, 0x000e3fff).bankr("bios_ext1").w(FUNC(xtom3d_state::bios_ext1_ram_w));
-	map(0x000e4000, 0x000e7fff).bankr("bios_ext2").w(FUNC(xtom3d_state::bios_ext2_ram_w));
-	map(0x000e8000, 0x000ebfff).bankr("bios_ext3").w(FUNC(xtom3d_state::bios_ext3_ram_w));
-	map(0x000ec000, 0x000effff).bankr("bios_ext4").w(FUNC(xtom3d_state::bios_ext4_ram_w));
-	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(FUNC(xtom3d_state::bios_ram_w));
-	map(0x00100000, 0x01ffffff).ram();
-	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
+	map.unmap_value_high();
 }
 
-void xtom3d_state::xtom3d_io(address_map &map)
+static void isa_internal_devices(device_slot_interface &device)
 {
-	pcat32_io_common(map);
-
-	map(0x00e8, 0x00ef).noprw();
-
-	map(0x03b0, 0x03bf).rw("vga", FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
-	map(0x03c0, 0x03cf).rw("vga", FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
-	map(0x03d0, 0x03df).rw("vga", FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
-
-	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
+	device.option_add("fdc37c93x", FDC37C93X);
 }
 
-
-void xtom3d_state::machine_start()
+void xtom3d_state::superio_config(device_t *device)
 {
-	m_bios_ram = std::make_unique<uint32_t[]>(0x10000/4);
-	m_bios_ext1_ram = std::make_unique<uint32_t[]>(0x4000/4);
-	m_bios_ext2_ram = std::make_unique<uint32_t[]>(0x4000/4);
-	m_bios_ext3_ram = std::make_unique<uint32_t[]>(0x4000/4);
-	m_bios_ext4_ram = std::make_unique<uint32_t[]>(0x4000/4);
-	m_isa_ram1 = std::make_unique<uint32_t[]>(0x4000/4);
-	m_isa_ram2 = std::make_unique<uint32_t[]>(0x4000/4);
-
-	for (int i = 0; i < 4; i++)
-		std::fill(std::begin(m_piix4_config_reg[i]), std::end(m_piix4_config_reg[i]), 0);
-
-	intel82439tx_init();
+	// TODO: check super I/O type
+	fdc37c93x_device &fdc = *downcast<fdc37c93x_device *>(device);
+	fdc.set_sysopt_pin(0);
+	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
+	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
+#if 0
+	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+#endif
 }
 
-void xtom3d_state::machine_reset()
-{
-	membank("bios_bank")->set_base(memregion("bios")->base() + 0x10000);
-	membank("bios_ext1")->set_base(memregion("bios")->base() + 0);
-	membank("bios_ext2")->set_base(memregion("bios")->base() + 0x4000);
-	membank("bios_ext3")->set_base(memregion("bios")->base() + 0x8000);
-	membank("bios_ext4")->set_base(memregion("bios")->base() + 0xc000);
-	membank("video_bank1")->set_base(memregion("video_bios")->base() + 0);
-	membank("video_bank2")->set_base(memregion("video_bios")->base() + 0x4000);
-}
-
+// TODO: unverified PCI config space
 void xtom3d_state::xtom3d(machine_config &config)
 {
-	PENTIUM2(config, m_maincpu, 450000000/16);  // actually Pentium II 450
+	PENTIUM2(config, m_maincpu, 450'000'000 / 16); // actually Pentium II 450
 	m_maincpu->set_addrmap(AS_PROGRAM, &xtom3d_state::xtom3d_map);
-	m_maincpu->set_addrmap(AS_IO, &xtom3d_state::xtom3d_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
+	//m_maincpu->set_addrmap(AS_IO, &xtom3d_state::xtom3d_io);
+	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+	m_maincpu->smiact().set("pci:00.0", FUNC(i82443bx_host_device::smi_act_w));
 
-	pcat_common(config);
+	PCI_ROOT(config, "pci", 0);
+	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 32*1024*1024);
+	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
+	//I82443BX_AGP   (config, "pci:01.0:00.0");
 
-	PCI_BUS_LEGACY(config, m_pcibus, 0, 0);
-	m_pcibus->set_device(0, FUNC(xtom3d_state::intel82439tx_pci_r), FUNC(xtom3d_state::intel82439tx_pci_w));
-	m_pcibus->set_device(7, FUNC(xtom3d_state::intel82371ab_pci_r), FUNC(xtom3d_state::intel82371ab_pci_w));
+	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0));
+	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
+	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 
-	/* video hardware */
-	pcvideo_vga(config);
+	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", 0));
+	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
+	ide.irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_mirq0_w));
+
+	I82371EB_USB (config, "pci:07.2", 0);
+	I82371EB_ACPI(config, "pci:07.3", 0);
+	LPC_ACPI     (config, "pci:07.3:acpi", 0);
+
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", superio_config);
+	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+
+	// YMF740G goes thru "pci:0c.0"
+	// Expansion slots, mapping SVGA for debugging
+	// TODO: all untested, check clock
+	// TODO: confirm Voodoo going in J4D2
+	#if 0
+	VOODOO_BANSHEE_PCI(config, m_voodoo, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
+	m_voodoo->set_fbmem(2);
+	m_voodoo->set_tmumem(4, 4);
+	m_voodoo->set_status_cycles(1000);
+
+	// TODO: fix legacy raw setup here
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57);
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
+	screen.set_screen_update(PCI_J4D2_ID, FUNC(voodoo_2_pci_device::screen_update));
+	#endif
+	// "pci:0d.0" J4D2
+	// "pci:0e.0" J4D1
+	VIRGE_PCI(config, "pci:0e.0", 0); // J4C1
 }
 
 
 ROM_START( xtom3d )
-	ROM_REGION32_LE(0x20000, "bios", 0)
+	ROM_REGION32_LE(0x20000, "pci:07.0", 0)
 	ROM_LOAD( "bios.u22", 0x000000, 0x020000, CRC(f7c58044) SHA1(fd967d009e0d3c8ed9dd7be852946f2b9dee7671) )
-
-	ROM_REGION( 0x8000, "video_bios", 0 ) // TODO: no VGA card is hooked up, to be removed
-	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, BAD_DUMP CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-	ROM_CONTINUE(                                 0x0001, 0x4000 )
 
 	ROM_REGION(0xe00000, "user2", 0)
 	ROM_LOAD( "u3",  0x000000, 0x200000, CRC(f332e030) SHA1(f04fc7fc97e6ada8122ea7d111455043d7cc42df) )

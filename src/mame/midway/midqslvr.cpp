@@ -288,7 +288,7 @@ Notes:
 //#include "bus/rs232/rs232.h"
 //#include "bus/rs232/sun_kbd.h"
 //#include "bus/rs232/terminal.h"
-//#include "machine/fdc37c93x.h"
+#include "machine/fdc37c93x.h"
 #include "video/voodoo_pci.h"
 
 namespace {
@@ -316,6 +316,8 @@ private:
 	optional_device<voodoo_2_pci_device> m_voodoo2;
 
 	void midqslvr_map(address_map &map);
+
+	static void superio_config(device_t *device);
 };
 
 class midway_graphite_state : public driver_device
@@ -341,17 +343,40 @@ void midway_quicksilver2_state::midqslvr_map(address_map &map)
 	map.unmap_value_high();
 }
 
+static void isa_internal_devices(device_slot_interface &device)
+{
+	device.option_add("fdc37c93x", FDC37C93X);
+}
+
+void midway_quicksilver2_state::superio_config(device_t *device)
+{
+	// TODO: FDC37M707
+	fdc37c93x_device &fdc = *downcast<fdc37c93x_device *>(device);
+	fdc.set_sysopt_pin(0);
+	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
+	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
+#if 0
+	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+#endif
+}
+
 void midway_quicksilver2_state::midqslvr(machine_config &config)
 {
 	PENTIUM2(config, m_maincpu, 100'000'000); // Celeron, downclocked for debugging
 	m_maincpu->set_addrmap(AS_PROGRAM, &midway_quicksilver2_state::midqslvr_map);
 	//m_maincpu->set_addrmap(AS_IO, &midway_quicksilver2_state::midqslvr_io);
 	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
-	m_maincpu->smiact().set("pci:00.0", FUNC(i82439hx_host_device::smi_act_w));
+	m_maincpu->smiact().set("pci:00.0", FUNC(i82443bx_host_device::smi_act_w));
 
 	PCI_ROOT(config, "pci", 0);
 	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 64*1024*1024);
-	// TODO: Virtual PCI-to-PCI bridge
 	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
 	//I82443BX_AGP   (config, "pci:01.0:00.0");
 
@@ -367,11 +392,9 @@ void midway_quicksilver2_state::midqslvr(machine_config &config)
 	I82371EB_ACPI(config, "pci:07.3", 0);
 	LPC_ACPI     (config, "pci:07.3:acpi", 0);
 
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa4", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	// YMF740G goes thru "pci:0c.0"
 	// Expansion slots, mapping SVGA for debugging
@@ -392,7 +415,7 @@ void midway_quicksilver2_state::midqslvr(machine_config &config)
 	#endif
 	// "pci:0d.0" J4D2
 	// "pci:0e.0" J4D1
-	//VIRGE_PCI(config, "pci:0e.0", 0); // J4C1
+	VIRGE_PCI(config, "pci:0e.0", 0); // J4C1
 }
 
 // Graphite runs on incompatible HW, consider splitting if things starts to get hairy ...
