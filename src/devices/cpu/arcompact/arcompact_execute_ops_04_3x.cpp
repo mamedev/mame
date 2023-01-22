@@ -5,6 +5,20 @@
 #include "arcompact.h"
 #include "arcompactdasm.h"
 
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//                                 IIII I      SS SSSS
+// LD<zz><.x><.aa><.di> a,[b,c]    0010 0bbb aa11 0ZZX   DBBB CCCC CCAA AAAA
+// LD<zz><.x><.aa><.di> 0,[b,c]    0010 0bbb aa11 0ZZX   DBBB CCCC CC11 1110
+// PREFETCH<.aa> [b,c]             0010 0bbb aa11 0000   0BBB CCCC CC11 1110    (prefetch is an alias)
+//
+// LD<zz><.x><.aa><.di> a,[b,limm] 0010 0bbb aa11 0ZZX   DBBB 1111 10AA AAAA (+ Limm)
+// LD<zz><.x><.aa><.di> 0,[b,limm] 0010 0bbb aa11 0ZZX   DBBB 1111 1011 1110 (+ Limm)
+// PREFETCH<.aa> [b,limm]          0010 0bbb aa11 0000   0BBB 1111 1011 1110 (+ Limm) (prefetch is an alias)
+//
+// LD<zz><.x><.di> a,[limm,c]      0010 0110 RR11 0ZZX   D111 CCCC CCAA AAAA (+ Limm)
+// LD<zz><.x><.di> 0,[limm,c]      0010 0110 RR11 0ZZX   D111 CCCC CC11 1110 (+ Limm)
+// PREFETCH [limm,c]               0010 0110 RR11 0000   0111 CCCC CC11 1110 (+ Limm) (prefetch is an alias)
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 uint32_t arcompact_device::arcompact_handle04_3x_helper(uint32_t op, int dsize, int extend)
 {
@@ -12,9 +26,85 @@ uint32_t arcompact_device::arcompact_handle04_3x_helper(uint32_t op, int dsize, 
 	uint8_t creg = common32_get_creg(op);
 
 	int size = check_b_c_limm(breg, creg);
+	uint8_t areg = common32_get_areg(op);
 
-	arcompact_log("unimplemented LD %08x (type 04_3x)", op);
-	return m_pc + (size>>0);
+	uint32_t address = m_regs[breg];
+
+	uint8_t X = extend;
+	uint32_t s = m_regs[creg];
+	int a = (op & 0x00c00000) >> 22; op &= ~0x00c00000;
+	//int D = (op & 0x00008000) >> 15; op &= ~0x00008000; // D isn't handled
+	uint8_t Z = dsize;
+
+	// address manipulation
+	if ((a == 0) || (a == 1))
+	{
+		address = address + s;
+	}
+	else if (a == 2)
+	{
+		//address = address;
+	}
+	else if (a == 3)
+	{
+		if (Z == 0)
+		{
+			address = address + (s << 2);
+		}
+		else if (Z == 2)
+		{
+			address = address + (s << 1);
+		}
+		else // Z == 1 and Z == 3 are invalid here
+		{
+			arcompact_fatal("illegal LD 3x %08x (data size %d mode %d)", op, Z, a);
+		}
+	}
+
+	uint32_t readdata = 0;
+
+	// read data
+	if (Z == 0)
+	{
+		readdata = READ32(address >> 2);
+
+		if (X) // sign extend is not supported for long reads
+			arcompact_fatal("illegal LD 3x %08x (data size %d mode %d with X)", op, Z, a);
+
+	}
+	else if (Z == 1)
+	{
+		readdata = READ8(address >> 0);
+
+		if (X) // todo
+			arcompact_fatal("illegal LD 3x %08x (data size %d mode %d with X)", op, Z, a);
+
+	}
+	else if (Z == 2)
+	{
+		readdata = READ16(address >> 1);
+
+		if (X) // todo
+			arcompact_fatal("illegal LD 3x %08x (data size %d mode %d with X)", op, Z, a);
+
+	}
+	else if (Z == 3)
+	{ // Z == 3 is always illegal
+		arcompact_fatal("illegal LD 3x %08x (data size %d mode %d)", op, Z, a);
+	}
+
+	m_regs[areg] = readdata;
+
+	// writeback / increment
+	if ((a == 1) || (a == 2))
+	{
+		if (breg == LIMM_REG)
+			arcompact_fatal("illegal LD 3x %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
+
+		m_regs[breg] = m_regs[breg] + s;
+	}
+
+	return m_pc + (size >> 0);
 }
 
 uint32_t arcompact_device::handleop32_LD_0(uint32_t op)  { return arcompact_handle04_3x_helper(op,0,0); }

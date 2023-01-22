@@ -190,7 +190,19 @@ uint32_t arcompact_device::handleop_BHI_S_s7(uint16_t op)  { return arcompact_ha
 // BHS_S s7                        1111 0111 01ss ssss
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_BHS_S_s7(uint16_t op)  { return arcompact_handle1e_03_0x_helper(op, "BHS_S"); }
+uint32_t arcompact_device::handleop_BHS_S_s7(uint16_t op)
+{
+	if (CONDITION_HS)
+	{
+		int s = (op & 0x003f) >> 0; op &= ~0x003f;
+		if (s & 0x020) s = -0x20 + (s & 0x1f);
+		uint32_t realaddress = PC_ALIGNED32 + (s * 2);
+		//m_regs[REG_BLINK] = m_pc + (2 >> 0); // don't link
+		return realaddress;
+	}
+
+	return m_pc + (2 >> 0);
+}
 
 // #######################################################################################################################
 //                                 IIII ISSs ss

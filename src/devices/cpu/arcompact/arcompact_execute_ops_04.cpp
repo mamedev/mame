@@ -338,22 +338,17 @@ uint32_t arcompact_device::handleop32_SUB_f_a_b_u6(uint32_t op)
 uint32_t arcompact_device::handleop32_SUB_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
+	int size = check_b_limm(breg);
 	uint8_t F = common32_get_F(op);
 	uint32_t S = common32_get_s12(op);
-
-	/* breg is also the destination, so this might not fetch LIMM */
-	int size = check_b_limm(breg);
-
 	uint32_t b = m_regs[breg];
-	uint32_t c = (uint32_t)S;
-
-
+	uint32_t c = S;
 	uint32_t result = b - c;
 	m_regs[breg] = result;
 
 	if (F)
 	{
-		arcompact_fatal("handleop32_SUB (SUB) (F set)\n"); // not yet supported
+		do_flags(result, b, c);
 	}
 	return m_pc + (size >> 0);
 }
@@ -1511,8 +1506,14 @@ uint32_t arcompact_device::handleop32_CMP_f_a_b_u6(uint32_t op)
 
 uint32_t arcompact_device::handleop32_CMP_f_b_b_s12(uint32_t op)
 {
-	arcompact_fatal("CMP with P10 not supported");
-	return m_pc + (0 >> 0);
+	uint8_t breg = common32_get_breg(op);
+	int size = check_b_limm(breg);
+	uint32_t S = common32_get_s12(op);
+	uint32_t b = m_regs[breg];
+	uint32_t c = S;
+	uint32_t result = b - c;
+	do_flags(result, b, c);
+	return m_pc + (size >> 0);
 }
 
 uint32_t arcompact_device::handleop32_CMP_cc_f_b_b_c(uint32_t op)

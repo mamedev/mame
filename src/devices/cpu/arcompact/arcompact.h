@@ -18,13 +18,6 @@ enum
 
 };
 
-#define LIMM_REG 62
-
-#define REG_BLINK (0x1f) // r31
-#define REG_SP (0x1c) // r28
-#define REG_ILINK1 (0x1d) // r29
-#define REG_ILINK2 (0x1e) // r30
-#define REG_LP_COUNT (0x3c) // r60
 
 #define ARCOMPACT_LOGGING 1
 
@@ -102,6 +95,18 @@ private:
 	uint32_t arcompact_auxreg025_INTVECTORBASE_r();
 	void arcompact_auxreg025_INTVECTORBASE_w(uint32_t data);
 
+	const static int LIMM_REG = 62;
+
+	const static int REG_BLINK = 0x1f; // r31
+	const static int REG_SP = 0x1c; // r28
+	const static int REG_ILINK1 = 0x1d; // r29
+	const static int REG_ILINK2 = 0x1e; // r30
+	const static int REG_LP_COUNT = 0x3c; // r60
+
+	const static uint32_t V_OVERFLOW_FLAG = 0x00000100;
+	const static uint32_t C_CARRY_FLAG = 0x00000200;
+	const static uint32_t N_NEGATIVE_FLAG = 0x00000400;
+	const static uint32_t Z_ZERO_FLAG = 0x00000800;
 
 	uint8_t common16_get_breg(uint16_t op)
 	{
@@ -873,10 +878,6 @@ private:
 
 };
 
-#define V_OVERFLOW_FLAG (0x00000100)
-#define C_CARRY_FLAG (0x00000200)
-#define N_NEGATIVE_FLAG (0x00000400)
-#define Z_ZERO_FLAG (0x00000800)
 
 // V = overflow (set if signed operation would overflow)
 #define STATUS32_SET_V   (m_status32 |=  V_OVERFLOW_FLAG)
@@ -898,12 +899,39 @@ private:
 #define STATUS32_CLEAR_Z (m_status32 &= ~Z_ZERO_FLAG)
 #define STATUS32_CHECK_Z (m_status32 &   Z_ZERO_FLAG)
 
-// Condition 0x0c (LE)
-#define CONDITION_LE ((STATUS32_CHECK_Z) || (STATUS32_CHECK_N && !STATUS32_CHECK_V) ||  (!STATUS32_CHECK_N && STATUS32_CHECK_V)) // Z or (N and /V) or (/N and V)
+
+// AL / RA - Always
+#define CONDITION_AL (1)
+// EQ / Z - Zero
 #define CONDITION_EQ (STATUS32_CHECK_Z)
-#define CONDITION_CS (STATUS32_CHECK_C)
-#define CONDITION_LT ((STATUS32_CHECK_N && !STATUS32_CHECK_V) || (!STATUS32_CHECK_N && STATUS32_CHECK_V))
+// NE / NZ - Non-Zero
+#define CONDITION_NE (!STATUS32_CHECK_Z)
+// PL / P - Positive
+#define CONDITION_PL (!STATUS32_CHECK_N)
+// MI / N - Negative
 #define CONDITION_MI (STATUS32_CHECK_N)
+// CS / C / LO - Carry Set
+#define CONDITION_CS (STATUS32_CHECK_C)
+// CC / NC / HS - Carry Clear
+#define CONDITION_HS (!STATUS32_CHECK_C)
+// VS / V - Overflow set
+
+// VC / NV - Overflow clear
+
+// GT - Greater than (signed)
+
+// GE - Greater than or equal to (signed)
+
+// LT - Less than (signed)
+#define CONDITION_LT ((STATUS32_CHECK_N && !STATUS32_CHECK_V) || (!STATUS32_CHECK_N && STATUS32_CHECK_V))
+// LE - Less than or equal (signed)
+#define CONDITION_LE ((STATUS32_CHECK_Z) || (STATUS32_CHECK_N && !STATUS32_CHECK_V) ||  (!STATUS32_CHECK_N && STATUS32_CHECK_V)) // Z or (N and /V) or (/N and V)
+// HI - Higher than (unsigned)
+
+// LS - Lower than or same (unsigned)
+
+// PNZ - Positive Non Zero
+
 
 
 DECLARE_DEVICE_TYPE(ARCA5, arcompact_device)
