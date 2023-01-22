@@ -151,7 +151,7 @@ uint32_t arcompact_device::arcompact_01_01_00_helper(uint32_t op, const char* op
 	int size = check_b_c_limm(breg, creg); \
 	b = m_regs[breg]; \
 	c = m_regs[creg];
-	
+
 #define BR_TAKEJUMP \
 	/* take jump */ \
 	uint32_t realaddress = PC_ALIGNED32 + (address * 2); \

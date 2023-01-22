@@ -83,7 +83,7 @@ uint32_t arcompact_device::handleop32_LSR_single_p00(uint32_t op)
 
 	c = m_regs[creg];
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
-	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
+
 	uint32_t result = c >> 1;
 	m_regs[breg] = result;
 
@@ -113,7 +113,7 @@ uint32_t arcompact_device::handleop32_LSR_single_p01(uint32_t op)
 
 	c = u;
 
-	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
+
 	uint32_t result = c >> 1;
 	m_regs[breg] = result;
 
@@ -172,7 +172,7 @@ uint32_t arcompact_device::handleop32_ROR_single_p00(uint32_t op)
 
 	c = m_regs[creg];
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
-	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
+
 	int shift = 1; uint32_t mask = (1 << (shift)) - 1; mask <<= (32-shift); uint32_t result = ((c >> shift) & ~mask) | ((c << (32-shift)) & mask);
 	m_regs[breg] = result;
 
@@ -202,7 +202,7 @@ uint32_t arcompact_device::handleop32_ROR_single_p01(uint32_t op)
 
 	c = u;
 
-	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
+
 	int shift = 1; uint32_t mask = (1 << (shift)) - 1; mask <<= (32-shift); uint32_t result = ((c >> shift) & ~mask) | ((c << (32-shift)) & mask);
 	m_regs[breg] = result;
 
@@ -282,7 +282,7 @@ uint32_t arcompact_device::handleop32_EXTW_p00(uint32_t op)
 
 	c = m_regs[creg];
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
-	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
+
 	uint32_t result = c & 0x0000ffff;
 	m_regs[breg] = result;
 
@@ -307,7 +307,7 @@ uint32_t arcompact_device::handleop32_EXTW_p01(uint32_t op)
 
 	c = u;
 
-	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
+
 	uint32_t result = c & 0x0000ffff;
 	m_regs[breg] = result;
 
@@ -385,7 +385,7 @@ uint32_t arcompact_device::handleop32_EXTB_p00(uint32_t op)
 
 	c = m_regs[creg];
 	/* todo: is the limm, limm syntax valid? (it's pointless.) */
-	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
+
 	uint32_t result = c & 0x000000ff;
 	m_regs[breg] = result;
 
@@ -410,7 +410,7 @@ uint32_t arcompact_device::handleop32_EXTB_p01(uint32_t op)
 
 	c = u;
 
-	/* todo: if areg = LIMM then there is no result (but since that register can never be read, I guess it doesn't matter if we store it there anyway?) */
+
 	uint32_t result = c & 0x000000ff;
 	m_regs[breg] = result;
 

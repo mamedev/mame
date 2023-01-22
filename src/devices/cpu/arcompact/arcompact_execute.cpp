@@ -5,6 +5,22 @@
 #include "arcompact.h"
 #include "arcompactdasm.h"
 
+/*
+
+NOTES:
+
+LIMM use
+--------
+If "destination register = LIMM" then there is no result stored, only flag updates, however there's no way to read LIMM anyway
+as specifying LIMM as a source register just causes the CPU to read the long immediate data instead. For emulation purposes we
+therefore just store the result as normal, to the reigster that can't be read.
+
+Likewise, when LIMM is used as a source register, we load the LIMM register with the long immediate when the opcode is decoded
+so don't require special logic further in the opcode handler.
+
+It is possible this is how the CPU works internally.
+
+*/
 
 
 void arcompact_device::execute_run()

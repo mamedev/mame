@@ -97,6 +97,7 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 
 }
 
+// can be used as a PUSH when breg is stack register (28), s is -4 (0x1fc) Z is 0, D is 0, and a is 1
 uint32_t arcompact_device::handleop32_ST_r_o(uint32_t op)
 {
 	int S = (op & 0x00008000) >> 15;

@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*********************************\
-
  ARCompact disassembler
 
 \*********************************/
@@ -813,7 +812,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 					case 0x00:
 					{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//                                           PP 
+//                                           PP
 // General Operations Reg-Reg      0010 0bbb 00ii iiii   FBBB CCCC CCAA AAAA
 // ADD<.f> a,b,c                   0010 0bbb 0000 0000   FBBB CCCC CCAA AAAA
 // ADD<.f> a,limm,c                0010 0110 0000 0000   F111 CCCC CCAA AAAA (+ Limm)
@@ -821,26 +820,26 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 // ADD<.f> 0,b,c                   0010 0bbb 0000 0000   FBBB CCCC CC11 1110
 // ADD<.f> 0,b,limm                0010 0bbb 0000 0000   FBBB 1111 1011 1110 (+ Limm)
 //
-//                                           PP 
+//                                           PP
 // Gen Op Reg+6-bit unsigned Imm   0010 0bbb 01ii iiii   FBBB UUUU UUAA AAAA
 // ADD<.f> a,b,u6                  0010 0bbb 0100 0000   FBBB uuuu uuAA AAAA
 // ADD<.f> 0,b,u6                  0010 0bbb 0100 0000   FBBB uuuu uu11 1110
 //
-//                                           PP 
+//                                           PP
 // Gen Op Reg+12-bit signed Imm    0010 0bbb 10ii iiii   FBBB ssss ssSS SSSS
 // ADD<.f> b,b,s12                 0010 0bbb 1000 0000   FBBB ssss ssSS SSSS
 //
-// 						                     PP                      M
-// Gen Op Conditional Register     0010 0bbb 11ii iiii   FBBB CCCC CC0Q QQQQ                           
+//                                           PP                      M
+// Gen Op Conditional Register     0010 0bbb 11ii iiii   FBBB CCCC CC0Q QQQQ
 // ADD<.cc><.f> b,b,c              0010 0bbb 1100 0000   FBBB CCCC CC0Q QQQQ
 // ADD<.cc><.f> b,b,limm           0010 0bbb 1100 0000   FBBB 1111 100Q QQQQ (+ Limm)
 // ADD<.cc><.f> 0,limm,c           0010 0110 1100 0000   F111 CCCC CC0Q QQQQ (+ Limm)
-// 
-// 						                     PP                      M 
+//
+//                                           PP                      M
 // Gen Op ConReg 6-bit unsign Imm  0010 0bbb 11ii iiii   FBBB UUUU UU1Q QQQQ
 // ADD<.cc><.f> b,b,u6             0010 0bbb 1100 0000   FBBB uuuu uu1Q QQQQ
 //
-// 
+//
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 						size = handle_dasm32_ADD(stream, pc, op, opcodes); break; // ADD
 					}
@@ -1435,27 +1434,27 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 					{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                                 IIII I      SS SSSS
-//                                           PP 
+//                                           PP
 // General Operations Reg-Reg      0010 0bbb 00ii iiii   FBBB CCCC CCAA AAAA
 // FLAG c                          0010 0000 0010 1001   0000 0000 0100 0000 (Leapster BIOS uses this redundant encoding where A is unused?)
 //
-//                                           PP 
+//                                           PP
 // Gen Op Reg+6-bit unsigned Imm   0010 0bbb 01ii iiii   FBBB UUUU UUAA AAAA
 // no listed FLAG encodings
 //
-//                                           PP 
+//                                           PP
 // Gen Op Reg+12-bit signed Imm    0010 0bbb 10ii iiii   FBBB ssss ssSS SSSS
 // FLAG s12                        0010 0rrr 1010 1001   0RRR ssss ssSS SSSS
 //
-// 						                     PP                      M
-// Gen Op Conditional Register     0010 0bbb 11ii iiii   FBBB CCCC CC0Q QQQQ                           
+//                                           PP                      M
+// Gen Op Conditional Register     0010 0bbb 11ii iiii   FBBB CCCC CC0Q QQQQ
 // FLAG<.cc> c                     0010 0rrr 1110 1001   0RRR CCCC CC0Q QQQQ
 // FLAG<.cc> limm                  0010 0rrr 1110 1001   0RRR 1111 100Q QQQQ (+ Limm)
 //
-// 						                     PP                      M 
+//                                           PP                      M
 // Gen Op ConReg 6-bit unsign Imm  0010 0bbb 11ii iiii   FBBB UUUU UU1Q QQQQ
 // FLAG<.cc> u6                    0010 0rrr 1110 1001   0RRR uuuu uu1Q QQQQ
-// 
+//
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 						size = handle_dasm32_FLAG(stream, pc, op, opcodes); break; // FLAG
 					}
