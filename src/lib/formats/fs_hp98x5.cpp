@@ -717,8 +717,8 @@ std::pair<hp98x5_impl::dir_t, hp98x5_impl::sect_map> hp98x5_impl::decode_dir() c
 				// DATA files have a fixed record size
 				e.m_bpr = BPR_9825;
 
-				if (e.m_type_code == 2) {
-					// File type = program
+				if (e.m_type_code != 1) {
+					// File type != DATA
 					// +10..+11: Size of file in words - 1
 					auto w5 = r16b(it + 10);
 					e.m_size = (w5 + 1) * 2;
@@ -727,7 +727,7 @@ std::pair<hp98x5_impl::dir_t, hp98x5_impl::sect_map> hp98x5_impl::decode_dir() c
 						throw std::runtime_error(util::string_format("Mismatching number of sectors (%u,%u)", exp_sectors, sectors));
 					}
 				} else {
-					// File type != program
+					// File type == DATA
 					e.m_size = e.m_sectors * SECTOR_SIZE;
 				}
 			} else {
@@ -785,8 +785,8 @@ std::vector<u8> hp98x5_impl::encode_dir() const
 				// * 9825 *
 				// ********
 
-				// Size of file in words - 1 (PROG files)
-				if (e.m_type_code == 2) {
+				// Size of file in words - 1 (any file type but DATA)
+				if (e.m_type_code != 1) {
 					w16b(out_ins, e.m_size / 2 - 1);
 				} else {
 					w16b(out_ins, 0);
