@@ -242,24 +242,310 @@ private:
 	uint32_t handleop32_BBIT1_reg_imm(uint32_t op);
 	uint32_t handleop32_LD_r_o(uint32_t op);
 	uint32_t handleop32_ST_r_o(uint32_t op);
+
+	// arcompact_execute_ops_04.cpp
+
+	uint32_t handleop32_ADD_cc(uint32_t op);
+	uint32_t handleop32_ADD(uint32_t op);
+	uint32_t handleop32_ADD_f_a_b_c(uint32_t op);
+	uint32_t handleop32_ADD_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_ADD_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_ADD_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_ADD_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_SUB_cc(uint32_t op);
+	uint32_t handleop32_SUB(uint32_t op);
+	uint32_t handleop32_SUB_f_a_b_c(uint32_t op);
+	uint32_t handleop32_SUB_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_SUB_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_SUB_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_SUB_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_AND_cc(uint32_t op);
+	uint32_t handleop32_AND(uint32_t op);
+	uint32_t handleop32_AND_f_a_b_c(uint32_t op);
+	uint32_t handleop32_AND_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_AND_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_AND_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_AND_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_OR_cc(uint32_t op);
+	uint32_t handleop32_OR(uint32_t op);
+	uint32_t handleop32_OR_f_a_b_c(uint32_t op);
+	uint32_t handleop32_OR_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_OR_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_OR_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_OR_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_BIC_cc(uint32_t op);
+	uint32_t handleop32_BIC(uint32_t op);
+	uint32_t handleop32_BIC_f_a_b_c(uint32_t op);
+	uint32_t handleop32_BIC_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_BIC_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_BIC_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_BIC_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_XOR_cc(uint32_t op);
+	uint32_t handleop32_XOR(uint32_t op);
+	uint32_t handleop32_XOR_f_a_b_c(uint32_t op);
+	uint32_t handleop32_XOR_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_XOR_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_XOR_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_XOR_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_MOV_cc(uint32_t op);
+	uint32_t handleop32_MOV(uint32_t op);
+	uint32_t handleop32_MOV_f_a_b_c(uint32_t op);
+	uint32_t handleop32_MOV_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_MOV_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_MOV_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_MOV_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_RSUB_cc(uint32_t op);
+	uint32_t handleop32_RSUB(uint32_t op);
+	uint32_t handleop32_RSUB_f_a_b_c(uint32_t op);
+	uint32_t handleop32_RSUB_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_RSUB_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_RSUB_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_RSUB_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_BSET_cc(uint32_t op);
+	uint32_t handleop32_BSET(uint32_t op);
+	uint32_t handleop32_BSET_f_a_b_c(uint32_t op);
+	uint32_t handleop32_BSET_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_BSET_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_BSET_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_BSET_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_BMSK_cc(uint32_t op);
+	uint32_t handleop32_BMSK(uint32_t op);
+	uint32_t handleop32_BMSK_f_a_b_c(uint32_t op);
+	uint32_t handleop32_BMSK_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_BMSK_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_BMSK_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_BMSK_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_ADD1_cc(uint32_t op);
+	uint32_t handleop32_ADD1(uint32_t op);
+	uint32_t handleop32_ADD1_f_a_b_c(uint32_t op);
+	uint32_t handleop32_ADD1_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_ADD1_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_ADD1_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_ADD1_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_ADD2_cc(uint32_t op);
+	uint32_t handleop32_ADD2(uint32_t op);
+	uint32_t handleop32_ADD2_f_a_b_c(uint32_t op);
+	uint32_t handleop32_ADD2_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_ADD2_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_ADD2_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_ADD2_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_ADD3_cc(uint32_t op);
+	uint32_t handleop32_ADD3(uint32_t op);
+	uint32_t handleop32_ADD3_f_a_b_c(uint32_t op);
+	uint32_t handleop32_ADD3_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_ADD3_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_ADD3_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_ADD3_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_SUB1_cc(uint32_t op);
+	uint32_t handleop32_SUB1(uint32_t op);
+	uint32_t handleop32_SUB1_f_a_b_c(uint32_t op);
+	uint32_t handleop32_SUB1_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_SUB1_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_SUB1_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_SUB1_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_SUB2_cc(uint32_t op);
+	uint32_t handleop32_SUB2(uint32_t op);
+	uint32_t handleop32_SUB2_f_a_b_c(uint32_t op);
+	uint32_t handleop32_SUB2_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_SUB2_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_SUB2_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_SUB2_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_SUB3_cc(uint32_t op);
+	uint32_t handleop32_SUB3(uint32_t op);
+	uint32_t handleop32_SUB3_f_a_b_c(uint32_t op);
+	uint32_t handleop32_SUB3_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_SUB3_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_SUB3_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_SUB3_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_Jcc_cc(uint32_t op);
+	uint32_t handleop32_Jcc(uint32_t op);
+	uint32_t handleop32_Jcc_f_a_b_c(uint32_t op);
+	uint32_t handleop32_Jcc_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_Jcc_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_Jcc_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_Jcc_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_Jcc_D_cc(uint32_t op);
+	uint32_t handleop32_Jcc_D(uint32_t op);
+	uint32_t handleop32_Jcc_D_f_a_b_c(uint32_t op);
+	uint32_t handleop32_Jcc_D_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_Jcc_D_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_Jcc_D_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_Jcc_D_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_LR_cc(uint32_t op);
+	uint32_t handleop32_LR(uint32_t op);
+	uint32_t handleop32_LR_f_a_b_c(uint32_t op);
+	uint32_t handleop32_LR_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_LR_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_LR_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_LR_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_SR_cc(uint32_t op);
+	uint32_t handleop32_SR(uint32_t op);
+	uint32_t handleop32_SR_f_a_b_c(uint32_t op);
+	uint32_t handleop32_SR_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_SR_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_SR_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_SR_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_ADC_f_a_b_c(uint32_t op);
+	uint32_t handleop32_ADC_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_ADC_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_ADC_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_ADC_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_ADC_cc(uint32_t op);
 	uint32_t handleop32_ADC(uint32_t op);
+
+	uint32_t handleop32_SBC_f_a_b_c(uint32_t op);
+	uint32_t handleop32_SBC_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_SBC_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_SBC_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_SBC_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_SBC_cc(uint32_t op);
 	uint32_t handleop32_SBC(uint32_t op);
+
+	uint32_t handleop32_MAX_f_a_b_c(uint32_t op);
+	uint32_t handleop32_MAX_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_MAX_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_MAX_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_MAX_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_MAX_cc(uint32_t op);
 	uint32_t handleop32_MAX(uint32_t op);
+
+	uint32_t handleop32_MIN_f_a_b_c(uint32_t op);
+	uint32_t handleop32_MIN_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_MIN_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_MIN_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_MIN_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_MIN_cc(uint32_t op);
 	uint32_t handleop32_MIN(uint32_t op);
+
+	uint32_t handleop32_TST_f_a_b_c(uint32_t op);
+	uint32_t handleop32_TST_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_TST_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_TST_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_TST_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_TST_cc(uint32_t op);
 	uint32_t handleop32_TST(uint32_t op);
+
+	uint32_t handleop32_CMP_f_a_b_c(uint32_t op);
+	uint32_t handleop32_CMP_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_CMP_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_CMP_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_CMP_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_CMP_cc(uint32_t op);
 	uint32_t handleop32_CMP(uint32_t op);
+
+	uint32_t handleop32_RCMP_f_a_b_c(uint32_t op);
+	uint32_t handleop32_RCMP_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_RCMP_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_RCMP_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_RCMP_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_RCMP_cc(uint32_t op);
 	uint32_t handleop32_RCMP(uint32_t op);
+
+	uint32_t handleop32_BCLR_f_a_b_c(uint32_t op);
+	uint32_t handleop32_BCLR_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_BCLR_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_BCLR_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_BCLR_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_BCLR_cc(uint32_t op);
 	uint32_t handleop32_BCLR(uint32_t op);
+
+	uint32_t handleop32_BTST_f_a_b_c(uint32_t op);
+	uint32_t handleop32_BTST_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_BTST_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_BTST_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_BTST_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_BTST_cc(uint32_t op);
 	uint32_t handleop32_BTST(uint32_t op);
+
+	uint32_t handleop32_BXOR_f_a_b_c(uint32_t op);
+	uint32_t handleop32_BXOR_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_BXOR_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_BXOR_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_BXOR_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_BXOR_cc(uint32_t op);
 	uint32_t handleop32_BXOR(uint32_t op);
+
+	uint32_t handleop32_MPY_f_a_b_c(uint32_t op);
+	uint32_t handleop32_MPY_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_MPY_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_MPY_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_MPY_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_MPY_cc(uint32_t op);
 	uint32_t handleop32_MPY(uint32_t op);
+
+	uint32_t handleop32_MPYH_f_a_b_c(uint32_t op);
+	uint32_t handleop32_MPYH_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_MPYH_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_MPYH_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_MPYH_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_MPYH_cc(uint32_t op);
 	uint32_t handleop32_MPYH(uint32_t op);
+
+	uint32_t handleop32_MPYHU_f_a_b_c(uint32_t op);
+	uint32_t handleop32_MPYHU_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_MPYHU_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_MPYHU_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_MPYHU_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_MPYHU_cc(uint32_t op);
 	uint32_t handleop32_MPYHU(uint32_t op);
+
+	uint32_t handleop32_MPYU_f_a_b_c(uint32_t op);
+	uint32_t handleop32_MPYU_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_MPYU_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_MPYU_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_MPYU_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_MPYU_cc(uint32_t op);
 	uint32_t handleop32_MPYU(uint32_t op);
+
+	uint32_t handleop32_JLcc_f_a_b_c(uint32_t op);
+	uint32_t handleop32_JLcc_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_JLcc_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_JLcc_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_JLcc_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_JLcc_cc(uint32_t op);
 	uint32_t handleop32_JLcc(uint32_t op);
+
+	uint32_t handleop32_JLcc_D_f_a_b_c(uint32_t op);
+	uint32_t handleop32_JLcc_D_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_JLcc_D_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_JLcc_D_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_JLcc_D_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_JLcc_D_cc(uint32_t op);
 	uint32_t handleop32_JLcc_D(uint32_t op);
+
 	uint32_t handleop32_LP(uint32_t op);
+
+	uint32_t handleop32_FLAG_f_a_b_c(uint32_t op);
+	uint32_t handleop32_FLAG_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_FLAG_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_FLAG_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_FLAG_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_FLAG_cc(uint32_t op);
 	uint32_t handleop32_FLAG(uint32_t op);
+
+
+
+
 	uint32_t handleop32_ASL_single(uint32_t op);
 	uint32_t handleop32_ASR_single(uint32_t op);
 	uint32_t handleop32_RRC(uint32_t op);
@@ -435,165 +721,6 @@ private:
 	*                                                                                                                                   *
 	************************************************************************************************************************************/
 
-	uint32_t handleop32_ADD_cc(uint32_t op);
-	uint32_t handleop32_ADD(uint32_t op);
-	uint32_t handleop32_ADD_f_a_b_c(uint32_t op);
-	uint32_t handleop32_ADD_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_ADD_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_ADD_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_ADD_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_SUB_cc(uint32_t op);
-	uint32_t handleop32_SUB(uint32_t op);
-	uint32_t handleop32_SUB_f_a_b_c(uint32_t op);
-	uint32_t handleop32_SUB_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_SUB_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_SUB_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_SUB_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_AND_cc(uint32_t op);
-	uint32_t handleop32_AND(uint32_t op);
-	uint32_t handleop32_AND_f_a_b_c(uint32_t op);
-	uint32_t handleop32_AND_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_AND_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_AND_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_AND_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_OR_cc(uint32_t op);
-	uint32_t handleop32_OR(uint32_t op);
-	uint32_t handleop32_OR_f_a_b_c(uint32_t op);
-	uint32_t handleop32_OR_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_OR_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_OR_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_OR_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_BIC_cc(uint32_t op);
-	uint32_t handleop32_BIC(uint32_t op);
-	uint32_t handleop32_BIC_f_a_b_c(uint32_t op);
-	uint32_t handleop32_BIC_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_BIC_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_BIC_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_BIC_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_XOR_cc(uint32_t op);
-	uint32_t handleop32_XOR(uint32_t op);
-	uint32_t handleop32_XOR_f_a_b_c(uint32_t op);
-	uint32_t handleop32_XOR_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_XOR_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_XOR_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_XOR_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_MOV_cc(uint32_t op);
-	uint32_t handleop32_MOV(uint32_t op);
-	uint32_t handleop32_MOV_f_a_b_c(uint32_t op);
-	uint32_t handleop32_MOV_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_MOV_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_MOV_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_MOV_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_RSUB_cc(uint32_t op);
-	uint32_t handleop32_RSUB(uint32_t op);
-	uint32_t handleop32_RSUB_f_a_b_c(uint32_t op);
-	uint32_t handleop32_RSUB_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_RSUB_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_RSUB_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_RSUB_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_BSET_cc(uint32_t op);
-	uint32_t handleop32_BSET(uint32_t op);
-	uint32_t handleop32_BSET_f_a_b_c(uint32_t op);
-	uint32_t handleop32_BSET_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_BSET_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_BSET_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_BSET_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_BMSK_cc(uint32_t op);
-	uint32_t handleop32_BMSK(uint32_t op);
-	uint32_t handleop32_BMSK_f_a_b_c(uint32_t op);
-	uint32_t handleop32_BMSK_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_BMSK_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_BMSK_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_BMSK_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_ADD1_cc(uint32_t op);
-	uint32_t handleop32_ADD1(uint32_t op);
-	uint32_t handleop32_ADD1_f_a_b_c(uint32_t op);
-	uint32_t handleop32_ADD1_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_ADD1_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_ADD1_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_ADD1_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_ADD2_cc(uint32_t op);
-	uint32_t handleop32_ADD2(uint32_t op);
-	uint32_t handleop32_ADD2_f_a_b_c(uint32_t op);
-	uint32_t handleop32_ADD2_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_ADD2_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_ADD2_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_ADD2_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_ADD3_cc(uint32_t op);
-	uint32_t handleop32_ADD3(uint32_t op);
-	uint32_t handleop32_ADD3_f_a_b_c(uint32_t op);
-	uint32_t handleop32_ADD3_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_ADD3_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_ADD3_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_ADD3_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_SUB1_cc(uint32_t op);
-	uint32_t handleop32_SUB1(uint32_t op);
-	uint32_t handleop32_SUB1_f_a_b_c(uint32_t op);
-	uint32_t handleop32_SUB1_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_SUB1_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_SUB1_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_SUB1_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_SUB2_cc(uint32_t op);
-	uint32_t handleop32_SUB2(uint32_t op);
-	uint32_t handleop32_SUB2_f_a_b_c(uint32_t op);
-	uint32_t handleop32_SUB2_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_SUB2_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_SUB2_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_SUB2_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_SUB3_cc(uint32_t op);
-	uint32_t handleop32_SUB3(uint32_t op);
-	uint32_t handleop32_SUB3_f_a_b_c(uint32_t op);
-	uint32_t handleop32_SUB3_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_SUB3_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_SUB3_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_SUB3_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_Jcc_cc(uint32_t op);
-	uint32_t handleop32_Jcc(uint32_t op);
-	uint32_t handleop32_Jcc_f_a_b_c(uint32_t op);
-	uint32_t handleop32_Jcc_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_Jcc_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_Jcc_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_Jcc_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_Jcc_D_cc(uint32_t op);
-	uint32_t handleop32_Jcc_D(uint32_t op);
-	uint32_t handleop32_Jcc_D_f_a_b_c(uint32_t op);
-	uint32_t handleop32_Jcc_D_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_Jcc_D_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_Jcc_D_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_Jcc_D_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_LR_cc(uint32_t op);
-	uint32_t handleop32_LR(uint32_t op);
-	uint32_t handleop32_LR_f_a_b_c(uint32_t op);
-	uint32_t handleop32_LR_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_LR_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_LR_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_LR_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_SR_cc(uint32_t op);
-	uint32_t handleop32_SR(uint32_t op);
-	uint32_t handleop32_SR_f_a_b_c(uint32_t op);
-	uint32_t handleop32_SR_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_SR_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_SR_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_SR_cc_f_b_b_u6(uint32_t op);
 
 	uint32_t handleop32_LSR_single_cc(uint32_t op);
 	uint32_t handleop32_LSR_single(uint32_t op);
