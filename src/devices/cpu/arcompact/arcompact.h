@@ -253,6 +253,39 @@ private:
 	void status32_clear_z(void) { m_status32 &= ~Z_ZERO_FLAG; }
 	bool status32_check_z(void) { return (m_status32 &   Z_ZERO_FLAG ? true : false); }
 
+	// 0x00 - AL / RA - Always
+	bool condition_AL() { return (true); }
+	// 0x01 - EQ / Z - Zero
+	bool condition_EQ() { return (status32_check_z()); }
+	// 0x02 - NE / NZ - Non-Zero
+	bool condition_NE() { return (!status32_check_z()); }
+	// 0x03 - PL / P - Positive
+	bool condition_PL() { return (!status32_check_n()); }
+	// 0x04 - MI / N - Negative
+	bool condition_MI() { return (status32_check_n()); }
+	// 0x05 - CS / C / LO - Carry Set
+	bool condition_CS() { return (status32_check_c()); }
+	// 0x06 - CC / NC / HS - Carry Clear
+	bool condition_HS() { return (!status32_check_c()); }
+	// 0x07 - VS / V - Overflow set
+	bool condition_VS() { return (status32_check_v()); }
+	// 0x08 - VC / NV - Overflow clear
+	bool condition_VC() { return (!status32_check_v()); }
+	// 0x09 GT - Greater than (signed)
+	bool condition_GT() { return ((status32_check_n() && status32_check_v() && !status32_check_z()) || (!status32_check_n() && !status32_check_v() && !status32_check_z())); }
+	// 0x0a - GE - Greater than or equal to (signed)
+	bool condition_GE() { return ((status32_check_n() && status32_check_v()) || (!status32_check_n() && !status32_check_v())); }
+	// 0x0b - LT - Less than (signed)
+	bool condition_LT() { return ((status32_check_n() && !status32_check_v()) || (!status32_check_n() && status32_check_v())); };
+	// 0x0c - LE - Less than or equal (signed)
+	bool condition_LE() { return ((status32_check_z()) || (status32_check_n() && !status32_check_v()) ||  (!status32_check_n() && status32_check_v())) ; }
+	// 0x0d - HI - Higher than (unsigned)
+	bool condition_HI() { return ((!status32_check_c()) && (!status32_check_z())); }
+	// 0x0e - LS - Lower than or same (unsigned)
+	bool condition_LS() { return (status32_check_c() || status32_check_z()); }
+	// 0x0f - PNZ - Positive Non Zero
+	bool condition_PNZ() { return ((!status32_check_n()) && (!status32_check_z())); }
+
 	/************************************************************************************************************************************
 	*                                                                                                                                   *
 	* 32-bit opcode handlers                                                                                                            *
@@ -912,43 +945,6 @@ private:
 	uint32_t m_INTVECTORBASE;
 
 };
-
-
-
-// 0x00 - AL / RA - Always
-#define CONDITION_AL (1)
-// 0x01 - EQ / Z - Zero
-#define CONDITION_EQ (status32_check_z())
-// 0x02 - NE / NZ - Non-Zero
-#define CONDITION_NE (!status32_check_z())
-// 0x03 - PL / P - Positive
-#define CONDITION_PL (!status32_check_n())
-// 0x04 - MI / N - Negative
-#define CONDITION_MI (status32_check_n())
-// 0x05 - CS / C / LO - Carry Set
-#define CONDITION_CS (status32_check_c())
-// 0x06 - CC / NC / HS - Carry Clear
-#define CONDITION_HS (!status32_check_c())
-// 0x07 - VS / V - Overflow set
-#define CONDITION_VS (status32_check_v())
-// 0x08 - VC / NV - Overflow clear
-#define CONDITION_VC (!status32_check_v())
-// 0x09 GT - Greater than (signed)
-#define CONDITION_GT ((status32_check_n() && status32_check_v() && !status32_check_z()) || (!status32_check_n() && !status32_check_v() && !status32_check_z()))
-// 0x0a - GE - Greater than or equal to (signed)
-#define CONDITION_GE ((status32_check_n() && status32_check_v()) || (!status32_check_n() && !status32_check_v()))
-// 0x0b - LT - Less than (signed)
-#define CONDITION_LT ((status32_check_n() && !status32_check_v()) || (!status32_check_n() && status32_check_v()))
-// 0x0c - LE - Less than or equal (signed)
-#define CONDITION_LE ((status32_check_z()) || (status32_check_n() && !status32_check_v()) ||  (!status32_check_n() && status32_check_v())) // Z or (N and /V) or (/N and V)
-// 0x0d - HI - Higher than (unsigned)
-#define CONDITION_HI ((!status32_check_c()) && (!status32_check_z()))
-// 0x0e - LS - Lower than or same (unsigned)
-#define CONDITION_LS (status32_check_c() || status32_check_z())
-// 0x0f - PNZ - Positive Non Zero
-#define CONDITION_PNZ ((!status32_check_n()) && (!status32_check_z()))
-
-
 
 DECLARE_DEVICE_TYPE(ARCA5, arcompact_device)
 

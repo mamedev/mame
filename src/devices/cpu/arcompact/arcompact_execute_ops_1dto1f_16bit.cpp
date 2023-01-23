@@ -147,7 +147,7 @@ uint32_t arcompact_device::handleop_BGE_S_s7(uint16_t op)  { return arcompact_ha
 
 uint32_t arcompact_device::handleop_BLT_S_s7(uint16_t op) // BLT_S
 {
-	if (CONDITION_LT)
+	if (condition_LT())
 	{
 		int s = (op & 0x003f) >> 0; op &= ~0x003f;
 		if (s & 0x020) s = -0x20 + (s & 0x1f);
@@ -166,7 +166,7 @@ uint32_t arcompact_device::handleop_BLT_S_s7(uint16_t op) // BLT_S
 
 uint32_t arcompact_device::handleop_BLE_S_s7(uint16_t op) // BLE_S
 {
-	if (CONDITION_LE)
+	if (condition_LE())
 	{
 		int s = (op & 0x003f) >> 0; op &= ~0x003f;
 		if (s & 0x020) s = -0x20 + (s & 0x1f);
@@ -192,7 +192,7 @@ uint32_t arcompact_device::handleop_BHI_S_s7(uint16_t op)  { return arcompact_ha
 
 uint32_t arcompact_device::handleop_BHS_S_s7(uint16_t op)
 {
-	if (CONDITION_HS)
+	if (condition_HS())
 	{
 		int s = (op & 0x003f) >> 0; op &= ~0x003f;
 		if (s & 0x020) s = -0x20 + (s & 0x1f);
@@ -211,7 +211,7 @@ uint32_t arcompact_device::handleop_BHS_S_s7(uint16_t op)
 
 uint32_t arcompact_device::handleop_BLO_S_s7(uint16_t op)
 {
-	if (CONDITION_CS) // LO = CONDITION_CS
+	if (condition_CS()) // LO = condition_CS()
 	{
 		int s = (op & 0x003f) >> 0; op &= ~0x003f;
 		if (s & 0x020) s = -0x20 + (s & 0x1f);
