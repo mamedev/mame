@@ -87,7 +87,7 @@ uint32_t arcompact_device::handleop_B_S_s10(uint16_t op) // B_S s10  (branch alw
 
 uint32_t arcompact_device::handleop_BEQ_S_s10(uint16_t op) // BEQ_S s10 (branch is zero bit is set)
 {
-	if (STATUS32_CHECK_Z)
+	if (status32_check_z())
 	{
 		int s = (op & 0x01ff) >> 0; op &= ~0x01ff;
 		if (s & 0x100) s = -0x100 + (s & 0xff);
@@ -106,7 +106,7 @@ uint32_t arcompact_device::handleop_BEQ_S_s10(uint16_t op) // BEQ_S s10 (branch 
 
 uint32_t arcompact_device::handleop_BNE_S_s10(uint16_t op) // BNE_S s10  (branch if zero bit isn't set)
 {
-	if (!STATUS32_CHECK_Z)
+	if (!status32_check_z())
 	{
 		int s = (op & 0x01ff) >> 0; op &= ~0x01ff;
 		if (s & 0x100) s = -0x100 + (s & 0xff);

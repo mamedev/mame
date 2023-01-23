@@ -233,6 +233,26 @@ private:
 		return op & 0x0000001f;
 	}
 
+	// V = overflow (set if signed operation would overflow)
+	void status32_set_v(void) { m_status32 |= V_OVERFLOW_FLAG; }
+	void status32_clear_v(void) { m_status32 &= ~V_OVERFLOW_FLAG; }
+	bool status32_check_v(void) { return (m_status32 & V_OVERFLOW_FLAG ? true : false); }
+
+	// C = carry (unsigned op, carry set is same condition as LO Lower Than, carry clear is same condition as HS Higher Same)
+	void status32_set_c(void) { m_status32 |=  C_CARRY_FLAG; }
+	void status32_clear_c(void) { m_status32 &= ~C_CARRY_FLAG; }
+	bool status32_check_c(void) { return (m_status32 &   C_CARRY_FLAG ? true : false); }
+
+	// N = negative (set if most significant bit of result is set)
+	void status32_set_n(void)  { m_status32 |=  N_NEGATIVE_FLAG; }
+	void status32_clear_n(void) { m_status32 &= ~N_NEGATIVE_FLAG; }
+	bool status32_check_n(void) { return (m_status32 &   N_NEGATIVE_FLAG ? true : false); }
+
+	// Z = zero (set if result is zero, ie both values the same for CMP)
+	void status32_set_z(void) { m_status32 |=  Z_ZERO_FLAG; }
+	void status32_clear_z(void) { m_status32 &= ~Z_ZERO_FLAG; }
+	bool status32_check_z(void) { return (m_status32 &   Z_ZERO_FLAG ? true : false); }
+
 	/************************************************************************************************************************************
 	*                                                                                                                                   *
 	* 32-bit opcode handlers                                                                                                            *
@@ -875,7 +895,6 @@ private:
 	inline uint64_t READAUX(uint64_t address) { return m_io->read_dword(address); }
 	inline void WRITEAUX(uint64_t address, uint32_t data) { m_io->write_dword(address, data); }
 
-
 	int check_condition(uint8_t condition);
 
 	uint32_t m_regs[0x40];
@@ -895,59 +914,39 @@ private:
 };
 
 
-// V = overflow (set if signed operation would overflow)
-#define STATUS32_SET_V   (m_status32 |=  V_OVERFLOW_FLAG)
-#define STATUS32_CLEAR_V (m_status32 &= ~V_OVERFLOW_FLAG)
-#define STATUS32_CHECK_V (m_status32 &   V_OVERFLOW_FLAG)
-
-// C = carry (unsigned op, carry set is same condition as LO Lower Than, carry clear is same condition as HS Higher Same)
-#define STATUS32_SET_C   (m_status32 |=  C_CARRY_FLAG)
-#define STATUS32_CLEAR_C (m_status32 &= ~C_CARRY_FLAG)
-#define STATUS32_CHECK_C (m_status32 &   C_CARRY_FLAG)
-
-// N = negative (set if most significant bit of result is set)
-#define STATUS32_SET_N   (m_status32 |=  N_NEGATIVE_FLAG)
-#define STATUS32_CLEAR_N (m_status32 &= ~N_NEGATIVE_FLAG)
-#define STATUS32_CHECK_N (m_status32 &   N_NEGATIVE_FLAG)
-
-// Z = zero (set if result is zero, ie both values the same for CMP)
-#define STATUS32_SET_Z   (m_status32 |=  Z_ZERO_FLAG)
-#define STATUS32_CLEAR_Z (m_status32 &= ~Z_ZERO_FLAG)
-#define STATUS32_CHECK_Z (m_status32 &   Z_ZERO_FLAG)
-
 
 // 0x00 - AL / RA - Always
 #define CONDITION_AL (1)
 // 0x01 - EQ / Z - Zero
-#define CONDITION_EQ (STATUS32_CHECK_Z)
+#define CONDITION_EQ (status32_check_z())
 // 0x02 - NE / NZ - Non-Zero
-#define CONDITION_NE (!STATUS32_CHECK_Z)
+#define CONDITION_NE (!status32_check_z())
 // 0x03 - PL / P - Positive
-#define CONDITION_PL (!STATUS32_CHECK_N)
+#define CONDITION_PL (!status32_check_n())
 // 0x04 - MI / N - Negative
-#define CONDITION_MI (STATUS32_CHECK_N)
+#define CONDITION_MI (status32_check_n())
 // 0x05 - CS / C / LO - Carry Set
-#define CONDITION_CS (STATUS32_CHECK_C)
+#define CONDITION_CS (status32_check_c())
 // 0x06 - CC / NC / HS - Carry Clear
-#define CONDITION_HS (!STATUS32_CHECK_C)
+#define CONDITION_HS (!status32_check_c())
 // 0x07 - VS / V - Overflow set
-#define CONDITION_VS (STATUS32_CHECK_V)
+#define CONDITION_VS (status32_check_v())
 // 0x08 - VC / NV - Overflow clear
-#define CONDITION_VC (!STATUS32_CHECK_V)
+#define CONDITION_VC (!status32_check_v())
 // 0x09 GT - Greater than (signed)
-#define CONDITION_GT ((STATUS32_CHECK_N && STATUS32_CHECK_V && !STATUS32_CHECK_Z) || (!STATUS32_CHECK_N && !STATUS32_CHECK_V && !STATUS32_CHECK_Z))
+#define CONDITION_GT ((status32_check_n() && status32_check_v() && !status32_check_z()) || (!status32_check_n() && !status32_check_v() && !status32_check_z()))
 // 0x0a - GE - Greater than or equal to (signed)
-#define CONDITION_GE ((STATUS32_CHECK_N && STATUS32_CHECK_V) || (!STATUS32_CHECK_N && !STATUS32_CHECK_V))
+#define CONDITION_GE ((status32_check_n() && status32_check_v()) || (!status32_check_n() && !status32_check_v()))
 // 0x0b - LT - Less than (signed)
-#define CONDITION_LT ((STATUS32_CHECK_N && !STATUS32_CHECK_V) || (!STATUS32_CHECK_N && STATUS32_CHECK_V))
+#define CONDITION_LT ((status32_check_n() && !status32_check_v()) || (!status32_check_n() && status32_check_v()))
 // 0x0c - LE - Less than or equal (signed)
-#define CONDITION_LE ((STATUS32_CHECK_Z) || (STATUS32_CHECK_N && !STATUS32_CHECK_V) ||  (!STATUS32_CHECK_N && STATUS32_CHECK_V)) // Z or (N and /V) or (/N and V)
+#define CONDITION_LE ((status32_check_z()) || (status32_check_n() && !status32_check_v()) ||  (!status32_check_n() && status32_check_v())) // Z or (N and /V) or (/N and V)
 // 0x0d - HI - Higher than (unsigned)
-#define CONDITION_HI ((!STATUS32_CHECK_C) && (!STATUS32_CHECK_Z))
+#define CONDITION_HI ((!status32_check_c()) && (!status32_check_z()))
 // 0x0e - LS - Lower than or same (unsigned)
-#define CONDITION_LS (STATUS32_CHECK_C || STATUS32_CHECK_Z)
+#define CONDITION_LS (status32_check_c() || status32_check_z())
 // 0x0f - PNZ - Positive Non Zero
-#define CONDITION_PNZ ((!STATUS32_CHECK_N) && (!STATUS32_CHECK_Z))
+#define CONDITION_PNZ ((!status32_check_n()) && (!status32_check_z()))
 
 
 

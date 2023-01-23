@@ -74,31 +74,31 @@ uint32_t arcompact_device::handleop_CMP_S_b_u7(uint16_t op) // CMP b, u7
 	// unsigned checks
 	if (m_regs[breg] == u)
 	{
-		STATUS32_SET_Z;
+		status32_set_z();
 	}
 	else
 	{
-		STATUS32_CLEAR_Z;
+		status32_clear_z();
 	}
 
 	if (m_regs[breg] < u)
 	{
-		STATUS32_SET_C;
+		status32_set_c();
 	}
 	else
 	{
-		STATUS32_CLEAR_C;
+		status32_clear_c();
 	}
 	// signed checks
 	int32_t temp = (int32_t)m_regs[breg] - (int32_t)u;
 
 	if (temp < 0)
 	{
-		STATUS32_SET_N;
+		status32_set_n();
 	}
 	else
 	{
-		STATUS32_CLEAR_N;
+		status32_clear_n();
 	}
 
 	// if signs of source values don't match, and sign of result doesn't match the first source value, then we've overflowed?
@@ -106,11 +106,11 @@ uint32_t arcompact_device::handleop_CMP_S_b_u7(uint16_t op) // CMP b, u7
 	{
 		if ((m_regs[breg] & 0x80000000) != (temp & 0x80000000))
 		{
-			STATUS32_SET_V;
+			status32_set_v();
 		}
 		else
 		{
-			STATUS32_CLEAR_V;
+			status32_clear_v();
 		}
 	}
 

@@ -91,9 +91,9 @@ uint32_t arcompact_device::handleop32_LSR_single_f_b_c(uint32_t op)
 
 	if (F)
 	{
-		if (result & 0x80000000) { STATUS32_SET_N; } else { STATUS32_CLEAR_N; }
-		if (result == 0x00000000) { STATUS32_SET_Z; } else { STATUS32_CLEAR_Z; }
-		if (c & 0x00000001) { STATUS32_SET_C; } else { STATUS32_CLEAR_C; }
+		if (result & 0x80000000) { status32_set_n(); } else { status32_clear_n(); }
+		if (result == 0x00000000) { status32_set_z(); } else { status32_clear_z(); }
+		if (c & 0x00000001) { status32_set_c(); } else { status32_clear_c(); }
 	}
 
 	return m_pc + (size >> 0);
@@ -116,9 +116,9 @@ uint32_t arcompact_device::handleop32_LSR_single_f_b_u6(uint32_t op)
 
 	if (F)
 	{
-		if (result & 0x80000000) { STATUS32_SET_N; } else { STATUS32_CLEAR_N; }
-		if (result == 0x00000000) { STATUS32_SET_Z; } else { STATUS32_CLEAR_Z; }
-		if (c & 0x00000001) { STATUS32_SET_C; } else { STATUS32_CLEAR_C; }
+		if (result & 0x80000000) { status32_set_n(); } else { status32_clear_n(); }
+		if (result == 0x00000000) { status32_set_z(); } else { status32_clear_z(); }
+		if (c & 0x00000001) { status32_set_c(); } else { status32_clear_c(); }
 	}
 	return m_pc + (size >> 0);
 }
@@ -172,12 +172,12 @@ uint32_t arcompact_device::handleop32_ROR_single_f_a_b_c(uint32_t op)
 
 	if (F)
 	{
-		if (result & 0x80000000) { STATUS32_SET_N; }
-		else { STATUS32_CLEAR_N; }
-		if (result == 0x00000000) { STATUS32_SET_Z; }
-		else { STATUS32_CLEAR_Z; }
-		if (c == 0x00000001) { STATUS32_SET_C; }
-		else { STATUS32_CLEAR_C; }
+		if (result & 0x80000000) { status32_set_n(); }
+		else { status32_clear_n(); }
+		if (result == 0x00000000) { status32_set_z(); }
+		else { status32_clear_z(); }
+		if (c == 0x00000001) { status32_set_c(); }
+		else { status32_clear_c(); }
 	}
 	return m_pc + (size >> 0);
 }
@@ -202,12 +202,12 @@ uint32_t arcompact_device::handleop32_ROR_single_f_a_b_u6(uint32_t op)
 
 	if (F)
 	{
-		if (result & 0x80000000) { STATUS32_SET_N; }
-		else { STATUS32_CLEAR_N; }
-		if (result == 0x00000000) { STATUS32_SET_Z; }
-		else { STATUS32_CLEAR_Z; }
-		if (c == 0x00000001) { STATUS32_SET_C; }
-		else { STATUS32_CLEAR_C; }
+		if (result & 0x80000000) { status32_set_n(); }
+		else { status32_clear_n(); }
+		if (result == 0x00000000) { status32_set_z(); }
+		else { status32_clear_z(); }
+		if (c == 0x00000001) { status32_set_c(); }
+		else { status32_clear_c(); }
 	}
 	return m_pc + (size >> 0);
 }
