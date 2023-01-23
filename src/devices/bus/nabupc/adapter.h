@@ -87,7 +87,7 @@ private:
 		std::error_condition read_archive(util::core_file &stream, uint32_t segment_id);
 		std::error_condition load(std::string_view local_path, uint32_t segment_id);
 		const pak& operator[](const int index) const;
-		uint32_t size() { return pak_list.size(); }
+		uint32_t size() const { return pak_list.size(); }
 	private:
 		static constexpr uint16_t crc_table[256] = {
 			0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7, 0x8108, 0x9129, 0xa14a, 0xb16b,
