@@ -29,7 +29,7 @@ uint32_t arcompact_device::handleop_J_S_D_b(uint16_t op)
 	int breg;
 
 	breg = common16_get_breg(op);
-	REG_16BIT_RANGE(breg);
+	breg = expand_reg(breg);
 
 	m_delayactive = 1;
 	m_delayjump = m_regs[breg];
@@ -48,7 +48,7 @@ uint32_t arcompact_device::handleop_JL_S_b(uint16_t op) // JL_S
 	int breg;
 
 	breg = common16_get_breg(op);
-	REG_16BIT_RANGE(breg);
+	breg = expand_reg(breg);
 
 	m_regs[REG_BLINK] = m_pc + (2 >> 0);
 
@@ -65,7 +65,7 @@ uint32_t arcompact_device::handleop_JL_S_D_b(uint16_t op) // JL_S.D
 	int breg;
 
 	breg = common16_get_breg(op);
-	REG_16BIT_RANGE(breg);
+	breg = expand_reg(breg);
 
 	m_delayactive = 1;
 	m_delayjump = m_regs[breg];

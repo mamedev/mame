@@ -1284,7 +1284,7 @@ uint32_t arcompact_device::handleop32_MOV_f_a_b_c(uint32_t op)
 
 	if (creg == LIMM_REG)
 	{
-		GET_LIMM_32;
+		get_limm_32bit_opcode();
 		size = 8;
 	}
 
@@ -3539,7 +3539,7 @@ uint32_t arcompact_device::handleop32_Jcc_f_a_b_c(uint32_t op)
 		// opcode          iiii i--- ppII IIII F--- CCCC CC-- ----
 		// J limm          0010 0RRR 0010 0000 0RRR 1111 10RR RRRR  [LIMM]  (creg = LIMM)
 
-		GET_LIMM_32;
+		get_limm_32bit_opcode();
 		size = 8;
 
 		return m_regs[LIMM_REG];
@@ -3614,7 +3614,7 @@ uint32_t arcompact_device::handleop32_Jcc_cc_f_b_b_c(uint32_t op) // Jcc   (no l
 	{
 		// opcode          iiii i--- ppII IIII F--- cccc ccmq qqqq
 		// Jcc limm        0010 0RRR 1110 0000 0RRR 1111 100Q QQQQ  [LIUMM]
-		GET_LIMM_32;
+		get_limm_32bit_opcode();
 		size = 8;
 
 		c = m_regs[LIMM_REG];
@@ -3723,7 +3723,7 @@ uint32_t arcompact_device::handleop32_Jcc_D_f_a_b_c(uint32_t op)
 
 	if (creg == LIMM_REG)
 	{
-		GET_LIMM_32;
+		get_limm_32bit_opcode();
 		size = 8;
 
 		handle_jump_to_addr(1,0,m_regs[LIMM_REG], m_pc + (size >> 0));
@@ -3763,7 +3763,7 @@ uint32_t arcompact_device::handleop32_Jcc_D_cc_f_b_b_c(uint32_t op) // Jcc.D   (
 
 	if (creg == LIMM_REG)
 	{
-		GET_LIMM_32;
+		get_limm_32bit_opcode();
 		size = 8;
 	}
 	else
@@ -4021,14 +4021,14 @@ uint32_t arcompact_device::handleop32_LP(uint32_t op) // LPcc (loop setup)
 		// if the loop condition fails then just jump to after the end of the loop, don't set any registers
 		if (!check_condition(condition))
 		{
-			uint32_t realoffset = PC_ALIGNED32 + (u * 2);
+			uint32_t realoffset = (m_pc&0xfffffffc) + (u * 2);
 			return realoffset;
 		}
 		else
 		{
 			// otherwise set up the loop positions
 			m_LP_START = m_pc + (size >> 0);
-			m_LP_END = PC_ALIGNED32 + (u * 2);
+			m_LP_END = (m_pc&0xfffffffc) + (u * 2);
 			return m_pc + (size>>0);
 		}
 
@@ -4164,7 +4164,7 @@ uint32_t arcompact_device::handleop32_LR_f_a_b_c(uint32_t op)
 
 	if (creg == LIMM_REG)
 	{
-		GET_LIMM_32;
+		get_limm_32bit_opcode();
 		size = 8;
 	}
 

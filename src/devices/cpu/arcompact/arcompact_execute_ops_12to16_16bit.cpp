@@ -25,8 +25,8 @@ uint32_t arcompact_device::handleop_LD_S_c_b_u7(uint16_t op)
 	creg = common16_get_creg(op);
 	u = common16_get_u5(op);
 
-	REG_16BIT_RANGE(breg);
-	REG_16BIT_RANGE(creg);
+	breg = expand_reg(breg);
+	creg = expand_reg(creg);
 
 	u <<= 2; // check
 	m_regs[creg] = READ32((m_regs[breg] + u));
@@ -47,8 +47,8 @@ uint32_t arcompact_device::handleop_LDB_S_c_b_u5(uint16_t op)
 	creg = common16_get_creg(op);
 	u = common16_get_u5(op);
 
-	REG_16BIT_RANGE(breg);
-	REG_16BIT_RANGE(creg);
+	breg = expand_reg(breg);
+	creg = expand_reg(creg);
 
 	m_regs[creg] = READ8((m_regs[breg] + u));
 
@@ -69,8 +69,8 @@ uint32_t arcompact_device::handleop_LDW_S_c_b_u6(uint16_t op)
 	creg = common16_get_creg(op);
 	u = common16_get_u5(op);
 
-	REG_16BIT_RANGE(breg);
-	REG_16BIT_RANGE(creg);
+	breg = expand_reg(breg);
+	creg = expand_reg(creg);
 
 	u <<= 1;
 	m_regs[creg] = READ16((m_regs[breg] + u));
@@ -101,8 +101,8 @@ uint32_t arcompact_device::handleop_ST_S_c_b_u7(uint16_t op) // ST_S c, [b, u7]
 	creg = common16_get_creg(op);
 	u = common16_get_u5(op);
 
-	REG_16BIT_RANGE(breg);
-	REG_16BIT_RANGE(creg);
+	breg = expand_reg(breg);
+	creg = expand_reg(creg);
 
 	u <<= 2;
 
@@ -124,8 +124,8 @@ uint32_t arcompact_device::handleop_STB_S_c_b_u5(uint16_t op) // STB_S c. [b, u6
 	creg = common16_get_creg(op);
 	u = common16_get_u5(op);
 
-	REG_16BIT_RANGE(breg);
-	REG_16BIT_RANGE(creg);
+	breg = expand_reg(breg);
+	creg = expand_reg(creg);
 
 //  u <<= 0;
 
@@ -147,8 +147,8 @@ uint32_t arcompact_device::handleop_STW_S_c_b_u6(uint16_t op) // STW_S c. [b, u6
 	creg = common16_get_creg(op);
 	u = common16_get_u5(op);
 
-	REG_16BIT_RANGE(breg);
-	REG_16BIT_RANGE(creg);
+	breg = expand_reg(breg);
+	creg = expand_reg(creg);
 
 	u <<= 1;
 

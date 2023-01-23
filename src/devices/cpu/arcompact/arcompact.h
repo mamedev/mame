@@ -9,48 +9,10 @@
 
 #pragma once
 
-enum
-{
-	ARCOMPACT_PC = STATE_GENPC,
-	ARCOMPACT_STATUS32 = 0x10,
-	ARCOMPACT_LP_START,
-	ARCOMPACT_LP_END
-
-};
-
-
 #define ARCOMPACT_LOGGING 1
 
 #define arcompact_fatal if (ARCOMPACT_LOGGING) fatalerror
 #define arcompact_log if (ARCOMPACT_LOGGING) fatalerror
-
-
-#define GET_01_01_01_BRANCH_ADDR \
-	int32_t address = (op & 0x00fe0000) >> 17; \
-	address |= ((op & 0x00008000) >> 15) << 7; \
-	if (address & 0x80) address = -0x80 + (address & 0x7f);
-
-
-
-
-
-// registers used in 16-bit opcodes have a limited range
-// and can only address registers r0-r3 and r12-r15
-
-#define REG_16BIT_RANGE(_reg_) \
-	if (_reg_>3) _reg_+= 8;
-
-#define GET_LIMM_32 \
-	m_regs[LIMM_REG] = (READ16((m_pc + 4)) << 16); \
-	m_regs[LIMM_REG] |= READ16((m_pc + 6));
-
-#define GET_LIMM_16 \
-	m_regs[LIMM_REG] = (READ16((m_pc + 2)) << 16); \
-	m_regs[LIMM_REG] |= READ16((m_pc + 4));
-
-#define PC_ALIGNED32 \
-	(m_pc&0xfffffffc)
-
 
 class arcompact_device : public cpu_device
 {
@@ -108,6 +70,34 @@ private:
 	const static uint32_t N_NEGATIVE_FLAG = 0x00000400;
 	const static uint32_t Z_ZERO_FLAG = 0x00000800;
 
+	enum
+	{
+		ARCOMPACT_PC = STATE_GENPC,
+		ARCOMPACT_STATUS32 = 0x10,
+		ARCOMPACT_LP_START,
+		ARCOMPACT_LP_END
+	};
+
+	void get_limm_32bit_opcode(void)
+	{
+		m_regs[LIMM_REG] = (READ16((m_pc + 4)) << 16);
+		m_regs[LIMM_REG] |= READ16((m_pc + 6));
+	}
+
+	void get_limm_16bit_opcode(void)
+	{
+		m_regs[LIMM_REG] = (READ16((m_pc + 2)) << 16);
+		m_regs[LIMM_REG] |= READ16((m_pc + 4));
+	}
+
+	// registers used in 16-bit opcodes have a limited range
+	// and can only address registers r0-r3 and r12-r15
+	uint8_t expand_reg(uint8_t reg)
+	{
+		if (reg>3) reg += 8;
+		return reg;
+	}
+
 	uint8_t common16_get_breg(uint16_t op)
 	{
 		return ((op & 0x0700) >> 8);
@@ -151,7 +141,6 @@ private:
 
 		return s;
 	}
-
 
 	uint8_t common32_get_breg(uint32_t op)
 	{
@@ -206,7 +195,7 @@ private:
 	{
 		if (creg == LIMM_REG)
 		{
-			GET_LIMM_32;
+			get_limm_32bit_opcode();
 			return 8;
 		}
 		return 4;
@@ -216,7 +205,7 @@ private:
 	{
 		if (breg == LIMM_REG)
 		{
-			GET_LIMM_32;
+			get_limm_32bit_opcode();
 			return 8;
 		}
 		return 4;
@@ -226,7 +215,7 @@ private:
 	{
 		if ((breg == LIMM_REG) || (creg == LIMM_REG))
 		{
-			GET_LIMM_32;
+			get_limm_32bit_opcode();
 			return 8;
 		}
 		return 4;

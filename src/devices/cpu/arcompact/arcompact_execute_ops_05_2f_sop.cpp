@@ -19,7 +19,7 @@ uint32_t arcompact_device::arcompact_handle05_2f_0x_helper(uint32_t op, const ch
 		if (creg == LIMM_REG)
 		{
 			//uint32_t limm;
-			//GET_LIMM_32;
+			//get_limm_32bit_opcode();
 			size = 8;
 
 		}

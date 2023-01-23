@@ -5,6 +5,10 @@
 #include "arcompact.h"
 #include "arcompactdasm.h"
 
+#define GET_01_01_01_BRANCH_ADDR \
+	int32_t address = (op & 0x00fe0000) >> 17; \
+	address |= ((op & 0x00008000) >> 15) << 7; \
+	if (address & 0x80) address = -0x80 + (address & 0x7f);
 
 uint32_t arcompact_device::handleop32_B_cc_D_s21(uint32_t op)
 {
@@ -22,7 +26,7 @@ uint32_t arcompact_device::handleop32_B_cc_D_s21(uint32_t op)
 	if (address & 0x80000) address = -0x80000 + (address & 0x7ffff);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 
-	uint32_t realaddress = PC_ALIGNED32 + (address * 2);
+	uint32_t realaddress = (m_pc&0xfffffffc) + (address * 2);
 
 	if (n)
 	{
@@ -51,7 +55,7 @@ uint32_t arcompact_device::handleop32_B_D_s25(uint32_t op)
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 //  int res =  (op & 0x00000010) >> 4; op &= ~0x00000010; // should be set to 0
 
-	uint32_t realaddress = PC_ALIGNED32 + (address * 2);
+	uint32_t realaddress = (m_pc&0xfffffffc) + (address * 2);
 
 	if (n)
 	{
@@ -93,7 +97,7 @@ uint32_t arcompact_device::handleop32_BL_d_s25(uint32_t op)
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 //  int res =  (op & 0x00000010) >> 4; op &= ~0x00000010;
 
-	uint32_t realaddress = PC_ALIGNED32 + (address * 2);
+	uint32_t realaddress = (m_pc&0xfffffffc) + (address * 2);
 
 	if (n)
 	{
@@ -130,7 +134,7 @@ uint32_t arcompact_device::arcompact_01_01_00_helper(uint32_t op, const char* op
 	else
 	{
 		//uint32_t limm;
-		//GET_LIMM_32;
+		//get_limm_32bit_opcode();
 		size = 8;
 	}
 
@@ -154,7 +158,7 @@ uint32_t arcompact_device::arcompact_01_01_00_helper(uint32_t op, const char* op
 
 #define BR_TAKEJUMP \
 	/* take jump */ \
-	uint32_t realaddress = PC_ALIGNED32 + (address * 2); \
+	uint32_t realaddress = (m_pc&0xfffffffc) + (address * 2); \
 		\
 	if (n) \
 	{ \
@@ -257,6 +261,8 @@ uint32_t arcompact_device::arcompact_01_01_01_helper(uint32_t op, const char* op
 	arcompact_log("unimplemented %s %08x (reg-imm)", optext, op);
 	return m_pc + (size>>0);
 }
+
+
 
 #define BR_REGIMM_SETUP \
 	GET_01_01_01_BRANCH_ADDR \

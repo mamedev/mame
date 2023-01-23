@@ -26,7 +26,7 @@ uint32_t arcompact_device::handleop_ASL_S_b_b_u5(uint16_t op)
 	breg = common16_get_breg(op);
 	u = common16_get_u5(op);
 
-	REG_16BIT_RANGE(breg);
+	breg = expand_reg(breg);
 
 	m_regs[breg] = m_regs[breg] << (u&0x1f);
 
@@ -45,7 +45,7 @@ uint32_t arcompact_device::handleop_LSR_S_b_b_u5(uint16_t op)
 	breg = common16_get_breg(op);
 	u = common16_get_u5(op);
 
-	REG_16BIT_RANGE(breg);
+	breg = expand_reg(breg);
 
 	m_regs[breg] = m_regs[breg] >> (u&0x1f);
 
@@ -64,7 +64,7 @@ uint32_t arcompact_device::handleop_ASR_S_b_b_u5(uint16_t op)
 	breg = common16_get_breg(op);
 	u = common16_get_u5(op);
 
-	REG_16BIT_RANGE(breg);
+	breg = expand_reg(breg);
 
 	int32_t temp = (int32_t)m_regs[breg]; m_regs[breg] = temp >> (u&0x1f); // treat it as a signed value, so sign extension occurs during shift
 
@@ -83,7 +83,7 @@ uint32_t arcompact_device::handleop_SUB_S_b_b_u5(uint16_t op)
 	breg = common16_get_breg(op);
 	u = common16_get_u5(op);
 
-	REG_16BIT_RANGE(breg);
+	breg = expand_reg(breg);
 
 	m_regs[breg] = m_regs[breg] - u;
 
@@ -102,7 +102,7 @@ uint32_t arcompact_device::handleop_BSET_S_b_b_u5(uint16_t op)
 	breg = common16_get_breg(op);
 	u = common16_get_u5(op);
 
-	REG_16BIT_RANGE(breg);
+	breg = expand_reg(breg);
 
 	m_regs[breg] = m_regs[breg] | (1 << (u & 0x1f));
 
@@ -119,7 +119,7 @@ uint32_t arcompact_device::handleop_BCLR_S_b_b_u5(uint16_t op)
 	uint8_t breg = common16_get_breg(op);
 	uint8_t u = common16_get_u5(op);
 
-	REG_16BIT_RANGE(breg);
+	breg = expand_reg(breg);
 
 	m_regs[breg] = m_regs[breg] &~ (1 << u);
 
@@ -136,7 +136,7 @@ uint32_t arcompact_device::handleop_BMSK_S_b_b_u5(uint16_t op)
 	uint8_t breg = common16_get_breg(op);
 	uint8_t u = common16_get_u5(op);
 
-	REG_16BIT_RANGE(breg);
+	breg = expand_reg(breg);
 
 	m_regs[breg] = m_regs[breg] & ((1 << (u + 1)) - 1);
 
