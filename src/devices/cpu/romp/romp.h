@@ -166,7 +166,7 @@ private:
 		switch (address >> 28)
 		{
 		default:
-			if (m_mmu->load(address, data, mode))
+			if (m_mmu->mem_load(address, data, mode))
 				f(data);
 			else
 				program_check(PCS_PCK | PCS_DAE);
@@ -176,8 +176,13 @@ private:
 			switch (address >> 24)
 			{
 			case 0xf0:
+				if (m_iou->pio_load(address, data, mode))
+					f(data);
+				else
+					program_check(PCS_PCK | PCS_DAE);
+				break;
 			case 0xf4:
-				if (m_iou->load(address, data, mode))
+				if (m_iou->mem_load(address, data, mode))
 					f(data);
 				else
 					program_check(PCS_PCK | PCS_DAE);
@@ -202,7 +207,7 @@ private:
 		switch (address >> 28)
 		{
 		default:
-			if (!m_mmu->store(address, data, mode))
+			if (!m_mmu->mem_store(address, data, mode))
 				program_check(PCS_PCK | PCS_DAE);
 			break;
 
@@ -210,8 +215,11 @@ private:
 			switch (address >> 24)
 			{
 			case 0xf0:
+				if (!m_iou->pio_store(address, data, mode))
+					program_check(PCS_PCK | PCS_DAE);
+				break;
 			case 0xf4:
-				if (!m_iou->store(address, data, mode))
+				if (!m_iou->mem_store(address, data, mode))
 					program_check(PCS_PCK | PCS_DAE);
 				break;
 
@@ -234,7 +242,7 @@ private:
 		switch (address >> 28)
 		{
 		default:
-			if (!m_mmu->modify(address, f, mode))
+			if (!m_mmu->mem_modify(address, f, mode))
 				program_check(PCS_PCK | PCS_DAE);
 			break;
 
@@ -242,8 +250,11 @@ private:
 			switch (address >> 24)
 			{
 			case 0xf0:
+				if (!m_iou->pio_modify(address, f, mode))
+					program_check(PCS_PCK | PCS_DAE);
+				break;
 			case 0xf4:
-				if (!m_iou->modify(address, f, mode))
+				if (!m_iou->mem_modify(address, f, mode))
 					program_check(PCS_PCK | PCS_DAE);
 				break;
 

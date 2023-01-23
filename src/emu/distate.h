@@ -104,10 +104,10 @@ protected:
 private:
 	// helpers
 	void format_from_mask();
-	std::string format(const char *string, bool maxout = false) const;
+	std::string format(const char *string, u64 result, bool maxout = false) const;
 
 	// statics
-	static const u64 k_decimal_divisor[20];      // divisors for outputting decimal values
+	static const u64 k_decimal_divisor[20];         // divisors for outputting decimal values
 
 	// public state description
 	device_state_interface *m_device_state;         // link to parent device state
@@ -357,13 +357,12 @@ protected:
 	virtual void interface_post_start() override;
 
 	// constants
-	static constexpr int FAST_STATE_MIN = -4;                           // range for fast state
-	static constexpr int FAST_STATE_MAX = 256;                          // lookups
+	static constexpr int FAST_STATE_MIN = -4;       // range for fast state
+	static constexpr int FAST_STATE_MAX = 256;      // lookups
 
 	// state
-	std::vector<std::unique_ptr<device_state_entry>>       m_state_list;           // head of state list
-	device_state_entry *                    m_fast_state[FAST_STATE_MAX + 1 - FAST_STATE_MIN];
-																	// fast access to common entries
+	std::vector<std::unique_ptr<device_state_entry>> m_state_list; // head of state list
+	device_state_entry *m_fast_state[FAST_STATE_MAX + 1 - FAST_STATE_MIN]; // fast access to common entries
 };
 
 // iterator

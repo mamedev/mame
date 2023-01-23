@@ -10,13 +10,15 @@
 
 #pragma once
 
-#include "sound/samples.h"
 #include "machine/74123.h"
+#include "machine/rescap.h"
+#include "sound/samples.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
 
-#define IREMM10_MASTER_CLOCK        (12500000)
+#define IREMM10_MASTER_CLOCK    12.5_MHz_XTAL
 
 #define IREMM10_CPU_CLOCK       (IREMM10_MASTER_CLOCK/16)
 #define IREMM10_PIXEL_CLOCK     (IREMM10_MASTER_CLOCK/2)
@@ -27,16 +29,16 @@
 #define IREMM10_VBSTART         (240)
 #define IREMM10_VBEND           (16)
 
-#define IREMM15_MASTER_CLOCK    (11730000)
+#define IREMM11_MASTER_CLOCK    11.73_MHz_XTAL
 
-#define IREMM15_CPU_CLOCK       (IREMM15_MASTER_CLOCK/10)
-#define IREMM15_PIXEL_CLOCK     (IREMM15_MASTER_CLOCK/2)
-#define IREMM15_HTOTAL          (372)
-#define IREMM15_HBSTART         (256)
-#define IREMM15_HBEND           (0)
-#define IREMM15_VTOTAL          (262)
-#define IREMM15_VBSTART         (240)
-#define IREMM15_VBEND           (16)
+#define IREMM11_CPU_CLOCK       (IREMM11_MASTER_CLOCK/16)
+#define IREMM11_PIXEL_CLOCK     (IREMM11_MASTER_CLOCK/2)
+#define IREMM11_HTOTAL          (372)
+#define IREMM11_HBSTART         (256)
+#define IREMM11_HBEND           (0)
+#define IREMM11_VTOTAL          (262)
+#define IREMM11_VBSTART         (240)
+#define IREMM11_VBEND           (16)
 
 class m1x_state : public driver_device
 {
@@ -79,20 +81,15 @@ protected:
 	// video-related
 	tilemap_t * m_tx_tilemap;
 
-	// this is currently unused, because it is needed by gfx_layout (which has no machine)
-	uint32_t extyoffs[32 * 8];
-
 	// video state
-	uint8_t m_flip;
+	uint8_t m_flip = 0;
 
 	// misc
-	int m_last;
-	emu_timer *m_interrupt_timer;
+	int m_last = 0;
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void palette(palette_device &palette) const;
-	TIMER_CALLBACK_MEMBER(interrupt_callback);
 };
 
 class m10_state : public m1x_state
@@ -107,6 +104,8 @@ public:
 	void m10(machine_config &config);
 	void m11(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(set_vr1) { m_ic8j2->set_resistor_value(RES_K(10 + newval / 5.0)); }
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -117,18 +116,17 @@ private:
 	required_device<ttl74123_device> m_ic8j2;
 
 	gfx_element *       m_back_gfx = nullptr;
+	int                 m_back_color[4];
+	int                 m_back_xpos[4];
 	uint8_t             m_bottomline = 0U;
 
 	void m10_ctrl_w(uint8_t data);
 	void m11_ctrl_w(uint8_t data);
 	void m10_a500_w(uint8_t data);
 	void m11_a100_w(uint8_t data);
-	uint8_t m10_a700_r();
-	uint8_t m11_a700_r();
+	uint8_t clear_74123_r();
 	void chargen_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(ic8j1_output_changed);
-	DECLARE_WRITE_LINE_MEMBER(ic8j2_output_changed);
 	inline void plot_pixel( bitmap_ind16 &bm, int x, int y, int col );
 
 	void m10_main(address_map &map);
@@ -143,7 +141,6 @@ public:
 	{ }
 
 	void m15(machine_config &config);
-	void headoni(machine_config &config);
 
 protected:
 	virtual void video_start() override;

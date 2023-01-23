@@ -21,6 +21,8 @@ The LCD is likely to be a SSD1828 LCD.
 #include "speaker.h"
 
 
+namespace {
+
 class pokemini_state : public driver_device
 {
 public:
@@ -1732,6 +1734,8 @@ ROM_START( pokemini )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "bios.min", 0x0000, 0x1000, CRC(aed3c14d) SHA1(daad4113713ed776fbd47727762bca81ba74915f) )
 ROM_END
+
+} // anonymous namespace
 
 
 CONS( 2001, pokemini, 0, 0, pokemini, pokemini, pokemini_state, empty_init, "Nintendo", "Pokemon Mini", MACHINE_NO_SOUND )

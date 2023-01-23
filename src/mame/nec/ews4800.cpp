@@ -22,7 +22,7 @@
 #include "machine/z80scc.h"
 #include "machine/am79c90.h"
 #include "machine/timekpr.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 
 // busses and connectors
 #include "machine/nscsi_bus.h"

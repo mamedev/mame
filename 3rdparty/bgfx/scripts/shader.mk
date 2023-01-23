@@ -1,6 +1,6 @@
 #
-# Copyright 2011-2021 Branimir Karadzic. All rights reserved.
-# License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+# Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+# License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
 #
 
 THISDIR:=$(dir $(lastword $(MAKEFILE_LIST)))
@@ -127,7 +127,7 @@ VS_BIN = $(addprefix $(BUILD_INTERMEDIATE_DIR)/, $(addsuffix .bin, $(basename $(
 FS_BIN = $(addprefix $(BUILD_INTERMEDIATE_DIR)/, $(addsuffix .bin, $(basename $(notdir $(FS_SOURCES)))))
 CS_BIN = $(addprefix $(BUILD_INTERMEDIATE_DIR)/, $(addsuffix .bin, $(basename $(notdir $(CS_SOURCES)))))
 
-BIN = $(VS_BIN) $(FS_BIN)
+BIN = $(VS_BIN) $(FS_BIN) $(CS_BIN)
 ASM = $(VS_ASM) $(FS_ASM)
 
 ifeq ($(TARGET), $(filter $(TARGET),1 3 4 5 6 7))

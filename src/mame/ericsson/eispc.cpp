@@ -105,6 +105,9 @@
 #define LOGFPU(...)  LOGMASKED(LOG_FPU,  __VA_ARGS__)
 #define LOGCOM(...)  LOGMASKED(LOG_COM,  __VA_ARGS__)
 
+
+namespace {
+
 class epc_state : public driver_device
 {
 public:
@@ -1065,6 +1068,9 @@ ROM_START( epc )
 	ROMX_LOAD("epcbios2.bin",  0xa000, 0x02000, CRC(3ca764ca) SHA1(02232fedef22d31a641f4b65933b9e269afce19e), ROM_BIOS(1))
 	ROMX_LOAD("epcbios3.bin",  0xc000, 0x02000, CRC(70483280) SHA1(b44b09da94d77b0269fc48f07d130b2d74c4bb8f), ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1985, epc,     0,      0,      epc,     epc_ports, epc_state, init_epc,    "Ericsson Information System",     "Ericsson PC" ,          0)
 //COMP( 1985, eppc,   ibm5150, 0,  pccga,         pccga,  pc_state, empty_init,    "Ericsson Information System",     "Ericsson Portable PC",  MACHINE_NOT_WORKING )

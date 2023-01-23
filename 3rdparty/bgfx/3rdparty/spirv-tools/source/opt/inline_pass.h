@@ -139,9 +139,9 @@ class InlinePass : public Pass {
   // Return true if |func| is a function that can be inlined.
   bool IsInlinableFunction(Function* func);
 
-  // Returns true if |func| contains an OpKill or OpTerminateInvocation
-  // instruction.
-  bool ContainsKillOrTerminateInvocation(Function* func) const;
+  // Returns true if |func| contains an abort instruction that is not an
+  // `OpUnreachable` instruction.
+  bool ContainsAbortOtherThanUnreachable(Function* func) const;
 
   // Update phis in succeeding blocks to point to new last block
   void UpdateSucceedingPhis(
@@ -235,6 +235,12 @@ class InlinePass : public Pass {
   // Move the OpLoopMerge from the last block back to the first.
   void MoveLoopMergeInstToFirstBlock(
       std::vector<std::unique_ptr<BasicBlock>>* new_blocks);
+
+  // Update the structure of single block loops so that the inlined code ends
+  // up in the loop construct and a new continue target is added to satisfy
+  // structural dominance.
+  void UpdateSingleBlockLoopContinueTarget(
+      uint32_t new_id, std::vector<std::unique_ptr<BasicBlock>>* new_blocks);
 };
 
 }  // namespace opt

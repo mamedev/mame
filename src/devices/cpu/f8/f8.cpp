@@ -285,7 +285,6 @@ void f8_cpu_device::ROMC_00(int insttim)
 	 * code addressed by PC0; then all devices increment the contents
 	 * of PC0.
 	 */
-
 	m_dbus = m_program.read_byte(m_pc0);
 	m_pc0 += 1;
 	m_icount -= insttim; /* ROMC00 is usually short, not short+long, but DS is long */

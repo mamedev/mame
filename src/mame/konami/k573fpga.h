@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:windyfairy
-#ifndef MAME_MACHINE_K573FPGA_H
-#define MAME_MACHINE_K573FPGA_H
+#ifndef MAME_KONAMI_K573FPGA_H
+#define MAME_KONAMI_K573FPGA_H
 
 #pragma once
 
@@ -108,4 +108,4 @@ private:
 	double counter_value;
 };
 
-#endif // MAME_MACHINE_K573FPGA_H
+#endif // MAME_KONAMI_K573FPGA_H

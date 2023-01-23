@@ -142,7 +142,7 @@ void tubep_state::tubep_main_map(address_map &map)
 	map(0xa000, 0xa7ff).ram();
 	map(0xc000, 0xc7ff).w(FUNC(tubep_state::tubep_textram_w)).share("textram");  /* RAM on GFX PCB @B13 */
 	map(0xe000, 0xe7ff).writeonly().share("share1");
-	map(0xe800, 0xebff).writeonly().share("backgroundram");             /* row of 8 x 2147 RAMs on main PCB */
+	map(0xe800, 0xebff).writeonly().share("bgram");         /* row of 8 x 2147 RAMs on main PCB */
 }
 
 
@@ -189,10 +189,10 @@ void tubep_state::tubep_second_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0xa000, 0xa000).w(FUNC(tubep_state::background_a000_w));
 	map(0xc000, 0xc000).w(FUNC(tubep_state::background_c000_w));
-	map(0xe000, 0xe7ff).ram().share("share1");                              /* 6116 #1 */
-	map(0xe800, 0xebff).writeonly().share("backgroundram"); /* row of 8 x 2147 RAMs on main PCB */
-	map(0xf000, 0xf3ff).lw8([this](offs_t off, u8 data) { m_sprite_colorsharedram[off] = data; }, "sc_w"); /* sprites color lookup table */
-	map(0xf800, 0xffff).ram().share("share2");                                  /* program copies here part of shared ram ?? */
+	map(0xe000, 0xe7ff).ram().share("share1");              /* 6116 #1 */
+	map(0xe800, 0xebff).writeonly().share("bgram");         /* row of 8 x 2147 RAMs on main PCB */
+	map(0xf000, 0xf3ff).writeonly().share("sprite_cram");   /* sprites color lookup table */
+	map(0xf800, 0xffff).ram().share("share2");              /* program copies here part of shared ram ?? */
 }
 
 
@@ -326,7 +326,7 @@ void tubep_state::machine_reset()
 /* MS2010-A CPU (equivalent to NSC8105 with one new opcode: 0xec) on graphics PCB */
 void tubep_state::nsc_map(address_map &map)
 {
-	map(0x0000, 0x03ff).ram().share("sprite_color");
+	map(0x0000, 0x03ff).ram().share("sprite_cram");
 	map(0x0800, 0x0fff).ram().share("share2");
 	map(0x2000, 0x2009).w(FUNC(tubep_state::sprite_control_w));
 	map(0x200a, 0x200b).nopw(); /* not used by the games - perhaps designed for debugging */
@@ -379,7 +379,7 @@ void rjammer_state::rjammer_second_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0xa000, 0xa7ff).ram();                         /* M5M5117P @21G */
 	map(0xe000, 0xe7ff).ram().share("share1");              /* MB8416 on daughterboard (the one on the right) */
-	map(0xe800, 0xefff).ram().share("rjammer_bgram");/* M5M5117P @19B (background) */
+	map(0xe800, 0xefff).ram().share("bgram");/* M5M5117P @19B (background) */
 	map(0xf800, 0xffff).ram().share("share2");
 }
 
@@ -524,7 +524,7 @@ void rjammer_state::voice_input_w(uint8_t data)
 	        I do it here because this port (0x80) is first one accessed
 	        in the interrupt routine.
 	*/
-	m_soundcpu->set_input_line(0, CLEAR_LINE );
+	m_soundcpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -593,7 +593,6 @@ void tubep_state::ay8910_portB_2_w(uint8_t data)
  *  Game-specific port definitions
  *
  *************************************/
-
 
 static INPUT_PORTS_START( tubep )
 	PORT_START("P1")
@@ -926,27 +925,27 @@ void rjammer_state::rjammer(machine_config &config)
  *************************************/
 
 ROM_START( tubep )
-	ROM_REGION( 0x10000,"maincpu", 0 ) /* Z80 (master) cpu code */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 (master) cpu code */
 	ROM_LOAD( "tp-p.5", 0x0000, 0x2000, CRC(d5e0cc2f) SHA1(db9b062b14af52bb5458fe71996da295a69148ac) )
 	ROM_LOAD( "tp-p.6", 0x2000, 0x2000, CRC(97b791a0) SHA1(20ef87b3d3bdfc8b983bcb8231252f81d98ad452) )
 	ROM_LOAD( "tp-p.7", 0x4000, 0x2000, CRC(add9983e) SHA1(70a517451553a8c0e74a1995d9afddb779efc92c) )
 	ROM_LOAD( "tp-p.8", 0x6000, 0x2000, CRC(b3793cb5) SHA1(0ed622b6bb97b9877acb6dc174edcd9977fa784e) )
 
-	ROM_REGION( 0x10000,"slave", 0 ) /* Z80 (slave) cpu code */
+	ROM_REGION( 0x10000, "slave", 0 ) /* Z80 (slave) cpu code */
 	ROM_LOAD( "tp-p.1", 0x0000, 0x2000, CRC(b4020fcc) SHA1(437a037adedd596d295a0b6e400d64dee6c4488e) )
 	ROM_LOAD( "tp-p.2", 0x2000, 0x2000, CRC(a69862d6) SHA1(7180cc26cd11d2daf453fcda8e6cc90851068bc4) )
 	ROM_LOAD( "tp-p.3", 0x4000, 0x2000, CRC(f1d86e00) SHA1(5c26f20f49e09a736cede4f276f5bdf76f932400) )
 	ROM_LOAD( "tp-p.4", 0x6000, 0x2000, CRC(0a1027bc) SHA1(2ebb53a1da53a9c3f0b99da084030c4d2b62a7b3) )
 
-	ROM_REGION( 0x10000,"soundcpu", 0 ) /* Z80 (sound) cpu code */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 (sound) cpu code */
 	ROM_LOAD( "tp-s.1", 0x0000, 0x2000, CRC(78964fcc) SHA1(a2c6119275d6291d82ac11dcffdaf2e8726e935a) )
 	ROM_LOAD( "tp-s.2", 0x2000, 0x2000, CRC(61232e29) SHA1(a9ef0fefb7250392ef51173b69a69c903ff91ee8) )
 
-	ROM_REGION( 0x10000,"mcu", 0 ) /* 64k for the custom CPU */
+	ROM_REGION( 0x10000, "mcu", 0 ) /* 64k for the custom CPU */
 	ROM_LOAD( "tp-g5.e1", 0xc000, 0x2000, CRC(9f375b27) SHA1(9666d1b20169d899176fbdf5954df41df06b4b82) )
 	ROM_LOAD( "tp-g6.d1", 0xe000, 0x2000, CRC(3ea127b8) SHA1(a5f83ee0eb871da81eeaf839499baf14b986c69e) )
 
-	ROM_REGION( 0xc000, "user1", 0 ) /* background data */
+	ROM_REGION( 0xc000, "background", 0 ) /* background data */
 	ROM_LOAD( "tp-b.1", 0x0000, 0x2000, CRC(fda355e0) SHA1(3270c65a4ee5d01388727f38691f7fe38f541031) )
 	ROM_LOAD( "tp-b.2", 0x2000, 0x2000, CRC(cbe30149) SHA1(e66057286bea3026743f6de27a7e8dc8a709f8f7) )
 	ROM_LOAD( "tp-b.3", 0x4000, 0x2000, CRC(f5d118e7) SHA1(a899bef3accef8995c457e8142a0001eed033fae) )
@@ -954,7 +953,7 @@ ROM_START( tubep )
 	ROM_LOAD( "tp-b.5", 0x8000, 0x2000, CRC(4dabea43) SHA1(72b9df9a3665baf34fb1f7301c5b9dd2619ed206) )
 	ROM_LOAD( "tp-b.6", 0xa000, 0x2000, CRC(01952144) SHA1(d1074c79b51d3e2c152c9f3df6892027fe3a0e00) )
 
-	ROM_REGION( 0x18000,"user2", 0 )
+	ROM_REGION( 0x18000, "sprites", 0 )
 	ROM_LOAD( "tp-c.1", 0x0000, 0x2000, CRC(ec002af2) SHA1(f9643c2ff01412d3da42b050bce4cf7f7d2e6f6a) )
 	ROM_LOAD( "tp-c.2", 0x2000, 0x2000, CRC(c44f7128) SHA1(e05c00a7094b3fbf7ac6ed6ed38e1b227d462b27) )
 	ROM_LOAD( "tp-c.3", 0x4000, 0x2000, CRC(4146b0c9) SHA1(cd3d620531660834530c64cdf1ef0659f9f6f437) )
@@ -971,17 +970,17 @@ ROM_START( tubep )
 	ROM_LOAD( "tp-g7.h2",  0x14000, 0x2000, CRC(105cb9e4) SHA1(b9d8ffe35c1f66aa401e5d8e415bf7c016ff53bb) )
 	ROM_LOAD( "tp-g8.i2",  0x16000, 0x2000, CRC(27e5e6c1) SHA1(f3896d0006351d165e36bafa4340175077b3d6ba) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "text", 0 )
 	ROM_LOAD( "tp-g3.c10", 0x0000, 0x1000, CRC(657a465d) SHA1(848217c3b736550586e8e9ba7a6e99e884094066) )   /* text characters */
 
-	ROM_REGION( 0x40,   "proms", 0 ) /* color proms */
+	ROM_REGION( 0x40, "proms", 0 ) /* color proms */
 	ROM_LOAD( "tp-2.c12", 0x0000, 0x0020, CRC(ac7e582f) SHA1(9d8f9eda7130b49b91d9c63bafa119b2a91eeda0) ) /* text and sprites palette */
 	ROM_LOAD( "tp-1.c13", 0x0020, 0x0020, CRC(cd0910d6) SHA1(1e6dae16115d5a03bbaf76c695327a06eb6da602) ) /* color control prom */
 ROM_END
 
 
 ROM_START( tubepb )
-	ROM_REGION( 0x10000,"maincpu", 0 ) /* Z80 (master) cpu code */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 (master) cpu code */
 	ROM_LOAD( "a15.bin", 0x0000, 0x1000, CRC(806370a8) SHA1(c1915fae15bd766ffbd3c47d65ade51d36117eb8) )
 	ROM_LOAD( "a16.bin", 0x1000, 0x1000, CRC(0917fb76) SHA1(1ce2680700d6ce28dfd202f238f1fc6e9c4a2758) )
 	ROM_LOAD( "a13.bin", 0x2000, 0x1000, CRC(6e4bb47e) SHA1(092eba1a90f43eb298ee9e4dc0f13d5411a14b4a) )
@@ -991,7 +990,7 @@ ROM_START( tubepb )
 	ROM_LOAD( "a9.bin",  0x6000, 0x1000, CRC(a20de3d1) SHA1(84f2417597dbaecace0ce72a1684345fb212fc3a) )
 	ROM_LOAD( "a10.bin", 0x7000, 0x1000, CRC(033ba70c) SHA1(de561c5db7cd493aee05e3513e48d52ed95bd510) )
 
-	ROM_REGION( 0x10000,"slave", 0 ) /* Z80 (slave) cpu code */
+	ROM_REGION( 0x10000, "slave", 0 ) /* Z80 (slave) cpu code */
 	ROM_LOAD( "a1.bin",  0x0000, 0x1000, CRC(8a68523d) SHA1(268c659a2312e4d1a29e2064f55dfa07e57f6bca) )
 	ROM_LOAD( "a2.bin",  0x1000, 0x1000, CRC(d15a8645) SHA1(9970377ff49ac525f2ef21c36ded8e7447ed700c) )
 	ROM_LOAD( "a3.bin",  0x2000, 0x1000, CRC(7acf777c) SHA1(042b051de8fcc1295aca459f762619771438625e) )
@@ -1001,15 +1000,15 @@ ROM_START( tubepb )
 	ROM_LOAD( "a7.bin",  0x6000, 0x1000, CRC(417dd321) SHA1(aa0faa19eed1397e46a67e8793c5a27991ea9c1b) )
 	ROM_LOAD( "a8.bin",  0x7000, 0x1000, CRC(d26ab4c0) SHA1(8d92386e75114494d65df4cfebdbacd09fddb48e) )
 
-	ROM_REGION( 0x10000,"soundcpu", 0 ) /* Z80 (sound) cpu code */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 (sound) cpu code */
 	ROM_LOAD( "15.bin",  0x0000, 0x2000, CRC(78964fcc) SHA1(a2c6119275d6291d82ac11dcffdaf2e8726e935a) )
 	ROM_LOAD( "16.bin",  0x2000, 0x2000, CRC(61232e29) SHA1(a9ef0fefb7250392ef51173b69a69c903ff91ee8) )
 
-	ROM_REGION( 0x10000,"mcu", 0 ) /* 64k for the custom CPU */
+	ROM_REGION( 0x10000, "mcu", 0 ) /* 64k for the custom CPU */
 	ROM_LOAD( "5.bin",   0xc000, 0x2000, CRC(9f375b27) SHA1(9666d1b20169d899176fbdf5954df41df06b4b82) )
 	ROM_LOAD( "6.bin",   0xe000, 0x2000, CRC(46a273b5) SHA1(ff862c9337b3eeadee5a3d3f0837931a7a71393e) )
 
-	ROM_REGION( 0xc000, "user1", 0 ) /* background data */
+	ROM_REGION( 0xc000, "background", 0 ) /* background data */
 	ROM_LOAD( "9.bin",   0x0000, 0x2000, CRC(fda355e0) SHA1(3270c65a4ee5d01388727f38691f7fe38f541031) )
 	ROM_LOAD( "10.bin",  0x2000, 0x2000, CRC(0ccb23b0) SHA1(71660a3476ed299684e5662058b8c40153d4a168) )
 	ROM_LOAD( "11.bin",  0x4000, 0x2000, CRC(f5d118e7) SHA1(a899bef3accef8995c457e8142a0001eed033fae) )
@@ -1017,7 +1016,7 @@ ROM_START( tubepb )
 	ROM_LOAD( "13.bin",  0x8000, 0x2000, CRC(4dabea43) SHA1(72b9df9a3665baf34fb1f7301c5b9dd2619ed206) )
 	ROM_LOAD( "14.bin",  0xa000, 0x2000, CRC(01952144) SHA1(d1074c79b51d3e2c152c9f3df6892027fe3a0e00) )
 
-	ROM_REGION( 0x18000,"user2", 0 )
+	ROM_REGION( 0x18000, "sprites", 0 )
 	ROM_LOAD( "d1.bin",  0x0000, 0x1000, CRC(702348d7) SHA1(717e48d8c3529acb9a216b4e99df1599fb2e6b3b) )
 	ROM_LOAD( "d2.bin",  0x1000, 0x1000, CRC(47601e8b) SHA1(4e56fe72644a000648199e92b306365c100cca30) )
 	ROM_LOAD( "d3.bin",  0x2000, 0x1000, CRC(caad3ee2) SHA1(a99b8da36bf26a193d92fa807f168e60ed4bdce5) )
@@ -1034,7 +1033,7 @@ ROM_START( tubepb )
 	ROM_LOAD( "d12.bin", 0xd000, 0x1000, CRC(77e72279) SHA1(594e8018d64fd9862f54de0152723e610163e1b8) )
 	ROM_LOAD( "d9.bin",  0xe000, 0x1000, CRC(7a0edea8) SHA1(ca98c35ef2007363ead3d24a8556e24df031308b) )
 	ROM_LOAD( "d10.bin", 0xf000, 0x1000, CRC(0c1c2cb1) SHA1(addc9cea5247b25c114b88e3e9e1804305aa53c8) )
-	ROM_LOAD( "4.bin",  0x10000, 0x1000, CRC(40a1fe00) SHA1(2e1e12efe8083bf96233016a7712e6e486d968e4) ) /* 2732 eprom is used, but the PCB is prepared for 2764 eproms */
+	ROM_LOAD( "4.bin",   0x10000, 0x1000, CRC(40a1fe00) SHA1(2e1e12efe8083bf96233016a7712e6e486d968e4) ) /* 2732 eprom is used, but the PCB is prepared for 2764 eproms */
 	ROM_RELOAD(          0x11000, 0x1000 )
 	ROM_LOAD( "1.bin",   0x12000, 0x1000, CRC(4a7407a2) SHA1(7ca4e03c637a6f1c338ca438a7ab9e4ba537fee0) )
 	ROM_LOAD( "2.bin",   0x13000, 0x1000, CRC(f0b26c2e) SHA1(54057c619675bb384035547becd2019974bf23fa) )
@@ -1042,46 +1041,46 @@ ROM_START( tubepb )
 	ROM_LOAD( "7.bin",   0x14000, 0x2000, CRC(105cb9e4) SHA1(b9d8ffe35c1f66aa401e5d8e415bf7c016ff53bb) )
 	ROM_LOAD( "8.bin",   0x16000, 0x2000, CRC(27e5e6c1) SHA1(f3896d0006351d165e36bafa4340175077b3d6ba) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "text", 0 )
 	ROM_LOAD( "3.bin",   0x0000, 0x1000, CRC(657a465d) SHA1(848217c3b736550586e8e9ba7a6e99e884094066) ) /* text characters */
 
-	ROM_REGION( 0x40,   "proms", 0 ) /* color proms */
+	ROM_REGION( 0x40, "proms", 0 ) /* color proms */
 	ROM_LOAD( "prom6331.b", 0x0000, 0x0020, CRC(ac7e582f) SHA1(9d8f9eda7130b49b91d9c63bafa119b2a91eeda0) ) /* text and sprites palette */
 	ROM_LOAD( "prom6331.a", 0x0020, 0x0020, CRC(cd0910d6) SHA1(1e6dae16115d5a03bbaf76c695327a06eb6da602) ) /* color control prom */
 ROM_END
 
 
 ROM_START( rjammer )
-	ROM_REGION( 0x10000,"maincpu", 0 ) /* Z80 (master) cpu code */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 (master) cpu code */
 	ROM_LOAD( "tp-p.1", 0x0000, 0x2000, CRC(93eeed67) SHA1(9ccfc49f42c6b451ff1c541d6487276f4bf9338e) )
 	ROM_LOAD( "tp-p.2", 0x2000, 0x2000, CRC(ed2830c4) SHA1(078046e88604617342d29f0f4a0473fe6d484b19) )
 	ROM_LOAD( "tp-p.3", 0x4000, 0x2000, CRC(e29f25e3) SHA1(21abf0e7c315fac15dd39355c16f9401c2cf4593) )
 	ROM_LOAD( "tp-p.4", 0x8000, 0x2000, CRC(6ed71fbc) SHA1(821506943b980077a9b4f309db095be7e952b13d) )
 	ROM_CONTINUE(       0x6000, 0x2000 )
 
-	ROM_REGION( 0x10000,"slave", 0 ) /* Z80 (slave) cpu code */
+	ROM_REGION( 0x10000, "slave", 0 ) /* Z80 (slave) cpu code */
 	ROM_LOAD( "tp-p.8", 0x0000, 0x2000, CRC(388b9c66) SHA1(6d3e614736a7f06c26191699e8a8a13b239b259f) )
 	ROM_LOAD( "tp-p.7", 0x2000, 0x2000, CRC(595030bb) SHA1(00dd0b3af965a2768c71297ba2a358050bdb8ef7) )
 	ROM_LOAD( "tp-p.6", 0x4000, 0x2000, CRC(b5aa0f89) SHA1(d7e8b7e76fe6e5ef1d9bcad8469d56b81c9509ac) )
 	ROM_LOAD( "tp-p.5", 0x6000, 0x2000, CRC(56eae9ac) SHA1(e5cd75df0c38021b81de2abf049b12c10db4f3cb) )
 
-	ROM_REGION( 0x10000,"soundcpu", 0 ) /* Z80 (sound) cpu code */
+	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 (sound) cpu code */
 	ROM_LOAD( "tp-b1.6d", 0x0000, 0x2000, CRC(b1c2525c) SHA1(7a184142e83982e33bc41cabae6fe804cec78748) )
 	ROM_LOAD( "tp-s3.4d", 0x2000, 0x2000, CRC(90c9d0b9) SHA1(8657ee93d7b67ba89848bf94e03b5c3bcace92c4) )
 	ROM_LOAD( "tp-s2.2d", 0x4000, 0x2000, CRC(444b6a1d) SHA1(1252b14d473d764a5326401aac782a1fa3419784) )
 	ROM_LOAD( "tp-s1.1d", 0x6000, 0x2000, CRC(391097cd) SHA1(d4b48a3f26044b131e65f74479bf1671ad677eb4) )
 
-	ROM_REGION( 0x10000,"mcu", 0 ) /* 64k for the custom CPU */
+	ROM_REGION( 0x10000, "mcu", 0 ) /* 64k for the custom CPU */
 	ROM_LOAD( "tp-g7.e1",  0xc000, 0x2000, CRC(9f375b27) SHA1(9666d1b20169d899176fbdf5954df41df06b4b82) )
 	ROM_LOAD( "tp-g8.d1",  0xe000, 0x2000, CRC(2e619fec) SHA1(d3d5fa708ca0097abf12d59ae41cb852278fe45d) )
 
-	ROM_REGION( 0x7000, "user1", 0 ) /* background data */
+	ROM_REGION( 0x7000, "background", 0 ) /* background data */
 	ROM_LOAD( "tp-b3.13d", 0x0000, 0x1000, CRC(b80ef399) SHA1(75fa17e1bb39363e194737a32db2d92e0cae5e79) )
 	ROM_LOAD( "tp-b5.11b", 0x1000, 0x2000, CRC(0f260bfe) SHA1(975b7837f6c3c9d743903910fbdc3111c18a5955) )
 	ROM_LOAD( "tp-b2.11d", 0x3000, 0x2000, CRC(8cd2c917) SHA1(472aceaf4a1050b2513d56b2703e556ac1e2a61a) )
 	ROM_LOAD( "tp-b4.19c", 0x5000, 0x2000, CRC(6600f306) SHA1(2e25790839a465f5f8729964cfe27a587eb663f5) )
 
-	ROM_REGION( 0x18000,"user2", 0 )
+	ROM_REGION( 0x18000, "sprites", 0 )
 	ROM_LOAD( "tp-c.8", 0x0000, 0x2000, CRC(9f31ecb5) SHA1(c4b979c7da096648d0c58b2c8a205e1622ee28e9) )
 	ROM_LOAD( "tp-c.7", 0x2000, 0x2000, CRC(cbf093f1) SHA1(128e01249165a87304eaf8003a9adf6f38d35d5e) )
 	ROM_LOAD( "tp-c.6", 0x4000, 0x2000, CRC(11f9752b) SHA1(11dcbbfe4e673e379afd67874b64b48cdafa00f5) )
@@ -1097,10 +1096,10 @@ ROM_START( rjammer )
 	ROM_LOAD( "tp-g6.h2",  0x14000, 0x2000, CRC(105cb9e4) SHA1(b9d8ffe35c1f66aa401e5d8e415bf7c016ff53bb) )
 	ROM_LOAD( "tp-g5.i2",  0x16000, 0x2000, CRC(27e5e6c1) SHA1(f3896d0006351d165e36bafa4340175077b3d6ba) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_REGION( 0x1000, "text", 0 )
 	ROM_LOAD( "tp-g4.c10", 0x0000, 0x1000, CRC(99e72549) SHA1(2509265c2d84ac6144aecd77f1b3f0d16bdcb572) )   /* text characters */
 
-	ROM_REGION( 0x40,   "proms", 0 ) /* color proms */
+	ROM_REGION( 0x40, "proms", 0 ) /* color proms */
 	ROM_LOAD( "16b", 0x0000, 0x0020, CRC(9a12873a) SHA1(70f088b6eb5431e2ac6afcf15531eeb02a169442) ) /* text palette, sprites palette */
 	ROM_LOAD( "16a", 0x0020, 0x0020, CRC(90222a71) SHA1(c3fd49c8075b0af451f6d2a142a4c4a2e397ac08) ) /* background palette */
 ROM_END

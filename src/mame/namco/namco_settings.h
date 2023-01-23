@@ -3,8 +3,8 @@
 
 // Namco system 12/23 settings device
 
-#ifndef MAME_MACHINE_NAMCO_SETTINGS_H
-#define MAME_MACHINE_NAMCO_SETTINGS_H
+#ifndef MAME_NAMCO_NAMCO_SETTINGS_H
+#define MAME_NAMCO_NAMCO_SETTINGS_H
 
 #pragma once
 
@@ -28,4 +28,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NAMCO_SETTINGS, namco_settings_device)
 
-#endif // MAME_MACHINE_NAMCO_SETTINGS_H
+#endif // MAME_NAMCO_NAMCO_SETTINGS_H

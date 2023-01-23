@@ -1388,7 +1388,7 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 	// pc to string conversion
 	int aw = pspace.logaddr_width();
 	bool is_octal = pspace.is_octal();
-	if((m_flags & util::disasm_interface::PAGED2LEVEL) == util::disasm_interface::PAGED2LEVEL) {
+	if((m_flags & util::disasm_interface::PAGED2LEVEL) == util::disasm_interface::PAGED2LEVEL && aw > (m_dintf.page_address_bits() + m_dintf.page2_address_bits())) {
 		int bits1 = m_dintf.page_address_bits();
 		int bits2 = m_dintf.page2_address_bits();
 		int bits3 = aw - bits1 - bits2;
@@ -1419,7 +1419,7 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 			};
 		}
 
-	} else if(m_flags & util::disasm_interface::PAGED) {
+	} else if((m_flags & util::disasm_interface::PAGED) && aw > m_dintf.page_address_bits()) {
 		int bits1 = m_dintf.page_address_bits();
 		int bits2 = aw - bits1;
 		offs_t sm1 = (1 << bits1) - 1;

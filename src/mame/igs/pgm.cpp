@@ -205,8 +205,14 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
-#define PGMLOGERROR 0
+#define LOG_Z80     (1U <<  1)
 
+#define LOG_ALL     (LOG_Z80)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+#define LOGZ80(...) LOGMASKED(LOG_Z80, __VA_ARGS__)
 
 u16 pgm_state::videoram_r(offs_t offset)
 {
@@ -248,14 +254,12 @@ void pgm_state::z80_ram_w(offs_t offset, u8 data)
 	m_z80_mainram[offset] = data;
 
 	if (pc != 0xf12 && pc != 0xde2 && pc != 0x100c50 && pc != 0x100b20)
-		if (PGMLOGERROR)
-			logerror("Z80: write %04x, %02x (%06x)\n", offset, data, m_maincpu->pc());
+		LOGZ80("Z80: write %04x, %02x (%06x)\n", offset, data, m_maincpu->pc());
 }
 
 void pgm_state::z80_reset_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (PGMLOGERROR)
-		logerror("Z80: reset %04x @ %04x (%06x)\n", data, mem_mask, m_maincpu->pc());
+	LOGZ80("Z80: reset %04x @ %04x (%06x)\n", data, mem_mask, m_maincpu->pc());
 
 	if (data == 0x5050)
 	{
@@ -273,22 +277,19 @@ void pgm_state::z80_reset_w(offs_t offset, u16 data, u16 mem_mask)
 
 void pgm_state::z80_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	if (PGMLOGERROR)
-		logerror("Z80: ctrl %04x @ %04x (%06x)\n", data, mem_mask, m_maincpu->pc());
+	LOGZ80("Z80: ctrl %04x @ %04x (%06x)\n", data, mem_mask, m_maincpu->pc());
 }
 
 void pgm_state::m68k_l1_w(u8 data)
 {
-	if (PGMLOGERROR)
-		logerror("SL 1 m68.w %02x (%06x) IRQ\n", data, m_maincpu->pc());
+	LOGZ80("SL 1 m68.w %02x (%06x) IRQ\n", data, m_maincpu->pc());
 	m_soundlatch->write(data);
 	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void pgm_state::z80_l3_w(u8 data)
 {
-	if (PGMLOGERROR)
-		logerror("SL 3 z80.w %02x (%04x)\n", data, m_soundcpu->pc());
+	LOGZ80("SL 3 z80.w %02x (%04x)\n", data, m_soundcpu->pc());
 	m_soundlatch3->write(data);
 }
 

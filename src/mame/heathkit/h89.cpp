@@ -25,6 +25,9 @@
 #include "machine/ins8250.h"
 #include "machine/timer.h"
 
+
+namespace {
+
 #define RS232_TAG "rs232"
 
 class h89_state : public driver_device
@@ -211,6 +214,9 @@ ROM_START( h89 )
 	ROM_LOAD( "2732_444-84_mtr84.rom", 0x0000, 0x1000, CRC(c98e5f4c) SHA1(03347206dca145ff69ca08435db822b70ce106af))
 	ROM_LOAD( "2732_mms84a_magnoliamms.bin", 0x0000, 0x1000, CRC(5563f42a) SHA1(1b74cafca8213d5c083f16d8a848933ab56eb43b))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

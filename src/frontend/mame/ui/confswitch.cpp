@@ -89,7 +89,7 @@ void menu_confswitch::menu_activated()
 }
 
 
-void menu_confswitch::populate(float &customtop, float &custombottom)
+void menu_confswitch::populate()
 {
 	// locate relevant fields if necessary
 	if (m_fields.empty())
@@ -320,6 +320,18 @@ menu_settings_dip_switches::~menu_settings_dip_switches()
 }
 
 
+void menu_settings_dip_switches::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu_confswitch::recompute_metrics(width, height, aspect);
+
+	set_custom_space(
+			0.0f,
+			m_visible_switch_groups
+				? ((m_visible_switch_groups * (DIP_SWITCH_HEIGHT * line_height())) + ((m_visible_switch_groups - 1) * (DIP_SWITCH_SPACING * line_height())) + (tb_border() * 3.0f))
+				: 0.0f);
+}
+
+
 void menu_settings_dip_switches::custom_render(void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
 {
 	// catch if no DIP locations have to be drawn
@@ -328,9 +340,8 @@ void menu_settings_dip_switches::custom_render(void *selectedref, float top, flo
 
 	// calculate optimal width
 	float const aspect(machine().render().ui_aspect(&container()));
-	float const lineheight(ui().get_line_height());
-	float const maxwidth(1.0f - (ui().box_lr_border() * 2.0f * aspect));
-	m_single_width = (lineheight * SINGLE_TOGGLE_SWITCH_FIELD_WIDTH * aspect);
+	float const maxwidth(1.0f - (lr_border() * 2.0f));
+	m_single_width = (line_height() * SINGLE_TOGGLE_SWITCH_FIELD_WIDTH * aspect);
 	float width(0.0f);
 	unsigned maxswitches(0U);
 	for (switch_group_descriptor const &group : switch_groups())
@@ -338,30 +349,30 @@ void menu_settings_dip_switches::custom_render(void *selectedref, float top, flo
 		if (group.mask)
 		{
 			maxswitches = (std::max)(group.switch_count(), maxswitches);
-			float const namewidth(ui().get_string_width(group.name));
+			float const namewidth(get_string_width(group.name));
 			float const switchwidth(m_single_width * maxswitches);
-			width = (std::min)((std::max)(namewidth + switchwidth + (lineheight * aspect), width), maxwidth);
+			width = (std::min)((std::max)(namewidth + switchwidth + (line_height() * aspect), width), maxwidth);
 		}
 	}
 
 	// draw extra menu area
-	float const boxwidth((std::max)(width + (ui().box_lr_border() * 2.0f * aspect), x2 - x1));
+	float const boxwidth((std::max)(width + (lr_border() * 2.0f), x2 - x1));
 	float const boxleft((1.0f - boxwidth) * 0.5f);
-	ui().draw_outlined_box(container(), boxleft, y2 + ui().box_tb_border(), boxleft + boxwidth, y2 + bottom, ui().colors().background_color());
+	ui().draw_outlined_box(container(), boxleft, y2 + tb_border(), boxleft + boxwidth, y2 + bottom, ui().colors().background_color());
 
 	// calculate centred layout
 	float const nameleft((1.0f - width) * 0.5f);
 	float const switchleft(nameleft + width - (m_single_width * maxswitches));
-	float const namewidth(width - (m_single_width * maxswitches) - (lineheight * aspect));
+	float const namewidth(width - (m_single_width * maxswitches) - (line_height() * aspect));
 
 	// iterate over switch groups
 	ioport_field *const field((uintptr_t(selectedref) != 1U) ? reinterpret_cast<ioport_field *>(selectedref) : nullptr);
-	float const nubheight(lineheight * SINGLE_TOGGLE_SWITCH_HEIGHT);
-	m_nub_width = lineheight * SINGLE_TOGGLE_SWITCH_WIDTH * aspect;
-	float const ygap(lineheight * ((DIP_SWITCH_HEIGHT * 0.5f) - SINGLE_TOGGLE_SWITCH_HEIGHT) * 0.5f);
+	float const nubheight(line_height() * SINGLE_TOGGLE_SWITCH_HEIGHT);
+	m_nub_width = line_height() * SINGLE_TOGGLE_SWITCH_WIDTH * aspect;
+	float const ygap(line_height() * ((DIP_SWITCH_HEIGHT * 0.5f) - SINGLE_TOGGLE_SWITCH_HEIGHT) * 0.5f);
 	float const xgap((m_single_width + (UI_LINE_WIDTH * 0.5f) - m_nub_width) * 0.5f);
 	m_first_nub = switchleft + xgap;
-	m_clickable_height = (lineheight * DIP_SWITCH_HEIGHT) - (ygap * 2.0f);
+	m_clickable_height = (line_height() * DIP_SWITCH_HEIGHT) - (ygap * 2.0f);
 	unsigned line(0U);
 	for (unsigned n = 0; switch_groups().size() > n; ++n)
 	{
@@ -378,16 +389,15 @@ void menu_settings_dip_switches::custom_render(void *selectedref, float top, flo
 			}
 
 			// draw the name
-			float const liney(y2 + (ui().box_tb_border() * 2.0f) + (lineheight * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING) * line));
-			ui().draw_text_full(
-					container(),
+			float const liney(y2 + (tb_border() * 2.0f) + (line_height() * (DIP_SWITCH_HEIGHT + DIP_SWITCH_SPACING) * line));
+			draw_text_normal(
 					group.name,
-					nameleft, liney + (lineheight * (DIP_SWITCH_HEIGHT - 1.0f) / 2.0f), namewidth,
+					nameleft, liney + (line_height() * (DIP_SWITCH_HEIGHT - 1.0f) / 2.0f), namewidth,
 					text_layout::text_justify::RIGHT, text_layout::word_wrapping::NEVER,
-					mame_ui_manager::NORMAL, ui().colors().text_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+					ui().colors().text_color());
 
 			// draw the group outline
-			float const switchbottom(liney + (DIP_SWITCH_HEIGHT * lineheight));
+			float const switchbottom(liney + (DIP_SWITCH_HEIGHT * line_height()));
 			unsigned const cnt(group.switch_count());
 			ui().draw_outlined_box(
 					container(),
@@ -472,28 +482,27 @@ bool menu_settings_dip_switches::custom_mouse_down()
 }
 
 
-void menu_settings_dip_switches::populate(float &customtop, float &custombottom)
+void menu_settings_dip_switches::populate()
 {
 	// let the base class add items
-	menu_confswitch::populate(customtop, custombottom);
+	menu_confswitch::populate();
 
 	// use up to about 70% of height for DIP switch display
 	if (active_switch_groups())
 	{
 		m_switch_group_y.resize(switch_groups().size());
-		float const lineheight(ui().get_line_height());
-		float const groupheight(DIP_SWITCH_HEIGHT * lineheight);
-		float const groupspacing(DIP_SWITCH_SPACING * lineheight);
+		float const groupheight(DIP_SWITCH_HEIGHT * line_height());
+		float const groupspacing(DIP_SWITCH_SPACING * line_height());
 		if ((active_switch_groups() * (groupheight + groupspacing)) > 0.7f)
 			m_visible_switch_groups = unsigned(0.7f / (groupheight + groupspacing));
 		else
 			m_visible_switch_groups = active_switch_groups();
-		custombottom = (m_visible_switch_groups * groupheight) + ((m_visible_switch_groups - 1) * groupspacing) + (ui().box_tb_border() * 3.0f);
+		set_custom_space(0.0f, (m_visible_switch_groups * groupheight) + ((m_visible_switch_groups - 1) * groupspacing) + (tb_border() * 3.0f));
 	}
 	else
 	{
 		m_visible_switch_groups = 0U;
-		custombottom = 0.0f;
+		set_custom_space(0.0f, 0.0f);
 	}
 }
 

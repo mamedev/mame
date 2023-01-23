@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /* */
-#ifndef MAME_MACHINE_K055555_H
-#define MAME_MACHINE_K055555_H
+#ifndef MAME_KONAMI_K055555_H
+#define MAME_KONAMI_K055555_H
 
 #pragma once
 
@@ -99,4 +99,4 @@ private:
 DECLARE_DEVICE_TYPE(K055555, k055555_device)
 
 
-#endif // MAME_MACHINE_K055555_H
+#endif // MAME_KONAMI_K055555_H

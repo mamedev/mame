@@ -25,12 +25,13 @@ public:
 	virtual ~menu_sliders() override;
 
 protected:
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 	virtual void menu_activated() override;
 	virtual void menu_deactivated() override;
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	bool const m_menuless_mode;

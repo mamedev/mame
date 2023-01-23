@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:
-/*******************************************************************************
+/**************************************************************************************************
 
     Skeleton driver for "EuroByte Electronics & Multimedia IASA" PC-based touch
     games, sold in Spain by Sleic / Petaco.
@@ -17,6 +17,8 @@
     16384 KB RAM
     Intel Pentium MMX 233 MHz or compatible (e.g. Cyrix M II-300GP 66MHz Bus 3.5x 2.9V)
 
+    Soyo M5EH uses a VIA Apollo MVP3 chipset with VT82C597 + VT82C586B
+
     MicroTouch ISA
     ExpertColor Med3931 ISA sound card or other 82C931-based similar card (e.g. BTC 1817DS OPTi ISA)
     PCI VGA ExpertColor M50-02 (S3, Trio64V2/DX 86C775, 512KB RAM)
@@ -24,11 +26,18 @@
     Creative Video Blaster camera (parallel port)
     HDD Samsung SV0322A or other IDE HDD with similar capacity (e.g. Seagate ST32122A).
 
-*******************************************************************************/
+    TODO:
+    - europl01 boots Windows 3.11 fine in pcipc & shutms11 but will:
+    1. "could not find sound card" in C:\wingk\audio\sndinit (which has a poor attempt at
+       suppressing the log, should be NUL but it's NULL instead)
+    2. Fails loading windows for "video device conflict" (s3vcp64.drv)
+    Note that the underlying .ini files will also load a Greek driver keyboard ...
+
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "speaker.h"
+#include "machine/pci.h"
 
 namespace {
 
@@ -45,33 +54,35 @@ public:
 
 private:
 	void mem_map(address_map &map);
-	void io_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 };
 
 void startouch_state::mem_map(address_map &map)
 {
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0);
+	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
 }
 
-void startouch_state::io_map(address_map &map)
-{
-}
 
 static INPUT_PORTS_START(europl01)
 INPUT_PORTS_END
 
 void startouch_state::europl01(machine_config &config)
 {
+	// Super Socket 7
 	PENTIUM_MMX(config, m_maincpu, 233'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &startouch_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &startouch_state::io_map);
+
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 ROM_START(europl01)
 
 	// Sleic used different motherboards for this machine. By now, we're adding all the known BIOSes here
-	ROM_REGION(0x20000, "mb_bios", 0)
+	ROM_REGION32_LE(0x20000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "soyo_5ehm13_1aa1", "Soyo 5EHM (Award BIOS 5EH V1.3-1AA1)")                                                                 // Soyo 5EHM V1.3
 	ROMX_LOAD("award_1998_pci-pnp_586_223123413.bin", 0x00000, 0x20000, CRC(d30fe6c2) SHA1(022cf24d982b82e4c13ebbe974adae3a1638d1cd), ROM_BIOS(0)) //   39SF010
 	ROM_SYSTEM_BIOS(1, "soyo_5ehm12_1ca2", "Soyo 5EHM (Award BIOS 5EH V1.2-1CA2)")                                                                 // Soyo 5EHM V1.2 (1MB cache)

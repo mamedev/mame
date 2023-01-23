@@ -2,15 +2,17 @@
 // copyright-holders:David Haywood, hap
 /*
 
-Chess King (棋王之王), LCD handheld presumably from Taiwan.
-Hold down u+d+l+r buttons at boot to enter a test/data clear mode of sorts.
+Chess King (棋王之王), LCD handheld console presumably from Taiwan.
+Hold down U+D+L+R buttons at boot to enter factory reset mode.
+Hold down START at boot to enter test mode.
 
 TODO:
 - lots of unknown writes
 - sound emulation is guessed
+- dump/add more cartridges? considering how unknown the handheld is, maybe only a handful were released
 - LCD chip(s) is not emulated, maybe the I/O chip does a DMA from RAM to the LCD?
 - chess game is buggy, assume that's just the way it is, aka BTANB
-  eg. sometimes it makes an illegal move, or castling doesn't erase the king
+  eg. sometimes it makes an illegal move, or castling doesn't erase the king from its original spot
 
 Hardware notes:
 
@@ -41,6 +43,7 @@ LCD module:
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
 
 namespace {
 
@@ -128,7 +131,7 @@ uint32_t chessking_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 			uint8_t data2 = m_videoram[0x6000 + offset + x/8];
 			uint8_t pix = BIT(data, ~x & 7) | BIT(data2, ~x & 7) << 1;
 
-			rgb_t pens[4] = { rgb_t::white(), rgb_t(0x55,0x55,0x55), rgb_t(0xaa,0xaa,0xaa), rgb_t::black() };
+			static const rgb_t pens[4] = { rgb_t::white(), rgb_t(0x55,0x55,0x55), rgb_t(0xaa,0xaa,0xaa), rgb_t::black() };
 			dst[x] = pens[pix];
 		}
 	}
@@ -166,8 +169,8 @@ void chessking_state::beeper_enable_w(uint8_t data)
 void chessking_state::update_beeper()
 {
 	uint16_t freq = (~m_beeper_freq & 0x1ff) + 1;
-	double step = (9.6_MHz_XTAL).dvalue() / 0x200000;
-	m_beeper->set_clock(freq * step);
+	double base = (9.6_MHz_XTAL).dvalue() / 0x80;
+	m_beeper->set_clock(base / freq);
 }
 
 
@@ -189,11 +192,13 @@ uint8_t chessking_state::cartridge_r(offs_t offset)
 {
 	// bank 1 selects main rom
 	if (m_cart_bank == 1)
-		return m_mainrom[offset & 0x1ffff];
+		return m_mainrom[offset & 0x3ffff];
 
-	else if (m_cart_bank & 4)
+	// banks 4-7 go to cartridge
+	else if (m_cart_bank >= 4)
 		return m_cart->read_rom(offset | (m_cart_bank & 3) << 19);
 
+	// other banks: maybe cartridge too?
 	return 0;
 }
 
@@ -333,7 +338,7 @@ void chessking_state::chesskng(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	BEEP(config, m_beeper, 0);
-	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.5);
+	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// Cartridge
 	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "chessking_cart");
@@ -349,8 +354,8 @@ void chessking_state::chesskng(machine_config &config)
 ******************************************************************************/
 
 ROM_START( chesskng )
-	ROM_REGION( 0x040000, "maincpu", 0 )
-	ROM_LOAD( "etmate-cch.u6", 0x000000, 0x040000, CRC(a4d1764b) SHA1(ccfae1e985f6ad316ff192206fbc0f8bcd4e44d5) )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "etmate-cch.u6", 0x00000, 0x40000, CRC(a4d1764b) SHA1(ccfae1e985f6ad316ff192206fbc0f8bcd4e44d5) )
 ROM_END
 
 } // anonymous namespace

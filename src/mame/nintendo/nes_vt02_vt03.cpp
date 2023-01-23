@@ -18,6 +18,9 @@
 #include "emu.h"
 #include "nes_vt_soc.h"
 
+
+namespace {
+
 class nes_vt_base_state : public driver_device
 {
 public:
@@ -51,13 +54,13 @@ protected:
 	required_region_ptr<uint8_t> m_prgrom;
 
 	uint8_t vt_rom_r(offs_t offset);
-	void vtspace_w(offs_t offset, uint8_t data);
+	[[maybe_unused]] void vtspace_w(offs_t offset, uint8_t data);
 
 	void configure_soc(nes_vt02_vt03_soc_device* soc);
 
-	uint8_t upper_412c_r();
-	uint8_t upper_412d_r();
-	void upper_412c_w(uint8_t data);
+	[[maybe_unused]] uint8_t upper_412c_r();
+	[[maybe_unused]] uint8_t upper_412d_r();
+	[[maybe_unused]] void upper_412c_w(uint8_t data);
 
 private:
 	/* Extra IO */
@@ -1309,7 +1312,7 @@ void nes_vt_state::init_protpp()
 	}
 }
 
-
+} // anonymous namespace
 
 
 // earlier version of vdogdemo

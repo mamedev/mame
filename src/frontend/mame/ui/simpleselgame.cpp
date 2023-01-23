@@ -236,7 +236,7 @@ void simple_menu_select_game::inkey_special(const event &menu_event)
 //  populate - populate the game select menu
 //-------------------------------------------------
 
-void simple_menu_select_game::populate(float &customtop, float &custombottom)
+void simple_menu_select_game::populate()
 {
 	int matchcount;
 	int curitem;
@@ -282,10 +282,19 @@ void simple_menu_select_game::populate(float &customtop, float &custombottom)
 	{
 		item_append(_("Return to Previous Menu"), 0, nullptr);
 	}
+}
+
+
+//-------------------------------------------------
+//  recompute_metrics - recompute metrics
+//-------------------------------------------------
+
+void simple_menu_select_game::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
 
 	// configure the custom rendering
-	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
-	custombottom = 4.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
+	set_custom_space(line_height() + 3.0f * tb_border(), 4.0f * line_height() + 3.0f * tb_border());
 }
 
 
@@ -307,7 +316,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 						emulator_info::get_configname(),
 						emulator_info::get_appname()),
 				text_layout::text_justify::CENTER,
-				0.5f, origy2 + ui().box_tb_border() + (0.5f * (bottom - ui().box_tb_border())),
+				0.5f, origy2 + tb_border() + (0.5f * (bottom - tb_border())),
 				UI_RED_COLOR);
 		return;
 	}
@@ -324,9 +333,9 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	// draw the top box
 	draw_text_box(
 			tempbuf, tempbuf + 1,
-			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
+			origx1, origx2, origy1 - top, origy1 - tb_border(),
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
-			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
+			ui().colors().text_color(), ui().colors().background_color());
 
 	// determine the text to render below
 	driver = ((uintptr_t)selectedref > 1) ? (const game_driver *)selectedref : nullptr;
@@ -412,9 +421,9 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	// draw the bottom box
 	draw_text_box(
 			tempbuf, tempbuf + 4,
-			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
+			origx1, origx2, origy2 + tb_border(), origy2 + bottom,
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, true,
-			ui().colors().text_color(), driver ? m_cached_color : ui().colors().background_color(), 1.0f);
+			ui().colors().text_color(), driver ? m_cached_color : ui().colors().background_color());
 }
 
 

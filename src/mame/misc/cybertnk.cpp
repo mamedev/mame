@@ -181,6 +181,8 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 #include "tilemap.h"
 
 
+namespace {
+
 class cybertnk_state : public driver_device
 {
 public:
@@ -973,5 +975,8 @@ void cybertnk_state::init_cybertnk()
 	}
 
 }
+
+} // anonymous namespace
+
 
 GAME( 1988, cybertnk, 0, cybertnk, cybertnk, cybertnk_state, init_cybertnk, ROT0, "Coreland", "Cyber Tank (v1.4)", MACHINE_IMPERFECT_GRAPHICS )

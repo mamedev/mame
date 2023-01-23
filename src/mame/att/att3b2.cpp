@@ -14,6 +14,9 @@
 //#include "machine/upd7261.h"
 #include "machine/wd_fdc.h"
 
+
+namespace {
+
 class att3b2_state : public driver_device
 {
 public:
@@ -129,6 +132,9 @@ ROM_START(3b2_600)
 	ROM_LOAD32_BYTE("abtru.bin", 0x0002, 0x8000, CRC(ea9e127b) SHA1(6618998ead5a5e07ead8c572619a6bcf71d84497))
 	ROM_LOAD32_BYTE("abtrt.bin", 0x0003, 0x8000, CRC(0f075161) SHA1(b67c9c4549dc789df33b5a38e4b35fe26fdfbea6))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1984, 3b2_300, 0,       0, att3b2v2, att3b2, att3b2_state, empty_init, "AT&T", "3B2/300", MACHINE_IS_SKELETON)
 COMP(1985, 3b2_310, 3b2_300, 0, att3b2v2, att3b2, att3b2_state, empty_init, "AT&T", "3B2/310", MACHINE_IS_SKELETON)

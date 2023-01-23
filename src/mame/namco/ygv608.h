@@ -5,8 +5,8 @@
  *    - Mark McDougall
  */
 
-#ifndef MAME_VIDEO_YGV608_H
-#define MAME_VIDEO_YGV608_H
+#ifndef MAME_NAMCO_YGV608_H
+#define MAME_NAMCO_YGV608_H
 
 #pragma once
 
@@ -310,4 +310,4 @@ private:
 DECLARE_DEVICE_TYPE(YGV608, ygv608_device)
 
 
-#endif
+#endif // MAME_NAMCO_YGV608_H

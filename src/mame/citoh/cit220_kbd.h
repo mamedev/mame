@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
 
-#ifndef MAME_MACHINE_CIT220_KBD_H
-#define MAME_MACHINE_CIT220_KBD_H
+#ifndef MAME_CITOH_CIT220_KBD_H
+#define MAME_CITOH_CIT220_KBD_H
 
 #pragma once
 
@@ -60,4 +60,4 @@ private:
 // device type declaration
 DECLARE_DEVICE_TYPE(CIT220P_KEYBOARD, cit220p_keyboard_device)
 
-#endif // MAME_MACHINE_CIT220_KBD_H
+#endif // MAME_CITOH_CIT220_KBD_H

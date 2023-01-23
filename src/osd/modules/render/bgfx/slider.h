@@ -6,10 +6,10 @@
 //
 //============================================================
 
-#pragma once
+#ifndef MAME_RENDER_BGFX_SLIDER_H
+#define MAME_RENDER_BGFX_SLIDER_H
 
-#ifndef __DRAWBGFX_SLIDER__
-#define __DRAWBGFX_SLIDER__
+#pragma once
 
 #include <bgfx/bgfx.h>
 
@@ -56,6 +56,9 @@ public:
 	slider_type type() const { return m_type; }
 	float value() const { return m_value; }
 	float uniform_value() const { return float(m_value); }
+	float min_value() const { return m_min; }
+	float default_value() const { return m_default; }
+	float max_value() const { return m_max; }
 	slider_state *core_slider() const { return m_slider_state.get(); }
 	size_t size() const { return get_size_for_type(m_type); }
 	static size_t get_size_for_type(slider_type type);
@@ -82,4 +85,4 @@ protected:
 	running_machine&m_machine;
 };
 
-#endif // __DRAWBGFX_SLIDER__
+#endif // MAME_RENDER_BGFX_SLIDER_H

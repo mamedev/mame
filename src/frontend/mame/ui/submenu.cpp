@@ -285,7 +285,7 @@ void submenu::handle(event const *ev)
 						const char *minimum = sm_option.entry->minimum();
 						const char *maximum = sm_option.entry->maximum();
 						f_step = atof(minimum);
-						if (f_step <= 0.0f) {
+						if (f_step <= 0.0F) {
 							int pmin = getprecisionchr(minimum);
 							int pmax = getprecisionchr(maximum);
 							tmptxt = '1' + std::string((pmin > pmax) ? pmin : pmax, '0');
@@ -339,7 +339,7 @@ void submenu::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void submenu::populate(float &customtop, float &custombottom)
+void submenu::populate()
 {
 	// add options
 	for (auto sm_option = m_options.begin(); sm_option < m_options.end(); ++sm_option)
@@ -405,7 +405,7 @@ void submenu::populate(float &customtop, float &custombottom)
 					}
 					else
 					{
-						f_min = 0.0f;
+						f_min = 0.0F;
 						f_max = std::numeric_limits<float>::max();
 					}
 					arrow_flags = get_arrow_flags(f_min, f_max, f_cur);
@@ -446,7 +446,17 @@ void submenu::populate(float &customtop, float &custombottom)
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-	custombottom = ui().get_line_height() + (3.0f * ui().box_tb_border());
+}
+
+//-------------------------------------------------
+//  recompute metrics
+//-------------------------------------------------
+
+void submenu::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	set_custom_space(0.0F, line_height() + (3.0F * tb_border()));
 }
 
 //-------------------------------------------------
@@ -463,9 +473,9 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 			char const *const bottomtext[] = { selected_sm_option.entry->description() };
 			draw_text_box(
 					std::begin(bottomtext), std::end(bottomtext),
-					origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
+					origx1, origx2, origy2 + tb_border(), origy2 + bottom,
 					text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
-					ui().colors().text_color(), ui().colors().background_color(), 1.0f);
+					ui().colors().text_color(), ui().colors().background_color());
 		}
 	}
 }

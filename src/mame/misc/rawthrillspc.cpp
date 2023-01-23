@@ -12,15 +12,19 @@
         · Microtel w/ASRock N68C-GS FX AM3+ motherboard.
     - Video GeForce GT730.
       * Other supported setups are:
-        · Nvidia 8400GS (256MB+).
-        · Nvidia 7300GS.
+        · nVidia 8400GS (256MB+).
+        · nVidia 7300GS.
     -Custom I/O boards (outside the PC, depending on each game).
     -Security dongle (HASP, USB or parallel port).
+
+TODO:
+- Cannot continue without a proper Athlon 64 X2 core (uses lots of unsupported RDMSR / WRMSR)
+
 */
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "screen.h"
+#include "machine/pci.h"
 
 namespace {
 
@@ -28,62 +32,38 @@ class rawthrillspc_state : public driver_device
 {
 public:
 	rawthrillspc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void rawthrillspc(machine_config &config);
 
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 private:
 	required_device<cpu_device> m_maincpu;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void rawthrillspc_map(address_map &map);
 };
 
-void rawthrillspc_state::video_start()
-{
-}
-
-uint32_t rawthrillspc_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
 
 void rawthrillspc_state::rawthrillspc_map(address_map &map)
 {
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0);
+	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
 }
 
 static INPUT_PORTS_START( rawthrillspc )
 INPUT_PORTS_END
 
 
-void rawthrillspc_state::machine_start()
-{
-}
-
-void rawthrillspc_state::machine_reset()
-{
-}
-
 void rawthrillspc_state::rawthrillspc(machine_config &config)
 {
 	// Basic machine hardware
-	PENTIUM4(config, m_maincpu, 120000000); // Actually an Athlon 64 X2
+	PENTIUM4(config, m_maincpu, 120'000'000); // Actually an Athlon 64 X2
 	m_maincpu->set_addrmap(AS_PROGRAM, &rawthrillspc_state::rawthrillspc_map);
 
-	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(800, 600); // Guess
-	screen.set_visarea(0, 800-1, 0, 600-1);
-	screen.set_screen_update(FUNC(rawthrillspc_state::screen_update));
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 /***************************************************************************
@@ -93,7 +73,7 @@ void rawthrillspc_state::rawthrillspc(machine_config &config)
 ***************************************************************************/
 
 #define OPTIPLEX740_BIOS \
-	ROM_REGION( 0x20000, "bios", 0 ) \
+	ROM_REGION32_LE( 0x20000, "bios", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "122", "v1.2.2" ) \
 	ROMX_LOAD( "1.2.2_4m.bin", 0x00000, 0x20000, CRC(43d5b4c8) SHA1(6307050961da5d647ca2fa787fd67c5ac9c690c9), ROM_BIOS(0) ) \
 	ROM_SYSTEM_BIOS( 1, "104", "v1.0.3" ) \

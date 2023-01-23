@@ -334,6 +334,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define GFXFIFO_IN_VERBOSE          0
 #define GFXFIFO_OUT_VERBOSE         0
 #define M2SFIFO_VERBOSE             0
@@ -3281,6 +3284,9 @@ ROM_START(racjamdx)
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "676a04", 0, SHA1(8e89d3e5099e871b99fccba13adaa3cf8a6b71f0) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*************************************************************************/
 

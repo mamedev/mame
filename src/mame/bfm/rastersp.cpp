@@ -35,6 +35,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 /*************************************
  *
  *  Defines
@@ -1602,6 +1605,9 @@ ROM_START( fbcrazy )
 	DISK_REGION( "scsibus:3:cdrom" )
 	DISK_IMAGE_READONLY( "95100303", 0, SHA1(9ba47c96de27ec2bea9c6624d78d309b67705406)  )
 ROM_END
+
+} // anonymous namespace
+
 
 /*************************************
  *

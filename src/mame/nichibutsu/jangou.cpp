@@ -43,6 +43,8 @@ $c088-$c095 player tiles
 #include "video/resnet.h"
 
 
+namespace {
+
 #define MASTER_CLOCK    XTAL(19'968'000)
 
 class jangou_state : public driver_device
@@ -1372,6 +1374,8 @@ void jangou_state::init_jngolady()
 {
 	m_nsc->space(AS_PROGRAM).install_read_handler(0x08, 0x08, read8smo_delegate(*this, FUNC(jangou_state::jngolady_rng_r)));
 }
+
+} // anonymous namespace
 
 
 /*************************************

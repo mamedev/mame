@@ -33,6 +33,8 @@ Other stuff: NEC D4992 (RTC?) and xtal possibly 32.768kHz, 3V coin battery, 93L4
 #include "speaker.h"
 
 
+namespace {
+
 class hideseek_state : public driver_device
 {
 public:
@@ -161,6 +163,8 @@ ROM_END
 void hideseek_state::init_hideseek()
 {
 }
+
+} // anonymous namespace
 
 
 GAME( 200?, hideseek, 0, hideseek, hideseek, hideseek_state, init_hideseek, ROT0, "<unknown>", "Hide & Seek", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

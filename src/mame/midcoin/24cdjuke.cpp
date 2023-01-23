@@ -58,6 +58,9 @@ http://www.tilt.it/deb/i-midcoin.html
 #include "machine/i8255.h"
 #include "24cdjuke.lh"
 
+
+namespace {
+
 class midcoin24cdjuke_state : public driver_device
 {
 public:
@@ -324,6 +327,8 @@ ROM_START( 24cdjuke )
 	ROM_LOAD( "m1-7611a-5.ic27", 0x000, 0x100, CRC(29b068e8) SHA1(477e2445c58b7d14c56a3ad4050eb22474d56005) )
 	ROM_LOAD( "m1-7611a-5.ic28", 0x000, 0x100, CRC(29b068e8) SHA1(477e2445c58b7d14c56a3ad4050eb22474d56005) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1988, 24cdjuke, 0, midcoin24cdjuke, midcoin24cdjuke, midcoin24cdjuke_state, empty_init, ROT0, "Midcoin", "Midcoin Juke Box 24CD", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // what name was it sold under? name is from the PCB text

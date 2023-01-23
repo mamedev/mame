@@ -424,6 +424,8 @@
 #include "suprstar.lh"
 
 
+namespace {
+
 #define MASTER_CLOCK    XTAL(16'000'000)
 #define CPU_CLOCK       MASTER_CLOCK/4  /* guess */
 #define SND_CLOCK       MASTER_CLOCK/4  /* guess */
@@ -1296,6 +1298,8 @@ void amaticmg_state::init_ama8000_3_o()
 {
 	decrypt(0x56e, 0xa7);
 }
+
+} // anonymous namespace
 
 
 /************************************

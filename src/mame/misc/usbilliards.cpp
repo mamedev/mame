@@ -22,6 +22,9 @@
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 
+
+namespace {
+
 // copied from Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
@@ -133,5 +136,8 @@ ROM_START( sharkusb )
 	ROM_LOAD( "82s123_b.5n",  0x0000, 0x0100, CRC(91b977b3) SHA1(37929f6049dea0ebed2c01ae20354e41c867b8f9) ) // 82s123 - handwritten B - B also etched in copper next to socket
 	ROM_LOAD( "82s123_a.6n",  0x0100, 0x0100, CRC(63f621cb) SHA1(6c6e6f22313db33afd069dae1b0180b5ccddfa56) ) // 82s123 - handwritten A - A also etched in copper next to socket
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1975, sharkusb,    0,       usbilliards, 0, usbilliards_state, empty_init, ROT0, "US Billiards Inc.", "Shark [TTL]", MACHINE_IS_SKELETON )

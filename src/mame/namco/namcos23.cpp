@@ -1340,6 +1340,8 @@ Notes:
 #include <cfloat>
 
 
+namespace {
+
 #define JVSCLOCK    (XTAL(14'745'600))
 
 //#define H8CLOCK     (16737350)      /* from 2061 */
@@ -5453,6 +5455,8 @@ ROM_START( crszonev2a )
 	ROM_LOAD( "csz1ccrl.7m",  0x000000, 0x400000, CRC(1c20768d) SHA1(6cf4280e26f3625d6f750837bf344163e7e93c3d) )
 	ROM_LOAD( "csz1ccrh.7k",  0x000000, 0x200000, CRC(bc2fa03c) SHA1(e63d8e75494a383bf9a213edfa9c472a010f8efe) )
 ROM_END
+
+} // anonymous namespace
 
 
 /* Games */

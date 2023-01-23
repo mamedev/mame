@@ -33,6 +33,8 @@ public:
 	virtual ~menu_select_software() override;
 
 protected:
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
+
 	virtual void menu_deactivated() override;
 
 private:
@@ -42,7 +44,7 @@ private:
 	struct search_item;
 	class machine_data;
 
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	// drawing

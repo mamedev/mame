@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
-#ifndef MAME_AUDIO_NAMCO52_H
-#define MAME_AUDIO_NAMCO52_H
+#ifndef MAME_NAMCO_NAMCO52_H
+#define MAME_NAMCO_NAMCO52_H
 
 #include "sound/discrete.h"
 #include "cpu/mb88xx/mb88xx.h"
@@ -62,4 +62,4 @@ DECLARE_DEVICE_TYPE(NAMCO_52XX, namco_52xx_device)
 #define NAMCO_52XX_P_DATA(base)     (base)
 
 
-#endif  // MAME_AUDIO_NAMCO52_H
+#endif  // MAME_NAMCO_NAMCO52_H

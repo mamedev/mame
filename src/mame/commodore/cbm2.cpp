@@ -41,6 +41,9 @@
 
 #include "utf8.h"
 
+
+namespace {
+
 #define PLA1_TAG        "u78"
 #define PLA2_TAG        "u88"
 #define MOS6567_TAG     "u23"
@@ -3064,6 +3067,7 @@ ROM_START( cbm720_se )
 	ROM_LOAD( "906114-05.u75", 0x00, 0xf5, CRC(ff6ba6b6) SHA1(45808c570eb2eda7091c51591b3dbd2db1ac646a) )
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************

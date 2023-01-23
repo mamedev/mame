@@ -38,6 +38,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class maygayep_state : public driver_device
 {
 public:
@@ -7045,6 +7047,8 @@ ROM_START( ep_party )
 	ROM_LOAD16_BYTE( "p_party.g1", 0x00001, 0x020000, CRC(d5cf55db) SHA1(f8aac12d1fd83072644311f5e4402f02db37a00c) )
 	MISSING_SOUND
 ROM_END
+
+} // anonymous namespace
 
 
 /* header info */

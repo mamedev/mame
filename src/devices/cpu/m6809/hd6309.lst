@@ -1049,13 +1049,14 @@ LDBT:
 STBT:
 	%IMM_IM;
 	%DIRECT;
-	@m_temp.b.l = read_operand();
+	@m_temp.b.l = bittest_register();
+	@m_temp.b.h = read_operand();
 	if (bittest_source())
-		m_temp.b.l |= (1 << ((m_temp_im >> 0) & 0x07));
+		m_temp.b.h |= (1 << (m_temp_im & 0x07));
 	else
-		m_temp.b.l &= ~(1 << ((m_temp_im >> 0) & 0x07));
+		m_temp.b.h &= ~(1 << (m_temp_im & 0x07));
 	@eat(2);
-	write_operand(m_temp.b.l);
+	write_operand(m_temp.b.h);
 	return;
 
 MULD:

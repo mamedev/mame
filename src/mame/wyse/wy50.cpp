@@ -34,8 +34,10 @@
 #include "machine/er1400.h"
 #include "machine/scn_pci.h"
 #include "wy50kb.h"
+#include "sound/beep.h"
 #include "video/scn2674.h"
 #include "screen.h"
+#include "speaker.h"
 
 class wy50_state : public driver_device
 {
@@ -47,6 +49,7 @@ public:
 		, m_earom(*this, "earom")
 		, m_pvtc(*this, "pvtc")
 		, m_sio(*this, "sio")
+		, m_beep(*this, "beep")
 		, m_chargen(*this, "chargen")
 		, m_videoram(*this, "videoram%u", 0U)
 	{
@@ -82,6 +85,7 @@ private:
 	required_device<er1400_device> m_earom;
 	required_device<scn2672_device> m_pvtc;
 	required_device<scn2661b_device> m_sio;
+	required_device<beep_device> m_beep;
 
 	required_region_ptr<u8> m_chargen;
 	required_shared_ptr_array<u8, 2> m_videoram;
@@ -246,6 +250,8 @@ void wy50_state::p1_w(u8 data)
 	// P1.6 = REV/DIM PROT
 	// P1.7 (inverted) = 80/132
 
+	m_beep->set_state(BIT(data, 5));
+
 	m_rev_prot = BIT(data, 6);
 
 	if (m_is_132 != BIT(data, 7))
@@ -320,6 +326,10 @@ void wy50_state::wy50(machine_config &config)
 	modem.rxd_handler().set(m_sio, FUNC(scn2661b_device::rxd_w));
 	modem.cts_handler().set(m_sio, FUNC(scn2661b_device::cts_w));
 	modem.dcd_handler().set(m_sio, FUNC(scn2661b_device::dcd_w));
+
+	SPEAKER(config, "speaker").front_center();
+	// Star Micronics QMB06 PZT Buzzer (2048Hz peak) + LC filter, output frequency is approximated here
+	BEEP(config, m_beep, 1000).add_route(ALL_OUTPUTS, "speaker", 0.10);
 }
 
 ROM_START(wy50)

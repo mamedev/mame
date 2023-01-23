@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
 
-#ifndef MAME_MACHINE_PC9801_CD_H
-#define MAME_MACHINE_PC9801_CD_H
+#ifndef MAME_NEC_PC9801_CD_H
+#define MAME_NEC_PC9801_CD_H
 
 #include "bus/ata/atapicdr.h"
 
@@ -20,4 +20,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(PC9801_CD, pc9801_cd_device)
 
-#endif // MAME_MACHINE_PC9801_CD_H
+#endif // MAME_NEC_PC9801_CD_H
