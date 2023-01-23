@@ -66,7 +66,7 @@ uint32_t arcompact_device::arcompact_handle04_3x_helper(uint32_t op, int dsize, 
 	// read data
 	if (Z == 0)
 	{
-		readdata = READ32(address >> 2);
+		readdata = READ32(address);
 
 		if (X) // sign extend is not supported for long reads
 			arcompact_fatal("illegal LD 3x %08x (data size %d mode %d with X)", op, Z, a);
@@ -74,7 +74,7 @@ uint32_t arcompact_device::arcompact_handle04_3x_helper(uint32_t op, int dsize, 
 	}
 	else if (Z == 1)
 	{
-		readdata = READ8(address >> 0);
+		readdata = READ8(address);
 
 		if (X) // todo
 			arcompact_fatal("illegal LD 3x %08x (data size %d mode %d with X)", op, Z, a);
@@ -82,7 +82,7 @@ uint32_t arcompact_device::arcompact_handle04_3x_helper(uint32_t op, int dsize, 
 	}
 	else if (Z == 2)
 	{
-		readdata = READ16(address >> 1);
+		readdata = READ16(address);
 
 		if (X) // todo
 			arcompact_fatal("illegal LD 3x %08x (data size %d mode %d with X)", op, Z, a);

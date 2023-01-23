@@ -217,7 +217,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 	if (instruction < 0x0c)
 	{
 		op <<= 16;
-		op |= READ16((m_pc + 2) >> 1);
+		op |= READ16((m_pc + 2));
 
 		switch (instruction & 0x3f) // 32-bit instructions (with optional extra dword for immediate data)
 		{

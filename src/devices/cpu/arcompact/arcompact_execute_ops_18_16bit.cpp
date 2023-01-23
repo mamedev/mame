@@ -30,7 +30,7 @@ uint32_t arcompact_device::handleop_LD_S_b_sp_u7(uint16_t op)   // LD_S b, [SP, 
 
 	uint32_t address = m_regs[REG_SP] + (u << 2);
 
-	m_regs[breg] = READ32(address >> 2);
+	m_regs[breg] = READ32(address);
 
 	return m_pc + (2 >> 0);
 }
@@ -62,7 +62,7 @@ uint32_t arcompact_device::handleop_ST_S_b_sp_u7(uint16_t op)  // ST_S b, [SP, u
 
 	uint32_t address = m_regs[REG_SP] + (u << 2);
 
-	WRITE32(address >> 2, m_regs[breg]);
+	WRITE32(address, m_regs[breg]);
 
 	return m_pc + (2 >> 0);
 }
@@ -140,7 +140,7 @@ uint32_t arcompact_device::handleop_POP_S_b(uint16_t op) // POP_S b
 	breg = common16_get_breg(op);
 	REG_16BIT_RANGE(breg);
 
-	m_regs[breg] = READ32(m_regs[REG_SP] >> 2);
+	m_regs[breg] = READ32(m_regs[REG_SP]);
 	m_regs[REG_SP] += 4;
 
 	return m_pc + (2 >> 0);
@@ -155,7 +155,7 @@ uint32_t arcompact_device::handleop_POP_S_b(uint16_t op) // POP_S b
 uint32_t arcompact_device::handleop_POP_S_blink(uint16_t op) // POP_S blink
 {
 	// breg bits are reserved
-	m_regs[REG_BLINK] = READ32(m_regs[REG_SP] >> 2 );
+	m_regs[REG_BLINK] = READ32(m_regs[REG_SP]);
 	m_regs[REG_SP] += 4;
 
 	return m_pc + (2 >> 0);
@@ -175,7 +175,7 @@ uint32_t arcompact_device::handleop_PUSH_S_b(uint16_t op) // PUSH_S b
 
 	m_regs[REG_SP] -= 4;
 
-	WRITE32(m_regs[REG_SP] >> 2, m_regs[breg]);
+	WRITE32(m_regs[REG_SP], m_regs[breg]);
 
 	return m_pc + (2 >> 0);
 }
@@ -192,7 +192,7 @@ uint32_t arcompact_device::handleop_PUSH_S_blink(uint16_t op) // PUSH_S [blink]
 
 	m_regs[REG_SP] -= 4;
 
-	WRITE32(m_regs[REG_SP] >> 2, m_regs[REG_BLINK]);
+	WRITE32(m_regs[REG_SP], m_regs[REG_BLINK]);
 
 	return m_pc + (2 >> 0);
 }

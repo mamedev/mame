@@ -65,7 +65,7 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 	// read data
 	if (Z == 0)
 	{
-		readdata = READ32(address >> 2);
+		readdata = READ32(address);
 
 		if (X) // sign extend is not supported for long reads
 			arcompact_fatal("illegal LD %08x (data size %d mode %d with X)", op, Z, a);
@@ -73,7 +73,7 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 	}
 	else if (Z == 1)
 	{
-		readdata = READ8(address >> 0);
+		readdata = READ8(address);
 
 		if (X) // todo
 			arcompact_fatal("illegal LD %08x (data size %d mode %d with X)", op, Z, a);
@@ -81,7 +81,7 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 	}
 	else if (Z == 2)
 	{
-		readdata = READ16(address >> 1);
+		readdata = READ16(address);
 
 		if (X) // todo
 			arcompact_fatal("illegal LD %08x (data size %d mode %d with X)", op, Z, a);
@@ -159,15 +159,15 @@ uint32_t arcompact_device::handleop32_ST_r_o(uint32_t op)
 	// write data
 	if (Z == 0)
 	{
-		WRITE32(address >> 2, writedata);
+		WRITE32(address, writedata);
 	}
 	else if (Z == 1)
 	{
-		WRITE8(address >> 0, writedata);
+		WRITE8(address, writedata);
 	}
 	else if (Z == 2)
 	{
-		WRITE16(address >> 1, writedata);
+		WRITE16(address, writedata);
 	}
 	else if (Z == 3)
 	{ // Z == 3 is always illegal

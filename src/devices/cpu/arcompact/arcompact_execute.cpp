@@ -36,7 +36,7 @@ void arcompact_device::execute_run()
 
 		if (m_delayactive)
 		{
-			uint16_t op = READ16((m_pc + 0) >> 1);
+			uint16_t op = READ16((m_pc + 0));
 			m_pc = get_instruction(op);
 			if (m_delaylinks) m_regs[REG_BLINK] = m_pc;
 
@@ -45,7 +45,7 @@ void arcompact_device::execute_run()
 		}
 		else
 		{
-			uint16_t op = READ16((m_pc + 0) >> 1);
+			uint16_t op = READ16((m_pc + 0));
 			m_pc = get_instruction(op);
 		}
 

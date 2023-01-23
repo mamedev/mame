@@ -41,12 +41,12 @@ enum
 	if (_reg_>3) _reg_+= 8;
 
 #define GET_LIMM_32 \
-	m_regs[LIMM_REG] = (READ16((m_pc + 4) >> 1) << 16); \
-	m_regs[LIMM_REG] |= READ16((m_pc + 6) >> 1);
+	m_regs[LIMM_REG] = (READ16((m_pc + 4)) << 16); \
+	m_regs[LIMM_REG] |= READ16((m_pc + 6));
 
 #define GET_LIMM_16 \
-	m_regs[LIMM_REG] = (READ16((m_pc + 2) >> 1) << 16); \
-	m_regs[LIMM_REG] |= READ16((m_pc + 4) >> 1);
+	m_regs[LIMM_REG] = (READ16((m_pc + 2)) << 16); \
+	m_regs[LIMM_REG] |= READ16((m_pc + 4));
 
 #define PC_ALIGNED32 \
 	(m_pc&0xfffffffc)
@@ -845,12 +845,43 @@ private:
 
 	void unimplemented_opcode(uint16_t op);
 
-	inline  uint32_t READ32(uint32_t address) { return m_program->read_dword(address << 2); }
-	inline void WRITE32(uint32_t address, uint32_t data) { m_program->write_dword(address << 2, data); }
-	inline uint16_t READ16(uint32_t address) { return m_program->read_word(address << 1); }
-	inline void WRITE16(uint32_t address, uint16_t data){   m_program->write_word(address << 1, data); }
-	inline uint8_t READ8(uint32_t address) { return m_program->read_byte(address << 0); }
-	inline void WRITE8(uint32_t address, uint8_t data){     m_program->write_byte(address << 0, data); }
+	inline  uint32_t READ32(uint32_t address)
+	{
+		if (address & 0x3)
+			fatalerror("%08x: attempted unaligned READ32 on address %08x", pc, address);
+
+		return m_program->read_dword(address);
+	}
+
+	inline void WRITE32(uint32_t address, uint32_t data)
+	{
+		if (address & 0x3)
+			fatalerror("%08x: attempted unaligned WRITE32 on address %08x", pc, address);
+
+		m_program->write_dword(address, data);
+	}
+	inline uint16_t READ16(uint32_t address)
+	{
+		if (address & 0x1)
+			fatalerror("%08x: attempted unaligned READ16 on address %08x", pc, address);
+
+		return m_program->read_word(address);
+	}
+	inline void WRITE16(uint32_t address, uint16_t data)
+	{
+		if (address & 0x1)
+			fatalerror("%08x: attempted unaligned WRITE16 on address %08x", pc, address);
+
+		m_program->write_word(address, data);
+	}
+	inline uint8_t READ8(uint32_t address)
+	{
+		return m_program->read_byte(address);
+	}
+	inline void WRITE8(uint32_t address, uint8_t data)
+	{
+		m_program->write_byte(address, data);
+	}
 
 	inline uint64_t READAUX(uint64_t address) { return m_io->read_dword(address); }
 	inline void WRITEAUX(uint64_t address, uint32_t data) { m_io->write_dword(address, data); }
