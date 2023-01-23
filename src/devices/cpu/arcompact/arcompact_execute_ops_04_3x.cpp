@@ -28,7 +28,7 @@ uint32_t arcompact_device::arcompact_handle04_3x_helper(uint32_t op, int dsize, 
 	int size = check_b_c_limm(breg, creg);
 	uint8_t areg = common32_get_areg(op);
 
-	uint32_t address = m_regs[breg];
+
 
 	uint8_t X = extend;
 	uint32_t s = m_regs[creg];
@@ -36,14 +36,21 @@ uint32_t arcompact_device::arcompact_handle04_3x_helper(uint32_t op, int dsize, 
 	//int D = (op & 0x00008000) >> 15; op &= ~0x00008000; // D isn't handled
 	uint8_t Z = dsize;
 
+	// writeback / increment
+	if (a == 1)
+	{
+		if (breg == LIMM_REG)
+			arcompact_fatal("illegal LD 3x %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
+
+		m_regs[breg] = m_regs[breg] + s;
+	}
+
+	uint32_t address = m_regs[breg];
+
 	// address manipulation
-	if ((a == 0) || (a == 1))
+	if (a == 0)
 	{
 		address = address + s;
-	}
-	else if (a == 2)
-	{
-		//address = address;
 	}
 	else if (a == 3)
 	{
@@ -96,7 +103,7 @@ uint32_t arcompact_device::arcompact_handle04_3x_helper(uint32_t op, int dsize, 
 	m_regs[areg] = readdata;
 
 	// writeback / increment
-	if ((a == 1) || (a == 2))
+	if (a == 2)
 	{
 		if (breg == LIMM_REG)
 			arcompact_fatal("illegal LD 3x %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal

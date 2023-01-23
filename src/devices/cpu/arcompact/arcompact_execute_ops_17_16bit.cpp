@@ -138,7 +138,7 @@ uint32_t arcompact_device::handleop_BMSK_S_b_b_u5(uint16_t op)
 
 	REG_16BIT_RANGE(breg);
 
-	m_regs[breg] = m_regs[breg] | ((1 << (u + 1)) - 1);
+	m_regs[breg] = m_regs[breg] & ((1 << (u + 1)) - 1);
 
 	return m_pc + (2 >> 0);
 }

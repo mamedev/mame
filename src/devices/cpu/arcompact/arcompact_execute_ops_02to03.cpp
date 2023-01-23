@@ -33,16 +33,21 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 
 	int size = check_b_limm(breg);
 
+	// writeback / increment
+	if (a == 1)
+	{
+		if (breg==LIMM_REG)
+			arcompact_fatal("yy_ illegal LD %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
+
+		m_regs[breg] = m_regs[breg] + s;
+	}
+
 	uint32_t address = m_regs[breg];
 
 	// address manipulation
-	if ((a == 0) || (a == 1))
+	if (a == 0)
 	{
 		address = address + s;
-	}
-	else if (a == 2)
-	{
-		//address = address;
 	}
 	else if (a == 3)
 	{
@@ -95,7 +100,7 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 	m_regs[areg] = readdata;
 
 	// writeback / increment
-	if ((a == 1) || (a == 2))
+	if (a == 2)
 	{
 		if (breg==LIMM_REG)
 			arcompact_fatal("yy_ illegal LD %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
@@ -131,20 +136,26 @@ uint32_t arcompact_device::handleop32_ST_r_o(uint32_t op)
 
 	int size = check_b_c_limm(breg, creg);
 
+	// writeback / increment
+	if (a == 1)
+	{
+		if (breg==LIMM_REG)
+			arcompact_fatal("illegal ST %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
+
+		m_regs[breg] = m_regs[breg] + s;
+	}
+
 	uint32_t address = m_regs[breg];
 	uint32_t writedata = m_regs[creg];
 
 	// are LIMM addresses with 's' offset non-0 ('a' mode 0 / 3) legal?
 	// not mentioned in docs..
 
+
 	// address manipulation
-	if ((a == 0) || (a == 1))
+	if (a == 0)
 	{
 		address = address + s;
-	}
-	else if (a == 2)
-	{
-		//address = address;
 	}
 	else if (a == 3)
 	{
@@ -175,7 +186,7 @@ uint32_t arcompact_device::handleop32_ST_r_o(uint32_t op)
 	}
 
 	// writeback / increment
-	if ((a == 1) || (a == 2))
+	if (a == 2)
 	{
 		if (breg==LIMM_REG)
 			arcompact_fatal("illegal ST %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
