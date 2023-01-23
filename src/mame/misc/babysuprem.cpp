@@ -17,9 +17,12 @@
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+
 #include "speaker.h"
+
 
 namespace {
 
@@ -79,5 +82,5 @@ ROM_END
 } // Anonymous namespace
 
 
-//    YEAR  NAME     PARENT  MACHINE   INPUT     CLASS           INIT        ROT   COMPANY           FULLNAME       FLAGS
+//    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        ROT   COMPANY           FULLNAME       FLAGS
 GAME( 198?, bsuprem, 0,      bsuprem, bsuprem, bsuprem_state, empty_init, ROT0, "Andra / Vifico", "Baby Suprem", MACHINE_IS_SKELETON_MECHANICAL )
