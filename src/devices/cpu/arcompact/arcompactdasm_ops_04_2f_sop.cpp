@@ -18,9 +18,9 @@ int arcompact_disassembler::handle04_2f_helper_dasm(std::ostream &stream, offs_t
 	// 0010 0bbb pp10 1111 FBBB CCCC CCII IIII
 	int size = 4;
 
-	DASM_COMMON32_GET_p;
-	DASM_COMMON32_GET_breg;
-	DASM_COMMON32_GET_F
+	uint8_t p = dasm_common32_get_p(op);;
+	uint8_t breg = dasm_common32_get_breg(op);
+	uint8_t F = dasm_common32_get_F(op);
 
 	util::stream_format(stream, "%s", optext);
 	util::stream_format(stream, "%s", flagbit[F]);
@@ -38,7 +38,7 @@ int arcompact_disassembler::handle04_2f_helper_dasm(std::ostream &stream, offs_t
 
 	if (p == 0)
 	{
-		DASM_COMMON32_GET_creg
+		uint8_t creg = dasm_common32_get_creg(op);
 
 		if (creg == DASM_LIMM_REG)
 		{
@@ -55,7 +55,7 @@ int arcompact_disassembler::handle04_2f_helper_dasm(std::ostream &stream, offs_t
 	}
 	else if (p == 1)
 	{
-		DASM_COMMON32_GET_u6
+		uint32_t u = dasm_common32_get_u6(op);
 
 		util::stream_format(stream, "U(0x%02x) ", u);
 	}

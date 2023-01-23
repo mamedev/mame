@@ -192,8 +192,8 @@ int arcompact_disassembler::handle_dasm32_JLcc_D(std::ostream &stream, offs_t pc
 
 int arcompact_disassembler::handle_dasm32_LP(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes) // LPcc (loop setup)
 {
-	DASM_COMMON32_GET_breg; // breg is reserved
-	DASM_COMMON32_GET_p;
+	uint8_t breg = dasm_common32_get_breg(op); // breg is reserved
+	uint8_t p = dasm_common32_get_p(op);;
 
 	if (p == 0x00)
 	{
@@ -212,7 +212,7 @@ int arcompact_disassembler::handle_dasm32_LP(std::ostream &stream, offs_t pc, ui
 	}
 	else if (p == 0x03) // Loop conditional
 	{ // 0010 0RRR 1110 1000 0RRR uuuu uu1Q QQQQ
-		DASM_COMMON32_GET_u6
+		uint32_t u = dasm_common32_get_u6(op);
 		DASM_COMMON32_GET_CONDITION
 		util::stream_format(stream, "LP<%s> (start %08x, end %08x)", conditions[condition], pc + 4, DASM_PC_ALIGNED32 + u*2);
 
@@ -250,9 +250,9 @@ int arcompact_disassembler::handle_dasm32_LR(std::ostream &stream, offs_t pc, ui
 	uint32_t limm = 0;
 	int got_limm = 0;
 
-	DASM_COMMON32_GET_p;
-	DASM_COMMON32_GET_breg;
-	DASM_COMMON32_GET_F
+	uint8_t p = dasm_common32_get_p(op);;
+	uint8_t breg = dasm_common32_get_breg(op);
+	uint8_t F = dasm_common32_get_F(op);
 
 	util::stream_format(stream, "LR");
 	if (F) util::stream_format(stream, ".<F set, illegal>");
@@ -273,8 +273,8 @@ int arcompact_disassembler::handle_dasm32_LR(std::ostream &stream, offs_t pc, ui
 
 	if (p == 0)
 	{
-		DASM_COMMON32_GET_creg
-		DASM_COMMON32_GET_areg_reserved
+		uint8_t creg = dasm_common32_get_creg(op);
+		uint8_t ares = dasm_common32_get_areg_reserved(op);
 
 		if (creg == DASM_LIMM_REG)
 		{
@@ -296,8 +296,8 @@ int arcompact_disassembler::handle_dasm32_LR(std::ostream &stream, offs_t pc, ui
 	}
 	else if (p == 1)
 	{
-		DASM_COMMON32_GET_u6
-		DASM_COMMON32_GET_areg_reserved
+		uint32_t u = dasm_common32_get_u6(op);
+		uint8_t ares = dasm_common32_get_areg_reserved(op);
 
 		int auxreg = u;
 		PRINT_AUX_REGNAME
@@ -329,9 +329,9 @@ int arcompact_disassembler::handle_dasm32_SR(std::ostream &stream, offs_t pc, ui
 	uint32_t limm = 0;
 	int got_limm = 0;
 
-	DASM_COMMON32_GET_p;
-	DASM_COMMON32_GET_breg;
-	DASM_COMMON32_GET_F
+	uint8_t p = dasm_common32_get_p(op);;
+	uint8_t breg = dasm_common32_get_breg(op);
+	uint8_t F = dasm_common32_get_F(op);
 
 	util::stream_format(stream, "SR");
 	if (F) util::stream_format(stream, ".<F set, illegal>");
@@ -356,8 +356,8 @@ int arcompact_disassembler::handle_dasm32_SR(std::ostream &stream, offs_t pc, ui
 
 	if (p == 0)
 	{
-		DASM_COMMON32_GET_creg
-		DASM_COMMON32_GET_areg_reserved
+		uint8_t creg = dasm_common32_get_creg(op);
+		uint8_t ares = dasm_common32_get_areg_reserved(op);
 
 		if (creg == DASM_LIMM_REG)
 		{
@@ -383,8 +383,8 @@ int arcompact_disassembler::handle_dasm32_SR(std::ostream &stream, offs_t pc, ui
 	}
 	else if (p == 1)
 	{
-		DASM_COMMON32_GET_u6
-		DASM_COMMON32_GET_areg_reserved
+		uint32_t u = dasm_common32_get_u6(op);
+		uint8_t ares = dasm_common32_get_areg_reserved(op);
 
 		int auxreg = u;
 		PRINT_AUX_REGNAME

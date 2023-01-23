@@ -12,66 +12,8 @@
 
 #pragma once
 
-#define DASM_GET_01_01_01_BRANCH_ADDR \
-	int32_t address = (op & 0x00fe0000) >> 17; \
-	address |= ((op & 0x00008000) >> 15) << 7; \
-	if (address & 0x80) address = -0x80 + (address & 0x7f); \
-	op &= ~ 0x00fe800f;
 
 
-#define DASM_GROUP_0e_GET_h \
-	h =  ((op & 0x0007) << 3); \
-	h |= ((op & 0x00e0) >> 5); \
-	op &= ~0x00e7;
-#define DASM_COMMON32_GET_breg \
-	int b_temp = (op & 0x07000000) >> 24; op &= ~0x07000000; \
-	int B_temp = (op & 0x00007000) >> 12; op &= ~0x00007000; \
-	int breg = b_temp | (B_temp << 3);
-#define DASM_COMMON32_GET_creg \
-	int creg = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0;
-#define DASM_COMMON32_GET_u6 \
-	int u = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0;
-#define DASM_COMMON32_GET_areg \
-	int areg = (op & 0x0000003f) >> 0; op &= ~0x0000003f;
-#define DASM_COMMON32_GET_areg_reserved \
-	int ares = (op & 0x0000003f) >> 0; op &= ~0x0000003f;
-#define DASM_COMMON32_GET_F \
-	int F = (op & 0x00008000) >> 15; op &= ~0x00008000;
-#define DASM_COMMON32_GET_p \
-	int p = (op & 0x00c00000) >> 22; op &= ~0x00c00000;
-
-#define DASM_COMMON32_GET_s12 \
-		int S_temp = (op & 0x0000003f) >> 0; op &= ~0x0000003f; \
-		int s_temp = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0; \
-		int S = s_temp | (S_temp<<6);
-#define DASM_COMMON32_GET_CONDITION \
-		uint8_t condition = op & 0x0000001f;  op &= ~0x0000001f;
-
-
-#define DASM_COMMON16_GET_breg \
-	breg =  ((op & 0x0700) >>8); \
-	op &= ~0x0700;
-#define DASM_COMMON16_GET_creg \
-	creg =  ((op & 0x00e0) >>5); \
-	op &= ~0x00e0;
-#define DASM_COMMON16_GET_areg \
-	areg =  ((op & 0x0007) >>0); \
-	op &= ~0x0007;
-#define DASM_COMMON16_GET_u3 \
-	u =  ((op & 0x0007) >>0); \
-	op &= ~0x0007;
-#define DASM_COMMON16_GET_u5 \
-	u =  ((op & 0x001f) >>0); \
-	op &= ~0x001f;
-#define DASM_COMMON16_GET_u8 \
-	u =  ((op & 0x00ff) >>0); \
-	op &= ~0x00ff;
-#define DASM_COMMON16_GET_u7 \
-	u =  ((op & 0x007f) >>0); \
-	op &= ~0x007f;
-#define DASM_COMMON16_GET_s9 \
-	s =  ((op & 0x01ff) >>0); \
-	op &= ~0x01ff;
 // registers used in 16-bit opcodes hae a limited range
 // and can only address registers r0-r3 and r12-r15
 
@@ -111,6 +53,129 @@ public:
 	static const char *const opcodes_04[0x40];
 
 private:
+
+#define DASM_GROUP_0e_GET_h \
+	h =  ((op & 0x0007) << 3); \
+	h |= ((op & 0x00e0) >> 5); \
+	op &= ~0x00e7;
+
+
+	uint8_t dasm_common32_get_breg(uint32_t &op)
+	{
+		int b_temp = (op & 0x07000000) >> 24; op &= ~0x07000000;
+		int B_temp = (op & 0x00007000) >> 12; op &= ~0x00007000;
+		int breg = b_temp | (B_temp << 3);
+		return breg;
+	}
+
+	uint8_t dasm_common32_get_creg(uint32_t& op)
+	{
+		int creg = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0;
+		return creg;
+	}
+
+	uint8_t dasm_common32_get_areg(uint32_t& op)
+	{
+		int areg = (op & 0x0000003f) >> 0; op &= ~0x0000003f;
+		return areg;
+	}
+
+	uint8_t dasm_common32_get_areg_reserved(uint32_t &op)
+	{
+		int ares = (op & 0x0000003f) >> 0; op &= ~0x0000003f;
+		return ares;
+	}
+
+	uint32_t dasm_common32_get_u6(uint32_t &op)
+	{
+		int u = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0;
+		return u;
+	}
+
+	uint8_t dasm_common32_get_F(uint32_t &op)
+	{
+		int F = (op & 0x00008000) >> 15; op &= ~0x00008000;
+		return F;
+	}
+
+	uint8_t dasm_common32_get_p(uint32_t &op)
+	{
+		int p = (op & 0x00c00000) >> 22; op &= ~0x00c00000;
+		return p;
+	}
+
+
+
+#define DASM_COMMON32_GET_s12 \
+		int S_temp = (op & 0x0000003f) >> 0; op &= ~0x0000003f; \
+		int s_temp = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0; \
+		int S = s_temp | (S_temp<<6);
+
+
+
+#define DASM_COMMON32_GET_CONDITION \
+		uint8_t condition = op & 0x0000001f;  op &= ~0x0000001f;
+
+
+	uint8_t dasm_common16_get_breg(uint16_t &op)
+	{
+		uint8_t breg = ((op & 0x0700) >> 8);
+		op &= ~0x0700;
+		return breg;
+	}
+
+	uint8_t dasm_common16_get_creg(uint16_t& op)
+	{
+		uint8_t creg = ((op & 0x00e0) >> 5);
+		op &= ~0x00e0;
+		return creg;
+	}
+
+	uint8_t dasm_common16_get_areg(uint16_t& op)
+	{
+		uint8_t areg = ((op & 0x0007) >> 0);
+		op &= ~0x0007;
+		return areg;
+	}
+
+	uint32_t dasm_common16_get_u3(uint16_t& op)
+	{
+		uint32_t u = ((op & 0x0007) >> 0);
+		op &= ~0x0007;
+		return u;
+	}
+
+	uint32_t dasm_common16_get_u5(uint16_t& op)
+	{
+		uint32_t u = ((op & 0x001f) >> 0);
+		op &= ~0x001f;
+		return u;
+	}
+
+
+	uint32_t dasm_common16_get_u8(uint16_t& op)
+	{
+		uint32_t u = ((op & 0x00ff) >> 0);
+		op &= ~0x00ff;
+		return u;
+	}
+
+	uint32_t dasm_common16_get_u7(uint16_t& op)
+	{
+		uint32_t u = ((op & 0x007f) >> 0);
+		op &= ~0x007f;
+		return u;
+	}
+
+	uint32_t dasm_common16_get_s9(uint16_t& op)
+	{
+		uint32_t s = ((op & 0x01ff) >> 0);
+		if (s & 0x100)
+			s |= 0xfffffe00;
+		op &= ~0x01ff;
+		return s;
+	}
+
 	int handle01_01_00_helper(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext);
 	int handle01_01_01_helper(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext);
 	int handle04_f_a_b_c_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int ignore_dst, int b_reserved);

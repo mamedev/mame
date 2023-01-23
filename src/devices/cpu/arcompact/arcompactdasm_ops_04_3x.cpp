@@ -25,10 +25,10 @@ int arcompact_disassembler::handle04_3x_helper_dasm(std::ostream &stream, offs_t
 	util::stream_format(stream, "%s", dataextend[extend]);
 
 	int mode = (op & 0x00c00000) >> 22; op &= ~0x00c00000;
-	DASM_COMMON32_GET_breg;
+	uint8_t breg = dasm_common32_get_breg(op);
 	int D = (op & 0x00008000) >> 15; op &= ~0x00008000;
-	DASM_COMMON32_GET_creg
-	DASM_COMMON32_GET_areg
+	uint8_t creg = dasm_common32_get_creg(op);
+	uint8_t areg = dasm_common32_get_areg(op);
 
 	util::stream_format(stream, "%s", addressmode[mode]);
 	util::stream_format(stream, "%s", cachebit[D]);

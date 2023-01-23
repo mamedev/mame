@@ -20,14 +20,14 @@ int arcompact_disassembler::handle_dasm32_LD_r_o(std::ostream &stream, offs_t pc
 	// 0001 0bbb ssss ssss SBBB DaaZ ZXAA AAAA
 	int size = 4;
 
-	DASM_COMMON32_GET_areg
+	uint8_t areg = dasm_common32_get_areg(op);
 	int X = (op & 0x00000040) >> 6;  //op &= ~0x00000040;
 	int Z = (op & 0x00000180) >> 7;  //op &= ~0x00000180;
 	int a = (op & 0x00000600) >> 9;  //op &= ~0x00000600;
 	int D = (op & 0x00000800) >> 11;// op &= ~0x00000800;
 	int S = (op & 0x00008000) >> 15;// op &= ~0x00008000;
 	int s = (op & 0x00ff0000) >> 16;// op &= ~0x00ff0000;
-	DASM_COMMON32_GET_breg;
+	uint8_t breg = dasm_common32_get_breg(op);
 
 	int sdat = s | (S << 8); // todo - signed
 
@@ -76,14 +76,14 @@ int arcompact_disassembler::handle_dasm32_ST_r_o(std::ostream &stream, offs_t pc
 	int S = (op & 0x00008000) >> 15;// op &= ~0x00008000;
 	int s = (op & 0x00ff0000) >> 16;// op &= ~0x00ff0000;
 
-	DASM_COMMON32_GET_breg;
+	uint8_t breg = dasm_common32_get_breg(op);
 	int sdat = s | (S << 8); // todo - signed
 
 	int R = (op & 0x00000001) >> 0; op &= ~0x00000001;
 	int Z = (op & 0x00000006) >> 1; op &= ~0x00000006;
 	int a = (op & 0x00000018) >> 3; op &= ~0x00000018;
 	int D = (op & 0x00000020) >> 5; op &= ~0x00000020;
-	DASM_COMMON32_GET_creg
+	uint8_t creg = dasm_common32_get_creg(op);
 
 	if (breg == DASM_LIMM_REG)
 	{

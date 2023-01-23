@@ -26,10 +26,10 @@ int arcompact_disassembler::handle04_f_a_b_c_helper_dasm(std::ostream &stream, o
 	uint32_t limm = 0;
 	int got_limm = 0;
 
-	DASM_COMMON32_GET_breg;
-	DASM_COMMON32_GET_F;
-	DASM_COMMON32_GET_creg
-	DASM_COMMON32_GET_areg
+	uint8_t breg = dasm_common32_get_breg(op);
+	uint8_t F = dasm_common32_get_F(op);;
+	uint8_t creg = dasm_common32_get_creg(op);
+	uint8_t areg = dasm_common32_get_areg(op);
 
 	util::stream_format(stream, "%s", optext);
 	util::stream_format(stream, "%s", flagbit[F]);
@@ -98,10 +98,10 @@ int arcompact_disassembler::handle04_f_a_b_u6_helper_dasm(std::ostream &stream, 
 	uint32_t limm = 0;
 //  int got_limm = 0;
 
-	DASM_COMMON32_GET_breg;
-	DASM_COMMON32_GET_F;
-	DASM_COMMON32_GET_u6
-	DASM_COMMON32_GET_areg
+	uint8_t breg = dasm_common32_get_breg(op);
+	uint8_t F = dasm_common32_get_F(op);;
+	uint32_t u = dasm_common32_get_u6(op);
+	uint8_t areg = dasm_common32_get_areg(op);
 
 	util::stream_format(stream, "%s", optext);
 	util::stream_format(stream, "%s", flagbit[F]);
@@ -156,8 +156,8 @@ int arcompact_disassembler::handle04_f_b_b_s12_helper_dasm(std::ostream &stream,
 	uint32_t limm;
 	//int got_limm = 0;
 
-	DASM_COMMON32_GET_breg;
-	DASM_COMMON32_GET_F
+	uint8_t breg = dasm_common32_get_breg(op);
+	uint8_t F = dasm_common32_get_F(op);
 	DASM_COMMON32_GET_s12;
 
 	util::stream_format(stream, "%s", optext);
@@ -195,10 +195,10 @@ int arcompact_disassembler::handle04_cc_f_b_b_c_helper_dasm(std::ostream &stream
 	uint32_t limm = 0;
 	int got_limm = 0;
 
-	DASM_COMMON32_GET_breg;
-	DASM_COMMON32_GET_F
+	uint8_t breg = dasm_common32_get_breg(op);
+	uint8_t F = dasm_common32_get_F(op);
 	DASM_COMMON32_GET_CONDITION;
-	DASM_COMMON32_GET_creg
+	uint8_t creg = dasm_common32_get_creg(op);
 
 	util::stream_format(stream, "%s", optext);
 	util::stream_format(stream, "%s", flagbit[F]);
@@ -251,10 +251,10 @@ int arcompact_disassembler::handle04_cc_f_b_b_u6_helper_dasm(std::ostream &strea
 	uint32_t limm;
 	//int got_limm = 0;
 
-	DASM_COMMON32_GET_breg;
-	DASM_COMMON32_GET_F
+	uint8_t breg = dasm_common32_get_breg(op);
+	uint8_t F = dasm_common32_get_F(op);
 	DASM_COMMON32_GET_CONDITION;
-	DASM_COMMON32_GET_u6
+	uint32_t u = dasm_common32_get_u6(op);
 
 	util::stream_format(stream, "%s", optext);
 	util::stream_format(stream, "%s", flagbit[F]);
@@ -304,7 +304,7 @@ int arcompact_disassembler::handle04_p11_helper_dasm(std::ostream &stream, offs_
 
 int arcompact_disassembler::handle04_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int ignore_dst, int b_reserved)
 {
-	DASM_COMMON32_GET_p;
+	uint8_t p = dasm_common32_get_p(op);;
 
 	switch (p)
 	{

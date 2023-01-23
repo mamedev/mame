@@ -10,6 +10,14 @@
 
 #include "arcompactdasm.h"
 
+
+#define DASM_GET_01_01_01_BRANCH_ADDR \
+	int32_t address = (op & 0x00fe0000) >> 17; \
+	address |= ((op & 0x00008000) >> 15) << 7; \
+	if (address & 0x80) address = -0x80 + (address & 0x7f); \
+	op &= ~ 0x00fe800f;
+
+
 int arcompact_disassembler::handle_dasm32_B_cc_D_s21(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	int size = 4;
@@ -89,8 +97,8 @@ int arcompact_disassembler::handle01_01_00_helper(std::ostream &stream, offs_t p
 	DASM_GET_01_01_01_BRANCH_ADDR
 
 
-	DASM_COMMON32_GET_creg
-	DASM_COMMON32_GET_breg;
+	uint8_t creg = dasm_common32_get_creg(op);
+	uint8_t breg = dasm_common32_get_breg(op);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 
 	op &= ~0x07007fe0;
@@ -178,8 +186,8 @@ int arcompact_disassembler::handle01_01_01_helper(std::ostream &stream, offs_t p
 	// 0000 1bbb ssss sss1 SBBB uuuu uuN1 iiii
 	DASM_GET_01_01_01_BRANCH_ADDR
 
-	DASM_COMMON32_GET_u6
-	DASM_COMMON32_GET_breg;
+	uint32_t u = dasm_common32_get_u6(op);
+	uint8_t breg = dasm_common32_get_breg(op);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 
 	op &= ~0x07007fe0;
