@@ -23,7 +23,7 @@ void arcompact_device::do_flags(uint32_t result, uint32_t b, uint32_t c)
 			STATUS32_CLEAR_V;
 		}
 	}
-	if (b < c)
+	if (result < b)
 	{
 		STATUS32_SET_C;
 	}

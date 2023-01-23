@@ -219,6 +219,11 @@ private:
 		return machine().rand() | (machine().rand()<<16); // there is a loop checking that this is above a certain value
 	}
 
+	uint32_t leapster_ff_r()
+	{
+		return 0xffffffff;
+	}
+
 	void leapster_aux004b_w(uint32_t data)
 	{
 		printf("leapster_aux004b_w %04x\n", data);
@@ -271,7 +276,11 @@ void leapster_state::machine_reset()
 void leapster_state::leapster_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).rom().mirror(0x40000000); // pointers in the BIOS region seem to be to the 40xxxxxx region, either we mirror there or something (real BIOS?) is acutally missing
-	map(0x0180D800, 0x0180D803).r(FUNC(leapster_state::leapster_random_r));
+	map(0x01802078, 0x0180207b).r(FUNC(leapster_state::leapster_random_r));
+	map(0x01809004, 0x01809007).r(FUNC(leapster_state::leapster_ff_r));
+	map(0x0180d800, 0x0180d803).r(FUNC(leapster_state::leapster_random_r));
+
+	
 	map(0x03000000, 0x030007ff).ram(); // puts stack here, writes a pointer @ 0x03000000 on startup
 	map(0x3c000000, 0x3c1fffff).ram(); // really ram, or has our code execution gone wrong?
 //  map(0x80000000, 0x807fffff).bankr("cartrom"); // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here - installed if a cart is present
