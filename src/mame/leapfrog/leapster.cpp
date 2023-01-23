@@ -31,6 +31,13 @@
     The Leapster 2 also has
         USB 1.1 (client only) + full-sized SD slot.
 
+
+	many magic numbers in the BIOS ROM match the [strings:VALID_FLAGS] table in
+	https://github.com/tsbiberdorf/MqxSrc/blob/master/tools/tad/mqx.tad
+	does this mean the System is running on the MQX RTOS?
+	https://www.synopsys.com/dw/ipdir.php?ds=os_mqx_software
+	indicates it was available for ARC processors
+
 */
 
 /* Cartridge pinout - for games list see hash/leapster.xml
