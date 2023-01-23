@@ -24,9 +24,7 @@
 #include "emu.h"
 #include "keyboard.h"
 
-#include "bus/rs232/rs232.h"
 #include "cpu/m6800/m6801.h"
-
 
 
 namespace  {
@@ -83,7 +81,7 @@ keyboard_device::keyboard_device(machine_config const &mconfig, char const *tag,
 	, device_rs232_port_interface(mconfig, *this)
 	, m_mcu(*this, "mcu")
 	, m_port1(0)
-	, m_gameport{0xff,0xff,0xff,0xff}
+	, m_gameport{ 0xff, 0xff, 0xff, 0xff }
 {
 }
 
