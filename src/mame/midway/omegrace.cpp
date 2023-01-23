@@ -613,10 +613,10 @@ ROM_END
 ROM_START( omegrace3 )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	/* ROMs typewritten as O.R. with date 7/27 written by hand in red ink */
-	ROM_LOAD( "omega_1_2-27.m7",            0x0000, 0x1000, CRC(f8539d46) SHA1(bb0c6bc2a84e904d1cb00822052c53c0a8ff1083) )
-	ROM_LOAD( "omega_2_2-27.l7",            0x1000, 0x1000, CRC(9c3edb1a) SHA1(d2487a402586339969070545e4ab24ced2e7243a) )
-	ROM_LOAD( "omega_3_2-27.k7",            0x2000, 0x1000, CRC(6349130d) SHA1(a1ff62044d9e59294f56079e704beeebc65a56aa) )
-	ROM_LOAD( "omega_4_2-27.j7",            0x3000, 0x1000, CRC(0a5ef64a) SHA1(42bcc5d5bfe11af4b26ba7753d83e121eef4b597) )
+	ROM_LOAD( "omega_1_7-27.m7",            0x0000, 0x1000, CRC(f8539d46) SHA1(bb0c6bc2a84e904d1cb00822052c53c0a8ff1083) )
+	ROM_LOAD( "omega_2_7-27.l7",            0x1000, 0x1000, CRC(9c3edb1a) SHA1(d2487a402586339969070545e4ab24ced2e7243a) )
+	ROM_LOAD( "omega_3_7-27.k7",            0x2000, 0x1000, CRC(6349130d) SHA1(a1ff62044d9e59294f56079e704beeebc65a56aa) )
+	ROM_LOAD( "omega_4_7-27.j7",            0x3000, 0x1000, CRC(0a5ef64a) SHA1(42bcc5d5bfe11af4b26ba7753d83e121eef4b597) )
 
 	ROM_REGION( 0x1000, "vectorrom", 0 )
 	ROM_LOAD( "o.r._vector_i_6-1-81.e1",    0x0000, 0x0800, CRC(1d0fdf3a) SHA1(3333397a9745874cea1dd6a1bda783cc59393b55) )
