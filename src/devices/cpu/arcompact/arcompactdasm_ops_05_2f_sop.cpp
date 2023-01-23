@@ -20,7 +20,7 @@ int arcompact_disassembler::handle05_2f_0x_helper_dasm(std::ostream &stream, off
 
 	int size = 4;
 
-	uint8_t p = dasm_common32_get_p(op);;
+	uint8_t p = dasm_common32_get_p(op);
 	uint8_t breg = dasm_common32_get_breg(op);
 	uint8_t F = dasm_common32_get_F(op);
 
@@ -38,7 +38,7 @@ int arcompact_disassembler::handle05_2f_0x_helper_dasm(std::ostream &stream, off
 		if (creg == DASM_LIMM_REG)
 		{
 			uint32_t limm;
-			DASM_GET_LIMM;
+			limm = dasm_get_limm_32bit_opcode(pc, opcodes);
 			size = 8;
 			util::stream_format(stream, "(%08x) ", limm);
 

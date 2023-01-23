@@ -20,9 +20,9 @@ int arcompact_disassembler::handle0c_helper_dasm(std::ostream &stream, offs_t pc
 	breg = dasm_common16_get_breg(op);
 	creg = dasm_common16_get_creg(op);
 
-	DASM_REG_16BIT_RANGE(areg);
-	DASM_REG_16BIT_RANGE(breg);
-	DASM_REG_16BIT_RANGE(creg);
+	areg = expand_reg(areg);
+	breg = expand_reg(breg);
+	creg = expand_reg(creg);
 
 
 	if (format==0) util::stream_format(stream, "%s %s <- [%s, %s]", optext, regnames[areg], regnames[breg], regnames[creg]);
@@ -61,8 +61,8 @@ int arcompact_disassembler::handle0d_helper_dasm(std::ostream &stream, offs_t pc
 	breg = dasm_common16_get_breg(op);
 	creg = dasm_common16_get_creg(op);
 
-	DASM_REG_16BIT_RANGE(breg);
-	DASM_REG_16BIT_RANGE(creg);
+	breg = expand_reg(breg);
+	creg = expand_reg(creg);
 
 	util::stream_format(stream, "%s %s <- [%s, 0x%02x]", optext, regnames[creg], regnames[breg], u);
 	return 2;
@@ -96,14 +96,14 @@ int arcompact_disassembler::handle0e_0x_helper_dasm(std::ostream &stream, offs_t
 	int h,breg;
 	int size = 2;
 
-	DASM_GROUP_0e_GET_h;
+	h = dasm_group_0e_get_h(op);
 	breg = dasm_common16_get_breg(op);
-	DASM_REG_16BIT_RANGE(breg);
+	breg = expand_reg(breg);
 
 	if (h == DASM_LIMM_REG)
 	{
 		uint32_t limm;
-		DASM_GET_LIMM16;
+		limm = dasm_get_limm_16bit_opcode(pc, opcodes);
 		size = 6;
 		if (!revop) util::stream_format( stream, "%s %s <- 0x%08x", optext, regnames[breg], limm);
 		else util::stream_format( stream, "%s 0x%08x <- %s", optext, limm, regnames[breg]);
@@ -146,7 +146,7 @@ int arcompact_disassembler::handle0f_00_0x_helper_dasm(std::ostream &stream, off
 	int breg;
 
 	breg = dasm_common16_get_breg(op);
-	DASM_REG_16BIT_RANGE(breg);
+	breg = expand_reg(breg);
 
 	util::stream_format( stream, "%s %s", optext, regnames[breg]);
 
@@ -228,8 +228,8 @@ int arcompact_disassembler::handle0f_0x_helper_dasm(std::ostream &stream, offs_t
 	breg = dasm_common16_get_breg(op);
 	creg = dasm_common16_get_creg(op);
 
-	DASM_REG_16BIT_RANGE(breg);
-	DASM_REG_16BIT_RANGE(creg);
+	breg = expand_reg(breg);
+	creg = expand_reg(creg);
 
 	if (nodst==0) util::stream_format(stream, "%s %s <- %s", optext, regnames[breg], regnames[creg]);
 	else if (nodst==1) util::stream_format(stream, "%s <no dst>, %s, %s", optext, regnames[breg], regnames[creg]);
@@ -386,8 +386,8 @@ int arcompact_disassembler::handle_ld_helper_dasm(std::ostream &stream, offs_t p
 	creg = dasm_common16_get_creg(op);
 	u = dasm_common16_get_u5(op);
 
-	DASM_REG_16BIT_RANGE(breg);
-	DASM_REG_16BIT_RANGE(creg);
+	breg = expand_reg(breg);
+	creg = expand_reg(creg);
 
 	u <<= shift;
 
@@ -441,7 +441,7 @@ int arcompact_disassembler::handle_l7_0x_helper_dasm(std::ostream &stream, offs_
 	breg = dasm_common16_get_breg(op);
 	u = dasm_common16_get_u5(op);
 
-	DASM_REG_16BIT_RANGE(breg);
+	breg = expand_reg(breg);
 
 	util::stream_format(stream, "%s %s, 0x%02x", optext, regnames[breg], u);
 
@@ -499,7 +499,7 @@ int arcompact_disassembler::handle18_0x_helper_dasm(std::ostream &stream, offs_t
 	breg = dasm_common16_get_breg(op);
 	u = dasm_common16_get_u5(op);
 
-	DASM_REG_16BIT_RANGE(breg);
+	breg = expand_reg(breg);
 
 	util::stream_format(stream, "%s %s ", optext, regnames[breg]);
 	if (st==1) util::stream_format(stream, "-> ");
@@ -562,7 +562,7 @@ int arcompact_disassembler::handle_dasm_POP_S_b(std::ostream &stream, offs_t pc,
 {
 	int breg;
 	breg = dasm_common16_get_breg(op);
-	DASM_REG_16BIT_RANGE(breg)
+	breg = expand_reg(breg);
 
 	util::stream_format(stream, "POP_S %s", regnames[breg]);
 
@@ -587,7 +587,7 @@ int arcompact_disassembler::handle_dasm_PUSH_S_b(std::ostream &stream, offs_t pc
 {
 	int breg;
 	breg = dasm_common16_get_breg(op);
-	DASM_REG_16BIT_RANGE(breg)
+	breg = expand_reg(breg);
 
 	util::stream_format(stream, "PUSH_S %s", regnames[breg]);
 
@@ -657,7 +657,7 @@ int arcompact_disassembler::handle_dasm_LD_S_b_pcl_u10(std::ostream &stream, off
 	int breg, u;
 	breg = dasm_common16_get_breg(op);
 	u = dasm_common16_get_u8(op);
-	DASM_REG_16BIT_RANGE(breg);
+	breg = expand_reg(breg);
 
 	util::stream_format(stream, "MOV_S %s, [PCL, %03x]", regnames[breg], u*4);
 
@@ -669,7 +669,7 @@ int arcompact_disassembler::handle_dasm_MOV_S_b_u8(std::ostream &stream, offs_t 
 	int breg, u;
 	breg = dasm_common16_get_breg(op);
 	u = dasm_common16_get_u8(op);
-	DASM_REG_16BIT_RANGE(breg);
+	breg = expand_reg(breg);
 
 	util::stream_format(stream, "MOV_S %s <- 0x%02x", regnames[breg], u);
 	return 2;
@@ -680,7 +680,7 @@ int arcompact_disassembler::handle_dasm_ADD_S_b_b_u7(std::ostream &stream, offs_
 	int breg, u;
 	breg = dasm_common16_get_breg(op);
 	u = dasm_common16_get_u7(op);
-	DASM_REG_16BIT_RANGE(breg);
+	breg = expand_reg(breg);
 
 	util::stream_format(stream, "ADD_S %s <- %s, %02x", regnames[breg], regnames[breg], u);
 	return 2;
@@ -691,7 +691,7 @@ int arcompact_disassembler::handle_dasm_CMP_S_b_u7(std::ostream &stream, offs_t 
 	int breg, u;
 	breg = dasm_common16_get_breg(op);
 	u = dasm_common16_get_u7(op);
-	DASM_REG_16BIT_RANGE(breg);
+	breg = expand_reg(breg);
 
 	util::stream_format(stream, "CMP_S %s, %02x", regnames[breg], u);
 	return 2;
@@ -701,12 +701,12 @@ int arcompact_disassembler::handle1d_helper_dasm(std::ostream &stream, offs_t pc
 {
 	int breg;
 	breg = dasm_common16_get_breg(op);
-	DASM_REG_16BIT_RANGE(breg);
+	breg = expand_reg(breg);
 
 	int s = (op & 0x007f) >> 0; op &= ~0x007f;
 	if (s & 0x40) s = -0x40 + (s & 0x3f);
 
-	util::stream_format(stream, "%s %s, 0 to 0x%08x", optext, regnames[breg], DASM_PC_ALIGNED32 + s*2);
+	util::stream_format(stream, "%s %s, 0 to 0x%08x", optext, regnames[breg], (pc&0xfffffffc) + s*2);
 	return 2;
 }
 
@@ -728,7 +728,7 @@ int arcompact_disassembler::handle1e_0x_helper_dasm(std::ostream &stream, offs_t
 	int s = (op & 0x01ff) >> 0; op &= ~0x01ff;
 	if (s & 0x100) s = -0x100 + (s & 0xff);
 
-	util::stream_format(stream, "%s %08x", optext, DASM_PC_ALIGNED32 + s*2);
+	util::stream_format(stream, "%s %08x", optext, (pc&0xfffffffc) + s*2);
 	return 2;
 }
 
@@ -755,7 +755,7 @@ int arcompact_disassembler::handle1e_03_0x_helper_dasm(std::ostream &stream, off
 	int s = (op & 0x003f) >> 0; op &= ~0x003f;
 	if (s & 0x020) s = -0x20 + (s & 0x1f);
 
-	util::stream_format(stream, "%s %08x", optext, DASM_PC_ALIGNED32 + s*2);
+	util::stream_format(stream, "%s %08x", optext, (pc&0xfffffffc) + s*2);
 	return 2;
 }
 
@@ -805,7 +805,7 @@ int arcompact_disassembler::handle_dasm_BL_S_s13(std::ostream &stream, offs_t pc
 	int s = (op & 0x07ff) >> 0; op &= ~0x07ff;
 	if (s & 0x400) s = -0x400 + (s & 0x3ff);
 
-	util::stream_format(stream, "BL_S %08x", DASM_PC_ALIGNED32 + (s*4));
+	util::stream_format(stream, "BL_S %08x", (pc&0xfffffffc) + (s*4));
 	return 2;
 }
 

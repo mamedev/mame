@@ -27,9 +27,9 @@ int arcompact_disassembler::handle_dasm32_B_cc_D_s21(std::ostream &stream, offs_
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
 	if (address & 0x80000) address = -0x80000 + (address & 0x7ffff);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
-	DASM_COMMON32_GET_CONDITION
+	uint8_t condition = dasm_common32_get_condition(op);
 
-	util::stream_format(stream, "B%s(%s) %08x", delaybit[n], conditions[condition], DASM_PC_ALIGNED32 + (address * 2));
+	util::stream_format(stream, "B%s(%s) %08x", delaybit[n], conditions[condition], (pc&0xfffffffc) + (address * 2));
 	return size;
 }
 
@@ -45,7 +45,7 @@ int arcompact_disassembler::handle_dasm32_B_D_s25(std::ostream &stream, offs_t p
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 	int res =  (op & 0x00000010) >> 4; op &= ~0x00000010;
 
-	util::stream_format(stream, "B%s %08x", delaybit[n], DASM_PC_ALIGNED32 + (address * 2));
+	util::stream_format(stream, "B%s %08x", delaybit[n], (pc&0xfffffffc) + (address * 2));
 	if (res)  util::stream_format(stream, "(reserved bit set)");
 
 	return size;
@@ -62,9 +62,9 @@ int arcompact_disassembler::handle_dasm32_BL_cc_d_s21(std::ostream &stream, offs
 	if (address & 0x800000) address = -0x800000 + (address&0x7fffff);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 
-	DASM_COMMON32_GET_CONDITION
+	uint8_t condition = dasm_common32_get_condition(op);
 
-	util::stream_format(stream, "BL%s(%s) %08x", delaybit[n], conditions[condition], DASM_PC_ALIGNED32 + (address *2));
+	util::stream_format(stream, "BL%s(%s) %08x", delaybit[n], conditions[condition], (pc&0xfffffffc) + (address *2));
 	return size;
 }
 
@@ -80,7 +80,7 @@ int arcompact_disassembler::handle_dasm32_BL_d_s25(std::ostream &stream, offs_t 
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 	int res =  (op & 0x00000010) >> 4; op &= ~0x00000010;
 
-	util::stream_format(stream, "BL%s %08x", delaybit[n], DASM_PC_ALIGNED32 + (address *2));
+	util::stream_format(stream, "BL%s %08x", delaybit[n], (pc&0xfffffffc) + (address *2));
 	if (res)  util::stream_format(stream, "(reserved bit set)");
 
 	return size;
@@ -105,26 +105,26 @@ int arcompact_disassembler::handle01_01_00_helper(std::ostream &stream, offs_t p
 
 	if ((breg != DASM_LIMM_REG) && (creg != DASM_LIMM_REG))
 	{
-		util::stream_format( stream, "%s%s %s, %s to 0x%08x", optext, delaybit[n], regnames[breg], regnames[creg], DASM_PC_ALIGNED32 + (address * 2) );
+		util::stream_format( stream, "%s%s %s, %s to 0x%08x", optext, delaybit[n], regnames[breg], regnames[creg], (pc&0xfffffffc) + (address * 2) );
 	}
 	else
 	{
 		uint32_t limm;
-		DASM_GET_LIMM;
+		limm = dasm_get_limm_32bit_opcode(pc, opcodes);
 		size = 8;
 
 		if ((breg == DASM_LIMM_REG) && (creg != DASM_LIMM_REG))
 		{
-			util::stream_format( stream, "%s%s 0x%08x, %s to 0x%08x", optext, delaybit[n], limm, regnames[creg], DASM_PC_ALIGNED32 + (address * 2) );
+			util::stream_format( stream, "%s%s 0x%08x, %s to 0x%08x", optext, delaybit[n], limm, regnames[creg], (pc&0xfffffffc) + (address * 2) );
 		}
 		else if ((creg == DASM_LIMM_REG) && (breg != DASM_LIMM_REG))
 		{
-			util::stream_format( stream, "%s%s %s, 0x%08x to 0x%08x", optext, delaybit[n], regnames[breg], limm, DASM_PC_ALIGNED32 + (address * 2) );
+			util::stream_format( stream, "%s%s %s, 0x%08x to 0x%08x", optext, delaybit[n], regnames[breg], limm, (pc&0xfffffffc) + (address * 2) );
 		}
 		else
 		{
 			// b and c are LIMM? invalid??
-			util::stream_format( stream, "%s%s 0x%08x, 0x%08x (illegal?) to 0x%08x", optext, delaybit[n], limm, limm, DASM_PC_ALIGNED32 + (address * 2) );
+			util::stream_format( stream, "%s%s 0x%08x, 0x%08x (illegal?) to 0x%08x", optext, delaybit[n], limm, limm, (pc&0xfffffffc) + (address * 2) );
 
 		}
 	}
@@ -192,7 +192,7 @@ int arcompact_disassembler::handle01_01_01_helper(std::ostream &stream, offs_t p
 
 	op &= ~0x07007fe0;
 
-	util::stream_format(stream, "%s%s %s, 0x%02x %08x (%08x)", optext, delaybit[n], regnames[breg], u, DASM_PC_ALIGNED32 + (address * 2), op & ~0xf8fe800f);
+	util::stream_format(stream, "%s%s %s, 0x%02x %08x (%08x)", optext, delaybit[n], regnames[breg], u, (pc&0xfffffffc) + (address * 2), op & ~0xf8fe800f);
 
 	return size;
 }

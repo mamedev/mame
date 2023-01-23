@@ -12,26 +12,6 @@
 
 #pragma once
 
-
-
-// registers used in 16-bit opcodes hae a limited range
-// and can only address registers r0-r3 and r12-r15
-
-#define DASM_REG_16BIT_RANGE(_reg_) \
-	if (_reg_>3) _reg_+= 8;
-
-// this is as messed up as the rest of the 16-bit alignment in LE mode...
-
-#define DASM_LIMM_REG 62
-#define DASM_GET_LIMM \
-	limm = (opcodes.r16(pc+4) << 16) | opcodes.r16(pc+6);
-
-#define DASM_GET_LIMM16 \
-	limm = (opcodes.r16(pc+2) << 16) | opcodes.r16(pc+4);
-
-#define DASM_PC_ALIGNED32 \
-	(pc&0xfffffffc)
-
 class arcompact_disassembler : public util::disasm_interface
 {
 public:
@@ -54,11 +34,40 @@ public:
 
 private:
 
-#define DASM_GROUP_0e_GET_h \
-	h =  ((op & 0x0007) << 3); \
-	h |= ((op & 0x00e0) >> 5); \
-	op &= ~0x00e7;
+	static const int DASM_LIMM_REG = 62;
 
+	// registers used in 16-bit opcodes have a limited range
+	// and can only address registers r0-r3 and r12-r15
+	uint8_t expand_reg(uint8_t reg)
+	{
+		if (reg>3) reg += 8;
+		return reg;
+	}
+
+	uint32_t dasm_get_limm_32bit_opcode(uint32_t pc, const data_buffer &opcodes)
+	{
+		return (opcodes.r16(pc + 4) << 16) | opcodes.r16(pc + 6);
+	}
+
+	uint32_t dasm_get_limm_16bit_opcode(uint32_t pc, const data_buffer &opcodes)
+	{
+		return (opcodes.r16(pc + 2) << 16) | opcodes.r16(pc + 4);
+	}
+
+
+	uint8_t dasm_group_0e_get_h(uint16_t &op)
+	{
+		uint8_t h = ((op & 0x0007) << 3);
+		h |= ((op & 0x00e0) >> 5);
+		op &= ~0x00e7;
+		return h;
+	}
+
+	uint8_t dasm_common32_get_condition(uint32_t& op)
+	{
+		uint8_t condition = op & 0x0000001f;  op &= ~0x0000001f;
+		return condition;
+	}
 
 	uint8_t dasm_common32_get_breg(uint32_t &op)
 	{
@@ -104,18 +113,17 @@ private:
 		return p;
 	}
 
+	uint32_t dasm_common32_get_s12(uint32_t& op)
+	{
+		int S_temp = (op & 0x0000003f) >> 0; op &= ~0x0000003f;
+		int s_temp = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0;
+		int S = s_temp | (S_temp << 6);
 
+		if (S & 0x800)
+			S |= 0xfffff000;
 
-#define DASM_COMMON32_GET_s12 \
-		int S_temp = (op & 0x0000003f) >> 0; op &= ~0x0000003f; \
-		int s_temp = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0; \
-		int S = s_temp | (S_temp<<6);
-
-
-
-#define DASM_COMMON32_GET_CONDITION \
-		uint8_t condition = op & 0x0000001f;  op &= ~0x0000001f;
-
+		return S;
+	}
 
 	uint8_t dasm_common16_get_breg(uint16_t &op)
 	{
@@ -151,7 +159,6 @@ private:
 		op &= ~0x001f;
 		return u;
 	}
-
 
 	uint32_t dasm_common16_get_u8(uint16_t& op)
 	{
