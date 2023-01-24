@@ -28,10 +28,11 @@ enum u7_mask : u8
 	U7_BLANK   = 0x80, // disable blanked screen
 };
 
-DEFINE_DEVICE_TYPE(LABTAM_VDUCOM, labtam_vducom_device, "labtam_vducom", "Labtam 8086 VDU COMM")
+DEFINE_DEVICE_TYPE(LABTAM_8086CPU, labtam_8086cpu_device, "labtam_8086cpu", "Labtam 8086 CPU")
+DEFINE_DEVICE_TYPE(LABTAM_VDUCOM,  labtam_vducom_device,  "labtam_vducom",  "Labtam 8086 VDU COMM")
 
-labtam_vducom_device::labtam_vducom_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, LABTAM_VDUCOM, tag, owner, clock)
+labtam_vducom_device_base::labtam_vducom_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_multibus_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")
 	, m_pic(*this, "pic")
@@ -48,12 +49,41 @@ labtam_vducom_device::labtam_vducom_device(machine_config const &mconfig, char c
 {
 }
 
+labtam_8086cpu_device::labtam_8086cpu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: labtam_vducom_device_base(mconfig, LABTAM_8086CPU, tag, owner, clock)
+{
+}
+
+labtam_vducom_device::labtam_vducom_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: labtam_vducom_device_base(mconfig, LABTAM_VDUCOM, tag, owner, clock)
+{
+}
+
+ROM_START(labtam_8086cpu)
+	ROM_REGION16_LE(0x10000, "eprom", 0)
+
+	ROM_SYSTEM_BIOS(0, "v0", "v0")
+	ROMX_LOAD("slave_1__0_v0.u34", 0xc000, 0x2000, CRC(f5007dd0) SHA1(2362852d88bf32ce605ad394244dc6e21a6df5c6), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("slave_1__1_v0.u44", 0xc001, 0x2000, CRC(2de2e667) SHA1(c575d5d53f2fe99569af002c636754dedca09e3b), ROM_SKIP(1) | ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "v1", "v1")
+	ROMX_LOAD("slave_1__0_v1.u34", 0xc000, 0x2000, CRC(ba6311aa) SHA1(403fdb8834ec7e3ff7cae3e1ad93238a8f4d1ed6), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("slave_1__1_v1.u44", 0xc001, 0x2000, CRC(2de2e667) SHA1(c575d5d53f2fe99569af002c636754dedca09e3b), ROM_SKIP(1) | ROM_BIOS(1))
+
+	// FIXME: this version not recognized as 8086 card by z80sbc?
+	ROM_SYSTEM_BIOS(2, "v2", "v2")
+	ROMX_LOAD("slave_1__0_v2.u34", 0xc000, 0x2000, CRC(f56d4843) SHA1(53a1a9c6f0816511ff651efada09b39126866d37), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("slave_1__1_v2.u44", 0xc001, 0x2000, CRC(a6fdbc6f) SHA1(3716142eed6bc68e1a85330c2dfc1d1148074087), ROM_SKIP(1) | ROM_BIOS(2))
+ROM_END
+
 ROM_START(labtam_vducom)
 	ROM_REGION16_LE(0x10000, "eprom", 0)
-	ROM_LOAD16_BYTE("vdu_com__k84.1-0.u26", 0x0000, 0x4000, CRC(ac27697e) SHA1(eeec9cff06181dffe95a37aefb2b3789a0959b4f))
-	ROM_LOAD16_BYTE("vdu_com__k84.1-1.u39", 0x0001, 0x4000, CRC(8b3e567d) SHA1(5ce821004155d02b87ed7b6d14989a9fffc38c6a))
-	ROM_LOAD16_BYTE("vdu_com__k84.1-2.u34", 0x8000, 0x4000, CRC(70a2c615) SHA1(67d265be3101dfe33fa705447e1394410e55f518))
-	ROM_LOAD16_BYTE("vdu_com__k84.1-3.u44", 0x8001, 0x4000, CRC(dcd7ce03) SHA1(727e5fa72d6088ddf9e8613656d713754d628538))
+	ROM_SYSTEM_BIOS(0, "k84", "Version K84")
+
+	ROMX_LOAD("vdu_com__k84.1-0.u26", 0x0000, 0x4000, CRC(ac27697e) SHA1(eeec9cff06181dffe95a37aefb2b3789a0959b4f), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("vdu_com__k84.1-1.u39", 0x0001, 0x4000, CRC(8b3e567d) SHA1(5ce821004155d02b87ed7b6d14989a9fffc38c6a), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("vdu_com__k84.1-2.u34", 0x8000, 0x4000, CRC(70a2c615) SHA1(67d265be3101dfe33fa705447e1394410e55f518), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("vdu_com__k84.1-3.u44", 0x8001, 0x4000, CRC(dcd7ce03) SHA1(727e5fa72d6088ddf9e8613656d713754d628538), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
 static INPUT_PORTS_START(labtam_vducom)
@@ -62,6 +92,29 @@ static INPUT_PORTS_START(labtam_vducom)
 	PORT_DIPSETTING(0x00, DEF_STR(Yes))
 	PORT_DIPSETTING(0x01, DEF_STR(No))
 	PORT_DIPNAME(0x02, 0x02, "Disable Graphics") PORT_DIPLOCATION("E4:2")
+	PORT_DIPSETTING(0x00, DEF_STR(Yes))
+	PORT_DIPSETTING(0x02, DEF_STR(No))
+	PORT_DIPNAME(0x04, 0x04, "Keyboard Select 0") PORT_DIPLOCATION("E4:3")
+	PORT_DIPSETTING(0x00, DEF_STR(Yes))
+	PORT_DIPSETTING(0x04, DEF_STR(No))
+	PORT_DIPNAME(0x08, 0x08, "Killer Enable") PORT_DIPLOCATION("E4:4")
+	PORT_DIPSETTING(0x00, DEF_STR(Yes))
+	PORT_DIPSETTING(0x08, DEF_STR(No))
+	PORT_DIPNAME(0x10, 0x10, "Init NVRAM") PORT_DIPLOCATION("E4:5")
+	PORT_DIPSETTING(0x00, DEF_STR(Yes))
+	PORT_DIPSETTING(0x10, DEF_STR(No))
+	PORT_DIPNAME(0x40, 0x40, "Terminal Mode") PORT_DIPLOCATION("E4:7")
+	PORT_DIPSETTING(0x00, DEF_STR(Yes))
+	PORT_DIPSETTING(0x40, DEF_STR(No))
+	PORT_DIPUNUSED_DIPLOC(0xa0, 0xa0, "E4:6,8")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(labtam_8086cpu)
+	PORT_START("E4")
+	PORT_DIPNAME(0x01, 0x01, "Keyboard Select 1") PORT_DIPLOCATION("E4:1")
+	PORT_DIPSETTING(0x00, DEF_STR(Yes))
+	PORT_DIPSETTING(0x01, DEF_STR(No))
+	PORT_DIPNAME(0x02, 0x00, "Disable Graphics") PORT_DIPLOCATION("E4:2")
 	PORT_DIPSETTING(0x00, DEF_STR(Yes))
 	PORT_DIPSETTING(0x02, DEF_STR(No))
 	PORT_DIPNAME(0x04, 0x04, "Keyboard Select 0") PORT_DIPLOCATION("E4:3")
@@ -107,23 +160,33 @@ const tiny_rom_entry *labtam_vducom_device::device_rom_region() const
 	return ROM_NAME(labtam_vducom);
 }
 
+const tiny_rom_entry *labtam_8086cpu_device::device_rom_region() const
+{
+	return ROM_NAME(labtam_8086cpu);
+}
+
 ioport_constructor labtam_vducom_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(labtam_vducom);
 }
 
-void labtam_vducom_device::device_resolve_objects()
+ioport_constructor labtam_8086cpu_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(labtam_8086cpu);
+}
+
+void labtam_vducom_device_base::device_resolve_objects()
 {
 	m_bus->int_callback<3>().set(m_pic, FUNC(pic8259_device::ir6_w));
 }
 
-void labtam_vducom_device::device_start()
+void labtam_vducom_device_base::device_start()
 {
 	save_item(NAME(m_start));
 	save_item(NAME(m_u7));
 }
 
-void labtam_vducom_device::device_reset()
+void labtam_vducom_device_base::device_reset()
 {
 	if (!m_installed)
 		m_installed = true;
@@ -137,11 +200,11 @@ void labtam_vducom_device::device_reset()
 	m_mbus.select(0);
 }
 
-void labtam_vducom_device::device_add_mconfig(machine_config &config)
+void labtam_vducom_device_base::device_add_mconfig(machine_config &config)
 {
 	I8086(config, m_cpu, 16_MHz_XTAL / 2);
-	m_cpu->set_addrmap(AS_PROGRAM, &labtam_vducom_device::cpu_mem);
-	m_cpu->set_addrmap(AS_IO, &labtam_vducom_device::cpu_pio);
+	m_cpu->set_addrmap(AS_PROGRAM, &labtam_vducom_device_base::cpu_mem);
+	m_cpu->set_addrmap(AS_IO, &labtam_vducom_device_base::cpu_pio);
 	m_cpu->set_irq_acknowledge_callback(m_pic, FUNC(pic8259_device::inta_cb));
 
 	AM9513(config, m_ctc[0], 4'000'000);
@@ -169,24 +232,27 @@ void labtam_vducom_device::device_add_mconfig(machine_config &config)
 	X2212(config, m_nvram[0]);
 	X2212(config, m_nvram[1]);
 
-	MC6845(config, m_crtc, 1'000'000);
-	m_crtc->set_show_border_area(false);
-	m_crtc->set_hpixels_per_column(16);
-	m_crtc->set_update_row_callback(FUNC(labtam_vducom_device::update_row));
-	m_crtc->set_screen(m_screen);
-	m_crtc->out_vsync_callback().set(m_pic, FUNC(pic8259_device::ir0_w));
+	if (type() == LABTAM_VDUCOM)
+	{
+		MC6845(config, m_crtc, 1'000'000);
+		m_crtc->set_show_border_area(false);
+		m_crtc->set_hpixels_per_column(16);
+		m_crtc->out_vsync_callback().set(m_pic, FUNC(pic8259_device::ir0_w));
 
-	PALETTE(config, m_palette, FUNC(labtam_vducom_device::palette_init), 4);
+		m_crtc->set_update_row_callback(FUNC(labtam_vducom_device_base::update_row));
+		m_crtc->set_screen(m_screen);
+		PALETTE(config, m_palette, FUNC(labtam_vducom_device_base::palette_init), 4);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(1'000'000, 62*16, 2*16, 52*16, 78*4, 3*4, 75*4);
-	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
+		SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+		m_screen->set_raw(1'000'000, 62 * 16, 2 * 16, 52 * 16, 78 * 4, 3 * 4, 75 * 4);
+		m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 
-	// gfxdecode is only to show the font data in the tile viewer
-	GFXDECODE(config, "gfx", m_palette, labtam_vducom);
+		// gfxdecode is only to show the font data in the tile viewer
+		GFXDECODE(config, "gfx", m_palette, labtam_vducom);
+	}
 }
 
-void labtam_vducom_device::cpu_mem(address_map &map)
+void labtam_vducom_device_base::cpu_mem(address_map &map)
 {
 	map(0x00000, 0x0ffff).ram().share("ram1");
 	map(0x10000, 0x1ffff).ram().share("ram0");
@@ -194,29 +260,32 @@ void labtam_vducom_device::cpu_mem(address_map &map)
 
 	map(0x80000, 0xfffff).view(m_mbus);
 	m_mbus[0](0x80000, 0x8ffff).rom().region("eprom", 0).mirror(0x70000);
-	m_mbus[1](0x80000, 0xfffff).rw(FUNC(labtam_vducom_device::bus_mem_r), FUNC(labtam_vducom_device::bus_mem_w));
+	m_mbus[1](0x80000, 0xfffff).rw(FUNC(labtam_vducom_device_base::bus_mem_r), FUNC(labtam_vducom_device_base::bus_mem_w));
 }
 
-void labtam_vducom_device::cpu_pio(address_map &map)
+void labtam_vducom_device_base::cpu_pio(address_map &map)
 {
-	map(0x0000, 0x7fff).rw(FUNC(labtam_vducom_device::bus_pio_r), FUNC(labtam_vducom_device::bus_pio_w));
+	map(0x0000, 0x7fff).rw(FUNC(labtam_vducom_device_base::bus_pio_r), FUNC(labtam_vducom_device_base::bus_pio_w));
 
-	map(0xe000, 0xe000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
-	map(0xe002, 0xe002).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	if (type() == LABTAM_VDUCOM)
+	{
+		map(0xe000, 0xe000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+		map(0xe002, 0xe002).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	}
 	map(0xe400, 0xe403).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0xe600, 0xe607).rw(m_com[0], FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w)).umask16(0x00ff);
 	map(0xe800, 0xe807).rw(m_com[1], FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w)).umask16(0x00ff);
 	map(0xea00, 0xea03).rw(m_ctc[0], FUNC(am9513_device::read8), FUNC(am9513_device::write8)).umask16(0x00ff);
 	map(0xec00, 0xec03).rw(m_ctc[1], FUNC(am9513_device::read8), FUNC(am9513_device::write8)).umask16(0x00ff);
-	map(0xee00, 0xefff).rw(FUNC(labtam_vducom_device::nvram_r), FUNC(labtam_vducom_device::nvram_w)).umask16(0x00ff);
+	map(0xee00, 0xefff).rw(FUNC(labtam_vducom_device_base::nvram_r), FUNC(labtam_vducom_device_base::nvram_w)).umask16(0x00ff);
 
-	map(0xf000, 0xf00f).rw(FUNC(labtam_vducom_device::u15_r), FUNC(labtam_vducom_device::u7_w)).umask16(0x00ff);
+	map(0xf000, 0xf00f).rw(FUNC(labtam_vducom_device_base::u15_r), FUNC(labtam_vducom_device_base::u7_w)).umask16(0x00ff);
 	map(0xf200, 0xf200).lw8([this](u8 data) { m_start = (m_start & 0xff00) | u16(data) << 0; }, "start_lo");
 	map(0xf400, 0xf400).lw8([this](u8 data) { m_start = (m_start & 0x00ff) | u16(data) << 8; }, "start_hi");
 	map(0xfe00, 0xfe00).lw8([this](u8 data) { m_nvram[0]->store(1); m_nvram[1]->store(1); }, "store_array");
 }
 
-void labtam_vducom_device::palette_init(palette_device &palette)
+void labtam_vducom_device_base::palette_init(palette_device &palette)
 {
 	// 0=black, 1=dim, 2=normal, 3=bold
 
@@ -228,7 +297,7 @@ void labtam_vducom_device::palette_init(palette_device &palette)
 
 // non-interlace: two planes 800x300, each 32k, 2bpp -> 4 levels (black, dim, normal, bold)
 // interlace: one plane 800x600, 64k, (black, normal)
-MC6845_UPDATE_ROW(labtam_vducom_device::update_row)
+MC6845_UPDATE_ROW(labtam_vducom_device_base::update_row)
 {
 	required_shared_ptr<u16> const ram = m_ram[BIT(m_u7, 2)];
 	offs_t const offset = (m_start >> 1) + ma * 4 + ra * 50;
@@ -249,7 +318,7 @@ MC6845_UPDATE_ROW(labtam_vducom_device::update_row)
 	}
 }
 
-void labtam_vducom_device::u7_w(offs_t offset, u8 data)
+void labtam_vducom_device_base::u7_w(offs_t offset, u8 data)
 {
 	LOG("u7_w offset %d data %d (%s)\n", offset, data, machine().describe_context());
 
@@ -261,14 +330,14 @@ void labtam_vducom_device::u7_w(offs_t offset, u8 data)
 	m_mbus.select(BIT(m_u7, 0));
 }
 
-void labtam_vducom_device::bus_mem_w(offs_t offset, u16 data, u16 mem_mask)
+void labtam_vducom_device_base::bus_mem_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	offs_t const address = (BIT(m_u7, 1) ? 0x80000 : 0) | (offset << 1);
 
 	m_bus->space(AS_PROGRAM).write_word(address, data, mem_mask);
 }
 
-u16 labtam_vducom_device::bus_mem_r(offs_t offset, u16 mem_mask)
+u16 labtam_vducom_device_base::bus_mem_r(offs_t offset, u16 mem_mask)
 {
 	offs_t const address = (BIT(m_u7, 1) ? 0x80000 : 0) | (offset << 1);
 
