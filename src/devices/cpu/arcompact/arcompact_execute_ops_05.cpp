@@ -68,7 +68,7 @@ uint32_t arcompact_device::handleop32_ASL_multiple_cc_f_b_b_u6(uint32_t op)
 	uint32_t u = common32_get_u6(op);
 	int size = check_b_limm(breg);
 	if (!check_condition(common32_get_condition(op)))
-		return m_pc + (size>>0);
+		return m_pc + size;
 	m_regs[breg] = handleop32_ASL_multiple_do_op(m_regs[breg], u, common32_get_F(op));
 	return m_pc + size;
 }
@@ -215,7 +215,7 @@ uint32_t arcompact_device::handleop32_LSR_multiple_cc_f_b_b_u6(uint32_t op)
 
 	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
-		return m_pc + (size>>0);
+		return m_pc + size;
 
 	uint32_t result = b >> (c&0x1f);
 	m_regs[breg] = result;

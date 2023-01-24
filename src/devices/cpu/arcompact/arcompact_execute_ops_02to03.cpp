@@ -108,7 +108,7 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 		m_regs[breg] = m_regs[breg] + s;
 	}
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 
 }
 
@@ -194,6 +194,6 @@ uint32_t arcompact_device::handleop32_ST_r_o(uint32_t op)
 		m_regs[breg] = m_regs[breg] + s;
 	}
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 
 }

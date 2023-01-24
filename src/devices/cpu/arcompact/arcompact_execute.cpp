@@ -193,7 +193,7 @@ uint32_t arcompact_device::arcompact_handle04_helper(uint32_t op, const char* op
 
 	arcompact_log("unimplemented %s %08x (04 type helper)", optext, op);
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 

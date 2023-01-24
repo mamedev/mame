@@ -170,62 +170,75 @@ uint32_t arcompact_device::handleop32_ADD(uint32_t op)
 //
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+uint32_t arcompact_device::handleop32_ADC_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags)
+{
+	uint32_t result = src1 + src2 + status32_check_c() ? 1 : 0;
+	if (set_flags)
+		do_flags_add(result, src1, src2);
+	return result;
+}
 
 uint32_t arcompact_device::handleop32_ADC_f_a_b_c(uint32_t op)
 {
-	arcompact_fatal("ADC with P00 not supported");
-	return m_pc + (0 >> 0);
+	uint8_t breg = common32_get_breg(op);
+	uint8_t creg = common32_get_creg(op);
+	int size = check_b_c_limm(breg, creg);
+	m_regs[common32_get_areg(op)] = handleop32_ADC_do_op(m_regs[breg], m_regs[creg], common32_get_F(op));
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_ADC_f_a_b_u6(uint32_t op)
 {
-	arcompact_fatal("ADC with P01 not supported");
-	return m_pc + (0 >> 0);
+	uint8_t breg = common32_get_breg(op);
+	int size = check_b_limm(breg);
+	m_regs[common32_get_areg(op)] = handleop32_ADC_do_op(m_regs[breg], common32_get_u6(op), common32_get_F(op));
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_ADC_f_b_b_s12(uint32_t op)
 {
-	arcompact_fatal("ADC with P10 not supported");
-	return m_pc + (0 >> 0);
+	uint8_t breg = common32_get_breg(op);
+	int size = check_b_limm(breg);
+	m_regs[breg] = handleop32_ADC_do_op(m_regs[breg], common32_get_s12(op), common32_get_F(op));
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_ADC_cc_f_b_b_c(uint32_t op)
 {
-	arcompact_fatal("ADC with P11 M0 not supported");
-	return m_pc + (0 >> 0);
+	uint8_t breg = common32_get_breg(op);
+	uint8_t creg = common32_get_creg(op);
+	int size = check_b_c_limm(breg, creg);
+	if (check_condition(common32_get_condition(op)))
+		m_regs[breg] = handleop32_ADC_do_op(m_regs[breg], m_regs[creg], common32_get_F(op));
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_ADC_cc_f_b_b_u6(uint32_t op)
 {
-	arcompact_fatal("ADC with P11 M0 not supported");
-	return m_pc + (0 >> 0);
-}
-
-uint32_t arcompact_device::handleop32_ADC_cc(uint32_t op)
-{
-	int M = (op & 0x00000020) >> 5;
-
-	switch (M)
-	{
-		case 0x00: return handleop32_ADC_cc_f_b_b_c(op);
-		case 0x01: return handleop32_ADC_cc_f_b_b_u6(op);
-	}
-
-	return 0;
+	uint8_t breg = common32_get_breg(op);
+	int size = check_b_limm(breg);
+	if (check_condition(common32_get_condition(op)))
+		m_regs[breg] = handleop32_ADC_do_op(m_regs[breg], common32_get_u6(op), common32_get_F(op));
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_ADC(uint32_t op)
 {
-	int p = (op & 0x00c00000) >> 22;
-
-	switch (p)
+	switch ((op & 0x00c00000) >> 22)
 	{
-		case 0x00: return handleop32_ADC_f_a_b_c(op);
-		case 0x01: return handleop32_ADC_f_a_b_u6(op);
-		case 0x02: return handleop32_ADC_f_b_b_s12(op);
-		case 0x03: return handleop32_ADC_cc(op);
+	case 0x00: return handleop32_ADC_f_a_b_c(op);
+	case 0x01: return handleop32_ADC_f_a_b_u6(op);
+	case 0x02: return handleop32_ADC_f_b_b_s12(op);
+	case 0x03:
+	{
+		switch ((op & 0x00000020) >> 5)
+		{
+		case 0x00: return handleop32_ADC_cc_f_b_b_c(op);
+		case 0x01: return handleop32_ADC_cc_f_b_b_u6(op);
+		}
+		return 0;
 	}
-
+	}
 	return 0;
 }
 
@@ -1317,7 +1330,7 @@ uint32_t arcompact_device::handleop32_RSUB_cc_f_b_b_u6(uint32_t op)
 
 	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
-		return m_pc + (size>>0);
+		return m_pc + size;
 
 	uint32_t result = c - b;
 	m_regs[breg] = result;
@@ -1468,7 +1481,7 @@ uint32_t arcompact_device::handleop32_BSET_cc_f_b_b_u6(uint32_t op)
 
 	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
-		return m_pc + (size>>0);
+		return m_pc + size;
 
 	uint32_t result = b | (1 << (c & 0x1f));
 	m_regs[breg] = result;
@@ -1823,7 +1836,7 @@ uint32_t arcompact_device::handleop32_BMSK_cc_f_b_b_u6(uint32_t op)
 
 	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
-		return m_pc + (size>>0);
+		return m_pc + size;
 
 	uint32_t result = b & ((1<<(c+1))-1);
 	m_regs[breg] = result;
@@ -1978,7 +1991,7 @@ uint32_t arcompact_device::handleop32_ADD1_cc_f_b_b_u6(uint32_t op)
 
 	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
-		return m_pc + (size>>0);
+		return m_pc + size;
 
 	uint32_t result = b + (c << 1);
 	m_regs[breg] = result;
@@ -2133,7 +2146,7 @@ uint32_t arcompact_device::handleop32_ADD2_cc_f_b_b_u6(uint32_t op)
 
 	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
-		return m_pc + (size>>0);
+		return m_pc + size;
 
 	uint32_t result = b + (c << 2);
 	m_regs[breg] = result;
@@ -2285,7 +2298,7 @@ uint32_t arcompact_device::handleop32_ADD3_cc_f_b_b_u6(uint32_t op)
 
 	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
-		return m_pc + (size>>0);
+		return m_pc + size;
 
 	uint32_t result = b + (c << 3);
 	m_regs[breg] = result;
@@ -2441,7 +2454,7 @@ uint32_t arcompact_device::handleop32_SUB1_cc_f_b_b_u6(uint32_t op)
 
 	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
-		return m_pc + (size>>0);
+		return m_pc + size;
 
 	uint32_t result = b - (c << 1);
 	m_regs[breg] = result;
@@ -2597,7 +2610,7 @@ uint32_t arcompact_device::handleop32_SUB2_cc_f_b_b_u6(uint32_t op)
 
 	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
-		return m_pc + (size>>0);
+		return m_pc + size;
 
 	uint32_t result = b - (c << 2);
 	m_regs[breg] = result;
@@ -2752,7 +2765,7 @@ uint32_t arcompact_device::handleop32_SUB3_cc_f_b_b_u6(uint32_t op)
 
 	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
-		return m_pc + (size>>0);
+		return m_pc + size;
 
 	uint32_t result = b - (c << 3);
 	m_regs[breg] = result;
@@ -3160,7 +3173,7 @@ uint32_t arcompact_device::handleop32_Jcc_f_a_b_c(uint32_t op)
 		}
 	}
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_Jcc_f_a_b_u6(uint32_t op)
@@ -3169,7 +3182,7 @@ uint32_t arcompact_device::handleop32_Jcc_f_a_b_u6(uint32_t op)
 	// J u6            0010 0RRR 0110 0000 0RRR uuuu uuRR RRRR
 	int size = 4;
 	arcompact_log("2 unimplemented J %08x", op);
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_Jcc_f_b_b_s12(uint32_t op)
@@ -3178,7 +3191,7 @@ uint32_t arcompact_device::handleop32_Jcc_f_b_b_s12(uint32_t op)
 	// J s12           0010 0RRR 1010 0000 0RRR ssss ssSS SSSS
 	int size = 4;
 	arcompact_log("3 unimplemented J %08x", op);
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 
@@ -3212,7 +3225,7 @@ uint32_t arcompact_device::handleop32_Jcc_cc_f_b_b_c(uint32_t op) // Jcc   (no l
 	}
 
 	if (!check_condition(condition))
-		return m_pc + (size>>0);
+		return m_pc + size;
 
 	if (!F)
 	{
@@ -3245,7 +3258,7 @@ uint32_t arcompact_device::handleop32_Jcc_cc_f_b_b_c(uint32_t op) // Jcc   (no l
 	}
 
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_Jcc_cc_f_b_b_u6(uint32_t op)
@@ -3254,7 +3267,7 @@ uint32_t arcompact_device::handleop32_Jcc_cc_f_b_b_u6(uint32_t op)
 	// Jcc u6          0010 0RRR 1110 0000 0RRR uuuu uu1Q QQQQ
 	int size = 4;
 	arcompact_log("unimplemented handleop32_Jcc_cc_f_b_b_u6 J %08x (u6)", op);
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_Jcc_cc(uint32_t op)
@@ -3312,24 +3325,24 @@ uint32_t arcompact_device::handleop32_Jcc_D_f_a_b_c(uint32_t op)
 	}
 	else
 	{
-		return handle_jump_to_register(1,0,creg, m_pc + (size>>0), F); // delay, no link
+		return handle_jump_to_register(1,0,creg, m_pc + size, F); // delay, no link
 	}
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_Jcc_D_f_a_b_u6(uint32_t op)
 {
 	int size = 4;
 	arcompact_log("unimplemented J.D (u6 type) %08x", op);
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_Jcc_D_f_b_b_s12(uint32_t op)
 {
 	int size = 4;
 	arcompact_log("unimplemented J.D (s12 type) %08x", op);
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 
@@ -3358,7 +3371,7 @@ uint32_t arcompact_device::handleop32_Jcc_D_cc_f_b_b_c(uint32_t op) // Jcc.D   (
 	}
 
 	if (!check_condition(condition))
-		return m_pc + (size>>0);
+		return m_pc + size;
 
 	if (!F)
 	{
@@ -3389,14 +3402,14 @@ uint32_t arcompact_device::handleop32_Jcc_D_cc_f_b_b_c(uint32_t op) // Jcc.D   (
 	}
 
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_Jcc_D_cc_f_b_b_u6(uint32_t op)
 {
 	int size = 4;
 	arcompact_log("unimplemented handleop32_Jcc_D_cc_f_b_b_u6 J.D %08x (u6)", op);
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_Jcc_D_cc(uint32_t op)
@@ -3576,9 +3589,7 @@ uint32_t arcompact_device::handleop32_JLcc_D(uint32_t op)
 uint32_t arcompact_device::handleop32_LP(uint32_t op) // LPcc (loop setup)
 {
 	int size = 4;
-//  uint8_t breg = common32_get_breg(op); // breg is reserved
 	int p = common32_get_p(op);
-
 	if (p == 0x00)
 	{
 		arcompact_fatal("<illegal LPcc, p = 0x00)");
@@ -3591,15 +3602,14 @@ uint32_t arcompact_device::handleop32_LP(uint32_t op) // LPcc (loop setup)
 	{ // 0010 0RRR 1010 1000 0RRR ssss ssSS SSSS
 		uint32_t S = common32_get_s12(op);
 		if (S & 0x800) S = -0x800 + (S&0x7ff);
-
-		arcompact_fatal("Lp unconditional not supported %d", S);
+		m_LP_START = m_pc + size;
+		m_LP_END = (m_pc&0xfffffffc) + (S * 2);
+		return m_pc + size;
 	}
 	else if (p == 0x03) // Loop conditional
 	{ // 0010 0RRR 1110 1000 0RRR uuuu uu1Q QQQQ
 		uint32_t u = common32_get_u6(op);
 		uint8_t condition = common32_get_condition(op);
-		//arcompact_fatal("Lp conditional %s not supported %d", arcompact_disassembler::conditions[condition], u);
-
 		// if the loop condition fails then just jump to after the end of the loop, don't set any registers
 		if (!check_condition(condition))
 		{
@@ -3611,12 +3621,10 @@ uint32_t arcompact_device::handleop32_LP(uint32_t op) // LPcc (loop setup)
 			// otherwise set up the loop positions
 			m_LP_START = m_pc + size;
 			m_LP_END = (m_pc&0xfffffffc) + (u * 2);
-			return m_pc + (size>>0);
+			return m_pc + size;
 		}
-
 	}
-
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -3831,7 +3839,7 @@ uint32_t arcompact_device::handleop32_LR_cc_f_b_b_u6(uint32_t op)
 
 	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
-		return m_pc + (size>>0);
+		return m_pc + size;
 
 	m_regs[breg] = READAUX(c);
 
@@ -3978,7 +3986,7 @@ uint32_t arcompact_device::handleop32_SR_cc_f_b_b_u6(uint32_t op)
 
 	uint8_t condition = common32_get_condition(op);
 	if (!check_condition(condition))
-		return m_pc + (size>>0);
+		return m_pc + size;
 
 	WRITEAUX(c,b);
 

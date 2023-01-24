@@ -17,7 +17,7 @@ uint32_t arcompact_device::handleop32_B_cc_D_s21(uint32_t op)
 	uint8_t condition = common32_get_condition(op);
 
 	if (!check_condition(condition))
-		return m_pc + (size>>0);
+		return m_pc + size;
 
 	// Branch Conditionally
 	// 0000 0sss ssss sss0 SSSS SSSS SSNQ QQQQ
@@ -41,7 +41,7 @@ uint32_t arcompact_device::handleop32_B_cc_D_s21(uint32_t op)
 	}
 
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_B_D_s25(uint32_t op)
@@ -70,7 +70,7 @@ uint32_t arcompact_device::handleop32_B_D_s25(uint32_t op)
 	}
 
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 
 }
 
@@ -80,7 +80,7 @@ uint32_t arcompact_device::handleop32_BL_cc_d_s21(uint32_t op)
 
 	// Branch and Link Conditionally
 	arcompact_log("unimplemented BLcc %08x", op);
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 
@@ -112,7 +112,7 @@ uint32_t arcompact_device::handleop32_BL_d_s25(uint32_t op)
 	}
 
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 
@@ -139,7 +139,7 @@ uint32_t arcompact_device::arcompact_01_01_00_helper(uint32_t op, const char* op
 	}
 
 	arcompact_log("unimplemented %s %08x (reg-reg)", optext, op);
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 
@@ -182,7 +182,7 @@ uint32_t arcompact_device::handleop32_BREQ_reg_reg(uint32_t op)  // register - r
 		BR_TAKEJUMP
 	}
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_BRNE_reg_reg(uint32_t op) // register - register BRNE
@@ -195,7 +195,7 @@ uint32_t arcompact_device::handleop32_BRNE_reg_reg(uint32_t op) // register - re
 		BR_TAKEJUMP
 	}
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_BRLT_reg_reg(uint32_t op) // regiter - register BRLT
@@ -208,7 +208,7 @@ uint32_t arcompact_device::handleop32_BRLT_reg_reg(uint32_t op) // regiter - reg
 		BR_TAKEJUMP
 	}
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 
 }
 uint32_t arcompact_device::handleop32_BRGE_reg_reg(uint32_t op) // register - register BRGE
@@ -221,7 +221,7 @@ uint32_t arcompact_device::handleop32_BRGE_reg_reg(uint32_t op) // register - re
 		BR_TAKEJUMP
 	}
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_BRLO_reg_reg(uint32_t op) // register - register BRLO
@@ -234,7 +234,7 @@ uint32_t arcompact_device::handleop32_BRLO_reg_reg(uint32_t op) // register - re
 		BR_TAKEJUMP
 	}
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 
@@ -248,7 +248,7 @@ uint32_t arcompact_device::handleop32_BRHS_reg_reg(uint32_t op) // register - re
 		BR_TAKEJUMP
 	}
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 
@@ -259,7 +259,7 @@ uint32_t arcompact_device::arcompact_01_01_01_helper(uint32_t op, const char* op
 {
 	int size = 4;
 	arcompact_log("unimplemented %s %08x (reg-imm)", optext, op);
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 
@@ -287,7 +287,7 @@ uint32_t arcompact_device::handleop32_BREQ_reg_imm(uint32_t op) // BREQ reg-imm
 		BR_TAKEJUMP
 	}
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_BRNE_reg_imm(uint32_t op) // BRNE reg-imm
@@ -300,7 +300,7 @@ uint32_t arcompact_device::handleop32_BRNE_reg_imm(uint32_t op) // BRNE reg-imm
 		BR_TAKEJUMP
 	}
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 
@@ -315,7 +315,7 @@ uint32_t arcompact_device::handleop32_BRLT_reg_imm(uint32_t op) // BRLT reg-imm
 		BR_TAKEJUMP
 	}
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 
 }
 uint32_t arcompact_device::handleop32_BRGE_reg_imm(uint32_t op)
@@ -328,7 +328,7 @@ uint32_t arcompact_device::handleop32_BRGE_reg_imm(uint32_t op)
 		BR_TAKEJUMP
 	}
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_BRLO_reg_imm(uint32_t op) //  register - immediate BRLO
@@ -341,7 +341,7 @@ uint32_t arcompact_device::handleop32_BRLO_reg_imm(uint32_t op) //  register - i
 		BR_TAKEJUMP
 	}
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 
 }
 
@@ -355,7 +355,7 @@ uint32_t arcompact_device::handleop32_BRHS_reg_imm(uint32_t op) // register - im
 		BR_TAKEJUMP
 	}
 
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_BBIT0_reg_imm(uint32_t op)  { return arcompact_01_01_01_helper(op, "BBIT0"); }

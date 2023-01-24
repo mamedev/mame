@@ -38,7 +38,7 @@ uint32_t arcompact_device::arcompact_handle05_2f_0x_helper(uint32_t op, const ch
 	}
 
 	arcompact_log("unimplemented %s %08x", optext, op);
-	return m_pc + (size>>0);
+	return m_pc + size;
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

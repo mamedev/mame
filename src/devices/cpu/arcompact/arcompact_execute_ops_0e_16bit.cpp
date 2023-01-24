@@ -24,7 +24,7 @@ uint32_t arcompact_device::arcompact_handle0e_0x_helper(uint16_t op, const char*
 
 	arcompact_log("unimplemented %s %04x (0x0e_0x group)", optext, op);
 
-	return m_pc+ (size>>0);
+	return m_pc+ size;
 
 }
 
@@ -51,7 +51,7 @@ uint32_t arcompact_device::handleop_ADD_S_b_b_h_or_limm(uint16_t op) // ADD_s b,
 
 	m_regs[breg] = m_regs[breg] + m_regs[h];
 
-	return m_pc+ (size>>0);
+	return m_pc+ size;
 }
 
 // #######################################################################################################################
@@ -87,7 +87,7 @@ uint32_t arcompact_device::handleop_MOV_S_b_h_or_limm(uint16_t op) // MOV_S b <-
 		m_regs[breg] = m_regs[h];
 	}
 
-	return m_pc+ (size>>0);
+	return m_pc+ size;
 }
 
 // #######################################################################################################################
@@ -121,5 +121,5 @@ uint32_t arcompact_device::handleop_MOV_S_hob(uint16_t op) // MOV_S h <- b
 
 	m_regs[h] = m_regs[breg];
 
-	return m_pc+ (size>>0);
+	return m_pc+ size;
 }

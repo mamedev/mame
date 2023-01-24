@@ -320,60 +320,68 @@ private:
 	// arcompact_execute_ops_04.cpp
 
 	uint32_t handleop32_ADD_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
-	uint32_t handleop32_ADD(uint32_t op);
 	uint32_t handleop32_ADD_f_a_b_c(uint32_t op);
 	uint32_t handleop32_ADD_f_a_b_u6(uint32_t op);
 	uint32_t handleop32_ADD_f_b_b_s12(uint32_t op);
 	uint32_t handleop32_ADD_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_ADD_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_ADD(uint32_t op);
+
+	uint32_t handleop32_ADC_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
+	uint32_t handleop32_ADC_f_a_b_c(uint32_t op);
+	uint32_t handleop32_ADC_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_ADC_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_ADC_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_ADC_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_ADC(uint32_t op);
 
 	uint32_t handleop32_SUB_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
-	uint32_t handleop32_SUB(uint32_t op);
 	uint32_t handleop32_SUB_f_a_b_c(uint32_t op);
 	uint32_t handleop32_SUB_f_a_b_u6(uint32_t op);
 	uint32_t handleop32_SUB_f_b_b_s12(uint32_t op);
 	uint32_t handleop32_SUB_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_SUB_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_SUB(uint32_t op);
 
 	uint32_t handleop32_AND_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
-	uint32_t handleop32_AND(uint32_t op);
 	uint32_t handleop32_AND_f_a_b_c(uint32_t op);
 	uint32_t handleop32_AND_f_a_b_u6(uint32_t op);
 	uint32_t handleop32_AND_f_b_b_s12(uint32_t op);
 	uint32_t handleop32_AND_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_AND_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_AND(uint32_t op);
 
 	uint32_t handleop32_OR_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
-	uint32_t handleop32_OR(uint32_t op);
 	uint32_t handleop32_OR_f_a_b_c(uint32_t op);
 	uint32_t handleop32_OR_f_a_b_u6(uint32_t op);
 	uint32_t handleop32_OR_f_b_b_s12(uint32_t op);
 	uint32_t handleop32_OR_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_OR_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_OR(uint32_t op);
 
 	uint32_t handleop32_BIC_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
-	uint32_t handleop32_BIC(uint32_t op);
 	uint32_t handleop32_BIC_f_a_b_c(uint32_t op);
 	uint32_t handleop32_BIC_f_a_b_u6(uint32_t op);
 	uint32_t handleop32_BIC_f_b_b_s12(uint32_t op);
 	uint32_t handleop32_BIC_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_BIC_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_BIC(uint32_t op);
 
 	uint32_t handleop32_XOR_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
-	uint32_t handleop32_XOR(uint32_t op);
 	uint32_t handleop32_XOR_f_a_b_c(uint32_t op);
 	uint32_t handleop32_XOR_f_a_b_u6(uint32_t op);
 	uint32_t handleop32_XOR_f_b_b_s12(uint32_t op);
 	uint32_t handleop32_XOR_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_XOR_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_XOR(uint32_t op);
 
 	void handleop32_MOV_do_op(uint32_t breg, uint32_t src2, uint8_t set_flags);
-	uint32_t handleop32_MOV(uint32_t op);
 	uint32_t handleop32_MOV_f_a_b_c(uint32_t op);
 	uint32_t handleop32_MOV_f_a_b_u6(uint32_t op);
 	uint32_t handleop32_MOV_f_b_b_s12(uint32_t op);
 	uint32_t handleop32_MOV_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_MOV_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_MOV(uint32_t op);
 
 	uint32_t handleop32_RSUB_cc(uint32_t op);
 	uint32_t handleop32_RSUB(uint32_t op);
@@ -478,14 +486,6 @@ private:
 	uint32_t handleop32_SR_f_b_b_s12(uint32_t op);
 	uint32_t handleop32_SR_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_SR_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_ADC_f_a_b_c(uint32_t op);
-	uint32_t handleop32_ADC_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_ADC_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_ADC_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_ADC_cc_f_b_b_u6(uint32_t op);
-	uint32_t handleop32_ADC_cc(uint32_t op);
-	uint32_t handleop32_ADC(uint32_t op);
 
 	uint32_t handleop32_SBC_f_a_b_c(uint32_t op);
 	uint32_t handleop32_SBC_f_a_b_u6(uint32_t op);
@@ -873,8 +873,6 @@ private:
 	uint32_t arcompact_handle_l7_0x_helper(uint16_t op, const char* optext);
 	uint32_t arcompact_handle18_0x_helper(uint16_t op, const char* optext, int st);
 	uint32_t arcompact_handle19_0x_helper(uint16_t op, const char* optext, int shift, int format);
-	uint32_t arcompact_handle1e_0x_helper(uint16_t op, const char* optext);
-	uint32_t arcompact_handle1e_03_0x_helper(uint16_t op, const char* optext);
 
 
 	uint32_t handle_jump_to_addr(int delay, int link, uint32_t address, uint32_t next_addr);
