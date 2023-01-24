@@ -54,7 +54,6 @@ private:
 		return (opcodes.r16(pc + 2) << 16) | opcodes.r16(pc + 4);
 	}
 
-
 	uint8_t dasm_group_0e_get_h(uint16_t &op)
 	{
 		uint8_t h = ((op & 0x0007) << 3);

@@ -317,6 +317,7 @@ private:
 
 	// arcompact_execute_ops_04.cpp
 
+	uint32_t handleop32_ADD_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_ADD_cc(uint32_t op);
 	uint32_t handleop32_ADD(uint32_t op);
 	uint32_t handleop32_ADD_f_a_b_c(uint32_t op);
@@ -664,8 +665,7 @@ private:
 	uint32_t handleop32_RTIE(uint32_t op);
 	uint32_t handleop32_BRK(uint32_t op);
 
-
-
+	// arcompact_execute_ops_04_3x.cpp
 
 	uint32_t handleop32_LD_0(uint32_t op);
 	uint32_t handleop32_LD_1(uint32_t op);
@@ -676,6 +676,23 @@ private:
 	uint32_t handleop32_LD_6(uint32_t op);
 	uint32_t handleop32_LD_7(uint32_t op);
 
+	// arcompact_execute_ops_05.cpp
+	uint32_t handleop32_ASL_multiple_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
+	uint32_t handleop32_ASL_multiple_cc(uint32_t op);
+	uint32_t handleop32_ASL_multiple(uint32_t op);
+	uint32_t handleop32_ASL_multiple_f_a_b_c(uint32_t op);
+	uint32_t handleop32_ASL_multiple_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_ASL_multiple_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_ASL_multiple_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_ASL_multiple_cc_f_b_b_u6(uint32_t op);
+
+	uint32_t handleop32_LSR_multiple_cc(uint32_t op);
+	uint32_t handleop32_LSR_multiple(uint32_t op);
+	uint32_t handleop32_LSR_multiple_f_a_b_c(uint32_t op);
+	uint32_t handleop32_LSR_multiple_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_LSR_multiple_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_LSR_multiple_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_LSR_multiple_cc_f_b_b_u6(uint32_t op);
 
 
 	uint32_t handleop32_ASR_multiple(uint32_t op);
@@ -833,21 +850,7 @@ private:
 
 
 
-	uint32_t handleop32_ASL_multiple_cc(uint32_t op);
-	uint32_t handleop32_ASL_multiple(uint32_t op);
-	uint32_t handleop32_ASL_multiple_f_a_b_c(uint32_t op);
-	uint32_t handleop32_ASL_multiple_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_ASL_multiple_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_ASL_multiple_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_ASL_multiple_cc_f_b_b_u6(uint32_t op);
 
-	uint32_t handleop32_LSR_multiple_cc(uint32_t op);
-	uint32_t handleop32_LSR_multiple(uint32_t op);
-	uint32_t handleop32_LSR_multiple_f_a_b_c(uint32_t op);
-	uint32_t handleop32_LSR_multiple_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_LSR_multiple_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_LSR_multiple_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_LSR_multiple_cc_f_b_b_u6(uint32_t op);
 
 	uint32_t arcompact_01_01_00_helper(uint32_t op, const char* optext);
 	uint32_t arcompact_01_01_01_helper(uint32_t op, const char* optext);
