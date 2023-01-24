@@ -203,6 +203,16 @@ private:
 		return (op & 0x00000fc0) >> 6;
 	}
 
+	int check_h_limm(uint8_t hreg)
+	{
+		if (hreg == LIMM_REG)
+		{
+			get_limm_16bit_opcode();
+			return 6;
+		}
+		return 2;
+	}
+
 	int check_c_limm(uint8_t creg)
 	{
 		if (creg == LIMM_REG)

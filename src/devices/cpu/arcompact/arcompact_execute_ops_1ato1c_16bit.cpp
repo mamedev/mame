@@ -25,14 +25,9 @@ uint32_t arcompact_device::handleop_LD_S_b_pcl_u10(uint16_t op)
 
 uint32_t arcompact_device::handleop_MOV_S_b_u8(uint16_t op) // MOV_S b, u8
 {
-	int breg;
-	uint32_t u;
-	breg = common16_get_breg(op);
-	u = common16_get_u8(op);
-	breg = expand_reg(breg);
-
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint32_t u = common16_get_u8(op);
 	m_regs[breg] = u;
-
 	return m_pc + 2;
 }
 
@@ -43,14 +38,9 @@ uint32_t arcompact_device::handleop_MOV_S_b_u8(uint16_t op) // MOV_S b, u8
 
 uint32_t arcompact_device::handleop_ADD_S_b_b_u7(uint16_t op) // ADD_S b, b, u7
 {
-	int breg;
-	uint32_t u;
-	breg = common16_get_breg(op);
-	u = common16_get_u7(op);
-	breg = expand_reg(breg);
-
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint32_t u = common16_get_u7(op);
 	m_regs[breg] = m_regs[breg] + u;
-
 	return m_pc + 2;
 }
 
@@ -61,60 +51,10 @@ uint32_t arcompact_device::handleop_ADD_S_b_b_u7(uint16_t op) // ADD_S b, b, u7
 
 uint32_t arcompact_device::handleop_CMP_S_b_u7(uint16_t op) // CMP b, u7
 {
-	int breg;
-	uint32_t u;
-	breg = common16_get_breg(op);
-	u = common16_get_u7(op);
-	breg = expand_reg(breg);
-
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint32_t u = common16_get_u7(op);
 	// flag setting ALWAYS occurs on CMP operations, even 16-bit ones even without a .F opcode type
-
-	// TODO: verify this flag setting logic
-
-	// unsigned checks
-	if (m_regs[breg] == u)
-	{
-		status32_set_z();
-	}
-	else
-	{
-		status32_clear_z();
-	}
-
-	if (m_regs[breg] < u)
-	{
-		status32_set_c();
-	}
-	else
-	{
-		status32_clear_c();
-	}
-	// signed checks
-	int32_t temp = (int32_t)m_regs[breg] - (int32_t)u;
-
-	if (temp < 0)
-	{
-		status32_set_n();
-	}
-	else
-	{
-		status32_clear_n();
-	}
-
-	// if signs of source values don't match, and sign of result doesn't match the first source value, then we've overflowed?
-	if ((m_regs[breg] & 0x80000000) != (u & 0x80000000))
-	{
-		if ((m_regs[breg] & 0x80000000) != (temp & 0x80000000))
-		{
-			status32_set_v();
-		}
-		else
-		{
-			status32_clear_v();
-		}
-	}
-
-	// only sets flags, no result written
-
+	uint32_t result = m_regs[breg] - u;
+	do_flags_sub(result, m_regs[breg], u);
 	return m_pc + 2;
 }

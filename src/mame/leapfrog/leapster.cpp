@@ -286,11 +286,11 @@ void leapster_state::leapster_map(address_map &map)
 	map(0x01802078, 0x0180207b).r(FUNC(leapster_state::leapster_random_r));
 	map(0x01809004, 0x01809007).r(FUNC(leapster_state::leapster_ff_r));
 	map(0x0180d800, 0x0180d803).r(FUNC(leapster_state::leapster_random_r));
-
 	
 	map(0x03000000, 0x030007ff).ram(); // puts stack here, writes a pointer @ 0x03000000 on startup
 	map(0x3c000000, 0x3c1fffff).ram(); // really ram, or has our code execution gone wrong?
-//  map(0x80000000, 0x807fffff).bankr("cartrom"); // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here - installed if a cart is present
+	// map(0x3c200000, 0x3fffffff).ram();
+	// map(0x80000000, 0x807fffff).bankr("cartrom"); // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here - installed if a cart is present
 }
 
 void leapster_state::leapster_aux(address_map &map)

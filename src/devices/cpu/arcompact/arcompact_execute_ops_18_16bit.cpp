@@ -52,18 +52,10 @@ uint32_t arcompact_device::handleop_LDB_S_b_sp_u7(uint16_t op)
 
 uint32_t arcompact_device::handleop_ST_S_b_sp_u7(uint16_t op)  // ST_S b, [SP, u7]
 {
-	int breg;
-	uint32_t u;
-
-	breg = common16_get_breg(op);
-	u = common16_get_u5(op);
-
-	breg = expand_reg(breg);
-
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint32_t u = common16_get_u5(op);
 	uint32_t address = m_regs[REG_SP] + (u << 2);
-
 	WRITE32(address, m_regs[breg]);
-
 	return m_pc + 2;
 }
 
@@ -74,7 +66,11 @@ uint32_t arcompact_device::handleop_ST_S_b_sp_u7(uint16_t op)  // ST_S b, [SP, u
 
 uint32_t arcompact_device::handleop_STB_S_b_sp_u7(uint16_t op)
 {
-	return arcompact_handle18_0x_helper(op, "STB_S (SP)", 1);
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint32_t u = common16_get_u5(op);
+	uint32_t address = m_regs[REG_SP] + (u << 2); // still dword aligned u7 despite being a byte write
+	WRITE8(address, m_regs[breg] & 0xff); // only write a byte, despite register being 32-bit?
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
