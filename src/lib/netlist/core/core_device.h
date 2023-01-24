@@ -13,8 +13,7 @@
 
 #include "../plib/pstring.h"
 
-namespace netlist
-{
+namespace netlist {
 	// -------------------------------------------------------------------------
 	// core_device_t construction parameters
 	// -------------------------------------------------------------------------
@@ -40,12 +39,12 @@ namespace netlist
 
 	private:
 		core_device_data_t(netlist_state_t &o, const pstring &n)
-		: owner(o)
-		, name(n)
+			: owner(o)
+			, name(n)
 		{
 		}
 		netlist_state_t &owner;
-		const pstring &  name;
+		const pstring   &name;
 	};
 
 	// The type use to pass data on
@@ -104,7 +103,7 @@ namespace netlist
 
 	public:
 		virtual void time_step([[maybe_unused]] detail::time_step_type ts_type,
-			[[maybe_unused]] nl_fptype                         st) noexcept
+			[[maybe_unused]] nl_fptype st) noexcept
 		{
 		}
 		virtual void update_terminals() noexcept {}
@@ -185,12 +184,12 @@ namespace netlist
 		}
 
 		void register_sub_alias(const pstring &name,
-			const detail::core_terminal_t &    term);
+			const detail::core_terminal_t     &term);
 		void register_sub_alias(const pstring &name, const pstring &aliased);
 
 		void connect(const pstring &t1, const pstring &t2);
 		void connect(const detail::core_terminal_t &t1,
-			const detail::core_terminal_t &         t2);
+			const detail::core_terminal_t          &t2);
 
 	protected:
 		// NETLIB_UPDATE_TERMINALSI() { }

@@ -21,8 +21,8 @@
 
 #include <memory>
 
-namespace netlist
-{
+namespace netlist {
+
 	/// @brief Base class for all device parameters
 	///
 	/// All device parameters classes derive from this object.
@@ -197,13 +197,13 @@ namespace netlist
 				typename DUMMY = std::enable_if_t<
 					plib::is_arithmetic<Y>::value>>
 			value_base_t(P &param, const pstring &name)
-			: m_value(gsl::narrow<T>(param.value(name)))
+				: m_value(gsl::narrow<T>(param.value(name)))
 			{
 			}
 			template <typename P, typename Y = T,
 				std::enable_if_t<!plib::is_arithmetic<Y>::value, int> = 0>
 			value_base_t(P &param, const pstring &name)
-			: m_value(static_cast<T>(param.value_str(name)))
+				: m_value(static_cast<T>(param.value_str(name)))
 			{
 			}
 			T operator()() const noexcept { return m_value; }
@@ -218,7 +218,7 @@ namespace netlist
 
 		param_model_t(core_device_t &device, const pstring &name,
 			const pstring &val)
-		: param_str_t(device, name, val)
+			: param_str_t(device, name, val)
 		{
 		}
 
@@ -242,7 +242,7 @@ namespace netlist
 	{
 	public:
 		param_data_t(core_device_t &device, const pstring &name)
-		: param_str_t(device, name, "")
+			: param_str_t(device, name, "")
 		{
 		}
 
@@ -277,8 +277,8 @@ namespace netlist
 	template <typename T>
 	param_num_t<T>::param_num_t(core_device_t &device, const pstring &name,
 		const T val)
-	: param_t(device, name)
-	, m_param(val)
+		: param_t(device, name)
+		, m_param(val)
 	{
 		bool    found = false;
 		pstring p = this->get_initial(&device, &found);
@@ -300,8 +300,8 @@ namespace netlist
 	template <typename T>
 	param_enum_t<T>::param_enum_t(core_device_t &device, const pstring &name,
 		const T val)
-	: param_t(device, name)
-	, m_param(val)
+		: param_t(device, name)
+		, m_param(val)
 	{
 		bool    found = false;
 		pstring p = this->get_initial(&device, &found);
@@ -323,8 +323,8 @@ namespace netlist
 
 	template <typename ST, std::size_t AW, std::size_t DW>
 	param_rom_t<ST, AW, DW>::param_rom_t(core_device_t &device,
-		const pstring &                                 name)
-	: param_data_t(device, name)
+		const pstring                                  &name)
+		: param_data_t(device, name)
 	{
 		auto f = this->stream();
 		if (!f.empty())

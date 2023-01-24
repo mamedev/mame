@@ -16,8 +16,8 @@
 
 #include <unordered_map>
 
-namespace netlist
-{
+namespace netlist {
+
 	class parser_t : public plib::token_reader_t
 	{
 	public:
@@ -30,7 +30,8 @@ namespace netlist
 
 		bool parse(plib::istream_uptr &&strm, const pstring &nlname);
 		bool parse(const token_store_t &store, const pstring &nlname);
-		void parse_tokens(plib::istream_uptr &&strm, token_store_t &tokstore);
+		void
+		parse_tokens(plib::istream_uptr &&strm, token_store_t &token_store);
 
 	protected:
 		void parse_netlist();
@@ -88,19 +89,19 @@ namespace netlist
 		token_id_t m_tok_TT_FAMILY;
 
 		plib::tokenizer_t m_tokenizer;
-		nlparse_t &       m_setup;
+		nlparse_t        &m_setup;
 
 		std::unordered_map<pstring, token_store_t> m_local;
-		token_store_t *                            m_cur_local;
+		token_store_t                             *m_cur_local;
 	};
 
 	class source_token_t : public source_netlist_t
 	{
 	public:
-		source_token_t(const pstring &     name,
+		source_token_t(const pstring      &name,
 			const parser_t::token_store_t &store)
-		: m_store(store)
-		, m_name(name)
+			: m_store(store)
+			, m_name(name)
 		{
 		}
 

@@ -12,8 +12,7 @@
 #include "logic_family.h"
 #include "param.h"
 
-namespace netlist
-{
+namespace netlist {
 
 	// -------------------------------------------------------------------------
 	// device_t construction parameters
@@ -27,7 +26,9 @@ namespace netlist
 	// device_t
 	// -------------------------------------------------------------------------
 
-	class device_t : public base_device_t, public logic_family_t
+	class device_t
+		: public base_device_t
+		, public logic_family_t
 	{
 	public:
 		using constructor_data_t = device_data_t;
@@ -48,9 +49,9 @@ namespace netlist
 
 	protected:
 		template <typename T1, typename T2>
-		void push_two(T1 &term1, netlist_sig_t newQ1,
-			const netlist_time &delay1, T2 &term2, netlist_sig_t newQ2,
-			const netlist_time &delay2) noexcept
+		void
+		push_two(T1 &term1, netlist_sig_t newQ1, const netlist_time &delay1,
+			T2 &term2, netlist_sig_t newQ2, const netlist_time &delay2) noexcept
 		{
 			if (delay2 < delay1)
 			{
@@ -81,15 +82,14 @@ namespace netlist
 
 		template <typename... Args>
 		sub_device_wrapper(base_device_t &owner, const pstring &name,
-						   Args &&...args)
+			Args &&...args)
 		{
 			// m_dev = owner.state().make_pool_object<DEVICE>(owner, name,
 			// std::forward<Args>(args)...);
 			m_dev = owner.state().make_pool_object<DEVICE>(
 				constructor_data_t{owner.state(), owner.name() + "." + name},
 				std::forward<Args>(args)...);
-			owner.state().register_device(
-				m_dev->name(),
+			owner.state().register_device(m_dev->name(),
 				device_arena::owned_ptr<core_device_t>(m_dev.get(), false));
 		}
 		template <typename... Args>
@@ -100,11 +100,10 @@ namespace netlist
 			m_dev = owner.state().make_pool_object<DEVICE>(
 				constructor_data_t{owner.state(), owner.name() + "." + name},
 				std::forward<Args>(args)...);
-			owner.state().register_device(
-				m_dev->name(),
+			owner.state().register_device(m_dev->name(),
 				device_arena::owned_ptr<core_device_t>(m_dev.get(), false));
 		}
-		DEVICE &      operator()() { return *m_dev; }
+		DEVICE       &operator()() { return *m_dev; }
 		const DEVICE &operator()() const { return *m_dev; }
 
 	private:

@@ -22,9 +22,7 @@
 #include <unordered_map>
 #include <vector>
 
-
-namespace netlist
-{
+namespace netlist {
 
 	// ----------------------------------------------------------------------------------------
 	// Collection of models
@@ -39,7 +37,10 @@ namespace netlist
 		{
 		public:
 			model_t(const pstring &model, const map_t &map)
-			: m_model(model), m_map(map) { }
+				: m_model(model)
+				, m_map(map)
+			{
+			}
 
 			pstring value_str(const pstring &entity) const;
 
@@ -51,12 +52,13 @@ namespace netlist
 			static pstring model_string(const map_t &map);
 
 			const pstring m_model; // only for error messages
-			const map_t &m_map;
+			const map_t  &m_map;
 		};
 
 		models_t(const raw_map_t &models)
-		: m_models(models)
-		{}
+			: m_models(models)
+		{
+		}
 
 		model_t get_model(const pstring &model);
 
@@ -69,35 +71,37 @@ namespace netlist
 		}
 
 	private:
-
 		void model_parse(const pstring &model, map_t &map);
 
-		const raw_map_t &m_models;
+		const raw_map_t                   &m_models;
 		std::unordered_map<pstring, map_t> m_cache;
 	};
 
-	namespace detail
-	{
+	namespace detail {
+
 		struct alias_t
 		{
-			alias_t(alias_type type, pstring alias, pstring references)
-			: m_type(type)
-			, m_alias(alias)
-			, m_references(references)
-			{}
+			alias_t(alias_type type, const pstring &alias,
+				const pstring &references)
+				: m_type(type)
+				, m_alias(alias)
+				, m_references(references)
+			{
+			}
 
 			alias_t(const alias_t &) = default;
 			alias_t &operator=(const alias_t &) = default;
 			alias_t(alias_t &&) noexcept = default;
 			alias_t &operator=(alias_t &&) noexcept = default;
 
-			pstring name() const { return m_alias; }
-			pstring references() const { return m_references; }
+			pstring    name() const { return m_alias; }
+			pstring    references() const { return m_references; }
 			alias_type type() const { return m_type; }
+
 		private:
 			alias_type m_type;
-			pstring m_alias;
-			pstring m_references;
+			pstring    m_alias;
+			pstring    m_references;
 		};
 
 		///
@@ -109,18 +113,22 @@ namespace netlist
 		{
 			using connection_t = std::pair<pstring, pstring>;
 
-			abstract_t(log_type &log) : m_factory(log) { }
-			std::unordered_map<pstring, alias_t>        m_aliases;
-			std::vector<connection_t>                   m_connections;
-			std::unordered_map<pstring, pstring>        m_param_values;
-			models_t::raw_map_t                         m_models;
+			abstract_t(log_type &log)
+				: m_factory(log)
+			{
+			}
+			std::unordered_map<pstring, alias_t> m_aliases;
+			std::vector<connection_t>            m_connections;
+			std::unordered_map<pstring, pstring> m_param_values;
+			models_t::raw_map_t                  m_models;
 
 			// need to preserve order of device creation ...
-			std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
+			std::vector<std::pair<pstring, factory::element_t *>>
+				m_device_factory;
 			// lifetime control only - can be cleared before run
-			std::vector<std::pair<pstring, pstring>>    m_default_params;
-			std::unordered_map<pstring, bool>           m_hints;
-			factory::list_t                             m_factory;
+			std::vector<std::pair<pstring, pstring>> m_default_params;
+			std::unordered_map<pstring, bool>        m_hints;
+			factory::list_t                          m_factory;
 		};
 	} // namespace detail
 
@@ -130,22 +138,31 @@ namespace netlist
 
 	struct param_ref_t
 	{
-		param_ref_t() noexcept : m_device(nullptr), m_param(nullptr) {}
+		param_ref_t() noexcept
+			: m_device(nullptr)
+			, m_param(nullptr)
+		{
+		}
 		param_ref_t(core_device_t &device, param_t &param) noexcept
-		: m_device(&device)
-		, m_param(&param)
-		{ }
+			: m_device(&device)
+			, m_param(&param)
+		{
+		}
 
 		~param_ref_t() = default;
 		PCOPYASSIGNMOVE(param_ref_t, default)
 
 		const core_device_t &device() const noexcept { return *m_device; }
-		param_t &param() const noexcept { return *m_param; }
+		param_t             &param() const noexcept { return *m_param; }
 
-		bool is_valid() const noexcept { return (m_device != nullptr) && (m_param != nullptr); }
+		bool is_valid() const noexcept
+		{
+			return (m_device != nullptr) && (m_param != nullptr);
+		}
+
 	private:
 		core_device_t *m_device;
-		param_t *m_param;
+		param_t       *m_param;
 	};
 
 	// ----------------------------------------------------------------------------------------
@@ -155,7 +172,6 @@ namespace netlist
 	class setup_t
 	{
 	public:
-
 		explicit setup_t(netlist_state_t &nlstate);
 		~setup_t() noexcept = default;
 
@@ -163,24 +179,30 @@ namespace netlist
 
 		// called from param_t creation
 		void register_param_t(param_t &param);
-		pstring get_initial_param_val(const pstring &name, const pstring &def) const;
+		pstring
+		get_initial_param_val(const pstring &name, const pstring &def) const;
 
 		void register_term(detail::core_terminal_t &term);
-		void register_term(terminal_t &term, terminal_t *other_term, const std::array<terminal_t *, 2> &splitter_terms);
+		void register_term(terminal_t &term, terminal_t *other_term,
+			const std::array<terminal_t *, 2> &splitter_terms);
 
 		// called from matrix_solver_t::get_connected_net
 		// returns the terminal being part of a two terminal device.
-		terminal_t *get_connected_terminal(const terminal_t &term) const noexcept
+		terminal_t *
+		get_connected_terminal(const terminal_t &term) const noexcept
 		{
 			auto ret(m_connected_terminals.find(&term));
-			return (ret != m_connected_terminals.end()) ? ret->second[0] : nullptr;
+			return (ret != m_connected_terminals.end()) ? ret->second[0]
+														: nullptr;
 		}
 
 		// called from net_splitter
-		const std::array<terminal_t *, 4> *get_connected_terminals(const terminal_t &term) const noexcept
+		const std::array<terminal_t *, 4> *
+		get_connected_terminals(const terminal_t &term) const noexcept
 		{
 			auto ret(m_connected_terminals.find(&term));
-			return (ret != m_connected_terminals.end()) ? &ret->second : nullptr;
+			return (ret != m_connected_terminals.end()) ? &ret->second
+														: nullptr;
 		}
 
 		// get family -> truth table
@@ -188,75 +210,85 @@ namespace netlist
 
 		param_ref_t find_param(const pstring &param_in) const;
 		// needed by nltool
-		std::vector<pstring> get_terminals_for_device_name(const pstring &devname) const;
+		std::vector<pstring>
+		get_terminals_for_device_name(const pstring &devname) const;
 
 		// needed by proxy device to check power terminals
-		detail::core_terminal_t *find_terminal(const pstring &terminal_in, detail::terminal_type atype, bool required = true) const;
-		detail::core_terminal_t *find_terminal(const pstring &terminal_in, bool required = true) const;
+		detail::core_terminal_t *find_terminal(const pstring &terminal_in,
+			detail::terminal_type atype, bool required = true) const;
+		detail::core_terminal_t *
+		find_terminal(const pstring &terminal_in, bool required = true) const;
 		pstring de_alias(const pstring &alias) const;
 
 		// run preparation
 
 		void prepare_to_run();
 
-		models_t &models() noexcept { return m_models; }
+		models_t       &models() noexcept { return m_models; }
 		const models_t &models() const noexcept { return m_models; }
 
-		netlist_state_t &nlstate() noexcept { return m_nlstate; }
+		netlist_state_t       &nlstate() noexcept { return m_nlstate; }
 		const netlist_state_t &nlstate() const noexcept { return m_nlstate; }
 
-		nlparse_t &parser() noexcept { return m_parser; }
+		nlparse_t       &parser() noexcept { return m_parser; }
 		const nlparse_t &parser() const noexcept { return m_parser; }
 
-		log_type &log() noexcept;
+		log_type       &log() noexcept;
 		const log_type &log() const noexcept;
 
 	private:
-
-		void resolve_inputs();
+		void    resolve_inputs();
 		pstring resolve_alias(const pstring &name) const;
 
 		void merge_nets(detail::net_t &this_net, detail::net_t &other_net);
 
-		void connect_terminals(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
-		void connect_input_output(detail::core_terminal_t &input, detail::core_terminal_t &output);
-		void connect_terminal_output(detail::core_terminal_t &terminal, detail::core_terminal_t &output);
-		void connect_terminal_input(detail::core_terminal_t &terminal, detail::core_terminal_t &input);
-		bool connect_input_input(detail::core_terminal_t &input1, detail::core_terminal_t &input2);
+		void connect_terminals(detail::core_terminal_t &t1,
+			detail::core_terminal_t                    &t2);
+		void connect_input_output(detail::core_terminal_t &input,
+			detail::core_terminal_t                       &output);
+		void connect_terminal_output(detail::core_terminal_t &terminal,
+			detail::core_terminal_t                          &output);
+		void connect_terminal_input(detail::core_terminal_t &terminal,
+			detail::core_terminal_t                         &input);
+		bool connect_input_input(detail::core_terminal_t &input1,
+			detail::core_terminal_t                      &input2);
 
 		bool connect(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 
 		// helpers
 		static pstring termtype_as_str(detail::core_terminal_t &in);
 
-		devices::nld_base_proxy *get_d_a_proxy(const detail::core_terminal_t &out);
+		devices::nld_base_proxy *
+		get_d_a_proxy(const detail::core_terminal_t &out);
 		devices::nld_base_proxy *get_a_d_proxy(detail::core_terminal_t &inp);
 		detail::core_terminal_t &resolve_proxy(detail::core_terminal_t &term);
 
 		// net manipulations
 
-		//void remove_terminal(detail::net_t &net, detail::core_terminal_t &terminal) noexcept(false);
+		// void remove_terminal(detail::net_t &net, detail::core_terminal_t
+		// &terminal) noexcept(false);
 		void move_connections(detail::net_t &net, detail::net_t &dest_net);
 		void delete_empty_nets();
 
-		detail::abstract_t                          m_abstract;
-		nlparse_t                                   m_parser;
-		netlist_state_t                             &m_nlstate;
+		detail::abstract_t m_abstract;
+		nlparse_t          m_parser;
+		netlist_state_t   &m_nlstate;
 
-		models_t                                    m_models;
+		models_t m_models;
 
 		// FIXME: currently only used during setup
-		devices::nld_netlistparams *                           m_netlist_params;
+		devices::nld_netlistparams *m_netlist_params;
 
 		// FIXME: can be cleared before run
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
 		// FIXME: Limited to 3 additional terminals
-		std::unordered_map<const terminal_t *,
-			std::array<terminal_t *, 4>>                       m_connected_terminals;
-		std::unordered_map<pstring, param_ref_t>               m_params;
+		std::unordered_map<const terminal_t *, std::array<terminal_t *, 4>>
+												 m_connected_terminals;
+		std::unordered_map<pstring, param_ref_t> m_params;
 		std::unordered_map<const detail::core_terminal_t *,
-			devices::nld_base_proxy *>                         m_proxies;
-		std::vector<host_arena::unique_ptr<param_t>>           m_defparam_lifetime;
+			devices::nld_base_proxy *>
+													 m_proxies;
+		std::vector<host_arena::unique_ptr<param_t>> m_defparam_lifetime;
 
 		unsigned m_proxy_cnt;
 	};
@@ -268,7 +300,6 @@ namespace netlist
 	class source_netlist_t : public plib::psource_t
 	{
 	public:
-
 		source_netlist_t() = default;
 
 		PCOPYASSIGNMOVE(source_netlist_t, delete)
@@ -280,7 +311,6 @@ namespace netlist
 	class source_data_t : public plib::psource_t
 	{
 	public:
-
 		source_data_t() = default;
 
 		PCOPYASSIGNMOVE(source_data_t, delete)
@@ -290,9 +320,8 @@ namespace netlist
 	class source_string_t : public source_netlist_t
 	{
 	public:
-
 		explicit source_string_t(const pstring &source)
-		: m_str(source)
+			: m_str(source)
 		{
 		}
 
@@ -306,9 +335,8 @@ namespace netlist
 	class source_file_t : public source_netlist_t
 	{
 	public:
-
 		explicit source_file_t(const pstring &filename)
-		: m_filename(filename)
+			: m_filename(filename)
 		{
 		}
 
@@ -322,10 +350,9 @@ namespace netlist
 	class source_pattern_t : public source_netlist_t
 	{
 	public:
-
 		explicit source_pattern_t(const pstring &pat, bool force_lowercase)
-		: m_pattern(pat)
-		, m_force_lowercase(force_lowercase)
+			: m_pattern(pat)
+			, m_force_lowercase(force_lowercase)
 		{
 		}
 
@@ -334,14 +361,14 @@ namespace netlist
 
 	private:
 		pstring m_pattern;
-		bool m_force_lowercase;
+		bool    m_force_lowercase;
 	};
 
 	class source_mem_t : public source_netlist_t
 	{
 	public:
 		explicit source_mem_t(const char *mem)
-		: m_str(mem)
+			: m_str(mem)
 		{
 		}
 
@@ -356,8 +383,8 @@ namespace netlist
 	{
 	public:
 		source_proc_t(const pstring &name, nlsetup_func setup_func)
-		: m_setup_func(setup_func)
-		, m_setup_func_name(name)
+			: m_setup_func(setup_func)
+			, m_setup_func_name(name)
 		{
 		}
 
@@ -368,10 +395,9 @@ namespace netlist
 
 	private:
 		nlsetup_func m_setup_func;
-		pstring m_setup_func_name;
+		pstring      m_setup_func_name;
 	};
 
 } // namespace netlist
-
 
 #endif // NL_CORE_SETUP_H_

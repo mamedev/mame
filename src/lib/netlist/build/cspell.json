@@ -74,7 +74,6 @@
 	"pstring",
 	"passert",
 	"putf",
-	"tokstor",
 	"psplit",
 	"gmin",
 	"lastx",
@@ -88,7 +87,6 @@
 	"anetlist",
 	"netdev",
 	"solv",
-	"sexpr",
 	"pstonum",
 	"pmfp",
 	"pmatrix",
@@ -149,8 +147,9 @@
 			"/\/\/ NOLINT\\(.*/",              // Exclude clang-tidy instructions
 			"/\/\/\/ \\\\file.*/",             // Doxygen
 			"/\/\/\/ \\\\addtogroup.*/",       // Doxygen
-			"/`[^`]+`/",                       // Markup code formatt
+			"/`[^`]+`/",                       // Markup code format
 			"/} \/\/ namespace.*/",            // Namespace comments
+			"/[A-z0-9]*\\.(c|h|cpp|hpp)",	   // Filenames in comments
 			// Project specific exclusions start here
 			"/\/\/ copyright-holders.*/",
 			"/\/\/- Pinalias:/",

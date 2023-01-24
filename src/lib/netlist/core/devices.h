@@ -21,8 +21,7 @@
 // Namespace starts
 //============================================================
 
-namespace netlist::devices
-{
+namespace netlist::devices {
 	// -----------------------------------------------------------------------------
 	// main clock
 	// -----------------------------------------------------------------------------
@@ -66,30 +65,32 @@ namespace netlist::devices
 		using constructor_type = nld_power_pins;
 
 		explicit nld_power_pins(device_t &owner)
-		: m_VCC(owner, owner.logic_family()->vcc_pin(), NETLIB_DELEGATE(noop))
-		, m_GND(owner, owner.logic_family()->gnd_pin(), NETLIB_DELEGATE(noop))
+			: m_VCC(owner, owner.logic_family()->vcc_pin(),
+				NETLIB_DELEGATE(noop))
+			, m_GND(owner, owner.logic_family()->gnd_pin(),
+				  NETLIB_DELEGATE(noop))
 		{
 		}
 
 		explicit nld_power_pins(device_t &owner, nl_delegate delegate)
-		: m_VCC(owner, owner.logic_family()->vcc_pin(), delegate)
-		, m_GND(owner, owner.logic_family()->gnd_pin(), delegate)
+			: m_VCC(owner, owner.logic_family()->vcc_pin(), delegate)
+			, m_GND(owner, owner.logic_family()->gnd_pin(), delegate)
 		{
 		}
 
 		// Some devices like the 74LS629 have two pairs of supply pins.
 		explicit nld_power_pins(device_t &owner, const pstring &vcc,
 			const pstring &gnd)
-		: m_VCC(owner, vcc, NETLIB_DELEGATE(noop))
-		, m_GND(owner, gnd, NETLIB_DELEGATE(noop))
+			: m_VCC(owner, vcc, NETLIB_DELEGATE(noop))
+			, m_GND(owner, gnd, NETLIB_DELEGATE(noop))
 		{
 		}
 
 		// Some devices like the 74LS629 have two pairs of supply pins.
 		explicit nld_power_pins(device_t &owner, const pstring &vcc,
 			const pstring &gnd, nl_delegate delegate)
-		: m_VCC(owner, vcc, delegate)
-		, m_GND(owner, gnd, delegate)
+			: m_VCC(owner, vcc, delegate)
+			, m_GND(owner, gnd, delegate)
 		{
 		}
 
@@ -109,10 +110,10 @@ namespace netlist::devices
 	NETLIB_OBJECT(netlistparams)
 	{
 		NETLIB_CONSTRUCTOR(netlistparams)
-		, m_use_deactivate(*this, "USE_DEACTIVATE", false)
-		, m_startup_strategy(*this, "STARTUP_STRATEGY", 0)
-		, m_mos_cap_model(*this, "DEFAULT_MOS_CAPMODEL", 2)
-		, m_max_link_loops(*this, "MAX_LINK_RESOLVE_LOOPS", 100)
+		, m_use_deactivate(*this, "USE_DEACTIVATE", false),
+			m_startup_strategy(*this, "STARTUP_STRATEGY", 0),
+			m_mos_cap_model(*this, "DEFAULT_MOS_CAPMODEL", 2),
+			m_max_link_loops(*this, "MAX_LINK_RESOLVE_LOOPS", 100)
 		{
 		}
 		// NETLIB_RESETI() {}

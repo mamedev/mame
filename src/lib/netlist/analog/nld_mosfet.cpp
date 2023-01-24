@@ -32,8 +32,7 @@
 
 #define BODY_CONNECTED_TO_SOURCE (1)
 
-namespace netlist::analog
-{
+namespace netlist::analog {
 
 	using constants = plib::constants<nl_fptype>;
 
@@ -101,26 +100,26 @@ namespace netlist::analog
 	{
 	public:
 		fet_model_t(param_model_t &model)
-		: m_VTO(model, "VTO")
-		, m_N(model, "N")
-		, m_ISS(model, "IS") // Haven't seen a model using ISS / ISD
-		, m_ISD(model, "IS")
-		, m_LD(model, "LD")
-		, m_L(model, "L")
-		, m_W(model, "W")
-		, m_TOX(model, "TOX")
-		, m_KP(model, "KP")
-		, m_UO(model, "UO")
-		, m_PHI(model, "PHI")
-		, m_NSUB(model, "NSUB")
-		, m_GAMMA(model, "GAMMA")
-		, m_LAMBDA(model, "LAMBDA")
-		, m_RD(model, "RD")
-		, m_RS(model, "RS")
-		, m_CGSO(model, "CGSO")
-		, m_CGDO(model, "CGDO")
-		, m_CGBO(model, "CGBO")
-		, m_CAPMOD(model, "CAPMOD")
+			: m_VTO(model, "VTO")
+			, m_N(model, "N")
+			, m_ISS(model, "IS") // Haven't seen a model using ISS / ISD
+			, m_ISD(model, "IS")
+			, m_LD(model, "LD")
+			, m_L(model, "L")
+			, m_W(model, "W")
+			, m_TOX(model, "TOX")
+			, m_KP(model, "KP")
+			, m_UO(model, "UO")
+			, m_PHI(model, "PHI")
+			, m_NSUB(model, "NSUB")
+			, m_GAMMA(model, "GAMMA")
+			, m_LAMBDA(model, "LAMBDA")
+			, m_RD(model, "RD")
+			, m_RS(model, "RS")
+			, m_CGSO(model, "CGSO")
+			, m_CGDO(model, "CGDO")
+			, m_CGBO(model, "CGBO")
+			, m_CAPMOD(model, "CAPMOD")
 		{
 		}
 
@@ -158,33 +157,34 @@ namespace netlist::analog
 	{
 	public:
 		nld_MOSFET(constructor_param_t data)
-		: base_device_t(data)
-		, m_model(*this, "MODEL", "NMOS")
-		, m_DG(*this, "m_DG", NETLIB_DELEGATE(terminal_handler))
-		, m_SG(*this, "m_SG", NETLIB_DELEGATE(terminal_handler))
-		, m_SD(*this, "m_SD", NETLIB_DELEGATE(terminal_handler))
-		, m_D_BD(*this, "m_D_BD")
+			: base_device_t(data)
+			, m_model(*this, "MODEL", "NMOS")
+			, m_DG(*this, "m_DG", NETLIB_DELEGATE(terminal_handler))
+			, m_SG(*this, "m_SG", NETLIB_DELEGATE(terminal_handler))
+			, m_SD(*this, "m_SD", NETLIB_DELEGATE(terminal_handler))
+			, m_D_BD(*this, "m_D_BD")
 #if (!BODY_CONNECTED_TO_SOURCE)
-		, m_D_BS(*this, "m_D_BS")
+			, m_D_BS(*this, "m_D_BS")
 #endif
-		, m_cap_gb(*this, "m_cap_gb")
-		, m_cap_gs(*this, "m_cap_gs")
-		, m_cap_gd(*this, "m_cap_gd")
-		, m_phi(nlconst::zero())
-		, m_gamma(nlconst::zero())
-		, m_vto(nlconst::zero())
-		, m_beta(nlconst::zero())
-		, m_lambda(nlconst::zero())
-		, m_Leff(nlconst::zero())
-		, m_CoxWL(nlconst::zero())
-		// S, m_polarity(qtype() == FET_NMOS ? nlconst::one() : -nlconst::one())
-		, m_Cgb(nlconst::zero())
-		, m_Cgs(nlconst::zero())
-		, m_Cgd(nlconst::zero())
-		, m_capacitor_model(2)
-		, m_Vgs(*this, "m_Vgs", nlconst::zero())
-		, m_Vgd(*this, "m_Vgd", nlconst::zero())
-		, m_model_acc(m_model)
+			, m_cap_gb(*this, "m_cap_gb")
+			, m_cap_gs(*this, "m_cap_gs")
+			, m_cap_gd(*this, "m_cap_gd")
+			, m_phi(nlconst::zero())
+			, m_gamma(nlconst::zero())
+			, m_vto(nlconst::zero())
+			, m_beta(nlconst::zero())
+			, m_lambda(nlconst::zero())
+			, m_Leff(nlconst::zero())
+			, m_CoxWL(nlconst::zero())
+			// S, m_polarity(qtype() == FET_NMOS ? nlconst::one() :
+			// -nlconst::one())
+			, m_Cgb(nlconst::zero())
+			, m_Cgs(nlconst::zero())
+			, m_Cgd(nlconst::zero())
+			, m_capacitor_model(2)
+			, m_Vgs(*this, "m_Vgs", nlconst::zero())
+			, m_Vgd(*this, "m_Vgd", nlconst::zero())
+			, m_model_acc(m_model)
 		{
 			register_sub_alias("S", m_SG.P()); // Source
 			register_sub_alias("G", m_SG.N()); // Gate
@@ -201,7 +201,7 @@ namespace netlist::analog
 			m_capacitor_model = m_model_acc.m_CAPMOD;
 			//# printf("capmod %d %g %g\n", m_capacitor_model, (nl_fptype)m_model_acc.m_VTO, m_polarity);
 			nl_assert_always(m_capacitor_model == 0 || m_capacitor_model == 2,
-							 "Error: CAPMODEL invalid value");
+				"Error: CAPMODEL invalid value");
 
 			//
 			// From http://ltwiki.org/LTspiceHelp/LTspiceHelp/M_MOSFET.htm :
@@ -217,13 +217,12 @@ namespace netlist::analog
 
 			// calculate effective channel length
 			m_Leff = m_model_acc.m_L - 2 * m_model_acc.m_LD;
-			nl_assert_always(
-				m_Leff > nlconst::zero(),
+			nl_assert_always(m_Leff > nlconst::zero(),
 				"Effective Lateral diffusion would be negative for model");
 
 			nl_fptype Cox = (m_model_acc.m_TOX > nlconst::zero())
 								? (constants::eps_SiO2() * constants::eps_0()
-								   / m_model_acc.m_TOX)
+									/ m_model_acc.m_TOX)
 								: nlconst::zero();
 
 			// calculate DC transconductance coefficient
@@ -248,7 +247,7 @@ namespace netlist::analog
 			{
 				nl_assert_always(m_model_acc.m_NSUB * nlconst::magic(1e6)
 									 >= constants::NiSi(),
-								 "Error calculating phi for model");
+					"Error calculating phi for model");
 				m_phi = nlconst::two() * Vt
 						* plib::log(m_model_acc.m_NSUB * nlconst::magic(1e6)
 									/ constants::NiSi());
@@ -321,10 +320,10 @@ namespace netlist::analog
 			// Bulk diodes
 
 			m_D_BD.set_param(m_model_acc.m_ISD, m_model_acc.m_N, exec().gmin(),
-							 constants::T0());
+				constants::T0());
 #if (!BODY_CONNECTED_TO_SOURCE)
 			m_D_BS.set_param(m_model_acc.m_ISS, m_model_acc.m_N, exec().gmin(),
-							 constants::T0());
+				constants::T0());
 #endif
 		}
 
@@ -380,9 +379,8 @@ namespace netlist::analog
 		fet_model_t          m_model_acc;
 
 		void set_cap(generic_capacitor<capacitor_e::VARIABLE_CAPACITY> &cap,
-					 nl_fptype capval, nl_fptype V, nl_fptype &g11,
-					 nl_fptype &g12, nl_fptype &g21, nl_fptype &g22,
-					 nl_fptype &I1, nl_fptype &I2) const
+			nl_fptype capval, nl_fptype V, nl_fptype &g11, nl_fptype &g12,
+			nl_fptype &g21, nl_fptype &g22, nl_fptype &I1, nl_fptype &I2) const
 		{
 			const nl_fptype I = cap.Ieq(capval, V) * m_polarity;
 			const nl_fptype G = cap.G(capval);
@@ -395,9 +393,8 @@ namespace netlist::analog
 			// printf("Cap: %g\n", capval);
 		}
 
-		void
-		calculate_caps(nl_fptype Vgs, nl_fptype Vgd, nl_fptype Vth,
-					   nl_fptype &Cgs, nl_fptype &Cgd, nl_fptype &Cgb) const
+		void calculate_caps(nl_fptype Vgs, nl_fptype Vgd, nl_fptype Vth,
+			nl_fptype &Cgs, nl_fptype &Cgd, nl_fptype &Cgb) const
 		{
 			nl_fptype Vctrl = Vgs - Vth * m_polarity;
 			// Cut off - now further differentiated into 3 different formulas
@@ -540,7 +537,7 @@ namespace netlist::analog
 			// back gate transconductance
 			const nl_fptype bgtc = (phi_m_Vbulk != nlconst::zero())
 									   ? (m_gamma / phi_m_Vbulk
-										  / nlconst::two())
+										   / nlconst::two())
 									   : nlconst::zero();
 			gmb = gm * bgtc;
 		}
@@ -605,11 +602,11 @@ namespace netlist::analog
 				calculate_caps(Vgd, Vgs, Vth, m_Cgd, m_Cgs, m_Cgb);
 
 			set_cap(m_cap_gb, m_Cgb + m_model_acc.m_CGBO * m_Leff, Vgb, gGG,
-					gGB, gBG, gBB, IG, IB);
+				gGB, gBG, gBB, IG, IB);
 			set_cap(m_cap_gs, m_Cgs + m_model_acc.m_CGSO * m_model_acc.m_W, Vgs,
-					gGG, gGS, gSG, gSS, IG, IS);
+				gGG, gGS, gSG, gSS, IG, IS);
 			set_cap(m_cap_gd, m_Cgd + m_model_acc.m_CGDO * m_model_acc.m_W, Vgd,
-					gGG, gGD, gDG, gDD, IG, ID);
+				gGG, gGD, gDG, gDD, IG, ID);
 		}
 
 		// Source connected to body, Diode S-B shorted!
@@ -617,13 +614,13 @@ namespace netlist::analog
 		const auto      zero(nlconst::zero());
 		//                 S          G
 		m_SG.set_mat(gSSBB, gSG + gBG, +(IS + IB), // S
-					 gGS + gGB, gGG, IG);          // G
+			gGS + gGB, gGG, IG);                   // G
 		//                 D          G
-		m_DG.set_mat(gDD, gDG, +ID,    // D
-					 gGD, zero, zero); // G
+		m_DG.set_mat(gDD, gDG, +ID, // D
+			gGD, zero, zero);       // G
 		//                 S          D
-		m_SD.set_mat(zero, gSD + gBD, zero,  // S
-					 gDS + gDB, zero, zero); // D
+		m_SD.set_mat(zero, gSD + gBD, zero, // S
+			gDS + gDB, zero, zero);         // D
 
 		/// |
 		/// |               D                S              G          I
@@ -658,7 +655,6 @@ namespace netlist::analog
 
 } // namespace netlist::analog
 
-namespace netlist::devices
-{
+namespace netlist::devices {
 	NETLIB_DEVICE_IMPL_NS(analog, MOSFET, "MOSFET", "MODEL")
 } // namespace netlist::devices

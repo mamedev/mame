@@ -18,8 +18,7 @@
 #include <array>
 #include <utility>
 
-namespace netlist
-{
+namespace netlist {
 	// -------------------------------------------------------------------------
 	// analog_t
 	// -------------------------------------------------------------------------
@@ -61,7 +60,7 @@ namespace netlist
 			terminal_t *other_terminal, nl_delegate delegate);
 
 		terminal_t(core_device_t &dev, const pstring &aname,
-			terminal_t *                       other_terminal,
+			terminal_t                        *other_terminal,
 			const std::array<terminal_t *, 2> &splitter_terms,
 			nl_delegate                        delegate);
 
@@ -75,19 +74,19 @@ namespace netlist
 		/// \param G Conductivity
 		void set_conductivity(nl_fptype G) const noexcept
 		{
-			set_go_gt_I(-G, G, nlconst::zero());
+			set_gt_go_I(G, -G, nlconst::zero());
 		}
 
-		void set_go_gt(nl_fptype GO, nl_fptype GT) const noexcept
+		void set_gt_go(nl_fptype GT, nl_fptype GO) const noexcept
 		{
-			set_go_gt_I(GO, GT, nlconst::zero());
+			set_gt_go_I(GT, GO, nlconst::zero());
 		}
 
-		void set_go_gt_I(nl_fptype GO, nl_fptype GT,
-			nl_fptype I) const noexcept;
+		void
+		set_gt_go_I(nl_fptype GT, nl_fptype GO, nl_fptype I) const noexcept;
 
-		void set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(
-			false);
+		void
+		set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false);
 
 	private:
 		nl_fptype *m_Idr; //!< drive current
@@ -108,7 +107,7 @@ namespace netlist
 	public:
 		/// \brief Constructor
 		analog_input_t(core_device_t &dev,     //!< owning device
-			const pstring &           aname,   //!< name of terminal
+			const pstring            &aname,   //!< name of terminal
 			nl_delegate               delegate //!< delegate
 		);
 
@@ -147,7 +146,29 @@ namespace netlist
 		return (this->has_net() ? net().solver() : nullptr);
 	}
 
-	inline void terminal_t::set_go_gt_I(nl_fptype GO, nl_fptype GT,
+	/// \brief set mna matrix elements
+	///
+	/// A single terminalhas the following representation as a mna matrix
+	/// given the terminal is element i and the connected terminal or
+	/// other terminal is element j:
+	///
+	/// |      |  Vi  |  Vj  | I |
+	/// |:----:|:----:|:----:|---|
+	/// |  Vi  |  GT  |  GO  | I |
+	/// |  Vj  |   0  |   0  | 0 |
+	///
+	/// For element j the mna matrix looks like this
+	///
+	/// |      |  Vi  |  Vj  | I |
+	/// |:----:|:----:|:----:|---|
+	/// |  Vi  |  0   |  0   | 0 |
+	/// |  Vj  |  GO  |  GT  | I |
+	///
+	/// @param GT (i,i) value
+	/// @param GO (i,j) value
+	/// @param I Current flowing into terminal I
+	///
+	inline void terminal_t::set_gt_go_I(nl_fptype GT, nl_fptype GO,
 		nl_fptype I) const noexcept
 	{
 		// Check for rail nets ...

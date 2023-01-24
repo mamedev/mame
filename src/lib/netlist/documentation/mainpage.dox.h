@@ -119,7 +119,8 @@ Now, the sum of all currents for a given net must be 0:
     \sum_n I_{n,l} = 0 = \sum_{n,k} (V_k - V^n - V_l ) \frac{1}{R^n} + I^n
 \f]
 
-With \f$ G^n = \frac{1}{R^n} \f$ and \f$ \sum_n  G^n = G^{tot} \f$ and \f$k=k(n)\f$
+With \f$ G^n = \frac{1}{R^n} \f$ and \f$ \sum_n  G^n = G^{tot} \f$ and
+\f$k=k(n)\f$
 
 \f[
     0 = - V_l G^{tot} + \sum_n (V_{k(n)} - V^n) G^n + I^n)

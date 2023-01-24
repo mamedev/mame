@@ -11,22 +11,21 @@
 
 // FIXME: Remove QBJT_switch - no more use
 
-namespace netlist::analog
-{
+namespace netlist::analog {
 	class diode
 	{
 	public:
 		diode()
-		: m_Is(nlconst::np_Is())
-		, m_VT(nlconst::np_VT())
-		, m_VT_inv(plib::reciprocal(m_VT))
+			: m_Is(nlconst::np_Is())
+			, m_VT(nlconst::np_VT())
+			, m_VT_inv(plib::reciprocal(m_VT))
 		{
 		}
 
 		diode(nl_fptype Is, nl_fptype n)
-		: m_Is(Is)
-		, m_VT(nlconst::np_VT(n))
-		, m_VT_inv(plib::reciprocal(m_VT))
+			: m_Is(Is)
+			, m_VT(nlconst::np_VT(n))
+			, m_VT_inv(plib::reciprocal(m_VT))
 		{
 		}
 		void set(nl_fptype Is, nl_fptype n) noexcept
@@ -123,15 +122,15 @@ namespace netlist::analog
 	{
 	public:
 		bjt_model_t(param_model_t &model)
-		: m_type((model.type() == "NPN") ? bjt_type::BJT_NPN
-										 : bjt_type::BJT_PNP)
-		, m_IS(model, "IS")
-		, m_BF(model, "BF")
-		, m_NF(model, "NF")
-		, m_BR(model, "BR")
-		, m_NR(model, "NR")
-		, m_CJE(model, "CJE")
-		, m_CJC(model, "CJC")
+			: m_type(
+				(model.type() == "NPN") ? bjt_type::BJT_NPN : bjt_type::BJT_PNP)
+			, m_IS(model, "IS")
+			, m_BF(model, "BF")
+			, m_NF(model, "NF")
+			, m_BR(model, "BR")
+			, m_NR(model, "NR")
+			, m_CJE(model, "CJE")
+			, m_CJC(model, "CJC")
 		{
 		}
 
@@ -166,16 +165,16 @@ namespace netlist::analog
 	{
 	public:
 		nld_QBJT_switch(constructor_param_t data)
-		: base_device_t(data)
-		, m_model(*this, "MODEL", "NPN")
-		, m_bjt_model(m_model)
-		, m_RB(*this, "m_RB", NETLIB_DELEGATE(terminal_handler))
-		, m_RC(*this, "m_RC", NETLIB_DELEGATE(terminal_handler))
-		, m_BC(*this, "m_BC", NETLIB_DELEGATE(terminal_handler))
-		, m_gB(nlconst::cgmin())
-		, m_gC(nlconst::cgmin())
-		, m_V(nlconst::zero())
-		, m_state_on(*this, "m_state_on", 0U)
+			: base_device_t(data)
+			, m_model(*this, "MODEL", "NPN")
+			, m_bjt_model(m_model)
+			, m_RB(*this, "m_RB", NETLIB_DELEGATE(terminal_handler))
+			, m_RC(*this, "m_RC", NETLIB_DELEGATE(terminal_handler))
+			, m_BC(*this, "m_BC", NETLIB_DELEGATE(terminal_handler))
+			, m_gB(nlconst::cgmin())
+			, m_gC(nlconst::cgmin())
+			, m_V(nlconst::zero())
+			, m_state_on(*this, "m_state_on", 0U)
 		{
 			register_sub_alias("B", m_RB.P());
 			register_sub_alias("E", m_RB.N());
@@ -248,12 +247,12 @@ namespace netlist::analog
 	class nld_three_terminal : public base_device_t
 	{
 	public:
-		nld_three_terminal(constructor_param_t    data,
-						   std::array<pstring, 3> pins)
-		: base_device_t(data)
-		, m_P0_P2(*this, "m_P1_P3", NETLIB_DELEGATE(terminal_handler))
-		, m_P1_P2(*this, "m_P2_P3", NETLIB_DELEGATE(terminal_handler))
-		, m_P0_P1(*this, "m_P1_P2", NETLIB_DELEGATE(terminal_handler))
+		nld_three_terminal(constructor_param_t data,
+			std::array<pstring, 3>             pins)
+			: base_device_t(data)
+			, m_P0_P2(*this, "m_P1_P3", NETLIB_DELEGATE(terminal_handler))
+			, m_P1_P2(*this, "m_P2_P3", NETLIB_DELEGATE(terminal_handler))
+			, m_P0_P1(*this, "m_P1_P2", NETLIB_DELEGATE(terminal_handler))
 		{
 			register_sub_alias(pins[0], m_P0_P2.P()); // Emitter - row 1
 			register_sub_alias(pins[1], m_P1_P2.P()); // Collector- row 2
@@ -283,7 +282,7 @@ namespace netlist::analog
 		nl_fptype delta_V() const noexcept
 		{
 			static_assert(PIN1 >= 0 && PIN2 >= 0 && PIN1 <= 2 && PIN2 <= 2,
-						  "out of bounds pin number");
+				"out of bounds pin number");
 			static constexpr const int sel = PIN1 * 10 + PIN2;
 			if constexpr (sel == 0)
 				return 0.0;
@@ -306,8 +305,8 @@ namespace netlist::analog
 		}
 
 		void set_mat_ex(double xee, double xec, double xeb, double xIe,
-						double xce, double xcc, double xcb, double xIc,
-						double xbe, double xbc, double xbb, double xIb)
+			double xce, double xcc, double xcb, double xIc, double xbe,
+			double xbc, double xbb, double xIb)
 		{
 			using row2 = std::array<nl_fptype, 3>;
 			// rows 0 and 2
@@ -368,13 +367,13 @@ namespace netlist::analog
 
 	public:
 		nld_QBJT_EB(constructor_param_t data)
-		: nld_three_terminal(data, {"E", "C", "B"})
-		, m_model(*this, "MODEL", "NPN")
-		, m_bjt_model(m_model)
-		, m_gD_BC(*this, "m_D_BC")
-		, m_gD_BE(*this, "m_D_BE")
-		, m_alpha_f(0)
-		, m_alpha_r(0)
+			: nld_three_terminal(data, {"E", "C", "B"})
+			, m_model(*this, "MODEL", "NPN")
+			, m_bjt_model(m_model)
+			, m_gD_BC(*this, "m_D_BC")
+			, m_gD_BE(*this, "m_D_BE")
+			, m_alpha_f(0)
+			, m_alpha_r(0)
 		{
 			if (m_bjt_model.m_CJE > nlconst::zero())
 			{
@@ -567,8 +566,7 @@ namespace netlist::analog
 
 } // namespace netlist::analog
 
-namespace netlist::devices
-{
+namespace netlist::devices {
 	NETLIB_DEVICE_IMPL_NS(analog, QBJT_EB, "QBJT_EB", "MODEL")
 	NETLIB_DEVICE_IMPL_NS(analog, QBJT_switch, "QBJT_SW", "MODEL")
 } // namespace netlist::devices

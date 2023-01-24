@@ -4,8 +4,7 @@ UseTab: ForContinuationAndIndentation
 TabWidth: 4
 IndentWidth: 4
 ColumnLimit: 80
-ContinuationIndentWidth: 4
-ConstructorInitializerIndentWidth: 0
+ConstructorInitializerIndentWidth: 4
 NamespaceIndentation: All
 CompactNamespaces: true
 FixNamespaceComments: true
@@ -14,7 +13,21 @@ IndentAccessModifiers: false
 AccessModifierOffset: -4
 IndentCaseLabels: true
 
-BreakBeforeBraces: Allman
+#BreakBeforeBraces: Allman
+BreakBeforeBraces: Custom
+BraceWrapping:
+    AfterCaseLabel: true
+    AfterClass: true
+    AfterControlStatement: Always
+    AfterEnum: true
+    AfterFunction: true
+    AfterNamespace: false
+    AfterStruct: true
+    AfterUnion: true
+    BeforeCatch: true
+    BeforeElse: true
+    BeforeLambdaBody: true
+
 BreakBeforeBinaryOperators: All
 BreakConstructorInitializers: BeforeComma
 # Currentline doesn't work
@@ -26,11 +39,11 @@ AlwaysBreakTemplateDeclarations: Yes
 # AfterComma does not work <= 13
 #BreakInheritanceList: AfterComma
 BreakInheritanceList: BeforeComma
-#BreakInheritanceList: false
 SpaceBeforeInheritanceColon: true
 
-#AlignAfterOpenBracket: DontAlign
-AlignAfterOpenBracket: Align
+AlignAfterOpenBracket: DontAlign
+#AlignAfterOpenBracket: Align
+ContinuationIndentWidth: 4
 PointerAlignment: Right
 ReferenceAlignment: Right
 SpacesInAngles: false
@@ -38,7 +51,7 @@ SpaceBeforeAssignmentOperators: true
 AlignConsecutiveDeclarations: true
 
 #Clang>=14
-#AlignArrayOfStructures: Left
+AlignArrayOfStructures: Left
 
 AllowShortIfStatementsOnASingleLine: false
 AllowShortCaseLabelsOnASingleLine: true
@@ -64,14 +77,18 @@ IncludeCategories:
     Priority:        22
   - Regex:           '^(("|"../)solver)/'
     Priority:        23
+  - Regex:           '^"plib/ptests\.h"'
+    Priority:        -1
   - Regex:           '^(("|"../)plib)/'
     Priority:        30
   - Regex:           '<[([:alnum:]|_).]+>'
     Priority:        40
+  - Regex:           '^"emu\.h"'
+    Priority:        -1
   - Regex:           '.*'
     Priority:        10
 
-StatementMacros: 
+StatementMacros:
   - "DIPPINS"
   - "TT_HEAD"
   - "TT_LINE"
@@ -84,7 +101,7 @@ StatementMacros:
 #  - "TRUTHTABLE_ENTRY"
   - "LOCAL_LIB_ENTRY"
 
-#StatementAttributeLikeMacros: 
+#StatementAttributeLikeMacros:
 #  - "NETLIST_NAME"
 #  - "NETLIB_NAME"
 
@@ -93,15 +110,15 @@ TypenameMacros:
   - "NETLIB_NAME"
   - "PENUM"
 
-WhitespaceSensitiveMacros: 
+WhitespaceSensitiveMacros:
   - "ALIAS"
   - "DIPPINS"
   - "NET_C"
   - "PENUM"
 
 IndentPPDirectives: BeforeHash
-MacroBlockBegin: "^static NETLIST_START\\(.+\\)|static TRUTHTABLE_START\\(.*\\)$"
-MacroBlockEnd: "^NETLIST_END\\(\\)|TRUTHTABLE_END\\(\\)$"
+MacroBlockBegin: "^INPUT_PORTS_START|static NETLIST_START\\(.+\\)|static TRUTHTABLE_START\\(.*\\)$"
+MacroBlockEnd: "^INPUT_PORTS_END|NETLIST_END\\(\\)|TRUTHTABLE_END\\(\\)$"
 
 # Avoid formatting 
 # -- clang-tidy

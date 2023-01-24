@@ -28,27 +28,27 @@
 #include <algorithm>
 #include <type_traits>
 
-namespace netlist::devices
-{
+namespace netlist::devices {
 
 	// -------------------------------------------------------------------------
 	// solver
 	// -------------------------------------------------------------------------
 
 	nld_solver::nld_solver(constructor_param_t data)
-	: device_t(data)
-	, m_fb_step(*this, "FB_step", NETLIB_DELEGATE(fb_step<false>))
-	, m_Q_step(*this, "Q_step")
-	, m_params(*this, "", solver::solver_parameter_defaults::get_instance())
-	, m_queue(
-		  this->state().pool(), config::max_solver_queue_size(),
-		  queue_type::id_delegate(&NETLIB_NAME(solver)::get_solver_id, this),
-		  queue_type::obj_delegate(&NETLIB_NAME(solver)::solver_by_id, this))
+		: device_t(data)
+		, m_fb_step(*this, "FB_step", NETLIB_DELEGATE(fb_step<false>))
+		, m_Q_step(*this, "Q_step")
+		, m_params(*this, "", solver::solver_parameter_defaults::get_instance())
+		, m_queue(this->state().pool(), config::max_solver_queue_size(),
+			  queue_type::id_delegate(&NETLIB_NAME(solver)::get_solver_id,
+				  this),
+			  queue_type::obj_delegate(&NETLIB_NAME(solver)::solver_by_id,
+				  this))
 	{
 		// internal stuff
 		state().save(*this,
-					 static_cast<plib::state_manager_t::callback_t &>(m_queue),
-					 this->name(), "m_queue");
+			static_cast<plib::state_manager_t::callback_t &>(m_queue),
+			this->name(), "m_queue");
 
 		connect("FB_step", "Q_step");
 	}
@@ -77,26 +77,25 @@ namespace netlist::devices
 		const netlist_time_ext now(exec().time());
 		const std::size_t      nthreads = m_params.m_parallel() < 2
 											  ? 1
-											  : std::min(
-											 static_cast<std::size_t>(
-												 m_params.m_parallel()),
-											 plib::omp::get_max_threads());
+											  : std::min(static_cast<std::size_t>(
+														m_params.m_parallel()),
+												  plib::omp::get_max_threads());
 		const netlist_time_ext sched(
 			now
 			+ (nthreads <= 1 ? netlist_time_ext::zero()
 							 : netlist_time_ext::from_nsec(100)));
 		plib::uninitialised_array<solver::matrix_solver_t *,
-								  config::max_solver_queue_size::value>
+			config::max_solver_queue_size::value>
 			tmp; // NOLINT
 		plib::uninitialised_array<netlist_time,
-								  config::max_solver_queue_size::value>
+			config::max_solver_queue_size::value>
 					nt; // NOLINT
 		std::size_t p = 0;
 
 		while (!m_queue.empty())
 		{
 			const auto t = m_queue.top().exec_time();
-			auto *     o = m_queue.top().object();
+			auto      *o = m_queue.top().object();
 			if (t != now)
 				if (t > sched)
 					break;
@@ -137,8 +136,8 @@ namespace netlist::devices
 		{
 			plib::omp::set_num_threads(nthreads);
 			plib::omp::for_static(static_cast<std::size_t>(0), p,
-								  [&tmp, &nt, now](std::size_t i)
-								  { nt[i] = tmp[i]->solve(now, "parallel"); });
+				[&tmp, &nt, now](std::size_t i)
+				{ nt[i] = tmp[i]->solve(now, "parallel"); });
 			for (std::size_t i = 0; i < p; i++)
 			{
 				if (nt[i] != netlist_time::zero())
@@ -152,7 +151,7 @@ namespace netlist::devices
 	}
 
 	void NETLIB_NAME(solver)::reschedule(solver::matrix_solver_t *solv,
-										 netlist_time             ts)
+		netlist_time                                              ts)
 	{
 		const netlist_time_ext now(exec().time());
 		const netlist_time_ext sched(now + ts);
@@ -191,8 +190,7 @@ namespace netlist::devices
 		if (nthreads > 1 && solvers.size() > 1)
 		{
 			plib::omp::set_num_threads(nthreads);
-			plib::omp::for_static(
-				static_cast<std::size_t>(0), solvers.size(),
+			plib::omp::for_static(static_cast<std::size_t>(0), solvers.size(),
 				[&solvers, now](std::size_t i) {
 					[[maybe_unused]] const netlist_time ts = solvers[i]
 																 ->ptr->solve(
@@ -222,18 +220,18 @@ namespace netlist::devices
 	template <class C, class A>
 	NETLIB_NAME(solver)::solver_ptr
 	create_it(A &arena, NETLIB_NAME(solver) &main_solver, pstring name,
-			  NETLIB_NAME(solver)::net_list_t &  nets,
-			  const solver::solver_parameters_t *params, std::size_t size)
+		NETLIB_NAME(solver)::net_list_t   &nets,
+		const solver::solver_parameters_t *params, std::size_t size)
 	{
 		return plib::make_unique<C>(arena, main_solver, name, nets, params,
-									size);
+			size);
 	}
 
 	template <typename FT, int SIZE>
 	NETLIB_NAME(solver)::solver_ptr NETLIB_NAME(solver)::create_solver(
 		std::size_t size, const pstring &solver_name,
 		const solver::solver_parameters_t *params,
-		NETLIB_NAME(solver)::net_list_t &  nets)
+		NETLIB_NAME(solver)::net_list_t   &nets)
 	{
 		switch (params->m_method())
 		{
@@ -303,32 +301,32 @@ namespace netlist::devices
 				if (net_count <= 16)
 				{
 					return create_solver<FT, -16>(net_count, sname, params,
-												  nets);
+						nets);
 				}
 				if (net_count <= 32)
 				{
 					return create_solver<FT, -32>(net_count, sname, params,
-												  nets);
+						nets);
 				}
 				if (net_count <= 64)
 				{
 					return create_solver<FT, -64>(net_count, sname, params,
-												  nets);
+						nets);
 				}
 				if (net_count <= 128)
 				{
 					return create_solver<FT, -128>(net_count, sname, params,
-												   nets);
+						nets);
 				}
 				if (net_count <= 256)
 				{
 					return create_solver<FT, -256>(net_count, sname, params,
-												   nets);
+						nets);
 				}
 				if (net_count <= 512)
 				{
 					return create_solver<FT, -512>(net_count, sname, params,
-												   nets);
+						nets);
 				}
 				return create_solver<FT, 0>(net_count, sname, params, nets);
 		}
@@ -347,7 +345,7 @@ namespace netlist::devices
 					// Must be an analog net
 					auto n = plib::dynamic_downcast<analog_net_t *>(net.get());
 					nl_assert_always(bool(n),
-									 "Unable to cast to analog_net_t &");
+						"Unable to cast to analog_net_t &");
 					if (!already_processed(*(*n)))
 					{
 						groupspre.emplace_back(
@@ -391,7 +389,7 @@ namespace netlist::devices
 						// copy all nets
 						for (auto &cn : groupspre[i])
 							if (!plib::container::contains(groupspre.back(),
-														   cn))
+									cn))
 								groupspre.back().push_back(cn);
 						// clear
 						groupspre[i].clear();
@@ -420,13 +418,13 @@ namespace netlist::devices
 				for (detail::core_terminal_t *term : terminals)
 				{
 					nl_state.log().verbose("Term {} {}", term->name(),
-										   static_cast<int>(term->type()));
+						static_cast<int>(term->type()));
 					// only process analog terminals
 					if (term->is_type(detail::terminal_type::TERMINAL))
 					{
 						auto pt = plib::dynamic_downcast<terminal_t *>(term);
 						nl_assert_always(bool(pt),
-										 "Error casting *term to terminal_t &");
+							"Error casting *term to terminal_t &");
 						// check the connected terminal
 						const auto *const connected_terminals
 							= nl_state.setup().get_connected_terminals(*(*pt));
@@ -436,7 +434,7 @@ namespace netlist::devices
 						{
 							analog_net_t &connected_net = (*ct)->net();
 							nl_state.log().verbose("  Connected net {}",
-												   connected_net.name());
+								connected_net.name());
 							if (!check_if_processed_and_join(connected_net))
 								process_net(nl_state, connected_net);
 						}
@@ -457,7 +455,7 @@ namespace netlist::devices
 
 		splitter.run(state());
 		log().verbose("Found {1} net groups in {2} nets\n",
-					  splitter.groups.size(), state().nets().size());
+			splitter.groups.size(), state().nets().size());
 
 		int num_errors = 0;
 
@@ -524,10 +522,10 @@ namespace netlist::devices
 				case solver::matrix_fp_type_e::FLOAT:
 					if (!config::use_float_matrix::value)
 						log().info("FPTYPE {1} not supported. Using DOUBLE",
-								   params->m_fp_type().name());
+							params->m_fp_type().name());
 					ms = create_solvers<std::conditional_t<
-						config::use_float_matrix::value, float, double>>(
-						sname, params.get(), grp);
+						config::use_float_matrix::value, float, double>>(sname,
+						params.get(), grp);
 					break;
 				case solver::matrix_fp_type_e::DOUBLE:
 					ms = create_solvers<double>(sname, params.get(), grp);
@@ -535,7 +533,7 @@ namespace netlist::devices
 				case solver::matrix_fp_type_e::LONGDOUBLE:
 					if (!config::use_long_double_matrix::value)
 						log().info("FPTYPE {1} not supported. Using DOUBLE",
-								   params->m_fp_type().name());
+							params->m_fp_type().name());
 					ms = create_solvers<std::conditional_t<
 						config::use_long_double_matrix::value, long double,
 						double>>(sname, params.get(), grp);
@@ -545,22 +543,21 @@ namespace netlist::devices
 					ms = create_solvers<FLOAT128>(sname, params.get(), grp);
 #else
 					log().info("FPTYPE {1} not supported. Using DOUBLE",
-							   params->m_fp_type().name());
+						params->m_fp_type().name());
 					ms = create_solvers<double>(sname, params.get(), grp);
 #endif
 					break;
 			}
 
-			state().register_device(
-				ms->name(),
+			state().register_device(ms->name(),
 				device_arena::owned_ptr<core_device_t>(ms.get(), false));
 
 			log().verbose("Solver {1}", ms->name());
 			log().verbose("       ==> {1} nets", grp.size());
 			log().verbose("       has {1} dynamic elements",
-						  ms->dynamic_device_count());
+				ms->dynamic_device_count());
 			log().verbose("       has {1} time step elements",
-						  ms->time_step_device_count());
+				ms->time_step_device_count());
 			for (auto &n : grp)
 			{
 				log().verbose("Net {1}", n->name());

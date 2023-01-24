@@ -21,8 +21,7 @@
 
 #include <unordered_map>
 
-namespace netlist
-{
+namespace netlist {
 	/// \brief Delegate type for device notification.
 	///
 	using nl_delegate = plib::pmfp<void()>;
@@ -30,8 +29,7 @@ namespace netlist
 	using nl_delegate_dyn = plib::pmfp<void()>;
 } // namespace netlist
 
-namespace netlist::detail
-{
+namespace netlist::detail {
 
 	template <typename C, typename T>
 	struct property_store_t
@@ -132,8 +130,8 @@ namespace netlist::detail
 	{
 	public:
 		explicit netlist_object_t(netlist_t &nl, const pstring &name)
-		: object_t(name)
-		, m_netlist(nl)
+			: object_t(name)
+			, m_netlist(nl)
 		{
 		}
 
@@ -206,10 +204,10 @@ namespace netlist::detail
 	/// All terminals are derived from this class.
 	///
 	class core_terminal_t
-	: public device_object_t
-	, public plib::linked_list_t<core_terminal_t, 0>::element_t
+		: public device_object_t
+		, public plib::linked_list_t<core_terminal_t, 0>::element_t
 #if NL_USE_INPLACE_CORE_TERMS
-	, public plib::linked_list_t<core_terminal_t, 1>::element_t
+		, public plib::linked_list_t<core_terminal_t, 1>::element_t
 #endif
 	{
 	public:
@@ -228,7 +226,7 @@ namespace netlist::detail
 		static constexpr netlist_sig_t OUT_TRISTATE() { return INP_MASK; }
 
 		static_assert(INP_BITS * 2 <= sizeof(netlist_sig_t) * 8,
-					  "netlist_sig_t size not sufficient");
+			"netlist_sig_t size not sufficient");
 
 		enum state_e
 		{
@@ -241,7 +239,7 @@ namespace netlist::detail
 		};
 
 		core_terminal_t(core_device_t &dev, const pstring &aname, state_e state,
-						nl_delegate delegate);
+			nl_delegate delegate);
 		virtual ~core_terminal_t() noexcept = default;
 
 		PCOPYASSIGNMOVE(core_terminal_t, delete)
@@ -279,10 +277,10 @@ namespace netlist::detail
 		constexpr state_e terminal_state() const noexcept { return m_state; }
 		constexpr void    set_state(state_e state) noexcept { m_state = state; }
 
-		void reset() noexcept
+		void reset() noexcept(false)
 		{
-			set_state(is_type(terminal_type::OUTPUT) ? STATE_OUT
-													 : STATE_INP_ACTIVE);
+			set_state(
+				is_type(terminal_type::OUTPUT) ? STATE_OUT : STATE_INP_ACTIVE);
 		}
 
 		constexpr void

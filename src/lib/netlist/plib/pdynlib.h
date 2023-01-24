@@ -18,8 +18,10 @@ namespace plib {
 	class dynamic_library_base
 	{
 	public:
-
-		explicit dynamic_library_base() : m_is_loaded(false) { }
+		explicit dynamic_library_base()
+			: m_is_loaded(false)
+		{
+		}
 
 		virtual ~dynamic_library_base() = default;
 
@@ -27,18 +29,22 @@ namespace plib {
 		dynamic_library_base &operator=(const dynamic_library_base &) = delete;
 
 		dynamic_library_base(dynamic_library_base &&) noexcept = default;
-		dynamic_library_base &operator=(dynamic_library_base &&) noexcept = default;
+		dynamic_library_base &
+		operator=(dynamic_library_base &&) noexcept = default;
 
 		template <typename R, typename... Args>
 		class function
 		{
 		public:
-			using calltype = R(*) (Args... args);
+			using calltype = R (*)(Args... args);
 
-			function() : m_sym(nullptr) { }
+			function()
+				: m_sym(nullptr)
+			{
+			}
 
 			function(dynamic_library_base &dl, const pstring &name) noexcept
-			: m_sym(dl.get_symbol<calltype>(name))
+				: m_sym(dl.get_symbol<calltype>(name))
 			{
 			}
 
@@ -47,13 +53,14 @@ namespace plib {
 				m_sym = dl.get_symbol<calltype>(name);
 			}
 
-			R operator ()(Args&&... args) const
+			R operator()(Args &&...args) const
 			{
 				return m_sym(std::forward<Args>(args)...);
-				//return m_sym(args...);
+				// return m_sym(args...);
 			}
 
 			bool resolved() const noexcept { return m_sym != nullptr; }
+
 		private:
 			calltype m_sym;
 		};
@@ -69,7 +76,9 @@ namespace plib {
 
 	protected:
 		void set_loaded(bool v) noexcept { m_is_loaded = v; }
-		virtual void *get_symbol_pointer(const pstring &name) const noexcept = 0;
+		virtual void *
+		get_symbol_pointer(const pstring &name) const noexcept = 0;
+
 	private:
 		bool m_is_loaded;
 	};
@@ -101,9 +110,8 @@ namespace plib {
 			void       *addr;
 		};
 
-
 		explicit static_library(const symbol *symbols)
-		: m_syms(symbols)
+			: m_syms(symbols)
 		{
 			if (symbols != nullptr)
 				set_loaded(true);

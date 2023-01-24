@@ -20,15 +20,14 @@
 #include <array>
 #include <utility>
 
-namespace netlist
-{
+namespace netlist {
 	// -------------------------------------------------------------------------
 	// logic_t
 	// -------------------------------------------------------------------------
 
 	class logic_t
-	: public detail::core_terminal_t
-	, public logic_family_t
+		: public detail::core_terminal_t
+		, public logic_family_t
 	{
 	public:
 		logic_t(device_t &dev, const pstring &aname, state_e terminal_state,

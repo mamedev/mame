@@ -21,8 +21,8 @@
 #include <utility>
 #include <vector>
 
-namespace netlist
-{
+namespace netlist {
+
 	// -----------------------------------------------------------------------------
 	// netlist_state__t
 	// -----------------------------------------------------------------------------
@@ -32,8 +32,8 @@ namespace netlist
 	public:
 		using nets_collection_type = std::vector<
 			device_arena::owned_ptr<detail::net_t>>;
-		using family_collection_type = std::unordered_map<
-			pstring, host_arena::unique_ptr<logic_family_desc_t>>;
+		using family_collection_type = std::unordered_map<pstring,
+			host_arena::unique_ptr<logic_family_desc_t>>;
 
 		// need to preserve order of device creation ...
 		using devices_collection_type = std::vector<
@@ -56,9 +56,8 @@ namespace netlist
 			return bool(plib::dynamic_downcast<C *>(p));
 		}
 
-		core_device_t *
-		get_single_device(const pstring &classname,
-						  bool (*cc)(core_device_t *)) const noexcept(false);
+		core_device_t *get_single_device(const pstring &classname,
+			bool (*cc)(core_device_t *)) const noexcept(false);
 
 		/// \brief Get single device filtered by class and name
 		///
@@ -121,16 +120,16 @@ namespace netlist
 		save(O &owner, C &state, const pstring &module, const pstring &stname)
 		{
 			this->run_state_manager().save_item(plib::void_ptr_cast(&owner),
-												state, module + "." + stname);
+				state, module + "." + stname);
 		}
 
 		template <typename O, typename C>
 		void save(O &owner, C *state, const pstring &module,
-				  const pstring &stname, const std::size_t count)
+			const pstring &stname, const std::size_t count)
 		{
 			this->run_state_manager().save_state_ptr(
 				plib::void_ptr_cast(&owner), module + "." + stname,
-				plib::state_manager_t::dtype<C>(), count, state);
+				plib::state_manager_t::datatype<C>(), count, state);
 		}
 
 		// FIXME: only used by queue_t save state
@@ -167,8 +166,8 @@ namespace netlist
 		/// \param dev Device to be registered
 
 		template <typename T>
-		void register_device(const pstring               &name,
-							 device_arena::owned_ptr<T> &&dev) noexcept(false)
+		void register_device(const pstring &name,
+			device_arena::owned_ptr<T>    &&dev) noexcept(false)
 		{
 			for (auto &d : m_devices)
 				if (d.first == name)
@@ -192,8 +191,8 @@ namespace netlist
 		void
 		register_device(const pstring &name, device_arena::unique_ptr<T> &&dev)
 		{
-			register_device(name, device_arena::owned_ptr<T>(
-									  dev.release(), true, dev.get_deleter()));
+			register_device(name, device_arena::owned_ptr<T>(dev.release(),
+									  true, dev.get_deleter()));
 		}
 
 		/// \brief Remove device
@@ -283,7 +282,7 @@ namespace netlist
 #if !(NL_USE_INPLACE_CORE_TERMS)
 		// all terms for a net
 		std::unordered_map<const detail::net_t *,
-						   std::vector<detail::core_terminal_t *>>
+			std::vector<detail::core_terminal_t *>>
 			m_core_terms;
 #endif
 		// dummy version

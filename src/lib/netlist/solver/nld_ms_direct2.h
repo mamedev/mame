@@ -12,25 +12,24 @@
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
 
-namespace netlist::solver
-{
+namespace netlist::solver {
 
 	// ----------------------------------------------------------------------------------------
 	// matrix_solver - Direct2
 	// ----------------------------------------------------------------------------------------
 
 	template <typename FT>
-	class matrix_solver_direct2_t: public matrix_solver_direct_t<FT, 2>
+	class matrix_solver_direct2_t : public matrix_solver_direct_t<FT, 2>
 	{
 	public:
-
 		using float_type = FT;
 
-		matrix_solver_direct2_t(devices::nld_solver &main_solver, const pstring &name,
-			const matrix_solver_t::net_list_t &nets,
+		matrix_solver_direct2_t(devices::nld_solver &main_solver,
+			const pstring &name, const matrix_solver_t::net_list_t &nets,
 			const solver::solver_parameters_t *params)
-		: matrix_solver_direct_t<FT, 2>(main_solver, name, nets, params, 2)
-		{}
+			: matrix_solver_direct_t<FT, 2>(main_solver, name, nets, params, 2)
+		{
+		}
 		void upstream_solve_non_dynamic() override
 		{
 			this->clear_square_mat(this->m_A);
@@ -41,12 +40,12 @@ namespace netlist::solver
 			const float_type c = this->m_A[1][0];
 			const float_type d = this->m_A[1][1];
 
-			const float_type v1 = (a * this->m_RHS[1] - c * this->m_RHS[0]) / (a * d - b * c);
+			const float_type v1 = (a * this->m_RHS[1] - c * this->m_RHS[0])
+								  / (a * d - b * c);
 			const float_type v0 = (this->m_RHS[0] - b * v1) / a;
 			this->m_new_V[0] = v0;
 			this->m_new_V[1] = v1;
 		}
-
 	};
 
 } // namespace netlist::solver

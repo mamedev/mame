@@ -16,17 +16,16 @@
 
 #include "plib/putil.h"
 
-namespace netlist::solver
-{
+namespace netlist::solver {
 
 	terms_for_net_t::terms_for_net_t(arena_type &arena, analog_net_t *net)
-	: m_nz(arena)
-	, m_nzrd(arena)
-	, m_nzbd(arena)
-	, m_connected_net_idx(arena)
-	, m_terms(arena)
-	, m_net(net)
-	, m_rail_start(0)
+		: m_nz(arena)
+		, m_nzrd(arena)
+		, m_nzbd(arena)
+		, m_connected_net_idx(arena)
+		, m_terms(arena)
+		, m_net(net)
+		, m_rail_start(0)
 	{
 	}
 
@@ -40,7 +39,7 @@ namespace netlist::solver
 				{
 					plib::container::insert_at(m_terms, i, term);
 					plib::container::insert_at(m_connected_net_idx, i,
-											   net_other);
+						net_other);
 					return;
 				}
 			}
@@ -53,29 +52,28 @@ namespace netlist::solver
 	// ----------------------------------------------------------------------------------------
 
 	matrix_solver_t::matrix_solver_t(devices::nld_solver &main_solver,
-									 const pstring       &name,
-									 const net_list_t    &nets,
-									 const solver::solver_parameters_t *params)
-	//: device_t(static_cast<device_t &>(main_solver), name)
-	: device_t(
-		device_data_t{main_solver.state(), main_solver.name() + "." + name})
-	, m_params(*params)
-	, m_gonn(m_arena)
-	, m_gtn(m_arena)
-	, m_Idrn(m_arena)
-	, m_connected_net_Vn(m_arena)
-	, m_iterative_fail(*this, "m_iterative_fail", 0)
-	, m_iterative_total(*this, "m_iterative_total", 0)
-	, m_main_solver(main_solver)
-	, m_stat_calculations(*this, "m_stat_calculations", 0)
-	, m_stat_newton_raphson(*this, "m_stat_newton_raphson", 0)
-	, m_stat_newton_raphson_fail(*this, "m_stat_newton_raphson_fail", 0)
-	, m_stat_vsolver_calls(*this, "m_stat_vsolver_calls", 0)
-	, m_last_step(*this, "m_last_step", netlist_time_ext::zero())
-	, m_step_funcs(m_arena)
-	, m_dynamic_funcs(m_arena)
-	, m_inputs(m_arena)
-	, m_ops(0)
+		const pstring &name, const net_list_t &nets,
+		const solver::solver_parameters_t *params)
+		//: device_t(static_cast<device_t &>(main_solver), name)
+		: device_t(
+			device_data_t{main_solver.state(), main_solver.name() + "." + name})
+		, m_params(*params)
+		, m_gonn(m_arena)
+		, m_gtn(m_arena)
+		, m_Idrn(m_arena)
+		, m_connected_net_Vn(m_arena)
+		, m_iterative_fail(*this, "m_iterative_fail", 0)
+		, m_iterative_total(*this, "m_iterative_total", 0)
+		, m_main_solver(main_solver)
+		, m_stat_calculations(*this, "m_stat_calculations", 0)
+		, m_stat_newton_raphson(*this, "m_stat_newton_raphson", 0)
+		, m_stat_newton_raphson_fail(*this, "m_stat_newton_raphson_fail", 0)
+		, m_stat_vsolver_calls(*this, "m_stat_vsolver_calls", 0)
+		, m_last_step(*this, "m_last_step", netlist_time_ext::zero())
+		, m_step_funcs(m_arena)
+		, m_dynamic_funcs(m_arena)
+		, m_inputs(m_arena)
+		, m_ops(0)
 	{
 		setup_base(this->state().setup(), nets);
 
@@ -95,7 +93,7 @@ namespace netlist::solver
 	}
 
 	void matrix_solver_t::setup_base([[maybe_unused]] setup_t &setup,
-									 const net_list_t         &nets)
+		const net_list_t                                      &nets)
 	{
 		log().debug("New solver setup\n");
 		std::vector<core_device_t *> step_devices;
@@ -126,23 +124,23 @@ namespace netlist::solver
 				nl_assert_always(&p->net() == &net, "Net integrity violated");
 
 				log().debug("{1} {2} {3}\n", p->name(), net.name(),
-							net.is_rail_net());
+					net.is_rail_net());
 				switch (p->type())
 				{
 					case detail::terminal_type::TERMINAL:
 						if (p->device().is_time_step())
 							if (!plib::container::contains(step_devices,
-														   &p->device()))
+									&p->device()))
 								step_devices.push_back(&p->device());
 						if (p->device().is_dynamic())
 							if (!plib::container::contains(dynamic_devices,
-														   &p->device()))
+									&p->device()))
 								dynamic_devices.push_back(&p->device());
 						{
 							auto pterm = plib::dynamic_downcast<terminal_t *>(
 								p);
 							nl_assert_always(bool(pterm),
-											 "cast to terminal_t * failed");
+								"cast to terminal_t * failed");
 							add_term(k, *pterm);
 						}
 						log().debug("Added terminal {1}\n", p->name());
@@ -165,12 +163,12 @@ namespace netlist::solver
 							auto proxied_net = plib::dynamic_downcast<
 								analog_net_t *>(p->net());
 							nl_assert_always(proxied_net,
-											 "Net is not an analog net");
+								"Net is not an analog net");
 							auto net_proxy_output_u
 								= state()
 									  .make_pool_object<
-										  proxied_analog_output_t>(
-										  *this, new_name, *proxied_net);
+										  proxied_analog_output_t>(*this,
+										  new_name, *proxied_net);
 							net_proxy_output = net_proxy_output_u.get();
 							m_inputs.emplace_back(
 								std::move(net_proxy_output_u));
@@ -180,7 +178,7 @@ namespace netlist::solver
 						// FIXME: repeated calling - kind of brute force
 						net_proxy_output->net().rebuild_list();
 						log().debug("Added input {1}",
-									net_proxy_output->name());
+							net_proxy_output->name());
 					}
 					break;
 					case detail::terminal_type::OUTPUT:
@@ -273,7 +271,7 @@ namespace netlist::solver
 					for (std::size_t i = k + 1; i < iN; i++)
 					{
 						if ((static_cast<int>(m_terms[k].rail_start())
-							 - static_cast<int>(m_terms[i].rail_start()))
+								- static_cast<int>(m_terms[i].rail_start()))
 								* sort_order
 							< 0)
 						{
@@ -304,8 +302,7 @@ namespace netlist::solver
 		{
 			m_terms[k].set_rail_start(m_terms[k].count());
 			for (std::size_t i = 0; i < m_rails_temp[k].count(); i++)
-				this->m_terms[k].add_terminal(
-					m_rails_temp[k].terms()[i],
+				this->m_terms[k].add_terminal(m_rails_temp[k].terms()[i],
 					m_rails_temp[k].m_connected_net_idx.data()[i], false);
 		}
 
@@ -327,7 +324,7 @@ namespace netlist::solver
 
 			for (std::size_t i = 0; i < t.rail_start(); i++)
 				if (!plib::container::contains(t.m_nz,
-											   static_cast<unsigned>(other[i])))
+						static_cast<unsigned>(other[i])))
 					t.m_nz.push_back(static_cast<unsigned>(other[i]));
 
 			t.m_nz.push_back(k); // add diagonal
@@ -362,7 +359,7 @@ namespace netlist::solver
 
 			for (std::size_t i = 0; i < t.rail_start(); i++)
 				if (!plib::container::contains(t.m_nzrd,
-											   static_cast<unsigned>(other[i]))
+						static_cast<unsigned>(other[i]))
 					&& other[i] >= static_cast<int>(k + 1))
 					t.m_nzrd.push_back(static_cast<unsigned>(other[i]));
 
@@ -404,7 +401,7 @@ namespace netlist::solver
 			}
 		}
 		log().verbose("Number of multiplications/additions for {1}: {2}",
-					  name(), m_ops);
+			name(), m_ops);
 
 		// Dumps non zero elements right of diagonal -> to much output, disabled
 		// NOLINTNEXTLINE(readability-simplify-boolean-expr)
@@ -426,11 +423,11 @@ namespace netlist::solver
 			pstring num = plib::pfmt("{1}")(k);
 
 			state().save(*this, m_gonn[k], "GO" + num, this->name(),
-						 m_terms[k].count());
+				m_terms[k].count());
 			state().save(*this, m_gtn[k], "GT" + num, this->name(),
-						 m_terms[k].count());
+				m_terms[k].count());
 			state().save(*this, m_Idrn[k], "IDR" + num, this->name(),
-						 m_terms[k].count());
+				m_terms[k].count());
 		}
 	}
 
@@ -467,9 +464,9 @@ namespace netlist::solver
 			for (std::size_t i = 0; i < count; i++)
 			{
 				m_terms[k].terms()[i]->set_ptrs(&m_gtn[k][i], &m_gonn[k][i],
-												&m_Idrn[k][i]);
+					&m_Idrn[k][i]);
 				m_connected_net_Vn[k][i] = get_connected_net(
-											   m_terms[k].terms()[i])
+					m_terms[k].terms()[i])
 											   ->Q_Analog_state_ptr();
 			}
 		}
@@ -495,7 +492,7 @@ namespace netlist::solver
 	}
 
 	void matrix_solver_t::step(detail::time_step_type ts_type,
-							   netlist_time           delta) noexcept
+		netlist_time                                  delta) noexcept
 	{
 		const auto dd(delta.as_fp<fptype>());
 		for (auto &d : m_step_funcs)
@@ -536,12 +533,11 @@ namespace netlist::solver
 		{
 			backup();
 			step(detail::time_step_type::FORWARD,
-				 netlist_time::from_fp(m_params.m_min_ts_ts()));
+				netlist_time::from_fp(m_params.m_min_ts_ts()));
 			resched = solve_nr_base();
 			// update time step calculation
 			next_time_step = compute_next_time_step(m_params.m_min_ts_ts(),
-													m_params.m_min_ts_ts(),
-													m_params.m_max_time_step);
+				m_params.m_min_ts_ts(), m_params.m_max_time_step);
 			delta -= netlist_time::from_fp(m_params.m_min_ts_ts());
 		}
 		// try remaining time using compute_next_time step
@@ -559,14 +555,14 @@ namespace netlist::solver
 		}
 
 		if (m_stat_newton_raphson % 100 == 0)
-			log().warning(MW_NEWTON_LOOPS_EXCEEDED_INVOCATION_3(
-				100, this->name(), exec().time().as_double() * 1e6));
+			log().warning(MW_NEWTON_LOOPS_EXCEEDED_INVOCATION_3(100,
+				this->name(), exec().time().as_double() * 1e6));
 
 		if (resched)
 		{
 			// reschedule ....
-			log().warning(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_2(
-				this->name(), exec().time().as_double() * 1e6));
+			log().warning(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_2(this->name(),
+				exec().time().as_double() * 1e6));
 			return netlist_time::from_fp(m_params.m_nr_recalc_delay());
 		}
 		if (m_params.m_dynamic_ts)
@@ -575,8 +571,8 @@ namespace netlist::solver
 		return netlist_time::from_fp(m_params.m_max_time_step);
 	}
 
-	netlist_time matrix_solver_t::solve(netlist_time_ext             now,
-										[[maybe_unused]] const char *source)
+	netlist_time matrix_solver_t::solve(netlist_time_ext now,
+		[[maybe_unused]] const char                     *source)
 	{
 		auto delta = static_cast<netlist_time>(now - m_last_step());
 		PFDEBUG(printf("solve %.10f\n", delta.as_double());)
@@ -616,8 +612,7 @@ namespace netlist::solver
 		{
 			if (time_step_device_count() > 0)
 				return compute_next_time_step(delta.as_fp<nl_fptype>(),
-											  m_params.m_min_time_step,
-											  m_params.m_max_time_step);
+					m_params.m_min_time_step, m_params.m_max_time_step);
 		}
 
 		if (time_step_device_count() > 0)
@@ -634,9 +629,8 @@ namespace netlist::solver
 		return -1;
 	}
 
-	std::pair<int, int>
-	matrix_solver_t::get_left_right_of_diagonal(std::size_t irow,
-												std::size_t idiag)
+	std::pair<int, int> matrix_solver_t::get_left_right_of_diagonal(
+		std::size_t irow, std::size_t idiag)
 	{
 		//
 		// return the maximum column left of the diagonal (-1 if no cols found)
@@ -671,9 +665,8 @@ namespace netlist::solver
 		return {colmax, colmin};
 	}
 
-	matrix_solver_t::fptype
-	matrix_solver_t::get_weight_around_diagonal(std::size_t row,
-												std::size_t diag)
+	matrix_solver_t::fptype matrix_solver_t::get_weight_around_diagonal(
+		std::size_t row, std::size_t diag)
 	{
 		{
 			//
@@ -739,11 +732,10 @@ namespace netlist::solver
 			log().verbose("Solver {1}", this->name());
 			log().verbose("       ==> {1} nets", this->m_terms.size());
 			log().verbose("       has {1} dynamic elements",
-						  this->dynamic_device_count());
+				this->dynamic_device_count());
 			log().verbose("       has {1} time step elements",
-						  this->time_step_device_count());
-			log().verbose(
-				"       {1:6.3} average newton raphson loops",
+				this->time_step_device_count());
+			log().verbose("       {1:6.3} average newton raphson loops",
 				static_cast<fptype>(this->m_stat_newton_raphson)
 					/ static_cast<fptype>(this->m_stat_vsolver_calls));
 			log().verbose(

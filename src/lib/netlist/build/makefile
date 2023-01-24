@@ -352,6 +352,7 @@ emsdk:
 # regression tests
 #-------------------------------------------------
 
+.PHONY: runtests
 runtests: $(TARGETS)
 	./nltool$(EXESUFFIX) -c tests
 
@@ -417,15 +418,21 @@ generated: $(SRC)/generated/lib_entries.hxx $(SRC)/generated/nld_devinc.h $(SRC)
 # fix permissions, source management
 #-------------------------------------------------
 
+.PHONY: fix_permissions
 fix_permissions:
 	@find .. -executable -and -not -type d -print | grep -v /build | xargs -r chmod a-x
 	@chmod a-x $(ALLFILES)
 	@find .. -print | xargs setfacl -b
 
+.PHONY: srcclean
 srcclean: $(ALLSOURCES) $(ALLHEADERS)
 	@../../../../srcclean -u $(ALLSOURCES) $(ALLHEADERS)
 
-precommit: fix_permissions srcclean all runtests
+.PHONY: precommit
+precommit:
+	$(MAKE) fix_permissions 
+	$(MAKE) srcclean
+	$(MAKE) runtests
 
 #-------------------------------------------------
 # clang tidy

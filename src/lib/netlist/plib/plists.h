@@ -26,7 +26,6 @@ namespace plib {
 	class uninitialised_array
 	{
 	public:
-
 		using value_type = C;
 		using pointer = value_type *;
 		using const_pointer = const value_type *;
@@ -42,9 +41,12 @@ namespace plib {
 		constexpr uninitialised_array() noexcept = default;
 
 		constexpr uninitialised_array(const uninitialised_array &) = default;
-		constexpr uninitialised_array &operator=(const uninitialised_array &) = default;
-		constexpr uninitialised_array(uninitialised_array &&) noexcept = default;
-		constexpr uninitialised_array &operator=(uninitialised_array &&) noexcept = default;
+		constexpr uninitialised_array &operator=(const uninitialised_array &)
+			= default;
+		constexpr uninitialised_array(
+			uninitialised_array &&) noexcept = default;
+		constexpr uninitialised_array &
+		operator=(uninitialised_array &&) noexcept = default;
 
 		~uninitialised_array() noexcept = default;
 
@@ -65,22 +67,42 @@ namespace plib {
 		}
 
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		constexpr iterator begin() const noexcept { return reinterpret_cast<iterator>(&m_buf[0]); }
+		constexpr iterator begin() const noexcept
+		{
+			return reinterpret_cast<iterator>(&m_buf[0]);
+		}
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		constexpr iterator end() const noexcept { return reinterpret_cast<iterator>(&m_buf[0] + N); }
+		constexpr iterator end() const noexcept
+		{
+			return reinterpret_cast<iterator>(&m_buf[0] + N);
+		}
 
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		constexpr iterator begin() noexcept { return reinterpret_cast<iterator>(&m_buf[0]); }
+		constexpr iterator begin() noexcept
+		{
+			return reinterpret_cast<iterator>(&m_buf[0]);
+		}
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		constexpr iterator end() noexcept { return reinterpret_cast<iterator>(&m_buf[0] + N); }
+		constexpr iterator end() noexcept
+		{
+			return reinterpret_cast<iterator>(&m_buf[0] + N);
+		}
 
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		constexpr const_iterator cbegin() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[0]); }
+		constexpr const_iterator cbegin() const noexcept
+		{
+			return reinterpret_cast<const_iterator>(&m_buf[0]);
+		}
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		constexpr const_iterator cend() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[0] + N); }
+		constexpr const_iterator cend() const noexcept
+		{
+			return reinterpret_cast<const_iterator>(&m_buf[0] + N);
+		}
 
 	private:
-		std::array<typename std::aligned_storage<sizeof(C), alignof(C)>::type, N> m_buf;
+		std::array<typename std::aligned_storage<sizeof(C), alignof(C)>::type,
+			N>
+			m_buf;
 	};
 
 	/// \brief fixed allocation vector
@@ -94,7 +116,6 @@ namespace plib {
 	class static_vector
 	{
 	public:
-
 		using value_type = C;
 		using pointer = value_type *;
 		using const_pointer = const value_type *;
@@ -108,7 +129,7 @@ namespace plib {
 		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 		constexpr static_vector() noexcept
-		: m_pos(0)
+			: m_pos(0)
 		{
 		}
 
@@ -117,10 +138,7 @@ namespace plib {
 		constexpr static_vector(static_vector &&) noexcept = default;
 		constexpr static_vector &operator=(static_vector &&) noexcept = default;
 
-		~static_vector() noexcept
-		{
-			clear();
-		}
+		~static_vector() noexcept { clear(); }
 
 		constexpr size_t size() const noexcept { return m_pos; }
 
@@ -128,13 +146,13 @@ namespace plib {
 
 		constexpr void clear()
 		{
-			for (size_type i=0; i<m_pos; ++i)
+			for (size_type i = 0; i < m_pos; ++i)
 				(*this)[i].~C();
 			m_pos = 0;
 		}
 
-		template<typename... Args>
-		constexpr void emplace_back(Args&&... args)
+		template <typename... Args>
+		constexpr void emplace_back(Args &&...args)
 		{
 			// placement new on buffer
 			new (&m_buf[m_pos]) C(std::forward<Args>(args)...);
@@ -154,22 +172,42 @@ namespace plib {
 		}
 
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		constexpr iterator begin() const noexcept { return reinterpret_cast<iterator>(&m_buf[0]); }
+		constexpr iterator begin() const noexcept
+		{
+			return reinterpret_cast<iterator>(&m_buf[0]);
+		}
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		constexpr iterator end() const noexcept { return reinterpret_cast<iterator>(&m_buf[0] + m_pos); }
+		constexpr iterator end() const noexcept
+		{
+			return reinterpret_cast<iterator>(&m_buf[0] + m_pos);
+		}
 
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		constexpr iterator begin() noexcept { return reinterpret_cast<iterator>(&m_buf[0]); }
+		constexpr iterator begin() noexcept
+		{
+			return reinterpret_cast<iterator>(&m_buf[0]);
+		}
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		constexpr iterator end() noexcept { return reinterpret_cast<iterator>(&m_buf[0] + m_pos); }
+		constexpr iterator end() noexcept
+		{
+			return reinterpret_cast<iterator>(&m_buf[0] + m_pos);
+		}
 
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		constexpr const_iterator cbegin() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[0]); }
+		constexpr const_iterator cbegin() const noexcept
+		{
+			return reinterpret_cast<const_iterator>(&m_buf[0]);
+		}
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-		constexpr const_iterator cend() const noexcept { return reinterpret_cast<const_iterator>(&m_buf[0] + m_pos); }
+		constexpr const_iterator cend() const noexcept
+		{
+			return reinterpret_cast<const_iterator>(&m_buf[0] + m_pos);
+		}
 
 	private:
-		std::array<typename std::aligned_storage<sizeof(C), alignof(C)>::type, N> m_buf;
+		std::array<typename std::aligned_storage<sizeof(C), alignof(C)>::type,
+			N>
+				  m_buf;
 		size_type m_pos;
 	};
 
@@ -190,41 +228,66 @@ namespace plib {
 
 			friend class linked_list_t<LC, TAG>;
 
-			constexpr element_t() noexcept : m_next(nullptr), m_prev(nullptr) {}
+			constexpr element_t() noexcept
+				: m_next(nullptr)
+				, m_prev(nullptr)
+			{
+			}
 			~element_t() noexcept = default;
 
 			constexpr element_t(const element_t &) noexcept = default;
-			constexpr element_t &operator=(const element_t &) noexcept = default;
+			constexpr element_t &
+			operator=(const element_t &) noexcept = default;
 			constexpr element_t(element_t &&) noexcept = default;
 			constexpr element_t &operator=(element_t &&) noexcept = default;
 
 		private:
-			element_t * m_next;
-			element_t * m_prev;
+			element_t *m_next;
+			element_t *m_prev;
 		};
 
-		struct iter_t final : public std::iterator<std::forward_iterator_tag, LC>
+		struct iter_t final
+			: public std::iterator<std::forward_iterator_tag, LC>
 		{
 		private:
-			element_t * p;
+			element_t *p;
+
 		public:
 			using tag = std::integral_constant<int, TAG>;
 
-			explicit constexpr iter_t(element_t * x) noexcept : p(x) { }
+			explicit constexpr iter_t(element_t *x) noexcept
+				: p(x)
+			{
+			}
 
 			constexpr iter_t(const iter_t &rhs) noexcept = default;
 			constexpr iter_t(iter_t &&rhs) noexcept = default;
-			constexpr iter_t& operator=(const iter_t &rhs) noexcept = default;
-			constexpr iter_t& operator=(iter_t &&rhs) noexcept  = default;
+			constexpr iter_t &operator=(const iter_t &rhs) noexcept = default;
+			constexpr iter_t &operator=(iter_t &&rhs) noexcept = default;
 
 			~iter_t() noexcept = default;
 
-			iter_t& operator++() noexcept { p = p->m_next; return *this; }
+			iter_t &operator++() noexcept
+			{
+				p = p->m_next;
+				return *this;
+			}
 			// NOLINTNEXTLINE(cert-dcl21-cpp)
-			iter_t operator++(int) & noexcept { const iter_t tmp(*this); operator++(); return tmp; }
+			iter_t operator++(int) &noexcept
+			{
+				const iter_t tmp(*this);
+							 operator++();
+				return tmp;
+			}
 
-			constexpr bool operator==(const iter_t& rhs) const noexcept { return p == rhs.p; }
-			constexpr bool operator!=(const iter_t& rhs) const noexcept { return p != rhs.p; }
+			constexpr bool operator==(const iter_t &rhs) const noexcept
+			{
+				return p == rhs.p;
+			}
+			constexpr bool operator!=(const iter_t &rhs) const noexcept
+			{
+				return p != rhs.p;
+			}
 #if 0
 			constexpr LC& operator*() noexcept { return *static_cast<LC *>(p); }
 			constexpr LC* operator->() noexcept { return static_cast<LC *>(p); }
@@ -232,15 +295,24 @@ namespace plib {
 			constexpr LC& operator*() const noexcept { return *static_cast<LC *>(p); }
 			constexpr LC* operator->() const noexcept { return static_cast<LC *>(p); }
 #else
-			constexpr LC* operator*() noexcept { return static_cast<LC *>(p); }
-			constexpr LC* operator->() noexcept { return static_cast<LC *>(p); }
+			constexpr LC *operator*() noexcept { return static_cast<LC *>(p); }
+			constexpr LC *operator->() noexcept { return static_cast<LC *>(p); }
 
-			constexpr LC* operator*() const noexcept { return static_cast<LC *>(p); }
-			constexpr LC* operator->() const noexcept { return static_cast<LC *>(p); }
+			constexpr LC *operator*() const noexcept
+			{
+				return static_cast<LC *>(p);
+			}
+			constexpr LC *operator->() const noexcept
+			{
+				return static_cast<LC *>(p);
+			}
 #endif
 		};
 
-		constexpr linked_list_t() noexcept : m_head(nullptr) {}
+		constexpr linked_list_t() noexcept
+			: m_head(nullptr)
+		{
+		}
 
 		constexpr iter_t begin() const noexcept { return iter_t(m_head); }
 		constexpr iter_t end() const noexcept { return iter_t(nullptr); }
@@ -256,8 +328,8 @@ namespace plib {
 
 		constexpr void push_back(element_t *elem) noexcept
 		{
-			element_t ** p(&m_head);
-			element_t *  prev(nullptr);
+			element_t **p(&m_head);
+			element_t  *prev(nullptr);
 			while (*p != nullptr)
 			{
 				prev = *p;
@@ -282,12 +354,12 @@ namespace plib {
 			}
 		}
 
-		constexpr LC *front() const noexcept { return m_head; }
+		constexpr LC  *front() const noexcept { return m_head; }
 		constexpr bool empty() const noexcept { return (m_head == nullptr); }
 		constexpr std::size_t size() const noexcept
 		{
 			std::size_t ret = 0;
-			element_t *p = m_head;
+			element_t  *p = m_head;
 			while (p != nullptr)
 			{
 				ret++;

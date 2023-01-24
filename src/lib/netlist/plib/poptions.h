@@ -28,6 +28,7 @@ namespace plib {
 		PCOPYASSIGNMOVE(option_base, delete)
 
 		virtual pstring help() const { return m_help; }
+
 	private:
 		pstring m_help;
 	};
@@ -36,9 +37,13 @@ namespace plib {
 	{
 	public:
 		option_group(options &parent, const pstring &group, const pstring &help)
-		: option_base(parent, help), m_group(group) { }
+			: option_base(parent, help)
+			, m_group(group)
+		{
+		}
 
 		pstring group() const { return m_group; }
+
 	private:
 		pstring m_group;
 	};
@@ -46,26 +51,31 @@ namespace plib {
 	class option_example : public option_base
 	{
 	public:
-		option_example(options &parent, const pstring &group, const pstring &help)
-		: option_base(parent, help), m_example(group) { }
+		option_example(options &parent, const pstring &group,
+			const pstring &help)
+			: option_base(parent, help)
+			, m_example(group)
+		{
+		}
 
 		pstring example() const { return m_example; }
+
 	private:
 		pstring m_example;
 	};
 
-
 	class option : public option_base
 	{
 	public:
-		option(options &parent, const pstring &short_opt, const pstring &long_opt, const pstring &help, bool has_argument);
+		option(options &parent, const pstring &short_opt,
+			const pstring &long_opt, const pstring &help, bool has_argument);
 
 		// no_argument options will be called with "" argument
 
 		pstring short_opt() const { return m_short; }
 		pstring long_opt() const { return m_long; }
-		bool has_argument() const { return m_has_argument ; }
-		bool was_specified() const { return m_specified; }
+		bool    has_argument() const { return m_has_argument; }
+		bool    was_specified() const { return m_specified; }
 
 		int do_parse(const pstring &argument)
 		{
@@ -79,18 +89,22 @@ namespace plib {
 	private:
 		pstring m_short;
 		pstring m_long;
-		bool m_has_argument;
-		bool m_specified;
+		bool    m_has_argument;
+		bool    m_specified;
 	};
 
 	class option_str : public option
 	{
 	public:
-		option_str(options &parent, const pstring &short_opt, const pstring &long_opt, const pstring &default_value, const pstring &help)
-		: option(parent, short_opt, long_opt, help, true), m_val(default_value)
-		{}
+		option_str(options &parent, const pstring &short_opt,
+			const pstring &long_opt, const pstring &default_value,
+			const pstring &help)
+			: option(parent, short_opt, long_opt, help, true)
+			, m_val(default_value)
+		{
+		}
 
-		pstring operator ()() const { return m_val; }
+		pstring operator()() const { return m_val; }
 
 	protected:
 		int parse(const pstring &argument) override;
@@ -102,30 +116,34 @@ namespace plib {
 	class option_str_limit_base : public option
 	{
 	public:
-		option_str_limit_base(options &parent, const pstring &short_opt, const pstring &long_opt, std::vector<pstring> &&limit, const pstring &help)
-		: option(parent, short_opt, long_opt, help, true)
-		, m_limit(limit)
+		option_str_limit_base(options &parent, const pstring &short_opt,
+			const pstring &long_opt, std::vector<pstring> &&limit,
+			const pstring &help)
+			: option(parent, short_opt, long_opt, help, true)
+			, m_limit(limit)
 		{
 		}
 		const std::vector<pstring> &limit() const { return m_limit; }
 
 	protected:
-
 	private:
 		std::vector<pstring> m_limit;
 	};
-
 
 	template <typename T>
 	class option_str_limit : public option_str_limit_base
 	{
 	public:
-		option_str_limit(options &parent, const pstring &short_opt, const pstring &long_opt, const T &default_value, std::vector<pstring> &&limit, const pstring &help)
-		: option_str_limit_base(parent, short_opt, long_opt, std::move(limit), help), m_val(default_value)
+		option_str_limit(options &parent, const pstring &short_opt,
+			const pstring &long_opt, const T &default_value,
+			std::vector<pstring> &&limit, const pstring &help)
+			: option_str_limit_base(parent, short_opt, long_opt,
+				std::move(limit), help)
+			, m_val(default_value)
 		{
 		}
 
-		T operator ()() const { return m_val; }
+		T operator()() const { return m_val; }
 
 		pstring as_string() const { return limit()[m_val]; }
 
@@ -150,11 +168,14 @@ namespace plib {
 	class option_bool : public option
 	{
 	public:
-		option_bool(options &parent, const pstring &short_opt, const pstring &long_opt, const pstring &help)
-		: option(parent, short_opt, long_opt, help, false), m_val(false)
-		{}
+		option_bool(options &parent, const pstring &short_opt,
+			const pstring &long_opt, const pstring &help)
+			: option(parent, short_opt, long_opt, help, false)
+			, m_val(false)
+		{
+		}
 
-		bool operator ()() const { return m_val; }
+		bool operator()() const { return m_val; }
 
 	protected:
 		int parse(const pstring &argument) override;
@@ -167,18 +188,19 @@ namespace plib {
 	class option_num : public option
 	{
 	public:
-		option_num(options &parent, const pstring &short_opt, const pstring &long_opt, T default_value,
-				const pstring &help,
-				T min_val = std::numeric_limits<T>::lowest(),
-				T max_val = std::numeric_limits<T>::max() )
-		: option(parent, short_opt, long_opt, help, true)
-		, m_val(default_value)
-		, m_min(min_val)
-		, m_max(max_val)
-		, m_def(default_value)
-		{}
+		option_num(options &parent, const pstring &short_opt,
+			const pstring &long_opt, T default_value, const pstring &help,
+			T min_val = std::numeric_limits<T>::lowest(),
+			T max_val = std::numeric_limits<T>::max())
+			: option(parent, short_opt, long_opt, help, true)
+			, m_val(default_value)
+			, m_min(min_val)
+			, m_max(max_val)
+			, m_def(default_value)
+		{
+		}
 
-		T operator ()() const { return m_val; }
+		T operator()() const { return m_val; }
 
 		pstring help() const override
 		{
@@ -204,11 +226,13 @@ namespace plib {
 	class option_vec : public option
 	{
 	public:
-		option_vec(options &parent, const pstring &short_opt, const pstring &long_opt, const pstring &help)
-		: option(parent, short_opt, long_opt, help, true)
-		{}
+		option_vec(options &parent, const pstring &short_opt,
+			const pstring &long_opt, const pstring &help)
+			: option(parent, short_opt, long_opt, help, true)
+		{
+		}
 
-		const std::vector<pstring> &operator ()() const { return m_val; }
+		const std::vector<pstring> &operator()() const { return m_val; }
 
 	protected:
 		int parse(const pstring &argument) override;
@@ -221,14 +245,14 @@ namespace plib {
 	{
 	public:
 		option_args(options &parent, const pstring &help)
-		: option_vec(parent, "", "", help)
-		{}
+			: option_vec(parent, "", "", help)
+		{
+		}
 	};
 
 	class options
 	{
 	public:
-
 		options();
 		explicit options(option **o);
 
@@ -236,38 +260,39 @@ namespace plib {
 
 		PCOPYASSIGNMOVE(options, delete)
 
-		void register_option(option_base *opt);
+		void        register_option(option_base *opt);
 		std::size_t parse(const std::vector<putf8string> &argv);
 
 		pstring help(const pstring &description, const pstring &usage,
-				unsigned width = 72, unsigned indent = 20) const;
+			unsigned width = 72, unsigned indent = 20) const;
 
 		pstring app() const { return m_app; }
 
 	private:
-		static pstring split_paragraphs(const pstring &text, unsigned width, unsigned indent,
-				unsigned first_line_indent, const pstring &line_end = "\n");
+		static pstring
+		split_paragraphs(const pstring &text, unsigned width, unsigned indent,
+			unsigned first_line_indent, const pstring &line_end = "\n");
 
 		void check_consistency() noexcept(false);
 
 		template <typename T>
 		T *getopt_type() const
 		{
-			for (const auto & base_class : m_options )
+			for (const auto &base_class : m_options)
 			{
 				if (auto opt = dynamic_cast<T *>(base_class))
 					return opt;
 			}
-		return nullptr;
-	}
+			return nullptr;
+		}
 
 		option *getopt_short(const pstring &arg) const;
 		option *getopt_long(const pstring &arg) const;
 
 		std::vector<option_base *> m_options;
-		pstring m_app;
-		option_args * m_other_args;
-};
+		pstring                    m_app;
+		option_args               *m_other_args;
+	};
 
 } // namespace plib
 

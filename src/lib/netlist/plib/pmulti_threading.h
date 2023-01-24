@@ -19,37 +19,48 @@
 
 namespace plib {
 
-	template<bool enabled_ = true>
+	template <bool enabled_ = true>
 	struct pspin_mutex
 	{
 	public:
 		inline pspin_mutex() noexcept = default;
-		inline void lock() noexcept{ while (m_lock.test_and_set(std::memory_order_acquire)) { } }
-		inline void unlock() noexcept { m_lock.clear(std::memory_order_release); }
+		inline void lock() noexcept
+		{
+			while (m_lock.test_and_set(std::memory_order_acquire))
+			{
+			}
+		}
+		inline void unlock() noexcept
+		{
+			m_lock.clear(std::memory_order_release);
+		}
+
 	private:
 		PALIGNAS_CACHELINE()
 		std::atomic_flag m_lock = ATOMIC_FLAG_INIT;
 	};
 
-	template<>
+	template <>
 	struct pspin_mutex<false>
 	{
 	public:
 		inline pspin_mutex() noexcept = default;
-		static inline void lock() noexcept { }
-		static inline void unlock() noexcept { }
+		static inline void lock() noexcept {}
+		static inline void unlock() noexcept {}
 	};
 
 	class psemaphore
 	{
 	public:
+		psemaphore(long count = 0) noexcept
+			: m_count(count)
+		{
+		}
 
-		psemaphore(long count = 0) noexcept: m_count(count) { }
-
-		psemaphore(const psemaphore& other) = delete;
-		psemaphore& operator=(const psemaphore& other) = delete;
-		psemaphore(psemaphore&& other) = delete;
-		psemaphore& operator=(psemaphore&& other) = delete;
+		psemaphore(const psemaphore &other) = delete;
+		psemaphore &operator=(const psemaphore &other) = delete;
+		psemaphore(psemaphore &&other) = delete;
+		psemaphore &operator=(psemaphore &&other) = delete;
 		~psemaphore() = default;
 
 		void release(long update = 1)
@@ -77,12 +88,12 @@ namespace plib {
 			}
 			return false;
 		}
-	private:
-		std::mutex m_mutex;
-		std::condition_variable m_cv;
-		long m_count;
-	};
 
+	private:
+		std::mutex              m_mutex;
+		std::condition_variable m_cv;
+		long                    m_count;
+	};
 
 } // namespace plib
 

@@ -14,16 +14,15 @@
 
 #include "plib/putil.h"
 
-namespace netlist::factory
-{
+namespace netlist::factory {
 
 	// FIXME: this doesn't do anything, check how to remove
 	class NETLIB_NAME(wrapper)
-	: public base_device_t
+		: public base_device_t
 	{
 	public:
 		NETLIB_NAME(wrapper)(base_device_param_t data)
-		: base_device_t(data)
+			: base_device_t(data)
 		{
 		}
 
@@ -32,8 +31,8 @@ namespace netlist::factory
 	};
 
 	element_t::element_t(const pstring &name, properties &&props)
-	: m_name(name)
-	, m_properties(props)
+		: m_name(name)
+		, m_properties(props)
 	{
 	}
 
@@ -42,7 +41,7 @@ namespace netlist::factory
 	// -------------------------------------------------------------------------
 
 	list_t::list_t(log_type &alog)
-	: m_log(alog)
+		: m_log(alog)
 	{
 	}
 
@@ -83,9 +82,9 @@ namespace netlist::factory
 	// -------------------------------------------------------------------------
 
 	library_element_t::library_element_t(const pstring &name,
-		properties &&                                   props)
-	: element_t(name,
-		std::move(properties(props).set_type(element_type::MACRO)))
+		properties                                    &&props)
+		: element_t(name,
+			std::move(properties(props).set_type(element_type::MACRO)))
 	{
 	}
 

@@ -13,8 +13,8 @@
 #include "../plib/pfmtlog.h"
 #include "../plib/pstring.h"
 
-namespace netlist
-{
+namespace netlist {
+
 	/// \brief A persistent variable template.
 	///  Use the state_var template to define a variable whose value is saved.
 	///  Within a device definition use
@@ -37,15 +37,17 @@ namespace netlist
 
 		template <typename O>
 		//! Constructor.
-		state_var(O &      owner, //!< owner must have a netlist() method.
-			const pstring &name,  //!< identifier/name for this state variable
-			const T &      value  //!< Initial value after construction
+		state_var(O       &owner, //!< owner must have a netlist() method.
+			const pstring &name,  //!< identifier/name for this state
+								 //!< variable
+			const T &value //!< Initial value after construction
 		);
 
 		template <typename O>
 		//! Constructor.
-		state_var(O &      owner, //!< owner must have a netlist() method.
-			const pstring &name   //!< identifier/name for this state variable
+		state_var(O       &owner, //!< owner must have a netlist() method.
+			const pstring &name   //!< identifier/name for this state
+								  //!< variable
 		);
 
 		state_var(state_var &&) noexcept = delete;
@@ -115,16 +117,20 @@ namespace netlist
 		using value_type = typename C::value_type;
 		//! Constructor.
 		template <typename O>
-		state_container(O &   owner, //!< owner must have a netlist() method.
-			const pstring &   name, //!< identifier/name for this state variable
-			const value_type &value //!< Initial value after construction
+		state_container(O &owner,   //!< owner must have a netlist() method.
+			const pstring &name,    //!< identifier/name for this state
+									//!< variable
+			const value_type &value //!< Initial value after
+									//!< construction
 		);
 		//! Constructor.
 		template <typename O>
-		state_container(O &   owner, //!< owner must have a netlist() method.
-			const pstring &   name, //!< identifier/name for this state variable
+		state_container(O &owner,   //!< owner must have a netlist() method.
+			const pstring &name,    //!< identifier/name for this state
+									//!< variable
 			std::size_t       n,    //!< number of elements to allocate
-			const value_type &value //!< Initial value after construction
+			const value_type &value //!< Initial value after
+									//!< construction
 		);
 		//! Copy Constructor.
 		state_container(const state_container &rhs) noexcept = default;
@@ -132,8 +138,8 @@ namespace netlist
 		~state_container() noexcept = default;
 		//! Move Constructor.
 		state_container(state_container &&rhs) noexcept = default;
-		state_container &operator=(
-			const state_container &rhs) noexcept = default;
+		state_container &
+		operator=(const state_container &rhs) noexcept = default;
 		state_container &operator=(state_container &&rhs) noexcept = default;
 	};
 
@@ -156,7 +162,7 @@ namespace netlist
 	template <typename T>
 	template <typename O>
 	state_var<T>::state_var(O &owner, const pstring &name, const T &value)
-	: m_value(value)
+		: m_value(value)
 	{
 		owner.state().save(owner, m_value, owner.name(), name);
 	}
@@ -182,7 +188,7 @@ namespace netlist
 	template <typename O>
 	state_container<C>::state_container(O &owner, const pstring &name,
 		std::size_t n, const state_container<C>::value_type &value)
-	: C(n, value)
+		: C(n, value)
 	{
 		owner.state().save(owner, static_cast<C &>(*this), owner.name(), name);
 	}
@@ -203,8 +209,8 @@ namespace netlist
 
 } // namespace netlist
 
-namespace plib
-{
+namespace plib {
+
 	template <typename X>
 	struct format_traits<netlist::state_var<X>> : format_traits<X>
 	{

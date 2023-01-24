@@ -13,10 +13,7 @@
 //
 #define TEST_ALT_OUTPUT (0)
 
-namespace netlist
-{
-	namespace analog
-	{
+namespace netlist::analog {
 
 	/// \brief Class representing the opamp model parameters.
 	///
@@ -27,24 +24,24 @@ namespace netlist
 	///
 	///  This is an extension to the traditional SPICE approach which
 	///  assumes that you will be using an manufacturer model. These models may
-	///  have copyrights incompatible with the netlist license. Thus they may not
-	///  be suitable for certain implementations of netlist.
+	///  have copyrights incompatible with the netlist license. Thus they may
+	///  not be suitable for certain implementations of netlist.
 	///
 	///  For the typical use cases in low frequency (< 100 KHz) applications at
-	///  which netlist is targeted, this model is certainly suitable. All parameters
-	///  can be determined from a typical opamp datasheet.
+	///  which netlist is targeted, this model is certainly suitable. All
+	///  parameters can be determined from a typical opamp datasheet.
 	///
-	///   |Type|name  |parameter                                      |units|default| example|
-	///   |:--:|:-----|:----------------------------------------------|:----|------:|-------:|
-	///   |  3 |TYPE  |Model Type, 1 and 3 are supported              |     |       |        |
-	///   |1,3 |FPF   |frequency of first pole                        |Hz   |       |100     |
-	///   |  3 |SLEW  |unity gain slew rate                           |V/s  |       |       1|
-	///   |1,3 |RI    |input resistance                               |Ohm  |       |1M      |
-	///   |1,3 |RO    |output resistance                              |Ohm  |       |50      |
-	///   |1,3 |UGF   |unity gain frequency (transition frequency)    |Hz   |       |1000    |
-	///   |  3 |VLL   |low output swing minus low supply rail         |V    |       |1.5     |
-	///   |  3 |VLH   |high supply rail minus high output swing       |V    |       |1.5     |
-	///   |  3 |DAB   |Differential Amp Bias - total quiescent current|A    |       |0.001   |
+	/// |Type|name  |parameter                                      |units|default| example|
+	/// |:--:|:-----|:----------------------------------------------|:----|------:|-------:|
+	/// |  3 |TYPE  |Model Type, 1 and 3 are supported              |     |       |        |
+	/// |1,3 |FPF   |frequency of first pole                        |Hz   |       |100     |
+	/// |  3 |SLEW  |unity gain slew rate                           |V/s  |       |       1|
+	/// |1,3 |RI    |input resistance                               |Ohm  |       |1M      |
+	/// |1,3 |RO    |output resistance                              |Ohm  |       |50      |
+	/// |1,3 |UGF   |unity gain frequency (transition frequency)    |Hz   |       |1000    |
+	/// |  3 |VLL   |low output swing minus low supply rail         |V    |       |1.5     |
+	/// |  3 |VLH   |high supply rail minus high output swing       |V    |       |1.5     |
+	/// |  3 |DAB   |Differential Amp Bias - total quiescent current|A    |       |0.001   |
 	///
 	///
 	/// Type = 0: Impedance changer
@@ -69,7 +66,8 @@ namespace netlist
 	///     RO = output resistance in Ohms
 	///     DAB = Differential Amp Bias ~ op amp's total quiescent current.
 	///
-	/// .model abc OPAMP(VLH=2.0 VLL=0.2 FPF=5 UGF=10k SLEW=0.6u RI=1000k RO=50 DAB=0.002)
+	/// .model abc OPAMP(VLH=2.0 VLL=0.2 FPF=5 UGF=10k SLEW=0.6u RI=1000k RO=50
+	/// DAB=0.002)
 	///
 	/// http://www.ecircuitcenter.com/Circuits/opmodel1/opmodel1.htm
 	///
@@ -78,44 +76,48 @@ namespace netlist
 	{
 	public:
 		opamp_model_t(param_model_t &model)
-		: m_TYPE(model, "TYPE")
-		, m_FPF(model, "FPF")
-		, m_SLEW(model, "SLEW")
-		, m_RI(model, "RI")
-		, m_RO(model, "RO")
-		, m_UGF(model, "UGF")
-		, m_VLL(model, "VLL")
-		, m_VLH(model, "VLH")
-		, m_DAB(model, "DAB")
-		{}
+			: m_TYPE(model, "TYPE")
+			, m_FPF(model, "FPF")
+			, m_SLEW(model, "SLEW")
+			, m_RI(model, "RI")
+			, m_RO(model, "RO")
+			, m_UGF(model, "UGF")
+			, m_VLL(model, "VLL")
+			, m_VLH(model, "VLH")
+			, m_DAB(model, "DAB")
+		{
+		}
 
-		param_model_t::value_t m_TYPE;   //!< Model Type, 1 and 3 are supported
-		param_model_t::value_t m_FPF;    //!< frequency of first pole
-		param_model_t::value_t m_SLEW;   //!< unity gain slew rate
-		param_model_t::value_t m_RI;     //!< input resistance
-		param_model_t::value_t m_RO;     //!< output resistance
-		param_model_t::value_t m_UGF;    //!< unity gain frequency (transition frequency)
-		param_model_t::value_t m_VLL;    //!< low output swing minus low supply rail
-		param_model_t::value_t m_VLH;    //!< high supply rail minus high output swing
-		param_model_t::value_t m_DAB;    //!< Differential Amp Bias - total quiescent current
+		param_model_t::value_t m_TYPE; //!< Model Type, 1 and 3 are supported
+		param_model_t::value_t m_FPF;  //!< frequency of first pole
+		param_model_t::value_t m_SLEW; //!< unity gain slew rate
+		param_model_t::value_t m_RI;   //!< input resistance
+		param_model_t::value_t m_RO;   //!< output resistance
+		param_model_t::value_t m_UGF;  //!< unity gain frequency (transition
+									   //!< frequency)
+		param_model_t::value_t m_VLL;  //!< low output swing minus low supply
+									   //!< rail
+		param_model_t::value_t m_VLH;  //!< high supply rail minus high output
+									   //!< swing
+		param_model_t::value_t m_DAB;  //!< Differential Amp Bias - total
+									   //!< quiescent current
 	};
-
 
 	class nld_opamp : public base_device_t
 	{
 	public:
 		nld_opamp(constructor_param_t data)
-		: base_device_t(data)
-		, m_RP(*this, "RP1")
-		, m_G1(*this, "G1")
-		, m_VCC(*this, "VCC", NETLIB_DELEGATE(supply))
-		, m_GND(*this, "GND", NETLIB_DELEGATE(supply))
-		, m_model(*this, "MODEL", "LM324")
-		, m_modacc(m_model)
-		, m_VH(*this, "VH")
-		, m_VL(*this, "VL")
-		, m_VREF(*this, "VREF")
-		, m_type(plib::narrow_cast<int>(m_modacc.m_TYPE))
+			: base_device_t(data)
+			, m_RP(*this, "RP1")
+			, m_G1(*this, "G1")
+			, m_VCC(*this, "VCC", NETLIB_DELEGATE(supply))
+			, m_GND(*this, "GND", NETLIB_DELEGATE(supply))
+			, m_model(*this, "MODEL", "LM324")
+			, m_modacc(m_model)
+			, m_VH(*this, "VH")
+			, m_VL(*this, "VL")
+			, m_VREF(*this, "VREF")
+			, m_type(plib::narrow_cast<int>(m_modacc.m_TYPE))
 		{
 			if (m_type < 1 || m_type > 3)
 			{
@@ -132,7 +134,6 @@ namespace netlist
 				connect("G1.ON", "VREF");
 				connect("RP1.2", "VREF");
 				connect("RP1.1", "G1.OP");
-
 			}
 			if (m_type == 2 || m_type == 3)
 			{
@@ -167,8 +168,10 @@ namespace netlist
 			if (m_type == 3)
 			{
 
-				create_and_register_sub_device(*this, "DN", m_DN, "D(IS=1e-15 N=1)");
-				create_and_register_sub_device(*this, "DP", m_DP, "D(IS=1e-15 N=1)");
+				create_and_register_sub_device(*this, "DN", m_DN,
+					"D(IS=1e-15 N=1)");
+				create_and_register_sub_device(*this, "DP", m_DP,
+					"D(IS=1e-15 N=1)");
 
 				connect("DP.K", "VH");
 				connect("VL", "DN.A");
@@ -181,28 +184,26 @@ namespace netlist
 				register_sub_alias("OUT", "EBUF.OP");
 #endif
 			}
-
 		}
 
 		NETLIB_HANDLERI(supply)
 		{
 			const nl_fptype cVt = nlconst::np_VT(nlconst::one()); // * m_n;
-			const nl_fptype cId = m_modacc.m_DAB; // 3 mA
-			const nl_fptype cVd = cVt * plib::log(cId / nlconst::np_Is() + nlconst::one());
+			const nl_fptype cId = m_modacc.m_DAB;                 // 3 mA
+			const nl_fptype cVd = cVt
+								  * plib::log(
+									  cId / nlconst::np_Is() + nlconst::one());
 
 			m_VH.push(m_VCC() - m_modacc.m_VLH - cVd);
 			m_VL.push(m_GND() + m_modacc.m_VLL + cVd);
 			m_VREF.push((m_VCC() + m_GND()) / nlconst::two());
 		}
 
-		NETLIB_RESETI()
-		{
-		}
+		NETLIB_RESETI() {}
 
 		NETLIB_UPDATE_PARAMI();
 
 	private:
-
 		NETLIB_SUB_NS(analog, R_base) m_RP;
 		NETLIB_SUB_NS(analog, VCCS) m_G1;
 		NETLIB_SUB_UPTR(analog, C) m_CP;
@@ -216,8 +217,8 @@ namespace netlist
 		analog_input_t m_VCC;
 		analog_input_t m_GND;
 
-		param_model_t m_model;
-		opamp_model_t m_modacc;
+		param_model_t   m_model;
+		opamp_model_t   m_modacc;
 		analog_output_t m_VH;
 		analog_output_t m_VL;
 		analog_output_t m_VREF;
@@ -240,17 +241,19 @@ namespace netlist
 		if (m_type == 3 || m_type == 2)
 		{
 			nl_fptype CP = m_modacc.m_DAB / m_modacc.m_SLEW;
-			nl_fptype RP = nlconst::half() / nlconst::pi() / CP / m_modacc.m_FPF;
+			nl_fptype RP = nlconst::half() / nlconst::pi() / CP
+						   / m_modacc.m_FPF;
 			nl_fptype G = m_modacc.m_UGF / m_modacc.m_FPF / RP;
 
-			//printf("OPAMP %s: %g %g %g\n", name().c_str(), CP, RP, G);
-			if (m_modacc.m_SLEW / (nlconst::four() * nlconst::pi() * nlconst::np_VT()) < m_modacc.m_UGF)
+			// printf("OPAMP %s: %g %g %g\n", name().c_str(), CP, RP, G);
+			if (m_modacc.m_SLEW
+					/ (nlconst::four() * nlconst::pi() * nlconst::np_VT())
+				< m_modacc.m_UGF)
 				log().warning(MW_OPAMP_FAIL_CONVERGENCE(this->name()));
 
 			m_CP->set_cap_embedded(CP);
 			m_RP().set_R(RP);
 			m_G1().m_G.set(G);
-
 		}
 		if (m_type == 2)
 		{
@@ -274,10 +277,8 @@ namespace netlist
 		}
 	}
 
+} // namespace netlist::analog
 
-	} //namespace analog
-
-	namespace devices {
-		NETLIB_DEVICE_IMPL_NS(analog, opamp, "OPAMP", "MODEL")
-	} // namespace devices
-} // namespace netlist
+namespace netlist::devices {
+	NETLIB_DEVICE_IMPL_NS(analog, opamp, "OPAMP", "MODEL")
+} // namespace netlist::devices

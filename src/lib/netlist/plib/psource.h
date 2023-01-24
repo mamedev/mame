@@ -18,11 +18,9 @@
 #include <sstream>
 #include <vector>
 
-
 #define PSOURCELOC() plib::source_location(__FILE__, __LINE__)
 
-namespace plib
-{
+namespace plib {
 
 	/// \brief Source code locations.
 	///
@@ -33,16 +31,28 @@ namespace plib
 	struct source_location
 	{
 		source_location() noexcept
-		: m_file("unknown"), m_func(m_file), m_line(0), m_col(0)
-		{ }
+			: m_file("unknown")
+			, m_func(m_file)
+			, m_line(0)
+			, m_col(0)
+		{
+		}
 
 		source_location(pstring file, unsigned line) noexcept
-		: m_file(std::move(file)), m_func("unknown"), m_line(line), m_col(0)
-		{ }
+			: m_file(std::move(file))
+			, m_func("unknown")
+			, m_line(line)
+			, m_col(0)
+		{
+		}
 
 		source_location(pstring file, pstring func, unsigned line) noexcept
-		: m_file(std::move(file)), m_func(std::move(func)), m_line(line), m_col(0)
-		{ }
+			: m_file(std::move(file))
+			, m_func(std::move(func))
+			, m_line(line)
+			, m_col(0)
+		{
+		}
 
 		PCOPYASSIGNMOVE(source_location, default)
 
@@ -50,18 +60,18 @@ namespace plib
 
 		unsigned line() const noexcept { return m_line; }
 		unsigned column() const noexcept { return m_col; }
-		pstring file_name() const noexcept { return m_file; }
-		pstring function_name() const noexcept { return m_func; }
+		pstring  file_name() const noexcept { return m_file; }
+		pstring  function_name() const noexcept { return m_func; }
 
-		source_location &operator ++() noexcept
+		source_location &operator++() noexcept
 		{
 			++m_line;
 			return *this;
 		}
 
 	private:
-		pstring m_file;
-		pstring m_func;
+		pstring  m_file;
+		pstring  m_func;
 		unsigned m_line;
 		unsigned m_col;
 	};
@@ -75,7 +85,6 @@ namespace plib
 	class psource_t
 	{
 	public:
-
 		psource_t() noexcept = default;
 
 		PCOPYASSIGNMOVE(psource_t, delete)
@@ -83,6 +92,7 @@ namespace plib
 		virtual ~psource_t() noexcept = default;
 
 		virtual istream_uptr stream(const pstring &name) = 0;
+
 	private:
 	};
 
@@ -95,8 +105,10 @@ namespace plib
 	{
 	public:
 		psource_str_t(pstring name, pstring str)
-		: m_name(std::move(name)), m_str(std::move(str))
-		{}
+			: m_name(std::move(name))
+			, m_str(std::move(str))
+		{
+		}
 
 		PCOPYASSIGNMOVE(psource_str_t, delete)
 		~psource_str_t() noexcept override = default;
@@ -104,10 +116,12 @@ namespace plib
 		istream_uptr stream(const pstring &name) override
 		{
 			if (name == m_name)
-				return {std::make_unique<std::stringstream>(putf8string(m_str)), name };
+				return {std::make_unique<std::stringstream>(putf8string(m_str)),
+					name};
 
 			return istream_uptr();
 		}
+
 	private:
 		pstring m_name;
 		pstring m_str;
@@ -127,9 +141,10 @@ namespace plib
 		virtual ~psource_collection_t() noexcept = default;
 
 		template <typename S, typename... Args>
-		void add_source(Args&&... args)
+		void add_source(Args &&...args)
 		{
-			static_assert(std::is_base_of<psource_t, S>::value, "S must inherit from plib::psource_t");
+			static_assert(std::is_base_of<psource_t, S>::value,
+				"S must inherit from plib::psource_t");
 
 			auto src = std::make_unique<S>(std::forward<Args>(args)...);
 			m_collection.push_back(std::move(src));

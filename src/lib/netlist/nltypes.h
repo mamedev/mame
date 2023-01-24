@@ -23,8 +23,8 @@
 ///
 #define NETLIB_NAME(chip) nld_##chip
 
-namespace netlist
-{
+namespace netlist {
+
 	// -----------------------------------------------------------------------------
 	// forward definitions
 	// -----------------------------------------------------------------------------
@@ -52,13 +52,11 @@ namespace netlist
 
 	class models_t;
 
-	namespace analog
-	{
+	namespace analog {
 		class NETLIB_NAME(two_terminal);
 	} // namespace analog
 
-	namespace devices
-	{
+	namespace devices {
 		class nld_solver;
 		class nld_mainclock;
 		class nld_base_proxy;
@@ -70,21 +68,18 @@ namespace netlist
 		class factory_truth_table_t;
 	} // namespace devices
 
-	namespace solver
-	{
+	namespace solver {
 		class matrix_solver_t;
 	} // namespace solver
 
-	namespace detail
-	{
+	namespace detail {
 		struct abstract_t;
 		class core_terminal_t;
 		class net_t;
 		class device_object_t;
 	} // namespace detail
 
-	namespace factory
-	{
+	namespace factory {
 		template <class C, typename... Args>
 		class device_element_t;
 		class library_element_t;
@@ -96,8 +91,7 @@ namespace netlist
 
 } // namespace netlist
 
-namespace netlist
-{
+namespace netlist {
 
 	/// \brief Constants and const calculations for the library
 	///
@@ -167,10 +161,9 @@ namespace netlist
 	///
 	/// \note This is not the right location yet.
 	///
-	using device_arena = std::conditional_t<
-		config::use_mempool::value,
+	using device_arena = std::conditional_t<config::use_mempool::value,
 		plib::mempool_arena<plib::aligned_arena<>,
-							config::mempool_align::value>,
+			config::mempool_align::value>,
 		plib::aligned_arena<>>;
 
 	using host_arena = plib::aligned_arena<>;
@@ -181,8 +174,7 @@ namespace netlist
 	//  Types needed by various includes
 	//============================================================
 
-	namespace detail
-	{
+	namespace detail {
 
 		/// \brief Time step type.
 		///
@@ -211,10 +203,10 @@ namespace netlist
 		///
 		enum class alias_type
 		{
-			UNKNOWN,    //!< Used as a placeholder during code changes
-			INTERNAL,   //!< the alias references a internal pin
-			FUNCTIONAL, //!< Used for aliases e.g. in BJTs : ALIAS("B",
-						//!< somesub.p())
+			UNKNOWN,     //!< Used as a placeholder during code changes
+			INTERNAL,    //!< the alias references a internal pin
+			FUNCTIONAL,  //!< Used for aliases e.g. in BJTs : ALIAS("B",
+						 //!< somesub.p())
 			PACKAGE_PIN, //!< the alias references a package pin, e.g. ALIAS(13,
 						 //!< B.CLK)
 			READABILITY, //!< the alias is used to improved readability, e.g.
@@ -227,11 +219,11 @@ namespace netlist
 	using netlist_time_ext = plib::ptime<
 		std::conditional<config::prefer_int128::value
 							 && plib::compile_info::has_int128::value,
-						 INT128, std::int64_t>::type,
+			INT128, std::int64_t>::type,
 		config::INTERNAL_RES::value>;
 
 	static_assert(noexcept(netlist_time::from_nsec(1)),
-				  "Not evaluated as constexpr");
+		"Not evaluated as constexpr");
 
 	//============================================================
 	//  MACROS
@@ -273,7 +265,7 @@ namespace netlist
 		/// \brief: used to hold two static netlist_time values
 		///
 		template <netlist_time::internal_type value0,
-				  netlist_time::internal_type value1>
+			netlist_time::internal_type       value1>
 		struct times_ns2
 		{
 			static constexpr netlist_time value(std::size_t N)
@@ -285,8 +277,8 @@ namespace netlist
 		/// \brief: used to hold three static netlist_time values
 		///
 		template <netlist_time::internal_type value0,
-				  netlist_time::internal_type value1,
-				  netlist_time::internal_type value2>
+			netlist_time::internal_type       value1,
+			netlist_time::internal_type       value2>
 		struct times_ns3
 		{
 			static constexpr netlist_time value(std::size_t N)

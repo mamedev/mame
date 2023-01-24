@@ -21,21 +21,20 @@
 #include <type_traits>
 #include <vector>
 
-namespace plib
-{
-	template<typename T>
+namespace plib {
+	template <typename T>
 	pstring to_string(const T &v)
 	{
 		return pstring(putf8string(std::to_string(v)));
 	}
 
-	template<typename T>
+	template <typename T>
 	pwstring to_wstring(const T &v)
 	{
 		return pwstring(std::to_wstring(v));
 	}
 
-	template<typename T>
+	template <typename T>
 	typename T::size_type find_first_not_of(const T &str, const T &no)
 	{
 		typename T::size_type pos = 0;
@@ -56,7 +55,7 @@ namespace plib
 		return T::npos;
 	}
 
-	template<typename T>
+	template <typename T>
 	typename T::size_type find_last_not_of(const T &str, const T &no)
 	{
 		// FIXME: use reverse iterator
@@ -79,7 +78,7 @@ namespace plib
 		return last_found;
 	}
 
-	template<typename T>
+	template <typename T>
 	typename T::size_type find_last_of(const T &str, const T &no)
 	{
 		typename T::size_type last_found = T::npos;
@@ -101,63 +100,64 @@ namespace plib
 		return last_found;
 	}
 
-	template<typename T>
+	template <typename T>
 	T ltrim(const T &str, const T &ws = T(" \t\n\r"))
 	{
 		auto f = find_first_not_of(str, ws);
 		return (f == T::npos) ? T() : str.substr(f);
 	}
 
-	template<typename T>
+	template <typename T>
 	T rtrim(const T &str, const T &ws = T(" \t\n\r"))
 	{
 		auto f = find_last_not_of(str, ws);
 		return (f == T::npos) ? T() : str.substr(0, f + 1);
 	}
 
-	template<typename T>
+	template <typename T>
 	T trim(const T &str, const T &ws = T(" \t\n\r"))
 	{
 		return rtrim(ltrim(str, ws), ws);
 	}
 
-	template<typename T>
+	template <typename T>
 	T left(const T &str, typename T::size_type len)
 	{
 		return str.substr(0, len);
 	}
 
-	template<typename T>
+	template <typename T>
 	T right(const T &str, typename T::size_type nlen)
 	{
-		return nlen >= str.length() ? str : str.substr(str.length() - nlen, nlen);
+		return nlen >= str.length() ? str
+									: str.substr(str.length() - nlen, nlen);
 	}
 
-	template<typename T>
+	template <typename T>
 	bool startsWith(const T &str, const T &arg)
 	{
 		return (arg == left(str, arg.length()));
 	}
 
-	template<typename T>
+	template <typename T>
 	bool endsWith(const T &str, const T &arg)
 	{
 		return (right(str, arg.length()) == arg);
 	}
 
-	template<typename T, typename TA>
+	template <typename T, typename TA>
 	bool startsWith(const T &str, const TA &arg)
 	{
 		return startsWith(str, static_cast<T>(arg));
 	}
 
-	template<typename T, typename TA>
+	template <typename T, typename TA>
 	bool endsWith(const T &str, const TA &arg)
 	{
 		return endsWith(str, static_cast<T>(arg));
 	}
 
-	template<typename T>
+	template <typename T>
 	std::size_t strlen(const T *str)
 	{
 		const T *p = str;
@@ -166,7 +166,7 @@ namespace plib
 		return narrow_cast<std::size_t>(p - str);
 	}
 
-	template<typename T>
+	template <typename T>
 	T ucase(const T &str)
 	{
 		T ret;
@@ -178,7 +178,7 @@ namespace plib
 		return ret;
 	}
 
-	template<typename T>
+	template <typename T>
 	T lcase(const T &str)
 	{
 		T ret;
@@ -190,20 +190,21 @@ namespace plib
 		return ret;
 	}
 
-	template<typename T>
+	template <typename T>
 	T rpad(const T &str, const T &ws, const typename T::size_type cnt)
 	{
 		// FIXME: pstringbuffer ret(*this);
 
-		T ret(str);
+		T                     ret(str);
 		typename T::size_type wsl = ws.length();
-		for (auto i = ret.length(); i < cnt; i+=wsl)
+		for (auto i = ret.length(); i < cnt; i += wsl)
 			ret += ws;
 		return ret;
 	}
 
-	template<typename T>
-	T replace_all(const T &str, typename T::value_type search, typename T::value_type replace)
+	template <typename T>
+	T replace_all(const T &str, typename T::value_type search,
+				  typename T::value_type replace)
 	{
 		T ret;
 		for (auto &c : str)
@@ -211,10 +212,10 @@ namespace plib
 		return ret;
 	}
 
-	template<typename T>
+	template <typename T>
 	T replace_all(const T &str, const T &search, const T &replace)
 	{
-		T ret;
+		T                           ret;
 		const typename T::size_type slen = search.length();
 
 		typename T::size_type last_s = 0;
@@ -230,21 +231,24 @@ namespace plib
 		return ret;
 	}
 
-	template<typename T, typename T1, typename T2>
+	template <typename T, typename T1, typename T2>
 	std::enable_if_t<!std::is_integral<T1>::value, T>
 	replace_all(const T &str, const T1 &search, const T2 &replace)
 	{
-		return replace_all(str, static_cast<T>(search), static_cast<T>(replace));
+		return replace_all(str, static_cast<T>(search),
+						   static_cast<T>(replace));
 	}
 
 	template <typename T>
-	std::vector<T> psplit(const T &str, const T &onstr, bool ignore_empty = false)
+	std::vector<T>
+	psplit(const T &str, const T &onstr, bool ignore_empty = false)
 	{
 		std::vector<T> ret;
 
-		auto p = str.begin();
-		auto pn = std::search(p, str.end(), onstr.begin(), onstr.end());
-		const auto ol = static_cast<typename T::difference_type>(onstr.length());
+		auto       p = str.begin();
+		auto       pn = std::search(p, str.end(), onstr.begin(), onstr.end());
+		const auto ol = static_cast<typename T::difference_type>(
+			onstr.length());
 
 		while (pn != str.end())
 		{
@@ -261,7 +265,8 @@ namespace plib
 	}
 
 	template <typename T>
-	std::vector<T> psplit(const T &str, const typename T::value_type &onstr, bool ignore_empty = false)
+	std::vector<T> psplit(const T &str, const typename T::value_type &onstr,
+						  bool ignore_empty = false)
 	{
 		std::vector<T> ret;
 
@@ -283,23 +288,22 @@ namespace plib
 	}
 
 	template <typename T>
-	std::vector<T> psplit_r(const T &stri,
-			const T &token,
-			const std::size_t max_split)
+	std::vector<T>
+	psplit_r(const T &stri, const T &token, const std::size_t max_split)
 	{
-		T str(stri);
+		T              str(stri);
 		std::vector<T> result;
-		std::size_t splits = 0;
+		std::size_t    splits = 0;
 
-		while(!str.empty())
+		while (!str.empty())
 		{
 			std::size_t index = str.rfind(token);
-			bool found = index!=T::npos;
+			bool        found = index != T::npos;
 			if (found)
 				splits++;
 			if ((splits <= max_split || max_split == 0) && found)
 			{
-				result.push_back(str.substr(index+token.size()));
+				result.push_back(str.substr(index + token.size()));
 				str = str.substr(0, index);
 				if (str.empty())
 					result.push_back(str);
@@ -316,14 +320,14 @@ namespace plib
 	template <typename T>
 	std::vector<T> psplit(const T &str, const std::vector<T> &onstrl)
 	{
-		T col = "";
+		T              col = "";
 		std::vector<T> ret;
 
 		auto i = str.begin();
 		while (i != str.end())
 		{
 			auto p = T::npos;
-			for (std::size_t j=0; j < onstrl.size(); j++)
+			for (std::size_t j = 0; j < onstrl.size(); j++)
 			{
 				if (std::equal(onstrl[j].begin(), onstrl[j].end(), i))
 				{
@@ -338,7 +342,8 @@ namespace plib
 
 				col.clear();
 				ret.push_back(onstrl[p]);
-				i = std::next(i, narrow_cast<typename T::difference_type>(onstrl[p].length()));
+				i = std::next(i, narrow_cast<typename T::difference_type>(
+									 onstrl[p].length()));
 			}
 			else
 			{

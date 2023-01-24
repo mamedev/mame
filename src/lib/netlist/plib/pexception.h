@@ -13,11 +13,13 @@
 
 #include <exception>
 
-#define passert_always(expr)                            \
-  ((expr) ? static_cast<void>(0) : plib::passert_fail (#expr, __FILE__, __LINE__, nullptr))
+#define passert_always(expr)                                                   \
+	((expr) ? static_cast<void>(0)                                             \
+			: plib::passert_fail(#expr, __FILE__, __LINE__, nullptr))
 
-#define passert_always_msg(expr, msg)                           \
-  ((expr) ? static_cast<void>(0) : plib::passert_fail (#expr, __FILE__, __LINE__, msg))
+#define passert_always_msg(expr, msg)                                          \
+	((expr) ? static_cast<void>(0)                                             \
+			: plib::passert_fail(#expr, __FILE__, __LINE__, msg))
 
 namespace plib {
 
@@ -27,8 +29,8 @@ namespace plib {
 	///
 	[[noreturn]] void terminate(const char *msg) noexcept;
 
-	[[noreturn]] void passert_fail(const char *assertion,
-		const char *file, int lineno, const char *msg) noexcept;
+	[[noreturn]] void passert_fail(const char *assertion, const char *file,
+		int lineno, const char *msg) noexcept;
 
 	//============================================================
 	//  exception base
@@ -40,7 +42,7 @@ namespace plib {
 		explicit pexception(const pstring &text);
 
 		const putf8string &text() const noexcept { return m_text; }
-		const char* what() const noexcept override { return m_text.c_str(); }
+		const char *what() const noexcept override { return m_text.c_str(); }
 
 	private:
 		putf8string m_text;
@@ -83,7 +85,8 @@ namespace plib {
 	};
 
 	// FIXME: currently only a stub for later use. More use could be added by
-	// using `-fnon-call-exceptions` and sigaction to enable c++ exception supported.
+	// using `-fnon-call-exceptions` and sigaction to enable c++ exception
+	// supported.
 	//
 
 	class fp_exception_e : public pexception
@@ -127,7 +130,6 @@ namespace plib {
 
 		static bool m_enable; // NOLINT
 	};
-
 
 } // namespace plib
 

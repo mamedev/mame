@@ -1,20 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
 
-#include "nlid_twoterm.h"
 #include "nl_base.h"
 #include "nl_factory.h"
+#include "nlid_twoterm.h"
+
 #include "solver/nld_solver.h"
 
 // FIXME : convert to parameters
 
-#define R_OFF   (plib::reciprocal(exec().gmin()))
-#define R_ON    nlconst::magic(0.01)
+#define R_OFF (plib::reciprocal(exec().gmin()))
+#define R_ON nlconst::magic(0.01)
 
-namespace netlist
-{
-	namespace analog
-	{
+namespace netlist::analog {
 	// ----------------------------------------------------------------------------------------
 	// SWITCH
 	// ----------------------------------------------------------------------------------------
@@ -23,43 +21,38 @@ namespace netlist
 	{
 	public:
 		nld_switch1(constructor_param_t data)
-		: base_device_t(data)
-		, m_R(*this, "R")
-		, m_POS(*this, "POS", false)
+			: base_device_t(data)
+			, m_R(*this, "R")
+			, m_POS(*this, "POS", false)
 		{
 			register_sub_alias("1", m_R().P());
 			register_sub_alias("2", m_R().N());
 		}
 
-		NETLIB_RESETI()
-		{
-			m_R().set_R(R_OFF);
-		}
+		NETLIB_RESETI() { m_R().set_R(R_OFF); }
 		NETLIB_UPDATE_PARAMI()
 		{
-			m_R().change_state([this]()
-			{
-				m_R().set_R(m_POS() ? R_ON : R_OFF);
-			});
+			m_R().change_state(
+				[this]() { m_R().set_R(m_POS() ? R_ON : R_OFF); });
 		}
 
 	private:
 		NETLIB_SUB_NS(analog, R_base) m_R;
-		param_logic_t                 m_POS;
+		param_logic_t m_POS;
 	};
 
-// ----------------------------------------------------------------------------------------
-// SWITCH2
-// ----------------------------------------------------------------------------------------
+	// ----------------------------------------------------------------------------------------
+	// SWITCH2
+	// ----------------------------------------------------------------------------------------
 
 	class nld_switch2 : public base_device_t
 	{
 	public:
 		nld_switch2(constructor_param_t data)
-		: base_device_t(data)
-		, m_R1(*this, "R1")
-		, m_R2(*this, "R2")
-		, m_POS(*this, "POS", false)
+			: base_device_t(data)
+			, m_R1(*this, "R1")
+			, m_R2(*this, "R2")
+			, m_POS(*this, "POS", false)
 		{
 			connect(m_R1().N(), m_R2().N());
 
@@ -75,7 +68,7 @@ namespace netlist
 	private:
 		NETLIB_SUB_NS(analog, R_base) m_R1;
 		NETLIB_SUB_NS(analog, R_base) m_R2;
-		param_logic_t                 m_POS;
+		param_logic_t m_POS;
 	};
 
 	NETLIB_RESET(switch2)
@@ -108,7 +101,12 @@ namespace netlist
 		nl_fptype r2 = m_POS() ? R_ON : R_OFF;
 
 		if (m_R1().solver() == m_R2().solver())
-			m_R1().change_state([this, &r1, &r2]() { m_R1().set_R(r1); m_R2().set_R(r2); });
+			m_R1().change_state(
+				[this, &r1, &r2]()
+				{
+					m_R1().set_R(r1);
+					m_R2().set_R(r2);
+				});
 		else
 		{
 			m_R1().change_state([this, &r1]() { m_R1().set_R(r1); });
@@ -116,10 +114,9 @@ namespace netlist
 		}
 	}
 
-	} //namespace analog
+} // namespace netlist::analog
 
-	namespace devices {
-		NETLIB_DEVICE_IMPL_NS(analog, switch1, "SWITCH",  "")
-		NETLIB_DEVICE_IMPL_NS(analog, switch2, "SWITCH2", "")
-	} // namespace devices
-} // namespace netlist
+namespace netlist::devices {
+	NETLIB_DEVICE_IMPL_NS(analog, switch1, "SWITCH", "")
+	NETLIB_DEVICE_IMPL_NS(analog, switch2, "SWITCH2", "")
+} // namespace netlist::devices

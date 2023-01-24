@@ -39,8 +39,8 @@
 	extern factory::constructor_ptr_t decl_##p_alias;                          \
 	factory::constructor_ptr_t        decl_##p_alias = NETLIB_NAME(p_alias##_c);
 
-namespace netlist::factory
-{
+namespace netlist::factory {
+
 	enum class element_type
 	{
 		BUILTIN,
@@ -49,11 +49,11 @@ namespace netlist::factory
 
 	struct properties
 	{
-		properties(const pstring &         default_parameter,
-				   plib::source_location &&location)
-		: m_default_parameter(default_parameter)
-		, m_location(std::move(location))
-		, m_type(element_type::BUILTIN)
+		properties(const pstring   &default_parameter,
+			plib::source_location &&location)
+			: m_default_parameter(default_parameter)
+			, m_location(std::move(location))
+			, m_type(element_type::BUILTIN)
 		{
 		}
 
@@ -97,9 +97,8 @@ namespace netlist::factory
 
 		PCOPYASSIGNMOVE(element_t, default)
 
-		virtual dev_uptr
-		make_device(device_arena &pool, netlist_state_t &anetlist,
-					const pstring &name)
+		virtual dev_uptr make_device(device_arena &pool,
+			netlist_state_t &anetlist, const pstring &name)
 			= 0;
 
 		pstring name() const noexcept { return m_name; }
@@ -126,31 +125,31 @@ namespace netlist::factory
 		using constructor_data_t = typename C::constructor_data_t;
 
 		device_element_t(const pstring &name, properties &&props,
-						 Args &&...args)
-		: element_t(name, std::move(props))
-		, m_args(std::forward<Args>(args)...)
+			Args &&...args)
+			: element_t(name, std::move(props))
+			, m_args(std::forward<Args>(args)...)
 		{
 		}
 
 		template <std::size_t... Is>
 		dev_uptr make_device(device_arena &pool, netlist_state_t &anetlist,
-							 const pstring &name, std::tuple<Args...> &args,
-							 std::index_sequence<Is...>)
+			const pstring &name, std::tuple<Args...> &args,
+			std::index_sequence<Is...>)
 		{
-			return plib::make_unique<C>(
-				pool, constructor_data_t{anetlist, name},
+			return plib::make_unique<C>(pool,
+				constructor_data_t{anetlist, name},
 				std::forward<Args>(std::get<Is>(args))...);
 		}
 
 		dev_uptr make_device(device_arena &pool, netlist_state_t &anetlist,
-							 const pstring &name, std::tuple<Args...> &args)
+			const pstring &name, std::tuple<Args...> &args)
 		{
 			return make_device(pool, anetlist, name, args,
-							   std::index_sequence_for<Args...>{});
+				std::index_sequence_for<Args...>{});
 		}
 
 		dev_uptr make_device(device_arena &pool, netlist_state_t &anetlist,
-							 const pstring &name) override
+			const pstring &name) override
 		{
 			return make_device(pool, anetlist, name, m_args);
 		}
@@ -177,8 +176,8 @@ namespace netlist::factory
 		template <class device_class, typename... Args>
 		void add(const pstring &name, properties &&props, Args &&...args)
 		{
-			add(device_element_t<device_class, Args...>::create(
-				name, std::move(props), std::forward<Args>(args)...));
+			add(device_element_t<device_class, Args...>::create(name,
+				std::move(props), std::forward<Args>(args)...));
 		}
 
 		void add(element_t::uptr &&factory) noexcept(false);
@@ -207,8 +206,8 @@ namespace netlist::factory
 	template <typename T>
 	element_t::uptr constructor_t(const pstring &name, properties &&props)
 	{
-		return plib::make_unique<device_element_t<T>, host_arena>(
-			name, std::move(props));
+		return plib::make_unique<device_element_t<T>, host_arena>(name,
+			std::move(props));
 	}
 
 	// -------------------------------------------------------------------------
@@ -221,13 +220,12 @@ namespace netlist::factory
 		library_element_t(const pstring &name, properties &&props);
 
 		dev_uptr make_device(device_arena &pool, netlist_state_t &anetlist,
-							 const pstring &name) override;
+			const pstring &name) override;
 	};
 
 } // namespace netlist::factory
 
-namespace netlist::devices
-{
+namespace netlist::devices {
 	void initialize_factory(factory::list_t &factory);
 } // namespace netlist::devices
 

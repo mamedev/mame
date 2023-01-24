@@ -14,8 +14,7 @@
 #include "../plib/pmempool.h"
 #include "../plib/pstring.h"
 
-namespace netlist
-{
+namespace netlist {
 	/// \brief Logic families descriptors are used to create proxy devices.
 	///  The logic family describes the analog capabilities of logic devices,
 	///  inputs and outputs.
@@ -32,8 +31,8 @@ namespace netlist
 
 		// FOXME: Should be move constructible
 		logic_family_desc_t(logic_family_desc_t &&) noexcept = delete;
-		logic_family_desc_t &operator=(
-			logic_family_desc_t &&) noexcept = delete;
+		logic_family_desc_t &
+		operator=(logic_family_desc_t &&) noexcept = delete;
 
 		virtual ~logic_family_desc_t() noexcept = default;
 
@@ -109,11 +108,11 @@ namespace netlist
 	{
 	public:
 		logic_family_t()
-		: m_logic_family(nullptr)
+			: m_logic_family(nullptr)
 		{
 		}
 		logic_family_t(const logic_family_desc_t *d)
-		: m_logic_family(d)
+			: m_logic_family(d)
 		{
 		}
 

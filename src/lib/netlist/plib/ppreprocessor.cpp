@@ -2,6 +2,7 @@
 // copyright-holders:Couriersud
 
 #include "ppreprocessor.h"
+
 #include "palloc.h"
 #include "pstonum.h"
 #include "pstrutil.h"
@@ -13,14 +14,15 @@ namespace plib {
 	// A simple preprocessor
 	// ----------------------------------------------------------------------------------------
 
-	ppreprocessor::ppreprocessor(psource_collection_t &sources, defines_map_type *defines)
-	: m_sources(sources)
-	, m_if_flag(0)
-	, m_if_seen(0)
-	, m_elif(0)
-	, m_if_level(0)
-	, m_state(PROCESS)
-	, m_comment(false)
+	ppreprocessor::ppreprocessor(psource_collection_t &sources,
+		defines_map_type                              *defines)
+		: m_sources(sources)
+		, m_if_flag(0)
+		, m_if_seen(0)
+		, m_elif(0)
+		, m_if_level(0)
+		, m_state(PROCESS)
+		, m_comment(false)
 	{
 		m_expr_sep.emplace_back("!");
 		m_expr_sep.emplace_back("(");
@@ -43,25 +45,26 @@ namespace plib {
 
 		if (defines != nullptr)
 			m_defines = *defines;
-		m_defines.insert({"__PLIB_PREPROCESSOR__", define_t("__PLIB_PREPROCESSOR__", "1")});
+		m_defines.insert(
+			{"__PLIB_PREPROCESSOR__", define_t("__PLIB_PREPROCESSOR__", "1")});
 		auto idx = m_defines.find("__PREPROCESSOR_DEBUG__");
 		m_debug_out = idx != m_defines.end();
-
 	}
 
 	void ppreprocessor::error(const pstring &err)
 	{
 		pstring s("");
-		pstring trail      ("                 from ");
+		pstring trail("                 from ");
 		pstring trail_first("In file included from ");
-		pstring e = plib::pfmt("{1}:{2}:0: error: {3}\n")
-				(m_stack.back().m_name, m_stack.back().m_lineno, err);
+		pstring e = plib::pfmt("{1}:{2}:0: error: {3}\n")(m_stack.back().m_name,
+			m_stack.back().m_lineno, err);
 		m_stack.pop_back();
 		while (!m_stack.empty())
 		{
 			if (m_stack.size() == 1)
 				trail = trail_first;
-			s = plib::pfmt("{1}{2}:{3}:0\n{4}")(trail, m_stack.back().m_name, m_stack.back().m_lineno, s);
+			s = plib::pfmt("{1}{2}:{3}:0\n{4}")(trail, m_stack.back().m_name,
+				m_stack.back().m_lineno, s);
 			m_stack.pop_back();
 		}
 		throw pexception("\n" + s + e + " " + m_line + "\n");
@@ -71,14 +74,18 @@ namespace plib {
 	struct simple_iter
 	{
 		simple_iter(PP *parent, const L &tokens)
-		: m_tokens(tokens), m_parent(parent), m_pos(0)
-		{}
+			: m_tokens(tokens)
+			, m_parent(parent)
+			, m_pos(0)
+		{
+		}
 
 		/// \brief skip white space in token list
 		///
 		void skip_ws()
 		{
-			while (m_pos < m_tokens.size() && (m_tokens[m_pos] == " " || m_tokens[m_pos] == "\t"))
+			while (m_pos < m_tokens.size()
+				   && (m_tokens[m_pos] == " " || m_tokens[m_pos] == "\t"))
 				m_pos++;
 		}
 
@@ -118,49 +125,48 @@ namespace plib {
 				error("no last token at beginning of line");
 			if (m_pos > m_tokens.size())
 				error("unexpected end of line");
-			return m_tokens[m_pos-1];
+			return m_tokens[m_pos - 1];
 		}
 
-		bool eod()
-		{
-			return (m_pos >= m_tokens.size());
-		}
+		bool eod() { return (m_pos >= m_tokens.size()); }
 
-		void error(const pstring &err)
-		{
-			m_parent->error(err);
-		}
+		void error(const pstring &err) { m_parent->error(err); }
+
 	private:
-		const L m_tokens;
-		PP *m_parent;
+		const L     m_tokens;
+		PP         *m_parent;
 		std::size_t m_pos;
 	};
 
-	#define CHECKTOK2(p_op, p_prio) \
-		else if (tok == # p_op)                         \
-		{                                               \
-			if (!has_val)                               \
-				{ sexpr.error("parsing error!"); return 1;} \
-			if (prio < (p_prio))                        \
-				return val;                             \
-			sexpr.next();                                    \
-			const auto v2 = prepro_expr(sexpr, (p_prio)); \
-			val = (val p_op v2);                        \
-		}                                               \
+#define CHECKTOK2(p_op, p_prio)                                                \
+	else if (tok == #p_op)                                                     \
+	{                                                                          \
+		if (!has_val)                                                          \
+		{                                                                      \
+			sexpr.error("parsing error!");                                     \
+			return 1;                                                          \
+		}                                                                      \
+		if (prio < (p_prio))                                                   \
+			return val;                                                        \
+		sexpr.next();                                                          \
+		const auto v2 = expression(sexpr, (p_prio));                           \
+		val = (val p_op v2);                                                   \
+	}
 
-	// Operator precedence see https://en.cppreference.com/w/cpp/language/operator_precedence
+	// Operator precedence see
+	// https://en.cppreference.com/w/cpp/language/operator_precedence
 
 	template <typename PP>
-	static int prepro_expr(simple_iter<PP> &sexpr, int prio)
+	static int expression(simple_iter<PP> &sexpr, int prio)
 	{
-		int val(0);
+		int  val(0);
 		bool has_val(false);
 
-		pstring tok=sexpr.peek_ws();
+		pstring tok = sexpr.peek_ws();
 		if (tok == "(")
 		{
 			sexpr.next();
-			val = prepro_expr(sexpr, 255);
+			val = expression(sexpr, 255);
 			if (sexpr.next() != ")")
 				sexpr.error("expected ')'");
 			has_val = true;
@@ -185,13 +191,13 @@ namespace plib {
 						return val;
 				}
 				sexpr.next();
-				val = !prepro_expr(sexpr, 3);
+				val = !expression(sexpr, 3);
 				has_val = true;
 			}
-			CHECKTOK2(*,  5)
-			CHECKTOK2(/,  5) // NOLINT(clang-analyzer-core.DivideZero)
-			CHECKTOK2(+,  6)
-			CHECKTOK2(-,  6)
+			CHECKTOK2(*, 5)
+			CHECKTOK2(/, 5) // NOLINT(clang-analyzer-core.DivideZero)
+			CHECKTOK2(+, 6)
+			CHECKTOK2(-, 6)
 			CHECKTOK2(==, 10)
 			CHECKTOK2(&&, 14)
 			CHECKTOK2(||, 15)
@@ -221,12 +227,12 @@ namespace plib {
 	}
 
 	ppreprocessor::string_list ppreprocessor::tokenize(const pstring &str,
-			const string_list &sep, bool remove_ws, bool concat)
+		const string_list &sep, bool remove_ws, bool concat)
 	{
 		const pstring STR = "\"";
-		string_list tmp_ret;
-		string_list tmp(psplit(str, sep));
-		std::size_t pi(0);
+		string_list   tmp_ret;
+		string_list   tmp(psplit(str, sep));
+		std::size_t   pi(0);
 
 		while (pi < tmp.size())
 		{
@@ -244,15 +250,17 @@ namespace plib {
 			}
 			else
 			{
-				pstring tok=tmp[pi];
-				if (tok.length() >= 2 && pi < tmp.size() - 2 )
+				pstring tok = tmp[pi];
+				if (tok.length() >= 2 && pi < tmp.size() - 2)
 				{
-					auto sc=tok.substr(0,1);
-					auto ec=tok.substr(tok.length()-1, 1);
-					if ((sc == "." || (sc>="0" && sc<="9")) && (ec=="e" || ec=="E"))
+					auto sc = tok.substr(0, 1);
+					auto ec = tok.substr(tok.length() - 1, 1);
+					if ((sc == "." || (sc >= "0" && sc <= "9"))
+						&& (ec == "e" || ec == "E"))
 					{
-						// looks like an incomplete float due splitting by - or +
-						tok = tok + tmp[pi+1] + tmp[pi+2];
+						// looks like an incomplete float due splitting by - or
+						// +
+						tok = tok + tmp[pi + 1] + tmp[pi + 2];
 						pi += 2;
 					}
 				}
@@ -268,7 +276,7 @@ namespace plib {
 		// FIXME: error if concat at beginning or end
 		string_list ret;
 		pi = 0;
-		while (pi<tmp_ret.size())
+		while (pi < tmp_ret.size())
 		{
 			if (tmp_ret[pi] == "##")
 			{
@@ -277,7 +285,8 @@ namespace plib {
 				pstring cc = ret.back();
 				ret.pop_back();
 				pi++;
-				while (pi < tmp_ret.size() && (tmp_ret[pi] == " " || tmp_ret[pi] == "\t"))
+				while (pi < tmp_ret.size()
+					   && (tmp_ret[pi] == " " || tmp_ret[pi] == "\t"))
 					pi++;
 				if (pi == tmp_ret.size())
 					error("## found at end of sequence");
@@ -295,46 +304,48 @@ namespace plib {
 		if (str.empty())
 			return false;
 		pstring::value_type c(str.at(0));
-		return ((c>='a' && c<='z') || (c>='A' && c<='Z') || c == '_');
+		return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_');
 	}
 
-	pstring ppreprocessor::replace_macros(const pstring &line)
+	pstring ppreprocessor::resolve_macros(const pstring &line)
 	{
-		//std::vector<pstring> elems(psplit(line, m_expr_sep));
-		bool repeat(false);
-		pstring tmpret(line);
+		// std::vector<pstring> elems(psplit(line, m_expr_sep));
+		bool    repeat(false);
+		pstring resolved_str(line);
 		do
 		{
 			repeat = false;
-			simple_iter<ppreprocessor> elems(this, tokenize(tmpret, m_expr_sep, false, true));
-			tmpret = "";
-			while (!elems.eod())
+			simple_iter<ppreprocessor> elements(this,
+				tokenize(resolved_str, m_expr_sep, false, true));
+			resolved_str = "";
+			while (!elements.eod())
 			{
-				auto token(elems.next_ws());
+				auto      token(elements.next_ws());
 				define_t *def = get_define(token);
 				if (def == nullptr)
-					tmpret += token;
+					resolved_str += token;
 				else if (!def->m_has_params)
 				{
-					tmpret += def->m_replace;
+					resolved_str += def->m_replace;
 					repeat = true;
 				}
 				else
 				{
-					token = elems.next();
+					token = elements.next();
 					if (token != "(")
-						error("expected '(' in macro expansion of " + def->m_name);
+						error("expected '(' in macro expansion of "
+							  + def->m_name);
 					string_list rep;
-					token = elems.next();
+					token = elements.next();
 					while (token != ")")
 					{
 						pstring par("");
-						int parenthesis_count(1);
+						int     parenthesis_count(1);
 						while (true)
 						{
-							if (parenthesis_count==1 && token == ",")
+							if (parenthesis_count == 1 && token == ",")
 							{
-								token = elems.next();
+								token = elements.next();
 								break;
 							}
 							if (token == "(")
@@ -343,15 +354,17 @@ namespace plib {
 								if (--parenthesis_count == 0)
 									break;
 							par += token;
-							token = elems.next();
+							token = elements.next();
 						}
 						rep.push_back(par);
 					}
 					repeat = true;
 					if (def->m_params.size() != rep.size())
-						error(pfmt("Expected {1} parameters, got {2}")(def->m_params.size(), rep.size()));
-					simple_iter<ppreprocessor> r(this, tokenize(def->m_replace, m_expr_sep, false, false));
-					bool stringify_next = false;
+						error(pfmt("Expected {1} parameters, got {2}")(
+							def->m_params.size(), rep.size()));
+					simple_iter<ppreprocessor> r(this,
+						tokenize(def->m_replace, m_expr_sep, false, false));
+					bool                       stringify_next = false;
 					while (!r.eod())
 					{
 						token = r.next();
@@ -359,7 +372,8 @@ namespace plib {
 							stringify_next = true;
 						else if (token != " " && token != "\t")
 						{
-							for (std::size_t i=0; i<def->m_params.size(); i++)
+							for (std::size_t i = 0; i < def->m_params.size();
+								 i++)
 								if (def->m_params[i] == token)
 								{
 									if (stringify_next)
@@ -372,21 +386,24 @@ namespace plib {
 									break;
 								}
 							if (stringify_next)
-								error("'#' is not followed by a macro parameter");
-							tmpret += token;
-							tmpret += " "; // make sure this is not concatenated with next token
+								error(
+									"'#' is not followed by a macro parameter");
+							resolved_str += token;
+							resolved_str += " "; // make sure this is not
+												 // concatenated with next token
 						}
 						else
-							tmpret += token;
+							resolved_str += token;
 					}
 				}
 			}
 		} while (repeat);
 
-		return tmpret;
+		return resolved_str;
 	}
 
-	static pstring cat_remainder(const std::vector<pstring> &elems, std::size_t start, const pstring &sep)
+	static pstring cat_remainder(const std::vector<pstring> &elems,
+		std::size_t start, const pstring &sep)
 	{
 		pstring ret("");
 		for (std::size_t i = start; i < elems.size(); i++)
@@ -445,7 +462,7 @@ namespace plib {
 		bool in_string = false;
 
 		pstring ret = "";
-		for (auto c = line.begin(); c != line.end(); )
+		for (auto c = line.begin(); c != line.end();)
 		{
 			if (!m_comment)
 			{
@@ -477,26 +494,26 @@ namespace plib {
 				else
 					ret += *c;
 			}
-			else
-				if (*c == '*')
-				{
-					c++;
-					if (c == line.end())
-						break;
-					if (*c == '/')
-						m_comment = false;
-				}
+			else if (*c == '*')
+			{
+				c++;
+				if (c == line.end())
+					break;
+				if (*c == '/')
+					m_comment = false;
+			}
 			c++;
 		}
 		return ret;
 	}
 #endif
 
-	std::pair<pstring,bool> ppreprocessor::process_line(const pstring &line_in)
+	std::pair<pstring, bool> ppreprocessor::process_line(const pstring &line_in)
 	{
 		bool line_cont = plib::right(line_in, 1) == "\\";
 
-		pstring line = line_cont ? plib::left(line_in, line_in.length() - 1) : line_in;
+		pstring line = line_cont ? plib::left(line_in, line_in.length() - 1)
+								 : line_in;
 
 		if (m_state == LINE_CONTINUATION)
 			m_line += line;
@@ -523,9 +540,10 @@ namespace plib {
 				m_if_seen |= (1 << m_if_level);
 				if (m_if_flag == 0)
 				{
-					lt = replace_macros(lt);
-					simple_iter<ppreprocessor> t(this, tokenize(lt.substr(3), m_expr_sep, true, true));
-					auto val = narrow_cast<int>(prepro_expr(t, 255));
+					lt = resolve_macros(lt);
+					simple_iter<ppreprocessor> t(this,
+						tokenize(lt.substr(3), m_expr_sep, true, true));
+					auto val = narrow_cast<int>(expression(t, 255));
 					t.skip_ws();
 					if (!t.eod())
 						error("found unprocessed content at end of line");
@@ -569,18 +587,19 @@ namespace plib {
 				if (!(m_if_seen & (1 << m_if_level)))
 					error("#elif without #if");
 
-				//if ((m_if_flag & (1 << m_if_level)) == 0)
-				//  m_if_flag ^= (1 << m_if_level);
+				// if ((m_if_flag & (1 << m_if_level)) == 0)
+				//   m_if_flag ^= (1 << m_if_level);
 				if (m_elif & (1 << m_if_level)) // elif disabled
 					m_if_flag |= (1 << m_if_level);
 				else
 					m_if_flag &= ~(1 << m_if_level);
 				if (m_if_flag == 0)
 				{
-					//m_if_flag ^= (1 << m_if_level);
-					lt = replace_macros(lt);
-					simple_iter<ppreprocessor> t(this, tokenize(lt.substr(5), m_expr_sep, true, true));
-					auto val = narrow_cast<int>(prepro_expr(t, 255));
+					// m_if_flag ^= (1 << m_if_level);
+					lt = resolve_macros(lt);
+					simple_iter<ppreprocessor> t(this,
+						tokenize(lt.substr(5), m_expr_sep, true, true));
+					auto val = narrow_cast<int>(expression(t, 255));
 					t.skip_ws();
 					if (!t.eod())
 						error("found unprocessed content at end of line");
@@ -604,7 +623,7 @@ namespace plib {
 				if (m_if_flag == 0)
 				{
 					pstring arg("");
-					for (std::size_t i=1; i<lti.size(); i++)
+					for (std::size_t i = 1; i < lti.size(); i++)
 						arg += (lti[i] + " ");
 
 					arg = plib::trim(arg);
@@ -613,18 +632,23 @@ namespace plib {
 					{
 						arg = arg.substr(1, arg.length() - 2);
 						// first try local context
-						auto l(plib::util::build_path({m_stack.back().m_local_path, arg}));
-						auto lstrm(m_sources.get_stream(l));
-						if (!lstrm.empty())
+						auto l(plib::util::build_path(
+							{m_stack.back().m_local_path, arg}));
+						auto include_stream(m_sources.get_stream(l));
+						if (!include_stream.empty())
 						{
-							m_stack.emplace_back(input_context(lstrm.release_stream(), plib::util::path(l), l));
+							m_stack.emplace_back(
+								input_context(include_stream.release_stream(),
+									plib::util::path(l), l));
 						}
 						else
 						{
 							auto strm(m_sources.get_stream(arg));
 							if (!strm.empty())
 							{
-								m_stack.emplace_back(input_context(strm.release_stream(), plib::util::path(arg), arg));
+								m_stack.emplace_back(
+									input_context(strm.release_stream(),
+										plib::util::path(arg), arg));
 							}
 							else
 								error("include not found:" + arg);
@@ -632,7 +656,8 @@ namespace plib {
 					}
 					else
 						error("include misspelled:" + arg);
-					pstring line_marker = pfmt("# {1} \"{2}\" 1\n")(m_stack.back().m_lineno, m_stack.back().m_name);
+					pstring line_marker = pfmt("# {1} \"{2}\" 1\n")(
+						m_stack.back().m_lineno, m_stack.back().m_name);
 					push_out(line_marker);
 				}
 			}
@@ -650,14 +675,16 @@ namespace plib {
 				{
 					if (lti.size() < 2)
 						error("define needs at least one argument");
-					simple_iter<ppreprocessor> args(this, tokenize(lt.substr(8), m_expr_sep, false, false));
-					pstring n = args.next();
+					simple_iter<ppreprocessor> args(this,
+						tokenize(lt.substr(8), m_expr_sep, false, false));
+					pstring                    n = args.next();
 					if (!is_valid_token(n))
 						error("define expected identifier");
 					auto *previous_define = get_define(n);
 					if (lti.size() == 2)
 					{
-						if (previous_define != nullptr && !previous_define->m_replace.empty())
+						if (previous_define != nullptr
+							&& !previous_define->m_replace.empty())
 							error("redefinition of " + n);
 						m_defines.insert({n, define_t(n, "")});
 					}
@@ -673,7 +700,8 @@ namespace plib {
 							def.m_params.push_back(token);
 							token = args.next();
 							if (token != "," && token != ")")
-								error(pfmt("expected , or ), found <{1}>")(token));
+								error(pfmt("expected , or ), found <{1}>")(
+									token));
 							if (token == ",")
 								token = args.next();
 						}
@@ -681,7 +709,8 @@ namespace plib {
 						while (!args.eod())
 							r += args.next_ws();
 						def.m_replace = r;
-						if (previous_define != nullptr && previous_define->m_replace != r)
+						if (previous_define != nullptr
+							&& previous_define->m_replace != r)
 							error("redefinition of " + n);
 						m_defines.insert({n, def});
 					}
@@ -690,7 +719,8 @@ namespace plib {
 						pstring r;
 						while (!args.eod())
 							r += args.next_ws();
-						if (previous_define != nullptr && previous_define->m_replace != r)
+						if (previous_define != nullptr
+							&& previous_define->m_replace != r)
 							error("redefinition of " + n);
 						m_defines.insert({n, define_t(n, r)});
 					}
@@ -702,8 +732,9 @@ namespace plib {
 				{
 					if (lti.size() < 2)
 						error("undef needs at least one argument");
-					simple_iter<ppreprocessor> args(this, tokenize(lt.substr(7), m_expr_sep, false, false));
-					pstring n = args.next();
+					simple_iter<ppreprocessor> args(this,
+						tokenize(lt.substr(7), m_expr_sep, false, false));
+					pstring                    n = args.next();
 					if (!is_valid_token(n))
 						error("undef expected identifier");
 					m_defines.erase(n);
@@ -714,13 +745,13 @@ namespace plib {
 				if (m_if_flag == 0)
 					error("unknown directive");
 			}
-			return { "", false };
+			return {"", false};
 		}
 
 		if (m_if_flag == 0)
-			return { replace_macros(lt), true };
+			return {resolve_macros(lt), true};
 
-		return { "", false };
+		return {"", false};
 	}
 
 	void ppreprocessor::push_out(const pstring &s)
@@ -735,9 +766,10 @@ namespace plib {
 		while (!m_stack.empty())
 		{
 			putf8string line;
-			pstring line_marker = pfmt("# {1} \"{2}\"\n")(m_stack.back().m_lineno, m_stack.back().m_name);
+			pstring     line_marker = pfmt("# {1} \"{2}\"\n")(
+				m_stack.back().m_lineno, m_stack.back().m_name);
 			push_out(line_marker);
-			bool last_skipped=false;
+			bool last_skipped = false;
 			while (m_stack.back().m_reader.read_line(line))
 			{
 				m_stack.back().m_lineno++;
@@ -745,7 +777,8 @@ namespace plib {
 				if (r.second)
 				{
 					if (last_skipped)
-						push_out(pfmt("# {1} \"{2}\"\n")(m_stack.back().m_lineno, m_stack.back().m_name));
+						push_out(pfmt("# {1} \"{2}\"\n")(
+							m_stack.back().m_lineno, m_stack.back().m_name));
 					push_out(r.first + "\n");
 					last_skipped = false;
 				}
@@ -755,12 +788,11 @@ namespace plib {
 			m_stack.pop_back();
 			if (!m_stack.empty())
 			{
-				line_marker = pfmt("# {1} \"{2}\" 2\n")(m_stack.back().m_lineno, m_stack.back().m_name);
+				line_marker = pfmt("# {1} \"{2}\" 2\n")(m_stack.back().m_lineno,
+					m_stack.back().m_name);
 				push_out(line_marker);
 			}
 		}
 	}
-
-
 
 } // namespace plib

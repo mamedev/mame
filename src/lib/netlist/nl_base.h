@@ -14,8 +14,7 @@
 #include "core/logic.h"
 #include "core/object_array.h"
 
-namespace netlist
-{
+namespace netlist {
 	// nothing in here. This should not change.
 
 } // namespace netlist

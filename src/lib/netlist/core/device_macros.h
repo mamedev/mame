@@ -26,7 +26,7 @@
 ///  Also refer to #NETLIB_CONSTRUCTOR.
 #define NETLIB_OBJECT(name)                                                    \
 	class NETLIB_NAME(name)                                                    \
-	: public device_t
+		: public device_t
 
 /// \brief Used to define the constructor of a netlist device.
 ///
@@ -35,7 +35,7 @@
 #define NETLIB_CONSTRUCTOR(cname)                                              \
 public:                                                                        \
 	NETLIB_NAME(cname)(constructor_param_t data)                               \
-	: device_t(data)
+		: device_t(data)
 
 /// \brief Used to define the constructor of a netlist device and define a
 /// default model.
@@ -50,7 +50,7 @@ public:                                                                        \
 #define NETLIB_CONSTRUCTOR_MODEL(cname, cmodel)                                \
 public:                                                                        \
 	NETLIB_NAME(cname)(constructor_param_t data)                               \
-	: device_t(data, cmodel)
+		: device_t(data, cmodel)
 
 /// \brief Used to define the destructor of a netlist device.
 /// The use of a destructor for netlist device should normally not be necessary.
@@ -107,8 +107,8 @@ public:                                                                        \
 
 #define NETLIB_TIMESTEPI()                                                     \
 public:                                                                        \
-	virtual void time_step(detail::time_step_type ts_type,                             \
-		nl_fptype                         step) noexcept override
+	virtual void time_step(detail::time_step_type ts_type,                     \
+		nl_fptype                                 step) noexcept override
 
 /// \brief Used to implement the body of the time stepping code.
 ///
@@ -119,8 +119,8 @@ public:                                                                        \
 /// \param cname Name of object as given to \ref NETLIB_OBJECT
 ///
 #define NETLIB_TIMESTEP(cname)                                                 \
-	void NETLIB_NAME(cname)::time_step(detail::time_step_type ts_type,                 \
-		nl_fptype                                     step) noexcept
+	void NETLIB_NAME(cname)::time_step(detail::time_step_type ts_type,         \
+		nl_fptype                                             step) noexcept
 
 //#define NETLIB_DELEGATE(name) nl_delegate(&this_type :: name, this)
 #define NETLIB_DELEGATE(name)                                                  \

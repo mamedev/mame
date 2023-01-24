@@ -21,8 +21,8 @@
 #include <array>
 #include <memory>
 
-namespace netlist::interface
-{
+namespace netlist::interface {
+
 	/// \brief analog_callback device
 	///
 	/// This device is used to call back into the application which
@@ -59,12 +59,12 @@ namespace netlist::interface
 	{
 	public:
 		nld_analog_callback(constructor_param_t data, nl_fptype threshold,
-							FUNC &&func)
-		: device_t(data)
-		, m_in(*this, "IN", NETLIB_DELEGATE(in))
-		, m_threshold(threshold)
-		, m_last(*this, "m_last", 0)
-		, m_func(func)
+			FUNC &&func)
+			: device_t(data)
+			, m_in(*this, "IN", NETLIB_DELEGATE(in))
+			, m_threshold(threshold)
+			, m_last(*this, "m_last", 0)
+			, m_func(func)
 		{
 		}
 
@@ -104,9 +104,9 @@ namespace netlist::interface
 	{
 	public:
 		nld_logic_callback(constructor_param_t data, FUNC &&func)
-		: device_t(data)
-		, m_in(*this, "IN", NETLIB_DELEGATE(in))
-		, m_func(func)
+			: device_t(data)
+			, m_in(*this, "IN", NETLIB_DELEGATE(in))
+			, m_func(func)
 		{
 		}
 
@@ -135,17 +135,17 @@ namespace netlist::interface
 	{
 	public:
 		nld_buffered_param_setter(constructor_param_t data)
-		: device_t(data)
-		, m_sample_time(netlist_time::zero())
-		, m_feedback(*this, "FB", NETLIB_DELEGATE(feedback)) // clock part
-		, m_Q(*this, "Q")
-		, m_pos(0)
-		, m_samples(0)
-		, m_param_name(*this, "CHAN", "")
-		, m_param_mult(*this, "MULT", 1.0)
-		, m_param_offset(*this, "OFFSET", 0.0)
-		, m_param(nullptr)
-		, m_id(*this, "ID", 0)
+			: device_t(data)
+			, m_sample_time(netlist_time::zero())
+			, m_feedback(*this, "FB", NETLIB_DELEGATE(feedback)) // clock part
+			, m_Q(*this, "Q")
+			, m_pos(0)
+			, m_samples(0)
+			, m_param_name(*this, "CHAN", "")
+			, m_param_mult(*this, "MULT", 1.0)
+			, m_param_offset(*this, "OFFSET", 0.0)
+			, m_param(nullptr)
+			, m_id(*this, "ID", 0)
 		{
 			connect("FB", "Q");
 			m_buffer = nullptr;
@@ -207,7 +207,7 @@ namespace netlist::interface
 		}
 
 		void buffer_reset(netlist_time sample_time, std::size_t num_samples,
-						  T *inputs)
+			T *inputs)
 		{
 			m_samples = num_samples;
 			m_sample_time = sample_time;
@@ -237,9 +237,9 @@ namespace netlist::interface
 		param_str_t              m_param_name;
 		param_fp_t               m_param_mult;
 		param_fp_t               m_param_offset;
-		param_t *                m_param;
+		param_t                 *m_param;
 		setter_t                 m_param_setter;
-		T *                      m_buffer;
+		T                       *m_buffer;
 		param_num_t<std::size_t> m_id;
 	};
 

@@ -12,21 +12,20 @@
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
 
-namespace netlist::solver
-{
+namespace netlist::solver {
 	template <typename FT>
-	class matrix_solver_direct1_t: public matrix_solver_direct_t<FT, 1>
+	class matrix_solver_direct1_t : public matrix_solver_direct_t<FT, 1>
 	{
 	public:
-
 		using float_type = FT;
 		using base_type = matrix_solver_direct_t<FT, 1>;
 
-		matrix_solver_direct1_t(devices::nld_solver &main_solver, const pstring &name,
-			const matrix_solver_t::net_list_t &nets,
+		matrix_solver_direct1_t(devices::nld_solver &main_solver,
+			const pstring &name, const matrix_solver_t::net_list_t &nets,
 			const solver::solver_parameters_t *params)
 			: matrix_solver_direct_t<FT, 1>(main_solver, name, nets, params, 1)
-			{}
+		{
+		}
 
 		// ----------------------------------------------------------------------------------------
 		// matrix_solver - Direct1
@@ -40,8 +39,6 @@ namespace netlist::solver
 		}
 	};
 
-
 } // namespace netlist::solver
-
 
 #endif // NLD_MS_DIRECT1_H_

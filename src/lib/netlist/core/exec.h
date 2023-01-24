@@ -15,8 +15,7 @@
 #include "../plib/plists.h"
 #include "../plib/pstring.h"
 
-namespace netlist
-{
+namespace netlist {
 	// -------------------------------------------------------------------------
 	// netlist_t
 	// -------------------------------------------------------------------------
@@ -87,10 +86,10 @@ namespace netlist
 			return static_cast<X *>(m_solver)->gmin();
 		}
 
-		netlist_state_t &      nl_state() noexcept { return m_state; }
+		netlist_state_t       &nl_state() noexcept { return m_state; }
 		const netlist_state_t &nl_state() const noexcept { return m_state; }
 
-		log_type &      log() noexcept { return m_state.log(); }
+		log_type       &log() noexcept { return m_state.log(); }
 		const log_type &log() const noexcept { return m_state.log(); }
 
 		void print_stats() const;
@@ -102,7 +101,7 @@ namespace netlist
 		template <bool KEEP_STATS>
 		void process_queue_stats(netlist_time_ext delta) noexcept;
 
-		netlist_state_t &    m_state;
+		netlist_state_t     &m_state;
 		devices::nld_solver *m_solver;
 
 		// mostly rw

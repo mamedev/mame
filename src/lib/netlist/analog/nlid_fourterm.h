@@ -12,8 +12,7 @@
 
 #include "plib/putil.h"
 
-namespace netlist::analog
-{
+namespace netlist::analog {
 
 	// ----------------------------------------------------------------------------------------
 	// nld_VCCS
@@ -37,25 +36,7 @@ namespace netlist::analog
 	class nld_VCCS : public base_device_t
 	{
 	public:
-		nld_VCCS(constructor_param_t data, nl_fptype ri = nlconst::magic(1e9))
-		: base_device_t(data)
-		, m_G(*this, "G", nlconst::one())
-		, m_RI(*this, "RI", ri)
-		, m_OP(*this, "OP", &m_IP, {&m_ON, &m_IN},
-			   NETLIB_DELEGATE(terminal_handler))
-		, m_ON(*this, "ON", &m_IP, {&m_OP, &m_IN},
-			   NETLIB_DELEGATE(terminal_handler))
-		, m_IP(*this, "IP", &m_IN, {&m_OP, &m_ON},
-			   NETLIB_DELEGATE(terminal_handler))
-		, m_IN(*this, "IN", &m_IP, {&m_OP, &m_ON},
-			   NETLIB_DELEGATE(terminal_handler))
-		, m_OP1(*this, "_OP1", &m_IN, NETLIB_DELEGATE(terminal_handler))
-		, m_ON1(*this, "_ON1", &m_IN, NETLIB_DELEGATE(terminal_handler))
-		, m_gfac(nlconst::one())
-		{
-			connect(m_OP, m_OP1);
-			connect(m_ON, m_ON1);
-		}
+		nld_VCCS(constructor_param_t data, nl_fptype ri = nlconst::magic(1e9));
 
 		NETLIB_RESETI();
 
@@ -66,9 +47,9 @@ namespace netlist::analog
 		NETLIB_HANDLERI(terminal_handler);
 		NETLIB_UPDATE_PARAMI() { NETLIB_NAME(VCCS)::reset(); }
 
-		void set_gfac(nl_fptype g) noexcept { m_gfac = g; }
+		void set_factor(nl_fptype g) noexcept { m_factor = g; }
 
-		nl_fptype get_gfac() const noexcept { return m_gfac; }
+		nl_fptype get_factor() const noexcept { return m_factor; }
 
 		terminal_t m_OP;
 		terminal_t m_ON;
@@ -80,7 +61,7 @@ namespace netlist::analog
 		terminal_t m_ON1;
 
 	private:
-		nl_fptype m_gfac;
+		nl_fptype m_factor;
 	};
 
 	// Limited Current source
@@ -88,12 +69,7 @@ namespace netlist::analog
 	class nld_LVCCS : public nld_VCCS
 	{
 	public:
-		nld_LVCCS(constructor_param_t data)
-		: nld_VCCS(data)
-		, m_cur_limit(*this, "CURLIM", nlconst::magic(1000.0))
-		, m_vi(nlconst::zero())
-		{
-		}
+		nld_LVCCS(constructor_param_t data);
 
 		NETLIB_IS_DYNAMIC(true)
 
@@ -134,11 +110,7 @@ namespace netlist::analog
 	class nld_CCCS : public nld_VCCS
 	{
 	public:
-		nld_CCCS(constructor_param_t data)
-		: nld_VCCS(data, nlconst::one())
-		{
-			set_gfac(-plib::reciprocal(m_RI()));
-		}
+		nld_CCCS(constructor_param_t data);
 
 		NETLIB_RESETI();
 
@@ -175,15 +147,7 @@ namespace netlist::analog
 	class nld_VCVS : public nld_VCCS
 	{
 	public:
-		nld_VCVS(constructor_param_t data)
-		: nld_VCCS(data)
-		, m_RO(*this, "RO", nlconst::one())
-		, m_OP2(*this, "_OP2", &m_ON2, NETLIB_DELEGATE(terminal_handler))
-		, m_ON2(*this, "_ON2", &m_OP2, NETLIB_DELEGATE(terminal_handler))
-		{
-			connect(m_OP2, m_OP1);
-			connect(m_ON2, m_ON1);
-		}
+		nld_VCVS(constructor_param_t data);
 
 		NETLIB_RESETI();
 
@@ -229,15 +193,7 @@ namespace netlist::analog
 	class nld_CCVS : public nld_VCCS
 	{
 	public:
-		nld_CCVS(constructor_param_t data)
-		: nld_VCCS(data, nlconst::one())
-		, m_RO(*this, "RO", nlconst::one())
-		, m_OP2(*this, "_OP2", &m_ON2, NETLIB_DELEGATE(terminal_handler))
-		, m_ON2(*this, "_ON2", &m_OP2, NETLIB_DELEGATE(terminal_handler))
-		{
-			connect(m_OP2, m_OP1);
-			connect(m_ON2, m_ON1);
-		}
+		nld_CCVS(constructor_param_t data);
 
 		NETLIB_RESETI();
 
