@@ -335,7 +335,7 @@ private:
 	uint32_t handleop32_SUB_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_SUB_cc_f_b_b_u6(uint32_t op);
 
-	uint32_t handleop32_AND_cc(uint32_t op);
+	uint32_t handleop32_AND_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_AND(uint32_t op);
 	uint32_t handleop32_AND_f_a_b_c(uint32_t op);
 	uint32_t handleop32_AND_f_a_b_u6(uint32_t op);
@@ -343,7 +343,7 @@ private:
 	uint32_t handleop32_AND_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_AND_cc_f_b_b_u6(uint32_t op);
 
-	uint32_t handleop32_OR_cc(uint32_t op);
+	uint32_t handleop32_OR_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_OR(uint32_t op);
 	uint32_t handleop32_OR_f_a_b_c(uint32_t op);
 	uint32_t handleop32_OR_f_a_b_u6(uint32_t op);
@@ -351,7 +351,7 @@ private:
 	uint32_t handleop32_OR_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_OR_cc_f_b_b_u6(uint32_t op);
 
-	uint32_t handleop32_BIC_cc(uint32_t op);
+	uint32_t handleop32_BIC_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_BIC(uint32_t op);
 	uint32_t handleop32_BIC_f_a_b_c(uint32_t op);
 	uint32_t handleop32_BIC_f_a_b_u6(uint32_t op);
@@ -359,7 +359,7 @@ private:
 	uint32_t handleop32_BIC_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_BIC_cc_f_b_b_u6(uint32_t op);
 
-	uint32_t handleop32_XOR_cc(uint32_t op);
+	uint32_t handleop32_XOR_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_XOR(uint32_t op);
 	uint32_t handleop32_XOR_f_a_b_c(uint32_t op);
 	uint32_t handleop32_XOR_f_a_b_u6(uint32_t op);
