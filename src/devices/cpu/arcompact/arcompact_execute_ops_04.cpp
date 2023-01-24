@@ -3629,7 +3629,7 @@ uint32_t arcompact_device::handleop32_LP(uint32_t op) // LPcc (loop setup)
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //  Neither a nor b are used, would putting limm in them cause the limm to be read?
-// 
+//
 //                                 IIII I      SS SSSS
 //                                           PP
 // General Operations Reg-Reg      0010 0bbb 00ii iiii   FBBB CCCC CCAA AAAA

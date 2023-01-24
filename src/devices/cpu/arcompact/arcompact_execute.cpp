@@ -52,12 +52,11 @@ void arcompact_device::execute_run()
 		// hardware loops
 		if (m_pc == m_LP_END)
 		{
-			if (m_regs[REG_LP_COUNT] != 1)
+			if (m_regs[REG_LP_COUNT] > 0)
 			{
 				m_pc = m_LP_START;
+				m_regs[REG_LP_COUNT]--;
 			}
-			m_regs[REG_LP_COUNT]--;
-
 		}
 
 		m_icount--;
@@ -123,8 +122,8 @@ uint32_t arcompact_device::handle_jump_to_register(int delay, int link, uint32_t
 	{
 		if (flag)
 		{
-			if ((reg == REG_ILINK1)) m_status32 = m_status32_l1;
-			if ((reg == REG_ILINK2)) m_status32 = m_status32_l2;
+			if (reg == REG_ILINK1) m_status32 = m_status32_l1;
+			if (reg == REG_ILINK2) m_status32 = m_status32_l2;
 			uint32_t target = m_regs[reg];
 			return handle_jump_to_addr(delay, link, target, next_addr);
 		}

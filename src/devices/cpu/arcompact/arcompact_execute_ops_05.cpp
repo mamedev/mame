@@ -108,7 +108,7 @@ uint32_t arcompact_device::handleop32_ASL_multiple(uint32_t op)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 uint32_t arcompact_device::handleop32_LSR_multiple_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags)
-{ 
+{
 	uint32_t result = src1 >> (src2 & 0x1f);
 	if (set_flags)
 		arcompact_fatal("handleop32_LSR_multiple (LSR) (F set)\n"); // not yet supported
