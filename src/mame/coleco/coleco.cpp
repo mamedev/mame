@@ -2,7 +2,7 @@
 // copyright-holders:Mike Balfour, Ben Bruscella, Sean Young, Frank Palazzolo
 /*******************************************************************************************************
 
-  coleco.c
+  coleco.cpp
 
   Driver file to handle emulation of the ColecoVision.
 
@@ -45,7 +45,7 @@
 
     -Roller Controller. Basically a trackball with four buttons (the two fire buttons from player 1 and
     the two fire buttons from player 2). Only one Roller Controller can be used on a real ColecoVision.
-    Roller Controller is connected to both controller sockets and both controllers are conected to the Roller
+    Roller Controller is connected to both controller sockets and both controllers are connected to the Roller
     Controller, it uses the spinner pins of both sockets to generate the X and Y signals (X from controller 1
     and the Y from controller 2)
 
@@ -77,12 +77,12 @@
 
 /* Read/Write Handlers */
 
-uint8_t coleco_state::paddle_1_r()
+uint8_t coleco_base_state::paddle_1_r()
 {
 	return m_joy_d7_state[0] | coleco_paddle_read(0, m_joy_mode, m_joy_analog_state[0]);
 }
 
-uint8_t coleco_state::paddle_2_r()
+uint8_t coleco_base_state::paddle_2_r()
 {
 	// Tape notes:
 	//     Signal is averaged to set the threshold voltage for a comparator
@@ -90,12 +90,12 @@ uint8_t coleco_state::paddle_2_r()
 	return m_joy_d7_state[1] | coleco_paddle_read(1, m_joy_mode, m_joy_analog_state[1]);
 }
 
-void coleco_state::paddle_off_w(uint8_t data)
+void coleco_base_state::paddle_off_w(uint8_t data)
 {
 	m_joy_mode = 0;
 }
 
-void coleco_state::paddle_on_w(uint8_t data)
+void coleco_base_state::paddle_on_w(uint8_t data)
 {
 	m_joy_mode = 1;
 }
@@ -156,11 +156,21 @@ void bit90_state::u32_w(uint8_t data)
 
 /* Memory Maps */
 
-void coleco_state::coleco_map(address_map &map)
+void coleco_base_state::coleco_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x6000, 0x63ff).ram().mirror(0x1c00);
-	map(0x8000, 0xffff).rom();
+	map(0x8000, 0xffff).r(FUNC(coleco_base_state::cart_r));
+}
+
+void coleco_state::sgm_map(address_map &map)
+{
+	coleco_map(map);
+
+	map(0x0000, 0x1fff).view(m_sgm_ram8k);
+	m_sgm_ram8k[0](0x0000, 0x1fff).ram();
+	map(0x2000, 0x7fff).view(m_sgm_ram24k);
+	m_sgm_ram24k[0](0x2000, 0x7fff).ram();
 }
 
 void bit90_state::bit90_map(address_map &map)
@@ -169,18 +179,30 @@ void bit90_state::bit90_map(address_map &map)
 	map(0x2000, 0x3fff).rom();
 	map(0x4000, 0x5fff).rom();  // Decoded through pin 5 of the Bit90 expansion port
 	map(0x6000, 0x67ff).ram().mirror(0x1800);
-	map(0x8000, 0xffff).ram();
+	map(0x8000, 0xffff).r(FUNC(coleco_base_state::cart_r));
 }
 
-void coleco_state::coleco_io_map(address_map &map)
+void coleco_base_state::coleco_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x80, 0x80).mirror(0x1f).w(FUNC(coleco_state::paddle_off_w));
+	map(0x80, 0x80).mirror(0x1f).w(FUNC(coleco_base_state::paddle_off_w));
 	map(0xa0, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
-	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(coleco_state::paddle_on_w));
+	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(coleco_base_state::paddle_on_w));
 	map(0xe0, 0xe0).mirror(0x1f).w("sn76489a", FUNC(sn76489a_device::write));
-	map(0xe0, 0xe0).mirror(0x1d).r(FUNC(coleco_state::paddle_1_r));
-	map(0xe2, 0xe2).mirror(0x1d).r(FUNC(coleco_state::paddle_2_r));
+	map(0xe0, 0xe0).mirror(0x1d).r(FUNC(coleco_base_state::paddle_1_r));
+	map(0xe2, 0xe2).mirror(0x1d).r(FUNC(coleco_base_state::paddle_2_r));
+}
+
+void coleco_state::sgm_io_map(address_map &map)
+{
+	coleco_io_map(map);
+
+	map(0x00, 0x7f).view(m_sgm_io);
+	m_sgm_io[0](0x50, 0x50).w(m_ay8910, FUNC(ay8910_device::address_w));
+	m_sgm_io[0](0x51, 0x51).w(m_ay8910, FUNC(ay8910_device::data_w));
+	m_sgm_io[0](0x52, 0x52).r(m_ay8910, FUNC(ay8910_device::data_r));
+	m_sgm_io[0](0x53, 0x53).lw8(NAME([this] (u8 data) { if (BIT(data, 0)) m_sgm_ram24k.select(0); else m_sgm_ram24k.disable(); }));
+	m_sgm_io[0](0x7f, 0x7f).lw8(NAME([this] (u8 data) { if (BIT(data, 1)) m_sgm_ram8k.disable(); else m_sgm_ram8k.select(0); }));
 }
 
 void bit90_state::bit90_io_map(address_map &map)
@@ -188,13 +210,13 @@ void bit90_state::bit90_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x80, 0x80).mirror(0x17).r(FUNC(bit90_state::bankswitch_u4_r));
 	map(0x88, 0x88).mirror(0x17).r(FUNC(bit90_state::bankswitch_u3_r));
-	map(0x80, 0x80).mirror(0x1f).w(FUNC(coleco_state::paddle_off_w));
+	map(0x80, 0x80).mirror(0x1f).w(FUNC(coleco_base_state::paddle_off_w));
 	map(0xa0, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 	map(0xc0, 0xc0).mirror(0x1f).r(FUNC(bit90_state::keyboard_r));
-	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(coleco_state::paddle_on_w));
-	map(0xe0, 0xe0).mirror(0x1d).r(FUNC(coleco_state::paddle_1_r));
+	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(coleco_base_state::paddle_on_w));
+	map(0xe0, 0xe0).mirror(0x1d).r(FUNC(coleco_base_state::paddle_1_r));
 	map(0xe0, 0xe0).mirror(0x1b).w(FUNC(bit90_state::u32_w));        // bits7-4 for keyscan, (to bcd decoder) and bits1-0 tape out
-	map(0xe2, 0xe2).mirror(0x1d).r(FUNC(coleco_state::paddle_2_r));  // also, bit7 is tape in
+	map(0xe2, 0xe2).mirror(0x1d).r(FUNC(coleco_base_state::paddle_2_r));  // also, bit7 is tape in
 	map(0xe4, 0xe4).mirror(0x1b).w("sn76489a", FUNC(sn76489a_device::write));
 
 	// IORQ goes to pin 55 of the Bit90 expansion port,
@@ -210,14 +232,23 @@ void bit90_state::bit90_io_map(address_map &map)
 	// RAM can appear here, starting at 0x8000 up to 0xffff
 }
 
-void coleco_state::czz50_map(address_map &map)
+void coleco_base_state::czz50_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x6000, 0x63ff).ram().mirror(0x1c00);
-	map(0x8000, 0xffff).rom();
+	map(0x8000, 0xffff).r(FUNC(coleco_base_state::cart_r));
 }
 
 /* Input Ports */
+
+static INPUT_PORTS_START( sgm )
+	PORT_INCLUDE( coleco )
+
+	PORT_START("SGMCONF")
+	PORT_CONFNAME( 0x01, 0x01, "Super Game Module" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( czz50 )
 	PORT_START("STD_KEYPAD1")
@@ -346,7 +377,7 @@ INPUT_PORTS_END
 
 /* Interrupts */
 
-WRITE_LINE_MEMBER(coleco_state::coleco_vdp_interrupt)
+WRITE_LINE_MEMBER(coleco_base_state::coleco_vdp_interrupt)
 {
 	// NMI on rising edge
 	if (state && !m_last_nmi_state)
@@ -355,13 +386,13 @@ WRITE_LINE_MEMBER(coleco_state::coleco_vdp_interrupt)
 	m_last_nmi_state = state;
 }
 
-TIMER_CALLBACK_MEMBER(coleco_state::paddle_d7reset_callback)
+TIMER_CALLBACK_MEMBER(coleco_base_state::paddle_d7reset_callback)
 {
 	m_joy_d7_state[param] = 0;
 	m_joy_analog_state[param] = 0;
 }
 
-TIMER_CALLBACK_MEMBER(coleco_state::paddle_irqreset_callback)
+TIMER_CALLBACK_MEMBER(coleco_base_state::paddle_irqreset_callback)
 {
 	m_joy_irq_state[param] = 0;
 
@@ -369,7 +400,7 @@ TIMER_CALLBACK_MEMBER(coleco_state::paddle_irqreset_callback)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(coleco_state::paddle_pulse_callback)
+TIMER_CALLBACK_MEMBER(coleco_base_state::paddle_pulse_callback)
 {
 	if (m_joy_analog_reload[param])
 	{
@@ -389,7 +420,7 @@ TIMER_CALLBACK_MEMBER(coleco_state::paddle_pulse_callback)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(coleco_state::paddle_update_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(coleco_base_state::paddle_update_callback)
 {
 	// arbitrary timer for reading analog controls
 	coleco_scan_paddles(&m_joy_analog_reload[0], &m_joy_analog_reload[1]);
@@ -410,12 +441,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(coleco_state::paddle_update_callback)
 	}
 }
 
-uint8_t coleco_state::cart_r(offs_t offset)
+uint8_t coleco_base_state::cart_r(offs_t offset)
 {
 	return m_cart->bd_r(offset & 0x7fff, 0, 0, 0, 0, 0);
 }
 
-uint8_t coleco_state::coleco_scan_paddles(uint8_t *joy_status0, uint8_t *joy_status1)
+uint8_t coleco_base_state::coleco_scan_paddles(uint8_t *joy_status0, uint8_t *joy_status1)
 {
 	uint8_t ctrl_sel = m_ctrlsel.read_safe(0);
 
@@ -444,7 +475,7 @@ uint8_t coleco_state::coleco_scan_paddles(uint8_t *joy_status0, uint8_t *joy_sta
 }
 
 
-uint8_t coleco_state::coleco_paddle_read(int port, int joy_mode, uint8_t joy_status)
+uint8_t coleco_base_state::coleco_paddle_read(int port, int joy_mode, uint8_t joy_status)
 {
 	uint8_t ctrl_sel = m_ctrlsel.read_safe(0);
 	uint8_t ctrl_extra = ctrl_sel & 0x80;
@@ -506,22 +537,19 @@ uint8_t coleco_state::coleco_paddle_read(int port, int joy_mode, uint8_t joy_sta
 	}
 }
 
-void coleco_state::machine_start()
+void coleco_base_state::machine_start()
 {
 	// init paddles
 	for (int port = 0; port < 2; port++)
 	{
-		m_joy_pulse_timer[port] = timer_alloc(FUNC(coleco_state::paddle_pulse_callback), this);
-		m_joy_d7_timer[port] = timer_alloc(FUNC(coleco_state::paddle_d7reset_callback), this);
-		m_joy_irq_timer[port] = timer_alloc(FUNC(coleco_state::paddle_irqreset_callback), this);
+		m_joy_pulse_timer[port] = timer_alloc(FUNC(coleco_base_state::paddle_pulse_callback), this);
+		m_joy_d7_timer[port] = timer_alloc(FUNC(coleco_base_state::paddle_d7reset_callback), this);
+		m_joy_irq_timer[port] = timer_alloc(FUNC(coleco_base_state::paddle_irqreset_callback), this);
 
 		m_joy_irq_state[port] = 0;
 		m_joy_d7_state[port] = 0;
 		m_joy_analog_state[port] = 0;
 	}
-
-	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xffff, read8sm_delegate(*this, FUNC(coleco_state::cart_r)));
 
 	save_item(NAME(m_joy_mode));
 	save_item(NAME(m_last_nmi_state));
@@ -533,19 +561,31 @@ void coleco_state::machine_start()
 
 void bit90_state::machine_start()
 {
-	coleco_state::machine_start();
+	coleco_base_state::machine_start();
 	uint8_t *banked = memregion("banked")->base();
 	m_bank->configure_entries(0, 0x02, banked, 0x2000);
 }
 
-void coleco_state::machine_reset()
+void coleco_base_state::machine_reset()
 {
 	m_last_nmi_state = 0;
 }
 
+void coleco_state::machine_reset()
+{
+	coleco_base_state::machine_reset();
+
+	if (m_sgmconf->read())
+		m_sgm_io.select(0);
+	else
+		m_sgm_io.disable();
+	m_sgm_ram8k.disable();
+	m_sgm_ram24k.disable();
+}
+
 void bit90_state::machine_reset()
 {
-	coleco_state::machine_reset();
+	coleco_base_state::machine_reset();
 	m_bank->set_entry(0);
 }
 
@@ -565,18 +605,18 @@ void bit90_state::machine_reset()
 
 /* Machine Drivers */
 
-void coleco_state::coleco(machine_config &config)
+void coleco_base_state::coleco_base(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(7'159'090)/2); // 3.579545 MHz
-	m_maincpu->set_addrmap(AS_PROGRAM, &coleco_state::coleco_map);
-	m_maincpu->set_addrmap(AS_IO, &coleco_state::coleco_io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &coleco_base_state::coleco_map);
+	m_maincpu->set_addrmap(AS_IO, &coleco_base_state::coleco_io_map);
 
 	/* video hardware */
 	tms9928a_device &vdp(TMS9928A(config, "tms9928a", XTAL(10'738'635)));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
-	vdp.int_callback().set(FUNC(coleco_state::coleco_vdp_interrupt));
+	vdp.int_callback().set(FUNC(coleco_base_state::coleco_vdp_interrupt));
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
@@ -592,7 +632,19 @@ void coleco_state::coleco(machine_config &config)
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("coleco");
 
-	TIMER(config, "paddle_timer").configure_periodic(FUNC(coleco_state::paddle_update_callback), attotime::from_msec(20));
+	TIMER(config, "paddle_timer").configure_periodic(FUNC(coleco_base_state::paddle_update_callback), attotime::from_msec(20));
+}
+
+void coleco_state::coleco(machine_config &config)
+{
+	coleco_base(config);
+
+	// additional Super Game Module hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &coleco_state::sgm_map);
+	m_maincpu->set_addrmap(AS_IO, &coleco_state::sgm_io_map);
+
+	AY8910(config, m_ay8910, XTAL(7'159'090)/4);
+	m_ay8910->add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void coleco_state::colecop(machine_config &config)
@@ -603,51 +655,35 @@ void coleco_state::colecop(machine_config &config)
 	tms9929a_device &vdp(TMS9929A(config.replace(), "tms9928a", XTAL(10'738'635)));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
-	vdp.int_callback().set(FUNC(coleco_state::coleco_vdp_interrupt));
+	vdp.int_callback().set(FUNC(coleco_base_state::coleco_vdp_interrupt));
 }
 
 void bit90_state::bit90(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(7'159'090)/2); // 3.579545 MHz
+	coleco_base(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &bit90_state::bit90_map);
 	m_maincpu->set_addrmap(AS_IO, &bit90_state::bit90_io_map);
 
-	/* video hardware */
-	tms9929a_device &vdp(TMS9929A(config, "tms9928a", XTAL(10'738'635)));
+	// video hardware
+	tms9929a_device &vdp(TMS9929A(config.replace(), "tms9928a", XTAL(10'738'635)));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
-	vdp.int_callback().set(FUNC(coleco_state::coleco_vdp_interrupt));
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	vdp.int_callback().set(FUNC(coleco_base_state::coleco_vdp_interrupt));
 
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	sn76489a_device &psg(SN76489A(config, "sn76489a", XTAL(7'159'090)/2)); // 3.579545 MHz
-	psg.add_route(ALL_OUTPUTS, "mono", 1.00);
-	// TODO: enable when Z80 has better WAIT pin emulation, this currently breaks pitfall2 for example
-	//psg.ready_cb().set_inputline("maincpu", Z80_INPUT_LINE_WAIT).invert();
-
-	/* cartridge */
-	COLECOVISION_CARTRIDGE_SLOT(config, m_cart, colecovision_cartridges, nullptr);
-
-	/* software lists */
-	SOFTWARE_LIST(config, "cart_list").set_original("coleco");
-
-	/* internal ram */
+	// internal ram
 	RAM(config, m_ram).set_default_size("32K").set_extra_options("1K,16K");
-
-	TIMER(config, "paddle_timer").configure_periodic(FUNC(coleco_state::paddle_update_callback), attotime::from_msec(20));
 }
 
-void coleco_state::czz50(machine_config &config)
+void coleco_base_state::czz50(machine_config &config)
 {
-	coleco(config);
+	coleco_base(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &coleco_state::czz50_map); // note: cpu speed unverified, assume it's the same as ColecoVision
+	m_maincpu->set_addrmap(AS_PROGRAM, &coleco_base_state::czz50_map); // note: cpu speed unverified, assume it's the same as ColecoVision
 }
 
-void coleco_state::dina(machine_config &config)
+void coleco_base_state::dina(machine_config &config)
 {
 	czz50(config);
 
@@ -655,7 +691,7 @@ void coleco_state::dina(machine_config &config)
 	tms9929a_device &vdp(TMS9929A(config.replace(), "tms9928a", XTAL(10'738'635)));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
-	vdp.int_callback().set(FUNC(coleco_state::coleco_vdp_interrupt));
+	vdp.int_callback().set(FUNC(coleco_base_state::coleco_vdp_interrupt));
 }
 
 
@@ -756,11 +792,11 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS         INIT        COMPANY             FULLNAME                            FLAGS
-CONS( 1982, coleco,   0,      0,      coleco,   coleco, coleco_state, empty_init, "Coleco",           "ColecoVision (NTSC)",              0 )
-CONS( 1982, onyx,     coleco, 0,      coleco,   coleco, coleco_state, empty_init, "Microdigital",     "Onyx (Brazil/Prototype)",          0 )
-CONS( 1983, colecop,  coleco, 0,      colecop,  coleco, coleco_state, empty_init, "Coleco",           "ColecoVision (PAL)",               0 )
-CONS( 1986, czz50,    0,      coleco, czz50,    czz50,  coleco_state, empty_init, "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
-CONS( 1988, dina,     czz50,  0,      dina,     czz50,  coleco_state, empty_init, "Telegames",        "Dina",                             0 )
-CONS( 1988, prsarcde, czz50,  0,      czz50,    czz50,  coleco_state, empty_init, "Telegames",        "Personal Arcade",                  0 )
-COMP( 1983, bit90,    0,      coleco, bit90,    bit90,  bit90_state,  init,       "Bit Corporation",  "Bit90",                            0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE      INPUT   CLASS              INIT        COMPANY             FULLNAME                            FLAGS
+CONS( 1982, coleco,   0,      0,      coleco,      sgm,    coleco_state,      empty_init, "Coleco",           "ColecoVision (NTSC)",              0 )
+CONS( 1982, onyx,     coleco, 0,      coleco_base, coleco, coleco_base_state, empty_init, "Microdigital",     "Onyx (Brazil/Prototype)",          0 )
+CONS( 1983, colecop,  coleco, 0,      colecop,     sgm,    coleco_state,      empty_init, "Coleco",           "ColecoVision (PAL)",               0 )
+CONS( 1986, czz50,    0,      coleco, czz50,       czz50,  coleco_base_state, empty_init, "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
+CONS( 1988, dina,     czz50,  0,      dina,        czz50,  coleco_base_state, empty_init, "Telegames",        "Dina",                             0 )
+CONS( 1988, prsarcde, czz50,  0,      czz50,       czz50,  coleco_base_state, empty_init, "Telegames",        "Personal Arcade",                  0 )
+COMP( 1983, bit90,    0,      coleco, bit90,       bit90,  bit90_state,       init,       "Bit Corporation",  "Bit90",                            0 )
