@@ -61,11 +61,15 @@ private:
 
 	const static int LIMM_REG = 62;
 
-	const static int REG_BLINK = 0x1f; // r31
-	const static int REG_SP = 0x1c; // r28
-	const static int REG_ILINK1 = 0x1d; // r29
-	const static int REG_ILINK2 = 0x1e; // r30
+	const static int REG_BLINK    = 0x1f; // r31
+	const static int REG_SP       = 0x1c; // r28
+	const static int REG_ILINK1   = 0x1d; // r29
+	const static int REG_ILINK2   = 0x1e; // r30
+	const static int REG_MLO      = 0x39; // r57 - multiply low 32-bits (of 64-bit result)
+	const static int REG_MMID     = 0x3a; // r58 - multiply mid 32-bits (of 64-bit result - overlaps)
+	const static int REG_MHI      = 0x3b; // r59 - multiply high 32-bits (of 64-bit result)
 	const static int REG_LP_COUNT = 0x3c; // r60
+
 
 	const static uint32_t V_OVERFLOW_FLAG = 0x00000100;
 	const static uint32_t C_CARRY_FLAG = 0x00000200;
@@ -684,7 +688,6 @@ private:
 
 	// arcompact_execute_ops_05.cpp
 	uint32_t handleop32_ASL_multiple_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
-	uint32_t handleop32_ASL_multiple_cc(uint32_t op);
 	uint32_t handleop32_ASL_multiple(uint32_t op);
 	uint32_t handleop32_ASL_multiple_f_a_b_c(uint32_t op);
 	uint32_t handleop32_ASL_multiple_f_a_b_u6(uint32_t op);
@@ -700,11 +703,17 @@ private:
 	uint32_t handleop32_LSR_multiple_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_LSR_multiple_cc_f_b_b_u6(uint32_t op);
 
+	void handleop32_MULU64_do_op(uint32_t src1, uint32_t src2);
+	uint32_t handleop32_MULU64_f_a_b_c(uint32_t op);
+	uint32_t handleop32_MULU64_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_MULU64_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_MULU64_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_MULU64_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_MULU64(uint32_t op);
 
 	uint32_t handleop32_ASR_multiple(uint32_t op);
 	uint32_t handleop32_ROR_multiple(uint32_t op);
 	uint32_t handleop32_MUL64(uint32_t op);
-	uint32_t handleop32_MULU64(uint32_t op);
 	uint32_t handleop32_ADDS(uint32_t op);
 	uint32_t handleop32_SUBS(uint32_t op);
 	uint32_t handleop32_DIVAW(uint32_t op);

@@ -23,7 +23,7 @@
 
 uint32_t arcompact_device::handleop32_ASL_multiple_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
-	uint32_t result = src1 << (src2&0x1f);
+	uint32_t result = src1 << (src2 & 0x1f);
 	if (set_flags)
 		arcompact_fatal("handleop32_ASL_multiple (ASL) (F set)\n"); // not yet supported
 	return result;
@@ -40,64 +40,55 @@ uint32_t arcompact_device::handleop32_ASL_multiple_f_a_b_c(uint32_t op)
 uint32_t arcompact_device::handleop32_ASL_multiple_f_a_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
-	uint32_t u = common32_get_u6(op);
 	int size = check_b_limm(breg);
-	m_regs[common32_get_areg(op)] = handleop32_ASL_multiple_do_op(m_regs[breg], u, common32_get_F(op));
+	m_regs[common32_get_areg(op)] = handleop32_ASL_multiple_do_op(m_regs[breg], common32_get_u6(op), common32_get_F(op));
 	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_ASL_multiple_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
-	uint32_t S = common32_get_s12(op);
 	int size = check_b_limm(breg);
-	m_regs[breg] = handleop32_ASL_multiple_do_op(m_regs[breg], S, common32_get_F(op));
+	m_regs[breg] = handleop32_ASL_multiple_do_op(m_regs[breg], common32_get_s12(op), common32_get_F(op));
 	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_ASL_multiple_cc_f_b_b_c(uint32_t op)
 {
-	int size = 4;
-	arcompact_fatal("handleop32_ASL_multiple_cc_f_b_b_c (ASL)\n");
+	uint8_t breg = common32_get_breg(op);
+	uint8_t creg = common32_get_creg(op);
+	int size = check_b_c_limm(breg, creg);
+	if (!check_condition(common32_get_condition(op)))
+		return m_pc + size;
+	m_regs[breg] = handleop32_ASL_multiple_do_op(m_regs[breg], m_regs[creg], common32_get_F(op));
 	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_ASL_multiple_cc_f_b_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
-	uint32_t u = common32_get_u6(op);
 	int size = check_b_limm(breg);
 	if (!check_condition(common32_get_condition(op)))
 		return m_pc + size;
-	m_regs[breg] = handleop32_ASL_multiple_do_op(m_regs[breg], u, common32_get_F(op));
+	m_regs[breg] = handleop32_ASL_multiple_do_op(m_regs[breg], common32_get_u6(op), common32_get_F(op));
 	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_ASL_multiple_cc(uint32_t op)
-{
-	int M = (op & 0x00000020) >> 5;
-
-	switch (M)
-	{
-		case 0x00: return handleop32_ASL_multiple_cc_f_b_b_c(op);
-		case 0x01: return handleop32_ASL_multiple_cc_f_b_b_u6(op);
-	}
-
-	return 0;
 }
 
 uint32_t arcompact_device::handleop32_ASL_multiple(uint32_t op)
 {
-	int p = (op & 0x00c00000) >> 22;
-
-	switch (p)
+	switch ((op & 0x00c00000) >> 22)
 	{
-		case 0x00: return handleop32_ASL_multiple_f_a_b_c(op);
-		case 0x01: return handleop32_ASL_multiple_f_a_b_u6(op);
-		case 0x02: return handleop32_ASL_multiple_f_b_b_s12(op);
-		case 0x03: return handleop32_ASL_multiple_cc(op);
+	case 0x00: return handleop32_ASL_multiple_f_a_b_c(op);
+	case 0x01: return handleop32_ASL_multiple_f_a_b_u6(op);
+	case 0x02: return handleop32_ASL_multiple_f_b_b_s12(op);
+	case 0x03:
+		switch ((op & 0x00000020) >> 5)
+		{
+		case 0x00: return handleop32_ASL_multiple_cc_f_b_b_c(op);
+		case 0x01: return handleop32_ASL_multiple_cc_f_b_b_u6(op);
+		}
+		return 0;
 	}
-
 	return 0;
 }
 
@@ -291,6 +282,7 @@ uint32_t arcompact_device::handleop32_ASR_multiple(uint32_t op)  { return arcomp
 uint32_t arcompact_device::handleop32_ROR_multiple(uint32_t op)  { return arcompact_handle04_helper(op, "ROR", 0,0); }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 32 x 32 Signed Multiply
 // MUL64 <0,>b,c                   0010 1bbb 0000 0100   0BBB CCCC CC11 1110
 // MUL64 <0,>b,u6                  0010 1bbb 0100 0100   0BBB uuuu uu11 1110
 // MUL64 <0,>b,s12                 0010 1bbb 1000 0100   0BBB ssss ssSS SSSS
@@ -305,6 +297,8 @@ uint32_t arcompact_device::handleop32_ROR_multiple(uint32_t op)  { return arcomp
 uint32_t arcompact_device::handleop32_MUL64(uint32_t op)  { return arcompact_handle04_helper(op, "MUL64", 2,0); } // special
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// 32 x 32 Unsigned Multiply
+// special handling, destination register is always the multiply result register, a is ignored
 // MULU64 <0,>b,c                  0010 1bbb 0000 0101   0BBB CCCC CC11 1110
 // MULU64 <0,>b,u6                 0010 1bbb 0100 0101   0BBB uuuu uu11 1110
 // MULU64 <0,>b,s12                0010 1bbb 1000 0101   0BBB ssss ssSS SSSS
@@ -316,9 +310,80 @@ uint32_t arcompact_device::handleop32_MUL64(uint32_t op)  { return arcompact_han
 // MULU64<.cc> <0,>b,limm          0010 1bbb 1100 0101   0BBB 1111 100Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_MULU64(uint32_t op)  { return arcompact_handle04_helper(op, "MULU64", 2,0);} // special
+void arcompact_device::handleop32_MULU64_do_op(uint32_t src1, uint32_t src2)
+{
+	uint64_t result = src1 * src2;
+	m_regs[REG_MLO] = result & 0xffffffff;
+	m_regs[REG_MMID] = (result >> 16) & 0xffffffff;
+	m_regs[REG_MHI] = (result >> 32) & 0xffffffff;
+}
 
-																												   // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+uint32_t arcompact_device::handleop32_MULU64_f_a_b_c(uint32_t op)
+{
+	uint8_t breg = common32_get_breg(op);
+	uint8_t creg = common32_get_creg(op);
+	int size = check_b_c_limm(breg, creg);
+	handleop32_MULU64_do_op(m_regs[breg], m_regs[creg]);
+	return m_pc + size;
+}
+uint32_t arcompact_device::handleop32_MULU64_f_a_b_u6(uint32_t op)
+{
+	uint8_t breg = common32_get_breg(op);
+	int size = check_b_limm(breg);
+	handleop32_MULU64_do_op(m_regs[breg], common32_get_u6(op));
+	return m_pc + size;
+}
+
+uint32_t arcompact_device::handleop32_MULU64_f_b_b_s12(uint32_t op)
+{
+	uint8_t breg = common32_get_breg(op);
+	int size = check_b_limm(breg);
+	handleop32_MULU64_do_op(m_regs[breg], common32_get_s12(op));
+	return m_pc + size;
+}
+
+uint32_t arcompact_device::handleop32_MULU64_cc_f_b_b_c(uint32_t op)
+{
+	uint8_t breg = common32_get_breg(op);
+	uint8_t creg = common32_get_creg(op);
+	int size = check_b_c_limm(breg, creg);
+	if (!check_condition(common32_get_condition(op)))
+		return m_pc + size;
+	handleop32_MULU64_do_op(m_regs[breg], m_regs[creg]);
+	return m_pc + size;
+}
+
+uint32_t arcompact_device::handleop32_MULU64_cc_f_b_b_u6(uint32_t op)
+{
+	uint8_t breg = common32_get_breg(op);
+	int size = check_b_limm(breg);
+	if (!check_condition(common32_get_condition(op)))
+		return m_pc + size;
+	handleop32_MULU64_do_op(m_regs[breg], common32_get_u6(op));
+	return m_pc + size;
+}
+
+uint32_t arcompact_device::handleop32_MULU64(uint32_t op)
+{
+	switch ((op & 0x00c00000) >> 22)
+	{
+	case 0x00: return handleop32_MULU64_f_a_b_c(op);
+	case 0x01: return handleop32_MULU64_f_a_b_u6(op);
+	case 0x02: return handleop32_MULU64_f_b_b_s12(op);
+	case 0x03:
+	{
+		switch ((op & 0x00000020) >> 5)
+		{
+		case 0x00: return handleop32_MULU64_cc_f_b_b_c(op);
+		case 0x01: return handleop32_MULU64_cc_f_b_b_u6(op);
+		}
+		return 0;
+	}
+	}
+	return 0;
+}
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ADDS<.f> a,b,c                  0010 1bbb 0000 0110   FBBB CCCC CCAA AAAA
 // ADDS<.f> a,b,u6                 0010 1bbb 0100 0110   FBBB uuuu uuAA AAAA
 // ADDS<.f> b,b,s12                0010 1bbb 1000 0110   FBBB ssss ssSS SSSS
