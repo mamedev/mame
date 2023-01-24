@@ -15,7 +15,7 @@
 uint32_t arcompact_device::handleop_LD_S_b_pcl_u10(uint16_t op)
 {
 	arcompact_log("unimplemented MOV_S x, [PCL, x] %04x",  op);
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -33,7 +33,7 @@ uint32_t arcompact_device::handleop_MOV_S_b_u8(uint16_t op) // MOV_S b, u8
 
 	m_regs[breg] = u;
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -51,7 +51,7 @@ uint32_t arcompact_device::handleop_ADD_S_b_b_u7(uint16_t op) // ADD_S b, b, u7
 
 	m_regs[breg] = m_regs[breg] + u;
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -116,5 +116,5 @@ uint32_t arcompact_device::handleop_CMP_S_b_u7(uint16_t op) // CMP b, u7
 
 	// only sets flags, no result written
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }

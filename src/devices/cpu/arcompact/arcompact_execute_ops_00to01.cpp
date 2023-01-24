@@ -36,7 +36,7 @@ uint32_t arcompact_device::handleop32_B_cc_D_s21(uint32_t op)
 	}
 	else
 	{
-	//  m_regs[REG_BLINK] = m_pc + (size >> 0);  // don't link
+	//  m_regs[REG_BLINK] = m_pc + size;  // don't link
 		return realaddress;
 	}
 
@@ -65,7 +65,7 @@ uint32_t arcompact_device::handleop32_B_D_s25(uint32_t op)
 	}
 	else
 	{
-	//  m_regs[REG_BLINK] = m_pc + (size >> 0);  // don't link
+	//  m_regs[REG_BLINK] = m_pc + size;  // don't link
 		return realaddress;
 	}
 
@@ -107,7 +107,7 @@ uint32_t arcompact_device::handleop32_BL_d_s25(uint32_t op)
 	}
 	else
 	{
-		m_regs[REG_BLINK] = m_pc + (size >> 0);
+		m_regs[REG_BLINK] = m_pc + size;
 		return realaddress;
 	}
 

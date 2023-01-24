@@ -367,7 +367,7 @@ private:
 	uint32_t handleop32_XOR_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_XOR_cc_f_b_b_u6(uint32_t op);
 
-	uint32_t handleop32_MOV_cc(uint32_t op);
+	void handleop32_MOV_do_op(uint32_t breg, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_MOV(uint32_t op);
 	uint32_t handleop32_MOV_f_a_b_c(uint32_t op);
 	uint32_t handleop32_MOV_f_a_b_u6(uint32_t op);

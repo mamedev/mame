@@ -96,7 +96,7 @@ uint32_t arcompact_device::handleop32_LSR_single_f_b_c(uint32_t op)
 		if (c & 0x00000001) { status32_set_c(); } else { status32_clear_c(); }
 	}
 
-	return m_pc + (size >> 0);
+	return m_pc + size;
 }
 
 
@@ -120,7 +120,7 @@ uint32_t arcompact_device::handleop32_LSR_single_f_b_u6(uint32_t op)
 		if (result == 0x00000000) { status32_set_z(); } else { status32_clear_z(); }
 		if (c & 0x00000001) { status32_set_c(); } else { status32_clear_c(); }
 	}
-	return m_pc + (size >> 0);
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_LSR_single(uint32_t op)
@@ -179,7 +179,7 @@ uint32_t arcompact_device::handleop32_ROR_single_f_a_b_c(uint32_t op)
 		if (c == 0x00000001) { status32_set_c(); }
 		else { status32_clear_c(); }
 	}
-	return m_pc + (size >> 0);
+	return m_pc + size;
 }
 
 
@@ -209,7 +209,7 @@ uint32_t arcompact_device::handleop32_ROR_single_f_a_b_u6(uint32_t op)
 		if (c == 0x00000001) { status32_set_c(); }
 		else { status32_clear_c(); }
 	}
-	return m_pc + (size >> 0);
+	return m_pc + size;
 }
 
 
@@ -217,7 +217,7 @@ uint32_t arcompact_device::handleop32_ROR_single_f_b_b_s12(uint32_t op)
 {
 	int size = 4;
 	arcompact_fatal("illegal handleop32_ROR_single_f_b_b_s12 (ares bits already used as opcode select, can't be used as s12) (ROR)\n");
-	return m_pc + (size >> 0);
+	return m_pc + size;
 }
 
 
@@ -225,13 +225,13 @@ uint32_t arcompact_device::handleop32_ROR_single_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
 	arcompact_fatal("illegal handleop32_ROR_single_cc_f_b_b_c (ares bits already used as opcode select, can't be used as Q condition) (ROR)\n");
-	return m_pc + (size >> 0);
+	return m_pc + size;
 }
 uint32_t arcompact_device::handleop32_ROR_single_cc_f_b_b_u6(uint32_t op)
 {
 	int size = 4;
 	arcompact_fatal("illegal handleop32_ROR_single_cc_f_b_b_u6 (ares bits already used as opcode select, can't be used as Q condition) (ROR)\n");
-	return m_pc + (size >> 0);
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_ROR_single_cc(uint32_t op)
@@ -334,7 +334,7 @@ uint32_t arcompact_device::handleop32_EXTB_f_a_b_c(uint32_t op)
 	{
 		arcompact_fatal("handleop32_EXTB (EXTB) (F set)\n"); // not yet supported
 	}
-	return m_pc + (size >> 0);
+	return m_pc + size;
 }
 
 
@@ -359,7 +359,7 @@ uint32_t arcompact_device::handleop32_EXTB_f_a_b_u6(uint32_t op)
 	{
 		arcompact_fatal("handleop32_EXTB (EXTB) (F set)\n"); // not yet supported
 	}
-	return m_pc + (size >> 0);
+	return m_pc + size;
 }
 
 
@@ -367,7 +367,7 @@ uint32_t arcompact_device::handleop32_EXTB_f_b_b_s12(uint32_t op)
 {
 	int size = 4;
 	arcompact_fatal("illegal handleop32_EXTB_f_b_b_s12 (ares bits already used as opcode select, can't be used as s12) (EXTB)\n");
-	return m_pc + (size >> 0);
+	return m_pc + size;
 }
 
 
@@ -375,13 +375,13 @@ uint32_t arcompact_device::handleop32_EXTB_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
 	arcompact_fatal("illegal handleop32_EXTB_cc_f_b_b_c (ares bits already used as opcode select, can't be used as Q condition) (EXTB)\n");
-	return m_pc + (size >> 0);
+	return m_pc + size;
 }
 uint32_t arcompact_device::handleop32_EXTB_cc_f_b_b_u6(uint32_t op)
 {
 	int size = 4;
 	arcompact_fatal("illegal handleop32_EXTB_cc_f_b_b_u6 (ares bits already used as opcode select, can't be used as Q condition) (EXTB)\n");
-	return m_pc + (size >> 0);
+	return m_pc + size;
 }
 
 
@@ -447,7 +447,7 @@ uint32_t arcompact_device::handleop32_EXTW_f_a_b_c(uint32_t op)
 	{
 		arcompact_fatal("handleop32_EXTW (EXTW) (F set)\n"); // not yet supported
 	}
-	return m_pc + (size >> 0);
+	return m_pc + size;
 }
 
 
@@ -472,7 +472,7 @@ uint32_t arcompact_device::handleop32_EXTW_f_a_b_u6(uint32_t op)
 	{
 		arcompact_fatal("handleop32_EXTW (EXTW) (F set)\n"); // not yet supported
 	}
-	return m_pc + (size >> 0);
+	return m_pc + size;
 }
 
 
@@ -480,7 +480,7 @@ uint32_t arcompact_device::handleop32_EXTW_f_b_b_s12(uint32_t op)
 {
 	int size = 4;
 	arcompact_fatal("illegal handleop32_EXTW_f_b_b_s12 (ares bits already used as opcode select, can't be used as s12) (EXTW)\n");
-	return m_pc + (size >> 0);
+	return m_pc + size;
 }
 
 
@@ -488,13 +488,13 @@ uint32_t arcompact_device::handleop32_EXTW_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
 	arcompact_fatal("illegal handleop32_EXTW_cc_f_b_b_c (ares bits already used as opcode select, can't be used as Q condition) (EXTW)\n");
-	return m_pc + (size >> 0);
+	return m_pc + size;
 }
 uint32_t arcompact_device::handleop32_EXTW_cc_f_b_b_u6(uint32_t op)
 {
 	int size = 4;
 	arcompact_fatal("illegal handleop32_EXTW_cc_f_b_b_u6 (ares bits already used as opcode select, can't be used as Q condition) (EXTW)\n");
-	return m_pc + (size >> 0);
+	return m_pc + size;
 }
 
 

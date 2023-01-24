@@ -9,7 +9,7 @@
 uint32_t arcompact_device::arcompact_handle18_0x_helper(uint16_t op, const char* optext, int st)
 {
 	arcompact_log("unimplemented %s %04x (0x18_0x group)", optext, op);
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -32,7 +32,7 @@ uint32_t arcompact_device::handleop_LD_S_b_sp_u7(uint16_t op)   // LD_S b, [SP, 
 
 	m_regs[breg] = READ32(address);
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -64,7 +64,7 @@ uint32_t arcompact_device::handleop_ST_S_b_sp_u7(uint16_t op)  // ST_S b, [SP, u
 
 	WRITE32(address, m_regs[breg]);
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -94,7 +94,7 @@ uint32_t arcompact_device::handleop_ADD_S_b_sp_u7(uint16_t op)  // ADD_S b, SP, 
 
 	m_regs[breg] = m_regs[REG_SP] + (u << 2);
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -110,7 +110,7 @@ uint32_t arcompact_device::handleop_ADD_S_sp_sp_u7(uint16_t op)
 
 	m_regs[REG_SP] = m_regs[REG_SP] + (u << 2);
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -125,7 +125,7 @@ uint32_t arcompact_device::handleop_SUB_S_sp_sp_u7(uint16_t op)
 
 	m_regs[REG_SP] = m_regs[REG_SP] - (u << 2);
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -143,7 +143,7 @@ uint32_t arcompact_device::handleop_POP_S_b(uint16_t op) // POP_S b
 	m_regs[breg] = READ32(m_regs[REG_SP]);
 	m_regs[REG_SP] += 4;
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 
@@ -158,7 +158,7 @@ uint32_t arcompact_device::handleop_POP_S_blink(uint16_t op) // POP_S blink
 	m_regs[REG_BLINK] = READ32(m_regs[REG_SP]);
 	m_regs[REG_SP] += 4;
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -177,7 +177,7 @@ uint32_t arcompact_device::handleop_PUSH_S_b(uint16_t op) // PUSH_S b
 
 	WRITE32(m_regs[REG_SP], m_regs[breg]);
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -194,5 +194,5 @@ uint32_t arcompact_device::handleop_PUSH_S_blink(uint16_t op) // PUSH_S [blink]
 
 	WRITE32(m_regs[REG_SP], m_regs[REG_BLINK]);
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }

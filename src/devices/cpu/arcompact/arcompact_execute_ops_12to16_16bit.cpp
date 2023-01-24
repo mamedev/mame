@@ -9,7 +9,7 @@
 uint32_t arcompact_device::arcompact_handle_ld_helper(uint16_t op, const char* optext, int shift, int swap)
 {
 	arcompact_log("unimplemented %s %04x (ld/st group %d %d)", optext, op, shift, swap);
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -31,7 +31,7 @@ uint32_t arcompact_device::handleop_LD_S_c_b_u7(uint16_t op)
 	u <<= 2; // check
 	m_regs[creg] = READ32((m_regs[breg] + u));
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 // #######################################################################################################################
 //                                 IIII I
@@ -52,7 +52,7 @@ uint32_t arcompact_device::handleop_LDB_S_c_b_u5(uint16_t op)
 
 	m_regs[creg] = READ8((m_regs[breg] + u));
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -75,7 +75,7 @@ uint32_t arcompact_device::handleop_LDW_S_c_b_u6(uint16_t op)
 	u <<= 1;
 	m_regs[creg] = READ16((m_regs[breg] + u));
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -108,7 +108,7 @@ uint32_t arcompact_device::handleop_ST_S_c_b_u7(uint16_t op) // ST_S c, [b, u7]
 
 	WRITE32((m_regs[breg] + u), m_regs[creg]);
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -131,7 +131,7 @@ uint32_t arcompact_device::handleop_STB_S_c_b_u5(uint16_t op) // STB_S c. [b, u6
 
 	WRITE8((m_regs[breg] + u) >> 0, m_regs[creg]);
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -154,6 +154,6 @@ uint32_t arcompact_device::handleop_STW_S_c_b_u6(uint16_t op) // STW_S c. [b, u6
 
 	WRITE16((m_regs[breg] + u), m_regs[creg]);
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 
 }

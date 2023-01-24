@@ -108,7 +108,7 @@ uint32_t arcompact_device::arcompact_handle04_3x_helper(uint32_t op, int dsize, 
 		m_regs[breg] = m_regs[breg] + s;
 	}
 
-	return m_pc + (size >> 0);
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_LD_0(uint32_t op)  { return arcompact_handle04_3x_helper(op,0,0); }

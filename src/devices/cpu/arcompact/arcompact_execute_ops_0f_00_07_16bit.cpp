@@ -12,28 +12,28 @@
 // NOP_S                           0111 1000 1110 0000
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_NOP_S(uint16_t op)  { /*arcompact_log("NOP_S");*/ return m_pc + (2 >> 0);}
+uint32_t arcompact_device::handleop_NOP_S(uint16_t op)  { /*arcompact_log("NOP_S");*/ return m_pc + 2;}
 
 // #######################################################################################################################
 //                                 IIII I$$$ sssS SSSS
 // UNIMP_S                         0111 1001 1110 0000
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_UNIMP_S(uint16_t op)  { arcompact_log("UNIMP_S"); return m_pc + (2 >> 0);} // Unimplemented Instruction, same as illegal, but recommended to fill blank space
+uint32_t arcompact_device::handleop_UNIMP_S(uint16_t op)  { arcompact_log("UNIMP_S"); return m_pc + 2;} // Unimplemented Instruction, same as illegal, but recommended to fill blank space
 
 // #######################################################################################################################
 //                                 IIII I$$$ sssS SSSS
 // JEQ_S [blink]                   0111 1100 1110 0000
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_JEQ_S_blink(uint16_t op)  { arcompact_log("JEQ_S [blink]"); return m_pc + (2 >> 0);}
+uint32_t arcompact_device::handleop_JEQ_S_blink(uint16_t op)  { arcompact_log("JEQ_S [blink]"); return m_pc + 2;}
 
 // #######################################################################################################################
 //                                 IIII I$$$ sssS SSSS
 // JNE_S [blink]                   0111 1101 1110 0000
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_JNE_S_blink(uint16_t op)  { arcompact_log("JNE_S [blink]"); return m_pc + (2 >> 0);}
+uint32_t arcompact_device::handleop_JNE_S_blink(uint16_t op)  { arcompact_log("JNE_S [blink]"); return m_pc + 2;}
 
 // #######################################################################################################################
 //                                 IIII I$$$ sssS SSSS
@@ -56,5 +56,5 @@ uint32_t arcompact_device::handleop_J_S_D_blink(uint16_t op) // J_S.D [blink]
 	m_delayjump = m_regs[REG_BLINK];
 	m_delaylinks = 0;
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }

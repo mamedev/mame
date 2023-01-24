@@ -8,7 +8,7 @@
 uint32_t arcompact_device::arcompact_handle0d_helper(uint16_t op, const char* optext)
 {
 	arcompact_log("unimplemented %s %04x (0x0d group)", optext, op);
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -29,7 +29,7 @@ uint32_t arcompact_device::handleop_ADD_S_c_b_u3(uint16_t op)
 	uint32_t result = m_regs[breg] + u;
 	m_regs[creg] = result;
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -50,7 +50,7 @@ uint32_t arcompact_device::handleop_SUB_S_c_b_u3(uint16_t op)
 	uint32_t result = m_regs[breg] - u;
 	m_regs[creg] = result;
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -72,7 +72,7 @@ uint32_t arcompact_device::handleop_ASL_S_c_b_u3(uint16_t op)
 	uint32_t result = m_regs[breg] << u;
 	m_regs[creg] = result;
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################

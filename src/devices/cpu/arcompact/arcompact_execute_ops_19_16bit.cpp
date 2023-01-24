@@ -9,7 +9,7 @@
 uint32_t arcompact_device::arcompact_handle19_0x_helper(uint16_t op, const char* optext, int shift, int format)
 {
 	arcompact_log("unimplemented %s %04x (0x19_0x group)", optext, op);
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################

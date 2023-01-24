@@ -10,7 +10,7 @@
 uint32_t arcompact_device::arcompact_handle_l7_0x_helper(uint16_t op, const char* optext)
 {
 	arcompact_log("unimplemented %s %04x (l7_0x group)", optext, op);
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 
@@ -30,7 +30,7 @@ uint32_t arcompact_device::handleop_ASL_S_b_b_u5(uint16_t op)
 
 	m_regs[breg] = m_regs[breg] << (u&0x1f);
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -49,7 +49,7 @@ uint32_t arcompact_device::handleop_LSR_S_b_b_u5(uint16_t op)
 
 	m_regs[breg] = m_regs[breg] >> (u&0x1f);
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -68,7 +68,7 @@ uint32_t arcompact_device::handleop_ASR_S_b_b_u5(uint16_t op)
 
 	int32_t temp = (int32_t)m_regs[breg]; m_regs[breg] = temp >> (u&0x1f); // treat it as a signed value, so sign extension occurs during shift
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -87,7 +87,7 @@ uint32_t arcompact_device::handleop_SUB_S_b_b_u5(uint16_t op)
 
 	m_regs[breg] = m_regs[breg] - u;
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -106,7 +106,7 @@ uint32_t arcompact_device::handleop_BSET_S_b_b_u5(uint16_t op)
 
 	m_regs[breg] = m_regs[breg] | (1 << (u & 0x1f));
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -123,7 +123,7 @@ uint32_t arcompact_device::handleop_BCLR_S_b_b_u5(uint16_t op)
 
 	m_regs[breg] = m_regs[breg] &~ (1 << u);
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -140,7 +140,7 @@ uint32_t arcompact_device::handleop_BMSK_S_b_b_u5(uint16_t op)
 
 	m_regs[breg] = m_regs[breg] & ((1 << (u + 1)) - 1);
 
-	return m_pc + (2 >> 0);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
