@@ -894,7 +894,7 @@ private:
 	inline  uint32_t READ32(uint32_t address)
 	{
 		if (address & 0x3)
-			fatalerror("%08x: attempted unaligned READ32 on address %08x", pc, address);
+			fatalerror("%08x: attempted unaligned READ32 on address %08x", m_pc, address);
 
 		return m_program->read_dword(address);
 	}
@@ -902,21 +902,21 @@ private:
 	inline void WRITE32(uint32_t address, uint32_t data)
 	{
 		if (address & 0x3)
-			fatalerror("%08x: attempted unaligned WRITE32 on address %08x", pc, address);
+			fatalerror("%08x: attempted unaligned WRITE32 on address %08x", m_pc, address);
 
 		m_program->write_dword(address, data);
 	}
 	inline uint16_t READ16(uint32_t address)
 	{
 		if (address & 0x1)
-			fatalerror("%08x: attempted unaligned READ16 on address %08x", pc, address);
+			fatalerror("%08x: attempted unaligned READ16 on address %08x", m_pc, address);
 
 		return m_program->read_word(address);
 	}
 	inline void WRITE16(uint32_t address, uint16_t data)
 	{
 		if (address & 0x1)
-			fatalerror("%08x: attempted unaligned WRITE16 on address %08x", pc, address);
+			fatalerror("%08x: attempted unaligned WRITE16 on address %08x", m_pc, address);
 
 		m_program->write_word(address, data);
 	}

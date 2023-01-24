@@ -47,7 +47,7 @@ uint32_t arcompact_device::arcompact_handle04_2f_helper(uint32_t op, const char*
 uint32_t arcompact_device::handleop32_ASL_single(uint32_t op)
 {
 	return arcompact_handle04_2f_helper(op, "ASL");
-} 
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                                 IIII I      SS SSSS               ss ssss

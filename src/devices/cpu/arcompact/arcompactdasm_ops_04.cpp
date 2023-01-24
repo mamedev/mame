@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*********************************\
-
  ARCompact disassembler
 
  ALU Operations, 0x04, [0x00-0x1F]

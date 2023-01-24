@@ -900,7 +900,7 @@ uint32_t arcompact_device::handleop32_MIN(uint32_t op)
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Unusual format, a is not used, dest is always b
-// 
+//
 //                                 IIII I      SS SSSS
 // MOV<.f> b,s12                   0010 0bbb 1000 1010   FBBB ssss ssSS SSSS
 // MOV<.f> 0,s12                   0010 0110 1000 1010   F111 ssss ssSS SSSS (is b is 'Limm' there's no destination)

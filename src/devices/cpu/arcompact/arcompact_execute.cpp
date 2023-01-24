@@ -78,10 +78,10 @@ int arcompact_device::check_condition(uint8_t condition)
 		case 0x04: return condition_MI(); // MI (N)
 		case 0x05: return condition_CS(); // CS (Carry Set / Lower than)
 		case 0x06: return condition_HS();
-		case 0x07: return condition_VS(); 
+		case 0x07: return condition_VS();
 		case 0x08: return condition_VC();
 		case 0x09: return condition_GT();
-		case 0x0a: return condition_GE(); 
+		case 0x0a: return condition_GE();
 		case 0x0b: return condition_LT();
 		case 0x0c: return condition_LE();
 		case 0x0d: return condition_HI();
