@@ -619,9 +619,14 @@ private:
 
 	// arcompact_execute_ops_04_2f_sop.cpp
 
+	uint32_t handleop32_ASL_single_do_op(uint32_t src, uint8_t set_flags);
 	uint32_t handleop32_ASL_single(uint32_t op);
+	uint32_t handleop32_ASL_single_f_b_c(uint32_t op);
+	uint32_t handleop32_ASL_single_f_b_u6(uint32_t op);
+
 	uint32_t handleop32_ASR_single(uint32_t op);
 
+	uint32_t handleop32_LSR_single_do_op(uint32_t src, uint8_t set_flags);
 	uint32_t handleop32_LSR_single(uint32_t op);
 	uint32_t handleop32_LSR_single_f_b_c(uint32_t op);
 	uint32_t handleop32_LSR_single_f_b_u6(uint32_t op);
