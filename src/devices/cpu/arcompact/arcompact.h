@@ -45,7 +45,9 @@ protected:
 private:
 	void arcompact_auxreg_map(address_map &map);
 
-	void do_flags(uint32_t result, uint32_t b, uint32_t c);
+	void do_flags_overflow(uint32_t result, uint32_t b, uint32_t c);
+	void do_flags_add(uint32_t result, uint32_t b, uint32_t c);
+	void do_flags_sub(uint32_t result, uint32_t b, uint32_t c);
 	void do_flags_nz(uint32_t result);
 
 	uint32_t arcompact_auxreg002_LPSTART_r();
@@ -318,7 +320,6 @@ private:
 	// arcompact_execute_ops_04.cpp
 
 	uint32_t handleop32_ADD_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
-	uint32_t handleop32_ADD_cc(uint32_t op);
 	uint32_t handleop32_ADD(uint32_t op);
 	uint32_t handleop32_ADD_f_a_b_c(uint32_t op);
 	uint32_t handleop32_ADD_f_a_b_u6(uint32_t op);
@@ -326,7 +327,7 @@ private:
 	uint32_t handleop32_ADD_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_ADD_cc_f_b_b_u6(uint32_t op);
 
-	uint32_t handleop32_SUB_cc(uint32_t op);
+	uint32_t handleop32_SUB_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_SUB(uint32_t op);
 	uint32_t handleop32_SUB_f_a_b_c(uint32_t op);
 	uint32_t handleop32_SUB_f_a_b_u6(uint32_t op);
