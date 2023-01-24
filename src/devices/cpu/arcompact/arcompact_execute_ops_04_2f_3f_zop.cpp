@@ -11,7 +11,13 @@
 // SLEEP c                         0010 0001 0010 1111   0000 CCCC CC11 1111
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_SLEEP(uint32_t op)  { arcompact_log("SLEEP (%08x)", op); return m_pc + 4;}
+uint32_t arcompact_device::handleop32_SLEEP(uint32_t op)
+{
+	// TODO: this is over simplified
+	debugreg_set_ZZ();
+	//arcompact_log("SLEEP (%08x)", op);
+	return m_pc + 4;
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                                 IIII I$$$   SS SSSS    $$$        ss ssss

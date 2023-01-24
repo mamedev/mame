@@ -225,7 +225,78 @@ uint32_t arcompact_device::handleop32_ROR_multiple(uint32_t op)  { return arcomp
 // MUL64<.cc> <0,>b,limm           0010 1bbb 1100 0100   0BBB 1111 100Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_MUL64(uint32_t op)  { return arcompact_handle04_helper(op, "MUL64", 2,0); } // special
+void arcompact_device::handleop32_MUL64_do_op(uint32_t src1, uint32_t src2)
+{
+	uint64_t result = (int32_t)src1 * (int32_t)src2;
+	m_regs[REG_MLO] = result & 0xffffffff;
+	m_regs[REG_MMID] = (result >> 16) & 0xffffffff;
+	m_regs[REG_MHI] = (result >> 32) & 0xffffffff;
+}
+
+uint32_t arcompact_device::handleop32_MUL64_f_a_b_c(uint32_t op)
+{
+	uint8_t breg = common32_get_breg(op);
+	uint8_t creg = common32_get_creg(op);
+	int size = check_b_c_limm(breg, creg);
+	handleop32_MUL64_do_op(m_regs[breg], m_regs[creg]);
+	return m_pc + size;
+}
+uint32_t arcompact_device::handleop32_MUL64_f_a_b_u6(uint32_t op)
+{
+	uint8_t breg = common32_get_breg(op);
+	int size = check_b_limm(breg);
+	handleop32_MUL64_do_op(m_regs[breg], common32_get_u6(op));
+	return m_pc + size;
+}
+
+uint32_t arcompact_device::handleop32_MUL64_f_b_b_s12(uint32_t op)
+{
+	uint8_t breg = common32_get_breg(op);
+	int size = check_b_limm(breg);
+	handleop32_MUL64_do_op(m_regs[breg], common32_get_s12(op));
+	return m_pc + size;
+}
+
+uint32_t arcompact_device::handleop32_MUL64_cc_f_b_b_c(uint32_t op)
+{
+	uint8_t breg = common32_get_breg(op);
+	uint8_t creg = common32_get_creg(op);
+	int size = check_b_c_limm(breg, creg);
+	if (!check_condition(common32_get_condition(op)))
+		return m_pc + size;
+	handleop32_MUL64_do_op(m_regs[breg], m_regs[creg]);
+	return m_pc + size;
+}
+
+uint32_t arcompact_device::handleop32_MUL64_cc_f_b_b_u6(uint32_t op)
+{
+	uint8_t breg = common32_get_breg(op);
+	int size = check_b_limm(breg);
+	if (!check_condition(common32_get_condition(op)))
+		return m_pc + size;
+	handleop32_MUL64_do_op(m_regs[breg], common32_get_u6(op));
+	return m_pc + size;
+}
+
+uint32_t arcompact_device::handleop32_MUL64(uint32_t op)
+{
+	switch ((op & 0x00c00000) >> 22)
+	{
+	case 0x00: return handleop32_MUL64_f_a_b_c(op);
+	case 0x01: return handleop32_MUL64_f_a_b_u6(op);
+	case 0x02: return handleop32_MUL64_f_b_b_s12(op);
+	case 0x03:
+	{
+		switch ((op & 0x00000020) >> 5)
+		{
+		case 0x00: return handleop32_MUL64_cc_f_b_b_c(op);
+		case 0x01: return handleop32_MUL64_cc_f_b_b_u6(op);
+		}
+		return 0;
+	}
+	}
+	return 0;
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // 32 x 32 Unsigned Multiply

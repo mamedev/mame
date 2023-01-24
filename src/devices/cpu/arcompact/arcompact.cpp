@@ -205,6 +205,7 @@ void arcompact_device::device_reset()
 	m_status32 = 0;
 	m_status32_l1 = 0;
 	m_status32_l2 = 0;
+	m_debug = 0;
 
 	m_LP_START = 0;
 	m_LP_END = 0;

@@ -25,37 +25,36 @@ It is possible this is how the CPU works internally.
 
 void arcompact_device::execute_run()
 {
-	//uint32_t lres;
-	//lres = 0;
-
 	while (m_icount > 0)
 	{
 		debugger_instruction_hook(m_pc);
 
-//      printf("new pc %04x\n", m_pc);
-
-		if (m_delayactive)
+		// make sure CPU isn't in 'SLEEP' mode
+		if (!debugreg_check_ZZ())
 		{
-			uint16_t op = READ16((m_pc + 0));
-			m_pc = get_instruction(op);
-			if (m_delaylinks) m_regs[REG_BLINK] = m_pc;
-
-			m_pc = m_delayjump;
-			m_delayactive = 0; m_delaylinks = 0;
-		}
-		else
-		{
-			uint16_t op = READ16((m_pc + 0));
-			m_pc = get_instruction(op);
-		}
-
-		// hardware loops
-		if (m_pc == m_LP_END)
-		{
-			if (m_regs[REG_LP_COUNT] > 0)
+			if (m_delayactive)
 			{
-				m_pc = m_LP_START;
-				m_regs[REG_LP_COUNT]--;
+				uint16_t op = READ16((m_pc + 0));
+				m_pc = get_instruction(op);
+				if (m_delaylinks) m_regs[REG_BLINK] = m_pc;
+
+				m_pc = m_delayjump;
+				m_delayactive = 0; m_delaylinks = 0;
+			}
+			else
+			{
+				uint16_t op = READ16((m_pc + 0));
+				m_pc = get_instruction(op);
+			}
+
+			// hardware loops
+			if (m_pc == m_LP_END)
+			{
+				if (m_regs[REG_LP_COUNT] > 0)
+				{
+					m_pc = m_LP_START;
+					m_regs[REG_LP_COUNT]--;
+				}
 			}
 		}
 

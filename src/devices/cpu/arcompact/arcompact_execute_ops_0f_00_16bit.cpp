@@ -3,21 +3,18 @@
 
 #include "emu.h"
 #include "arcompact.h"
-#include "arcompactdasm.h"
 
-
-uint32_t arcompact_device::arcompact_handle0f_00_0x_helper(uint16_t op, const char* optext)
-{
-	arcompact_log("unimplemented %s %04x", optext, op);
-	return m_pc + 2;
-}
 
 // #######################################################################################################################
 //                                 IIII I    sssS SSSS
 // J_S [b]                         0111 1bbb 0000 0000
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_J_S_b(uint16_t op)  { return arcompact_handle0f_00_0x_helper(op, "J_S"); }
+uint32_t arcompact_device::handleop_J_S_b(uint16_t op)
+{
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	return m_regs[breg];
+}
 
 // #######################################################################################################################
 //                                 IIII I    sssS SSSS
@@ -26,15 +23,10 @@ uint32_t arcompact_device::handleop_J_S_b(uint16_t op)  { return arcompact_handl
 
 uint32_t arcompact_device::handleop_J_S_D_b(uint16_t op)
 {
-	int breg;
-
-	breg = common16_get_breg(op);
-	breg = expand_reg(breg);
-
+	uint8_t breg = expand_reg(common16_get_breg(op));
 	m_delayactive = 1;
 	m_delayjump = m_regs[breg];
 	m_delaylinks = 0;
-
 	return m_pc + 2;
 }
 
@@ -45,13 +37,8 @@ uint32_t arcompact_device::handleop_J_S_D_b(uint16_t op)
 
 uint32_t arcompact_device::handleop_JL_S_b(uint16_t op) // JL_S
 {
-	int breg;
-
-	breg = common16_get_breg(op);
-	breg = expand_reg(breg);
-
+	uint8_t breg = expand_reg(common16_get_breg(op));
 	m_regs[REG_BLINK] = m_pc + 2;
-
 	return m_regs[breg];
 }
 
@@ -62,15 +49,10 @@ uint32_t arcompact_device::handleop_JL_S_b(uint16_t op) // JL_S
 
 uint32_t arcompact_device::handleop_JL_S_D_b(uint16_t op) // JL_S.D
 {
-	int breg;
-
-	breg = common16_get_breg(op);
-	breg = expand_reg(breg);
-
+	uint8_t breg = expand_reg(common16_get_breg(op));
 	m_delayactive = 1;
 	m_delayjump = m_regs[breg];
 	m_delaylinks = 1;
-
 	return m_pc + 2;
 }
 
@@ -79,4 +61,8 @@ uint32_t arcompact_device::handleop_JL_S_D_b(uint16_t op) // JL_S.D
 //                                 IIII I    sssS SSSS
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_SUB_S_NE_b_b_b(uint16_t op)  { return arcompact_handle0f_00_0x_helper(op, "SUB_S.NE"); }
+uint32_t arcompact_device::handleop_SUB_S_NE_b_b_b(uint16_t op)
+{
+	arcompact_log("unimplemented SUB_S.NE %04x", op);
+	return m_pc + 2;
+}

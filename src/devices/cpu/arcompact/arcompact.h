@@ -275,6 +275,11 @@ private:
 	void status32_clear_z(void) { m_status32 &= ~Z_ZERO_FLAG; }
 	bool status32_check_z(void) { return (m_status32 &   Z_ZERO_FLAG ? true : false); }
 
+	// debug is the name of the register, this is not a debug function
+	void debugreg_set_ZZ(void) { m_debug |= (1<<23); }
+	void debugreg_clear_ZZ(void) { m_debug &= ~(1<<23); }
+	bool debugreg_check_ZZ(void) { return (m_debug & (1<<23)) ? true : false; }
+
 	// 0x00 - AL / RA - Always
 	bool condition_AL() { return (true); }
 	// 0x01 - EQ / Z - Zero
@@ -719,6 +724,14 @@ private:
 	uint32_t handleop32_LSR_multiple_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_LSR_multiple_cc_f_b_b_u6(uint32_t op);
 
+	void handleop32_MUL64_do_op(uint32_t src1, uint32_t src2);
+	uint32_t handleop32_MUL64_f_a_b_c(uint32_t op);
+	uint32_t handleop32_MUL64_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_MUL64_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_MUL64_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_MUL64_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_MUL64(uint32_t op);
+
 	void handleop32_MULU64_do_op(uint32_t src1, uint32_t src2);
 	uint32_t handleop32_MULU64_f_a_b_c(uint32_t op);
 	uint32_t handleop32_MULU64_f_a_b_u6(uint32_t op);
@@ -729,7 +742,6 @@ private:
 
 	uint32_t handleop32_ASR_multiple(uint32_t op);
 	uint32_t handleop32_ROR_multiple(uint32_t op);
-	uint32_t handleop32_MUL64(uint32_t op);
 	uint32_t handleop32_ADDS(uint32_t op);
 	uint32_t handleop32_SUBS(uint32_t op);
 	uint32_t handleop32_DIVAW(uint32_t op);
@@ -892,7 +904,6 @@ private:
 	uint32_t arcompact_handle0c_helper(uint16_t op, const char* optext);
 	uint32_t arcompact_handle0d_helper(uint16_t op, const char* optext);
 	uint32_t arcompact_handle0e_0x_helper(uint16_t op, const char* optext, int revop);
-	uint32_t arcompact_handle0f_00_0x_helper(uint16_t op, const char* optext);
 	uint32_t arcompact_handle0f_0x_helper(uint16_t op, const char* optext, int nodst);
 	uint32_t arcompact_handle_ld_helper(uint16_t op, const char* optext, int shift, int swap);
 	uint32_t arcompact_handle_l7_0x_helper(uint16_t op, const char* optext);
@@ -911,7 +922,7 @@ private:
 	uint32_t m_pc;
 
 	address_space *m_program;
-	address_space  *m_io;
+	address_space *m_io;
 
 	int m_icount;
 
@@ -973,6 +984,10 @@ private:
 	uint32_t m_status32;
 	uint32_t m_status32_l1;
 	uint32_t m_status32_l2;
+
+// 31   30   29   28   27   26   25   24   23   22   21   20   19   18   17   16   15   14   13   12   11   10   09   08   07   06   05   04   03   02   01   00
+// LD | SH | BH | UB | xx | xx | xx | xx | ZZ | RA | xx | xx | xx | xx | xx | xx | xx | xx | xx | xx | IS | xx | xx | xx | xx | xx | xx | xx | xx | xx | FH | SS
+	uint32_t m_debug;
 
 	uint32_t m_LP_START;
 	uint32_t m_LP_END;

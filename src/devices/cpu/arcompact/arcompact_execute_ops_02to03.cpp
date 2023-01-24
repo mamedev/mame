@@ -80,16 +80,22 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 	{
 		readdata = READ8(address);
 
-		if (X) // todo
-			arcompact_fatal("illegal LD %08x (data size %d mode %d with X)", op, Z, a);
+		if (X)
+		{
+			if (readdata & 0x80)
+				readdata |= 0xffffff00;
+		}
 
 	}
 	else if (Z == 2)
 	{
 		readdata = READ16(address);
 
-		if (X) // todo
-			arcompact_fatal("illegal LD %08x (data size %d mode %d with X)", op, Z, a);
+		if (X)
+		{
+			if (readdata & 0x8000)
+				readdata |= 0xffff0000;
+		}
 
 	}
 	else if (Z == 3)

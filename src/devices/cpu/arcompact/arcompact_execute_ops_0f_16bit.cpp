@@ -97,7 +97,16 @@ uint32_t arcompact_device::handleop_TST_S_b_c(uint16_t op)
 // MUL64_S <0,>b,c                 0111 1bbb ccc0 1100
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_MUL64_S_0_b_c(uint16_t op)  { return arcompact_handle0f_0x_helper(op, "MUL64_S",2);  } // actual destination is special multiply registers
+uint32_t arcompact_device::handleop_MUL64_S_0_b_c(uint16_t op)
+{
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint8_t creg = expand_reg(common16_get_creg(op));
+	uint64_t result = (int32_t)m_regs[breg] * (int32_t)m_regs[creg];
+	m_regs[REG_MLO] = result & 0xffffffff;
+	m_regs[REG_MMID] = (result >> 16) & 0xffffffff;
+	m_regs[REG_MHI] = (result >> 32) & 0xffffffff;
+	return m_pc + 2;
+}
 
 // #######################################################################################################################
 //                                 IIII I       S SSSS
