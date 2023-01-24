@@ -123,8 +123,10 @@ uint32_t arcompact_device::handle_jump_to_register(int delay, int link, uint32_t
 	{
 		if (flag)
 		{
-			arcompact_fatal("jump to ILINK1/ILINK2 not supported");
-			return next_addr;
+			if ((reg == REG_ILINK1)) m_status32 = m_status32_l1;
+			if ((reg == REG_ILINK2)) m_status32 = m_status32_l2;
+			uint32_t target = m_regs[reg];
+			return handle_jump_to_addr(delay, link, target, next_addr);
 		}
 		else
 		{

@@ -3124,7 +3124,7 @@ uint32_t arcompact_device::handleop32_MPYU(uint32_t op)
 
 uint32_t arcompact_device::handleop32_Jcc_f_a_b_c(uint32_t op)
 {
-	int size;
+	int size = 4;
 
 	uint8_t creg = common32_get_creg(op);
 	uint8_t F = common32_get_F(op);
@@ -3144,13 +3144,13 @@ uint32_t arcompact_device::handleop32_Jcc_f_a_b_c(uint32_t op)
 		// opcode          iiii i--- ppII IIII F--- CCCC CC-- ----
 		// J [c]           0010 0RRR 0010 0000 0RRR CCCC CCRR RRRR
 		// J.F [ilink1]    0010 0RRR 0010 0000 1RRR 0111 01RR RRRR  (creg = ILINK1, FLAG must be set)
-		// J.F [ilink2]    0010 0RRR 0010 0000 1RRR 0111 10RR RRRR  (creg = ILINE2, FLAG must be set)
+		// J.F [ilink2]    0010 0RRR 0010 0000 1RRR 0111 10RR RRRR  (creg = ILINK2, FLAG must be set)
 
 		if (F)
 		{
 			if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
 			{
-				arcompact_log("1 unimplemented J.F %08x", op);
+				return handle_jump_to_register(0,0,creg, m_pc + size, F); // delay, no link
 			}
 			else
 			{
@@ -3628,6 +3628,8 @@ uint32_t arcompact_device::handleop32_LP(uint32_t op) // LPcc (loop setup)
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//  Neither a nor b are used, would putting limm in them cause the limm to be read?
+// 
 //                                 IIII I      SS SSSS
 //                                           PP
 // General Operations Reg-Reg      0010 0bbb 00ii iiii   FBBB CCCC CCAA AAAA
@@ -3652,18 +3654,8 @@ uint32_t arcompact_device::handleop32_LP(uint32_t op) // LPcc (loop setup)
 //
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-
-uint32_t arcompact_device::handleop32_FLAG_f_a_b_c(uint32_t op)
+void arcompact_device::handleop32_FLAG_do_op(uint32_t source)
 {
-	uint8_t breg = common32_get_breg(op);
-	uint8_t creg = common32_get_creg(op);
-	int size = check_b_c_limm(breg, creg);
-	//uint8_t areg = common32_get_areg(op);
-	//uint32_t b = m_regs[breg];
-	uint32_t c = m_regs[creg];
-
-	/* todo: is the limm, limm syntax valid? (it's pointless.) */
-	uint32_t source = c;
 	if (!(source & 0x0001)) // H means ignore all others
 	{
 		// privileged  mode only
@@ -3679,59 +3671,63 @@ uint32_t arcompact_device::handleop32_FLAG_f_a_b_c(uint32_t op)
 		if (source & 0x0400) { status32_set_n(); } else { status32_clear_n(); }
 		if (source & 0x0800) { status32_set_z(); } else { status32_clear_z(); }
 	}
+}
 
+// due to 'a' and 'b' not being used, this is considered a redundant encoding of the conditional 'from c register' case
+// but is used extensively by the Leapster BIOS
+uint32_t arcompact_device::handleop32_FLAG_f_a_b_c(uint32_t op)
+{
+	uint8_t creg = common32_get_creg(op);
+	int size = check_c_limm(creg);
+	handleop32_FLAG_do_op(m_regs[creg]);
 	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_FLAG_f_a_b_u6(uint32_t op)
 {
-	arcompact_fatal("FLAG with P01 not supported");
-	return m_pc + (0 >> 0);
+	handleop32_FLAG_do_op(common32_get_u6(op));
+	return m_pc + 4;
 }
 
 uint32_t arcompact_device::handleop32_FLAG_f_b_b_s12(uint32_t op)
 {
-	arcompact_fatal("FLAG with P10 not supported");
-	return m_pc + (0 >> 0);
+	handleop32_FLAG_do_op(common32_get_s12(op));
+	return m_pc + 4;
 }
 
 uint32_t arcompact_device::handleop32_FLAG_cc_f_b_b_c(uint32_t op)
 {
-	arcompact_fatal("FLAG with P11 M0 not supported");
-	return m_pc + (0 >> 0);
+	uint8_t creg = common32_get_creg(op);
+	int size = check_c_limm(creg);
+	if (check_condition(common32_get_condition(op)))
+		handleop32_FLAG_do_op(m_regs[creg]);
+	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_FLAG_cc_f_b_b_u6(uint32_t op)
 {
-	arcompact_fatal("FLAG with P11 M0 not supported");
-	return m_pc + (0 >> 0);
-}
-
-uint32_t arcompact_device::handleop32_FLAG_cc(uint32_t op)
-{
-	int M = (op & 0x00000020) >> 5;
-
-	switch (M)
-	{
-		case 0x00: return handleop32_FLAG_cc_f_b_b_c(op);
-		case 0x01: return handleop32_FLAG_cc_f_b_b_u6(op);
-	}
-
-	return 0;
+	if (check_condition(common32_get_condition(op)))
+		handleop32_FLAG_do_op(common32_get_u6(op));
+	return m_pc + 4;
 }
 
 uint32_t arcompact_device::handleop32_FLAG(uint32_t op)
 {
-	int p = (op & 0x00c00000) >> 22;
-
-	switch (p)
+	switch ((op & 0x00c00000) >> 22)
 	{
-		case 0x00: return handleop32_FLAG_f_a_b_c(op);
-		case 0x01: return handleop32_FLAG_f_a_b_u6(op);
-		case 0x02: return handleop32_FLAG_f_b_b_s12(op);
-		case 0x03: return handleop32_FLAG_cc(op);
+	case 0x00: return handleop32_FLAG_f_a_b_c(op);
+	case 0x01: return handleop32_FLAG_f_a_b_u6(op);
+	case 0x02: return handleop32_FLAG_f_b_b_s12(op);
+	case 0x03:
+	{
+		switch ((op & 0x00000020) >> 5)
+		{
+		case 0x00: return handleop32_FLAG_cc_f_b_b_c(op);
+		case 0x01: return handleop32_FLAG_cc_f_b_b_u6(op);
+		}
+		return 0;
 	}
-
+	}
 	return 0;
 }
 

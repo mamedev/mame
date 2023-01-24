@@ -56,6 +56,12 @@ private:
 	void arcompact_auxreg003_LPEND_w(uint32_t data);
 
 	uint32_t arcompact_auxreg00a_STATUS32_r();
+
+	uint32_t arcompact_auxreg00b_STATUS32_L1_r();
+	uint32_t arcompact_auxreg00c_STATUS32_L2_r();
+	void arcompact_auxreg00b_STATUS32_L1_w(uint32_t data);
+	void arcompact_auxreg00c_STATUS32_L2_w(uint32_t data);
+
 	uint32_t arcompact_auxreg025_INTVECTORBASE_r();
 	void arcompact_auxreg025_INTVECTORBASE_w(uint32_t data);
 
@@ -613,12 +619,12 @@ private:
 
 	uint32_t handleop32_LP(uint32_t op);
 
+	void handleop32_FLAG_do_op(uint32_t source);
 	uint32_t handleop32_FLAG_f_a_b_c(uint32_t op);
 	uint32_t handleop32_FLAG_f_a_b_u6(uint32_t op);
 	uint32_t handleop32_FLAG_f_b_b_s12(uint32_t op);
 	uint32_t handleop32_FLAG_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_FLAG_cc_f_b_b_u6(uint32_t op);
-	uint32_t handleop32_FLAG_cc(uint32_t op);
 	uint32_t handleop32_FLAG(uint32_t op);
 
 	// arcompact_execute_ops_04_2f_sop.cpp
@@ -695,7 +701,7 @@ private:
 	uint32_t handleop32_ASL_multiple_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_ASL_multiple_cc_f_b_b_u6(uint32_t op);
 
-	uint32_t handleop32_LSR_multiple_cc(uint32_t op);
+	uint32_t handleop32_LSR_multiple_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_LSR_multiple(uint32_t op);
 	uint32_t handleop32_LSR_multiple_f_a_b_c(uint32_t op);
 	uint32_t handleop32_LSR_multiple_f_a_b_u6(uint32_t op);
@@ -955,6 +961,8 @@ private:
 //  f  e  d  c| b  a  9  8| 7  6  5  4| 3  2  1  0
 //  -  -  -  L| Z  N  C  V| U DE AE A2|A1 E2 E1  H
 	uint32_t m_status32;
+	uint32_t m_status32_l1;
+	uint32_t m_status32_l2;
 
 	uint32_t m_LP_START;
 	uint32_t m_LP_END;

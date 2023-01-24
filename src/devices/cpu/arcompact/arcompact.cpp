@@ -31,7 +31,13 @@ void arcompact_device::arcompact_auxreg002_LPSTART_w(uint32_t data) { m_LP_START
 uint32_t arcompact_device::arcompact_auxreg003_LPEND_r() { return m_LP_END&0xfffffffe; }
 void arcompact_device::arcompact_auxreg003_LPEND_w(uint32_t data) { m_LP_END = data&0xfffffffe; }
 
-uint32_t arcompact_device::arcompact_auxreg00a_STATUS32_r() { return 0xffffdead; /*m_status32;*/ }
+uint32_t arcompact_device::arcompact_auxreg00a_STATUS32_r() { return m_status32; }
+
+uint32_t arcompact_device::arcompact_auxreg00b_STATUS32_L1_r() { return m_status32_l1; }
+uint32_t arcompact_device::arcompact_auxreg00c_STATUS32_L2_r() { return m_status32_l2; }
+void arcompact_device::arcompact_auxreg00b_STATUS32_L1_w(uint32_t data) { m_status32_l1 = data; }
+void arcompact_device::arcompact_auxreg00c_STATUS32_L2_w(uint32_t data) { m_status32_l2 = data; }
+
 
 uint32_t arcompact_device::arcompact_auxreg025_INTVECTORBASE_r() { return m_INTVECTORBASE&0xfffffc00; }
 void arcompact_device::arcompact_auxreg025_INTVECTORBASE_w(uint32_t data) { m_INTVECTORBASE = data&0xfffffc00; }
@@ -43,7 +49,10 @@ void arcompact_device::arcompact_auxreg_map(address_map &map)
 {
 	map(0x000000002, 0x000000002).rw(FUNC(arcompact_device::arcompact_auxreg002_LPSTART_r), FUNC(arcompact_device::arcompact_auxreg002_LPSTART_w));
 	map(0x000000003, 0x000000003).rw(FUNC(arcompact_device::arcompact_auxreg003_LPEND_r), FUNC(arcompact_device::arcompact_auxreg003_LPEND_w));
-	map(0x000000009, 0x000000009).r(FUNC(arcompact_device::arcompact_auxreg00a_STATUS32_r)); // r/o
+	map(0x00000000a, 0x00000000a).r(FUNC(arcompact_device::arcompact_auxreg00a_STATUS32_r)); // r/o
+	map(0x00000000b, 0x00000000b).rw(FUNC(arcompact_device::arcompact_auxreg00b_STATUS32_L1_r), FUNC(arcompact_device::arcompact_auxreg00b_STATUS32_L1_w));
+	map(0x00000000c, 0x00000000c).rw(FUNC(arcompact_device::arcompact_auxreg00c_STATUS32_L2_r), FUNC(arcompact_device::arcompact_auxreg00c_STATUS32_L2_w));
+
 	map(0x000000025, 0x000000025).rw(FUNC(arcompact_device::arcompact_auxreg025_INTVECTORBASE_r), FUNC(arcompact_device::arcompact_auxreg025_INTVECTORBASE_w));
 }
 
@@ -194,6 +203,9 @@ void arcompact_device::device_reset()
 		elem = 0;
 
 	m_status32 = 0;
+	m_status32_l1 = 0;
+	m_status32_l2 = 0;
+
 	m_LP_START = 0;
 	m_LP_END = 0;
 	m_INTVECTORBASE = 0;
