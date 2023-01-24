@@ -105,6 +105,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/input/input_sdlcommon.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_sdlcommon.h",
 		MAME_DIR .. "src/osd/modules/input/input_x11.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_evdev.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_windows.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_windows.h",
 		MAME_DIR .. "src/osd/modules/input/input_xinput.cpp",
@@ -296,6 +297,16 @@ function osdmodulesbuild()
 	else
 		includedirs {
 			ext_includedir("portmidi"),
+		}
+	end
+
+	if _OPTIONS["USE_EVDEV"]=="1" then
+		defines {
+			"USE_EVDEV=1",
+		}
+	else
+		defines {
+			"USE_EVDEV=0",
 		}
 	end
 
@@ -527,6 +538,15 @@ end
 
 
 newoption {
+	trigger = "USE_EVDEV",
+	description = "Include event device input module",
+	allowed = {
+		{ "0",  "Don'tnclude event device input module", },
+		{ "1",  "Include event device input module", },
+	},
+}
+
+newoption {
 	trigger = "USE_TAPTUN",
 	description = "Include tap/tun network module",
 	allowed = {
@@ -640,6 +660,13 @@ newoption {
 	description = "QT lib location",
 }
 
+if not _OPTIONS["USE_EVDEV"] then
+	if _OPTIONS["targetos"]=="linux" then
+		_OPTIONS["USE_EVDEV"] = "1"
+	else
+		_OPTIONS["USE_EVDEV"] = "0"
+	end
+end
 
 if not _OPTIONS["USE_TAPTUN"] then
 	if _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="windows" then

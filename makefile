@@ -36,6 +36,7 @@
 # USE_TAPTUN = 1
 # USE_PCAP = 1
 # USE_QTDEBUG = 1
+# USE_EVDEV = 1
 # NO_X11 = 1
 # NO_USE_XINPUT = 1
 # NO_USE_XINPUT_WII_LIGHTGUN_HACK = 1
@@ -747,6 +748,10 @@ endif
 
 ifdef TARGETOS
 TARGET_PARAMS += --targetos='$(TARGETOS)'
+endif
+
+ifdef USE_EVDEV
+PARAMS += --USE_EVDEV='$(USE_EVDEV)'
 endif
 
 ifdef USE_TAPTUN
