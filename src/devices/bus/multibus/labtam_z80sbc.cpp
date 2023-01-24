@@ -88,11 +88,16 @@ labtam_z80sbc_device::labtam_z80sbc_device(machine_config const &mconfig, char c
 }
 
 ROM_START(labtam_z80sbc)
+	ROM_SYSTEM_BIOS(0, "c85", "Version C85")
+	ROM_SYSTEM_BIOS(1, "a85", "Version A85")
+
 	ROM_REGION(0x2000, "eprom0", 0)
-	ROM_LOAD("z80_boot__a85_0.u59", 0x0000, 0x2000, CRC(4453c938) SHA1(b04987a07ff7e21f7eb354162ad14b59d17096dd))
+	ROMX_LOAD("z80_boot__c85_0.u59", 0x0000, 0x2000, CRC(472b39ad) SHA1(689c194dee29f895fb4f3e901adab3267e0e2823), ROM_BIOS(0))
+	ROMX_LOAD("z80_boot__a85_0.u59", 0x0000, 0x2000, CRC(4453c938) SHA1(b04987a07ff7e21f7eb354162ad14b59d17096dd), ROM_BIOS(1))
 
 	ROM_REGION(0x2000, "eprom1", 0)
-	ROM_LOAD("z80_boot__a85_1.u53", 0x0000, 0x2000, CRC(b7d489ea) SHA1(5bd6f3dd1c1f6f3e07706293bfc46a9bfc43d1f2))
+	ROMX_LOAD("z80_boot__c85_1.u53", 0x0000, 0x2000, CRC(8cb2374d) SHA1(20f6ec9ba9c8fb453f6497ffa0fb1dc3611e7d7f), ROM_BIOS(0))
+	ROMX_LOAD("z80_boot__a85_1.u53", 0x0000, 0x2000, CRC(b7d489ea) SHA1(5bd6f3dd1c1f6f3e07706293bfc46a9bfc43d1f2), ROM_BIOS(1))
 ROM_END
 
 static INPUT_PORTS_START(labtam_z80sbc)
