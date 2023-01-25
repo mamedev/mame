@@ -381,6 +381,7 @@ hp/hp48.cpp
 hp/hp49gp.cpp
 hp/hp64k.cpp
 hp/hp700.cpp
+hp/hp7596a.cpp
 hp/hp80.cpp
 hp/hp95lx.cpp
 hp/hp9825.cpp
