@@ -5,15 +5,6 @@
 #include "arcompact.h"
 #include "arcompactdasm.h"
 
-
-
-uint32_t arcompact_device::arcompact_handle_l7_0x_helper(uint16_t op, const char* optext)
-{
-	arcompact_log("unimplemented %s %04x (l7_0x group)", optext, op);
-	return m_pc + 2;
-}
-
-
 // #######################################################################################################################
 //                                 IIII I    SSS
 // ASL_S b,b,u5                    1011 1bbb 000u uuuu
@@ -21,15 +12,9 @@ uint32_t arcompact_device::arcompact_handle_l7_0x_helper(uint16_t op, const char
 
 uint32_t arcompact_device::handleop_ASL_S_b_b_u5(uint16_t op)
 {
-	int breg, u;
-
-	breg = common16_get_breg(op);
-	u = common16_get_u5(op);
-
-	breg = expand_reg(breg);
-
-	m_regs[breg] = m_regs[breg] << (u&0x1f);
-
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint32_t u = common16_get_u5(op);
+	m_regs[breg] = m_regs[breg] << (u & 0x1f);
 	return m_pc + 2;
 }
 
@@ -40,15 +25,9 @@ uint32_t arcompact_device::handleop_ASL_S_b_b_u5(uint16_t op)
 
 uint32_t arcompact_device::handleop_LSR_S_b_b_u5(uint16_t op)
 {
-	int breg, u;
-
-	breg = common16_get_breg(op);
-	u = common16_get_u5(op);
-
-	breg = expand_reg(breg);
-
-	m_regs[breg] = m_regs[breg] >> (u&0x1f);
-
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint32_t u = common16_get_u5(op);
+	m_regs[breg] = m_regs[breg] >> (u & 0x1f);
 	return m_pc + 2;
 }
 
@@ -59,15 +38,10 @@ uint32_t arcompact_device::handleop_LSR_S_b_b_u5(uint16_t op)
 
 uint32_t arcompact_device::handleop_ASR_S_b_b_u5(uint16_t op)
 {
-	int breg, u;
-
-	breg = common16_get_breg(op);
-	u = common16_get_u5(op);
-
-	breg = expand_reg(breg);
-
-	int32_t temp = (int32_t)m_regs[breg]; m_regs[breg] = temp >> (u&0x1f); // treat it as a signed value, so sign extension occurs during shift
-
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint32_t u = common16_get_u5(op);
+	int32_t temp = (int32_t)m_regs[breg];
+	m_regs[breg] = temp >> (u&0x1f); // treat it as a signed value, so sign extension occurs during shift
 	return m_pc + 2;
 }
 
@@ -78,15 +52,9 @@ uint32_t arcompact_device::handleop_ASR_S_b_b_u5(uint16_t op)
 
 uint32_t arcompact_device::handleop_SUB_S_b_b_u5(uint16_t op)
 {
-	int breg, u;
-
-	breg = common16_get_breg(op);
-	u = common16_get_u5(op);
-
-	breg = expand_reg(breg);
-
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint32_t u = common16_get_u5(op);
 	m_regs[breg] = m_regs[breg] - u;
-
 	return m_pc + 2;
 }
 
@@ -97,15 +65,9 @@ uint32_t arcompact_device::handleop_SUB_S_b_b_u5(uint16_t op)
 
 uint32_t arcompact_device::handleop_BSET_S_b_b_u5(uint16_t op)
 {
-	int breg, u;
-
-	breg = common16_get_breg(op);
-	u = common16_get_u5(op);
-
-	breg = expand_reg(breg);
-
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint32_t u = common16_get_u5(op);
 	m_regs[breg] = m_regs[breg] | (1 << (u & 0x1f));
-
 	return m_pc + 2;
 }
 
@@ -116,13 +78,9 @@ uint32_t arcompact_device::handleop_BSET_S_b_b_u5(uint16_t op)
 
 uint32_t arcompact_device::handleop_BCLR_S_b_b_u5(uint16_t op)
 {
-	uint8_t breg = common16_get_breg(op);
-	uint8_t u = common16_get_u5(op);
-
-	breg = expand_reg(breg);
-
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint32_t u = common16_get_u5(op);
 	m_regs[breg] = m_regs[breg] &~ (1 << u);
-
 	return m_pc + 2;
 }
 
@@ -133,13 +91,9 @@ uint32_t arcompact_device::handleop_BCLR_S_b_b_u5(uint16_t op)
 
 uint32_t arcompact_device::handleop_BMSK_S_b_b_u5(uint16_t op)
 {
-	uint8_t breg = common16_get_breg(op);
-	uint8_t u = common16_get_u5(op);
-
-	breg = expand_reg(breg);
-
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint32_t u = common16_get_u5(op);
 	m_regs[breg] = m_regs[breg] & ((1 << (u + 1)) - 1);
-
 	return m_pc + 2;
 }
 
@@ -150,5 +104,5 @@ uint32_t arcompact_device::handleop_BMSK_S_b_b_u5(uint16_t op)
 
 uint32_t arcompact_device::handleop_BTST_S_b_u5(uint16_t op)
 {
-	return arcompact_handle_l7_0x_helper(op, "BTST_S");
+	arcompact_log("unimplemented BTST_S %04x (l7_0x group)", op);
 }

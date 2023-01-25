@@ -3,7 +3,6 @@
 
 #include "emu.h"
 #include "arcompact.h"
-#include "arcompactdasm.h"
 
 #define GET_01_01_01_BRANCH_ADDR \
 	int32_t address = (op & 0x00fe0000) >> 17; \
@@ -13,7 +12,6 @@
 uint32_t arcompact_device::handleop32_B_cc_D_s21(uint32_t op)
 {
 	int size = 4;
-
 	uint8_t condition = common32_get_condition(op);
 
 	if (!check_condition(condition))
@@ -36,11 +34,8 @@ uint32_t arcompact_device::handleop32_B_cc_D_s21(uint32_t op)
 	}
 	else
 	{
-	//  m_regs[REG_BLINK] = m_pc + size;  // don't link
 		return realaddress;
 	}
-
-
 	return m_pc + size;
 }
 
@@ -53,10 +48,8 @@ uint32_t arcompact_device::handleop32_B_D_s25(uint32_t op)
 	address |= ((op & 0x0000000f) >> 0) << 20;
 	if (address & 0x800000) address = -0x800000 + (address & 0x7fffff);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
-//  int res =  (op & 0x00000010) >> 4; op &= ~0x00000010; // should be set to 0
 
 	uint32_t realaddress = (m_pc&0xfffffffc) + (address * 2);
-
 	if (n)
 	{
 		m_delayactive = 1;
@@ -65,25 +58,18 @@ uint32_t arcompact_device::handleop32_B_D_s25(uint32_t op)
 	}
 	else
 	{
-	//  m_regs[REG_BLINK] = m_pc + size;  // don't link
 		return realaddress;
 	}
-
-
 	return m_pc + size;
-
 }
 
 uint32_t arcompact_device::handleop32_BL_cc_d_s21(uint32_t op)
 {
 	int size = 4;
-
 	// Branch and Link Conditionally
 	arcompact_log("unimplemented BLcc %08x", op);
 	return m_pc + size;
 }
-
-
 
 uint32_t arcompact_device::handleop32_BL_d_s25(uint32_t op)
 {
@@ -95,7 +81,6 @@ uint32_t arcompact_device::handleop32_BL_d_s25(uint32_t op)
 	address |=        ((op & 0x0000000f) >> 0) << 20;
 	if (address & 0x800000) address = -0x800000 + (address&0x7fffff);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
-//  int res =  (op & 0x00000010) >> 4; op &= ~0x00000010;
 
 	uint32_t realaddress = (m_pc&0xfffffffc) + (address * 2);
 
@@ -110,12 +95,8 @@ uint32_t arcompact_device::handleop32_BL_d_s25(uint32_t op)
 		m_regs[REG_BLINK] = m_pc + size;
 		return realaddress;
 	}
-
-
 	return m_pc + size;
 }
-
-
 
 uint32_t arcompact_device::arcompact_01_01_00_helper(uint32_t op, const char* optext)
 {
@@ -125,8 +106,6 @@ uint32_t arcompact_device::arcompact_01_01_00_helper(uint32_t op, const char* op
 
 	uint8_t creg = common32_get_creg(op);
 	uint8_t breg = common32_get_breg(op);
-	//int n = (op & 0x00000020) >> 5;
-
 
 	if ((breg != LIMM_REG) && (creg != LIMM_REG))
 	{
@@ -141,7 +120,6 @@ uint32_t arcompact_device::arcompact_01_01_00_helper(uint32_t op, const char* op
 	arcompact_log("unimplemented %s %08x (reg-reg)", optext, op);
 	return m_pc + size;
 }
-
 
 // register - register cases
 
@@ -171,86 +149,67 @@ uint32_t arcompact_device::arcompact_01_01_00_helper(uint32_t op, const char* op
 		return realaddress; \
 	}
 
-
 uint32_t arcompact_device::handleop32_BREQ_reg_reg(uint32_t op)  // register - register BREQ
 {
-	BR_REGREG_SETUP
-
-	// BREQ
-	if (b == c)
+	BR_REGREG_SETUP	
+	if (b == c) // BREQ
 	{
 		BR_TAKEJUMP
 	}
-
 	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_BRNE_reg_reg(uint32_t op) // register - register BRNE
 {
-	BR_REGREG_SETUP
-
-	// BRNE
+	BR_REGREG_SETUP // BRNE	
 	if (b != c)
 	{
 		BR_TAKEJUMP
 	}
-
 	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_BRLT_reg_reg(uint32_t op) // regiter - register BRLT
 {
 	BR_REGREG_SETUP
-
-	// BRLT  (signed operation)
-	if ((int32_t)b < (int32_t)c)
+	if ((int32_t)b < (int32_t)c) // BRLT (signed operation)
 	{
 		BR_TAKEJUMP
 	}
-
 	return m_pc + size;
-
 }
+
 uint32_t arcompact_device::handleop32_BRGE_reg_reg(uint32_t op) // register - register BRGE
 {
-	BR_REGREG_SETUP
-
-	// BRGE  (signed operation)
-	if ((int32_t)b >= (int32_t)c)
+	BR_REGREG_SETUP	
+	if ((int32_t)b >= (int32_t)c) // BRGE  (signed operation)
 	{
 		BR_TAKEJUMP
 	}
-
 	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_BRLO_reg_reg(uint32_t op) // register - register BRLO
 {
 	BR_REGREG_SETUP
-
-	// BRLO (unsigned operation)
-	if (b < c)
+	if (b < c) 	// BRLO (unsigned operation)
 	{
 		BR_TAKEJUMP
 	}
 
 	return m_pc + size;
 }
-
 
 uint32_t arcompact_device::handleop32_BRHS_reg_reg(uint32_t op) // register - register BRHS
 {
 	BR_REGREG_SETUP
-
-	// BRHS (unsigned operation)
-	if (b >= c)
+	if (b >= c) // BRHS (unsigned operation)
 	{
 		BR_TAKEJUMP
 	}
 
 	return m_pc + size;
 }
-
 
 uint32_t arcompact_device::handleop32_BBIT0_reg_reg(uint32_t op)  { return arcompact_01_01_00_helper( op, "BBIT0");}
 uint32_t arcompact_device::handleop32_BBIT1_reg_reg(uint32_t op)  { return arcompact_01_01_00_helper( op, "BBIT1");}
@@ -262,85 +221,64 @@ uint32_t arcompact_device::arcompact_01_01_01_helper(uint32_t op, const char* op
 	return m_pc + size;
 }
 
-
-
 #define BR_REGIMM_SETUP \
 	GET_01_01_01_BRANCH_ADDR \
 	uint32_t u = common32_get_u6(op); \
 	uint8_t breg = common32_get_breg(op); \
 	int n = (op & 0x00000020) >> 5; \
 	uint32_t b,c; \
-	/* comparing a LIMM  to an immediate is pointless, is it a valid encoding? */ \
 	int size = check_b_limm(breg); \
 	b = m_regs[breg]; \
 	c = u;
 
-
 // register -immediate cases
 uint32_t arcompact_device::handleop32_BREQ_reg_imm(uint32_t op) // BREQ reg-imm
 {
-	BR_REGIMM_SETUP
-
-	// BREQ
-	if (b == c)
+	BR_REGIMM_SETUP	
+	if (b == c) // BREQ
 	{
 		BR_TAKEJUMP
 	}
-
 	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_BRNE_reg_imm(uint32_t op) // BRNE reg-imm
 {
-	BR_REGIMM_SETUP
-
-	// BRNE
-	if (b != c)
+	BR_REGIMM_SETUP	
+	if (b != c) // BRNE
 	{
 		BR_TAKEJUMP
 	}
-
 	return m_pc + size;
 }
-
-
 
 uint32_t arcompact_device::handleop32_BRLT_reg_imm(uint32_t op) // BRLT reg-imm
 {
 	BR_REGIMM_SETUP
-
-	// BRLT  (signed operation)
-	if ((int32_t)b < (int32_t)c)
+	if ((int32_t)b < (int32_t)c) // BRLT  (signed operation)
 	{
 		BR_TAKEJUMP
 	}
-
 	return m_pc + size;
 
 }
 uint32_t arcompact_device::handleop32_BRGE_reg_imm(uint32_t op)
 {
 	BR_REGIMM_SETUP
-
-	// BRGE  (signed operation)
-	if ((int32_t)b >= (int32_t)c)
+	if ((int32_t)b >= (int32_t)c) // BRGE  (signed operation)
 	{
 		BR_TAKEJUMP
 	}
-
 	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_BRLO_reg_imm(uint32_t op) //  register - immediate BRLO
 {
-	BR_REGIMM_SETUP
-
-	// BRLO (unsigned operation)
+	BR_REGIMM_SETUP // BRLO (unsigned operation)	
 	if (b < c)
 	{
 		BR_TAKEJUMP
 	}
-
 	return m_pc + size;
 
 }
@@ -348,13 +286,10 @@ uint32_t arcompact_device::handleop32_BRLO_reg_imm(uint32_t op) //  register - i
 uint32_t arcompact_device::handleop32_BRHS_reg_imm(uint32_t op) // register - immediate BRHS
 {
 	BR_REGIMM_SETUP
-
-	// BRHS (unsigned operation)
-	if (b >= c)
+	if (b >= c) // BRHS (unsigned operation)
 	{
 		BR_TAKEJUMP
 	}
-
 	return m_pc + size;
 }
 

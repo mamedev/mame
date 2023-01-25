@@ -15,9 +15,7 @@ uint32_t arcompact_device::arcompact_handle04_2f_helper(uint32_t op, const char*
 	if (p == 0)
 	{
 		uint8_t creg = common32_get_creg(op);
-
 		size = check_c_limm(creg);
-
 	}
 	else if (p == 1)
 	{

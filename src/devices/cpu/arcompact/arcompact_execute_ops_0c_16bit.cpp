@@ -5,12 +5,6 @@
 #include "arcompact.h"
 #include "arcompactdasm.h"
 
-uint32_t arcompact_device::arcompact_handle0c_helper(uint16_t op, const char* optext)
-{
-	arcompact_log("unimplemented %s %04x (0x0c group)", optext, op);
-	return m_pc + 2;
-}
-
 // #######################################################################################################################
 //                                 IIII I       S S
 // LD_S a,[b,c]                    0110 0bbb ccc0 0aaa
@@ -18,7 +12,8 @@ uint32_t arcompact_device::arcompact_handle0c_helper(uint16_t op, const char* op
 
 uint32_t arcompact_device::handleop_LD_S_a_b_c(uint16_t op)
 {
-	return arcompact_handle0c_helper(op, "LD_S");
+	arcompact_log("unimplemented LD_S %04x (0x0c group)", op);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -28,7 +23,8 @@ uint32_t arcompact_device::handleop_LD_S_a_b_c(uint16_t op)
 
 uint32_t arcompact_device::handleop_LDB_S_a_b_c(uint16_t op)
 {
-	return arcompact_handle0c_helper(op, "LDB_S");
+	arcompact_log("unimplemented LDB_S %04x (0x0c group)", op);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -38,7 +34,8 @@ uint32_t arcompact_device::handleop_LDB_S_a_b_c(uint16_t op)
 
 uint32_t arcompact_device::handleop_LDW_S_a_b_c(uint16_t op)
 {
-	return arcompact_handle0c_helper(op, "LDW_S");
+	arcompact_log("unimplemented LDW_S %04x (0x0c group)", op);
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -48,17 +45,9 @@ uint32_t arcompact_device::handleop_LDW_S_a_b_c(uint16_t op)
 
 uint32_t arcompact_device::handleop_ADD_S_a_b_c(uint16_t op) // ADD_S a <- b + c
 {
-	int areg, breg, creg;
-
-	areg = common16_get_areg(op);
-	breg = common16_get_breg(op);
-	creg = common16_get_creg(op);
-
-	areg = expand_reg(areg);
-	breg = expand_reg(breg);
-	creg = expand_reg(creg);
-
+	uint8_t areg = expand_reg(common16_get_areg(op));
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint8_t creg = expand_reg(common16_get_creg(op));
 	m_regs[areg] = m_regs[breg] + m_regs[creg];
-
 	return m_pc + 2;
 }

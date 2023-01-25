@@ -11,10 +11,7 @@
 
 uint32_t arcompact_device::handleop_BREQ_S_b_0_s8(uint16_t op) // BREQ_S b,0,s8
 {
-	int breg;
-	breg = common16_get_breg(op);
-	breg = expand_reg(breg);
-
+	uint8_t breg = expand_reg(common16_get_breg(op));
 	if (!m_regs[breg])
 	{
 		int s = (op & 0x007f) >> 0; op &= ~0x007f;
@@ -32,10 +29,7 @@ uint32_t arcompact_device::handleop_BREQ_S_b_0_s8(uint16_t op) // BREQ_S b,0,s8
 
 uint32_t arcompact_device::handleop_BRNE_S_b_0_s8(uint16_t op) // BRNE_S b,0,s8
 {
-	int breg;
-	breg = common16_get_breg(op);
-	breg = expand_reg(breg);
-
+	uint8_t breg = expand_reg(common16_get_breg(op));
 	if (m_regs[breg])
 	{
 		int s = (op & 0x007f) >> 0; op &= ~0x007f;

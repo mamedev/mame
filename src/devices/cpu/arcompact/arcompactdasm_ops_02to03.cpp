@@ -37,7 +37,6 @@ int arcompact_disassembler::handle_dasm32_LD_r_o(std::ostream &stream, offs_t pc
 		size = 8;
 	}
 
-
 	if ((s == 0x04) && (S == 0) && (Z == 0) && (X == 0) & (a == 2) && (D == 0) && (breg == 28))
 	{
 		util::stream_format(stream, "POP");

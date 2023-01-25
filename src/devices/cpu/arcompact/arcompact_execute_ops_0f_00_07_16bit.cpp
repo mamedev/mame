@@ -3,7 +3,6 @@
 
 #include "emu.h"
 #include "arcompact.h"
-#include "arcompactdasm.h"
 
 // Zero parameters (ZOP)
 
@@ -55,6 +54,5 @@ uint32_t arcompact_device::handleop_J_S_D_blink(uint16_t op) // J_S.D [blink]
 	m_delayactive = 1;
 	m_delayjump = m_regs[REG_BLINK];
 	m_delaylinks = 0;
-
 	return m_pc + 2;
 }

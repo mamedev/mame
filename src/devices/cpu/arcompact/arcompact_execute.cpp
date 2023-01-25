@@ -22,7 +22,6 @@ It is possible this is how the CPU works internally.
 
 */
 
-
 void arcompact_device::execute_run()
 {
 	while (m_icount > 0)
@@ -57,10 +56,8 @@ void arcompact_device::execute_run()
 				}
 			}
 		}
-
 		m_icount--;
 	}
-
 }
 
 
@@ -69,12 +66,12 @@ int arcompact_device::check_condition(uint8_t condition)
 {
 	switch (condition & 0x1f)
 	{
-		case 0x00: return condition_AL(); // AL
+		case 0x00: return condition_AL();
 		case 0x01: return condition_EQ();
-		case 0x02: return condition_NE(); // NE
+		case 0x02: return condition_NE();
 		case 0x03: return condition_PL();
-		case 0x04: return condition_MI(); // MI (N)
-		case 0x05: return condition_CS(); // CS (Carry Set / Lower than)
+		case 0x04: return condition_MI();
+		case 0x05: return condition_CS();
 		case 0x06: return condition_HS();
 		case 0x07: return condition_VS();
 		case 0x08: return condition_VC();
@@ -88,11 +85,62 @@ int arcompact_device::check_condition(uint8_t condition)
 
 		default: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
 	}
-
 	return -1;
 }
 
-// handlers
+
+void arcompact_device::do_flags_overflow(uint32_t result, uint32_t b, uint32_t c)
+{
+	if ((b & 0x80000000) == (c & 0x80000000))
+	{
+		if ((result & 0x80000000) != (b & 0x80000000))
+		{
+			status32_set_v();
+		}
+		else
+		{
+			status32_clear_v();
+		}
+	}
+}
+
+void arcompact_device::do_flags_add(uint32_t result, uint32_t b, uint32_t c)
+{
+	do_flags_nz(result);
+	do_flags_overflow(result, b, c);
+
+	if (result < b)
+	{
+		status32_set_c();
+	}
+	else
+	{
+		status32_clear_c();
+	}
+}
+
+void arcompact_device::do_flags_sub(uint32_t result, uint32_t b, uint32_t c)
+{
+	do_flags_nz(result);
+	do_flags_overflow(result, b, c);
+
+	if (result > b)
+	{
+		status32_set_c();
+	}
+	else
+	{
+		status32_clear_c();
+	}
+}
+
+void arcompact_device::do_flags_nz(uint32_t result)
+{
+	if (result & 0x80000000) { status32_set_n(); }
+	else { status32_clear_n(); }
+	if (result == 0x00000000) { status32_set_z(); }
+	else { status32_clear_z(); }
+}
 
 uint32_t arcompact_device::handle_jump_to_addr(int delay, int link, uint32_t address, uint32_t next_addr)
 {
@@ -109,7 +157,6 @@ uint32_t arcompact_device::handle_jump_to_addr(int delay, int link, uint32_t add
 		if (link) m_regs[REG_BLINK] = next_addr;
 		return address;
 	}
-
 }
 
 uint32_t arcompact_device::handle_jump_to_register(int delay, int link, uint32_t reg, uint32_t next_addr, int flag)
@@ -146,57 +193,8 @@ uint32_t arcompact_device::handle_jump_to_register(int delay, int link, uint32_t
 			return handle_jump_to_addr(delay, link, target, next_addr);
 		}
 	}
-
 	return 0;
 }
-
-
-
-uint32_t arcompact_device::arcompact_handle04_helper(uint32_t op, const char* optext, int ignore_dst, int b_reserved)
-{
-	int p = common32_get_p(op);
-	uint8_t breg = common32_get_breg(op);
-	int size = 4;
-
-	if (!b_reserved)
-	{
-		size = check_b_limm(breg);
-	}
-	else
-	{
-	}
-
-	if (p == 0)
-	{
-		uint8_t creg = common32_get_creg(op);
-		size = check_c_limm(creg);
-	}
-	else if (p == 1)
-	{
-	}
-	else if (p == 2)
-	{
-	}
-	else if (p == 3)
-	{
-		int M = (op & 0x00000020) >> 5;
-
-		if (M == 0)
-		{
-			uint8_t creg = common32_get_creg(op);
-			size = check_c_limm(creg);
-		}
-		else if (M == 1)
-		{
-		}
-	}
-
-	arcompact_log("unimplemented %s %08x (04 type helper)", optext, op);
-
-	return m_pc + size;
-}
-
-
 
 
 /************************************************************************************************************************************

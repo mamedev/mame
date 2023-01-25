@@ -27,7 +27,6 @@ int arcompact_disassembler::handle05_2f_0x_helper_dasm(std::ostream &stream, off
 	util::stream_format(stream, "%s", flagbit[F]);
 //  util::stream_format(stream, " p(%d)", p);
 
-
 	util::stream_format(stream, " %s, ", regnames[breg]);
 
 	if (p == 0)

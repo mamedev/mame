@@ -432,7 +432,7 @@ private:
 	uint32_t handleop32_BMSK_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_BMSK_cc_f_b_b_u6(uint32_t op);
 
-	uint32_t handleop32_ADD1_cc(uint32_t op);
+	uint32_t handleop32_ADD1_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_ADD1(uint32_t op);
 	uint32_t handleop32_ADD1_f_a_b_c(uint32_t op);
 	uint32_t handleop32_ADD1_f_a_b_u6(uint32_t op);
@@ -440,7 +440,7 @@ private:
 	uint32_t handleop32_ADD1_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_ADD1_cc_f_b_b_u6(uint32_t op);
 
-	uint32_t handleop32_ADD2_cc(uint32_t op);
+	uint32_t handleop32_ADD2_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_ADD2(uint32_t op);
 	uint32_t handleop32_ADD2_f_a_b_c(uint32_t op);
 	uint32_t handleop32_ADD2_f_a_b_u6(uint32_t op);
@@ -448,7 +448,7 @@ private:
 	uint32_t handleop32_ADD2_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_ADD2_cc_f_b_b_u6(uint32_t op);
 
-	uint32_t handleop32_ADD3_cc(uint32_t op);
+	uint32_t handleop32_ADD3_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_ADD3(uint32_t op);
 	uint32_t handleop32_ADD3_f_a_b_c(uint32_t op);
 	uint32_t handleop32_ADD3_f_a_b_u6(uint32_t op);
@@ -456,7 +456,7 @@ private:
 	uint32_t handleop32_ADD3_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_ADD3_cc_f_b_b_u6(uint32_t op);
 
-	uint32_t handleop32_SUB1_cc(uint32_t op);
+	uint32_t handleop32_SUB1_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_SUB1(uint32_t op);
 	uint32_t handleop32_SUB1_f_a_b_c(uint32_t op);
 	uint32_t handleop32_SUB1_f_a_b_u6(uint32_t op);
@@ -464,7 +464,7 @@ private:
 	uint32_t handleop32_SUB1_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_SUB1_cc_f_b_b_u6(uint32_t op);
 
-	uint32_t handleop32_SUB2_cc(uint32_t op);
+	uint32_t handleop32_SUB2_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_SUB2(uint32_t op);
 	uint32_t handleop32_SUB2_f_a_b_c(uint32_t op);
 	uint32_t handleop32_SUB2_f_a_b_u6(uint32_t op);
@@ -472,7 +472,7 @@ private:
 	uint32_t handleop32_SUB2_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_SUB2_cc_f_b_b_u6(uint32_t op);
 
-	uint32_t handleop32_SUB3_cc(uint32_t op);
+	uint32_t handleop32_SUB3_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_SUB3(uint32_t op);
 	uint32_t handleop32_SUB3_f_a_b_c(uint32_t op);
 	uint32_t handleop32_SUB3_f_a_b_u6(uint32_t op);
@@ -891,25 +891,16 @@ private:
 	*                                                                                                                                   *
 	************************************************************************************************************************************/
 
-
-
-
-
 	uint32_t arcompact_01_01_00_helper(uint32_t op, const char* optext);
 	uint32_t arcompact_01_01_01_helper(uint32_t op, const char* optext);
-	uint32_t arcompact_handle04_helper(uint32_t op, const char* optext, int ignore_dst, int b_reserved);
+	uint32_t arcompact_handle05_helper(uint32_t op, const char* optext, int ignore_dst, int b_reserved);
 	uint32_t arcompact_handle04_2f_helper(uint32_t op, const char* optext);
 	uint32_t arcompact_handle04_3x_helper(uint32_t op, int dsize, int extend);
 	uint32_t arcompact_handle05_2f_0x_helper(uint32_t op, const char* optext);
-	uint32_t arcompact_handle0c_helper(uint16_t op, const char* optext);
-	uint32_t arcompact_handle0d_helper(uint16_t op, const char* optext);
-	uint32_t arcompact_handle0e_0x_helper(uint16_t op, const char* optext, int revop);
 	uint32_t arcompact_handle0f_0x_helper(uint16_t op, const char* optext, int nodst);
-	uint32_t arcompact_handle_ld_helper(uint16_t op, const char* optext, int shift, int swap);
-	uint32_t arcompact_handle_l7_0x_helper(uint16_t op, const char* optext);
-	uint32_t arcompact_handle18_0x_helper(uint16_t op, const char* optext, int st);
 	uint32_t arcompact_handle19_0x_helper(uint16_t op, const char* optext, int shift, int format);
 
+	uint32_t arcompact_handle18_0x_helper(uint16_t op, const char* optext, int st);
 
 	uint32_t handle_jump_to_addr(int delay, int link, uint32_t address, uint32_t next_addr);
 	uint32_t handle_jump_to_register(int delay, int link, uint32_t reg, uint32_t next_addr, int flag);
@@ -930,7 +921,7 @@ private:
 
 	void unimplemented_opcode(uint16_t op);
 
-	inline  uint32_t READ32(uint32_t address)
+	inline uint32_t READ32(uint32_t address)
 	{
 		if (address & 0x3)
 			fatalerror("%08x: attempted unaligned READ32 on address %08x", m_pc, address);
@@ -992,7 +983,6 @@ private:
 	uint32_t m_LP_START;
 	uint32_t m_LP_END;
 	uint32_t m_INTVECTORBASE;
-
 };
 
 DECLARE_DEVICE_TYPE(ARCA5, arcompact_device)

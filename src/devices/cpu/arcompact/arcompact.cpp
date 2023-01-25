@@ -38,12 +38,8 @@ uint32_t arcompact_device::arcompact_auxreg00c_STATUS32_L2_r() { return m_status
 void arcompact_device::arcompact_auxreg00b_STATUS32_L1_w(uint32_t data) { m_status32_l1 = data; }
 void arcompact_device::arcompact_auxreg00c_STATUS32_L2_w(uint32_t data) { m_status32_l2 = data; }
 
-
 uint32_t arcompact_device::arcompact_auxreg025_INTVECTORBASE_r() { return m_INTVECTORBASE&0xfffffc00; }
 void arcompact_device::arcompact_auxreg025_INTVECTORBASE_w(uint32_t data) { m_INTVECTORBASE = data&0xfffffc00; }
-
-
-
 
 void arcompact_device::arcompact_auxreg_map(address_map &map)
 {
@@ -115,7 +111,6 @@ void arcompact_device::device_start()
 		state_add(i, arcompact_disassembler::regnames[i-0x100], m_debugger_temp).callimport().callexport().formatstr("%08X");
 	}
 
-
 	set_icountptr(m_icount);
 }
 
@@ -152,7 +147,6 @@ void arcompact_device::state_export(const device_state_entry &entry)
 				m_debugger_temp = m_regs[index - 0x100];
 			}
 			break;
-
 	}
 }
 
@@ -210,12 +204,10 @@ void arcompact_device::device_reset()
 	m_LP_START = 0;
 	m_LP_END = 0;
 	m_INTVECTORBASE = 0;
-
 }
 
 
 /*****************************************************************************/
-
 
 void arcompact_device::execute_set_input(int irqline, int state)
 {
@@ -2719,7 +2711,6 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 			}
 		}
 	}
-
 	return 0;
 }
 

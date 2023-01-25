@@ -3,30 +3,7 @@
 
 #include "emu.h"
 #include "arcompact.h"
-#include "arcompactdasm.h"
 
-uint32_t arcompact_device::arcompact_handle0e_0x_helper(uint16_t op, const char* optext, int revop)
-{
-	int h;// , breg;
-	int size;
-
-	h = group_0e_get_h(op);
-
-	if (h == LIMM_REG)
-	{
-		//uint32_t limm;
-		//GET_LIMM;
-		size = 6;
-	}
-	else
-	{
-	}
-
-	arcompact_log("unimplemented %s %04x (0x0e_0x group)", optext, op);
-
-	return m_pc+ size;
-
-}
 
 // #######################################################################################################################
 //                                 IIII I       S S

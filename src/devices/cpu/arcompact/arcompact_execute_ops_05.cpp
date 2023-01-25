@@ -3,7 +3,41 @@
 
 #include "emu.h"
 #include "arcompact.h"
-#include "arcompactdasm.h"
+
+uint32_t arcompact_device::arcompact_handle05_helper(uint32_t op, const char* optext, int ignore_dst, int b_reserved)
+{
+	int p = common32_get_p(op);
+	uint8_t breg = common32_get_breg(op);
+	int size = 4;
+
+	if (!b_reserved)
+	{
+		size = check_b_limm(breg);
+	}
+
+	if (p == 0)
+	{
+		uint8_t creg = common32_get_creg(op);
+		size = check_c_limm(creg);
+	}
+	else if (p == 1)
+	{
+	}
+	else if (p == 2)
+	{
+	}
+	else if (p == 3)
+	{
+		int M = (op & 0x00000020) >> 5;
+		if (M == 0)
+		{
+			uint8_t creg = common32_get_creg(op);
+			size = check_c_limm(creg);
+		}
+	}
+	arcompact_log("unimplemented %s %08x (04 type helper)", optext, op);
+	return m_pc + size;
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                                 IIII I      SS SSSS
@@ -193,7 +227,7 @@ uint32_t arcompact_device::handleop32_LSR_multiple(uint32_t op)
 // ASR<.cc><.f> 0,limm,c           0010 1110 1100 0010   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ASR_multiple(uint32_t op)  { return arcompact_handle04_helper(op, "ASR", 0,0); }
+uint32_t arcompact_device::handleop32_ASR_multiple(uint32_t op)  { return arcompact_handle05_helper(op, "ASR", 0,0); }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ROR<.f> a,b,c                   0010 1bbb 0000 0011   FBBB CCCC CCAA AAAA
@@ -210,7 +244,7 @@ uint32_t arcompact_device::handleop32_ASR_multiple(uint32_t op)  { return arcomp
 // ROR<.cc><.f> 0,limm,c           0010 1110 1100 0011   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ROR_multiple(uint32_t op)  { return arcompact_handle04_helper(op, "ROR", 0,0); }
+uint32_t arcompact_device::handleop32_ROR_multiple(uint32_t op)  { return arcompact_handle05_helper(op, "ROR", 0,0); }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // 32 x 32 Signed Multiply
@@ -401,7 +435,7 @@ uint32_t arcompact_device::handleop32_MULU64(uint32_t op)
 // ADDS<.cc><.f> 0,limm,c          0010 1110 1100 0110   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ADDS(uint32_t op)  { return arcompact_handle04_helper(op, "ADDS", 0,0); }
+uint32_t arcompact_device::handleop32_ADDS(uint32_t op)  { return arcompact_handle05_helper(op, "ADDS", 0,0); }
 
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -420,7 +454,7 @@ uint32_t arcompact_device::handleop32_ADDS(uint32_t op)  { return arcompact_hand
 // SUBS<.cc><.f> 0,limm,c          0010 1110 1100 0111   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_SUBS(uint32_t op)  { return arcompact_handle04_helper(op, "SUBS", 0,0); }
+uint32_t arcompact_device::handleop32_SUBS(uint32_t op)  { return arcompact_handle05_helper(op, "SUBS", 0,0); }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // DIVAW a,b,c                     0010 1bbb 0000 1000   0BBB CCCC CCAA AAAA
@@ -438,7 +472,7 @@ uint32_t arcompact_device::handleop32_SUBS(uint32_t op)  { return arcompact_hand
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-uint32_t arcompact_device::handleop32_DIVAW(uint32_t op)  { return arcompact_handle04_helper(op, "DIVAW", 0,0); }
+uint32_t arcompact_device::handleop32_DIVAW(uint32_t op)  { return arcompact_handle05_helper(op, "DIVAW", 0,0); }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                                 IIII I      SS SSSS
@@ -455,7 +489,7 @@ uint32_t arcompact_device::handleop32_DIVAW(uint32_t op)  { return arcompact_han
 // ASLS<.cc><.f> 0,limm,c          0010 1110 1100 1010   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ASLS(uint32_t op)  { return arcompact_handle04_helper(op, "ASLS", 0,0); }
+uint32_t arcompact_device::handleop32_ASLS(uint32_t op)  { return arcompact_handle05_helper(op, "ASLS", 0,0); }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ASRS<.f> a,b,c                  0010 1bbb 0000 1011   FBBB CCCC CCAA AAAA
@@ -472,7 +506,7 @@ uint32_t arcompact_device::handleop32_ASLS(uint32_t op)  { return arcompact_hand
 // ASRS<.cc><.f> 0,limm,c          0010 1110 1100 1011   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ASRS(uint32_t op)  { return arcompact_handle04_helper(op, "ASRS", 0,0); }
+uint32_t arcompact_device::handleop32_ASRS(uint32_t op)  { return arcompact_handle05_helper(op, "ASRS", 0,0); }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ADDSDW<.f> a,b,c                0010 1bbb 0010 1000   FBBB CCCC CCAA AAAA
@@ -489,7 +523,7 @@ uint32_t arcompact_device::handleop32_ASRS(uint32_t op)  { return arcompact_hand
 // ADDSDW<.cc><.f> 0,limm,c        0010 1110 1110 1000   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ADDSDW(uint32_t op)  { return arcompact_handle04_helper(op, "ADDSDW", 0,0); }
+uint32_t arcompact_device::handleop32_ADDSDW(uint32_t op)  { return arcompact_handle05_helper(op, "ADDSDW", 0,0); }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // SUBSDW<.f> a,b,c                0010 1bbb 0010 1001   FBBB CCCC CCAA AAAA
@@ -506,6 +540,6 @@ uint32_t arcompact_device::handleop32_ADDSDW(uint32_t op)  { return arcompact_ha
 // SUBSDW<.cc><.f> 0,limm,c        0010 1110 1110 1001   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_SUBSDW(uint32_t op)  { return arcompact_handle04_helper(op, "SUBSDW", 0,0); }
+uint32_t arcompact_device::handleop32_SUBSDW(uint32_t op)  { return arcompact_handle05_helper(op, "SUBSDW", 0,0); }
 
 

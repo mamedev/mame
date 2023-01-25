@@ -55,13 +55,11 @@ int arcompact_disassembler::handle04_3x_helper_dasm(std::ostream &stream, offs_t
 			size = 8;
 		}
 		util::stream_format(stream, "(%08x)]", limm);
-
 	}
 	else
 	{
 		util::stream_format(stream, "%s]", regnames[creg]);
 	}
-
 
 	return size;
 }

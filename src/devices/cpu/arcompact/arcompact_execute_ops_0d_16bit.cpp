@@ -3,13 +3,6 @@
 
 #include "emu.h"
 #include "arcompact.h"
-#include "arcompactdasm.h"
-
-uint32_t arcompact_device::arcompact_handle0d_helper(uint16_t op, const char* optext)
-{
-	arcompact_log("unimplemented %s %04x (0x0d group)", optext, op);
-	return m_pc + 2;
-}
 
 // #######################################################################################################################
 // ADD_S c,b,u3                    0110 1bbb ccc0 0uuu
@@ -17,18 +10,11 @@ uint32_t arcompact_device::arcompact_handle0d_helper(uint16_t op, const char* op
 
 uint32_t arcompact_device::handleop_ADD_S_c_b_u3(uint16_t op)
 {
-	int u, breg, creg;
-
-	u = common16_get_u3(op);
-	breg = common16_get_breg(op);
-	creg = common16_get_creg(op);
-
-	breg = expand_reg(breg);
-	creg = expand_reg(creg);
-
+	uint32_t u = common16_get_u3(op);
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint8_t creg = expand_reg(common16_get_creg(op));
 	uint32_t result = m_regs[breg] + u;
 	m_regs[creg] = result;
-
 	return m_pc + 2;
 }
 
@@ -38,18 +24,11 @@ uint32_t arcompact_device::handleop_ADD_S_c_b_u3(uint16_t op)
 
 uint32_t arcompact_device::handleop_SUB_S_c_b_u3(uint16_t op)
 {
-	int u, breg, creg;
-
-	u = common16_get_u3(op);
-	breg = common16_get_breg(op);
-	creg = common16_get_creg(op);
-
-	breg = expand_reg(breg);
-	creg = expand_reg(creg);
-
+	uint32_t u = common16_get_u3(op);
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint8_t creg = expand_reg(common16_get_creg(op));
 	uint32_t result = m_regs[breg] - u;
 	m_regs[creg] = result;
-
 	return m_pc + 2;
 }
 
@@ -60,18 +39,11 @@ uint32_t arcompact_device::handleop_SUB_S_c_b_u3(uint16_t op)
 
 uint32_t arcompact_device::handleop_ASL_S_c_b_u3(uint16_t op)
 {
-	int u, breg, creg;
-
-	u = common16_get_u3(op);
-	breg = common16_get_breg(op);
-	creg = common16_get_creg(op);
-
-	breg = expand_reg(breg);
-	creg = expand_reg(creg);
-
+	uint32_t u = common16_get_u3(op);
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint8_t creg = expand_reg(common16_get_creg(op));
 	uint32_t result = m_regs[breg] << u;
 	m_regs[creg] = result;
-
 	return m_pc + 2;
 }
 
@@ -82,5 +54,6 @@ uint32_t arcompact_device::handleop_ASL_S_c_b_u3(uint16_t op)
 
 uint32_t arcompact_device::handleop_ASR_S_c_b_u3(uint16_t op)
 {
-	return arcompact_handle0d_helper(op, "ASR_S");
+	arcompact_log("unimplemented ASR_S %04x (0x0d group)", op);
+	return m_pc + 2;
 }

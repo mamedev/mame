@@ -19,7 +19,7 @@ public:
 
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
-
+	
 	static const char *const conditions[0x20];
 	static const char *const auxregnames[0x420];
 	static const char *const datasize[0x4];

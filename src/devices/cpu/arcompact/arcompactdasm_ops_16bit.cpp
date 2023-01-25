@@ -9,27 +9,15 @@
 
 #include "arcompactdasm.h"
 
-
-
 int arcompact_disassembler::handle0c_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext, int format)
 {
-	int areg, breg, creg;
-
-	areg = dasm_common16_get_areg(op);
-	breg = dasm_common16_get_breg(op);
-	creg = dasm_common16_get_creg(op);
-
-	areg = expand_reg(areg);
-	breg = expand_reg(breg);
-	creg = expand_reg(creg);
-
-
+	uint8_t areg = expand_reg(dasm_common16_get_areg(op));
+	uint8_t breg = expand_reg(dasm_common16_get_breg(op));
+	uint8_t creg = expand_reg(dasm_common16_get_creg(op));
 	if (format==0) util::stream_format(stream, "%s %s <- [%s, %s]", optext, regnames[areg], regnames[breg], regnames[creg]);
 	else util::stream_format(stream, "%s %s <- %s, %s", optext, regnames[areg], regnames[breg], regnames[creg]);
-
 	return 2;
 }
-
 
 int arcompact_disassembler::handle_dasm_LD_S_a_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
@@ -51,22 +39,14 @@ int arcompact_disassembler::handle_dasm_ADD_S_a_b_c(std::ostream &stream, offs_t
 	return handle0c_helper_dasm(stream, pc, op, opcodes, "ADD_S", 1);
 }
 
-
 int arcompact_disassembler::handle0d_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext)
 {
-	int u, breg, creg;
-
-	u = dasm_common16_get_u3(op);
-	breg = dasm_common16_get_breg(op);
-	creg = dasm_common16_get_creg(op);
-
-	breg = expand_reg(breg);
-	creg = expand_reg(creg);
-
+	uint32_t u = dasm_common16_get_u3(op);
+	uint8_t breg = expand_reg(dasm_common16_get_breg(op));
+	uint8_t creg = expand_reg(dasm_common16_get_creg(op));
 	util::stream_format(stream, "%s %s <- [%s, 0x%02x]", optext, regnames[creg], regnames[breg], u);
 	return 2;
 }
-
 
 int arcompact_disassembler::handle_dasm_ADD_S_c_b_u3(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
@@ -88,17 +68,11 @@ int arcompact_disassembler::handle_dasm_ASR_S_c_b_u3(std::ostream &stream, offs_
 	return handle0d_helper_dasm(stream, pc, op, opcodes, "ASR_S");
 }
 
-
-
 int arcompact_disassembler::handle0e_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext, int revop)
 {
-	int h,breg;
 	int size = 2;
-
-	h = dasm_group_0e_get_h(op);
-	breg = dasm_common16_get_breg(op);
-	breg = expand_reg(breg);
-
+	uint8_t h = dasm_group_0e_get_h(op);
+	uint8_t breg = expand_reg(dasm_common16_get_breg(op));
 	if (h == DASM_LIMM_REG)
 	{
 		uint32_t limm;
@@ -113,9 +87,7 @@ int arcompact_disassembler::handle0e_0x_helper_dasm(std::ostream &stream, offs_t
 		else util::stream_format( stream, "%s %s <- %s", optext, regnames[h], regnames[breg]);
 
 	}
-
 	return size;
-
 }
 
 int arcompact_disassembler::handle_dasm_ADD_S_b_b_h_or_limm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
@@ -138,22 +110,12 @@ int arcompact_disassembler::handle_dasm_MOV_S_hob(std::ostream &stream, offs_t p
 	return handle0e_0x_helper_dasm(stream, pc, op, opcodes, "MOV_S", 1);
 }
 
-
-
 int arcompact_disassembler::handle0f_00_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext)
 {
-	int breg;
-
-	breg = dasm_common16_get_breg(op);
-	breg = expand_reg(breg);
-
+	uint8_t breg = expand_reg(dasm_common16_get_breg(op));
 	util::stream_format( stream, "%s %s", optext, regnames[breg]);
-
 	return 2;
-
 }
-
-
 
 int arcompact_disassembler::handle_dasm_J_S_b(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
@@ -180,39 +142,42 @@ int arcompact_disassembler::handle_dasm_SUB_S_NE_b_b_b(std::ostream &stream, off
 	return handle0f_00_0x_helper_dasm(stream, pc, op, opcodes, "SUB_S.NE");
 }
 
-
-
-
-
 // Zero parameters (ZOP)
 int arcompact_disassembler::handle_dasm_NOP_S(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
-	util::stream_format( stream, "NOP_S"); return 2;
+	util::stream_format(stream, "NOP_S");
+	return 2;
 }
 
 int arcompact_disassembler::handle_dasm_UNIMP_S(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
-	util::stream_format( stream, "UNIMP_S"); return 2;
-} // Unimplemented Instruction, same as illegal, but recommended to fill blank space
+	// Unimplemented Instruction, same as illegal, but recommended to fill blank space
+	util::stream_format( stream, "UNIMP_S");
+	return 2;
+} 
 
 int arcompact_disassembler::handle_dasm_JEQ_S_blink(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
-	util::stream_format( stream, "JEQ_S [blink]"); return 2;
+	util::stream_format( stream, "JEQ_S [blink]");
+	return 2;
 }
 
 int arcompact_disassembler::handle_dasm_JNE_S_blink(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
-	util::stream_format( stream, "JNE_S [blink]"); return 2;
+	util::stream_format( stream, "JNE_S [blink]");
+	return 2;
 }
 
 int arcompact_disassembler::handle_dasm_J_S_blink(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
-	util::stream_format( stream, "J_S [blink]"); return 2;
+	util::stream_format( stream, "J_S [blink]");
+	return 2;
 }
 
 int arcompact_disassembler::handle_dasm_J_S_D_blink(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
-	util::stream_format( stream, "J_S.D [blink]"); return 2;
+	util::stream_format( stream, "J_S.D [blink]");
+	return 2;
 }
 
 
