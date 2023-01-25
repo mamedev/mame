@@ -78,12 +78,12 @@ u8 i82443bx_host_device::capptr_r()
 	return 0xa0;
 }
 
-// Register is different, bit 7 logic seemingly changed wrt i82439hx
+// Register is different wrt i82439hx
 std::tuple<bool, bool> i82443bx_host_device::read_memory_holes()
 {
 	const bool lower_hole = (m_fdhc & 0xc0) == 0x40;
 	// TODO: 11 is "reserved"
-	const bool upper_hole = (m_fdhc & 0xc0) == 0x80;
+	const bool upper_hole = (m_fdhc & 0xc0) != 0x80;
 	return std::make_tuple(lower_hole, upper_hole);
 }
 
