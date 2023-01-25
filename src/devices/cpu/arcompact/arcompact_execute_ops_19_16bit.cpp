@@ -24,7 +24,10 @@ uint32_t arcompact_device::handleop_LD_S_r0_gp_s11(uint16_t op)  { return arcomp
 // LDB_S r0,[gp,s9]                1100 101s ssss ssss
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_LDB_S_r0_gp_s9(uint16_t op)  { return arcompact_handle19_0x_helper(op, "LDB_S", 0, 0); }
+uint32_t arcompact_device::handleop_LDB_S_r0_gp_s9(uint16_t op)
+{
+	return arcompact_handle19_0x_helper(op, "LDB_S", 0, 0);
+}
 
 // #######################################################################################################################
 //                                 IIII ISS

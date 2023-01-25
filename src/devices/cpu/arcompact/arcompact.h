@@ -424,13 +424,13 @@ private:
 	uint32_t handleop32_BSET_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_BSET_cc_f_b_b_u6(uint32_t op);
 
-	uint32_t handleop32_BMSK_cc(uint32_t op);
-	uint32_t handleop32_BMSK(uint32_t op);
+	uint32_t handleop32_BMSK_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_BMSK_f_a_b_c(uint32_t op);
 	uint32_t handleop32_BMSK_f_a_b_u6(uint32_t op);
 	uint32_t handleop32_BMSK_f_b_b_s12(uint32_t op);
 	uint32_t handleop32_BMSK_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_BMSK_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_BMSK(uint32_t op);
 
 	uint32_t handleop32_ADD1_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_ADD1(uint32_t op);
@@ -536,20 +536,20 @@ private:
 	uint32_t handleop32_MIN_cc(uint32_t op);
 	uint32_t handleop32_MIN(uint32_t op);
 
+	void handleop32_TST_do_op(uint32_t src1, uint32_t src2);
 	uint32_t handleop32_TST_f_a_b_c(uint32_t op);
 	uint32_t handleop32_TST_f_a_b_u6(uint32_t op);
 	uint32_t handleop32_TST_f_b_b_s12(uint32_t op);
 	uint32_t handleop32_TST_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_TST_cc_f_b_b_u6(uint32_t op);
-	uint32_t handleop32_TST_cc(uint32_t op);
 	uint32_t handleop32_TST(uint32_t op);
 
+	void handleop32_CMP_do_op(uint32_t src1, uint32_t src2);
 	uint32_t handleop32_CMP_f_a_b_c(uint32_t op);
 	uint32_t handleop32_CMP_f_a_b_u6(uint32_t op);
 	uint32_t handleop32_CMP_f_b_b_s12(uint32_t op);
 	uint32_t handleop32_CMP_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_CMP_cc_f_b_b_u6(uint32_t op);
-	uint32_t handleop32_CMP_cc(uint32_t op);
 	uint32_t handleop32_CMP(uint32_t op);
 
 	uint32_t handleop32_RCMP_f_a_b_c(uint32_t op);
@@ -616,13 +616,13 @@ private:
 	uint32_t handleop32_MPYU_cc(uint32_t op);
 	uint32_t handleop32_MPYU(uint32_t op);
 
+	uint32_t handleop32_JLcc_cc(uint32_t op);
+	uint32_t handleop32_JLcc(uint32_t op);
 	uint32_t handleop32_JLcc_f_a_b_c(uint32_t op);
 	uint32_t handleop32_JLcc_f_a_b_u6(uint32_t op);
 	uint32_t handleop32_JLcc_f_b_b_s12(uint32_t op);
 	uint32_t handleop32_JLcc_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_JLcc_cc_f_b_b_u6(uint32_t op);
-	uint32_t handleop32_JLcc_cc(uint32_t op);
-	uint32_t handleop32_JLcc(uint32_t op);
 
 	uint32_t handleop32_JLcc_D_f_a_b_c(uint32_t op);
 	uint32_t handleop32_JLcc_D_f_a_b_u6(uint32_t op);
@@ -664,21 +664,15 @@ private:
 	uint32_t handleop32_ROR_single_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_ROR_single_cc_f_b_b_u6(uint32_t op);
 
-	uint32_t handleop32_EXTB_cc(uint32_t op);
+	uint32_t handleop32_EXTB_do_op(uint32_t src, uint8_t set_flags);
 	uint32_t handleop32_EXTB(uint32_t op);
-	uint32_t handleop32_EXTB_f_a_b_c(uint32_t op);
-	uint32_t handleop32_EXTB_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_EXTB_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_EXTB_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_EXTB_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_EXTB_f_b_c(uint32_t op);
+	uint32_t handleop32_EXTB_f_b_u6(uint32_t op);
 
-	uint32_t handleop32_EXTW_cc(uint32_t op);
+	uint32_t handleop32_EXTW_do_op(uint32_t src, uint8_t set_flags);
 	uint32_t handleop32_EXTW(uint32_t op);
-	uint32_t handleop32_EXTW_f_a_b_c(uint32_t op);
-	uint32_t handleop32_EXTW_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_EXTW_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_EXTW_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_EXTW_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_EXTW_f_b_c(uint32_t op);
+	uint32_t handleop32_EXTW_f_b_u6(uint32_t op);
 
 	uint32_t handleop32_RRC(uint32_t op);
 	uint32_t handleop32_SEXB(uint32_t op);
@@ -724,6 +718,14 @@ private:
 	uint32_t handleop32_LSR_multiple_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_LSR_multiple_cc_f_b_b_u6(uint32_t op);
 
+	uint32_t handleop32_ASR_multiple_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
+	uint32_t handleop32_ASR_multiple(uint32_t op);
+	uint32_t handleop32_ASR_multiple_f_a_b_c(uint32_t op);
+	uint32_t handleop32_ASR_multiple_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_ASR_multiple_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_ASR_multiple_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_ASR_multiple_cc_f_b_b_u6(uint32_t op);
+
 	void handleop32_MUL64_do_op(uint32_t src1, uint32_t src2);
 	uint32_t handleop32_MUL64_f_a_b_c(uint32_t op);
 	uint32_t handleop32_MUL64_f_a_b_u6(uint32_t op);
@@ -740,7 +742,8 @@ private:
 	uint32_t handleop32_MULU64_cc_f_b_b_u6(uint32_t op);
 	uint32_t handleop32_MULU64(uint32_t op);
 
-	uint32_t handleop32_ASR_multiple(uint32_t op);
+
+
 	uint32_t handleop32_ROR_multiple(uint32_t op);
 	uint32_t handleop32_ADDS(uint32_t op);
 	uint32_t handleop32_SUBS(uint32_t op);

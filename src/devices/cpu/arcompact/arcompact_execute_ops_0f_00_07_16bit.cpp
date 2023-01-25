@@ -25,14 +25,28 @@ uint32_t arcompact_device::handleop_UNIMP_S(uint16_t op)  { arcompact_log("UNIMP
 // JEQ_S [blink]                   0111 1100 1110 0000
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_JEQ_S_blink(uint16_t op)  { arcompact_log("JEQ_S [blink]"); return m_pc + 2;}
+uint32_t arcompact_device::handleop_JEQ_S_blink(uint16_t op)
+{
+	if (status32_check_z())
+	{
+		return m_regs[REG_BLINK];
+	}
+	return m_pc + 2;
+}
 
 // #######################################################################################################################
 //                                 IIII I$$$ sssS SSSS
 // JNE_S [blink]                   0111 1101 1110 0000
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_JNE_S_blink(uint16_t op)  { arcompact_log("JNE_S [blink]"); return m_pc + 2;}
+uint32_t arcompact_device::handleop_JNE_S_blink(uint16_t op)
+{
+	if (!status32_check_z())
+	{
+		return m_regs[REG_BLINK];
+	}
+	return m_pc + 2;
+}
 
 // #######################################################################################################################
 //                                 IIII I$$$ sssS SSSS

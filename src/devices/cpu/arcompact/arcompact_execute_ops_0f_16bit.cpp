@@ -159,7 +159,13 @@ uint32_t arcompact_device::handleop_ABS_S_b_c(uint16_t op)  { return arcompact_h
 // NOT_S b,c                       0111 1bbb ccc1 0010
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_NOT_S_b_c(uint16_t op)  { return arcompact_handle0f_0x_helper(op, "NOT_S",0);  }
+uint32_t arcompact_device::handleop_NOT_S_b_c(uint16_t op)
+{
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint8_t creg = expand_reg(common16_get_creg(op));
+	m_regs[breg] = m_regs[creg] ^ 0xffffffff;
+	return m_pc + 2;
+}
 
 // #######################################################################################################################
 //                                 IIII I       S SSSS
