@@ -19330,6 +19330,9 @@ hp3478a                         //
 @source:hp/hp64k.cpp
 hp64k                           //
 
+@source:hp/hp7596a.cpp
+hp7596a                         //
+
 @source:hp/hp9825.cpp
 hp9825a                         // HP 9825A
 hp9825b                         // HP 9825B
