@@ -194,9 +194,12 @@ PCB - LEAPSTER-TV:
 */
 
 #include "emu.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "cpu/arcompact/arcompact.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 
@@ -204,10 +207,11 @@ PCB - LEAPSTER-TV:
 class leapster_state : public driver_device
 {
 public:
-	leapster_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	leapster_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_cart(*this, "cartslot")
+		m_cart(*this, "cartslot"),
+		m_palette(*this, "palette")
 		{ }
 
 	void leapster(machine_config &config);
@@ -236,11 +240,17 @@ private:
 		printf("leapster_aux004b_w %04x\n", data);
 	}
 
+	void leapster_aux001a_w(uint32_t data);
+
 	void leapster_aux(address_map &map);
 	void leapster_map(address_map &map);
 
+	uint16_t m_1a_data[0x1000];
+	int m_1a_pointer;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
+	required_device<palette_device> m_palette;
 
 	memory_region *m_cart_rom = nullptr;
 };
@@ -249,6 +259,18 @@ private:
 static INPUT_PORTS_START( leapster )
 INPUT_PORTS_END
 
+void leapster_state::leapster_aux001a_w(uint32_t data)
+{
+	// probably not palette, but it does load 0x1000 words of increasing value on startup, so could be?
+	m_1a_data[m_1a_pointer & 0xfff] = data;
+
+	uint8_t r = (data >> 12) & 0x7;
+	uint8_t g = (data >> 8) & 0xf;
+	uint8_t b = (data >> 4) & 0xf;
+
+	m_palette->set_pen_color(m_1a_pointer & 0xfff, rgb_t(pal3bit(r), pal4bit(g), pal4bit(b)));
+	m_1a_pointer++;
+}
 
 uint32_t leapster_state::screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -274,10 +296,15 @@ void leapster_state::machine_start()
 	{
 		m_maincpu->space(AS_PROGRAM).install_rom(0x80000000, 0x807fffff, m_cart_rom->base());
 	}
+
+	save_item(NAME(m_1a_data));
 }
 
 void leapster_state::machine_reset()
 {
+	m_1a_pointer = 0;
+	for (int i = 0; i < 0x1000; i++)
+		m_1a_data[i] = 0;
 }
 
 void leapster_state::leapster_map(address_map &map)
@@ -295,6 +322,7 @@ void leapster_state::leapster_map(address_map &map)
 
 void leapster_state::leapster_aux(address_map &map)
 {
+	map(0x00000001a, 0x00000001a).w(FUNC(leapster_state::leapster_aux001a_w));
 	map(0x00000004b, 0x00000004b).w(FUNC(leapster_state::leapster_aux004b_w)); // this address isn't used by ARC internal stuff afaik, so probably leapster specific
 }
 
@@ -312,6 +340,8 @@ void leapster_state::leapster(machine_config &config)
 	screen.set_size(160, 160);
 	screen.set_visarea(0, 160-1, 0, 160-1);
 	screen.set_screen_update(FUNC(leapster_state::screen_update_leapster));
+
+	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 0x1000).set_endianness(ENDIANNESS_BIG);
 
 	// Cartridge
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "leapster_cart", "bin").set_device_load(FUNC(leapster_state::cart_load));
