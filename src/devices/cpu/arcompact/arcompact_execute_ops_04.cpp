@@ -118,7 +118,7 @@ uint32_t arcompact_device::handleop32_ADD(uint32_t op)
 
 uint32_t arcompact_device::handleop32_ADC_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
-	uint32_t result = src1 + src2 + status32_check_c() ? 1 : 0;
+	uint32_t result = src1 + src2 + (status32_check_c() ? 1 : 0);
 	if (set_flags)
 		do_flags_add(result, src1, src2);
 	return result;
