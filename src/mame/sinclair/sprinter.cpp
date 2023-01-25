@@ -4,14 +4,6 @@
 
 Sprinter Sp2000 (Peters Plus Ltd)
 
-TODO:
-----------:hi:----------
-	- mem contention
-----------:med:---------
-----------:low:---------
-	- gfx_layouts
-	- spectrum parentless
-
 *******************************************************************************************/
 
 #include "emu.h"
@@ -68,6 +60,8 @@ namespace {
 #define CBL_STEREO  BIT(m_cbl_xx, 6)
 #define CBL_MODE16  BIT(m_cbl_xx, 5)
 #define CBL_INT_ENA BIT(m_cbl_xx, 4)
+#define RAM1        m_ram_pages[0xe9 - 0xc0]
+#define RAM2        m_ram_pages[0xea - 0xc0]
 
 
 class sprinter_state : public spectrum_128_state
@@ -112,6 +106,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(irq_on) override;
 	INTERRUPT_GEN_MEMBER(sprinter_int);
 	TIMER_CALLBACK_MEMBER(cbl_tick);
+	TIMER_CALLBACK_MEMBER(wait_exit);
 
 	void sprinter_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -150,7 +145,7 @@ private:
 	void ata_data_w(u8 data);
 
 	u8 *m_dcp_location;
-	u8 m_dcpp_data[0x100] = {};
+	u8 m_ram_pages[0x40] = {}; // 0xc0 - 0xff
 
 	u16 m_pages[4] = {}; // internal state for faster calculations
 	u8 ram_r(offs_t offset);
@@ -202,8 +197,6 @@ private:
 	u8 m_all_mode;
 	u8 m_port_y;
 	u8 m_rgmod;
-	u8 m_ram1;
-	u8 m_ram2;
 	u8 m_pg3;
 	u8 m_hold;
 	u8 m_kbd_data_cnt;
@@ -219,6 +212,7 @@ private:
 	u8 m_accel_buffer[256] = {};
 	accel_state m_accel_state;
 	accel_state m_accel_mode;
+	emu_timer *m_waits_burner = nullptr;
 
 	// Covox Blaster
 	u8 m_cbl_xx;
@@ -253,13 +247,13 @@ void sprinter_state::update_memory()
 		const bool sc0 = BIT(m_sc, 0);
 		const bool sc_lc = !(sc0 && m_ram_sys) && !cash_on;
 		const u8 spr_ = BIT(m_sc, 1) ? 0 : ((m_dos << 1) | (BIT(m_pn, 4) || !m_dos));
-		const u8 pg0 = 0xe0
+		const u8 pg0 = 0x20 // 0xe0
 			| ((sc0 || !m_ram_sys || cash_on || !nmi_ena) << 3)
 			| (((m_arom16 && !(sc0 && m_ram_sys)) || (cash_on && nmi_ena)) << 2)
 			| (((BIT(spr_, 1) && sc_lc) || !m_ram_sys || !nmi_ena) << 1)
 			| ((BIT(spr_, 0) && sc_lc) || !m_ram_sys || !nmi_ena);
 
-		m_pages[0] = BANK_RAM_MASK | m_dcpp_data[pg0];
+		m_pages[0] = BANK_RAM_MASK | m_ram_pages[pg0];
 		m_bank_ram[0]->set_entry(m_pages[0] & 0xff);
 		if (sc0 && m_ram_sys)
 			m_bank_view0.disable();
@@ -270,13 +264,14 @@ void sprinter_state::update_memory()
 		}
 	}
 
-	m_pages[1] = BANK_RAM_MASK | m_ram1;
-	m_bank_ram[1]->set_entry(m_ram1);
-	m_pages[2] = BANK_RAM_MASK | m_ram2;
-	m_bank_ram[2]->set_entry(m_ram2);
+	m_pages[1] = BANK_RAM_MASK | RAM1;
+	m_bank_ram[1]->set_entry(RAM1);
+	m_pages[2] = BANK_RAM_MASK | RAM2;
+	m_bank_ram[2]->set_entry(RAM2);
 
-	m_pg3 = 0xc0 | (BIT(~m_pn, 7) << 5) | 0x10 | (((BIT(m_sc, 4) && BIT(~m_cnf, 7)) || (BIT(m_cnf, 7) && BIT(m_pn, 6))) << 3) | (m_pn & 0x07);
-	m_pages[3] = m_starting ? 0x40 : m_dcpp_data[m_pg3];
+	// 0xd0, 0xf0
+	m_pg3 = (BIT(~m_pn, 7) << 5) | 0x10 | (((BIT(m_sc, 4) && BIT(~m_cnf, 7)) || (BIT(m_cnf, 7) && BIT(m_pn, 6))) << 3) | (m_pn & 0x07);
+	m_pages[3] = m_starting ? 0x40 : m_ram_pages[m_pg3];
 	m_bank_ram[3]->set_entry(m_pages[3] & 0xff);
 	if (BIT(m_sc, 4) && ((m_pages[3] & 0xf9) == 0xd0))
 	{
@@ -394,6 +389,11 @@ void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bi
 					pal = BIT(mode[0], 6, 2) << 8;
 					x = (BIT(mode[0], 0, 4) << 6) | (BIT(mode[1], 0, 3) << 3);
 					y = BIT(mode[1], 3, 5) << 3;
+					if (BIT(mode[2], 2))
+					{
+						x += 4 * BIT(mode[2], 0);
+						y += 4 * BIT(mode[2], 1);
+					}
 				}
 			}
 
@@ -404,7 +404,7 @@ void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bi
 			}
 			else
 			{
-				const u8 color = m_vram[(y + (b8 & 7)) * 1024 + x + ((a16 & 15) >> 1)];
+				const u8 color = m_vram[(y + ((b8 & 7) >> BIT(mode[2], 2))) * 1024 + x + ((a16 & 15) >> (1 + BIT(mode[2], 2)))];
 				*pix++ = pal + (BIT(mode[0], 5) ? color : ((a16 & 1) ? (color & 0x0f) : (color >> 4)));
 			}
 		}
@@ -426,8 +426,7 @@ u8 sprinter_state::dcp_r(offs_t offset)
 
 	const u16 dcp_offset = (BIT(m_cnf, 3, 2) << 12) | (0 << 11) | (m_dos << 10) | (1 << 9) | (BIT(offset, 14, 2) << 7) | (BIT(offset, 13) << 4) | (BIT(offset, 7) << 3) | (offset & 0x67);
 	const u8 dcpp = m_dcp_location[dcp_offset];
-
-	u8 data = m_dcpp_data[dcpp];
+	u8 data = 0xff;
 	switch (dcpp)
 	{
 	case 0x00: // no port
@@ -502,9 +501,11 @@ u8 sprinter_state::dcp_r(offs_t offset)
 		data = m_cbl_xx;
 		break;
 
-	// value ports
-	case 0x88: // fastram
-	case 0xc0 ... 0xff:
+	case 0xc0 ... 0xef:
+		data = m_ram_pages[dcpp - 0xc0];
+		break;
+	case 0xf0 ... 0xff:
+		data = m_ram_pages[m_pg3];
 		break;
 
 	default:
@@ -534,12 +535,10 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		update_memory();
 	}
 
-
 	const u16 dcp_offset = (BIT(m_cnf, 3, 2) << 12) | (0 << 11) | (m_dos << 10) | (0 << 9) | (BIT(offset, 14, 2) << 7) | (BIT(offset, 13) << 4) | (BIT(offset, 7) << 3) | (offset & 0x67);
-	u8 dcpp = m_dcp_location[dcp_offset];
-	if (dcpp >= 0xf0) dcpp = 0xf0 | m_pg3;
-	m_dcpp_data[dcpp] = data;
-
+	const u8 dcpp = m_dcp_location[dcp_offset];
+	if ((dcpp >= 0xc0) && (dcpp < 0xf0))
+		m_ram_pages[dcpp - 0xc0] = data;
 	switch (dcpp)
 	{
 	case 0x10:
@@ -659,11 +658,13 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		break;
 
 	case 0xc0: // 1FFD
+	case 0xc8:
 		m_sc = data;
 		if (BIT(m_cnf, 6)) m_sc = 0;      // CNF_SC_RESET
 		update_memory();
 		break;
 	case 0xc1: // 7FFD
+	case 0xc9:
 		m_pn = data;
 		if (BIT(m_cnf, 5)) m_pn &= 0xc0;  // CNF_PN[5..0]_RESET
 		if (BIT(~m_cnf, 7)) m_pn &= 0x1f; // CNF_PN[7..6]_RESET
@@ -680,14 +681,17 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		m_hold = data;
 		break;
 	case 0xc4:
+	case 0xcc:
 		m_port_y = data;
 		break;
 	case 0xc5:
+	case 0xcd:
 		m_screen->update_now();
 		m_rgmod = data;
 		break;
 
 	case 0xc6: // CNF/SYS
+	case 0xce:
 		m_ram_sys = BIT(~offset, 6);
 		if (BIT(data, 1))
 		{
@@ -708,16 +712,11 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		update_memory();
 		break;
 
-	case 0xe9:
-		m_ram1 = data;
+	case 0xd0 ... 0xef:
 		update_memory();
 		break;
-	case 0xea:
-		m_ram2 = data;
-		update_memory();
-		break;
-	case 0xd0 ... 0xe8: // ROM/RAM pages
-	case 0xeb ... 0xff:
+	case 0xf0 ... 0xff:
+		m_ram_pages[m_pg3] = data;
 		update_memory();
 		break;
 
@@ -1091,7 +1090,7 @@ void sprinter_state::machine_start()
 	spectrum_128_state::machine_start();
 
 	save_item(NAME(m_pages));
-	save_item(NAME(m_dcpp_data));
+	save_item(NAME(m_ram_pages));
 
 	save_item(NAME(m_accel_buffer_size));
 	//save_item(NAME(m_accel_buffer));
@@ -1112,26 +1111,24 @@ void sprinter_state::machine_start()
 	m_dcp_location = m_ram->pointer() + (0x40 << 14);
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
-	u8 port_default[16*4] = {
+	const u8 port_default[0x40] = {
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // Cx - SYS PORTS COPIES
 		0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, // Dx - RAM PAGES
 		0x41, 0x41, 0x41, 0x41, 0x41, 0x41, 0x41, 0x41, 0x00, 0x05, 0x02, 0x41, 0xff, 0x00, 0x00, 0x41, // Ex - ROM PAGES
 		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, // Fx - RAM PAGES
 	};
-	for (u8 i = 0; i < 16*4; i++)
-		m_dcpp_data[0xc0 + i] = port_default[i];
+	std::copy(std::begin(port_default), std::end(port_default), std::begin(m_ram_pages));
 
 	m_all_mode = 0x00; // c3
 	m_port_y   = 0x00; // c4
 	m_rgmod    = 0x00; // c5
 	m_hold     = 0x77; // cb
-	m_ram1     = 0x05; // e9
-	m_ram2     = 0x02; // ea
 }
 
 void sprinter_state::machine_reset()
 {
 	m_cbl_timer->adjust(attotime::never);
+	m_waits_burner->adjust(attotime::never);
 	m_timer_overlap = 0;
 
 	spectrum_128_state::machine_reset();
@@ -1186,6 +1183,7 @@ void sprinter_state::video_start()
 	init_taps();
 
 	m_cbl_timer = timer_alloc(FUNC(sprinter_state::cbl_tick), this);
+	m_waits_burner = timer_alloc(FUNC(sprinter_state::wait_exit), this);
 }
 
 static void sprinter_ata_devices(device_slot_interface &device)
@@ -1205,11 +1203,16 @@ void sprinter_state::on_kbd_data(int state)
 void sprinter_state::do_cpu_wait(u8 count)
 {
 	m_timer_overlap += count;
-	const int allowed = std::min<int>(m_timer_overlap, m_maincpu->cycles_remaining() - 3);
+	const s32 allowed = std::min<s32>(m_timer_overlap, m_maincpu->cycles_remaining() - 3);
 	if (allowed > 0)
 	{
 		m_maincpu->adjust_icount(-allowed);
 		m_timer_overlap -= allowed;
+		if (m_timer_overlap)
+		{
+			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+			m_waits_burner->adjust(m_maincpu->cycles_to_attotime(m_timer_overlap));
+		}
 	}
 }
 
@@ -1223,6 +1226,12 @@ INTERRUPT_GEN_MEMBER(sprinter_state::sprinter_int)
 {
 	// Pentagon's INT for now
 	m_irq_on_timer->adjust(attotime(0, m_screen->time_until_pos(287, 375 * 2).as_attoseconds()));
+}
+
+TIMER_CALLBACK_MEMBER(sprinter_state::wait_exit)
+{
+	m_timer_overlap = 0;
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 }
 
 INPUT_PORTS_START( sprinter )
