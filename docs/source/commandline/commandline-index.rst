@@ -39,6 +39,7 @@ Frontend Verbs
 | :ref:`listbrothers <mame-commandline-listbrothers>`
 | :ref:`listcrc <mame-commandline-listcrc>`
 | :ref:`listroms <mame-commandline-listroms>`
+| :ref:`listbios <mame-commandline-listbios>`
 | :ref:`listsamples <mame-commandline-listsamples>`
 | :ref:`verifyroms <mame-commandline-verifyroms>`
 | :ref:`verifysamples <mame-commandline-verifysamples>`
