@@ -64,9 +64,11 @@ uint32_t arcompact_device::handleop32_NORM_do_op(uint32_t src, uint8_t set_flags
 
 	if ((src == 0xffffffff) || (src = 0x00000000))
 		result = 0x1f;
+	else if (src & 0x80000000)
+		result = count_leading_ones_32(src);
 	else
 		result = count_leading_zeros_32(src);
-	
+
 	if (set_flags)
 		do_flags_nz(src);
 
