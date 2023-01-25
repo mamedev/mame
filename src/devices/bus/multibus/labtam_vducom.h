@@ -33,9 +33,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-private:
 	void cpu_mem(address_map &map);
-	void cpu_pio(address_map &map);
+	virtual void cpu_pio(address_map &map);
 
 	void bus_mem_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 bus_mem_r(offs_t offset, u16 mem_mask);
@@ -48,19 +47,16 @@ private:
 	u8 u15_r(offs_t offset) { return BIT(m_e4->read(), offset); }
 	void u7_w(offs_t offset, u8 data);
 
-	void palette_init(palette_device &palette);
-	MC6845_UPDATE_ROW(update_row);
+	u16 start() const { return m_start; }
+	u8 u7() const { return m_u7; }
 
+private:
 	required_device<i8086_cpu_device> m_cpu;
 	required_device<pic8259_device> m_pic;
 	required_device_array<am9513_device, 2> m_ctc;
 	required_device_array<z80sio_device, 2> m_com;
 	required_device_array<x2212_device, 2> m_nvram;
-	optional_device<mc6845_device> m_crtc;
-	optional_device<palette_device> m_palette;
-	optional_device<screen_device> m_screen;
 
-	required_shared_ptr_array<u16, 2> m_ram;
 	required_ioport m_e4;
 	memory_view m_mbus;
 
@@ -88,8 +84,19 @@ public:
 protected:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	virtual void cpu_pio(address_map &map) override;
 
 private:
+	void palette_init(palette_device &palette);
+	MC6845_UPDATE_ROW(update_row);
+
+	required_device<mc6845_device> m_crtc;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+
+	required_shared_ptr_array<u16, 2> m_ram;
 };
 
 DECLARE_DEVICE_TYPE(LABTAM_8086CPU, labtam_8086cpu_device)

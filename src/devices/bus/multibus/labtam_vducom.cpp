@@ -39,10 +39,6 @@ labtam_vducom_device_base::labtam_vducom_device_base(machine_config const &mconf
 	, m_ctc(*this, "ctc%u", 0U)
 	, m_com(*this, "com%u", 0U)
 	, m_nvram(*this, "nvram%u", 0U)
-	, m_crtc(*this, "crtc")
-	, m_palette(*this, "palette")
-	, m_screen(*this, "screen")
-	, m_ram(*this, "ram%u", 0U)
 	, m_e4(*this, "E4")
 	, m_mbus(*this, "mbus")
 	, m_installed(false)
@@ -56,6 +52,10 @@ labtam_8086cpu_device::labtam_8086cpu_device(machine_config const &mconfig, char
 
 labtam_vducom_device::labtam_vducom_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: labtam_vducom_device_base(mconfig, LABTAM_VDUCOM, tag, owner, clock)
+	, m_crtc(*this, "crtc")
+	, m_palette(*this, "palette")
+	, m_screen(*this, "screen")
+	, m_ram(*this, "ram%u", 0U)
 {
 }
 
@@ -63,27 +63,24 @@ ROM_START(labtam_8086cpu)
 	ROM_REGION16_LE(0x10000, "eprom", 0)
 
 	ROM_SYSTEM_BIOS(0, "v0", "v0")
-	ROMX_LOAD("slave_1__0_v0.u34", 0xc000, 0x2000, CRC(f5007dd0) SHA1(2362852d88bf32ce605ad394244dc6e21a6df5c6), ROM_SKIP(1) | ROM_BIOS(0))
-	ROMX_LOAD("slave_1__1_v0.u44", 0xc001, 0x2000, CRC(2de2e667) SHA1(c575d5d53f2fe99569af002c636754dedca09e3b), ROM_SKIP(1) | ROM_BIOS(0))
-
-	ROM_SYSTEM_BIOS(1, "v1", "v1")
-	ROMX_LOAD("slave_1__0_v1.u34", 0xc000, 0x2000, CRC(ba6311aa) SHA1(403fdb8834ec7e3ff7cae3e1ad93238a8f4d1ed6), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("slave_1__1_v1.u44", 0xc001, 0x2000, CRC(2de2e667) SHA1(c575d5d53f2fe99569af002c636754dedca09e3b), ROM_SKIP(1) | ROM_BIOS(1))
-
-	// FIXME: this version not recognized as 8086 card by z80sbc?
-	ROM_SYSTEM_BIOS(2, "v2", "v2")
-	ROMX_LOAD("slave_1__0_v2.u34", 0xc000, 0x2000, CRC(f56d4843) SHA1(53a1a9c6f0816511ff651efada09b39126866d37), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD("slave_1__1_v2.u44", 0xc001, 0x2000, CRC(a6fdbc6f) SHA1(3716142eed6bc68e1a85330c2dfc1d1148074087), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("slave_1__0.u34", 0xc000, 0x2000, CRC(f5007dd0) SHA1(2362852d88bf32ce605ad394244dc6e21a6df5c6), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("slave_1__1.u44", 0xc001, 0x2000, CRC(2de2e667) SHA1(c575d5d53f2fe99569af002c636754dedca09e3b), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
 ROM_START(labtam_vducom)
 	ROM_REGION16_LE(0x10000, "eprom", 0)
-	ROM_SYSTEM_BIOS(0, "k84", "Version K84")
 
-	ROMX_LOAD("vdu_com__k84.1-0.u26", 0x0000, 0x4000, CRC(ac27697e) SHA1(eeec9cff06181dffe95a37aefb2b3789a0959b4f), ROM_SKIP(1) | ROM_BIOS(0))
-	ROMX_LOAD("vdu_com__k84.1-1.u39", 0x0001, 0x4000, CRC(8b3e567d) SHA1(5ce821004155d02b87ed7b6d14989a9fffc38c6a), ROM_SKIP(1) | ROM_BIOS(0))
-	ROMX_LOAD("vdu_com__k84.1-2.u34", 0x8000, 0x4000, CRC(70a2c615) SHA1(67d265be3101dfe33fa705447e1394410e55f518), ROM_SKIP(1) | ROM_BIOS(0))
-	ROMX_LOAD("vdu_com__k84.1-3.u44", 0x8001, 0x4000, CRC(dcd7ce03) SHA1(727e5fa72d6088ddf9e8613656d713754d628538), ROM_SKIP(1) | ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(0, "k84", "Version K84 23/11/84") // date not certain
+	ROMX_LOAD("vdu_com__k84.1_0.u26", 0x0000, 0x4000, CRC(ac27697e) SHA1(eeec9cff06181dffe95a37aefb2b3789a0959b4f), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("vdu_com__k84.1_1.u39", 0x0001, 0x4000, CRC(8b3e567d) SHA1(5ce821004155d02b87ed7b6d14989a9fffc38c6a), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("vdu_com__k84.1_2.u34", 0x8000, 0x4000, CRC(70a2c615) SHA1(67d265be3101dfe33fa705447e1394410e55f518), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("vdu_com__k84.1_3.u44", 0x8001, 0x4000, CRC(dcd7ce03) SHA1(727e5fa72d6088ddf9e8613656d713754d628538), ROM_SKIP(1) | ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "l83", "Version L83 15/12/83") // date not certain
+	ROMX_LOAD("vdu_com__l83.3_0.u26", 0x0000, 0x4000, CRC(2ff53d1d) SHA1(034a89f25dd03e43bdeae710f55d948483624dbe), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("vdu_com__l83.3_1.u39", 0x0001, 0x4000, CRC(5c425046) SHA1(baad928d3189ed6112ed1849511ce230ddb66166), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("vdu_com__l83.3_2.u34", 0x8000, 0x4000, CRC(2ed84e20) SHA1(36fdf5e83b1e8f9b706a221930cec1aa2c587a96), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("vdu_com__l83.3_3.u44", 0x8001, 0x4000, CRC(c601c308) SHA1(61503b5109183a5814be3fcaa393fde8f5bd5359), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
 static INPUT_PORTS_START(labtam_vducom)
@@ -231,25 +228,27 @@ void labtam_vducom_device_base::device_add_mconfig(machine_config &config)
 
 	X2212(config, m_nvram[0]);
 	X2212(config, m_nvram[1]);
+}
 
-	if (type() == LABTAM_VDUCOM)
-	{
-		MC6845(config, m_crtc, 1'000'000);
-		m_crtc->set_show_border_area(false);
-		m_crtc->set_hpixels_per_column(16);
-		m_crtc->out_vsync_callback().set(m_pic, FUNC(pic8259_device::ir0_w));
+void labtam_vducom_device::device_add_mconfig(machine_config &config)
+{
+	labtam_vducom_device_base::device_add_mconfig(config);
 
-		m_crtc->set_update_row_callback(FUNC(labtam_vducom_device_base::update_row));
-		m_crtc->set_screen(m_screen);
-		PALETTE(config, m_palette, FUNC(labtam_vducom_device_base::palette_init), 4);
+	MC6845(config, m_crtc, 1'000'000);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_hpixels_per_column(16);
+	m_crtc->out_vsync_callback().set("pic", FUNC(pic8259_device::ir0_w));
 
-		SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-		m_screen->set_raw(1'000'000, 62 * 16, 2 * 16, 52 * 16, 78 * 4, 3 * 4, 75 * 4);
-		m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
+	m_crtc->set_update_row_callback(FUNC(labtam_vducom_device::update_row));
+	m_crtc->set_screen(m_screen);
+	PALETTE(config, m_palette, FUNC(labtam_vducom_device::palette_init), 4);
 
-		// gfxdecode is only to show the font data in the tile viewer
-		GFXDECODE(config, "gfx", m_palette, labtam_vducom);
-	}
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(1'000'000, 62 * 16, 2 * 16, 52 * 16, 78 * 4, 3 * 4, 75 * 4);
+	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
+
+	// gfxdecode is only to show the font data in the tile viewer
+	GFXDECODE(config, "gfx", m_palette, labtam_vducom);
 }
 
 void labtam_vducom_device_base::cpu_mem(address_map &map)
@@ -267,11 +266,6 @@ void labtam_vducom_device_base::cpu_pio(address_map &map)
 {
 	map(0x0000, 0x7fff).rw(FUNC(labtam_vducom_device_base::bus_pio_r), FUNC(labtam_vducom_device_base::bus_pio_w));
 
-	if (type() == LABTAM_VDUCOM)
-	{
-		map(0xe000, 0xe000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
-		map(0xe002, 0xe002).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	}
 	map(0xe400, 0xe403).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0xe600, 0xe607).rw(m_com[0], FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w)).umask16(0x00ff);
 	map(0xe800, 0xe807).rw(m_com[1], FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w)).umask16(0x00ff);
@@ -285,7 +279,15 @@ void labtam_vducom_device_base::cpu_pio(address_map &map)
 	map(0xfe00, 0xfe00).lw8([this](u8 data) { m_nvram[0]->store(1); m_nvram[1]->store(1); }, "store_array");
 }
 
-void labtam_vducom_device_base::palette_init(palette_device &palette)
+void labtam_vducom_device::cpu_pio(address_map &map)
+{
+	labtam_vducom_device_base::cpu_pio(map);
+
+	map(0xe000, 0xe000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0xe002, 0xe002).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+}
+
+void labtam_vducom_device::palette_init(palette_device &palette)
 {
 	// 0=black, 1=dim, 2=normal, 3=bold
 
@@ -297,10 +299,10 @@ void labtam_vducom_device_base::palette_init(palette_device &palette)
 
 // non-interlace: two planes 800x300, each 32k, 2bpp -> 4 levels (black, dim, normal, bold)
 // interlace: one plane 800x600, 64k, (black, normal)
-MC6845_UPDATE_ROW(labtam_vducom_device_base::update_row)
+MC6845_UPDATE_ROW(labtam_vducom_device::update_row)
 {
-	required_shared_ptr<u16> const ram = m_ram[BIT(m_u7, 2)];
-	offs_t const offset = (m_start >> 1) + ma * 4 + ra * 50;
+	required_shared_ptr<u16> const ram = m_ram[BIT(u7(), 2)];
+	offs_t const offset = (start() >> 1) + ma * 4 + ra * 50;
 
 	for (unsigned x = 0; x < x_count; x++)
 	{
@@ -310,7 +312,7 @@ MC6845_UPDATE_ROW(labtam_vducom_device_base::update_row)
 		for (unsigned b = 0; b < 16; b++)
 		{
 			unsigned c = BIT(data0, b) << 1;
-			if (m_u7 & U7_HALF)
+			if (u7() & U7_HALF)
 				c |= BIT(data1, b);
 
 			bitmap.pix(y, x * 16 + b) = m_palette->pen_color(c);
