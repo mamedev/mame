@@ -983,7 +983,7 @@ static INPUT_PORTS_START( rockn )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")   //$be0008.w
-	PORT_DIPNAME( 0x0001, 0x0001, "DIPSW 1-1") // All these used to be marked 'Cheat', can't think why.
+	PORT_DIPNAME( 0x0001, 0x0001, "test") // All these used to be marked 'Cheat', can't think why.
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, "DIPSW 1-2")
