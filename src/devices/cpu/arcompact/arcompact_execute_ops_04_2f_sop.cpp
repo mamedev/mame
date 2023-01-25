@@ -454,6 +454,7 @@ uint32_t arcompact_device::handleop32_ABS(uint32_t op)  { return arcompact_handl
 uint32_t arcompact_device::handleop32_NOT(uint32_t op)  { return arcompact_handle04_2f_helper(op, "NOT"); } // NOT
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Rotate Left Through Carry
 //                                 IIII I      SS SSSS               ss ssss
 // RLC<.f> b,c                     0010 0bbb 0010 1111   FBBB CCCC CC00 1011
 // RLC<.f> b,u6                    0010 0bbb 0110 1111   FBBB uuuu uu00 1011
@@ -464,7 +465,53 @@ uint32_t arcompact_device::handleop32_NOT(uint32_t op)  { return arcompact_handl
 // RLC<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 1011 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_RLC(uint32_t op)  { return arcompact_handle04_2f_helper(op, "RLC"); } // RLC
+uint32_t arcompact_device::handleop32_RLC_do_op(uint32_t src, uint8_t set_flags)
+{
+	uint32_t result = src << 1;
+	if (status32_check_c())
+		result |= 1;
+
+	if (set_flags)
+	{
+		do_flags_nz(result);
+		if (src & 0x80000000)
+			status32_set_c();
+		else
+			status32_clear_c();
+	}
+	return result;
+}
+
+uint32_t arcompact_device::handleop32_RLC_f_b_c(uint32_t op)
+{
+	uint8_t breg = common32_get_breg(op);
+	uint8_t creg = common32_get_creg(op);
+	int size = check_b_c_limm(breg, creg);
+	m_regs[breg] = handleop32_RLC_do_op(m_regs[creg], common32_get_F(op));
+	return m_pc + size;
+}
+
+uint32_t arcompact_device::handleop32_RLC_f_b_u6(uint32_t op)
+{
+	uint8_t breg = common32_get_breg(op);
+	int size = check_b_limm(breg);
+	m_regs[breg] = handleop32_RLC_do_op(common32_get_u6(op), common32_get_F(op));
+	return m_pc + size;
+}
+
+uint32_t arcompact_device::handleop32_RLC(uint32_t op)
+{
+	switch ((op & 0x00c00000) >> 22)
+	{
+		case 0x00: return handleop32_RLC_f_b_c(op);
+		case 0x01: return handleop32_RLC_f_b_u6(op);
+		case 0x02:
+		case 0x03:
+			arcompact_fatal("illegal handleop32_RLC_f_b_b_s12 (ares bits already used as opcode select, can't be used as s12) (LSR1)\n");
+			return 0;
+	}
+	return 0;
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                                 IIII I      SS SSSS               ss ssss

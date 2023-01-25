@@ -674,12 +674,16 @@ private:
 	uint32_t handleop32_EXTW_f_b_c(uint32_t op);
 	uint32_t handleop32_EXTW_f_b_u6(uint32_t op);
 
+	uint32_t handleop32_RLC_do_op(uint32_t src, uint8_t set_flags);
+	uint32_t handleop32_RLC(uint32_t op);
+	uint32_t handleop32_RLC_f_b_c(uint32_t op);
+	uint32_t handleop32_RLC_f_b_u6(uint32_t op);
+
 	uint32_t handleop32_RRC(uint32_t op);
 	uint32_t handleop32_SEXB(uint32_t op);
 	uint32_t handleop32_SEXW(uint32_t op);
 	uint32_t handleop32_ABS(uint32_t op);
 	uint32_t handleop32_NOT(uint32_t op);
-	uint32_t handleop32_RLC(uint32_t op);
 	uint32_t handleop32_EX(uint32_t op);
 
 	// arcompact_execute_ops_04_2f_3f_zop.cpp

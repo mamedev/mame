@@ -126,7 +126,7 @@ int arcompact_disassembler::handle_dasm32_NOT(std::ostream &stream, offs_t pc, u
 
 int arcompact_disassembler::handle_dasm32_RLC(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
-	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "RCL");
+	return handle04_2f_helper_dasm(stream, pc, op, opcodes, "RLC");
 }
 
 int arcompact_disassembler::handle_dasm32_EX(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
