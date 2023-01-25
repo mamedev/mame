@@ -198,25 +198,13 @@ private:
 	static void superio_config(device_t *device);
 	static void romdisk_config(device_t *device);
 
-//	void flash_cmd_w(offs_t offset, u8 data);
 };
-
-
-/*void xtom3d_state::flash_cmd_w(offs_t offset, u8 data)
-{
-	printf("%02x %02x\n", offset, data);
-}*/
 
 
 void xtom3d_state::xtom3d_map(address_map &map)
 {
 	map.unmap_value_high();
 }
-
-/*void xtom3d_state::xtom3d_io(address_map &map)
-{
-	map.unmap_value_high();
-}*/
 
 static void isa_internal_devices(device_slot_interface &device)
 {

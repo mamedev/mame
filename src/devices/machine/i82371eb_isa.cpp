@@ -6,6 +6,7 @@
 
 	TODO:
 	- i82371ab PIIX4 / i82371mb PIIX4M dispatches
+	- pinpoint actual differences wrt i82371sb (definitely EISA, then ...?)
 
 **************************************************************************************************/
 
@@ -25,7 +26,7 @@
 #define LOGMAP(...)    LOGMASKED(LOG_MAP,  __VA_ARGS__)
 #define LOGTODO(...)   LOGMASKED(LOG_TODO, __VA_ARGS__)
 
-DEFINE_DEVICE_TYPE(I82371EB_ISA, i82371eb_isa_device, "i82371eb_acpi", "Intel 82371EB PIIX4E PCI to ISA/EIO southbridge")
+DEFINE_DEVICE_TYPE(I82371EB_ISA, i82371eb_isa_device, "i82371eb_isa", "Intel 82371EB PIIX4E PCI to ISA/EIO southbridge")
 
 i82371eb_isa_device::i82371eb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i82371sb_isa_device(mconfig, I82371EB_ISA, tag, owner, clock)
