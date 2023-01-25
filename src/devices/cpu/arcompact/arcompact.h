@@ -900,8 +900,6 @@ private:
 	uint32_t arcompact_handle0f_0x_helper(uint16_t op, const char* optext, int nodst);
 	uint32_t arcompact_handle19_0x_helper(uint16_t op, const char* optext, int shift, int format);
 
-	uint32_t arcompact_handle18_0x_helper(uint16_t op, const char* optext, int st);
-
 	uint32_t handle_jump_to_addr(int delay, int link, uint32_t address, uint32_t next_addr);
 	uint32_t handle_jump_to_register(int delay, int link, uint32_t reg, uint32_t next_addr, int flag);
 
