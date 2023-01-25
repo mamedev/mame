@@ -145,7 +145,16 @@ uint32_t arcompact_device::handleop32_LSR_multiple_do_op(uint32_t src1, uint32_t
 {
 	uint32_t result = src1 >> (src2 & 0x1f);
 	if (set_flags)
-		arcompact_fatal("handleop32_LSR_multiple (LSR) (F set)\n"); // not yet supported
+	{
+		do_flags_nz(result);
+		if (src2 != 0)
+		{
+			if (src1 & (1 << (src2-1)))
+				status32_set_c();
+			else
+				status32_clear_c();
+		}
+	}
 	return result;
 }
 

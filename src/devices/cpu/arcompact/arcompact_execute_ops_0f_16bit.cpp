@@ -57,7 +57,14 @@ uint32_t arcompact_device::handleop_OR_S_b_b_c(uint16_t op)
 // BIC_S b,b,c                     0111 1bbb ccc0 0110
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_BIC_S_b_b_c(uint16_t op)  { return arcompact_handle0f_0x_helper(op, "BIC_S",0);  }
+uint32_t arcompact_device::handleop_BIC_S_b_b_c(uint16_t op)
+{
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint8_t creg = expand_reg(common16_get_creg(op));
+	uint32_t result = m_regs[breg] &~ m_regs[creg];
+	m_regs[breg] = result;
+	return m_pc + 2;
+}
 
 // #######################################################################################################################
 //                                 IIII I       S SSSS

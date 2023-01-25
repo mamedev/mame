@@ -63,11 +63,38 @@ uint32_t arcompact_device::handleop32_B_D_s25(uint32_t op)
 	return m_pc + size;
 }
 
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// BL<.cc><.d> s21                 0000 1sss ssss ss00   SSSS SSSS SSNQ QQQQ
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 uint32_t arcompact_device::handleop32_BL_cc_d_s21(uint32_t op)
 {
 	int size = 4;
 	// Branch and Link Conditionally
-	arcompact_log("unimplemented BLcc %08x", op);
+	uint8_t condition = common32_get_condition(op);
+
+	if (!check_condition(condition))
+		return m_pc + size;
+
+	int32_t address =   (op & 0x07fc0000) >> 17;
+	address |=        ((op & 0x0000ffc0) >> 6) << 10;
+
+	if (address & 0x40000) address = -0x40000 + (address&0x3ffff);
+	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
+
+	uint32_t realaddress = (m_pc&0xfffffffc) + (address * 2);
+
+	if (n)
+	{
+		m_delayactive = 1;
+		m_delayjump = realaddress;
+		m_delaylinks = 1;
+	}
+	else
+	{
+		m_regs[REG_BLINK] = m_pc + size;
+		return realaddress;
+	}
 	return m_pc + size;
 }
 

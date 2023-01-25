@@ -560,12 +560,12 @@ private:
 	uint32_t handleop32_RCMP_cc(uint32_t op);
 	uint32_t handleop32_RCMP(uint32_t op);
 
+	uint32_t handleop32_BCLR_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_BCLR_f_a_b_c(uint32_t op);
 	uint32_t handleop32_BCLR_f_a_b_u6(uint32_t op);
 	uint32_t handleop32_BCLR_f_b_b_s12(uint32_t op);
 	uint32_t handleop32_BCLR_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_BCLR_cc_f_b_b_u6(uint32_t op);
-	uint32_t handleop32_BCLR_cc(uint32_t op);
 	uint32_t handleop32_BCLR(uint32_t op);
 
 	uint32_t handleop32_BTST_f_a_b_c(uint32_t op);
@@ -742,6 +742,11 @@ private:
 	uint32_t handleop32_MULU64_cc_f_b_b_u6(uint32_t op);
 	uint32_t handleop32_MULU64(uint32_t op);
 
+	// arcompact_execute_ops_05_2f_sop.cpp
+	uint32_t handleop32_NORM_do_op(uint32_t src, uint8_t set_flags);
+	uint32_t handleop32_NORM(uint32_t op);
+	uint32_t handleop32_NORM_f_b_c(uint32_t op);
+	uint32_t handleop32_NORM_f_b_u6(uint32_t op);
 
 
 	uint32_t handleop32_ROR_multiple(uint32_t op);
@@ -753,7 +758,6 @@ private:
 	uint32_t handleop32_ADDSDW(uint32_t op);
 	uint32_t handleop32_SUBSDW(uint32_t op);
 	uint32_t handleop32_SWAP(uint32_t op);
-	uint32_t handleop32_NORM(uint32_t op);
 	uint32_t handleop32_SAT16(uint32_t op);
 	uint32_t handleop32_RND16(uint32_t op);
 	uint32_t handleop32_ABSSW(uint32_t op);
