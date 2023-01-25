@@ -3,7 +3,6 @@
 
 #include "emu.h"
 #include "arcompact.h"
-#include "arcompactdasm.h"
 
 // #######################################################################################################################
 //                                 IIII I    SSS
@@ -104,5 +103,9 @@ uint32_t arcompact_device::handleop_BMSK_S_b_b_u5(uint16_t op)
 
 uint32_t arcompact_device::handleop_BTST_S_b_u5(uint16_t op)
 {
-	arcompact_log("unimplemented BTST_S %04x (l7_0x group)", op);
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint32_t u = common16_get_u5(op);
+	uint32_t result = m_regs[breg] & (1 << u);
+	do_flags_nz(result);
+	return m_pc + 2;
 }

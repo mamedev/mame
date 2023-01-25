@@ -98,29 +98,6 @@ uint32_t arcompact_device::handleop32_BL_d_s25(uint32_t op)
 	return m_pc + size;
 }
 
-uint32_t arcompact_device::arcompact_01_01_00_helper(uint32_t op, const char* optext)
-{
-	int size;
-
-	// Branch on Compare / Bit Test - Register-Register
-
-	uint8_t creg = common32_get_creg(op);
-	uint8_t breg = common32_get_breg(op);
-
-	if ((breg != LIMM_REG) && (creg != LIMM_REG))
-	{
-	}
-	else
-	{
-		//uint32_t limm;
-		//get_limm_32bit_opcode();
-		size = 8;
-	}
-
-	arcompact_log("unimplemented %s %08x (reg-reg)", optext, op);
-	return m_pc + size;
-}
-
 // register - register cases
 
 #define BR_REGREG_SETUP \
@@ -129,10 +106,9 @@ uint32_t arcompact_device::arcompact_01_01_00_helper(uint32_t op, const char* op
 	uint8_t creg = common32_get_creg(op); \
 	uint8_t breg = common32_get_breg(op); \
 	int n = (op & 0x00000020) >> 5; \
-	uint32_t b,c; \
 	int size = check_b_c_limm(breg, creg); \
-	b = m_regs[breg]; \
-	c = m_regs[creg];
+	uint32_t b = m_regs[breg]; \
+	uint32_t c = m_regs[creg];
 
 #define BR_TAKEJUMP \
 	/* take jump */ \
@@ -207,17 +183,26 @@ uint32_t arcompact_device::handleop32_BRHS_reg_reg(uint32_t op) // register - re
 	{
 		BR_TAKEJUMP
 	}
-
 	return m_pc + size;
 }
 
-uint32_t arcompact_device::handleop32_BBIT0_reg_reg(uint32_t op)  { return arcompact_01_01_00_helper( op, "BBIT0");}
-uint32_t arcompact_device::handleop32_BBIT1_reg_reg(uint32_t op)  { return arcompact_01_01_00_helper( op, "BBIT1");}
-
-uint32_t arcompact_device::arcompact_01_01_01_helper(uint32_t op, const char* optext)
+uint32_t arcompact_device::handleop32_BBIT0_reg_reg(uint32_t op)
 {
-	int size = 4;
-	arcompact_log("unimplemented %s %08x (reg-imm)", optext, op);
+	BR_REGREG_SETUP
+	if (!(b & (1 << (c & 0x1f)))) // Branch if bit is 0
+	{
+		BR_TAKEJUMP
+	}
+	return m_pc + size;
+}
+
+uint32_t arcompact_device::handleop32_BBIT1_reg_reg(uint32_t op)
+{
+	BR_REGREG_SETUP
+	if (b & (1 << (c & 0x1f))) // Branch if bit is 1
+	{
+		BR_TAKEJUMP
+	}
 	return m_pc + size;
 }
 
@@ -226,10 +211,9 @@ uint32_t arcompact_device::arcompact_01_01_01_helper(uint32_t op, const char* op
 	uint32_t u = common32_get_u6(op); \
 	uint8_t breg = common32_get_breg(op); \
 	int n = (op & 0x00000020) >> 5; \
-	uint32_t b,c; \
 	int size = check_b_limm(breg); \
-	b = m_regs[breg]; \
-	c = u;
+	uint32_t b = m_regs[breg]; \
+	uint32_t c = u;
 
 // register -immediate cases
 uint32_t arcompact_device::handleop32_BREQ_reg_imm(uint32_t op) // BREQ reg-imm
@@ -293,5 +277,22 @@ uint32_t arcompact_device::handleop32_BRHS_reg_imm(uint32_t op) // register - im
 	return m_pc + size;
 }
 
-uint32_t arcompact_device::handleop32_BBIT0_reg_imm(uint32_t op)  { return arcompact_01_01_01_helper(op, "BBIT0"); }
-uint32_t arcompact_device::handleop32_BBIT1_reg_imm(uint32_t op)  { return arcompact_01_01_01_helper(op, "BBIT1"); }
+uint32_t arcompact_device::handleop32_BBIT0_reg_imm(uint32_t op)
+{
+	BR_REGIMM_SETUP
+	if (!(b & (1 << (c & 0x1f)))) // Branch if bit is 0
+	{
+		BR_TAKEJUMP
+	}
+	return m_pc + size;
+}
+
+uint32_t arcompact_device::handleop32_BBIT1_reg_imm(uint32_t op)
+{
+	BR_REGIMM_SETUP
+	if (b & (1 << (c & 0x1f))) // Branch if bit is 1
+	{
+		BR_TAKEJUMP
+	}
+	return m_pc + size;
+}

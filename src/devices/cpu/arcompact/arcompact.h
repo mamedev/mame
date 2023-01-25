@@ -891,8 +891,6 @@ private:
 	*                                                                                                                                   *
 	************************************************************************************************************************************/
 
-	uint32_t arcompact_01_01_00_helper(uint32_t op, const char* optext);
-	uint32_t arcompact_01_01_01_helper(uint32_t op, const char* optext);
 	uint32_t arcompact_handle05_helper(uint32_t op, const char* optext, int ignore_dst, int b_reserved);
 	uint32_t arcompact_handle04_2f_helper(uint32_t op, const char* optext);
 	uint32_t arcompact_handle04_3x_helper(uint32_t op, int dsize, int extend);
