@@ -3,7 +3,6 @@
 
 #include "emu.h"
 #include "arcompact.h"
-#include "arcompactdasm.h"
 
 
 uint32_t arcompact_device::arcompact_handle19_0x_helper(uint16_t op, const char* optext, int shift, int format)
@@ -17,7 +16,10 @@ uint32_t arcompact_device::arcompact_handle19_0x_helper(uint16_t op, const char*
 // LD_S r0,[gp,s11]                1100 100s ssss ssss
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_LD_S_r0_gp_s11(uint16_t op)  { return arcompact_handle19_0x_helper(op, "LD_S", 2, 0); }
+uint32_t arcompact_device::handleop_LD_S_r0_gp_s11(uint16_t op)
+{
+	return arcompact_handle19_0x_helper(op, "LD_S", 2, 0);
+}
 
 // #######################################################################################################################
 //                                 IIII ISS
@@ -34,12 +36,18 @@ uint32_t arcompact_device::handleop_LDB_S_r0_gp_s9(uint16_t op)
 // LDW_S r0,[gp,s10]               1100 110s ssss ssss
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_LDW_S_r0_gp_s10(uint16_t op)  { return arcompact_handle19_0x_helper(op, "LDW_S", 1, 0);  }
+uint32_t arcompact_device::handleop_LDW_S_r0_gp_s10(uint16_t op)
+{
+	return arcompact_handle19_0x_helper(op, "LDW_S", 1, 0);
+}
 
 // #######################################################################################################################
 //                                 IIII ISS
 // ADD_S r0,gp,s11                 1100 111s ssss ssss
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_ADD_S_r0_gp_s11(uint16_t op)  { return arcompact_handle19_0x_helper(op, "ADD_S", 2, 1); }
+uint32_t arcompact_device::handleop_ADD_S_r0_gp_s11(uint16_t op)
+{
+	return arcompact_handle19_0x_helper(op, "ADD_S", 2, 1);
+}
 

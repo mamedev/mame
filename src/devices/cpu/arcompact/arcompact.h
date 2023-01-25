@@ -656,13 +656,10 @@ private:
 	uint32_t handleop32_LSR_single_f_b_c(uint32_t op);
 	uint32_t handleop32_LSR_single_f_b_u6(uint32_t op);
 
-	uint32_t handleop32_ROR_single_cc(uint32_t op);
-	uint32_t handleop32_ROR_single(uint32_t op);
-	uint32_t handleop32_ROR_single_f_a_b_c(uint32_t op);
-	uint32_t handleop32_ROR_single_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_ROR_single_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_ROR_single_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_ROR_single_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_ROR_do_op(uint32_t src, uint8_t set_flags);
+	uint32_t handleop32_ROR(uint32_t op);
+	uint32_t handleop32_ROR_f_b_c(uint32_t op);
+	uint32_t handleop32_ROR_f_b_u6(uint32_t op);
 
 	uint32_t handleop32_EXTB_do_op(uint32_t src, uint8_t set_flags);
 	uint32_t handleop32_EXTB(uint32_t op);

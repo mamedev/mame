@@ -48,16 +48,8 @@ uint32_t arcompact_device::handleop32_ASL_single_do_op(uint32_t src, uint8_t set
 	if (set_flags)
 	{
 		do_flags_nz(result);
-		do_flags_overflow(result, src, src);
-
-		if (result < src)
-		{
-			status32_set_c();
-		}
-		else
-		{
-			status32_clear_c();
-		}
+		if ((src & 0x80000000) != (result & 0x80000000)) { status32_set_v(); } else { status32_clear_v(); }
+		if (src & 0x80000000) { status32_set_c(); } else { status32_clear_c(); }
 	}
 	return result;
 }
@@ -171,114 +163,49 @@ uint32_t arcompact_device::handleop32_LSR_single(uint32_t op)
 // ROR<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 0011 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+uint32_t arcompact_device::handleop32_ROR_do_op(uint32_t src, uint8_t set_flags)
+{
+	uint32_t result = src >> 1;
+	if (src & 1)
+		result |= 0x80000000;
 
+	if (set_flags)
+	{
+		do_flags_nz(result);
+		if (src & 0x00000001) { status32_set_c(); } else { status32_clear_c(); }
+	}
 
-uint32_t arcompact_device::handleop32_ROR_single_f_a_b_c(uint32_t op)
+	return result;
+}
+
+uint32_t arcompact_device::handleop32_ROR_f_b_c(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
-	uint8_t F = common32_get_F(op);
 	uint8_t creg = common32_get_creg(op);
-	 //uint8_t areg = common32_get_areg(op); // areg bits already used as opcode select
-
-	uint32_t c;
-
-	int size = check_c_limm(creg);
-
-	c = m_regs[creg];
-	/* todo: is the limm, limm syntax valid? (it's pointless.) */
-
-	int shift = 1; uint32_t mask = (1 << (shift)) - 1; mask <<= (32-shift); uint32_t result = ((c >> shift) & ~mask) | ((c << (32-shift)) & mask);
-	m_regs[breg] = result;
-
-	if (F)
-	{
-		if (result & 0x80000000) { status32_set_n(); }
-		else { status32_clear_n(); }
-		if (result == 0x00000000) { status32_set_z(); }
-		else { status32_clear_z(); }
-		if (c == 0x00000001) { status32_set_c(); }
-		else { status32_clear_c(); }
-	}
+	int size = check_b_c_limm(breg, creg);
+	m_regs[breg] = handleop32_ROR_do_op(m_regs[creg], common32_get_F(op));
 	return m_pc + size;
 }
 
-
-uint32_t arcompact_device::handleop32_ROR_single_f_a_b_u6(uint32_t op)
+uint32_t arcompact_device::handleop32_ROR_f_b_u6(uint32_t op)
 {
-	int size = 4;
-
 	uint8_t breg = common32_get_breg(op);
-	uint8_t F = common32_get_F(op);
-	uint32_t u = common32_get_u6(op);
-	 //uint8_t areg = common32_get_areg(op); // areg bits already used as opcode select
+	int size = check_b_limm(breg);
+	m_regs[breg] = handleop32_ROR_do_op(common32_get_u6(op), common32_get_F(op));
+	return m_pc + size;
+}
 
-	uint32_t c;
-
-	c = u;
-
-
-	int shift = 1; uint32_t mask = (1 << (shift)) - 1; mask <<= (32-shift); uint32_t result = ((c >> shift) & ~mask) | ((c << (32-shift)) & mask);
-	m_regs[breg] = result;
-
-	if (F)
+uint32_t arcompact_device::handleop32_ROR(uint32_t op)
+{
+	switch ((op & 0x00c00000) >> 22)
 	{
-		if (result & 0x80000000) { status32_set_n(); }
-		else { status32_clear_n(); }
-		if (result == 0x00000000) { status32_set_z(); }
-		else { status32_clear_z(); }
-		if (c == 0x00000001) { status32_set_c(); }
-		else { status32_clear_c(); }
+		case 0x00: return handleop32_ROR_f_b_c(op);
+		case 0x01: return handleop32_ROR_f_b_u6(op);
+		case 0x02:
+		case 0x03:
+			arcompact_fatal("illegal handleop32_ROR_f_b_b_s12 (ares bits already used as opcode select, can't be used as s12) (LSR1)\n");
+			return 0;
 	}
-	return m_pc + size;
-}
-
-
-uint32_t arcompact_device::handleop32_ROR_single_f_b_b_s12(uint32_t op)
-{
-	int size = 4;
-	arcompact_fatal("illegal handleop32_ROR_single_f_b_b_s12 (ares bits already used as opcode select, can't be used as s12) (ROR)\n");
-	return m_pc + size;
-}
-
-
-uint32_t arcompact_device::handleop32_ROR_single_cc_f_b_b_c(uint32_t op)
-{
-	int size = 4;
-	arcompact_fatal("illegal handleop32_ROR_single_cc_f_b_b_c (ares bits already used as opcode select, can't be used as Q condition) (ROR)\n");
-	return m_pc + size;
-}
-uint32_t arcompact_device::handleop32_ROR_single_cc_f_b_b_u6(uint32_t op)
-{
-	int size = 4;
-	arcompact_fatal("illegal handleop32_ROR_single_cc_f_b_b_u6 (ares bits already used as opcode select, can't be used as Q condition) (ROR)\n");
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_ROR_single_cc(uint32_t op)
-{
-	int M = (op & 0x00000020) >> 5;
-
-	switch (M)
-	{
-		case 0x00: return handleop32_ROR_single_cc_f_b_b_c(op);
-		case 0x01: return handleop32_ROR_single_cc_f_b_b_u6(op);
-	}
-
-	return 0;
-}
-
-uint32_t arcompact_device::handleop32_ROR_single(uint32_t op)
-{
-	int p = (op & 0x00c00000) >> 22;
-
-	switch (p)
-	{
-		case 0x00: return handleop32_ROR_single_f_a_b_c(op);
-		case 0x01: return handleop32_ROR_single_f_a_b_u6(op);
-		case 0x02: return handleop32_ROR_single_f_b_b_s12(op);
-		case 0x03: return handleop32_ROR_single_cc(op);
-	}
-
 	return 0;
 }
 
@@ -514,6 +441,7 @@ uint32_t arcompact_device::handleop32_RLC(uint32_t op)
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Atomic Exchange 
 //                                 IIII I      SS SSSS               ss ssss
 // EX<.di> b,[c]                   0010 0bbb 0010 1111   DBBB CCCC CC00 1100
 // EX<.di> b,[u6]                  0010 0bbb 0110 1111   DBBB uuuu uu00 1100

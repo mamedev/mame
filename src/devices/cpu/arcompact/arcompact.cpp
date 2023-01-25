@@ -1168,7 +1168,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // ROR<.f> 0,u6                    0010 0110 0110 1111   F111 uuuu uu00 0011
 // ROR<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 0011 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								return handleop32_ROR_single(op);  // ROR
+								return handleop32_ROR(op);  // ROR
 							}
 							case 0x04:
 							{

@@ -3,7 +3,6 @@
 
 #include "emu.h"
 #include "arcompact.h"
-#include "arcompactdasm.h"
 
 uint32_t arcompact_device::arcompact_handle05_2f_0x_helper(uint32_t op, const char* optext)
 {
