@@ -396,6 +396,25 @@ overwritten.
             000-lo.lo                            131072 CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a)
             sfix.sfix                            131072 CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3)
 
+.. _mame-commandline-listbios:
+
+**-listbios** [*<pattern>*...]
+
+    Example:
+        .. code-block:: bash
+
+            mame -listbios 3do
+            4 BIOSes available for driver "3do".
+            Name:             Description:
+            panafz10          "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer"
+            goldstar          "Goldstar 3DO Interactive Multiplayer v1.01m"
+            panafz1           "Panasonic FZ-1 R.E.A.L. 3DO Interactive Multiplayer"
+            sanyotry          "Sanyo TRY 3DO Interactive Multiplayer"
+
+    Displays a list of alternate ROM BIOSes for supported systems/devices that
+    match the specified pattern(s). If no patterns are specified, the results
+    will include *all* supported systems and devices.
+
 .. _mame-commandline-listsamples:
 
 **-listsamples** [<*pattern*>]
@@ -3800,8 +3819,8 @@ Core Misc Options
 **-bios** *<biosname>*
 
     Specifies the specific BIOS to use with the current system, for systems that
-    make use of a BIOS. The **-listxml** output will list all of the possible
-    BIOS names for a system.
+    make use of a BIOS. The **-listbios** output will list all of the possible
+    BIOS names for a system, as does the **-listxml** output.
 
     The default is ``default``.
 
