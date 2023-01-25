@@ -23,26 +23,42 @@ uint32_t arcompact_device::handleop32_SLEEP(uint32_t op)
 // SWI/TRAP0                       0010 0010 0110 1111   0000 0000 0011 1111
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_SWI(uint32_t op)  { arcompact_log("SWI / TRAP0 (%08x)", op); return m_pc + 4;}
+uint32_t arcompact_device::handleop32_SWI(uint32_t op)
+{
+	arcompact_log("SWI / TRAP0 (%08x)", op);
+	return m_pc + 4;
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                                 IIII I$$$   SS SSSS    $$$        ss ssss
 // SYNC                            0010 0011 0110 1111   0000 0000 0011 1111
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_SYNC(uint32_t op)  { arcompact_log("SYNC (%08x)", op); return m_pc + 4;}
+uint32_t arcompact_device::handleop32_SYNC(uint32_t op)
+{
+	arcompact_log("SYNC (%08x)", op);
+	return m_pc + 4;
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                                 IIII I$$$   SS SSSS    $$$        ss ssss
 // RTIE                            0010 0100 0110 1111   0000 0000 0011 1111
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_RTIE(uint32_t op)  { arcompact_log("RTIE (%08x)", op); return m_pc + 4;}
+uint32_t arcompact_device::handleop32_RTIE(uint32_t op)
+{
+	arcompact_log("RTIE (%08x)", op);
+	return m_pc + 4;
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                                 IIII I$$$   SS SSSS    $$$        ss ssss
 // BRK                             0010 0101 0110 1111   0000 0000 0011 1111
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_BRK(uint32_t op)  { arcompact_log("BRK (%08x)", op); return m_pc + 4;}
+uint32_t arcompact_device::handleop32_BRK(uint32_t op)
+{
+	arcompact_log("BRK (%08x)", op);
+	return m_pc + 4;
+}
 

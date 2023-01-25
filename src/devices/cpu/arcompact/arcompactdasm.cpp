@@ -2285,9 +2285,9 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 					{
 // #######################################################################################################################
 //                                 IIII I       S S
-// MOV_S hob                       0111 0bbb hhh1 1HHH
+// MOV_S h,b                       0111 0bbb hhh1 1HHH
 // #######################################################################################################################
-						size = handle_dasm_MOV_S_hob(stream, pc, op, opcodes); break; // MOV_S hob
+						size = handle_dasm_MOV_S_h_b(stream, pc, op, opcodes); break; // MOV_S h,b
 					}
 				}
 				break;

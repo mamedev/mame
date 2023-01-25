@@ -159,7 +159,10 @@ uint32_t arcompact_device::handleop_EXTW_S_b_c(uint16_t op)
 // ABS_S b,c                       0111 1bbb ccc1 0001
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_ABS_S_b_c(uint16_t op)  { return arcompact_handle0f_0x_helper(op, "ABS_S",0);  }
+uint32_t arcompact_device::handleop_ABS_S_b_c(uint16_t op)
+{
+	return arcompact_handle0f_0x_helper(op, "ABS_S",0);
+}
 
 // #######################################################################################################################
 //                                 IIII I       S SSSS

@@ -105,7 +105,7 @@ int arcompact_disassembler::handle_dasm_CMP_S_b_h_or_limm(std::ostream &stream, 
 	return handle0e_0x_helper_dasm(stream, pc, op, opcodes, "CMP_S", 0);
 }
 
-int arcompact_disassembler::handle_dasm_MOV_S_hob(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm_MOV_S_h_b(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	return handle0e_0x_helper_dasm(stream, pc, op, opcodes, "MOV_S", 1);
 }

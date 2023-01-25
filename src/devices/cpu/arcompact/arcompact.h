@@ -791,7 +791,7 @@ private:
 	uint32_t handleop_ADD_S_b_b_h_or_limm(uint16_t op);
 	uint32_t handleop_MOV_S_b_h_or_limm(uint16_t op);
 	uint32_t handleop_CMP_S_b_h_or_limm(uint16_t op);
-	uint32_t handleop_MOV_S_hob(uint16_t op);
+	uint32_t handleop_MOV_S_h_b(uint16_t op);
 	uint32_t handleop_J_S_b(uint16_t op);
 	uint32_t handleop_J_S_D_b(uint16_t op);
 	uint32_t handleop_JL_S_b(uint16_t op);
