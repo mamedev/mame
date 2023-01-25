@@ -36,7 +36,6 @@ https://archive.org/details/7200-0001-vector-4-technical-information-sep-82
 https://www.bitsavers.org/pdf/vectorGraphic/vector_4/7100-0001_Vector_4_Users_Manual_Feb83.pdf
 
 TODO:
-- keyboard mcu
 - S-100 interrupts and ready
 - parallel port
 - WAIT CPU states
@@ -47,6 +46,7 @@ TODO:
 #include "emu.h"
 
 #include "sbcvideo.h"
+#include "v4_kbd.h"
 
 #include "bus/rs232/rs232.h"
 #include "bus/s100/s100.h"
@@ -149,15 +149,6 @@ static void vector4_s100_devices(device_slot_interface &device)
 static INPUT_PORTS_START( vector4 )
 INPUT_PORTS_END
 
-// 7200-0001 page 102 (II 5-11)
-DEVICE_INPUT_DEFAULTS_START(keyboard)
-	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD",    0x00ff, RS232_BAUD_300)
-	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD",    0x00ff, RS232_BAUD_300)
-	DEVICE_INPUT_DEFAULTS("RS232_DATABITS",  0x00ff, RS232_DATABITS_8)
-	DEVICE_INPUT_DEFAULTS("RS232_PARITY",    0x00ff, RS232_PARITY_NONE)
-	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS",  0x00ff, RS232_STOPBITS_2)
-DEVICE_INPUT_DEFAULTS_END
-
 void vector4_state::vector4(machine_config &config)
 {
 	const XTAL _32m(32'640'000);
@@ -202,12 +193,13 @@ void vector4_state::vector4(machine_config &config)
 	// 7200-0001 page 210 D13, D1
 	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", _2mclk/26/16));
 	i8251_device &uart0(I8251(config, "uart0", 0));
-	rs232_port_device &rs232keyboard(RS232_PORT(config, "rs232keyboard", default_rs232_devices, "keyboard"));
+	vector4_keyboard_device &v4kbd(VECTOR4_KEYBOARD(config, "rs232keyboard", 0));
 	keyboard_clock.signal_handler().set(uart0, FUNC(i8251_device::write_txc));
 	keyboard_clock.signal_handler().append(uart0, FUNC(i8251_device::write_rxc));
-	uart0.txd_handler().set(rs232keyboard, FUNC(rs232_port_device::write_txd));
-	rs232keyboard.rxd_handler().set(uart0, FUNC(i8251_device::write_rxd));
-	rs232keyboard.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
+	uart0.txd_handler().set(v4kbd, FUNC(vector4_keyboard_device::write_rxd));
+	v4kbd.txd_handler().set(uart0, FUNC(i8251_device::write_rxd));
+	// Missing from schematic, but jumper wire present on the board.
+	uart0.write_cts(0);
 
 	// D3
 	i8251_device &uart1(I8251(config, "uart1", 0));
