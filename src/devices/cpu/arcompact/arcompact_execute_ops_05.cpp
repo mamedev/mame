@@ -243,6 +243,8 @@ uint32_t arcompact_device::handleop32_ASR_multiple_do_op(uint32_t src1, uint32_t
 	if (src1 & 0x80000000)
 		result |= 0xffffffff << (31 - (src2 & 0x1f));
 
+	printf("src1 %08x src2 %08x result %08x\n", src1, src2, result);
+
 	if (set_flags)
 		arcompact_fatal("handleop32_ASR_multiple (ASR) (F set)\n"); // not yet supported
 	return result;
