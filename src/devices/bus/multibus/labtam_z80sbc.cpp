@@ -257,13 +257,13 @@ void labtam_z80sbc_device::device_reset()
 		u32 const ram1_select = m_e15[3]->read();
 
 		m_bus->space(AS_PROGRAM).install_ram(ram0_select, ram0_select | 0xffff, m_ram0.get());
-		m_bus->space(AS_PROGRAM).install_ram(ram1_select, ram1_select | 0xffff, m_ram0.get());
+		m_bus->space(AS_PROGRAM).install_ram(ram1_select, ram1_select | 0xffff, m_ram1.get());
 
 		u16 const pio_select = m_e15[2]->read() | m_e15[1]->read() | m_e15[0]->read();
 
 		m_bus->space(AS_IO).install_write_handler(pio_select | 0, pio_select | 0, write8smo_delegate(*this, FUNC(labtam_z80sbc_device::fdcclr_w)));
 		m_bus->space(AS_IO).install_write_handler(pio_select | 2, pio_select | 2, write8smo_delegate(*this, FUNC(labtam_z80sbc_device::netclr_w)));
-		m_bus->space(AS_IO).install_write_handler(pio_select | 4, pio_select | 4, write8smo_delegate(*this, FUNC(labtam_z80sbc_device::fdcattn_w)));
+		m_bus->space(AS_IO).install_write_handler(pio_select | 4, pio_select | 4, write8smo_delegate(*this, FUNC(labtam_z80sbc_device::fdcatn_w)));
 		m_bus->space(AS_IO).install_read_handler(pio_select | 8, pio_select | 8, read8smo_delegate(*this, FUNC(labtam_z80sbc_device::fdcstatus_r)));
 
 		m_installed = true;
@@ -281,6 +281,7 @@ static void z80sbc_floppies(device_slot_interface &device)
 {
 	device.option_add("dssd5", FLOPPY_525_SD);
 	device.option_add("dsdd5", FLOPPY_525_DD);
+	device.option_add("dshd5", FLOPPY_525_HD);
 	device.option_add("dssd8", FLOPPY_8_DSSD);
 	device.option_add("dsdd8", FLOPPY_8_DSDD);
 }
@@ -338,7 +339,7 @@ void labtam_z80sbc_device::device_add_mconfig(machine_config &config)
 	m_uic->out_int_callback().set(m_int, FUNC(input_merger_any_high_device::in_w<3>));
 
 	WD2793(config, m_fdc, 2'000'000);
-	m_fdc->intrq_wr_callback().set(FUNC(labtam_z80sbc_device::fdcint_w));
+	m_fdc->intrq_wr_callback().set(m_uic, FUNC(am9519_device::ireq2_w));
 	m_fdc->drq_wr_callback().set(m_dma[0], FUNC(z80dma_device::rdy_w));
 
 	// WD1002 irq -> Am9519 ireq3
@@ -368,8 +369,8 @@ void labtam_z80sbc_device::cpu_mem(address_map &map)
 
 void labtam_z80sbc_device::cpu_pio(address_map &map)
 {
-	map(0x0000, 0x0000).lw8([this](u8 data) { LOG("fdcset 0x%02x (%s)\n", data, machine().describe_context()); }, "fdcset");
-	//map(0x0008, 0x0008); // TODO: serset: set sio interrupt
+	map(0x0000, 0x0000).mirror(0xff00).lw8([this](u8 data) { LOG("fdcset 0x%02x (%s)\n", data, machine().describe_context()); m_fdcstatus |= 0x01; int_w<3>(0); }, "fdcset");
+	map(0x0008, 0x0008).mirror(0xff00).lw8([this](u8 data) { LOG("serset 0x%02x (%s)\n", data, machine().describe_context()); m_fdcstatus |= 0x02; }, "serset");
 
 	map(0x0010, 0x0010).select(0xff00).lw8([this](offs_t offset, u8 data) { m_map_lo[offset >> 8] = data; }, "mapwr0");
 	map(0x0018, 0x0018).select(0xff00).lw8([this](offs_t offset, u8 data) { m_map_hi[offset >> 8] = data & 0xf0; }, "mapwr1");
@@ -520,17 +521,6 @@ void labtam_z80sbc_device::mapnum_w(u8 data)
 	m_map_num = data & 0x07;
 }
 
-void labtam_z80sbc_device::fdcint_w(int state)
-{
-	if (state)
-		m_fdcstatus |= 1U << 0;
-	else
-		m_fdcstatus &= ~(1U << 0);
-
-	m_uic->ireq2_w(state);
-	int_w<3>(state);
-}
-
 void labtam_z80sbc_device::drive_w(offs_t offset, u8 data)
 {
 	switch (offset)
@@ -574,23 +564,27 @@ void labtam_z80sbc_device::drive_w(offs_t offset, u8 data)
 
 void labtam_z80sbc_device::fdcclr_w(u8 data)
 {
-	m_uic->ireq4_w(0);
+	LOG("fdcclr 0x%02x (%s)\n", data, machine().describe_context());
+	m_fdcstatus &= ~0x01;
+	int_w<3>(1);
 }
 
 void labtam_z80sbc_device::netclr_w(u8 data)
 {
-	LOG("netclr_w 0x%02x (%s)\n", data, machine().describe_context());
+	LOG("netclr 0x%02x (%s)\n", data, machine().describe_context());
+	m_fdcstatus &= ~0x02;
 }
 
-void labtam_z80sbc_device::fdcattn_w(u8 data)
+void labtam_z80sbc_device::fdcatn_w(u8 data)
 {
-	LOG("fdcattn_w 0x%02x (%s)\n", data, machine().describe_context());
+	LOG("fdcatn 0x%02x (%s)\n", data, machine().describe_context());
 	m_uic->ireq4_w(1);
+	m_uic->ireq4_w(0);
 }
 
 u8 labtam_z80sbc_device::fdcstatus_r()
 {
-	LOG("fdcstatus_r (%s)\n", machine().describe_context());
+	LOG("fdcstatus (%s)\n", machine().describe_context());
 	return m_fdcstatus;
 }
 
