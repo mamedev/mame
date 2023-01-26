@@ -45,7 +45,10 @@ uint32_t arcompact_device::arcompact_handle05_2f_0x_helper(uint32_t op, const ch
 // SWAP<.f> 0,limm                 0010 1110 0010 1111   F111 1111 1000 0000 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_SWAP(uint32_t op)  { return arcompact_handle05_2f_0x_helper(op, "SWAP");  }
+uint32_t arcompact_device::handleop32_SWAP(uint32_t op)
+{
+	return arcompact_handle05_2f_0x_helper(op, "SWAP");
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // NORM<.f> b,c                    0010 1bbb 0010 1111   FBBB CCCC CC00 0001
@@ -115,7 +118,10 @@ uint32_t arcompact_device::handleop32_NORM(uint32_t op)
 // SAT16<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 0010 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_SAT16(uint32_t op)  { return arcompact_handle05_2f_0x_helper(op, "SAT16"); }
+uint32_t arcompact_device::handleop32_SAT16(uint32_t op)
+{
+	return arcompact_handle05_2f_0x_helper(op, "SAT16");
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // RND16<.f> b,c                   0010 1bbb 0010 1111   FBBB CCCC CC00 0011
@@ -127,7 +133,10 @@ uint32_t arcompact_device::handleop32_SAT16(uint32_t op)  { return arcompact_han
 // RND16<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 0011 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_RND16(uint32_t op)  { return arcompact_handle05_2f_0x_helper(op, "RND16"); }
+uint32_t arcompact_device::handleop32_RND16(uint32_t op)
+{
+	return arcompact_handle05_2f_0x_helper(op, "RND16");
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ABSSW<.f> b,c                   0010 1bbb 0010 1111   FBBB CCCC CC00 0100
@@ -139,7 +148,10 @@ uint32_t arcompact_device::handleop32_RND16(uint32_t op)  { return arcompact_han
 // ABSSW<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 0100 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ABSSW(uint32_t op)  { return arcompact_handle05_2f_0x_helper(op, "ABSSW"); }
+uint32_t arcompact_device::handleop32_ABSSW(uint32_t op)
+{
+	return arcompact_handle05_2f_0x_helper(op, "ABSSW");
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ABSS<.f> b,c                    0010 1bbb 0010 1111   FBBB CCCC CC00 0101
@@ -151,7 +163,10 @@ uint32_t arcompact_device::handleop32_ABSSW(uint32_t op)  { return arcompact_han
 // ABSS<.f> 0,limm                 0010 1110 0010 1111   F111 1111 1000 0101 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ABSS(uint32_t op)  { return arcompact_handle05_2f_0x_helper(op, "ABSS");  }
+uint32_t arcompact_device::handleop32_ABSS(uint32_t op)
+{
+	return arcompact_handle05_2f_0x_helper(op, "ABSS");
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // NEGSW<.f> b,c                   0010 1bbb 0010 1111   FBBB CCCC CC00 0110
@@ -163,7 +178,10 @@ uint32_t arcompact_device::handleop32_ABSS(uint32_t op)  { return arcompact_hand
 // NEGSW<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 0110 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_NEGSW(uint32_t op)  { return arcompact_handle05_2f_0x_helper(op, "NEGSW"); }
+uint32_t arcompact_device::handleop32_NEGSW(uint32_t op)
+{
+	return arcompact_handle05_2f_0x_helper(op, "NEGSW");
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // NEGS<.f> b,c                    0010 1bbb 0010 1111   FBBB CCCC CC00 0111
@@ -175,7 +193,10 @@ uint32_t arcompact_device::handleop32_NEGSW(uint32_t op)  { return arcompact_han
 // NEGS<.f> 0,limm                 0010 1110 0010 1111   F111 1111 1000 0111 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_NEGS(uint32_t op)  { return arcompact_handle05_2f_0x_helper(op, "NEGS");  }
+uint32_t arcompact_device::handleop32_NEGS(uint32_t op)
+{
+	return arcompact_handle05_2f_0x_helper(op, "NEGS");
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // NORMW<.f> b,c                   0010 1bbb 0010 1111   FBBB CCCC CC00 1000
@@ -187,4 +208,7 @@ uint32_t arcompact_device::handleop32_NEGS(uint32_t op)  { return arcompact_hand
 // NORMW<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 1000 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_NORMW(uint32_t op)  { return arcompact_handle05_2f_0x_helper(op, "NORMW"); }
+uint32_t arcompact_device::handleop32_NORMW(uint32_t op)
+{
+	return arcompact_handle05_2f_0x_helper(op, "NORMW");
+}

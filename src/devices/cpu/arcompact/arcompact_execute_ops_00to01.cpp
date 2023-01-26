@@ -46,9 +46,9 @@ bool arcompact_device::BRxx_condition(uint8_t condition, uint32_t b, uint32_t c)
 	return false;
 }
 
-uint32_t arcompact_device::handleop32_BRxx_reg_reg(uint32_t op, uint8_t condition) // register - register cases
+// Branch on Compare / Bit Test - Register-Register
+uint32_t arcompact_device::handleop32_BRxx_reg_reg(uint32_t op, uint8_t condition)
 {
-	/* Branch on Compare / Bit Test - Register-Register */
 	int32_t address = get_01_01_01_address_offset(op);
 	uint8_t creg = common32_get_creg(op);
 	uint8_t breg = common32_get_breg(op);
@@ -63,7 +63,8 @@ uint32_t arcompact_device::handleop32_BRxx_reg_reg(uint32_t op, uint8_t conditio
 	return m_pc + size;
 }
 
-uint32_t arcompact_device::handleop32_BRxx_reg_imm(uint32_t op, uint8_t condition) // register - immediate cases
+// Branch on Compare / Bit Test - Register-Immediate
+uint32_t arcompact_device::handleop32_BRxx_reg_imm(uint32_t op, uint8_t condition)
 {
 	int32_t address = get_01_01_01_address_offset(op);
 	uint32_t u = common32_get_u6(op);
@@ -91,8 +92,6 @@ uint32_t arcompact_device::handleop32_B_cc_D_s21(uint32_t op)
 	if (!check_condition(condition))
 		return m_pc + size;
 
-	// Branch Conditionally
-	// 0000 0sss ssss sss0 SSSS SSSS SSNQ QQQQ
 	int32_t address = (op & 0x07fe0000) >> 17;
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
 	if (address & 0x80000) address = -0x80000 + (address & 0x7ffff);
@@ -114,13 +113,13 @@ uint32_t arcompact_device::handleop32_B_cc_D_s21(uint32_t op)
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Branch Unconditionally Far
 // B<.d> s25                       0000 0sss ssss sss1   SSSS SSSS SSNR tttt
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 uint32_t arcompact_device::handleop32_B_D_s25(uint32_t op)
 {
 	int size = 4;
-	// Branch Unconditionally Far
 	int32_t address = (op & 0x07fe0000) >> 17;
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
 	address |= ((op & 0x0000000f) >> 0) << 20;
@@ -142,13 +141,13 @@ uint32_t arcompact_device::handleop32_B_D_s25(uint32_t op)
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Branch and Link Conditionally
 // BL<.cc><.d> s21                 0000 1sss ssss ss00   SSSS SSSS SSNQ QQQQ
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 uint32_t arcompact_device::handleop32_BL_cc_d_s21(uint32_t op)
 {
 	int size = 4;
-	// Branch and Link Conditionally
 	uint8_t condition = common32_get_condition(op);
 
 	if (!check_condition(condition))
@@ -177,14 +176,13 @@ uint32_t arcompact_device::handleop32_BL_cc_d_s21(uint32_t op)
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Branch and Link Unconditionally Far
 // BL<.d> s25                      0000 1sss ssss ss10   SSSS SSSS SSNR tttt
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 uint32_t arcompact_device::handleop32_BL_d_s25(uint32_t op)
 {
 	int size = 4;
-	// Branch and Link Unconditionally Far
-	// 00001 sssssssss 10  SSSSSSSSSS N R TTTT
 	int32_t address =   (op & 0x07fc0000) >> 17;
 	address |=        ((op & 0x0000ffc0) >> 6) << 10;
 	address |=        ((op & 0x0000000f) >> 0) << 20;

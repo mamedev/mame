@@ -154,7 +154,7 @@ int arcompact_disassembler::handle_dasm_UNIMP_S(std::ostream &stream, offs_t pc,
 	// Unimplemented Instruction, same as illegal, but recommended to fill blank space
 	util::stream_format( stream, "UNIMP_S");
 	return 2;
-} 
+}
 
 int arcompact_disassembler::handle_dasm_JEQ_S_blink(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {

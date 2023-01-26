@@ -4,28 +4,27 @@
 #include "emu.h"
 #include "arcompact.h"
 
-uint32_t arcompact_device::handle_jump_to_addr(int delay, int link, uint32_t address, uint32_t next_addr)
+uint32_t arcompact_device::handle_jump_to_addr(bool delay, bool link, uint32_t address, uint32_t next_addr)
 {
 	if (delay)
 	{
 		m_delayactive = 1;
 		m_delayjump = address;
-		if (link) m_delaylinks = 1;
+		if (link)
+			m_delaylinks = 1;
 		else m_delaylinks = 0;
 		return next_addr;
 	}
 	else
 	{
-		if (link) m_regs[REG_BLINK] = next_addr;
+		if (link)
+			m_regs[REG_BLINK] = next_addr;
 		return address;
 	}
 }
 
-uint32_t arcompact_device::handle_jump_to_register(int delay, int link, uint32_t reg, uint32_t next_addr, int flag)
+uint32_t arcompact_device::handle_jump_to_register(bool delay, bool link, uint32_t reg, uint32_t next_addr, int flag)
 {
-	if (reg == LIMM_REG)
-		arcompact_fatal("handle_jump_to_register called with LIMM register, call handle_jump_to_addr instead");
-
 	if ((reg == REG_ILINK1) || (reg == REG_ILINK2))
 	{
 		if (flag)
@@ -50,7 +49,6 @@ uint32_t arcompact_device::handle_jump_to_register(int delay, int link, uint32_t
 		}
 		else
 		{
-			//arcompact_fatal("jump not supported");
 			uint32_t target = m_regs[reg];
 			return handle_jump_to_addr(delay, link, target, next_addr);
 		}
@@ -67,64 +65,43 @@ uint32_t arcompact_device::handleop32_Jcc_f_a_b_c_helper(uint32_t op, bool delay
 	{
 		get_limm_32bit_opcode();
 		size = 8;
-		if (delay)
-		{
-			if (link)
-				return handle_jump_to_addr(1, 1, m_regs[LIMM_REG], m_pc + size);
-			else
-				return handle_jump_to_addr(1, 0, m_regs[LIMM_REG], m_pc + size);
-		}
-		else
-		{
-			if (link)
-				m_regs[REG_BLINK] = m_pc + size;
+	}
 
-			return m_regs[LIMM_REG];
-		}
+	if (delay)
+	{
+		return handle_jump_to_register(delay, link, creg, m_pc + size, F);
 	}
 	else
 	{
-		if (delay)
+		if (F)
 		{
-			if (link)
-				return handle_jump_to_register(1,1,creg, m_pc + size, F);
+			if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
+			{
+				return handle_jump_to_register(delay, link, creg, m_pc + size, F);
+			}
 			else
-				return handle_jump_to_register(1,0,creg, m_pc + size, F);
+			{
+				// should not use .F unless jumping to ILINK1/2
+				arcompact_fatal("illegal unimplemented J(L)(.D).F (F should not be set) %08x", op);
+			}
 		}
 		else
 		{
-			if (F)
+			if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
 			{
-				if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
-				{
-					if (link)
-						return handle_jump_to_register(0, 1, creg, m_pc + size, F);
-					else
-						return handle_jump_to_register(0, 0, creg, m_pc + size, F);
-				}
-				else
-				{
-					// should not use .F unless jumping to ILINK1/2
-					arcompact_fatal("illegal unimplemented J(L)(.D).F (F should not be set) %08x", op);
-				}
+				// should only jumping to ILINK1/2 if .F is set
+				arcompact_fatal("illegal unimplemented J(L)(.D) (F not set) %08x", op);
 			}
 			else
 			{
-				if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
-				{
-					// should only jumping to ILINK1/2 if .F is set
-					arcompact_fatal("illegal unimplemented J(L)(.D) (F not set) %08x", op);
-				}
-				else
-				{
-					if (link)
-						m_regs[REG_BLINK] = m_pc + size;
+				if (link)
+					m_regs[REG_BLINK] = m_pc + size;
 
-					return m_regs[creg];
-				}
+				return m_regs[creg];
 			}
 		}
 	}
+
 	return m_pc + size;
 }
 
@@ -140,12 +117,9 @@ uint32_t arcompact_device::handleop32_Jcc_cc_f_b_b_c_helper(uint32_t op, bool de
 	{
 		get_limm_32bit_opcode();
 		size = 8;
-		c = m_regs[LIMM_REG];
 	}
-	else
-	{
-		c = m_regs[creg];
-	}
+
+	c = m_regs[creg];
 
 	if (!check_condition(condition))
 		return m_pc + size;
@@ -219,14 +193,14 @@ uint32_t arcompact_device::handleop32_Jcc_f_a_b_c(uint32_t op)
 uint32_t arcompact_device::handleop32_Jcc_f_a_b_u6(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("2 unimplemented J %08x", op);
+	arcompact_log("unimplemented J %08x", op);
 	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_Jcc_f_b_b_s12(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("3 unimplemented J %08x", op);
+	arcompact_log("unimplemented J %08x", op);
 	return m_pc + size;
 }
 
@@ -338,14 +312,14 @@ uint32_t arcompact_device::handleop32_JLcc_f_a_b_c(uint32_t op)
 uint32_t arcompact_device::handleop32_JLcc_f_a_b_u6(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("2 unimplemented J %08x", op);
+	arcompact_log("unimplemented JL %08x", op);
 	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_JLcc_f_b_b_s12(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("3 unimplemented J %08x", op);
+	arcompact_log("unimplemented JL %08x", op);
 	return m_pc + size;
 }
 
@@ -357,7 +331,7 @@ uint32_t arcompact_device::handleop32_JLcc_cc_f_b_b_c(uint32_t op)
 uint32_t arcompact_device::handleop32_JLcc_cc_f_b_b_u6(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("unimplemented handleop32_JLcc_cc_f_b_b_u6 J %08x (u6)", op);
+	arcompact_log("unimplemented handleop32_JLcc_cc_f_b_b_u6 JL %08x (u6)", op);
 	return m_pc + size;
 }
 
@@ -397,14 +371,14 @@ uint32_t arcompact_device::handleop32_JLcc_D_f_a_b_c(uint32_t op)
 uint32_t arcompact_device::handleop32_JLcc_D_f_a_b_u6(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("unimplemented J.D (u6 type) %08x", op);
+	arcompact_log("unimplemented JL.D (u6 type) %08x", op);
 	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_JLcc_D_f_b_b_s12(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("unimplemented J.D (s12 type) %08x", op);
+	arcompact_log("unimplemented JL.D (s12 type) %08x", op);
 	return m_pc + size;
 }
 
@@ -416,7 +390,7 @@ uint32_t arcompact_device::handleop32_JLcc_D_cc_f_b_b_c(uint32_t op)
 uint32_t arcompact_device::handleop32_JLcc_D_cc_f_b_b_u6(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("unimplemented handleop32_JLcc_D_cc_f_b_b_u6 J.D %08x (u6)", op);
+	arcompact_log("unimplemented handleop32_JLcc_D_cc_f_b_b_u6 JL.D %08x (u6)", op);
 	return m_pc + size;
 }
 

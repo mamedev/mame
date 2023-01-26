@@ -3,7 +3,6 @@
 
 #include "emu.h"
 #include "arcompact.h"
-#include "arcompactdasm.h"
 
 uint32_t arcompact_device::handleop32_ARC_EXT06(uint32_t op)
 {

@@ -117,14 +117,20 @@ uint32_t arcompact_device::handleop_MUL64_S_0_b_c(uint16_t op)
 // SEXB_S b,c                      0111 1bbb ccc0 1101
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_SEXB_S_b_c(uint16_t op)  { return arcompact_handle0f_0x_helper(op, "SEXB_S",0); }
+uint32_t arcompact_device::handleop_SEXB_S_b_c(uint16_t op)
+{
+	return arcompact_handle0f_0x_helper(op, "SEXB_S",0);
+}
 
 // #######################################################################################################################
 //                                 IIII I       S SSSS
 // SEXW_S b,c                      0111 1bbb ccc0 1110
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_SEXW_S_b_c(uint16_t op)  { return arcompact_handle0f_0x_helper(op, "SEXW_S",0); }
+uint32_t arcompact_device::handleop_SEXW_S_b_c(uint16_t op)
+{
+	return arcompact_handle0f_0x_helper(op, "SEXW_S",0);
+}
 
 // #######################################################################################################################
 //                                 IIII I       S SSSS
@@ -238,7 +244,10 @@ uint32_t arcompact_device::handleop_ADD3_S_b_b_c(uint16_t op)
 // ASL_S b,b,c                     0111 1bbb ccc1 1000
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_ASL_S_b_b_c_multiple(uint16_t op)  { return arcompact_handle0f_0x_helper(op, "ASL_S",0);  }
+uint32_t arcompact_device::handleop_ASL_S_b_b_c_multiple(uint16_t op)
+{
+	return arcompact_handle0f_0x_helper(op, "ASL_S",0);
+}
 
 // #######################################################################################################################
 //                                 IIII I       S SSSS
@@ -259,7 +268,10 @@ uint32_t arcompact_device::handleop_LSR_S_b_b_c_multiple(uint16_t op)
 // ASR_S b,b,c                     0111 1bbb ccc1 1010
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_ASR_S_b_b_c_multiple(uint16_t op)  { return arcompact_handle0f_0x_helper(op, "ASR_S",0);  }
+uint32_t arcompact_device::handleop_ASR_S_b_b_c_multiple(uint16_t op)
+{
+	return arcompact_handle0f_0x_helper(op, "ASR_S",0);
+}
 
 // #######################################################################################################################
 //                                 IIII I       S SSSS
@@ -280,7 +292,10 @@ uint32_t arcompact_device::handleop_ASL_S_b_c_single(uint16_t op)
 // ASR_S b,c                       0111 1bbb ccc1 1100
 // #######################################################################################################################
 
-uint32_t arcompact_device::handleop_ASR_S_b_c_single(uint16_t op)  { return arcompact_handle0f_0x_helper(op, "ASR1_S",0); }
+uint32_t arcompact_device::handleop_ASR_S_b_c_single(uint16_t op)
+{
+	return arcompact_handle0f_0x_helper(op, "ASR1_S",0);
+}
 
 // #######################################################################################################################
 //                                 IIII I       S SSSS
