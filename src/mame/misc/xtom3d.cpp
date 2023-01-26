@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Guru
+// copyright-holders:Guru, Angelo Salese
 /**************************************************************************************************
 
 X Tom 3D
@@ -82,7 +82,7 @@ public:
 
 protected:
 	virtual void device_start() override;
-//	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_reset() override;
 
 private:
 	required_memory_region m_flash_rom;
@@ -95,6 +95,7 @@ private:
 	u8 m_flash_cmd = 0;
 	u32 m_flash_addr = 0;
 	bool m_flash_unlock = false;
+	u8 m_flash_state = 0;
 };
 
 // "OKSAN (R) ROM DISK for MK-III Version 1.00.0305"
@@ -113,6 +114,11 @@ void isa16_oksan_rom_disk::device_start()
 	set_isa_device();
 }
 
+void isa16_oksan_rom_disk::device_reset()
+{
+	m_flash_state = 0;
+}
+
 void isa16_oksan_rom_disk::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_IO)
@@ -128,9 +134,9 @@ u8 isa16_oksan_rom_disk::read(offs_t offset)
 	{
 		if (m_flash_cmd == 0xf0 && m_flash_unlock)
 		{
-			u8 rom_data = m_flash_rom->base()[m_flash_addr + (offset & 1)];
-			if (offset & 1)
-				m_flash_addr += 2;
+			u8 rom_data = m_flash_rom->base()[(m_flash_addr << 1) + (offset & 1)];
+			if (offset & 1 && !machine().side_effects_disabled())
+				m_flash_addr ++;
 			
 			return rom_data;
 		}
@@ -140,31 +146,42 @@ u8 isa16_oksan_rom_disk::read(offs_t offset)
 
 void isa16_oksan_rom_disk::write(offs_t offset, u8 data)
 {
-	if (offset < 8 && ((offset & 1) == 0) && m_flash_cmd == 0xf0)
+//	if (offset < 8 && ((offset & 1) == 0) && m_flash_cmd == 0xf0)
 		printf("%04x %04x \n", offset, data);
 
 	switch(offset)
 	{
+		// address port
 		case 0x0:
-			m_flash_addr &= 0xfffffe01;
-			m_flash_addr |= data * 0x2;
+			m_flash_addr &= 0xffffff00;
+			m_flash_addr |= data & 0xff;
 			break;
 		case 0x2:
-			m_flash_addr &= 0xfffe01ff;
-			m_flash_addr |= data * 0x200;
+			m_flash_addr &= 0xffff00ff;
+			m_flash_addr |= (data & 0xff) << 8;
 			break;
 		case 0x4:
-			m_flash_addr &= 0xfe01ffff;
-			m_flash_addr |= data * 0x20000;
-			break;
 		case 0x6:
-			m_flash_addr &= 0x01ffffff;
-			m_flash_addr |= data * 0x2000000;
+			popmessage("%02x", data);
+			//m_flash_addr &= 0xfe01ffff;
+			//m_flash_addr |= data * 0x20000;
+			//m_flash_addr &= 0x01ffffff;
+			//m_flash_addr |= data * 0x2000000;
 			break;
+		// data port
 		case 0xa:
-			m_flash_cmd = data;
+			if (data == 0xaa && m_flash_addr == 0x5555 && m_flash_state == 0)
+				m_flash_state = 1;
+			else if (data == 0x55 && m_flash_addr == 0x2aaa && m_flash_state == 1)
+				m_flash_state = 2;
+			else if (m_flash_state == 2 && m_flash_addr == 0x5555)
+			{
+				m_flash_state = 0;
+				m_flash_cmd = data;
+				//printf("%02x %08x\n", data, m_flash_addr);
+			}
 			break;
-		// chip select, 0 -> 1 transitions
+		// chip enable, 0 -> 1 transitions
 		case 0xc:
 			m_flash_unlock = bool(BIT(data, 3));
 			break;
@@ -311,4 +328,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAME(1999, xtom3d, 0, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Jamie System Development", "X Tom 3D", MACHINE_IS_SKELETON)
+GAME(1999, xtom3d, 0, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Jamie System Development", "X Tom 3D", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
