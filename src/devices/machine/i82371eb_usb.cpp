@@ -64,7 +64,11 @@ void i82371eb_usb_device::device_start()
 {
 	pci_device::device_start();
 
+	skip_map_regs(4);
 	add_map(32, M_IO, FUNC(i82371eb_usb_device::io_map));
+
+	// INTD#
+	intr_pin = 4;
 }
 
 
