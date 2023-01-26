@@ -430,7 +430,7 @@ private:
 	uint32_t handleop32_MOV_cc_f_b_b_u6(uint32_t op);
 	uint32_t handleop32_MOV(uint32_t op);
 
-	uint32_t handleop32_RSUB_cc(uint32_t op);
+	uint32_t handleop32_RSUB_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_RSUB(uint32_t op);
 	uint32_t handleop32_RSUB_f_a_b_c(uint32_t op);
 	uint32_t handleop32_RSUB_f_a_b_u6(uint32_t op);
@@ -438,7 +438,7 @@ private:
 	uint32_t handleop32_RSUB_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_RSUB_cc_f_b_b_u6(uint32_t op);
 
-	uint32_t handleop32_BSET_cc(uint32_t op);
+	uint32_t handleop32_BSET_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_BSET(uint32_t op);
 	uint32_t handleop32_BSET_f_a_b_c(uint32_t op);
 	uint32_t handleop32_BSET_f_a_b_u6(uint32_t op);
