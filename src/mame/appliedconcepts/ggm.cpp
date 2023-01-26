@@ -44,7 +44,6 @@ Other games:
 
 TODO:
 - confirm display AP segment, is it used anywhere?
-- lasvegas overlay
 
 ******************************************************************************/
 
@@ -80,13 +79,15 @@ public:
 		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot"),
 		m_ca1_off(*this, "ca1_off"),
+		m_fdigit(*this, "fdigit%u.%u", 0U, 0U),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	void ggm(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_switch) { update_reset(newval); }
-	DECLARE_CUSTOM_INPUT_MEMBER(overlay_r) { u8 data = m_inputs[5]->read(); return (data == 0xf) ? m_overlay : data; }
+	DECLARE_INPUT_CHANGED_MEMBER(overlay_switch) { update_overlay(); }
+	DECLARE_CUSTOM_INPUT_MEMBER(overlay_r);
 
 protected:
 	virtual void machine_start() override;
@@ -101,11 +102,13 @@ private:
 	required_device<dac_bit_interface> m_dac;
 	required_device<generic_slot_device> m_cart;
 	required_device<timer_device> m_ca1_off;
+	output_finder<2, 6> m_fdigit;
 	required_ioport_array<4+3> m_inputs;
 
 	void main_map(address_map &map);
 
 	void update_reset(ioport_value state);
+	void update_overlay();
 	void update_display();
 	TIMER_DEVICE_CALLBACK_MEMBER(ca1_off) { m_via->write_ca1(0); }
 
@@ -132,6 +135,8 @@ private:
 
 void ggm_state::machine_start()
 {
+	m_fdigit.resolve();
+
 	// register for savestates
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_digit_data));
@@ -147,6 +152,8 @@ void ggm_state::machine_start()
 
 void ggm_state::machine_reset()
 {
+	update_overlay();
+
 	// it determines whether it's a cold boot or warm boot ("MEM" switch), with CA1
 	if (~m_inputs[4]->read() & 2)
 	{
@@ -167,6 +174,40 @@ void ggm_state::update_reset(ioport_value state)
 		m_via->reset();
 		m_display->clear();
 	}
+}
+
+
+
+/******************************************************************************
+    Keypad Overlay
+******************************************************************************/
+
+CUSTOM_INPUT_MEMBER(ggm_state::overlay_r)
+{
+	u8 data = m_inputs[5]->read() & 0xf;
+	return (data == 0xf) ? m_overlay : data;
+}
+
+void ggm_state::update_overlay()
+{
+	static const u16 overlay_lut[16] =
+	{
+		// see input defs for which overlay number is which
+		0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	};
+
+	static const u16 fdigit_lut[][6] =
+	{
+		// button labels in same style as MAME digits
+		{ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 },
+		{ 0x01fe, 0x1bdc, 0x1bfe, 0x2408, 0x0cac, 0x383e },
+	};
+
+	for (int i = 0; i < 6; i++)
+		m_fdigit[1][i] = fdigit_lut[overlay_lut[overlay_r()]][i];
+
+	for (int i = 0; i < 6; i++)
+		m_fdigit[0][i] = m_fdigit[1][i] ^ 0x3fff;
 }
 
 
@@ -298,6 +339,8 @@ void ggm_state::main_map(address_map &map)
 #define OVERLAY(val) \
 	PORT_CONDITION("IN.6", 0x0f, EQUALS, val)
 
+// overlay numbers are in order they were added to MAME, this prevents complications with (external) artwork
+
 static INPUT_PORTS_START( overlay_boris ) // actually most of the Chess games have a similar overlay
 	PORT_MODIFY("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x01) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
@@ -388,6 +431,36 @@ static INPUT_PORTS_START( overlay_steinitz )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x03) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( overlay_lasvegas )
+	PORT_MODIFY("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+
+	PORT_MODIFY("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+
+	PORT_MODIFY("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_D) PORT_NAME("Double")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_H) PORT_NAME("Hit")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_S) PORT_NAME("Stand / Decline")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_I) PORT_NAME("Take Insurance")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE")
+
+	PORT_MODIFY("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_L) PORT_NAME("Split")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_U) PORT_NAME("Shuffle Point")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_A) PORT_NAME("Audio")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_T) PORT_NAME("Total")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( ggm )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x00) PORT_CODE(KEYCODE_X) PORT_NAME("Keypad 4-2")
@@ -420,6 +493,7 @@ static INPUT_PORTS_START( ggm )
 	PORT_INCLUDE( overlay_boris )
 	PORT_INCLUDE( overlay_morphy )
 	PORT_INCLUDE( overlay_steinitz )
+	PORT_INCLUDE( overlay_lasvegas )
 
 	PORT_START("IN.4")
 	PORT_CONFNAME( 0x01, 0x00, "Version" ) // factory-set
@@ -428,10 +502,11 @@ static INPUT_PORTS_START( ggm )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, ggm_state, reset_switch, 0) PORT_NAME("Memory Switch")
 
 	PORT_START("IN.5")
-	PORT_CONFNAME( 0x0f, 0x0f, "Keypad Overlay" )
+	PORT_CONFNAME( 0x0f, 0x0f, "Keypad Overlay" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ggm_state, overlay_switch, 0)
 	PORT_CONFSETTING(    0x00, "None" )
 	PORT_CONFSETTING(    0x0f, "Auto" ) // get param from softwarelist
 	PORT_CONFSETTING(    0x01, "Boris 2.5" )
+	PORT_CONFSETTING(    0x04, "Las Vegas 21" )
 	PORT_CONFSETTING(    0x02, "Morphy" )
 	PORT_CONFSETTING(    0x03, "Steinitz" )
 
