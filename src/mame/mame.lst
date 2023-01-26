@@ -7487,18 +7487,18 @@ m4przmc__d                      //
 m4przmc__e                      //
 m4przmc__f                      //
 m4przmc__g                      //
-m4przmc__h                     //
-m4przmc__i                     //
-m4przmc__j                     //
-m4przmc__k                     //
-m4przmc__l                     //
-m4przmc__m                     //
-m4przmc__n                     //
-m4przmc__o                     //
-m4przmc__p                     //
-m4przmc__q                     //
-m4przmc__r                     //
-m4przmc__s                     //
+m4przmc__h                      //
+m4przmc__i                      //
+m4przmc__j                      //
+m4przmc__k                      //
+m4przmc__l                      //
+m4przmc__m                      //
+m4przmc__n                      //
+m4przmc__o                      //
+m4przmc__p                      //
+m4przmc__q                      //
+m4przmc__r                      //
+m4przmc__s                      //
 m4przsss                        // Prize Spend Spend Spend (Barcrest)
 m4przsss__0                     //
 m4przsss__1                     //
@@ -7921,16 +7921,16 @@ v4bulblxb
 v4bulblxc
 v4cmaze                         // The Crystal Maze (v1.3)
 v4cmaze2                        // The New Crystal Maze Featuring Ocean Zone
-v4cmaze2_amld                       //
+v4cmaze2_amld                   //
 v4cmaze2b                       //
 v4cmaze2c                       //
 v4cmaze2d                       //
 v4cmaze3                        // The Crystal Maze Team Challenge
-v4cmaze3_amld                       //
+v4cmaze3_amld                   //
 v4cmaze3b                       //
 v4cmaze3c                       //
 v4cmaze3d                       //
-v4cmaze_amld                        //
+v4cmaze_amld                    //
 v4cmazeb                        //
 v4cmazec                        //
 v4cmazed                        //
@@ -7997,7 +7997,7 @@ v4gldrsh3
 v4mate                          // The Mating Game
 v4mated                         //
 v4mazbel                        // Mazooma Belle
-v4mazbel15                        //
+v4mazbel15                      //
 v4mazbel15a
 v4mdice                         // Miami Dice
 v4mdicea
@@ -8024,7 +8024,7 @@ v4mdiceu
 v4mdicev
 v4mdicew
 v4mdice5
-v4mdiceger                         // Miami Dice
+v4mdiceger                      // Miami Dice
 v4mdice6
 v4megbuk                        // Megabucks Poker
 v4megbuka
@@ -8103,10 +8103,10 @@ v4picdil                        // Piccadilly Night
 v4picdila
 v4picdilz
 v4psi                           // Prize Space Invaders
-v4psibc                          //
-v4psi14                          //
+v4psibc                         //
+v4psi14                         //
 v4psibcd                        //
-v4psid                        //
+v4psid                          //
 v4psi14a                        //
 v4pztet                         // Prize Tetris
 v4pzteta
@@ -26527,7 +26527,7 @@ scrpionda                       // (c) 1997 Merit Industries, Inc.
 scrpiondb                       // (c) 1993 Merit Industries, Inc.
 
 @source:merit/meritsdx.cpp
-scrpndx                        //
+scrpndx                         //
 
 @source:merit/mgames.cpp
 mgames                          // (c) 1981 Merit
@@ -30683,7 +30683,7 @@ odyssey                         // (c) Silicon Gaming.
 
 @source:misc/oneshot.cpp
 maddonna                        // (c) 1995 Tuning
-komocomo                       //
+komocomo                        //
 maddonnab                       // (c) 1995 Tuning
 oneshot                         // no copyright notice
 
@@ -36346,7 +36346,7 @@ rollr_l2                        //
 rollr_l3                        //
 rollr_p2                        //
 rvrbt_l3                        //
-rvrbt_p7                       //
+rvrbt_p7                        //
 strax_p7                        //
 
 @source:pinball/sam.cpp
@@ -40158,7 +40158,7 @@ zombraidpj                      // (c) 1995 Sammy Industries Co.,Ltd.
 
 @source:seta/seta2.cpp
 ablast                          // (c) 2000 Subsino
-ablastb                         //bootleg
+ablastb                         // bootleg
 deerhunt                        // (c) 2000 Sammy USA Corporation
 deerhunta                       // (c) 2000 Sammy USA Corporation
 deerhuntb                       // (c) 2000 Sammy USA Corporation
@@ -40554,7 +40554,7 @@ ts2068                          // 1983 TS2068
 uk2086                          // 1986 UK2086
 
 @source:sinclair/tsconf.cpp
-tsconf                           // ZX Evolution - TS-Configuration
+tsconf                          // ZX Evolution - TS-Configuration
 
 @source:sinclair/zx.cpp
 lambda                          // Lambda 8300
@@ -43176,18 +43176,18 @@ tehkanwch                       // (c) 1986 (hack)
 
 @source:tecmo/wc90.cpp
 pac90                           // bootleg
-twcup90                            // (c) 1989 Tecmo
-twcup90a                           // (c) 1989 Tecmo
-twcup90b                           // (c) 1989 Tecmo
-twcup90c                           // (c) 1989 Tecmo
-twcup90t                           // (c) 1989 Tecmo
+twcup90                         // (c) 1989 Tecmo
+twcup90a                        // (c) 1989 Tecmo
+twcup90b                        // (c) 1989 Tecmo
+twcup90c                        // (c) 1989 Tecmo
+twcup90t                        // (c) 1989 Tecmo
 
 @source:tecmo/wc90b.cpp
-twcup90b1                          // bootleg
-twcup90b2                          // bootleg
-twcup90ba                          // bootleg
-twcup90bb                          // bootleg
-eurogael                           // bootleg
+twcup90b1                       // bootleg
+twcup90b2                       // bootleg
+twcup90ba                       // bootleg
+twcup90bb                       // bootleg
+eurogael                        // bootleg
 
 @source:tektronix/tek405x.cpp
 tek4051                         //

@@ -114,8 +114,8 @@ TODO:
 - kevtris's HMCS40 ROM dumps are incomplete, missing MCU factory test code from
   the 2nd half of the ROM, none of the games access it though and it's impossible
   to execute unless the chip is in testmode.
-- Though very uncommon when compared to games with LED/lamp display, some
-  games may manipulate VFD plate brightness by strobing it longer/shorter,
+- Though very uncommon when compared to games with LED/lamp display, some games
+  may deliberately change VFD plate brightness by strobing it longer/shorter,
   eg. cgalaxn when a ship explodes.
 - bzaxxon 3D effect is difficult to simulate
 - improve/redo SVG for: bzaxxon, bbtime

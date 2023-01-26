@@ -69,6 +69,7 @@ TODO:
 
 #include "speaker.h"
 
+// netlist
 #include "nl_sfxphasor.h"
 
 // internal artwork
