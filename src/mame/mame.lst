@@ -16891,6 +16891,9 @@ dectalk                         // 1983 Digital Equipment Corporation
 @source:dec/decwritr.cpp
 la120                           // 1978 Digital Equipment Corporation
 
+@source:dec/dtc03.cpp
+dtc03                           // 1985 Digital Equipment Corporation
+
 @source:dec/jensen.cpp
 d2k300axp                       // DEC 2000 Model 300 AXP
 d2k500axp                       // DEC 2000 Model 500 AXP
@@ -24326,7 +24329,7 @@ polysix                         //
 poly61                          //
 
 @source:kurzweil/krz2000.cpp
-k2000                           // (c) 1990 Kurzweil Music Systems
+k2000                           // (c) 1990 Kurzweil Music Systems/YCA
 
 @source:kyber/kminus.cpp
 kminus                          // 1982 Kyber Minus
