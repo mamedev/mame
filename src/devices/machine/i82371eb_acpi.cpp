@@ -30,6 +30,7 @@ DEFINE_DEVICE_TYPE(I82371EB_ACPI, i82371eb_acpi_device, "i82371eb_acpi", "Intel 
 i82371eb_acpi_device::i82371eb_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_device(mconfig, I82371EB_ACPI, tag, owner, clock)
 	, m_acpi(*this, "acpi")
+	, m_smbus(*this, "smbus")
 
 {
 	// 0x068000 - Bridge devices, other bridge device
@@ -91,7 +92,8 @@ void i82371eb_acpi_device::map_extra(uint64_t memory_window_start, uint64_t memo
 	if (iose && BIT(m_smbus_host_config, 0))
 	{
 		LOGMAP("- SMBBA %04x-%04x\n", m_smbba, m_smbba + 0xf);
-		io_space->install_device(m_smbba, m_smbba + 0xf, *this, &i82371eb_acpi_device::smbus_map);
+		m_smbus->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, m_smbba + 0xf, m_smbba, io_space);
+		//io_space->install_device(m_smbba, m_smbba + 0xf, *this, &i82371eb_acpi_device::smbus_map);
 	}
 }
 

@@ -8,6 +8,7 @@
 
 #include "pci.h"
 #include "lpc-acpi.h"
+#include "pci-smbus.h"
 
 class i82371eb_acpi_device : public pci_device 
 {
@@ -31,6 +32,7 @@ protected:
 
 private:
 	required_device<lpc_acpi_device> m_acpi;
+	required_device<smbus_device> m_smbus;
 
 	u8 pmregmisc_r();
 	void pmregmisc_w(u8 data);

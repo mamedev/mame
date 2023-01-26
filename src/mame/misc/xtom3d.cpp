@@ -11,13 +11,7 @@ Oksan is the old company name that became Andamiro.
 
 TODO:
 - Doesn't really accesses a Super I/O, which implies that the Holtek keyboard and the RTC chips are on a separate ISA plane.
-- Preliminary ROM loading, starts loading Windows 98 but executes a bad opcode:
-0000EE29: pop     ax
-0000EE2A: push    cs
-0000EE2B: call    0EEC6h
-0000EEC6: iret
-0000EE2E: or      di,di
-00000000: xor     al,12h ; ???
+- DIR texture folder will throw mangled file structure the second time around;
 
 
 This game runs on PC-based hardware.
@@ -55,6 +49,7 @@ MX29F1610MC 16M FlashROM (x7)
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
+#include "machine/pci-smbus.h"
 #include "machine/i82443bx_host.h"
 #include "machine/i82371eb_isa.h"
 #include "machine/i82371eb_ide.h"
@@ -140,7 +135,7 @@ u8 isa16_oksan_rom_disk::read(offs_t offset)
 	{
 		if (m_flash_cmd == 0xf0 && m_flash_unlock)
 		{
-			u8 rom_data = m_flash_rom->base()[(m_flash_addr << 1) + (offset & 1)];
+			u8 rom_data = m_flash_rom->base()[((m_flash_addr << 1) + (offset & 1)) & 0xffffff];
 			if (offset & 1 && !machine().side_effects_disabled())
 				m_flash_addr ++;
 
@@ -167,6 +162,8 @@ void isa16_oksan_rom_disk::write(offs_t offset, u8 data)
 			m_flash_addr |= (data & 0xff) << 8;
 			break;
 		case 0x4:
+			//if (data)
+			//	printf("%02x\n", data);
 			m_flash_addr &= 0xff00ffff;
 			m_flash_addr |= (data & 0xff) << 16;
 			break;
@@ -181,7 +178,9 @@ void isa16_oksan_rom_disk::write(offs_t offset, u8 data)
 		// data port
 		case 0xa:
 			if (data == 0xaa && m_flash_addr == 0x5555 && m_flash_state == 0)
+			{
 				m_flash_state = 1;
+			}
 			else if (data == 0x55 && m_flash_addr == 0x2aaa && m_flash_state == 1)
 				m_flash_state = 2;
 			else if (m_flash_state == 2 && m_flash_addr == 0x5555)
@@ -344,6 +343,7 @@ void xtom3d_state::xtom3d(machine_config &config)
 	I82371EB_USB (config, "pci:07.2", 0);
 	I82371EB_ACPI(config, "pci:07.3", 0);
 	LPC_ACPI     (config, "pci:07.3:acpi", 0);
+	SMBUS        (config, "pci:07.3:smbus", 0);
 
 	ISA16_SLOT(config, "board1", 0, "pci:07.0:isabus", xtom3d_isa_cards, "oksan_romdisk", true).set_option_machine_config("oksan_romdisk", romdisk_config);
 	ISA16_SLOT(config, "board2", 0, "pci:07.0:isabus", xtom3d_isa_cards, "oksan_lpc", true).set_option_machine_config("oksan_lpc", lpc_config);
@@ -354,7 +354,7 @@ void xtom3d_state::xtom3d(machine_config &config)
 	// Expansion slots, mapping SVGA for debugging
 	// TODO: all untested, check clock
 	// TODO: confirm Voodoo going in J4D2, may really go in AGP slot under bridge instead?
-	#if 1
+	#if 0
 	VOODOO_BANSHEE_PCI(config, m_voodoo, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
 	m_voodoo->set_fbmem(2);
 	m_voodoo->set_tmumem(4, 4);
@@ -378,7 +378,7 @@ ROM_START( xtom3d )
 	ROM_REGION32_LE(0x20000, "pci:07.0", 0)
 	ROM_LOAD( "bios.u22", 0x000000, 0x020000, CRC(f7c58044) SHA1(fd967d009e0d3c8ed9dd7be852946f2b9dee7671) )
 
-	ROM_REGION(0xe00000, "board1:user2", 0)
+	ROM_REGION(0x1000000, "board1:user2", ROMREGION_ERASEFF)
 	ROM_LOAD( "u3",  0x000000, 0x200000, CRC(f332e030) SHA1(f04fc7fc97e6ada8122ea7d111455043d7cc42df) )
 	ROM_LOAD( "u4",  0x200000, 0x200000, CRC(ac40ea0b) SHA1(6fcb86f493885d62d20df6bddaa1a1b19d478c65) )
 	ROM_LOAD( "u5",  0x400000, 0x200000, CRC(0fb98a20) SHA1(d21f33b0ca65dc6f90a411a9682f960e9c60244c) )
