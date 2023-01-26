@@ -202,6 +202,7 @@ dec/decmate2.cpp
 dec/decstation.cpp
 dec/dectalk.cpp
 dec/decwritr.cpp
+dec/dtc03.cpp
 dec/jensen.cpp
 dec/pdp1.cpp
 dec/pdp11.cpp
