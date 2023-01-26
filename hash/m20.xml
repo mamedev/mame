@@ -130,7 +130,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pcos30ea" cloneof="pcos30e">
-		<description>Olivetti PCOS 3.0e</description>
+		<description>Olivetti PCOS 3.0e (Copy 1)</description>
 		<year>1983</year>
 		<publisher>Olivetti</publisher>
 
@@ -142,7 +142,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pcos30eb" cloneof="pcos30e">
-		<description>Olivetti PCOS 3.0e</description>
+		<description>Olivetti PCOS 3.0e (Copy 2)</description>
 		<year>1983</year>
 		<publisher>Olivetti</publisher>
 
@@ -315,7 +315,7 @@ license:CC0-1.0
 		<publisher>Microsoft</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="235450">
+			<dataarea name="flop" size="286720">
 				<rom name="multipl.imd" size="235450" crc="c724f5a5" sha1="2f3ad71d4f614fcc3257f6f79fb10922914915d7"/>
 			</dataarea>
 		</part>
@@ -400,24 +400,24 @@ license:CC0-1.0
 	</software>
 
 	<software name="olitest"><!-- bootable pcos20 -->
-		<description>OliTest</description>
+		<description>OliTest (Copy 1)</description>
 		<year>1981</year>
 		<publisher>Olivetti</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="280897">
+			<dataarea name="flop" size="286720">
 				<rom name="olitest.imd" size="280897" crc="f5e7509b" sha1="994647d937b179eec7b6bb5f157646692bd6b5ba"/>
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="olitesta" cloneof="olitest"><!-- bootable (pcos20) -->
-		<description>OliTest</description>
+		<description>OliTest (Copy 2)</description>
 		<year>19??</year>
 		<publisher>Olivetti</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="280897">
+			<dataarea name="flop" size="286720">
 				<rom name="olitest.img" size="286720" crc="7519913c" sha1="cc219018fd53d60d1b65091b0c626dbf4973a6cf"/>
 			</dataarea>
 		</part>
@@ -574,7 +574,7 @@ license:CC0-1.0
 
 	<software name="m20utent" supported="no">
 	<!-- This is a user disk with high school math programs -->
-	<!-- Collection of BASIC programs, boot PCOS and run basic to use, e.g. > ba "1:labirinto.bas" -->
+	<!-- Collection of BASIC programs, boot PCOS and run basic to use -->
 		<description>M20 Utente (Italian)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -588,7 +588,7 @@ license:CC0-1.0
 
 	<software name="m20graph" supported="no"><!-- Missing FM track0 -->
 	<!-- This is a user disk with a collection of graphic demos -->
-	<!-- Collection of BASIC programs, boot PCOS and run basic to use, e.g. > ba "1:alien" -->
+	<!-- Collection of BASIC programs, boot PCOS and run basic to use -->
 		<description>M20 Graph</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
