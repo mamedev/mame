@@ -31,15 +31,20 @@ Known chess cartridges (*denotes not dumped):
 - Steinitz Edition-4: Master Chess
 - *Monitor Edition: Master Kriegspiel
 
+The newer revisions of Gruenfeld and Capablanca did not have any version label visible
+on the module, though the German distributor Sandy Electronic sold them (and offered
+an upgrade service) as Gruenfeld-S and Capablanca-S.
+
 Other games:
-- *Borchek Edition: Master Checkers
 - *Odin Edition: Master Reversi
-- *Las Vegas 21
+- Las Vegas 21: Master Blackjack
+- *Borchek: Championship Checkers
 - *Wits End (unreleased?)
 - *Lunar Lander (unreleased?)
 
 TODO:
 - confirm display AP segment, is it used anywhere?
+- lasvegas overlay
 
 ******************************************************************************/
 
