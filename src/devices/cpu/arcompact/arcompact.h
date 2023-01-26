@@ -18,7 +18,11 @@
 // for 16-bit ops also.  It is also explicitly stated that
 // the EXT and SEX opcodes can be used to convert 8/16-bit
 // data into 32-bit, which suggests it isn't always automatic.
-#define ARCOMPACT_LD_DOES_NOT_EXTEND_BYTE_AND_WORD
+//
+// The code to compare the copyright string at 0x40000100
+// suggests that the 16-bit opcodes reading 8-bit addresses
+// MUST zero extend at least.
+//#define ARCOMPACT_LD_DOES_NOT_EXTEND_BYTE_AND_WORD
 
 #define arcompact_fatal if (ARCOMPACT_LOGGING) fatalerror
 #define arcompact_log if (ARCOMPACT_LOGGING) fatalerror
