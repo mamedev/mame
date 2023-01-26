@@ -10029,11 +10029,11 @@ WRITE_LINE_MEMBER(mmpanic_state::mmpanic_rtc_irq)
 void mmpanic_state::mmpanic(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 8000000);
+	Z80(config, m_maincpu, XTAL(16'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmpanic_state::mmpanic_map);
 	m_maincpu->set_addrmap(AS_IO, &mmpanic_state::mmpanic_portmap);
 
-	Z80(config, m_soundcpu, 3579545);
+	Z80(config, m_soundcpu, XTAL(14'318'181) / 4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &mmpanic_state::mmpanic_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &mmpanic_state::mmpanic_sound_portmap);
 
@@ -10062,11 +10062,11 @@ void mmpanic_state::mmpanic(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	YM2413(config, "ym2413", 3579545).add_route(ALL_OUTPUTS, "mono", 0.80);
+	YM2413(config, "ym2413", XTAL(14'318'181) / 4).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	AY8910(config, "aysnd", 3579545).add_route(ALL_OUTPUTS, "mono", 0.30);
+	AY8910(config, "aysnd", XTAL(14'318'181) / 8).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	OKIM6295(config, m_oki, 1022720, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, XTAL(14'318'181) / 14, okim6295_device::PIN7_HIGH); // pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* devices */
