@@ -47,13 +47,22 @@ void arcompact_device::execute_run()
 			}
 
 			// hardware loops
+			// NOTE: this behavior should differ between ARC models
 			if (m_pc == m_LP_END)
 			{
+#if 0 // this behavior should be correct, but causes a lot loops with counters set to values such as 0xffffffff
+				if (m_regs[REG_LP_COUNT] != 1)
+				{
+					m_pc = m_LP_START;
+				}
+				m_regs[REG_LP_COUNT]--;
+#else // this is not as described, so probably incorrect
 				if (m_regs[REG_LP_COUNT] > 0)
 				{
 					m_pc = m_LP_START;
 					m_regs[REG_LP_COUNT]--;
 				}
+#endif
 			}
 		}
 		m_icount--;

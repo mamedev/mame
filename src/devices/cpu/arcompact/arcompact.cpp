@@ -38,6 +38,19 @@ uint32_t arcompact_device::arcompact_auxreg00c_STATUS32_L2_r() { return m_status
 void arcompact_device::arcompact_auxreg00b_STATUS32_L1_w(uint32_t data) { m_status32_l1 = data; }
 void arcompact_device::arcompact_auxreg00c_STATUS32_L2_w(uint32_t data) { m_status32_l2 = data; }
 
+void arcompact_device::arcompact_auxreg012_MULHI_w(uint32_t data)
+{
+	// The regular multiply result registers (r56 - MLO, r57 - MMID and r58 - MHI) are read-only
+	// this optional extension allows the program to directly set the value of MHI
+	// so that it's state can be restored
+	//
+	// (although the Leapster BIOS tries to write MMID directly when doing such a restoration
+	// despite otherwise going through the recommended procedure of multiplying the lower result
+	// by 1 to restore MLO and writing to this AUX address to restore MHI)
+	m_regs[REG_MHI] = data;
+}
+
+
 uint32_t arcompact_device::arcompact_auxreg025_INTVECTORBASE_r() { return m_INTVECTORBASE&0xfffffc00; }
 void arcompact_device::arcompact_auxreg025_INTVECTORBASE_w(uint32_t data) { m_INTVECTORBASE = data&0xfffffc00; }
 
@@ -48,6 +61,8 @@ void arcompact_device::arcompact_auxreg_map(address_map &map)
 	map(0x00000000a, 0x00000000a).r(FUNC(arcompact_device::arcompact_auxreg00a_STATUS32_r)); // r/o
 	map(0x00000000b, 0x00000000b).rw(FUNC(arcompact_device::arcompact_auxreg00b_STATUS32_L1_r), FUNC(arcompact_device::arcompact_auxreg00b_STATUS32_L1_w));
 	map(0x00000000c, 0x00000000c).rw(FUNC(arcompact_device::arcompact_auxreg00c_STATUS32_L2_r), FUNC(arcompact_device::arcompact_auxreg00c_STATUS32_L2_w));
+
+	map(0x000000012, 0x000000012).w(FUNC(arcompact_device::arcompact_auxreg012_MULHI_w));
 
 	map(0x000000025, 0x000000025).rw(FUNC(arcompact_device::arcompact_auxreg025_INTVECTORBASE_r), FUNC(arcompact_device::arcompact_auxreg025_INTVECTORBASE_w));
 }

@@ -62,6 +62,8 @@ private:
 	void arcompact_auxreg00b_STATUS32_L1_w(uint32_t data);
 	void arcompact_auxreg00c_STATUS32_L2_w(uint32_t data);
 
+	void arcompact_auxreg012_MULHI_w(uint32_t data);
+
 	uint32_t arcompact_auxreg025_INTVECTORBASE_r();
 	void arcompact_auxreg025_INTVECTORBASE_w(uint32_t data);
 

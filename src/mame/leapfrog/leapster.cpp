@@ -317,7 +317,7 @@ void leapster_state::leapster_map(address_map &map)
 	map(0x03000000, 0x030007ff).ram(); // puts stack here, writes a pointer @ 0x03000000 on startup
 	map(0x03000800, 0x0300ffff).ram(); // some of the later models need to store stack values here (or code execution has gone wrong?)
 	map(0x3c000000, 0x3c1fffff).ram(); // puts task stacks etc. here
-	// map(0x3c200000, 0x3fffffff).ram();
+	map(0x3c200000, 0x3fffffff).ram();
 	// map(0x80000000, 0x807fffff).bankr("cartrom"); // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here - installed if a cart is present
 }
 
