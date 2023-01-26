@@ -170,7 +170,11 @@ Notes:
 - gladiatr and clones start with one credit due to the way MAME initialises
   memory and the dodgy code the bootleg MCUs use to synchronise with the host
   CPUs.  On an F3 reset they randomly start with one credit or no credits.
-- gladiatr and clones don't show player inputs in service mode.
+  More specifically, the 1st opcode in cctl and ccpu is nonsense. Whether it's
+  a bad dump or done on purpose by the bootleggers is unknown. The JNT0 test
+  makes no sense, and if the jump would have succeeded, the jump target is
+  in the middle of another opcode. It makes more sense if the 1st byte was
+  0x22 instead of 0x26 and that would fix the coin issue.
 
 TODO:
 -----
