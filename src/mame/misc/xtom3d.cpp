@@ -13,7 +13,7 @@ TODO:
 - Doesn't really accesses a Super I/O, which implies that the Holtek keyboard and the RTC chips are on a separate ISA plane.
 - Preliminary ROM loading, starts loading Windows 98 but executes a bad opcode:
 0000EE29: pop     ax
-0000EE2A: push    cs 
+0000EE2A: push    cs
 0000EE2B: call    0EEC6h
 0000EEC6: iret
 0000EE2E: or      di,di
@@ -68,9 +68,15 @@ MX29F1610MC 16M FlashROM (x7)
 //#include "bus/rs232/rs232.h"
 //#include "bus/rs232/sun_kbd.h"
 //#include "bus/rs232/terminal.h"
-#include "machine/fdc37c93x.h"
+//#include "machine/fdc37c93x.h"
+#include "machine/mc146818.h"
+#include "machine/8042kbdc.h"
 #include "video/voodoo_pci.h"
 
+
+/*
+ * ISA16 Oksan ROM DISK
+ */
 
 class isa16_oksan_rom_disk : public device_t, public device_isa16_card_interface
 {
@@ -137,7 +143,7 @@ u8 isa16_oksan_rom_disk::read(offs_t offset)
 			u8 rom_data = m_flash_rom->base()[(m_flash_addr << 1) + (offset & 1)];
 			if (offset & 1 && !machine().side_effects_disabled())
 				m_flash_addr ++;
-			
+
 			return rom_data;
 		}
 	}
@@ -146,8 +152,8 @@ u8 isa16_oksan_rom_disk::read(offs_t offset)
 
 void isa16_oksan_rom_disk::write(offs_t offset, u8 data)
 {
-//	if (offset < 8 && ((offset & 1) == 0) && m_flash_cmd == 0xf0)
-		printf("%04x %04x \n", offset, data);
+//  if (offset < 8 && ((offset & 1) == 0) && m_flash_cmd == 0xf0)
+	//  printf("%04x %04x \n", offset, data);
 
 	switch(offset)
 	{
@@ -161,8 +167,12 @@ void isa16_oksan_rom_disk::write(offs_t offset, u8 data)
 			m_flash_addr |= (data & 0xff) << 8;
 			break;
 		case 0x4:
+			m_flash_addr &= 0xff00ffff;
+			m_flash_addr |= (data & 0xff) << 16;
+			break;
 		case 0x6:
-			popmessage("%02x", data);
+			if (data)
+				popmessage("%02x", data);
 			//m_flash_addr &= 0xfe01ffff;
 			//m_flash_addr |= data * 0x20000;
 			//m_flash_addr &= 0x01ffffff;
@@ -188,6 +198,72 @@ void isa16_oksan_rom_disk::write(offs_t offset, u8 data)
 	}
 }
 
+/*
+ * ISA16 Oksan LPC
+ */
+
+class isa16_oksan_lpc : public device_t, public device_isa16_card_interface
+{
+public:
+	// construction/destruction
+	isa16_oksan_lpc(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	required_device<mc146818_device> m_rtc;
+	required_device<kbdc8042_device> m_kbdc;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	void remap(int space_id, offs_t start, offs_t end) override;
+};
+
+DEFINE_DEVICE_TYPE(ISA16_OKSAN_LPC, isa16_oksan_lpc, "isa16_oksan_lpc", "ISA16 Oksan LPC")
+
+isa16_oksan_lpc::isa16_oksan_lpc(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ISA16_OKSAN_LPC, tag, owner, clock)
+	, device_isa16_card_interface(mconfig, *this)
+	, m_rtc(*this, "rtc")
+	, m_kbdc(*this, "kbdc")
+{
+}
+
+void isa16_oksan_lpc::device_add_mconfig(machine_config &config)
+{
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	//m_rtc->irq().set(m_pic8259_2, FUNC(pic8259_device::ir0_w));
+	m_rtc->set_century_index(0x32);
+
+	KBDC8042(config, m_kbdc, 0);
+	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
+	m_kbdc->system_reset_callback().set_inputline(":maincpu", INPUT_LINE_RESET);
+	m_kbdc->gate_a20_callback().set_inputline(":maincpu", INPUT_LINE_A20);
+	m_kbdc->input_buffer_full_callback().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
+}
+
+
+void isa16_oksan_lpc::device_start()
+{
+	set_isa_device();
+}
+
+void isa16_oksan_lpc::device_reset()
+{
+
+}
+
+void isa16_oksan_lpc::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x60, 0x6f, read8sm_delegate(m_kbdc, FUNC(kbdc8042_device::data_r)), write8sm_delegate(m_kbdc, FUNC(kbdc8042_device::data_w)));
+		m_isa->install_device(0x70, 0x7f, read8sm_delegate(m_rtc, FUNC(mc146818_device::read)), write8sm_delegate(m_rtc, FUNC(mc146818_device::write)));
+	}
+}
+
+
 namespace {
 
 #define PCI_J4D2_ID "pci:0d.0"
@@ -210,11 +286,10 @@ private:
 	optional_device<voodoo_banshee_pci_device> m_voodoo;
 
 	void xtom3d_map(address_map &map);
-//	void xtom3d_io(address_map &map);
+//  void xtom3d_io(address_map &map);
 
-	static void superio_config(device_t *device);
 	static void romdisk_config(device_t *device);
-
+	static void lpc_config(device_t *device);
 };
 
 
@@ -223,33 +298,10 @@ void xtom3d_state::xtom3d_map(address_map &map)
 	map.unmap_value_high();
 }
 
-static void isa_internal_devices(device_slot_interface &device)
-{
-	device.option_add("fdc37c93x", FDC37C93X);
-}
-
-void xtom3d_state::superio_config(device_t *device)
-{
-	// TODO: check super I/O type
-	fdc37c93x_device &fdc = *downcast<fdc37c93x_device *>(device);
-	fdc.set_sysopt_pin(0);
-	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
-	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
-	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
-	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
-#if 0
-	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
-	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
-	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
-	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
-	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
-	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
-#endif
-}
-
 void xtom3d_isa_cards(device_slot_interface &device)
 {
 	device.option_add_internal("oksan_romdisk", ISA16_OKSAN_ROM_DISK);
+	device.option_add_internal("oksan_lpc", ISA16_OKSAN_LPC);
 }
 
 void xtom3d_state::romdisk_config(device_t *device)
@@ -258,12 +310,21 @@ void xtom3d_state::romdisk_config(device_t *device)
 	romdisk.set_rom_tag("user2");
 }
 
+void xtom3d_state::lpc_config(device_t *device)
+{
+//  auto *state = device->subdevice<xtom3d_state>(":");
+	//isa16_oksan_lpc &lpc = *downcast<isa16_oksan_lpc *>(device);
+//  lpc.m_kbdc->system_reset_callback().set_inputline(":maincpu", INPUT_LINE_RESET);
+//  m_kbdc->gate_a20_callback().set_inputline(":maincpu", INPUT_LINE_A20);
+//  m_kbdc->input_buffer_full_callback().set(":, FUNC(pic8259_device::ir1_w));
+}
+
 // TODO: unverified PCI config space
 void xtom3d_state::xtom3d(machine_config &config)
 {
 	PENTIUM2(config, m_maincpu, 450'000'000 / 16); // actually Pentium II 450
 	m_maincpu->set_addrmap(AS_PROGRAM, &xtom3d_state::xtom3d_map);
-//	m_maincpu->set_addrmap(AS_IO, &xtom3d_state::xtom3d_io);
+//  m_maincpu->set_addrmap(AS_IO, &xtom3d_state::xtom3d_io);
 	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 	m_maincpu->smiact().set("pci:00.0", FUNC(i82443bx_host_device::smi_act_w));
 
@@ -285,15 +346,15 @@ void xtom3d_state::xtom3d(machine_config &config)
 	LPC_ACPI     (config, "pci:07.3:acpi", 0);
 
 	ISA16_SLOT(config, "board1", 0, "pci:07.0:isabus", xtom3d_isa_cards, "oksan_romdisk", true).set_option_machine_config("oksan_romdisk", romdisk_config);
-	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", superio_config);
+	ISA16_SLOT(config, "board2", 0, "pci:07.0:isabus", xtom3d_isa_cards, "oksan_lpc", true).set_option_machine_config("oksan_lpc", lpc_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	// YMF740G goes thru "pci:0c.0"
 	// Expansion slots, mapping SVGA for debugging
 	// TODO: all untested, check clock
-	// TODO: confirm Voodoo going in J4D2
-	#if 0
+	// TODO: confirm Voodoo going in J4D2, may really go in AGP slot under bridge instead?
+	#if 1
 	VOODOO_BANSHEE_PCI(config, m_voodoo, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
 	m_voodoo->set_fbmem(2);
 	m_voodoo->set_tmumem(4, 4);
@@ -304,11 +365,12 @@ void xtom3d_state::xtom3d(machine_config &config)
 	screen.set_refresh_hz(57);
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
-	screen.set_screen_update(PCI_J4D2_ID, FUNC(voodoo_2_pci_device::screen_update));
+	screen.set_screen_update(PCI_J4D2_ID, FUNC(voodoo_banshee_pci_device::screen_update));
+	#else
+	VIRGE_PCI(config, "pci:0e.0", 0); // J4C1
 	#endif
 	// "pci:0d.0" J4D2
 	// "pci:0e.0" J4D1
-	VIRGE_PCI(config, "pci:0e.0", 0); // J4C1
 }
 
 
