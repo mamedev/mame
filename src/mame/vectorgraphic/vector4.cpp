@@ -209,11 +209,11 @@ void vector4_state::vector4(machine_config &config)
 	rs232keyboard.rxd_handler().set(uart0, FUNC(i8251_device::write_rxd));
 	rs232keyboard.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
-	// D2
+	// D3
 	i8251_device &uart1(I8251(config, "uart1", 0));
 	rs232_port_device &rs232com(RS232_PORT(config, "rs232com", default_rs232_devices, nullptr));
-	pit.out_handler<2>().set(uart1, FUNC(i8251_device::write_txc));
-	pit.out_handler<2>().append(uart1, FUNC(i8251_device::write_rxc));
+	pit.out_handler<1>().set(uart1, FUNC(i8251_device::write_txc));
+	pit.out_handler<1>().append(uart1, FUNC(i8251_device::write_rxc));
 	uart1.txd_handler().set(rs232com, FUNC(rs232_port_device::write_txd));
 	uart1.dtr_handler().set(rs232com, FUNC(rs232_port_device::write_dtr));
 	uart1.rts_handler().set(rs232com, FUNC(rs232_port_device::write_rts));
@@ -221,11 +221,11 @@ void vector4_state::vector4(machine_config &config)
 	rs232com.dsr_handler().set(uart1, FUNC(i8251_device::write_dsr));
 	rs232com.cts_handler().set(uart1, FUNC(i8251_device::write_cts));
 
-	// D3
+	// D2
 	i8251_device &uart2(I8251(config, "uart2", 0));
 	rs232_port_device &rs232prtr(RS232_PORT(config, "rs232prtr", default_rs232_devices, nullptr));
-	pit.out_handler<1>().set(uart2, FUNC(i8251_device::write_txc));
-	pit.out_handler<1>().append(uart2, FUNC(i8251_device::write_rxc));
+	pit.out_handler<2>().set(uart2, FUNC(i8251_device::write_txc));
+	pit.out_handler<2>().append(uart2, FUNC(i8251_device::write_rxc));
 	uart2.txd_handler().set(rs232prtr, FUNC(rs232_port_device::write_txd));
 	uart2.dtr_handler().set(rs232prtr, FUNC(rs232_port_device::write_dtr));
 	uart2.rts_handler().set(rs232prtr, FUNC(rs232_port_device::write_rts));
