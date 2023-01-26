@@ -164,8 +164,8 @@ void vector4_state::vector4(machine_config &config)
 	const XTAL _2m = _32m/16;
 
 	/* processors */
-	// Manual says 5.1 MHz. Schematic shows it is driven by the 32.64 MHz xtal.
-	// TOOD: What is going on with CLOCK at A1?
+	// Manual says 5.1 MHz. To do so, schematic shows (A1) it is driven by the
+	// 32.64 MHz xtal, 1/16 of the cycles are skipped, and it is divided by 6.
 	Z80(config, m_maincpu, 5'100'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vector4_state::vector4_z80mem);
 	m_maincpu->set_addrmap(AS_IO, &vector4_state::vector4_io);
