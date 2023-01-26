@@ -142,61 +142,6 @@ void arcompact_device::do_flags_nz(uint32_t result)
 	else { status32_clear_z(); }
 }
 
-uint32_t arcompact_device::handle_jump_to_addr(int delay, int link, uint32_t address, uint32_t next_addr)
-{
-	if (delay)
-	{
-		m_delayactive = 1;
-		m_delayjump = address;
-		if (link) m_delaylinks = 1;
-		else m_delaylinks = 0;
-		return next_addr;
-	}
-	else
-	{
-		if (link) m_regs[REG_BLINK] = next_addr;
-		return address;
-	}
-}
-
-uint32_t arcompact_device::handle_jump_to_register(int delay, int link, uint32_t reg, uint32_t next_addr, int flag)
-{
-	if (reg == LIMM_REG)
-		arcompact_fatal("handle_jump_to_register called with LIMM register, call handle_jump_to_addr instead");
-
-	if ((reg == REG_ILINK1) || (reg == REG_ILINK2))
-	{
-		if (flag)
-		{
-			if (reg == REG_ILINK1) m_status32 = m_status32_l1;
-			if (reg == REG_ILINK2) m_status32 = m_status32_l2;
-			uint32_t target = m_regs[reg];
-			return handle_jump_to_addr(delay, link, target, next_addr);
-		}
-		else
-		{
-			arcompact_fatal("illegal jump to ILINK1/ILINK2 not supported"); // FLAG bit must be set
-			return next_addr;
-		}
-	}
-	else
-	{
-		if (flag)
-		{
-			arcompact_fatal("illegal jump (flag bit set)"); // FLAG bit must NOT be set
-			return next_addr;
-		}
-		else
-		{
-			//arcompact_fatal("jump not supported");
-			uint32_t target = m_regs[reg];
-			return handle_jump_to_addr(delay, link, target, next_addr);
-		}
-	}
-	return 0;
-}
-
-
 /************************************************************************************************************************************
 *                                                                                                                                   *
 * illegal opcode handlers                                                                                            *

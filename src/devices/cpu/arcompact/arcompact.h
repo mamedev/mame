@@ -487,7 +487,9 @@ private:
 	uint32_t handleop32_SUB3_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_SUB3_cc_f_b_b_u6(uint32_t op);
 
-	uint32_t handleop32_Jcc_cc(uint32_t op);
+	uint32_t handleop32_Jcc_f_a_b_c_helper(uint32_t op, bool delay, bool link);
+	uint32_t handleop32_Jcc_cc_f_b_b_c_helper(uint32_t op, bool delay, bool link);
+
 	uint32_t handleop32_Jcc(uint32_t op);
 	uint32_t handleop32_Jcc_f_a_b_c(uint32_t op);
 	uint32_t handleop32_Jcc_f_a_b_u6(uint32_t op);
@@ -495,7 +497,6 @@ private:
 	uint32_t handleop32_Jcc_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_Jcc_cc_f_b_b_u6(uint32_t op);
 
-	uint32_t handleop32_Jcc_D_cc(uint32_t op);
 	uint32_t handleop32_Jcc_D(uint32_t op);
 	uint32_t handleop32_Jcc_D_f_a_b_c(uint32_t op);
 	uint32_t handleop32_Jcc_D_f_a_b_u6(uint32_t op);
@@ -623,20 +624,18 @@ private:
 	uint32_t handleop32_MPYU_cc(uint32_t op);
 	uint32_t handleop32_MPYU(uint32_t op);
 
-	uint32_t handleop32_JLcc_cc(uint32_t op);
-	uint32_t handleop32_JLcc(uint32_t op);
 	uint32_t handleop32_JLcc_f_a_b_c(uint32_t op);
 	uint32_t handleop32_JLcc_f_a_b_u6(uint32_t op);
 	uint32_t handleop32_JLcc_f_b_b_s12(uint32_t op);
 	uint32_t handleop32_JLcc_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_JLcc_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_JLcc(uint32_t op);
 
 	uint32_t handleop32_JLcc_D_f_a_b_c(uint32_t op);
 	uint32_t handleop32_JLcc_D_f_a_b_u6(uint32_t op);
 	uint32_t handleop32_JLcc_D_f_b_b_s12(uint32_t op);
 	uint32_t handleop32_JLcc_D_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_JLcc_D_cc_f_b_b_u6(uint32_t op);
-	uint32_t handleop32_JLcc_D_cc(uint32_t op);
 	uint32_t handleop32_JLcc_D(uint32_t op);
 
 	uint32_t handleop32_LP(uint32_t op);
