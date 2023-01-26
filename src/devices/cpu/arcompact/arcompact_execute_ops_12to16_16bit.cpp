@@ -27,7 +27,11 @@ uint32_t arcompact_device::handleop_LDB_S_c_b_u5(uint16_t op)
 	uint8_t breg = expand_reg(common16_get_breg(op));
 	uint8_t creg = expand_reg(common16_get_creg(op));
 	uint32_t u = common16_get_u5(op);
+#ifdef ARCOMPACT_LD_DOES_NOT_EXTEND_BYTE_AND_WORD
+	m_regs[creg] = (m_regs[creg] & 0xffffff00) | READ8((m_regs[breg] + u));
+#else
 	m_regs[creg] = READ8((m_regs[breg] + u));
+#endif
 	return m_pc + 2;
 }
 
@@ -41,7 +45,11 @@ uint32_t arcompact_device::handleop_LDW_S_c_b_u6(uint16_t op)
 	uint8_t breg = expand_reg(common16_get_breg(op));
 	uint8_t creg = expand_reg(common16_get_creg(op));
 	uint32_t u = common16_get_u5(op) << 1;
+#ifdef ARCOMPACT_LD_DOES_NOT_EXTEND_BYTE_AND_WORD
+	m_regs[creg] = (m_regs[creg] & 0xffff0000) | READ16((m_regs[breg] + u));
+#else
 	m_regs[creg] = READ16((m_regs[breg] + u));
+#endif
 	return m_pc + 2;
 }
 

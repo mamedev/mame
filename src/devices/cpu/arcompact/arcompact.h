@@ -11,6 +11,15 @@
 
 #define ARCOMPACT_LOGGING 1
 
+// Unsure of this behavior, documentation is not 100% clear
+// in some places it is said that LD will zero extend data
+// if X flag on operation is 0, in other places it indicates
+// there is no extension in such a case.  This may differ
+// for 16-bit ops also.  It is also explicitly stated that
+// the EXT and SEX opcodes can be used to convert 8/16-bit
+// data into 32-bit, which suggests it isn't always automatic.
+#define ARCOMPACT_LD_DOES_NOT_EXTEND_BYTE_AND_WORD
+
 #define arcompact_fatal if (ARCOMPACT_LOGGING) fatalerror
 #define arcompact_log if (ARCOMPACT_LOGGING) fatalerror
 

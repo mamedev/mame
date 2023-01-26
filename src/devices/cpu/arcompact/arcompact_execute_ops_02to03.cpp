@@ -71,6 +71,8 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 	{
 		readdata = READ32(address);
 
+		m_regs[areg] = readdata;
+
 		if (X) // sign extend is not supported for long reads
 			arcompact_fatal("illegal LD %08x (data size %d mode %d with X)", op, Z, a);
 
@@ -83,8 +85,17 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 		{
 			if (readdata & 0x80)
 				readdata |= 0xffffff00;
-		}
 
+			m_regs[areg] = readdata;
+		}
+		else
+		{
+#ifdef ARCOMPACT_LD_DOES_NOT_EXTEND_BYTE_AND_WORD
+			m_regs[areg] = (m_regs[areg] & 0xffffff00) | readdata;
+#else
+			m_regs[areg] = readdata;
+#endif
+		}
 	}
 	else if (Z == 2)
 	{
@@ -94,6 +105,16 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 		{
 			if (readdata & 0x8000)
 				readdata |= 0xffff0000;
+
+			m_regs[areg] = readdata;
+		}
+		else
+		{
+#ifdef ARCOMPACT_LD_DOES_NOT_EXTEND_BYTE_AND_WORD
+			m_regs[areg] = (m_regs[areg] & 0xffff0000) | readdata;
+#else
+			m_regs[areg] = readdata;
+#endif
 		}
 
 	}
@@ -102,7 +123,6 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 		arcompact_fatal("xx_ illegal LD %08x (data size %d mode %d)", op, Z, a);
 	}
 
-	m_regs[areg] = readdata;
 
 	// writeback / increment
 	if (a == 2)
