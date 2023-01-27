@@ -47,22 +47,27 @@ void arcompact_device::execute_run()
 			}
 
 			// hardware loops
-			// NOTE: this behavior should differ between ARC models
-			if (m_pc == m_LP_END)
+
+			// NOTE: if LPcc condition code fails, the m_PC returned will be m_LP_END
+			// which will then cause this check to happen and potentially jump back to
+			// the start of the loop if LP_COUNT is anything other than 1, this should
+			// not happen.  It could be our PC handling needs to be better?  Either way
+			// guard against it!
+			if (m_allow_loop_check)
 			{
-#if 1 // this behavior should be correct, but causes a lot loops with counters set to values such as 0xffffffff
-				if ((m_regs[REG_LP_COUNT] != 1))
+				if (m_pc == m_LP_END)
 				{
-					m_pc = m_LP_START;
-				}
-				m_regs[REG_LP_COUNT]--;
-#else // this is not as described, so probably incorrect
-				if (m_regs[REG_LP_COUNT] > 0)
-				{
-					m_pc = m_LP_START;
+					// NOTE: this behavior should differ between ARC models
+					if ((m_regs[REG_LP_COUNT] != 1))
+					{
+						m_pc = m_LP_START;
+					}
 					m_regs[REG_LP_COUNT]--;
 				}
-#endif
+			}
+			else
+			{
+				m_allow_loop_check = true;
 			}
 		}
 		m_icount--;

@@ -219,6 +219,8 @@ void arcompact_device::device_reset()
 	m_LP_START = 0;
 	m_LP_END = 0;
 	m_INTVECTORBASE = 0;
+
+	m_allow_loop_check = true;
 }
 
 
