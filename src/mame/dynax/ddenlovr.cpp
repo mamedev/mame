@@ -10090,7 +10090,7 @@ void mmpanic_state::mmpanic(machine_config &config)
 void hanakanz_state::hanakanz(machine_config &config)
 {
 	/* basic machine hardware */
-	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, 20'000'000));
+	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, XTAL(20'000'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
 	maincpu.set_addrmap(AS_IO, &hanakanz_state::hanakanz_portmap);
 	maincpu.in_p0_callback().set(FUNC(hanakanz_state::hanakanz_busy_r));
