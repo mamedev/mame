@@ -9,13 +9,17 @@
 *******************************************************************c********/
 
 #include "output_module.h"
+
 #include "modules/osdmodule.h"
+
+namespace osd {
+
+namespace {
 
 class output_none : public osd_module, public output_module
 {
 public:
-	output_none()
-	: osd_module(OSD_OUTPUT_PROVIDER, "none"), output_module()
+	output_none() : osd_module(OSD_OUTPUT_PROVIDER, "none")
 	{
 	}
 	virtual ~output_none() { }
@@ -29,4 +33,8 @@ public:
 
 };
 
-MODULE_DEFINITION(OUTPUT_NONE, output_none)
+} // anonymous namespace
+
+} // namespace osd
+
+MODULE_DEFINITION(OUTPUT_NONE, osd::output_none)

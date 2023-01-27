@@ -4519,7 +4519,7 @@ msgstr "Κέρμα 12"
 
 #: src/emu/inpttype.ipp:583
 msgctxt "input-name"
-msgid "Bill 1"
+msgid "Banknote 1"
 msgstr "Αποδέκτης Χαρτονομισμάτων 1"
 
 #: src/emu/inpttype.ipp:588
@@ -4926,103 +4926,103 @@ msgstr "Περιστροφικό Κάθ. 10"
 
 #: src/emu/inpttype.ipp:742
 msgctxt "input-name"
-msgid "Track X"
-msgstr "Τροχιά X"
+msgid "Trackball X"
+msgstr "Ιχνόσφαιρα X"
 
 #: src/emu/inpttype.ipp:743
 msgctxt "input-name"
-msgid "Track X 2"
-msgstr "Τροχιά X 2"
+msgid "Trackball X 2"
+msgstr "Ιχνόσφαιρα X 2"
 
 #: src/emu/inpttype.ipp:744
 msgctxt "input-name"
-msgid "Track X 3"
-msgstr "Τροχιά X 3"
+msgid "Trackball X 3"
+msgstr "Ιχνόσφαιρα X 3"
 
 #: src/emu/inpttype.ipp:745
 msgctxt "input-name"
-msgid "Track X 4"
-msgstr "Τροχιά X 4"
+msgid "Trackball X 4"
+msgstr "Ιχνόσφαιρα X 4"
 
 #: src/emu/inpttype.ipp:746
 msgctxt "input-name"
-msgid "Track X 5"
-msgstr "Τροχιά X 5"
+msgid "Trackball X 5"
+msgstr "Ιχνόσφαιρα X 5"
 
 #: src/emu/inpttype.ipp:747
 msgctxt "input-name"
-msgid "Track X 6"
-msgstr "Τροχιά X 6"
+msgid "Trackball X 6"
+msgstr "Ιχνόσφαιρα X 6"
 
 #: src/emu/inpttype.ipp:748
 msgctxt "input-name"
-msgid "Track X 7"
-msgstr "Τροχιά X 7"
+msgid "Trackball X 7"
+msgstr "Ιχνόσφαιρα X 7"
 
 #: src/emu/inpttype.ipp:749
 msgctxt "input-name"
-msgid "Track X 8"
-msgstr "Τροχιά X 8"
+msgid "Trackball X 8"
+msgstr "Ιχνόσφαιρα X 8"
 
 #: src/emu/inpttype.ipp:750
 msgctxt "input-name"
-msgid "Track X 9"
-msgstr "Τροχιά X 9"
+msgid "Trackball X 9"
+msgstr "Ιχνόσφαιρα X 9"
 
 #: src/emu/inpttype.ipp:751
 msgctxt "input-name"
-msgid "Track X 10"
-msgstr "Τροχιά X 10"
+msgid "Trackball X 10"
+msgstr "Ιχνόσφαιρα X 10"
 
 #: src/emu/inpttype.ipp:756
 msgctxt "input-name"
-msgid "Track Y"
-msgstr "Τροχιά Y"
+msgid "Trackball Y"
+msgstr "Ιχνόσφαιρα Y"
 
 #: src/emu/inpttype.ipp:757
 msgctxt "input-name"
-msgid "Track Y 2"
-msgstr "Τροχιά Y 2"
+msgid "Trackball Y 2"
+msgstr "Ιχνόσφαιρα Y 2"
 
 #: src/emu/inpttype.ipp:758
 msgctxt "input-name"
-msgid "Track Y 3"
-msgstr "Τροχιά Y 3"
+msgid "Trackball Y 3"
+msgstr "Ιχνόσφαιρα Y 3"
 
 #: src/emu/inpttype.ipp:759
 msgctxt "input-name"
-msgid "Track Y 4"
-msgstr "Τροχιά Y 4"
+msgid "Trackball Y 4"
+msgstr "Ιχνόσφαιρα Y 4"
 
 #: src/emu/inpttype.ipp:760
 msgctxt "input-name"
-msgid "Track Y 5"
-msgstr "Τροχιά Y 5"
+msgid "Trackball Y 5"
+msgstr "Ιχνόσφαιρα Y 5"
 
 #: src/emu/inpttype.ipp:761
 msgctxt "input-name"
-msgid "Track Y 6"
-msgstr "Τροχιά Y 6"
+msgid "Trackball Y 6"
+msgstr "Ιχνόσφαιρα Y 6"
 
 #: src/emu/inpttype.ipp:762
 msgctxt "input-name"
-msgid "Track Y 7"
-msgstr "Τροχιά Y 7"
+msgid "Trackball Y 7"
+msgstr "Ιχνόσφαιρα Y 7"
 
 #: src/emu/inpttype.ipp:763
 msgctxt "input-name"
-msgid "Track Y 8"
-msgstr "Τροχιά Y 8"
+msgid "Trackball Y 8"
+msgstr "Ιχνόσφαιρα Y 8"
 
 #: src/emu/inpttype.ipp:764
 msgctxt "input-name"
-msgid "Track Y 9"
-msgstr "Τροχιά Y 9"
+msgid "Trackball Y 9"
+msgstr "Ιχνόσφαιρα Y 9"
 
 #: src/emu/inpttype.ipp:765
 msgctxt "input-name"
-msgid "Track Y 10"
-msgstr "Τροχιά Y 10"
+msgid "Trackball Y 10"
+msgstr "Ιχνόσφαιρα Y 10"
 
 #: src/emu/inpttype.ipp:770
 msgctxt "input-name"

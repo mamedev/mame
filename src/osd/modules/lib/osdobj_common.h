@@ -24,8 +24,9 @@
 
 #include <iosfwd>
 #include <list>
-#include <string>
 #include <memory>
+#include <string>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 
@@ -86,8 +87,7 @@
 #define OSDOPTION_AUDIO_OUTPUT          "audio_output"
 #define OSDOPTION_AUDIO_EFFECT          "audio_effect"
 
-#define OSDOPTVAL_AUTO                  "auto"
-#define OSDOPTVAL_NONE                  "none"
+#define OSDOPTION_MIDI_PROVIDER         "midiprovider"
 
 #define OSDOPTION_BGFX_PATH             "bgfx_path"
 #define OSDOPTION_BGFX_BACKEND          "bgfx_backend"
@@ -96,6 +96,9 @@
 #define OSDOPTION_BGFX_SHADOW_MASK      "bgfx_shadow_mask"
 #define OSDOPTION_BGFX_LUT              "bgfx_lut"
 #define OSDOPTION_BGFX_AVI_NAME         "bgfx_avi_name"
+
+#define OSDOPTVAL_AUTO                  "auto"
+#define OSDOPTVAL_NONE                  "none"
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -286,7 +289,7 @@ private:
 	osd_module_manager m_mod_man;
 	font_module *m_font_module;
 
-	void update_option(const std::string &key, std::vector<const char *> &values);
+	void update_option(const std::string &key, std::vector<std::string_view> const &values);
 	// FIXME: should be elsewhere
 	osd_module *select_module_options(const core_options &opts, const std::string &opt_name)
 	{
@@ -321,7 +324,7 @@ protected:
 	std::vector<ui::menu_item> m_sliders;
 
 private:
-	std::vector<const char *> m_video_names;
+	std::vector<std::string_view> m_video_names;
 	std::unordered_map<std::string, std::string> m_option_descs;
 };
 

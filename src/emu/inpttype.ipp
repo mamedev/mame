@@ -580,7 +580,7 @@ namespace {
 		INPUT_PORT_DIGITAL_TYPE(  0, OTHER,    COIN10,              N_p("input-name", "Coin 10"),                input_seq() ) \
 		INPUT_PORT_DIGITAL_TYPE(  0, OTHER,    COIN11,              N_p("input-name", "Coin 11"),                input_seq() ) \
 		INPUT_PORT_DIGITAL_TYPE(  0, OTHER,    COIN12,              N_p("input-name", "Coin 12"),                input_seq() ) \
-		INPUT_PORT_DIGITAL_TYPE(  0, OTHER,    BILL1,               N_p("input-name", "Bill 1"),                 input_seq(KEYCODE_BACKSPACE) ) \
+		INPUT_PORT_DIGITAL_TYPE(  0, OTHER,    BILL1,               N_p("input-name", "Banknote 1"),             input_seq(KEYCODE_BACKSPACE) ) \
 		CORE_INPUT_TYPES_END()
 
 #define CORE_INPUT_TYPES_SERVICE \
@@ -739,30 +739,30 @@ namespace {
 
 #define CORE_INPUT_TYPES_TRACKBALL_X \
 		CORE_INPUT_TYPES_BEGIN(trackball_x) \
-		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  TRACKBALL_X,         N_p("input-name", "Track X"),                input_seq(MOUSECODE_X_INDEXED(0), input_seq::or_code, JOYCODE_X_INDEXED(0)), input_seq(KEYCODE_LEFT), input_seq(KEYCODE_RIGHT) ) \
-		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  TRACKBALL_X,         N_p("input-name", "Track X 2"),              input_seq(MOUSECODE_X_INDEXED(1), input_seq::or_code, JOYCODE_X_INDEXED(1)), input_seq(KEYCODE_D), input_seq(KEYCODE_G) ) \
-		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  TRACKBALL_X,         N_p("input-name", "Track X 3"),              input_seq(MOUSECODE_X_INDEXED(2), input_seq::or_code, JOYCODE_X_INDEXED(2)), input_seq(KEYCODE_J), input_seq(KEYCODE_L) ) \
-		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  TRACKBALL_X,         N_p("input-name", "Track X 4"),              input_seq(MOUSECODE_X_INDEXED(3), input_seq::or_code, JOYCODE_X_INDEXED(3)), input_seq(), input_seq() ) \
-		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  TRACKBALL_X,         N_p("input-name", "Track X 5"),              input_seq(MOUSECODE_X_INDEXED(4), input_seq::or_code, JOYCODE_X_INDEXED(4)), input_seq(), input_seq() ) \
-		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  TRACKBALL_X,         N_p("input-name", "Track X 6"),              input_seq(MOUSECODE_X_INDEXED(5), input_seq::or_code, JOYCODE_X_INDEXED(5)), input_seq(), input_seq() ) \
-		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  TRACKBALL_X,         N_p("input-name", "Track X 7"),              input_seq(MOUSECODE_X_INDEXED(6), input_seq::or_code, JOYCODE_X_INDEXED(6)), input_seq(), input_seq() ) \
-		INPUT_PORT_ANALOG_TYPE(   8, PLAYER8,  TRACKBALL_X,         N_p("input-name", "Track X 8"),              input_seq(MOUSECODE_X_INDEXED(7), input_seq::or_code, JOYCODE_X_INDEXED(7)), input_seq(), input_seq() ) \
-		INPUT_PORT_ANALOG_TYPE(   9, PLAYER9,  TRACKBALL_X,         N_p("input-name", "Track X 9"),              input_seq(MOUSECODE_X_INDEXED(8), input_seq::or_code, JOYCODE_X_INDEXED(8)), input_seq(), input_seq() ) \
-		INPUT_PORT_ANALOG_TYPE(  10, PLAYER10, TRACKBALL_X,         N_p("input-name", "Track X 10"),             input_seq(MOUSECODE_X_INDEXED(9), input_seq::or_code, JOYCODE_X_INDEXED(9)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  TRACKBALL_X,         N_p("input-name", "Trackball X"),            input_seq(MOUSECODE_X_INDEXED(0), input_seq::or_code, JOYCODE_X_INDEXED(0)), input_seq(KEYCODE_LEFT), input_seq(KEYCODE_RIGHT) ) \
+		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  TRACKBALL_X,         N_p("input-name", "Trackball X 2"),          input_seq(MOUSECODE_X_INDEXED(1), input_seq::or_code, JOYCODE_X_INDEXED(1)), input_seq(KEYCODE_D), input_seq(KEYCODE_G) ) \
+		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  TRACKBALL_X,         N_p("input-name", "Trackball X 3"),          input_seq(MOUSECODE_X_INDEXED(2), input_seq::or_code, JOYCODE_X_INDEXED(2)), input_seq(KEYCODE_J), input_seq(KEYCODE_L) ) \
+		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  TRACKBALL_X,         N_p("input-name", "Trackball X 4"),          input_seq(MOUSECODE_X_INDEXED(3), input_seq::or_code, JOYCODE_X_INDEXED(3)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  TRACKBALL_X,         N_p("input-name", "Trackball X 5"),          input_seq(MOUSECODE_X_INDEXED(4), input_seq::or_code, JOYCODE_X_INDEXED(4)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  TRACKBALL_X,         N_p("input-name", "Trackball X 6"),          input_seq(MOUSECODE_X_INDEXED(5), input_seq::or_code, JOYCODE_X_INDEXED(5)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  TRACKBALL_X,         N_p("input-name", "Trackball X 7"),          input_seq(MOUSECODE_X_INDEXED(6), input_seq::or_code, JOYCODE_X_INDEXED(6)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   8, PLAYER8,  TRACKBALL_X,         N_p("input-name", "Trackball X 8"),          input_seq(MOUSECODE_X_INDEXED(7), input_seq::or_code, JOYCODE_X_INDEXED(7)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   9, PLAYER9,  TRACKBALL_X,         N_p("input-name", "Trackball X 9"),          input_seq(MOUSECODE_X_INDEXED(8), input_seq::or_code, JOYCODE_X_INDEXED(8)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(  10, PLAYER10, TRACKBALL_X,         N_p("input-name", "Trackball X 10"),         input_seq(MOUSECODE_X_INDEXED(9), input_seq::or_code, JOYCODE_X_INDEXED(9)), input_seq(), input_seq() ) \
 		CORE_INPUT_TYPES_END()
 
 #define CORE_INPUT_TYPES_TRACKBALL_Y \
 		CORE_INPUT_TYPES_BEGIN(trackball_y) \
-		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  TRACKBALL_Y,         N_p("input-name", "Track Y"),                input_seq(MOUSECODE_Y_INDEXED(0), input_seq::or_code, JOYCODE_Y_INDEXED(0)), input_seq(KEYCODE_UP), input_seq(KEYCODE_DOWN) ) \
-		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  TRACKBALL_Y,         N_p("input-name", "Track Y 2"),              input_seq(MOUSECODE_Y_INDEXED(1), input_seq::or_code, JOYCODE_Y_INDEXED(1)), input_seq(KEYCODE_R), input_seq(KEYCODE_F) ) \
-		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  TRACKBALL_Y,         N_p("input-name", "Track Y 3"),              input_seq(MOUSECODE_Y_INDEXED(2), input_seq::or_code, JOYCODE_Y_INDEXED(2)), input_seq(KEYCODE_I), input_seq(KEYCODE_K) ) \
-		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  TRACKBALL_Y,         N_p("input-name", "Track Y 4"),              input_seq(MOUSECODE_Y_INDEXED(3), input_seq::or_code, JOYCODE_Y_INDEXED(3)), input_seq(), input_seq() ) \
-		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  TRACKBALL_Y,         N_p("input-name", "Track Y 5"),              input_seq(MOUSECODE_Y_INDEXED(4), input_seq::or_code, JOYCODE_Y_INDEXED(4)), input_seq(), input_seq() ) \
-		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  TRACKBALL_Y,         N_p("input-name", "Track Y 6"),              input_seq(MOUSECODE_Y_INDEXED(5), input_seq::or_code, JOYCODE_Y_INDEXED(5)), input_seq(), input_seq() ) \
-		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  TRACKBALL_Y,         N_p("input-name", "Track Y 7"),              input_seq(MOUSECODE_Y_INDEXED(6), input_seq::or_code, JOYCODE_Y_INDEXED(6)), input_seq(), input_seq() ) \
-		INPUT_PORT_ANALOG_TYPE(   8, PLAYER8,  TRACKBALL_Y,         N_p("input-name", "Track Y 8"),              input_seq(MOUSECODE_Y_INDEXED(7), input_seq::or_code, JOYCODE_Y_INDEXED(7)), input_seq(), input_seq() ) \
-		INPUT_PORT_ANALOG_TYPE(   9, PLAYER9,  TRACKBALL_Y,         N_p("input-name", "Track Y 9"),              input_seq(MOUSECODE_Y_INDEXED(8), input_seq::or_code, JOYCODE_Y_INDEXED(8)), input_seq(), input_seq() ) \
-		INPUT_PORT_ANALOG_TYPE(  10, PLAYER10, TRACKBALL_Y,         N_p("input-name", "Track Y 10"),             input_seq(MOUSECODE_Y_INDEXED(9), input_seq::or_code, JOYCODE_Y_INDEXED(9)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  TRACKBALL_Y,         N_p("input-name", "Trackball Y"),            input_seq(MOUSECODE_Y_INDEXED(0), input_seq::or_code, JOYCODE_Y_INDEXED(0)), input_seq(KEYCODE_UP), input_seq(KEYCODE_DOWN) ) \
+		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  TRACKBALL_Y,         N_p("input-name", "Trackball Y 2"),          input_seq(MOUSECODE_Y_INDEXED(1), input_seq::or_code, JOYCODE_Y_INDEXED(1)), input_seq(KEYCODE_R), input_seq(KEYCODE_F) ) \
+		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  TRACKBALL_Y,         N_p("input-name", "Trackball Y 3"),          input_seq(MOUSECODE_Y_INDEXED(2), input_seq::or_code, JOYCODE_Y_INDEXED(2)), input_seq(KEYCODE_I), input_seq(KEYCODE_K) ) \
+		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  TRACKBALL_Y,         N_p("input-name", "Trackball Y 4"),          input_seq(MOUSECODE_Y_INDEXED(3), input_seq::or_code, JOYCODE_Y_INDEXED(3)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  TRACKBALL_Y,         N_p("input-name", "Trackball Y 5"),          input_seq(MOUSECODE_Y_INDEXED(4), input_seq::or_code, JOYCODE_Y_INDEXED(4)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  TRACKBALL_Y,         N_p("input-name", "Trackball Y 6"),          input_seq(MOUSECODE_Y_INDEXED(5), input_seq::or_code, JOYCODE_Y_INDEXED(5)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  TRACKBALL_Y,         N_p("input-name", "Trackball Y 7"),          input_seq(MOUSECODE_Y_INDEXED(6), input_seq::or_code, JOYCODE_Y_INDEXED(6)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   8, PLAYER8,  TRACKBALL_Y,         N_p("input-name", "Trackball Y 8"),          input_seq(MOUSECODE_Y_INDEXED(7), input_seq::or_code, JOYCODE_Y_INDEXED(7)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   9, PLAYER9,  TRACKBALL_Y,         N_p("input-name", "Trackball Y 9"),          input_seq(MOUSECODE_Y_INDEXED(8), input_seq::or_code, JOYCODE_Y_INDEXED(8)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(  10, PLAYER10, TRACKBALL_Y,         N_p("input-name", "Trackball Y 10"),         input_seq(MOUSECODE_Y_INDEXED(9), input_seq::or_code, JOYCODE_Y_INDEXED(9)), input_seq(), input_seq() ) \
 		CORE_INPUT_TYPES_END()
 
 #define CORE_INPUT_TYPES_AD_STICK_X \

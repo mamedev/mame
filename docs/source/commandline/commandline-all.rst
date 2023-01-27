@@ -972,7 +972,7 @@ Example:
 
 ..  rubric:: Footnotes
 
-..  [#JIPAutoWindows] On Windows, auto will default to ``winhybrid``.
+..  [#JIPAutoWindows] On Windows native, auto will default to ``winhybrid``.
 
 ..  [#JIPAutoSDL] On SDL, auto will default to ``sdlgame``.
 
@@ -1001,6 +1001,21 @@ Example:
     .. code-block:: bash
 
         mame mk2 -joystickprovider winhybrid
+
+.. _mame-commandline-midiprovider:
+
+**-midiprovider** *<module>*
+
+    Chooses how MAME will communicate with MIDI devices and applications (e.g.
+    music keyboards and synthesisers).  Supported options are ``pm`` to use the
+    PortMidi library, or ``none`` to disable MIDI input and output (MIDI files
+    can still be played).  The default is ``auto``, which will use PortMidi if
+    available.
+
+Example:
+    .. code-block:: bash
+
+        mame -midiprovider none dx100 -midiin canyon.mid
 
 
 .. _mame-commandline-cliverbs:
@@ -2092,35 +2107,35 @@ Core Video Options
 
     Generally Available:
 
-      |	Using ``bgfx`` specifies the new hardware accelerated renderer.
-      |
-      |	Using ``opengl`` tells MAME to render video using OpenGL acceleration.
-      |
-      |	Using ``none`` displays no windows and does no drawing.  This is primarily present for doing CPU benchmarks without the overhead of the video system.
-      |
+    * Using ``bgfx`` specifies the new hardware accelerated renderer.
+    * Using ``opengl`` tells MAME to render video using OpenGL acceleration.
+    * Using ``none`` displays no windows and does no drawing.  This is primarily
+      intended for benchmarking emulation without the overhead of the video
+      system.
 
     On Windows:
 
-      |	Using ``gdi`` tells MAME to render video using older standard Windows graphics drawing calls.  This is the slowest but most compatible option on older versions of Windows.
-      |
-      |	Using ``d3d`` tells MAME to use Direct3D for rendering.  This produces the better quality output than ``gdi`` and enables additional rendering options.  It is recommended if you have a semi-recent (2002+) video card or onboard Intel video of the HD3000 line or better.
-      |
+    * Using ``gdi`` tells MAME to render video using older standard Windows
+      graphics drawing calls.  This is the slowest but most compatible option on
+      older versions of Windows or buggy graphics hardware drivers.
+    * Using ``d3d`` tells MAME to use Direct3D 9 for rendering.  This produces
+      better quality output than ``gdi`` and enables additional rendering
+      options.  It is recommended if you have a 3D-capable video card or onboard
+      Intel video of the HD3000 line or better.
 
     On other platforms (including SDL on Windows):
 
-      |	Using ``accel`` tells MAME to render video using SDL's 2D acceleration if possible.
-      |
-      |	Using ``soft`` uses software rendering for video output.  This isn't as fast or as nice as OpenGL but will work on any platform.
-      |
+    * Using ``accel`` tells MAME to render video using SDL’s 2D acceleration if
+      possible.
+    * Using ``soft`` uses software rendering for video output.  This isn’t as
+      fast or as nice as OpenGL, but it will work on any platform.
 
     Defaults:
 
-      |	The default on Windows is ``d3d``.
-      |
-      |	The default for Mac OS X is ``opengl`` because OS X is guaranteed to have a compliant OpenGL stack.
-      |
-      |	The default on all other systems is ``soft``.
-      |
+    * The default on Windows is ``d3d``.
+    * The default for macOS is ``opengl`` because OS X is guaranteed to have a
+      compliant OpenGL stack.
+    * The default on all other systems is ``soft``.
 
     Example:
         .. code-block:: bash
@@ -3331,17 +3346,17 @@ Core Input Options
 
 **-joystick_deadzone** *<value>* / **-joy_deadzone** *<value>* / **-jdz** *<value>*
 
-  If you play with an analog joystick, the center can drift a little.
-  joystick_deadzone tells how far along an axis you must move before the axis
-  starts to change. This option expects a float in the range of 0.0 to 1.0.
-  Where 0 is the center of the joystick and 1 is the outer limit.
+    If you play with an analog joystick, the center can drift a little.
+    joystick_deadzone tells how far along an axis you must move before the axis
+    starts to change. This option expects a float in the range of 0.0 to 1.0.
+    Where 0 is the center of the joystick and 1 is the outer limit.
 
-  The default is ``0.3``.
+    The default is ``0.15``.
 
     Example:
         .. code-block:: bash
 
-            mame sinistar -joystick_deadzone 0.45
+            mame sinistar -joystick_deadzone 0.3
 
 .. _mame-commandline-joysticksaturation:
 
@@ -3360,6 +3375,29 @@ Core Input Options
 
             mame sinistar -joystick_saturation 1.0
 
+.. _mame-commandline-joystickthreshold:
+
+**-joystick_threshold** *<value>* / **joy_threshold** *<value>* / **-jthresh** *<value>*
+
+    When a joystick axis (or other absolute analog axis) is assigned to a
+    digital input, this controls how far it must be moved from the neutral
+    position (or centre) to be considered active or switched on.  This option
+    expects a float in the range of 0.0 to 1.0, where 0 means any movement from
+    the neutral position is considered active, and 1 means only the outer limits
+    are considered active.  This threshold is **not** adjusted to the range
+    between the dead zone and saturation point.
+
+    Note that if a :ref:`joystick map <mame-commandline-joystickmap>` is
+    configured, that will take precedence over this setting when a joystick’s
+    main X/Y axes are assigned to digital inputs.
+
+    The default is ``0.3``.
+
+    Example:
+        .. code-block:: bash
+
+            mame raiden -joystick_threshold 0.2
+
 .. _mame-commandline-natural:
 
 **\-[no]natural**
@@ -3376,18 +3414,22 @@ Core Input Options
     presses/releases the emulated key.
 
     In "natural keyboard" mode, MAME attempts to translate characters to
-    keystrokes.  The OS translates keystrokes to characters
-    (similarly when you type into a text editor), and MAME attempts to translate
-    these characters to emulated keystrokes.
+    keystrokes.  The OS translates keystrokes to characters (similarly to when
+    you type into a text editor), and MAME attempts to translate these
+    characters to emulated keystrokes.
 
     **There are a number of unavoidable limitations in "natural keyboard" mode:**
 
-      * The emulated system driver and/or keyboard device or has to support it.
-      * The selected keyboard *must* match the keyboard layout selected in the emulated OS!
-      * Keystrokes that don't produce characters can't be translated. (e.g. pressing a modifier on its own such as **shift**, **ctrl**, or **alt**)
-      * Holding a key until the character repeats will cause the emulated key to be pressed repeatedly as opposed to being held down.
-      * Dead key sequences are cumbersome to use at best.
-      * It won't work at all if IME edit is involved. (e.g. for Chinese/Japanese/Korean)
+    * The emulated system driver and/or keyboard device has to support it.
+    * The selected keyboard layout *must* match the keyboard layout selected in
+      the emulated OS!
+    * Keystrokes that don’t produce characters can’t be translated (e.g.
+      pressing a modifier on its own such as **shift**, **ctrl**, or **alt**).
+    * Holding a key until the character repeats will cause the emulated key to
+      be pressed repeatedly as opposed to being held down.
+    * Dead key sequences are cumbersome to use at best.
+    * It won’t work at all if IME edit is involved (e.g. for Chinese, Japanese
+      or Korean language input).
 
     Example:
         .. code-block:: bash

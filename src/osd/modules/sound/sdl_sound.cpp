@@ -9,6 +9,7 @@
 //============================================================
 
 #include "sound_module.h"
+
 #include "modules/osdmodule.h"
 
 #if (defined(OSD_SDL) || defined(USE_SDL_SOUND))
@@ -26,6 +27,11 @@
 #include <fstream>
 #include <memory>
 
+
+namespace osd {
+
+namespace {
+
 //============================================================
 //  DEBUGGING
 //============================================================
@@ -41,13 +47,13 @@ class sound_sdl : public osd_module, public sound_module
 public:
 
 	// number of samples per SDL callback
-	static const int SDL_XFER_SAMPLES = 512;
+	static inline constexpr int SDL_XFER_SAMPLES = 512;
 
 	sound_sdl() :
 		osd_module(OSD_SOUND_PROVIDER, "sdl"), sound_module(),
 		stream_in_initialized(0),
 		attenuation(0), buf_locked(0), stream_buffer(nullptr), stream_buffer_size(0), buffer_underflows(0), buffer_overflows(0)
-{
+	{
 		sdl_xfer_samples = SDL_XFER_SAMPLES;
 	}
 	virtual ~sound_sdl() { }
@@ -456,10 +462,15 @@ void sound_sdl::sdl_destroy_buffers()
 	stream_buffer.reset();
 }
 
+} // anonymous namespace
+
+} // namespace osd
 
 
-#else /* SDLMAME_UNIX */
-	MODULE_NOT_SUPPORTED(sound_sdl, OSD_SOUND_PROVIDER, "sdl")
+#else // (defined(OSD_SDL) || defined(USE_SDL_SOUND))
+
+namespace osd { namespace { MODULE_NOT_SUPPORTED(sound_sdl, OSD_SOUND_PROVIDER, "sdl") } }
+
 #endif
 
-MODULE_DEFINITION(SOUND_SDL, sound_sdl)
+MODULE_DEFINITION(SOUND_SDL, osd::sound_sdl)
