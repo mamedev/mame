@@ -19,7 +19,11 @@ TODO:
   likely for drawing an error.
 - Pinpoint what i/o $2a8 is for during texture init (alt serial flash transfer?)
 - EEPROM (i/o $2ac r/w)
-- Hookup ISA sound board
+- Hookup ISA sound board;
+- Pump it Up is known to run on almost identical HW, except that it uses a boot floppy and a
+  non-El Torito complaint CD-Rom. This implies that it has an extra FDC either on an ISA board or
+  a Super I/O ...
+  https://github.com/Shizmob/arcade-docs/blob/main/andamiro/board.md#mk3
 
 ===================================================================================================
 
@@ -408,3 +412,17 @@ ROM_END
 } // anonymous namespace
 
 GAME(1999, xtom3d, 0, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro / Jamie System Development", "X Tom 3D", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(1999, pumpit1,  0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up: The 1st Dance Floor")
+// GAME(1999, pumpit2,  0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up: The 2nd Dance Floor")
+// GAME(1999, pumpit3,  0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up The O.B.G: The 3rd Dance Floor")
+// GAME(2000, pumpito,  0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up The O.B.G: The Season Evolution Dance Floor"
+// GAME(2000, pumpitc,  0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up: The Collection"
+// GAME(2000, pumpitpc, 0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up: The Perfect Collection")
+// GAME(2001, pumpite,  0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up Extra")
+// GAME(2001, pumpitpr, 0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro","Pump it Up The Premiere: The International Dance Floor")
+// GAME(2001, pumpitpx, 0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX: The International Dance Floor")
+// GAME(2002, pumpit8,  0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up The Rebirth: The 8th Dance Floor")
+// GAME(2002, pumpitp2, 0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up The Premiere 2: The International 2nd Dance Floor"
+// GAME(2002, pumpipx2, 0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX 2")
+// GAME(2003, pumpitp3, 0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up The Premiere 3: The International 3rd Dance Floor")
+// GAME(2003, pumpipx3, 0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX 3: The International 4th Dance Floor")
