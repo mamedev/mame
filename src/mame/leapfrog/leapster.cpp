@@ -235,17 +235,33 @@ private:
 		return 0xffffffff;
 	}
 
-	void leapster_aux004b_w(uint32_t data)
+	void leapster_aux0047_w(uint32_t data)
 	{
-		printf("leapster_aux004b_w %04x\n", data);
+		logerror("%s: leapster_aux0047_w %08x\n", machine().describe_context(), data);
 	}
 
+	uint32_t leapster_aux0048_r(void);
+
+	void leapster_aux0048_w(uint32_t data)
+	{
+		logerror("%s: leapster_aux0047_w %08x\n", machine().describe_context(), data);
+	}
+
+	void leapster_aux004b_w(uint32_t data)
+	{
+		logerror("%s: leapster_aux004b_w %08x\n", machine().describe_context(), data);
+	}
+
+	void leapster_aux0010_w(uint32_t data);
+	uint32_t leapster_aux0011_r(void);
+	void leapster_aux0011_w(uint32_t data);
 	void leapster_aux001a_w(uint32_t data);
+	uint32_t leapster_aux001b_r(void);
 
 	void leapster_aux(address_map &map);
 	void leapster_map(address_map &map);
 
-	uint16_t m_1a_data[0x1000];
+	uint16_t m_1a_data[0x800];
 	int m_1a_pointer;
 
 	required_device<cpu_device> m_maincpu;
@@ -259,17 +275,43 @@ private:
 static INPUT_PORTS_START( leapster )
 INPUT_PORTS_END
 
+void leapster_state::leapster_aux0010_w(uint32_t data)
+{
+}
+
+void leapster_state::leapster_aux0011_w(uint32_t data)
+{
+	// unknown, written with 1a
+}
+
 void leapster_state::leapster_aux001a_w(uint32_t data)
 {
 	// probably not palette, but it does load 0x1000 words of increasing value on startup, so could be?
-	m_1a_data[m_1a_pointer & 0xfff] = data;
+	m_1a_data[m_1a_pointer & 0x7ff] = data;
 
 	uint8_t r = (data >> 12) & 0x7;
 	uint8_t g = (data >> 8) & 0xf;
 	uint8_t b = (data >> 4) & 0xf;
 
-	m_palette->set_pen_color(m_1a_pointer & 0xfff, rgb_t(pal3bit(r), pal4bit(g), pal4bit(b)));
+	m_palette->set_pen_color(m_1a_pointer & 0x7ff, rgb_t(pal3bit(r), pal4bit(g), pal4bit(b)));
 	m_1a_pointer++;
+}
+
+uint32_t leapster_state::leapster_aux0011_r(void)
+{
+	// unknown, read when 11/1a are being written
+	return 0x00000000;
+}
+
+uint32_t leapster_state::leapster_aux001b_r(void)
+{
+	// unknown, read when 11/1a are being written
+	return 0x00000000;
+}
+
+uint32_t leapster_state::leapster_aux0048_r(void)
+{
+	return 0x00000000;
 }
 
 uint32_t leapster_state::screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -303,13 +345,14 @@ void leapster_state::machine_start()
 void leapster_state::machine_reset()
 {
 	m_1a_pointer = 0;
-	for (int i = 0; i < 0x1000; i++)
+	for (int i = 0; i < 0x800; i++)
 		m_1a_data[i] = 0;
 }
 
 void leapster_state::leapster_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).rom().mirror(0x40000000); // pointers in the BIOS region seem to be to the 40xxxxxx region, either we mirror there or something (real BIOS?) is acutally missing
+//	map(0x01800000, 0x0180ffff).ram();
 	map(0x01802078, 0x0180207b).r(FUNC(leapster_state::leapster_random_r));
 	map(0x01809004, 0x01809007).r(FUNC(leapster_state::leapster_ff_r));
 	map(0x0180d800, 0x0180d803).r(FUNC(leapster_state::leapster_random_r));
@@ -323,8 +366,15 @@ void leapster_state::leapster_map(address_map &map)
 
 void leapster_state::leapster_aux(address_map &map)
 {
+	// addresses used here aren't known internal ARC addresses, so are presumed to be Leapster specific
+	map(0x000000010, 0x000000010).w(FUNC(leapster_state::leapster_aux0010_w));
+	map(0x000000011, 0x000000011).rw(FUNC(leapster_state::leapster_aux0011_r), FUNC(leapster_state::leapster_aux0011_w));
 	map(0x00000001a, 0x00000001a).w(FUNC(leapster_state::leapster_aux001a_w));
-	map(0x00000004b, 0x00000004b).w(FUNC(leapster_state::leapster_aux004b_w)); // this address isn't used by ARC internal stuff afaik, so probably leapster specific
+	map(0x00000001b, 0x00000001b).r(FUNC(leapster_state::leapster_aux001b_r));
+
+	map(0x000000047, 0x000000047).w(FUNC(leapster_state::leapster_aux0047_w));
+	map(0x000000048, 0x000000048).rw(FUNC(leapster_state::leapster_aux0048_r), FUNC(leapster_state::leapster_aux0048_w));
+	map(0x00000004b, 0x00000004b).w(FUNC(leapster_state::leapster_aux004b_w));
 }
 
 void leapster_state::leapster(machine_config &config)
@@ -342,7 +392,7 @@ void leapster_state::leapster(machine_config &config)
 	screen.set_visarea(0, 160-1, 0, 160-1);
 	screen.set_screen_update(FUNC(leapster_state::screen_update_leapster));
 
-	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 0x1000).set_endianness(ENDIANNESS_BIG);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_444, 0x800).set_endianness(ENDIANNESS_BIG);
 
 	// Cartridge
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "leapster_cart", "bin").set_device_load(FUNC(leapster_state::cart_load));

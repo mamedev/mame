@@ -50,9 +50,102 @@ void arcompact_device::arcompact_auxreg012_MULHI_w(uint32_t data)
 	m_regs[REG_MHI] = data;
 }
 
+void arcompact_device::arcompact_auxreg043_AUX_IRQ_LV12_w(uint32_t data)
+{
+	logerror("%s: arcompact_auxreg043_AUX_IRQ_LV12_w %08x\n", machine().describe_context(), data);
+}
+
 
 uint32_t arcompact_device::arcompact_auxreg025_INTVECTORBASE_r() { return m_INTVECTORBASE&0xfffffc00; }
-void arcompact_device::arcompact_auxreg025_INTVECTORBASE_w(uint32_t data) { m_INTVECTORBASE = data&0xfffffc00; }
+
+void arcompact_device::arcompact_auxreg025_INTVECTORBASE_w(uint32_t data)
+{
+	logerror("%s: m_INTVECTORBASE write %08x\n", machine().describe_context(), data);
+	m_INTVECTORBASE = data & 0xfffffc00;
+}
+
+uint32_t arcompact_device::arcompact_auxreg012_TIMER0_r(offs_t offset)
+{
+	switch (offset)
+	{
+	case 0x00:
+		logerror("%s: TIMER0 COUNT read\n", machine().describe_context());
+		return m_timer[0][0];
+	case 0x01:
+		logerror("%s: TIMER0 CONTROL read\n", machine().describe_context());
+		return m_timer[0][1];
+	case 0x02:
+		logerror("%s: TIMER0 LIMIT read\n", machine().describe_context());
+		return m_timer[0][2];
+	}
+	return 0x00;
+}
+
+uint32_t arcompact_device::arcompact_auxreg100_TIMER1_r(offs_t offset)
+{
+	switch (offset)
+	{
+	case 0x00:
+		logerror("%s: TIMER1 COUNT read\n", machine().describe_context());
+		return m_timer[1][0];
+	case 0x01:
+		logerror("%s: TIMER1 CONTROL read\n", machine().describe_context());
+		return m_timer[1][1];
+	case 0x02:
+		logerror("%s: TIMER1 LIMIT read\n", machine().describe_context());
+		return m_timer[1][2];
+	}
+	return 0x00;
+}
+
+void arcompact_device::arcompact_auxreg012_TIMER0_w(offs_t offset, uint32_t data)
+{
+	switch (offset)
+	{
+	case 0x00:
+		m_timer[0][0] = data;
+		logerror("%s: TIMER0 COUNT write %08x\n", machine().describe_context(), data);
+		break;
+	case 0x01:
+		m_timer[0][1] = data;
+		logerror("%s: TIMER0 CONTROL write %08x\n", machine().describe_context(), data);
+		break;
+	case 0x02:
+		m_timer[0][2] = data;
+		logerror("%s: TIMER0 LIMIT write %08x\n", machine().describe_context(), data);
+		break;
+	}
+}
+
+void arcompact_device::arcompact_auxreg100_TIMER1_w(offs_t offset, uint32_t data)
+{
+	switch (offset)
+	{
+	case 0x00:
+		m_timer[1][0] = data;
+		logerror("%s: TIMER1 COUNT write %08x\n", machine().describe_context(), data);
+		break;
+	case 0x01:
+		m_timer[1][1] = data;
+		logerror("%s: TIMER1 CONTROL write %08x\n", machine().describe_context(), data);
+		break;
+	case 0x02:
+		m_timer[1][2] = data;
+		logerror("%s: TIMER1 LIMIT write %08x\n", machine().describe_context(), data);
+		break;
+	}
+}
+
+uint32_t arcompact_device::arcompact_auxreg200_AUX_IRQ_LVL_r(void)
+{
+	logerror("%s: arcompact_auxreg200_AUX_IRQ_LVL_r\n", machine().describe_context());
+	return 0;
+}
+
+void arcompact_device::arcompact_auxreg200_AUX_IRQ_LVL_w(uint32_t data)
+{
+	logerror("%s: arcompact_auxreg200_AUX_IRQ_LVL_w %08x\n", machine().describe_context(), data);
+}
 
 void arcompact_device::arcompact_auxreg_map(address_map &map)
 {
@@ -64,7 +157,15 @@ void arcompact_device::arcompact_auxreg_map(address_map &map)
 
 	map(0x000000012, 0x000000012).w(FUNC(arcompact_device::arcompact_auxreg012_MULHI_w));
 
+	map(0x000000021, 0x000000023).rw(FUNC(arcompact_device::arcompact_auxreg012_TIMER0_r), FUNC(arcompact_device::arcompact_auxreg012_TIMER0_w));
+
 	map(0x000000025, 0x000000025).rw(FUNC(arcompact_device::arcompact_auxreg025_INTVECTORBASE_r), FUNC(arcompact_device::arcompact_auxreg025_INTVECTORBASE_w));
+
+	map(0x000000043, 0x000000043).w(FUNC(arcompact_device::arcompact_auxreg043_AUX_IRQ_LV12_w));
+
+	map(0x000000100, 0x000000102).rw(FUNC(arcompact_device::arcompact_auxreg100_TIMER1_r), FUNC(arcompact_device::arcompact_auxreg100_TIMER1_w));
+
+	map(0x000000200, 0x000000200).rw(FUNC(arcompact_device::arcompact_auxreg200_AUX_IRQ_LVL_r), FUNC(arcompact_device::arcompact_auxreg200_AUX_IRQ_LVL_w));
 }
 
 #define AUX_SPACE_ADDRESS_WIDTH 32  // IO space is 32 bits of dwords
@@ -127,6 +228,8 @@ void arcompact_device::device_start()
 	}
 
 	set_icountptr(m_icount);
+
+	save_item(NAME(m_INTVECTORBASE));
 }
 
 
@@ -221,6 +324,10 @@ void arcompact_device::device_reset()
 	m_INTVECTORBASE = 0;
 
 	m_allow_loop_check = true;
+
+	for (int t = 0; t < 2; t++)
+		for (int r = 0; r < 3; r++)
+			m_timer[t][r] = 0x00;
 }
 
 

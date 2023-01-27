@@ -77,8 +77,18 @@ private:
 
 	void arcompact_auxreg012_MULHI_w(uint32_t data);
 
+	uint32_t arcompact_auxreg012_TIMER0_r(offs_t offset);
+	uint32_t arcompact_auxreg100_TIMER1_r(offs_t offset);
+	void arcompact_auxreg012_TIMER0_w(offs_t offset, uint32_t data);
+	void arcompact_auxreg100_TIMER1_w(offs_t offset, uint32_t data);
+
 	uint32_t arcompact_auxreg025_INTVECTORBASE_r();
 	void arcompact_auxreg025_INTVECTORBASE_w(uint32_t data);
+
+	void arcompact_auxreg043_AUX_IRQ_LV12_w(uint32_t data);
+
+	uint32_t arcompact_auxreg200_AUX_IRQ_LVL_r();
+	void arcompact_auxreg200_AUX_IRQ_LVL_w(uint32_t data);
 
 	const static int LIMM_REG = 62;
 
@@ -946,6 +956,8 @@ private:
 // 31   30   29   28   27   26   25   24   23   22   21   20   19   18   17   16   15   14   13   12   11   10   09   08   07   06   05   04   03   02   01   00
 // LD | SH | BH | UB | xx | xx | xx | xx | ZZ | RA | xx | xx | xx | xx | xx | xx | xx | xx | xx | xx | IS | xx | xx | xx | xx | xx | xx | xx | xx | xx | FH | SS
 	uint32_t m_debug;
+
+	uint32_t m_timer[2][3];
 
 	uint32_t m_LP_START;
 	uint32_t m_LP_END;
