@@ -11,8 +11,8 @@
  * way around.
  */
 
-#ifndef MAME_MACHINE_CXD8452AQ_H
-#define MAME_MACHINE_CXD8452AQ_H
+#ifndef MAME_SONY_CXD8452AQ_H
+#define MAME_SONY_CXD8452AQ_H
 
 #pragma once
 
@@ -115,4 +115,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(CXD8452AQ, cxd8452aq_device)
 
-#endif // MAME_MACHINE_CXD8452AQ_H
+#endif // MAME_SONY_CXD8452AQ_H

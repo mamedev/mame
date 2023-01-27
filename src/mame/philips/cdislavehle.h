@@ -15,8 +15,8 @@ TODO:
 
 *******************************************************************************/
 
-#ifndef MAME_MACHINE_CDISLAVEHLE_H
-#define MAME_MACHINE_CDISLAVEHLE_H
+#ifndef MAME_PHILIPS_CDISLAVEHLE_H
+#define MAME_PHILIPS_CDISLAVEHLE_H
 
 #pragma once
 
@@ -99,4 +99,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(CDI_SLAVE_HLE, cdislave_hle_device)
 
-#endif // MAME_MACHINE_CDISLAVEHLE_H
+#endif // MAME_PHILIPS_CDISLAVEHLE_H

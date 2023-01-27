@@ -37,6 +37,8 @@ No software to test with, so we'll never know if the FDC works.
 #include "imagedev/floppy.h"
 
 
+namespace {
+
 class mccpm_state : public driver_device
 {
 public:
@@ -262,6 +264,9 @@ ROM_START( mccpm )
 	ROM_SYSTEM_BIOS(2, "v34a", "V3.4 (alt)")
 	ROMX_LOAD("mc01mon.bin", 0x0000, 0x0d00, CRC(d1c89043) SHA1(f52a0ed3793dde0de74596be7339233b6a1770af), ROM_BIOS(2))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

@@ -42,6 +42,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class qvt70_state : public driver_device
 {
 public:
@@ -423,6 +426,9 @@ ROM_START( qvt82 )
 	ROM_LOAD( "304229-02d_revd.u6", 0x00000, 0x10000, CRC(597431df) SHA1(10c4669b759dd7cfd6746e54dc12807197cf841a) ) // 304229-02D  QVT-82 REV. D  U6 (BF7F) (checksum matches)
 	ROM_LOAD( "304229-01d_revd.u5", 0x20000, 0x10000, CRC(9ebd09b6) SHA1(ef9f002016d05b770e7b66d15f05fc286bd022d9) ) // 304229-01D  QVT-82 REV. D  U5 (462B) (checksum matches)
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1992, qvt70, 0, 0, qvt70, qvt70, qvt70_state, empty_init, "Qume", "QVT-70", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1993, qvt82, 0, 0, qvt70, qvt70, qvt70_state, empty_init, "Qume", "QVT-82", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

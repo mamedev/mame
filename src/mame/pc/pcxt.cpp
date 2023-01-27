@@ -66,60 +66,6 @@ the main program is 9th October 1990.
 #include "machine/bankdev.h"
 #include "machine/genpc.h"
 
-class pcxt_state : public driver_device
-{
-public:
-	pcxt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_mb(*this, "mb"),
-		m_bank(*this, "bank"),
-		m_cvsd(*this, "voice"),
-		m_samples(*this, "samples"){ }
-
-	void tetriskr(machine_config &config);
-	void filetto(machine_config &config);
-
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
-	TIMER_CALLBACK_MEMBER(sample_tick);
-
-private:
-	int m_lastvalue;
-	uint8_t m_disk_data[2];
-	uint8_t m_port_b_data;
-	uint8_t m_status;
-	uint8_t m_clr_status;
-	uint8_t m_voice, m_bit;
-	uint32_t m_vaddr;
-	emu_timer *m_sample;
-
-	uint8_t disk_iobank_r(offs_t offset);
-	void disk_iobank_w(offs_t offset, uint8_t data);
-	uint8_t fdc765_status_r();
-	uint8_t fdc765_data_r();
-	void fdc765_data_w(uint8_t data);
-	void fdc_dor_w(uint8_t data);
-	uint8_t port_a_r();
-	uint8_t port_b_r();
-	uint8_t port_c_r();
-	void port_b_w(uint8_t data);
-	void voice_start_w(uint8_t data);
-
-	required_device<cpu_device> m_maincpu;
-	required_device<pc_noppi_mb_device> m_mb;
-	optional_device<address_map_bank_device> m_bank;
-	optional_device<hc55516_device> m_cvsd;
-	optional_memory_region m_samples;
-	void bank_map(address_map &map);
-	void filetto_io(address_map &map);
-	void filetto_map(address_map &map);
-	void tetriskr_io(address_map &map);
-	void tetriskr_map(address_map &map);
-};
-
 
 class isa8_cga_filetto_device : public isa8_cga_device
 {
@@ -250,6 +196,64 @@ const tiny_rom_entry *isa8_cga_tetriskr_device::device_rom_region() const
 {
 	return ROM_NAME( tetriskr_cga );
 }
+
+
+namespace {
+
+class pcxt_state : public driver_device
+{
+public:
+	pcxt_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_mb(*this, "mb"),
+		m_bank(*this, "bank"),
+		m_cvsd(*this, "voice"),
+		m_samples(*this, "samples"){ }
+
+	void tetriskr(machine_config &config);
+	void filetto(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	TIMER_CALLBACK_MEMBER(sample_tick);
+
+private:
+	int m_lastvalue;
+	uint8_t m_disk_data[2];
+	uint8_t m_port_b_data;
+	uint8_t m_status;
+	uint8_t m_clr_status;
+	uint8_t m_voice, m_bit;
+	uint32_t m_vaddr;
+	emu_timer *m_sample;
+
+	uint8_t disk_iobank_r(offs_t offset);
+	void disk_iobank_w(offs_t offset, uint8_t data);
+	uint8_t fdc765_status_r();
+	uint8_t fdc765_data_r();
+	void fdc765_data_w(uint8_t data);
+	void fdc_dor_w(uint8_t data);
+	uint8_t port_a_r();
+	uint8_t port_b_r();
+	uint8_t port_c_r();
+	void port_b_w(uint8_t data);
+	void voice_start_w(uint8_t data);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<pc_noppi_mb_device> m_mb;
+	optional_device<address_map_bank_device> m_bank;
+	optional_device<hc55516_device> m_cvsd;
+	optional_memory_region m_samples;
+	void bank_map(address_map &map);
+	void filetto_io(address_map &map);
+	void filetto_map(address_map &map);
+	void tetriskr_io(address_map &map);
+	void tetriskr_map(address_map &map);
+};
+
 
 uint8_t pcxt_state::disk_iobank_r(offs_t offset)
 {
@@ -613,6 +617,9 @@ ROM_START( tetriskr )
 	ROM_FILL( 0x1bde, 1, 0x8e )
 	ROM_FILL( 0x1bdf, 1, 0xda )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1990, filetto,  0, filetto,  filetto,  pcxt_state, empty_init, ROT0,  "Novarmatic", "Filetto (v1.05 901009)",                             MACHINE_IMPERFECT_SOUND )
 GAME( 1988?,tetriskr, 0, tetriskr, tetriskr, pcxt_state, empty_init, ROT0,  "bootleg",    "Tetris (Korean bootleg of Mirrorsoft PC-XT Tetris)", MACHINE_IMPERFECT_SOUND )

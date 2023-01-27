@@ -32,6 +32,9 @@
 #define VERBOSE         (LOG_UNKNOWN)
 #include "logmacro.h"
 
+
+namespace {
+
 class indigo_state : public driver_device
 {
 public:
@@ -239,6 +242,9 @@ ROM_START( indigo4k )
 	ROM_SYSTEM_BIOS( 1, "405g-rev-b", "SGI Version 4.0.5G Rev B IP20, Nov 10, 1992" ) // dumped over serial connection from boot monitor and swapped
 	ROMX_LOAD( "ip20prom.070-8116-005.bin", 0x000000, 0x080000, CRC(1875b645) SHA1(52f5d7baea3d1bc720eb2164104c177e23504345), ROM_GROUPDWORD | ROM_REVERSE | ROM_BIOS(1) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS           INIT        COMPANY                 FULLNAME                                          FLAGS
 COMP( 1991, indigo3k, 0,      0,      indigo3k, indigo, indigo3k_state, empty_init, "Silicon Graphics Inc", "IRIS Indigo (R3000, 33MHz)",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

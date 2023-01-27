@@ -50,6 +50,8 @@ XTAL values appear to be 3579.545 (X1) and 11.200 (X2).
 #include "speaker.h"
 
 
+namespace {
+
 #define LOG_AUDIO_COMM  (0)
 
 #define MAIN_CPU_MASTER_CLOCK   (11.2_MHz_XTAL)
@@ -526,6 +528,7 @@ ROM_START( r2dtank )
 	ROM_LOAD( "r2d5.7l",      0xf800, 0x0800, CRC(c49bed15) SHA1(ffa635a65c024c532bb13fb91bbd3e54923e81bf) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Samuele Zannoli
-#ifndef MAME_MACHINE_315_6154_H
-#define MAME_MACHINE_315_6154_H
+#ifndef MAME_SEGA_315_6154_H
+#define MAME_SEGA_315_6154_H
 
 #pragma once
 
@@ -47,4 +47,4 @@ private:
 
 };
 
-#endif // MAME_MACHINE_315_6154_H
+#endif // MAME_SEGA_315_6154_H

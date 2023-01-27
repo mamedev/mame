@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
 
-#ifndef MAME_MACHINE_GUNSENSE_H
-#define MAME_MACHINE_GUNSENSE_H
+#ifndef MAME_SEGA_GUNSENSE_H
+#define MAME_SEGA_GUNSENSE_H
 
 class sega_gunsense_board_device : public device_t
 {
@@ -21,4 +21,4 @@ private:
 // device type declaration
 DECLARE_DEVICE_TYPE(SEGA_GUNSENSE, sega_gunsense_board_device)
 
-#endif // MAME_MACHINE_GUNSENSE_H
+#endif // MAME_SEGA_GUNSENSE_H

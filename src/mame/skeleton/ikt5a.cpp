@@ -15,6 +15,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class ikt5a_state : public driver_device
 {
 public:
@@ -188,5 +191,8 @@ ROM_START(ikt5a) // 80C51 (+xtal 15.000) // 8k ram // RGB external, uses XT keyb
 	ROM_REGION(0x2000, "chargen", 0)
 	ROM_LOAD("g26.bin",      0x0000, 0x2000, CRC(657668be) SHA1(212a9eb1fb9b9c16f3cc606c6befbd913ddfa395))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1993, ikt5a, 0, 0, ikt5a, ikt5a, ikt5a_state, empty_init, "Creator / Fura Elektronik", "IKT-5A", MACHINE_IS_SKELETON)

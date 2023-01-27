@@ -18,6 +18,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class alphajuno_state : public driver_device
 {
 public:
@@ -211,6 +214,9 @@ ROM_START(mks50)
 	ROM_REGION(0x4000, "program", 0)
 	ROM_LOAD("mks-50_v1.02.ic7", 0x0000, 0x4000, CRC(a342f90e) SHA1(8eed986051abfdf55167c179dc7c7f0822a3ba0c))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1985, ajuno1, 0, 0, ajuno1, ajuno1, alphajuno_state, empty_init, "Roland", "Alpha Juno-1 (JU-1) Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
 //SYST(1985, hs10, ajuno1, 0, ajuno1, ajuno1, alphajuno_state, empty_init, "Roland", "SynthPlus 10 (HS-10) Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)

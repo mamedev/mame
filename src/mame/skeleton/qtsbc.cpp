@@ -72,6 +72,8 @@ List of signals on pin headers (from CompuTime manual):
 //#include "bus/s100/s100.h"
 
 
+namespace {
+
 class qtsbc_state : public driver_device
 {
 public:
@@ -548,6 +550,9 @@ ROM_START( qtsbc )
 	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "qtsbc.u23", 0x0000, 0x0800, CRC(823fd942) SHA1(64c4f74dd069ae4d43d301f5e279185f32a1efa0))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

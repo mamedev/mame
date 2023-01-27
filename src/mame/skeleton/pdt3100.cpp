@@ -21,6 +21,9 @@ Installed program: "Scan3000" from the Spanish company "CB IBERSOFT".
 #include "emu.h"
 #include "cpu/nec/v25.h"
 
+
+namespace {
+
 class pdt3100_state : public driver_device
 {
 public:
@@ -72,5 +75,8 @@ ROM_START(pdt3100)
 	ROM_REGION(0x20000, "flash3", 0)
 	ROM_LOAD("03-13467-06_c62e_02-02-98.u11", 0x00000, 0x20000, CRC(4ff6396c) SHA1(c4bc8e8e0991fa7f7852726c280f9aba57fef3f4))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1998, pdt3100, 0, 0, pdt3100, pdt3100, pdt3100_state, empty_init, "Symbol", "PDT 3100 (v1.10-00)", MACHINE_IS_SKELETON)

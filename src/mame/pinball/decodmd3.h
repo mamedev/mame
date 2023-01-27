@@ -4,8 +4,8 @@
  *  Data East Pinball DMD Type 3 Display
  */
 
-#ifndef MAME_VIDEO_DECODMD3_H
-#define MAME_VIDEO_DECODMD3_H
+#ifndef MAME_PINBALL_DECODMD3_H
+#define MAME_PINBALL_DECODMD3_H
 
 #pragma once
 
@@ -68,4 +68,4 @@ private:
 
 DECLARE_DEVICE_TYPE(DECODMD3, decodmd_type3_device)
 
-#endif // MAME_VIDEO_DECODMD3_H
+#endif // MAME_PINBALL_DECODMD3_H

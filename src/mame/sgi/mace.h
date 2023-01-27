@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_MACE_H
-#define MAME_MACHINE_MACE_H
+#ifndef MAME_SGI_MACE_H
+#define MAME_SGI_MACE_H
 
 #pragma once
 
@@ -113,4 +113,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SGI_MACE, mace_device)
 
-#endif // MAME_MACHINE_MACE_H
+#endif // MAME_SGI_MACE_H

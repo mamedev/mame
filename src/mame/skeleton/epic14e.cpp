@@ -19,6 +19,9 @@
 #include "video/scn2674.h"
 #include "screen.h"
 
+
+namespace {
+
 class epic14e_state : public driver_device
 {
 public:
@@ -249,6 +252,8 @@ ROM_START(epic14e)
 	ROM_REGION(0x0400, "keybmcu", 0)
 	ROM_LOAD("246.bin", 0x0000, 0x0400, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(1982, epic14e, 0, 0, epic14e, epic14e, epic14e_state, empty_init, "Epic Computer Products", "Epic 14E (v1.0)", MACHINE_IS_SKELETON)

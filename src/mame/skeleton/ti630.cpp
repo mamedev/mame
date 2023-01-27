@@ -41,6 +41,8 @@ It means we probably would have to emulate a modem device for it to treat commun
 #include "screen.h"
 
 
+namespace {
+
 class ti630_state : public driver_device
 {
 public:
@@ -169,6 +171,9 @@ ROM_START( ti630 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ti630.ci11",  0x00000, 0x10000, CRC(2602cbdc) SHA1(98266bea52a5893e0af0b5872eca0a0a1e0c5f9c) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME           FLAGS
 COMP( 1999, ti630, 0,      0,      ti630,   0,     ti630_state, init_ti630, "Intelbras", "TI630 telephone", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
