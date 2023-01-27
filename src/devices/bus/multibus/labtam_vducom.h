@@ -51,11 +51,16 @@ protected:
 	u8 u7() const { return m_u7; }
 
 private:
+	u8 nvram_recall();
+	void nvram_store(u8 data);
+
 	required_device<i8086_cpu_device> m_cpu;
 	required_device<pic8259_device> m_pic;
 	required_device_array<am9513_device, 2> m_ctc;
 	required_device_array<z80sio_device, 2> m_com;
 	required_device_array<x2212_device, 2> m_nvram;
+
+	required_device_array<rs232_port_device, 4> m_serial;
 
 	required_ioport m_e4;
 	memory_view m_mbus;
