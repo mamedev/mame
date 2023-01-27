@@ -60,8 +60,9 @@ uint32_t arcompact_device::handleop32_SWAP(uint32_t op)
 // NORM<.f> 0,limm                 0010 1110 0010 1111   F111 1111 1000 0001 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_NORM_do_op(uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_NORM_do_op(void* obj, uint32_t src, uint8_t set_flags)
 {
+	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result;
 
 	if ((src == 0xffffffff) || (src == 0x00000000))
@@ -72,7 +73,7 @@ uint32_t arcompact_device::handleop32_NORM_do_op(uint32_t src, uint8_t set_flags
 		result = count_leading_zeros_32(src);
 
 	if (set_flags)
-		do_flags_nz(src);
+		o->do_flags_nz(src);
 
 	return result;
 }

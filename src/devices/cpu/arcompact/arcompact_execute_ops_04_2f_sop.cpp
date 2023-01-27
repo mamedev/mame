@@ -41,14 +41,15 @@ uint32_t arcompact_device::arcompact_handle04_2f_helper(uint32_t op, const char*
 // ASL<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 0000 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ASL_single_do_op(uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_ASL_single_do_op(void* obj, uint32_t src, uint8_t set_flags)
 {
+	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src + src;
 	if (set_flags)
 	{
-		do_flags_nz(result);
-		if ((src & 0x80000000) != (result & 0x80000000)) { status32_set_v(); } else { status32_clear_v(); }
-		if (src & 0x80000000) { status32_set_c(); } else { status32_clear_c(); }
+		o->do_flags_nz(result);
+		if ((src & 0x80000000) != (result & 0x80000000)) { o->status32_set_v(); } else { o->status32_clear_v(); }
+		if (src & 0x80000000) { o->status32_set_c(); } else { o->status32_clear_c(); }
 	}
 	return result;
 }
@@ -80,14 +81,15 @@ uint32_t arcompact_device::handleop32_ASR_single(uint32_t op)
 // LSR<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 0010 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_LSR_single_do_op(uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_LSR_single_do_op(void* obj, uint32_t src, uint8_t set_flags)
 {
+	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src >> 1;
 	if (set_flags)
 	{
-		if (result & 0x80000000) { status32_set_n(); } else { status32_clear_n(); }
-		if (result == 0x00000000) { status32_set_z(); } else { status32_clear_z(); }
-		if (src & 0x00000001) { status32_set_c(); } else { status32_clear_c(); }
+		if (result & 0x80000000) { o->status32_set_n(); } else { o->status32_clear_n(); }
+		if (result == 0x00000000) { o->status32_set_z(); } else { o->status32_clear_z(); }
+		if (src & 0x00000001) { o->status32_set_c(); } else { o->status32_clear_c(); }
 	}
 	return result;
 }
@@ -103,16 +105,17 @@ uint32_t arcompact_device::handleop32_LSR_single_do_op(uint32_t src, uint8_t set
 // ROR<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 0011 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ROR_do_op(uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_ROR_do_op(void* obj, uint32_t src, uint8_t set_flags)
 {
+	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src >> 1;
 	if (src & 1)
 		result |= 0x80000000;
 
 	if (set_flags)
 	{
-		do_flags_nz(result);
-		if (src & 0x00000001) { status32_set_c(); } else { status32_clear_c(); }
+		o->do_flags_nz(result);
+		if (src & 0x00000001) { o->status32_set_c(); } else { o->status32_clear_c(); }
 	}
 
 	return result;
@@ -177,12 +180,13 @@ uint32_t arcompact_device::handleop32_SEXW(uint32_t op)
 // EXTB<.f> 0,limm                 0010 0110 0010 1111   F111 1111 1000 0111 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_EXTB_do_op(uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_EXTB_do_op(void* obj, uint32_t src, uint8_t set_flags)
 {
+	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src & 0xff;
 	if (set_flags)
 	{
-		do_flags_nz(result);
+		o->do_flags_nz(result);
 	}
 	return result;
 }
@@ -199,12 +203,13 @@ uint32_t arcompact_device::handleop32_EXTB_do_op(uint32_t src, uint8_t set_flags
 // EXTW<.f> 0,limm                 0010 0110 0010 1111   F111 1111 1000 1000 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_EXTW_do_op(uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_EXTW_do_op(void* obj, uint32_t src, uint8_t set_flags)
 {
+	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src & 0xffff;
 	if (set_flags)
 	{
-		do_flags_nz(result);
+		o->do_flags_nz(result);
 	}
 	return result;
 }
@@ -254,19 +259,20 @@ uint32_t arcompact_device::handleop32_NOT(uint32_t op)
 // RLC<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 1011 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_RLC_do_op(uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_RLC_do_op(void* obj, uint32_t src, uint8_t set_flags)
 {
+	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src << 1;
-	if (status32_check_c())
+	if (o->status32_check_c())
 		result |= 1;
 
 	if (set_flags)
 	{
-		do_flags_nz(result);
+		o->do_flags_nz(result);
 		if (src & 0x80000000)
-			status32_set_c();
+			o->status32_set_c();
 		else
-			status32_clear_c();
+			o->status32_clear_c();
 	}
 	return result;
 }

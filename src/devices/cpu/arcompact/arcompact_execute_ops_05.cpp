@@ -55,7 +55,7 @@ uint32_t arcompact_device::arcompact_handle05_helper(uint32_t op, const char* op
 // ASL<.cc><.f> 0,limm,c           0010 1110 1100 0000   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ASL_multiple_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_ASL_multiple_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
 	uint32_t result = src1 << (src2 & 0x1f);
 	if (set_flags)
@@ -78,18 +78,19 @@ uint32_t arcompact_device::handleop32_ASL_multiple_do_op(uint32_t src1, uint32_t
 // LSR<.cc><.f> 0,limm,c           0010 1110 1100 0001   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_LSR_multiple_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_LSR_multiple_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
+	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src1 >> (src2 & 0x1f);
 	if (set_flags)
 	{
-		do_flags_nz(result);
+		o->do_flags_nz(result);
 		if (src2 != 0)
 		{
 			if (src1 & (1 << (src2-1)))
-				status32_set_c();
+				o->status32_set_c();
 			else
-				status32_clear_c();
+				o->status32_clear_c();
 		}
 	}
 	return result;
@@ -110,7 +111,7 @@ uint32_t arcompact_device::handleop32_LSR_multiple_do_op(uint32_t src1, uint32_t
 // ASR<.cc><.f> 0,limm,c           0010 1110 1100 0010   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ASR_multiple_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_ASR_multiple_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
 	uint32_t result = src1 >> (src2 & 0x1f);
 
@@ -152,12 +153,13 @@ uint32_t arcompact_device::handleop32_ROR_multiple(uint32_t op)  { return arcomp
 // MUL64<.cc> <0,>b,limm           0010 1bbb 1100 0100   0BBB 1111 100Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-void arcompact_device::handleop32_MUL64_do_op(uint32_t src1, uint32_t src2)
+void arcompact_device::handleop32_MUL64_do_op(void* obj, uint32_t src1, uint32_t src2)
 {
+	arcompact_device* o = (arcompact_device*)obj;
 	uint64_t result = (int32_t)src1 * (int32_t)src2;
-	m_regs[REG_MLO] = result & 0xffffffff;
-	m_regs[REG_MMID] = (result >> 16) & 0xffffffff;
-	m_regs[REG_MHI] = (result >> 32) & 0xffffffff;
+	o->m_regs[REG_MLO] = result & 0xffffffff;
+	o->m_regs[REG_MMID] = (result >> 16) & 0xffffffff;
+	o->m_regs[REG_MHI] = (result >> 32) & 0xffffffff;
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -174,12 +176,13 @@ void arcompact_device::handleop32_MUL64_do_op(uint32_t src1, uint32_t src2)
 // MULU64<.cc> <0,>b,limm          0010 1bbb 1100 0101   0BBB 1111 100Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-void arcompact_device::handleop32_MULU64_do_op(uint32_t src1, uint32_t src2)
+void arcompact_device::handleop32_MULU64_do_op(void* obj, uint32_t src1, uint32_t src2)
 {
+	arcompact_device* o = (arcompact_device*)obj;
 	uint64_t result = src1 * src2;
-	m_regs[REG_MLO] = result & 0xffffffff;
-	m_regs[REG_MMID] = (result >> 16) & 0xffffffff;
-	m_regs[REG_MHI] = (result >> 32) & 0xffffffff;
+	o->m_regs[REG_MLO] = result & 0xffffffff;
+	o->m_regs[REG_MMID] = (result >> 16) & 0xffffffff;
+	o->m_regs[REG_MHI] = (result >> 32) & 0xffffffff;
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
