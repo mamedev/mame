@@ -95,7 +95,7 @@ void menu_selector::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void menu_selector::populate(float &customtop, float &custombottom)
+void menu_selector::populate()
 {
 	set_heading(util::string_format(_("menu-selector", "%1$s - Search: %2$s_"), m_title, m_search));
 
@@ -124,8 +124,18 @@ void menu_selector::populate(float &customtop, float &custombottom)
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-	custombottom = ui().get_line_height() + 3.0f * ui().box_tb_border();
 	m_initial = -1;
+}
+
+//-------------------------------------------------
+//  recompute metrics
+//-------------------------------------------------
+
+void menu_selector::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	set_custom_space(0.0F, line_height() + 3.0F * tb_border());
 }
 
 //-------------------------------------------------
@@ -138,9 +148,9 @@ void menu_selector::custom_render(void *selectedref, float top, float bottom, fl
 	std::string const tempbuf[] = { util::string_format(_("menu-selector", "Double-click or press %1$s to select"), ui().get_general_input_setting(IPT_UI_SELECT)) };
 	draw_text_box(
 			std::begin(tempbuf), std::end(tempbuf),
-			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
+			origx1, origx2, origy2 + tb_border(), origy2 + bottom,
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
-			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
+			ui().colors().text_color(), ui().colors().background_color());
 }
 
 //-------------------------------------------------

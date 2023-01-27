@@ -26,6 +26,8 @@ There is next to no error checking, for example the T command
 #include "screen.h"
 
 
+namespace {
+
 class homez80_state : public driver_device
 {
 public:
@@ -315,6 +317,9 @@ ROM_START( homez80 )
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD( "chargen.ic12", 0x0000, 0x0800, CRC(93243be3) SHA1(718efc06c131843c15383e50af23f3a5cf44dd9b) ) // 27C256, A11/12/13/14 tied low.
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

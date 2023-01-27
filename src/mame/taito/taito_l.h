@@ -6,7 +6,6 @@
 #pragma once
 
 #include "machine/74157.h"
-#include "machine/bankdev.h"
 #include "machine/tc009xlvc.h"
 #include "machine/timer.h"
 #include "machine/upd4701.h"

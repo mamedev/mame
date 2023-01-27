@@ -33,6 +33,8 @@ public:
 	static void force_game_select(mame_ui_manager &mui, render_container &container);
 
 protected:
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
+
 	void menu_activated() override;
 	void menu_deactivated() override;
 
@@ -56,7 +58,7 @@ private:
 
 	static bool s_first_start;
 
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	// drawing

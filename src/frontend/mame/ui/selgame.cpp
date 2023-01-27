@@ -112,7 +112,6 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 	set_right_image(moptions.system_right_image());
 
 	ui_globals::curdats_view = 0;
-	ui_globals::panels_status = moptions.hide_panels();
 	ui_globals::curdats_total = 1;
 }
 
@@ -126,12 +125,30 @@ menu_select_game::~menu_select_game()
 	ui().save_ui_options();
 }
 
+
+//-------------------------------------------------
+//  recompute metrics
+//-------------------------------------------------
+
+void menu_select_game::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu_select_launch::recompute_metrics(width, height, aspect);
+
+	m_icons.clear();
+
+	// configure the custom rendering
+	set_custom_space(3.0F * line_height() + 5.0F * tb_border(), 4.0F * line_height() + 3.0F * tb_border());
+}
+
+
 //-------------------------------------------------
 //  menu_activated
 //-------------------------------------------------
 
 void menu_select_game::menu_activated()
 {
+	menu_select_launch::menu_activated();
+
 	// if I have to load datfile, perform a hard reset
 	if (ui_globals::reset)
 	{
@@ -142,11 +159,6 @@ void menu_select_game::menu_activated()
 		ui_globals::reset = false;
 		machine().schedule_hard_reset();
 		stack_reset();
-		return;
-	}
-	else
-	{
-		menu_select_launch::menu_activated();
 	}
 }
 
@@ -172,7 +184,6 @@ void menu_select_game::menu_deactivated()
 	std::string const filter(m_persistent_data.filter_data().get_config_string());
 
 	ui_options &mopt = ui().options();
-	mopt.set_value(OPTION_HIDE_PANELS,        ui_globals::panels_status,   OPTION_PRIORITY_CMDLINE);
 	mopt.set_value(OPTION_LAST_USED_MACHINE,  last_driver,                 OPTION_PRIORITY_CMDLINE);
 	mopt.set_value(OPTION_LAST_USED_FILTER,   filter,                      OPTION_PRIORITY_CMDLINE);
 	mopt.set_value(OPTION_SYSTEM_RIGHT_PANEL, right_panel_config_string(), OPTION_PRIORITY_CMDLINE);
@@ -338,7 +349,7 @@ void menu_select_game::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void menu_select_game::populate(float &customtop, float &custombottom)
+void menu_select_game::populate()
 {
 	for (auto &icon : m_icons) // TODO: why is this here?  maybe better on resize or setting change?
 		icon.second.texture.reset();
@@ -460,18 +471,11 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 		m_skip_main_items = 0;
 	}
 
-	// configure the custom rendering
-	customtop = 3.0f * ui().get_line_height() + 5.0f * ui().box_tb_border();
-	custombottom = 4.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
-
 	// reselect prior game launched, if any
 	if (old_item_selected != -1)
 	{
 		set_selected_index(old_item_selected);
-		if (ui_globals::visible_main_lines == 0)
-			top_line = (selected_index() != 0) ? selected_index() - 1 : 0;
-		else
-			top_line = selected_index() - (ui_globals::visible_main_lines / 2);
+		centre_selection();
 
 		if (reselect_last::software().empty())
 			reselect_last::reset();
@@ -938,6 +942,10 @@ render_texture *menu_select_game::get_icon_texture(int linenum, void *selectedre
 	return icon->second.bitmap.valid() ? icon->second.texture.get() : nullptr;
 }
 
+
+//-------------------------------------------------
+//  export displayed list
+//-------------------------------------------------
 
 void menu_select_game::inkey_export()
 {

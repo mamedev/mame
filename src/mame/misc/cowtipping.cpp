@@ -29,6 +29,9 @@ The PIC is undumped, but on PCB the game seems to run without it, hanging when c
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class cowtipping_state : public driver_device
 {
 public:
@@ -107,6 +110,8 @@ ROM_START( cowtippa )
 	ROM_REGION( 0x1000, "pic", 0 )
 	ROM_LOAD( "54_pic12c508-04p.u3", 0x000, 0x09db, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 2004, cowtipp,  0,       cowtipping, cowtipping, cowtipping_state, empty_init, ROT270, "Game Refuge / Team Play", "Cow Tipping - Shake Cattle & Roll (set 1)", MACHINE_IS_SKELETON )

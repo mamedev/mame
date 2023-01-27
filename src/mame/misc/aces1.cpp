@@ -50,6 +50,7 @@ JPM style Reel MCU? Certainly reel data seems to be muxed together in a weird wa
 #include "ac1taklv.lh"
 
 
+namespace {
 
 class aces1_state : public driver_device
 {
@@ -860,6 +861,9 @@ ROM_END
 void aces1_state::init_aces1()
 {
 }
+
+} // anonymous namespace
+
 
 GAMEL( 199?, ac1clbmn,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Club Money (Ace) (ACESYS1) (set 1)",          MACHINE_IS_SKELETON_MECHANICAL, layout_ac1clbmn )
 GAMEL( 199?, ac1gogld,  0,        aces1, aces1, aces1_state, init_aces1, ROT0, "Ace", "Go For Gold (Ace) (ACESYS1) (set 1)",         MACHINE_IS_SKELETON_MECHANICAL, layout_ac1gogld )

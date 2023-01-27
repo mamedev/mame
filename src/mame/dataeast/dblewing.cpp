@@ -83,6 +83,9 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class dblewing_state : public driver_device
 {
 public:
@@ -491,6 +494,8 @@ void dblewing_state::init_dblewing()
 
 	save_item(NAME(m_soundlatch_pending));
 }
+
+} // anonymous namespace
 
 
 GAME( 1993, dblewing,  0,        dblewing, dblewing, dblewing_state, init_dblewing, ROT90, "Mitchell", "Double Wings (set 1)", MACHINE_SUPPORTS_SAVE )

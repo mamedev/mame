@@ -14,6 +14,7 @@
 #include "imagedev/snapquik.h"
 #include "jag_blitter.h"
 #include "cdrom.h"
+#include "bus/generic/slot.h"
 #include "imagedev/chd_cd.h"
 #include "screen.h"
 #include "emupal.h"

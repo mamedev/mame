@@ -28,6 +28,8 @@
     <enter>
     <enter>
 
+	ABCenix <= D-NIX <= AT&T Unix System V
+
 */
 
 /*
@@ -879,8 +881,7 @@ void abc1600_state::abc1600(machine_config &config)
 	m_dma0->out_bao_callback().set(m_dma1, FUNC(z80dma_device::bai_w));
 	m_dma0->in_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_mreq_r));
 	m_dma0->out_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_mreq_w));
-	m_dma0->out_ieo_callback().set(m_bus0i, FUNC(abcbus_slot_device::prac_w)).exor(1);
-	//m_dma0->out_ieo_callback().set(m_bus0x, FUNC(abcbus_slot_device::prac_w)).exor(1);
+	m_dma0->out_ieo_callback().set([this](int state) { m_bus0i->prac_w(state); m_bus0x->prac_w(state); }).exor(1);
 	m_dma0->in_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_iorq_r));
 	m_dma0->out_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_iorq_w));
 

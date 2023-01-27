@@ -24,6 +24,7 @@
 //#include "machine/i2cmem.h"
 
 
+namespace {
 
 class nexus3d_state : public driver_device
 {
@@ -375,6 +376,9 @@ void nexus3d_state::init_acheartf()
 	// patch additional unknown check after $c0000a00
 	// 0x107c serial?
 }
+
+} // anonymous namespace
+
 
 GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d_state, init_acheart,  ROT0, "Examu", "Arcana Heart",      MACHINE_IS_SKELETON )
 GAME( 2006, acheartf, 0, nexus3d, nexus3d, nexus3d_state, init_acheartf, ROT0, "Examu", "Arcana Heart Full", MACHINE_IS_SKELETON )

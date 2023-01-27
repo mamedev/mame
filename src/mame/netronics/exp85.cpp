@@ -41,6 +41,9 @@
 #include "imagedev/cassette.h"
 #include "sound/spkrdev.h"
 
+
+namespace {
+
 #define I8085A_TAG      "u100"
 #define I8155_TAG       "u106"
 #define I8355_TAG       "u105"
@@ -274,6 +277,9 @@ ROM_START( exp85 )
     ROM_SYSTEM_BIOS( 1, "hexkbd", "Hex Keyboard" )
     ROMX_LOAD( "hex.u105", 0xf000, 0x0800, NO_DUMP, ROM_BIOS(1) )*/
 ROM_END
+
+} // anonymous namespace
+
 
 /* System Drivers */
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME       FLAGS

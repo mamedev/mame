@@ -31,6 +31,7 @@
 #define RS232_BAUD_2000 (0x13)
 #define RS232_BAUD_3600 (0x14)
 #define RS232_BAUD_7200 (0x15)
+#define RS232_BAUD_111900 (0x16)
 
 #define PORT_RS232_BAUD(_tag, _default_baud, _description, _class, _write_line) \
 	PORT_START(_tag) \
@@ -56,6 +57,7 @@
 	PORT_CONFSETTING( RS232_BAUD_28800, "28800") \
 	PORT_CONFSETTING( RS232_BAUD_38400, "38400") \
 	PORT_CONFSETTING( RS232_BAUD_57600, "57600") \
+	PORT_CONFSETTING( RS232_BAUD_111900, "111900") \
 	PORT_CONFSETTING( RS232_BAUD_115200, "115200")
 
 #define RS232_DATABITS_5 (0x00)
@@ -226,7 +228,8 @@ protected:
 			1800,
 			2000,
 			3600,
-			7200
+			7200,
+			111900
 		};
 
 		return values[baud];

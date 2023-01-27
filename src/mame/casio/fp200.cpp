@@ -26,6 +26,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 static constexpr XTAL MAIN_CLOCK = 6.144_MHz_XTAL;
 
 class fp200_state : public driver_device
@@ -622,5 +625,8 @@ ROM_START( fp200 )
 
 	ROM_REGION( 0x800, "chargen", ROMREGION_ERASE00 )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1982, fp200, 0, 0, fp200, fp200, fp200_state, empty_init, "Casio", "FP-200 (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

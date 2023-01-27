@@ -139,5 +139,5 @@ void main()
   // Convert the image gamma for display on our output device.
   cout = linear_to_output(cout);
 
-  gl_FragColor = vec4(cout,mul_res.a);
+  gl_FragColor = vec4(cout,1.0);
 }

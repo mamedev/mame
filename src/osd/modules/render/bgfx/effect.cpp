@@ -50,6 +50,7 @@ void bgfx_effect::submit(int view, uint64_t blend)
 	}
 
 	const uint64_t final_state = (blend != ~0ULL) ? ((m_state & ~BGFX_STATE_BLEND_MASK) | blend) : m_state;
+
 	bgfx::setState(final_state);
 	bgfx::submit(view, m_program_handle);
 }

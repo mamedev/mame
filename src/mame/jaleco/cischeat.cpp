@@ -1838,6 +1838,108 @@ static INPUT_PORTS_START( captflag )
 	PORT_DIPSETTING(      0x2000, "All" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( vscaptfl )
+	PORT_START("Buttons")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP   ) PORT_NAME("P1 Left Red Stick Up") PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_NAME("P1 Left Red Stick Down") PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP   ) PORT_NAME("P1 Right White Stick Up") PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_NAME("P1 Right White Stick Down") PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN2    ) PORT_IMPULSE(1) // coin 2
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2  ) PORT_NAME("Decide Button") // decide
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN1    ) PORT_IMPULSE(1) // coin 1
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1 ) // service
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE  ) // test
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1  ) PORT_NAME("Select Button") // select
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH,IPT_OUTPUT   ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r) // prize sensor
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // potery on schems?
+
+	PORT_START("Buttons2")
+	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(captflag_state, motor_pos_r<LEFT>)
+	PORT_BIT( 0x000c, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(captflag_state, motor_pos_r<RIGHT>)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(captflag_state, motor_busy_r<LEFT>)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(captflag_state, motor_busy_r<RIGHT>)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_NAME("P2 Left Red Stick Up") PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_NAME("P2 Left Red Stick Down") PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_NAME("P2 Right White Stick Up") PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_NAME("P2 Right White Stick Down") PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SW01")
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW01:1,2")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0004, 0x0004, "Mode") PORT_DIPLOCATION("SW01:3")
+	PORT_DIPSETTING(      0x0004, "1 set" )
+	PORT_DIPSETTING(      0x0000, "3 set" )
+	PORT_DIPNAME( 0x0008, 0x0008, "BGM Volume" ) PORT_DIPLOCATION("SW01:4")
+	PORT_DIPSETTING(      0x0000, "Low" )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW01:5")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00e0, 0x00e0, "Capsule Payout" ) PORT_DIPLOCATION("SW01:6,7,8")
+	PORT_DIPSETTING(      0x0000, "Nothing" )
+	PORT_DIPSETTING(      0x00c0, "05%" )
+	PORT_DIPSETTING(      0x00e0, "10%" )
+	PORT_DIPSETTING(      0x00a0, "15%" )
+	PORT_DIPSETTING(      0x0080, "20%" )
+	PORT_DIPSETTING(      0x0060, "30%" )
+	PORT_DIPSETTING(      0x0040, "50%" )
+	PORT_DIPSETTING(      0x0020, "All" )
+
+	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW02:1,2,3")
+	PORT_DIPSETTING(      0x0100, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0300, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0700, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0600, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0500, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x3800, 0x3800, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW02:4,5,6")
+	PORT_DIPSETTING(      0x0800, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x1800, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x3800, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x3000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x2800, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0xc000, 0xc000, "Qualify" ) PORT_DIPLOCATION("SW02:7,8")
+	PORT_DIPSETTING(      0x0000, "30/40" )
+	PORT_DIPSETTING(      0xc000, "30/50" )
+	PORT_DIPSETTING(      0x8000, "40/50" )
+	PORT_DIPSETTING(      0x4000, "50/50" )
+
+	PORT_START("SW1_2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x0001, 0x0001, "SW1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0002, 0x0002, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0004, 0x0004, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0008, 0x0008, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0010, 0x0010, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0020, 0x0020, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW1:8" )
+
+	PORT_DIPUNKNOWN_DIPLOC( 0x0100, 0x0100, "SW2:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0200, 0x0200, "SW2:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0800, 0x0800, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW2:8" )
+INPUT_PORTS_END
 
 /**************************************************************************
 
@@ -3927,6 +4029,85 @@ void captflag_state::init_captflag()
 
 /***************************************************************************
 
+                         Vs. Super Captain Flag
+ 
+ PCB IDs:
+
+ CF-93153 EB93041-20091
+ 
+ CF-92128B EB92027-20060
+ 
+ GP-9189 EB90015-20038
+
+**************************************************************************/
+
+ROM_START( vscaptfl )
+	ROM_REGION( 0x80000, "maincpu", 0 )        /* Main CPU Code */
+	ROM_LOAD16_BYTE( "vs.s.c.f-cf-92128-3_ver.1.3.ic40", 0x000000, 0x040000, CRC(a52595af) SHA1(6a7b3172c256015a0b46394dc1d0bf92ef826a90) )
+	ROM_LOAD16_BYTE( "vs.s.c.f-cf-92128-4_ver.1.3.ic46", 0x000001, 0x040000, CRC(1d015f55) SHA1(652d8c3e5c71ae149ff95a008a15d067bcdd8293) )
+
+	ROM_REGION( 0x80000, "scroll0", 0 ) /* Scroll 0 */
+	ROM_LOAD( "mr92027_11.ic54", 0x000000, 0x080000, CRC(d34cae3c) SHA1(622ad4645df12d34e55bbfb7194508957bb2198b) )
+
+//  ROM_REGION( 0x080000, "scroll1", 0 ) /* Scroll 1 */
+//  UNUSED
+
+	ROM_REGION( 0x20000, "scroll2", 0 ) /* Scroll 2 */
+	ROM_LOAD( "vs-cf92128_6_ver1.0.ic55", 0x000000, 0x020000, CRC(55c8db06) SHA1(499c0de2202e873eeca98c2f0932569f3df01a21) )
+
+	ROM_REGION( 0x500000, "sprites", 0 ) /* Sprites */
+	ROM_LOAD16_BYTE( "mr92027_01.ic1",           0x000000, 0x080000, CRC(03d69f0f) SHA1(97a0552d94ca1e9c76896903c02c3f005752e5db) )
+	ROM_LOAD16_BYTE( "mr92027_02.ic2",           0x000001, 0x080000, CRC(fbfba282) SHA1(65735d8f6abdb5816b8b26ce2969959a0f2e2c7d) )
+	ROM_LOAD16_BYTE( "mr92027_03.ic5",           0x100000, 0x080000, CRC(1e02abff) SHA1(497aeab40c778ef6d8a76b005530fea5f4f68ab8) )
+	ROM_LOAD16_BYTE( "mr92027_04.ic6",           0x100001, 0x080000, CRC(89dfe3e8) SHA1(f069cf55d08e5901699e7ee7c6b2b5cdba031cf2) )
+	ROM_LOAD16_BYTE( "mr92027_05.ic11",          0x200000, 0x080000, CRC(edc33285) SHA1(a23f9a1877108eaaef6d467ae21433fe5f24261f) )
+	ROM_LOAD16_BYTE( "mr92027_06.ic12",          0x200001, 0x080000, CRC(99b8f6d8) SHA1(e01c85861d5a131bb31908460cb3bc9eb0ea045c) )
+	ROM_LOAD16_BYTE( "vs-gp9189_7_ver1.0.ic15",  0x300000, 0x080000, CRC(63459f84) SHA1(1956ceab56f7266329b4e276876363f2334f0287) )
+	ROM_LOAD16_BYTE( "vs-gp9189_8_ver1.0.ic16",  0x300001, 0x080000, CRC(ed40b351) SHA1(9fca6ec3f364ee80729d59e617b2341d39326f2b) )
+	ROM_LOAD16_BYTE( "vs-gp9189_9_ver1.0.ic21",  0x400000, 0x080000, CRC(eb20c7d4) SHA1(64956c672fec1e96a97e25144b351bc24c32aa4f) )
+	ROM_LOAD16_BYTE( "vs-gp9189_10_ver1.0.ic22", 0x400001, 0x080000, CRC(5e24c3b0) SHA1(714418a48d66782798abfb9394b3a527e63ad9c5) )
+
+	ROM_REGION( 0x80000, "user2", 0 )       /* Unused ROMs */
+	// Located on CF-93153
+	ROM_LOAD( "pr92027b.ic31",       0x000000, 0x000117, CRC(bebd5200) SHA1(6ce078daf44b7839536dae0e6539388228f4ff47) )
+	ROM_LOAD( "pr92027b.ic34",       0x000000, 0x000117, CRC(bebd5200) SHA1(6ce078daf44b7839536dae0e6539388228f4ff47) )
+	// Located on CF-92128B
+	ROM_LOAD( "pr88004q.ic88",       0x000000, 0x000200, CRC(9327dc37) SHA1(cfe7b144cdcd76170d47f1c4e0f72b6d4fca0c8d) )
+	ROM_LOAD( "pr91042.ic86",        0x000000, 0x000100, CRC(e71de4aa) SHA1(d06e5a35ad2127df2d6328cce153073380ee7819) )
+	ROM_LOAD( "pr92027a.ic16",       0x000000, 0x000020, CRC(bee7adc6) SHA1(cd11a3dae0317d06a69b5707a653b8997c1eb97f) )
+	ROM_LOAD( "pr92027a.ic17",       0x000000, 0x000020, CRC(bee7adc6) SHA1(cd11a3dae0317d06a69b5707a653b8997c1eb97f) )
+	// Located on CF-92128B
+	ROM_LOAD( "ch9072_4.ic48",       0x000000, 0x002000, CRC(b45b4dc0) SHA1(b9fae0c9ac2d40f0a202c538d866d5f2941ba8dd) )
+	ROM_LOAD( "ch9072_5.ic36",       0x000000, 0x002000, CRC(e122916b) SHA1(86d5ecc7ecc6f175ecb28459697ef33e1ee06860) )
+	ROM_LOAD( "ch9072_6.ic35",       0x000000, 0x002000, CRC(05d95bf7) SHA1(78181cf71f22c090a1e62823a43757353a9ef6ab) )
+	ROM_LOAD( "ch9072_8.ic65",       0x000000, 0x002000, CRC(6bf52596) SHA1(bf4e7e7df3daae4aa6a441b58b15a435aa45630e) )
+	ROM_LOAD( "mr90015-35_w33.ic54", 0x000000, 0x080000, CRC(9d428fb7) SHA1(02f72938d73db932bd217620a175a05215f6016a) )
+	ROM_LOAD( "mr90015-35_w33.ic67", 0x000000, 0x080000, CRC(9d428fb7) SHA1(02f72938d73db932bd217620a175a05215f6016a) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )       /* Samples (8x20000) */
+	ROM_LOAD( "vs-cf92128_2.ic19", 0x000000, 0x100000, CRC(7629969c) SHA1(94b391f230f5b5f9498bc967beaed1e6c95a028f) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )       /* Samples (8x20000) */
+	ROM_LOAD( "vs-cf92128_1.ic18", 0x000000, 0x100000, CRC(50c99a47) SHA1(c0c4ac24eebdd462176a5cbaf9e33918c6d54e10) )
+ROM_END
+
+void captflag_state::init_vscaptfl()
+{
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	
+	space.unmap_readwrite(0x100044, 0x100045);
+	space.unmap_readwrite(0x100048, 0x100049);
+
+	space.install_read_port(0x100044, 0x100045, "Buttons2");
+	space.install_write_handler(0x10004c, 0x10004d, write16s_delegate(*this, FUNC(captflag_state::motor_command_left_w)));
+	space.install_write_handler(0x100050, 0x100051, write16s_delegate(*this, FUNC(captflag_state::motor_command_right_w)));
+
+	init_captflag();
+}
+
+
+/***************************************************************************
+
 
                                 Game Drivers
 
@@ -3951,6 +4132,7 @@ GAME(  1992, wildplt,   0,        wildplt,  wildplt,  wildplt_state,   init_f1gp
 GAMEL( 1993, f1gpstr2,  0,        f1gpstr2, f1gpstr2, cischeat_state,  init_f1gpstar, ROT0,   "Jaleco", "F-1 Grand Prix Star II",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_f1gpstar )
 
 GAME(  1993, captflag,  0,        captflag, captflag, captflag_state,  init_captflag, ROT270, "Jaleco", "Captain Flag (Japan)",                   MACHINE_IMPERFECT_GRAPHICS )
+GAME(  1993, vscaptfl,  0,        captflag, vscaptfl, captflag_state,  init_vscaptfl, ROT270, "Jaleco", "Vs. Super Captain Flag (Japan)",         MACHINE_IMPERFECT_GRAPHICS )
 
 GAME(  1994, scudhamm,  0,        scudhamm, scudhamm, cischeat_state,  empty_init,    ROT270, "Jaleco", "Scud Hammer (ver 1.4)",                  MACHINE_IMPERFECT_GRAPHICS ) // version on program ROMS' labels
 GAME(  1994, scudhamma, scudhamm, scudhamm, scudhamma,cischeat_state,  empty_init,    ROT270, "Jaleco", "Scud Hammer (older version?)",           MACHINE_IMPERFECT_GRAPHICS ) // maybe older cause it has one less dip listed?

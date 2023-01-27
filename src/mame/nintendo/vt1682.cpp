@@ -81,6 +81,9 @@
 #define VERBOSE             (0)
 #include "logmacro.h"
 
+
+namespace {
+
 // NTSC uses XTAL(21'477'272) Sound CPU runs at exactly this, Main CPU runs at this / 4
 // PAL  uses XTAL(26'601'712) Sound CPU runs at exactly this, Main CPU runs at this / 5
 
@@ -125,7 +128,7 @@ public:
 		m_render_timer(*this, "render_timer")
 	{ }
 
-	void vt_vt1682(machine_config& config);
+	[[maybe_unused]] void vt_vt1682(machine_config& config);
 	void regular_init();
 
 protected:
@@ -606,7 +609,7 @@ private:
 	int get_address_for_tilepos(int x, int y, int tilesize, uint16_t* pagebases);
 
 	void draw_tile_pixline(int segment, int tile, int yy, int x, int y, int palselect, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect);
-	void draw_tile(int segment, int tile, int x, int y, int palselect, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect);
+	[[maybe_unused]] void draw_tile(int segment, int tile, int x, int y, int palselect, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, const rectangle& cliprect);
 	void draw_layer(int which, int opaque, const rectangle& cliprect);
 	void draw_sprites(const rectangle& cliprect);
 };
@@ -6184,7 +6187,7 @@ ROM_START( gm235upc )
 	// also has RAM
 ROM_END
 
-
+} // anonymous namespace
 
 
 // TODO: this is a cartridge based system (actually, verify this, it seems some versions simply had built in games) move these to SL if verified as from cartridge config

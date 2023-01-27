@@ -337,7 +337,6 @@ Notes:
 #include "emu.h"
 #include "jaguar.h"
 
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "bus/ata/idehd.h"
 #include "cpu/m68000/m68000.h"

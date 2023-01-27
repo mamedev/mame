@@ -7,8 +7,8 @@
     Driver by Takahiro Nogi 1999/11/05 -
 
 ******************************************************************************/
-#ifndef MAME_MACHINE_NB1413M3_H
-#define MAME_MACHINE_NB1413M3_H
+#ifndef MAME_NICHIBUTSU_NB1413M3_H
+#define MAME_NICHIBUTSU_NB1413M3_H
 
 #pragma once
 
@@ -200,4 +200,4 @@ INPUT_PORTS_EXTERN( nbhf2_ctrl );
 
 DECLARE_DEVICE_TYPE(NB1413M3, nb1413m3_device)
 
-#endif // MAME_MACHINE_NB1413M3_H
+#endif // MAME_NICHIBUTSU_NB1413M3_H

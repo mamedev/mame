@@ -23,6 +23,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define KBD_VERBOSE 1
 #define LED_VERBOSE 0
 #define DC305_VERBOSE 0
@@ -490,6 +492,8 @@ ROM_START( la120 )
 	// there is an optional 3 roms, european and APL (and BOTH) rom which goes from 2000-2fff in e4, all undumped.
 	// there is another romset used on the Bell Teleprinter 1000 (Model LAS12) which I believe is 23-004e4.e6 and 23-086e2.e4
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

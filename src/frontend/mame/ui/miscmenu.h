@@ -33,7 +33,7 @@ public:
 	virtual ~menu_network_devices();
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 };
 
@@ -48,7 +48,7 @@ protected:
 	virtual void populate_text(std::optional<text_layout> &layout, float &width, int &lines) override;
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	attotime prevtime;
@@ -81,7 +81,7 @@ private:
 		std::string next_name;
 	};
 
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	std::vector<crosshair_item_data> m_data;
@@ -96,7 +96,7 @@ public:
 	virtual ~menu_bios_selection();
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 };
 
@@ -112,7 +112,7 @@ public:
 	virtual ~menu_export();
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	std::vector<const game_driver*> m_list;
@@ -148,7 +148,7 @@ private:
 		LAST = ADVANCED
 	};
 
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	void setup_bios();
@@ -174,7 +174,7 @@ public:
 	virtual ~menu_plugins_configure();
 
 protected:
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 };
 

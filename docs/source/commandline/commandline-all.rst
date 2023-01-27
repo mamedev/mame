@@ -1,10 +1,10 @@
 .. _mame-commandline-universal:
 
-Universal Commandline Options
-=============================
+Universal Command-line Options
+==============================
 
 This section contains configuration options that are applicable to *all* MAME
-sub-builds (both SDL and Windows native).
+configurations (including both SDL and Windows native).
 
 .. contents:: :local:
 
@@ -396,6 +396,25 @@ overwritten.
             000-lo.lo                            131072 CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a)
             sfix.sfix                            131072 CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3)
 
+.. _mame-commandline-listbios:
+
+**-listbios** [*<pattern>*...]
+
+    Example:
+        .. code-block:: bash
+
+            mame -listbios 3do
+            4 BIOSes available for driver "3do".
+            Name:             Description:
+            panafz10          "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer"
+            goldstar          "Goldstar 3DO Interactive Multiplayer v1.01m"
+            panafz1           "Panasonic FZ-1 R.E.A.L. 3DO Interactive Multiplayer"
+            sanyotry          "Sanyo TRY 3DO Interactive Multiplayer"
+
+    Displays a list of alternate ROM BIOSes for supported systems/devices that
+    match the specified pattern(s). If no patterns are specified, the results
+    will include *all* supported systems and devices.
+
 .. _mame-commandline-listsamples:
 
 **-listsamples** [<*pattern*>]
@@ -450,7 +469,7 @@ overwritten.
 
 .. _mame-commandline-romident:
 
-**-romident** [*path\\to\\romstocheck.zip*]
+**-romident** [*path/to/romstocheck.zip*]
 
     Attempts to identify ROM files, if they are known to MAME, in the specified
     .zip file or directory. This command can be used to try and identify ROM
@@ -693,6 +712,46 @@ OSD-related Options
 
             mame ibm5150 -uimodekey DEL
 
+.. _mame-commandline-controllermap:
+
+**-controller_map** / **-ctrlmap** *<filename>*
+
+    Path to a text file containing game controller button and axis mappings in
+    the format used by SDL2 and Steam, or ``none`` to use only built-in
+    mappings.  Must use an ASCII-compatible text encoding with native line
+    endings (e.g. CRLF on Windows).  Currently only supported when using the
+    ``sdlgame`` joystick provider.  The default setting is ``none``.
+
+    A `community-sourced list of game controller mappings
+    <https://github.com/gabomdq/SDL_GameControllerDB>`_ can be found on GitHub.
+    Besides using a text editor, several tools are available for creating game
+    controller mappings, including `SDL2 Gamepad Mapper
+    <https://gitlab.com/ryochan7/sdl2-gamepad-mapper/-/releases>`_ and SDL2
+    ControllerMap which is `supplied with SDL
+    <https://github.com/libsdl-org/SDL/releases/latest>`_.  You can also
+    configure your controller in Steam’s Big Picture mode, then copy the
+    mappings from ``SDL_GamepadBind`` entries in the **config.vdf** file found
+    in the **config** folder inside your Steam installation folder.
+
+    Example:
+        .. code-block:: bash
+
+            mame -controller_map gamecontrollerdb.txt sf2ce
+
+.. _mame-commandline-backgroundinput:
+
+**-[no]background_input**
+
+    Sets whether input is accepted or ignored when MAME does not have UI focus.
+    Currently supported for RawInput mouse/keyboard input on Windows, and SDL
+    game controller/joystick input.  This setting is ignored when the debugger
+    is enabled.  The default is OFF (**-nobackground_input**).
+
+    Example:
+        .. code-block:: bash
+
+            mame -background_input ssf2tb
+
 .. _mame-commandline-uifontprovider:
 
 **-uifontprovider** *<module>*
@@ -887,7 +946,8 @@ Example:
 
 **-joystickprovider** *<module>*
 
-    Chooses how MAME will get joystick input. The default is ``auto``.
+    Chooses how MAME will get joystick and other game controller input. The
+    default is ``auto``.
 
 .. list-table:: Supported joystick input providers per-platform
     :header-rows: 0
@@ -898,34 +958,49 @@ Example:
       - winhybrid
       - dinput
       - xinput
+      - sdlgame
+      - sdljoy
       - none
-      - sdl
     * - **SDL**
       - auto [#JIPAutoSDL]_.
       -
       -
       -
+      - sdlgame
+      - sdljoy
       - none
-      - sdl
 
 ..  rubric:: Footnotes
 
-..  [#JIPAutoWindows] On Windows, auto will default to ``dinput``.
+..  [#JIPAutoWindows] On Windows, auto will default to ``winhybrid``.
 
-..  [#JIPAutoSDL] On SDL, auto will default to ``sdl``.
+..  [#JIPAutoSDL] On SDL, auto will default to ``sdlgame``.
 
-.. Tip:: Note that Microsoft XBox 360 and XBox One controllers connected to
-         Windows will work best with ``winhybrid`` or ``xinput``. The
-         ``winhybrid`` option supports a mix of DirectInput and XInput
-         controllers at the same time.
+winhybrid
+    Uses XInput for compatible game controllers, falling back to DirectInput for
+    other game controllers.  Typically provides the best experience on Windows.
+dinput
+    Uses DirectInput for all game controllers.  May be useful if you want to use
+    more than four XInput game controllers simultaneously.  Note that LT and RT
+    controls are combined with using XInput game controllers via DirectInput.
+xinput
+    Supports up to four XInput game controllers.
+sdlgame
+    Uses the SDL game controller API for game controllers with button/axis
+    mappings available, falling back to the SDL joystick API for other game
+    controllers.  Provides consistent button and axis assignment and meaningful
+    control names for popular game controllers.  Use the :ref:`controller_map
+    option <mame-commandline-controllermap>` to supply mappings for additional
+    game controllers or override built-in mappings.
+sdljoy
+    Uses the SDL joystick API for all game controllers.
+none
+    Ignores all game controllers.
 
 Example:
     .. code-block:: bash
 
         mame mk2 -joystickprovider winhybrid
-
-.. Tip:: On Windows, winhybrid is likely to give the best experience by
-         supporting both XInput and DirectInput controllers.
 
 
 .. _mame-commandline-cliverbs:
@@ -1056,7 +1131,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -homepath c:\mame\lua
+            mame -homepath C:\mame\lua
 
 .. _mame-commandline-rompath:
 
@@ -1071,7 +1146,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -rompath c:\mame\roms;c:\roms\another
+            mame -rompath C:\mame\roms;C:\roms\another
 
 .. _mame-commandline-hashpath:
 
@@ -1086,7 +1161,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -hashpath c:\mame\hash;c:\roms\softlists
+            mame -hashpath C:\mame\hash;C:\roms\softlists
 
 .. _mame-commandline-samplepath:
 
@@ -1101,7 +1176,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -samplepath c:\mame\samples;c:\roms\samples
+            mame -samplepath C:\mame\samples;C:\roms\samples
 
 .. _mame-commandline-artpath:
 
@@ -1116,7 +1191,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -artpath c:\mame\artwork;c:\emu\shared-artwork
+            mame -artpath C:\mame\artwork;C:\emu\shared-artwork
 
 .. _mame-commandline-ctrlrpath:
 
@@ -1132,7 +1207,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -ctrlrpath c:\mame\ctrlr;c:\emu\controllers
+            mame -ctrlrpath C:\mame\ctrlr;C:\emu\controllers
 
 .. _mame-commandline-inipath:
 
@@ -1161,7 +1236,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -inipath c:\users\thisuser\documents\mameini
+            mame -inipath C:\Users\thisuser\documents\mameini
 
 .. _mame-commandline-fontpath:
 
@@ -1176,7 +1251,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -fontpath c:\mame\;c:\emu\artwork\mamefonts
+            mame -fontpath C:\mame\;C:\emu\artwork\mamefonts
 
 .. _mame-commandline-cheatpath:
 
@@ -1191,7 +1266,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -cheatpath c:\mame\cheat;c:\emu\cheats
+            mame -cheatpath C:\mame\cheat;C:\emu\cheats
 
 .. _mame-commandline-crosshairpath:
 
@@ -1206,7 +1281,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -crosshairpath c:\mame\crsshair;c:\emu\artwork\crosshairs
+            mame -crosshairpath C:\mame\crsshair;C:\emu\artwork\crosshairs
 
 .. _mame-commandline-pluginspath:
 
@@ -1220,7 +1295,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -pluginspath c:\mame\plugins;c:\emu\lua
+            mame -pluginspath C:\mame\plugins;C:\emu\lua
 
 .. _mame-commandline-languagepath:
 
@@ -1235,7 +1310,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -languagepath c:\mame\language;c:\emu\mame-languages
+            mame -languagepath C:\mame\language;C:\emu\mame-languages
 
 .. _mame-commandline-swpath:
 
@@ -1249,7 +1324,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame -swpath c:\mame\software;c:\emu\mydisks
+            mame -swpath C:\mame\software;C:\emu\mydisks
 
 
 .. _mame-commandline-coreoutdir:
@@ -1274,7 +1349,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame -cfg_directory c:\mame\cfg
+            mame -cfg_directory C:\mame\cfg
 
 .. _mame-commandline-nvramdirectory:
 
@@ -1292,7 +1367,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame -nvram_directory c:\mame\nvram
+            mame -nvram_directory C:\mame\nvram
 
 .. _mame-commandline-inputdirectory:
 
@@ -1309,7 +1384,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame -input_directory c:\mame\inp
+            mame -input_directory C:\mame\inp
 
 .. _mame-commandline-statedirectory:
 
@@ -1326,7 +1401,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame -state_directory c:\mame\sta
+            mame -state_directory C:\mame\sta
 
 .. _mame-commandline-snapshotdirectory:
 
@@ -1342,7 +1417,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame -snapshot_directory c:\mame\snap
+            mame -snapshot_directory C:\mame\snap
 
 .. _mame-commandline-diffdirectory:
 
@@ -1361,7 +1436,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame -diff_directory c:\mame\diff
+            mame -diff_directory C:\mame\diff
 
 .. _mame-commandline-commentdirectory:
 
@@ -1378,7 +1453,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame -comment_directory c:\mame\comments
+            mame -comment_directory C:\mame\comments
 
 
 .. _mame-commandline-savestate:
@@ -3744,8 +3819,8 @@ Core Misc Options
 **-bios** *<biosname>*
 
     Specifies the specific BIOS to use with the current system, for systems that
-    make use of a BIOS. The **-listxml** output will list all of the possible
-    BIOS names for a system.
+    make use of a BIOS. The **-listbios** output will list all of the possible
+    BIOS names for a system, as does the **-listxml** output.
 
     The default is ``default``.
 
@@ -4013,7 +4088,7 @@ HTTP Server Options
     Example:
         .. code-block:: bash
 
-            mame apple2 -http -http_port 6502 -http_root c:\users\me\appleweb\root
+            mame apple2 -http -http_port 6502 -http_root C:\Users\me\appleweb\root
 
 
 .. _mame-commandline-portaudio:

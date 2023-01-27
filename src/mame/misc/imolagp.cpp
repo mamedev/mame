@@ -114,6 +114,8 @@ silkscreened by Falgas and the cab contains Falgas logos with a small note that 
 #include "imolagp.lh"
 
 
+namespace {
+
 class imolagp_state : public driver_device
 {
 public:
@@ -621,6 +623,8 @@ ROM_START( imolagpo )
 	ROM_LOAD( "xr.bin",   0x3800, 0x0400, CRC(8a8667aa) SHA1(53f34b6c5327d4398de644d7f318d460da56c2de) ) // ? gfx: sign+explosion
 	ROM_LOAD( "xe.bin",   0x3c00, 0x0400, CRC(e0e81120) SHA1(14a77dfd069be342df4dbb1b747443c6d121d3fe) ) // ? car+misc
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR,  NAME,     PARENT,  MACHINE, INPUT,    CLASS,         INIT,       MONITOR, COMPANY,      FULLNAME,                   FLAGS

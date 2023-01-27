@@ -63,6 +63,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class pda600_state : public driver_device
 {
 public:
@@ -234,6 +236,9 @@ ROM_START( pda600 )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "pdarom.bin", 0x00000, 0x20000, CRC(f793a6c5) SHA1(ab14b0fdcedb927c66357368a2bfff605ba758fb))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

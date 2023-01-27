@@ -5,14 +5,11 @@
  * IBM RT PC I/O Channel Converter/Controller
  *
  * Sources:
- *   - http://bitsavers.org/pdf/ibm/pc/rt/75X0232_RT_PC_Technical_Reference_Volume_1_Jun87.pdf
+ *   - IBM RT PC Hardware Technical Reference Volume I, 75X0232, March 1987
  *
  * TODO:
- *   - bus spaces should be little endian
+ *   - isa bus i/o space should be halfword addressed
  *   - alternate controllers, region mode dma
- *   - improve rsc interface
- *   - state saving
- *   - refactoring and cleanup
  */
 
 #include "emu.h"
@@ -25,14 +22,14 @@
 //#define VERBOSE (LOG_GENERAL|LOG_DMA)
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(RTPC_IOCC, rtpc_iocc_device, "rtpc_iocc", "RT PC I/O Channel Converter/Controller")
+DEFINE_DEVICE_TYPE(RTPC_IOCC, rtpc_iocc_device, "rtpc_iocc", "IBM RT PC I/O Channel Converter/Controller")
 
 rtpc_iocc_device::rtpc_iocc_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, RTPC_IOCC, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, rsc_bus_interface(mconfig, *this)
-	, m_mem_config("mem", ENDIANNESS_BIG, 16, 24, 0)
-	, m_pio_config("pio", ENDIANNESS_BIG, 16, 24, 0)
+	, m_mem_config("mem", ENDIANNESS_LITTLE, 16, 24, 0)
+	, m_pio_config("pio", ENDIANNESS_LITTLE, 16, 24, 0)
 	, m_out_int(*this)
 	, m_out_rst(*this)
 	, m_rsc(*this, "^mmu")
@@ -66,6 +63,9 @@ void rtpc_iocc_device::device_start()
 	save_item(NAME(m_tcw));
 	save_item(NAME(m_adc));
 	save_item(NAME(m_out_int_state));
+
+	space(AS_PROGRAM).specific(m_mem);
+	space(AS_IO).specific(m_pio);
 }
 
 void rtpc_iocc_device::device_reset()
@@ -86,10 +86,10 @@ u8 rtpc_iocc_device::dma_b_r(offs_t offset)
 
 		LOGMASKED(LOG_DMA, "dma0 tcw 0x%04x real 0x%08x\n", tcw, real);
 		if (tcw & TCW_IOC)
-			data = space(AS_PROGRAM).read_byte(real);
+			data = m_mem.read_byte(real);
 		else
 		{
-			if (!m_rsc->load(real, data, RSC_N))
+			if (!m_rsc->mem_load(real, data, RSC_N))
 			{
 				// on dma exception
 				// - assert interrupt (level 2)
@@ -120,9 +120,9 @@ void rtpc_iocc_device::dma_b_w(offs_t offset, u8 data)
 
 		LOGMASKED(LOG_DMA, "dma0 tcw 0x%04x real 0x%08x\n", tcw, real);
 		if (tcw & TCW_IOC)
-			space(AS_PROGRAM).write_byte(real, data);
+			m_mem.write_byte(real, data);
 		else
-			m_rsc->store(real, data, RSC_N);
+			m_rsc->mem_store(real, data, RSC_N);
 	}
 	else
 		fatalerror("rtpc_iocc_device::dma_b_w() invalid dma operation\n");
@@ -139,9 +139,9 @@ u8 rtpc_iocc_device::dma_w_r(offs_t offset)
 
 		LOGMASKED(LOG_DMA, "dma1 tcw 0x%04x real 0x%08x\n", tcw, real);
 		if (tcw & TCW_IOC)
-			data = space(AS_PROGRAM).read_word(real);
+			data = swapendian_int16(m_mem.read_word(real));
 		else
-			m_rsc->load(real, data, RSC_N);
+			m_rsc->mem_load(real, data, RSC_N);
 	}
 	else
 		fatalerror("rtpc_iocc_device::dma_w_r() invalid dma operation\n");
@@ -161,74 +161,12 @@ void rtpc_iocc_device::dma_w_w(offs_t offset, u8 data)
 		LOGMASKED(LOG_DMA, "dma1 tcw 0x%04x real 0x%08x\n", tcw, real);
 		// FIXME: upper data bits
 		if (tcw & TCW_IOC)
-			space(AS_PROGRAM).write_word(real, data);
+			m_mem.write_word(real, swapendian_int16(data));
 		else
-			m_rsc->store(real, u16(data), RSC_N);
+			m_rsc->mem_store(real, u16(data), RSC_N);
 	}
 	else
 		fatalerror("rtpc_iocc_device::dma_w_w() invalid dma operation\n");
-}
-
-template <typename T> bool rtpc_iocc_device::load(u32 address, T &data, rsc_mode const mode)
-{
-	unsigned const s = (address >> 24) & 15 ? AS_PROGRAM : AS_IO;
-
-	if (s == AS_PROGRAM && (mode & RSC_U) && !(m_ccr & CCR_MMP))
-	{
-		LOG("load mem protection violation (%s)\n", machine().describe_context());
-		m_csr |= CSR_EXR | CSR_PER | CSR_PD | CSR_PVIO;
-
-		return false;
-	}
-
-	if (s == AS_IO)
-	{
-		if ((mode & RSC_U) && (address == 0xf001'0800U || !(m_ccr & CCR_IMP)))
-		{
-			LOG("load pio protection violation (%s)\n", machine().describe_context());
-			m_csr |= CSR_EXR | CSR_PER | CSR_PD | CSR_PVIO;
-
-			return false;
-		}
-	}
-
-	switch (sizeof(T))
-	{
-	case 1: data = space(s).read_byte(address); break;
-	case 2:
-		if (s == 2 && target_size(address) < sizeof(T))
-		{
-			LOGMASKED(LOG_WIDEPIO, "load pio w<-b 0x%08x (%s)\n", address, machine().describe_context());
-			data = u16(space(s).read_byte(address)) << 8;
-			data |= space(s).read_byte(address);
-		}
-		else
-			data = space(s).read_word(address);
-		break;
-	case 4:
-		if (s == 2 && target_size(address) < sizeof(T))
-		{
-			if (target_size(address) == 1)
-			{
-				LOGMASKED(LOG_WIDEPIO, "load pio d<-b 0x%08x (%s)\n", address, machine().describe_context());
-				data = u32(space(s).read_byte(address)) << 24;
-				data |= u32(space(s).read_byte(address)) << 16;
-				data |= u32(space(s).read_byte(address)) << 8;
-				data |= space(s).read_byte(address);
-			}
-			else
-			{
-				LOGMASKED(LOG_WIDEPIO, "load pio d<-w 0x%08x (%s)\n", address, machine().describe_context());
-				data = u32(space(s).read_word(address)) << 16;
-				data |= space(s).read_word(address);
-			}
-		}
-		else
-			data = space(s).read_dword(address);
-		break;
-	}
-
-	return true;
 }
 
 #ifdef _MSC_VER
@@ -236,9 +174,32 @@ template <typename T> bool rtpc_iocc_device::load(u32 address, T &data, rsc_mode
 #pragma warning(disable:4333)
 #endif
 
-template <typename T> bool rtpc_iocc_device::store(u32 address, T data, rsc_mode const mode)
+template <typename T> bool rtpc_iocc_device::mem_load(u32 address, T &data, rsc_mode const mode)
 {
-	unsigned const spacenum = (address >> 24) & 15 ? AS_PROGRAM : AS_IO;
+	if ((mode & RSC_U) && !(m_ccr & CCR_MMP))
+	{
+		LOG("load mem protection violation (%s)\n", machine().describe_context());
+		m_csr |= CSR_EXR | CSR_PER | CSR_PD | CSR_PVIO;
+
+		return false;
+	}
+
+	switch (sizeof(T))
+	{
+	case 1: data = m_mem.read_byte(address); break;
+	case 2: data = swapendian_int16(m_mem.read_word(address)); break;
+	case 4:
+		data = swapendian_int32(m_mem.read_word(address + 0));
+		data |= swapendian_int16(m_mem.read_word(address + 2));
+		break;
+	}
+
+	return true;
+}
+
+template <typename T> bool rtpc_iocc_device::mem_store(u32 address, T data, rsc_mode const mode)
+{
+	int const spacenum = (address >> 24) & 15 ? AS_PROGRAM : AS_IO;
 
 	if (spacenum == AS_PROGRAM && (mode & RSC_U) && !(m_ccr & CCR_MMP))
 	{
@@ -255,68 +216,22 @@ template <typename T> bool rtpc_iocc_device::store(u32 address, T data, rsc_mode
 		return true;
 	}
 
-	if (spacenum == AS_IO && (mode & RSC_U))
-	{
-		if (address == 0xf001'0800U || !(m_ccr & CCR_IMP))
-		{
-			LOG("store pio protection violation (%s)\n", machine().describe_context());
-			m_csr |= CSR_PER | CSR_PD | CSR_PVIO;
-			if (mode & RSC_T)
-			{
-				m_csr |= CSR_EXR;
-				return false;
-			}
-			else
-				set_int(true);
-
-			return true;
-		}
-	}
-
 	switch (sizeof(T))
 	{
-	case 1: space(spacenum).write_byte(address, data); break;
-	case 2:
-		if (spacenum == AS_IO && target_size(address) < sizeof(T))
-		{
-			LOGMASKED(LOG_WIDEPIO, "store pio w->b 0x%08x data 0x%04x (%s)\n", address, data, machine().describe_context());
-			space(spacenum).write_byte(address, u8(data >> 8));
-			space(spacenum).write_byte(address, u8(data >> 0));
-		}
-		else
-			space(spacenum).write_word(address, data);
-		break;
+	case 1: m_mem.write_byte(address, data); break;
+	case 2: m_mem.write_word(address, swapendian_int16(data)); break;
 	case 4:
-		if (spacenum == AS_IO && target_size(address) < sizeof(T))
-		{
-			if (target_size(address) == 1)
-			{
-				LOGMASKED(LOG_WIDEPIO, "store pio d->b 0x%08x data 0x%08x (%s)\n", address, data, machine().describe_context());
-				space(spacenum).write_byte(address, u8(data >> 24));
-				space(spacenum).write_byte(address, u8(data >> 16));
-				space(spacenum).write_byte(address, u8(data >> 8));
-				space(spacenum).write_byte(address, u8(data >> 0));
-			}
-			else
-			{
-				LOGMASKED(LOG_WIDEPIO, "store pio d->w 0x%08x data 0x%08x (%s)\n", address, data, machine().describe_context());
-				space(spacenum).write_word(address, u16(data >> 16));
-				space(spacenum).write_word(address, u16(data >> 0));
-			}
-		}
-		else
-			space(spacenum).write_dword(address, data);
+		m_mem.write_word(address + 0, swapendian_int16(data >> 16));
+		m_mem.write_word(address + 2, swapendian_int16(data >> 0));
 		break;
 	}
 
 	return true;
 }
 
-template <typename T> bool rtpc_iocc_device::modify(u32 address, std::function<T(T)> f, rsc_mode const mode)
+template <typename T> bool rtpc_iocc_device::mem_modify(u32 address, std::function<T(T)> f, rsc_mode const mode)
 {
-	unsigned const spacenum = (address >> 24) & 15 ? AS_PROGRAM : AS_IO;
-
-	if (spacenum == AS_PROGRAM && (mode & RSC_U) && !(m_ccr & CCR_MMP))
+	if ((mode & RSC_U) && !(m_ccr & CCR_MMP))
 	{
 		LOG("modify mem protection violation (%s)\n", machine().describe_context());
 		m_csr |= CSR_PER | CSR_PD | CSR_PVIO;
@@ -331,20 +246,161 @@ template <typename T> bool rtpc_iocc_device::modify(u32 address, std::function<T
 		return true;
 	}
 
-	if (spacenum == AS_IO)
+	switch (sizeof(T))
 	{
-		LOG("modify pio space invalid operation (%s)\n", machine().describe_context());
-		m_csr |= CSR_EXR | CSR_PER | CSR_PD | CSR_INVOP;
+	case 1: m_mem.write_byte(address, f(m_mem.read_byte(address))); break;
+	case 2: m_mem.write_word(address, swapendian_int16(f(swapendian_int16(m_mem.read_word(address))))); break;
+	case 4:
+		{
+			T data = swapendian_int32(m_mem.read_word(address + 0));
+			data |= swapendian_int16(m_mem.read_word(address + 2));
+
+			data = f(data);
+
+			m_mem.write_word(address + 0, swapendian_int16(data >> 16));
+			m_mem.write_word(address + 2, swapendian_int16(data >> 0));
+		}
+		break;
+	}
+
+	return true;
+}
+
+template <typename T> bool rtpc_iocc_device::pio_load(u32 address, T &data, rsc_mode const mode)
+{
+	if ((mode & RSC_U) && (address == CSR_ADDR || !(m_ccr & CCR_IMP)))
+	{
+		LOG("load pio protection violation (%s)\n", machine().describe_context());
+		m_csr |= CSR_EXR | CSR_PER | CSR_PD | CSR_PVIO;
 
 		return false;
+	}
+	else if ((address & REG_MASK) == CSR_ADDR)
+	{
+		data = m_csr | CSR_RSV;
+
+		return true;
+	}
+	else if ((address & REG_MASK) == TCW_BASE)
+	{
+		// the multiply creates a halfword smear needed to pass POST
+		data = m_tcw[(address & ~REG_MASK) >> 1] * 0x0001'0001U;
+
+		return true;
 	}
 
 	switch (sizeof(T))
 	{
-	case 1: space(spacenum).write_byte(address, f(space(spacenum).read_byte(address))); break;
-	case 2: space(spacenum).write_word(address, f(space(spacenum).read_word(address))); break;
-	case 4: space(spacenum).write_dword(address, f(space(spacenum).read_dword(address))); break;
+	case 1: data = m_pio.read_byte(address); break;
+	case 2:
+		switch (m_pio.lookup_read_word_flags(address) & PIO_SIZE)
+		{
+		case PIO_B:
+			data = swapendian_int16(m_pio.read_byte(address));
+			data |= m_pio.read_byte(address);
+			LOGMASKED(LOG_WIDEPIO, "load pio w<-b 0x%08x data 0x%04x (%s)\n", address, data, machine().describe_context());
+			break;
+		case PIO_W:
+			data = swapendian_int16(m_pio.read_word(address));
+			break;
+		}
+		break;
+	case 4:
+		switch (m_pio.lookup_read_dword_flags(address) & PIO_SIZE)
+		{
+		case PIO_B:
+			data = u32(m_pio.read_byte(address)) << 24;
+			data |= u32(m_pio.read_byte(address)) << 16;
+			data |= u32(m_pio.read_byte(address)) << 8;
+			data |= u32(m_pio.read_byte(address)) << 0;
+			LOGMASKED(LOG_WIDEPIO, "load pio d<-b 0x%08x data 0x%08x (%s)\n", address, data, machine().describe_context());
+			break;
+		case PIO_W:
+			data = swapendian_int32(m_pio.read_word(address));
+			data |= swapendian_int16(m_pio.read_word(address));
+			LOGMASKED(LOG_WIDEPIO, "load pio d<-w 0x%08x data 0x%08x(%s)\n", address, data, machine().describe_context());
+			break;
+		}
+		break;
 	}
 
 	return true;
+}
+
+template <typename T> bool rtpc_iocc_device::pio_store(u32 address, T data, rsc_mode const mode)
+{
+	if ((mode & RSC_U) && (address == CSR_ADDR || !(m_ccr & CCR_IMP)))
+	{
+		LOG("store pio protection violation (%s)\n", machine().describe_context());
+		m_csr |= CSR_PER | CSR_PD | CSR_PVIO;
+		if (mode & RSC_T)
+		{
+			m_csr |= CSR_EXR;
+			return false;
+		}
+		else
+			set_int(true);
+
+		return true;
+	}
+	else if ((address & REG_MASK) == CSR_ADDR)
+	{
+		m_csr = 0;
+		set_int(false);
+
+		return true;
+	}
+	else if ((address & REG_MASK) == TCW_BASE)
+	{
+		m_tcw[(address & ~REG_MASK) >> 1] = data;
+
+		return true;
+	}
+
+	switch (sizeof(T))
+	{
+	case 1: m_pio.write_byte(address, data); break;
+	case 2:
+		switch (m_pio.lookup_write_word_flags(address) & PIO_SIZE)
+		{
+		case PIO_B:
+			LOGMASKED(LOG_WIDEPIO, "store pio w->b 0x%08x data 0x%04x (%s)\n", address, data, machine().describe_context());
+			m_pio.write_byte(address, data >> 8);
+			m_pio.write_byte(address, data >> 0);
+			break;
+		case PIO_W:
+			m_pio.write_word(address, swapendian_int16(data));
+			break;
+		}
+		break;
+	case 4:
+		switch (m_pio.lookup_write_dword_flags(address) & PIO_SIZE)
+		{
+		case PIO_B:
+			// HACK: suppress excessive logging from frequent delay register word writes
+			if (address != 0xf000'80e0U)
+				LOGMASKED(LOG_WIDEPIO, "store pio d->b 0x%08x data 0x%08x (%s)\n", address, data, machine().describe_context());
+			m_pio.write_byte(address, data >> 24);
+			m_pio.write_byte(address, data >> 16);
+			m_pio.write_byte(address, data >> 8);
+			m_pio.write_byte(address, data >> 0);
+			break;
+		case PIO_W:
+			LOGMASKED(LOG_WIDEPIO, "store pio d->w 0x%08x data 0x%08x (%s)\n", address, data, machine().describe_context());
+			m_pio.write_word(address, swapendian_int16(data >> 16));
+			m_pio.write_word(address, swapendian_int16(data >> 0));
+			break;
+		}
+		break;
+	}
+
+	return true;
+}
+
+template <typename T> bool rtpc_iocc_device::pio_modify(u32 address, std::function<T(T)> f, rsc_mode const mode)
+{
+	LOG("modify pio space invalid operation (%s)\n", machine().describe_context());
+	m_csr |= CSR_EXR | CSR_PER | CSR_PD | CSR_INVOP;
+
+	return false;
 }

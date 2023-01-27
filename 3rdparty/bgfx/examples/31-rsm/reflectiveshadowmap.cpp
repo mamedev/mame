@@ -1,6 +1,6 @@
 /*
  * Copyright 2016 Joseph Cherlin. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include <common.h>
@@ -211,6 +211,8 @@ public:
 		bgfx::Init init;
 		init.type     = args.m_type;
 		init.vendorId = args.m_pciId;
+		init.platformData.nwh  = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
+		init.platformData.ndt  = entry::getNativeDisplayHandle();
 		init.resolution.width  = m_width;
 		init.resolution.height = m_height;
 		init.resolution.reset  = m_reset;
@@ -353,8 +355,8 @@ public:
 				, BGFX_TEXTURE_RT /* | BGFX_SAMPLER_COMPARE_LEQUAL*/
 				);  // Note I'm not setting BGFX_SAMPLER_COMPARE_LEQUAL.  Why?
 					// Normally a PCF shadow map such as this requires a compare.  However, this sample also
-					// reads from this texture in the lighting pass, and only uses the PCF capabilites in the
-					// combine pass, so the flag is disabled by default.
+					// reads from this texture in the lighting pass, and only uses the PCF capabilities in
+					// the combine pass, so the flag is disabled by default.
 
 		m_shadowBuffer = bgfx::createFrameBuffer(BX_COUNTOF(m_shadowBufferTex), m_shadowBufferTex, true);
 

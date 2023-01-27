@@ -1256,7 +1256,7 @@ ROM_START( witchstar ) // Licensed for Korea
 ROM_END
 
 
-ROM_START( pbchmp95 ) // Licensed for Germany?
+ROM_START( pbchmp95 ) // Licensed for Netherlands?
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "3.bin", 0x00000, 0x20000, CRC(e881aa05) SHA1(10d259396cac4b9a1b72c262c11ffa5efbdac433) )
 

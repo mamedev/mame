@@ -53,6 +53,7 @@ BTANB:
 
 #include "gmaster.lh"
 
+
 namespace {
 
 class gmaster_state : public driver_device
@@ -61,6 +62,7 @@ public:
 	gmaster_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_ram(*this, "ram"),
 		m_lcd(*this, "lcd%u", 0),
 		m_screen(*this, "screen"),
 		m_speaker(*this, "speaker")
@@ -73,6 +75,7 @@ protected:
 
 private:
 	required_device<upd78c11_device> m_maincpu;
+	required_shared_ptr<u8> m_ram;
 	required_device_array<sed1520_device, 2> m_lcd;
 	required_device<screen_device> m_screen;
 	required_device<speaker_sound_device> m_speaker;
@@ -86,13 +89,11 @@ private:
 
 	void main_map(address_map &map);
 
-	u8 m_ram[0x800] = { };
 	u8 m_chipsel = 0;
 };
 
 void gmaster_state::machine_start()
 {
-	save_item(NAME(m_ram));
 	save_item(NAME(m_chipsel));
 }
 
@@ -171,7 +172,7 @@ void gmaster_state::io_w(offs_t offset, u8 data)
 void gmaster_state::main_map(address_map &map)
 {
 	// 0x0000-0x0fff is internal ROM
-	map(0x4000, 0x47ff).mirror(0x3800).rw(FUNC(gmaster_state::io_r), FUNC(gmaster_state::io_w));
+	map(0x4000, 0x47ff).mirror(0x3800).rw(FUNC(gmaster_state::io_r), FUNC(gmaster_state::io_w)).share("ram");
 	map(0x8000, 0xfeff).r("cartslot", FUNC(generic_slot_device::read_rom));
 	// 0xff00-0xffff is internal RAM
 }

@@ -68,7 +68,7 @@
 #include "machine/dp83932c.h"
 #include "machine/mc146818.h"
 #include "machine/ins8250.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 #include "machine/upd765.h"
 #include "machine/at_keybc.h"
 #include "machine/pc_lpt.h"
@@ -333,7 +333,8 @@ void jazz_state::jazz(machine_config &config)
 	m_mct_adr->dma_r_cb<1>().set(m_fdc, FUNC(n82077aa_device::dma_r));
 	m_mct_adr->dma_w_cb<1>().set(m_fdc, FUNC(n82077aa_device::dma_w));
 
-	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	DS1287(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->set_binary(true);
 	m_rtc->set_epoch(1980);
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);

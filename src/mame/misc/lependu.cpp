@@ -77,7 +77,6 @@
 
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
-#include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "sound/discrete.h"
 #include "video/mc6845.h"
@@ -88,6 +87,9 @@
 #include "tilemap.h"
 
 #include "lependu.lh"
+
+
+namespace {
 
 #define MASTER_CLOCK    XTAL(10'000'000)
 #define CPU_CLOCK       (MASTER_CLOCK/16)
@@ -626,6 +628,8 @@ void lependu_state::init_lependu()
 	// fix checksum to avoid RAM clear
 	ROM[0xdd79] = 0xb7;
 }
+
+} // anonymous namespace
 
 
 /*********************************************

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_VIDEO_SKNSSPR_H
-#define MAME_VIDEO_SKNSSPR_H
+#ifndef MAME_KANEKO_SKNSSPR_H
+#define MAME_KANEKO_SKNSSPR_H
 
 #pragma once
 
@@ -29,4 +29,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SKNS_SPRITE, sknsspr_device)
 
-#endif // MAME_VIDEO_SKNSSPR_H
+#endif // MAME_KANEKO_SKNSSPR_H

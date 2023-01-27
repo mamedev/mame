@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia, Mike Coates, Nicola Salmoria, Miguel Angel Horna, Luca Elia, David Haywood
-#ifndef MAME_VIDEO_GAELCO_WRALLY_SPRITES_H
-#define MAME_VIDEO_GAELCO_WRALLY_SPRITES_H
+#ifndef MAME_GAELCO_GAELCO_WRALLY_SPRITES_H
+#define MAME_GAELCO_GAELCO_WRALLY_SPRITES_H
 
 #pragma once
 
@@ -45,4 +45,4 @@ protected:
 DECLARE_DEVICE_TYPE(GAELCO_WRALLY_SPRITES, gaelco_wrally_sprites_device)
 DECLARE_DEVICE_TYPE(BLMBYCAR_SPRITES, blmbycar_sprites_device)
 
-#endif // MAME_VIDEO_GAELCO_WRALLY_SPRITES_H
+#endif // MAME_GAELCO_GAELCO_WRALLY_SPRITES_H

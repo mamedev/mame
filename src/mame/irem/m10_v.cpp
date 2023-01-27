@@ -20,7 +20,6 @@ static const uint32_t extyoffs[] =
 	STEP256(0, 8)
 };
 
-
 static const gfx_layout backlayout =
 {
 	8,8*32, // 8*(8*32) characters
@@ -119,16 +118,13 @@ void m15_state::video_start()
 
 uint32_t m10_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	static const int color[4]= { 3, 3, 5, 5 };
-	static const int xpos[4] = { 4*8, 26*8, 7*8, 6*8};
-
 	bitmap.fill(0, cliprect);
 
 	for (int i = 0; i < 4; i++)
 		if (m_flip)
-				m_back_gfx->opaque(bitmap,cliprect, i, color[i], 1, 1, 31 * 8 - xpos[i], 0);
+				m_back_gfx->opaque(bitmap,cliprect, i, m_back_color[i], 1, 1, 31 * 8 - m_back_xpos[i], 0);
 		else
-				m_back_gfx->opaque(bitmap,cliprect, i, color[i], 0, 0, xpos[i], 0);
+				m_back_gfx->opaque(bitmap,cliprect, i, m_back_color[i], 0, 0, m_back_xpos[i], 0);
 
 	if (m_bottomline)
 	{

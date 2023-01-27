@@ -162,7 +162,7 @@ int ti990_hdc_device::get_id_from_device( device_t *device )
 /*
     Initialize hard disk unit and open a hard disk image
 */
-DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device::load_hd )
+image_init_result ti990_hdc_device::load_hd(device_image_interface &image)
 {
 	int id = get_id_from_device( &image.device() );
 	hd_unit_t *d;
@@ -237,7 +237,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ti990_hdc_device::load_hd )
 /*
     close a hard disk image
 */
-DEVICE_IMAGE_UNLOAD_MEMBER( ti990_hdc_device::unload_hd )
+void ti990_hdc_device::unload_hd(device_image_interface &image)
 {
 	int id = get_id_from_device(&image.device());
 	hd_unit_t *d;

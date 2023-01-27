@@ -88,6 +88,8 @@
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 
+namespace {
+
 class hp95lx_state : public driver_device
 {
 public:
@@ -153,7 +155,7 @@ private:
 	void video_address_w(uint8_t data);
 	uint8_t video_register_r();
 	void video_register_w(uint8_t data);
-	void debug_w(offs_t offset, uint8_t data);
+	[[maybe_unused]] void debug_w(offs_t offset, uint8_t data);
 
 	void hp95lx_io(address_map &map);
 	void hp95lx_map(address_map &map);
@@ -771,6 +773,8 @@ ROM_START( hp95lx )
 
 	ROM_REGION(0x800,"gfx1", ROMREGION_ERASE00)
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS          INIT         COMPANY             FULLNAME    FLAGS

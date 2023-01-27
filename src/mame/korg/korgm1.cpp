@@ -18,6 +18,9 @@
 #include "screen.h"
 //#include "speaker.h"
 
+
+namespace {
+
 class korgm1_state : public driver_device
 {
 public:
@@ -363,6 +366,9 @@ ROM_START( korgm1p1 )
 	ROM_LOAD( "u203.bin", 0x200000, 0x100000, CRC(65eb825d) SHA1(8289b06759cf6e4eafe04c940f11312466352e14) )
 	ROM_LOAD( "u204.bin", 0x300000, 0x100000, CRC(ff8d6307) SHA1(3021fe2ce88884e57b397bc5dfb4b29afc56eec4) )
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1988, korgm1,    0,      0, korgm1, korgm1, korgm1_state, empty_init, "Korg",                 "M1 Music Workstation (Rev 19)",    MACHINE_IS_SKELETON)
 SYST(1988, korgm1ex,  korgm1, 0, korgm1, korgm1, korgm1_state, empty_init, "Korg",                 "M1 EX Music Workstation (v1.29)",  MACHINE_IS_SKELETON)

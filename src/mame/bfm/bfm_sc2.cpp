@@ -194,6 +194,8 @@ Adder hardware:
 #include "sc2prem2.lh"
 
 
+namespace {
+
 class bfm_sc2_state : public driver_device
 {
 public:
@@ -247,7 +249,7 @@ protected:
 	void uart2data_w(uint8_t data);
 	uint8_t key_r(offs_t offset);
 	void vfd1_bd1_w(uint8_t data);
-	void vfd2_data_w(uint8_t data);
+	[[maybe_unused]] void vfd2_data_w(uint8_t data);
 	void e2ram_w(uint8_t data);
 	uint8_t direct_input_r();
 	int recdata(int changed, int data);
@@ -257,7 +259,7 @@ protected:
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	void on_scorpion2_reset();
 	void Scorpion2_SetSwitchState(int strobe, int data, int state);
-	int Scorpion2_GetSwitchState(int strobe, int data);
+	[[maybe_unused]] int Scorpion2_GetSwitchState(int strobe, int data);
 	void e2ram_reset();
 	int recAck(int changed, int data);
 	int read_e2ram();
@@ -8588,6 +8590,7 @@ ROM_START( sc2cvega4p )
 	sc2_plds
 ROM_END
 
+} // anonymous namespace
 
 
 /* Video Based (Adder 2) */

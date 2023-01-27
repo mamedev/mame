@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Alex W. Jackson
-#ifndef MAME_MACHINE_NAMCOMCU_H
-#define MAME_MACHINE_NAMCOMCU_H
+#ifndef MAME_NAMCO_NAMCOMCU_H
+#define MAME_NAMCO_NAMCOMCU_H
 
 #pragma once
 
@@ -60,4 +60,4 @@ DECLARE_DEVICE_TYPE(NAMCO_C75, namco_c75_device)
 DECLARE_DEVICE_TYPE(NAMCO_C76, namco_c76_device)
 
 
-#endif // MAME_MACHINE_NAMCOMCU_H
+#endif // MAME_NAMCO_NAMCOMCU_H

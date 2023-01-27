@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #ifndef BX_ALLOCATOR_H_HEADER_GUARD
@@ -49,7 +49,7 @@ namespace bx
 
 	inline void* alignedAlloc(AllocatorI* _allocator, size_t _size, size_t _align, const char* _file, uint32_t _line)
 	{
-		const size_t align = max(_align, sizeof(uint32_t) );;
+		const size_t align = max(_align, sizeof(uint32_t) );
 		const size_t total = _size + align;
 		uint8_t* ptr = (uint8_t*)alloc(_allocator, total, 0, _file, _line);
 		uint8_t* aligned = (uint8_t*)alignPtr(ptr, sizeof(uint32_t), align);

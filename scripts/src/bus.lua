@@ -2561,6 +2561,8 @@ if (BUSES["VME"]~=null) then
 		MAME_DIR .. "src/devices/bus/vme/vme_hcpu30.h",
 		MAME_DIR .. "src/devices/bus/vme/vme_smvme2000.cpp",
 		MAME_DIR .. "src/devices/bus/vme/vme_smvme2000.h",
+		MAME_DIR .. "src/devices/bus/vme/vme_mvme180.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme_mvme180.h",
 	}
 end
 
@@ -5142,3 +5144,31 @@ if (BUSES["MTU130"]~=null) then
 	}
  end
 
+---------------------------------------------------
+--
+--@src/devices/bus/nabupc/option.h,BUSES["NABU"] = true
+---------------------------------------------------
+if (BUSES["NABU"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/nabupc/adapter.cpp",
+		MAME_DIR .. "src/devices/bus/nabupc/adapter.h",
+		MAME_DIR .. "src/devices/bus/nabupc/fdc.cpp",
+		MAME_DIR .. "src/devices/bus/nabupc/fdc.h",
+		MAME_DIR .. "src/devices/bus/nabupc/option.cpp",
+		MAME_DIR .. "src/devices/bus/nabupc/option.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/nabupc/keyboard/keyboard.h,BUSES["NABU_KEYBOARD"] = true
+---------------------------------------------------
+
+if (BUSES["NABU_KEYBOARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/nabupc/keyboard/hlekeyboard.cpp",
+		MAME_DIR .. "src/devices/bus/nabupc/keyboard/hlekeyboard.h",
+		MAME_DIR .. "src/devices/bus/nabupc/keyboard/keyboard.cpp",
+		MAME_DIR .. "src/devices/bus/nabupc/keyboard/keyboard.h",
+	}
+end

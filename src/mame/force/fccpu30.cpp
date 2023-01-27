@@ -231,6 +231,9 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+
+namespace {
+
 #define DUSCC_CLOCK XTAL(14'745'600) /* Verified */
 
 class cpu30_state : public driver_device
@@ -1039,6 +1042,9 @@ void cpu30_state::fga_irq_callback(int)(01)
 void fga002_device::check_interrupts()()
  */
 
+ } // anonymous namespace
+ 
+ 
 /* Driver */
 /*    YEAR  NAME            PARENT   COMPAT  MACHINE        INPUT  CLASS        INIT             COMPANY                 FULLNAME                  FLAGS */
 COMP( 1988, fccpu30,        0,       0,      cpu30,         cpu30, cpu30_state, empty_init,      "Force Computers GmbH", "SYS68K/CPU-30",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

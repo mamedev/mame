@@ -17,9 +17,8 @@
 
     TODO:
         * (Tickee) gun sometimes misfires
-        * rapidfir, maletmad dipswitches (2*8)
         * maletmad some animation seems to run unthrottled (eg. the turtle rum barrels level),
-          though rate of game timer and music is ok
+          though rate of game timer and music is ok, suspect tms34010 gfxcycles timing
 
 ***************************************************************************/
 
@@ -391,7 +390,6 @@ uint16_t tickee_gun_state::rapidfir_gun2_r()
 
 
 
-
 /*************************************
  *
  *  Sound
@@ -515,7 +513,24 @@ void tickee_gun_state::rapidfir_map(address_map &map)
  *
  *************************************/
 
+static INPUT_PORTS_START( lightguns )
+	PORT_START("GUNX1") // fake analog X
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
+
+	PORT_START("GUNY1") // fake analog Y
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
+
+	PORT_START("GUNX2") // fake analog X
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
+	PORT_START("GUNY2") // fake analog Y
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( tickee )
+	PORT_INCLUDE( lightguns )
+
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x01, "Game Time/Diff" )
 	PORT_DIPSETTING(    0x03, "Very Fast/Very Easy" )
@@ -557,22 +572,12 @@ static INPUT_PORTS_START( tickee )
 	PORT_START("IN2")
 	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
 	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("GUNX1") // fake analog X
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
-
-	PORT_START("GUNY1") // fake analog Y
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
-
-	PORT_START("GUNX2") // fake analog X
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
-
-	PORT_START("GUNY2") // fake analog Y
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( ghoshunt )
+	PORT_INCLUDE( lightguns )
+
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Messages in Play")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
@@ -619,18 +624,6 @@ static INPUT_PORTS_START( ghoshunt )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r) // left ticket status
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xd8, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("GUNX1") // fake analog X
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
-
-	PORT_START("GUNY1") // fake analog Y
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
-
-	PORT_START("GUNX2") // fake analog X
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
-
-	PORT_START("GUNY2") // fake analog Y
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -681,6 +674,8 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( rapidfir )
+	PORT_INCLUDE( lightguns )
+
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -703,43 +698,30 @@ static INPUT_PORTS_START( rapidfir )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0001, DEF_STR( On ))
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0002, DEF_STR( On ))
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0004, DEF_STR( On ))
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0008, DEF_STR( On ))
-	PORT_BIT( 0x0070, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
-	PORT_DIPSETTING(      0x0080, DEF_STR( On ))
+	PORT_DIPUNKNOWN( 0x01, 0x01 )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0040, 0x0000, "Reset NVRAM" )
-	PORT_DIPSETTING(      0x0000, DEF_STR( No ))
-	PORT_DIPSETTING(      0x0040, DEF_STR( Yes ))
-	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("GUNX1") // fake analog X
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
-
-	PORT_START("GUNY1") // fake analog Y
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
-
-	PORT_START("GUNX2") // fake analog X
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
-
-	PORT_START("GUNY2") // fake analog Y
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
+	PORT_DIPUNKNOWN( 0x01, 0x01 )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPNAME( 0x40, 0x00, "Reset NVRAM" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ))
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ))
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( maletmad )
 	PORT_INCLUDE( rapidfir )
@@ -754,6 +736,47 @@ static INPUT_PORTS_START( maletmad )
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("DSW0")
+	PORT_DIPNAME( 0x03, 0x03, "Payout" )
+	PORT_DIPSETTING(    0x03, "1 Hit - 1 Ticket" )
+	PORT_DIPSETTING(    0x02, "2 Hits - 1 Ticket" )
+	PORT_DIPSETTING(    0x01, "3 Hits - 1 Ticket" )
+	PORT_DIPSETTING(    0x00, "5 Hits - 1 Ticket" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Jackpot Amount" )
+	PORT_DIPSETTING(    0x0c, "100 Tickets" )
+	PORT_DIPSETTING(    0x08, "200 Tickets" )
+	PORT_DIPSETTING(    0x04, "300 Tickets" )
+	PORT_DIPSETTING(    0x00, "400 Tickets" )
+	PORT_DIPNAME( 0x30, 0x30, "Game Time")
+	PORT_DIPSETTING(    0x30, "10 seconds")
+	PORT_DIPSETTING(    0x20, "15 seconds")
+	PORT_DIPSETTING(    0x10, "20 seconds")
+	PORT_DIPSETTING(    0x00, "30 seconds")
+	PORT_DIPNAME( 0xc0, 0xc0, "Jackpot Trigger" )
+	PORT_DIPSETTING(    0xc0, "4 Coins" )
+	PORT_DIPSETTING(    0x80, "5 Coins" )
+	PORT_DIPSETTING(    0x40, "6 Coins" )
+	PORT_DIPSETTING(    0x00, "7 Coins" )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ))
+	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ))
+	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ))
+	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_3C ))
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ))
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
 	// 1 mallet, so no there is no 'gun 2'
 	PORT_MODIFY("GUNX2")
@@ -1156,7 +1179,6 @@ Hanaho Games, 1999 licensed to Capcom
 Same exact PCB as Rapid Fire
 
 */
-
 
 ROM_START( maletmad ) // Version 2.1
 	ROM_REGION16_LE( 0x400000, "user1", 0 ) // 34010 code

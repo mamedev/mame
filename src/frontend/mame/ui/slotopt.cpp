@@ -171,7 +171,7 @@ bool menu_slot_devices::try_refresh_current_options()
 //  populate
 //-------------------------------------------------
 
-void menu_slot_devices::populate(float &customtop, float &custombottom)
+void menu_slot_devices::populate()
 {
 	// we need to keep our own copy of the machine_config because we
 	// can change this out from under the caller
@@ -202,9 +202,19 @@ void menu_slot_devices::populate(float &customtop, float &custombottom)
 	}
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Reset System"), 0, ITEMREF_RESET);
+}
+
+
+//-------------------------------------------------
+//  recompute metrics
+//-------------------------------------------------
+
+void menu_slot_devices::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
 
 	// leave space for the name of the current option at the bottom
-	custombottom = ui().get_line_height() + 3.0f * ui().box_tb_border();
+	set_custom_space(0.0F, line_height() + 3.0F * tb_border());
 }
 
 
@@ -221,9 +231,9 @@ void menu_slot_devices::custom_render(void *selectedref, float top, float bottom
 		char const *const text[] = { option ? option->devtype().fullname() : _("[empty slot]") };
 		draw_text_box(
 				std::begin(text), std::end(text),
-				origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
+				origx1, origx2, origy2 + tb_border(), origy2 + bottom,
 				text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
-				ui().colors().text_color(), ui().colors().background_color(), 1.0f);
+				ui().colors().text_color(), ui().colors().background_color());
 	}
 }
 

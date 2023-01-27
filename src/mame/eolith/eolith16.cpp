@@ -22,6 +22,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class eolith16_state : public eolith_state
 {
 public:
@@ -249,5 +251,8 @@ void eolith16_state::init_eolith16()
 {
 	init_speedup();
 }
+
+} // anonymous namespace
+
 
 GAME( 1999, klondkp, 0, eolith16, eolith16, eolith16_state, init_eolith16, ROT0, "Eolith", "KlonDike+", MACHINE_SUPPORTS_SAVE )

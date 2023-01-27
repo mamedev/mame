@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "scsi_morley.h"
 #include "machine/7200fifo.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 #include "bus/nscsi/devices.h"
 
 

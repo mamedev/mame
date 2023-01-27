@@ -49,6 +49,7 @@ public:
 		m_waiting_for_debugger(false),
 		m_window_list(),
 		m_main_console(nullptr),
+		m_next_window_pos{ 0, 0 },
 		m_config(),
 		m_save_windows(true)
 	{
@@ -83,6 +84,8 @@ protected:
 	virtual void show_all() override;
 	virtual void hide_all() override;
 
+	virtual void stagger_window(HWND window, int width, int height) override;
+
 private:
 	template <typename T> T *create_window();
 
@@ -96,6 +99,9 @@ private:
 	bool m_waiting_for_debugger;
 	std::vector<std::unique_ptr<osd::debugger::win::debugwin_info> > m_window_list;
 	osd::debugger::win::consolewin_info *m_main_console;
+
+	POINT m_next_window_pos;
+	LONG m_window_start_x;
 
 	util::xml::file::ptr m_config;
 	bool m_save_windows;
@@ -129,7 +135,26 @@ void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 {
 	// create a console window
 	if (!m_main_console)
+	{
 		m_main_console = create_window<osd::debugger::win::consolewin_info>();
+
+		// set the starting position for new auxiliary windows
+		HMONITOR const nearest_monitor = MonitorFromWindow(
+				std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window(),
+				MONITOR_DEFAULTTONEAREST);
+		if (nearest_monitor)
+		{
+			MONITORINFO info;
+			std::memset(&info, 0, sizeof(info));
+			info.cbSize = sizeof(info);
+			if (GetMonitorInfo(nearest_monitor, &info))
+			{
+				m_next_window_pos.x = info.rcWork.left + 100;
+				m_next_window_pos.y = info.rcWork.top + 100;
+				m_window_start_x = m_next_window_pos.x;
+			}
+		}
+	}
 
 	// update the views in the console to reflect the current CPU
 	if (m_main_console)
@@ -283,6 +308,52 @@ void debugger_windows::hide_all()
 	SetForegroundWindow(std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window());
 	for (auto &info : m_window_list)
 		info->hide();
+}
+
+
+void debugger_windows::stagger_window(HWND window, int width, int height)
+{
+	// get width/height for client size
+	RECT target;
+	target.left = 0;
+	target.top = 0;
+	target.right = width;
+	target.bottom = height;
+	if (!AdjustWindowRectEx(&target, GetWindowLong(window, GWL_STYLE), GetMenu(window) ? TRUE : FALSE,GetWindowLong(window, GWL_EXSTYLE)))
+	{
+		// really shouldn't end up here, but have to do something
+		SetWindowPos(window, HWND_TOP, m_next_window_pos.x, m_next_window_pos.y, width, height, SWP_SHOWWINDOW);
+		return;
+	}
+	target.right -= target.left;
+	target.bottom -= target.top;
+	target.left = target.top = 0;
+
+	// get the work area for the nearest monitor to the target position
+	HMONITOR const mon = MonitorFromPoint(m_next_window_pos, MONITOR_DEFAULTTONEAREST);
+	if (mon)
+	{
+		MONITORINFO info;
+		std::memset(&info, 0, sizeof(info));
+		info.cbSize = sizeof(info);
+		if (GetMonitorInfo(mon, &info))
+		{
+			// restart cascade if necessary
+			if (((m_next_window_pos.x + target.right) > info.rcWork.right) || ((m_next_window_pos.y + target.bottom) > info.rcWork.bottom))
+			{
+				m_next_window_pos.x = m_window_start_x += 16;
+				m_next_window_pos.y = info.rcWork.top + 100;
+				if ((m_next_window_pos.x + target.right) > info.rcWork.right)
+					m_next_window_pos.x = m_window_start_x = info.rcWork.left + 100;
+			}
+		}
+	}
+
+	// move the window and adjust the next position
+	MoveWindow(window, m_next_window_pos.x, m_next_window_pos.y, target.right, target.bottom, FALSE);
+	SetWindowPos(window, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_SHOWWINDOW);
+	m_next_window_pos.x += 16;
+	m_next_window_pos.y += 16;
 }
 
 

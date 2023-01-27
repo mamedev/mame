@@ -26,7 +26,7 @@ public:
 	virtual ~menu_video_targets() override;
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 };
 
@@ -38,7 +38,7 @@ public:
 	virtual ~menu_video_options() override;
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	render_target &m_target;

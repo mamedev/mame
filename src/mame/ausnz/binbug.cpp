@@ -52,6 +52,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class binbug_state : public driver_device
 {
 public:
@@ -286,6 +288,9 @@ ROM_START( binbug )
 	ROM_REGION( 0x0400, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "binbug.rom", 0x0000, 0x0400, CRC(2cb1ac6e) SHA1(a969883fc767484d6b0fa103cfa4b4129b90441b) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

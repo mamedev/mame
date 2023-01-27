@@ -33,6 +33,8 @@ are the same of IGS.  AMT may be previous IGS name.
 #include "tilemap.h"
 
 
+namespace {
+
 class cabaret_state : public driver_device
 {
 public:
@@ -447,5 +449,8 @@ ROM_START( cabaret )
 	ROM_REGION( 0x8000, "gfx3", 0 )
 	ROM_LOAD( "cg-7.u98",  0x0000, 0x8000, CRC(b93ae6f8) SHA1(accb87045c278d5d79fff65bb763aa6e8025a945) )   /* background maps, read by the CPU */
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1992, cabaret, 0, cabaret, cabaret, cabaret_state, init_cabaret, ROT0, "AMT Co. Ltd.", "Cabaret Show", MACHINE_NOT_WORKING )

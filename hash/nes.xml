@@ -3734,7 +3734,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="btoadsj" cloneof="btoads">
+<!-- Same issue as US release -->
+	<software name="btoadsj" cloneof="btoads" supported="no">
 		<description>Battletoads (Japan)</description>
 		<year>1991</year>
 		<publisher>Masaya</publisher>
@@ -3754,7 +3755,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="btoadsu" cloneof="btoads">
+<!-- Game hangs at start of level 3 (turbo tunnel). Sprite 0 hit issue? -->
+	<software name="btoadsu" cloneof="btoads" supported="no">
 		<description>Battletoads (USA)</description>
 		<year>1991</year>
 		<publisher>Tradewest</publisher>
@@ -3779,8 +3781,9 @@ license:CC0-1.0
 		</part>
 	</software>
 
+<!-- Same issue as US release -->
 <!-- glitches on NTSC -->
-	<software name="btoads" supported="partial">
+	<software name="btoads" supported="no">
 		<description>Battletoads (Europe)</description>
 		<year>1993</year>
 		<publisher>Tradewest</publisher>
@@ -44926,12 +44929,13 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<info name="alt_title" value="アバドックス"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
-			<feature name="pcb" value="NES-SLROM" />
+			<feature name="pcb_model" value="HVC-SLROM-03" />
+			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="chr" size="131072">
-				<rom name="abadox (japan).chr" size="131072" crc="f1569df0" sha1="623c95592c972c3c569f8195951684c904aa5c6c" offset="00000" />
+				<rom name="nat-a3-0 chr" size="131072" crc="f1569df0" sha1="623c95592c972c3c569f8195951684c904aa5c6c" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="abadox (japan).prg" size="131072" crc="e675ba2a" sha1="566a4484df0dd2a0a19553d93d24c29f26113942" offset="00000" />
+				<rom name="nat-a3-0 prg" size="131072" crc="e675ba2a" sha1="566a4484df0dd2a0a19553d93d24c29f26113942" />
 			</dataarea>
 		</part>
 	</software>
@@ -47708,12 +47712,13 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="ゴッドスレイヤー はるか天空のソナタ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="pcb_model" value="HVC-TKROM-02" />
+			<feature name="mmc3_type" value="MMC3B" />
 			<dataarea name="chr" size="131072">
-				<rom name="god slayer - haruka tenkuu no sonata (japan).chr" size="131072" crc="da0003d7" sha1="01d49e3450077acfa29c21679951e13d93577344" offset="00000" />
+				<rom name="sfx-g0-0 chr" size="131072" crc="da0003d7" sha1="01d49e3450077acfa29c21679951e13d93577344" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="god slayer - haruka tenkuu no sonata (japan).prg" size="262144" crc="c17ae2dc" sha1="3da15f3afe11a5266708d60a589b791ae2884e61" offset="00000" />
+				<rom name="sfx-g0-0 prg" size="262144" crc="c17ae2dc" sha1="3da15f3afe11a5266708d60a589b791ae2884e61" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -48967,10 +48972,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="グナム危機一髪危機一発 エンパイアシティ1931"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
-			<feature name="pcb" value="NES-UNROM" />
+			<feature name="pcb_model" value="HVC-UNROM-03" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="magnum kiki ippatsu - empire city - 1931 (japan).prg" size="131072" crc="8e7abdfc" sha1="c8d644b58d442651748ad81b5552c5e890c10a58" offset="00000" />
+				<rom name="tfs-mg-0 prg" size="131072" crc="8e7abdfc" sha1="c8d644b58d442651748ad81b5552c5e890c10a58" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="chessking_cart" description="Chess King cartridges">
+
+	<software name="chn_dic">
+		<description>English-Chinese Dictionary</description>
+		<year>1994</year>
+		<publisher>I-Star Co., Ltd.</publisher>
+		<part name="cart" interface="chessking_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="et-mate_chn-dic.u1" size="0x200000" crc="9de03037" sha1="6b7d399c98ffbb6c633cbc5e18e1d6ed0a05b06e" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -36,6 +36,8 @@
 #include "gldarrow.lh"
 
 
+namespace {
+
 class meyc8088_state : public driver_device
 {
 public:
@@ -412,6 +414,8 @@ ROM_START( gldarrow )
 	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "prom.2c", 0x00, 0x20, CRC(2839bb14) SHA1(c9acdb3ae00c2f9344aedaf77c0f4e860a3184fc) ) // M3-7602-5 color prom
 ROM_END
+
+} // anonymous namespace
 
 
 GAMEL( 1984, gldarrow, 0, meyc8088, gldarrow, meyc8088_state, empty_init, ROT0, "Meyco Games, Inc.", "Golden Arrow (Standard G8-03)", MACHINE_SUPPORTS_SAVE, layout_gldarrow )

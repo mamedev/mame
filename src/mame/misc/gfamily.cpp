@@ -11,17 +11,20 @@ PC with Chinese Windows 2000 Pro and several emulators, including (programs may 
  -FB Alpha v0.2.94.98
  -ZiNc 1.1
 
-PC motherboard plus an additional PCB for JAMMA, inputs and basic config (and protection) with:
+SiS651/SiS962 based chipset plus an additional PCB for JAMMA, inputs and basic config (and protection) with:
  Atmel AT89C2051 (near a 4 dipswitches bank and a 6.000 MHz xtal)
  Microchip CF745 (near another 4 dipswitches bank and a 4.000 MHz xtal)
  2 x Microchip PIC12F508
  Altera Max EPM7128SQC100-10 CPLD
 
+TODO:
+- Move to sis630.cpp or a derived state (BIOS kinda boots with existing driver)
+
 */
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "screen.h"
+#include "machine/pci.h"
 
 namespace {
 
@@ -35,56 +38,31 @@ public:
 
 	void gfamily(machine_config &config);
 
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 private:
 	required_device<cpu_device> m_maincpu;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void gfamily_map(address_map &map);
 };
 
-void gfamily_state::video_start()
-{
-}
-
-uint32_t gfamily_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
 
 void gfamily_state::gfamily_map(address_map &map)
 {
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0x60000);
+	map(0xfff80000, 0xffffffff).rom().region("bios", 0);
 }
 
 static INPUT_PORTS_START( gfamily )
 INPUT_PORTS_END
 
-
-void gfamily_state::machine_start()
-{
-}
-
-void gfamily_state::machine_reset()
-{
-}
-
 void gfamily_state::gfamily(machine_config &config)
 {
-	// Basic machine hardware
+	// Socket 478
 	PENTIUM4(config, m_maincpu, 1'700'000'000); // Actually an Intel Celeron SL6SC 1.7GHz (with the config found with the default BIOS)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gfamily_state::gfamily_map);
 
-	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(gfamily_state::screen_update));
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 /***************************************************************************
@@ -97,7 +75,7 @@ ROM_START( gmfamily )
 
 	/* Different PC motherboards with different configurations.
 	   By now, we're throwing all known BIOSes here. */
-	ROM_REGION(0x80000, "bios", 0)
+	ROM_REGION32_LE(0x80000, "bios", 0)
 
 	/* CPU: Intel Celeron 1.7GHz / 128kb / 400MHz SL6SC
 	   RAM: 256MB-DDR400

@@ -41,6 +41,8 @@ Sound: BASIC-31 has sound, and BASIC-52 doesn't. The sound command is PWM.
 #include "speaker.h"
 
 
+namespace {
+
 class basic52_state : public driver_device
 {
 public:
@@ -171,6 +173,9 @@ ROM_START( basic31 )
 	ROM_SYSTEM_BIOS(1, "v12a", "v 1.2a")
 	ROMX_LOAD( "mcs-51-12a.bin", 0x0000, 0x2000, CRC(225bb2f0) SHA1(46e97643a7a5cb4c278f9e3c73d18cd93209f8bf), ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 /*    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME        FLAGS */

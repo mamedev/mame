@@ -31,6 +31,9 @@ able to deal with 256byte sectors so fails to load the irmx 512byte sector image
 #include "isbc_215g.h"
 #include "isbc_208.h"
 
+
+namespace {
+
 class isbc_state : public driver_device
 {
 public:
@@ -704,6 +707,9 @@ ROM_START( sm1810 )
 	ROM_LOAD16_BYTE( "sm1810.42-1.06-2.bin", 0x4000, 0x2000, CRC(ae015240) SHA1(2c345a9e0832a0f26493bda394b2c4ad7ada7aad))
 	ROM_LOAD16_BYTE( "sm1810.42-1.06-3.bin", 0x4001, 0x2000, CRC(9741a51a) SHA1(c9d3a6a5c51fe9814986517b0f4cbeae8200babc))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

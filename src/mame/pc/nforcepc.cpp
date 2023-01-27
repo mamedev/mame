@@ -16,7 +16,7 @@
   - A keyboard
   - A ddr dimm memory module
   Later add:
-  - A Nvidia NV25 based AGP video card
+  - A nVidia NV25 based AGP video card
 
 */
 

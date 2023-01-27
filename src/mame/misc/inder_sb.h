@@ -3,8 +3,8 @@
 /* */
 
 
-#ifndef MAME_MACHINE_INDER_SB_H
-#define MAME_MACHINE_INDER_SB_H
+#ifndef MAME_MISC_INDER_SB_H
+#define MAME_MISC_INDER_SB_H
 
 #pragma once
 
@@ -59,4 +59,4 @@ private:
 	uint8_t m_soundback;
 };
 
-#endif // MAME_MACHINE_INDER_SB_H
+#endif // MAME_MISC_INDER_SB_H

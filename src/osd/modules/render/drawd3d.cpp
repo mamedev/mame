@@ -446,6 +446,7 @@ d3d_texture_manager::d3d_texture_manager(renderer_d3d9 *d3d)
 	// set the max texture size
 	win->target()->set_max_texture_size(m_texture_max_width, m_texture_max_height);
 	osd_printf_verbose("Direct3D: Max texture size = %dx%d\n", (int)m_texture_max_width, (int)m_texture_max_height);
+	printf("Direct3D: Max texture size = %dx%d\n", (int)m_texture_max_width, (int)m_texture_max_height);
 }
 
 void d3d_texture_manager::create_resources()

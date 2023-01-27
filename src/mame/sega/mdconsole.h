@@ -10,6 +10,7 @@
 #include "mega32x.h"
 #include "megacd.h"
 
+#include "bus/generic/slot.h"
 #include "bus/megadrive/md_slot.h"
 #include "bus/megadrive/md_carts.h"
 #include "bus/sms_ctrl/smsctrl.h"

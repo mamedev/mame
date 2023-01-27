@@ -11,7 +11,9 @@
 	"blend": {
 		"equation": "add",
 		"srcColor": "dstcolor",
-		"dstColor": "1-srcalpha"
+		"dstColor": "1-srcalpha",
+		"srcAlpha": "1",
+		"dstAlpha": "0"
 	},
 	"depth": {
 		"function": "always"

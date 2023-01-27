@@ -11,34 +11,22 @@
 
 #include "osdcore.h"
 
-#include <cstdarg>
 #include <cmath>
 
-bool state_reader::READER_CHECK(bool condition, const char* format, ...)
+
+bool state_reader::V_READER_CHECK(bool condition, const util::format_argument_pack<std::ostream> &args)
 {
 	if (!condition)
-	{
-		va_list ap;
-		va_start(ap, format);
-		char buf[2048];
-		vsnprintf(buf, 2048, format, ap);
-		osd_printf_error("Error: %s\n", buf);
-		va_end(ap);
-	}
+		osd_printf_error("Error: %s\n", util::string_format(args));
+
 	return condition;
 }
 
-bool state_reader::READER_WARN(bool condition, const char* format, ...)
+bool state_reader::V_READER_WARN(bool condition, const util::format_argument_pack<std::ostream> &args)
 {
 	if (!condition)
-	{
-		va_list ap;
-		va_start(ap, format);
-		char buf[2048];
-		vsnprintf(buf, 2048, format, ap);
-		osd_printf_warning("Warning: %s\n", buf);
-		va_end(ap);
-	}
+		osd_printf_warning("Warning: %s\n", util::string_format(args));
+
 	return condition;
 }
 
