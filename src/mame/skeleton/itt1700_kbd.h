@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
 
-#ifndef MAME_MACHINE_ITT1700_KBD
-#define MAME_MACHINE_ITT1700_KBD
+#ifndef MAME_SKELETON_ITT1700_KBD
+#define MAME_SKELETON_ITT1700_KBD
 
 #pragma once
 
@@ -44,4 +44,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(ITT1700_KEYBOARD, itt1700_keyboard_device)
 
-#endif // MAME_MACHINE_ITT1700_KBD_H
+#endif // MAME_SKELETON_ITT1700_KBD_H

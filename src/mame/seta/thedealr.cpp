@@ -40,6 +40,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class thedealr_state : public driver_device
 {
 public:
@@ -533,5 +535,8 @@ ROM_START( thedealr )
 	ROM_LOAD( "xb0-u65.u65", 0x000, 0x200, CRC(5969a133) SHA1(f92f17949c1974d779d31741afd137f9217af3b9) )
 	ROM_LOAD( "xb0-u68.u68", 0x200, 0x200, CRC(c0c54d43) SHA1(5ce352fb888c8e683014c73e6da00ec95f2ae572) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1988?, thedealr, 0, thedealr, thedealr, thedealr_state, empty_init, ROT0, "Visco Games", "The Dealer (Visco)", MACHINE_SUPPORTS_SAVE )

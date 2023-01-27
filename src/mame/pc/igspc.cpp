@@ -47,6 +47,9 @@ TODO:
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 
+
+namespace {
+
 class speeddrv_state : public driver_device
 {
 public:
@@ -117,6 +120,9 @@ ROM_END
 void speeddrv_state::init_speeddrv()
 {
 }
+
+} // anonymous namespace
+
 
 GAME( 2004, speeddrv, 0, speeddrv, speeddrv, speeddrv_state, init_speeddrv, ROT0, "IGS", "Speed Driver",          MACHINE_IS_SKELETON )
 GAME( 200?, eztouch,  0, speeddrv, speeddrv, speeddrv_state, init_speeddrv, ROT0, "IGS", "EZ Touch (v116 China)", MACHINE_IS_SKELETON )

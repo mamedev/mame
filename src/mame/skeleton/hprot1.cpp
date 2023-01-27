@@ -63,6 +63,9 @@ Infinite loop is reached at address 0x7699
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class hprot1_state : public driver_device
 {
 public:
@@ -323,6 +326,9 @@ ROM_START( hprot2r6 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hprot_card2_rev6.u2",  0x00000, 0x10000, CRC(791f2425) SHA1(70af8911a27921cac6d98a5cd07602a7f59c2848) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS         INIT         COMPANY  FULLNAME                       FLAGS */
 COMP( 2002, hprot1,   0,      0,      hprot1,   hprot1,   hprot1_state, init_hprot1, "HENRY", "Henry Prot I v19 (REV.1)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)

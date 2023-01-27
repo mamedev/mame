@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_315_5296_H
-#define MAME_MACHINE_315_5296_H
+#ifndef MAME_SEGA_315_5296_H
+#define MAME_SEGA_315_5296_H
 
 #pragma once
 
@@ -73,4 +73,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(SEGA_315_5296, sega_315_5296_device)
 
-#endif // MAME_MACHINE_315_5296_H
+#endif // MAME_SEGA_315_5296_H

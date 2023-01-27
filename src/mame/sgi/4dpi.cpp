@@ -70,6 +70,9 @@
 
 #include "softlist.h"
 
+
+namespace {
+
 class pi4d2x_state : public driver_device
 {
 public:
@@ -1042,6 +1045,9 @@ ROM_START(4d35)
 	ROM_SYSTEM_BIOS(2, "4.0a", "SGI Version 4.0 Rev A IP12,  Aug 22, 1991")
 	ROMX_LOAD("ip12prom.070-8045-002.u61", 0x000000, 0x040000, CRC(fe999bae) SHA1(eb054c365a6e018be3b9ae44169c0ffc6447c6f0), ROM_BIOS(2))
 ROM_END
+
+} // anonymous namespace
+
 
 //   YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY                 FULLNAME                FLAGS
 COMP(1988, 4d20, 0,      0,      pi4d20,  0,     pi4d2x_state, initialize, "Silicon Graphics Inc", "Personal IRIS 4D/20",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

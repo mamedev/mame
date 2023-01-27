@@ -8,8 +8,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_MACHINE_PCE220_SER_H
-#define MAME_MACHINE_PCE220_SER_H
+#ifndef MAME_SHARP_PCE220_SER_H
+#define MAME_SHARP_PCE220_SER_H
 
 #pragma once
 
@@ -88,4 +88,4 @@ DECLARE_DEVICE_TYPE(PCE220SERIAL, pce220_serial_device)
 ***************************************************************************/
 #define PCE220SERIAL_TAG        "serial"
 
-#endif // MAME_MACHINE_PCE220_SER_H
+#endif // MAME_SHARP_PCE220_SER_H

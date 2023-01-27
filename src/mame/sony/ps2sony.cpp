@@ -184,6 +184,9 @@ iLinkSGUID=0x--------
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class ps2sony_state : public driver_device
 {
 public:
@@ -921,5 +924,8 @@ ROM_START( ps2 )
 	ROM_SYSTEM_BIOS( 62, "scph70002_a", "SCPH-70002/SCPH-75002 (Version 5.0 06/14/04 A)" )
 	ROMX_LOAD( "ps2-0200a-20040614_alt.bin", 0x000000, 0x400000, CRC(3e0aa788) SHA1(597841bfea6e334f5ec4116299091ae2ed3da479), ROM_BIOS(62) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 2000, ps2, 0, 0, ps2sony, ps2sony, ps2sony_state, empty_init, "Sony", "PlayStation 2", MACHINE_IS_SKELETON )

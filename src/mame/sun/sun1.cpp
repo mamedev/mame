@@ -64,6 +64,8 @@
 #include "machine/z80sio.h"
 
 
+namespace {
+
 class sun1_state : public driver_device
 {
 public:
@@ -175,6 +177,9 @@ ROM_START( sun1 )
 	ROM_LOAD( "cpuu602.p1.bin", 0x0200, 0x0020, CRC(ee1e5a14) SHA1(0d3346cb3b647fa2475bd7b4fa36ea6ecfdaf805))
 	ROM_LOAD( "cpuu502.p0.bin", 0x0220, 0x0020, CRC(20eb1183) SHA1(9b268792b28d858d6b6a1b6c4148af88a8d6b735))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

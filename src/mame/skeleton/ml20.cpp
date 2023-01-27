@@ -60,6 +60,9 @@
 
 #include "ml20.lh"
 
+
+namespace {
+
 class ml20_state : public driver_device
 {
 public:
@@ -286,6 +289,9 @@ ROM_START( ml20 )
 	ROM_REGION(0x10000, "bios", 0)
 	ROM_LOAD("ml-20_v1.27.ic4", 0x0000, 0x10000, CRC(844d6d23) SHA1(08cd290bc342da328abc91b0699662c9ba335c0d) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE INPUT  CLASS       INIT        COMPANY    FULLNAME         FLAGS
 COMP( 1999, ml20, 0,      0,      ml20,   ml20,  ml20_state, empty_init, "Digitek", "Micrologic 20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE)

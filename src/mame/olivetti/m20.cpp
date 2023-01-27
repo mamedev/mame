@@ -60,6 +60,8 @@ E I1     Vectored interrupt error
 #include "formats/pc_dsk.h"
 
 
+namespace {
+
 class m20_state : public driver_device
 {
 public:
@@ -847,6 +849,9 @@ ROM_START(m44) // TODO: implement different hardware. Split to another driver?
 	ROM_REGION( 0x114, "plds", 0 )
 	ROM_LOAD( "pl46.j09", 0x000, 0x114, NO_DUMP ) // PLD, chip type unknown
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME           FLAGS
 COMP( 1981, m20,  0,      0,      m20,     0,     m20_state, empty_init, "Olivetti", "Olivetti L1 M20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

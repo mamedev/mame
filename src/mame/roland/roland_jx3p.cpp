@@ -17,6 +17,9 @@
 #include "machine/pit8253.h"
 #include "machine/rescap.h"
 
+
+namespace {
+
 class roland_jx3p_state : public driver_device
 {
 public:
@@ -264,6 +267,9 @@ ROM_START(gr700)
 	ROM_REGION(0x2000, "interface", 0)
 	ROM_LOAD("if_v1.4.ic17", 0x0000, 0x2000, CRC(56579d31) SHA1(b6d5b02e8952d52eff5a0bf77f7922e6d135454a))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1983, jx3p,  0, 0, jx3p,  jx3p,  roland_jx3p_state, empty_init, "Roland", "JX-3P Programmable Preset Polyphonic Synthesizer", MACHINE_IS_SKELETON)
 SYST(1984, mks30, 0, 0, mks30, mks30, roland_jx3p_state, empty_init, "Roland", "MKS-30 Planet-S MIDI Sound Module",                MACHINE_IS_SKELETON)

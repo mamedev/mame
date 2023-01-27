@@ -22,6 +22,9 @@
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 
+
+namespace {
+
 #define I8049_TAG   "i8049"
 
 class digijet_state : public driver_device
@@ -61,6 +64,9 @@ ROM_START( digijet )
 	ROM_REGION( 0x800, I8049_TAG, 0 )
 	ROM_LOAD( "vanagon_85_usa_ca.bin", 0x000, 0x800, CRC(2ed7c4c5) SHA1(ae48d8892b44fe76b48bcefd293c15cd47af3fba) ) // Volkswagen Vanagon, 1985, USA, California
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY       FULLNAME   FLAGS
 CONS( 1985, digijet, 0,      0,      digijet, digijet, digijet_state, empty_init, "Volkswagen", "Digijet", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

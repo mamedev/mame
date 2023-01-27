@@ -40,6 +40,9 @@ The keyboard has a sticker that proclaims it was made by Fujitsu Limited.
 #include "screen.h"
 #include "formats/imd_dsk.h"
 
+
+namespace {
+
 class peoplepc_state : public driver_device
 {
 public:
@@ -358,5 +361,8 @@ ROM_START( olypeopl )
 	ROM_REGION(0x400, "kbdmcu", 0)
 	ROM_LOAD( "m1.bin", 0x000, 0x400, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1983, olypeopl, 0, 0, olypeopl, 0, peoplepc_state, empty_init, "Olympia International", "People PC", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

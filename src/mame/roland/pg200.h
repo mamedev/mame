@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
 
-#ifndef MAME_MACHINE_PG200_H
-#define MAME_MACHINE_PG200_H
+#ifndef MAME_ROLAND_PG200_H
+#define MAME_ROLAND_PG200_H
 
 #include "cpu/mcs48/mcs48.h"
 
@@ -23,4 +23,4 @@ private:
 
 DECLARE_DEVICE_TYPE(PG200, pg200_device)
 
-#endif // MAME_MACHINE_PG200_H
+#endif // MAME_ROLAND_PG200_H

@@ -83,6 +83,9 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 
+
+namespace {
+
 class symbolics_state : public driver_device
 {
 public:
@@ -99,8 +102,8 @@ public:
 
 private:
 	required_device<m68000_base_device> m_maincpu;
-	uint16_t buserror_r();
-	uint16_t fep_paddle_id_prom_r();
+	[[maybe_unused]] uint16_t buserror_r();
+	[[maybe_unused]] uint16_t fep_paddle_id_prom_r();
 	//uint16_t ram_parity_hack_r(offs_t offset);
 	//void ram_parity_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	//bool m_parity_error_has_occurred[0x20000];
@@ -384,6 +387,9 @@ ROM_START( s3670 )
 	*/
 
 ROM_END
+
+} // anonymous namespace
+
 
 /******************************************************************************
  Drivers

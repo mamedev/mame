@@ -109,6 +109,9 @@ the Neogeo Pocket.
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 enum flash_state
 {
 	F_READ,                     /* xxxx F0 or 5555 AA 2AAA 55 5555 F0 */
@@ -906,6 +909,8 @@ ROM_START(ngpc)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("ngpcbios.rom", 0x0000, 0x10000, CRC(6eeb6f40) SHA1(edc13192054a59be49c6d55f83b70e2510968e86))
 ROM_END
+
+} // anonymous namespace
 
 
 //   YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  STATE      INIT        COMPANY  FULLNAME               FLAGS

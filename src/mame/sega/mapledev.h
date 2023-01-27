@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_MAPLEDEV_H
-#define MAME_MACHINE_MAPLEDEV_H
+#ifndef MAME_SEGA_MAPLEDEV_H
+#define MAME_SEGA_MAPLEDEV_H
 
 
 #include "maple-dc.h"
@@ -43,4 +43,4 @@ private:
 	emu_timer *timer = nullptr;
 };
 
-#endif // MAME_MACHINE_MAPLEDEV_H
+#endif // MAME_SEGA_MAPLEDEV_H

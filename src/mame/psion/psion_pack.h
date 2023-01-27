@@ -6,8 +6,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_MACHINE_PSION_PACK_H
-#define MAME_MACHINE_PSION_PACK_H
+#ifndef MAME_PSION_PSION_PACK_H
+#define MAME_PSION_PSION_PACK_H
 
 #include "imagedev/memcard.h"
 
@@ -70,4 +70,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(PSION_DATAPACK, datapack_device)
 
-#endif // MAME_MACHINE_PSION_PACK_H
+#endif // MAME_PSION_PSION_PACK_H

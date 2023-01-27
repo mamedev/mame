@@ -29,8 +29,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_VIDEO_ZX8301_H
-#define MAME_VIDEO_ZX8301_H
+#ifndef MAME_SINCLAIR_ZX8301_H
+#define MAME_SINCLAIR_ZX8301_H
 
 #pragma once
 
@@ -107,4 +107,4 @@ DECLARE_DEVICE_TYPE(ZX8301, zx8301_device)
 
 
 
-#endif // MAME_VIDEO_ZX8301_H
+#endif // MAME_SINCLAIR_ZX8301_H

@@ -33,6 +33,8 @@ Measured clocks:
 #include "tilemap.h"
 
 
+namespace {
+
 class seicupbl_state : public driver_device
 {
 public:
@@ -889,6 +891,8 @@ ROM_START( cupsocsb4 )
 	ROM_LOAD16_BYTE( "15.bin", 0x00000, 0x080000, CRC(8fd87e65) SHA1(acc9fd0289fa9ab60bec16d3e642039380e5180a) ) // 27c4001
 	ROM_LOAD16_BYTE( "14.bin", 0x00001, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) ) // 27c4001
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1992, cupsocsb,  cupsoc,   cupsocbl, cupsoc, seicupbl_state, empty_init, ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

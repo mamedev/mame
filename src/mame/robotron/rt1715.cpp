@@ -47,6 +47,8 @@
 #define LOGBANK(format, ...)    LOGMASKED(LOG_BANK,   "%11.6f at %s: " format, machine().time().as_double(), machine().describe_context(), __VA_ARGS__)
 
 
+namespace {
+
 class rt1715_state : public driver_device
 {
 public:
@@ -874,6 +876,8 @@ ROM_START( rt1715w )
 	ROM_REGION(0x0100, "prom", 0)
 	ROM_LOAD("287.bin", 0x0000, 0x0100, CRC(8508360c) SHA1(d262a8c3cf2d284c67f23b853e0d59ae5cc1d4c8)) // /CAS decoder prom, 74S287
 ROM_END
+
+} // anonymous namespace
 
 
 /***************************************************************************

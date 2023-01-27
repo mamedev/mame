@@ -83,6 +83,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define MAIN_CPU_MASTER_CLOCK       XTAL(11'200'000)
 #define PIXEL_CLOCK                 (MAIN_CPU_MASTER_CLOCK / 2)
 #define CRTC_CLOCK                  (MAIN_CPU_MASTER_CLOCK / 16)
@@ -738,6 +740,7 @@ ROM_START( warcadia )
 	ROM_LOAD( "ar-11",        0x7000, 0x0800, CRC(208f4488) SHA1(533f8942e1c964cc88253e9dc4ec711f77607e4c) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

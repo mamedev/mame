@@ -6,8 +6,8 @@
  *  Created on: 10/07/2013
  */
 
-#ifndef MAME_MACHINE_DECOPINCPU_H
-#define MAME_MACHINE_DECOPINCPU_H
+#ifndef MAME_PINBALL_DECOPINCPU_H
+#define MAME_PINBALL_DECOPINCPU_H
 
 #pragma once
 
@@ -177,4 +177,4 @@ DECLARE_DEVICE_TYPE(DECOCPU2,  decocpu_type2_device)
 DECLARE_DEVICE_TYPE(DECOCPU3,  decocpu_type3_device)
 DECLARE_DEVICE_TYPE(DECOCPU3B, decocpu_type3b_device)
 
-#endif // MAME_MACHINE_DECOPINCPU_H
+#endif // MAME_PINBALL_DECOPINCPU_H

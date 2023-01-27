@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_MACHINE_ZORBAKBD_H
-#define MAME_MACHINE_ZORBAKBD_H
+#ifndef MAME_SKELETON_ZORBAKBD_H
+#define MAME_SKELETON_ZORBAKBD_H
 
 #pragma once
 
@@ -40,4 +40,4 @@ protected:
 	u8      m_row_select;
 };
 
-#endif // MAME_MACHINE_ZORBAKBD_H
+#endif // MAME_SKELETON_ZORBAKBD_H

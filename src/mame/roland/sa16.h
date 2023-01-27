@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_SA16_H
-#define MAME_MACHINE_SA16_H
+#ifndef MAME_ROLAND_SA16_H
+#define MAME_ROLAND_SA16_H
 
 #pragma once
 
@@ -67,4 +67,4 @@ public:
 DECLARE_DEVICE_TYPE(RF5C36, rf5c36_device)
 DECLARE_DEVICE_TYPE(SA16, sa16_device)
 
-#endif // MAME_MACHINE_SA16_H
+#endif // MAME_ROLAND_SA16_H

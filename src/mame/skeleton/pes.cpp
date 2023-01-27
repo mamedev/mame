@@ -68,6 +68,8 @@ Current status:
 #include "speaker.h"
 
 
+namespace {
+
 class pes_state : public driver_device
 {
 public:
@@ -202,6 +204,9 @@ ROM_START( pes )
 	ROM_SYSTEM_BIOS( 1, "kevbios", "PES box with kevtris' rewritten firmware")
 	ROMX_LOAD( "pes.bin",   0x0000, 0x2000, CRC(22c1c4ec) SHA1(042e139cd0cf6ffafcd88904f1636c6fa1b38f25), ROM_BIOS(1)) // rewritten firmware by kevtris, 4800bps serial, RTS/CTS plus XON/XOFF flow control, 64 byte buffer
 ROM_END
+
+} // anonymous namespace
+
 
 /******************************************************************************
  Drivers

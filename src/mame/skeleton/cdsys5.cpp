@@ -12,6 +12,9 @@
 #include "machine/mc146818.h"
 #include "machine/nvram.h"
 
+
+namespace {
+
 class cdsys5_state : public driver_device
 {
 public:
@@ -89,6 +92,8 @@ ROM_START(minijook)
 	ROM_REGION(0x8000, "program", 0)
 	ROM_LOAD("mj-sl-s-v3.4.u10", 0x0000, 0x8000, CRC(7b8f03ce) SHA1(9d7fb9a9f5051ecadad5a33860117bc4dfd8ab30)) // 0xxxxxxxxxxxxxx = 0xFF
 ROM_END
+
+} // anonymous namespace
 
 
 SYST(199?, minijook, 0, 0, minijook, minijook, cdsys5_state, empty_init, "Sound Leisure", "MiniJook", MACHINE_IS_SKELETON_MECHANICAL)

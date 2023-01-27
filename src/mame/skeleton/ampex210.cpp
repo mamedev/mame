@@ -17,6 +17,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class ampex210_state : public driver_device
 {
 public:
@@ -237,6 +239,9 @@ ROM_START(ampex230p) // EPROMs stickered "© 1989 AMPEX CORP."
 	ROM_REGION(0x2000, "chargen", 0)
 	ROM_LOAD("230_u2.bin", 0x0000, 0x2000, CRC(7143b773) SHA1(616d3c0c1a1f7a00bf16857324043955ab842994))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1988, ampex210p, 0, 0, ampex210p, ampex210p, ampex210_state, empty_init, "Ampex", "Ampex 210 plus Terminal (v3.0)", MACHINE_IS_SKELETON)
 COMP(1988, ampex230p, 0, 0, ampex230p, ampex210p, ampex210_state, empty_init, "Ampex", "Ampex 230 plus Terminal (v4.0)", MACHINE_IS_SKELETON)

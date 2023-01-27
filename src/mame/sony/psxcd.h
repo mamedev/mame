@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf,R. Belmont,pSXAuthor,Carl
-#ifndef MAME_MACHINE_PSXCD_H
-#define MAME_MACHINE_PSXCD_H
+#ifndef MAME_SONY_PSXCD_H
+#define MAME_SONY_PSXCD_H
 
 #pragma once
 
@@ -178,4 +178,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(PSXCD, psxcd_device)
 
-#endif // MAME_MACHINE_PSXCD_H
+#endif // MAME_SONY_PSXCD_H
