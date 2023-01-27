@@ -47,7 +47,7 @@ public:
 
 };
 
-#else /* SDLMAME_UNIX */
+#else /* SDLMAME_EMSCRIPTEN */
 	MODULE_NOT_SUPPORTED(sound_js, OSD_SOUND_PROVIDER, "js")
 #endif
 

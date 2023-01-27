@@ -64,6 +64,7 @@ OSD-related Options
 | :ref:`mouseprovider <mame-commandline-mouseprovider>`
 | :ref:`lightgunprovider <mame-commandline-lightgunprovider>`
 | :ref:`joystickprovider <mame-commandline-joystickprovider>`
+| :ref:`midiprovider <mame-commandline-midiprovider>`
 
 
 OSD CLI Verbs
@@ -266,6 +267,7 @@ Core Input Options
 | :ref:`joystick_map <mame-commandline-joystickmap>`
 | :ref:`joystick_deadzone <mame-commandline-joystickdeadzone>`
 | :ref:`joystick_saturation <mame-commandline-joysticksaturation>`
+| :ref:`joystick_threshold <mame-commandline-joystickthreshold>`
 | :ref:`[no]natural <mame-commandline-natural>`
 | :ref:`[no]joystick_contradictory <mame-commandline-joystickcontradictory>`
 | :ref:`coin_impulse <mame-commandline-coinimpulse>`

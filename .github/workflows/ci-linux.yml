@@ -3,7 +3,7 @@ name: CI (Linux)
 on:
   push:
     paths:
-    - '.github/**'
+    - '.github/workflows/**'
     - '3rdparty/**'
     - 'hash/**'
     - 'scripts/**'
@@ -12,7 +12,7 @@ on:
     - 'makefile'
   pull_request:
     paths:
-    - '.github/**'
+    - '.github/workflows/**'
     - '3rdparty/**'
     - 'hash/**'
     - 'scripts/**'

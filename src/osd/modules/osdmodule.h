@@ -15,6 +15,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 
@@ -24,7 +25,10 @@
 
 class osd_options;
 
-// ======================> osd_module
+
+//============================================================
+//  TYPE DEFINITIONS
+//============================================================
 
 class osd_module
 {
@@ -48,8 +52,10 @@ private:
 	std::string const m_type;
 };
 
+
 // a module_type is simply a pointer to its alloc function
 typedef std::unique_ptr<osd_module> (*module_type)();
+
 
 // this template function creates a stub which constructs a module
 template <class ModuleClass>
@@ -57,6 +63,7 @@ std::unique_ptr<osd_module> module_creator()
 {
 	return std::unique_ptr<osd_module>(new ModuleClass);
 }
+
 
 class osd_module_manager
 {
@@ -77,7 +84,7 @@ public:
 
 	osd_module *select_module(const char *type, const char *name = "");
 
-	void get_module_names(const char *type, const int max, int &num, const char *names[]) const;
+	std::vector<std::string_view> get_module_names(const char *type) const;
 
 	void init(const osd_options &options);
 
@@ -90,18 +97,20 @@ private:
 	std::vector<std::reference_wrapper<osd_module> > m_selected;
 };
 
+
 #define MODULE_DEFINITION(mod_id, mod_class) \
-	extern const module_type mod_id ;  \
-	const module_type mod_id = &module_creator< mod_class >;
+		extern const module_type mod_id ;  \
+		const module_type mod_id = &module_creator<mod_class>;
 
 
 #define MODULE_NOT_SUPPORTED(mod_class, mod_type, mod_name) \
-	class mod_class : public osd_module { \
-	public: \
-		mod_class () : osd_module(mod_type, mod_name) { } \
-		virtual ~mod_class() { } \
-		virtual int init(const osd_options &options) override { return -1; } \
-		virtual bool probe() override { return false; } \
-	};
+		class mod_class : public osd_module \
+		{ \
+		public: \
+			mod_class () : osd_module(mod_type, mod_name) { } \
+			virtual ~mod_class() { } \
+			virtual int init(const osd_options &options) override { return -1; } \
+			virtual bool probe() override { return false; } \
+		};
 
 #endif  /* MAME_OSD_MODULES_OSDMODULE_H */

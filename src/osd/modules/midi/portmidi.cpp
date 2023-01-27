@@ -8,13 +8,21 @@
 
 *******************************************************************c********/
 
+#include "midi_module.h"
+
+#include "modules/osdmodule.h"
+
 #ifndef NO_USE_MIDI
 
 #include <portmidi.h>
-#include "modules/osdmodule.h"
-#include "midi_module.h"
+
 #include <cstdio>
 #include <cstring>
+
+
+namespace osd {
+
+namespace {
 
 class pm_module : public osd_module, public midi_module
 {
@@ -26,7 +34,7 @@ public:
 	virtual ~pm_module() { }
 
 	virtual int init(const osd_options &options)override;
-	virtual void exit()override;
+	virtual void exit() override;
 
 	virtual std::unique_ptr<osd_midi_device> create_midi_device() override;
 	virtual void list_midi_devices() override;
@@ -464,12 +472,16 @@ void osd_midi_device_pm::write(uint8_t data)
 	}
 
 }
-#else
-	#include "modules/osdmodule.h"
-	#include "midi_module.h"
 
-	MODULE_NOT_SUPPORTED(pm_module, OSD_MIDI_PROVIDER, "pm")
+} // anonymous namespace
+
+} // namespace osd
+
+#else
+
+namespace osd { namespace { MODULE_NOT_SUPPORTED(pm_module, OSD_MIDI_PROVIDER, "pm") } }
+
 #endif
 
 
-MODULE_DEFINITION(MIDI_PM, pm_module)
+MODULE_DEFINITION(MIDI_PM, osd::pm_module)

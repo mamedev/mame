@@ -413,6 +413,7 @@ dinput_joystick_device::dinput_joystick_device(running_machine &machine, std::st
 void dinput_joystick_device::reset()
 {
 	memset(&joystick.state, 0, sizeof(joystick.state));
+	std::fill(std::begin(joystick.state.rgdwPOV), std::end(joystick.state.rgdwPOV), 0xffff);
 }
 
 void dinput_joystick_device::poll()
@@ -531,11 +532,10 @@ int dinput_joystick_device::configure()
 		std::string name = dinput_module::device_item_name(this, offset, default_button_name(butnum).c_str(), nullptr);
 
 		input_item_id itemid;
-
 		if (butnum < INPUT_MAX_BUTTONS)
-			itemid = static_cast<input_item_id>(ITEM_ID_BUTTON1 + butnum);
+			itemid = input_item_id(ITEM_ID_BUTTON1 + butnum);
 		else if (butnum < INPUT_MAX_BUTTONS + INPUT_MAX_ADD_SWITCH)
-			itemid = static_cast<input_item_id>(ITEM_ID_ADD_SWITCH1 - INPUT_MAX_BUTTONS + butnum);
+			itemid = input_item_id(ITEM_ID_ADD_SWITCH1 - INPUT_MAX_BUTTONS + butnum);
 		else
 			itemid = ITEM_ID_OTHER_SWITCH;
 
