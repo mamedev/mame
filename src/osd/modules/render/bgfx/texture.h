@@ -38,7 +38,7 @@ public:
 	virtual int width_div_factor() const override { return m_width_div_factor; }
 	virtual int width_mul_factor() const override { return m_width_mul_factor; }
 
-	void update(const bgfx::Memory *data, uint16_t pitch = UINT16_MAX);
+	void update(const bgfx::Memory *data, uint16_t pitch = UINT16_MAX, uint16_t width_margin = 0);
 
 protected:
 	std::string                 m_name;

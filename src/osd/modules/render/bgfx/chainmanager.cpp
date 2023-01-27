@@ -578,7 +578,7 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 		}
 		else
 		{
-			texture->update(mem, pitch);
+			texture->update(mem, pitch, prim.m_prim->texture.width_margin);
 
 			if (prim.m_prim->texture.palette)
 			{

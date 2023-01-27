@@ -58,7 +58,8 @@ bgfx_texture::~bgfx_texture()
 	bgfx::destroy(m_texture);
 }
 
-void bgfx_texture::update(const bgfx::Memory *data, uint16_t pitch)
+void bgfx_texture::update(const bgfx::Memory *data, uint16_t pitch, uint16_t width_margin)
 {
+	m_width_margin = width_margin;
 	bgfx::updateTexture2D(m_texture, 0, 0, 0, 0, (m_rowpixels * m_width_mul_factor) / m_width_div_factor, m_height, data, pitch);
 }
