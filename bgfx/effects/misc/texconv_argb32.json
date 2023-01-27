@@ -2,8 +2,7 @@
 // copyright-holders:Ryan Holtz
 //===============================================================
 //
-//  texconv_yuy16.json: An opaque texture-to-target copy with
-//  YUY16 conversion.
+//  texconv_argb32.json: An basic texture-to-target copy.
 //
 //===============================================================
 {
@@ -18,11 +17,10 @@
 	"cull": { "mode": "none" },
 	"write": { "rgb": true, "alpha": true },
 	"vertex": "chains/misc/vs_resize_blit",
-	"fragment": "chains/misc/fs_blit_yuy16",
+	"fragment": "chains/misc/fs_blit",
 	"uniforms": [
 		{ "name": "s_tex",           "type": "int",  "values": [ 1.0 ] },
-		{ "name": "u_tex_size0",     "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
-		{ "name": "u_inv_tex_size0", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+		{ "name": "s_pal",           "type": "int",  "values": [ 1.0 ] },
 		{ "name": "u_inv_view_dims", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
 		{ "name": "u_tex_bounds0",   "type": "vec4", "values": [ 0.0, 0.0, 1.0, 1.0 ] }
 	]

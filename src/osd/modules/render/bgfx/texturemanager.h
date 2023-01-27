@@ -30,12 +30,12 @@ public:
 	texture_manager() { }
 	~texture_manager();
 
-	bgfx_texture* create_texture(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, void* data = nullptr, uint32_t flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
+	bgfx_texture* create_texture(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t width_margin, uint32_t height, void* data = nullptr, uint32_t flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP);
 	bgfx_texture* create_png_texture(std::string path, std::string file_name, std::string texture_name, uint32_t flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP, uint32_t screen = -1);
 	void add_provider(std::string name, bgfx_texture_handle_provider* texture);
 	void remove_provider(std::string name, bool delete_provider = false);
-	bgfx::TextureHandle create_or_update_mame_texture(uint32_t format, int width, int height
-		, int rowpixels, const rgb_t *palette, void *base, uint32_t seqid, uint32_t flags, uint64_t key, uint64_t old_key);
+	bgfx::TextureHandle create_or_update_mame_texture(uint32_t format, int width, int width_margin, int height,
+		int rowpixels, const rgb_t *palette, void *base, uint32_t seqid, uint32_t flags, uint64_t key, uint64_t old_key);
 
 	// Getters
 	bgfx::TextureHandle handle(std::string name);

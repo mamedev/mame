@@ -363,7 +363,7 @@ int renderer_bgfx::create()
 	m_sliders_dirty = true;
 
 	uint32_t flags = BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
-	m_texture_cache = m_textures->create_texture("#cache", bgfx::TextureFormat::BGRA8, CACHE_SIZE, CACHE_SIZE, nullptr, flags);
+	m_texture_cache = m_textures->create_texture("#cache", bgfx::TextureFormat::BGRA8, CACHE_SIZE, 0, CACHE_SIZE, nullptr, flags);
 
 	memset(m_white, 0xff, sizeof(uint32_t) * 16 * 16);
 	m_texinfo.push_back(rectangle_packer::packable_rectangle(WHITE_HASH, PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32), 16, 16, 16, nullptr, m_white));
@@ -499,15 +499,6 @@ void renderer_bgfx::put_packed_quad(render_primitive *prim, uint32_t hash, Scree
 	float y[4] = { prim->bounds.y0, prim->bounds.y0, prim->bounds.y1, prim->bounds.y1 };
 	float u[4] = { u0, u1, u0, u1 };
 	float v[4] = { v0, v0, v1, v1 };
-
-	/*if (bgfx::getRendererType() == bgfx::RendererType::Direct3D9)
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			u[i] += 0.5f / size;
-			v[i] += 0.5f / size;
-		}
-	}*/
 
 	if (PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_SWAP_XY)
 	{
@@ -664,7 +655,7 @@ void renderer_bgfx::render_textured_quad(render_primitive* prim, bgfx::Transient
 	else
 	{
 		texture = m_textures->create_or_update_mame_texture(prim->flags & PRIMFLAG_TEXFORMAT_MASK
-			, tex_width, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base, prim->texture.seqid
+			, tex_width, prim->texture.width_margin, tex_height, prim->texture.rowpixels, prim->texture.palette, prim->texture.base, prim->texture.seqid
 			, texture_flags, prim->texture.unique_id, prim->texture.old_id);
 	}
 
@@ -1278,7 +1269,7 @@ void renderer_bgfx::process_atlas_packs(std::vector<std::vector<rectangle_packer
 			uint16_t pitch = rect.width();
 			int width_div_factor = 1;
 			int width_mul_factor = 1;
-			const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, rect.format(), rect.rowpixels(), rect.height(), rect.palette(), rect.base(), pitch, width_div_factor, width_mul_factor);
+			const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, rect.format(), rect.rowpixels(), 0, rect.height(), rect.palette(), rect.base(), pitch, width_div_factor, width_mul_factor);
 			bgfx::updateTexture2D(m_texture_cache->texture(), 0, 0, rect.x(), rect.y(), (rect.width() * width_mul_factor) / width_div_factor, rect.height(), mem, pitch);
 		}
 	}
@@ -1331,8 +1322,7 @@ bool renderer_bgfx::check_for_dirty_atlas()
 				atlas_dirty = true;
 
 				m_texinfo.push_back(rectangle_packer::packable_rectangle(hash, prim.flags & PRIMFLAG_TEXFORMAT_MASK,
-					prim.texture.width, prim.texture.height,
-					prim.texture.rowpixels, prim.texture.palette, prim.texture.base));
+					prim.texture.width, prim.texture.height, prim.texture.rowpixels, prim.texture.palette, prim.texture.base));
 				acquired_infos[hash] = m_texinfo[m_texinfo.size() - 1];
 			}
 		}

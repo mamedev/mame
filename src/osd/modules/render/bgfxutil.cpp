@@ -14,10 +14,11 @@
 #include "render.h"
 
 
-const bgfx::Memory* bgfx_util::mame_texture_data_to_bgfx_texture_data(bgfx::TextureFormat::Enum &dst_format, uint32_t src_format, int rowpixels, int height, const rgb_t *palette, void *base, uint16_t &out_pitch, int &width_div_factor, int &width_mul_factor)
+const bgfx::Memory* bgfx_util::mame_texture_data_to_bgfx_texture_data(bgfx::TextureFormat::Enum &dst_format, uint32_t src_format, int rowpixels, int width_margin, int height, const rgb_t *palette, void *base, uint16_t &out_pitch, int &width_div_factor, int &width_mul_factor)
 {
 	bgfx::TextureInfo info;
 	const bgfx::Memory *data = nullptr;
+	uint8_t *adjusted_base = (uint8_t *)base;
 
 	switch (src_format)
 	{
@@ -28,7 +29,11 @@ const bgfx::Memory* bgfx_util::mame_texture_data_to_bgfx_texture_data(bgfx::Text
 			out_pitch = rowpixels * 2;
 			bgfx::calcTextureSize(info, rowpixels / width_div_factor, height, 1, false, false, 1, dst_format);
 
-			data = bgfx::copy(base, info.storageSize);
+			if (width_margin)
+			{
+				adjusted_base -= width_margin * 2;
+			}
+			data = bgfx::copy(adjusted_base, info.storageSize);
 			break;
 		case PRIMFLAG_TEXFORMAT(TEXFORMAT_PALETTE16):
 			dst_format = bgfx::TextureFormat::R8;
@@ -37,7 +42,11 @@ const bgfx::Memory* bgfx_util::mame_texture_data_to_bgfx_texture_data(bgfx::Text
 			out_pitch = rowpixels * 2;
 			bgfx::calcTextureSize(info, rowpixels * width_mul_factor, height, 1, false, false, 1, dst_format);
 
-			data = bgfx::copy(base, info.storageSize);
+			if (width_margin)
+			{
+				adjusted_base -= width_margin * 2;
+			}
+			data = bgfx::copy(adjusted_base, info.storageSize);
 			break;
 		case PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32):
 		case PRIMFLAG_TEXFORMAT(TEXFORMAT_RGB32):
@@ -47,7 +56,11 @@ const bgfx::Memory* bgfx_util::mame_texture_data_to_bgfx_texture_data(bgfx::Text
 			out_pitch = rowpixels * 4;
 			bgfx::calcTextureSize(info, rowpixels, height, 1, false, false, 1, dst_format);
 
-			data = bgfx::copy(base, info.storageSize);
+			if (width_margin)
+			{
+				adjusted_base -= width_margin * 4;
+			}
+			data = bgfx::copy(adjusted_base, info.storageSize);
 			break;
 	}
 

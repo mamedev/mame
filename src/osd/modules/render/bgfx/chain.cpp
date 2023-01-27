@@ -165,6 +165,10 @@ void bgfx_chain::insert_effect(uint32_t index, bgfx_effect *effect, const bool a
 	uniforms.push_back(new bgfx_value_uniform(new bgfx_uniform("u_tex_size1", bgfx::UniformType::Vec4), values, 4));
 	uniforms.push_back(new bgfx_value_uniform(new bgfx_uniform("u_inv_tex_size0", bgfx::UniformType::Vec4), values, 4));
 	uniforms.push_back(new bgfx_value_uniform(new bgfx_uniform("u_inv_tex_size1", bgfx::UniformType::Vec4), values, 4));
+	uniforms.push_back(new bgfx_value_uniform(new bgfx_uniform("u_tex_bounds0", bgfx::UniformType::Vec4), values, 4));
+	uniforms.push_back(new bgfx_value_uniform(new bgfx_uniform("u_tex_bounds1", bgfx::UniformType::Vec4), values, 4));
+	uniforms.push_back(new bgfx_value_uniform(new bgfx_uniform("u_inv_tex_bounds0", bgfx::UniformType::Vec4), values, 4));
+	uniforms.push_back(new bgfx_value_uniform(new bgfx_uniform("u_inv_tex_bounds1", bgfx::UniformType::Vec4), values, 4));
 
 	m_entries.insert(m_entries.begin() + index, new bgfx_chain_entry(name, effect, clear, suppressors, inputs, uniforms, m_targets, "screen", apply_tint));
 

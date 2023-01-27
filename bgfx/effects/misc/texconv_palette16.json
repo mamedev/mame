@@ -16,7 +16,7 @@
 	"depth": { "function": "always", "writeenable": false },
 	"cull": { "mode": "none" },
 	"write": { "rgb": true, "alpha": true },
-	"vertex": "chains/misc/vs_blit",
+	"vertex": "chains/misc/vs_resize_blit",
 	"fragment": "chains/misc/fs_blit_palette16",
 	"uniforms": [
 		{ "name": "s_tex",           "type": "int", "values": [ 1.0 ] },
@@ -24,6 +24,7 @@
 		{ "name": "u_tex_size0",     "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
 		{ "name": "u_inv_tex_size0", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
 		{ "name": "u_inv_tex_size1", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
-		{ "name": "u_inv_view_dims", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
+		{ "name": "u_inv_view_dims", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+		{ "name": "u_tex_bounds0",   "type": "vec4", "values": [ 0.0, 0.0, 1.0, 1.0 ] }
 	]
 }

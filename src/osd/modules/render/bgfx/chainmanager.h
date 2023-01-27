@@ -63,8 +63,8 @@ public:
 		uint16_t m_screen_height = 0;
 		uint16_t m_quad_width = 0;
 		uint16_t m_quad_height = 0;
-		float m_tex_width = 0.0F;
-		float m_tex_height = 0.0F;
+		float m_tex_width = 0.0f;
+		float m_tex_height = 0.0f;
 		int m_rowpixels = 0;
 		uint32_t m_palette_length = 0;
 		uint32_t m_flags = 0;

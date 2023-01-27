@@ -54,8 +54,8 @@ chain_manager::screen_prim::screen_prim(render_primitive *prim)
 	m_screen_height = uint16_t(floorf(prim->get_full_quad_height() + 0.5f));
 	m_quad_width = uint16_t(floorf(prim->get_quad_width() + 0.5f));
 	m_quad_height = uint16_t(floorf(prim->get_quad_height() + 0.5f));
-	m_tex_width = float(prim->texture.width);
-	m_tex_height = float(prim->texture.height);
+	m_tex_width = prim->texture.width;
+	m_tex_height = prim->texture.height;
 	m_rowpixels = prim->texture.rowpixels;
 	m_palette_length = prim->texture.palette_length;
 	m_flags = prim->flags;
@@ -540,14 +540,14 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 		int width_div_factor = 1;
 		int width_mul_factor = 1;
 		const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, prim.m_flags & PRIMFLAG_TEXFORMAT_MASK,
-			prim.m_rowpixels, tex_height, prim.m_prim->texture.palette, prim.m_prim->texture.base, pitch, width_div_factor, width_mul_factor);
+			prim.m_rowpixels, prim.m_prim->texture.width_margin, tex_height, prim.m_prim->texture.palette, prim.m_prim->texture.base, pitch, width_div_factor, width_mul_factor);
 
 		if (texture == nullptr)
 		{
 			uint32_t flags = BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
 			if (!PRIMFLAG_GET_TEXWRAP(prim.m_flags))
 				flags |= BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
-			bgfx_texture *texture = new bgfx_texture(full_name, dst_format, tex_width, tex_height, mem, flags, pitch, prim.m_rowpixels, width_div_factor, width_mul_factor);
+			bgfx_texture *texture = new bgfx_texture(full_name, dst_format, tex_width, prim.m_prim->texture.width_margin, tex_height, mem, flags, pitch, prim.m_rowpixels, width_div_factor, width_mul_factor);
 			m_textures.add_provider(full_name, texture);
 
 			if (prim.m_prim->texture.palette)
@@ -557,7 +557,7 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 				m_palette_temp.resize(palette_width * palette_height * 4);
 				memcpy(&m_palette_temp[0], prim.m_prim->texture.palette, prim.m_palette_length * 4);
 				const bgfx::Memory *palmem = bgfx::copy(&m_palette_temp[0], palette_width * palette_height * 4);
-				palette = new bgfx_texture(palette_name, bgfx::TextureFormat::BGRA8, palette_width, palette_height, palmem, BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT, palette_width * 4);
+				palette = new bgfx_texture(palette_name, bgfx::TextureFormat::BGRA8, palette_width, 0, palette_height, palmem, BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT, palette_width * 4);
 				m_textures.add_provider(palette_name, palette);
 			}
 
@@ -595,7 +595,7 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 				}
 				else
 				{
-					palette = new bgfx_texture(palette_name, bgfx::TextureFormat::BGRA8, palette_width, palette_height, palmem, BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT, palette_width * 4);
+					palette = new bgfx_texture(palette_name, bgfx::TextureFormat::BGRA8, palette_width, 0, palette_height, palmem, BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT, palette_width * 4);
 					m_textures.add_provider(palette_name, palette);
 					while (screen >= m_screen_palettes.size())
 					{
