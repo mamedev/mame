@@ -77,37 +77,6 @@ uint32_t arcompact_device::handleop32_NORM_do_op(uint32_t src, uint8_t set_flags
 	return result;
 }
 
-uint32_t arcompact_device::handleop32_NORM_f_b_c(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint8_t creg = common32_get_creg(op);
-	int size = check_b_c_limm(breg, creg);
-	m_regs[breg] = handleop32_NORM_do_op(m_regs[creg], common32_get_F(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_NORM_f_b_u6(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	m_regs[breg] = handleop32_NORM_do_op(common32_get_u6(op), common32_get_F(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_NORM(uint32_t op)
-{
-	switch ((op & 0x00c00000) >> 22)
-	{
-		case 0x00: return handleop32_NORM_f_b_c(op);
-		case 0x01: return handleop32_NORM_f_b_u6(op);
-		case 0x02:
-		case 0x03:
-			arcompact_fatal("illegal handleop32_NORM_f_b_b_s12 (ares bits already used as opcode select, can't be used as s12) (LSR1)\n");
-			return 0;
-	}
-	return 0;
-}
-
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // SAT16<.f> b,c                   0010 1bbb 0010 1111   FBBB CCCC CC00 0010
 // SAT16<.f> b,u6                  0010 1bbb 0110 1111   FBBB uuuu uu00 0010

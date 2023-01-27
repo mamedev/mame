@@ -533,6 +533,33 @@ private:
 		return 0;
 	}
 
+	template<typename OPHANDLER>
+	uint32_t handleop32_general_SOP_group(uint32_t op, OPHANDLER ophandler)
+	{
+		switch ((op & 0x00c00000) >> 22)
+		{
+			case 0x00:
+			{
+				uint8_t breg = common32_get_breg(op);
+				uint8_t creg = common32_get_creg(op);
+				int size = check_b_c_limm(breg, creg);
+				m_regs[breg] = (this->*ophandler)(m_regs[creg], common32_get_F(op));
+				return m_pc + size;
+			}
+			case 0x01:
+			{
+				uint8_t breg = common32_get_breg(op);
+				int size = check_b_limm(breg);
+				m_regs[breg] = (this->*ophandler)(common32_get_u6(op), common32_get_F(op));
+				return m_pc + size;
+			}
+			case 0x02:
+			case 0x03:
+				arcompact_fatal("SOP Group: illegal mode 02/03 specifying use of bits already assigned to opcode select: opcode %04x\n", op);
+				return 0;
+		}
+		return 0;
+	}
 
 	// arcompact_execute_ops_04.cpp
 	uint32_t handleop32_ADD_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
@@ -638,38 +665,14 @@ private:
 	uint32_t handleop32_FLAG(uint32_t op);
 
 	// arcompact_execute_ops_04_2f_sop.cpp
-
-	uint32_t handleop32_ASL_single_do_op(uint32_t src, uint8_t set_flags);
-	uint32_t handleop32_ASL_single(uint32_t op);
-	uint32_t handleop32_ASL_single_f_b_c(uint32_t op);
-	uint32_t handleop32_ASL_single_f_b_u6(uint32_t op);
-
 	uint32_t handleop32_ASR_single(uint32_t op);
 
+	uint32_t handleop32_ASL_single_do_op(uint32_t src, uint8_t set_flags);
 	uint32_t handleop32_LSR_single_do_op(uint32_t src, uint8_t set_flags);
-	uint32_t handleop32_LSR_single(uint32_t op);
-	uint32_t handleop32_LSR_single_f_b_c(uint32_t op);
-	uint32_t handleop32_LSR_single_f_b_u6(uint32_t op);
-
 	uint32_t handleop32_ROR_do_op(uint32_t src, uint8_t set_flags);
-	uint32_t handleop32_ROR(uint32_t op);
-	uint32_t handleop32_ROR_f_b_c(uint32_t op);
-	uint32_t handleop32_ROR_f_b_u6(uint32_t op);
-
 	uint32_t handleop32_EXTB_do_op(uint32_t src, uint8_t set_flags);
-	uint32_t handleop32_EXTB(uint32_t op);
-	uint32_t handleop32_EXTB_f_b_c(uint32_t op);
-	uint32_t handleop32_EXTB_f_b_u6(uint32_t op);
-
 	uint32_t handleop32_EXTW_do_op(uint32_t src, uint8_t set_flags);
-	uint32_t handleop32_EXTW(uint32_t op);
-	uint32_t handleop32_EXTW_f_b_c(uint32_t op);
-	uint32_t handleop32_EXTW_f_b_u6(uint32_t op);
-
 	uint32_t handleop32_RLC_do_op(uint32_t src, uint8_t set_flags);
-	uint32_t handleop32_RLC(uint32_t op);
-	uint32_t handleop32_RLC_f_b_c(uint32_t op);
-	uint32_t handleop32_RLC_f_b_u6(uint32_t op);
 
 	uint32_t handleop32_RRC(uint32_t op);
 	uint32_t handleop32_SEXB(uint32_t op);
@@ -707,9 +710,6 @@ private:
 
 	// arcompact_execute_ops_05_2f_sop.cpp
 	uint32_t handleop32_NORM_do_op(uint32_t src, uint8_t set_flags);
-	uint32_t handleop32_NORM(uint32_t op);
-	uint32_t handleop32_NORM_f_b_c(uint32_t op);
-	uint32_t handleop32_NORM_f_b_u6(uint32_t op);
 
 
 	uint32_t handleop32_ROR_multiple(uint32_t op);
