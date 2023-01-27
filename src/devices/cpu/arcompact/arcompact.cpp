@@ -556,7 +556,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // SBC<.f> 0,b,limm                0010 0bbb 0000 0011   FBBB 1111 1011 1110 (+ Limm)
 // SBC<.cc><.f> 0,limm,c           0010 0110 1100 0011   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_SBC(op);  // SBC
+						return handleop32_general(op, handleop32_SBC_do_op);  // SBC
 					}
 					case 0x04:
 					{
@@ -654,7 +654,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // MAX<.f> 0,b,limm                0010 0bbb 0000 1000   FBBB 1111 1011 1110 (+ Limm)
 // MAX<.cc><.f> 0,limm,c           0010 0110 1100 1000   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_MAX(op);  // MAX
+						return handleop32_general(op, handleop32_MAX_do_op);  // MAX
 					}
 					case 0x09:
 					{
@@ -674,7 +674,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // MIN<.f> 0,b,limm                0010 0bbb 0000 1001   FBBB 1111 1011 1110 (+ Limm)
 // MIN<.cc><.f> 0,limm,c           0010 0110 1100 1001   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_MIN(op);  // MIN
+						return handleop32_general(op, handleop32_MIN_do_op);  // MIN
 					}
 					case 0x0a:
 					{
@@ -806,7 +806,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // BXOR<.f> 0,b,u6                 0010 0bbb 0101 0010   FBBB uuuu uu11 1110
 // BXOR<.cc><.f> 0,limm,c          0010 0110 1101 0010   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_BXOR(op);  // BXOR
+						return handleop32_general(op, handleop32_BXOR_do_op);  // BXOR
 					}
 					case 0x13:
 					{
@@ -960,7 +960,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // MPY<.f> 0,b,u6                  0010 0bbb 0101 1010   FBBB uuuu uu11 1110
 // MPY<.cc><.f> 0,limm,c           0010 0110 1101 1010   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_MPY(op);  // MPY *
+						return handleop32_general(op, handleop32_MPY_do_op);  // MPY *
 					}
 					case 0x1b:
 					{
@@ -979,7 +979,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // MPYH<.f> 0,b,u6                 0010 0bbb 0101 1011   FBBB uuuu uu11 1110
 // MPYH<.cc><.f> 0,limm,c          0010 0110 1101 1011   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_MPYH(op);  // MPYH *
+						return handleop32_general(op, handleop32_MPYH_do_op);  // MPYH *
 					}
 					case 0x1c:
 					{
@@ -998,7 +998,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // MPYHU<.f> 0,b,u6                0010 0bbb 0101 1100   FBBB uuuu uu11 1110
 // MPYHU<.cc><.f> 0,limm,c         0010 0110 1101 1100   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_MPYHU(op);  // MPYHU *
+						return handleop32_general(op, handleop32_MPYHU_do_op);  // MPYHU *
 					}
 					case 0x1d:
 					{
@@ -1016,7 +1016,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // MPYU<.f> 0,b,u6                 0010 0bbb 0101 1101   FBBB uuuu uu11 1110
 // MPYU<.cc><.f> 0,limm,c          0010 0110 1101 1101   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_MPYU(op);  // MPYU *
+						return handleop32_general(op, handleop32_MPYU_do_op);  // MPYU *
 					}
 					case 0x20:
 					{

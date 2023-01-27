@@ -99,65 +99,14 @@ uint32_t arcompact_device::handleop32_SUB_do_op(uint32_t src1, uint32_t src2, ui
 // SBC<.cc><.f> 0,limm,c           0010 0110 1100 0011   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-
-uint32_t arcompact_device::handleop32_SBC_f_a_b_c(uint32_t op)
+uint32_t arcompact_device::handleop32_SBC_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
-	arcompact_fatal("SBC with P00 not supported");
-	return m_pc;
+	uint32_t result = 0;
+	arcompact_fatal("SBC not supported");
+	if (set_flags)
+		arcompact_fatal("SBC flags not supported");
+	return result;
 }
-
-uint32_t arcompact_device::handleop32_SBC_f_a_b_u6(uint32_t op)
-{
-	arcompact_fatal("SBC with P01 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_SBC_f_b_b_s12(uint32_t op)
-{
-	arcompact_fatal("SBC with P10 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_SBC_cc_f_b_b_c(uint32_t op)
-{
-	arcompact_fatal("SBC with P11 M0 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_SBC_cc_f_b_b_u6(uint32_t op)
-{
-	arcompact_fatal("SBC with P11 M0 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_SBC_cc(uint32_t op)
-{
-	int M = (op & 0x00000020) >> 5;
-
-	switch (M)
-	{
-		case 0x00: return handleop32_SBC_cc_f_b_b_c(op);
-		case 0x01: return handleop32_SBC_cc_f_b_b_u6(op);
-	}
-
-	return 0;
-}
-
-uint32_t arcompact_device::handleop32_SBC(uint32_t op)
-{
-	int p = (op & 0x00c00000) >> 22;
-
-	switch (p)
-	{
-		case 0x00: return handleop32_SBC_f_a_b_c(op);
-		case 0x01: return handleop32_SBC_f_a_b_u6(op);
-		case 0x02: return handleop32_SBC_f_b_b_s12(op);
-		case 0x03: return handleop32_SBC_cc(op);
-	}
-
-	return 0;
-}
-
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // AND<.f> a,b,c                   0010 0bbb 0000 0100   FBBB CCCC CCAA AAAA
@@ -275,62 +224,13 @@ uint32_t arcompact_device::handleop32_XOR_do_op(uint32_t src1, uint32_t src2, ui
 // MAX<.cc><.f> 0,limm,c           0010 0110 1100 1000   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_MAX_f_a_b_c(uint32_t op)
+uint32_t arcompact_device::handleop32_MAX_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
-	arcompact_fatal("MAX with P00 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MAX_f_a_b_u6(uint32_t op)
-{
-	arcompact_fatal("MAX with P01 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MAX_f_b_b_s12(uint32_t op)
-{
-	arcompact_fatal("MAX with P10 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MAX_cc_f_b_b_c(uint32_t op)
-{
-	arcompact_fatal("MAX with P11 M0 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MAX_cc_f_b_b_u6(uint32_t op)
-{
-	arcompact_fatal("MAX with P11 M0 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MAX_cc(uint32_t op)
-{
-	int M = (op & 0x00000020) >> 5;
-
-	switch (M)
-	{
-		case 0x00: return handleop32_MAX_cc_f_b_b_c(op);
-		case 0x01: return handleop32_MAX_cc_f_b_b_u6(op);
-	}
-
-	return 0;
-}
-
-uint32_t arcompact_device::handleop32_MAX(uint32_t op)
-{
-	int p = (op & 0x00c00000) >> 22;
-
-	switch (p)
-	{
-		case 0x00: return handleop32_MAX_f_a_b_c(op);
-		case 0x01: return handleop32_MAX_f_a_b_u6(op);
-		case 0x02: return handleop32_MAX_f_b_b_s12(op);
-		case 0x03: return handleop32_MAX_cc(op);
-	}
-
-	return 0;
+	uint32_t result = 0;
+	arcompact_fatal("MAX not supported");
+	if (set_flags)
+		arcompact_fatal("MAX flags not supported");
+	return result;
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -350,62 +250,13 @@ uint32_t arcompact_device::handleop32_MAX(uint32_t op)
 // MIN<.cc><.f> 0,limm,c           0010 0110 1100 1001   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_MIN_f_a_b_c(uint32_t op)
+uint32_t arcompact_device::handleop32_MIN_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
-	arcompact_fatal("MIN with P00 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MIN_f_a_b_u6(uint32_t op)
-{
-	arcompact_fatal("MIN with P01 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MIN_f_b_b_s12(uint32_t op)
-{
-	arcompact_fatal("MIN with P10 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MIN_cc_f_b_b_c(uint32_t op)
-{
-	arcompact_fatal("MIN with P11 M0 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MIN_cc_f_b_b_u6(uint32_t op)
-{
-	arcompact_fatal("MIN with P11 M0 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MIN_cc(uint32_t op)
-{
-	int M = (op & 0x00000020) >> 5;
-
-	switch (M)
-	{
-		case 0x00: return handleop32_MIN_cc_f_b_b_c(op);
-		case 0x01: return handleop32_MIN_cc_f_b_b_u6(op);
-	}
-
-	return 0;
-}
-
-uint32_t arcompact_device::handleop32_MIN(uint32_t op)
-{
-	int p = (op & 0x00c00000) >> 22;
-
-	switch (p)
-	{
-		case 0x00: return handleop32_MIN_f_a_b_c(op);
-		case 0x01: return handleop32_MIN_f_a_b_u6(op);
-		case 0x02: return handleop32_MIN_f_b_b_s12(op);
-		case 0x03: return handleop32_MIN_cc(op);
-	}
-
-	return 0;
+	uint32_t result = 0;
+	arcompact_fatal("MIN not supported");
+	if (set_flags)
+		arcompact_fatal("MIN flags not supported");
+	return result;
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -869,62 +720,13 @@ uint32_t arcompact_device::handleop32_BTST(uint32_t op)
 // BXOR<.cc><.f> 0,limm,c          0010 0110 1101 0010   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_BXOR_f_a_b_c(uint32_t op)
+uint32_t arcompact_device::handleop32_BXOR_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
-	arcompact_fatal("BXOR with P00 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_BXOR_f_a_b_u6(uint32_t op)
-{
-	arcompact_fatal("BXOR with P01 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_BXOR_f_b_b_s12(uint32_t op)
-{
-	arcompact_fatal("BXOR with P10 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_BXOR_cc_f_b_b_c(uint32_t op)
-{
-	arcompact_fatal("BXOR with P11 M0 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_BXOR_cc_f_b_b_u6(uint32_t op)
-{
-	arcompact_fatal("BXOR with P11 M0 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_BXOR_cc(uint32_t op)
-{
-	int M = (op & 0x00000020) >> 5;
-
-	switch (M)
-	{
-		case 0x00: return handleop32_BXOR_cc_f_b_b_c(op);
-		case 0x01: return handleop32_BXOR_cc_f_b_b_u6(op);
-	}
-
-	return 0;
-}
-
-uint32_t arcompact_device::handleop32_BXOR(uint32_t op)
-{
-	int p = (op & 0x00c00000) >> 22;
-
-	switch (p)
-	{
-		case 0x00: return handleop32_BXOR_f_a_b_c(op);
-		case 0x01: return handleop32_BXOR_f_a_b_u6(op);
-		case 0x02: return handleop32_BXOR_f_b_b_s12(op);
-		case 0x03: return handleop32_BXOR_cc(op);
-	}
-
-	return 0;
+	uint32_t result = 0;
+	arcompact_fatal("BXOR not supported");
+	if (set_flags)
+		arcompact_fatal("BXOR flags not supported");
+	return result;
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1113,58 +915,13 @@ uint32_t arcompact_device::handleop32_SUB3_do_op(uint32_t src1, uint32_t src2, u
 // MPY<.cc><.f> 0,limm,c           0010 0110 1101 1010   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_MPY_f_a_b_c(uint32_t op)
+uint32_t arcompact_device::handleop32_MPY_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
-	arcompact_fatal("MPY with P00 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MPY_f_a_b_u6(uint32_t op)
-{
-	arcompact_fatal("MPY with P01 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MPY_f_b_b_s12(uint32_t op)
-{
-	arcompact_fatal("MPY with P10 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MPY_cc_f_b_b_c(uint32_t op)
-{
-	arcompact_fatal("MPY with P11 M0 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MPY_cc_f_b_b_u6(uint32_t op)
-{
-	arcompact_fatal("MPY with P11 M0 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MPY_cc(uint32_t op)
-{
-	int M = (op & 0x00000020) >> 5;
-	switch (M)
-	{
-		case 0x00: return handleop32_MPY_cc_f_b_b_c(op);
-		case 0x01: return handleop32_MPY_cc_f_b_b_u6(op);
-	}
-	return 0;
-}
-
-uint32_t arcompact_device::handleop32_MPY(uint32_t op)
-{
-	int p = (op & 0x00c00000) >> 22;
-	switch (p)
-	{
-		case 0x00: return handleop32_MPY_f_a_b_c(op);
-		case 0x01: return handleop32_MPY_f_a_b_u6(op);
-		case 0x02: return handleop32_MPY_f_b_b_s12(op);
-		case 0x03: return handleop32_MPY_cc(op);
-	}
-	return 0;
+	uint32_t result = 0;
+	arcompact_fatal("MPY not supported");
+	if (set_flags)
+		arcompact_fatal("MPY flags not supported");
+	return result;
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1183,60 +940,14 @@ uint32_t arcompact_device::handleop32_MPY(uint32_t op)
 // MPYH<.cc><.f> 0,limm,c          0010 0110 1101 1011   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_MPYH_f_a_b_c(uint32_t op)
+uint32_t arcompact_device::handleop32_MPYH_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
-	arcompact_fatal("MPYH with P00 not supported");
-	return m_pc;
+	uint32_t result = 0;
+	arcompact_fatal("MPYH not supported");
+	if (set_flags)
+		arcompact_fatal("MPYH flags not supported");
+	return result;
 }
-
-uint32_t arcompact_device::handleop32_MPYH_f_a_b_u6(uint32_t op)
-{
-	arcompact_fatal("MPYH with P01 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MPYH_f_b_b_s12(uint32_t op)
-{
-	arcompact_fatal("MPYH with P10 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MPYH_cc_f_b_b_c(uint32_t op)
-{
-	arcompact_fatal("MPYH with P11 M0 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MPYH_cc_f_b_b_u6(uint32_t op)
-{
-	arcompact_fatal("MPYH with P11 M0 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MPYH_cc(uint32_t op)
-{
-	int M = (op & 0x00000020) >> 5;
-	switch (M)
-	{
-		case 0x00: return handleop32_MPYH_cc_f_b_b_c(op);
-		case 0x01: return handleop32_MPYH_cc_f_b_b_u6(op);
-	}
-	return 0;
-}
-
-uint32_t arcompact_device::handleop32_MPYH(uint32_t op)
-{
-	int p = (op & 0x00c00000) >> 22;
-	switch (p)
-	{
-		case 0x00: return handleop32_MPYH_f_a_b_c(op);
-		case 0x01: return handleop32_MPYH_f_a_b_u6(op);
-		case 0x02: return handleop32_MPYH_f_b_b_s12(op);
-		case 0x03: return handleop32_MPYH_cc(op);
-	}
-	return 0;
-}
-
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                                 IIII I      SS SSSS
 // MPYHU<.f> a,b,c                 0010 0bbb 0001 1100   FBBB CCCC CCAA AAAA
@@ -1253,62 +964,13 @@ uint32_t arcompact_device::handleop32_MPYH(uint32_t op)
 // MPYHU<.cc><.f> 0,limm,c         0010 0110 1101 1100   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_MPYHU_f_a_b_c(uint32_t op)
+uint32_t arcompact_device::handleop32_MPYHU_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
-	arcompact_fatal("MPYHU with P00 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MPYHU_f_a_b_u6(uint32_t op)
-{
-	arcompact_fatal("MPYHU with P01 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MPYHU_f_b_b_s12(uint32_t op)
-{
-	arcompact_fatal("MPYHU with P10 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MPYHU_cc_f_b_b_c(uint32_t op)
-{
-	arcompact_fatal("MPYHU with P11 M0 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MPYHU_cc_f_b_b_u6(uint32_t op)
-{
-	arcompact_fatal("MPYHU with P11 M0 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MPYHU_cc(uint32_t op)
-{
-	int M = (op & 0x00000020) >> 5;
-
-	switch (M)
-	{
-		case 0x00: return handleop32_MPYHU_cc_f_b_b_c(op);
-		case 0x01: return handleop32_MPYHU_cc_f_b_b_u6(op);
-	}
-
-	return 0;
-}
-
-uint32_t arcompact_device::handleop32_MPYHU(uint32_t op)
-{
-	int p = (op & 0x00c00000) >> 22;
-
-	switch (p)
-	{
-		case 0x00: return handleop32_MPYHU_f_a_b_c(op);
-		case 0x01: return handleop32_MPYHU_f_a_b_u6(op);
-		case 0x02: return handleop32_MPYHU_f_b_b_s12(op);
-		case 0x03: return handleop32_MPYHU_cc(op);
-	}
-
-	return 0;
+	uint32_t result = 0;
+	arcompact_fatal("MPYHU not supported");
+	if (set_flags)
+		arcompact_fatal("MPYHU flags not supported");
+	return result;
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1326,58 +988,13 @@ uint32_t arcompact_device::handleop32_MPYHU(uint32_t op)
 // MPYU<.cc><.f> 0,limm,c          0010 0110 1101 1101   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_MPYU_f_a_b_c(uint32_t op)
+uint32_t arcompact_device::handleop32_MPYU_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
-	arcompact_fatal("MPYU with P00 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MPYU_f_a_b_u6(uint32_t op)
-{
-	arcompact_fatal("MPYU with P01 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MPYU_f_b_b_s12(uint32_t op)
-{
-	arcompact_fatal("MPYU with P10 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MPYU_cc_f_b_b_c(uint32_t op)
-{
-	arcompact_fatal("MPYU with P11 M0 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MPYU_cc_f_b_b_u6(uint32_t op)
-{
-	arcompact_fatal("MPYU with P11 M0 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_MPYU_cc(uint32_t op)
-{
-	int M = (op & 0x00000020) >> 5;
-	switch (M)
-	{
-		case 0x00: return handleop32_MPYU_cc_f_b_b_c(op);
-		case 0x01: return handleop32_MPYU_cc_f_b_b_u6(op);
-	}
-	return 0;
-}
-
-uint32_t arcompact_device::handleop32_MPYU(uint32_t op)
-{
-	int p = (op & 0x00c00000) >> 22;
-	switch (p)
-	{
-		case 0x00: return handleop32_MPYU_f_a_b_c(op);
-		case 0x01: return handleop32_MPYU_f_a_b_u6(op);
-		case 0x02: return handleop32_MPYU_f_b_b_s12(op);
-		case 0x03: return handleop32_MPYU_cc(op);
-	}
-	return 0;
+	uint32_t result = 0;
+	arcompact_fatal("MPYU not supported");
+	if (set_flags)
+		arcompact_fatal("MPYU flags not supported");
+	return result;
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
