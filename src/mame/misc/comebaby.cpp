@@ -1,12 +1,13 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// copyright-holders:Ryan Holtz, Angelo Salese
 /* Come On Baby
   (c) 2000 ExPotato Co. Ltd (Excellent Potato)
 
 TODO:
-- skeleton driver;
 - Throws "Primary master hard disk fail" in shutms11. Disk has a non canonical -chs of 524,255,63.
-  winimage will throw plenty of errors on manual file extraction.
+  winimage will throw plenty of errors on manual file extraction (related to Korean paths?).
+- In this driver with a manually rebuilt image will loop during the fake "now loading" screen
+  (customized Win 98 splash screen);
 - In pcipc with a manually rebuilt image will throw an exception in "Internat" module once it loads
   Windows 98 (and installs the diff drivers).
 
@@ -205,9 +206,11 @@ TODO:
 #include "machine/fdc37c93x.h"
 #include "video/voodoo_pci.h"
 
+#define ENABLE_VOODOO 0
+
 namespace {
 
-#define PCI_J4D2_ID "pci:0d.0"
+#define PCI_AGP_ID "pci:01.0:00.0"
 
 class comebaby_state : public driver_device
 {
@@ -215,14 +218,15 @@ public:
 	comebaby_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_voodoo3(*this, PCI_J4D2_ID)
+		, m_voodoo3(*this, PCI_AGP_ID)
 	{ }
 
 	void comebaby(machine_config &config);
 
 private:
 	required_device<pentium2_device> m_maincpu;
-	required_device<voodoo_2_pci_device> m_voodoo3;
+	// optional for making the compile switch to work
+	optional_device<voodoo_3_pci_device> m_voodoo3;
 
 	void comebaby_map(address_map &map);
 
@@ -244,7 +248,8 @@ static void isa_internal_devices(device_slot_interface &device)
 
 void comebaby_state::superio_config(device_t *device)
 {
-	// TODO: check super I/O type
+	// TODO: wrong super I/O type
+	// Most likely FDC37M707, check MB manual
 	fdc37c93x_device &fdc = *downcast<fdc37c93x_device *>(device);
 	fdc.set_sysopt_pin(0);
 	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
@@ -295,10 +300,8 @@ void comebaby_state::comebaby(machine_config &config)
 	// YMF740G goes thru "pci:0c.0"
 	// Expansion slots, mapping SVGA for debugging
 	// TODO: all untested, check clock
-	// TODO: confirm Voodoo going in J4D2
-	#if 1
-	// TODO: should really be a Voodoo 3, but it intercepts VGA I/Os, making latter to not work ...
-	VOODOO_2_PCI(config, m_voodoo3, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
+	#if ENABLE_VOODOO
+	VOODOO_3_PCI(config, m_voodoo3, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
 	m_voodoo3->set_fbmem(2);
 	m_voodoo3->set_tmumem(4, 4);
 	m_voodoo3->set_status_cycles(1000);
@@ -308,11 +311,13 @@ void comebaby_state::comebaby(machine_config &config)
 	screen.set_refresh_hz(57);
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
-	screen.set_screen_update(PCI_J4D2_ID, FUNC(voodoo_2_pci_device::screen_update));
-	#endif
+	screen.set_screen_update(PCI_AGP_ID, FUNC(voodoo_3_pci_device::screen_update));
+	#else
 	// "pci:0d.0" J4D2
 	// "pci:0e.0" J4D1
 	VIRGE_PCI(config, "pci:0e.0", 0); // J4C1
+	#endif
+
 }
 
 
