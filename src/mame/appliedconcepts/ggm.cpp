@@ -204,10 +204,11 @@ void ggm_state::update_overlay()
 	};
 
 	for (int i = 0; i < 6; i++)
-		m_fdigit[1][i] = fdigit_lut[overlay_lut[overlay_r()]][i];
-
-	for (int i = 0; i < 6; i++)
-		m_fdigit[0][i] = m_fdigit[1][i] ^ 0x3fff;
+	{
+		u16 value = fdigit_lut[overlay_lut[overlay_r()]][i];
+		m_fdigit[1][i] = value;
+		m_fdigit[0][i] = value ^ 0x3fff;
+	}
 }
 
 
