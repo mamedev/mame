@@ -63,69 +63,6 @@ uint32_t arcompact_device::handleop32_ASL_multiple_do_op(uint32_t src1, uint32_t
 	return result;
 }
 
-uint32_t arcompact_device::handleop32_ASL_multiple_f_a_b_c(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint8_t creg = common32_get_creg(op);
-	int size = check_b_c_limm(breg, creg);
-	m_regs[common32_get_areg(op)] = handleop32_ASL_multiple_do_op(m_regs[breg], m_regs[creg], common32_get_F(op));
-	return m_pc + size;
-}
-uint32_t arcompact_device::handleop32_ASL_multiple_f_a_b_u6(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	m_regs[common32_get_areg(op)] = handleop32_ASL_multiple_do_op(m_regs[breg], common32_get_u6(op), common32_get_F(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_ASL_multiple_f_b_b_s12(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	m_regs[breg] = handleop32_ASL_multiple_do_op(m_regs[breg], common32_get_s12(op), common32_get_F(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_ASL_multiple_cc_f_b_b_c(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint8_t creg = common32_get_creg(op);
-	int size = check_b_c_limm(breg, creg);
-	if (!check_condition(common32_get_condition(op)))
-		return m_pc + size;
-	m_regs[breg] = handleop32_ASL_multiple_do_op(m_regs[breg], m_regs[creg], common32_get_F(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_ASL_multiple_cc_f_b_b_u6(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	if (!check_condition(common32_get_condition(op)))
-		return m_pc + size;
-	m_regs[breg] = handleop32_ASL_multiple_do_op(m_regs[breg], common32_get_u6(op), common32_get_F(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_ASL_multiple(uint32_t op)
-{
-	switch ((op & 0x00c00000) >> 22)
-	{
-	case 0x00: return handleop32_ASL_multiple_f_a_b_c(op);
-	case 0x01: return handleop32_ASL_multiple_f_a_b_u6(op);
-	case 0x02: return handleop32_ASL_multiple_f_b_b_s12(op);
-	case 0x03:
-		switch ((op & 0x00000020) >> 5)
-		{
-		case 0x00: return handleop32_ASL_multiple_cc_f_b_b_c(op);
-		case 0x01: return handleop32_ASL_multiple_cc_f_b_b_u6(op);
-		}
-		return 0;
-	}
-	return 0;
-}
-
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // LSR<.f> a,b,c                   0010 1bbb 0000 0001   FBBB CCCC CCAA AAAA
 // LSR<.f> a,b,u6                  0010 1bbb 0100 0001   FBBB uuuu uuAA AAAA
@@ -158,69 +95,6 @@ uint32_t arcompact_device::handleop32_LSR_multiple_do_op(uint32_t src1, uint32_t
 	return result;
 }
 
-uint32_t arcompact_device::handleop32_LSR_multiple_f_a_b_c(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint8_t creg = common32_get_creg(op);
-	int size = check_b_c_limm(breg, creg);
-	m_regs[common32_get_areg(op)] = handleop32_LSR_multiple_do_op(m_regs[breg], m_regs[creg], common32_get_F(op));
-	return m_pc + size;
-}
-uint32_t arcompact_device::handleop32_LSR_multiple_f_a_b_u6(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	m_regs[common32_get_areg(op)] = handleop32_LSR_multiple_do_op(m_regs[breg], common32_get_u6(op), common32_get_F(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_LSR_multiple_f_b_b_s12(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	m_regs[breg] = handleop32_LSR_multiple_do_op(m_regs[breg], common32_get_s12(op), common32_get_F(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_LSR_multiple_cc_f_b_b_c(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint8_t creg = common32_get_creg(op);
-	int size = check_b_c_limm(breg, creg);
-	if (!check_condition(common32_get_condition(op)))
-		return m_pc + size;
-	m_regs[breg] = handleop32_LSR_multiple_do_op(m_regs[breg], m_regs[creg], common32_get_F(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_LSR_multiple_cc_f_b_b_u6(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	if (!check_condition(common32_get_condition(op)))
-		return m_pc + size;
-	m_regs[breg] = handleop32_LSR_multiple_do_op(m_regs[breg], common32_get_u6(op), common32_get_F(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_LSR_multiple(uint32_t op)
-{
-	switch ((op & 0x00c00000) >> 22)
-	{
-	case 0x00: return handleop32_LSR_multiple_f_a_b_c(op);
-	case 0x01: return handleop32_LSR_multiple_f_a_b_u6(op);
-	case 0x02: return handleop32_LSR_multiple_f_b_b_s12(op);
-	case 0x03:
-		switch ((op & 0x00000020) >> 5)
-		{
-		case 0x00: return handleop32_LSR_multiple_cc_f_b_b_c(op);
-		case 0x01: return handleop32_LSR_multiple_cc_f_b_b_u6(op);
-		}
-		return 0;
-	}
-	return 0;
-}
-
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ASR<.f> a,b,c                   0010 1bbb 0000 0010   FBBB CCCC CCAA AAAA
 // ASR<.f> a,b,u6                  0010 1bbb 0100 0010   FBBB uuuu uuAA AAAA
@@ -246,69 +120,6 @@ uint32_t arcompact_device::handleop32_ASR_multiple_do_op(uint32_t src1, uint32_t
 	if (set_flags)
 		arcompact_fatal("handleop32_ASR_multiple (ASR) (F set)\n"); // not yet supported
 	return result;
-}
-
-uint32_t arcompact_device::handleop32_ASR_multiple_f_a_b_c(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint8_t creg = common32_get_creg(op);
-	int size = check_b_c_limm(breg, creg);
-	m_regs[common32_get_areg(op)] = handleop32_ASR_multiple_do_op(m_regs[breg], m_regs[creg], common32_get_F(op));
-	return m_pc + size;
-}
-uint32_t arcompact_device::handleop32_ASR_multiple_f_a_b_u6(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	m_regs[common32_get_areg(op)] = handleop32_ASR_multiple_do_op(m_regs[breg], common32_get_u6(op), common32_get_F(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_ASR_multiple_f_b_b_s12(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	m_regs[breg] = handleop32_ASR_multiple_do_op(m_regs[breg], common32_get_s12(op), common32_get_F(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_ASR_multiple_cc_f_b_b_c(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint8_t creg = common32_get_creg(op);
-	int size = check_b_c_limm(breg, creg);
-	if (!check_condition(common32_get_condition(op)))
-		return m_pc + size;
-	m_regs[breg] = handleop32_ASR_multiple_do_op(m_regs[breg], m_regs[creg], common32_get_F(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_ASR_multiple_cc_f_b_b_u6(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	if (!check_condition(common32_get_condition(op)))
-		return m_pc + size;
-	m_regs[breg] = handleop32_ASR_multiple_do_op(m_regs[breg], common32_get_u6(op), common32_get_F(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_ASR_multiple(uint32_t op)
-{
-	switch ((op & 0x00c00000) >> 22)
-	{
-	case 0x00: return handleop32_ASR_multiple_f_a_b_c(op);
-	case 0x01: return handleop32_ASR_multiple_f_a_b_u6(op);
-	case 0x02: return handleop32_ASR_multiple_f_b_b_s12(op);
-	case 0x03:
-		switch ((op & 0x00000020) >> 5)
-		{
-		case 0x00: return handleop32_ASR_multiple_cc_f_b_b_c(op);
-		case 0x01: return handleop32_ASR_multiple_cc_f_b_b_u6(op);
-		}
-		return 0;
-	}
-	return 0;
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

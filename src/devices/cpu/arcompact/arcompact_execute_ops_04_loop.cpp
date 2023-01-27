@@ -26,8 +26,19 @@ uint32_t arcompact_device::handleop32_LP(uint32_t op) // LPcc (loop setup)
 	{ // 0010 0RRR 1010 1000 0RRR ssss ssSS SSSS
 		uint32_t S = common32_get_s12(op);
 		if (S & 0x800) S = -0x800 + (S&0x7ff);
-		m_LP_START = m_pc + size;
-		m_LP_END = (m_pc&0xfffffffc) + (S * 2);
+
+		/*
+		if (m_regs[REG_LP_COUNT] == 0) // maybe LP_COUNT = 0 logic is incorrect
+		{
+			uint32_t realoffset = (m_pc&0xfffffffc) + (S * 2);
+			return realoffset;
+		}
+		else
+		*/
+		{
+			m_LP_START = m_pc + size;
+			m_LP_END = (m_pc & 0xfffffffc) + (S * 2);
+		}
 		return m_pc + size;
 	}
 	else if (p == 0x03) // Loop conditional
@@ -35,7 +46,7 @@ uint32_t arcompact_device::handleop32_LP(uint32_t op) // LPcc (loop setup)
 		uint32_t u = common32_get_u6(op);
 		uint8_t condition = common32_get_condition(op);
 		// if the loop condition fails then just jump to after the end of the loop, don't set any registers
-		if (!check_condition(condition))
+		if (!check_condition(condition) /*|| (m_regs[REG_LP_COUNT] == 0)*/) // maybe LP_COUNT = 0 logic is incorrect
 		{
 			uint32_t realoffset = (m_pc&0xfffffffc) + (u * 2);
 			return realoffset;
