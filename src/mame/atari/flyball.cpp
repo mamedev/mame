@@ -25,6 +25,9 @@ Etched in copper on top of board:
 #include "netlist/nl_setup.h"
 #include "nl_flyball.h"
 
+
+namespace {
+
 static constexpr XTAL MASTER_CLOCK  = 12.096_MHz_XTAL;
 static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK / 2;
 
@@ -547,6 +550,8 @@ ROM_START( flyball1 )
 	ROM_LOAD16_BYTE( "6137.e2", 0x0000, 0x0200, CRC(68961fda) SHA1(a06c7b453cce04716f49bd65ecfe1ba67cb8681e) )
 	ROM_LOAD16_BYTE( "6138.f2", 0x0001, 0x0200, CRC(aab314f6) SHA1(6625c719fdc000d6af94bc9474de8f7e977cee97) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

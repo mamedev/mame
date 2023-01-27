@@ -615,8 +615,8 @@ bool emu_options::add_and_remove_slot_options()
 
 
 //-------------------------------------------------
-//  add_and_remove_slot_options - add any missing
-//  and/or purge extraneous slot options
+//  add_and_remove_image_options - add any missing
+//  and/or purge extraneous image options
 //-------------------------------------------------
 
 bool emu_options::add_and_remove_image_options()
@@ -719,7 +719,7 @@ bool emu_options::add_and_remove_image_options()
 
 //-------------------------------------------------
 //  reevaluate_default_card_software - based on recent
-//  changes in what images are mounted, give drivers
+//  changes in what images are mounted, give devices
 //  a chance to specify new default slot options
 //-------------------------------------------------
 
@@ -758,6 +758,16 @@ void emu_options::reevaluate_default_card_software()
 			std::string default_card_software = get_default_card_software(slot);
 			if (slot_opt.default_card_software() != default_card_software)
 			{
+				// HACK: prevent option values set from "XXX_default" in software list entries
+				// from getting cleared out, using crude heuristic to distinguish these from
+				// values representing cartridge types and such
+				if (default_card_software.empty())
+				{
+					auto *opt = slot.option(slot_opt.default_card_software().c_str());
+					if (opt && opt->selectable())
+						continue;
+				}
+
 				slot_opt.set_default_card_software(std::move(default_card_software));
 
 				// calling set_default_card_software() can cause a cascade of slot/image

@@ -197,6 +197,7 @@ const double XTAL::known_xtals[] = {
 	 11'289'600, /* 11.2896_MHz_XTAL       Frantic Fred */
 	 11'400'000, /* 11.4_MHz_XTAL          HP 9845 */
 	 11'668'800, /* 11.6688_MHz_XTAL       Gameplan pixel clock */
+	 11'730'000, /* 11.73_MHz_XTAL         Irem M-11 */
 	 11'800'000, /* 11.8_MHz_XTAL          IBM PC Music Feature Card */
 	 11'980'800, /* 11.9808_MHz_XTAL       Luxor ABC 80 */
 	 12'000'000, /* 12_MHz_XTAL            Extremely common, used on 100's of PCBs */

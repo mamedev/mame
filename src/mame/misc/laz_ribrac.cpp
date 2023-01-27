@@ -27,6 +27,8 @@ Awesome tossem u21 = 27c512
 #include "speaker.h"
 
 
+namespace {
+
 class ribrac_state : public driver_device
 {
 public:
@@ -354,6 +356,9 @@ ROM_START( awetoss )
 	ROM_LOAD( "awsmtoss.u12", 0x20000, 0x10000, CRC(9ddf6dd9) SHA1(c115828ab261ae6d83cb500057313c3a5570b4b0) )
 	ROM_LOAD( "awsmtoss.u11", 0x30000, 0x10000, CRC(8ae9d4f0) SHA1(58d1d8972c8e4c9a7c63e9d63e267ea81515d22a) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1993, ribrac, 0, ribrac, ribrac, ribrac_state, empty_init, ROT0, "Lazer-Tron", "Ribbit Racin (Lazer-Tron)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 19??, awetoss, 0, ribrac, awetoss, ribrac_state, empty_init, ROT0, "Lazer-Tron", "Awesome Toss 'Em (Lazer-Tron)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )

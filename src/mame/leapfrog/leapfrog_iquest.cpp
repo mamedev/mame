@@ -21,6 +21,9 @@
 #include "speaker.h"
 #include "screen.h"
 
+
+namespace {
+
 class leapfrog_iquest_state : public driver_device
 {
 public:
@@ -768,6 +771,7 @@ ROM_START( ttwistfb ) // PCB marks ROM glob as 16M
 	ROM_LOAD( "factblaster.bin", 0x000000, 0x200000, CRC(8efd63f5) SHA1(2cbd1299006ad9743d846e774afe7a134ba0fce3))
 ROM_END
 
+} // anonymous namespace
 
 
 //    year, name,        parent,    compat, machine,                         input,            class,                                init,       company,    fullname,                         flags

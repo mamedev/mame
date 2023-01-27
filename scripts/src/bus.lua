@@ -2563,6 +2563,8 @@ if (BUSES["VME"]~=null) then
 		MAME_DIR .. "src/devices/bus/vme/vme_hcpu30.h",
 		MAME_DIR .. "src/devices/bus/vme/vme_smvme2000.cpp",
 		MAME_DIR .. "src/devices/bus/vme/vme_smvme2000.h",
+		MAME_DIR .. "src/devices/bus/vme/vme_mvme180.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme_mvme180.h",
 	}
 end
 
@@ -4070,6 +4072,8 @@ if (BUSES["PCE_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/pce_ctrl/joypad2.h",
 		MAME_DIR .. "src/devices/bus/pce_ctrl/joypad6.cpp",
 		MAME_DIR .. "src/devices/bus/pce_ctrl/joypad6.h",
+		MAME_DIR .. "src/devices/bus/pce_ctrl/mouse.cpp",
+		MAME_DIR .. "src/devices/bus/pce_ctrl/mouse.h",
 		MAME_DIR .. "src/devices/bus/pce_ctrl/multitap.cpp",
 		MAME_DIR .. "src/devices/bus/pce_ctrl/multitap.h",
 		MAME_DIR .. "src/devices/bus/pce_ctrl/pachinko.cpp",
@@ -4771,6 +4775,8 @@ if (BUSES["HP9845_IO"]~=null) then
 		MAME_DIR .. "src/devices/bus/hp9845_io/98036.h",
 		MAME_DIR .. "src/devices/bus/hp9845_io/98046.cpp",
 		MAME_DIR .. "src/devices/bus/hp9845_io/98046.h",
+		MAME_DIR .. "src/devices/bus/hp9845_io/hp9871.cpp",
+		MAME_DIR .. "src/devices/bus/hp9845_io/hp9871.h",
 		MAME_DIR .. "src/devices/bus/hp9845_io/hp9885.cpp",
 		MAME_DIR .. "src/devices/bus/hp9845_io/hp9885.h",
 	}
@@ -5121,6 +5127,8 @@ if (BUSES["PC8801"]~=null) then
 		MAME_DIR .. "src/devices/bus/pc8801/pcg8100.h",
 		MAME_DIR .. "src/devices/bus/pc8801/jmbx1.cpp",
 		MAME_DIR .. "src/devices/bus/pc8801/jmbx1.h",
+		MAME_DIR .. "src/devices/bus/pc8801/hmb20.cpp",
+		MAME_DIR .. "src/devices/bus/pc8801/hmb20.h",
 	}
 end
 
@@ -5138,3 +5146,31 @@ if (BUSES["MTU130"]~=null) then
 	}
  end
 
+---------------------------------------------------
+--
+--@src/devices/bus/nabupc/option.h,BUSES["NABU"] = true
+---------------------------------------------------
+if (BUSES["NABU"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/nabupc/adapter.cpp",
+		MAME_DIR .. "src/devices/bus/nabupc/adapter.h",
+		MAME_DIR .. "src/devices/bus/nabupc/fdc.cpp",
+		MAME_DIR .. "src/devices/bus/nabupc/fdc.h",
+		MAME_DIR .. "src/devices/bus/nabupc/option.cpp",
+		MAME_DIR .. "src/devices/bus/nabupc/option.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/nabupc/keyboard/keyboard.h,BUSES["NABU_KEYBOARD"] = true
+---------------------------------------------------
+
+if (BUSES["NABU_KEYBOARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/nabupc/keyboard/hlekeyboard.cpp",
+		MAME_DIR .. "src/devices/bus/nabupc/keyboard/hlekeyboard.h",
+		MAME_DIR .. "src/devices/bus/nabupc/keyboard/keyboard.cpp",
+		MAME_DIR .. "src/devices/bus/nabupc/keyboard/keyboard.h",
+	}
+end

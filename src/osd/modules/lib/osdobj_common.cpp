@@ -2,21 +2,22 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    osdepend.c
+    osdobj_common.h
 
     OS-dependent code interface.
 
 ***************************************************************************/
 
-#include "modules/lib/osdobj_common.h"
+#include "osdobj_common.h"
 
+#include "modules/debugger/debug_module.h"
 #include "modules/font/font_module.h"
 #include "modules/input/input_module.h"
-#include "modules/sound/sound_module.h"
-#include "modules/debugger/debug_module.h"
-#include "modules/netdev/netdev_module.h"
 #include "modules/midi/midi_module.h"
 #include "modules/monitor/monitor_module.h"
+#include "modules/netdev/netdev_module.h"
+#include "modules/sound/sound_module.h"
+
 #include "osdnet.h"
 #include "watchdog.h"
 
@@ -28,149 +29,151 @@
 
 const options_entry osd_options::s_option_entries[] =
 {
-	{ nullptr,                               nullptr,           core_options::option_type::HEADER,    "OSD KEYBOARD MAPPING OPTIONS" },
+	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD INPUT MAPPING OPTIONS" },
 #if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
-	{ OSDOPTION_UIMODEKEY,                   "DEL",             core_options::option_type::STRING,    "key to enable/disable MAME controls when emulated system has keyboard inputs" },
+	{ OSDOPTION_UIMODEKEY,                       "DEL",            core_options::option_type::STRING,    "key to enable/disable MAME controls when emulated system has keyboard inputs" },
 #else
-	{ OSDOPTION_UIMODEKEY,                   "auto",            core_options::option_type::STRING,    "key to enable/disable MAME controls when emulated system has keyboard inputs" },
+	{ OSDOPTION_UIMODEKEY,                       "auto",           core_options::option_type::STRING,    "key to enable/disable MAME controls when emulated system has keyboard inputs" },
 #endif  // SDLMAME_MACOSX
+	{ OSDOPTION_CONTROLLER_MAP_FILE ";ctrlmap",  OSDOPTVAL_NONE,   core_options::option_type::PATH,      "game controller mapping file" },
+	{ OSDOPTION_BACKGROUND_INPUT,                "0",              core_options::option_type::BOOLEAN,   "don't ignore input when losing UI focus" },
 
-	{ nullptr,                                nullptr,          core_options::option_type::HEADER,    "OSD FONT OPTIONS" },
-	{ OSD_FONT_PROVIDER,                      OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "provider for UI font: " },
+	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD FONT OPTIONS" },
+	{ OSD_FONT_PROVIDER,                         OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "provider for UI font: " },
 
-	{ nullptr,                                nullptr,          core_options::option_type::HEADER,    "OSD OUTPUT OPTIONS" },
-	{ OSD_OUTPUT_PROVIDER,                    OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "provider for output notifications: " },
+	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD OUTPUT OPTIONS" },
+	{ OSD_OUTPUT_PROVIDER,                       OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "provider for output notifications: " },
 
-	{ nullptr,                                nullptr,          core_options::option_type::HEADER,    "OSD INPUT OPTIONS" },
-	{ OSD_KEYBOARDINPUT_PROVIDER,             OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "provider for keyboard input: " },
-	{ OSD_MOUSEINPUT_PROVIDER,                OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "provider for mouse input: " },
-	{ OSD_LIGHTGUNINPUT_PROVIDER,             OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "provider for lightgun input: " },
-	{ OSD_JOYSTICKINPUT_PROVIDER,             OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "provider for joystick input: " },
+	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD INPUT OPTIONS" },
+	{ OSD_KEYBOARDINPUT_PROVIDER,                OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "provider for keyboard input: " },
+	{ OSD_MOUSEINPUT_PROVIDER,                   OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "provider for mouse input: " },
+	{ OSD_LIGHTGUNINPUT_PROVIDER,                OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "provider for lightgun input: " },
+	{ OSD_JOYSTICKINPUT_PROVIDER,                OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "provider for joystick input: " },
 
-	{ nullptr,                                nullptr,          core_options::option_type::HEADER,    "OSD CLI OPTIONS" },
-	{ OSDCOMMAND_LIST_MIDI_DEVICES ";mlist",  "0",              core_options::option_type::COMMAND,   "list available MIDI I/O devices" },
-	{ OSDCOMMAND_LIST_NETWORK_ADAPTERS ";nlist", "0",           core_options::option_type::COMMAND,   "list available network adapters" },
+	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD CLI OPTIONS" },
+	{ OSDCOMMAND_LIST_MIDI_DEVICES ";mlist",     "0",              core_options::option_type::COMMAND,   "list available MIDI I/O devices" },
+	{ OSDCOMMAND_LIST_NETWORK_ADAPTERS ";nlist", "0",              core_options::option_type::COMMAND,   "list available network adapters" },
 
-	{ nullptr,                                nullptr,          core_options::option_type::HEADER,    "OSD DEBUGGING OPTIONS" },
-	{ OSDOPTION_DEBUGGER,                     OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "debugger used: " },
-	{ OSDOPTION_DEBUGGER_PORT,                "23946",          core_options::option_type::INTEGER,   "port to use for gdbstub debugger" },
-	{ OSDOPTION_DEBUGGER_FONT ";dfont",       OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "font to use for debugger views" },
-	{ OSDOPTION_DEBUGGER_FONT_SIZE ";dfontsize", "0",           core_options::option_type::FLOAT,     "font size to use for debugger views" },
-	{ OSDOPTION_WATCHDOG ";wdog",             "0",              core_options::option_type::INTEGER,   "force the program to terminate if no updates within specified number of seconds" },
+	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD DEBUGGING OPTIONS" },
+	{ OSDOPTION_DEBUGGER,                        OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "debugger used: " },
+	{ OSDOPTION_DEBUGGER_PORT,                   "23946",          core_options::option_type::INTEGER,   "port to use for gdbstub debugger" },
+	{ OSDOPTION_DEBUGGER_FONT ";dfont",          OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "font to use for debugger views" },
+	{ OSDOPTION_DEBUGGER_FONT_SIZE ";dfontsize", "0",              core_options::option_type::FLOAT,     "font size to use for debugger views" },
+	{ OSDOPTION_WATCHDOG ";wdog",                "0",              core_options::option_type::INTEGER,   "force the program to terminate if no updates within specified number of seconds" },
 
-	{ nullptr,                                nullptr,          core_options::option_type::HEADER,    "OSD PERFORMANCE OPTIONS" },
-	{ OSDOPTION_NUMPROCESSORS ";np",          OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "number of processors; this overrides the number the system reports" },
-	{ OSDOPTION_BENCH,                        "0",              core_options::option_type::INTEGER,   "benchmark for the given number of emulated seconds; implies -video none -sound none -nothrottle" },
+	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD PERFORMANCE OPTIONS" },
+	{ OSDOPTION_NUMPROCESSORS ";np",             OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "number of processors; this overrides the number the system reports" },
+	{ OSDOPTION_BENCH,                           "0",              core_options::option_type::INTEGER,   "benchmark for the given number of emulated seconds; implies -video none -sound none -nothrottle" },
 
-	{ nullptr,                                nullptr,          core_options::option_type::HEADER,    "OSD VIDEO OPTIONS" },
+	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD VIDEO OPTIONS" },
 // OS X can be trusted to have working hardware OpenGL, so default to it on for the best user experience
-	{ OSDOPTION_VIDEO,                        OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "video output method: " },
-	{ OSDOPTION_NUMSCREENS "(1-4)",           "1",              core_options::option_type::INTEGER,   "number of output screens/windows to create; usually, you want just one" },
-	{ OSDOPTION_WINDOW ";w",                  "0",              core_options::option_type::BOOLEAN,   "enable window mode; otherwise, full screen mode is assumed" },
-	{ OSDOPTION_MAXIMIZE ";max",              "1",              core_options::option_type::BOOLEAN,   "default to maximized windows" },
-	{ OSDOPTION_WAITVSYNC ";vs",              "0",              core_options::option_type::BOOLEAN,   "enable waiting for the start of VBLANK before flipping screens (reduces tearing effects)" },
-	{ OSDOPTION_SYNCREFRESH ";srf",           "0",              core_options::option_type::BOOLEAN,   "enable using the start of VBLANK for throttling instead of the game time" },
-	{ OSD_MONITOR_PROVIDER,                   OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "monitor discovery method: " },
+	{ OSDOPTION_VIDEO,                           OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "video output method: " },
+	{ OSDOPTION_NUMSCREENS "(1-4)",              "1",              core_options::option_type::INTEGER,   "number of output screens/windows to create; usually, you want just one" },
+	{ OSDOPTION_WINDOW ";w",                     "0",              core_options::option_type::BOOLEAN,   "enable window mode; otherwise, full screen mode is assumed" },
+	{ OSDOPTION_MAXIMIZE ";max",                 "1",              core_options::option_type::BOOLEAN,   "default to maximized windows" },
+	{ OSDOPTION_WAITVSYNC ";vs",                 "0",              core_options::option_type::BOOLEAN,   "enable waiting for the start of VBLANK before flipping screens (reduces tearing effects)" },
+	{ OSDOPTION_SYNCREFRESH ";srf",              "0",              core_options::option_type::BOOLEAN,   "enable using the start of VBLANK for throttling instead of the game time" },
+	{ OSD_MONITOR_PROVIDER,                      OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "monitor discovery method: " },
 
 	// per-window options
-	{ nullptr,                                nullptr,          core_options::option_type::HEADER,    "OSD PER-WINDOW VIDEO OPTIONS" },
-	{ OSDOPTION_SCREEN,                       OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "explicit name of the first screen; 'auto' here will try to make a best guess" },
-	{ OSDOPTION_ASPECT ";screen_aspect",      OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "aspect ratio for all screens; 'auto' here will try to make a best guess" },
-	{ OSDOPTION_RESOLUTION ";r",              OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "preferred resolution for all screens; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ OSDOPTION_VIEW,                         OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "preferred view for all screens" },
+	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD PER-WINDOW VIDEO OPTIONS" },
+	{ OSDOPTION_SCREEN,                          OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "explicit name of the first screen; 'auto' here will try to make a best guess" },
+	{ OSDOPTION_ASPECT ";screen_aspect",         OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "aspect ratio for all screens; 'auto' here will try to make a best guess" },
+	{ OSDOPTION_RESOLUTION ";r",                 OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "preferred resolution for all screens; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ OSDOPTION_VIEW,                            OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "preferred view for all screens" },
 
-	{ OSDOPTION_SCREEN "0",                   OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "explicit name of the first screen; 'auto' here will try to make a best guess" },
-	{ OSDOPTION_ASPECT "0",                   OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "aspect ratio of the first screen; 'auto' here will try to make a best guess" },
-	{ OSDOPTION_RESOLUTION "0;r0",            OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "preferred resolution of the first screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ OSDOPTION_VIEW "0",                     OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "preferred view for the first screen" },
+	{ OSDOPTION_SCREEN "0",                      OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "explicit name of the first screen; 'auto' here will try to make a best guess" },
+	{ OSDOPTION_ASPECT "0",                      OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "aspect ratio of the first screen; 'auto' here will try to make a best guess" },
+	{ OSDOPTION_RESOLUTION "0;r0",               OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "preferred resolution of the first screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ OSDOPTION_VIEW "0",                        OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "preferred view for the first screen" },
 
-	{ OSDOPTION_SCREEN "1",                   OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "explicit name of the second screen; 'auto' here will try to make a best guess" },
-	{ OSDOPTION_ASPECT "1",                   OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "aspect ratio of the second screen; 'auto' here will try to make a best guess" },
-	{ OSDOPTION_RESOLUTION "1;r1",            OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "preferred resolution of the second screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ OSDOPTION_VIEW "1",                     OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "preferred view for the second screen" },
+	{ OSDOPTION_SCREEN "1",                      OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "explicit name of the second screen; 'auto' here will try to make a best guess" },
+	{ OSDOPTION_ASPECT "1",                      OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "aspect ratio of the second screen; 'auto' here will try to make a best guess" },
+	{ OSDOPTION_RESOLUTION "1;r1",               OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "preferred resolution of the second screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ OSDOPTION_VIEW "1",                        OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "preferred view for the second screen" },
 
-	{ OSDOPTION_SCREEN "2",                   OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "explicit name of the third screen; 'auto' here will try to make a best guess" },
-	{ OSDOPTION_ASPECT "2",                   OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "aspect ratio of the third screen; 'auto' here will try to make a best guess" },
-	{ OSDOPTION_RESOLUTION "2;r2",            OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "preferred resolution of the third screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ OSDOPTION_VIEW "2",                     OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "preferred view for the third screen" },
+	{ OSDOPTION_SCREEN "2",                      OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "explicit name of the third screen; 'auto' here will try to make a best guess" },
+	{ OSDOPTION_ASPECT "2",                      OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "aspect ratio of the third screen; 'auto' here will try to make a best guess" },
+	{ OSDOPTION_RESOLUTION "2;r2",               OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "preferred resolution of the third screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ OSDOPTION_VIEW "2",                        OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "preferred view for the third screen" },
 
-	{ OSDOPTION_SCREEN "3",                   OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "explicit name of the fourth screen; 'auto' here will try to make a best guess" },
-	{ OSDOPTION_ASPECT "3",                   OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "aspect ratio of the fourth screen; 'auto' here will try to make a best guess" },
-	{ OSDOPTION_RESOLUTION "3;r3",            OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "preferred resolution of the fourth screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ OSDOPTION_VIEW "3",                     OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "preferred view for the fourth screen" },
+	{ OSDOPTION_SCREEN "3",                      OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "explicit name of the fourth screen; 'auto' here will try to make a best guess" },
+	{ OSDOPTION_ASPECT "3",                      OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "aspect ratio of the fourth screen; 'auto' here will try to make a best guess" },
+	{ OSDOPTION_RESOLUTION "3;r3",               OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "preferred resolution of the fourth screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ OSDOPTION_VIEW "3",                        OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "preferred view for the fourth screen" },
 
 	// full screen options
-	{ nullptr,                                nullptr,          core_options::option_type::HEADER,    "OSD FULL SCREEN OPTIONS" },
-	{ OSDOPTION_SWITCHRES,                    "0",              core_options::option_type::BOOLEAN,   "enable resolution switching" },
+	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD FULL SCREEN OPTIONS" },
+	{ OSDOPTION_SWITCHRES,                       "0",              core_options::option_type::BOOLEAN,   "enable resolution switching" },
 
-	{ nullptr,                                nullptr,          core_options::option_type::HEADER,    "OSD ACCELERATED VIDEO OPTIONS" },
-	{ OSDOPTION_FILTER ";glfilter;flt",       "1",              core_options::option_type::BOOLEAN,   "use bilinear filtering when scaling emulated video" },
-	{ OSDOPTION_PRESCALE "(1-8)",             "1",              core_options::option_type::INTEGER,   "scale emulated video by this factor before applying filters/shaders" },
+	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD ACCELERATED VIDEO OPTIONS" },
+	{ OSDOPTION_FILTER ";glfilter;flt",          "1",              core_options::option_type::BOOLEAN,   "use bilinear filtering when scaling emulated video" },
+	{ OSDOPTION_PRESCALE "(1-8)",                "1",              core_options::option_type::INTEGER,   "scale emulated video by this factor before applying filters/shaders" },
 
 #if USE_OPENGL
-	{ nullptr,                                nullptr,          core_options::option_type::HEADER,    "OpenGL-SPECIFIC OPTIONS" },
-	{ OSDOPTION_GL_FORCEPOW2TEXTURE,          "0",              core_options::option_type::BOOLEAN,   "force power-of-two texture sizes (default no)" },
-	{ OSDOPTION_GL_NOTEXTURERECT,             "0",              core_options::option_type::BOOLEAN,   "don't use OpenGL GL_ARB_texture_rectangle (default on)" },
-	{ OSDOPTION_GL_VBO,                       "1",              core_options::option_type::BOOLEAN,   "enable OpenGL VBO if available (default on)" },
-	{ OSDOPTION_GL_PBO,                       "1",              core_options::option_type::BOOLEAN,   "enable OpenGL PBO if available (default on)" },
-	{ OSDOPTION_GL_GLSL,                      "0",              core_options::option_type::BOOLEAN,   "enable OpenGL GLSL if available (default off)" },
-	{ OSDOPTION_GLSL_FILTER,                  "1",              core_options::option_type::STRING,    "enable OpenGL GLSL filtering instead of FF filtering 0-plain, 1-bilinear (default), 2-bicubic" },
-	{ OSDOPTION_SHADER_MAME "0",              OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader set mame bitmap 0" },
-	{ OSDOPTION_SHADER_MAME "1",              OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader set mame bitmap 1" },
-	{ OSDOPTION_SHADER_MAME "2",              OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader set mame bitmap 2" },
-	{ OSDOPTION_SHADER_MAME "3",              OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader set mame bitmap 3" },
-	{ OSDOPTION_SHADER_MAME "4",              OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader set mame bitmap 4" },
-	{ OSDOPTION_SHADER_MAME "5",              OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader set mame bitmap 5" },
-	{ OSDOPTION_SHADER_MAME "6",              OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader set mame bitmap 6" },
-	{ OSDOPTION_SHADER_MAME "7",              OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader set mame bitmap 7" },
-	{ OSDOPTION_SHADER_MAME "8",              OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader set mame bitmap 8" },
-	{ OSDOPTION_SHADER_MAME "9",              OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader set mame bitmap 9" },
-	{ OSDOPTION_SHADER_SCREEN "0",            OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader screen bitmap 0" },
-	{ OSDOPTION_SHADER_SCREEN "1",            OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader screen bitmap 1" },
-	{ OSDOPTION_SHADER_SCREEN "2",            OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader screen bitmap 2" },
-	{ OSDOPTION_SHADER_SCREEN "3",            OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader screen bitmap 3" },
-	{ OSDOPTION_SHADER_SCREEN "4",            OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader screen bitmap 4" },
-	{ OSDOPTION_SHADER_SCREEN "5",            OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader screen bitmap 5" },
-	{ OSDOPTION_SHADER_SCREEN "6",            OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader screen bitmap 6" },
-	{ OSDOPTION_SHADER_SCREEN "7",            OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader screen bitmap 7" },
-	{ OSDOPTION_SHADER_SCREEN "8",            OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader screen bitmap 8" },
-	{ OSDOPTION_SHADER_SCREEN "9",            OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader screen bitmap 9" },
+	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OpenGL-SPECIFIC OPTIONS" },
+	{ OSDOPTION_GL_FORCEPOW2TEXTURE,             "0",              core_options::option_type::BOOLEAN,   "force power-of-two texture sizes (default no)" },
+	{ OSDOPTION_GL_NOTEXTURERECT,                "0",              core_options::option_type::BOOLEAN,   "don't use OpenGL GL_ARB_texture_rectangle (default on)" },
+	{ OSDOPTION_GL_VBO,                          "1",              core_options::option_type::BOOLEAN,   "enable OpenGL VBO if available (default on)" },
+	{ OSDOPTION_GL_PBO,                          "1",              core_options::option_type::BOOLEAN,   "enable OpenGL PBO if available (default on)" },
+	{ OSDOPTION_GL_GLSL,                         "0",              core_options::option_type::BOOLEAN,   "enable OpenGL GLSL if available (default off)" },
+	{ OSDOPTION_GLSL_FILTER,                     "1",              core_options::option_type::STRING,    "enable OpenGL GLSL filtering instead of FF filtering 0-plain, 1-bilinear (default), 2-bicubic" },
+	{ OSDOPTION_SHADER_MAME "0",                 OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader set mame bitmap 0" },
+	{ OSDOPTION_SHADER_MAME "1",                 OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader set mame bitmap 1" },
+	{ OSDOPTION_SHADER_MAME "2",                 OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader set mame bitmap 2" },
+	{ OSDOPTION_SHADER_MAME "3",                 OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader set mame bitmap 3" },
+	{ OSDOPTION_SHADER_MAME "4",                 OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader set mame bitmap 4" },
+	{ OSDOPTION_SHADER_MAME "5",                 OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader set mame bitmap 5" },
+	{ OSDOPTION_SHADER_MAME "6",                 OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader set mame bitmap 6" },
+	{ OSDOPTION_SHADER_MAME "7",                 OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader set mame bitmap 7" },
+	{ OSDOPTION_SHADER_MAME "8",                 OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader set mame bitmap 8" },
+	{ OSDOPTION_SHADER_MAME "9",                 OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader set mame bitmap 9" },
+	{ OSDOPTION_SHADER_SCREEN "0",               OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader screen bitmap 0" },
+	{ OSDOPTION_SHADER_SCREEN "1",               OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader screen bitmap 1" },
+	{ OSDOPTION_SHADER_SCREEN "2",               OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader screen bitmap 2" },
+	{ OSDOPTION_SHADER_SCREEN "3",               OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader screen bitmap 3" },
+	{ OSDOPTION_SHADER_SCREEN "4",               OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader screen bitmap 4" },
+	{ OSDOPTION_SHADER_SCREEN "5",               OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader screen bitmap 5" },
+	{ OSDOPTION_SHADER_SCREEN "6",               OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader screen bitmap 6" },
+	{ OSDOPTION_SHADER_SCREEN "7",               OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader screen bitmap 7" },
+	{ OSDOPTION_SHADER_SCREEN "8",               OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader screen bitmap 8" },
+	{ OSDOPTION_SHADER_SCREEN "9",               OSDOPTVAL_NONE,   core_options::option_type::STRING,    "custom OpenGL GLSL shader screen bitmap 9" },
 #endif
 
-	{ nullptr,                                nullptr,          core_options::option_type::HEADER,    "OSD SOUND OPTIONS" },
-	{ OSDOPTION_SOUND,                        OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "sound output method: " },
-	{ OSDOPTION_AUDIO_LATENCY "(0-5)",        "2",              core_options::option_type::INTEGER,   "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
+	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD SOUND OPTIONS" },
+	{ OSDOPTION_SOUND,                           OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "sound output method: " },
+	{ OSDOPTION_AUDIO_LATENCY "(0-5)",           "2",              core_options::option_type::INTEGER,   "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
 
 #ifndef NO_USE_PORTAUDIO
-	{ nullptr,                                nullptr,          core_options::option_type::HEADER,    "PORTAUDIO OPTIONS" },
-	{ OSDOPTION_PA_API,                       OSDOPTVAL_NONE,   core_options::option_type::STRING,    "PortAudio API" },
-	{ OSDOPTION_PA_DEVICE,                    OSDOPTVAL_NONE,   core_options::option_type::STRING,    "PortAudio device" },
-	{ OSDOPTION_PA_LATENCY "(0-0.25)",        "0",              core_options::option_type::FLOAT,     "suggested latency in seconds, 0 for default" },
+	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "PORTAUDIO OPTIONS" },
+	{ OSDOPTION_PA_API,                          OSDOPTVAL_NONE,   core_options::option_type::STRING,    "PortAudio API" },
+	{ OSDOPTION_PA_DEVICE,                       OSDOPTVAL_NONE,   core_options::option_type::STRING,    "PortAudio device" },
+	{ OSDOPTION_PA_LATENCY "(0-0.25)",           "0",              core_options::option_type::FLOAT,     "suggested latency in seconds, 0 for default" },
 #endif
 
 #ifdef SDLMAME_MACOSX
-	{ nullptr,                                nullptr,          core_options::option_type::HEADER,    "CoreAudio-SPECIFIC OPTIONS" },
-	{ OSDOPTION_AUDIO_OUTPUT,                 OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "audio output device" },
-	{ OSDOPTION_AUDIO_EFFECT "0",             OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 0" },
-	{ OSDOPTION_AUDIO_EFFECT "1",             OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 1" },
-	{ OSDOPTION_AUDIO_EFFECT "2",             OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 2" },
-	{ OSDOPTION_AUDIO_EFFECT "3",             OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 3" },
-	{ OSDOPTION_AUDIO_EFFECT "4",             OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 4" },
-	{ OSDOPTION_AUDIO_EFFECT "5",             OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 5" },
-	{ OSDOPTION_AUDIO_EFFECT "6",             OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 6" },
-	{ OSDOPTION_AUDIO_EFFECT "7",             OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 7" },
-	{ OSDOPTION_AUDIO_EFFECT "8",             OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 8" },
-	{ OSDOPTION_AUDIO_EFFECT "9",             OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 9" },
+	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "CoreAudio-SPECIFIC OPTIONS" },
+	{ OSDOPTION_AUDIO_OUTPUT,                    OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "audio output device" },
+	{ OSDOPTION_AUDIO_EFFECT "0",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 0" },
+	{ OSDOPTION_AUDIO_EFFECT "1",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 1" },
+	{ OSDOPTION_AUDIO_EFFECT "2",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 2" },
+	{ OSDOPTION_AUDIO_EFFECT "3",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 3" },
+	{ OSDOPTION_AUDIO_EFFECT "4",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 4" },
+	{ OSDOPTION_AUDIO_EFFECT "5",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 5" },
+	{ OSDOPTION_AUDIO_EFFECT "6",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 6" },
+	{ OSDOPTION_AUDIO_EFFECT "7",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 7" },
+	{ OSDOPTION_AUDIO_EFFECT "8",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 8" },
+	{ OSDOPTION_AUDIO_EFFECT "9",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 9" },
 #endif
 
-	{ nullptr,                                nullptr,           core_options::option_type::HEADER, "BGFX POST-PROCESSING OPTIONS" },
-	{ OSDOPTION_BGFX_PATH,                    "bgfx",            core_options::option_type::PATH,   "path to BGFX-related files" },
-	{ OSDOPTION_BGFX_BACKEND,                 "auto",            core_options::option_type::STRING, "BGFX backend to use (d3d9, d3d11, d3d12, metal, opengl, gles, vulkan)" },
-	{ OSDOPTION_BGFX_DEBUG,                   "0",               core_options::option_type::BOOLEAN, "enable BGFX debugging statistics" },
-	{ OSDOPTION_BGFX_SCREEN_CHAINS,           "default",         core_options::option_type::STRING, "comma-delimited list of screen chain JSON names, colon-delimited per-window" },
-	{ OSDOPTION_BGFX_SHADOW_MASK,             "slot-mask.png",   core_options::option_type::STRING, "shadow mask texture name" },
-	{ OSDOPTION_BGFX_LUT,                     "lut-default.png", core_options::option_type::STRING, "LUT texture name" },
-	{ OSDOPTION_BGFX_AVI_NAME,                OSDOPTVAL_AUTO,    core_options::option_type::PATH,   "filename for BGFX output logging" },
+	{ nullptr,                                   nullptr,           core_options::option_type::HEADER, "BGFX POST-PROCESSING OPTIONS" },
+	{ OSDOPTION_BGFX_PATH,                       "bgfx",            core_options::option_type::PATH,   "path to BGFX-related files" },
+	{ OSDOPTION_BGFX_BACKEND,                    "auto",            core_options::option_type::STRING, "BGFX backend to use (d3d9, d3d11, d3d12, metal, opengl, gles, vulkan)" },
+	{ OSDOPTION_BGFX_DEBUG,                      "0",               core_options::option_type::BOOLEAN, "enable BGFX debugging statistics" },
+	{ OSDOPTION_BGFX_SCREEN_CHAINS,              "default",         core_options::option_type::STRING, "comma-delimited list of screen chain JSON names, colon-delimited per-window" },
+	{ OSDOPTION_BGFX_SHADOW_MASK,                "slot-mask.png",   core_options::option_type::STRING, "shadow mask texture name" },
+	{ OSDOPTION_BGFX_LUT,                        "lut-default.png", core_options::option_type::STRING, "LUT texture name" },
+	{ OSDOPTION_BGFX_AVI_NAME,                   OSDOPTVAL_AUTO,    core_options::option_type::PATH,   "filename for BGFX output logging" },
 
 		// End of list
 	{ nullptr }
@@ -283,7 +286,8 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_WIN32);
 	REGISTER_MODULE(m_mod_man, LIGHTGUN_NONE);
 
-	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_SDL);
+	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_SDLGAME);
+	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_SDLJOY);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_WINHYBRID);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_DINPUT);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_XINPUT);

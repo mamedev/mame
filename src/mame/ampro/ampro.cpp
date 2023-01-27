@@ -32,6 +32,9 @@ of a hard drive of up to 88MB.
 #include "machine/timer.h"
 #include "softlist_dev.h"
 
+
+namespace {
+
 class ampro_state : public driver_device
 {
 public:
@@ -275,6 +278,9 @@ ROM_START( ampro )
 	ROM_SYSTEM_BIOS( 2, "scsi", "SCSI Boot")
 	ROMX_LOAD( "scsi", 0x0000, 0x1000, CRC(8eb20e5d) SHA1(0ab1ff65cf6d3c1a713a8ac5c1ee4c662ac3da0c), ROM_BIOS(2))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

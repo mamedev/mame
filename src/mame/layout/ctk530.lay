@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <mamelayout version="2">
 	<!-- general grey backdrop -->
@@ -66,13 +66,13 @@ license:CC0
 		<disk><bounds x="0" y="0" width="40" height="40" /><color red="0.0" green="0.0" blue="0.0" /></disk>
 		<disk state="0"><bounds x="2" y="2" width="36" height="36" /><color red="0.5" green="0.5" blue="0.5" /></disk>
 		<disk state="1"><bounds x="2" y="2" width="36" height="36" /><color red="0.3" green="0.3" blue="0.3" /></disk>
-		<text string="&#x25b2;" align="1"><bounds x="10" y="-2" width="30" height="36"/><color red="0.2" green="0.2" blue="0.2" /></text>
+		<text string="&#x25b2;"><bounds xc="20" y="-2" width="30" height="36"/><color red="0.2" green="0.2" blue="0.2" /></text>
 	</element>
 	<element name="button-circ-down" defstate="0">
 		<disk><bounds x="0" y="0" width="40" height="40" /><color red="0.0" green="0.0" blue="0.0" /></disk>
 		<disk state="0"><bounds x="2" y="2" width="36" height="36" /><color red="0.5" green="0.5" blue="0.5" /></disk>
 		<disk state="1"><bounds x="2" y="2" width="36" height="36" /><color red="0.3" green="0.3" blue="0.3" /></disk>
-		<text string="&#x25bc;" align="1"><bounds x="10" y="2" width="30" height="36"/><color red="0.2" green="0.2" blue="0.2" /></text>
+		<text string="&#x25bc;"><bounds xc="20" y="2" width="30" height="36"/><color red="0.2" green="0.2" blue="0.2" /></text>
 	</element>
 	<element name="button-demo" defstate="0">
 		<disk><bounds x="0" y="0" width="50" height="50" /><color red="0.0" green="0.0" blue="0.0" /></disk>

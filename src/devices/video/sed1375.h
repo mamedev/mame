@@ -92,74 +92,74 @@ protected:
 
 	enum : u8
 	{
-		MODE0_MASK				= 0xff,
-		MODE0_WIDTH_MASK		= 0x03,
-		MODE0_FPSHIFT_BIT		= 2,
-		MODE0_FPFRAME_POL_BIT	= 3,
-		MODE0_FPLINE_POL_BIT	= 4,
-		MODE0_COLOR_BIT			= 5,
-		MODE0_DUAL_BIT			= 6,
-		MODE0_TFT_BIT			= 7,
+		MODE0_MASK              = 0xff,
+		MODE0_WIDTH_MASK        = 0x03,
+		MODE0_FPSHIFT_BIT       = 2,
+		MODE0_FPFRAME_POL_BIT   = 3,
+		MODE0_FPLINE_POL_BIT    = 4,
+		MODE0_COLOR_BIT         = 5,
+		MODE0_DUAL_BIT          = 6,
+		MODE0_TFT_BIT           = 7,
 
-		MODE1_MASK				= 0xff,
-		MODE1_SWINVERT_BIT		= 0,
-		MODE1_HWINVERT_BIT		= 1,
-		MODE1_FRREPEAT_BIT		= 2,
-		MODE1_BLANK_BIT			= 3,
-		MODE1_CLKDIV_BIT		= 4,
-		MODE1_HIPERF_BIT		= 5,
-		MODE1_BPP_MASK			= 0xc0,
-		MODE1_BPP_SHIFT			= 6,
+		MODE1_MASK              = 0xff,
+		MODE1_SWINVERT_BIT      = 0,
+		MODE1_HWINVERT_BIT      = 1,
+		MODE1_FRREPEAT_BIT      = 2,
+		MODE1_BLANK_BIT         = 3,
+		MODE1_CLKDIV_BIT        = 4,
+		MODE1_HIPERF_BIT        = 5,
+		MODE1_BPP_MASK          = 0xc0,
+		MODE1_BPP_SHIFT         = 6,
 
-		MODE2_MASK				= 0x0f,
-		MODE2_SWPWRSAVE_MASK	= 0x03,
-		MODE2_SWPWRSAVE_SHIFT	= 0,
-		MODE2_HWPWRSAVE_BIT		= 2,
-		MODE2_LCDPWR_OVR_BIT	= 3,
+		MODE2_MASK              = 0x0f,
+		MODE2_SWPWRSAVE_MASK    = 0x03,
+		MODE2_SWPWRSAVE_SHIFT   = 0,
+		MODE2_HWPWRSAVE_BIT     = 2,
+		MODE2_LCDPWR_OVR_BIT    = 3,
 
-		PANEL_HSIZE_MASK		= 0x7f,
+		PANEL_HSIZE_MASK        = 0x7f,
 
-		FPLINE_START_MASK		= 0x1f,
+		FPLINE_START_MASK       = 0x1f,
 
-		HBLANK_MASK				= 0x1f,
+		HBLANK_MASK             = 0x1f,
 
-		FPFRAME_START_MASK		= 0x3f,
+		FPFRAME_START_MASK      = 0x3f,
 
-		VBLANK_MASK				= 0x3f,
-		VBLANK_VBL_BIT			= 7,
+		VBLANK_MASK             = 0x3f,
+		VBLANK_VBL_BIT          = 7,
 
-		MODRATE_MASK			= 0x3f,
+		MODRATE_MASK            = 0x3f,
 
-		START_OVF_MASK			= 0x01,
+		START_OVF_MASK          = 0x01,
 
-		MEM_ADDR_OFFSET_MASK	= 0xff,
+		MEM_ADDR_OFFSET_MASK    = 0xff,
 
-		LUT_ADDR_MASK			= 0xff,
+		LUT_ADDR_MASK           = 0xff,
 
-		LUT_DATA_MASK			= 0xf0,
-		LUT_DATA_SHIFT			= 4,
+		LUT_DATA_MASK           = 0xf0,
+		LUT_DATA_SHIFT          = 4,
 
-		GPIO_CONFIG_MASK		= 0x1f,
-		GPIO_STATUS_MASK		= 0x1f,
+		GPIO_CONFIG_MASK        = 0x1f,
+		GPIO_STATUS_MASK        = 0x1f,
 
-		SCRATCH_MASK			= 0xff,
+		SCRATCH_MASK            = 0xff,
 
-		SWIVEL_MODE_MASK		= 0xc3,
-		SWIVEL_CLKSEL_MASK		= 0x03,
-		SWIVEL_MODE_BIT			= 6,
-		SWIVEL_ENABLE_BIT		= 7,
+		SWIVEL_MODE_MASK        = 0xc3,
+		SWIVEL_CLKSEL_MASK      = 0x03,
+		SWIVEL_MODE_BIT         = 6,
+		SWIVEL_ENABLE_BIT       = 7,
 
-		SWIVEL_BYTECNT_MASK		= 0xff
+		SWIVEL_BYTECNT_MASK     = 0xff
 	};
 
 	enum : u16
 	{
-		PANEL_VSIZE_MASK		= 0x03ff,
+		PANEL_VSIZE_MASK        = 0x03ff,
 
-		SCREEN1_START_MASK		= 0xffff,
-		SCREEN2_START_MASK		= 0xffff,
+		SCREEN1_START_MASK      = 0xffff,
+		SCREEN2_START_MASK      = 0xffff,
 
-		SCREEN1_VSIZE_MASK		= 0x03ff
+		SCREEN1_VSIZE_MASK      = 0x03ff
 	};
 
 	memory_share_creator<u8> m_vram;

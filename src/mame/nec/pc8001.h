@@ -1,23 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Angelo Salese
+#ifndef MAME_NEC_PC8001_H
+#define MAME_NEC_PC8001_H
 
 #pragma once
 
-#ifndef MAME_INCLUDES_PC8001_H
-#define MAME_INCLUDES_PC8001_H
+#include "pc80s31k.h"
 
+#include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "machine/buffer.h"
-#include "bus/centronics/ctronics.h"
-#include "machine/i8257.h"
-#include "machine/i8255.h"
 #include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/i8257.h"
 #include "machine/ram.h"
 #include "machine/upd1990a.h"
-#include "pc80s31k.h"
 #include "sound/beep.h"
 #include "video/upd3301.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -169,4 +170,4 @@ private:
 	u8 m_n80sr_bank = 0;
 };
 
-#endif
+#endif // MAME_NEC_PC8001_H

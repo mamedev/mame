@@ -5,7 +5,7 @@
  * IBM RT PC.
  *
  * Sources:
- *   - http://bitsavers.org/pdf/ibm/pc/rt/75X0232_RT_PC_Technical_Reference_Volume_1_Jun87.pdf
+ *   - IBM RT PC Hardware Technical Reference Volume I, 75X0232, March 1987
  *   - http://www.cs.cmu.edu/afs/andrew.cmu.edu/usr/shadow/www/ibmrt.html
  *   - http://ps-2.kev009.com/ohlandl/6152/rt_index.html
  *
@@ -68,9 +68,8 @@
   * https://ardent-tool.com/615x/rt_loadable_post.html
   *
   * WIP
-  *  - diagnostic disk 1 fails with alternating code a6/13
-  *      exception at 0x16824: lcs r2,0x4(r9)  # r9=40435c9c
-  *  - aix vrm disk 1 fails with alternating code a6/13
+  *  - boots to vrm install disk menu
+  *  - requires improved hard disk controller emulation
   */
 
 #include "emu.h"
@@ -94,7 +93,6 @@
 #include "bus/isa/isa_cards.h"
 #include "bus/isa/mda.h"
 #include "bus/isa/fdc.h"
-#include "bus/isa/ide.h"
 
 // busses and connectors
 #include "bus/rs232/rs232.h"
@@ -110,7 +108,7 @@
 #define LOG_GENERAL (1U << 0)
 #define LOG_KLS     (1U << 1)
 
-//#define VERBOSE (LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL|LOG_KLS)
 #include "logmacro.h"
 
 #include "debugger.h"
@@ -152,23 +150,24 @@ protected:
 
 	void iocc_mem_map(address_map &map) { map.unmap_value_high(); }
 	template <bool SCC> void iocc_pio_map(address_map &map);
+	void mcu_pgm_map(address_map &map);
 
 	void common(machine_config &config);
 
+	void kls_cmd_w(u16 data);
 	void mcu_port1_w(u8 data);
 	void mcu_port2_w(u8 data);
 	void mcu_port3_w(u8 data);
 	void ppi_portc_w(u8 data);
 
-	void kls_cmd_w(offs_t offset, u16 data, u16 mem_mask);
 	void crra_w(u8 data);
 	void crrb_w(u8 data);
 	void dia_w(u8 data);
 
 	void mcu_timer(timer_device &timer, s32 param)
 	{
-		m_mcu_p3 ^= 0x10;
-		m_mcu->set_input_line(MCS51_T0_LINE, BIT(m_mcu_p3, 4));
+		m_mcu->set_input_line(MCS51_T0_LINE, 1);
+		m_mcu->set_input_line(MCS51_T0_LINE, 0);
 	}
 
 	void speaker()
@@ -195,13 +194,17 @@ protected:
 
 	required_region_ptr<u32> m_ipl;
 
-	u8 m_mcu_p0 = 0;
-	u8 m_mcu_p1 = 0;
-	u8 m_mcu_p2 = 0;
-	u8 m_mcu_p3 = 0;
+	u8 m_kls_cmd;
 
-	u8 m_ppi_pb = 0;
-	u8 m_mcu_uart = 0;
+	u8 m_mcu_p0;
+	u8 m_mcu_p1;
+	u8 m_mcu_p2;
+	u8 m_mcu_p3;
+	u8 m_mcu_uart;
+
+	u8 m_ppi_pa;
+	u8 m_ppi_pb;
+	u8 m_ppi_pc;
 
 	u8 m_ch8er = 0; // dma channel 8 enable register
 	u8 m_crra = 0; // component reset register a
@@ -214,12 +217,17 @@ static double const speaker_levels[4] = { 0.0, 1.0 / 3.0, 2.0 / 3.0, 1.0 };
 
 void rtpc_state::machine_start()
 {
+	m_kls_cmd = 0;
+
 	m_mcu_p0 = 0;
 	m_mcu_p1 = 0;
 	m_mcu_p2 = 0;
 	m_mcu_p3 = 0;
+	m_mcu_uart = 0;
 
+	m_ppi_pa = 0;
 	m_ppi_pb = 0;
+	m_ppi_pc = 0;
 
 	m_crra = 0xff;
 	m_crrb = 0xff;
@@ -250,12 +258,12 @@ template <bool SCC> void rtpc_state::iocc_pio_map(address_map &map)
 	// delay 1µs per byte written
 	map(0x00'80e0, 0x00'80e3).lw8([this](u8 data) { m_cpu->eat_cycles(m_cpu->clock() / 1000000 + 1); }, "io_delay");
 
-	map(0x00'8400, 0x00'8403).mirror(0x7c).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x00'8400, 0x00'8401).mirror(0x78).w(FUNC(rtpc_state::kls_cmd_w));
+	map(0x00'8400, 0x00'8401).w(FUNC(rtpc_state::kls_cmd_w)).flags(rtpc_iocc_device::PIO_W);
+	map(0x00'8404, 0x00'8407).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 
 	map(0x00'8800, 0x00'883f).rw(m_rtc, FUNC(mc146818_device::read_direct), FUNC(mc146818_device::write_direct));
 	map(0x00'8840, 0x00'884f).mirror(0x10).rw(m_dma[0], FUNC(am9517a_device::read), FUNC(am9517a_device::write));
-	map(0x00'8860, 0x00'887f).umask16(0xff00).rw(m_dma[1], FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x00'8860, 0x00'887f).umask16(0x00ff).rw(m_dma[1], FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x00'8880, 0x00'8881).mirror(0x1e).rw(m_pic[0], FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00'88a0, 0x00'88a1).mirror(0x1e).rw(m_pic[1], FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00'88c0, 0x00'88c0).mirror(0x1f).rw(m_iocc, FUNC(rtpc_iocc_device::dbr_r), FUNC(rtpc_iocc_device::dbr_w));
@@ -275,10 +283,12 @@ template <bool SCC> void rtpc_state::iocc_pio_map(address_map &map)
 	// 8c82 diag dma mode?
 	// 8c84 diag dma exit?
 	map(0x00'8ce0, 0x00'8ce1).nopw(); // FIXME: hex display register?
+}
 
-	map(0x01'0000, 0x01'07ff).rw(m_iocc, FUNC(rtpc_iocc_device::tcw_r), FUNC(rtpc_iocc_device::tcw_w));
-	map(0x01'0800, 0x01'0801).mirror(0x7fc).rw(m_iocc, FUNC(rtpc_iocc_device::csr_r<1>), FUNC(rtpc_iocc_device::csr_w));
-	map(0x01'0802, 0x01'0803).mirror(0x7fc).rw(m_iocc, FUNC(rtpc_iocc_device::csr_r<0>), FUNC(rtpc_iocc_device::csr_w));
+void rtpc_state::mcu_pgm_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region("mcu", 0);
+	map(0xf800, 0xffff).lr8([this]() { m_cpu->pulse_input_line(INPUT_LINE_IRQ0, attotime::from_msec(1)); return 0; }, "sys_atn");
 }
 
 void rtpc_state::mcu_port1_w(u8 data)
@@ -286,7 +296,7 @@ void rtpc_state::mcu_port1_w(u8 data)
 	// bit  function
 	//  6   speaker volume 0
 	//  7   speaker volume 1
-	LOGMASKED(LOG_KLS, "mcu_port1_w volume %d\n", data >> 6);
+	LOGMASKED(LOG_KLS, "kls volume %d\n", data >> 6);
 	m_mcu_p1 = (m_mcu_p1 & 0x3f) | (data & 0xc0);
 
 	// speaker volume wraps to ppi port b.6 and b.5
@@ -298,41 +308,57 @@ void rtpc_state::mcu_port1_w(u8 data)
 
 void rtpc_state::mcu_port2_w(u8 data)
 {
-	// bit  dst
-	//  0   ppi port c.0 (iid0)
-	//  1   ppi port c.1 (iid1)
-	//  2   ppi port c.2 (iid2)
-	//  3   i/o channel system reset (active low)
-	//  4   ppi port c.4
-	//  5   (input)
-	//  6   ppi port c.6 (-ack)
-	//  7   speaker frequency
-
-	// interrupts
-	// 0 informational
-	// 1 received byte from keyboard
-	// 2 received byte from uart
-	// 3 returning byte requested by system
-	// 4 block transfer ready
-	// 5 unassigned
-	// 6 self-test performed
-	// 7 error condition
+	// bit  i/o  function
+	//  0    o   ppi port c.0 (iid0)
+	//  1    o   ppi port c.1 (iid1)
+	//  2    o   ppi port c.2 (iid2)
+	//  3    o   i/o channel system reset (active low)
+	//  4    o   ppi port c.4 (-stb)
+	//  5    i   ppi port c.5 (ibf)
+	//  6    o   ppi port c.6 (-ack)
+	//  7    o   speaker frequency
 
 	if ((data ^ m_mcu_p2) & 7)
-		LOGMASKED(LOG_KLS, "mcu_port2_w interrupt %d\n", data & 7);
+	{
+		static const char *const mcu_code[] =
+		{
+			"informational", "received byte from keyboard", "received byte from uart", "returning byte requested by system",
+			"block transfer ready", "unassigned", "self-test performed", "error condition"
+		};
+		LOGMASKED(LOG_KLS, "kls mcu iid %d: %s\n", data & 7, mcu_code[data & 7]);
+	}
 
 	if ((data ^ m_mcu_p2) & 8)
-		LOGMASKED(LOG_KLS, "mcu_port2_w system reset %d\n", data & 8);
+		LOGMASKED(LOG_KLS, "kls mcu system reset %d\n", BIT(data, 3));
 
-	m_ppi->pc4_w(BIT(data, 4));
-	m_ppi->pc6_w(BIT(data, 6));
+	if ((data ^ m_mcu_p2) & 0x10)
+	{
+		if (!BIT(data, 4))
+		{
+			LOGMASKED(LOG_KLS, "kls mcu data out 0x%02x\n", m_mcu_p0);
+			m_ppi_pa = m_mcu_p0;
+		}
+		m_ppi->pc4_w(BIT(data, 4));
+	}
 
-	m_mcu_p2 &= ~0xdf;
-	m_mcu_p2 |= data & 0xdf;
+	if ((data ^ m_mcu_p2) & 0x40)
+	{
+
+		m_ppi->pc6_w(BIT(data, 6));
+		if (!BIT(data, 6))
+		{
+			LOGMASKED(LOG_KLS, "kls mcu data in 0x%02x\n", m_ppi_pa);
+			m_mcu_p0 = m_ppi_pa;
+		}
+	}
+
+	m_mcu_p2 = (m_mcu_p2 & ~0xdf) | (data & 0xdf);
 
 	// speaker frequency wraps to ppi port b.7
-	m_ppi_pb &= ~0x80;
-	m_ppi_pb |= ~data & 0x80;
+	m_ppi_pb = (m_ppi_pb & ~0x80) | (~data & 0x80);
+
+	// iid, ack, stb map to ppi port c
+	m_ppi_pc = (m_ppi_pc & ~0x57) | (data & 0x57);
 
 	speaker();
 }
@@ -342,14 +368,12 @@ void rtpc_state::mcu_port3_w(u8 data)
 	// bit  i/o  function
 	//  0    i   uart rx
 	//  1    o   uart tx
-	//  2    i   kbd clock in
-	//  3    i   obf/int1
-	//  4    i   32 kHz
+	//  2    i   kbd clock in (-int0)
+	//  3    i   ppi -obf (-int1)
+	//  4    i   32 kHz (t0)
 	//  5    i   kbd data in
 	//  6    o   kbd data out
 	//  7    o   kbd clock out
-
-	LOGMASKED(LOG_KLS, "mcu_port3_w 0x%02x\n", data);
 
 	m_kbd_con->data_write_from_mb(BIT(data, 6));
 	m_kbd_con->clock_write_from_mb(BIT(data, 7));
@@ -357,45 +381,85 @@ void rtpc_state::mcu_port3_w(u8 data)
 	m_mcu_p3 = (m_mcu_p3 & ~0xc2) | (data & 0xc2);
 }
 
+/*
+ * bit  i/o  function
+ *  0    i   iid0
+ *  1    i   iid1
+ *  2    i   iid2
+ *  3    o   +irq
+ *  4    i   -stb
+ *  5    o   ibf
+ *  6    i   -ack
+ *  7    o   -obf
+ */
 void rtpc_state::ppi_portc_w(u8 data)
 {
 	LOGMASKED(LOG_KLS, "ppi_portc_w 0x%02x\n", data);
 
-	// bit 3 -> i/o channel (irq)
-	m_pic[0]->ir5_w(BIT(data, 3));
+	// bit 3 (+irq) -> i/o channel
+	if (BIT(m_ppi_pc ^ data, 3))
+	{
+		LOGMASKED(LOG_KLS, "kls host irq %d\n", BIT(data, 3));
+		m_pic[0]->ir5_w(BIT(data, 3));
+	}
 
-	// bit 5 -> mcu p2.5 (ibf)
-	if (BIT(data, 5))
-		m_mcu_p2 |= 0x20;
-	else
-		m_mcu_p2 &= ~0x20;
+	// bit 5 (+ibf) -> mcu p2.5
+	if (BIT(m_ppi_pc ^ data, 5))
+	{
+		if (BIT(data, 5))
+			m_mcu_p2 |= 0x20;
+		else
+			m_mcu_p2 &= ~0x20;
+	}
 
-	// bit 7 -> mcu p3.3(-int1) (-obf)
-	if (BIT(data, 7))
-		m_mcu_p3 |= 0x08;
-	else
-		m_mcu_p3 &= ~0x08;
-	m_mcu->set_input_line(MCS51_INT1_LINE, !BIT(data, 7));
+	// bit 7 (-obf) -> mcu p3.3 (-int1)
+	if (BIT(m_ppi_pc ^ data, 7))
+		m_mcu->set_input_line(MCS51_INT1_LINE, !BIT(data, 7));
+
+	m_ppi_pc = (m_ppi_pc & ~0xa8) | (data & 0xa8);
 }
 
-void rtpc_state::kls_cmd_w(offs_t offset, u16 data, u16 mem_mask)
+void rtpc_state::kls_cmd_w(u16 data)
 {
-	LOGMASKED(LOG_KLS, "kls_cmd_w command 0x%02x data 0x%02x mask 0x%04x\n", u8(data), data >> 8, mem_mask);
+	LOGMASKED(LOG_KLS, "kls command 0x%02x data 0x%02x (%s)\n", data >> 8, u8(data), machine().describe_context());
 
 	// 00cc cccc dddd dddd
-	switch (mem_mask)
+	m_kls_cmd = BIT(data, 8, 6);
+
+	switch (m_kls_cmd & 0x1f)
 	{
-	case 0xff00:
-		m_ppi->write(0, data);
+	case 0x0: // extended command
+		switch (u8(data))
+		{
+		case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
+		case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
+			LOGMASKED(LOG_KLS, "clr mode bit %d\n", data & 0xf); break;
+		case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
+		case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
+			LOGMASKED(LOG_KLS, "set mode bit %d\n", data & 0xf); break;
+		default: LOGMASKED(LOG_KLS, "extended command 0x%02x\n", data); break;
+		}
 		break;
-	case 0x00ff:
-		m_ppi->write(1, data);
+	case 0x1: LOGMASKED(LOG_KLS, "write keyboard 0x%02x\n", data); break;
+	case 0x2: LOGMASKED(LOG_KLS, "write speaker 0x%02x\n", data); break;
+	case 0x3: LOGMASKED(LOG_KLS, "write uart control 0x%02x\n", data); break;
+	case 0x4: LOGMASKED(LOG_KLS, "write uart query 0x%02x\n", data); break;
+	case 0x5: LOGMASKED(LOG_KLS, "set uart rate 0x%02x\n", data); break;
+	case 0x6: LOGMASKED(LOG_KLS, "init uart 0x%02x\n", data); break;
+	case 0x7: LOGMASKED(LOG_KLS, "set speaker duration 0x%02x\n", data); break;
+	case 0x8: LOGMASKED(LOG_KLS, "set speaker freq-hi 0x%02x\n", data); break;
+	case 0x9: LOGMASKED(LOG_KLS, "set speaker freq-lo 0x%02x\n", data); break;
+	case 0xc: LOGMASKED(LOG_KLS, "diagnostic write 0x%02x\n", data); break;
+	case 0xa: case 0xb: case 0xd: case 0xe: case 0xf:
+		LOGMASKED(LOG_KLS, "unassigned\n");
 		break;
-	case 0xffff:
-		m_mcu_p1 = (m_mcu_p1 & ~0x3f) | (data & 0x3f);
-		m_ppi->write(0, data >> 8);
+	default:
+		LOGMASKED(LOG_KLS, "write shared ram addr 0x%x data 0x%02x\n", m_kls_cmd & 0xf, data);
 		break;
 	}
+
+	m_mcu_p1 = (m_mcu_p1 & 0xe0) | (m_kls_cmd & 0x1f);
+	m_ppi->write(0, data);
 }
 
 void rtpc_state::crra_w(u8 data)
@@ -417,7 +481,7 @@ void rtpc_state::crra_w(u8 data)
 
 void rtpc_state::crrb_w(u8 data)
 {
-	LOG("crrb_w 0x%02x\n", data);
+	LOG("crrb_w 0x%02x (%s)\n", data, machine().describe_context());
 
 	// bit  function
 	//  0   8530
@@ -431,8 +495,11 @@ void rtpc_state::crrb_w(u8 data)
 
 	if (m_scc && BIT(data, 0))
 		m_scc->reset();
+
 	// TODO: rs232 if
+
 	m_mcu->set_input_line(INPUT_LINE_RESET, !BIT(data, 2));
+
 	// TODO: dmac !ready
 	// TODO: arbitor
 
@@ -466,6 +533,17 @@ void rtpc_state::dia_w(u8 data)
 
 void rtpc_state::common(machine_config &config)
 {
+	/*
+	 * irq  source
+	 *  0   mcu system attention
+	 *  1   rtc interrupt
+	 *  2   mmu program check, iocc error
+	 *  3   pic 0 interrupt
+	 *  4   pic 1 interrupt
+	 *  5   (not connected, software interrupt?)
+	 *  6   (not connected, software interrupt?)
+	 * nmi  mmu machine check, early power off
+	 */
 	ROMP(config, m_cpu, 23'529'400 / 4);
 	m_cpu->set_mmu(m_mmu);
 	m_cpu->set_iou(m_iocc);
@@ -491,27 +569,27 @@ void rtpc_state::common(machine_config &config)
 	// (c)IBM 1986
 	// (c)INTEL '80
 	I8051(config, m_mcu, 9.216_MHz_XTAL);
-	m_mcu->port_in_cb<0>().set([this]() { return m_ppi->pa_r(); });
+	m_mcu->set_addrmap(AS_PROGRAM, &rtpc_state::mcu_pgm_map);
+	m_mcu->port_in_cb<0>().set([this]() { return m_mcu_p0; });
 	m_mcu->port_out_cb<0>().set([this](u8 data) { m_mcu_p0 = data; });
-	m_mcu->port_in_cb<1>().set([this]() { return m_mcu_p1 & 0x1f; });
+	m_mcu->port_in_cb<1>().set([this]() { return m_mcu_p1 | 0xc0; });
 	m_mcu->port_out_cb<1>().set(FUNC(rtpc_state::mcu_port1_w));
-	m_mcu->port_in_cb<2>().set([this]() { return m_mcu_p2; });
+	m_mcu->port_in_cb<2>().set([this]() { return m_mcu_p2 | 0xdf; });
 	m_mcu->port_out_cb<2>().set(FUNC(rtpc_state::mcu_port2_w));
+	m_mcu->port_in_cb<3>().set([this]() { return m_mcu_p3 | 0xce; });
 	m_mcu->port_out_cb<3>().set(FUNC(rtpc_state::mcu_port3_w));
-	m_mcu->port_in_cb<3>().set([this]() { return m_mcu_p3 & 0x3d; });
 	m_mcu->serial_tx_cb().set(
 		[this](u8 data)
 		{
-			if (BIT(m_mcu_p1, 5))
+			if (BIT(m_kls_cmd, 5))
 			{
 				m_mcu_uart = data;
 				m_mcu->set_input_line(MCS51_RX_LINE, 1);
 			}
 			else
-				logerror("uart tx 0x%02x\n", data);
+				LOGMASKED(LOG_KLS, "kls uart tx 0x%02x\n", data);
 		});
 	m_mcu->serial_rx_cb().set([this]() { return m_mcu_uart; });
-	//m_mcu->out_?().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 
 	TIMER(config, "mcu_timer").configure_periodic(FUNC(rtpc_state::mcu_timer), attotime::from_hz(32768));
 
@@ -637,28 +715,21 @@ void rtpc_state::common(machine_config &config)
 	// port C lower: input
 	// port C upper: 8051 handshake
 	// port C & 0x20 -> irq
-	m_ppi->in_pa_callback().set([this]() { return m_mcu_p0; });
+	m_ppi->out_pa_callback().set([this](u8 data) { m_ppi_pa = data; });
+	m_ppi->in_pa_callback().set([this]() { return m_ppi_pa; });
 
 	// TODO: bits 4-1 "non-adapter system board signals"
 	// TODO: bit 0 "uart rxd signal"
 	m_ppi->in_pb_callback().set([this]() { return m_ppi_pb; });
 
 	m_ppi->out_pc_callback().set(FUNC(rtpc_state::ppi_portc_w));
-	m_ppi->in_pc_callback().set([this]() { return m_mcu_p2 & 0x57; });
+	m_ppi->in_pc_callback().set([this]() { return m_ppi_pc; });
 
 	RTPC_KBD_CON(config, m_kbd_con);
 	m_kbd_con->option_add("kbd", RTPC_KBD);
 	m_kbd_con->set_default_option("kbd");
 	m_kbd_con->out_data_cb().set([this](int state) { if (state) m_mcu_p3 |= 0x20; else m_mcu_p3 &= ~0x20; });
-	m_kbd_con->out_clock_cb().set(
-		[this](int state)
-		{
-			if (state)
-				m_mcu_p3 |= 0x04;
-			else
-				m_mcu_p3 &= ~0x04;
-			m_mcu->set_input_line(MCS51_INT0_LINE, !state);
-		});
+	m_kbd_con->out_clock_cb().set_inputline(m_mcu, MCS51_INT0_LINE).invert();
 
 	// MC146818AP
 	// IL 0A46D8729
@@ -693,7 +764,6 @@ void rtpc_isa8_cards(device_slot_interface &device)
 void rtpc_isa16_cards(device_slot_interface &device)
 {
 	// FIXME: need 16-bit combined hdc/fdc card
-	device.option_add("hdc", ISA16_IDE);
 	device.option_add("fdc", ISA8_FDC_AT);
 }
 

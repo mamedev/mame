@@ -1013,9 +1013,9 @@ void render_target::set_bounds(s32 width, s32 height, float pixel_aspect)
 	m_width = width;
 	m_height = height;
 	m_bounds.x0 = m_bounds.y0 = 0;
-	m_bounds.x1 = (float)width;
-	m_bounds.y1 = (float)height;
-	m_pixel_aspect = pixel_aspect != 0.0? pixel_aspect : 1.0;
+	m_bounds.x1 = float(width);
+	m_bounds.y1 = float(height);
+	m_pixel_aspect = pixel_aspect != 0.0F ? pixel_aspect : 1.0F;
 }
 
 

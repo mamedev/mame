@@ -111,6 +111,8 @@ Port B, bit 1
 #include "speaker.h"
 
 
+namespace {
+
 class pensebem2017_state : public driver_device
 {
 public:
@@ -312,6 +314,9 @@ ROM_START( pbem2017 )
 	ROM_REGION(0x42e1a, "screen", 0)
 	ROM_LOAD("pensebem.svg", 0, 0x42e1a, CRC(7146c0db) SHA1(966e95742acdda05028ee7b0c1352c88abb35041))
 ROM_END
+
+} // anonymous namespace
+
 
 /*   YEAR  NAME    PARENT    COMPAT    MACHINE        INPUT         STATE                INIT         COMPANY    FULLNAME */
 COMP(2017, pbem2017,    0,        0,   pensebem2017,  pensebem2017, pensebem2017_state,  empty_init,  "TecToy",  "Pense Bem (2017)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

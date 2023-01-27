@@ -375,9 +375,8 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(seicross_state::vblank_irq)
 {
-	if(m_irq_mask)
+	if (m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
-
 }
 
 

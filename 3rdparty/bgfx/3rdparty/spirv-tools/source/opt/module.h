@@ -36,7 +36,7 @@ struct ModuleHeader {
   uint32_t version;
   uint32_t generator;
   uint32_t bound;
-  uint32_t reserved;
+  uint32_t schema;
 };
 
 // A SPIR-V module. It contains all the information for a SPIR-V module and
@@ -61,7 +61,7 @@ class Module {
   }
 
   // Returns the Id bound.
-  uint32_t IdBound() { return header_.bound; }
+  uint32_t IdBound() const { return header_.bound; }
 
   // Returns the current Id bound and increases it to the next available value.
   // If the id bound has already reached its maximum value, then 0 is returned.
@@ -82,6 +82,9 @@ class Module {
 
   // Set the memory model for this module.
   inline void SetMemoryModel(std::unique_ptr<Instruction> m);
+
+  // Set the sampled image addressing mode for this module.
+  inline void SetSampledImageAddressMode(std::unique_ptr<Instruction> m);
 
   // Appends an entry point instruction to this module.
   inline void AddEntryPoint(std::unique_ptr<Instruction> e);
@@ -141,6 +144,8 @@ class Module {
   inline uint32_t id_bound() const { return header_.bound; }
 
   inline uint32_t version() const { return header_.version; }
+  inline uint32_t generator() const { return header_.generator; }
+  inline uint32_t schema() const { return header_.schema; }
 
   inline void set_version(uint32_t v) { header_.version = v; }
 
@@ -156,10 +161,18 @@ class Module {
   inline IteratorRange<inst_iterator> ext_inst_imports();
   inline IteratorRange<const_inst_iterator> ext_inst_imports() const;
 
-  // Return the memory model instruction contained inthis module.
+  // Return the memory model instruction contained in this module.
   inline Instruction* GetMemoryModel() { return memory_model_.get(); }
   inline const Instruction* GetMemoryModel() const {
     return memory_model_.get();
+  }
+
+  // Return the sampled image address mode instruction contained in this module.
+  inline Instruction* GetSampledImageAddressMode() {
+    return sampled_image_address_mode_.get();
+  }
+  inline const Instruction* GetSampledImageAddressMode() const {
+    return sampled_image_address_mode_.get();
   }
 
   // There are several kinds of debug instructions, according to where they can
@@ -286,6 +299,8 @@ class Module {
   InstructionList ext_inst_imports_;
   // A module only has one memory model instruction.
   std::unique_ptr<Instruction> memory_model_;
+  // A module can only have one optional sampled image addressing mode
+  std::unique_ptr<Instruction> sampled_image_address_mode_;
   InstructionList entry_points_;
   InstructionList execution_modes_;
   InstructionList debugs1_;
@@ -322,6 +337,10 @@ inline void Module::AddExtInstImport(std::unique_ptr<Instruction> e) {
 
 inline void Module::SetMemoryModel(std::unique_ptr<Instruction> m) {
   memory_model_ = std::move(m);
+}
+
+inline void Module::SetSampledImageAddressMode(std::unique_ptr<Instruction> m) {
+  sampled_image_address_mode_ = std::move(m);
 }
 
 inline void Module::AddEntryPoint(std::unique_ptr<Instruction> e) {

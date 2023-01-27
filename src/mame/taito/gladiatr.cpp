@@ -170,7 +170,11 @@ Notes:
 - gladiatr and clones start with one credit due to the way MAME initialises
   memory and the dodgy code the bootleg MCUs use to synchronise with the host
   CPUs.  On an F3 reset they randomly start with one credit or no credits.
-- gladiatr and clones don't show player inputs in service mode.
+  More specifically, the 1st opcode in cctl and ccpu is nonsense. Whether it's
+  a bad dump or done on purpose by the bootleggers is unknown. The JNT0 test
+  makes no sense, and if the jump would have succeeded, the jump target is
+  in the middle of another opcode. It makes more sense if the 1st byte was
+  0x22 instead of 0x26 and that would fix the coin issue.
 
 TODO:
 -----
@@ -1385,7 +1389,6 @@ void gladiatr_state::init_gladiatr()
 	// sort data
 	std::swap_ranges(rom + 0x14000, rom + 0x18000, rom + 0x18000);
 
-
 	rom = memregion("gfx3")->base();
 	// unpack 3bpp graphics
 	for (int j = 5; j >= 0; j--)
@@ -1461,5 +1464,5 @@ void ppking_state::init_ppking()
 GAME( 1985, ppking,   0,        ppking,   ppking,   ppking_state,   init_ppking,   ROT90, "Taito America Corporation",           "Ping-Pong King",                                MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN )
 GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation",         "Ougon no Shiro (Japan)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, greatgur, gladiatr, greatgur, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation",         "Great Gurianos (Japan?)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, greatgur, gladiatr, greatgur, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation",         "Great Gurianos (bootleg?)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gcastle,  gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation",         "Golden Castle (prototype?)",                    MACHINE_SUPPORTS_SAVE ) // incomplete dump

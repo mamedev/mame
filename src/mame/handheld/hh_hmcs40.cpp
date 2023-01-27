@@ -81,7 +81,7 @@ known chips:
   C57     HD44801  1985, Alpha 8505 protection MCU (see 8201)
   C89     HD44801  1985, CXG Portachess (1985 version) -> cxg/scptchess.cpp
 
- *A86     HD44820  1983, Chess King Pocket Micro
+ *A86     HD44820  1983, Chess King Pocket Micro / Mighty Midget
  *B63     HD44820  1985, CXG Pocket Chess (12 buttons)
 
  *A13     HD44840  1982, CXG Computachess II
@@ -107,15 +107,15 @@ ROM source notes when dumped from another title, but confident it's the same:
 - zackman: Tandy Zackman
 
 TODO:
-- cgalaxn discrete sound (alien attacking sound effect)
+- cgalaxn netlist sound for alien attack sweep sound (MAME doesn't support N13T1?)
 - epacman2 booting the game in demo mode, pacman should take the shortest route
   to the upper-left power pill, followed by going to the top-right power pill:
   mcu cycle/interrupt timing related
 - kevtris's HMCS40 ROM dumps are incomplete, missing MCU factory test code from
   the 2nd half of the ROM, none of the games access it though and it's impossible
   to execute unless the chip is in testmode.
-- Though very uncommon when compared to games with LED/lamp display, some
-  games may manipulate VFD plate brightness by strobing it longer/shorter,
+- Though very uncommon when compared to games with LED/lamp display, some games
+  may deliberately change VFD plate brightness by strobing it longer/shorter,
   eg. cgalaxn when a ship explodes.
 - bzaxxon 3D effect is difficult to simulate
 - improve/redo SVG for: bzaxxon, bbtime
@@ -147,6 +147,8 @@ TODO:
 
 #include "hh_hmcs40_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
+
+namespace {
 
 class hh_hmcs40_state : public driver_device
 {
@@ -260,8 +262,6 @@ INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
-
-namespace {
 
 /***************************************************************************
 

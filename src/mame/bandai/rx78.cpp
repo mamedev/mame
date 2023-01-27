@@ -76,6 +76,9 @@ BTANB:
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class rx78_state : public driver_device
 {
 public:
@@ -569,6 +572,9 @@ void rx78_state::init_rx78()
 	if (ram_size == 0x4000)
 		prg.unmap_readwrite(0x6000, 0xafff);
 }
+
+} // anonymous namespace
+
 
 /* Driver */
 

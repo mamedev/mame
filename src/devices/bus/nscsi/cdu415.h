@@ -8,7 +8,7 @@
 
 #include "machine/nscsi_bus.h"
 #include "cpu/h8/h83032.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 
 class cdu415_device : public device_t, public nscsi_slot_card_interface
 {

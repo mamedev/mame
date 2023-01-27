@@ -307,16 +307,21 @@ bool configuration_manager::save_xml(emu_file &file, config_type which_type)
 	systemnode->set_attribute("name", (which_type == config_type::DEFAULT) ? "default" : machine().system().name);
 
 	// loop over all registrants and call their save function
+	util::xml::data_node *curnode = nullptr;
 	for (auto const &type : m_typelist)
 	{
-		util::xml::data_node *const curnode = systemnode->add_child(type.first.c_str(), nullptr);
+		if (!curnode || (type.first != curnode->get_name()))
+			curnode = systemnode->add_child(type.first.c_str(), nullptr);
 		if (!curnode)
 			return false;
 		type.second.save(which_type, curnode);
 
 		// if nothing was added, just nuke the node
 		if (!curnode->get_value() && !curnode->get_first_child() && !curnode->count_attributes())
+		{
 			curnode->delete_node();
+			curnode = nullptr;
+		}
 	}
 
 	// restore unhandled settings

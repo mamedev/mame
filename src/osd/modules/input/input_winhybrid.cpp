@@ -22,6 +22,8 @@
 #include <wbemcli.h>
 
 
+namespace osd {
+
 namespace {
 
 using namespace Microsoft::WRL;
@@ -226,8 +228,6 @@ protected:
 		if (result != DI_OK)
 			fatalerror("DirectInput: Unable to enumerate game controllers (result=%08X)\n", uint32_t(result));
 
-		xinput_joystick_device *devinfo;
-
 		// now add all xinput devices
 		if (!m_xinput_detect_failed)
 		{
@@ -236,16 +236,9 @@ protected:
 			{
 				XINPUT_STATE state = { 0 };
 
+				// allocate and link in a new device
 				if (m_xinput_helper->xinput_get_state(i, &state) == ERROR_SUCCESS)
-				{
-					// allocate and link in a new device
-					devinfo = m_xinput_helper->create_xinput_device(machine, i, *this);
-					if (!devinfo)
-						continue;
-
-					// Configure each gamepad to add buttons and Axes, etc.
-					devinfo->configure();
-				}
+					m_xinput_helper->create_xinput_device(machine, i, *this);
 			}
 		}
 	}
@@ -429,12 +422,14 @@ private:
 
 } // anonymous namespace
 
+} // namespace osd
+
 #else // defined(OSD_WINDOWS)
 
 #include "input_module.h"
 
-MODULE_NOT_SUPPORTED(winhybrid_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "winhybrid")
+namespace osd { MODULE_NOT_SUPPORTED(winhybrid_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "winhybrid") }
 
 #endif // defined(OSD_WINDOWS)
 
-MODULE_DEFINITION(JOYSTICKINPUT_WINHYBRID, winhybrid_joystick_module)
+MODULE_DEFINITION(JOYSTICKINPUT_WINHYBRID, osd::winhybrid_joystick_module)

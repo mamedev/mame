@@ -66,6 +66,7 @@
 #define CLICOMMAND_LISTBROTHERS         "listbrothers"
 #define CLICOMMAND_LISTCRC              "listcrc"
 #define CLICOMMAND_LISTROMS             "listroms"
+#define CLICOMMAND_LISTBIOS             "listbios"
 #define CLICOMMAND_LISTSAMPLES          "listsamples"
 #define CLICOMMAND_VERIFYROMS           "verifyroms"
 #define CLICOMMAND_VERIFYSAMPLES        "verifysamples"
@@ -111,6 +112,7 @@ const options_entry cli_option_entries[] =
 	{ CLICOMMAND_LISTBROTHERS   ";lb",      "0",       core_options::option_type::COMMAND,    "show \"brothers\", or other drivers from same sourcefile" },
 	{ CLICOMMAND_LISTCRC,                   "0",       core_options::option_type::COMMAND,    "CRC-32s" },
 	{ CLICOMMAND_LISTROMS       ";lr",      "0",       core_options::option_type::COMMAND,    "list required ROMs for a driver" },
+	{ CLICOMMAND_LISTBIOS,                  "0",       core_options::option_type::COMMAND,    "list alternate BIOSes for a driver" },
 	{ CLICOMMAND_LISTSAMPLES,               "0",       core_options::option_type::COMMAND,    "list optional samples for a driver" },
 	{ CLICOMMAND_VERIFYROMS,                "0",       core_options::option_type::COMMAND,    "report romsets that have problems" },
 	{ CLICOMMAND_VERIFYSAMPLES,             "0",       core_options::option_type::COMMAND,    "report samplesets that have problems" },
@@ -652,6 +654,48 @@ void cli_frontend::listroms(const std::vector<std::string> &args)
 						// end with a CR
 						osd_printf_info("\n");
 					}
+				}
+			});
+}
+
+
+//-------------------------------------------------
+//  listbios - output the list of BIOSes referenced
+//  by matching systems/devices
+//-------------------------------------------------
+
+void cli_frontend::listbios(const std::vector<std::string> &args)
+{
+	apply_device_action(
+			args,
+			[] (device_t &root, char const *type, bool first)
+			{
+				// space between items
+				if (!first)
+					osd_printf_info("\n");
+
+				// gather BIOS names and descriptions for one device only
+				std::vector<std::pair<std::string, std::string>> bioses;
+				for (const romload::system_bios &bios : romload::system_bioses(root.rom_region()))
+				{
+					int bios_index = bios.get_value() - 1;
+					if (bios_index >= 0)
+					{
+						if (bioses.size() < bios_index)
+							bioses.resize(bios_index);
+						bioses.emplace(bioses.begin() + bios_index, bios.get_name(), bios.get_description());
+					}
+				}
+
+				// print results
+				if (bioses.empty())
+					osd_printf_info("No BIOSes available for %s \"%s\".\n", type, root.shortname());
+				else
+				{
+					osd_printf_info("%d BIOS%s available for %s \"%s\".\n", bioses.size(), bioses.size() != 1 ? "es" : "", type, root.shortname());
+					osd_printf_info("Name:             Description:\n");
+					for (const auto &desc : bioses)
+						osd_printf_info("%-17s \"%s\"\n", desc.first, desc.second);
 				}
 			});
 }
@@ -1644,6 +1688,7 @@ const cli_frontend::info_command_struct *cli_frontend::find_command(const std::s
 		{ CLICOMMAND_LISTDEVICES,       0,  1, &cli_frontend::listdevices,      "[system name]" },
 		{ CLICOMMAND_LISTSLOTS,         0,  1, &cli_frontend::listslots,        "[system name]" },
 		{ CLICOMMAND_LISTROMS,          0, -1, &cli_frontend::listroms,         "[pattern] ..." },
+		{ CLICOMMAND_LISTBIOS,          0, -1, &cli_frontend::listbios,         "[pattern] ..." },
 		{ CLICOMMAND_LISTSAMPLES,       0,  1, &cli_frontend::listsamples,      "[system name]" },
 		{ CLICOMMAND_VERIFYROMS,        0, -1, &cli_frontend::verifyroms,       "[pattern] ..." },
 		{ CLICOMMAND_VERIFYSAMPLES,     0,  1, &cli_frontend::verifysamples,    "[system name|*]" },

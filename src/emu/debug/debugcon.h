@@ -30,10 +30,6 @@ constexpr u32 CMDFLAG_NONE                  = 0x0000;
 constexpr u32 CMDFLAG_KEEP_QUOTES           = 0x0001;
 constexpr u32 CMDFLAG_CUSTOM_HELP           = 0x0002;
 
-// parameter separator macros
-#define CMDPARAM_SEPARATOR                  "\0"
-#define CMDPARAM_TERMINATOR                 "\0\0"
-
 
 
 /***************************************************************************

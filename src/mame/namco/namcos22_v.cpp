@@ -2403,7 +2403,7 @@ void namcos22_state::update_mixer()
 	if (m_is_ss22)
 	{
 		/*
-				0 1 2 3  4 5 6 7  8 9 a b  c d e f 10       14       18       1c
+		        0 1 2 3  4 5 6 7  8 9 a b  c d e f 10       14       18       1c
 		00824000: ffffff00 00000000 0000007f 00ff006f fe00eded 0f700000 0000037f 00010007 // alpine surfer
 		00824000: ffffff00 00000000 0000007f 00ff0000 1000ff00 0f000000 00ff007f 00010007 // time crisis
 		00824000: ffffff00 00000000 1830407f 00800000 0000007f 0f000000 0000037f 00010007 // trans sprite
@@ -2411,28 +2411,28 @@ void namcos22_state::update_mixer()
 		00824000: ffffff00 00000000 1800187f 00800000 0080007f 0f000000 0000037f 00010007 // trans poly(2)
 		00824000: ffffff00 00000000 1800187f 00000000 0000007f 0f800000 0000037f 00010007 // trans text
 
-			00,01,02        polygon fade rgb
-			03
-			04
-			05,06,07        world fog rgb
-			08,09,0a        background color
-			0b
-			0c
-			0d,0e           spot factor
-			0f              polygon alpha color mask
-			10              polygon alpha pen mask
-			11              global polygon alpha factor
-			12,13           textlayer alpha pen comparison
-			14              textlayer alpha pen mask?
-			15              textlayer alpha factor
-			16,17,18        global fade rgb
-			19              global fade factor
-			1a              fade target flags
-			1b              textlayer palette base
-			1c
-			1d
-			1e
-			1f              layer enable
+		    00,01,02        polygon fade rgb
+		    03
+		    04
+		    05,06,07        world fog rgb
+		    08,09,0a        background color
+		    0b
+		    0c
+		    0d,0e           spot factor
+		    0f              polygon alpha color mask
+		    10              polygon alpha pen mask
+		    11              global polygon alpha factor
+		    12,13           textlayer alpha pen comparison
+		    14              textlayer alpha pen mask?
+		    15              textlayer alpha factor
+		    16,17,18        global fade rgb
+		    19              global fade factor
+		    1a              fade target flags
+		    1b              textlayer palette base
+		    1c
+		    1d
+		    1e
+		    1f              layer enable
 		*/
 		m_poly_fade_r        = nthbyte(m_mixer, 0x00);
 		m_poly_fade_g        = nthbyte(m_mixer, 0x01);
@@ -2464,24 +2464,24 @@ void namcos22_state::update_mixer()
 		90020180: ff713700 00000000 00000000 00000000
 		90020200: ff100000 00000000 00000000 00000000
 
-			00,01           display flags
-			02
-			03
-			04              bgcolor palette base?
-			05
-			06
-			07              textlayer palette base?
-			08,09,0a        textlayer pen c shadow rgb
-			0b,0c,0d        textlayer pen d shadow rgb
-			0e,0f,10        textlayer pen e shadow rgb
-			11,12           global fade factor red
-			13,14           global fade factor green
-			15,16           global fade factor blue
-			80-87           fog color mask?
-			100,180,200     fog rgb 0
-			101,181,201     fog rgb 1
-			102,182,202     fog rgb 2
-			103,183,203     fog rgb 3
+		    00,01           display flags
+		    02
+		    03
+		    04              bgcolor palette base?
+		    05
+		    06
+		    07              textlayer palette base?
+		    08,09,0a        textlayer pen c shadow rgb
+		    0b,0c,0d        textlayer pen d shadow rgb
+		    0e,0f,10        textlayer pen e shadow rgb
+		    11,12           global fade factor red
+		    13,14           global fade factor green
+		    15,16           global fade factor blue
+		    80-87           fog color mask?
+		    100,180,200     fog rgb 0
+		    101,181,201     fog rgb 1
+		    102,182,202     fog rgb 2
+		    103,183,203     fog rgb 3
 		*/
 		m_mixer_flags         = nthbyte(m_mixer, 0x00) << 8 | nthbyte(m_mixer, 0x01);
 		m_bg_palbase          = nthbyte(m_mixer, 0x04) << 8 & 0x7f00;

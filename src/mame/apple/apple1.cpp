@@ -84,6 +84,9 @@
 #include "screen.h"
 #include "softlist_dev.h"
 
+
+namespace {
+
 #define A1_CPU_TAG  "maincpu"
 #define A1_PIA_TAG  "pia6821"
 #define A1_BUS_TAG  "a1bus"
@@ -623,6 +626,9 @@ ROM_START(apple1)
 	ROM_REGION(0x0200, "gfx1",0)
 	ROM_LOAD("s2513.d2", 0x0000, 0x0200, CRC(a7e567fc) SHA1(b18aae0a2d4f92f5a7e22640719bbc4652f3f4ee)) // apple1.vid
 ROM_END
+
+} // anonymous namespace
+
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY           FULLNAME */
 COMP( 1976, apple1, 0,      0,      apple1,  apple1, apple1_state, empty_init, "Apple Computer", "Apple I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

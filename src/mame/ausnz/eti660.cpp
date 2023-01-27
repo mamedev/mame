@@ -47,6 +47,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define CDP1802_TAG     "ic3"
 #define CDP1864_TAG     "ic4"
 #define MC6821_TAG      "ic5"
@@ -406,6 +409,9 @@ ROM_START( eti660 )
 	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
 	ROM_LOAD( "eti660.bin", 0x0000, 0x0400, CRC(811dfa62) SHA1(c0c4951e02f873f15560bdc3f35cdf3f99653922) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                            FULLNAME   FLAGS
 COMP( 1981, eti660, 0,      0,      eti660,  eti660, eti660_state, empty_init, "Electronics Today International", "ETI-660 Learners' Microcomputer", MACHINE_SUPPORTS_SAVE )

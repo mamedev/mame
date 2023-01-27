@@ -34,6 +34,8 @@ always false - counter was reloaded and incremented before interrupt occurs
 #include "speaker.h"
 
 
+namespace {
+
 class tugboat_state : public driver_device
 {
 public:
@@ -436,6 +438,8 @@ ROM_START( berenstn )
 	ROM_REGION( 0x0100, "proms", 0 ) /* Same as Tugboat but is this actually correct? */
 	ROM_LOAD( "n.t.2-031j.24s10", 0x0000, 0x0100, CRC(236672bf) SHA1(57482d0a23223ef7b211045ad28d3e41e90f961e) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1982, tugboat,  0, tugboat, tugboat,  tugboat_state, empty_init, ROT90, "Enter-Tech, Ltd.", "Tugboat",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

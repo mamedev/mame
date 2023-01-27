@@ -52,11 +52,10 @@ private:
 
 	void intswt_w(u8 data);
 	void mapnum_w(u8 data);
-	void fdcint_w(int state);
 	void drive_w(offs_t offset, u8 data);
 	void fdcclr_w(u8 data);
 	void netclr_w(u8 data);
-	void fdcattn_w(u8 data);
+	void fdcatn_w(u8 data);
 	u8 fdcstatus_r();
 	u8 drvstatus_r();
 

@@ -145,6 +145,9 @@ THE OFF POSIION UNLESS THE COINAGES
 #include "video/tms9928a.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define SCREEN_TAG      "screen"
 #define M6809_TAG       "u3"
 #define TMS9118_TAG     "u11"
@@ -544,6 +547,9 @@ ROM_START( arac6spa )
 	ROM_REGION( 0x8000, M6809_TAG, 0 )
 	ROM_LOAD( "1.u15", 0x0000, 0x8000, CRC(397e890e) SHA1(5b532b046f36dcfbd7118bd5a0fab3436b0b8dc1) )
 ROM_END
+
+} // anonymous namespace
+
 
 /***************************************************************************
     SYSTEM DRIVERS

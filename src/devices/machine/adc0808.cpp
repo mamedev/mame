@@ -140,7 +140,7 @@ TIMER_CALLBACK_MEMBER(adc0808_device::update_state)
 				logerror("Conversion finished, result %02x\n", m_sar);
 
 			if (m_sar != start_sar)
-				logerror("Conversion finished, should fail - starting value %02x, ending value %02x", start_sar, m_sar);
+				logerror("Conversion finished, should fail - starting value %02x, ending value %02x\n", start_sar, m_sar);
 
 			// eoc is delayed by one cycle
 			m_cycle_timer->adjust(attotime::never);

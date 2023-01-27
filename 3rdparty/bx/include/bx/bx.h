@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #ifndef BX_H_HEADER_GUARD
@@ -14,10 +14,17 @@
 
 #include "platform.h"
 #include "config.h"
+#include "constants.h"
 #include "macros.h"
+#include "debug.h"
+#include "typetraits.h"
 
 ///
 #define BX_COUNTOF(_x) sizeof(bx::CountOfRequireArrayArgumentT(_x) )
+
+///
+#define BX_OFFSETOF(_type, _member) \
+	(reinterpret_cast<ptrdiff_t>(&(reinterpret_cast<_type*>(16)->_member) )-ptrdiff_t(16) )
 
 ///
 #if BX_COMPILER_MSVC
@@ -31,16 +38,37 @@
 
 namespace bx
 {
-	constexpr int32_t kExitSuccess = 0;
-	constexpr int32_t kExitFailure = 1;
-
-	///
-	template<class Ty>
-	constexpr bool isTriviallyCopyable();
+	/// Arithmetic type `Ty` limits.
+	template<typename Ty, bool SignT = isSigned<Ty>()>
+	struct LimitsT;
 
 	/// Find the address of an object of a class that has an overloaded unary ampersand (&) operator.
-	template <class Ty>
+	template<typename Ty>
 	Ty* addressOf(Ty& _a);
+
+	/// Find the address of an object of a class that has an overloaded unary ampersand (&) operator.
+	template<typename Ty>
+	const Ty* addressOf(const Ty& _a);
+
+	/// Returns typed pointer from typeless pointer offseted.
+	///
+	/// @param[in] _ptr Pointer to get offset from.
+	/// @param[in] _offsetInBytes Offset from pointer in bytes.
+	///
+	/// @returns Typed pointer from typeless pointer offseted.
+	///
+	template<typename Ty>
+	Ty* addressOf(void* _ptr, ptrdiff_t _offsetInBytes = 0);
+
+	/// Returns typed pointer from typeless pointer offseted.
+	///
+	/// @param[in] _ptr Pointer to get offset from.
+	/// @param[in] _offsetInBytes Offset from pointer in bytes.
+	///
+	/// @returns Typed pointer from typeless pointer offseted.
+	///
+	template<typename Ty>
+	const Ty* addressOf(const void* _ptr, ptrdiff_t _offsetInBytes = 0);
 
 	/// Swap two values.
 	template<typename Ty>
@@ -49,31 +77,39 @@ namespace bx
 	/// Swap memory.
 	void swap(void* _a, void* _b, size_t _numBytes);
 
+	/// Returns numeric minimum of type.
+	template<typename Ty>
+	constexpr Ty min();
+
+	/// Returns numeric maximum of type.
+	template<typename Ty>
+	constexpr Ty max();
+
 	/// Returns minimum of two values.
 	template<typename Ty>
-	constexpr Ty min(const Ty& _a, const Ty& _b);
+	constexpr Ty min(const Ty& _a, const TypeIdentityType<Ty>& _b);
 
 	/// Returns maximum of two values.
 	template<typename Ty>
-	constexpr Ty max(const Ty& _a, const Ty& _b);
+	constexpr Ty max(const Ty& _a, const TypeIdentityType<Ty>& _b);
 
-	/// Returns minimum of three values.
-	template<typename Ty>
-	constexpr Ty min(const Ty& _a, const Ty& _b, const Ty& _c);
+	/// Returns minimum of three or more values.
+	template<typename Ty, typename... Args>
+	constexpr Ty min(const Ty& _a, const TypeIdentityType<Ty>& _b, const Args&... _args);
 
-	/// Returns maximum of three values.
-	template<typename Ty>
-	constexpr Ty max(const Ty& _a, const Ty& _b, const Ty& _c);
+	/// Returns maximum of three or more values.
+	template<typename Ty, typename... Args>
+	constexpr Ty max(const Ty& _a, const TypeIdentityType<Ty>& _b, const Args&... _args);
 
-	/// Returns middle of three values.
-	template<typename Ty>
-	constexpr Ty mid(const Ty& _a, const Ty& _b, const Ty& _c);
+	/// Returns middle of three or more values.
+	template<typename Ty, typename... Args>
+	constexpr Ty mid(const Ty& _a, const TypeIdentityType<Ty>& _b, const Args&... _args);
 
 	/// Returns clamped value between min/max.
 	template<typename Ty>
-	constexpr Ty clamp(const Ty& _a, const Ty& _min, const Ty& _max);
+	constexpr Ty clamp(const Ty& _a, const TypeIdentityType<Ty>& _min, const TypeIdentityType<Ty>& _max);
 
-	/// Returns true if value is power of 2.
+	/// Returns true if value `_a` is power of 2.
 	template<typename Ty>
 	constexpr bool isPowerOf2(Ty _a);
 
@@ -94,7 +130,7 @@ namespace bx
 	/// @param _src Source pointer.
 	/// @param _srcStride Source stride.
 	/// @param _stride Number of bytes per stride to copy.
-	/// @param _num Number of strides.
+	/// @param _numStrides Number of strides.
 	///
 	/// @remark Source and destination memory blocks must not overlap.
 	///
@@ -104,12 +140,31 @@ namespace bx
 		, const void* _src
 		, uint32_t _srcStride
 		, uint32_t _stride
-		, uint32_t _num
+		, uint32_t _numStrides
 		);
 
+	/// Copy memory block.
+	///
+	/// @param _dst Destination pointer.
+	/// @param _src Source pointer.
+	/// @param _numBytes Number of bytes to copy.
+	///
+	/// @remark If source and destination memory blocks overlap memory will be copied in reverse
+	///   order.
 	///
 	void memMove(void* _dst, const void* _src, size_t _numBytes);
 
+	/// Copy strided memory block.
+	///
+	/// @param _dst Destination pointer.
+	/// @param _dstStride Destination stride.
+	/// @param _src Source pointer.
+	/// @param _srcStride Source stride.
+	/// @param _stride Number of bytes per stride to copy.
+	/// @param _numStrides Number of strides.
+	///
+	/// @remark If source and destination memory blocks overlap memory will be copied in reverse
+	///   order.
 	///
 	void memMove(
 		  void* _dst
@@ -117,34 +172,73 @@ namespace bx
 		, const void* _src
 		, uint32_t _srcStride
 		, uint32_t _stride
-		, uint32_t _num
+		, uint32_t _numStrides
 		);
 
+	/// Fill memory block to specified value `_ch`.
+	///
+	/// @param _dst Destination pointer.
+	/// @param _ch Fill value.
+	/// @param _numBytes Number of bytes to copy.
 	///
 	void memSet(void* _dst, uint8_t _ch, size_t _numBytes);
 
+	/// Fill strided memory block to specified value `_ch`.
 	///
-	void memSet(void* _dst, uint32_t _dstStride, uint8_t _ch, uint32_t _stride, uint32_t _num);
+	/// @param _dst Destination pointer.
+	/// @param _dstStride Destination stride.
+	/// @param _ch Fill value.
+	/// @param _stride Number of bytes per stride to copy.
+	/// @param _numStrides Number of strides.
+	///
+	void memSet(
+		  void* _dst
+		, uint32_t _dstStride
+		, uint8_t _ch
+		, uint32_t _stride
+		, uint32_t _numStrides
+		);
 
+	/// Compare two memory blocks.
+	///
+	/// @param _lhs Pointer to memory block.
+	/// @param _rhs Pointer to memory block.
+	/// @param _numBytes Number of bytes to compare.
+	///
+	/// @returns 0 if two blocks are identical, positive value if first different byte in `_lhs` is
+	///   greater than corresponding byte in `_rhs`.
 	///
 	int32_t memCmp(const void* _lhs, const void* _rhs, size_t _numBytes);
 
+	/// Gather data scattered through memory into linear memory block.
+	///
+	/// @param _dst Destination pointer.
+	/// @param _src Source pointer.
+	/// @param _stride Number of bytes per stride to copy.
+	/// @param _numStrides Number of strides.
 	///
 	void gather(
 		  void* _dst
 		, const void* _src
 		, uint32_t _srcStride
 		, uint32_t _stride
-		, uint32_t _num
+		, uint32_t _numStrides
 		);
 
+	/// Scatter data from linear memory block through memory.
+	///
+	/// @param _dst Destination pointer.
+	/// @param _dstStride Destination stride.
+	/// @param _src Source pointer.
+	/// @param _stride Number of bytes per stride to copy.
+	/// @param _numStrides Number of strides.
 	///
 	void scatter(
 		  void* _dst
 		, uint32_t _dstStride
 		, const void* _src
 		, uint32_t _stride
-		, uint32_t _num
+		, uint32_t _numStrides
 		);
 
 } // namespace bx

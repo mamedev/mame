@@ -487,8 +487,7 @@ int z80dma_device::do_write()
 	m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
 
 	m_byte_counter++;
-	m_count--;
-	done = (m_count == 0xFFFF); //correct?
+	done = (m_count == m_byte_counter);
 
 	if (done)
 	{

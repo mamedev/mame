@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_HP9845_PRINTER_H
-#define MAME_MACHINE_HP9845_PRINTER_H
+#ifndef MAME_HP_HP9845_PRINTER_H
+#define MAME_HP_HP9845_PRINTER_H
 
 #pragma once
 
@@ -123,4 +123,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(HP9845_PRINTER, hp9845_printer_device)
 
-#endif // MAME_MACHINE_HP9845_PRINTER_H
+#endif // MAME_HP_HP9845_PRINTER_H

@@ -634,7 +634,7 @@ void tigeroad_state::tigeroad(machine_config &config)
 
 	// Timings may be different, driver originally had 60.08Hz vblank.
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(6000000, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
+	screen.set_raw(XTAL(24'000'000)/4, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
 	screen.set_screen_update(FUNC(tigeroad_state::screen_update));
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
@@ -672,7 +672,7 @@ void f1dream_state::f1dream(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &f1dream_state::f1dream_map);
 
-	I8751(config, m_mcu, XTAL(10'000'000)); // ???
+	I8751(config, m_mcu, XTAL(10'000'000)); // 8MHz rated chip, 24.0000MHz/3???
 	m_mcu->set_addrmap(AS_IO, &f1dream_state::f1dream_mcu_io);
 	m_mcu->port_out_cb<1>().set("soundlatch", FUNC(generic_latch_8_device::write));
 	m_mcu->port_out_cb<3>().set(FUNC(f1dream_state::out3_w));
@@ -685,7 +685,7 @@ void tigeroad_state::toramich(machine_config &config)
 
 	// basic machine hardware
 
-	z80_device &sample(Z80(config, "sample", 3579545)); // ?
+	z80_device &sample(Z80(config, "sample", XTAL(3'579'545)));
 	sample.set_addrmap(AS_PROGRAM, &tigeroad_state::sample_map);
 	sample.set_addrmap(AS_IO, &tigeroad_state::sample_port_map);
 	sample.set_periodic_int(FUNC(tigeroad_state::irq0_line_hold), attotime::from_hz(4000));  // ?
@@ -696,14 +696,14 @@ void tigeroad_state::toramich(machine_config &config)
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void tigeroad_state::f1dream_comad(machine_config &config)
+void tigeroad_state::f1dream_comad(machine_config &config) // COMAD-01 PCB with 24.0000MHz, 10.0000MHz & 8.0000MHz OSCs
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 8000000);
+	M68000(config, m_maincpu, XTAL(10'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tigeroad_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(tigeroad_state::irq2_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);
+	Z80(config, m_audiocpu, XTAL(8'000'000)/2); // 4MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tigeroad_state::comad_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &tigeroad_state::comad_sound_io_map);
 
@@ -713,7 +713,7 @@ void tigeroad_state::f1dream_comad(machine_config &config)
 	BUFFERED_SPRITERAM16(config, "spriteram");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(6000000, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
+	screen.set_raw(XTAL(24'000'000)/4, 384, 128, 0, 262, 22, 246); // hsync is 50..77, vsync is 257..259
 	screen.set_screen_update(FUNC(tigeroad_state::screen_update));
 	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
@@ -731,11 +731,11 @@ void tigeroad_state::f1dream_comad(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym2203_device &ym1(YM2203(config, "ym1", 2000000));
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(8'000'000)/4)); // 2MHz
 	ym1.irq_handler().set_inputline("audiocpu", 0);
 	ym1.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 2000000));
+	ym2203_device &ym2(YM2203(config, "ym2", XTAL(8'000'000)/4)); // 2MHz
 	ym2.add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
@@ -755,7 +755,7 @@ void pushman_state::pushman(machine_config &config)
 	f1dream_comad(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pushman_state::pushman_map);
 
-	M68705R3(config, m_mcu, 4000000);    // No idea
+	M68705R3(config, m_mcu, XTAL(8'000'000)/2); // 4MHz
 	m_mcu->porta_w().set(FUNC(pushman_state::mcu_pa_w));
 	m_mcu->portb_w().set(FUNC(pushman_state::mcu_pb_w));
 	m_mcu->portc_w().set(FUNC(pushman_state::mcu_pc_w));

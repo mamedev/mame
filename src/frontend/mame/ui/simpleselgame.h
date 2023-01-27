@@ -29,13 +29,14 @@ public:
 	static void force_game_select(mame_ui_manager &mui, render_container &container);
 
 protected:
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 	virtual bool custom_ui_cancel() override { return !m_search.empty(); }
 
 private:
 	enum { VISIBLE_GAMES_IN_LIST = 15 };
 
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	// internal methods

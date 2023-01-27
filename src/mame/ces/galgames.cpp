@@ -719,6 +719,9 @@ WRITE_LINE_MEMBER(galgames_slot_device::eeprom_cs_write)
 	m_carts[m_cart]->eeprom_cs_write(state);
 }
 
+
+namespace {
+
 /***************************************************************************
 
                                  General
@@ -1230,6 +1233,8 @@ ROM_START(galgame4)
 
 	GALGAMES_MB_PALS
 ROM_END
+
+} // anonymous namespace
 
 
 GAME(1998, galgbios, 0,        galgbios, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games BIOS",                  MACHINE_IS_BIOS_ROOT)

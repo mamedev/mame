@@ -41,8 +41,6 @@ private:
 	void mempak_format(uint8_t* pak);
 	image_init_result disk_load(device_image_interface &image);
 	void disk_unload(device_image_interface &image);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(load_n64dd);
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(unload_n64dd);
 	void n64_map(address_map &map);
 	void n64dd_map(address_map &map);
 	void rsp_imem_map(address_map &map);
@@ -402,16 +400,6 @@ MACHINE_START_MEMBER(n64_mess_state,n64dd)
 	}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state::load_n64dd)
-{
-	return disk_load(image);
-}
-
-DEVICE_IMAGE_UNLOAD_MEMBER(n64_mess_state::unload_n64dd)
-{
-	disk_unload(image);
-}
-
 image_init_result n64_mess_state::disk_load(device_image_interface &image)
 {
 	image.fseek(0, SEEK_SET);
@@ -491,8 +479,8 @@ void n64_mess_state::n64dd(machine_config &config)
 	cartslot.set_device_load(FUNC(n64_mess_state::cart_load));
 
 	harddisk_image_device &hdd(HARDDISK(config, "n64disk"));
-	hdd.set_device_load(FUNC(n64_mess_state::load_n64dd));
-	hdd.set_device_unload(FUNC(n64_mess_state::unload_n64dd));
+	hdd.set_device_load(FUNC(n64_mess_state::disk_load));
+	hdd.set_device_unload(FUNC(n64_mess_state::disk_unload));
 	hdd.set_interface("n64dd_disk");
 
 	SOFTWARE_LIST(config, "dd_list").set_original("n64dd");

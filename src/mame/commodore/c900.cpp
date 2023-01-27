@@ -41,6 +41,8 @@ To Do:
 #include "speaker.h"
 
 
+namespace {
+
 class c900_state : public driver_device
 {
 public:
@@ -166,6 +168,9 @@ ROM_START( c900 )
 	ROM_REGION( 0x1000, "chargen", 0 ) // this must be for the c900 terminal as the mainframe has no video output
 	ROM_LOAD( "380217-01.u2", 0x0000, 0x1000, CRC(64cb4171) SHA1(e60d796170addfd27e2c33090f9c512c7e3f99f5) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY      FULLNAME         FLAGS */
 COMP( 1985, c900, 0,      0,      c900,    c900,  c900_state, empty_init, "Commodore", "Commodore 900", MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )

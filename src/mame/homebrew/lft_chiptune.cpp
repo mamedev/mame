@@ -11,6 +11,9 @@
 #include "sound/dac.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define MASTER_CLOCK    8000000
 
 class lft_chiptune_state : public driver_device
@@ -81,6 +84,9 @@ ROM_START( hwchiptn )
 	ROM_REGION( 0x200, "eeprom", 0 )
 	ROM_LOAD( "eeprom.raw", 0x0000, 0x0200, CRC(bd7bc39f) SHA1(9d0ac37bb3ec8c95990fd37a962a17a95ce97aa0) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*   YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT        CLASS               INIT        COMPANY                 FULLNAME */
 CONS(2007, hwchiptn, 0,      0,      chiptune,   empty_input, lft_chiptune_state, empty_init, u8"Linus Åkesson / kryo", "The Hardware Chiptune Project", 0)

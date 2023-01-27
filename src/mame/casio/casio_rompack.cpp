@@ -18,6 +18,8 @@
 #include "softlist_dev.h"
 
 
+namespace {
+
 class casiorom_state : public driver_device
 {
 public:
@@ -56,6 +58,8 @@ void casiorom_state::casiorom(machine_config &config)
 
 ROM_START( casiorom )
 ROM_END
+
+} // anonymous namespace
 
 
 CONS( 198?, casiorom, 0, 0, casiorom,  casiorom, casiorom_state, empty_init, "Casio", "Casio ROM Pack Software List holder", MACHINE_IS_SKELETON )

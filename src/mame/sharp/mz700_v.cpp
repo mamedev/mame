@@ -61,7 +61,7 @@ uint32_t mz_state::screen_update_mz700(screen_device &screen, bitmap_ind16 &bitm
     Not working.
 ***************************************************************************/
 
-uint32_t mz_state::screen_update_mz800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mz800_state::screen_update_mz800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_mz700_mode)
 		return screen_update_mz700(screen, bitmap, cliprect);
@@ -96,7 +96,7 @@ uint32_t mz_state::screen_update_mz800(screen_device &screen, bitmap_ind16 &bitm
     CGRAM
 ***************************************************************************/
 
-void mz_state::mz800_cgram_w(offs_t offset, uint8_t data)
+void mz800_state::mz800_cgram_w(offs_t offset, uint8_t data)
 {
 	m_cgram[offset] = data;
 }

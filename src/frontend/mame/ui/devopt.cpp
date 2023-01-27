@@ -46,7 +46,7 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 	if (!layout || (layout->width() != width))
 	{
 		rgb_t const color = ui().colors().text_color();
-		layout.emplace(ui().create_layout(container(), width));
+		layout.emplace(create_layout(width));
 
 		machine_config &mconfig(const_cast<machine_config &>(machine().config()));
 		machine_config::token const tok(mconfig.begin_configuration(mconfig.root_device()));
@@ -355,7 +355,7 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 	width = layout->actual_width();
 }
 
-void menu_device_config::populate(float &customtop, float &custombottom)
+void menu_device_config::populate()
 {
 }
 

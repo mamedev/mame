@@ -206,7 +206,7 @@ void mrjong_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int sy = m_videoram[offs + 0];
 		if (flip_screen())
 		{
-			sx = 208 - sx;
+			sx = 192 - sx;
 			sy = 240 - sy;
 			flipx = !flipx;
 			flipy = !flipy;

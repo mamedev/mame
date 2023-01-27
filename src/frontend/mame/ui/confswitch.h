@@ -57,7 +57,7 @@ protected:
 	menu_confswitch(mame_ui_manager &mui, render_container &container, uint32_t type);
 
 	virtual void menu_activated() override;
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 
 	field_vector const &fields() { return m_fields; }
 	switch_group_vector const &switch_groups() { return m_switch_groups; }
@@ -82,11 +82,12 @@ public:
 	virtual ~menu_settings_dip_switches() override;
 
 protected:
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 	virtual bool custom_mouse_down() override;
 
 private:
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 
 	std::vector<float> m_switch_group_y;
 	unsigned m_visible_switch_groups;

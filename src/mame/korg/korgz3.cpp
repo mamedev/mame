@@ -15,6 +15,9 @@
 #include "sound/ymopz.h"
 #include "speaker.h"
 
+
+namespace {
+
 class korgz3_state : public driver_device
 {
 public:
@@ -143,5 +146,8 @@ ROM_START(korgz3)
 	ROM_REGION(0x8000, "hd6303_program", 0)
 	ROM_LOAD("881605.ic13", 0x0000, 0x8000, CRC(39ca77fa) SHA1(b9073ef1dfad7f9d07558d2389875ebe26835068))
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1988, korgz3, 0, 0, korgz3, korgz3, korgz3_state, empty_init, "Korg", "Z3 Guitar Synthesizer", MACHINE_IS_SKELETON)

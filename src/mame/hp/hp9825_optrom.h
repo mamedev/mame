@@ -7,8 +7,8 @@
     Optional ROMs for HP9825 systems
 
 *********************************************************************/
-#ifndef MAME_MACHINE_HP9825_OPTROM_H
-#define MAME_MACHINE_HP9825_OPTROM_H
+#ifndef MAME_HP_HP9825_OPTROM_H
+#define MAME_HP_HP9825_OPTROM_H
 
 #pragma once
 
@@ -50,4 +50,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(HP9825_OPTROM, hp9825_optrom_device)
 
-#endif /* MAME_MACHINE_HP9825_OPTROM_H */
+#endif /* MAME_HP_HP9825_OPTROM_H */

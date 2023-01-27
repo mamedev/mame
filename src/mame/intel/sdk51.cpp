@@ -16,6 +16,9 @@
 #include "machine/i8243.h"
 #include "machine/i8251.h"
 
+
+namespace {
+
 class sdk51_state : public driver_device
 {
 public:
@@ -317,5 +320,8 @@ ROM_START(sdk51)
 	ROM_REGION(0x0200, "cycles", 0)
 	ROM_LOAD("u63-3622a.bin", 0x000, 0x200, CRC(85cbd498) SHA1(f0214b6d02d6d153b5fafd9adf5a23013373c9c4)) // pin 9 output stuck high but not used
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1981, sdk51, 0, 0, sdk51, sdk51, sdk51_state, empty_init, "Intel", "MCS-51 System Design Kit", MACHINE_IS_SKELETON)

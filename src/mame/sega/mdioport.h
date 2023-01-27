@@ -6,7 +6,7 @@
 
     Seven I/O lines with individually selectable direction, UART,
     and interrupt output.
-	
+
     Mega Drive has three instances of this block connected to the
     CTRL1, CTRL2 and EXP connectors.
 

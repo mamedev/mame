@@ -218,7 +218,7 @@ std::error_condition osd_set_clipboard_text(std::string_view text) noexcept
 			GlobalFree(clip);
 			return win_error_to_error_condition(err);
 		}
-		if (!OpenClipboard(nullptr))
+		if (!EmptyClipboard())
 		{
 			DWORD const err(GetLastError());
 			CloseClipboard();

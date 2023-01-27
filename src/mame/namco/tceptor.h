@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "cpu/m6502/m65c02.h"
 #include "sound/namco.h"
 #include "namco_c45road.h"
 #include "emupal.h"
@@ -31,25 +30,43 @@ public:
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_inp(*this, "IN%u", 0U),
+		m_dsw(*this, "DSW%u", 1U),
 		m_shutter(*this, "shutter")
 	{ }
 
 	void tceptor(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
-	uint8_t m_m6809_irq_enable = 0;
-	uint8_t m_m68k_irq_enable = 0;
-	uint8_t m_mcu_irq_enable = 0;
 	required_device<cpu_device> m_maincpu;
-	required_device_array<m65c02_device, 2> m_audiocpu;
+	required_device_array<cpu_device, 2> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_mcu;
 	required_device<namco_cus30_device> m_cus30;
+
 	required_shared_ptr<uint8_t> m_tile_ram;
 	required_shared_ptr<uint8_t> m_tile_attr;
 	required_shared_ptr<uint8_t> m_bg_ram;
 	required_shared_ptr<uint8_t> m_m68k_shared_ram;
 	required_shared_ptr<uint16_t> m_sprite_ram;
+
+	required_device<namco_c45_road_device> m_c45_road;
+	required_device<screen_device> m_screen;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	required_ioport_array<2> m_inp;
+	required_ioport_array<2> m_dsw;
+	output_finder<> m_shutter;
+
+	uint8_t m_m6809_irq_enable = 0;
+	uint8_t m_m68k_irq_enable = 0;
+	uint8_t m_mcu_irq_enable = 0;
 	int m_sprite16 = 0;
 	int m_sprite32 = 0;
 	int m_bg = 0;
@@ -62,6 +79,7 @@ private:
 	std::unique_ptr<uint8_t[]> m_decoded_16;
 	std::unique_ptr<uint8_t[]> m_decoded_32;
 	int m_is_mask_spr[1024/16]{};
+
 	uint8_t m68k_shared_r(offs_t offset);
 	void m68k_shared_w(offs_t offset, uint8_t data);
 	void m6809_irq_enable_w(uint8_t data);
@@ -80,19 +98,9 @@ private:
 	void tceptor2_shutter_w(uint8_t data);
 	void tile_mark_dirty(int offset);
 
-	required_device<namco_c45_road_device> m_c45_road;
-	required_device<screen_device> m_screen;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-
-	output_finder<> m_shutter;
-
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	void tceptor_palette(palette_device &palette);
 	uint32_t screen_update_tceptor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_tceptor);

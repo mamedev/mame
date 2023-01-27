@@ -93,6 +93,9 @@ References:
 #include "bus/rs232/rs232.h"
 #include "machine/terminal.h"
 
+
+namespace {
+
 class mekd1_state : public driver_device
 {
 public:
@@ -456,6 +459,9 @@ ROM_START( mekd1 )
 	ROM_REGION( 0x0200, "mcm6830l7", 0 )
 	ROM_LOAD("mikbugv9.bin", 0x0000, 0x0200, CRC(f5ff896f) SHA1(32990115ad9eebe7a1a5a03b4b1ea83360b1820f))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

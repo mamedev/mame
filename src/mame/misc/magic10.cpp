@@ -25,6 +25,7 @@
   Magic Colors (ver. 1.6)        1999  ABM Games             post lex  [3]       no        DIP V      yes     battery   9743 Rev.01
   Magic Colors (ver. 1.7a)       1999  ABM Games             post lex  [3]       no        LCC        yes     none      Rev.03
   Alta Tensione (ver. 2.01a)     1999  Unknown               post lex  [3]       no        LCC        yes     battery   H3
+  Super Petrix                   199?  Unknown               post lex  [4]       yes       DIP V      no      NVRAM     COMP01
 
 *************************************************************************************************************************************
 
@@ -85,6 +86,33 @@
   - Press BET (key 'm') twice to leave the Test Mode and start the game...
 
 
+  * [4] Super Petrix
+  First time boot instructions:
+
+  When you see the HARDWARE TEST screen enter the following sequence
+  HOLD1, HOLD1, HOLD3, HOLD2
+
+  The game will now boot into Super Petrix.
+  There is a hidden poker game which can be selected in various ways.
+  1. Toggle the "Switch to Poker Mode" input. From now on the game will only run Poker.
+  2. The player can select Poker from Tetris by pressing HOLD1, HOLD2, HOLD3, HOLD4, START
+     in sequence.
+  3. The operator can use a hidden test to enable other methods of entering Poker such
+     as completing one line of Tetris, completing one level of Tetris and other methods.
+
+  There is a hidden test menu which allows various settings to be changed, this
+  includes ticket payout, changing the player sequence to enter Poker etc.
+  This is entered as follows:
+  1. Set DIP switches to OFF, OFF, ON, ON, OFF, OFF, ON, ON
+  2. Enter normal test by pressing F2 while VERSION 1P or HARDWARE TEST is displayed.
+  3. Enter advanced setup.
+  4. Change LEVEL to NORMAL.
+  5. Change FREE PLAY to YES
+  6. Press and hold HOLD3, HOLD5 and START until the horizontal scrolling line stops scrolling.
+  7. Press HOLD4, HOLD5 and START together and release to enter hidden menu.
+  
+  Note that ticket payout won't work with the current ticket driver.
+
 *****************************************************************************
 
 There are basically 2 hardware setup:
@@ -115,6 +143,16 @@ Both setups show different variants for components layout, memory size, NVRAM, e
   - Priorities,likely to be hardwired with the color writes (0=tile has the
      highest priority).
   - Define parent/clone relationship between Magic's 10 and Music Sort.
+  - Position of "PUSH IP START" and "SUPER PETRIX" logo don't match actual hardware
+    but fixing these causes the poker winplan to be in the wrong place.
+  - Super Petrix and Super Gran Safari use the same board but spetrix accesses the sound
+    chip on the upper byte of the data bus and sgsafari on the lower. Is this just
+	a programming error on spetrix ?
+  - Super Petrix attract mode consists of interleaved blue and gold blocks with the
+    blue scrolling diagonally. The blocks are out of alignment which is caused by
+	update_screen doing m_tilemap[1]->set_scrollx(0, (m_vregs[2 / 2] - m_vregs[6 / 2]) + 4)
+	Removing the +4 fixes the problem but does it cause other issues ?
+
 
 ****************************************************************************/
 
@@ -245,6 +283,26 @@ private:
 	void map(address_map &map);
 };
 
+
+class spetrix_state : public magic10_base_state
+{
+public:
+	spetrix_state(const machine_config &mconfig, device_type type, const char *tag) :
+		magic10_base_state(mconfig, type, tag),
+		m_ticket(*this, "ticket")
+	{ }
+
+	void spetrix(machine_config &config);
+
+	void init_spetrix();
+
+protected:
+	required_device<ticket_dispenser_device> m_ticket;
+
+private:
+	void out_w(uint16_t data);
+	void spetrix_map(address_map &map);
+};
 
 /***************************
 *      Video Hardware      *
@@ -387,6 +445,22 @@ void magic10_state::out_w(uint16_t data)
 	m_hopper->motor_w(BIT(data, 14) );
 }
 
+void spetrix_state::out_w(uint16_t data)
+{
+/*
+  ----------------------------------------------
+  --- Super Petrix outputs
+  ----------------------------------------------
+
+  0x0200 - Ticket Motor.
+  0x0400 - Coin counter.
+
+*/
+
+	m_ticket->motor_w(BIT(data, 9));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 10));
+}
+
 /***************************
 *       Memory Maps        *
 ***************************/
@@ -491,6 +565,22 @@ void magic10_state::sgsafari_map(address_map &map)
   0x500088 - 0x5000ff ; unknown.
 
 */
+
+void spetrix_state::spetrix_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom();
+	map(0x100000, 0x100fff).ram().w(FUNC(spetrix_state::videoram_w<1>)).share(m_videoram[1]);
+	map(0x101000, 0x101fff).ram().w(FUNC(spetrix_state::videoram_w<0>)).share(m_videoram[0]);
+	map(0x102000, 0x103fff).ram().w(FUNC(spetrix_state::videoram_w<2>)).share(m_videoram[2]);
+	map(0x200000, 0x203fff).ram().share("nvram");
+	map(0x300000, 0x3001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x500002, 0x500003).portr("DSW1");
+	map(0x500008, 0x500009).w(FUNC(spetrix_state::out_w));
+	map(0x50000a, 0x50000a).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x50000e, 0x50000f).portr("IN0");
+	map(0x500080, 0x500087).ram().share(m_vregs);   // video registers?
+	map(0x600000, 0x603fff).ram();
+}
 
 /***************************
 *       Input Ports        *
@@ -737,6 +827,61 @@ static INPUT_PORTS_START( sgsafari )
 	PORT_DIPSETTING(        0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( spetrix )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )   PORT_NAME("Right - Hold 1")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )   PORT_NAME("Left - Hold 2 / Low")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )   PORT_NAME("Up - Hold 3")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )   PORT_NAME("Down - Hold 4 / High")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )   PORT_NAME("Rotate Left - Hold 5")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 )        PORT_NAME("Select - Start / Collect")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_BET )    PORT_NAME("Rotate Right - Bet / Collect")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START2 )        PORT_NAME("Petrix Start")
+	PORT_SERVICE_NO_TOGGLE( 0x1000, IP_ACTIVE_LOW )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM )        PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Collect Points")
+
+	PORT_START("DSW1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_SERVICE1 )     PORT_NAME("Switch to Poker Mode")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_DIPNAME( 0x0100,   0x0100, "DIP1" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(        0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(        0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200,   0x0200, "DIP2" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(        0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(        0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400,   0x0000, "DIP3" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(        0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(        0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800,   0x0000, "DIP4" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(        0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(        0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000,   0x1000, "DIP5" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(        0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(        0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000,   0x2000, "DIP6" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(        0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(        0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000,   0x0000, "DIP7" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(        0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(        0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000,   0x0000, "DIP8" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(        0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(        0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 /****************************
 *     Graphics Layouts      *
@@ -849,6 +994,19 @@ void magic10_state::sgsafari(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(magic10_state::irq2_line_hold));    // L1 interrupts
 
 	subdevice<screen_device>("screen")->set_visarea(0*8, 44*8-1, 0*8, 30*8-1);
+}
+
+
+void spetrix_state::spetrix(machine_config &config)
+{
+	base(config);
+
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(6), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH );
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &spetrix_state::spetrix_map);
+	m_maincpu->set_vblank_int("screen", FUNC(spetrix_state::irq2_line_hold));    // L1 interrupts
+
+	subdevice<screen_device>("screen")->set_visarea(0*8, 45*8-1, 0*8, 30*8-1);
 }
 
 
@@ -1464,6 +1622,25 @@ ROM_START( sgsafari )
 ROM_END
 
 /*
+	Super Petrix - Tetris type game.
+	Unknown manufacturer.
+*/
+ROM_START( spetrix ) // same PCB as sgsafari but with a M48Z08 instead of a M48Z02
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "u7", 0x00000, 0x10000, CRC(d1bd325e) SHA1(0b4836356304145761dc894e308fa467c1ca9882) )
+	ROM_LOAD16_BYTE( "u2", 0x00001, 0x10000, CRC(e84cf453) SHA1(5ab3aff3e91de486c5791c2917443ee4b94706d6) )
+
+	ROM_REGION( 0x80000, "tiles", 0 )
+	ROM_LOAD( "u15", 0x00000, 0x20000, CRC(3becd06b) SHA1(6ea84577ec363062692bb7ad79698bbe93603abb) )
+	ROM_LOAD( "u18", 0x20000, 0x20000, CRC(2cb619f0) SHA1(f58ec59ea50ea6a12c3be08c635876058c1cdf22) )
+	ROM_LOAD( "u16", 0x40000, 0x20000, CRC(39d33d9b) SHA1(b8c13f7c18f3f064fad05cac07409fd6753df911) )
+	ROM_LOAD( "u19", 0x60000, 0x20000, CRC(0f84fad3) SHA1(d74553498f12cb77d9bef525524a7c75c3427e50) )
+
+	ROM_REGION( 0x040000, "oki", 0 ) // ADPCM samples
+	ROM_LOAD( "u39", 0x00000, 0x40000, CRC(eaaedf14) SHA1(b1a9dcbf3ee0542d61b1691d5f70375a44c06e21) )
+ROM_END
+
+/*
   Music Sort (Ver. 2.02).
   Same PCB than Magic's 10 (ver. 16.15)
 
@@ -1709,6 +1886,12 @@ void magic10_state::init_sgsafari()
 	m_layer2_offset[1] = 20;
 }
 
+void spetrix_state::init_spetrix()
+{
+	m_layer2_offset[0] = 16;
+	m_layer2_offset[1] = 16;
+}
+
 void magic102_state::init_altaten()
 {
 	m_layer2_offset[0] = 8;
@@ -1717,8 +1900,8 @@ void magic102_state::init_altaten()
 	// patching the boot protection...
 	uint8_t *rom = memregion("maincpu")->base();
 
-		rom[0x7668] = 0x71;
-		rom[0x7669] = 0x4e;
+	rom[0x7668] = 0x71;
+	rom[0x7669] = 0x4e;
 }
 
 } // Anonymous namespace
@@ -1743,3 +1926,4 @@ GAMEL( 1996, sgsafari,  0,        sgsafari, sgsafari, magic10_state,  init_sgsaf
 GAMEL( 1995, musicsrt,  0,        magic10a, musicsrt, magic10_state,  init_magic10,  ROT0, "ABM Games",            "Music Sort (ver. 2.02)",         MACHINE_SUPPORTS_SAVE,                        layout_musicsrt )
 GAME(  1998, lunaprk,   0,        magic102, magic102, magic102_state, init_suprpool, ROT0, "ABM Games",            "Luna Park (ver. 1.2)",           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME(  1999, altaten,   0,        magic102, magic102, magic102_state, init_altaten,  ROT0, "<unknown>",            "Alta Tensione (ver. 2.01a)",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME(  199?, spetrix,   0,        spetrix,  spetrix,  spetrix_state,  init_spetrix,  ROT0, "<unknown>",            "Super Petrix (ver. 1P)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

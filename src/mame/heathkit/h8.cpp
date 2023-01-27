@@ -57,6 +57,7 @@ Official test program from pages 4 to 8 of the operator's manual:
 #include "formats/h8_cas.h"
 #include "h8.lh"
 
+namespace {
 
 class h8_state : public driver_device
 {
@@ -406,6 +407,9 @@ ROM_START( h8 )
 	ROM_SYSTEM_BIOS(4, "bios4", "not working")
 	ROMX_LOAD( "2732_444-140_pam37.rom", 0x0000, 0x1000, CRC(53a540db) SHA1(90082d02ffb1d27e8172b11fff465bd24343486e), ROM_BIOS(4) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

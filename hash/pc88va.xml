@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="pc88va" description="NEC PC-88VA disk images">
 
@@ -84,14 +84,16 @@ Operating Systems
 
 <!-- Demos and Utilities -->
 
-	<!-- These three demos all starts off with the same first two demo sequences -->
-	<!-- TODO: confirm if they need to be marked as clone once we got them working -->
-	<software name="pc88vad" supported="no">
+	<!-- These three demos all have the same sequences, mislabeled? -->
+	<software name="pc88vad" cloneof="88va2d" supported="no">
 		<description>PC88-VA Demo</description>
 		<year>19??</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-Crashes during first demo sequence
+1st sequence should [OFX/OFY] scroll, half height [gfx] layer
+3rd sequence has half height [gfx] layer
+Transition fades out too late, sprite should supposedly fade out before reaching top of screen, requires [IDP] IBF flag
+Transition between 3rd and 4th sequences don't look right, [IDP]
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1296112">   <!-- Data CRC16: 2729 -->
@@ -103,12 +105,15 @@ Crashes during first demo sequence
 
 <!-- These were in a folder called 基本システムセット, i.e. Kihon System Set (AKA Basic System Set) -->
 
-	<software name="88va1td" supported="no">
+	<software name="88va1td" cloneof="88va2d" supported="no">
 		<description>88VA1 Tentou Demo</description>
 		<year>19??</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-Crashes during first demo sequence
+1st sequence should [OFX/OFY] scroll, half height [gfx] layer
+3rd sequence has half height [gfx] layer
+Transition fades out too late, sprite should supposedly fade out before reaching top of screen, requires [IDP] IBF flag
+Transition between 3rd and 4th sequences don't look right, [IDP]
 ]]></notes>
 		<info name="alt_title" value="88VA1 店頭デモ" />
 		<part name="flop1" interface="floppy_5_25">
@@ -123,8 +128,10 @@ Crashes during first demo sequence
 		<year>19??</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-Crashes during or after second demo sequence
+1st sequence should [OFX/OFY] scroll, half height [gfx] layer
+3rd sequence has half height [gfx] layer
 Transition fades out too late, sprite should supposedly fade out before reaching top of screen, requires [IDP] IBF flag
+Transition between 3rd and 4th sequences don't look right, [IDP]
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
@@ -139,7 +146,7 @@ Transition fades out too late, sprite should supposedly fade out before reaching
 		<year>1987</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-No text for [gfx] status bar
+[gfx] status bar has wrong colors [OFX/OFY]
 ]]></notes>
 		<info name="alt_title" value="アニメフレーマー" />
 		<part name="flop1" interface="floppy_5_25">
@@ -164,7 +171,7 @@ No text for [gfx] status bar
 		<year>1987</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-No text for [gfx] status bar
+[gfx] status bar has wrong colors [OFX/OFY]
 ]]></notes>
 		<!-- labels were swapped -->
 		<part name="flop1" interface="floppy_5_25">
@@ -199,10 +206,12 @@ Has unsupported MIF-201 [MIDI] interface cfr. http://www.pc88.gr.jp/vafaq/view.p
 
 	<software name="pceva2tb" supported="no">
 		<description>PC-Engine (VA2 Tenpu-ban)</description>
-		<year>19??</year>
+		<year>1988</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
 Has HDFORM.COM utility
+Unsupported features in batch files
+Untested directory NEC_SAMP (cannot type [keyboard] underscore char)
 ]]></notes>
 		<info name="alt_title" value="PC-Engine(VA2添付版)" />
 		<part name="flop1" interface="floppy_5_25">
@@ -212,13 +221,19 @@ Has HDFORM.COM utility
 		</part>
 	</software>
 
-	<software name="pce11" supported="no">
+	<software name="pce11" cloneof="pceva2tb" supported="no">
 		<description>PC-Engine v1.1</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1988</year>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+Has HDFORM.COM utility
+Unsupported features in batch files
+Untested directory NEC_SAMP (cannot type [keyboard] underscore char)
+]]></notes>
+		<!-- baddump: NEC_SAMP directory edited in 2010 -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
-				<rom name="pc-engine 1.1 os.d88" size="1331888" crc="17d2e121" sha1="b88095cae4238a68833435ac0e3414081cb5a13b"/>
+				<rom name="pc-engine 1.1 os.d88" size="1331888" crc="17d2e121" sha1="b88095cae4238a68833435ac0e3414081cb5a13b" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -231,10 +246,13 @@ Has HDFORM.COM utility
 		<year>19??</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
-Often crashes during loading [FDC] or during gameplay with stuck [OPNA] note
 [SGP] playfield artifacts
+Lists dual port 1/2 as a unsupported [DE-9] input method
+Winning newspaper screen has [OFX/OFY] bug
+How to exit from attract mode once you enter it?
 ]]></notes>
 		<info name="alt_title" value="ファミリースタジアム" />
+		<info name="usage" value="Menuing works with keyboard only until game prompts you to use a joystick"/>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1281968">
@@ -257,17 +275,20 @@ Often crashes during loading [FDC] or during gameplay with stuck [OPNA] note
 		</part>
 	</software>
 
-	<!-- TODO: seems a clone of famista, while famist89a is the actual '89 version -->
-	<software name="famist89" supported="no">
-		<description>Family Stadium '89 - Pennant Race Hen</description>
+	<!-- Mislabeled disk -->
+	<software name="famist89" cloneof="famista" supported="no">
+		<description>Family Stadium (alt)</description>
 		<year>19??</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
-Often crashes during loading [FDC] or during gameplay with stuck [OPNA] note
 [SGP] playfield artifacts
-Needs graphic [OFX/OFY] scroll
+Lists dual port 1/2 as a unsupported [DE-9] input method
+Winning newspaper screen has [OFX/OFY] bug
+How to exit from attract mode once you enter it?
 ]]></notes>
-		<info name="alt_title" value="ファミリースタジアム'89ペナントレース編" />
+
+		<info name="alt_title" value="ファミリースタジアム" />
+		<info name="usage" value="Menuing works with keyboard only until game prompts you to use a joystick"/>
 		<!--combined image-->
 		<!--rom name="family stadium pennant race ban (va).d88" size="2563936" crc="91d95d8e" sha1="3d31ab00a0be2f792d2bcb031afd065d138c747a"/-->
 
@@ -286,13 +307,17 @@ Needs graphic [OFX/OFY] scroll
 		</part>
 	</software>
 
-	<software name="famist89a" cloneof="famist89" supported="no">
-		<description>Family Stadium '89 (alt?)</description>
+	<software name="famist89a" supported="no">
+		<description>Family Stadium '89 - Pennant Race Hen</description>
 		<year>19??</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
-Hangs during match loading
+[SGP] playfield artifacts
+Lists dual port 1/2 as a unsupported [DE-9] input method
+Winning newspaper screen has [OFX/OFY] bug
 ]]></notes>
+		<info name="alt_title" value="ファミリースタジアム'89ペナントレース編" />
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1298608">
@@ -389,12 +414,13 @@ Burps on [FDC] access after disk swap with program and player disks, trying to s
 		<year>1987</year>
 		<publisher>ウインキーソフト (Winky Soft)</publisher>
 		<notes><![CDATA[
-Crashes during opening with an (A)bort (R)etry (F)ail [FDC]
-[OPNA] dies often
-Map select may use [SGP]
-Needs graphic [OFX/OFY] scroll
+Map select uses [ROP]
+Needs graphic [OFX/OFY] scroll on gameplay
+Unplayable with [keyboard]
+Gameplay start with [cliprect] mask effect
 ]]></notes>
 		<info name="alt_title" value="オルテウス" />
+		<info name="usage" value="Kana Lock on pauses the game"/>
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1281968">
@@ -430,12 +456,14 @@ Needs graphic [OFX/OFY] scroll
 		<year>1987</year>
 		<publisher>ウインキーソフト (Winky Soft)</publisher>
 		<notes><![CDATA[
-Crashes during opening with an (A)bort (R)etry (F)ail [FDC]
-[OPNA] dies often
-Map select may use [SGP]
-Needs graphic [OFX/OFY] scroll
+Map select uses [ROP]
+Needs graphic [OFX/OFY] scroll on gameplay
+Unplayable with [keyboard]
+Gameplay start with [cliprect] mask effect
 ]]></notes>
 		<info name="alt_title" value="オルテウス" />
+		<info name="usage" value="Kana Lock on pauses the game"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1281968">
@@ -470,8 +498,8 @@ Needs graphic [OFX/OFY] scroll
 		<year>1988</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-Crashes often on opening [OPNA] or [FDC]
-No enemy sprites during gameplay [SGP]
+Various [SGP] issues during gameplay
+Intro uses [cliprect] effects
 Needs graphic [OFX/OFY] scroll
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
@@ -523,10 +551,11 @@ Burps on [FDC] access after disk swap with program and player disks, trying to s
 		<year>1986</year>
 		<publisher>システムソフト (System Soft)</publisher>
 		<notes><![CDATA[
-No sound even if the game claims to have it, cfr. settings pane (particularly clicks) [dac1bit]
-Disk errors if accessing [FDC] with motor off (goes idle after a while)
+Needs [dac1bit] clicks on gameplay
 [mouse] is a requirement?
-Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bits set (for flame effect?), eventually crashes (no pointer available)
+May crash with disk error when entering winning animation (verify)
+Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bits set (for flame effect?), press mouse left button to return to game
+[OPNA] seems to cut off shortly on intro and winning screen compared to VAEG
 ]]></notes>
 		<info name="alt_title" value="上海" />
 		<part name="flop1" interface="floppy_5_25">
@@ -541,8 +570,7 @@ Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bit
 		<year>1987</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<notes><![CDATA[
-Hangs on opening due of [OPNA] irq misfiring
-Opening has a few weird places for [gfx] priority
+Opening has a few weird places for [gfx] priority and half height [gfx]
 Has [SGP] and [ROP] artifacts
 Omake: if sound irqs don't run then needs to press key 0 pad to move on
 ]]></notes>
@@ -757,9 +785,8 @@ Enables [FDC] PIO mode, black screen
 		<year>1988</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 		<notes><![CDATA[
-White screen after [SGP] transfers, jumps to lalaland on copyright screen
-Triggers "unimplemented floating point control" at PC=0x1d88d
-Known to have [floppy] copy protection, VAEG emu sports a lovely "TETRIS IS ONLY 6,800 YEN" on title screen with annoying SFX covering the BGM
+Uses direct color layers, white screens with sound, bypass by changing m_video_pri_reg in debugger to ab89 0000
+Fails [floppy] copy protection, draws "TETRIS IS ONLY 6,800 YEN" on title screen with annoying SFX covering the BGM
 ]]></notes>
 		<info name="release" value="19881222"/>
 		<info name="alt_title" value="テトリス"/>
@@ -778,8 +805,8 @@ Known to have [floppy] copy protection, VAEG emu sports a lovely "TETRIS IS ONLY
 		<year>1992</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<notes><![CDATA[
-Crashes with [ROP] artifacts on opening
-No [OPNA] sound
+Heavy [ROP] artifacts on setup menu and opening, crashes with black screen at the end
+Crashes if directly selecting new game
 Has unemulated [MIDI] options
 ]]></notes>
 		<info name="release" value="199201xx"/>
@@ -840,9 +867,7 @@ Has unemulated [MIDI] options
 		<year>1990</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<notes><![CDATA[
-Hangs on check at PC=2c67b on opening, wants either [OPNA] or [SGP] irq
-No [OPNA] sound
-[gfx]s have halved height
+Half height [gfx]s
 Heavy [ROP] artifacts during gameplay
 Optionally wants kana lock enabled for entering a name for new game [keyboard] irq
 ]]></notes>
@@ -874,10 +899,9 @@ Optionally wants kana lock enabled for entering a name for new game [keyboard] i
 		<year>1991</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<notes><![CDATA[
-(A)bort (R)etry (F)ail during loading [FDC]
-Missing graphics [ROP]
+Heavy [ROP] artifacts on intro
 Sprites don't draw properly during gameplay [ROP]
-No [OPNA] sound
+Ugly pitch for [OPNA] voice samples on intro
 [gfx]s have halved height
 ]]></notes>
 		<info name="release" value="19911220"/>
@@ -1009,7 +1033,7 @@ Loads N88 BASIC then jumps to lalaland [FDC]
 		<info name="release" value="199008xx"/>
 		<info name="alt_title" value="ディー・ピー・エス SG"/>
 		<!-- Data disk for dps? -->
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System" />
 			<dataarea name="flop" size="1261568">
@@ -1212,8 +1236,10 @@ All disks fail initial bootstrap [FDC]
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-Doesn't draw anything [SGP]
-Eventually hangs on badly colored [sprites]
+Requires [ROP] for intro and title screen
+Has badly colored sprites on character select
+Doesn't draw background in gameplay, uses direct color layers
+Has unemulated [SGP] operand for shot 1
 ]]></notes>
 		<info name="developer" value="Fredia" />
 		<info name="alt_title" value="ばる〜んぶ れ〜か〜" />
@@ -1229,8 +1255,8 @@ Eventually hangs on badly colored [sprites]
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-Doesn't draw title screen [SGP]
-Needs graphic [OFX/OFY] scroll
+Title screen has [SGP] artifacts
+Needs graphic [OFX/OFY] scroll on gameplay
 ]]></notes>
 		<info name="developer" value="Fredia" />
 		<part name="flop1" interface="floppy_5_25">
@@ -1246,8 +1272,7 @@ Needs graphic [OFX/OFY] scroll
 		<year>2006</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-Currently punts to PC Engine OS in 24.8 kHz [CRTC] vblank bit
-Broken graphics [SGP]
+Broken graphics [SGP] or [cliprect]
 15.7 kHz has doubled height [gfx]
 ]]></notes>
 		<info name="developer" value="Shinra" />
@@ -1266,12 +1291,13 @@ Broken graphics [SGP]
 	</software>
 
 	<software name="hatisora" supported="no">
+		<!-- "Hati in the Sky" -->
 		<description>Hati no Sora de</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-No graphics [SGP]
-Throws an (A)bort (R)etry (F)ail during opening [FDC]
+Title screen doesn't show text layer, [cliprect]? (verify)
+Needs [OFX/OFY] on gameplay
 ]]></notes>
 		<info name="developer" value="LOKAPALA" />
 		<info name="alt_title" value="ハティの空で" />
@@ -1288,7 +1314,8 @@ Throws an (A)bort (R)etry (F)ail during opening [FDC]
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
 Broken Upyolic logo [ROP]
-Black screen, loops on [IDP] vblank bit
+Needs joystick in otherwise it loops on title screen
+Gameplay don't mask bullets on right side, [cliprect]
 ]]></notes>
 		<info name="developer" value="Upyolic Soft" />
 		<info name="alt_title" value="最終平気UPOプレリリース" />
@@ -1303,6 +1330,9 @@ Black screen, loops on [IDP] vblank bit
 		<description>Pac-Man</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+[SGP] and [ROP] issues on gameplay
+]]></notes>
 		<info name="developer" value="Shinra" />
 		<info name="usage" value="Boot a PC Engine OS disk, then swap with this disk and type BASIC PACMAN.BAS to load" />
 		<part name="flop1" interface="floppy_5_25">
@@ -1318,7 +1348,7 @@ Black screen, loops on [IDP] vblank bit
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-Punts to PC Engine OS with "abort batch processing" message
+[SGP] and [ROP] issues on gameplay
 ]]></notes>
 		<info name="developer" value="Shinra" />
 		<part name="flop1" interface="floppy_5_25">

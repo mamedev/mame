@@ -13,7 +13,7 @@
 #include "machine/8530scc.h"
 #include "nextkbd.h"
 #include "machine/upd765.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 #include "machine/mb8795.h"
 #include "nextmo.h"
 #include "imagedev/chd_cd.h"
@@ -29,7 +29,7 @@ public:
 			scc(*this, "scc"),
 			keyboard(*this, "keyboard"),
 			scsibus(*this, "scsibus"),
-			scsi(*this, "scsibus:7:ncr5390"),
+			scsi(*this, "scsibus:7:ncr53c90"),
 			net(*this, "net"),
 			mo(*this, "mo"),
 			fdc(*this, "fdc"),
@@ -68,7 +68,7 @@ private:
 	required_device<scc8530_legacy_device> scc;
 	required_device<nextkbd_device> keyboard;
 	required_device<nscsi_bus_device> scsibus;
-	required_device<ncr5390_device> scsi;
+	required_device<ncr53c90_device> scsi;
 	required_device<mb8795_device> net;
 	optional_device<nextmo_device> mo; // cube only
 	optional_device<n82077aa_device> fdc; // 040 only
@@ -146,7 +146,7 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
-	void ncr5390(device_t *device);
+	void ncr53c90(device_t *device);
 	void next_0b_m_mem(address_map &map);
 	void next_0b_m_mo_mem(address_map &map);
 	void next_0b_m_nofdc_mem(address_map &map);

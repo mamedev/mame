@@ -25,6 +25,8 @@ Pluto 8: ColdFire 5475
 #include "speaker.h"
 
 
+namespace {
+
 class jpmsys7_state : public driver_device
 {
 public:
@@ -229,6 +231,8 @@ ROM_START( j7bullio )
 	ROM_LOAD16_BYTE( "04c1", 0x0000, 0x100000, CRC(0e724535) SHA1(c77e0ab67ce25421e7c94bf38733af6fd4148ba3) )
 	ROM_LOAD16_BYTE( "04c2", 0x0000, 0x100000, CRC(74d43f1d) SHA1(a75c41928727c2752bfa6f04460fa003441ca0a6) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 200?, j7bmagic,  0,         jpmsys7, jpmsys7, jpmsys7_state, empty_init, ROT0, "JPM","Black Magic (JPM)", MACHINE_IS_SKELETON_MECHANICAL )

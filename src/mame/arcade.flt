@@ -17,6 +17,7 @@ alpha/champbas.cpp
 alpha/equites.cpp
 alpha/meijinsn.cpp
 alpha/shougi.cpp
+alpha/splendor.cpp
 amiga/alg.cpp
 amiga/arsystems.cpp
 amiga/cubo.cpp
@@ -640,6 +641,7 @@ misc/atronic.cpp
 misc/attckufo.cpp
 misc/avt.cpp
 misc/aztarac.cpp
+misc/babysuprem.cpp
 misc/bailey.cpp
 misc/beaminv.cpp
 misc/beezer.cpp
@@ -662,6 +664,7 @@ misc/chance32.cpp
 misc/changyu.cpp
 misc/chicago.cpp
 misc/chsuper.cpp
+misc/cleartone.cpp
 misc/clowndwn.cpp
 misc/clpoker.cpp
 misc/cocoloco.cpp

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="pc8801_flop" description="NEC PC-8801 disk images">
 
@@ -17056,8 +17056,7 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Mouse pointer is jumpy -->
-	<software name="ishido" supported="partial">
+	<software name="ishido">
 		<description>Ishido - The Way of Stones</description>
 		<year>1990</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -30672,7 +30671,7 @@ Kinda ugly to look at without a shader
 		<!-- TODO: pinpoint exact range of machines supported -->
 		<!-- crashes in vanilla pc8801 and 8801ma, works with mk2sr -->
 		<info name="usage" value="Needs BASIC V1, suggested to use pc8801mk2sr"/>
-		
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="345856">
 				<rom name="shanghai sr.d88" size="345856" crc="6f74c72a" sha1="c970bdcd57a0a3fb2cfebf4fb0bf80c39e218a28"/>

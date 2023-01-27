@@ -9,7 +9,7 @@ Unknown part number, used as GPU for PC88VA
 TODO:
 - timing details
 - specifics about what exactly happens in work area when either SGP runs or is idle.
-- famista: during gameplay it BITBLT same source to destination 0x00037076 
+- famista: during gameplay it BITBLT same source to destination 0x00037076
   with tp_mode = 3 and pitch = 0 (!?);
 - rtype: during gameplay it does transfers with Pitch = 0xfff0, alias for negative draw?
 - basic fires a VABOT on loading;
@@ -61,7 +61,7 @@ void pc88va_sgp_device::device_start()
 
 void pc88va_sgp_device::device_reset()
 {
-	
+
 }
 
 /****************************************
@@ -334,7 +334,7 @@ void pc88va_sgp_device::start_exec()
  * ---- ---- ---- 1110 /(Src AND Dst)
  * ---- ---- ---- 1111 1
  *
- * PATBLT is identical to BITBLT except it repeats source copy 
+ * PATBLT is identical to BITBLT except it repeats source copy
  * if it exceeds the clipping range.
  */
 void pc88va_sgp_device::cmd_blit(u16 draw_mode, bool is_patblt)
@@ -346,7 +346,7 @@ void pc88va_sgp_device::cmd_blit(u16 draw_mode, bool is_patblt)
 	if (is_patblt == true)
 	{
 		LOG("PATBLT\n");
-	//	return;
+	//  return;
 	}
 
 	// ballbrkr: 6

@@ -67,9 +67,9 @@ distomeb_slot_device::distomeb_slot_device(const machine_config &mconfig, const 
 void distomeb_slot_device::device_start()
 {
 	m_cart = get_card_device();
-    m_cart_callback.resolve_safe();
+	m_cart_callback.resolve_safe();
 
-   	save_item(NAME(m_cart_line));
+	save_item(NAME(m_cart_line));
 }
 
 
@@ -124,7 +124,7 @@ template class device_finder<device_distomeb_interface, true>;
 device_distomeb_interface::device_distomeb_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "distomeb")
 	, m_owning_slot(dynamic_cast<distomeb_slot_device *>(device.owner()))
-{	
+{
 }
 
 

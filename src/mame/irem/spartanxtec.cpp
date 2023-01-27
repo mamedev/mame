@@ -31,6 +31,8 @@ probably an original bug?
 #include "tilemap.h"
 
 
+namespace {
+
 class spartanxtec_state : public driver_device
 {
 public:
@@ -448,6 +450,7 @@ ROM_START( spartanxtec )
 
 ROM_END
 
+} // anonymous namespace
 
 
 GAME( 1987, spartanxtec,  kungfum,    spartanxtec, spartanxtec, spartanxtec_state, empty_init, ROT0, "bootleg (Tecfri)", "Spartan X (Tecfri hardware bootleg)", 0 )

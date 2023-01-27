@@ -29,6 +29,8 @@ The asp ctc needs at least 2 triggers. The purpose of the zve pio is unknown.
 #include "machine/z80sio.h"
 
 
+namespace {
+
 class mc8030_state : public driver_device
 {
 public:
@@ -289,6 +291,9 @@ ROM_START( mc8030 )
 	ROM_LOAD( "spe_1a.rom",    0x2000, 0x000800, CRC(37c71c68) SHA1(951650698b00f65facf5ccfbd8dd13628a93425d) )
 	ROM_LOAD( "spe_2a.rom",    0x2800, 0x000400, CRC(9ec8f287) SHA1(cdf5a9583d898814ba480ffbc8d906a642c6dc81) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

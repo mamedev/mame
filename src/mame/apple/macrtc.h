@@ -7,8 +7,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_MACRTC_H
-#define MAME_MACHINE_MACRTC_H
+#ifndef MAME_APPLE_MACRTC_H
+#define MAME_APPLE_MACRTC_H
 
 #pragma once
 
@@ -117,4 +117,4 @@ protected:
 DECLARE_DEVICE_TYPE(RTC3430040, rtc3430040_device)
 DECLARE_DEVICE_TYPE(RTC3430042, rtc3430042_device)
 
-#endif // MAME_MACHINE_MACRTC_H
+#endif // MAME_APPLE_MACRTC_H

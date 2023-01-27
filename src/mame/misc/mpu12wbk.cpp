@@ -436,6 +436,9 @@
 
 #include "fruitstb.lh"
 
+
+namespace {
+
 #define MASTER_CLOCK    XTAL(8'000'000)
 
 
@@ -1060,6 +1063,8 @@ void mpu12wbk_state::init_mpu12wbk()
 {
 	// just in case...
 }
+
+} // anonymous namespace
 
 
 /********************************

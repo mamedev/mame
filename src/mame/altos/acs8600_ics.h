@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 
-#ifndef MAME_MACHINE_ACS8600_ICS_H
-#define MAME_MACHINE_ACS8600_ICS_H
+#ifndef MAME_ALTOS_ACS8600_ICS_H
+#define MAME_ALTOS_ACS8600_ICS_H
 
 #pragma once
 
@@ -44,4 +44,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ACS8600_ICS, acs8600_ics_device)
 
-#endif // MAME_MACHINE_ACS8600_ICS_H
+#endif // MAME_ALTOS_ACS8600_ICS_H

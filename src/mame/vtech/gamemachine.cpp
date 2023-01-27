@@ -119,7 +119,7 @@ public:
 		m_psu(*this, "psu"),
 		m_display(*this, "display"),
 		m_speaker(*this, "speaker"),
-		m_snd_nl_pin(*this, "snd_nl:p%02u", 8U),
+		m_sound_nl(*this, "sound_nl:p%02u", 8U),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
@@ -135,7 +135,7 @@ private:
 	required_device<f38t56_device> m_psu;
 	required_device<pwm_display_device> m_display;
 	optional_device<speaker_sound_device> m_speaker;
-	optional_device_array<netlist_mame_logic_input_device, 8> m_snd_nl_pin;
+	optional_device_array<netlist_mame_logic_input_device, 8> m_sound_nl;
 	required_ioport_array<2> m_inputs;
 
 	void main_map(address_map &map);
@@ -226,7 +226,7 @@ void gm_state::discrete_w(u8 data)
 
 	// P40-P47: 555 to speaker (see nl_gamemachine.cpp)
 	for (int i = 0; i < 8; i++)
-		m_snd_nl_pin[i]->write_line(BIT(~data, i));
+		m_sound_nl[i]->write_line(BIT(~data, i));
 }
 
 u8 gm_state::sound_r()
@@ -359,17 +359,18 @@ void gm_state::gamemach(machine_config &config)
 	config.set_default_layout(layout_gamemach);
 
 	// sound hardware
-	NETLIST_SOUND(config, "snd_nl", 48000).set_source(NETLIST_NAME(gamemachine)).add_route(ALL_OUTPUTS, "mono", 1.0);
-	NETLIST_STREAM_OUTPUT(config, "snd_nl:cout0", 0, "SPK1.2").set_mult_offset(-10000.0 / 32768.0, 10000.0 * 3.75 / 32768.0);
+	config.device_remove("speaker");
+	NETLIST_SOUND(config, "sound_nl", 48000).set_source(NETLIST_NAME(gamemachine)).add_route(ALL_OUTPUTS, "mono", 1.0);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "SPK1.2").set_mult_offset(-10000.0 / 32768.0, 10000.0 * 3.75 / 32768.0);
 
-	NETLIST_LOGIC_INPUT(config, "snd_nl:p08", "P08.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:p09", "P09.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:p10", "P10.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:p11", "P11.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:p12", "P12.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:p13", "P13.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:p14", "P14.IN", 0);
-	NETLIST_LOGIC_INPUT(config, "snd_nl:p15", "P15.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p08", "P08.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p09", "P09.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p10", "P10.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p11", "P11.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p12", "P12.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p13", "P13.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p14", "P14.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p15", "P15.IN", 0);
 }
 
 

@@ -986,7 +986,7 @@ void nds_state::nds(machine_config &config)
 	ADDRESS_MAP_BANK(config, "nds9wram").set_map(&nds_state::nds9_wram_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x8000);
 }
 
-/* Help identifying the region and revisions of the set would be greatly appreciated! */
+// Help identifying the region and revisions of the main set would be greatly appreciated!
 ROM_START( nds )
 	ROM_REGION( 0x1000, "arm9", 0 )
 	ROM_LOAD( "biosnds9.rom", 0x0000, 0x1000, CRC(2ab23573) SHA1(bfaac75f101c135e32e2aaf541de6b1be4c8c62d) )
@@ -995,7 +995,12 @@ ROM_START( nds )
 	ROM_LOAD( "biosnds7.rom", 0x0000, 0x4000, CRC(1280f0d5) SHA1(24f67bdea115a2c847c8813a262502ee1607b7df) )
 
 	ROM_REGION32_LE( 0x40000, "firmware", 0 )
-	ROM_LOAD( "firmware.bin", 0x0000, 0x40000, CRC(945f9dc9) SHA1(cfe072921ee3fb93f688743f8beef89043c3e9ad) )
+	ROM_SYSTEM_BIOS( 0, "nds", "Nintendo DS" )
+	ROMX_LOAD( "firmware.bin", 0x0000, 0x40000, CRC(945f9dc9) SHA1(cfe072921ee3fb93f688743f8beef89043c3e9ad), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "40820d", "Nintendo DS ver.40820D prototype" ) // from X4 prototype unit
+	ROMX_LOAD( "fw0802d6.bin", 0x0000, 0x40000, CRC(18e137df) SHA1(d51be561a6538941f8f43d6db9cdb964a383080a), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "040615", "Nintendo DS ver.040615 prototype" )
+	ROMX_LOAD( "fw64b19d.bin", 0x0000, 0x40000, CRC(93487f12) SHA1(3af896a05736cc0385d0f858b431ff719164caf6), ROM_BIOS(2) )
 ROM_END
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY     FULLNAME  FLAGS

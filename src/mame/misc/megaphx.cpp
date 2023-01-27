@@ -1,53 +1,49 @@
 // license: BSD-3-Clause
 // copyright-holders: David Haywood, Dirk Best
 /*
-   Dinamic / Inder arcade hardware
 
-   Mega Phoenix
-   Hammer Boy
+Dinamic / Inder arcade hardware
+- Mega Phoenix
+- Hammer Boy
+- YoYo Spell
 
- also known to exist on this hardware:
-   Nonamed 2 (ever finished? only code seen has 1991 date and is vastly incomplete) (versions exist for Amstrad CPC, MSX and Spectrum)
-   After The War
+also known to exist on this hardware:
+- Nonamed 2 (ever finished? only code seen has 1991 date and is vastly incomplete)
+  (versions exist for Amstrad CPC, MSX and Spectrum)
+- After The War
 
-
-
-  trivia: Test mode graphics are the same as Little Robin(?!), TMS is very similar too, suggesting they share a common codebase.
-
- PIC16C54 info:
- - The PIC has 5 functions:
-   * Read dip switches (serially connected) [cmd 0x82 0x86]
-   * Read the two start buttons [returned with all commands]
-   * Provide 4 security codes. For the dumped PIC those are:
-     0x4a 0x6f 0x61 0x6e (Joan). Not used by Mega Phoenix. [cmd 0x8a 0x8e 0x92 0x96]
-   * Watchdog enable. Not used by Mega Phoenix. [cmd 9a]
-   * Provide PIC software version to the game. This is 0x11 here. [all other cmds]
- - Communication with the game is achieved using a 8255 PPI on port C that is
-   connected serially to the PIC. For port assignments see the code below.
- - The game sends an 8-bit command. After each bit, the PIC sends an answer bit.
-   The start buttons are always bits 2 and 3 here.
- - All sent commands look like this: 1ccccc10
- - After the command was received, the PIC will send an additional 8 bits
-   with the result.
+trivia: Test mode graphics are the same as Little Robin(?!), TMS is very similar too,
+suggesting they share a common codebase.
 
 
+PIC16C54 info:
+- The PIC has 5 functions:
+  * Read dip switches (serially connected) [cmd 0x82 0x86]
+  * Read the two start buttons [returned with all commands]
+  * Provide 4 security codes. For the dumped PIC those are:
+    0x4a 0x6f 0x61 0x6e (Joan). Not used by Mega Phoenix. [cmd 0x8a 0x8e 0x92 0x96]
+  * Watchdog enable. Not used by Mega Phoenix. [cmd 9a]
+  * Provide PIC software version to the game. This is 0x11 here. [all other cmds]
+- Communication with the game is achieved using a 8255 PPI on port C that is
+  connected serially to the PIC. For port assignments see the code below.
+- The game sends an 8-bit command. After each bit, the PIC sends an answer bit.
+  The start buttons are always bits 2 and 3 here.
+- All sent commands look like this: 1ccccc10
+- After the command was received, the PIC will send an additional 8 bits
+  with the result.
 
- ToDo:
-  - where should roms 6/7 map, they contain the 68k vectors, but the game expects RAM at 0, and it doesn't seem to read any of the other data from those roms.. they contain
-    a cross hatch pattern amongst other things?
- Sound:
-  - how does banking work? when the irq callbacks happen for each irq level? currently no way to access this because it's a daisy chain setup with the ctc?
-  - even if i hack that the title screen speech doesn't work properly - is there a timing register like little robin?
- I/O:
-  - Verify when m_ppi_to_pic_command is set and cleared. It's currently guessed but seems to work fine this way.
 
+TODO:
+- how does sound banking work? when the irq callbacks happen for each irq level? currently no way
+  to access this because it's a daisy chain setup with the ctc?
+- even if i hack that the title screen speech doesn't work properly - is there a timing register like little robin?
+- Verify when m_ppi_to_pic_command is set and cleared. It's currently guessed but seems to work fine this way.
 
-  --
+----------------------------------------
 
+Chips of note
 
-  Chips of note
-
-  Main board:
+Main board:
 
   TS68000CP8
   TMS34010FNL-40
@@ -59,7 +55,7 @@
 
   2x 8 DSW, bottom corner, away from everything..
 
- Sub / Sound board:
+Sub / Sound board:
 
   ST Z8430AB1
 
@@ -70,109 +66,116 @@
     LA MANIPULCION DE LA ETIQUETA O DE LA PLACA ANULA SU SARANTIA
     (this sticker is also present on the other PCB)
 
-
 */
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/74166.h"
 #include "machine/i8255.h"
+
 #include "inder_sb.h"
 #include "inder_vid.h"
 
-
+namespace {
 
 class megaphx_state : public driver_device
 {
 public:
-	megaphx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_indervid(*this, "inder_vid"),
+	megaphx_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mainram(*this, "mainram"),
+		m_bootrom(*this, "boot"),
+		m_indervid(*this, "inder_vid"),
 		m_indersb(*this, "inder_sb"),
 		m_ppi(*this, "ppi8255_0"),
 		m_dsw_shifter(*this, "ttl166_%u", 1U),
-		m_dsw_data(0),
-		m_ppi_to_pic_command(0), m_ppi_to_pic_clock(0), m_ppi_to_pic_data(0),
-		m_pic_to_ppi_clock(0), m_pic_to_ppi_data(0)
+		m_start(*this, "START")
 	{ }
 
 	void megaphx(machine_config &config);
-
-	void init_megaphx();
+	void hamboy(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	required_device<inder_vid_device> m_indervid;
-
 private:
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint16_t> m_mainram;
+	required_region_ptr<uint16_t> m_bootrom;
+	required_device<inder_vid_device> m_indervid;
+	required_device<inder_sb_device> m_indersb;
+	required_device<i8255_device> m_ppi;
+	required_device_array<ttl166_device, 2> m_dsw_shifter;
+	required_ioport m_start;
+
 	uint8_t pic_porta_r();
 	void pic_porta_w(uint8_t data);
 	uint8_t pic_portb_r();
 	void pic_portb_w(uint8_t data);
 	uint8_t ppi_portc_r();
 	void ppi_portc_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(dsw_w);
+	void dsw_w(int state) { m_dsw_data = state; }
 
 	void megaphx_68k_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint16_t> m_mainram;
-	required_device<inder_sb_device> m_indersb;
-	required_device<i8255_device> m_ppi;
-	required_device_array<ttl166_device, 2> m_dsw_shifter;
+	void install_bootrom(bool enable);
+	TIMER_CALLBACK_MEMBER(disable_bootrom) { install_bootrom(false); }
+	emu_timer *m_disable_bootrom = nullptr;
 
-	int m_dsw_data;
-	int m_ppi_to_pic_command;
-	int m_ppi_to_pic_clock;
-	int m_ppi_to_pic_data;
-	int m_pic_to_ppi_clock;
-	int m_pic_to_ppi_data;
-};
-
-class hamboy_state : public megaphx_state
-{
-public:
-	hamboy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: megaphx_state(mconfig, type, tag)
-	{ }
-
-protected:
-	virtual void machine_reset() override;
+	int m_dsw_data = 0;
+	int m_ppi_to_pic_command = 0;
+	int m_ppi_to_pic_clock = 0;
+	int m_ppi_to_pic_data = 0;
+	int m_pic_to_ppi_clock = 0;
+	int m_pic_to_ppi_data = 0;
 };
 
 void megaphx_state::machine_start()
 {
-	uint16_t *src = (uint16_t*)memregion( "boot" )->base();
-	// copy vector table? - it must be writable because the game write the irq vector..
-	memcpy(m_mainram, src, 0x80);
+	m_disable_bootrom = timer_alloc(FUNC(megaphx_state::disable_bootrom), this);
+
+	save_item(NAME(m_dsw_data));
+	save_item(NAME(m_ppi_to_pic_command));
+	save_item(NAME(m_ppi_to_pic_clock));
+	save_item(NAME(m_ppi_to_pic_data));
+	save_item(NAME(m_pic_to_ppi_clock));
+	save_item(NAME(m_pic_to_ppi_data));
 }
 
 void megaphx_state::machine_reset()
 {
-	m_indervid->set_bpp(8);
+	install_bootrom(true);
+	m_disable_bootrom->adjust(m_maincpu->cycles_to_attotime(50));
 }
 
-void hamboy_state::machine_reset()
+void megaphx_state::install_bootrom(bool enable)
 {
-	m_indervid->set_bpp(4);
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.unmap_readwrite(0, std::max(m_bootrom.bytes(), m_mainram.bytes()) - 1);
+
+	// bootrom bankswitch
+	if (enable)
+		program.install_rom(0, m_bootrom.bytes() - 1, m_bootrom);
+	else
+		program.install_ram(0, m_mainram.bytes() - 1, m_mainram);
 }
+
+
 
 void megaphx_state::megaphx_68k_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom().region("boot", 0x00000); // or the rom doesn't map here? it contains the service mode grid amongst other things..
-	map(0x000000, 0x00ffff).ram().share("mainram"); // maps over part of the rom??
+	map(0x000000, 0x00ffff).ram().share(m_mainram);
 	map(0x040000, 0x040007).rw("inder_vid:tms", FUNC(tms34010_device::host_r), FUNC(tms34010_device::host_w));
 	map(0x050000, 0x050001).w(m_indersb, FUNC(inder_sb_device::megaphx_0x050000_w));
 	map(0x050002, 0x050003).r(m_indersb, FUNC(inder_sb_device::megaphx_0x050002_r));
 	map(0x060000, 0x060007).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x800000, 0x8fffff).rom().region("data", 0x00000);
+	map(0xfc0000, 0xffffff).rom().region("boot", 0x00000);
 }
-
 
 
 
@@ -245,6 +248,7 @@ static INPUT_PORTS_START( megaphx )
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:!8")
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( hamboy )
 	PORT_INCLUDE(megaphx)
 
@@ -285,6 +289,24 @@ static INPUT_PORTS_START( hamboy )
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "SW2:!7")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:!8")
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( yoyospel )
+	PORT_INCLUDE(megaphx)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME(0x01, 0x00, DEF_STR( Demo_Sounds )) PORT_DIPLOCATION("SW2:!1")
+	PORT_DIPSETTING(   0x01, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x00, DEF_STR( On ))
+	PORT_SERVICE_DIPLOC(0x02, IP_ACTIVE_HIGH, "SW2:!2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x00, "SW2:!3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x00, "SW2:!4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x00, "SW2:!5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x00, "SW2:!6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x00, "SW2:!7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:!8")
+INPUT_PORTS_END
+
 
 
 // pic port a
@@ -330,14 +352,13 @@ uint8_t megaphx_state::pic_portb_r()
 
 	data |= m_ppi_to_pic_command << 0;
 	data |= m_dsw_data << 1;
-	data |= ioport("START")->read() << 4;
+	data |= m_start->read() << 4 & 0x30;
 
 	return data;
 }
 
 void megaphx_state::pic_portb_w(uint8_t data)
 {
-
 	m_dsw_shifter[0]->shift_load_w(BIT(data, 2));
 	m_dsw_shifter[1]->shift_load_w(BIT(data, 2));
 	m_dsw_shifter[0]->clock_w(BIT(data, 3));
@@ -367,10 +388,6 @@ uint8_t megaphx_state::ppi_portc_r()
 
 void megaphx_state::ppi_portc_w(uint8_t data)
 {
-	// avoid bogus write on reset
-	if (data == 0xff)
-		return;
-
 	// only set, don't clear here. otherwise the pic has no chance to pick it up
 	if (BIT(data, 4))
 		m_ppi_to_pic_command = BIT(data, 4);
@@ -379,10 +396,7 @@ void megaphx_state::ppi_portc_w(uint8_t data)
 	m_ppi_to_pic_clock = BIT(data, 7);
 }
 
-WRITE_LINE_MEMBER( megaphx_state::dsw_w )
-{
-	m_dsw_data = state;
-}
+
 
 void megaphx_state::megaphx(machine_config &config)
 {
@@ -410,14 +424,24 @@ void megaphx_state::megaphx(machine_config &config)
 	m_ppi->in_pb_callback().set_ioport("P2");
 	m_ppi->in_pc_callback().set(FUNC(megaphx_state::ppi_portc_r));
 	m_ppi->out_pc_callback().set(FUNC(megaphx_state::ppi_portc_w));
+	m_ppi->tri_pc_callback().set_constant(0);
 
 	INDER_VIDEO(config, m_indervid, 0);
 
 	INDER_AUDIO(config, "inder_sb", 0);
 }
 
+void megaphx_state::hamboy(machine_config &config)
+{
+	megaphx(config);
+
+	m_indervid->set_bpp(4);
+}
+
+
+
 ROM_START( megaphx )
-	ROM_REGION16_BE( 0x40000, "boot", 0 )  // the majority of the data in these does not get used?! (only the vector table) is it just garbage??
+	ROM_REGION16_BE( 0x40000, "boot", 0 ) // the majority of the data in these does not get used?! (only the vector table) is it just garbage??
 	ROM_LOAD16_BYTE( "mph6.u32", 0x000001, 0x20000, CRC(b99703d4) SHA1(393b6869e71d4c61060e66e0e9e36a1e6ca345d1) )
 	ROM_LOAD16_BYTE( "mph7.u21", 0x000000, 0x20000, CRC(f11e7449) SHA1(1017142d10011d68e49d3ccdb1ac4e815c03b17a) )
 
@@ -445,32 +469,72 @@ ROM_START( megaphx )
 	ROM_LOAD( "p40_u29_palce16v8h-25.jed", 0x000, 0xbd4, BAD_DUMP CRC(44b7e51c) SHA1(b8b34f3b319d664ec3ad72ed87d9f65701f183a5) )
 ROM_END
 
+
 ROM_START( hamboy )
-	ROM_REGION16_BE( 0x40000, "boot", 0 )  // these only contain the boot vectors(!)
-	ROM_LOAD16_BYTE( "hb8 - u32.bin", 0x000001, 0x20000, CRC(4f7b142a) SHA1(e6e6cb05672e4f99def69be2f4cbc56f5d37f226) )
-	ROM_LOAD16_BYTE( "hb9 - u21.bin", 0x000000, 0x20000, CRC(138e294f) SHA1(671b34395f0773889ddf6aa1f4291df981d1b059) )
+	ROM_REGION16_BE( 0x40000, "boot", 0 ) // these only contain the boot vectors(!)
+	ROM_LOAD16_BYTE( "hb8.u32", 0x000001, 0x20000, CRC(4f7b142a) SHA1(e6e6cb05672e4f99def69be2f4cbc56f5d37f226) )
+	ROM_LOAD16_BYTE( "hb9.u21", 0x000000, 0x20000, CRC(138e294f) SHA1(671b34395f0773889ddf6aa1f4291df981d1b059) )
 
 	ROM_REGION16_BE( 0x100000, "data", 0 )
-	ROM_LOAD16_BYTE( "hb0 - u38.bin", 0x000001, 0x20000, CRC(b946a47f) SHA1(7f78a198fa3c5a00c124ab62473da4cddc0ac31f) )
-	ROM_LOAD16_BYTE( "hb1 - u27.bin", 0x000000, 0x20000, CRC(890e1571) SHA1(e4a50a1849e9bc9853070da160e042f13737d8d2) )
-	ROM_LOAD16_BYTE( "hb2 - u37.bin", 0x040001, 0x20000, CRC(b71b0aad) SHA1(fb2525a1581e6aa9a60ce76a09947b8d1941951c) )
-	ROM_LOAD16_BYTE( "hb3 - u26.bin", 0x040000, 0x20000, CRC(1d0d61b9) SHA1(d747c8c31a81364d85ac00c50cefd695868d916d) )
-	ROM_LOAD16_BYTE( "hb4 - u36.bin", 0x080001, 0x20000, CRC(9b81948e) SHA1(9e8bbee7f19e97d81205add7dbe89b353c6ab25a) )
-	ROM_LOAD16_BYTE( "hb5 - u25.bin", 0x080000, 0x20000, CRC(23885e08) SHA1(f0233e3e007715d1b0b94fd52ffb597d667dc818) )
-	ROM_LOAD16_BYTE( "hb6 - u35.bin", 0x0c0001, 0x20000, CRC(0c479648) SHA1(a07947b0b4e526b853782545bfdf73effa6c6579) )
-	ROM_LOAD16_BYTE( "hb7 - u24.bin", 0x0c0000, 0x20000, CRC(297a6944) SHA1(7c5c66412db7905b0302a4e451fc20c20233990e) )
+	ROM_LOAD16_BYTE( "hb0.u38", 0x000001, 0x20000, CRC(b946a47f) SHA1(7f78a198fa3c5a00c124ab62473da4cddc0ac31f) )
+	ROM_LOAD16_BYTE( "hb1.u27", 0x000000, 0x20000, CRC(890e1571) SHA1(e4a50a1849e9bc9853070da160e042f13737d8d2) )
+	ROM_LOAD16_BYTE( "hb2.u37", 0x040001, 0x20000, CRC(b71b0aad) SHA1(fb2525a1581e6aa9a60ce76a09947b8d1941951c) )
+	ROM_LOAD16_BYTE( "hb3.u26", 0x040000, 0x20000, CRC(1d0d61b9) SHA1(d747c8c31a81364d85ac00c50cefd695868d916d) )
+	ROM_LOAD16_BYTE( "hb4.u36", 0x080001, 0x20000, CRC(9b81948e) SHA1(9e8bbee7f19e97d81205add7dbe89b353c6ab25a) )
+	ROM_LOAD16_BYTE( "hb5.u25", 0x080000, 0x20000, CRC(23885e08) SHA1(f0233e3e007715d1b0b94fd52ffb597d667dc818) )
+	ROM_LOAD16_BYTE( "hb6.u35", 0x0c0001, 0x20000, CRC(0c479648) SHA1(a07947b0b4e526b853782545bfdf73effa6c6579) )
+	ROM_LOAD16_BYTE( "hb7.u24", 0x0c0000, 0x20000, CRC(297a6944) SHA1(7c5c66412db7905b0302a4e451fc20c20233990e) )
 
 	ROM_REGION( 0x200000, "inder_sb:user2", 0 )
-	ROM_LOAD( "sonido hammerboy 0 - u39.bin", 0x00000, 0x20000, CRC(8d94ac97) SHA1(3447e4b5670880a9b222cba84f5630e8ed42c2d3) )
-	ROM_LOAD( "sonido hammerboy 1 - u38.bin", 0x20000, 0x20000, CRC(f92e5098) SHA1(10c869c7b1250a119bf201bfc8c586e9340c2a66) )
+	ROM_LOAD( "sonido_hammerboy_0.u39", 0x00000, 0x20000, CRC(8d94ac97) SHA1(3447e4b5670880a9b222cba84f5630e8ed42c2d3) )
+	ROM_LOAD( "sonido_hammerboy_1.u38", 0x20000, 0x20000, CRC(f92e5098) SHA1(10c869c7b1250a119bf201bfc8c586e9340c2a66) )
 
 	ROM_REGION( 0x100000, "inder_sb:audiocpu", 0 )
-	ROM_LOAD( "hammerboy - u35.bin", 0x000000, 0x2000,  CRC(cd22f2a4) SHA1(c5cf5b1ce528412493e2b5f565ed38e3e9123d37) )
+	ROM_LOAD( "hammerboy.u35", 0x000000, 0x2000,  CRC(cd22f2a4) SHA1(c5cf5b1ce528412493e2b5f565ed38e3e9123d37) )
 
 	ROM_REGION( 0x100000, "pic", 0 )
 	ROM_LOAD( "pic16c54-xt.bin", 0x000000, 0x430, CRC(21f396fb) SHA1(c8badb9b3681e684bced0ced1de4c3a15641de8b) )
 	ROM_FILL(0x2c, 1, 0x01) // patch timer length or it's too slow (pic issue?)
 ROM_END
 
-GAME( 1991, megaphx,  0,        megaphx, megaphx, megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Mega Phoenix", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1990, hamboy,   0,        megaphx, hamboy,  hamboy_state,  empty_init, ROT0, "Dinamic / Inder", "Hammer Boy",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+ROM_START( yoyospel )
+	ROM_REGION16_BE( 0x40000, "boot", 0 )
+	ROM_LOAD16_BYTE( "yo-yo_9.u32", 0x000000, 0x20000, CRC(7de27e36) SHA1(a32e79ab5a6c55df0056710c05ef714e25eda3d4) )
+	ROM_LOAD16_BYTE( "yo-yo_8.u21", 0x000001, 0x20000, CRC(9f350036) SHA1(be42ced534faf850f0b2780d77dda7df9b08cdcc) )
+
+	ROM_REGION16_BE( 0x100000, "data", 0 )
+	ROM_LOAD16_BYTE( "yo-yo_1.u38", 0x000001, 0x20000, CRC(3f09bbf3) SHA1(842a1d11090c91f8b1d14b209d51da4323c82894) )
+	ROM_LOAD16_BYTE( "yo-yo_0.u27", 0x000000, 0x20000, CRC(5aeeac9a) SHA1(a3b149fb92075d19aaf9bcd3319d9ae32208fac2) )
+	ROM_LOAD16_BYTE( "yo-yo_3.u37", 0x040001, 0x20000, CRC(1af108b9) SHA1(36e2d6044781e2b0d37003418eae02b949d3758a) )
+	ROM_LOAD16_BYTE( "yo-yo_2.u26", 0x040000, 0x20000, CRC(f578e99b) SHA1(026b6a243ef3ab345ff6be8bad679f64a081b768) )
+	ROM_LOAD16_BYTE( "yo-yo_5.u36", 0x080001, 0x20000, CRC(d1ebd4a4) SHA1(c19bbd39456394acc4d72c0d6cb5eeda50701def) )
+	ROM_LOAD16_BYTE( "yo-yo_4.u25", 0x080000, 0x20000, CRC(7e3219c6) SHA1(15c9bb1a3ff8e48e1d9a3fb50293d083a54b705c) )
+	ROM_LOAD16_BYTE( "yo-yo_7.u35", 0x0c0001, 0x20000, CRC(3139630c) SHA1(39992169bc65590edb209b516af59206ab9f550a) )
+	ROM_LOAD16_BYTE( "yo-yo_6.u24", 0x0c0000, 0x20000, CRC(b1066c4c) SHA1(eb0c95eeaf1e4b57d1bb08b110951ba044300361) )
+
+	ROM_REGION( 0x200000, "inder_sb:user2", 0 )
+	ROM_LOAD( "yo-yo_son_1.u39", 0x00000, 0x20000, CRC(a075806e) SHA1(e0cf67cd22651a450646a35c87dffbf057dc5c21) )
+	ROM_LOAD( "yo-yo_son_2.u38", 0x20000, 0x20000, CRC(b31ad4a1) SHA1(a464301cf8ca152c23fb206eb52ba0910e1fd02e) )
+
+	ROM_REGION( 0x100000, "inder_sb:audiocpu", 0 )
+	ROM_LOAD( "yo-yo_son_0.u35", 0x000000, 0x2000,  CRC(7f9a2dcf) SHA1(37a28fedc690e0486c13eb85c20610e695d7dce3) )
+
+	ROM_REGION( 0x100000, "pic", 0 )
+	ROM_LOAD( "pic16c54-xt.bin", 0x000000, 0x430,  CRC(21f396fb) SHA1(c8badb9b3681e684bced0ced1de4c3a15641de8b) )
+	ROM_FILL(0x2c, 1, 0x01) // patch timer length or it's too slow (pic issue?)
+
+	ROM_REGION( 0x1000, "pals", 0 ) // protected
+	ROM_LOAD( "p31_u31_palce16v8h-25.jed", 0x000, 0xbd4, NO_DUMP )
+	ROM_LOAD( "p40_u29_palce16v8h-25.jed", 0x000, 0xbd4, NO_DUMP )
+ROM_END
+
+} // anonymous namespace
+
+
+
+GAME( 1991, megaphx,  0,        megaphx, megaphx, megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Mega Phoenix", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hamboy,   0,        hamboy,  hamboy,  megaphx_state, empty_init, ROT0, "Dinamic / Inder", "Hammer Boy",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+
+// This game would later become Little Robin, although this early version has significant design differences.  The game has no music, probably not an emulation problem.
+GAME( 1992, yoyospel, littlerb, megaphx, yoyospel,megaphx_state, empty_init, ROT0, "Inder", "YoYo Spell (prototype)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

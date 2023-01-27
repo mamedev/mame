@@ -519,6 +519,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class bingor_state : public driver_device
 {
 public:
@@ -935,6 +937,8 @@ ROM_START( vip2000 )
 	ROM_REGION( 0x20000, "eeprom", 0 )
 	ROM_LOAD( "24c04a.bin", 0x000, 0x200, CRC(4e231420) SHA1(24dcfc90ef9903692030be7de0f04fc9370021fd) )
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME     PARENT   MACHINE   INPUT   STATE         INIT        ROT    COMPANY                          FULLNAME                             FLAGS

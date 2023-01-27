@@ -65,8 +65,8 @@ protected:
 							   // reserved
 		MCS_PCC = 0x0000'8000, // processor channel check
 
-		MCS_ALL = 0x0000'ff00,
-		PCS_ALL = 0x0000'00ff,
+		MCS_ALL = 0x0000'be00,
+		PCS_ALL = 0x0000'00fe,
 	};
 
 	enum irb_mask : u16
@@ -142,8 +142,7 @@ private:
 
 	void interrupt_check();
 	void machine_check(u32 mcs);
-	void program_check(u32 pcs, u32 iar);
-	void program_check(u32 pcs) { program_check(pcs, m_scr[IAR]); }
+	void program_check(u32 pcs);
 	void interrupt_enter(unsigned vector, u32 iar, u16 svc = 0);
 
 	using rsc_mode = rsc_bus_interface::rsc_mode;
@@ -167,7 +166,7 @@ private:
 		switch (address >> 28)
 		{
 		default:
-			if (m_mmu->load(address, data, mode))
+			if (m_mmu->mem_load(address, data, mode))
 				f(data);
 			else
 				program_check(PCS_PCK | PCS_DAE);
@@ -177,8 +176,13 @@ private:
 			switch (address >> 24)
 			{
 			case 0xf0:
+				if (m_iou->pio_load(address, data, mode))
+					f(data);
+				else
+					program_check(PCS_PCK | PCS_DAE);
+				break;
 			case 0xf4:
-				if (m_iou->load(address, data, mode))
+				if (m_iou->mem_load(address, data, mode))
 					f(data);
 				else
 					program_check(PCS_PCK | PCS_DAE);
@@ -203,7 +207,7 @@ private:
 		switch (address >> 28)
 		{
 		default:
-			if (!m_mmu->store(address, data, mode))
+			if (!m_mmu->mem_store(address, data, mode))
 				program_check(PCS_PCK | PCS_DAE);
 			break;
 
@@ -211,8 +215,11 @@ private:
 			switch (address >> 24)
 			{
 			case 0xf0:
+				if (!m_iou->pio_store(address, data, mode))
+					program_check(PCS_PCK | PCS_DAE);
+				break;
 			case 0xf4:
-				if (!m_iou->store(address, data, mode))
+				if (!m_iou->mem_store(address, data, mode))
 					program_check(PCS_PCK | PCS_DAE);
 				break;
 
@@ -235,7 +242,7 @@ private:
 		switch (address >> 28)
 		{
 		default:
-			if (!m_mmu->modify(address, f, mode))
+			if (!m_mmu->mem_modify(address, f, mode))
 				program_check(PCS_PCK | PCS_DAE);
 			break;
 
@@ -243,8 +250,11 @@ private:
 			switch (address >> 24)
 			{
 			case 0xf0:
+				if (!m_iou->pio_modify(address, f, mode))
+					program_check(PCS_PCK | PCS_DAE);
+				break;
 			case 0xf4:
-				if (!m_iou->modify(address, f, mode))
+				if (!m_iou->mem_modify(address, f, mode))
 					program_check(PCS_PCK | PCS_DAE);
 				break;
 
@@ -289,6 +299,7 @@ private:
 	m_branch_state;
 	u32 m_branch_source;
 	u32 m_branch_target;
+	bool m_defer_int;
 };
 
 DECLARE_DEVICE_TYPE(ROMP, romp_device)

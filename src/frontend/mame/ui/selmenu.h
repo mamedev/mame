@@ -39,8 +39,8 @@ public:
 	virtual ~menu_select_launch() override;
 
 protected:
-	static constexpr std::size_t MAX_ICONS_RENDER = 128;
-	static constexpr std::size_t MAX_VISIBLE_SEARCH = 200;
+	static inline constexpr std::size_t MAX_ICONS_RENDER = 128;
+	static inline constexpr std::size_t MAX_VISIBLE_SEARCH = 200;
 
 	// tab navigation
 	enum class focused_menu
@@ -126,7 +126,10 @@ protected:
 	void launch_system(game_driver const &driver, ui_software_info const &swinfo) { launch_system(ui(), driver, &swinfo, nullptr, nullptr); }
 	void launch_system(game_driver const &driver, ui_software_info const &swinfo, std::string const &part) { launch_system(ui(), driver, &swinfo, &part, nullptr); }
 
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual void menu_activated() override;
+	virtual void menu_deactivated() override;
 
 	// handlers
 	virtual void inkey_export() = 0;
@@ -134,7 +137,7 @@ protected:
 
 	// draw arrow
 	void draw_common_arrow(float origx1, float origy1, float origx2, float origy2, int current, int dmin, int dmax, float title);
-	void draw_info_arrow(int ub, float origx1, float origx2, float oy1, float line_height, float text_size, float ud_arrow_width);
+	void draw_info_arrow(int ub, float origx1, float origx2, float oy1, float line_height, float ud_arrow_width);
 
 	bool draw_error_text();
 
@@ -158,8 +161,17 @@ protected:
 	void *get_selection_ptr() const
 	{
 		void *const selected_ref(get_selection_ref());
-		return (uintptr_t(selected_ref) > skip_main_items) ? selected_ref : m_prev_selected;
+		return (uintptr_t(selected_ref) > m_skip_main_items) ? selected_ref : m_prev_selected;
 	}
+
+	u8 const right_panel() const { return m_right_panel; }
+	u8 const right_image() const { return m_image_view; }
+	char const *right_panel_config_string() const;
+	char const *right_image_config_string() const;
+	void set_right_panel(u8 index);
+	void set_right_image(u8 index);
+	void set_right_panel(std::string_view value);
+	void set_right_image(std::string_view value);
 
 	static std::string make_system_audit_fail_text(media_auditor const &auditor, media_auditor::summary summary);
 	static std::string make_software_audit_fail_text(media_auditor const &auditor, media_auditor::summary summary);
@@ -169,7 +181,7 @@ protected:
 	}
 
 	int         m_available_items;
-	int         skip_main_items;
+	int         m_skip_main_items;
 	void        *m_prev_selected;
 	int         m_total_lines;
 	int         m_topline_datsview;
@@ -275,11 +287,11 @@ private:
 	void get_title_search(std::string &title, std::string &search);
 
 	// event handling
-	virtual void handle_keys(uint32_t flags, int &iptkey) override;
-	virtual void handle_events(uint32_t flags, event &ev) override;
+	virtual void handle_keys(u32 flags, int &iptkey) override;
+	virtual void handle_events(u32 flags, event &ev) override;
 
 	// draw game list
-	virtual void draw(uint32_t flags) override;
+	virtual void draw(u32 flags) override;
 
 	// draw right panel
 	void draw_right_panel(float origx1, float origy1, float origx2, float origy2);
@@ -304,6 +316,9 @@ private:
 	static bool has_multiple_bios(ui_software_info const &swinfo, s_bios &biosname);
 	static bool has_multiple_bios(game_driver const &driver, s_bios &biosname);
 
+	bool show_left_panel() const;
+	bool show_right_panel() const;
+
 	bool        m_ui_error;
 	std::string m_error_text;
 
@@ -314,19 +329,27 @@ private:
 	std::string                 m_info_buffer;
 	std::optional<text_layout>  m_info_layout;
 
-	cache                   &m_cache;
-	bool                    m_is_swlist;
-	focused_menu            m_focus;
-	bool                    m_pressed;              // mouse button held down
-	osd_ticks_t             m_repeat;
+	int                         m_icon_width;
+	int                         m_icon_height;
+	float                       m_divider_width;
+	float                       m_divider_arrow_width;
+	float                       m_divider_arrow_height;
+	float                       m_info_line_height;
 
-	int                     m_right_visible_lines;  // right box lines
+	cache                       &m_cache;
+	bool                        m_is_swlist;
+	focused_menu                m_focus;
+	bool                        m_pressed;              // mouse button held down
+	osd_ticks_t                 m_repeat;
 
-	bool                    m_has_icons;
-	bool                    m_switch_image;
-	bool                    m_default_image;
-	uint8_t                 m_image_view;
-	flags_cache             m_flags;
+	int                         m_right_visible_lines;  // right box lines
+
+	u8                          m_panels_status;
+	u8                          m_right_panel;
+	bool                        m_has_icons;
+	bool                        m_switch_image;
+	u8                          m_image_view;
+	flags_cache                 m_flags;
 };
 
 } // namespace ui

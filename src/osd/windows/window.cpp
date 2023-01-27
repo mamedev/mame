@@ -1033,7 +1033,8 @@ int win_window_info::complete_create()
 	if (video_config.mode == VIDEO_MODE_NONE || attached_mode())
 	{
 		set_renderer(osd_renderer::make_for_type(video_config.mode, shared_from_this()));
-		renderer().create();
+		if (renderer().create())
+			return 1;
 		return 0;
 	}
 

@@ -444,12 +444,6 @@ INTERRUPT_GEN_MEMBER(m72_state::fake_nmi)
 }
 
 
-void m72_state::bchopper_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	static const int a[6] = { 0x0000, 0x0010, 0x2510, 0x6510, 0x8510, 0x9310 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 6) m_audio->set_sample_start(a[data & 0xff]);
-}
-
 void m72_state::nspirit_sample_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	static const int a[9] = { 0x0000, 0x0020, 0x2020, 0, 0x5720, 0, 0x7b60, 0x9b60, 0xc360 };
@@ -524,29 +518,6 @@ running, but they have not been derived from the real 8751 code.
 #define CODE_LEN 96
 #define CRC_LEN 18
 
-/* Battle Chopper (World, M72 hardware) */
-static const u8 bchopper_code[CODE_LEN] =
-{
-	0x68,0x00,0xa0,             // push 0a000h
-	0x1f,                       // pop ds
-	0xc6,0x06,0x38,0x38,0x53,   // mov [3838h], byte 053h
-	0xc6,0x06,0x3a,0x38,0x41,   // mov [383ah], byte 041h
-	0xc6,0x06,0x3c,0x38,0x4d,   // mov [383ch], byte 04dh
-	0xc6,0x06,0x3e,0x38,0x4f,   // mov [383eh], byte 04fh
-	0xc6,0x06,0x40,0x38,0x54,   // mov [3840h], byte 054h
-	0xc6,0x06,0x42,0x38,0x4f,   // mov [3842h], byte 04fh
-	0x68,0x00,0xb0,             // push 0b000h
-	0x1f,                       // pop ds
-	0xc6,0x06,0x00,0x09,0x49^0xff,  // mov [0900h], byte 049h
-	0xc6,0x06,0x00,0x0a,0x49^0xff,  // mov [0a00h], byte 049h
-	0xc6,0x06,0x00,0x0b,0x49^0xff,  // mov [0b00h], byte 049h
-	0xc6,0x06,0x00,0x00,0xcb^0xff,  // mov [0000h], byte 0cbh ; retf : bypass protection check during the game
-	0x68,0x00,0xd0,             // push 0d000h
-	0x1f,                       // pop ds
-	0xea,0x68,0x01,0x40,0x00    // jmp  0040:$0168
-};
-static const u8 bchopper_crc[CRC_LEN] =  {   0x1a,0x12,0x5c,0x08, 0x84,0xb6,0x73,0xd1,
-												0x54,0x91,0x94,0xeb, 0x00,0x00 };
 
 /* Ninja Spirit (World, M72 hardware) */
 static const u8 nspirit_code[CODE_LEN] =
@@ -624,12 +595,6 @@ void m72_state::install_protection_handler(const u8 *code,const u8 *crc)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb0000, 0xb0fff, write16s_delegate(*this, FUNC(m72_state::protection_w)));
 
 	save_pointer(NAME(m_protection_ram), 0x1000/2);
-}
-
-void m72_state::init_bchopper()
-{
-	install_protection_handler(bchopper_code,bchopper_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16s_delegate(*this, FUNC(m72_state::bchopper_sample_trigger_w)));
 }
 
 void m72_state::init_nspirit()
@@ -1858,14 +1823,17 @@ void m72_state::m72_airduel(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &m72_state::m72_airduel_portmap);
 }
 
-void m72_state::imgfightb(machine_config &config)
+void m72_state::imgfightjb(machine_config &config)
 {
 	m72_8751(config);
-	i80c31_device &mcu(I80C31(config.replace(), m_mcu, XTAL(7'200'000)));
+	i80c31_device &mcu(I80C31(config.replace(), m_mcu, XTAL(32'000'000) / 4));
 	mcu.set_addrmap(AS_PROGRAM, &m72_state::i80c31_mem_map);
 	mcu.set_addrmap(AS_IO, &m72_state::mcu_io_map);
+	mcu.port_out_cb<1>().set(m_dac, FUNC(dac_byte_interface::write));
 
 	// TODO: uses 6116 type RAM instead of MB8421 and MB8431
+
+	MCFG_VIDEO_START_OVERRIDE(m72_state, imgfight)
 }
 
 void m72_state::rtype(machine_config &config)
@@ -2406,8 +2374,8 @@ ROM_START( bchopper )
 	ROM_LOAD16_BYTE( "mh_c-l3-b.ic34", 0x60000, 0x10000, CRC(11562221) SHA1(a2f136a487fb6f30350e8d1e26c0729eb0686c7d) )
 	ROM_RELOAD(                        0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )  // i8751 microcontroller
-	ROM_LOAD( "mh_c-pr-b.ic1",  0x00000, 0x10000, NO_DUMP ) // i8751 MCU labeled  MH C-PR-B  - read protected
+	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
+	ROM_LOAD( "mh_c-pr-b.ic1", 0x0000, 0x1000, CRC(9d201fea) SHA1(20fca55c46d756784b341bbe204388b9d836e76d) ) // i8751 MCU labeled  MH C-PR-B
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "mh_c-00-a.ic53", 0x00000, 0x10000, CRC(f6e6e660) SHA1(e066e5ed37719cf2b6fd36e0117f11325bb06f9c) )  // sprites
@@ -2455,8 +2423,8 @@ ROM_START( mrheli )
 	ROM_LOAD16_BYTE( "mh_c-l3-.ic34", 0x60000, 0x10000, CRC(c0982536) SHA1(45399f8d0577c6e2a277a69303954ce5d2de7c07) )
 	ROM_RELOAD(                       0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )  // i8751 microcontroller
-	ROM_LOAD( "mh_c-pr-.ic1",  0x00000, 0x1000, CRC(897dc4ee) SHA1(05a24bf76e8fa9ca96ba9376cbf44d299df04138) ) // i8751 MCU labeled  MH C-PR-
+	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
+	ROM_LOAD( "mh_c-pr-.ic1", 0x0000, 0x1000, CRC(897dc4ee) SHA1(05a24bf76e8fa9ca96ba9376cbf44d299df04138) ) // i8751 MCU labeled  MH C-PR-
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "mh_c-00.ic53", 0x00000, 0x20000, CRC(dec4e121) SHA1(92169b523f1600e994e016dc1959a52958e1d89d) )  // sprites
@@ -2627,8 +2595,8 @@ ROM_START( nspirit )
 	ROM_LOAD16_BYTE( "nin_c-l3-b.6a", 0x60000, 0x10000, CRC(fd7408b8) SHA1(3cbe72835a561c50265a047f0f5cd62db48378fd) )
 	ROM_RELOAD(                       0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )  // i8751 microcontroller
-	ROM_LOAD( "nin_c-pr-b.ic1", 0x00000, 0x01000, NO_DUMP ) // i8751 MCU labeled  NIN C-PR-B  - read protected
+	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
+	ROM_LOAD( "nin_c-pr-b.ic1", 0x0000, 0x1000, NO_DUMP ) // i8751 MCU labeled  NIN C-PR-B  - read protected
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "nin-r00.7m",  0x00000, 0x20000, CRC(5f61d30b) SHA1(7754697e43f6117fa604f50885b76014b1dc5760) )  // sprites
@@ -2674,8 +2642,8 @@ ROM_START( nspiritj )
 	ROM_LOAD16_BYTE( "nin_c-l3.6a", 0x60000, 0x10000, CRC(e754a87a) SHA1(9951d972ed13a0415c827beff122bc7ddb078447) )
 	ROM_RELOAD(                     0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )  // i8751 microcontroller
-	ROM_LOAD( "nin_c-pr-.ic1", 0x00000, 0x01000, CRC(802d440a) SHA1(45b844b831aa6d5d002e3960e17fb5a058b02a29) ) // i8751 MCU labeled  NIN C-PR-
+	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
+	ROM_LOAD( "nin_c-pr-.ic1", 0x0000, 0x1000, CRC(802d440a) SHA1(45b844b831aa6d5d002e3960e17fb5a058b02a29) ) // i8751 MCU labeled  NIN C-PR-
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "nin-r00.7m",  0x00000, 0x20000, CRC(5f61d30b) SHA1(7754697e43f6117fa604f50885b76014b1dc5760) )  // sprites
@@ -2718,8 +2686,8 @@ ROM_START( imgfight )
 	ROM_LOAD16_BYTE( "if-c-l3.ic34",   0x40000, 0x20000, CRC(c66ae348) SHA1(eca5096ebd5bffc6e68f3fc9969cda9679bd921f) )
 	ROM_RELOAD(                        0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )  // i8751 microcontroller
-	ROM_LOAD( "if_c-pr-a.ic1",  0x00000, 0x01000, CRC(55f10458) SHA1(d520ec2b075c94d76d97e0105644ff96384b378c) ) // i8751 MCU labeled  IF C-PR-A
+	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
+	ROM_LOAD( "if_c-pr-a.ic1", 0x0000, 0x1000, CRC(55f10458) SHA1(d520ec2b075c94d76d97e0105644ff96384b378c) ) // i8751 MCU labeled  IF C-PR-A
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "if-c-00.ic53", 0x00000, 0x20000, CRC(745e6638) SHA1(43fb1f9da4190fea67eee3aee8caf4219becc21b) )  // sprites
@@ -2762,8 +2730,8 @@ ROM_START( imgfightj )
 	ROM_LOAD16_BYTE( "if-c-l3.ic34", 0x40000, 0x20000, CRC(c66ae348) SHA1(eca5096ebd5bffc6e68f3fc9969cda9679bd921f) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )  // i8751 microcontroller
-	ROM_LOAD( "if_c-pr-.ic1", 0x00000, 0x01000, CRC(ef0d5098) SHA1(068b73937588e16a318a094dfe2fb1293b1a1711) ) // i8751 MCU labeled  IF C-PR-
+	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
+	ROM_LOAD( "if_c-pr-.ic1", 0x0000, 0x1000, CRC(ef0d5098) SHA1(068b73937588e16a318a094dfe2fb1293b1a1711) ) // i8751 MCU labeled  IF C-PR-
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "if-c-00.ic53", 0x00000, 0x20000, CRC(745e6638) SHA1(43fb1f9da4190fea67eee3aee8caf4219becc21b) )  // sprites
@@ -2797,11 +2765,11 @@ ROM_START( imgfightj )
 	ROM_LOAD( "if-c-3f-.ic13",  0x0400, 0x0117, CRC(2d774e1e) SHA1(373c3cbfaf983961c17ebe96b5aff850f36cb30c) ) // PAL16L8 - bruteforced - located on M72-C-A top board
 ROM_END
 
-ROM_START( imgfightb ) // mostly identical to imgfightj content-wise, it's a 4 PCB stack bootleg with flying wires
-	ROM_REGION( 0x100000, "maincpu", 0 ) // identical, but ic111.9e
+ROM_START( imgfightjb ) // mostly identical to imgfightj content-wise, it's a 4 PCB stack bootleg with flying wires
+	ROM_REGION( 0x100000, "maincpu", 0 ) // identical
 	ROM_LOAD16_BYTE( "ic108.9b", 0x00001, 0x10000, CRC(592d2d80) SHA1(d54916a9bfe4b65a972b62202af706135e73518d) )
 	ROM_LOAD16_BYTE( "ic89.7b",  0x00000, 0x10000, CRC(61f89056) SHA1(3e0724dbc2b00a30193ea6cfac8b4331055d4fd4) )
-	ROM_LOAD16_BYTE( "ic111.9e", 0x40001, 0x10000, CRC(da50622e) SHA1(32c75b6270d401a6825632c66f3026cae7b5b81f) ) // slight difference: 99.998474%: 0x1116 from 0x09 to 0x0d
+	ROM_LOAD16_BYTE( "ic111.9e", 0x40001, 0x10000, CRC(6aae3a46) SHA1(87fe2e13b4dd98c6cbec03ec52dfae1980403125) ) // dump had a slight difference: 99.998474%: 0x1116 from 0x09 to 0x0d. Determined to be rot.
 	ROM_RELOAD(                  0xc0001, 0x10000 )
 	ROM_LOAD16_BYTE( "ic110.9d", 0x60001, 0x10000, CRC(0e0aefcd) SHA1(f5056a2d0612d912aff1e0eccb1182de7ae16990) )
 	ROM_RELOAD(                  0xe0001, 0x10000 )
@@ -2810,8 +2778,8 @@ ROM_START( imgfightb ) // mostly identical to imgfightj content-wise, it's a 4 P
 	ROM_LOAD16_BYTE( "ic91.7d",  0x60000, 0x10000, CRC(d69c0722) SHA1(ef18e7b7057f19caaa61d0b8c07d2d0c6e0a555e) )
 	ROM_RELOAD(                  0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "25.ic27.2l",  0x00000, 0x2000, CRC(d83359a2) SHA1(2d486bf4a873abfe591e0d9383f9e230f47bc42a) ) // i80c31 instead of i8751, contents identical to imgfightj MCU, with second half padded with 0xff
+	ROM_REGION( 0x2000, "mcu", 0 )
+	ROM_LOAD( "25.ic27.2l", 0x00000, 0x2000, CRC(d83359a2) SHA1(2d486bf4a873abfe591e0d9383f9e230f47bc42a) ) // i80c31 instead of i8751, contents identical to imgfightj MCU, with second half padded with 0xff
 
 	ROM_REGION( 0x080000, "sprites", 0 ) // half size ROMs, but identical content
 	ROM_LOAD( "ic96.7k",  0x00000, 0x10000, CRC(d4febb03) SHA1(6fe53b198bdcef1708ff134c64af9c064e274e1b) )  // sprites
@@ -2850,8 +2818,8 @@ ROM_START( loht )
 	ROM_LOAD16_BYTE( "tom_c-l3-.ic34",  0x40000, 0x20000, CRC(2f049b03) SHA1(21047cb10912b1fc23795673af3ea7de249328b7) )
 	ROM_RELOAD(                         0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )  // i8751 microcontroller
-	ROM_LOAD( "tom_c-pr-b.ic1", 0x00000, 0x01000, CRC(9c9545f1) SHA1(ca800ce7467efb877d0fff4c47d72478a991e2a9) ) // i8751 MCU labeled  TOM C-PR-B
+	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
+	ROM_LOAD( "tom_c-pr-b.ic1", 0x0000, 0x1000, CRC(9c9545f1) SHA1(ca800ce7467efb877d0fff4c47d72478a991e2a9) ) // i8751 MCU labeled  TOM C-PR-B
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "tom_m53.ic53", 0x00000, 0x20000, CRC(0b83265f) SHA1(b31918d6442b79c9fe4f20410189788b050a994e) )  // sprites
@@ -2953,8 +2921,8 @@ ROM_START( lohtj )
 	ROM_LOAD16_BYTE( "tom_c-l3-", 0x40000, 0x20000, CRC(2f049b03) SHA1(21047cb10912b1fc23795673af3ea7de249328b7) )
 	ROM_RELOAD(                   0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )  // i8751 microcontroller
-	ROM_LOAD( "tom_c-pr-.ic1",  0x00000, 0x01000, CRC(9fa9b496) SHA1(b529bcd7bf123894e11f2a8df8826932122e375a) ) // i8751 MCU labeled  TOM C-PR-
+	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
+	ROM_LOAD( "tom_c-pr-.ic1", 0x0000, 0x1000, CRC(9fa9b496) SHA1(b529bcd7bf123894e11f2a8df8826932122e375a) ) // i8751 MCU labeled  TOM C-PR-
 
 	ROM_REGION( 0x080000, "sprites", 0 ) // same data as loht above, just mask ROMs without labels
 	ROM_LOAD( "r200",     0x00000, 0x20000, CRC(0b83265f) SHA1(b31918d6442b79c9fe4f20410189788b050a994e) )  // sprites
@@ -3051,7 +3019,7 @@ ROM_START( lohtb2 )
 	ROM_LOAD16_BYTE( "loht-a12.bin", 0x60000, 0x10000, CRC(cfb0390d) SHA1(4acc61a51a7ae681bd8d835e2644b44c4d6d7bcb) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) // MCU running in external mode on daughtercard. Same data as lohtj just padded with 0xff
+	ROM_REGION( 0x2000, "mcu", 0 ) // MCU running in external mode on daughtercard. Same data as lohtj just padded with 0xff
 	ROM_LOAD( "loht-a26.bin",  0x00000, 0x02000, CRC(ac901e17) SHA1(70a73288d594c78ad2aca78ce55a699cb040bede) )
 
 	ROM_REGION( 0x080000, "sprites", 0 )
@@ -3094,8 +3062,8 @@ ROM_START( lohtb3 ) // extremely similar to the original. Copyright changed to 1
 	ROM_LOAD16_BYTE( "i-3.3",    0x60000, 0x10000, CRC(cfb0390d) SHA1(4acc61a51a7ae681bd8d835e2644b44c4d6d7bcb) )
 	ROM_RELOAD(                  0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )  // i8751 microcontroller
-	ROM_LOAD( "c8751h.bin",  0x00000, 0x01000, CRC(9c9545f1) SHA1(ca800ce7467efb877d0fff4c47d72478a991e2a9) ) // unprotected?? == tom_c-pr-b.ic1 from loht (World) set
+	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
+	ROM_LOAD( "c8751h.bin", 0x0000, 0x1000, CRC(9c9545f1) SHA1(ca800ce7467efb877d0fff4c47d72478a991e2a9) ) // unprotected?? == tom_c-pr-b.ic1 from loht (World) set
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "i-8.8",   0x00000, 0x10000, CRC(df5ac5ee) SHA1(5b45417ada402047d97dfb6cee6545686ad26e37) )
@@ -3416,8 +3384,8 @@ ROM_START( xmultiplm72 )
 	ROM_LOAD16_BYTE( "xm_c-l0-.ic37", 0x40000, 0x10000, CRC(06a9e213) SHA1(9831c110814642703d6e71d49848d854095b7d3a) )
 	ROM_RELOAD(                       0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )  // i8751 microcontroller
-	ROM_LOAD( "xm_c-pr-.ic1", 0x00000, 0x01000, CRC(c8ceb3cd) SHA1(e5d20a3a9d7f0919604543c97643a03434d80130) ) // i8751 MCU labeled  XM C-PR-
+	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
+	ROM_LOAD( "xm_c-pr-.ic1", 0x0000, 0x1000, CRC(c8ceb3cd) SHA1(e5d20a3a9d7f0919604543c97643a03434d80130) ) // i8751 MCU labeled  XM C-PR-
 
 	ROM_REGION( 0x100000, "sprites", 0 )
 	ROM_LOAD( "t44.00.ic53", 0x00000, 0x20000, CRC(db45186e) SHA1(8c8edeb4b7e6b0516f2597823dc27eba9c5d9528) )  // sprites
@@ -3464,8 +3432,8 @@ ROM_START( dbreedm72 )
 	ROM_LOAD16_BYTE( "db_c-l0.ic37",   0x60000, 0x10000, CRC(ed0f5e06) SHA1(9030840b15e83c18d59c884ed08c93c05fa70c5b) )
 	ROM_RELOAD(                        0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )  // i8751 microcontroller
-	ROM_LOAD( "db_c-pr-b.ic1",  0x00000, 0x01000, NO_DUMP ) // Requires different currently undumped MCU code - i8751 MCU labeled  DB C-PR-B??
+	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
+	ROM_LOAD( "db_c-pr-b.ic1", 0x0000, 0x1000, NO_DUMP ) // Requires different currently undumped MCU code - i8751 MCU labeled  DB C-PR-B??
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "db_k800m.00", 0x00000, 0x20000, CRC(c027a8cf) SHA1(534dc416b8f5587168c7f644d3f9438c8a190491) )   // sprites
@@ -3507,8 +3475,8 @@ ROM_START( dbreedjm72 )
 	ROM_LOAD16_BYTE( "db_c-l0.ic37",  0x60000, 0x10000, CRC(ed0f5e06) SHA1(9030840b15e83c18d59c884ed08c93c05fa70c5b) )
 	ROM_RELOAD(                       0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )  // i8751 microcontroller
-	ROM_LOAD( "db_c-pr-.ic1",  0x00000, 0x01000, CRC(8bf2910c) SHA1(65842c928626077f613e0ab56074e83301a64a2e) ) // i8751 MCU labeled  DB C-PR-
+	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
+	ROM_LOAD( "db_c-pr-.ic1", 0x0000, 0x1000, CRC(8bf2910c) SHA1(65842c928626077f613e0ab56074e83301a64a2e) ) // i8751 MCU labeled  DB C-PR-
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "db_k800m.00", 0x00000, 0x20000, CRC(c027a8cf) SHA1(534dc416b8f5587168c7f644d3f9438c8a190491) )   // sprites
@@ -3551,8 +3519,8 @@ ROM_START( dkgensanm72 )
 	ROM_LOAD16_BYTE( "ge72-l3.bin",  0x60000, 0x10000, CRC(23d303a5) SHA1(b62010f34d71afb590deae458493454f9af38f7c) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )  // i8751 microcontroller
-	ROM_LOAD( "dkgenm72_i8751.ic1",  0x00000, 0x10000, NO_DUMP ) // read protected
+	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
+	ROM_LOAD( "dkgenm72_i8751.ic1", 0x0000, 0x1000, NO_DUMP ) // read protected
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "hh_00.rom",    0x00000, 0x20000, CRC(ec5127ef) SHA1(014ac8ad7b19cd9b475b72a0f42a4991119501c4) )  // sprites
@@ -3596,7 +3564,7 @@ ROM_START( airduelm72 )
 	ROM_RELOAD(                        0xc0000, 0x20000 )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
-	ROM_LOAD( "ad_c-pr-c.ic1", 0x00000, 0x01000, CRC(8785e4e2) SHA1(491f5646e1c5d68453086f05b9d79722eb5282ea) ) // i8751 MCU labeled  AD C-PR-C
+	ROM_LOAD( "ad_c-pr-c.ic1", 0x0000, 0x1000, CRC(8785e4e2) SHA1(491f5646e1c5d68453086f05b9d79722eb5282ea) ) // i8751 MCU labeled  AD C-PR-C
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "ad-00.ic53", 0x00000, 0x20000, CRC(2f0d599b) SHA1(a966f806b5e25bb98cc63c46c49e0e676a62afcf) )
@@ -3640,7 +3608,7 @@ ROM_START( airdueljm72 )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
-	ROM_LOAD( "ad_c-pr-.ic1", 0x00000, 0x01000, CRC(45584e52) SHA1(647826f1bec9b39ae971ecb58d921d363ee4cf45) ) // i8751 MCU labeled  AD C-PR-
+	ROM_LOAD( "ad_c-pr-.ic1", 0x0000, 0x1000, CRC(45584e52) SHA1(647826f1bec9b39ae971ecb58d921d363ee4cf45) ) // i8751 MCU labeled  AD C-PR-
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "ad-00.ic53", 0x00000, 0x20000, CRC(2f0d599b) SHA1(a966f806b5e25bb98cc63c46c49e0e676a62afcf) )
@@ -3683,8 +3651,8 @@ ROM_START( gallopm72 )
 	ROM_LOAD16_BYTE( "cc-c-l3.ic34", 0x40000, 0x20000, CRC(acd3278e) SHA1(83d7ddfbdb4bc9548a179b728351a21b3b0ac134) )
 	ROM_RELOAD(                      0xc0000, 0x20000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )  // i8751 microcontroller
-	ROM_LOAD( "cc_c-pr-.ic1", 0x00000, 0x10000, NO_DUMP ) // read protected (only used for sample triggering, not supplying code / warning screens)
+	ROM_REGION( 0x1000, "mcu", 0 )  // i8751 microcontroller
+	ROM_LOAD( "cc_c-pr-.ic1", 0x0000, 0x1000, NO_DUMP ) // read protected (only used for sample triggering, not supplying code / warning screens)
 
 	ROM_REGION( 0x080000, "sprites", 0 )  // sprites - same data as the cosmccop/gallop sets
 	ROM_LOAD( "cc-c-00.ic53", 0x00000, 0x20000, CRC(9d99deaa) SHA1(acf16bea0f482306107d2a305c568406b6c21e9a) )   // == cc-b-n0.ic31
@@ -4690,7 +4658,7 @@ GAME( 1987, rtypejp,     rtype,    rtype,        rtypep,       m72_state, empty_
 GAME( 1987, rtypeu,      rtype,    rtype,        rtype,        m72_state, empty_init,      ROT0,   "Irem (Nintendo of America license)", "R-Type (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rtypeb,      rtype,    rtype,        rtype,        m72_state, empty_init,      ROT0,   "bootleg", "R-Type (World bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, bchopper,    0,        m72,          bchopper,     m72_state, init_bchopper,   ROT0,   "Irem", "Battle Chopper (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
+GAME( 1987, bchopper,    0,        mrheli,       bchopper,     m72_state, init_m72_8751,   ROT0,   "Irem", "Battle Chopper (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1987, mrheli,      bchopper, mrheli,       bchopper,     m72_state, init_m72_8751,   ROT0,   "Irem", "Mr. HELI no Daibouken (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, nspirit,     0,        m72,          nspirit,      m72_state, init_nspirit,    ROT0,   "Irem", "Ninja Spirit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // missing i8751 MCU code
@@ -4698,7 +4666,7 @@ GAME( 1988, nspiritj,    nspirit,  nspiritj,     nspirit,      m72_state, init_m
 
 GAME( 1988, imgfight,    0,        imgfight,     imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, imgfightj,   imgfight, imgfight,     imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, imgfightb,   imgfight, imgfightb,    imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan, bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // uses an 80c31 MCU, which isn't hooked up correctly yet. Gives 'RAM NG 7' error
+GAME( 1988, imgfightjb,  imgfight, imgfightjb,   imgfight,     m72_state, init_m72_8751,   ROT270, "Irem", "Image Fight (Japan, bootleg)", MACHINE_SUPPORTS_SAVE ) // uses an 80c31 MCU
 
 GAME( 1989, loht,        0,        m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "Irem", "Legend of Hero Tonma (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1989, lohtj,       loht,     m72_8751,     loht,         m72_state, init_m72_8751,   ROT0,   "Irem", "Legend of Hero Tonma (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -37,6 +37,9 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 class quickpick5_state : public driver_device
 {
 public:
@@ -667,6 +670,8 @@ ROM_START( waijockey )
 	ROM_REGION( 0x20000, "oki", 0 )    // OKIM6295 samples
 	ROM_LOAD( "gs-257-a01.1g", 0x000000, 0x020000, CRC(8ce0e693) SHA1(fad19ba37c7987a4d2797200b96ac9c050eb5d94) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1991, quickp5,   0, quickpick5, quickpick5,  quickpick5_state, empty_init, ROT0, "Konami", "Quick Pick 5", MACHINE_IMPERFECT_GRAPHICS)

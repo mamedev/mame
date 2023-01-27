@@ -10,50 +10,90 @@
     3       Left    3       Left    In      D2
     4       Right   4       Right   In      D3
     6       TRIG1   6       TL      In      L/H
-    7       TRIG2   9       TR      In      Ack
-    8       STROBE  7       TH      Out     Req
+    7       TRIG2   9       TR      In      ACK
+    8       STROBE  7       TH      Out     REQ
 
     In analog mode, data is shifted out as twelve nybbles:
 
           _           ________________________________________________________________
-    Req    \_________/
+    REQ    \_________/
           ____    __    __    __    __    __    __    __    __    __    __    __    __
-    Ack       \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/
+    ACK       \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/  \__/
                   _____       _____       _____       _____       _____       _____
     L/H   _______/     \_____/     \_____/     \_____/     \_____/     \_____/     \__
               _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____ _____
     D     XXXX_____X_____X_____X_____X_____X_____X_____X_____X_____X_____X_____X_____X
 
-    The falling edge on Req causes data output to start.  The host
-    can't control the speed, it just polls the L/H and Ack lines to
+    The falling edge on REQ causes data output to start.  The host
+    can't control the speed, it just polls the L/H and ACK lines to
     know when the data is ready to read.
 
-    Step    D0      D1      D2      D3
-     1      D       C       B/B'    A/A'
-     2      Select  Start   E2      E1
-     3      Y4      Y5      Y6      Y7
-     4      X4      X5      X6      X7
-     5      Z4      Z5      Z6      Z7
-     6      RZ4     RZ5     RZ6     RZ7
-     7      Y0      Y1      Y2      Y3
-     8      X0      X1      X2      X3
-     9      Z0      Z1      Z2      Z3
-    10      RZ0     RZ1     RZ2     RZ3
-    11      B'      A'      B       A
+    Nybble  D3      D2      D1      D0
+     1      A/A'    B/B'    C       D
+     2      E1      E2      Start   Select
+     3      Y7      Y6      Y5      Y4
+     4      X7      X6      X5      X4
+     5      Z7      Z6      Z5      Z4
+     6      RZ7     RZ6     RZ5     RZ4
+     7      Y3      Y2      Y1      Y0
+     8      X3      X2      X1      X0
+     9      Z3      Z2      Z1      Z0
+    10      RZ3     RZ2     RZ1     RZ0
+    11      A       B       A'      B'
     12      -       -       -       -
 
     In MD mode, each pair of nybbles is transmitted in reverse
     order.
 
-    In digital mode, Req is a simple multiplexer input:
+    Sharp released assembly language source code for an X68000
+    driver.  It uses the following algorithm:
+    1. Generate falling edge on REQ
+    2. Wait until L/H is low
+    3. Wait until ACK is low
+    4. Read a nybble
+    5. Wait until L/H is high
+    6. Wait until ACK is low
+    7. Read a nybble
+    8. If eight nybbles have been read, raise REQ.
+    9. Loop to step 2 until twelve nybbles have been read
 
-    Req     0       1
+    Mega Drive games use a similar approach, but raise REQ after
+    reading two nybbles.  PC Engine games only generate a short low
+    pulse on REQ, but use the same algorithm to determine when to
+    read data.
+
+    CSK Research Institute games for FM Towns (including After
+    Burner III and Galaxy Force II) use a different algorithm:
+     1. Generate falling edge on REQ
+     2. Wait until L/H is high
+     3. Wait until ACK is high
+     4. Read a nybble
+     5. Wait until L/H is low
+     6. Wait until ACK is high
+     7. Read a nybble
+     8. Wait until L/H is high
+     9. Wait until ACK is high
+    10. Read a nybble
+    11. Loop to step 5 until eleven nybbles have been read
+    11. Raise REQ
+
+    From this it can be deduced that:
+    * A negative edge on REQ triggers a report.
+    * The exact time REQ is held low isn't important.
+    * Data is valid while ACK is low and for some time after ACK is
+      raised.
+    * L/H is low when idle and changes some time before data is
+      updated.
+
+    In digital mode, REQ is a simple multiplexer input:
+
+    REQ     0       1
     D0      Up      Throttle Up
     D1      Down    Throttle Down
     D2      Left    C
     D3      Right   D
     L/H     A/A'    E1
-    Ack     B/B'    E2
+    ACK     B/B'    E2
 
     Start appears as simultaneous Left/Right
     Select appears as simultaneous Up/Down
@@ -64,13 +104,13 @@
 
     Digital MD mode emulates a 3-button Mega Drive pad:
 
-    Req     0       1
+    REQ     0       1
     D0      Up      Up
     D1      Down    Down
     D2      0       Left
     D3      0       Right
     L/H     A       B
-    Ack     Start   C
+    ACK     Start   C
 
     TODO:
     * Dump MB88513 microcontroller from original controller.
@@ -178,8 +218,8 @@ u8 micom_xe_1a_device::out_r()
 			{
 				u8 const z = m_analog_callback(2);
 				u8 const result =
-						((0xc0 > z)  ? 0x01 : 0x00) | // Throttle Up
-						((0x40 <= z) ? 0x02 : 0x00) | // Throttle Down
+						((0x40 <= z) ? 0x01 : 0x00) | // Throttle Up
+						((0xc0 > z)  ? 0x02 : 0x00) | // Throttle Down
 						(BIT(buttons, 1) << 2) |      // C
 						(BIT(buttons, 0) << 3) |      // D
 						(BIT(buttons, 7) << 4) |      // E1
@@ -219,7 +259,7 @@ WRITE_LINE_MEMBER(micom_xe_1a_device::req_w)
 	{
 		if (m_mode)
 		{
-			LOG("%s: /Req = %u\n", machine().describe_context(), req);
+			LOG("%s: /REQ = %u\n", machine().describe_context(), req);
 			if (!req)
 			{
 				// acquire data
@@ -234,7 +274,7 @@ WRITE_LINE_MEMBER(micom_xe_1a_device::req_w)
 				m_data[2] = BIT(analog[2], 4, 4) | (BIT(analog[3], 4, 4) << 4);
 				m_data[3] = BIT(analog[0], 0, 4) | (BIT(analog[1], 0, 4) << 4);
 				m_data[4] = BIT(analog[2], 0, 4) | (BIT(analog[3], 0, 4) << 4);
-				m_data[5] = BIT(buttons, 8, 8) & ((BIT(buttons, 6, 2) << 2) | 0xf3);
+				m_data[5] = BIT(buttons, 8, 8) & ((BIT(buttons, 2, 2) << 2) | 0xf3);
 
 				// takes a while to respond
 				m_output_timer->adjust(attotime::from_nsec(50'000), 0);
@@ -242,7 +282,7 @@ WRITE_LINE_MEMBER(micom_xe_1a_device::req_w)
 		}
 		else
 		{
-			LOG("%s: /Req = %u ignored in digital mode\n", machine().describe_context(), req);
+			LOG("%s: /REQ = %u ignored in digital mode\n", machine().describe_context(), req);
 		}
 		m_req = req;
 	}
@@ -300,7 +340,7 @@ TIMER_CALLBACK_MEMBER(micom_xe_1a_device::step_output)
 	{
 		m_out = (m_out & 0x0f) | (BIT(step, 0) ? 0x30 : 0x20);
 		LOG(
-				"Set nybble %u data = 0x%X, L/H = %u, /Ack = %u\n",
+				"Set nybble %u data = 0x%X, L/H = %u, /ACK = %u\n",
 				step,
 				BIT(m_out, 0, 4),
 				BIT(m_out, 4),
@@ -320,7 +360,7 @@ TIMER_CALLBACK_MEMBER(micom_xe_1a_device::step_output)
 			else
 				m_out = 0x0f | (m_out & 0x10);
 			LOG(
-					"Set nybble %u data = 0x%X, L/H = %u, /Ack = %u\n",
+					"Set nybble %u data = 0x%X, L/H = %u, /ACK = %u\n",
 					step,
 					BIT(m_out, 0, 4),
 					BIT(m_out, 4),

@@ -36,9 +36,10 @@ protected:
 			bool must_exist,
 			bool one_shot);
 
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 	virtual void handle_keys(uint32_t flags, int &iptkey) override;
-	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void populate() override;
 	virtual void handle(event const *ev) override;
 
 	virtual void process_file(std::string &&file_name) = 0;

@@ -1809,7 +1809,7 @@ ROM_END
 
 ROM_START( gungunad )
 	ROM_REGION(0x200000, "bios", ROMREGION_ERASE00)
-	// some lines were swapped going into the die, but it is unclear if they're swapped back inside it 
+	// some lines were swapped going into the die, but it is unclear if they're swapped back inside it
 	ROM_LOAD("gga.bin", 0x000000, 0x40000, CRC(5252b6bb) SHA1(8a9f920e4bccabbd337f37a838af574e2b16746f) )
 	ROM_CONTINUE(0x080000,0x040000)
 	ROM_CONTINUE(0x040000,0x040000)

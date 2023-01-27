@@ -79,6 +79,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class leapfrog_leappad_state : public driver_device
 {
 public:
@@ -220,6 +223,9 @@ ROM_START( ltleappad )
 	ROM_SYSTEM_BIOS( 1, "germany",  "Germany, Jan 11 2005" )
 	ROMX_LOAD( "leappad_little_touch_german.bin", 0x000000, 0x400000, CRC(39ee76a2) SHA1(34f1b6e075e10e14380d925944f4c84d068ec58e), ROM_BIOS(1) ) // contains "Jan 11 2005 10:45:42 152-11010 Full Base ROM: V1.0 - Germany"
 ROM_END
+
+} // anonymous namespace
+
 
 //    year, name,      parent, compat, machine,            input,            class,                  init,       company,    fullname,               flags
 CONS( 2001, leappad,   0,      0,      leapfrog_leappad,   leapfrog_leappad, leapfrog_leappad_state, empty_init, "LeapFrog", "LeapPad",              MACHINE_IS_SKELETON )
