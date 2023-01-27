@@ -704,7 +704,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // TST<.cc> b,limm                 0010 0bbb 1100 1011   1BBB 1111 100Q QQQQ (+ Limm)
 // TST<.cc> limm,c                 0010 0110 1100 1011   1111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_TST(op);  // TST
+						return handleop32_general_nowriteback_forced_flag(op, handleop32_TST_do_op);  // TST
 					}
 					case 0x0c:
 					{
@@ -716,7 +716,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // CMP<.cc> b,limm                 0010 0bbb 1100 1100   1BBB 1111 100Q QQQQ (+ Limm)
 // CMP<.cc> limm,c                 0010 0110 1100 1100   1111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_CMP(op);  // CMP
+						return handleop32_general_nowriteback_forced_flag(op, handleop32_CMP_do_op);  // CMP
 					}
 					case 0x0d:
 					{
@@ -727,7 +727,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // RCMP<.cc> b,limm                0010 0bbb 1100 1101   1BBB 1111 100Q QQQQ (+ Limm)
 // RCMP<.cc> limm,c                0010 0110 1100 1101   1111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_RCMP(op);  // RCMP
+						return handleop32_general_nowriteback_forced_flag(op, handleop32_RCMP_do_op);  // RCMP
 					}
 					case 0x0e:
 					{
@@ -791,7 +791,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // BTST<.cc> b,u6                  0010 0bbb 1101 0001   1BBB uuuu uu1Q QQQQ
 // BTST<.cc> limm,c                0010 0110 1101 0001   1111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_BTST(op);  // BTST
+						return handleop32_general_nowriteback_forced_flag(op, handleop32_BTST_do_op);  // BTST
 					}
 					case 0x12:
 					{
@@ -1492,7 +1492,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // MUL64<.cc> <0,>limm,c           0010 1110 1100 0100   0111 CCCC CC0Q QQQQ (+ Limm)
 // MUL64<.cc> <0,>b,limm           0010 1bbb 1100 0100   0BBB 1111 100Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_MUL64(op);  // MUL64
+						return handleop32_general_MULx64(op, handleop32_MUL64_do_op);  // MUL64
 					}
 					case 0x05:
 					{
@@ -1507,7 +1507,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // MULU64<.cc> <0,>limm,c          0010 1110 1100 0101   0111 CCCC CC0Q QQQQ (+ Limm)
 // MULU64<.cc> <0,>b,limm          0010 1bbb 1100 0101   0BBB 1111 100Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_MULU64(op);  // MULU64
+						return handleop32_general_MULx64(op, handleop32_MULU64_do_op);  // MULU64
 					}
 					case 0x06:
 					{

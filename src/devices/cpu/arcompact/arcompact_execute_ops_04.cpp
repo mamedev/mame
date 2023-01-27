@@ -364,70 +364,6 @@ void arcompact_device::handleop32_TST_do_op(uint32_t src1, uint32_t src2)
 	do_flags_nz(result);
 }
 
-uint32_t arcompact_device::handleop32_TST_f_a_b_c(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint8_t creg = common32_get_creg(op);
-	int size = check_b_c_limm(breg, creg);
-	handleop32_TST_do_op(m_regs[breg], m_regs[creg]);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_TST_f_a_b_u6(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	handleop32_TST_do_op(m_regs[breg], common32_get_u6(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_TST_f_b_b_s12(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	handleop32_TST_do_op(m_regs[breg], common32_get_s12(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_TST_cc_f_b_b_c(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint8_t creg = common32_get_creg(op);
-	int size = check_b_c_limm(breg, creg);
-	if (check_condition(common32_get_condition(op)))
-		handleop32_TST_do_op(m_regs[breg], m_regs[creg]);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_TST_cc_f_b_b_u6(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	if (check_condition(common32_get_condition(op)))
-		handleop32_TST_do_op(m_regs[breg], common32_get_u6(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_TST(uint32_t op)
-{
-	switch ((op & 0x00c00000) >> 22)
-	{
-	case 0x00: return handleop32_TST_f_a_b_c(op);
-	case 0x01: return handleop32_TST_f_a_b_u6(op);
-	case 0x02: return handleop32_TST_f_b_b_s12(op);
-	case 0x03:
-	{
-		switch ((op & 0x00000020) >> 5)
-		{
-		case 0x00: return handleop32_TST_cc_f_b_b_c(op);
-		case 0x01: return handleop32_TST_cc_f_b_b_u6(op);
-		}
-		return 0;
-	}
-	}
-	return 0;
-}
-
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                                 IIII I      SS SSSS
 // CMP b,s12                       0010 0bbb 1000 1100   1BBB ssss ssSS SSSS
@@ -445,70 +381,6 @@ void arcompact_device::handleop32_CMP_do_op(uint32_t src1, uint32_t src2)
 	do_flags_sub(result, src1, src2);
 }
 
-uint32_t arcompact_device::handleop32_CMP_f_a_b_c(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint8_t creg = common32_get_creg(op);
-	int size = check_b_c_limm(breg, creg);
-	handleop32_CMP_do_op(m_regs[breg], m_regs[creg]);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_CMP_f_a_b_u6(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	handleop32_CMP_do_op(m_regs[breg], common32_get_u6(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_CMP_f_b_b_s12(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	handleop32_CMP_do_op(m_regs[breg], common32_get_s12(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_CMP_cc_f_b_b_c(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint8_t creg = common32_get_creg(op);
-	int size = check_b_c_limm(breg, creg);
-	if (check_condition(common32_get_condition(op)))
-		handleop32_CMP_do_op(m_regs[breg], m_regs[creg]);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_CMP_cc_f_b_b_u6(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	if (check_condition(common32_get_condition(op)))
-		handleop32_CMP_do_op(m_regs[breg], common32_get_u6(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_CMP(uint32_t op)
-{
-	switch ((op & 0x00c00000) >> 22)
-	{
-	case 0x00: return handleop32_CMP_f_a_b_c(op);
-	case 0x01: return handleop32_CMP_f_a_b_u6(op);
-	case 0x02: return handleop32_CMP_f_b_b_s12(op);
-	case 0x03:
-	{
-		switch ((op & 0x00000020) >> 5)
-		{
-		case 0x00: return handleop32_CMP_cc_f_b_b_c(op);
-		case 0x01: return handleop32_CMP_cc_f_b_b_u6(op);
-		}
-		return 0;
-	}
-	}
-	return 0;
-}
-
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // RCMP b,s12                      0010 0bbb 1000 1101   1BBB ssss ssSS SSSS
 // RCMP<.cc> b,c                   0010 0bbb 1100 1101   1BBB CCCC CC0Q QQQQ
@@ -517,62 +389,10 @@ uint32_t arcompact_device::handleop32_CMP(uint32_t op)
 // RCMP<.cc> limm,c                0010 0110 1100 1101   1111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_RCMP_f_a_b_c(uint32_t op)
+void arcompact_device::handleop32_RCMP_do_op(uint32_t src1, uint32_t src2)
 {
-	arcompact_fatal("RCMP with P00 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_RCMP_f_a_b_u6(uint32_t op)
-{
-	arcompact_fatal("RCMP with P01 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_RCMP_f_b_b_s12(uint32_t op)
-{
-	arcompact_fatal("RCMP with P10 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_RCMP_cc_f_b_b_c(uint32_t op)
-{
-	arcompact_fatal("RCMP with P11 M0 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_RCMP_cc_f_b_b_u6(uint32_t op)
-{
-	arcompact_fatal("RCMP with P11 M0 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_RCMP_cc(uint32_t op)
-{
-	int M = (op & 0x00000020) >> 5;
-
-	switch (M)
-	{
-		case 0x00: return handleop32_RCMP_cc_f_b_b_c(op);
-		case 0x01: return handleop32_RCMP_cc_f_b_b_u6(op);
-	}
-
-	return 0;
-}
-
-uint32_t arcompact_device::handleop32_RCMP(uint32_t op)
-{
-	int p = (op & 0x00c00000) >> 22;
-
-	switch (p)
-	{
-		case 0x00: return handleop32_RCMP_f_a_b_c(op);
-		case 0x01: return handleop32_RCMP_f_a_b_u6(op);
-		case 0x02: return handleop32_RCMP_f_b_b_s12(op);
-		case 0x03: return handleop32_RCMP_cc(op);
-	}
-
-	return 0;
+	arcompact_fatal("RCMP not supported");
+	//do_flags
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -650,64 +470,11 @@ uint32_t arcompact_device::handleop32_BCLR_do_op(uint32_t src1, uint32_t src2, u
 // BTST<.cc> limm,c                0010 0110 1101 0001   1111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_BTST_f_a_b_c(uint32_t op)
+void arcompact_device::handleop32_BTST_do_op(uint32_t src1, uint32_t src2)
 {
-	arcompact_fatal("BTST with P00 not supported");
-	return m_pc;
+	arcompact_fatal("BTST not supported");
+	//do_flags
 }
-
-uint32_t arcompact_device::handleop32_BTST_f_a_b_u6(uint32_t op)
-{
-	arcompact_fatal("BTST with P01 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_BTST_f_b_b_s12(uint32_t op)
-{
-	arcompact_fatal("BTST with P10 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_BTST_cc_f_b_b_c(uint32_t op)
-{
-	arcompact_fatal("BTST with P11 M0 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_BTST_cc_f_b_b_u6(uint32_t op)
-{
-	arcompact_fatal("BTST with P11 M0 not supported");
-	return m_pc;
-}
-
-uint32_t arcompact_device::handleop32_BTST_cc(uint32_t op)
-{
-	int M = (op & 0x00000020) >> 5;
-
-	switch (M)
-	{
-		case 0x00: return handleop32_BTST_cc_f_b_b_c(op);
-		case 0x01: return handleop32_BTST_cc_f_b_b_u6(op);
-	}
-
-	return 0;
-}
-
-uint32_t arcompact_device::handleop32_BTST(uint32_t op)
-{
-	int p = (op & 0x00c00000) >> 22;
-
-	switch (p)
-	{
-		case 0x00: return handleop32_BTST_f_a_b_c(op);
-		case 0x01: return handleop32_BTST_f_a_b_u6(op);
-		case 0x02: return handleop32_BTST_f_b_b_s12(op);
-		case 0x03: return handleop32_BTST_cc(op);
-	}
-
-	return 0;
-}
-
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BXOR<.f> a,b,c                  0010 0bbb 0001 0010   FBBB CCCC CCAA AAAA
 // BXOR<.f> a,b,u6                 0010 0bbb 0101 0010   FBBB uuuu uuAA AAAA

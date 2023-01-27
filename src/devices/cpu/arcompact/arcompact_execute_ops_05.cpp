@@ -160,71 +160,6 @@ void arcompact_device::handleop32_MUL64_do_op(uint32_t src1, uint32_t src2)
 	m_regs[REG_MHI] = (result >> 32) & 0xffffffff;
 }
 
-uint32_t arcompact_device::handleop32_MUL64_f_a_b_c(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint8_t creg = common32_get_creg(op);
-	int size = check_b_c_limm(breg, creg);
-	handleop32_MUL64_do_op(m_regs[breg], m_regs[creg]);
-	return m_pc + size;
-}
-uint32_t arcompact_device::handleop32_MUL64_f_a_b_u6(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	handleop32_MUL64_do_op(m_regs[breg], common32_get_u6(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_MUL64_f_b_b_s12(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	handleop32_MUL64_do_op(m_regs[breg], common32_get_s12(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_MUL64_cc_f_b_b_c(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint8_t creg = common32_get_creg(op);
-	int size = check_b_c_limm(breg, creg);
-	if (!check_condition(common32_get_condition(op)))
-		return m_pc + size;
-	handleop32_MUL64_do_op(m_regs[breg], m_regs[creg]);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_MUL64_cc_f_b_b_u6(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	if (!check_condition(common32_get_condition(op)))
-		return m_pc + size;
-	handleop32_MUL64_do_op(m_regs[breg], common32_get_u6(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_MUL64(uint32_t op)
-{
-	switch ((op & 0x00c00000) >> 22)
-	{
-	case 0x00: return handleop32_MUL64_f_a_b_c(op);
-	case 0x01: return handleop32_MUL64_f_a_b_u6(op);
-	case 0x02: return handleop32_MUL64_f_b_b_s12(op);
-	case 0x03:
-	{
-		switch ((op & 0x00000020) >> 5)
-		{
-		case 0x00: return handleop32_MUL64_cc_f_b_b_c(op);
-		case 0x01: return handleop32_MUL64_cc_f_b_b_u6(op);
-		}
-		return 0;
-	}
-	}
-	return 0;
-}
-
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // 32 x 32 Unsigned Multiply
 // special handling, destination register is always the multiply result register, a is ignored
@@ -247,71 +182,6 @@ void arcompact_device::handleop32_MULU64_do_op(uint32_t src1, uint32_t src2)
 	m_regs[REG_MHI] = (result >> 32) & 0xffffffff;
 }
 
-uint32_t arcompact_device::handleop32_MULU64_f_a_b_c(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint8_t creg = common32_get_creg(op);
-	int size = check_b_c_limm(breg, creg);
-	handleop32_MULU64_do_op(m_regs[breg], m_regs[creg]);
-	return m_pc + size;
-}
-uint32_t arcompact_device::handleop32_MULU64_f_a_b_u6(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	handleop32_MULU64_do_op(m_regs[breg], common32_get_u6(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_MULU64_f_b_b_s12(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	handleop32_MULU64_do_op(m_regs[breg], common32_get_s12(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_MULU64_cc_f_b_b_c(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint8_t creg = common32_get_creg(op);
-	int size = check_b_c_limm(breg, creg);
-	if (!check_condition(common32_get_condition(op)))
-		return m_pc + size;
-	handleop32_MULU64_do_op(m_regs[breg], m_regs[creg]);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_MULU64_cc_f_b_b_u6(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	int size = check_b_limm(breg);
-	if (!check_condition(common32_get_condition(op)))
-		return m_pc + size;
-	handleop32_MULU64_do_op(m_regs[breg], common32_get_u6(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_MULU64(uint32_t op)
-{
-	switch ((op & 0x00c00000) >> 22)
-	{
-	case 0x00: return handleop32_MULU64_f_a_b_c(op);
-	case 0x01: return handleop32_MULU64_f_a_b_u6(op);
-	case 0x02: return handleop32_MULU64_f_b_b_s12(op);
-	case 0x03:
-	{
-		switch ((op & 0x00000020) >> 5)
-		{
-		case 0x00: return handleop32_MULU64_cc_f_b_b_c(op);
-		case 0x01: return handleop32_MULU64_cc_f_b_b_u6(op);
-		}
-		return 0;
-	}
-	}
-	return 0;
-}
-
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ADDS<.f> a,b,c                  0010 1bbb 0000 0110   FBBB CCCC CCAA AAAA
 // ADDS<.f> a,b,u6                 0010 1bbb 0100 0110   FBBB uuuu uuAA AAAA
@@ -328,8 +198,10 @@ uint32_t arcompact_device::handleop32_MULU64(uint32_t op)
 // ADDS<.cc><.f> 0,limm,c          0010 1110 1100 0110   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ADDS(uint32_t op)  { return arcompact_handle05_helper(op, "ADDS", 0,0); }
-
+uint32_t arcompact_device::handleop32_ADDS(uint32_t op)
+{
+	return arcompact_handle05_helper(op, "ADDS", 0,0);
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // SUBS<.f> a,b,c                  0010 1bbb 0000 0111   FBBB CCCC CCAA AAAA
@@ -347,7 +219,10 @@ uint32_t arcompact_device::handleop32_ADDS(uint32_t op)  { return arcompact_hand
 // SUBS<.cc><.f> 0,limm,c          0010 1110 1100 0111   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_SUBS(uint32_t op)  { return arcompact_handle05_helper(op, "SUBS", 0,0); }
+uint32_t arcompact_device::handleop32_SUBS(uint32_t op)
+{
+	return arcompact_handle05_helper(op, "SUBS", 0,0);
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // DIVAW a,b,c                     0010 1bbb 0000 1000   0BBB CCCC CCAA AAAA
@@ -364,8 +239,10 @@ uint32_t arcompact_device::handleop32_SUBS(uint32_t op)  { return arcompact_hand
 // DIVAW<.cc> 0,limm,c             0010 1110 1100 1000   0111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-
-uint32_t arcompact_device::handleop32_DIVAW(uint32_t op)  { return arcompact_handle05_helper(op, "DIVAW", 0,0); }
+uint32_t arcompact_device::handleop32_DIVAW(uint32_t op)
+{
+	return arcompact_handle05_helper(op, "DIVAW", 0,0);
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                                 IIII I      SS SSSS
@@ -382,7 +259,10 @@ uint32_t arcompact_device::handleop32_DIVAW(uint32_t op)  { return arcompact_han
 // ASLS<.cc><.f> 0,limm,c          0010 1110 1100 1010   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ASLS(uint32_t op)  { return arcompact_handle05_helper(op, "ASLS", 0,0); }
+uint32_t arcompact_device::handleop32_ASLS(uint32_t op)
+{
+	return arcompact_handle05_helper(op, "ASLS", 0,0);
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ASRS<.f> a,b,c                  0010 1bbb 0000 1011   FBBB CCCC CCAA AAAA
@@ -399,7 +279,10 @@ uint32_t arcompact_device::handleop32_ASLS(uint32_t op)  { return arcompact_hand
 // ASRS<.cc><.f> 0,limm,c          0010 1110 1100 1011   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ASRS(uint32_t op)  { return arcompact_handle05_helper(op, "ASRS", 0,0); }
+uint32_t arcompact_device::handleop32_ASRS(uint32_t op)
+{
+	return arcompact_handle05_helper(op, "ASRS", 0,0);
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // ADDSDW<.f> a,b,c                0010 1bbb 0010 1000   FBBB CCCC CCAA AAAA
@@ -416,7 +299,10 @@ uint32_t arcompact_device::handleop32_ASRS(uint32_t op)  { return arcompact_hand
 // ADDSDW<.cc><.f> 0,limm,c        0010 1110 1110 1000   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ADDSDW(uint32_t op)  { return arcompact_handle05_helper(op, "ADDSDW", 0,0); }
+uint32_t arcompact_device::handleop32_ADDSDW(uint32_t op)
+{
+	return arcompact_handle05_helper(op, "ADDSDW", 0,0);
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // SUBSDW<.f> a,b,c                0010 1bbb 0010 1001   FBBB CCCC CCAA AAAA
@@ -433,6 +319,9 @@ uint32_t arcompact_device::handleop32_ADDSDW(uint32_t op)  { return arcompact_ha
 // SUBSDW<.cc><.f> 0,limm,c        0010 1110 1110 1001   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_SUBSDW(uint32_t op)  { return arcompact_handle05_helper(op, "SUBSDW", 0,0); }
+uint32_t arcompact_device::handleop32_SUBSDW(uint32_t op)
+{
+	return arcompact_handle05_helper(op, "SUBSDW", 0,0);
+}
 
 

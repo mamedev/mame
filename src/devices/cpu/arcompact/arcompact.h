@@ -413,13 +413,126 @@ private:
 					m_regs[breg] = (this->*ophandler)(m_regs[breg], common32_get_u6(op), common32_get_F(op));
 				return m_pc + size;
 			}
-			return 0;
 			}
 		}
-		return 0;
 		}
 		return 0;
 	}
+
+	template<typename OPHANDLER>
+	uint32_t handleop32_general_MULx64(uint32_t op, OPHANDLER ophandler)
+	{
+		switch ((op & 0x00c00000) >> 22)
+		{
+		case 0x00:
+		{
+			uint8_t breg = common32_get_breg(op);
+			uint8_t creg = common32_get_creg(op);
+			int size = check_b_c_limm(breg, creg);
+			(this->*ophandler)(m_regs[breg], m_regs[creg]);
+			return m_pc + size;
+		}
+
+		case 0x01:
+		{
+			uint8_t breg = common32_get_breg(op);
+			int size = check_b_limm(breg);
+			(this->*ophandler)(m_regs[breg], common32_get_u6(op));
+			return m_pc + size;
+		}
+		case 0x02:
+		{
+			uint8_t breg = common32_get_breg(op);
+			int size = check_b_limm(breg);
+			(this->*ophandler)(m_regs[breg], common32_get_s12(op));
+			return m_pc + size;
+		}
+		case 0x03:
+		{
+			switch ((op & 0x00000020) >> 5)
+			{
+			case 0x00:
+			{
+				uint8_t breg = common32_get_breg(op);
+				uint8_t creg = common32_get_creg(op);
+				int size = check_b_c_limm(breg, creg);
+				if (!check_condition(common32_get_condition(op)))
+					return m_pc + size;
+				(this->*ophandler)(m_regs[breg], m_regs[creg]);
+				return m_pc + size;
+			}
+
+			case 0x01:
+			{
+				uint8_t breg = common32_get_breg(op);
+				int size = check_b_limm(breg);
+				if (!check_condition(common32_get_condition(op)))
+					return m_pc + size;
+				(this->*ophandler)(m_regs[breg], common32_get_u6(op));
+				return m_pc + size;
+			}
+			}
+		}
+		}
+
+		return 0;
+	}
+
+	template<typename OPHANDLER>
+	uint32_t handleop32_general_nowriteback_forced_flag(uint32_t op, OPHANDLER ophandler)
+	{
+		switch ((op & 0x00c00000) >> 22)
+		{
+		case 0x00:
+		{
+			uint8_t breg = common32_get_breg(op);
+			uint8_t creg = common32_get_creg(op);
+			int size = check_b_c_limm(breg, creg);
+			(this->*ophandler)(m_regs[breg], m_regs[creg]);
+			return m_pc + size;
+		}
+		case 0x01:
+		{
+			uint8_t breg = common32_get_breg(op);
+			int size = check_b_limm(breg);
+			(this->*ophandler)(m_regs[breg], common32_get_u6(op));
+			return m_pc + size;
+		}
+		case 0x02:
+		{
+			uint8_t breg = common32_get_breg(op);
+			int size = check_b_limm(breg);
+			(this->*ophandler)(m_regs[breg], common32_get_s12(op));
+			return m_pc + size;
+		}
+		case 0x03:
+		{
+			switch ((op & 0x00000020) >> 5)
+			{
+			case 0x00:
+			{
+				uint8_t breg = common32_get_breg(op);
+				uint8_t creg = common32_get_creg(op);
+				int size = check_b_c_limm(breg, creg);
+				if (check_condition(common32_get_condition(op)))
+					(this->*ophandler)(m_regs[breg], m_regs[creg]);
+				return m_pc + size;
+			}
+			case 0x01:
+			{
+				uint8_t breg = common32_get_breg(op);
+				int size = check_b_limm(breg);
+				if (check_condition(common32_get_condition(op)))
+					(this->*ophandler)(m_regs[breg], common32_get_u6(op));
+				return m_pc + size;
+			}
+			}
+		}
+		}
+
+		return 0;
+	}
+
 
 	// arcompact_execute_ops_04.cpp
 	uint32_t handleop32_ADD_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
@@ -489,38 +602,10 @@ private:
 
 
 	void handleop32_TST_do_op(uint32_t src1, uint32_t src2);
-	uint32_t handleop32_TST_f_a_b_c(uint32_t op);
-	uint32_t handleop32_TST_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_TST_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_TST_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_TST_cc_f_b_b_u6(uint32_t op);
-	uint32_t handleop32_TST(uint32_t op);
-
 	void handleop32_CMP_do_op(uint32_t src1, uint32_t src2);
-	uint32_t handleop32_CMP_f_a_b_c(uint32_t op);
-	uint32_t handleop32_CMP_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_CMP_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_CMP_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_CMP_cc_f_b_b_u6(uint32_t op);
-	uint32_t handleop32_CMP(uint32_t op);
+	void handleop32_RCMP_do_op(uint32_t src1, uint32_t src2);
+	void handleop32_BTST_do_op(uint32_t src1, uint32_t src2);
 
-	uint32_t handleop32_RCMP_f_a_b_c(uint32_t op);
-	uint32_t handleop32_RCMP_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_RCMP_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_RCMP_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_RCMP_cc_f_b_b_u6(uint32_t op);
-	uint32_t handleop32_RCMP_cc(uint32_t op);
-	uint32_t handleop32_RCMP(uint32_t op);
-
-
-
-	uint32_t handleop32_BTST_f_a_b_c(uint32_t op);
-	uint32_t handleop32_BTST_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_BTST_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_BTST_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_BTST_cc_f_b_b_u6(uint32_t op);
-	uint32_t handleop32_BTST_cc(uint32_t op);
-	uint32_t handleop32_BTST(uint32_t op);
 
 	uint32_t handleop32_BXOR_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_MPY_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
@@ -618,20 +703,7 @@ private:
 	uint32_t handleop32_ASR_multiple_do_op(uint32_t src1, uint32_t src2, uint8_t set_flags);
 
 	void handleop32_MUL64_do_op(uint32_t src1, uint32_t src2);
-	uint32_t handleop32_MUL64_f_a_b_c(uint32_t op);
-	uint32_t handleop32_MUL64_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_MUL64_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_MUL64_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_MUL64_cc_f_b_b_u6(uint32_t op);
-	uint32_t handleop32_MUL64(uint32_t op);
-
 	void handleop32_MULU64_do_op(uint32_t src1, uint32_t src2);
-	uint32_t handleop32_MULU64_f_a_b_c(uint32_t op);
-	uint32_t handleop32_MULU64_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_MULU64_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_MULU64_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_MULU64_cc_f_b_b_u6(uint32_t op);
-	uint32_t handleop32_MULU64(uint32_t op);
 
 	// arcompact_execute_ops_05_2f_sop.cpp
 	uint32_t handleop32_NORM_do_op(uint32_t src, uint8_t set_flags);
