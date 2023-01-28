@@ -562,13 +562,11 @@ int32_t dinput_joystick_device::pov_get_state(void *device_internal, void *item_
 //============================================================
 
 dinput_api_helper::dinput_api_helper()
-	: m_dinput(nullptr)
 {
 }
 
 dinput_api_helper::~dinput_api_helper()
 {
-	m_dinput.Reset();
 }
 
 int dinput_api_helper::initialize()
