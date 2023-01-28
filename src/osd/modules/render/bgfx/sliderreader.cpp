@@ -33,7 +33,7 @@ const slider_reader::string_to_enum slider_reader::SCREEN_NAMES[slider_reader::S
 	{ "all",   uint64_t(bgfx_slider::screen_type::SLIDER_SCREEN_TYPE_ANY) }
 };
 
-std::vector<bgfx_slider*> slider_reader::read_from_value(const Value& value, std::string prefix, chain_manager& chains, uint32_t screen_index)
+std::vector<bgfx_slider*> slider_reader::read_from_value(const Value& value, const std::string &prefix, chain_manager& chains, uint32_t screen_index)
 {
 	std::vector<bgfx_slider*> sliders;
 
@@ -55,7 +55,7 @@ std::vector<bgfx_slider*> slider_reader::read_from_value(const Value& value, std
 		const Value& string_array = value["strings"];
 		for (uint32_t i = 0; i < string_array.Size(); i++)
 		{
-			if (!READER_CHECK(string_array[i].IsString(), (prefix + "Slider '" + name + "': strings[" + std::to_string(i) + "]: must be a string\n").c_str()))
+			if (!READER_CHECK(string_array[i].IsString(), "%sSlider '%s': strings[%u]: must be a string\n", prefix, name, i))
 			{
 				return sliders;
 			}
@@ -117,32 +117,31 @@ std::vector<bgfx_slider*> slider_reader::read_from_value(const Value& value, std
 					desc = prefixed_desc + "Invalid";
 					break;
 			}
-			sliders.push_back(new bgfx_slider(chains.machine(), full_name, min[index], defaults[index], max[index], step, type, screen_type, format, desc, strings));
+			sliders.push_back(new bgfx_slider(chains.machine(), std::move(full_name), min[index], defaults[index], max[index], step, type, screen_type, format, desc, strings));
 		}
 	}
 	else
 	{
-		float min = get_float(value, "min", 0.0f);
-		float def = get_float(value, "default", 0.0f);
-		float max = get_float(value, "max", 1.0f);
+		const float min = get_float(value, "min", 0.0f);
+		const float def = get_float(value, "default", 0.0f);
+		const float max = get_float(value, "max", 1.0f);
 		sliders.push_back(new bgfx_slider(chains.machine(), name + "0", min, def, max, step, type, screen_type, format, prefixed_desc, strings));
 	}
 	return sliders;
 }
 
-bool slider_reader::get_values(const Value& value, std::string prefix, std::string name, float* values, const int count)
+bool slider_reader::get_values(const Value& value, const std::string &prefix, const std::string &name, float* values, const int count)
 {
-	const char* name_str = name.c_str();
-	const Value& value_array = value[name_str];
+	const Value& value_array = value[name.c_str()];
 	for (uint32_t i = 0; i < value_array.Size() && i < count; i++)
 	{
-		if (!READER_CHECK(value_array[i].IsNumber(), (prefix + "Entry " + std::to_string(i) + " must be a number\n").c_str())) return false;
+		if (!READER_CHECK(value_array[i].IsNumber(), "%sEntry %u must be a number\n", prefix, i)) return false;
 		values[i] = value_array[i].GetFloat();
 	}
 	return true;
 }
 
-bool slider_reader::validate_parameters(const Value& value, std::string prefix)
+bool slider_reader::validate_parameters(const Value& value, const std::string &prefix)
 {
 	if (!READER_CHECK(value.HasMember("name"), "%1$sMust have string value 'name'", prefix)) return false;
 	if (!READER_CHECK(value["name"].IsString(), "%1$sValue 'name' must be a string", prefix)) return false;

@@ -49,7 +49,7 @@ void main()
 	//     D  E  F
 	//        H
 
- 	v_texcoord1 = vec4(1.0 / u_tex_size0.xy, 0.0, 0.0); // F H
+	v_texcoord1 = vec4(1.0 / u_tex_size0.xy, 0.0, 0.0); // F H
 
 	v_color0 = a_color0;
 }
