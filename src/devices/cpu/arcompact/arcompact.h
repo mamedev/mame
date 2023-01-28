@@ -33,6 +33,8 @@ public:
 	// construction/destruction
 	arcompact_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void set_default_vector_base(uint32_t address) { m_default_vector_base = address & 0xfffffc00; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -571,6 +573,10 @@ private:
 		return 0;
 	}
 
+	// arcompact_execute.cpp
+	// used by both arcompact_execute_ops_04_3x.cpp and arcompact_execute_ops_02to03.cpp
+	void arcompact_handle_ld_helper(uint32_t op, uint8_t areg, uint8_t breg, uint32_t s, uint8_t X, uint8_t Z, uint8_t a);
+
 	// arcompact_execute_ops_04.cpp
 	static uint32_t handleop32_ADD_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
 	static uint32_t handleop32_ADC_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
@@ -940,6 +946,10 @@ private:
 
 	int check_condition(uint8_t condition);
 
+	// config
+	uint32_t m_default_vector_base;
+
+	// internal state
 	uint32_t m_regs[0x40];
 
 	int m_delayactive;

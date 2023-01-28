@@ -225,32 +225,14 @@ private:
 	uint32_t screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	uint32_t leapster_random_r()
-	{
-		return machine().rand() | (machine().rand()<<16); // there is a loop checking that this is above a certain value
-	}
+	uint32_t leapster_180207b_r();
+	uint32_t leapster_1809004_r();
+	uint32_t leapster_180d803_r();
 
-	uint32_t leapster_ff_r()
-	{
-		return 0xffffffff;
-	}
-
-	void leapster_aux0047_w(uint32_t data)
-	{
-		logerror("%s: leapster_aux0047_w %08x\n", machine().describe_context(), data);
-	}
-
+	void leapster_aux0047_w(uint32_t data);
 	uint32_t leapster_aux0048_r(void);
-
-	void leapster_aux0048_w(uint32_t data)
-	{
-		logerror("%s: leapster_aux0047_w %08x\n", machine().describe_context(), data);
-	}
-
-	void leapster_aux004b_w(uint32_t data)
-	{
-		logerror("%s: leapster_aux004b_w %08x\n", machine().describe_context(), data);
-	}
+	void leapster_aux0048_w(uint32_t data);
+	void leapster_aux004b_w(uint32_t data);
 
 	void leapster_aux0010_w(uint32_t data);
 	uint32_t leapster_aux0011_r(void);
@@ -264,7 +246,7 @@ private:
 	uint16_t m_1a_data[0x800];
 	int m_1a_pointer;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<arcompact_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_device<palette_device> m_palette;
 
@@ -300,19 +282,56 @@ void leapster_state::leapster_aux001a_w(uint32_t data)
 uint32_t leapster_state::leapster_aux0011_r(void)
 {
 	// unknown, read when 11/1a are being written
+	logerror("%s: leapster_aux0011_r\n", machine().describe_context());
 	return 0x00000000;
 }
 
 uint32_t leapster_state::leapster_aux001b_r(void)
 {
 	// unknown, read when 11/1a are being written
+	logerror("%s: leapster_aux001b_r\n", machine().describe_context());
 	return 0x00000000;
+}
+
+void leapster_state::leapster_aux0047_w(uint32_t data)
+{
+	logerror("%s: leapster_aux0047_w %08x\n", machine().describe_context(), data);
 }
 
 uint32_t leapster_state::leapster_aux0048_r(void)
 {
+	logerror("%s: leapster_aux0048_r\n", machine().describe_context());
 	return 0x00000000;
 }
+
+void leapster_state::leapster_aux0048_w(uint32_t data)
+{
+	logerror("%s: leapster_aux0047_w %08x\n", machine().describe_context(), data);
+}
+
+void leapster_state::leapster_aux004b_w(uint32_t data)
+{
+	logerror("%s: leapster_aux004b_w %08x\n", machine().describe_context(), data);
+}
+
+uint32_t leapster_state::leapster_180207b_r()
+{
+	logerror("%s: leapster_180207b_r\n", machine().describe_context());
+	return machine().rand() | (machine().rand()<<16);
+}
+
+uint32_t leapster_state::leapster_1809004_r()
+{
+	logerror("%s: leapster_1809004_r\n", machine().describe_context());
+	return 0xffffffff;
+}
+
+uint32_t leapster_state::leapster_180d803_r()
+{
+	logerror("%s: leapster_180d803_r\n", machine().describe_context());
+	return machine().rand() | (machine().rand()<<16);
+}
+
 
 uint32_t leapster_state::screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -351,16 +370,16 @@ void leapster_state::machine_reset()
 
 void leapster_state::leapster_map(address_map &map)
 {
-	map(0x00000000, 0x007fffff).rom().mirror(0x40000000); // pointers in the BIOS region seem to be to the 40xxxxxx region, either we mirror there or something (real BIOS?) is acutally missing
 //	map(0x01800000, 0x0180ffff).ram();
-	map(0x01802078, 0x0180207b).r(FUNC(leapster_state::leapster_random_r));
-	map(0x01809004, 0x01809007).r(FUNC(leapster_state::leapster_ff_r));
-	map(0x0180d800, 0x0180d803).r(FUNC(leapster_state::leapster_random_r));
+	map(0x01802078, 0x0180207b).r(FUNC(leapster_state::leapster_180207b_r));
+	map(0x01809004, 0x01809007).r(FUNC(leapster_state::leapster_1809004_r));
+	map(0x0180d800, 0x0180d803).r(FUNC(leapster_state::leapster_180d803_r));
 	
 	map(0x03000000, 0x030007ff).ram(); // puts stack here, writes a pointer @ 0x03000000 on startup
 	map(0x03000800, 0x0300ffff).ram(); // some of the later models need to store stack values here (or code execution has gone wrong?)
-	map(0x3c000000, 0x3c1fffff).ram(); // puts task stacks etc. here
+	map(0x3c000000, 0x3c1fffff).ram(); // vector base gets moved here with new IRQ table, puts task stacks etc. here
 	map(0x3c200000, 0x3fffffff).ram();
+	map(0x40000000, 0x407fffff).rom().region("maincpu", 0);
 	// map(0x80000000, 0x807fffff).bankr("cartrom"); // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here - installed if a cart is present
 }
 
@@ -384,6 +403,7 @@ void leapster_state::leapster(machine_config &config)
 	ARCA5(config, m_maincpu, 96000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &leapster_state::leapster_map);
 	m_maincpu->set_addrmap(AS_IO, &leapster_state::leapster_aux);
+	m_maincpu->set_default_vector_base(0x40000000);
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));

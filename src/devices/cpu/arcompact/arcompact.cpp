@@ -174,6 +174,7 @@ arcompact_device::arcompact_device(const machine_config &mconfig, const char *ta
 	: cpu_device(mconfig, ARCA5, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0) // some docs describe these as 'middle endian'?!
 	, m_io_config( "io", ENDIANNESS_LITTLE, 32, AUX_SPACE_ADDRESS_WIDTH, -2, address_map_constructor(FUNC(arcompact_device::arcompact_auxreg_map), this))
+	, m_default_vector_base(0)
 {
 }
 
@@ -306,7 +307,7 @@ void arcompact_device::state_import(const device_state_entry &entry)
 
 void arcompact_device::device_reset()
 {
-	m_pc = 0x00000000;
+	m_pc = m_INTVECTORBASE = m_default_vector_base;
 
 	m_delayactive = 0;
 	m_delayjump = 0x00000000;

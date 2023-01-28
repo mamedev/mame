@@ -29,112 +29,11 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 	int a = (op & 0x00000600) >> 9;  //op &= ~0x00000600;
 //  int D = (op & 0x00000800) >> 11;// op &= ~0x00000800; // we don't use the data cache currently
 
-
 	int size = check_b_limm(breg);
 
-	// writeback / increment
-	if (a == 1)
-	{
-		if (breg==LIMM_REG)
-			arcompact_fatal("yy_ illegal LD %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
-
-		m_regs[breg] = m_regs[breg] + s;
-	}
-
-	uint32_t address = m_regs[breg];
-
-	// address manipulation
-	if (a == 0)
-	{
-		address = address + s;
-	}
-	else if (a == 3)
-	{
-		if (Z == 0)
-		{
-			address = address + (s << 2);
-		}
-		else if (Z == 2)
-		{
-			address = address + (s << 1);
-		}
-		else // Z == 1 and Z == 3 are invalid here
-		{
-			arcompact_fatal("zz_ illegal LD %08x (data size %d mode %d)", op, Z, a);
-		}
-	}
-
-	uint32_t readdata = 0;
-
-	// read data
-	if (Z == 0)
-	{
-		readdata = READ32(address);
-
-		m_regs[areg] = readdata;
-
-		if (X) // sign extend is not supported for long reads
-			arcompact_fatal("illegal LD %08x (data size %d mode %d with X)", op, Z, a);
-
-	}
-	else if (Z == 1)
-	{
-		readdata = READ8(address);
-
-		if (X)
-		{
-			if (readdata & 0x80)
-				readdata |= 0xffffff00;
-
-			m_regs[areg] = readdata;
-		}
-		else
-		{
-#ifdef ARCOMPACT_LD_DOES_NOT_EXTEND_BYTE_AND_WORD
-			m_regs[areg] = (m_regs[areg] & 0xffffff00) | readdata;
-#else
-			m_regs[areg] = readdata;
-#endif
-		}
-	}
-	else if (Z == 2)
-	{
-		readdata = READ16(address);
-
-		if (X)
-		{
-			if (readdata & 0x8000)
-				readdata |= 0xffff0000;
-
-			m_regs[areg] = readdata;
-		}
-		else
-		{
-#ifdef ARCOMPACT_LD_DOES_NOT_EXTEND_BYTE_AND_WORD
-			m_regs[areg] = (m_regs[areg] & 0xffff0000) | readdata;
-#else
-			m_regs[areg] = readdata;
-#endif
-		}
-
-	}
-	else if (Z == 3)
-	{ // Z == 3 is always illegal
-		arcompact_fatal("xx_ illegal LD %08x (data size %d mode %d)", op, Z, a);
-	}
-
-
-	// writeback / increment
-	if (a == 2)
-	{
-		if (breg==LIMM_REG)
-			arcompact_fatal("yy_ illegal LD %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
-
-		m_regs[breg] = m_regs[breg] + s;
-	}
+	arcompact_handle_ld_helper(op, areg, breg, s, X, Z, a);
 
 	return m_pc + size;
-
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
