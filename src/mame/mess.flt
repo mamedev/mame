@@ -202,6 +202,7 @@ dec/decmate2.cpp
 dec/decstation.cpp
 dec/dectalk.cpp
 dec/decwritr.cpp
+dec/dtc03.cpp
 dec/jensen.cpp
 dec/pdp1.cpp
 dec/pdp11.cpp
@@ -311,7 +312,6 @@ handheld/talkingbb.cpp
 handheld/talkingfb.cpp
 handheld/teammate.cpp
 handheld/tispeak.cpp
-handheld/tispellb.cpp
 handheld/wildfire.cpp
 hds/hds200.cpp
 heathkit/et3400.cpp
@@ -382,6 +382,7 @@ hp/hp48.cpp
 hp/hp49gp.cpp
 hp/hp64k.cpp
 hp/hp700.cpp
+hp/hp7596a.cpp
 hp/hp80.cpp
 hp/hp95lx.cpp
 hp/hp9825.cpp
@@ -525,6 +526,7 @@ multitech/mpf1.cpp
 multitech/mpf1_88.cpp
 mupid/mdisk.cpp
 mupid/mupid2.cpp
+misc/nabupc.cpp
 nakajima/nakajies.cpp
 nascom/nascom1.cpp
 natsemi/ns32kdb.cpp
@@ -1070,6 +1072,7 @@ ti/cc40.cpp
 ti/evmbug.cpp
 ti/exelv.cpp
 ti/geneve.cpp
+ti/spellb.cpp
 ti/ti74.cpp
 ti/ti85.cpp
 ti/ti89.cpp

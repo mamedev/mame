@@ -69,6 +69,7 @@ TODO:
 
 #include "speaker.h"
 
+// netlist
 #include "nl_sfxphasor.h"
 
 // internal artwork
@@ -86,6 +87,8 @@ TODO:
 
 #include "hh_pic16_test.lh" // common test-layout - use external artwork
 
+
+namespace {
 
 class hh_pic16_state : public driver_device
 {
@@ -204,8 +207,6 @@ void hh_pic16_state::set_power(bool state)
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
-
-namespace {
 
 /***************************************************************************
 

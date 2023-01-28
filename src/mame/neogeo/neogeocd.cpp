@@ -35,6 +35,8 @@
 #include "softlist.h"
 
 
+namespace {
+
 // was it actually released in eu / asia?
 #define NEOCD_REGION_ASIA 3 // IronClad runs with a darkened screen (MVS has the same issue)
 #define NEOCD_REGION_EUROPE 2 // ^
@@ -1117,6 +1119,8 @@ void ngcd_state::init_neocdzj()
 {
 	m_system_region = NEOCD_REGION_JAPAN;
 }
+
+} // anonymous namespace
 
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT   CLASS        INIT          COMPANY FULLNAME               FLAGS */

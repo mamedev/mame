@@ -1,38 +1,27 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Sean Riddle, David Viens, Kevin Horton
-/******************************************************************************
+/*******************************************************************************
 
 Tiger Electronics K28 (model 7-232) Sold in Hong Kong, distributed in US as:
 - Coleco: Talking Teacher
 - Sears: Talkatron: Learning Computer
 
-K28 model 7-232 (HK), 1985
+1981 K28 models 7-230 and 7-231 are on different hardware, showing a different
+keyboard, VFD, and use the SC-01 speech chip. --> driver k28.cpp
+
+Hardware notes:
 - MCU: TMS1400 MP7324 (die label: TMS1400, MP7324, 28L 01D D000 R100)
 - TMS51xx: TMS5110A
 - VSM: 16KB CM62084
 - LCD: SMOS SMC1112 MCU to 8*14-seg display
-
-1981 K28 models 7-230 and 7-231 are on different hardware, showing a different
-keyboard, VFD, and use the SC-01 speech chip. --> driver k28.cpp
-
-K28 modules: (* denotes not dumped)
-- Spelling I: VSM: 16KB CM62086
-- Spelling II: VSM: 16KB CM62085?
-- Spelling III: VSM: 16KB CM62087
-- Expansion Module 1: VSM: 16KB CM62214? - assumed same VSM as CM62086
-- Expansion Module 2: VSM: 16KB CM62216 - assumed same VSM as the one in Spelling II
-- Expansion Module 3: VSM: 16KB CM62215 - same VSM as CM62087
-- Expansion Module 4: VSM: 16KB CM62217
-- Expansion Module 5: VSM: 16KB CM62218*
-- Expansion Module 6: VSM: 16KB CM62219
-
-note: these won't work on the 1981 version(s)
+- module slot (not compatible with the 1981 version(s))
 
 TODO:
 - emulate LCD
+- dump/add module #5
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -79,7 +68,6 @@ private:
 	optional_device<generic_slot_device> m_cart;
 	required_ioport_array<9> m_inputs;
 
-	void update_display(u8 old, u8 data);
 	u8 read_k();
 	void write_o(u16 data);
 	void write_r(u32 data);
@@ -102,9 +90,9 @@ void k28m2_state::machine_start()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Power
-******************************************************************************/
+*******************************************************************************/
 
 void k28m2_state::machine_reset()
 {
@@ -126,9 +114,9 @@ void k28m2_state::power_off()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Cartridge
-******************************************************************************/
+*******************************************************************************/
 
 DEVICE_IMAGE_LOAD_MEMBER(k28m2_state::cart_load)
 {
@@ -148,14 +136,9 @@ DEVICE_IMAGE_LOAD_MEMBER(k28m2_state::cart_load)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
-
-void k28m2_state::update_display(u8 old, u8 data)
-{
-	// ?
-}
+*******************************************************************************/
 
 void k28m2_state::write_r(u32 data)
 {
@@ -170,7 +153,7 @@ void k28m2_state::write_r(u32 data)
 	m_inp_mux = (m_inp_mux & 0xff) | (data << 3 & 0x100);
 
 	// R7-R10: LCD data
-	update_display(m_r >> 7 & 0xf, data >> 7 & 0xf);
+	//TODO..
 
 	// R6: power-off request, on falling edge
 	if (~data & m_r & 0x40)
@@ -200,9 +183,9 @@ u8 k28m2_state::read_k()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( k28m2 )
 	PORT_START("IN.0") // O0
@@ -262,9 +245,9 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void k28m2_state::k28m2(machine_config &config)
 {
@@ -299,9 +282,9 @@ void k28m2_state::k28m2(machine_config &config)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( k28m2 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -320,9 +303,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
 //    YEAR  NAME    PARENT  CMP MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
 COMP( 1985, k28m2,  0,       0, k28m2,   k28m2, k28m2_state, empty_init, "Tiger Electronics", "K28: Talking Learning Computer (model 7-232)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

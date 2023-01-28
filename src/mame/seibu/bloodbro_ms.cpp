@@ -33,6 +33,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class bloodbro_ms_state : public driver_device
 {
 public:
@@ -299,7 +301,7 @@ ROM_START( bloodbrom )
 	ROM_LOAD( "51-1-b_5246_gal16v8-20hb1.ic8", 0x000, 0x117, NO_DUMP ) // Protected
 ROM_END
 
-
+} // anonymous namespace
 
 
 GAME( 199?, bloodbrom,  bloodbro,  bloodbrom,  bloodbrom,  bloodbro_ms_state, init_bloodbrom, ROT0, "bootleg (Gaelco / Ervisa)", "Blood Bros. (Modular System)", MACHINE_IS_SKELETON )

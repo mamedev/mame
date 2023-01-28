@@ -71,6 +71,9 @@ end
 
 #include <cstdarg>
 
+
+namespace {
+
 #define PALM_Z22_BATTERY_LEVEL  75
 
 #define VERBOSE_LEVEL ( 0 )
@@ -347,5 +350,8 @@ ROM_START( palmz22 )
 	ROM_REGION( 0x2100000, "nand", 0 )
 	ROM_LOAD( "palmz22.bin", 0, 0x2100000, CRC(6d0320b3) SHA1(99297975fdad44faf69cc6eaf0fa2560d5579a4d) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 2005, palmz22, 0, 0, palmz22, palmz22, palmz22_state, init_palmz22, "Palm", "Palm Z22", MACHINE_NO_SOUND)

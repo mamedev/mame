@@ -63,14 +63,15 @@ public:
 		uint16_t m_screen_height = 0;
 		uint16_t m_quad_width = 0;
 		uint16_t m_quad_height = 0;
-		float m_tex_width = 0.0F;
-		float m_tex_height = 0.0F;
+		float m_tex_width = 0.0f;
+		float m_tex_height = 0.0f;
 		int m_rowpixels = 0;
 		uint32_t m_palette_length = 0;
 		uint32_t m_flags = 0;
 	};
 
-	chain_manager(running_machine& machine, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index, slider_dirty_notifier& slider_notifier);
+	chain_manager(running_machine& machine, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index,
+		slider_dirty_notifier& slider_notifier, uint16_t user_prescale, uint16_t max_prescale_size);
 	~chain_manager();
 
 	uint32_t update_screen_textures(uint32_t view, render_primitive *starting_prim, osd_window& window);
@@ -104,6 +105,7 @@ private:
 
 	void init_texture_converters();
 
+	void get_default_chain_info(std::string &out_chain_name, int32_t &out_chain_index);
 	void refresh_available_chains();
 	void destroy_unloaded_chains();
 	void find_available_chains(std::string root, std::string path);
@@ -112,6 +114,7 @@ private:
 
 	void update_screen_count(uint32_t screen_count);
 
+	void set_current_chain(uint32_t screen, int32_t chain_index);
 	int32_t slider_changed(int id, std::string *str, int32_t newval);
 	void create_selection_slider(uint32_t screen_index);
 	bool needs_sliders();
@@ -125,8 +128,11 @@ private:
 	target_manager&             m_targets;
 	effect_manager&             m_effects;
 	uint32_t                    m_window_index;
+	uint16_t                    m_user_prescale;
+	uint16_t                    m_max_prescale_size;
 	slider_dirty_notifier&      m_slider_notifier;
 	uint32_t                    m_screen_count;
+	int32_t                     m_default_chain_index;
 	std::vector<chain_desc>     m_available_chains;
 	std::vector<bgfx_chain*>    m_screen_chains;
 	std::vector<std::string>    m_chain_names;
@@ -139,6 +145,9 @@ private:
 	bgfx_effect *               m_adjuster;
 	std::vector<screen_prim>    m_screen_prims;
 	std::vector<uint8_t>        m_palette_temp;
+
+	static int32_t s_old_chain_selections[16];
+	static bool s_reinit_cookie;
 
 	static inline constexpr uint32_t CHAIN_NONE = 0;
 };

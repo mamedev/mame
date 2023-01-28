@@ -47,6 +47,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 /*************************************
  *
  *  Driver state
@@ -642,6 +644,9 @@ ROM_START( smartoss )
 	ROM_REGION( 0x40000, "unkdata", 0 )
 	ROM_LOAD( "s-tossem.u27", 0x0000, 0x40000, CRC(703d19b7) SHA1(75641d885885a67bd66afa38577c7907fa505b0b) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*************************************
  *

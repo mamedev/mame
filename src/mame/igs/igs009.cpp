@@ -40,6 +40,8 @@ Year  Game                         Manufacturer    Notes
 #include "tilemap.h"
 
 
+namespace {
+
 class igs009_state : public driver_device
 {
 public:
@@ -1074,6 +1076,8 @@ ROM_START( gp98 )
 	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
 	// no OKI on this
 ROM_END
+
+} // anonymous namespace
 
 
 /*    YEAR   NAME       PARENT    MACHINE   INPUT     STATE          INIT            ROT   COMPANY           FULLNAME                      FLAGS  */

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_MACHINE_RTPC_IOCC_H
-#define MAME_MACHINE_RTPC_IOCC_H
+#ifndef MAME_IBM_RTPC_IOCC_H
+#define MAME_IBM_RTPC_IOCC_H
 
 #pragma once
 
@@ -172,4 +172,4 @@ private:
 
 DECLARE_DEVICE_TYPE(RTPC_IOCC, rtpc_iocc_device)
 
-#endif // MAME_MACHINE_RTPC_IOCC_H
+#endif // MAME_IBM_RTPC_IOCC_H

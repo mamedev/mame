@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_VIDEO_ALPHA68K_PALETTE_H
-#define MAME_VIDEO_ALPHA68K_PALETTE_H
+#ifndef MAME_SHARED_ALPHA68K_PALETTE_H
+#define MAME_SHARED_ALPHA68K_PALETTE_H
 
 #pragma once
 
@@ -65,4 +65,4 @@ DECLARE_DEVICE_TYPE(ALPHA68K_PALETTE, alpha68k_palette_device)
 //**************************************************************************
 
 
-#endif // MAME_VIDEO_ALPHA68K_PALETTE_H
+#endif // MAME_SHARED_ALPHA68K_PALETTE_H

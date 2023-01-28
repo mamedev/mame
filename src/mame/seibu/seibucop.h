@@ -7,8 +7,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_SEIBUCOP_H
-#define MAME_MACHINE_SEIBUCOP_H
+#ifndef MAME_SEIBU_SEIBUCOP_H
+#define MAME_SEIBU_SEIBUCOP_H
 
 #pragma once
 
@@ -267,4 +267,4 @@ private:
 
 DECLARE_DEVICE_TYPE(RAIDEN2COP, raiden2cop_device)
 
-#endif // MAME_MACHINE_SEIBUCOP_H
+#endif // MAME_SEIBU_SEIBUCOP_H

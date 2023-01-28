@@ -87,6 +87,9 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+
+namespace {
+
 class cpu20_state : public driver_device
 {
 public:
@@ -206,6 +209,9 @@ ROM_START(fccpu20sbc)   ROM_END
 #define rom_fccpu21yasbc    rom_fccpu20sbc
 #define rom_fccpu21bsbc     rom_fccpu20sbc
 #define rom_fccpu21ybsbc    rom_fccpu20sbc
+
+} // anonymous namespace
+
 
 /* Driver */
 /*    YEAR  NAME          PARENT      COMPAT MACHINE  INPUT  CLASS        INIT          COMPANY                 FULLNAME           FLAGS */

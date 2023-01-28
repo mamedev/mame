@@ -7,9 +7,24 @@
 //====================================================================
 
 #include "sound_module.h"
+
 #include "modules/osdmodule.h"
 
 #if defined(OSD_WINDOWS)
+
+// MAME headers
+#include "winutil.h"
+
+#include "modules/lib/osdlib.h"
+#include "osdcore.h"
+#include "osdepend.h"
+
+// stdlib includes
+#include <algorithm>
+#include <chrono>
+#include <mutex>
+#include <queue>
+#include <thread>
 
 // standard windows headers
 #include <windows.h>
@@ -21,20 +36,10 @@
 
 #undef interface
 
-// stdlib includes
-#include <algorithm>
-#include <chrono>
-#include <mutex>
-#include <queue>
-#include <thread>
 
-// MAME headers
-#include "osdcore.h"
-#include "osdepend.h"
+namespace osd {
 
-#include "winutil.h"
-
-#include "modules/lib/osdlib.h"
+namespace {
 
 //============================================================
 //  Constants
@@ -230,7 +235,7 @@ public:
 	virtual ~sound_xaudio2() { }
 
 	bool probe() override;
-	int init(osd_options const &options) override;
+	int init(osd_interface &osd, osd_options const &options) override;
 	void exit() override;
 
 	// sound_module
@@ -269,7 +274,7 @@ bool sound_xaudio2::probe()
 //  init
 //============================================================
 
-int sound_xaudio2::init(osd_options const &options)
+int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 {
 	HRESULT result;
 	WAVEFORMATEX format = {0};
@@ -695,9 +700,15 @@ void sound_xaudio2::roll_buffer()
 	}
 }
 
+} // anonymous namespace
+
+} // namespace osd
+
 
 #else
-MODULE_NOT_SUPPORTED(sound_xaudio2, OSD_SOUND_PROVIDER, "xaudio2")
+
+namespace osd { namespace { MODULE_NOT_SUPPORTED(sound_xaudio2, OSD_SOUND_PROVIDER, "xaudio2") } }
+
 #endif
 
-MODULE_DEFINITION(SOUND_XAUDIO2, sound_xaudio2)
+MODULE_DEFINITION(SOUND_XAUDIO2, osd::sound_xaudio2)

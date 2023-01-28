@@ -34,6 +34,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define MASTER_CLOCK 4.028_MHz_XTAL
 
 #define mc6845_h_char_total     (m_crtc_vreg[0]+1)
@@ -1161,6 +1163,9 @@ ROM_START( smc777 )
 	ROM_REGION( 0x400, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "m5l8041a-077p.bin", 0x000, 0x400, NO_DUMP ) // 8041 keyboard mcu, needs decapping
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

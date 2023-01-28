@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
-#ifndef MAME_MACHINE_OCTO_KBD_H
-#define MAME_MACHINE_OCTO_KBD_H
+#ifndef MAME_LSI_OCTO_KBD_H
+#define MAME_LSI_OCTO_KBD_H
 
 #pragma once
 
@@ -31,4 +31,4 @@ private:
 
 DECLARE_DEVICE_TYPE(OCTOPUS_KEYBOARD, octopus_keyboard_device)
 
-#endif // MAME_MACHINE_OCTO_KBD_H
+#endif // MAME_LSI_OCTO_KBD_H

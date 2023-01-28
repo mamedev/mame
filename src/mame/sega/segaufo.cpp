@@ -59,6 +59,8 @@
 #include "ufo800.lh"
 
 
+namespace {
+
 /* simulation parameters */
 // x/y/z cabinet dimensions per player (motor range)
 #define CABINET_WIDTH   400
@@ -936,6 +938,8 @@ ROM_START( ufo800 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-20413a.ic33",  0x000000, 0x010000, CRC(36e9da6d) SHA1(8e1dbf8b24bc31be7de28f4d562838c291af7c7b) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAMEL( 1991, newufo,       0,      newufo,  newufo,  ufo_state, empty_init, ROT0, "Sega", "New UFO Catcher (standard)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )

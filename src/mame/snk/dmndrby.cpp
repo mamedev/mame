@@ -63,6 +63,8 @@ DD10 DD14  DD18     H5            DD21
 #include "tilemap.h"
 
 
+namespace {
+
 class dmndrby_state : public driver_device
 {
 public:
@@ -667,6 +669,8 @@ ROM_START( dmndrbya )
 	ROM_LOAD( "ddprom2.j5", 0x0000, 0x0100, CRC(3e5402dc) SHA1(2f497333f49064c54995cec8919f3aebdc17e977) )
 	ROM_LOAD( "ddprom6.m12",0x0100, 0x0100, CRC(7f677b7d) SHA1(946014cb01f5954a3cb196796741ee174a0de641) )
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR, NAME,     PARENT,  MACHINE, INPUT,   STATE,         INIT,       MONITOR, COMPANY,       FULLNAME                    FLAGS

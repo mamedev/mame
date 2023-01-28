@@ -12,14 +12,16 @@
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
 // MAME headers
-#include "osdcore.h"
-#include "osdepend.h"
 #include "emuopts.h"
 
+// osd headers
+#include "osdepend.h"
+#include "osdcore.h"
+
 #ifdef SDLMAME_WIN32
-#include "../../sdl/osdsdl.h"
+#include "modules/lib/osdobj_common.h"
+#include "sdl/window.h"
 #include <SDL2/SDL_syswm.h>
-#include "../../sdl/window.h"
 #else
 #include "winmain.h"
 #include "window.h"
@@ -47,6 +49,8 @@
 
 #define LOG(...)      do { if (LOG_SOUND) osd_printf_verbose(__VA_ARGS__); } while(0)
 
+
+namespace osd {
 
 namespace {
 
@@ -217,7 +221,7 @@ public:
 	}
 	virtual ~sound_direct_sound() { }
 
-	virtual int init(osd_options const &options) override;
+	virtual int init(osd_interface &osd, osd_options const &options) override;
 	virtual void exit() override;
 
 	// sound_module
@@ -251,9 +255,9 @@ private:
 //  init
 //============================================================
 
-int sound_direct_sound::init(osd_options const &options)
+int sound_direct_sound::init(osd_interface &osd, osd_options const &options)
 {
-	// attempt to initialize directsound
+	// attempt to initialize DirectSound
 	// don't make it fatal if we can't -- we'll just run without sound
 	dsound_init();
 	m_buffer_underflows = m_buffer_overflows = 0;
@@ -554,9 +558,13 @@ void sound_direct_sound::destroy_buffers()
 
 } // anonymous namespace
 
+} // namespace osd
+
 
 #else // defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
-	MODULE_NOT_SUPPORTED(sound_direct_sound, OSD_SOUND_PROVIDER, "dsound")
+
+namespace osd { namespace { MODULE_NOT_SUPPORTED(sound_direct_sound, OSD_SOUND_PROVIDER, "dsound") } }
+
 #endif // defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
-MODULE_DEFINITION(SOUND_DSOUND, sound_direct_sound)
+MODULE_DEFINITION(SOUND_DSOUND, osd::sound_direct_sound)

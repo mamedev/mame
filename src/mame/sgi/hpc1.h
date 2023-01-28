@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_HPC1_H
-#define MAME_MACHINE_HPC1_H
+#ifndef MAME_SGI_HPC1_H
+#define MAME_SGI_HPC1_H
 
 #pragma once
 
@@ -138,4 +138,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SGI_HPC1, hpc1_device)
 
-#endif // MAME_MACHINE_HPC1_H
+#endif // MAME_SGI_HPC1_H

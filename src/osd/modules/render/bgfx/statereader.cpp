@@ -22,6 +22,14 @@ bool state_reader::V_READER_CHECK(bool condition, const util::format_argument_pa
 	return condition;
 }
 
+bool state_reader::V_READER_WARN(bool condition, const util::format_argument_pack<std::ostream> &args)
+{
+	if (!condition)
+		osd_printf_warning("Warning: %s\n", util::string_format(args));
+
+	return condition;
+}
+
 uint64_t state_reader::get_enum_from_value(const Value& value, std::string name, const uint64_t default_value, const string_to_enum* enums, const int count)
 {
 	if (value.HasMember(name.c_str()))
@@ -112,7 +120,7 @@ float state_reader::get_float(const Value& value, const std::string name, const 
 {
 	if (value.HasMember(name.c_str()))
 	{
-		return (float)value[name.c_str()].GetDouble();
+		return float(value[name.c_str()].GetDouble());
 	}
 	return default_value;
 }
@@ -123,7 +131,7 @@ void state_reader::get_float(const Value& value, const std::string name, float* 
 	{
 		if (count == 1)
 		{
-			*out = (float) value[name.c_str()].GetDouble();
+			*out = float(value[name.c_str()].GetDouble());
 			return;
 		}
 		else
@@ -141,7 +149,7 @@ void state_reader::get_vec_values(const Value& value_array, float* data, const u
 {
 	for (unsigned int i = 0; i < count && i < value_array.Size(); i++)
 	{
-		data[i] = (float) value_array[i].GetDouble();
+		data[i] = float(value_array[i].GetDouble());
 	}
 }
 

@@ -106,6 +106,9 @@ TODO:
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 class joystand_state : public driver_device
 {
 public:
@@ -650,5 +653,8 @@ ROM_START( joystand )
 	ROM_LOAD( "jsp-sub.1f",    0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "jsp-xct.ic5",   0x000, 0x117, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1997, joystand, 0, joystand, joystand, joystand_state, empty_init, ROT0, "Yuvo", "Joy Stand Private", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )

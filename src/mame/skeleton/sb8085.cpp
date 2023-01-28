@@ -47,6 +47,9 @@
 #include "machine/i8155.h"
 #include "machine/i8251.h"
 
+
+namespace {
+
 class sb8085_state : public driver_device
 {
 public:
@@ -320,5 +323,8 @@ ROM_START(sb8085)
 	ROM_LOAD("2.u20", 0x400, 0x400, CRC(2426af98) SHA1(b6e37041f997aeea13be79df10dc410f4b0c51a6))
 	ROM_LOAD("3.u21", 0x800, 0x400, CRC(088ad01b) SHA1(6832e63dc1769db09107bc09f4c2cfb158dd8d33))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1977, sb8085, 0, 0, sb8085, sb8085, sb8085_state, empty_init, "Space Byte", "Space Byte 8085", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

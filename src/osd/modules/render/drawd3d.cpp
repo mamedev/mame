@@ -242,7 +242,12 @@ int renderer_d3d9::draw(const int update)
 		return check;
 
 	begin_frame();
+
+	// reset blend mode
+	set_blendmode(BLENDMODE_NONE);
+
 	process_primitives();
+
 	end_frame();
 
 	return 0;
@@ -254,8 +259,12 @@ void renderer_d3d9::set_texture(texture_info *texture)
 	{
 		m_last_texture = texture;
 		m_last_texture_flags = (texture == nullptr ? 0 : texture->get_flags());
+		if (m_shaders->enabled())
+		{
+			m_shaders->set_texture(texture);
+		}
+
 		HRESULT result = m_device->SetTexture(0, (texture == nullptr) ? get_default_texture()->get_finaltex() : texture->get_finaltex());
-		m_shaders->set_texture(texture);
 		if (FAILED(result))
 			osd_printf_verbose("Direct3D: Error %08lX during device set_texture call\n", result);
 	}
@@ -353,15 +362,20 @@ void renderer_d3d9::set_blendmode(int blendmode)
 	}
 
 	// adjust the bits that changed
+	bool new_blend_enable = false;
 	if (blendenable != m_last_blendenable)
 	{
 		m_last_blendenable = blendenable;
+		if (blendenable)
+		{
+			new_blend_enable  = true;
+		}
 		HRESULT result = m_device->SetRenderState(D3DRS_ALPHABLENDENABLE, blendenable);
 		if (FAILED(result))
 			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderState call\n", result);
 	}
 
-	if (blendop != m_last_blendop)
+	if (blendop != m_last_blendop || new_blend_enable)
 	{
 		m_last_blendop = blendop;
 		HRESULT result = m_device->SetRenderState(D3DRS_BLENDOP, blendop);
@@ -369,7 +383,7 @@ void renderer_d3d9::set_blendmode(int blendmode)
 			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderState call\n", result);
 	}
 
-	if (blendsrc != m_last_blendsrc)
+	if (blendsrc != m_last_blendsrc || new_blend_enable)
 	{
 		m_last_blendsrc = blendsrc;
 		HRESULT result = m_device->SetRenderState(D3DRS_SRCBLEND, blendsrc);
@@ -377,7 +391,7 @@ void renderer_d3d9::set_blendmode(int blendmode)
 			osd_printf_verbose("Direct3D: Error %08lX during device SetRenderState call\n", result);
 	}
 
-	if (blenddst != m_last_blenddst)
+	if (blenddst != m_last_blenddst || new_blend_enable)
 	{
 		m_last_blenddst = blenddst;
 		HRESULT result = m_device->SetRenderState(D3DRS_DESTBLEND, blenddst);
@@ -652,7 +666,7 @@ void renderer_d3d9::begin_frame()
 {
 	auto win = assert_window();
 
-	HRESULT result = m_device->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
+	HRESULT result = m_device->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0xff,0,0,0), 0, 0);
 	if (FAILED(result))
 		osd_printf_verbose("Direct3D: Error %08lX during device clear call\n", result);
 
@@ -667,7 +681,7 @@ void renderer_d3d9::begin_frame()
 		osd_printf_verbose("Direct3D: Error %08lX during device BeginScene call\n", result);
 
 	if (m_shaders->enabled())
-		m_shaders->init_fsfx_quad();
+		m_shaders->begin_frame(win->m_primlist);
 }
 
 void renderer_d3d9::process_primitives()
@@ -723,6 +737,9 @@ void renderer_d3d9::end_frame()
 	// flush any pending polygons
 	primitive_flush_pending();
 
+	if (m_shaders->enabled())
+		m_shaders->end_frame();
+
 	// finish the scene
 	HRESULT result = m_device->EndScene();
 	if (FAILED(result))
@@ -746,7 +763,7 @@ void renderer_d3d9::update_presentation_parameters()
 	m_presentation.MultiSampleType = D3DMULTISAMPLE_NONE;
 	m_presentation.SwapEffect = D3DSWAPEFFECT_DISCARD;
 	m_presentation.hDeviceWindow = std::static_pointer_cast<win_window_info>(win)->platform_window();
-	m_presentation.Windowed = !win->fullscreen() || win->win_has_menu();
+	m_presentation.Windowed = !win->fullscreen();
 	m_presentation.EnableAutoDepthStencil = FALSE;
 	m_presentation.AutoDepthStencilFormat = D3DFMT_D16;
 	m_presentation.Flags = 0;
@@ -1193,7 +1210,7 @@ int renderer_d3d9::config_adapter_mode()
 	auto win = assert_window();
 
 	// choose a resolution: window mode case
-	if (!win->fullscreen() || !video_config.switchres || win->win_has_menu())
+	if (!win->fullscreen() || !video_config.switchres)
 	{
 		RECT client;
 
@@ -1412,6 +1429,7 @@ void renderer_d3d9::batch_vectors(int vector_count)
 	int triangle_count = vector_count * 2;
 	m_vectorbatch = mesh_alloc(vertex_count);
 	m_batchindex = 0;
+	uint32_t tint = 0xffffffff;
 
 	uint32_t cached_flags = 0;
 	for (render_primitive &prim : *win->m_primlist)
@@ -1423,6 +1441,12 @@ void renderer_d3d9::batch_vectors(int vector_count)
 				{
 					batch_vector(prim);
 					cached_flags = prim.flags;
+
+					const uint8_t a = (uint8_t)std::round(prim.color.a * 255);
+					const uint8_t r = (uint8_t)std::round(prim.color.r * 255);
+					const uint8_t g = (uint8_t)std::round(prim.color.g * 255);
+					const uint8_t b = (uint8_t)std::round(prim.color.b * 255);
+					tint = (a << 24) | (b << 16) | (g << 8) | r;
 				}
 				break;
 
@@ -1433,6 +1457,12 @@ void renderer_d3d9::batch_vectors(int vector_count)
 					quad_height = prim.get_quad_height();
 					target_width = prim.get_full_quad_width();
 					target_height = prim.get_full_quad_height();
+
+					const uint8_t a = (uint8_t)std::round(prim.color.a * 255);
+					const uint8_t r = (uint8_t)std::round(prim.color.r * 255);
+					const uint8_t g = (uint8_t)std::round(prim.color.g * 255);
+					const uint8_t b = (uint8_t)std::round(prim.color.b * 255);
+					tint = (a << 24) | (b << 16) | (g << 8) | r;
 				}
 				break;
 
@@ -1510,7 +1540,7 @@ void renderer_d3d9::batch_vectors(int vector_count)
 	}
 
 	// now add a polygon entry
-	m_poly[m_numpolys].init(D3DPT_TRIANGLELIST, triangle_count, vertex_count, cached_flags, nullptr, D3DTOP_MODULATE, quad_width, quad_height);
+	m_poly[m_numpolys].init(D3DPT_TRIANGLELIST, triangle_count, vertex_count, cached_flags, nullptr, D3DTOP_MODULATE, quad_width, quad_height, tint);
 	m_numpolys++;
 }
 
@@ -1652,10 +1682,10 @@ void renderer_d3d9::draw_line(const render_primitive &prim)
 	vertex[3].v0 = stop.c.y;
 
 	// determine the color of the line
-	auto r = (int32_t)(prim.color.r * 255.0f);
-	auto g = (int32_t)(prim.color.g * 255.0f);
-	auto b = (int32_t)(prim.color.b * 255.0f);
-	auto a = (int32_t)(prim.color.a * 255.0f);
+	auto r = (int32_t)std::round(prim.color.r * 255.0f);
+	auto g = (int32_t)std::round(prim.color.g * 255.0f);
+	auto b = (int32_t)std::round(prim.color.b * 255.0f);
+	auto a = (int32_t)std::round(prim.color.a * 255.0f);
 	DWORD color = D3DCOLOR_ARGB(a, r, g, b);
 
 	// set the color, Z parameters to standard values
@@ -1667,7 +1697,7 @@ void renderer_d3d9::draw_line(const render_primitive &prim)
 	}
 
 	// now add a polygon entry
-	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, nullptr, D3DTOP_MODULATE, 0.0f, 0.0f);
+	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, nullptr, D3DTOP_MODULATE, 0.0f, 0.0f, (uint32_t)color);
 	m_numpolys++;
 }
 
@@ -1721,10 +1751,10 @@ void renderer_d3d9::draw_quad(const render_primitive &prim)
 	}
 
 	// determine the color, allowing for over modulation
-	auto r = (int32_t)(prim.color.r * 255.0f);
-	auto g = (int32_t)(prim.color.g * 255.0f);
-	auto b = (int32_t)(prim.color.b * 255.0f);
-	auto a = (int32_t)(prim.color.a * 255.0f);
+	auto r = (int32_t)std::round(prim.color.r * 255.0f);
+	auto g = (int32_t)std::round(prim.color.g * 255.0f);
+	auto b = (int32_t)std::round(prim.color.b * 255.0f);
+	auto a = (int32_t)std::round(prim.color.a * 255.0f);
 	DWORD color = D3DCOLOR_ARGB(a, r, g, b);
 
 	// adjust half pixel X/Y offset, set the color, Z parameters to standard values
@@ -1738,7 +1768,7 @@ void renderer_d3d9::draw_quad(const render_primitive &prim)
 	}
 
 	// now add a polygon entry
-	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, texture, D3DTOP_MODULATE, quad_width, quad_height);
+	m_poly[m_numpolys].init(D3DPT_TRIANGLESTRIP, 2, 4, prim.flags, texture, D3DTOP_MODULATE, quad_width, quad_height, (uint32_t)color);
 	m_numpolys++;
 }
 
@@ -1826,9 +1856,17 @@ void renderer_d3d9::primitive_flush_pending()
 			newfilter = FALSE;
 			if (PRIMFLAG_GET_SCREENTEX(flags))
 				newfilter = video_config.filter;
-			set_filter(newfilter);
-			set_wrap(PRIMFLAG_GET_TEXWRAP(flags) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
-			set_modmode(m_poly[polynum].modmode());
+
+			if (m_shaders->enabled())
+			{
+				m_shaders->set_filter(newfilter);
+			}
+			else
+			{
+				set_filter(newfilter);
+				set_wrap(PRIMFLAG_GET_TEXWRAP(flags) ? D3DTADDRESS_WRAP : D3DTADDRESS_CLAMP);
+				set_modmode(m_poly[polynum].modmode());
+			}
 		}
 
 		if (vertnum + m_poly[polynum].numverts() > m_numverts)
@@ -1841,9 +1879,6 @@ void renderer_d3d9::primitive_flush_pending()
 
 		if(m_shaders->enabled())
 		{
-			// reset blend mode (handled by shader passes)
-			set_blendmode(BLENDMODE_NONE);
-
 			m_shaders->render_quad(&m_poly[polynum], vertnum);
 		}
 		else

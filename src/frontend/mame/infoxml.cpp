@@ -13,16 +13,20 @@
 
 #include "mameopts.h"
 
+// devices
 #include "machine/ram.h"
 #include "sound/samples.h"
 
+// emu
 #include "config.h"
 #include "drivenum.h"
+#include "main.h"
 #include "romload.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
+// lib/util
 #include "corestr.h"
 #include "xmlfile.h"
 
@@ -1388,11 +1392,11 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 		int             maxbuttons;     // max index of buttons (using IPT_BUTTONn) [probably to be removed soonish]
 		int             ways;           // directions for joystick
 		bool            analog;         // is analog input?
-		uint8_t           helper[3];      // for dual joysticks [possibly to be removed soonish]
-		int32_t           min;            // analog minimum value
-		int32_t           max;            // analog maximum value
-		int32_t           sensitivity;    // default analog sensitivity
-		int32_t           keydelta;       // default analog keydelta
+		uint8_t         helper[3];      // for dual joysticks [possibly to be removed soonish]
+		int32_t         min;            // analog minimum value
+		int32_t         max;            // analog maximum value
+		int32_t         sensitivity;    // default analog sensitivity
+		int32_t         keydelta;       // default analog keydelta
 		bool            reverse;        // default analog reverse setting
 	} control_info[CTRL_COUNT * CTRL_PCOUNT];
 

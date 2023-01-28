@@ -9,28 +9,33 @@
 //============================================================
 
 #include "sound_module.h"
+
 #include "modules/osdmodule.h"
 
 #if (defined(OSD_SDL) || defined(USE_SDL_SOUND))
 
-// standard sdl header
-#include <SDL2/SDL.h>
-
-// MAME headers
-#include "emuopts.h"
 #include "osdcore.h"
 
-#include "../../sdl/osdsdl.h"
+// standard sdl header
+#include <SDL2/SDL.h>
 
 #include <algorithm>
 #include <fstream>
 #include <memory>
 
+
+namespace osd {
+
+namespace {
+
 //============================================================
 //  DEBUGGING
 //============================================================
 
-#define LOG_SOUND       0
+#define LOG_SOUND           0
+
+#define SDLMAME_SOUND_LOG   "sound.log"
+
 
 //============================================================
 //  CLASS
@@ -41,18 +46,18 @@ class sound_sdl : public osd_module, public sound_module
 public:
 
 	// number of samples per SDL callback
-	static const int SDL_XFER_SAMPLES = 512;
+	static inline constexpr int SDL_XFER_SAMPLES = 512;
 
 	sound_sdl() :
 		osd_module(OSD_SOUND_PROVIDER, "sdl"), sound_module(),
 		stream_in_initialized(0),
 		attenuation(0), buf_locked(0), stream_buffer(nullptr), stream_buffer_size(0), buffer_underflows(0), buffer_overflows(0)
-{
+	{
 		sdl_xfer_samples = SDL_XFER_SAMPLES;
 	}
 	virtual ~sound_sdl() { }
 
-	virtual int init(const osd_options &options) override;
+	virtual int init(osd_interface &osd, const osd_options &options) override;
 	virtual void exit() override;
 
 	// sound_module
@@ -330,7 +335,7 @@ void sound_sdl::sdl_callback(void *userdata, Uint8 *stream, int len)
 //  sound_sdl::init
 //============================================================
 
-int sound_sdl::init(const osd_options &options)
+int sound_sdl::init(osd_interface &osd, const osd_options &options)
 {
 	int         n_channels = 2;
 	int         audio_latency;
@@ -456,10 +461,15 @@ void sound_sdl::sdl_destroy_buffers()
 	stream_buffer.reset();
 }
 
+} // anonymous namespace
+
+} // namespace osd
 
 
-#else /* SDLMAME_UNIX */
-	MODULE_NOT_SUPPORTED(sound_sdl, OSD_SOUND_PROVIDER, "sdl")
+#else // (defined(OSD_SDL) || defined(USE_SDL_SOUND))
+
+namespace osd { namespace { MODULE_NOT_SUPPORTED(sound_sdl, OSD_SOUND_PROVIDER, "sdl") } }
+
 #endif
 
-MODULE_DEFINITION(SOUND_SDL, sound_sdl)
+MODULE_DEFINITION(SOUND_SDL, osd::sound_sdl)

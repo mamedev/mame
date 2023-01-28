@@ -25,6 +25,9 @@
 #include "cpu/i386/i386.h"
 #include "screen.h"
 
+
+namespace {
+
 class matrix_state : public driver_device
 {
 public:
@@ -80,6 +83,8 @@ ROM_START( matrix )
 	ROM_LOAD( "matrix_031203u19.bin", 0x200000, 0x080000, CRC(c612c80c) SHA1(ef7586369fd1f9c6b8f3e78806c3be16b5aa1a3d) )
 	ROM_LOAD( "matrix_031203u20.bin", 0x280000, 0x080000, CRC(f87ac4ae) SHA1(ef9b730a1113d36ef6a041fe36d77edfa255ad98) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 200?, matrix, 0, matrix, matrix, matrix_state, empty_init, ROT0, "<unknown>", "Matrix", MACHINE_IS_SKELETON )

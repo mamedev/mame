@@ -15,7 +15,13 @@
 
 #pragma once
 
+// OSD headers
+#include "window.h"
+
 #include <SDL2/SDL.h>
+
+#include <memory>
+
 
 /* renderer_sdl1 is the information about SDL for the current screen */
 class renderer_sdl1 : public osd_renderer

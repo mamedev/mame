@@ -15,6 +15,9 @@
 #include "machine/tms9914.h"
 #include "machine/x2201.h"
 
+
+namespace {
+
 class si5500_state : public driver_device
 {
 public:
@@ -228,5 +231,8 @@ ROM_START(si5500)
 	ROM_LOAD("m5500dl_7-9-86.u5", 0x1000, 0x1000, CRC(a932e85a) SHA1(f7152ae78bad79b457bb739e7ecc4556ca33cbbc))
 	ROM_LOAD("m5500dl_7-9-86.u6", 0x2000, 0x1000, CRC(3161347d) SHA1(fab6c228a21ef3ecce255079a48ef1697f2c7ccb))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1986, si5500, 0, 0, si5500, si5500, si5500_state, empty_init, "Scientific Instruments", "Model 5500 Temperature Controller", MACHINE_IS_SKELETON)

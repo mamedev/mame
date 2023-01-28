@@ -2,7 +2,12 @@
 // copyright-holders:
 /*
 
-Skeleton driver for Recreativos Franco PC-Pentium based slots machines.
+Skeleton driver for Recreativos Franco PC-Pentium based video + mechanical slots machines.
+
+TODO:
+- Keeps reading $fed40000 (mapped thru PCI), expects to read with bit 7 high.
+- In shutms11 it will start booting Win CE "BIOS" bootloader then quickly Triple Fault
+  at $1d/$1e****** range check.
 
 Configuration for 'Santa Fe Golden' video slot machine:
 
@@ -14,6 +19,19 @@ Motherboard
   Intel Celeron 575 1M cache, 2,00 GHz
   1GB RAM
   Compact Flash Transcend 512MB 20100202
+
+Advantech AIMB-256 is a single board PCB with:
+- Intel ICH8-M
+- Intel GME965 (GMCH X3100)
+- Realtek RTL8111B (LAN, PCIe x 2)
+- Realtek ALC888 (HD Audio, 7.1+2 channels)
+- W83627DHG Super I/O LPC i/f
+- Optional infineon SLB9635TT on LPC bus (TPM 1.2)
+- Compact Flash support
+- VGA + DVI ports
+- 10 USB ports
+- DIO
+- PCI1 connector
 
 PCB coinage (monedero-billetero-hopper) R.F. 53452303
   PIC18F448-I/P
@@ -175,7 +193,7 @@ PCB counters (contadores) R.F. 53430106
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "screen.h"
+#include "machine/pci.h"
 
 namespace {
 
@@ -189,56 +207,30 @@ public:
 
 	void rfslotspcpent(machine_config &config);
 
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 private:
 	required_device<cpu_device> m_maincpu;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void rfslotspcpent_map(address_map &map);
 };
 
-void rfslotspcpent_state::video_start()
-{
-}
-
-uint32_t rfslotspcpent_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
-
 void rfslotspcpent_state::rfslotspcpent_map(address_map &map)
 {
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0x1e0000);
+	map(0xffe00000, 0xffffffff).rom().region("bios", 0);
 }
 
 static INPUT_PORTS_START( rfslotspcpent )
 INPUT_PORTS_END
 
-
-void rfslotspcpent_state::machine_start()
-{
-}
-
-void rfslotspcpent_state::machine_reset()
-{
-}
-
 void rfslotspcpent_state::rfslotspcpent(machine_config &config)
 {
-	// Basic machine hardware
-	PENTIUM4(config, m_maincpu, 100000000); // Actually an Intel Celeron 575 1M cache, 2,00 GHz
+	// Socket 478 Core 2 Duo / Celeron M
+	PENTIUM4(config, m_maincpu, 100'000'000); // Actually an Intel Celeron 575 1M cache, 2,00 GHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &rfslotspcpent_state::rfslotspcpent_map);
 
-	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(rfslotspcpent_state::screen_update));
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 /***************************************************************************
@@ -248,7 +240,7 @@ void rfslotspcpent_state::rfslotspcpent(machine_config &config)
 ***************************************************************************/
 
 ROM_START( rfsantafeg )
-	ROM_REGION(0x200000, "bios", 0) // Advantech AIMB-256
+	ROM_REGION32_LE(0x200000, "bios", 0) // Advantech AIMB-256
 	ROM_LOAD("bios_a256v103.bin", 0x000000, 0x200000, CRC(06df0d8d) SHA1(5d740071500729af8c045b562adc5f8da058b59f) )
 
 	DISK_REGION( "ide:0:hdd:image" ) // Compact Flash Transcend 512MB

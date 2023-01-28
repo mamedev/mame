@@ -86,8 +86,6 @@ static DWORD main_threadid;
 //============================================================
 
 // event handling
-static std::chrono::steady_clock::time_point last_event_check;
-
 static int ui_temp_pause;
 static int ui_temp_was_paused;
 
@@ -355,24 +353,42 @@ void win_window_info::show_pointer()
 	ShowCursor(FALSE);
 }
 
+
+bool windows_osd_interface::has_focus() const
+{
+	return winwindow_has_focus();
+}
+
+
 //============================================================
 //  winwindow_process_events_periodic
 //  (main thread)
 //============================================================
 
-void winwindow_process_events_periodic(running_machine &machine)
+void windows_osd_interface::process_events()
 {
-	auto currticks = std::chrono::steady_clock::now();
-
 	assert(GetCurrentThreadId() == main_threadid);
 
+	auto const currticks = std::chrono::steady_clock::now();
+
 	// update once every 1/8th of a second
-	if (currticks - last_event_check < std::chrono::milliseconds(1000 / 8))
+	if (currticks < (m_last_event_check + std::chrono::milliseconds(1000 / 8)))
 		return;
-	winwindow_process_events(machine, true, false);
+
+	process_events(true, false);
 }
 
 
+
+//============================================================
+//  winwindow_video_window_proc_ui
+//  (window thread)
+//============================================================
+
+static LRESULT CALLBACK winwindow_video_window_proc_ui(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
+{
+	return win_window_info::video_window_proc(wnd, message, wparam, lparam);
+}
 
 //============================================================
 //  is_mame_window
@@ -418,14 +434,12 @@ inline static BOOL handle_keypress(windows_osd_interface *osd, int vkey, int dow
 //  (main thread)
 //============================================================
 
-void winwindow_process_events(running_machine &machine, bool ingame, bool nodispatch)
+void windows_osd_interface::process_events(bool ingame, bool nodispatch)
 {
-	MSG message;
-
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// remember the last time we did this
-	last_event_check = std::chrono::steady_clock::now();
+	m_last_event_check = std::chrono::steady_clock::now();
 
 	do
 	{
@@ -434,75 +448,77 @@ void winwindow_process_events(running_machine &machine, bool ingame, bool nodisp
 			WaitMessage();
 
 		// loop over all messages in the queue
+		MSG message;
 		while (PeekMessage(&message, nullptr, 0, 0, PM_REMOVE))
 		{
 			// prevent debugger windows from getting messages during reset
-			int dispatch = TRUE && !nodispatch;
+			bool dispatch = !nodispatch;
 
-			if (message.hwnd == nullptr || is_mame_window(message.hwnd))
+			if (!message.hwnd || is_mame_window(message.hwnd))
 			{
-				dispatch = TRUE;
+				dispatch = true;
 				switch (message.message)
 				{
 					// ignore keyboard messages
 					case WM_SYSKEYUP:
 					case WM_SYSKEYDOWN:
-						dispatch = FALSE;
+						dispatch = false;
 						break;
 
 					// forward mouse button downs to the input system
 					case WM_LBUTTONDOWN:
-						dispatch = !handle_mouse_button(WINOSD(machine), 0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(this, 0, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_RBUTTONDOWN:
-						dispatch = !handle_mouse_button(WINOSD(machine), 1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(this, 1, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_MBUTTONDOWN:
-						dispatch = !handle_mouse_button(WINOSD(machine), 2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(this, 2, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_XBUTTONDOWN:
-						dispatch = !handle_mouse_button(WINOSD(machine), 3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(this, 3, TRUE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					// forward mouse button ups to the input system
 					case WM_LBUTTONUP:
-						dispatch = !handle_mouse_button(WINOSD(machine), 0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(this, 0, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_RBUTTONUP:
-						dispatch = !handle_mouse_button(WINOSD(machine), 1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(this, 1, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_MBUTTONUP:
-						dispatch = !handle_mouse_button(WINOSD(machine), 2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(this, 2, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_XBUTTONUP:
-						dispatch = !handle_mouse_button(WINOSD(machine), 3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
+						dispatch = !handle_mouse_button(this, 3, FALSE, GET_X_LPARAM(message.lParam), GET_Y_LPARAM(message.lParam));
 						break;
 
 					case WM_KEYDOWN:
 						if (NOT_ALREADY_DOWN(message.lParam))
-							dispatch = !handle_keypress(WINOSD(machine), message.wParam, TRUE, SCAN_CODE(message.lParam), IS_EXTENDED(message.lParam));
+							dispatch = !handle_keypress(this, message.wParam, TRUE, SCAN_CODE(message.lParam), IS_EXTENDED(message.lParam));
 						break;
 
 					case WM_KEYUP:
-						dispatch = !handle_keypress(WINOSD(machine), message.wParam, FALSE, SCAN_CODE(message.lParam), IS_EXTENDED(message.lParam));
+						dispatch = !handle_keypress(this, message.wParam, FALSE, SCAN_CODE(message.lParam), IS_EXTENDED(message.lParam));
 						break;
 				}
 			}
 
 			// dispatch if necessary
 			if (dispatch)
-				winwindow_dispatch_message(machine, &message);
+				winwindow_dispatch_message(machine(), &message);
 		}
-	} while (ui_temp_pause > 0);
+	}
+	while (ui_temp_pause > 0);
 
 	// update the cursor state after processing events
-	winwindow_update_cursor_state(machine);
+	winwindow_update_cursor_state(machine());
 }
 
 
@@ -669,7 +685,7 @@ void winwindow_update_cursor_state(running_machine &machine)
 	if (osd_common_t::s_window_list.empty())
 		return;
 
-	auto window = osd_common_t::s_window_list.front();
+	auto &window = static_cast<win_window_info &>(*osd_common_t::s_window_list.front());
 
 	// if we should hide the mouse cursor, then do it
 	// rules are:
@@ -678,22 +694,22 @@ void winwindow_update_cursor_state(running_machine &machine)
 	//   3. we also hide the cursor in windowed mode if we're not paused and
 	//      the input system requests it
 	if (winwindow_has_focus() && (
-		(window->fullscreen() && !window->win_has_menu())
+		(window.fullscreen() && !GetMenu(window.platform_window()))
 		|| (!machine.paused() && WINOSD(machine)->should_hide_mouse())))
 	{
 		// hide cursor
-		window->hide_pointer();
+		window.hide_pointer();
 
 		// clip pointer to game video window
-		window->capture_pointer();
+		window.capture_pointer();
 	}
 	else
 	{
 		// show cursor
-		window->show_pointer();
+		window.show_pointer();
 
 		// allow cursor to move freely
-		window->release_pointer();
+		window.release_pointer();
 	}
 }
 
@@ -948,7 +964,7 @@ int win_window_info::wnd_extra_width()
 	RECT temprect = { 100, 100, 200, 200 };
 	if (fullscreen())
 		return 0;
-	AdjustWindowRectEx(&temprect, WINDOW_STYLE, win_has_menu(), WINDOW_STYLE_EX);
+	AdjustWindowRectEx(&temprect, WINDOW_STYLE, GetMenu(platform_window()) ? true : false, WINDOW_STYLE_EX);
 	return rect_width(&temprect) - 100;
 }
 
@@ -964,7 +980,7 @@ int win_window_info::wnd_extra_height()
 	RECT temprect = { 100, 100, 200, 200 };
 	if (fullscreen())
 		return 0;
-	AdjustWindowRectEx(&temprect, WINDOW_STYLE, win_has_menu(), WINDOW_STYLE_EX);
+	AdjustWindowRectEx(&temprect, WINDOW_STYLE, GetMenu(platform_window()) ? true : false, WINDOW_STYLE_EX);
 	return rect_height(&temprect) - 100;
 }
 
@@ -978,20 +994,12 @@ int win_window_info::complete_create()
 {
 	RECT client;
 	int tempwidth, tempheight;
-	HMENU menu = nullptr;
 	HDC dc;
 
 	assert(GetCurrentThreadId() == window_threadid);
 
 	// get the monitor bounds
 	osd_rect monitorbounds = monitor()->position_size();
-
-	// create the window menu if needed
-	if (downcast<windows_options &>(machine().options()).menu())
-	{
-		if (win_create_menu(machine(), &menu))
-			return 1;
-	}
 
 	// are we in worker UI mode?
 	HWND hwnd;
@@ -1015,7 +1023,7 @@ int win_window_info::complete_create()
 						monitorbounds.left() + 20, monitorbounds.top() + 20,
 						monitorbounds.left() + 100, monitorbounds.top() + 100,
 						nullptr,//(osd_common_t::s_window_list != nullptr) ? osd_common_t::s_window_list->m_hwnd : nullptr,
-						menu,
+						nullptr,
 						GetModuleHandleUni(),
 						nullptr);
 	}
@@ -1099,7 +1107,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			PAINTSTRUCT pstruct;
 			HDC hdc = BeginPaint(wnd, &pstruct);
 			window->draw_video_contents(hdc, true);
-			if (window->win_has_menu())
+			if (GetMenu(window->platform_window()))
 				DrawMenuBar(window->platform_window());
 			EndPaint(wnd, &pstruct);
 		}
@@ -1107,7 +1115,7 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 
 	// non-client paint: punt if full screen
 	case WM_NCPAINT:
-		if (!window->fullscreen() || window->win_has_menu())
+		if (!window->fullscreen() || GetMenu(window->platform_window()))
 			return DefWindowProc(wnd, message, wparam, lparam);
 		break;
 

@@ -12,6 +12,9 @@
 #include "emupal.h"
 #include "speaker.h"
 
+
+namespace {
+
 class vt_unknown_state : public driver_device
 {
 public:
@@ -98,6 +101,8 @@ ROM_START( dgun2572 )
 	ROM_REGION( 0x2000000, "maincpu", 0 ) // extra pins on subboard not marked, is this a good dump?
 	ROM_LOAD( "dreamgearwgun.bin", 0x00000, 0x2000000, CRC(92b55c75) SHA1(c7b2319e304a4bf480b5dcd4f24af2e6ba834d0d) )
 ROM_END
+
+} // anonymous namespace
 
 
 CONS( 201?, dgun2572,  0,         0,  vt_unknown,     vt_unknown, vt_unknown_state, empty_init, "dreamGEAR", "My Arcade Wireless Video Game Station 200-in-1 (DGUN-2572)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

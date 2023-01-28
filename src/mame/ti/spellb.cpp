@@ -1,88 +1,101 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Sean Riddle
-/***************************************************************************
+/*******************************************************************************
 
-  ** subclass of hh_tms1k_state (hh_tms1k.h, hh_tms1k.cpp) **
+Texas Instruments Spelling B hardware
 
-  Texas Instruments Spelling B hardware
+The Spelling B was introduced together with the Speak & Spell. It is a handheld
+educational toy with booklet. Two revisions of the hardware exist.
 
-  The Spelling B was introduced together with the Speak & Spell. It is a
-  handheld educational toy with booklet. Two revisions of the hardware exist.
+1st version:
 
-  1st version:
+Spelling B (US), 1978
+- TMS0270 MCU TMC0272 (die label: 0272A T0270B)
+- TMS1980 MCU TMC1984 (die label: 1980A 84A)
+- 8-digit cyan VFD (seen with and without apostrophe)
 
-  Spelling B (US), 1978
-  - TMS0270 MCU TMC0272 (die label: 0272A T0270B)
-  - TMS1980 MCU TMC1984 (die label: 1980A 84A)
-  - 8-digit cyan VFD (seen with and without apostrophe)
+2nd version:
 
-  2nd version:
+Spelling B (US), 1980
+- TMS0270 MCU TMC0274
+- TMC0355 4KB VSM ROM CD2602
+- 8-digit cyan VFD
+- 1-bit sound (indicated by a music note symbol on the top-right of the casing)
+- note: much rarer than the 1978 version, not much luck finding one on eBay.
+  The words/indexes from the documentation are the same as the older version.
 
-  Spelling B (US), 1980
-  - TMS0270 MCU TMC0274
-  - TMC0355 4KB VSM ROM CD2602
-  - 8-digit cyan VFD
-  - 1-bit sound (indicated by a music note symbol on the top-right of the casing)
-  - note: much rarer than the 1978 version, not much luck finding one on eBay.
-    The words/indexes from the documentation are the same as the older version.
+Spelling ABC (UK), 1980: exact same hardware as US 2nd version (the 1st version
+was also sold in the UK earlier, but not renamed)
 
-  Spelling ABC (UK), 1980: exact same hardware as US 2nd version (the 1st version
-  was also sold in the UK earlier, but not renamed)
+Spelling ABC (Germany), 1980: different VSM
+- TMC0355 4KB VSM ROM CD2607
 
-  Spelling ABC (Germany), 1980: different VSM
-  - TMC0355 4KB VSM ROM CD2607
+Mr. Challenger (US), 1979
+- TMS0270 MCU TMC0273
+- TMC0355 4KB VSM ROM CD2601
+- 8-digit cyan VFD
+- 1-bit sound
 
-  Mr. Challenger (US), 1979
-  - TMS0270 MCU TMC0273
-  - TMC0355 4KB VSM ROM CD2601
-  - 8-digit cyan VFD
-  - 1-bit sound
+Letterlogic (UK), 1980: exact same hardware as US Mr. Challenger
+- note: stylized as "LETTERlogic", same for other language versions
 
-  Letterlogic (UK), 1980: exact same hardware as US Mr. Challenger
-  - note: stylized as "LETTERlogic", same for other language versions
+Letterlogic (France), 1980: different VSM
+- TMC0355 4KB VSM ROM CD2603
 
-  Letterlogic (France), 1980: different VSM
-  - TMC0355 4KB VSM ROM CD2603
+Letterlogic (Germany), 1980: different VSM
+- TMC0355 4KB VSM ROM CD2604
 
-  Letterlogic (Germany), 1980: different VSM
-  - TMC0355 4KB VSM ROM CD2604
-
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
-#include "hh_tms1k.h"
 
+#include "cpu/tms1000/tms0270.h"
+#include "cpu/tms1000/tms0980.h"
 #include "machine/tms6100.h"
+#include "sound/spkrdev.h"
+#include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
 #include "spellb.lh"
 
+
 namespace {
 
-class tispellb_state : public hh_tms1k_state
+class spellb_state : public driver_device
 {
 public:
-	tispellb_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_tms1k_state(mconfig, type, tag),
+	spellb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
-		m_tms6100(*this, "tms6100")
+		m_tms6100(*this, "tms6100"),
+		m_display(*this, "display"),
+		m_speaker(*this, "speaker"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	void rev1(machine_config &config);
 	void rev2(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(power_on);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	// devices
-	optional_device<tms1k_base_device> m_subcpu;
+	required_device<tms0270_cpu_device> m_maincpu;
+	optional_device<tms1980_cpu_device> m_subcpu;
 	optional_device<tms6100_device> m_tms6100;
+	required_device<pwm_display_device> m_display;
+	optional_device<speaker_sound_device> m_speaker;
+	required_ioport_array<8> m_inputs;
 
-	u8 m_rev1_ctl = 0;
-	u16 m_sub_o = 0;
-	u16 m_sub_r = 0;
-
-	virtual void set_power(bool state) override;
+	void power_off();
 	void power_subcpu();
 	void update_display();
 
@@ -99,61 +112,87 @@ private:
 	void rev2_write_o(u16 data);
 	void rev2_write_r(u32 data);
 
-	virtual void machine_start() override;
+	bool m_power_on = false;
+	u32 m_r = 0;
+	u16 m_grid = 0;
+	u16 m_plate = 0;
+	u16 m_sub_o = 0;
+	u16 m_sub_r = 0;
+	u8 m_rev1_ctl = 0;
 };
 
-void tispellb_state::machine_start()
+void spellb_state::machine_start()
 {
-	hh_tms1k_state::machine_start();
-
 	// register for savestates
-	save_item(NAME(m_rev1_ctl));
+	save_item(NAME(m_power_on));
+	save_item(NAME(m_r));
+	save_item(NAME(m_grid));
+	save_item(NAME(m_plate));
 	save_item(NAME(m_sub_o));
 	save_item(NAME(m_sub_r));
+	save_item(NAME(m_rev1_ctl));
 }
 
 
 
-/***************************************************************************
+/*******************************************************************************
+    Power
+*******************************************************************************/
 
-  I/O
+void spellb_state::machine_reset()
+{
+	m_power_on = true;
+	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	power_subcpu();
+}
 
-***************************************************************************/
+INPUT_CHANGED_MEMBER(spellb_state::power_on)
+{
+	if (newval && !m_power_on)
+		machine_reset();
+}
 
-// common
+void spellb_state::power_off()
+{
+	m_power_on = false;
+	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	power_subcpu();
 
-void tispellb_state::power_subcpu()
+	m_display->clear();
+}
+
+void spellb_state::power_subcpu()
 {
 	if (m_subcpu)
 		m_subcpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
 }
 
-void tispellb_state::set_power(bool state)
-{
-	hh_tms1k_state::set_power(state);
-	power_subcpu();
-}
 
-void tispellb_state::update_display()
+
+/*******************************************************************************
+    I/O
+*******************************************************************************/
+
+// common
+
+void spellb_state::update_display()
 {
 	// almost same as snspell
 	u16 gridmask = m_display->row_on(15) ? 0xffff : 0x8000;
 	m_display->matrix(m_grid & gridmask, m_plate);
 }
 
-void tispellb_state::main_write_o(u16 data)
+void spellb_state::main_write_o(u16 data)
 {
 	// reorder opla to led14seg, plus DP as d14 and AP as d15, same as snspell
 	m_plate = bitswap<16>(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
 	update_display();
 }
 
-void tispellb_state::main_write_r(u32 data)
+void spellb_state::main_write_r(u32 data)
 {
-	// R0-R6: input mux
 	// R0-R7: select digit
 	// R15: filament on
-	m_inp_mux = data & 0x7f;
 	m_grid = data & 0x80ff;
 	update_display();
 
@@ -161,25 +200,33 @@ void tispellb_state::main_write_r(u32 data)
 	if (~data & m_r & 0x2000)
 		power_off();
 
+	// R0-R6: input mux
 	m_r = data;
 }
 
-u8 tispellb_state::main_read_k()
+u8 spellb_state::main_read_k()
 {
-	// K: multiplexed inputs (note: the Vss row is always on)
-	return m_inputs[7]->read() | read_inputs(7);
+	u8 data = 0;
+
+	// K: multiplexed inputs
+	for (int i = 0; i < 7; i++)
+		if (BIT(m_r, i))
+			data |= m_inputs[i]->read();
+
+	// Vss row is always on
+	return data | m_inputs[7]->read();
 }
 
 
 // 1st revision mcu/mcu comms
 
-void tispellb_state::rev1_ctl_w(u8 data)
+void spellb_state::rev1_ctl_w(u8 data)
 {
 	// main CTL write data
 	m_rev1_ctl = data & 0xf;
 }
 
-u8 tispellb_state::sub_read_k()
+u8 spellb_state::sub_read_k()
 {
 	// sub K8421 <- main CTL3210 (does not use external CS)
 	if (m_r & 0x1000)
@@ -188,19 +235,19 @@ u8 tispellb_state::sub_read_k()
 		return m_sub_o | (m_plate & 0xe) | (m_plate >> 6 & 1);
 }
 
-void tispellb_state::sub_write_o(u16 data)
+void spellb_state::sub_write_o(u16 data)
 {
 	// sub O write data
 	m_sub_o = bitswap<4>(data,6,0,4,3);
 }
 
-u8 tispellb_state::rev1_ctl_r()
+u8 spellb_state::rev1_ctl_r()
 {
 	// main CTL3210 <- sub O6043
 	return m_sub_o;
 }
 
-void tispellb_state::sub_write_r(u16 data)
+void spellb_state::sub_write_r(u16 data)
 {
 	// sub R: unused?
 	m_sub_r = data;
@@ -209,7 +256,7 @@ void tispellb_state::sub_write_r(u16 data)
 
 // 2nd revision specifics
 
-void tispellb_state::rev2_write_o(u16 data)
+void spellb_state::rev2_write_o(u16 data)
 {
 	// SEG DP: speaker out
 	m_speaker->level_w(data >> 15 & 1);
@@ -218,7 +265,7 @@ void tispellb_state::rev2_write_o(u16 data)
 	main_write_o(data & 0x6fff);
 }
 
-void tispellb_state::rev2_write_r(u32 data)
+void spellb_state::rev2_write_r(u32 data)
 {
 	// R12: TMC0355 CS
 	// R4: TMC0355 M1
@@ -235,11 +282,9 @@ void tispellb_state::rev2_write_r(u32 data)
 
 
 
-/***************************************************************************
-
-  Inputs
-
-***************************************************************************/
+/*******************************************************************************
+    Input Ports
+*******************************************************************************/
 
 static INPUT_PORTS_START( spellb )
 	PORT_START("IN.0") // R0
@@ -295,7 +340,7 @@ static INPUT_PORTS_START( spellb )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_NAME("Missing Letter")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_NAME("Mystery Word")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_NAME("Scramble")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F1) PORT_CHAR('6') PORT_NAME("Spelling B/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, true)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F1) PORT_CHAR('6') PORT_NAME("Spelling B/On") PORT_CHANGED_MEMBER(DEVICE_SELF, spellb_state, power_on, 0)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_NAME("Starts With")
 INPUT_PORTS_END
 
@@ -315,7 +360,7 @@ static INPUT_PORTS_START( spellabc )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_NAME("Was Fehlt?")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_NAME(u8"Wörter Rätsel")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_NAME("Wirr Warr")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F1) PORT_CHAR('6') PORT_NAME("Lerne ABC/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, true)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F1) PORT_CHAR('6') PORT_NAME("Lerne ABC/On") PORT_CHANGED_MEMBER(DEVICE_SELF, spellb_state, power_on, 0)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_NAME("Anfang Mit")
 INPUT_PORTS_END
 
@@ -331,7 +376,7 @@ static INPUT_PORTS_START( mrchalgr )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_NAME("Crazy Letters")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_NAME("Letter Guesser")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_NAME("Word Challenge")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F1) PORT_CHAR('6') PORT_NAME("Mystery Word/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, true)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F1) PORT_CHAR('6') PORT_NAME("Mystery Word/On") PORT_CHANGED_MEMBER(DEVICE_SELF, spellb_state, power_on, 0)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_NAME("Replay")
 INPUT_PORTS_END
 
@@ -351,7 +396,7 @@ static INPUT_PORTS_START( letterlf )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_NAME("Suite Folle")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_NAME("Devin")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_NAME("Duel")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F1) PORT_CHAR('6') PORT_NAME("Mot Mystere/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, true)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F1) PORT_CHAR('6') PORT_NAME("Mot Mystere/On") PORT_CHANGED_MEMBER(DEVICE_SELF, spellb_state, power_on, 0)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_NAME("Rejouez")
 INPUT_PORTS_END
 
@@ -371,32 +416,30 @@ static INPUT_PORTS_START( letterlg )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_NAME("Lettern Salat")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_NAME("Lettern Rater")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_NAME("Wettstreit")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F1) PORT_CHAR('6') PORT_NAME(u8"Wörter Rätsel/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, true)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F1) PORT_CHAR('6') PORT_NAME(u8"Wörter Rätsel/On") PORT_CHANGED_MEMBER(DEVICE_SELF, spellb_state, power_on, 0)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_NAME("Wiedergabe")
 INPUT_PORTS_END
 
 
 
-/***************************************************************************
+/******************************************************************************
+    Machine Configs
+******************************************************************************/
 
-  Machine Config
-
-***************************************************************************/
-
-void tispellb_state::rev1(machine_config &config)
+void spellb_state::rev1(machine_config &config)
 {
 	// basic machine hardware
 	TMS0270(config, m_maincpu, 320000); // approximation
-	m_maincpu->read_k().set(FUNC(tispellb_state::main_read_k));
-	m_maincpu->write_o().set(FUNC(tispellb_state::main_write_o));
-	m_maincpu->write_r().set(FUNC(tispellb_state::main_write_r));
-	m_maincpu->read_ctl().set(FUNC(tispellb_state::rev1_ctl_r));
-	m_maincpu->write_ctl().set(FUNC(tispellb_state::rev1_ctl_w));
+	m_maincpu->read_k().set(FUNC(spellb_state::main_read_k));
+	m_maincpu->write_o().set(FUNC(spellb_state::main_write_o));
+	m_maincpu->write_r().set(FUNC(spellb_state::main_write_r));
+	m_maincpu->read_ctl().set(FUNC(spellb_state::rev1_ctl_r));
+	m_maincpu->write_ctl().set(FUNC(spellb_state::rev1_ctl_w));
 
 	TMS1980(config, m_subcpu, 320000); // approximation
-	m_subcpu->read_k().set(FUNC(tispellb_state::sub_read_k));
-	m_subcpu->write_o().set(FUNC(tispellb_state::sub_write_o));
-	m_subcpu->write_r().set(FUNC(tispellb_state::sub_write_r));
+	m_subcpu->read_k().set(FUNC(spellb_state::sub_read_k));
+	m_subcpu->write_o().set(FUNC(spellb_state::sub_write_o));
+	m_subcpu->write_r().set(FUNC(spellb_state::sub_write_r));
 
 	config.set_perfect_quantum(m_maincpu);
 
@@ -408,13 +451,13 @@ void tispellb_state::rev1(machine_config &config)
 	// no sound!
 }
 
-void tispellb_state::rev2(machine_config &config)
+void spellb_state::rev2(machine_config &config)
 {
 	// basic machine hardware
 	TMS0270(config, m_maincpu, 320000); // approximation
-	m_maincpu->read_k().set(FUNC(tispellb_state::main_read_k));
-	m_maincpu->write_o().set(FUNC(tispellb_state::rev2_write_o));
-	m_maincpu->write_r().set(FUNC(tispellb_state::rev2_write_r));
+	m_maincpu->read_k().set(FUNC(spellb_state::main_read_k));
+	m_maincpu->write_o().set(FUNC(spellb_state::rev2_write_o));
+	m_maincpu->write_r().set(FUNC(spellb_state::rev2_write_r));
 	m_maincpu->read_ctl().set(m_tms6100, FUNC(tms6100_device::data_r));
 	m_maincpu->write_ctl().set(m_tms6100, FUNC(tms6100_device::add_w));
 
@@ -433,11 +476,9 @@ void tispellb_state::rev2(machine_config &config)
 
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*******************************************************************************
+    ROM Definitions
+*******************************************************************************/
 
 ROM_START( spellb )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -541,11 +582,15 @@ ROM_END
 
 
 
-//    YEAR  NAME      PARENT   CMP MACHINE  INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-COMP( 1980, spellb,   0,        0, rev2,    spellb,   tispellb_state, empty_init, "Texas Instruments", "Spelling B (US, 1980 version)", MACHINE_SUPPORTS_SAVE )
-COMP( 1978, spellba,  spellb,   0, rev1,    spellb,   tispellb_state, empty_init, "Texas Instruments", "Spelling B (US, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, spellabc, spellb,   0, rev2,    spellabc, tispellb_state, empty_init, "Texas Instruments", "Spelling ABC (Germany)", MACHINE_SUPPORTS_SAVE )
+/*******************************************************************************
+    Drivers
+*******************************************************************************/
 
-COMP( 1979, mrchalgr, 0,        0, rev2,    mrchalgr, tispellb_state, empty_init, "Texas Instruments", "Mr. Challenger (US)", MACHINE_SUPPORTS_SAVE )
-COMP( 1980, letterlf, mrchalgr, 0, rev2,    letterlf, tispellb_state, empty_init, "Texas Instruments", "Letterlogic (France)", MACHINE_SUPPORTS_SAVE )
-COMP( 1980, letterlg, mrchalgr, 0, rev2,    letterlg, tispellb_state, empty_init, "Texas Instruments", "Letterlogic (Germany)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT   CMP MACHINE  INPUT     CLASS         INIT        COMPANY, FULLNAME, FLAGS
+COMP( 1980, spellb,   0,        0, rev2,    spellb,   spellb_state, empty_init, "Texas Instruments", "Spelling B (US, 1980 version)", MACHINE_SUPPORTS_SAVE )
+COMP( 1978, spellba,  spellb,   0, rev1,    spellb,   spellb_state, empty_init, "Texas Instruments", "Spelling B (US, 1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, spellabc, spellb,   0, rev2,    spellabc, spellb_state, empty_init, "Texas Instruments", "Spelling ABC (Germany)", MACHINE_SUPPORTS_SAVE )
+
+COMP( 1979, mrchalgr, 0,        0, rev2,    mrchalgr, spellb_state, empty_init, "Texas Instruments", "Mr. Challenger (US)", MACHINE_SUPPORTS_SAVE )
+COMP( 1980, letterlf, mrchalgr, 0, rev2,    letterlf, spellb_state, empty_init, "Texas Instruments", "Letterlogic (France)", MACHINE_SUPPORTS_SAVE )
+COMP( 1980, letterlg, mrchalgr, 0, rev2,    letterlg, spellb_state, empty_init, "Texas Instruments", "Letterlogic (Germany)", MACHINE_SUPPORTS_SAVE )

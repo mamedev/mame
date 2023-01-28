@@ -1444,6 +1444,45 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="onyx2demo1">
+		<description>Onyx2 - As Real As it Gets Demo CD - Volume 1</description>
+		<year>1998</year> <!-- 09/98 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0828-001"/>
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="sgi-onyx2-demo-1" sha1="42a6d6e968e1c97be0aa28e32834fd127a423ccb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="onyx2demo2">
+		<description>Onyx2 - As Real As it Gets Demo CD - Volume 2</description>
+		<year>1998</year> <!-- 09/98 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0829-001"/>
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="sgi-onyx2-demo-2" sha1="65f883c17c32a8d18d90872da424ec5a2d255d03" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="onyx2demo3">
+		<description>Onyx2 - As Real As it Gets Demo CD - Volume 3</description>
+		<year>1998</year> <!-- 09/98 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0830-001"/>
+			<!-- Origin: archive.org -->
+			<diskarea name="cdrom">
+				<disk name="sgi-onyx2-demo-3" sha1="a4798ad293b23b904149bd7d72708c01a729c1be" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Development and compilers -->
 
 	<software name="ada95_1_1">
@@ -3693,7 +3732,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="irix_5_0">
-	<!-- node: Onyx workstations & Challenge servers only -->
+		<!-- note: Onyx workstations & Challenge servers only -->
 		<description>IRIX 5.0</description>
 		<year>1993</year> <!-- 02/93 -->
 		<publisher>Silicon Graphics</publisher>

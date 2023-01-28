@@ -91,22 +91,26 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
+
 #include "config.h"
+#include "emuopts.h"
 #include "fileio.h"
-#include "xmlfile.h"
-#include "profiler.h"
-#include "ui/uimain.h"
 #include "inputdev.h"
+#include "main.h"
 #include "natkeyboard.h"
+#include "profiler.h"
+
+#include "ui/uimain.h"
 
 #include "util/corestr.h"
 #include "util/ioprocsfilter.h"
 #include "util/language.h"
 #include "util/unicode.h"
+#include "util/xmlfile.h"
 
 #include "osdepend.h"
 
+#include <algorithm>
 #include <cctype>
 #include <ctime>
 
@@ -161,6 +165,22 @@ inline s64 recip_scale(s64 scale)
 inline s32 apply_scale(s32 value, s64 scale)
 {
 	return (s64(value) * scale) / (1 << 24);
+}
+
+//-------------------------------------------------
+//  compute_shift -- get shift required to right-
+//  align an I/O port field value
+//-------------------------------------------------
+
+inline u8 compute_shift(ioport_value mask)
+{
+	u8 result = 0U;
+	while (mask && !BIT(mask, 0))
+	{
+		mask >>= 1;
+		++result;
+	}
+	return result;
 }
 
 
@@ -3398,9 +3418,9 @@ ioport_configurer& ioport_configurer::onoff_alloc(const char *name, ioport_value
 //-------------------------------------------------
 
 dynamic_field::dynamic_field(ioport_field &field)
-	: m_field(field),
-		m_shift(0),
-		m_oldval(field.defvalue())
+	: m_field(field)
+	, m_shift(0)
+	, m_oldval(field.defvalue())
 {
 	// fill in the data
 	for (ioport_value mask = field.mask(); !(mask & 1); mask >>= 1)
@@ -3455,45 +3475,36 @@ void dynamic_field::write(ioport_value newval)
 //-------------------------------------------------
 
 analog_field::analog_field(ioport_field &field)
-	: m_field(field),
-		m_shift(0),
-		m_adjdefvalue(field.defvalue() & field.mask()),
-		m_adjmin(field.minval() & field.mask()),
-		m_adjmax(field.maxval() & field.mask()),
-		m_adjoverride(field.defvalue() & field.mask()),
-		m_sensitivity(field.sensitivity()),
-		m_reverse(field.analog_reverse()),
-		m_delta(field.delta()),
-		m_centerdelta(field.centerdelta()),
-		m_accum(0),
-		m_previous(0),
-		m_previousanalog(0),
-		m_minimum(osd::INPUT_ABSOLUTE_MIN),
-		m_maximum(osd::INPUT_ABSOLUTE_MAX),
-		m_center(0),
-		m_reverse_val(0),
-		m_scalepos(0),
-		m_scaleneg(0),
-		m_keyscalepos(0),
-		m_keyscaleneg(0),
-		m_positionalscale(0),
-		m_absolute(false),
-		m_wraps(false),
-		m_autocenter(false),
-		m_single_scale(false),
-		m_interpolate(false),
-		m_lastdigital(false),
-		m_use_adjoverride(false)
+	: m_field(field)
+	, m_shift(compute_shift(field.mask()))
+	, m_adjdefvalue((field.defvalue() & field.mask()) >> m_shift)
+	, m_adjmin((field.minval() & field.mask()) >> m_shift)
+	, m_adjmax((field.maxval() & field.mask()) >> m_shift)
+	, m_adjoverride((field.defvalue() & field.mask()) >> m_shift)
+	, m_sensitivity(field.sensitivity())
+	, m_reverse(field.analog_reverse())
+	, m_delta(field.delta())
+	, m_centerdelta(field.centerdelta())
+	, m_accum(0)
+	, m_previous(0)
+	, m_previousanalog(0)
+	, m_minimum(osd::INPUT_ABSOLUTE_MIN)
+	, m_maximum(osd::INPUT_ABSOLUTE_MAX)
+	, m_center(0)
+	, m_reverse_val(0)
+	, m_scalepos(0)
+	, m_scaleneg(0)
+	, m_keyscalepos(0)
+	, m_keyscaleneg(0)
+	, m_positionalscale(0)
+	, m_absolute(false)
+	, m_wraps(false)
+	, m_autocenter(false)
+	, m_single_scale(false)
+	, m_interpolate(false)
+	, m_lastdigital(false)
+	, m_use_adjoverride(false)
 {
-	// compute the shift amount and number of bits
-	for (ioport_value mask = field.mask(); !(mask & 1); mask >>= 1)
-		m_shift++;
-
-	// initialize core data
-	m_adjdefvalue >>= m_shift;
-	m_adjmin >>= m_shift;
-	m_adjmax >>= m_shift;
-
 	// set basic parameters based on the configured type
 	switch (field.type())
 	{
@@ -3557,21 +3568,23 @@ analog_field::analog_field(ioport_field &field)
 			fatalerror("Unknown analog port type -- don't know if it is absolute or not\n");
 	}
 
-	// further processing for absolute controls
 	if (m_absolute)
 	{
+		// further processing for absolute controls
+
 		// if the default value is pegged at the min or max, use a single scale value for the whole axis
 		m_single_scale = (m_adjdefvalue == m_adjmin) || (m_adjdefvalue == m_adjmax);
 
 		// if not "single scale", compute separate scales for each side of the default
 		if (!m_single_scale)
 		{
-			// unsigned
-			m_scalepos = compute_scale(m_adjmax - m_adjdefvalue, osd::INPUT_ABSOLUTE_MAX - 0);
-			m_scaleneg = compute_scale(m_adjdefvalue - m_adjmin, 0 - osd::INPUT_ABSOLUTE_MIN);
-
-			if (m_adjmin > m_adjmax)
-				m_scaleneg = -m_scaleneg;
+			// unsigned, potentially passing through zero
+			m_scalepos = compute_scale(
+					(m_adjmax - m_adjdefvalue) & (field.mask() >> m_shift),
+					osd::INPUT_ABSOLUTE_MAX);
+			m_scaleneg = compute_scale(
+					(m_adjdefvalue - m_adjmin) & (field.mask() >> m_shift),
+					-osd::INPUT_ABSOLUTE_MIN);
 
 			// reverse point is at center
 			m_reverse_val = 0;
@@ -3588,11 +3601,11 @@ analog_field::analog_field(ioport_field &field)
 			m_reverse_val = m_maximum;
 		}
 	}
-
-	// relative and positional controls all map directly with a 512x scale factor
 	else
 	{
-		// The relative code is set up to allow specifing PORT_MINMAX and default values.
+		// relative and positional controls all map directly with a 512x scale factor
+
+		// The relative code is set up to allow specifying PORT_MINMAX and default values.
 		// The validity checks are purposely set up to not allow you to use anything other
 		// a default of 0 and PORT_MINMAX(0,mask).  This is in case the need arises to use
 		// this feature in the future.  Keeping the code in does not hurt anything.
@@ -3610,8 +3623,10 @@ analog_field::analog_field(ioport_field &field)
 		m_scaleneg = m_scalepos = compute_scale(1, osd::INPUT_RELATIVE_PER_PIXEL);
 
 		if (m_field.analog_reset())
+		{
 			// delta values reverse from center
 			m_reverse_val = 0;
+		}
 		else
 		{
 			// positional controls reverse from their max range
@@ -3621,8 +3636,8 @@ analog_field::analog_field(ioport_field &field)
 			if (m_wraps)
 			{
 				// FIXME: positional needs -1, using osd::INPUT_RELATIVE_PER_PIXEL skips a position (and reads outside the table array)
-				if(field.type() == IPT_POSITIONAL || field.type() == IPT_POSITIONAL_V)
-					m_reverse_val --;
+				if (field.type() == IPT_POSITIONAL || field.type() == IPT_POSITIONAL_V)
+					m_reverse_val--;
 				else
 					m_reverse_val -= osd::INPUT_RELATIVE_PER_PIXEL;
 			}

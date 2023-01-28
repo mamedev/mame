@@ -44,39 +44,58 @@
 
 using namespace rapidjson;
 
+int32_t chain_manager::s_old_chain_selections[16] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+bool chain_manager::s_reinit_cookie = false;
 
 chain_manager::screen_prim::screen_prim(render_primitive *prim)
 {
 	m_prim = prim;
-	m_screen_width = (uint16_t)floorf(prim->get_full_quad_width() + 0.5f);
-	m_screen_height = (uint16_t)floorf(prim->get_full_quad_height() + 0.5f);
-	m_quad_width = (uint16_t)floorf(prim->get_quad_width() + 0.5f);
-	m_quad_height = (uint16_t)floorf(prim->get_quad_height() + 0.5f);
-	m_tex_width = (float)prim->texture.width;
-	m_tex_height = (float)prim->texture.height;
+	m_screen_width = uint16_t(floorf(prim->get_full_quad_width() + 0.5f));
+	m_screen_height = uint16_t(floorf(prim->get_full_quad_height() + 0.5f));
+	m_quad_width = uint16_t(floorf(prim->get_quad_width() + 0.5f));
+	m_quad_height = uint16_t(floorf(prim->get_quad_height() + 0.5f));
+	m_tex_width = prim->texture.width;
+	m_tex_height = prim->texture.height;
 	m_rowpixels = prim->texture.rowpixels;
 	m_palette_length = prim->texture.palette_length;
 	m_flags = prim->flags;
 }
 
-chain_manager::chain_manager(running_machine& machine, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index, slider_dirty_notifier& slider_notifier)
+chain_manager::chain_manager(running_machine& machine, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index,
+	slider_dirty_notifier& slider_notifier, uint16_t user_prescale, uint16_t max_prescale_size)
 	: m_machine(machine)
 	, m_options(options)
 	, m_textures(textures)
 	, m_targets(targets)
 	, m_effects(effects)
 	, m_window_index(window_index)
+	, m_user_prescale(user_prescale)
+	, m_max_prescale_size(max_prescale_size)
 	, m_slider_notifier(slider_notifier)
 	, m_screen_count(0)
+	, m_default_chain_index(-1)
 {
 	m_converters.clear();
 	refresh_available_chains();
 	parse_chain_selections(options.bgfx_screen_chains());
 	init_texture_converters();
+
+	if (s_reinit_cookie)
+	{
+		for (uint32_t i = 0; i < std::size(s_old_chain_selections); i++)
+		{
+			set_current_chain(i, s_old_chain_selections[i]);
+		}
+	}
 }
 
 chain_manager::~chain_manager()
 {
+	for (uint32_t i = 0; i < std::size(s_old_chain_selections); i++)
+	{
+		s_old_chain_selections[i] = i < m_current_chain.size() ? m_current_chain[i] : -1;
+	}
+	s_reinit_cookie = true;
 	destroy_chains();
 }
 
@@ -90,6 +109,20 @@ void chain_manager::init_texture_converters()
 	m_adjuster = m_effects.get_or_load_effect(m_options, "misc/bcg_adjust");
 }
 
+void chain_manager::get_default_chain_info(std::string &out_chain_name, int32_t &out_chain_index)
+{
+	if (m_default_chain_index == -1)
+	{
+		out_chain_index = CHAIN_NONE;
+		out_chain_name = "";
+		return;
+	}
+
+	out_chain_index = m_default_chain_index;
+	out_chain_name = "default";
+	return;
+}
+
 void chain_manager::refresh_available_chains()
 {
 	m_available_chains.clear();
@@ -97,6 +130,16 @@ void chain_manager::refresh_available_chains()
 
 	const std::string chains_path  = util::string_format("%s" PATH_SEPARATOR "chains", m_options.bgfx_path());
 	find_available_chains(chains_path, "");
+	if (m_default_chain_index == -1)
+	{
+		for (size_t i = 0; i < m_available_chains.size(); i++)
+		{
+			if (m_available_chains[i].m_name == "default")
+			{
+				m_default_chain_index = int32_t(i);
+			}
+		}
+	}
 
 	destroy_unloaded_chains();
 }
@@ -115,8 +158,7 @@ void chain_manager::destroy_unloaded_chains()
 				{
 					delete m_screen_chains[i];
 					m_screen_chains[i] = nullptr;
-					m_chain_names[i] = "";
-					m_current_chain[i] = CHAIN_NONE;
+					get_default_chain_info(m_chain_names[i], m_current_chain[i]);
 					break;
 				}
 			}
@@ -203,7 +245,7 @@ bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 		return nullptr;
 	}
 
-	bgfx_chain* chain = chain_reader::read_from_value(document, name + ": ", *this, screen_index);
+	bgfx_chain* chain = chain_reader::read_from_value(document, name + ": ", *this, screen_index, m_user_prescale, m_max_prescale_size);
 
 	if (chain == nullptr)
 	{
@@ -323,7 +365,7 @@ bgfx_chain* chain_manager::screen_chain(uint32_t screen)
 
 void chain_manager::process_screen_quad(uint32_t view, uint32_t screen, screen_prim &prim, osd_window& window)
 {
-	const bool any_targets_rebuilt = m_targets.update_target_sizes(screen, prim.m_tex_width, prim.m_tex_height, TARGET_STYLE_GUEST);
+	const bool any_targets_rebuilt = m_targets.update_target_sizes(screen, prim.m_tex_width, prim.m_tex_height, TARGET_STYLE_GUEST, m_user_prescale, m_max_prescale_size);
 	if (any_targets_rebuilt)
 	{
 		for (bgfx_chain* chain : m_screen_chains)
@@ -336,7 +378,7 @@ void chain_manager::process_screen_quad(uint32_t view, uint32_t screen, screen_p
 	}
 
 	bgfx_chain* chain = screen_chain(screen);
-	chain->process(prim, view, screen, m_textures, window, bgfx_util::get_blend_state(PRIMFLAG_GET_BLENDMODE(prim.m_flags)));
+	chain->process(prim, view, screen, m_textures, window);
 	view += chain->applicable_passes();
 }
 
@@ -363,7 +405,7 @@ uint32_t chain_manager::count_screens(render_primitive* prim)
 	if (screen_count > 0)
 	{
 		update_screen_count(screen_count);
-		m_targets.update_screen_count(screen_count);
+		m_targets.update_screen_count(screen_count, m_user_prescale, m_max_prescale_size);
 	}
 
 	if (screen_count < m_screen_prims.size())
@@ -385,8 +427,12 @@ void chain_manager::update_screen_count(uint32_t screen_count)
 		while (m_screen_chains.size() < m_screen_count)
 		{
 			m_screen_chains.push_back(nullptr);
-			m_chain_names.push_back("");
-			m_current_chain.push_back(CHAIN_NONE);
+
+			int32_t chain_index = CHAIN_NONE;
+			std::string chain_name = "";
+			get_default_chain_info(chain_name, chain_index);
+			m_chain_names.push_back(chain_name);
+			m_current_chain.push_back(chain_index);
 		}
 
 		// Ensure we have a screen chain selection slider per screen
@@ -399,11 +445,20 @@ void chain_manager::update_screen_count(uint32_t screen_count)
 	}
 }
 
+void chain_manager::set_current_chain(uint32_t screen, int32_t chain_index)
+{
+	if (chain_index < m_available_chains.size() && screen < m_current_chain.size() && screen < m_chain_names.size())
+	{
+		m_current_chain[screen] = chain_index;
+		m_chain_names[screen] = m_available_chains[chain_index].m_name;
+	}
+}
+
 int32_t chain_manager::slider_changed(int id, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
 	{
-		m_current_chain[id] = newval;
+		set_current_chain(id, newval);
 
 		std::vector<std::vector<float>> settings = slider_settings();
 		reload_chains();
@@ -485,24 +540,24 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 		int width_div_factor = 1;
 		int width_mul_factor = 1;
 		const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, prim.m_flags & PRIMFLAG_TEXFORMAT_MASK,
-			prim.m_rowpixels, tex_height, prim.m_prim->texture.palette, prim.m_prim->texture.base, pitch, width_div_factor, width_mul_factor);
+			prim.m_rowpixels, prim.m_prim->texture.width_margin, tex_height, prim.m_prim->texture.palette, prim.m_prim->texture.base, pitch, width_div_factor, width_mul_factor);
 
 		if (texture == nullptr)
 		{
 			uint32_t flags = BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT;
 			if (!PRIMFLAG_GET_TEXWRAP(prim.m_flags))
 				flags |= BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP;
-			bgfx_texture *texture = new bgfx_texture(full_name, dst_format, tex_width, tex_height, mem, flags, pitch, prim.m_rowpixels, width_div_factor, width_mul_factor);
+			bgfx_texture *texture = new bgfx_texture(full_name, dst_format, tex_width, prim.m_prim->texture.width_margin, tex_height, mem, flags, pitch, prim.m_rowpixels, width_div_factor, width_mul_factor);
 			m_textures.add_provider(full_name, texture);
 
 			if (prim.m_prim->texture.palette)
 			{
-				uint16_t palette_width = (uint16_t)std::min(prim.m_palette_length, 256U);
-				uint16_t palette_height = (uint16_t)std::max((prim.m_palette_length + 255) / 256, 1U);
+				uint16_t palette_width = uint16_t(std::min(prim.m_palette_length, 256U));
+				uint16_t palette_height = uint16_t(std::max((prim.m_palette_length + 255) / 256, 1U));
 				m_palette_temp.resize(palette_width * palette_height * 4);
 				memcpy(&m_palette_temp[0], prim.m_prim->texture.palette, prim.m_palette_length * 4);
 				const bgfx::Memory *palmem = bgfx::copy(&m_palette_temp[0], palette_width * palette_height * 4);
-				palette = new bgfx_texture(palette_name, bgfx::TextureFormat::BGRA8, palette_width, palette_height, palmem, BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT, palette_width * 4);
+				palette = new bgfx_texture(palette_name, bgfx::TextureFormat::BGRA8, palette_width, 0, palette_height, palmem, BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT, palette_width * 4);
 				m_textures.add_provider(palette_name, palette);
 			}
 
@@ -523,12 +578,12 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 		}
 		else
 		{
-			texture->update(mem, pitch);
+			texture->update(mem, pitch, prim.m_prim->texture.width_margin);
 
 			if (prim.m_prim->texture.palette)
 			{
-				uint16_t palette_width = (uint16_t)std::min(prim.m_palette_length, 256U);
-				uint16_t palette_height = (uint16_t)std::max((prim.m_palette_length + 255) / 256, 1U);
+				uint16_t palette_width = uint16_t(std::min(prim.m_palette_length, 256U));
+				uint16_t palette_height = uint16_t(std::max((prim.m_palette_length + 255) / 256, 1U));
 				const uint32_t palette_size = palette_width * palette_height * 4;
 				m_palette_temp.resize(palette_size);
 				memcpy(&m_palette_temp[0], prim.m_prim->texture.palette, prim.m_palette_length * 4);
@@ -540,7 +595,7 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 				}
 				else
 				{
-					palette = new bgfx_texture(palette_name, bgfx::TextureFormat::BGRA8, palette_width, palette_height, palmem, BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT, palette_width * 4);
+					palette = new bgfx_texture(palette_name, bgfx::TextureFormat::BGRA8, palette_width, 0, palette_height, palmem, BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT, palette_width * 4);
 					m_textures.add_provider(palette_name, palette);
 					while (screen >= m_screen_palettes.size())
 					{
@@ -551,15 +606,17 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 			}
 		}
 
+		const bool has_tint = (prim.m_prim->color.a != 1.0f) || (prim.m_prim->color.r != 1.0f) || (prim.m_prim->color.g != 1.0f) || (prim.m_prim->color.b != 1.0f);
 		bgfx_chain* chain = screen_chain(screen);
 		if (chain && needs_adjust && !chain->has_adjuster())
 		{
-			chain->insert_effect(chain->has_converter() ? 1 : 0, m_adjuster, "XXadjust", needs_conversion ? "screen" : "source", *this);
+			const bool apply_tint = !needs_conversion && has_tint;
+			chain->insert_effect(chain->has_converter() ? 1 : 0, m_adjuster, apply_tint, "XXadjust", needs_conversion ? "screen" : "source", *this);
 			chain->set_has_adjuster(true);
 		}
 		if (chain && needs_conversion && !chain->has_converter())
 		{
-			chain->insert_effect(0, m_converters[src_format], "XXconvert", "source", *this);
+			chain->insert_effect(0, m_converters[src_format], has_tint, "XXconvert", "source", *this);
 			chain->set_has_converter(true);
 		}
 	}
@@ -587,7 +644,7 @@ uint32_t chain_manager::process_screen_chains(uint32_t view, osd_window& window)
 			std::swap(screen_width, screen_height);
 		}
 
-		const bool any_targets_rebuilt = m_targets.update_target_sizes(screen_index, screen_width, screen_height, TARGET_STYLE_NATIVE);
+		const bool any_targets_rebuilt = m_targets.update_target_sizes(screen_index, screen_width, screen_height, TARGET_STYLE_NATIVE, m_user_prescale, m_max_prescale_size);
 		if (any_targets_rebuilt)
 		{
 			for (bgfx_chain* chain : m_screen_chains)

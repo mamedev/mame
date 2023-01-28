@@ -109,6 +109,9 @@
 #define VERBOSE     (0)
 #include "logmacro.h"
 
+
+namespace {
+
 #define Q209_CPU_CLOCK          (40.21_MHz_XTAL / 40) // verified by manual
 #define SYSTEM_CAS_CLOCK        (40.21_MHz_XTAL / 20) // likewise
 
@@ -278,8 +281,8 @@ public:
 	template <int CpuNum> u8 periphs_range_r(offs_t offset);
 	template <int CpuNum> void periphs_range_w(offs_t offset, u8 data);
 
-	u8 tvt_r();
-	void tvt_w(u8 data);
+	[[maybe_unused]] u8 tvt_r();
+	[[maybe_unused]] void tvt_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(pia_q219_irqa);
 	DECLARE_WRITE_LINE_MEMBER(pia_q219_irqb);
 	DECLARE_WRITE_LINE_MEMBER(ptm_q219_irq);
@@ -2269,5 +2272,8 @@ ROM_END
 void cmi_state::init_cmi2x()
 {
 }
+
+} // anonymous namespace
+
 
 CONS( 1983, cmi2x, 0, 0, cmi2x, cmi2x, cmi_state, init_cmi2x, "Fairlight", "CMI IIx", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

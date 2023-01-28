@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_MACHINE_ROSETTA_H
-#define MAME_MACHINE_ROSETTA_H
+#ifndef MAME_IBM_ROSETTA_H
+#define MAME_IBM_ROSETTA_H
 
 #pragma once
 
@@ -188,4 +188,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ROSETTA, rosetta_device)
 
-#endif // MAME_MACHINE_ROSETTA_H
+#endif // MAME_IBM_ROSETTA_H

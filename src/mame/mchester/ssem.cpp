@@ -15,6 +15,8 @@
 #include <sstream>
 
 
+namespace {
+
 class ssem_state : public driver_device
 {
 public:
@@ -688,6 +690,8 @@ void ssem_state::ssem(machine_config &config)
 ROM_START( ssem )
 	ROM_REGION( 0x80, "maincpu", ROMREGION_ERASE00 )  /* Main Store */
 ROM_END
+
+} // anonymous namespace
 
 
 //   YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                  FULLNAME

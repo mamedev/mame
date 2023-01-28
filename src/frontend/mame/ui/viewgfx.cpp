@@ -537,6 +537,7 @@ private:
 	{
 		if (!uistate)
 			m_machine.resume();
+		m_machine.ui_input().reset();
 		m_bitmap_dirty = true;
 		return UI_HANDLER_CANCEL;
 	}

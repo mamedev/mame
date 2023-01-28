@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Couriersud
 /*
- * osdmodule.c
+ * osdmodule.cpp
  *
  */
 
 #include "modules/osdmodule.h"
+
 #include "osdcore.h"
 
 #include <algorithm>
@@ -57,10 +58,10 @@ osd_module *osd_module_manager::select_module(const char *type, const char *name
 	return m;
 }
 
-void osd_module_manager::init(const osd_options &options)
+void osd_module_manager::init(osd_interface &osd, const osd_options &options)
 {
 	for (osd_module &m : m_selected)
-		m.init(options);
+		m.init(osd, options);
 }
 
 void osd_module_manager::exit()
@@ -83,12 +84,13 @@ int osd_module_manager::get_module_index(const char *type, const char *name) con
 	return -1;
 }
 
-void osd_module_manager::get_module_names(const char *type, const int max, int &num, const char *names[]) const
+std::vector<std::string_view> osd_module_manager::get_module_names(const char *type) const
 {
-	num = 0;
-	for (int i = 0; (m_modules.size() > i) && (max > num); i++)
+	std::vector<std::string_view> result;
+	for (auto &m : m_modules)
 	{
-		if (m_modules[i]->type() == type)
-			names[num++] = m_modules[i]->name().c_str();
+		if (m->type() == type)
+			result.emplace_back(m->name());
 	}
+	return result;
 }

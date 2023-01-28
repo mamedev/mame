@@ -5,8 +5,8 @@
  *
  */
 
-#ifndef MAME_AUDIO_PINSND88_H
-#define MAME_AUDIO_PINSND88_H
+#ifndef MAME_PINBALL_PINSND88_H
+#define MAME_PINBALL_PINSND88_H
 
 #pragma once
 
@@ -69,4 +69,4 @@ private:
 
 DECLARE_DEVICE_TYPE(PINSND88, pinsnd88_device)
 
-#endif // MAME_AUDIO_PINSND88_H
+#endif // MAME_PINBALL_PINSND88_H

@@ -64,6 +64,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "beaminv.lh"
 
 
+namespace {
+
 class beaminv_state : public driver_device
 {
 public:
@@ -449,6 +451,7 @@ ROM_START( ctainv )
 	ROM_LOAD( "6.bin", 0x1800, 0x0400, CRC(06dcb63c) SHA1(4d5260b3785e2c215dd0b3c9f8457cf4a557a452) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

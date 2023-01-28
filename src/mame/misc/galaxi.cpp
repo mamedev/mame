@@ -44,6 +44,9 @@
 
 #include "galaxi.lh"
 
+
+namespace {
+
 #define CPU_CLOCK       (XTAL(10'000'000))
 #define SND_CLOCK       (XTAL(16'000'000))/16
 
@@ -589,6 +592,8 @@ ROM_START( lastfour )
 	ROM_REGION( 0x40000, "oki", 0 ) /* 4-bit ADPCM mono @ 6 kHz.*/
 	ROM_LOAD( "21.u38", 0x00000, 0x20000, CRC(e48523dd) SHA1(47bc2e5c2164b93d685fa134397845e0ed7aaa5f) )
 ROM_END
+
+} // anonymous namespace
 
 
 /***************************************************************************

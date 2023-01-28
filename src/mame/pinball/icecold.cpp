@@ -28,6 +28,8 @@ How to play
 #include "icecold.lh"
 
 
+namespace {
+
 class icecold_state : public driver_device
 {
 public:
@@ -447,6 +449,8 @@ ROM_START(zekepeak)
 	ROM_LOAD("zp23.bin", 0xe000, 0x2000, CRC(ef959586) SHA1(7f8a4787b340bfa34180164806b181b5fb4e5cfa))
 	ROM_LOAD("zp24.bin", 0xc000, 0x2000, CRC(ee90c8f5) SHA1(27a513000e90536e485ccdf43786b415b3c95bd7))
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1983, icecold,  0,       icecold, icecold, icecold_state, empty_init, ROT0, "Taito", "Ice Cold Beer (set 1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL)

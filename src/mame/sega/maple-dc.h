@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_MAPLE_DC_H
-#define MAME_MACHINE_MAPLE_DC_H
+#ifndef MAME_SEGA_MAPLE_DC_H
+#define MAME_SEGA_MAPLE_DC_H
 
 #pragma once
 
@@ -81,4 +81,4 @@ private:
 
 DECLARE_DEVICE_TYPE(MAPLE_DC, maple_dc_device)
 
-#endif // MAME_MACHINE_MAPLE_DC_H
+#endif // MAME_SEGA_MAPLE_DC_H

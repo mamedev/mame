@@ -6,8 +6,8 @@ NEC PC-80S31K
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_PC80S31K_H
-#define MAME_MACHINE_PC80S31K_H
+#ifndef MAME_NEC_PC80S31K_H
+#define MAME_NEC_PC80S31K_H
 
 #pragma once
 
@@ -131,4 +131,4 @@ DECLARE_DEVICE_TYPE(PC80S31,       pc80s31_device)
 DECLARE_DEVICE_TYPE(PC80S31K,      pc80s31k_device)
 DECLARE_DEVICE_TYPE(PC88VA2_FD_IF, pc88va2_fd_if_device)
 
-#endif // MAME_MACHINE_PC80S31K_H
+#endif // MAME_NEC_PC80S31K_H

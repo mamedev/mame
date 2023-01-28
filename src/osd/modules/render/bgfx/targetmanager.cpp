@@ -11,13 +11,13 @@
 
 #include <bgfx/bgfx.h>
 
-#include <vector>
-
 #include "modules/lib/osdobj_common.h"
 
+#include "bgfxutil.h"
 #include "targetmanager.h"
-
 #include "target.h"
+
+#include <vector>
 
 const int32_t target_manager::MAX_SCREENS = 100;
 
@@ -45,7 +45,8 @@ target_manager::~target_manager()
 	}
 }
 
-bgfx_target* target_manager::create_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t style, bool double_buffer, bool filter, uint16_t scale, uint32_t screen)
+bgfx_target* target_manager::create_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint16_t xprescale, uint16_t yprescale,
+	uint32_t style, bool double_buffer, bool filter, uint16_t scale, uint32_t screen)
 {
 	std::string full_name = name + std::to_string(screen);
 
@@ -53,7 +54,7 @@ bgfx_target* target_manager::create_target(std::string name, bgfx::TextureFormat
 	if (iter != m_targets.end())
 		destroy_target(name, screen);
 
-	bgfx_target *target = new bgfx_target(name, format, width, height, style, double_buffer, filter, scale, screen);
+	bgfx_target *target = new bgfx_target(name, format, width, height, xprescale, yprescale, style, double_buffer, filter, scale, screen);
 	m_targets[full_name] = target;
 	m_textures.add_provider(full_name, target);
 
@@ -88,7 +89,7 @@ bgfx_target* target_manager::target(uint32_t screen, std::string name)
 	return m_targets[full_name];
 }
 
-bool target_manager::update_target_sizes(uint32_t screen, uint16_t width, uint16_t height, uint32_t style)
+bool target_manager::update_target_sizes(uint32_t screen, uint16_t width, uint16_t height, uint32_t style, uint16_t user_prescale, uint16_t max_prescale_size)
 {
 	if (style == TARGET_STYLE_CUSTOM) return false;
 
@@ -103,14 +104,14 @@ bool target_manager::update_target_sizes(uint32_t screen, uint16_t width, uint16
 	if (width != sizes[screen].width() || height != sizes[screen].height())
 	{
 		sizes[screen] = osd_dim(width, height);
-		rebuild_targets(screen, style);
+		rebuild_targets(screen, style, user_prescale, max_prescale_size);
 		return true;
 	}
 
 	return false;
 }
 
-void target_manager::rebuild_targets(uint32_t screen, uint32_t style)
+void target_manager::rebuild_targets(uint32_t screen, uint32_t style, uint16_t user_prescale, uint16_t max_prescale_size)
 {
 	if (style == TARGET_STYLE_CUSTOM) return;
 
@@ -135,13 +136,16 @@ void target_manager::rebuild_targets(uint32_t screen, uint32_t style)
 		const uint16_t scale = target->scale();
 		const uint16_t width(sizes[screen].width());
 		const uint16_t height(sizes[screen].height());
+		uint16_t xprescale = user_prescale;
+		uint16_t yprescale = user_prescale;
+		bgfx_util::find_prescale_factor(width, height, max_prescale_size, xprescale, yprescale);
 
 		destroy_target(name, screen);
-		create_target(name, format, width, height, style, double_buffered, filter, scale, screen);
+		create_target(name, format, width, height, xprescale, yprescale, style, double_buffered, filter, scale, screen);
 	}
 }
 
-void target_manager::update_screen_count(uint32_t count)
+void target_manager::update_screen_count(uint32_t count, uint16_t user_prescale, uint16_t max_prescale_size)
 {
 	// Ensure that there's an entry to fill
 	while (count > m_native_dims.size())
@@ -157,26 +161,26 @@ void target_manager::update_screen_count(uint32_t count)
 		{
 			for (uint32_t screen = old_count; screen < m_screen_count; screen++)
 			{
-				create_target_if_nonexistent(screen, "output", false, false, TARGET_STYLE_NATIVE);
+				create_output_if_nonexistent(screen, user_prescale, max_prescale_size);
 			}
 		}
 	}
 }
 
-void target_manager::create_target_if_nonexistent(uint32_t screen, std::string name, bool double_buffered, bool filter, uint32_t style)
+void target_manager::create_output_if_nonexistent(uint32_t screen, uint16_t user_prescale, uint16_t max_prescale_size)
 {
-	if (style == TARGET_STYLE_CUSTOM) return;
-
-	if (m_targets.find(name + std::to_string(screen)) != m_targets.end())
+	if (m_targets.find("output" + std::to_string(screen)) != m_targets.end())
 	{
 		return;
 	}
 
-	std::vector<osd_dim>& sizes = style == TARGET_STYLE_GUEST ? m_guest_dims : m_native_dims;
-	uint16_t width(sizes[screen].width());
-	uint16_t height(sizes[screen].height());
+	uint16_t width(m_native_dims[screen].width());
+	uint16_t height(m_native_dims[screen].height());
+	uint16_t xprescale = user_prescale;
+	uint16_t yprescale = user_prescale;
+	bgfx_util::find_prescale_factor(width, height, max_prescale_size, xprescale, yprescale);
 
-	create_target(name, bgfx::TextureFormat::BGRA8, width, height, style, double_buffered, filter, 1, screen);
+	create_target("output", bgfx::TextureFormat::BGRA8, width, height, xprescale, yprescale, TARGET_STYLE_NATIVE, false, false, 1, screen);
 }
 
 uint16_t target_manager::width(uint32_t style, uint32_t screen)

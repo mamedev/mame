@@ -82,6 +82,9 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+
+namespace {
+
 #define PIA1_TAG "pia1"
 #define PIA2_TAG "pia2"
 #define PIA3_TAG "pia3"
@@ -813,6 +816,9 @@ ROM_START( can09 ) /* The bigger black computer CAN v1 */
 	ROM_REGION(0x10000, "roms", 0)
 	ROM_LOAD( "ic14-vdu42.bin", 0x0000, 0x2000, CRC(67fc3c8c) SHA1(1474d6259646798377ef4ce7e43d3c8d73858344) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY            FULLNAME            FLAGS
 COMP( 1984, can09,  0,      0,      can09,   can09,  can09_state,  empty_init, "Candela Data AB", "Candela CAN09 v1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_GRAPHICS)

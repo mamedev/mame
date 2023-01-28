@@ -15,8 +15,12 @@
 #include "input_module.h"
 
 #include "interface/inputman.h"
+#include "modules/osdmodule.h"
+
+#include "util/strformat.h"
 
 #include <algorithm>
+#include <cassert>
 #include <chrono>
 #include <functional>
 #include <memory>
@@ -191,76 +195,66 @@ enum
 #define KEY_MAIL            0xEC    /* Mail */
 #define KEY_MEDIASELECT     0xED    /* Media Select */
 
+
 //============================================================
 //  device_info
 //============================================================
 
-class input_device_list;
-
 class device_info
 {
-	friend input_device_list;
-
 private:
 	const std::string       m_name;
 	const std::string       m_id;
-	osd::input_device *     m_device;
-	running_machine &       m_machine;
 	input_module &          m_module;
-	input_device_class      m_deviceclass;
 
 public:
 	// Constructor
-	device_info(running_machine &machine, std::string &&name, std::string &&id, input_device_class deviceclass, input_module &module) :
+	device_info(std::string &&name, std::string &&id, input_module &module) :
 		m_name(std::move(name)),
 		m_id(std::move(id)),
-		m_device(nullptr),
-		m_machine(machine),
-		m_module(module),
-		m_deviceclass(deviceclass)
+		m_module(module)
 	{
 	}
 
 	// Destructor
-	virtual ~device_info() { }
+	virtual ~device_info() = default;
 
 	// Getters
-	running_machine &         machine() const { return m_machine; }
-	const std::string &       name() const { return m_name; }
-	const std::string &       id() const { return m_id; }
-	osd::input_device *       device() const { return m_device; }
-	input_module &            module() const { return m_module; }
-	input_device_class        deviceclass() const { return m_deviceclass; }
+	const std::string &name() const { return m_name; }
+	const std::string &id() const { return m_id; }
+	input_module &module() const { return m_module; }
 
 	// Poll and reset methods
 	virtual void poll() { }
 	virtual void reset() = 0;
+	virtual void configure(osd::input_device &device) = 0;
 };
+
 
 //============================================================
 //  event_based_device
 //============================================================
 
-#define DEFAULT_EVENT_QUEUE_SIZE 20
-
 template <class TEvent>
 class event_based_device : public device_info
 {
 private:
-	std::queue<TEvent>   m_event_queue;
+	static inline constexpr unsigned DEFAULT_EVENT_QUEUE_SIZE = 20;
+
+	std::queue<TEvent> m_event_queue;
 
 protected:
 	std::mutex           m_device_lock;
 
-	virtual void process_event(TEvent &ev) = 0;
+	virtual void process_event(TEvent const &ev) = 0;
 
 public:
-	event_based_device(running_machine &machine, std::string &&name, std::string &&id, input_device_class deviceclass, input_module &module) :
-		device_info(machine, std::move(name), std::move(id), deviceclass, module)
+	event_based_device(std::string &&name, std::string &&id, input_module &module) :
+		device_info(std::move(name), std::move(id), module)
 	{
 	}
 
-	void queue_events(const TEvent *events, int count)
+	void queue_events(TEvent const *events, int count)
 	{
 		std::lock_guard<std::mutex> scope_lock(m_device_lock);
 		for (int i = 0; i < count; i++)
@@ -278,27 +272,28 @@ public:
 		// Process each event until the queue is empty
 		while (!m_event_queue.empty())
 		{
-			TEvent &next_event = m_event_queue.front();
-			process_event(next_event);
+			process_event(m_event_queue.front());
 			m_event_queue.pop();
 		}
 	}
 };
 
+
 //============================================================
 //  input_device_list class
 //============================================================
 
+template <typename Info>
 class input_device_list
 {
 private:
-	std::vector<std::unique_ptr<device_info>> m_list;
+	std::vector<std::unique_ptr<Info> > m_list;
 
 public:
 	auto size() const { return m_list.size(); }
 	auto empty() const { return m_list.empty(); }
-	auto begin() { return m_list.begin(); }
-	auto end() { return m_list.end(); }
+	auto begin() const { return m_list.begin(); }
+	auto end() const { return m_list.end(); }
 
 	void poll_devices()
 	{
@@ -312,18 +307,11 @@ public:
 			device->reset();
 	}
 
-	void free_device(device_info &devinfo)
-	{
-		// find the device to remove
-		const auto device_matches = [&devinfo] (std::unique_ptr<device_info> &device) { return &devinfo == device.get(); };
-		m_list.erase(std::remove_if(std::begin(m_list), std::end(m_list), device_matches), m_list.end());
-	}
-
 	template <typename T>
 	void for_each_device(T &&action)
 	{
 		for (auto &device: m_list)
-			action(device.get());
+			action(*device);
 	}
 
 	void free_all_devices()
@@ -332,41 +320,34 @@ public:
 			m_list.pop_back();
 	}
 
-	template <typename TActual, typename... TArgs>
-	TActual &create_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module, TArgs &&... args)
+	template <typename Actual>
+	Actual &add_device(std::unique_ptr<Actual> &&devinfo)
 	{
-		// allocate the device object
-		auto devinfo = std::make_unique<TActual>(machine, std::move(name), std::move(id), module, std::forward<TArgs>(args)...);
-
-		return add_device(machine.input(), std::move(devinfo));
-	}
-
-	template <typename TActual>
-	TActual &add_device(osd::input_manager &manager, std::unique_ptr<TActual> &&devinfo)
-	{
-		// Add the device to the machine
-		devinfo->m_device = &manager.add_device(devinfo->deviceclass(), devinfo->name(), devinfo->id(), devinfo.get());
-
-		// append us to the list
-		return *static_cast<TActual *>(m_list.emplace_back(std::move(devinfo)).get());
+		// append us to the list and return reference
+		Actual &result = *devinfo;
+		m_list.emplace_back(std::move(devinfo));
+		return result;
 	}
 };
 
+
 // keyboard translation table
 
-struct key_trans_entry {
+struct key_trans_entry
+{
 	input_item_id   mame_key;
 
-#if defined(OSD_SDL)
+#if defined(OSD_SDL) || defined(SDLMAME_WIN32)
 	int             sdl_scancode;
-#elif defined(OSD_WINDOWS)
+#endif
+#if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 	int             scan_code;
 	unsigned char   virtual_key;
 #endif
 
 	char            ascii_key;
-	char const  *   mame_key_name;
-	char *          ui_name;
+	char const *    mame_key_name;
+	char const *    ui_name;
 };
 
 class keyboard_trans_table
@@ -379,7 +360,7 @@ private:
 	std::unique_ptr<key_trans_entry[]>  m_custom_table;
 
 	key_trans_entry *                   m_table;
-	uint32_t                              m_table_size;
+	uint32_t                            m_table_size;
 
 public:
 	// constructor
@@ -392,7 +373,7 @@ public:
 	input_item_id lookup_mame_code(const char * scode) const;
 	int lookup_mame_index(const char * scode) const;
 
-#if defined(OSD_WINDOWS)
+#if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 	input_item_id map_di_scancode_to_itemid(int di_scancode) const;
 	int vkey_for_mame_code(input_code code) const;
 #endif
@@ -406,74 +387,121 @@ public:
 	key_trans_entry & operator [](int i) const { return m_table[i]; }
 };
 
+
 //============================================================
 //  input_module_base - base class for input modules
 //============================================================
 
-class osd_options;
+class input_module_base : public osd_module, public input_module
+{
+private:
+	// 10 milliseconds polling interval
+	static constexpr inline unsigned MIN_POLLING_INTERVAL = 10;
 
-typedef std::chrono::high_resolution_clock clock_type;
-typedef std::chrono::time_point<std::chrono::high_resolution_clock> timepoint_type;
+	using clock_type = std::chrono::high_resolution_clock;
+	using timepoint_type =  std::chrono::time_point<std::chrono::high_resolution_clock>;
 
-// 10 milliseconds polling interval
-#define MIN_POLLING_INTERVAL 10
+	clock_type            m_clock;
+	timepoint_type        m_last_poll;
+	bool                  m_background_input;
+	const osd_options *   m_options;
+	osd::input_manager *  m_manager;
 
-class input_module_base : public input_module
+	virtual void poll() = 0;
+
+protected:
+	input_module_base(char const *type, char const *name);
+
+	osd::input_manager &  manager() { assert(m_manager); return *m_manager; }
+	const osd_options *   options() const { return m_options; }
+	bool                  background_input() const { return m_background_input; }
+
+	virtual void before_poll() { }
+
+public:
+	virtual int init(osd_interface &osd, const osd_options &options) override;
+
+	virtual void input_init(running_machine &machine) override;
+	virtual void poll_if_necessary() override;
+
+	virtual void reset_devices() = 0; // SDL OSD uses this to forcibly release keys
+};
+
+
+//============================================================
+//  input_module_impl - base class for input modules
+//============================================================
+
+template <typename Info, typename OsdImpl>
+class input_module_impl : public input_module_base
 {
 public:
-	input_module_base(const char *type, const char* name) :
-		input_module(type, name),
-		m_input_enabled(false),
-		m_mouse_enabled(false),
-		m_lightgun_enabled(false),
-		m_input_paused(false),
-		m_options(nullptr)
+	virtual void exit() override
 	{
+		devicelist().free_all_devices();
+	}
+
+	virtual int init(osd_interface &osd, const osd_options &options) override
+	{
+		m_osd = dynamic_cast<OsdImpl *>(&osd);
+		if (!m_osd)
+			return -1;
+
+		return input_module_base::init(osd, options);
+	}
+
+	virtual void reset_devices() override { devicelist().reset_devices(); }
+
+protected:
+	using input_module_base::input_module_base;
+
+	input_device_list<Info> &devicelist() { return m_devicelist; }
+	OsdImpl &osd() { assert(m_osd); return *m_osd; }
+
+	virtual void before_poll() override
+	{
+		// periodically process events, in case they're not coming through
+		// this also will make sure the mouse state is up-to-date
+		osd().process_events();
+	}
+
+	virtual bool should_poll_devices()
+	{
+		return background_input() || osd().has_focus();
+	}
+
+	template <typename Actual, typename... Params>
+	Actual &create_device(input_device_class deviceclass, std::string &&name, std::string &&id, Params &&... args)
+	{
+		// allocate the device object and add it to the input manager
+		return add_device(
+				deviceclass,
+				std::make_unique<Actual>(std::move(name), std::move(id), *this, std::forward<Params>(args)...));
+	}
+
+	template <typename Actual>
+	Actual &add_device(input_device_class deviceclass, std::unique_ptr<Actual> &&devinfo)
+	{
+		// add it to the input manager and append it to the list
+		osd::input_device &osddev = manager().add_device(deviceclass, devinfo->name(), devinfo->id(), devinfo.get());
+		devinfo->configure(osddev);
+		return devicelist().add_device(std::move(devinfo));
 	}
 
 private:
-	bool                  m_input_enabled;
-	bool                  m_mouse_enabled;
-	bool                  m_lightgun_enabled;
-	bool                  m_input_paused;
-	const osd_options *   m_options;
-	input_device_list     m_devicelist;
-	clock_type            m_clock;
-	timepoint_type        m_last_poll;
-
-protected:
-	void set_mouse_enabled(bool value) { m_mouse_enabled = value; }
-
-public:
-
-	const osd_options *   options() const { return m_options; }
-	input_device_list &   devicelist() { return m_devicelist; }
-	bool                  input_enabled() const { return m_input_enabled; }
-	bool                  input_paused() const { return m_input_paused; }
-	bool                  mouse_enabled() const { return m_mouse_enabled; }
-	bool                  lightgun_enabled() const { return m_lightgun_enabled; }
-
-	virtual int init(const osd_options &options) override;
-
-	virtual void poll_if_necessary(running_machine &machine) override
+	virtual void poll() override final
 	{
-		auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(m_clock.now() - m_last_poll);
-		if (elapsed.count() >= MIN_POLLING_INTERVAL)
-		{
-			poll(machine);
-		}
+		// poll all of the devices
+		if (should_poll_devices())
+			m_devicelist.poll_devices();
+		else
+			m_devicelist.reset_devices();
 	}
 
-	virtual void pause() override;
-	virtual void resume() override;
-	virtual void exit() override;
-
-protected:
-	virtual int init_internal() { return 0; }
-	virtual void poll(running_machine &machine);
-	virtual bool should_poll_devices(running_machine &machine) = 0;
-	virtual void before_poll(running_machine &machine) { }
+	input_device_list<Info> m_devicelist;
+	OsdImpl *m_osd = nullptr;
 };
+
 
 template <class TItem>
 int generic_button_get_state(void *device_internal, void *item_internal)
@@ -482,9 +510,10 @@ int generic_button_get_state(void *device_internal, void *item_internal)
 	TItem *itemdata = static_cast<TItem*>(item_internal);
 
 	// return the current state
-	devinfo->module().poll_if_necessary(devinfo->machine());
+	devinfo->module().poll_if_necessary();
 	return *itemdata >> 7;
 }
+
 
 template <class TItem>
 int generic_axis_get_state(void *device_internal, void *item_internal)
@@ -493,9 +522,10 @@ int generic_axis_get_state(void *device_internal, void *item_internal)
 	TItem *axisdata = static_cast<TItem*>(item_internal);
 
 	// return the current state
-	devinfo->module().poll_if_necessary(devinfo->machine());
+	devinfo->module().poll_if_necessary();
 	return *axisdata;
 }
+
 
 //============================================================
 //  default_button_name
@@ -524,23 +554,22 @@ const char *const default_axis_name[] =
 
 inline int32_t normalize_absolute_axis(double raw, double rawmin, double rawmax)
 {
-	double center = (rawmax + rawmin) / 2.0;
-
-	// make sure we have valid data
+	// make sure we have valid arguments
 	if (rawmin >= rawmax)
 		return int32_t(raw);
 
+	double const center = (rawmax + rawmin) / 2.0;
 	if (raw >= center)
 	{
 		// above center
-		double result = (raw - center) * osd::INPUT_ABSOLUTE_MAX / (rawmax - center);
-		return std::min(result, (double)osd::INPUT_ABSOLUTE_MAX);
+		double const result = (raw - center) * double(osd::INPUT_ABSOLUTE_MAX) / (rawmax - center);
+		return int32_t(std::min(result, double(osd::INPUT_ABSOLUTE_MAX)));
 	}
 	else
 	{
 		// below center
-		double result = -((center - raw) * (double)-osd::INPUT_ABSOLUTE_MIN / (center - rawmin));
-		return std::max(result, (double)osd::INPUT_ABSOLUTE_MIN);
+		double result = -((center - raw) * double(-osd::INPUT_ABSOLUTE_MIN) / (center - rawmin));
+		return int32_t(std::max(result, double(osd::INPUT_ABSOLUTE_MIN)));
 	}
 }
 

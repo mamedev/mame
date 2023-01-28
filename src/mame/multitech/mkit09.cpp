@@ -46,6 +46,8 @@ Test Paste:
 #include "mkit09.lh"
 
 
+namespace {
+
 class mkit09_state : public driver_device
 {
 public:
@@ -350,6 +352,9 @@ ROM_START( mkit09a )
 	ROM_FILL(0x99b,1,0x06) // fix start address
 	ROM_FILL(0x99c,1,0x63) // ... so that MEM starts at 0000 instead of F908.
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

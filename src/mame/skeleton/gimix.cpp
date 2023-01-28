@@ -37,6 +37,9 @@
 #include "formats/os9_dsk.h"
 #include "softlist_dev.h"
 
+
+namespace {
+
 #define DMA_DRQ         (m_dma_status & 0x80)
 #define DMA_INTRQ       (m_dma_status & 0x40)
 #define DMA_MOTOR_DELAY (m_dma_status & 0x20)
@@ -850,5 +853,8 @@ ROM_START( gimix )
 	ROM_REGION( 0x10000, "xebec", 0)
 	ROM_LOAD( "gimixhd.h11",  0x000000, 0x001000, CRC(35c12201) SHA1(51ac9052f9757d79c7f5bd3aa5d8421e98cfcc37) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1980, gimix, 0, 0, gimix, gimix, gimix_state, empty_init, "Gimix", "Gimix 6809 System", MACHINE_NO_SOUND_HW )

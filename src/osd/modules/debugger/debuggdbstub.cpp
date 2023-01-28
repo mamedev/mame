@@ -23,6 +23,8 @@
 #include <cinttypes>
 
 
+namespace osd {
+
 namespace {
 
 //-------------------------------------------------------------------------
@@ -516,7 +518,7 @@ public:
 
 	virtual ~debug_gdbstub() { }
 
-	virtual int init(const osd_options &options) override;
+	virtual int init(osd_interface &osd, const osd_options &options) override;
 	virtual void exit() override;
 
 	virtual void init_debugger(running_machine &machine) override;
@@ -630,7 +632,7 @@ private:
 };
 
 //-------------------------------------------------------------------------
-int debug_gdbstub::init(const osd_options &options)
+int debug_gdbstub::init(osd_interface &osd, const osd_options &options)
 {
 	m_debugger_port = options.debugger_port();
 	return 0;
@@ -1495,5 +1497,7 @@ void debug_gdbstub::handle_character(char ch)
 
 } // anonymous namespace
 
+} // namespace osd
+
 //-------------------------------------------------------------------------
-MODULE_DEFINITION(DEBUG_GDBSTUB, debug_gdbstub)
+MODULE_DEFINITION(DEBUG_GDBSTUB, osd::debug_gdbstub)

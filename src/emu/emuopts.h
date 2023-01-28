@@ -136,6 +136,7 @@
 #define OPTION_JOYSTICK_MAP         "joystick_map"
 #define OPTION_JOYSTICK_DEADZONE    "joystick_deadzone"
 #define OPTION_JOYSTICK_SATURATION  "joystick_saturation"
+#define OPTION_JOYSTICK_THRESHOLD   "joystick_threshold"
 #define OPTION_NATURAL_KEYBOARD     "natural"
 #define OPTION_JOYSTICK_CONTRADICTORY   "joystick_contradictory"
 #define OPTION_COIN_IMPULSE         "coin_impulse"
@@ -426,6 +427,7 @@ public:
 	const char *joystick_map() const { return value(OPTION_JOYSTICK_MAP); }
 	float joystick_deadzone() const { return float_value(OPTION_JOYSTICK_DEADZONE); }
 	float joystick_saturation() const { return float_value(OPTION_JOYSTICK_SATURATION); }
+	float joystick_threshold() const { return float_value(OPTION_JOYSTICK_THRESHOLD); }
 	bool steadykey() const { return bool_value(OPTION_STEADYKEY); }
 	bool ui_active() const { return bool_value(OPTION_UI_ACTIVE); }
 	bool offscreen_reload() const { return bool_value(OPTION_OFFSCREEN_RELOAD); }

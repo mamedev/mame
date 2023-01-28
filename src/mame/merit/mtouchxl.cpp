@@ -50,6 +50,9 @@
 #include "sound/ad1848.h"
 #include "speaker.h"
 
+
+namespace {
+
 class mtxl_state : public driver_device
 {
 public:
@@ -491,6 +494,9 @@ ROM_START( mtchxlti )
 	DISK_REGION("board1:ide:ide:0:hdd")
 	DISK_IMAGE_READONLY("r00", 0, SHA1(8e9a2f9e670f02139cee11b7e8f758639d8b2838))
 ROM_END
+
+} // anonymous namespace
+
 
 /***************************************************************************
 

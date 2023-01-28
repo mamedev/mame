@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_315_5195_H
-#define MAME_MACHINE_315_5195_H
+#ifndef MAME_SEGA_315_5195_H
+#define MAME_SEGA_315_5195_H
 
 #pragma once
 
@@ -147,4 +147,4 @@ private:
 DECLARE_DEVICE_TYPE(SEGA_315_5195_MEM_MAPPER, sega_315_5195_mapper_device)
 
 
-#endif // MAME_MACHINE_315_5195_H
+#endif // MAME_SEGA_315_5195_H

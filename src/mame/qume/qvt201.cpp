@@ -16,6 +16,9 @@ Skeleton driver for Qume QVT-201 & QVT-202 display terminals.
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class qvt201_state : public driver_device
 {
 public:
@@ -31,8 +34,9 @@ public:
 	{ }
 
 	void qvt201(machine_config &config);
+
 private:
-	SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
+	[[maybe_unused]] SCN2672_DRAW_CHARACTER_MEMBER(draw_character);
 
 	void offset_w(uint8_t data);
 	void keyboard_w(uint8_t data);
@@ -196,5 +200,8 @@ ROM_START( qvt201 )
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "301847-01.u42",  0x0000, 0x1000, CRC(546ed236) SHA1(312d57a7012f50327310bd11bda000149f13342e) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1986, qvt201, 0, 0, qvt201, qvt201, qvt201_state, empty_init, "Qume", "QVT-201 (Rev. T201VE)", MACHINE_IS_SKELETON )

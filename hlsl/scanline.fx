@@ -116,17 +116,14 @@ float2 GetAdjustedCoords(float2 coord)
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float2 BaseCoord = GetAdjustedCoords(Input.TexCoord);
-
 	// Color
-	float4 BaseColor = tex2D(DiffuseSampler, BaseCoord);
-	BaseColor.a = 1.0f;
+	float4 BaseColor = tex2D(DiffuseSampler, Input.TexCoord);
 
 	// clip border
-	if (BaseCoord.x < 0.0f || BaseCoord.y < 0.0f ||
-		BaseCoord.x > 1.0f || BaseCoord.y > 1.0f)
+	if (Input.TexCoord.x < 0.0f || Input.TexCoord.y < 0.0f ||
+		Input.TexCoord.x > 1.0f || Input.TexCoord.y > 1.0f)
 	{
-		// we don't use the clip function, because we don't clear the render target before
+		// return black for the area outside the screen
 		return float4(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
@@ -135,7 +132,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 
 	float ColorBrightness = 0.299f * BaseColor.r + 0.587f * BaseColor.g + 0.114 * BaseColor.b;
 
-	float ScanlineCoord = BaseCoord.y;
+	float ScanlineCoord = Input.TexCoord.y;
 	ScanlineCoord += SwapXY
 		? QuadDims.x <= SourceDims.x * 2.0f
 			? 0.5f / QuadDims.x // uncenter scanlines if the quad is less than twice the size of the source

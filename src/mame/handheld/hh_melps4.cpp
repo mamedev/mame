@@ -23,6 +23,8 @@ TODO:
 //#include "hh_melps4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
+namespace {
+
 class hh_melps4_state : public driver_device
 {
 public:
@@ -105,8 +107,6 @@ INPUT_CHANGED_MEMBER(hh_melps4_state::reset_button)
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
-
-namespace {
 
 /***************************************************************************
 

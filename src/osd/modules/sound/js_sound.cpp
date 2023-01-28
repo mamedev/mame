@@ -25,7 +25,7 @@ public:
 	}
 	virtual ~sound_js() { }
 
-	virtual int init(const osd_options &options) { return 0; }
+	virtual int init(osd_interface &osd, const osd_options &options) { return 0; }
 	virtual void exit() { }
 
 	// sound_module
@@ -47,7 +47,7 @@ public:
 
 };
 
-#else /* SDLMAME_UNIX */
+#else /* SDLMAME_EMSCRIPTEN */
 	MODULE_NOT_SUPPORTED(sound_js, OSD_SOUND_PROVIDER, "js")
 #endif
 

@@ -204,6 +204,8 @@ PCB - LEAPSTER-TV:
 #include "softlist_dev.h"
 
 
+namespace {
+
 class leapster_state : public driver_device
 {
 public:
@@ -508,6 +510,9 @@ ROM_END
 void leapster_state::init_leapster()
 {
 }
+
+} // anonymous namespace
+
 
 CONS( 2003, leapster,    0,        0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster",       MACHINE_IS_SKELETON )
 CONS( 2005, leapstertv,  leapster, 0, leapster, leapster, leapster_state, init_leapster, "LeapFrog", "Leapster TV",    MACHINE_IS_SKELETON )

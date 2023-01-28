@@ -11,6 +11,9 @@
 #include "cpu/upd78k/upd78k3.h"
 #include "machine/nvram.h"
 
+
+namespace {
+
 class kawai_k1_state : public driver_device
 {
 public:
@@ -105,6 +108,9 @@ ROM_START(k1rii)
 	ROM_REGION(0x80000, "waverom", 0)
 	ROM_LOAD("p106.bin", 0x00000, 0x80000, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1988, k1,  0,  0, k1,  k1, kawai_k1_state, empty_init, "Kawai Musical Instrument Manufacturing", "K1 Digital Multi-Dimensional Synthesizer",         MACHINE_IS_SKELETON)
 SYST(1988, k1m, k1, 0, k1m, k1, kawai_k1_state, empty_init, "Kawai Musical Instrument Manufacturing", "K1m Digital Multi-Dimensional Synthesizer Module", MACHINE_IS_SKELETON)

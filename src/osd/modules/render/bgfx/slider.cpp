@@ -11,8 +11,10 @@
 
 #include "strformat.h"
 
-bgfx_slider::bgfx_slider(running_machine &machine, std::string name, float min, float def, float max, float step, slider_type type, screen_type screen, std::string format, std::string description, std::vector<std::string>& strings)
-	: m_name(name)
+#include <utility>
+
+bgfx_slider::bgfx_slider(running_machine &machine, std::string &&name, float min, float def, float max, float step, slider_type type, screen_type screen, std::string format, std::string description, std::vector<std::string>& strings)
+	: m_name(std::move(name))
 	, m_step(step)
 	, m_type(type)
 	, m_screen_type(screen)

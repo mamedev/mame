@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
-#ifndef MAME_MACHINE_K057714_H
-#define MAME_MACHINE_K057714_H
+#ifndef MAME_KONAMI_K057714_H
+#define MAME_KONAMI_K057714_H
 
 #pragma once
 
@@ -93,4 +93,4 @@ private:
 DECLARE_DEVICE_TYPE(K057714, k057714_device)
 
 
-#endif // MAME_MACHINE_K057714_H
+#endif // MAME_KONAMI_K057714_H

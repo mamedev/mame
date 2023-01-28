@@ -547,6 +547,8 @@ the keypad symbols seem to use a different matrix pattern from the rest?
 #include "formats/imd_dsk.h"
 
 
+namespace {
+
 #define MAINCPU_TAG "maincpu"
 #define SUBCPU_TAG  "subcpu"
 #define DMAC_TAG    "dmac"
@@ -1044,6 +1046,9 @@ ROM_START( fanucspgm )
 	ROM_REGION(0x8000, CHARGEN_TAG, 0)
 	ROM_LOAD( "a22_020b.5g",  0x000000, 0x002000, CRC(7b5f8e20) SHA1(9de607e541d8aad2d1ea56321270bb8466b16e3d) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 //    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT      CLASS            INIT            COMPANY  FULLNAME                         FLAGS

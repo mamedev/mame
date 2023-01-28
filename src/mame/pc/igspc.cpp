@@ -4,12 +4,12 @@
 
  IGS PC based hardware
 
+TODO:
+- Checks CPUID pretty soon that is a Geode processor at PC=f604d, jumps to lalaland
+  on next CPUID with EAX=1 if ecx is equal to 0x540/0x551/0x552 ...
 
  Speed Driver
  -------------
-
-TODO:
-can't be emulated without proper mb bios
 
  4 boards
     1x NV440 gfx card
@@ -45,6 +45,10 @@ can't be emulated without proper mb bios
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "machine/pci.h"
+
+
+namespace {
 
 class speeddrv_state : public driver_device
 {
@@ -59,23 +63,17 @@ public:
 	void init_speeddrv();
 
 private:
-	void speeddrv_io(address_map &map);
 	void speeddrv_map(address_map &map);
 
-	// devices
-	required_device<cpu_device> m_maincpu;
-public:
+	required_device<mediagx_device> m_maincpu;
 };
 
 void speeddrv_state::speeddrv_map(address_map &map)
 {
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0x20000);
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
 }
-
-void speeddrv_state::speeddrv_io(address_map &map)
-{
-}
-
 
 static INPUT_PORTS_START( speeddrv )
 INPUT_PORTS_END
@@ -84,10 +82,12 @@ INPUT_PORTS_END
 
 void speeddrv_state::speeddrv(machine_config &config)
 {
-	/* basic machine hardware */
-	I486(config, m_maincpu, 40000000); // ?? at least a pentium
+	// TODO: AMD Geode, superset of MediaGX, clock is probably higher
+	MEDIAGX(config, m_maincpu, 40'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &speeddrv_state::speeddrv_map);
-	m_maincpu->set_addrmap(AS_IO, &speeddrv_state::speeddrv_io);
+
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 
@@ -120,6 +120,9 @@ ROM_END
 void speeddrv_state::init_speeddrv()
 {
 }
+
+} // anonymous namespace
+
 
 GAME( 2004, speeddrv, 0, speeddrv, speeddrv, speeddrv_state, init_speeddrv, ROT0, "IGS", "Speed Driver",          MACHINE_IS_SKELETON )
 GAME( 200?, eztouch,  0, speeddrv, speeddrv, speeddrv_state, init_speeddrv, ROT0, "IGS", "EZ Touch (v116 China)", MACHINE_IS_SKELETON )

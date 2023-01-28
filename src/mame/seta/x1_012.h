@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_VIDEO_X1_012_H
-#define MAME_VIDEO_X1_012_H
+#ifndef MAME_SETA_X1_012_H
+#define MAME_SETA_X1_012_H
 
 #pragma once
 
@@ -60,5 +60,5 @@ private:
 
 DECLARE_DEVICE_TYPE(X1_012, x1_012_device)
 
-#endif // MAME_VIDEO_X1_012_H
+#endif // MAME_SETA_X1_012_H
 

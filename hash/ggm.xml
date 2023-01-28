@@ -17,14 +17,14 @@ license:CC0-1.0
 			<dataarea name="rom" size="0x8000">
 				<rom name="007-7039-00" offset="0x4000" size="0x1000" crc="0db2e277" sha1="9f8823739d28b0a0e3857b7c672aa2514cd6816b" /> <!-- AMD AM9232CPC -->
 				<rom                    offset="0x6000" size="0x1000" loadflag="reload" />
-				<rom name="007040xxx"   offset="0x5000" size="0x1000" crc="980fa10f" sha1="5ec814bbaf583031acbe2c0199a6195c2849ef5e" /> <!-- Rockwell R3280-11 -->
+				<rom name="0077040xxx"  offset="0x5000" size="0x1000" crc="980fa10f" sha1="5ec814bbaf583031acbe2c0199a6195c2849ef5e" /> <!-- Rockwell R3280-11 -->
 				<rom                    offset="0x7000" size="0x1000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="capa">
-		<description>Capablanca Edition - Master Chess Endgame</description>
+		<description>Capablanca Edition: Master Chess Endgame</description>
 		<year>1981</year>
 		<publisher>Applied Concepts</publisher>
 		<part name="cart" interface="ggm">
@@ -37,8 +37,35 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="capas" cloneof="capa">
+		<description>Capablanca-S Edition: Master Chess Endgame</description>
+		<year>1982</year>
+		<publisher>Applied Concepts</publisher>
+		<part name="cart" interface="ggm">
+			<feature name="overlay" value="0x02" />
+			<feature name="ram" value="1" /> <!-- HM6116LP-3 @ 0x800-0xfff -->
+			<dataarea name="rom" size="0x10000">
+				<rom name="capablanca-s.6" offset="0x6000" size="0x2000" crc="24ab74e0" sha1="473d91458db7f4c771f694934f95ed9d2ab5471a" /> <!-- M27C64A, both ROM labels identical -->
+				<rom name="capablanca-s.e" offset="0xe000" size="0x2000" crc="f42700e4" sha1="80cf7da34784865ff3e82b19c0aa269ef778df66" /> <!-- " -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lasvegas">
+		<description>Las Vegas 21: Master Blackjack</description>
+		<year>1980</year>
+		<publisher>Applied Concepts</publisher>
+		<part name="cart" interface="ggm">
+			<feature name="overlay" value="0x04" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="0077042xxx" offset="0x5000" size="0x1000" crc="26541ac5" sha1="8a3304b4528570d23a7441629efa8de10c37f49e" /> <!-- Rockwell R32E9-11 -->
+				<rom                   offset="0x7000" size="0x1000" loadflag="reload" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="morphy">
-		<description>Morphy Edition - Master Chess</description>
+		<description>Morphy Edition: Master Chess</description>
 		<year>1981</year>
 		<publisher>Applied Concepts</publisher>
 		<part name="cart" interface="ggm">
@@ -53,7 +80,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sandy" cloneof="morphy">
-		<description>Sandy Edition - Master Chess</description>
+		<description>Sandy Edition: Master Chess</description>
 		<year>1981</year>
 		<publisher>Sandy Electronic</publisher>
 		<part name="cart" interface="ggm">
@@ -68,7 +95,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="steinitz">
-		<description>Steinitz Edition-4 - Master Chess</description>
+		<description>Steinitz Edition-4: Master Chess</description>
 		<year>1982</year>
 		<publisher>Applied Concepts</publisher>
 		<part name="cart" interface="ggm">

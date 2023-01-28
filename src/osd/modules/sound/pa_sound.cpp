@@ -9,40 +9,45 @@
 *******************************************************************c********/
 
 #include "sound_module.h"
+
 #include "modules/osdmodule.h"
 
 #ifndef NO_USE_PORTAUDIO
 
-#include <portaudio.h>
 #include "modules/lib/osdobj_common.h"
+#include "osdcore.h"
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <atomic>
-#include <cmath>
-#include <climits>
+#include <portaudio.h>
+
 #include <algorithm>
+#include <atomic>
+#include <climits>
+#include <cmath>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
 #ifdef _WIN32
 #include "pa_win_wasapi.h"
 #endif
 
+
+namespace osd {
+
+namespace {
+
 #define LOG_FILE   "pa.log"
 #define LOG_BUFCNT 0
-
-using osd::s16;
 
 class sound_pa : public osd_module, public sound_module
 {
 public:
-	sound_pa()
-		: osd_module(OSD_SOUND_PROVIDER, "portaudio"), sound_module()
+	sound_pa() : osd_module(OSD_SOUND_PROVIDER, "portaudio")
 	{
 	}
 	virtual ~sound_pa() { }
 
-	virtual int init(osd_options const &options) override;
+	virtual int init(osd_interface &osd, osd_options const &options) override;
 	virtual void exit() override;
 
 	// sound_module
@@ -172,7 +177,7 @@ private:
 #endif
 };
 
-int sound_pa::init(osd_options const &options)
+int sound_pa::init(osd_interface &osd, osd_options const &options)
 {
 	PaStreamParameters   stream_params;
 	const PaStreamInfo*  stream_info;
@@ -458,8 +463,14 @@ void sound_pa::exit()
 		osd_printf_verbose("Sound: overflows=%d underflows=%d\n", m_overflows, m_underflows);
 }
 
+} // anonymous namespace
+
+} // namespace osd
+
 #else
-	MODULE_NOT_SUPPORTED(sound_pa, OSD_SOUND_PROVIDER, "portaudio")
+
+namespace osd { namespace { MODULE_NOT_SUPPORTED(sound_pa, OSD_SOUND_PROVIDER, "portaudio") } }
+
 #endif
 
-MODULE_DEFINITION(SOUND_PORTAUDIO, sound_pa)
+MODULE_DEFINITION(SOUND_PORTAUDIO, osd::sound_pa)

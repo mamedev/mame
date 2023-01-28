@@ -86,6 +86,9 @@ SWEET LAND III (1998) main PCB layout
 #include "machine/i8255.h"
 #include "sound/ymopn.h"
 
+
+namespace {
+
 class sweetland_state : public driver_device
 {
 public:
@@ -173,6 +176,8 @@ ROM_START(sweetlnd)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD( "sw1.5h", 0x0000, 0x4000, CRC(6e361ae5) SHA1(b12ce39aa8235993d0acdc623ff8dbce9feb146e) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1986, sweetlnd, 0, sweetland, sweetland, sweetland_state, empty_init, ROT0, "Namco", "Sweet Land", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

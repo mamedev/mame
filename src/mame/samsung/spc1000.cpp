@@ -142,6 +142,8 @@ small ics.
 #include "formats/spc1000_cas.h"
 
 
+namespace {
+
 class spc1000_state : public driver_device
 {
 public:
@@ -525,6 +527,8 @@ ROM_START( spc1000 )
 	//ROM_LOAD("spcall.rom", 0x0000, 0x8000, CRC(2fbb6eca) SHA1(cc9a076b0f00d54b2aec31f1f558b10f43ef61c8))  // bad?
 	ROM_LOAD("spcall.rom", 0x0000, 0x8000, CRC(240426be) SHA1(8eb32e147c17a6d0f947b8bb3c6844750a7b64a8))
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

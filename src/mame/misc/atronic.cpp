@@ -324,6 +324,9 @@ Markings bottom: 6 470.5020 00.07
 #include "screen.h"
 #include "video/ramdac.h"
 
+
+namespace {
+
 class atronic_state : public driver_device
 {
 public:
@@ -340,7 +343,7 @@ public:
 	void atronic(machine_config &config);
 
 private:
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	[[maybe_unused]] u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	u8 serial_r();
 	void serial_w(u8 data);
@@ -1329,6 +1332,7 @@ ROM_START( santam )
 	ROM_LOAD( "sb_u21_8m_m27c801-100f1_94cch.bin", 0x0000, 0x100000, CRC(c740b5be) SHA1(dafe80431197fe22cddd0fc295436edc37256603) )
 ROM_END
 
+} // anonymous namespace
 
 
 GAME( 1999, atronic,   0,        atronic, atronic, atronic_state, empty_init, ROT0, "Atronic", "Atronic SetUp/Clear Chips (Russia, set 1)", MACHINE_IS_SKELETON)

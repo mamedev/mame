@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_HP9845_OPTROM_H
-#define MAME_MACHINE_HP9845_OPTROM_H
+#ifndef MAME_HP_HP9845_OPTROM_H
+#define MAME_HP_HP9845_OPTROM_H
 
 #pragma once
 
@@ -42,4 +42,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(HP9845_OPTROM, hp9845_optrom_device)
 
-#endif // MAME_MACHINE_HP9845_OPTROM_H
+#endif // MAME_HP_HP9845_OPTROM_H

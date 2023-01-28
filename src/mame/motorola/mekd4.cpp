@@ -266,6 +266,8 @@ FS 0 to F
 #include "mekd4.lh"
 
 
+namespace {
+
 class mekd4_state : public driver_device
 {
 public:
@@ -1069,6 +1071,9 @@ ROM_START(mekd4)
 	ROM_REGION(0x0400, "rommap",0)
 	ROM_LOAD("d4map00.rom", 0x0000, 0x0400, CRC(7e676444) SHA1(4f8a7443da509561be958786f9bd72eac3969a89))
 ROM_END
+
+} // anonymous namespace
+
 
 /***************************************************************************
 

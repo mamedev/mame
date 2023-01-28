@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Samuele Zannoli
-#ifndef MAME_MACHINE_SEGASHIOBD_H
-#define MAME_MACHINE_SEGASHIOBD_H
+#ifndef MAME_SEGA_SEGASHIOBD_H
+#define MAME_SEGA_SEGASHIOBD_H
 
 #pragma once
 
@@ -26,4 +26,4 @@ private:
 	required_device<sh4_device> m_maincpu;
 };
 
-#endif // MAME_MACHINE_SEGASHIOBD_H
+#endif // MAME_SEGA_SEGASHIOBD_H

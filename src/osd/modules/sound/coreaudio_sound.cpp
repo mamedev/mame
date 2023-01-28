@@ -24,16 +24,9 @@
 #include <cstring>
 
 
-#ifdef MAC_OS_X_VERSION_MAX_ALLOWED
+namespace osd {
 
-#if MAC_OS_X_VERSION_MAX_ALLOWED < 1060
-
-typedef ComponentDescription AudioComponentDescription;
-
-#endif // MAC_OS_X_VERSION_MAX_ALLOWED < 1060
-
-#endif // MAC_OS_X_VERSION_MAX_ALLOWED
-
+namespace {
 
 class sound_coreaudio : public osd_module, public sound_module
 {
@@ -59,7 +52,7 @@ public:
 	{
 	}
 
-	virtual int init(osd_options const &options) override;
+	virtual int init(osd_interface &osd, osd_options const &options) override;
 	virtual void exit() override;
 
 	// sound_module
@@ -186,7 +179,7 @@ private:
 };
 
 
-int sound_coreaudio::init(const osd_options &options)
+int sound_coreaudio::init(osd_interface &osd, const osd_options &options)
 {
 	OSStatus err;
 
@@ -1013,8 +1006,14 @@ OSStatus sound_coreaudio::render_callback(
 	return ((sound_coreaudio *)refcon)->render(action_flags, timestamp, bus_number, number_frames, data);
 }
 
+} // anonymous namespace
+
+} // namespace osd
+
 #else /* SDLMAME_MACOSX */
-	MODULE_NOT_SUPPORTED(sound_coreaudio, OSD_SOUND_PROVIDER, "coreaudio")
+
+namespace osd { namespace { MODULE_NOT_SUPPORTED(sound_coreaudio, OSD_SOUND_PROVIDER, "coreaudio") } }
+
 #endif
 
-MODULE_DEFINITION(SOUND_COREAUDIO, sound_coreaudio)
+MODULE_DEFINITION(SOUND_COREAUDIO, osd::sound_coreaudio)

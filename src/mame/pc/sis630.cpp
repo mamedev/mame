@@ -162,6 +162,9 @@
 #include "machine/sis950_smbus.h"
 //#include "machine/fdc37c93x.h"
 
+
+namespace {
+
 class sis630_state : public driver_device
 {
 public:
@@ -296,6 +299,8 @@ ROM_START(gamecst2)
 	DISK_REGION( "pci:00.1:ide1:0:hdd:image" )
 	DISK_IMAGE( "gamecst2", 0, SHA1(14e1b311cb474801c7bdda3164a0c220fb102159) )
 ROM_END
+
+} // anonymous namespace
 
 
 COMP( 2000, shutms11, 0,      0,      sis630,  sis630, sis630_state, empty_init, "Shuttle", "MS11 PC", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

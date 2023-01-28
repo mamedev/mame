@@ -116,6 +116,8 @@ ROM source notes when dumped from another title, but confident it's the same:
 //#include "hh_ucom4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
+namespace {
+
 class hh_ucom4_state : public driver_device
 {
 public:
@@ -237,8 +239,6 @@ INPUT_CHANGED_MEMBER(hh_ucom4_state::single_interrupt_line)
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
-
-namespace {
 
 /***************************************************************************
 

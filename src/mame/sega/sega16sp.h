@@ -5,8 +5,8 @@
     Sega 16-bit sprite hardware
 
 ***************************************************************************/
-#ifndef MAME_VIDEO_SEGA16SP_H
-#define MAME_VIDEO_SEGA16SP_H
+#ifndef MAME_SEGA_SEGA16SP_H
+#define MAME_SEGA_SEGA16SP_H
 
 #pragma once
 
@@ -233,4 +233,4 @@ DECLARE_DEVICE_TYPE(SEGA_XBOARD_SPRITES,    sega_xboard_sprite_device)
 DECLARE_DEVICE_TYPE(SEGA_YBOARD_SPRITES,    sega_yboard_sprite_device)
 
 
-#endif // MAME_VIDEO_SEGA16SP_H
+#endif // MAME_SEGA_SEGA16SP_H

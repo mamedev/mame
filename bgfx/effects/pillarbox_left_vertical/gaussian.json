@@ -24,9 +24,10 @@
 	"vertex": "chains/pillarbox_left_vertical/vs_gaussian",
 	"fragment": "chains/pillarbox_left_vertical/fs_gaussian",
 	"uniforms": [
-		{ "name": "s_tex",       "type": "int",  "values": [ 1.0 ] },
-		{ "name": "u_tex_size0", "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
-		{ "name": "u_dimension", "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
-		{ "name": "u_radius",    "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] }
+		{ "name": "s_tex",           "type": "int",  "values": [ 1.0 ] },
+		{ "name": "u_tex_size0",     "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
+		{ "name": "u_dimension",     "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
+		{ "name": "u_radius",        "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
+		{ "name": "u_inv_view_dims", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
 	]
 }

@@ -13,8 +13,9 @@
 #include "modules/osdmodule.h"
 #include "osdcore.h"
 
-bgfx_effect::bgfx_effect(uint64_t state, bgfx::ShaderHandle vertex_shader, bgfx::ShaderHandle fragment_shader, std::vector<bgfx_uniform*> uniforms)
-	: m_state(state)
+bgfx_effect::bgfx_effect(std::string name, uint64_t state, bgfx::ShaderHandle vertex_shader, bgfx::ShaderHandle fragment_shader, std::vector<bgfx_uniform*> uniforms)
+	: m_name(name)
+	, m_state(state)
 {
 	m_program_handle = bgfx::createProgram(vertex_shader, fragment_shader, false);
 
@@ -47,7 +48,10 @@ void bgfx_effect::submit(int view, uint64_t blend)
 	{
 		(uniform_pair.second)->upload();
 	}
-	bgfx::setState(m_state | blend);
+
+	const uint64_t final_state = (blend != ~0ULL) ? ((m_state & ~BGFX_STATE_BLEND_MASK) | blend) : m_state;
+
+	bgfx::setState(final_state);
 	bgfx::submit(view, m_program_handle);
 }
 
