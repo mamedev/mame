@@ -10,24 +10,21 @@
 //
 //============================================================
 
+#include "drawsdl.h"
+
+// MAME headers
+#include "emucore.h"
+#include "rendersw.hxx"
+
+#include "ui/uimain.h"
+
+// osd headers
+#include "modules/monitor/monitor_module.h"
+
 // standard C headers
 #include <cmath>
 #include <cstdio>
 
-// MAME headers
-#include "emucore.h"
-#include "ui/uimain.h"
-#include "rendersw.hxx"
-
-// standard SDL headers
-#include <SDL2/SDL.h>
-
-// OSD headers
-#include "osdsdl.h"
-#include "window.h"
-
-#include "drawsdl.h"
-#include "modules/monitor/monitor_module.h"
 
 //============================================================
 //  DEBUGGING

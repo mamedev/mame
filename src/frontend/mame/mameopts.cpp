@@ -11,13 +11,17 @@
 #include "emu.h"
 #include "mameopts.h"
 
-#include "drivenum.h"
-#include "fileio.h"
-#include "screen.h"
-#include "softlist_dev.h"
-#include "hashfile.h"
 #include "clifront.h"
 
+// emu
+#include "drivenum.h"
+#include "fileio.h"
+#include "hashfile.h"
+#include "main.h"
+#include "screen.h"
+#include "softlist_dev.h"
+
+// lib/util
 #include "path.h"
 #include "zippath.h"
 

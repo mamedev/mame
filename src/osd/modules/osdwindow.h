@@ -20,11 +20,6 @@
 #include <mmsystem.h>
 #endif
 
-#ifdef OSD_SDL
-// forward declaration
-struct SDL_Window;
-#endif
-
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
@@ -113,10 +108,6 @@ public:
 
 	virtual void update() = 0;
 	virtual void complete_destroy() = 0;
-
-#if defined(OSD_WINDOWS)
-	virtual bool win_has_menu() = 0;
-#endif
 
 private:
 	void set_starting_view(int index, const char *defview, const char *view);

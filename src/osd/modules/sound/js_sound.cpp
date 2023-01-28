@@ -25,7 +25,7 @@ public:
 	}
 	virtual ~sound_js() { }
 
-	virtual int init(const osd_options &options) { return 0; }
+	virtual int init(osd_interface &osd, const osd_options &options) { return 0; }
 	virtual void exit() { }
 
 	// sound_module

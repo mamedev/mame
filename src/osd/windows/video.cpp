@@ -6,12 +6,13 @@
 //
 //============================================================
 
-// standard windows headers
-#include <windows.h>
+#include "modules/monitor/monitor_module.h"
+#include "modules/osdwindow.h"
 
 // MAME headers
 #include "emu.h"
 #include "emuopts.h"
+#include "main.h"
 #include "render.h"
 #include "uiinput.h"
 
@@ -20,8 +21,8 @@
 #include "window.h"
 #include "strconv.h"
 
-#include "modules/monitor/monitor_module.h"
-#include "modules/osdwindow.h"
+// standard windows headers
+#include <windows.h>
 
 //============================================================
 //  CONSTANTS
@@ -109,7 +110,7 @@ void windows_osd_interface::update(bool skip_redraw)
 void windows_osd_interface::input_update()
 {
 	// poll the joystick values here
-	winwindow_process_events(machine(), true, false);
+	process_events(true, false);
 	poll_input(machine());
 	check_osd_inputs();
 }

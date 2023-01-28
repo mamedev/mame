@@ -61,11 +61,6 @@ public:
 
 	void update() override;
 
-	virtual bool win_has_menu() override
-	{
-		return GetMenu(platform_window()) ? true : false;
-	}
-
 	virtual osd_dim get_size() override
 	{
 		RECT client;
@@ -150,22 +145,15 @@ struct osd_draw_callbacks
 bool winwindow_has_focus(void);
 void winwindow_update_cursor_state(running_machine &machine);
 
-extern LRESULT CALLBACK winwindow_video_window_proc_ui(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
-
 void winwindow_toggle_full_screen(void);
 void winwindow_take_snap(void);
 void winwindow_take_video(void);
 void winwindow_toggle_fsfx(void);
 
-void winwindow_process_events_periodic(running_machine &machine);
-void winwindow_process_events(running_machine &machine, bool ingame, bool nodispatch);
-
 void winwindow_ui_pause(running_machine &machine, int pause);
 int winwindow_ui_is_paused(running_machine &machine);
 
 void winwindow_dispatch_message(running_machine &machine, MSG *message);
-
-extern int win_create_menu(running_machine &machine, HMENU *menus);
 
 
 

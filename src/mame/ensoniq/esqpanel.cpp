@@ -4,8 +4,10 @@
     Ensoniq panel/display device
 */
 #include "emu.h"
-#include "http.h"
 #include "esqpanel.h"
+
+#include "http.h"
+#include "main.h"
 
 //**************************************************************************
 // External panel support

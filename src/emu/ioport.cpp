@@ -96,6 +96,7 @@
 #include "emuopts.h"
 #include "fileio.h"
 #include "inputdev.h"
+#include "main.h"
 #include "natkeyboard.h"
 #include "profiler.h"
 
@@ -109,6 +110,7 @@
 
 #include "osdepend.h"
 
+#include <algorithm>
 #include <cctype>
 #include <ctime>
 

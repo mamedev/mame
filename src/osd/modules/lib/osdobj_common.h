@@ -89,6 +89,8 @@
 
 #define OSDOPTION_MIDI_PROVIDER         "midiprovider"
 
+#define OSDOPTION_NETWORK_PROVIDER      "networkprovider"
+
 #define OSDOPTION_BGFX_PATH             "bgfx_path"
 #define OSDOPTION_BGFX_BACKEND          "bgfx_backend"
 #define OSDOPTION_BGFX_DEBUG            "bgfx_debug"
@@ -251,8 +253,6 @@ public:
 	virtual void video_register();
 	virtual bool window_init();
 
-	virtual void input_resume();
-
 	virtual void exit_subsystems();
 	virtual void video_exit();
 	virtual void window_exit();
@@ -270,11 +270,13 @@ public:
 
 	void notify(const char *outname, int32_t value) const { m_output->notify(outname, value); }
 
-	static std::list<std::shared_ptr<osd_window>> s_window_list;
+	virtual void process_events() = 0;
+	virtual bool has_focus() const = 0;
+
+	static std::list<std::shared_ptr<osd_window> > s_window_list;
 
 protected:
 	virtual bool input_init();
-	virtual void input_pause();
 
 	virtual void build_slider_list() { }
 	virtual void update_slider_list() { }

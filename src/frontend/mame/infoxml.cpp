@@ -20,6 +20,7 @@
 // emu
 #include "config.h"
 #include "drivenum.h"
+#include "main.h"
 #include "romload.h"
 #include "screen.h"
 #include "softlist_dev.h"

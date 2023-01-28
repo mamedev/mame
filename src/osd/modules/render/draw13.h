@@ -15,7 +15,6 @@
 
 // OSD headers
 #ifndef OSD_WINDOWS
-#include "osdsdl.h"
 #include "window.h"
 #else
 #include "../windows/window.h"

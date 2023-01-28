@@ -743,9 +743,12 @@ OSD-related Options
 **-[no]background_input**
 
     Sets whether input is accepted or ignored when MAME does not have UI focus.
-    Currently supported for RawInput mouse/keyboard input on Windows, and SDL
-    game controller/joystick input.  This setting is ignored when the debugger
-    is enabled.  The default is OFF (**-nobackground_input**).
+    This setting is ignored when the debugger is enabled.  The default is OFF
+    (**-nobackground_input**).
+
+    Currently supported for RawInput mouse/keyboard input, DirectInput
+    mouse/keyboard/joystick input and XInput joystick input on Windows, and SDL
+    game controller/joystick input.
 
     Example:
         .. code-block:: bash
@@ -1017,11 +1020,31 @@ Example:
 
         mame -midiprovider none dx100 -midiin canyon.mid
 
+.. _mame-commandline-networkprovider:
+
+**-networkprovider** *<module>*
+
+    Chooses how MAME will provide communication for emulated packet-oriented
+    network interfaces (e.g. Ethernet cards).  Supported options are ``taptun``
+    to use the TUN/TAP, TAP-Windows or similar, ``pcap`` to use a pcap library,
+    or ``none`` to disable communication for emulated network interfaces.
+    Available options depend on your operating system.  By default, ``taptun``
+    and ``none`` are available on Windows and Linux, and ``pcap`` and ``none``
+    are available on macOS.
+
+    The default is ``auto`` which will use ``taptun`` if available, falling back
+    to ``pcap``.
+
+Example:
+    .. code-block:: bash
+
+        mame -networkprovider pcap apple2ee -sl3 uthernet
+
 
 .. _mame-commandline-cliverbs:
 
-OSD CLI Verbs
--------------
+OSD Command-Line Verbs
+----------------------
 
 .. _mame-commandline-listmidi:
 

@@ -38,7 +38,7 @@ public:
 	}
 	virtual ~sound_pulse() { }
 
-	virtual int init(osd_options const &options) override;
+	virtual int init(osd_interface &osd, osd_options const &options) override;
 	virtual void exit() override;
 	virtual void update_audio_stream(bool is_throttled, const s16 *buffer, int samples_this_frame) override;
 	virtual void set_mastervolume(int attenuation) override;
@@ -273,7 +273,7 @@ void sound_pulse::stop_mainloop(int err)
 	pa_mainloop_quit(m_mainloop, err);
 }
 
-int sound_pulse::init(osd_options const &options)
+int sound_pulse::init(osd_interface &osd, osd_options const &options)
 {
 	m_last_sample = 0;
 	m_setting_volume = false;

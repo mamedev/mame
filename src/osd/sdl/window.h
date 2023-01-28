@@ -11,19 +11,18 @@
 #ifndef MAME_OSD_SDL_WINDOW_H
 #define MAME_OSD_SDL_WINDOW_H
 
-#include "osdsdl.h"
-
 #include "modules/osdwindow.h"
 #include "osdsync.h"
 
 #include <cstdint>
 #include <memory>
-#include <list>
 
 
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
+
+struct SDL_Window;
 
 class render_target;
 

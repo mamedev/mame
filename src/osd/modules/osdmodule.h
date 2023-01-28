@@ -23,6 +23,7 @@
 //  TYPE DEFINITIONS
 //============================================================
 
+class osd_interface;
 class osd_options;
 
 
@@ -40,7 +41,7 @@ public:
 
 	virtual bool probe() { return true; }
 
-	virtual int init(const osd_options &options) = 0;
+	virtual int init(osd_interface &osd, const osd_options &options) = 0;
 	virtual void exit() { }
 
 protected:
@@ -86,7 +87,7 @@ public:
 
 	std::vector<std::string_view> get_module_names(const char *type) const;
 
-	void init(const osd_options &options);
+	void init(osd_interface &osd, const osd_options &options);
 
 	void exit();
 
@@ -109,7 +110,7 @@ private:
 		public: \
 			mod_class () : osd_module(mod_type, mod_name) { } \
 			virtual ~mod_class() { } \
-			virtual int init(const osd_options &options) override { return -1; } \
+			virtual int init(osd_interface &osd, const osd_options &options) override { return -1; } \
 			virtual bool probe() override { return false; } \
 		};
 

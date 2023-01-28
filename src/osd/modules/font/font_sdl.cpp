@@ -6,7 +6,6 @@
  */
 
 #include "font_module.h"
-#include "modules/osdmodule.h"
 
 #if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX) && !defined(SDLMAME_HAIKU) && !defined(SDLMAME_ANDROID)
 
@@ -305,7 +304,7 @@ public:
 		return std::make_unique<osd_font_sdl>();
 	}
 
-	virtual int init(const osd_options &options) override
+	virtual int init(osd_interface &osd, const osd_options &options) override
 	{
 		if (TTF_Init() == -1)
 		{
