@@ -26,7 +26,7 @@ class shader_manager;
 class effect_reader : public state_reader
 {
 public:
-	static bgfx_effect *read_from_value(const Value& value, std::string prefix, osd_options &options, shader_manager& shaders);
+	static bgfx_effect *read_from_value(std::string name, const Value& value, std::string prefix, osd_options &options, shader_manager& shaders);
 	static bool validate_value(const Value& value, std::string prefix, osd_options &options);
 
 private:

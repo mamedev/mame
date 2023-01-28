@@ -93,7 +93,7 @@ bgfx_effect* effect_manager::load_effect(osd_options &options, std::string name)
 		return nullptr;
 	}
 
-	bgfx_effect* effect = effect_reader::read_from_value(document, "Effect '" + name + "': ", options, m_shaders);
+	bgfx_effect* effect = effect_reader::read_from_value(name, document, "Effect '" + name + "': ", options, m_shaders);
 
 	if (effect == nullptr)
 	{

@@ -27,7 +27,8 @@ enum
 class bgfx_target : public bgfx_texture_handle_provider
 {
 public:
-	bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t style, bool double_buffer, bool filter, uint16_t scale, uint32_t screen);
+	bgfx_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint16_t xprescale, uint16_t yprescale,
+		uint32_t style, bool double_buffer, bool filter, uint16_t scale, uint32_t screen);
 	bgfx_target(void *handle, uint16_t width, uint16_t height);
 	virtual ~bgfx_target();
 
@@ -42,13 +43,16 @@ public:
 	bool                        filter() const { return m_filter; }
 	uint16_t                    scale() const { return m_scale; }
 	uint32_t                    screen_index() const { return m_screen; }
+	uint16_t                    raw_width() const { return m_width; }
+	uint16_t                    raw_height() const { return m_height; }
 
 	// bgfx_texture_handle_provider
 	virtual bgfx::TextureHandle texture() const override;
 	virtual bool is_target() const override { return true; }
-	virtual uint16_t width() const override { return m_width; }
-	virtual uint16_t height() const override { return m_height; }
-	virtual uint16_t rowpixels() const override { return m_width; }
+	virtual uint16_t width() const override { return m_width * m_xprescale; }
+	virtual uint16_t width_margin() const override { return 0; }
+	virtual uint16_t height() const override { return m_height * m_yprescale; }
+	virtual uint16_t rowpixels() const override { return m_width * m_xprescale; }
 	virtual int width_div_factor() const override { return 1; }
 	virtual int width_mul_factor() const override { return 1; }
 
@@ -62,6 +66,8 @@ private:
 
 	uint16_t                    m_width;
 	uint16_t                    m_height;
+	uint16_t                    m_xprescale;
+	uint16_t                    m_yprescale;
 
 	bool                        m_double_buffer;
 	uint32_t                    m_style;
