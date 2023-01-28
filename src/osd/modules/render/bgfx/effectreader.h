@@ -6,10 +6,10 @@
 //
 //============================================================
 
-#pragma once
+#ifndef MAME_RENDER_BGFX_EFFECTREADER_H
+#define MAME_RENDER_BGFX_EFFECTREADER_H
 
-#ifndef __DRAWBGFX_EFFECT_READER__
-#define __DRAWBGFX_EFFECT_READER__
+#pragma once
 
 #include "statereader.h"
 
@@ -26,16 +26,16 @@ class shader_manager;
 class effect_reader : public state_reader
 {
 public:
-	static bgfx_effect *read_from_value(std::string name, const Value& value, std::string prefix, osd_options &options, shader_manager& shaders);
-	static bool validate_value(const Value& value, std::string prefix, osd_options &options);
+	static bgfx_effect *read_from_value(std::string name, const Value& value, const std::string &prefix, osd_options &options, shader_manager& shaders);
+	static bool validate_value(const Value& value, const std::string &prefix, osd_options &options);
 
 private:
-	static bool get_base_effect_data(const Value& value, std::string &prefix, uint64_t &flags, std::string &vertex_name, std::string &fragment_name,
+	static bool get_base_effect_data(const Value& value, const std::string &prefix, uint64_t &flags, std::string &vertex_name, std::string &fragment_name,
 		std::vector<bgfx_uniform *> &uniforms);
 	static bool get_shader_data(const Value& value, osd_options &options, shader_manager &shaders, std::string &vertex_name, bgfx::ShaderHandle &vertex_shader,
 		std::string &fragment_name, bgfx::ShaderHandle &fragment_shader);
 	static void clear_uniform_list(std::vector<bgfx_uniform *> &uniforms);
-	static bool validate_parameters(const Value& value, std::string prefix);
+	static bool validate_parameters(const Value& value, const std::string &prefix);
 };
 
-#endif // __DRAWBGFX_EFFECT_READER__
+#endif // MAME_RENDER_BGFX_EFFECTREADER_H

@@ -27,15 +27,24 @@
 #include "clear.h"
 #include "modules/osdwindow.h"
 
-bgfx_chain::bgfx_chain(std::string name, std::string author, bool transform, target_manager& targets, std::vector<bgfx_slider*> sliders, std::vector<bgfx_parameter*> params, std::vector<bgfx_chain_entry*> entries, std::vector<bgfx_target*> target_list, std::uint32_t screen_index)
-	: m_name(name)
-	, m_author(author)
+bgfx_chain::bgfx_chain(
+		std::string &&name,
+		std::string &&author,
+		bool transform,
+		target_manager& targets,
+		std::vector<bgfx_slider*> &&sliders,
+		std::vector<bgfx_parameter*> &&params,
+		std::vector<bgfx_chain_entry*> &&entries,
+		std::vector<bgfx_target*> &&target_list,
+		std::uint32_t screen_index)
+	: m_name(std::move(name))
+	, m_author(std::move(author))
 	, m_transform(transform)
 	, m_targets(targets)
-	, m_sliders(sliders)
-	, m_params(params)
-	, m_entries(entries)
-	, m_target_list(target_list)
+	, m_sliders(std::move(sliders))
+	, m_params(std::move(params))
+	, m_entries(std::move(entries))
+	, m_target_list(std::move(target_list))
 	, m_current_time(0)
 	, m_screen_index(screen_index)
 	, m_has_converter(false)

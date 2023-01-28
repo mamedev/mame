@@ -9,10 +9,10 @@
 //
 //============================================================
 
-#pragma once
+#ifndef MAME_RENDER_BGFX_VALUEUNIFORM_H
+#define MAME_RENDER_BGFX_VALUEUNIFORM_H
 
-#ifndef __DRAWBGFX_VALUE_UNIFORM__
-#define __DRAWBGFX_VALUE_UNIFORM__
+#pragma once
 
 #include "entryuniform.h"
 
@@ -28,4 +28,4 @@ private:
 	const int   m_count;
 };
 
-#endif // __DRAWBGFX_VALUE_UNIFORM__
+#endif // MAME_RENDER_BGFX_VALUEUNIFORM_H

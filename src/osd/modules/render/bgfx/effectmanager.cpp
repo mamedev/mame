@@ -39,7 +39,7 @@ static bool prepare_effect_document(std::string &name, osd_options &options, rap
 	bx::FileReader reader;
 	if (!bx::open(&reader, path.c_str()))
 	{
-		osd_printf_error("Unable to open effect file %s\n", path.c_str());
+		osd_printf_error("Unable to open effect file %s\n", path);
 		return false;
 	}
 
@@ -57,8 +57,8 @@ static bool prepare_effect_document(std::string &name, osd_options &options, rap
 	if (document.HasParseError())
 	{
 		std::string error(rapidjson::GetParseError_En(document.GetParseError()));
-		osd_printf_error("Unable to parse effect %s. Errors returned:\n", path.c_str());
-		osd_printf_error("%s\n", error.c_str());
+		osd_printf_error("Unable to parse effect %s. Errors returned:\n", path);
+		osd_printf_error("%s\n", error);
 		return false;
 	}
 
@@ -97,7 +97,7 @@ bgfx_effect* effect_manager::load_effect(osd_options &options, std::string name)
 
 	if (effect == nullptr)
 	{
-		osd_printf_error("Unable to load effect %s\n", name.c_str());
+		osd_printf_error("Unable to load effect %s\n", name);
 		return nullptr;
 	}
 
