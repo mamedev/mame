@@ -225,6 +225,8 @@ private:
 	uint32_t screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
+	INTERRUPT_GEN_MEMBER(testirq);
+
 	uint32_t leapster_180207b_r();
 	uint32_t leapster_1809004_r();
 	uint32_t leapster_180b004_r();
@@ -410,6 +412,11 @@ void leapster_state::leapster_aux(address_map &map)
 	map(0x00000004b, 0x00000004b).w(FUNC(leapster_state::leapster_aux004b_w));
 }
 
+INTERRUPT_GEN_MEMBER(leapster_state::testirq)
+{
+	m_maincpu->set_input_line(0, ASSERT_LINE);
+}
+
 void leapster_state::leapster(machine_config &config)
 {
 	// Basic machine hardware
@@ -418,6 +425,7 @@ void leapster_state::leapster(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &leapster_state::leapster_map);
 	m_maincpu->set_addrmap(AS_IO, &leapster_state::leapster_aux);
 	m_maincpu->set_default_vector_base(0x40000000);
+	m_maincpu->set_vblank_int("screen", FUNC(leapster_state::testirq));
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));

@@ -21,12 +21,32 @@ so don't require special logic further in the opcode handler.
 It is possible this is how the CPU works internally.
 
 */
+void arcompact_device::check_interrupts()
+{
+	if (m_irq_pending)
+	{
+		if (m_status32 & 0x00000006)
+		{
+			logerror("HACK/TEST IRQ\n");
+			int vector = 3;
+			m_pc = m_INTVECTORBASE + vector * 8;
+			m_irq_pending = 0;
+			debugreg_clear_ZZ();
+			standard_irq_callback_member(*this, 0);
+		}
+	}
+}
 
 void arcompact_device::execute_run()
 {
 	while (m_icount > 0)
 	{
 		debugger_instruction_hook(m_pc);
+
+		if (!m_delayactive)
+		{
+			check_interrupts();
+		}
 
 		// make sure CPU isn't in 'SLEEP' mode
 		if (!debugreg_check_ZZ())

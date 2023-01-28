@@ -228,6 +228,8 @@ void arcompact_device::device_start()
 		state_add(i, arcompact_disassembler::regnames[i-0x100], m_debugger_temp).callimport().callexport().formatstr("%08X");
 	}
 
+	m_irq_pending = false;
+
 	set_icountptr(m_icount);
 
 	save_item(NAME(m_INTVECTORBASE));
@@ -311,6 +313,7 @@ void arcompact_device::device_reset()
 
 	m_delayactive = 0;
 	m_delayjump = 0x00000000;
+	m_irq_pending = false;
 
 	for (auto & elem : m_regs)
 		elem = 0;
@@ -336,6 +339,10 @@ void arcompact_device::device_reset()
 
 void arcompact_device::execute_set_input(int irqline, int state)
 {
+	if (state == ASSERT_LINE)
+		m_irq_pending = true;
+	else
+		m_irq_pending = false;
 }
 
 /*****************************************************************************/
@@ -1622,6 +1629,9 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 					case 0x06:
 					{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Extended Arithmetic (optional on ARCtangent-A5, ARC600, built in on ARC700)
+// ADDS - Add and Saturate
+//
 // ADDS<.f> a,b,c                  0010 1bbb 0000 0110   FBBB CCCC CCAA AAAA
 // ADDS<.f> a,b,u6                 0010 1bbb 0100 0110   FBBB uuuu uuAA AAAA
 // ADDS<.f> b,b,s12                0010 1bbb 1000 0110   FBBB ssss ssSS SSSS
@@ -1641,6 +1651,9 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 					case 0x07:
 					{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Extended Arithmetic (optional on ARCtangent-A5, ARC600, built in on ARC700)
+// SUBS - Subtract and Saturate
+//
 // SUBS<.f> a,b,c                  0010 1bbb 0000 0111   FBBB CCCC CCAA AAAA
 // SUBS<.f> a,b,u6                 0010 1bbb 0100 0111   FBBB uuuu uuAA AAAA
 // SUBS<.f> b,b,s12                0010 1bbb 1000 0111   FBBB ssss ssSS SSSS
@@ -1660,6 +1673,9 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 					case 0x08:
 					{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Extended Arithmetic (optional on ARCtangent-A5, ARC600, built in on ARC700)
+// DIVAW - Division Assist
+// 						   
 // DIVAW a,b,c                     0010 1bbb 0000 1000   0BBB CCCC CCAA AAAA
 // DIVAW a,b,u6                    0010 1bbb 0100 1000   0BBB uuuu uuAA AAAA
 // DIVAW b,b,s12                   0010 1bbb 1000 1000   0BBB ssss ssSS SSSS
@@ -1678,6 +1694,9 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 					case 0x0a:
 					{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Extended Arithmetic (optional ARCtangent-A5, ARC600, built in on ARC700)
+// ASLS - Arithmetic Shift Left and Saturate (with negative shift value support)
+//
 //                                 IIII I      SS SSSS
 // ASLS<.f> a,b,c                  0010 1bbb 0000 1010   FBBB CCCC CCAA AAAA
 // ASLS<.f> a,b,u6                 0010 1bbb 0100 1010   FBBB uuuu uuAA AAAA
@@ -1696,6 +1715,9 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 					case 0x0b:
 					{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Extended Arithmetic (optional ARCtangent-A5, ARC600, built in on ARC700)
+// ASRS - Arithmetic Shift Right and Saturate (with negative shift value support)
+//
 // ASRS<.f> a,b,c                  0010 1bbb 0000 1011   FBBB CCCC CCAA AAAA
 // ASRS<.f> a,b,u6                 0010 1bbb 0100 1011   FBBB uuuu uuAA AAAA
 // ASRS<.f> b,b,s12                0010 1bbb 1000 1011   FBBB ssss ssSS SSSS
@@ -1714,6 +1736,9 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 					case 0x28:
 					{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Extended Arithmetic (optional ARCtangent-A5, ARC600, built in on ARC700)
+// ADDSDW - Dual 16-bit Add and Saturate
+// 
 // ADDSDW<.f> a,b,c                0010 1bbb 0010 1000   FBBB CCCC CCAA AAAA
 // ADDSDW<.f> a,b,u6               0010 1bbb 0110 1000   FBBB uuuu uuAA AAAA
 // ADDSDW<.f> b,b,s12              0010 1bbb 1010 1000   FBBB ssss ssSS SSSS
@@ -1732,6 +1757,9 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 					case 0x29:
 					{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Extended Arithmetic (optional ARCtangent-A5, ARC600, built in on ARC700)
+// SUBSDW - Dual 16-bit Subtract and Saturate
+//
 // SUBSDW<.f> a,b,c                0010 1bbb 0010 1001   FBBB CCCC CCAA AAAA
 // SUBSDW<.f> a,b,u6               0010 1bbb 0110 1001   FBBB uuuu uuAA AAAA
 // SUBSDW<.f> b,b,s12              0010 1bbb 1010 1001   FBBB ssss ssSS SSSS
