@@ -494,7 +494,7 @@ public:
 		for (int button = 0; button < m_button_count; button++)
 		{
 			input_item_id const itemid = input_item_id(ITEM_ID_BUTTON1 + button);
-			device.add_item(default_button_name(button), std::string_view(), itemid, generic_button_get_state<std::int32_t>, &m_lightgun.buttons[button]);
+			device.add_item(default_button_name(button), itemid, generic_button_get_state<std::int32_t>, &m_lightgun.buttons[button]);
 		}
 
 		// Add X and Y axis
