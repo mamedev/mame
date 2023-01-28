@@ -90,13 +90,13 @@ void main()
   weights=weights+scanlineWeights(abs(uv_ratio.y), col)/3.0;
   weights2=weights2+scanlineWeights(abs(1.0-uv_ratio.y), col2)/3.0;
 #endif
-  vec3 mul_res  = (col * weights + col2 * weights2).rgb * vec3_splat(cval);
+  vec4 mul_res  = col * weights + col2 * weights2 * vec4_splat(cval);
 
   // Shadow mask
-  vec3 cout = apply_shadow_mask(v_texCoord.xy, mul_res);
+  vec3 cout = apply_shadow_mask(v_texCoord.xy, mul_res.rgb);
 
   // Convert the image gamma for display on our output device.
   cout = linear_to_output(cout);
 
-  gl_FragColor = vec4(cout,1.0);
+  gl_FragColor = vec4(cout,mul_res.a);
 }

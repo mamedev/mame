@@ -37,7 +37,7 @@ bgfx_uniform* uniform_reader::read_from_value(const Value& value, std::string pr
 	unsigned int index = 0;
 	for (; index < type_size / 4 && index < value_array.Size(); index++)
 	{
-		data[index] = (float)value_array[index].GetDouble();
+		data[index] = float(value_array[index].GetDouble());
 	}
 
 	for (; index < type_size / 4; index++)
@@ -45,7 +45,7 @@ bgfx_uniform* uniform_reader::read_from_value(const Value& value, std::string pr
 		data[index] = 0.0f;
 	}
 
-	auto* uniform = new bgfx_uniform(name, type);
+	bgfx_uniform* uniform = new bgfx_uniform(name, type);
 	uniform->set((void*)data, type_size);
 	delete [] data;
 

@@ -42,7 +42,6 @@
 	"passes": [
 		{
 			"effect": "xbr/xbr-lv3-multipass/xbr-lv3-pass0",
-			"applytint": true,
 			"name": "Pass 0",
 			"input": [
 				{ "sampler": "decal", "texture": "screen" }

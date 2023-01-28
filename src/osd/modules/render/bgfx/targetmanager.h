@@ -30,12 +30,13 @@ public:
 	target_manager(texture_manager& textures);
 	~target_manager();
 
-	bgfx_target* create_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint32_t style, bool double_buffer, bool filter, uint16_t scale, uint32_t screen);
+	bgfx_target* create_target(std::string name, bgfx::TextureFormat::Enum format, uint16_t width, uint16_t height, uint16_t xprescale, uint16_t yprescale,
+		uint32_t style, bool double_buffer, bool filter, uint16_t scale, uint32_t screen);
 	void destroy_target(std::string name, uint32_t screen = -1);
 	bgfx_target* create_backbuffer(void *handle, uint16_t width, uint16_t height);
 
-	bool update_target_sizes(uint32_t screen, uint16_t width, uint16_t height, uint32_t style);
-	void update_screen_count(uint32_t count);
+	bool update_target_sizes(uint32_t screen, uint16_t width, uint16_t height, uint32_t style, uint16_t user_prescale, uint16_t max_prescale_size);
+	void update_screen_count(uint32_t count, uint16_t user_prescale, uint16_t max_prescale_size);
 
 	// Getters
 	bgfx_target* target(uint32_t screen, std::string name);
@@ -43,8 +44,8 @@ public:
 	uint16_t height(uint32_t style, uint32_t screen);
 
 private:
-	void rebuild_targets(uint32_t screen, uint32_t style);
-	void create_target_if_nonexistent(uint32_t screen, std::string name, bool double_buffered, bool filter, uint32_t style);
+	void rebuild_targets(uint32_t screen, uint32_t style, uint16_t user_prescale, uint16_t max_prescale_size);
+	void create_output_if_nonexistent(uint32_t screen, uint16_t user_prescale, uint16_t max_prescale_size);
 
 	std::map<std::string, bgfx_target*> m_targets;
 	texture_manager& m_textures;

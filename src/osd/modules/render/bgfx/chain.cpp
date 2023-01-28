@@ -78,7 +78,7 @@ void bgfx_chain::repopulate_targets()
 	}
 }
 
-void bgfx_chain::process(chain_manager::screen_prim &prim, int view, int screen, texture_manager& textures, osd_window& window, uint64_t blend)
+void bgfx_chain::process(chain_manager::screen_prim &prim, int view, int screen, texture_manager& textures, osd_window& window)
 {
 	screen_device_enumerator screen_iterator(window.machine().root_device());
 	screen_device* screen_device = screen_iterator.byindex(screen);
@@ -108,11 +108,12 @@ void bgfx_chain::process(chain_manager::screen_prim &prim, int view, int screen,
 	}
 
 	int current_view = view;
-	for (bgfx_chain_entry* entry : m_entries)
+	for (size_t i = 0; i < m_entries.size(); i++)
 	{
-		if (!entry->skip())
+		if (!m_entries[i]->skip())
 		{
-			entry->submit(current_view, prim, textures, screen_count, screen_width, screen_height, screen_scale_x, screen_scale_y, screen_offset_x, screen_offset_y, rotation_type, swap_xy, blend, screen);
+			m_entries[i]->submit(current_view, prim, textures, screen_count, screen_width, screen_height, screen_scale_x, screen_scale_y, screen_offset_x, screen_offset_y,
+				rotation_type, swap_xy, screen);
 			current_view++;
 		}
 	}
@@ -145,7 +146,7 @@ uint32_t bgfx_chain::applicable_passes()
 	return applicable_passes;
 }
 
-void bgfx_chain::insert_effect(uint32_t index, bgfx_effect *effect, std::string name, std::string source, chain_manager &chains)
+void bgfx_chain::insert_effect(uint32_t index, bgfx_effect *effect, const bool apply_tint, std::string name, std::string source, chain_manager &chains)
 {
 	auto *clear = new clear_state(BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH | BGFX_CLEAR_STENCIL, 0, 1.0f, 0);
 	std::vector<bgfx_suppressor*> suppressors;
@@ -164,11 +165,15 @@ void bgfx_chain::insert_effect(uint32_t index, bgfx_effect *effect, std::string 
 	uniforms.push_back(new bgfx_value_uniform(new bgfx_uniform("u_tex_size1", bgfx::UniformType::Vec4), values, 4));
 	uniforms.push_back(new bgfx_value_uniform(new bgfx_uniform("u_inv_tex_size0", bgfx::UniformType::Vec4), values, 4));
 	uniforms.push_back(new bgfx_value_uniform(new bgfx_uniform("u_inv_tex_size1", bgfx::UniformType::Vec4), values, 4));
+	uniforms.push_back(new bgfx_value_uniform(new bgfx_uniform("u_tex_bounds0", bgfx::UniformType::Vec4), values, 4));
+	uniforms.push_back(new bgfx_value_uniform(new bgfx_uniform("u_tex_bounds1", bgfx::UniformType::Vec4), values, 4));
+	uniforms.push_back(new bgfx_value_uniform(new bgfx_uniform("u_inv_tex_bounds0", bgfx::UniformType::Vec4), values, 4));
+	uniforms.push_back(new bgfx_value_uniform(new bgfx_uniform("u_inv_tex_bounds1", bgfx::UniformType::Vec4), values, 4));
 
-	m_entries.insert(m_entries.begin() + index, new bgfx_chain_entry(name, effect, clear, suppressors, inputs, uniforms, m_targets, "screen", false));
+	m_entries.insert(m_entries.begin() + index, new bgfx_chain_entry(name, effect, clear, suppressors, inputs, uniforms, m_targets, "screen", apply_tint));
 
 	const uint32_t screen_width = chains.targets().width(TARGET_STYLE_GUEST, m_screen_index);
 	const uint32_t screen_height = chains.targets().height(TARGET_STYLE_GUEST, m_screen_index);
 	m_targets.destroy_target("screen", m_screen_index);
-	m_targets.create_target("screen", bgfx::TextureFormat::BGRA8, screen_width, screen_height, TARGET_STYLE_GUEST, true, false, 1, m_screen_index);
+	m_targets.create_target("screen", bgfx::TextureFormat::BGRA8, screen_width, screen_height, 1, 1, TARGET_STYLE_GUEST, true, false, 1, m_screen_index);
 }

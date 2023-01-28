@@ -23,6 +23,7 @@ public:
 	virtual bgfx::TextureHandle texture() const = 0;
 	virtual bool is_target() const = 0;
 	virtual uint16_t width() const = 0;
+	virtual uint16_t width_margin() const = 0;
 	virtual uint16_t height() const = 0;
 	virtual uint16_t rowpixels() const = 0;
 	virtual int width_div_factor() const = 0;
