@@ -881,7 +881,6 @@ private:
 	uint32_t arcompact_handle04_2f_helper(uint32_t op, const char* optext);
 	uint32_t arcompact_handle04_3x_helper(uint32_t op, int dsize, int extend);
 	uint32_t arcompact_handle05_2f_0x_helper(uint32_t op, const char* optext);
-	uint32_t arcompact_handle0f_0x_helper(uint16_t op, const char* optext, int nodst);
 	uint32_t arcompact_handle19_0x_helper(uint16_t op, const char* optext, int shift, int format);
 
 	uint32_t handle_jump_to_addr(bool delay, bool link, uint32_t address, uint32_t next_addr);

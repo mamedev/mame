@@ -4,12 +4,6 @@
 #include "emu.h"
 #include "arcompact.h"
 
-uint32_t arcompact_device::arcompact_handle0f_0x_helper(uint16_t op, const char* optext, int nodst)
-{
-	arcompact_log("unimplemented %s %04x (0xf_0x group)", optext, op);
-	return m_pc + 2;
-}
-
 // #######################################################################################################################
 //                                 IIII I       S SSSS
 // SUB_S b,b,c                     0111 1bbb ccc0 0010
@@ -119,7 +113,14 @@ uint32_t arcompact_device::handleop_MUL64_S_0_b_c(uint16_t op)
 
 uint32_t arcompact_device::handleop_SEXB_S_b_c(uint16_t op)
 {
-	return arcompact_handle0f_0x_helper(op, "SEXB_S",0);
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint8_t creg = expand_reg(common16_get_creg(op));
+	uint32_t source = m_regs[creg];
+	uint32_t result = source & 0x000000ff;
+	if (source & 0x00000080)
+		result |= 0xffffff00;
+	m_regs[breg] = result;
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -129,7 +130,14 @@ uint32_t arcompact_device::handleop_SEXB_S_b_c(uint16_t op)
 
 uint32_t arcompact_device::handleop_SEXW_S_b_c(uint16_t op)
 {
-	return arcompact_handle0f_0x_helper(op, "SEXW_S",0);
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint8_t creg = expand_reg(common16_get_creg(op));
+	uint32_t source = m_regs[creg];
+	uint32_t result = source & 0x0000ffff;
+	if (source & 0x00008000)
+		result |= 0xffff0000;
+	m_regs[breg] = result;
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -167,7 +175,18 @@ uint32_t arcompact_device::handleop_EXTW_S_b_c(uint16_t op)
 
 uint32_t arcompact_device::handleop_ABS_S_b_c(uint16_t op)
 {
-	return arcompact_handle0f_0x_helper(op, "ABS_S",0);
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint8_t creg = expand_reg(common16_get_creg(op));
+	uint32_t source = m_regs[creg];
+	uint32_t result;
+	if (source & 0x80000000)
+		result = 0x80000000 - (source & 0x7fffffff);
+	else
+		result = source;
+
+	m_regs[breg] = result;
+	return m_pc + 2;
+
 }
 
 // #######################################################################################################################
@@ -246,7 +265,11 @@ uint32_t arcompact_device::handleop_ADD3_S_b_b_c(uint16_t op)
 
 uint32_t arcompact_device::handleop_ASL_S_b_b_c_multiple(uint16_t op)
 {
-	return arcompact_handle0f_0x_helper(op, "ASL_S",0);
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint8_t creg = expand_reg(common16_get_creg(op));
+	uint32_t result = m_regs[breg] << (m_regs[creg]&0x1f);
+	m_regs[breg] = result;
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -270,7 +293,15 @@ uint32_t arcompact_device::handleop_LSR_S_b_b_c_multiple(uint16_t op)
 
 uint32_t arcompact_device::handleop_ASR_S_b_b_c_multiple(uint16_t op)
 {
-	return arcompact_handle0f_0x_helper(op, "ASR_S",0);
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint8_t creg = expand_reg(common16_get_creg(op));
+	uint32_t source = m_regs[breg];
+	uint32_t source2 = m_regs[creg];
+	uint32_t result = source >> (source2 & 0x1f);
+	if (source & 0x80000000)
+		result |= 0xffffffff << (31 - (source2 & 0x1f));
+	m_regs[breg] = result;
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -294,7 +325,14 @@ uint32_t arcompact_device::handleop_ASL_S_b_c_single(uint16_t op)
 
 uint32_t arcompact_device::handleop_ASR_S_b_c_single(uint16_t op)
 {
-	return arcompact_handle0f_0x_helper(op, "ASR1_S",0);
+	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint8_t creg = expand_reg(common16_get_creg(op));
+	uint32_t source = m_regs[creg];
+	uint32_t result = source >> 1;
+	if (source & 0x80000000)
+		result |= 0x80000000;
+	m_regs[breg] = result;
+	return m_pc + 2;
 }
 
 // #######################################################################################################################

@@ -227,6 +227,7 @@ private:
 
 	uint32_t leapster_180207b_r();
 	uint32_t leapster_1809004_r();
+	uint32_t leapster_180b004_r();
 	uint32_t leapster_180d803_r();
 
 	void leapster_aux0047_w(uint32_t data);
@@ -326,6 +327,13 @@ uint32_t leapster_state::leapster_1809004_r()
 	return 0xffffffff;
 }
 
+uint32_t leapster_state::leapster_180b004_r()
+{
+	// leapster2 BIOS checks if this is 0
+	logerror("%s: leapster_180b004_r\n", machine().describe_context());
+	return 0xffffffff;
+}
+
 uint32_t leapster_state::leapster_180d803_r()
 {
 	logerror("%s: leapster_180d803_r\n", machine().describe_context());
@@ -370,9 +378,15 @@ void leapster_state::machine_reset()
 
 void leapster_state::leapster_map(address_map &map)
 {
+//  A vector table is copied from 0x00000000 to 0x3c000000, but it is unclear if that is a BIOS mirror
+// 	or if it should be copying a different table.
+
 //	map(0x01800000, 0x0180ffff).ram();
 	map(0x01802078, 0x0180207b).r(FUNC(leapster_state::leapster_180207b_r));
 	map(0x01809004, 0x01809007).r(FUNC(leapster_state::leapster_1809004_r));
+
+	map(0x0180b004, 0x0180b007).r(FUNC(leapster_state::leapster_180b004_r));
+
 	map(0x0180d800, 0x0180d803).r(FUNC(leapster_state::leapster_180d803_r));
 	
 	map(0x03000000, 0x030007ff).ram(); // puts stack here, writes a pointer @ 0x03000000 on startup
