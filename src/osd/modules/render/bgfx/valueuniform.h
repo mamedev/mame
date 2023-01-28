@@ -19,7 +19,7 @@
 class bgfx_value_uniform : public bgfx_entry_uniform
 {
 public:
-	bgfx_value_uniform(bgfx_uniform* uniform, float* values, const int count);
+	bgfx_value_uniform(bgfx_uniform* uniform, const float* values, const int count);
 
 	virtual void bind() override;
 
