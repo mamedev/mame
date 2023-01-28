@@ -230,7 +230,8 @@ private:
 	uint32_t leapster_180207b_r();
 	uint32_t leapster_1809004_r();
 	uint32_t leapster_180b004_r();
-	uint32_t leapster_180d803_r();
+	uint32_t leapster_180d400_r();
+	uint32_t leapster_180d800_r();
 
 	void leapster_aux0047_w(uint32_t data);
 	uint32_t leapster_aux0048_r(void);
@@ -336,9 +337,16 @@ uint32_t leapster_state::leapster_180b004_r()
 	return 0xffffffff;
 }
 
-uint32_t leapster_state::leapster_180d803_r()
+uint32_t leapster_state::leapster_180d400_r()
 {
-	logerror("%s: leapster_180d803_r\n", machine().describe_context());
+	logerror("%s: leapster_180d400_r\n", machine().describe_context());
+	//does a BRLO.ND against 30d400
+	return 0x0030d400;
+}
+
+uint32_t leapster_state::leapster_180d800_r()
+{
+	logerror("%s: leapster_180d800_r\n", machine().describe_context());
 	return machine().rand() | (machine().rand()<<16);
 }
 
@@ -389,7 +397,9 @@ void leapster_state::leapster_map(address_map &map)
 
 	map(0x0180b004, 0x0180b007).r(FUNC(leapster_state::leapster_180b004_r));
 
-	map(0x0180d800, 0x0180d803).r(FUNC(leapster_state::leapster_180d803_r));
+	map(0x0180d400, 0x0180d403).r(FUNC(leapster_state::leapster_180d400_r));
+
+	map(0x0180d800, 0x0180d803).r(FUNC(leapster_state::leapster_180d800_r));
 	
 	map(0x03000000, 0x030007ff).ram(); // puts stack here, writes a pointer @ 0x03000000 on startup
 	map(0x03000800, 0x0300ffff).ram(); // some of the later models need to store stack values here (or code execution has gone wrong?)
@@ -398,6 +408,7 @@ void leapster_state::leapster_map(address_map &map)
 	map(0x40000000, 0x407fffff).rom().region("maincpu", 0);
 	// map(0x80000000, 0x807fffff).bankr("cartrom"); // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here - installed if a cart is present
 }
+
 
 void leapster_state::leapster_aux(address_map &map)
 {

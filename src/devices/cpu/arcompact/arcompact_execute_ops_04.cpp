@@ -811,8 +811,8 @@ void arcompact_device::handleop32_FLAG_do_op(uint32_t source)
 	if (!(source & 0x0001)) // H means ignore all others
 	{
 		// privileged  mode only
-		//(source & 0x0002) ? SET_E1 : CLEAR_E1
-		//(source & 0x0004) ? SET_E2 : CLEAR_E2
+		if (source & 0x0002) { status32_set_e1(); } else { status32_clear_e1(); }
+		if (source & 0x0004) { status32_set_e2(); } else { status32_clear_e2(); }
 		//(source & 0x0008)
 		//(source & 0x0010)
 		//(source & 0x0020)

@@ -103,6 +103,8 @@ private:
 	const static int REG_MHI      = 0x3b; // r59 - multiply high 32-bits (of 64-bit result)
 	const static int REG_LP_COUNT = 0x3c; // r60
 
+	const static uint32_t E1_FLAG = 0x00000002;
+	const static uint32_t E2_FLAG = 0x00000004;
 
 	const static uint32_t V_OVERFLOW_FLAG = 0x00000100;
 	const static uint32_t C_CARRY_FLAG = 0x00000200;
@@ -281,6 +283,14 @@ private:
 	{
 		return op & 0x0000001f;
 	}
+
+	void status32_set_e1(void) { m_status32 |= E1_FLAG; }
+	void status32_clear_e1(void) { m_status32 &= ~E1_FLAG; }
+	bool status32_check_e1(void) { return (m_status32 & E1_FLAG ? true : false); }
+
+	void status32_set_e2(void) { m_status32 |= E2_FLAG; }
+	void status32_clear_e2(void) { m_status32 &= ~E2_FLAG; }
+	bool status32_check_e2(void) { return (m_status32 & E2_FLAG ? true : false); }
 
 	// V = overflow (set if signed operation would overflow)
 	void status32_set_v(void) { m_status32 |= V_OVERFLOW_FLAG; }
