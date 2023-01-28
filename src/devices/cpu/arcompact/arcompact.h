@@ -691,9 +691,9 @@ private:
 	static uint32_t handleop32_RLC_do_op(void* obj, uint32_t src, uint8_t set_flags);
 
 	uint32_t handleop32_RRC(uint32_t op);
-	uint32_t handleop32_SEXB(uint32_t op);
-	uint32_t handleop32_SEXW(uint32_t op);
-	uint32_t handleop32_ABS(uint32_t op);
+	static uint32_t handleop32_SEXB_do_op(void* obj, uint32_t src, uint8_t set_flags);
+	static uint32_t handleop32_SEXW_do_op(void* obj, uint32_t src, uint8_t set_flags);
+	static uint32_t handleop32_ABS_do_op(void* obj, uint32_t src, uint8_t set_flags);
 	uint32_t handleop32_NOT(uint32_t op);
 	uint32_t handleop32_EX(uint32_t op);
 
@@ -743,7 +743,7 @@ private:
 	uint32_t handleop32_ABSS(uint32_t op);
 	uint32_t handleop32_NEGSW(uint32_t op);
 	uint32_t handleop32_NEGS(uint32_t op);
-	uint32_t handleop32_NORMW(uint32_t op);
+	static uint32_t handleop32_NORMW_do_op(void* obj, uint32_t src, uint8_t set_flags);
 
 	uint32_t handleop32_ARC_EXT06(uint32_t op);
 	uint32_t handleop32_USER_EXT07(uint32_t op);

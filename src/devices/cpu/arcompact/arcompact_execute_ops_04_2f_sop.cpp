@@ -148,9 +148,15 @@ uint32_t arcompact_device::handleop32_RRC(uint32_t op)
 // SEXB<.f> 0,limm                 0010 0110 0010 1111   F111 1111 1000 0101 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_SEXB(uint32_t op)
+uint32_t arcompact_device::handleop32_SEXB_do_op(void* obj, uint32_t src, uint8_t set_flags)
 {
-	return arcompact_handle04_2f_helper(op, "SEXB");
+	//arcompact_device* o = (arcompact_device*)obj;
+	uint32_t result = src & 0x000000ff;
+	if (src & 0x00000080)
+		result |= 0xffffff00;
+	if (set_flags)
+		arcompact_fatal("handleop32_SEXB (F set)\n"); // not yet supported
+	return result;
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -164,9 +170,15 @@ uint32_t arcompact_device::handleop32_SEXB(uint32_t op)
 // SEXW<.f> 0,limm                 0010 0110 0010 1111   F111 1111 1000 0110 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_SEXW(uint32_t op)
+uint32_t arcompact_device::handleop32_SEXW_do_op(void* obj, uint32_t src, uint8_t set_flags)
 {
-	return arcompact_handle04_2f_helper(op, "SEXW");
+	//arcompact_device* o = (arcompact_device*)obj;
+	uint32_t result = src & 0x0000ffff;
+	if (src & 0x00008000)
+		result |= 0xffff0000;
+	if (set_flags)
+		arcompact_fatal("handleop32_SEXW (F set)\n"); // not yet supported
+	return result;
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -225,9 +237,19 @@ uint32_t arcompact_device::handleop32_EXTW_do_op(void* obj, uint32_t src, uint8_
 // ABS<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 1001 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ABS(uint32_t op)
+uint32_t arcompact_device::handleop32_ABS_do_op(void* obj, uint32_t src, uint8_t set_flags)
 {
-	return arcompact_handle04_2f_helper(op, "ABS");
+	//arcompact_device* o = (arcompact_device*)obj;
+	uint32_t result;
+	if (src & 0x80000000)
+		result = 0x80000000 - (src & 0x7fffffff);
+	else
+		result = src;
+
+	if (set_flags)
+		arcompact_fatal("handleop32_ABS (F set)\n"); // not yet supported
+
+	return result;
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

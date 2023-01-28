@@ -1321,7 +1321,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // SEXB<.f> 0,u6                   0010 0110 0110 1111   F111 uuuu uu00 0101
 // SEXB<.f> 0,limm                 0010 0110 0010 1111   F111 1111 1000 0101 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								return handleop32_SEXB(op);  // SEXB
+								return handleop32_general_SOP_group(op, handleop32_SEXB_do_op);  // SEXB
 							}
 							case 0x06:
 							{
@@ -1335,7 +1335,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // SEXW<.f> 0,u6                   0010 0110 0110 1111   F111 uuuu uu00 0110
 // SEXW<.f> 0,limm                 0010 0110 0010 1111   F111 1111 1000 0110 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								return handleop32_SEXW(op);  // SEXW
+								return handleop32_general_SOP_group(op, handleop32_SEXW_do_op);  // SEXW
 							}
 							case 0x07:
 							{
@@ -1377,7 +1377,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // ABS<.f> 0,u6                    0010 0110 0110 1111   F111 uuuu uu00 1001
 // ABS<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 1001 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								return handleop32_ABS(op);  // ABS
+								return handleop32_general_SOP_group(op, handleop32_ABS_do_op);  // ABS
 							}
 							case 0x0a:
 							{
@@ -1867,7 +1867,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // NORMW<.f> 0,u6                  0010 1110 0110 1111   F111 uuuu uu00 1000
 // NORMW<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 1000 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								return handleop32_NORMW(op);  // NORMW
+								return handleop32_general_SOP_group(op, handleop32_NORMW_do_op);  // NORMW
 							}
 							case 0x3f: // ZOPs (Zero Operand Opcodes)
 							{

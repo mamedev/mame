@@ -178,7 +178,26 @@ uint32_t arcompact_device::handleop32_NEGS(uint32_t op)
 // NORMW<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 1000 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_NORMW(uint32_t op)
+uint32_t arcompact_device::handleop32_NORMW_do_op(void* obj, uint32_t src, uint8_t set_flags)
 {
-	return arcompact_handle05_2f_0x_helper(op, "NORMW");
+	//arcompact_device* o = (arcompact_device*)obj;
+	uint32_t result;
+
+	uint32_t source = src;
+	if (source & 0x00008000)
+		source |= 0xffff0000;
+	else
+		source &= 0x0000ffff;
+
+	if ((source == 0x0000ffff) || (source == 0x00000000))
+		result = 0x0f;
+	else if (source & 0x00008000)
+		result = count_leading_ones_32(source) - 0x10;
+	else
+		result = count_leading_zeros_32(source) - 0x10;
+
+	if (set_flags)
+		arcompact_fatal("handleop32_NORMW (F set)\n"); // not yet supported
+
+	return result;
 }

@@ -138,7 +138,10 @@ uint32_t arcompact_device::handleop32_ASR_multiple_do_op(void* obj, uint32_t src
 // ROR<.cc><.f> 0,limm,c           0010 1110 1100 0011   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ROR_multiple(uint32_t op)  { return arcompact_handle05_helper(op, "ROR", 0,0); }
+uint32_t arcompact_device::handleop32_ROR_multiple(uint32_t op)
+{
+	return arcompact_handle05_helper(op, "ROR", 0, 0);
+}
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // 32 x 32 Signed Multiply
