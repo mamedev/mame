@@ -58,10 +58,10 @@ osd_module *osd_module_manager::select_module(const char *type, const char *name
 	return m;
 }
 
-void osd_module_manager::init(const osd_options &options)
+void osd_module_manager::init(osd_interface &osd, const osd_options &options)
 {
 	for (osd_module &m : m_selected)
-		m.init(options);
+		m.init(osd, options);
 }
 
 void osd_module_manager::exit()

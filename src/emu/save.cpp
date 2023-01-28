@@ -25,6 +25,8 @@
 #include "emu.h"
 #include "emuopts.h"
 
+#include "main.h"
+
 #include "util/coreutil.h"
 #include "util/ioprocs.h"
 #include "util/ioprocsfilter.h"

@@ -25,7 +25,7 @@ public:
 	}
 	virtual ~sound_none() { }
 
-	virtual int init(const osd_options &options) override { return 0; }
+	virtual int init(osd_interface &osd, const osd_options &options) override { return 0; }
 	virtual void exit() override { }
 
 	// sound_module

@@ -1,26 +1,29 @@
+// license:BSD-3-Clause
+// copyright-holders:Brad Hughes, Vas Crabb
 #ifndef MAME_OSD_INPUT_INPUT_XINPUT_H
 #define MAME_OSD_INPUT_INPUT_XINPUT_H
 
 #pragma once
 
-#include "input_windows.h"
+#include "input_common.h"
 
 #include "modules/lib/osdlib.h"
 
-#include <xinput.h>
-
 #include <memory>
+
+#include <xinput.h>
 
 
 namespace osd {
 
-class xinput_api_helper : public std::enable_shared_from_this<xinput_api_helper>
+class xinput_api_helper
 {
 public:
 	xinput_api_helper() { }
 
 	int initialize();
-	device_info *create_xinput_device(running_machine &machine, UINT index, wininput_module &module);
+
+	std::unique_ptr<device_info> create_xinput_device(UINT index, input_module_base &module);
 
 	DWORD xinput_get_state(DWORD dwUserindex, XINPUT_STATE *pState) const
 	{

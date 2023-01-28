@@ -47,7 +47,7 @@ public:
 	}
 	virtual ~sound_pa() { }
 
-	virtual int init(osd_options const &options) override;
+	virtual int init(osd_interface &osd, osd_options const &options) override;
 	virtual void exit() override;
 
 	// sound_module
@@ -177,7 +177,7 @@ private:
 #endif
 };
 
-int sound_pa::init(osd_options const &options)
+int sound_pa::init(osd_interface &osd, osd_options const &options)
 {
 	PaStreamParameters   stream_params;
 	const PaStreamInfo*  stream_info;

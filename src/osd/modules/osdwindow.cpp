@@ -8,8 +8,10 @@
 
 #include "emu.h"
 #include "osdwindow.h"
-#include "modules/lib/osdobj_common.h"
-#include "modules/monitor/monitor_module.h"
+
+// osd/modules
+#include "lib/osdobj_common.h"
+#include "monitor/monitor_module.h"
 
 #include "render/drawnone.h"
 #include "render/drawbgfx.h"
@@ -23,6 +25,10 @@
 #include "render/draw13.h"
 #include "render/drawsdl.h"
 #endif
+
+// emu
+#include "main.h"
+
 
 osd_window::osd_window(running_machine &machine, int index, std::shared_ptr<osd_monitor_info> monitor, const osd_window_config &config) :
 #ifdef OSD_WINDOWS

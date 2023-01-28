@@ -33,7 +33,7 @@ public:
 	}
 	virtual ~pm_module() { }
 
-	virtual int init(const osd_options &options)override;
+	virtual int init(osd_interface &osd, const osd_options &options) override;
 	virtual void exit() override;
 
 	virtual std::unique_ptr<osd_midi_device> create_midi_device() override;
@@ -73,7 +73,7 @@ std::unique_ptr<osd_midi_device> pm_module::create_midi_device()
 }
 
 
-int pm_module::init(const osd_options &options)
+int pm_module::init(osd_interface &osd, const osd_options &options)
 {
 	Pm_Initialize();
 	return 0;

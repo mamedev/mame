@@ -12,6 +12,7 @@
 #include "validity.h"
 
 #include "emuopts.h"
+#include "main.h"
 #include "romload.h"
 #include "speaker.h"
 #include "video/rgbutil.h"

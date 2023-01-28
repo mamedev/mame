@@ -6,7 +6,7 @@
 */
 
 #include "font_module.h"
-#include "modules/osdmodule.h"
+
 #include "modules/lib/osdlib.h"
 
 #if defined(OSD_WINDOWS)
@@ -681,7 +681,7 @@ public:
 		return true;
 	}
 
-	virtual int init(const osd_options &options) override
+	virtual int init(osd_interface &osd, const osd_options &options) override
 	{
 		HRESULT result;
 

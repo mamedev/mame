@@ -746,7 +746,7 @@ void renderer_d3d9::update_presentation_parameters()
 	m_presentation.MultiSampleType = D3DMULTISAMPLE_NONE;
 	m_presentation.SwapEffect = D3DSWAPEFFECT_DISCARD;
 	m_presentation.hDeviceWindow = std::static_pointer_cast<win_window_info>(win)->platform_window();
-	m_presentation.Windowed = !win->fullscreen() || win->win_has_menu();
+	m_presentation.Windowed = !win->fullscreen();
 	m_presentation.EnableAutoDepthStencil = FALSE;
 	m_presentation.AutoDepthStencilFormat = D3DFMT_D16;
 	m_presentation.Flags = 0;
@@ -1193,7 +1193,7 @@ int renderer_d3d9::config_adapter_mode()
 	auto win = assert_window();
 
 	// choose a resolution: window mode case
-	if (!win->fullscreen() || !video_config.switchres || win->win_has_menu())
+	if (!win->fullscreen() || !video_config.switchres)
 	{
 		RECT client;
 

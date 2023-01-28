@@ -638,50 +638,39 @@ input_code input_manager::code_from_itemid(input_item_id itemid) const
 std::string input_manager::code_name(input_code code) const
 {
 	// if nothing there, return an empty string
-	input_device_item *item = item_from_code(code);
-	if (item == nullptr)
+	input_device_item const *const item = item_from_code(code);
+	if (!item)
 		return std::string();
 
-	// determine the devclass part
-	const char *devclass = (*devclass_string_table)[code.device_class()];
-
-	// determine the devindex part
-	std::string devindex = string_format("%d", code.device_index() + 1);
-
-	// if we're unifying all devices, don't display a number
-	if (!m_class[code.device_class()]->multi())
-		devindex.clear();
+	std::string str;
 
 	// keyboard 0 doesn't show a class or index if it is the only one
-	input_device_class device_class = item->device().devclass();
-	if (device_class == DEVICE_CLASS_KEYBOARD && m_class[device_class]->maxindex() == 0)
+	input_device_class const device_class = item->device().devclass();
+	if ((device_class != DEVICE_CLASS_KEYBOARD) || (m_class[device_class]->maxindex() > 0))
 	{
-		devclass = "";
-		devindex.clear();
+		// determine the devclass part
+		str = (*devclass_string_table)[code.device_class()];
+
+		// if we're unifying all devices, don't display a number
+		if (m_class[code.device_class()]->multi())
+			str.append(util::string_format(" %d ", code.device_index() + 1));
+		else
+			str.append(" ");
 	}
 
-	// devcode part comes from the item name
-	std::string_view devcode = item->name();
+	// append item name - redundant with joystick switch left/right/up/down
+	if ((device_class != DEVICE_CLASS_JOYSTICK) || (code.item_class() == ITEM_CLASS_SWITCH))
+	{
+		if ((code.item_modifier() < ITEM_MODIFIER_LEFT) || (code.item_modifier() > ITEM_MODIFIER_DOWN))
+			str.append(item->name());
+	}
 
-	// determine the modifier part
-	const char *modifier = (*modifier_string_table)[code.item_modifier()];
-
-	// devcode is redundant with joystick switch left/right/up/down
-	if (device_class == DEVICE_CLASS_JOYSTICK && code.item_class() == ITEM_CLASS_SWITCH)
-		if (code.item_modifier() >= ITEM_MODIFIER_LEFT && code.item_modifier() <= ITEM_MODIFIER_DOWN)
-			devcode = std::string_view();
-
-	// concatenate the strings
-	std::string str(devclass);
-	if (!devindex.empty())
-		str.append(" ").append(devindex);
-	if (!devcode.empty())
-		str.append(" ").append(devcode);
-	if (modifier != nullptr)
+	// append the modifier
+	char const *const modifier = (*modifier_string_table)[code.item_modifier()];
+	if (modifier && *modifier)
 		str.append(" ").append(modifier);
 
-	// delete any leading spaces
-	return std::string(strtrimspace(str));
+	return str;
 }
 
 

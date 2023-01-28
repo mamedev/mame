@@ -15,8 +15,10 @@
 #include "drivenum.h"
 #include "emuopts.h"
 #include "fileio.h"
+#include "main.h"
 #include "softlist.h"
 
+// lib/util
 #include "corestr.h"
 #include "xmlfile.h"
 #include "zippath.h"

@@ -65,6 +65,7 @@ OSD-related Options
 | :ref:`lightgunprovider <mame-commandline-lightgunprovider>`
 | :ref:`joystickprovider <mame-commandline-joystickprovider>`
 | :ref:`midiprovider <mame-commandline-midiprovider>`
+| :ref:`networkprovider <mame-commandline-networkprovider>`
 
 
 OSD CLI Verbs

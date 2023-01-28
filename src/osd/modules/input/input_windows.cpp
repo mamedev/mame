@@ -12,6 +12,7 @@
 
 // MAME headers
 #include "emu.h"
+#include "inputdev.h"
 
 #include "input_windows.h"
 
@@ -25,51 +26,52 @@
 
 bool windows_osd_interface::should_hide_mouse() const
 {
-	bool hidemouse = false;
-	wininput_module *mod;
+	if (!winwindow_has_focus())
+		return false;
 
-	mod = dynamic_cast<wininput_module *>(m_keyboard_input);
-	if (mod) hidemouse |= mod->should_hide_mouse();
+	if (machine().paused())
+		return false;
 
-	mod = dynamic_cast<wininput_module *>(m_mouse_input);
-	if (mod) hidemouse |= mod->should_hide_mouse();
+	// track if mouse/lightgun is enabled, for mouse hiding purposes
+	bool const mouse_enabled = machine().input().device_class(DEVICE_CLASS_MOUSE).enabled();
+	bool const lightgun_enabled = machine().input().device_class(DEVICE_CLASS_LIGHTGUN).enabled();
+	if (!mouse_enabled && !lightgun_enabled)
+		return false;
 
-	mod = dynamic_cast<wininput_module *>(m_lightgun_input);
-	if (mod) hidemouse |= mod->should_hide_mouse();
-
-	mod = dynamic_cast<wininput_module *>(m_joystick_input);
-	if (mod) hidemouse |= mod->should_hide_mouse();
-
-	return hidemouse;
+	return true;
 }
 
 bool windows_osd_interface::handle_input_event(input_event eventid, void *eventdata) const
 {
 	bool handled = false;
 
-	wininput_module *mod;
+	wininput_event_handler *mod;
 
-	mod = dynamic_cast<wininput_module *>(m_keyboard_input);
-	if (mod) handled |= mod->handle_input_event(eventid, eventdata);
+	mod = dynamic_cast<wininput_event_handler *>(m_keyboard_input);
+	if (mod)
+		handled |= mod->handle_input_event(eventid, eventdata);
 
-	mod = dynamic_cast<wininput_module *>(m_mouse_input);
-	if (mod) handled |= mod->handle_input_event(eventid, eventdata);
+	mod = dynamic_cast<wininput_event_handler *>(m_mouse_input);
+	if (mod)
+		handled |= mod->handle_input_event(eventid, eventdata);
 
-	mod = dynamic_cast<wininput_module *>(m_lightgun_input);
-	if (mod) handled |= mod->handle_input_event(eventid, eventdata);
+	mod = dynamic_cast<wininput_event_handler *>(m_lightgun_input);
+	if (mod)
+		handled |= mod->handle_input_event(eventid, eventdata);
 
-	mod = dynamic_cast<wininput_module *>(m_joystick_input);
-	if (mod) handled |= mod->handle_input_event(eventid, eventdata);
+	mod = dynamic_cast<wininput_event_handler *>(m_joystick_input);
+	if (mod)
+		handled |= mod->handle_input_event(eventid, eventdata);
 
 	return handled;
 }
 
 void windows_osd_interface::poll_input(running_machine &machine) const
 {
-	m_keyboard_input->poll_if_necessary(machine);
-	m_mouse_input->poll_if_necessary(machine);
-	m_lightgun_input->poll_if_necessary(machine);
-	m_joystick_input->poll_if_necessary(machine);
+	m_keyboard_input->poll_if_necessary();
+	m_mouse_input->poll_if_necessary();
+	m_lightgun_input->poll_if_necessary();
+	m_joystick_input->poll_if_necessary();
 }
 
 //============================================================

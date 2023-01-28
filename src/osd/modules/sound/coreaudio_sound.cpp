@@ -52,7 +52,7 @@ public:
 	{
 	}
 
-	virtual int init(osd_options const &options) override;
+	virtual int init(osd_interface &osd, osd_options const &options) override;
 	virtual void exit() override;
 
 	// sound_module
@@ -179,7 +179,7 @@ private:
 };
 
 
-int sound_coreaudio::init(const osd_options &options)
+int sound_coreaudio::init(osd_interface &osd, const osd_options &options)
 {
 	OSStatus err;
 

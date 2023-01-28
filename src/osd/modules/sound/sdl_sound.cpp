@@ -14,14 +14,10 @@
 
 #if (defined(OSD_SDL) || defined(USE_SDL_SOUND))
 
-// standard sdl header
-#include <SDL2/SDL.h>
-
-// MAME headers
-#include "emuopts.h"
 #include "osdcore.h"
 
-#include "../../sdl/osdsdl.h"
+// standard sdl header
+#include <SDL2/SDL.h>
 
 #include <algorithm>
 #include <fstream>
@@ -36,7 +32,10 @@ namespace {
 //  DEBUGGING
 //============================================================
 
-#define LOG_SOUND       0
+#define LOG_SOUND           0
+
+#define SDLMAME_SOUND_LOG   "sound.log"
+
 
 //============================================================
 //  CLASS
@@ -58,7 +57,7 @@ public:
 	}
 	virtual ~sound_sdl() { }
 
-	virtual int init(const osd_options &options) override;
+	virtual int init(osd_interface &osd, const osd_options &options) override;
 	virtual void exit() override;
 
 	// sound_module
@@ -336,7 +335,7 @@ void sound_sdl::sdl_callback(void *userdata, Uint8 *stream, int len)
 //  sound_sdl::init
 //============================================================
 
-int sound_sdl::init(const osd_options &options)
+int sound_sdl::init(osd_interface &osd, const osd_options &options)
 {
 	int         n_channels = 2;
 	int         audio_latency;

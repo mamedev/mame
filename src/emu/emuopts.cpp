@@ -10,10 +10,13 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "drivenum.h"
-#include "softlist_dev.h"
-#include "hashfile.h"
 
+#include "drivenum.h"
+#include "hashfile.h"
+#include "main.h"
+#include "softlist_dev.h"
+
+// lib/util
 #include "corestr.h"
 #include "path.h"
 
