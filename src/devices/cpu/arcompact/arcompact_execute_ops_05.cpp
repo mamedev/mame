@@ -113,13 +113,23 @@ uint32_t arcompact_device::handleop32_LSR_multiple_do_op(void* obj, uint32_t src
 
 uint32_t arcompact_device::handleop32_ASR_multiple_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
+	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src1 >> (src2 & 0x1f);
 
 	if (src1 & 0x80000000)
 		result |= 0xffffffff << (31 - (src2 & 0x1f));
 
 	if (set_flags)
-		arcompact_fatal("handleop32_ASR_multiple (ASR) (F set)\n"); // not yet supported
+	{
+		o->do_flags_nz(result);
+		if (src2 != 0)
+		{
+			if (src1 & (1 << (src2 - 1)))
+				o->status32_set_c();
+			else
+				o->status32_clear_c();
+		}
+	}
 	return result;
 }
 
@@ -138,9 +148,24 @@ uint32_t arcompact_device::handleop32_ASR_multiple_do_op(void* obj, uint32_t src
 // ROR<.cc><.f> 0,limm,c           0010 1110 1100 0011   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ROR_multiple(uint32_t op)
+uint32_t arcompact_device::handleop32_ROR_multiple_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
-	return arcompact_handle05_helper(op, "ROR", 0, 0);
+	arcompact_device* o = (arcompact_device*)obj;
+	uint32_t result = src1 >> (src2 & 0x1f);
+	result |= src1 << (31 - (src2 & 0x1f));
+
+	if (set_flags)
+	{
+		o->do_flags_nz(result);
+		if (src2 != 0)
+		{
+			if (src1 & (1 << (src2 - 1)))
+				o->status32_set_c();
+			else
+				o->status32_clear_c();
+		}
+	}
+	return result;
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

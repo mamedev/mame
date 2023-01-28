@@ -740,7 +740,7 @@ private:
 	static uint32_t handleop32_NORM_do_op(void* obj, uint32_t src, uint8_t set_flags);
 
 
-	uint32_t handleop32_ROR_multiple(uint32_t op);
+	static uint32_t handleop32_ROR_multiple_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_ADDS(uint32_t op);
 	uint32_t handleop32_SUBS(uint32_t op);
 	uint32_t handleop32_DIVAW(uint32_t op);

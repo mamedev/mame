@@ -1594,7 +1594,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // ROR<.f> 0,b,u6                  0010 1bbb 0100 0011   FBBB uuuu uu11 1110
 // ROR<.cc><.f> 0,limm,c           0010 1110 1100 0011   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_ROR_multiple(op);  // ROR
+						return handleop32_general(op, handleop32_ROR_multiple_do_op);  // ROR
 					}
 					case 0x04:
 					{
@@ -1675,7 +1675,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Extended Arithmetic (optional on ARCtangent-A5, ARC600, built in on ARC700)
 // DIVAW - Division Assist
-// 						   
+//
 // DIVAW a,b,c                     0010 1bbb 0000 1000   0BBB CCCC CCAA AAAA
 // DIVAW a,b,u6                    0010 1bbb 0100 1000   0BBB uuuu uuAA AAAA
 // DIVAW b,b,s12                   0010 1bbb 1000 1000   0BBB ssss ssSS SSSS
@@ -1738,7 +1738,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Extended Arithmetic (optional ARCtangent-A5, ARC600, built in on ARC700)
 // ADDSDW - Dual 16-bit Add and Saturate
-// 
+//
 // ADDSDW<.f> a,b,c                0010 1bbb 0010 1000   FBBB CCCC CCAA AAAA
 // ADDSDW<.f> a,b,u6               0010 1bbb 0110 1000   FBBB uuuu uuAA AAAA
 // ADDSDW<.f> b,b,s12              0010 1bbb 1010 1000   FBBB ssss ssSS SSSS
