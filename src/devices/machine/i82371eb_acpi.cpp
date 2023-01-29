@@ -16,7 +16,7 @@
 #define LOG_TODO   (1U << 2) // log unimplemented registers
 #define LOG_MAP    (1U << 3) // log full remaps (verbose)
 
-#define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO)
+#define VERBOSE (LOG_GENERAL | LOG_IO | LOG_TODO | LOG_MAP)
 #define LOG_OUTPUT_FUNC osd_printf_warning
 
 #include "logmacro.h"
@@ -86,13 +86,15 @@ void i82371eb_acpi_device::map_extra(uint64_t memory_window_start, uint64_t memo
 
 	const bool iose = bool(BIT(command, 0));
 
-	//LOGMAP("IOSE (SMBus) %s\n", m_pmiose ? "Enable" : "Disable");
+	LOGMAP("IOSE (SMBus) %s\n", m_pmiose ? "Enable" : "Disable");
 
 	// presume if SMB_HST_EN is zero will also remove SMBUS mapping
 	if (iose && BIT(m_smbus_host_config, 0))
 	{
-		LOGMAP("- SMBBA %04x-%04x\n", m_smbba, m_smbba + 0xf);
-		m_smbus->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, m_smbba + 0xf, m_smbba, io_space);
+		LOGMAP("- SMBBA %04x-%04x (%08x %08x)\n", m_smbba, m_smbba + 0xf, io_window_start, io_window_end);
+		io_space->install_device(m_smbba, m_smbba | 0xf, *m_smbus, &smbus_device::map);
+
+//		m_smbus->map_device(memory_window_start, memory_window_end, 0, memory_space, m_smbba, m_smbba + 0xf, 0, io_space);
 		//io_space->install_device(m_smbba, m_smbba + 0xf, *this, &i82371eb_acpi_device::smbus_map);
 	}
 }
