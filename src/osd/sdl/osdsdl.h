@@ -150,8 +150,6 @@ public:
 	// input overridables
 	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) override;
 
-	virtual void video_register() override;
-
 	virtual bool video_init() override;
 	virtual bool window_init() override;
 
@@ -199,7 +197,7 @@ private:
 	template <typename T> sdl_window_info *focus_window(T const &event) const;
 
 	sdl_options &m_options;
-	std::shared_ptr<sdl_window_info> m_focus_window;
+	sdl_window_info *m_focus_window;
 	int m_mouse_over_window;
 	uint8_t m_modifier_keys;
 

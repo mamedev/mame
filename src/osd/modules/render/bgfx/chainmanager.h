@@ -70,7 +70,7 @@ public:
 		uint32_t m_flags = 0;
 	};
 
-	chain_manager(running_machine& machine, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index,
+	chain_manager(running_machine& machine, const osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index,
 		slider_dirty_notifier& slider_notifier, uint16_t user_prescale, uint16_t max_prescale_size);
 	~chain_manager();
 
@@ -79,7 +79,7 @@ public:
 
 	// Getters
 	running_machine& machine() const { return m_machine; }
-	osd_options& options() const { return m_options; }
+	const osd_options& options() const { return m_options; }
 	texture_manager& textures() const { return m_textures; }
 	target_manager& targets() const { return m_targets; }
 	effect_manager& effects() const { return m_effects; }
@@ -123,7 +123,7 @@ private:
 	void process_screen_quad(uint32_t view, uint32_t screen, screen_prim &prim, osd_window& window);
 
 	running_machine&            m_machine;
-	osd_options&                m_options;
+	const osd_options&          m_options;
 	texture_manager&            m_textures;
 	target_manager&             m_targets;
 	effect_manager&             m_effects;
@@ -145,9 +145,6 @@ private:
 	bgfx_effect *               m_adjuster;
 	std::vector<screen_prim>    m_screen_prims;
 	std::vector<uint8_t>        m_palette_temp;
-
-	static int32_t s_old_chain_selections[16];
-	static bool s_reinit_cookie;
 
 	static inline constexpr uint32_t CHAIN_NONE = 0;
 };

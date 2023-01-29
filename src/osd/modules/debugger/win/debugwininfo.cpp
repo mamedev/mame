@@ -47,7 +47,7 @@ debugwin_info::debugwin_info(debugger_windows_interface &debugger, bool is_main_
 	m_wnd = win_create_window_ex_utf8(
 			DEBUG_WINDOW_STYLE_EX, "MAMEDebugWindow", title, DEBUG_WINDOW_STYLE,
 			0, 0, 100, 100,
-			std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window(),
+			dynamic_cast<win_window_info &>(*osd_common_t::window_list().front()).platform_window(),
 			create_standard_menubar(),
 			GetModuleHandleUni(),
 			this);

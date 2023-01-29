@@ -44,9 +44,6 @@
 
 using namespace rapidjson;
 
-int32_t chain_manager::s_old_chain_selections[16] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-bool chain_manager::s_reinit_cookie = false;
-
 chain_manager::screen_prim::screen_prim(render_primitive *prim)
 {
 	m_prim = prim;
@@ -61,8 +58,16 @@ chain_manager::screen_prim::screen_prim(render_primitive *prim)
 	m_flags = prim->flags;
 }
 
-chain_manager::chain_manager(running_machine& machine, osd_options& options, texture_manager& textures, target_manager& targets, effect_manager& effects, uint32_t window_index,
-	slider_dirty_notifier& slider_notifier, uint16_t user_prescale, uint16_t max_prescale_size)
+chain_manager::chain_manager(
+		running_machine& machine,
+		const osd_options& options,
+		texture_manager& textures,
+		target_manager& targets,
+		effect_manager& effects,
+		uint32_t window_index,
+		slider_dirty_notifier& slider_notifier,
+		uint16_t user_prescale,
+		uint16_t max_prescale_size)
 	: m_machine(machine)
 	, m_options(options)
 	, m_textures(textures)
@@ -79,23 +84,10 @@ chain_manager::chain_manager(running_machine& machine, osd_options& options, tex
 	refresh_available_chains();
 	parse_chain_selections(options.bgfx_screen_chains());
 	init_texture_converters();
-
-	if (s_reinit_cookie)
-	{
-		for (uint32_t i = 0; i < std::size(s_old_chain_selections); i++)
-		{
-			set_current_chain(i, s_old_chain_selections[i]);
-		}
-	}
 }
 
 chain_manager::~chain_manager()
 {
-	for (uint32_t i = 0; i < std::size(s_old_chain_selections); i++)
-	{
-		s_old_chain_selections[i] = i < m_current_chain.size() ? m_current_chain[i] : -1;
-	}
-	s_reinit_cookie = true;
 	destroy_chains();
 }
 

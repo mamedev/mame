@@ -78,16 +78,14 @@ public:
 	osd_module *get_module_generic(const char *type, const char *name);
 
 	template<class C>
-	C select_module(const char *type, const char *name = "")
+	C &select_module(osd_interface &osd, const osd_options &options, const char *type, const char *name = "")
 	{
-		return dynamic_cast<C>(select_module(type, name));
+		return dynamic_cast<C &>(select_module(osd, options, type, name));
 	}
 
-	osd_module *select_module(const char *type, const char *name = "");
+	osd_module &select_module(osd_interface &osd, const osd_options &options, const char *type, const char *name = "");
 
 	std::vector<std::string_view> get_module_names(const char *type) const;
-
-	void init(osd_interface &osd, const osd_options &options);
 
 	void exit();
 

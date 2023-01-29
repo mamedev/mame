@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <bgfx/bgfx.h>
-
 #include "binpacker.h"
 #include "bgfx/chain.h"
 #include "bgfx/chainmanager.h"
@@ -14,6 +12,10 @@
 #include "sliderdirtynotifier.h"
 
 #include "modules/osdwindow.h"
+
+#include "notifier.h"
+
+#include <bgfx/bgfx.h>
 
 #include <map>
 #include <memory>
@@ -35,11 +37,14 @@ class avi_write;
 class renderer_bgfx : public osd_renderer, public slider_dirty_notifier
 {
 public:
-	renderer_bgfx(std::shared_ptr<osd_window> w);
+	renderer_bgfx(
+			osd_window &window,
+			const osd_options &options,
+			util::notifier<util::xml::data_node const &> &load_notifier,
+			util::notifier<util::xml::data_node &> &save_notifier,
+			util::xml::data_node &persistent_settings,
+			uint32_t max_texsize);
 	virtual ~renderer_bgfx();
-
-	static bool init(running_machine &machine);
-	static void exit();
 
 	virtual int create() override;
 	virtual int draw(const int update) override;
@@ -73,8 +78,6 @@ private:
 		BUFFER_DONE
 	};
 
-	void init_bgfx_library();
-
 	void vertex(ScreenVertex* vertex, float x, float y, float z, uint32_t rgba, float u, float v);
 	void render_avi_quad();
 	void update_recording();
@@ -103,11 +106,11 @@ private:
 	void process_atlas_packs(std::vector<std::vector<rectangle_packer::packed_rectangle>>& packed);
 	uint32_t get_texture_hash(render_primitive *prim);
 
-	void load_config(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode);
-	void save_config(config_type cfg_type, util::xml::data_node *parentnode);
+	void load_config(util::xml::data_node const &parentnode);
+	void save_config(util::xml::data_node &parentnode);
 
-	osd_options& m_options;
-	bgfx::PlatformData m_platform_data;
+	const osd_options& m_options;
+	const uint32_t m_max_texture_size;
 
 	bgfx_target *m_framebuffer;
 	bgfx_texture *m_texture_cache;
@@ -115,11 +118,11 @@ private:
 	// Original display_mode
 	osd_dim m_dimensions;
 
-	texture_manager *m_textures;
-	target_manager *m_targets;
-	shader_manager *m_shaders;
-	effect_manager *m_effects;
-	chain_manager *m_chains;
+	std::unique_ptr<texture_manager> m_textures;
+	std::unique_ptr<target_manager> m_targets;
+	std::unique_ptr<shader_manager> m_shaders;
+	std::unique_ptr<effect_manager> m_effects;
+	std::unique_ptr<chain_manager> m_chains;
 
 	bgfx_effect *m_gui_effect[4];
 	bgfx_effect *m_screen_effect[4];
@@ -130,7 +133,7 @@ private:
 	rectangle_packer m_packer;
 
 	uint32_t m_white[16*16];
-	bgfx_view *m_ortho_view;
+	std::unique_ptr<bgfx_view> m_ortho_view;
 	uint32_t m_max_view;
 	uint16_t m_view_width;
 	uint16_t m_view_height;
@@ -141,17 +144,19 @@ private:
 	bgfx::TextureHandle m_avi_texture;
 	bitmap_rgb32 m_avi_bitmap;
 	uint8_t *m_avi_data;
+
 	std::unique_ptr<util::xml::file> m_config;
+	const util::notifier_subscription m_load_sub;
+	const util::notifier_subscription m_save_sub;
+	util::xml::data_node &m_persistent_settings;
 
 	static const uint16_t CACHE_SIZE;
 	static const uint32_t PACKABLE_SIZE;
 	static const uint32_t WHITE_HASH;
 
 	static uint32_t s_current_view;
-	static bool s_bgfx_library_initialized;
 	static uint32_t s_width[16];
 	static uint32_t s_height[16];
-	static uint32_t s_max_texture_size;
 };
 
 #endif // MAME_RENDER_DRAWBGFX_H
