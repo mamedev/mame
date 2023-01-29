@@ -50,6 +50,7 @@ public:
 	template <typename... T> void set_rte_callback(T &&... args) { m_rte_instr_callback.set(std::forward<T>(args)...); }
 
 	u64 vpa_sync(offs_t address, u64 current_time);
+	u32 vpa_after(offs_t address);
 
 protected:
 	// Processor special states
