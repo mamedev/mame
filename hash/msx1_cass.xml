@@ -97,7 +97,7 @@ license:CC0-1.0
 		<description>Breakout! The Great computer Adventure (United Kingdom)</description>
 		<year>1985</year>
 		<publisher>Toshiba</publisher>
-		<info name="usage" value="Load with RUN&quot;CAS:&quot;. The game requires 64k in slot 2"/>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;. This software was designed to be used on the British HX-10 (hx10), it fails to run on most other machines."/>
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="64019">
@@ -111,7 +111,7 @@ license:CC0-1.0
 		<description>Breakout! The Great computer Adventure (United Kingdom, alt)</description>
 		<year>1985</year>
 		<publisher>Toshiba</publisher>
-		<info name="usage" value="Load with RUN&quot;CAS:&quot;. The game requires 64k in slot 2"/>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;. This software was designed to be used on the British HX-10 (hx10), it fails to run on most other machines."/>
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="63987">
