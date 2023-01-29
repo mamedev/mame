@@ -56,18 +56,29 @@ void bgfx_input_pair::bind(bgfx_effect *effect, const int32_t screen) const
 	if (!provider)
 		return;
 
+	float rowpixels(provider->rowpixels());
+	float width_margin(provider->width_margin());
+	float height(provider->height());
+
 	bgfx_uniform *tex_size = effect->uniform("u_tex_size" + std::to_string(m_index));
 	if (tex_size && provider)
 	{
-		float values[2] = { float(provider->rowpixels()), float(provider->height()) };
+		float values[2] = { rowpixels, height };
 		tex_size->set(values, sizeof(float) * 2);
 	}
 
 	bgfx_uniform *inv_tex_size = effect->uniform("u_inv_tex_size" + std::to_string(m_index));
 	if (inv_tex_size && provider)
 	{
-		float values[2] = { 1.0f / float(provider->rowpixels()), 1.0f / float(provider->height()) };
+		float values[2] = { 1.0f / rowpixels, 1.0f / height };
 		inv_tex_size->set(values, sizeof(float) * 2);
+	}
+
+	bgfx_uniform *tex_bounds = effect->uniform("u_tex_bounds" + std::to_string(m_index));
+	if (tex_bounds && provider)
+	{
+		float values[4] = { width_margin / rowpixels, 0.0f, 1.0f + width_margin / rowpixels, 1.0f };
+		tex_bounds->set(values, sizeof(float) * 4);
 	}
 
 	bgfx::setTexture(m_index, effect->uniform(m_sampler)->handle(), chains().textures().handle(name));

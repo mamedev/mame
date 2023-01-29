@@ -10,13 +10,17 @@
 //============================================================
 
 #include "valueuniform.h"
-#include <cstring>
 
-bgfx_value_uniform::bgfx_value_uniform(bgfx_uniform* uniform, float* values, const int count)
+#include <algorithm>
+#include <cassert>
+
+
+bgfx_value_uniform::bgfx_value_uniform(bgfx_uniform* uniform, const float* values, const int count)
 	: bgfx_entry_uniform(uniform)
 	, m_count(count)
 {
-	memcpy(m_values, values, sizeof(float) * count);
+	assert(count <= std::size(m_values));
+	std::copy_n(values, count, m_values);
 }
 
 void bgfx_value_uniform::bind()

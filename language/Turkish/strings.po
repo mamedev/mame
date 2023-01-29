@@ -4418,7 +4418,7 @@ msgstr ""
 
 #: src/emu/inpttype.ipp:583
 msgctxt "input-name"
-msgid "Bill 1"
+msgid "Banknote 1"
 msgstr ""
 
 #: src/emu/inpttype.ipp:588
@@ -4825,102 +4825,102 @@ msgstr ""
 
 #: src/emu/inpttype.ipp:742
 msgctxt "input-name"
-msgid "Track X"
+msgid "Trackball X"
 msgstr ""
 
 #: src/emu/inpttype.ipp:743
 msgctxt "input-name"
-msgid "Track X 2"
+msgid "Trackball X 2"
 msgstr ""
 
 #: src/emu/inpttype.ipp:744
 msgctxt "input-name"
-msgid "Track X 3"
+msgid "Trackball X 3"
 msgstr ""
 
 #: src/emu/inpttype.ipp:745
 msgctxt "input-name"
-msgid "Track X 4"
+msgid "Trackball X 4"
 msgstr ""
 
 #: src/emu/inpttype.ipp:746
 msgctxt "input-name"
-msgid "Track X 5"
+msgid "Trackball X 5"
 msgstr ""
 
 #: src/emu/inpttype.ipp:747
 msgctxt "input-name"
-msgid "Track X 6"
+msgid "Trackball X 6"
 msgstr ""
 
 #: src/emu/inpttype.ipp:748
 msgctxt "input-name"
-msgid "Track X 7"
+msgid "Trackball X 7"
 msgstr ""
 
 #: src/emu/inpttype.ipp:749
 msgctxt "input-name"
-msgid "Track X 8"
+msgid "Trackball X 8"
 msgstr ""
 
 #: src/emu/inpttype.ipp:750
 msgctxt "input-name"
-msgid "Track X 9"
+msgid "Trackball X 9"
 msgstr ""
 
 #: src/emu/inpttype.ipp:751
 msgctxt "input-name"
-msgid "Track X 10"
+msgid "Trackball X 10"
 msgstr ""
 
 #: src/emu/inpttype.ipp:756
 msgctxt "input-name"
-msgid "Track Y"
+msgid "Trackball Y"
 msgstr ""
 
 #: src/emu/inpttype.ipp:757
 msgctxt "input-name"
-msgid "Track Y 2"
+msgid "Trackball Y 2"
 msgstr ""
 
 #: src/emu/inpttype.ipp:758
 msgctxt "input-name"
-msgid "Track Y 3"
+msgid "Trackball Y 3"
 msgstr ""
 
 #: src/emu/inpttype.ipp:759
 msgctxt "input-name"
-msgid "Track Y 4"
+msgid "Trackball Y 4"
 msgstr ""
 
 #: src/emu/inpttype.ipp:760
 msgctxt "input-name"
-msgid "Track Y 5"
+msgid "Trackball Y 5"
 msgstr ""
 
 #: src/emu/inpttype.ipp:761
 msgctxt "input-name"
-msgid "Track Y 6"
+msgid "Trackball Y 6"
 msgstr ""
 
 #: src/emu/inpttype.ipp:762
 msgctxt "input-name"
-msgid "Track Y 7"
+msgid "Trackball Y 7"
 msgstr ""
 
 #: src/emu/inpttype.ipp:763
 msgctxt "input-name"
-msgid "Track Y 8"
+msgid "Trackball Y 8"
 msgstr ""
 
 #: src/emu/inpttype.ipp:764
 msgctxt "input-name"
-msgid "Track Y 9"
+msgid "Trackball Y 9"
 msgstr ""
 
 #: src/emu/inpttype.ipp:765
 msgctxt "input-name"
-msgid "Track Y 10"
+msgid "Trackball Y 10"
 msgstr ""
 
 #: src/emu/inpttype.ipp:770

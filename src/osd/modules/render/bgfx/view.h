@@ -21,7 +21,7 @@ public:
 		, m_view_height(0)
 		, m_z_near(0.0f)
 		, m_z_far(100.0f)
-		, m_clear_color(0)
+		, m_clear_color(0x000000ff)
 		, m_clear_depth(1.0f)
 		, m_clear_stencil(0)
 		, m_do_clear_color(true)

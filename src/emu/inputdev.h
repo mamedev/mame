@@ -100,7 +100,13 @@ public:
 
 protected:
 	// construction/destruction
-	input_device_item(input_device &device, std::string_view name, void *internal, input_item_id itemid, item_get_state_func getstate, input_item_class itemclass);
+	input_device_item(
+			input_device &device,
+			std::string_view name,
+			void *internal,
+			input_item_id itemid,
+			item_get_state_func getstate,
+			input_item_class itemclass);
 
 	// internal state
 	input_device &          m_device;               // reference to our owning device
@@ -138,14 +144,19 @@ public:
 	input_device_item *item(input_item_id index) const { return m_item[index].get(); }
 	input_item_id maxitem() const { return m_maxitem; }
 	void *internal() const { return m_internal; }
+	s32 threshold() const { return m_threshold; }
 	bool steadykey_enabled() const { return m_steadykey_enabled; }
 	bool lightgun_reload_button() const { return m_lightgun_reload_button; }
 
 	// setters
 	void set_devindex(int devindex) { m_devindex = devindex; }
 
-	// item management
-	virtual input_item_id add_item(std::string_view name, input_item_id itemid, item_get_state_func getstate, void *internal) override;
+	// interface for host input device
+	virtual input_item_id add_item(
+			std::string_view name,
+			input_item_id itemid,
+			item_get_state_func getstate,
+			void *internal) override;
 
 	// helpers
 	s32 adjust_absolute(s32 value) const { return adjust_absolute_value(value); }
@@ -164,10 +175,11 @@ private:
 	int                     m_devindex;             // device index of this device
 	std::unique_ptr<input_device_item> m_item[ITEM_ID_ABSOLUTE_MAXIMUM+1]; // array of pointers to items
 	input_item_id           m_maxitem;              // maximum item index
-	void *                  m_internal;             // internal callback pointer
+	void *const             m_internal;             // internal callback pointer
 
-	bool                    m_steadykey_enabled;    // steadykey enabled for keyboards
-	bool                    m_lightgun_reload_button; // lightgun reload hack
+	s32 const               m_threshold;            // threshold for treating absolute axis as active
+	bool const              m_steadykey_enabled;    // steadykey enabled for keyboards
+	bool const              m_lightgun_reload_button; // lightgun reload hack
 };
 
 
@@ -238,9 +250,10 @@ protected:
 
 private:
 	// joystick information
-	joystick_map            m_joymap;               // joystick map for this device
-	s32                     m_joystick_deadzone;    // deadzone for joystick
-	s32                     m_joystick_saturation;  // saturation position for joystick
+	joystick_map    m_joymap;      // joystick map for this device
+	s32 const       m_deadzone;    // deadzone for joystick
+	s32 const       m_saturation;  // saturation position for joystick
+	s64 const       m_range;       // difference between saturation and deadzone
 };
 
 

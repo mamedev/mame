@@ -301,6 +301,8 @@ Few other notes:
 #include "formats/sord_cas.h"
 
 
+namespace {
+
 class m5_state : public driver_device
 {
 public:
@@ -1669,6 +1671,9 @@ ROM_START( m5p_brno )
 	//ROM_LOAD( "brno_rom12.rom", 0x2000, 0x4000, CRC(cac52406) SHA1(91f6ba97e85a2b3a317689635d425ee97413bbe3)) //windows+BI
 	//ROM_LOAD( "brno_boot.rom", 0x2000, 0xd80, CRC(60008729) SHA1(fb26e2ae9f74b0ae0d723b417a038a8ef3d72782))
 ROM_END
+
+} // anonymous namespace
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS

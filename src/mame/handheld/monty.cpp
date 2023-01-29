@@ -81,15 +81,13 @@ private:
 	u8 input_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(halt_changed) { m_halt = state; }
 
-	u64 m_lcd_data[32];
+	u64 m_lcd_data[32] = { };
 	int m_lcd_cs = 0;
 	int m_halt = 0;
 };
 
 void monty_state::machine_start()
 {
-	memset(m_lcd_data, 0, sizeof(m_lcd_data));
-
 	save_item(NAME(m_lcd_data));
 	save_item(NAME(m_lcd_cs));
 	save_item(NAME(m_halt));

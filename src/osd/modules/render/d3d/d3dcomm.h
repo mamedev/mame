@@ -170,7 +170,7 @@ class poly_info
 public:
 	void init(D3DPRIMITIVETYPE type, uint32_t count, uint32_t numverts,
 				uint32_t flags, texture_info *texture, uint32_t modmode,
-				float prim_width, float prim_height)
+				float prim_width, float prim_height, uint32_t tint)
 	{
 		m_type = type;
 		m_count = count;
@@ -180,6 +180,7 @@ public:
 		m_modmode = modmode;
 		m_prim_width = prim_width;
 		m_prim_height = prim_height;
+		m_tint = tint;
 	}
 
 	D3DPRIMITIVETYPE        type() const { return m_type; }
@@ -193,6 +194,8 @@ public:
 	float                   prim_width() const { return m_prim_width; }
 	float                   prim_height() const { return m_prim_height; }
 
+	DWORD                   tint() const { return m_tint; }
+
 private:
 	D3DPRIMITIVETYPE        m_type;         // type of primitive
 	uint32_t                m_count;        // total number of primitives
@@ -204,6 +207,8 @@ private:
 
 	float                   m_prim_width;   // used by quads
 	float                   m_prim_height;  // used by quads
+
+	uint32_t                m_tint;         // color tint for primitive
 };
 
 /* vertex describes a single vertex */

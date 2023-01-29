@@ -1,13 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 
+#include "netdev_module.h"
+
+#include "modules/osdmodule.h"
+
 #if defined(OSD_NET_USE_PCAP)
 
 #include "emu.h"
 #include "dinetwork.h"
 #include "osdnet.h"
-#include "netdev_module.h"
-#include "modules/osdmodule.h"
 #include "modules/lib/osdlib.h"
 
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
@@ -25,6 +27,10 @@
 #endif
 
 #include <pcap.h>
+
+namespace osd {
+
+namespace {
 
 // Typedefs for dynamically loaded functions
 typedef int (*pcap_findalldevs_fn)(pcap_if_t **, char *);
@@ -49,7 +55,7 @@ public:
 
 	virtual ~pcap_module() { }
 
-	virtual int init(const osd_options &options) override;
+	virtual int init(osd_interface &osd, const osd_options &options) override;
 	virtual void exit() override;
 
 	virtual bool probe() override
@@ -255,7 +261,7 @@ static CREATE_NETDEV(create_pcap)
 	return dynamic_cast<osd_netdev *>(dev);
 }
 
-int pcap_module::init(const osd_options &options)
+int pcap_module::init(osd_interface &osd, const osd_options &options)
 {
 	pcap_if_t *devs;
 	char errbuf[PCAP_ERRBUF_SIZE];
@@ -286,12 +292,15 @@ void pcap_module::exit()
 	clear_netdev();
 }
 
-#else
-	#include "modules/osdmodule.h"
-	#include "netdev_module.h"
+} // anonymous namespace
 
-	MODULE_NOT_SUPPORTED(pcap_module, OSD_NETDEV_PROVIDER, "pcap")
+} // namespace osd
+
+#else
+
+namespace osd { namespace { MODULE_NOT_SUPPORTED(pcap_module, OSD_NETDEV_PROVIDER, "pcap") } }
+
 #endif
 
 
-MODULE_DEFINITION(NETDEV_PCAP, pcap_module)
+MODULE_DEFINITION(NETDEV_PCAP, osd::pcap_module)

@@ -18,6 +18,7 @@
 
 #include "drivenum.h"
 #include "fileio.h"
+#include "main.h"
 #include "uiinput.h"
 
 #include "util/corestr.h"

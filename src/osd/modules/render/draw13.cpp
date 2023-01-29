@@ -10,23 +10,20 @@
 //
 //============================================================
 
+#include "emu.h"
+#include "draw13.h"
+
+// OSD headers
+#include "sdlopts.h"
+#include "window.h"
+
+// lib/util
+#include "options.h"
+
 // standard C headers
 #include <cmath>
 #include <cstdio>
 
-// MAME headers
-#include "emu.h"
-#include "options.h"
-
-// OSD headers
-#include "osdsdl.h"
-#include "window.h"
-
-#include "draw13.h"
-
-//============================================================
-//  DEBUGGING
-//============================================================
 
 //============================================================
 //  CONSTANTS

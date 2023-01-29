@@ -2,30 +2,27 @@
 // copyright-holders:Olivier Galibert, R. Belmont
 //============================================================
 //
-//  video.c - SDL video handling
+//  video.cpp - SDL video handling
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
 //============================================================
-#include <SDL2/SDL.h>
 
-// MAME headers
-#include "emu.h"
-#include "rendutil.h"
-#include "ui/uimain.h"
-#include "emuopts.h"
-#include "uiinput.h"
-
+#include "window.h"
 
 // MAMEOS headers
-#include "window.h"
 #include "osdsdl.h"
 #include "modules/lib/osdlib.h"
 #include "modules/monitor/monitor_module.h"
 
-//============================================================
-//  CONSTANTS
-//============================================================
+// MAME headers
+#include "emu.h"
+#include "emuopts.h"
+#include "main.h"
+#include "rendutil.h"
+#include "uiinput.h"
+
+#include <SDL2/SDL.h>
 
 
 //============================================================
@@ -34,16 +31,10 @@
 
 osd_video_config video_config;
 
-//============================================================
-//  LOCAL VARIABLES
-//============================================================
-
 
 //============================================================
 //  PROTOTYPES
 //============================================================
-
-static void check_osd_inputs(running_machine &machine);
 
 static void get_resolution(const char *defdata, const char *data, osd_window_config *config, int report_error);
 
@@ -112,53 +103,6 @@ void sdl_osd_interface::update(bool skip_redraw)
 	// if we're running, disable some parts of the debugger
 	if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
 		debugger_update();
-}
-
-//============================================================
-//  input_update
-//============================================================
-
-void sdl_osd_interface::input_update()
-{
-	// poll the joystick values here
-	process_events_buf();
-	poll_inputs(machine());
-	check_osd_inputs(machine());
-}
-
-//============================================================
-//  check_osd_inputs
-//============================================================
-
-static void check_osd_inputs(running_machine &machine)
-{
-	// check for toggling fullscreen mode
-	if (machine.ui_input().pressed(IPT_OSD_1))
-	{
-		for (auto curwin : osd_common_t::s_window_list)
-			std::static_pointer_cast<sdl_window_info>(curwin)->toggle_full_screen();
-	}
-
-	auto window = osd_common_t::s_window_list.front();
-
-	if (USE_OPENGL)
-	{
-		//FIXME: on a per window basis
-		if (machine.ui_input().pressed(IPT_OSD_5))
-		{
-			video_config.filter = !video_config.filter;
-			machine.ui().popup_time(1, "Filter %s", video_config.filter? "enabled":"disabled");
-		}
-	}
-
-	if (machine.ui_input().pressed(IPT_OSD_6))
-		std::static_pointer_cast<sdl_window_info>(window)->modify_prescale(-1);
-
-	if (machine.ui_input().pressed(IPT_OSD_7))
-		std::static_pointer_cast<sdl_window_info>(window)->modify_prescale(1);
-
-	if (machine.ui_input().pressed(IPT_OSD_8))
-		window->renderer().record();
 }
 
 //============================================================

@@ -20,6 +20,7 @@
 #include "fileio.h"
 #include "http.h"
 #include "image.h"
+#include "main.h"
 #include "natkeyboard.h"
 #include "network.h"
 #include "render.h"

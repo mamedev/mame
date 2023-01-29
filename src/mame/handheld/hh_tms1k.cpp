@@ -224,6 +224,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "screen.h"
 #include "speaker.h"
 
+// netlist
 #include "nl_bship.h"
 
 // internal artwork
@@ -2217,7 +2218,7 @@ class h2hbaskb_state : public hh_tms1k_state
 public:
 	h2hbaskb_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_tms1k_state(mconfig, type, tag),
-		m_cap_empty_timer(*this, "cap_empty")
+		m_cap_discharge(*this, "cap_discharge")
 	{ }
 
 	void h2hbaskb(machine_config &config);
@@ -2227,9 +2228,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	required_device<timer_device> m_cap_empty_timer;
-	TIMER_DEVICE_CALLBACK_MEMBER(cap_empty_callback);
-	bool m_cap_state = false;
+	required_device<timer_device> m_cap_discharge;
 	attotime m_cap_charge = attotime::zero;
 
 	void update_display();
@@ -2243,17 +2242,10 @@ void h2hbaskb_state::machine_start()
 	hh_tms1k_state::machine_start();
 
 	// register for savestates
-	save_item(NAME(m_cap_state));
 	save_item(NAME(m_cap_charge));
 }
 
 // handlers
-
-TIMER_DEVICE_CALLBACK_MEMBER(h2hbaskb_state::cap_empty_callback)
-{
-	if (~m_r & 0x200)
-		m_cap_state = false;
-}
 
 void h2hbaskb_state::update_display()
 {
@@ -2276,12 +2268,10 @@ void h2hbaskb_state::write_r(u32 data)
 	// R9: K8 and 15uF cap to V- (used as timer)
 	// rising edge, remember the time
 	if (data & ~m_r & 0x200)
-	{
-		m_cap_state = true;
 		m_cap_charge = machine().time();
-	}
+
 	// falling edge, determine how long K8 should stay up
-	if (~data & m_r & 0x200)
+	else if (~data & m_r & 0x200)
 	{
 		const attotime full = attotime::from_usec(1300); // approx. charge time
 		const int factor = 27; // approx. factor for charge/discharge to logic 0
@@ -2290,7 +2280,7 @@ void h2hbaskb_state::write_r(u32 data)
 		if (charge > full)
 			charge = full;
 
-		m_cap_empty_timer->adjust(charge * factor);
+		m_cap_discharge->adjust(charge * factor);
 	}
 
 	// R0-R7: led select
@@ -2308,7 +2298,8 @@ void h2hbaskb_state::write_o(u16 data)
 u8 h2hbaskb_state::read_k()
 {
 	// K1-K4: multiplexed inputs, K8: R9 and capacitor
-	return (read_inputs(4) & 7) | (m_cap_state ? 8 : 0);
+	u8 cap_state = (m_r & 0x200 || m_cap_discharge->enabled()) ? 8 : 0;
+	return (read_inputs(4) & 7) | cap_state;
 }
 
 // config
@@ -2355,7 +2346,7 @@ void h2hbaskb_state::h2hbaskb(machine_config &config)
 	m_maincpu->write_r().set(FUNC(h2hbaskb_state::write_r));
 	m_maincpu->write_o().set(FUNC(h2hbaskb_state::write_o));
 
-	TIMER(config, "cap_empty").configure_generic(FUNC(h2hbaskb_state::cap_empty_callback));
+	TIMER(config, "cap_discharge").configure_generic(nullptr);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6+6, 7);

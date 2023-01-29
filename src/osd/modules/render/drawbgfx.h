@@ -84,10 +84,10 @@ private:
 	void setup_ortho_view();
 
 	void allocate_buffer(render_primitive *prim, uint32_t blend, bgfx::TransientVertexBuffer *buffer);
-	buffer_status buffer_primitives(bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer, int32_t screen);
+	buffer_status buffer_primitives(bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer, int32_t screen, int window_index);
 
-	void render_textured_quad(render_primitive* prim, bgfx::TransientVertexBuffer* buffer);
-	void render_post_screen_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer, int32_t screen);
+	void render_textured_quad(render_primitive* prim, bgfx::TransientVertexBuffer* buffer, int window_index);
+	void render_post_screen_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer, int32_t screen, int window_index);
 
 	void put_packed_quad(render_primitive *prim, uint32_t hash, ScreenVertex* vertex);
 	void put_packed_line(render_primitive *prim, ScreenVertex* vertex);
@@ -132,6 +132,8 @@ private:
 	uint32_t m_white[16*16];
 	bgfx_view *m_ortho_view;
 	uint32_t m_max_view;
+	uint16_t m_view_width;
+	uint16_t m_view_height;
 
 	bgfx_view *m_avi_view;
 	avi_write *m_avi_writer;
@@ -149,6 +151,7 @@ private:
 	static bool s_bgfx_library_initialized;
 	static uint32_t s_width[16];
 	static uint32_t s_height[16];
+	static uint32_t s_max_texture_size;
 };
 
 #endif // MAME_RENDER_DRAWBGFX_H

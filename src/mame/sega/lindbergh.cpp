@@ -369,6 +369,9 @@ Sega 2005
 #include "sound/sb0400.h"
 #include "video/gf7600gs.h"
 
+
+namespace {
+
 class lindbergh_state : public driver_device
 {
 public:
@@ -613,6 +616,9 @@ ROM_START(lbvbiosu)
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY("dvp-0021b", 0, SHA1(362ac028ba19ba4762678953a033034a5ee8ad53))
 ROM_END
+
+} // anonymous namespace
+
 
 GAME(1999, lindbios,  0,        lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "Sega Lindbergh Bios",                      MACHINE_IS_BIOS_ROOT)
 GAME(2005, hotd4,     lindbios, lindbergh, 0, lindbergh_state, empty_init, ROT0, "Sega", "The House of the Dead 4 (Export) (Rev B)", MACHINE_NOT_WORKING|MACHINE_UNEMULATED_PROTECTION|MACHINE_NO_SOUND)

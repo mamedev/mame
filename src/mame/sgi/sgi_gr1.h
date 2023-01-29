@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_VIDEO_SGI_GR1_H
-#define MAME_VIDEO_SGI_GR1_H
+#ifndef MAME_SGI_SGI_GR1_H
+#define MAME_SGI_SGI_GR1_H
 
 #pragma once
 
@@ -137,4 +137,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SGI_GR1, sgi_gr1_device)
 
-#endif // MAME_VIDEO_SGI_GR1_H
+#endif // MAME_SGI_SGI_GR1_H

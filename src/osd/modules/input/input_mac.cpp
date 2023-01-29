@@ -37,7 +37,7 @@ void mac_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 {
 }
 
-void mac_osd_interface::poll_inputs(running_machine &machine)
+void mac_osd_interface::poll_inputs()
 {
 	MacPollInputs();
 }

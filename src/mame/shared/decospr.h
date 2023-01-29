@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Haywood
-#ifndef MAME_VIDEO_DECOSPR_H
-#define MAME_VIDEO_DECOSPR_H
+#ifndef MAME_SHARED_DECOSPR_H
+#define MAME_SHARED_DECOSPR_H
 
 #pragma once
 
@@ -74,4 +74,4 @@ private:
 
 DECLARE_DEVICE_TYPE(DECO_SPRITE, decospr_device)
 
-#endif // MAME_VIDEO_DECOSPR_H
+#endif // MAME_SHARED_DECOSPR_H

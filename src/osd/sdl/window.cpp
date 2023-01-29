@@ -8,8 +8,22 @@
 //
 //============================================================
 
-#ifdef SDLMAME_WIN32
-#include <windows.h>
+// MAME headers
+#include "emu.h"
+#include "emuopts.h"
+#include "render.h"
+#include "screen.h"
+#include "ui/uimain.h"
+
+// OSD headers
+#include "window.h"
+#include "osdsdl.h"
+#include "modules/render/drawbgfx.h"
+#include "modules/render/drawsdl.h"
+#include "modules/render/draw13.h"
+#include "modules/monitor/monitor_common.h"
+#if (USE_OPENGL)
+#include "modules/render/drawogl.h"
 #endif
 
 // standard SDL headers
@@ -24,25 +38,10 @@
 #include <list>
 #include <memory>
 
-// MAME headers
-
-#include "emu.h"
-#include "emuopts.h"
-#include "render.h"
-#include "screen.h"
-#include "ui/uimain.h"
-
-// OSD headers
-
-#include "window.h"
-#include "osdsdl.h"
-#include "modules/render/drawbgfx.h"
-#include "modules/render/drawsdl.h"
-#include "modules/render/draw13.h"
-#include "modules/monitor/monitor_common.h"
-#if (USE_OPENGL)
-#include "modules/render/drawogl.h"
+#ifdef SDLMAME_WIN32
+#include <windows.h>
 #endif
+
 
 //============================================================
 //  PARAMETERS
@@ -73,14 +72,6 @@ class SDL_DM_Wrapper
 public:
 	SDL_DisplayMode mode;
 };
-
-// debugger
-//static int in_background;
-
-
-//============================================================
-//  PROTOTYPES
-//============================================================
 
 
 //============================================================

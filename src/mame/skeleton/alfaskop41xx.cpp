@@ -57,6 +57,9 @@ Dansk Datahistorisk Forening - http://datamuseum.dk/
 #define LOGIRQ(...)   LOGMASKED(LOG_IRQ,   __VA_ARGS__)
 #define LOGADLC(...)  LOGMASKED(LOG_ADLC,  __VA_ARGS__)
 
+
+namespace {
+
 #define PLA1_TAG "ic50"
 #define PLA1_INUSE 0 // 0=disabled until a PLA converter between DATAIO and MAXLOADER (mame format) exists
 
@@ -565,6 +568,9 @@ ROM_START( alfaskop4101 ) // Communication Processor Unit
 	ROM_REGION( 0x800, "roms", ROMREGION_ERASEFF )
 	ROM_LOAD( "alfaskop4101.bin", 0x0000, 0x0800, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver(S) */
 

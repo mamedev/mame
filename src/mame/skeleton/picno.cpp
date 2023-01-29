@@ -34,6 +34,9 @@ Can't do anything until the internal ROM is dumped.
 //#include "screen.h"
 //#include "speaker.h"
 
+
+namespace {
+
 class picno_state : public driver_device
 {
 public:
@@ -92,6 +95,9 @@ ROM_START( picno2 )
 	ROM_REGION(0x80000, "roms", 0)
 	ROM_LOAD( "rx001-z8-v4j.u2", 0x00000, 0x80000, CRC(ae89a9a5) SHA1(51ed458ffd151e19019beb23517263efce4be272) ) //HN62334BP
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY   FULLNAME   FLAGS
 CONS( 1993, picno,  0,      0,      picno,   picno, picno_state, empty_init, "Konami", "Picno",   MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )

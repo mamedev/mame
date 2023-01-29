@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald,Carl
 
-#ifndef MAME_VIDEO_X68K_CRTC_H
-#define MAME_VIDEO_X68K_CRTC_H
+#ifndef MAME_SHARP_X68K_CRTC_H
+#define MAME_SHARP_X68K_CRTC_H
 
 class x68k_crtc_device : public device_t, public device_video_interface
 {
@@ -135,4 +135,4 @@ public:
 DECLARE_DEVICE_TYPE(VINAS, vinas_device)
 DECLARE_DEVICE_TYPE(VICON, vicon_device)
 
-#endif // MAME_VIDEO_X68K_CRTC_H
+#endif // MAME_SHARP_X68K_CRTC_H

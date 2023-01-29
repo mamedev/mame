@@ -14,6 +14,7 @@
 
 #include "emuopts.h"
 #include "fileio.h"
+#include "main.h"
 #include "rendfont.h"
 #include "rendutil.h"
 #include "video/rgbutil.h"

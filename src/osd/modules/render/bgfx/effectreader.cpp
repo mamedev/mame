@@ -17,7 +17,7 @@
 #include "uniformreader.h"
 #include "uniform.h"
 
-bgfx_effect *effect_reader::read_from_value(const Value& value, std::string prefix, osd_options &options, shader_manager& shaders)
+bgfx_effect *effect_reader::read_from_value(std::string name, const Value& value, const std::string &prefix, osd_options &options, shader_manager& shaders)
 {
 	uint64_t flags = 0;
 	std::string vertex_name;
@@ -37,7 +37,7 @@ bgfx_effect *effect_reader::read_from_value(const Value& value, std::string pref
 		return nullptr;
 	}
 
-	bgfx_effect *effect = new bgfx_effect(flags, vertex_shader, fragment_shader, uniforms);
+	bgfx_effect *effect = new bgfx_effect(name, flags, vertex_shader, fragment_shader, uniforms);
 	if (effect->is_valid())
 	{
 		return effect;
@@ -48,7 +48,7 @@ bgfx_effect *effect_reader::read_from_value(const Value& value, std::string pref
 	return nullptr;
 }
 
-bool effect_reader::validate_value(const Value& value, std::string prefix, osd_options &options)
+bool effect_reader::validate_value(const Value& value, const std::string &prefix, osd_options &options)
 {
 	if (!validate_parameters(value, prefix))
 	{
@@ -80,7 +80,7 @@ bool effect_reader::validate_value(const Value& value, std::string prefix, osd_o
 	return true;
 }
 
-bool effect_reader::get_base_effect_data(const Value& value, std::string &prefix, uint64_t &flags, std::string &vertex_name, std::string &fragment_name,
+bool effect_reader::get_base_effect_data(const Value& value, const std::string &prefix, uint64_t &flags, std::string &vertex_name, std::string &fragment_name,
 	std::vector<bgfx_uniform *> &uniforms)
 {
 	if (!validate_parameters(value, prefix))
@@ -153,17 +153,17 @@ void effect_reader::clear_uniform_list(std::vector<bgfx_uniform *> &uniforms)
 	}
 }
 
-bool effect_reader::validate_parameters(const Value& value, std::string prefix)
+bool effect_reader::validate_parameters(const Value& value, const std::string &prefix)
 {
-	if (!READER_CHECK(value.HasMember("depth"), (prefix + "Must have object value 'depth' (what are our Z-buffer settings?)\n").c_str())) return false;
-	if (!READER_CHECK(value.HasMember("cull"), (prefix + "Must have object value 'cull' (do we cull triangles based on winding?)\n").c_str())) return false;
-	if (!READER_CHECK(value.HasMember("write"), (prefix + "Must have object value 'write' (what are our color buffer write settings?)\n").c_str())) return false;
-	if (!READER_CHECK(value.HasMember("vertex"), (prefix + "Must have string value 'vertex' (what is our vertex shader?)\n").c_str())) return false;
-	if (!READER_CHECK(value["vertex"].IsString(), (prefix + "Value 'vertex' must be a string\n").c_str())) return false;
-	if (!READER_CHECK(value.HasMember("fragment") || value.HasMember("pixel"), (prefix + "Must have string value named 'fragment' or 'pixel' (what is our fragment/pixel shader?)\n").c_str())) return false;
-	if (!READER_CHECK(!value.HasMember("fragment") || value["fragment"].IsString(), (prefix + "Value 'fragment' must be a string\n").c_str())) return false;
-	if (!READER_CHECK(!value.HasMember("pixel") || value["pixel"].IsString(), (prefix + "Value 'pixel' must be a string\n").c_str())) return false;
-	if (!READER_CHECK(value.HasMember("uniforms"), (prefix + "Must have array value 'uniforms' (what are our shader's parameters?)\n").c_str())) return false;
-	if (!READER_CHECK(value["uniforms"].IsArray(), (prefix + "Value 'uniforms' must be an array\n").c_str())) return false;
+	if (!READER_CHECK(value.HasMember("depth"), "%sMust have object value 'depth' (what are our Z-buffer settings?)\n", prefix)) return false;
+	if (!READER_CHECK(value.HasMember("cull"), "%sMust have object value 'cull' (do we cull triangles based on winding?)\n", prefix)) return false;
+	if (!READER_CHECK(value.HasMember("write"), "%sMust have object value 'write' (what are our color buffer write settings?)\n", prefix)) return false;
+	if (!READER_CHECK(value.HasMember("vertex"), "%sMust have string value 'vertex' (what is our vertex shader?)\n", prefix)) return false;
+	if (!READER_CHECK(value["vertex"].IsString(), "%sValue 'vertex' must be a string\n", prefix)) return false;
+	if (!READER_CHECK(value.HasMember("fragment") || value.HasMember("pixel"), "%sMust have string value named 'fragment' or 'pixel' (what is our fragment/pixel shader?)\n", prefix)) return false;
+	if (!READER_CHECK(!value.HasMember("fragment") || value["fragment"].IsString(), "%sValue 'fragment' must be a string\n", prefix)) return false;
+	if (!READER_CHECK(!value.HasMember("pixel") || value["pixel"].IsString(), "%sValue 'pixel' must be a string\n", prefix)) return false;
+	if (!READER_CHECK(value.HasMember("uniforms"), "%sMust have array value 'uniforms' (what are our shader's parameters?)\n", prefix)) return false;
+	if (!READER_CHECK(value["uniforms"].IsArray(), "%sValue 'uniforms' must be an array\n", prefix)) return false;
 	return true;
 }

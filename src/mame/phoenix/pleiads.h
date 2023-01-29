@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller
-#ifndef MAME_AUDIO_PLEIADS_H
-#define MAME_AUDIO_PLEIADS_H
+#ifndef MAME_PHOENIX_PLEIADS_H
+#define MAME_PHOENIX_PLEIADS_H
 
 #pragma once
 
@@ -127,4 +127,4 @@ DECLARE_DEVICE_TYPE(PLEIADS_SOUND, pleiads_sound_device)
 DECLARE_DEVICE_TYPE(NAUGHTYB_SOUND, naughtyb_sound_device)
 DECLARE_DEVICE_TYPE(POPFLAME_SOUND, popflame_sound_device)
 
-#endif // MAME_AUDIO_PLEIADS_H
+#endif // MAME_PHOENIX_PLEIADS_H

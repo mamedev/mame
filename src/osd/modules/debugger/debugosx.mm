@@ -24,11 +24,6 @@
 // MAMEOS headers
 #include "modules/lib/osdobj_common.h"
 #include "osx/debugosx.h"
-#ifdef OSD_MAC
-#include "osdmac.h"
-#else
-#include "osdsdl.h"
-#endif
 #include "debug_module.h"
 
 #import "osx/debugconsole.h"
@@ -61,12 +56,12 @@ public:
 			[m_console release];
 	}
 
-	virtual int init(const osd_options &options);
-	virtual void exit();
+	virtual int init(osd_interface &osd, const osd_options &options) override;
+	virtual void exit() override;
 
-	virtual void init_debugger(running_machine &machine);
-	virtual void wait_for_debugger(device_t &device, bool firststop);
-	virtual void debugger_update();
+	virtual void init_debugger(running_machine &machine) override;
+	virtual void wait_for_debugger(device_t &device, bool firststop) override;
+	virtual void debugger_update() override;
 
 private:
 	void create_console();
@@ -91,7 +86,7 @@ std::atomic_bool debugger_osx::s_added_menus(false);
 //  initialise debugger module
 //============================================================
 
-int debugger_osx::init(const osd_options &options)
+int debugger_osx::init(osd_interface &osd, const osd_options &options)
 {
 	return 0;
 }

@@ -53,8 +53,15 @@ protected:
 		return V_READER_CHECK(condition, util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
 	}
 
+	template <typename Format, typename... Params>
+	static bool READER_WARN(bool condition, Format &&fmt, Params &&... args)
+	{
+		return V_READER_WARN(condition, util::make_format_argument_pack(std::forward<Format>(fmt), std::forward<Params>(args)...));
+	}
+
 private:
 	static bool V_READER_CHECK(bool condition, const util::format_argument_pack<std::ostream> &args);
+	static bool V_READER_WARN(bool condition, const util::format_argument_pack<std::ostream> &args);
 	static void get_vec_values(const Value& value_array, float* data, const unsigned int count);
 };
 

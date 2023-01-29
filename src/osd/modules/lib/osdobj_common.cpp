@@ -166,6 +166,12 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_AUDIO_EFFECT "9",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 9" },
 #endif
 
+	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD MIDI OPTIONS" },
+	{ OSDOPTION_MIDI_PROVIDER,                   OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "MIDI I/O method: " },
+
+	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD EMULATED NETWORKING OPTIONS" },
+	{ OSDOPTION_NETWORK_PROVIDER,                OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "Emulated networking provider: " },
+
 	{ nullptr,                                   nullptr,           core_options::option_type::HEADER, "BGFX POST-PROCESSING OPTIONS" },
 	{ OSDOPTION_BGFX_PATH,                       "bgfx",            core_options::option_type::PATH,   "path to BGFX-related files" },
 	{ OSDOPTION_BGFX_BACKEND,                    "auto",            core_options::option_type::STRING, "BGFX backend to use (d3d9, d3d11, d3d12, metal, opengl, gles, vulkan)" },
@@ -221,7 +227,7 @@ osd_common_t::~osd_common_t()
 	osd_output::pop(this);
 }
 
-#define REGISTER_MODULE(_O, _X ) { extern const module_type _X; _O . register_module( _X ); }
+#define REGISTER_MODULE(O, X) { extern const module_type X; O.register_module(X); }
 
 void osd_common_t::register_options()
 {
@@ -301,72 +307,17 @@ void osd_common_t::register_options()
 
 	// after initialization we know which modules are supported
 
-	const char *names[20];
-	int num;
-	std::vector<const char *> dnames;
-
-	m_mod_man.get_module_names(OSD_MONITOR_PROVIDER, 20, num, names);
-	for (int i = 0; i < num; i++)
-		dnames.push_back(names[i]);
-	update_option(OSD_MONITOR_PROVIDER, dnames);
-
-	m_mod_man.get_module_names(OSD_FONT_PROVIDER, 20, num, names);
-	dnames.clear();
-	for (int i = 0; i < num; i++)
-		dnames.push_back(names[i]);
-	update_option(OSD_FONT_PROVIDER, dnames);
-
-	m_mod_man.get_module_names(OSD_KEYBOARDINPUT_PROVIDER, 20, num, names);
-	dnames.clear();
-	for (int i = 0; i < num; i++)
-		dnames.push_back(names[i]);
-	update_option(OSD_KEYBOARDINPUT_PROVIDER, dnames);
-
-	m_mod_man.get_module_names(OSD_MOUSEINPUT_PROVIDER, 20, num, names);
-	dnames.clear();
-	for (int i = 0; i < num; i++)
-		dnames.push_back(names[i]);
-	update_option(OSD_MOUSEINPUT_PROVIDER, dnames);
-
-	m_mod_man.get_module_names(OSD_LIGHTGUNINPUT_PROVIDER, 20, num, names);
-	dnames.clear();
-	for (int i = 0; i < num; i++)
-		dnames.push_back(names[i]);
-	update_option(OSD_LIGHTGUNINPUT_PROVIDER, dnames);
-
-	m_mod_man.get_module_names(OSD_JOYSTICKINPUT_PROVIDER, 20, num, names);
-	dnames.clear();
-	for (int i = 0; i < num; i++)
-		dnames.push_back(names[i]);
-	update_option(OSD_JOYSTICKINPUT_PROVIDER, dnames);
-
-	m_mod_man.get_module_names(OSD_SOUND_PROVIDER, 20, num, names);
-	dnames.clear();
-	for (int i = 0; i < num; i++)
-		dnames.push_back(names[i]);
-	update_option(OSD_SOUND_PROVIDER, dnames);
-
-#if 0
-	// Register midi options and update options
-	m_mod_man.get_module_names(OSD_MIDI_PROVIDER, 20, num, names);
-	dnames.clear();
-	for (int i = 0; i < num; i++)
-		dnames.push_back(names[i]);
-	update_option(OSD_MIDI_PROVIDER, dnames);
-#endif
-
-	// Register debugger options and update options
-	m_mod_man.get_module_names(OSD_DEBUG_PROVIDER, 20, num, names);
-	dnames.clear();
-	for (int i = 0; i < num; i++)
-		dnames.push_back(names[i]);
-	update_option(OSD_DEBUG_PROVIDER, dnames);
-
-	m_mod_man.get_module_names(OSD_OUTPUT_PROVIDER, 20, num, names);
-	dnames.clear();
-	for (int i = 0; i < num; i++)
-		dnames.push_back(names[i]);
-	update_option(OSD_OUTPUT_PROVIDER, dnames);
+	update_option(OSD_MONITOR_PROVIDER, m_mod_man.get_module_names(OSD_MONITOR_PROVIDER));
+	update_option(OSD_FONT_PROVIDER, m_mod_man.get_module_names(OSD_FONT_PROVIDER));
+	update_option(OSD_KEYBOARDINPUT_PROVIDER, m_mod_man.get_module_names(OSD_KEYBOARDINPUT_PROVIDER));
+	update_option(OSD_MOUSEINPUT_PROVIDER, m_mod_man.get_module_names(OSD_MOUSEINPUT_PROVIDER));
+	update_option(OSD_LIGHTGUNINPUT_PROVIDER, m_mod_man.get_module_names(OSD_LIGHTGUNINPUT_PROVIDER));
+	update_option(OSD_JOYSTICKINPUT_PROVIDER, m_mod_man.get_module_names(OSD_JOYSTICKINPUT_PROVIDER));
+	update_option(OSD_SOUND_PROVIDER, m_mod_man.get_module_names(OSD_SOUND_PROVIDER));
+	update_option(OSD_MIDI_PROVIDER, m_mod_man.get_module_names(OSD_MIDI_PROVIDER));
+	update_option(OSD_NETDEV_PROVIDER, m_mod_man.get_module_names(OSD_NETDEV_PROVIDER));
+	update_option(OSD_DEBUG_PROVIDER, m_mod_man.get_module_names(OSD_DEBUG_PROVIDER));
+	update_option(OSD_OUTPUT_PROVIDER, m_mod_man.get_module_names(OSD_OUTPUT_PROVIDER));
 
 	// Register video options and update options
 	video_options_add("none", nullptr);
@@ -374,21 +325,20 @@ void osd_common_t::register_options()
 	update_option(OSDOPTION_VIDEO, m_video_names);
 }
 
-void osd_common_t::update_option(const std::string &key, std::vector<const char *> &values)
+void osd_common_t::update_option(const std::string &key, std::vector<std::string_view> const &values)
 {
 	std::string current_value(m_options.description(key.c_str()));
 	std::string new_option_value("");
 	for (unsigned int index = 0; index < values.size(); index++)
 	{
-		std::string t(values[index]);
 		if (new_option_value.length() > 0)
 		{
-			if( index != (values.size()-1))
+			if (index != (values.size() - 1))
 				new_option_value.append(", ");
 			else
 				new_option_value.append(" or ");
 		}
-		new_option_value.append(t);
+		new_option_value.append(values[index]);
 	}
 
 	m_option_descs[key] = current_value + new_option_value;
@@ -629,7 +579,7 @@ bool osd_common_t::execute_command(const char *command)
 
 		if (om->probe())
 		{
-			om->init(options());
+			om->init(*this, options());
 			osd_list_network_adapters();
 			om->exit();
 		}
@@ -643,7 +593,7 @@ bool osd_common_t::execute_command(const char *command)
 
 		if (om->probe())
 		{
-			om->init(options());
+			om->init(*this, options());
 			pm->list_midi_devices();
 			om->exit();
 		}
@@ -664,7 +614,7 @@ void osd_common_t::init_subsystems()
 	// monitors have to be initialized before video init
 	m_monitor_module = select_module_options<monitor_module *>(options(), OSD_MONITOR_PROVIDER);
 	assert(m_monitor_module != nullptr);
-	m_monitor_module->init(options());
+	m_monitor_module->init(*this, options());
 
 	if (!video_init())
 	{
@@ -695,12 +645,9 @@ void osd_common_t::init_subsystems()
 	m_output->set_machine(&machine());
 	machine().output().set_global_notifier(output_notifier_callback, this);
 
-	m_mod_man.init(options());
+	m_mod_man.init(*this, options());
 
 	input_init();
-	// we need pause callbacks
-	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(&osd_common_t::input_pause, this));
-	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(&osd_common_t::input_resume, this));
 }
 
 bool osd_common_t::video_init()
@@ -729,22 +676,6 @@ bool osd_common_t::input_init()
 	m_lightgun_input->input_init(machine());
 	m_joystick_input->input_init(machine());
 	return true;
-}
-
-void osd_common_t::input_pause()
-{
-	m_keyboard_input->pause();
-	m_mouse_input->pause();
-	m_lightgun_input->pause();
-	m_joystick_input->pause();
-}
-
-void osd_common_t::input_resume()
-{
-	m_keyboard_input->resume();
-	m_mouse_input->resume();
-	m_lightgun_input->resume();
-	m_joystick_input->resume();
 }
 
 void osd_common_t::exit_subsystems()

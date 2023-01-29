@@ -38,6 +38,8 @@ but the syntax has yet to be worked out. BAUD [0-9] is allowed but what is it do
 #include "utf8.h"
 
 
+namespace {
+
 class shine_state : public driver_device
 {
 public:
@@ -297,6 +299,8 @@ ROM_START( shine )
 	ROM_LOAD("e3.ic61",         0x3000, 0x1000, CRC(5a1624e9) SHA1(b4fbc983c646d4e70dda878d5dd75e45408522a9))
 	ROM_LOAD("f3.ic60",         0x4000, 0x1000, CRC(1549ca2f) SHA1(5b011cdca0121a550af956b6d4580544942459ce))
 ROM_END
+
+} // anonymous namespace
 
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT   CLASS         INIT         COMPANY                  FULLNAME    FLAGS */

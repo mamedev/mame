@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "debug_module.h"
-#include "modules/osdmodule.h"
 
 #if defined(OSD_WINDOWS) /*|| defined(SDLMAME_WIN32)*/
 
@@ -22,28 +21,34 @@
 #include "win/pointswininfo.h"
 #include "win/uimetrics.h"
 
+// emu
 #include "config.h"
 #include "debugger.h"
 #include "debug/debugcpu.h"
 
 #include "util/xmlfile.h"
 
+// osd/windows
 #include "window.h"
-#include "../input/input_common.h"
-#include "../input/input_windows.h"
+#include "winmain.h"
 
+#include "../input/input_windows.h" // for the keyboard translation table
+
+
+namespace osd {
 
 namespace {
 
 class debugger_windows :
 		public osd_module,
 		public debug_module,
-		protected osd::debugger::win::debugger_windows_interface
+		protected debugger::win::debugger_windows_interface
 {
 public:
 	debugger_windows() :
 		osd_module(OSD_DEBUG_PROVIDER, "windows"),
 		debug_module(),
+		m_osd(nullptr),
 		m_machine(nullptr),
 		m_metrics(),
 		m_waiting_for_debugger(false),
@@ -57,7 +62,7 @@ public:
 
 	virtual ~debugger_windows() { }
 
-	virtual int init(const osd_options &options) override { return 0; }
+	virtual int init(osd_interface &osd, osd_options const &options) override;
 	virtual void exit() override;
 
 	virtual void init_debugger(running_machine &machine) override;
@@ -67,7 +72,7 @@ public:
 protected:
 	virtual running_machine &machine() const override { return *m_machine; }
 
-	virtual osd::debugger::win::ui_metrics &metrics() const override { return *m_metrics; }
+	virtual debugger::win::ui_metrics &metrics() const override { return *m_metrics; }
 	virtual void set_color_theme(int index) override;
 	virtual bool get_save_window_arrangement() const override { return m_save_windows; }
 	virtual void set_save_window_arrangement(bool save) override { m_save_windows = save; }
@@ -75,11 +80,11 @@ protected:
 	virtual bool const &waiting_for_debugger() const override { return m_waiting_for_debugger; }
 	virtual bool seq_pressed() const override;
 
-	virtual void create_memory_window() override { create_window<osd::debugger::win::memorywin_info>(); }
-	virtual void create_disasm_window() override { create_window<osd::debugger::win::disasmwin_info>(); }
-	virtual void create_log_window() override { create_window<osd::debugger::win::logwin_info>(); }
-	virtual void create_points_window() override { create_window<osd::debugger::win::pointswin_info>(); }
-	virtual void remove_window(osd::debugger::win::debugwin_info &info) override;
+	virtual void create_memory_window() override { create_window<debugger::win::memorywin_info>(); }
+	virtual void create_disasm_window() override { create_window<debugger::win::disasmwin_info>(); }
+	virtual void create_log_window() override { create_window<debugger::win::logwin_info>(); }
+	virtual void create_points_window() override { create_window<debugger::win::pointswin_info>(); }
+	virtual void remove_window(debugger::win::debugwin_info &info) override;
 
 	virtual void show_all() override;
 	virtual void hide_all() override;
@@ -94,11 +99,12 @@ private:
 
 	void load_configuration(util::xml::data_node const &parentnode);
 
+	windows_osd_interface *m_osd;
 	running_machine *m_machine;
-	std::unique_ptr<osd::debugger::win::ui_metrics> m_metrics;
+	std::unique_ptr<debugger::win::ui_metrics> m_metrics;
 	bool m_waiting_for_debugger;
-	std::vector<std::unique_ptr<osd::debugger::win::debugwin_info> > m_window_list;
-	osd::debugger::win::consolewin_info *m_main_console;
+	std::vector<std::unique_ptr<debugger::win::debugwin_info> > m_window_list;
+	debugger::win::consolewin_info *m_main_console;
 
 	POINT m_next_window_pos;
 	LONG m_window_start_x;
@@ -106,6 +112,16 @@ private:
 	util::xml::file::ptr m_config;
 	bool m_save_windows;
 };
+
+
+int debugger_windows::init(osd_interface &osd, osd_options const &options)
+{
+	m_osd = dynamic_cast<windows_osd_interface *>(&osd);
+	if (!m_osd)
+		return -1;
+
+	return 0;
+}
 
 
 void debugger_windows::exit()
@@ -123,7 +139,7 @@ void debugger_windows::exit()
 void debugger_windows::init_debugger(running_machine &machine)
 {
 	m_machine = &machine;
-	m_metrics = std::make_unique<osd::debugger::win::ui_metrics>(downcast<osd_options &>(m_machine->options()));
+	m_metrics = std::make_unique<debugger::win::ui_metrics>(downcast<osd_options &>(m_machine->options()));
 	machine.configuration().config_register(
 			"debugger",
 			configuration_manager::load_delegate(&debugger_windows::config_load, this),
@@ -136,7 +152,7 @@ void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 	// create a console window
 	if (!m_main_console)
 	{
-		m_main_console = create_window<osd::debugger::win::consolewin_info>();
+		m_main_console = create_window<debugger::win::consolewin_info>();
 
 		// set the starting position for new auxiliary windows
 		HMONITOR const nearest_monitor = MonitorFromWindow(
@@ -286,7 +302,7 @@ bool debugger_windows::seq_pressed() const
 }
 
 
-void debugger_windows::remove_window(osd::debugger::win::debugwin_info &info)
+void debugger_windows::remove_window(debugger::win::debugwin_info &info)
 {
 	for (auto it = m_window_list.begin(); it != m_window_list.end(); ++it)
 		if (it->get() == &info) {
@@ -378,10 +394,10 @@ void debugger_windows::config_load(config_type cfgtype, config_level cfglevel, u
 	{
 		if (config_type::DEFAULT == cfgtype)
 		{
-			m_save_windows = 0 != parentnode->get_attribute_int(osd::debugger::ATTR_DEBUGGER_SAVE_WINDOWS, m_save_windows ? 1 : 0);
-			util::xml::data_node const *const colors = parentnode->get_child(osd::debugger::NODE_COLORS);
+			m_save_windows = 0 != parentnode->get_attribute_int(debugger::ATTR_DEBUGGER_SAVE_WINDOWS, m_save_windows ? 1 : 0);
+			util::xml::data_node const *const colors = parentnode->get_child(debugger::NODE_COLORS);
 			if (colors)
-				m_metrics->set_color_theme(colors->get_attribute_int(osd::debugger::ATTR_COLORS_THEME, m_metrics->get_color_theme()));
+				m_metrics->set_color_theme(colors->get_attribute_int(debugger::ATTR_COLORS_THEME, m_metrics->get_color_theme()));
 		}
 		else if (config_type::SYSTEM == cfgtype)
 		{
@@ -404,10 +420,10 @@ void debugger_windows::config_save(config_type cfgtype, util::xml::data_node *pa
 {
 	if (config_type::DEFAULT == cfgtype)
 	{
-		parentnode->set_attribute_int(osd::debugger::ATTR_DEBUGGER_SAVE_WINDOWS, m_save_windows ? 1 : 0);
-		util::xml::data_node *const colors = parentnode->add_child(osd::debugger::NODE_COLORS, nullptr);
+		parentnode->set_attribute_int(debugger::ATTR_DEBUGGER_SAVE_WINDOWS, m_save_windows ? 1 : 0);
+		util::xml::data_node *const colors = parentnode->add_child(debugger::NODE_COLORS, nullptr);
 		if (colors)
-			colors->set_attribute_int(osd::debugger::ATTR_COLORS_THEME, m_metrics->get_color_theme());
+			colors->set_attribute_int(debugger::ATTR_COLORS_THEME, m_metrics->get_color_theme());
 	}
 	else if (m_save_windows && (config_type::SYSTEM == cfgtype))
 	{
@@ -419,30 +435,30 @@ void debugger_windows::config_save(config_type cfgtype, util::xml::data_node *pa
 
 void debugger_windows::load_configuration(util::xml::data_node const &parentnode)
 {
-	for (util::xml::data_node const *node = parentnode.get_child(osd::debugger::NODE_WINDOW); node; node = node->get_next_sibling(osd::debugger::NODE_WINDOW))
+	for (util::xml::data_node const *node = parentnode.get_child(debugger::NODE_WINDOW); node; node = node->get_next_sibling(debugger::NODE_WINDOW))
 	{
-		osd::debugger::win::debugwin_info *win = nullptr;
-		switch (node->get_attribute_int(osd::debugger::ATTR_WINDOW_TYPE, -1))
+		debugger::win::debugwin_info *win = nullptr;
+		switch (node->get_attribute_int(debugger::ATTR_WINDOW_TYPE, -1))
 		{
-		case osd::debugger::WINDOW_TYPE_CONSOLE:
+		case debugger::WINDOW_TYPE_CONSOLE:
 			m_main_console->restore_configuration_from_node(*node);
 			break;
-		case osd::debugger::WINDOW_TYPE_MEMORY_VIEWER:
-			win = create_window<osd::debugger::win::memorywin_info>();
+		case debugger::WINDOW_TYPE_MEMORY_VIEWER:
+			win = create_window<debugger::win::memorywin_info>();
 			break;
-		case osd::debugger::WINDOW_TYPE_DISASSEMBLY_VIEWER:
-			win = create_window<osd::debugger::win::disasmwin_info>();
+		case debugger::WINDOW_TYPE_DISASSEMBLY_VIEWER:
+			win = create_window<debugger::win::disasmwin_info>();
 			break;
-		case osd::debugger::WINDOW_TYPE_ERROR_LOG_VIEWER:
-			win = create_window<osd::debugger::win::logwin_info>();
+		case debugger::WINDOW_TYPE_ERROR_LOG_VIEWER:
+			win = create_window<debugger::win::logwin_info>();
 			break;
-		case osd::debugger::WINDOW_TYPE_POINTS_VIEWER:
-			win = create_window<osd::debugger::win::pointswin_info>();
+		case debugger::WINDOW_TYPE_POINTS_VIEWER:
+			win = create_window<debugger::win::pointswin_info>();
 			break;
-		case osd::debugger::WINDOW_TYPE_DEVICES_VIEWER:
+		case debugger::WINDOW_TYPE_DEVICES_VIEWER:
 			// not supported
 			break;
-		case osd::debugger::WINDOW_TYPE_DEVICE_INFO_VIEWER:
+		case debugger::WINDOW_TYPE_DEVICE_INFO_VIEWER:
 			// not supported
 			break;
 		default:
@@ -455,8 +471,12 @@ void debugger_windows::load_configuration(util::xml::data_node const &parentnode
 
 } // anonymous namespace
 
+} // namespace osd
+
 #else // not Windows
-MODULE_NOT_SUPPORTED(debugger_windows, OSD_DEBUG_PROVIDER, "windows")
+
+namespace osd { namespace { MODULE_NOT_SUPPORTED(debugger_windows, OSD_DEBUG_PROVIDER, "windows") } }
+
 #endif
 
-MODULE_DEFINITION(DEBUG_WINDOWS, debugger_windows)
+MODULE_DEFINITION(DEBUG_WINDOWS, osd::debugger_windows)

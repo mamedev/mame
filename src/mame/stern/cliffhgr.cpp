@@ -86,6 +86,8 @@ Side 2 = 0x8F7DDD (or 0x880000 | ( 0x77 << 12 ) | 0x0DDD)
 #include "speaker.h"
 
 
+namespace {
+
 #define CLIFF_ENABLE_SND_1  NODE_01
 #define CLIFF_ENABLE_SND_2  NODE_02
 
@@ -772,6 +774,8 @@ ROM_START( goaltogo )
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "goaltog1", 0, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

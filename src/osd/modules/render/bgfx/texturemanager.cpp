@@ -50,9 +50,9 @@ void texture_manager::add_provider(std::string name, bgfx_texture_handle_provide
 	}
 }
 
-bgfx_texture* texture_manager::create_texture(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t height, void* data, uint32_t flags)
+bgfx_texture* texture_manager::create_texture(std::string name, bgfx::TextureFormat::Enum format, uint32_t width, uint32_t width_margin, uint32_t height, void* data, uint32_t flags)
 {
-	auto* texture = new bgfx_texture(name, format, width, height, flags, data);
+	auto* texture = new bgfx_texture(name, format, width, width_margin, height, flags, data);
 	m_textures[name] = texture;
 	return texture;
 }
@@ -69,7 +69,7 @@ bgfx_texture* texture_manager::create_png_texture(std::string path, std::string 
 
 	if (bitmap.width() == 0 || bitmap.height() == 0)
 	{
-		osd_printf_error("Unable to load PNG '%s' from path '%s'\n", file_name.c_str(), path.c_str());
+		osd_printf_error("Unable to load PNG '%s' from path '%s'\n", file_name, path);
 		return nullptr;
 	}
 
@@ -89,14 +89,14 @@ bgfx_texture* texture_manager::create_png_texture(std::string path, std::string 
 	{
 		texture_name += std::to_string(screen);
 	}
-	bgfx_texture* texture = create_texture(texture_name, bgfx::TextureFormat::BGRA8, width, height, data, flags);
+	bgfx_texture* texture = create_texture(texture_name, bgfx::TextureFormat::BGRA8, width, 0, height, data, flags);
 
 	delete [] data;
 
 	return texture;
 }
 
-bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t format, int width, int height
+bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t format, int width, int width_margin, int height
 	, int rowpixels, const rgb_t *palette, void *base, uint32_t seqid, uint32_t flags, uint64_t key, uint64_t old_key)
 {
 	bgfx::TextureHandle handle = BGFX_INVALID_HANDLE;
@@ -126,8 +126,8 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t form
 					uint16_t pitch = width;
 					int width_div_factor = 1;
 					int width_mul_factor = 1;
-					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, height, palette, base, pitch, width_div_factor, width_mul_factor);
-					bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)((rowpixels * width_mul_factor) / width_div_factor), (uint16_t)height, mem, pitch);
+					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, width_margin, height, palette, base, pitch, width_div_factor, width_mul_factor);
+					bgfx::updateTexture2D(handle, 0, 0, 0, 0, uint16_t((rowpixels * width_mul_factor) / width_div_factor), uint16_t(height), mem, pitch);
 					return handle;
 				}
 			}
@@ -156,8 +156,8 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t form
 					uint16_t pitch = width;
 					int width_div_factor = 1;
 					int width_mul_factor = 1;
-					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, height, palette, base, pitch, width_div_factor, width_mul_factor);
-					bgfx::updateTexture2D(handle, 0, 0, 0, 0, (uint16_t)((rowpixels * width_mul_factor) / width_div_factor), (uint16_t)height, mem, pitch);
+					const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, width_margin, height, palette, base, pitch, width_div_factor, width_mul_factor);
+					bgfx::updateTexture2D(handle, 0, 0, 0, 0, uint16_t((rowpixels * width_mul_factor) / width_div_factor), uint16_t(height), mem, pitch);
 					return handle;
 				}
 			}
@@ -169,10 +169,10 @@ bgfx::TextureHandle texture_manager::create_or_update_mame_texture(uint32_t form
 	uint16_t pitch = width;
 	int width_div_factor = 1;
 	int width_mul_factor = 1;
-	const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, height, palette, base, pitch, width_div_factor, width_mul_factor);
-	const uint16_t adjusted_width = (uint16_t)((rowpixels * width_mul_factor) / width_div_factor);
+	const bgfx::Memory* mem = bgfx_util::mame_texture_data_to_bgfx_texture_data(dst_format, format, rowpixels, width_margin, height, palette, base, pitch, width_div_factor, width_mul_factor);
+	const uint16_t adjusted_width = uint16_t((rowpixels * width_mul_factor) / width_div_factor);
 	handle = bgfx::createTexture2D(adjusted_width, height, false, 1, dst_format, flags, nullptr);
-	bgfx::updateTexture2D(handle, 0, 0, 0, 0, adjusted_width, (uint16_t)height, mem, pitch);
+	bgfx::updateTexture2D(handle, 0, 0, 0, 0, adjusted_width, uint16_t(height), mem, pitch);
 
 	m_mame_textures[key] = { handle, seqid, width, height };
 	return handle;

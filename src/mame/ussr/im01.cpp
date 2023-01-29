@@ -101,8 +101,6 @@ CТА: -                                                   - Enter Move
 
 namespace {
 
-// ИМ-01 / shared
-
 class im01_state : public driver_device
 {
 public:
@@ -121,6 +119,7 @@ public:
 protected:
 	virtual void machine_start() override;
 
+private:
 	// devices/pointers
 	required_device<t11_device> m_maincpu;
 	required_device<pwm_display_device> m_display;

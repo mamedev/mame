@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_AUDIO_SVIS_SND_H
-#define MAME_AUDIO_SVIS_SND_H
+#ifndef MAME_SVISION_SVIS_SND_H
+#define MAME_SVISION_SVIS_SND_H
 
 #pragma once
 
@@ -101,4 +101,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SVISION_SND, svision_sound_device)
 
-#endif // MAME_AUDIO_SVIS_SND_H
+#endif // MAME_SVISION_SVIS_SND_H

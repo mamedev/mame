@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald,Vas Crabb
-#ifndef MAME_MACHINE_X68K_KBD_H
-#define MAME_MACHINE_X68K_KBD_H
+#ifndef MAME_SHARP_X68K_KBD_H
+#define MAME_SHARP_X68K_KBD_H
 
 #pragma once
 
@@ -40,4 +40,4 @@ private:
 
 DECLARE_DEVICE_TYPE(X68K_KEYBOARD, x68k_keyboard_device)
 
-#endif // MAME_MACHINE_X68K_KBD_H
+#endif // MAME_SHARP_X68K_KBD_H
