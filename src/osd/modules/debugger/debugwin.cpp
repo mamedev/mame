@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Vas Crabb
 //============================================================
 //
-//  debugwin.c - Win32 debug window handling
+//  debugwin.cpp - Win32 debug window handling
 //
 //============================================================
 
@@ -156,7 +156,7 @@ void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 
 		// set the starting position for new auxiliary windows
 		HMONITOR const nearest_monitor = MonitorFromWindow(
-				std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window(),
+				dynamic_cast<win_window_info &>(*osd_common_t::window_list().front()).platform_window(),
 				MONITOR_DEFAULTTONEAREST);
 		if (nearest_monitor)
 		{
@@ -321,7 +321,7 @@ void debugger_windows::show_all()
 
 void debugger_windows::hide_all()
 {
-	SetForegroundWindow(std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window());
+	SetForegroundWindow(dynamic_cast<win_window_info &>(*osd_common_t::window_list().front()).platform_window());
 	for (auto &info : m_window_list)
 		info->hide();
 }

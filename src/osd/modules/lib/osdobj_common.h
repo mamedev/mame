@@ -190,15 +190,16 @@ public:
 
 // ======================> osd_interface
 
-class font_module;
-class sound_module;
 class debug_module;
-class midi_module;
+class font_module;
 class input_module;
-class output_module;
+class midi_module;
 class monitor_module;
 class osd_watchdog;
 class osd_window;
+class output_module;
+class render_module;
+class sound_module;
 
 // description of the currently-running machine
 class osd_common_t : public osd_interface, osd_output
@@ -250,7 +251,6 @@ public:
 	virtual void init_subsystems();
 
 	virtual bool video_init();
-	virtual void video_register();
 	virtual bool window_init();
 
 	virtual void exit_subsystems();
@@ -258,8 +258,6 @@ public:
 	virtual void window_exit();
 
 	virtual void osd_exit();
-
-	virtual void video_options_add(const char *name, void *type);
 
 	virtual osd_options &options() { return m_options; }
 
@@ -273,13 +271,15 @@ public:
 	virtual void process_events() = 0;
 	virtual bool has_focus() const = 0;
 
-	static std::list<std::shared_ptr<osd_window> > s_window_list;
+	static const std::list<std::unique_ptr<osd_window> > &window_list() { return s_window_list; }
 
 protected:
 	virtual bool input_init();
 
 	virtual void build_slider_list() { }
 	virtual void update_slider_list() { }
+
+	static std::list<std::unique_ptr<osd_window> > s_window_list;
 
 private:
 	// internal state
@@ -293,26 +293,24 @@ private:
 
 	void update_option(const std::string &key, std::vector<std::string_view> const &values);
 	// FIXME: should be elsewhere
-	osd_module *select_module_options(const core_options &opts, const std::string &opt_name)
+	template<class C>
+	C &select_module_options(const std::string &opt_name)
 	{
-		std::string opt_val = opts.exists(opt_name) ? opts.value(opt_name) : "";
-		if (opt_val.compare("auto")==0)
+		std::string opt_val = options().exists(opt_name) ? options().value(opt_name) : "";
+		if (opt_val == "auto")
+		{
 			opt_val = "";
+		}
 		else if (!m_mod_man.type_has_name(opt_name.c_str(), opt_val.c_str()))
 		{
 			osd_printf_warning("Value %s not supported for option %s - falling back to auto\n", opt_val, opt_name);
 			opt_val = "";
 		}
-		return m_mod_man.select_module(opt_name.c_str(), opt_val.c_str());
-	}
-
-	template<class C>
-	C select_module_options(const core_options &opts, const std::string &opt_name)
-	{
-		return dynamic_cast<C>(select_module_options(opts, opt_name));
+		return m_mod_man.select_module<C>(*this, options(), opt_name.c_str(), opt_val.c_str());
 	}
 
 protected:
+	render_module*  m_render;
 	sound_module*   m_sound;
 	debug_module*   m_debugger;
 	midi_module*    m_midi;
@@ -326,7 +324,6 @@ protected:
 	std::vector<ui::menu_item> m_sliders;
 
 private:
-	std::vector<std::string_view> m_video_names;
 	std::unordered_map<std::string, std::string> m_option_descs;
 };
 

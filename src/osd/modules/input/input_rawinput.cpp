@@ -595,7 +595,7 @@ public:
 		registration.dwFlags = RIDEV_DEVNOTIFY;
 		if (background_input())
 			registration.dwFlags |= RIDEV_INPUTSINK;
-		registration.hwndTarget = std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window();
+		registration.hwndTarget = dynamic_cast<win_window_info &>(*osd_common_t::window_list().front()).platform_window();
 
 		// register the device
 		RegisterRawInputDevices(&registration, 1, sizeof(registration));

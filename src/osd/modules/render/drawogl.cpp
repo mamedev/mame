@@ -12,37 +12,61 @@
 //
 //============================================================
 
-// standard C headers
-#include <cmath>
-#include <cstdio>
+#include "render_module.h"
 
-// MAME headers
+#include "modules/osdmodule.h"
+
+#if USE_OPENGL
+
+// will be picked up from specific OSD implementation
+#include "window.h"
+
+// OSD common headers
+#include "modules/lib/osdlib.h"
+#include "modules/lib/osdobj_common.h"
+#include "modules/opengl/gl_shader_mgr.h"
+#include "modules/opengl/gl_shader_tool.h"
 #include "osdcomm.h"
-#include "emu.h"
-#include "emuopts.h"
 
-#ifdef OSD_MAC
+// OSD headers
+#if defined(OSD_WINDOWS)
+typedef uint64_t HashT;
+#include "winglcontext.h"
+#elif defined(OSD_MAC)
 #define GL_SILENCE_DEPRECATION (1)
+#include "osdmac.h"
+#else
+#include "osdsdl.h"
+#include "sdlglcontext.h"
 #endif
 
+// emu
+#include "emucore.h"
+#include "emuopts.h"
+#include "render.h"
+
+
 #if !defined(OSD_WINDOWS) && !defined(OSD_MAC)
+
 // standard SDL headers
 #define TOBEMIGRATED 1
 #include <SDL2/SDL.h>
-#endif
 
-#include "modules/lib/osdlib.h"
-#include "modules/lib/osdobj_common.h"
+#endif // !defined(OSD_WINDOWS && !defined(OSD_MAC)
 
-// OpenGL headers
-#include "modules/opengl/osd_opengl.h"
 
-#include "modules/opengl/gl_shader_tool.h"
-#include "modules/opengl/gl_shader_mgr.h"
+// standard C headers
+#include <cmath>
+#include <cstdio>
+#include <memory>
+#include <utility>
+
 
 #if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
+
 #include <cstring>
 #include <cstdio>
+
 #include <sys/types.h>
 #include <sys/sysctl.h>
 
@@ -72,7 +96,13 @@ typedef void (APIENTRYP PFNGLBINDRENDERBUFFEREXTPROC) (GLenum m_target, GLuint r
 typedef void (APIENTRYP PFNGLRENDERBUFFERSTORAGEEXTPROC) (GLenum m_target, GLenum internalformat, GLsizei width, GLsizei height);
 typedef void (APIENTRYP PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC) (GLenum m_target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
 typedef void (APIENTRYP PFNGLDELETERENDERBUFFERSEXTPROC) (GLsizei n, const GLuint *renderbuffers);
-#endif
+
+#endif // defined(SDLMAME_MACOSX) || defined(OSD_MAC)
+
+
+namespace osd {
+
+namespace {
 
 // make sure the extensions compile OK everywhere
 #ifndef GL_TEXTURE_STORAGE_HINT_APPLE
@@ -128,7 +158,261 @@ typedef void (APIENTRYP PFNGLDELETERENDERBUFFERSEXTPROC) (GLsizei n, const GLuin
 #define GL_DEPTH_COMPONENT32                0x81A7
 #endif
 
-#include "drawogl.h"
+
+//============================================================
+//  Configuration
+//============================================================
+
+#define GLSL_SHADER_MAX 10
+
+struct ogl_video_config
+{
+	ogl_video_config() = default;
+
+	bool        vbo = false;
+	bool        pbo = false;
+	bool        allowtexturerect = false;               // allow GL_ARB_texture_rectangle, default: no
+	bool        forcepow2texture = false;               // force power of two textures, default: no
+	bool        glsl = false;
+	int         glsl_filter = 0;                        // glsl filtering, >0 disables filter
+	std::string glsl_shader_mamebm[GLSL_SHADER_MAX];    // custom glsl shader set, mame bitmap
+	int         glsl_shader_mamebm_num = 0;             // custom glsl shader set number, mame bitmap
+	std::string glsl_shader_scrn[GLSL_SHADER_MAX];      // custom glsl shader set, screen bitmap
+	int         glsl_shader_scrn_num = 0;               // custom glsl shader number, screen bitmap
+};
+
+
+//============================================================
+//  Textures
+//============================================================
+
+/* ogl_texture_info holds information about a texture */
+class ogl_texture_info
+{
+public:
+	ogl_texture_info()
+	:   hash(0), flags(0), rawwidth(0), rawheight(0),
+		rawwidth_create(0), rawheight_create(0),
+		type(0), format(0), borderpix(0), xprescale(0), yprescale(0), nocopy(0),
+		texture(0), texTarget(0), texpow2(0), mpass_dest_idx(0), pbo(0), data(nullptr),
+		data_own(0), texCoordBufferName(0)
+	{
+		for (int i=0; i<2; i++)
+		{
+			mpass_textureunit[i] = 0;
+			mpass_texture_mamebm[i] = 0;
+			mpass_fbo_mamebm[i] = 0;
+			mpass_texture_scrn[i] = 0;
+			mpass_fbo_scrn[i] = 0;
+		}
+		for (int i=0; i<8; i++)
+			texCoord[i] = 0.0f;
+	}
+
+	HashT               hash;               // hash value for the texture (must be >= pointer size)
+	uint32_t            flags;              // rendering flags
+	render_texinfo      texinfo;            // copy of the texture info
+	int                 rawwidth, rawheight;    // raw width/height of the texture
+	int                 rawwidth_create;    // raw width/height, pow2 compatible, if needed
+	int                 rawheight_create;   // (create and initial set the texture, not for copy!)
+	int                 type;               // what type of texture are we?
+	int                 format;             // texture format
+	int                 borderpix;          // do we have a 1 pixel border?
+	int                 xprescale;          // what is our X prescale factor?
+	int                 yprescale;          // what is our Y prescale factor?
+	int                 nocopy;             // must the texture date be copied?
+
+	uint32_t            texture;            // OpenGL texture "name"/ID
+
+	GLenum              texTarget;          // OpenGL texture target
+	int                 texpow2;            // Is this texture pow2
+
+	uint32_t            mpass_dest_idx;         // Multipass dest idx [0..1]
+	uint32_t            mpass_textureunit[2];   // texture unit names for GLSL
+
+	uint32_t            mpass_texture_mamebm[2];// Multipass OpenGL texture "name"/ID for the shader
+	uint32_t            mpass_fbo_mamebm[2];    // framebuffer object for this texture, multipass
+	uint32_t            mpass_texture_scrn[2];  // Multipass OpenGL texture "name"/ID for the shader
+	uint32_t            mpass_fbo_scrn[2];      // framebuffer object for this texture, multipass
+
+	uint32_t            pbo;                    // pixel buffer object for this texture (DYNAMIC only!)
+	uint32_t            *data;                  // pixels for the texture
+	int                 data_own;               // do we own / allocated it ?
+	GLfloat             texCoord[8];
+	GLuint              texCoordBufferName;
+
+};
+
+// renderer_ogl is the information about OpenGL for the current screen
+class renderer_ogl : public osd_renderer
+{
+public:
+	renderer_ogl(osd_window &window, ogl_video_config const &ogl_config)
+		: osd_renderer(window)
+		, m_ogl_config(ogl_config)
+		, m_blittimer(0)
+		, m_width(0)
+		, m_height(0)
+		, m_blit_dim(0, 0)
+		, m_initialized(0)
+		, m_last_blendmode(0)
+		, m_texture_max_width(0)
+		, m_texture_max_height(0)
+		, m_texpoweroftwo(0)
+		, m_usevbo(0)
+		, m_usepbo(0)
+		, m_usefbo(0)
+		, m_useglsl(0)
+		, m_glsl(nullptr)
+		, m_glsl_program_num(0)
+		, m_glsl_program_mb2sc(0)
+		, m_usetexturerect(0)
+		, m_init_context(0)
+		, m_last_hofs(0.0f)
+		, m_last_vofs(0.0f)
+		, m_surf_w(0)
+		, m_surf_h(0)
+	{
+		for (int i=0; i < HASH_SIZE + OVERFLOW_SIZE; i++)
+			m_texhash[i] = nullptr;
+		for (int i=0; i < 2*GLSL_SHADER_MAX; i++)
+			m_glsl_program[i] = 0;
+		for (int i=0; i < 8; i++)
+			m_texVerticex[i] = 0.0f;
+	}
+	virtual ~renderer_ogl()
+	{
+		// free the memory in the window
+		destroy_all_textures();
+	}
+
+	virtual int create() override;
+	virtual int draw(const int update) override;
+
+#ifndef OSD_WINDOWS
+	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
+#endif
+	virtual render_primitive_list *get_primitives() override
+	{
+		osd_dim nd = window().get_size();
+		if (nd != m_blit_dim)
+		{
+			m_blit_dim = nd;
+			notify_changed();
+		}
+		if ((m_blit_dim.width() == 0) || (m_blit_dim.height() == 0))
+			return nullptr;
+		window().target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), window().pixel_aspect());
+		return &window().target()->get_primitives();
+	}
+
+#ifdef OSD_WINDOWS
+	virtual void save() override { }
+	virtual void record() override { }
+	virtual void toggle_fsfx() override { }
+#endif
+
+private:
+	static const uint32_t HASH_SIZE = ((1 << 10) + 1);
+	static const uint32_t OVERFLOW_SIZE = (1 << 10);
+
+	void destroy_all_textures();
+
+	void loadGLExtensions();
+	void initialize_gl();
+	void set_blendmode(int blendmode);
+	HashT texture_compute_hash(const render_texinfo *texture, uint32_t flags);
+	void texture_compute_type_subroutine(const render_texinfo *texsource, ogl_texture_info *texture, uint32_t flags);
+	void texture_compute_size_subroutine(ogl_texture_info *texture, uint32_t flags,
+				uint32_t width, uint32_t height,
+				int* p_width, int* p_height, int* p_width_create, int* p_height_create);
+	void texture_compute_size_type(const render_texinfo *texsource, ogl_texture_info *texture, uint32_t flags);
+	ogl_texture_info *texture_create(const render_texinfo *texsource, uint32_t flags);
+	int texture_shader_create(const render_texinfo *texsource, ogl_texture_info *texture, uint32_t flags);
+	ogl_texture_info *texture_find(const render_primitive *prim);
+	void texture_coord_update(ogl_texture_info *texture, const render_primitive *prim, int shaderIdx);
+	void texture_mpass_flip(ogl_texture_info *texture, int shaderIdx);
+	void texture_shader_update(ogl_texture_info *texture, render_container *container,  int shaderIdx);
+	ogl_texture_info * texture_update(const render_primitive *prim, int shaderIdx);
+	void texture_disable(ogl_texture_info * texture);
+	void texture_all_disable();
+
+	int gl_checkFramebufferStatus() const;
+	int texture_fbo_create(uint32_t text_unit, uint32_t text_name, uint32_t fbo_name, int width, int height) const;
+	void texture_set_data(ogl_texture_info *texture, const render_texinfo *texsource, uint32_t flags) const;
+
+	ogl_video_config const &m_ogl_config;
+
+	int32_t         m_blittimer;
+	int             m_width;
+	int             m_height;
+	osd_dim         m_blit_dim;
+
+	std::unique_ptr<osd_gl_context> m_gl_context;
+
+	int             m_initialized;        // is everything well initialized, i.e. all GL stuff etc.
+	// 3D info (GL mode only)
+	ogl_texture_info *  m_texhash[HASH_SIZE + OVERFLOW_SIZE];
+	int             m_last_blendmode;     // previous blendmode
+	int32_t         m_texture_max_width;      // texture maximum width
+	int32_t         m_texture_max_height;     // texture maximum height
+	int             m_texpoweroftwo;          // must textures be power-of-2 sized?
+	int             m_usevbo;         // runtime check if VBO is available
+	int             m_usepbo;         // runtime check if PBO is available
+	int             m_usefbo;         // runtime check if FBO is available
+	int             m_useglsl;        // runtime check if GLSL is available
+
+	glsl_shader_info *m_glsl;             // glsl_shader_info
+
+	GLhandleARB     m_glsl_program[2*GLSL_SHADER_MAX];  // GLSL programs, or 0
+	int             m_glsl_program_num;   // number of GLSL programs
+	int             m_glsl_program_mb2sc; // GLSL program idx, which transforms
+										// the mame-bitmap. screen-bitmap (size/rotation/..)
+										// All progs <= glsl_program_mb2sc using the mame bitmap
+										// as input, otherwise the screen bitmap.
+										// All progs >= glsl_program_mb2sc using the screen bitmap
+										// as output, otherwise the mame bitmap.
+	int             m_usetexturerect;     // use ARB_texture_rectangle for non-power-of-2, general use
+
+	int             m_init_context;       // initialize context before next draw
+
+	float           m_last_hofs;
+	float           m_last_vofs;
+
+	// Static vars from draogl_window_dra
+	int32_t         m_surf_w;
+	int32_t         m_surf_h;
+	GLfloat         m_texVerticex[8];
+
+	// OGL 1.3
+#if defined(GL_ARB_multitexture) && !defined(OSD_MAC)
+	PFNGLACTIVETEXTUREARBPROC          m_glActiveTexture  = nullptr;
+#else
+	PFNGLACTIVETEXTUREPROC             m_glActiveTexture  = nullptr;
+#endif
+
+	// VBO
+	PFNGLGENBUFFERSPROC                m_glGenBuffers     = nullptr;
+	PFNGLDELETEBUFFERSPROC             m_glDeleteBuffers  = nullptr;
+	PFNGLBINDBUFFERPROC                m_glBindBuffer     = nullptr;
+	PFNGLBUFFERDATAPROC                m_glBufferData     = nullptr;
+	PFNGLBUFFERSUBDATAPROC             m_glBufferSubData  = nullptr;
+
+	// PBO
+	PFNGLMAPBUFFERPROC                 m_glMapBuffer      = nullptr;
+	PFNGLUNMAPBUFFERPROC               m_glUnmapBuffer    = nullptr;
+
+	// FBO
+	PFNGLISFRAMEBUFFEREXTPROC          m_glIsFramebuffer          = nullptr;
+	PFNGLBINDFRAMEBUFFEREXTPROC        m_glBindFramebuffer        = nullptr;
+	PFNGLDELETEFRAMEBUFFERSEXTPROC     m_glDeleteFramebuffers     = nullptr;
+	PFNGLGENFRAMEBUFFERSEXTPROC        m_glGenFramebuffers        = nullptr;
+	PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC m_glCheckFramebufferStatus = nullptr;
+	PFNGLFRAMEBUFFERTEXTURE2DEXTPROC   m_glFramebufferTexture2D   = nullptr;
+
+	static bool     s_shown_video_info;
+};
+
 
 //============================================================
 //  DEBUGGING
@@ -241,101 +525,19 @@ void renderer_ogl::set_blendmode(int blendmode)
 	}
 }
 
-//============================================================
-//  STATIC VARIABLES
-//============================================================
-
-// OGL 1.3
-#if defined(GL_ARB_multitexture) && !defined(OSD_MAC)
-static PFNGLACTIVETEXTUREARBPROC pfn_glActiveTexture    = nullptr;
-#else
-static PFNGLACTIVETEXTUREPROC pfn_glActiveTexture   = nullptr;
-#endif
-
-// VBO
-static PFNGLGENBUFFERSPROC pfn_glGenBuffers     = nullptr;
-static PFNGLDELETEBUFFERSPROC pfn_glDeleteBuffers   = nullptr;
-static PFNGLBINDBUFFERPROC pfn_glBindBuffer     = nullptr;
-static PFNGLBUFFERDATAPROC pfn_glBufferData     = nullptr;
-static PFNGLBUFFERSUBDATAPROC pfn_glBufferSubData   = nullptr;
-
-// PBO
-static PFNGLMAPBUFFERPROC     pfn_glMapBuffer       = nullptr;
-static PFNGLUNMAPBUFFERPROC   pfn_glUnmapBuffer     = nullptr;
-
-// FBO
-static PFNGLISFRAMEBUFFEREXTPROC   pfn_glIsFramebuffer          = nullptr;
-static PFNGLBINDFRAMEBUFFEREXTPROC pfn_glBindFramebuffer        = nullptr;
-static PFNGLDELETEFRAMEBUFFERSEXTPROC pfn_glDeleteFramebuffers      = nullptr;
-static PFNGLGENFRAMEBUFFERSEXTPROC pfn_glGenFramebuffers        = nullptr;
-static PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC pfn_glCheckFramebufferStatus  = nullptr;
-static PFNGLFRAMEBUFFERTEXTURE2DEXTPROC pfn_glFramebufferTexture2D  = nullptr;
-
 static int glsl_shader_feature = GLSL_SHADER_FEAT_PLAIN;
-
-//============================================================
-//  Textures
-//============================================================
-
-static void texture_set_data(ogl_texture_info *texture, const render_texinfo *texsource, uint32_t flags);
 
 //============================================================
 //  Static Variables
 //============================================================
 
 bool renderer_ogl::s_shown_video_info = false;
-bool renderer_ogl::s_dll_loaded = false;
-
-void renderer_ogl::init(running_machine &machine)
-{
-	s_dll_loaded = false;
-
-	load_gl_lib(machine);
-#if defined(OSD_WINDOWS)
-	osd_printf_verbose("Using Windows OpenGL driver\n");
-#else
-	osd_printf_verbose("Using SDL multi-window OpenGL driver (SDL 2.0+)\n");
-#endif
-}
-
-//============================================================
-// CONSTRUCTOR & DESTRUCTOR
-//============================================================
-
-renderer_ogl::~renderer_ogl()
-{
-	// free the memory in the window
-	destroy_all_textures();
-
-	delete m_gl_context;
-	m_gl_context = nullptr;
-}
-
-void renderer_ogl::exit()
-{
-	for (int i = 0; i < video_config.glsl_shader_mamebm_num; i++)
-	{
-		if (nullptr != video_config.glsl_shader_mamebm[i])
-		{
-			free(video_config.glsl_shader_mamebm[i]);
-			video_config.glsl_shader_mamebm[i] = nullptr;
-		}
-	}
-	for (int i =0; i < video_config.glsl_shader_scrn_num; i++)
-	{
-		if (nullptr != video_config.glsl_shader_scrn[i])
-		{
-			free(video_config.glsl_shader_scrn[i]);
-			video_config.glsl_shader_scrn[i] = nullptr;
-		}
-	}
-}
 
 //============================================================
 // Load the OGL function addresses
 //============================================================
 
-static void loadgl_functions(osd_gl_context *context)
+static void loadgl_functions(osd_gl_context &context)
 {
 #ifdef USE_DISPATCH_GL
 
@@ -346,7 +548,7 @@ static void loadgl_functions(osd_gl_context *context)
 	 */
 
 	#define OSD_GL(ret,func,params) \
-	if (!( func = (ret (APIENTRY *)params) context->getProcAddress( #func ) )) \
+	if (!( func = (ret (APIENTRY *)params) context.getProcAddress( #func ) )) \
 		{ err_count++; osd_printf_error("GL function %s not found!\n", #func ); }
 
 	#define OSD_GL_UNUSED(ret,func,params)
@@ -359,45 +561,6 @@ static void loadgl_functions(osd_gl_context *context)
 		fatalerror("Error loading GL library functions, giving up\n");
 
 #endif
-}
-
-//============================================================
-// Load GL library
-//============================================================
-
-#ifdef USE_DISPATCH_GL
-osd_gl_dispatch *gl_dispatch = nullptr;
-#endif
-
-void renderer_ogl::load_gl_lib(running_machine &machine)
-{
-	if (!s_dll_loaded)
-	{
-#ifndef OSD_WINDOWS
-#ifdef USE_DISPATCH_GL
-		/*
-		 *  directfb and and x11 use this env var
-		 *   SDL_VIDEO_GL_DRIVER
-		 */
-		const char *stemp;
-
-		stemp = downcast<sdl_options &>(machine.options()).gl_lib();
-		if (stemp != nullptr && strcmp(stemp, OSDOPTVAL_AUTO) == 0)
-			stemp = nullptr;
-
-		if (SDL_GL_LoadLibrary(stemp) != 0) // Load library (default for e==nullptr
-		{
-			fatalerror("Unable to load opengl library: %s\n", stemp ? stemp : "<default>");
-		}
-		osd_printf_verbose("Loaded opengl shared library: %s\n", stemp ? stemp : "<default>");
-		/* FIXME: must be freed as well */
-#endif
-#endif
-#ifdef USE_DISPATCH_GL
-		gl_dispatch = new osd_gl_dispatch;
-#endif
-		s_dll_loaded = true;
-	}
 }
 
 void renderer_ogl::initialize_gl()
@@ -425,7 +588,7 @@ void renderer_ogl::initialize_gl()
 	m_usefbo = 0;
 	m_useglsl = 0;
 
-	if (video_config.allowtexturerect && (strstr(extstr, "GL_ARB_texture_rectangle") ||  strstr(extstr, "GL_EXT_texture_rectangle")))
+	if (m_ogl_config.allowtexturerect && (strstr(extstr, "GL_ARB_texture_rectangle") ||  strstr(extstr, "GL_EXT_texture_rectangle")))
 	{
 		has_and_allow_texturerect = 1;
 		if (!s_shown_video_info)
@@ -435,7 +598,7 @@ void renderer_ogl::initialize_gl()
 	}
 
 	// does this card support non-power-of-two sized textures?  (they're faster, so use them if possible)
-	if ( !video_config.forcepow2texture && strstr(extstr, "GL_ARB_texture_non_power_of_two"))
+	if ( !m_ogl_config.forcepow2texture && strstr(extstr, "GL_ARB_texture_non_power_of_two"))
 	{
 		if (!s_shown_video_info)
 		{
@@ -465,7 +628,7 @@ void renderer_ogl::initialize_gl()
 
 	if (strstr(extstr, "GL_ARB_vertex_buffer_object"))
 	{
-		m_usevbo = video_config.vbo;
+		m_usevbo = m_ogl_config.vbo;
 		if (!s_shown_video_info)
 		{
 			if(m_usevbo)
@@ -479,7 +642,7 @@ void renderer_ogl::initialize_gl()
 	{
 		if( m_usevbo )
 		{
-			m_usepbo = video_config.pbo;
+			m_usepbo = m_ogl_config.pbo;
 			if (!s_shown_video_info)
 			{
 				if(m_usepbo)
@@ -522,7 +685,7 @@ void renderer_ogl::initialize_gl()
 		strstr(extstr, "GL_ARB_fragment_shader")
 		)
 	{
-		m_useglsl = video_config.glsl;
+		m_useglsl = m_ogl_config.glsl;
 		if (!s_shown_video_info)
 		{
 			if(m_useglsl)
@@ -562,16 +725,14 @@ void renderer_ogl::initialize_gl()
 
 int renderer_ogl::create()
 {
-	auto win = assert_window();
-
 	// create renderer
 #if defined(OSD_WINDOWS)
-	m_gl_context = new win_gl_context(std::static_pointer_cast<win_window_info>(win)->platform_window());
+	m_gl_context.reset(new win_gl_context(dynamic_cast<win_window_info &>(window()).platform_window()));
 #elif defined(OSD_MAC)
 // TODO
-//  m_gl_context = new mac_gl_context(std::static_pointer_cast<mac_window_info>(win)->platform_window());
+//  m_gl_context.reset(new mac_gl_context(dynamic_cast<mac_window_info &>(window()).platform_window()));
 #else
-	m_gl_context = new sdl_gl_context(std::static_pointer_cast<sdl_window_info>(win)->platform_window());
+	m_gl_context.reset(new sdl_gl_context(dynamic_cast<sdl_window_info &>(window()).platform_window()));
 #endif
 	if  (m_gl_context->LastErrorMsg() != nullptr)
 	{
@@ -579,7 +740,6 @@ int renderer_ogl::create()
 		return 1;
 	}
 	m_gl_context->SetSwapInterval(video_config.waitvsync ? 1 : 0);
-
 
 	m_blittimer = 0;
 	m_surf_w = 0;
@@ -595,9 +755,8 @@ int renderer_ogl::create()
 	/* load any GL function addresses
 	 * this must be done here because we need a context
 	 */
-	loadgl_functions(m_gl_context);
+	loadgl_functions(*m_gl_context);
 	initialize_gl();
-
 
 	m_init_context = 0;
 
@@ -628,27 +787,15 @@ int renderer_ogl::xy_to_render_target(int x, int y, int *xt, int *yt)
 
 void renderer_ogl::destroy_all_textures()
 {
-	ogl_texture_info *texture = nullptr;
-	bool lock=false;
-	int i;
 
-	if ( !m_initialized )
-		return;
-
-	auto win = try_getwindow();
-
-	// During destroy this can get called
-	// and the window is no longer available
-	if (win == nullptr)
+	if (!m_initialized)
 		return;
 
 	m_gl_context->MakeCurrent();
 
-	if(win->m_primlist)
-	{
-		lock=true;
-		win->m_primlist->acquire_lock();
-	}
+	bool const lock = bool(window().m_primlist);
+	if (lock)
+		window().m_primlist->acquire_lock();
 
 	glFinish();
 
@@ -656,41 +803,39 @@ void renderer_ogl::destroy_all_textures()
 	glFinish();
 	glDisableClientState(GL_VERTEX_ARRAY);
 
-	i=0;
-	while (i<HASH_SIZE+OVERFLOW_SIZE)
+	for (int i = 0; i < (HASH_SIZE + OVERFLOW_SIZE); ++i)
 	{
-		texture = m_texhash[i];
-		m_texhash[i] = nullptr;
-		if (texture != nullptr)
+		ogl_texture_info *const texture = std::exchange(m_texhash[i], nullptr);
+		if (texture)
 		{
-			if(m_usevbo)
+			if (m_usevbo)
 			{
-				pfn_glDeleteBuffers( 1, &(texture->texCoordBufferName) );
+				m_glDeleteBuffers( 1, &(texture->texCoordBufferName) );
 				texture->texCoordBufferName=0;
 			}
 
-			if(m_usepbo && texture->pbo)
+			if (m_usepbo && texture->pbo)
 			{
-				pfn_glDeleteBuffers( 1, (GLuint *)&(texture->pbo) );
+				m_glDeleteBuffers( 1, (GLuint *)&(texture->pbo) );
 				texture->pbo=0;
 			}
 
-			if( m_glsl_program_num > 1 )
+			if (m_glsl_program_num > 1)
 			{
 				assert(m_usefbo);
-				pfn_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_mamebm[0]);
+				m_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_mamebm[0]);
 				glDeleteTextures(2, (GLuint *)&texture->mpass_texture_mamebm[0]);
 			}
 
-			if ( m_glsl_program_mb2sc < m_glsl_program_num - 1 )
+			if (m_glsl_program_mb2sc < m_glsl_program_num - 1)
 			{
 				assert(m_usefbo);
-				pfn_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_scrn[0]);
+				m_glDeleteFramebuffers(2, (GLuint *)&texture->mpass_fbo_scrn[0]);
 				glDeleteTextures(2, (GLuint *)&texture->mpass_texture_scrn[0]);
 			}
 
 			glDeleteTextures(1, (GLuint *)&texture->texture);
-			if ( texture->data_own )
+			if (texture->data_own)
 			{
 				free(texture->data);
 				texture->data=nullptr;
@@ -698,9 +843,9 @@ void renderer_ogl::destroy_all_textures()
 			}
 			delete texture;
 		}
-		i++;
 	}
-	if ( m_useglsl )
+
+	if (m_useglsl)
 	{
 		glsl_shader_free(m_glsl);
 		m_glsl = nullptr;
@@ -709,7 +854,7 @@ void renderer_ogl::destroy_all_textures()
 	m_initialized = 0;
 
 	if (lock)
-		win->m_primlist->release_lock();
+		window().m_primlist->release_lock();
 }
 //============================================================
 //  loadGLExtensions
@@ -747,55 +892,55 @@ void renderer_ogl::loadGLExtensions()
 	// VBO:
 	if( m_usevbo )
 	{
-		pfn_glGenBuffers = (PFNGLGENBUFFERSPROC) m_gl_context->getProcAddress("glGenBuffers");
-		pfn_glDeleteBuffers = (PFNGLDELETEBUFFERSPROC) m_gl_context->getProcAddress("glDeleteBuffers");
-		pfn_glBindBuffer = (PFNGLBINDBUFFERPROC) m_gl_context->getProcAddress("glBindBuffer");
-		pfn_glBufferData = (PFNGLBUFFERDATAPROC) m_gl_context->getProcAddress("glBufferData");
-		pfn_glBufferSubData = (PFNGLBUFFERSUBDATAPROC) m_gl_context->getProcAddress("glBufferSubData");
+		m_glGenBuffers = (PFNGLGENBUFFERSPROC) m_gl_context->getProcAddress("glGenBuffers");
+		m_glDeleteBuffers = (PFNGLDELETEBUFFERSPROC) m_gl_context->getProcAddress("glDeleteBuffers");
+		m_glBindBuffer = (PFNGLBINDBUFFERPROC) m_gl_context->getProcAddress("glBindBuffer");
+		m_glBufferData = (PFNGLBUFFERDATAPROC) m_gl_context->getProcAddress("glBufferData");
+		m_glBufferSubData = (PFNGLBUFFERSUBDATAPROC) m_gl_context->getProcAddress("glBufferSubData");
 	}
 	// PBO:
 	if ( m_usepbo )
 	{
-		pfn_glMapBuffer  = (PFNGLMAPBUFFERPROC) m_gl_context->getProcAddress("glMapBuffer");
-		pfn_glUnmapBuffer= (PFNGLUNMAPBUFFERPROC) m_gl_context->getProcAddress("glUnmapBuffer");
+		m_glMapBuffer  = (PFNGLMAPBUFFERPROC) m_gl_context->getProcAddress("glMapBuffer");
+		m_glUnmapBuffer= (PFNGLUNMAPBUFFERPROC) m_gl_context->getProcAddress("glUnmapBuffer");
 	}
 	// FBO:
 	if ( m_usefbo )
 	{
-		pfn_glIsFramebuffer = (PFNGLISFRAMEBUFFEREXTPROC) m_gl_context->getProcAddress("glIsFramebufferEXT");
-		pfn_glBindFramebuffer = (PFNGLBINDFRAMEBUFFEREXTPROC) m_gl_context->getProcAddress("glBindFramebufferEXT");
-		pfn_glDeleteFramebuffers = (PFNGLDELETEFRAMEBUFFERSEXTPROC) m_gl_context->getProcAddress("glDeleteFramebuffersEXT");
-		pfn_glGenFramebuffers = (PFNGLGENFRAMEBUFFERSEXTPROC) m_gl_context->getProcAddress("glGenFramebuffersEXT");
-		pfn_glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC) m_gl_context->getProcAddress("glCheckFramebufferStatusEXT");
-		pfn_glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DEXTPROC) m_gl_context->getProcAddress("glFramebufferTexture2DEXT");
+		m_glIsFramebuffer = (PFNGLISFRAMEBUFFEREXTPROC) m_gl_context->getProcAddress("glIsFramebufferEXT");
+		m_glBindFramebuffer = (PFNGLBINDFRAMEBUFFEREXTPROC) m_gl_context->getProcAddress("glBindFramebufferEXT");
+		m_glDeleteFramebuffers = (PFNGLDELETEFRAMEBUFFERSEXTPROC) m_gl_context->getProcAddress("glDeleteFramebuffersEXT");
+		m_glGenFramebuffers = (PFNGLGENFRAMEBUFFERSEXTPROC) m_gl_context->getProcAddress("glGenFramebuffersEXT");
+		m_glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC) m_gl_context->getProcAddress("glCheckFramebufferStatusEXT");
+		m_glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DEXTPROC) m_gl_context->getProcAddress("glFramebufferTexture2DEXT");
 	}
 
 	if ( m_usevbo &&
-			( !pfn_glGenBuffers || !pfn_glDeleteBuffers ||
-			!pfn_glBindBuffer || !pfn_glBufferData || !pfn_glBufferSubData
+			( !m_glGenBuffers || !m_glDeleteBuffers ||
+			!m_glBindBuffer || !m_glBufferData || !m_glBufferSubData
 		) )
 	{
 		m_usepbo=false;
 		if (_once)
 		{
 			osd_printf_warning("OpenGL: VBO not supported, missing: ");
-			if (!pfn_glGenBuffers)
+			if (!m_glGenBuffers)
 			{
 				osd_printf_warning("glGenBuffers, ");
 			}
-			if (!pfn_glDeleteBuffers)
+			if (!m_glDeleteBuffers)
 			{
 				osd_printf_warning("glDeleteBuffers");
 			}
-			if (!pfn_glBindBuffer)
+			if (!m_glBindBuffer)
 			{
 				osd_printf_warning("glBindBuffer, ");
 			}
-			if (!pfn_glBufferData)
+			if (!m_glBufferData)
 			{
 				osd_printf_warning("glBufferData, ");
 			}
-			if (!pfn_glBufferSubData)
+			if (!m_glBufferSubData)
 			{
 				osd_printf_warning("glBufferSubData, ");
 			}
@@ -811,17 +956,17 @@ void renderer_ogl::loadGLExtensions()
 		}
 	}
 
-	if ( m_usepbo && ( !pfn_glMapBuffer || !pfn_glUnmapBuffer ) )
+	if ( m_usepbo && ( !m_glMapBuffer || !m_glUnmapBuffer ) )
 	{
 		m_usepbo=false;
 		if (_once)
 		{
 			osd_printf_warning("OpenGL: PBO not supported, missing: ");
-			if (!pfn_glMapBuffer)
+			if (!m_glMapBuffer)
 			{
 				osd_printf_warning("glMapBuffer, ");
 			}
-			if (!pfn_glUnmapBuffer)
+			if (!m_glUnmapBuffer)
 			{
 				osd_printf_warning("glUnmapBuffer, ");
 			}
@@ -830,37 +975,37 @@ void renderer_ogl::loadGLExtensions()
 	}
 
 	if ( m_usefbo &&
-		( !pfn_glIsFramebuffer || !pfn_glBindFramebuffer || !pfn_glDeleteFramebuffers ||
-			!pfn_glGenFramebuffers || !pfn_glCheckFramebufferStatus || !pfn_glFramebufferTexture2D
+		( !m_glIsFramebuffer || !m_glBindFramebuffer || !m_glDeleteFramebuffers ||
+			!m_glGenFramebuffers || !m_glCheckFramebufferStatus || !m_glFramebufferTexture2D
 		))
 	{
 		m_usefbo=false;
 		if (_once)
 		{
 			osd_printf_warning("OpenGL: FBO not supported, missing: ");
-			if (!pfn_glIsFramebuffer)
+			if (!m_glIsFramebuffer)
 			{
-				osd_printf_warning("pfn_glIsFramebuffer, ");
+				osd_printf_warning("m_glIsFramebuffer, ");
 			}
-			if (!pfn_glBindFramebuffer)
+			if (!m_glBindFramebuffer)
 			{
-				osd_printf_warning("pfn_glBindFramebuffer, ");
+				osd_printf_warning("m_glBindFramebuffer, ");
 			}
-			if (!pfn_glDeleteFramebuffers)
+			if (!m_glDeleteFramebuffers)
 			{
-				osd_printf_warning("pfn_glDeleteFramebuffers, ");
+				osd_printf_warning("m_glDeleteFramebuffers, ");
 			}
-			if (!pfn_glGenFramebuffers)
+			if (!m_glGenFramebuffers)
 			{
-				osd_printf_warning("pfn_glGenFramebuffers, ");
+				osd_printf_warning("m_glGenFramebuffers, ");
 			}
-			if (!pfn_glCheckFramebufferStatus)
+			if (!m_glCheckFramebufferStatus)
 			{
-				osd_printf_warning("pfn_glCheckFramebufferStatus, ");
+				osd_printf_warning("m_glCheckFramebufferStatus, ");
 			}
-			if (!pfn_glFramebufferTexture2D)
+			if (!m_glFramebufferTexture2D)
 			{
-				osd_printf_warning("pfn_glFramebufferTexture2D, ");
+				osd_printf_warning("m_glFramebufferTexture2D, ");
 			}
 			osd_printf_warning("\n");
 		}
@@ -899,11 +1044,11 @@ void renderer_ogl::loadGLExtensions()
 	if ( m_useglsl )
 	{
 		#if defined(GL_ARB_multitexture) && !defined(OSD_MAC)
-		pfn_glActiveTexture = (PFNGLACTIVETEXTUREARBPROC) m_gl_context->getProcAddress("glActiveTextureARB");
+		m_glActiveTexture = (PFNGLACTIVETEXTUREARBPROC) m_gl_context->getProcAddress("glActiveTextureARB");
 		#else
-		pfn_glActiveTexture = (PFNGLACTIVETEXTUREPROC) m_gl_context->getProcAddress("glActiveTexture");
+		m_glActiveTexture = (PFNGLACTIVETEXTUREPROC) m_gl_context->getProcAddress("glActiveTexture");
 		#endif
-		if (!pfn_glActiveTexture)
+		if (!m_glActiveTexture)
 		{
 			if (_once)
 			{
@@ -915,7 +1060,7 @@ void renderer_ogl::loadGLExtensions()
 
 	if ( m_useglsl )
 	{
-		m_glsl = glsl_shader_init(m_gl_context);
+		m_glsl = glsl_shader_init(m_gl_context.get());
 		m_useglsl = (m_glsl != nullptr ? 1 : 0);
 
 		if ( ! m_useglsl )
@@ -927,9 +1072,9 @@ void renderer_ogl::loadGLExtensions()
 		}
 	}
 
-	if ( m_useglsl )
+	if (m_useglsl)
 	{
-		if (assert_window()->prescale() != 1 )
+		if (window().prescale() != 1 )
 		{
 			m_useglsl = 0;
 			if (_once)
@@ -939,7 +1084,7 @@ void renderer_ogl::loadGLExtensions()
 		}
 	}
 
-	if ( m_useglsl )
+	if (m_useglsl)
 	{
 		int i;
 		video_config.filter = false;
@@ -947,7 +1092,7 @@ void renderer_ogl::loadGLExtensions()
 		m_glsl_program_num = 0;
 		m_glsl_program_mb2sc = 0;
 
-		for(i=0; i<video_config.glsl_shader_mamebm_num; i++)
+		for(i=0; i<m_ogl_config.glsl_shader_mamebm_num; i++)
 		{
 			if ( !m_usefbo && m_glsl_program_num==1 )
 			{
@@ -958,50 +1103,50 @@ void renderer_ogl::loadGLExtensions()
 				break;
 			}
 
-			if ( glsl_shader_add_mamebm(m_glsl, video_config.glsl_shader_mamebm[i], m_glsl_program_num) )
+			if ( glsl_shader_add_mamebm(m_glsl, m_ogl_config.glsl_shader_mamebm[i].c_str(), m_glsl_program_num) )
 			{
 				osd_printf_error("OpenGL: GLSL loading mame bitmap shader %d failed (%s)\n",
-					i, video_config.glsl_shader_mamebm[i]);
+					i, m_ogl_config.glsl_shader_mamebm[i]);
 			} else {
 				glsl_shader_feature = GLSL_SHADER_FEAT_CUSTOM;
 				if (_once)
 				{
 					osd_printf_verbose("OpenGL: GLSL using mame bitmap shader filter %d: '%s'\n",
-						m_glsl_program_num, video_config.glsl_shader_mamebm[i]);
+						m_glsl_program_num, m_ogl_config.glsl_shader_mamebm[i]);
 				}
 				m_glsl_program_mb2sc = m_glsl_program_num; // the last mame_bitmap (mb) shader does it.
 				m_glsl_program_num++;
 			}
 		}
 
-		if ( video_config.glsl_shader_scrn_num > 0 && m_glsl_program_num==0 )
+		if ( m_ogl_config.glsl_shader_scrn_num > 0 && m_glsl_program_num==0 )
 		{
 			osd_printf_verbose("OpenGL: GLSL cannot use screen bitmap shader without bitmap shader\n");
 		}
 
-		for(i=0; m_usefbo && m_glsl_program_num>0 && i<video_config.glsl_shader_scrn_num; i++)
+		for(i=0; m_usefbo && m_glsl_program_num>0 && i<m_ogl_config.glsl_shader_scrn_num; i++)
 		{
-			if ( glsl_shader_add_scrn(m_glsl, video_config.glsl_shader_scrn[i],
+			if ( glsl_shader_add_scrn(m_glsl, m_ogl_config.glsl_shader_scrn[i].c_str(),
 											m_glsl_program_num-1-m_glsl_program_mb2sc) )
 			{
 				osd_printf_error("OpenGL: GLSL loading screen bitmap shader %d failed (%s)\n",
-					i, video_config.glsl_shader_scrn[i]);
+					i, m_ogl_config.glsl_shader_scrn[i]);
 			} else {
 				if (_once)
 				{
 					osd_printf_verbose("OpenGL: GLSL using screen bitmap shader filter %d: '%s'\n",
-						m_glsl_program_num, video_config.glsl_shader_scrn[i]);
+						m_glsl_program_num, m_ogl_config.glsl_shader_scrn[i]);
 				}
 				m_glsl_program_num++;
 			}
 		}
 
 		if ( 0==m_glsl_program_num &&
-				0 <= video_config.glsl_filter && video_config.glsl_filter < GLSL_SHADER_FEAT_INT_NUMBER )
+				0 <= m_ogl_config.glsl_filter && m_ogl_config.glsl_filter < GLSL_SHADER_FEAT_INT_NUMBER )
 		{
 			m_glsl_program_mb2sc = m_glsl_program_num; // the last mame_bitmap (mb) shader does it.
 			m_glsl_program_num++;
-			glsl_shader_feature = video_config.glsl_filter;
+			glsl_shader_feature = m_ogl_config.glsl_filter;
 
 			if (_once)
 			{
@@ -1031,16 +1176,7 @@ int renderer_ogl::draw(const int update)
 	float vofs, hofs;
 	int  pendingPrimitive=GL_NO_PRIMITIVE, curPrimitive=GL_NO_PRIMITIVE;
 
-#ifdef TOBEMIGRATED
-	if (video_config.novideo)
-	{
-		return 0;
-	}
-#endif
-
-	auto win = assert_window();
-
-	osd_dim wdim = win->get_size();
+	osd_dim wdim = window().get_size();
 
 	if (has_flags(FI_CHANGED) || (wdim.width() != m_width) || (wdim.height() != m_height))
 	{
@@ -1192,16 +1328,15 @@ int renderer_ogl::draw(const int update)
 			hofs = (cw - m_blit_dim.width()) / 2.0f;
 		}
 	}
-#else
 #endif
 
 	m_last_hofs = hofs;
 	m_last_vofs = vofs;
 
-	win->m_primlist->acquire_lock();
+	window().m_primlist->acquire_lock();
 
 	// now draw
-	for (render_primitive &prim : *win->m_primlist)
+	for (render_primitive &prim : *window().m_primlist)
 	{
 		int i;
 
@@ -1407,7 +1542,7 @@ int renderer_ogl::draw(const int update)
 		pendingPrimitive=GL_NO_PRIMITIVE;
 	}
 
-	win->m_primlist->release_lock();
+	window().m_primlist->release_lock();
 	m_init_context = 0;
 
 	m_gl_context->SwapBuffer();
@@ -1543,9 +1678,8 @@ void renderer_ogl::texture_compute_size_subroutine(ogl_texture_info *texture, ui
 	while (texture->yprescale > 1 && height_create * texture->yprescale > m_texture_max_height)
 		texture->yprescale--;
 
-	auto win = assert_window();
-	if (PRIMFLAG_GET_SCREENTEX(flags) && (texture->xprescale != win->prescale() || texture->yprescale != win->prescale()))
-		osd_printf_warning("SDL: adjusting prescale from %dx%d to %dx%d\n", win->prescale(), win->prescale(), texture->xprescale, texture->yprescale);
+	if (PRIMFLAG_GET_SCREENTEX(flags) && (texture->xprescale != window().prescale() || texture->yprescale != window().prescale()))
+		osd_printf_warning("SDL: adjusting prescale from %dx%d to %dx%d\n", window().prescale(), window().prescale(), texture->xprescale, texture->yprescale);
 
 	width  *= texture->xprescale;
 	height *= texture->yprescale;
@@ -1640,10 +1774,9 @@ void renderer_ogl::texture_compute_size_type(const render_texinfo *texsource, og
 //  texture_create
 //============================================================
 
-static int gl_checkFramebufferStatus()
+int renderer_ogl::gl_checkFramebufferStatus() const
 {
-	GLenum status;
-	status=(GLenum)pfn_glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT);
+	GLenum const status = (GLenum)m_glCheckFramebufferStatus(GL_FRAMEBUFFER_EXT);
 	switch(status) {
 		case GL_FRAMEBUFFER_COMPLETE_EXT:
 			return 0;
@@ -1683,10 +1816,10 @@ static int gl_checkFramebufferStatus()
 	return -1;
 }
 
-static int texture_fbo_create(uint32_t text_unit, uint32_t text_name, uint32_t fbo_name, int width, int height)
+int renderer_ogl::texture_fbo_create(uint32_t text_unit, uint32_t text_name, uint32_t fbo_name, int width, int height) const
 {
-	pfn_glActiveTexture(text_unit);
-	pfn_glBindFramebuffer(GL_FRAMEBUFFER_EXT, fbo_name);
+	m_glActiveTexture(text_unit);
+	m_glBindFramebuffer(GL_FRAMEBUFFER_EXT, fbo_name);
 	glBindTexture(GL_TEXTURE_2D, text_name);
 	{
 		GLint _width, _height;
@@ -1708,7 +1841,7 @@ static int texture_fbo_create(uint32_t text_unit, uint32_t text_name, uint32_t f
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	pfn_glFramebufferTexture2D(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+	m_glFramebufferTexture2D(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
 					GL_TEXTURE_2D, text_name, 0);
 
 	if ( gl_checkFramebufferStatus() )
@@ -1789,7 +1922,7 @@ int renderer_ogl::texture_shader_create(const render_texinfo *texsource, ogl_tex
 	{
 		// multipass mode
 		// GL_TEXTURE2/GL_TEXTURE3
-		pfn_glGenFramebuffers(2, (GLuint *)&texture->mpass_fbo_mamebm[0]);
+		m_glGenFramebuffers(2, (GLuint *)&texture->mpass_fbo_mamebm[0]);
 		glGenTextures(2, (GLuint *)&texture->mpass_texture_mamebm[0]);
 
 		for (i=0; i<2; i++)
@@ -1803,7 +1936,7 @@ int renderer_ogl::texture_shader_create(const render_texinfo *texsource, ogl_tex
 			}
 		}
 
-		pfn_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
+		m_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
 
 		osd_printf_verbose("GL texture: mpass mame-bmp   2x %dx%d (pow2 %dx%d)\n",
 			texture->rawwidth, texture->rawheight, texture->rawwidth_create, texture->rawheight_create);
@@ -1813,7 +1946,7 @@ int renderer_ogl::texture_shader_create(const render_texinfo *texsource, ogl_tex
 	{
 		// multipass mode
 		// GL_TEXTURE2/GL_TEXTURE3
-		pfn_glGenFramebuffers(2, (GLuint *)&texture->mpass_fbo_scrn[0]);
+		m_glGenFramebuffers(2, (GLuint *)&texture->mpass_fbo_scrn[0]);
 		glGenTextures(2, (GLuint *)&texture->mpass_texture_scrn[0]);
 
 		for (i=0; i<2; i++)
@@ -1834,7 +1967,7 @@ int renderer_ogl::texture_shader_create(const render_texinfo *texsource, ogl_tex
 	// GL_TEXTURE0
 	// get a name for this texture
 	glGenTextures(1, (GLuint *)&texture->texture);
-	pfn_glActiveTexture(GL_TEXTURE0);
+	m_glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texture->texture);
 
 	glPixelStorei(GL_UNPACK_ROW_LENGTH, texture->rawwidth_create);
@@ -1907,9 +2040,8 @@ ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, 
 	texture->texinfo.seqid = -1; // force set data
 	if (PRIMFLAG_GET_SCREENTEX(flags))
 	{
-		auto win = assert_window();
-		texture->xprescale = win->prescale();
-		texture->yprescale = win->prescale();
+		texture->xprescale = window().prescale();
+		texture->yprescale = window().prescale();
 	}
 	else
 	{
@@ -2028,12 +2160,12 @@ ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, 
 		assert(m_usepbo);
 
 		// create the PBO
-		pfn_glGenBuffers(1, (GLuint *)&texture->pbo);
+		m_glGenBuffers(1, (GLuint *)&texture->pbo);
 
-		pfn_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, texture->pbo);
+		m_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, texture->pbo);
 
 		// set up the PBO dimension, ..
-		pfn_glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB,
+		m_glBufferData(GL_PIXEL_UNPACK_BUFFER_ARB,
 							texture->rawwidth * texture->rawheight * sizeof(uint32_t),
 					nullptr, GL_STREAM_DRAW);
 	}
@@ -2063,10 +2195,10 @@ ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, 
 	if (m_usevbo)
 	{
 		// Generate And Bind The Texture Coordinate Buffer
-		pfn_glGenBuffers( 1, &(texture->texCoordBufferName) );
-		pfn_glBindBuffer( GL_ARRAY_BUFFER_ARB, texture->texCoordBufferName );
+		m_glGenBuffers( 1, &(texture->texCoordBufferName) );
+		m_glBindBuffer( GL_ARRAY_BUFFER_ARB, texture->texCoordBufferName );
 		// Load The Data
-		pfn_glBufferData( GL_ARRAY_BUFFER_ARB, 4*2*sizeof(GLfloat), texture->texCoord, GL_STREAM_DRAW );
+		m_glBufferData( GL_ARRAY_BUFFER_ARB, 4*2*sizeof(GLfloat), texture->texCoord, GL_STREAM_DRAW );
 		glTexCoordPointer( 2, GL_FLOAT, 0, (char *) nullptr ); // we are using ARB VBO buffers
 	}
 	else
@@ -2327,14 +2459,14 @@ static inline void copyline_yuy16_to_argb(uint32_t *dst, const uint16_t *src, in
 //  texture_set_data
 //============================================================
 
-static void texture_set_data(ogl_texture_info *texture, const render_texinfo *texsource, uint32_t flags)
+void renderer_ogl::texture_set_data(ogl_texture_info *texture, const render_texinfo *texsource, uint32_t flags) const
 {
 	if ( texture->type == TEXTURE_TYPE_DYNAMIC )
 	{
 		assert(texture->pbo);
 		assert(!texture->nocopy);
 
-		texture->data = (uint32_t *) pfn_glMapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY);
+		texture->data = (uint32_t *) m_glMapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY);
 	}
 
 	// note that nocopy and borderpix are mutually exclusive, IOW
@@ -2401,7 +2533,7 @@ static void texture_set_data(ogl_texture_info *texture, const render_texinfo *te
 
 	if ( texture->type == TEXTURE_TYPE_SHADER )
 	{
-		pfn_glActiveTexture(GL_TEXTURE0);
+		m_glActiveTexture(GL_TEXTURE0);
 		glBindTexture(texture->texTarget, texture->texture);
 
 		if (texture->nocopy)
@@ -2420,7 +2552,7 @@ static void texture_set_data(ogl_texture_info *texture, const render_texinfo *te
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, texture->rawwidth);
 
 		// unmap the buffer from the CPU space so it can DMA
-		pfn_glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB);
+		m_glUnmapBuffer(GL_PIXEL_UNPACK_BUFFER_ARB);
 
 		// kick off the DMA
 		glTexSubImage2D(texture->texTarget, 0, 0, 0, texture->rawwidth, texture->rawheight,
@@ -2575,7 +2707,7 @@ void renderer_ogl::texture_mpass_flip(ogl_texture_info *texture, int shaderIdx)
 		GL_CHECK_ERROR_NORMAL();
 	}
 
-	pfn_glActiveTexture(texture->mpass_textureunit[mpass_src_idx]);
+	m_glActiveTexture(texture->mpass_textureunit[mpass_src_idx]);
 	if ( shaderIdx<=m_glsl_program_mb2sc )
 	{
 		glBindTexture(texture->texTarget, texture->mpass_texture_mamebm[mpass_src_idx]);
@@ -2584,22 +2716,22 @@ void renderer_ogl::texture_mpass_flip(ogl_texture_info *texture, int shaderIdx)
 	{
 		glBindTexture(texture->texTarget, texture->mpass_texture_scrn[mpass_src_idx]);
 	}
-	pfn_glActiveTexture(texture->mpass_textureunit[texture->mpass_dest_idx]);
+	m_glActiveTexture(texture->mpass_textureunit[texture->mpass_dest_idx]);
 	glBindTexture(texture->texTarget, 0);
 
-	pfn_glActiveTexture(texture->mpass_textureunit[texture->mpass_dest_idx]);
+	m_glActiveTexture(texture->mpass_textureunit[texture->mpass_dest_idx]);
 
 	if ( shaderIdx<m_glsl_program_num-1 )
 	{
 		if ( shaderIdx>=m_glsl_program_mb2sc )
 		{
 			glBindTexture(texture->texTarget, texture->mpass_texture_scrn[texture->mpass_dest_idx]);
-			pfn_glBindFramebuffer(GL_FRAMEBUFFER_EXT, texture->mpass_fbo_scrn[texture->mpass_dest_idx]);
+			m_glBindFramebuffer(GL_FRAMEBUFFER_EXT, texture->mpass_fbo_scrn[texture->mpass_dest_idx]);
 		}
 		else
 		{
 			glBindTexture(texture->texTarget, texture->mpass_texture_mamebm[texture->mpass_dest_idx]);
-			pfn_glBindFramebuffer(GL_FRAMEBUFFER_EXT, texture->mpass_fbo_mamebm[texture->mpass_dest_idx]);
+			m_glBindFramebuffer(GL_FRAMEBUFFER_EXT, texture->mpass_fbo_mamebm[texture->mpass_dest_idx]);
 		}
 
 		if ( shaderIdx==0 )
@@ -2620,7 +2752,7 @@ void renderer_ogl::texture_mpass_flip(ogl_texture_info *texture, int shaderIdx)
 	else
 	{
 		glBindTexture(texture->texTarget, 0);
-		pfn_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
+		m_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
 
 		if ( m_glsl_program_mb2sc == m_glsl_program_num-1 )
 		{
@@ -2628,7 +2760,7 @@ void renderer_ogl::texture_mpass_flip(ogl_texture_info *texture, int shaderIdx)
 			GL_CHECK_ERROR_NORMAL();
 		}
 
-		pfn_glActiveTexture(GL_TEXTURE0);
+		m_glActiveTexture(GL_TEXTURE0);
 		glBindTexture(texture->texTarget, 0);
 	}
 }
@@ -2676,7 +2808,7 @@ ogl_texture_info * renderer_ogl::texture_update(const render_primitive *prim, in
 		else if ( texture->type == TEXTURE_TYPE_DYNAMIC )
 		{
 			assert ( m_usepbo ) ;
-			pfn_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, texture->pbo);
+			m_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, texture->pbo);
 			glEnable(texture->texTarget);
 		}
 		else
@@ -2716,9 +2848,9 @@ ogl_texture_info * renderer_ogl::texture_update(const render_primitive *prim, in
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 		if(m_usevbo)
 		{
-			pfn_glBindBuffer( GL_ARRAY_BUFFER_ARB, texture->texCoordBufferName );
+			m_glBindBuffer( GL_ARRAY_BUFFER_ARB, texture->texCoordBufferName );
 			// Load The Data
-			pfn_glBufferSubData( GL_ARRAY_BUFFER_ARB, 0, 4*2*sizeof(GLfloat), texture->texCoord );
+			m_glBufferSubData( GL_ARRAY_BUFFER_ARB, 0, 4*2*sizeof(GLfloat), texture->texCoord );
 			glTexCoordPointer( 2, GL_FLOAT, 0, (char *) nullptr ); // we are using ARB VBO buffers
 		}
 		else
@@ -2736,11 +2868,14 @@ void renderer_ogl::texture_disable(ogl_texture_info * texture)
 	{
 		assert ( m_useglsl );
 		pfn_glUseProgramObjectARB(0); // back to fixed function pipeline
-	} else if ( texture->type == TEXTURE_TYPE_DYNAMIC )
+	}
+	else if ( texture->type == TEXTURE_TYPE_DYNAMIC )
 	{
-		pfn_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+		m_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0);
 		glDisable(texture->texTarget);
-	} else {
+	}
+	else
+	{
 		glDisable(texture->texTarget);
 	}
 }
@@ -2751,18 +2886,18 @@ void renderer_ogl::texture_all_disable()
 	{
 		pfn_glUseProgramObjectARB(0); // back to fixed function pipeline
 
-		pfn_glActiveTexture(GL_TEXTURE3);
+		m_glActiveTexture(GL_TEXTURE3);
 		glBindTexture(GL_TEXTURE_2D, 0);
-		if ( m_usefbo ) pfn_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
-		pfn_glActiveTexture(GL_TEXTURE2);
+		if ( m_usefbo ) m_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
+		m_glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, 0);
-		if ( m_usefbo ) pfn_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
-		pfn_glActiveTexture(GL_TEXTURE1);
+		if ( m_usefbo ) m_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
+		m_glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, 0);
-		if ( m_usefbo ) pfn_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
-		pfn_glActiveTexture(GL_TEXTURE0);
+		if ( m_usefbo ) m_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
+		m_glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, 0);
-		if ( m_usefbo ) pfn_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
+		if ( m_usefbo ) m_glBindFramebuffer(GL_FRAMEBUFFER_EXT, 0);
 	}
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB, 0);
 
@@ -2775,10 +2910,143 @@ void renderer_ogl::texture_all_disable()
 	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	if(m_usevbo)
 	{
-		pfn_glBindBuffer( GL_ARRAY_BUFFER_ARB, 0); // unbind ..
+		m_glBindBuffer( GL_ARRAY_BUFFER_ARB, 0); // unbind ..
 	}
 	if ( m_usepbo )
 	{
-		pfn_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0);
+		m_glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0);
 	}
 }
+
+
+class video_opengl : public osd_module, public render_module
+{
+public:
+	video_opengl()
+		: osd_module(OSD_RENDERER_PROVIDER, "opengl")
+#ifdef USE_DISPATCH_GL
+		, m_dll_loaded(false)
+#endif
+	{
+	}
+	~video_opengl() { exit(); }
+
+	virtual int init(osd_interface &osd, osd_options const &options) override;
+	virtual void exit() override;
+
+	virtual std::unique_ptr<osd_renderer> create(osd_window &window) override;
+
+protected:
+	virtual unsigned flags() const override { return FLAG_INTERACTIVE | FLAG_SDL_NEEDS_OPENGL; }
+
+private:
+	ogl_video_config m_ogl_config;
+#ifdef USE_DISPATCH_GL
+	std::unique_ptr<osd_gl_dispatch> m_gl_dispatch;
+	bool m_dll_loaded;
+#endif
+};
+
+int video_opengl::init(osd_interface &osd, osd_options const &options)
+{
+	m_ogl_config.vbo              = options.gl_vbo();
+	m_ogl_config.pbo              = options.gl_pbo();
+	m_ogl_config.allowtexturerect = !options.gl_no_texture_rect();
+	m_ogl_config.forcepow2texture = options.gl_force_pow2_texture();
+	m_ogl_config.glsl             = options.gl_glsl();
+	if (m_ogl_config.glsl)
+	{
+		m_ogl_config.glsl_filter = options.glsl_filter();
+
+		m_ogl_config.glsl_shader_mamebm_num = 0;
+		for (int i = 0; i < GLSL_SHADER_MAX; i++)
+		{
+			char const *const stemp = options.shader_mame(i);
+			if (stemp && *stemp && strcmp(stemp, OSDOPTVAL_NONE))
+				m_ogl_config.glsl_shader_mamebm[m_ogl_config.glsl_shader_mamebm_num++] = stemp;
+		}
+
+		m_ogl_config.glsl_shader_scrn_num = 0;
+		for (int i = 0; i < GLSL_SHADER_MAX; i++)
+		{
+			char const *const stemp = options.shader_screen(i);
+			if (stemp && *stemp && strcmp(stemp, OSDOPTVAL_NONE))
+				m_ogl_config.glsl_shader_scrn[m_ogl_config.glsl_shader_scrn_num++] = stemp;
+		}
+	}
+	else
+	{
+		m_ogl_config.glsl_filter = 0;
+
+		m_ogl_config.glsl_shader_mamebm_num = 0;
+		for (std::string &s : m_ogl_config.glsl_shader_mamebm)
+			s.clear();
+
+		m_ogl_config.glsl_shader_scrn_num = 0;
+		for (std::string &s : m_ogl_config.glsl_shader_scrn)
+			s.clear();
+	}
+
+#if defined(USE_DISPATCH_GL)
+#if defined(OSD_SDL)
+	if (!m_dll_loaded)
+	{
+		// directfb and and x11 use this env var: SDL_VIDEO_GL_DRIVER
+		char const *libname = dynamic_cast<sdl_options const &>(options).gl_lib();
+		if (libname && (!*libname || !std::strcmp(libname, OSDOPTVAL_AUTO)))
+			libname = nullptr;
+
+		if (SDL_GL_LoadLibrary(libname) != 0)
+		{
+			osd_printf_error("Unable to load OpenGL shared library: %s\n", libname ? libname : "<default>");
+			return -1;
+		}
+
+		osd_printf_verbose("Loaded OpenGL shared library: %s\n", libname ? libname : "<default>");
+	}
+#endif // defined(OSD_SDL)
+	m_dll_loaded = true;
+	m_gl_dispatch = std::make_unique<osd_gl_dispatch>();
+#endif // defined(USE_DISPATCH_GL)
+
+#if defined(OSD_WINDOWS)
+	osd_printf_verbose("Using Windows OpenGL driver\n");
+#else // defined(OSD_WINDOWS)
+	osd_printf_verbose("Using SDL multi-window OpenGL driver (SDL 2.0+)\n");
+#endif // defined(OSD_WINDOWS)
+
+	return 0;
+}
+
+void video_opengl::exit()
+{
+#if defined(USE_DISPATCH_GL)
+#if defined(OSD_SDL)
+	if (m_dll_loaded)
+		SDL_GL_UnloadLibrary();
+#endif // defined(OSD_SDL)
+	m_gl_dispatch.reset();
+	m_dll_loaded = false;
+#endif // defined(USE_DISPATCH_GL)
+
+	m_ogl_config = ogl_video_config();
+}
+
+std::unique_ptr<osd_renderer> video_opengl::create(osd_window &window)
+{
+	return std::make_unique<renderer_ogl>(window, m_ogl_config);
+}
+
+} // anonymous namespace
+
+} // namespace osd
+
+
+#else // USE_OPENGL
+
+namespace osd { namespace { MODULE_NOT_SUPPORTED(video_opengl, OSD_RENDERER_PROVIDER, "opengl") } }
+
+#endif // USE_OPENGL
+
+
+MODULE_DEFINITION(RENDERER_OPENGL, osd::video_opengl)

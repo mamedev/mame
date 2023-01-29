@@ -7,6 +7,8 @@
 
 #include "modules/osdmodule.h"
 
+#include "emucore.h"
+
 #include "osdcore.h"
 
 #include <algorithm>
@@ -48,20 +50,62 @@ osd_module *osd_module_manager::get_module_generic(const char *type, const char 
 		return nullptr;
 }
 
-osd_module *osd_module_manager::select_module(const char *type, const char *name)
+osd_module &osd_module_manager::select_module(osd_interface &osd, const osd_options &options, const char *type, const char *name)
 {
-	osd_module *m = get_module_generic(type, name);
+	// see if a module of this type has already been already selected
+	for (osd_module &existing : m_selected)
+	{
+		if (existing.type() == type)
+		{
+			osd_printf_warning(
+					"Attempt to select %s module %s after selecting module %s\n",
+					type,
+					(name && *name) ? name : "<default>",
+					existing.name());
+			return existing;
+		}
+	}
 
-	// FIXME: check if already exists!
+	// try to start the selected module
+	osd_module *const m = get_module_generic(type, name);
 	if (m)
-		m_selected.emplace_back(*m);
-	return m;
-}
+	{
+		//osd_printf_verbose("Attempting to initialize %s module %s\n", type, m->name());
+		if (!m->init(osd, options))
+		{
+			m_selected.emplace_back(*m);
+			return *m;
+		}
+		osd_printf_verbose("Initializing %s module %s failed\n", type, m->name());
+	}
+	else
+	{
+		osd_printf_verbose("Could not find %s module %s\n", type, name ? name : "<default>");
+	}
 
-void osd_module_manager::init(osd_interface &osd, const osd_options &options)
-{
-	for (osd_module &m : m_selected)
-		m.init(osd, options);
+	// walk down the list until something works
+	for (auto const &fallback : m_modules)
+	{
+		if ((fallback->type() == type) && (fallback.get() != m))
+		{
+			osd_printf_verbose("Attempting to initialize %s module %s\n", type, fallback->name());
+			if (!fallback->init(osd, options))
+			{
+				osd_printf_warning(
+						m
+							?  "Initializing %s module %s failed, falling back to %s\n"
+							: "Could not find %s module %s, falling back to %s\n",
+						type,
+						m ? m->name() : (name && *name) ? name : "<default>",
+						fallback->name());
+				m_selected.emplace_back(*fallback);
+				return *fallback;
+			}
+		}
+	}
+
+	// can't deal with absence of a module, and at least the "none" module should have worked
+	throw emu_fatalerror("All %s modules failed to initialize", type);
 }
 
 void osd_module_manager::exit()

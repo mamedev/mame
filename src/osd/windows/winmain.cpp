@@ -89,7 +89,7 @@ public:
 		if (channel == OSD_OUTPUT_CHANNEL_ERROR)
 		{
 			// if we are in fullscreen mode, go to windowed mode
-			if ((video_config.windowed == 0) && !osd_common_t::s_window_list.empty())
+			if ((video_config.windowed == 0) && !osd_common_t::window_list().empty())
 				winwindow_toggle_full_screen();
 
 			auto &state(get_state());
@@ -284,21 +284,6 @@ windows_osd_interface::~windows_osd_interface()
 
 
 //============================================================
-//  video_register
-//============================================================
-
-void windows_osd_interface::video_register()
-{
-	video_options_add("gdi", nullptr);
-	video_options_add("d3d", nullptr);
-#if USE_OPENGL
-	video_options_add("opengl", nullptr);
-#endif
-	video_options_add("bgfx", nullptr);
-	//video_options_add("auto", nullptr); // making d3d video default one
-}
-
-//============================================================
 //  init
 //============================================================
 
@@ -352,9 +337,9 @@ void windows_osd_interface::init(running_machine &machine)
 	osd_common_t::init_subsystems();
 
 	// notify listeners of screen configuration
-	for (const auto &info : osd_common_t::s_window_list)
+	for (const auto &info : osd_common_t::window_list())
 	{
-		machine.output().set_value(string_format("Orientation(%s)", info->monitor()->devicename()), std::static_pointer_cast<win_window_info>(info)->m_targetorient);
+		machine.output().set_value(string_format("Orientation(%s)", info->monitor()->devicename()), dynamic_cast<win_window_info &>(*info).m_targetorient);
 	}
 
 	// hook up the debugger log
