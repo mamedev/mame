@@ -39,8 +39,11 @@ uint32_t arcompact_device::handleop_ASR_S_b_b_u5(uint16_t op)
 {
 	uint8_t breg = common16_get_and_expand_breg(op);
 	uint32_t u = common16_get_u5(op);
-	int32_t temp = (int32_t)m_regs[breg];
-	m_regs[breg] = temp >> (u&0x1f); // treat it as a signed value, so sign extension occurs during shift
+	uint32_t source = m_regs[breg];
+	uint32_t result = m_regs[breg] >> (u & 0x1f);
+	if (source & 0x80000000)
+		result |= 0xffffffff << (31 - (u & 0x1f));
+	m_regs[breg] = result;
 	return m_pc + 2;
 }
 

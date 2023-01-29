@@ -267,7 +267,7 @@ uint32_t arcompact_device::handleop_ASL_S_b_b_c_multiple(uint16_t op)
 {
 	uint8_t breg = common16_get_and_expand_breg(op);
 	uint8_t creg = common16_get_and_expand_creg(op);
-	uint32_t result = m_regs[breg] << (m_regs[creg]&0x1f);
+	uint32_t result = m_regs[breg] << (m_regs[creg] & 0x1f);
 	m_regs[breg] = result;
 	return m_pc + 2;
 }
