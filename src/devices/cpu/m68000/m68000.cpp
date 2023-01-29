@@ -51,12 +51,19 @@ void m68000_device::do_post_run()
 	m_post_run = 0;
 }
 
-u64 m68000_device::vpa_sync(offs_t address, u64 current_time)
+u64 m68000_device::vpa_sync(offs_t, u64 current_time)
 {
-	u64 delta = current_time % 10;
-	if(delta)
-		current_time += 10-delta;
+	u64 mod = current_time % 10;
+	if(mod < 7)
+		current_time = current_time - mod + 10;
+	else
+		current_time = current_time - mod + 20;
 	return current_time;
+}
+
+u32 m68000_device::vpa_after(offs_t)
+{
+	return 1;
 }
 
 void m68000_device::trigger_bus_error()
@@ -141,13 +148,13 @@ void m68000_device::default_autovectors_map(address_map &map)
 {
 	if(m_cpu_space_id == AS_CPU_SPACE && !has_configured_map(AS_CPU_SPACE)) {
 		offs_t mask = make_bitmask<offs_t>(24) - 0xf;
-		map(mask + 0x3, mask + 0x3).before_time(*this, FUNC(m68000_device::vpa_sync)).lr8(NAME([] () -> u8 { return autovector(1); }));
-		map(mask + 0x5, mask + 0x5).before_time(*this, FUNC(m68000_device::vpa_sync)).lr8(NAME([] () -> u8 { return autovector(2); }));
-		map(mask + 0x7, mask + 0x7).before_time(*this, FUNC(m68000_device::vpa_sync)).lr8(NAME([] () -> u8 { return autovector(3); }));
-		map(mask + 0x9, mask + 0x9).before_time(*this, FUNC(m68000_device::vpa_sync)).lr8(NAME([] () -> u8 { return autovector(4); }));
-		map(mask + 0xb, mask + 0xb).before_time(*this, FUNC(m68000_device::vpa_sync)).lr8(NAME([] () -> u8 { return autovector(5); }));
-		map(mask + 0xd, mask + 0xd).before_time(*this, FUNC(m68000_device::vpa_sync)).lr8(NAME([] () -> u8 { return autovector(6); }));
-		map(mask + 0xf, mask + 0xf).before_time(*this, FUNC(m68000_device::vpa_sync)).lr8(NAME([] () -> u8 { return autovector(7); }));
+		map(mask + 0x3, mask + 0x3).before_time(*this, FUNC(m68000_device::vpa_sync)).after_delay(*this, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return autovector(1); }));
+		map(mask + 0x5, mask + 0x5).before_time(*this, FUNC(m68000_device::vpa_sync)).after_delay(*this, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return autovector(2); }));
+		map(mask + 0x7, mask + 0x7).before_time(*this, FUNC(m68000_device::vpa_sync)).after_delay(*this, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return autovector(3); }));
+		map(mask + 0x9, mask + 0x9).before_time(*this, FUNC(m68000_device::vpa_sync)).after_delay(*this, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return autovector(4); }));
+		map(mask + 0xb, mask + 0xb).before_time(*this, FUNC(m68000_device::vpa_sync)).after_delay(*this, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return autovector(5); }));
+		map(mask + 0xd, mask + 0xd).before_time(*this, FUNC(m68000_device::vpa_sync)).after_delay(*this, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return autovector(6); }));
+		map(mask + 0xf, mask + 0xf).before_time(*this, FUNC(m68000_device::vpa_sync)).after_delay(*this, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return autovector(7); }));
 	}
 }
 

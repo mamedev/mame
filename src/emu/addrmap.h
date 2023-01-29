@@ -242,15 +242,15 @@ public:
 	// wait-states, device reference -> delegate converter
 	template <typename T, typename U>
 	address_map_entry &before_time(T &obj, u64 (U::*ws)(offs_t, u64), const char *name)
-	{ m_before_time = ws_time_delegate(*make_pointer<U>(obj), ws, name); return *this; }
+	{ m_before_time = ws_time_delegate(obj, ws, name); return *this; }
 
 	template <typename T, typename U>
 	address_map_entry &before_delay(T &obj, u32 (U::*ws)(offs_t), const char *name)
-	{ m_before_delay = ws_delay_delegate(*make_pointer<U>(obj), ws, name); return *this; }
+	{ m_before_delay = ws_delay_delegate(obj, ws, name); return *this; }
 
 	template <typename T, typename U>
 	address_map_entry &after_delay(T &obj, u32 (U::*ws)(offs_t), const char *name)
-	{ m_after_delay = ws_delay_delegate(*make_pointer<U>(obj), ws, name); return *this; }
+	{ m_after_delay = ws_delay_delegate(obj, ws, name); return *this; }
 
 	// wait-states, lambda -> delegate converter
 	template <typename T>
