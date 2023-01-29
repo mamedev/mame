@@ -25,10 +25,28 @@ void arcompact_device::check_interrupts()
 {
 	if (m_irq_pending)
 	{
-		if (m_status32 & 0x00000006)
+		if (m_status32 & 0x00000002) // & 0x04 = level2, & 0x02 = level1
 		{
-			logerror("HACK/TEST IRQ\n");
+			int level = 1;
 			int vector = 3;
+
+			logerror("HACK/TEST IRQ\n");
+
+			if (level == 1)
+			{
+				m_regs[REG_ILINK1] = m_pc;
+				m_status32_l1 = m_status32;
+			}
+			else if (level == 2)
+			{
+				m_regs[REG_ILINK2] = m_pc;
+				m_status32_l2 = m_status32;
+			}
+			else
+			{
+				fatalerror("illegal IRQ level\n");
+			}
+
 			m_pc = m_INTVECTORBASE + vector * 8;
 			m_irq_pending = 0;
 			debugreg_clear_ZZ();

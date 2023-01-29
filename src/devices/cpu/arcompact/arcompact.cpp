@@ -149,8 +149,13 @@ void arcompact_device::arcompact_auxreg200_AUX_IRQ_LVL_w(uint32_t data)
 
 void arcompact_device::arcompact_auxreg_map(address_map &map)
 {
+	//map(0x000000000, 0x000000000) // STATUS register in ARCtangent-A4 format (legacy)
+	//map(0x000000001, 0x000000001) // SEMAPHORE (for multi-cpu comms)
 	map(0x000000002, 0x000000002).rw(FUNC(arcompact_device::arcompact_auxreg002_LPSTART_r), FUNC(arcompact_device::arcompact_auxreg002_LPSTART_w));
 	map(0x000000003, 0x000000003).rw(FUNC(arcompact_device::arcompact_auxreg003_LPEND_r), FUNC(arcompact_device::arcompact_auxreg003_LPEND_w));
+	//map(0x000000004, 0x000000004) // IDENTITY (processor ID register)
+	//map(0x000000005, 0x000000005) // DEBUG (various flags, including SLEEP)
+	//map(0x000000006, 0x000000006) // PC (alt way of reading current PC)
 	map(0x00000000a, 0x00000000a).r(FUNC(arcompact_device::arcompact_auxreg00a_STATUS32_r)); // r/o
 	map(0x00000000b, 0x00000000b).rw(FUNC(arcompact_device::arcompact_auxreg00b_STATUS32_L1_r), FUNC(arcompact_device::arcompact_auxreg00b_STATUS32_L1_w));
 	map(0x00000000c, 0x00000000c).rw(FUNC(arcompact_device::arcompact_auxreg00c_STATUS32_L2_r), FUNC(arcompact_device::arcompact_auxreg00c_STATUS32_L2_w));
@@ -160,6 +165,8 @@ void arcompact_device::arcompact_auxreg_map(address_map &map)
 	map(0x000000021, 0x000000023).rw(FUNC(arcompact_device::arcompact_auxreg012_TIMER0_r), FUNC(arcompact_device::arcompact_auxreg012_TIMER0_w));
 
 	map(0x000000025, 0x000000025).rw(FUNC(arcompact_device::arcompact_auxreg025_INTVECTORBASE_r), FUNC(arcompact_device::arcompact_auxreg025_INTVECTORBASE_w));
+
+	//map(0x000000041, 0x000000041) // AUX_MACMODE (used by optional maths extensions)
 
 	map(0x000000043, 0x000000043).w(FUNC(arcompact_device::arcompact_auxreg043_AUX_IRQ_LV12_w));
 
@@ -179,6 +186,24 @@ void arcompact_device::arcompact_auxreg_map(address_map &map)
 	map(0x000000100, 0x000000102).rw(FUNC(arcompact_device::arcompact_auxreg100_TIMER1_r), FUNC(arcompact_device::arcompact_auxreg100_TIMER1_w));
 
 	map(0x000000200, 0x000000200).rw(FUNC(arcompact_device::arcompact_auxreg200_AUX_IRQ_LVL_r), FUNC(arcompact_device::arcompact_auxreg200_AUX_IRQ_LVL_w));
+	//map(0x000000201, 0x000000201) // AUX_IRQ_HINT
+
+	// below are ARC700 registers
+	//map(0x000000400, 0x000000400) // ERET
+	//map(0x000000401, 0x000000401) // ERBTA
+	//map(0x000000402, 0x000000402) // ERSTATUS
+	//map(0x000000403, 0x000000403) // ECR
+	//map(0x000000404, 0x000000404) // EFA
+	//map(0x00000040a, 0x00000040a) // ICAUSE1
+	//map(0x00000040b, 0x00000040b) // ICAUSE2
+	//map(0x00000040c, 0x00000040c) // AUX_IENABLE
+	//map(0x00000040d, 0x00000040d) // AUX_ITRIGGER
+	//map(0x000000410, 0x000000410) // XPU
+	//map(0x000000412, 0x000000412) // BTA
+	//map(0x000000413, 0x000000413) // BTA_L1
+	//map(0x000000414, 0x000000414) // BTA_L2
+	//map(0x000000415, 0x000000415) // AUX_IRQ_PULSE_CANCEL
+	//map(0x000000416, 0x000000416) // AUX_IRQ_PENDING
 }
 
 #define AUX_SPACE_ADDRESS_WIDTH 32  // IO space is 32 bits of dwords

@@ -348,8 +348,9 @@ uint32_t leapster_state::leapster_180d400_r()
 
 uint32_t leapster_state::leapster_180d800_r()
 {
-	logerror("%s: leapster_180d800_r\n", machine().describe_context());
-	return machine().rand() | (machine().rand()<<16);
+	logerror("%s: leapster_180d800_r (return usually checked against 00027100)\n", machine().describe_context());
+	//does a BRLO.ND against 00027100
+	return 0x00027100;
 }
 
 

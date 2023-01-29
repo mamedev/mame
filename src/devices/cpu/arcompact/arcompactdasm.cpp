@@ -485,7 +485,7 @@ const char *const arcompact_disassembler::opcodes_04[0x40] =
 	/* 10 */ "BCLR",
 	/* 11 */ "BTST",
 	/* 12 */ "BXOR",
-	/* 13 */ "BSMK",
+	/* 13 */ "BMSK",
 	/* 14 */ "ADD1",
 	/* 15 */ "ADD2",
 	/* 16 */ "ADD3",
