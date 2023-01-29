@@ -199,7 +199,7 @@ license:CC0-1.0
 		<description>007 - The Living Daylights (Europe)</description>
 		<year>1987</year>
 		<publisher>Domark</publisher>
-		<info name="ean" value="9781851601240"/>
+		<info name="gtin" value="09781851601240"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -226,7 +226,7 @@ license:CC0-1.0
 		<description>10th Frame (Europe)</description>
 		<year>1986</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="ean" value="5013442538944"/>
+		<info name="gtin" value="05013442538944"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -241,7 +241,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Mastertronic Added Dimension</publisher>
 		<info name="serial" value="IX 0203"/>
-		<info name="ean" value="5012967710071"/>
+		<info name="gtin" value="05012967710071"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -269,7 +269,7 @@ license:CC0-1.0
 		<description>4x4 Off-Road Racing (Europe)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="ean" value="5013442542118"/>
+		<info name="gtin" value="05013442542118"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -290,7 +290,7 @@ license:CC0-1.0
 		<description>4x4 Off-Road Racing (Europe, alt)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="ean" value="5013442542118"/>
+		<info name="gtin" value="05013442542118"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -324,7 +324,7 @@ license:CC0-1.0
 		<description>737 Flight Simulator (Europe)</description>
 		<year>1984</year>
 		<publisher>Mirrorsoft</publisher>
-		<info name="ean" value="5012342020092"/>
+		<info name="gtin" value="05012342020092"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -338,7 +338,7 @@ license:CC0-1.0
 		<description>737 Flight Simulator (Europe, alt)</description>
 		<year>1984</year>
 		<publisher>Mirrorsoft</publisher>
-		<info name="ean" value="5012342020092"/>
+		<info name="gtin" value="05012342020092"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -580,7 +580,7 @@ license:CC0-1.0
 		<description>Ace of Aces (Europe)</description>
 		<year>1986</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="ean" value="5013442533840"/>
+		<info name="gtin" value="05013442533840"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -594,7 +594,7 @@ license:CC0-1.0
 		<description>Addictaball (Europe)</description>
 		<year>1988</year>
 		<publisher>Alligata Software</publisher>
-		<info name="ean" value="5012625130166"/>
+		<info name="gtin" value="05012625130166"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -674,7 +674,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="UXK 588"/>
-		<info name="ean" value="0047875615885"/>
+		<info name="gtin" value="00047875615885"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -750,7 +750,7 @@ license:CC0-1.0
 		<description>Alien 8 (Europe)</description>
 		<year>1985</year>
 		<publisher>Ultimate Play The Game</publisher>
-		<info name="ean" value="5012163486107"/>
+		<info name="gtin" value="05012163486107"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -786,7 +786,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Mr. Micro</publisher>
 		<info name="serial" value="UXK 614"/>
-		<info name="ean" value="0047875616141"/>
+		<info name="gtin" value="00047875616141"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -906,7 +906,7 @@ license:CC0-1.0
 		<description>Amaurote (Europe)</description>
 		<year>1987</year>
 		<publisher>Mastertronic Added Dimension</publisher>
-		<info name="ean" value="5012967710088"/>
+		<info name="gtin" value="05012967710088"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -978,7 +978,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Mastertronic Added Dimension</publisher>
 		<info name="serial" value="IX 0204"/>
-		<info name="ean" value="5012967710095"/>
+		<info name="gtin" value="05012967710095"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -1346,7 +1346,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Dinamic Software</publisher>
 		<info name="serial" value="MSX 890048"/>
-		<info name="ean" value="8413460030289"/>
+		<info name="gtin" value="08413460030289"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -1416,7 +1416,7 @@ license:CC0-1.0
 		<description>Attacked (Europe)</description>
 		<year>198?</year>
 		<publisher>Micro Value</publisher>
-		<info name="ean" value="5013835100963"/>
+		<info name="gtin" value="05013835100963"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -1430,7 +1430,7 @@ license:CC0-1.0
 		<description>Auf Wiedersehen Monty (Europe)</description>
 		<year>1987</year>
 		<publisher>Gremlin Graphics</publisher>
-		<info name="ean" value="5013658013143"/>
+		<info name="gtin" value="05013658013143"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -1444,7 +1444,7 @@ license:CC0-1.0
 		<description>Avenger - The Way of the Tiger II (Europe)</description>
 		<year>1986</year>
 		<publisher>Gremlin Graphics</publisher>
-		<info name="ean" value="5013658013112"/>
+		<info name="gtin" value="05013658013112"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -1492,7 +1492,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Dynamic Software</publisher>
 		<info name="serial" value="MSX 890037"/>
-		<info name="ean" value="8413460030227"/>
+		<info name="gtin" value="08413460030227"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -1648,7 +1648,7 @@ license:CC0-1.0
 		<description>Batman (Europe)</description>
 		<year>1986</year>
 		<publisher>Ocean Software</publisher>
-		<info name="ean" value="5013156010439"/>
+		<info name="gtin" value="05013156010439"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -1662,7 +1662,7 @@ license:CC0-1.0
 		<description>Batman (Europe, alt)</description>
 		<year>1986</year>
 		<publisher>Ocean Software</publisher>
-		<info name="ean" value="5013156010439"/>
+		<info name="gtin" value="05013156010439"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -1782,7 +1782,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Dinamic Software</publisher>
 		<info name="serial" value="MSX 890034"/>
-		<info name="ean" value="8413460010199"/>
+		<info name="gtin" value="08413460010199"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -1798,7 +1798,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Dinamic Software</publisher>
 		<info name="serial" value="MSX 890034"/>
-		<info name="ean" value="8413460010199"/>
+		<info name="gtin" value="08413460010199"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -1951,7 +1951,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="6026"/>
-		<info name="ean" value="5015026060261"/>
+		<info name="gtin" value="05015026060261"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -1965,7 +1965,7 @@ license:CC0-1.0
 		<description>Boardello (Europe)</description>
 		<year>1985</year>
 		<publisher>Bubble Bus Software</publisher>
-		<info name="ean" value="5012337311051"/>
+		<info name="gtin" value="05012337311051"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -2062,7 +2062,7 @@ license:CC0-1.0
 		<description>Bop! (Europe)</description>
 		<year>1986</year>
 		<publisher>Bug-Byte Software</publisher>
-		<info name="ean" value="5013248000041"/>
+		<info name="gtin" value="05013248000041"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -2160,7 +2160,7 @@ license:CC0-1.0
 		<description>Bounder (Europe)</description>
 		<year>1987</year>
 		<publisher>Gremlin Graphics</publisher>
-		<info name="ean" value="5013658013044"/>
+		<info name="gtin" value="05013658013044"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -2174,7 +2174,7 @@ license:CC0-1.0
 		<description>Bounder (Europe, alt)</description>
 		<year>1987</year>
 		<publisher>Gremlin Graphics</publisher>
-		<info name="ean" value="5013658013044"/>
+		<info name="gtin" value="05013658013044"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -2312,7 +2312,7 @@ license:CC0-1.0
 		<description>Bubbler (Europe)</description>
 		<year>1987</year>
 		<publisher>Ultimate Play The Game</publisher>
-		<info name="ean" value="5013442538227"/>
+		<info name="gtin" value="05013442538227"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -2428,7 +2428,7 @@ license:CC0-1.0
 		<description>Buster Block (Europe)</description>
 		<year>1985</year>
 		<publisher>Kuma Computers</publisher>
-		<info name="ean" value="5013677000117"/>
+		<info name="gtin" value="05013677000117"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -2525,7 +2525,7 @@ license:CC0-1.0
 		<description>California Games (Europe)</description>
 		<year>1987</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="ean" value="5013442537138"/>
+		<info name="gtin" value="05013442537138"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -2599,7 +2599,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Winner Software</publisher>
 		<info name="serial" value="WIN 16"/>
-		<info name="ean" value="5015103778232"/>
+		<info name="gtin" value="05015103778232"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -2873,7 +2873,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Bug-Byte Software</publisher>
 		<info name="serial" value="BBT 068"/>
-		<info name="ean" value="5013248670671"/>
+		<info name="gtin" value="05013248670671"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -3320,7 +3320,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Bulldog</publisher>
 		<info name="serial" value="BX 0166"/>
-		<info name="ean" value="5012967710033"/>
+		<info name="gtin" value="05012967710033"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -3335,7 +3335,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>CDS Microsystems</publisher>
 		<info name="serial" value="XXX 7005"/>
-		<info name="ean" value="5012323070054"/>
+		<info name="gtin" value="05012323070054"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -3664,7 +3664,7 @@ license:CC0-1.0
 		<description>Contract Bridge (Europe)</description>
 		<year>1984</year>
 		<publisher>Alligata Software</publisher>
-		<info name="ean" value="5011997159553"/>
+		<info name="gtin" value="05011997159553"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -3712,7 +3712,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Dinamic Software</publisher>
 		<info name="serial" value="3890044"/>
-		<info name="ean" value="8413460030265"/>
+		<info name="gtin" value="08413460030265"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -3727,7 +3727,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Martech Games</publisher>
 		<info name="serial" value="M96"/>
-		<info name="ean" value="5012753001055"/>
+		<info name="gtin" value="05012753001055"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -4086,7 +4086,7 @@ license:CC0-1.0
 		<description>Death Wish 3 (Europe)</description>
 		<year>1987</year>
 		<publisher>Gremlin Graphics</publisher>
-		<info name="ean" value="5013658013198"/>
+		<info name="gtin" value="05013658013198"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -4162,7 +4162,7 @@ license:CC0-1.0
 		<description>Desolator (Europe)</description>
 		<year>1986</year>
 		<publisher>Gremlin Graphics</publisher>
-		<info name="ean" value="5013658013075"/>
+		<info name="gtin" value="05013658013075"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -4176,7 +4176,7 @@ license:CC0-1.0
 		<description>Desolator (Europe, alt)</description>
 		<year>1986</year>
 		<publisher>Gremlin Graphics</publisher>
-		<info name="ean" value="5013658013075"/>
+		<info name="gtin" value="05013658013075"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -4210,7 +4210,7 @@ license:CC0-1.0
 		<description>Desperado 2 (Spain)</description>
 		<year>1991</year>
 		<publisher>Topo Soft</publisher>
-		<info name="ean" value="8420224611707"/>
+		<info name="gtin" value="08420224611707"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -4224,7 +4224,7 @@ license:CC0-1.0
 		<description>Desperado 2 (Spain, alt)</description>
 		<year>1991</year>
 		<publisher>Topo Soft</publisher>
-		<info name="ean" value="8420224611707"/>
+		<info name="gtin" value="08420224611707"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -4343,7 +4343,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Bug-Byte Software</publisher>
 		<info name="serial" value="7"/>
-		<info name="ean" value="5013248001185"/>
+		<info name="gtin" value="05013248001185"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -4392,7 +4392,7 @@ license:CC0-1.0
 		<description>Disc Warrior (United Kingdom)</description>
 		<year>1985</year>
 		<publisher>Budgie Software</publisher>
-		<info name="ean" value="5012625181328"/>
+		<info name="gtin" value="05012625181328"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -4406,7 +4406,7 @@ license:CC0-1.0
 		<description>Disc Warrior (Europe)</description>
 		<year>1984</year>
 		<publisher>Alligata Software</publisher>
-		<info name="ean" value="5012625130036"/>
+		<info name="gtin" value="05012625130036"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -4503,7 +4503,7 @@ license:CC0-1.0
 		<description>Dizzy Dice (Europe)</description>
 		<year>1988</year>
 		<publisher>Players Software</publisher>
-		<info name="ean" value="5013728001285"/>
+		<info name="gtin" value="05013728001285"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -4608,7 +4608,7 @@ license:CC0-1.0
 		<description>Donkey Kong (Europe)</description>
 		<year>1986</year>
 		<publisher>Ocean Software</publisher>
-		<info name="ean" value="5013156110368"/>
+		<info name="gtin" value="05013156110368"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -4622,7 +4622,7 @@ license:CC0-1.0
 		<description>Donkey Kong (Europe, alt)</description>
 		<year>1986</year>
 		<publisher>Ocean Software</publisher>
-		<info name="ean" value="5013156110368"/>
+		<info name="gtin" value="05013156110368"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -4685,7 +4685,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Bulldog</publisher>
 		<info name="serial" value="BX 0177"/>
-		<info name="ean" value="5012967700645"/>
+		<info name="gtin" value="05012967700645"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -4700,7 +4700,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Bulldog</publisher>
 		<info name="serial" value="BX 0177"/>
-		<info name="ean" value="5012967700645"/>
+		<info name="gtin" value="05012967700645"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -4858,7 +4858,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Dro Soft</publisher>
 		<info name="serial" value="4DR-204"/>
-		<info name="ean" value="8414185042045"/>
+		<info name="gtin" value="08414185042045"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -4968,7 +4968,7 @@ license:CC0-1.0
 		<description>Elite (Europe, hacked by Martos)</description>
 		<year>1987</year>
 		<publisher>Firebird Software</publisher>
-		<info name="ean" value="5012439002086"/>
+		<info name="gtin" value="05012439002086"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -5303,7 +5303,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Bulldog</publisher>
 		<info name="serial" value="BX 0157"/>
-		<info name="ean" value="5012967700621"/>
+		<info name="gtin" value="05012967700621"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -5439,7 +5439,7 @@ license:CC0-1.0
 		<description>Firehawk (Europe)</description>
 		<year>1987</year>
 		<publisher>Players Software</publisher>
-		<info name="ean" value="5013728000769"/>
+		<info name="gtin" value="05013728000769"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -5453,7 +5453,7 @@ license:CC0-1.0
 		<description>Firehawk (Europe, alt)</description>
 		<year>1987</year>
 		<publisher>Players Software</publisher>
-		<info name="ean" value="5013728000769"/>
+		<info name="gtin" value="05013728000769"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -5509,7 +5509,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Mastertronic Added Dimension</publisher>
 		<info name="serial" value="IX 0141"/>
-		<info name="ean" value="5012967710057"/>
+		<info name="gtin" value="05012967710057"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -5578,7 +5578,7 @@ license:CC0-1.0
 		<description>The Flintstones (Europe)</description>
 		<year>1988</year>
 		<publisher>Grandslam Entertainments</publisher>
-		<info name="ean" value="5013248001116"/>
+		<info name="gtin" value="05013248001116"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -5605,7 +5605,7 @@ license:CC0-1.0
 		<description>Foot Volley</description>
 		<year>1986</year>
 		<publisher>Players Software</publisher>
-		<info name="ean" value="5013728000448"/>
+		<info name="gtin" value="05013728000448"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -5633,7 +5633,7 @@ license:CC0-1.0
 		<description>Footballer of the Year (Europe, hacked by Martos)</description>
 		<year>1987</year>
 		<publisher>Gremlin Graphics</publisher>
-		<info name="ean" value="5013658013082"/>
+		<info name="gtin" value="05013658013082"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -5676,7 +5676,7 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Mastertronic</publisher>
 		<info name="serial" value="IX 0058"/>
-		<info name="ean" value="5012967700010"/>
+		<info name="gtin" value="05012967700010"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -5691,7 +5691,7 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Mastertronic</publisher>
 		<info name="serial" value="IX 0058"/>
-		<info name="ean" value="5012967700010"/>
+		<info name="gtin" value="05012967700010"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -5783,7 +5783,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Alternative Software</publisher>
 		<info name="serial" value="AS711"/>
-		<info name="ean" value="5015103778171"/>
+		<info name="gtin" value="05015103778171"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -5805,7 +5805,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Dinamic Software</publisher>
 		<info name="serial" value="MSX 3890047"/>
-		<info name="ean" value="8413460030272"/>
+		<info name="gtin" value="08413460030272"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -5820,7 +5820,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>CDS Microsystems</publisher>
 		<info name="serial" value="XXX 7501"/>
-		<info name="ean" value="5012323075011"/>
+		<info name="gtin" value="05012323075011"/>
 		<info name="usage" value="Load with CLOAD + RUN"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -5888,7 +5888,7 @@ license:CC0-1.0
 		<description>Future Knight (Europe)</description>
 		<year>1986</year>
 		<publisher>Gremlin Graphics</publisher>
-		<info name="ean" value="5013658013129"/>
+		<info name="gtin" value="05013658013129"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -5916,7 +5916,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Bug-Byte Software</publisher>
 		<info name="serial" value="8"/>
-		<info name="ean" value="5013248001161"/>
+		<info name="gtin" value="05013248001161"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -5931,7 +5931,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Bug-Byte Software</publisher>
 		<info name="serial" value="3"/>
-		<info name="ean" value="5013248000935"/>
+		<info name="gtin" value="05013248000935"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -5946,7 +5946,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Summit Software</publisher>
 		<info name="serial" value="SUM 996"/>
-		<info name="ean" value="5015103777822"/>
+		<info name="gtin" value="05015103777822"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -6569,7 +6569,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Go!</publisher>
 		<info name="alt_title" value="Desperado"/>
-		<info name="ean" value="5013442538241"/>
+		<info name="gtin" value="05013442538241"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -6767,7 +6767,7 @@ license:CC0-1.0
 		<description>Harvey Smith's Showjumper (Europe, hacked protection)</description>
 		<year>1985</year>
 		<publisher>Software Projects</publisher>
-		<info name="ean" value="5012563000408"/>
+		<info name="gtin" value="05012563000408"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -6781,7 +6781,7 @@ license:CC0-1.0
 		<description>Harvey Smith's Showjumper (Europe)</description>
 		<year>1985</year>
 		<publisher>Software Projects</publisher>
-		<info name="ean" value="5012563000408"/>
+		<info name="gtin" value="05012563000408"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -6920,7 +6920,7 @@ license:CC0-1.0
 		<description>Hercules - Slayer of the Damned (Europe)</description>
 		<year>1988</year>
 		<publisher>Gremlin Graphics</publisher>
-		<info name="ean" value="5013658010883"/>
+		<info name="gtin" value="05013658010883"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -6934,7 +6934,7 @@ license:CC0-1.0
 		<description>Here &amp; There with the Mr. Men (Europe)</description>
 		<year>1985</year>
 		<publisher>Mirrorsoft</publisher>
-		<info name="ean" value="5012342012066"/>
+		<info name="gtin" value="05012342012066"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -7079,7 +7079,7 @@ license:CC0-1.0
 		<description>Hot Shoe (Europe)</description>
 		<year>1984</year>
 		<publisher>Longman Software</publisher>
-		<info name="ean" value="9780582836150"/>
+		<info name="gtin" value="09780582836150"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -7282,7 +7282,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Dro Soft</publisher>
 		<info name="serial" value="4 DR-207"/>
-		<info name="ean" value="8414185042076"/>
+		<info name="gtin" value="08414185042076"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -7304,7 +7304,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Dro Soft</publisher>
 		<info name="serial" value="4 DR-207"/>
-		<info name="ean" value="8414185042076"/>
+		<info name="gtin" value="08414185042076"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -7340,7 +7340,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>CDS Micro Systems</publisher>
 		<info name="serial" value="XXX 7004"/>
-		<info name="ean" value="5012323070047"/>
+		<info name="gtin" value="05012323070047"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -7653,7 +7653,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Endurance Games</publisher>
 		<info name="serial" value="ESX 010"/>
-		<info name="ean" value="5014293007504"/>
+		<info name="gtin" value="05014293007504"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -7668,7 +7668,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Endurance Games</publisher>
 		<info name="serial" value="ESX 010"/>
-		<info name="ean" value="5014293007504"/>
+		<info name="gtin" value="05014293007504"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -7683,7 +7683,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Endurance Games</publisher>
 		<info name="serial" value="ESX 010"/>
-		<info name="ean" value="5014293007504"/>
+		<info name="gtin" value="05014293007504"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -7840,7 +7840,7 @@ license:CC0-1.0
 		<description>Jack the Nipper II - In Coconut Capers (Europe)</description>
 		<year>1987</year>
 		<publisher>Gremlin Graphics</publisher>
-		<info name="ean" value="5013658013181"/>
+		<info name="gtin" value="05013658013181"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -7868,7 +7868,7 @@ license:CC0-1.0
 		<year>1991</year>
 		<publisher>Opera Soft</publisher>
 		<info name="serial" value="MSX-1030"/>
-		<info name="ean" value="8414970003268"/>
+		<info name="gtin" value="08414970003268"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -7982,7 +7982,7 @@ license:CC0-1.0
 		<description>Jet Set Willy (Europe)</description>
 		<year>1984</year>
 		<publisher>Software Projects</publisher>
-		<info name="ean" value="5012563000101"/>
+		<info name="gtin" value="05012563000101"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -7997,7 +7997,7 @@ license:CC0-1.0
 		<description>Jet Set Willy II - The Final Frontier (Europe, hacked protection)</description>
 		<year>1985</year>
 		<publisher>Software Projects</publisher>
-		<info name="ean" value="5012563000392"/>
+		<info name="gtin" value="05012563000392"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -8011,7 +8011,7 @@ license:CC0-1.0
 		<description>Jet Set Willy II - The Final Frontier (Europe)</description>
 		<year>1985</year>
 		<publisher>Software Projects</publisher>
-		<info name="ean" value="5012563000392"/>
+		<info name="gtin" value="05012563000392"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -8077,7 +8077,7 @@ license:CC0-1.0
 		<description>Joe Blade (Europe)</description>
 		<year>1989</year>
 		<publisher>Players Software</publisher>
-		<info name="ean" value="5013728000974"/>
+		<info name="gtin" value="05013728000974"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -8120,7 +8120,7 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Bug-Byte Software</publisher>
 		<info name="serial" value="BBM 026"/>
-		<info name="ean" value="5013248330025"/>
+		<info name="gtin" value="05013248330025"/>
 		<info name="usage" value="Load with CLOAD + RUN"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -8306,7 +8306,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Bug-Byte Software</publisher>
 		<info name="serial" value="5"/>
-		<info name="ean" value="5013248001178"/>
+		<info name="gtin" value="05013248001178"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -8335,7 +8335,7 @@ license:CC0-1.0
 		<description>King Size - 50 Games in One Pack (Europe)</description>
 		<year>1986</year>
 		<publisher>Robtek Software</publisher>
-		<info name="ean" value="5014168008551"/>
+		<info name="gtin" value="05014168008551"/>
 		<info name="usage" value="Load with CLOAD + RUN"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -8396,7 +8396,7 @@ license:CC0-1.0
 		<description>Knight Orc (Europe, hacked protection)</description>
 		<year>1987</year>
 		<publisher>Rainbird Software</publisher>
-		<info name="ean" value="5012439006558"/>
+		<info name="gtin" value="05012439006558"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -8423,7 +8423,7 @@ license:CC0-1.0
 		<description>Knight Orc (Europe)</description>
 		<year>1987</year>
 		<publisher>Rainbird Software</publisher>
-		<info name="ean" value="5012439006558"/>
+		<info name="gtin" value="05012439006558"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -8450,7 +8450,7 @@ license:CC0-1.0
 		<description>Knight Orc (Europe, hacked protection 2)</description>
 		<year>1987</year>
 		<publisher>Rainbird Software</publisher>
-		<info name="ean" value="5012439006558"/>
+		<info name="gtin" value="05012439006558"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -8478,7 +8478,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Mastertronic Added Dimension</publisher>
 		<info name="serial" value="MAD 20"/>
-		<info name="ean" value="5012967710019"/>
+		<info name="gtin" value="05012967710019"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -8492,7 +8492,7 @@ license:CC0-1.0
 		<description>3D Knockout (Europe)</description>
 		<year>1985</year>
 		<publisher>Alligata Software</publisher>
-		<info name="ean" value="5012625130043"/>
+		<info name="gtin" value="05012625130043"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -8541,7 +8541,7 @@ license:CC0-1.0
 		<description>Krakout (Europe)</description>
 		<year>1987</year>
 		<publisher>Gremlin Graphics</publisher>
-		<info name="ean" value="5013658013167"/>
+		<info name="gtin" value="05013658013167"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -8555,7 +8555,7 @@ license:CC0-1.0
 		<description>Krakout (Europe, alt)</description>
 		<year>1987</year>
 		<publisher>Gremlin Graphics</publisher>
-		<info name="ean" value="5013658013167"/>
+		<info name="gtin" value="05013658013167"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -9148,7 +9148,7 @@ license:CC0-1.0
 		<year>198?</year>
 		<publisher>Blue Ribbon Software</publisher>
 		<info name="serial" value="XXX 7904"/>
-		<info name="ean" value="5012323079040"/>
+		<info name="gtin" value="05012323079040"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -9163,7 +9163,7 @@ license:CC0-1.0
 		<year>198?</year>
 		<publisher>Blue Ribbon Software</publisher>
 		<info name="serial" value="XXX 7904"/>
-		<info name="ean" value="5012323079040"/>
+		<info name="gtin" value="05012323079040"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -9301,7 +9301,7 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Dro Soft</publisher>
 		<info name="serial" value="4 MH-213"/>
-		<info name="ean" value="8414185042137"/>
+		<info name="gtin" value="08414185042137"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -9330,7 +9330,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Firebird Software</publisher>
 		<info name="alt_title" value="Maltese Joe's Pool Challenge"/>
-		<info name="ean" value="50170960004444"/>
+		<info name="gtin" value="050170960004444"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -9479,7 +9479,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Bug-Byte Software</publisher>
 		<info name="serial" value="02"/>
-		<info name="ean" value="5013248000959"/>
+		<info name="gtin" value="05013248000959"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -9533,7 +9533,7 @@ license:CC0-1.0
 		<description>Mask III - Venom Strikes Back (Europe)</description>
 		<year>1988</year>
 		<publisher>Gremlin Graphics</publisher>
-		<info name="ean" value="5013658013242"/>
+		<info name="gtin" value="05013658013242"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -9548,7 +9548,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Mastertronic</publisher>
 		<info name="serial" value="IX 0147"/>
-		<info name="ean" value="5012967700676"/>
+		<info name="gtin" value="05012967700676"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -9563,7 +9563,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Mastertronic</publisher>
 		<info name="serial" value="IX 0147"/>
-		<info name="ean" value="5012967700676"/>
+		<info name="gtin" value="05012967700676"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -9578,7 +9578,7 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="UXK-116"/>
-		<info name="ean" value="0047875611160?"/>
+		<info name="gtin" value="00047875611160?"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -9606,7 +9606,7 @@ license:CC0-1.0
 		<description>Match Day II (Europe)</description>
 		<year>1987</year>
 		<publisher>Ocean Software</publisher>
-		<info name="ean" value="5013156011054"/>
+		<info name="gtin" value="05013156011054"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -9680,7 +9680,7 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Mr. Micro</publisher>
 		<info name="serial" value="TE001"/>
-		<info name="ean" value="5014293005302"/>
+		<info name="gtin" value="05014293005302"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -9780,7 +9780,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Dinamic Software</publisher>
 		<info name="serial" value="MSX 880024"/>
-		<info name="ean" value="8413460030029"/>
+		<info name="gtin" value="08413460030029"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -9795,7 +9795,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Dinamic Software</publisher>
 		<info name="serial" value="MSX 880024"/>
-		<info name="ean" value="8413460030029"/>
+		<info name="gtin" value="08413460030029"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -9817,7 +9817,7 @@ license:CC0-1.0
 		<year>1991</year>
 		<publisher>Dinamic Software</publisher>
 		<info name="serial" value="910004"/>
-		<info name="ean" value="8413460030425"/>
+		<info name="gtin" value="08413460030425"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -9921,7 +9921,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Dinamic Software</publisher>
 		<info name="serial" value="MSX 890042"/>
-		<info name="ean" value="8413460030258"/>
+		<info name="gtin" value="08413460030258"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -9958,7 +9958,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Mastertronic</publisher>
 		<info name="serial" value="IX 0179"/>
-		<info name="ean" value="5012967700713"/>
+		<info name="gtin" value="05012967700713"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -9973,7 +9973,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Mastertronic</publisher>
 		<info name="serial" value="IX 0179"/>
-		<info name="ean" value="5012967700713"/>
+		<info name="gtin" value="05012967700713"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -10097,7 +10097,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Mastertronic</publisher>
 		<info name="serial" value="IX 0119"/>
-		<info name="ean" value="5012967700027"/>
+		<info name="gtin" value="05012967700027"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -10112,7 +10112,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Mastertronic</publisher>
 		<info name="serial" value="IX 0119"/>
-		<info name="ean" value="5012967700027"/>
+		<info name="gtin" value="05012967700027"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -10127,7 +10127,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Leisure Genius</publisher>
 		<info name="serial" value="LG 310"/>
-		<info name="ean" value="0045822003105"/>
+		<info name="gtin" value="00045822003105"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -10280,7 +10280,7 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Positive</publisher>
 		<info name="serial" value="X 21008 / PS-008"/>
-		<info name="ean" value="8413460210087"/>
+		<info name="gtin" value="08413460210087"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -10296,7 +10296,7 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Positive</publisher>
 		<info name="serial" value="X 21008 / PS-008"/>
-		<info name="ean" value="8413460210087"/>
+		<info name="gtin" value="08413460210087"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -10312,7 +10312,7 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Positive</publisher>
 		<info name="serial" value="X 21008 / PS-008"/>
-		<info name="ean" value="8413460210087"/>
+		<info name="gtin" value="08413460210087"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -10381,7 +10381,7 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Opera Soft</publisher>
 		<info name="serial" value="MSC-773"/>
-		<info name="ean" value="8414970003169"/>
+		<info name="gtin" value="08414970003169"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -10582,7 +10582,7 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Dinamic Software</publisher>
 		<info name="serial" value="3900015"/>
-		<info name="ean" value="8413460030395"/>
+		<info name="gtin" value="08413460030395"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -10604,7 +10604,7 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Dinamic Software</publisher>
 		<info name="serial" value="3900015"/>
-		<info name="ean" value="8413460030395"/>
+		<info name="gtin" value="08413460030395"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -10626,7 +10626,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Dinamic Software</publisher>
 		<info name="serial" value="MSX 30074"/>
-		<info name="ean" value="8413460030074"/>
+		<info name="gtin" value="08413460030074"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -10648,7 +10648,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Dinamic Software</publisher>
 		<info name="serial" value="MSX 890031"/>
-		<info name="ean" value="8413460030074"/>
+		<info name="gtin" value="08413460030074"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -10671,7 +10671,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Dinamic Software</publisher>
 		<info name="serial" value="MSX 890031"/>
-		<info name="ean" value="8413460030074"/>
+		<info name="gtin" value="08413460030074"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -10706,7 +10706,7 @@ license:CC0-1.0
 		<description>Nightshade (Europe)</description>
 		<year>1985</year>
 		<publisher>Ultimate Play The Game</publisher>
-		<info name="ean" value="5012163486145"/>
+		<info name="gtin" value="05012163486145"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -10905,7 +10905,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Mastertronic</publisher>
 		<info name="serial" value="IX 0121"/>
-		<info name="ean" value="5012967700058"/>
+		<info name="gtin" value="05012967700058"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -10920,7 +10920,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Mastertronic</publisher>
 		<info name="serial" value="IX 0121"/>
-		<info name="ean" value="5012967700058"/>
+		<info name="gtin" value="05012967700058"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -10935,7 +10935,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Mastertronic</publisher>
 		<info name="serial" value="IX 0121"/>
-		<info name="ean" value="5012967700058"/>
+		<info name="gtin" value="05012967700058"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -10949,7 +10949,7 @@ license:CC0-1.0
 		<description>Oh Mummy!! (Europe)</description>
 		<year>1984</year>
 		<publisher>Eclipse Software</publisher>
-		<info name="ean" value="9780582836167"/>
+		<info name="gtin" value="09780582836167"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -11006,7 +11006,7 @@ license:CC0-1.0
 		<description>Ole! (Europe)</description>
 		<year>1986</year>
 		<publisher>Bug-Byte Software</publisher>
-		<info name="ean" value="5013248670695"/>
+		<info name="gtin" value="05013248670695"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -11020,7 +11020,7 @@ license:CC0-1.0
 		<description>Operation Wolf (Europe)</description>
 		<year>1988</year>
 		<publisher>Ocean Software</publisher>
-		<info name="ean" value="5013156012808"/>
+		<info name="gtin" value="05013156012808"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -11034,7 +11034,7 @@ license:CC0-1.0
 		<description>Operation Wolf (Europe, 2 sides)</description>
 		<year>1988</year>
 		<publisher>Ocean Software</publisher>
-		<info name="ean" value="5013156012808"/>
+		<info name="gtin" value="05013156012808"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -11055,7 +11055,7 @@ license:CC0-1.0
 		<description>Operation Wolf (Europe, 2 sides, alt)</description>
 		<year>1988</year>
 		<publisher>Ocean Software</publisher>
-		<info name="ean" value="5013156012808"/>
+		<info name="gtin" value="05013156012808"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -11119,7 +11119,7 @@ license:CC0-1.0
 		<description>Out Run (Europe)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="ean" value="5013442543832"/>
+		<info name="gtin" value="05013442543832"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -11133,7 +11133,7 @@ license:CC0-1.0
 		<description>Out Run (Europe, alt)</description>
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="ean" value="5013442543832"/>
+		<info name="gtin" value="05013442543832"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -11203,7 +11203,7 @@ license:CC0-1.0
 		<description>Pac-Land (Europe)</description>
 		<year>1988</year>
 		<publisher>Grandslam Entertainments</publisher>
-		<info name="ean" value="5013248000782"/>
+		<info name="gtin" value="05013248000782"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -11218,7 +11218,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Bug-Byte Software</publisher>
 		<info name="serial" value="01"/>
-		<info name="ean" value="5013248000942"/>
+		<info name="gtin" value="05013248000942"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -11232,7 +11232,7 @@ license:CC0-1.0
 		<description>Pac-Mania (Europe)</description>
 		<year>1988</year>
 		<publisher>Grandslam Entertainments</publisher>
-		<info name="ean" value="5013248001758"/>
+		<info name="gtin" value="05013248001758"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -11372,7 +11372,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Mirrorsoft</publisher>
 		<info name="serial" value="MSIC-PAS4"/>
-		<info name="ean" value="5012342999619"/>
+		<info name="gtin" value="05012342999619"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -11442,7 +11442,7 @@ license:CC0-1.0
 		<description>Pentagram (Europe)</description>
 		<year>1986</year>
 		<publisher>Ultimate Play The Game</publisher>
-		<info name="ean" value="5013442536025"/>
+		<info name="gtin" value="05013442536025"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -11992,7 +11992,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="6025"/>
-		<info name="ean" value="5015026060254"/>
+		<info name="gtin" value="05015026060254"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -12252,7 +12252,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Bug-Byte Software</publisher>
 		<info name="serial" value="6"/>
-		<info name="ean" value="5013248001192"/>
+		<info name="gtin" value="05013248001192"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -12266,7 +12266,7 @@ license:CC0-1.0
 		<description>Rambo III (Europe)</description>
 		<year>1988</year>
 		<publisher>Ocean Software</publisher>
-		<info name="ean" value="5013156012815"/>
+		<info name="gtin" value="05013156012815"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -12280,7 +12280,7 @@ license:CC0-1.0
 		<description>Rambo III (Europe, 2 sides)</description>
 		<year>1988</year>
 		<publisher>Ocean Software</publisher>
-		<info name="ean" value="5013156012815"/>
+		<info name="gtin" value="05013156012815"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -12301,7 +12301,7 @@ license:CC0-1.0
 		<description>Rambo III (Europe, 2 sides, alt)</description>
 		<year>1988</year>
 		<publisher>Ocean Software</publisher>
-		<info name="ean" value="5013156012815"/>
+		<info name="gtin" value="05013156012815"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -12337,7 +12337,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Mastertronic</publisher>
 		<info name="serial" value="IX 0167"/>
-		<info name="ean" value="5012967700720"/>
+		<info name="gtin" value="05012967700720"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -12352,7 +12352,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Mastertronic</publisher>
 		<info name="serial" value="IX 0167"/>
-		<info name="ean" value="5012967700720"/>
+		<info name="gtin" value="05012967700720"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -12406,7 +12406,7 @@ license:CC0-1.0
 		<description>Reflex (Europe)</description>
 		<year>1987</year>
 		<publisher>Players Software</publisher>
-		<info name="ean" value="5013728000844"/>
+		<info name="gtin" value="05013728000844"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -12427,7 +12427,7 @@ license:CC0-1.0
 		<description>Reflex (Europe, alt)</description>
 		<year>1987</year>
 		<publisher>Players Software</publisher>
-		<info name="ean" value="5013728000844"/>
+		<info name="gtin" value="05013728000844"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -12448,7 +12448,7 @@ license:CC0-1.0
 		<description>Reflex (Europe, alt 2)</description>
 		<year>1987</year>
 		<publisher>Players Software</publisher>
-		<info name="ean" value="5013728000844"/>
+		<info name="gtin" value="05013728000844"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -12504,7 +12504,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Dinamic Software</publisher>
 		<info name="serial" value="MSX 890039"/>
-		<info name="ean" value="8413460030128"/>
+		<info name="gtin" value="08413460030128"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -12519,7 +12519,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Dinamic Software</publisher>
 		<info name="serial" value="MSX 890039"/>
-		<info name="ean" value="8413460030128"/>
+		<info name="gtin" value="08413460030128"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -12541,7 +12541,7 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Opera Soft</publisher>
 		<info name="serial" value="MSX 1035"/>
-		<info name="ean" value="8414970003251"/>
+		<info name="gtin" value="08414970003251"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -12563,7 +12563,7 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Opera Soft</publisher>
 		<info name="serial" value="MSX 1035"/>
-		<info name="ean" value="8414970003251"/>
+		<info name="gtin" value="08414970003251"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -12585,7 +12585,7 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Opera Soft</publisher>
 		<info name="serial" value="MSX 1035"/>
-		<info name="ean" value="8414970003251"/>
+		<info name="gtin" value="08414970003251"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -12633,7 +12633,7 @@ license:CC0-1.0
 		<description>Robocop (Europe)</description>
 		<year>1988</year>
 		<publisher>Ocean Software</publisher>
-		<info name="ean" value="5013156013027"/>
+		<info name="gtin" value="05013156013027"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -12654,7 +12654,7 @@ license:CC0-1.0
 		<description>Robocop (Europe, alt)</description>
 		<year>1988</year>
 		<publisher>Ocean Software</publisher>
-		<info name="ean" value="5013156013027"/>
+		<info name="gtin" value="05013156013027"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -12716,7 +12716,7 @@ license:CC0-1.0
 		<description>Rocket Roger (Europe)</description>
 		<year>1987</year>
 		<publisher>Alligata Software</publisher>
-		<info name="ean" value="5012625130050"/>
+		<info name="gtin" value="05012625130050"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -12730,7 +12730,7 @@ license:CC0-1.0
 		<description>Rocket Roger (Europe, alt)</description>
 		<year>1987</year>
 		<publisher>Alligata Software</publisher>
-		<info name="ean" value="5012625130050"/>
+		<info name="gtin" value="05012625130050"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -12921,7 +12921,7 @@ license:CC0-1.0
 		<description>Samantha Fox Strip Poker (Europe)</description>
 		<year>1986</year>
 		<publisher>Martech Games</publisher>
-		<info name="ean" value="5012753000560"/>
+		<info name="gtin" value="05012753000560"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -12942,7 +12942,7 @@ license:CC0-1.0
 		<description>Samantha Fox Strip Poker (Europe, alt)</description>
 		<year>1986</year>
 		<publisher>Martech Games</publisher>
-		<info name="ean" value="5012753000560"/>
+		<info name="gtin" value="05012753000560"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -13065,7 +13065,7 @@ license:CC0-1.0
 		<description>Scramble Spirits (Europe)</description>
 		<year>1990</year>
 		<publisher>Grandslam Entertainments</publisher>
-		<info name="ean" value="5013248003080"/>
+		<info name="gtin" value="05013248003080"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -13086,7 +13086,7 @@ license:CC0-1.0
 		<description>Scramble Spirits (Europe, alt)</description>
 		<year>1990</year>
 		<publisher>Grandslam Entertainments</publisher>
-		<info name="ean" value="5013248003080"/>
+		<info name="gtin" value="05013248003080"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -13107,7 +13107,7 @@ license:CC0-1.0
 		<description>Sea King (Europe)</description>
 		<year>1986</year>
 		<publisher>Players Software</publisher>
-		<info name="ean" value="5013728000738"/>
+		<info name="gtin" value="05013728000738"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -13392,7 +13392,7 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Opera Soft</publisher>
 		<info name="serial" value="MSC 772"/>
-		<info name="ean" value="8414970003183"/>
+		<info name="gtin" value="08414970003183"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -13426,7 +13426,7 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Opera Soft</publisher>
 		<info name="serial" value="MSC 772"/>
-		<info name="ean" value="8414970003183"/>
+		<info name="gtin" value="08414970003183"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -14098,7 +14098,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Mastertronic</publisher>
 		<info name="serial" value="IX 0114"/>
-		<info name="ean" value="5012967700034"/>
+		<info name="gtin" value="05012967700034"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -14113,7 +14113,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Mastertronic</publisher>
 		<info name="serial" value="IX 0114"/>
-		<info name="ean" value="5012967700034"/>
+		<info name="gtin" value="05012967700034"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -14128,7 +14128,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Mastertronic</publisher>
 		<info name="serial" value="IX 0114"/>
-		<info name="ean" value="5012967700034"/>
+		<info name="gtin" value="05012967700034"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -14169,7 +14169,7 @@ license:CC0-1.0
 		<description>Spitfire '40 (Europe)</description>
 		<year>1986</year>
 		<publisher>Mirrorsoft</publisher>
-		<info name="ean" value="5012342230606"/>
+		<info name="gtin" value="05012342230606"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -14395,7 +14395,7 @@ license:CC0-1.0
 		<description>Starquake (Europe)</description>
 		<year>1986</year>
 		<publisher>Bubble Bus Software</publisher>
-		<info name="ean" value="5012337311112"/>
+		<info name="gtin" value="05012337311112"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -14409,7 +14409,7 @@ license:CC0-1.0
 		<description>Starquake (Europe, alt)</description>
 		<year>1986</year>
 		<publisher>Bubble Bus Software</publisher>
-		<info name="ean" value="5012337311112"/>
+		<info name="gtin" value="05012337311112"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -14514,7 +14514,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Mastertronic</publisher>
 		<info name="serial" value="IX 0123"/>
-		<info name="ean" value="5012967700072"/>
+		<info name="gtin" value="05012967700072"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -14529,7 +14529,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Mastertronic</publisher>
 		<info name="serial" value="IX 0123"/>
-		<info name="ean" value="5012967700072"/>
+		<info name="gtin" value="05012967700072"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -14544,7 +14544,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Mastertronic Added Dimension</publisher>
 		<info name="serial" value="IX 0181"/>
-		<info name="ean" value="5012967710040"/>
+		<info name="gtin" value="05012967710040"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -14559,7 +14559,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Bulldog</publisher>
 		<info name="serial" value="BX 0193"/>
-		<info name="ean" value="5012967700706"/>
+		<info name="gtin" value="05012967700706"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -14674,7 +14674,7 @@ license:CC0-1.0
 		<description>Superbowl (Europe)</description>
 		<year>1985</year>
 		<publisher>Budgie Budget Software</publisher>
-		<info name="ean" value="5012625181311"/>
+		<info name="gtin" value="05012625181311"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -14715,7 +14715,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Atlantis Software</publisher>
 		<info name="serial" value="AT 701"/>
-		<info name="ean" value="5013991701011"/>
+		<info name="gtin" value="05013991701011"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -14792,7 +14792,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Bug-Byte Software</publisher>
 		<info name="serial" value="9"/>
-		<info name="ean" value="5013248001208"/>
+		<info name="gtin" value="05013248001208"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -14918,7 +14918,7 @@ license:CC0-1.0
 		<description>Terramex (Europe)</description>
 		<year>1988</year>
 		<publisher>Grandslam Entertainments</publisher>
-		<info name="ean" value="5013248000867"/>
+		<info name="gtin" value="05013248000867"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -14988,7 +14988,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Dro Soft</publisher>
 		<info name="serial" value="4 AL-223"/>
-		<info name="ean" value="8414185042236"/>
+		<info name="gtin" value="08414185042236"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -15003,7 +15003,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Dro Soft</publisher>
 		<info name="serial" value="4 AL-223"/>
-		<info name="ean" value="8414185042236"/>
+		<info name="gtin" value="08414185042236"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -15044,7 +15044,7 @@ license:CC0-1.0
 		<description>Thing Bounces Back (Europe)</description>
 		<year>1987</year>
 		<publisher>Gremlin Graphics</publisher>
-		<info name="ean" value="5013658013174"/>
+		<info name="gtin" value="05013658013174"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -15094,7 +15094,7 @@ license:CC0-1.0
 		<description>Thunderbirds (Europe)</description>
 		<year>1989</year>
 		<publisher>Grandslam Entertainments</publisher>
-		<info name="ean" value="5013248002359"/>
+		<info name="gtin" value="05013248002359"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -15264,7 +15264,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Bug-Byte Software</publisher>
 		<info name="serial" value="BBM 065"/>
-		<info name="ean" value="5013248670657"/>
+		<info name="gtin" value="05013248670657"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -15279,7 +15279,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Bug-Byte Software</publisher>
 		<info name="serial" value="BBM 065"/>
-		<info name="ean" value="5013248670657"/>
+		<info name="gtin" value="05013248670657"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -15468,7 +15468,7 @@ license:CC0-1.0
 		<description>Trailblazer (Europe)</description>
 		<year>1986</year>
 		<publisher>Gremlin Graphics</publisher>
-		<info name="ean" value="5013658013105"/>
+		<info name="gtin" value="05013658013105"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -15482,7 +15482,7 @@ license:CC0-1.0
 		<description>Trailblazer (Europe, alt loader)</description>
 		<year>1986</year>
 		<publisher>Gremlin Graphics</publisher>
-		<info name="ean" value="5013658013105"/>
+		<info name="gtin" value="05013658013105"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -15496,7 +15496,7 @@ license:CC0-1.0
 		<description>Trantor - The Last Stormtrooper (Europe)</description>
 		<year>1987</year>
 		<publisher>Go!</publisher>
-		<info name="ean" value="5013442538388"/>
+		<info name="gtin" value="05013442538388"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -15510,7 +15510,7 @@ license:CC0-1.0
 		<description>Trantor - The Last Stormtrooper (Europe, alt)</description>
 		<year>1987</year>
 		<publisher>Go!</publisher>
-		<info name="ean" value="5013442538388"/>
+		<info name="gtin" value="05013442538388"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -15524,7 +15524,7 @@ license:CC0-1.0
 		<description>Trantor - The Last Stormtrooper (Europe, alt 2)</description>
 		<year>1987</year>
 		<publisher>Go!</publisher>
-		<info name="ean" value="5013442538388"/>
+		<info name="gtin" value="05013442538388"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -15735,7 +15735,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Bug-Byte Software</publisher>
 		<info name="serial" value="BBM 019"/>
-		<info name="ean" value="5013248670190"/>
+		<info name="gtin" value="05013248670190"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -15750,7 +15750,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Bug-Byte Software</publisher>
 		<info name="serial" value="BBM 019"/>
-		<info name="ean" value="5013248670190"/>
+		<info name="gtin" value="05013248670190"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -15773,7 +15773,7 @@ license:CC0-1.0
 				<rom name="tutor (1985)(sony)(es)(side a)[cload + run].cas" size="7291" crc="12d28902" sha1="641286e2e4c231630f74203f40aa65a946a16a20"/>
 			</dataarea>
 		</part>
-		<part name="cass1" interface="msx_cass">
+		<part name="cass2" interface="msx_cass">
 			<feature name="part_id" value="Tape 2 - Logo"/>
 			<dataarea name="cass" size="4896">
 				<rom name="tutor (1985)(sony)(es)(side b)[cload + run].cas" size="4896" crc="6204d745" sha1="816e63bfa8ef520b60455a004da0197deb8f1513"/>
@@ -15827,7 +15827,7 @@ license:CC0-1.0
 		<description>Uchi Mata (Europe)</description>
 		<year>1987</year>
 		<publisher>Martech Games</publisher>
-		<info name="ean" value="5012753000805"/>
+		<info name="gtin" value="05012753000805"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -15843,7 +15843,7 @@ license:CC0-1.0
 		<description>Uchi Mata (Europe, alt loader)</description>
 		<year>1987</year>
 		<publisher>Martech Games</publisher>
-		<info name="ean" value="5012753000805"/>
+		<info name="gtin" value="05012753000805"/>
 		<info name="usage" value="Load with CLOAD + RUN"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -15983,7 +15983,7 @@ license:CC0-1.0
 		<description>Valkyr (Europe)</description>
 		<year>1985</year>
 		<publisher>Gremlin Graphics</publisher>
-		<info name="ean" value="5013658013068"/>
+		<info name="gtin" value="05013658013068"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -16094,7 +16094,7 @@ license:CC0-1.0
 		<description>Vestron (Europe)</description>
 		<year>1986</year>
 		<publisher>Players Software</publisher>
-		<info name="ean" value="5013728000356"/>
+		<info name="gtin" value="05013728000356"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -16108,7 +16108,7 @@ license:CC0-1.0
 		<description>Vestron (Europe, alt)</description>
 		<year>1986</year>
 		<publisher>Players Software</publisher>
-		<info name="ean" value="5013728000356"/>
+		<info name="gtin" value="05013728000356"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -16206,7 +16206,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Mastertronic</publisher>
 		<info name="serial" value="IX 0113"/>
-		<info name="ean" value="5012967700614"/>
+		<info name="gtin" value="05012967700614"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -16220,7 +16220,7 @@ license:CC0-1.0
 		<description>A View to a Kill (Europe)</description>
 		<year>1986</year>
 		<publisher>Domark</publisher>
-		<info name="ean" value="9781851600168"/>
+		<info name="gtin" value="09781851600168"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -16234,7 +16234,7 @@ license:CC0-1.0
 		<description>A View to a Kill (Europe, alt)</description>
 		<year>1986</year>
 		<publisher>Domark</publisher>
-		<info name="ean" value="9781851600168"/>
+		<info name="gtin" value="09781851600168"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -16263,7 +16263,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Mastertronic</publisher>
 		<info name="serial" value="IX 0171"/>
-		<info name="ean" value="5012967710064"/>
+		<info name="gtin" value="05012967710064"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -16333,7 +16333,7 @@ license:CC0-1.0
 		<description>Wallball (Europe)</description>
 		<year>198?</year>
 		<publisher>Microvalue</publisher>
-		<info name="ean" value="5013835100987"/>
+		<info name="gtin" value="05013835100987"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -16347,7 +16347,7 @@ license:CC0-1.0
 		<description>Wallball (Europe, alt)</description>
 		<year>198?</year>
 		<publisher>Microvalue</publisher>
-		<info name="ean" value="5013835100987"/>
+		<info name="gtin" value="05013835100987"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -16391,7 +16391,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Dro Soft</publisher>
 		<info name="serial" value="4 MH-191"/>
-		<info name="ean" value="8414185041918"/>
+		<info name="gtin" value="08414185041918"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -16406,7 +16406,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Bug-Byte Software</publisher>
 		<info name="serial" value="4"/>
-		<info name="ean" value="5013248001000"/>
+		<info name="gtin" value="05013248001000"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -16420,7 +16420,7 @@ license:CC0-1.0
 		<description>The Way of the Tiger (Europe)</description>
 		<year>1986</year>
 		<publisher>Gremlin Graphics</publisher>
-		<info name="ean" value="5013658013037"/>
+		<info name="gtin" value="05013658013037"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1a" interface="msx_cass">
@@ -16519,7 +16519,7 @@ license:CC0-1.0
 		<description>Who Dares Wins 2 (Europe)</description>
 		<year>1986</year>
 		<publisher>Alligata Software</publisher>
-		<info name="ean" value="5012625130067"/>
+		<info name="gtin" value="05012625130067"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -16534,7 +16534,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Alternative Software</publisher>
 		<info name="serial" value="AS278"/>
-		<info name="ean" value="5015103882786"/>
+		<info name="gtin" value="05015103882786"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -16565,25 +16565,25 @@ license:CC0-1.0
 		<info name="serial" value="E-M005"/>
 		<info name="usage" value="Load with CLOAD + RUN. Requires a Japanese system."/>
 
-		<part name="cass1" interface="msx_cass">
+		<part name="cass1a" interface="msx_cass">
 			<feature name="part_id" value="Tape 1 Side A"/>
 			<dataarea name="cass" size="17830">
 				<rom name="wing man (1985)(enix)(jp)(tape 1 of 2 side a)[cload + run].cas" size="17830" crc="6e4417f6" sha1="679b21adf5dd874b24df35552327bdb0af793ab8"/>
 			</dataarea>
 		</part>
-		<part name="cass2" interface="msx_cass">
+		<part name="cass1b" interface="msx_cass">
 			<feature name="part_id" value="Tape 1 Side B"/>
 			<dataarea name="cass" size="49318">
 				<rom name="wing man (1985)(enix)(jp)(tape 1 of 2 side b)[cload + run].cas" size="49318" crc="1fc9e602" sha1="78b7007e08ef66a1c17c105de069919a63435cce"/>
 			</dataarea>
 		</part>
-		<part name="cass3" interface="msx_cass">
+		<part name="cass2a" interface="msx_cass">
 			<feature name="part_id" value="Tape 2 Side A"/>
 			<dataarea name="cass" size="40086">
 				<rom name="wing man (1985)(enix)(jp)(tape 2 of 2 side a)[cload + run].cas" size="40086" crc="23f1ff30" sha1="9b047d6c38979c83c083adf7932abadd90a495ce"/>
 			</dataarea>
 		</part>
-		<part name="cass4" interface="msx_cass">
+		<part name="cass2b" interface="msx_cass">
 			<feature name="part_id" value="Tape 2 Side B"/>
 			<dataarea name="cass" size="40086">
 				<rom name="wing man (1985)(enix)(jp)(tape 2 of 2 side b)[cload + run].cas" size="40086" crc="ae86137b" sha1="4facd5ec40d7e2e2fa6bf49f4c1784254858a7b3"/>
@@ -16610,13 +16610,13 @@ license:CC0-1.0
 		<publisher>Anco Software</publisher>
 		<info name="usage" value="Load with CLOAD + RUN"/>
 
-		<part name="cass1" interface="msx_cass">
+		<part name="cass1a" interface="msx_cass">
 			<feature name="part_id" value="Side A?"/>
 			<dataarea name="cass" size="49880">
 				<rom name="winter events (1987)(anco software)(gb)(side a)[cload + run].cas" size="49880" crc="0033cbb3" sha1="27875c8aa514bf6c74c43e8f9ec58d5e5e4d46f0"/>
 			</dataarea>
 		</part>
-		<part name="cass2" interface="msx_cass">
+		<part name="cass1b" interface="msx_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="52208">
 				<rom name="winter events (1987)(anco software)(gb)(side b)[martos].cas" size="52208" crc="5e34d1f8" sha1="cf87f620d15a16f4fda690110cd0cdc92e179b5a"/>
@@ -16631,13 +16631,13 @@ license:CC0-1.0
 		<info name="serial" value="5013442530108"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
-		<part name="cass1" interface="msx_cass">
+		<part name="cass1a" interface="msx_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="47015">
 				<rom name="winter games (1986)(u.s. gold)(gb)(side a)[bload'cas-',r].cas" size="47015" crc="99960ea5" sha1="e39384b61abb237fd87b5078554c942c8766dc36"/>
 			</dataarea>
 		</part>
-		<part name="cass2" interface="msx_cass">
+		<part name="cass1b" interface="msx_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="62052">
 				<rom name="winter games (1986)(u.s. gold)(gb)(side b)[bload'cas-',r].cas" size="62052" crc="914797c9" sha1="61705c66c244c8e27bc22a008d6eaf8af751427b"/>
@@ -16652,13 +16652,13 @@ license:CC0-1.0
 		<info name="serial" value="5013442530108"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
-		<part name="cass1" interface="msx_cass">
+		<part name="cass1a" interface="msx_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="47015">
 				<rom name="winter games (1986)(u.s. gold)(gb)(side a)[a][bload'cas-',r].cas" size="47015" crc="f37a405c" sha1="d9f7a9d8a5f02bc1561e47499b87645c15a16c5c"/>
 			</dataarea>
 		</part>
-		<part name="cass2" interface="msx_cass">
+		<part name="cass1b" interface="msx_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="62052">
 				<rom name="winter games (1986)(u.s. gold)(gb)(side b)[bload'cas-',r].cas" size="62052" crc="914797c9" sha1="61705c66c244c8e27bc22a008d6eaf8af751427b"/>
@@ -16672,13 +16672,13 @@ license:CC0-1.0
 		<publisher>Tynesoft</publisher>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
-		<part name="cass1" interface="msx_cass">
+		<part name="cass1a" interface="msx_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="24135">
 				<rom name="winter olympics (1986)(tynesoft)(gb)(side a)[run'cas-'].cas" size="24135" crc="a2ba8ee1" sha1="c034f2252d8e02df266c4988f6f2b60f5ea048b6"/>
 			</dataarea>
 		</part>
-		<part name="cass2" interface="msx_cass">
+		<part name="cass1b" interface="msx_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="23771">
 				<rom name="winter olympics (1986)(tynesoft)(gb)(side b)[run'cas-'].cas" size="23771" crc="d96e60b4" sha1="2e017571b81765450baa6a688a5c8ed4bb92df61"/>
@@ -16716,7 +16716,7 @@ license:CC0-1.0
 		<description>Wizard's Lair (Europe)</description>
 		<year>1986</year>
 		<publisher>Bubble Bus Software</publisher>
-		<info name="ean" value="5012337511185"/>
+		<info name="gtin" value="05012337511185"/>
 		<info name="usage" value="Load with CLOAD + RUN"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -16730,7 +16730,7 @@ license:CC0-1.0
 		<description>Wizard's Lair (Europe, alt)</description>
 		<year>1986</year>
 		<publisher>Bubble Bus Software</publisher>
-		<info name="ean" value="5012337511185"/>
+		<info name="gtin" value="05012337511185"/>
 		<info name="usage" value="Load with CLOAD + RUN"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -16759,7 +16759,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Dro Soft</publisher>
 		<info name="serial" value="4 VG-236"/>
-		<info name="ean" value="8414185042397"/>
+		<info name="gtin" value="08414185042397"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -16799,16 +16799,16 @@ license:CC0-1.0
 		<description>World Games (Europe)</description>
 		<year>1987</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="ean" value="5013442537145"/>
+		<info name="gtin" value="05013442537145"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
-		<part name="cass1" interface="msx_cass">
+		<part name="cass1a" interface="msx_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="98360">
 				<rom name="world games (1987)(u.s. gold)(gb)(side a)[run'cas-'].cas" size="98360" crc="976d1404" sha1="1f2cfacd52c95c51030005a1f3df8fc48d446d81"/>
 			</dataarea>
 		</part>
-		<part name="cass2" interface="msx_cass">
+		<part name="cass1b" interface="msx_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="108711">
 				<rom name="world games (1987)(u.s. gold)(gb)(side b)[run'cas-'].cas" size="108711" crc="b932a7eb" sha1="d036636ec1e053c51d43e81cb6064d0de7256405"/>
@@ -16902,7 +16902,7 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Mr. Micro</publisher>
 		<info name="serial" value="TE002"/>
-		<info name="ean" value="5014293005401"/>
+		<info name="gtin" value="05014293005401"/>
 		<info name="usage" value="Load with BLOAD&quot;CAS:&quot;,R"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -16980,15 +16980,15 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Dro Soft</publisher>
 		<info name="serial" value="4 DR-171"/>
-		<info name="ean" value="8414185041710"/>
+		<info name="gtin" value="08414185041710"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
-		<part name="cass1" interface="msx_cass">
+		<part name="cass1a" interface="msx_cass">
 			<dataarea name="cass" size="35224">
 				<rom name="zipi y zape (1989)(dro soft)(es)(side a)[run'cas-'].cas" size="35224" crc="7061c0ca" sha1="5b606ad42c3b5586a925215324fee12f90161850"/>
 			</dataarea>
 		</part>
-		<part name="cass2" interface="msx_cass">
+		<part name="cass1b" interface="msx_cass">
 			<dataarea name="cass" size="36065">
 				<rom name="zipi y zape (1989)(dro soft)(es)(side b)[run'cas-'].cas" size="36065" crc="5baf3c84" sha1="ca0da84527d3f6d3af47020920d427eb78724f0e"/>
 			</dataarea>
@@ -17000,7 +17000,7 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Martech Games</publisher>
 		<info name="serial" value="ZS-MSX/069"/>
-		<info name="ean" value="5012753000348"/>
+		<info name="gtin" value="05012753000348"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -17174,14 +17174,14 @@ license:CC0-1.0
 		<info name="usage" value="Load with LOAD&quot;CAS:&quot; and RUN"/>
 
 		<!-- Damas - RUN"CAS:DAMA", Mision Imposible - RUN"CAS:MISI" -->
-		<part name="side_a" interface="msx_cass">
+		<part name="cass1a" interface="msx_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="23328">
 				<rom name="lenguaje maquina - issue xx (198x)(lenguaje maquina)(es)(side a).cas" size="23328" crc="6535ed98" sha1="68e94590577c6a4c9291363c199aa6a2f162ff68"/>
 			</dataarea>
 		</part>
 		<!-- Reto Numerico - RUN"CAS:RETO", Calimero - RUN"CAS:CALI", Amortizacion - RUN"CAS:AMORT", Dibujo Lineal - RUN"CAS:DIBU" -->
-		<part name="side_b" interface="msx_cass">
+		<part name="cass1b" interface="msx_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="19728">
 				<rom name="lenguaje maquina - issue xx (198x)(lenguaje maquina)(es)(Side b).cas" size="19728" crc="4c8d3be0" sha1="95b51b1bbfeb8da2b5261ff3493eeeb39c06207e"/>
@@ -17312,13 +17312,13 @@ license:CC0-1.0
 		<publisher>Grupo de Trabajo Software</publisher>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
-		<part name="cass1" interface="msx_cass">
+		<part name="cass1a" interface="msx_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="14923">
 				<rom name="msx games vol 04 - xider (19xx)(grupo de trabajo software)(es)(side a)[run'cas-'].cas" size="14923" crc="112a2380" sha1="7f13236ab1991b110fcc493ce0ea5777d31fa6d9"/>
 			</dataarea>
 		</part>
-		<part name="cass2" interface="msx_cass">
+		<part name="cass1b" interface="msx_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="14923">
 				<rom name="msx games vol 04 - xider (19xx)(grupo de trabajo software)(es)(side b)[run'cas-'].cas" size="14923" crc="e800ecb7" sha1="428483ff0b4927f4b002860270e0eff80d8a8f21"/>
@@ -17505,13 +17505,13 @@ license:CC0-1.0
 		<publisher>Grupo de Trabajo Software</publisher>
 		<info name="usage" value="Load with CLOAD + RUN"/>
 
-		<part name="side_a" interface="msx_cass">
+		<part name="cass1a" interface="msx_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="19067">
 				<rom name="msx software - issue 04 (198x)(grupo de trabajo software)(es)(side a)[cload].cas" size="19067" crc="9ba6b335" sha1="838bd75e15f8b9bbd4bc22e674b5d0c6402eebac"/>
 			</dataarea>
 		</part>
-		<part name="side_b" interface="msx_cass">
+		<part name="cass1b" interface="msx_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="14212">
 				<rom name="msx software - issue 04 (198x)(grupo de trabajo software)(es)(side b)[cload].cas" size="14212" crc="d2c0406c" sha1="a4f165b050591d2cff26662f5a1d8c34393adcb4"/>
