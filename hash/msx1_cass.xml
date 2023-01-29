@@ -125,7 +125,7 @@ license:CC0-1.0
 		<description>Breakout! The Great computer Adventure (United Kingdom, alt 2)</description>
 		<year>1985</year>
 		<publisher>Toshiba</publisher>
-		<info name="usage" value="Load with RUN&quot;CAS:&quot;. The game requires 64k in slot 2"/>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;. This software was designed to be used on the British HX-10 (hx10), it fails to run on most other machines."/>
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="63987">
@@ -1622,6 +1622,7 @@ license:CC0-1.0
 		<description>Base de Datos (Spain, DIMensionNEW)</description>
 		<year>1985</year>
 		<publisher>Toshiba</publisher>
+		<info name="developer" value="DIMensionNEW"/>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -1635,6 +1636,7 @@ license:CC0-1.0
 		<description>Base de Datos (Spain, EMSA)</description>
 		<year>198?</year>
 		<publisher>Toshiba</publisher>
+		<info name="developer" value="EMSA"/>
 		<info name="usage" value="Load with CLOAD + RUN"/>
 
 		<part name="cass1" interface="msx_cass">
@@ -14730,7 +14732,7 @@ license:CC0-1.0
 		<year>1991</year>
 		<publisher>Dro Soft</publisher>
 		<info name="serial" value="4 SV 288"/>
-		<info name="usage" value="Load with RUN&quot;CAS:&quot;. Requires a system with 128KB."/>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;. Requires a system with 128KB RAM."/>
 
 		<part name="cass1a" interface="msx_cass">
 			<feature name="part_id" value="Side A"/>
@@ -14750,7 +14752,7 @@ license:CC0-1.0
 		<description>SWIV (Spain, alt)</description>
 		<year>1991</year>
 		<publisher>Dro Soft</publisher>
-		<info name="usage" value="Load with RUN&quot;CAS:&quot;. Requires a system with 128KB."/>
+		<info name="usage" value="Load with RUN&quot;CAS:&quot;. Requires a system with 128KB RAM."/>
 
 		<part name="cass1" interface="msx_cass">
 			<feature name="part_id" value="Side A"/>
