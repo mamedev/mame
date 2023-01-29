@@ -21,6 +21,9 @@ so don't require special logic further in the opcode handler.
 It is possible this is how the CPU works internally.
 
 */
+
+// currently causes the Leapster to put an unhandled interrupt exception string in RAM
+// at 0x03000000
 void arcompact_device::check_interrupts()
 {
 	if (m_irq_pending)
@@ -28,7 +31,7 @@ void arcompact_device::check_interrupts()
 		if (m_status32 & 0x00000002) // & 0x04 = level2, & 0x02 = level1
 		{
 			int level = 1;
-			int vector = 3;
+			int vector = 4;
 
 			logerror("HACK/TEST IRQ\n");
 

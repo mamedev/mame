@@ -229,8 +229,16 @@ private:
 
 	INTERRUPT_GEN_MEMBER(testirq);
 
+	uint32_t leapster_1801000_r();
+	uint32_t leapster_1801004_r();
+	uint32_t leapster_1801008_r();
+	uint32_t leapster_180100c_r();
+	uint32_t leapster_1801018_r();
 	uint32_t leapster_1809004_r();
+	uint32_t leapster_1809008_r();
+	uint32_t leapster_180b000_r();
 	uint32_t leapster_180b004_r();
+	uint32_t leapster_180b008_r();
 	uint32_t leapster_180d400_r();
 	uint32_t leapster_180d800_r();
 
@@ -319,11 +327,53 @@ void leapster_state::leapster_aux004b_w(uint32_t data)
 	logerror("%s: leapster_aux004b_w %08x\n", machine().describe_context(), data);
 }
 
+uint32_t leapster_state::leapster_1801000_r()
+{
+	logerror("%s: leapster_1801000_r\n", machine().describe_context());
+	return 0x00000000;
+}
+
+uint32_t leapster_state::leapster_1801004_r()
+{
+	logerror("%s: leapster_1801004_r\n", machine().describe_context());
+	return 0x00000000;
+}
+
+uint32_t leapster_state::leapster_1801008_r()
+{
+	logerror("%s: leapster_1801004_r\n", machine().describe_context());
+	return 0x00000000;
+}
+
+uint32_t leapster_state::leapster_180100c_r()
+{
+	logerror("%s: leapster_180100c_r\n", machine().describe_context());
+	return 0x00000000;
+}
+
+uint32_t leapster_state::leapster_1801018_r()
+{
+	logerror("%s: leapster_1801018_r\n", machine().describe_context());
+	return 0x00000000;
+}
+
 uint32_t leapster_state::leapster_1809004_r()
 {
 	logerror("%s: leapster_1809004_r (return usually checked against 0x00200000)\n", machine().describe_context());
 	// does an AND with 0x00200000 and often jumps to dead loops if that fails
 	return 0x00200000;
+}
+
+uint32_t leapster_state::leapster_1809008_r()
+{
+	logerror("%s: leapster_1809008_r\n", machine().describe_context());
+	return 0x00000000;
+}
+
+uint32_t leapster_state::leapster_180b000_r()
+{
+	logerror("%s: leapster_180b000_r\n", machine().describe_context());
+	return 0x00000000;
 }
 
 uint32_t leapster_state::leapster_180b004_r()
@@ -333,6 +383,13 @@ uint32_t leapster_state::leapster_180b004_r()
 	return 0xffffffff;
 }
 
+uint32_t leapster_state::leapster_180b008_r()
+{
+	// checks bit 1 (using BMSK instruction and AND instruction)
+	// writes back to same address?
+	logerror("%s: leapster_180b008_r\n", machine().describe_context());
+	return 0x00000001;
+}
 uint32_t leapster_state::leapster_180d400_r()
 {
 	logerror("%s: leapster_180d400_r (return usually checked against 0x0030d400)\n", machine().describe_context());
@@ -349,7 +406,6 @@ uint32_t leapster_state::leapster_180d800_r()
 	// loops against 0x00003e80 (16,000) in other places 4003A56C for example
 	return 0x00027100;
 }
-
 
 uint32_t leapster_state::screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -390,11 +446,23 @@ void leapster_state::leapster_map(address_map &map)
 {
 //  A vector table is copied from 0x00000000 to 0x3c000000, but it is unclear if that is a BIOS mirror
 // 	or if it should be copying a different table.
+	map(0x00000000, 0x007fffff).mirror(0x40000000).rom().region("maincpu", 0);
+	//map(0x40000000, 0x407fffff).rom().region("maincpu", 0);
 
 //	map(0x01800000, 0x0180ffff).ram();
-	map(0x01809004, 0x01809007).r(FUNC(leapster_state::leapster_1809004_r));
 
+	map(0x01801000, 0x01801003).r(FUNC(leapster_state::leapster_1801000_r));
+	map(0x01801004, 0x01801007).r(FUNC(leapster_state::leapster_1801004_r));
+	map(0x01801008, 0x0180100b).r(FUNC(leapster_state::leapster_1801008_r));
+	map(0x0180100c, 0x0180100f).r(FUNC(leapster_state::leapster_180100c_r));
+	map(0x01801018, 0x0180101b).r(FUNC(leapster_state::leapster_1801018_r));
+
+	map(0x01809004, 0x01809007).r(FUNC(leapster_state::leapster_1809004_r));
+	map(0x01809008, 0x0180900b).r(FUNC(leapster_state::leapster_1809008_r));
+
+	map(0x0180b000, 0x0180b003).r(FUNC(leapster_state::leapster_180b000_r));
 	map(0x0180b004, 0x0180b007).r(FUNC(leapster_state::leapster_180b004_r));
+	map(0x0180b008, 0x0180b00b).r(FUNC(leapster_state::leapster_180b008_r));
 
 	map(0x0180d400, 0x0180d403).r(FUNC(leapster_state::leapster_180d400_r));
 
@@ -404,7 +472,6 @@ void leapster_state::leapster_map(address_map &map)
 	map(0x03000800, 0x0300ffff).ram(); // some of the later models need to store stack values here (or code execution has gone wrong?)
 	map(0x3c000000, 0x3c1fffff).ram(); // vector base gets moved here with new IRQ table, puts task stacks etc. here
 	map(0x3c200000, 0x3fffffff).ram();
-	map(0x40000000, 0x407fffff).rom().region("maincpu", 0);
 	// map(0x80000000, 0x807fffff).bankr("cartrom"); // game ROM pointers are all to the 80xxxxxx region, so I assume it maps here - installed if a cart is present
 }
 
