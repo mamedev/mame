@@ -56,6 +56,7 @@ namespace {
 #define SPRINT_BORDER_BOTTOM 16
 #define SPRINT_YVIS          (SPRINT_BORDER_TOP + SPRINT_SCREEN_YSIZE + SPRINT_BORDER_BOTTOM)
 
+#define ACC_ENA     BIT(m_all_mode, 0)
 #define CBL_MODE    BIT(m_cbl_xx, 7)
 #define CBL_STEREO  BIT(m_cbl_xx, 6)
 #define CBL_MODE16  BIT(m_cbl_xx, 5)
@@ -78,6 +79,7 @@ public:
 		, m_rdac(*this, "rdac")
 		, m_kbd(*this, "kbd")
 		, m_io_mouse(*this, "mouse_input%u", 1U)
+		, m_io_turbo(*this, "TURBO")
 		, m_palette(*this, "palette")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_vram(*this, "vram", 0x40000, ENDIANNESS_LITTLE)
@@ -88,6 +90,8 @@ public:
 	{ }
 
 	void sprinter(machine_config &config);
+
+	INPUT_CHANGED_MEMBER(turbo_changed);
 
 protected:
 	virtual void machine_start() override;
@@ -102,6 +106,7 @@ protected:
 	void init_taps();
 
 	void update_memory();
+	void update_cpu();
 
 	TIMER_CALLBACK_MEMBER(irq_on) override;
 	INTERRUPT_GEN_MEMBER(sprinter_int);
@@ -151,8 +156,6 @@ private:
 	u8 ram_r(offs_t offset);
 	void ram_w(offs_t offset, u8 data);
 
-	void dac_w(u16 left, u16 right);
-
 	void accel_control_r(u8 data);
 	void accel_r_tap(offs_t offset, u8 &data);
 	void accel_w_tap(offs_t offset, u8 &data);
@@ -169,6 +172,7 @@ private:
 	required_device<dac_word_interface> m_rdac;
 	required_device<pc_kbdc_device> m_kbd;
 	required_ioport_array<3> m_io_mouse;
+	required_ioport m_io_turbo;
 	required_device<device_palette_interface> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	memory_share_creator<u8> m_vram;
@@ -190,6 +194,7 @@ private:
 	bool m_ram_sys;
 	bool m_sys_pg;
 	bool m_turbo;
+	bool m_turbo_hard;
 	bool m_arom16;
 	u8 m_rom_rg;
 	u8 m_pn;
@@ -220,7 +225,6 @@ private:
 	u8 m_cbl_cnt;
 	u8 m_cbl_wa;
 	bool m_cbl_wae;
-	u8 m_cbl_data_latch;
 	emu_timer *m_cbl_timer = nullptr;
 };
 
@@ -286,6 +290,11 @@ void sprinter_state::update_memory()
 	}
 
 	LOGMEM("MEM: %x %x %x %x\n", m_pages[0], m_pages[1], m_pages[2], m_pages[3]);
+}
+
+void sprinter_state::update_cpu()
+{
+	m_maincpu->set_clock(X_SP / ((m_turbo && m_turbo_hard) ? 2 : 12)); // 1 - 21MHz, 0 - 3.5MHz
 }
 
 void sprinter_state::sprinter_palette(palette_device &palette) const
@@ -472,7 +481,7 @@ u8 sprinter_state::dcp_r(offs_t offset)
 		{
 			data &= ~0xa0;
 			data |= (m_screen->vpos() >= (SPRINT_BORDER_TOP + SPRINT_SCREEN_YSIZE)) << 5;
-			data |= (m_cbl_cnt ^ m_cbl_wa) & 0x80;
+			data |= (CBL_INT_ENA ? (m_cbl_cnt ^ m_cbl_wa) : m_cbl_cnt) & 0x80;
 		}
 		break;
 
@@ -590,59 +599,23 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		if (CBL_INT_ENA)
 			m_cbl_data[m_cbl_wa++] = data << 8;
 		else
-			dac_w(data << 8, data << 8);
+		{
+			m_ldac->write(data << 8);
+			m_rdac->write(data << 8);
+		}
 		break;
 
 	case 0x89:
+	{
 		m_cbl_xx = data;
 		m_cbl_cnt = 0;
-		if (CBL_INT_ENA)
-		{
-			m_cbl_wa = 0;
-			m_cbl_wae = CBL_MODE16;
-		}
-
-		if (CBL_MODE)
-		{
-			u8 cbl_tab = 0;
-			switch (m_cbl_xx & 0x0f)
-			{
-			case 0:
-				cbl_tab = 13; // 16 KHz
-				break;
-			case 1:
-				cbl_tab = 9; // 22 KHz
-				break;
-			case 8:
-				cbl_tab = 27; // 7.8125 KHz
-				break;
-			case 9:
-				cbl_tab = 19; // 10.9375 KHz
-				break;
-			case 10:
-				cbl_tab = 13; // 15.625 KHz
-				break;
-			case 11:
-				cbl_tab = 9; // 21.875  KHz
-				break;
-			case 12:
-				cbl_tab = 6; // 31.25 KHz
-				break;
-			case 13:
-				cbl_tab = 4; // 43.75 KHz
-				break;
-			case 14:
-				cbl_tab = 3; // 54.6875 KHz
-				break;
-			case 15:
-				cbl_tab = 1; // 109.375 KHz
-				break;
-			}
-			m_cbl_timer->adjust(attotime::zero, 0, attotime::from_hz(X_SP / (192 * (cbl_tab + 1))));
-		}
-		else
-			m_cbl_timer->adjust(attotime::never);
+		m_cbl_wa = 0;
+		m_cbl_wae = CBL_MODE16;
+		const u8 divs[16] = {13, 9, 0, 0, 0, 0, 0, 0, 27, 19, 13, 9, 6, 4, 3, 1};
+		const attotime rate = (CBL_MODE && divs[m_cbl_xx & 15]) ? attotime::from_ticks(divs[m_cbl_xx & 15] + 1, X_SP / 192) : attotime::never;
+		m_cbl_timer->adjust(rate, 0, rate);
 		break;
+	}
 
 	case 0x8f: // rom & fastram page
 		m_rom_rg = data;
@@ -696,7 +669,7 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		if (BIT(data, 1))
 		{
 			m_turbo = BIT(data, 0);
-			m_maincpu->set_clock(X_SP / (m_turbo ? 2 : 12)); // 1 - 21MHz, 0 - 3.5MHz
+			update_cpu();
 		}
 		else
 			m_arom16 = BIT(data, 0);
@@ -755,17 +728,11 @@ void sprinter_state::ata_data_w(u8 data)
 		m_ata[m_ata_selected]->cs0_w(0, (data << 8) | m_ata_data_latch);
 }
 
-void sprinter_state::dac_w(u16 left, u16 right)
-{
-	m_ldac->write(left);
-	m_rdac->write(right);
-}
-
 TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
 {
-	u16 left = m_cbl_data[m_cbl_cnt++] ^ (CBL_MODE16 << 15);
-	u16 right = CBL_STEREO ? (m_cbl_data[m_cbl_cnt++] ^ (CBL_MODE16 << 15)) : left;
-	dac_w(left, right);
+	const u16 left = m_cbl_data[m_cbl_cnt++];
+	m_ldac->write(left);
+	m_rdac->write(CBL_STEREO ? m_cbl_data[m_cbl_cnt++] : left);
 
 	if (CBL_INT_ENA && !(m_cbl_cnt & 0x7f))
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -990,17 +957,19 @@ void sprinter_state::ram_w(offs_t offset, u8 data)
 				m_vram[vxa] = data;
 			}
 		}
-
-		if ((m_accel_state != OFF) && (page == 0xfd))
+		else if ((m_accel_state != OFF) && (page == 0xfd))
 		{
 			if (!CBL_MODE16)
 				m_cbl_data[m_cbl_wa++] = (data << 8);
 			else
 			{
 				if (m_cbl_wae)
-					m_cbl_data_latch = data;
+					m_cbl_data[m_cbl_wa] = data;
 				else
-					m_cbl_data[m_cbl_wa++] = (data << 8) | m_cbl_data_latch;
+				{
+					m_cbl_data[m_cbl_wa] |= ((data ^ 0x80) << 8);
+					m_cbl_wa++;
+				}
 				m_cbl_wae = !m_cbl_wae;
 			}
 		}
@@ -1018,7 +987,7 @@ u8 sprinter_state::m1_r(offs_t offset)
 	u8 data = m_program.read_byte(offset);
 	m_z80_m1 = 0;
 
-	if (!machine().side_effects_disabled() && (m_all_mode & 1))
+	if (!machine().side_effects_disabled() && ACC_ENA)
 		accel_control_r(data);
 
 	return data;
@@ -1075,12 +1044,12 @@ void sprinter_state::init_taps()
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
 	prg.install_read_tap(0x0000, 0xffff, "accel_read", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
-		if (!machine().side_effects_disabled() && !m_z80_m1 && (m_all_mode & 1) && (m_accel_state != OFF))
+		if (!machine().side_effects_disabled() && !m_z80_m1 && ACC_ENA && (m_accel_state != OFF))
 			accel_r_tap(offset, data);
 	});
 	prg.install_write_tap(0x0000, 0xffff, "accel_write", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
-		if (!m_z80_m1 && (m_all_mode & 1) && (m_accel_state != OFF))
+		if (!m_z80_m1 && ACC_ENA && (m_accel_state != OFF))
 			accel_w_tap(offset, data);
 	});
 }
@@ -1156,6 +1125,7 @@ void sprinter_state::machine_reset()
 	m_ata_data_flip = false;
 
 	m_kbd_data_cnt = 0;
+	m_turbo_hard = 1;
 
 	update_memory();
 }
@@ -1194,10 +1164,13 @@ static void sprinter_ata_devices(device_slot_interface &device)
 
 void sprinter_state::on_kbd_data(int state)
 {
-	m_kbd_data_cnt++;
-	m_kbd_data_cnt %= 11;
-	if (!m_kbd_data_cnt && (state && ((m_all_mode & 0x09) == 0x09)))
-		irq_on(0);
+	if (state && ((m_all_mode & 0x09) == 0x09))
+	{
+		m_kbd_data_cnt++;
+		m_kbd_data_cnt %= 11;
+		if (!m_kbd_data_cnt)
+			irq_on(0);
+	}
 }
 
 void sprinter_state::do_cpu_wait(u8 count)
@@ -1225,13 +1198,21 @@ TIMER_CALLBACK_MEMBER(sprinter_state::irq_on)
 INTERRUPT_GEN_MEMBER(sprinter_state::sprinter_int)
 {
 	// Pentagon's INT for now
-	m_irq_on_timer->adjust(attotime(0, m_screen->time_until_pos(287, 375 * 2).as_attoseconds()));
+	m_irq_on_timer->adjust(attotime(0, m_screen->time_until_pos(287, 375 * 2 + 1).as_attoseconds()));
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::wait_exit)
 {
 	m_timer_overlap = 0;
 	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+}
+
+INPUT_CHANGED_MEMBER(sprinter_state::turbo_changed)
+{
+	m_turbo_hard = !m_turbo_hard;
+	update_cpu();
+
+	popmessage("Turbo %s\n", (m_turbo && m_turbo_hard) ? "ON" : "OFF");
 }
 
 INPUT_PORTS_START( sprinter )
@@ -1248,6 +1229,9 @@ INPUT_PORTS_START( sprinter )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
+
+	PORT_START("TURBO")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Turbo") PORT_CODE(KEYCODE_F12) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, sprinter_state, turbo_changed, 0)
 INPUT_PORTS_END
 
 void sprinter_state::sprinter(machine_config &config)
@@ -1263,6 +1247,7 @@ void sprinter_state::sprinter(machine_config &config)
 	m_maincpu->set_io_map(&sprinter_state::map_io);
 	m_maincpu->set_vblank_int("screen", FUNC(sprinter_state::sprinter_int));
 	m_maincpu->nomreq_cb().set_nop();
+	m_maincpu->irqack_cb().set([this](int){ m_maincpu->set_input_line(0, CLEAR_LINE); });
 
 	m_screen->set_raw(X_SP / 3, SPRINT_WIDTH, SPRINT_HEIGHT, { 0, SPRINT_XVIS - 1, 0, SPRINT_YVIS - 1 });
 	m_screen->set_screen_update(FUNC(sprinter_state::screen_update));
