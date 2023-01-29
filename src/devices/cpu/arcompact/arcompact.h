@@ -388,202 +388,15 @@ private:
 	uint32_t handleop32_LD_r_o(uint32_t op);
 	uint32_t handleop32_ST_r_o(uint32_t op);
 
-	template<typename OPHANDLER>
-	uint32_t handleop32_general(uint32_t op, OPHANDLER ophandler)
-	{
-		switch ((op & 0x00c00000) >> 22)
-		{
-		case 0x00:
-		{
-			uint8_t breg = common32_get_breg(op);
-			uint8_t creg = common32_get_creg(op);
-			int size = check_b_c_limm(breg, creg);
-			m_regs[common32_get_areg(op)] = ophandler(this, m_regs[breg], m_regs[creg], common32_get_F(op));
-			return m_pc + size;
-		}
+	typedef uint32_t (*ophandler32)(void*,uint32_t,uint32_t,uint8_t);
+	typedef void (*ophandler32_ff)(void*,uint32_t,uint32_t);
+	typedef void (*ophandler32_mul)(void*,uint32_t,uint32_t);
+	typedef uint32_t (*ophandler32_sop)(void*,uint32_t, uint8_t);
 
-		case 0x01:
-		{
-			uint8_t breg = common32_get_breg(op);
-			int size = check_b_limm(breg);
-			m_regs[common32_get_areg(op)] = ophandler(this, m_regs[breg], common32_get_u6(op), common32_get_F(op));
-			return m_pc + size;
-		}
-		case 0x02:
-		{
-			uint8_t breg = common32_get_breg(op);
-			int size = check_b_limm(breg);
-			m_regs[breg] = ophandler(this, m_regs[breg], common32_get_s12(op), common32_get_F(op));
-			return m_pc + size;
-		}
-		case 0x03:
-		{
-			switch ((op & 0x00000020) >> 5)
-			{
-			case 0x00:
-			{
-				uint8_t breg = common32_get_breg(op);
-				uint8_t creg = common32_get_creg(op);
-				int size = check_b_c_limm(breg, creg);
-				if (check_condition(common32_get_condition(op)))
-					m_regs[breg] = ophandler(this, m_regs[breg], m_regs[creg], common32_get_F(op));
-				return m_pc + size;
-			}
-			case 0x01:
-			{
-				uint8_t breg = common32_get_breg(op);
-				int size = check_b_limm(breg);
-				if (check_condition(common32_get_condition(op)))
-					m_regs[breg] = ophandler(this, m_regs[breg], common32_get_u6(op), common32_get_F(op));
-				return m_pc + size;
-			}
-			}
-		}
-		}
-		return 0;
-	}
-
-	template<typename OPHANDLER>
-	uint32_t handleop32_general_MULx64(uint32_t op, OPHANDLER ophandler)
-	{
-		switch ((op & 0x00c00000) >> 22)
-		{
-		case 0x00:
-		{
-			uint8_t breg = common32_get_breg(op);
-			uint8_t creg = common32_get_creg(op);
-			int size = check_b_c_limm(breg, creg);
-			ophandler(this, m_regs[breg], m_regs[creg]);
-			return m_pc + size;
-		}
-
-		case 0x01:
-		{
-			uint8_t breg = common32_get_breg(op);
-			int size = check_b_limm(breg);
-			ophandler(this, m_regs[breg], common32_get_u6(op));
-			return m_pc + size;
-		}
-		case 0x02:
-		{
-			uint8_t breg = common32_get_breg(op);
-			int size = check_b_limm(breg);
-			ophandler(this, m_regs[breg], common32_get_s12(op));
-			return m_pc + size;
-		}
-		case 0x03:
-		{
-			switch ((op & 0x00000020) >> 5)
-			{
-			case 0x00:
-			{
-				uint8_t breg = common32_get_breg(op);
-				uint8_t creg = common32_get_creg(op);
-				int size = check_b_c_limm(breg, creg);
-				if (!check_condition(common32_get_condition(op)))
-					return m_pc + size;
-				ophandler(this, m_regs[breg], m_regs[creg]);
-				return m_pc + size;
-			}
-
-			case 0x01:
-			{
-				uint8_t breg = common32_get_breg(op);
-				int size = check_b_limm(breg);
-				if (!check_condition(common32_get_condition(op)))
-					return m_pc + size;
-				ophandler(this, m_regs[breg], common32_get_u6(op));
-				return m_pc + size;
-			}
-			}
-		}
-		}
-
-		return 0;
-	}
-
-	template<typename OPHANDLER>
-	uint32_t handleop32_general_nowriteback_forced_flag(uint32_t op, OPHANDLER ophandler)
-	{
-		switch ((op & 0x00c00000) >> 22)
-		{
-		case 0x00:
-		{
-			uint8_t breg = common32_get_breg(op);
-			uint8_t creg = common32_get_creg(op);
-			int size = check_b_c_limm(breg, creg);
-			ophandler(this, m_regs[breg], m_regs[creg]);
-			return m_pc + size;
-		}
-		case 0x01:
-		{
-			uint8_t breg = common32_get_breg(op);
-			int size = check_b_limm(breg);
-			ophandler(this, m_regs[breg], common32_get_u6(op));
-			return m_pc + size;
-		}
-		case 0x02:
-		{
-			uint8_t breg = common32_get_breg(op);
-			int size = check_b_limm(breg);
-			ophandler(this, m_regs[breg], common32_get_s12(op));
-			return m_pc + size;
-		}
-		case 0x03:
-		{
-			switch ((op & 0x00000020) >> 5)
-			{
-			case 0x00:
-			{
-				uint8_t breg = common32_get_breg(op);
-				uint8_t creg = common32_get_creg(op);
-				int size = check_b_c_limm(breg, creg);
-				if (check_condition(common32_get_condition(op)))
-					ophandler(this, m_regs[breg], m_regs[creg]);
-				return m_pc + size;
-			}
-			case 0x01:
-			{
-				uint8_t breg = common32_get_breg(op);
-				int size = check_b_limm(breg);
-				if (check_condition(common32_get_condition(op)))
-					ophandler(this, m_regs[breg], common32_get_u6(op));
-				return m_pc + size;
-			}
-			}
-		}
-		}
-
-		return 0;
-	}
-
-	template<typename OPHANDLER>
-	uint32_t handleop32_general_SOP_group(uint32_t op, OPHANDLER ophandler)
-	{
-		switch ((op & 0x00c00000) >> 22)
-		{
-			case 0x00:
-			{
-				uint8_t breg = common32_get_breg(op);
-				uint8_t creg = common32_get_creg(op);
-				int size = check_b_c_limm(breg, creg);
-				m_regs[breg] = ophandler(this, m_regs[creg], common32_get_F(op));
-				return m_pc + size;
-			}
-			case 0x01:
-			{
-				uint8_t breg = common32_get_breg(op);
-				int size = check_b_limm(breg);
-				m_regs[breg] = ophandler(this, common32_get_u6(op), common32_get_F(op));
-				return m_pc + size;
-			}
-			case 0x02:
-			case 0x03:
-				arcompact_fatal("SOP Group: illegal mode 02/03 specifying use of bits already assigned to opcode select: opcode %04x\n", op);
-				return 0;
-		}
-		return 0;
-	}
+	uint32_t handleop32_general(uint32_t op, ophandler32 ophandler);
+	uint32_t handleop32_general_MULx64(uint32_t op, ophandler32_mul ophandler);
+	uint32_t handleop32_general_nowriteback_forced_flag(uint32_t op, ophandler32_ff ophandler);
+	uint32_t handleop32_general_SOP_group(uint32_t op, ophandler32_sop ophandler);
 
 	// arcompact_execute.cpp
 	// used by both arcompact_execute_ops_04_3x.cpp and arcompact_execute_ops_02to03.cpp
@@ -738,7 +551,6 @@ private:
 
 	// arcompact_execute_ops_05_2f_sop.cpp
 	static uint32_t handleop32_NORM_do_op(void* obj, uint32_t src, uint8_t set_flags);
-
 
 	static uint32_t handleop32_ROR_multiple_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
 	uint32_t handleop32_ADDS(uint32_t op);
