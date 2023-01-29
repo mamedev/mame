@@ -229,7 +229,6 @@ private:
 
 	INTERRUPT_GEN_MEMBER(testirq);
 
-	uint32_t leapster_180207b_r();
 	uint32_t leapster_1809004_r();
 	uint32_t leapster_180b004_r();
 	uint32_t leapster_180d400_r();
@@ -320,16 +319,11 @@ void leapster_state::leapster_aux004b_w(uint32_t data)
 	logerror("%s: leapster_aux004b_w %08x\n", machine().describe_context(), data);
 }
 
-uint32_t leapster_state::leapster_180207b_r()
-{
-	logerror("%s: leapster_180207b_r\n", machine().describe_context());
-	return machine().rand() | (machine().rand()<<16);
-}
-
 uint32_t leapster_state::leapster_1809004_r()
 {
-	logerror("%s: leapster_1809004_r\n", machine().describe_context());
-	return 0xffffffff;
+	logerror("%s: leapster_1809004_r (return usually checked against 0x00200000)\n", machine().describe_context());
+	// does an AND with 0x00200000 and often jumps to dead loops if that fails
+	return 0x00200000;
 }
 
 uint32_t leapster_state::leapster_180b004_r()
@@ -341,15 +335,18 @@ uint32_t leapster_state::leapster_180b004_r()
 
 uint32_t leapster_state::leapster_180d400_r()
 {
-	logerror("%s: leapster_180d400_r\n", machine().describe_context());
-	//does a BRLO.ND against 30d400
+	logerror("%s: leapster_180d400_r (return usually checked against 0x0030d400)\n", machine().describe_context());
+	// does a BRLO.ND against it
+	// loops against 0x0030d400 (3,200,000) at 4003A52A for example
 	return 0x0030d400;
 }
 
 uint32_t leapster_state::leapster_180d800_r()
 {
-	logerror("%s: leapster_180d800_r (return usually checked against 00027100)\n", machine().describe_context());
-	//does a BRLO.ND against 00027100
+	logerror("%s: leapster_180d800_r (return usually checked against 0x00027100 or 0x00003e80)\n", machine().describe_context());
+	// does a BRLO.ND against it
+	// loops against 0x00027100 (160,000)
+	// loops against 0x00003e80 (16,000) in other places 4003A56C for example
 	return 0x00027100;
 }
 
@@ -395,7 +392,6 @@ void leapster_state::leapster_map(address_map &map)
 // 	or if it should be copying a different table.
 
 //	map(0x01800000, 0x0180ffff).ram();
-	map(0x01802078, 0x0180207b).r(FUNC(leapster_state::leapster_180207b_r));
 	map(0x01809004, 0x01809007).r(FUNC(leapster_state::leapster_1809004_r));
 
 	map(0x0180b004, 0x0180b007).r(FUNC(leapster_state::leapster_180b004_r));
