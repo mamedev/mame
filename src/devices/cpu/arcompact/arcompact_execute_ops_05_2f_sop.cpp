@@ -36,6 +36,8 @@ uint32_t arcompact_device::arcompact_handle05_2f_0x_helper(uint32_t op, const ch
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// SWAP - Swap words (optional extension on ARCtangent-A5 / ARC600, built in on ARC700)
+// 
 // SWAP<.f> b,c                    0010 1bbb 0010 1111   FBBB CCCC CC00 0000
 // SWAP<.f> b,u6                   0010 1bbb 0110 1111   FBBB uuuu uu00 0000
 // SWAP<.f> b,limm                 0010 1bbb 0010 1111   FBBB 1111 1000 0000 (+ Limm)
@@ -45,9 +47,16 @@ uint32_t arcompact_device::arcompact_handle05_2f_0x_helper(uint32_t op, const ch
 // SWAP<.f> 0,limm                 0010 1110 0010 1111   F111 1111 1000 0000 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_SWAP(uint32_t op)
+
+uint32_t arcompact_device::handleop32_SWAP_do_op(void* obj, uint32_t src, uint8_t set_flags)
 {
-	return arcompact_handle05_2f_0x_helper(op, "SWAP");
+	arcompact_device* o = (arcompact_device*)obj;
+	uint32_t result = (((src & 0xffff0000) >> 16) | ((src & 0x0000ffff) << 16));
+
+	if (set_flags)
+		o->do_flags_nz(result);
+
+	return result;
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

@@ -60,7 +60,14 @@ uint32_t arcompact_device::handleop_LDW_S_c_b_u6(uint16_t op)
 
 uint32_t arcompact_device::handleop_LDW_S_X_c_b_u6(uint16_t op)
 {
-	arcompact_log("unimplemented LDW_S.X %04x", op);
+	uint8_t breg = common16_get_and_expand_breg(op);
+	uint8_t creg = common16_get_and_expand_creg(op);
+	uint32_t u = common16_get_u5(op) << 1;
+	m_regs[creg] = READ16((m_regs[breg] + u));
+
+	if (m_regs[creg] & 0x00008000)
+		m_regs[creg] |= 0xffff0000;
+
 	return m_pc + 2;
 }
 

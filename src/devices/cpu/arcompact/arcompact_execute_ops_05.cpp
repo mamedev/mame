@@ -57,9 +57,19 @@ uint32_t arcompact_device::arcompact_handle05_helper(uint32_t op, const char* op
 
 uint32_t arcompact_device::handleop32_ASL_multiple_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
+	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src1 << (src2 & 0x1f);
 	if (set_flags)
-		arcompact_fatal("handleop32_ASL_multiple (ASL) (F set)\n"); // not yet supported
+	{
+		o->do_flags_nz(result);
+		if (src2 != 0)
+		{
+			if (src1 & (1 << (32 - src2)))
+				o->status32_set_c();
+			else
+				o->status32_clear_c();
+		}
+	}
 	return result;
 }
 
@@ -169,6 +179,8 @@ uint32_t arcompact_device::handleop32_ROR_multiple_do_op(void* obj, uint32_t src
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Optional for ARCtangent-A5/ARC600, not available as an option on ARC700
+// 
 // 32 x 32 Signed Multiply
 // MUL64 <0,>b,c                   0010 1bbb 0000 0100   0BBB CCCC CC11 1110
 // MUL64 <0,>b,u6                  0010 1bbb 0100 0100   0BBB uuuu uu11 1110
@@ -191,6 +203,8 @@ void arcompact_device::handleop32_MUL64_do_op(void* obj, uint32_t src1, uint32_t
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Optional for ARCtangent-A5/ARC600, not available as an option on ARC700
+//
 // 32 x 32 Unsigned Multiply
 // special handling, destination register is always the multiply result register, a is ignored
 // MULU64 <0,>b,c                  0010 1bbb 0000 0101   0BBB CCCC CC11 1110

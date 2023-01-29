@@ -55,9 +55,10 @@ uint32_t arcompact_device::handleop32_ADD_do_op(void* obj, uint32_t src1, uint32
 uint32_t arcompact_device::handleop32_ADC_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
 	arcompact_device* o = (arcompact_device*)obj;
-	uint32_t result = src1 + src2 + (o->status32_check_c() ? 1 : 0);
-	if (set_flags)
-		o->do_flags_add(result, src1, src2);
+	uint8_t c = o->status32_check_c() ? 1 : 0;
+	uint32_t result = src1 + (src2 + c);
+	if (set_flags) // TODO: verify
+		o->do_flags_add(result, src1, (src2 + c));
 	return result;
 }
 
@@ -104,10 +105,11 @@ uint32_t arcompact_device::handleop32_SUB_do_op(void* obj, uint32_t src1, uint32
 
 uint32_t arcompact_device::handleop32_SBC_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
-	uint32_t result = 0;
-	arcompact_fatal("SBC not supported");
-	if (set_flags)
-		arcompact_fatal("SBC flags not supported");
+	arcompact_device* o = (arcompact_device*)obj;
+	uint8_t c = o->status32_check_c() ? 1 : 0;
+	uint32_t result = src1 - (src2 + c);
+	if (set_flags) // TODO: verify
+		o->do_flags_sub(result, src1, (src2 + c));
 	return result;
 }
 
@@ -154,9 +156,10 @@ uint32_t arcompact_device::handleop32_AND_do_op(void* obj, uint32_t src1, uint32
 
 uint32_t arcompact_device::handleop32_OR_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
+	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src1 | src2;
 	if (set_flags)
-		arcompact_fatal("handleop32_OR (OR) (F set)\n"); // not yet supported
+		o->do_flags_nz(result);
 	return result;
 }
 
@@ -206,9 +209,10 @@ uint32_t arcompact_device::handleop32_BIC_do_op(void* obj, uint32_t src1, uint32
 
 uint32_t arcompact_device::handleop32_XOR_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
+	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src1 ^ src2;
 	if (set_flags)
-		arcompact_fatal("handleop32_XOR (XOR) (F set)\n"); // not yet supported
+		o->do_flags_nz(result);
 	return result;
 }
 
@@ -231,10 +235,24 @@ uint32_t arcompact_device::handleop32_XOR_do_op(void* obj, uint32_t src1, uint32
 
 uint32_t arcompact_device::handleop32_MAX_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
-	uint32_t result = 0;
-	arcompact_fatal("MAX not supported");
-	if (set_flags)
-		arcompact_fatal("MAX flags not supported");
+	arcompact_device* o = (arcompact_device*)obj;
+	uint32_t alu = src1 - src2;
+	uint32_t result;
+
+	if ((int32_t)src2 >= (int32_t)src1)
+		result = src2;
+	else
+		result = src1;
+
+	if (set_flags) // TODO: verify
+	{
+		o->do_flags_nz(alu);
+		o->do_flags_overflow(alu, src1, src2);
+		if ((int32_t)src2 >= (int32_t)src1)
+			o->status32_set_c();
+		else
+			o->status32_clear_c();
+	}
 	return result;
 }
 
@@ -257,10 +275,24 @@ uint32_t arcompact_device::handleop32_MAX_do_op(void* obj, uint32_t src1, uint32
 
 uint32_t arcompact_device::handleop32_MIN_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
-	uint32_t result = 0;
-	arcompact_fatal("MIN not supported");
-	if (set_flags)
-		arcompact_fatal("MIN flags not supported");
+	arcompact_device* o = (arcompact_device*)obj;
+	uint32_t alu = src1 - src2;
+	uint32_t result;
+
+	if ((int32_t)src2 <= (int32_t)src1)
+		result = src2;
+	else
+		result = src1;
+
+	if (set_flags) // TODO: verify
+	{
+		o->do_flags_nz(alu);
+		o->do_flags_overflow(alu, src1, src2);
+		if ((int32_t)src2 <= (int32_t)src1)
+			o->status32_set_c();
+		else
+			o->status32_clear_c();
+	}
 	return result;
 }
 
@@ -398,8 +430,9 @@ void arcompact_device::handleop32_CMP_do_op(void* obj, uint32_t src1, uint32_t s
 
 void arcompact_device::handleop32_RCMP_do_op(void* obj, uint32_t src1, uint32_t src2)
 {
-	arcompact_fatal("RCMP not supported");
-	//do_flags
+	arcompact_device* o = (arcompact_device*)obj;
+	uint32_t result = src2 - src1;
+	o->do_flags_sub(result, src2, src1);
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -425,9 +458,10 @@ void arcompact_device::handleop32_RCMP_do_op(void* obj, uint32_t src1, uint32_t 
 
 uint32_t arcompact_device::handleop32_RSUB_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
+	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src2 - src1;
 	if (set_flags)
-		arcompact_fatal("handleop32_RSUB (RSUB) (F set)\n"); // not yet supported
+		o->do_flags_sub(result, src2, src1);
 	return result;
 }
 
@@ -445,9 +479,10 @@ uint32_t arcompact_device::handleop32_RSUB_do_op(void* obj, uint32_t src1, uint3
 
 uint32_t arcompact_device::handleop32_BSET_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
+	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src1 | (1 << (src2 & 0x1f));
 	if (set_flags)
-		arcompact_fatal("handleop32_BSET (BSET) (F set)\n"); // not yet supported
+		o->do_flags_nz(result);
 	return result;
 }
 
@@ -480,9 +515,11 @@ uint32_t arcompact_device::handleop32_BCLR_do_op(void* obj, uint32_t src1, uint3
 
 void arcompact_device::handleop32_BTST_do_op(void* obj, uint32_t src1, uint32_t src2)
 {
-	arcompact_fatal("BTST not supported");
-	//do_flags
+	arcompact_device* o = (arcompact_device*)obj;
+	uint32_t result = src1 & (1 << (src2 & 0x1f));
+	o->do_flags_nz(result);
 }
+
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BXOR<.f> a,b,c                  0010 0bbb 0001 0010   FBBB CCCC CCAA AAAA
 // BXOR<.f> a,b,u6                 0010 0bbb 0101 0010   FBBB uuuu uuAA AAAA
@@ -497,10 +534,10 @@ void arcompact_device::handleop32_BTST_do_op(void* obj, uint32_t src1, uint32_t 
 
 uint32_t arcompact_device::handleop32_BXOR_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
-	uint32_t result = 0;
-	arcompact_fatal("BXOR not supported");
+	arcompact_device* o = (arcompact_device*)obj;
+	uint32_t result = src1 ^ (1 << (src2 & 0x1f));
 	if (set_flags)
-		arcompact_fatal("BXOR flags not supported");
+		o->do_flags_nz(result);
 	return result;
 }
 
@@ -682,6 +719,8 @@ uint32_t arcompact_device::handleop32_SUB3_do_op(void* obj, uint32_t src1, uint3
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Optional on ARC700 only, not available on ARCtangent-A5 or ARC600
+//
 //                                 IIII I      SS SSSS
 // MPY<.f> a,b,c                   0010 0bbb 0001 1010   FBBB CCCC CCAA AAAA
 // MPY<.f> a,b,u6                  0010 0bbb 0101 1010   FBBB uuuu uuAA AAAA
@@ -707,6 +746,8 @@ uint32_t arcompact_device::handleop32_MPY_do_op(void* obj, uint32_t src1, uint32
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Optional on ARC700 only, not available on ARCtangent-A5 or ARC600
+//
 //                                 IIII I      SS SSSS
 // MPYH<.f> a,b,c                  0010 0bbb 0001 1011   FBBB CCCC CCAA AAAA
 // MPYH<.f> a,b,u6                 0010 0bbb 0101 1011   FBBB uuuu uuAA AAAA
@@ -731,6 +772,8 @@ uint32_t arcompact_device::handleop32_MPYH_do_op(void* obj, uint32_t src1, uint3
 	return result;
 }
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Optional on ARC700 only, not available on ARCtangent-A5 or ARC600
+//
 //                                 IIII I      SS SSSS
 // MPYHU<.f> a,b,c                 0010 0bbb 0001 1100   FBBB CCCC CCAA AAAA
 // MPYHU<.f> a,b,u6                0010 0bbb 0101 1100   FBBB uuuu uuAA AAAA
@@ -756,6 +799,8 @@ uint32_t arcompact_device::handleop32_MPYHU_do_op(void* obj, uint32_t src1, uint
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Optional on ARC700 only, not available on ARCtangent-A5 or ARC600
+//
 // MPYU<.f> a,b,c                  0010 0bbb 0001 1101   FBBB CCCC CCAA AAAA
 // MPYU<.f> a,b,u6                 0010 0bbb 0101 1101   FBBB uuuu uuAA AAAA
 // MPYU<.f> b,b,s12                0010 0bbb 1001 1101   FBBB ssss ssSS SSSS
@@ -808,7 +853,7 @@ uint32_t arcompact_device::handleop32_MPYU_do_op(void* obj, uint32_t src1, uint3
 
 void arcompact_device::handleop32_FLAG_do_op(uint32_t source)
 {
-	if (!(source & 0x0001)) // H means ignore all others
+	if (!(source & 0x0001)) // H means ignore all others (and halts CPU?)
 	{
 		// privileged  mode only
 		if (source & 0x0002) { status32_set_e1(); } else { status32_clear_e1(); }
@@ -822,6 +867,10 @@ void arcompact_device::handleop32_FLAG_do_op(uint32_t source)
 		if (source & 0x0200) { status32_set_c(); } else { status32_clear_c(); }
 		if (source & 0x0400) { status32_set_n(); } else { status32_clear_n(); }
 		if (source & 0x0800) { status32_set_z(); } else { status32_clear_z(); }
+	}
+	else
+	{
+		arcompact_fatal("FLAG operation with H set (halt CPU?)");
 	}
 }
 

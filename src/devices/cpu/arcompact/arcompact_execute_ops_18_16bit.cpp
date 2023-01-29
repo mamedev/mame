@@ -25,7 +25,10 @@ uint32_t arcompact_device::handleop_LD_S_b_sp_u7(uint16_t op)   // LD_S b, [SP, 
 
 uint32_t arcompact_device::handleop_LDB_S_b_sp_u7(uint16_t op)
 {
-	arcompact_log("unimplemented LDB_S %04x (0x18_0x group)", op);
+	uint8_t breg = common16_get_and_expand_breg(op);
+	uint32_t u = common16_get_u5(op);
+	uint32_t address = m_regs[REG_SP] + (u << 2);
+	m_regs[breg] = READ8(address);
 	return m_pc + 2;
 }
 

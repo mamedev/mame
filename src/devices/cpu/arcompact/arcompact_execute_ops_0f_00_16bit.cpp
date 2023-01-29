@@ -62,6 +62,12 @@ uint32_t arcompact_device::handleop_JL_S_D_b(uint16_t op) // JL_S.D
 
 uint32_t arcompact_device::handleop_SUB_S_NE_b_b_b(uint16_t op)
 {
-	arcompact_log("unimplemented SUB_S.NE %04x", op);
+	// opcode clears a register if 'z' is 0
+	if (condition_NE())
+	{
+		uint8_t breg = common16_get_and_expand_breg(op);
+		//m_regs[breg] = m_regs[breg] - m_regs[breg];
+		m_regs[breg] = 0;
+	}
 	return m_pc + 2;
 }

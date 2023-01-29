@@ -496,8 +496,7 @@ private:
 	uint32_t handleop32_FLAG(uint32_t op);
 
 	// arcompact_execute_ops_04_2f_sop.cpp
-	uint32_t handleop32_ASR_single(uint32_t op);
-
+	static uint32_t handleop32_ASR_single_do_op(void* obj, uint32_t src, uint8_t set_flags);
 	static uint32_t handleop32_ASL_single_do_op(void* obj, uint32_t src, uint8_t set_flags);
 	static uint32_t handleop32_LSR_single_do_op(void* obj, uint32_t src, uint8_t set_flags);
 	static uint32_t handleop32_ROR_do_op(void* obj, uint32_t src, uint8_t set_flags);
@@ -505,11 +504,11 @@ private:
 	static uint32_t handleop32_EXTW_do_op(void* obj, uint32_t src, uint8_t set_flags);
 	static uint32_t handleop32_RLC_do_op(void* obj, uint32_t src, uint8_t set_flags);
 
-	uint32_t handleop32_RRC(uint32_t op);
+	static uint32_t handleop32_RRC_do_op(void* obj, uint32_t src, uint8_t set_flags);
 	static uint32_t handleop32_SEXB_do_op(void* obj, uint32_t src, uint8_t set_flags);
 	static uint32_t handleop32_SEXW_do_op(void* obj, uint32_t src, uint8_t set_flags);
 	static uint32_t handleop32_ABS_do_op(void* obj, uint32_t src, uint8_t set_flags);
-	uint32_t handleop32_NOT(uint32_t op);
+	static uint32_t handleop32_NOT_do_op(void* obj, uint32_t src, uint8_t set_flags);
 	uint32_t handleop32_EX(uint32_t op);
 
 	// arcompact_execute_ops_04_2f_3f_zop.cpp
@@ -550,7 +549,7 @@ private:
 	uint32_t handleop32_ASRS(uint32_t op);
 	uint32_t handleop32_ADDSDW(uint32_t op);
 	uint32_t handleop32_SUBSDW(uint32_t op);
-	uint32_t handleop32_SWAP(uint32_t op);
+	static uint32_t handleop32_SWAP_do_op(void* obj, uint32_t src, uint8_t set_flags);
 	uint32_t handleop32_SAT16(uint32_t op);
 	uint32_t handleop32_RND16(uint32_t op);
 	uint32_t handleop32_ABSSW(uint32_t op);
