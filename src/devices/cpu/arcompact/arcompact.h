@@ -87,6 +87,7 @@ private:
 	uint32_t arcompact_auxreg025_INTVECTORBASE_r();
 	void arcompact_auxreg025_INTVECTORBASE_w(uint32_t data);
 
+	uint32_t arcompact_auxreg043_AUX_IRQ_LV12_r();
 	void arcompact_auxreg043_AUX_IRQ_LV12_w(uint32_t data);
 
 	uint32_t arcompact_auxreg200_AUX_IRQ_LVL_r();
@@ -785,6 +786,7 @@ private:
 	uint32_t m_LP_START;
 	uint32_t m_LP_END;
 	uint32_t m_INTVECTORBASE;
+	uint32_t m_AUX_IRQ_LV12;
 };
 
 DECLARE_DEVICE_TYPE(ARCA5, arcompact_device)

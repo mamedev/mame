@@ -39,11 +39,13 @@ void arcompact_device::check_interrupts()
 			{
 				m_regs[REG_ILINK1] = m_pc;
 				m_status32_l1 = m_status32;
+				m_AUX_IRQ_LV12 |= 0x00000001;
 			}
 			else if (level == 2)
 			{
 				m_regs[REG_ILINK2] = m_pc;
 				m_status32_l2 = m_status32;
+				m_AUX_IRQ_LV12 |= 0x00000002;
 			}
 			else
 			{

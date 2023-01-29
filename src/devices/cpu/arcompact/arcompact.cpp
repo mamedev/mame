@@ -50,9 +50,17 @@ void arcompact_device::arcompact_auxreg012_MULHI_w(uint32_t data)
 	m_regs[REG_MHI] = data;
 }
 
+uint32_t arcompact_device::arcompact_auxreg043_AUX_IRQ_LV12_r()
+{
+	logerror("%s: arcompact_auxreg043_AUX_IRQ_LV12_r\n", machine().describe_context());
+	return m_AUX_IRQ_LV12;
+}
+
 void arcompact_device::arcompact_auxreg043_AUX_IRQ_LV12_w(uint32_t data)
 {
 	logerror("%s: arcompact_auxreg043_AUX_IRQ_LV12_w %08x\n", machine().describe_context(), data);
+	if (data & 0x00000001) m_AUX_IRQ_LV12 &= ~0x00000001;
+	if (data & 0x00000002) m_AUX_IRQ_LV12 &= ~0x00000002;
 }
 
 
@@ -168,19 +176,19 @@ void arcompact_device::arcompact_auxreg_map(address_map &map)
 
 	//map(0x000000041, 0x000000041) // AUX_MACMODE (used by optional maths extensions)
 
-	map(0x000000043, 0x000000043).w(FUNC(arcompact_device::arcompact_auxreg043_AUX_IRQ_LV12_w));
+	map(0x000000043, 0x000000043).rw(FUNC(arcompact_device::arcompact_auxreg043_AUX_IRQ_LV12_r), FUNC(arcompact_device::arcompact_auxreg043_AUX_IRQ_LV12_w));
 
 	// these registers can be used to check which optional capabilities any given CPU was built with
 	//map(0x000000060, 0x000000060) // BCR_VER - Build Configuration Registers Version
-	//map(0x000000063, 0x000000063) // BTA_LINK_BUILD - Build configuration for BTA Registers 
-	//map(0x000000065, 0x000000065) // EA_BUILD - Build configuration for Extended Arithmetic 
-	//map(0x000000068, 0x000000068) // VECBASE_AC_BUILD - Build configuration for Interrupts 
-	//map(0x00000006e, 0x00000006e) // RF_BUILD - Build configuration for Core Registers 
-	//map(0x000000075, 0x000000075) // TIMER_BUILD - Build configuration for Processor Timers 
-	//map(0x00000007b, 0x00000007b) // MULTIPLY_BUILD - Build configuration for Multiply 
+	//map(0x000000063, 0x000000063) // BTA_LINK_BUILD - Build configuration for BTA Registers
+	//map(0x000000065, 0x000000065) // EA_BUILD - Build configuration for Extended Arithmetic
+	//map(0x000000068, 0x000000068) // VECBASE_AC_BUILD - Build configuration for Interrupts
+	//map(0x00000006e, 0x00000006e) // RF_BUILD - Build configuration for Core Registers
+	//map(0x000000075, 0x000000075) // TIMER_BUILD - Build configuration for Processor Timers
+	//map(0x00000007b, 0x00000007b) // MULTIPLY_BUILD - Build configuration for Multiply
 	//map(0x00000007c, 0x00000007c) // SWAP_BUILD - Build configuration for Swap
-	//map(0x00000007d, 0x00000007d) // NORM_BUILD - Build configuration for Normalize 
-	//map(0x00000007e, 0x00000007e) // MINMAX_BUILD - Build configuration for Min/Max 
+	//map(0x00000007d, 0x00000007d) // NORM_BUILD - Build configuration for Normalize
+	//map(0x00000007e, 0x00000007e) // MINMAX_BUILD - Build configuration for Min/Max
 	//map(0x00000007f, 0x00000007f) // BARREL_BUILD - Build configuration for Barrel Shift
 
 	map(0x000000100, 0x000000102).rw(FUNC(arcompact_device::arcompact_auxreg100_TIMER1_r), FUNC(arcompact_device::arcompact_auxreg100_TIMER1_w));
@@ -363,7 +371,7 @@ void arcompact_device::device_reset()
 
 	m_LP_START = 0;
 	m_LP_END = 0;
-	m_INTVECTORBASE = 0;
+	m_AUX_IRQ_LV12 = 0;
 
 	m_allow_loop_check = true;
 

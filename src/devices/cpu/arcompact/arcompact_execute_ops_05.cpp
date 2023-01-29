@@ -180,7 +180,7 @@ uint32_t arcompact_device::handleop32_ROR_multiple_do_op(void* obj, uint32_t src
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Optional for ARCtangent-A5/ARC600, not available as an option on ARC700
-// 
+//
 // 32 x 32 Signed Multiply
 // MUL64 <0,>b,c                   0010 1bbb 0000 0100   0BBB CCCC CC11 1110
 // MUL64 <0,>b,u6                  0010 1bbb 0100 0100   0BBB uuuu uu11 1110
