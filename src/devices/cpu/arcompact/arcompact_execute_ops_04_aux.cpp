@@ -106,7 +106,7 @@ uint32_t arcompact_device::handleop32_SR_f_a_b_c(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t creg = common32_get_creg(op);
-	int size = check_b_c_limm(breg, creg);
+	int size = check_limm(breg, creg);
 	uint32_t b = m_regs[breg];
 	uint32_t c = m_regs[creg];
 	WRITEAUX(c,b);
@@ -117,7 +117,7 @@ uint32_t arcompact_device::handleop32_SR_f_a_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint32_t u = common32_get_u6(op);
-	int size = check_b_limm(breg);
+	int size = check_limm(breg);
 	uint32_t b = m_regs[breg];
 	uint32_t c = u;
 	WRITEAUX(c,b);
@@ -128,7 +128,7 @@ uint32_t arcompact_device::handleop32_SR_f_b_b_s12(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint32_t S = common32_get_s12(op);
-	int size = check_b_limm(breg);
+	int size = check_limm(breg);
 	uint32_t b = m_regs[breg];
 	uint32_t c = (uint32_t)S;
 	WRITEAUX(c,b);
@@ -146,7 +146,7 @@ uint32_t arcompact_device::handleop32_SR_cc_f_b_b_u6(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint32_t u = common32_get_u6(op);
-	int size = check_b_limm(breg);
+	int size = check_limm(breg);
 	uint32_t b = m_regs[breg];
 	uint32_t c = u;
 	uint8_t condition = common32_get_condition(op);

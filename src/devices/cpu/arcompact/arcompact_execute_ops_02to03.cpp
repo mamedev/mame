@@ -29,7 +29,7 @@ uint32_t arcompact_device::handleop32_LD_r_o(uint32_t op)
 	int a = (op & 0x00000600) >> 9;  //op &= ~0x00000600;
 //  int D = (op & 0x00000800) >> 11;// op &= ~0x00000800; // we don't use the data cache currently
 
-	int size = check_b_limm(breg);
+	int size = check_limm(breg);
 
 	arcompact_handle_ld_helper(op, areg, breg, s, X, Z, a);
 
@@ -58,7 +58,7 @@ uint32_t arcompact_device::handleop32_ST_r_o(uint32_t op)
 	int a = (op & 0x00000018) >> 3;
 //  int D = (op & 0x00000020) >> 5; // we don't use the data cache currently
 
-	int size = check_b_c_limm(breg, creg);
+	int size = check_limm(breg, creg);
 
 	// writeback / increment
 	if (a == 1)

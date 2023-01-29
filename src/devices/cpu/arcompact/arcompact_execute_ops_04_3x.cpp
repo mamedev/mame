@@ -23,7 +23,7 @@ uint32_t arcompact_device::arcompact_handle04_3x_helper(uint32_t op, int dsize, 
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t creg = common32_get_creg(op);
-	int size = check_b_c_limm(breg, creg);
+	int size = check_limm(breg, creg);
 	uint8_t areg = common32_get_areg(op);
 
 	uint8_t X = extend;

@@ -295,7 +295,7 @@ uint32_t arcompact_device::handleop32_MOV_f_a_b_c(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t creg = common32_get_creg(op);
-	int size = check_c_limm(creg);
+	int size = check_limm(creg);
 	handleop32_MOV_do_op(breg, m_regs[creg], common32_get_F(op));
 	return m_pc + size;
 }
@@ -320,7 +320,7 @@ uint32_t arcompact_device::handleop32_MOV_cc_f_b_b_c(uint32_t op)
 {
 	uint8_t breg = common32_get_breg(op);
 	uint8_t creg = common32_get_creg(op);
-	int size = check_c_limm(creg);
+	int size = check_limm(creg);
 	if (check_condition(common32_get_condition(op)))
 		handleop32_MOV_do_op(breg, m_regs[creg], common32_get_F(op));
 	return m_pc + size;
@@ -830,7 +830,7 @@ void arcompact_device::handleop32_FLAG_do_op(uint32_t source)
 uint32_t arcompact_device::handleop32_FLAG_f_a_b_c(uint32_t op)
 {
 	uint8_t creg = common32_get_creg(op);
-	int size = check_c_limm(creg);
+	int size = check_limm(creg);
 	handleop32_FLAG_do_op(m_regs[creg]);
 	return m_pc + size;
 }
@@ -850,7 +850,7 @@ uint32_t arcompact_device::handleop32_FLAG_f_b_b_s12(uint32_t op)
 uint32_t arcompact_device::handleop32_FLAG_cc_f_b_b_c(uint32_t op)
 {
 	uint8_t creg = common32_get_creg(op);
-	int size = check_c_limm(creg);
+	int size = check_limm(creg);
 	if (check_condition(common32_get_condition(op)))
 		handleop32_FLAG_do_op(m_regs[creg]);
 	return m_pc + size;

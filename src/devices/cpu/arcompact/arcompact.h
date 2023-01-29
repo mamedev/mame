@@ -133,25 +133,25 @@ private:
 
 	// registers used in 16-bit opcodes have a limited range
 	// and can only address registers r0-r3 and r12-r15
-	uint8_t expand_reg(uint8_t reg)
+	uint8_t common16_get_and_expand_breg(uint16_t op)
 	{
+		uint8_t reg = ((op & 0x0700) >> 8);
 		if (reg>3) reg += 8;
 		return reg;
 	}
 
-	uint8_t common16_get_breg(uint16_t op)
+	uint8_t common16_get_and_expand_creg(uint16_t op)
 	{
-		return ((op & 0x0700) >> 8);
+		uint8_t reg = ((op & 0x00e0) >> 5);
+		if (reg>3) reg += 8;
+		return reg;
 	}
 
-	uint8_t common16_get_creg(uint16_t op)
+	uint8_t common16_get_and_expand_areg(uint16_t op)
 	{
-		return ((op & 0x00e0) >> 5);
-	}
-
-	uint8_t common16_get_areg(uint16_t op)
-	{
-		return ((op & 0x0007) >> 0);
+		uint8_t reg = ((op & 0x0007) >> 0);
+		if (reg>3) reg += 8;
+		return reg;
 	}
 
 	uint8_t common16_get_u3(uint16_t op)
@@ -232,7 +232,7 @@ private:
 		return (op & 0x00000fc0) >> 6;
 	}
 
-	int check_h_limm(uint8_t hreg)
+	int check_limm16(uint8_t hreg)
 	{
 		if (hreg == LIMM_REG)
 		{
@@ -242,9 +242,9 @@ private:
 		return 2;
 	}
 
-	int check_c_limm(uint8_t creg)
+	int check_limm(uint8_t reg)
 	{
-		if (creg == LIMM_REG)
+		if (reg == LIMM_REG)
 		{
 			get_limm_32bit_opcode();
 			return 8;
@@ -252,17 +252,7 @@ private:
 		return 4;
 	}
 
-	int check_b_limm(uint8_t breg)
-	{
-		if (breg == LIMM_REG)
-		{
-			get_limm_32bit_opcode();
-			return 8;
-		}
-		return 4;
-	}
-
-	int check_b_c_limm(uint8_t breg, uint8_t creg)
+	int check_limm(uint8_t breg, uint8_t creg)
 	{
 		if ((breg == LIMM_REG) || (creg == LIMM_REG))
 		{

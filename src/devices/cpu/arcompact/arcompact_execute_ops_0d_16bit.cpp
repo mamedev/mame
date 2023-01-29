@@ -11,8 +11,8 @@
 uint32_t arcompact_device::handleop_ADD_S_c_b_u3(uint16_t op)
 {
 	uint32_t u = common16_get_u3(op);
-	uint8_t breg = expand_reg(common16_get_breg(op));
-	uint8_t creg = expand_reg(common16_get_creg(op));
+	uint8_t breg = common16_get_and_expand_breg(op);
+	uint8_t creg = common16_get_and_expand_creg(op);
 	uint32_t result = m_regs[breg] + u;
 	m_regs[creg] = result;
 	return m_pc + 2;
@@ -25,8 +25,8 @@ uint32_t arcompact_device::handleop_ADD_S_c_b_u3(uint16_t op)
 uint32_t arcompact_device::handleop_SUB_S_c_b_u3(uint16_t op)
 {
 	uint32_t u = common16_get_u3(op);
-	uint8_t breg = expand_reg(common16_get_breg(op));
-	uint8_t creg = expand_reg(common16_get_creg(op));
+	uint8_t breg = common16_get_and_expand_breg(op);
+	uint8_t creg = common16_get_and_expand_creg(op);
 	uint32_t result = m_regs[breg] - u;
 	m_regs[creg] = result;
 	return m_pc + 2;
@@ -40,8 +40,8 @@ uint32_t arcompact_device::handleop_SUB_S_c_b_u3(uint16_t op)
 uint32_t arcompact_device::handleop_ASL_S_c_b_u3(uint16_t op)
 {
 	uint32_t u = common16_get_u3(op);
-	uint8_t breg = expand_reg(common16_get_breg(op));
-	uint8_t creg = expand_reg(common16_get_creg(op));
+	uint8_t breg = common16_get_and_expand_breg(op);
+	uint8_t creg = common16_get_and_expand_creg(op);
 	uint32_t result = m_regs[breg] << u;
 	m_regs[creg] = result;
 	return m_pc + 2;

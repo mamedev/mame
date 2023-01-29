@@ -11,7 +11,7 @@
 
 uint32_t arcompact_device::handleop_J_S_b(uint16_t op)
 {
-	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint8_t breg = common16_get_and_expand_breg(op);
 	return m_regs[breg];
 }
 
@@ -22,7 +22,7 @@ uint32_t arcompact_device::handleop_J_S_b(uint16_t op)
 
 uint32_t arcompact_device::handleop_J_S_D_b(uint16_t op)
 {
-	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint8_t breg = common16_get_and_expand_breg(op);
 	m_delayactive = 1;
 	m_delayjump = m_regs[breg];
 	m_delaylinks = 0;
@@ -36,7 +36,7 @@ uint32_t arcompact_device::handleop_J_S_D_b(uint16_t op)
 
 uint32_t arcompact_device::handleop_JL_S_b(uint16_t op) // JL_S
 {
-	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint8_t breg = common16_get_and_expand_breg(op);
 	m_regs[REG_BLINK] = m_pc + 2;
 	return m_regs[breg];
 }
@@ -48,7 +48,7 @@ uint32_t arcompact_device::handleop_JL_S_b(uint16_t op) // JL_S
 
 uint32_t arcompact_device::handleop_JL_S_D_b(uint16_t op) // JL_S.D
 {
-	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint8_t breg = common16_get_and_expand_breg(op);
 	m_delayactive = 1;
 	m_delayjump = m_regs[breg];
 	m_delaylinks = 1;

@@ -283,7 +283,7 @@ uint32_t arcompact_device::handleop32_general(uint32_t op, ophandler32 ophandler
 	{
 		uint8_t breg = common32_get_breg(op);
 		uint8_t creg = common32_get_creg(op);
-		int size = check_b_c_limm(breg, creg);
+		int size = check_limm(breg, creg);
 		m_regs[common32_get_areg(op)] = ophandler(this, m_regs[breg], m_regs[creg], common32_get_F(op));
 		return m_pc + size;
 	}
@@ -291,14 +291,14 @@ uint32_t arcompact_device::handleop32_general(uint32_t op, ophandler32 ophandler
 	case 0x01:
 	{
 		uint8_t breg = common32_get_breg(op);
-		int size = check_b_limm(breg);
+		int size = check_limm(breg);
 		m_regs[common32_get_areg(op)] = ophandler(this, m_regs[breg], common32_get_u6(op), common32_get_F(op));
 		return m_pc + size;
 	}
 	case 0x02:
 	{
 		uint8_t breg = common32_get_breg(op);
-		int size = check_b_limm(breg);
+		int size = check_limm(breg);
 		m_regs[breg] = ophandler(this, m_regs[breg], common32_get_s12(op), common32_get_F(op));
 		return m_pc + size;
 	}
@@ -310,7 +310,7 @@ uint32_t arcompact_device::handleop32_general(uint32_t op, ophandler32 ophandler
 		{
 			uint8_t breg = common32_get_breg(op);
 			uint8_t creg = common32_get_creg(op);
-			int size = check_b_c_limm(breg, creg);
+			int size = check_limm(breg, creg);
 			if (check_condition(common32_get_condition(op)))
 				m_regs[breg] = ophandler(this, m_regs[breg], m_regs[creg], common32_get_F(op));
 			return m_pc + size;
@@ -318,7 +318,7 @@ uint32_t arcompact_device::handleop32_general(uint32_t op, ophandler32 ophandler
 		case 0x01:
 		{
 			uint8_t breg = common32_get_breg(op);
-			int size = check_b_limm(breg);
+			int size = check_limm(breg);
 			if (check_condition(common32_get_condition(op)))
 				m_regs[breg] = ophandler(this, m_regs[breg], common32_get_u6(op), common32_get_F(op));
 			return m_pc + size;
@@ -337,7 +337,7 @@ uint32_t arcompact_device::handleop32_general_MULx64(uint32_t op, ophandler32_mu
 	{
 		uint8_t breg = common32_get_breg(op);
 		uint8_t creg = common32_get_creg(op);
-		int size = check_b_c_limm(breg, creg);
+		int size = check_limm(breg, creg);
 		ophandler(this, m_regs[breg], m_regs[creg]);
 		return m_pc + size;
 	}
@@ -345,14 +345,14 @@ uint32_t arcompact_device::handleop32_general_MULx64(uint32_t op, ophandler32_mu
 	case 0x01:
 	{
 		uint8_t breg = common32_get_breg(op);
-		int size = check_b_limm(breg);
+		int size = check_limm(breg);
 		ophandler(this, m_regs[breg], common32_get_u6(op));
 		return m_pc + size;
 	}
 	case 0x02:
 	{
 		uint8_t breg = common32_get_breg(op);
-		int size = check_b_limm(breg);
+		int size = check_limm(breg);
 		ophandler(this, m_regs[breg], common32_get_s12(op));
 		return m_pc + size;
 	}
@@ -364,7 +364,7 @@ uint32_t arcompact_device::handleop32_general_MULx64(uint32_t op, ophandler32_mu
 		{
 			uint8_t breg = common32_get_breg(op);
 			uint8_t creg = common32_get_creg(op);
-			int size = check_b_c_limm(breg, creg);
+			int size = check_limm(breg, creg);
 			if (!check_condition(common32_get_condition(op)))
 				return m_pc + size;
 			ophandler(this, m_regs[breg], m_regs[creg]);
@@ -374,7 +374,7 @@ uint32_t arcompact_device::handleop32_general_MULx64(uint32_t op, ophandler32_mu
 		case 0x01:
 		{
 			uint8_t breg = common32_get_breg(op);
-			int size = check_b_limm(breg);
+			int size = check_limm(breg);
 			if (!check_condition(common32_get_condition(op)))
 				return m_pc + size;
 			ophandler(this, m_regs[breg], common32_get_u6(op));
@@ -395,21 +395,21 @@ uint32_t arcompact_device::handleop32_general_nowriteback_forced_flag(uint32_t o
 	{
 		uint8_t breg = common32_get_breg(op);
 		uint8_t creg = common32_get_creg(op);
-		int size = check_b_c_limm(breg, creg);
+		int size = check_limm(breg, creg);
 		ophandler(this, m_regs[breg], m_regs[creg]);
 		return m_pc + size;
 	}
 	case 0x01:
 	{
 		uint8_t breg = common32_get_breg(op);
-		int size = check_b_limm(breg);
+		int size = check_limm(breg);
 		ophandler(this, m_regs[breg], common32_get_u6(op));
 		return m_pc + size;
 	}
 	case 0x02:
 	{
 		uint8_t breg = common32_get_breg(op);
-		int size = check_b_limm(breg);
+		int size = check_limm(breg);
 		ophandler(this, m_regs[breg], common32_get_s12(op));
 		return m_pc + size;
 	}
@@ -421,7 +421,7 @@ uint32_t arcompact_device::handleop32_general_nowriteback_forced_flag(uint32_t o
 		{
 			uint8_t breg = common32_get_breg(op);
 			uint8_t creg = common32_get_creg(op);
-			int size = check_b_c_limm(breg, creg);
+			int size = check_limm(breg, creg);
 			if (check_condition(common32_get_condition(op)))
 				ophandler(this, m_regs[breg], m_regs[creg]);
 			return m_pc + size;
@@ -429,7 +429,7 @@ uint32_t arcompact_device::handleop32_general_nowriteback_forced_flag(uint32_t o
 		case 0x01:
 		{
 			uint8_t breg = common32_get_breg(op);
-			int size = check_b_limm(breg);
+			int size = check_limm(breg);
 			if (check_condition(common32_get_condition(op)))
 				ophandler(this, m_regs[breg], common32_get_u6(op));
 			return m_pc + size;
@@ -449,14 +449,14 @@ uint32_t arcompact_device::handleop32_general_SOP_group(uint32_t op, ophandler32
 		{
 			uint8_t breg = common32_get_breg(op);
 			uint8_t creg = common32_get_creg(op);
-			int size = check_b_c_limm(breg, creg);
+			int size = check_limm(breg, creg);
 			m_regs[breg] = ophandler(this, m_regs[creg], common32_get_F(op));
 			return m_pc + size;
 		}
 		case 0x01:
 		{
 			uint8_t breg = common32_get_breg(op);
-			int size = check_b_limm(breg);
+			int size = check_limm(breg);
 			m_regs[breg] = ophandler(this, common32_get_u6(op), common32_get_F(op));
 			return m_pc + size;
 		}

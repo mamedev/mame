@@ -11,9 +11,9 @@
 
 uint32_t arcompact_device::handleop_LD_S_a_b_c(uint16_t op)
 {
-	uint8_t areg = expand_reg(common16_get_areg(op));
-	uint8_t breg = expand_reg(common16_get_breg(op));
-	uint8_t creg = expand_reg(common16_get_creg(op));
+	uint8_t areg = common16_get_and_expand_areg(op);
+	uint8_t breg = common16_get_and_expand_breg(op);
+	uint8_t creg = common16_get_and_expand_creg(op);
 	m_regs[areg] = READ32(m_regs[breg] + m_regs[creg]);
 	return m_pc + 2;
 }
@@ -25,9 +25,9 @@ uint32_t arcompact_device::handleop_LD_S_a_b_c(uint16_t op)
 
 uint32_t arcompact_device::handleop_LDB_S_a_b_c(uint16_t op)
 {
-	uint8_t areg = expand_reg(common16_get_areg(op));
-	uint8_t breg = expand_reg(common16_get_breg(op));
-	uint8_t creg = expand_reg(common16_get_creg(op));
+	uint8_t areg = common16_get_and_expand_areg(op);
+	uint8_t breg = common16_get_and_expand_breg(op);
+	uint8_t creg = common16_get_and_expand_creg(op);
 #ifdef ARCOMPACT_LD_DOES_NOT_EXTEND_BYTE_AND_WORD
 	m_regs[areg] = (m_regs[areg] & 0xffffff00) | READ8(m_regs[breg] + m_regs[creg]);
 #else
@@ -43,9 +43,9 @@ uint32_t arcompact_device::handleop_LDB_S_a_b_c(uint16_t op)
 
 uint32_t arcompact_device::handleop_LDW_S_a_b_c(uint16_t op)
 {
-	uint8_t areg = expand_reg(common16_get_areg(op));
-	uint8_t breg = expand_reg(common16_get_breg(op));
-	uint8_t creg = expand_reg(common16_get_creg(op));
+	uint8_t areg = common16_get_and_expand_areg(op);
+	uint8_t breg = common16_get_and_expand_breg(op);
+	uint8_t creg = common16_get_and_expand_creg(op);
 #ifdef ARCOMPACT_LD_DOES_NOT_EXTEND_BYTE_AND_WORD
 	m_regs[areg] = (m_regs[areg] & 0xffff0000) | READ16(m_regs[breg] + m_regs[creg]);
 #else
@@ -61,9 +61,9 @@ uint32_t arcompact_device::handleop_LDW_S_a_b_c(uint16_t op)
 
 uint32_t arcompact_device::handleop_ADD_S_a_b_c(uint16_t op) // ADD_S a <- b + c
 {
-	uint8_t areg = expand_reg(common16_get_areg(op));
-	uint8_t breg = expand_reg(common16_get_breg(op));
-	uint8_t creg = expand_reg(common16_get_creg(op));
+	uint8_t areg = common16_get_and_expand_areg(op);
+	uint8_t breg = common16_get_and_expand_breg(op);
+	uint8_t creg = common16_get_and_expand_creg(op);
 	m_regs[areg] = m_regs[breg] + m_regs[creg];
 	return m_pc + 2;
 }

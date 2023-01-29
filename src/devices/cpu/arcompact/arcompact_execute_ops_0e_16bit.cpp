@@ -14,8 +14,8 @@
 uint32_t arcompact_device::handleop_ADD_S_b_b_h_or_limm(uint16_t op) // ADD_s b, b, h
 {
 	uint8_t h = group_0e_get_h(op);
-	uint8_t breg = expand_reg(common16_get_breg(op));
-	int size = check_h_limm(h);
+	uint8_t breg = common16_get_and_expand_breg(op);
+	int size = check_limm16(h);
 	m_regs[breg] = m_regs[breg] + m_regs[h];
 	return m_pc+ size;
 }
@@ -30,8 +30,8 @@ uint32_t arcompact_device::handleop_ADD_S_b_b_h_or_limm(uint16_t op) // ADD_s b,
 uint32_t arcompact_device::handleop_MOV_S_b_h_or_limm(uint16_t op) // MOV_S b <- h
 {
 	uint8_t h = group_0e_get_h(op);
-	uint8_t breg = expand_reg(common16_get_breg(op));
-	int size = check_h_limm(h);
+	uint8_t breg = common16_get_and_expand_breg(op);
+	int size = check_limm16(h);
 	m_regs[breg] = m_regs[h];
 	return m_pc + size;
 }
@@ -44,9 +44,9 @@ uint32_t arcompact_device::handleop_MOV_S_b_h_or_limm(uint16_t op) // MOV_S b <-
 
 uint32_t arcompact_device::handleop_CMP_S_b_h_or_limm(uint16_t op)
 {
-	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint8_t breg = common16_get_and_expand_breg(op);
 	uint8_t h = group_0e_get_h(op);
-	int size = check_h_limm(h);
+	int size = check_limm16(h);
 	// flag setting ALWAYS occurs on CMP operations, even 16-bit ones even without a .F opcode type
 	uint32_t result = m_regs[breg] - m_regs[h];
 	do_flags_sub(result, m_regs[breg], m_regs[h]);
@@ -61,7 +61,7 @@ uint32_t arcompact_device::handleop_CMP_S_b_h_or_limm(uint16_t op)
 uint32_t arcompact_device::handleop_MOV_S_h_b(uint16_t op) // MOV_S h <- b
 {
 	uint8_t h = group_0e_get_h(op);
-	uint8_t breg = expand_reg(common16_get_breg(op));
+	uint8_t breg = common16_get_and_expand_breg(op);
 	m_regs[h] = m_regs[breg];
 	return m_pc + 2;
 }

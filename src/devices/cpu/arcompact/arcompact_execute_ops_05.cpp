@@ -12,13 +12,13 @@ uint32_t arcompact_device::arcompact_handle05_helper(uint32_t op, const char* op
 
 	if (!b_reserved)
 	{
-		size = check_b_limm(breg);
+		size = check_limm(breg);
 	}
 
 	if (p == 0)
 	{
 		uint8_t creg = common32_get_creg(op);
-		size = check_c_limm(creg);
+		size = check_limm(creg);
 	}
 	else if (p == 1)
 	{
@@ -32,7 +32,7 @@ uint32_t arcompact_device::arcompact_handle05_helper(uint32_t op, const char* op
 		if (M == 0)
 		{
 			uint8_t creg = common32_get_creg(op);
-			size = check_c_limm(creg);
+			size = check_limm(creg);
 		}
 	}
 	arcompact_log("unimplemented %s %08x (04 type helper)", optext, op);

@@ -53,7 +53,7 @@ uint32_t arcompact_device::handleop32_BRxx_reg_reg(uint32_t op, uint8_t conditio
 	uint8_t creg = common32_get_creg(op);
 	uint8_t breg = common32_get_breg(op);
 	int n = (op & 0x00000020) >> 5;
-	int size = check_b_c_limm(breg, creg);
+	int size = check_limm(breg, creg);
 	uint32_t b = m_regs[breg];
 	uint32_t c = m_regs[creg];
 	if (BRxx_condition(condition, b, c))
@@ -70,7 +70,7 @@ uint32_t arcompact_device::handleop32_BRxx_reg_imm(uint32_t op, uint8_t conditio
 	uint32_t u = common32_get_u6(op);
 	uint8_t breg = common32_get_breg(op);
 	int n = (op & 0x00000020) >> 5;
-	int size = check_b_limm(breg);
+	int size = check_limm(breg);
 	uint32_t b = m_regs[breg];
 	uint32_t c = u;
 	if (BRxx_condition(condition, b, c))
