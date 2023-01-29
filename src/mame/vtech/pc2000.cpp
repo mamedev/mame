@@ -1143,7 +1143,7 @@ ROM_END
 //    YEAR  NAME      PARENT  COMPAT MACHINE    INPUT    CLASS         INIT        COMPANY                    FULLNAME                                  FLAGS
 COMP( 1988, pc1000,   0,      0,     pc1000,    pc1000,  pc1000_state, empty_init, "Video Technology",        "PreComputer 1000",                       MACHINE_NOT_WORKING )
 COMP( 1988, misterx,  0,      0,     misterx,   pc1000,  pc1000_state, empty_init, "Video Technology / Yeno", "MisterX",                                MACHINE_NOT_WORKING )
-COMP( 198?, primusex, 0,      0,     misterx,   pc1000,  pc1000_state, empty_init, "Yeno",                    "Primus Expert mit Stimme",               MACHINE_NOT_WORKING )
+COMP( 198?, primusex, 0,      0,     misterx,   pc1000,  pc1000_state, empty_init, "Yeno",                    "Primus Expert mit Stimme",               MACHINE_IS_SKELETON )
 COMP( 1988, ordisava, 0,      0,     pc1000,    pc1000,  pc1000_state, empty_init, "Video Technology",        "Ordisavant (France)",                    MACHINE_NOT_WORKING )
 COMP( 1993, pc2000,   0,      0,     pc2000,    pc2000,  pc2000_state, empty_init, "Video Technology",        "PreComputer 2000",                       MACHINE_NOT_WORKING )
 COMP( 1993, pc2000s,  pc2000, 0,     pc2000eur, pc2000,  pc2000_state, empty_init, "Video Technology",        "PreComputer 2000 (Spain)",               MACHINE_NOT_WORKING )
