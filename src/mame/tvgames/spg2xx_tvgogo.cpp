@@ -9,6 +9,8 @@
 #include "softlist_dev.h"
 
 
+namespace {
+
 class tvgogo_state : public spg2xx_game_state
 {
 public:
@@ -263,6 +265,8 @@ ROM_START( tvgogo )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	// no internal ROM? (Camera might have an MCU tho)
 ROM_END
+
+} // anonymous namespace
 
 
 // Toyquest games

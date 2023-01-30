@@ -179,6 +179,8 @@ BIT N - ( scale < 50% ) ? 1 : 0
 #include "speaker.h"
 
 
+namespace {
+
 static const int ZOOM_TABLE_SIZE=1<<14;
 static const int NUM_SCANLINES=256-8;
 static const int NUM_VBLANK_LINES=8;
@@ -782,5 +784,8 @@ ROM_START( wheelfir )
 	ROM_REGION16_BE(0x80, "eeprom", 0)
 	ROM_LOAD16_WORD_SWAP( "eeprom", 0x000000, 0x000080, CRC(961e4bc9) SHA1(8944504bf56a272e9aa08185e73c6b4212d52383) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 199?, wheelfir,    0, wheelfir,    wheelfir, wheelfir_state, empty_init, ROT0,  "TCH", "Wheels & Fire", MACHINE_IMPERFECT_GRAPHICS)

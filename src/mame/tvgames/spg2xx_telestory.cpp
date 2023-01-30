@@ -9,6 +9,8 @@
 #include "softlist_dev.h"
 
 
+namespace {
+
 class telestory_state : public spg2xx_game_state
 {
 public:
@@ -294,6 +296,8 @@ ROM_START( telestry )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	// no internal ROM, only RAM
 ROM_END
+
+} // anonymous namespace
 
 
 /* Sound data for the narrator is written to the SIO data port

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Jonathan Gevaryahu
-#ifndef MAME_MACHINE_TAITOCCHIP_H
-#define MAME_MACHINE_TAITOCCHIP_H
+#ifndef MAME_TAITO_TAITOCCHIP_H
+#define MAME_TAITO_TAITOCCHIP_H
 
 #pragma once
 
@@ -65,4 +65,4 @@ private:
 	devcb_write8       m_out_pc_cb;
 };
 
-#endif // MAME_MACHINE_TAITOCCHIP_H
+#endif // MAME_TAITO_TAITOCCHIP_H

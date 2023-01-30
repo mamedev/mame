@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_MACHINE_XAVIX_MTRK_WHEEL_H
-#define MAME_MACHINE_XAVIX_MTRK_WHEEL_H
+#ifndef MAME_TVGAMES_XAVIX_MTRK_WHEEL_H
+#define MAME_TVGAMES_XAVIX_MTRK_WHEEL_H
 
 #pragma once
 
@@ -37,4 +37,4 @@ private:
 	int m_is_running;
 };
 
-#endif // MAME_MACHINE_XAVIX_MTRK_WHEEL_H
+#endif // MAME_TVGAMES_XAVIX_MTRK_WHEEL_H

@@ -5,6 +5,8 @@
 #include "spg2xx.h"
 
 
+namespace {
+
 class shredmjr_game_state : public spg2xx_game_state
 {
 public:
@@ -223,7 +225,7 @@ ROM_START( guitarstp )
 	ROM_LOAD16_WORD_SWAP( "29gl064.u2", 0x000000, 0x800000, CRC(1dbcff73) SHA1(b179e4da6f38e7d5ec796bf846a63492d30eb0f5) )
 ROM_END
 
-
+} // anonymous namespace
 
 
 

@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_6883SAM_H
-#define MAME_MACHINE_6883SAM_H
+#ifndef MAME_TRS_6883SAM_H
+#define MAME_TRS_6883SAM_H
 
 #pragma once
 
@@ -216,4 +216,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SAM6883, sam6883_device)
 
-#endif // MAME_MACHINE_6883SAM_H
+#endif // MAME_TRS_6883SAM_H
