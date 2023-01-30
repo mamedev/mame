@@ -38,7 +38,6 @@ amstrad/pc1512.cpp
 amstrad/pcw.cpp
 amstrad/pcw16.cpp
 amstrad/pda600.cpp
-amstrad/pda600_copro.cpp
 apf/apf.cpp
 apollo/apollo.cpp
 apple/apple1.cpp

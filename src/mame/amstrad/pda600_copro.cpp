@@ -78,6 +78,10 @@ pda600_copro_device::pda600_copro_device(const machine_config &mconfig, const ch
 	, device_buffered_serial_interface(mconfig, *this)
 	, m_tx_cb(*this)
 	, m_tone_cb(*this)
+	, m_state(0)
+	, m_resp_type(0)
+	, m_resp_data(0)
+	, m_buf_size(0)
 {
 }
 
@@ -100,6 +104,8 @@ void pda600_copro_device::device_start()
 	save_item(NAME(m_state));
 	save_item(NAME(m_resp_type));
 	save_item(NAME(m_resp_data));
+	save_item(NAME(m_buf));
+	save_item(NAME(m_buf_size));
 
 	m_update_timer = timer_alloc(FUNC(pda600_copro_device::update_timer), this);
 }
@@ -111,7 +117,7 @@ void pda600_copro_device::device_reset()
 	m_tone_cb(0);
 
 	m_state = STATE_READY;
-	m_buf.clear();
+	m_buf_size = 0;
 	m_resp_type = m_resp_data = 0;
 
 	m_update_timer->adjust(attotime::never);
@@ -120,11 +126,12 @@ void pda600_copro_device::device_reset()
 
 TIMER_CALLBACK_MEMBER(pda600_copro_device::update_timer)
 {
-	if (m_state == STATE_PLAY_TONE && m_buf.size() >= 2)
+	if (m_state == STATE_PLAY_TONE && m_buf_size >= 2)
 	{
 		m_tone_cb(m_buf[0]);
 		m_update_timer->adjust(attotime::from_msec(m_buf[1] * 10));
-		m_buf.erase(m_buf.begin(), m_buf.begin() + 2);
+		m_buf_size -= 2;
+		std::memmove(m_buf.begin(), m_buf.begin() + 2, m_buf_size);
 	}
 	else
 	{
@@ -176,32 +183,32 @@ void pda600_copro_device::received_byte(u8 byte)
 			send_byte(PDA600_NAK);
 		}
 
-		if (m_buf.size() > 2 && m_buf[2] == 'S')
+		if (m_buf_size > 2 && m_buf[2] == 'S')
 			m_state = STATE_SLEEP;
 		else
 			m_state = STATE_READY;
 
-		m_buf.clear();
+		m_buf_size = 0;
 		return;
 	}
 
-	m_buf.push_back(byte);
+	m_buf[m_buf_size++] = byte;
 
 	if (m_buf[0] == PDA600_ACK)
 	{
-		m_buf.clear();
+		m_buf_size = 0;
 	}
 	else if (m_buf[0] != PDA600_SOH)
 	{
 		logerror("PDA600: unknown start %02x\n", byte);
 		send_byte(PDA600_NAK);
-		m_buf.clear();
+		m_buf_size = 0;
 	}
-	else if (m_buf.size() == 1)
+	else if (m_buf_size == 1)
 	{
 		send_byte(PDA600_ACK);
 	}
-	else if (m_buf.size() == m_buf[1] + 3)
+	else if (m_buf_size == m_buf[1] + 3)
 	{
 		if (0)
 		{
@@ -213,7 +220,7 @@ void pda600_copro_device::received_byte(u8 byte)
 		}
 
 		u8 checksum = 0;
-		for (int i = 1; i < m_buf.size(); i++)
+		for (int i = 1; i < m_buf_size; i++)
 			checksum += m_buf[i];
 
 		m_resp_type = m_resp_data = 0;
@@ -305,8 +312,8 @@ void pda600_copro_device::exec_beep()
 
 	m_resp_type = m_resp_data = 0;  // Empty response
 	m_state = STATE_PLAY_TONE;
-	m_buf.erase(m_buf.begin(), m_buf.begin() + 3);
-	m_buf.pop_back();
+	m_buf_size -= 4;
+	std::memmove(m_buf.begin(), m_buf.begin() + 3, m_buf_size);
 	m_update_timer->adjust(attotime::zero);
 }
 

@@ -53,10 +53,11 @@ private:
 	devcb_write_line m_tx_cb;
 	devcb_write8     m_tone_cb;
 	emu_timer *      m_update_timer;
-	u8               m_state = 0;
-	u8               m_resp_type = 0;
-	u8               m_resp_data = 0;
-	std::vector<u8>  m_buf;
+	u8               m_state;
+	u8               m_resp_type;
+	u8               m_resp_data;
+	u8               m_buf_size;
+	std::array<u8,256> m_buf;
 };
 
 

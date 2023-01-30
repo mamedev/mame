@@ -158,8 +158,8 @@ private:
 	u8   m_pen_shift    = 0;
 	u8   m_pen_cnt      = 0;
 	u32  m_card_size    = 0;
-	int  m_rtc_irq      = 0;
-	int  m_serl_clk     = 0;
+	u8   m_rtc_irq      = 0;
+	u8   m_serl_clk     = 0;
 	u8   m_io_regs[4]   = {};
 	u8   m_lcd_ar       = 0;
 	u8   m_lcd_regs[32] = {};
