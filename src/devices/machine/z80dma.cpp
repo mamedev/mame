@@ -460,7 +460,7 @@ int z80dma_device::do_write()
 	uint8_t mode;
 
 	mode = TRANSFER_MODE;
-	if (m_count == 0x0000)
+	if (m_byte_counter == 0x0000)
 	{
 		//FIXME: Any signal here
 	}
@@ -487,7 +487,13 @@ int z80dma_device::do_write()
 	m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
 
 	m_byte_counter++;
-	done = (m_count == m_byte_counter);
+	/*
+	 * HACK: The user manual states that 216+1 bytes are transferred when the
+	 * block length is set to zero, however it also states the maximum length
+	 * is 64Kbytes. For transfers less than the maximum, the value in the block
+	 * length regster is set to N-1.
+	 */
+	done = (m_byte_counter == (m_count ? m_count + 1 : m_count));
 
 	if (done)
 	{
