@@ -84,6 +84,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="speller" supported="no">
+		<description>Pre-Computer Speller</description>
+		<year>1988</year>
+		<publisher>VTech</publisher>
+		<part name="rom" interface="genius_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom name="27-00867-000.ic1" size="0x20000" crc="71c54de1" sha1="9b0d253d286e6353c5e6113d07f5cfe4fe77d889" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sportstr">
 		<description>Sports Trivia</description>
 		<year>1988</year>
