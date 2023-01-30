@@ -11,6 +11,127 @@
 
 #include "arcompactdasm.h"
 
+
+// MOV is a special case because 'a' is completely ignored even where
+// it would usually be the destination.
+// as a result, b is always the destination, and LIMM handling is different
+// it also has an official NOP alias for no destination + no flag cases
+int arcompact_disassembler::handle04_MOV_f_a_b_c_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	int size = 4;
+	uint8_t breg = dasm_common32_get_breg(op);
+	uint8_t F = dasm_common32_get_F(op);
+	uint8_t creg = dasm_common32_get_creg(op);
+	util::stream_format(stream, "MOV%s", flagbit[F]);
+	util::stream_format(stream, " %s,", regnames[breg]);
+	if (creg == DASM_LIMM_REG)
+	{
+		uint32_t limm = dasm_get_limm_32bit_opcode(pc, opcodes);
+		size = 8;
+		util::stream_format(stream, " 0x%08x", limm);
+	}
+	else
+	{
+		util::stream_format(stream, " %s", regnames[creg]);
+	}
+	return size;
+}
+
+int arcompact_disassembler::handle04_MOV_f_a_b_u6_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	int size = 4;
+	uint8_t breg = dasm_common32_get_breg(op);
+	uint8_t F = dasm_common32_get_F(op);
+	uint32_t u = dasm_common32_get_u6(op);
+	// if there's no destination and no flags being set, this is a NOP
+	if ((F == 0) & (breg == DASM_LIMM_REG))
+	{
+		util::stream_format(stream, "NOP");
+	}
+	else
+	{
+		util::stream_format(stream, "MOV%s", flagbit[F]);
+		util::stream_format(stream, " %s,", regnames[breg]);
+		util::stream_format(stream, " 0x%02x", u);
+	}
+	return size;
+}
+
+
+int arcompact_disassembler::handle04_MOV_f_b_b_s12_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	uint8_t breg = dasm_common32_get_breg(op);
+	uint8_t F = dasm_common32_get_F(op);
+	uint32_t S = dasm_common32_get_s12(op);
+	util::stream_format(stream, "MOV%s", flagbit[F]);
+	util::stream_format(stream, " %s, ", regnames[breg]);
+	util::stream_format(stream, "S(%02x)", S);
+	return 4;
+}
+
+int arcompact_disassembler::handle04_MOV_cc_f_b_b_c_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	int size = 4;
+	uint8_t breg = dasm_common32_get_breg(op);
+	uint8_t F = dasm_common32_get_F(op);
+	uint8_t condition = dasm_common32_get_condition(op);
+	uint8_t creg = dasm_common32_get_creg(op);
+	util::stream_format(stream, "MOV%s", flagbit[F]);
+	util::stream_format(stream, " %s, ", regnames[breg]);
+	util::stream_format(stream, " Cond<%s> ", conditions[condition]);
+	if (creg == DASM_LIMM_REG)
+	{
+		uint32_t limm = dasm_get_limm_32bit_opcode(pc, opcodes);
+		size = 8;
+		util::stream_format(stream, " 0x%08x ", limm);
+	}
+	else
+	{
+		util::stream_format(stream, "C(%s)", regnames[creg]);
+	}
+	return size;
+}
+
+int arcompact_disassembler::handle04_MOV_cc_f_b_b_u6_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{	
+	uint8_t breg = dasm_common32_get_breg(op);
+	uint8_t F = dasm_common32_get_F(op);
+	uint8_t condition = dasm_common32_get_condition(op);
+	uint32_t u = dasm_common32_get_u6(op);
+	util::stream_format(stream, "MOV%s", flagbit[F]);
+	util::stream_format(stream, " %s, ", regnames[breg]);
+	util::stream_format(stream, " Cond<%s> ", conditions[condition]);
+	util::stream_format(stream, "U(%02x)", u);
+	return 4;
+}
+
+int arcompact_disassembler::handle04_MOV_p11_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	int M = (op & 0x00000020) >> 5; op &= ~0x00000020;
+	switch (M)
+	{
+		case 0x00: return handle04_MOV_cc_f_b_b_c_helper_dasm(stream, pc, op, opcodes);
+		case 0x01: return handle04_MOV_cc_f_b_b_u6_helper_dasm(stream, pc, op, opcodes);
+	}
+	return 0;
+}
+
+
+int arcompact_disassembler::handle04_MOV_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+{
+	uint8_t p = dasm_common32_get_p(op);
+	switch (p)
+	{
+		case 0x00: return handle04_MOV_f_a_b_c_helper_dasm(stream, pc, op, opcodes);
+		case 0x01: return handle04_MOV_f_a_b_u6_helper_dasm(stream, pc, op, opcodes);
+		case 0x02: return handle04_MOV_f_b_b_s12_helper_dasm(stream, pc, op, opcodes);
+		case 0x03: return handle04_MOV_p11_helper_dasm(stream, pc, op, opcodes);
+	}
+
+	return 0;
+}
+
+
 int arcompact_disassembler::handle_dasm32_ADD(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "ADD", 0,0);
@@ -63,7 +184,7 @@ int arcompact_disassembler::handle_dasm32_MIN(std::ostream &stream, offs_t pc, u
 
 int arcompact_disassembler::handle_dasm32_MOV(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
-	return handle04_helper_dasm(stream, pc, op, opcodes, "MOV", 1,0);
+	return handle04_MOV_helper_dasm(stream, pc, op, opcodes);
 }
 
 int arcompact_disassembler::handle_dasm32_TST(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
