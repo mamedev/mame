@@ -559,6 +559,10 @@ private:
 	uint32_t handleop32_NEGS(uint32_t op);
 	static uint32_t handleop32_NORMW_do_op(void* obj, uint32_t src, uint8_t set_flags);
 
+	uint32_t handleop32_UNKNOWN_05_0c(uint32_t op);
+	uint32_t handleop32_UNKNOWN_05_10(uint32_t op);
+	uint32_t handleop32_UNKNOWN_05_14(uint32_t op);
+
 	uint32_t handleop32_ARC_EXT06(uint32_t op);
 	uint32_t handleop32_USER_EXT07(uint32_t op);
 	uint32_t handleop32_USER_EXT08(uint32_t op);

@@ -369,4 +369,25 @@ uint32_t arcompact_device::handleop32_SUBSDW(uint32_t op)
 	return arcompact_handle05_helper(op, "SUBSDW", 0,0);
 }
 
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Unknown Extension Ops
+//
+// the Leapster BIOS makes use of these in one small area of the code
+// probably dual-16bit ops, but also making use of a bunch of AUX ports for data?
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+uint32_t arcompact_device::handleop32_UNKNOWN_05_0c(uint32_t op)
+{
+	return arcompact_handle05_helper(op, "UNKNOWN_05_0c", 0,0);
+}
+
+uint32_t arcompact_device::handleop32_UNKNOWN_05_10(uint32_t op)
+{
+	return arcompact_handle05_helper(op, "UNKNOWN_05_10", 0,0);
+}
+
+uint32_t arcompact_device::handleop32_UNKNOWN_05_14(uint32_t op)
+{
+	return arcompact_handle05_helper(op, "UNKNOWN_05_14", 0,0);
+}
 
