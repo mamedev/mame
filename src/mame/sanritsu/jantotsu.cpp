@@ -493,7 +493,7 @@ void jantotsu_state::machine_reset()
 void jantotsu_state::jantotsu(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 18.432_MHz_XTAL / 4);
+	Z80(config, m_maincpu, XTAL(18'432'000) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jantotsu_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &jantotsu_state::io_map);
 
@@ -511,10 +511,10 @@ void jantotsu_state::jantotsu(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76489A(config, "sn1", 18.432_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
-	SN76489A(config, "sn2", 18.432_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489A(config, "sn1", XTAL(18'432'000) / 6).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489A(config, "sn2", XTAL(18'432'000) / 6).add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	MSM5205(config, m_adpcm, 384_kHz_XTAL);
+	MSM5205(config, m_adpcm, XTAL(384'000));
 	m_adpcm->vck_legacy_callback().set(FUNC(jantotsu_state::adpcm_int));  // interrupt function
 	m_adpcm->set_prescaler_selector(msm5205_device::S64_4B);  // 6 KHz
 	m_adpcm->add_route(ALL_OUTPUTS, "mono", 1.00);
