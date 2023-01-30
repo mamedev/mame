@@ -240,6 +240,7 @@ private:
 	uint32_t leapster_180b004_r();
 	uint32_t leapster_180b008_r();
 	uint32_t leapster_180d400_r();
+	uint32_t leapster_180d514_r();
 	uint32_t leapster_180d800_r();
 
 	void leapster_aux0047_w(uint32_t data);
@@ -390,12 +391,20 @@ uint32_t leapster_state::leapster_180b008_r()
 	logerror("%s: leapster_180b008_r\n", machine().describe_context());
 	return 0x00000001;
 }
+
 uint32_t leapster_state::leapster_180d400_r()
 {
 	logerror("%s: leapster_180d400_r (return usually checked against 0x0030d400)\n", machine().describe_context());
 	// does a BRLO.ND against it
 	// loops against 0x0030d400 (3,200,000) at 4003A52A for example
 	return 0x0030d400;
+}
+
+uint32_t leapster_state::leapster_180d514_r()
+{
+	logerror("%s: leapster_180d514_r (return usually checked against 0x0030d400)\n", machine().describe_context());
+	// leapster -bios 0 does a BRNE in a loop comparing with 0x80
+	return 0x00000080;
 }
 
 uint32_t leapster_state::leapster_180d800_r()
@@ -465,6 +474,8 @@ void leapster_state::leapster_map(address_map &map)
 	map(0x0180b008, 0x0180b00b).r(FUNC(leapster_state::leapster_180b008_r));
 
 	map(0x0180d400, 0x0180d403).r(FUNC(leapster_state::leapster_180d400_r));
+
+	map(0x0180d514, 0x0180d517).r(FUNC(leapster_state::leapster_180d514_r));
 
 	map(0x0180d800, 0x0180d803).r(FUNC(leapster_state::leapster_180d800_r));
 	
