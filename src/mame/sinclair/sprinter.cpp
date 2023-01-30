@@ -596,7 +596,7 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		break;
 
 	case 0x88:
-		if (CBL_INT_ENA)
+		if (CBL_MODE)
 			m_cbl_data[m_cbl_wa++] = data << 8;
 		else
 		{
@@ -735,7 +735,7 @@ TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
 	m_rdac->write(CBL_STEREO ? m_cbl_data[m_cbl_cnt++] : left);
 
 	if (CBL_INT_ENA && !(m_cbl_cnt & 0x7f))
-		m_maincpu->set_input_line(0, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 void sprinter_state::accel_control_r(u8 data)
@@ -1191,7 +1191,7 @@ void sprinter_state::do_cpu_wait(u8 count)
 
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_on)
 {
-	m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	m_irq_off_timer->adjust(attotime::from_hz(3.5_MHz_XTAL / 32));
 }
 
@@ -1231,7 +1231,7 @@ INPUT_PORTS_START( sprinter )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
 
 	PORT_START("TURBO")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Turbo") PORT_CODE(KEYCODE_F12) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, sprinter_state, turbo_changed, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Turbo") PORT_CODE(KEYCODE_F11) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, sprinter_state, turbo_changed, 0)
 INPUT_PORTS_END
 
 void sprinter_state::sprinter(machine_config &config)
@@ -1247,7 +1247,7 @@ void sprinter_state::sprinter(machine_config &config)
 	m_maincpu->set_io_map(&sprinter_state::map_io);
 	m_maincpu->set_vblank_int("screen", FUNC(sprinter_state::sprinter_int));
 	m_maincpu->nomreq_cb().set_nop();
-	m_maincpu->irqack_cb().set([this](int){ m_maincpu->set_input_line(0, CLEAR_LINE); });
+	m_maincpu->irqack_cb().set([this](int){ m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); });
 
 	m_screen->set_raw(X_SP / 3, SPRINT_WIDTH, SPRINT_HEIGHT, { 0, SPRINT_XVIS - 1, 0, SPRINT_YVIS - 1 });
 	m_screen->set_screen_update(FUNC(sprinter_state::screen_update));
