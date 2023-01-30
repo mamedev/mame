@@ -24,6 +24,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class sm1800_state : public driver_device
 {
 public:
@@ -202,6 +204,9 @@ ROM_START( sm1800 )
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "font.bin", 0x0000, 0x0800, CRC(28ed9ebc) SHA1(f561136962a06a5dcb5a0436931d29e940155d24))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

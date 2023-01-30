@@ -8,6 +8,9 @@
 #include "spg2xx.h"
 #include "machine/nvram.h"
 
+
+namespace {
+
 class jakks_state : public spg2xx_game_state
 {
 public:
@@ -198,6 +201,8 @@ ROM_START( jak_mpacw )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "wirelessnamco.bin", 0x000000, 0x200000, CRC(78a318ca) SHA1(3c2601cbb023edb6a1f3d4bce686e0be1ef63eee) )
 ROM_END
+
+} // anonymous namespace
 
 
 // Pre-GameKey units

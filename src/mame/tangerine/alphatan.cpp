@@ -39,6 +39,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class alphatan_state : public driver_device
 {
 public:
@@ -225,6 +227,8 @@ ROM_START(alphatan)
 	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_LOAD("tantel2732.bin", 0x0000, 0x1000, CRC(875c1ce9) SHA1(76e874cbc5d1341b09f57424181f24bdb31da210))
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME       PARENT  COMPAT  MACHINE     INPUT      CLASS           INIT        COMPANY    FULLNAME        FLAGS

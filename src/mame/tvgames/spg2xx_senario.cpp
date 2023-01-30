@@ -20,6 +20,8 @@
 #include "machine/intelfsh.h"
 
 
+namespace {
+
 class spg2xx_senario_state : public spg2xx_game_state
 {
 public:
@@ -324,6 +326,7 @@ ROM_START( senbbs )
 	ROM_LOAD16_WORD_SWAP( "bigbonusslots.bin", 0x000000, 0x800000, CRC(071effc3) SHA1(892c05a8b64a388b331ad0d361bf4c523c6c14c9) )
 ROM_END
 
+} // anonymous namespace
 
 
 CONS( 2005, senbbs,      0,     0,        senbbs,       senbbs,    spg2xx_senario_bbs_state,   empty_init, "Senario", "Big Bonus Slots (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

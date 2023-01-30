@@ -20,6 +20,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class elan_ep3a19a_state : public driver_device
 {
 public:
@@ -345,6 +348,9 @@ void elan_ep3a19a_state::init_tvbg()
 		ROM[i] = bitswap<8>(ROM[i], 6, 5, 7, 0, 2, 3, 1, 4);
 	}
 }
+
+} // anonymous namespace
+
 
 CONS( 2007, tvbg6a, 0, 0, elan_ep3a19a, tvbg_1button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 6-in-1: Silly 6 Pins, Candy Land, Hungry Hungry Hippos, Match 'em, Mixin' Pics, Checkers", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=zajzQo47YYA
 CONS( 2007, tvbg6b, 0, 0, elan_ep3a19a, tvbg_1button, elan_ep3a19a_state, init_tvbg, "NSI International / Mammoth Toys (Licensed by Hasbro)", "TV Board Games 6-in-1: Simon, Battleship, Mouse Trap, Checkers, Link-a-Line, Roll Over", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // https://www.youtube.com/watch?v=JbrR67kY8MI

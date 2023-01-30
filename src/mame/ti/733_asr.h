@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Raphael Nabet
-#ifndef MAME_VIDEO_733_ASR
-#define MAME_VIDEO_733_ASR
+#ifndef MAME_TI_733_ASR
+#define MAME_TI_733_ASR
 
 #pragma once
 
@@ -79,4 +79,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ASR733, asr733_device)
 
-#endif // MAME_VIDEO_733_ASR
+#endif // MAME_TI_733_ASR

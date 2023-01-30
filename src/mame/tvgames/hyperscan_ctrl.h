@@ -2,8 +2,8 @@
 // copyright-holders:Sandro Ronco
 
 
-#ifndef MAME_MACHINE_HYPERSCAN_CTRL_H
-#define MAME_MACHINE_HYPERSCAN_CTRL_H
+#ifndef MAME_TVGAMES_HYPERSCAN_CTRL_H
+#define MAME_TVGAMES_HYPERSCAN_CTRL_H
 
 #pragma once
 
@@ -28,4 +28,4 @@ private:
 
 DECLARE_DEVICE_TYPE(HYPERSCAN_CTRL, hyperscan_ctrl_device)
 
-#endif // MAME_MACHINE_HYPERSCAN_CTRL_H
+#endif // MAME_TVGAMES_HYPERSCAN_CTRL_H
