@@ -419,7 +419,13 @@ void m68000_device::start_interrupt_vector_lookup()
 	// flag for berr -> spurious
 
 	int level = m_next_state >> 24;
-	standard_irq_callback(level);
+	if(m_interrupt_mixer)
+		standard_irq_callback(level);
+	else {
+		for(int i=0; i<3; i++)
+			if(level & (1<<i))
+				standard_irq_callback(i);
+	}
 
 	// Clear the nmi flag
 	if(level == 7) {
