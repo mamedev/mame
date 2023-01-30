@@ -302,7 +302,7 @@ int arcompact_disassembler::handle_dasm32_JLcc_D(std::ostream &stream, offs_t pc
 	return handle04_helper_dasm(stream, pc, op, opcodes, "JL.D", 1,1);
 }
 
-int arcompact_disassembler::handle_dasm32_LP(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes) // LPcc (loop setup)
+int arcompact_disassembler::handle_dasm32_LP(std::ostream& stream, offs_t pc, uint32_t op, const data_buffer& opcodes) // LPcc (loop setup)
 {
 	uint8_t breg = dasm_common32_get_breg(op); // breg is reserved
 	uint8_t p = dasm_common32_get_p(op);
@@ -318,18 +318,18 @@ int arcompact_disassembler::handle_dasm32_LP(std::ostream &stream, offs_t pc, ui
 	else if (p == 0x02) // Loop unconditional
 	{ // 0010 0RRR 1010 1000 0RRR ssss ssSS SSSS
 		uint32_t S = dasm_common32_get_s12(op);
-		if (S & 0x800) S = -0x800 + (S&0x7ff);
+		if (S & 0x800) S = -0x800 + (S & 0x7ff);
 
-		util::stream_format(stream, "LP (start %08x, end %08x)", pc + 4, pc + S*2);
+		util::stream_format(stream, "LP (start %08x, end %08x)", pc + 4, (pc & 0xfffffffc) + S * 2);
 	}
 	else if (p == 0x03) // Loop conditional
 	{ // 0010 0RRR 1110 1000 0RRR uuuu uu1Q QQQQ
 		uint32_t u = dasm_common32_get_u6(op);
 		uint8_t condition = dasm_common32_get_condition(op);
-		util::stream_format(stream, "LP<%s> (start %08x, end %08x)", conditions[condition], pc + 4, (pc&0xfffffffc) + u*2);
+		util::stream_format(stream, "LP<%s> (start %08x, end %08x)", conditions[condition], pc + 4, (pc & 0xfffffffc) + u * 2);
 
-		int unused = (op & 0x00000020)>>5;
-		if (unused==0)  util::stream_format(stream, "(unused bit not set)");
+		int unused = (op & 0x00000020) >> 5;
+		if (unused == 0)  util::stream_format(stream, "(unused bit not set)");
 
 	}
 
