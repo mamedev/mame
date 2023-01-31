@@ -45,6 +45,9 @@
 
 #include "utf8.h"
 
+
+namespace {
+
 enum
 {
 	TEXT = 0,
@@ -1012,6 +1015,9 @@ ROM_START(las3000)
 	ROM_REGION(0x100, "fdc", 0)
 	ROM_LOAD ( "l3kdisk.rom", 0x0000, 0x0100, CRC(2d4b1584) SHA1(989780b77e100598124df7b72663e5a31a3339c0))
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY             FULLNAME      FLAGS
 COMP( 1983, las3000, 0,      0,      laser3k, laser3k, laser3k_state, empty_init, "Video Technology", "Laser 3000", MACHINE_NOT_WORKING )

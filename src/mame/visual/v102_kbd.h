@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
 
-#ifndef MAME_MACHINE_V102_KBD_H
-#define MAME_MACHINE_V102_KBD_H
+#ifndef MAME_VISUAL_V102_KBD_H
+#define MAME_VISUAL_V102_KBD_H
 
 #pragma once
 
@@ -60,4 +60,4 @@ protected:
 DECLARE_DEVICE_TYPE(V102_KEYBOARD, v102_keyboard_device)
 DECLARE_DEVICE_TYPE(V550_KEYBOARD, v550_keyboard_device)
 
-#endif // MAME_MACHINE_V102_KBD_H
+#endif // MAME_VISUAL_V102_KBD_H
