@@ -127,6 +127,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 static INPUT_PORTS_START( mu100 )
 	PORT_START("P7")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Enter")     PORT_CODE(KEYCODE_ENTER)
@@ -778,6 +780,9 @@ ROM_START( mu100b )
 	ROM_LOAD32_WORD( "xt462a0.ic39", 0x1000000, 0x400000, CRC(2e82cbd4) SHA1(d1f0e2713bf2cca9156c562e23fcce4fa5d7cfb3) )
 	ROM_LOAD32_WORD( "xt463a0.ic38", 0x1000002, 0x400000, CRC(cce5f8d3) SHA1(bdca8c5158f452f2b5535c7d658c9b22c6d66048) )
 ROM_END
+
+} // anonymous namespace
+
 
 SYST( 1997, mu100,  0,     0, mu100, mu100, mu100_state,  empty_init, "Yamaha", "MU100",                  MACHINE_NOT_WORKING )
 SYST( 1997, mu100r, mu100, 0, mu100, mu100, mu100r_state, empty_init, "Yamaha", "MU100 Rackable version", MACHINE_NOT_WORKING )

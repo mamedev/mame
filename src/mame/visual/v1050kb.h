@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_V1050KB_H
-#define MAME_MACHINE_V1050KB_H
+#ifndef MAME_VISUAL_V1050KB_H
+#define MAME_VISUAL_V1050KB_H
 
 #pragma once
 
@@ -61,4 +61,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(V1050_KEYBOARD, v1050_keyboard_device)
 
-#endif // MAME_MACHINE_V1050KB_H
+#endif // MAME_VISUAL_V1050KB_H
