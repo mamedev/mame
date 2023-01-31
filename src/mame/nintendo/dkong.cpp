@@ -412,6 +412,8 @@ Donkey Kong Notes
 #include "cpu/s2650/s2650.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/eepromser.h"
+#include "sound/sn76496.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -910,6 +912,11 @@ void dkong_state::s2650_io_map(address_map &map)
 void dkong_state::s2650_data_map(address_map &map)
 {
 	map(S2650_DATA_PORT, S2650_DATA_PORT).w(FUNC(dkong_state::s2650_data_w));
+}
+
+void spclforc_state::data_map(address_map &map)
+{
+	map(S2650_DATA_PORT, S2650_DATA_PORT).w("snsnd", FUNC(sn76496_device::write));
 }
 
 
@@ -1870,11 +1877,16 @@ void dkong_state::herbiedk(machine_config &config)
 	downcast<s2650_device &>(*m_maincpu).sense_handler().set(m_screen, FUNC(screen_device::vblank)).invert(); // ???
 }
 
-void dkong_state::spclforc(machine_config &config)
+void spclforc_state::spclforc(machine_config &config)
 {
 	herbiedk(config);
+
+	downcast<s2650_device &>(*m_maincpu).set_addrmap(AS_DATA, &spclforc_state::data_map);
 	config.device_remove("soundcpu");
-	m_screen->set_screen_update(FUNC(dkong_state::screen_update_spclforc));
+
+	m_screen->set_screen_update(FUNC(spclforc_state::screen_update_spclforc));
+
+	SN76496(config, "snsnd", CLOCK_1H).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 /*************************************
@@ -3791,8 +3803,8 @@ GAME( 1984, herodku,   hero,     s2650,     herodk,   dkong_state, empty_init,  
 GAME( 1984, 8ballact,  0,        herbiedk,  8ballact, dkong_state, empty_init,    ROT270, "Seatongrove Ltd (Magic Electronics USA license)",   "Eight Ball Action (DK conversion)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1984, 8ballact2, 8ballact, herbiedk,  8ballact, dkong_state, empty_init,    ROT270, "Seatongrove Ltd (Magic Electronics USA license)",   "Eight Ball Action (DKJr conversion)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1984, shootgal,  0,        s2650,     shootgal, dkong_state, empty_init,    ROT0,   "Seatongrove Ltd (Zaccaria license)",                "Shooting Gallery",                                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, spclforc,  0,        spclforc,  spclforc, dkong_state, empty_init,    ROT270, "Senko Industries (Magic Electronics Inc. license)", "Special Forces",                                           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, spcfrcii,  0,        spclforc,  spclforc, dkong_state, empty_init,    ROT270, "Senko Industries (Magic Electronics Inc. license)", "Special Forces II",                                        MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spclforc,  0,        spclforc,  spclforc, spclforc_state, empty_init, ROT270, "Senko Industries (Magic Electronics Inc. license)", "Special Forces",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spcfrcii,  0,        spclforc,  spclforc, spclforc_state, empty_init, ROT270, "Senko Industries (Magic Electronics Inc. license)", "Special Forces II",                                        MACHINE_SUPPORTS_SAVE )
 
 /* EPOS */
 GAME( 1984, drakton,   0,        drakton,   drakton,  dkong_state, init_drakton,  ROT270, "Epos Corporation", "Drakton (DK conversion)",     MACHINE_SUPPORTS_SAVE )
