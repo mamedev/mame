@@ -2598,6 +2598,8 @@ void system1_state::nob(machine_config &config)
 
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &system1_state::nobo_map);
+
+	SN76489A(config.replace(), "sn2", SOUND_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void system1_state::nobm(machine_config &config)
