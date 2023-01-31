@@ -50,6 +50,7 @@ public:
 	{
 	}
 
+	virtual bool probe() override;
 	virtual int init(osd_interface &osd, osd_options const &options) override;
 	virtual void exit() override;
 
@@ -65,6 +66,17 @@ private:
 	Microsoft::WRL::ComPtr<IDirect3D9> m_d3dobj;
 	osd_options const *m_options;
 };
+
+
+//============================================================
+//  video_d3d::probe
+//============================================================
+
+bool video_d3d::probe()
+{
+	// do a dry run of loading the Direct3D 9 DLL
+	return dynamic_module::open({ "d3d9.dll" })->bind<d3d9_create_fn>("Direct3DCreate9") != nullptr;
+}
 
 
 //============================================================
