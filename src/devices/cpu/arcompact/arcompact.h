@@ -96,6 +96,8 @@ private:
 	const static int LIMM_REG = 62;
 
 	const static int REG_BLINK    = 0x1f; // r31
+	const static int REG_GP       = 0x1a; // r26
+	const static int REG_FP       = 0x1b; // r27
 	const static int REG_SP       = 0x1c; // r28
 	const static int REG_ILINK1   = 0x1d; // r29
 	const static int REG_ILINK2   = 0x1e; // r30
@@ -699,7 +701,6 @@ private:
 	uint32_t arcompact_handle04_2f_helper(uint32_t op, const char* optext);
 	uint32_t arcompact_handle04_3x_helper(uint32_t op, int dsize, int extend);
 	uint32_t arcompact_handle05_2f_0x_helper(uint32_t op, const char* optext);
-	uint32_t arcompact_handle19_0x_helper(uint16_t op, const char* optext, int shift, int format);
 
 	uint32_t handle_jump_to_addr(bool delay, bool link, uint32_t address, uint32_t next_addr);
 	uint32_t handle_jump_to_register(bool delay, bool link, uint32_t reg, uint32_t next_addr, int flag);
