@@ -149,7 +149,7 @@ struct copy_info_t
 	mutable int         samples;
 	mutable int         perf;
 	/* list */
-	copy_info_t         *next;
+	copy_info_t const   *next;
 };
 
 /* renderer_sdl2 is the information about SDL for the current screen */
@@ -990,9 +990,9 @@ private:
 	void expand_copy_info();
 	void free_copy_info();
 
-	static void add_list(copy_info_t *&head, copy_info_t const &element, Uint32 bm);
+	static void add_list(copy_info_t const *&head, copy_info_t const &element, Uint32 bm);
 
-	copy_info_t *m_blit_info[SDL_TEXFORMAT_LAST + 1];
+	copy_info_t const *m_blit_info[SDL_TEXFORMAT_LAST + 1];
 	bool m_blit_info_initialized;
 	bool m_gllib_loaded;
 
@@ -1065,7 +1065,7 @@ void video_sdl2::free_copy_info()
 	{
 		for (int i = 0; i <= SDL_TEXFORMAT_LAST; i++)
 		{
-			for (copy_info_t *bi = m_blit_info[i]; bi != nullptr; )
+			for (copy_info_t const *bi = m_blit_info[i]; bi != nullptr; )
 			{
 				if (bi->pixel_count)
 				{
@@ -1078,9 +1078,7 @@ void video_sdl2::free_copy_info()
 							bi->samples,
 							bi->perf);
 				}
-				copy_info_t *freeme = bi;
-				bi = bi->next;
-				delete freeme;
+				delete std::exchange(bi, bi->next);
 			}
 			m_blit_info[i] = nullptr;
 		}
@@ -1088,7 +1086,7 @@ void video_sdl2::free_copy_info()
 	}
 }
 
-void video_sdl2::add_list(copy_info_t *&head, copy_info_t const &element, Uint32 bm)
+void video_sdl2::add_list(copy_info_t const *&head, copy_info_t const &element, Uint32 bm)
 {
 	copy_info_t *const newci = new copy_info_t(element);
 

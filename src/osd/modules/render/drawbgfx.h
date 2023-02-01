@@ -37,13 +37,9 @@ class avi_write;
 class renderer_bgfx : public osd_renderer, public slider_dirty_notifier
 {
 public:
-	renderer_bgfx(
-			osd_window &window,
-			const osd_options &options,
-			util::notifier<util::xml::data_node const &> &load_notifier,
-			util::notifier<util::xml::data_node &> &save_notifier,
-			util::xml::data_node &persistent_settings,
-			uint32_t max_texsize);
+	class parent_module;
+
+	renderer_bgfx(osd_window &window, parent_module &parent_module);
 	virtual ~renderer_bgfx();
 
 	virtual int create() override;
@@ -78,6 +74,16 @@ private:
 		BUFFER_DONE
 	};
 
+	class parent_module_holder
+	{
+	public:
+		parent_module_holder(parent_module &parent);
+		~parent_module_holder();
+		parent_module &operator()() const { return m_parent; }
+	private:
+		parent_module &m_parent;
+	};
+
 	void vertex(ScreenVertex* vertex, float x, float y, float z, uint32_t rgba, float u, float v);
 	void render_avi_quad();
 	void update_recording();
@@ -109,8 +115,7 @@ private:
 	void load_config(util::xml::data_node const &parentnode);
 	void save_config(util::xml::data_node &parentnode);
 
-	const osd_options& m_options;
-	const uint32_t m_max_texture_size;
+	parent_module_holder m_module; // keep this where it will be destructed last
 
 	bgfx_target *m_framebuffer;
 	bgfx_texture *m_texture_cache;
@@ -148,7 +153,6 @@ private:
 	std::unique_ptr<util::xml::file> m_config;
 	const util::notifier_subscription m_load_sub;
 	const util::notifier_subscription m_save_sub;
-	util::xml::data_node &m_persistent_settings;
 
 	static const uint16_t CACHE_SIZE;
 	static const uint32_t PACKABLE_SIZE;

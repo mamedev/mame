@@ -65,6 +65,87 @@ extern void *GetOSWindow(void *wincontroller);
 
 
 //============================================================
+//  Renderer interface to parent module
+//============================================================
+
+class renderer_bgfx::parent_module
+{
+public:
+	util::xml::data_node &persistent_settings() { return *m_persistent_settings; }
+	osd_options const &options() const { return *m_options; }
+	uint32_t max_texture_size() const { return m_max_texture_size; }
+
+	template <typename T>
+	util::notifier_subscription subscribe_load(void (T::*func)(util::xml::data_node const &), T *obj)
+	{
+		return m_load_notifier.subscribe(delegate<void (util::xml::data_node const &)>(func, obj));
+	}
+
+	template <typename T>
+	util::notifier_subscription subscribe_save(void (T::*func)(util::xml::data_node &), T *obj)
+	{
+		return m_save_notifier.subscribe(delegate<void (util::xml::data_node &)>(func, obj));
+	}
+
+protected:
+	parent_module()
+		: m_options(nullptr)
+		, m_max_texture_size(0)
+		, m_renderer_count(0)
+	{
+	}
+	virtual ~parent_module()
+	{
+		assert(!m_renderer_count);
+	}
+
+	bool has_active_renderers() const
+	{
+		return 0 < m_renderer_count;
+	}
+
+	util::notifier<util::xml::data_node const &> m_load_notifier;
+	util::notifier<util::xml::data_node &> m_save_notifier;
+	util::xml::file::ptr m_persistent_settings;
+	osd_options const *m_options;
+	uint32_t m_max_texture_size;
+
+private:
+	friend class parent_module_holder;
+
+	virtual void last_renderer_destroyed() = 0;
+
+	void renderer_created()
+	{
+		++m_renderer_count;
+	}
+
+	void renderer_destroyed()
+	{
+		assert(m_renderer_count);
+		if (!--m_renderer_count)
+			last_renderer_destroyed();
+	}
+
+	unsigned m_renderer_count;
+};
+
+
+inline renderer_bgfx::parent_module_holder::parent_module_holder(parent_module &parent)
+	: m_parent(parent)
+{
+	m_parent.renderer_created();
+}
+
+
+inline renderer_bgfx::parent_module_holder::~parent_module_holder()
+{
+	m_parent.renderer_destroyed();
+}
+
+
+
+//============================================================
 //  OSD MODULE
 //============================================================
 
@@ -72,13 +153,11 @@ namespace osd {
 
 namespace {
 
-class video_bgfx : public osd_module, public render_module
+class video_bgfx : public osd_module, public render_module, protected renderer_bgfx::parent_module
 {
 public:
 	video_bgfx()
 		: osd_module(OSD_RENDERER_PROVIDER, "bgfx")
-		, m_options(nullptr)
-		, m_max_texture_size(0)
 		, m_bgfx_library_initialized(false)
 	{
 	}
@@ -93,6 +172,8 @@ protected:
 	virtual unsigned flags() const override { return FLAG_INTERACTIVE; }
 
 private:
+	virtual void last_renderer_destroyed() override;
+
 	void load_config(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode);
 	void save_config(config_type cfg_type, util::xml::data_node *parentnode);
 
@@ -100,11 +181,6 @@ private:
 
 	static bool set_platform_data(bgfx::PlatformData &platform_data, osd_window const &window);
 
-	util::notifier<util::xml::data_node const &> m_load_notifier;
-	util::notifier<util::xml::data_node &> m_save_notifier;
-	util::xml::file::ptr m_persistent_settings;
-	osd_options const *m_options;
-	uint32_t m_max_texture_size;
 	bool m_bgfx_library_initialized;
 };
 
@@ -165,6 +241,8 @@ int video_bgfx::init(osd_interface &osd, osd_options const &options)
 
 void video_bgfx::exit()
 {
+	assert(!has_active_renderers());
+
 	if (m_bgfx_library_initialized)
 	{
 		osd_printf_verbose("Shutting down BGFX library\n");
@@ -184,22 +262,13 @@ void video_bgfx::exit()
 
 std::unique_ptr<osd_renderer> video_bgfx::create(osd_window &window)
 {
-	// hacky - reinitialise when window 0 is created
-	// this is the cause of the fullscreen toggle crash on Linux
-	if ((window.index() == 0) && m_bgfx_library_initialized)
-	{
-		osd_printf_verbose("Shutting down BGFX library to recreate window 0\n");
-		imguiDestroy();
-		bgfx::shutdown();
-		m_bgfx_library_initialized = false;
-		m_max_texture_size = 0;
-	}
-
 	// start BGFX if this is the first window
 	if (!m_bgfx_library_initialized)
 	{
-		osd_printf_verbose("Initializing BGFX library\n");
 		assert(window.index() == 0); // bad things will happen otherwise
+		assert(!has_active_renderers());
+
+		osd_printf_verbose("Initializing BGFX library\n");
 		if (!init_bgfx_library(window))
 		{
 			osd_printf_error("BGFX library initialization failed\n");
@@ -208,13 +277,24 @@ std::unique_ptr<osd_renderer> video_bgfx::create(osd_window &window)
 		m_bgfx_library_initialized = true;
 	}
 
-	return std::make_unique<renderer_bgfx>(
-			window,
-			*m_options,
-			m_load_notifier,
-			m_save_notifier,
-			*m_persistent_settings,
-			m_max_texture_size);
+	return std::make_unique<renderer_bgfx>(window, static_cast<renderer_bgfx::parent_module &>(*this));
+}
+
+
+//============================================================
+//  video_bgfx::last_renderer_destroyed
+//============================================================
+
+void video_bgfx::last_renderer_destroyed()
+{
+	if (m_bgfx_library_initialized)
+	{
+		osd_printf_verbose("No more renderers - shutting down BGFX library\n");
+		imguiDestroy();
+		bgfx::shutdown();
+		m_bgfx_library_initialized = false;
+		m_max_texture_size = 0;
+	}
 }
 
 
@@ -413,16 +493,9 @@ static void *sdlNativeWindowHandle(SDL_Window *window)
 //  renderer_bgfx - constructor
 //============================================================
 
-renderer_bgfx::renderer_bgfx(
-		osd_window &window,
-		const osd_options &options,
-		util::notifier<util::xml::data_node const &> &load_notifier,
-		util::notifier<util::xml::data_node &> &save_notifier,
-		util::xml::data_node &persistent_settings,
-		uint32_t max_texsize)
+renderer_bgfx::renderer_bgfx(osd_window &window, parent_module &parent)
 	: osd_renderer(window)
-	, m_options(options)
-	, m_max_texture_size(max_texsize)
+	, m_module(parent)
 	, m_framebuffer(nullptr)
 	, m_texture_cache(nullptr)
 	, m_dimensions(0, 0)
@@ -432,12 +505,11 @@ renderer_bgfx::renderer_bgfx(
 	, m_avi_view(nullptr)
 	, m_avi_writer(nullptr)
 	, m_avi_target(nullptr)
-	, m_load_sub(load_notifier.subscribe(delegate<void (util::xml::data_node const &)>(&renderer_bgfx::load_config, this)))
-	, m_save_sub(save_notifier.subscribe(delegate<void (util::xml::data_node &)>(&renderer_bgfx::save_config, this)))
-	, m_persistent_settings(persistent_settings)
+	, m_load_sub(parent.subscribe_load(&renderer_bgfx::load_config, this))
+	, m_save_sub(parent.subscribe_save(&renderer_bgfx::save_config, this))
 {
 	// load settings if recreated after fullscreen toggle
-	util::xml::data_node *windownode = m_persistent_settings.get_child("window");
+	util::xml::data_node *windownode = m_module().persistent_settings().get_child("window");
 	while (windownode)
 	{
 		if (windownode->get_attribute_int("index", -1) != window.index())
@@ -466,9 +538,9 @@ renderer_bgfx::~renderer_bgfx()
 {
 	// persist settings across fullscreen toggle
 	if (m_chains)
-		m_chains->save_config(m_persistent_settings);
+		m_chains->save_config(m_module().persistent_settings());
 	else if (m_config)
-		m_config->get_first_child()->copy_into(m_persistent_settings);
+		m_config->get_first_child()->copy_into(m_module().persistent_settings());
 
 	bgfx::reset(0, 0, BGFX_RESET_NONE);
 
@@ -508,15 +580,15 @@ int renderer_bgfx::create()
 	m_effects = std::make_unique<effect_manager>(*m_shaders);
 
 	// Create program from shaders.
-	m_gui_effect[0] = m_effects->get_or_load_effect(m_options, "gui_opaque");
-	m_gui_effect[1] = m_effects->get_or_load_effect(m_options, "gui_blend");
-	m_gui_effect[2] = m_effects->get_or_load_effect(m_options, "gui_multiply");
-	m_gui_effect[3] = m_effects->get_or_load_effect(m_options, "gui_add");
+	m_gui_effect[0] = m_effects->get_or_load_effect(m_module().options(), "gui_opaque");
+	m_gui_effect[1] = m_effects->get_or_load_effect(m_module().options(), "gui_blend");
+	m_gui_effect[2] = m_effects->get_or_load_effect(m_module().options(), "gui_multiply");
+	m_gui_effect[3] = m_effects->get_or_load_effect(m_module().options(), "gui_add");
 
-	m_screen_effect[0] = m_effects->get_or_load_effect(m_options, "screen_opaque");
-	m_screen_effect[1] = m_effects->get_or_load_effect(m_options, "screen_blend");
-	m_screen_effect[2] = m_effects->get_or_load_effect(m_options, "screen_multiply");
-	m_screen_effect[3] = m_effects->get_or_load_effect(m_options, "screen_add");
+	m_screen_effect[0] = m_effects->get_or_load_effect(m_module().options(), "screen_opaque");
+	m_screen_effect[1] = m_effects->get_or_load_effect(m_module().options(), "screen_blend");
+	m_screen_effect[2] = m_effects->get_or_load_effect(m_module().options(), "screen_multiply");
+	m_screen_effect[3] = m_effects->get_or_load_effect(m_module().options(), "screen_add");
 
 	if (window().index() != 0)
 	{
@@ -533,10 +605,10 @@ int renderer_bgfx::create()
 			m_ortho_view->set_backbuffer(m_framebuffer);
 	}
 
-	const uint32_t max_prescale_size = std::min(2u * std::max(wdim.width(), wdim.height()), m_max_texture_size);
+	const uint32_t max_prescale_size = std::min(2u * std::max(wdim.width(), wdim.height()), m_module().max_texture_size());
 	m_chains = std::make_unique<chain_manager>(
 			window().machine(),
-			m_options,
+			m_module().options(),
 			*m_textures,
 			*m_targets,
 			*m_effects,
@@ -584,7 +656,7 @@ void renderer_bgfx::record()
 	}
 	else
 	{
-		m_avi_writer->record(m_options.bgfx_avi_name());
+		m_avi_writer->record(m_module().options().bgfx_avi_name());
 		m_avi_target = m_targets->create_target("avibuffer", bgfx::TextureFormat::BGRA8, s_width[0], s_height[0], 1, 1, TARGET_STYLE_CUSTOM, false, true, 1, 0);
 		m_avi_texture = bgfx::createTexture2D(s_width[0], s_height[0], false, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_BLIT_DST | BGFX_TEXTURE_READ_BACK);
 
@@ -1061,6 +1133,7 @@ int renderer_bgfx::draw(int update)
 		// screen).
 		if (m_config)
 		{
+			osd_printf_verbose("BGFX: Applying configuration for window %d\n", window().index());
 			m_chains->load_config(*m_config->get_first_child());
 			m_config.reset();
 		}
@@ -1547,6 +1620,7 @@ void renderer_bgfx::load_config(util::xml::data_node const &parentnode)
 		else
 			m_config->get_first_child()->delete_node();
 		windownode->copy_into(*m_config);
+		osd_printf_verbose("BGFX: Found configuration for window %d\n", window().index());
 		break;
 	}
 }
