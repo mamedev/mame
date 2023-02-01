@@ -11,8 +11,8 @@
     - scobra.cpp
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_GALAXOLD_H
-#define MAME_INCLUDES_GALAXOLD_H
+#ifndef MAME_GALAXIAN_GALAXOLD_H
+#define MAME_GALAXIAN_GALAXOLD_H
 
 #pragma once
 
@@ -300,4 +300,4 @@ protected:
 
 #define galaxold_coin_counter_0_w galaxold_coin_counter_w
 
-#endif
+#endif // MAME_GALAXIAN_GALAXOLD_H

@@ -5,8 +5,8 @@
  * includes/osborne1.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_OSBORNE1_H
-#define MAME_INCLUDES_OSBORNE1_H
+#ifndef MAME_OSBORNE_OSBORNE1_H
+#define MAME_OSBORNE_OSBORNE1_H
 
 #pragma once
 
@@ -219,4 +219,4 @@ private:
 	required_region_ptr<u8>         m_p_nuevo;
 };
 
-#endif // MAME_INCLUDES_OSBORNE1_H
+#endif // MAME_OSBORNE_OSBORNE1_H

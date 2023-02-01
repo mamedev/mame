@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Jarek Parchanski, Nicola Salmoria, Mirko Buffoni
-#ifndef MAME_INCLUDES_SYSTEM1_H
-#define MAME_INCLUDES_SYSTEM1_H
+#ifndef MAME_SEGA_SYSTEM1_H
+#define MAME_SEGA_SYSTEM1_H
 
 #pragma once
 
@@ -244,4 +244,4 @@ private:
 	void system1_ppi_io_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SYSTEM1_H
+#endif // MAME_SEGA_SYSTEM1_H

@@ -5,8 +5,8 @@
     Sega Z80-3D system
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_TURBO_H
-#define MAME_INCLUDES_TURBO_H
+#ifndef MAME_SEGA_TURBO_H
+#define MAME_SEGA_TURBO_H
 
 #pragma once
 
@@ -278,4 +278,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_TURBO_H
+#endif // MAME_SEGA_TURBO_H

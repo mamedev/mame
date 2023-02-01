@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_PACMAN_H
-#define MAME_INCLUDES_PACMAN_H
+#ifndef MAME_PACMAN_PACMAN_H
+#define MAME_PACMAN_PACMAN_H
 
 #pragma once
 
@@ -324,4 +324,4 @@ protected:
 };
 
 
-#endif // MAME_INCLUDES_PACMAN_H
+#endif // MAME_PACMAN_PACMAN_H

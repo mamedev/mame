@@ -5,8 +5,8 @@
     Atari Drag Race hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_DRAGRACE_H
-#define MAME_INCLUDES_DRAGRACE_H
+#ifndef MAME_ATARI_DRAGRACE_H
+#define MAME_ATARI_DRAGRACE_H
 
 #pragma once
 
@@ -101,4 +101,4 @@ private:
 //----------- defined in audio/dragrace.cpp -----------
 DISCRETE_SOUND_EXTERN( dragrace_discrete );
 
-#endif // MAME_INCLUDES_DRAGRACE_H
+#endif // MAME_ATARI_DRAGRACE_H

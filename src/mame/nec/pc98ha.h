@@ -6,8 +6,8 @@
  *
  ******************************************/
 
-#ifndef MAME_INCLUDES_PC98HA_H
-#define MAME_INCLUDES_PC98HA_H
+#ifndef MAME_NEC_PC98HA_H
+#define MAME_NEC_PC98HA_H
 
 #pragma once
 
@@ -101,4 +101,4 @@ private:
 	u8 m_ext_view_sel = 0;
 };
 
-#endif // MAME_INCLUDES_PC98HA_H
+#endif // MAME_NEC_PC98HA_H

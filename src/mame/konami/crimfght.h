@@ -5,8 +5,8 @@
     Crime Fighters
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_CRIMFGHT_H
-#define MAME_INCLUDES_CRIMFGHT_H
+#ifndef MAME_KONAMI_CRIMFGHT_H
+#define MAME_KONAMI_CRIMFGHT_H
 
 #pragma once
 
@@ -70,4 +70,4 @@ private:
 	int m_init = 0;
 };
 
-#endif // MAME_INCLUDES_CRIMFGHT_H
+#endif // MAME_KONAMI_CRIMFGHT_H

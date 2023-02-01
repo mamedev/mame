@@ -5,8 +5,8 @@
     Atari Rampart hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_RAMPART_H
-#define MAME_INCLUDES_RAMPART_H
+#ifndef MAME_ATARI_RAMPART_H
+#define MAME_ATARI_RAMPART_H
 
 #pragma once
 
@@ -63,4 +63,4 @@ private:
 	static const atari_motion_objects_config s_mob_config;
 };
 
-#endif // MAME_INCLUDES_RAMPART_H
+#endif // MAME_ATARI_RAMPART_H

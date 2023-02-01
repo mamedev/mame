@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
-#ifndef MAME_INCLUDES_NBMJ8900_H
-#define MAME_INCLUDES_NBMJ8900_H
+#ifndef MAME_NICHIBUTSU_NBMJ8900_H
+#define MAME_NICHIBUTSU_NBMJ8900_H
 
 #pragma once
 
@@ -88,4 +88,4 @@ private:
 	TIMER_CALLBACK_MEMBER(clear_busy_flag);
 };
 
-#endif // MAME_INCLUDES_NBMJ8900_H
+#endif // MAME_NICHIBUTSU_NBMJ8900_H

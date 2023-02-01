@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_V1050_H
-#define MAME_INCLUDES_V1050_H
+#ifndef MAME_VISUAL_V1050_H
+#define MAME_VISUAL_V1050_H
 
 #pragma once
 
@@ -235,4 +235,4 @@ private:
 	int m_centronics_perror = 0;
 };
 
-#endif // MAME_INCLUDES_V1050_H
+#endif // MAME_VISUAL_V1050_H

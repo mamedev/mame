@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_REALBRK_H
-#define MAME_INCLUDES_REALBRK_H
+#ifndef MAME_DYNAX_REALBRK_H
+#define MAME_DYNAX_REALBRK_H
 
 #pragma once
 
@@ -94,4 +94,4 @@ private:
 	void realbrk_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_REALBRK_H
+#endif // MAME_DYNAX_REALBRK_H

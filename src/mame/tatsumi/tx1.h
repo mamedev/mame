@@ -5,8 +5,8 @@
     TX-1/Buggy Boy hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_TX1_H
-#define MAME_INCLUDES_TX1_H
+#ifndef MAME_TATSUMI_TX1_H
+#define MAME_TATSUMI_TX1_H
 
 #pragma once
 
@@ -243,4 +243,4 @@ private:
 	void tx1_math(address_map &map);
 };
 
-#endif // MAME_INCLUDES_TX1_H
+#endif // MAME_TATSUMI_TX1_H

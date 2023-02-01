@@ -5,8 +5,8 @@
     Atari Night Driver hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_NITEDRVR_H
-#define MAME_INCLUDES_NITEDRVR_H
+#ifndef MAME_ATARI_NITEDRVR_H
+#define MAME_ATARI_NITEDRVR_H
 
 #pragma once
 
@@ -96,4 +96,4 @@ private:
 //----------- defined in audio/nitedrvr.cpp -----------
 DISCRETE_SOUND_EXTERN( nitedrvr_discrete );
 
-#endif // MAME_INCLUDES_NITEDRVR_H
+#endif // MAME_ATARI_NITEDRVR_H

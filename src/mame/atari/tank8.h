@@ -5,8 +5,8 @@
     Atari tank8 hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_TANK8_H
-#define MAME_INCLUDES_TANK8_H
+#ifndef MAME_ATARI_TANK8_H
+#define MAME_ATARI_TANK8_H
 
 #pragma once
 
@@ -106,4 +106,4 @@ private:
 
 DISCRETE_SOUND_EXTERN( tank8_discrete );
 
-#endif // MAME_INCLUDES_TANK8_H
+#endif // MAME_ATARI_TANK8_H

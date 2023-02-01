@@ -7,8 +7,8 @@
     Phill Harvey-Smith
     2011-01-29.
 */
-#ifndef MAME_INCLUDES_MBC55X_H
-#define MAME_INCLUDES_MBC55X_H
+#ifndef MAME_SANYO_MBC55X_H
+#define MAME_SANYO_MBC55X_H
 
 #pragma once
 
@@ -180,4 +180,4 @@ private:
 
 #define OUTPUT_SEGOFS(mess,seg,ofs)  logerror("%s=%04X:%04X [%08X]\n",mess,seg,ofs,((seg<<4)+ofs))
 
-#endif // MAME_INCLUDES_MBC55X_H
+#endif // MAME_SANYO_MBC55X_H

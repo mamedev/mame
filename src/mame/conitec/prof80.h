@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_PROF80_H
-#define MAME_INCLUDES_PROF80_H
+#ifndef MAME_CONITEC_PROF80_H
+#define MAME_CONITEC_PROF80_H
 
 #pragma once
 
@@ -98,4 +98,4 @@ private:
 	void prof80_mmu(address_map &map);
 };
 
-#endif
+#endif // MAME_CONITEC_PROF80_H

@@ -5,8 +5,8 @@
  * includes/mbee.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_MBEE_H
-#define MAME_INCLUDES_MBEE_H
+#ifndef MAME_AUSNZ_MBEE_H
+#define MAME_AUSNZ_MBEE_H
 
 #pragma once
 
@@ -209,4 +209,4 @@ private:
 	optional_device_array<generic_slot_device, 20> m_pak;
 };
 
-#endif // MAME_INCLUDES_MBEE_H
+#endif // MAME_AUSNZ_MBEE_H

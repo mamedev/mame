@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
-#ifndef MAME_INCLUDES_SPRINT8_H
-#define MAME_INCLUDES_SPRINT8_H
+#ifndef MAME_ATARI_SPRINT8_H
+#define MAME_ATARI_SPRINT8_H
 
 #pragma once
 
@@ -88,4 +88,4 @@ private:
 /*----------- defined in audio/sprint8.c -----------*/
 DISCRETE_SOUND_EXTERN( sprint8_discrete );
 
-#endif // MAME_INCLUDES_SPRINT8_H
+#endif // MAME_ATARI_SPRINT8_H

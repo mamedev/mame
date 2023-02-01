@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_TANDY2K_H
-#define MAME_INCLUDES_TANDY2K_H
+#ifndef MAME_TRS_TANDY2K_H
+#define MAME_TRS_TANDY2K_H
 
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
@@ -274,4 +274,4 @@ private:
 	required_ioport m_y_axis;
 };
 
-#endif // MAME_INCLUDES_TANDY2K_H
+#endif // MAME_TRS_TANDY2K_H

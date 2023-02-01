@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
-#ifndef MAME_INCLUDES_PASTELG_H
-#define MAME_INCLUDES_PASTELG_H
+#ifndef MAME_NICHIBUTSU_PASTELG_H
+#define MAME_NICHIBUTSU_PASTELG_H
 
 #pragma once
 
@@ -111,4 +111,4 @@ private:
 	void io_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_PASTELG_H
+#endif // MAME_NICHIBUTSU_PASTELG_H

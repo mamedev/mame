@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 
-#ifndef MAME_INCLUDES_CDI_H
-#define MAME_INCLUDES_CDI_H
+#ifndef MAME_PHILIPS_CDI_H
+#define MAME_PHILIPS_CDI_H
 
 #include "machine/scc68070.h"
 #include "cdislavehle.h"
@@ -128,4 +128,4 @@ private:
 // 0x001: French
 // 0x188: German
 
-#endif // MAME_INCLUDES_CDI_H
+#endif // MAME_PHILIPS_CDI_H

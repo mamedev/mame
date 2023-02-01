@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
-#ifndef MAME_INCLUDES_DEC0_H
-#define MAME_INCLUDES_DEC0_H
+#ifndef MAME_DATAEAST_DEC0_H
+#define MAME_DATAEAST_DEC0_H
 
 #pragma once
 
@@ -213,4 +213,4 @@ private:
 	void secretab_s_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_DEC0_H
+#endif // MAME_DATAEAST_DEC0_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:BUT
-#ifndef MAME_INCLUDES_TCEPTOR_H
-#define MAME_INCLUDES_TCEPTOR_H
+#ifndef MAME_NAMCO_TCEPTOR_H
+#define MAME_NAMCO_TCEPTOR_H
 
 #pragma once
 
@@ -124,4 +124,4 @@ private:
 	void mcu_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_TCEPTOR_H
+#endif // MAME_NAMCO_TCEPTOR_H

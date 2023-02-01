@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
-#ifndef MAME_INCLUDES_LIBERATE_H
-#define MAME_INCLUDES_LIBERATE_H
+#ifndef MAME_DATAEAST_LIBERATE_H
+#define MAME_DATAEAST_LIBERATE_H
 
 #pragma once
 
@@ -113,4 +113,4 @@ private:
 	void prosport_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_LIBERATE_H
+#endif // MAME_DATAEAST_LIBERATE_H

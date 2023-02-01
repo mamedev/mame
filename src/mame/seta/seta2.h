@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia, David Haywood
-#ifndef MAME_INCLUDES_SETA2_H
-#define MAME_INCLUDES_SETA2_H
+#ifndef MAME_SETA_SETA2_H
+#define MAME_SETA_SETA2_H
 
 #pragma once
 
@@ -248,4 +248,4 @@ private:
 	uint8_t m_lamps1 = 0, m_lamps2 = 0, m_cam = 0;
 };
 
-#endif // MAME_INCLUDES_SETA2_H
+#endif // MAME_SETA_SETA2_H

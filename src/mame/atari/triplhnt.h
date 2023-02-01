@@ -5,8 +5,8 @@
     Atari Triple Hunt hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_TRIPLHNT_H
-#define MAME_INCLUDES_TRIPLHNT_H
+#ifndef MAME_ATARI_TRIPLHNT_H
+#define MAME_ATARI_TRIPLHNT_H
 
 #pragma once
 
@@ -105,4 +105,4 @@ private:
 DISCRETE_SOUND_EXTERN( triplhnt_discrete );
 extern const char *const triplhnt_sample_names[];
 
-#endif // MAME_INCLUDES_TRIPLHNT_H
+#endif // MAME_ATARI_TRIPLHNT_H

@@ -5,8 +5,8 @@
     Mermaid
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_MERMAID_H
-#define MAME_INCLUDES_MERMAID_H
+#ifndef MAME_SANRITSU_MERMAID_H
+#define MAME_SANRITSU_MERMAID_H
 
 #pragma once
 
@@ -126,4 +126,4 @@ private:
 	void mermaid_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MERMAID_H
+#endif // MAME_SANRITSU_MERMAID_H
