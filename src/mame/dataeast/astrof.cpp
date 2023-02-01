@@ -57,9 +57,10 @@
           emulates an unmodified PCB, you can enable the hacks in the DRIVER
           CONFIGURATION menu.
 
+          B&W cabinet versions also exist.
+
           Versions of Tomahawk using the Astro Fighter PROM have been seen,
           see notes in ROM loading.
-
 
 ****************************************************************************/
 
