@@ -13,6 +13,7 @@
         * Astro Combat (2 sets)
         * Super Star Battle
         * Space Fighter Mark II (2 sets)
+        * Saturn: Space Fighter 3D
         * Tomahawk 777 late version with changed game play
         * Tomahawk 777 early version
 
@@ -36,13 +37,18 @@
 
           Set 3:    8Kbit ROMs
                     Blue/Solid empty fuel bar.
-                   300 points for every seven bombs destroyed.
+                    300 points for every seven bombs destroyed.
 
         * I know there must be at least one other ROM set for Astro Fighter
           I have played one that stoped between waves to show the next enemy
 
+        * Saturn: Space Fighter 3D is Space Fighter Mark II with extra game modes.
+          It's not 3-dimensional. The game modes are: Storm, Sweeper, Scramble.
+
     Known issues/to-do's:
         * Analog sound in all games
+        * satsf3d color prom is not dumped, using the one from spfghmk2 instead
+		  (it looks good compared to photo)
 
     About Colours:
         * It was fairly common to have wiremods on these PCBs to change the
@@ -1328,7 +1334,6 @@ ROM_START( spfghmk2 )
 	ROM_LOAD( "709-5.1a",     0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
 ROM_END
 
-
 ROM_START( spfghmk22 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2708mkii.5e",  0xe400, 0x0400, CRC(27d7060d) SHA1(796c44a395e1c54769dc57050503b4b111bde7ef) )
@@ -1341,6 +1346,23 @@ ROM_START( spfghmk22 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "709-5.1a",     0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
+ROM_END
+
+
+ROM_START( satsf3d )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "b8-2.5d",  0xdc00, 0x0400, CRC(4f0fc817) SHA1(b4fed244f93425107d36fa8f61ada5dc92034716) )
+	ROM_LOAD( "b7-1.4e",  0xe000, 0x0400, CRC(6235c388) SHA1(57645eeffea61b06e38819e5f17fbeaa412f673d) )
+	ROM_LOAD( "b6-1.4f",  0xe400, 0x0400, CRC(56735767) SHA1(73cd8a4dfa88de4d9e9451b36440688984af79a4) )
+	ROM_LOAD( "b5-2.5e",  0xe800, 0x0400, CRC(0af82ccf) SHA1(7924b6be2a71361a1f054bf7cb95a00367516267) )
+	ROM_LOAD( "b4-1.5f",  0xec00, 0x0400, CRC(d68b9c7a) SHA1(b03322557be60d14d56b624a120807bcaa18a905) )
+	ROM_LOAD( "b3-1.4h",  0xf000, 0x0400, CRC(cc4ecb1b) SHA1(8ecf39c62ec6a4a8a7bf02a044c9cc492070e1aa) )
+	ROM_LOAD( "b2-1.4k",  0xf400, 0x0400, CRC(84cb830c) SHA1(ddc67c48ae80f8833330517015fac66433a65759) )
+	ROM_LOAD( "b1-1.5h",  0xf800, 0x0400, CRC(53e32287) SHA1(9a924dfc3c175641c15b759302ddcc4edf44fe74) )
+	ROM_LOAD( "b0-1.5k",  0xfc00, 0x0400, CRC(c79a8346) SHA1(a46a66e080603c2cee09378f59f52986f48c6151) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "709-5.1a", 0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) BAD_DUMP )
 ROM_END
 
 
@@ -1364,7 +1386,6 @@ ROM_START( tomahawk )
 	// Fighter without the PROM properly replaced tho.
 	//ROM_LOAD( "astrf.clr",    0x0000, 0x0020, CRC(61329fd1) SHA1(15782d8757d4dda5a8b97815e94c90218f0e08dd) )
 ROM_END
-
 
 ROM_START( tomahawk1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1478,6 +1499,8 @@ GAME( 1979, sstarbtl,  astrof,   abattle,  abattle,   astrof_state, init_sstarbt
 
 GAME( 1979, spfghmk2,  0,        spfghmk2, spfghmk2,  astrof_state, empty_init,    ROT90, "Data East",             "Space Fighter Mark II (set 1)",           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, spfghmk22, spfghmk2, spfghmk2, spfghmk22, astrof_state, empty_init,    ROT90, "Data East",             "Space Fighter Mark II (set 2)",           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+
+GAME( 1979, satsf3d,   0,        spfghmk2, spfghmk2,  astrof_state, empty_init,    ROT90, "Data East",             "Saturn: Space Fighter 3D",                MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1980, tomahawk,  0,        tomahawk, tomahawk,  astrof_state, empty_init,    ROT90, "Data East",             "Tomahawk 777 (rev 5)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, tomahawk1, tomahawk, tomahawk, tomahawk1, astrof_state, empty_init,    ROT90, "Data East",             "Tomahawk 777 (rev 1)",                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
