@@ -307,4 +307,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT  MACHINE    INPUT     CLASS           INIT        SCREEN  COMPANY, FULLNAME, FLAGS
-GAMEL(1978, cothello, 0,      cothello,  cothello, cothello_state, empty_init, ROT0,   "Nintendo", "Computer Othello", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND, layout_cothello )
+GAMEL(1978, cothello, 0,      cothello,  cothello, cothello_state, empty_init, ROT0,   "Nintendo", "Computer Othello", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_cothello )
