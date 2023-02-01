@@ -524,6 +524,10 @@ void winwindow_toggle_full_screen()
 	// toggle the window mode
 	video_config.windowed = !video_config.windowed;
 
+	// destroy the renderers first so that the render module can bounce if it depends on having a window handle
+	for (auto it = osd_common_t::window_list().rbegin(); osd_common_t::window_list().rend() != it; ++it)
+		(*it)->renderer_reset();
+
 	// iterate over windows and toggle their fullscreen state
 	for (const auto &window : osd_common_t::window_list())
 	{
