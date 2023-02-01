@@ -178,12 +178,12 @@ LSX 15  C
 
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
+// emu
+#include "emu.h" // put this here before windows.h defines interface as a macro
+
 #include "input_xinput.h"
 
 #include "modules/lib/osdobj_common.h"
-
-// emu
-#include "emu.h"
 
 // lib/util
 #include "util/coretmpl.h"
@@ -195,9 +195,6 @@ LSX 15  C
 #include <string>
 #include <tuple>
 #include <utility>
-
-// standard windows headers
-#include <windows.h>
 
 
 #define XINPUT_LIBRARIES { "xinput1_4.dll", "xinput9_1_0.dll" }
