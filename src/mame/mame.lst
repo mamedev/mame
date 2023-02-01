@@ -28655,6 +28655,7 @@ goldenchip                      // (c) 19?? SegaSA / Sonic
 @source:misc/discoboy.cpp
 discoboy                        // (c) 1993 Soft Art Co.
 discoboyp                       // (c) 1993 Soft Art Co. (Promat license?)
+djgirl
 
 @source:misc/dmainevent.cpp
 dmainevent                      // (c) 1983 Destron
