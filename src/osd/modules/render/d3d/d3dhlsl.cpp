@@ -571,7 +571,7 @@ void shaders::begin_frame(render_primitive_list *primlist)
 
 	std::fill(std::begin(target_to_screen), std::end(target_to_screen), 0);
 	std::fill(std::begin(targets_per_screen), std::end(targets_per_screen), 0);
-	render_container *containers[sizeof(target_to_screen)/sizeof(*target_to_screen)];
+	EQUIVALENT_ARRAY(target_to_screen, render_container *) containers;
 
 	// Maximum potential runtime O(max_num_targets^2)
 	num_targets = 0;
