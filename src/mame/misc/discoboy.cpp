@@ -558,6 +558,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1993, discoboy,  0,        discoboy, discoboy, discoboy_state, empty_init, ROT270, "Soft Art Co.", "Disco Boy",                            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, discoboy,  0,        discoboy, discoboy, discoboy_state, empty_init, ROT270, "Soft Art Co.",          "Disco Boy",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, discoboyp, discoboy, discoboy, discoboy, discoboy_state, empty_init, ROT270, "Soft Art Co. / Promat", "Disco Boy (Promat license)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, djgirl,    discoboy, discoboy, discoboy, discoboy_state, empty_init, ROT270, "Soft Art Co. / Promat", "DJ Girl (Promat license)",    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
