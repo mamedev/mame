@@ -4,13 +4,25 @@
 
 Nintendo Computer Othello
 
-x
+This is Nintendo's 1st microprocessor-based arcade game.
+It's a cocktail cabinet, P1 side has 10 buttons, and P2 side has 4.
+
+In 1980, they also sold a home version. It was called Computer TV Game (model CTG-HC10)
+and is presumed to be on the same base hardware as the arcade version.
 
 Hardware notes:
-- x
+- PCB label: COG CPU
+- M58710S (8080A), ?MHz XTAL
+- 3*1KB M58732S 2708 ROM, 4th socket is empty
+- 256 bytes RAM (2*M58722P 2111A), 0.5KB DRAM (M58755S)
+- M58741P Color TV Interface, 64*64 1bpp video
+- beeper
 
 TODO:
-- WIP
+- verify XTAL
+- verify video timing
+- inputs
+- sound
 
 *******************************************************************************/
 
@@ -95,6 +107,7 @@ void cothello_state::main_map(address_map &map)
 	map(0x8000, 0x8000).w(FUNC(cothello_state::sound_w));
 	map(0xa000, 0xa000).portr("IN.1");
 	map(0xc000, 0xffff).writeonly().share("vram");
+	map(0xc040, 0xc07f).mirror(0x3f00).nopw();
 }
 
 
