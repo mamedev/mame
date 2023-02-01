@@ -87,7 +87,7 @@ bgfx_target* target_reader::read_from_value(
 			break;
 	}
 
-	return chains.targets().create_target(target_name, bgfx::TextureFormat::BGRA8, width, height, xprescale, yprescale, mode, double_buffer, bilinear, scale, screen_index);
+	return chains.targets().create_target(std::move(target_name), bgfx::TextureFormat::BGRA8, width, height, xprescale, yprescale, mode, double_buffer, bilinear, scale, screen_index);
 }
 
 bool target_reader::validate_parameters(const Value& value, const std::string &prefix)

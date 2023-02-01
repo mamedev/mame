@@ -21,7 +21,13 @@
 #include <vector>
 #include <map>
 
-bgfx_chain* chain_reader::read_from_value(const Value& value, const std::string &prefix, chain_manager& chains, uint32_t screen_index, uint16_t user_prescale, uint16_t max_prescale_size)
+std::unique_ptr<bgfx_chain> chain_reader::read_from_value(
+		const Value& value,
+		const std::string &prefix,
+		chain_manager& chains,
+		uint32_t screen_index,
+		uint16_t user_prescale,
+		uint16_t max_prescale_size)
 {
 	if (!validate_parameters(value, prefix))
 	{
@@ -120,7 +126,7 @@ bgfx_chain* chain_reader::read_from_value(const Value& value, const std::string 
 		}
 	}
 
-	return new bgfx_chain(
+	return std::make_unique<bgfx_chain>(
 			std::move(name),
 			std::move(author),
 			transform,

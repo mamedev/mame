@@ -87,7 +87,7 @@ public:
 	uint32_t window_index() const { return m_window_index; }
 	uint32_t screen_count() const { return m_screen_count; }
 	bgfx_chain* screen_chain(uint32_t screen);
-	bgfx_chain* load_chain(std::string name, uint32_t screen_index);
+	std::unique_ptr<bgfx_chain> load_chain(std::string name, uint32_t screen_index);
 	bool has_applicable_chain(uint32_t screen);
 	std::vector<ui::menu_item> get_slider_list();
 	std::vector<std::vector<float>> slider_settings();
