@@ -35,12 +35,14 @@
 #include "sliderdirtynotifier.h"
 
 #include "util/path.h"
+#include "util/unicode.h"
 #include "util/xmlfile.h"
 
 #include "osdcore.h"
 #include "osdfile.h"
 
 #include <algorithm>
+#include <locale>
 
 
 using namespace rapidjson;
@@ -119,10 +121,28 @@ void chain_manager::get_default_chain_info(std::string &out_chain_name, int32_t 
 void chain_manager::refresh_available_chains()
 {
 	m_available_chains.clear();
-	m_available_chains.push_back(chain_desc("none", ""));
+	m_available_chains.emplace_back("none", "");
 
-	const std::string chains_path  = util::string_format("%s" PATH_SEPARATOR "chains", m_options.bgfx_path());
-	find_available_chains(chains_path, "");
+	find_available_chains(util::path_concat(m_options.bgfx_path(), "chains"), "");
+	std::collate<wchar_t> const &coll = std::use_facet<std::collate<wchar_t> >(std::locale());
+	std::sort(
+			m_available_chains.begin(),
+			m_available_chains.end(),
+			[&coll] (chain_desc const &x, chain_desc const &y) -> bool
+			{
+				if (x.m_name == "none")
+					return y.m_name != "none";
+				else if (y.m_name == "none")
+					return false;
+				else if (x.m_name == "default")
+					return y.m_name != "default";
+				else if (y.m_name == "default")
+					return false;
+				std::wstring const xstr = wstring_from_utf8(x.m_name);
+				std::wstring const ystr = wstring_from_utf8(y.m_name);
+				return coll.compare(xstr.data(), xstr.data() + xstr.size(), ystr.data(), ystr.data() + ystr.size()) < 0;
+			});
+
 	if (m_default_chain_index == -1)
 	{
 		for (size_t i = 0; i < m_available_chains.size(); i++)
@@ -159,42 +179,40 @@ void chain_manager::destroy_unloaded_chains()
 	}
 }
 
-void chain_manager::find_available_chains(std::string root, std::string path)
+void chain_manager::find_available_chains(std::string_view root, std::string_view path)
 {
-	osd::directory::ptr directory = osd::directory::open(root + path);
-	if (directory != nullptr)
+	osd::directory::ptr directory = osd::directory::open(path.empty() ? std::string(root) : util::path_concat(root, path));
+	if (directory)
 	{
-		for (const osd::directory::entry *entry = directory->read(); entry != nullptr; entry = directory->read())
+		for (const osd::directory::entry *entry = directory->read(); entry; entry = directory->read())
 		{
 			if (entry->type == osd::directory::entry::entry_type::FILE)
 			{
-				std::string name(entry->name);
-				std::string extension(".json");
+				const std::string_view name(entry->name);
+				const std::string_view extension(".json");
 
 				// Does the name has at least one character in addition to ".json"?
 				if (name.length() > extension.length())
 				{
 					size_t start = name.length() - extension.length();
-					std::string test_segment = name.substr(start, extension.length());
+					const std::string_view test_segment = name.substr(start, extension.length());
 
 					// Does it end in .json?
 					if (test_segment == extension)
 					{
-						m_available_chains.push_back(chain_desc(name.substr(0, start), path));
+						m_available_chains.emplace_back(std::string(name.substr(0, start)), std::string(path));
 					}
 				}
 			}
 			else if (entry->type == osd::directory::entry::entry_type::DIR)
 			{
-				std::string name = entry->name;
-				if (!(name == "." || name == ".."))
+				const std::string_view name = entry->name;
+				if ((name != ".") && (name != ".."))
 				{
-					std::string appended_path = path + "/" + name;
-					if (path.length() == 0)
-					{
-						appended_path = name;
-					}
-					find_available_chains(root, path + "/" + name);
+					if (path.empty())
+						find_available_chains(root, name);
+					else
+						find_available_chains(root, util::path_concat(path, name));
 				}
 			}
 		}
@@ -253,17 +271,17 @@ std::unique_ptr<bgfx_chain> chain_manager::load_chain(std::string name, uint32_t
 	return chain;
 }
 
-void chain_manager::parse_chain_selections(std::string chain_str)
+void chain_manager::parse_chain_selections(std::string_view chain_str)
 {
-	std::vector<std::string> chain_names = split_option_string(chain_str);
+	std::vector<std::string_view> chain_names = split_option_string(chain_str);
 
 	if (chain_names.empty())
 		chain_names.push_back("default");
 
 	while (m_current_chain.size() != chain_names.size())
 	{
-		m_screen_chains.push_back(nullptr);
-		m_chain_names.push_back("");
+		m_screen_chains.emplace_back(nullptr);
+		m_chain_names.emplace_back();
 		m_current_chain.push_back(CHAIN_NONE);
 	}
 
@@ -273,9 +291,7 @@ void chain_manager::parse_chain_selections(std::string chain_str)
 		for (chain_index = 0; chain_index < m_available_chains.size(); chain_index++)
 		{
 			if (m_available_chains[chain_index].m_name == chain_names[index])
-			{
 				break;
-			}
 		}
 
 		if (chain_index < m_available_chains.size())
@@ -291,24 +307,35 @@ void chain_manager::parse_chain_selections(std::string chain_str)
 	}
 }
 
-std::vector<std::string> chain_manager::split_option_string(std::string chain_str) const
+std::vector<std::string_view> chain_manager::split_option_string(std::string_view chain_str) const
 {
-	std::vector<std::string> chain_names;
+	std::vector<std::string_view> chain_names;
 
-	uint32_t length = chain_str.length();
+	const uint32_t length = chain_str.length();
 	uint32_t win = 0;
 	uint32_t last_start = 0;
-	for (uint32_t i = 0; i < length + 1; i++)
+	for (uint32_t i = 0; i <= length; i++)
 	{
-		if (i == length || chain_str[i] == ',' || chain_str[i] == ':')
+		if (i == length || (chain_str[i] == ',') || (chain_str[i] == ':'))
 		{
-			if (win == m_window_index)
+			if ((win == 0) || (win == m_window_index))
 			{
-				chain_names.push_back(chain_str.substr(last_start, i - last_start));
+				// treat an empty string as equivalent to "default"
+				if (i > last_start)
+					chain_names.push_back(chain_str.substr(last_start, i - last_start));
+				else
+					chain_names.push_back("default");
 			}
+
 			last_start = i + 1;
-			if (chain_str[i] == ':')
+			if ((i < length) && (chain_str[i] == ':'))
 			{
+				// no point walking the rest of the string if this was our window
+				if (win == m_window_index)
+					break;
+
+				// don't use first for all if more than one window is specified
+				chain_names.clear();
 				win++;
 			}
 		}
@@ -701,10 +728,18 @@ void chain_manager::restore_slider_settings(int32_t id, std::vector<std::vector<
 
 void chain_manager::load_config(util::xml::data_node const &windownode)
 {
-	bool const explicit_chains = OPTION_PRIORITY_NORMAL <= m_options.get_entry(OSDOPTION_BGFX_SCREEN_CHAINS)->priority();
+	bool const persist = windownode.get_attribute_int("persist", 1) != 0;
+	bool const default_chains = OPTION_PRIORITY_NORMAL > m_options.get_entry(OSDOPTION_BGFX_SCREEN_CHAINS)->priority();
+	bool const explicit_chains = !persist && !default_chains && *m_options.bgfx_screen_chains();
 
 	// if chains weren't explicitly specified, restore the chains from the config file
-	if (!explicit_chains)
+	if (explicit_chains)
+	{
+		osd_printf_verbose(
+				"BGFX: Ignoring chain selection from window 0 configuration due to explicitly specified chains\n",
+				m_window_index);
+	}
+	else
 	{
 		bool changed = false;
 		util::xml::data_node const *screennode = windownode.get_child("screen");
