@@ -34,6 +34,7 @@ public:
 
 private:
 	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -52,6 +53,7 @@ private:
 
 	devcb_write_line m_tx_cb;
 	devcb_write8     m_tone_cb;
+	required_ioport_array<4> m_fake_ioport;
 	emu_timer *      m_update_timer;
 	u8               m_state;
 	u8               m_resp_type;
