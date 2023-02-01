@@ -1199,7 +1199,6 @@ bool renderer_bgfx::update_dimensions()
 
 		if (window().index() != 0)
 		{
-			delete m_framebuffer;
 #ifdef OSD_WINDOWS
 			m_framebuffer = m_targets->create_backbuffer(dynamic_cast<win_window_info &>(window()).platform_window(), width, height);
 #elif defined(OSD_MAC)
