@@ -1015,6 +1015,7 @@ nichibutsu/tubep.cpp
 nichibutsu/wiping.cpp
 nintendo/aleck64.cpp
 nintendo/cham24.cpp
+nintendo/cothello.cpp
 nintendo/dkong.cpp
 nintendo/famibox.cpp
 nintendo/mario.cpp

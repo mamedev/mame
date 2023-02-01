@@ -33511,6 +33511,9 @@ cham24                          // 2002
 @source:nintendo/compmahj.cpp
 compmahj                        // 1983 Nintendo Computer Mah-jong Yakuman
 
+@source:nintendo/cothello.cpp
+cothello
+
 @source:nintendo/dkong.cpp
 8ballact                        // (c) 1984 Seatongrove Ltd (Magic Eletronics USA license)
 8ballact2                       // (c) 1984 Seatongrove Ltd (Magic Eletronics USA license)

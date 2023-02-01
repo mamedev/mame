@@ -9,10 +9,10 @@ license:CC0-1.0
 
 	<view name="Color Overlay">
 		<screen index="0">
-			<bounds left="0" top="0" right="3" bottom="4" />
+			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 		<element ref="overlay" blend="multiply">
-			<bounds left="0" top="0" right="3" bottom="4" />
+			<bounds left="0" top="0" right="4" bottom="3" />
 		</element>
 	</view>
 </mamelayout>
