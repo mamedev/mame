@@ -537,10 +537,10 @@ renderer_bgfx::renderer_bgfx(osd_window &window, parent_module &parent)
 renderer_bgfx::~renderer_bgfx()
 {
 	// persist settings across fullscreen toggle
-	if (m_chains)
-		m_chains->save_config(m_module().persistent_settings());
-	else if (m_config)
+	if (m_config)
 		m_config->get_first_child()->copy_into(m_module().persistent_settings());
+	else if (m_chains)
+		m_chains->save_config(m_module().persistent_settings());
 
 	bgfx::reset(0, 0, BGFX_RESET_NONE);
 
@@ -1620,6 +1620,7 @@ void renderer_bgfx::load_config(util::xml::data_node const &parentnode)
 		else
 			m_config->get_first_child()->delete_node();
 		windownode->copy_into(*m_config);
+		m_config->get_first_child()->set_attribute("persist", "0");
 		osd_printf_verbose("BGFX: Found configuration for window %d\n", window().index());
 		break;
 	}

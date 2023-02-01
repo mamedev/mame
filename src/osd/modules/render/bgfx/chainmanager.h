@@ -22,6 +22,8 @@
 
 #include <map>
 #include <string>
+#include <string_view>
+#include <utility>
 #include <vector>
 
 
@@ -35,19 +37,6 @@ namespace ui { class menu_item; }
 
 class bgfx_chain;
 class bgfx_slider;
-
-class chain_desc
-{
-public:
-	chain_desc(std::string name, std::string path)
-		: m_name(name)
-		, m_path(path)
-	{
-	}
-
-	const std::string m_name;
-	const std::string m_path;
-};
 
 class chain_manager
 {
@@ -99,6 +88,24 @@ public:
 	void save_config(util::xml::data_node &parentnode);
 
 private:
+	class chain_desc
+	{
+	public:
+		chain_desc(const chain_desc &) = default;
+		chain_desc(chain_desc &&) = default;
+		chain_desc &operator=(const chain_desc &) = default;
+		chain_desc &operator=(chain_desc &&) = default;
+
+		chain_desc(std::string &&name, std::string &&path)
+			: m_name(std::move(name))
+			, m_path(std::move(path))
+		{
+		}
+
+		std::string m_name;
+		std::string m_path;
+	};
+
 	void load_chains();
 	void destroy_chains();
 	void reload_chains();
@@ -108,9 +115,9 @@ private:
 	void get_default_chain_info(std::string &out_chain_name, int32_t &out_chain_index);
 	void refresh_available_chains();
 	void destroy_unloaded_chains();
-	void find_available_chains(std::string root, std::string path);
-	void parse_chain_selections(std::string chain_str);
-	std::vector<std::string> split_option_string(std::string chain_str) const;
+	void find_available_chains(std::string_view root, std::string_view path);
+	void parse_chain_selections(std::string_view chain_str);
+	std::vector<std::string_view> split_option_string(std::string_view chain_str) const;
 
 	void update_screen_count(uint32_t screen_count);
 
