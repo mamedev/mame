@@ -59,6 +59,11 @@ bool cpu_device::cpu_is_interruptible() const
 	return false;
 }
 
+void cpu_device::defer_access(void)
+{
+  m_access_to_be_redone = true;
+	*m_icountptr = 0;
+}
 
 bool cpu_device::access_before_time(u64 access_time, u64 current_time)
 {
