@@ -21,8 +21,12 @@ Hardware notes:
 TODO:
 - verify XTAL
 - verify video timing
-- inputs
+- coin
 - sound
+- is there a button select, or is current input emulation correct where for
+  example P1 can move P2 cursor? (the only unique P2 button is the Set button)
+- unknown if the screen is color or B&W + overlay, but since the video chip is
+  meant for a color tv, let's assume the green tint is from the screen itself
 
 *******************************************************************************/
 
@@ -45,7 +49,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
-		m_vram(*this, "vram")
+		m_vram(*this, "vram"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	void cothello(machine_config &config);
@@ -54,11 +59,14 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<u8> m_vram;
+	required_ioport_array<3> m_inputs;
 
 	void main_map(address_map &map);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	u8 input_r();
+	u8 coin_r();
 	void sound_w(u8 data);
 };
 
@@ -75,7 +83,7 @@ u32 cothello_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int pixel = m_vram[(y << 8 | x) & 0x3fff] & 1;
-			bitmap.pix(y, x) = pixel ? rgb_t::white() : rgb_t::black();
+			bitmap.pix(y, x) = pixel ? rgb_t(0x00, 0xff, 0x80) : rgb_t::black();
 		}
 	}
 
@@ -87,6 +95,21 @@ u32 cothello_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 /*******************************************************************************
     I/O
 *******************************************************************************/
+
+u8 cothello_state::input_r()
+{
+	u8 data = 0xff;
+
+	for (int i = 0; i < 3; i++)
+		data &= m_inputs[i]->read();
+
+	return data;
+}
+
+u8 cothello_state::coin_r()
+{
+	return 0xfb;
+}
 
 void cothello_state::sound_w(u8 data)
 {
@@ -103,9 +126,9 @@ void cothello_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0bff).rom();
 	map(0x4000, 0x40ff).ram();
-	map(0x6000, 0x6000).portr("IN.0");
+	map(0x6000, 0x6000).r(FUNC(cothello_state::input_r));
 	map(0x8000, 0x8000).w(FUNC(cothello_state::sound_w));
-	map(0xa000, 0xa000).portr("IN.1");
+	map(0xa000, 0xa000).r(FUNC(cothello_state::coin_r));
 	map(0xc000, 0xffff).writeonly().share("vram");
 	map(0xc040, 0xc07f).mirror(0x3f00).nopw();
 }
@@ -118,24 +141,29 @@ void cothello_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( cothello )
 	PORT_START("IN.0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_6)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("1 Player Start Sente")  // 4
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("1 Player Start Gote")   // 3
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3 ) PORT_NAME("2 Players Start Sente") // 2
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START4 ) PORT_NAME("2 Players Start Gote")  // 1
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Reset")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Abort")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )
 
 	PORT_START("IN.1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Pass")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Set")
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN.2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Pass")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Set")
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
