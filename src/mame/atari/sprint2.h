@@ -5,8 +5,8 @@
     Atari Sprint hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SPRINT2_H
-#define MAME_INCLUDES_SPRINT2_H
+#ifndef MAME_ATARI_SPRINT2_H
+#define MAME_ATARI_SPRINT2_H
 
 #pragma once
 
@@ -118,4 +118,4 @@ DISCRETE_SOUND_EXTERN( sprint2_discrete );
 DISCRETE_SOUND_EXTERN( sprint1_discrete );
 DISCRETE_SOUND_EXTERN( dominos_discrete );
 
-#endif // MAME_INCLUDES_SPRINT2_H
+#endif // MAME_ATARI_SPRINT2_H

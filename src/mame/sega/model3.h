@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Ville Linde
-#ifndef MAME_INCLUDES_MODEL3_H
-#define MAME_INCLUDES_MODEL3_H
+#ifndef MAME_SEGA_MODEL3_H
+#define MAME_SEGA_MODEL3_H
 
 #pragma once
 
@@ -438,4 +438,4 @@ private:
 	void getbass_iocpu_io(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MODEL3_H
+#endif // MAME_SEGA_MODEL3_H

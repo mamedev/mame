@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_ABC80_H
-#define MAME_INCLUDES_ABC80_H
+#ifndef MAME_LUXOR_ABC80_H
+#define MAME_LUXOR_ABC80_H
 
 #pragma once
 
@@ -189,4 +189,4 @@ protected:
 	emu_timer *m_keyboard_clear_timer = nullptr;
 };
 
-#endif // MAME_INCLUDES_ABC80_H
+#endif // MAME_LUXOR_ABC80_H

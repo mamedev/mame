@@ -5,8 +5,8 @@
     Atari Orbit hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_ORBIT_H
-#define MAME_INCLUDES_ORBIT_H
+#ifndef MAME_ATARI_ORBIT_H
+#define MAME_ATARI_ORBIT_H
 
 #pragma once
 
@@ -90,4 +90,4 @@ private:
 
 DISCRETE_SOUND_EXTERN( orbit_discrete );
 
-#endif // MAME_INCLUDES_ORBIT_H
+#endif // MAME_ATARI_ORBIT_H

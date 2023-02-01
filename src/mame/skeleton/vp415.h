@@ -38,8 +38,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_INCLUDES_VP415_H
-#define MAME_INCLUDES_VP415_H
+#ifndef MAME_SKELETON_VP415_H
+#define MAME_SKELETON_VP415_H
 
 #pragma once
 
@@ -277,4 +277,4 @@ private:
 	static const char *const SYNCGEN_TAG;
 };
 
-#endif // MAME_INCLUDES_VP415_H
+#endif // MAME_SKELETON_VP415_H

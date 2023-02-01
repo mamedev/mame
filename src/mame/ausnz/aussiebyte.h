@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
-#ifndef MAME_INCLUDES_AUSSIEBYTE_H
-#define MAME_INCLUDES_AUSSIEBYTE_H
+#ifndef MAME_AUSNZ_AUSSIEBYTE_H
+#define MAME_AUSNZ_AUSSIEBYTE_H
 
 #pragma once
 
@@ -154,4 +154,4 @@ private:
 	required_device<msm5832_device> m_rtc;
 };
 
-#endif // MAME_INCLUDES_AUSSIEBYTE_H
+#endif // MAME_AUSNZ_AUSSIEBYTE_H

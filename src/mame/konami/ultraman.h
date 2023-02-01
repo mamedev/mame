@@ -5,8 +5,8 @@
     Ultraman
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_ULTRAMAN_H
-#define MAME_INCLUDES_ULTRAMAN_H
+#ifndef MAME_KONAMI_ULTRAMAN_H
+#define MAME_KONAMI_ULTRAMAN_H
 
 #pragma once
 
@@ -57,4 +57,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_ULTRAMAN_H
+#endif // MAME_KONAMI_ULTRAMAN_H

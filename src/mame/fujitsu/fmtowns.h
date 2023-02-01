@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
-#ifndef MAME_INCLUDES_FMTOWNS_H
-#define MAME_INCLUDES_FMTOWNS_H
+#ifndef MAME_FUJITSU_FMTOWNS_H
+#define MAME_FUJITSU_FMTOWNS_H
 
 #pragma once
 
@@ -433,4 +433,4 @@ protected:
 	virtual void driver_start() override;
 };
 
-#endif // MAME_INCLUDES_FMTOWNS_H
+#endif // MAME_FUJITSU_FMTOWNS_H

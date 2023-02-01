@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Al Kossow
-#ifndef MAME_INCLUDES_M79AMB_H
-#define MAME_INCLUDES_M79AMB_H
+#ifndef MAME_MIDW8080_M79AMB_H
+#define MAME_MIDW8080_M79AMB_H
 
 #pragma once
 
@@ -55,4 +55,4 @@ private:
 
 DISCRETE_SOUND_EXTERN( m79amb_discrete );
 
-#endif // MAME_INCLUDES_M79AMB_H
+#endif // MAME_MIDW8080_M79AMB_H

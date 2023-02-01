@@ -5,8 +5,8 @@
     Atari Pool Shark hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_POOLSHRK_H
-#define MAME_INCLUDES_POOLSHRK_H
+#ifndef MAME_ATARI_POOLSHRK_H
+#define MAME_ATARI_POOLSHRK_H
 
 #pragma once
 
@@ -76,4 +76,4 @@ private:
 /*----------- defined in audio/poolshrk.c -----------*/
 DISCRETE_SOUND_EXTERN( poolshrk_discrete );
 
-#endif // MAME_INCLUDES_POOLSHRK_H
+#endif // MAME_ATARI_POOLSHRK_H

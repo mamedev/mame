@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Phil Stroffolino, Carlos A. Lozano
-#ifndef MAME_INCLUDES_ARMEDF_H
-#define MAME_INCLUDES_ARMEDF_H
+#ifndef MAME_NICHIBUTSU_ARMEDF_H
+#define MAME_NICHIBUTSU_ARMEDF_H
 
 #pragma once
 
@@ -191,4 +191,4 @@ private:
 	void bigfghtr_mcu_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_ARMEDF_H
+#endif // MAME_NICHIBUTSU_ARMEDF_H

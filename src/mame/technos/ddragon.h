@@ -5,8 +5,8 @@
     Double Dragon & Double Dragon II (but also China Gate)
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_DDRAGON_H
-#define MAME_INCLUDES_DDRAGON_H
+#ifndef MAME_TECHNOS_DDRAGON_H
+#define MAME_TECHNOS_DDRAGON_H
 
 #pragma once
 
@@ -202,4 +202,4 @@ private:
 	void toffy_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_DDRAGON_H
+#endif // MAME_TECHNOS_DDRAGON_H

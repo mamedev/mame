@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Phil Stroffolino, Mirko Buffoni
-#ifndef MAME_INCLUDES_SYSTEM16_H
-#define MAME_INCLUDES_SYSTEM16_H
+#ifndef MAME_SEGA_SYSTEM16_H
+#define MAME_SEGA_SYSTEM16_H
 
 #pragma once
 
@@ -310,4 +310,4 @@ private:
 	output_finder<2> m_leds;
 };
 
-#endif // MAME_INCLUDES_SYSTEM16_H
+#endif // MAME_SEGA_SYSTEM16_H

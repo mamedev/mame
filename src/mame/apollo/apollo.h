@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef MAME_INCLUDES_APOLLO_H
-#define MAME_INCLUDES_APOLLO_H
+#ifndef MAME_APOLLO_APOLLO_H
+#define MAME_APOLLO_APOLLO_H
 
 #pragma once
 
@@ -716,4 +716,4 @@ private:
 DECLARE_DEVICE_TYPE(APOLLO_STDIO, apollo_stdio_device)
 #endif /* APOLLO_XXL */
 
-#endif // MAME_INCLUDES_APOLLO_H
+#endif // MAME_APOLLO_APOLLO_H

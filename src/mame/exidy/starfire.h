@@ -5,8 +5,8 @@
     Star Fire/Fire One system
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_STARFIRE_H
-#define MAME_INCLUDES_STARFIRE_H
+#ifndef MAME_EXIDY_STARFIRE_H
+#define MAME_EXIDY_STARFIRE_H
 
 #pragma once
 
@@ -199,4 +199,4 @@ private:
 	required_device<netlist_mame_logic_input_device> m_music_c;
 };
 
-#endif // MAME_INCLUDES_STARFIRE_H
+#endif // MAME_EXIDY_STARFIRE_H

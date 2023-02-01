@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_AVIGO_H
-#define MAME_INCLUDES_AVIGO_H
+#ifndef MAME_TI_AVIGO_H
+#define MAME_TI_AVIGO_H
 
 #pragma once
 
@@ -118,4 +118,4 @@ protected:
 	uint8_t               m_warm_start = 0U;
 };
 
-#endif // MAME_INCLUDES_AVIGO_H
+#endif // MAME_TI_AVIGO_H

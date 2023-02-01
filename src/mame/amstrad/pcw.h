@@ -5,8 +5,8 @@
  * includes/pcw.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_PCW_H
-#define MAME_INCLUDES_PCW_H
+#ifndef MAME_AMSTRAD_PCW_H
+#define MAME_AMSTRAD_PCW_H
 
 #pragma once
 
@@ -169,4 +169,4 @@ private:
 	void pcw_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_PCW_H
+#endif // MAME_AMSTRAD_PCW_H

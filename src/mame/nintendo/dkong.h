@@ -5,8 +5,8 @@
   Nintendo Donkey Kong hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_DKONG_H
-#define MAME_INCLUDES_DKONG_H
+#ifndef MAME_NINTENDO_DKONG_H
+#define MAME_NINTENDO_DKONG_H
 
 #pragma once
 
@@ -361,4 +361,4 @@ private:
 	uint32_t screen_update_spclforc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-#endif // MAME_INCLUDES_DKONG_H
+#endif // MAME_NINTENDO_DKONG_H

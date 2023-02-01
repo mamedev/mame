@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_PC8401A_H
-#define MAME_INCLUDES_PC8401A_H
+#ifndef MAME_NEC_PC8401A_H
+#define MAME_NEC_PC8401A_H
 
 #pragma once
 
@@ -124,4 +124,4 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-#endif // MAME_INCLUDES_PC8401A_H
+#endif // MAME_NEC_PC8401A_H

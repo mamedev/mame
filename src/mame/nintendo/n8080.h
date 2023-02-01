@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
-#ifndef MAME_INCLUDES_N8080_H
-#define MAME_INCLUDES_N8080_H
+#ifndef MAME_NINTENDO_N8080_H
+#define MAME_NINTENDO_N8080_H
 
 #pragma once
 
@@ -206,4 +206,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_N8080_H
+#endif // MAME_NINTENDO_N8080_H

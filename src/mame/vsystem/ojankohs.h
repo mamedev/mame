@@ -5,8 +5,8 @@
     Ojanko High School & other Video System mahjong series
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_OJANKOHS_H
-#define MAME_INCLUDES_OJANKOHS_H
+#ifndef MAME_VSYSTEM_OJANKOHS_H
+#define MAME_VSYSTEM_OJANKOHS_H
 
 #pragma once
 
@@ -183,4 +183,4 @@ private:
 	void map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_OJANKOHS_H
+#endif // MAME_VSYSTEM_OJANKOHS_H

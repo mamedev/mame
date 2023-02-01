@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_SETA_H
-#define MAME_INCLUDES_SETA_H
+#ifndef MAME_SETA_SETA_H
+#define MAME_SETA_SETA_H
 
 #pragma once
 
@@ -612,4 +612,4 @@ private:
 	void show_outputs();
 };
 
-#endif // MAME_INCLUDES_SETA_H
+#endif // MAME_SETA_SETA_H

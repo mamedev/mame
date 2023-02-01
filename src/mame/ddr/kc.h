@@ -5,8 +5,8 @@
  * includes/kc.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_KC_H
-#define MAME_INCLUDES_KC_H
+#ifndef MAME_DDR_KC_H
+#define MAME_DDR_KC_H
 
 #pragma once
 
@@ -198,4 +198,4 @@ public:
 	void kc85_4_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_KC_H
+#endif // MAME_DDR_KC_H

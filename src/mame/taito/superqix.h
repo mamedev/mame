@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni, Nicola Salmoria, Tomasz Slanina
-#ifndef MAME_INCLUDES_SUPERQIX_H
-#define MAME_INCLUDES_SUPERQIX_H
+#ifndef MAME_TAITO_SUPERQIX_H
+#define MAME_TAITO_SUPERQIX_H
 
 #pragma once
 
@@ -212,4 +212,4 @@ private:
 	int m_dial_sign[2];
 };
 
-#endif // MAME_INCLUDES_SUPERQIX_H
+#endif // MAME_TAITO_SUPERQIX_H

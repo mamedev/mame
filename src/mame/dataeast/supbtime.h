@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_INCLUDES_SUPBTIME_H
-#define MAME_INCLUDES_SUPBTIME_H
+#ifndef MAME_DATAEAST_SUPBTIME_H
+#define MAME_DATAEAST_SUPBTIME_H
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
@@ -61,4 +61,4 @@ private:
 };
 
 
-#endif
+#endif // MAME_DATAEAST_SUPBTIME_H

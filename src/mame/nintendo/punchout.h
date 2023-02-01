@@ -5,8 +5,8 @@
     Punch Out / Super Punch Out / Arm Wrestling
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_PUNCHOUT_H
-#define MAME_INCLUDES_PUNCHOUT_H
+#ifndef MAME_NINTENDO_PUNCHOUT_H
+#define MAME_NINTENDO_PUNCHOUT_H
 
 #pragma once
 
@@ -109,4 +109,4 @@ private:
 	void spnchout_io_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_PUNCHOUT_H
+#endif // MAME_NINTENDO_PUNCHOUT_H
