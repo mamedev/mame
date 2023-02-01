@@ -518,7 +518,7 @@ public:
 
 				// loop over channels and read the samples
 				int channels = unsigned((std::min<std::size_t>)(m_info.channels, std::size(m_audio)));
-				int16_t *samplesptr[std::size(m_audio)];
+				int16_t *samplesptr[sizeof(m_audio)/sizeof(*m_audio)];
 				for (int chnum = 0; chnum < channels; chnum++)
 				{
 					// read the sound samples
