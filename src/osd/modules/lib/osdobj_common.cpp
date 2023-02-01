@@ -691,8 +691,8 @@ void osd_common_t::window_exit()
 void osd_common_t::osd_exit()
 {
 	// destroy the renderers before shutting down their parent module
-	for (auto const &window : s_window_list)
-		window->renderer_reset();
+	for (auto it = window_list().rbegin(); window_list().rend() != it; ++it)
+		(*it)->renderer_reset();
 
 	m_mod_man.exit();
 

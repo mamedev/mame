@@ -137,6 +137,9 @@ static void check_osd_inputs(running_machine &machine)
 	// check for toggling fullscreen mode
 	if (machine.ui_input().pressed(IPT_OSD_1))
 	{
+		// destroy the renderers first so that the render module can bounce if it depends on having a window handle
+		for (auto it = osd_common_t::window_list().rbegin(); osd_common_t::window_list().rend() != it; ++it)
+			(*it)->renderer_reset();
 		for (auto const &curwin : osd_common_t::window_list())
 			dynamic_cast<mac_window_info &>(*curwin).toggle_full_screen();
 	}
