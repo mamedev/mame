@@ -369,7 +369,7 @@ void nbmj8891_state::gfxdraw()
 			color = GFX[gfxaddr++];
 
 			// for hanamomo font type
-			if (m_nb1413m3->m_nb1413m3_type == NB1413M3_HANAMOMO)
+			if (m_nb1413m3->m_nb1413m3_type == nb1413m3_device::NB1413M3_HANAMOMO)
 			{
 				if ((ioport("FONTTYPE")->read()) == 0x00)
 				{
@@ -489,7 +489,7 @@ VIDEO_START_MEMBER( nbmj8891_state, _1layer )
 	m_blitter_src_addr = 0;
 	m_gfxrom = 0;
 
-	if (m_nb1413m3->m_nb1413m3_type == NB1413M3_TAIWANMB)
+	if (m_nb1413m3->m_nb1413m3_type == nb1413m3_device::NB1413M3_TAIWANMB)
 	{
 		if (m_clut_ptr)
 		{
