@@ -42,7 +42,7 @@
         * I know there must be at least one other ROM set for Astro Fighter
           I have played one that stoped between waves to show the next enemy
 
-        * Saturn: Space Fighter 3D is Space Fighter Mark II with extra game modes.
+        * Saturn: Space Fighter 3D is basically Space Fighter with extra game modes.
           It's not 3-dimensional. The game modes are: Storm, Sweeper, Scramble.
 
     Known issues/to-do's:
@@ -57,7 +57,7 @@
           emulates an unmodified PCB, you can enable the hacks in the DRIVER
           CONFIGURATION menu.
 
-          B&W cabinet versions also exist.
+          B&W cabinet versions of the Space Fighter games also exist.
 
           Versions of Tomahawk using the Astro Fighter PROM have been seen,
           see notes in ROM loading.
