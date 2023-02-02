@@ -134,14 +134,14 @@ void nbmj8688_state::mjsikaku_gfxflag2_w(uint8_t data)
 {
 	m_gfxflag2 = data;
 
-	if (m_nb1413m3->m_nb1413m3_type == NB1413M3_SEIHAM
-			|| m_nb1413m3->m_nb1413m3_type == NB1413M3_KORINAI
-			|| m_nb1413m3->m_nb1413m3_type == NB1413M3_KORINAIM
-			|| m_nb1413m3->m_nb1413m3_type == NB1413M3_LIVEGAL)
+	if (m_nb1413m3->m_nb1413m3_type == nb1413m3_device::NB1413M3_SEIHAM
+			|| m_nb1413m3->m_nb1413m3_type == nb1413m3_device::NB1413M3_KORINAI
+			|| m_nb1413m3->m_nb1413m3_type == nb1413m3_device::NB1413M3_KORINAIM
+			|| m_nb1413m3->m_nb1413m3_type == nb1413m3_device::NB1413M3_LIVEGAL)
 		m_gfxflag2 ^= 0x20;
 
-	if (m_nb1413m3->m_nb1413m3_type == NB1413M3_OJOUSANM
-			|| m_nb1413m3->m_nb1413m3_type == NB1413M3_RYUUHA)
+	if (m_nb1413m3->m_nb1413m3_type == nb1413m3_device::NB1413M3_OJOUSANM
+			|| m_nb1413m3->m_nb1413m3_type == nb1413m3_device::NB1413M3_RYUUHA)
 		m_gfxflag2 |= 0x20;
 }
 

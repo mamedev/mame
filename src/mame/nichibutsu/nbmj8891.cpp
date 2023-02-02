@@ -2191,7 +2191,8 @@ void nbmj8891_state::gionbana(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::gionbana_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(nbmj8891_state::irq0_line_hold));
 
-	NB1413M3(config, m_nb1413m3, 0, NB1413M3_GIONBANA);
+	NB1413M3(config, m_nb1413m3, 0, nb1413m3_device::NB1413M3_GIONBANA);
+	m_nb1413m3->set_blitter_rom_tag("gfx1");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2221,7 +2222,7 @@ void nbmj8891_state::mgion(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::mgion_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::mgion_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_MGION);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MGION);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
@@ -2234,7 +2235,7 @@ void nbmj8891_state::omotesnd(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::omotesnd_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::omotesnd_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_OMOTESND);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_OMOTESND);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2249,7 +2250,7 @@ void nbmj8891_state::abunai(machine_config &config)
 {
 	gionbana(config);
 
-	m_nb1413m3->set_type(NB1413M3_ABUNAI);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_ABUNAI);
 }
 
 /* NBMJDRV2 */
@@ -2260,7 +2261,7 @@ void nbmj8891_state::mjcamerb(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::hanamomo_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_MJCAMERB);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MJCAMERB);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2276,7 +2277,7 @@ void nbmj8891_state::mmcamera(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::hanamomo_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_MMCAMERA);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MMCAMERA);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2293,7 +2294,7 @@ void nbmj8891_state::hanamomo(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::hanamomo_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::hanamomo_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_HANAMOMO);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_HANAMOMO);
 
 	/* video hardware */
 	m_screen->set_visarea(0, 512-1, 16, 240-1);
@@ -2308,7 +2309,7 @@ void nbmj8891_state::msjiken(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::gionbana_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::msjiken_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_MSJIKEN);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MSJIKEN);
 }
 
 /* NBMJDRV3 */
@@ -2316,7 +2317,7 @@ void nbmj8891_state::telmahjn(machine_config &config)
 {
 	gionbana(config);
 
-	m_nb1413m3->set_type(NB1413M3_TELMAHJN);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_TELMAHJN);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
@@ -2326,7 +2327,7 @@ void nbmj8891_state::mgmen89(machine_config &config)
 {
 	telmahjn(config);
 
-	m_nb1413m3->set_type(NB1413M3_MGMEN89);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MGMEN89);
 }
 
 /* NBMJDRV4 */
@@ -2336,7 +2337,7 @@ void nbmj8891_state::mjfocus(machine_config &config)
 
 	/* basic machine hardware */
 
-	m_nb1413m3->set_type(NB1413M3_MJFOCUS);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MJFOCUS);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
@@ -2346,14 +2347,14 @@ void nbmj8891_state::pairsnb(machine_config &config)
 {
 	gionbana(config);
 
-	m_nb1413m3->set_type(NB1413M3_PAIRSNB);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_PAIRSNB);
 }
 
 void nbmj8891_state::pairsten(machine_config &config)
 {
 	gionbana(config);
 
-	m_nb1413m3->set_type(NB1413M3_PAIRSTEN);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_PAIRSTEN);
 }
 
 /* NBMJDRV5 */
@@ -2364,7 +2365,7 @@ void nbmj8891_state::mjnanpas(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::club90s_map);
 
-	m_nb1413m3->set_type(NB1413M3_MJNANPAS);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MJNANPAS);
 }
 
 void nbmj8891_state::maiko(machine_config &config)
@@ -2375,7 +2376,7 @@ void nbmj8891_state::maiko(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::maiko_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::maiko_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_MAIKO);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MAIKO);
 }
 
 void nbmj8891_state::mmaiko(machine_config &config)
@@ -2385,7 +2386,7 @@ void nbmj8891_state::mmaiko(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::mmaiko_map);
 
-	m_nb1413m3->set_type(NB1413M3_MMAIKO);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MMAIKO);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
@@ -2398,7 +2399,7 @@ void nbmj8891_state::lovehous(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::lovehous_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::lovehous_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_LOVEHOUS);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_LOVEHOUS);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
@@ -2410,7 +2411,7 @@ void nbmj8891_state::hanaoji(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::hanaoji_map);
 
-	m_nb1413m3->set_type(NB1413M3_HANAOJI);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_HANAOJI);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
@@ -2441,7 +2442,7 @@ void nbmj8891_state::scandal(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::scandalm_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::scandal_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_SCANDAL);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_SCANDAL);
 }
 
 void nbmj8891_state::bananadr(machine_config &config)
@@ -2452,7 +2453,7 @@ void nbmj8891_state::bananadr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::scandalm_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::bananadr_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_BANANADR);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_BANANADR);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }
@@ -2461,21 +2462,21 @@ void nbmj8891_state::club90s(machine_config &config)
 {
 	mjnanpas(config);
 
-	m_nb1413m3->set_type(NB1413M3_CLUB90S);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_CLUB90S);
 }
 
 void nbmj8891_state::mladyhtr(machine_config &config)
 {
 	mjnanpas(config);
 
-	m_nb1413m3->set_type(NB1413M3_MLADYHTR);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MLADYHTR);
 }
 
 void nbmj8891_state::chinmoku(machine_config &config)
 {
 	mjnanpas(config);
 
-	m_nb1413m3->set_type(NB1413M3_CHINMOKU);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_CHINMOKU);
 }
 
 /* NBMJDRV6 */
@@ -2487,7 +2488,7 @@ void nbmj8891_state::mjfocusm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nbmj8891_state::scandalm_map);
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::scandalm_io_map);
 
-	m_nb1413m3->set_type(NB1413M3_MJFOCUSM);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_MJFOCUSM);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -2506,7 +2507,7 @@ void nbmj8891_state::scandalm(machine_config &config)
 {
 	mjfocusm(config);
 
-	m_nb1413m3->set_type(NB1413M3_SCANDALM);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_SCANDALM);
 }
 
 void nbmj8891_state::taiwanmb(machine_config &config)
@@ -2518,7 +2519,7 @@ void nbmj8891_state::taiwanmb(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &nbmj8891_state::taiwanmb_io_map);
 //  m_maincpu->set_vblank_int("screen", FUNC(nbmj8891_state::irq0_line_hold));
 
-	m_nb1413m3->set_type(NB1413M3_TAIWANMB);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_TAIWANMB);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
