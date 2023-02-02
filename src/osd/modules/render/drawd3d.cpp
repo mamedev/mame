@@ -513,13 +513,12 @@ d3d_texture_manager::d3d_texture_manager(renderer_d3d9 &d3d, IDirect3D9 *d3dobj)
 void d3d_texture_manager::create_resources()
 {
 	m_default_bitmap.allocate(8, 8);
-	m_default_bitmap.fill(rgb_t(0xff,0xff,0xff,0xff));
-
 	if (m_default_bitmap.valid())
 	{
-		render_texinfo texture;
+		m_default_bitmap.fill(rgb_t(0xff,0xff,0xff,0xff));
 
 		// fake in the basic data so it looks like it came from render.c
+		render_texinfo texture;
 		texture.base = m_default_bitmap.raw_pixptr(0);
 		texture.rowpixels = m_default_bitmap.rowpixels();
 		texture.width = m_default_bitmap.width();
@@ -552,16 +551,16 @@ uint32_t d3d_texture_manager::texture_compute_hash(const render_texinfo *texture
 
 texture_info *d3d_texture_manager::find_texinfo(const render_texinfo *texinfo, uint32_t flags)
 {
-	uint32_t hash = texture_compute_hash(texinfo, flags);
+	const uint32_t hash = texture_compute_hash(texinfo, flags);
 
 	// find a match
 	for (auto it = m_texture_list.begin(); it != m_texture_list.end(); it++)
 	{
-		auto test_screen = (uint32_t)((*it)->get_texinfo().unique_id >> 57);
-		uint32_t test_page = (uint32_t)((*it)->get_texinfo().unique_id >> 56) & 1;
-		auto prim_screen = (uint32_t)(texinfo->unique_id >> 57);
-		uint32_t prim_page = (uint32_t)(texinfo->unique_id >> 56) & 1;
-		if (test_screen != prim_screen || test_page != prim_page)
+		const uint32_t test_screen = uint32_t((*it)->get_texinfo().unique_id >> 57);
+		const uint32_t test_page = uint32_t((*it)->get_texinfo().unique_id >> 56) & 1;
+		const uint32_t prim_screen = uint32_t(texinfo->unique_id >> 57);
+		const uint32_t prim_page = uint32_t(texinfo->unique_id >> 56) & 1;
+		if ((test_screen != prim_screen) || (test_page != prim_page))
 			continue;
 
 		if ((*it)->get_hash() == hash &&
@@ -687,7 +686,7 @@ void d3d_texture_manager::update_textures()
 			texture_info *texture = find_texinfo(&prim.texture, prim.flags);
 			if (texture == nullptr)
 			{
-				int prescale = m_renderer.get_shaders()->enabled() ? 1 : m_renderer.window().prescale();
+				const int prescale = m_renderer.get_shaders()->enabled() ? 1 : m_renderer.window().prescale();
 
 				auto tex = std::make_unique<texture_info>(*this, &prim.texture, prescale, prim.flags);
 				texture = tex.get();
@@ -706,9 +705,7 @@ void d3d_texture_manager::update_textures()
 	}
 
 	if (!m_renderer.get_shaders()->enabled())
-	{
 		return;
-	}
 
 	int screen_index = 0;
 	for (render_primitive &prim : *m_renderer.window().m_primlist)
@@ -1969,11 +1966,9 @@ texture_info::texture_info(d3d_texture_manager &manager, const render_texinfo* t
 	, m_flags(flags)
 	, m_texinfo(*texsource)
 	, m_type(!PRIMFLAG_GET_SCREENTEX(flags) ? TEXTURE_TYPE_PLAIN : TEXTURE_TYPE_DYNAMIC) // required to compute texture size
-	, m_xprescale(prescale)
-	, m_yprescale(prescale)
+	, m_xprescale(PRIMFLAG_GET_SCREENTEX(flags) ? prescale : 1)
+	, m_yprescale(PRIMFLAG_GET_SCREENTEX(flags) ? prescale : 1)
 {
-	HRESULT result;
-
 	// compute the size
 	compute_size(texsource->width, texsource->height);
 
@@ -1981,7 +1976,7 @@ texture_info::texture_info(d3d_texture_manager &manager, const render_texinfo* t
 	{
 		// non-screen textures are easy
 		assert(PRIMFLAG_TEXFORMAT(flags) != TEXFORMAT_YUY16);
-		result = m_renderer.get_device()->CreateTexture(m_rawdims.c.x, m_rawdims.c.y, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &m_d3dtex, nullptr);
+		const HRESULT result = m_renderer.get_device()->CreateTexture(m_rawdims.c.x, m_rawdims.c.y, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &m_d3dtex, nullptr);
 		if (FAILED(result))
 			goto error;
 
@@ -1990,12 +1985,11 @@ texture_info::texture_info(d3d_texture_manager &manager, const render_texinfo* t
 	else
 	{
 		// screen textures are allocated differently
-		D3DFORMAT format;
-		DWORD usage = D3DUSAGE_DYNAMIC;
-		D3DPOOL pool = D3DPOOL_DEFAULT;
-		int maxdim = std::max(m_renderer.get_presentation()->BackBufferWidth, m_renderer.get_presentation()->BackBufferHeight);
 
 		// pick the format
+		const DWORD usage = D3DUSAGE_DYNAMIC;
+		const D3DPOOL pool = D3DPOOL_DEFAULT;
+		D3DFORMAT format;
 		if (PRIMFLAG_GET_TEXFORMAT(flags) == TEXFORMAT_YUY16)
 			format = m_texture_manager.get_yuv_format();
 		else if (PRIMFLAG_GET_TEXFORMAT(flags) == TEXFORMAT_ARGB32)
@@ -2004,35 +1998,29 @@ texture_info::texture_info(d3d_texture_manager &manager, const render_texinfo* t
 			format = m_renderer.get_screen_format();
 
 		// don't prescale above screen size
-		while (m_xprescale > 1 && m_rawdims.c.x * m_xprescale >= 2 * maxdim)
-		{
+		const int maxdim = std::max(
+				m_renderer.get_presentation()->BackBufferWidth,
+				m_renderer.get_presentation()->BackBufferHeight);
+
+		while ((m_xprescale > 1) && ((m_rawdims.c.x * m_xprescale) >= (2 * maxdim)))
 			m_xprescale--;
-		}
-		while (m_xprescale > 1 && m_rawdims.c.x * m_xprescale > manager.get_max_texture_width())
-		{
+		while ((m_xprescale > 1) && ((m_rawdims.c.x * m_xprescale) > manager.get_max_texture_width()))
 			m_xprescale--;
-		}
-		while (m_yprescale > 1 && m_rawdims.c.y * m_yprescale >= 2 * maxdim)
-		{
+
+		while ((m_yprescale > 1) && ((m_rawdims.c.y * m_yprescale) >= (2 * maxdim)))
 			m_yprescale--;
-		}
-		while (m_yprescale > 1 && m_rawdims.c.y * m_yprescale > manager.get_max_texture_height())
-		{
+		while ((m_yprescale > 1) && ((m_rawdims.c.y * m_yprescale) > manager.get_max_texture_height()))
 			m_yprescale--;
-		}
 
 		const int prescale = m_renderer.window().prescale();
-		if (m_xprescale != prescale || m_yprescale != prescale)
+		if ((m_xprescale != prescale) || (m_yprescale != prescale))
 			osd_printf_verbose("Direct3D: adjusting prescale from %dx%d to %dx%d\n", prescale, prescale, m_xprescale, m_yprescale);
 
 		// loop until we allocate something or error
+		HRESULT result;
 		for (int attempt = 0; attempt < 2; attempt++)
 		{
-			// second attempt is always 1:1
-			if (attempt == 1)
-				m_xprescale = m_yprescale = 1;
-
-			if (m_xprescale == 1 && m_yprescale == 1)
+			if ((m_xprescale == 1) && (m_yprescale == 1))
 			{
 				// screen textures with no prescaling are pretty easy
 				result = m_renderer.get_device()->CreateTexture(m_rawdims.c.x, m_rawdims.c.y, 1, usage, format, pool, &m_d3dtex, nullptr);
@@ -2046,26 +2034,33 @@ texture_info::texture_info(d3d_texture_manager &manager, const render_texinfo* t
 			{
 				// screen textures with prescaling require two allocations
 				result = m_renderer.get_device()->CreateTexture(m_rawdims.c.x, m_rawdims.c.y, 1, usage, format, pool, &m_d3dtex, nullptr);
-				if (FAILED(result))
-					continue;
-
-				// for the target surface, we allocate a render target texture
-				const int scwidth = m_rawdims.c.x * m_xprescale;
-				const int scheight = m_rawdims.c.y * m_yprescale;
-
-				// target surfaces typically cannot be YCbCr, so we always pick RGB in that case
-				const D3DFORMAT finalfmt = (format != m_texture_manager.get_yuv_format()) ? format : D3DFMT_A8R8G8B8;
-
-				result = m_renderer.get_device()->CreateTexture(scwidth, scheight, 1, D3DUSAGE_RENDERTARGET, finalfmt, D3DPOOL_DEFAULT, &m_d3dfinaltex, nullptr);
 				if (result == D3D_OK)
-					break;
+				{
+					// for the target surface, we allocate a render target texture
+					const int scwidth = m_rawdims.c.x * m_xprescale;
+					const int scheight = m_rawdims.c.y * m_yprescale;
 
-				m_d3dtex.Reset();
+					// target surfaces typically cannot be YCbCr, so we always pick RGB in that case
+					const D3DFORMAT finalfmt = (format != m_texture_manager.get_yuv_format()) ? format : D3DFMT_A8R8G8B8;
+
+					result = m_renderer.get_device()->CreateTexture(scwidth, scheight, 1, D3DUSAGE_RENDERTARGET, finalfmt, D3DPOOL_DEFAULT, &m_d3dfinaltex, nullptr);
+					if (result == D3D_OK)
+						break;
+
+					m_d3dtex.Reset();
+				}
 			}
+
+			// second attempt is always 1:1
+			m_xprescale = m_yprescale = 1;
 		}
+		if (FAILED(result))
+			goto error;
 	}
 
 	// copy the data to the texture
+	assert(m_d3dtex);
+	assert(m_d3dfinaltex);
 	set_data(texsource, flags);
 
 	return;
@@ -2452,12 +2447,17 @@ void texture_info::set_data(const render_texinfo *texsource, uint32_t flags)
 
 void texture_info::prescale()
 {
-	HRESULT result;
-	int i;
-
 	// if we don't need to, just skip it
-	if (m_d3dtex == m_d3dfinaltex)
+	if (m_d3dtex.Get() == m_d3dfinaltex.Get())
+	{
+		assert(m_xprescale == 1);
+		assert(m_yprescale == 1);
 		return;
+	}
+
+	assert(m_d3dtex);
+	assert((m_xprescale > 1) || (m_yprescale > 1));
+	HRESULT result;
 
 	// for all cases, we need to get the surface of the render target
 	Microsoft::WRL::ComPtr<IDirect3DSurface9> scale_surface;
@@ -2466,7 +2466,6 @@ void texture_info::prescale()
 		osd_printf_verbose("Direct3D: Error %08lX during texture GetSurfaceLevel call\n", result);
 
 	// if we have an offscreen plain surface, we can just StretchRect to it
-	assert(m_d3dtex);
 
 	// first remember the original render target and set the new one
 	Microsoft::WRL::ComPtr<IDirect3DSurface9> backbuffer;
@@ -2517,7 +2516,7 @@ void texture_info::prescale()
 	lockedbuf[3].v0 = (float)(m_texinfo.height + 2 * m_yborderpix) / (float)m_rawdims.c.y;
 
 	// reset the remaining vertex parameters
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		lockedbuf[i].z = 0.0f;
 		lockedbuf[i].rhw = 1.0f;

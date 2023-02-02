@@ -1308,7 +1308,7 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 
 	set_curr_effect(post_effect.get());
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("ShadowTexture", shadow_texture == nullptr ? nullptr : shadow_texture->get_finaltex());
+	curr_effect->set_texture("ShadowTexture", !shadow_texture ? nullptr : shadow_texture->get_finaltex());
 	curr_effect->set_int("ShadowTileMode", options->shadow_mask_tile_mode);
 	curr_effect->set_texture("DiffuseTexture", rt->target_texture[next_index].Get());
 	curr_effect->set_vector("BackColor", 3, back_color);
@@ -1461,7 +1461,7 @@ int shaders::vector_buffer_pass(d3d_render_target *rt, int source_index, poly_in
 	curr_effect->update_uniforms();
 
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index].Get());
-	curr_effect->set_texture("LutTexture", lut_texture == nullptr ? nullptr : lut_texture->get_finaltex());
+	curr_effect->set_texture("LutTexture", !lut_texture ? nullptr : lut_texture->get_finaltex());
 
 	// we need to clear the vector render target here
 	next_index = rt->next_index(next_index);
@@ -1481,7 +1481,7 @@ int shaders::screen_pass(d3d_render_target *rt, int source_index, poly_info *pol
 	curr_effect->update_uniforms();
 
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index].Get());
-	curr_effect->set_texture("LutTexture", lut_texture == nullptr ? nullptr : lut_texture->get_finaltex());
+	curr_effect->set_texture("LutTexture", !lut_texture ? nullptr : lut_texture->get_finaltex());
 
 	blit(backbuffer.Get(), false, poly->type(), vertnum, poly->count());
 
@@ -1513,7 +1513,7 @@ void shaders::ui_pass(poly_info *poly, int vertnum)
 	curr_effect->set_texture("Diffuse", diffuse_texture->get_finaltex());
 	curr_effect->update_uniforms();
 
-	curr_effect->set_texture("LutTexture", lut_texture == nullptr ? nullptr : ui_lut_texture->get_finaltex());
+	curr_effect->set_texture("LutTexture", !lut_texture ? nullptr : ui_lut_texture->get_finaltex());
 
 	blit(nullptr, false, poly->type(), vertnum, poly->count());
 }
@@ -2554,7 +2554,7 @@ void uniform::update()
 			m_shader->set_float("SmoothBorderAmount", options->smooth_border);
 			break;
 		case CU_POST_SHADOW_ALPHA:
-			m_shader->set_float("ShadowAlpha", shadersys->shadow_texture == nullptr ? 0.0f : options->shadow_mask_alpha);
+			m_shader->set_float("ShadowAlpha", !shadersys->shadow_texture ? 0.0f : options->shadow_mask_alpha);
 			break;
 		case CU_POST_SHADOW_COUNT:
 		{
