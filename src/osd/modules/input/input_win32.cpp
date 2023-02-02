@@ -114,7 +114,7 @@ public:
 					{
 						device.queue_events(args, 1);
 					});
-			return true;
+			return false; // we still want text input events to be generated
 
 		default:
 			return false;
