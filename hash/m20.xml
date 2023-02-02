@@ -75,7 +75,7 @@ license:CC0-1.0
 		<publisher>Olivetti</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="273424">
+			<dataarea name="flop" size="286720">
 				<rom name="pcos13d.imd" size="273424" crc="c82f4ae4" sha1="23658a35a7cc7d8888dc0be2bc2c3961faee79e7"/>
 			</dataarea>
 		</part>
@@ -87,7 +87,7 @@ license:CC0-1.0
 		<publisher>Olivetti</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="185194">
+			<dataarea name="flop" size="286720">
 				<rom name="pcos13f.imd" size="185194" crc="61047402" sha1="31c716245911544597981474b69c23a9a3a084a7"/>
 			</dataarea>
 		</part>
@@ -123,7 +123,7 @@ license:CC0-1.0
 		<publisher>Olivetti</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="228963">
+			<dataarea name="flop" size="286720">
 				<rom name="pcos30e.img" size="228963" crc="ee2f9763" sha1="7f7dddb7815d0a4615ed4eac8f4709fb67688b46"/>
 			</dataarea>
 		</part>
@@ -207,7 +207,7 @@ license:CC0-1.0
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="33619">
+			<dataarea name="flop" size="368640">
 				<rom name="adm5.imd" size="33619" crc="f7abfeee" sha1="ee432dc896f9b034c1f7ff3fac67cf5b8e003ff5"/>
 			</dataarea>
 		</part>
@@ -221,7 +221,7 @@ license:CC0-1.0
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="8192">
+			<dataarea name="flop" size="368640">
 				<rom name="adm51.imd" size="8192" crc="8916ea22" sha1="99fec256ae75c6569dff5bb8005f0e7bc301f4d8"/>
 			</dataarea>
 		</part>
@@ -285,12 +285,12 @@ license:CC0-1.0
 		<publisher>Olivetti</publisher>
 
 		<part name="flop1" interface="floppy_5_25"><!-- bootable (pcos 2.0h) -->
-			<dataarea name="flop" size="270678">
+			<dataarea name="flop" size="286720">
 				<rom name="dbms.imd" size="270678" crc="96a01fe0" sha1="ed6526f87959f50c322eba1322ecdff3d014d904"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="23070">
+			<dataarea name="flop" size="286720">
 				<rom name="dbms2.imd" size="23070" crc="418ee13c" sha1="2552731921d7f71323e27024564c4c15dc17489f"/>
 			</dataarea>
 		</part>
@@ -400,6 +400,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="olitest"><!-- bootable pcos20 -->
+		<!-- olitest_7519913c.img is an identical img version of this disk --> 
 		<description>OliTest (Copy 1)</description>
 		<year>1981</year>
 		<publisher>Olivetti</publisher>
@@ -411,18 +412,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="olitesta" cloneof="olitest"><!-- bootable (pcos20) -->
-		<description>OliTest (Copy 2)</description>
-		<year>19??</year>
-		<publisher>Olivetti</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="286720">
-				<rom name="olitest.img" size="286720" crc="7519913c" sha1="cc219018fd53d60d1b65091b0c626dbf4973a6cf"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="olitutor">
 		<!-- M20 manual, boot with PCOS -->
 		<description>OliTutor 2.0 (Ita)</description>
@@ -430,17 +419,17 @@ license:CC0-1.0
 		<publisher>Olivetti</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="246997">
+			<dataarea name="flop" size="286720">
 				<rom name="olitu01.imd" size="246997" crc="b1182d9a" sha1="91e6dfba1df8757cf99354246e02a354393f9c89"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="249800">
+			<dataarea name="flop" size="286720">
 				<rom name="olitu02.imd" size="249800" crc="9185a40f" sha1="dd12ee4fb5571d36de2386378ff7aa80ddbf5f1b"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<dataarea name="flop" size="264592">
+			<dataarea name="flop" size="286720">
 				<rom name="olitu03.imd" size="264592" crc="17830cc7" sha1="3c779ce97d95d2f620ff94002083cd71e747d78e"/>
 			</dataarea>
 		</part>
@@ -580,7 +569,7 @@ license:CC0-1.0
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="84505">
+			<dataarea name="flop" size="286720">
 				<rom name="m20utent.imd" size="84505" crc="bc634ebe" sha1="65428513aa1f9a1832db502e22069f1eae59f96c"/>
 			</dataarea>
 		</part>
