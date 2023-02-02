@@ -9,23 +9,6 @@
 
 #pragma once
 
-#define ARCOMPACT_LOGGING 1
-
-// Unsure of this behavior, documentation is not 100% clear
-// in some places it is said that LD will zero extend data
-// if X flag on operation is 0, in other places it indicates
-// there is no extension in such a case.  This may differ
-// for 16-bit ops also.  It is also explicitly stated that
-// the EXT and SEX opcodes can be used to convert 8/16-bit
-// data into 32-bit, which suggests it isn't always automatic.
-//
-// The code to compare the copyright string at 0x40000100
-// suggests that the 16-bit opcodes reading 8-bit addresses
-// MUST zero extend at least.
-//#define ARCOMPACT_LD_DOES_NOT_EXTEND_BYTE_AND_WORD
-
-#define arcompact_fatal if (ARCOMPACT_LOGGING) fatalerror
-#define arcompact_log if (ARCOMPACT_LOGGING) fatalerror
 
 class arcompact_device : public cpu_device
 {
@@ -93,7 +76,6 @@ private:
 	uint32_t arcompact_auxreg200_AUX_IRQ_LVL_r();
 	void arcompact_auxreg200_AUX_IRQ_LVL_w(uint32_t data);
 
-	const static int LIMM_REG = 62;
 
 	const static int REG_BLINK    = 0x1f; // r31
 	const static int REG_GP       = 0x1a; // r26
@@ -105,6 +87,8 @@ private:
 	const static int REG_MMID     = 0x3a; // r58 - multiply mid 32-bits (of 64-bit result - overlaps)
 	const static int REG_MHI      = 0x3b; // r59 - multiply high 32-bits (of 64-bit result)
 	const static int REG_LP_COUNT = 0x3c; // r60
+	const static int REG_LIMM     = 0x3e; // r62 - used to indicate long immedaite
+	const static int REG_PCL      = 0x3f; // r63
 
 	const static uint32_t E1_FLAG = 0x00000002;
 	const static uint32_t E2_FLAG = 0x00000004;
@@ -124,14 +108,14 @@ private:
 
 	void get_limm_32bit_opcode(void)
 	{
-		m_regs[LIMM_REG] = (READ16((m_pc + 4)) << 16);
-		m_regs[LIMM_REG] |= READ16((m_pc + 6));
+		m_regs[REG_LIMM] = (READ16((m_pc + 4)) << 16);
+		m_regs[REG_LIMM] |= READ16((m_pc + 6));
 	}
 
 	void get_limm_16bit_opcode(void)
 	{
-		m_regs[LIMM_REG] = (READ16((m_pc + 2)) << 16);
-		m_regs[LIMM_REG] |= READ16((m_pc + 4));
+		m_regs[REG_LIMM] = (READ16((m_pc + 2)) << 16);
+		m_regs[REG_LIMM] |= READ16((m_pc + 4));
 	}
 
 	// registers used in 16-bit opcodes have a limited range
@@ -237,7 +221,7 @@ private:
 
 	int check_limm16(uint8_t hreg)
 	{
-		if (hreg == LIMM_REG)
+		if (hreg == REG_LIMM)
 		{
 			get_limm_16bit_opcode();
 			return 6;
@@ -247,7 +231,7 @@ private:
 
 	int check_limm(uint8_t reg)
 	{
-		if (reg == LIMM_REG)
+		if (reg == REG_LIMM)
 		{
 			get_limm_32bit_opcode();
 			return 8;
@@ -257,7 +241,7 @@ private:
 
 	int check_limm(uint8_t breg, uint8_t creg)
 	{
-		if ((breg == LIMM_REG) || (creg == LIMM_REG))
+		if ((breg == REG_LIMM) || (creg == REG_LIMM))
 		{
 			get_limm_32bit_opcode();
 			return 8;
@@ -710,7 +694,6 @@ private:
 	const address_space_config m_program_config;
 	const address_space_config m_io_config;
 
-	uint32_t m_pc;
 
 	address_space *m_program;
 	address_space *m_io;
@@ -720,6 +703,12 @@ private:
 	uint32_t m_debugger_temp;
 
 	void unimplemented_opcode(uint16_t op);
+
+	void set_pc(uint32_t pc)
+	{
+		m_pc = pc; // can be 16-bit aligned
+		m_regs[REG_PCL] = m_pc & 0xfffffffc; // always 32-bit aligned
+	}
 
 	inline uint32_t READ32(uint32_t address)
 	{
@@ -768,10 +757,11 @@ private:
 	uint32_t m_default_vector_base;
 
 	// internal state
+	uint32_t m_pc;
 	uint32_t m_regs[0x40];
 
-	int m_delayactive;
-	int m_delaylinks;
+	bool m_delayactive;
+	bool m_delaylinks;
 	uint32_t m_delayjump;
 	bool m_allow_loop_check;
 	bool m_irq_pending;
@@ -792,6 +782,8 @@ private:
 	uint32_t m_LP_END;
 	uint32_t m_INTVECTORBASE;
 	uint32_t m_AUX_IRQ_LV12;
+	uint32_t m_AUX_IRQ_LEV;
+
 };
 
 DECLARE_DEVICE_TYPE(ARCA5, arcompact_device)

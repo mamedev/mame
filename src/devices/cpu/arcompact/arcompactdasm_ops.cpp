@@ -35,14 +35,14 @@ int arcompact_disassembler::handle04_f_a_b_c_helper_dasm(std::ostream &stream, o
 	//  util::stream_format(stream, " p(%d)", p);
 
 
-	if ((!b_reserved) && (breg == DASM_LIMM_REG))
+	if ((!b_reserved) && (breg == DASM_REG_LIMM))
 	{
 		limm = dasm_get_limm_32bit_opcode(pc, opcodes);
 		size = 8;
 		got_limm = 1;
 	}
 
-	if (creg == DASM_LIMM_REG)
+	if (creg == DASM_REG_LIMM)
 	{
 		if (!got_limm)
 		{
@@ -55,7 +55,7 @@ int arcompact_disassembler::handle04_f_a_b_c_helper_dasm(std::ostream &stream, o
 
 	if (ignore_dst == 0)
 	{
-		if (areg != DASM_LIMM_REG)  util::stream_format(stream, " %s <-", regnames[areg]);
+		if (areg != DASM_REG_LIMM)  util::stream_format(stream, " %s <-", regnames[areg]);
 		else util::stream_format(stream, " <no dst> <-");
 	}
 	else if (ignore_dst == 1) // certain opcode types ignore the 'a' field entirely, it should be set to 0.
@@ -64,13 +64,13 @@ int arcompact_disassembler::handle04_f_a_b_c_helper_dasm(std::ostream &stream, o
 	}
 	else if (ignore_dst == 2) // for multiply operations areg should always be set to LIMM
 	{
-		if (areg != DASM_LIMM_REG) util::stream_format(stream, " <invalid %d> <-", areg);
+		if (areg != DASM_REG_LIMM) util::stream_format(stream, " <invalid %d> <-", areg);
 		else  util::stream_format(stream, " <mulres> <-");
 	}
 
 	if (!b_reserved)
 	{
-		if (breg == DASM_LIMM_REG)
+		if (breg == DASM_REG_LIMM)
 			util::stream_format(stream, " 0x%08x,", limm);
 		else
 			util::stream_format(stream, " %s,", regnames[breg]);
@@ -80,7 +80,7 @@ int arcompact_disassembler::handle04_f_a_b_c_helper_dasm(std::ostream &stream, o
 		if (breg) util::stream_format(stream, "<reserved %d>,", breg);
 	}
 
-	if (creg == DASM_LIMM_REG)
+	if (creg == DASM_REG_LIMM)
 		util::stream_format(stream, " 0x%08x", limm);
 	else
 		util::stream_format(stream, " %s", regnames[creg]);
@@ -107,7 +107,7 @@ int arcompact_disassembler::handle04_f_a_b_u6_helper_dasm(std::ostream &stream, 
 	//  util::stream_format(stream, " p(%d)", p);
 
 
-	if ((!b_reserved) && (breg == DASM_LIMM_REG))
+	if ((!b_reserved) && (breg == DASM_REG_LIMM))
 	{
 		limm = dasm_get_limm_32bit_opcode(pc, opcodes);
 		size = 8;
@@ -118,7 +118,7 @@ int arcompact_disassembler::handle04_f_a_b_u6_helper_dasm(std::ostream &stream, 
 
 	if (ignore_dst == 0)
 	{
-		if (areg != DASM_LIMM_REG)  util::stream_format(stream, " %s <-", regnames[areg]);
+		if (areg != DASM_REG_LIMM)  util::stream_format(stream, " %s <-", regnames[areg]);
 		else util::stream_format(stream, " <no dst> <-");
 	}
 	else if (ignore_dst == 1) // certain opcode types ignore the 'a' field entirely, it should be set to 0.
@@ -127,13 +127,13 @@ int arcompact_disassembler::handle04_f_a_b_u6_helper_dasm(std::ostream &stream, 
 	}
 	else if (ignore_dst == 2) // for multiply operations areg should always be set to LIMM
 	{
-		if (areg != DASM_LIMM_REG) util::stream_format(stream, " <invalid %d> <-", areg);
+		if (areg != DASM_REG_LIMM) util::stream_format(stream, " <invalid %d> <-", areg);
 		else  util::stream_format(stream, " <mulres> <-");
 	}
 
 	if (!b_reserved)
 	{
-		if (breg == DASM_LIMM_REG)
+		if (breg == DASM_REG_LIMM)
 			util::stream_format(stream, " 0x%08x,", limm);
 		else
 			util::stream_format(stream, " %s,", regnames[breg]);
@@ -166,7 +166,7 @@ int arcompact_disassembler::handle04_f_b_b_s12_helper_dasm(std::ostream &stream,
 
 	if (!b_reserved)
 	{
-		if (breg == DASM_LIMM_REG)
+		if (breg == DASM_REG_LIMM)
 		{
 			limm = dasm_get_limm_32bit_opcode(pc, opcodes);
 			size = 8;
@@ -205,7 +205,7 @@ int arcompact_disassembler::handle04_cc_f_b_b_c_helper_dasm(std::ostream &stream
 
 	if (!b_reserved)
 	{
-		if (breg == DASM_LIMM_REG)
+		if (breg == DASM_REG_LIMM)
 		{
 			limm = dasm_get_limm_32bit_opcode(pc, opcodes);
 			size = 8;
@@ -227,7 +227,7 @@ int arcompact_disassembler::handle04_cc_f_b_b_c_helper_dasm(std::ostream &stream
 	util::stream_format(stream, " Cond<%s> ", conditions[condition]);
 
 
-	if (creg == DASM_LIMM_REG)
+	if (creg == DASM_REG_LIMM)
 	{
 		if (!got_limm)
 		{
@@ -261,7 +261,7 @@ int arcompact_disassembler::handle04_cc_f_b_b_u6_helper_dasm(std::ostream &strea
 
 	if (!b_reserved)
 	{
-		if (breg == DASM_LIMM_REG)
+		if (breg == DASM_REG_LIMM)
 		{
 			limm = dasm_get_limm_32bit_opcode(pc, opcodes);
 			size = 8;

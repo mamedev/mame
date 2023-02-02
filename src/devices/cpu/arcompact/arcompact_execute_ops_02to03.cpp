@@ -63,8 +63,8 @@ uint32_t arcompact_device::handleop32_ST_r_o(uint32_t op)
 	// writeback / increment
 	if (a == 1)
 	{
-		if (breg==LIMM_REG)
-			arcompact_fatal("illegal ST %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
+		if (breg==REG_LIMM)
+			fatalerror("illegal ST %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
 
 		m_regs[breg] = m_regs[breg] + s;
 	}
@@ -88,7 +88,7 @@ uint32_t arcompact_device::handleop32_ST_r_o(uint32_t op)
 		else if (Z==2)
 			address = address + (s << 1);
 		else // Z == 1 and Z == 3 are invalid here
-			arcompact_fatal("illegal ST %08x (data size %d mode %d)", op, Z, a);
+			fatalerror("illegal ST %08x (data size %d mode %d)", op, Z, a);
 	}
 
 	// write data
@@ -106,14 +106,14 @@ uint32_t arcompact_device::handleop32_ST_r_o(uint32_t op)
 	}
 	else if (Z == 3)
 	{ // Z == 3 is always illegal
-		arcompact_fatal("illegal ST %08x (data size %d mode %d)", op, Z, a);
+		fatalerror("illegal ST %08x (data size %d mode %d)", op, Z, a);
 	}
 
 	// writeback / increment
 	if (a == 2)
 	{
-		if (breg==LIMM_REG)
-			arcompact_fatal("illegal ST %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
+		if (breg==REG_LIMM)
+			fatalerror("illegal ST %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
 
 		m_regs[breg] = m_regs[breg] + s;
 	}

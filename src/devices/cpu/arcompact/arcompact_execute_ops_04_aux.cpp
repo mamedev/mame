@@ -17,7 +17,7 @@ uint32_t arcompact_device::handleop32_LR_f_a_b_c(uint32_t op)
 	int size = 4;
 	uint8_t breg = common32_get_breg(op);
 	uint8_t creg = common32_get_creg(op);
-	if (creg == LIMM_REG)
+	if (creg == REG_LIMM)
 	{
 		get_limm_32bit_opcode();
 		size = 8;
@@ -50,7 +50,7 @@ uint32_t arcompact_device::handleop32_LR_f_b_b_s12(uint32_t op)
 uint32_t arcompact_device::handleop32_LR_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
-	arcompact_fatal("handleop32_LR_cc_f_b_b_c (LR)\n");
+	fatalerror("handleop32_LR_cc_f_b_b_c (LR)\n");
 	return m_pc + size;
 }
 
@@ -138,7 +138,7 @@ uint32_t arcompact_device::handleop32_SR_f_b_b_s12(uint32_t op)
 uint32_t arcompact_device::handleop32_SR_cc_f_b_b_c(uint32_t op)
 {
 	int size = 4;
-	arcompact_fatal("handleop32_SR_cc_f_b_b_c (SR)\n");
+	fatalerror("handleop32_SR_cc_f_b_b_c (SR)\n");
 	return m_pc + size;
 }
 

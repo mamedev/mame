@@ -33,7 +33,7 @@ int arcompact_disassembler::handle05_2f_0x_helper_dasm(std::ostream &stream, off
 	{
 		uint8_t creg = dasm_common32_get_creg(op);
 
-		if (creg == DASM_LIMM_REG)
+		if (creg == DASM_REG_LIMM)
 		{
 			uint32_t limm;
 			limm = dasm_get_limm_32bit_opcode(pc, opcodes);

@@ -24,7 +24,7 @@ int arcompact_disassembler::handle04_MOV_f_a_b_c_helper_dasm(std::ostream &strea
 	uint8_t creg = dasm_common32_get_creg(op);
 	util::stream_format(stream, "MOV%s", flagbit[F]);
 	util::stream_format(stream, " %s,", regnames[breg]);
-	if (creg == DASM_LIMM_REG)
+	if (creg == DASM_REG_LIMM)
 	{
 		uint32_t limm = dasm_get_limm_32bit_opcode(pc, opcodes);
 		size = 8;
@@ -44,7 +44,7 @@ int arcompact_disassembler::handle04_MOV_f_a_b_u6_helper_dasm(std::ostream &stre
 	uint8_t F = dasm_common32_get_F(op);
 	uint32_t u = dasm_common32_get_u6(op);
 	// if there's no destination and no flags being set, this is a NOP
-	if ((F == 0) & (breg == DASM_LIMM_REG))
+	if ((F == 0) & (breg == DASM_REG_LIMM))
 	{
 		util::stream_format(stream, "NOP");
 	}
@@ -79,7 +79,7 @@ int arcompact_disassembler::handle04_MOV_cc_f_b_b_c_helper_dasm(std::ostream &st
 	util::stream_format(stream, "MOV%s", flagbit[F]);
 	util::stream_format(stream, " %s, ", regnames[breg]);
 	util::stream_format(stream, " Cond<%s> ", conditions[condition]);
-	if (creg == DASM_LIMM_REG)
+	if (creg == DASM_REG_LIMM)
 	{
 		uint32_t limm = dasm_get_limm_32bit_opcode(pc, opcodes);
 		size = 8;
@@ -368,7 +368,7 @@ int arcompact_disassembler::handle_dasm32_LR(std::ostream &stream, offs_t pc, ui
 	if (F) util::stream_format(stream, ".<F set, illegal>");
 //  util::stream_format(stream, " p(%d)", p);
 
-	if (breg == DASM_LIMM_REG)
+	if (breg == DASM_REG_LIMM)
 	{
 		util::stream_format(stream, "<no dest>"); // illegal encoding?
 	}
@@ -382,7 +382,7 @@ int arcompact_disassembler::handle_dasm32_LR(std::ostream &stream, offs_t pc, ui
 		uint8_t creg = dasm_common32_get_creg(op);
 		uint8_t ares = dasm_common32_get_areg_reserved(op);
 
-		if (creg == DASM_LIMM_REG)
+		if (creg == DASM_REG_LIMM)
 		{
 			if (!got_limm)
 			{
@@ -440,7 +440,7 @@ int arcompact_disassembler::handle_dasm32_SR(std::ostream &stream, offs_t pc, ui
 	if (F) util::stream_format(stream, ".<F set, illegal>");
 //  util::stream_format(stream, " p(%d)", p);
 
-	if (breg == DASM_LIMM_REG)
+	if (breg == DASM_REG_LIMM)
 	{
 		limm = dasm_get_limm_32bit_opcode(pc, opcodes);
 		size = 8;
@@ -458,7 +458,7 @@ int arcompact_disassembler::handle_dasm32_SR(std::ostream &stream, offs_t pc, ui
 		uint8_t creg = dasm_common32_get_creg(op);
 		uint8_t ares = dasm_common32_get_areg_reserved(op);
 
-		if (creg == DASM_LIMM_REG)
+		if (creg == DASM_REG_LIMM)
 		{
 			if (!got_limm)
 			{

@@ -34,7 +34,7 @@ int arcompact_disassembler::handle04_3x_helper_dasm(std::ostream &stream, offs_t
 
 	util::stream_format(stream, " %s. ", regnames[areg]);
 
-	if (breg == DASM_LIMM_REG)
+	if (breg == DASM_REG_LIMM)
 	{
 		limm = dasm_get_limm_32bit_opcode(pc, opcodes);
 		size = 8;
@@ -47,7 +47,7 @@ int arcompact_disassembler::handle04_3x_helper_dasm(std::ostream &stream, offs_t
 		util::stream_format(stream, "[%s, ", regnames[breg]);
 	}
 
-	if (creg == DASM_LIMM_REG)
+	if (creg == DASM_REG_LIMM)
 	{
 		if (!got_limm)
 		{

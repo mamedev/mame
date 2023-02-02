@@ -14,7 +14,7 @@ uint32_t arcompact_device::arcompact_handle05_2f_0x_helper(uint32_t op, const ch
 	if (p == 0)
 	{
 		uint8_t creg = common32_get_creg(op);
-		if (creg == LIMM_REG)
+		if (creg == REG_LIMM)
 		{
 			//uint32_t limm;
 			//get_limm_32bit_opcode();
@@ -31,7 +31,7 @@ uint32_t arcompact_device::arcompact_handle05_2f_0x_helper(uint32_t op, const ch
 	{
 	}
 
-	arcompact_log("unimplemented %s %08x", optext, op);
+	fatalerror("unimplemented %s %08x", optext, op);
 	return m_pc + size;
 }
 
@@ -206,7 +206,7 @@ uint32_t arcompact_device::handleop32_NORMW_do_op(void* obj, uint32_t src, uint8
 		result = count_leading_zeros_32(source) - 0x10;
 
 	if (set_flags)
-		arcompact_fatal("handleop32_NORMW (F set)\n"); // not yet supported
+		fatalerror("handleop32_NORMW (F set)\n"); // not yet supported
 
 	return result;
 }

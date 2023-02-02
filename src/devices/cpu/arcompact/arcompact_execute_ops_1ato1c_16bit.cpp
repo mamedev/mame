@@ -14,7 +14,9 @@
 
 uint32_t arcompact_device::handleop_LD_S_b_pcl_u10(uint16_t op)
 {
-	arcompact_log("unimplemented MOV_S x, [PCL, x] %04x",  op);
+	uint8_t breg = common16_get_and_expand_breg(op);
+	uint32_t u = common16_get_u8(op);
+	m_regs[breg] = READ32(m_regs[REG_PCL] + (u << 2));
 	return m_pc + 2;
 }
 

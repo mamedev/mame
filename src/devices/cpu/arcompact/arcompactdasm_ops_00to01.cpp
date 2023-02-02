@@ -102,7 +102,7 @@ int arcompact_disassembler::handle01_01_00_helper(std::ostream &stream, offs_t p
 
 	op &= ~0x07007fe0;
 
-	if ((breg != DASM_LIMM_REG) && (creg != DASM_LIMM_REG))
+	if ((breg != DASM_REG_LIMM) && (creg != DASM_REG_LIMM))
 	{
 		util::stream_format( stream, "%s%s %s, %s to 0x%08x", optext, delaybit[n], regnames[breg], regnames[creg], (pc&0xfffffffc) + (address * 2) );
 	}
@@ -112,11 +112,11 @@ int arcompact_disassembler::handle01_01_00_helper(std::ostream &stream, offs_t p
 		limm = dasm_get_limm_32bit_opcode(pc, opcodes);
 		size = 8;
 
-		if ((breg == DASM_LIMM_REG) && (creg != DASM_LIMM_REG))
+		if ((breg == DASM_REG_LIMM) && (creg != DASM_REG_LIMM))
 		{
 			util::stream_format( stream, "%s%s 0x%08x, %s to 0x%08x", optext, delaybit[n], limm, regnames[creg], (pc&0xfffffffc) + (address * 2) );
 		}
-		else if ((creg == DASM_LIMM_REG) && (breg != DASM_LIMM_REG))
+		else if ((creg == DASM_REG_LIMM) && (breg != DASM_REG_LIMM))
 		{
 			util::stream_format( stream, "%s%s %s, 0x%08x to 0x%08x", optext, delaybit[n], regnames[breg], limm, (pc&0xfffffffc) + (address * 2) );
 		}

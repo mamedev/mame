@@ -22,16 +22,53 @@ It is possible this is how the CPU works internally.
 
 */
 
+/*
+
+Vector | Offset | Default Source                 | Link Reg         | Default Pri   | Relative Priority
+--------------------------------------------------------------------------------------------------------
+ 0     | 0x00   | Reset (Special)                | (none)           | high (always) | H1
+ 1     | 0x08   | Memory Error (Special)         | ILINK2 (always)  | high (always) | H2
+ 2     | 0x10   | Instruction Error (Special)    | ILINK2 (always)  | high (always) | H3
+--------------------------------------------------------------------------------------------------------
+ 3     | 0x18   | Timer 0 IRQ                    | ILINK1           | lv. 1 (low)   | L27
+ 4     | 0x20   | XY Memory IRQ                  | ILINK1           | lv. 1 (low)   | L26
+ 5     | 0x28   | UART IRQ                       | ILINK1           | lv. 1 (low)   | L25
+ 6     | 0x30   | EMAC IRQ                       | ILINK2           | lv. 2 (med)   | M2
+ 7     | 0x38   | Timer 1 IRQ                    | ILINK2           | lv. 2 (med)   | M1
+--------------------------------------------------------------------------------------------------------
+ 8     | 0x40   | IRQ8                           | ILINK1           | lv. 1 (low)   | L24
+ 9     | 0x48   | IRQ9                           | ILINK1           | lv. 1 (low)   | L23
+....
+ 14    | 0x70   | IRQ14                          | ILINK1           | lv. 1 (low)   | L18
+ 15    | 0x78   | IRQ15                          | ILINK1           | lv. 1 (low)   | L17
+--------------------------------------------------------------------------------------------------------
+ 16    | 0x80   | IRQ16 (extended)               | ILINK1           | lv. 1 (low)   | L16
+ 17    | 0x87   | IRQ17 (extended)               | ILINK1           | lv. 1 (low)   | L15
+....
+ 16    | 0xf0   | IRQ30 (extended)               | ILINK1           | lv. 1 (low)   | L2
+ 17    | 0xf8   | IRQ31 (extended)               | ILINK1           | lv. 1 (low)   | L1
+--------------------------------------------------------------------------------------------------------
+
+*/
+
+
+
 // currently causes the Leapster to put an unhandled interrupt exception string in RAM
 // at 0x03000000
 void arcompact_device::check_interrupts()
 {
+	int vector = 8;
+
+	if (vector < 3)
+	{
+		fatalerror("check_interrupts called for vector < 3 (these are special exceptions)");
+	}
+
 	if (m_irq_pending)
 	{
 		if (m_status32 & 0x00000002) // & 0x04 = level2, & 0x02 = level1
 		{
-			int level = 1;
-			int vector = 4;
+			int level = ((m_AUX_IRQ_LEV >> vector) & 1)+1;
 
 			logerror("HACK/TEST IRQ\n");
 
@@ -52,7 +89,7 @@ void arcompact_device::check_interrupts()
 				fatalerror("illegal IRQ level\n");
 			}
 
-			m_pc = m_INTVECTORBASE + vector * 8;
+			set_pc(m_INTVECTORBASE + vector * 8);
 			m_irq_pending = 0;
 			debugreg_clear_ZZ();
 			standard_irq_callback_member(*this, 0);
@@ -77,16 +114,18 @@ void arcompact_device::execute_run()
 			if (m_delayactive)
 			{
 				uint16_t op = READ16((m_pc + 0));
-				m_pc = get_instruction(op);
+				set_pc(get_instruction(op));
 				if (m_delaylinks) m_regs[REG_BLINK] = m_pc;
 
-				m_pc = m_delayjump;
-				m_delayactive = 0; m_delaylinks = 0;
+				set_pc(m_delayjump);
+
+				m_delayactive = false;
+				m_delaylinks = false;
 			}
 			else
 			{
 				uint16_t op = READ16((m_pc + 0));
-				m_pc = get_instruction(op);
+				set_pc(get_instruction(op));
 			}
 
 			// hardware loops
@@ -103,7 +142,7 @@ void arcompact_device::execute_run()
 					// NOTE: this behavior should differ between ARC models
 					if ((m_regs[REG_LP_COUNT] != 1))
 					{
-						m_pc = m_LP_START;
+						set_pc(m_LP_START);
 					}
 					m_regs[REG_LP_COUNT]--;
 				}
@@ -204,8 +243,8 @@ void arcompact_device::arcompact_handle_ld_helper(uint32_t op, uint8_t areg, uin
 	// writeback / increment
 	if (a == 1)
 	{
-		if (breg == LIMM_REG)
-			arcompact_fatal("illegal LD helper %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
+		if (breg == REG_LIMM)
+			fatalerror("illegal LD helper %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
 
 		m_regs[breg] = m_regs[breg] + s;
 	}
@@ -229,7 +268,7 @@ void arcompact_device::arcompact_handle_ld_helper(uint32_t op, uint8_t areg, uin
 		}
 		else // Z == 1 and Z == 3 are invalid here
 		{
-			arcompact_fatal("illegal LD helper %08x (data size %d mode %d)", op, Z, a);
+			fatalerror("illegal LD helper %08x (data size %d mode %d)", op, Z, a);
 		}
 	}
 
@@ -241,7 +280,7 @@ void arcompact_device::arcompact_handle_ld_helper(uint32_t op, uint8_t areg, uin
 		readdata = READ32(address);
 		m_regs[areg] = readdata;
 		if (X) // sign extend is not supported for long reads
-			arcompact_fatal("illegal LD helper %08x (data size %d mode %d with X)", op, Z, a);
+			fatalerror("illegal LD helper %08x (data size %d mode %d with X)", op, Z, a);
 	}
 	else if (Z == 1)
 	{
@@ -256,11 +295,7 @@ void arcompact_device::arcompact_handle_ld_helper(uint32_t op, uint8_t areg, uin
 		}
 		else
 		{
-#ifdef ARCOMPACT_LD_DOES_NOT_EXTEND_BYTE_AND_WORD
-			m_regs[areg] = (m_regs[areg] & 0xffffff00) | readdata;
-#else
 			m_regs[areg] = readdata;
-#endif
 		}
 	}
 	else if (Z == 2)
@@ -276,23 +311,19 @@ void arcompact_device::arcompact_handle_ld_helper(uint32_t op, uint8_t areg, uin
 		}
 		else
 		{
-#ifdef ARCOMPACT_LD_DOES_NOT_EXTEND_BYTE_AND_WORD
-			m_regs[areg] = (m_regs[areg] & 0xffff0000) | readdata;
-#else
 			m_regs[areg] = readdata;
-#endif
 		}
 	}
 	else if (Z == 3)
 	{ // Z == 3 is always illegal
-		arcompact_fatal("illegal LD helper %08x (data size %d mode %d)", op, Z, a);
+		fatalerror("illegal LD helper %08x (data size %d mode %d)", op, Z, a);
 	}
 
 	// writeback / increment
 	if (a == 2)
 	{
-		if (breg == LIMM_REG)
-			arcompact_fatal("illegal LD helper %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
+		if (breg == REG_LIMM)
+			fatalerror("illegal LD helper %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
 
 		m_regs[breg] = m_regs[breg] + s;
 	}
@@ -485,7 +516,7 @@ uint32_t arcompact_device::handleop32_general_SOP_group(uint32_t op, ophandler32
 		}
 		case 0x02:
 		case 0x03:
-			arcompact_fatal("SOP Group: illegal mode 02/03 specifying use of bits already assigned to opcode select: opcode %04x\n", op);
+			fatalerror("SOP Group: illegal mode 02/03 specifying use of bits already assigned to opcode select: opcode %04x\n", op);
 			return 0;
 	}
 	return 0;

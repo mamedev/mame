@@ -31,7 +31,7 @@ int arcompact_disassembler::handle_dasm32_LD_r_o(std::ostream &stream, offs_t pc
 	int sdat = s | (S << 8); // todo - signed
 
 	uint32_t limm = 0;
-	if (breg == DASM_LIMM_REG)
+	if (breg == DASM_REG_LIMM)
 	{
 		limm = dasm_get_limm_32bit_opcode(pc, opcodes);
 		size = 8;
@@ -53,7 +53,7 @@ int arcompact_disassembler::handle_dasm32_LD_r_o(std::ostream &stream, offs_t pc
 		util::stream_format(stream, " ");
 		util::stream_format(stream, "%s <- ", regnames[areg]);
 		util::stream_format(stream, "[");
-		if (breg == DASM_LIMM_REG) util::stream_format(stream, "(%08x), ", limm);
+		if (breg == DASM_REG_LIMM) util::stream_format(stream, "(%08x), ", limm);
 		else util::stream_format(stream, "%s, ", regnames[breg]);
 		util::stream_format(stream, "%03x", sdat);
 		util::stream_format(stream, "]");
@@ -83,7 +83,7 @@ int arcompact_disassembler::handle_dasm32_ST_r_o(std::ostream &stream, offs_t pc
 	int D = (op & 0x00000020) >> 5; op &= ~0x00000020;
 	uint8_t creg = dasm_common32_get_creg(op);
 
-	if (breg == DASM_LIMM_REG)
+	if (breg == DASM_REG_LIMM)
 	{
 		limm = dasm_get_limm_32bit_opcode(pc, opcodes);
 		size = 8;
@@ -105,12 +105,12 @@ int arcompact_disassembler::handle_dasm32_ST_r_o(std::ostream &stream, offs_t pc
 		util::stream_format(stream, " ");
 
 		util::stream_format(stream, "[");
-		if (breg == DASM_LIMM_REG) util::stream_format(stream, "(%08x), ", limm);
+		if (breg == DASM_REG_LIMM) util::stream_format(stream, "(%08x), ", limm);
 		else util::stream_format(stream, "%s, ", regnames[breg]);
 		util::stream_format(stream, "%03x", sdat);
 		util::stream_format(stream, "] <- ");
 
-		if (creg == DASM_LIMM_REG)
+		if (creg == DASM_REG_LIMM)
 		{
 			if (!got_limm)
 			{

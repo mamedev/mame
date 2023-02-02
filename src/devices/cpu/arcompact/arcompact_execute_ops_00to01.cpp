@@ -19,9 +19,9 @@ uint32_t arcompact_device::BRxx_takejump(uint32_t address, uint8_t n, int size)
 	uint32_t realaddress = (m_pc & 0xfffffffc) + (address * 2);
 	if (n)
 	{
-		m_delayactive = 1;
+		m_delayactive = true;
 		m_delayjump = realaddress;
-		m_delaylinks = 0;
+		m_delaylinks = false;
 		return m_pc + size; // jump is delayed, so return next instruction
 	}
 	else
@@ -101,9 +101,9 @@ uint32_t arcompact_device::handleop32_B_cc_D_s21(uint32_t op)
 
 	if (n)
 	{
-		m_delayactive = 1;
+		m_delayactive = true;
 		m_delayjump = realaddress;
-		m_delaylinks = 0; // don't link
+		m_delaylinks = false; // don't link
 	}
 	else
 	{
@@ -129,9 +129,9 @@ uint32_t arcompact_device::handleop32_B_D_s25(uint32_t op)
 	uint32_t realaddress = (m_pc&0xfffffffc) + (address * 2);
 	if (n)
 	{
-		m_delayactive = 1;
+		m_delayactive = true;
 		m_delayjump = realaddress;
-		m_delaylinks = 0; // don't link
+		m_delaylinks = false; // don't link
 	}
 	else
 	{
@@ -163,9 +163,9 @@ uint32_t arcompact_device::handleop32_BL_cc_d_s21(uint32_t op)
 
 	if (n)
 	{
-		m_delayactive = 1;
+		m_delayactive = true;
 		m_delayjump = realaddress;
-		m_delaylinks = 1;
+		m_delaylinks = true;
 	}
 	else
 	{
@@ -193,9 +193,9 @@ uint32_t arcompact_device::handleop32_BL_d_s25(uint32_t op)
 
 	if (n)
 	{
-		m_delayactive = 1;
+		m_delayactive = true;
 		m_delayjump = realaddress;
-		m_delaylinks = 1;
+		m_delaylinks = true;
 	}
 	else
 	{

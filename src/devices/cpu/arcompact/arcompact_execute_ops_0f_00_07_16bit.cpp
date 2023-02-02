@@ -24,7 +24,7 @@ uint32_t arcompact_device::handleop_NOP_S(uint16_t op)
 
 uint32_t arcompact_device::handleop_UNIMP_S(uint16_t op)
 {
-	arcompact_log("UNIMP_S");
+	fatalerror("UNIMP_S");
 	return m_pc + 2;
 }
 
@@ -73,8 +73,8 @@ uint32_t arcompact_device::handleop_J_S_blink(uint16_t op) // J_S [blink]
 
 uint32_t arcompact_device::handleop_J_S_D_blink(uint16_t op) // J_S.D [blink]
 {
-	m_delayactive = 1;
+	m_delayactive = true;
 	m_delayjump = m_regs[REG_BLINK];
-	m_delaylinks = 0;
+	m_delaylinks = false;
 	return m_pc + 2;
 }

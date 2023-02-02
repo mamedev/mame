@@ -26,7 +26,7 @@ uint32_t arcompact_device::arcompact_handle04_2f_helper(uint32_t op, const char*
 	{
 	}
 
-	arcompact_log("unimplemented %s %08x (type 04_2f)", optext, op);
+	fatalerror("unimplemented %s %08x (type 04_2f)", optext, op);
 	return m_pc + size;
 }
 

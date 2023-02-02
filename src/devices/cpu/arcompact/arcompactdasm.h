@@ -33,7 +33,7 @@ public:
 
 private:
 
-	static const int DASM_LIMM_REG = 62;
+	static const int DASM_REG_LIMM = 62;
 
 	// registers used in 16-bit opcodes have a limited range
 	// and can only address registers r0-r3 and r12-r15

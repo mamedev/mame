@@ -23,9 +23,9 @@ uint32_t arcompact_device::handleop_J_S_b(uint16_t op)
 uint32_t arcompact_device::handleop_J_S_D_b(uint16_t op)
 {
 	uint8_t breg = common16_get_and_expand_breg(op);
-	m_delayactive = 1;
+	m_delayactive = true;
 	m_delayjump = m_regs[breg];
-	m_delaylinks = 0;
+	m_delaylinks = false;
 	return m_pc + 2;
 }
 
@@ -49,9 +49,9 @@ uint32_t arcompact_device::handleop_JL_S_b(uint16_t op) // JL_S
 uint32_t arcompact_device::handleop_JL_S_D_b(uint16_t op) // JL_S.D
 {
 	uint8_t breg = common16_get_and_expand_breg(op);
-	m_delayactive = 1;
+	m_delayactive = true;
 	m_delayjump = m_regs[breg];
-	m_delaylinks = 1;
+	m_delaylinks = true;
 	return m_pc + 2;
 }
 

@@ -153,7 +153,10 @@ uint32_t arcompact_device::arcompact_auxreg200_AUX_IRQ_LVL_r(void)
 void arcompact_device::arcompact_auxreg200_AUX_IRQ_LVL_w(uint32_t data)
 {
 	logerror("%s: arcompact_auxreg200_AUX_IRQ_LVL_w %08x\n", machine().describe_context(), data);
+	m_AUX_IRQ_LEV = data;
 }
+
+
 
 void arcompact_device::arcompact_auxreg_map(address_map &map)
 {
@@ -278,7 +281,23 @@ void arcompact_device::device_start()
 
 	set_icountptr(m_icount);
 
+	save_item(NAME(m_pc));
+	save_item(NAME(m_regs));
+	save_item(NAME(m_delayactive));
+	save_item(NAME(m_delaylinks));
+	save_item(NAME(m_delayjump));
+	save_item(NAME(m_allow_loop_check));
+	save_item(NAME(m_irq_pending));
+	save_item(NAME(m_status32));
+	save_item(NAME(m_status32_l1));
+	save_item(NAME(m_status32_l2));
+	save_item(NAME(m_debug));
+	save_item(NAME(m_timer));
+	save_item(NAME(m_LP_START));
+	save_item(NAME(m_LP_END));
 	save_item(NAME(m_INTVECTORBASE));
+	save_item(NAME(m_AUX_IRQ_LV12));
+	save_item(NAME(m_AUX_IRQ_LEV));
 }
 
 
@@ -357,7 +376,7 @@ void arcompact_device::device_reset()
 {
 	m_pc = m_INTVECTORBASE = m_default_vector_base;
 
-	m_delayactive = 0;
+	m_delayactive = false;
 	m_delayjump = 0x00000000;
 	m_irq_pending = false;
 
@@ -372,6 +391,7 @@ void arcompact_device::device_reset()
 	m_LP_START = 0;
 	m_LP_END = 0;
 	m_AUX_IRQ_LV12 = 0;
+	m_AUX_IRQ_LEV = 0x000000c0; // only 2 interrupts are set to 'medium' priority (level 2) by default.
 
 	m_allow_loop_check = true;
 

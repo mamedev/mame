@@ -2,7 +2,6 @@
 // copyright-holders:David Haywood
 /*********************************\
  ARCompact disassembler
-
 \*********************************/
 
 #include "emu.h"
@@ -73,7 +72,7 @@ int arcompact_disassembler::handle0e_0x_helper_dasm(std::ostream &stream, offs_t
 	int size = 2;
 	uint8_t h = dasm_group_0e_get_h(op);
 	uint8_t breg = expand_reg(dasm_common16_get_breg(op));
-	if (h == DASM_LIMM_REG)
+	if (h == DASM_REG_LIMM)
 	{
 		uint32_t limm;
 		limm = dasm_get_limm_16bit_opcode(pc, opcodes);

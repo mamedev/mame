@@ -739,9 +739,9 @@ uint32_t arcompact_device::handleop32_SUB3_do_op(void* obj, uint32_t src1, uint3
 uint32_t arcompact_device::handleop32_MPY_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
 	uint32_t result = 0;
-	arcompact_fatal("MPY not supported");
+	fatalerror("MPY not supported");
 	if (set_flags)
-		arcompact_fatal("MPY flags not supported");
+		fatalerror("MPY flags not supported");
 	return result;
 }
 
@@ -766,9 +766,9 @@ uint32_t arcompact_device::handleop32_MPY_do_op(void* obj, uint32_t src1, uint32
 uint32_t arcompact_device::handleop32_MPYH_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
 	uint32_t result = 0;
-	arcompact_fatal("MPYH not supported");
+	fatalerror("MPYH not supported");
 	if (set_flags)
-		arcompact_fatal("MPYH flags not supported");
+		fatalerror("MPYH flags not supported");
 	return result;
 }
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -792,9 +792,9 @@ uint32_t arcompact_device::handleop32_MPYH_do_op(void* obj, uint32_t src1, uint3
 uint32_t arcompact_device::handleop32_MPYHU_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
 	uint32_t result = 0;
-	arcompact_fatal("MPYHU not supported");
+	fatalerror("MPYHU not supported");
 	if (set_flags)
-		arcompact_fatal("MPYHU flags not supported");
+		fatalerror("MPYHU flags not supported");
 	return result;
 }
 
@@ -818,9 +818,9 @@ uint32_t arcompact_device::handleop32_MPYHU_do_op(void* obj, uint32_t src1, uint
 uint32_t arcompact_device::handleop32_MPYU_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
 	uint32_t result = 0;
-	arcompact_fatal("MPYU not supported");
+	fatalerror("MPYU not supported");
 	if (set_flags)
-		arcompact_fatal("MPYU flags not supported");
+		fatalerror("MPYU flags not supported");
 	return result;
 }
 
@@ -870,7 +870,7 @@ void arcompact_device::handleop32_FLAG_do_op(uint32_t source)
 	}
 	else
 	{
-		arcompact_fatal("FLAG operation with H set (halt CPU?)");
+		fatalerror("FLAG operation with H set (halt CPU?)");
 	}
 }
 

@@ -8,11 +8,11 @@ uint32_t arcompact_device::handle_jump_to_addr(bool delay, bool link, uint32_t a
 {
 	if (delay)
 	{
-		m_delayactive = 1;
+		m_delayactive = true;
 		m_delayjump = address;
 		if (link)
-			m_delaylinks = 1;
-		else m_delaylinks = 0;
+			m_delaylinks = true;
+		else m_delaylinks = false;
 		return next_addr;
 	}
 	else
@@ -36,7 +36,7 @@ uint32_t arcompact_device::handle_jump_to_register(bool delay, bool link, uint32
 		}
 		else
 		{
-			arcompact_fatal("illegal jump to ILINK1/ILINK2 not supported"); // FLAG bit must be set
+			fatalerror("illegal jump to ILINK1/ILINK2 not supported"); // FLAG bit must be set
 			return next_addr;
 		}
 	}
@@ -44,7 +44,7 @@ uint32_t arcompact_device::handle_jump_to_register(bool delay, bool link, uint32
 	{
 		if (flag)
 		{
-			arcompact_fatal("illegal jump (flag bit set)"); // FLAG bit must NOT be set
+			fatalerror("illegal jump (flag bit set)"); // FLAG bit must NOT be set
 			return next_addr;
 		}
 		else
@@ -61,7 +61,7 @@ uint32_t arcompact_device::handleop32_Jcc_f_a_b_c_helper(uint32_t op, bool delay
 	int size = 4;
 	uint8_t creg = common32_get_creg(op);
 	uint8_t F = common32_get_F(op);
-	if (creg == LIMM_REG)
+	if (creg == REG_LIMM)
 	{
 		get_limm_32bit_opcode();
 		size = 8;
@@ -82,7 +82,7 @@ uint32_t arcompact_device::handleop32_Jcc_f_a_b_c_helper(uint32_t op, bool delay
 			else
 			{
 				// should not use .F unless jumping to ILINK1/2
-				arcompact_fatal("illegal unimplemented J(L)(.D).F (F should not be set) %08x", op);
+				fatalerror("illegal unimplemented J(L)(.D).F (F should not be set) %08x", op);
 			}
 		}
 		else
@@ -90,7 +90,7 @@ uint32_t arcompact_device::handleop32_Jcc_f_a_b_c_helper(uint32_t op, bool delay
 			if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
 			{
 				// should only jumping to ILINK1/2 if .F is set
-				arcompact_fatal("illegal unimplemented J(L)(.D) (F not set) %08x", op);
+				fatalerror("illegal unimplemented J(L)(.D) (F not set) %08x", op);
 			}
 			else
 			{
@@ -113,7 +113,7 @@ uint32_t arcompact_device::handleop32_Jcc_cc_f_b_b_c_helper(uint32_t op, bool de
 	uint8_t F = common32_get_F(op);
 	uint32_t c;
 
-	if (creg == LIMM_REG)
+	if (creg == REG_LIMM)
 	{
 		get_limm_32bit_opcode();
 		size = 8;
@@ -129,13 +129,13 @@ uint32_t arcompact_device::handleop32_Jcc_cc_f_b_b_c_helper(uint32_t op, bool de
 		// if F isn't set then the destination can't be ILINK1 or ILINK2
 		if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
 		{
-			arcompact_fatal ("fatal handleop32_J(L)cc_cc_(.D)f_b_b_c J %08x (F not set but ILINK1 or ILINK2 used as dst)", op);
+			fatalerror ("fatal handleop32_J(L)cc_cc_(.D)f_b_b_c J %08x (F not set but ILINK1 or ILINK2 used as dst)", op);
 		}
 		else
 		{
 			if (delay)
 			{
-				arcompact_log("unimplemented J(L)cc.D (p11_m0 type, unimplemented) %08x", op);
+				fatalerror("unimplemented J(L)cc.D (p11_m0 type, unimplemented) %08x", op);
 			}
 			else
 			{
@@ -152,17 +152,17 @@ uint32_t arcompact_device::handleop32_Jcc_cc_f_b_b_c_helper(uint32_t op, bool de
 		// if F is set then the destination MUST be ILINK1 or ILINK2
 		if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
 		{
-			arcompact_log("unimplemented handleop32_J(L)cc_(.D)cc_f_b_b_c J %08x (F set)", op);
+			fatalerror("unimplemented handleop32_J(L)cc_(.D)cc_f_b_b_c J %08x (F set)", op);
 		}
 		else
 		{
 			if (delay)
 			{
-				arcompact_log("unimplemented J(L)cc.D.F (p11_m0 type, illegal) %08x", op);
+				fatalerror("unimplemented J(L)cc.D.F (p11_m0 type, illegal) %08x", op);
 			}
 			else
 			{
-				arcompact_fatal("fatal handleop32_J(L)cc_cc_f_b_b_c J %08x (F set but not ILINK1 or ILINK2 used as dst)", op);
+				fatalerror("fatal handleop32_J(L)cc_cc_f_b_b_c J %08x (F set but not ILINK1 or ILINK2 used as dst)", op);
 			}
 		}
 	}
@@ -193,14 +193,14 @@ uint32_t arcompact_device::handleop32_Jcc_f_a_b_c(uint32_t op)
 uint32_t arcompact_device::handleop32_Jcc_f_a_b_u6(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("unimplemented J %08x", op);
+	fatalerror("unimplemented J %08x", op);
 	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_Jcc_f_b_b_s12(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("unimplemented J %08x", op);
+	fatalerror("unimplemented J %08x", op);
 	return m_pc + size;
 }
 
@@ -212,7 +212,7 @@ uint32_t arcompact_device::handleop32_Jcc_cc_f_b_b_c(uint32_t op)
 uint32_t arcompact_device::handleop32_Jcc_cc_f_b_b_u6(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("unimplemented handleop32_Jcc_cc_f_b_b_u6 J %08x (u6)", op);
+	fatalerror("unimplemented handleop32_Jcc_cc_f_b_b_u6 J %08x (u6)", op);
 	return m_pc + size;
 }
 
@@ -252,14 +252,14 @@ uint32_t arcompact_device::handleop32_Jcc_D_f_a_b_c(uint32_t op)
 uint32_t arcompact_device::handleop32_Jcc_D_f_a_b_u6(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("unimplemented J.D (u6 type) %08x", op);
+	fatalerror("unimplemented J.D (u6 type) %08x", op);
 	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_Jcc_D_f_b_b_s12(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("unimplemented J.D (s12 type) %08x", op);
+	fatalerror("unimplemented J.D (s12 type) %08x", op);
 	return m_pc + size;
 }
 
@@ -271,7 +271,7 @@ uint32_t arcompact_device::handleop32_Jcc_D_cc_f_b_b_c(uint32_t op)
 uint32_t arcompact_device::handleop32_Jcc_D_cc_f_b_b_u6(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("unimplemented handleop32_Jcc_D_cc_f_b_b_u6 J.D %08x (u6)", op);
+	fatalerror("unimplemented handleop32_Jcc_D_cc_f_b_b_u6 J.D %08x (u6)", op);
 	return m_pc + size;
 }
 
@@ -312,14 +312,14 @@ uint32_t arcompact_device::handleop32_JLcc_f_a_b_c(uint32_t op)
 uint32_t arcompact_device::handleop32_JLcc_f_a_b_u6(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("unimplemented JL %08x", op);
+	fatalerror("unimplemented JL %08x", op);
 	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_JLcc_f_b_b_s12(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("unimplemented JL %08x", op);
+	fatalerror("unimplemented JL %08x", op);
 	return m_pc + size;
 }
 
@@ -331,7 +331,7 @@ uint32_t arcompact_device::handleop32_JLcc_cc_f_b_b_c(uint32_t op)
 uint32_t arcompact_device::handleop32_JLcc_cc_f_b_b_u6(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("unimplemented handleop32_JLcc_cc_f_b_b_u6 JL %08x (u6)", op);
+	fatalerror("unimplemented handleop32_JLcc_cc_f_b_b_u6 JL %08x (u6)", op);
 	return m_pc + size;
 }
 
@@ -371,14 +371,14 @@ uint32_t arcompact_device::handleop32_JLcc_D_f_a_b_c(uint32_t op)
 uint32_t arcompact_device::handleop32_JLcc_D_f_a_b_u6(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("unimplemented JL.D (u6 type) %08x", op);
+	fatalerror("unimplemented JL.D (u6 type) %08x", op);
 	return m_pc + size;
 }
 
 uint32_t arcompact_device::handleop32_JLcc_D_f_b_b_s12(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("unimplemented JL.D (s12 type) %08x", op);
+	fatalerror("unimplemented JL.D (s12 type) %08x", op);
 	return m_pc + size;
 }
 
@@ -390,7 +390,7 @@ uint32_t arcompact_device::handleop32_JLcc_D_cc_f_b_b_c(uint32_t op)
 uint32_t arcompact_device::handleop32_JLcc_D_cc_f_b_b_u6(uint32_t op)
 {
 	int size = 4;
-	arcompact_log("unimplemented handleop32_JLcc_D_cc_f_b_b_u6 JL.D %08x (u6)", op);
+	fatalerror("unimplemented handleop32_JLcc_D_cc_f_b_b_u6 JL.D %08x (u6)", op);
 	return m_pc + size;
 }
 

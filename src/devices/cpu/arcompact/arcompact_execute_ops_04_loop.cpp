@@ -16,11 +16,11 @@ uint32_t arcompact_device::handleop32_LP(uint32_t op) // LPcc (loop setup)
 	int p = common32_get_p(op);
 	if (p == 0x00)
 	{
-		arcompact_fatal("<illegal LPcc, p = 0x00)");
+		fatalerror("<illegal LPcc, p = 0x00)");
 	}
 	else if (p == 0x01)
 	{
-		arcompact_fatal("<illegal LPcc, p = 0x01)");
+		fatalerror("<illegal LPcc, p = 0x01)");
 	}
 	else if (p == 0x02) // Loop unconditional
 	{ // 0010 0RRR 1010 1000 0RRR ssss ssSS SSSS

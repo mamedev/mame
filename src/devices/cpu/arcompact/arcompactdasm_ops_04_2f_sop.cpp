@@ -25,7 +25,7 @@ int arcompact_disassembler::handle04_2f_helper_dasm(std::ostream &stream, offs_t
 	util::stream_format(stream, "%s", flagbit[F]);
 //  util::stream_format(stream, " p(%d)", p);
 
-	if (breg == DASM_LIMM_REG)
+	if (breg == DASM_REG_LIMM)
 	{
 		util::stream_format(stream, " <no dst>, ");
 		// if using the 'EX' opcode this is illegal
@@ -39,7 +39,7 @@ int arcompact_disassembler::handle04_2f_helper_dasm(std::ostream &stream, offs_t
 	{
 		uint8_t creg = dasm_common32_get_creg(op);
 
-		if (creg == DASM_LIMM_REG)
+		if (creg == DASM_REG_LIMM)
 		{
 			uint32_t limm;
 			limm = dasm_get_limm_32bit_opcode(pc, opcodes);

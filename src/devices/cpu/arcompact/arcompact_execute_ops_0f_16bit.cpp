@@ -356,7 +356,7 @@ uint32_t arcompact_device::handleop_LSR_S_b_c_single(uint16_t op)
 
 uint32_t arcompact_device::handleop_TRAP_S_u6(uint16_t op)  // special
 {
-	arcompact_log("unimplemented TRAP_S %04x",  op);
+	fatalerror("unimplemented TRAP_S %04x",  op);
 	return m_pc + 2;
 }
 
@@ -367,6 +367,6 @@ uint32_t arcompact_device::handleop_TRAP_S_u6(uint16_t op)  // special
 
 uint32_t arcompact_device::handleop_BRK_S(uint16_t op)  // special
 {
-	arcompact_log("unimplemented BRK_S %04x",  op);
+	fatalerror("unimplemented BRK_S %04x",  op);
 	return m_pc + 2;
 }
