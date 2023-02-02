@@ -22,8 +22,7 @@ int arcompact_disassembler::handle04_MOV_f_a_b_c_helper_dasm(std::ostream &strea
 	uint8_t breg = dasm_common32_get_breg(op);
 	uint8_t F = dasm_common32_get_F(op);
 	uint8_t creg = dasm_common32_get_creg(op);
-	util::stream_format(stream, "MOV%s", flagbit[F]);
-	util::stream_format(stream, " %s,", regnames[breg]);
+	util::stream_format(stream, "MOV%s %s,", flagbit[F], regnames[breg]);
 	if (creg == DASM_REG_LIMM)
 	{
 		uint32_t limm = dasm_get_limm_32bit_opcode(pc, opcodes);
@@ -50,9 +49,7 @@ int arcompact_disassembler::handle04_MOV_f_a_b_u6_helper_dasm(std::ostream &stre
 	}
 	else
 	{
-		util::stream_format(stream, "MOV%s", flagbit[F]);
-		util::stream_format(stream, " %s,", regnames[breg]);
-		util::stream_format(stream, " 0x%02x", u);
+		util::stream_format(stream, "MOV%s %s, 0x%08x", flagbit[F], regnames[breg], u);
 	}
 	return size;
 }
@@ -63,9 +60,7 @@ int arcompact_disassembler::handle04_MOV_f_b_b_s12_helper_dasm(std::ostream &str
 	uint8_t breg = dasm_common32_get_breg(op);
 	uint8_t F = dasm_common32_get_F(op);
 	uint32_t S = dasm_common32_get_s12(op);
-	util::stream_format(stream, "MOV%s", flagbit[F]);
-	util::stream_format(stream, " %s, ", regnames[breg]);
-	util::stream_format(stream, "S(%02x)", S);
+	util::stream_format(stream, "MOV%s %s, 0x%08x", flagbit[F], regnames[breg], S);
 	return 4;
 }
 
@@ -76,32 +71,27 @@ int arcompact_disassembler::handle04_MOV_cc_f_b_b_c_helper_dasm(std::ostream &st
 	uint8_t F = dasm_common32_get_F(op);
 	uint8_t condition = dasm_common32_get_condition(op);
 	uint8_t creg = dasm_common32_get_creg(op);
-	util::stream_format(stream, "MOV%s", flagbit[F]);
-	util::stream_format(stream, " %s, ", regnames[breg]);
-	util::stream_format(stream, " Cond<%s> ", conditions[condition]);
+	util::stream_format(stream, "MOV%s%s %s, ", conditions[condition], flagbit[F], regnames[breg]);
 	if (creg == DASM_REG_LIMM)
 	{
 		uint32_t limm = dasm_get_limm_32bit_opcode(pc, opcodes);
 		size = 8;
-		util::stream_format(stream, " 0x%08x ", limm);
+		util::stream_format(stream, "0x%08x", limm);
 	}
 	else
 	{
-		util::stream_format(stream, "C(%s)", regnames[creg]);
+		util::stream_format(stream, "%s", regnames[creg]);
 	}
 	return size;
 }
 
 int arcompact_disassembler::handle04_MOV_cc_f_b_b_u6_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
-{	
+{
 	uint8_t breg = dasm_common32_get_breg(op);
 	uint8_t F = dasm_common32_get_F(op);
 	uint8_t condition = dasm_common32_get_condition(op);
 	uint32_t u = dasm_common32_get_u6(op);
-	util::stream_format(stream, "MOV%s", flagbit[F]);
-	util::stream_format(stream, " %s, ", regnames[breg]);
-	util::stream_format(stream, " Cond<%s> ", conditions[condition]);
-	util::stream_format(stream, "U(%02x)", u);
+	util::stream_format(stream, "MOV%s%s %s, 0x%08x", conditions[condition], flagbit[F], regnames[breg], u);
 	return 4;
 }
 
@@ -380,8 +370,6 @@ int arcompact_disassembler::handle_dasm32_LR(std::ostream &stream, offs_t pc, ui
 	if (p == 0)
 	{
 		uint8_t creg = dasm_common32_get_creg(op);
-		uint8_t ares = dasm_common32_get_areg_reserved(op);
-
 		if (creg == DASM_REG_LIMM)
 		{
 			if (!got_limm)
@@ -390,24 +378,18 @@ int arcompact_disassembler::handle_dasm32_LR(std::ostream &stream, offs_t pc, ui
 				size = 8;
 			}
 
-			util::stream_format(stream, "(%08x) ", limm);
+			util::stream_format(stream, "0x%08x ", limm);
 		}
 		else
 		{
-			util::stream_format(stream, "C(%s) ", regnames[creg]);
+			util::stream_format(stream, "%s ", regnames[creg]);
 		}
-
-		if (ares) util::stream_format(stream, "reserved(%02x) ", ares);
 	}
 	else if (p == 1)
 	{
 		uint32_t u = dasm_common32_get_u6(op);
-		uint8_t ares = dasm_common32_get_areg_reserved(op);
-
 		int auxreg = u;
 		PRINT_AUX_REGNAME
-
-		if (ares) util::stream_format(stream, "reserved(%02x) ", ares);
 	}
 	else if (p == 2)
 	{
@@ -445,7 +427,7 @@ int arcompact_disassembler::handle_dasm32_SR(std::ostream &stream, offs_t pc, ui
 		limm = dasm_get_limm_32bit_opcode(pc, opcodes);
 		size = 8;
 		got_limm = 1;
-		util::stream_format(stream, " %08x -> ", limm);
+		util::stream_format(stream, " 0x%08x -> ", limm);
 
 	}
 	else
@@ -456,7 +438,6 @@ int arcompact_disassembler::handle_dasm32_SR(std::ostream &stream, offs_t pc, ui
 	if (p == 0)
 	{
 		uint8_t creg = dasm_common32_get_creg(op);
-		uint8_t ares = dasm_common32_get_areg_reserved(op);
 
 		if (creg == DASM_REG_LIMM)
 		{
@@ -465,25 +446,20 @@ int arcompact_disassembler::handle_dasm32_SR(std::ostream &stream, offs_t pc, ui
 				limm = dasm_get_limm_32bit_opcode(pc, opcodes);
 				size = 8;
 			}
-			util::stream_format(stream, "[%08x]", limm);
+			util::stream_format(stream, "[0x%08x]", limm);
 
 		}
 		else
 		{
 			util::stream_format(stream, "[%s]", regnames[creg]);
 		}
-
-		if (ares) util::stream_format(stream, " (reserved %02x) ", ares);
 	}
 	else if (p == 1)
 	{
 		uint32_t u = dasm_common32_get_u6(op);
-		uint8_t ares = dasm_common32_get_areg_reserved(op);
 
 		int auxreg = u;
 		PRINT_AUX_REGNAME
-
-		if (ares) util::stream_format(stream, " (reserved %02x) ", ares);
 	}
 	else if (p == 2)
 	{
@@ -501,6 +477,6 @@ int arcompact_disassembler::handle_dasm32_SR(std::ostream &stream, offs_t pc, ui
 
 int arcompact_disassembler::handle_dasm32_FLAG(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
-	// leapster bios uses formats for FLAG that are not defined, bug I guess work anyway (P modes 0 / 1)
+	// leapster bios uses formats for FLAG that are explicitly defined and are considered redundant
 	return handle04_helper_dasm(stream, pc, op, opcodes, "FLAG", 1,1);
 }

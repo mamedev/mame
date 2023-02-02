@@ -337,8 +337,8 @@ int arcompact_disassembler::handle_ld_helper_dasm(std::ostream &stream, offs_t p
 
 	u <<= shift;
 
-	if (!swap) util::stream_format(stream, "%s %s, [%s, 0x%02x] (%04x)", optext, regnames[creg], regnames[breg], u, op);
-	else  util::stream_format(stream, "%s [%s, 0x%02x], %s (%04x)", optext, regnames[breg], u, regnames[creg], op);
+	if (!swap) util::stream_format(stream, "%s %s, [%s, 0x%02x]", optext, regnames[creg], regnames[breg], u);
+	else  util::stream_format(stream, "%s [%s, 0x%02x], %s", optext, regnames[breg], u, regnames[creg]);
 	return 2;
 }
 
@@ -501,14 +501,7 @@ int arcompact_disassembler::handle_dasm_POP_S_b(std::ostream &stream, offs_t pc,
 
 int arcompact_disassembler::handle_dasm_POP_S_blink(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
-	int res = (op & 0x0700) >> 8;
-	op &= ~0x0700; // all bits now used
-
-	if (res)
-		util::stream_format(stream, "POP_S [BLINK] (Reserved Bits set %04x)", op);
-	else
-		util::stream_format(stream, "POP_S [BLINK]");
-
+	util::stream_format(stream, "POP_S [BLINK]");
 	return 2;
 }
 
@@ -523,14 +516,7 @@ int arcompact_disassembler::handle_dasm_PUSH_S_b(std::ostream &stream, offs_t pc
 
 int arcompact_disassembler::handle_dasm_PUSH_S_blink(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
-	int res = (op & 0x0700) >> 8;
-	op &= ~0x0700; // all bits now used
-
-	if (res)
-		util::stream_format(stream, "PUSH_S [BLINK] (Reserved Bits set %04x)", op);
-	else
-		util::stream_format(stream, "PUSH_S [BLINK]");
-
+	util::stream_format(stream, "PUSH_S [BLINK]");
 	return 2;
 }
 
@@ -544,11 +530,11 @@ int arcompact_disassembler::handle19_0x_helper_dasm(std::ostream &stream, offs_t
 	util::stream_format(stream, "%s %s, ", optext, regnames[0]);
 	if (format == 0)
 	{
-		util::stream_format(stream, "[GP, %03x]", s);
+		util::stream_format(stream, "[GP, 0x%03x]", s);
 	}
 	else
 	{
-		util::stream_format(stream, "GP, %03x", s);
+		util::stream_format(stream, "GP, 0x%03x", s);
 	}
 
 	return 2;
@@ -580,7 +566,7 @@ int arcompact_disassembler::handle_dasm_LD_S_b_pcl_u10(std::ostream &stream, off
 	uint8_t breg = expand_reg(dasm_common16_get_breg(op));
 	uint32_t u = dasm_common16_get_u8(op);
 
-	util::stream_format(stream, "MOV_S %s, [PCL, %03x]", regnames[breg], u*4);
+	util::stream_format(stream, "MOV_S %s, [PCL, 0x%03x]", regnames[breg], u*4);
 
 	return 2;
 }
@@ -598,7 +584,7 @@ int arcompact_disassembler::handle_dasm_ADD_S_b_b_u7(std::ostream &stream, offs_
 	uint8_t breg = expand_reg(dasm_common16_get_breg(op));
 	uint32_t u = dasm_common16_get_u7(op);
 
-	util::stream_format(stream, "ADD_S %s <- %s, %02x", regnames[breg], regnames[breg], u);
+	util::stream_format(stream, "ADD_S %s <- %s, 0x%02x", regnames[breg], regnames[breg], u);
 	return 2;
 }
 
@@ -607,7 +593,7 @@ int arcompact_disassembler::handle_dasm_CMP_S_b_u7(std::ostream &stream, offs_t 
 	uint8_t breg = expand_reg(dasm_common16_get_breg(op));
 	uint32_t u = dasm_common16_get_u7(op);
 
-	util::stream_format(stream, "CMP_S %s, %02x", regnames[breg], u);
+	util::stream_format(stream, "CMP_S %s, 0x%02x", regnames[breg], u);
 	return 2;
 }
 
@@ -637,7 +623,7 @@ int arcompact_disassembler::handle1e_0x_helper_dasm(std::ostream &stream, offs_t
 	int s = (op & 0x01ff) >> 0; op &= ~0x01ff;
 	if (s & 0x100) s = -0x100 + (s & 0xff);
 
-	util::stream_format(stream, "%s %08x", optext, (pc&0xfffffffc) + s*2);
+	util::stream_format(stream, "%s 0x%08x", optext, (pc & 0xfffffffc) + s * 2);
 	return 2;
 }
 
@@ -661,7 +647,7 @@ int arcompact_disassembler::handle1e_03_0x_helper_dasm(std::ostream &stream, off
 	int s = (op & 0x003f) >> 0; op &= ~0x003f;
 	if (s & 0x020) s = -0x20 + (s & 0x1f);
 
-	util::stream_format(stream, "%s %08x", optext, (pc&0xfffffffc) + s*2);
+	util::stream_format(stream, "%s 0x%08x", optext, (pc & 0xfffffffc) + s * 2);
 	return 2;
 }
 
@@ -710,7 +696,7 @@ int arcompact_disassembler::handle_dasm_BL_S_s13(std::ostream &stream, offs_t pc
 	int s = (op & 0x07ff) >> 0; op &= ~0x07ff;
 	if (s & 0x400) s = -0x400 + (s & 0x3ff);
 
-	util::stream_format(stream, "BL_S %08x", (pc&0xfffffffc) + (s*4));
+	util::stream_format(stream, "BL_S 0x%08x", (pc & 0xfffffffc) + (s * 4));
 	return 2;
 }
 

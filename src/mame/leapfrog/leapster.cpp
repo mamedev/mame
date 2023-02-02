@@ -32,11 +32,11 @@
         USB 1.1 (client only) + full-sized SD slot.
 
 
-	many magic numbers in the BIOS ROM match the [strings:VALID_FLAGS] table in
-	https://github.com/tsbiberdorf/MqxSrc/blob/master/tools/tad/mqx.tad
-	does this mean the System is running on the MQX RTOS?
-	https://www.synopsys.com/dw/ipdir.php?ds=os_mqx_software
-	indicates it was available for ARC processors
+    many magic numbers in the BIOS ROM match the [strings:VALID_FLAGS] table in
+    https://github.com/tsbiberdorf/MqxSrc/blob/master/tools/tad/mqx.tad
+    does this mean the System is running on the MQX RTOS?
+    https://www.synopsys.com/dw/ipdir.php?ds=os_mqx_software
+    indicates it was available for ARC processors
 
 */
 
@@ -454,11 +454,11 @@ void leapster_state::machine_reset()
 void leapster_state::leapster_map(address_map &map)
 {
 //  A vector table is copied from 0x00000000 to 0x3c000000, but it is unclear if that is a BIOS mirror
-// 	or if it should be copying a different table.
+//  or if it should be copying a different table.
 	map(0x00000000, 0x007fffff).mirror(0x40000000).rom().region("maincpu", 0);
 	//map(0x40000000, 0x407fffff).rom().region("maincpu", 0);
 
-//	map(0x01800000, 0x0180ffff).ram();
+//  map(0x01800000, 0x0180ffff).ram();
 
 	map(0x01801000, 0x01801003).r(FUNC(leapster_state::leapster_1801000_r));
 	map(0x01801004, 0x01801007).r(FUNC(leapster_state::leapster_1801004_r));
@@ -478,7 +478,7 @@ void leapster_state::leapster_map(address_map &map)
 	map(0x0180d514, 0x0180d517).r(FUNC(leapster_state::leapster_180d514_r));
 
 	map(0x0180d800, 0x0180d803).r(FUNC(leapster_state::leapster_180d800_r));
-	
+
 	map(0x03000000, 0x030007ff).ram(); // puts stack here, writes a pointer @ 0x03000000 on startup
 	map(0x03000800, 0x0300ffff).ram(); // some of the later models need to store stack values here (or code execution has gone wrong?)
 	map(0x3c000000, 0x3c1fffff).ram(); // vector base gets moved here with new IRQ table, puts task stacks etc. here

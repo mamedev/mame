@@ -63,5 +63,4 @@ uint32_t arcompact_device::handleop_ASR_S_c_b_u3(uint16_t op)
 		result |= 0xffffffff << (31 - u);
 	m_regs[creg] = result;
 	return m_pc + 2;
-
 }

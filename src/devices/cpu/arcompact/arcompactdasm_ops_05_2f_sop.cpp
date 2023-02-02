@@ -23,11 +23,7 @@ int arcompact_disassembler::handle05_2f_0x_helper_dasm(std::ostream &stream, off
 	uint8_t breg = dasm_common32_get_breg(op);
 	uint8_t F = dasm_common32_get_F(op);
 
-	util::stream_format(stream, "%s", optext);
-	util::stream_format(stream, "%s", flagbit[F]);
-//  util::stream_format(stream, " p(%d)", p);
-
-	util::stream_format(stream, " %s, ", regnames[breg]);
+	util::stream_format(stream, "%s%s %s, ", optext, flagbit[F], regnames[breg]);
 
 	if (p == 0)
 	{
@@ -38,18 +34,18 @@ int arcompact_disassembler::handle05_2f_0x_helper_dasm(std::ostream &stream, off
 			uint32_t limm;
 			limm = dasm_get_limm_32bit_opcode(pc, opcodes);
 			size = 8;
-			util::stream_format(stream, "(%08x) ", limm);
+			util::stream_format(stream, "0x%08x ", limm);
 
 		}
 		else
 		{
-			util::stream_format(stream, "C(%s) ", regnames[creg]);
+			util::stream_format(stream, "%s ", regnames[creg]);
 		}
 	}
 	else if (p == 1)
 	{
 		uint32_t u = dasm_common32_get_u6(op);
-		util::stream_format(stream, "U(0x%02x) ", u);
+		util::stream_format(stream, "0x%02x ", u);
 	}
 	else if (p == 2)
 	{

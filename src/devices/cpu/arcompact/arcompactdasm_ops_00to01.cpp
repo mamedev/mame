@@ -28,7 +28,7 @@ int arcompact_disassembler::handle_dasm32_B_cc_D_s21(std::ostream &stream, offs_
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 	uint8_t condition = dasm_common32_get_condition(op);
 
-	util::stream_format(stream, "B%s(%s) %08x", delaybit[n], conditions[condition], (pc&0xfffffffc) + (address * 2));
+	util::stream_format(stream, "B%s%s 0x%08x", conditions[condition], delaybit[n], (pc&0xfffffffc) + (address * 2));
 	return size;
 }
 
@@ -42,10 +42,8 @@ int arcompact_disassembler::handle_dasm32_B_D_s25(std::ostream &stream, offs_t p
 	address |= ((op & 0x0000000f) >> 0) << 20;
 	if (address & 0x800000) address = -0x800000 + (address & 0x7fffff);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
-	int res =  (op & 0x00000010) >> 4; op &= ~0x00000010;
 
-	util::stream_format(stream, "B%s %08x", delaybit[n], (pc&0xfffffffc) + (address * 2));
-	if (res)  util::stream_format(stream, "(reserved bit set)");
+	util::stream_format(stream, "B%s 0x%08x", delaybit[n], (pc&0xfffffffc) + (address * 2));
 
 	return size;
 }
@@ -63,7 +61,7 @@ int arcompact_disassembler::handle_dasm32_BL_cc_d_s21(std::ostream &stream, offs
 
 	uint8_t condition = dasm_common32_get_condition(op);
 
-	util::stream_format(stream, "BL%s(%s) %08x", delaybit[n], conditions[condition], (pc&0xfffffffc) + (address *2));
+	util::stream_format(stream, "BL%s%s 0x%08x", conditions[condition], delaybit[n], (pc&0xfffffffc) + (address *2));
 	return size;
 }
 
@@ -77,10 +75,8 @@ int arcompact_disassembler::handle_dasm32_BL_d_s25(std::ostream &stream, offs_t 
 	address |=        ((op & 0x0000000f) >> 0) << 20;
 	if (address & 0x800000) address = -0x800000 + (address&0x7fffff);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
-	int res =  (op & 0x00000010) >> 4; op &= ~0x00000010;
 
-	util::stream_format(stream, "BL%s %08x", delaybit[n], (pc&0xfffffffc) + (address *2));
-	if (res)  util::stream_format(stream, "(reserved bit set)");
+	util::stream_format(stream, "BL%s 0x%08x", delaybit[n], (pc&0xfffffffc) + (address *2));
 
 	return size;
 }
@@ -191,7 +187,7 @@ int arcompact_disassembler::handle01_01_01_helper(std::ostream &stream, offs_t p
 
 	op &= ~0x07007fe0;
 
-	util::stream_format(stream, "%s%s %s, 0x%02x %08x (%08x)", optext, delaybit[n], regnames[breg], u, (pc&0xfffffffc) + (address * 2), op & ~0xf8fe800f);
+	util::stream_format(stream, "%s%s %s, 0x%02x 0x%08x", optext, delaybit[n], regnames[breg], u, (pc&0xfffffffc) + (address * 2));
 
 	return size;
 }

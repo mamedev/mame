@@ -19,9 +19,7 @@ int arcompact_disassembler::handle04_3x_helper_dasm(std::ostream& stream, offs_t
 	uint32_t limm = 0;
 	int got_limm = 0;
 
-	util::stream_format(stream, "LD");
-	util::stream_format(stream, "%s", datasize[dsize]);
-	util::stream_format(stream, "%s", dataextend[extend]);
+	util::stream_format(stream, "LD%s%s", datasize[dsize], dataextend[extend]);
 
 	int mode = (op & 0x00c00000) >> 22; op &= ~0x00c00000;
 	uint8_t breg = dasm_common32_get_breg(op);
@@ -29,17 +27,14 @@ int arcompact_disassembler::handle04_3x_helper_dasm(std::ostream& stream, offs_t
 	uint8_t creg = dasm_common32_get_creg(op);
 	uint8_t areg = dasm_common32_get_areg(op);
 
-	util::stream_format(stream, "%s", addressmode[mode]);
-	util::stream_format(stream, "%s", cachebit[D]);
-
-	util::stream_format(stream, " %s. ", regnames[areg]);
+	util::stream_format(stream, "%s%s %s. ", addressmode[mode], cachebit[D], regnames[areg]);
 
 	if (breg == DASM_REG_LIMM)
 	{
 		limm = dasm_get_limm_32bit_opcode(pc, opcodes);
 		size = 8;
 		got_limm = 1;
-		util::stream_format(stream, "[%08x, ", limm);
+		util::stream_format(stream, "[0x%08x, ", limm);
 
 	}
 	else
@@ -54,7 +49,7 @@ int arcompact_disassembler::handle04_3x_helper_dasm(std::ostream& stream, offs_t
 			limm = dasm_get_limm_32bit_opcode(pc, opcodes);
 			size = 8;
 		}
-		util::stream_format(stream, "(%08x)]", limm);
+		util::stream_format(stream, "0x%08x]", limm);
 	}
 	else
 	{

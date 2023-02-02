@@ -2,7 +2,6 @@
 // copyright-holders:David Haywood
 /*********************************\
  ARCompact disassembler
-
 \*********************************/
 
 #include "emu.h"

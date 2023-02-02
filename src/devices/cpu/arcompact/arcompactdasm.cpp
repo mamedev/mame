@@ -13,7 +13,6 @@ u32 arcompact_disassembler::opcode_alignment() const
 	return 2;
 }
 
-
 // condition codes (basic ones are the same as arc
 const char *const arcompact_disassembler::conditions[0x20] =
 {
