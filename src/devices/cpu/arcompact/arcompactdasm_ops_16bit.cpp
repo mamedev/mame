@@ -179,20 +179,10 @@ int arcompact_disassembler::handle_dasm_J_S_D_blink(std::ostream &stream, offs_t
 	return 2;
 }
 
-
-
-
-
-
 int arcompact_disassembler::handle0f_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext, int nodst)
 {
-	int breg, creg;
-
-	breg = dasm_common16_get_breg(op);
-	creg = dasm_common16_get_creg(op);
-
-	breg = expand_reg(breg);
-	creg = expand_reg(creg);
+	uint8_t breg = expand_reg(dasm_common16_get_breg(op));
+	uint8_t creg = expand_reg(dasm_common16_get_creg(op));
 
 	if (nodst==0) util::stream_format(stream, "%s %s <- %s", optext, regnames[breg], regnames[creg]);
 	else if (nodst==1) util::stream_format(stream, "%s <no dst>, %s, %s", optext, regnames[breg], regnames[creg]);
@@ -316,8 +306,6 @@ int arcompact_disassembler::handle_dasm_LSR_S_b_c_single(std::ostream &stream, o
 	return handle0f_0x_helper_dasm(stream, pc, op, opcodes, "LSR1_S",0);
 }
 
-
-
 int arcompact_disassembler::handle_dasm_TRAP_S_u6(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)  // special
 { // 0111 1uuu uuu1 1110
 	int u = (op & 0x07e0)>>5;
@@ -343,21 +331,15 @@ int arcompact_disassembler::handle_dasm_BRK_S(std::ostream &stream, offs_t pc, u
 
 int arcompact_disassembler::handle_ld_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext, int shift, int swap)
 {
-	int breg, creg, u;
-
-	breg = dasm_common16_get_breg(op);
-	creg = dasm_common16_get_creg(op);
-	u = dasm_common16_get_u5(op);
-
-	breg = expand_reg(breg);
-	creg = expand_reg(creg);
+	uint8_t breg = expand_reg(dasm_common16_get_breg(op));
+	uint8_t creg = expand_reg(dasm_common16_get_creg(op));
+	uint32_t u = dasm_common16_get_u5(op);
 
 	u <<= shift;
 
 	if (!swap) util::stream_format(stream, "%s %s, [%s, 0x%02x] (%04x)", optext, regnames[creg], regnames[breg], u, op);
 	else  util::stream_format(stream, "%s [%s, 0x%02x], %s (%04x)", optext, regnames[breg], u, regnames[creg], op);
 	return 2;
-
 }
 
 
@@ -399,17 +381,10 @@ int arcompact_disassembler::handle_dasm_STW_S_c_b_u6(std::ostream &stream, offs_
 
 int arcompact_disassembler::handle_l7_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext)
 {
-	int breg, u;
-
-	breg = dasm_common16_get_breg(op);
-	u = dasm_common16_get_u5(op);
-
-	breg = expand_reg(breg);
-
+	uint8_t breg = expand_reg(dasm_common16_get_breg(op));
+	uint32_t u = dasm_common16_get_u5(op);
 	util::stream_format(stream, "%s %s, 0x%02x", optext, regnames[breg], u);
-
 	return 2;
-
 }
 
 int arcompact_disassembler::handle_dasm_ASL_S_b_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
@@ -457,12 +432,8 @@ int arcompact_disassembler::handle_dasm_BTST_S_b_u5(std::ostream &stream, offs_t
 
 int arcompact_disassembler::handle18_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext, int st, int format)
 {
-	int breg, u;
-
-	breg = dasm_common16_get_breg(op);
-	u = dasm_common16_get_u5(op);
-
-	breg = expand_reg(breg);
+	uint8_t breg = expand_reg(dasm_common16_get_breg(op));
+	uint32_t u = dasm_common16_get_u5(op);
 
 	util::stream_format(stream, "%s %s ", optext, regnames[breg]);
 	if (st==1) util::stream_format(stream, "-> ");
@@ -470,7 +441,6 @@ int arcompact_disassembler::handle18_0x_helper_dasm(std::ostream &stream, offs_t
 
 	if (format==0) util::stream_format(stream, "[SP, 0x%02x]", u*4);
 	else  util::stream_format(stream, "SP, 0x%02x", u*4);
-
 
 	return 2;
 }
@@ -513,8 +483,7 @@ int arcompact_disassembler::handle_dasm_ADD_S_sp_sp_u7(std::ostream &stream, off
 
 int arcompact_disassembler::handle_dasm_SUB_S_sp_sp_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
-	int u;
-	u = dasm_common16_get_u5(op);
+	uint32_t u = dasm_common16_get_u5(op);
 
 	util::stream_format( stream, "SUB_S SP, SP, 0x%02x", u*4);
 	return 2;
@@ -523,9 +492,7 @@ int arcompact_disassembler::handle_dasm_SUB_S_sp_sp_u7(std::ostream &stream, off
 // op bits remaining for 0x18_06_xx subgroups 0x0700
 int arcompact_disassembler::handle_dasm_POP_S_b(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
-	int breg;
-	breg = dasm_common16_get_breg(op);
-	breg = expand_reg(breg);
+	uint8_t breg = expand_reg(dasm_common16_get_breg(op));
 
 	util::stream_format(stream, "POP_S %s", regnames[breg]);
 
@@ -548,12 +515,8 @@ int arcompact_disassembler::handle_dasm_POP_S_blink(std::ostream &stream, offs_t
 // op bits remaining for 0x18_07_xx subgroups 0x0700
 int arcompact_disassembler::handle_dasm_PUSH_S_b(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
-	int breg;
-	breg = dasm_common16_get_breg(op);
-	breg = expand_reg(breg);
-
+	uint8_t breg = expand_reg(dasm_common16_get_breg(op));
 	util::stream_format(stream, "PUSH_S %s", regnames[breg]);
-
 	return 2;
 }
 
@@ -574,12 +537,9 @@ int arcompact_disassembler::handle_dasm_PUSH_S_blink(std::ostream &stream, offs_
 
 int arcompact_disassembler::handle19_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext, int shift, int format)
 {
-	int s;
-
-	s = dasm_common16_get_s9(op);
+	uint32_t s = dasm_common16_get_s9(op);
 	// todo, signed
 	s <<= shift;
-
 
 	util::stream_format(stream, "%s %s, ", optext, regnames[0]);
 	if (format == 0)
@@ -617,10 +577,8 @@ int arcompact_disassembler::handle_dasm_ADD_S_r0_gp_s11(std::ostream &stream, of
 
 int arcompact_disassembler::handle_dasm_LD_S_b_pcl_u10(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
-	int breg, u;
-	breg = dasm_common16_get_breg(op);
-	u = dasm_common16_get_u8(op);
-	breg = expand_reg(breg);
+	uint8_t breg = expand_reg(dasm_common16_get_breg(op));
+	uint32_t u = dasm_common16_get_u8(op);
 
 	util::stream_format(stream, "MOV_S %s, [PCL, %03x]", regnames[breg], u*4);
 
@@ -629,21 +587,16 @@ int arcompact_disassembler::handle_dasm_LD_S_b_pcl_u10(std::ostream &stream, off
 
 int arcompact_disassembler::handle_dasm_MOV_S_b_u8(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
-	int breg, u;
-	breg = dasm_common16_get_breg(op);
-	u = dasm_common16_get_u8(op);
-	breg = expand_reg(breg);
-
+	uint8_t breg = expand_reg(dasm_common16_get_breg(op));
+	uint32_t u = dasm_common16_get_u8(op);
 	util::stream_format(stream, "MOV_S %s <- 0x%02x", regnames[breg], u);
 	return 2;
 }
 
 int arcompact_disassembler::handle_dasm_ADD_S_b_b_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
-	int breg, u;
-	breg = dasm_common16_get_breg(op);
-	u = dasm_common16_get_u7(op);
-	breg = expand_reg(breg);
+	uint8_t breg = expand_reg(dasm_common16_get_breg(op));
+	uint32_t u = dasm_common16_get_u7(op);
 
 	util::stream_format(stream, "ADD_S %s <- %s, %02x", regnames[breg], regnames[breg], u);
 	return 2;
@@ -651,10 +604,8 @@ int arcompact_disassembler::handle_dasm_ADD_S_b_b_u7(std::ostream &stream, offs_
 
 int arcompact_disassembler::handle_dasm_CMP_S_b_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
-	int breg, u;
-	breg = dasm_common16_get_breg(op);
-	u = dasm_common16_get_u7(op);
-	breg = expand_reg(breg);
+	uint8_t breg = expand_reg(dasm_common16_get_breg(op));
+	uint32_t u = dasm_common16_get_u7(op);
 
 	util::stream_format(stream, "CMP_S %s, %02x", regnames[breg], u);
 	return 2;
@@ -662,9 +613,7 @@ int arcompact_disassembler::handle_dasm_CMP_S_b_u7(std::ostream &stream, offs_t 
 
 int arcompact_disassembler::handle1d_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext)
 {
-	int breg;
-	breg = dasm_common16_get_breg(op);
-	breg = expand_reg(breg);
+	uint8_t breg = expand_reg(dasm_common16_get_breg(op));
 
 	int s = (op & 0x007f) >> 0; op &= ~0x007f;
 	if (s & 0x40) s = -0x40 + (s & 0x3f);
@@ -672,7 +621,6 @@ int arcompact_disassembler::handle1d_helper_dasm(std::ostream &stream, offs_t pc
 	util::stream_format(stream, "%s %s, 0 to 0x%08x", optext, regnames[breg], (pc&0xfffffffc) + s*2);
 	return 2;
 }
-
 
 int arcompact_disassembler::handle_dasm_BREQ_S_b_0_s8(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
@@ -684,8 +632,6 @@ int arcompact_disassembler::handle_dasm_BRNE_S_b_0_s8(std::ostream &stream, offs
 	return handle1d_helper_dasm(stream, pc, op, opcodes,"BRNE_S");
 }
 
-
-
 int arcompact_disassembler::handle1e_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext)
 {
 	int s = (op & 0x01ff) >> 0; op &= ~0x01ff;
@@ -694,8 +640,6 @@ int arcompact_disassembler::handle1e_0x_helper_dasm(std::ostream &stream, offs_t
 	util::stream_format(stream, "%s %08x", optext, (pc&0xfffffffc) + s*2);
 	return 2;
 }
-
-
 
 int arcompact_disassembler::handle_dasm_B_S_s10(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
@@ -711,7 +655,6 @@ int arcompact_disassembler::handle_dasm_BNE_S_s10(std::ostream &stream, offs_t p
 {
 	return handle1e_0x_helper_dasm(stream, pc, op, opcodes, "BNE_S");
 }
-
 
 int arcompact_disassembler::handle1e_03_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext)
 {
@@ -762,7 +705,6 @@ int arcompact_disassembler::handle_dasm_BLS_S_s7(std::ostream &stream, offs_t pc
 	return handle1e_03_0x_helper_dasm(stream, pc, op, opcodes, "BLS_S");
 }
 
-
 int arcompact_disassembler::handle_dasm_BL_S_s13(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes)
 {
 	int s = (op & 0x07ff) >> 0; op &= ~0x07ff;
@@ -780,11 +722,13 @@ int arcompact_disassembler::handle_dasm_BL_S_s13(std::ostream &stream, offs_t pc
 
 int arcompact_disassembler::handle_dasm_illegal(std::ostream& stream, offs_t pc, uint8_t param1, uint8_t param2, uint16_t op, const data_buffer& opcodes)
 {
+	util::stream_format(stream, "<illegal 0x%02x_%02x> (%04x)\n", param1, param2, op);
 	return 2;
 }
 
 int arcompact_disassembler::handle_dasm_illegal(std::ostream& stream, offs_t pc, uint8_t param1, uint8_t param2, uint8_t param3, uint16_t op, const data_buffer& opcodes)
 {
+	util::stream_format(stream, "<illegal 0x%02x_%02x_%02x> (%04x)\n", param1, param2, param3, op);
 	return 2;
 }
 

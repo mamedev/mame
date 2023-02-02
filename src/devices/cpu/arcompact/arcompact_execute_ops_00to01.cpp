@@ -97,7 +97,7 @@ uint32_t arcompact_device::handleop32_B_cc_D_s21(uint32_t op)
 	if (address & 0x80000) address = -0x80000 + (address & 0x7ffff);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 
-	uint32_t realaddress = (m_pc&0xfffffffc) + (address * 2);
+	uint32_t realaddress = (m_pc & 0xfffffffc) + (address * 2);
 
 	if (n)
 	{
@@ -126,7 +126,7 @@ uint32_t arcompact_device::handleop32_B_D_s25(uint32_t op)
 	if (address & 0x800000) address = -0x800000 + (address & 0x7fffff);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 
-	uint32_t realaddress = (m_pc&0xfffffffc) + (address * 2);
+	uint32_t realaddress = (m_pc & 0xfffffffc) + (address * 2);
 	if (n)
 	{
 		m_delayactive = true;
@@ -153,13 +153,13 @@ uint32_t arcompact_device::handleop32_BL_cc_d_s21(uint32_t op)
 	if (!check_condition(condition))
 		return m_pc + size;
 
-	int32_t address =   (op & 0x07fc0000) >> 17;
-	address |=        ((op & 0x0000ffc0) >> 6) << 10;
+	int32_t address = (op & 0x07fc0000) >> 17;
+	address |= ((op & 0x0000ffc0) >> 6) << 10;
 
-	if (address & 0x40000) address = -0x40000 + (address&0x3ffff);
+	if (address & 0x40000) address = -0x40000 + (address & 0x3ffff);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 
-	uint32_t realaddress = (m_pc&0xfffffffc) + (address * 2);
+	uint32_t realaddress = (m_pc & 0xfffffffc) + (address * 2);
 
 	if (n)
 	{
@@ -183,13 +183,13 @@ uint32_t arcompact_device::handleop32_BL_cc_d_s21(uint32_t op)
 uint32_t arcompact_device::handleop32_BL_d_s25(uint32_t op)
 {
 	int size = 4;
-	int32_t address =   (op & 0x07fc0000) >> 17;
-	address |=        ((op & 0x0000ffc0) >> 6) << 10;
-	address |=        ((op & 0x0000000f) >> 0) << 20;
-	if (address & 0x800000) address = -0x800000 + (address&0x7fffff);
+	int32_t address = (op & 0x07fc0000) >> 17;
+	address |= ((op & 0x0000ffc0) >> 6) << 10;
+	address |= ((op & 0x0000000f) >> 0) << 20;
+	if (address & 0x800000) address = -0x800000 + (address & 0x7fffff);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 
-	uint32_t realaddress = (m_pc&0xfffffffc) + (address * 2);
+	uint32_t realaddress = (m_pc & 0xfffffffc) + (address * 2);
 
 	if (n)
 	{

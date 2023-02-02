@@ -51,10 +51,8 @@ Vector | Offset | Default Source                 | Link Reg         | Default Pr
 
 */
 
-
-
 // currently causes the Leapster to put an unhandled interrupt exception string in RAM
-// at 0x03000000
+// at 0x03000800
 void arcompact_device::check_interrupts()
 {
 	int vector = 8;
@@ -68,7 +66,7 @@ void arcompact_device::check_interrupts()
 	{
 		if (m_status32 & 0x00000002) // & 0x04 = level2, & 0x02 = level1
 		{
-			int level = ((m_AUX_IRQ_LEV >> vector) & 1)+1;
+			int level = ((m_AUX_IRQ_LEV >> vector) & 1) + 1;
 
 			logerror("HACK/TEST IRQ\n");
 
@@ -162,24 +160,24 @@ int arcompact_device::check_condition(uint8_t condition)
 {
 	switch (condition & 0x1f)
 	{
-		case 0x00: return condition_AL();
-		case 0x01: return condition_EQ();
-		case 0x02: return condition_NE();
-		case 0x03: return condition_PL();
-		case 0x04: return condition_MI();
-		case 0x05: return condition_CS();
-		case 0x06: return condition_HS();
-		case 0x07: return condition_VS();
-		case 0x08: return condition_VC();
-		case 0x09: return condition_GT();
-		case 0x0a: return condition_GE();
-		case 0x0b: return condition_LT();
-		case 0x0c: return condition_LE();
-		case 0x0d: return condition_HI();
-		case 0x0e: return condition_LS();
-		case 0x0f: return condition_PNZ();
+	case 0x00: return condition_AL();
+	case 0x01: return condition_EQ();
+	case 0x02: return condition_NE();
+	case 0x03: return condition_PL();
+	case 0x04: return condition_MI();
+	case 0x05: return condition_CS();
+	case 0x06: return condition_HS();
+	case 0x07: return condition_VS();
+	case 0x08: return condition_VC();
+	case 0x09: return condition_GT();
+	case 0x0a: return condition_GE();
+	case 0x0b: return condition_LT();
+	case 0x0c: return condition_LE();
+	case 0x0d: return condition_HI();
+	case 0x0e: return condition_LS();
+	case 0x0f: return condition_PNZ();
 
-		default: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
+	default: fatalerror("unhandled condition check %s", arcompact_disassembler::conditions[condition]); return -1;
 	}
 	return -1;
 }
@@ -499,25 +497,25 @@ uint32_t arcompact_device::handleop32_general_SOP_group(uint32_t op, ophandler32
 {
 	switch ((op & 0x00c00000) >> 22)
 	{
-		case 0x00:
-		{
-			uint8_t breg = common32_get_breg(op);
-			uint8_t creg = common32_get_creg(op);
-			int size = check_limm(breg, creg);
-			m_regs[breg] = ophandler(this, m_regs[creg], common32_get_F(op));
-			return m_pc + size;
-		}
-		case 0x01:
-		{
-			uint8_t breg = common32_get_breg(op);
-			int size = check_limm(breg);
-			m_regs[breg] = ophandler(this, common32_get_u6(op), common32_get_F(op));
-			return m_pc + size;
-		}
-		case 0x02:
-		case 0x03:
-			fatalerror("SOP Group: illegal mode 02/03 specifying use of bits already assigned to opcode select: opcode %04x\n", op);
-			return 0;
+	case 0x00:
+	{
+		uint8_t breg = common32_get_breg(op);
+		uint8_t creg = common32_get_creg(op);
+		int size = check_limm(breg, creg);
+		m_regs[breg] = ophandler(this, m_regs[creg], common32_get_F(op));
+		return m_pc + size;
+	}
+	case 0x01:
+	{
+		uint8_t breg = common32_get_breg(op);
+		int size = check_limm(breg);
+		m_regs[breg] = ophandler(this, common32_get_u6(op), common32_get_F(op));
+		return m_pc + size;
+	}
+	case 0x02:
+	case 0x03:
+		fatalerror("SOP Group: illegal mode 02/03 specifying use of bits already assigned to opcode select: opcode %04x\n", op);
+		return 0;
 	}
 	return 0;
 }
@@ -529,12 +527,12 @@ uint32_t arcompact_device::handleop32_general_SOP_group(uint32_t op, ophandler32
 *                                                                                                                                   *
 ************************************************************************************************************************************/
 
-uint32_t arcompact_device::arcompact_handle_reserved(uint8_t param1, uint8_t param2, uint8_t param3, uint8_t param4, uint32_t op)  { logerror("<reserved 0x%02x_%02x_%02x_%02x> (%08x)\n", param1, param2, param3, param4, op); fatalerror("<illegal op>"); return m_pc + 4;}
+uint32_t arcompact_device::arcompact_handle_reserved(uint8_t param1, uint8_t param2, uint8_t param3, uint8_t param4, uint32_t op) { logerror("<reserved 0x%02x_%02x_%02x_%02x> (%08x)\n", param1, param2, param3, param4, op); fatalerror("<illegal op>"); return m_pc + 4; }
 
 uint32_t arcompact_device::arcompact_handle_illegal(uint8_t param1, uint8_t param2, uint16_t op) { logerror("<illegal 0x%02x_%02x> (%04x)\n", param1, param2, op); fatalerror("<illegal op>");  return m_pc + 2; }
 uint32_t arcompact_device::arcompact_handle_illegal(uint8_t param1, uint8_t param2, uint8_t param3, uint16_t op) { logerror("<illegal 0x%02x_%02x_%02x> (%04x)\n", param1, param2, param3, op); fatalerror("<illegal op>");  return m_pc + 2; }
 uint32_t arcompact_device::arcompact_handle_illegal(uint8_t param1, uint8_t param2, uint8_t param3, uint8_t param4, uint16_t op) { logerror("<illegal 0x%02x_%02x_%02x_%02x> (%04x)\n", param1, param2, param3, param4, op); fatalerror("<illegal op>");  return m_pc + 2; }
 
-uint32_t arcompact_device::arcompact_handle_illegal(uint8_t param1, uint8_t param2, uint32_t op)  { logerror("<illegal 0x%02x_%02x> (%08x)\n", param1, param2, op); fatalerror("<illegal op>"); return m_pc + 4;}
-uint32_t arcompact_device::arcompact_handle_illegal(uint8_t param1, uint8_t param2, uint8_t param3, uint32_t op)  { logerror("<illegal 0x%02x_%02x_%02x> (%08x)\n", param1, param2, param3, op); fatalerror("<illegal op>"); return m_pc + 4;}
-uint32_t arcompact_device::arcompact_handle_illegal(uint8_t param1, uint8_t param2, uint8_t param3, uint8_t param4, uint32_t op)  { logerror("<illegal 0x%02x_%02x_%02x_%02x> (%08x)\n", param1, param2, param3, param4, op); fatalerror("<illegal op>"); return m_pc + 4;}
+uint32_t arcompact_device::arcompact_handle_illegal(uint8_t param1, uint8_t param2, uint32_t op) { logerror("<illegal 0x%02x_%02x> (%08x)\n", param1, param2, op); fatalerror("<illegal op>"); return m_pc + 4; }
+uint32_t arcompact_device::arcompact_handle_illegal(uint8_t param1, uint8_t param2, uint8_t param3, uint32_t op) { logerror("<illegal 0x%02x_%02x_%02x> (%08x)\n", param1, param2, param3, op); fatalerror("<illegal op>"); return m_pc + 4; }
+uint32_t arcompact_device::arcompact_handle_illegal(uint8_t param1, uint8_t param2, uint8_t param3, uint8_t param4, uint32_t op) { logerror("<illegal 0x%02x_%02x_%02x_%02x> (%08x)\n", param1, param2, param3, param4, op); fatalerror("<illegal op>"); return m_pc + 4; }

@@ -55,7 +55,7 @@ uint32_t arcompact_device::handleop_BIC_S_b_b_c(uint16_t op)
 {
 	uint8_t breg = common16_get_and_expand_breg(op);
 	uint8_t creg = common16_get_and_expand_creg(op);
-	uint32_t result = m_regs[breg] &~ m_regs[creg];
+	uint32_t result = m_regs[breg] & ~m_regs[creg];
 	m_regs[breg] = result;
 	return m_pc + 2;
 }
@@ -85,8 +85,10 @@ uint32_t arcompact_device::handleop_TST_S_b_c(uint16_t op)
 	uint8_t creg = common16_get_and_expand_creg(op);
 	uint32_t result = m_regs[breg] & m_regs[creg];
 	// unlike most 16-bit opcodes, TST_S sets flags
-	if (!result) { status32_set_z(); } else { status32_clear_z(); }
-	if (result & 0x8000000) { status32_set_n(); } else { status32_clear_n(); }
+	if (!result) { status32_set_z(); }
+	else { status32_clear_z(); }
+	if (result & 0x8000000) { status32_set_n(); }
+	else { status32_clear_n(); }
 	return m_pc + 2;
 }
 
@@ -225,7 +227,7 @@ uint32_t arcompact_device::handleop_ADD1_S_b_b_c(uint16_t op)
 {
 	uint8_t breg = common16_get_and_expand_breg(op);
 	uint8_t creg = common16_get_and_expand_creg(op);
-	uint32_t result = m_regs[breg] + (m_regs[creg] <<1);
+	uint32_t result = m_regs[breg] + (m_regs[creg] << 1);
 	m_regs[breg] = result;
 	return m_pc + 2;
 }
@@ -239,7 +241,7 @@ uint32_t arcompact_device::handleop_ADD2_S_b_b_c(uint16_t op)
 {
 	uint8_t breg = common16_get_and_expand_breg(op);
 	uint8_t creg = common16_get_and_expand_creg(op);
-	uint32_t result = m_regs[breg] + (m_regs[creg] <<2);
+	uint32_t result = m_regs[breg] + (m_regs[creg] << 2);
 	m_regs[breg] = result;
 	return m_pc + 2;
 }
@@ -253,7 +255,7 @@ uint32_t arcompact_device::handleop_ADD3_S_b_b_c(uint16_t op)
 {
 	uint8_t breg = common16_get_and_expand_breg(op);
 	uint8_t creg = common16_get_and_expand_creg(op);
-	uint32_t result = m_regs[breg] + (m_regs[creg] <<3);
+	uint32_t result = m_regs[breg] + (m_regs[creg] << 3);
 	m_regs[breg] = result;
 	return m_pc + 2;
 }
@@ -281,7 +283,7 @@ uint32_t arcompact_device::handleop_LSR_S_b_b_c_multiple(uint16_t op)
 {
 	uint8_t breg = common16_get_and_expand_breg(op);
 	uint8_t creg = common16_get_and_expand_creg(op);
-	uint32_t result = m_regs[breg] >> (m_regs[creg]&0x1f);
+	uint32_t result = m_regs[breg] >> (m_regs[creg] & 0x1f);
 	m_regs[breg] = result;
 	return m_pc + 2;
 }
@@ -356,7 +358,7 @@ uint32_t arcompact_device::handleop_LSR_S_b_c_single(uint16_t op)
 
 uint32_t arcompact_device::handleop_TRAP_S_u6(uint16_t op)  // special
 {
-	fatalerror("unimplemented TRAP_S %04x",  op);
+	fatalerror("unimplemented TRAP_S %04x", op);
 	return m_pc + 2;
 }
 
@@ -367,6 +369,6 @@ uint32_t arcompact_device::handleop_TRAP_S_u6(uint16_t op)  // special
 
 uint32_t arcompact_device::handleop_BRK_S(uint16_t op)  // special
 {
-	fatalerror("unimplemented BRK_S %04x",  op);
+	fatalerror("unimplemented BRK_S %04x", op);
 	return m_pc + 2;
 }

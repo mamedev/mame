@@ -51,4 +51,3 @@ uint32_t arcompact_device::handleop_ADD_S_r0_gp_s11(uint16_t op)
 	m_regs[0] = m_regs[REG_GP] + (s << 2);
 	return m_pc + 2;
 }
-

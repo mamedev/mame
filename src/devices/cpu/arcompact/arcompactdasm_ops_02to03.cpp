@@ -10,7 +10,7 @@
 #include "arcompactdasm.h"
 
 
-int arcompact_disassembler::handle_dasm32_LD_r_o(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_LD_r_o(std::ostream& stream, offs_t pc, uint32_t op, const data_buffer& opcodes)
 {
 	// bitpos
 	// 1111 1111 1111 1111 0000 0000 0000 0000
@@ -61,7 +61,7 @@ int arcompact_disassembler::handle_dasm32_LD_r_o(std::ostream &stream, offs_t pc
 	return size;
 }
 
-int arcompact_disassembler::handle_dasm32_ST_r_o(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
+int arcompact_disassembler::handle_dasm32_ST_r_o(std::ostream& stream, offs_t pc, uint32_t op, const data_buffer& opcodes)
 {
 	int size = 4;
 	uint32_t limm = 0;

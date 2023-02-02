@@ -783,7 +783,6 @@ private:
 	uint32_t m_INTVECTORBASE;
 	uint32_t m_AUX_IRQ_LV12;
 	uint32_t m_AUX_IRQ_LEV;
-
 };
 
 DECLARE_DEVICE_TYPE(ARCA5, arcompact_device)

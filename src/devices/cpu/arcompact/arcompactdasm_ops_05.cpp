@@ -32,12 +32,12 @@ int arcompact_disassembler::handle_dasm32_ROR_multiple(std::ostream &stream, off
 int arcompact_disassembler::handle_dasm32_MUL64(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "MUL64", 2,0);
-} // special
+}
 
 int arcompact_disassembler::handle_dasm32_MULU64(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	return handle04_helper_dasm(stream, pc, op, opcodes, "MULU64", 2,0);
-} // special
+}
 
 int arcompact_disassembler::handle_dasm32_ADDS(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {

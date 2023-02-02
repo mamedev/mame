@@ -61,4 +61,3 @@ uint32_t arcompact_device::handleop32_BRK(uint32_t op)
 	fatalerror("BRK (%08x)", op);
 	return m_pc + 4;
 }
-

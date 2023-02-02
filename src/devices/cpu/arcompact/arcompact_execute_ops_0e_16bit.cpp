@@ -4,7 +4,6 @@
 #include "emu.h"
 #include "arcompact.h"
 
-
 // #######################################################################################################################
 //                                 IIII I       S S
 // ADD_S b,b,h                     0111 0bbb hhh0 0HHH
@@ -17,7 +16,7 @@ uint32_t arcompact_device::handleop_ADD_S_b_b_h_or_limm(uint16_t op) // ADD_s b,
 	uint8_t breg = common16_get_and_expand_breg(op);
 	int size = check_limm16(h);
 	m_regs[breg] = m_regs[breg] + m_regs[h];
-	return m_pc+ size;
+	return m_pc + size;
 }
 
 // #######################################################################################################################

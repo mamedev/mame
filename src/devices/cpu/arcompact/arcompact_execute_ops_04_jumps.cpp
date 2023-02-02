@@ -129,7 +129,7 @@ uint32_t arcompact_device::handleop32_Jcc_cc_f_b_b_c_helper(uint32_t op, bool de
 		// if F isn't set then the destination can't be ILINK1 or ILINK2
 		if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
 		{
-			fatalerror ("fatal handleop32_J(L)cc_cc_(.D)f_b_b_c J %08x (F not set but ILINK1 or ILINK2 used as dst)", op);
+			fatalerror("fatal handleop32_J(L)cc_cc_(.D)f_b_b_c J %08x (F not set but ILINK1 or ILINK2 used as dst)", op);
 		}
 		else
 		{

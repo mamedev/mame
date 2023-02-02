@@ -53,17 +53,17 @@ uint32_t arcompact_device::handleop32_ST_r_o(uint32_t op)
 	uint8_t breg = common32_get_breg(op);
 	uint8_t creg = common32_get_creg(op);
 
-//  int R = (op & 0x00000001) >> 0; // bit 0 is reserved
+	//  int R = (op & 0x00000001) >> 0; // bit 0 is reserved
 	int Z = (op & 0x00000006) >> 1;
 	int a = (op & 0x00000018) >> 3;
-//  int D = (op & 0x00000020) >> 5; // we don't use the data cache currently
+	//  int D = (op & 0x00000020) >> 5; // we don't use the data cache currently
 
 	int size = check_limm(breg, creg);
 
 	// writeback / increment
 	if (a == 1)
 	{
-		if (breg==REG_LIMM)
+		if (breg == REG_LIMM)
 			fatalerror("illegal ST %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
 
 		m_regs[breg] = m_regs[breg] + s;
@@ -85,7 +85,7 @@ uint32_t arcompact_device::handleop32_ST_r_o(uint32_t op)
 	{
 		if (Z == 0)
 			address = address + (s << 2);
-		else if (Z==2)
+		else if (Z == 2)
 			address = address + (s << 1);
 		else // Z == 1 and Z == 3 are invalid here
 			fatalerror("illegal ST %08x (data size %d mode %d)", op, Z, a);
@@ -112,7 +112,7 @@ uint32_t arcompact_device::handleop32_ST_r_o(uint32_t op)
 	// writeback / increment
 	if (a == 2)
 	{
-		if (breg==REG_LIMM)
+		if (breg == REG_LIMM)
 			fatalerror("illegal ST %08x (data size %d mode %d)", op, Z, a); // using the LIMM as the base register and an increment mode is illegal
 
 		m_regs[breg] = m_regs[breg] + s;

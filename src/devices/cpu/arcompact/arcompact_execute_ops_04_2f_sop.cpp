@@ -4,32 +4,6 @@
 #include "emu.h"
 #include "arcompact.h"
 
-uint32_t arcompact_device::arcompact_handle04_2f_helper(uint32_t op, const char* optext)
-{
-	int size;
-
-	int p = common32_get_p(op);
-	//uint8_t breg = common32_get_breg(op);
-
-	if (p == 0)
-	{
-		uint8_t creg = common32_get_creg(op);
-		size = check_limm(creg);
-	}
-	else if (p == 1)
-	{
-	}
-	else if (p == 2)
-	{
-	}
-	else if (p == 3)
-	{
-	}
-
-	fatalerror("unimplemented %s %08x (type 04_2f)", optext, op);
-	return m_pc + size;
-}
-
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                                 IIII I      SS SSSS               ss ssss
 // ASL<.f> b,c                     0010 0bbb 0010 1111   FBBB CCCC CC00 0000
@@ -48,8 +22,10 @@ uint32_t arcompact_device::handleop32_ASL_single_do_op(void* obj, uint32_t src, 
 	if (set_flags)
 	{
 		o->do_flags_nz(result);
-		if ((src & 0x80000000) != (result & 0x80000000)) { o->status32_set_v(); } else { o->status32_clear_v(); }
-		if (src & 0x80000000) { o->status32_set_c(); } else { o->status32_clear_c(); }
+		if ((src & 0x80000000) != (result & 0x80000000)) { o->status32_set_v(); }
+		else { o->status32_clear_v(); }
+		if (src & 0x80000000) { o->status32_set_c(); }
+		else { o->status32_clear_c(); }
 	}
 	return result;
 }
@@ -75,7 +51,8 @@ uint32_t arcompact_device::handleop32_ASR_single_do_op(void* obj, uint32_t src, 
 	if (set_flags)
 	{
 		o->do_flags_nz(result);
-		if (src & 0x00000001) { o->status32_set_c(); } else { o->status32_clear_c(); }
+		if (src & 0x00000001) { o->status32_set_c(); }
+		else { o->status32_clear_c(); }
 	}
 	return result;
 }
@@ -98,7 +75,8 @@ uint32_t arcompact_device::handleop32_LSR_single_do_op(void* obj, uint32_t src, 
 	if (set_flags)
 	{
 		o->do_flags_nz(result);
-		if (src & 0x00000001) { o->status32_set_c(); } else { o->status32_clear_c(); }
+		if (src & 0x00000001) { o->status32_set_c(); }
+		else { o->status32_clear_c(); }
 	}
 	return result;
 }
@@ -124,7 +102,8 @@ uint32_t arcompact_device::handleop32_ROR_do_op(void* obj, uint32_t src, uint8_t
 	if (set_flags)
 	{
 		o->do_flags_nz(result);
-		if (src & 0x00000001) { o->status32_set_c(); } else { o->status32_clear_c(); }
+		if (src & 0x00000001) { o->status32_set_c(); }
+		else { o->status32_clear_c(); }
 	}
 
 	return result;
@@ -268,10 +247,14 @@ uint32_t arcompact_device::handleop32_ABS_do_op(void* obj, uint32_t src, uint8_t
 
 	if (set_flags)
 	{
-		if (result == 0x00000000) { o->status32_set_z(); } else { o->status32_clear_z(); }
-		if (src == 0x80000000) { o->status32_set_n(); } else { o->status32_clear_n(); }
-		if (src & 0x80000000) { o->status32_set_c(); } else { o->status32_clear_c(); }
-		if (src == 0x80000000) { o->status32_set_v(); } else { o->status32_clear_v(); }
+		if (result == 0x00000000) { o->status32_set_z(); }
+		else { o->status32_clear_z(); }
+		if (src == 0x80000000) { o->status32_set_n(); }
+		else { o->status32_clear_n(); }
+		if (src & 0x80000000) { o->status32_set_c(); }
+		else { o->status32_clear_c(); }
+		if (src == 0x80000000) { o->status32_set_v(); }
+		else { o->status32_clear_v(); }
 	}
 
 	return result;
@@ -338,5 +321,32 @@ uint32_t arcompact_device::handleop32_RLC_do_op(void* obj, uint32_t src, uint8_t
 
 uint32_t arcompact_device::handleop32_EX(uint32_t op)
 {
-	return arcompact_handle04_2f_helper(op, "EX");
+	int size = 4;
+
+	int p = common32_get_p(op);
+	uint8_t breg = common32_get_breg(op);
+	uint32_t b = m_regs[breg];
+
+	if (p == 0)
+	{
+		uint8_t creg = common32_get_creg(op);
+		size = check_limm(creg);
+		uint32_t temp = READ32(m_regs[creg]);
+		WRITE32(m_regs[creg], b);
+		m_regs[breg] = temp;
+	}
+	else if (p == 1)
+	{
+		uint8_t u = common32_get_u6(op);
+		uint32_t temp = READ32(u);
+		WRITE32(u, b);
+		m_regs[breg] = temp;
+	}
+	else
+	{
+		fatalerror("EX used with p == 2 or p == 3");
+	}
+
+	return m_pc + size;
 }
+

@@ -13,10 +13,10 @@
 
 // 0010 0bbb aa11 0ZZX DBBB CCCC CCAA AAAA
 // note, bits  11 0ZZX are part of the sub-opcode # already - this is a special encoding
-int arcompact_disassembler::handle04_3x_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, int dsize, int extend)
+int arcompact_disassembler::handle04_3x_helper_dasm(std::ostream& stream, offs_t pc, uint32_t op, const data_buffer& opcodes, int dsize, int extend)
 {
 	int size = 4;
-	uint32_t limm=0;
+	uint32_t limm = 0;
 	int got_limm = 0;
 
 	util::stream_format(stream, "LD");

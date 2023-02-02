@@ -556,7 +556,7 @@ uint32_t arcompact_device::handleop32_BXOR_do_op(void* obj, uint32_t src1, uint3
 uint32_t arcompact_device::handleop32_BMSK_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags)
 {
 	arcompact_device* o = (arcompact_device*)obj;
-	uint32_t result = src1 & ((1<<(src2+1))-1);
+	uint32_t result = src1 & ((1 << (src2 + 1)) - 1);
 	if (set_flags)
 		o->do_flags_nz(result);
 	return result;
@@ -856,17 +856,23 @@ void arcompact_device::handleop32_FLAG_do_op(uint32_t source)
 	if (!(source & 0x0001)) // H means ignore all others (and halts CPU?)
 	{
 		// privileged  mode only
-		if (source & 0x0002) { status32_set_e1(); } else { status32_clear_e1(); }
-		if (source & 0x0004) { status32_set_e2(); } else { status32_clear_e2(); }
+		if (source & 0x0002) { status32_set_e1(); }
+		else { status32_clear_e1(); }
+		if (source & 0x0004) { status32_set_e2(); }
+		else { status32_clear_e2(); }
 		//(source & 0x0008)
 		//(source & 0x0010)
 		//(source & 0x0020)
 		//(source & 0x0040)
 		//(source & 0x0080)
-		if (source & 0x0100) { status32_set_v(); } else { status32_clear_v(); }
-		if (source & 0x0200) { status32_set_c(); } else { status32_clear_c(); }
-		if (source & 0x0400) { status32_set_n(); } else { status32_clear_n(); }
-		if (source & 0x0800) { status32_set_z(); } else { status32_clear_z(); }
+		if (source & 0x0100) { status32_set_v(); }
+		else { status32_clear_v(); }
+		if (source & 0x0200) { status32_set_c(); }
+		else { status32_clear_c(); }
+		if (source & 0x0400) { status32_set_n(); }
+		else { status32_clear_n(); }
+		if (source & 0x0800) { status32_set_z(); }
+		else { status32_clear_z(); }
 	}
 	else
 	{
