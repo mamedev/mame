@@ -2,7 +2,7 @@
 // copyright-holders:hap
 /*******************************************************************************
 
-Nintendo Computer Othello
+Nintendo Computer Othello (コンピューター オセロ)
 
 This is Nintendo's 1st microprocessor-based arcade game.
 It's a cocktail cabinet, P1 side has 10 buttons, and P2 side has 4.
@@ -14,7 +14,8 @@ Hardware notes:
 - PCB label: COG CPU
 - M58710S (8080A), 3.579545MHz XTAL
 - 3*1KB M58732S 2708 ROM, 4th socket is empty
-- 256 bytes RAM (2*M58722P 2111A), 0.5KB DRAM (M58755S)
+- 256 bytes RAM (2*M58722P 2111A)
+- 0.5KB DRAM (M58755S) for framebuffer
 - M58741P Color TV Interface, 64*64 1bpp video
 - 7seg time counter (not software controlled)
 - beeper
@@ -27,7 +28,7 @@ TODO:
   due to the M58741P HOLD pin halting the 8080, which is not emulated.
 - Is there a button select somewhere? I really can't find any. Or is current
   input emulation correct where for example P1 can move P2 cursor? (the only
-  unique P2 button is the Set button)
+  unique P2 button is the Set button).
 - It's not known if the screen is color or B&W + overlay, but since the video
   chip is meant for a color tv, let's assume the green tint is from the screen
   itself. Photos of the home version also show a green tint.
@@ -73,7 +74,7 @@ private:
 	required_shared_ptr<u8> m_vram;
 	required_device<beep_device> m_beeper;
 	required_ioport_array<4> m_inputs;
-	output_finder<4> m_digits;
+	output_finder<3> m_digits;
 
 	void main_map(address_map &map);
 
@@ -87,6 +88,7 @@ private:
 	TIMER_CALLBACK_MEMBER(beeper_off) { m_beeper->set_state(0); }
 
 	u16 m_counter = 0;
+	u8 m_sound_data = 0;
 	emu_timer *m_counter_timer;
 	emu_timer *m_beeper_off;
 };
@@ -99,6 +101,7 @@ void cothello_state::machine_start()
 	m_beeper_off = timer_alloc(FUNC(cothello_state::beeper_off), this);
 
 	save_item(NAME(m_counter));
+	save_item(NAME(m_sound_data));
 }
 
 
@@ -145,13 +148,10 @@ TIMER_CALLBACK_MEMBER(cothello_state::counter_tick)
 	u8 max = std::clamp(int(m_inputs[3]->read()), 1, 9);
 	u8 high = (m_counter / 100) % 10;
 
-	if (high == 0 || high == max)
-		m_maincpu->set_input_line(0, HOLD_LINE);
-
 	if (high != max)
 		m_counter_timer->adjust(attotime::from_seconds(1));
 
-	// output counter to 7segs
+	// output counter to 7segs (don't know which decoder chip, but 6/9 has roof/tail)
 	static const u8 led_map[] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f };
 
 	m_digits[0] = led_map[m_counter % 10];
@@ -182,17 +182,19 @@ void cothello_state::sound_w(u8 data)
 	if (data & 0x80)
 	{
 		// d3: beeper start
-		if (data & 8)
+		if (~m_sound_data & data & 8)
 		{
 			m_beeper->set_state(1);
-			m_beeper_off->adjust(attotime::from_msec(80));
+			m_beeper_off->adjust(attotime::from_msec(80)); // approximation
 		}
 
 		// d0-d2: beeper frequency
 		u8 freq = (data & 0x7) + 1;
-		const u32 base = 3500;
+		const u32 base = 3500; // approximation
 		m_beeper->set_clock(base / freq);
 	}
+
+	m_sound_data = data;
 }
 
 
@@ -209,7 +211,7 @@ void cothello_state::main_map(address_map &map)
 	map(0x8000, 0x8000).w(FUNC(cothello_state::sound_w));
 	map(0xa000, 0xa000).r(FUNC(cothello_state::coin_r));
 	map(0xc000, 0xffff).writeonly().share("vram");
-	map(0xc040, 0xc07f).mirror(0x3f00).nopw();
+	map(0xc040, 0xc0ff).mirror(0x3f00).nopw();
 }
 
 
@@ -225,9 +227,9 @@ static INPUT_PORTS_START( cothello )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START3 ) PORT_NAME("2 Players Start Sente") // 2
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START4 ) PORT_NAME("2 Players Start Gote")  // 1
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Reset")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Abort")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Reset")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Abort")
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("IN.1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY
@@ -269,7 +271,8 @@ INPUT_PORTS_END
 void cothello_state::cothello(machine_config &config)
 {
 	// basic machine hardware
-	I8080A(config, m_maincpu, 750000);
+	I8080A(config, m_maincpu, 750000); // wrong, see TODO
+	m_maincpu->set_vblank_int("screen", FUNC(cothello_state::irq0_line_hold));
 	m_maincpu->set_addrmap(AS_PROGRAM, &cothello_state::main_map);
 
 	// video hardware
@@ -307,4 +310,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME      PARENT  MACHINE    INPUT     CLASS           INIT        SCREEN  COMPANY, FULLNAME, FLAGS
-GAMEL(1978, cothello, 0,      cothello,  cothello, cothello_state, empty_init, ROT0,   "Nintendo", "Computer Othello", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_cothello )
+GAMEL(1978, cothello, 0,      cothello,  cothello, cothello_state, empty_init, ROT0,   "Nintendo", "Computer Othello", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING, layout_cothello )
