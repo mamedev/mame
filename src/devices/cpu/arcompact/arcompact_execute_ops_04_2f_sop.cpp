@@ -15,7 +15,7 @@
 // ASL<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 0000 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ASL_single_do_op(void* obj, uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_ASL_single_do_op(void* obj, uint32_t src, bool set_flags)
 {
 	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src + src;
@@ -41,7 +41,7 @@ uint32_t arcompact_device::handleop32_ASL_single_do_op(void* obj, uint32_t src, 
 // ASR<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 0001 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ASR_single_do_op(void* obj, uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_ASR_single_do_op(void* obj, uint32_t src, bool set_flags)
 {
 	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src >> 1;
@@ -68,7 +68,7 @@ uint32_t arcompact_device::handleop32_ASR_single_do_op(void* obj, uint32_t src, 
 // LSR<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 0010 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_LSR_single_do_op(void* obj, uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_LSR_single_do_op(void* obj, uint32_t src, bool set_flags)
 {
 	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src >> 1;
@@ -92,7 +92,7 @@ uint32_t arcompact_device::handleop32_LSR_single_do_op(void* obj, uint32_t src, 
 // ROR<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 0011 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ROR_do_op(void* obj, uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_ROR_do_op(void* obj, uint32_t src, bool set_flags)
 {
 	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src >> 1;
@@ -120,7 +120,7 @@ uint32_t arcompact_device::handleop32_ROR_do_op(void* obj, uint32_t src, uint8_t
 // RRC<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 0100 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_RRC_do_op(void* obj, uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_RRC_do_op(void* obj, uint32_t src, bool set_flags)
 {
 	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src >> 1;
@@ -149,7 +149,7 @@ uint32_t arcompact_device::handleop32_RRC_do_op(void* obj, uint32_t src, uint8_t
 // SEXB<.f> 0,limm                 0010 0110 0010 1111   F111 1111 1000 0101 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_SEXB_do_op(void* obj, uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_SEXB_do_op(void* obj, uint32_t src, bool set_flags)
 {
 	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src & 0x000000ff;
@@ -171,7 +171,7 @@ uint32_t arcompact_device::handleop32_SEXB_do_op(void* obj, uint32_t src, uint8_
 // SEXW<.f> 0,limm                 0010 0110 0010 1111   F111 1111 1000 0110 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_SEXW_do_op(void* obj, uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_SEXW_do_op(void* obj, uint32_t src, bool set_flags)
 {
 	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src & 0x0000ffff;
@@ -193,7 +193,7 @@ uint32_t arcompact_device::handleop32_SEXW_do_op(void* obj, uint32_t src, uint8_
 // EXTB<.f> 0,limm                 0010 0110 0010 1111   F111 1111 1000 0111 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_EXTB_do_op(void* obj, uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_EXTB_do_op(void* obj, uint32_t src, bool set_flags)
 {
 	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src & 0xff;
@@ -216,7 +216,7 @@ uint32_t arcompact_device::handleop32_EXTB_do_op(void* obj, uint32_t src, uint8_
 // EXTW<.f> 0,limm                 0010 0110 0010 1111   F111 1111 1000 1000 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_EXTW_do_op(void* obj, uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_EXTW_do_op(void* obj, uint32_t src, bool set_flags)
 {
 	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src & 0xffff;
@@ -236,7 +236,7 @@ uint32_t arcompact_device::handleop32_EXTW_do_op(void* obj, uint32_t src, uint8_
 // ABS<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 1001 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ABS_do_op(void* obj, uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_ABS_do_op(void* obj, uint32_t src, bool set_flags)
 {
 	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result;
@@ -272,7 +272,7 @@ uint32_t arcompact_device::handleop32_ABS_do_op(void* obj, uint32_t src, uint8_t
 //
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_NOT_do_op(void* obj, uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_NOT_do_op(void* obj, uint32_t src, bool set_flags)
 {
 	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src ^ 0xffffffff;
@@ -293,7 +293,7 @@ uint32_t arcompact_device::handleop32_NOT_do_op(void* obj, uint32_t src, uint8_t
 // RLC<.f> 0,limm                  0010 0110 0010 1111   F111 1111 1000 1011 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_RLC_do_op(void* obj, uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_RLC_do_op(void* obj, uint32_t src, bool set_flags)
 {
 	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = src << 1;

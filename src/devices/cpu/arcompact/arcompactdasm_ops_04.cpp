@@ -20,9 +20,9 @@ int arcompact_disassembler::handle04_MOV_f_a_b_c_helper_dasm(std::ostream &strea
 {
 	int size = 4;
 	uint8_t breg = dasm_common32_get_breg(op);
-	uint8_t F = dasm_common32_get_F(op);
+	bool F = dasm_common32_get_F(op);
 	uint8_t creg = dasm_common32_get_creg(op);
-	util::stream_format(stream, "MOV%s %s,", flagbit[F], regnames[breg]);
+	util::stream_format(stream, "MOV%s %s,", flagbit[F ? 1:0], regnames[breg]);
 	if (creg == DASM_REG_LIMM)
 	{
 		uint32_t limm = dasm_get_limm_32bit_opcode(pc, opcodes);
@@ -40,7 +40,7 @@ int arcompact_disassembler::handle04_MOV_f_a_b_u6_helper_dasm(std::ostream &stre
 {
 	int size = 4;
 	uint8_t breg = dasm_common32_get_breg(op);
-	uint8_t F = dasm_common32_get_F(op);
+	bool F = dasm_common32_get_F(op);
 	uint32_t u = dasm_common32_get_u6(op);
 	// if there's no destination and no flags being set, this is a NOP
 	if ((F == 0) & (breg == DASM_REG_LIMM))
@@ -49,7 +49,7 @@ int arcompact_disassembler::handle04_MOV_f_a_b_u6_helper_dasm(std::ostream &stre
 	}
 	else
 	{
-		util::stream_format(stream, "MOV%s %s, 0x%08x", flagbit[F], regnames[breg], u);
+		util::stream_format(stream, "MOV%s %s, 0x%08x", flagbit[F ? 1:0], regnames[breg], u);
 	}
 	return size;
 }
@@ -58,9 +58,9 @@ int arcompact_disassembler::handle04_MOV_f_a_b_u6_helper_dasm(std::ostream &stre
 int arcompact_disassembler::handle04_MOV_f_b_b_s12_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	uint8_t breg = dasm_common32_get_breg(op);
-	uint8_t F = dasm_common32_get_F(op);
+	bool F = dasm_common32_get_F(op);
 	uint32_t S = dasm_common32_get_s12(op);
-	util::stream_format(stream, "MOV%s %s, 0x%08x", flagbit[F], regnames[breg], S);
+	util::stream_format(stream, "MOV%s %s, 0x%08x", flagbit[F ? 1:0], regnames[breg], S);
 	return 4;
 }
 
@@ -68,10 +68,10 @@ int arcompact_disassembler::handle04_MOV_cc_f_b_b_c_helper_dasm(std::ostream &st
 {
 	int size = 4;
 	uint8_t breg = dasm_common32_get_breg(op);
-	uint8_t F = dasm_common32_get_F(op);
+	bool F = dasm_common32_get_F(op);
 	uint8_t condition = dasm_common32_get_condition(op);
 	uint8_t creg = dasm_common32_get_creg(op);
-	util::stream_format(stream, "MOV%s%s %s, ", conditions[condition], flagbit[F], regnames[breg]);
+	util::stream_format(stream, "MOV%s%s %s, ", conditions[condition], flagbit[F ? 1:0], regnames[breg]);
 	if (creg == DASM_REG_LIMM)
 	{
 		uint32_t limm = dasm_get_limm_32bit_opcode(pc, opcodes);
@@ -88,10 +88,10 @@ int arcompact_disassembler::handle04_MOV_cc_f_b_b_c_helper_dasm(std::ostream &st
 int arcompact_disassembler::handle04_MOV_cc_f_b_b_u6_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
 	uint8_t breg = dasm_common32_get_breg(op);
-	uint8_t F = dasm_common32_get_F(op);
+	bool F = dasm_common32_get_F(op);
 	uint8_t condition = dasm_common32_get_condition(op);
 	uint32_t u = dasm_common32_get_u6(op);
-	util::stream_format(stream, "MOV%s%s %s, 0x%08x", conditions[condition], flagbit[F], regnames[breg], u);
+	util::stream_format(stream, "MOV%s%s %s, 0x%08x", conditions[condition], flagbit[F ? 1:0], regnames[breg], u);
 	return 4;
 }
 
@@ -352,7 +352,7 @@ int arcompact_disassembler::handle_dasm32_LR(std::ostream &stream, offs_t pc, ui
 
 	uint8_t p = dasm_common32_get_p(op);
 	uint8_t breg = dasm_common32_get_breg(op);
-	uint8_t F = dasm_common32_get_F(op);
+	bool F = dasm_common32_get_F(op);
 
 	util::stream_format(stream, "LR");
 	if (F) util::stream_format(stream, ".<F set, illegal>");
@@ -416,7 +416,7 @@ int arcompact_disassembler::handle_dasm32_SR(std::ostream &stream, offs_t pc, ui
 
 	uint8_t p = dasm_common32_get_p(op);
 	uint8_t breg = dasm_common32_get_breg(op);
-	uint8_t F = dasm_common32_get_F(op);
+	bool F = dasm_common32_get_F(op);
 
 	util::stream_format(stream, "SR");
 	if (F) util::stream_format(stream, ".<F set, illegal>");

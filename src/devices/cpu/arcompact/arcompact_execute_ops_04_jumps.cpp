@@ -60,7 +60,7 @@ uint32_t arcompact_device::handleop32_Jcc_f_a_b_c_helper(uint32_t op, bool delay
 {
 	int size = 4;
 	uint8_t creg = common32_get_creg(op);
-	uint8_t F = common32_get_F(op);
+	bool F = common32_get_F(op);
 	if (creg == REG_LIMM)
 	{
 		get_limm_32bit_opcode();
@@ -110,7 +110,7 @@ uint32_t arcompact_device::handleop32_Jcc_cc_f_b_b_c_helper(uint32_t op, bool de
 	int size = 4;
 	uint8_t creg = common32_get_creg(op);
 	uint8_t condition = common32_get_condition(op);
-	uint8_t F = common32_get_F(op);
+	bool F = common32_get_F(op);
 	uint32_t c;
 
 	if (creg == REG_LIMM)

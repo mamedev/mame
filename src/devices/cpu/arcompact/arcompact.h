@@ -9,7 +9,6 @@
 
 #pragma once
 
-
 class arcompact_device : public cpu_device
 {
 public:
@@ -43,10 +42,6 @@ protected:
 private:
 	void arcompact_auxreg_map(address_map &map);
 
-	void do_flags_overflow(uint32_t result, uint32_t b, uint32_t c);
-	void do_flags_add(uint32_t result, uint32_t b, uint32_t c);
-	void do_flags_sub(uint32_t result, uint32_t b, uint32_t c);
-	void do_flags_nz(uint32_t result);
 
 	uint32_t arcompact_auxreg002_LPSTART_r();
 	void arcompact_auxreg002_LPSTART_w(uint32_t data);
@@ -174,9 +169,9 @@ private:
 		return b_temp | (B_temp << 3);
 	}
 
-	uint8_t common32_get_F(uint32_t op)
+	bool common32_get_F(uint32_t op)
 	{
-		return (op & 0x00008000) >> 15;
+		return (op & 0x00008000) ? true : false;
 	}
 
 	uint8_t common32_get_creg(uint32_t op)
@@ -362,31 +357,17 @@ private:
 	uint32_t handleop32_LD_r_o(uint32_t op);
 	uint32_t handleop32_ST_r_o(uint32_t op);
 
-	typedef uint32_t (*ophandler32)(void*,uint32_t,uint32_t,uint8_t);
-	typedef void (*ophandler32_ff)(void*,uint32_t,uint32_t);
-	typedef void (*ophandler32_mul)(void*,uint32_t,uint32_t);
-	typedef uint32_t (*ophandler32_sop)(void*,uint32_t, uint8_t);
-
-	uint32_t handleop32_general(uint32_t op, ophandler32 ophandler);
-	uint32_t handleop32_general_MULx64(uint32_t op, ophandler32_mul ophandler);
-	uint32_t handleop32_general_nowriteback_forced_flag(uint32_t op, ophandler32_ff ophandler);
-	uint32_t handleop32_general_SOP_group(uint32_t op, ophandler32_sop ophandler);
-
-	// arcompact_execute.cpp
-	// used by both arcompact_execute_ops_04_3x.cpp and arcompact_execute_ops_02to03.cpp
-	void arcompact_handle_ld_helper(uint32_t op, uint8_t areg, uint8_t breg, uint32_t s, uint8_t X, uint8_t Z, uint8_t a);
-
 	// arcompact_execute_ops_04.cpp
-	static uint32_t handleop32_ADD_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_ADC_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_SUB_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_AND_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_OR_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
+	static uint32_t handleop32_ADD_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_ADC_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_SUB_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_AND_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_OR_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
 
-	static uint32_t handleop32_BIC_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_XOR_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
+	static uint32_t handleop32_BIC_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_XOR_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
 
-	void handleop32_MOV_do_op(uint32_t breg, uint32_t src2, uint8_t set_flags);
+	void handleop32_MOV_do_op(uint32_t breg, uint32_t src2, bool set_flags);
 	uint32_t handleop32_MOV_f_a_b_c(uint32_t op);
 	uint32_t handleop32_MOV_f_a_b_u6(uint32_t op);
 	uint32_t handleop32_MOV_f_b_b_s12(uint32_t op);
@@ -394,16 +375,16 @@ private:
 	uint32_t handleop32_MOV_cc_f_b_b_u6(uint32_t op);
 	uint32_t handleop32_MOV(uint32_t op);
 
-	static uint32_t handleop32_RSUB_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_BSET_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_BCLR_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_BMSK_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_ADD1_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_ADD2_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_ADD3_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_SUB1_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_SUB2_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_SUB3_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
+	static uint32_t handleop32_RSUB_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_BSET_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_BCLR_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_BMSK_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_ADD1_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_ADD2_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_ADD3_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_SUB1_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_SUB2_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_SUB3_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
 
 	uint32_t handleop32_Jcc_f_a_b_c_helper(uint32_t op, bool delay, bool link);
 	uint32_t handleop32_Jcc_cc_f_b_b_c_helper(uint32_t op, bool delay, bool link);
@@ -438,9 +419,9 @@ private:
 	uint32_t handleop32_SR_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_SR_cc_f_b_b_u6(uint32_t op);
 
-	static uint32_t handleop32_SBC_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_MAX_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_MIN_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
+	static uint32_t handleop32_SBC_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_MAX_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_MIN_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
 
 
 	static void handleop32_TST_do_op(void* obj, uint32_t src1, uint32_t src2);
@@ -449,11 +430,11 @@ private:
 	static void handleop32_BTST_do_op(void* obj, uint32_t src1, uint32_t src2);
 
 
-	static uint32_t handleop32_BXOR_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_MPY_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_MPYH_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_MPYHU_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_MPYU_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
+	static uint32_t handleop32_BXOR_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_MPY_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_MPYH_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_MPYHU_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_MPYU_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
 
 	uint32_t handleop32_JLcc_f_a_b_c(uint32_t op);
 	uint32_t handleop32_JLcc_f_a_b_u6(uint32_t op);
@@ -480,19 +461,19 @@ private:
 	uint32_t handleop32_FLAG(uint32_t op);
 
 	// arcompact_execute_ops_04_2f_sop.cpp
-	static uint32_t handleop32_ASR_single_do_op(void* obj, uint32_t src, uint8_t set_flags);
-	static uint32_t handleop32_ASL_single_do_op(void* obj, uint32_t src, uint8_t set_flags);
-	static uint32_t handleop32_LSR_single_do_op(void* obj, uint32_t src, uint8_t set_flags);
-	static uint32_t handleop32_ROR_do_op(void* obj, uint32_t src, uint8_t set_flags);
-	static uint32_t handleop32_EXTB_do_op(void* obj, uint32_t src, uint8_t set_flags);
-	static uint32_t handleop32_EXTW_do_op(void* obj, uint32_t src, uint8_t set_flags);
-	static uint32_t handleop32_RLC_do_op(void* obj, uint32_t src, uint8_t set_flags);
+	static uint32_t handleop32_ASR_single_do_op(void* obj, uint32_t src, bool set_flags);
+	static uint32_t handleop32_ASL_single_do_op(void* obj, uint32_t src, bool set_flags);
+	static uint32_t handleop32_LSR_single_do_op(void* obj, uint32_t src, bool set_flags);
+	static uint32_t handleop32_ROR_do_op(void* obj, uint32_t src, bool set_flags);
+	static uint32_t handleop32_EXTB_do_op(void* obj, uint32_t src, bool set_flags);
+	static uint32_t handleop32_EXTW_do_op(void* obj, uint32_t src, bool set_flags);
+	static uint32_t handleop32_RLC_do_op(void* obj, uint32_t src, bool set_flags);
 
-	static uint32_t handleop32_RRC_do_op(void* obj, uint32_t src, uint8_t set_flags);
-	static uint32_t handleop32_SEXB_do_op(void* obj, uint32_t src, uint8_t set_flags);
-	static uint32_t handleop32_SEXW_do_op(void* obj, uint32_t src, uint8_t set_flags);
-	static uint32_t handleop32_ABS_do_op(void* obj, uint32_t src, uint8_t set_flags);
-	static uint32_t handleop32_NOT_do_op(void* obj, uint32_t src, uint8_t set_flags);
+	static uint32_t handleop32_RRC_do_op(void* obj, uint32_t src, bool set_flags);
+	static uint32_t handleop32_SEXB_do_op(void* obj, uint32_t src, bool set_flags);
+	static uint32_t handleop32_SEXW_do_op(void* obj, uint32_t src, bool set_flags);
+	static uint32_t handleop32_ABS_do_op(void* obj, uint32_t src, bool set_flags);
+	static uint32_t handleop32_NOT_do_op(void* obj, uint32_t src, bool set_flags);
 	uint32_t handleop32_EX(uint32_t op);
 
 	// arcompact_execute_ops_04_2f_3f_zop.cpp
@@ -515,17 +496,17 @@ private:
 	uint32_t handleop32_LD_7(uint32_t op);
 
 	// arcompact_execute_ops_05.cpp
-	static uint32_t handleop32_ASL_multiple_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_LSR_multiple_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
-	static uint32_t handleop32_ASR_multiple_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
+	static uint32_t handleop32_ASL_multiple_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_LSR_multiple_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_ASR_multiple_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
 
 	static void handleop32_MUL64_do_op(void* obj, uint32_t src1, uint32_t src2);
 	static void handleop32_MULU64_do_op(void* obj, uint32_t src1, uint32_t src2);
 
 	// arcompact_execute_ops_05_2f_sop.cpp
-	static uint32_t handleop32_NORM_do_op(void* obj, uint32_t src, uint8_t set_flags);
+	static uint32_t handleop32_NORM_do_op(void* obj, uint32_t src, bool set_flags);
 
-	static uint32_t handleop32_ROR_multiple_do_op(void* obj, uint32_t src1, uint32_t src2, uint8_t set_flags);
+	static uint32_t handleop32_ROR_multiple_do_op(void* obj, uint32_t src1, uint32_t src2, bool set_flags);
 	uint32_t handleop32_ADDS(uint32_t op);
 	uint32_t handleop32_SUBS(uint32_t op);
 	uint32_t handleop32_DIVAW(uint32_t op);
@@ -533,14 +514,14 @@ private:
 	uint32_t handleop32_ASRS(uint32_t op);
 	uint32_t handleop32_ADDSDW(uint32_t op);
 	uint32_t handleop32_SUBSDW(uint32_t op);
-	static uint32_t handleop32_SWAP_do_op(void* obj, uint32_t src, uint8_t set_flags);
+	static uint32_t handleop32_SWAP_do_op(void* obj, uint32_t src, bool set_flags);
 	uint32_t handleop32_SAT16(uint32_t op);
 	uint32_t handleop32_RND16(uint32_t op);
 	uint32_t handleop32_ABSSW(uint32_t op);
 	uint32_t handleop32_ABSS(uint32_t op);
 	uint32_t handleop32_NEGSW(uint32_t op);
 	uint32_t handleop32_NEGS(uint32_t op);
-	static uint32_t handleop32_NORMW_do_op(void* obj, uint32_t src, uint8_t set_flags);
+	static uint32_t handleop32_NORMW_do_op(void* obj, uint32_t src, bool set_flags);
 
 	uint32_t handleop32_UNKNOWN_05_0c(uint32_t op);
 	uint32_t handleop32_UNKNOWN_05_10(uint32_t op);
@@ -679,7 +660,6 @@ private:
 	************************************************************************************************************************************/
 
 	uint32_t arcompact_handle05_helper(uint32_t op, const char* optext, int ignore_dst, int b_reserved);
-	uint32_t arcompact_handle04_2f_helper(uint32_t op, const char* optext);
 	uint32_t arcompact_handle04_3x_helper(uint32_t op, int dsize, int extend);
 	uint32_t arcompact_handle05_2f_0x_helper(uint32_t op, const char* optext);
 
@@ -748,7 +728,21 @@ private:
 	inline uint64_t READAUX(uint64_t address) { return m_io->read_dword(address); }
 	inline void WRITEAUX(uint64_t address, uint32_t data) { m_io->write_dword(address, data); }
 
-	int check_condition(uint8_t condition);
+	// arcompact_helper.ipp
+	inline bool check_condition(uint8_t condition);
+	inline void do_flags_overflow(uint32_t result, uint32_t b, uint32_t c);
+	inline void do_flags_add(uint32_t result, uint32_t b, uint32_t c);
+	inline void do_flags_sub(uint32_t result, uint32_t b, uint32_t c);
+	inline void do_flags_nz(uint32_t result);
+	typedef uint32_t (*ophandler32)(void*,uint32_t,uint32_t,bool set_flags);
+	typedef void (*ophandler32_ff)(void*,uint32_t,uint32_t);
+	typedef void (*ophandler32_mul)(void*,uint32_t,uint32_t);
+	typedef uint32_t (*ophandler32_sop)(void*,uint32_t,bool set_flags);
+	inline uint32_t handleop32_general(uint32_t op, ophandler32 ophandler);
+	inline uint32_t handleop32_general_MULx64(uint32_t op, ophandler32_mul ophandler);
+	inline uint32_t handleop32_general_nowriteback_forced_flag(uint32_t op, ophandler32_ff ophandler);
+	inline uint32_t handleop32_general_SOP_group(uint32_t op, ophandler32_sop ophandler);
+	inline void arcompact_handle_ld_helper(uint32_t op, uint8_t areg, uint8_t breg, uint32_t s, uint8_t X, uint8_t Z, uint8_t a);
 
 	// config
 	uint32_t m_default_vector_base;
@@ -783,5 +777,7 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(ARCA5, arcompact_device)
+
+#include "arcompact_helper.ipp"
 
 #endif // MAME_CPU_ARCOMPACT_ARCOMPACT_H

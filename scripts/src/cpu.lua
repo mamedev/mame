@@ -147,6 +147,7 @@ if CPUS["ARCOMPACT"] then
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_19_16bit.cpp",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_1ato1c_16bit.cpp",
 		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_execute_ops_1dto1f_16bit.cpp",
+		MAME_DIR .. "src/devices/cpu/arcompact/arcompact_helper.ipp",
 	}
 end
 

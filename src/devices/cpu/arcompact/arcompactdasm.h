@@ -99,9 +99,10 @@ private:
 		return u;
 	}
 
-	uint8_t dasm_common32_get_F(uint32_t &op)
+	bool dasm_common32_get_F(uint32_t &op)
 	{
-		int F = (op & 0x00008000) >> 15; op &= ~0x00008000;
+		bool F = (op & 0x00008000) ? true : false;
+		op &= ~0x00008000;
 		return F;
 	}
 

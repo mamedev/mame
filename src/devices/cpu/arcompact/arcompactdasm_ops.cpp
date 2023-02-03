@@ -26,11 +26,11 @@ int arcompact_disassembler::handle04_f_a_b_c_helper_dasm(std::ostream &stream, o
 	int got_limm = 0;
 
 	uint8_t breg = dasm_common32_get_breg(op);
-	uint8_t F = dasm_common32_get_F(op);
+	bool F = dasm_common32_get_F(op);
 	uint8_t creg = dasm_common32_get_creg(op);
 	uint8_t areg = dasm_common32_get_areg(op);
 
-	util::stream_format(stream, "%s%s", optext, flagbit[F]);
+	util::stream_format(stream, "%s%s", optext, flagbit[F ? 1:0]);
 
 	if ((!b_reserved) && (breg == DASM_REG_LIMM))
 	{
@@ -95,11 +95,11 @@ int arcompact_disassembler::handle04_f_a_b_u6_helper_dasm(std::ostream &stream, 
 //  int got_limm = 0;
 
 	uint8_t breg = dasm_common32_get_breg(op);
-	uint8_t F = dasm_common32_get_F(op);
+	bool F = dasm_common32_get_F(op);
 	uint32_t u = dasm_common32_get_u6(op);
 	uint8_t areg = dasm_common32_get_areg(op);
 
-	util::stream_format(stream, "%s%s", optext, flagbit[F]);
+	util::stream_format(stream, "%s%s", optext, flagbit[F ? 1:0]);
 
 	if ((!b_reserved) && (breg == DASM_REG_LIMM))
 	{
@@ -150,10 +150,10 @@ int arcompact_disassembler::handle04_f_b_b_s12_helper_dasm(std::ostream &stream,
 	//int got_limm = 0;
 
 	uint8_t breg = dasm_common32_get_breg(op);
-	uint8_t F = dasm_common32_get_F(op);
+	bool F = dasm_common32_get_F(op);
 	uint32_t S = dasm_common32_get_s12(op);
 
-	util::stream_format(stream, "%s%s", optext, flagbit[F]);
+	util::stream_format(stream, "%s%s", optext, flagbit[F ? 1:0]);
 
 	if (!b_reserved)
 	{
@@ -182,11 +182,11 @@ int arcompact_disassembler::handle04_cc_f_b_b_c_helper_dasm(std::ostream &stream
 	int got_limm = 0;
 
 	uint8_t breg = dasm_common32_get_breg(op);
-	uint8_t F = dasm_common32_get_F(op);
+	bool F = dasm_common32_get_F(op);
 	uint8_t condition = dasm_common32_get_condition(op);
 	uint8_t creg = dasm_common32_get_creg(op);
 
-	util::stream_format(stream, "%s%s%s", optext, conditions[condition], flagbit[F]);
+	util::stream_format(stream, "%s%s%s", optext, conditions[condition], flagbit[F ? 1:0]);
 
 	if (!b_reserved)
 	{
@@ -228,11 +228,11 @@ int arcompact_disassembler::handle04_cc_f_b_b_u6_helper_dasm(std::ostream &strea
 	//int got_limm = 0;
 
 	uint8_t breg = dasm_common32_get_breg(op);
-	uint8_t F = dasm_common32_get_F(op);
+	bool F = dasm_common32_get_F(op);
 	uint8_t condition = dasm_common32_get_condition(op);
 	uint32_t u = dasm_common32_get_u6(op);
 
-	util::stream_format(stream, "%s%s%s", optext, conditions[condition], flagbit[F]);
+	util::stream_format(stream, "%s%s%s", optext, conditions[condition], flagbit[F ? 1:0]);
 
 	if (!b_reserved)
 	{

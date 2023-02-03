@@ -48,7 +48,7 @@ uint32_t arcompact_device::arcompact_handle05_2f_0x_helper(uint32_t op, const ch
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-uint32_t arcompact_device::handleop32_SWAP_do_op(void* obj, uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_SWAP_do_op(void* obj, uint32_t src, bool set_flags)
 {
 	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result = (((src & 0xffff0000) >> 16) | ((src & 0x0000ffff) << 16));
@@ -69,7 +69,7 @@ uint32_t arcompact_device::handleop32_SWAP_do_op(void* obj, uint32_t src, uint8_
 // NORM<.f> 0,limm                 0010 1110 0010 1111   F111 1111 1000 0001 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_NORM_do_op(void* obj, uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_NORM_do_op(void* obj, uint32_t src, bool set_flags)
 {
 	arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result;
@@ -187,7 +187,7 @@ uint32_t arcompact_device::handleop32_NEGS(uint32_t op)
 // NORMW<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 1000 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_NORMW_do_op(void* obj, uint32_t src, uint8_t set_flags)
+uint32_t arcompact_device::handleop32_NORMW_do_op(void* obj, uint32_t src, bool set_flags)
 {
 	//arcompact_device* o = (arcompact_device*)obj;
 	uint32_t result;

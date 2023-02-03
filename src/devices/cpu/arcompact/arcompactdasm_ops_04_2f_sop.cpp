@@ -19,7 +19,7 @@ int arcompact_disassembler::handle04_2f_helper_dasm(std::ostream &stream, offs_t
 
 	uint8_t p = dasm_common32_get_p(op);
 	uint8_t breg = dasm_common32_get_breg(op);
-	uint8_t F = dasm_common32_get_F(op);
+	bool F = dasm_common32_get_F(op);
 
 	util::stream_format(stream, "%s%s", optext, flagbit[F]);
 
