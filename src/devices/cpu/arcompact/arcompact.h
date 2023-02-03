@@ -106,13 +106,13 @@ private:
 		ARCOMPACT_LP_END
 	};
 
-	void get_limm_32bit_opcode(void)
+	void get_limm_32bit_opcode()
 	{
 		m_regs[REG_LIMM] = (READ16((m_pc + 4)) << 16);
 		m_regs[REG_LIMM] |= READ16((m_pc + 6));
 	}
 
-	void get_limm_16bit_opcode(void)
+	void get_limm_16bit_opcode()
 	{
 		m_regs[REG_LIMM] = (READ16((m_pc + 2)) << 16);
 		m_regs[REG_LIMM] |= READ16((m_pc + 4));
@@ -136,37 +136,34 @@ private:
 
 	uint8_t common16_get_and_expand_areg(uint16_t op)
 	{
-		uint8_t reg = ((op & 0x0007) >> 0);
+		uint8_t reg = op & 0x0007;
 		if (reg>3) reg += 8;
 		return reg;
 	}
 
 	uint8_t common16_get_u3(uint16_t op)
 	{
-		return ((op & 0x0007) >> 0);
+		return op & 0x0007;
 	}
 
 	uint8_t common16_get_u5(uint16_t op)
 	{
-		return ((op & 0x001f) >> 0);
+		return op & 0x001f;
 	}
 
 	uint8_t common16_get_u8(uint16_t op)
 	{
-		return ((op & 0x00ff) >>0);
+		return op & 0x00ff;
 	}
 
 	uint8_t common16_get_u7(uint16_t op)
 	{
-		return ((op & 0x007f) >>0);
+		return op & 0x007f;
 	}
 
-	uint8_t common16_get_s9(uint16_t op)
+	uint32_t common16_get_s9(uint16_t op)
 	{
-		uint8_t s = ((op & 0x01ff) >> 0);
-		if (s & 0x100)
-			s |= 0xfe00;
-
+		uint32_t s = util::sext(op & 0x01ff,9);
 		return s;
 	}
 
@@ -189,7 +186,7 @@ private:
 
 	uint8_t common32_get_areg(uint32_t op)
 	{
-		return (op & 0x0000003f) >> 0;
+		return op & 0x0000003f;
 	}
 
 	uint8_t common32_get_p(uint32_t op)
@@ -199,12 +196,12 @@ private:
 
 	uint8_t common32_get_areg_reserved(uint32_t op)
 	{
-		return (op & 0x0000003f) >> 0;
+		return op & 0x0000003f;
 	}
 
 	uint32_t common32_get_s12(uint32_t op)
 	{
-		int S_temp = (op & 0x0000003f) >> 0;
+		int S_temp = op & 0x0000003f;
 		int s_temp = (op & 0x00000fc0) >> 6;
 		uint32_t S = s_temp | (S_temp<<6);
 
@@ -261,38 +258,38 @@ private:
 		return op & 0x0000001f;
 	}
 
-	void status32_set_e1(void) { m_status32 |= E1_FLAG; }
-	void status32_clear_e1(void) { m_status32 &= ~E1_FLAG; }
-	bool status32_check_e1(void) { return (m_status32 & E1_FLAG ? true : false); }
+	void status32_set_e1() { m_status32 |= E1_FLAG; }
+	void status32_clear_e1() { m_status32 &= ~E1_FLAG; }
+	bool status32_check_e1() { return (m_status32 & E1_FLAG ? true : false); }
 
-	void status32_set_e2(void) { m_status32 |= E2_FLAG; }
-	void status32_clear_e2(void) { m_status32 &= ~E2_FLAG; }
-	bool status32_check_e2(void) { return (m_status32 & E2_FLAG ? true : false); }
+	void status32_set_e2() { m_status32 |= E2_FLAG; }
+	void status32_clear_e2() { m_status32 &= ~E2_FLAG; }
+	bool status32_check_e2() { return (m_status32 & E2_FLAG ? true : false); }
 
 	// V = overflow (set if signed operation would overflow)
-	void status32_set_v(void) { m_status32 |= V_OVERFLOW_FLAG; }
-	void status32_clear_v(void) { m_status32 &= ~V_OVERFLOW_FLAG; }
-	bool status32_check_v(void) { return (m_status32 & V_OVERFLOW_FLAG ? true : false); }
+	void status32_set_v() { m_status32 |= V_OVERFLOW_FLAG; }
+	void status32_clear_v() { m_status32 &= ~V_OVERFLOW_FLAG; }
+	bool status32_check_v() { return (m_status32 & V_OVERFLOW_FLAG ? true : false); }
 
 	// C = carry (unsigned op, carry set is same condition as LO Lower Than, carry clear is same condition as HS Higher Same)
-	void status32_set_c(void) { m_status32 |=  C_CARRY_FLAG; }
-	void status32_clear_c(void) { m_status32 &= ~C_CARRY_FLAG; }
-	bool status32_check_c(void) { return (m_status32 &   C_CARRY_FLAG ? true : false); }
+	void status32_set_c() { m_status32 |=  C_CARRY_FLAG; }
+	void status32_clear_c() { m_status32 &= ~C_CARRY_FLAG; }
+	bool status32_check_c() { return (m_status32 &   C_CARRY_FLAG ? true : false); }
 
 	// N = negative (set if most significant bit of result is set)
-	void status32_set_n(void)  { m_status32 |=  N_NEGATIVE_FLAG; }
-	void status32_clear_n(void) { m_status32 &= ~N_NEGATIVE_FLAG; }
-	bool status32_check_n(void) { return (m_status32 &   N_NEGATIVE_FLAG ? true : false); }
+	void status32_set_n()  { m_status32 |=  N_NEGATIVE_FLAG; }
+	void status32_clear_n() { m_status32 &= ~N_NEGATIVE_FLAG; }
+	bool status32_check_n() { return (m_status32 &   N_NEGATIVE_FLAG ? true : false); }
 
 	// Z = zero (set if result is zero, ie both values the same for CMP)
-	void status32_set_z(void) { m_status32 |=  Z_ZERO_FLAG; }
-	void status32_clear_z(void) { m_status32 &= ~Z_ZERO_FLAG; }
-	bool status32_check_z(void) { return (m_status32 &   Z_ZERO_FLAG ? true : false); }
+	void status32_set_z() { m_status32 |=  Z_ZERO_FLAG; }
+	void status32_clear_z() { m_status32 &= ~Z_ZERO_FLAG; }
+	bool status32_check_z() { return (m_status32 &   Z_ZERO_FLAG ? true : false); }
 
 	// debug is the name of the register, this is not a debug function
-	void debugreg_set_ZZ(void) { m_debug |= (1<<23); }
-	void debugreg_clear_ZZ(void) { m_debug &= ~(1<<23); }
-	bool debugreg_check_ZZ(void) { return (m_debug & (1<<23)) ? true : false; }
+	void debugreg_set_ZZ() { m_debug |= (1<<23); }
+	void debugreg_clear_ZZ() { m_debug &= ~(1<<23); }
+	bool debugreg_check_ZZ() { return (m_debug & (1<<23)) ? true : false; }
 
 	// 0x00 - AL / RA - Always
 	bool condition_AL() { return (true); }

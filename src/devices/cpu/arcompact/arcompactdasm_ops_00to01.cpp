@@ -39,7 +39,7 @@ int arcompact_disassembler::handle_dasm32_B_D_s25(std::ostream &stream, offs_t p
 	// 0000 0sss ssss sss1 SSSS SSSS SSNR TTTT
 	int32_t address = (op & 0x07fe0000) >> 17;
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
-	address |= ((op & 0x0000000f) >> 0) << 20;
+	address |= (op & 0x0000000f) << 20;
 	if (address & 0x800000) address = -0x800000 + (address & 0x7fffff);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 
@@ -72,7 +72,7 @@ int arcompact_disassembler::handle_dasm32_BL_d_s25(std::ostream &stream, offs_t 
 	// 00001 sssssssss 10  SSSSSSSSSS N R TTTT
 	int32_t address =   (op & 0x07fc0000) >> 17;
 	address |=        ((op & 0x0000ffc0) >> 6) << 10;
-	address |=        ((op & 0x0000000f) >> 0) << 20;
+	address |=        (op & 0x0000000f) << 20;
 	if (address & 0x800000) address = -0x800000 + (address&0x7fffff);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 
@@ -120,10 +120,8 @@ int arcompact_disassembler::handle01_01_00_helper(std::ostream &stream, offs_t p
 		{
 			// b and c are LIMM? invalid??
 			util::stream_format( stream, "%s%s 0x%08x, 0x%08x (illegal?) to 0x%08x", optext, delaybit[n], limm, limm, (pc&0xfffffffc) + (address * 2) );
-
 		}
 	}
-
 	return size;
 }
 
@@ -168,7 +166,6 @@ int arcompact_disassembler::handle_dasm32_BBIT1_reg_reg(std::ostream &stream, of
 {
 	return handle01_01_00_helper( stream, pc, op, opcodes, "BBIT1");
 }
-
 
 int arcompact_disassembler::handle01_01_01_helper(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext)
 {

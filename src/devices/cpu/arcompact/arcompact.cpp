@@ -143,7 +143,7 @@ void arcompact_device::arcompact_auxreg100_TIMER1_w(offs_t offset, uint32_t data
 	}
 }
 
-uint32_t arcompact_device::arcompact_auxreg200_AUX_IRQ_LVL_r(void)
+uint32_t arcompact_device::arcompact_auxreg200_AUX_IRQ_LVL_r()
 {
 	logerror("%s: arcompact_auxreg200_AUX_IRQ_LVL_r\n", machine().describe_context());
 	return 0;
@@ -482,7 +482,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 							default: return -1;
 							case 0x00: // Branch on Compare Register-Register
 							{
-								uint8_t subinstr3 = (op & 0x0000000f) >> 0;
+								uint8_t subinstr3 = op & 0x0000000f;
 								switch (subinstr3)
 								{
 									case 0x00:
@@ -562,7 +562,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 							}
 							case 0x01: // Branch on Compare/Bit Test Register-Immediate
 							{
-								uint8_t subinstr3 = (op & 0x0000000f) >> 0;
+								uint8_t subinstr3 = op & 0x0000000f;
 								switch (subinstr3)
 								{
 									case 0x00:
@@ -1306,7 +1306,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 					}
 					case 0x2f: // Sub Opcode
 					{
-						uint8_t subinstr2 = (op & 0x0000003f) >> 0;
+						uint8_t subinstr2 = op & 0x0000003f;
 						switch (subinstr2 & 0x3f)
 						{
 							case 0x00:
@@ -1861,7 +1861,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 					}
 					case 0x2f: // SOPs
 					{
-						uint8_t subinstr2 = (op & 0x0000003f) >> 0;
+						uint8_t subinstr2 = op & 0x0000003f;
 						switch (subinstr2)
 						{
 							case 0x00:
@@ -2144,7 +2144,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 			}
 			case 0x0f: // op_S b,b,c (single 16-bit ops)
 			{
-				uint8_t subinstr = (op & 0x01f) >> 0;
+				uint8_t subinstr = op & 0x01f;
 
 				switch (subinstr)
 				{
@@ -2677,7 +2677,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 					}
 					case 0x06: // subtable 18_06
 					{
-						uint8_t subinstr2 = (op & 0x001f) >> 0;
+						uint8_t subinstr2 = op & 0x001f;
 						switch (subinstr2)
 						{
 							case 0x01:
@@ -2701,7 +2701,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 					}
 					case 0x07: // subtable 18_07
 					{
-						uint8_t subinstr2 = (op & 0x001f) >> 0;
+						uint8_t subinstr2 = op & 0x001f;
 
 						switch (subinstr2)
 						{

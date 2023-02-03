@@ -122,7 +122,7 @@ uint32_t arcompact_device::handleop32_B_D_s25(uint32_t op)
 	int size = 4;
 	int32_t address = (op & 0x07fe0000) >> 17;
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
-	address |= ((op & 0x0000000f) >> 0) << 20;
+	address |= (op & 0x0000000f) << 20;
 	if (address & 0x800000) address = -0x800000 + (address & 0x7fffff);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 
@@ -185,7 +185,7 @@ uint32_t arcompact_device::handleop32_BL_d_s25(uint32_t op)
 	int size = 4;
 	int32_t address = (op & 0x07fc0000) >> 17;
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
-	address |= ((op & 0x0000000f) >> 0) << 20;
+	address |= (op & 0x0000000f) << 20;
 	if (address & 0x800000) address = -0x800000 + (address & 0x7fffff);
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 

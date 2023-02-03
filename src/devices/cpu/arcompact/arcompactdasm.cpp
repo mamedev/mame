@@ -618,7 +618,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 							default: break; // size = -1;
 							case 0x00: // Branch on Compare Register-Register
 							{
-								uint8_t subinstr3 = (op & 0x0000000f) >> 0;
+								uint8_t subinstr3 = op & 0x0000000f;
 								switch (subinstr3)
 								{
 									case 0x00:
@@ -699,7 +699,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 							}
 							case 0x01: // Branch on Compare/Bit Test Register-Immediate
 							{
-								uint8_t subinstr3 = (op & 0x0000000f) >> 0;
+								uint8_t subinstr3 = op & 0x0000000f;
 								switch (subinstr3)
 								{
 									case 0x00:
@@ -1484,7 +1484,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 					}
 					case 0x2f: // Sub Opcode
 					{
-						uint8_t subinstr2 = (op & 0x0000003f) >> 0;
+						uint8_t subinstr2 = op & 0x0000003f;
 						switch (subinstr2 & 0x3f)
 						{
 							case 0x00:
@@ -2029,7 +2029,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 					}
 					case 0x2f: // SOPs
 					{
-						uint8_t subinstr2 = (op & 0x0000003f) >> 0;
+						uint8_t subinstr2 = op & 0x0000003f;
 						switch (subinstr2)
 						{
 							case 0x00:
@@ -2321,7 +2321,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 			}
 			case 0x0f: // op_S b,b,c (single 16-bit ops)
 			{
-				uint8_t subinstr = (op & 0x01f) >> 0;
+				uint8_t subinstr = op & 0x01f;
 
 				switch (subinstr)
 				{
@@ -2859,7 +2859,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 					}
 					case 0x06: // subtable 18_06
 					{
-						uint8_t subinstr2 = (op & 0x001f) >> 0;
+						uint8_t subinstr2 = op & 0x001f;
 						switch (subinstr2)
 						{
 							case 0x01:
@@ -2884,7 +2884,7 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 					}
 					case 0x07: // subtable 18_07
 					{
-						uint8_t subinstr2 = (op & 0x001f) >> 0;
+						uint8_t subinstr2 = op & 0x001f;
 
 						switch (subinstr2)
 						{
