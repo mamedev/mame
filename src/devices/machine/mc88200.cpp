@@ -692,9 +692,8 @@ template <typename T> std::optional<T> mc88200_device::cache_read(u32 physical_a
 			{
 			case 1: return T(data >> ((physical_address & 3) * 8));
 			case 2: return T(data >> ((physical_address & 3) * 8));
+			case 4: return T(data);
 			}
-
-			return T(data);
 		}
 	}
 
