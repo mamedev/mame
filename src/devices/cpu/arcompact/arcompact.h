@@ -115,86 +115,86 @@ private:
 
 	// registers used in 16-bit opcodes have a limited range
 	// and can only address registers r0-r3 and r12-r15
-	uint8_t common16_get_and_expand_breg(uint16_t op)
+	static uint8_t common16_get_and_expand_breg(uint16_t op)
 	{
 		uint8_t reg = ((op & 0x0700) >> 8);
 		if (reg>3) reg += 8;
 		return reg;
 	}
 
-	uint8_t common16_get_and_expand_creg(uint16_t op)
+	static uint8_t common16_get_and_expand_creg(uint16_t op)
 	{
 		uint8_t reg = ((op & 0x00e0) >> 5);
 		if (reg>3) reg += 8;
 		return reg;
 	}
 
-	uint8_t common16_get_and_expand_areg(uint16_t op)
+	static uint8_t common16_get_and_expand_areg(uint16_t op)
 	{
 		uint8_t reg = op & 0x0007;
 		if (reg>3) reg += 8;
 		return reg;
 	}
 
-	uint8_t common16_get_u3(uint16_t op)
+	static uint8_t common16_get_u3(uint16_t op)
 	{
 		return op & 0x0007;
 	}
 
-	uint8_t common16_get_u5(uint16_t op)
+	static uint8_t common16_get_u5(uint16_t op)
 	{
 		return op & 0x001f;
 	}
 
-	uint8_t common16_get_u8(uint16_t op)
+	static uint8_t common16_get_u8(uint16_t op)
 	{
 		return op & 0x00ff;
 	}
 
-	uint8_t common16_get_u7(uint16_t op)
+	static uint8_t common16_get_u7(uint16_t op)
 	{
 		return op & 0x007f;
 	}
 
-	uint32_t common16_get_s9(uint16_t op)
+	static uint32_t common16_get_s9(uint16_t op)
 	{
 		uint32_t s = util::sext(op & 0x01ff, 9);
 		return s;
 	}
 
-	uint8_t common32_get_breg(uint32_t op)
+	static uint8_t common32_get_breg(uint32_t op)
 	{
 		int b_temp = (op & 0x07000000) >> 24;
 		int B_temp = (op & 0x00007000) >> 12;
 		return b_temp | (B_temp << 3);
 	}
 
-	bool common32_get_F(uint32_t op)
+	static bool common32_get_F(uint32_t op)
 	{
 		return (op & 0x00008000) ? true : false;
 	}
 
-	uint8_t common32_get_creg(uint32_t op)
+	static uint8_t common32_get_creg(uint32_t op)
 	{
 		return (op & 0x00000fc0) >> 6;
 	}
 
-	uint8_t common32_get_areg(uint32_t op)
+	static uint8_t common32_get_areg(uint32_t op)
 	{
 		return op & 0x0000003f;
 	}
 
-	uint8_t common32_get_p(uint32_t op)
+	static uint8_t common32_get_p(uint32_t op)
 	{
 		return (op & 0x00c00000) >> 22;
 	}
 
-	uint8_t common32_get_areg_reserved(uint32_t op)
+	static uint8_t common32_get_areg_reserved(uint32_t op)
 	{
 		return op & 0x0000003f;
 	}
 
-	uint32_t common32_get_s12(uint32_t op)
+	static uint32_t common32_get_s12(uint32_t op)
 	{
 		int S_temp = op & 0x0000003f;
 		int s_temp = (op & 0x00000fc0) >> 6;
@@ -206,7 +206,7 @@ private:
 		return S;
 	}
 
-	uint32_t common32_get_u6(uint32_t op)
+	static uint32_t common32_get_u6(uint32_t op)
 	{
 		return (op & 0x00000fc0) >> 6;
 	}
@@ -241,14 +241,14 @@ private:
 		return 4;
 	}
 
-	uint8_t group_0e_get_h(uint16_t op)
+	static uint8_t group_0e_get_h(uint16_t op)
 	{
 		uint8_t h = ((op & 0x0007) << 3);
 		h |= ((op & 0x00e0) >> 5);
 		return h;
 	}
 
-	uint8_t common32_get_condition(uint32_t op)
+	static uint8_t common32_get_condition(uint32_t op)
 	{
 		return op & 0x0000001f;
 	}
@@ -287,7 +287,7 @@ private:
 	bool debugreg_check_ZZ() { return (m_debug & (1<<23)) ? true : false; }
 
 	// 0x00 - AL / RA - Always
-	bool condition_AL() { return (true); }
+	static bool condition_AL() { return (true); }
 	// 0x01 - EQ / Z - Zero
 	bool condition_EQ() { return (status32_check_z()); }
 	// 0x02 - NE / NZ - Non-Zero
