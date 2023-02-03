@@ -783,12 +783,6 @@ void ata_mass_storage_device::process_command()
 		start_busy(MINIMUM_COMMAND_TIME, PARAM_COMMAND);
 		break;
 
-	case IDE_COMMAND_STANDBY_IMMEDIATE:
-	case IDE_COMMAND_STANDBY:
-		osd_printf_debug("IDE unimplemented command (%02X)\n", m_command);
-		set_irq(ASSERT_LINE);
-		break;
-
 	default:
 		ata_hle_device::process_command();
 		break;
