@@ -634,6 +634,10 @@ void ata_mass_storage_device::process_command()
 
 	switch (m_command)
 	{
+	case IDE_COMMAND_NOP:
+		set_irq(ASSERT_LINE);
+		break;
+
 	case IDE_COMMAND_READ_SECTORS:
 	case IDE_COMMAND_READ_SECTORS_NORETRY:
 		LOGPRINT(("IDE Read multiple: C=%u H=%d S=%u LBA=%u count=%u\n",
@@ -777,6 +781,14 @@ void ata_mass_storage_device::process_command()
 
 	case IDE_COMMAND_READ_NATIVE_MAX_ADDRESS:
 		start_busy(MINIMUM_COMMAND_TIME, PARAM_COMMAND);
+		break;
+
+	case IDE_COMMAND_PACKET:
+	case IDE_COMMAND_IDENTIFY_PACKET_DEVICE:
+	case IDE_COMMAND_STANDBY_IMMEDIATE:
+	case IDE_COMMAND_STANDBY:
+		osd_printf_debug("IDE unimplemented command (%02X)\n", m_command);
+		set_irq(ASSERT_LINE);
 		break;
 
 	default:
