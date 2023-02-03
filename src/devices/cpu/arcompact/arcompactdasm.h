@@ -118,10 +118,7 @@ private:
 		int S_temp = op & 0x0000003f; op &= ~0x0000003f;
 		int s_temp = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0;
 		int S = s_temp | (S_temp << 6);
-
-		if (S & 0x800)
-			S |= 0xfffff000;
-
+		S = util::sext(S, 12);
 		return S;
 	}
 
@@ -177,8 +174,7 @@ private:
 	static uint32_t dasm_common16_get_s9(uint16_t& op)
 	{
 		uint32_t s = op & 0x01ff;
-		if (s & 0x100)
-			s |= 0xfffffe00;
+		s = util::sext(s, 9);
 		op &= ~0x01ff;
 		return s;
 	}

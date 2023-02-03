@@ -4,6 +4,18 @@
 #include "emu.h"
 #include "arcompact.h"
 
+uint32_t arcompact_device::branch_common(uint16_t op, bool cond, unsigned width)
+{
+    if (cond)
+    {
+        int s = util::sext(op, width);
+        //op &= ~util::make_bitmask<uint32_t>(width); // not really necessary - result never used
+        uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 2);
+        return realaddress;
+    }
+    return m_pc + 2;
+}
+
 // #######################################################################################################################
 //                                 IIII I    s
 // BREQ_S b,0,s8                   1110 1bbb 0sss ssss
@@ -12,14 +24,7 @@
 uint32_t arcompact_device::handleop_BREQ_S_b_0_s8(uint16_t op) // BREQ_S b,0,s8
 {
 	uint8_t breg = common16_get_and_expand_breg(op);
-	if (!m_regs[breg])
-	{
-		int s = op & 0x007f; op &= ~0x007f;
-		if (s & 0x40) s = -0x40 + (s & 0x3f);
-		uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 2);
-		return realaddress;
-	}
-	return m_pc + 2;
+	return branch_common(op, !m_regs[breg], 7);
 }
 
 // #######################################################################################################################
@@ -30,14 +35,7 @@ uint32_t arcompact_device::handleop_BREQ_S_b_0_s8(uint16_t op) // BREQ_S b,0,s8
 uint32_t arcompact_device::handleop_BRNE_S_b_0_s8(uint16_t op) // BRNE_S b,0,s8
 {
 	uint8_t breg = common16_get_and_expand_breg(op);
-	if (m_regs[breg])
-	{
-		int s = op & 0x007f; op &= ~0x007f;
-		if (s & 0x40) s = -0x40 + (s & 0x3f);
-		uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 2);
-		return realaddress;
-	}
-	return m_pc + 2;
+	return branch_common(op, m_regs[breg], 7);
 }
 
 // #######################################################################################################################
@@ -47,10 +45,7 @@ uint32_t arcompact_device::handleop_BRNE_S_b_0_s8(uint16_t op) // BRNE_S b,0,s8
 
 uint32_t arcompact_device::handleop_B_S_s10(uint16_t op) // B_S s10  (branch always)
 {
-	int s = op & 0x01ff; op &= ~0x01ff;
-	if (s & 0x100) s = -0x100 + (s & 0xff);
-	uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 2);
-	return realaddress;
+	return branch_common(op, true, 9);
 }
 
 // #######################################################################################################################
@@ -60,14 +55,7 @@ uint32_t arcompact_device::handleop_B_S_s10(uint16_t op) // B_S s10  (branch alw
 
 uint32_t arcompact_device::handleop_BEQ_S_s10(uint16_t op) // BEQ_S s10 (branch is zero bit is set)
 {
-	if (status32_check_z())
-	{
-		int s = op & 0x01ff; op &= ~0x01ff;
-		if (s & 0x100) s = -0x100 + (s & 0xff);
-		uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 2);
-		return realaddress;
-	}
-	return m_pc + 2;
+	return branch_common(op ,status32_check_z(), 9);
 }
 
 // #######################################################################################################################
@@ -77,14 +65,7 @@ uint32_t arcompact_device::handleop_BEQ_S_s10(uint16_t op) // BEQ_S s10 (branch 
 
 uint32_t arcompact_device::handleop_BNE_S_s10(uint16_t op) // BNE_S s10  (branch if zero bit isn't set)
 {
-	if (!status32_check_z())
-	{
-		int s = op & 0x01ff; op &= ~0x01ff;
-		if (s & 0x100) s = -0x100 + (s & 0xff);
-		uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 2);
-		return realaddress;
-	}
-	return m_pc + 2;
+	return branch_common(op ,!status32_check_z(), 9);
 }
 
 // #######################################################################################################################
@@ -94,14 +75,7 @@ uint32_t arcompact_device::handleop_BNE_S_s10(uint16_t op) // BNE_S s10  (branch
 
 uint32_t arcompact_device::handleop_BGT_S_s7(uint16_t op)
 {
-	if (condition_GT())
-	{
-		int s = op & 0x003f; op &= ~0x003f;
-		if (s & 0x020) s = -0x20 + (s & 0x1f);
-		uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 2);
-		return realaddress;
-	}
-	return m_pc + 2;
+	return branch_common(op, condition_GT(), 6);
 }
 
 // #######################################################################################################################
@@ -111,14 +85,7 @@ uint32_t arcompact_device::handleop_BGT_S_s7(uint16_t op)
 
 uint32_t arcompact_device::handleop_BGE_S_s7(uint16_t op)
 {
-	if (condition_GE())
-	{
-		int s = op & 0x003f; op &= ~0x003f;
-		if (s & 0x020) s = -0x20 + (s & 0x1f);
-		uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 2);
-		return realaddress;
-	}
-	return m_pc + 2;
+	return branch_common(op, condition_GE(), 6);
 }
 
 // #######################################################################################################################
@@ -128,14 +95,7 @@ uint32_t arcompact_device::handleop_BGE_S_s7(uint16_t op)
 
 uint32_t arcompact_device::handleop_BLT_S_s7(uint16_t op) // BLT_S
 {
-	if (condition_LT())
-	{
-		int s = op & 0x003f; op &= ~0x003f;
-		if (s & 0x020) s = -0x20 + (s & 0x1f);
-		uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 2);
-		return realaddress;
-	}
-	return m_pc + 2;
+	return branch_common(op, condition_LT(), 6);
 }
 
 // #######################################################################################################################
@@ -145,14 +105,7 @@ uint32_t arcompact_device::handleop_BLT_S_s7(uint16_t op) // BLT_S
 
 uint32_t arcompact_device::handleop_BLE_S_s7(uint16_t op) // BLE_S
 {
-	if (condition_LE())
-	{
-		int s = op & 0x003f; op &= ~0x003f;
-		if (s & 0x020) s = -0x20 + (s & 0x1f);
-		uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 2);
-		return realaddress;
-	}
-	return m_pc + 2;
+	return branch_common(op, condition_LE(), 6);
 }
 
 // #######################################################################################################################
@@ -162,14 +115,7 @@ uint32_t arcompact_device::handleop_BLE_S_s7(uint16_t op) // BLE_S
 
 uint32_t arcompact_device::handleop_BHI_S_s7(uint16_t op)
 {
-	if (condition_HI())
-	{
-		int s = op & 0x003f; op &= ~0x003f;
-		if (s & 0x020) s = -0x20 + (s & 0x1f);
-		uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 2);
-		return realaddress;
-	}
-	return m_pc + 2;
+	return branch_common(op, condition_HI(), 6);
 }
 
 // #######################################################################################################################
@@ -179,14 +125,7 @@ uint32_t arcompact_device::handleop_BHI_S_s7(uint16_t op)
 
 uint32_t arcompact_device::handleop_BHS_S_s7(uint16_t op)
 {
-	if (condition_HS())
-	{
-		int s = op & 0x003f; op &= ~0x003f;
-		if (s & 0x020) s = -0x20 + (s & 0x1f);
-		uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 2);
-		return realaddress;
-	}
-	return m_pc + 2;
+	return branch_common(op, condition_HS(), 6);
 }
 
 // #######################################################################################################################
@@ -196,14 +135,7 @@ uint32_t arcompact_device::handleop_BHS_S_s7(uint16_t op)
 
 uint32_t arcompact_device::handleop_BLO_S_s7(uint16_t op)
 {
-	if (condition_CS()) // LO = condition_CS()
-	{
-		int s = op & 0x003f; op &= ~0x003f;
-		if (s & 0x020) s = -0x20 + (s & 0x1f);
-		uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 2);
-		return realaddress;
-	}
-	return m_pc + 2;
+	return branch_common(op, condition_CS(), 6);
 }
 
 // #######################################################################################################################
@@ -213,14 +145,7 @@ uint32_t arcompact_device::handleop_BLO_S_s7(uint16_t op)
 
 uint32_t arcompact_device::handleop_BLS_S_s7(uint16_t op)
 {
-	if (condition_LS())
-	{
-		int s = op & 0x003f; op &= ~0x003f;
-		if (s & 0x020) s = -0x20 + (s & 0x1f);
-		uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 2);
-		return realaddress;
-	}
-	return m_pc + 2;
+	return branch_common(op, condition_LS(), 6);
 }
 
 // #######################################################################################################################
@@ -230,9 +155,8 @@ uint32_t arcompact_device::handleop_BLS_S_s7(uint16_t op)
 
 uint32_t arcompact_device::handleop_BL_S_s13(uint16_t op) // BL_S s13
 {
-	int s = op & 0x07ff; op &= ~0x07ff;
-	if (s & 0x400) s = -0x400 + (s & 0x3ff);
-	uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 4);
+    int s = util::sext(op, 11);
+    uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 4);
 	m_regs[REG_BLINK] = m_pc + 2;
 	return realaddress;
 }

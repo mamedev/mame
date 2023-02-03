@@ -199,10 +199,7 @@ private:
 		int S_temp = op & 0x0000003f;
 		int s_temp = (op & 0x00000fc0) >> 6;
 		uint32_t S = s_temp | (S_temp<<6);
-
-		if (S & 0x800) // sign extend
-			S |= 0xfffff000;
-
+		S = util::sext(S, 12);
 		return S;
 	}
 
@@ -622,6 +619,7 @@ private:
 	uint32_t handleop_MOV_S_b_u8(uint16_t op);
 	uint32_t handleop_ADD_S_b_b_u7(uint16_t op);
 	uint32_t handleop_CMP_S_b_u7(uint16_t op);
+	uint32_t branch_common(uint16_t op, bool cond, unsigned width);
 	uint32_t handleop_BREQ_S_b_0_s8(uint16_t op);
 	uint32_t handleop_BRNE_S_b_0_s8(uint16_t op);
 	uint32_t handleop_B_S_s10(uint16_t op);

@@ -144,11 +144,9 @@ uint32_t arcompact_device::handleop32_RRC_do_op(arcompact_device &o, uint32_t sr
 // SEXB<.f> 0,limm                 0010 0110 0010 1111   F111 1111 1000 0101 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_SEXB_do_op(arcompact_device &o, uint32_t src, bool set_flags)
+uint32_t arcompact_device::handleop32_SEXB_do_op(arcompact_device& o, uint32_t src, bool set_flags)
 {
-	uint32_t result = src & 0x000000ff;
-	if (src & 0x00000080)
-		result |= 0xffffff00;
+	uint32_t result = util::sext(src & 0xff, 8);
 	if (set_flags)
 		o.do_flags_nz(result);
 	return result;
@@ -165,11 +163,9 @@ uint32_t arcompact_device::handleop32_SEXB_do_op(arcompact_device &o, uint32_t s
 // SEXW<.f> 0,limm                 0010 0110 0010 1111   F111 1111 1000 0110 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_SEXW_do_op(arcompact_device &o, uint32_t src, bool set_flags)
+uint32_t arcompact_device::handleop32_SEXW_do_op(arcompact_device& o, uint32_t src, bool set_flags)
 {
-	uint32_t result = src & 0x0000ffff;
-	if (src & 0x00008000)
-		result |= 0xffff0000;
+	uint32_t result = util::sext(src & 0xffff, 16);
 	if (set_flags)
 		o.do_flags_nz(result);
 	return result;

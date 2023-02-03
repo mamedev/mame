@@ -29,8 +29,7 @@ int arcompact_disassembler::handle_dasm32_LD_r_o(std::ostream& stream, offs_t pc
 	uint8_t breg = dasm_common32_get_breg(op);
 
 	uint32_t sdat = s | (S << 8);
-	if (sdat & 0x100)
-		sdat |= 0xffffff00;
+	sdat = util::sext(sdat, 9);
 
 	uint32_t limm = 0;
 	if (breg == DASM_REG_LIMM)
@@ -68,8 +67,7 @@ int arcompact_disassembler::handle_dasm32_ST_r_o(std::ostream& stream, offs_t pc
 
 	uint8_t breg = dasm_common32_get_breg(op);
 	uint32_t sdat = s | (S << 8);
-	if (sdat & 0x100)
-		sdat |= 0xffffff00;
+	sdat = util::sext(sdat, 9);
 
 	int Z = (op & 0x00000006) >> 1; op &= ~0x00000006;
 	int a = (op & 0x00000018) >> 3; op &= ~0x00000018;

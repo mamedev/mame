@@ -131,9 +131,7 @@ inline void arcompact_device::arcompact_handle_ld_helper(uint32_t op, uint8_t ar
 
 		if (X)
 		{
-			if (readdata & 0x80)
-				readdata |= 0xffffff00;
-
+			readdata = util::sext(readdata, 8);
 			m_regs[areg] = readdata;
 		}
 		else
@@ -147,9 +145,7 @@ inline void arcompact_device::arcompact_handle_ld_helper(uint32_t op, uint8_t ar
 
 		if (X)
 		{
-			if (readdata & 0x8000)
-				readdata |= 0xffff0000;
-
+			readdata = util::sext(readdata, 16);
 			m_regs[areg] = readdata;
 		}
 		else
