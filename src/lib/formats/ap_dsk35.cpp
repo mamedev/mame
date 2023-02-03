@@ -152,7 +152,7 @@ int dc42_format::identify(util::random_read &io, uint32_t form_factor, const std
 		return 0;
 	}
 
-	return (size == 0x54+tsize+dsize && h[0] < 64 && h[0x52] == 1 && h[0x53] == 0) ? FIFID_STRUCT|FIFID_STRUCT : 0;
+	return (size == 0x54+tsize+dsize && h[0] < 64 && h[0x52] == 1 && h[0x53] == 0) ? FIFID_STRUCT : 0;
 }
 
 bool dc42_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) const
@@ -166,7 +166,7 @@ bool dc42_format::load(util::random_read &io, uint32_t form_factor, const std::v
 	uint8_t encoding = h[0x50];
 	uint8_t format = h[0x51];
 
-	if((encoding != 0x00 || format != 0x02) && (encoding != 0x01 || (format != 0x22 && format != 0x24))) {
+	if((encoding != 0x00 || format != 0x02) && ((encoding != 0x01 && encoding != 0x03) || (format != 0x22 && format != 0x24))) {
 		osd_printf_error("dc42: Unsupported encoding/format combination %02x/%02x\n", encoding, format);
 		return false;
 	}
