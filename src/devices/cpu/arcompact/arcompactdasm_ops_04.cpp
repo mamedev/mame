@@ -294,16 +294,16 @@ int arcompact_disassembler::handle_dasm32_JLcc_D(std::ostream &stream, offs_t pc
 
 int arcompact_disassembler::handle_dasm32_LP(std::ostream& stream, offs_t pc, uint32_t op, const data_buffer& opcodes) // LPcc (loop setup)
 {
-	uint8_t breg = dasm_common32_get_breg(op); // breg is reserved
+	//uint8_t breg = dasm_common32_get_breg(op); // breg is reserved
 	uint8_t p = dasm_common32_get_p(op);
 
 	if (p == 0x00)
 	{
-		util::stream_format(stream, "<illegal LPcc, p = 0x00)");
+		util::stream_format(stream, "<illegal LPcc, p = 0x00>");
 	}
 	else if (p == 0x01)
 	{
-		util::stream_format(stream, "<illegal LPcc, p = 0x01)");
+		util::stream_format(stream, "<illegal LPcc, p = 0x01>");
 	}
 	else if (p == 0x02) // Loop unconditional
 	{ // 0010 0RRR 1010 1000 0RRR ssss ssSS SSSS
@@ -317,13 +317,7 @@ int arcompact_disassembler::handle_dasm32_LP(std::ostream& stream, offs_t pc, ui
 		uint32_t u = dasm_common32_get_u6(op);
 		uint8_t condition = dasm_common32_get_condition(op);
 		util::stream_format(stream, "LP<%s> (start %08x, end %08x)", conditions[condition], pc + 4, (pc & 0xfffffffc) + u * 2);
-
-		int unused = (op & 0x00000020) >> 5;
-		if (unused == 0)  util::stream_format(stream, "(unused bit not set)");
-
 	}
-
-	if (breg) util::stream_format(stream, "(reseved B bits set %02x)", breg);
 
 	return 4;
 }

@@ -92,8 +92,7 @@ int arcompact_disassembler::handle_dasm32_ST_r_o(std::ostream& stream, offs_t pc
 		util::stream_format(stream, "ST%s%s%s [", datasize[Z], addressmode[a], cachebit[D]);
 		if (breg == DASM_REG_LIMM) util::stream_format(stream, "0x%08x, ", limm);
 		else util::stream_format(stream, "%s, ", regnames[breg]);
-		util::stream_format(stream, "0x%03x", sdat);
-		util::stream_format(stream, "] <- ");
+		util::stream_format(stream, "0x%03x] <- ", sdat);
 
 		if (creg == DASM_REG_LIMM)
 		{
