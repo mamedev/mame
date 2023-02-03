@@ -1,8 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
-
-#ifndef MAME_TEKTRONIX_TEK410X_KEYBOARD_H
-#define MAME_TEKTRONIX_TEK410X_KEYBOARD_H
+#ifndef MAME_TEKTRONIX_TEK410X_KBD_H
+#define MAME_TEKTRONIX_TEK410X_KBD_H
 
 #pragma once
 
@@ -66,4 +65,4 @@ private:
 // device type declaration
 DECLARE_DEVICE_TYPE(TEK410X_KEYBOARD, tek410x_keyboard_device)
 
-#endif // MAME_TEKTRONIX_TEK410X_KEYBOARD_H
+#endif // MAME_TEKTRONIX_TEK410X_KBD_H
