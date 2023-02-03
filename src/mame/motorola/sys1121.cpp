@@ -10,6 +10,9 @@
 
 #include "emu.h"
 #include "bus/vme/vme_mvme120.h"
+#include "bus/vme/vme_mvme180.h"
+#include "bus/vme/vme_mvme181.h"
+#include "bus/vme/vme_mvme327a.h"
 #include "bus/vme/vme_smvme2000.h"
 #include "logmacro.h"
 
@@ -32,11 +35,14 @@ namespace
 
 	static void sys1121_vme_cards(device_slot_interface &device)
 	{
-		device.option_add("mvme120", VME_MVME120);
-		device.option_add("mvme121", VME_MVME121);
-		device.option_add("mvme122", VME_MVME122);
-		device.option_add("mvme123", VME_MVME123);
+		device.option_add("mvme120",   VME_MVME120);
+		device.option_add("mvme121",   VME_MVME121);
+		device.option_add("mvme122",   VME_MVME122);
+		device.option_add("mvme123",   VME_MVME123);
 		device.option_add("smvme2000", VME_SMVME2000);
+		device.option_add("mvme180",   VME_MVME180);
+		device.option_add("mvme181",   VME_MVME181);
+		device.option_add("mvme327a",  VME_MVME327A);
 	}
 
 	void sys1121_state::sys1121(machine_config &config)
