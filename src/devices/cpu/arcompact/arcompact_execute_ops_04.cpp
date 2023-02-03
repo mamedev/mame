@@ -25,7 +25,6 @@
 
 uint32_t arcompact_device::handleop32_ADD_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint32_t result = src1 + src2;
 	if (set_flags)
 		o.do_flags_add(result, src1, src2);
@@ -54,7 +53,6 @@ uint32_t arcompact_device::handleop32_ADD_do_op(arcompact_device &o, uint32_t sr
 
 uint32_t arcompact_device::handleop32_ADC_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint8_t c = o.status32_check_c() ? 1 : 0;
 	uint32_t result = src1 + (src2 + c);
 	if (set_flags) // TODO: verify
@@ -80,7 +78,6 @@ uint32_t arcompact_device::handleop32_ADC_do_op(arcompact_device &o, uint32_t sr
 
 uint32_t arcompact_device::handleop32_SUB_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint32_t result = src1 - src2;
 	if (set_flags)
 		o.do_flags_sub(result, src1, src2);
@@ -105,7 +102,6 @@ uint32_t arcompact_device::handleop32_SUB_do_op(arcompact_device &o, uint32_t sr
 
 uint32_t arcompact_device::handleop32_SBC_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint8_t c = o.status32_check_c() ? 1 : 0;
 	uint32_t result = src1 - (src2 + c);
 	if (set_flags) // TODO: verify
@@ -131,7 +127,6 @@ uint32_t arcompact_device::handleop32_SBC_do_op(arcompact_device &o, uint32_t sr
 
 uint32_t arcompact_device::handleop32_AND_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint32_t result = src1 & src2;
 	if (set_flags)
 		o.do_flags_nz(result);
@@ -156,7 +151,6 @@ uint32_t arcompact_device::handleop32_AND_do_op(arcompact_device &o, uint32_t sr
 
 uint32_t arcompact_device::handleop32_OR_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint32_t result = src1 | src2;
 	if (set_flags)
 		o.do_flags_nz(result);
@@ -183,7 +177,6 @@ uint32_t arcompact_device::handleop32_OR_do_op(arcompact_device &o, uint32_t src
 
 uint32_t arcompact_device::handleop32_BIC_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint32_t result = src1 & (~src2);
 	if (set_flags)
 		o.do_flags_nz(result);
@@ -209,7 +202,6 @@ uint32_t arcompact_device::handleop32_BIC_do_op(arcompact_device &o, uint32_t sr
 
 uint32_t arcompact_device::handleop32_XOR_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint32_t result = src1 ^ src2;
 	if (set_flags)
 		o.do_flags_nz(result);
@@ -235,7 +227,6 @@ uint32_t arcompact_device::handleop32_XOR_do_op(arcompact_device &o, uint32_t sr
 
 uint32_t arcompact_device::handleop32_MAX_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint32_t alu = src1 - src2;
 	uint32_t result;
 
@@ -275,7 +266,6 @@ uint32_t arcompact_device::handleop32_MAX_do_op(arcompact_device &o, uint32_t sr
 
 uint32_t arcompact_device::handleop32_MIN_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint32_t alu = src1 - src2;
 	uint32_t result;
 
@@ -397,7 +387,6 @@ uint32_t arcompact_device::handleop32_MOV(uint32_t op)
 
 void arcompact_device::handleop32_TST_do_op(arcompact_device &o, uint32_t src1, uint32_t src2)
 {
-	
 	uint32_t result = src1 & src2;
 	o.do_flags_nz(result);
 }
@@ -415,7 +404,6 @@ void arcompact_device::handleop32_TST_do_op(arcompact_device &o, uint32_t src1, 
 
 void arcompact_device::handleop32_CMP_do_op(arcompact_device &o, uint32_t src1, uint32_t src2)
 {
-	
 	uint32_t result = src1 - src2;
 	o.do_flags_sub(result, src1, src2);
 }
@@ -430,7 +418,6 @@ void arcompact_device::handleop32_CMP_do_op(arcompact_device &o, uint32_t src1, 
 
 void arcompact_device::handleop32_RCMP_do_op(arcompact_device &o, uint32_t src1, uint32_t src2)
 {
-	
 	uint32_t result = src2 - src1;
 	o.do_flags_sub(result, src2, src1);
 }
@@ -458,7 +445,6 @@ void arcompact_device::handleop32_RCMP_do_op(arcompact_device &o, uint32_t src1,
 
 uint32_t arcompact_device::handleop32_RSUB_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint32_t result = src2 - src1;
 	if (set_flags)
 		o.do_flags_sub(result, src2, src1);
@@ -479,7 +465,6 @@ uint32_t arcompact_device::handleop32_RSUB_do_op(arcompact_device &o, uint32_t s
 
 uint32_t arcompact_device::handleop32_BSET_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint32_t result = src1 | (1 << (src2 & 0x1f));
 	if (set_flags)
 		o.do_flags_nz(result);
@@ -500,7 +485,6 @@ uint32_t arcompact_device::handleop32_BSET_do_op(arcompact_device &o, uint32_t s
 
 uint32_t arcompact_device::handleop32_BCLR_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint32_t result = src1 & ~(1 << (src2 & 0x1f));
 	if (set_flags)
 		o.do_flags_nz(result);
@@ -515,7 +499,6 @@ uint32_t arcompact_device::handleop32_BCLR_do_op(arcompact_device &o, uint32_t s
 
 void arcompact_device::handleop32_BTST_do_op(arcompact_device &o, uint32_t src1, uint32_t src2)
 {
-	
 	uint32_t result = src1 & (1 << (src2 & 0x1f));
 	o.do_flags_nz(result);
 }
@@ -534,7 +517,6 @@ void arcompact_device::handleop32_BTST_do_op(arcompact_device &o, uint32_t src1,
 
 uint32_t arcompact_device::handleop32_BXOR_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint32_t result = src1 ^ (1 << (src2 & 0x1f));
 	if (set_flags)
 		o.do_flags_nz(result);
@@ -555,7 +537,6 @@ uint32_t arcompact_device::handleop32_BXOR_do_op(arcompact_device &o, uint32_t s
 
 uint32_t arcompact_device::handleop32_BMSK_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint32_t result = src1 & ((1 << (src2 + 1)) - 1);
 	if (set_flags)
 		o.do_flags_nz(result);
@@ -581,7 +562,6 @@ uint32_t arcompact_device::handleop32_BMSK_do_op(arcompact_device &o, uint32_t s
 
 uint32_t arcompact_device::handleop32_ADD1_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint32_t result = src1 + (src2 << 1);
 	if (set_flags)
 		o.do_flags_add(result, src1, src2 << 1);
@@ -607,7 +587,6 @@ uint32_t arcompact_device::handleop32_ADD1_do_op(arcompact_device &o, uint32_t s
 
 uint32_t arcompact_device::handleop32_ADD2_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint32_t result = src1 + (src2 << 2);
 	if (set_flags)
 		o.do_flags_add(result, src1, src2 << 2);
@@ -633,7 +612,6 @@ uint32_t arcompact_device::handleop32_ADD2_do_op(arcompact_device &o, uint32_t s
 
 uint32_t arcompact_device::handleop32_ADD3_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint32_t result = src1 + (src2 << 3);
 	if (set_flags)
 		o.do_flags_add(result, src1, src2 << 3);
@@ -659,7 +637,6 @@ uint32_t arcompact_device::handleop32_ADD3_do_op(arcompact_device &o, uint32_t s
 
 uint32_t arcompact_device::handleop32_SUB1_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint32_t result = src1 - (src2 << 1);
 	if (set_flags)
 		o.do_flags_sub(result, src1, (src2 << 1));
@@ -685,7 +662,6 @@ uint32_t arcompact_device::handleop32_SUB1_do_op(arcompact_device &o, uint32_t s
 
 uint32_t arcompact_device::handleop32_SUB2_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint32_t result = src1 - (src2 << 2);
 	if (set_flags)
 		o.do_flags_sub(result, src1, (src2 << 2));
@@ -711,7 +687,6 @@ uint32_t arcompact_device::handleop32_SUB2_do_op(arcompact_device &o, uint32_t s
 
 uint32_t arcompact_device::handleop32_SUB3_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	
 	uint32_t result = src1 - (src2 << 3);
 	if (set_flags)
 		o.do_flags_sub(result, src1, (src2 << 3));

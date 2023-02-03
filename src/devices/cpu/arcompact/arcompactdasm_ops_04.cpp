@@ -322,16 +322,18 @@ int arcompact_disassembler::handle_dasm32_LP(std::ostream& stream, offs_t pc, ui
 	return 4;
 }
 
-#define PRINT_AUX_REGNAME \
-	if ((auxreg >= 0) && (auxreg < 0x420)) \
-	{ \
-		if (strcmp(auxregnames[auxreg],"unusedreg")) \
-			util::stream_format(stream, "[%s]", auxregnames[auxreg]); \
-		else \
-			util::stream_format(stream, "[%03x]", auxreg); \
-	} \
-	else \
+void arcompact_disassembler::output_aux_regname(std::ostream& stream, uint32_t auxreg)
+{
+	if ((auxreg >= 0) && (auxreg < 0x420))
+	{
+		if (strcmp(auxregnames[auxreg], "unusedreg"))
+			util::stream_format(stream, "[%s]", auxregnames[auxreg]);
+		else
+			util::stream_format(stream, "[%03x]", auxreg);
+	}
+	else
 		util::stream_format(stream, "[%03x]", auxreg);
+}
 
 int arcompact_disassembler::handle_dasm32_LR(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)  // Load FROM Auxiliary register TO register
 {
@@ -382,15 +384,13 @@ int arcompact_disassembler::handle_dasm32_LR(std::ostream &stream, offs_t pc, ui
 	else if (p == 1)
 	{
 		uint32_t u = dasm_common32_get_u6(op);
-		int auxreg = u;
-		PRINT_AUX_REGNAME
+		output_aux_regname(stream, u);
 	}
 	else if (p == 2)
 	{
 		uint32_t S = dasm_common32_get_s12(op);
 
-		int auxreg = S;
-		PRINT_AUX_REGNAME
+		output_aux_regname(stream, S);
 	}
 	else if (p == 3)
 	{
@@ -451,15 +451,12 @@ int arcompact_disassembler::handle_dasm32_SR(std::ostream &stream, offs_t pc, ui
 	else if (p == 1)
 	{
 		uint32_t u = dasm_common32_get_u6(op);
-
-		int auxreg = u;
-		PRINT_AUX_REGNAME
+		output_aux_regname(stream, u);
 	}
 	else if (p == 2)
 	{
 		uint32_t S = dasm_common32_get_s12(op);
-		int auxreg = S;
-		PRINT_AUX_REGNAME
+		output_aux_regname(stream, S);
 	}
 	else if (p == 3)
 	{

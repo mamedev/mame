@@ -50,7 +50,6 @@ uint32_t arcompact_device::arcompact_handle05_2f_0x_helper(uint32_t op, const ch
 
 uint32_t arcompact_device::handleop32_SWAP_do_op(arcompact_device &o, uint32_t src, bool set_flags)
 {
-	
 	uint32_t result = (((src & 0xffff0000) >> 16) | ((src & 0x0000ffff) << 16));
 
 	if (set_flags)
@@ -71,7 +70,6 @@ uint32_t arcompact_device::handleop32_SWAP_do_op(arcompact_device &o, uint32_t s
 
 uint32_t arcompact_device::handleop32_NORM_do_op(arcompact_device &o, uint32_t src, bool set_flags)
 {
-	
 	uint32_t result;
 
 	if ((src == 0xffffffff) || (src == 0x00000000))
@@ -189,7 +187,6 @@ uint32_t arcompact_device::handleop32_NEGS(uint32_t op)
 
 uint32_t arcompact_device::handleop32_NORMW_do_op(arcompact_device &o, uint32_t src, bool set_flags)
 {
-	//
 	uint32_t result;
 
 	uint32_t source = src;

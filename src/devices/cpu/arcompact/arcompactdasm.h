@@ -183,6 +183,7 @@ private:
 		return s;
 	}
 
+	static void output_aux_regname(std::ostream& stream, uint32_t auxreg);
 
 	static int handle04_MOV_f_a_b_c_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
 	static int handle04_MOV_f_a_b_u6_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);

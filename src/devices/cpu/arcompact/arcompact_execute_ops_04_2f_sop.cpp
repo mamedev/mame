@@ -17,7 +17,6 @@
 
 uint32_t arcompact_device::handleop32_ASL_single_do_op(arcompact_device &o, uint32_t src, bool set_flags)
 {
-	
 	uint32_t result = src + src;
 	if (set_flags)
 	{
@@ -43,7 +42,6 @@ uint32_t arcompact_device::handleop32_ASL_single_do_op(arcompact_device &o, uint
 
 uint32_t arcompact_device::handleop32_ASR_single_do_op(arcompact_device &o, uint32_t src, bool set_flags)
 {
-	
 	uint32_t result = src >> 1;
 	if (src & 0x80000000)
 		result |= 0x80000000;
@@ -70,7 +68,6 @@ uint32_t arcompact_device::handleop32_ASR_single_do_op(arcompact_device &o, uint
 
 uint32_t arcompact_device::handleop32_LSR_single_do_op(arcompact_device &o, uint32_t src, bool set_flags)
 {
-	
 	uint32_t result = src >> 1;
 	if (set_flags)
 	{
@@ -94,7 +91,6 @@ uint32_t arcompact_device::handleop32_LSR_single_do_op(arcompact_device &o, uint
 
 uint32_t arcompact_device::handleop32_ROR_do_op(arcompact_device &o, uint32_t src, bool set_flags)
 {
-	
 	uint32_t result = src >> 1;
 	if (src & 1)
 		result |= 0x80000000;
@@ -122,7 +118,6 @@ uint32_t arcompact_device::handleop32_ROR_do_op(arcompact_device &o, uint32_t sr
 
 uint32_t arcompact_device::handleop32_RRC_do_op(arcompact_device &o, uint32_t src, bool set_flags)
 {
-	
 	uint32_t result = src >> 1;
 	if (o.status32_check_c())
 		result |= 0x80000000;
@@ -151,7 +146,6 @@ uint32_t arcompact_device::handleop32_RRC_do_op(arcompact_device &o, uint32_t sr
 
 uint32_t arcompact_device::handleop32_SEXB_do_op(arcompact_device &o, uint32_t src, bool set_flags)
 {
-	
 	uint32_t result = src & 0x000000ff;
 	if (src & 0x00000080)
 		result |= 0xffffff00;
@@ -173,7 +167,6 @@ uint32_t arcompact_device::handleop32_SEXB_do_op(arcompact_device &o, uint32_t s
 
 uint32_t arcompact_device::handleop32_SEXW_do_op(arcompact_device &o, uint32_t src, bool set_flags)
 {
-	
 	uint32_t result = src & 0x0000ffff;
 	if (src & 0x00008000)
 		result |= 0xffff0000;
@@ -195,7 +188,6 @@ uint32_t arcompact_device::handleop32_SEXW_do_op(arcompact_device &o, uint32_t s
 
 uint32_t arcompact_device::handleop32_EXTB_do_op(arcompact_device &o, uint32_t src, bool set_flags)
 {
-	
 	uint32_t result = src & 0xff;
 	if (set_flags)
 	{
@@ -218,7 +210,6 @@ uint32_t arcompact_device::handleop32_EXTB_do_op(arcompact_device &o, uint32_t s
 
 uint32_t arcompact_device::handleop32_EXTW_do_op(arcompact_device &o, uint32_t src, bool set_flags)
 {
-	
 	uint32_t result = src & 0xffff;
 	if (set_flags)
 		o.do_flags_nz(result);
@@ -238,7 +229,6 @@ uint32_t arcompact_device::handleop32_EXTW_do_op(arcompact_device &o, uint32_t s
 
 uint32_t arcompact_device::handleop32_ABS_do_op(arcompact_device &o, uint32_t src, bool set_flags)
 {
-	
 	uint32_t result;
 	if (src & 0x80000000)
 		result = 0x80000000 - (src & 0x7fffffff);
@@ -274,7 +264,6 @@ uint32_t arcompact_device::handleop32_ABS_do_op(arcompact_device &o, uint32_t sr
 
 uint32_t arcompact_device::handleop32_NOT_do_op(arcompact_device &o, uint32_t src, bool set_flags)
 {
-	
 	uint32_t result = src ^ 0xffffffff;
 	if (set_flags)
 		o.do_flags_nz(result);
@@ -295,7 +284,6 @@ uint32_t arcompact_device::handleop32_NOT_do_op(arcompact_device &o, uint32_t sr
 
 uint32_t arcompact_device::handleop32_RLC_do_op(arcompact_device &o, uint32_t src, bool set_flags)
 {
-	
 	uint32_t result = src << 1;
 	if (o.status32_check_c())
 		result |= 1;

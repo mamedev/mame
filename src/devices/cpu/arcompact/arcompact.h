@@ -734,10 +734,10 @@ private:
 	inline void do_flags_add(uint32_t result, uint32_t b, uint32_t c);
 	inline void do_flags_sub(uint32_t result, uint32_t b, uint32_t c);
 	inline void do_flags_nz(uint32_t result);
-    using ophandler32 = uint32_t (*)(arcompact_device &obj, uint32_t src1, uint32_t src2, bool set_flags);
-    using ophandler32_ff = void (*)(arcompact_device &obj, uint32_t src1, uint32_t src2);
-    using ophandler32_mul = void (*)(arcompact_device &obj, uint32_t src1, uint32_t src2);
-    using ophandler32_sop = uint32_t (*)(arcompact_device &obj, uint32_t src1, bool set_flags);
+	using ophandler32 = uint32_t (*)(arcompact_device &obj, uint32_t src1, uint32_t src2, bool set_flags);
+	using ophandler32_ff = void (*)(arcompact_device &obj, uint32_t src1, uint32_t src2);
+	using ophandler32_mul = void (*)(arcompact_device &obj, uint32_t src1, uint32_t src2);
+	using ophandler32_sop = uint32_t (*)(arcompact_device &obj, uint32_t src1, bool set_flags);
 	inline uint32_t handleop32_general(uint32_t op, ophandler32 ophandler);
 	inline uint32_t handleop32_general_MULx64(uint32_t op, ophandler32_mul ophandler);
 	inline uint32_t handleop32_general_nowriteback_forced_flag(uint32_t op, ophandler32_ff ophandler);
