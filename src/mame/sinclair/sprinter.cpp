@@ -25,6 +25,7 @@ Sprinter Sp2000 (Peters Plus Ltd)
 #include "sound/dac.h"
 
 #include <algorithm>
+#include <queue>
 
 
 #define LOG_IO    (1U << 1)
@@ -109,7 +110,6 @@ protected:
 	void update_cpu();
 
 	TIMER_CALLBACK_MEMBER(irq_on) override;
-	INTERRUPT_GEN_MEMBER(sprinter_int);
 	TIMER_CALLBACK_MEMBER(cbl_tick);
 	TIMER_CALLBACK_MEMBER(wait_exit);
 
@@ -146,15 +146,14 @@ private:
 	u8 dcp_r(offs_t offset);
 	void dcp_w(offs_t offset, u8 data);
 
-	u8 ata_data_r();
-	void ata_data_w(u8 data);
-
 	u8 *m_dcp_location;
 	u8 m_ram_pages[0x40] = {}; // 0xc0 - 0xff
 
 	u16 m_pages[4] = {}; // internal state for faster calculations
 	u8 ram_r(offs_t offset);
 	void ram_w(offs_t offset, u8 data);
+	void vram_w(offs_t offset, u8 data);
+	void update_int(bool recalculate);
 
 	void accel_control_r(u8 data);
 	void accel_r_tap(offs_t offset, u8 &data);
@@ -184,6 +183,7 @@ private:
 
 	bool m_z80_m1;
 	u16 m_timer_overlap;
+	std::queue<std::pair<u16, u16>> m_ints;
 
 	bool m_starting;
 	bool m_dos; // 0-on, 1-off
@@ -207,8 +207,7 @@ private:
 	u8 m_kbd_data_cnt;
 
 	bool m_ata_selected; // 0-primary, 1-secondary
-	bool m_ata_data_flip;
-	u16 m_ata_data_latch;
+	u8 m_ata_data_latch;
 
 	// Accelerator
 	bool m_skip_write;
@@ -294,7 +293,10 @@ void sprinter_state::update_memory()
 
 void sprinter_state::update_cpu()
 {
+	double clock = m_maincpu->clock();
 	m_maincpu->set_clock(X_SP / ((m_turbo && m_turbo_hard) ? 2 : 12)); // 1 - 21MHz, 0 - 3.5MHz
+	clock /= m_maincpu->clock();
+	m_timer_overlap /= clock;
 }
 
 void sprinter_state::sprinter_palette(palette_device &palette) const
@@ -340,33 +342,39 @@ void sprinter_state::screen_update_txt(screen_device &screen, bitmap_ind16 &bitm
 				{
 					if (!BIT(mode[0], 5) && (((a16 & 15) == 8) || (do_init && (a16 & 8))))
 						mode = mode + 1024;
-					attr = m_vram[(mode[2] << 10) | (BIT(mode[0], 0, 4) << 6) | (BIT(m_pn, 3) << 5) | 0b11000 | BIT(mode[0], 6, 2)];
-					symb = m_vram[((mode[1] << 10) | (BIT(mode[0], 0, 4) << 6) | (BIT(m_pn, 3) << 5) | (BIT(mode[0], 6, 2) << 3) | (b8 & 7))];
+
+					if ((mode[0] & 0xfc) == 0xfc) // blank
+						attr = symb = 0;
+					else
+					{
+						attr = m_vram[(mode[2] << 10) | (BIT(mode[0], 0, 4) << 6) | (BIT(m_pn, 3) << 5) | 0b11000 | BIT(mode[0], 6, 2)];
+						symb = m_vram[((mode[1] << 10) | (BIT(mode[0], 0, 4) << 6) | (BIT(m_pn, 3) << 5) | (BIT(mode[0], 6, 2) << 3) | (b8 & 7))];
+					}
 				}
 			}
 
 			if (!BIT(mode[0], 4)) // skip graph block
 			{
-				hpos += 15 - (a16 & 15); // skip to the last of 16px block
+				hpos += 15 - (a16 & 15); // skip to the end of 16px block
 				pix += 16 - (a16 & 15);
 			}
 			else
 			{
-				u16 pal;
-				if (BIT(mode[0], 5, 3) == 7)
+				u16 pal = 0x400;
+				if (~mode[0] & 0xfc) // !blank
 				{
-					if ((mode[0] & 0x0c) == 0x0c)
-						pal = 0x400;
+					if (BIT(mode[0], 5, 3) == 7) // border
+					{
+						if ((mode[0] & 0x0c) != 0x0c)
+							pal = 0x400 | ((m_port_fe_data & 0x07) << 3) | (m_port_fe_data & 0x07);
+					}
 					else
-						pal = 0x400 | ((m_port_fe_data & 0x07) << 3) | (m_port_fe_data & 0x07);
-				}
-				else
-				{
-					const u8 bit = 1 << (7 - ((a16 >> BIT(mode[0], 5)) & 7));
-					pal = attr + 0x400 + 0x100 * bool(symb & bit) + 0x200 * flash;
+					{
+						const u8 bit = 1 << (7 - ((a16 >> BIT(mode[0], 5)) & 7));
+						pal = attr + 0x400 + 0x100 * bool(symb & bit) + 0x200 * flash;
+					}
 				}
 				*pix++ = pal;
-
 			}
 		}
 	}
@@ -427,10 +435,14 @@ u8 sprinter_state::dcp_r(offs_t offset)
 	if ((offset & 0xfe) == 0xee)
 		return 0;
 
-	if (!machine().side_effects_disabled() && ((offset & 0x7f) == 0x7b))
+	if (!machine().side_effects_disabled())
 	{
-		m_cash_on = BIT(offset, 7);
-		update_memory();
+		do_cpu_wait(6);
+		if (((offset & 0x7f) == 0x7b))
+		{
+			m_cash_on = BIT(offset, 7);
+			update_memory();
+		}
 	}
 
 	const u16 dcp_offset = (BIT(m_cnf, 3, 2) << 12) | (0 << 11) | (m_dos << 10) | (1 << 9) | (BIT(offset, 14, 2) << 7) | (BIT(offset, 13) << 4) | (BIT(offset, 7) << 3) | (offset & 0x67);
@@ -463,16 +475,26 @@ u8 sprinter_state::dcp_r(offs_t offset)
 		break;
 
 	case 0x20:
-		data = ata_data_r();
+		if (!machine().side_effects_disabled() && BIT(~offset, 8))
+		{
+			const u16 tmp = m_ata[m_ata_selected]->cs0_r(0);
+			m_ata_data_latch = tmp >> 8;
+			data = tmp;
+		}
+		else
+			data = m_ata_data_latch;
 		break;
 	case 0x21 ... 0x27:
-		data = m_ata[m_ata_selected]->cs0_r(dcpp & 0x07);
+		if (BIT(~offset, 8))
+			data = m_ata[m_ata_selected]->cs0_r(dcpp & 0x07);
 		break;
 	case 0x28:
-		data = m_ata[m_ata_selected]->cs1_r(6);
+		if (BIT(~offset, 8))
+			data = m_ata[m_ata_selected]->cs1_r(6);
 		break;
 	case 0x29:
-		data = m_ata[m_ata_selected]->cs1_r(7);
+		if (BIT(~offset, 8))
+			data = m_ata[m_ata_selected]->cs1_r(7);
 		break;
 
 	case 0x40:
@@ -530,6 +552,8 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 	if (((offset & 0xfe) == 0xee) || m_starting)
 		return;  // see: dcp_r
 
+	do_cpu_wait(6);
+
 	if ((offset & 0xbf) == 0x3c)
 	{
 		m_rom_sys = BIT(~offset, 6);
@@ -578,20 +602,23 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		break;
 
 	case 0x20:
-		ata_data_w(data);
+		if (BIT(offset, 8))
+			m_ata[m_ata_selected]->cs0_w(0, (data << 8) | m_ata_data_latch);
+		else
+			m_ata_data_latch = data;
 		break;
 	case 0x21 ... 0x27:
-		m_ata[m_ata_selected]->cs0_w(dcpp & 0x07, data);
+		if (BIT(offset, 8))
+			m_ata[m_ata_selected]->cs0_w(dcpp & 0x07, data);
 		break;
 	case 0x28:
-		m_ata[m_ata_selected]->cs1_w(6, data);
+		if (BIT(offset, 8))
+			m_ata[m_ata_selected]->cs1_w(6, data);
 		break;
 	case 0x2a: // HDD1 - secondary
-		m_ata_data_flip = false;
 		m_ata_selected = 1;
 		break;
 	case 0x2b: // HDD2 - primary
-		m_ata_data_flip = false;
 		m_ata_selected = 0;
 		break;
 
@@ -661,6 +688,7 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 	case 0xcd:
 		m_screen->update_now();
 		m_rgmod = data;
+		update_int(true);
 		break;
 
 	case 0xc6: // CNF/SYS
@@ -701,31 +729,6 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		LOGIO("IOw: %02X / %X < %x\n", dcpp, offset, data);
 		break;
 	}
-}
-
-u8 sprinter_state::ata_data_r()
-{
-	if (!machine().side_effects_disabled())
-	{
-		m_ata_data_flip ^= true;
-		if (m_ata_data_flip)
-		{
-			const u16 data = m_ata[m_ata_selected]->cs0_r(0);
-			m_ata_data_latch = data >> 8;
-			return data;
-		}
-	}
-
-	return m_ata_data_latch;
-}
-
-void sprinter_state::ata_data_w(u8 data)
-{
-	m_ata_data_flip ^= true;
-	if (m_ata_data_flip)
-		m_ata_data_latch = data;
-	else
-		m_ata[m_ata_selected]->cs0_w(0, (data << 8) | m_ata_data_latch);
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
@@ -899,8 +902,8 @@ void sprinter_state::update_accel_buffer(u8 idx, u8 data)
 u8 sprinter_state::ram_r(offs_t offset)
 {
 	const u8 bank = offset >> 14;
-	if (!machine().side_effects_disabled() && m_turbo)
-		do_cpu_wait(3);
+	if (!machine().side_effects_disabled())
+		do_cpu_wait(6);
 
 	return ((m_pages[bank] & 0xf0) == 0x50)
 		? m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)]
@@ -919,27 +922,14 @@ void sprinter_state::ram_w(offs_t offset, u8 data)
 	const u8 page = m_pages[bank] & 0xff;
 	if ((page & 0xf0) == 0x50)
 	{
-		const u16 vaddr = (offset & 0x03ff);
-		u8* line = m_vram + (m_port_y * 1024);
-
+		const u32 vaddr = m_port_y * 1024 + (offset & 0x3ff);
 		if (BIT(~page, 2))
 		{
-			if (m_turbo)
-				do_cpu_wait(3);
-			m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)] = data;
+			do_cpu_wait(6);
+			m_ram->pointer()[(0x50 << 14) + vaddr] = data;
 		}
 		if (!(BIT(page, 3) && (data == 0xff)))
-		{
-			m_screen->update_now();
-			line[vaddr] = data;
-		}
-
-		if (vaddr >= 0x3e0)
-		{
-			const u8 pal_num = BIT(vaddr, 2, 3);
-			const u16 p_red = 0x3e0 + pal_num * 4;
-			m_palette->set_pen_color(m_port_y + pal_num * 256, rgb_t(line[p_red], line[p_red + 1], line[p_red + 2]));
-		}
+			vram_w(vaddr, data);
 	}
 	else
 	{
@@ -952,9 +942,7 @@ void sprinter_state::ram_w(offs_t offset, u8 data)
 				const bool zxa15 = BIT(offset, 15) ? BIT(m_pg3, 1) : 0; // SP_SA
 				const u8 zxs = m_port_y & 0x3f;
 				const u32 vxa = (BIT(offset, 0, 8) << 10) | (BIT(zxs, 1, 4) << 6) | ((BIT(zxs, 0) ^ zxa15 ^ BIT(offset, 13)) << 5) | BIT(offset, 8, 5);
-
-				m_screen->update_now();
-				m_vram[vxa] = data;
+				vram_w(vxa, data);
 			}
 		}
 		else if ((m_accel_state != OFF) && (page == 0xfd))
@@ -974,15 +962,55 @@ void sprinter_state::ram_w(offs_t offset, u8 data)
 			}
 		}
 
-		if (m_turbo)
-			do_cpu_wait(3);
+		do_cpu_wait(6);
 		reinterpret_cast<u8 *>(m_bank_ram[bank]->base())[offset & 0x3fff] = data;
+	}
+}
+
+void sprinter_state::vram_w(offs_t offset, u8 data)
+{
+	m_screen->update_now();
+	const u16 laddr = offset & 0x3ff;
+	const bool is_int_updated = (laddr >= 0x300) && (laddr < 0x3a0) && ((offset & 0x403) == 0x400) && (((m_vram[offset] & 0xfc) == 0xfc) || ((data & 0xfc) == 0xfc)) && (m_vram[offset] ^ data);
+	m_vram[offset] = data;
+	if (is_int_updated)
+		update_int(true);
+	else if (laddr >= 0x3e0)
+	{
+		const u16 pen = BIT(offset, 2, 3) * 256 + (offset >> 10);
+		const u32 p_red = offset & ~0x3;
+		m_palette->set_pen_color(pen, rgb_t(m_vram[p_red], m_vram[p_red + 1], m_vram[p_red + 2]));
+	}
+}
+
+void sprinter_state::update_int(bool recalculate)
+{
+	if (recalculate)
+	{
+		m_ints = {};
+		for (auto a = 0; a <= 55; a++)
+		{
+			const u8* la = m_vram + (1 + 2 * a + 0x80 * (m_rgmod & 1)) * 1024 + 0x300;
+			for (auto b = 0; b <= 39; b++)
+			{
+				if ((*la & 0xfd) == 0xfd)
+					m_ints.push({b * 8 + 23, a * 16 + 112});
+				la += 4;
+			}
+		}
+	}
+
+	if (!m_ints.empty())
+	{
+		std::pair<u16, u16> next = m_ints.front();
+		m_ints.pop();
+		m_irq_on_timer->adjust(m_screen->time_until_pos(next.first, next.second));
+		m_ints.push(next);
 	}
 }
 
 u8 sprinter_state::m1_r(offs_t offset)
 {
-	do_cpu_wait(0); // adjust remaining
 	m_z80_m1 = 1;
 	u8 data = m_program.read_byte(offset);
 	m_z80_m1 = 0;
@@ -1122,7 +1150,6 @@ void sprinter_state::machine_reset()
 	m_cbl_wa = 0;
 
 	m_ata_selected = 0;
-	m_ata_data_flip = false;
 
 	m_kbd_data_cnt = 0;
 	m_turbo_hard = 1;
@@ -1169,13 +1196,16 @@ void sprinter_state::on_kbd_data(int state)
 		m_kbd_data_cnt++;
 		m_kbd_data_cnt %= 11;
 		if (!m_kbd_data_cnt)
-			irq_on(0);
+		{
+			m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+			m_irq_off_timer->adjust(attotime::from_hz(3.5_MHz_XTAL / 32));
+		}
 	}
 }
 
 void sprinter_state::do_cpu_wait(u8 count)
 {
-	m_timer_overlap += count;
+	m_timer_overlap += (m_turbo && m_turbo_hard) ? count : 0;
 	const s32 allowed = std::min<s32>(m_timer_overlap, m_maincpu->cycles_remaining() - 3);
 	if (allowed > 0)
 	{
@@ -1192,13 +1222,8 @@ void sprinter_state::do_cpu_wait(u8 count)
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_on)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	m_irq_off_timer->adjust(attotime::from_hz(3.5_MHz_XTAL / 32));
-}
-
-INTERRUPT_GEN_MEMBER(sprinter_state::sprinter_int)
-{
-	// Pentagon's INT for now
-	m_irq_on_timer->adjust(attotime(0, m_screen->time_until_pos(287, 375 * 2 + 1).as_attoseconds()));
+	m_irq_off_timer->adjust(m_maincpu->cycles_to_attotime(m_timer_overlap) + attotime::from_hz(3.5_MHz_XTAL / 32));
+	update_int(false);
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::wait_exit)
@@ -1231,7 +1256,7 @@ INPUT_PORTS_START( sprinter )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
 
 	PORT_START("TURBO")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Turbo") PORT_CODE(KEYCODE_F11) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, sprinter_state, turbo_changed, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Turbo") PORT_CODE(KEYCODE_F12) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, sprinter_state, turbo_changed, 0)
 INPUT_PORTS_END
 
 void sprinter_state::sprinter(machine_config &config)
@@ -1245,7 +1270,6 @@ void sprinter_state::sprinter(machine_config &config)
 	m_maincpu->set_m1_map(&sprinter_state::map_fetch);
 	m_maincpu->set_memory_map(&sprinter_state::map_mem);
 	m_maincpu->set_io_map(&sprinter_state::map_io);
-	m_maincpu->set_vblank_int("screen", FUNC(sprinter_state::sprinter_int));
 	m_maincpu->nomreq_cb().set_nop();
 	m_maincpu->irqack_cb().set([this](int){ m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); });
 
