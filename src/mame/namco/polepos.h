@@ -5,8 +5,8 @@
     Pole Position hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_POLEPOS_H
-#define MAME_INCLUDES_POLEPOS_H
+#ifndef MAME_NAMCO_POLEPOS_H
+#define MAME_NAMCO_POLEPOS_H
 
 #pragma once
 
@@ -134,4 +134,4 @@ private:
 	void z80_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_POLEPOS_H
+#endif // MAME_NAMCO_POLEPOS_H

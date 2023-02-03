@@ -5,8 +5,8 @@
   Nintendo Donkey Kong hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_DKONG_H
-#define MAME_INCLUDES_DKONG_H
+#ifndef MAME_NINTENDO_DKONG_H
+#define MAME_NINTENDO_DKONG_H
 
 #pragma once
 
@@ -133,7 +133,6 @@ public:
 	void ddk_braze(machine_config &config);
 	void dk3_braze(machine_config &config);
 	void strtheat(machine_config &config);
-	void spclforc(machine_config &config);
 	void s2650(machine_config &config);
 	void dkongjr(machine_config &config);
 	void radarscp1(machine_config &config);
@@ -162,7 +161,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(dk_braze_a15);
 
-private:
+protected:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<mcs48_cpu_device> m_soundcpu;
@@ -255,6 +254,7 @@ private:
 	memory_bank_creator m_bank2;
 	memory_passthrough_handler m_dkong3_tap[2];
 
+private:
 	uint8_t hb_dma_read_byte(offs_t offset);
 	void hb_dma_write_byte(offs_t offset, uint8_t data);
 	void dkong3_coin_counter_w(offs_t offset, uint8_t data);
@@ -309,7 +309,6 @@ private:
 	void dkong_p1_w(uint8_t data);
 	uint32_t screen_update_dkong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pestplce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_spclforc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(s2650_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
@@ -337,7 +336,7 @@ private:
 	void s2650_io_map(address_map &map);
 	void s2650_map(address_map &map);
 
-private:
+protected:
 	// video/dkong.c
 	void radarscp_step(int line_cnt);
 	void radarscp_scanline(int scanline);
@@ -346,4 +345,20 @@ private:
 	void radarscp_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-#endif // MAME_INCLUDES_DKONG_H
+class spclforc_state : public dkong_state
+{
+public:
+	spclforc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: dkong_state(mconfig, type, tag)
+	{
+	}
+
+	void spclforc(machine_config &config);
+
+private:
+	void data_map(address_map &map);
+
+	uint32_t screen_update_spclforc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+};
+
+#endif // MAME_NINTENDO_DKONG_H

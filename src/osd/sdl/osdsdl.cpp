@@ -134,23 +134,22 @@ void osd_sdl_info()
 }
 
 
-std::shared_ptr<sdl_window_info> window_from_id(Uint32 id)
+sdl_window_info *window_from_id(Uint32 id)
 {
 	SDL_Window const *const sdl_window = SDL_GetWindowFromID(id);
 
-	auto &windows = osd_common_t::s_window_list;
 	auto const window = std::find_if(
-			windows.begin(),
-			windows.end(),
-			[sdl_window] (std::shared_ptr<osd_window> w)
+			osd_common_t::window_list().begin(),
+			osd_common_t::window_list().end(),
+			[sdl_window] (std::unique_ptr<osd_window> const &w)
 			{
-				return std::static_pointer_cast<sdl_window_info>(w)->platform_window() == sdl_window;
+				return dynamic_cast<sdl_window_info &>(*w).platform_window() == sdl_window;
 			});
 
-	if (window == windows.end())
+	if (window == osd_common_t::window_list().end())
 		return nullptr;
 
-	return std::static_pointer_cast<sdl_window_info>(*window);
+	return &static_cast<sdl_window_info &>(**window);
 }
 
 } // anonymous namespace
@@ -164,7 +163,7 @@ std::shared_ptr<sdl_window_info> window_from_id(Uint32 id)
 sdl_osd_interface::sdl_osd_interface(sdl_options &options) :
 	osd_common_t(options),
 	m_options(options),
-	m_focus_window(),
+	m_focus_window(nullptr),
 	m_mouse_over_window(0),
 	m_modifier_keys(0),
 	m_last_click_time(std::chrono::steady_clock::time_point::min()),
@@ -422,18 +421,6 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 }
 
 
-void sdl_osd_interface::video_register()
-{
-	video_options_add("soft", nullptr);
-	video_options_add("accel", nullptr);
-#if USE_OPENGL
-	video_options_add("opengl", nullptr);
-#endif
-	video_options_add("bgfx", nullptr);
-	//video_options_add("auto", nullptr); // making d3d video default one
-}
-
-
 void sdl_osd_interface::poll_inputs()
 {
 	m_keyboard_input->poll_if_necessary();
@@ -501,21 +488,21 @@ void sdl_osd_interface::process_events()
 			if (event.key.keysym.sym < 0x20)
 			{
 				// push control characters - they don't arrive as text input events
-				machine().ui_input().push_char_event(osd_common_t::s_window_list.front()->target(), event.key.keysym.sym);
+				machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), event.key.keysym.sym);
 			}
 			else if (m_modifier_keys & MODIFIER_KEY_CTRL)
 			{
 				// SDL filters out control characters for text input, so they are decoded here
 				if (event.key.keysym.sym >= 0x40 && event.key.keysym.sym < 0x7f)
 				{
-					machine().ui_input().push_char_event(osd_common_t::s_window_list.front()->target(), event.key.keysym.sym & 0x1f);
+					machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), event.key.keysym.sym & 0x1f);
 				}
 				else if (m_modifier_keys & MODIFIER_KEY_SHIFT)
 				{
 					if (event.key.keysym.sym == SDLK_6) // Ctrl-^ (RS)
-						machine().ui_input().push_char_event(osd_common_t::s_window_list.front()->target(), 0x1e);
+						machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), 0x1e);
 					else if (event.key.keysym.sym == SDLK_MINUS) // Ctrl-_ (US)
-						machine().ui_input().push_char_event(osd_common_t::s_window_list.front()->target(), 0x1f);
+						machine().ui_input().push_char_event(osd_common_t::window_list().front()->target(), 0x1f);
 				}
 			}
 			break;
@@ -688,7 +675,7 @@ void sdl_osd_interface::process_textinput_event(SDL_Event const &event)
 	if (*event.text.text)
 	{
 		auto const window = focus_window(event.text);
-		//printf("Focus window is %p - wl %p\n", window, osd_common_t::s_window_list);
+		//printf("Focus window is %p - wl %p\n", window, osd_common_t::window_list().front().get());
 		if (window != nullptr)
 		{
 			auto ptr = event.text.text;
@@ -716,11 +703,14 @@ void sdl_osd_interface::check_osd_inputs()
 	// check for toggling fullscreen mode
 	if (machine().ui_input().pressed(IPT_OSD_1))
 	{
-		for (auto curwin : osd_common_t::s_window_list)
-			std::static_pointer_cast<sdl_window_info>(curwin)->toggle_full_screen();
+		// destroy the renderers first so that the render module can bounce if it depends on having a window handle
+		for (auto it = osd_common_t::window_list().rbegin(); osd_common_t::window_list().rend() != it; ++it)
+			(*it)->renderer_reset();
+		for (auto const &curwin : osd_common_t::window_list())
+			dynamic_cast<sdl_window_info &>(*curwin).toggle_full_screen();
 	}
 
-	auto window = osd_common_t::s_window_list.front();
+	auto const &window = osd_common_t::window_list().front();
 
 	if (USE_OPENGL)
 	{
@@ -733,10 +723,10 @@ void sdl_osd_interface::check_osd_inputs()
 	}
 
 	if (machine().ui_input().pressed(IPT_OSD_6))
-		std::static_pointer_cast<sdl_window_info>(window)->modify_prescale(-1);
+		dynamic_cast<sdl_window_info &>(*window).modify_prescale(-1);
 
 	if (machine().ui_input().pressed(IPT_OSD_7))
-		std::static_pointer_cast<sdl_window_info>(window)->modify_prescale(1);
+		dynamic_cast<sdl_window_info &>(*window).modify_prescale(1);
 
 	if (machine().ui_input().pressed(IPT_OSD_8))
 		window->renderer().record();
@@ -748,7 +738,7 @@ sdl_window_info *sdl_osd_interface::focus_window(T const &event) const
 {
 	// FIXME: SDL does not properly report the window for certain OS.
 	if (false)
-		return window_from_id(event.windowID).get();
+		return window_from_id(event.windowID);
 	else
-		return m_focus_window.get();
+		return m_focus_window;
 }

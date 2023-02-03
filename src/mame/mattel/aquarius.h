@@ -5,8 +5,8 @@
  * includes/aquarius.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_AQUARIUS_H
-#define MAME_INCLUDES_AQUARIUS_H
+#ifndef MAME_MATTEL_AQUARIUS_H
+#define MAME_MATTEL_AQUARIUS_H
 
 #pragma once
 
@@ -95,4 +95,4 @@ private:
 	void aquarius_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_AQUARIUS_H
+#endif // MAME_MATTEL_AQUARIUS_H

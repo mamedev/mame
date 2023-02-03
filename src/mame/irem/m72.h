@@ -5,8 +5,8 @@
     Irem M72 hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_M72_H
-#define MAME_INCLUDES_M72_H
+#ifndef MAME_IREM_M72_H
+#define MAME_IREM_M72_H
 
 #pragma once
 
@@ -263,4 +263,4 @@ private:
 	void xmultiplm72_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_M72_H
+#endif // MAME_IREM_M72_H

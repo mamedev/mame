@@ -5,8 +5,8 @@
     Atari "Round" hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_RELIEF_H
-#define MAME_INCLUDES_RELIEF_H
+#ifndef MAME_ATARI_RELIEF_H
+#define MAME_ATARI_RELIEF_H
 
 #pragma once
 
@@ -63,4 +63,4 @@ private:
 	static const atari_motion_objects_config s_mob_config;
 };
 
-#endif // MAME_INCLUDES_RELIEF_H
+#endif // MAME_ATARI_RELIEF_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Paul Priest
-#ifndef MAME_INCLUDES_PSIKYOSH_H
-#define MAME_INCLUDES_PSIKYOSH_H
+#ifndef MAME_PSIKYO_PSIKYOSH_H
+#define MAME_PSIKYO_PSIKYOSH_H
 
 #pragma once
 
@@ -129,4 +129,4 @@ private:
 	void s1945iiibl_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_PSIKYOSH_H
+#endif // MAME_PSIKYO_PSIKYOSH_H

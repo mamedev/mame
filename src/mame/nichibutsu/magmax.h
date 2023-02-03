@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
-#ifndef MAME_INCLUDES_MAGMAX_H
-#define MAME_INCLUDES_MAGMAX_H
+#ifndef MAME_NICHIBUTSU_MAGMAX_H
+#define MAME_NICHIBUTSU_MAGMAX_H
 
 #pragma once
 
@@ -82,4 +82,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MAGMAX_H
+#endif // MAME_NICHIBUTSU_MAGMAX_H

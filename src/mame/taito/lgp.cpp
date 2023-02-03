@@ -72,6 +72,8 @@ Dumping Notes:
 #include "speaker.h"
 
 
+namespace {
+
 class lgp_state : public driver_device
 {
 public:
@@ -608,6 +610,9 @@ ROM_END
 void lgp_state::init_lgp()
 {
 }
+
+} // anonymous namespace
+
 
 /*    YEAR  NAME PARENT   MACHINE INPUT STATE      INIT      MONITOR  COMPANY   FULLNAME                         FLAGS) */
 GAME( 1983, lgp, 0,       lgp,    lgp,  lgp_state, init_lgp, ROT0,    "Taito",  "Laser Grand Prix",              MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

@@ -34,6 +34,9 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class irisha_state : public driver_device
 {
 public:
@@ -427,6 +430,9 @@ ROM_START( irisha )
 	ROM_LOAD( "ir_bootm.bin", 0x0000, 0x2000, CRC(7f9f4f0e) SHA1(05f97e1a1d7a15f4451129dba6c0bddc87ea748e))
 	ROM_LOAD( "ir_conou.bin", 0x2000, 0x2000, CRC(bf92beed) SHA1(696c482ba53bc6261db11061ecc7141c67f1d820))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME  FLAGS

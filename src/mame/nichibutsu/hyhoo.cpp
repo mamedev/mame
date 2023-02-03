@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
+
 /******************************************************************************
 
     Game Driver for Nichibutsu Mahjong series.
@@ -17,29 +18,329 @@
 Memo:
 
 - Some games display "GFXROM BANK OVER!!" or "GFXROM ADDRESS OVER!!"
-  in Debug build.
+  if logging is enabled.
 
 - Screen flip is not perfect.
 
 ******************************************************************************/
 
 #include "emu.h"
-#include "hyhoo.h"
+
+#include "nb1413m3.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+
+#include "screen.h"
 #include "speaker.h"
 
 
-void hyhoo_state::hyhoo_map(address_map &map)
+// configurable logging
+#define LOG_ROMSEL     (1U << 1)
+#define LOG_GFXROMBANK (1U << 2)
+#define LOG_GFXROMADDR (1U << 3)
+
+//#define VERBOSE (LOG_GENERAL | LOG_ROMSEL | GFXROMBANK | GFXROMADDR)
+
+#include "logmacro.h"
+
+#define LOGROMSEL(...)     LOGMASKED(LOG_ROMSEL,     __VA_ARGS__)
+#define LOGGFXROMBANK(...) LOGMASKED(LOG_GFXROMBANK, __VA_ARGS__)
+#define LOGGFXROMADDR(...) LOGMASKED(LOG_GFXROMADDR, __VA_ARGS__)
+
+
+namespace {
+
+class hyhoo_state : public driver_device
+{
+public:
+	hyhoo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_nb1413m3(*this, "nb1413m3"),
+		m_screen(*this, "screen"),
+		m_blitter_rom(*this, "blitter"),
+		m_clut(*this, "clut") { }
+
+	void hyhoo(machine_config &config);
+	void hyhoo2(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<nb1413m3_device> m_nb1413m3;
+	required_device<screen_device> m_screen;
+	required_region_ptr<uint8_t> m_blitter_rom;
+	required_shared_ptr<uint8_t> m_clut;
+
+	uint8_t m_blitter_destx = 0;
+	uint8_t m_blitter_desty = 0;
+	uint8_t m_blitter_sizex = 0;
+	uint8_t m_blitter_sizey = 0;
+	uint16_t m_blitter_src_addr = 0;
+	uint8_t m_blitter_direction_x = 0;
+	uint8_t m_blitter_direction_y = 0;
+	uint8_t m_gfxrom = 0;
+	uint8_t m_dispflag = 0;
+	uint8_t m_highcolorflag = 0;
+	uint8_t m_flipscreen = 0;
+	bitmap_rgb32 m_tmpbitmap{};
+	emu_timer *m_blitter_timer = nullptr;
+
+	void blitter_w(offs_t offset, uint8_t data);
+	void romsel_w(uint8_t data);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void gfxdraw();
+
+	void io_map(address_map &map);
+	void program_map(address_map &map);
+
+	TIMER_CALLBACK_MEMBER(clear_busy_flag);
+};
+
+
+// video
+
+void hyhoo_state::blitter_w(offs_t offset, uint8_t data)
+{
+	switch (offset)
+	{
+		case 0x00:  m_blitter_src_addr = (m_blitter_src_addr & 0xff00) | data;
+					m_nb1413m3->gfxradr_l_w(data); break;
+		case 0x01:  m_blitter_src_addr = (m_blitter_src_addr & 0x00ff) | (data << 8);
+					m_nb1413m3->gfxradr_h_w(data); break;
+		case 0x02:  m_blitter_destx = data; break;
+		case 0x03:  m_blitter_desty = data; break;
+		case 0x04:  m_blitter_sizex = data; break;
+		case 0x05:  m_blitter_sizey = data;
+					// writing here also starts the blit
+					gfxdraw();
+					break;
+		case 0x06:  m_blitter_direction_x = (data >> 0) & 0x01;
+					m_blitter_direction_y = (data >> 1) & 0x01;
+					m_flipscreen = (~data >> 2) & 0x01;
+					m_dispflag = (~data >> 3) & 0x01;
+					break;
+		case 0x07:  break;
+	}
+}
+
+
+void hyhoo_state::romsel_w(uint8_t data)
+{
+	m_gfxrom = (((data & 0xc0) >> 4) + (data & 0x03));
+	m_highcolorflag = data;
+	m_nb1413m3->gfxrombank_w(data);
+
+	if ((0x20000 * m_gfxrom) >= m_blitter_rom.length())
+	{
+		LOGGFXROMBANK("GFXROM BANK OVER!!");
+
+		m_gfxrom &= (m_blitter_rom.length() / 0x20000 - 1);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(hyhoo_state::clear_busy_flag)
+{
+	m_nb1413m3->busyflag_w(1);
+}
+
+void hyhoo_state::gfxdraw()
+{
+	int sizex, sizey;
+	int skipx, skipy;
+
+	m_nb1413m3->m_busyctr = 0;
+
+	m_gfxrom |= ((m_nb1413m3->m_sndrombank1 & 0x02) << 3);
+
+	int const startx = m_blitter_destx + m_blitter_sizex;
+	int const starty = m_blitter_desty + m_blitter_sizey;
+
+	if (m_blitter_direction_x)
+	{
+		sizex = m_blitter_sizex ^ 0xff;
+		skipx = 1;
+	}
+	else
+	{
+		sizex = m_blitter_sizex;
+		skipx = -1;
+	}
+
+	if (m_blitter_direction_y)
+	{
+		sizey = m_blitter_sizey ^ 0xff;
+		skipy = 1;
+	}
+	else
+	{
+		sizey = m_blitter_sizey;
+		skipy = -1;
+	}
+
+	int gfxaddr = (m_gfxrom << 17) + (m_blitter_src_addr << 1);
+
+	for (int y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)
+	{
+		for (int x = startx, ctrx = sizex; ctrx >= 0; x += skipx, ctrx--)
+		{
+			if (gfxaddr >= m_blitter_rom.length())
+			{
+				LOGGFXROMADDR("GFXROM ADDRESS OVER!!");
+
+				gfxaddr = 0;
+			}
+
+			uint8_t const color = m_blitter_rom[gfxaddr++];
+
+			int const dx1 = (2 * x + 0) & 0x1ff;
+			int const dx2 = (2 * x + 1) & 0x1ff;
+			int const dy = y & 0xff;
+
+			if (m_highcolorflag & 0x04)
+			{
+				// direct mode
+
+				if (color != 0xff)
+				{
+					if (m_highcolorflag & 0x20)
+					{
+						// least significant bits
+
+						// src xxxxxxxx_bbbggrrr
+						// dst xxbbbxxx_ggxxxrrr
+
+						int const r = ((color & 0x07) >> 0) & 0x07;
+						int const g = ((color & 0x18) >> 3) & 0x03;
+						int const b = ((color & 0xe0) >> 5) & 0x07;
+
+						pen_t const pen = rgb_t(pal6bit(r), pal5bit(g), pal5bit(b));
+
+						m_tmpbitmap.pix(dy, dx1) |= pen;
+						m_tmpbitmap.pix(dy, dx2) |= pen;
+					}
+					else
+					{
+						// most significant bits
+
+						// src xxxxxxxx_bbgggrrr
+						// dst bbxxxggg_xxrrrxxx
+
+						int const r = ((color & 0x07) >> 0) & 0x07;
+						int const g = ((color & 0x38) >> 3) & 0x07;
+						int const b = ((color & 0xc0) >> 6) & 0x03;
+
+						pen_t const pen = rgb_t(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
+
+						m_tmpbitmap.pix(dy, dx1) = pen;
+						m_tmpbitmap.pix(dy, dx2) = pen;
+					}
+				}
+			}
+			else
+			{
+				// lookup table mode
+				uint8_t color1, color2;
+
+				if (m_blitter_direction_x)
+				{
+					// flip
+					color1 = (color & 0x0f) >> 0;
+					color2 = (color & 0xf0) >> 4;
+				}
+				else
+				{
+					// normal
+					color1 = (color & 0xf0) >> 4;
+					color2 = (color & 0x0f) >> 0;
+				}
+
+				if (m_clut[color1])
+				{
+					// src xxxxxxxx_bbgggrrr
+					// dst bbxxxggg_xxrrrxxx
+
+					int const r = ((~m_clut[color1] & 0x07) >> 0) & 0x07;
+					int const g = ((~m_clut[color1] & 0x38) >> 3) & 0x07;
+					int const b = ((~m_clut[color1] & 0xc0) >> 6) & 0x03;
+
+					pen_t const pen = rgb_t(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
+
+					m_tmpbitmap.pix(dy, dx1) = pen;
+				}
+
+				if (m_clut[color2])
+				{
+					// src xxxxxxxx_bbgggrrr
+					// dst bbxxxggg_xxrrrxxx
+
+					int const r = ((~m_clut[color2] & 0x07) >> 0) & 0x07;
+					int const g = ((~m_clut[color2] & 0x38) >> 3) & 0x07;
+					int const b = ((~m_clut[color2] & 0xc0) >> 6) & 0x03;
+
+					pen_t const pen = rgb_t(pal6bit(r << 3), pal5bit(g << 2), pal5bit(b << 3));
+
+					m_tmpbitmap.pix(dy, dx2) = pen;
+				}
+			}
+
+			m_nb1413m3->m_busyctr++;
+		}
+	}
+
+	m_nb1413m3->busyflag_w(0);
+	m_blitter_timer->adjust(attotime::from_hz(400000) * m_nb1413m3->m_busyctr);
+}
+
+
+void hyhoo_state::video_start()
+{
+	m_blitter_timer = timer_alloc(FUNC(hyhoo_state::clear_busy_flag), this);
+
+	m_screen->register_screen_bitmap(m_tmpbitmap);
+	save_item(NAME(m_blitter_destx));
+	save_item(NAME(m_blitter_desty));
+	save_item(NAME(m_blitter_sizex));
+	save_item(NAME(m_blitter_sizey));
+	save_item(NAME(m_blitter_src_addr));
+	save_item(NAME(m_blitter_direction_x));
+	save_item(NAME(m_blitter_direction_y));
+	save_item(NAME(m_gfxrom));
+	save_item(NAME(m_dispflag));
+	save_item(NAME(m_highcolorflag));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_tmpbitmap));
+
+	m_blitter_src_addr = 0;
+}
+
+
+uint32_t hyhoo_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	if (m_dispflag)
+		copybitmap(bitmap, m_tmpbitmap, m_flipscreen, m_flipscreen, 0, 0, cliprect);
+	else
+		bitmap.fill(rgb_t::black(), cliprect);
+
+	return 0;
+}
+
+
+// machine
+
+void hyhoo_state::program_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
 	map(0xf000, 0xffff).ram().share("nvram");
 }
 
-void hyhoo_state::hyhoo_io_map(address_map &map)
+void hyhoo_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 //  map(0x00, 0x00).w(m_nb1413m3, FUNC(nb1413m3_device::nmi_clock_w));
@@ -47,12 +348,12 @@ void hyhoo_state::hyhoo_io_map(address_map &map)
 	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x82, 0x83).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x90, 0x90).portr("SYSTEM");
-	map(0x90, 0x97).w(FUNC(hyhoo_state::hyhoo_blitter_w));
+	map(0x90, 0x97).w(FUNC(hyhoo_state::blitter_w));
 	map(0xa0, 0xa0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport1_r), FUNC(nb1413m3_device::inputportsel_w));
 	map(0xb0, 0xb0).rw(m_nb1413m3, FUNC(nb1413m3_device::inputport2_r), FUNC(nb1413m3_device::sndrombank1_w));
-	map(0xc0, 0xcf).writeonly().share("clut");
+	map(0xc0, 0xcf).writeonly().share(m_clut);
 	map(0xd0, 0xd0).nopr().w("dac", FUNC(dac_byte_interface::data_w));     // unknown read
-	map(0xe0, 0xe0).w(FUNC(hyhoo_state::hyhoo_romsel_w));
+	map(0xe0, 0xe0).w(FUNC(hyhoo_state::romsel_w));
 	map(0xe0, 0xe1).r(m_nb1413m3, FUNC(nb1413m3_device::gfxrom_r));
 	map(0xf0, 0xf0).r(m_nb1413m3, FUNC(nb1413m3_device::dipsw1_r));
 //  map(0xf0, 0xf0).nopw();
@@ -222,28 +523,29 @@ INPUT_PORTS_END
 
 void hyhoo_state::hyhoo(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 5000000);   /* 5.00 MHz ?? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &hyhoo_state::hyhoo_map);
-	m_maincpu->set_addrmap(AS_IO, &hyhoo_state::hyhoo_io_map);
+	// basic machine hardware
+	Z80(config, m_maincpu, 5'000'000);   // 5.00 MHz ??
+	m_maincpu->set_addrmap(AS_PROGRAM, &hyhoo_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &hyhoo_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(hyhoo_state::irq0_line_hold));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);
 	m_screen->set_visarea(0, 512-1, 16, 240-1);
-	m_screen->set_screen_update(FUNC(hyhoo_state::screen_update_hyhoo));
+	m_screen->set_screen_update(FUNC(hyhoo_state::screen_update));
 
-	NB1413M3(config, m_nb1413m3, 0, NB1413M3_HYHOO);
+	NB1413M3(config, m_nb1413m3, 0, nb1413m3_device::NB1413M3_HYHOO);
+	m_nb1413m3->set_blitter_rom_tag("blitter");
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 1250000));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1'250'000));
 	aysnd.port_a_read_callback().set_ioport("DSWA");
 	aysnd.port_b_read_callback().set_ioport("DSWB");
 	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.35);
@@ -255,18 +557,18 @@ void hyhoo_state::hyhoo(machine_config &config)
 void hyhoo_state::hyhoo2(machine_config &config)
 {
 	hyhoo(config);
-	m_nb1413m3->set_type(NB1413M3_HYHOO2);
+	m_nb1413m3->set_type(nb1413m3_device::NB1413M3_HYHOO2);
 }
 
 
 ROM_START( hyhoo )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hyhoo.1",     0x00000, 0x08000, CRC(c2852861) SHA1(ad23d8f5b196f15f863862010c8fb0dc4c072172) )
 
-	ROM_REGION( 0x10000, "voice", 0 ) /* voice */
+	ROM_REGION( 0x10000, "voice", 0 )
 	ROM_LOAD( "hyhoo.2",     0x00000, 0x10000, CRC(1fffcc84) SHA1(b95b5f143f5314c7ef09a60051b6ad5b5779de4c) )
 
-	ROM_REGION( 0x380000, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x380000, "blitter", 0 )
 	ROM_LOAD( "hy1506-1.1i", 0x000000, 0x80000, CRC(42c9fa34) SHA1(dec70c7b52cdd08f0719436ab4ad143253fb9f55) )
 	ROM_LOAD( "hy1506-1.2i", 0x080000, 0x80000, CRC(4c14972f) SHA1(fcfb5a961f855476ac3c9009388cb6af5e93a3a7) )
 	ROM_LOAD( "hy1506-1.3i", 0x100000, 0x80000, CRC(4a18c783) SHA1(34844a95a893d5026331c67584a04f68db7d8b50) )
@@ -275,14 +577,14 @@ ROM_START( hyhoo )
 ROM_END
 
 ROM_START( hyhoo2 )
-	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hyhoo2.2",    0x00000, 0x08000, CRC(d8733cdc) SHA1(e683e3a799ed06fb5d4149e1ba76ebd6828b6369) )
 	ROM_LOAD( "hyhoo2.1",    0x08000, 0x08000, CRC(4a1d9493) SHA1(ee9288e9cb1f681216a98fb31539cb75b4548935) )
 
-	ROM_REGION( 0x10000, "voice", 0 ) /* voice */
+	ROM_REGION( 0x10000, "voice", 0 )
 	ROM_LOAD( "hyhoo2.3",    0x00000, 0x10000, CRC(d7e82b23) SHA1(41b9fa943ec1fc80b5f31aad62b5975485fa1742) )
 
-	ROM_REGION( 0x380000, "gfx1", 0 ) /* gfx */
+	ROM_REGION( 0x380000, "blitter", 0 )
 	ROM_LOAD( "hy1506-1.1i", 0x000000, 0x80000, CRC(42c9fa34) SHA1(dec70c7b52cdd08f0719436ab4ad143253fb9f55) )
 	ROM_LOAD( "hy1506-1.2i", 0x080000, 0x80000, CRC(4c14972f) SHA1(fcfb5a961f855476ac3c9009388cb6af5e93a3a7) )
 	ROM_LOAD( "hy1506-1.3i", 0x100000, 0x80000, CRC(4a18c783) SHA1(34844a95a893d5026331c67584a04f68db7d8b50) )
@@ -301,6 +603,8 @@ ROM_START( hyhoo2 )
 	ROM_LOAD( "hyhoo2.s12",  0x2b0000, 0x10000, CRC(92a07b8a) SHA1(0528e809159d1b3f18fe3c75e5fbc789eb985cbf) )
 ROM_END
 
+} // anonymous namespace
 
-GAME( 1987, hyhoo,  0, hyhoo,  hyhoo,  hyhoo_state, empty_init, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo (Japan)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1987, hyhoo,  0, hyhoo,  hyhoo,  hyhoo_state, empty_init, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo (Japan)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1987, hyhoo2, 0, hyhoo2, hyhoo2, hyhoo_state, empty_init, ROT90, "Nichibutsu", "Hayaoshi Taisen Quiz Hyhoo 2 (Japan)", MACHINE_SUPPORTS_SAVE )

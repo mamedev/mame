@@ -16247,6 +16247,7 @@ astrof2                         // (c) [1980?]
 astrof3                         // (c) [1980?]
 astroff                         // bootleg (Famaresa)
 astroff2                        // bootleg (Famaresa)
+satsf3d                         //
 spfghmk2                        // (c) [1979] Data East Corporation
 spfghmk22                       // (c) [1979] Data East Corporation
 sstarbtl                        // bootleg
@@ -28655,6 +28656,7 @@ goldenchip                      // (c) 19?? SegaSA / Sonic
 @source:misc/discoboy.cpp
 discoboy                        // (c) 1993 Soft Art Co.
 discoboyp                       // (c) 1993 Soft Art Co. (Promat license?)
+djgirl
 
 @source:misc/dmainevent.cpp
 dmainevent                      // (c) 1983 Destron
@@ -32422,6 +32424,7 @@ tekken2a                        // 1995.08 Tekken 2 (World, TES2/VER.A)
 tekken2b                        // 1995.09 Tekken 2 Ver.B (World, TES2/VER.B)
 tekken2jb                       // 1995.09 Tekken 2 Ver.B (Japan, TES1/VER.B)
 tekken2jc                       // 1995.11 Tekken 2 Ver.B (Japan, TES1/VER.C)
+tekken2ua                       // 1995.08 Tekken 2 (US, TES3/VER.A)
 tekken2ub                       // 1995.09 Tekken 2 Ver.B (US, TES3/VER.B)
 tekkenac                        // 1995.01 Tekken (Asia, TE4/VER.C)
 tekkenb                         // 1994.12 Tekken (World, TE2/VER.B)
@@ -33510,6 +33513,9 @@ cham24                          // 2002
 
 @source:nintendo/compmahj.cpp
 compmahj                        // 1983 Nintendo Computer Mah-jong Yakuman
+
+@source:nintendo/cothello.cpp
+cothello
 
 @source:nintendo/dkong.cpp
 8ballact                        // (c) 1984 Seatongrove Ltd (Magic Eletronics USA license)

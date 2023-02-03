@@ -13,12 +13,16 @@
 
 #include "statereader.h"
 
+#include <memory>
+#include <string>
+
+
 class bgfx_uniform;
 
 class uniform_reader : public state_reader
 {
 public:
-	static bgfx_uniform* read_from_value(const Value& value, const std::string &prefix);
+	static std::unique_ptr<bgfx_uniform> read_from_value(const Value& value, const std::string &prefix);
 
 private:
 	static bool validate_parameters(const Value& value, const std::string &prefix);

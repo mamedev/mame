@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
-#ifndef MAME_INCLUDES_DJMAIN_H
-#define MAME_INCLUDES_DJMAIN_H
+#ifndef MAME_KONAMI_DJMAIN_H
+#define MAME_KONAMI_DJMAIN_H
 
 #pragma once
 
@@ -104,4 +104,4 @@ private:
 	const uint8_t *m_ata_master_password = nullptr;
 };
 
-#endif // MAME_INCLUDES_DJMAIN_H
+#endif // MAME_KONAMI_DJMAIN_H

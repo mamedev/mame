@@ -69,6 +69,9 @@ TODO:
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class mk3b_soc_state : public driver_device
 {
 public:
@@ -248,5 +251,8 @@ ROM_START( rs70_648 )
 	ROM_REGION(0x04000000, "norflash", 0)
 	ROM_LOAD("s29gl512p.bin", 0x000000, 0x04000000, CRC(cb452bd7) SHA1(0b19a13a3d0b829725c10d64d7ff852ff5202ed0) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 2019, rs70_648,  0,        0, mk3b_soc, mk3b_soc, mk3b_soc_state, init_rs70, "CoolBoy", "RS-70 648-in-1",      MACHINE_IS_SKELETON )

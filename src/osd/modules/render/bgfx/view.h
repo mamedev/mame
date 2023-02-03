@@ -4,12 +4,14 @@
 #pragma once
 
 #include "window.h"
+
 #include <climits>
 
 class renderer_bgfx;
 class bgfx_target;
 
-class bgfx_view {
+class bgfx_view
+{
 public:
 	bgfx_view(renderer_bgfx *renderer, uint32_t index, bgfx_target *backbuffer, std::vector<uint32_t> &seen_views)
 		: m_renderer(renderer)

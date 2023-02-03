@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_SEICROSS_H
-#define MAME_INCLUDES_SEICROSS_H
+#ifndef MAME_NICHIBUTSU_SEICROSS_H
+#define MAME_NICHIBUTSU_SEICROSS_H
 
 #pragma once
 
@@ -83,4 +83,4 @@ private:
 	void mcu_nvram_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SEICROSS_H
+#endif // MAME_NICHIBUTSU_SEICROSS_H

@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef MAME_INCLUDES_ADAM_H
-#define MAME_INCLUDES_ADAM_H
+#ifndef MAME_COLECO_ADAM_H
+#define MAME_COLECO_ADAM_H
 
 #include "bus/adam/exp.h"
 #include "bus/adamnet/adamnet.h"
@@ -116,4 +116,4 @@ private:
 	void m6801_mem(address_map &map);
 };
 
-#endif
+#endif // MAME_COLECO_ADAM_H

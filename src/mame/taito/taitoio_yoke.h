@@ -5,8 +5,8 @@
     Taito Yoke + Throttle Flight device
 
 ***************************************************************************/
-#ifndef MAME_MACHINE_TAITO_YOKE_H
-#define MAME_MACHINE_TAITO_YOKE_H
+#ifndef MAME_TAITO_TAITO_YOKE_H
+#define MAME_TAITO_TAITO_YOKE_H
 
 #pragma once
 
@@ -51,4 +51,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TAITOIO_YOKE, taitoio_yoke_device)
 
-#endif // MAME_MACHINE_TAITO_YOKE_H
+#endif // MAME_TAITO_TAITO_YOKE_H

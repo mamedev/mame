@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef MAME_INCLUDES_VIP_H
-#define MAME_INCLUDES_VIP_H
+#ifndef MAME_RCA_VIP_H
+#define MAME_RCA_VIP_H
 
 #include "bus/vip/byteio.h"
 #include "bus/vip/exp.h"
@@ -132,4 +132,4 @@ private:
 	output_finder<3> m_leds;
 };
 
-#endif
+#endif // MAME_RCA_VIP_H

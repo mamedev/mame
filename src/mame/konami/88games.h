@@ -5,8 +5,8 @@
     88 Games
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_88GAMES_H
-#define MAME_INCLUDES_88GAMES_H
+#ifndef MAME_KONAMI_88GAMES_H
+#define MAME_KONAMI_88GAMES_H
 
 #pragma once
 
@@ -77,4 +77,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_88GAMES_H
+#endif // MAME_KONAMI_88GAMES_H

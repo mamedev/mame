@@ -625,11 +625,11 @@ std::pair<Microsoft::WRL::ComPtr<IDirectInputDevice8>, LPCDIDATAFORMAT> dinput_a
 	HWND window_handle;
 	DWORD di_cooperative_level;
 #if defined(OSD_WINDOWS)
-	auto const window = std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front());
-	bool const standalone_window = window && !window->attached_mode();
+	auto const &window = dynamic_cast<win_window_info &>(*osd_common_t::window_list().front());
+	bool const standalone_window = !window.attached_mode();
 #elif defined(SDLMAME_WIN32)
-	auto const window = std::static_pointer_cast<sdl_window_info>(osd_common_t::s_window_list.front());
-	bool const standalone_window = bool(window);
+	auto const &window = dynamic_cast<sdl_window_info &>(*osd_common_t::window_list().front());
+	bool const standalone_window = true;
 #endif
 	if (!standalone_window)
 	{
@@ -640,12 +640,13 @@ std::pair<Microsoft::WRL::ComPtr<IDirectInputDevice8>, LPCDIDATAFORMAT> dinput_a
 	else
 	{
 #if defined(OSD_WINDOWS)
-		window_handle = window->platform_window();
+		window_handle = window.platform_window();
 #elif defined(SDLMAME_WIN32)
-		auto const sdlwindow = window->platform_window();
+		auto const sdlwindow = window.platform_window();
 		SDL_SysWMinfo info;
 		SDL_VERSION(&info.version);
-		SDL_GetWindowWMInfo(sdlwindow, &info);
+		if (!SDL_GetWindowWMInfo(sdlwindow, &info))
+			return std::make_pair(nullptr, nullptr);
 		window_handle = info.info.win.window;
 #endif
 		switch (cooperative_level)

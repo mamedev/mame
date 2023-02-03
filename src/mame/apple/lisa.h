@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_LISA_H
-#define MAME_INCLUDES_LISA_H
+#ifndef MAME_APPLE_LISA_H
+#define MAME_APPLE_LISA_H
 
 #include "cpu/m6502/m6504.h"
 #include "cpu/m68000/m68000.h"
@@ -256,4 +256,4 @@ private:
 	void lisa_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_LISA_H
+#endif // MAME_APPLE_LISA_H

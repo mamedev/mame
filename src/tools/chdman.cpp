@@ -13,6 +13,7 @@
 #include "bitmap.h"
 #include "cdrom.h"
 #include "corefile.h"
+#include "coretmpl.h"
 #include "hashing.h"
 #include "md5.h"
 #include "path.h"
@@ -517,8 +518,8 @@ public:
 				uint32_t samples = (uint64_t(m_info.rate) * uint64_t(effframe + 1) * uint64_t(1000000) + m_info.fps_times_1million - 1) / uint64_t(m_info.fps_times_1million) - first_sample;
 
 				// loop over channels and read the samples
-				int channels = unsigned((std::min<std::size_t>)(m_info.channels, std::size(m_audio)));
-				int16_t *samplesptr[std::size(m_audio)];
+				int channels = unsigned(std::min<std::size_t>(m_info.channels, std::size(m_audio)));
+				EQUIVALENT_ARRAY(m_audio, int16_t *) samplesptr;
 				for (int chnum = 0; chnum < channels; chnum++)
 				{
 					// read the sound samples

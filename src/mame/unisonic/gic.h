@@ -11,8 +11,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_VIDEO_GIC_H
-#define MAME_VIDEO_GIC_H
+#ifndef MAME_UNISONIC_GIC_H
+#define MAME_UNISONIC_GIC_H
 
 #pragma once
 
@@ -96,4 +96,4 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(GIC, gic_device)
 
-#endif  // MAME_VIDEO_GIC_H
+#endif  // MAME_UNISONIC_GIC_H

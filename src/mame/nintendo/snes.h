@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, R. Belmont, Anthony Kruize, Fabio Priuli, Ryan Holtz
 
-#ifndef MAME_INCLUDES_SNES_H
-#define MAME_INCLUDES_SNES_H
+#ifndef MAME_NINTENDO_SNES_H
+#define MAME_NINTENDO_SNES_H
 
 #include "cpu/g65816/g65816.h"
 #include "machine/input_merger.h"
@@ -455,4 +455,4 @@ enum
 	HAS_UNK
 };
 
-#endif // MAME_INCLUDES_SNES_H
+#endif // MAME_NINTENDO_SNES_H

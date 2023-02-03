@@ -5,8 +5,8 @@
     Cop 01
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_COP01_H
-#define MAME_INCLUDES_COP01_H
+#ifndef MAME_NICHIBUTSU_COP01_H
+#define MAME_NICHIBUTSU_COP01_H
 
 #pragma once
 
@@ -93,4 +93,4 @@ private:
 	required_device<nb1412m2_device> m_prot;
 };
 
-#endif // MAME_INCLUDES_COP01_H
+#endif // MAME_NICHIBUTSU_COP01_H

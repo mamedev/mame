@@ -14,11 +14,11 @@
 
 #include "win32_output.h"
 
-// MAME headers
-#include "emu.h"
-
 #include "winmain.h"
 #include "winutil.h"
+
+// MAME headers
+#include "emu.h"
 
 // standard windows headers
 #include <windows.h>
@@ -71,7 +71,11 @@ class output_win32 : public osd_module, public output_module
 {
 public:
 	output_win32()
-		: osd_module(OSD_OUTPUT_PROVIDER, "windows"), output_module(), m_output_hwnd(nullptr), m_clientlist(nullptr)
+		: osd_module(OSD_OUTPUT_PROVIDER, "windows")
+		, output_module()
+		, m_output_hwnd(nullptr)
+		, m_clientlist(nullptr)
+		, m_machine(nullptr)
 	{
 	}
 	virtual ~output_win32() { }
@@ -80,21 +84,23 @@ public:
 	virtual void exit() override;
 
 	// output_module
-
 	virtual void notify(const char *outname, int32_t value) override;
 
-	int create_window_class();
+	running_machine &machine() { return *m_machine; }
+
 	LRESULT register_client(HWND hwnd, LPARAM id);
 	LRESULT unregister_client(HWND hwnd, LPARAM id);
 	LRESULT send_id_string(HWND hwnd, LPARAM id);
 
 private:
+	int create_window_class();
 	// our HWND
 	HWND                 m_output_hwnd;
 
 	// client list
 	registered_client *  m_clientlist;
 
+	running_machine *    m_machine;
 };
 
 
@@ -104,6 +110,8 @@ private:
 
 int output_win32::init(osd_interface &osd, const osd_options &options)
 {
+	m_machine = &downcast<osd_common_t &>(osd).machine();
+
 	int result;
 
 	// reset globals

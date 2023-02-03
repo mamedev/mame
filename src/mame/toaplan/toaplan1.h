@@ -4,8 +4,8 @@
                 ToaPlan game hardware from 1988-1991
                 ------------------------------------
 ****************************************************************************/
-#ifndef MAME_INCLUDES_TOAPLAN1_H
-#define MAME_INCLUDES_TOAPLAN1_H
+#ifndef MAME_TOAPLAN_TOAPLAN1_H
+#define MAME_TOAPLAN_TOAPLAN1_H
 
 #pragma once
 
@@ -254,4 +254,4 @@ private:
 	void main_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_TOAPLAN1_H
+#endif // MAME_TOAPLAN_TOAPLAN1_H

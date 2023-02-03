@@ -5,8 +5,8 @@
     Atari Klax hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_KLAX_H
-#define MAME_INCLUDES_KLAX_H
+#ifndef MAME_ATARI_KLAX_H
+#define MAME_ATARI_KLAX_H
 
 #pragma once
 
@@ -92,4 +92,4 @@ private:
 	bool m_audio_nibble = false;
 };
 
-#endif // MAME_INCLUDES_KLAX_H
+#endif // MAME_ATARI_KLAX_H

@@ -9,8 +9,8 @@
  * Driver by Wilbert Pol
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_GAMECOM_H
-#define MAME_INCLUDES_GAMECOM_H
+#ifndef MAME_TIGER_GAMECOM_H
+#define MAME_TIGER_GAMECOM_H
 
 #pragma once
 
@@ -303,4 +303,4 @@ private:
 	required_ioport_array<13> m_io_grid;
 };
 
-#endif // MAME_INCLUDES_GAMECOM_H
+#endif // MAME_TIGER_GAMECOM_H

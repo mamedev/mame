@@ -75,6 +75,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class pi_storyreader_state : public driver_device
 {
 public:
@@ -163,6 +166,9 @@ ROM_START( pi_stry2 )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "internal.mcu.rom", 0x0000, 0x1000, NO_DUMP ) // unknown type / size
 ROM_END
+
+} // anonymous namespace
+
 
 //    year, name,        parent,    compat, machine,            input,            class,                  init,       company,    fullname,                         flags
 

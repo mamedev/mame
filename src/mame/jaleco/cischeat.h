@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_CISCHEAT_H
-#define MAME_INCLUDES_CISCHEAT_H
+#ifndef MAME_JALECO_CISCHEAT_H
+#define MAME_JALECO_CISCHEAT_H
 
 #pragma once
 
@@ -252,4 +252,4 @@ private:
 	uint16_t m_motor_pos[2];
 };
 
-#endif
+#endif // MAME_JALECO_CISCHEAT_H

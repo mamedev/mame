@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 
-#ifndef MAME_INCLUDES_XEVIOUS
-#define MAME_INCLUDES_XEVIOUS
+#ifndef MAME_NAMCO_XEVIOUS
+#define MAME_NAMCO_XEVIOUS
 
 #pragma once
 
@@ -106,4 +106,4 @@ private:
 	char m_sound_played = 0;
 };
 
-#endif // MAME_INCLUDES_XEVIOUS
+#endif // MAME_NAMCO_XEVIOUS

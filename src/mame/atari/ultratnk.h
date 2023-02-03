@@ -5,8 +5,8 @@
     Atari Ultra Tank hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_ULTRATNK_H
-#define MAME_INCLUDES_ULTRATNK_H
+#ifndef MAME_ATARI_ULTRATNK_H
+#define MAME_ATARI_ULTRATNK_H
 
 #pragma once
 
@@ -81,4 +81,4 @@ private:
 	emu_timer *m_nmi_timer = nullptr;
 };
 
-#endif // MAME_INCLUDES_ULTRATNK_H
+#endif // MAME_ATARI_ULTRATNK_H

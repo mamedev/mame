@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca, Grull Osgo
-#ifndef MAME_INCLUDES_AMPOKER2_H
-#define MAME_INCLUDES_AMPOKER2_H
+#ifndef MAME_MISC_AMPOKER2_H
+#define MAME_MISC_AMPOKER2_H
 
 #pragma once
 
@@ -58,4 +58,4 @@ private:
 	output_finder<10> m_lamps;
 };
 
-#endif // MAME_INCLUDES_AMPOKER2_H
+#endif // MAME_MISC_AMPOKER2_H

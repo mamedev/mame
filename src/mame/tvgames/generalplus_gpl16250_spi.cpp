@@ -17,6 +17,8 @@
 #include "softlist_dev.h"
 
 
+namespace {
+
 class generalplus_gpspispi_game_state : public gcm394_game_state
 {
 public:
@@ -181,6 +183,8 @@ void generalplus_gpspispi_game_state::init_spi()
 	internal[0x7ffe] = vectorbase + 0x1c;
 	internal[0x7fff] = vectorbase + 0x1e;
 }
+
+} // anonymous namespace
 
 
 CONS(200?, bkrankp, 0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state , init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

@@ -421,7 +421,16 @@ void ncr53c90_device::step(bool timeout)
 			break;
 
 		if((state & STATE_MASK) != INIT_XFR_RECV_PAD)
+		{
 			fifo_push(scsi_bus->data_r());
+			// in async mode data in phase, tcount is decremented on ACKO, not DACK
+			if ((sync_offset == 0) && ((ctrl & S_PHASE_MASK) == 0x01))
+			{
+				LOGMASKED(LOG_FIFO, "decrement_tcounter data in async, phase %02x\n", (ctrl & S_PHASE_MASK));
+				decrement_tcounter();
+				check_drq();
+			}
+		}
 		scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
 		state = (state & STATE_MASK) | (RECV_WAIT_REQ_0 << SUB_SHIFT);
 		step(false);
@@ -437,6 +446,10 @@ void ncr53c90_device::step(bool timeout)
 	case DISC_SEL_ARBITRATION_INIT:
 		// wait until a command is in the fifo
 		if (!fifo_pos) {
+			// this sequence isn't documented for initiator selection, but
+			// it makes macqd700 happy and may be consistent with target
+			// selection sequences
+			seq = 1;
 			// dma starts after bus arbitration/selection is complete
 			check_drq();
 			break;
@@ -616,7 +629,9 @@ void ncr53c90_device::step(bool timeout)
 
 	case INIT_XFR_FUNCTION_COMPLETE:
 		// wait for dma transfer to complete or fifo to drain
-		if (dma_command && !(status & S_TC0) && fifo_pos)
+		if ((dma_dir == DMA_OUT) && dma_command && !(status & S_TC0) && fifo_pos)
+			break;
+		if ((dma_dir == DMA_IN) && dma_command && (status & S_TC0) && fifo_pos)
 			break;
 
 		function_complete();
@@ -624,7 +639,9 @@ void ncr53c90_device::step(bool timeout)
 
 	case INIT_XFR_BUS_COMPLETE:
 		// wait for dma transfer to complete or fifo to drain
-		if (dma_command && !(status & S_TC0) && fifo_pos)
+		if ((dma_dir == DMA_OUT) && dma_command && !(status & S_TC0) && fifo_pos)
+			break;
+		if ((dma_dir == DMA_IN) && dma_command && (status & S_TC0) && fifo_pos)
 			break;
 		bus_complete();
 		break;
@@ -784,6 +801,7 @@ uint8_t ncr53c90_device::fifo_pop()
 
 void ncr53c90_device::fifo_push(uint8_t val)
 {
+	LOGMASKED(LOG_FIFO, "Push %02x to FIFO at position %d\n", val, fifo_pos);
 	fifo[fifo_pos++] = val;
 	check_drq();
 }
@@ -797,6 +815,8 @@ uint8_t ncr53c90_device::fifo_r()
 		memmove(fifo, fifo+1, fifo_pos);
 	} else
 		r = 0;
+
+	check_drq();
 	LOGMASKED(LOG_FIFO, "fifo_r 0x%02x fifo_pos %d (%s)\n", r, fifo_pos, machine().describe_context());
 	return r;
 }
@@ -806,6 +826,8 @@ void ncr53c90_device::fifo_w(uint8_t data)
 	LOGMASKED(LOG_FIFO, "fifo_w 0x%02x fifo_pos %d (%s)\n", data, fifo_pos, machine().describe_context());
 	if(fifo_pos != 16)
 		fifo[fifo_pos++] = data;
+
+	check_drq();
 }
 
 uint8_t ncr53c90_device::command_r()
@@ -859,13 +881,16 @@ void ncr53c90_device::start_command()
 	dma_command = command[0] & 0x80;
 	if (dma_command)
 	{
+		LOGMASKED(LOG_COMMAND, "DMA command: tcounter reloaded to %d\n", tcount);
 		tcounter = tcount;
 
 		// clear transfer count zero flag when counter is reloaded
 		status &= ~S_TC0;
 	}
 	else
+	{
 		tcounter = 0;
+	}
 
 	switch(c) {
 	case CM_NOP:
@@ -1098,7 +1123,9 @@ void ncr53c90_device::dma_set(int dir)
 
 	// account for data already in the fifo
 	if (dir == DMA_OUT && fifo_pos)
+	{
 		decrement_tcounter(fifo_pos);
+	}
 }
 
 void ncr53c90_device::dma_w(uint8_t val)
@@ -1112,7 +1139,11 @@ void ncr53c90_device::dma_w(uint8_t val)
 uint8_t ncr53c90_device::dma_r()
 {
 	uint8_t r = fifo_pop();
-	decrement_tcounter();
+
+	if ((sync_offset != 0) || ((scsi_bus->ctrl_r() & S_PHASE_MASK) != 0x01))
+	{
+		decrement_tcounter();
+	}
 	check_drq();
 	step(false);
 	return r;
@@ -1128,7 +1159,10 @@ void ncr53c90_device::check_drq()
 		break;
 
 	case DMA_IN: // device to memory
-		drq_state = !(status & S_TC0) && fifo_pos;
+		if (sync_offset == 0)
+			drq_state = (fifo_pos > 0);
+		else
+			drq_state = !(status & S_TC0) && fifo_pos;
 		break;
 
 	case DMA_OUT: // memory to device
@@ -1150,6 +1184,8 @@ void ncr53c90_device::decrement_tcounter(int count)
 	tcounter -= count;
 	if (tcounter == 0)
 		status |= S_TC0;
+
+	check_drq();
 }
 
 /*
@@ -1237,7 +1273,10 @@ u16 ncr53c94_device::dma16_r()
 	memmove(fifo, fifo + 2, fifo_pos);
 
 	// update drq
-	decrement_tcounter(2);
+	if ((sync_offset != 0) || ((scsi_bus->ctrl_r() & S_PHASE_MASK) != 0x01))
+	{
+		decrement_tcounter(2);
+	}
 	check_drq();
 
 	step(false);

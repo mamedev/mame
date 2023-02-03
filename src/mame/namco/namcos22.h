@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_INCLUDES_NAMCOS22_H
-#define MAME_INCLUDES_NAMCOS22_H
+#ifndef MAME_NAMCO_NAMCOS22_H
+#define MAME_NAMCO_NAMCOS22_H
 
 #pragma once
 
@@ -680,4 +680,4 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(trackball_interrupt);
 };
 
-#endif // MAME_INCLUDES_NAMCOS22_H
+#endif // MAME_NAMCO_NAMCOS22_H

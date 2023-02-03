@@ -33,6 +33,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class vtech_storio_state : public driver_device
 {
 public:
@@ -177,6 +180,9 @@ ROM_START( storionl )
 	ROM_REGION( 0x03af81c6, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "nldut-pack_20111017.bin", 0x000000, 0x03af81c6, CRC(6cfac599) SHA1(d16b45fd287c9d823bde13b88eb6c8158ac2b475) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags
 CONS( 2011, vreader,      0,       0,      vtech_storio, vtech_storio, vtech_storio_state, empty_init, "VTech", "V.Reader (US, English, 2011-10-17)", MACHINE_IS_SKELETON )

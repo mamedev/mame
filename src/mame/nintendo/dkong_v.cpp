@@ -1016,7 +1016,7 @@ uint32_t dkong_state::screen_update_pestplce(screen_device &screen, bitmap_ind16
 	return 0;
 }
 
-uint32_t dkong_state::screen_update_spclforc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t spclforc_state::screen_update_spclforc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	machine().tilemap().set_flip_all(m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

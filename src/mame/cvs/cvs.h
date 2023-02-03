@@ -5,8 +5,8 @@
     Century CVS System
 
 ****************************************************************************/
-#ifndef MAME_INCLUDES_CVS_H
-#define MAME_INCLUDES_CVS_H
+#ifndef MAME_CVS_CVS_H
+#define MAME_CVS_CVS_H
 
 #pragma once
 
@@ -161,4 +161,4 @@ protected:
 	                                                    we can use the same gfx_layout */
 };
 
-#endif // MAME_INCLUDES_CVS_H
+#endif // MAME_CVS_CVS_H

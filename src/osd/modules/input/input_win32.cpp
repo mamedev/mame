@@ -114,7 +114,7 @@ public:
 					{
 						device.queue_events(args, 1);
 					});
-			return true;
+			return false; // we still want text input events to be generated
 
 		default:
 			return false;
@@ -154,7 +154,9 @@ public:
 			m_mouse.lY = (cursor_info.ptScreenPos.y - m_win32_mouse.last_point.y) * INPUT_RELATIVE_PER_PIXEL;
 
 			RECT window_pos = {0};
-			GetWindowRect(std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window(), &window_pos);
+			GetWindowRect(
+					dynamic_cast<win_window_info &>(*osd_common_t::window_list().front()).platform_window(),
+					&window_pos);
 
 			// We reset the cursor position to the middle of the window each frame
 			m_win32_mouse.last_point.x = window_pos.left + (window_pos.right - window_pos.left) / 2;
@@ -326,10 +328,10 @@ public:
 		// get the cursor position and transform into final results
 		POINT mousepos;
 		GetCursorPos(&mousepos);
-		if (!osd_common_t::s_window_list.empty())
+		if (!osd_common_t::window_list().empty())
 		{
 			// get the position relative to the window
-			HWND const hwnd = std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window();
+			HWND const hwnd = dynamic_cast<win_window_info &>(*osd_common_t::window_list().front()).platform_window();
 			RECT client_rect;
 			GetClientRect(hwnd, &client_rect);
 			ScreenToClient(hwnd, &mousepos);
@@ -390,7 +392,7 @@ protected:
 		if (args.keydown)
 		{
 			// get the position relative to the window
-			HWND const hwnd = std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window();
+			HWND const hwnd = dynamic_cast<win_window_info &>(*osd_common_t::window_list().front()).platform_window();
 			RECT client_rect;
 			GetClientRect(hwnd, &client_rect);
 

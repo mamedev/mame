@@ -203,12 +203,17 @@ namespace plib {
 			element_t * m_prev;
 		};
 
-		struct iter_t final : public std::iterator<std::forward_iterator_tag, LC>
+		struct iter_t final
 		{
 		private:
 			element_t * p;
 		public:
 			using tag = std::integral_constant<int, TAG>;
+			using iterator_category = std::forward_iterator_tag;
+			using value_type = LC;
+			using pointer = value_type *;
+			using reference = value_type &;
+			using difference_type = std::ptrdiff_t;
 
 			explicit constexpr iter_t(element_t * x) noexcept : p(x) { }
 

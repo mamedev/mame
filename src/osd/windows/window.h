@@ -54,7 +54,7 @@ enum class win_window_focus
 class win_window_info  : public osd_window_t<HWND>
 {
 public:
-	win_window_info(running_machine &machine, int index, std::shared_ptr<osd_monitor_info> monitor, const osd_window_config *config);
+	win_window_info(running_machine &machine, render_module &renderprovider, int index, const std::shared_ptr<osd_monitor_info> &monitor, const osd_window_config *config);
 
 	bool attached_mode() const { return m_attached_mode; }
 	win_window_focus focus() const;
@@ -68,6 +68,9 @@ public:
 		return osd_dim(client.right - client.left, client.bottom - client.top);
 	}
 
+	win_window_info *main_window() const { return m_main; }
+	void set_main_window(win_window_info &main) { m_main = &main; }
+
 	void capture_pointer() override;
 	void release_pointer() override;
 	void show_pointer() override;
@@ -77,7 +80,12 @@ public:
 
 	// static
 
-	static void create(running_machine &machine, int index, std::shared_ptr<osd_monitor_info> monitor, const osd_window_config *config);
+	static std::unique_ptr<win_window_info> create(
+			running_machine &machine,
+			render_module &renderprovider,
+			int index,
+			const std::shared_ptr<osd_monitor_info> &monitor,
+			const osd_window_config *config);
 
 	// static callbacks
 
@@ -126,15 +134,10 @@ private:
 	void adjust_window_position_after_major_change();
 	void set_fullscreen(int fullscreen);
 
-	static POINT        s_saved_cursor_pos;
-
+	win_window_info *   m_main;
 	bool                m_attached_mode;
-};
 
-struct osd_draw_callbacks
-{
-	osd_renderer *(*create)(osd_window *window);
-	void (*exit)(void);
+	static POINT        s_saved_cursor_pos;
 };
 
 

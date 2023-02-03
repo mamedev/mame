@@ -3,8 +3,8 @@
 // *******************************
 // Driver for HP 9845B/C/T systems
 // *******************************
-#ifndef MAME_INCLUDES_HP9845_H
-#define MAME_INCLUDES_HP9845_H
+#ifndef MAME_HP_HP9845_H
+#define MAME_HP_HP9845_H
 
 #pragma once
 
@@ -140,4 +140,4 @@ protected:
 	int m_slot_sc[ 4 ]{};
 };
 
-#endif // MAME_INCLUDES_HP9845_H
+#endif // MAME_HP_HP9845_H

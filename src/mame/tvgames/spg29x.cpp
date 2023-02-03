@@ -82,6 +82,7 @@
 #include "softlist_dev.h"
 
 
+namespace {
 
 class spg29x_game_state : public driver_device
 {
@@ -607,6 +608,8 @@ ROM_START( zone3d )
 	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
 	ROM_LOAD32_DWORD("internal.rom", 0x000000, 0x008000, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

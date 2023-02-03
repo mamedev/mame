@@ -39,6 +39,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class wy50_state : public driver_device
 {
 public:
@@ -350,6 +353,9 @@ ROM_START(wy75) // 8031, green, 101-key detached keyboard
 	ROM_REGION16_LE(0xc8, "earom", 0)
 	ROM_LOAD("default.bin", 0x00, 0xc8, CRC(0efeff07) SHA1(304e07ef87a4b107700273321a1d4e34a56d6821))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1984, wy50, 0, 0, wy50, wy50, wy50_state, empty_init, "Wyse Technology", "WY-50 (Rev. E)", MACHINE_IS_SKELETON)
 COMP(1984, wy75, 0, 0, wy50, wy50, wy50_state, empty_init, "Wyse Technology", "WY-75 (Rev. H)", MACHINE_IS_SKELETON)

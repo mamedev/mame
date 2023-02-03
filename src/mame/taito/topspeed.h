@@ -5,8 +5,8 @@
     Top Speed / Full Throttle
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_TOPSPEED_H
-#define MAME_INCLUDES_TOPSPEED_H
+#ifndef MAME_TAITO_TOPSPEED_H
+#define MAME_TAITO_TOPSPEED_H
 
 #pragma once
 
@@ -112,4 +112,4 @@ private:
 	void z80_prg(address_map &map);
 };
 
-#endif // MAME_INCLUDES_TOPSPEED_H
+#endif // MAME_TAITO_TOPSPEED_H
