@@ -890,7 +890,7 @@ void ata_hle_device::write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask)
 				else if (device_selected() || m_command == IDE_COMMAND_DIAGNOSTIC)
 				{
 					m_command = data;
-					m_error &= ~IDE_ERROR_DIAGNOSTIC_OK & ~IDE_ERROR_ABRT & ~IDE_ERROR_DIAGNOSTIC_DEVICE1_FAILED;
+					m_error = IDE_ERROR_NONE;
 
 					/* implicitly clear interrupts & dmarq here */
 					set_irq(CLEAR_LINE);
