@@ -1881,7 +1881,7 @@ void spclforc_state::spclforc(machine_config &config)
 {
 	herbiedk(config);
 
-	downcast<s2650_device &>(*m_maincpu).set_addrmap(AS_DATA, &spclforc_state::data_map);
+	m_maincpu->set_addrmap(AS_DATA, &spclforc_state::data_map);
 	config.device_remove("soundcpu");
 
 	m_screen->set_screen_update(FUNC(spclforc_state::screen_update_spclforc));
