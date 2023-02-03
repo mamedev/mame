@@ -5113,3 +5113,14 @@ if (MACHINES["MICOMXE1A"]~=null) then
 		MAME_DIR .. "src/devices/machine/micomxe1a.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/mc88200.h,MACHINES["MC88200"] = true
+---------------------------------------------------
+if (MACHINES["MC88200"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mc88200.cpp",
+		MAME_DIR .. "src/devices/machine/mc88200.h",
+	}
+end
