@@ -1113,7 +1113,7 @@ void upd7810_device::upd7810_sio_input()
 				case 0x48:  /* 7bits, no parity, 1 stop bit */
 				case 0x68:  /* 7bits, no parity, 1 stop bit (parity select = 1 but parity is off) */
 					m_rxs >>= 16 - 9;
-					m_rxs |= ~0 << 9;
+					m_rxs |= ~0U << 9;
 					RXB = (m_rxs >> 1) & 0x7f;
 					if ((1 << 8) != (m_rxs & (1 | (1 << 8))))
 						IRR |= INTER;   /* framing error */
@@ -1121,14 +1121,14 @@ void upd7810_device::upd7810_sio_input()
 				case 0x4c:  /* 8bits, no parity, 1 stop bit */
 				case 0x6c:  /* 8bits, no parity, 1 stop bit (parity select = 1 but parity is off) */
 					m_rxs >>= 16 - 10;
-					m_rxs |= ~0 << 10;
+					m_rxs |= ~0U << 10;
 					RXB = (m_rxs >> 1) & 0xff;
 					if ((1 << 9) != (m_rxs & (1 | (1 << 9))))
 						IRR |= INTER;   /* framing error */
 					break;
 				case 0x58:  /* 7bits, odd parity, 1 stop bit */
 					m_rxs >>= 16 - 10;
-					m_rxs |= ~0 << 10;
+					m_rxs |= ~0U << 10;
 					RXB = (m_rxs >> 1) & 0x7f;
 					if ((1 << 9) != (m_rxs & (1 | (1 << 9))))
 						IRR |= INTER;   /* framing error */
@@ -1137,7 +1137,7 @@ void upd7810_device::upd7810_sio_input()
 					break;
 				case 0x5c:  /* 8bits, odd parity, 1 stop bit */
 					m_rxs >>= 16 - 11;
-					m_rxs |= ~0 << 11;
+					m_rxs |= ~0U << 11;
 					RXB = (m_rxs >> 1) & 0xff;
 					if ((1 << 10) != (m_rxs & (1 | (1 << 10))))
 						IRR |= INTER;   /* framing error */
@@ -1146,7 +1146,7 @@ void upd7810_device::upd7810_sio_input()
 					break;
 				case 0x78:  /* 7bits, even parity, 1 stop bit */
 					m_rxs >>= 16 - 10;
-					m_rxs |= ~0 << 10;
+					m_rxs |= ~0U << 10;
 					RXB = (m_rxs >> 1) & 0x7f;
 					if ((1 << 9) != (m_rxs & (1 | (1 << 9))))
 						IRR |= INTER;   /* framing error */
@@ -1155,7 +1155,7 @@ void upd7810_device::upd7810_sio_input()
 					break;
 				case 0x7c:  /* 8bits, even parity, 1 stop bit */
 					m_rxs >>= 16 - 11;
-					m_rxs |= ~0 << 11;
+					m_rxs |= ~0U << 11;
 					RXB = (m_rxs >> 1) & 0xff;
 					if ((1 << 10) != (m_rxs & (1 | (1 << 10))))
 						IRR |= INTER;   /* framing error */
@@ -1165,7 +1165,7 @@ void upd7810_device::upd7810_sio_input()
 				case 0xc8:  /* 7bits, no parity, 2 stop bits */
 				case 0xe8:  /* 7bits, no parity, 2 stop bits (parity select = 1 but parity is off) */
 					m_rxs >>= 16 - 10;
-					m_rxs |= ~0 << 10;
+					m_rxs |= ~0U << 10;
 					RXB = (m_rxs >> 1) & 0x7f;
 					if ((3 << 9) != (m_rxs & (1 | (3 << 9))))
 						IRR |= INTER;   /* framing error */
@@ -1175,7 +1175,7 @@ void upd7810_device::upd7810_sio_input()
 				case 0xcc:  /* 8bits, no parity, 2 stop bits */
 				case 0xec:  /* 8bits, no parity, 2 stop bits (parity select = 1 but parity is off) */
 					m_rxs >>= 16 - 11;
-					m_rxs |= ~0 << 11;
+					m_rxs |= ~0U << 11;
 					RXB = (m_rxs >> 1) & 0xff;
 					if ((3 << 10) != (m_rxs & (1 | (3 << 10))))
 						IRR |= INTER;   /* framing error */
@@ -1184,7 +1184,7 @@ void upd7810_device::upd7810_sio_input()
 					break;
 				case 0xd8:  /* 7bits, odd parity, 2 stop bits */
 					m_rxs >>= 16 - 11;
-					m_rxs |= ~0 << 11;
+					m_rxs |= ~0U << 11;
 					RXB = (m_rxs >> 1) & 0x7f;
 					if ((3 << 10) != (m_rxs & (1 | (3 << 10))))
 						IRR |= INTER;   /* framing error */
@@ -1193,7 +1193,7 @@ void upd7810_device::upd7810_sio_input()
 					break;
 				case 0xdc:  /* 8bits, odd parity, 2 stop bits */
 					m_rxs >>= 16 - 12;
-					m_rxs |= ~0 << 12;
+					m_rxs |= ~0U << 12;
 					RXB = (m_rxs >> 1) & 0xff;
 					if ((3 << 11) != (m_rxs & (1 | (3 << 11))))
 						IRR |= INTER;   /* framing error */
@@ -1202,7 +1202,7 @@ void upd7810_device::upd7810_sio_input()
 					break;
 				case 0xf8:  /* 7bits, even parity, 2 stop bits */
 					m_rxs >>= 16 - 11;
-					m_rxs |= ~0 << 11;
+					m_rxs |= ~0U << 11;
 					RXB = (m_rxs >> 1) & 0x7f;
 					if ((3 << 10) != (m_rxs & (1 | (3 << 10))))
 						IRR |= INTER;   /* framing error */
@@ -1211,7 +1211,7 @@ void upd7810_device::upd7810_sio_input()
 					break;
 				case 0xfc:  /* 8bits, even parity, 2 stop bits */
 					m_rxs >>= 16 - 12;
-					m_rxs |= ~0 << 12;
+					m_rxs |= ~0U << 12;
 					RXB = (m_rxs >> 1) & 0xff;
 					if ((3 << 11) != (m_rxs & (1 | (3 << 11))))
 						IRR |= INTER;   /* framing error */
@@ -1223,7 +1223,7 @@ void upd7810_device::upd7810_sio_input()
 			else
 			{
 				m_rxs >>= 16 - 8;
-				m_rxs |= ~0 << 8;
+				m_rxs |= ~0U << 8;
 				RXB = m_rxs;
 //              m_rxcnt = 8;
 			}
