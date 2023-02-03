@@ -191,11 +191,6 @@ class ogl_texture_info
 {
 public:
 	ogl_texture_info()
-	:   hash(0), flags(0), rawwidth(0), rawheight(0),
-		rawwidth_create(0), rawheight_create(0),
-		type(0), format(0), borderpix(0), xprescale(0), yprescale(0), nocopy(0),
-		texture(0), texTarget(0), texpow2(0), mpass_dest_idx(0), pbo(0), data(nullptr),
-		data_own(0), texCoordBufferName(0)
 	{
 		for (int i=0; i<2; i++)
 		{
@@ -209,35 +204,35 @@ public:
 			texCoord[i] = 0.0f;
 	}
 
-	HashT               hash;               // hash value for the texture (must be >= pointer size)
-	uint32_t            flags;              // rendering flags
-	render_texinfo      texinfo;            // copy of the texture info
-	int                 rawwidth, rawheight;    // raw width/height of the texture
-	int                 rawwidth_create;    // raw width/height, pow2 compatible, if needed
-	int                 rawheight_create;   // (create and initial set the texture, not for copy!)
-	int                 type;               // what type of texture are we?
-	int                 format;             // texture format
-	int                 borderpix;          // do we have a 1 pixel border?
-	int                 xprescale;          // what is our X prescale factor?
-	int                 yprescale;          // what is our Y prescale factor?
-	int                 nocopy;             // must the texture date be copied?
+	HashT               hash = 0;                       // hash value for the texture (must be >= pointer size)
+	uint32_t            flags = 0;                      // rendering flags
+	render_texinfo      texinfo;                        // copy of the texture info
+	int                 rawwidth = 0, rawheight = 0;    // raw width/height of the texture
+	int                 rawwidth_create = 0;            // raw width/height, pow2 compatible, if needed
+	int                 rawheight_create = 0;           // (create and initial set the texture, not for copy!)
+	int                 type = 0;                       // what type of texture are we?
+	int                 format = 0;                     // texture format
+	int                 borderpix = 0;                  // do we have a 1 pixel border?
+	int                 xprescale = 0;                  // what is our X prescale factor?
+	int                 yprescale = 0;                  // what is our Y prescale factor?
+	int                 nocopy = 0;                     // must the texture date be copied?
 
-	uint32_t            texture;            // OpenGL texture "name"/ID
+	uint32_t            texture = 0;                    // OpenGL texture "name"/ID
 
-	GLenum              texTarget;          // OpenGL texture target
-	int                 texpow2;            // Is this texture pow2
+	GLenum              texTarget = 0;                  // OpenGL texture target
+	int                 texpow2 = 0;                    // Is this texture pow2
 
-	uint32_t            mpass_dest_idx;         // Multipass dest idx [0..1]
-	uint32_t            mpass_textureunit[2];   // texture unit names for GLSL
+	uint32_t            mpass_dest_idx = 0;             // Multipass dest idx [0..1]
+	uint32_t            mpass_textureunit[2];           // texture unit names for GLSL
 
-	uint32_t            mpass_texture_mamebm[2];// Multipass OpenGL texture "name"/ID for the shader
-	uint32_t            mpass_fbo_mamebm[2];    // framebuffer object for this texture, multipass
-	uint32_t            mpass_texture_scrn[2];  // Multipass OpenGL texture "name"/ID for the shader
-	uint32_t            mpass_fbo_scrn[2];      // framebuffer object for this texture, multipass
+	uint32_t            mpass_texture_mamebm[2];        // Multipass OpenGL texture "name"/ID for the shader
+	uint32_t            mpass_fbo_mamebm[2];            // framebuffer object for this texture, multipass
+	uint32_t            mpass_texture_scrn[2];          // Multipass OpenGL texture "name"/ID for the shader
+	uint32_t            mpass_fbo_scrn[2];              // framebuffer object for this texture, multipass
 
-	uint32_t            pbo;                    // pixel buffer object for this texture (DYNAMIC only!)
-	uint32_t            *data;                  // pixels for the texture
-	int                 data_own;               // do we own / allocated it ?
+	uint32_t            pbo = 0;                        // pixel buffer object for this texture (DYNAMIC only!)
+	uint32_t            *data = nullptr;                // pixels for the texture
+	bool                data_own = false;               // do we own / allocated it ?
 	GLfloat             texCoord[8];
 	GLuint              texCoordBufferName;
 
