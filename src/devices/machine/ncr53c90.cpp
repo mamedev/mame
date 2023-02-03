@@ -446,6 +446,10 @@ void ncr53c90_device::step(bool timeout)
 	case DISC_SEL_ARBITRATION_INIT:
 		// wait until a command is in the fifo
 		if (!fifo_pos) {
+			// this sequence isn't documented for initiator selection, but
+			// it makes macqd700 happy and may be consistent with target
+			// selection sequences
+			seq = 1;
 			// dma starts after bus arbitration/selection is complete
 			check_drq();
 			break;
@@ -1069,7 +1073,7 @@ void ncr53c90_device::timeout_w(uint8_t data)
 uint8_t ncr53c90_device::seq_step_r()
 {
 	LOG("seq_step_r %d (%s)\n", seq, machine().describe_context());
-	return seq + 1; // HACK for Mac Quadra 700; our sequence steps don't correspond exactly to what the real chip does
+	return seq;
 }
 
 void ncr53c90_device::sync_period_w(uint8_t data)
