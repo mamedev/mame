@@ -10,7 +10,7 @@
 
 #include "cpu/m88000/m88000.h"
 #include "machine/mc68681.h"
-//#include "machine/mc88200.h"
+#include "machine/mc88200.h"
 
 #include "bus/rs232/rs232.h"
 
@@ -36,7 +36,7 @@ private:
 	void interrupt();
 
 	required_device<mc88100_device> m_cpu;
-	//required_device_array<mc88200_device, 2> m_mmu;
+	required_device_array<mc88200_device, 2> m_mmu;
 
 	required_device<scn2681_device> m_duart;
 	required_device_array<rs232_port_device, 2> m_serial;
