@@ -140,8 +140,6 @@ private:
 	uint32_t m_white[16*16];
 	std::unique_ptr<bgfx_view> m_ortho_view;
 	uint32_t m_max_view;
-	uint16_t m_view_width;
-	uint16_t m_view_height;
 
 	bgfx_view *m_avi_view;
 	avi_write *m_avi_writer;
