@@ -84,31 +84,28 @@ public:
 	int raw_width() const { return m_texinfo.width; }
 	int raw_height() const { return m_texinfo.height; }
 
-	texture_info *next() { return m_next; }
 	const render_texinfo &texinfo() const { return m_texinfo; }
 	render_texinfo &texinfo() { return m_texinfo; }
 
 	HashT hash() const { return m_hash; }
 	uint32_t flags() const { return m_flags; }
-	// FIXME:
-	bool is_pixels_owned() const;
 
 private:
+	bool is_pixels_owned() const;
+
 	void set_coloralphamode(SDL_Texture *texture_id, const render_color *color);
 
 	Uint32              m_sdl_access;
 	renderer_sdl2 *     m_renderer;
 	render_texinfo      m_texinfo;            // copy of the texture info
 	HashT               m_hash;               // hash value for the texture (must be >= pointer size)
-	uint32_t              m_flags;              // rendering flags
+	uint32_t            m_flags;              // rendering flags
 
 	SDL_Texture *       m_texture_id;
 	bool                m_is_rotated;
 
 	int                 m_format;             // texture format
 	SDL_BlendMode       m_sdl_blendmode;
-
-	texture_info *      m_next;               // next texture in the list
 };
 
 // inline functions and macros
@@ -666,11 +663,10 @@ copy_info_t const *texture_info::compute_size_type()
 	return nullptr;
 }
 
-// FIXME:
 bool texture_info::is_pixels_owned() const
-{ // do we own / allocated it ?
-	return ((m_sdl_access == SDL_TEXTUREACCESS_STATIC)
-			&& (m_copyinfo->blitter->m_is_passthrough));
+{
+	// do we own / allocated it ?
+	return (m_sdl_access == SDL_TEXTUREACCESS_STATIC) && !m_copyinfo->blitter->m_is_passthrough;
 }
 
 //============================================================
@@ -760,12 +756,11 @@ texture_info::texture_info(renderer_sdl2 *renderer, const render_texinfo &texsou
 			m_pixels = malloc(m_setup.rotwidth * m_setup.rotheight * m_copyinfo->blitter->m_dest_bpp);
 	}
 	m_last_access = osd_ticks();
-
 }
 
 texture_info::~texture_info()
 {
-	if ( is_pixels_owned() && (m_pixels != nullptr) )
+	if (is_pixels_owned() && m_pixels)
 		free(m_pixels);
 	SDL_DestroyTexture(m_texture_id);
 }
@@ -779,7 +774,7 @@ void texture_info::set_data(const render_texinfo &texsource, const uint32_t flag
 	m_copyinfo->time -= osd_ticks();
 	if (m_sdl_access == SDL_TEXTUREACCESS_STATIC)
 	{
-		if ( m_copyinfo->blitter->m_is_passthrough )
+		if (m_copyinfo->blitter->m_is_passthrough)
 		{
 			m_pixels = texsource.base;
 			m_pitch = m_texinfo.rowpixels * m_copyinfo->blitter->m_dest_bpp;
@@ -793,11 +788,11 @@ void texture_info::set_data(const render_texinfo &texsource, const uint32_t flag
 	}
 	else
 	{
-		SDL_LockTexture(m_texture_id, nullptr, (void **) &m_pixels, &m_pitch);
+		SDL_LockTexture(m_texture_id, nullptr, (void **)&m_pixels, &m_pitch);
 		if ( m_copyinfo->blitter->m_is_passthrough )
 		{
-			uint8_t *src = (uint8_t *) texsource.base;
-			uint8_t *dst = (uint8_t *) m_pixels;
+			const uint8_t *src = (uint8_t *)texsource.base;
+			uint8_t *dst = (uint8_t *)m_pixels;
 			int spitch = texsource.rowpixels * m_copyinfo->blitter->m_dest_bpp;
 			int num = texsource.width * m_copyinfo->blitter->m_dest_bpp;
 			int h = texsource.height;
