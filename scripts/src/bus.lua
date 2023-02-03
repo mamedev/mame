@@ -2563,6 +2563,8 @@ if (BUSES["VME"]~=null) then
 		MAME_DIR .. "src/devices/bus/vme/vme_smvme2000.h",
 		MAME_DIR .. "src/devices/bus/vme/vme_mvme180.cpp",
 		MAME_DIR .. "src/devices/bus/vme/vme_mvme180.h",
+		MAME_DIR .. "src/devices/bus/vme/vme_mvme181.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme_mvme181.h",
 	}
 end
 
