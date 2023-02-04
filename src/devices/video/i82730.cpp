@@ -17,7 +17,7 @@
 #define LOG_COMMANDS (1U << 1)
 #define LOG_DATASTREAM (1U << 2)
 //#define VERBOSE (LOG_GENERAL | LOG_COMMANDS | LOG_DATASTREAM)
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (0 != (LOG_GENERAL))
 #include "logmacro.h"
 
 
