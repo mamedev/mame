@@ -12,7 +12,6 @@
 #include "modules/osdmodule.h"
 #include "modules/osdwindow.h"
 
-#include "emu.h" // FIXME: only here for main.h, won't be necessary soon
 #include "main.h"
 #include "render.h"
 

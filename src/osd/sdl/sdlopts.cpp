@@ -4,7 +4,6 @@
 #include "sdlopts.h"
 
 // emu
-#include "emu.h"
 #include "main.h"
 
 // lib/util

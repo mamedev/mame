@@ -6,18 +6,17 @@
 
     Controls execution of the core emulator system.
 ***************************************************************************/
-
-#pragma once
-
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
 #ifndef MAME_EMU_MAIN_H
 #define MAME_EMU_MAIN_H
 
-#include <thread>
-#include <ctime>
+#pragma once
+
+#include "emufwd.h"
+
+#include <memory>
+#include <string>
+#include <vector>
+
 
 //**************************************************************************
 //    CONSTANTS
@@ -66,10 +65,11 @@ public:
 
 class machine_manager
 {
-	DISABLE_COPYING(machine_manager);
 protected:
 	// construction/destruction
-	machine_manager(emu_options& options, osd_interface& osd);
+	machine_manager(emu_options &options, osd_interface &osd);
+	machine_manager(machine_manager const &) = delete;
+
 public:
 	virtual ~machine_manager();
 

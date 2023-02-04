@@ -1389,7 +1389,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 		int             player;         // player which the input belongs to
 		int             nbuttons;       // total number of buttons
 		int             reqbuttons;     // total number of non-optional buttons
-		int             maxbuttons;     // max index of buttons (using IPT_BUTTONn) [probably to be removed soonish]
+		uint32_t        maxbuttons;     // max index of buttons (using IPT_BUTTONn) [probably to be removed soonish]
 		int             ways;           // directions for joystick
 		bool            analog;         // is analog input?
 		uint8_t         helper[3];      // for dual joysticks [possibly to be removed soonish]
@@ -1404,7 +1404,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 
 	// tracking info as we iterate
 	int nplayer = 0;
-	int ncoin = 0;
+	uint32_t ncoin = 0;
 	bool service = false;
 	bool tilt = false;
 
@@ -1732,7 +1732,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 	out << "\t\t<input";
 	util::stream_format(out, " players=\"%d\"", nplayer);
 	if (ncoin != 0)
-		util::stream_format(out, " coins=\"%d\"", ncoin);
+		util::stream_format(out, " coins=\"%u\"", ncoin);
 	if (service)
 		util::stream_format(out, " service=\"yes\"");
 	if (tilt)
@@ -1751,7 +1751,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 					util::stream_format(out, " player=\"%d\"", elem.player);
 				if (elem.nbuttons > 0)
 				{
-					util::stream_format(out, " buttons=\"%d\"", strcmp(elem.type, "stick") ? elem.nbuttons : elem.maxbuttons);
+					util::stream_format(out, " buttons=\"%u\"", strcmp(elem.type, "stick") ? elem.nbuttons : elem.maxbuttons);
 					if (elem.reqbuttons < elem.nbuttons)
 						util::stream_format(out, " reqbuttons=\"%d\"", elem.reqbuttons);
 				}
@@ -1777,7 +1777,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 					util::stream_format(out, " player=\"%d\"", elem.player);
 				if (elem.nbuttons > 0)
 				{
-					util::stream_format(out, " buttons=\"%d\"", strcmp(elem.type, "joy") ? elem.nbuttons : elem.maxbuttons);
+					util::stream_format(out, " buttons=\"%u\"", strcmp(elem.type, "joy") ? elem.nbuttons : elem.maxbuttons);
 					if (elem.reqbuttons < elem.nbuttons)
 						util::stream_format(out, " reqbuttons=\"%d\"", elem.reqbuttons);
 				}
