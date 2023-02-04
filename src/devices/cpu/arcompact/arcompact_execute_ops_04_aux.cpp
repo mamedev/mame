@@ -12,81 +12,67 @@
 // LR b,[s12]                      0010 0bbb 1010 1010   0BBB ssss ssSS SSSS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_LR_f_a_b_c(uint32_t op)
-{
-	int size = 4;
-	uint8_t breg = common32_get_breg(op);
-	uint8_t creg = common32_get_creg(op);
-	if (creg == REG_LIMM)
-	{
-		get_limm_32bit_opcode();
-		size = 8;
-	}
-	uint32_t c = m_regs[creg];
-	m_regs[breg] = READAUX(c);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_LR_f_a_b_u6(uint32_t op)
-{
-	int size = 4;
-	uint8_t breg = common32_get_breg(op);
-	uint32_t u = common32_get_u6(op);
-	uint32_t c = u;
-	m_regs[breg] = READAUX(c);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_LR_f_b_b_s12(uint32_t op)
-{
-	int size = 4;
-	uint8_t breg = common32_get_breg(op);
-	uint32_t S = common32_get_s12(op);
-	uint32_t c = (uint32_t)S;
-	m_regs[breg] = READAUX(c);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_LR_cc_f_b_b_c(uint32_t op)
-{
-	int size = 4;
-	fatalerror("handleop32_LR_cc_f_b_b_c (LR)\n");
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_LR_cc_f_b_b_u6(uint32_t op)
-{
-	int size = 4;
-	uint8_t breg = common32_get_breg(op);
-	uint32_t u = common32_get_u6(op);
-	uint32_t c = u;
-	uint8_t condition = common32_get_condition(op);
-	if (!check_condition(condition))
-		return m_pc + size;
-	m_regs[breg] = READAUX(c);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_LR_cc(uint32_t op)
-{
-	int M = (op & 0x00000020) >> 5;
-	switch (M)
-	{
-	case 0x00: return handleop32_LR_cc_f_b_b_c(op);
-	case 0x01: return handleop32_LR_cc_f_b_b_u6(op);
-	}
-	return 0;
-}
-
 uint32_t arcompact_device::handleop32_LR(uint32_t op)
 {
-	int p = (op & 0x00c00000) >> 22;
-	switch (p)
+	switch ((op & 0x00c00000) >> 22)
 	{
-	case 0x00: return handleop32_LR_f_a_b_c(op);
-	case 0x01: return handleop32_LR_f_a_b_u6(op);
-	case 0x02: return handleop32_LR_f_b_b_s12(op);
-	case 0x03: return handleop32_LR_cc(op);
+	case 0x00:
+	{
+		int size = 4;
+		uint8_t breg = common32_get_breg(op);
+		uint8_t creg = common32_get_creg(op);
+		if (creg == REG_LIMM)
+		{
+			get_limm_32bit_opcode();
+			size = 8;
+		}
+		uint32_t c = m_regs[creg];
+		m_regs[breg] = READAUX(c);
+		return m_pc + size;
+	}
+	case 0x01:
+	{
+		int size = 4;
+		uint8_t breg = common32_get_breg(op);
+		uint32_t u = common32_get_u6(op);
+		uint32_t c = u;
+		m_regs[breg] = READAUX(c);
+		return m_pc + size;
+	}
+	case 0x02:
+	{
+		int size = 4;
+		uint8_t breg = common32_get_breg(op);
+		uint32_t S = common32_get_s12(op);
+		uint32_t c = (uint32_t)S;
+		m_regs[breg] = READAUX(c);
+		return m_pc + size;
+	}
+	case 0x03:
+	{
+		switch ((op & 0x00000020) >> 5)
+		{
+		case 0x00:
+		{
+			int size = 4;
+			fatalerror("handleop32_LR_cc_f_b_b_c (LR)\n");
+			return m_pc + size;
+		}
+		case 0x01:
+		{
+			int size = 4;
+			uint8_t breg = common32_get_breg(op);
+			uint32_t u = common32_get_u6(op);
+			uint32_t c = u;
+			uint8_t condition = common32_get_condition(op);
+			if (!check_condition(condition))
+				return m_pc + size;
+			m_regs[breg] = READAUX(c);
+			return m_pc + size;
+		}
+		}
+		return 0;
+	}
 	}
 	return 0;
 }
@@ -102,80 +88,66 @@ uint32_t arcompact_device::handleop32_LR(uint32_t op)
 // SR limm,[s12]                   0010 0110 1010 1011   0111 ssss ssSS SSSS (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_SR_f_a_b_c(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint8_t creg = common32_get_creg(op);
-	int size = check_limm(breg, creg);
-	uint32_t b = m_regs[breg];
-	uint32_t c = m_regs[creg];
-	WRITEAUX(c, b);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_SR_f_a_b_u6(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint32_t u = common32_get_u6(op);
-	int size = check_limm(breg);
-	uint32_t b = m_regs[breg];
-	uint32_t c = u;
-	WRITEAUX(c, b);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_SR_f_b_b_s12(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint32_t S = common32_get_s12(op);
-	int size = check_limm(breg);
-	uint32_t b = m_regs[breg];
-	uint32_t c = (uint32_t)S;
-	WRITEAUX(c, b);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_SR_cc_f_b_b_c(uint32_t op)
-{
-	int size = 4;
-	fatalerror("handleop32_SR_cc_f_b_b_c (SR)\n");
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_SR_cc_f_b_b_u6(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint32_t u = common32_get_u6(op);
-	int size = check_limm(breg);
-	uint32_t b = m_regs[breg];
-	uint32_t c = u;
-	uint8_t condition = common32_get_condition(op);
-	if (!check_condition(condition))
-		return m_pc + size;
-	WRITEAUX(c, b);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_SR_cc(uint32_t op)
-{
-	int M = (op & 0x00000020) >> 5;
-	switch (M)
-	{
-	case 0x00: return handleop32_SR_cc_f_b_b_c(op);
-	case 0x01: return handleop32_SR_cc_f_b_b_u6(op);
-	}
-	return 0;
-}
-
 uint32_t arcompact_device::handleop32_SR(uint32_t op)
 {
-	int p = (op & 0x00c00000) >> 22;
-	switch (p)
+	switch ((op & 0x00c00000) >> 22)
 	{
-	case 0x00: return handleop32_SR_f_a_b_c(op);
-	case 0x01: return handleop32_SR_f_a_b_u6(op);
-	case 0x02: return handleop32_SR_f_b_b_s12(op);
-	case 0x03: return handleop32_SR_cc(op);
+	case 0x00:
+	{
+		uint8_t breg = common32_get_breg(op);
+		uint8_t creg = common32_get_creg(op);
+		int size = check_limm(breg, creg);
+		uint32_t b = m_regs[breg];
+		uint32_t c = m_regs[creg];
+		WRITEAUX(c, b);
+		return m_pc + size;
+	}
+	case 0x01:
+	{
+		uint8_t breg = common32_get_breg(op);
+		uint32_t u = common32_get_u6(op);
+		int size = check_limm(breg);
+		uint32_t b = m_regs[breg];
+		uint32_t c = u;
+		WRITEAUX(c, b);
+		return m_pc + size;
+	}
+	case 0x02:
+	{
+		uint8_t breg = common32_get_breg(op);
+		uint32_t S = common32_get_s12(op);
+		int size = check_limm(breg);
+		uint32_t b = m_regs[breg];
+		uint32_t c = (uint32_t)S;
+		WRITEAUX(c, b);
+		return m_pc + size;
+	}
+	case 0x03:
+	{
+		switch ((op & 0x00000020) >> 5)
+		{
+		case 0x00:
+		{
+			int size = 4;
+			fatalerror("handleop32_SR_cc_f_b_b_c (SR)\n");
+			return m_pc + size;
+		}
+		case 0x01:
+		{
+			uint8_t breg = common32_get_breg(op);
+			uint32_t u = common32_get_u6(op);
+			int size = check_limm(breg);
+			uint32_t b = m_regs[breg];
+			uint32_t c = u;
+			uint8_t condition = common32_get_condition(op);
+			if (!check_condition(condition))
+				return m_pc + size;
+			WRITEAUX(c, b);
+			return m_pc + size;
+		}
+		}
+		return 0;
+	}
 	}
 	return 0;
 }

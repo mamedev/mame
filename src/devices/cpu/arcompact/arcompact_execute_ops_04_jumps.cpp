@@ -185,49 +185,33 @@ uint32_t arcompact_device::handleop32_Jcc_cc_f_b_b_c_helper(uint32_t op, bool de
 // J s12                           0010 0RRR 1010 0000   0RRR ssss ssSS SSSS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_Jcc_f_a_b_c(uint32_t op)
-{
-	return handleop32_Jcc_f_a_b_c_helper(op, false, false);
-}
-
-uint32_t arcompact_device::handleop32_Jcc_f_a_b_u6(uint32_t op)
-{
-	int size = 4;
-	fatalerror("unimplemented J %08x", op);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_Jcc_f_b_b_s12(uint32_t op)
-{
-	int size = 4;
-	fatalerror("unimplemented J %08x", op);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_Jcc_cc_f_b_b_c(uint32_t op)
-{
-	return handleop32_Jcc_cc_f_b_b_c_helper(op, false, false);
-}
-
-uint32_t arcompact_device::handleop32_Jcc_cc_f_b_b_u6(uint32_t op)
-{
-	int size = 4;
-	fatalerror("unimplemented handleop32_Jcc_cc_f_b_b_u6 J %08x (u6)", op);
-	return m_pc + size;
-}
-
 uint32_t arcompact_device::handleop32_Jcc(uint32_t op)
 {
 	switch ((op & 0x00c00000) >> 22)
 	{
-	case 0x00: return handleop32_Jcc_f_a_b_c(op);
-	case 0x01: return handleop32_Jcc_f_a_b_u6(op);
-	case 0x02: return handleop32_Jcc_f_b_b_s12(op);
+	case 0x00: return handleop32_Jcc_f_a_b_c_helper(op, false, false);
+	case 0x01:
+	{
+		int size = 4;
+		fatalerror("unimplemented J %08x", op);
+		return m_pc + size;
+	}
+	case 0x02:
+	{
+		int size = 4;
+		fatalerror("unimplemented J %08x", op);
+		return m_pc + size;
+	}
 	case 0x03:
 		switch ((op & 0x00000020) >> 5)
 		{
-		case 0x00: return handleop32_Jcc_cc_f_b_b_c(op);
-		case 0x01: return handleop32_Jcc_cc_f_b_b_u6(op);
+		case 0x00: return handleop32_Jcc_cc_f_b_b_c_helper(op, false, false);
+		case 0x01:
+		{
+			int size = 4;
+			fatalerror("unimplemented handleop32_Jcc_cc_f_b_b_u6 J %08x (u6)", op);
+			return m_pc + size;
+		}
 		}
 		return 0;
 	}
@@ -244,49 +228,33 @@ uint32_t arcompact_device::handleop32_Jcc(uint32_t op)
 // J.D s12                         0010 0RRR 1010 0001   0RRR ssss ssSS SSSS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_Jcc_D_f_a_b_c(uint32_t op)
-{
-	return handleop32_Jcc_f_a_b_c_helper(op, true, false);
-}
-
-uint32_t arcompact_device::handleop32_Jcc_D_f_a_b_u6(uint32_t op)
-{
-	int size = 4;
-	fatalerror("unimplemented J.D (u6 type) %08x", op);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_Jcc_D_f_b_b_s12(uint32_t op)
-{
-	int size = 4;
-	fatalerror("unimplemented J.D (s12 type) %08x", op);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_Jcc_D_cc_f_b_b_c(uint32_t op)
-{
-	return handleop32_Jcc_cc_f_b_b_c_helper(op, true, false);
-}
-
-uint32_t arcompact_device::handleop32_Jcc_D_cc_f_b_b_u6(uint32_t op)
-{
-	int size = 4;
-	fatalerror("unimplemented handleop32_Jcc_D_cc_f_b_b_u6 J.D %08x (u6)", op);
-	return m_pc + size;
-}
-
 uint32_t arcompact_device::handleop32_Jcc_D(uint32_t op)
 {
 	switch ((op & 0x00c00000) >> 22)
 	{
-	case 0x00: return handleop32_Jcc_D_f_a_b_c(op);
-	case 0x01: return handleop32_Jcc_D_f_a_b_u6(op);
-	case 0x02: return handleop32_Jcc_D_f_b_b_s12(op);
+	case 0x00: return handleop32_Jcc_f_a_b_c_helper(op, true, false);
+	case 0x01:
+	{
+		int size = 4;
+		fatalerror("unimplemented J.D (u6 type) %08x", op);
+		return m_pc + size;
+	}
+	case 0x02:
+	{
+		int size = 4;
+		fatalerror("unimplemented J.D (s12 type) %08x", op);
+		return m_pc + size;
+	}
 	case 0x03:
 		switch ((op & 0x00000020) >> 5)
 		{
-		case 0x00: return handleop32_Jcc_D_cc_f_b_b_c(op);
-		case 0x01: return handleop32_Jcc_D_cc_f_b_b_u6(op);
+		case 0x00: return handleop32_Jcc_cc_f_b_b_c_helper(op, true, false);
+		case 0x01:
+		{
+			int size = 4;
+			fatalerror("unimplemented handleop32_Jcc_D_cc_f_b_b_u6 J.D %08x (u6)", op);
+			return m_pc + size;
+		}
 		}
 		return 0;
 	}
@@ -304,50 +272,33 @@ uint32_t arcompact_device::handleop32_Jcc_D(uint32_t op)
 // JL s12                          0010 0RRR 1010 0010   0RRR ssss ssSS SSSS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_JLcc_f_a_b_c(uint32_t op)
-{
-	return handleop32_Jcc_f_a_b_c_helper(op, false, true);
-}
-
-uint32_t arcompact_device::handleop32_JLcc_f_a_b_u6(uint32_t op)
-{
-	int size = 4;
-	fatalerror("unimplemented JL %08x", op);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_JLcc_f_b_b_s12(uint32_t op)
-{
-	int size = 4;
-	fatalerror("unimplemented JL %08x", op);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_JLcc_cc_f_b_b_c(uint32_t op)
-{
-	return handleop32_Jcc_cc_f_b_b_c_helper(op, false, true);
-}
-
-uint32_t arcompact_device::handleop32_JLcc_cc_f_b_b_u6(uint32_t op)
-{
-	int size = 4;
-	fatalerror("unimplemented handleop32_JLcc_cc_f_b_b_u6 JL %08x (u6)", op);
-	return m_pc + size;
-}
-
-
 uint32_t arcompact_device::handleop32_JLcc(uint32_t op)
 {
 	switch ((op & 0x00c00000) >> 22)
 	{
-	case 0x00: return handleop32_JLcc_f_a_b_c(op);
-	case 0x01: return handleop32_JLcc_f_a_b_u6(op);
-	case 0x02: return handleop32_JLcc_f_b_b_s12(op);
+	case 0x00: return handleop32_Jcc_f_a_b_c_helper(op, false, true);
+	case 0x01:
+	{
+		int size = 4;
+		fatalerror("unimplemented JL %08x", op);
+		return m_pc + size;
+	}
+	case 0x02:
+	{
+		int size = 4;
+		fatalerror("unimplemented JL %08x", op);
+		return m_pc + size;
+	}
 	case 0x03:
 		switch ((op & 0x00000020) >> 5)
 		{
-		case 0x00: return handleop32_JLcc_cc_f_b_b_c(op);
-		case 0x01: return handleop32_JLcc_cc_f_b_b_u6(op);
+		case 0x00: return handleop32_Jcc_cc_f_b_b_c_helper(op, false, true);
+		case 0x01:
+		{
+			int size = 4;
+			fatalerror("unimplemented handleop32_JLcc_cc_f_b_b_u6 JL %08x (u6)", op);
+			return m_pc + size;
+		}
 		}
 		return 0;
 	}
@@ -363,49 +314,33 @@ uint32_t arcompact_device::handleop32_JLcc(uint32_t op)
 // JL.D s12                        0010 0RRR 1010 0011   0RRR ssss ssSS SSSS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_JLcc_D_f_a_b_c(uint32_t op)
-{
-	return handleop32_Jcc_f_a_b_c_helper(op, true, true);
-}
-
-uint32_t arcompact_device::handleop32_JLcc_D_f_a_b_u6(uint32_t op)
-{
-	int size = 4;
-	fatalerror("unimplemented JL.D (u6 type) %08x", op);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_JLcc_D_f_b_b_s12(uint32_t op)
-{
-	int size = 4;
-	fatalerror("unimplemented JL.D (s12 type) %08x", op);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_JLcc_D_cc_f_b_b_c(uint32_t op)
-{
-	return handleop32_Jcc_cc_f_b_b_c_helper(op, true, true);
-}
-
-uint32_t arcompact_device::handleop32_JLcc_D_cc_f_b_b_u6(uint32_t op)
-{
-	int size = 4;
-	fatalerror("unimplemented handleop32_JLcc_D_cc_f_b_b_u6 JL.D %08x (u6)", op);
-	return m_pc + size;
-}
-
 uint32_t arcompact_device::handleop32_JLcc_D(uint32_t op)
 {
 	switch ((op & 0x00c00000) >> 22)
 	{
-	case 0x00: return handleop32_JLcc_D_f_a_b_c(op);
-	case 0x01: return handleop32_JLcc_D_f_a_b_u6(op);
-	case 0x02: return handleop32_JLcc_D_f_b_b_s12(op);
+	case 0x00: return handleop32_Jcc_f_a_b_c_helper(op, true, true);
+	case 0x01:
+	{
+		int size = 4;
+		fatalerror("unimplemented JL.D (u6 type) %08x", op);
+		return m_pc + size;
+	}
+	case 0x02:
+	{
+		int size = 4;
+		fatalerror("unimplemented JL.D (s12 type) %08x", op);
+		return m_pc + size;
+	}
 	case 0x03:
 		switch ((op & 0x00000020) >> 5)
 		{
-		case 0x00: return handleop32_JLcc_D_cc_f_b_b_c(op);
-		case 0x01: return handleop32_JLcc_D_cc_f_b_b_u6(op);
+		case 0x00: return handleop32_Jcc_cc_f_b_b_c_helper(op, true, true);
+		case 0x01:
+		{
+			int size = 4;
+			fatalerror("unimplemented handleop32_JLcc_D_cc_f_b_b_u6 JL.D %08x (u6)", op);
+			return m_pc + size;
+		}
 		}
 		return 0;
 	}

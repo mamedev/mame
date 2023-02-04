@@ -311,64 +311,50 @@ void arcompact_device::handleop32_MOV_do_op(uint32_t breg, uint32_t src2, bool s
 		do_flags_nz(m_regs[breg]);
 }
 
-// due to 'a' not being used, this is considered a redundant encoding of the conditional 'from c register' case
-// but is used extensively by the Leapster BIOS
-uint32_t arcompact_device::handleop32_MOV_f_a_b_c(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint8_t creg = common32_get_creg(op);
-	int size = check_limm(creg);
-	handleop32_MOV_do_op(breg, m_regs[creg], common32_get_F(op));
-	return m_pc + size;
-}
-
-// due to 'a' not being used, this is considered a redundant encoding of the conditional 'from u6 immediate' case
-// but is used extensively by the Leapster BIOS
-uint32_t arcompact_device::handleop32_MOV_f_a_b_u6(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	handleop32_MOV_do_op(breg, common32_get_u6(op), common32_get_F(op));
-	return m_pc + 4;
-}
-
-uint32_t arcompact_device::handleop32_MOV_f_b_b_s12(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	handleop32_MOV_do_op(breg, common32_get_s12(op), common32_get_F(op));
-	return m_pc + 4;
-}
-
-uint32_t arcompact_device::handleop32_MOV_cc_f_b_b_c(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	uint8_t creg = common32_get_creg(op);
-	int size = check_limm(creg);
-	if (check_condition(common32_get_condition(op)))
-		handleop32_MOV_do_op(breg, m_regs[creg], common32_get_F(op));
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_MOV_cc_f_b_b_u6(uint32_t op)
-{
-	uint8_t breg = common32_get_breg(op);
-	if (check_condition(common32_get_condition(op)))
-		handleop32_MOV_do_op(breg, common32_get_u6(op), common32_get_F(op));
-	return m_pc + 4;
-}
-
 uint32_t arcompact_device::handleop32_MOV(uint32_t op)
 {
 	switch ((op & 0x00c00000) >> 22)
 	{
-	case 0x00: return handleop32_MOV_f_a_b_c(op);
-	case 0x01: return handleop32_MOV_f_a_b_u6(op);
-	case 0x02: return handleop32_MOV_f_b_b_s12(op);
+	case 0x00:
+	{
+		uint8_t breg = common32_get_breg(op);
+		uint8_t creg = common32_get_creg(op);
+		int size = check_limm(creg);
+		handleop32_MOV_do_op(breg, m_regs[creg], common32_get_F(op));
+		return m_pc + size;
+	}
+	case 0x01:
+	{
+		uint8_t breg = common32_get_breg(op);
+		handleop32_MOV_do_op(breg, common32_get_u6(op), common32_get_F(op));
+		return m_pc + 4;
+	}
+	case 0x02:
+	{
+		uint8_t breg = common32_get_breg(op);
+		handleop32_MOV_do_op(breg, common32_get_s12(op), common32_get_F(op));
+		return m_pc + 4;
+	}
 	case 0x03:
 	{
 		switch ((op & 0x00000020) >> 5)
 		{
-		case 0x00: return handleop32_MOV_cc_f_b_b_c(op);
-		case 0x01: return handleop32_MOV_cc_f_b_b_u6(op);
+		case 0x00:
+		{
+			uint8_t breg = common32_get_breg(op);
+			uint8_t creg = common32_get_creg(op);
+			int size = check_limm(creg);
+			if (check_condition(common32_get_condition(op)))
+				handleop32_MOV_do_op(breg, m_regs[creg], common32_get_F(op));
+			return m_pc + size;
+		}
+		case 0x01:
+		{
+			uint8_t breg = common32_get_breg(op);
+			if (check_condition(common32_get_condition(op)))
+				handleop32_MOV_do_op(breg, common32_get_u6(op), common32_get_F(op));
+			return m_pc + 4;
+		}
 		}
 		return 0;
 	}
@@ -855,57 +841,45 @@ void arcompact_device::handleop32_FLAG_do_op(uint32_t source)
 	}
 }
 
-// due to 'a' and 'b' not being used, this is considered a redundant encoding of the conditional 'from c register' case
-// but is used extensively by the Leapster BIOS
-uint32_t arcompact_device::handleop32_FLAG_f_a_b_c(uint32_t op)
-{
-	uint8_t creg = common32_get_creg(op);
-	int size = check_limm(creg);
-	handleop32_FLAG_do_op(m_regs[creg]);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_FLAG_f_a_b_u6(uint32_t op)
-{
-	handleop32_FLAG_do_op(common32_get_u6(op));
-	return m_pc + 4;
-}
-
-uint32_t arcompact_device::handleop32_FLAG_f_b_b_s12(uint32_t op)
-{
-	handleop32_FLAG_do_op(common32_get_s12(op));
-	return m_pc + 4;
-}
-
-uint32_t arcompact_device::handleop32_FLAG_cc_f_b_b_c(uint32_t op)
-{
-	uint8_t creg = common32_get_creg(op);
-	int size = check_limm(creg);
-	if (check_condition(common32_get_condition(op)))
-		handleop32_FLAG_do_op(m_regs[creg]);
-	return m_pc + size;
-}
-
-uint32_t arcompact_device::handleop32_FLAG_cc_f_b_b_u6(uint32_t op)
-{
-	if (check_condition(common32_get_condition(op)))
-		handleop32_FLAG_do_op(common32_get_u6(op));
-	return m_pc + 4;
-}
-
 uint32_t arcompact_device::handleop32_FLAG(uint32_t op)
 {
 	switch ((op & 0x00c00000) >> 22)
 	{
-	case 0x00: return handleop32_FLAG_f_a_b_c(op);
-	case 0x01: return handleop32_FLAG_f_a_b_u6(op);
-	case 0x02: return handleop32_FLAG_f_b_b_s12(op);
+	case 0x00:
+	{
+		uint8_t creg = common32_get_creg(op);
+		int size = check_limm(creg);
+		handleop32_FLAG_do_op(m_regs[creg]);
+		return m_pc + size;
+	}
+	case 0x01:
+	{
+		handleop32_FLAG_do_op(common32_get_u6(op));
+		return m_pc + 4;
+	}
+	case 0x02:
+	{
+		handleop32_FLAG_do_op(common32_get_s12(op));
+		return m_pc + 4;
+	}
 	case 0x03:
 	{
 		switch ((op & 0x00000020) >> 5)
 		{
-		case 0x00: return handleop32_FLAG_cc_f_b_b_c(op);
-		case 0x01: return handleop32_FLAG_cc_f_b_b_u6(op);
+		case 0x00:
+		{
+			uint8_t creg = common32_get_creg(op);
+			int size = check_limm(creg);
+			if (check_condition(common32_get_condition(op)))
+				handleop32_FLAG_do_op(m_regs[creg]);
+			return m_pc + size;
+		}
+		case 0x01:
+		{
+			if (check_condition(common32_get_condition(op)))
+				handleop32_FLAG_do_op(common32_get_u6(op));
+			return m_pc + 4;
+		}
 		}
 		return 0;
 	}
