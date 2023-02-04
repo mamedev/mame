@@ -3164,7 +3164,10 @@ void i386_device::x87_fist_m16int(uint8_t modrm)
 		if (!floatx80_lt(fx80, lowerLim) && floatx80_le(fx80, upperLim))
 			m16int = floatx80_to_int32(fx80);
 		else
+		{
+			float_exception_flags = float_flag_invalid;
 			m16int = -32768;
+		}
 	}
 
 	uint32_t ea = Getx87EA(modrm, 1);
@@ -3199,7 +3202,10 @@ void i386_device::x87_fist_m32int(uint8_t modrm)
 		if (!floatx80_lt(fx80, lowerLim) && floatx80_le(fx80, upperLim))
 			m32int = floatx80_to_int32(fx80);
 		else
+		{
+			float_exception_flags = float_flag_invalid;
 			m32int = 0x80000000;
+		}
 	}
 
 	uint32_t ea = Getx87EA(modrm, 1);
@@ -3217,7 +3223,7 @@ void i386_device::x87_fistp_m16int(uint8_t modrm)
 
 	if (x87_mf_fault())
 		return;
-if (X87_IS_ST_EMPTY(0))
+	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
 		m16int = (uint16_t)0x8000;
@@ -3234,7 +3240,10 @@ if (X87_IS_ST_EMPTY(0))
 		if (!floatx80_lt(fx80, lowerLim) && floatx80_le(fx80, upperLim))
 			m16int = floatx80_to_int32(fx80);
 		else
+		{
+			float_exception_flags = float_flag_invalid;
 			m16int = (uint16_t)0x8000;
+		}
 	}
 
 	uint32_t ea = Getx87EA(modrm, 1);
@@ -3270,7 +3279,10 @@ void i386_device::x87_fistp_m32int(uint8_t modrm)
 		if (!floatx80_lt(fx80, lowerLim) && floatx80_le(fx80, upperLim))
 			m32int = floatx80_to_int32(fx80);
 		else
+		{
+			float_exception_flags = float_flag_invalid;
 			m32int = 0x80000000;
+		}
 	}
 
 	uint32_t ea = Getx87EA(modrm, 1);
@@ -3306,7 +3318,10 @@ void i386_device::x87_fistp_m64int(uint8_t modrm)
 		if (!floatx80_lt(fx80, lowerLim) && floatx80_le(fx80, upperLim))
 			m64int = floatx80_to_int64(fx80);
 		else
+		{
+			float_exception_flags = float_flag_invalid;
 			m64int = 0x8000000000000000U;
+		}
 	}
 
 	uint32_t ea = Getx87EA(modrm, 1);
@@ -5055,48 +5070,88 @@ void i386_device::x87_invalid(uint8_t modrm)
 
 void i386_device::i386_x87_group_d8()
 {
+	if (m_cr[0] & 0xc)
+	{
+		i386_trap(FAULT_NM, 0, 0);
+		return;
+	}
 	uint8_t modrm = FETCH();
 	(this->*m_opcode_table_x87_d8[modrm])(modrm);
 }
 
 void i386_device::i386_x87_group_d9()
 {
+	if (m_cr[0] & 0xc)
+	{
+		i386_trap(FAULT_NM, 0, 0);
+		return;
+	}
 	uint8_t modrm = FETCH();
 	(this->*m_opcode_table_x87_d9[modrm])(modrm);
 }
 
 void i386_device::i386_x87_group_da()
 {
+	if (m_cr[0] & 0xc)
+	{
+		i386_trap(FAULT_NM, 0, 0);
+		return;
+	}
 	uint8_t modrm = FETCH();
 	(this->*m_opcode_table_x87_da[modrm])(modrm);
 }
 
 void i386_device::i386_x87_group_db()
 {
+	if (m_cr[0] & 0xc)
+	{
+		i386_trap(FAULT_NM, 0, 0);
+		return;
+	}
 	uint8_t modrm = FETCH();
 	(this->*m_opcode_table_x87_db[modrm])(modrm);
 }
 
 void i386_device::i386_x87_group_dc()
 {
+	if (m_cr[0] & 0xc)
+	{
+		i386_trap(FAULT_NM, 0, 0);
+		return;
+	}
 	uint8_t modrm = FETCH();
 	(this->*m_opcode_table_x87_dc[modrm])(modrm);
 }
 
 void i386_device::i386_x87_group_dd()
 {
+	if (m_cr[0] & 0xc)
+	{
+		i386_trap(FAULT_NM, 0, 0);
+		return;
+	}
 	uint8_t modrm = FETCH();
 	(this->*m_opcode_table_x87_dd[modrm])(modrm);
 }
 
 void i386_device::i386_x87_group_de()
 {
+	if (m_cr[0] & 0xc)
+	{
+		i386_trap(FAULT_NM, 0, 0);
+		return;
+	}
 	uint8_t modrm = FETCH();
 	(this->*m_opcode_table_x87_de[modrm])(modrm);
 }
 
 void i386_device::i386_x87_group_df()
 {
+	if (m_cr[0] & 0xc)
+	{
+		i386_trap(FAULT_NM, 0, 0);
+		return;
+	}
 	uint8_t modrm = FETCH();
 	(this->*m_opcode_table_x87_df[modrm])(modrm);
 }
