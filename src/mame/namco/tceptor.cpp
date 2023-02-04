@@ -70,34 +70,12 @@ void tceptor_state::mcu_irq_disable_w(uint8_t data)
 /* fix dsw/input data to memory mapped data */
 uint8_t tceptor_state::fix_input0(uint8_t in1, uint8_t in2)
 {
-	uint8_t r = 0;
-
-	r |= (in1 & 0x80) >> 7;
-	r |= (in1 & 0x20) >> 4;
-	r |= (in1 & 0x08) >> 1;
-	r |= (in1 & 0x02) << 2;
-	r |= (in2 & 0x80) >> 3;
-	r |= (in2 & 0x20) >> 0;
-	r |= (in2 & 0x08) << 3;
-	r |= (in2 & 0x02) << 6;
-
-	return r;
+	return bitswap<4>(in1,1,3,5,7) | bitswap<4>(in2,1,3,5,7) << 4;
 }
 
 uint8_t tceptor_state::fix_input1(uint8_t in1, uint8_t in2)
 {
-	uint8_t r = 0;
-
-	r |= (in1 & 0x40) >> 6;
-	r |= (in1 & 0x10) >> 3;
-	r |= (in1 & 0x04) >> 0;
-	r |= (in1 & 0x01) << 3;
-	r |= (in2 & 0x40) >> 2;
-	r |= (in2 & 0x10) << 1;
-	r |= (in2 & 0x04) << 4;
-	r |= (in2 & 0x01) << 7;
-
-	return r;
+	return bitswap<4>(in1,0,2,4,6) | bitswap<4>(in2,0,2,4,6) << 4;
 }
 
 uint8_t tceptor_state::dsw0_r()

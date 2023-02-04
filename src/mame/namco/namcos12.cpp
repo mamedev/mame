@@ -2613,7 +2613,7 @@ ROM_START( soulclbr )
 	ROM_LOAD( "soc1wave0.2",         0x0000000, 0x800000, CRC(c100618d) SHA1(b87f88ee42ad9c5affa674e5f816d902143fed99) )
 ROM_END
 
-ROM_START( soulclbrwb )
+ROM_START( soulclbrab )
 	ROM_REGION32_LE( 0x00400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "soc14verb.2l", 0x000000, 0x200000, CRC(6af5c5f6) SHA1(51d1e7d78d95cfc765cd219ed07b405cd920044b) )
 	ROM_LOAD16_BYTE( "soc14verb.2p", 0x000001, 0x200000, CRC(23e7a4c4) SHA1(a97f36cafdeff9e26fbd24e54ab8ac8080763761) )
@@ -2708,7 +2708,7 @@ ROM_START( soulclbrjb )
 	ROM_LOAD( "soc1wave0.2",         0x0000000, 0x800000, CRC(c100618d) SHA1(b87f88ee42ad9c5affa674e5f816d902143fed99) )
 ROM_END
 
-ROM_START( soulclbraa )
+ROM_START( soulclbra )
 	ROM_REGION32_LE( 0x00400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "soc12vera.2l",  0x0000000, 0x200000, CRC(ceadcc9a) SHA1(68cd3d15f28178fcea8aada6067b7060edfb2913) )
 	ROM_LOAD16_BYTE( "soc12vera.2p",  0x0000001, 0x200000, CRC(65a74cf0) SHA1(1129c078925bd02f4e9cef64cd7761968be53537) )
@@ -3394,11 +3394,11 @@ GAME( 1996, tekken3je1,tekken3,  coh700,   namcos12,  namcos12_state,          i
 GAME( 1996, tekken3ja, tekken3,  coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.A)", 0 ) /* KC006 */
 GAME( 1997, lbgrande,  0,        coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Libero Grande (World, LG2/VER.A)", 0 ) /* KC014 */
 GAME( 1997, toukon3,   0,        coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco / Tomy",    "Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (Japan, TR1/VER.A)", 0 ) /* KC019 */
-GAME( 1998, soulclbr,  0,        coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (World, SOC14/VER.C)", 0 )
-GAME( 1998, soulclbrwb,soulclbr, coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (World, SOC14/VER.B)", 0 )
+GAME( 1998, soulclbr,  0,        coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (Asia, SOC14/VER.C)", 0 )
+GAME( 1998, soulclbrab,soulclbr, coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (Asia, SOC14/VER.B)", 0 )
+GAME( 1998, soulclbra, soulclbr, coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (World, SOC12/VER.A2)", 0 ) /* KC020 */
 GAME( 1998, soulclbruc,soulclbr, coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (US, SOC13/VER.C)", 0 )
 GAME( 1998, soulclbrub,soulclbr, coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (US, SOC13/VER.B)", 0 ) /* KC020 */
-GAME( 1998, soulclbraa,soulclbr, coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (Asia, SOC12/VER.A2)", 0 ) /* KC020 */
 GAME( 1998, soulclbrjc,soulclbr, coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.C)", 0 ) /* KC020 */
 GAME( 1998, soulclbrjb,soulclbr, coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.B)", 0 ) /* KC020 */
 GAME( 1998, soulclbrja,soulclbr, coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Soul Calibur (Japan, SOC11/VER.A2)", 0 ) /* KC020 */
@@ -3411,10 +3411,10 @@ GAME( 1998, sws98,     0,        coh700,   namcos12,  namcos12_state,          i
 GAME( 1998, technodr,  0,        technodr, technodr,  namcos12_boothack_state, init_technodr, ROT0, "Namco",           "Techno Drive (Japan, TH1/VER.B)", MACHINE_NODEVICE_PRINTER ) /* KC056 */
 GAME( 1998, tenkomor,  0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT90,"Namco",           "Tenkomori Shooting (World, TKM2/VER.A1)", 0 ) /* KC036 */
 GAME( 1998, tenkomorja,tenkomor, coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT90,"Namco",           "Tenkomori Shooting (Japan, TKM1/VER.A1)", 0 ) /* KC036 */
-GAME( 1998, fgtlayer,  0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Arika / Namco",   "Fighting Layer (FTL3/VER.A)", 0 ) /* KC037 */ // supposedly US region but doesn't show the usual warning / WDUD screens
+GAME( 1998, fgtlayer,  0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Arika / Namco",   "Fighting Layer (Asia, FTL3/VER.A)", 0 ) /* KC037 */
 GAME( 1998, fgtlayerj, fgtlayer, coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Arika / Namco",   "Fighting Layer (Japan, FTL0/VER.A)", 0 ) /* KC037 */
 GAME( 1998, pacapp,    0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Produce / Namco", "Paca Paca Passion (Japan, PPP1/VER.A2)", 0 ) /* KC038 */
-GAME( 1999, ptblank2,  0,        ptblank2, ptblank2,  namcos12_boothack_state, init_ptblank2, ROT0, "Namco",           "Point Blank 2 (GNB5/VER.A)", 0 ) /* KC042 */
+GAME( 1999, ptblank2,  0,        ptblank2, ptblank2,  namcos12_boothack_state, init_ptblank2, ROT0, "Namco",           "Point Blank 2 (World, GNB5/VER.A)", 0 ) /* KC042 */
 GAME( 1999, gunbarl,   ptblank2, ptblank2, ptblank2,  namcos12_boothack_state, init_ptblank2, ROT0, "Namco",           "Gunbarl (Japan, GNB4/VER.A)", 0 ) /* KC042 */
 GAME( 1999, sws99,     0,        coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Super World Stadium '99 (Japan, SS91/VER.A3)", 0 ) /* KC043 */
 GAME( 1999, tektagt,   0,        tektagt,  namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Namco",           "Tekken Tag Tournament (World, TEG2/VER.C1, set 1)", 0 ) /* KC044 */
