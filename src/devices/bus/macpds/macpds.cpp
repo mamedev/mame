@@ -72,6 +72,12 @@ macpds_device::macpds_device(const machine_config &mconfig, device_type type, co
 	m_maincpu(*this, finder_base::DUMMY_TAG)
 {
 }
+
+macpds_device::~macpds_device()
+{
+}
+
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -88,9 +94,9 @@ void macpds_device::device_reset()
 {
 }
 
-void macpds_device::add_macpds_card(device_macpds_card_interface *card)
+void macpds_device::add_macpds_card(device_macpds_card_interface &card)
 {
-	m_device_list.append(*card);
+	m_device_list.emplace_back(card);
 }
 
 template<typename R, typename W> void macpds_device::install_device(offs_t start, offs_t end, R rhandler, W whandler, uint32_t mask)
@@ -132,9 +138,10 @@ void macpds_device::set_irq_line(int line, int state)
 //  device_macpds_card_interface - constructor
 //-------------------------------------------------
 
-device_macpds_card_interface::device_macpds_card_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "macpds"),
-		m_macpds(nullptr), m_macpds_slot(nullptr), m_next(nullptr)
+device_macpds_card_interface::device_macpds_card_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "macpds"),
+	m_macpds(nullptr),
+	m_macpds_slot(nullptr)
 {
 }
 
@@ -149,7 +156,7 @@ device_macpds_card_interface::~device_macpds_card_interface()
 
 void device_macpds_card_interface::set_macpds_device()
 {
-	m_macpds->add_macpds_card(this);
+	m_macpds->add_macpds_card(*this);
 }
 
 void device_macpds_card_interface::install_bank(offs_t start, offs_t end, uint8_t *data)

@@ -35,6 +35,7 @@
 #include <cmath>
 #include <cstdio>
 #include <iterator>
+#include <list>
 
 
 namespace osd {
@@ -62,7 +63,6 @@ struct copy_info_t;
 /* texture_info holds information about a texture */
 class texture_info
 {
-	friend class simple_list<texture_info>;
 public:
 	texture_info(renderer_sdl2 *renderer, const render_texinfo &texsource, const quad_setup_data &setup, const uint32_t flags);
 	~texture_info();
@@ -84,31 +84,28 @@ public:
 	int raw_width() const { return m_texinfo.width; }
 	int raw_height() const { return m_texinfo.height; }
 
-	texture_info *next() { return m_next; }
 	const render_texinfo &texinfo() const { return m_texinfo; }
 	render_texinfo &texinfo() { return m_texinfo; }
 
 	HashT hash() const { return m_hash; }
 	uint32_t flags() const { return m_flags; }
-	// FIXME:
-	bool is_pixels_owned() const;
 
 private:
+	bool is_pixels_owned() const;
+
 	void set_coloralphamode(SDL_Texture *texture_id, const render_color *color);
 
 	Uint32              m_sdl_access;
 	renderer_sdl2 *     m_renderer;
 	render_texinfo      m_texinfo;            // copy of the texture info
 	HashT               m_hash;               // hash value for the texture (must be >= pointer size)
-	uint32_t              m_flags;              // rendering flags
+	uint32_t            m_flags;              // rendering flags
 
 	SDL_Texture *       m_texture_id;
 	bool                m_is_rotated;
 
 	int                 m_format;             // texture format
 	SDL_BlendMode       m_sdl_blendmode;
-
-	texture_info *      m_next;               // next texture in the list
 };
 
 // inline functions and macros
@@ -187,7 +184,7 @@ private:
 
 	int32_t         m_blittimer;
 
-	simple_list<texture_info>  m_texlist;                // list of active textures
+	std::list<texture_info> m_texlist;                // list of active textures
 
 	float           m_last_hofs;
 	float           m_last_vofs;
@@ -511,11 +508,11 @@ void renderer_sdl2::destroy_all_textures()
 	if (window().m_primlist)
 	{
 		window().m_primlist->acquire_lock();
-		m_texlist.reset();
+		m_texlist.clear();
 		window().m_primlist->release_lock();
 	}
 	else
-		m_texlist.reset();
+		m_texlist.clear();
 }
 
 //============================================================
@@ -666,11 +663,10 @@ copy_info_t const *texture_info::compute_size_type()
 	return nullptr;
 }
 
-// FIXME:
 bool texture_info::is_pixels_owned() const
-{ // do we own / allocated it ?
-	return ((m_sdl_access == SDL_TEXTUREACCESS_STATIC)
-			&& (m_copyinfo->blitter->m_is_passthrough));
+{
+	// do we own / allocated it ?
+	return (m_sdl_access == SDL_TEXTUREACCESS_STATIC) && !m_copyinfo->blitter->m_is_passthrough;
 }
 
 //============================================================
@@ -760,12 +756,11 @@ texture_info::texture_info(renderer_sdl2 *renderer, const render_texinfo &texsou
 			m_pixels = malloc(m_setup.rotwidth * m_setup.rotheight * m_copyinfo->blitter->m_dest_bpp);
 	}
 	m_last_access = osd_ticks();
-
 }
 
 texture_info::~texture_info()
 {
-	if ( is_pixels_owned() && (m_pixels != nullptr) )
+	if (is_pixels_owned() && m_pixels)
 		free(m_pixels);
 	SDL_DestroyTexture(m_texture_id);
 }
@@ -779,7 +774,7 @@ void texture_info::set_data(const render_texinfo &texsource, const uint32_t flag
 	m_copyinfo->time -= osd_ticks();
 	if (m_sdl_access == SDL_TEXTUREACCESS_STATIC)
 	{
-		if ( m_copyinfo->blitter->m_is_passthrough )
+		if (m_copyinfo->blitter->m_is_passthrough)
 		{
 			m_pixels = texsource.base;
 			m_pitch = m_texinfo.rowpixels * m_copyinfo->blitter->m_dest_bpp;
@@ -793,11 +788,11 @@ void texture_info::set_data(const render_texinfo &texsource, const uint32_t flag
 	}
 	else
 	{
-		SDL_LockTexture(m_texture_id, nullptr, (void **) &m_pixels, &m_pitch);
+		SDL_LockTexture(m_texture_id, nullptr, (void **)&m_pixels, &m_pitch);
 		if ( m_copyinfo->blitter->m_is_passthrough )
 		{
-			uint8_t *src = (uint8_t *) texsource.base;
-			uint8_t *dst = (uint8_t *) m_pixels;
+			const uint8_t *src = (uint8_t *)texsource.base;
+			uint8_t *dst = (uint8_t *)m_pixels;
 			int spitch = texsource.rowpixels * m_copyinfo->blitter->m_dest_bpp;
 			int num = texsource.width * m_copyinfo->blitter->m_dest_bpp;
 			int h = texsource.height;
@@ -883,32 +878,32 @@ void quad_setup_data::compute(const render_primitive &prim, const int prescale)
 
 texture_info *renderer_sdl2::texture_find(const render_primitive &prim, const quad_setup_data &setup)
 {
-	HashT texhash = texture_compute_hash(prim.texture, prim.flags);
-	texture_info *texture;
-	osd_ticks_t now = osd_ticks();
+	const HashT texhash = texture_compute_hash(prim.texture, prim.flags);
+	const osd_ticks_t now = osd_ticks();
 
 	// find a match
-	for (texture = m_texlist.first(); texture != nullptr; )
-		if (texture->hash() == texhash &&
-			texture->matches(prim, setup))
+	for (auto texture = m_texlist.begin(); texture != m_texlist.end(); )
+	{
+		if ((texture->hash() == texhash) && texture->matches(prim, setup))
 		{
-			/* would we choose another blitter based on performance ? */
+			// would we choose another blitter based on performance?
 			if ((texture->m_copyinfo->samples & 0x7f) == 0x7f)
 			{
 				if (texture->m_copyinfo != texture->compute_size_type())
 					return nullptr;
 			}
 			texture->m_last_access = now;
-			return texture;
+			return &*texture;
 		}
 		else
 		{
-			/* free resources not needed any longer? */
-			texture_info *expire = texture;
-			texture = texture->next();
-			if (now - expire->m_last_access > osd_ticks_per_second())
-				m_texlist.remove(*expire);
+			// free resources not needed any longer?
+			if ((now - texture->m_last_access) > osd_ticks_per_second())
+				texture = m_texlist.erase(texture);
+			else
+				++texture;
 		}
+	}
 
 	// nothing found
 	return nullptr;
@@ -928,16 +923,15 @@ texture_info * renderer_sdl2::texture_update(const render_primitive &prim)
 	texture = texture_find(prim, setup);
 
 	// if we didn't find one, create a new texture
-	if (texture == nullptr && prim.texture.base != nullptr)
+	if (!texture && prim.texture.base)
 	{
-		texture = new texture_info(this, prim.texture, setup, prim.flags);
-		/* add us to the texture list */
-		m_texlist.prepend(*texture);
+		// add us to the texture list
+		texture = &m_texlist.emplace_front(this, prim.texture, setup, prim.flags);
 	}
 
-	if (texture != nullptr)
+	if (texture)
 	{
-		if (prim.texture.base != nullptr && texture->texinfo().seqid != prim.texture.seqid)
+		if (prim.texture.base && (texture->texinfo().seqid != prim.texture.seqid))
 		{
 			texture->texinfo().seqid = prim.texture.seqid;
 			// if we found it, but with a different seqid, copy the data

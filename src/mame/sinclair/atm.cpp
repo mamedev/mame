@@ -74,7 +74,7 @@ void atm_state::atm_update_memory()
 
 u16 atm_state::atm_update_memory_get_page(u8 bank)
 {
-	return m_pen ? pen_page(bank) : (~PEN_RAMNROM_MASK & ~PEN_DOS7FFD_MASK);
+	return m_pen ? pen_page(bank) : (u16) (~PEN_RAMNROM_MASK & ~PEN_DOS7FFD_MASK);
 }
 
 void atm_state::atm_ula_w(offs_t offset, u8 data)

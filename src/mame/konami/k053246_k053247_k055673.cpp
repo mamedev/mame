@@ -201,10 +201,12 @@ u8 k053247_device::k053246_r(offs_t offset)
 {
 	if (m_objcha_line == ASSERT_LINE)
 	{
-		int addr;
+		int addr = (m_kx46_regs[6] << 17) | (m_kx46_regs[7] << 9) | (m_kx46_regs[4] << 1) | ((offset & 1) ^ 1);
 
-		addr = (m_kx46_regs[6] << 17) | (m_kx46_regs[7] << 9) | (m_kx46_regs[4] << 1) | ((offset & 1) ^ 1);
+		// assumes it can make an address mask with m_gfxrom.length() - 1
+		assert(!(m_gfxrom.length() & (m_gfxrom.length() - 1)));
 		addr &= m_gfxrom.length() - 1;
+
 		return m_gfxrom[addr];
 	}
 	else
@@ -899,9 +901,6 @@ k055673_device::k055673_device(const machine_config &mconfig, const char *tag, d
 
 void k055673_device::device_start()
 {
-	// assumes it can make an address mask with m_gfxrom.length() - 1
-	assert(!(m_gfxrom.length() & (m_gfxrom.length() - 1)));
-
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 
@@ -1068,9 +1067,6 @@ k053247_device::k053247_device(const machine_config &mconfig, device_type type, 
 
 void k053247_device::device_start()
 {
-	// assumes it can make an address mask with m_gfxrom.length() - 1
-	assert(!(m_gfxrom.length() & (m_gfxrom.length() - 1)));
-
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 

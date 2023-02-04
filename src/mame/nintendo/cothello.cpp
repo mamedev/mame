@@ -27,8 +27,7 @@ TODO:
   compared to videos of the game. 0.9MHz(XTAL/4) is also too fast. It's probably
   due to the M58741P HOLD pin halting the 8080, which is not emulated.
 - Is there a button select somewhere? I really can't find any. Or is current
-  input emulation correct where for example P1 can move P2 cursor? (the only
-  unique P2 button is the Set button).
+  input emulation correct where for example P1 can move P2 cursor?
 - It's not known if the screen is color or B&W + overlay, but since the video
   chip is meant for a color tv, let's assume the green tint is from the screen
   itself. Photos of the home version also show a green tint.
@@ -161,8 +160,7 @@ TIMER_CALLBACK_MEMBER(cothello_state::counter_tick)
 
 u8 cothello_state::coin_r()
 {
-	// d0-d2: coin status
-	// d3: ?
+	// d0-d3: coin status
 	// d4-d7: unused
 	return m_counter_timer->enabled() ? 0xfb : 0xff;
 }

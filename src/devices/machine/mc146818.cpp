@@ -52,6 +52,7 @@ ds1287_device::ds1287_device(const machine_config &mconfig, const char *tag, dev
 mc146818_device::mc146818_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_nvram_interface(mconfig, *this),
+		device_rtc_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
 		m_index(0),
 		m_clock_timer(nullptr),
@@ -61,10 +62,8 @@ mc146818_device::mc146818_device(const machine_config &mconfig, device_type type
 		m_write_sqw(*this),
 		m_century_index(-1),
 		m_epoch(0),
-		m_use_utc(false),
 		m_binary(false),
 		m_hour(false),
-		m_binyear(false),
 		m_sqw_state(false),
 		m_tuc(0)
 {
@@ -265,7 +264,6 @@ void mc146818_device::nvram_default()
 	if(m_hour)
 		m_data[REG_B] |= REG_B_24_12;
 
-	set_base_datetime();
 	update_timer();
 	update_irq();
 }
@@ -283,7 +281,6 @@ bool mc146818_device::nvram_read(util::read_stream &file)
 	if (file.read(&m_data[0], size, actual) || actual != size)
 		return false;
 
-	set_base_datetime();
 	update_timer();
 	update_irq();
 
@@ -454,36 +451,29 @@ void mc146818_device::set_century(int century)
 
 
 //-------------------------------------------------
-//  set_base_datetime - update clock with real time
+//  rtc_clock_updated - update clock with real time
 //-------------------------------------------------
 
-void mc146818_device::set_base_datetime()
+void mc146818_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
-	system_time systime;
-	system_time::full_time current_time;
-
-	machine().base_datetime(systime);
-
-	current_time = (m_use_utc) ? systime.utc_time: systime.local_time;
-
 //  logerror("mc146818_set_base_datetime %02d/%02d/%02d %02d:%02d:%02d\n",
-//          current_time.year % 100, current_time.month + 1, current_time.mday,
-//          current_time.hour,current_time.minute, current_time.second);
+//          year, month, day,
+//          hour, minute, second);
 
-	set_seconds(current_time.second);
-	set_minutes(current_time.minute);
-	set_hours(current_time.hour);
-	set_dayofweek(current_time.weekday + 1);
-	set_dayofmonth(current_time.mday);
-	set_month(current_time.month + 1);
+	set_seconds(second);
+	set_minutes(minute);
+	set_hours(hour);
+	set_dayofweek(day_of_week);
+	set_dayofmonth(day);
+	set_month(month);
 
-	if(m_binyear)
-		set_year((current_time.year - m_epoch) % (m_data[REG_B] & REG_B_DM ? 0x100 : 100)); // pcd actually depends on this
+	if (m_epoch != 0)
+		set_year((year - m_epoch) % (m_data[REG_B] & REG_B_DM ? 0x100 : 100)); // pcd actually depends on this
 	else
-		set_year((current_time.year - m_epoch) % 100);
+		set_year(year % 100);
 
 	if (m_century_index >= 0)
-		set_century(current_time.year / 100);
+		set_century(year / 100);
 }
 
 

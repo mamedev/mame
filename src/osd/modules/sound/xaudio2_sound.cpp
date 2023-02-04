@@ -219,13 +219,13 @@ public:
 
 private:
 	// Xaudio callbacks
-	void STDAPICALLTYPE OnVoiceProcessingPassStart(uint32_t bytes_required) override;
-	void STDAPICALLTYPE OnVoiceProcessingPassEnd() override {}
-	void STDAPICALLTYPE OnStreamEnd() override {}
-	void STDAPICALLTYPE OnBufferStart(void* pBufferContext) override {}
-	void STDAPICALLTYPE OnLoopEnd(void* pBufferContext) override {}
-	void STDAPICALLTYPE OnVoiceError(void* pBufferContext, HRESULT error) override {}
-	void STDAPICALLTYPE OnBufferEnd(void *pBufferContext) override;
+	void STDAPICALLTYPE OnVoiceProcessingPassStart(uint32_t bytes_required) noexcept override;
+	void STDAPICALLTYPE OnVoiceProcessingPassEnd() noexcept override {}
+	void STDAPICALLTYPE OnStreamEnd() noexcept override {}
+	void STDAPICALLTYPE OnBufferStart(void* pBufferContext) noexcept override {}
+	void STDAPICALLTYPE OnLoopEnd(void* pBufferContext) noexcept override {}
+	void STDAPICALLTYPE OnVoiceError(void* pBufferContext, HRESULT error) noexcept override {}
+	void STDAPICALLTYPE OnBufferEnd(void *pBufferContext) noexcept override;
 
 	void create_buffers(const WAVEFORMATEX &format);
 	HRESULT create_voices(const WAVEFORMATEX &format);
@@ -446,7 +446,7 @@ void sound_xaudio2::set_mastervolume(int attenuation)
 //============================================================
 
 // The XAudio2 voice callback triggered when a buffer finishes playing
-void sound_xaudio2::OnBufferEnd(void *pBufferContext)
+void sound_xaudio2::OnBufferEnd(void *pBufferContext) noexcept
 {
 	BYTE* completed_buffer = static_cast<BYTE*>(pBufferContext);
 	if (completed_buffer != nullptr)
@@ -463,7 +463,7 @@ void sound_xaudio2::OnBufferEnd(void *pBufferContext)
 //============================================================
 
 // The XAudio2 voice callback triggered on every pass
-void sound_xaudio2::OnVoiceProcessingPassStart(uint32_t bytes_required)
+void sound_xaudio2::OnVoiceProcessingPassStart(uint32_t bytes_required) noexcept
 {
 	if (bytes_required == 0)
 	{

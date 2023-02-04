@@ -13,6 +13,10 @@
 
 #pragma once
 
+#include <functional>
+#include <utility>
+#include <vector>
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -26,12 +30,9 @@ class nubus_device;
 class device_nubus_card_interface : public device_interface
 {
 	friend class nubus_device;
-	template <class ElementType> friend class simple_list;
 public:
 	// construction/destruction
 	virtual ~device_nubus_card_interface();
-
-	device_nubus_card_interface *next() const { return m_next; }
 
 	void set_nubus_device();
 
@@ -61,7 +62,6 @@ private:
 	const char *m_nubus_slottag;
 	int m_slot;
 	std::vector<uint8_t> m_declaration_rom;
-	device_nubus_card_interface *m_next;
 };
 
 class nubus_slot_device : public device_t, public device_single_card_slot_interface<device_nubus_card_interface>
@@ -111,7 +111,7 @@ class nubus_device : public device_t
 public:
 	// construction/destruction
 	nubus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~nubus_device() { m_device_list.detach_all(); }
+	~nubus_device();
 
 	// inline configuration
 	template <typename T> void set_space(T &&tag, int spacenum) { m_space.set_tag(std::forward<T>(tag), spacenum); }
@@ -122,7 +122,7 @@ public:
 	auto out_irqd_callback() { return m_out_irqd_cb.bind(); }
 	auto out_irqe_callback() { return m_out_irqe_cb.bind(); }
 
-	void add_nubus_card(device_nubus_card_interface *card);
+	void add_nubus_card(device_nubus_card_interface &card);
 	template <typename R, typename W> void install_device(offs_t start, offs_t end, R rhandler, W whandler, uint32_t mask=0xffffffff);
 	template <typename R> void install_readonly_device(offs_t start, offs_t end, R rhandler, uint32_t mask=0xffffffff);
 	template <typename W> void install_writeonly_device(offs_t start, offs_t end, W whandler, uint32_t mask=0xffffffff);
@@ -154,7 +154,7 @@ protected:
 	devcb_write_line    m_out_irqd_cb;
 	devcb_write_line    m_out_irqe_cb;
 
-	simple_list<device_nubus_card_interface> m_device_list;
+	std::vector<std::reference_wrapper<device_nubus_card_interface> > m_device_list;
 };
 
 inline void device_nubus_card_interface::raise_slot_irq()
