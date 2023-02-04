@@ -244,15 +244,15 @@ private:
 	uint32_t leapster_180d800_r();
 
 	void leapster_aux0047_w(uint32_t data);
-	uint32_t leapster_aux0048_r(void);
+	uint32_t leapster_aux0048_r();
 	void leapster_aux0048_w(uint32_t data);
 	void leapster_aux004b_w(uint32_t data);
 
 	void leapster_aux0010_w(uint32_t data);
-	uint32_t leapster_aux0011_r(void);
+	uint32_t leapster_aux0011_r();
 	void leapster_aux0011_w(uint32_t data);
 	void leapster_aux001a_w(uint32_t data);
-	uint32_t leapster_aux001b_r(void);
+	uint32_t leapster_aux001b_r();
 
 	void leapster_aux(address_map &map);
 	void leapster_map(address_map &map);
@@ -293,14 +293,14 @@ void leapster_state::leapster_aux001a_w(uint32_t data)
 	m_1a_pointer++;
 }
 
-uint32_t leapster_state::leapster_aux0011_r(void)
+uint32_t leapster_state::leapster_aux0011_r()
 {
 	// unknown, read when 11/1a are being written
 	logerror("%s: leapster_aux0011_r\n", machine().describe_context());
 	return 0x00000000;
 }
 
-uint32_t leapster_state::leapster_aux001b_r(void)
+uint32_t leapster_state::leapster_aux001b_r()
 {
 	// unknown, read when 11/1a are being written
 	logerror("%s: leapster_aux001b_r\n", machine().describe_context());
@@ -312,7 +312,7 @@ void leapster_state::leapster_aux0047_w(uint32_t data)
 	logerror("%s: leapster_aux0047_w %08x\n", machine().describe_context(), data);
 }
 
-uint32_t leapster_state::leapster_aux0048_r(void)
+uint32_t leapster_state::leapster_aux0048_r()
 {
 	logerror("%s: leapster_aux0048_r\n", machine().describe_context());
 	return 0x00000000;
