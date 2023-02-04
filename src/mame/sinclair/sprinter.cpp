@@ -920,6 +920,9 @@ void sprinter_state::ram_w(offs_t offset, u8 data)
 
 	const u8 bank = offset >> 14;
 	const u8 page = m_pages[bank] & 0xff;
+	if ((bank == 3) && (m_sc == 0x10) && (m_pages[3] == (BANK_RAM_MASK | 0xa0)))
+		machine().schedule_soft_reset();
+
 	if ((page & 0xf0) == 0x50)
 	{
 		const u32 vaddr = m_port_y * 1024 + (offset & 0x3ff);
@@ -1222,7 +1225,7 @@ void sprinter_state::do_cpu_wait(u8 count)
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_on)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-	m_irq_off_timer->adjust(m_maincpu->cycles_to_attotime(m_timer_overlap) + attotime::from_hz(3.5_MHz_XTAL / 32));
+	m_irq_off_timer->adjust(attotime::from_hz(3.5_MHz_XTAL / 32));
 	update_int(false);
 }
 
