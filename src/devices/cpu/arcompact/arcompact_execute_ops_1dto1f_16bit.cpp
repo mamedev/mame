@@ -6,14 +6,13 @@
 
 inline uint32_t arcompact_device::branch_common(uint16_t op, bool cond, unsigned width)
 {
-    if (cond)
-    {
-        int s = util::sext(op, width);
-        //op &= ~util::make_bitmask<uint32_t>(width); // not really necessary - result never used
-        uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 2);
-        return realaddress;
-    }
-    return m_pc + 2;
+	if (cond)
+	{
+		int s = util::sext(op, width);
+		uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 2);
+		return realaddress;
+	}
+	return m_pc + 2;
 }
 
 // #######################################################################################################################
@@ -155,8 +154,8 @@ uint32_t arcompact_device::handleop_BLS_S_s7(uint16_t op)
 
 uint32_t arcompact_device::handleop_BL_S_s13(uint16_t op) // BL_S s13
 {
-    int s = util::sext(op, 11);
-    uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 4);
+	int s = util::sext(op, 11);
+	uint32_t realaddress = (m_pc & 0xfffffffc) + (s * 4);
 	m_regs[REG_BLINK] = m_pc + 2;
 	return realaddress;
 }

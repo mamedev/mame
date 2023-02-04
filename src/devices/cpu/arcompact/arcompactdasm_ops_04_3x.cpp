@@ -21,9 +21,9 @@ int arcompact_disassembler::handle04_3x_helper_dasm(std::ostream& stream, offs_t
 
 	util::stream_format(stream, "LD%s%s", datasize[dsize], dataextend[extend]);
 
-	int mode = (op & 0x00c00000) >> 22; op &= ~0x00c00000;
+	int mode = (op & 0x00c00000) >> 22;
 	uint8_t breg = dasm_common32_get_breg(op);
-	int D = (op & 0x00008000) >> 15; op &= ~0x00008000;
+	int D = (op & 0x00008000) >> 15;
 	uint8_t creg = dasm_common32_get_creg(op);
 	uint8_t areg = dasm_common32_get_areg(op);
 

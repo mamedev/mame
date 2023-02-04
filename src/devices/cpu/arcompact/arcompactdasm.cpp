@@ -551,8 +551,6 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 		op <<= 16;
 		op |= opcodes.r16(pc+2);
 
-		op &= ~0xf8000000;
-
 		switch (instruction & 0x3f) // 32-bit instructions (with optional extra dword for immediate data)
 		{
 			default: break; // size = -1;
@@ -2189,7 +2187,6 @@ offs_t arcompact_disassembler::disassemble(std::ostream &stream, offs_t pc, cons
 	else
 	{
 		size = 2;
-		op &= ~0xf800;
 
 		switch (instruction) // 16-bit instructions
 		{

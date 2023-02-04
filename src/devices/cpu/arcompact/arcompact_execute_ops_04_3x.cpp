@@ -28,8 +28,8 @@ uint32_t arcompact_device::arcompact_handle04_3x_helper(uint32_t op, int dsize, 
 
 	uint8_t X = extend;
 	uint32_t s = m_regs[creg];
-	int a = (op & 0x00c00000) >> 22; op &= ~0x00c00000;
-	//int D = (op & 0x00008000) >> 15; op &= ~0x00008000; // D isn't handled
+	int a = (op & 0x00c00000) >> 22;
+	//int D = (op & 0x00008000) >> 15; // D isn't handled
 	uint8_t Z = dsize;
 
 	arcompact_handle_ld_helper(op, areg, breg, s, X, Z, a);

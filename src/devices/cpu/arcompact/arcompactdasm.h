@@ -58,65 +58,63 @@ private:
 	{
 		uint8_t h = ((op & 0x0007) << 3);
 		h |= ((op & 0x00e0) >> 5);
-		op &= ~0x00e7;
 		return h;
 	}
 
 	static uint8_t dasm_common32_get_condition(uint32_t& op)
 	{
-		uint8_t condition = op & 0x0000001f;  op &= ~0x0000001f;
+		uint8_t condition = op & 0x0000001f;
 		return condition;
 	}
 
 	static uint8_t dasm_common32_get_breg(uint32_t &op)
 	{
-		int b_temp = (op & 0x07000000) >> 24; op &= ~0x07000000;
-		int B_temp = (op & 0x00007000) >> 12; op &= ~0x00007000;
+		int b_temp = (op & 0x07000000) >> 24;
+		int B_temp = (op & 0x00007000) >> 12;
 		int breg = b_temp | (B_temp << 3);
 		return breg;
 	}
 
 	static uint8_t dasm_common32_get_creg(uint32_t& op)
 	{
-		int creg = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0;
+		int creg = (op & 0x00000fc0) >> 6;
 		return creg;
 	}
 
 	static uint8_t dasm_common32_get_areg(uint32_t& op)
 	{
-		int areg = op & 0x0000003f; op &= ~0x0000003f;
+		int areg = op & 0x0000003f;
 		return areg;
 	}
 
 	static uint8_t dasm_common32_get_areg_reserved(uint32_t &op)
 	{
-		int ares = op & 0x0000003f; op &= ~0x0000003f;
+		int ares = op & 0x0000003f;
 		return ares;
 	}
 
 	static uint32_t dasm_common32_get_u6(uint32_t &op)
 	{
-		int u = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0;
+		int u = (op & 0x00000fc0) >> 6;
 		return u;
 	}
 
 	static bool dasm_common32_get_F(uint32_t &op)
 	{
 		bool F = (op & 0x00008000) ? true : false;
-		op &= ~0x00008000;
 		return F;
 	}
 
 	static uint8_t dasm_common32_get_p(uint32_t &op)
 	{
-		int p = (op & 0x00c00000) >> 22; op &= ~0x00c00000;
+		int p = (op & 0x00c00000) >> 22;
 		return p;
 	}
 
 	static uint32_t dasm_common32_get_s12(uint32_t& op)
 	{
-		int S_temp = op & 0x0000003f; op &= ~0x0000003f;
-		int s_temp = (op & 0x00000fc0) >> 6; op &= ~0x00000fc0;
+		int S_temp = op & 0x0000003f;
+		int s_temp = (op & 0x00000fc0) >> 6;
 		int S = s_temp | (S_temp << 6);
 		S = util::sext(S, 12);
 		return S;
@@ -125,49 +123,42 @@ private:
 	static uint8_t dasm_common16_get_breg(uint16_t &op)
 	{
 		uint8_t breg = ((op & 0x0700) >> 8);
-		op &= ~0x0700;
 		return breg;
 	}
 
 	static uint8_t dasm_common16_get_creg(uint16_t& op)
 	{
 		uint8_t creg = ((op & 0x00e0) >> 5);
-		op &= ~0x00e0;
 		return creg;
 	}
 
 	static uint8_t dasm_common16_get_areg(uint16_t& op)
 	{
 		uint8_t areg = op & 0x0007;
-		op &= ~0x0007;
 		return areg;
 	}
 
 	static uint32_t dasm_common16_get_u3(uint16_t& op)
 	{
 		uint32_t u = op & 0x0007;
-		op &= ~0x0007;
 		return u;
 	}
 
 	static uint32_t dasm_common16_get_u5(uint16_t& op)
 	{
 		uint32_t u = op & 0x001f;
-		op &= ~0x001f;
 		return u;
 	}
 
 	static uint32_t dasm_common16_get_u8(uint16_t& op)
 	{
 		uint32_t u = op & 0x00ff;
-		op &= ~0x00ff;
 		return u;
 	}
 
 	static uint32_t dasm_common16_get_u7(uint16_t& op)
 	{
 		uint32_t u = op & 0x007f;
-		op &= ~0x007f;
 		return u;
 	}
 
@@ -175,7 +166,6 @@ private:
 	{
 		uint32_t s = op & 0x01ff;
 		s = util::sext(s, 9);
-		op &= ~0x01ff;
 		return s;
 	}
 

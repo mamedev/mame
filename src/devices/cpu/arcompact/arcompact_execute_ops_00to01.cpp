@@ -97,7 +97,7 @@ uint32_t arcompact_device::handleop32_B_cc_D_s21(uint32_t op)
 
 	address = util::sext(address, 20);
 
-	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
+	int n = (op & 0x00000020) >> 5;
 
 	uint32_t realaddress = (m_pc & 0xfffffffc) + (address * 2);
 
@@ -128,7 +128,7 @@ uint32_t arcompact_device::handleop32_B_D_s25(uint32_t op)
 
 	address = util::sext(address, 24);
 
-	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
+	int n = (op & 0x00000020) >> 5;
 
 	uint32_t realaddress = (m_pc & 0xfffffffc) + (address * 2);
 	if (n)
@@ -162,7 +162,7 @@ uint32_t arcompact_device::handleop32_BL_cc_d_s21(uint32_t op)
 
 	address = util::sext(address, 20);
 
-	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
+	int n = (op & 0x00000020) >> 5;
 
 	uint32_t realaddress = (m_pc & 0xfffffffc) + (address * 2);
 
@@ -194,7 +194,7 @@ uint32_t arcompact_device::handleop32_BL_d_s25(uint32_t op)
 
 	address = util::sext(address, 24);
 
-	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
+	int n = (op & 0x00000020) >> 5;
 
 	uint32_t realaddress = (m_pc & 0xfffffffc) + (address * 2);
 

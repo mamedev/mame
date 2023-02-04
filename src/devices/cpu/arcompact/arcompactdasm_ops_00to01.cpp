@@ -13,9 +13,7 @@
 #define DASM_GET_01_01_01_BRANCH_ADDR \
 	int32_t address = (op & 0x00fe0000) >> 17; \
 	address |= ((op & 0x00008000) >> 15) << 7; \
-	if (address & 0x80) address = -0x80 + (address & 0x7f); \
-	op &= ~ 0x00fe800f;
-
+	address = util::sext(address, 8);
 
 int arcompact_disassembler::handle_dasm32_B_cc_D_s21(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
@@ -24,8 +22,8 @@ int arcompact_disassembler::handle_dasm32_B_cc_D_s21(std::ostream &stream, offs_
 	// 0000 0sss ssss sss0 SSSS SSSS SSNQ QQQQ
 	int32_t address = (op & 0x07fe0000) >> 17;
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
-	if (address & 0x80000) address = -0x80000 + (address & 0x7ffff);
-	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
+	address = util::sext(address, 20);
+	int n = (op & 0x00000020) >> 5;
 	uint8_t condition = dasm_common32_get_condition(op);
 
 	util::stream_format(stream, "B%s%s 0x%08x", conditions[condition], delaybit[n], (pc&0xfffffffc) + (address * 2));
@@ -40,8 +38,8 @@ int arcompact_disassembler::handle_dasm32_B_D_s25(std::ostream &stream, offs_t p
 	int32_t address = (op & 0x07fe0000) >> 17;
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
 	address |= (op & 0x0000000f) << 20;
-	if (address & 0x800000) address = -0x800000 + (address & 0x7fffff);
-	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
+	address = util::sext(address, 24);
+	int n = (op & 0x00000020) >> 5;
 
 	util::stream_format(stream, "B%s 0x%08x", delaybit[n], (pc&0xfffffffc) + (address * 2));
 
@@ -56,8 +54,9 @@ int arcompact_disassembler::handle_dasm32_BL_cc_d_s21(std::ostream &stream, offs
 	// 00001 sssssssss 00 SSSSSSSSSS N QQQQQ
 	int32_t address =   (op & 0x07fc0000) >> 17;
 	address |=        ((op & 0x0000ffc0) >> 6) << 10;
-	if (address & 0x800000) address = -0x800000 + (address&0x7fffff);
-	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
+	address = util::sext(address, 20);
+
+	int n = (op & 0x00000020) >> 5;
 
 	uint8_t condition = dasm_common32_get_condition(op);
 
@@ -70,11 +69,12 @@ int arcompact_disassembler::handle_dasm32_BL_d_s25(std::ostream &stream, offs_t 
 	int size = 4;
 	// Branch and Link Unconditionally Far
 	// 00001 sssssssss 10  SSSSSSSSSS N R TTTT
-	int32_t address =   (op & 0x07fc0000) >> 17;
+	uint32_t address =   (op & 0x07fc0000) >> 17;
 	address |=        ((op & 0x0000ffc0) >> 6) << 10;
 	address |=        (op & 0x0000000f) << 20;
-	if (address & 0x800000) address = -0x800000 + (address&0x7fffff);
-	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
+	address = util::sext(address, 24);
+
+	int n = (op & 0x00000020) >> 5;
 
 	util::stream_format(stream, "BL%s 0x%08x", delaybit[n], (pc&0xfffffffc) + (address *2));
 
@@ -91,12 +91,9 @@ int arcompact_disassembler::handle01_01_00_helper(std::ostream &stream, offs_t p
 	// 00001 bbb sssssss 1 S BBB CCCCCC N 0 iiii
 	DASM_GET_01_01_01_BRANCH_ADDR
 
-
 	uint8_t creg = dasm_common32_get_creg(op);
 	uint8_t breg = dasm_common32_get_breg(op);
-	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
-
-	op &= ~0x07007fe0;
+	int n = (op & 0x00000020) >> 5;
 
 	if ((breg != DASM_REG_LIMM) && (creg != DASM_REG_LIMM))
 	{
@@ -180,9 +177,7 @@ int arcompact_disassembler::handle01_01_01_helper(std::ostream &stream, offs_t p
 
 	uint32_t u = dasm_common32_get_u6(op);
 	uint8_t breg = dasm_common32_get_breg(op);
-	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
-
-	op &= ~0x07007fe0;
+	int n = (op & 0x00000020) >> 5;
 
 	util::stream_format(stream, "%s%s %s, 0x%02x 0x%08x", optext, delaybit[n], regnames[breg], u, (pc&0xfffffffc) + (address * 2));
 

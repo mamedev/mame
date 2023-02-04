@@ -257,7 +257,7 @@ int arcompact_disassembler::handle04_cc_f_b_b_u6_helper_dasm(std::ostream &strea
 
 int arcompact_disassembler::handle04_p11_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int b_reserved)
 {
-	int M = (op & 0x00000020) >> 5; op &= ~0x00000020;
+	int M = (op & 0x00000020) >> 5;
 
 	switch (M)
 	{
