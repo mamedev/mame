@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_DIGDUG_H
-#define MAME_INCLUDES_DIGDUG_H
+#ifndef MAME_NAMCO_DIGDUG_H
+#define MAME_NAMCO_DIGDUG_H
 
 #pragma once
 
@@ -55,4 +55,4 @@ private:
 	void digdug_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_DIGDUG_H
+#endif // MAME_NAMCO_DIGDUG_H

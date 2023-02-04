@@ -5,8 +5,8 @@
  * includes/intv.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_INTV_H
-#define MAME_INCLUDES_INTV_H
+#ifndef MAME_MATTEL_INTV_H
+#define MAME_MATTEL_INTV_H
 
 #pragma once
 
@@ -148,4 +148,4 @@ private:
 	ioport_port *m_intv_keyboard[10];
 };
 
-#endif // MAME_INCLUDES_INTV_H
+#endif // MAME_MATTEL_INTV_H

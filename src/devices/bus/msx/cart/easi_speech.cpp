@@ -3,10 +3,15 @@
 /******************************************************************************
 
 Easi-Speech cartridge (R.Amy, 1987)
+It has a GI SP0256A-AL2 (no XTAL)
 
 The program adds a hook to 0xfd29, usage appears to be something like this:
-defusr0=&hfd29
-a$=usr0("hello")
+n%=(number 0-511):a=usr9(n%)
+or a=usr9(number)
+
+Or a custom string:
+a$="hello world":a$=usr9(a$)
+or a$=usr9("string")
 
 ******************************************************************************/
 

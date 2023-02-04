@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_INCLUDES_PGM2_H
-#define MAME_INCLUDES_PGM2_H
+#ifndef MAME_IGS_PGM2_H
+#define MAME_IGS_PGM2_H
 
 #pragma once
 
@@ -194,4 +194,4 @@ private:
 	required_memory_region m_mainrom;
 };
 
-#endif
+#endif // MAME_IGS_PGM2_H

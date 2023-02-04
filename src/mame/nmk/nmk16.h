@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Mirko Buffoni,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,Alex Marshall,Angelo Salese,Luca Elia
 // thanks-to:Richard Bush
-#ifndef MAME_INCLUDES_NMK16_H
-#define MAME_INCLUDES_NMK16_H
+#ifndef MAME_NMK_NMK16_H
+#define MAME_NMK_NMK16_H
 
 #pragma once
 
@@ -316,4 +316,4 @@ private:
 	void tomagic_sound_io_map(address_map &map);
 };
 
-#endif //MAME_INCLUDES_NMK16_H
+#endif //MAME_NMK_NMK16_H

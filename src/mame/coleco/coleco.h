@@ -2,8 +2,8 @@
 // copyright-holders:Mike Balfour, Ben Bruscella, Sean Young, Frank Palazzolo
 #pragma once
 
-#ifndef MAME_INCLUDES_COLECO_H
-#define MAME_INCLUDES_COLECO_H
+#ifndef MAME_COLECO_COLECO_H
+#define MAME_COLECO_COLECO_H
 
 
 #include "cpu/z80/z80.h"
@@ -136,4 +136,4 @@ private:
 	uint8_t m_unknown = 0U;
 };
 
-#endif
+#endif // MAME_COLECO_COLECO_H

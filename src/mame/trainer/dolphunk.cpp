@@ -96,6 +96,8 @@ Thanks to Amigan site for various documents.
 #include "dolphunk.lh"
 
 
+namespace {
+
 class dauphin_state : public driver_device
 {
 public:
@@ -281,6 +283,9 @@ ROM_START( dauphin )
 	// This the original
 	//ROM_LOAD( "reflexes.bin", 0x0c00, 0x0072, CRC(c4bed94b) SHA1(cf525755a1dbce6a4681353be692ddf0346f323b) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

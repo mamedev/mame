@@ -5,8 +5,8 @@
     1943
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_1943_H
-#define MAME_INCLUDES_1943_H
+#ifndef MAME_CAPCOM_1943_H
+#define MAME_CAPCOM_1943_H
 
 #pragma once
 
@@ -102,4 +102,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_1943_H
+#endif // MAME_CAPCOM_1943_H

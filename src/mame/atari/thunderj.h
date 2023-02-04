@@ -5,8 +5,8 @@
     Atari ThunderJaws hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_THUNDERJ_H
-#define MAME_INCLUDES_THUNDERJ_H
+#ifndef MAME_ATARI_THUNDERJ_H
+#define MAME_ATARI_THUNDERJ_H
 
 #pragma once
 
@@ -56,4 +56,4 @@ private:
 	static const atari_motion_objects_config s_mob_config;
 };
 
-#endif // MAME_INCLUDES_THUNDERJ_H
+#endif // MAME_ATARI_THUNDERJ_H

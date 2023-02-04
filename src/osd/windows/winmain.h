@@ -67,8 +67,6 @@ public:
 	// video overridables
 	virtual void add_audio_to_recording(const int16_t *buffer, int samples_this_frame) override;
 
-	virtual void video_register() override;
-
 	virtual bool video_init() override;
 	virtual bool window_init() override;
 

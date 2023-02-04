@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_SVISION_H
-#define MAME_INCLUDES_SVISION_H
+#ifndef MAME_SVISION_SVISION_H
+#define MAME_SVISION_SVISION_H
 
 #pragma once
 
@@ -125,4 +125,4 @@ private:
 	bool m_dma_finished = false;
 };
 
-#endif // MAME_INCLUDES_SVISION_H
+#endif // MAME_SVISION_SVISION_H

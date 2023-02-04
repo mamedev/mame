@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_OB68K1A_H
-#define MAME_INCLUDES_OB68K1A_H
+#ifndef MAME_OMNIBYTE_OB68K1A_H
+#define MAME_OMNIBYTE_OB68K1A_H
 
 #pragma once
 
@@ -60,4 +60,4 @@ private:
 	void ob68k1a_mem(address_map &map);
 };
 
-#endif
+#endif // MAME_OMNIBYTE_OB68K1A_H

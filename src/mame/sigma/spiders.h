@@ -5,8 +5,8 @@
     Sigma Spiders hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_SPIDERS_H
-#define MAME_INCLUDES_SPIDERS_H
+#ifndef MAME_SIGMA_SPIDERS_H
+#define MAME_SIGMA_SPIDERS_H
 
 #pragma once
 
@@ -62,4 +62,4 @@ private:
 	uint8_t m_gfx_rom_ctrl_data = 0;
 };
 
-#endif // MAME_INCLUDES_SPIDERS_H
+#endif // MAME_SIGMA_SPIDERS_H

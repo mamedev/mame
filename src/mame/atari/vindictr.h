@@ -5,8 +5,8 @@
     Atari Vindicators hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_VINDICTR_H
-#define MAME_INCLUDES_VINDICTR_H
+#ifndef MAME_ATARI_VINDICTR_H
+#define MAME_ATARI_VINDICTR_H
 
 #pragma once
 
@@ -67,4 +67,4 @@ private:
 	uint16_t          m_playfield_yscroll = 0;
 };
 
-#endif // MAME_INCLUDES_VINDICTR_H
+#endif // MAME_ATARI_VINDICTR_H

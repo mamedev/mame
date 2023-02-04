@@ -32,8 +32,7 @@
     - decryption seems good but gets stuck with 'data error' and 'illegal inst'
         errors. Second one probably due to same problem as jungleyo. First one
         possibly checksum failure due to patch in init_frtgenie()?
-        To bypass do:
-        bpset 5732. Once hit, do PC = 5810.
+        To bypass do: bp 5732,1,{pc=0x5810;g}
     - second half of the main CPU ROM seems to contain an earlier version of the
       data 'GENIE FRUITS DATA: 2001/08/15 VERSION: VA1.00'. Can it be reached or
       just a leftover?
@@ -664,19 +663,19 @@ void jungleyo_state::init_frtgenie()
 	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
 
 	for (int i = 0x00000; i < 0x10000 / 2; i++)
-		src[i] = bitswap<16>(src[i] ^ 0x00ff, 11, 12, 14, 9, 10, 13, 8, 15, 5, 0, 2, 3, 6, 1, 4, 7); // ok
+		src[i] = bitswap<16>(src[i] ^ 0x00ff, 11, 12, 14, 9, 10, 13, 8, 15, 5, 0, 2, 3, 6, 1, 4, 7);
 
 	for (int i = 0x10000 / 2; i < 0x20000 / 2; i++)
-		src[i] = bitswap<16>(src[i] ^ 0xff00, 14, 11, 8, 13, 15, 9, 12, 10, 1, 5, 3, 0, 7, 2, 6, 4); // ok
+		src[i] = bitswap<16>(src[i] ^ 0xff00, 14, 11, 8, 13, 15, 9, 12, 10, 1, 5, 3, 0, 7, 2, 6, 4);
 
 	for (int i = 0x20000 / 2; i < 0x30000 / 2; i++)
-		src[i] = bitswap<16>(src[i] ^ 0x00ff, 8, 14, 12, 11, 9, 15, 10, 13, 7, 4, 1, 5, 3, 6, 0, 2); // ok
+		src[i] = bitswap<16>(src[i] ^ 0x00ff, 8, 14, 12, 11, 9, 15, 10, 13, 7, 4, 1, 5, 3, 6, 0, 2);
 
 	for (int i = 0x30000 / 2; i < 0x40000 / 2; i++)
-		src[i] = bitswap<16>(src[i] ^ 0xffff, 15, 9, 10, 12, 8, 11, 13, 14, 2, 6, 4, 5, 0, 7, 3, 1); // ok
+		src[i] = bitswap<16>(src[i] ^ 0xffff, 15, 9, 10, 12, 8, 11, 13, 14, 2, 6, 4, 5, 0, 7, 3, 1);
 
 	for (int i = 0x40000 / 2; i < 0x80000 / 2; i++) // the second half of the ROM seems to have the same bitswap
-		src[i] = bitswap<16>(src[i] ^ 0x0000, 10, 13, 15, 8, 12, 14, 11, 9, 0, 7, 6, 4, 1, 5, 2, 3); // ok
+		src[i] = bitswap<16>(src[i] ^ 0x0000, 10, 13, 15, 8, 12, 14, 11, 9, 0, 7, 6, 4, 1, 5, 2, 3);
 
 	// TODO: Stack Pointer/Initial PC settings don't seem to decrypt correctly
 	// hack these until better understood (still wrong values)

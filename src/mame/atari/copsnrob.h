@@ -5,8 +5,8 @@
     Atari Cops'n Robbers hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_COPSNROB_H
-#define MAME_INCLUDES_COPSNROB_H
+#ifndef MAME_ATARI_COPSNROB_H
+#define MAME_ATARI_COPSNROB_H
 
 #pragma once
 
@@ -70,4 +70,4 @@ private:
 	output_finder<2> m_leds;
 };
 
-#endif // MAME_INCLUDES_COPSNROB_H
+#endif // MAME_ATARI_COPSNROB_H

@@ -5,8 +5,8 @@
     Atari Star Wars hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_STARWARS_H
-#define MAME_INCLUDES_STARWARS_H
+#ifndef MAME_ATARI_STARWARS_H
+#define MAME_ATARI_STARWARS_H
 
 #pragma once
 
@@ -100,4 +100,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_STARWARS_H
+#endif // MAME_ATARI_STARWARS_H

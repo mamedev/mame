@@ -5,8 +5,8 @@
     Bishi Bashi Champ Mini Game Senshuken
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_BISHI_H
-#define MAME_INCLUDES_BISHI_H
+#ifndef MAME_KONAMI_BISHI_H
+#define MAME_KONAMI_BISHI_H
 
 #pragma once
 
@@ -68,4 +68,4 @@ private:
 	required_device<screen_device> m_screen;
 };
 
-#endif // MAME_INCLUDES_BISHI_H
+#endif // MAME_KONAMI_BISHI_H

@@ -6,8 +6,8 @@
 
 */
 
-#ifndef MAME_INCLUDES_HH_TMS1K_H
-#define MAME_INCLUDES_HH_TMS1K_H
+#ifndef MAME_HANDHELD_HH_TMS1K_H
+#define MAME_HANDHELD_HH_TMS1K_H
 
 #pragma once
 
@@ -72,4 +72,4 @@ protected:
 };
 
 
-#endif // MAME_INCLUDES_HH_TMS1K_H
+#endif // MAME_HANDHELD_HH_TMS1K_H

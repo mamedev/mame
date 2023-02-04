@@ -6,8 +6,8 @@
     Williams/Midway Y/Z-unit system
 
 **************************************************************************/
-#ifndef MAME_INCLUDES_MIDYUNIT_H
-#define MAME_INCLUDES_MIDYUNIT_H
+#ifndef MAME_MIDWAY_MIDYUNIT_H
+#define MAME_MIDWAY_MIDYUNIT_H
 
 #pragma once
 
@@ -175,4 +175,4 @@ private:
 	void term2_init_common(write16s_delegate hack_w);
 };
 
-#endif // MAME_INCLUDES_MIDYUNIT_H
+#endif // MAME_MIDWAY_MIDYUNIT_H

@@ -69,6 +69,8 @@ ToDo:
 #include "speaker.h"
 
 
+namespace {
+
 class iq151_state : public driver_device
 {
 public:
@@ -483,6 +485,9 @@ ROM_START( iq151 )
 	ROM_SYSTEM_BIOS( 3, "cpmold", "CPM (old)" )
 	ROMX_LOAD( "iq151_monitor_cpm_old.rom", 0xf000, 0x1000, CRC(6743e1b7) SHA1(ae4f3b1ba2511a1f91c4e8afdfc0e5aeb0fb3a42), ROM_BIOS(3))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

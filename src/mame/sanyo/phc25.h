@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder, Robbbert
 #pragma once
 
-#ifndef MAME_INCLUDES_PHC25_H
-#define MAME_INCLUDES_PHC25_H
+#ifndef MAME_SANYO_PHC25_H
+#define MAME_SANYO_PHC25_H
 
 
 #include "cpu/z80/z80.h"
@@ -60,4 +60,4 @@ private:
 	required_device<cassette_image_device> m_cassette;
 };
 
-#endif
+#endif // MAME_SANYO_PHC25_H

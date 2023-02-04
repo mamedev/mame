@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_CLSHROAD_H
-#define MAME_INCLUDES_CLSHROAD_H
+#ifndef MAME_NICHIBUTSU_CLSHROAD_H
+#define MAME_NICHIBUTSU_CLSHROAD_H
 
 #pragma once
 
@@ -81,4 +81,4 @@ private:
 	void clshroad_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_CLSHROAD_H
+#endif // MAME_NICHIBUTSU_CLSHROAD_H

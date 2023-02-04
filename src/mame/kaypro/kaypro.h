@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
-#ifndef MAME_INCLUDES_KAYPRO_H
-#define MAME_INCLUDES_KAYPRO_H
+#ifndef MAME_KAYPRO_KAYPRO_H
+#define MAME_KAYPRO_KAYPRO_H
 
 #pragma once
 
@@ -123,4 +123,4 @@ private:
 	output_finder<2> m_leds;
 };
 
-#endif // MAME_INCLUDES_KAYPRO_H
+#endif // MAME_KAYPRO_KAYPRO_H

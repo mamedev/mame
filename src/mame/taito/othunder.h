@@ -5,8 +5,8 @@
     Operation Thunderbolt
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_OTHUNDER_H
-#define MAME_INCLUDES_OTHUNDER_H
+#ifndef MAME_TAITO_OTHUNDER_H
+#define MAME_TAITO_OTHUNDER_H
 
 #pragma once
 
@@ -101,4 +101,4 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
-#endif // MAME_INCLUDES_OTHUNDER_H
+#endif // MAME_TAITO_OTHUNDER_H

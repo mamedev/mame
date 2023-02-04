@@ -7,8 +7,8 @@
     various SNK triple Z80 games
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SNK_H
-#define MAME_INCLUDES_SNK_H
+#ifndef MAME_SNK_SNK_H
+#define MAME_SNK_SNK_H
 
 #pragma once
 
@@ -289,4 +289,4 @@ private:
 	void tnk3_cpuB_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SNK_H
+#endif // MAME_SNK_SNK_H

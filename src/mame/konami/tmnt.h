@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_TMNT_H
-#define MAME_INCLUDES_TMNT_H
+#ifndef MAME_KONAMI_TMNT_H
+#define MAME_KONAMI_TMNT_H
 
 #pragma once
 
@@ -263,4 +263,4 @@ private:
 	int        m_roz_char_bank = 0;
 };
 
-#endif // MAME_INCLUDES_TMNT_H
+#endif // MAME_KONAMI_TMNT_H

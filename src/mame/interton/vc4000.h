@@ -6,8 +6,8 @@
  * includes/vc4000.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_VC4000_H
-#define MAME_INCLUDES_VC4000_H
+#ifndef MAME_INTERTON_VC4000_H
+#define MAME_INTERTON_VC4000_H
 
 #pragma once
 
@@ -168,4 +168,4 @@ private:
 	inline void vc4000_draw_grid(uint8_t *collision);
 };
 
-#endif // MAME_INCLUDES_VC4000_H
+#endif // MAME_INTERTON_VC4000_H

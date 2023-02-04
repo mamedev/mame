@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_P2000T_H
-#define MAME_INCLUDES_P2000T_H
+#ifndef MAME_PHILIPS_P2000T_H
+#define MAME_PHILIPS_P2000T_H
 
 #pragma once
 
@@ -96,4 +96,4 @@ private:
 	int8_t m_frame_count = 0;
 };
 
-#endif // MAME_INCLUDES_P2000T_H
+#endif // MAME_PHILIPS_P2000T_H

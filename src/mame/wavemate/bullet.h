@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_BULLET_H
-#define MAME_INCLUDES_BULLET_H
+#ifndef MAME_WAVEMATE_BULLET_H
+#define MAME_WAVEMATE_BULLET_H
 
 #pragma once
 
@@ -188,4 +188,4 @@ protected:
 	int m_wrdy = 0;
 };
 
-#endif // MAME_INCLUDES_BULLET_H
+#endif // MAME_WAVEMATE_BULLET_H

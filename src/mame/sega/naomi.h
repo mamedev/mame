@@ -1,8 +1,8 @@
 // license:LGPL-2.1+
 // copyright-holders: Samuele Zannoli, R. Belmont, ElSemi, David Haywood, Angelo Salese, Olivier Galibert, MetalliC
 
-#ifndef MAME_INCLUDES_NAOMI_H
-#define MAME_INCLUDES_NAOMI_H
+#ifndef MAME_SEGA_NAOMI_H
+#define MAME_SEGA_NAOMI_H
 
 #pragma once
 
@@ -122,4 +122,4 @@ private:
 	void elan_regs_w(offs_t offset, uint32_t data);
 };
 
-#endif // MAME_INCLUDES_NAOMI_H
+#endif // MAME_SEGA_NAOMI_H

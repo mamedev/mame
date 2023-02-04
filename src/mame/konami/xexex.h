@@ -5,8 +5,8 @@
     Xexex
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_XEXEX_H
-#define MAME_INCLUDES_XEXEX_H
+#ifndef MAME_KONAMI_XEXEX_H
+#define MAME_KONAMI_XEXEX_H
 
 #pragma once
 
@@ -116,4 +116,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_XEXEX_H
+#endif // MAME_KONAMI_XEXEX_H

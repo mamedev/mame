@@ -31,6 +31,13 @@
 #include "screen.h"
 
 
+//#define VERBOSE (LOG_DEBUG)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
+
+namespace {
+
 static constexpr int KSM_COLUMNS_MAX = 132;
 
 static constexpr int KSM_TOTAL_HORZ = KSM_COLUMNS_MAX * 10;
@@ -38,11 +45,6 @@ static constexpr int KSM_DISP_HORZ = KSM_COLUMNS_MAX * 8;
 
 static constexpr int KSM_TOTAL_VERT = 260;
 static constexpr int KSM_DISP_VERT = 250;
-
-
-//#define VERBOSE (LOG_DEBUG)
-//#define LOG_OUTPUT_FUNC osd_printf_info
-#include "logmacro.h"
 
 
 class sm7238_state : public driver_device
@@ -432,6 +434,9 @@ ROM_START( sm7238 )
 	ROM_REGION(0x2000, "chargen", ROMREGION_ERASE00)
 	ROM_LOAD( "bsk1_00_2.064", 0x0000, 0x2000, CRC(1e3d5885) SHA1(5afdc10f775f424473c2a78de62e3bfc82bdddd1))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

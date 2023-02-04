@@ -400,6 +400,10 @@ overwritten.
 
 **-listbios** [*<pattern>*...]
 
+    Displays a list of alternate ROM BIOSes for supported systems/devices that
+    match the specified pattern(s).  If no patterns are specified, the results
+    will include *all* supported systems and devices.
+
     Example:
         .. code-block:: bash
 
@@ -410,10 +414,6 @@ overwritten.
             goldstar          "Goldstar 3DO Interactive Multiplayer v1.01m"
             panafz1           "Panasonic FZ-1 R.E.A.L. 3DO Interactive Multiplayer"
             sanyotry          "Sanyo TRY 3DO Interactive Multiplayer"
-
-    Displays a list of alternate ROM BIOSes for supported systems/devices that
-    match the specified pattern(s). If no patterns are specified, the results
-    will include *all* supported systems and devices.
 
 .. _mame-commandline-listsamples:
 
@@ -3105,7 +3105,16 @@ Core Input Options
 
     Controls whether or not MAME makes use of mouse controllers.  When this is
     enabled, you will likely be unable to use your mouse for other purposes
-    until you exit or pause the system.
+    until you exit or pause the system.  Supported mouse controllers depend on
+    your :ref:`mouseprovider setting <mame-commandline-mouseprovider>`.
+
+    Note that if this setting is off (**-nomouse**), mouse input may still be
+    enabled depending on the inputs present on the emulated system and your
+    :ref:`automatic input enable settings <mame-commandline-inputenable>`.  In
+    particular, the default is to enable mouse input when the emulated system
+    has mouse inputs (**-mouse_device mouse**), so MAME will capture your mouse
+    pointer when you run a system with mouse inputs unless you also change
+    the **mouse_device** setting.
 
     The default is OFF (**-nomouse**).
 
@@ -3118,10 +3127,16 @@ Core Input Options
 
 **-[no]joystick** / **-[no]joy**
 
-    Controls whether or not MAME makes use of joystick/gamepad controllers.
+    Controls whether or not MAME makes use of game controllers (e.g. joysticks,
+    gamepads and simulation controls).  Supported game controllers depend on
+    your :ref:`joystickprovider setting <mame-commandline-joystickprovider>`.
 
     When this is enabled, MAME will ask the system about which controllers are
     connected.
+
+    Note that if this setting is off (**-nojoystick**), joystick input may still
+    be enabled depending on the inputs present on the emulated system and your
+    :ref:`automatic input enable settings <mame-commandline-inputenable>`.
 
     The default is OFF (**-nojoystick**).
 
@@ -3135,8 +3150,14 @@ Core Input Options
 **-[no]lightgun** / **-[no]gun**
 
     Controls whether or not MAME makes use of lightgun controllers.  Note that
-    most lightguns map to the mouse, so using **-lightgun** and **-mouse**
-    together may produce strange results.
+    most lightguns also produce mouse input, so enabling mouse and lightgun
+    controllers simultaneously (using **-lightgun** and **-mouse** together) may
+    produce strange behaviour.  Supported lightgun controllers depend on your
+    :ref:`lightgunprovider setting <mame-commandline-lightgunprovider>`.
+
+    Note that if this setting is off (**-nolightgun**), lightgun input may still
+    be enabled depending on the inputs present on the emulated system and your
+    :ref:`automatic input enable settings <mame-commandline-inputenable>`.
 
     The default is OFF (**-nolightgun**).
 
@@ -3525,20 +3546,29 @@ Core Input Automatic Enable Options
 
 **-mouse_device** ( ``none`` | ``keyboard`` | ``mouse`` | ``lightgun`` | ``joystick`` )
 
-    Each of these options controls autoenabling the mouse, joystick, or lightgun
-    depending on the presence of a particular class of analog control for a
-    particular system.  For example, if you specify the option
-    **-paddle mouse**, then any game that has a paddle control will
-    automatically enable mouse controls just as if you had explicitly specified
-    **-mouse**.
+    Each of these options sets whether mouse, joystick or lightgun controllers
+    should be enabled when running an emulated system that uses a particular
+    class of analog inputs.  These options can effectively set
+    :ref:`-mouse <mame-commandline-nomouse>`, :ref:`-joystick
+    <mame-commandline-nojoystick>` and/or :ref:`-lightgun
+    <mame-commandline-nolightgun>` depending on the type of inputs present on
+    the emulated system.
+
+    For example, if you specify the option **-paddle_device mouse**, then mouse
+    controls will automatically be enabled when you run a game that has paddle
+    controls (e.g. Super Breakout), even if you specified **-nomouse**.
+
+    The default is to automatically enable mouse controls when running emulated
+    systems with mouse inputs (**-mouse_device mouse**).
 
     Example:
         .. code-block:: bash
 
             mame sbrkout -paddle_device mouse
 
-.. Tip:: Note that these controls override the values of **-[no]mouse**,
-         **-[no]joystick**, etc.
+.. Tip:: Note that these settings can override **-nomouse**, **-nojoystick**
+         and/or **-nolightgun** depending on the inputs present on the emulated
+         system.
 
 
 .. _mame-commandline-debugging:

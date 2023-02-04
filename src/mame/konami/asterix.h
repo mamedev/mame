@@ -5,8 +5,8 @@
     Asterix
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_ASTERIX_H
-#define MAME_INCLUDES_ASTERIX_H
+#ifndef MAME_KONAMI_ASTERIX_H
+#define MAME_KONAMI_ASTERIX_H
 
 #pragma once
 
@@ -68,4 +68,4 @@ private:
 	required_device<k053251_device> m_k053251;
 };
 
-#endif // MAME_INCLUDES_ASTERIX_H
+#endif // MAME_KONAMI_ASTERIX_H

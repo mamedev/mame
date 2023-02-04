@@ -2,8 +2,8 @@
 // copyright-holders:Sandro Ronco
 
 
-#ifndef MAME_MACHINE_HYPERSCAN_CARD_H
-#define MAME_MACHINE_HYPERSCAN_CARD_H
+#ifndef MAME_TVGAMES_HYPERSCAN_CARD_H
+#define MAME_TVGAMES_HYPERSCAN_CARD_H
 
 #pragma once
 
@@ -51,4 +51,4 @@ private:
 
 DECLARE_DEVICE_TYPE(HYPERSCAN_CARD, hyperscan_card_device)
 
-#endif // MAME_MACHINE_HYPERSCAN_CARD_H
+#endif // MAME_TVGAMES_HYPERSCAN_CARD_H

@@ -6,8 +6,8 @@
     (32-bit blitter variant)
 
 **************************************************************************/
-#ifndef MAME_INCLUDES_ITECH32_H
-#define MAME_INCLUDES_ITECH32_H
+#ifndef MAME_ITECH_ITECH32_H
+#define MAME_ITECH_ITECH32_H
 
 #pragma once
 
@@ -303,4 +303,4 @@ private:
 	emu_timer *m_gun_timer = nullptr;
 };
 
-#endif // MAME_INCLUDES_ITECH32_H
+#endif // MAME_ITECH_ITECH32_H

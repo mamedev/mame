@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_DAI_H
-#define MAME_INCLUDES_DAI_H
+#ifndef MAME_DAI_DAI_H
+#define MAME_DAI_DAI_H
 
 #include "dai_snd.h"
 
@@ -81,4 +81,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_DAI_H
+#endif // MAME_DAI_DAI_H

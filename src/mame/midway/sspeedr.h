@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
-#ifndef MAME_INCLUDES_SSPEEDR_H
-#define MAME_INCLUDES_SSPEEDR_H
+#ifndef MAME_MIDWAY_SSPEEDR_H
+#define MAME_MIDWAY_SSPEEDR_H
 
 #pragma once
 
@@ -96,4 +96,4 @@ private:
 	required_region_ptr<uint8_t> m_track;
 };
 
-#endif // MAME_INCLUDES_SSPEEDR_H
+#endif // MAME_MIDWAY_SSPEEDR_H

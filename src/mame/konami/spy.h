@@ -5,8 +5,8 @@
     S.P.Y.
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SPY_H
-#define MAME_INCLUDES_SPY_H
+#ifndef MAME_KONAMI_SPY_H
+#define MAME_KONAMI_SPY_H
 
 #pragma once
 
@@ -74,4 +74,4 @@ private:
 	void spy_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SPY_H
+#endif // MAME_KONAMI_SPY_H

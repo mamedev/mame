@@ -82,10 +82,20 @@ Input device options
 
 **-[no]dual_lightgun** / **-[no]dual**
 
-    Controls whether or not MAME attempts to track two lightguns connected
-    simultaneously.  This option requires the :ref:`lightgun option
-    <mame-commandline-lightgun>` to be on.  This option is a hack for supporting
-    certain older dual lightgun setups.  If you have multiple lightguns
-    connected, you will probably just need to enable the :ref:`mouse option
-    <mame-commandline-mouse>` and configure each lightgun independently.  The
-    default is OFF (**-nodual_lightgun**).
+    Controls whether or not MAME attempts to track two lightguns that appear as
+    a single mouse.  This option requires the :ref:`lightgun option
+    <mame-commandline-nolightgun>` to be on and the :ref:`lightgunprovider
+    option <mame-commandline-lightgunprovider>` to be set to *win32*.
+
+    This option supports certain older dual lightgun setups that work by setting
+    the mouse pointer location at the moment a lightgun trigger is activated.
+    The primary and secondary triggers on the first lightgun correspond to the
+    first and second mouse buttons, and the primary and secondary triggers on
+    the second lightgun correspond to the third and fourth mouse buttons.
+
+    If you have multiple lightguns connected, you will probably just need to
+    enable the :ref:`lightgun option <mame-commandline-nolightgun>`, use the
+    default :ref:`lightgunprovider option <mame-commandline-lightgunprovider>`
+    of *rawinput*, and configure each lightgun individually.
+
+    The default is OFF (**-nodual_lightgun**).

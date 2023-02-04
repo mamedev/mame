@@ -6,8 +6,8 @@
  *  Reference: http://sharpmz.computingmuseum.com
  *
  ******************************************************************************/
-#ifndef MAME_INCLUDES_MZ700_H
-#define MAME_INCLUDES_MZ700_H
+#ifndef MAME_SHARP_MZ700_H
+#define MAME_SHARP_MZ700_H
 
 #pragma once
 
@@ -170,4 +170,4 @@ private:
 	uint16_t m_mz800_ramaddr = 0;
 };
 
-#endif // MAME_INCLUDES_MZ700_H
+#endif // MAME_SHARP_MZ700_H

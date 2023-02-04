@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia, David Haywood
-#ifndef MAME_INCLUDES_SPLASH_H
-#define MAME_INCLUDES_SPLASH_H
+#ifndef MAME_GAELCO_SPLASH_H
+#define MAME_GAELCO_SPLASH_H
 
 #pragma once
 
@@ -171,4 +171,4 @@ private:
 	int m_snd_interrupt_enable2 = 0;
 };
 
-#endif // MAME_INCLUDES_SPLASH_H
+#endif // MAME_GAELCO_SPLASH_H

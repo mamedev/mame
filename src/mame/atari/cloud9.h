@@ -5,8 +5,8 @@
     Atari Cloud 9 (prototype) hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_CLOUD9_H
-#define MAME_INCLUDES_CLOUD9_H
+#ifndef MAME_ATARI_CLOUD9_H
+#define MAME_ATARI_CLOUD9_H
 
 #pragma once
 
@@ -85,4 +85,4 @@ private:
 	uint8_t       m_irq_state = 0U;
 };
 
-#endif // MAME_INCLUDES_CLOUD9_H
+#endif // MAME_ATARI_CLOUD9_H

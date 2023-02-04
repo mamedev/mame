@@ -9,8 +9,8 @@
  * Driver by Wilbert Pol
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_ELECTRON_H
-#define MAME_INCLUDES_ELECTRON_H
+#ifndef MAME_ACORN_ELECTRON_H
+#define MAME_ACORN_ELECTRON_H
 
 #pragma once
 
@@ -187,4 +187,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_ELECTRON_H
+#endif // MAME_ACORN_ELECTRON_H

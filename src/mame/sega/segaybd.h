@@ -5,8 +5,8 @@
     Sega Y-Board hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_SEGAYBD_H
-#define MAME_INCLUDES_SEGAYBD_H
+#ifndef MAME_SEGA_SEGAYBD_H
+#define MAME_SEGA_SEGAYBD_H
 
 #pragma once
 
@@ -137,4 +137,4 @@ private:
 	uint8_t           m_misc_io_data = 0;
 };
 
-#endif // MAME_INCLUDES_SEGAYBD_H
+#endif // MAME_SEGA_SEGAYBD_H

@@ -5,8 +5,8 @@
     Super Contra / Thunder Cross
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_THUNDERX_H
-#define MAME_INCLUDES_THUNDERX_H
+#ifndef MAME_KONAMI_THUNDERX_H
+#define MAME_KONAMI_THUNDERX_H
 
 #pragma once
 
@@ -96,4 +96,4 @@ private:
 	void thunderx_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_THUNDERX_H
+#endif // MAME_KONAMI_THUNDERX_H

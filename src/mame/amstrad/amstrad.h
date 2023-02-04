@@ -5,8 +5,8 @@
  * includes/amstrad.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_AMSTRAD_H
-#define MAME_INCLUDES_AMSTRAD_H
+#ifndef MAME_AMSTRAD_AMSTRAD_H
+#define MAME_AMSTRAD_AMSTRAD_H
 
 #pragma once
 
@@ -319,4 +319,4 @@ private:
 void cpc_exp_cards(device_slot_interface &device);
 void cpcplus_exp_cards(device_slot_interface &device);
 
-#endif // MAME_INCLUDES_AMSTRAD_H
+#endif // MAME_AMSTRAD_AMSTRAD_H

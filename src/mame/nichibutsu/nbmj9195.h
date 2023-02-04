@@ -5,8 +5,8 @@
     nbmj9195 - Nichibutsu Mahjong games for years 1991-1995
 
 ******************************************************************************/
-#ifndef MAME_INCLUDES_NBMJ9195_H
-#define MAME_INCLUDES_NBMJ9195_H
+#ifndef MAME_NICHIBUTSU_NBMJ9195_H
+#define MAME_NICHIBUTSU_NBMJ9195_H
 
 #pragma once
 
@@ -191,4 +191,4 @@ private:
 	void yosimoto_io_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_NBMJ9195_H
+#endif // MAME_NICHIBUTSU_NBMJ9195_H
