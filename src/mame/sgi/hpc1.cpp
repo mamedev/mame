@@ -184,7 +184,7 @@ void hpc1_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, nullptr, false);
 
-	DP8573(config, m_rtc);
+	DP8573(config, m_rtc).set_use_utc(true);
 
 	PIT8254(config, m_pit, 0);
 	m_pit->set_clk<0>(1000000);

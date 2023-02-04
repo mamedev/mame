@@ -650,6 +650,7 @@ void laser3k_state::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, con
 			}
 			else
 			{
+				// FIXME: this is unreachable - loop bound is checks (col < 40) so these columns can never be copied
 				vram_row[1+(col*2)+0] = vram[offset+0x2000];
 				vram_row[1+(col*2)+1] = vram[offset+0x2001];
 			}

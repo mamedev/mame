@@ -1,12 +1,13 @@
 // license:GPL-2.0+
 // copyright-holders:Raphael Nabet
-#ifndef MAME_TI_733_ASR
-#define MAME_TI_733_ASR
+#ifndef MAME_TI_733_ASR_H
+#define MAME_TI_733_ASR_H
 
 #pragma once
 
 #include "emupal.h"
 #include "screen.h"
+
 #define asr733_chr_region ":gfx1"
 
 class asr733_device : public device_t, public device_gfx_interface
@@ -79,4 +80,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ASR733, asr733_device)
 
-#endif // MAME_TI_733_ASR
+#endif // MAME_TI_733_ASR_H

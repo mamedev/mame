@@ -91,6 +91,7 @@ inline int counter_from_ram(u8 const *data, s32 offset, u8 unmap = 0)
 timekeeper_device::timekeeper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 size)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
+	, device_rtc_interface(mconfig, *this)
 	, m_reset_cb(*this)
 	, m_irq_cb(*this)
 	, m_default_data(*this, DEVICE_SELF)
@@ -200,19 +201,7 @@ mk48t12_device::mk48t12_device(const machine_config &mconfig, const char *tag, d
 
 void timekeeper_device::device_start()
 {
-	system_time systime;
-
-	machine().base_datetime(systime);
-
 	m_control = 0;
-	m_seconds = time_helper::make_bcd(systime.local_time.second);
-	m_minutes = time_helper::make_bcd(systime.local_time.minute);
-	m_hours = time_helper::make_bcd(systime.local_time.hour);
-	m_day = time_helper::make_bcd(systime.local_time.weekday + 1);
-	m_date = time_helper::make_bcd(systime.local_time.mday);
-	m_month = time_helper::make_bcd(systime.local_time.month + 1);
-	m_year = time_helper::make_bcd(systime.local_time.year % 100);
-	m_century = time_helper::make_bcd(systime.local_time.year / 100);
 	m_data.resize(m_size);
 
 	save_item(NAME(m_control));
@@ -242,6 +231,18 @@ void timekeeper_device::device_start()
 
 void timekeeper_device::device_reset()
 {
+}
+
+void timekeeper_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	m_seconds = time_helper::make_bcd(second);
+	m_minutes = time_helper::make_bcd(minute);
+	m_hours = time_helper::make_bcd(hour);
+	m_day = time_helper::make_bcd(day_of_week);
+	m_date = time_helper::make_bcd(day);
+	m_month = time_helper::make_bcd(month);
+	m_year = time_helper::make_bcd(year % 100);
+	m_century = time_helper::make_bcd(year / 100);
 }
 
 void timekeeper_device::counters_to_ram()
