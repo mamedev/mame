@@ -25,8 +25,6 @@ uint32_t arcompact_device::handleop32_LP(uint32_t op) // LPcc (loop setup)
 	else if (p == 0x02) // Loop unconditional
 	{ // 0010 0RRR 1010 1000 0RRR ssss ssSS SSSS
 		uint32_t S = common32_get_s12(op);
-		if (S & 0x800) S = -0x800 + (S & 0x7ff);
-
 		m_LP_START = m_pc + size;
 		m_LP_END = (m_pc & 0xfffffffc) + (S * 2);
 

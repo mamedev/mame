@@ -118,7 +118,7 @@ uint32_t arcompact_device::handleop_SEXB_S_b_c(uint16_t op)
 	uint8_t breg = common16_get_and_expand_breg(op);
 	uint8_t creg = common16_get_and_expand_creg(op);
 	uint32_t source = m_regs[creg];
-	uint32_t result = util::sext(source & 0xff, 8);
+	uint32_t result = util::sext(source, 8);
 	m_regs[breg] = result;
 	return m_pc + 2;
 }
@@ -133,7 +133,7 @@ uint32_t arcompact_device::handleop_SEXW_S_b_c(uint16_t op)
 	uint8_t breg = common16_get_and_expand_breg(op);
 	uint8_t creg = common16_get_and_expand_creg(op);
 	uint32_t source = m_regs[creg];
-	uint32_t result = util::sext(source & 0xffff, 16);
+	uint32_t result = util::sext(source, 16);
 	m_regs[breg] = result;
 	return m_pc + 2;
 }

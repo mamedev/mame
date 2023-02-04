@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "arcompact.h"
 
-uint32_t arcompact_device::branch_common(uint16_t op, bool cond, unsigned width)
+inline uint32_t arcompact_device::branch_common(uint16_t op, bool cond, unsigned width)
 {
     if (cond)
     {

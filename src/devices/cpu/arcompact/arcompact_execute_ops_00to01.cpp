@@ -6,15 +6,15 @@
 
 // helpers for below this group of opcodes
 
-int32_t arcompact_device::get_01_01_01_address_offset(uint32_t op)
+inline uint32_t arcompact_device::get_01_01_01_address_offset(uint32_t op)
 {
 	int32_t address = (op & 0x00fe0000) >> 17;
 	address |= ((op & 0x00008000) >> 15) << 7;
-	if (address & 0x80) address = -0x80 + (address & 0x7f);
+	address = util::sext(address, 8);
 	return address;
 }
 
-uint32_t arcompact_device::BRxx_takejump(uint32_t address, uint8_t n, int size)
+inline uint32_t arcompact_device::BRxx_takejump(uint32_t address, uint8_t n, int size)
 {
 	uint32_t realaddress = (m_pc & 0xfffffffc) + (address * 2);
 	if (n)
@@ -30,7 +30,7 @@ uint32_t arcompact_device::BRxx_takejump(uint32_t address, uint8_t n, int size)
 	}
 }
 
-bool arcompact_device::BRxx_condition(uint8_t condition, uint32_t b, uint32_t c)
+inline bool arcompact_device::BRxx_condition(uint8_t condition, uint32_t b, uint32_t c)
 {
 	switch (condition)
 	{
@@ -47,9 +47,9 @@ bool arcompact_device::BRxx_condition(uint8_t condition, uint32_t b, uint32_t c)
 }
 
 // Branch on Compare / Bit Test - Register-Register
-uint32_t arcompact_device::handleop32_BRxx_reg_reg(uint32_t op, uint8_t condition)
+inline uint32_t arcompact_device::handleop32_BRxx_reg_reg(uint32_t op, uint8_t condition)
 {
-	int32_t address = get_01_01_01_address_offset(op);
+	uint32_t address = get_01_01_01_address_offset(op);
 	uint8_t creg = common32_get_creg(op);
 	uint8_t breg = common32_get_breg(op);
 	int n = (op & 0x00000020) >> 5;
@@ -64,9 +64,9 @@ uint32_t arcompact_device::handleop32_BRxx_reg_reg(uint32_t op, uint8_t conditio
 }
 
 // Branch on Compare / Bit Test - Register-Immediate
-uint32_t arcompact_device::handleop32_BRxx_reg_imm(uint32_t op, uint8_t condition)
+inline uint32_t arcompact_device::handleop32_BRxx_reg_imm(uint32_t op, uint8_t condition)
 {
-	int32_t address = get_01_01_01_address_offset(op);
+	uint32_t address = get_01_01_01_address_offset(op);
 	uint32_t u = common32_get_u6(op);
 	uint8_t breg = common32_get_breg(op);
 	int n = (op & 0x00000020) >> 5;
@@ -94,7 +94,9 @@ uint32_t arcompact_device::handleop32_B_cc_D_s21(uint32_t op)
 
 	int32_t address = (op & 0x07fe0000) >> 17;
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
-	if (address & 0x80000) address = -0x80000 + (address & 0x7ffff);
+
+	address = util::sext(address, 20);
+
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 
 	uint32_t realaddress = (m_pc & 0xfffffffc) + (address * 2);
@@ -123,7 +125,9 @@ uint32_t arcompact_device::handleop32_B_D_s25(uint32_t op)
 	int32_t address = (op & 0x07fe0000) >> 17;
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
 	address |= (op & 0x0000000f) << 20;
-	if (address & 0x800000) address = -0x800000 + (address & 0x7fffff);
+
+	address = util::sext(address, 24);
+
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 
 	uint32_t realaddress = (m_pc & 0xfffffffc) + (address * 2);
@@ -153,10 +157,11 @@ uint32_t arcompact_device::handleop32_BL_cc_d_s21(uint32_t op)
 	if (!check_condition(condition))
 		return m_pc + size;
 
-	int32_t address = (op & 0x07fc0000) >> 17;
+	uint32_t address = (op & 0x07fc0000) >> 17; // bit 0 is always 0
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
 
-	if (address & 0x40000) address = -0x40000 + (address & 0x3ffff);
+	address = util::sext(address, 20);
+
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 
 	uint32_t realaddress = (m_pc & 0xfffffffc) + (address * 2);
@@ -183,10 +188,12 @@ uint32_t arcompact_device::handleop32_BL_cc_d_s21(uint32_t op)
 uint32_t arcompact_device::handleop32_BL_d_s25(uint32_t op)
 {
 	int size = 4;
-	int32_t address = (op & 0x07fc0000) >> 17;
+	uint32_t address = (op & 0x07fc0000) >> 17; // bit 0 is always 0
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
 	address |= (op & 0x0000000f) << 20;
-	if (address & 0x800000) address = -0x800000 + (address & 0x7fffff);
+
+	address = util::sext(address, 24);
+
 	int n = (op & 0x00000020) >> 5; op &= ~0x00000020;
 
 	uint32_t realaddress = (m_pc & 0xfffffffc) + (address * 2);

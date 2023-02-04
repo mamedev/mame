@@ -146,7 +146,7 @@ uint32_t arcompact_device::handleop32_RRC_do_op(arcompact_device &o, uint32_t sr
 
 uint32_t arcompact_device::handleop32_SEXB_do_op(arcompact_device& o, uint32_t src, bool set_flags)
 {
-	uint32_t result = util::sext(src & 0xff, 8);
+	uint32_t result = util::sext(src, 8);
 	if (set_flags)
 		o.do_flags_nz(result);
 	return result;
@@ -165,7 +165,7 @@ uint32_t arcompact_device::handleop32_SEXB_do_op(arcompact_device& o, uint32_t s
 
 uint32_t arcompact_device::handleop32_SEXW_do_op(arcompact_device& o, uint32_t src, bool set_flags)
 {
-	uint32_t result = util::sext(src & 0xffff, 16);
+	uint32_t result = util::sext(src, 16);
 	if (set_flags)
 		o.do_flags_nz(result);
 	return result;

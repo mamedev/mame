@@ -308,8 +308,6 @@ int arcompact_disassembler::handle_dasm32_LP(std::ostream& stream, offs_t pc, ui
 	else if (p == 0x02) // Loop unconditional
 	{ // 0010 0RRR 1010 1000 0RRR ssss ssSS SSSS
 		uint32_t S = dasm_common32_get_s12(op);
-		if (S & 0x800) S = -0x800 + (S & 0x7ff);
-
 		util::stream_format(stream, "LP (start %08x, end %08x)", pc + 4, (pc & 0xfffffffc) + S * 2);
 	}
 	else if (p == 0x03) // Loop conditional
@@ -389,7 +387,6 @@ int arcompact_disassembler::handle_dasm32_LR(std::ostream &stream, offs_t pc, ui
 	else if (p == 2)
 	{
 		uint32_t S = dasm_common32_get_s12(op);
-
 		output_aux_regname(stream, S);
 	}
 	else if (p == 3)
