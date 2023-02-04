@@ -2,18 +2,19 @@
 // copyright-holders:David Haywood
 /*********************************\
  ARCompact disassembler
-
 \*********************************/
 
 #include "emu.h"
-
 #include "arcompactdasm.h"
 
 
-#define DASM_GET_01_01_01_BRANCH_ADDR \
-	int32_t address = (op & 0x00fe0000) >> 17; \
-	address |= ((op & 0x00008000) >> 15) << 7; \
+inline uint32_t arcompact_disassembler::get_01_01_01_address_offset(uint32_t op)
+{
+	uint32_t address = (op & 0x00fe0000) >> 17;
+	address |= ((op & 0x00008000) >> 15) << 7;
 	address = util::sext(address, 8);
+	return address;
+}
 
 int arcompact_disassembler::handle_dasm32_B_cc_D_s21(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes)
 {
@@ -89,7 +90,7 @@ int arcompact_disassembler::handle01_01_00_helper(std::ostream &stream, offs_t p
 
 	// Branch on Compare / Bit Test - Register-Register
 	// 00001 bbb sssssss 1 S BBB CCCCCC N 0 iiii
-	DASM_GET_01_01_01_BRANCH_ADDR
+	uint32_t address = get_01_01_01_address_offset(op);
 
 	uint8_t creg = dasm_common32_get_creg(op);
 	uint8_t breg = dasm_common32_get_breg(op);
@@ -173,7 +174,7 @@ int arcompact_disassembler::handle01_01_01_helper(std::ostream &stream, offs_t p
 
 	// Branch on Compare / Bit Test - Register-Immediate
 	// 0000 1bbb ssss sss1 SBBB uuuu uuN1 iiii
-	DASM_GET_01_01_01_BRANCH_ADDR
+	uint32_t address = get_01_01_01_address_offset(op);
 
 	uint32_t u = dasm_common32_get_u6(op);
 	uint8_t breg = dasm_common32_get_breg(op);

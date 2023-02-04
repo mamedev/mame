@@ -8,7 +8,7 @@
 
 inline uint32_t arcompact_device::get_01_01_01_address_offset(uint32_t op)
 {
-	int32_t address = (op & 0x00fe0000) >> 17;
+	uint32_t address = (op & 0x00fe0000) >> 17;
 	address |= ((op & 0x00008000) >> 15) << 7;
 	address = util::sext(address, 8);
 	return address;
