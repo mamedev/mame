@@ -1566,14 +1566,10 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // LD<zz><.x><.di> 0,[limm,c]      0010 0110 RR11 0ZZX   D111 CCCC CC11 1110 (+ Limm)
 // PREFETCH [limm,c]               0010 0110 RR11 0000   0111 CCCC CC11 1110 (+ Limm) (prefetch is an alias)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-					case 0x30: return handleop32_LD_0(op);  // LD r-r
-					case 0x31: return handleop32_LD_1(op);  // LD r-r
-					case 0x32: return handleop32_LD_2(op);  // LD r-r
-					case 0x33: return handleop32_LD_3(op);  // LD r-r
-					case 0x34: return handleop32_LD_4(op);  // LD r-r
-					case 0x35: return handleop32_LD_5(op);  // LD r-r
-					case 0x36: return handleop32_LD_6(op);  // LD r-r
-					case 0x37: return handleop32_LD_7(op);  // LD r-r
+					case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
+					{
+						return handleop32_LDrr(op, (op >> 17) & 3, (op >> 16) & 1);  // LD r-r
+					}
 					default:
 					{
 						return arcompact_handle_illegal(instruction, subinstr, op);  // illegal
@@ -1709,7 +1705,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // ADDS<.f> 0,b,limm               0010 1bbb 0000 0110   FBBB 1111 1011 1110 (+ Limm)
 // ADDS<.cc><.f> 0,limm,c          0010 1110 1100 0110   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_ADDS(op);  // ADDS
+						return handleop32_general(op, handleop32_ADDS_do_op); // ADDS
 					}
 					case 0x07:
 					{
@@ -1731,7 +1727,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // SUBS<.f> 0,b,limm               0010 1bbb 0000 0111   FBBB 1111 1011 1110 (+ Limm)
 // SUBS<.cc><.f> 0,limm,c          0010 1110 1100 0111   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_SUBS(op);  // SUBS
+						return handleop32_general(op, handleop32_SUBS_do_op); // SUBS
 					}
 					case 0x08:
 					{
@@ -1752,7 +1748,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // DIVAW 0,b,u6                    0010 1bbb 0100 1000   0BBB uuuu uu11 1110
 // DIVAW<.cc> 0,limm,c             0010 1110 1100 1000   0111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_DIVAW(op);  // DIVAW
+						return handleop32_general(op, handleop32_DIVAW_do_op); // DIVAW
 					}
 					case 0x0a:
 					{
@@ -1773,7 +1769,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // ASLS<.f> 0,b,u6                 0010 1bbb 0100 1010   FBBB uuuu uu11 1110
 // ASLS<.cc><.f> 0,limm,c          0010 1110 1100 1010   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_ASLS(op);  // ASLS
+						return handleop32_general(op, handleop32_ASLS_do_op); // ASLS
 					}
 					case 0x0b:
 					{
@@ -1794,28 +1790,28 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // ASRS<.f> 0,b,u6                 0010 1bbb 0100 1011   FBBB uuuu uu11 1110
 // ASRS<.cc><.f> 0,limm,c          0010 1110 1100 1011   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_ASRS(op);  // ASRS
+						return handleop32_general(op, handleop32_ASRS_do_op); // ASRS
 					}
 					case 0x0c:
 					{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Unknown Extension Op
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_UNKNOWN_05_0c(op);
+						return handleop32_general(op, handleop32_UNKNOWN_05_0c_do_op);
 					}
 					case 0x10:
 					{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Unknown Extension Op
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_UNKNOWN_05_10(op);
+						return handleop32_general(op, handleop32_UNKNOWN_05_10_do_op);
 					}
 					case 0x14:
 					{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Unknown Extension Op
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_UNKNOWN_05_14(op);
+						return handleop32_general(op, handleop32_UNKNOWN_05_14_do_op);
 					}
 					case 0x28:
 					{
@@ -1836,7 +1832,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // ADDSDW<.f> 0,b,u6               0010 1bbb 0110 1000   FBBB uuuu uu11 1110
 // ADDSDW<.cc><.f> 0,limm,c        0010 1110 1110 1000   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_ADDSDW(op);  // ADDSDW
+						return handleop32_general(op, handleop32_ADDSDW_do_op); // ADDSDW
 					}
 					case 0x29:
 					{
@@ -1857,7 +1853,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // SUBSDW<.f> 0,b,u6               0010 1bbb 0110 1001   FBBB uuuu uu11 1110
 // SUBSDW<.cc><.f> 0,limm,c        0010 1110 1110 1001   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_SUBSDW(op);  // SUBSDW
+						return handleop32_general(op, handleop32_SUBSDW_do_op); // SUBSDW
 					}
 					case 0x2f: // SOPs
 					{
@@ -1901,7 +1897,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // SAT16<.f> 0,u6                  0010 1110 0110 1111   F111 uuuu uu00 0010
 // SAT16<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 0010 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								return handleop32_SAT16(op);  // SAT16
+								return handleop32_general_SOP_group(op, handleop32_SAT16_do_op);  // SAT16
 							}
 							case 0x03:
 							{
@@ -1914,7 +1910,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // RND16<.f> 0,u6                  0010 1110 0110 1111   F111 uuuu uu00 0011
 // RND16<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 0011 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								return handleop32_RND16(op);  // RND16
+								return handleop32_general_SOP_group(op, handleop32_RND16_do_op); // RND16
 							}
 							case 0x04:
 							{
@@ -1927,7 +1923,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // ABSSW<.f> 0,u6                  0010 1110 0110 1111   F111 uuuu uu00 0100
 // ABSSW<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 0100 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								return handleop32_ABSSW(op);  // ABSSW
+								return handleop32_general_SOP_group(op, handleop32_ABSSW_do_op); // ABSSW
 							}
 							case 0x05:
 							{
@@ -1940,7 +1936,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // ABSS<.f> 0,u6                   0010 1110 0110 1111   F111 uuuu uu00 0101
 // ABSS<.f> 0,limm                 0010 1110 0010 1111   F111 1111 1000 0101 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								return handleop32_ABSS(op);  // ABSS
+								return handleop32_general_SOP_group(op, handleop32_ABSS_do_op); // ABSS
 							}
 							case 0x06:
 							{
@@ -1953,7 +1949,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // NEGSW<.f> 0,u6                  0010 1110 0110 1111   F111 uuuu uu00 0110
 // NEGSW<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 0110 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								return handleop32_NEGSW(op);  // NEGSW
+								return handleop32_general_SOP_group(op, handleop32_NEGSW_do_op); // NEGSW
 							}
 							case 0x07:
 							{
@@ -1966,7 +1962,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // NEGS<.f> 0,u6                   0010 1110 0110 1111   F111 uuuu uu00 0111
 // NEGS<.f> 0,limm                 0010 1110 0010 1111   F111 1111 1000 0111 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-								return handleop32_NEGS(op);  // NEGS
+								return handleop32_general_SOP_group(op, handleop32_NEGS_do_op); // NEGS
 							}
 							case 0x08:
 							{

@@ -4,37 +4,6 @@
 #include "emu.h"
 #include "arcompact.h"
 
-uint32_t arcompact_device::arcompact_handle05_2f_0x_helper(uint32_t op, const char* optext)
-{
-	int size;
-
-	int p = common32_get_p(op);
-	//uint8_t breg = common32_get_breg(op);
-
-	if (p == 0)
-	{
-		uint8_t creg = common32_get_creg(op);
-		if (creg == REG_LIMM)
-		{
-			//uint32_t limm;
-			//get_limm_32bit_opcode();
-			size = 8;
-		}
-	}
-	else if (p == 1)
-	{
-	}
-	else if (p == 2)
-	{
-	}
-	else if (p == 3)
-	{
-	}
-
-	fatalerror("unimplemented %s %08x", optext, op);
-	return m_pc + size;
-}
-
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // SWAP - Swap words (optional extension on ARCtangent-A5 / ARC600, built in on ARC700)
 //
@@ -46,7 +15,6 @@ uint32_t arcompact_device::arcompact_handle05_2f_0x_helper(uint32_t op, const ch
 // SWAP<.f> 0,u6                   0010 1110 0110 1111   F111 uuuu uu00 0000
 // SWAP<.f> 0,limm                 0010 1110 0010 1111   F111 1111 1000 0000 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
 
 uint32_t arcompact_device::handleop32_SWAP_do_op(arcompact_device &o, uint32_t src, bool set_flags)
 {
@@ -95,9 +63,9 @@ uint32_t arcompact_device::handleop32_NORM_do_op(arcompact_device &o, uint32_t s
 // SAT16<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 0010 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_SAT16(uint32_t op)
+uint32_t arcompact_device::handleop32_SAT16_do_op(arcompact_device& o, uint32_t src, bool set_flags)
 {
-	return arcompact_handle05_2f_0x_helper(op, "SAT16");
+	fatalerror("Unhandled SAT16");
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -110,9 +78,9 @@ uint32_t arcompact_device::handleop32_SAT16(uint32_t op)
 // RND16<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 0011 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_RND16(uint32_t op)
+uint32_t arcompact_device::handleop32_RND16_do_op(arcompact_device& o, uint32_t src, bool set_flags)
 {
-	return arcompact_handle05_2f_0x_helper(op, "RND16");
+	fatalerror("Unhandled RND16");
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -125,9 +93,9 @@ uint32_t arcompact_device::handleop32_RND16(uint32_t op)
 // ABSSW<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 0100 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ABSSW(uint32_t op)
+uint32_t arcompact_device::handleop32_ABSSW_do_op(arcompact_device& o, uint32_t src, bool set_flags)
 {
-	return arcompact_handle05_2f_0x_helper(op, "ABSSW");
+	fatalerror("Unhandled ABSSW");
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -140,9 +108,9 @@ uint32_t arcompact_device::handleop32_ABSSW(uint32_t op)
 // ABSS<.f> 0,limm                 0010 1110 0010 1111   F111 1111 1000 0101 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ABSS(uint32_t op)
+uint32_t arcompact_device::handleop32_ABSS_do_op(arcompact_device& o, uint32_t src, bool set_flags)
 {
-	return arcompact_handle05_2f_0x_helper(op, "ABSS");
+	fatalerror("Unhandled ABSS");
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -155,9 +123,9 @@ uint32_t arcompact_device::handleop32_ABSS(uint32_t op)
 // NEGSW<.f> 0,limm                0010 1110 0010 1111   F111 1111 1000 0110 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_NEGSW(uint32_t op)
+uint32_t arcompact_device::handleop32_NEGSW_do_op(arcompact_device& o, uint32_t src, bool set_flags)
 {
-	return arcompact_handle05_2f_0x_helper(op, "NEGSW");
+	fatalerror("Unhandled NEGSW");
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -170,9 +138,9 @@ uint32_t arcompact_device::handleop32_NEGSW(uint32_t op)
 // NEGS<.f> 0,limm                 0010 1110 0010 1111   F111 1111 1000 0111 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_NEGS(uint32_t op)
+uint32_t arcompact_device::handleop32_NEGS_do_op(arcompact_device& o, uint32_t src, bool set_flags)
 {
-	return arcompact_handle05_2f_0x_helper(op, "NEGS");
+	fatalerror("Unhandled NEGS");
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

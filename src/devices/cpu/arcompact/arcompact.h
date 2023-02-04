@@ -324,17 +324,16 @@ private:
 	*                                                                                                                                   *
 	************************************************************************************************************************************/
 
+	// arcompact_execute_ops_00to01.cpp
 	uint32_t handleop32_B_cc_D_s21(uint32_t op);
 	uint32_t handleop32_B_D_s25(uint32_t op);
 	uint32_t handleop32_BL_cc_d_s21(uint32_t op);
 	uint32_t handleop32_BL_d_s25(uint32_t op);
-
 	uint32_t get_01_01_01_address_offset(uint32_t op);
 	uint32_t BRxx_takejump(uint32_t address, uint8_t n, int size);
 	static bool BRxx_condition(uint8_t condition, uint32_t b, uint32_t c);
 	uint32_t handleop32_BRxx_reg_reg(uint32_t op, uint8_t condition);
 	uint32_t handleop32_BRxx_reg_imm(uint32_t op, uint8_t condition);
-
 	uint32_t handleop32_BREQ_reg_reg(uint32_t op);
 	uint32_t handleop32_BRNE_reg_reg(uint32_t op);
 	uint32_t handleop32_BRLT_reg_reg(uint32_t op);
@@ -351,6 +350,8 @@ private:
 	uint32_t handleop32_BRHS_reg_imm(uint32_t op);
 	uint32_t handleop32_BBIT0_reg_imm(uint32_t op);
 	uint32_t handleop32_BBIT1_reg_imm(uint32_t op);
+
+	// arcompact_execute_ops_02to03.cpp
 	uint32_t handleop32_LD_r_o(uint32_t op);
 	uint32_t handleop32_ST_r_o(uint32_t op);
 
@@ -360,7 +361,6 @@ private:
 	static uint32_t handleop32_SUB_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 	static uint32_t handleop32_AND_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 	static uint32_t handleop32_OR_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
-
 	static uint32_t handleop32_BIC_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 	static uint32_t handleop32_XOR_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 
@@ -382,72 +382,19 @@ private:
 	static uint32_t handleop32_SUB1_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 	static uint32_t handleop32_SUB2_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 	static uint32_t handleop32_SUB3_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
-
-	uint32_t handleop32_Jcc_f_a_b_c_helper(uint32_t op, bool delay, bool link);
-	uint32_t handleop32_Jcc_cc_f_b_b_c_helper(uint32_t op, bool delay, bool link);
-
-	uint32_t handleop32_Jcc(uint32_t op);
-	uint32_t handleop32_Jcc_f_a_b_c(uint32_t op);
-	uint32_t handleop32_Jcc_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_Jcc_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_Jcc_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_Jcc_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_Jcc_D(uint32_t op);
-	uint32_t handleop32_Jcc_D_f_a_b_c(uint32_t op);
-	uint32_t handleop32_Jcc_D_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_Jcc_D_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_Jcc_D_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_Jcc_D_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_LR_cc(uint32_t op);
-	uint32_t handleop32_LR(uint32_t op);
-	uint32_t handleop32_LR_f_a_b_c(uint32_t op);
-	uint32_t handleop32_LR_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_LR_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_LR_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_LR_cc_f_b_b_u6(uint32_t op);
-
-	uint32_t handleop32_SR_cc(uint32_t op);
-	uint32_t handleop32_SR(uint32_t op);
-	uint32_t handleop32_SR_f_a_b_c(uint32_t op);
-	uint32_t handleop32_SR_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_SR_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_SR_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_SR_cc_f_b_b_u6(uint32_t op);
-
 	static uint32_t handleop32_SBC_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 	static uint32_t handleop32_MAX_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 	static uint32_t handleop32_MIN_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
-
-
-	static void handleop32_TST_do_op(arcompact_device &o, uint32_t src1, uint32_t src2);
-	static void handleop32_CMP_do_op(arcompact_device &o, uint32_t src1, uint32_t src2);
-	static void handleop32_RCMP_do_op(arcompact_device &o, uint32_t src1, uint32_t src2);
-	static void handleop32_BTST_do_op(arcompact_device &o, uint32_t src1, uint32_t src2);
-
-
 	static uint32_t handleop32_BXOR_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 	static uint32_t handleop32_MPY_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 	static uint32_t handleop32_MPYH_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 	static uint32_t handleop32_MPYHU_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 	static uint32_t handleop32_MPYU_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 
-	uint32_t handleop32_JLcc_f_a_b_c(uint32_t op);
-	uint32_t handleop32_JLcc_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_JLcc_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_JLcc_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_JLcc_cc_f_b_b_u6(uint32_t op);
-	uint32_t handleop32_JLcc(uint32_t op);
-
-	uint32_t handleop32_JLcc_D_f_a_b_c(uint32_t op);
-	uint32_t handleop32_JLcc_D_f_a_b_u6(uint32_t op);
-	uint32_t handleop32_JLcc_D_f_b_b_s12(uint32_t op);
-	uint32_t handleop32_JLcc_D_cc_f_b_b_c(uint32_t op);
-	uint32_t handleop32_JLcc_D_cc_f_b_b_u6(uint32_t op);
-	uint32_t handleop32_JLcc_D(uint32_t op);
-
-	uint32_t handleop32_LP(uint32_t op);
+	static void handleop32_TST_do_op(arcompact_device &o, uint32_t src1, uint32_t src2);
+	static void handleop32_CMP_do_op(arcompact_device &o, uint32_t src1, uint32_t src2);
+	static void handleop32_RCMP_do_op(arcompact_device &o, uint32_t src1, uint32_t src2);
+	static void handleop32_BTST_do_op(arcompact_device &o, uint32_t src1, uint32_t src2);
 
 	void handleop32_FLAG_do_op(uint32_t source);
 	uint32_t handleop32_FLAG_f_a_b_c(uint32_t op);
@@ -456,6 +403,55 @@ private:
 	uint32_t handleop32_FLAG_cc_f_b_b_c(uint32_t op);
 	uint32_t handleop32_FLAG_cc_f_b_b_u6(uint32_t op);
 	uint32_t handleop32_FLAG(uint32_t op);
+
+	// arcompact_execute_ops_04_jumps.cpp
+	inline uint32_t handle_jump_to_addr(bool delay, bool link, uint32_t address, uint32_t next_addr);
+	inline uint32_t handle_jump_to_register(bool delay, bool link, uint32_t reg, uint32_t next_addr, int flag);
+	uint32_t handleop32_Jcc_f_a_b_c_helper(uint32_t op, bool delay, bool link);
+	uint32_t handleop32_Jcc_cc_f_b_b_c_helper(uint32_t op, bool delay, bool link);
+	uint32_t handleop32_Jcc(uint32_t op);
+	uint32_t handleop32_Jcc_f_a_b_c(uint32_t op);
+	uint32_t handleop32_Jcc_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_Jcc_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_Jcc_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_Jcc_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_Jcc_D(uint32_t op);
+	uint32_t handleop32_Jcc_D_f_a_b_c(uint32_t op);
+	uint32_t handleop32_Jcc_D_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_Jcc_D_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_Jcc_D_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_Jcc_D_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_JLcc_f_a_b_c(uint32_t op);
+	uint32_t handleop32_JLcc_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_JLcc_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_JLcc_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_JLcc_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_JLcc(uint32_t op);
+	uint32_t handleop32_JLcc_D_f_a_b_c(uint32_t op);
+	uint32_t handleop32_JLcc_D_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_JLcc_D_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_JLcc_D_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_JLcc_D_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_JLcc_D(uint32_t op);
+
+	// arcompact_execute_ops_04_aux.cpp
+	uint32_t handleop32_LR_cc(uint32_t op);
+	uint32_t handleop32_LR(uint32_t op);
+	uint32_t handleop32_LR_f_a_b_c(uint32_t op);
+	uint32_t handleop32_LR_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_LR_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_LR_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_LR_cc_f_b_b_u6(uint32_t op);
+	uint32_t handleop32_SR_cc(uint32_t op);
+	uint32_t handleop32_SR(uint32_t op);
+	uint32_t handleop32_SR_f_a_b_c(uint32_t op);
+	uint32_t handleop32_SR_f_a_b_u6(uint32_t op);
+	uint32_t handleop32_SR_f_b_b_s12(uint32_t op);
+	uint32_t handleop32_SR_cc_f_b_b_c(uint32_t op);
+	uint32_t handleop32_SR_cc_f_b_b_u6(uint32_t op);
+
+	// arcompact_execute_ops_04_loop.cpp
+	uint32_t handleop32_LP(uint32_t op);
 
 	// arcompact_execute_ops_04_2f_sop.cpp
 	static uint32_t handleop32_ASR_single_do_op(arcompact_device &o, uint32_t src, bool set_flags);
@@ -474,7 +470,6 @@ private:
 	uint32_t handleop32_EX(uint32_t op);
 
 	// arcompact_execute_ops_04_2f_3f_zop.cpp
-
 	uint32_t handleop32_SLEEP(uint32_t op);
 	uint32_t handleop32_SWI(uint32_t op);
 	uint32_t handleop32_SYNC(uint32_t op);
@@ -482,48 +477,38 @@ private:
 	uint32_t handleop32_BRK(uint32_t op);
 
 	// arcompact_execute_ops_04_3x.cpp
-
-	uint32_t handleop32_LD_0(uint32_t op);
-	uint32_t handleop32_LD_1(uint32_t op);
-	uint32_t handleop32_LD_2(uint32_t op);
-	uint32_t handleop32_LD_3(uint32_t op);
-	uint32_t handleop32_LD_4(uint32_t op);
-	uint32_t handleop32_LD_5(uint32_t op);
-	uint32_t handleop32_LD_6(uint32_t op);
-	uint32_t handleop32_LD_7(uint32_t op);
+	uint32_t handleop32_LDrr(uint32_t op, int dsize, int extend);
 
 	// arcompact_execute_ops_05.cpp
 	static uint32_t handleop32_ASL_multiple_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 	static uint32_t handleop32_LSR_multiple_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 	static uint32_t handleop32_ASR_multiple_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
-
+	static uint32_t handleop32_ROR_multiple_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 	static void handleop32_MUL64_do_op(arcompact_device &o, uint32_t src1, uint32_t src2);
 	static void handleop32_MULU64_do_op(arcompact_device &o, uint32_t src1, uint32_t src2);
+	static uint32_t handleop32_ADDS_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_SUBS_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_DIVAW_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_ASLS_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_ASRS_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_ADDSDW_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_SUBSDW_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_UNKNOWN_05_0c_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_UNKNOWN_05_10_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_UNKNOWN_05_14_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 
 	// arcompact_execute_ops_05_2f_sop.cpp
 	static uint32_t handleop32_NORM_do_op(arcompact_device &o, uint32_t src, bool set_flags);
-
-	static uint32_t handleop32_ROR_multiple_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
-	uint32_t handleop32_ADDS(uint32_t op);
-	uint32_t handleop32_SUBS(uint32_t op);
-	uint32_t handleop32_DIVAW(uint32_t op);
-	uint32_t handleop32_ASLS(uint32_t op);
-	uint32_t handleop32_ASRS(uint32_t op);
-	uint32_t handleop32_ADDSDW(uint32_t op);
-	uint32_t handleop32_SUBSDW(uint32_t op);
 	static uint32_t handleop32_SWAP_do_op(arcompact_device &o, uint32_t src, bool set_flags);
-	uint32_t handleop32_SAT16(uint32_t op);
-	uint32_t handleop32_RND16(uint32_t op);
-	uint32_t handleop32_ABSSW(uint32_t op);
-	uint32_t handleop32_ABSS(uint32_t op);
-	uint32_t handleop32_NEGSW(uint32_t op);
-	uint32_t handleop32_NEGS(uint32_t op);
+	static uint32_t handleop32_SAT16_do_op(arcompact_device &o, uint32_t src, bool set_flags);
+	static uint32_t handleop32_RND16_do_op(arcompact_device &o, uint32_t src, bool set_flags);
+	static uint32_t handleop32_ABSSW_do_op(arcompact_device &o, uint32_t src, bool set_flags);
+	static uint32_t handleop32_ABSS_do_op(arcompact_device &o, uint32_t src, bool set_flags);
+	static uint32_t handleop32_NEGSW_do_op(arcompact_device &o, uint32_t src, bool set_flags);
+	static uint32_t handleop32_NEGS_do_op(arcompact_device &o, uint32_t src, bool set_flags);
 	static uint32_t handleop32_NORMW_do_op(arcompact_device &o, uint32_t src, bool set_flags);
 
-	uint32_t handleop32_UNKNOWN_05_0c(uint32_t op);
-	uint32_t handleop32_UNKNOWN_05_10(uint32_t op);
-	uint32_t handleop32_UNKNOWN_05_14(uint32_t op);
-
+	// arcompact_execute_ops_06to0b.cpp
 	uint32_t handleop32_ARC_EXT06(uint32_t op);
 	uint32_t handleop32_USER_EXT07(uint32_t op);
 	uint32_t handleop32_USER_EXT08(uint32_t op);
@@ -657,18 +642,10 @@ private:
 	*                                                                                                                                   *
 	************************************************************************************************************************************/
 
-	uint32_t arcompact_handle05_helper(uint32_t op, const char* optext, int ignore_dst, int b_reserved);
-	uint32_t arcompact_handle04_3x_helper(uint32_t op, int dsize, int extend);
-	uint32_t arcompact_handle05_2f_0x_helper(uint32_t op, const char* optext);
-
-	uint32_t handle_jump_to_addr(bool delay, bool link, uint32_t address, uint32_t next_addr);
-	uint32_t handle_jump_to_register(bool delay, bool link, uint32_t reg, uint32_t next_addr, int flag);
-
 	uint32_t get_instruction(uint32_t op);
 
 	const address_space_config m_program_config;
 	const address_space_config m_io_config;
-
 
 	address_space *m_program;
 	address_space *m_io;

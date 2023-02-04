@@ -4,41 +4,6 @@
 #include "emu.h"
 #include "arcompact.h"
 
-uint32_t arcompact_device::arcompact_handle05_helper(uint32_t op, const char* optext, int ignore_dst, int b_reserved)
-{
-	int p = common32_get_p(op);
-	uint8_t breg = common32_get_breg(op);
-	int size = 4;
-
-	if (!b_reserved)
-	{
-		size = check_limm(breg);
-	}
-
-	if (p == 0)
-	{
-		uint8_t creg = common32_get_creg(op);
-		size = check_limm(creg);
-	}
-	else if (p == 1)
-	{
-	}
-	else if (p == 2)
-	{
-	}
-	else if (p == 3)
-	{
-		int M = (op & 0x00000020) >> 5;
-		if (M == 0)
-		{
-			uint8_t creg = common32_get_creg(op);
-			size = check_limm(creg);
-		}
-	}
-	fatalerror("unimplemented %s %08x (04 type helper)", optext, op);
-	return m_pc + size;
-}
-
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                                 IIII I      SS SSSS
 // ASL<.f> a,b,c                   0010 1bbb 0000 0000   FBBB CCCC CCAA AAAA
@@ -237,9 +202,9 @@ void arcompact_device::handleop32_MULU64_do_op(arcompact_device &o, uint32_t src
 // ADDS<.cc><.f> 0,limm,c          0010 1110 1100 0110   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ADDS(uint32_t op)
+uint32_t arcompact_device::handleop32_ADDS_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	return arcompact_handle05_helper(op, "ADDS", 0, 0);
+	fatalerror("ADDS unhandled");
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -258,9 +223,9 @@ uint32_t arcompact_device::handleop32_ADDS(uint32_t op)
 // SUBS<.cc><.f> 0,limm,c          0010 1110 1100 0111   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_SUBS(uint32_t op)
+uint32_t arcompact_device::handleop32_SUBS_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	return arcompact_handle05_helper(op, "SUBS", 0, 0);
+	fatalerror("SUBS unhandled");
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -278,9 +243,9 @@ uint32_t arcompact_device::handleop32_SUBS(uint32_t op)
 // DIVAW<.cc> 0,limm,c             0010 1110 1100 1000   0111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_DIVAW(uint32_t op)
+uint32_t arcompact_device::handleop32_DIVAW_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	return arcompact_handle05_helper(op, "DIVAW", 0, 0);
+	fatalerror("DIVAW unhandled");
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -298,9 +263,9 @@ uint32_t arcompact_device::handleop32_DIVAW(uint32_t op)
 // ASLS<.cc><.f> 0,limm,c          0010 1110 1100 1010   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ASLS(uint32_t op)
+uint32_t arcompact_device::handleop32_ASLS_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	return arcompact_handle05_helper(op, "ASLS", 0, 0);
+	fatalerror("ASLS unhandled");
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -318,9 +283,9 @@ uint32_t arcompact_device::handleop32_ASLS(uint32_t op)
 // ASRS<.cc><.f> 0,limm,c          0010 1110 1100 1011   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ASRS(uint32_t op)
+uint32_t arcompact_device::handleop32_ASRS_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	return arcompact_handle05_helper(op, "ASRS", 0, 0);
+	fatalerror("ASRS unhandled");
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -338,9 +303,9 @@ uint32_t arcompact_device::handleop32_ASRS(uint32_t op)
 // ADDSDW<.cc><.f> 0,limm,c        0010 1110 1110 1000   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_ADDSDW(uint32_t op)
+uint32_t arcompact_device::handleop32_ADDSDW_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	return arcompact_handle05_helper(op, "ADDSDW", 0, 0);
+	fatalerror("ADDSDW unhandled");
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -358,9 +323,9 @@ uint32_t arcompact_device::handleop32_ADDSDW(uint32_t op)
 // SUBSDW<.cc><.f> 0,limm,c        0010 1110 1110 1001   F111 CCCC CC0Q QQQQ (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_SUBSDW(uint32_t op)
+uint32_t arcompact_device::handleop32_SUBSDW_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	return arcompact_handle05_helper(op, "SUBSDW", 0, 0);
+	fatalerror("SUBSDW unhandled");
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -370,18 +335,17 @@ uint32_t arcompact_device::handleop32_SUBSDW(uint32_t op)
 // probably dual-16bit ops, but also making use of a bunch of AUX ports for data?
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_UNKNOWN_05_0c(uint32_t op)
+uint32_t arcompact_device::handleop32_UNKNOWN_05_0c_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	return arcompact_handle05_helper(op, "UNKNOWN_05_0c", 0, 0);
+	fatalerror("UNKNOWN_05_0c unhandled");
 }
 
-uint32_t arcompact_device::handleop32_UNKNOWN_05_10(uint32_t op)
+uint32_t arcompact_device::handleop32_UNKNOWN_05_10_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	return arcompact_handle05_helper(op, "UNKNOWN_05_10", 0, 0);
+	fatalerror("UNKNOWN_05_10 unhandled");
 }
 
-uint32_t arcompact_device::handleop32_UNKNOWN_05_14(uint32_t op)
+uint32_t arcompact_device::handleop32_UNKNOWN_05_14_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags)
 {
-	return arcompact_handle05_helper(op, "UNKNOWN_05_14", 0, 0);
+	fatalerror("UNKNOWN_05_14 unhandled");
 }
-

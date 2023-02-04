@@ -19,8 +19,11 @@
 // PREFETCH [limm,c]               0010 0110 RR11 0000   0111 CCCC CC11 1110 (+ Limm) (prefetch is an alias)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::arcompact_handle04_3x_helper(uint32_t op, int dsize, int extend)
+uint32_t arcompact_device::handleop32_LDrr(uint32_t op, int dsize, int extend)
 {
+	// ZZ value of 0x0 with X of 1 is illegal
+	// ZZ value of 0x3 is illegal
+
 	uint8_t breg = common32_get_breg(op);
 	uint8_t creg = common32_get_creg(op);
 	int size = check_limm(breg, creg);
@@ -36,14 +39,3 @@ uint32_t arcompact_device::arcompact_handle04_3x_helper(uint32_t op, int dsize, 
 
 	return m_pc + size;
 }
-
-uint32_t arcompact_device::handleop32_LD_0(uint32_t op) { return arcompact_handle04_3x_helper(op, 0, 0); }
-// ZZ value of 0x0 with X of 1 is illegal
-uint32_t arcompact_device::handleop32_LD_1(uint32_t op) { return arcompact_handle04_3x_helper(op, 0, 1); }
-uint32_t arcompact_device::handleop32_LD_2(uint32_t op) { return arcompact_handle04_3x_helper(op, 1, 0); }
-uint32_t arcompact_device::handleop32_LD_3(uint32_t op) { return arcompact_handle04_3x_helper(op, 1, 1); }
-uint32_t arcompact_device::handleop32_LD_4(uint32_t op) { return arcompact_handle04_3x_helper(op, 2, 0); }
-uint32_t arcompact_device::handleop32_LD_5(uint32_t op) { return arcompact_handle04_3x_helper(op, 2, 1); }
-// ZZ value of 0x3 is illegal
-uint32_t arcompact_device::handleop32_LD_6(uint32_t op) { return arcompact_handle04_3x_helper(op, 3, 0); }
-uint32_t arcompact_device::handleop32_LD_7(uint32_t op) { return arcompact_handle04_3x_helper(op, 3, 1); }
