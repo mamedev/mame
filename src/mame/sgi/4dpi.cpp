@@ -664,7 +664,7 @@ void pi4d2x_state::common(machine_config &config)
 
 	EEPROM_93C56_16BIT(config, m_eeprom);
 
-	DP8573(config, m_rtc); // DP8572AN
+	DP8573(config, m_rtc).set_use_utc(true); // DP8572AN
 
 	PIT8254(config, m_pit);
 	m_pit->set_clk<2>(3.6864_MHz_XTAL);
