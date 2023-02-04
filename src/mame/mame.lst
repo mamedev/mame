@@ -802,6 +802,9 @@ apple2gsmt                      // 1991 "Mark Twain" prototype
 @source:apple/apple3.cpp
 apple3                          // May 1980 Apple ///
 
+@source:apple/imacg3.cpp
+imac							// August 15, 1998 Apple iMac (Bondi blue)
+
 @source:apple/iphone2g.cpp
 iphone2g                        // (c) 2007 Apple
 
@@ -886,6 +889,9 @@ mp130
 emate
 mp2000
 mp2100
+
+@source:apple/powermacg3.cpp
+pwrmacg3						// November 10, 1997 Apple Power Macintosh G3 (beige)
 
 @source:apple/superga2.cpp
 kuzmich
