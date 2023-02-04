@@ -2779,6 +2779,8 @@ if (MACHINES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/machine/lpc-rtc.h",
 		MAME_DIR .. "src/devices/machine/lpc-pit.cpp",
 		MAME_DIR .. "src/devices/machine/lpc-pit.h",
+		MAME_DIR .. "src/devices/machine/mpc106.cpp",
+		MAME_DIR .. "src/devices/machine/mpc106.h",
 		MAME_DIR .. "src/devices/machine/vrc4373.cpp",
 		MAME_DIR .. "src/devices/machine/vrc4373.h",
 		MAME_DIR .. "src/devices/machine/vrc5074.cpp",
