@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "interface/inputman.h"
+#include "interface/inputdev.h"
 
 
 //**************************************************************************
@@ -103,6 +103,7 @@ protected:
 	input_device_item(
 			input_device &device,
 			std::string_view name,
+			std::string_view tokenhint,
 			void *internal,
 			input_item_id itemid,
 			item_get_state_func getstate,
@@ -142,6 +143,7 @@ public:
 	const std::string &id() const { return m_id; }
 	int devindex() const { return m_devindex; }
 	input_device_item *item(input_item_id index) const { return m_item[index].get(); }
+	const assignment_vector &default_assignments() const { return m_default_assignments; }
 	input_item_id maxitem() const { return m_maxitem; }
 	void *internal() const { return m_internal; }
 	s32 threshold() const { return m_threshold; }
@@ -154,9 +156,11 @@ public:
 	// interface for host input device
 	virtual input_item_id add_item(
 			std::string_view name,
+			std::string_view tokenhint,
 			input_item_id itemid,
 			item_get_state_func getstate,
 			void *internal) override;
+	virtual void set_default_assignments(assignment_vector &&assignments) override;
 
 	// helpers
 	s32 adjust_absolute(s32 value) const { return adjust_absolute_value(value); }
@@ -174,6 +178,7 @@ private:
 	std::string             m_id;                   // id of device
 	int                     m_devindex;             // device index of this device
 	std::unique_ptr<input_device_item> m_item[ITEM_ID_ABSOLUTE_MAXIMUM+1]; // array of pointers to items
+	assignment_vector       m_default_assignments;  // additional assignments
 	input_item_id           m_maxitem;              // maximum item index
 	void *const             m_internal;             // internal callback pointer
 

@@ -14,6 +14,7 @@
 
 #include "input_module.h"
 
+#include "interface/inputdev.h"
 #include "interface/inputman.h"
 #include "modules/osdmodule.h"
 
@@ -562,14 +563,14 @@ inline int32_t normalize_absolute_axis(double raw, double rawmin, double rawmax)
 	if (raw >= center)
 	{
 		// above center
-		double const result = (raw - center) * double(osd::INPUT_ABSOLUTE_MAX) / (rawmax - center);
-		return int32_t(std::min(result, double(osd::INPUT_ABSOLUTE_MAX)));
+		double const result = (raw - center) * double(osd::input_device::ABSOLUTE_MAX) / (rawmax - center);
+		return int32_t(std::min(result, double(osd::input_device::ABSOLUTE_MAX)));
 	}
 	else
 	{
 		// below center
-		double result = -((center - raw) * double(-osd::INPUT_ABSOLUTE_MIN) / (center - rawmin));
-		return int32_t(std::max(result, double(osd::INPUT_ABSOLUTE_MIN)));
+		double result = -((center - raw) * double(-osd::input_device::ABSOLUTE_MIN) / (center - rawmin));
+		return int32_t(std::max(result, double(osd::input_device::ABSOLUTE_MIN)));
 	}
 }
 

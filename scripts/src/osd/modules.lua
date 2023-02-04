@@ -55,6 +55,8 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/watchdog.cpp",
 		MAME_DIR .. "src/osd/watchdog.h",
 		MAME_DIR .. "src/osd/interface/inputcode.h",
+		MAME_DIR .. "src/osd/interface/inputdev.h",
+		MAME_DIR .. "src/osd/interface/inputfwd.h",
 		MAME_DIR .. "src/osd/interface/inputman.h",
 		MAME_DIR .. "src/osd/interface/inputseq.cpp",
 		MAME_DIR .. "src/osd/interface/inputseq.h",
