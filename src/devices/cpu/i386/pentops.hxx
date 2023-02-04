@@ -7,6 +7,11 @@ extern flag float64_is_nan( float64 a ); // since its not defined in softfloat.h
 
 void i386_device::MMXPROLOG()
 {
+	if (m_cr[0] & 0xc)
+	{
+		i386_trap(FAULT_NM, 0, 0);
+		return;
+	}
 	//m_x87_sw &= ~(X87_SW_TOP_MASK << X87_SW_TOP_SHIFT); // top = 0
 	m_x87_tw = 0; // tag word = 0
 }

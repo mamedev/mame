@@ -2017,6 +2017,16 @@ void i386_device::i386_common_init()
 	save_item(NAME(m_nmi_latched));
 	save_item(NAME(m_smbase));
 	save_item(NAME(m_lock));
+
+	save_item(NAME(m_x87_cw));
+	save_item(NAME(m_x87_tw));
+	save_item(NAME(m_x87_sw));
+	save_item(NAME(m_x87_cs));
+	save_item(NAME(m_x87_ds));
+	save_item(NAME(m_x87_inst_ptr));
+	save_item(NAME(m_x87_data_ptr));
+	save_item(NAME(m_x87_opcode));
+
 	machine().save().register_postload(save_prepost_delegate(FUNC(i386_device::i386_postload), this));
 
 	m_smiact.resolve_safe();
