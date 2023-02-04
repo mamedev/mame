@@ -728,9 +728,8 @@ template <typename T> std::optional<T> mc88200_device::cache_read(u32 physical_a
 		{
 		case 1: return T(data >> ((physical_address & 3) * 8));
 		case 2: return T(data >> ((physical_address & 3) * 8));
+		case 4: return T(data);
 		}
-
-		return T(data);
 	}
 	else
 	{
@@ -738,9 +737,8 @@ template <typename T> std::optional<T> mc88200_device::cache_read(u32 physical_a
 		{
 		case 1: return m_mbus->read_byte(physical_address);
 		case 2: return m_mbus->read_word(physical_address);
+		case 4: return m_mbus->read_dword(physical_address);
 		}
-
-		return m_mbus->read_dword(physical_address);
 	}
 }
 

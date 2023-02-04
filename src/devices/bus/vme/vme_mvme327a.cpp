@@ -90,14 +90,14 @@ void vme_mvme327a_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("wd33c93a", WD33C93A).machine_config(
-		[this](device_t *device)
-		{
-			wd33c9x_base_device &wd33c93(downcast<wd33c9x_base_device &>(*device));
+			[] (device_t *device)
+			{
+				wd33c9x_base_device &wd33c93(downcast<wd33c9x_base_device &>(*device));
 
-			wd33c93.set_clock(10000000);
-			//wd33c93.irq_cb().set(*this, ...);
-			//wd33c93.drq_cb().set(*this, ...);
-		});
+				wd33c93.set_clock(10000000);
+				//wd33c93.irq_cb().set(*this, ...);
+				//wd33c93.drq_cb().set(*this, ...);
+			});
 }
 
 void vme_mvme327a_device::cpu_mem(address_map &map)

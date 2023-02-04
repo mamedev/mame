@@ -400,6 +400,10 @@ overwritten.
 
 **-listbios** [*<pattern>*...]
 
+    Displays a list of alternate ROM BIOSes for supported systems/devices that
+    match the specified pattern(s).  If no patterns are specified, the results
+    will include *all* supported systems and devices.
+
     Example:
         .. code-block:: bash
 
@@ -410,10 +414,6 @@ overwritten.
             goldstar          "Goldstar 3DO Interactive Multiplayer v1.01m"
             panafz1           "Panasonic FZ-1 R.E.A.L. 3DO Interactive Multiplayer"
             sanyotry          "Sanyo TRY 3DO Interactive Multiplayer"
-
-    Displays a list of alternate ROM BIOSes for supported systems/devices that
-    match the specified pattern(s). If no patterns are specified, the results
-    will include *all* supported systems and devices.
 
 .. _mame-commandline-listsamples:
 
