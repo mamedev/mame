@@ -226,7 +226,7 @@ void nscsi_cdrom_device::scsi_command()
 		 * SUPPORTED.
 		 */
 		int page = scsi_cmdbuf[2];
-		int size = (scsi_cmdbuf[3] << 8) | scsi_cmdbuf[4];
+		int size = scsi_cmdbuf[4];
 		switch(page) {
 		case 0:
 			std::fill_n(scsi_cmdbuf, size, 0);
