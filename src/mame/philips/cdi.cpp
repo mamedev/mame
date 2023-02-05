@@ -84,7 +84,7 @@ TODO:
 
 void cdi_state::cdimono1_mem(address_map &map)
 {
-	map(0x000000, 0xffffff).rw(m_maincpu, FUNC(scc68070_device::berr_r), FUNC(scc68070_device::berr_w));
+	map(0x000000, 0xffffff).rw(FUNC(cdi_state::bus_error_r), FUNC(cdi_state::bus_error_w));
 	map(0x000000, 0x07ffff).rw(FUNC(cdi_state::plane_r<0>), FUNC(cdi_state::plane_w<0>)).share("plane0");
 	map(0x200000, 0x27ffff).rw(FUNC(cdi_state::plane_r<1>), FUNC(cdi_state::plane_w<1>)).share("plane1");
 	map(0x300000, 0x303bff).rw(m_cdic, FUNC(cdicdic_device::ram_r), FUNC(cdicdic_device::ram_w));
@@ -235,6 +235,32 @@ uint16_t cdi_state::main_rom_r(offs_t offset)
 {
 	m_maincpu->eat_cycles(m_mcd212->rom_dtack_cycle_count());
 	return m_main_rom[offset];
+}
+
+
+/**********************
+*  BERR Handling      *
+**********************/
+
+uint16_t cdi_state::bus_error_r(offs_t offset)
+{
+	if(!machine().side_effects_disabled())
+	{
+		m_maincpu->set_buserror_details(offset*2, true, m_maincpu->get_fc());
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	}
+	return 0xff;
+}
+
+void cdi_state::bus_error_w(offs_t offset, uint16_t data)
+{
+	if(!machine().side_effects_disabled())
+	{
+		m_maincpu->set_buserror_details(offset*2, false, m_maincpu->get_fc());
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	}
 }
 
 
