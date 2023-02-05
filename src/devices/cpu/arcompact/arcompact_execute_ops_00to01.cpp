@@ -14,18 +14,20 @@ inline uint32_t arcompact_device::get_01_01_01_address_offset(uint32_t op)
 	return address;
 }
 
-inline uint32_t arcompact_device::BRxx_takejump(uint32_t address, uint8_t n, int size)
+inline uint32_t arcompact_device::BRxx_takejump(uint32_t address, uint8_t n, int size, bool link)
 {
 	uint32_t realaddress = (m_pc & 0xfffffffc) + (address * 2);
 	if (n)
 	{
 		m_delayactive = true;
 		m_delayjump = realaddress;
-		m_delaylinks = false;
+		m_delaylinks = link;
 		return m_pc + size; // jump is delayed, so return next instruction
 	}
 	else
 	{
+		if (link)
+			m_regs[REG_BLINK] = m_pc + size;
 		return realaddress;
 	}
 }
@@ -46,72 +48,112 @@ inline bool arcompact_device::BRxx_condition(uint8_t condition, uint32_t b, uint
 	return false;
 }
 
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// BREQ<.d> b,c,s9                 0000 1bbb ssss sss1   SBBB CCCC CCN0 0000
+// BREQ b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0000 (+ Limm)
+// BREQ limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0000 (+ Limm)
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// BRNE<.d> b,c,s9                 0000 1bbb ssss sss1   SBBB CCCC CCN0 0001
+// BRNE b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0001 (+ Limm)
+// BRNE limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0001 (+ Limm)
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// BRLT<.d> b,c,s9                 0000 1bbb ssss sss1   SBBB CCCC CCN0 0010
+// BRLT b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0010 (+ Limm)
+// BRLT limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0010 (+ Limm)
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// BRGE<.d> b,c,s9                 0000 1bbb ssss sss1   SBBB CCCC CCN0 0011
+// BRGE b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0011 (+ Limm)
+// BRGE limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0011 (+ Limm)
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// BRLO<.d> b,c,s9                 0000 1bbb ssss sss1   SBBB CCCC CCN0 0100
+// BRLO b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0100 (+ Limm)
+// BRLO limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0100 (+ Limm)
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// BRHS b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0101 (+ Limm)
+// BRHS limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0101 (+ Limm)
+// BRHS<.d> b,c,s9                 0000 1bbb ssss sss1   SBBB CCCC CCN0 0101
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// BBIT0<.d> b,c,s9                0000 1bbb ssss sss1   SBBB CCCC CCN0 1110
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// BBIT1<.d> b,c,s9                0000 1bbb ssss sss1   SBBB CCCC CCN0 1111
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 // Branch on Compare / Bit Test - Register-Register
-inline uint32_t arcompact_device::handleop32_BRxx_reg_reg(uint32_t op, uint8_t condition)
+uint32_t arcompact_device::handleop32_BRxx_reg_reg(uint32_t op, uint8_t condition)
 {
-	uint32_t address = get_01_01_01_address_offset(op);
 	uint8_t creg = common32_get_creg(op);
 	uint8_t breg = common32_get_breg(op);
-	int n = (op & 0x00000020) >> 5;
 	int size = check_limm(breg, creg);
 	uint32_t b = m_regs[breg];
 	uint32_t c = m_regs[creg];
 	if (BRxx_condition(condition, b, c))
 	{
-		return BRxx_takejump(address, n, size);
-	}
-	return m_pc + size;
-}
-
-// Branch on Compare / Bit Test - Register-Immediate
-inline uint32_t arcompact_device::handleop32_BRxx_reg_imm(uint32_t op, uint8_t condition)
-{
-	uint32_t address = get_01_01_01_address_offset(op);
-	uint32_t u = common32_get_u6(op);
-	uint8_t breg = common32_get_breg(op);
-	int n = (op & 0x00000020) >> 5;
-	int size = check_limm(breg);
-	uint32_t b = m_regs[breg];
-	uint32_t c = u;
-	if (BRxx_condition(condition, b, c))
-	{
-		return BRxx_takejump(address, n, size);
+		uint32_t address = get_01_01_01_address_offset(op);
+		return BRxx_takejump(address, (op & 0x00000020) >> 5, size, false);
 	}
 	return m_pc + size;
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// BREQ<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0000
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// BRNE<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0001
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// BRLT<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0010
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// BRGE<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0011
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// BRLO<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0100
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// BRHS<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0101
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// BBIT0<.d> b,u6,s9               0000 1bbb ssss sss1   SBBB uuuu uuN1 1110
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// BBIT1<.d> b,u6,s9               0000 1bbb ssss sss1   SBBB uuuu uuN1 1111
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+// Branch on Compare / Bit Test - Register-Immediate
+uint32_t arcompact_device::handleop32_BRxx_reg_imm(uint32_t op, uint8_t condition)
+{
+	uint32_t u = common32_get_u6(op);
+	uint8_t breg = common32_get_breg(op);
+	int size = check_limm(breg);
+	uint32_t b = m_regs[breg];
+	if (BRxx_condition(condition, b, u))
+	{
+		uint32_t address = get_01_01_01_address_offset(op);
+		return BRxx_takejump(address, (op & 0x00000020) >> 5, size, false);
+	}
+	return m_pc + size;
+}
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Branch Conditionally
 // B<cc><.d> s21                   0000 0sss ssss sss0   SSSS SSSS SSNQ QQQQ
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 uint32_t arcompact_device::handleop32_B_cc_D_s21(uint32_t op)
 {
-	int size = 4;
-	uint8_t condition = common32_get_condition(op);
-
-	if (!check_condition(condition))
-		return m_pc + size;
-
-	int32_t address = (op & 0x07fe0000) >> 17;
+	if (!check_condition(common32_get_condition(op)))
+		return m_pc + 4;
+	uint32_t address = (op & 0x07fe0000) >> 17;
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
-
 	address = util::sext(address, 20);
-
-	int n = (op & 0x00000020) >> 5;
-
-	uint32_t realaddress = (m_pc & 0xfffffffc) + (address * 2);
-
-	if (n)
-	{
-		m_delayactive = true;
-		m_delayjump = realaddress;
-		m_delaylinks = false; // don't link
-	}
-	else
-	{
-		return realaddress;
-	}
-	return m_pc + size;
+	return BRxx_takejump(address, (op & 0x00000020) >> 5, 4, false);
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -121,27 +163,11 @@ uint32_t arcompact_device::handleop32_B_cc_D_s21(uint32_t op)
 
 uint32_t arcompact_device::handleop32_B_D_s25(uint32_t op)
 {
-	int size = 4;
-	int32_t address = (op & 0x07fe0000) >> 17;
+	uint32_t address = (op & 0x07fe0000) >> 17;
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
 	address |= (op & 0x0000000f) << 20;
-
 	address = util::sext(address, 24);
-
-	int n = (op & 0x00000020) >> 5;
-
-	uint32_t realaddress = (m_pc & 0xfffffffc) + (address * 2);
-	if (n)
-	{
-		m_delayactive = true;
-		m_delayjump = realaddress;
-		m_delaylinks = false; // don't link
-	}
-	else
-	{
-		return realaddress;
-	}
-	return m_pc + size;
+	return BRxx_takejump(address, (op & 0x00000020) >> 5, 4, false);
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -151,33 +177,12 @@ uint32_t arcompact_device::handleop32_B_D_s25(uint32_t op)
 
 uint32_t arcompact_device::handleop32_BL_cc_d_s21(uint32_t op)
 {
-	int size = 4;
-	uint8_t condition = common32_get_condition(op);
-
-	if (!check_condition(condition))
-		return m_pc + size;
-
+	if (!check_condition(common32_get_condition(op)))
+		return m_pc + 4;
 	uint32_t address = (op & 0x07fc0000) >> 17; // bit 0 is always 0
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
-
 	address = util::sext(address, 20);
-
-	int n = (op & 0x00000020) >> 5;
-
-	uint32_t realaddress = (m_pc & 0xfffffffc) + (address * 2);
-
-	if (n)
-	{
-		m_delayactive = true;
-		m_delayjump = realaddress;
-		m_delaylinks = true;
-	}
-	else
-	{
-		m_regs[REG_BLINK] = m_pc + size;
-		return realaddress;
-	}
-	return m_pc + size;
+	return BRxx_takejump(address, (op & 0x00000020) >> 5, 4, true);
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -187,183 +192,9 @@ uint32_t arcompact_device::handleop32_BL_cc_d_s21(uint32_t op)
 
 uint32_t arcompact_device::handleop32_BL_d_s25(uint32_t op)
 {
-	int size = 4;
 	uint32_t address = (op & 0x07fc0000) >> 17; // bit 0 is always 0
 	address |= ((op & 0x0000ffc0) >> 6) << 10;
 	address |= (op & 0x0000000f) << 20;
-
 	address = util::sext(address, 24);
-
-	int n = (op & 0x00000020) >> 5;
-
-	uint32_t realaddress = (m_pc & 0xfffffffc) + (address * 2);
-
-	if (n)
-	{
-		m_delayactive = true;
-		m_delayjump = realaddress;
-		m_delaylinks = true;
-	}
-	else
-	{
-		m_regs[REG_BLINK] = m_pc + size;
-		return realaddress;
-	}
-	return m_pc + size;
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// BREQ<.d> b,c,s9                 0000 1bbb ssss sss1   SBBB CCCC CCN0 0000
-// BREQ b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0000 (+ Limm)
-// BREQ limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0000 (+ Limm)
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-uint32_t arcompact_device::handleop32_BREQ_reg_reg(uint32_t op)  // register - register BREQ
-{
-	return handleop32_BRxx_reg_reg(op, 0);
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// BRNE<.d> b,c,s9                 0000 1bbb ssss sss1   SBBB CCCC CCN0 0001
-// BRNE b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0001 (+ Limm)
-// BRNE limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0001 (+ Limm)
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-uint32_t arcompact_device::handleop32_BRNE_reg_reg(uint32_t op) // register - register BRNE
-{
-	return handleop32_BRxx_reg_reg(op, 1);
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// BRLT<.d> b,c,s9                 0000 1bbb ssss sss1   SBBB CCCC CCN0 0010
-// BRLT b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0010 (+ Limm)
-// BRLT limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0010 (+ Limm)
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-uint32_t arcompact_device::handleop32_BRLT_reg_reg(uint32_t op) // regiter - register BRLT
-{
-	return handleop32_BRxx_reg_reg(op, 2);
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// BRGE<.d> b,c,s9                 0000 1bbb ssss sss1   SBBB CCCC CCN0 0011
-// BRGE b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0011 (+ Limm)
-// BRGE limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0011 (+ Limm)
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-uint32_t arcompact_device::handleop32_BRGE_reg_reg(uint32_t op) // register - register BRGE
-{
-	return handleop32_BRxx_reg_reg(op, 3);
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// BRLO<.d> b,c,s9                 0000 1bbb ssss sss1   SBBB CCCC CCN0 0100
-// BRLO b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0100 (+ Limm)
-// BRLO limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0100 (+ Limm)
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-uint32_t arcompact_device::handleop32_BRLO_reg_reg(uint32_t op) // register - register BRLO
-{
-	return handleop32_BRxx_reg_reg(op, 4);
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// BRHS b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0101 (+ Limm)
-// BRHS limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0101 (+ Limm)
-// BRHS<.d> b,c,s9                 0000 1bbb ssss sss1   SBBB CCCC CCN0 0101
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-uint32_t arcompact_device::handleop32_BRHS_reg_reg(uint32_t op) // register - register BRHS
-{
-	return handleop32_BRxx_reg_reg(op, 5);
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// BBIT0<.d> b,c,s9                0000 1bbb ssss sss1   SBBB CCCC CCN0 1110
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-uint32_t arcompact_device::handleop32_BBIT0_reg_reg(uint32_t op)
-{
-	return handleop32_BRxx_reg_reg(op, 6);
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// BBIT1<.d> b,c,s9                0000 1bbb ssss sss1   SBBB CCCC CCN0 1111
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-uint32_t arcompact_device::handleop32_BBIT1_reg_reg(uint32_t op)
-{
-	return handleop32_BRxx_reg_reg(op, 7);
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// BREQ<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0000
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-uint32_t arcompact_device::handleop32_BREQ_reg_imm(uint32_t op) // BREQ reg-imm
-{
-	return handleop32_BRxx_reg_imm(op, 0);
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// BRNE<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0001
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-uint32_t arcompact_device::handleop32_BRNE_reg_imm(uint32_t op) // BRNE reg-imm
-{
-	return handleop32_BRxx_reg_imm(op, 1);
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// BRLT<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0010
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-uint32_t arcompact_device::handleop32_BRLT_reg_imm(uint32_t op) // BRLT reg-imm
-{
-	return handleop32_BRxx_reg_imm(op, 2);
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// BRGE<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0011
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-uint32_t arcompact_device::handleop32_BRGE_reg_imm(uint32_t op)
-{
-	return handleop32_BRxx_reg_imm(op, 3);
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// BRLO<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0100
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-uint32_t arcompact_device::handleop32_BRLO_reg_imm(uint32_t op) //  register - immediate BRLO
-{
-	return handleop32_BRxx_reg_imm(op, 4);
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// BRHS<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0101
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-uint32_t arcompact_device::handleop32_BRHS_reg_imm(uint32_t op) // register - immediate BRHS
-{
-	return handleop32_BRxx_reg_imm(op, 5);
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// BBIT0<.d> b,u6,s9               0000 1bbb ssss sss1   SBBB uuuu uuN1 1110
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-uint32_t arcompact_device::handleop32_BBIT0_reg_imm(uint32_t op)
-{
-	return handleop32_BRxx_reg_imm(op, 6);
-}
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// BBIT1<.d> b,u6,s9               0000 1bbb ssss sss1   SBBB uuuu uuN1 1111
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-uint32_t arcompact_device::handleop32_BBIT1_reg_imm(uint32_t op)
-{
-	return handleop32_BRxx_reg_imm(op, 7);
+	return BRxx_takejump(address, (op & 0x00000020) >> 5, 4, true);
 }

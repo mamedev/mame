@@ -330,26 +330,10 @@ private:
 	uint32_t handleop32_BL_cc_d_s21(uint32_t op);
 	uint32_t handleop32_BL_d_s25(uint32_t op);
 	uint32_t get_01_01_01_address_offset(uint32_t op);
-	uint32_t BRxx_takejump(uint32_t address, uint8_t n, int size);
+	uint32_t BRxx_takejump(uint32_t address, uint8_t n, int size, bool link);
 	static bool BRxx_condition(uint8_t condition, uint32_t b, uint32_t c);
 	uint32_t handleop32_BRxx_reg_reg(uint32_t op, uint8_t condition);
 	uint32_t handleop32_BRxx_reg_imm(uint32_t op, uint8_t condition);
-	uint32_t handleop32_BREQ_reg_reg(uint32_t op);
-	uint32_t handleop32_BRNE_reg_reg(uint32_t op);
-	uint32_t handleop32_BRLT_reg_reg(uint32_t op);
-	uint32_t handleop32_BRGE_reg_reg(uint32_t op);
-	uint32_t handleop32_BRLO_reg_reg(uint32_t op);
-	uint32_t handleop32_BRHS_reg_reg(uint32_t op);
-	uint32_t handleop32_BBIT0_reg_reg(uint32_t op);
-	uint32_t handleop32_BBIT1_reg_reg(uint32_t op);
-	uint32_t handleop32_BREQ_reg_imm(uint32_t op);
-	uint32_t handleop32_BRNE_reg_imm(uint32_t op);
-	uint32_t handleop32_BRLT_reg_imm(uint32_t op);
-	uint32_t handleop32_BRGE_reg_imm(uint32_t op);
-	uint32_t handleop32_BRLO_reg_imm(uint32_t op);
-	uint32_t handleop32_BRHS_reg_imm(uint32_t op);
-	uint32_t handleop32_BBIT0_reg_imm(uint32_t op);
-	uint32_t handleop32_BBIT1_reg_imm(uint32_t op);
 
 	// arcompact_execute_ops_02to03.cpp
 	uint32_t handleop32_LD_r_o(uint32_t op);

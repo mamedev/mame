@@ -492,7 +492,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // BREQ b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0000 (+ Limm)
 // BREQ limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0000 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										return handleop32_BREQ_reg_reg(op);  // BREQ (reg-reg)
+										return handleop32_BRxx_reg_reg(op, 0);  // BREQ (reg-reg)
 									}
 									case 0x01:
 									{
@@ -501,7 +501,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // BRNE b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0001 (+ Limm)
 // BRNE limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0001 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										return handleop32_BRNE_reg_reg(op);  // BRNE (reg-reg)
+										return handleop32_BRxx_reg_reg(op, 1); // BRNE (reg-reg)
 									}
 									case 0x02:
 									{
@@ -510,7 +510,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // BRLT b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0010 (+ Limm)
 // BRLT limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0010 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										return handleop32_BRLT_reg_reg(op);  // BRLT (reg-reg)
+										return handleop32_BRxx_reg_reg(op, 2); // BRLT (reg-reg)
 									}
 									case 0x03:
 									{
@@ -519,7 +519,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // BRGE b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0011 (+ Limm)
 // BRGE limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0011 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										return handleop32_BRGE_reg_reg(op);  // BRGE (reg-reg)
+										return handleop32_BRxx_reg_reg(op, 3); // BRGE (reg-reg)
 									}
 									case 0x04:
 									{
@@ -528,7 +528,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // BRLO b,limm,s9                  0000 1bbb ssss sss1   SBBB 1111 1000 0100 (+ Limm)
 // BRLO limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0100 (+ Limm)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										return handleop32_BRLO_reg_reg(op);  // BRLO (reg-reg)
+										return handleop32_BRxx_reg_reg(op, 4); // BRLO (reg-reg)
 									}
 									case 0x05:
 									{
@@ -537,21 +537,21 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // BRHS limm,c,s9                  0000 1110 ssss sss1   S111 CCCC CC00 0101 (+ Limm)
 // BRHS<.d> b,c,s9                 0000 1bbb ssss sss1   SBBB CCCC CCN0 0101
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										return handleop32_BRHS_reg_reg(op);  // BRHS (reg-reg)
+										return handleop32_BRxx_reg_reg(op, 5); // BRHS (reg-reg)
 									}
 									case 0x0e:
 									{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BBIT0<.d> b,c,s9                0000 1bbb ssss sss1   SBBB CCCC CCN0 1110
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										return handleop32_BBIT0_reg_reg(op);  // BBIT0 (reg-reg)
+										return handleop32_BRxx_reg_reg(op, 6); // BBIT0 (reg-reg)
 									}
 									case 0x0f:
 									{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BBIT1<.d> b,c,s9                0000 1bbb ssss sss1   SBBB CCCC CCN0 1111
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										return handleop32_BBIT1_reg_reg(op);  // BBIT1 (reg-reg)
+										return handleop32_BRxx_reg_reg(op, 7); // BBIT1 (reg-reg)
 									}
 									default:
 									{
@@ -570,56 +570,56 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BREQ<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0000
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										return handleop32_BREQ_reg_imm(op);  // BREQ (reg-imm)
+										return handleop32_BRxx_reg_imm(op, 0); // BREQ (reg-imm)
 									}
 									case 0x01:
 									{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BRNE<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0001
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										return handleop32_BRNE_reg_imm(op);  // BRNE (reg-imm)
+										return handleop32_BRxx_reg_imm(op, 1); // BRNE (reg-imm)
 									}
 									case 0x02:
 									{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BRLT<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0010
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										return handleop32_BRLT_reg_imm(op);  // BRLT (reg-imm)
+										return handleop32_BRxx_reg_imm(op, 2); // BRLT (reg-imm)
 									}
 									case 0x03:
 									{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BRGE<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0011
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										return handleop32_BRGE_reg_imm(op);  // BRGE (reg-imm)
+										return handleop32_BRxx_reg_imm(op, 3); // BRGE (reg-imm)
 									}
 									case 0x04:
 									{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BRLO<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0100
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										return handleop32_BRLO_reg_imm(op);  // BRLO (reg-imm)
+										return handleop32_BRxx_reg_imm(op, 4); // BRLO (reg-imm)
 									}
 									case 0x05:
 									{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BRHS<.d> b,u6,s9                0000 1bbb ssss sss1   SBBB UUUU UUN1 0101
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										return handleop32_BRHS_reg_imm(op);  // BRHS (reg-imm)
+										return handleop32_BRxx_reg_imm(op, 5); // BRHS (reg-imm)
 									}
 									case 0x0e:
 									{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BBIT0<.d> b,u6,s9               0000 1bbb ssss sss1   SBBB uuuu uuN1 1110
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										return handleop32_BBIT0_reg_imm(op);  // BBIT0 (reg-imm)
+										return handleop32_BRxx_reg_imm(op, 6); // BBIT0 (reg-imm)
 									}
 									case 0x0f:
 									{
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // BBIT1<.d> b,u6,s9               0000 1bbb ssss sss1   SBBB uuuu uuN1 1111
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-										return handleop32_BBIT1_reg_imm(op);  // BBIT1 (reg-imm)
+										return handleop32_BRxx_reg_imm(op, 7); // BBIT1 (reg-imm)
 									}
 									default:
 									{
