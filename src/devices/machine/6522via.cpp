@@ -800,7 +800,7 @@ u8 via6522_device::read(offs_t offset)
 		break;
 
 	case VIA_IER:
-		val = m_ier | 0x80;
+		val = m_ier & 0x7F;
 		break;
 
 	case VIA_IFR:
