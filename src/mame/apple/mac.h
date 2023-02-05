@@ -7,8 +7,8 @@
  * Macintosh II driver declarations
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_MAC_H
-#define MAME_INCLUDES_MAC_H
+#ifndef MAME_APPLE_MAC_H
+#define MAME_APPLE_MAC_H
 
 #pragma once
 
@@ -42,6 +42,8 @@
 #define MAC_V_VIS   (342)
 #define MAC_H_TOTAL (704)  // (512+192)
 #define MAC_V_TOTAL (370) // (342+28)
+
+#define MACII_USE_ADBMODEM (0)
 
 // Mac driver data
 
@@ -291,4 +293,4 @@ private:
 	void mac_install_memory(offs_t memory_begin, offs_t memory_end, offs_t memory_size, void *memory_data, int is_rom);
 };
 
-#endif // MAME_INCLUDES_MAC_H
+#endif // MAME_APPLE_MAC_H

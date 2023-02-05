@@ -149,6 +149,8 @@
 #include "screen.h"
 
 
+namespace {
+
 #define TIMEKEEPER_TAG  "timekpr"
 #define SCC1_TAG        "scc1"
 #define SCC2_TAG        "scc2"
@@ -696,6 +698,9 @@ Sun 3/460/480 V3.0 Bootprom (2 Files, one for odd and one for even addresses)
 	ROMX_LOAD( "sun3_460_v2.9.1_0", 0x00000, 0x10000, CRC(d62dbf09) SHA1(4a6b5fd7840b44fe93c9058a8973d8dd3c9f7d24), ROM_BIOS(1))
 	ROMX_LOAD( "sun3_460_v2.9.1_1", 0x10000, 0x10000, CRC(3b5a5942) SHA1(ed6250e3c07d7cb62d4dd517a8637c8d37e16dc5), ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

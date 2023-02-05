@@ -10,8 +10,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_VIDEO_ANTIC_H
-#define MAME_VIDEO_ANTIC_H
+#ifndef MAME_ATARI_ANTIC_H
+#define MAME_ATARI_ANTIC_H
 
 #pragma once
 
@@ -109,7 +109,6 @@ private:
 
 	required_device<gtia_device> m_gtia;
 	required_device<cpu_device> m_maincpu;
-	optional_ioport m_djoy_b;
 	optional_ioport m_artifacts;
 
 	uint32_t m_tv_artifacts;
@@ -197,4 +196,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(ATARI_ANTIC, antic_device)
 
-#endif // MAME_VIDEO_ANTIC_H
+#endif // MAME_ATARI_ANTIC_H

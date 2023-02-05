@@ -44,6 +44,9 @@
 
 #include "dmv.lh"
 
+
+namespace {
+
 class dmv_state : public driver_device
 {
 public:
@@ -931,6 +934,9 @@ ROM_START( dmv )
 
 	ROM_REGION(0x10000, "ram", ROMREGION_ERASE) // 64K RAM on mainboard
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

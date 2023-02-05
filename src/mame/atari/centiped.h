@@ -5,8 +5,8 @@
     Atari Centipede hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_CENTIPED_H
-#define MAME_INCLUDES_CENTIPED_H
+#ifndef MAME_ATARI_CENTIPED_H
+#define MAME_ATARI_CENTIPED_H
 
 #pragma once
 
@@ -185,4 +185,4 @@ private:
 	void multiped_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_CENTIPED_H
+#endif // MAME_ATARI_CENTIPED_H

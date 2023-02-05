@@ -5,8 +5,8 @@
  * includes/nc.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_NC_H
-#define MAME_INCLUDES_NC_H
+#ifndef MAME_AMSTRAD_NC_H
+#define MAME_AMSTRAD_NC_H
 
 #pragma once
 
@@ -209,4 +209,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_NC_H
+#endif // MAME_AMSTRAD_NC_H

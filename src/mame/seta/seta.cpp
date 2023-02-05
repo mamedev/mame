@@ -1822,7 +1822,7 @@ void downtown_state::calibr50_map(address_map &map)
 	map(0x500000, 0x500001).nopw();                        // ?
 	map(0x600000, 0x600003).r(FUNC(downtown_state::seta_dsw_r));                // DSW
 	map(0x700000, 0x7003ff).ram().share("paletteram1");  // Palette
-	map(0x800000, 0x800005).w(m_layers[0], FUNC(x1_012_device::vctrl_w));// VRAM Ctrl
+	map(0x800000, 0x800005).w(FUNC(downtown_state::vram_layer0_vctrl_raster_trampoline_w));// VRAM Ctrl
 	map(0x900000, 0x903fff).ram().w(m_layers[0], FUNC(x1_012_device::vram_w)).share("layer1"); // VRAM
 
 	map(0x904000, 0x904fff).ram();                             //
@@ -7967,6 +7967,7 @@ void downtown_state::twineagl(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown);
+	m_layers[0]->set_screen(m_screen);
 	m_layers[0]->set_tile_offset_callback(FUNC(downtown_state::twineagl_tile_offset));
 	m_layers[0]->set_xoffsets(-3, 0);
 
@@ -8017,6 +8018,7 @@ void downtown_state::downtown(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown);
+	m_layers[0]->set_screen(m_screen);
 	m_layers[0]->set_tile_offset_callback(FUNC(downtown_state::twineagl_tile_offset));
 	m_layers[0]->set_xoffsets(0, -1);
 
@@ -8107,6 +8109,7 @@ void usclssic_state::usclssic(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_usclssic);
+	m_layers[0]->set_screen(m_screen);
 	m_layers[0]->set_tile_offset_callback(FUNC(usclssic_state::tile_offset));
 	m_layers[0]->set_xoffsets(-1, 0);
 
@@ -8169,8 +8172,10 @@ void downtown_state::calibr50(machine_config &config)
 	screen.set_visarea(0*8, 48*8-1, 1*8, 31*8-1);
 	screen.set_screen_update(FUNC(downtown_state::screen_update_seta));
 	screen.set_palette(m_palette);
+	//screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown);
+	m_layers[0]->set_screen(m_screen);
 	m_layers[0]->set_xoffsets(-2, -3);
 
 	PALETTE(config, m_palette).set_entries(512);
@@ -8223,6 +8228,7 @@ void downtown_state::metafox(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown);
+	m_layers[0]->set_screen(m_screen);
 	m_layers[0]->set_tile_offset_callback(FUNC(downtown_state::twineagl_tile_offset));
 	m_layers[0]->set_xoffsets(-19, 16);
 
@@ -8320,7 +8326,9 @@ void seta_state::blandia(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_blandia_layer1).set_xoffsets(6, -2);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2).set_xoffsets(6, -2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::blandia_palette), (16*32 + 64*32*4)*2, 0x600*2);  // sprites, layer1, layer2, palette effect - layers 1&2 are 6 planes deep
 
 	/* sound hardware */
@@ -8357,7 +8365,9 @@ void seta_state::blandiap(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_blandia_layer1).set_xoffsets(6, -2);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2).set_xoffsets(6, -2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::blandia_palette), (16*32 + 64*32*4)*2, 0x600*2);  // sprites, layer1, layer2, palette effect - layers 1&2 are 6 planes deep
 
 	/* sound hardware */
@@ -8471,7 +8481,9 @@ void seta_state::daioh(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-2, -2);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	/* sound hardware */
@@ -8529,6 +8541,7 @@ void seta_state::drgnunit(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_xoffsets(-2, -2);
+	m_layers[0]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512);
 
 	/* sound hardware */
@@ -8616,6 +8629,7 @@ void setaroul_state::setaroul(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_setaroul).set_xoffsets(0, 5);
+	m_layers[0]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(setaroul_state::setaroul_palette), 512);
 
 	/* sound hardware */
@@ -8660,7 +8674,9 @@ void seta_state::eightfrc(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	/* sound hardware */
@@ -8708,7 +8724,9 @@ void seta_state::extdwnhl(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_zingzip_layer1).set_xoffsets(-2, -2);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_zingzip_layer2).set_xoffsets(-2, -2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::zingzip_palette), 16*32 + 16*32 + 64*32*2, 0x600);    // sprites, layer2, layer1 - layer 1 gfx is 6 planes deep
 
 	/* sound hardware */
@@ -8775,7 +8793,9 @@ void seta_state::gundhara(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_jjsquawk_layer1);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawk_layer2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::gundhara_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep (seta_state,but have only 4 palettes)
 
 	/* sound hardware */
@@ -8850,7 +8870,9 @@ void seta_state::jjsquawk(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_jjsquawk_layer1).set_xoffsets(-1, -1);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawk_layer2).set_xoffsets(-1, -1);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
 	/* sound hardware */
@@ -8884,7 +8906,9 @@ void seta_state::jjsquawb(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_jjsquawkb_layer1).set_xoffsets(-1, -1);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawkb_layer2).set_xoffsets(-1, -1);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
 	/* sound hardware */
@@ -8930,7 +8954,9 @@ void seta_state::kamenrid(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-2, -2);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	/* sound hardware */
@@ -9044,8 +9070,8 @@ void seta_state::krzybowl(machine_config &config)
 	m_spritegen->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 	// position kludges
 	m_spritegen->set_fg_xoffsets(0, 0); // correct (test grid)
-	m_spritegen->set_fg_yoffsets(-0x12, 0x0e);
-	m_spritegen->set_bg_yoffsets(0x1, -0x1);
+	m_spritegen->set_fg_yoffsets(-0x06, 0x0e);
+	m_spritegen->set_bg_yoffsets(-0x3, -0x1);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -9101,7 +9127,9 @@ void seta_state::madshark(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_jjsquawk_layer1);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawk_layer2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
 	/* sound hardware */
@@ -9135,7 +9163,9 @@ void seta_state::madsharkbl(machine_config &config) // bootleg doesn't actually 
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_jjsquawk_layer1);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawk_layer2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
 	/* sound hardware */
@@ -9190,7 +9220,9 @@ void magspeed_state::magspeed(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(0, -2);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(0, -2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	/* sound hardware */
@@ -9236,7 +9268,9 @@ void seta_state::msgundam(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-2, -2);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	/* sound hardware */
@@ -9281,7 +9315,9 @@ void seta_state::oisipuzl(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-1, -1);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-1, -1);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	set_tilemaps_flip(1); // flip is inverted for the tilemaps
@@ -9326,7 +9362,9 @@ void seta_state::triplfun(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-1, -1);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-1, -1);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	set_tilemaps_flip(1); // flip is inverted for the tilemaps
@@ -9373,7 +9411,9 @@ void seta_state::rezon(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-2, -2);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	/* sound hardware */
@@ -9612,7 +9652,9 @@ void seta_state::utoukond(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(0, -2);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(0, -2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	/* sound hardware */
@@ -9672,7 +9714,9 @@ void seta_state::wrofaero(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
 	/* sound hardware */
@@ -9718,7 +9762,9 @@ void seta_state::zingzip(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_zingzip_layer1).set_xoffsets(-2, -1);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_zingzip_layer2).set_xoffsets(-2, -1);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::zingzip_palette), 16*32 + 16*32 + 64*32*2, 0x600);    // sprites, layer2, layer1 - layer 1 gfx is 6 planes deep
 
 	/* sound hardware */
@@ -9811,7 +9857,9 @@ void seta_state::crazyfgt(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_blandia_layer1).set_xoffsets(0, -2);
+	m_layers[0]->set_screen(m_screen);
 	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2).set_xoffsets(0, -2);
+	m_layers[1]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::gundhara_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep (seta_state,but have only 4 palettes)
 
 	/* sound hardware */
@@ -9892,6 +9940,7 @@ void jockeyc_state::jockeyc(machine_config &config)
 	screen.set_palette(m_palette);
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_xoffsets(126, -2);
+	m_layers[0]->set_screen(m_screen);
 	PALETTE(config, m_palette, FUNC(seta_state::palette_init_RRRRRGGGGGBBBBB_proms), 512 * 1);
 
 	/* sound hardware */

@@ -86,6 +86,8 @@ ________________________|___________________________
 #include "speaker.h"
 
 
+namespace {
+
 #define MASTER_CLOCK    16_MHz_XTAL
 #define VIDEO_CLOCK     6_MHz_XTAL
 
@@ -485,6 +487,8 @@ ROM_START( flipjack )
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "m3-7611-5.f8", 0x0000, 0x0100, CRC(f0248102) SHA1(22d87935c941e2e8bba5427599f6fd5fa1262ebc) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1983?, flipjack, 0, flipjack, flipjack, flipjack_state, empty_init, ROT270, "Jackson Co., Ltd.", "Flipper Jack", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // copyright not shown, datecodes on pcb suggests mid-1983

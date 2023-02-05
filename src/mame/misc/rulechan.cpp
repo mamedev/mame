@@ -179,6 +179,9 @@
 
 #include "rulechan.lh"
 
+
+namespace {
+
 #define CPU_CLOCK       XTAL(8'000'000)     // guess
 #define VID_CLOCK       XTAL(21'477'272)    // guess
 #define TMS_CLOCK       (CPU_CLOCK / 4)      // guess
@@ -799,6 +802,8 @@ void rulechan_state::rulechan_init()
 	m_updn3 = 0;
 	m_updn4 = 0;
 }
+
+} // anonymous namespace
 
 
 /**************************************

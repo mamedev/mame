@@ -16,6 +16,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class ipds_state : public driver_device
 {
 public:
@@ -173,6 +175,9 @@ ROM_START( ipds )
 	ROM_LOAD( "162806-001.u24", 0x0000, 0x0800, CRC(e6ba41ca) SHA1(a2d3438b728670b75c359ff49146ef57c08bf0f1) )
 	ROM_LOAD( "163775-001.u8",  0x0800, 0x0800, CRC(0442163e) SHA1(737732adcfe22823db37112e28758464f5d9af7b) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

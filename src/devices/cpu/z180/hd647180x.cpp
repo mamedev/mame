@@ -139,9 +139,9 @@ uint8_t hd647180x_device::z180_internal_port_read(uint8_t port)
 		break;
 
 	case 0x64: // lower half of ODRE is write-only
-		data = (m_odr[port - 0x60] | 0x0f) & m_ddr[3];
-		if (m_ddr[3] != 0xff)
-			data |= m_port_input_cb[3](0, ~m_ddr[3]) & ~m_ddr[3];
+		data = (m_odr[port - 0x60] | 0x0f) & m_ddr[4];
+		if (m_ddr[4] != 0xff)
+			data |= m_port_input_cb[4](0, ~m_ddr[4]) & ~m_ddr[4];
 		LOG("HD647180X IDRE rd $%02x\n", data);
 		break;
 

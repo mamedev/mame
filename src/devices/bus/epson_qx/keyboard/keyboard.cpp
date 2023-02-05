@@ -6,13 +6,16 @@
 
 ***************************************************************************/
 
-#include "cpu/mcs48/mcs48.h"
 #include "emu.h"
 #include "keyboard.h"
+
 #include "matrix.h"
+
+#include "cpu/mcs48/mcs48.h"
 
 #include "qx10ascii.lh"
 #include "qx10hasci.lh"
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -21,6 +24,7 @@
 DEFINE_DEVICE_TYPE(EPSON_QX_KEYBOARD_PORT, bus::epson_qx::keyboard::keyboard_port_device, "epson_qx_kbd", "Epson QX-10 Keyboard Port")
 DEFINE_DEVICE_TYPE(QX10_KEYBOARD_HASCI, bus::epson_qx::keyboard::qx10_keyboard_hasci, "qx10_keyboard_hasci", "Epson QX-10 Keyboard (HASCI)")
 DEFINE_DEVICE_TYPE(QX10_KEYBOARD_ASCII, bus::epson_qx::keyboard::qx10_keyboard_ascii, "qx10_keyboard_ascii", "Epson QX-10 Keyboard (ASCII)")
+
 
 namespace bus::epson_qx::keyboard {
 
@@ -32,11 +36,11 @@ namespace bus::epson_qx::keyboard {
 //  keyboard_port_device - constructor
 //-------------------------------------------------
 
-keyboard_port_device::keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, EPSON_QX_KEYBOARD_PORT, tag, owner, clock),
-	device_single_card_slot_interface<keyboard_device>(mconfig, *this),
-	m_kbd(nullptr),
-	m_txd_handler(*this)
+keyboard_port_device::keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, EPSON_QX_KEYBOARD_PORT, tag, owner, clock)
+	, device_single_card_slot_interface<keyboard_device>(mconfig, *this)
+	, m_kbd(nullptr)
+	, m_txd_handler(*this)
 {
 }
 
@@ -161,7 +165,7 @@ WRITE_LINE_MEMBER(keyboard_device::clk_w)
 //**************************************************************************
 
 qx10_keyboard_hasci::qx10_keyboard_hasci(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
-       : keyboard_device(mconfig, QX10_KEYBOARD_HASCI, tag, owner, clock)
+	: keyboard_device(mconfig, QX10_KEYBOARD_HASCI, tag, owner, clock)
 {
 }
 
@@ -180,7 +184,7 @@ const internal_layout &qx10_keyboard_hasci::layout() const
 //**************************************************************************
 
 qx10_keyboard_ascii::qx10_keyboard_ascii(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
-       : keyboard_device(mconfig, QX10_KEYBOARD_ASCII, tag, owner, clock)
+	: keyboard_device(mconfig, QX10_KEYBOARD_ASCII, tag, owner, clock)
 {
 }
 

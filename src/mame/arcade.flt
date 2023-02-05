@@ -17,6 +17,7 @@ alpha/champbas.cpp
 alpha/equites.cpp
 alpha/meijinsn.cpp
 alpha/shougi.cpp
+alpha/splendor.cpp
 amiga/alg.cpp
 amiga/arsystems.cpp
 amiga/cubo.cpp
@@ -640,11 +641,11 @@ misc/atronic.cpp
 misc/attckufo.cpp
 misc/avt.cpp
 misc/aztarac.cpp
+misc/babysuprem.cpp
 misc/bailey.cpp
 misc/beaminv.cpp
 misc/beezer.cpp
 misc/belatra.cpp
-misc/bgt.cpp
 misc/bingoman.cpp
 misc/bingor.cpp
 misc/blitz68k.cpp
@@ -663,6 +664,7 @@ misc/chance32.cpp
 misc/changyu.cpp
 misc/chicago.cpp
 misc/chsuper.cpp
+misc/cleartone.cpp
 misc/clowndwn.cpp
 misc/clpoker.cpp
 misc/cocoloco.cpp
@@ -770,7 +772,6 @@ misc/jubilee.cpp
 misc/jungleyo.cpp
 misc/kas89.cpp
 misc/kingpin.cpp
-misc/krokha.cpp
 misc/kurukuru.cpp
 misc/kyugo.cpp
 misc/ladyfrog.cpp
@@ -874,6 +875,7 @@ misc/skopro.cpp
 misc/skyarmy.cpp
 misc/skylncr.cpp
 misc/sliver.cpp
+misc/smd2144c.cpp
 misc/smotor.cpp
 misc/smsmcorp.cpp
 misc/sothello.cpp
@@ -1013,6 +1015,7 @@ nichibutsu/tubep.cpp
 nichibutsu/wiping.cpp
 nintendo/aleck64.cpp
 nintendo/cham24.cpp
+nintendo/cothello.cpp
 nintendo/dkong.cpp
 nintendo/famibox.cpp
 nintendo/mario.cpp
@@ -1212,6 +1215,7 @@ sega/hshavoc.cpp
 sega/kopunch.cpp
 sega/lindbergh.cpp
 sega/megadriv_acbl.cpp
+sega/megadriv_sunmix.cpp
 sega/megaplay.cpp
 sega/megatech.cpp
 sega/model1.cpp
@@ -1244,6 +1248,7 @@ sega/segasm1.cpp
 sega/segasp.cpp
 sega/segattl.cpp
 sega/segaufo.cpp
+sega/segaufoh8.cpp
 sega/segaxbd.cpp
 sega/segaybd.cpp
 sega/sg1000a.cpp
@@ -1258,6 +1263,7 @@ sega/system16.cpp
 sega/timetrv.cpp
 sega/triforce.cpp
 sega/turbo.cpp
+sega/unkhockey.cpp
 sega/vicdual.cpp
 sega/winclub.cpp
 sega/y2.cpp
@@ -1314,6 +1320,7 @@ sigma/sigmab52.cpp
 sigma/sigmab98.cpp
 sigma/spiders.cpp
 sigma/sub.cpp
+skeleton/elcirculo.cpp
 snk/bbusters.cpp
 snk/dmndrby.cpp
 snk/hng64.cpp

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
   To investigate:
     - Gargoyle's Quest - Ghosts'n Goblins (Rev 1)   <-  Unreleased in USA?
@@ -684,6 +684,18 @@ license:CC0
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="dmg-ale-0.u1" size="0x20000" crc="141675d3" sha1="ca586c59b2473a8bec2f0f37504cb74e3a1e4d11" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="altspaceup" cloneof="altspace" supported="partial">
+		<description>Altered Space - A 3-D Alien Adventure (USA, prototype, 19910215)</description>
+		<year>1991</year>
+		<publisher>Sony Imagesoft</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="u1" size="0x20000" crc="0ba573f4" sha1="ab343a7c94f3f6e1f411ea0b947c109fb20e576d" />
 			</dataarea>
 		</part>
 	</software>
@@ -5851,6 +5863,25 @@ license:CC0
 				<rom name="dragon ball z - gokuu gekitouden (japan).bin" size="0x80000" crc="ff3c027d" sha1="1f7a08d2e51e90d770d9dbf4092166b2bfa5697e" />
 			</dataarea>
 			<dataarea name="nvram" size="0x2000">
+				<rom value="0xff" size="0x2000" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- unlicensed English translation of Dragon Ball Z - Gokuu Gekitouden -->
+	<software name="dbzeng" cloneof="dbzgeki" supported="partial">
+		<description>Dragon Ball Z English</description> <!-- title screen -->
+		<year>2001</year>
+		<publisher>Liebao Technology?</publisher>
+		<info name="alt_title" value="Dragon Ball Z 3" /> <!-- cartridge label? -->
+		<part name="cart" interface="gameboy_cart">
+			<feature name="enhancement" value="sgb" />
+			<feature name="slot" value="rom_liebao" />
+			<dataarea name="rom" size="0x100000">
+				<rom name="dragon ball z english.gb" size="0x100000" crc="71b8ea17" sha1="c43eb3906f77dda5fee94a0fce0b6d783461238c" />
+			</dataarea>
+			<dataarea name="nvram" size="0x2000">
+				<rom value="0xff" size="0x2000" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -10448,6 +10479,19 @@ license:CC0
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="jeep jamboree (usa).bin" size="0x20000" crc="a1e76a33" sha1="988a40823f7db661bc91ffff8fc1bcd80e64f18d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jeepjambp" cloneof="jeepjamb">
+		<description>Jeep Jamboree (USA, prototype)</description>
+		<year>1992</year>
+		<publisher>Virgin Games</publisher>
+		<info name="alt_title" value="Jeep Jamboree - Off Road Adventure (box)" />
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="jeep 3-9 prg0" size="0x20000" crc="4da15b28" sha1="9e58a8553d7405a13f282b46fc0bbfe23594d3cf" />
 			</dataarea>
 		</part>
 	</software>
@@ -23789,6 +23833,18 @@ license:CC0
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="super scrabble (usa).bin" size="0x20000" crc="3874b7a2" sha1="59755c83dc26015c4084296ab06600ffc235f026" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sscrabblp" cloneof="sscrabbl">
+		<description>Super Scrabble (USA, prototype)</description>
+		<year>1991?</year>
+		<publisher>Milton Bradley</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="scrabble.bin" size="0x20000" crc="10ecadbf" sha1="9deab55c1074c0182bac775b9e984afa170f57b0"/>
 			</dataarea>
 		</part>
 	</software>

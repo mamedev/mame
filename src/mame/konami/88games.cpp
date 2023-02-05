@@ -298,7 +298,7 @@ void _88games_state::machine_reset()
 void _88games_state::_88games(machine_config &config)
 {
 	/* basic machine hardware */
-	KONAMI(config, m_maincpu, 3000000); /* ? */
+	KONAMI(config, m_maincpu, 12000000); /* ? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &_88games_state::main_map);
 	m_maincpu->line().set(FUNC(_88games_state::banking_callback));
 

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_VIDEO_ELAN_EU3A05COMMONVID_H
-#define MAME_VIDEO_ELAN_EU3A05COMMONVID_H
+#ifndef MAME_TVGAMES_ELAN_EU3A05COMMONVID_H
+#define MAME_TVGAMES_ELAN_EU3A05COMMONVID_H
 
 #include "emupal.h"
 
@@ -32,4 +32,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_COMMONVID, elan_eu3a05commonvid_device)
 
-#endif // MAME_VIDEO_ELAN_EU3A05COMMONVID_H
+#endif // MAME_TVGAMES_ELAN_EU3A05COMMONVID_H

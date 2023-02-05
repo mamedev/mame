@@ -27,6 +27,9 @@
 #include "sound/spkrdev.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define ISABUS_TAG "isa"
 
 class indiana_state : public driver_device
@@ -141,6 +144,9 @@ ROM_START( indiana )
 	ROM_SYSTEM_BIOS( 2, "v7", "ver 0.7" )
 	ROMX_LOAD( "prom0_7.bin", 0x0000, 0x10000, CRC(d6a3b6bc) SHA1(01d8cee989ab29646d9d3f8b7262b10055653d41), ROM_BIOS(2))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

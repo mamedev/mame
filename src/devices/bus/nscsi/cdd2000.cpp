@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "bus/nscsi/cdd2000.h"
 #include "cpu/mc68hc11/mc68hc11.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 
 DEFINE_DEVICE_TYPE(CDD2000, cdd2000_device, "cdd2000", "Philips CDD2000 CD-R")
 

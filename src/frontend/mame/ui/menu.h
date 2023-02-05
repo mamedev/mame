@@ -70,6 +70,9 @@ public:
 	void item_append(menu_item_type type, uint32_t flags = 0);
 	void item_append_on_off(const std::string &text, bool state, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
 
+	// set space required for drawing extra content
+	void set_custom_space(float top, float bottom);
+
 	// reset the menus, clearing everything
 	static void stack_reset(mame_ui_manager &ui) { get_global_state(ui).stack_reset(); }
 
@@ -193,6 +196,63 @@ protected:
 	float get_customtop() const { return m_customtop; }
 	float get_custombottom() const { return m_custombottom; }
 
+	float line_height() const { return m_line_height; }
+	float gutter_width() const { return m_gutter_width; }
+	float tb_border() const { return m_tb_border; }
+	float lr_border() const { return m_lr_border; }
+	float lr_arrow_width() const { return m_lr_arrow_width; }
+	float ud_arrow_width() const { return m_ud_arrow_width; }
+
+	float get_string_width(std::string_view s) { return ui().get_string_width(s, line_height()); }
+	text_layout create_layout(float width = 1.0, text_layout::text_justify justify = text_layout::text_justify::LEFT, text_layout::word_wrapping wrap = text_layout::word_wrapping::WORD);
+
+	void draw_text_normal(
+			std::string_view text,
+			float x, float y, float width,
+			text_layout::text_justify justify, text_layout::word_wrapping wrap,
+			rgb_t color)
+	{
+		ui().draw_text_full(
+				container(),
+				text,
+				x, y, width, justify, wrap,
+				mame_ui_manager::NORMAL, color, ui().colors().text_bg_color(),
+				nullptr, nullptr,
+				line_height());
+	}
+
+	float get_text_width(
+			std::string_view text,
+			float x, float y, float width,
+			text_layout::text_justify justify, text_layout::word_wrapping wrap)
+	{
+		float result;
+		ui().draw_text_full(
+				container(),
+				text,
+				x, y, width, justify, wrap,
+				mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
+				&result, nullptr,
+				line_height());
+		return result;
+	}
+
+	std::pair<float, float> get_text_dimensions(
+			std::string_view text,
+			float x, float y, float width,
+			text_layout::text_justify justify, text_layout::word_wrapping wrap)
+	{
+		std::pair<float, float> result;
+		ui().draw_text_full(
+				container(),
+				text,
+				x, y, width, justify, wrap,
+				mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
+				&result.first, &result.second,
+				line_height());
+		return result;
+	}
+
 	// highlight
 	void highlight(float x0, float y0, float x1, float y1, rgb_t bgcolor);
 	render_texture *hilight_main_texture() { return m_global_state.hilight_main_texture(); }
@@ -214,16 +274,15 @@ protected:
 			rgb_t fgcolor, rgb_t bgcolor, float text_size)
 	{
 		// size up the text
-		float const lrborder(ui().box_lr_border() * machine().render().ui_aspect(&container()));
-		float const origwidth(origx2 - origx1 - (2.0f * lrborder));
+		float const origwidth(origx2 - origx1 - (2.0f * lr_border()));
 		float maxwidth(origwidth);
 		for (Iter it = begin; it != end; ++it)
 		{
 			std::string_view const &line(*it);
 			if (!line.empty())
 			{
-				auto layout = ui().create_layout(container(), 1.0f, justify, wrap);
-				layout.add_text(std::string_view(*it), rgb_t::white(), rgb_t::black(), text_size);
+				text_layout layout(*ui().get_font(), text_size * m_last_aspect, text_size, 1.0, justify, wrap);
+				layout.add_text(std::string_view(*it), rgb_t::white(), rgb_t::black());
 				maxwidth = (std::max)(layout.actual_width(), maxwidth);
 			}
 		}
@@ -234,13 +293,13 @@ protected:
 		}
 
 		// draw containing box
-		float const boxleft(0.5f - (maxwidth * 0.5f) - lrborder);
-		float boxright(0.5f + (maxwidth * 0.5f) + lrborder);
+		float const boxleft(0.5f - (maxwidth * 0.5f) - lr_border());
+		float boxright(0.5f + (maxwidth * 0.5f) + lr_border());
 		ui().draw_outlined_box(container(), boxleft, y1, boxright, y2, bgcolor);
 
 		// inset box and draw content
 		float const textleft(0.5f - (maxwidth * 0.5f));
-		y1 += ui().box_tb_border();
+		y1 += tb_border();
 		for (Iter it = begin; it != end; ++it)
 		{
 			ui().draw_text_full(
@@ -248,16 +307,27 @@ protected:
 					textleft, y1, maxwidth, justify, wrap,
 					mame_ui_manager::NORMAL, fgcolor, ui().colors().text_bg_color(),
 					nullptr, nullptr, text_size);
-			y1 += ui().get_line_height();
+			y1 += text_size;
 		}
 
 		// in case you want another box of similar width
 		return maxwidth;
 	}
 
+	template <typename Iter>
+	float draw_text_box(
+			Iter begin, Iter end,
+			float origx1, float origx2, float y1, float y2,
+			ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, bool scale,
+			rgb_t fgcolor, rgb_t bgcolor)
+	{
+		return draw_text_box(begin, end, origx1, origx2, y1, y2, justify, wrap, scale, fgcolor, bgcolor, line_height());
+	}
+
 	void draw_background();
 
 	// draw additional menu content
+	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect);
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
 	// map mouse to menu coordinates
@@ -355,7 +425,7 @@ private:
 	void set_special_main_menu(bool disable);
 
 	// to be implemented in derived classes
-	virtual void populate(float &customtop, float &custombottom) = 0;
+	virtual void populate() = 0;
 
 	// to be implemented in derived classes
 	virtual void handle(event const *ev) = 0;
@@ -384,6 +454,15 @@ private:
 	std::optional<std::string> m_heading;           // menu heading
 	std::vector<menu_item>  m_items;                // array of items
 	bool                    m_rebuilding;           // ensure items are only added during rebuild
+
+	std::pair<uint32_t, uint32_t> m_last_size;      // pixel size of UI container when metrics were computed
+	float                   m_last_aspect;          // aspect ratio of UI container when metrics were computed
+	float                   m_line_height;
+	float                   m_gutter_width;
+	float                   m_tb_border;
+	float                   m_lr_border;
+	float                   m_lr_arrow_width;
+	float                   m_ud_arrow_width;
 
 	uint32_t                m_process_flags;        // event processing options
 	int                     m_selected;             // which item is selected

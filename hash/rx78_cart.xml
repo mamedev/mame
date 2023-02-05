@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 The Bandai RX-78 Gundam has two slots where you can plug in a ROM cart or an additional device, like a
 printer interface. The system was capable of loading software from these ROM carts, or from a cassette

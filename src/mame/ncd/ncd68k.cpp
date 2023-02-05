@@ -83,6 +83,9 @@
 //#define VERBOSE (LOG_GENERAL|LOG_MCU)
 #include "logmacro.h"
 
+
+namespace {
+
 class ncd68k_state : public driver_device
 {
 public:
@@ -703,6 +706,9 @@ ROM_START(ncd19)
 	ROM_REGION(0x800, "mcu", 0)
 	ROM_LOAD("ncd4200005.u18", 0x000, 0x800, CRC(075c3746) SHA1(6954cfab5141138df975f1b15d2c8e08d4d203c1))
 ROM_END
+
+} // anonymous namespace
+
 
 //   YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT   CLASS         INIT        COMPANY                      FULLNAME   FLAGS
 COMP(1989, ncd16,  0,      0,      configure, ncd68k, ncd16_state,  initialise, "Network Computing Devices", "NCD 16",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

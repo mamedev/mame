@@ -40,6 +40,8 @@
 #include "utf8.h"
 
 
+namespace {
+
 #define MASTER_CLOCK 17.73447_MHz_XTAL  / 5  /* TODO: was 4 MHz, but otherwise cassette won't work due of a bug with MZF support ... */
 
 #define UTF8_POUND "\xc2\xa3"
@@ -1001,6 +1003,8 @@ ROM_START( mz2200 )
 	ROM_LOAD( "font.bin",    0x0000, 0x0800, BAD_DUMP CRC(6ae6ce8e) SHA1(6adcdab9e4647429dd8deb73146264746b5eccda) )
 	ROM_LOAD( "font400.bin", 0x0800, 0x1000, BAD_DUMP CRC(56c5d2bc) SHA1(fea655ff5eedacf8978fa3c185485db44376e24d) )
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

@@ -30,6 +30,7 @@ namespace {
 const uint32_t kTypeImageDimIndex = 1;
 const uint32_t kLoadBaseIndex = 0;
 const uint32_t kPointerTypeStorageClassIndex = 0;
+const uint32_t kVariableStorageClassIndex = 0;
 const uint32_t kTypeImageSampledIndex = 5;
 
 // Constants for OpenCL.DebugInfo.100 / NonSemantic.Shader.DebugInfo.100
@@ -75,10 +76,9 @@ Instruction::Instruction(IRContext* c, const spv_parsed_instruction_t& inst,
       dbg_scope_(kNoDebugScope, kNoInlinedAt) {
   for (uint32_t i = 0; i < inst.num_operands; ++i) {
     const auto& current_payload = inst.operands[i];
-    std::vector<uint32_t> words(
-        inst.words + current_payload.offset,
+    operands_.emplace_back(
+        current_payload.type, inst.words + current_payload.offset,
         inst.words + current_payload.offset + current_payload.num_words);
-    operands_.emplace_back(current_payload.type, std::move(words));
   }
   assert((!IsLineInst() || dbg_line.empty()) &&
          "Op(No)Line attaching to Op(No)Line found");
@@ -95,10 +95,9 @@ Instruction::Instruction(IRContext* c, const spv_parsed_instruction_t& inst,
       dbg_scope_(dbg_scope) {
   for (uint32_t i = 0; i < inst.num_operands; ++i) {
     const auto& current_payload = inst.operands[i];
-    std::vector<uint32_t> words(
-        inst.words + current_payload.offset,
+    operands_.emplace_back(
+        current_payload.type, inst.words + current_payload.offset,
         inst.words + current_payload.offset + current_payload.num_words);
-    operands_.emplace_back(current_payload.type, std::move(words));
   }
 }
 
@@ -403,6 +402,21 @@ bool Instruction::IsVulkanStorageBuffer() const {
   return false;
 }
 
+bool Instruction::IsVulkanStorageBufferVariable() const {
+  if (opcode() != SpvOpVariable) {
+    return false;
+  }
+
+  uint32_t storage_class = GetSingleWordInOperand(kVariableStorageClassIndex);
+  if (storage_class == SpvStorageClassStorageBuffer ||
+      storage_class == SpvStorageClassUniform) {
+    Instruction* var_type = context()->get_def_use_mgr()->GetDef(type_id());
+    return var_type != nullptr && var_type->IsVulkanStorageBuffer();
+  }
+
+  return false;
+}
+
 bool Instruction::IsVulkanUniformBuffer() const {
   if (opcode() != SpvOpTypePointer) {
     return false;
@@ -488,26 +502,6 @@ bool Instruction::IsReadOnlyPointerKernel() const {
       type_def->GetSingleWordInOperand(kPointerTypeStorageClassIndex);
 
   return storage_class == SpvStorageClassUniformConstant;
-}
-
-uint32_t Instruction::GetTypeComponent(uint32_t element) const {
-  uint32_t subtype = 0;
-  switch (opcode()) {
-    case SpvOpTypeStruct:
-      subtype = GetSingleWordInOperand(element);
-      break;
-    case SpvOpTypeArray:
-    case SpvOpTypeRuntimeArray:
-    case SpvOpTypeVector:
-    case SpvOpTypeMatrix:
-      // These types all have uniform subtypes.
-      subtype = GetSingleWordInOperand(0u);
-      break;
-    default:
-      break;
-  }
-
-  return subtype;
 }
 
 void Instruction::UpdateLexicalScope(uint32_t scope) {
@@ -679,8 +673,12 @@ NonSemanticShaderDebugInfo100Instructions Instruction::GetShader100DebugOpcode()
     return NonSemanticShaderDebugInfo100InstructionsMax;
   }
 
-  return NonSemanticShaderDebugInfo100Instructions(
-      GetSingleWordInOperand(kExtInstInstructionInIdx));
+  uint32_t opcode = GetSingleWordInOperand(kExtInstInstructionInIdx);
+  if (opcode >= NonSemanticShaderDebugInfo100InstructionsMax) {
+    return NonSemanticShaderDebugInfo100InstructionsMax;
+  }
+
+  return NonSemanticShaderDebugInfo100Instructions(opcode);
 }
 
 CommonDebugInfoInstructions Instruction::GetCommonDebugOpcode() const {

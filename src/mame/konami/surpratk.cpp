@@ -18,7 +18,7 @@
 #include "k053251.h"
 #include "konami_helper.h"
 
-#include "cpu/m6809/konami.h" // for the callback and the FIRQ IRQ definition
+#include "cpu/m6809/konami.h"
 #include "machine/bankdev.h"
 #include "machine/watchdog.h"
 #include "sound/ymopm.h"
@@ -300,7 +300,7 @@ void surpratk_state::banking_callback(uint8_t data)
 void surpratk_state::surpratk(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, XTAL(24'000'000) / 2 / 4); // 053248, the clock input is 12MHz, and internal CPU divider of 4
+	KONAMI(config, m_maincpu, XTAL(24'000'000) / 2); // 053248, the clock input is 12MHz, and internal CPU divider of 4
 	m_maincpu->set_addrmap(AS_PROGRAM, &surpratk_state::main_map);
 	m_maincpu->line().set(FUNC(surpratk_state::banking_callback));
 

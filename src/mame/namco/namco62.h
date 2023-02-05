@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Philip Bennett
-#ifndef MAME_MACHINE_NAMCO62_H
-#define MAME_MACHINE_NAMCO62_H
+#ifndef MAME_NAMCO_NAMCO62_H
+#define MAME_NAMCO_NAMCO62_H
 
 #include "cpu/mb88xx/mb88xx.h"
 
@@ -29,4 +29,4 @@ private:
 
 DECLARE_DEVICE_TYPE(NAMCO_62XX, namco_62xx_device)
 
-#endif // MAME_MACHINE_NAMCO62_H
+#endif // MAME_NAMCO_NAMCO62_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
-#ifndef MAME_MACHINE_MS7004_H
-#define MAME_MACHINE_MS7004_H
+#ifndef MAME_SHARED_MS7004_H
+#define MAME_SHARED_MS7004_H
 
 #pragma once
 
@@ -61,4 +61,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(MS7004, ms7004_device)
 
-#endif // MAME_MACHINE_MS7004_H
+#endif // MAME_SHARED_MS7004_H

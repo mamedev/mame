@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="msx2_cart" description="MSX2 cartridges">
 
@@ -17,7 +17,7 @@ LZ93A13 (32 pin) - 8KB banks
 -->
 
 	<software name="aclassmj">
-		<description>Inemuri-ryuu Asada Tetsuya no A-kyuu Mahjong (Jpn)</description>
+		<description>Inemuri-ryuu Asada Tetsuya no A-kyuu Mahjong (Japan)</description>
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="居眠り流 阿佐田哲也のA級麻雀" />
@@ -33,7 +33,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="aleste">
-		<description>Aleste (Jpn)</description>
+		<description>Aleste (Japan)</description>
 		<year>1988</year>
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="アレスタ" />
@@ -48,7 +48,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="androgyn">
-		<description>Han Seimei Senki Androgynus (Jpn)</description>
+		<description>Han Seimei Senki Androgynus (Japan)</description>
 		<year>1988</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="反生命戦機アンドロギュヌス" />
@@ -64,7 +64,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="aressha">
-		<description>A Ressha de Ikou - Take the A Train. (Jpn)</description>
+		<description>A Ressha de Ikou - Take the A Train. (Japan)</description>
 		<year>1989</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="A列車で行こう" />
@@ -82,7 +82,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="arknoid2">
-		<description>Arkanoid 2 (Jpn)</description>
+		<description>Arkanoid 2 (Japan)</description>
 		<year>1987</year>
 		<publisher>Nidecom</publisher>
 		<info name="alt_title" value="アルカノイドII" />
@@ -97,7 +97,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ashguine">
-		<description>Densetsu no Seisenshi Ashguine (Jpn)</description>
+		<description>Densetsu no Seisenshi Ashguine (Japan)</description>
 		<year>1987</year>
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="伝説の聖戦士 アシュギーネ" />
@@ -112,7 +112,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ashguin2">
-		<description>Ashguine 2 - Kokuu no Gajou (Jpn)</description>
+		<description>Ashguine 2 - Kokuu no Gajou (Japan)</description>
 		<year>1987</year>
 		<publisher>Panasoft / T&amp;E Soft</publisher>
 		<info name="serial" value="SW-M002" />
@@ -128,7 +128,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ashguin3">
-		<description>Ashguine - Fukushuu no Honoo (Jpn)</description>
+		<description>Ashguine - Fukushuu no Honoo (Japan)</description>
 		<year>1987</year>
 		<publisher>Panasoft / Micro Cabin</publisher>
 		<info name="serial" value="SW-M003" />
@@ -144,7 +144,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ashguin3a" cloneof="ashguin3">
-		<description>Ashguine - Fukushuu no Honoo (Jpn, Alt)</description>
+		<description>Ashguine - Fukushuu no Honoo (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Panasoft / Micro Cabin</publisher>
 		<info name="alt_title" value="アシュギーネ 復讐の炎" />
@@ -160,7 +160,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="asteka2">
-		<description>Taiyou no Shinden - Asteka II (Jpn)</description>
+		<description>Taiyou no Shinden - Asteka II (Japan)</description>
 		<year>1987</year>
 		<publisher>Nihon Falcom</publisher>
 		<info name="alt_title" value="太陽の神殿 アステカII" />
@@ -180,7 +180,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="bublbobl">
-		<description>Bubble Bobble (Jpn)</description>
+		<description>Bubble Bobble (Japan)</description>
 		<year>1987</year>
 		<publisher>Taito</publisher>
 		<info name="alt_title" value="バブルボブル" />
@@ -196,7 +196,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="cockpit">
-		<description>The Cockpit (Jpn)</description>
+		<description>The Cockpit (Japan)</description>
 		<year>1987</year>
 		<publisher>Nidecom</publisher>
 		<info name="alt_title" value="ザ・コックピット" />
@@ -212,7 +212,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="crimson">
-		<description>Crimson (Jpn)</description>
+		<description>Crimson (Japan)</description>
 		<year>1987</year>
 		<publisher>Xtal Soft</publisher>
 		<info name="alt_title" value="クリムゾン" />
@@ -227,7 +227,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="daikokai">
-		<description>Daikoukai Jidai (Jpn)</description>
+		<description>Daikoukai Jidai (Japan)</description>
 		<year>1990</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="大航海時代" />
@@ -245,7 +245,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="daisenr">
-		<description>Daisenryaku MSX2 (Jpn)</description>
+		<description>Daisenryaku MSX2 (Japan)</description>
 		<year>1986</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="大戦略" />
@@ -264,7 +264,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="dbuster">
-		<description>Dragon Buster (Jpn)</description>
+		<description>Dragon Buster (Japan)</description>
 		<year>1987</year>
 		<publisher>Namco</publisher>
 		<info name="alt_title" value="ドラゴンバスター" />
@@ -279,7 +279,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="dires">
-		<description>Dires (Jpn)</description>
+		<description>Dires (Japan)</description>
 		<year>1988</year>
 		<publisher>Bothtec</publisher>
 		<part name="cart" interface="msx_cart">
@@ -297,7 +297,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 <!-- This contains Bishoujo Shashinkan Studio Cut + Bishoujo Shashinkan Moving School -->
 	<software name="doublvis">
-		<description>Bishoujo Shashinkan - The Double Vision (Jpn)</description>
+		<description>Bishoujo Shashinkan - The Double Vision (Japan)</description>
 		<year>1988</year>
 		<publisher>Hard</publisher>
 		<info name="alt_title" value="ダブル・ヴィジョン" />
@@ -312,7 +312,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="dquest">
-		<description>Dragon Quest (Jpn)</description>
+		<description>Dragon Quest (Japan)</description>
 		<year>1986</year>
 		<publisher>enix</publisher>
 		<info name="alt_title" value="ドラゴンクエスト" />
@@ -327,7 +327,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="dquest2">
-		<description>Dragon Quest II - Akuryou no Kamigami (Jpn)</description>
+		<description>Dragon Quest II - Akuryou no Kamigami (Japan)</description>
 		<year>1987</year>
 		<publisher>Enix</publisher>
 		<info name="alt_title" value="ドラゴンクエストII 悪霊の神々" />
@@ -342,7 +342,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="drwn4078">
-		<description>Darwin 4078 (Jpn)</description>
+		<description>Darwin 4078 (Japan)</description>
 		<year>1987</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="alt_title" value="ダーウィン4078" />
@@ -359,7 +359,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- Doesn't boot in msx2 driver, works in some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="dslayer4">
-		<description>Dragon Slayer IV - Drasle Family (Jpn)</description>
+		<description>Dragon Slayer IV - Drasle Family (Japan)</description>
 		<year>1987</year>
 		<publisher>Nihon Falcom</publisher>
 		<info name="alt_title" value="ドラゴンスレイヤーIV" />
@@ -375,7 +375,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="dynabowl">
-		<description>Dynamite Bowl (Jpn)</description>
+		<description>Dynamite Bowl (Japan)</description>
 		<year>1987</year>
 		<publisher>Toshiba EMI</publisher>
 		<info name="alt_title" value="ダイナマイトボウル" />
@@ -392,7 +392,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- Freezes at title screen in the generic msx2 driver, works fine in some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="eidolon">
-		<description>The Eidolon (Jpn)</description>
+		<description>The Eidolon (Japan)</description>
 		<year>1986</year>
 		<publisher>PonyCa</publisher>
 		<info name="alt_title" value="アイドロン" />
@@ -408,7 +408,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="emperor">
-		<description>L'Empereur (Jpn)</description>
+		<description>L'Empereur (Japan)</description>
 		<year>1990</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="ランペルール" />
@@ -426,7 +426,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="eurosens">
-		<description>Europa Sensen (Jpn)</description>
+		<description>Europa Sensen (Japan)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="ヨーロッパ戦線" />
@@ -444,7 +444,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="f15se">
-		<description>F-15 Strike Eagle (Jpn)</description>
+		<description>F-15 Strike Eagle (Japan)</description>
 		<year>1987</year>
 		<publisher>System Soft</publisher>
 		<info name="alt_title" value="F-15ストライクイーグル" />
@@ -459,7 +459,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="famibill">
-		<description>Family Billiards (Jpn)</description>
+		<description>Family Billiards (Japan)</description>
 		<year>1987</year>
 		<publisher>Pack-In-Video</publisher>
 		<info name="alt_title" value="ファミリービリヤード" />
@@ -475,7 +475,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="famiboxi">
-		<description>Family Boxing (Jpn)</description>
+		<description>Family Boxing (Japan)</description>
 		<year>1988</year>
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="ファミリーボクシング" />
@@ -490,7 +490,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="famiparo">
-		<description>Famicle Parodic (Jpn)</description>
+		<description>Famicle Parodic (Japan)</description>
 		<year>1988</year>
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="ファミクルパロディック" />
@@ -505,7 +505,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="famista">
-		<description>Pro Yakyuu Family Stadium - Pennant Race (Jpn)</description>
+		<description>Pro Yakyuu Family Stadium - Pennant Race (Japan)</description>
 		<year>1989</year>
 		<publisher>Namco</publisher>
 		<info name="alt_title" value="プロ野球ファミリースタジアム ペナントレース" />
@@ -520,7 +520,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="fantzon2">
-		<description>Fantasy Zone II - The Tears of Opa-Opa (Jpn)</description>
+		<description>Fantasy Zone II - The Tears of Opa-Opa (Japan)</description>
 		<year>1987</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ファンタジーゾーンII ～オパオパの涙～" />
@@ -535,7 +535,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="fireball">
-		<description>Fire Ball (Jpn)</description>
+		<description>Fire Ball (Japan)</description>
 		<year>1987</year>
 		<publisher>HummingBird</publisher>
 		<info name="alt_title" value="ファイア・ボール" />
@@ -550,7 +550,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="fleetco2">
-		<description>Fleet Commander II - Tasogare no Kaiiki (Jpn)</description>
+		<description>Fleet Commander II - Tasogare no Kaiiki (Japan)</description>
 		<year>1990</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="フリートコマンダーII 黄昏の海域" />
@@ -565,7 +565,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="gambler2">
-		<description>Gambler Jikochuushinha 2 - Jishou! Kyougou Janshi Hen (Jpn)</description>
+		<description>Gambler Jikochuushinha 2 - Jishou! Kyougou Janshi Hen (Japan)</description>
 		<year>1988</year>
 		<publisher>Game Arts</publisher>
 		<info name="alt_title" value="ぎゅわんぶらあ自己中心派2 自称! 強豪雀士編" />
@@ -580,7 +580,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="garakuta">
-		<description>Garakuta (Jpn)</description>
+		<description>Garakuta (Japan)</description>
 		<year>1988</year>
 		<publisher>Wachi Software</publisher>
 		<info name="alt_title" value="お絵描きソフト 画楽多 ~ Oekaki Soft Garakuta" />
@@ -598,7 +598,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="genchohi">
-		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi (Jpn)</description>
+		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan)</description>
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="蒼き狼と白き牝鹿 元朝秘史" />
@@ -616,7 +616,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="genghis">
-		<description>Aoki Ookami to Shiroki Mejika - Genghis Khan (Jpn)</description>
+		<description>Aoki Ookami to Shiroki Mejika - Genghis Khan (Japan)</description>
 		<year>1988</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="蒼き狼と白き牝鹿 ジンギスカン" />
@@ -634,7 +634,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="grlyblok">
-		<description>Girly Block (Jpn)</description>
+		<description>Girly Block (Japan)</description>
 		<year>1988</year>
 		<publisher>The Links</publisher>
 		<info name="alt_title" value="ガーリーブロック" />
@@ -649,7 +649,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="hardball">
-		<description>Hardball (Jpn)</description>
+		<description>Hardball (Japan)</description>
 		<year>1987</year>
 		<publisher>Sony</publisher>
 		<part name="cart" interface="msx_cart">
@@ -664,7 +664,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="holein1s">
-		<description>Hole in One Special (Jpn)</description>
+		<description>Hole in One Special (Japan)</description>
 		<year>1987</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="alt_title" value="ホール・イン・ワン スペシャル" />
@@ -679,7 +679,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="hydlide3">
-		<description>Hydlide 3 - The Space Memories (Jpn)</description>
+		<description>Hydlide 3 - The Space Memories (Japan)</description>
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="alt_title" value="ハイドライド3" />
@@ -694,7 +694,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ideyumj">
-		<description>Ide Yousuke Meijin no Jissen Mahjong (Jpn)</description>
+		<description>Ide Yousuke Meijin no Jissen Mahjong (Japan)</description>
 		<year>1988</year>
 		<publisher>Pack-In Video</publisher>
 		<info name="alt_title" value="井出洋介名人の実戦麻雀" />
@@ -709,7 +709,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="inindo">
-		<description>Inindou - Datou Nobunaga (Jpn)</description>
+		<description>Inindou - Datou Nobunaga (Japan)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="伊忍道 打倒信長" />
@@ -727,7 +727,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ishinara">
-		<description>Ishin no Arashi (Jpn)</description>
+		<description>Ishin no Arashi (Japan)</description>
 		<year>1989</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="維新の嵐" />
@@ -765,7 +765,7 @@ LZ93A13 (32 pin) - 8KB banks
 -->
 
 	<software name="kikikai">
-		<description>Kiki KaiKai (Jpn)</description>
+		<description>Kiki KaiKai (Japan)</description>
 		<year>1986</year>
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="奇々怪界" />
@@ -780,7 +780,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="kisei">
-		<description>Kisei (Jpn)</description>
+		<description>Kisei (Japan)</description>
 		<year>1987</year>
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="棋聖" />
@@ -798,7 +798,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="kitahei">
-		<description>Honkaku Shougi Kitahei (Jpn)</description>
+		<description>Honkaku Shougi Kitahei (Japan)</description>
 		<year>1986</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="本格将棋 棋太平" />
@@ -815,7 +815,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="lupin">
-		<description>Lupin Sansei - Cagliostro no Shiro (Jpn)</description>
+		<description>Lupin Sansei - Cagliostro no Shiro (Japan)</description>
 		<year>1987</year>
 		<publisher>Toho</publisher>
 		<info name="alt_title" value="ルパン三世 カリオストロの城" />
@@ -849,7 +849,7 @@ LZ93A13 (32 pin) - 8KB banks
 -->
 
 	<software name="mikkoku">
-		<description>Maison Ikkoku (Jpn)</description>
+		<description>Maison Ikkoku (Japan)</description>
 		<year>1987</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="めぞん一刻" />
@@ -864,7 +864,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="mikkokuk">
-		<description>Maison Ikkoku Kanketsu Hen (Jpn)</description>
+		<description>Maison Ikkoku Kanketsu Hen (Japan)</description>
 		<year>1988</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="めぞん一刻 完結篇" />
@@ -879,7 +879,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="mississp">
-		<description>Mississippi Satsujin Jiken (Jpn)</description>
+		<description>Mississippi Satsujin Jiken (Japan)</description>
 		<year>1987</year>
 		<publisher>Jaleco</publisher>
 		<info name="alt_title" value="ミシシッピー殺人事件" />
@@ -895,7 +895,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<!-- This features a upd7756 for audio playback -->
 	<software name="moeronet">
-		<description>Moero! Nettou Yakyuu '88 (Jpn)</description>
+		<description>Moero! Nettou Yakyuu '88 (Japan)</description>
 		<year>1988</year>
 		<publisher>Jaleco</publisher>
 		<info name="alt_title" value="燃えろ!!熱闘野球'88" />
@@ -913,7 +913,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="monmonmo">
-		<description>Mon Mon Monster (Jpn)</description>
+		<description>Mon Mon Monster (Japan)</description>
 		<year>1989</year>
 		<publisher>Hot-B</publisher>
 		<info name="alt_title" value="ンモンモンスター" />
@@ -930,7 +930,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- Does not boot in the generic msx2 driver, works fine in some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this (probably needs Kanji rom?) -->
 	<software name="murdclub">
-		<description>Final Mystery Murder Club - Satsujin Club (Jpn)</description>
+		<description>Final Mystery Murder Club - Satsujin Club (Japan)</description>
 		<year>1988</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="殺人倶楽部" />
@@ -946,7 +946,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ninjakun">
-		<description>Ninja-kun - Ashura no Shou (Jpn)</description>
+		<description>Ninja-kun - Ashura no Shou (Japan)</description>
 		<year>1987</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="alt_title" value="忍者くん 阿修羅の章" />
@@ -961,7 +961,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="nobuseng">
-		<description>Nobunaga no Yabou - Sengoku Gunyuuden (Jpn)</description>
+		<description>Nobunaga no Yabou - Sengoku Gunyuuden (Japan)</description>
 		<year>1989</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="信長の野望 戦国群雄伝" />
@@ -979,7 +979,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="nobuzenk">
-		<description>Nobunaga no Yabou - Zenkokuban (Jpn)</description>
+		<description>Nobunaga no Yabou - Zenkokuban (Japan)</description>
 		<year>1987</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="信長の野望 全国版" />
@@ -997,7 +997,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="nobubufu">
-		<description>Nobunaga no Yabou - Bushou Fuuunroku (Jpn)</description>
+		<description>Nobunaga no Yabou - Bushou Fuuunroku (Japan)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="信長の野望 武将風雲録" />
@@ -1015,7 +1015,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ogre">
-		<description>Ogre (Jpn)</description>
+		<description>Ogre (Japan)</description>
 		<year>1986</year>
 		<publisher>System Soft</publisher>
 		<info name="alt_title" value="オーガ" />
@@ -1032,7 +1032,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<!-- Looks like a bad dump: contains "mega rom loader" messages -->
 	<software name="pacmania">
-		<description>Pac-Mania (Jpn)</description>
+		<description>Pac-Mania (Japan)</description>
 		<year>1989</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="msx_cart">
@@ -1048,7 +1048,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- Does not boot in the generic msx2 driver, works fine in some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this (probably needs Kanji rom?) -->
 	<software name="profmjg">
-		<description>Professional Mahjong Gokuu (Jpn)</description>
+		<description>Professional Mahjong Gokuu (Japan)</description>
 		<year>1988</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="プロフェッショナル麻雀悟空" />
@@ -1067,7 +1067,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="projcta2">
-		<description>Project A2 - Shijou Saidai no Hyouteki (Jpn)</description>
+		<description>Project A2 - Shijou Saidai no Hyouteki (Japan)</description>
 		<year>1987</year>
 		<publisher>Pony</publisher>
 		<info name="alt_title" value="プロジェクトA2 史上最大の標的" />
@@ -1082,7 +1082,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="proyakfn">
-		<description>Pro Yakyuu Fan (Jpn)</description>
+		<description>Pro Yakyuu Fan (Japan)</description>
 		<year>1987</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="プロ野球FAN" />
@@ -1097,7 +1097,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="quinpl">
-		<description>Quinpl (Jpn)</description>
+		<description>Quinpl (Japan)</description>
 		<year>1988</year>
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="クインプル" />
@@ -1113,7 +1113,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="rastan">
-		<description>Rastan Saga (Jpn)</description>
+		<description>Rastan Saga (Japan)</description>
 		<year>1988</year>
 		<publisher>Taito</publisher>
 		<info name="alt_title" value="ラスタン・サーガ" />
@@ -1130,7 +1130,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- does not seem to work in the generic msx2 driver, works on some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="relics">
-		<description>Relics (Jpn)</description>
+		<description>Relics (Japan)</description>
 		<year>1986</year>
 		<publisher>Bothtec</publisher>
 		<info name="alt_title" value="レリクス" />
@@ -1146,7 +1146,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="replicrt">
-		<description>Replicart (Jpn)</description>
+		<description>Replicart (Japan)</description>
 		<year>1987</year>
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="レプリカート" />
@@ -1161,7 +1161,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="retjelda">
-		<description>Return of Jelda (Jpn)</description>
+		<description>Return of Jelda (Japan)</description>
 		<year>1987</year>
 		<publisher>Carry Lab</publisher>
 		<info name="alt_title" value="リターン・オブ・ジェルダ" />
@@ -1176,7 +1176,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="romancia">
-		<description>Romancia (Jpn)</description>
+		<description>Romancia (Japan)</description>
 		<year>1986</year>
 		<publisher>Nihon Falcom</publisher>
 		<info name="alt_title" value="ロマンシア" />
@@ -1192,7 +1192,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="royalbld">
-		<description>Royal Blood (Jpn)</description>
+		<description>Royal Blood (Japan)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="ロイヤルブラッド" />
@@ -1210,7 +1210,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="rtishtar">
-		<description>The Return of Ishtar (Jpn)</description>
+		<description>The Return of Ishtar (Japan)</description>
 		<year>1988</year>
 		<publisher>Namco</publisher>
 		<info name="alt_title" value="イシターの復活" />
@@ -1226,7 +1226,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="sangoku2">
-		<description>Sangokushi II (Jpn)</description>
+		<description>Sangokushi II (Japan)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="三国志II" />
@@ -1244,7 +1244,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="scramble">
-		<description>Scramble Formation (Jpn)</description>
+		<description>Scramble Formation (Japan)</description>
 		<year>1987</year>
 		<publisher>Taito</publisher>
 		<info name="alt_title" value="スクランブルフォーメーション" />
@@ -1260,7 +1260,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="seikima2">
-		<description>Seikima II Special - Akuma no Gyakushuu (Jpn)</description>
+		<description>Seikima II Special - Akuma no Gyakushuu (Japan)</description>
 		<year>1987</year>
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="聖飢魔IIスペシャル 悪魔の逆襲" />
@@ -1275,7 +1275,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="shiryo">
-		<description>Shiryou Sensen - War of the Dead (Jpn)</description>
+		<description>Shiryou Sensen - War of the Dead (Japan)</description>
 		<year>1987</year>
 		<publisher>Victor Music Industry</publisher>
 		<info name="alt_title" value="死霊戦線" />
@@ -1293,7 +1293,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="stramars">
-		<description>Strategic Mars (Jpn)</description>
+		<description>Strategic Mars (Japan)</description>
 		<year>1989</year>
 		<publisher>db-Soft</publisher>
 		<part name="cart" interface="msx_cart">
@@ -1307,7 +1307,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="suikoden">
-		<description>Suikoden - Tenmei no Chikai (Jpn)</description>
+		<description>Suikoden - Tenmei no Chikai (Japan)</description>
 		<year>1989</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="水滸伝 天命の誓い" />
@@ -1325,7 +1325,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="supdaisn">
-		<description>Super Daisenryaku (Jpn)</description>
+		<description>Super Daisenryaku (Japan)</description>
 		<year>1988</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="SUPER大戦略" />
@@ -1343,7 +1343,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="srunner">
-		<description>Super Runner (Jpn)</description>
+		<description>Super Runner (Japan)</description>
 		<year>1987</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="スーパーランナー" />
@@ -1359,7 +1359,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="striton">
-		<description>Super Triton (Jpn)</description>
+		<description>Super Triton (Japan)</description>
 		<year>1986</year>
 		<publisher>Xain Soft</publisher>
 		<info name="alt_title" value="スーパートリトーン" />
@@ -1374,7 +1374,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="teiketsu">
-		<description>Teitoku no Ketsudan (Jpn)</description>
+		<description>Teitoku no Ketsudan (Japan)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="提督の決断" />
@@ -1392,7 +1392,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="tengoku">
-		<description>Tengoku Yoitoko (Jpn)</description>
+		<description>Tengoku Yoitoko (Japan)</description>
 		<year>1987</year>
 		<publisher>Taito</publisher>
 		<info name="alt_title" value="天国よいとこ" />
@@ -1407,7 +1407,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="tetris">
-		<description>Tetris (Jpn)</description>
+		<description>Tetris (Japan)</description>
 		<year>1988</year>
 		<publisher>BPS</publisher>
 		<info name="alt_title" value="テトリス" />
@@ -1423,7 +1423,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="topzip">
-		<description>Topple Zip (Jpn)</description>
+		<description>Topple Zip (Japan)</description>
 		<year>1988</year>
 		<publisher>Bothtec</publisher>
 		<part name="cart" interface="msx_cart">
@@ -1437,7 +1437,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ultima3">
-		<description>Ultima Exodus (Jpn)</description>
+		<description>Ultima Exodus (Japan)</description>
 		<year>1987</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ウルティマ 恐怖のエクソダス ~ Ultima - Kyoufu no Exodus (Box?)" />
@@ -1455,7 +1455,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="uruseiya">
-		<description>Urusei Yatsura (Jpn)</description>
+		<description>Urusei Yatsura (Japan)</description>
 		<year>1987</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="うる星やつら" />
@@ -1471,7 +1471,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<!-- the Japanese text only works fine on Japanese machines, like hbf1 or hbf12 -->
 	<software name="victnin2">
-		<description>Victorious Nine II - Koukou Yakyuu Hen (Jpn)</description>
+		<description>Victorious Nine II - Koukou Yakyuu Hen (Japan)</description>
 		<year>1987</year>
 		<publisher>Nidecom</publisher>
 		<info name="alt_title" value="ビクトリアス・ナインII 高校野球編" />
@@ -1487,7 +1487,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="woodypoc">
-		<description>Woody Poco (Jpn)</description>
+		<description>Woody Poco (Japan)</description>
 		<year>1987</year>
 		<publisher>dB-Soft</publisher>
 		<info name="alt_title" value="うっでぃぽこ" />
@@ -1503,7 +1503,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="xevious">
-		<description>Xevious - Fardraut Saga (Jpn)</description>
+		<description>Xevious - Fardraut Saga (Japan)</description>
 		<year>1989</year>
 		<publisher>Namco</publisher>
 		<info name="alt_title" value="ゼビウス ファードラウト伝説" />
@@ -1518,7 +1518,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="yaksa">
-		<description>Yaksa (Jpn)</description>
+		<description>Yaksa (Japan)</description>
 		<year>1987</year>
 		<publisher>Wolf Team</publisher>
 		<part name="cart" interface="msx_cart">
@@ -1532,7 +1532,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="yamaskrt">
-		<description>Yamamura Misa Suspense - Kyouto Ryuu no Tera Satsujin Jiken (Jpn)</description>
+		<description>Yamamura Misa Suspense - Kyouto Ryuu no Tera Satsujin Jiken (Japan)</description>
 		<year>1988</year>
 		<publisher>Taito</publisher>
 		<info name="alt_title" value="京都龍の寺殺人事件" />
@@ -1547,7 +1547,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="yuurei">
-		<description>Yuurei-kun (Jpn)</description>
+		<description>Yuurei-kun (Japan)</description>
 		<year>1988</year>
 		<publisher>System Sacom</publisher>
 		<info name="alt_title" value="幽霊君" />
@@ -1562,7 +1562,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="zanacex">
-		<description>Zanac EX (Jpn)</description>
+		<description>Zanac EX (Japan)</description>
 		<year>1986</year>
 		<publisher>Pony</publisher>
 		<info name="alt_title" value="ザナック EX" />
@@ -1577,7 +1577,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="zoids">
-		<description>Zoids - Chuuou Tairiku no Tatakai (Jpn)</description>
+		<description>Zoids - Chuuou Tairiku no Tatakai (Japan)</description>
 		<year>1988</year>
 		<publisher>Toshiba EMI</publisher>
 		<info name="alt_title" value="ゾイド 中央大陸の戦い" />
@@ -1592,7 +1592,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="zukkoke">
-		<description>Zukkoke Yajikita Onmitsu Douchuu (Jpn)</description>
+		<description>Zukkoke Yajikita Onmitsu Douchuu (Japan)</description>
 		<year>1987</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="alt_title" value="ずっこけやじきた隠密道中" />
@@ -1610,7 +1610,7 @@ LZ93A13 (32 pin) - 8KB banks
 <!-- Additional dumps from nointro, to be verified! -->
 
 	<software name="1942">
-		<description>1942 (Jpn)</description>
+		<description>1942 (Japan)</description>
 		<year>1987</year>
 		<publisher>ASCII</publisher>
 		<part name="cart" interface="msx_cart">
@@ -1623,7 +1623,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="1942k" cloneof="1942">
-		<description>1942 (Kor)</description>
+		<description>1942 (Korea)</description>
 		<year>1987</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
@@ -1636,7 +1636,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="acrojet">
-		<description>AcroJet (Jpn)</description>
+		<description>AcroJet (Japan)</description>
 		<year>1988</year>
 		<publisher>System Soft</publisher>
 		<info name="alt_title" value="アクロジェット" />
@@ -1650,7 +1650,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="algtsub">
-		<description>Algeese no Tsubasa (Jpn)</description>
+		<description>Algeese no Tsubasa (Japan)</description>
 		<year>1988</year>
 		<publisher>Kogado</publisher>
 		<info name="alt_title" value="アルギースの翼" />
@@ -1678,7 +1678,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="amesoccr">
-		<description>American Soccer (Jpn)</description>
+		<description>American Soccer (Japan)</description>
 		<year>1987</year>
 		<publisher>Nidecom</publisher>
 		<info name="alt_title" value="アメリカンサッカー" />
@@ -1692,7 +1692,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="androgyna" cloneof="androgyn">
-		<description>Han Seimei Senki Androgynus (Jpn, Alt)</description>
+		<description>Han Seimei Senki Androgynus (Japan, alt)</description>
 		<year>1988</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="反生命戦機アンドロギュヌス" />
@@ -1720,7 +1720,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="arctic">
-		<description>Arctic - Active Rail Playing (Jpn)</description>
+		<description>Arctic - Active Rail Playing (Japan)</description>
 		<year>1989</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="アークティック" />
@@ -1734,7 +1734,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="arctica" cloneof="arctic">
-		<description>Arctic - Active Rail Playing (Jpn, Alt)</description>
+		<description>Arctic - Active Rail Playing (Japan, alt)</description>
 		<year>1989</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="アークティック" />
@@ -1750,7 +1750,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="bublbobla" cloneof="bublbobl">
-		<description>Bubble Bobble (Jpn, Alt)</description>
+		<description>Bubble Bobble (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Taito</publisher>
 		<info name="alt_title" value="バブルボブル" />
@@ -1765,7 +1765,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="contra">
-		<description>Contra (Jpn)</description>
+		<description>Contra (Japan)</description>
 		<year>1989</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="魂斗羅" />
@@ -1779,7 +1779,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="drwn4078a" cloneof="drwn4078">
-		<description>Darwin 4078 (Jpn, Alt)</description>
+		<description>Darwin 4078 (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="alt_title" value="ダーウィン4078" />
@@ -1793,7 +1793,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="drwn4078b" cloneof="drwn4078">
-		<description>Darwin 4078 (Jpn, Alt 2)</description>
+		<description>Darwin 4078 (Japan, alt 2)</description>
 		<year>1987</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="alt_title" value="ダーウィン4078" />
@@ -1807,7 +1807,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="dforest">
-		<description>Deep Forest (Jpn)</description>
+		<description>Deep Forest (Japan)</description>
 		<year>1987</year>
 		<publisher>Xain Soft</publisher>
 		<info name="alt_title" value="ディープフォレスト" />
@@ -1821,7 +1821,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="dforesta" cloneof="dforest">
-		<description>Deep Forest (Jpn, Alt)</description>
+		<description>Deep Forest (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Xain Soft</publisher>
 		<info name="alt_title" value="ディープフォレスト" />
@@ -1835,7 +1835,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="dquest2a" cloneof="dquest2">
-		<description>Dragon Quest II - Akuryou no Kamigami (Jpn, Alt)</description>
+		<description>Dragon Quest II - Akuryou no Kamigami (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Enix</publisher>
 		<info name="alt_title" value="ドラゴンクエストII 悪霊の神々" />
@@ -1851,7 +1851,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- Doesn't boot in msx2 driver, works in some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="dslayer4a" cloneof="dslayer4">
-		<description>Dragon Slayer IV - Drasle Family (Jpn, Alt)</description>
+		<description>Dragon Slayer IV - Drasle Family (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Nihon Falcom</publisher>
 		<info name="alt_title" value="ドラゴンスレイヤーIV" />
@@ -1866,7 +1866,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="druid">
-		<description>Druid (Jpn)</description>
+		<description>Druid (Japan)</description>
 		<year>1988</year>
 		<publisher>Jaleco</publisher>
 		<info name="alt_title" value="ドルイド" />
@@ -1880,7 +1880,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="druida" cloneof="druid">
-		<description>Druid (Jpn, Alt)</description>
+		<description>Druid (Japan, alt)</description>
 		<year>1988</year>
 		<publisher>Jaleco</publisher>
 		<info name="alt_title" value="ドルイド" />
@@ -1894,7 +1894,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="dynabowla" cloneof="dynabowl">
-		<description>Dynamite Bowl (Jpn, Alt)</description>
+		<description>Dynamite Bowl (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Toshiba EMI</publisher>
 		<info name="alt_title" value="ダイナマイトボウル" />
@@ -1910,7 +1910,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="elthlead">
-		<description>Elthlead (Jpn)</description>
+		<description>Elthlead (Japan)</description>
 		<year>1988</year>
 		<publisher>NCS</publisher>
 		<info name="alt_title" value="エルスリード" />
@@ -1927,7 +1927,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="fantzon2a" cloneof="fantzon2">
-		<description>Fantasy Zone II - The Tears of Opa-Opa (Jpn, Alt)</description>
+		<description>Fantasy Zone II - The Tears of Opa-Opa (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ファンタジーゾーンII ～オパオパの涙～" />
@@ -1941,7 +1941,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="gakumono">
-		<description>Gakuen Monogatari - High School Story (Jpn)</description>
+		<description>Gakuen Monogatari - High School Story (Japan)</description>
 		<year>1988</year>
 		<publisher>Great</publisher>
 		<info name="alt_title" value="学園物語" />
@@ -1955,7 +1955,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="garyuou">
-		<description>Garyuu Ou (Jpn)</description>
+		<description>Garyuu Ou (Japan)</description>
 		<year>1987</year>
 		<publisher>Xain Soft</publisher>
 		<info name="alt_title" value="牙龍王" />
@@ -1969,7 +1969,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="garyuoua" cloneof="garyuou">
-		<description>Garyuu Ou (Jpn, Alt)</description>
+		<description>Garyuu Ou (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Xain Soft</publisher>
 		<info name="alt_title" value="牙龍王" />
@@ -1985,7 +1985,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- works only some times in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="gekipenn">
-		<description>Gekitotsu Pennant Race - The Pro Yakyuu (Jpn)</description>
+		<description>Gekitotsu Pennant Race - The Pro Yakyuu (Japan)</description>
 		<year>1988</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ＴＨＥプロ野球 激突ペナントレース" />
@@ -2002,7 +2002,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- works only some times in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="gekipenna" cloneof="gekipenn">
-		<description>Gekitotsu Pennant Race - The Pro Yakyuu (Jpn, Alt)</description>
+		<description>Gekitotsu Pennant Race - The Pro Yakyuu (Japan, alt)</description>
 		<year>1988</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ＴＨＥプロ野球 激突ペナントレース" />
@@ -2019,7 +2019,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- works only some times in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="gekipennb" cloneof="gekipenn">
-		<description>Gekitotsu Pennant Race - The Pro Yakyuu (Jpn, Alt 2)</description>
+		<description>Gekitotsu Pennant Race - The Pro Yakyuu (Japan, alt 2)</description>
 		<year>1988</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ＴＨＥプロ野球 激突ペナントレース" />
@@ -2036,7 +2036,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- works only some times in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="gekipennc" cloneof="gekipenn">
-		<description>Gekitotsu Pennant Race - The Pro Yakyuu (Jpn, Alt 3)</description>
+		<description>Gekitotsu Pennant Race - The Pro Yakyuu (Japan, alt 3)</description>
 		<year>1988</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ＴＨＥプロ野球 激突ペナントレース" />
@@ -2051,7 +2051,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="gekipen2">
-		<description>Gekitotsu Pennant Race 2 (Jpn)</description>
+		<description>Gekitotsu Pennant Race 2 (Japan)</description>
 		<year>1989</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="激突ペナントレース2" />
@@ -2065,7 +2065,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ggoemon">
-		<description>Ganbare Goemon! Karakuri Douchuu (Jpn)</description>
+		<description>Ganbare Goemon! Karakuri Douchuu (Japan)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="がんばれゴエモン!からくり道中" />
@@ -2079,7 +2079,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="hacker">
-		<description>Hacker (Jpn)</description>
+		<description>Hacker (Japan)</description>
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ハッカー" />
@@ -2093,7 +2093,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="hainomaj">
-		<description>Hai no Majutsushi (Jpn)</description>
+		<description>Hai no Majutsushi (Japan)</description>
 		<year>1989</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="牌の魔術師" />
@@ -2108,7 +2108,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<!-- the version with Japanese text only works fine on some Japanese machines, like hbf1 or hbf12 -->
 	<software name="herolanc">
-		<description>Heroes of the Lance (Jpn)</description>
+		<description>Heroes of the Lance (Japan)</description>
 		<year>1991</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="usage" value="Requires a Japanese system for the Japanese text" />
@@ -2126,7 +2126,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<!-- the Japanese text only works fine on Japanese machines, like hbf1 or hbf12 -->
 	<software name="higemaru">
-		<description>Higemaru Makaijima - Nanatsu no Shima Daibouken (Jpn)</description>
+		<description>Higemaru Makaijima - Nanatsu no Shima Daibouken (Japan)</description>
 		<year>1987</year>
 		<publisher>Capcom</publisher>
 		<info name="usage" value="Requires a Japanese system" />
@@ -2141,7 +2141,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="highsc">
-		<description>High School! Kimengumi (Jpn)</description>
+		<description>High School! Kimengumi (Japan)</description>
 		<year>1987</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ハイスクール!奇面組" />
@@ -2155,7 +2155,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="hinotori">
-		<description>Hi no Tori - Houou-hen (Jpn)</description>
+		<description>Hi no Tori - Houou-hen (Japan)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="火の鳥鳳凰編" />
@@ -2169,7 +2169,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="hinotoria" cloneof="hinotori">
-		<description>Hi no Tori - Houou-hen (Jpn, Alt)</description>
+		<description>Hi no Tori - Houou-hen (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="火の鳥鳳凰編" />
@@ -2183,7 +2183,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="hinotorib" cloneof="hinotori">
-		<description>Hi no Tori - Houou-hen (Jpn, Alt 2)</description>
+		<description>Hi no Tori - Houou-hen (Japan, alt 2)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="火の鳥鳳凰編" />
@@ -2197,7 +2197,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="holein1sa" cloneof="holein1s">
-		<description>Hole in One Special (Jpn, Alt)</description>
+		<description>Hole in One Special (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="alt_title" value="ホール・イン・ワン スペシャル" />
@@ -2213,7 +2213,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="ikari">
-		<description>Ikari (Jpn)</description>
+		<description>Ikari (Japan)</description>
 		<year>1987</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="怒" />
@@ -2230,7 +2230,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="ikaria" cloneof="ikari">
-		<description>Ikari (Jpn, Alt)</description>
+		<description>Ikari (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="怒" />
@@ -2245,7 +2245,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="jansei">
-		<description>Jansei (Jpn)</description>
+		<description>Jansei (Japan)</description>
 		<year>1986</year>
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="雀聖" />
@@ -2261,7 +2261,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="janseia" cloneof="jansei">
-		<description>Jansei (Jpn, Alt)</description>
+		<description>Jansei (Japan, alt)</description>
 		<year>1986</year>
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="雀聖" />
@@ -2277,7 +2277,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="kempelen">
-		<description>Kempelen Chess (Jpn)</description>
+		<description>Kempelen Chess (Japan)</description>
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ケンペレンチェス" />
@@ -2291,7 +2291,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="kingkon2">
-		<description>King Kong 2 - Yomigaeru Densetsu (Jpn)</description>
+		<description>King Kong 2 - Yomigaeru Densetsu (Japan)</description>
 		<year>1986</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="キングコング2 甦る伝説" />
@@ -2305,7 +2305,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="kingkon2k" cloneof="kingkon2">
-		<description>King Kong 2 - Yomigaeru Densetsu (Kor)</description>
+		<description>King Kong 2 - Yomigaeru Densetsu (Korea)</description>
 		<year>1987</year>
 		<publisher>Zemina</publisher>
 		<part name="cart" interface="msx_cart">
@@ -2318,7 +2318,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="kororift">
-		<description>Koronis Rift (Jpn)</description>
+		<description>Koronis Rift (Japan)</description>
 		<year>1987</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="コロニスリフト" />
@@ -2333,7 +2333,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<!-- the Japanese text only works fine on Japanese machines, like hbf1 or hbf12 -->
 	<software name="labyrint">
-		<description>Labyrinth (Jpn)</description>
+		<description>Labyrinth (Japan)</description>
 		<year>1987</year>
 		<publisher>Pack-In Video</publisher>
 		<info name="alt_title" value="ラビリンス" />
@@ -2349,7 +2349,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<!-- the Japanese text only works fine on Japanese machines, like hbf1 or hbf12 -->
 	<software name="labyrinta" cloneof="labyrint">
-		<description>Labyrinth (Jpn, Alt)</description>
+		<description>Labyrinth (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Pack-In Video</publisher>
 		<info name="alt_title" value="ラビリンス" />
@@ -2364,7 +2364,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="lupin2">
-		<description>Lupin Sansei - Babylon no Ougon Densetsu (Jpn)</description>
+		<description>Lupin Sansei - Babylon no Ougon Densetsu (Japan)</description>
 		<year>1988</year>
 		<publisher>Toho</publisher>
 		<info name="alt_title" value="ルパン3 世バビロンの黄金伝説" />
@@ -2378,7 +2378,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="lupin2a" cloneof="lupin2">
-		<description>Lupin Sansei - Babylon no Ougon Densetsu (Jpn, Alt)</description>
+		<description>Lupin Sansei - Babylon no Ougon Densetsu (Japan, alt)</description>
 		<year>1988</year>
 		<publisher>Toho</publisher>
 		<info name="alt_title" value="ルパン3 世バビロンの黄金伝説" />
@@ -2394,7 +2394,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="lupina" cloneof="lupin">
-		<description>Lupin Sansei - Cagliostro no Shiro (Jpn, Alt)</description>
+		<description>Lupin Sansei - Cagliostro no Shiro (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Toho</publisher>
 		<info name="alt_title" value="ルパン三世 カリオストロの城" />
@@ -2411,7 +2411,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="madrider">
-		<description>Mad Rider (Jpn)</description>
+		<description>Mad Rider (Japan)</description>
 		<year>1987</year>
 		<publisher>Carry Lab</publisher>
 		<info name="alt_title" value="マッドライダー" />
@@ -2428,7 +2428,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="madridera" cloneof="madrider">
-		<description>Mad Rider (Jpn, Alt)</description>
+		<description>Mad Rider (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Carry Lab</publisher>
 		<info name="alt_title" value="マッドライダー" />
@@ -2443,7 +2443,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="malayahi">
-		<description>Malaya no Hihou (Jpn)</description>
+		<description>Malaya no Hihou (Japan)</description>
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="マラヤの秘宝" />
@@ -2459,7 +2459,7 @@ LZ93A13 (32 pin) - 8KB banks
 <!-- Legit or fan translated??? -->
 	<!-- Konami -->
 	<software name="mgear">
-		<description>Metal Gear (Euro?)</description>
+		<description>Metal Gear (Europe?)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="msx_cart">
@@ -2474,7 +2474,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- does not work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="mgearj" cloneof="mgear">
-		<description>Metal Gear (Jpn)</description>
+		<description>Metal Gear (Japan)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="メタルギア" />
@@ -2489,7 +2489,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="mgearjvc" cloneof="mgear">
-		<description>Metal Gear (Jpn, Virtual Console)</description>
+		<description>Metal Gear (Japan, Virtual Console)</description>
 		<year>2010</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="メタルギア" />
@@ -2504,7 +2504,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="mgear2ss">
-		<description>Metal Gear 2 - Solid Snake (Jpn)</description>
+		<description>Metal Gear 2 - Solid Snake (Japan)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ソリッドスネークメタルギア2" />
@@ -2518,7 +2518,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="mgear2ssd" cloneof="mgear2ss">
-		<description>Metal Gear 2 - Solid Snake (Demo) (Jpn)</description>
+		<description>Metal Gear 2 - Solid Snake (demo) (Japan)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ソリッドスネークメタルギア2" />
@@ -2532,7 +2532,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="mgear2ssvc" cloneof="mgear2ss">
-		<description>Metal Gear 2 - Solid Snake (Jpn, Virtual Console)</description>
+		<description>Metal Gear 2 - Solid Snake (Japan, Virtual Console)</description>
 		<year>2010</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ソリッドスネークメタルギア2" />
@@ -2546,7 +2546,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="mirai">
-		<description>Mirai (Jpn)</description>
+		<description>Mirai (Japan)</description>
 		<year>1987</year>
 		<publisher>Xain Soft</publisher>
 		<info name="alt_title" value="未来" />
@@ -2560,7 +2560,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="nekkejud">
-		<description>Nekketsu Juudou (Jpn)</description>
+		<description>Nekketsu Juudou (Japan)</description>
 		<year>1989</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="熱血柔道" />
@@ -2574,7 +2574,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="nekkejuda" cloneof="nekkejud">
-		<description>Nekketsu Juudou (Jpn, Alt)</description>
+		<description>Nekketsu Juudou (Japan, alt)</description>
 		<year>1989</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="熱血柔道" />
@@ -2588,7 +2588,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ogrea" cloneof="ogre">
-		<description>Ogre (Jpn, Alt)</description>
+		<description>Ogre (Japan, alt)</description>
 		<year>1986</year>
 		<publisher>System Soft</publisher>
 		<info name="alt_title" value="オーガ" />
@@ -2602,7 +2602,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ouketani">
-		<description>Ouke no Tani - El Giza no Fuuin (Jpn)</description>
+		<description>Ouke no Tani - El Giza no Fuuin (Japan)</description>
 		<year>1988</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="エルギーザの封印" />
@@ -2616,7 +2616,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ouketaniec" cloneof="ouketani">
-		<description>Ouke no Tani - El Giza no Fuuin - Edit Contest Yuushuu Sakuhinshuu (Jpn)</description>
+		<description>Ouke no Tani - El Giza no Fuuin - Edit Contest Yuushuu Sakuhinshuu (Japan)</description>
 		<year>1988</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="エルギーザの封印" />
@@ -2630,7 +2630,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="outrun">
-		<description>Out Run (Jpn)</description>
+		<description>Out Run (Japan)</description>
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="アウトラン" />
@@ -2644,7 +2644,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="pachipro">
-		<description>Pachi Pro Densetsu (Jpn)</description>
+		<description>Pachi Pro Densetsu (Japan)</description>
 		<year>1988</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="alt_title" value="パチプロ伝説" />
@@ -2658,7 +2658,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="penguin2">
-		<description>Penguin-kun Wars 2 (Jpn)</description>
+		<description>Penguin-kun Wars 2 (Japan)</description>
 		<year>1988</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="ぺんぎんくんウォーズ２" />
@@ -2672,7 +2672,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="penguin2a" cloneof="penguin2">
-		<description>Penguin-kun Wars 2 (Jpn, Alt)</description>
+		<description>Penguin-kun Wars 2 (Japan, alt)</description>
 		<year>1988</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="ぺんぎんくんウォーズ２" />
@@ -2686,7 +2686,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="predator">
-		<description>Predator (Jpn)</description>
+		<description>Predator (Japan)</description>
 		<year>1988</year>
 		<publisher>Pack-In Video</publisher>
 		<info name="alt_title" value="プレデター" />
@@ -2700,7 +2700,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="quarth">
-		<description>Quarth (Jpn)</description>
+		<description>Quarth (Japan)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="クォース" />
@@ -2714,7 +2714,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="quarthk" cloneof="quarth">
-		<description>Quarth (Kor)</description>
+		<description>Quarth (Korea)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="msx_cart">
@@ -2727,7 +2727,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="quarthd" cloneof="quarth">
-		<description>Quarth (Demo) (Jpn)</description>
+		<description>Quarth (demo) (Japan)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="クォース" />
@@ -2741,7 +2741,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ricktomi">
-		<description>Rick to Mick no Daibouken (Jpn)</description>
+		<description>Rick to Mick no Daibouken (Japan)</description>
 		<year>1987</year>
 		<publisher>HummingBird</publisher>
 		<info name="alt_title" value="りっくとみっくの大冒険" />
@@ -2756,7 +2756,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<!-- the Japanese text only works fine on Japanese machines, like hbf1 or hbf12 -->
 	<software name="sangokus">
-		<description>Sangokushi (Jpn)</description>
+		<description>Sangokushi (Japan)</description>
 		<year>1988</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="三國志" />
@@ -2773,7 +2773,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="sanpei">
-		<description>Tsuri Kichi Sanpei - Blue Marlin Hen (Jpn)</description>
+		<description>Tsuri Kichi Sanpei - Blue Marlin Hen (Japan)</description>
 		<year>1988</year>
 		<publisher>Victor Ongaku Sangyou</publisher>
 		<info name="alt_title" value="釣りキチ三平ブルーマリン編" />
@@ -2789,7 +2789,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="sanpei2">
-		<description>Tsuri Kichi Sanpei - Tsuri Sennin Hen (Jpn)</description>
+		<description>Tsuri Kichi Sanpei - Tsuri Sennin Hen (Japan)</description>
 		<year>1989</year>
 		<publisher>Victor Ongaku Sangyou</publisher>
 		<info name="alt_title" value="釣りキチ三平ブルーマリン編" />
@@ -2804,7 +2804,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="seikima2a" cloneof="seikima2">
-		<description>Seikima II Special - Akuma no Gyakushuu (Jpn, Alt)</description>
+		<description>Seikima II Special - Akuma no Gyakushuu (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="聖飢魔IIスペシャル 悪魔の逆襲" />
@@ -2818,7 +2818,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="shanghai">
-		<description>Shanghai (Jpn)</description>
+		<description>Shanghai (Japan)</description>
 		<year>1987</year>
 		<publisher>System Soft</publisher>
 		<info name="alt_title" value="上海" />
@@ -2832,7 +2832,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="spmanbow">
-		<description>Space Manbow (Jpn)</description>
+		<description>Space Manbow (Japan)</description>
 		<year>1989</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="スペースマンボウ" />
@@ -2847,7 +2847,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<!-- the Japanese text only works fine on Japanese machines, like hbf1 or hbf12 -->
 	<software name="srambosp">
-		<description>Super Rambo Special (Jpn)</description>
+		<description>Super Rambo Special (Japan)</description>
 		<year>1986</year>
 		<publisher>Pack-In Video</publisher>
 		<info name="alt_title" value="スーパーランボースペシャル" />
@@ -2862,7 +2862,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="starvirg">
-		<description>Star Virgin (Jpn)</description>
+		<description>Star Virgin (Japan)</description>
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="スターヴァージン" />
@@ -2876,7 +2876,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="starvirga" cloneof="starvirg">
-		<description>Star Virgin (Jpn, Alt)</description>
+		<description>Star Virgin (Japan, alt)</description>
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="スターヴァージン" />
@@ -2890,7 +2890,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="sloderun">
-		<description>Super Lode Runner (Jpn)</description>
+		<description>Super Lode Runner (Japan)</description>
 		<year>1987</year>
 		<publisher>Irem</publisher>
 		<info name="alt_title" value="スーパーロードランナー" />
@@ -2906,7 +2906,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="tkshogi2">
-		<description>Tanigawa Kouji no Shougi Shinan II (Jpn)</description>
+		<description>Tanigawa Kouji no Shougi Shinan II (Japan)</description>
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="谷川浩司の将棋指南II" />
@@ -2923,7 +2923,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="usas">
-		<description>The Treasure of Usas (Euro) ~ Uşas (Jpn)</description>
+		<description>The Treasure of Usas (Europe) ~ Uşas (Japan)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ウシャス" />
@@ -2937,7 +2937,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="usasa" cloneof="usas">
-		<description>The Treasure of Usas (Euro) ~ Uşas (Jpn) (Alt)</description>
+		<description>The Treasure of Usas (Europe) ~ Uşas (Japan) (alt)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ウシャス" />
@@ -2951,7 +2951,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="vampkill">
-		<description>Vampire Killer (Euro) ~ Akumajou Dracula (Jpn)</description>
+		<description>Vampire Killer (Europe) ~ Akumajou Dracula (Japan)</description>
 		<year>1986</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="悪魔城ドラキュラ" />
@@ -2965,7 +2965,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="vampkill1" cloneof="vampkill">
-		<description>Vampire Killer (Euro) ~ Akumajou Dracula (Jpn) (Alt)</description>
+		<description>Vampire Killer (Europe) ~ Akumajou Dracula (Japan) (alt)</description>
 		<year>1986</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="悪魔城ドラキュラ" />
@@ -2979,7 +2979,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="vampkill2" cloneof="vampkill">
-		<description>Vampire Killer (Euro) ~ Akumajou Dracula (Jpn) (Alt 2)</description>
+		<description>Vampire Killer (Europe) ~ Akumajou Dracula (Japan) (alt 2)</description>
 		<year>1986</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="悪魔城ドラキュラ" />
@@ -2993,7 +2993,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="vampkill3" cloneof="vampkill">
-		<description>Vampire Killer (Euro) ~ Akumajou Dracula (Jpn) (Alt 3)</description>
+		<description>Vampire Killer (Europe) ~ Akumajou Dracula (Japan) (alt 3)</description>
 		<year>1986</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="悪魔城ドラキュラ" />
@@ -3008,7 +3008,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<!-- the Japanese text only works fine on Japanese machines, like hbf1 or hbf12 -->
 	<software name="wizardry" supported="partial">
-		<description>Wizardry - Proving Grounds of Mad Overlord! (Jpn)</description>
+		<description>Wizardry - Proving Grounds of Mad Overlord! (Japan)</description>
 		<year>1988</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="ウィザードリィ" />
@@ -3025,7 +3025,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="woodypoca" cloneof="woodypoc">
-		<description>Woody Poco (Jpn, Alt)</description>
+		<description>Woody Poco (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>dB-Soft</publisher>
 		<info name="alt_title" value="うっでぃぽこ" />
@@ -3039,7 +3039,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="xeviousa" cloneof="xevious">
-		<description>Xevious - Fardraut Saga (Jpn, Alt)</description>
+		<description>Xevious - Fardraut Saga (Japan, alt)</description>
 		<year>1989</year>
 		<publisher>Namco</publisher>
 		<info name="alt_title" value="ゼビウス ファードラウト伝説" />
@@ -3053,7 +3053,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="zanacexa" cloneof="zanacex">
-		<description>Zanac EX (Jpn, Alt)</description>
+		<description>Zanac EX (Japan, alt)</description>
 		<year>1986</year>
 		<publisher>Pony</publisher>
 		<info name="alt_title" value="ザナック EX" />
@@ -3067,7 +3067,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="zombihun">
-		<description>Zombie Hunter (Jpn)</description>
+		<description>Zombie Hunter (Japan)</description>
 		<year>1989</year>
 		<publisher>Hi-Score Software</publisher>
 		<info name="alt_title" value="ゾンビハンター" />
@@ -3081,7 +3081,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="zukkokea" cloneof="zukkoke">
-		<description>Zukkoke Yajikita Onmitsu Douchuu (Jpn, Alt)</description>
+		<description>Zukkoke Yajikita Onmitsu Douchuu (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="alt_title" value="ずっこけやじきた隠密道中" />
@@ -3100,7 +3100,7 @@ LZ93A13 (32 pin) - 8KB banks
 	<!-- Non-Games -->
 
 	<software name="testcart" supported="no">
-		<description>Service Test Cart MSX2 (Euro?)</description>
+		<description>Service Test Cart MSX2 (Europe?)</description>
 		<year>19??</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="msx_cart">
@@ -3112,7 +3112,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="cheese2">
-		<description>Cheese 2 (Jpn)</description>
+		<description>Cheese 2 (Japan)</description>
 		<year>1985</year>
 		<publisher>Neos</publisher>
 		<part name="cart" interface="msx_cart">
@@ -3125,7 +3125,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 <!-- Needs Kanji rom? -->
 	<software name="msxwrit2" supported="no">
-		<description>Japanese MSX-Write II (Jpn)</description>
+		<description>Japanese MSX-Write II (Japan)</description>
 		<year>1988</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="日本語ＭＳＸ－ＷｒｉｔｅII" />
@@ -3141,7 +3141,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="synthsar">
-		<description>Synthe Saurus v1.1 (Jpn)</description>
+		<description>Synthe Saurus v1.1 (Japan)</description>
 		<year>1988</year>
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="シンセサウルス" />

@@ -162,6 +162,9 @@ PCB - German Version:
 #include "screen.h"
 #include "softlist_dev.h"
 
+
+namespace {
+
 #define KEYBOARD_QUEUE_SIZE     0x80
 
 class geniusiq_state : public driver_device
@@ -761,6 +764,9 @@ ROM_START( itunlim )
 	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_LOAD( "27-06124-002.u3", 0x000000, 0x200000, CRC(0c0753ce) SHA1(d22504d583ca8d6a9d2f56fbaa3e1d52c442a1e9) )
 ROM_END
+
+} // anonymous namespace
+
 
 // Drivers
 

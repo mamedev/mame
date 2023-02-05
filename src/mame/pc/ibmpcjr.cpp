@@ -29,6 +29,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class pcjr_state : public driver_device
 {
 public:
@@ -722,6 +724,9 @@ ROM_START( ibmpcjx )
 	ROM_REGION(0x38000,"kanji", 0)
 	ROM_LOAD("kanji.rom",     0x00000, 0x38000, BAD_DUMP CRC(eaa6e3c3) SHA1(35554587d02d947fae8446964b1886fff5c9d67f)) // hand-made rom
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS       INIT        COMPANY                            FULLNAME     FLAGS
 COMP( 1983, ibmpcjr, ibm5150, 0,      ibmpcjr, ibmpcjr, pcjr_state, empty_init, "International Business Machines", "IBM PC Jr", MACHINE_IMPERFECT_COLORS )

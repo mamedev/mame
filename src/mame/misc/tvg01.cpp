@@ -63,6 +63,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class tvg01_state : public driver_device
 {
 public:
@@ -327,6 +329,8 @@ ROM_START(theboat)
 	ROM_LOAD("5.ic14", 0x8000, 0x4000, CRC(7899a587) SHA1(13cbb7e837e14bc49d8b34dbf876b666cdf48979))
 	// Empty socket for one more ROM (IC16),
 ROM_END
+
+} // anonymous namespace
 
 
 //   YEAR  NAME      PARENT  MACHINE   INPUT     STATE        INIT        ROT    COMPANY            FULLNAME   FLAGS

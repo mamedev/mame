@@ -111,7 +111,7 @@ menu_cheat::menu_cheat(mame_ui_manager &mui, render_container &container) : menu
 	set_process_flags(PROCESS_LR_REPEAT);
 }
 
-void menu_cheat::populate(float &customtop, float &custombottom)
+void menu_cheat::populate()
 {
 	/* iterate over cheats */
 	std::string text;

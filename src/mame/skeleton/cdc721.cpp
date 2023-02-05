@@ -24,6 +24,8 @@ Control Data Corporation CDC 721 Terminal (Viking)
 #include "screen.h"
 
 
+namespace {
+
 class cdc721_state : public driver_device
 {
 public:
@@ -416,5 +418,8 @@ ROM_START( cdc721 )
 	ROM_LOAD( "66315369.bin", 0x0000, 0x2000, CRC(224d3368) SHA1(e335ef6cd56d77194235f5a2a7cf2af9ebf42342) )
 	ROM_LOAD( "66315370.bin", 0x2000, 0x2000, CRC(2543bf32) SHA1(1ac73a0e475d9fd86fba054e1a7a443d5bad1987) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1981, cdc721, 0, 0, cdc721, cdc721, cdc721_state, empty_init, "Control Data Corporation", "721 Display Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

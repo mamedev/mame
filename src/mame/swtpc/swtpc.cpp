@@ -101,6 +101,9 @@ Z Goto Prom (0xC000)
 #include "machine/ram.h"
 #include "bus/ss50/interface.h"
 
+
+namespace {
+
 class swtpc_state : public driver_device
 {
 public:
@@ -323,6 +326,9 @@ ROM_START( swtpcm )
 	ROM_REGION( 0x0400, "mcm6830", 0 )
 	ROM_LOAD("mikbug.bin", 0x0000, 0x0400, CRC(e7f4d9d0) SHA1(5ad585218f9c9c70f38b3c74e3ed5dfe0357621c))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

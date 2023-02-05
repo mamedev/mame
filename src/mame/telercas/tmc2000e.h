@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef MAME_INCLUDES_TMC2000E_H
-#define MAME_INCLUDES_TMC2000E_H
+#ifndef MAME_TELERCAS_TMC2000E_H
+#define MAME_TELERCAS_TMC2000E_H
 
 
 #include "cpu/cosmac/cosmac.h"
@@ -74,4 +74,4 @@ private:
 	output_finder<> m_led;
 };
 
-#endif
+#endif // MAME_TELERCAS_TMC2000E_H

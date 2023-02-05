@@ -8,8 +8,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_FMT_ICMEM_H
-#define MAME_MACHINE_FMT_ICMEM_H
+#ifndef MAME_FUJITSU_FMT_ICMEM_H
+#define MAME_FUJITSU_FMT_ICMEM_H
 
 #pragma once
 
@@ -60,4 +60,4 @@ private:
 DECLARE_DEVICE_TYPE(FMT_ICMEM, fmt_icmem_device)
 
 
-#endif  // MAME_MACHINE_FMT_ICMEM_H
+#endif  // MAME_FUJITSU_FMT_ICMEM_H

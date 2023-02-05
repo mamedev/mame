@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
 <softwarelist name="msx2_cass" description="MSX2 cassettes">
@@ -16,7 +16,7 @@ To verify:
 -->
 
 	<software name="chess2">
-		<description>The Chess Game 2 (Euro)</description>
+		<description>The Chess Game 2 (Europe)</description>
 		<year>1986</year>
 		<publisher>Eaglesoft</publisher>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
@@ -29,7 +29,7 @@ To verify:
 	</software>
 
 	<software name="leonardo">
-		<description>Leonardo (Jpn)</description>
+		<description>Leonardo (Japan)</description>
 		<year>1987</year>
 		<publisher>Omega System</publisher>
 		<info name="alt_title" value="レオナルド" />
@@ -43,7 +43,7 @@ To verify:
 	</software>
 
 	<software name="redlight">
-		<description>Red Lights of Amsterdam (Euro)</description>
+		<description>Red Lights of Amsterdam (Europe)</description>
 		<year>1986</year>
 		<publisher>Eaglesoft</publisher>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>
@@ -56,7 +56,7 @@ To verify:
 	</software>
 
 	<software name="redlighta" cloneof="redlight">
-		<description>Red Lights of Amsterdam (Euro, 2 Sides)</description>
+		<description>Red Lights of Amsterdam (Europe, 2 sides)</description>
 		<year>1986</year>
 		<publisher>Eaglesoft</publisher>
 		<info name="usage" value="Load with RUN&quot;CAS:&quot;"/>

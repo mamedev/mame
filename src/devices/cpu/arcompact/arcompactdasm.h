@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*********************************\
-
  ARCompact disassembler
 
 \*********************************/
@@ -33,235 +32,393 @@ public:
 	static const char *const opcodes_04[0x40];
 
 private:
-	int handle01_01_00_helper(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext);
-	int handle01_01_01_helper(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext);
 
-	int handle04_p00_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int ignore_dst, int b_reserved);
-	int handle04_p01_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int ignore_dst, int b_reserved);
-	int handle04_p10_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int b_reserved);
-	int handle04_p11_m0_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int b_reserved);
-	int handle04_p11_m1_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int b_reserved);
-	int handle04_p11_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int b_reserved);
-	int handle04_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int ignore_dst, int b_reserved);
-	int handle04_2f_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext);
-	int handle04_3x_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, int dsize, int extend);
-	int handle05_2f_0x_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext);
-	int handle0c_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext, int format);
-	int handle0d_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext);
-	int handle0e_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext, int revop);
-	int handle0f_00_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext);
-	int handle0f_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext, int nodst);
-	int handle_ld_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext, int shift, int swap);
-	int handle_l7_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext);
-	int handle18_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext, int st, int format);
-	int handle19_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext, int shift, int format);
-	int handle1d_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext);
-	int handle1e_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext);
-	int handle1e_03_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext);
+	static const int DASM_REG_LIMM = 62;
 
-	int handle00_00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle00_01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_00_00dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_00_01dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_00_00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_00_01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_00_02_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_00_03_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_00_04_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_00_05_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_00_0e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_00_0f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_01_00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_01_01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_01_02_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_01_03_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_01_04_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_01_05_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_01_0e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_01_0f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle02_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle03_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_02_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_03_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_04_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_05_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_06_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_07_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_08_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_09_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_0a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_0b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_0c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_0d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_0e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_0f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_10_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_11_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_12_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_13_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_14_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_15_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_16_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_17_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_18_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_19_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_1a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_1b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_1c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_1d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_20_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_21_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_22_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_23_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_28_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_29_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_02_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_03_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_04_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_05_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_06_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_07_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_08_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_09_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_0a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_0b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_0c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_02_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_03_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_04_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_05_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_30_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_31_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_32_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_33_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_34_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_35_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_36_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_37_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_02_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_03_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_04_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_05_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_06_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_07_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_08_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_0a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_0b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_28_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_29_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	// registers used in 16-bit opcodes have a limited range
+	// and can only address registers r0-r3 and r12-r15
+	static constexpr uint8_t expand_reg(uint8_t reg)
+	{
+		if (reg>3)
+			return reg + 8;
+		return reg;
+	}
 
-	int handle06_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle07_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle08_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle09_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle0a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle0b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static uint32_t dasm_get_limm_32bit_opcode(uint32_t pc, const data_buffer &opcodes)
+	{
+		return (opcodes.r16(pc + 4) << 16) | opcodes.r16(pc + 6);
+	}
 
-	int handle0c_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0c_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0c_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0c_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0d_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0d_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0d_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0d_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0e_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0e_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0e_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0e_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_00_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_00_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_00_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_00_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_00_06_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_00_07_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_00_07_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_00_07_04_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_00_07_05_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_00_07_06_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_00_07_07_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_04_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_05_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_06_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_07_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_0b_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_0c_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_0d_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_0e_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_0f_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_10_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_11_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_12_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_13_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_14_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_15_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_16_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_18_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_19_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_1a_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_1b_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_1c_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_1d_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_1e_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_1f_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle10_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle11_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle12_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle13_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle14_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle15_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle16_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle17_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle17_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle17_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle17_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle17_04_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle17_05_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle17_06_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle17_07_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_04_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_05_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_05_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_11_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_11_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle19_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle19_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle19_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle19_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1a_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1b_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1c_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1c_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1d_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1d_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1e_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1e_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1e_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1e_03_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1e_03_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1e_03_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1e_03_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1e_03_04_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1e_03_05_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1e_03_06_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1e_03_07_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1f_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static uint32_t dasm_get_limm_16bit_opcode(uint32_t pc, const data_buffer &opcodes)
+	{
+		return (opcodes.r16(pc + 2) << 16) | opcodes.r16(pc + 4);
+	}
+
+	static uint8_t dasm_group_0e_get_h(uint16_t &op)
+	{
+		uint8_t h = ((op & 0x0007) << 3);
+		h |= ((op & 0x00e0) >> 5);
+		return h;
+	}
+
+	static uint8_t dasm_common32_get_condition(uint32_t& op)
+	{
+		uint8_t condition = op & 0x0000001f;
+		return condition;
+	}
+
+	static uint8_t dasm_common32_get_breg(uint32_t &op)
+	{
+		int b_temp = (op & 0x07000000) >> 24;
+		int B_temp = (op & 0x00007000) >> 12;
+		int breg = b_temp | (B_temp << 3);
+		return breg;
+	}
+
+	static uint8_t dasm_common32_get_creg(uint32_t& op)
+	{
+		int creg = (op & 0x00000fc0) >> 6;
+		return creg;
+	}
+
+	static uint8_t dasm_common32_get_areg(uint32_t& op)
+	{
+		int areg = op & 0x0000003f;
+		return areg;
+	}
+
+	static uint8_t dasm_common32_get_areg_reserved(uint32_t &op)
+	{
+		int ares = op & 0x0000003f;
+		return ares;
+	}
+
+	static uint32_t dasm_common32_get_u6(uint32_t &op)
+	{
+		int u = (op & 0x00000fc0) >> 6;
+		return u;
+	}
+
+	static bool dasm_common32_get_F(uint32_t &op)
+	{
+		bool F = (op & 0x00008000) ? true : false;
+		return F;
+	}
+
+	static uint8_t dasm_common32_get_p(uint32_t &op)
+	{
+		int p = (op & 0x00c00000) >> 22;
+		return p;
+	}
+
+	static uint32_t dasm_common32_get_s12(uint32_t& op)
+	{
+		int S_temp = op & 0x0000003f;
+		int s_temp = (op & 0x00000fc0) >> 6;
+		int S = s_temp | (S_temp << 6);
+		S = util::sext(S, 12);
+		return S;
+	}
+
+	static uint8_t dasm_common16_get_breg(uint16_t &op)
+	{
+		uint8_t breg = ((op & 0x0700) >> 8);
+		return breg;
+	}
+
+	static uint8_t dasm_common16_get_creg(uint16_t& op)
+	{
+		uint8_t creg = ((op & 0x00e0) >> 5);
+		return creg;
+	}
+
+	static uint8_t dasm_common16_get_areg(uint16_t& op)
+	{
+		uint8_t areg = op & 0x0007;
+		return areg;
+	}
+
+	static uint32_t dasm_common16_get_u3(uint16_t& op)
+	{
+		uint32_t u = op & 0x0007;
+		return u;
+	}
+
+	static uint32_t dasm_common16_get_u5(uint16_t& op)
+	{
+		uint32_t u = op & 0x001f;
+		return u;
+	}
+
+	static uint32_t dasm_common16_get_u8(uint16_t& op)
+	{
+		uint32_t u = op & 0x00ff;
+		return u;
+	}
+
+	static uint32_t dasm_common16_get_u7(uint16_t& op)
+	{
+		uint32_t u = op & 0x007f;
+		return u;
+	}
+
+	static uint32_t dasm_common16_get_s9(uint16_t& op)
+	{
+		uint32_t s = op & 0x01ff;
+		s = util::sext(s, 9);
+		return s;
+	}
+
+	static void output_aux_regname(std::ostream& stream, uint32_t auxreg);
+
+	static int handle04_MOV_f_a_b_c_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle04_MOV_f_a_b_u6_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle04_MOV_f_b_b_s12_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle04_MOV_cc_f_b_b_c_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle04_MOV_cc_f_b_b_u6_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle04_MOV_p11_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle04_MOV_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+
+	static int handle01_01_00_helper(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext);
+	static int handle01_01_01_helper(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext);
+	static int handle04_f_a_b_c_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int ignore_dst, int b_reserved);
+	static int handle04_f_a_b_u6_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int ignore_dst, int b_reserved);
+	static int handle04_f_b_b_s12_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int b_reserved);
+	static int handle04_cc_f_b_b_c_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int b_reserved);
+	static int handle04_cc_f_b_b_u6_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int b_reserved);
+	static int handle04_p11_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int b_reserved);
+	static int handle04_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int ignore_dst, int b_reserved);
+	static int handle04_2f_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext);
+	static int handle04_3x_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, int dsize, int extend);
+	static int handle05_2f_0x_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext);
+	static int handle0c_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext, int format);
+	static int handle0d_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext);
+	static int handle0e_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext, int revop);
+	static int handle0f_00_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext);
+	static int handle0f_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext, int nodst);
+	static int handle_ld_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext, int shift, int swap);
+	static int handle_l7_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext);
+	static int handle18_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext, int st, int format);
+	static int handle19_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext, int shift, int format);
+	static int handle1d_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext);
+	static int handle1e_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext);
+	static int handle1e_03_0x_helper_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes, const char* optext);
+
+	static uint32_t get_01_01_01_address_offset(uint32_t op);
+	static int handle_dasm32_B_cc_D_s21(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_B_D_s25(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BL_cc_d_s21(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BL_d_s25(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BREQ_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BRNE_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BRLT_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BRGE_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BRLO_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BRHS_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BBIT0_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BBIT1_reg_reg(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BREQ_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BRNE_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BRLT_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BRGE_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BRLO_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BRHS_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BBIT0_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BBIT1_reg_imm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_LD_r_o(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_ST_r_o(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+
+	// ALU Operations, 0x04, [0x00-0x1F]
+	static int handle_dasm32_ADD(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_ADC(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_SUB(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_SBC(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_AND(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_OR(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BIC(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_XOR(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_MAX(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_MIN(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_MOV(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_TST(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_CMP(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_RCMP(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_RSUB(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BSET(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BCLR(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BTST(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BXOR(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BMSK(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_ADD1(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_ADD2(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_ADD3(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_SUB1(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_SUB2(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_SUB3(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_MPY(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_MPYH(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_MPYHU(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_MPYU(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	//
+	static int handle_dasm32_Jcc(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_Jcc_D(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_JLcc(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_JLcc_D(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_LP(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_FLAG(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_LR(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_SR(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_ASL_single(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_ASR_single(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_LSR_single(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_ROR_single(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_RRC(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_SEXB(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_SEXW(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_EXTB(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_EXTW(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_ABS(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_NOT(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_RLC(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_EX(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_SLEEP(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_SWI(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_SYNC(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_RTIE(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_BRK(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_LD_0(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_LD_1(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_LD_2(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_LD_3(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_LD_4(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_LD_5(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_LD_6(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_LD_7(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_ASL_multiple(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_LSR_multiple(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_ASR_multiple(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_ROR_multiple(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_MUL64(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_MULU64(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_ADDS(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_SUBS(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_DIVAW(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_ASLS(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_ASRS(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_ADDSDW(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_SUBSDW(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_SWAP(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_NORM(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_SAT16(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_RND16(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_ABSSW(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_ABSS(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_NEGSW(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_NEGS(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_NORMW(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_ARC_EXT06(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_USER_EXT07(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_USER_EXT08(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_MARKET_EXT09(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_MARKET_EXT0a(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm32_MARKET_EXT0b(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+
+	static int handle_dasm_LD_S_a_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_LDB_S_a_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_LDW_S_a_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ADD_S_a_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ADD_S_c_b_u3(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_SUB_S_c_b_u3(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ASL_S_c_b_u3(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ASR_S_c_b_u3(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ADD_S_b_b_h_or_limm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_MOV_S_b_h_or_limm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_CMP_S_b_h_or_limm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_MOV_S_h_b(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_J_S_b(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_J_S_D_b(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_JL_S_b(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_JL_S_D_b(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_SUB_S_NE_b_b_b(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_NOP_S(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_UNIMP_S(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_JEQ_S_blink(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_JNE_S_blink(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_J_S_blink(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_J_S_D_blink(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_SUB_S_b_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_AND_S_b_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_OR_S_b_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_BIC_S_b_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_XOR_S_b_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_TST_S_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_MUL64_S_0_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_SEXB_S_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_SEXW_S_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_EXTB_S_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_EXTW_S_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ABS_S_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_NOT_S_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_NEG_S_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ADD1_S_b_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ADD2_S_b_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ADD3_S_b_b_c(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ASL_S_b_b_c_multiple(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_LSR_S_b_b_c_multiple(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ASR_S_b_b_c_multiple(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ASL_S_b_c_single(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ASR_S_b_c_single(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_LSR_S_b_c_single(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_TRAP_S_u6(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_BRK_S(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_LD_S_c_b_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_LDB_S_c_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_LDW_S_c_b_u6(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_LDW_S_X_c_b_u6(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ST_S_c_b_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_STB_S_c_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_STW_S_c_b_u6(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ASL_S_b_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_LSR_S_b_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ASR_S_b_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_SUB_S_b_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_BSET_S_b_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_BCLR_S_b_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_BMSK_S_b_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_BTST_S_b_u5(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_LD_S_b_sp_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_LDB_S_b_sp_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ST_S_b_sp_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_STB_S_b_sp_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ADD_S_b_sp_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ADD_S_sp_sp_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_SUB_S_sp_sp_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_POP_S_b(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_POP_S_blink(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_PUSH_S_b(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_PUSH_S_blink(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_LD_S_r0_gp_s11(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_LDB_S_r0_gp_s9(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_LDW_S_r0_gp_s10(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ADD_S_r0_gp_s11(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_LD_S_b_pcl_u10(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_MOV_S_b_u8(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_ADD_S_b_b_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_CMP_S_b_u7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_BREQ_S_b_0_s8(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_BRNE_S_b_0_s8(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_B_S_s10(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_BEQ_S_s10(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_BNE_S_s10(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_BGT_S_s7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_BGE_S_s7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_BLT_S_s7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_BLE_S_s7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_BHI_S_s7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_BHS_S_s7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_BLO_S_s7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_BLS_S_s7(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_BL_S_s13(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
 
 	/************************************************************************************************************************************
 	 *                                                                                                                                   *
@@ -269,453 +426,15 @@ private:
 	 *                                                                                                                                   *
 	 ************************************************************************************************************************************/
 
-	int handle01_01_00_06_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_00_07_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_00_08_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_00_09_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_00_0a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_00_0b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_00_0c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_00_0d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm_illegal(std::ostream &stream, offs_t pc, uint8_t param1, uint8_t param2, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_illegal(std::ostream &stream, offs_t pc, uint8_t param1, uint8_t param2, uint8_t param3, uint16_t op, const data_buffer &opcodes);
+	static int handle_dasm_illegal(std::ostream &stream, offs_t pc, uint8_t param1, uint8_t param2, uint8_t param3, uint8_t param4, uint16_t op, const data_buffer &opcodes);
 
-	int handle01_01_01_06_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_01_07_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_01_08_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_01_09_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_01_0a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_01_0b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_01_0c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_01_0d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm_illegal(std::ostream &stream, offs_t pc, uint8_t param1, uint8_t param2, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm_illegal(std::ostream &stream, offs_t pc, uint8_t param1, uint8_t param2, uint8_t param3, uint32_t op, const data_buffer &opcodes);
+	static int handle_dasm_illegal(std::ostream &stream, offs_t pc, uint8_t param1, uint8_t param2, uint8_t param3, uint8_t param4, uint32_t op, const data_buffer &opcodes);
 
-
-	int handle04_1e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_1f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-
-	int handle04_24_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_25_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_26_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_27_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-
-	int handle04_2c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-
-	int handle04_2f_0d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_0e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_0f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_10_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_11_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_12_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_13_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_14_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_15_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_16_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_17_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_18_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_19_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_1a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_1b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_1c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_1d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_1e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_1f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_20_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_21_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_22_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_23_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_24_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_25_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_26_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_27_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_28_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_29_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_2a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_2b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_2c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_2d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_2e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_2f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_30_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_31_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_32_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_33_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_34_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_35_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_36_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_37_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_38_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_39_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-
-	int handle04_2f_3f_00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_06_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_07_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_08_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_09_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_0a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_0b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_0c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_0d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_0e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_0f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_10_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_11_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_12_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_13_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_14_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_15_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_16_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_17_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_18_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_19_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_1a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_1b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_1c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_1d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_1e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_1f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_20_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_21_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_22_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_23_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_24_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_25_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_26_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_27_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_28_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_29_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_2a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_2b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_2c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_2d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_2e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_2f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_30_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_31_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_32_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_33_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_34_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_35_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_36_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_37_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_38_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_39_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_3a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_3b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_3c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_3d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_3e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_3f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-
-	int handle05_2f_00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_02_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_03_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_04_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_05_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_06_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_07_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_08_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_09_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_0a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_0b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_0c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_0d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_0e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_0f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_10_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_11_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_12_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_13_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_14_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_15_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_16_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_17_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_18_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_19_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_1a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_1b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_1c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_1d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_1e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_1f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_20_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_21_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_22_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_23_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_24_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_25_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_26_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_27_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_28_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_29_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_2a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_2b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_2c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_2d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_2e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_2f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_30_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_31_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_32_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_33_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_34_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_35_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_36_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_37_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_38_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_39_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-
-	int handle05_2f_3f_00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_02_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_03_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_04_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_05_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_06_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_07_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_08_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_09_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_0a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_0b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_0c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_0d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_0e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_0f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_10_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_11_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_12_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_13_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_14_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_15_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_16_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_17_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_18_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_19_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_1a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_1b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_1c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_1d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_1e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_1f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_20_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_21_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_22_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_23_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_24_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_25_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_26_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_27_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_28_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_29_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_2a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_2b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_2c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_2d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_2e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_2f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_30_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_31_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_32_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_33_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_34_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_35_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_36_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_37_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_38_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_39_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_3a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_3b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_3c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_3d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_3e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_3f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-
-
-	int handle04_38_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_39_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_3a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_3b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_3c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_3d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_3e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_3f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-
-	int handle05_09_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_0c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_0d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_0e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_0f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_10_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_11_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_12_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_13_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_14_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_15_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_16_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_17_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_18_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_19_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_1a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_1b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_1c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_1d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_1e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_1f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_20_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_21_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_22_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_23_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_24_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_25_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_26_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_27_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-
-	int handle05_2a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-
-	int handle05_30_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_31_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_32_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_33_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_34_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_35_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_36_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_37_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_38_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_39_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_3a_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_3b_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_3c_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_3d_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_3e_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_3f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-
-	int handle0f_00_04_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_00_05_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_00_07_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_00_07_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_01_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_08_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_09_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_0a_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_17_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-
-	int handle18_05_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_05_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_05_04_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_05_05_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_05_06_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_05_07_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_04_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_05_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_06_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_07_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_08_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_09_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_0a_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_0b_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_0c_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_0d_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_0e_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_0f_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_10_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_12_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_13_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_14_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_15_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_16_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_17_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_18_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_19_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_1a_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_1b_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_1c_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_1d_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_1e_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_1f_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_02_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_04_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_05_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_06_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_07_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_08_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_09_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_0a_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_0b_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_0c_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_0d_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_0e_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_0f_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_10_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_12_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_13_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_14_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_15_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_16_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_17_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_18_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_19_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_1a_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_1b_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_1c_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_1d_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_1e_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_1f_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-
-
-
-
-	int handle00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_00_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle01_01_01_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle04_2f_3f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-
-	int handle05_2f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-	int handle05_2f_3f_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes);
-
-
-	int handle0c_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0d_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0e_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_00_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle0f_00_07_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle17_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_05_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_06_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle18_07_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle19_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1c_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1d_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1e_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-	int handle1e_03_dasm(std::ostream &stream, offs_t pc, uint16_t op, const data_buffer &opcodes);
-
+	static int handle_dasm_reserved(std::ostream &stream, offs_t pc, uint8_t param1, uint8_t param2, uint8_t param3, uint8_t param4, uint32_t op, const data_buffer &opcodes);
 };
 
 #endif

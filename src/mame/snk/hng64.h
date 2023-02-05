@@ -1,7 +1,7 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner
-#ifndef MAME_INCLUDES_HNG64_H
-#define MAME_INCLUDES_HNG64_H
+#ifndef MAME_SNK_HNG64_H
+#define MAME_SNK_HNG64_H
 
 #pragma once
 
@@ -509,4 +509,4 @@ private:
 	void hng_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_HNG64_H
+#endif // MAME_SNK_HNG64_H

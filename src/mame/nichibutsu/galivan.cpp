@@ -14,7 +14,7 @@ Ninja Emaki (US)
 Youma Ninpou Chou (Japan)
 (c)1986 NihonBussan Co.,Ltd.
 Driver by
-Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/17 -
+Takahiro Nogi 1999/12/17 -
 
 TODO
 - Find out how layers are enabled\disabled
@@ -134,7 +134,9 @@ MB7114.2D - Fujitsu MB7114 256 x4-bit Bi-polar PROM (sprite look-up table)
 #include "galivan.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/rescap.h"
 #include "sound/dac.h"
+#include "sound/flt_biquad.h"
 #include "sound/ymopl.h"
 #include "speaker.h"
 
@@ -524,12 +526,10 @@ void galivan_state::video_config(machine_config &config)
 	m_screen->set_palette(m_palette);
 }
 
-void galivan_state::galivan(machine_config &config)
+void galivan_state::galivan_common(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(12'000'000)/2);      /* 6 MHz? */
-	m_maincpu->set_addrmap(AS_PROGRAM, &galivan_state::galivan_map);
-	m_maincpu->set_addrmap(AS_IO, &galivan_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(galivan_state::irq0_line_assert));
 
 	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(8'000'000)/2));      /* 4 MHz? */
@@ -537,24 +537,64 @@ void galivan_state::galivan(machine_config &config)
 	audiocpu.set_addrmap(AS_IO, &galivan_state::sound_io_map);
 	audiocpu.set_periodic_int(FUNC(galivan_state::irq0_line_hold), attotime::from_hz(XTAL(8'000'000)/2/512));   // ?
 
-	MCFG_MACHINE_START_OVERRIDE(galivan_state,galivan)
-	MCFG_MACHINE_RESET_OVERRIDE(galivan_state,galivan)
-
+	/* video hardware */
 	video_config(config);
-	MCFG_VIDEO_START_OVERRIDE(galivan_state,galivan)
-	m_screen->set_screen_update(FUNC(galivan_state::screen_update_galivan));
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galivan);
-	PALETTE(config, m_palette, FUNC(galivan_state::galivan_palette), 16*16+16*16+256*16, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM3526(config, "ymsnd", XTAL(8'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	// Note: The galivan filters are identical to the later Nichibutsu filters(armedf.cpp)
+	// with the sole exception of the mixing resistors and component locations.
+	// Mixing resistors:
+	// Yamaha - 1kohm = 0.6597 of total
+	// DAC1 - 4.7kohm = 0.1404 of total
+	// DAC2 - 3.3kohm = 0.1999 of total
+	// However, the actual volume output by the ym3014 dac and the r2r resistors
+	//  is not the same range on each!
+	// The YM3014 dac has a DC offset of 1/2 VDD, then +- 1/4 VDD of signal,
+	//  so min of 1.25v and max of 3.75v, vpp of 2.5v
+	// The R2R dacs are full range, min of 0v and max of (almost) 5v, vpp of ~5.0v
+	// Because of this, we have to compensate as MAME's ymfm core outputs full range.
+	// Math:
+	//  YMFM:  0.6597 * 0.5 = 0.32985
+	//  DAC1:  0.1404 * 1.0 = 0.1404
+	//  DAC2:  0.1999 * 1.0 = 0.1999
+	//  Sum:                  0.67015
+	//  Multiply all 3 values by 1 / 0.67015 (i.e. 1.492203):
+	// Final values are: ym: 0.492203; dac1: 0.209505; dac2: 0.298291
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // YM3014 DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // YM3014 DAC
+	FILTER_BIQUAD(config, m_ymfilter).opamp_sk_lowpass_setup(RES_K(4.7), RES_K(4.7), RES_M(999.99), RES_R(0.001), CAP_N(3.3), CAP_N(1.0)); // R15, R14, nothing(infinite resistance), wire(short), C9, C11
+	m_ymfilter->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_dacfilter1).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R11, R10, nothing(infinite resistance), wire(short), C7, C17
+	m_dacfilter1->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	FILTER_BIQUAD(config, m_dacfilter2).opamp_sk_lowpass_setup(RES_K(10), RES_K(10), RES_M(999.99), RES_R(0.001), CAP_N(10), CAP_N(4.7)); // R13, R12, nothing(infinite resistance), wire(short), C8, C18
+	m_dacfilter2->add_route(ALL_OUTPUTS, "speaker", 1.0);
+
+	YM3526(config, "ymsnd", XTAL(8'000'000)/2).add_route(ALL_OUTPUTS, m_ymfilter, 0.4922);
+
+	// note the two dac channel volume mix values might be backwards, we need a pcb reference recording!
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, m_dacfilter1, 0.2095); // SIP R2R DAC @ RA1 with 74HC374P latch
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, m_dacfilter2, 0.2983); // SIP R2R DAC @ RA2 with 74HC374P latch
+}
+
+void galivan_state::galivan(machine_config &config)
+{
+	galivan_common(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &galivan_state::galivan_map);
+	m_maincpu->set_addrmap(AS_IO, &galivan_state::io_map);
+
+	MCFG_MACHINE_START_OVERRIDE(galivan_state,galivan)
+	MCFG_MACHINE_RESET_OVERRIDE(galivan_state,galivan)
+
+	/* video hardware */
+	MCFG_VIDEO_START_OVERRIDE(galivan_state,galivan)
+	m_screen->set_screen_update(FUNC(galivan_state::screen_update_galivan));
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galivan);
+	PALETTE(config, m_palette, FUNC(galivan_state::galivan_palette), 16*16+16*16+256*16, 256);
 }
 
 void dangarj_state::dangarj(machine_config &config)
@@ -567,16 +607,11 @@ void dangarj_state::dangarj(machine_config &config)
 
 void galivan_state::ninjemak(machine_config &config)
 {
+	galivan_common(config);
+
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/2);      /* 6 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &galivan_state::ninjemak_map);
 	m_maincpu->set_addrmap(AS_IO, &galivan_state::ninjemak_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(galivan_state::irq0_line_assert));
-
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(8'000'000)/2));      /* 4 MHz? */
-	audiocpu.set_addrmap(AS_PROGRAM, &galivan_state::sound_map);
-	audiocpu.set_addrmap(AS_IO, &galivan_state::sound_io_map);
-	audiocpu.set_periodic_int(FUNC(galivan_state::irq0_line_hold), attotime::from_hz(XTAL(8'000'000)/2/512));   // ?
 
 	MCFG_MACHINE_START_OVERRIDE(galivan_state,ninjemak)
 	MCFG_MACHINE_RESET_OVERRIDE(galivan_state,ninjemak)
@@ -584,21 +619,10 @@ void galivan_state::ninjemak(machine_config &config)
 	NB1414M4(config, m_nb1414m4, 0);
 
 	/* video hardware */
-	video_config(config);
 	MCFG_VIDEO_START_OVERRIDE(galivan_state,ninjemak)
 	m_screen->set_screen_update(FUNC(galivan_state::screen_update_ninjemak));
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ninjemak);
 	PALETTE(config, m_palette, FUNC(galivan_state::ninjemak_palette), 8*16+16*16+256*16, 256);
-
-	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-
-	GENERIC_LATCH_8(config, m_soundlatch);
-
-	YM3526(config, "ymsnd", XTAL(8'000'000)/2).add_route(ALL_OUTPUTS, "speaker", 0.8);
-
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // YM3014 DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // YM3014 DAC
 }
 
 void galivan_state::youmab(machine_config &config)
@@ -1266,10 +1290,10 @@ void galivan_state::init_youmab()
 GAME( 1985, galivan,  0,        galivan,  galivan,  galivan_state, empty_init,  ROT270, "Nichibutsu", "Cosmo Police Galivan (12/26/1985)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, galivan2, galivan,  galivan,  galivan,  galivan_state, empty_init,  ROT270, "Nichibutsu", "Cosmo Police Galivan (12/16/1985)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, galivan3, galivan,  galivan,  galivan,  galivan_state, empty_init,  ROT270, "Nichibutsu", "Cosmo Police Galivan (12/11/1985)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dangar,   0,        galivan,  dangar,   galivan_state, empty_init,  ROT270, "Nichibutsu", "Ufo Robo Dangar (4/07/1987)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, dangar,   0,        galivan,  dangar,   galivan_state, empty_init,  ROT270, "Nichibutsu", "Ufo Robo Dangar (4/09/1987)", MACHINE_SUPPORTS_SAVE ) // GV-1412-I and GV-1412-II pcbs
 GAME( 1986, dangara,  dangar,   galivan,  dangar2,  galivan_state, empty_init,  ROT270, "Nichibutsu", "Ufo Robo Dangar (12/1/1986)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, dangarj,  dangar,   dangarj,  dangar2,  dangarj_state, empty_init,  ROT270, "Nichibutsu", "Ufo Robo Dangar (9/26/1986, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, dangarb,  dangar,   galivan,  dangar2,  galivan_state, empty_init,  ROT270, "Nichibutsu", "Ufo Robo Dangar (9/26/1986, bootleg set 1)", MACHINE_SUPPORTS_SAVE ) // checks protection like dangarj but check readback is patched at 0x9d58 (also checks i/o port 0xc0?)
+GAME( 1986, dangarb,  dangar,   galivan,  dangar2,  galivan_state, empty_init,  ROT270, "bootleg",    "Ufo Robo Dangar (9/26/1986, bootleg set 1)", MACHINE_SUPPORTS_SAVE ) // checks protection like dangarj but check readback is patched at 0x9d58 (also checks i/o port 0xc0?)
 GAME( 1986, dangarbt, dangar,   galivan,  dangarb,  galivan_state, empty_init,  ROT270, "bootleg",    "Ufo Robo Dangar (9/26/1986, bootleg set 2)", MACHINE_SUPPORTS_SAVE ) // directly patched at entry point 0x9d44
 GAME( 1986, ninjemak, 0,        ninjemak, ninjemak, galivan_state, empty_init,  ROT270, "Nichibutsu", "Ninja Emaki (US)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
 GAME( 1986, youma,    ninjemak, ninjemak, ninjemak, galivan_state, empty_init,  ROT270, "Nichibutsu", "Youma Ninpou Chou (Japan)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )

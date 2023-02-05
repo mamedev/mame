@@ -125,6 +125,7 @@ gtia_device::gtia_device(const machine_config &mconfig, const char *tag, device_
 	, m_region(GTIA_NTSC)
 	, m_read_cb(*this)
 	, m_write_cb(*this)
+	, m_trigger_cb(*this)
 {
 }
 
@@ -137,6 +138,7 @@ void gtia_device::device_start()
 {
 	m_read_cb.resolve();
 	m_write_cb.resolve();
+	m_trigger_cb.resolve_safe(0xf);
 
 	save_item(NAME(m_r.m0pf));
 	save_item(NAME(m_r.m1pf));
@@ -302,8 +304,10 @@ int gtia_device::is_ntsc()
 	return m_region == GTIA_NTSC;
 }
 
-void gtia_device::button_interrupt(int button_count, uint8_t button_port)
+void gtia_device::button_interrupt(int button_count)
 {
+	uint8_t button_port = m_trigger_cb();
+
 	/* specify buttons relevant to this Atari variant */
 	for (int i = 0; i < button_count; i++)
 	{
@@ -315,8 +319,10 @@ void gtia_device::button_interrupt(int button_count, uint8_t button_port)
 	/* button registers for xl/xe */
 	if (button_count == 2)
 	{
-		m_r.but[2] = 1;  /* not used on xl/xe */
-		m_r.but[3] = 0;  /* 1 if external cartridge is inserted */
+		// TRIG2: unused on xl/xe (1), xegs keyboard (1) connected (0) disconnected
+		m_r.but[2] = 1;
+		// TRIG3: RD5 external cart readback (1) present (0) disabled thru bankswitch or absent
+		m_r.but[3] = 0;
 	}
 
 }

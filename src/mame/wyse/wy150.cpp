@@ -18,6 +18,9 @@
 #include "machine/nvram.h"
 #include "screen.h"
 
+
+namespace {
+
 class wy150_state : public driver_device
 {
 public:
@@ -121,6 +124,9 @@ void wy150_state::driver_start()
 			rom[base | offset] = bitswap<8>(orig[bitswap<14>(offset, 7, 8, 6, 5, 4, 3, 9, 10, 11, 12, 13, 2, 1, 0)], 3, 4, 2, 5, 1, 6, 0, 7);
 	}
 }
+
+} // anonymous namespace
+
 
 COMP(1991, wy150, 0, 0, wy150, wy150, wy150_state, empty_init, "Wyse Technology", "WY-150 (v1.0)", MACHINE_IS_SKELETON)
 COMP(1992, wy120, 0, 0, wy150, wy150, wy150_state, empty_init, "Wyse Technology", "WY-120 (v1.4)", MACHINE_IS_SKELETON)

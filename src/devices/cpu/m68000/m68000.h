@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include "m68kcommon.h"
+#include "m68kmusashi.h"
 
-class m68000_device : public m68000_base_device
+class m68000_device : public m68000_musashi_device
 {
 public:
 	// construction/destruction

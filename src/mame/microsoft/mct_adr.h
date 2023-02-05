@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_MACHINE_MCT_ADR_H
-#define MAME_MACHINE_MCT_ADR_H
+#ifndef MAME_MICROSOFT_MCT_ADR_H
+#define MAME_MICROSOFT_MCT_ADR_H
 
 #pragma once
 
@@ -161,4 +161,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(MCT_ADR, mct_adr_device)
 
-#endif // MAME_MACHINE_MCT_ADR_H
+#endif // MAME_MICROSOFT_MCT_ADR_H

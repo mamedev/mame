@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_UPD65031_H
-#define MAME_MACHINE_UPD65031_H
+#ifndef MAME_ACORN_UPD65031_H
+#define MAME_ACORN_UPD65031_H
 
 #pragma once
 
@@ -117,4 +117,4 @@ private:
 DECLARE_DEVICE_TYPE(UPD65031, upd65031_device)
 
 
-#endif // MAME_MACHINE_UPD65031_H
+#endif // MAME_ACORN_UPD65031_H

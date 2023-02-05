@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "bgfx_p.h"
@@ -492,7 +492,7 @@ namespace bgfx
 			break;
 		}
 
-		return 0;
+		return size;
 	}
 
 	int32_t toString(char* _out, int32_t _size, const Dx9bcInstruction& _instruction)

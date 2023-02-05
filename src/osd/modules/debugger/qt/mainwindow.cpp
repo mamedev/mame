@@ -21,9 +21,8 @@
 
 namespace osd::debugger::qt {
 
-MainWindow::MainWindow(running_machine &machine, QWidget *parent) :
-	WindowQt(machine, nullptr),
-	m_historyIndex(0),
+MainWindow::MainWindow(DebuggerQt &debugger, QWidget *parent) :
+	WindowQt(debugger, nullptr),
 	m_inputHistory(),
 	m_exiting(false)
 {
@@ -37,6 +36,7 @@ MainWindow::MainWindow(running_machine &machine, QWidget *parent) :
 	// The input line
 	m_inputEdit = new QLineEdit(mainWindowFrame);
 	connect(m_inputEdit, &QLineEdit::returnPressed, this, &MainWindow::executeCommandSlot);
+	connect(m_inputEdit, &QLineEdit::textEdited, this, &MainWindow::commandEditedSlot);
 	m_inputEdit->installEventFilter(this);
 
 
@@ -154,6 +154,30 @@ void MainWindow::setProcessor(device_t *processor)
 }
 
 
+void MainWindow::restoreConfiguration(util::xml::data_node const &node)
+{
+	WindowQt::restoreConfiguration(node);
+
+	debug_view_disasm &dasmview = *m_dasmFrame->view()->view<debug_view_disasm>();
+
+	restoreState(QByteArray::fromPercentEncoding(node.get_attribute_string("qtwindowstate", "")));
+
+	auto const rightbar = node.get_attribute_int(ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, dasmview.right_column());
+	QActionGroup *const rightBarGroup = findChild<QActionGroup *>("rightbargroup");
+	for (QAction *action : rightBarGroup->actions())
+	{
+		if (action->data().toInt() == rightbar)
+		{
+			action->trigger();
+			break;
+		}
+	}
+
+	m_dasmFrame->view()->restoreConfigurationFromNode(node);
+	m_inputHistory.restoreConfigurationFromNode(node);
+}
+
+
 void MainWindow::saveConfigurationToNode(util::xml::data_node &node)
 {
 	WindowQt::saveConfigurationToNode(node);
@@ -163,6 +187,9 @@ void MainWindow::saveConfigurationToNode(util::xml::data_node &node)
 	debug_view_disasm &dasmview = *m_dasmFrame->view()->view<debug_view_disasm>();
 	node.set_attribute_int(ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, dasmview.right_column());
 	node.set_attribute("qtwindowstate", saveState().toPercentEncoding().data());
+
+	m_dasmFrame->view()->saveConfigurationToNode(node);
+	m_inputHistory.saveConfigurationToNode(node);
 }
 
 
@@ -182,46 +209,47 @@ void MainWindow::closeEvent(QCloseEvent *event)
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
 	// Only filter keypresses
-	QKeyEvent *keyEvent = nullptr;
-	if (event->type() == QEvent::KeyPress)
-		keyEvent = static_cast<QKeyEvent*>(event);
-	else
+	if (event->type() != QEvent::KeyPress)
 		return QObject::eventFilter(obj, event);
+
+	QKeyEvent const &keyEvent = *static_cast<QKeyEvent *>(event);
 
 	// Catch up & down keys
-	if (keyEvent->key() == Qt::Key_Up || keyEvent->key() == Qt::Key_Down)
+	if (keyEvent.key() == Qt::Key_Escape)
 	{
-		if (keyEvent->key() == Qt::Key_Up)
-		{
-			if (m_historyIndex > 0)
-				m_historyIndex--;
-		}
-		else if (keyEvent->key() == Qt::Key_Down)
-		{
-			if (m_historyIndex < m_inputHistory.size())
-				m_historyIndex++;
-		}
-
-		// Populate the input edit or clear it if you're at the end
-		if (m_historyIndex == m_inputHistory.size())
-		{
-			m_inputEdit->setText("");
-		}
-		else
-		{
-			m_inputEdit->setText(m_inputHistory[m_historyIndex]);
-		}
+		m_inputEdit->clear();
+		m_inputHistory.reset();
+		return true;
 	}
-	else if (keyEvent->key() == Qt::Key_Enter)
+	else if (keyEvent.key() == Qt::Key_Up)
+	{
+		QString const *const hist = m_inputHistory.previous(m_inputEdit->text());
+		if (hist)
+		{
+			m_inputEdit->setText(*hist);
+			m_inputEdit->setSelection(hist->size(), 0);
+		}
+		return true;
+	}
+	else if (keyEvent.key() == Qt::Key_Down)
+	{
+		QString const *const hist = m_inputHistory.next(m_inputEdit->text());
+		if (hist)
+		{
+			m_inputEdit->setText(*hist);
+			m_inputEdit->setSelection(hist->size(), 0);
+		}
+		return true;
+	}
+	else if (keyEvent.key() == Qt::Key_Enter)
 	{
 		executeCommand(false);
+		return true;
 	}
 	else
 	{
 		return QObject::eventFilter(obj, event);
 	}
-
-	return true;
 }
 
 
@@ -243,9 +271,9 @@ void MainWindow::toggleBreakpointAtCursor(bool changedTo)
 		else
 			command = string_format("bpclear 0x%X", bp->index());
 		m_machine.debugger().console().execute_command(command, true);
+		m_machine.debug_view().update_all();
+		m_machine.debugger().refresh_display();
 	}
-
-	refreshAll();
 }
 
 
@@ -265,10 +293,10 @@ void MainWindow::enableBreakpointAtCursor(bool changedTo)
 			int32_t const bpindex = bp->index();
 			std::string command = string_format(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", bpindex);
 			m_machine.debugger().console().execute_command(command, true);
+			m_machine.debug_view().update_all();
+			m_machine.debugger().refresh_display();
 		}
 	}
-
-	refreshAll();
 }
 
 
@@ -296,33 +324,35 @@ void MainWindow::executeCommandSlot()
 	executeCommand(true);
 }
 
+void MainWindow::commandEditedSlot(QString const &text)
+{
+	m_inputHistory.edit();
+}
+
 void MainWindow::executeCommand(bool withClear)
 {
-	QString command = m_inputEdit->text();
-
-	// A blank command is a "silent step"
+	QString const command = m_inputEdit->text();
 	if (command == "")
 	{
+		// A blank command is a "silent step"
 		m_machine.debugger().console().get_visible_cpu()->debug()->single_step();
-		return;
+		m_inputHistory.reset();
 	}
-
-	// Send along the command
-	m_machine.debugger().console().execute_command(command.toLocal8Bit().data(), true);
-
-	// Add history & set the index to be the top of the stack
-	addToHistory(command);
-
-	// Clear out the text and reset the history pointer only if asked
-	if (withClear)
+	else
 	{
-		m_inputEdit->clear();
-		m_historyIndex = m_inputHistory.size();
-	}
+		// Send along the command
+		m_machine.debugger().console().execute_command(command.toUtf8().data(), true);
 
-	// Refresh
-	m_consoleView->viewport()->update();
-	refreshAll();
+		// Add history
+		m_inputHistory.add(command);
+
+		// Clear out the text and reset the history pointer only if asked
+		if (withClear)
+		{
+			m_inputEdit->clear();
+			m_inputHistory.edit();
+		}
+	}
 }
 
 
@@ -335,7 +365,6 @@ void MainWindow::mountImage(bool changedTo)
 	if (!img)
 	{
 		m_machine.debugger().console().printf("Something is wrong with the mount menu.\n");
-		refreshAll();
 		return;
 	}
 
@@ -349,7 +378,6 @@ void MainWindow::mountImage(bool changedTo)
 	if (img->load(filename.toUtf8().data()) != image_init_result::PASS)
 	{
 		m_machine.debugger().console().printf("Image could not be mounted.\n");
-		refreshAll();
 		return;
 	}
 
@@ -365,7 +393,6 @@ void MainWindow::mountImage(bool changedTo)
 	parentMenuItem->setTitle(newTitle);
 
 	m_machine.debugger().console().printf("Image %s mounted successfully.\n", filename.toUtf8().data());
-	refreshAll();
 }
 
 
@@ -389,7 +416,6 @@ void MainWindow::unmountImage(bool changedTo)
 	parentMenuItem->setTitle(newTitle);
 
 	m_machine.debugger().console().printf("Image successfully unmounted.\n");
-	refreshAll();
 }
 
 
@@ -429,21 +455,10 @@ void MainWindow::debugActClose()
 }
 
 
-void MainWindow::addToHistory(const QString& command)
+void MainWindow::debuggerExit()
 {
-	if (command == "")
-		return;
-
-	// Always push back when there is no previous history
-	if (m_inputHistory.empty())
-	{
-		m_inputHistory.push_back(m_inputEdit->text());
-		return;
-	}
-
-	// If there is previous history, make sure it's not what you just executed
-	if (m_inputHistory.back() != m_inputEdit->text())
-		m_inputHistory.push_back(m_inputEdit->text());
+	m_exiting = true;
+	close();
 }
 
 
@@ -480,35 +495,6 @@ void MainWindow::createImagesMenu()
 	}
 }
 
-
-//=========================================================================
-//  MainWindowQtConfig
-//=========================================================================
-void MainWindowQtConfig::applyToQWidget(QWidget *widget)
-{
-	WindowQtConfig::applyToQWidget(widget);
-	MainWindow *window = dynamic_cast<MainWindow *>(widget);
-	window->restoreState(m_windowState);
-
-	QActionGroup *const rightBarGroup = window->findChild<QActionGroup*>("rightbargroup");
-	for (QAction *action : rightBarGroup->actions())
-	{
-		if (action->data().toInt() == m_rightBar)
-		{
-			action->trigger();
-			break;
-		}
-	}
-}
-
-
-void MainWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
-{
-	WindowQtConfig::recoverFromXmlNode(node);
-	const char* state = node.get_attribute_string("qtwindowstate", "");
-	m_windowState = QByteArray::fromPercentEncoding(state);
-	m_rightBar = node.get_attribute_int(ATTR_WINDOW_DISASSEMBLY_RIGHT_COLUMN, m_rightBar);
-}
 
 DasmDockWidget::~DasmDockWidget()
 {

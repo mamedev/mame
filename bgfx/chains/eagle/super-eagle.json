@@ -26,7 +26,6 @@
 	"passes": [
 		{
 			"effect": "eagle/supereagle",
-			"applytint": true,
 			"name": "Super Eagle pass",
 			"input": [
 				{ "sampler": "decal", "texture": "screen" },

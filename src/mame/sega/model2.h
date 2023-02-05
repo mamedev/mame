@@ -859,4 +859,4 @@ struct model2_state::geo_state
 	model2_state *      state = nullptr;
 };
 
-#endif // MAME_INCLUDES_MODEL2_H
+#endif // MAME_SEGA_MODEL2_H

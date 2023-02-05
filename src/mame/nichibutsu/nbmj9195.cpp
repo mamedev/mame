@@ -4,7 +4,7 @@
 
     nbmj9195 - Nichibutsu Mahjong games for years 1991-1995
 
-    Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 2000/03/13 -
+    Driver by Takahiro Nogi 2000/03/13 -
     Special thanks to Tatsuyuki Satoh
 
 ******************************************************************************/

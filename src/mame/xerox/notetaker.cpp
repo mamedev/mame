@@ -122,6 +122,9 @@ DONE:
 #define VERBOSE (0)
 #include "logmacro.h"
 
+
+namespace {
+
 class notetaker_state : public driver_device
 {
 public:
@@ -991,6 +994,9 @@ ROM_START( notetakr )
 	The PROM output is SetMemRq_q and is inverted compared to the equation above.
 	*/
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

@@ -5,8 +5,8 @@
     Sega g80 common sound hardware
 
 *************************************************************************/
-#ifndef MAME_AUDIO_SEGAUSB_H
-#define MAME_AUDIO_SEGAUSB_H
+#ifndef MAME_SEGA_SEGAUSB_H
+#define MAME_SEGA_SEGAUSB_H
 
 #pragma once
 
@@ -189,4 +189,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(SEGAUSBROM, usb_rom_sound_device)
 
-#endif // MAME_AUDIO_SEGAUSB_H
+#endif // MAME_SEGA_SEGAUSB_H

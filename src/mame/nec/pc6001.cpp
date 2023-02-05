@@ -257,6 +257,42 @@ void pc6001_state::nec_ppi8255_w(offs_t offset, uint8_t data)
 	m_ppi->write(offset,data);
 }
 
+uint8_t pc6001_state::joystick_r()
+{
+	uint8_t data = m_joymux->output_r();
+
+	// FIXME: bits 6 and 7 are supposed to be nHSYNC and nVSYNC
+	if (m_screen->hblank())
+		data &= 0xbf;
+	else
+		data |= 0x40;
+	if (m_screen->vblank())
+		data &= 0x7f;
+	else
+		data |= 0x80;
+
+	return data;
+}
+
+uint8_t pc6001_state::joystick_out_r()
+{
+	return m_joystick_out;
+}
+
+void pc6001_state::joystick_out_w(uint8_t data)
+{
+	// bit 7 is output enable for first part of 74LS367 buffer
+	m_joy[1]->pin_6_w(BIT(data, 7) ? 1 : BIT(data, 0));
+	m_joy[1]->pin_7_w(BIT(data, 7) ? 1 : BIT(data, 1));
+	m_joy[0]->pin_6_w(BIT(data, 7) ? 1 : BIT(data, 2));
+	m_joy[0]->pin_7_w(BIT(data, 7) ? 1 : BIT(data, 3));
+	m_joy[1]->pin_8_w(BIT(data, 4));
+	m_joy[0]->pin_8_w(BIT(data, 5));
+	m_joymux->select_w(BIT(data, 6));
+
+	m_joystick_out = data;
+}
+
 void pc6001_state::pc6001_map(address_map &map)
 {
 	map.unmap_value_high();
@@ -1078,27 +1114,6 @@ static INPUT_PORTS_START( pc6001 )
 	PORT_DIPSETTING(    0x04, "Green/Pink" )
 	//5-6-7 is presumably invalid
 
-	/* TODO: these two are unchecked */
-	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 	PORT_START("key1") //0x00-0x1f
 	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_UNUSED) //0x00 null
 	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_UNUSED) //0x01 soh
@@ -1404,7 +1419,7 @@ uint8_t pc6001_state::check_keyboard_press()
 uint8_t pc6001_state::check_joy_press()
 {
 	// TODO: this may really just rearrange keyboard key presses in a joystick like fashion, somehow akin to Sharp X1 mode
-	uint8_t p1_key = m_io_p1->read() ^ 0xff;
+	uint8_t p1_key = m_joymux->output_r() ^ 0xff;
 	uint8_t shift_key = m_io_key_modifiers->read() & 0x02;
 	uint8_t space_key = m_io_keys[1]->read() & 0x01;
 	uint8_t joy_press;
@@ -1485,7 +1500,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::keyboard_callback)
 	uint32_t key2 = m_io_keys[1]->read();
 	uint32_t key3 = m_io_keys[2]->read();
 	u8 key_fn = m_io_fn_keys->read();
-//  uint8_t p1_key = m_io_p1->read();
+//  uint8_t p1_key = m_joy[0]->read();
 
 	if(m_cas_switch == 0)
 	{
@@ -1715,6 +1730,13 @@ void pc6001_state::pc6001(machine_config &config)
 	/* uart */
 	I8251(config, "uart", 0);
 
+	MSX_GENERAL_PURPOSE_PORT(config, m_joy[0], msx_general_purpose_port_devices, "joystick");
+	MSX_GENERAL_PURPOSE_PORT(config, m_joy[1], msx_general_purpose_port_devices, "joystick");
+
+	LS157_X2(config, m_joymux);
+	m_joymux->a_in_callback().set(m_joy[1], FUNC(msx_general_purpose_port_device::read));
+	m_joymux->b_in_callback().set(m_joy[0], FUNC(msx_general_purpose_port_device::read));
+
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "pc6001_cart");
 	SOFTWARE_LIST(config, "cart_list_pc6001").set_original("pc6001_cart");
 
@@ -1726,11 +1748,12 @@ void pc6001_state::pc6001(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, m_ay, PC6001_MAIN_CLOCK/4);
-	m_ay->port_a_read_callback().set_ioport("P1");
-	m_ay->port_b_read_callback().set_ioport("P2");
+	m_ay->port_a_read_callback().set(FUNC(pc6001_state::joystick_r));
+	m_ay->port_b_read_callback().set(FUNC(pc6001_state::joystick_out_r));
+	m_ay->port_b_write_callback().set(FUNC(pc6001_state::joystick_out_w));
 	m_ay->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	/* TODO: accurate timing on this */
+	// TODO: accurate timing on this
 	TIMER(config, "keyboard_timer").configure_periodic(FUNC(pc6001_state::keyboard_callback), attotime::from_hz(250));
 	TIMER(config, "cassette_timer").configure_periodic(FUNC(pc6001_state::cassette_callback), attotime::from_hz(1200/12));
 }
@@ -1820,9 +1843,10 @@ void pc6001mk2sr_state::pc6001mk2sr(machine_config &config)
 	pc6601_fdc_config(config);
 
 	config.device_remove("aysnd");
-	YM2203(config, m_ym, PC6001_MAIN_CLOCK/4);
-	m_ym->port_a_read_callback().set_ioport("P1");
-	m_ym->port_b_read_callback().set_ioport("P2");
+	YM2203(config, m_ym, 4_MHz_XTAL);
+	m_ym->port_a_read_callback().set(FUNC(pc6001mk2sr_state::joystick_r));
+	m_ym->port_b_read_callback().set(FUNC(pc6001mk2sr_state::joystick_out_r));
+	m_ym->port_b_write_callback().set(FUNC(pc6001mk2sr_state::joystick_out_w));
 	m_ym->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	// TODO: 1D 3'5" floppy drive

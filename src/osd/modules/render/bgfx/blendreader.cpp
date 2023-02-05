@@ -44,8 +44,11 @@ uint64_t blend_reader::read_from_value(const Value& value)
 	uint64_t equation = get_enum_from_value(value, "equation", BGFX_STATE_BLEND_EQUATION_ADD, EQUATION_NAMES, EQUATION_COUNT);
 	uint64_t srccolor = get_enum_from_value(value, "srcColor", BGFX_STATE_BLEND_ONE, FUNCTION_NAMES, FUNCTION_COUNT);
 	uint64_t dstcolor = get_enum_from_value(value, "dstColor", BGFX_STATE_BLEND_ZERO, FUNCTION_NAMES, FUNCTION_COUNT);
-	uint64_t srcalpha = get_enum_from_value(value, "srcAlpha", BGFX_STATE_BLEND_ONE, FUNCTION_NAMES, FUNCTION_COUNT);
-	uint64_t dstalpha = get_enum_from_value(value, "dstAlpha", BGFX_STATE_BLEND_ZERO, FUNCTION_NAMES, FUNCTION_COUNT);
-
-	return BGFX_STATE_BLEND_EQUATION(equation) | BGFX_STATE_BLEND_FUNC_SEPARATE(srccolor, dstcolor, srcalpha, dstalpha);
+	if (value.HasMember("srcAlpha") && value.HasMember("dstAlpha"))
+	{
+		uint64_t srcalpha = get_enum_from_value(value, "srcAlpha", BGFX_STATE_BLEND_ONE, FUNCTION_NAMES, FUNCTION_COUNT);
+		uint64_t dstalpha = get_enum_from_value(value, "dstAlpha", BGFX_STATE_BLEND_ZERO, FUNCTION_NAMES, FUNCTION_COUNT);
+		return BGFX_STATE_BLEND_EQUATION(equation) | BGFX_STATE_BLEND_FUNC_SEPARATE(srccolor, dstcolor, srcalpha, dstalpha);
+	}
+	return BGFX_STATE_BLEND_EQUATION(equation) | BGFX_STATE_BLEND_FUNC(srccolor, dstcolor);
 }

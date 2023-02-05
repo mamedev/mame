@@ -15,6 +15,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class tvcapcom_state : public driver_device
 {
 public:
@@ -87,5 +90,8 @@ ROM_START( tvcapcom )
 	ROM_LOAD("tvc_read3.u14",  0x00, 0x21000898, CRC(4a3f143d) SHA1(83bb7abc5f925df9c4e28de0298aed7b3b791e37))
 
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 2008, tvcapcom,  0, tvcapcom,    tvcapcom, tvcapcom_state, empty_init, ROT0, "Capcom",            "Tatsunoko Vs Capcom : Cross Generation of Heroes", MACHINE_IS_SKELETON )

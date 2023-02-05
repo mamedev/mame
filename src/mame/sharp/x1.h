@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_X1_H
-#define MAME_INCLUDES_X1_H
+#ifndef MAME_SHARP_X1_H
+#define MAME_SHARP_X1_H
 
 #pragma once
 
@@ -341,4 +341,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(X1_KEYBOARD, x1_keyboard_device)
 
-#endif // MAME_INCLUDES_X1_H
+#endif // MAME_SHARP_X1_H

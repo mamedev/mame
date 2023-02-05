@@ -29,8 +29,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_DC305_H
-#define MAME_MACHINE_DC305_H
+#ifndef MAME_DEC_DC305_H
+#define MAME_DEC_DC305_H
 
 #pragma once
 
@@ -72,4 +72,4 @@ private:
 // device type declaration
 DECLARE_DEVICE_TYPE(DC305, dc305_device)
 
-#endif // MAME_MACHINE_DC305_H
+#endif // MAME_DEC_DC305_H

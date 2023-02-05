@@ -20,6 +20,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class cupidon_state : public driver_device
 {
 public:
@@ -170,6 +172,9 @@ void cupidon_state::init_cupidon()
 void cupidon_state::init_funnyfm()
 {
 }
+
+} // anonymous namespace
+
 
 /* (c) date is from string in ROM, revision date is noted next to sets - Spellings are as found in ROM */
 GAME( 2004, tsarevna,  0,        cupidon, cupidon, cupidon_state, init_cupidon, ROT0, "Kupidon", "Tsarevna (v1.29)",         MACHINE_IS_SKELETON ) // 12 Oct 2005

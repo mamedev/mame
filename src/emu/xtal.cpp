@@ -142,7 +142,7 @@ const double XTAL::known_xtals[] = {
 	  7'000'000, /* 7_MHz_XTAL             Jaleco Mega System PCBs */
 	  7'056'000, /* 7.056_MHz_XTAL         Alesis QS FXCHIP (LCM of 44.1 kHz and 48 kHz) */
 	  7'159'090, /* 7.15909_MHz_XTAL       Blood Bros (2x NTSC subcarrier) */
-	  7'200'000, /* 7.2_MHz_XTAL           Image Fight bootleg I80C031 MCU */
+	  7'200'000, /* 7.2_MHz_XTAL           Novag Constellation (later models, with /2 divider), Kawai K1 keyscan IC */
 	  7'372'800, /* 7.3728_MHz_XTAL        - */
 	  7'864'300, /* 7.8643_MHz_XTAL        Used on InterFlip games as video clock */
 	  7'987'000, /* 7.987_MHz_XTAL         PC9801-86 YM2608 clock */
@@ -163,6 +163,7 @@ const double XTAL::known_xtals[] = {
 	  9'000'000, /* 9_MHz_XTAL             Homedata PCBs */
 	  9'216'000, /* 9.216_MHz_XTAL         Univac UTS 20 */
 	  9'400'000, /* 9.4_MHz_XTAL           Yamaha MU-5 and TG-100 */
+	  9'426'500, /* 9.4265_MHz_XTAL        Yamaha DX7, and DX9 */
 	  9'600'000, /* 9.6_MHz_XTAL           WD37C65 second clock (for 300 KB/sec rate) */
 	  9'732'000, /* 9.732_MHz_XTAL         CTA Invader */
 	  9'828'000, /* 9.828_MHz_XTAL         Universal PCBs */
@@ -196,6 +197,7 @@ const double XTAL::known_xtals[] = {
 	 11'289'600, /* 11.2896_MHz_XTAL       Frantic Fred */
 	 11'400'000, /* 11.4_MHz_XTAL          HP 9845 */
 	 11'668'800, /* 11.6688_MHz_XTAL       Gameplan pixel clock */
+	 11'730'000, /* 11.73_MHz_XTAL         Irem M-11 */
 	 11'800'000, /* 11.8_MHz_XTAL          IBM PC Music Feature Card */
 	 11'980'800, /* 11.9808_MHz_XTAL       Luxor ABC 80 */
 	 12'000'000, /* 12_MHz_XTAL            Extremely common, used on 100's of PCBs */
@@ -332,7 +334,7 @@ const double XTAL::known_xtals[] = {
 	 22'321'000, /* 22.321_MHz_XTAL        Apple LaserWriter II NT */
 	 22'464'000, /* 22.464_MHz_XTAL        CIT-101 132-column display clock */
 	 22'579'000, /* 22.579_MHz_XTAL        Sega System H1 SCSP clock */
-	 22'579'200, /* 22.5792_MHz_XTAL       (44100 * 512) */
+	 22'579'200, /* 22.5792_MHz_XTAL       Enhanced Apple Digital Sound Chip clock (44100 * 512) */
 	 22'656'000, /* 22.656_MHz_XTAL        Super Pinball Action (~1440x NTSC line rate) */
 	 22'680'000, /* 22.680_MHz_XTAL        HDS200 80-columns display clock */
 	 22'896'000, /* 22.896_MHz_XTAL        DEC VT220 132-column display clock */

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="ibm5150_hdd" description="IBM PC hard disk images">
 

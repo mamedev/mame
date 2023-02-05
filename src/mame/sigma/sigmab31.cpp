@@ -99,6 +99,8 @@ chip at location ic50   28 pin dip  stamped     Hitachi logo? 1A1 R
 #include "speaker.h"
 
 
+namespace {
+
 class sigmab31_state : public driver_device
 {
 public:
@@ -194,6 +196,8 @@ ROM_START( cptlucky )
 	ROM_REGION( 0x8000, "opl", 0 )
 	ROM_LOAD( "m-slot_03-00_l89-1625.57", 0x00000, 0x8000, CRC(268c8a7c) SHA1(90903428d6c0af3ebdcb462e80a7c28dc4ee7af2) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1988, cptlucky, 0, sigmab31, cptlucky, sigmab31_state, empty_init, ROT0, "Sigma", "Captain Lucky", MACHINE_IS_SKELETON_MECHANICAL ) // 1988 copyright in main CPU ROM

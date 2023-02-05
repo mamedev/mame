@@ -6,8 +6,8 @@
  *
  ******************************************/
 
-#ifndef MAME_INCLUDES_PC9801_EPSON_H
-#define MAME_INCLUDES_PC9801_EPSON_H
+#ifndef MAME_NEC_PC9801_EPSON_H
+#define MAME_NEC_PC9801_EPSON_H
 
 #pragma once
 
@@ -62,4 +62,4 @@ private:
 //  u8 m_itf_bank;
 };
 
-#endif // MAME_INCLUDES_PC9801_EPSON_H
+#endif // MAME_NEC_PC9801_EPSON_H

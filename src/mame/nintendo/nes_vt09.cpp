@@ -25,6 +25,9 @@
 
 #include "softlist_dev.h"
 
+
+namespace {
+
 class nes_vt09_common_base_state : public driver_device
 {
 public:
@@ -58,7 +61,7 @@ protected:
 	required_region_ptr<uint8_t> m_prgrom;
 
 	uint8_t vt_rom_r(offs_t offset);
-	void vtspace_w(offs_t offset, uint8_t data);
+	[[maybe_unused]] void vtspace_w(offs_t offset, uint8_t data);
 
 	void configure_soc(nes_vt02_vt03_soc_device* soc);
 
@@ -85,7 +88,7 @@ public:
 	void vt_external_space_map_4mbyte(address_map& map);
 	void vt_external_space_map_2mbyte(address_map& map);
 	void vt_external_space_map_1mbyte(address_map& map);
-	void vt_external_space_map_512kbyte(address_map& map);
+	[[maybe_unused]] void vt_external_space_map_512kbyte(address_map& map);
 
 
 protected:
@@ -533,6 +536,9 @@ ROM_START( timetp25 )
 	ROM_LOAD( "s29al016d70tfi02.u2", 0x00000, 0x200000, CRC(6109816a) SHA1(e48699d48b72219d80b8d27b1337e8d09793f4da) )
 	ROM_FILL(0x1fce36, 0x01, 0x04 | 0x40) // the code doesn't set the 'alt 4bpp' mode bit, but needs it? why? it isn't hardcoded as the system takes cartridges which don't want it
 ROM_END
+
+} // anonymous namespace
+
 
 // MSI Entertainment games (MSI previously operated as Majesco Entertainment)
 

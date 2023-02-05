@@ -37,13 +37,19 @@ inline menu_analog::item_data::item_data(ioport_field &f, int t) noexcept
 
 inline menu_analog::field_data::field_data(ioport_field &f) noexcept
 	: field(f)
-	, range(f.maxval() - f.minval())
-	, neutral(float(f.analog_reverse() ? (f.maxval() - f.defvalue()) : (f.defvalue() - f.minval())) / range)
-	, origin((f.analog_wraps() && (f.defvalue() != f.minval()) && (f.defvalue() != f.maxval())) ? 0.0f : neutral)
+	, range(0.0F)
+	, neutral(0.0F)
+	, origin(0.0F)
 	, shift(0U)
 	, show_neutral((f.defvalue() != f.minval()) && (f.defvalue() != f.maxval()))
 {
 	for (ioport_value m = f.mask(); m && !BIT(m, 0); m >>= 1, ++shift) { }
+	ioport_value const m(f.mask() >> shift);
+	range = (f.maxval() - f.minval()) & m;
+	ioport_value const n((f.analog_reverse() ? (f.maxval() - f.defvalue()) : (f.defvalue() - f.minval())) & m);
+	neutral = float(n) / range;
+	if (!f.analog_wraps() || (f.defvalue() == f.minval()) || (f.defvalue() == f.maxval()))
+		origin = neutral;
 }
 
 
@@ -66,20 +72,27 @@ menu_analog::~menu_analog()
 }
 
 
+void menu_analog::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	// space for live display
+	set_custom_space(0.0f, (line_height() * m_visible_fields) + (tb_border() * 3.0f));
+}
+
+
 void menu_analog::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
 {
 	// work out how much space to use for field names
 	float const aspect(machine().render().ui_aspect(&container()));
 	float const extrawidth(0.4f + (((ui().box_lr_border() * 2.0f) + ui().get_line_height()) * aspect));
-	float const nameavail(1.0f - (ui().box_lr_border() * 2.0f * aspect) - extrawidth);
+	float const nameavail(1.0f - (lr_border() * 2.0f) - extrawidth);
 	float namewidth(0.0f);
 	for (field_data &data : m_field_data)
-		namewidth = (std::min)((std::max)(ui().get_string_width(data.field.get().name()), namewidth), nameavail);
+		namewidth = (std::min)((std::max)(get_string_width(data.field.get().name()), namewidth), nameavail);
 
 	// make a box or two
 	rgb_t const fgcolor(ui().colors().text_color());
-	float const lineheight(ui().get_line_height());
-	float const border(ui().box_tb_border());
 	float const boxleft((1.0f - namewidth - extrawidth) / 2.0f);
 	float const boxright(boxleft + namewidth + extrawidth);
 	float boxtop;
@@ -92,19 +105,19 @@ void menu_analog::custom_render(void *selectedref, float top, float bottom, floa
 			m_prompt = util::string_format(_("Press %s to show menu"), ui().get_general_input_setting(IPT_UI_ON_SCREEN_DISPLAY));
 		draw_text_box(
 				&m_prompt, &m_prompt + 1,
-				boxleft, boxright, y - top, y - top + lineheight + (border * 2.0f),
+				boxleft, boxright, y - top, y - top + line_height() + (tb_border() * 2.0f),
 				text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
-				fgcolor, ui().colors().background_color(), 1.0f);
-		boxtop = y - top + lineheight + (border * 3.0f);
-		firstliney = y - top + lineheight + (border * 4.0f);
-		visible_fields = std::min<int>(m_field_data.size(), int((y2 + bottom - border - firstliney) / lineheight));
-		boxbottom = firstliney + (lineheight * visible_fields) + border;
+				fgcolor, ui().colors().background_color());
+		boxtop = y - top + line_height() + (tb_border() * 3.0f);
+		firstliney = y - top + line_height() + (tb_border() * 4.0f);
+		visible_fields = std::min<int>(m_field_data.size(), int((y2 + bottom - tb_border() - firstliney) / line_height()));
+		boxbottom = firstliney + (line_height() * visible_fields) + tb_border();
 	}
 	else
 	{
-		boxtop = y2 + border;
+		boxtop = y2 + tb_border();
 		boxbottom = y2 + bottom;
-		firstliney = y2 + (border * 2.0f);
+		firstliney = y2 + (tb_border() * 2.0f);
 		visible_fields = m_visible_fields;
 	}
 	ui().draw_outlined_box(container(), boxleft, boxtop, boxright, boxbottom, ui().colors().background_color());
@@ -133,24 +146,24 @@ void menu_analog::custom_render(void *selectedref, float top, float bottom, floa
 		m_top_field = m_field_data.size() - visible_fields;
 
 	// show live fields
-	namewidth += lineheight * aspect;
-	float const nameleft(boxleft + (ui().box_lr_border() * aspect));
+	namewidth += line_height() * aspect;
+	float const nameleft(boxleft + lr_border());
 	float const indleft(nameleft + namewidth);
 	float const indright(indleft + 0.4f);
 	for (unsigned line = 0; visible_fields > line; ++line)
 	{
 		// draw arrows if scrolling is possible and menu is hidden
-		float const liney(firstliney + (lineheight * line));
+		float const liney(firstliney + (line_height() * line));
 		if (m_hide_menu)
 		{
 			bool const uparrow(!line && m_top_field);
 			bool const downarrow(((visible_fields - 1) == line) && ((m_field_data.size() - 1) > (line + m_top_field)));
 			if (uparrow || downarrow)
 			{
-				float const arrowwidth = lineheight * aspect;
+				float const arrowwidth = line_height() * aspect;
 				draw_arrow(
-						0.5f * (nameleft + indright - arrowwidth), liney + (0.25f * lineheight),
-						0.5f * (nameleft + indright + arrowwidth), liney + (0.75f * lineheight),
+						0.5f * (nameleft + indright - arrowwidth), liney + (0.25f * line_height()),
+						0.5f * (nameleft + indright + arrowwidth), liney + (0.75f * line_height()),
 						fgcolor, line ? (ROT0 ^ ORIENTATION_FLIP_Y) : ROT0);
 				continue;
 			}
@@ -160,22 +173,21 @@ void menu_analog::custom_render(void *selectedref, float top, float bottom, floa
 		field_data &data(m_field_data[line + m_top_field]);
 		bool const selected(&data.field.get() == selfield);
 		rgb_t const fieldcolor(selected ? ui().colors().selected_color() : fgcolor);
-		ui().draw_text_full(
-				container(),
+		draw_text_normal(
 				data.field.get().name(),
 				nameleft, liney, namewidth,
 				text_layout::text_justify::LEFT, text_layout::word_wrapping::NEVER,
-				mame_ui_manager::NORMAL, fieldcolor, ui().colors().text_bg_color());
+				fieldcolor);
 
 		ioport_value cur(0U);
 		data.field.get().live().analog->read(cur);
-		cur = (cur >> data.shift) - data.field.get().minval();
+		cur = ((cur >> data.shift) - data.field.get().minval()) & (data.field.get().mask() >> data.shift);
 		float fill(float(cur) / data.range);
 		if (data.field.get().analog_reverse())
 			fill = 1.0f - fill;
 
-		float const indtop(liney + (lineheight * 0.2f));
-		float const indbottom(liney + (lineheight * 0.8f));
+		float const indtop(liney + (line_height() * 0.2f));
+		float const indbottom(liney + (line_height() * 0.8f));
 		if (data.origin > fill)
 			container().add_rect(indleft + (fill * 0.4f), indtop, indleft + (data.origin * 0.4f), indbottom, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		else
@@ -234,8 +246,13 @@ void menu_analog::handle(event const *ev)
 
 			switch (ev->iptkey)
 			{
-			// if selected, reset to default value
+			// flip toggles when selected
 			case IPT_UI_SELECT:
+				if (ANALOG_ITEM_REVERSE == data.type)
+					newval = newval ? 0 : 1;
+				break;
+
+			// if cleared, reset to default value
 			case IPT_UI_CLEAR:
 				newval = data.defvalue;
 				break;
@@ -334,7 +351,7 @@ void menu_analog::handle(event const *ev)
 }
 
 
-void menu_analog::populate(float &customtop, float &custombottom)
+void menu_analog::populate()
 {
 	// loop over input ports
 	if (m_item_data.empty())
@@ -404,7 +421,7 @@ void menu_analog::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 
 	// space for live display
-	custombottom = (ui().get_line_height() * m_visible_fields) + (ui().box_tb_border() * 3.0f);
+	set_custom_space(0.0f, (line_height() * m_visible_fields) + (tb_border() * 3.0f));
 }
 
 
@@ -456,8 +473,8 @@ void menu_analog::find_fields()
 	}
 
 	// restrict live display to 40% height plus borders
-	if ((ui().get_line_height() * m_field_data.size()) > 0.4f)
-		m_visible_fields = unsigned(0.4f / ui().get_line_height());
+	if ((line_height() * m_field_data.size()) > 0.4f)
+		m_visible_fields = unsigned(0.4f / line_height());
 	else
 		m_visible_fields = m_field_data.size();
 }

@@ -41,7 +41,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(bus_error_off);
 
 private:
-	required_device<m68000_base_device> m_maincpu;
+	required_device<m68000_musashi_device> m_maincpu;
 	required_device<duscc68562_device> m_dusccterm;
 	required_device<wd33c93a_device> m_scsi;
 	required_device<upd765_family_device> m_fdc;
@@ -51,7 +51,7 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<input_buffer_device> m_cent_status_in;
-	required_device<m68000_base_device> m_oscpu;
+	required_device<m68000_musashi_device> m_oscpu;
 	required_shared_ptr<uint32_t> m_mailbox;
 	required_shared_ptr<uint32_t> m_p_ram;
 	required_region_ptr<uint32_t> m_sysrom;

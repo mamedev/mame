@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_INCLUDES_XAVIX_H
-#define MAME_INCLUDES_XAVIX_H
+#ifndef MAME_TVGAMES_XAVIX_H
+#define MAME_TVGAMES_XAVIX_H
 
 #include "cpu/m6502/xavix.h"
 #include "cpu/m6502/xavix2000.h"
@@ -987,4 +987,4 @@ protected:
 };
 
 
-#endif // MAME_INCLUDES_XAVIX_H
+#endif // MAME_TVGAMES_XAVIX_H

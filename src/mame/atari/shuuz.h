@@ -5,8 +5,8 @@
     Atari Shuuz hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SHUUZ_H
-#define MAME_INCLUDES_SHUUZ_H
+#ifndef MAME_ATARI_SHUUZ_H
+#define MAME_ATARI_SHUUZ_H
 
 #pragma once
 
@@ -53,4 +53,4 @@ private:
 	static const atari_motion_objects_config s_mob_config;
 };
 
-#endif // MAME_INCLUDES_SHUUZ_H
+#endif // MAME_ATARI_SHUUZ_H

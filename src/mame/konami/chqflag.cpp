@@ -315,7 +315,7 @@ inline void chqflag_state::update_background_shadows(uint8_t data)
 void chqflag_state::chqflag(machine_config &config)
 {
 	/* basic machine hardware */
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/2/4);    /* 052001 (verified on pcb) */
+	KONAMI(config, m_maincpu, XTAL(24'000'000)/2);    /* 052001 (verified on pcb) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &chqflag_state::chqflag_map);
 
 	Z80(config, m_audiocpu, XTAL(3'579'545)); /* verified on pcb */

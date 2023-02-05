@@ -5,8 +5,8 @@
     X68000 Custom SASI HD controller
 
 */
-#ifndef MAME_MACHINE_X68K_HDC_H
-#define MAME_MACHINE_X68K_HDC_H
+#ifndef MAME_SHARP_X68K_HDC_H
+#define MAME_SHARP_X68K_HDC_H
 
 #pragma once
 
@@ -129,4 +129,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(X68KHDC, x68k_hdc_image_device)
 
-#endif // MAME_MACHINE_X68K_HDC_H
+#endif // MAME_SHARP_X68K_HDC_H

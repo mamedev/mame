@@ -100,7 +100,7 @@ N F L Football             N B A Basketball           N H L Hockey
 
 Series 18: (256K)          Series 19: (256K)
 -----------------          -----------------
-Entertainment              Social Study
+Entertainment 3            Social Study
 This is Music              Television 2
 Super Trivia               Variety Pack
 World Geography            Famous Firsts
@@ -127,6 +127,8 @@ NOTE: Trivia Question ROM names are the internal names used. IE: read from the f
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class gei_state : public driver_device
 {
@@ -1754,6 +1756,24 @@ ROM_START( gtsers15 ) /* v5.06, From a TRIV3D romboard */
 	ROM_LOAD( "gtsers15.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) )
 ROM_END
 
+ROM_START( gtsers18 ) /* v5.06, From a TRIV3D romboard */
+	ROM_REGION( 0x38000, "maincpu", 0 )
+	ROM_LOAD( "program_v5.06",   0x00000, 0x4000, CRC(e9d6226c) SHA1(42e62c5cafa3f051bf48c18c8c549ffcd4c766c5) )
+	ROM_LOAD( "entertainment_3", 0x10000, 0x8000, CRC(577161c4) SHA1(0bbe5a030aa5b34414346613016e6164cddc7032) )
+	ROM_LOAD( "more_sports",     0x18000, 0x8000, CRC(1350777e) SHA1(97bda88a4340a3dc4b9edda0386a7f649e65939f) )
+	ROM_LOAD( "super_trivia",    0x20000, 0x8000, CRC(178461ce) SHA1(dfed10c744c7b6d0ee0cc10f4a9851be9a0a72c4) )
+	ROM_LOAD( "this_is_music",   0x28000, 0x8000, CRC(64eaf91a) SHA1(c7ca9012e00bd46758fd4942c5f882f9e6152090) )
+	ROM_LOAD( "adult_sex_9",     0x30000, 0x8000, CRC(83c8839c) SHA1(9a4641204bfa23d98674a36ad6b957d1a559c87b) ) /* Listed as an alternate question set */
+	/* Missing "world_geography" */
+
+	ROM_REGION( 0x0400, "pld", 0 ) // probably one of the two GALs provides the "signature"
+	ROM_LOAD( "gal16v8",   0x0000, 0x0117, NO_DUMP )  /* read protected */
+	ROM_LOAD( "gal18v8",   0x0200, 0x0117, NO_DUMP )  /* read protected */
+
+	ROM_REGION( 0x0008, "signature", 0 ) // bytes 0x03 through 0x0a of each question ROM - to prevent ROM swaps
+	ROM_LOAD( "gtsers18.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) ) /* Same as series 15 sig? */
+ROM_END
+
 ROM_START( gt103a1 ) /* Need to verify which series or sets these belong to */
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "prog1_versiona",  0x00000, 0x4000, CRC(537d6566) SHA1(282a33e4a9fc54d34094393c00026bf31ccd6ab5) )
@@ -2003,6 +2023,9 @@ void gei_state::init_geimulti()
 	m_rombank->set_entry(0);
 }
 
+} // anonymous namespace
+
+
 GAME( 1982, jokpoker,  0,        gselect,   gselect,  gei_state, init_setbank,  ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03B)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, jokpokera, jokpoker, jokpokera, gselect,  gei_state, init_setbank,  ROT0, "Greyhound Electronics", "Joker Poker (Version 16.03BI 5-10-85, Joker Poker ICB 9-30-86)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, jokpokerb, jokpoker, jokpokera, gselect,  gei_state, init_setbank,  ROT0, "Greyhound Electronics", "Joker Poker (Version 16.04BI 10-19-88, Joker Poker ICB 9-30-86)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
@@ -2040,6 +2063,7 @@ GAME( 1984, gtsers12a, gtsers8,  findout,   gt103,    gei_state, init_bank8k,   
 GAME( 1986, gtsers14,  gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 14)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gtsers14a, gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 14 Alt Question Rom)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gtsers15,  gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 15)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, gtsers18,  gtsers8,  findout,   gt103,    gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 18)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gt103a1,   gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Unsorted question roms)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gt103aa,   gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Alt questions 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gt103ab,   gtsers8,  findout,   getrivia, gei_state, init_bank8k,   ROT0, "Greyhound Electronics", "Trivia (Version 1.03a Alt questions 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

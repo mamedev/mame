@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_VIDEO_VS920A_H
-#define MAME_VIDEO_VS920A_H
+#ifndef MAME_VSYSTEM_VS920A_H
+#define MAME_VSYSTEM_VS920A_H
 
 #pragma once
 
@@ -41,4 +41,4 @@ private:
 
 DECLARE_DEVICE_TYPE(VS920A, vs920a_text_tilemap_device)
 
-#endif // MAME_VIDEO_VS920A_H
+#endif // MAME_VSYSTEM_VS920A_H

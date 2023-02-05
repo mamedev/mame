@@ -1,36 +1,58 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+// thanks-to: sampson
 /* Taito Type X Skeleton
  - PC based platforms
 
  (insert original hardware specs, plus any other details here)
+ https://wiki.arcadeotaku.com/w/Taito_Type_X
+ https://wiki.arcadeotaku.com/w/Taito_Type_X%C2%B2
 
- todo: everything..
+TODO:
+ - Undumped custom BIOSes, at least regular Type X uses a Springdale spinoff.
+   Type X: Intel 865G
+   Type X+: as above plus better PCI video/sound cards
+   Type X7: Intel 855GME + ICH4
+   Type X2 & Satellite Terminal: Intel Q965 + ICH8
+   Type X Zero: MCP7A-ION
+   Type X3: Intel Q67 express
 
- - there is no bios dump
+ - GPUs also uses custom BIOSes, again undumped;
+
+ - To access BIOS menu needs to hold CTRL+ALT+F9 on POST. The menu is password
+   protected in plaintext ...
+
+ - The BIOS cannot load any OS that isn't the intended ones, non canonical MBR
+   checks? investigate;
 
  - there are a lot of hacked versions of the games designed to run on PCs
    this driver is for storing information about the unmodified versions only,
    the 'hacked to run on PC' versions are of no interest to MAME, only proper
    drive images.
 
- - some of the games are said to be encrypted, how does this work, how do we
-   get the keys? some images are copies of the files from an already mounted
+ - For copy protection most if not all games uses a USB dongle with sim card that
+   is necessary for decrypting game containers inside HDD cfr. page 12 of the Type X2
+   manual
+
+ - (old note) some of the games are said to be encrypted, how does this work,
+   how do we get the keys? some images are copies of the files from an already mounted
    filesystem, again this isn't suitable for MAME.
 
- - hardware specs can differ from game to game as well as between the platform
-   types, I'm currently not sure what constitutes a new platform (different
-   security?)  need Guru style readmes for each platform.
+ - Taito's NESiCAxLive platform requires a live connection to a dedicated
+   Taito Type X Zero in-store "server", that will pass the info to a intranet
+   connected Type X/X2. Notice that the Type X Zero will eventually try to connect thru
+   "strict" ssl pinning, which will refuse any connection that isn't the internally
+   defined CA.
 
- - Taito's NESiCA Live platform probably comes after this, but as it's likely
-   impossible to ever emulate it.
+ - Type X Zero can also be used on specific cab setups, for example connecting two
+   Type X3 usf4 for versus mode.
 
  - Preliminary game lists (mainly from system16.com)
 
     Taito Type X games
 
     Chaos Breaker / Dark Awake
-    Datacarddass Dragon Ball Z
+    Data Carddass Dragon Ball Z
     Dinoking III Allosaurus
     Dinomax
     Dragon Quest - Monster Battle Road
@@ -111,6 +133,17 @@
 
     Taito Type X Zero games
 
+    Card de Renketsu! Densha de Go!
+    Groove Coaster
+    Groove Coaster 2 Heavenly Festival
+    Groove Coaster 3 Link Fever
+    Groove Coaster 3 EX Dream Party
+    Groove Coaster 4 Starlight Road
+    Groove Coaster 4 EX Infinity Highway
+    Groove Coaster 4 MAX Diamond Galaxy
+    Groove Coaster EX
+    Kickthrough Racers
+    Mogutte Horehore
     Spin Gear
 
 */
@@ -118,15 +151,17 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "emupal.h"
-#include "screen.h"
+#include "machine/pci.h"
+
+
+namespace {
 
 class taito_type_x_state : public driver_device
 {
 public:
 	taito_type_x_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{ }
 
 	void taito_type_x(machine_config &config);
@@ -134,61 +169,30 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_taito_type_x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void taito_type_x_map(address_map &map);
 };
 
 
-
-
-void taito_type_x_state::video_start()
-{
-}
-
-
-uint32_t taito_type_x_state::screen_update_taito_type_x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
-
 void taito_type_x_state::taito_type_x_map(address_map &map)
 {
-	map(0x00, 0x0f).rom();
 }
 
 static INPUT_PORTS_START( taito_type_x )
 INPUT_PORTS_END
 
-
-void taito_type_x_state::machine_start()
-{
-}
-
-void taito_type_x_state::machine_reset()
-{
-}
-
 // todo: different configs for the different machine types.
 void taito_type_x_state::taito_type_x(machine_config &config)
 {
-	/* basic machine hardware */
-	PENTIUM3(config, m_maincpu, 733333333); /* Wrong, much newer processors, much faster. */
+	// Socket 478
+	PENTIUM4(config, m_maincpu, 100'000'000); /* Wrong, much newer processors, much faster. */
 	m_maincpu->set_addrmap(AS_PROGRAM, &taito_type_x_state::taito_type_x_map);
+	m_maincpu->set_disable();
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(taito_type_x_state::screen_update_taito_type_x));
-
-	PALETTE(config, "palette").set_entries(0x10000);
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
+} // anonymous namespace
 
 
 /***************************************************************************
@@ -200,63 +204,84 @@ void taito_type_x_state::taito_type_x(machine_config &config)
 // Type X
 
 ROM_START( chaosbrk )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
 	/* bios, video bios etc. not dumped */
+
+	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
 	DISK_IMAGE( "chaosbreaker_v2_02j", 0, SHA1(8fe7bdc20a8d9e81f08cef60324ed9ac978a16e9) )
 ROM_END
 
 ROM_START( goketsuj )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
 	/* bios, video bios etc. not dumped */
+
+	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd:image" ) // Single 160GB drive
 	DISK_IMAGE( "goketsuji_v200906230", 0, SHA1(f0733fbb42994208e18c6afe67f1e9746351a3a2) )
 ROM_END
 
 ROM_START( gwinggen )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
 	/* bios, video bios etc. not dumped */
+
+	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
 	DISK_IMAGE( "gigawing_v2_02j", 0, SHA1(e09a2e5019111765689cb205cc94e7868c55e9ca) )
 ROM_END
 
 ROM_START( homura )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
 	/* bios, video bios etc. not dumped */
+
+	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
 	DISK_IMAGE( "homura_v2_04jpn", 0, SHA1(0d9d24583fa786b82bf27447408111bd4686033e) )
 ROM_END
 
 ROM_START( hotgmkmp )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
 	/* bios, video bios etc. not dumped */
+
+	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
 	DISK_IMAGE( "wdc wd400eb-11cpf0", 0, SHA1(15f8cf77b5bdc516a891022462a42521be1d7553) )
 ROM_END
 
 ROM_START( kof98um )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
 	/* bios, video bios etc. not dumped */
+
+	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
 	DISK_IMAGE( "kof98um_v1_00", 0, SHA1(cf21747ddcdf802d766a2bd6a3d75a965e89b2cf) )
 ROM_END
 
 ROM_START( kofskyst)
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
 	/* bios, video bios etc. not dumped */
+
+	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	// Single 40GB drive(KOF SKY STAGE - M9008134A - Ver.1.00J - 40.0 GB WD - WD400BB-22JHCO)
@@ -266,36 +291,48 @@ ROM_START( kofskyst)
 ROM_END
 
 ROM_START( raiden3 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
 	/* bios, video bios etc. not dumped */
+
+	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
 	DISK_IMAGE( "raiden3_v2_01j", 0, SHA1(60142f765a0706e938b91cc41dc14eb67bd78615) )
 ROM_END
 
 ROM_START( raiden4 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
 	/* bios, video bios etc. not dumped */
+
+	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
 	DISK_IMAGE( "raiden4_v1_00j", 0, SHA1(f5ad509f57067089e0217df6d05036484b06a41a) )
 ROM_END
 
 ROM_START( shikiga3 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
 	/* bios, video bios etc. not dumped */
+
+	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd:image" ) // Single 20GB drive
 	DISK_IMAGE( "shikigami3_v2_06jpn", 0, SHA1(4bf41ab1a3f2cd51cd2b1e6183959d2a4878449d) )
 ROM_END
 
 ROM_START( spicaadv )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
 	/* bios, video bios etc. not dumped */
+
+	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
 	DISK_IMAGE( "spicaadventure_v2_03j", 0, SHA1(218ee0670a7b895f42480f0fe6719ecd4f4ba9e6) )
@@ -307,37 +344,43 @@ ROM_END
 //
 //           USAGI   M9006613A  VER.2.04JPN     40.0GB  WD  WD400BB-22JHCO
 ROM_START( usagiol )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
 	/* bios, video bios etc. not dumped */
+
+	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive, WD Caviar model WD400BB, LBA 78165360
 	DISK_IMAGE( "usagionline_v2_04j", 0, SHA1(6d4a780c40ee5c9b0192932e926f144d76b87262) )
 ROM_END
 
 ROM_START( trbwtchs )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
 	/* bios, video bios etc. not dumped */
+
+	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd:image" ) // Single 160GB drive
 	DISK_IMAGE( "troublewitches_ac_v1.00j", 0, SHA1(733ecbae040dd32447230d3fc81e6f8614715ee5) )
 ROM_END
 
 
-GAME( 2004, chaosbrk,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Taito Corporation", "Chaos Breaker (v2.02J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2004, gwinggen,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Takumi Corporation", "Giga Wing Generations (v2.02J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, homura,    0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "SKonec Entertainment", "Homura (v2.04J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, hotgmkmp,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "XNauts", "Taisen Hot Gimmick Mix Party",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, raiden3,   0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "MOSS / Seibu Kaihatsu", "Raiden III (v2.01J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, spicaadv,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Taito Corporation", "Spica Adventure (v2.03J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2005, usagiol,   0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Taito Corporation/Warashi", "Usagi Online (v2.04J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2006, shikiga3,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Alfa System/SKonec Entertainment", "Shikigami no Shiro III (v2.06J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2007, raiden4,   0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "MOSS / Seibu Kaihatsu", "Raiden IV (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2008, kof98um,   0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "SNK", "The King of Fighters '98: Ultimate Match (v1.00)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2008, trbwtchs,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Adventure Planning Service/Studio SiestA", "Trouble Witches AC (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2009, goketsuj,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Atlus", "Gouketsuji Ichizoku: Senzo Kuyou (v200906230)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2010, kofskyst,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Moss / SNK Playmore", "KOF Sky Stage (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2004, chaosbrk,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Taito Corporation", "Chaos Breaker (v2.02J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2004, gwinggen,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Takumi Corporation", "Giga Wing Generations (v2.02J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2005, homura,    0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "SKonec Entertainment", "Homura (v2.04J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2005, hotgmkmp,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "XNauts", "Taisen Hot Gimmick Mix Party",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2005, raiden3,   0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "MOSS / Seibu Kaihatsu", "Raiden III (v2.01J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2005, spicaadv,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Taito Corporation", "Spica Adventure (v2.03J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2005, usagiol,   0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Taito Corporation/Warashi", "Usagi: Yasei no Topai Online (v2.04J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2006, shikiga3,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Alfa System/SKonec Entertainment", "Shikigami no Shiro III (v2.06J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2007, raiden4,   0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "MOSS / Seibu Kaihatsu", "Raiden IV (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2008, kof98um,   0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "SNK", "The King of Fighters '98: Ultimate Match (v1.00)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2008, trbwtchs,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Adventure Planning Service/Studio SiestA", "Trouble Witches AC (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2009, goketsuj,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Atlus", "Gouketsuji Ichizoku: Senzo Kuyou (v200906230)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2010, kofskyst,  0,    taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Moss / SNK Playmore", "KOF Sky Stage (v1.00J)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )
 
 
 // Type X+
@@ -348,9 +391,12 @@ GAME( 2010, kofskyst,  0,    taito_type_x, taito_type_x, taito_type_x_state, emp
 //
 //           ****   M9006981A  VER.1.00   40.0GB  WD  WD400BB-22JHCO
 ROM_START( wontmuch )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x2_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
 	/* bios, video bios etc. not dumped */
+
+	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd:image" ) // Single 40GB drive
 	// 5BC6813ADBE1525BAFED792FC12C27AB
@@ -358,15 +404,18 @@ ROM_START( wontmuch )
 ROM_END
 
 
-GAME( 2006, wontmuch, 0, taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Capcom", "Won!Tertainment Music Channel (v1.00)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2006, wontmuch, 0, taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Capcom", "Won!Tertainment Music Channel (v1.00)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )
 
 
 // Type X2
 
 ROM_START( chasehq2 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x2_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
 	/* bios, video bios etc. not dumped */
+
+	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd:image" ) // Single 80GB drive
 	// 2188b8d76766c34580d99bf5ab0848fc 696092ff8467034acc4b34702006b3afbcb90082 chase_hq_2_v2.0.6.jp.001
@@ -374,9 +423,12 @@ ROM_START( chasehq2 )
 ROM_END
 
 ROM_START( samspsen )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x2_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
 	/* bios, video bios etc. not dumped */
+
+	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd:image" ) // Single 80GB drive
 	//e19435da2cd417d1e2949d14a043d6e1 50ef9af80b11984c56e4f765a6f827fa5d22b404 samurai spirits sen.v1.00.001
@@ -384,9 +436,12 @@ ROM_START( samspsen )
 ROM_END
 
 ROM_START( kofxii )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("taito_type_x2_bios.bin", 0x00, 0x10000, NO_DUMP ) // size unknown.
 	/* bios, video bios etc. not dumped */
+
+	ROM_REGION( 0x1000, "dongle", ROMREGION_ERASEFF )
+	ROM_LOAD("dongle.pic", 0, 0x1000, NO_DUMP )
 
 	DISK_REGION( "ide:0:hdd:image" ) // Single 80GB drive
 	//2ff6b2d33ab7e915733a4328c73695de xii_ver.1.img
@@ -394,6 +449,6 @@ ROM_START( kofxii )
 ROM_END
 
 
-GAME( 2006, chasehq2, 0, taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Taito Corporation", "Chase H.Q. 2 (v2.0.6.JP)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2008, samspsen, 0, taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "SNK Playmore",      "Samurai Spirits Sen (v1.00)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2009, kofxii,   0, taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "SNK Playmore",      "The King of Fighters XII (v1.00)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2006, chasehq2, 0, taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "Taito Corporation", "Chase H.Q. 2 (v2.0.6.JP)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2008, samspsen, 0, taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "SNK Playmore",      "Samurai Spirits Sen (v1.00)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2009, kofxii,   0, taito_type_x, taito_type_x, taito_type_x_state, empty_init, ROT0, "SNK Playmore",      "The King of Fighters XII (v1.00)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_UNEMULATED_PROTECTION )

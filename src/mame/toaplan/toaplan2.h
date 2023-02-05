@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Quench, Yochizo, David Haywood
-#ifndef MAME_INCLUDES_TOAPLAN2_H
-#define MAME_INCLUDES_TOAPLAN2_H
+#ifndef MAME_TOAPLAN_TOAPLAN2_H
+#define MAME_TOAPLAN_TOAPLAN2_H
 
 #pragma once
 
@@ -178,7 +178,6 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	virtual void machine_start() override;
-	DECLARE_MACHINE_RESET(toaplan2);
 	DECLARE_MACHINE_RESET(bgaregga);
 	DECLARE_VIDEO_START(toaplan2);
 	DECLARE_MACHINE_RESET(ghox);
@@ -250,4 +249,4 @@ private:
 	void vfive_v25_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_TOAPLAN2_H
+#endif // MAME_TOAPLAN_TOAPLAN2_H

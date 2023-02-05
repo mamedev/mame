@@ -7,8 +7,8 @@
     Phill Harvey-Smith
     2009-11-29.
 */
-#ifndef MAME_INCLUDES_RMNIMBUS_H
-#define MAME_INCLUDES_RMNIMBUS_H
+#ifndef MAME_RM_RMNIMBUS_H
+#define MAME_RM_RMNIMBUS_H
 
 #pragma once
 
@@ -261,4 +261,4 @@ private:
 	TIMER_CALLBACK_MEMBER(do_mouse);
 };
 
-#endif // MAME_INCLUDES_RMNIMBUS_H
+#endif // MAME_RM_RMNIMBUS_H

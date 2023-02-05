@@ -3,10 +3,6 @@
 /******************************************************************************
  *  Microtan 65
  *
- *  system driver
- *
- *  Juergen Buchmueller <pullmoll@t-online.de>, Jul 2000
- *
  *  Thanks go to Geoff Macdonald <mail@geoff.org.uk>
  *  for his site http://www.geoff.org.uk/microtan/index.htm
  *  and to Fabrice Frances <frances@ensica.fr>
@@ -49,11 +45,32 @@
  *  BAS       Start BASIC
  *  WAR       Re-enter BASIC (warm start)
  *
- *  The keyboard is essentially an ordinary ASCII keyboard, with 71 keys, 8
- *  TTL chips and an undumped 2716 eprom labelled MON V1. We currently use a
- *  generic keyboard because of the lack of a schematic. Unemulated keys are
- *  'SHIFT LOCK' and 'REPT'. Since all commands must be uppercase, capslock
- *  is defaulted to on.
+ *  Ralbug commnds:
+ *  COP       Copy
+ *  MEM       Modify memory
+ *  SYW       Warm start to DOS system
+ *  SYC       Cold start to DOS system
+ *  SYB       Boot DOS system
+ *  LIS       List a line of memory
+ *  JMP       Go to address that follows
+ *  JSR       JSR to following address
+ *  JMI       Jump indirect
+ *  JSI       JSR indirect
+ *  TES       Memory test
+ *  CLR       Clear screen
+ *  COL       Colour change
+ *  HEL       Help display menu
+ *  VEC       List vector jump table
+ *  FIL       Fill Memory
+ *  CUR       Cursor move
+ *  ASC       ASCII table display
+ *  SYN       Command syntax
+ *  HOM       Home cursor
+ *  WAR       Warm start $0003
+ *  STA       Start $0000
+ *  EXP       Expand monitor
+ *  BLE       Keyboard bleep
+ *  KIL       Kill off the cache
  *
  *****************************************************************************/
 
@@ -72,7 +89,7 @@ void microtan_state::mt65_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x03ff).ram().w(FUNC(microtan_state::videoram_w)).share(m_videoram);
 	map(0xbff0, 0xbfff).rw(FUNC(microtan_state::bffx_r), FUNC(microtan_state::bffx_w));
-	map(0xf800, 0xffff).rom();
+	map(0xf800, 0xffff).rom().region("maincpu", 0);
 }
 
 void microtan_state::spinv_map(address_map &map)
@@ -80,181 +97,39 @@ void microtan_state::spinv_map(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x03ff).ram().w(FUNC(microtan_state::videoram_w)).share(m_videoram);
-	map(0xbc04, 0xbc04).rw(FUNC(microtan_state::sound_r), FUNC(microtan_state::sound_w));
 	map(0xbff0, 0xbfff).rw(FUNC(microtan_state::bffx_r), FUNC(microtan_state::bffx_w));
-	map(0xe800, 0xefff).rom().mirror(0x1000);
+	map(0xf800, 0xffff).rom().region("maincpu", 0);
 }
 
 void mt6809_state::mt6809_map(address_map &map)
 {
 	map(0x0000, 0xffff).rw(m_tanbus, FUNC(tanbus_device::read), FUNC(tanbus_device::write));
-	map(0xdc00, 0xdfff).ram();
-	map(0xdfd8, 0xdfd8).r(FUNC(mt6809_state::keyboard_r));
-	map(0xf800, 0xffff).rom();
+	map(0x0000, 0x03ff).ram();
+	map(0xbff0, 0xbfff).rw(FUNC(mt6809_state::bffx_r), FUNC(mt6809_state::bffx_w));
+	map(0xf800, 0xffff).rom().region("maincpu", 0);
 }
 
 
-INPUT_CHANGED_MEMBER(microtan_state::trigger_reset)
+WRITE_LINE_MEMBER(microtan_state::trigger_reset)
 {
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 
-	if (newval)
+	if (state)
 	{
 		machine().schedule_soft_reset();
 	}
 }
 
-static INPUT_PORTS_START( microtan )
-	PORT_START("CONFIG")
-	PORT_CONFNAME(0x03, 0x00, "Input")
-	PORT_CONFSETTING(0x00, "ASCII Keyboard")
-	PORT_CONFSETTING(0x01, "Hex Keypad")
+WRITE_LINE_MEMBER(mt6809_state::trigger_reset)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 
-	PORT_START("KBD0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(27)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("1  !") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("2  \"") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("3  #") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("4  $") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("5  %") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("6  &") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("7  \'") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR(39)
+	if (state)
+	{
+		machine().schedule_soft_reset();
+	}
+}
 
-	PORT_START("KBD1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("8  (") PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("9  )") PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR('~')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(":  *") PORT_CODE(KEYCODE_MINUS) PORT_CHAR(':') PORT_CHAR('*')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("-  =") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('-') PORT_CHAR('=')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NEW PAGE") PORT_CODE(KEYCODE_TILDE) PORT_CHAR(12)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RUB OUT") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_TAB) PORT_CHAR('^') PORT_CHAR('_')
-
-	PORT_START("KBD2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_CHAR('q')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_CHAR('w')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E') PORT_CHAR('e')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R') PORT_CHAR('r')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T') PORT_CHAR('t')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_CHAR('y')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U') PORT_CHAR('u')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_CHAR('i')
-
-	PORT_START("KBD3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O') PORT_CHAR('o')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P') PORT_CHAR('p')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("[  {") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("]  }") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("BREAK") PORT_CODE(KEYCODE_DEL) PORT_CHAR(3)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_KEYBOARD ) PORT_NAME("ALFA LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-
-	PORT_START("KBD4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_CHAR('a')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_CHAR('s')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D') PORT_CHAR('d')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_CHAR('f')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G') PORT_CHAR('g')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_CHAR('h')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('j')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K') PORT_CHAR('k')
-
-	PORT_START("KBD5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_CHAR('l')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(";  +") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("@") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('@') PORT_CHAR('`')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\\  |") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHIFT (L)") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_CHAR('z')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('x')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHAR('c')
-
-	PORT_START("KBD6")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_CHAR('v')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_CHAR('b')
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR('n')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHAR('m')
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(",  <") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(".  >") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("/  ?") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHIFT (R)") PORT_CODE(KEYCODE_RSHIFT)
-
-	PORT_START("KBD7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LINE FEED") PORT_CHAR(10)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(32)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("- (KP)") PORT_CODE(KEYCODE_MINUS_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(", (KP)") PORT_CODE(KEYCODE_PLUS_PAD)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("ENTER (KP)") PORT_CODE(KEYCODE_ENTER_PAD)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(". (KP)") PORT_CODE(KEYCODE_DEL_PAD)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("0 (KP)") PORT_CODE(KEYCODE_0_PAD)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("1 (KP)") PORT_CODE(KEYCODE_1_PAD)
-
-	PORT_START("KBD8")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("2 (KP)") PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("3 (KP)") PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("4 (KP)") PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("5 (KP)") PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("6 (KP)") PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("7 (KP)") PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("8 (KP)") PORT_CODE(KEYCODE_8_PAD)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("9 (KP)") PORT_CODE(KEYCODE_9_PAD)
-
-	PORT_START("KPAD0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("0") PORT_CODE(KEYCODE_0_PAD)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("4") PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("8 P") PORT_CODE(KEYCODE_8_PAD)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("C M") PORT_CODE(KEYCODE_C)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT)
-	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("KPAD1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("1") PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("5 O") PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("9 ESC") PORT_CODE(KEYCODE_9_PAD)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("D G") PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("LF DEL") PORT_CODE(KEYCODE_DEL_PAD)
-	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("KPAD2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("2") PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("6 C") PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("E S") PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("CR SP") PORT_CODE(KEYCODE_ENTER_PAD)
-	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("KPAD3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("3 '") PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("7 R") PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("B L") PORT_CODE(KEYCODE_B)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("F N") PORT_CODE(KEYCODE_F)
-	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("BRK")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_F12) PORT_CHAR(UCHAR_MAMEKEY(F12)) PORT_CHANGED_MEMBER(DEVICE_SELF, microtan_state, trigger_reset, 0)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( spinveti )
-	PORT_START("CONFIG")
-	PORT_CONFNAME(0x03, 0x02, "Input")
-	PORT_CONFSETTING(0x02, "ETI Keypad")
-	PORT_CONFNAME(0x60, 0x20, "Difficulty")
-	PORT_CONFSETTING(0x00, "Easy")
-	PORT_CONFSETTING(0x20, "Normal")
-	PORT_CONFSETTING(0x40, "Hard")
-	PORT_CONFSETTING(0x60, "Hardest")
-
-	PORT_START("KEYPAD")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Play") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Fire") PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Hold") PORT_CODE(KEYCODE_H)
-
-	PORT_START("BRK")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Reset") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, microtan_state, trigger_reset, 0)
-INPUT_PORTS_END
 
 static const gfx_layout char_layout =
 {
@@ -279,9 +154,11 @@ void microtan_state::mt65(machine_config &config)
 	M6502(config, m_maincpu, 6_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &microtan_state::mt65_map);
 
-	TIMER(config, "kbd_timer").configure_periodic(FUNC(microtan_state::kbd_scan), attotime::from_hz(45));
-
 	INPUT_MERGER_ANY_HIGH(config, m_irq_line).output_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
+
+	MICROTAN_KBD_SLOT(config, m_keyboard, microtan_kbd_devices, "mt009");
+	m_keyboard->strobe_handler().set(FUNC(microtan_state::kbd_int));
+	m_keyboard->reset_handler().set(FUNC(microtan_state::trigger_reset));
 
 	/* video hardware - include overscan */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -348,6 +225,10 @@ void microtan_state::spinveti(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, m_irq_line).output_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
+	MICROTAN_KBD_SLOT(config, m_keyboard, microtan_kbd_devices, "spinveti");
+	m_keyboard->strobe_handler().set(FUNC(microtan_state::kbd_int));
+	m_keyboard->reset_handler().set(FUNC(microtan_state::trigger_reset));
+
 	/* video hardware - include overscan */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(6_MHz_XTAL, 384, 0, 32*8, 312, 0, 16*16);
@@ -357,59 +238,57 @@ void microtan_state::spinveti(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_microtan);
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
-
-	/* TODO: Sound hardware */
 }
 
 
 static DEVICE_INPUT_DEFAULTS_START(ra32k_def_ram0000)
 	/* 32K RAM configured 0x0000-0x7fff */
-	DEVICE_INPUT_DEFAULTS("SW1", 0xff, 0xff) // all blocks enabled
-	DEVICE_INPUT_DEFAULTS("SW2", 0xff, 0xff) // all blocks enabled
-	DEVICE_INPUT_DEFAULTS("SW3", 0x0f, 0x0f) // start address $0000
-	DEVICE_INPUT_DEFAULTS("LNK1", 0x03, 0x01)
+	DEVICE_INPUT_DEFAULTS("DSW1", 0xff, 0xff) // all blocks enabled
+	DEVICE_INPUT_DEFAULTS("DSW2", 0xff, 0xff) // all blocks enabled
+	DEVICE_INPUT_DEFAULTS("DSW3", 0x0f, 0x0f) // start address $0000
+	DEVICE_INPUT_DEFAULTS("LNK1", 0x01, 0x01) // paged
 DEVICE_INPUT_DEFAULTS_END
 
 static DEVICE_INPUT_DEFAULTS_START(ra32k_def_ram8000)
 	/* 32K RAM configured 0x8000-0xffff */
-	DEVICE_INPUT_DEFAULTS("SW1", 0xff, 0x7f) // disable block $F800
-	DEVICE_INPUT_DEFAULTS("SW2", 0xff, 0xff) // all blocks enabled
-	DEVICE_INPUT_DEFAULTS("SW3", 0x0f, 0x0d) // start address $8000
-	DEVICE_INPUT_DEFAULTS("LNK1", 0x03, 0x00)
+	DEVICE_INPUT_DEFAULTS("DSW1", 0xff, 0x7f) // disable block $F800
+	DEVICE_INPUT_DEFAULTS("DSW2", 0xff, 0xff) // all blocks enabled
+	DEVICE_INPUT_DEFAULTS("DSW3", 0x0f, 0x0d) // start address $8000
+	DEVICE_INPUT_DEFAULTS("LNK1", 0x01, 0x00) // permanent
 DEVICE_INPUT_DEFAULTS_END
 
-static DEVICE_INPUT_DEFAULTS_START(ra32k_def_rom2000)
+static DEVICE_INPUT_DEFAULTS_START(ra32k_def_rom0000)
 	/* 8K EPROM configured 0x2000-0x3fff */
-	DEVICE_INPUT_DEFAULTS("SW1", 0xff, 0xff) // all blocks enabled
-	DEVICE_INPUT_DEFAULTS("SW2", 0xff, 0xff) // all blocks enabled
-	DEVICE_INPUT_DEFAULTS("SW3", 0x0f, 0x04) // start address $2000
-	DEVICE_INPUT_DEFAULTS("LNK1", 0x03, 0x02)
+	DEVICE_INPUT_DEFAULTS("DSW1", 0xff, 0xff) // all blocks enabled
+	DEVICE_INPUT_DEFAULTS("DSW2", 0xff, 0xff) // all blocks enabled
+	DEVICE_INPUT_DEFAULTS("DSW3", 0x0f, 0x0f) // start address $0000
+	DEVICE_INPUT_DEFAULTS("LNK1", 0x01, 0x01) // paged
 DEVICE_INPUT_DEFAULTS_END
 
 void mt6809_state::mt6809(machine_config &config)
 {
 	/* Ralph Allen 6809 CPU Board */
-	MC6809(config, m_maincpu, 6_MHz_XTAL / 4); // TODO: verify divider
+	MC6809(config, m_maincpu, 6_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mt6809_state::mt6809_map);
 
-	TIMER(config, "kbd_timer").configure_periodic(FUNC(microtan_state::kbd_scan), attotime::from_hz(45));
-
-	INPUT_MERGER_ANY_HIGH(config, m_irq_line).output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	MICROTAN_KBD_SLOT(config, m_keyboard, microtan_kbd_devices, "mt009");
+	m_keyboard->strobe_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_keyboard->reset_handler().set(FUNC(mt6809_state::trigger_reset));
 
 	/* Microtan Motherboard */
 	TANBUS(config, m_tanbus, 6_MHz_XTAL);
-	m_tanbus->out_irq_callback().set(m_irq_line, FUNC(input_merger_device::in_w<IRQ_TANBUS>));
+	m_tanbus->out_irq_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
 	m_tanbus->out_nmi_callback().set_inputline(m_maincpu, M6809_FIRQ_LINE);
 
 	TANBUS_SLOT(config, "tanbus:tanex", -1, tanex_devices, nullptr);
-	TANBUS_SLOT(config, "tanbus:0", 0, tanbus6809_devices, "ra32k").set_option_device_input_defaults("ra32k", DEVICE_INPUT_DEFAULTS_NAME(ra32k_def_ram0000));
-	TANBUS_SLOT(config, "tanbus:1", 1, tanbus6809_devices, "ra32k").set_option_device_input_defaults("ra32k", DEVICE_INPUT_DEFAULTS_NAME(ra32k_def_ram8000));
+	TANBUS_SLOT(config, "tanbus:0", 0, tanbus6809_devices, "ra32kram").set_option_device_input_defaults("ra32kram", DEVICE_INPUT_DEFAULTS_NAME(ra32k_def_ram0000));
+	TANBUS_SLOT(config, "tanbus:1", 1, tanbus6809_devices, "ra32kram").set_option_device_input_defaults("ra32kram", DEVICE_INPUT_DEFAULTS_NAME(ra32k_def_ram8000));
 	TANBUS_SLOT(config, "tanbus:2", 2, tanbus6809_devices, "ravdu");
-	TANBUS_SLOT(config, "tanbus:3", 3, tanbus6809_devices, "radisc");
+	TANBUS_SLOT(config, "tanbus:3", 3, tanbus6809_devices, nullptr);
 	TANBUS_SLOT(config, "tanbus:4", 4, tanbus6809_devices, nullptr);
-	TANBUS_SLOT(config, "tanbus:5", 5, tanbus6809_devices, nullptr);
+	TANBUS_SLOT(config, "tanbus:5", 5, tanbus6809_devices, "radisc");
 	TANBUS_SLOT(config, "tanbus:6", 6, tanbus6809_devices, nullptr);
-	TANBUS_SLOT(config, "tanbus:7", 7, tanbus6809_devices, "ra32k").set_option_device_input_defaults("ra32k", DEVICE_INPUT_DEFAULTS_NAME(ra32k_def_rom2000));
+	TANBUS_SLOT(config, "tanbus:7", 7, tanbus6809_devices, "ra32krom").set_option_device_input_defaults("ra32krom", DEVICE_INPUT_DEFAULTS_NAME(ra32k_def_rom0000));
 	TANBUS_SLOT(config, "tanbus:exp", 8, tanbus6809_devices, nullptr);
 
 	/* software lists */
@@ -418,69 +297,69 @@ void mt6809_state::mt6809(machine_config &config)
 
 
 ROM_START( mt65 )
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x0800, "maincpu", 0)
 	ROM_DEFAULT_BIOS("tanbug23")
 	/* Microtan 65 (MT0016 Iss 1) */
 	ROM_SYSTEM_BIOS(0, "tanbug23", "TANBUG V2.3")
-	ROMX_LOAD("tanbug23.k3", 0xf800, 0x0800, CRC(7f29845d) SHA1(de277e942eefa11a9a6defe3d7d03071d5100b68), ROM_BIOS(0))
+	ROMX_LOAD("tanbug23.k3", 0x0000, 0x0800, CRC(7f29845d) SHA1(de277e942eefa11a9a6defe3d7d03071d5100b68), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "tanbug23p", "TANBUG V2.3 (patched)")
-	ROMX_LOAD("tanbug_2.rom", 0xf800, 0x0400, CRC(7e215313) SHA1(c8fb3d33ce2beaf624dc75ec57d34c216b086274), ROM_BIOS(1))
-	ROMX_LOAD("tanbug.rom", 0xfc00, 0x0400, CRC(c8221d9e) SHA1(c7fe4c174523aaaab30be7a8c9baf2bc08b33968), ROM_BIOS(1))
+	ROMX_LOAD("tanbug_2.rom", 0x0000, 0x0400, CRC(7e215313) SHA1(c8fb3d33ce2beaf624dc75ec57d34c216b086274), ROM_BIOS(1))
+	ROMX_LOAD("tanbug.rom",   0x0400, 0x0400, CRC(c8221d9e) SHA1(c7fe4c174523aaaab30be7a8c9baf2bc08b33968), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(2, "tanbug31", "TANBUG V3.1 (TANDOS)")
-	ROMX_LOAD("tanbug31.k3", 0xf800, 0x0800, CRC(5943e427) SHA1(55fe645363cd5f2015a537be6f7a00de33d1bea5), ROM_BIOS(2))
+	ROMX_LOAD("tanbug31.k3", 0x0000, 0x0800, CRC(5943e427) SHA1(55fe645363cd5f2015a537be6f7a00de33d1bea5), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "tanbug3b", "TANBUG V.3B (MPVDU)")
-	ROMX_LOAD("tanbug3b.k3", 0xf800, 0x0800, CRC(5b49f861) SHA1(b37cddf97b6324ab0647479b5b013a9b3d47ddda), ROM_BIOS(3))
+	ROMX_LOAD("tanbug3b.k3", 0x0000, 0x0800, CRC(5b49f861) SHA1(b37cddf97b6324ab0647479b5b013a9b3d47ddda), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(4, "tugbug11", "TUGBUG V1.1 (VID8082)")
-	ROMX_LOAD("tugbug11.k3", 0xf800, 0x0800, CRC(23b02439) SHA1(9e56fbd6c07b1dc5c10e7b574a5ea26405781a3d), ROM_BIOS(4))
+	ROMX_LOAD("tugbug11.k3", 0x0000, 0x0800, CRC(23b02439) SHA1(9e56fbd6c07b1dc5c10e7b574a5ea26405781a3d), ROM_BIOS(4))
 
+	/* DM8678BWF (upper case) and DM8678CAE (lower case) */
 	ROM_REGION(0x1000, "gfx1", 0)
 	ROM_LOAD("charset.rom", 0x0000, 0x0800, CRC(3b3c5360) SHA1(a3a2f74149107f8b8f35b15069c71f3aa843d12f))
 	ROM_RELOAD(0x0800, 0x0800)
 
 	ROM_REGION(0x1000, "gfx2", ROMREGION_ERASEFF)
-	// initialized in init_gfx2
 ROM_END
 
 ROM_START( micron )
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x0800, "maincpu", 0)
 	ROM_DEFAULT_BIOS("tanbug1")
 	/* MT65 (Iss 0) */
 	ROM_SYSTEM_BIOS(0, "tanbug1", "TANBUG V1")
-	ROMX_LOAD("tanbug1.g2", 0xf800, 0x0400, CRC(6f45aaca) SHA1(c1a020d86830ee475ee75c847e98f7a02d467659), ROM_BIOS(0) | ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO)
-	ROM_RELOAD(0xfc00, 0x0400)
-	ROMX_LOAD("tanbug1.h2", 0xf800, 0x0400, CRC(1ccd6b8f) SHA1(49784749599255458ba5513d8c2fc58c4df39515), ROM_BIOS(0) | ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI)
-	ROM_RELOAD(0xfc00, 0x0400)
+	ROMX_LOAD("tanbug1.g2", 0x0000, 0x0400, CRC(6f45aaca) SHA1(c1a020d86830ee475ee75c847e98f7a02d467659), ROM_BIOS(0) | ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO)
+	ROM_RELOAD(0x0400, 0x0400)
+	ROMX_LOAD("tanbug1.h2", 0x0000, 0x0400, CRC(1ccd6b8f) SHA1(49784749599255458ba5513d8c2fc58c4df39515), ROM_BIOS(0) | ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI)
+	ROM_RELOAD(0x0400, 0x0400)
 
+	/* DM8678BWF (upper case) and DM8678CAE (lower case) */
 	ROM_REGION(0x1000, "gfx1", 0)
 	ROM_LOAD("charset.rom", 0x0000, 0x0800, CRC(3b3c5360) SHA1(a3a2f74149107f8b8f35b15069c71f3aa843d12f))
 	ROM_RELOAD(0x0800, 0x0800)
 
 	ROM_REGION(0x1000, "gfx2", ROMREGION_ERASEFF)
-	// initialized in init_gfx2
 ROM_END
 
 ROM_START( spinveti )
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("spaceinv.ic20", 0xe800, 0x0800, CRC(3e235077) SHA1(ae7d2788125d01a3c5d57ab0d992bd708abd6ade))
+	ROM_REGION(0x0800, "maincpu", 0)
+	ROM_LOAD("spaceinv.ic20", 0x0000, 0x0800, CRC(c0b074e0) SHA1(464be4082bd60d825c0c1e7ae033d7ab095c8e70))
 
+	/* DM8678BWF only */
 	ROM_REGION(0x1000, "gfx1", 0)
 	ROM_LOAD("charset.rom",  0x0000, 0x0800, CRC(3b3c5360) SHA1(a3a2f74149107f8b8f35b15069c71f3aa843d12f))
 	ROM_RELOAD(0x0800, 0x0800)
 
 	ROM_REGION(0x1000, "gfx2", ROMREGION_ERASEFF)
-	// initialized in init_gfx2
 ROM_END
 
 ROM_START( mt6809 )
 	/* 6809 CPU Card (Ralph Allen Engineering) */
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x0800, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "ralbug14", "RALBUG V1.4")
-	ROMX_LOAD("ralbug14.rom", 0xf800, 0x0800, CRC(8bbc87d8) SHA1(3d53a6ffd4a8d7c8edf4f2e23946011ed29146ce), ROM_BIOS(0))
+	ROMX_LOAD("ralbug14.rom", 0x0000, 0x0800, CRC(8bbc87d8) SHA1(3d53a6ffd4a8d7c8edf4f2e23946011ed29146ce), ROM_BIOS(0))
 ROM_END
 
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY          FULLNAME        FLAGS
-COMP( 1979, mt65,     0,      0,      mt65,     microtan, microtan_state, init_microtan, "Tangerine",     "Microtan 65",            MACHINE_NO_SOUND_HW )
-COMP( 1980, micron,   mt65,   0,      micron,   microtan, microtan_state, init_microtan, "Tangerine",     "Micron",                 MACHINE_NO_SOUND_HW )
-COMP( 1980, spinveti, 0,      0,      spinveti, spinveti, microtan_state, init_gfx2,     "Tangerine/ETI", "Space Invasion (ETI)",   MACHINE_NO_SOUND )
-COMP( 1984, mt6809,   mt65,   0,      mt6809,   microtan, mt6809_state,   empty_init,    "Tangerine",     "Microtan 6809 System",   MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT           COMPANY          FULLNAME                  FLAGS
+COMP( 1979, mt65,     0,      0,      mt65,     0,        microtan_state, empty_init,    "Tangerine",     "Microtan 65",            MACHINE_NO_SOUND_HW )
+COMP( 1980, micron,   mt65,   0,      micron,   0,        microtan_state, empty_init,    "Tangerine",     "Micron",                 MACHINE_NO_SOUND_HW )
+COMP( 1980, spinveti, 0,      0,      spinveti, 0,        microtan_state, empty_init,    "Tangerine/ETI", "Space Invasion (ETI)",   MACHINE_NO_SOUND )
+COMP( 1984, mt6809,   mt65,   0,      mt6809,   0,        mt6809_state,   empty_init,    "Tangerine",     "Microtan 6809 System",   MACHINE_NO_SOUND_HW )

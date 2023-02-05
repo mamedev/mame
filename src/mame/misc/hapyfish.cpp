@@ -67,6 +67,9 @@
 #define VERBOSE     (LOG_GPIO | LOG_ADC | LOG_I2C | LOG_INPUTS)
 #include "logmacro.h"
 
+
+namespace {
+
 class hapyfish_state : public driver_device
 {
 public:
@@ -82,8 +85,6 @@ public:
 	{ }
 
 	void hapyfish(machine_config &config);
-
-	void init_mini2440();
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -506,11 +507,6 @@ void hapyfish_state::hapyfish_map(address_map &map)
     MACHINE DRIVERS
 ***************************************************************************/
 
-void hapyfish_state::init_mini2440()
-{
-	// do nothing
-}
-
 void hapyfish_state::hapyfish(machine_config &config)
 {
 	ARM920T(config, m_maincpu, 100000000);
@@ -610,5 +606,8 @@ ROM_START( hapyfsh2 )
 	ROM_REGION( 0x84000000, "nand2", 0 )
 	ROM_LOAD( "flash.u28",        0x00000000, 0x84000000, CRC(f00a25cd) SHA1(9c33f8e26b84cea957d9c37fb83a686b948c6834) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 201?, hapyfsh2, 0, hapyfish, hapyfish, hapyfish_state, empty_init, ROT0, "bootleg", "Happy Fish (V2 PCB, 302-in-1)", MACHINE_IS_SKELETON )

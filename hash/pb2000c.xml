@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="pb2000c" description="Casio PB-2000C memory cards">
 	<software name="prolog">

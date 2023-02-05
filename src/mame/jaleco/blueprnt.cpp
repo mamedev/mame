@@ -275,12 +275,12 @@ uint32_t blueprnt_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	if (flip_screen())
 	{
 		for (int i = 0; i < 32; i++)
-			m_bg_tilemap->set_scrolly(i, m_scrollram[32 - i]);
+			m_bg_tilemap->set_scrolly(i, m_scrollram[(32 - i) & 0xff]);
 	}
 	else
 	{
 		for (int i = 0; i < 32; i++)
-			m_bg_tilemap->set_scrolly(i, m_scrollram[30 - i]);
+			m_bg_tilemap->set_scrolly(i, m_scrollram[(30 - i) & 0xff]);
 	}
 
 	bitmap.fill(m_palette->black_pen(), cliprect);

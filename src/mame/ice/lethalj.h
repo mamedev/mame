@@ -5,8 +5,8 @@
     The Game Room Lethal Justice hardware
 
 **************************************************************************/
-#ifndef MAME_INCLUDES_LETHALJ_H
-#define MAME_INCLUDES_LETHALJ_H
+#ifndef MAME_ICE_LETHALJ_H
+#define MAME_ICE_LETHALJ_H
 
 #pragma once
 
@@ -34,6 +34,7 @@ public:
 
 	void lethalj(machine_config &config);
 	void gameroom(machine_config &config);
+	void franticf(machine_config &config);
 
 	void init_cfarm();
 	void init_ripribit();
@@ -81,4 +82,4 @@ private:
 	uint8_t m_blank_palette = 0;
 };
 
-#endif // MAME_INCLUDES_LETHALJ_H
+#endif // MAME_ICE_LETHALJ_H

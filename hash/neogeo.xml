@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
      The list contains both MVS and AES cartridges.
 
@@ -6094,7 +6094,7 @@ license:CC0
 	-->
 
 	<software name="ironclad">
-		<description>Choutetsu Brikin'ger / Iron Clad (Prototype)</description>
+		<description>Choutetsu Brikin'ger / Iron Clad (prototype)</description>
 		<year>1996</year>
 		<publisher>Saurus</publisher>
 		<sharedfeat name="release" value="MVS,AES" />
@@ -6124,7 +6124,7 @@ license:CC0
 	</software>
 
 	<software name="ironclado" cloneof="ironclad">
-		<description>Choutetsu Brikin'ger / Iron Clad (Prototype, bootleg)</description>
+		<description>Choutetsu Brikin'ger / Iron Clad (prototype, bootleg)</description>
 		<year>1996</year>
 		<publisher>bootleg</publisher>
 		<sharedfeat name="release" value="MVS,AES" />

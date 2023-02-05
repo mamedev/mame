@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_315_5296_H
-#define MAME_MACHINE_315_5296_H
+#ifndef MAME_SEGA_315_5296_H
+#define MAME_SEGA_315_5296_H
 
 #pragma once
 
@@ -65,12 +65,12 @@ private:
 	devcb_write_line::array<3> m_out_cnt_cb;
 
 	uint8_t m_output_latch[8];
-	uint8_t m_cnt = 0;
-	uint8_t m_dir = 0;
+	uint8_t m_cnt;
+	uint8_t m_dir;
 	uint8_t m_dir_override;
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(SEGA_315_5296, sega_315_5296_device)
 
-#endif // MAME_MACHINE_315_5296_H
+#endif // MAME_SEGA_315_5296_H

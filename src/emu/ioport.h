@@ -49,7 +49,7 @@ constexpr char32_t UCHAR_MAMEKEY_BEGIN = UCHAR_PRIVATE + 2;
 
 
 // sequence types for input_port_seq() call
-enum input_seq_type
+enum input_seq_type : int
 {
 	SEQ_TYPE_INVALID = -1,
 	SEQ_TYPE_STANDARD = 0,
@@ -90,7 +90,7 @@ enum ioport_group
 
 
 // various input port types
-enum ioport_type
+enum ioport_type : u32
 {
 	// pseudo-port types
 	IPT_INVALID = 0,
@@ -1165,8 +1165,8 @@ private:
 	ioport_field &      m_field;                // pointer to the input field referenced
 
 	// adjusted values (right-justified and tweaked)
-	u8                  m_shift;                // shift to align final value in the port
-	s32                 m_adjdefvalue;          // adjusted default value from the config
+	u8 const            m_shift;                // shift to align final value in the port
+	s32 const           m_adjdefvalue;          // adjusted default value from the config
 	s32                 m_adjmin;               // adjusted minimum value from the config
 	s32                 m_adjmax;               // adjusted maximum value from the config
 	s32                 m_adjoverride;          // programmatically set adjusted value
@@ -1303,6 +1303,7 @@ private:
 	bool load_default_config(int type, int player, const std::pair<input_seq, char const *> (&newseq)[SEQ_TYPE_TOTAL]);
 	bool load_controller_config(util::xml::data_node const &portnode, int type, int player, const std::pair<input_seq, char const *> (&newseq)[SEQ_TYPE_TOTAL]);
 	void load_system_config(util::xml::data_node const &portnode, int type, int player, const std::pair<input_seq, char const *> (&newseq)[SEQ_TYPE_TOTAL]);
+	void apply_device_defaults();
 
 	void save_config(config_type cfg_type, util::xml::data_node *parentnode);
 	bool save_this_input_field_type(ioport_type type);
@@ -1347,6 +1348,7 @@ private:
 
 	// storage for inactive configuration
 	std::unique_ptr<util::xml::file> m_deselected_card_config;
+	bool m_applied_device_defaults;
 };
 
 

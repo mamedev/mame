@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_MACHINE_NES_VT09_SOC_H
-#define MAME_MACHINE_NES_VT09_SOC_H
+#ifndef MAME_NINTENDO_NES_VT09_SOC_H
+#define MAME_NINTENDO_NES_VT09_SOC_H
 
 #pragma once
 
@@ -45,4 +45,4 @@ protected:
 DECLARE_DEVICE_TYPE(NES_VT09_SOC, nes_vt09_soc_device)
 
 
-#endif // MAME_MACHINE_NES_VT09_SOC_H
+#endif // MAME_NINTENDO_NES_VT09_SOC_H

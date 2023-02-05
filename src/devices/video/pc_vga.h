@@ -273,6 +273,7 @@ protected:
 		uint8_t rgb24_en;
 		uint8_t rgb32_en;
 		uint8_t id;
+		bool ignore_chain4;
 	} svga;
 };
 
@@ -688,8 +689,13 @@ public:
 	virtual void port_03c0_w(offs_t offset, uint8_t data) override;
 	virtual uint8_t port_03d0_r(offs_t offset) override;
 	virtual void port_03d0_w(offs_t offset, uint8_t data) override;
-	virtual uint8_t mem_r(offs_t offset) override;
-	virtual void mem_w(offs_t offset, uint8_t data) override;
+//	virtual uint8_t mem_r(offs_t offset) override;
+//	virtual void mem_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t mem_linear_r(offs_t offset) override;
+	virtual void mem_linear_w(offs_t offset,uint8_t data) override;
+
+protected:
+	virtual uint16_t offset() override;
 };
 
 

@@ -1544,7 +1544,7 @@ void floppy_sound_device::device_start()
 {
 	// What kind of drive do we have?
 	bool is525 = strstr(tag(), "525") != nullptr;
-	set_samples_names(is525? floppy525_sample_names : floppy35_sample_names);
+	set_samples_names(is525 ? floppy525_sample_names : floppy35_sample_names);
 
 	m_motor_on = false;
 
@@ -1582,13 +1582,16 @@ void floppy_sound_device::motor(bool running, bool withdisk)
 		if ((m_spin_playback_sample==QUIET || m_spin_playback_sample==SPIN_END) && running) // motor was either off or already spinning down
 		{
 			m_spin_samplepos = 0;
-			m_spin_playback_sample = withdisk? SPIN_START_LOADED : SPIN_START_EMPTY; // (re)start the motor sound
+			m_spin_playback_sample = withdisk ? SPIN_START_LOADED : SPIN_START_EMPTY; // (re)start the motor sound
 		}
 		else
 		{
 			// Motor has been running and is turned off now
 			if ((m_spin_playback_sample == SPIN_EMPTY || m_spin_playback_sample == SPIN_LOADED) && !running)
+			{
+				m_spin_samplepos = 0;
 				m_spin_playback_sample = SPIN_END; // go to spin down sound when loop is finished
+			}
 		}
 	}
 	m_motor_on = running;
@@ -1734,7 +1737,7 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 					// Spindown sample over, be quiet or restart if the
 					// motor has been restarted
 					if (m_motor_on)
-						m_spin_playback_sample = m_with_disk? SPIN_START_LOADED : SPIN_START_EMPTY;
+						m_spin_playback_sample = m_with_disk ? SPIN_START_LOADED : SPIN_START_EMPTY;
 					else
 						m_spin_playback_sample = QUIET;
 					break;

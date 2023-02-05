@@ -59,6 +59,9 @@
 #include "screen.h"
 #include "dfs500.lh"
 
+
+namespace {
+
 #define VIDEO_WIDTH 768
 #define VIDEO_HEIGHT 256
 
@@ -109,7 +112,7 @@ private:
 	void cpanelcpu_mem_map(address_map &map);
 	void cpanelcpu_io_map(address_map &map);
 	void maincpu_mem_map(address_map &map);
-	void maincpu_io_map(address_map &map);
+	[[maybe_unused]] void maincpu_io_map(address_map &map);
 	void effectcpu_mem_map(address_map &map);
 	uint8_t pit_r(offs_t offset);
 	void pit_w(offs_t offset, uint8_t data);
@@ -1051,6 +1054,9 @@ ROM_START(dfs500)
 	ROM_LOAD("27c4001-12f1_sy172_v1.01_cc13.ic7", 0x100000,  0x80000, CRC(e1fe8606) SHA1(a573c7023daeb84d5a1182db4051b1bccfcfc1f8))
 	ROM_LOAD("27c4001-12f1_sy172_v1.01_c42d.ic8", 0x180000,  0x80000, CRC(66e0f20f) SHA1(e82562ae1eeecc5c97b0f40e01102c2ebe0d6276))
 ROM_END
+
+} // anonymous namespace
+
 
 //   YEAR  NAME   PARENT/COMPAT MACHINE  INPUT    CLASS          INIT     COMPANY  FULLNAME                     FLAGS
 SYST(1994, dfs500,    0, 0,     dfs500, dfs500, dfs500_state, empty_init, "Sony", "DFS-500 DME Video Switcher", MACHINE_NOT_WORKING)

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Andreas Naive
 
-#ifndef MAME_MACHINE_NS10CRYPT_H
-#define MAME_MACHINE_NS10CRYPT_H
+#ifndef MAME_NAMCO_NS10CRYPT_H
+#define MAME_NAMCO_NS10CRYPT_H
 
 #include <cstdint>
 
@@ -167,4 +167,4 @@ DECLARE_DEVICE_TYPE(MRDRILR2_DECRYPTER, mrdrilr2_decrypter_device)
 DECLARE_DEVICE_TYPE(NFLCLSFB_DECRYPTER, nflclsfb_decrypter_device)
 DECLARE_DEVICE_TYPE(STARTRGN_DECRYPTER, startrgn_decrypter_device)
 
-#endif // MAME_MACHINE_NS10CRYPT_H
+#endif // MAME_NAMCO_NS10CRYPT_H

@@ -37,6 +37,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
@@ -977,6 +979,8 @@ ROM_START( samcoupe )
 	ROM_SYSTEM_BIOS( 14, "atom",  "ATOM HDD Interface Auto Boot" )
 	ROMX_LOAD( "atom.z5",   0x0000, 0x8000, CRC(dec75f58) SHA1(cd342579f066c0863e4f769c2e6757085e21b0a1), ROM_BIOS(14) )
 ROM_END
+
+} // anonymous namespace
 
 
 /***************************************************************************

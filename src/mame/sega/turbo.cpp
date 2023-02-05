@@ -8,9 +8,12 @@
     and Aaron Giles
 
     Games supported:
-        * Turbo
-        * Subroc 3D
-        * Buck Rogers: Planet of Zoom
+    - Turbo
+    - Subroc 3D
+    - Buck Rogers: Planet of Zoom
+
+    BTANB:
+    - subroc3d 'seafoam' appears as black spots on top of some sprites
 
 **************************************************************************
     TURBO
@@ -110,7 +113,7 @@
     Here is a complete list of the ROMs:
 
     Turbo ROMLIST - Frank Palazzolo
-    Name     Loc             Function
+    Name         Loc    Function
     -----------------------------------------------------------------------------
     Images Acquired:
     EPR1262,3,4  IC76, IC89, IC103
@@ -130,19 +133,19 @@
     EPR1246-1258        Sprite ROMS
     EPR1288-1300
 
-    PR-1114     IC13    Color 1 (road, etc.)
-    PR-1115     IC18    Road gfx
-    PR-1116     IC20    Crash (collision detection?)
-    PR-1117     IC21    Color 2 (road, etc.)
-    PR-1118     IC99    256x4 Character Color PROM
-    PR-1119     IC50    512x8 Vertical Timing PROM
-    PR-1120     IC62    Horizontal Timing PROM
-    PR-1121     IC29    Color PROM
-    PR-1122     IC11    Pattern 1
-    PR-1123     IC21    Pattern 2
+    PR-1114      IC13   Color 1 (road, etc.)
+    PR-1115      IC18   Road gfx
+    PR-1116      IC20   Crash (collision detection?)
+    PR-1117      IC21   Color 2 (road, etc.)
+    PR-1118      IC99   256x4 Character Color PROM
+    PR-1119      IC50   512x8 Vertical Timing PROM
+    PR-1120      IC62   Horizontal Timing PROM
+    PR-1121      IC29   Color PROM
+    PR-1122      IC11   Pattern 1
+    PR-1123      IC21   Pattern 2
 
-    PA-06R      IC22    Mathbox Timing PAL
-    PA-06L      IC90    Address Decode PAL
+    PA-06R       IC22   Mathbox Timing PAL
+    PA-06L       IC90   Address Decode PAL
 
 **************************************************************************/
 
@@ -213,6 +216,8 @@ void buckrog_state::machine_reset()
 void subroc3d_state::machine_start()
 {
 	turbo_base_state::machine_start();
+
+	m_shutter.resolve();
 
 	save_item(NAME(m_col));
 	save_item(NAME(m_ply));
@@ -353,8 +358,13 @@ void subroc3d_state::ppi0b_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 	m_lamp = BIT(data, 2);
-	m_flip = (data >> 4) & 1;
+	m_flip = BIT(data, 4);
+
+	// flip also goes to 3D scope shutter sync
+	// (it's a motor to 2 rotating discs, half painted black)
+	m_shutter = BIT(data, 4);
 }
+
 
 /*************************************
  *
@@ -420,8 +430,23 @@ void turbo_base_state::digit_w(uint8_t data)
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	m_digits[m_i8279_scanlines * 2] = ls48_map[data & 0x0f];
-	m_digits[m_i8279_scanlines * 2 + 1] = ls48_map[data>>4];
+	m_digits[m_i8279_scanlines * 2 + 1] = ls48_map[data >> 4];
 }
+
+
+/*************************************
+ *
+ *  Shared pedal reading
+ *
+ *************************************/
+
+CUSTOM_INPUT_MEMBER(turbo_base_state::pedal_r)
+{
+	// inverted 2-bit Gray code from a pair of optos in mechanical pedal
+	uint8_t pedal = m_pedal->read();
+	return (pedal >> 6) ^ (pedal >> 7) ^ 0x03;
+}
+
 
 /*************************************
  *
@@ -432,7 +457,7 @@ void turbo_base_state::digit_w(uint8_t data)
 uint8_t turbo_state::collision_r()
 {
 	m_screen->update_partial(m_screen->vpos());
-	return m_dsw3->read() | (m_collision & 15);
+	return (m_dsw[2]->read() & 0xf0) | (m_collision & 0xf);
 }
 
 
@@ -483,40 +508,26 @@ WRITE_LINE_MEMBER(turbo_state::start_lamp_w)
 uint8_t buckrog_state::subcpu_command_r()
 {
 	// assert ACK
-	m_i8255[0]->pc6_w(CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_i8255[0]->pc6_w(CLEAR_LINE);
+
 	return m_command;
 }
 
 
 uint8_t buckrog_state::port_2_r()
 {
-	int inp1 = m_dsw[0]->read();
-	int inp2 = m_dsw[1]->read();
-
-	return  (((inp2 >> 6) & 1) << 7) |
-			(((inp2 >> 4) & 1) << 6) |
-			(((inp2 >> 3) & 1) << 5) |
-			(((inp2 >> 0) & 1) << 4) |
-			(((inp1 >> 6) & 1) << 3) |
-			(((inp1 >> 4) & 1) << 2) |
-			(((inp1 >> 3) & 1) << 1) |
-			(((inp1 >> 0) & 1) << 0);
+	uint8_t inp1 = bitswap<4>(m_dsw[0]->read(), 6, 4, 3, 0);
+	uint8_t inp2 = bitswap<4>(m_dsw[1]->read(), 6, 4, 3, 0);
+	return inp1 | inp2 << 4;
 }
 
 
 uint8_t buckrog_state::port_3_r()
 {
-	int inp1 = m_dsw[0]->read();
-	int inp2 = m_dsw[1]->read();
-
-	return  (((inp2 >> 7) & 1) << 7) |
-			(((inp2 >> 5) & 1) << 6) |
-			(((inp2 >> 2) & 1) << 5) |
-			(((inp2 >> 1) & 1) << 4) |
-			(((inp1 >> 7) & 1) << 3) |
-			(((inp1 >> 5) & 1) << 2) |
-			(((inp1 >> 2) & 1) << 1) |
-			(((inp1 >> 1) & 1) << 0);
+	uint8_t inp1 = bitswap<4>(m_dsw[0]->read(), 7, 5, 2, 1);
+	uint8_t inp2 = bitswap<4>(m_dsw[1]->read(), 7, 5, 2, 1);
+	return inp1 | inp2 << 4;
 }
 
 
@@ -535,13 +546,13 @@ void buckrog_state::i8255_0_w(offs_t offset, uint8_t data)
 uint8_t turbo_state::spriteram_r(offs_t offset)
 {
 	offset = (offset & 0x07) | ((offset & 0xf0) >> 1);
-	return m_alt_spriteram[offset];
+	return m_spriteram[offset];
 }
 
 void turbo_state::spriteram_w(offs_t offset, uint8_t data)
 {
 	offset = (offset & 0x07) | ((offset & 0xf0) >> 1);
-	m_alt_spriteram[offset] = data;
+	m_spriteram[offset] = data;
 }
 
 
@@ -566,7 +577,7 @@ void turbo_state::prg_map(address_map &map)
 	map(0xfa00, 0xfa03).mirror(0x00fc).rw(m_i8255[2], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfb00, 0xfb03).mirror(0x00fc).rw(m_i8255[3], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfc00, 0xfc01).mirror(0x00fe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0xfd00, 0xfdff).portr("INPUT");
+	map(0xfd00, 0xfdff).portr("IN0");
 	map(0xfe00, 0xfeff).r(FUNC(turbo_state::collision_r));
 }
 
@@ -581,15 +592,15 @@ void turbo_state::prg_map(address_map &map)
 void subroc3d_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
-	map(0xa000, 0xa3ff).ram().share(m_sprite_position);                           // CONT RAM
-	map(0xa400, 0xa7ff).ram().share(m_spriteram);                           // CONT RAM
+	map(0xa000, 0xa3ff).ram().share(m_sprite_position);               // CONT RAM
+	map(0xa400, 0xa7ff).ram().share(m_spriteram);                     // CONT RAM
 	map(0xa800, 0xa800).mirror(0x07fc).portr("IN0");                  // INPUT 253
 	map(0xa801, 0xa801).mirror(0x07fc).portr("IN1");                  // INPUT 253
 	map(0xa802, 0xa802).mirror(0x07fc).portr("DSW2");                 // INPUT 253
 	map(0xa803, 0xa803).mirror(0x07fc).portr("DSW3");                 // INPUT 253
-	map(0xb000, 0xb7ff).ram();                                                 // SCRATCH
-	map(0xb800, 0xbfff);                                                        // HANDLE CL
-	map(0xe000, 0xe7ff).ram().w(FUNC(subroc3d_state::videoram_w)).share(m_videoram);    // FIX PAGE
+	map(0xb000, 0xb7ff).ram();                                        // SCRATCH
+	map(0xb800, 0xbfff);                                              // HANDLE CL
+	map(0xe000, 0xe7ff).ram().w(FUNC(subroc3d_state::videoram_w)).share(m_videoram); // FIX PAGE
 	map(0xe800, 0xe803).mirror(0x07fc).rw(m_i8255[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf000, 0xf003).mirror(0x07fc).rw(m_i8255[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf800, 0xf801).mirror(0x07fe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
@@ -606,18 +617,18 @@ void subroc3d_state::prg_map(address_map &map)
 void buckrog_state::main_prg_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xc7ff).ram().w(FUNC(buckrog_state::videoram_w)).share(m_videoram);    // FIX PAGE
-	map(0xc800, 0xc803).mirror(0x07fc).r(m_i8255[0], FUNC(i8255_device::read)).w(FUNC(buckrog_state::i8255_0_w));    // 8255
-	map(0xd000, 0xd003).mirror(0x07fc).rw(m_i8255[1], FUNC(i8255_device::read), FUNC(i8255_device::write));            // 8255
+	map(0xc000, 0xc7ff).ram().w(FUNC(buckrog_state::videoram_w)).share(m_videoram); // FIX PAGE
+	map(0xc800, 0xc803).mirror(0x07fc).r(m_i8255[0], FUNC(i8255_device::read)).w(FUNC(buckrog_state::i8255_0_w));
+	map(0xd000, 0xd003).mirror(0x07fc).rw(m_i8255[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xd800, 0xd801).mirror(0x07fe).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0xe000, 0xe3ff).ram().share(m_sprite_position);                           // CONT RAM
+	map(0xe000, 0xe3ff).ram().share(m_sprite_position);                     // CONT RAM
 	map(0xe400, 0xe7ff).ram().share(m_spriteram);                           // CONT RAM
-	map(0xe800, 0xe800).mirror(0x07fc).portr("IN0");                  // INPUT
+	map(0xe800, 0xe800).mirror(0x07fc).portr("IN0");                        // INPUT
 	map(0xe801, 0xe801).mirror(0x07fc).portr("IN1");
 	map(0xe802, 0xe802).mirror(0x07fc).r(FUNC(buckrog_state::port_2_r));
 	map(0xe803, 0xe803).mirror(0x07fc).r(FUNC(buckrog_state::port_3_r));
 	map(0xf000, 0xf000);
-	map(0xf800, 0xffff).ram();                                                 // SCRATCH
+	map(0xf800, 0xffff).ram();                                              // SCRATCH
 }
 
 void buckrog_state::decrypted_opcodes_map(address_map &map)
@@ -648,10 +659,9 @@ void buckrog_state::sub_portmap(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( turbo )
-	PORT_START("INPUT") // IN0
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )                // ACCEL B
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )                // ACCEL A
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_TOGGLE    // SHIFT
+	PORT_START("IN0") // IN0
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(turbo_base_state, pedal_r)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Gear Shift") PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -659,20 +669,20 @@ static INPUT_PORTS_START( turbo )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("DSW1")  // DSW1
-	PORT_DIPNAME( 0x03, 0x03, "Car On Extended Play" )  PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x01, "2" )
-	PORT_DIPSETTING(    0x02, "3" )
-	PORT_DIPSETTING(    0x03, "4" )
+	PORT_DIPNAME( 0x03, 0x03, "Max Lives During Extended Play" )  PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, "Fixed (55 sec)" )
 	PORT_DIPSETTING(    0x00, "Adjustable" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ))
-	PORT_DIPNAME( 0x10, 0x10, "Game Mode" )             PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x00, "No Collisions (cheat)" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0x10, 0x10, "Collisions" )            PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, "Off (Cheat)" )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "Initial Entry" )         PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x20, DEF_STR( On ))
@@ -716,15 +726,18 @@ static INPUT_PORTS_START( turbo )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Tachometer" )            PORT_DIPLOCATION("SW3:3")
+	PORT_DIPNAME( 0x40, 0x00, "Tachometer" )            PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x40, "Analog (Meter)")
 	PORT_DIPSETTING(    0x00, "Digital (LED)")
-	PORT_DIPNAME( 0x80, 0x80, "Sound System" )          PORT_DIPLOCATION("SW3:4")
+	PORT_DIPNAME( 0x80, 0x00, "Sound System" )          PORT_DIPLOCATION("SW3:4")
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, "Cockpit")
 
-	PORT_START("DIAL")  // IN0
-	PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(10) PORT_KEYDELTA(30)
+	PORT_START("DIAL")
+	PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
+
+	PORT_START("PEDAL")
+	PORT_BIT( 0xff, 0, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
 	// this is actually a variable resistor
 	PORT_START("VR1")
@@ -738,18 +751,21 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( subroc3d )
 	PORT_START("IN0")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY // buttons on right side of periscope
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )   PORT_16WAY // "
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) // pull handle on left side of periscope
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  // push "
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_SERVICE_NO_TOGGLE( 0x10, 0x10 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("DSW1")  // DSW1                 // Unused
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW2")  // DSW2
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A ))        PORT_DIPLOCATION("SW2:1,2,3")
@@ -800,16 +816,16 @@ static INPUT_PORTS_START( subroc3d )
 	PORT_DIPNAME( 0x80, 0x80, "Game" )                  PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(    0x00, "Endless" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
-
-	PORT_START("DSW1")  // DSW1                 // Unused
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( buckrog )
 	PORT_START("IN0")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) // Accel Hi
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Accel Lo
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )  PORT_CONDITION("DSW2", 0x80, EQUALS, 0x00) // cockpit
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )  PORT_CONDITION("DSW2", 0x80, EQUALS, 0x80) // upright
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00) PORT_CUSTOM_MEMBER(turbo_base_state, pedal_r)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02) // fast
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02) // slow
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 
@@ -850,8 +866,8 @@ static INPUT_PORTS_START( buckrog )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")  // DSW2
-	PORT_DIPNAME( 0x01, 0x00, "Collisions" )            PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x01, 0x00, "Collisions" )            PORT_DIPLOCATION("SW2:1") // manual calls it collisions, but actually it's infinite lives
+	PORT_DIPSETTING(    0x01, "Off (Cheat)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "Accel by" )              PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x00, "Pedal" )
@@ -870,9 +886,12 @@ static INPUT_PORTS_START( buckrog )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x40, "5" )
 	PORT_DIPSETTING(    0x60, "6" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x80, "Cockpit" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, "Cockpit" )
+
+	PORT_START("PEDAL")
+	PORT_BIT( 0xff, 0, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
 INPUT_PORTS_END
 
 
@@ -923,9 +942,9 @@ void turbo_state::turbo(machine_config &config)
 	m_i8255[3]->out_pc_callback().set(FUNC(turbo_state::ppi3c_w));
 
 	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/16)); // clock = H1
-	kbdc.out_sl_callback().set(FUNC(turbo_state::scanlines_w)); // scan SL lines
-	kbdc.out_disp_callback().set(FUNC(turbo_state::digit_w));   // display A&B
-	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
+	kbdc.out_sl_callback().set(FUNC(turbo_state::scanlines_w));  // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(turbo_state::digit_w));    // display A&B
+	kbdc.in_rl_callback().set_ioport("DSW1");                    // kbd RL lines
 
 	ls259_device &outlatch(LS259(config, "outlatch")); // IC125 - outputs passed through CN5
 	outlatch.q_out_cb<0>().set(FUNC(turbo_state::coin_meter_1_w));
@@ -964,10 +983,10 @@ void subroc3d_state::subroc3d(machine_config &config)
 	m_i8255[1]->out_pb_callback().set(FUNC(subroc3d_state::sound_b_w));
 	m_i8255[1]->out_pc_callback().set(FUNC(subroc3d_state::sound_c_w));
 
-	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/16)); // unknown clock
+	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/16));   // unknown clock
 	kbdc.out_sl_callback().set(FUNC(subroc3d_state::scanlines_w)); // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(subroc3d_state::digit_w));   // display A&B
-	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
+	kbdc.in_rl_callback().set_ioport("DSW1");                      // kbd RL lines
 
 	// video hardware
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_turbo);
@@ -1008,10 +1027,10 @@ void buckrog_state::buckrog(machine_config &config)
 	m_i8255[1]->out_pb_callback().set(FUNC(buckrog_state::sound_b_w));
 	m_i8255[1]->out_pc_callback().set(FUNC(buckrog_state::ppi1c_w));
 
-	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/16)); // unknown clock
+	i8279_device &kbdc(I8279(config, "i8279", MASTER_CLOCK/16));  // unknown clock
 	kbdc.out_sl_callback().set(FUNC(buckrog_state::scanlines_w)); // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(buckrog_state::digit_w));   // display A&B
-	kbdc.in_rl_callback().set_ioport("DSW1");                   // kbd RL lines
+	kbdc.in_rl_callback().set_ioport("DSW1");                     // kbd RL lines
 
 	// video hardware
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_turbo);
@@ -1047,6 +1066,7 @@ void buckrog_state::buckroge(machine_config &config)
 	maincpu.set_vblank_int("screen", FUNC(buckrog_state::irq0_line_hold));
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
 }
+
 
 /*************************************
  *
@@ -1804,10 +1824,12 @@ void turbo_state::rom_decode()
 		// 0x0800-0xbff
 		// 0x4000-0x43ff
 		// 0x4800-0x4bff
-		{ 0x00,0x44,0x0c,0x48,0x00,0x44,0x0c,0x48,
+		{
+			0x00,0x44,0x0c,0x48,0x00,0x44,0x0c,0x48,
 			0xa0,0xe4,0xac,0xe8,0xa0,0xe4,0xac,0xe8,
 			0x60,0x24,0x6c,0x28,0x60,0x24,0x6c,0x28,
-			0xc0,0x84,0xcc,0x88,0xc0,0x84,0xcc,0x88 },
+			0xc0,0x84,0xcc,0x88,0xc0,0x84,0xcc,0x88
+		},
 
 		// Table 1 */
 		// 0x0400-0x07ff
@@ -1822,30 +1844,36 @@ void turbo_state::rom_decode()
 		// 0x4c00-0x4fff
 		// 0x5400-0x57ff
 		// 0x5c00-0x5fff
-		{ 0x00,0x44,0x18,0x5c,0x14,0x50,0x0c,0x48,
+		{
+			0x00,0x44,0x18,0x5c,0x14,0x50,0x0c,0x48,
 			0x28,0x6c,0x30,0x74,0x3c,0x78,0x24,0x60,
 			0x60,0x24,0x78,0x3c,0x74,0x30,0x6c,0x28,
-			0x48,0x0c,0x50,0x14,0x5c,0x18,0x44,0x00 }, //0x00 --> 0x10 ?
+			0x48,0x0c,0x50,0x14,0x5c,0x18,0x44,0x00 //0x00 --> 0x10 ?
+		},
 
 		// Table 2 */
 		// 0x1000-0x13ff
 		// 0x1800-0x1bff
 		// 0x5000-0x53ff
 		// 0x5800-0x5bff
-		{ 0x00,0x00,0x28,0x28,0x90,0x90,0xb8,0xb8,
+		{
+			0x00,0x00,0x28,0x28,0x90,0x90,0xb8,0xb8,
 			0x28,0x28,0x00,0x00,0xb8,0xb8,0x90,0x90,
 			0x00,0x00,0x28,0x28,0x90,0x90,0xb8,0xb8,
-			0x28,0x28,0x00,0x00,0xb8,0xb8,0x90,0x90 },
+			0x28,0x28,0x00,0x00,0xb8,0xb8,0x90,0x90
+		},
 
 		// Table 3 */
 		// 0x2000-0x23ff
 		// 0x2800-0x2bff
 		// 0x3000-0x33ff
 		// 0x3800-0x3bff
-		{ 0x00,0x14,0x88,0x9c,0x30,0x24,0xb8,0xac,
+		{
+			0x00,0x14,0x88,0x9c,0x30,0x24,0xb8,0xac,
 			0x24,0x30,0xac,0xb8,0x14,0x00,0x9c,0x88,
 			0x48,0x5c,0xc0,0xd4,0x78,0x6c,0xf0,0xe4,
-			0x6c,0x78,0xe4,0xf0,0x5c,0x48,0xd4,0xc0 }
+			0x6c,0x78,0xe4,0xf0,0x5c,0x48,0xd4,0xc0
+		}
 	};
 
 	static const int findtable[]=
@@ -1883,23 +1911,25 @@ void turbo_state::init_turbo_enc()
 	rom_decode();
 }
 
+
+
 /*************************************
  *
  *  Game drivers
  *
  *************************************/
 
-GAMEL( 1981, turbo,     0,       turbo,    turbo,    turbo_state,    empty_init,       ROT270,             "Sega",    "Turbo (program 1513-1515)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turboa,    turbo,   turbo,    turbo,    turbo_state,    init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1262-1264)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turbob,    turbo,   turbo,    turbo,    turbo_state,    init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev C)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turboc,    turbo,   turbo,    turbo,    turbo_state,    init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev B)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turbod,    turbo,   turbo,    turbo,    turbo_state,    init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev A)", MACHINE_IMPERFECT_SOUND , layout_turbo )
-GAMEL( 1981, turboe,    turbo,   turbo,    turbo,    turbo_state,    init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365)", MACHINE_IMPERFECT_SOUND , layout_turbo ) // but still reports 1262-1264 in the test mode?
-GAMEL( 1981, turbobl,   turbo,   turbo,    turbo,    turbo_state,    empty_init,       ROT270,             "bootleg", "Indianapolis (bootleg of Turbo)", MACHINE_IMPERFECT_SOUND , layout_turbo ) // decrypted bootleg of a 1262-1264 set
+GAMEL( 1981, turbo,     0,       turbo,    turbo,    turbo_state,    empty_init,       ROT270,             "Sega",    "Turbo (program 1513-1515)", MACHINE_IMPERFECT_SOUND, layout_turbo )
+GAMEL( 1981, turboa,    turbo,   turbo,    turbo,    turbo_state,    init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1262-1264)", MACHINE_IMPERFECT_SOUND, layout_turbo )
+GAMEL( 1981, turbob,    turbo,   turbo,    turbo,    turbo_state,    init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev C)", MACHINE_IMPERFECT_SOUND, layout_turbo )
+GAMEL( 1981, turboc,    turbo,   turbo,    turbo,    turbo_state,    init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev B)", MACHINE_IMPERFECT_SOUND, layout_turbo )
+GAMEL( 1981, turbod,    turbo,   turbo,    turbo,    turbo_state,    init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365 rev A)", MACHINE_IMPERFECT_SOUND, layout_turbo )
+GAMEL( 1981, turboe,    turbo,   turbo,    turbo,    turbo_state,    init_turbo_enc,   ROT270,             "Sega",    "Turbo (encrypted, program 1363-1365)", MACHINE_IMPERFECT_SOUND, layout_turbo ) // but still reports 1262-1264 in the test mode?
+GAMEL( 1981, turbobl,   turbo,   turbo,    turbo,    turbo_state,    empty_init,       ROT270,             "bootleg", "Indianapolis (bootleg of Turbo)", MACHINE_IMPERFECT_SOUND, layout_turbo ) // decrypted bootleg of a 1262-1264 set
 
-GAMEL( 1982, subroc3d,  0,       subroc3d, subroc3d, subroc3d_state, empty_init,       ORIENTATION_FLIP_X, "Sega",    "Subroc-3D", MACHINE_IMPERFECT_SOUND , layout_subroc3d )
+GAMEL( 1982, subroc3d,  0,       subroc3d, subroc3d, subroc3d_state, empty_init,       ORIENTATION_FLIP_X, "Sega",    "Subroc-3D", MACHINE_IMPERFECT_SOUND, layout_subroc3d )
 
-GAMEL( 1982, buckrog,   0,       buckroge, buckrog,  buckrog_state,  empty_init,       ROT0,               "Sega",    "Buck Rogers: Planet of Zoom", MACHINE_IMPERFECT_SOUND , layout_buckrog )
-GAMEL( 1982, buckrogn,  buckrog, buckrogu, buckrog,  buckrog_state,  empty_init,       ROT0,               "Sega",    "Buck Rogers: Planet of Zoom (not encrypted, set 1)", MACHINE_IMPERFECT_SOUND , layout_buckrog )
-GAMEL( 1982, buckrogn2, buckrog, buckrogu, buckrog,  buckrog_state,  empty_init,       ROT0,               "Sega",    "Buck Rogers: Planet of Zoom (not encrypted, set 2)", MACHINE_IMPERFECT_SOUND , layout_buckrog )
+GAMEL( 1982, buckrog,   0,       buckroge, buckrog,  buckrog_state,  empty_init,       ROT0,               "Sega",    "Buck Rogers: Planet of Zoom", MACHINE_IMPERFECT_SOUND, layout_buckrog )
+GAMEL( 1982, buckrogn,  buckrog, buckrogu, buckrog,  buckrog_state,  empty_init,       ROT0,               "Sega",    "Buck Rogers: Planet of Zoom (not encrypted, set 1)", MACHINE_IMPERFECT_SOUND, layout_buckrog )
+GAMEL( 1982, buckrogn2, buckrog, buckrogu, buckrog,  buckrog_state,  empty_init,       ROT0,               "Sega",    "Buck Rogers: Planet of Zoom (not encrypted, set 2)", MACHINE_IMPERFECT_SOUND, layout_buckrog )
 GAMEL( 1982, zoom909,   buckrog, buckroge, buckrog,  buckrog_state,  empty_init,       ROT0,               "Sega",    "Zoom 909", MACHINE_IMPERFECT_SOUND, layout_buckrog )

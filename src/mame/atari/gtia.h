@@ -10,8 +10,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_VIDEO_GTIA_H
-#define MAME_VIDEO_GTIA_H
+#ifndef MAME_ATARI_GTIA_H
+#define MAME_ATARI_GTIA_H
 
 #pragma once
 
@@ -33,6 +33,7 @@ public:
 	void set_region(gtia_region region) { m_region = region; }
 	auto read_callback() { return m_read_cb.bind(); }
 	auto write_callback() { return m_write_cb.bind(); }
+	auto trigger_callback() { return m_trigger_cb.bind(); }
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -45,7 +46,7 @@ public:
 	uint8_t get_w_colpf2() { return m_w.colpf2; }
 	uint8_t get_w_prior() { return m_w.prior; }
 	void count_hitclr_frames() { m_h.hitclr_frames++; }
-	void button_interrupt(int button_count, uint8_t button_port);
+	void button_interrupt(int button_count);
 
 	void render(uint8_t *src, uint8_t *dst, uint8_t *pmbits, uint8_t *prio);
 
@@ -182,10 +183,11 @@ private:
 
 	devcb_read8 m_read_cb;
 	devcb_write8 m_write_cb;
+	devcb_read8 m_trigger_cb;
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(ATARI_GTIA, gtia_device)
 
-#endif // MAME_VIDEO_GTIA_H
+#endif // MAME_ATARI_GTIA_H

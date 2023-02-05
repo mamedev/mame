@@ -5,8 +5,8 @@
     Mr. Do
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_MRDO_H
-#define MAME_INCLUDES_MRDO_H
+#ifndef MAME_UNIVERSAL_MRDO_H
+#define MAME_UNIVERSAL_MRDO_H
 
 #pragma once
 
@@ -93,4 +93,4 @@ protected:
 	virtual uint8_t protection_r() override { return 0; }
 };
 
-#endif // MAME_INCLUDES_MRDO_H
+#endif // MAME_UNIVERSAL_MRDO_H

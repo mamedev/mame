@@ -13,7 +13,7 @@
 #define Im(x)     (u64(u8(x >> 13)))       // literal immediate field
 
 #define Disp_M(x) (s64(s16(x)))            // memory instruction 16-bit signed offset
-#define Disp_P(x) (s64(s16(x << 4)) >> 4)  // hardware load/store 12-bit signed offset
-#define Disp_B(x) (s64(s32(x << 11)) >> 9) // branch instruction offset
+#define Disp_P(x) (s64(util::sext(x, 12))) // hardware load/store 12-bit signed offset
+#define Disp_B(x) (s64(util::sext(x << 2, 23))) // branch instruction offset
 
 #endif // MAME_CPU_ALPHA_COMMON_H

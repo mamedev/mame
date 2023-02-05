@@ -21,7 +21,7 @@ Other        :  93C46 EEPROM
 Year + Game               License       PCB         Tilemaps        Sprites         Other
 -----------------------------------------------------------------------------------------
 94 Mazinger Z             Banpresto     BP943A      038 9335EX706   013 9341E7009   Z80
-94 Power Instinct 2       Atlus         ATG02?      038 9429WX709   013 9341E7009   Z80 NMK 112
+94 Power Instinct 2       Atlus         AT047G2-B   038 9429WX709   013 9341E7009   Z80 NMK 112
 95 Gogetsuji Legends      Atlus         AT047G2-B   038 9429WX709   013 9341E7009   Z80 NMK 112
 95 Metamoqester           Banpresto     BP947A      038 9437WX711   013 9346E7002   Z80
 95 Sailor Moon            Banpresto     BP945A      038 9437WX711   013 9346E7002   Z80
@@ -4272,21 +4272,109 @@ ROM_START( ppsatan )
 ROM_END
 
 
-/***************************************************************************
+/*
 
-           Power Instinct 2 (USA) / Gouketsuji Ichizoku 2 (Japan)
+Power Instinct 2 (US) / Gouketsuji Ichizoku 2 (Japan)
+Atlus, 1994
 
-(c)1994 Atlus
-CPU: 68000, Z80
-Sound: YM2203, AR17961 (x2)
-Custom: NMK 112 (M6295 sample ROM banking), Atlus 8647-01  013, 038 (x4)
-X1 = 12 MHz
-X2 = 28 MHz
-X3 = 16 MHz
+PCB Layout
+----------
 
-***************************************************************************/
+AT047G2-B ATLUS
+|---------------------------------------------------------------|
+|LM324 M6295  G02_U53          Z80  16MHz 28MHz 12MHz  TA8030S  |
+|VOL          G02_U54 |------| G02_U3A                 G02_U82A |
+|      M6295  G02_U55 |NMK112|   6264         6264              |
+|uPC2505      G02_U56 |      |                        |------|  |
+|      4558           |------|                6264    |038   |  |
+|     Y3014   YM2203    PAL                           |9429WX|  |
+|                                            G02_U89  |------|  |
+|J       TEST_SW  62256                                         |
+|A    93C46       62256                       6264    |------|  |
+|M                                                    |038   |  |
+|M    |---|        G  G  G  G           PAL   6264    |9429WX|  |
+|A    |   |        0  0  0  0                         |------|  |
+|     | 6 |        2  2  2  2                G02_U81            |
+|     | 8 |        -  -  -  -                         |------|  |
+|     | 0 |        U  U  U  U                 6264    |038   |  |
+|     | 0 |        4  4  4  4                         |9429WX|  |
+|     | 0 |        5  3  4  2     62256       6264    |------|  |
+|     |   |        A  A  A  A     62256                         |
+|     |---|     PAL            |-------|     G02_U78  |------|  |
+|                              |8647-01|              |038   |  |
+|                              |013    |    KM416C256 |9429WX|  |
+|                              |9341E70|              |------|  |
+|         G02_U66    G02_U63   |-------|                6264    |
+|           G02_U65    G02_U62   62256      KM416C256           |
+| G02_U67     G02_U64    G02_U61 62256                  6264    |
+|---------------------------------------------------------------|
+Notes:
+      68000 clock - 16.000MHz
+      Z80 clock   - 8.000MHz [16/2]
+      6295 clocks - 3.000MHz [12/4], sample rate = 3000000 / 165
+      YM2203 clock- 4.000MHz [16/4]
+      VSync       - 57.5Hz
+      HSync       - 15.23kHz
 
-ROM_START( pwrinst2 )
+      ROMs -
+            U3       : 27C1001 EPROM
+            U82      : 27C040 EPROM
+            U42-45   : 27C040 EPROMs
+            U81, U89 : 8M 42 pin mask ROM (read as 27C800)
+            ALL other ROMs are soldered-in 16M 42 pin mask ROM (read as 27C160)
+*/
+
+ROM_START( pwrinst2 )   /* 94.04.08 */
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 code */
+	ROM_LOAD16_BYTE( "g02.u45a", 0x000000, 0x80000, CRC(ddfff811) SHA1(720f577dc77fc12aeb67511251e995169df754b6) )
+	ROM_LOAD16_BYTE( "g02.u44a", 0x000001, 0x80000, CRC(5561f620) SHA1(3241ccc47e909930d79ad0a1a1b11a11879b17be) )
+	ROM_LOAD16_BYTE( "g02.u43a", 0x100000, 0x80000, CRC(c4fd5d62) SHA1(8d00adfe5da9b0d0134fc9921c12f20b80954c3b) )
+	ROM_LOAD16_BYTE( "g02.u42a", 0x100001, 0x80000, CRC(56279c1c) SHA1(f86edc2264758f9dc920a162d2dc71cc1f63d22e) )
+
+	ROM_REGION16_BE( 0x100000, "user1", ROMREGION_ERASE00 ) /* 68000 extra data roms */
+	/* not used */
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 code */
+	ROM_LOAD( "g02.u3a", 0x00000, 0x20000, CRC(ebea5e1e) SHA1(4d3af9e5f29d0c1b26563f51250039c9e8bd3735) )
+
+	ROM_REGION( 0xe00000, "sprites0", 0 )        /* Sprites: * 2 */
+	ROM_LOAD( "g02.u61", 0x000000, 0x200000, CRC(91e30398) SHA1(2b59a5e40bed2a988382054fe30d92808dad3348) )
+	ROM_LOAD( "g02.u62", 0x200000, 0x200000, CRC(d9455dd7) SHA1(afa69fe9a540cd78b8cfecf09cffa1401c01141a) )
+	ROM_LOAD( "g02.u63", 0x400000, 0x200000, CRC(4d20560b) SHA1(ceaee8cf0b69cc366b95ddcb689a5594d79e5114) )
+	ROM_LOAD( "g02.u64", 0x600000, 0x200000, CRC(b17b9b6e) SHA1(fc6213d8322cda4c7f653e2d7d6d314ce84c97b7) )
+	ROM_LOAD( "g02.u65", 0x800000, 0x200000, CRC(08541878) SHA1(138cf077a49a26440a3da1bdc2c399a208359e57) )
+	ROM_LOAD( "g02.u66", 0xa00000, 0x200000, CRC(becf2a36) SHA1(f8b386d0292b1dc745b7253a3df51d1aa8d5e9db) )
+	ROM_LOAD( "g02.u67", 0xc00000, 0x200000, CRC(52fe2b8b) SHA1(dd50aa62f7db995e28f47de9b3fb749aeeaaa5b0) )
+
+	ROM_REGION( 0x200000, "layer0", 0 ) /* Layer 0 */
+	ROM_LOAD( "g02.u78", 0x000000, 0x200000, CRC(1eca63d2) SHA1(538942b43301f950e3d5139461331c54dc90129d) )
+
+	ROM_REGION( 0x100000, "layer1", 0 ) /* Layer 1 */
+	ROM_LOAD( "g02.u81", 0x000000, 0x100000, CRC(8a3ff685) SHA1(4a59ec50ec4470453374fe10f76d3e894494b49f) )
+
+	ROM_REGION( 0x100000, "layer2", 0 ) /* Layer 2 */
+	ROM_LOAD( "g02.u89", 0x000000, 0x100000, CRC(373e1f73) SHA1(ec1ae9fab37eee41be8e1bc6dad03809b62fdbce) )
+
+	ROM_REGION( 0x080000, "layer3", 0 ) /* Layer 3 */
+	ROM_LOAD( "g02.82a", 0x000000, 0x080000, CRC(4b3567d6) SHA1(d3e14783b312d2bea9722a8e3c22bcec81e26166) )
+
+	ROM_REGION( 0x440000, "oki1", 0 )   /* OKIM6295 #1 Samples */
+	/* Leave the 0x40000 bytes addressable by the chip empty */
+	ROM_LOAD( "g02.u53", 0x040000, 0x200000, CRC(c4bdd9e0) SHA1(a938a831e789ddf6f3cc5f3e5f3877ec7bd62d4e) )
+	ROM_LOAD( "g02.u54", 0x240000, 0x200000, CRC(1357d50e) SHA1(433766177ce9d6933f90de85ba91bfc6d8d5d664) )
+
+	ROM_REGION( 0x440000, "oki2", 0 )   /* OKIM6295 #2 Samples */
+	/* Leave the 0x40000 bytes addressable by the chip empty */
+	ROM_LOAD( "g02.u55", 0x040000, 0x200000, CRC(2d102898) SHA1(bd81f4cd2ba100707db0c5bb1419f0b23c998574) )
+	ROM_LOAD( "g02.u56", 0x240000, 0x200000, CRC(9ff50dda) SHA1(1121685e387c20e228032f2b0f5cbb606376fc15) )
+
+	ROM_REGION( 0x03ff, "pal", 0 )
+	ROM_LOAD( "peel18cv8p-15.u7",  0x0000, 0x0155, CRC(e02b2d2b) SHA1(26293538ca17674e1b249ed82a6df2570c6e5155) ) /* PEEL18CV8P-15 */
+	ROM_LOAD( "peel18cv8p-15.u21", 0x0155, 0x0155, CRC(7ca78400) SHA1(1cebdd64e08bbc535f23592daf9380696bd2c281) ) /* PEEL18CV8P-15 */
+	ROM_LOAD( "peel18cv8p-15.u25", 0x02aa, 0x0155, CRC(61b414df) SHA1(f12c5e62f83114f83108895ee58ceea31cdcb9fd) ) /* PEEL18CV8P-15 */
+ROM_END
+
+ROM_START( pwrinst2a )  /* also 94.04.08 like pwrinst2, but different program roms */
 	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 code */
 	ROM_LOAD16_BYTE( "g02.u45", 0x000000, 0x80000, CRC(7b33bc43) SHA1(a68eb94e679f03c354932b8c5cd1bb2922fec0aa) )
 	ROM_LOAD16_BYTE( "g02.u44", 0x000001, 0x80000, CRC(8f6f6637) SHA1(024b12c0fe40e27c79e38bd7601a9183a62d75fd) )
@@ -4329,6 +4417,11 @@ ROM_START( pwrinst2 )
 	/* Leave the 0x40000 bytes addressable by the chip empty */
 	ROM_LOAD( "g02.u55", 0x040000, 0x200000, CRC(2d102898) SHA1(bd81f4cd2ba100707db0c5bb1419f0b23c998574) )
 	ROM_LOAD( "g02.u56", 0x240000, 0x200000, CRC(9ff50dda) SHA1(1121685e387c20e228032f2b0f5cbb606376fc15) )
+
+	ROM_REGION( 0x03ff, "pal", 0 )
+	ROM_LOAD( "peel18cv8p-15.u7",  0x0000, 0x0155, CRC(e02b2d2b) SHA1(26293538ca17674e1b249ed82a6df2570c6e5155) ) /* PEEL18CV8P-15 */
+	ROM_LOAD( "peel18cv8p-15.u21", 0x0155, 0x0155, CRC(7ca78400) SHA1(1cebdd64e08bbc535f23592daf9380696bd2c281) ) /* PEEL18CV8P-15 */
+	ROM_LOAD( "peel18cv8p-15.u25", 0x02aa, 0x0155, CRC(61b414df) SHA1(f12c5e62f83114f83108895ee58ceea31cdcb9fd) ) /* PEEL18CV8P-15 */
 ROM_END
 
 ROM_START( pwrinst2j )
@@ -4374,6 +4467,11 @@ ROM_START( pwrinst2j )
 	/* Leave the 0x40000 bytes addressable by the chip empty */
 	ROM_LOAD( "g02.u55", 0x040000, 0x200000, CRC(2d102898) SHA1(bd81f4cd2ba100707db0c5bb1419f0b23c998574) )
 	ROM_LOAD( "g02.u56", 0x240000, 0x200000, CRC(9ff50dda) SHA1(1121685e387c20e228032f2b0f5cbb606376fc15) )
+
+	ROM_REGION( 0x03ff, "pal", 0 )
+	ROM_LOAD( "peel18cv8p-15.u7",  0x0000, 0x0155, CRC(e02b2d2b) SHA1(26293538ca17674e1b249ed82a6df2570c6e5155) ) /* PEEL18CV8P-15 */
+	ROM_LOAD( "peel18cv8p-15.u21", 0x0155, 0x0155, CRC(7ca78400) SHA1(1cebdd64e08bbc535f23592daf9380696bd2c281) ) /* PEEL18CV8P-15 */
+	ROM_LOAD( "peel18cv8p-15.u25", 0x02aa, 0x0155, CRC(61b414df) SHA1(f12c5e62f83114f83108895ee58ceea31cdcb9fd) ) /* PEEL18CV8P-15 */
 ROM_END
 
 /*
@@ -4474,6 +4572,11 @@ ROM_START( plegends )
 	/* Leave the 0x40000 bytes addressable by the chip empty */
 	ROM_LOAD( "g02.u55", 0x040000, 0x200000, CRC(2d102898) SHA1(bd81f4cd2ba100707db0c5bb1419f0b23c998574) )
 	ROM_LOAD( "g02.u56", 0x240000, 0x200000, CRC(9ff50dda) SHA1(1121685e387c20e228032f2b0f5cbb606376fc15) )
+
+	ROM_REGION( 0x03ff, "pal", 0 )
+	ROM_LOAD( "peel18cv8p-15.u7",  0x0000, 0x0155, CRC(e02b2d2b) SHA1(26293538ca17674e1b249ed82a6df2570c6e5155) ) /* PEEL18CV8P-15 */
+	ROM_LOAD( "peel18cv8p-15.u21", 0x0155, 0x0155, CRC(7ca78400) SHA1(1cebdd64e08bbc535f23592daf9380696bd2c281) ) /* PEEL18CV8P-15 */
+	ROM_LOAD( "peel18cv8p-15.u25", 0x02aa, 0x0155, CRC(61b414df) SHA1(f12c5e62f83114f83108895ee58ceea31cdcb9fd) ) /* PEEL18CV8P-15 */
 ROM_END
 
 ROM_START( plegendsj )
@@ -4521,6 +4624,11 @@ ROM_START( plegendsj )
 	/* Leave the 0x40000 bytes addressable by the chip empty */
 	ROM_LOAD( "g02.u55", 0x040000, 0x200000, CRC(2d102898) SHA1(bd81f4cd2ba100707db0c5bb1419f0b23c998574) )
 	ROM_LOAD( "g02.u56", 0x240000, 0x200000, CRC(9ff50dda) SHA1(1121685e387c20e228032f2b0f5cbb606376fc15) )
+
+	ROM_REGION( 0x03ff, "pal", 0 )
+	ROM_LOAD( "peel18cv8p-15.u7",  0x0000, 0x0155, CRC(e02b2d2b) SHA1(26293538ca17674e1b249ed82a6df2570c6e5155) ) /* PEEL18CV8P-15 */
+	ROM_LOAD( "peel18cv8p-15.u21", 0x0155, 0x0155, CRC(7ca78400) SHA1(1cebdd64e08bbc535f23592daf9380696bd2c281) ) /* PEEL18CV8P-15 */
+	ROM_LOAD( "peel18cv8p-15.u25", 0x02aa, 0x0155, CRC(61b414df) SHA1(f12c5e62f83114f83108895ee58ceea31cdcb9fd) ) /* PEEL18CV8P-15 */
 ROM_END
 
 
@@ -5195,7 +5303,7 @@ void cave_state::init_ppsatan()
 	save_item(NAME(m_ppsatan_io_mux));
 }
 
-void cave_state::init_pwrinst2j()
+void cave_state::init_pwrinst2()
 {
 	u8 *src = m_spriteregion[0]->base();
 	const u32 len = m_spriteregion[0]->bytes();
@@ -5223,11 +5331,11 @@ void cave_state::init_pwrinst2j()
 	m_time_vblank_irq = 2000;   /**/
 }
 
-void cave_state::init_pwrinst2()
+void cave_state::init_pwrinst2a()
 {
 	/* this patch fixes on of the moves, why is it needed? is the rom bad or is there another
 	   problem? does the Japan set need it or not? */
-	init_pwrinst2j();
+	init_pwrinst2();
 
 #if 1       //ROM PATCH
 	{
@@ -5311,9 +5419,10 @@ void cave_state::init_korokoro()
 
 
 ***************************************************************************/
-
-GAME( 1994, pwrinst2,   0,        pwrinst2, metmqstr, cave_state, init_pwrinst2,  ROT0,   "Atlus",                                  "Power Instinct 2 (US, Ver. 94.04.08)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1994, pwrinst2j,  pwrinst2, pwrinst2, metmqstr, cave_state, init_pwrinst2j, ROT0,   "Atlus",                                  "Gouketsuji Ichizoku 2 (Japan, Ver. 94.04.08)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT    MACHINE   INPUT      CLASS      INIT            ROT     COMPANY                                   FULLNAME                                        FLAGS
+GAME( 1994, pwrinst2,   0,        pwrinst2, metmqstr, cave_state, init_pwrinst2,  ROT0,   "Atlus",                                  "Power Instinct 2 (US, Ver. 94.04.08, set 1)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pwrinst2a,  pwrinst2, pwrinst2, metmqstr, cave_state, init_pwrinst2a, ROT0,   "Atlus",                                  "Power Instinct 2 (US, Ver. 94.04.08, set 2)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pwrinst2j,  pwrinst2, pwrinst2, metmqstr, cave_state, init_pwrinst2,  ROT0,   "Atlus",                                  "Gouketsuji Ichizoku 2 (Japan, Ver. 94.04.08)", MACHINE_SUPPORTS_SAVE )
 
 // Version/Date string is stored at 68000 ROM 0x1200-0x121f
 // The EEPROM determines the region, program roms are the same between sets
@@ -5330,8 +5439,8 @@ GAME( 1995, donpachihk, donpachi, donpachi, cave,     cave_state, init_donpachi,
 GAME( 1995, metmqstr,   0,        metmqstr, metmqstr, cave_state, init_metmqstr,  ROT0,   "Banpresto / Pandorabox",                 "Metamoqester (World)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1995, nmaster,    metmqstr, metmqstr, metmqstr, cave_state, init_metmqstr,  ROT0,   "Banpresto / Pandorabox",                 "Oni - The Ninja Master (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1995, plegends,   0,        pwrinst2, metmqstr, cave_state, init_pwrinst2j, ROT0,   "Atlus",                                  "Gogetsuji Legends (US, Ver. 95.06.20)",                       MACHINE_SUPPORTS_SAVE )
-GAME( 1995, plegendsj,  plegends, pwrinst2, metmqstr, cave_state, init_pwrinst2j, ROT0,   "Atlus",                                  "Gouketsuji Gaiden - Saikyou Densetsu (Japan, Ver. 95.06.20)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, plegends,   0,        pwrinst2, metmqstr, cave_state, init_pwrinst2,  ROT0,   "Atlus",                                  "Gogetsuji Legends (US, Ver. 95.06.20)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1995, plegendsj,  plegends, pwrinst2, metmqstr, cave_state, init_pwrinst2,  ROT0,   "Atlus",                                  "Gouketsuji Gaiden - Saikyou Densetsu (Japan, Ver. 95.06.20)", MACHINE_SUPPORTS_SAVE )
 
 // The EEPROM determines the region, program roms are the same between sets
 GAME( 1995, sailormn,   0,        sailormn, cave,     cave_state, init_sailormn,  ROT0,   "Gazelle (Banpresto license)",            "Pretty Soldier Sailor Moon (Version 95/03/22B, Europe)",     MACHINE_SUPPORTS_SAVE )

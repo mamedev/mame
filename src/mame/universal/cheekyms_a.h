@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_AUDIO_CHEEKYMS_H
-#define MAME_AUDIO_CHEEKYMS_H
+#ifndef MAME_UNIVERSAL_CHEEKYMS_A_H
+#define MAME_UNIVERSAL_CHEEKYMS_A_H
 
 #pragma once
 
@@ -41,4 +41,4 @@ private:
 
 DECLARE_DEVICE_TYPE(CHEEKY_MOUSE_AUDIO, cheekyms_audio_device)
 
-#endif // MAME_AUDIO_CHEEKYMS_H
+#endif // MAME_UNIVERSAL_CHEEKYMS_A_H

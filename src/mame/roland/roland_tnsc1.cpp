@@ -27,6 +27,8 @@
 #include "softlist_dev.h"
 
 
+namespace {
+
 class rlndtnsc1_state : public driver_device
 {
 public:
@@ -65,6 +67,8 @@ void rlndtnsc1_state::rlndtnsc1(machine_config &config)
 
 ROM_START( rlndtnsc1 )
 ROM_END
+
+} // anonymous namespace
 
 
 CONS( 198?, rlndtnsc1, 0, 0, rlndtnsc1, rlndtnsc1, rlndtnsc1_state, empty_init, "Roland", "Roland Music Style Card Software List holder", MACHINE_IS_SKELETON )

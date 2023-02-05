@@ -31,23 +31,24 @@ known chips:
  *192     1650    19??, <unknown> phone dialer (have dump)
  *255     1655    19??, <unknown> talking clock (have dump)
  *518     1650A   19??, GI Teleview Control Chip (features differ per program)
- *519     1650A   19??, "
- *532     1650A   19??, "
- *533     1650A   19??, "
+ *519     1650A   19??, GI Teleview Control Chip
+ @522     1655A   1981, Electroplay Sound FX Phasor
+ *532     1650A   19??, GI Teleview Control Chip
+ *533     1650A   19??, GI Teleview Control Chip
  *536     1650    1982, GI Teleview Autodialer/Terminal Identifier
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
-ROM source notes when dumped from another publisher, but confident it's the same:
+ROM source notes when dumped from another title, but confident it's the same:
 - drdunk: Tandy Electronic Basketball
 - flash: Radio Shack Sound Effects Chassis
 - hccbaskb: Sears Electronic Basketball
+- ttfballa: (no brand) Football
 - us2pfball: Tandy 2-Player Football
 - uspbball: Tandy 2-Player Baseball
 
 TODO:
 - tweak MCU frequency for games when video/audio recording surfaces(YouTube etc.)
-- ttfball: discrete sound part, for volume gating?
 - what's the relation between drdunk and hccbaskb? Probably made by the same
   Hong Kong subcontractor? I presume Toytronic.
 - uspbball and pabball internal artwork
@@ -59,11 +60,17 @@ TODO:
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "video/pwm.h"
 #include "machine/clock.h"
+#include "machine/input_merger.h"
+#include "machine/netlist.h"
 #include "machine/timer.h"
+#include "sound/dac.h"
 #include "sound/flt_vol.h"
 #include "sound/spkrdev.h"
 
 #include "speaker.h"
+
+// netlist
+#include "nl_sfxphasor.h"
 
 // internal artwork
 #include "drdunk.lh"
@@ -81,6 +88,8 @@ TODO:
 #include "hh_pic16_test.lh" // common test-layout - use external artwork
 
 
+namespace {
+
 class hh_pic16_state : public driver_device
 {
 public:
@@ -92,7 +101,8 @@ public:
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	virtual DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	DECLARE_INPUT_CHANGED_MEMBER(power_button);
 
 protected:
 	virtual void machine_start() override;
@@ -113,6 +123,7 @@ protected:
 
 	u16 read_inputs(int columns, u16 colmask = ~0);
 	u8 read_rotated_inputs(int columns, u8 rowmask = ~0);
+	void set_power(bool state);
 };
 
 
@@ -130,6 +141,7 @@ void hh_pic16_state::machine_start()
 
 void hh_pic16_state::machine_reset()
 {
+	set_power(true);
 }
 
 
@@ -175,6 +187,19 @@ INPUT_CHANGED_MEMBER(hh_pic16_state::reset_button)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
+INPUT_CHANGED_MEMBER(hh_pic16_state::power_button)
+{
+	set_power((bool)param);
+}
+
+void hh_pic16_state::set_power(bool state)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+
+	if (m_display && !state)
+		m_display->clear();
+}
+
 
 
 /***************************************************************************
@@ -182,8 +207,6 @@ INPUT_CHANGED_MEMBER(hh_pic16_state::reset_button)
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
-
-namespace {
 
 /***************************************************************************
 
@@ -284,14 +307,14 @@ INPUT_PORTS_END
 void touchme_state::touchme(machine_config &config)
 {
 	// basic machine hardware
-	PIC1655(config, m_maincpu, 300000); // approximation - RC osc. R=100K, C=47pF
+	PIC1655(config, m_maincpu, 250000); // approximation - RC osc. R=100K, C=47pF
 	m_maincpu->read_a().set(FUNC(touchme_state::read_a));
 	m_maincpu->write_b().set(FUNC(touchme_state::write_b));
 	m_maincpu->read_c().set_constant(0xff);
 	m_maincpu->write_c().set(FUNC(touchme_state::write_c));
 
 	// PIC CLKOUT, tied to RTCC
-	CLOCK(config, "clock", 300000/4).signal_handler().set_inputline("maincpu", PIC16C5x_RTCC);
+	CLOCK(config, "clock", 250000/4).signal_handler().set_inputline("maincpu", PIC16C5x_RTCC);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(7, 7);
@@ -322,6 +345,10 @@ ROM_END
   Caprice Pro-Action Baseball (manufactured by Calfax)
   * PIC 1655A-043
   * 1 7seg LED + 36 other LEDs, CD4028, 1-bit sound
+
+  The box says (C) Calfax, Inc. 1979. Manufactured in Hong Kong for Caprice
+  Electronics, exclusively for Kmart Corporation. Calfax / Caprice is basically
+  the same company.
 
 ***************************************************************************/
 
@@ -390,7 +417,7 @@ static INPUT_PORTS_START( pabball )
 	PORT_CONFSETTING(    0x20, "2" )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_pic16_state, reset_button, 0) PORT_NAME("P1 Reset")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, pabball_state, reset_button, 0) PORT_NAME("P1 Reset")
 INPUT_PORTS_END
 
 void pabball_state::pabball(machine_config &config)
@@ -417,6 +444,147 @@ void pabball_state::pabball(machine_config &config)
 ROM_START( pabball )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "pic_1655a-043", 0x0000, 0x0400, CRC(43c9b765) SHA1(888a431bab9bcb241c14f33f70863fa2ad89c96b) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Electroplay Sound FX Phasor
+  * PIC 1655A-522
+  * 3-bit sound with volume envelope
+
+  It's a toy synthesizer. It included keypad overlays with nursery rhymes.
+
+  When in music mode, the user can create custom sounds with the F key, other
+  keys are music notes. To put it briefly, commands A,B are for vibrato,
+  C is for volume decay, and D,E,F change the timbre.
+
+  Paste example (must be in music mode): F11A F3B F4C F3D F3E F6F
+
+***************************************************************************/
+
+class sfxphasor_state : public hh_pic16_state
+{
+public:
+	sfxphasor_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_pic16_state(mconfig, type, tag),
+		m_sound_nl(*this, "sound_nl:p%02u", 10U)
+	{ }
+
+	void sfxphasor(machine_config &config);
+
+private:
+	optional_device_array<netlist_mame_logic_input_device, 8> m_sound_nl;
+
+	void write_b(u8 data);
+	void write_c(u8 data);
+	u8 read_c();
+};
+
+// handlers
+
+void sfxphasor_state::write_b(u8 data)
+{
+	// B2: trigger power off
+	if (~m_b & data & 4)
+		set_power(false);
+
+	// B0,B3: envelope param
+	m_sound_nl[0]->write_line(BIT(data, 0));
+	m_sound_nl[3]->write_line(BIT(data, 3));
+
+	// B5-B7: sound out
+	for (int i = 5; i < 8; i++)
+		m_sound_nl[i]->write_line(BIT(data, i));
+
+	m_b = data;
+}
+
+void sfxphasor_state::write_c(u8 data)
+{
+	m_c = data;
+}
+
+u8 sfxphasor_state::read_c()
+{
+	// C0-C3: multiplexed inputs from C4-C7
+	m_inp_mux = m_c >> 4 & 0xf;
+	u8 lo = read_inputs(4, 0xf);
+
+	// C4-C7: multiplexed inputs from C0-C3
+	m_inp_mux = m_c & 0xf;
+	u8 hi = read_rotated_inputs(4, 0xf);
+
+	return lo | hi << 4;
+}
+
+// config
+
+static INPUT_PORTS_START( sfxphasor )
+	PORT_START("IN.0") // C4 port C
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHAR('4') PORT_NAME("4 / Locomotive")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0') PORT_NAME("0 / Helicopter")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('8')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+
+	PORT_START("IN.1") // C5 port C
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHAR('5') PORT_NAME("5 / Bee")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1') PORT_NAME("1 / Telephone")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR('9')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+
+	PORT_START("IN.3") // C7 port C
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('6') PORT_NAME("6 / Boat")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('2') PORT_NAME("2 / Race Car")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+
+	PORT_START("IN.2") // C6 port C
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('7') PORT_NAME("7 / Police Car")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CHAR('3') PORT_NAME("3 / UFO")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR('F') PORT_CHAR(13) PORT_NAME("F / Enter")
+
+	PORT_START("IN.4") // port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x02, 0x02, "Auto Power Off" ) // MCU pin, not a switch
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_NAME("On / Sounds") PORT_CHANGED_MEMBER(DEVICE_SELF, sfxphasor_state, power_button, true)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("On / Music") PORT_CHANGED_MEMBER(DEVICE_SELF, sfxphasor_state, power_button, true)
+INPUT_PORTS_END
+
+void sfxphasor_state::sfxphasor(machine_config &config)
+{
+	// basic machine hardware
+	PIC1655(config, m_maincpu, 950000); // approximation - RC osc. R=10K+VR, C=47pF
+	m_maincpu->read_a().set_ioport("IN.4");
+	m_maincpu->write_b().set(FUNC(sfxphasor_state::write_b));
+	m_maincpu->write_c().set(FUNC(sfxphasor_state::write_c));
+	m_maincpu->read_c().set(FUNC(sfxphasor_state::read_c));
+
+	// no visual feedback!
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	NETLIST_SOUND(config, "sound_nl", 48000).set_source(NETLIST_NAME(sfxphasor)).add_route(ALL_OUTPUTS, "mono", 0.25);
+	NETLIST_STREAM_OUTPUT(config, "sound_nl:cout0", 0, "SPK1.1").set_mult_offset(1.0, 0.0);
+
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p10", "P10.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p13", "P13.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p15", "P15.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p16", "P16.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "sound_nl:p17", "P17.IN", 0);
+}
+
+// roms
+
+ROM_START( sfxphasor )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "pic_1655a-522", 0x0000, 0x0400, CRC(0af77e83) SHA1(49b089681149254041c14a740cad19a619725c3c) )
 ROM_END
 
 
@@ -1505,19 +1673,13 @@ ROM_END
 
 /***************************************************************************
 
-  Toytronic Football (set 1)
+  Toytronic Football
   * PIC 1655A-033
-  * 4511 7seg BCD decoder, 7 7seg LEDs + 27 other LEDs, 1-bit sound
-
-  (no brand) Football (set 2)
-  * PIC 1655-024
-  * rest same as above, 1 less button
+  * 4511 7seg BCD decoder, 7 7seg LEDs + 27 other LEDs
+  * 1-bit sound through volume gate
 
   Hello and welcome to another Mattel Football clone, there are so many of these.
-  The 1655-024 one came from an unbranded handheld, but comparison suggests that
-  it's the 'prequel' of 1655A-033.
-
-  The 1655-024 version looks and sounds the same as Conic "Electronic Football".
+  Comparison suggests that this is the 'sequel' to 1655A-024.
 
 ***************************************************************************/
 
@@ -1530,11 +1692,11 @@ public:
 
 	void ttfball(machine_config &config);
 
-private:
+protected:
 	void update_display();
 	u8 read_a();
 	void write_b(u8 data);
-	void write_c(u8 data);
+	virtual void write_c(u8 data);
 };
 
 // handlers
@@ -1544,8 +1706,8 @@ void ttfball_state::update_display()
 	// C0-C2: led data
 	// C0-C3: 4511 A-D, C4: digit segment DP
 	// C5: select digits or led matrix
-	const u8 _4511_map[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0,0,0,0,0,0 };
-	u16 led_data = (m_c & 0x20) ? (_4511_map[m_c & 0xf] | (~m_c << 3 & 0x80)) : (~m_c << 8 & 0x700);
+	const u8 cd4511_map[0x10] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67 };
+	u16 led_data = (m_c & 0x20) ? (cd4511_map[m_c & 0xf] | (~m_c << 3 & 0x80)) : (~m_c << 8 & 0x700);
 
 	m_display->matrix(m_b | (m_c << 1 & 0x100), led_data);
 }
@@ -1571,9 +1733,6 @@ void ttfball_state::write_b(u8 data)
 
 void ttfball_state::write_c(u8 data)
 {
-	// C6: speaker out
-	m_speaker->level_w(data >> 6 & 1);
-
 	// C7: input mux high
 	m_inp_mux = (m_inp_mux & 0xf) | (data >> 3 & 0x10);
 
@@ -1608,34 +1767,10 @@ static INPUT_PORTS_START( ttfball )
 	PORT_CONFSETTING(    0x00, "2" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( ttfballa )
-	PORT_START("IN.0") // B0 port A3
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Kick")
-
-	PORT_START("IN.1") // B1 port A3
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Forward")
-
-	PORT_START("IN.2") // B3 port A3
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY
-
-	PORT_START("IN.3") // B7 port A3
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_16WAY
-
-	PORT_START("IN.4") // C7 port A3
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN.5") // port A
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Status")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Score")
-	PORT_CONFNAME( 0x04, 0x04, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(    0x04, "1" )
-	PORT_CONFSETTING(    0x00, "2" )
-INPUT_PORTS_END
-
 void ttfball_state::ttfball(machine_config &config)
 {
 	// basic machine hardware
-	PIC1655(config, m_maincpu, 600000); // approximation - RC osc. R=27K(set 1) or 33K(set 2), C=68pF
+	PIC1655(config, m_maincpu, 550000); // approximation - RC osc. 27K, C=68pF
 	m_maincpu->read_a().set(FUNC(ttfball_state::read_a));
 	m_maincpu->write_b().set(FUNC(ttfball_state::write_b));
 	m_maincpu->read_c().set_constant(0xff);
@@ -1650,6 +1785,13 @@ void ttfball_state::ttfball(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	auto &gate(CLOCK(config, "gate", 3500)); // approximation
+	gate.signal_handler().set("merge", FUNC(input_merger_all_high_device::in_w<0>));
+	m_maincpu->write_c().append("merge", FUNC(input_merger_all_high_device::in_w<1>)).bit(6);
+
+	auto &merge(INPUT_MERGER_ALL_HIGH(config, "merge"));
+	merge.output_handler().set(m_speaker, FUNC(speaker_sound_device::level_w));
 }
 
 // roms
@@ -1658,6 +1800,92 @@ ROM_START( ttfball )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "pic_1655a-033", 0x0000, 0x0400, CRC(2b500501) SHA1(f7fe464663c56e2181a31a1dc5f1f5239df57bed) )
 ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Toytronic Football (model 003201)
+  * PIC 1655-024
+  * 4511 7seg BCD decoder, 7 7seg LEDs + 27 other LEDs, 1-bit sound
+
+  The 1655-024 version looks and sounds the same as Conic "Electronic Football".
+  The reason it went through several brands (and even a no brand one) was
+  probably due to legal pursuit from Mattel.
+
+  known releases:
+  - Hong Kong(1): Football, published by Toytronic
+  - Hong Kong(2): Football, published by (no brand)
+
+***************************************************************************/
+
+class ttfballa_state : public ttfball_state
+{
+public:
+	ttfballa_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ttfball_state(mconfig, type, tag)
+	{ }
+
+	void ttfballa(machine_config &config);
+
+protected:
+	virtual void write_c(u8 data) override;
+};
+
+// handlers
+
+void ttfballa_state::write_c(u8 data)
+{
+	// C6: speaker out
+	m_speaker->level_w(BIT(data, 6));
+
+	// same as ttfball
+	m_c = data;
+	update_display();
+}
+
+// config
+
+static INPUT_PORTS_START( ttfballa )
+	PORT_START("IN.0") // B0 port A3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Kick")
+
+	PORT_START("IN.1") // B1 port A3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Forward")
+
+	PORT_START("IN.2") // B3 port A3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_16WAY
+
+	PORT_START("IN.3") // B7 port A3
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_16WAY
+
+	PORT_START("IN.4") // C7 port A3 (not used)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN.5") // port A
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Status")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Score")
+	PORT_CONFNAME( 0x04, 0x04, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x04, "1" )
+	PORT_CONFSETTING(    0x00, "2" )
+INPUT_PORTS_END
+
+void ttfballa_state::ttfballa(machine_config &config)
+{
+	ttfball(config);
+
+	m_maincpu->set_clock(500000); // approximation - RC osc. 33K, C=68pF
+	m_display->set_bri_levels(0.002, 0.02);
+
+	// no volume gate
+	m_maincpu->write_c().set(FUNC(ttfballa_state::write_c));
+	config.device_remove("gate");
+	config.device_remove("merge");
+}
+
+// roms
 
 ROM_START( ttfballa )
 	ROM_REGION( 0x0400, "maincpu", 0 )
@@ -1940,9 +2168,11 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME       PARENT  CMP MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1979, touchme,   0,       0, touchme,   touchme,   touchme_state,   empty_init, "Atari", "Touch Me (handheld, Rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, touchme,   0,       0, touchme,   touchme,   touchme_state,   empty_init, "Atari", "Touch Me (handheld, Rev. 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, pabball,   0,       0, pabball,   pabball,   pabball_state,   empty_init, "Caprice / Calfax", "Pro-Action Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1979, pabball,   0,       0, pabball,   pabball,   pabball_state,   empty_init, "Calfax / Caprice Electronics", "Pro-Action Electronic-Computerized Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+
+CONS( 1981, sfxphasor, 0,       0, sfxphasor, sfxphasor, sfxphasor_state, empty_init, "Electroplay", "Sound FX Phasor", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 CONS( 1980, melodym,   0,       0, melodym,   melodym,   melodym_state,   empty_init, "GAF", "Melody Madness", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
@@ -1951,7 +2181,7 @@ CONS( 1980, flash,     0,       0, flash,     flash,     flash_state,     empty_
 
 CONS( 1980, matchme,   0,       0, matchme,   matchme,   matchme_state,   empty_init, "Kingsford", "Match Me", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1979, drdunk,    0,       0, drdunk,    drdunk,    drdunk_state,    empty_init, "Kmart", "Dr. Dunk", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, drdunk,    0,       0, drdunk,    drdunk,    drdunk_state,    empty_init, "Kmart Corporation", "Dr. Dunk", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, leboom,    0,       0, leboom,    leboom,    leboom_state,    empty_init, "Lakeside", "Le Boom", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
@@ -1959,7 +2189,7 @@ CONS( 1979, rockpin,   0,       0, rockpin,   rockpin,   rockpin_state,   empty_
 CONS( 1979, hccbaskb,  0,       0, hccbaskb,  hccbaskb,  hccbaskb_state,  empty_init, "Tiger Electronics", "Half Court Computer Basketball", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1979, ttfball,   0,       0, ttfball,   ttfball,   ttfball_state,   empty_init, "Toytronic", "Football (Toytronic, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-CONS( 1979, ttfballa,  ttfball, 0, ttfball,   ttfballa,  ttfball_state,   empty_init, "Toytronic", "Football (Toytronic, set 2)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, ttfballa,  ttfball, 0, ttfballa,  ttfballa,  ttfballa_state,  empty_init, "Toytronic", "Football (Toytronic, set 2)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1981, uspbball,  0,       0, uspbball,  uspbball,  uspbball_state,  empty_init, "U.S. Games", "Programmable Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 CONS( 1981, us2pfball, 0,       0, us2pfball, us2pfball, us2pfball_state, empty_init, "U.S. Games", "Electronic 2-Player Football", MACHINE_SUPPORTS_SAVE )

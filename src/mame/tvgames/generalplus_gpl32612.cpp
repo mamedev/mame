@@ -31,6 +31,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class generalplus_gpl32612_game_state : public driver_device
 {
 public:
@@ -311,6 +314,8 @@ void generalplus_gpl32612_game_state::nand_init840()
 	nand_init(0x840, 0x800);
 	bootstrap();
 }
+
+} // anonymous namespace
 
 
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags

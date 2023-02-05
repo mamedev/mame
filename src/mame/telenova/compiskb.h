@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_INCLUDES_COMPISKB_H
-#define MAME_INCLUDES_COMPISKB_H
+#ifndef MAME_TELENOVA_COMPISKB_H
+#define MAME_TELENOVA_COMPISKB_H
 
 #pragma once
 
@@ -61,4 +61,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(COMPIS_KEYBOARD, compis_keyboard_device)
 
-#endif // MAME_INCLUDES_COMPISKB_H
+#endif // MAME_TELENOVA_COMPISKB_H

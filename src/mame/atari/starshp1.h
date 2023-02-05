@@ -25,8 +25,8 @@
  *  Horizontal Visible Area    384 (0x180)         768 (0x300)
  *  Horizontal Blanking Time   128 (0x080)         256 (0x100)
  */
-#ifndef MAME_INCLUDES_STARSHP1_H
-#define MAME_INCLUDES_STARSHP1_H
+#ifndef MAME_ATARI_STARSHP1_H
+#define MAME_ATARI_STARSHP1_H
 
 #pragma once
 
@@ -94,7 +94,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_starshp1);
 	INTERRUPT_GEN_MEMBER(starshp1_interrupt);
 	void set_pens();
-	void draw_starfield(bitmap_ind16 &bitmap);
+	void draw_starfield(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int get_sprite_hpos(int i);
 	int get_sprite_vpos(int i);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -160,4 +160,4 @@ DISCRETE_SOUND_EXTERN( starshp1_discrete );
 #define STARSHP1_PHASOR_ON          NODE_09
 #define STARSHP1_ATTRACT            NODE_10
 
-#endif // MAME_INCLUDES_STARSHP1_H
+#endif // MAME_ATARI_STARSHP1_H

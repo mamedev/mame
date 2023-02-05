@@ -154,6 +154,10 @@ u32 intchess_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
+static GFXDECODE_START( gfx_intchess )
+	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x1, 0, 2 )
+GFXDECODE_END
+
 void intchess_state::vram_w(offs_t offset, u8 data)
 {
 	// d0-d2: sprite index
@@ -263,27 +267,6 @@ static INPUT_PORTS_START( intchess )
 	PORT_START("RESET")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, intchess_state, reset_button, 0) PORT_NAME("Reset") // Start
 INPUT_PORTS_END
-
-
-
-/******************************************************************************
-    GFX Layouts
-******************************************************************************/
-
-static const gfx_layout layout_8x8 =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ STEP8(0,1) },
-	{ STEP8(0,8) },
-	8*8
-};
-
-static GFXDECODE_START( gfx_intchess )
-	GFXDECODE_ENTRY( "gfx", 0, layout_8x8, 0, 2 )
-GFXDECODE_END
 
 
 

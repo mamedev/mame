@@ -4600,6 +4600,9 @@ ROM_START( dirtdvls )   /* Step 2.1 - Export version, Sega game ID# is 833-13427
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
 	ROM_FILL( 0x000000, 0x800000, 0x0000 )
 
+	ROM_REGION( 0x10000, "drivebd", 0 ) /* Drive board ROM, same hardware and ROM as Scud Race */
+	ROM_LOAD( "epr-19338a.bin", 0x000000, 0x010000, CRC(c9fac464) SHA1(47b9ab7921a685c01629afb592d597faa11d2bd6) )
+
 	//             ????     317-0238-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "29290f17" )
 ROM_END
@@ -4657,6 +4660,9 @@ ROM_START( dirtdvlsu )   /* Step 2.1 - USA version, Sega game ID# is 833-13528-0
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
 	ROM_FILL( 0x000000, 0x800000, 0x0000 )
+
+	ROM_REGION( 0x10000, "drivebd", 0 ) /* Drive board ROM, same hardware and ROM as Scud Race */
+	ROM_LOAD( "epr-19338a.bin", 0x000000, 0x010000, CRC(c9fac464) SHA1(47b9ab7921a685c01629afb592d597faa11d2bd6) )
 
 	//             ????     317-0238-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "29290f17" )
@@ -4716,6 +4722,9 @@ ROM_START( dirtdvlsau )  /* Step 2.1 - Australia version */
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
 	ROM_FILL( 0x000000, 0x800000, 0x0000 )
 
+	ROM_REGION( 0x10000, "drivebd", 0 ) /* Drive board ROM, same hardware and ROM as Scud Race */
+	ROM_LOAD( "epr-19338a.bin", 0x000000, 0x010000, CRC(c9fac464) SHA1(47b9ab7921a685c01629afb592d597faa11d2bd6) )
+
 	//             ????     317-0238-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "29290f17" )
 ROM_END
@@ -4774,6 +4783,9 @@ ROM_START( dirtdvlsj )   /* Step 2.1 - Japan version, Sega game ID# is 833-13527
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
 	ROM_FILL( 0x000000, 0x800000, 0x0000 )
 
+	ROM_REGION( 0x10000, "drivebd", 0 ) /* Drive board ROM, same hardware and ROM as Scud Race */
+	ROM_LOAD( "epr-19338a.bin", 0x000000, 0x010000, CRC(c9fac464) SHA1(47b9ab7921a685c01629afb592d597faa11d2bd6) )
+
 	//             ????     317-0238-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "29290f17" )
 ROM_END
@@ -4831,6 +4843,9 @@ ROM_START( dirtdvlsg )   /* Step 2.1 - Game Assignment shows "EXPORT" like paren
 
 	ROM_REGION( 0x800000, "dsb", 0 )    /* DSB samples */
 	ROM_FILL( 0x000000, 0x800000, 0x0000 )
+
+	ROM_REGION( 0x10000, "drivebd", 0 ) /* Drive board ROM, same hardware and ROM as Scud Race */
+	ROM_LOAD( "epr-19338a.bin", 0x000000, 0x010000, CRC(c9fac464) SHA1(47b9ab7921a685c01629afb592d597faa11d2bd6) )
 
 	//             ????     317-0238-COM   Model 3
 	ROM_PARAMETER( ":315_5881:key", "29290f17" )
@@ -5966,7 +5981,7 @@ ROM_START( magtruck )   /* Step 2.1, Sega game ID# is 833-13601-01 (Export), ROM
 	ROM_LOAD_VROM( "mpr-21422.41",  0x00000c, 0x400000, CRC(feca77a5) SHA1(e475a96fa3d2efae65f29266ff2322cc23392ac8) )
 
 	ROM_REGION( 0x080000, "audiocpu", 0 )   /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "epr-21438.21", 0x000000, 0x080000, CRC(6815af9e) SHA1(f956b5c5519a94cc60e31a2bd391949109908239) ) // Japan - epr-21437 
+	ROM_LOAD16_WORD_SWAP( "epr-21438.21", 0x000000, 0x080000, CRC(6815af9e) SHA1(f956b5c5519a94cc60e31a2bd391949109908239) ) // Japan - epr-21437
 
 	ROM_REGION16_BE( 0x1000000, "samples", 0 )   /* SCSP samples */
 	ROM_LOAD16_WORD_SWAP( "mpr-21427.22", 0x000000, 0x400000, CRC(884566f6) SHA1(02b7243890e25ccb364a7ad3e8d61f8defeaf039) )

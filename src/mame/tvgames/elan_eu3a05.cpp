@@ -223,6 +223,9 @@ Set 5043 bit 0 low
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
+
+namespace {
+
 class elan_eu3a05_state : public driver_device
 {
 public:
@@ -971,6 +974,9 @@ void elan_eu3a05_pvwwcas_state::init_pvwwcas()
 	ROM[0x3f8d93] = 0xea;
 	ROM[0x3f8d94] = 0xea;
 }
+
+} // anonymous namespace
+
 
 CONS( 2004, rad_sinv, 0, 0, elan_eu3a05, rad_sinv, elan_eu3a05_state, empty_init, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
 

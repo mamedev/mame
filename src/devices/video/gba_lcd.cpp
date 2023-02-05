@@ -15,6 +15,8 @@
 
 #include "screen.h"
 
+#include <cstdarg>
+
 
 namespace {
 

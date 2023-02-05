@@ -145,7 +145,9 @@ struct apu_t
 	noise_t    noi;
 	dpcm_t     dpcm;
 
-	int step_mode = 0;
+	u8 step_mode = 0;
+	bool frame_irq_enabled = false;
+	bool frame_irq_occurred = false;
 };
 
 /* CONSTANTS */

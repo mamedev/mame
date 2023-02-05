@@ -1010,6 +1010,7 @@ end
 -- warnings only applicable to C++ compiles
 	buildoptions_cpp {
 		"-Woverloaded-virtual",
+		"-Wvla",
 	}
 
 if _OPTIONS["SANITIZE"] then

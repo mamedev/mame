@@ -10,9 +10,20 @@
 #include <cassert>
 
 
-/***************************************************************************
- TYPE DEFINITIONS
- ***************************************************************************/
+//**************************************************************************
+//  MACROS
+//**************************************************************************
+
+#define DEVICE_IMAGE_LOAD_MEMBER(_name)             image_init_result _name(device_image_interface &image)
+#define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)     DEVICE_IMAGE_LOAD_MEMBER(_name)
+
+#define DEVICE_IMAGE_UNLOAD_MEMBER(_name)           void _name(device_image_interface &image)
+#define DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(_name)   DEVICE_IMAGE_UNLOAD_MEMBER(_name)
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
 class device_generic_cart_interface : public device_interface
 {
@@ -138,6 +149,9 @@ class generic_slot_device : public device_t,
 								public device_single_card_slot_interface<device_generic_cart_interface>
 {
 public:
+	typedef device_delegate<image_init_result (device_image_interface &)> load_delegate;
+	typedef device_delegate<void (device_image_interface &)> unload_delegate;
+
 	virtual ~generic_slot_device();
 
 	template <typename... T> void set_device_load(T &&... args) { m_device_image_load.set(std::forward<T>(args)...); }

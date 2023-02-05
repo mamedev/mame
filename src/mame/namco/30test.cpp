@@ -50,6 +50,8 @@ testmode (hold 9, press F2). Voice language cannot be changed here though.
 #include "30test.lh"
 
 
+namespace {
+
 class namco_30test_state : public driver_device
 {
 public:
@@ -281,6 +283,7 @@ ROM_START( 30test )
 	ROM_LOAD( "tt1-voi0.7p",   0x0000, 0x80000, CRC(b4fc5921) SHA1(92a88d5adb50dae48715847f12e88a35e37ef78c) )
 ROM_END
 
+} // anonymous namespace
 
 
 /******************************************************************************

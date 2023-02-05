@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 V.Smile Motion:               80-08****  (Smartridges are orange)
 V.Smile Smartbook Software:   80-089***  (Smartridges are red)
@@ -63,10 +63,11 @@ VTech V.Smile Baby cartridges
 +========+===================+============================================================================+
 |   XX   | 80-099120(US)     | Barney - Let's Go to a Party                                               |
 +========+===================+============================================================================+
-|   XX   | 80-099140(US)     | Teletubbies                                                                |
-|        | 80-099142(NL)     | Teletubbies                                                                |
-|        | 80-099143(UK)     | Teletubbies                                                                |
-|   XX   | 80-099145(FR)     | Teletubbies                                                                |
+|   XX   | 80-099140(US)     | Teletubbies - Time for Teletubbies                                         |
+|        | 80-099142(NL)     | Teletubbies - Tijd voor Teletubbies                                        |
+|        | 80-099143(UK)     | Teletubbies - Time for Teletubbies                                         |
+|   XX   | 80-099145(FR)     | Teletubbies - C'est l'heure des Teletubbies                                |
+|        | 80-099147(SP)     | Teletubbies - ¡Es la hora de los Teletubbies!                              |
 +========+===================+============================================================================+
 |   XX   | 80-099160(US)     | Discovery with Baby Mickey and Friends                                     |
 |        | 80-099163(UK)     | Discovery with Baby Mickey and Friends                                     |

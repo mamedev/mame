@@ -8,23 +8,20 @@
 
 #include "modules/osdmodule.h"
 
-#if defined(OSD_WINDOWS)
-
-#include "emu.h"
+#if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
 #include "input_dinput.h"
 #include "input_xinput.h"
 
-#include <list>
 #include <vector>
 
 #include <oleauto.h>
 #include <wbemcli.h>
 
 
-namespace {
+namespace osd {
 
-using namespace Microsoft::WRL;
+namespace {
 
 template <class TCom>
 class ComArray
@@ -42,7 +39,7 @@ public:
 		Release();
 	}
 
-	TCom** ReleaseAndGetAddressOf()
+	TCom **ReleaseAndGetAddressOf()
 	{
 		Release();
 
@@ -50,7 +47,7 @@ public:
 		return &m_entries[0];
 	}
 
-	TCom* operator [] (int i)
+	TCom *operator[](int i)
 	{
 		return m_entries[i];
 	}
@@ -64,7 +61,7 @@ public:
 	{
 		for (auto &entry : m_entries)
 		{
-			if (entry != nullptr)
+			if (entry)
 			{
 				entry->Release();
 				entry = nullptr;
@@ -119,28 +116,25 @@ public:
 
 typedef std::unique_ptr<OLECHAR, bstr_deleter> bstr_ptr;
 
+
 //============================================================
 //  winhybrid_joystick_module
 //============================================================
 
-class winhybrid_joystick_module : public wininput_module, public device_enum_interface
+class winhybrid_joystick_module : public input_module_impl<device_info, osd_common_t>, public device_enum_interface
 {
 private:
-	std::shared_ptr<xinput_api_helper> m_xinput_helper;
+	std::unique_ptr<xinput_api_helper> m_xinput_helper;
 	std::unique_ptr<dinput_api_helper> m_dinput_helper;
-	std::list<DWORD> m_xinput_deviceids;
-	bool m_xinput_detect_failed;
+	std::vector<DWORD> m_xinput_deviceids;
 
 public:
 	winhybrid_joystick_module() :
-		wininput_module(OSD_JOYSTICKINPUT_PROVIDER, "winhybrid"),
-		m_xinput_helper(nullptr),
-		m_dinput_helper(nullptr),
-		m_xinput_detect_failed(false)
+		input_module_impl<device_info, osd_common_t>(OSD_JOYSTICKINPUT_PROVIDER, "winhybrid")
 	{
 	}
 
-	bool probe() override
+	virtual bool probe() override
 	{
 		int status = init_helpers();
 		if (status != 0)
@@ -152,10 +146,12 @@ public:
 		return true;
 	}
 
-	int init(const osd_options &options) override
+	virtual int init(osd_interface &osd, const osd_options &options) override
 	{
+		int status;
+
 		// Call the base
-		int status = wininput_module::init(options);
+		status = input_module_impl<device_info, osd_common_t>::init(osd, options);
 		if (status != 0)
 			return status;
 
@@ -170,98 +166,95 @@ public:
 		return 0;
 	}
 
-	BOOL device_enum_callback(LPCDIDEVICEINSTANCE instance, LPVOID ref) override
+	virtual BOOL device_enum_callback(LPCDIDEVICEINSTANCE instance) override
 	{
-		dinput_cooperative_level cooperative_level = dinput_cooperative_level::FOREGROUND;
-		running_machine &machine = *static_cast<running_machine *>(ref);
-		dinput_joystick_device *devinfo;
-		int result = 0;
-
-		// First check if this device is XInput Compatible. If so, don't add it here
-		// as it'll be picked up by Xinput
-		if (!m_xinput_detect_failed && is_xinput_device(&instance->guidProduct))
+		// First check if this device is XInput compatible.
+		// If so, don't add it here as it'll be picked up by Xinput.
+		if (is_xinput_device(instance->guidProduct))
 		{
 			osd_printf_verbose("Skipping DirectInput for XInput compatible joystick %S.\n", instance->tszInstanceName);
-			goto exit;
+			return DIENUM_CONTINUE;
 		}
-
-		if (!osd_common_t::s_window_list.empty() && osd_common_t::s_window_list.front()->win_has_menu())
-			cooperative_level = dinput_cooperative_level::BACKGROUND;
 
 		// allocate and link in a new device
-		devinfo = m_dinput_helper->create_device<dinput_joystick_device>(machine, *this, instance, &c_dfDIJoystick, nullptr, cooperative_level);
-		if (devinfo == nullptr)
-			goto exit;
+		auto devinfo = m_dinput_helper->create_device<dinput_joystick_device>(
+				*this,
+				instance,
+				&c_dfDIJoystick,
+				nullptr,
+				background_input() ? dinput_cooperative_level::BACKGROUND : dinput_cooperative_level::FOREGROUND,
+				[] (auto const &device, auto const &format) -> bool
+				{
+					// set absolute mode
+					HRESULT const result = dinput_api_helper::set_dword_property(
+							device,
+							DIPROP_AXISMODE,
+							0,
+							DIPH_DEVICE,
+							DIPROPAXISMODE_ABS);
+					if ((result != DI_OK) && (result != DI_PROPNOEFFECT))
+					{
+						osd_printf_error("DirectInput: Unable to set absolute mode for joystick.\n");
+						return false;
+					}
+					return true;
+				});
+		if (devinfo)
+			add_device(DEVICE_CLASS_JOYSTICK, std::move(devinfo));
 
-		result = devinfo->configure();
-		if (result != 0)
-		{
-			osd_printf_error("Failed to configure DI Joystick device. Error 0x%x\n", static_cast<unsigned int>(result));
-		}
-
-	exit:
 		return DIENUM_CONTINUE;
 	}
 
-	void exit() override
-	{
-		m_xinput_helper.reset();
-		m_dinput_helper.reset();
-
-		wininput_module::exit();
-	}
-
-protected:
 	virtual void input_init(running_machine &machine) override
 	{
-		HRESULT result = get_xinput_devices(m_xinput_deviceids);
+		input_module_impl<device_info, osd_common_t>::input_init(machine);
+
+		bool xinput_detect_failed = false;
+		HRESULT result = get_xinput_devices();
 		if (result != 0)
 		{
-			m_xinput_detect_failed = true;
+			xinput_detect_failed = true;
+			m_xinput_deviceids.clear();
 			osd_printf_warning("XInput device detection failed. XInput won't be used. Error: 0x%X\n", uint32_t(result));
 		}
 
-		// Enumerate all the directinput joysticks and add them if they aren't xinput compatible
-		result = m_dinput_helper->enum_attached_devices(DI8DEVCLASS_GAMECTRL, this, &machine);
+		// Enumerate all the DirectInput joysticks and add them if they aren't XInput compatible
+		result = m_dinput_helper->enum_attached_devices(DI8DEVCLASS_GAMECTRL, *this);
 		if (result != DI_OK)
-			fatalerror("DirectInput: Unable to enumerate game controllers (result=%08X)\n", uint32_t(result));
-
-		xinput_joystick_device *devinfo;
+			fatalerror("DirectInput: Unable to enumerate game controllers (result=%08X).\n", uint32_t(result));
 
 		// now add all xinput devices
-		if (!m_xinput_detect_failed)
+		if (!xinput_detect_failed)
 		{
 			// Loop through each gamepad to determine if they are connected
 			for (UINT i = 0; i < XUSER_MAX_COUNT; i++)
 			{
-				XINPUT_STATE state = { 0 };
-
-				if (m_xinput_helper->xinput_get_state(i, &state) == ERROR_SUCCESS)
-				{
-					// allocate and link in a new device
-					devinfo = m_xinput_helper->create_xinput_device(machine, i, *this);
-					if (!devinfo)
-						continue;
-
-					// Configure each gamepad to add buttons and Axes, etc.
-					devinfo->configure();
-				}
+				// allocate and link in a new device
+				auto devinfo = m_xinput_helper->create_xinput_device(i, *this);
+				if (devinfo)
+					add_device(DEVICE_CLASS_JOYSTICK, std::move(devinfo));
 			}
 		}
+	}
+
+	virtual void exit() override
+	{
+		input_module_impl<device_info, osd_common_t>::exit();
+
+		m_xinput_helper.reset();
+		m_dinput_helper.reset();
 	}
 
 private:
 	int init_helpers()
 	{
-		int status = 0;
-
 		if (!m_xinput_helper)
 		{
-			m_xinput_helper = std::make_shared<xinput_api_helper>();
-			status = m_xinput_helper->initialize();
+			m_xinput_helper = std::make_unique<xinput_api_helper>();
+			int const status = m_xinput_helper->initialize();
 			if (status != 0)
 			{
-				osd_printf_verbose("xinput_api_helper failed to initialize! Error: %u\n", static_cast<unsigned int>(status));
+				osd_printf_verbose("Failed to initialize XInput API! Error: %u\n", static_cast<unsigned int>(status));
 				return -1;
 			}
 		}
@@ -269,30 +262,28 @@ private:
 		if (!m_dinput_helper)
 		{
 			m_dinput_helper = std::make_unique<dinput_api_helper>();
-			status = m_dinput_helper->initialize();
+			int const status = m_dinput_helper->initialize();
 			if (status != DI_OK)
 			{
-				osd_printf_verbose("dinput_api_helper failed to initialize! Error: %u\n", static_cast<unsigned int>(status));
+				osd_printf_verbose("Failed to initialize DirectInput API! Error: %u\n", static_cast<unsigned int>(status));
 				return -1;
 			}
 		}
 
-		return status;
+		return 0;
 	}
 
 	//-----------------------------------------------------------------------------
 	// Returns true if the DirectInput device is also an XInput device.
 	//-----------------------------------------------------------------------------
-	bool is_xinput_device(const GUID* pGuidProductFromDirectInput)
+	bool is_xinput_device(GUID const &pGuidProductFromDirectInput) const
 	{
 		// Check each xinput device to see if this device's vid/pid matches
-		for (auto devid = m_xinput_deviceids.begin(); devid != m_xinput_deviceids.end(); ++devid)
-		{
-			if (*devid == pGuidProductFromDirectInput->Data1)
-				return true;
-		}
-
-		return false;
+		auto const found = std::find(
+				m_xinput_deviceids.begin(),
+				m_xinput_deviceids.end(),
+				pGuidProductFromDirectInput.Data1);
+		return m_xinput_deviceids.end() != found;
 	}
 
 	//-----------------------------------------------------------------------------
@@ -302,54 +293,66 @@ private:
 	// Checking against a VID/PID of 0x028E/0x045E won't find 3rd party or future
 	// XInput devices.
 	//-----------------------------------------------------------------------------
-	HRESULT get_xinput_devices(std::list<DWORD> &xinput_id_list) const
+	HRESULT get_xinput_devices()
 	{
-		ComPtr<IWbemServices> pIWbemServices;
-		ComPtr<IEnumWbemClassObject> pEnumDevices;
-		ComPtr<IWbemLocator> pIWbemLocator;
-		ComArray<IWbemClassObject> pDevices(20);
-		bstr_ptr bstrDeviceID;
-		bstr_ptr bstrClassName;
-		bstr_ptr bstrNamespace;
-		DWORD uReturned = 0;
-		UINT iDevice;
-		variant_wrapper var;
-		HRESULT hr;
+		m_xinput_deviceids.clear();
 
 		// CoInit if needed
-		CoInitialize(nullptr);
+		class com_helper
+		{
+		public:
+			com_helper()
+			{
+				switch (CoInitialize(nullptr))
+				{
+				case S_OK:
+				case S_FALSE:
+					m_succeeded = true;
+				}
+			}
+			~com_helper()
+			{
+				if (m_succeeded)
+					CoUninitialize();
+			}
+		private:
+			bool m_succeeded = false;
+		};
+		com_helper cominit;
+
+		HRESULT hr;
 
 		// Create WMI
+		Microsoft::WRL::ComPtr<IWbemLocator> pIWbemLocator;
 		hr = CoCreateInstance(
-			__uuidof(WbemLocator),
-			nullptr,
-			CLSCTX_INPROC_SERVER,
-			__uuidof(IWbemLocator),
-			reinterpret_cast<void**>(pIWbemLocator.GetAddressOf()));
-
-		if (FAILED(hr) || pIWbemLocator == nullptr)
+				__uuidof(WbemLocator),
+				nullptr,
+				CLSCTX_INPROC_SERVER,
+				__uuidof(IWbemLocator),
+				reinterpret_cast<void **>(pIWbemLocator.GetAddressOf()));
+		if (FAILED(hr) || !pIWbemLocator)
 		{
 			osd_printf_error("Creating WbemLocator failed. Error: 0x%X\n", static_cast<unsigned int>(hr));
 			return hr;
 		}
 
 		// Create BSTRs for WMI
-		bstrNamespace = bstr_ptr(SysAllocString(L"\\\\.\\root\\cimv2"));
-		bstrDeviceID = bstr_ptr(SysAllocString(L"DeviceID"));
-		bstrClassName = bstr_ptr(SysAllocString(L"Win32_PNPEntity"));
+		bstr_ptr bstrNamespace = bstr_ptr(SysAllocString(L"\\\\.\\root\\cimv2"));
+		bstr_ptr bstrDeviceID = bstr_ptr(SysAllocString(L"DeviceID"));
+		bstr_ptr bstrClassName = bstr_ptr(SysAllocString(L"Win32_PNPEntity"));
 
 		// Connect to WMI
+		Microsoft::WRL::ComPtr<IWbemServices> pIWbemServices;
 		hr = pIWbemLocator->ConnectServer(
-			bstrNamespace.get(),
-			nullptr,
-			nullptr,
-			nullptr,
-			0L,
-			nullptr,
-			nullptr,
-			pIWbemServices.GetAddressOf());
-
-		if (FAILED(hr) || pIWbemServices == nullptr)
+				bstrNamespace.get(),
+				nullptr,
+				nullptr,
+				nullptr,
+				0L,
+				nullptr,
+				nullptr,
+				pIWbemServices.GetAddressOf());
+		if (FAILED(hr) || !pIWbemServices)
 		{
 			osd_printf_error("Connecting to WMI Server failed. Error: 0x%X\n", static_cast<unsigned int>(hr));
 			return hr;
@@ -357,38 +360,41 @@ private:
 
 		// Switch security level to IMPERSONATE
 		(void)CoSetProxyBlanket(
-			pIWbemServices.Get(),
-			RPC_C_AUTHN_WINNT,
-			RPC_C_AUTHZ_NONE,
-			nullptr,
-			RPC_C_AUTHN_LEVEL_CALL,
-			RPC_C_IMP_LEVEL_IMPERSONATE,
-			nullptr,
-			0);
+				pIWbemServices.Get(),
+				RPC_C_AUTHN_WINNT,
+				RPC_C_AUTHZ_NONE,
+				nullptr,
+				RPC_C_AUTHN_LEVEL_CALL,
+				RPC_C_IMP_LEVEL_IMPERSONATE,
+				nullptr,
+				0);
 
 		// Get list of Win32_PNPEntity devices
+		Microsoft::WRL::ComPtr<IEnumWbemClassObject> pEnumDevices;
 		hr = pIWbemServices->CreateInstanceEnum(bstrClassName.get(), 0, nullptr, pEnumDevices.GetAddressOf());
-		if (FAILED(hr) || pEnumDevices == nullptr)
+		if (FAILED(hr) || !pEnumDevices)
 		{
 			osd_printf_error("Getting list of Win32_PNPEntity devices failed. Error: 0x%X\n", static_cast<unsigned int>(hr));
 			return hr;
 		}
 
 		// Loop over all devices
-		for (; ; )
+		ComArray<IWbemClassObject> pDevices(20);
+		variant_wrapper var;
+		for ( ; ; )
 		{
 			// Get a few at a time
+			DWORD uReturned = 0;
 			hr = pEnumDevices->Next(10000, pDevices.Size(), pDevices.ReleaseAndGetAddressOf(), &uReturned);
 			if (FAILED(hr))
 			{
 				osd_printf_error("Enumerating WMI classes failed. Error: 0x%X\n", static_cast<unsigned int>(hr));
 				return hr;
 			}
-
 			if (uReturned == 0)
 				break;
 
-			for (iDevice = 0; iDevice < uReturned; iDevice++)
+			for (UINT iDevice = 0; iDevice < uReturned; iDevice++)
 			{
 				if (!pDevices[iDevice])
 					continue;
@@ -402,19 +408,18 @@ private:
 					if (wcsstr(var.Get().bstrVal, L"IG_"))
 					{
 						// If it does, then get the VID/PID from var.bstrVal
-						DWORD dwPid = 0, dwVid = 0;
-						WCHAR* strVid = wcsstr(var.Get().bstrVal, L"VID_");
+						DWORD dwVid = 0;
+						WCHAR const *const strVid = wcsstr(var.Get().bstrVal, L"VID_");
 						if (strVid && swscanf(strVid, L"VID_%4X", &dwVid) != 1)
 							dwVid = 0;
 
-						WCHAR* strPid = wcsstr(var.Get().bstrVal, L"PID_");
+						DWORD dwPid = 0;
+						WCHAR const *const strPid = wcsstr(var.Get().bstrVal, L"PID_");
 						if (strPid && swscanf(strPid, L"PID_%4X", &dwPid) != 1)
 							dwPid = 0;
 
-						DWORD dwVidPid = MAKELONG(dwVid, dwPid);
-
-						// Add the VID/PID to a linked list
-						xinput_id_list.push_back(dwVidPid);
+						// Add the VID/PID to a list
+						m_xinput_deviceids.push_back(MAKELONG(dwVid, dwPid));
 					}
 				}
 			}
@@ -429,12 +434,14 @@ private:
 
 } // anonymous namespace
 
-#else // defined(OSD_WINDOWS)
+} // namespace osd
+
+#else // defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
 #include "input_module.h"
 
-MODULE_NOT_SUPPORTED(winhybrid_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "winhybrid")
+namespace osd { namespace { MODULE_NOT_SUPPORTED(winhybrid_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "winhybrid") } }
 
-#endif // defined(OSD_WINDOWS)
+#endif // defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
-MODULE_DEFINITION(JOYSTICKINPUT_WINHYBRID, winhybrid_joystick_module)
+MODULE_DEFINITION(JOYSTICKINPUT_WINHYBRID, osd::winhybrid_joystick_module)

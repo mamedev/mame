@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:AJR
 
-#ifndef MAME_MACHINE_TV950KB_H
-#define MAME_MACHINE_TV950KB_H
+#ifndef MAME_TELEVIDEO_TV950KB_H
+#define MAME_TELEVIDEO_TV950KB_H
 
 #pragma once
 
@@ -52,4 +52,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(TV950_KEYBOARD, tv950kb_device)
 
-#endif // MAME_MACHINE_TV950KB_H
+#endif // MAME_TELEVIDEO_TV950KB_H

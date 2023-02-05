@@ -14,6 +14,8 @@
 //#include "machine/eepromser.h"
 
 
+namespace {
+
 class cbnt2039_state : public driver_device
 {
 public:
@@ -62,6 +64,8 @@ ROM_START(cbnt2039)
 	ROM_REGION16_LE(0x20000, "sbprom", 0)
 	ROM_LOAD("sbprom_27c_2ea2-1001.u12", 0x00000, 0x20000, CRC(4ee02833) SHA1(17c8b02bbef7b855a91dfb8bd9758ffb5cc9b9e7)) // handwritten label
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(1993, cbnt2039, 0, 0, cbnt2039, cbnt2039, cbnt2039_state, empty_init, "Cablenet", "2039 Controller", MACHINE_IS_SKELETON)

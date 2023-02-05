@@ -221,7 +221,7 @@ protected:
 
 private:
 	cococart_base_update_delegate    m_update;
-	cococart_slot_device *           m_owning_slot;
+	cococart_slot_device * const     m_owning_slot;
 	device_cococart_host_interface * m_host;
 };
 

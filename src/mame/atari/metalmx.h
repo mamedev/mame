@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Philip Bennett
-#ifndef MAME_INCLUDES_METALMX_H
-#define MAME_INCLUDES_METALMX_H
+#ifndef MAME_ATARI_METALMX_H
+#define MAME_ATARI_METALMX_H
 
 #pragma once
 
@@ -69,4 +69,4 @@ private:
 	required_shared_ptr<uint32_t> m_gsp_vram;
 };
 
-#endif // MAME_INCLUDES_METALMX_H
+#endif // MAME_ATARI_METALMX_H

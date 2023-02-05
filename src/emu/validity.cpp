@@ -12,6 +12,7 @@
 #include "validity.h"
 
 #include "emuopts.h"
+#include "main.h"
 #include "romload.h"
 #include "speaker.h"
 #include "video/rgbutil.h"
@@ -2457,26 +2458,29 @@ void validity_checker::validate_inputs(device_t &root)
 				if (field.is_analog())
 					validate_analog_input_field(field);
 
-				// look for invalid (0) types which should be mapped to IPT_OTHER
-				if (field.type() == IPT_INVALID)
-					osd_printf_error("Field has an invalid type (0); use IPT_OTHER instead\n");
-
-				if (field.type() == IPT_SPECIAL)
-					osd_printf_error("Field has an invalid type IPT_SPECIAL\n");
-
-				// verify dip switches
-				if (field.type() == IPT_DIPSWITCH)
+				// checks based on field type
+				if ((field.type() > IPT_UI_FIRST) && (field.type() < IPT_UI_LAST))
 				{
-					// dip switch fields must have a specific name
+					osd_printf_error("Field has invalid UI control type\n");
+				}
+				else if (field.type() == IPT_INVALID)
+				{
+					osd_printf_error("Field has an invalid type (0); use IPT_OTHER instead\n");
+				}
+				else if (field.type() == IPT_SPECIAL)
+				{
+					osd_printf_error("Field has an invalid type IPT_SPECIAL\n");
+				}
+				else if (field.type() == IPT_DIPSWITCH)
+				{
+					// DIP switch fields must have a specific name
 					if (field.specific_name() == nullptr)
 						osd_printf_error("DIP switch has no specific name\n");
 
 					// verify the settings list
 					validate_dip_settings(field);
 				}
-
-				// verify config settings
-				if (field.type() == IPT_CONFIG)
+				else if (field.type() == IPT_CONFIG)
 				{
 					// config fields must have a specific name
 					if (field.specific_name() == nullptr)
@@ -2484,7 +2488,7 @@ void validity_checker::validate_inputs(device_t &root)
 				}
 
 				// verify names
-				const char *name = field.specific_name();
+				char const *const name = field.specific_name();
 				if (name != nullptr)
 				{
 					// check for empty string

@@ -69,6 +69,10 @@ private:
 
 	int m_icount;
 
+	inline void CLRFLAG(uint32_t f) { m_SR&=~f; }
+	inline void SETFLAG(uint32_t f) { m_SR|=f; }
+	inline bool TESTFLAG(uint32_t f) const { return m_SR&f; }
+
 	inline uint8_t SE3208_Read8(uint32_t addr);
 	inline uint16_t SE3208_Read16(uint32_t addr);
 	inline uint32_t SE3208_Read32(uint32_t addr);
@@ -86,6 +90,7 @@ private:
 	inline uint32_t AslWithFlags(uint32_t Val, uint8_t By);
 	inline void PushVal(uint32_t Val);
 	inline uint32_t PopVal();
+	inline void TakeExceptionVector(uint8_t vector);
 
 	typedef void (se3208_device::*OP)(uint16_t Opcode);
 	OP OpTable[0x10000];

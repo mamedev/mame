@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
 <softwarelist name="saturn" description="Sega Saturn CD-ROMs">
@@ -5457,7 +5457,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9152"/>
 		<info name="release" value="19970801"/>
-		<info name="alt_title" value="LAST BRONX ラストブロンクス"/>
+		<info name="alt_title" value="ラストブロンクス"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -7339,11 +7339,14 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Sega Ages - OutRun (Japan)... -->
 	<software name="outrun" supported="no">
 		<description>Sega Ages - Out Run (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Keeps repeating voice samples [SCSP]
+Sega logo animation draws offset [VDP2]
+]]></notes>
 		<info name="serial" value="GS-9110"/>
 		<info name="release" value="19960920"/>
 		<info name="alt_title" value="アウトラン"/>
@@ -11729,7 +11732,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9152"/>
 		<info name="release" value="19970801"/>
-		<info name="alt_title" value="LAST BRONX ラストブロンクス"/>
+		<info name="alt_title" value="ラストブロンクス"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
@@ -23904,7 +23907,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9152"/>
 		<info name="release" value="19970801"/>
-		<info name="alt_title" value="LAST BRONX ラストブロンクス"/>
+		<info name="alt_title" value="ラストブロンクス"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">

@@ -78,7 +78,7 @@
 		<rect state="0">
 			<color red="0.06" green="0.13" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;1.20">
+		<text string="£1.20">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -98,7 +98,7 @@
 		<rect state="0">
 			<color red="0.06" green="0.13" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;1.00">
+		<text string="£1.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -118,7 +118,7 @@
 		<rect state="0">
 			<color red="0.06" green="0.13" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;1.60">
+		<text string="£1.60">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -138,7 +138,7 @@
 		<rect state="0">
 			<color red="0.06" green="0.13" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;2.00">
+		<text string="£2.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -158,7 +158,7 @@
 		<rect state="0">
 			<color red="0.06" green="0.13" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;3.00">
+		<text string="£3.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -178,7 +178,7 @@
 		<rect state="0">
 			<color red="0.06" green="0.13" blue="0.13"/>
 		</rect>
-		<text string="&#xA3;6.00">
+		<text string="£6.00">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -650,7 +650,7 @@
 		<rect state="0">
 			<color red="0.25" green="0.25" blue="0.25"/>
 		</rect>
-		<text string="&#xA3;1">
+		<text string="£1">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -849,7 +849,7 @@
 		<disk state="1"> <bounds xc="0.5" yc="0.5" width="0.583333" height="0.583333"/> <color red="1.00" green="1.00" blue="1.00"/> </disk>
 	</element>
 	<element name="label_150">
-		<text string="&#xA3;">
+		<text string="£">
 			<color red="0.0" green="0.0" blue="0.0"/>
 			<bounds x="0.05" y="0.05" width="0.90" height="0.90"/>
 		</text>
@@ -958,9 +958,9 @@
 		</element>
 	</repeat>
 	<element name="debug_vfd">
-		<led14segsc>
+		<led16segsc>
 			<color red="0.0" green="1.0" blue="1.0"/>
-		</led14segsc>
+		</led16segsc>
 	</element>
 	<element name="debug_stepper_value" defstate="0">
 		<simplecounter maxstate="999" digits="3">

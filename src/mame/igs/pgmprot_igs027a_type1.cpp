@@ -62,6 +62,13 @@
 
 #include "screen.h"
 
+#define LOG_PROT    (1U <<  1)
+#define LOG_ALL     (LOG_PROT)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+#define LOGPROT(...) LOGMASKED(LOG_PROT, __VA_ARGS__)
 
 /**************************** EMULATION *******************************/
 /* used by photoy2k, kovsh */
@@ -100,8 +107,7 @@ u16 pgm_arm_type1_state::arm7_type1_ram_r(offs_t offset, u16 mem_mask)
 {
 	const u16 *share16 = reinterpret_cast<u16 *>(m_arm7_shareram.target());
 
-	if (PGMARM7LOGERROR)
-		logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) %s\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, machine().describe_context());
+	LOGPROT("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) %s\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, machine().describe_context());
 	return share16[BYTE_XOR_LE(offset << 1)];
 }
 
@@ -109,8 +115,7 @@ void pgm_arm_type1_state::arm7_type1_ram_w(offs_t offset, u16 data, u16 mem_mask
 {
 	u16 *share16 = reinterpret_cast<u16 *>(m_arm7_shareram.target());
 
-	if (PGMARM7LOGERROR)
-		logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) %s\n", BYTE_XOR_LE(offset), data, mem_mask, machine().describe_context());
+	LOGPROT("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) %s\n", BYTE_XOR_LE(offset), data, mem_mask, machine().describe_context());
 	COMBINE_DATA(&share16[BYTE_XOR_LE(offset << 1)]);
 }
 
@@ -130,15 +135,13 @@ u32 pgm_arm_type1_state::arm7_type1_exrom_r()
 
 u32 pgm_arm_type1_state::arm7_type1_shareram_r(offs_t offset, u32 mem_mask)
 {
-	if (PGMARM7LOGERROR)
-		logerror("ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x) %s\n", offset << 2, m_arm7_shareram[offset], mem_mask, machine().describe_context());
+	LOGPROT("ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x) %s\n", offset << 2, m_arm7_shareram[offset], mem_mask, machine().describe_context());
 	return m_arm7_shareram[offset];
 }
 
 void pgm_arm_type1_state::arm7_type1_shareram_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	if (PGMARM7LOGERROR)
-		logerror("ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x) %s\n", offset << 2, data, mem_mask, machine().describe_context());
+	LOGPROT("ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x) %s\n", offset << 2, data, mem_mask, machine().describe_context());
 	COMBINE_DATA(&m_arm7_shareram[offset]);
 }
 

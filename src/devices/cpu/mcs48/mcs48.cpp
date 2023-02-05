@@ -201,10 +201,15 @@ void mcs48_cpu_device::data_8bit(address_map &map)
 
 mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size, uint8_t feature_mask, const mcs48_cpu_device::mcs48_ophandler *opcode_table)
 	: cpu_device(mconfig, type, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, (feature_mask & MB_FEATURE) != 0 ? 12 : 11, 0
-					   , (rom_size == 1024) ? address_map_constructor(FUNC(mcs48_cpu_device::program_10bit), this) : (rom_size == 2048) ? address_map_constructor(FUNC(mcs48_cpu_device::program_11bit), this) : (rom_size == 4096) ? address_map_constructor(FUNC(mcs48_cpu_device::program_12bit), this) : address_map_constructor())
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, ( ( ram_size == 64 ) ? 6 : ( ( ram_size == 128 ) ? 7 : 8 ) ), 0
-					, (ram_size == 64) ? address_map_constructor(FUNC(mcs48_cpu_device::data_6bit), this) : (ram_size == 128) ? address_map_constructor(FUNC(mcs48_cpu_device::data_7bit), this) : address_map_constructor(FUNC(mcs48_cpu_device::data_8bit), this))
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, (feature_mask & MB_FEATURE) != 0 ? 12 : 11, 0,
+			(rom_size == 1024) ? address_map_constructor(FUNC(mcs48_cpu_device::program_10bit), this) :
+			(rom_size == 2048) ? address_map_constructor(FUNC(mcs48_cpu_device::program_11bit), this) :
+			(rom_size == 4096) ? address_map_constructor(FUNC(mcs48_cpu_device::program_12bit), this) :
+			address_map_constructor())
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, ((ram_size == 64) ? 6 : ((ram_size == 128) ? 7 : 8)), 0,
+			(ram_size == 64) ? address_map_constructor(FUNC(mcs48_cpu_device::data_6bit), this) :
+			(ram_size == 128) ? address_map_constructor(FUNC(mcs48_cpu_device::data_7bit), this) :
+			address_map_constructor(FUNC(mcs48_cpu_device::data_8bit), this))
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0)
 	, m_port_in_cb(*this)
 	, m_port_out_cb(*this)
@@ -709,7 +714,7 @@ OPHANDLER( in_a_p2 )        { burn_cycles(2); m_a = port_r(2) & m_p2; }
 OPHANDLER( ins_a_bus )      { burn_cycles(2); m_a = bus_r(); }
 OPHANDLER( in_a_dbb )
 {
-	burn_cycles(2);
+	burn_cycles(1);
 
 	// acknowledge the IBF IRQ and clear the bit in STS
 	if ((m_sts & STS_IBF) != 0)
@@ -850,7 +855,7 @@ OPHANDLER( outl_p1_a )      { burn_cycles(2); port_w(1, m_p1 = m_a); }
 OPHANDLER( outl_p2_a )      { burn_cycles(2); uint8_t mask = p2_mask(); port_w(2, m_p2 = (m_p2 & ~mask) | (m_a & mask)); }
 OPHANDLER( out_dbb_a )
 {
-	burn_cycles(2);
+	burn_cycles(1);
 
 	// copy to the DBBO and update the bit in STS
 	m_dbbo = m_a;

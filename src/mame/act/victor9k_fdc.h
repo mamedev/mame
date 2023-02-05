@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_MACHINE_VICTOR9K_FDC_H
-#define MAME_MACHINE_VICTOR9K_FDC_H
+#ifndef MAME_ACT_VICTOR9K_FDC_H
+#define MAME_ACT_VICTOR9K_FDC_H
 
 #pragma once
 
@@ -226,4 +226,4 @@ private:
 DECLARE_DEVICE_TYPE(VICTOR_9000_FDC, victor_9000_fdc_device)
 
 
-#endif // MAME_MACHINE_VICTOR9K_FDC_H
+#endif // MAME_ACT_VICTOR9K_FDC_H

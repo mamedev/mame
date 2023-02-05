@@ -5,8 +5,8 @@
     Atari Xybots hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_XYBOTS_H
-#define MAME_INCLUDES_XYBOTS_H
+#ifndef MAME_ATARI_XYBOTS_H
+#define MAME_ATARI_XYBOTS_H
 
 #pragma once
 
@@ -60,4 +60,4 @@ private:
 	static const atari_motion_objects_config s_mob_config;
 };
 
-#endif // MAME_INCLUDES_XYBOTS_H
+#endif // MAME_ATARI_XYBOTS_H

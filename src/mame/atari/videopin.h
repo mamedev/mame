@@ -5,8 +5,8 @@
     Atari Video Pinball hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_VIDEOPIN_H
-#define MAME_INCLUDES_VIDEOPIN_H
+#ifndef MAME_ATARI_VIDEOPIN_H
+#define MAME_ATARI_VIDEOPIN_H
 
 #pragma once
 
@@ -87,4 +87,4 @@ private:
 /*----------- defined in audio/videopin.c -----------*/
 DISCRETE_SOUND_EXTERN( videopin_discrete );
 
-#endif // MAME_INCLUDES_VIDEOPIN_H
+#endif // MAME_ATARI_VIDEOPIN_H

@@ -426,7 +426,7 @@ void liberatr_state::liberatr(machine_config &config)
 	/* basic machine hardware */
 	m6502_device &maincpu(M6502(config, "maincpu", MASTER_CLOCK/16)); /* 1.25Mhz divided from 20Mhz master clock */
 	maincpu.set_addrmap(AS_PROGRAM, &liberatr_state::liberatr_map);
-	maincpu.set_periodic_int(FUNC(driver_device::irq0_line_hold), attotime::from_hz(4*60));
+	maincpu.set_periodic_int(FUNC(liberatr_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	ER2055(config, m_earom);
 

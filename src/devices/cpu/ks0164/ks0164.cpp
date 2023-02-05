@@ -9,11 +9,6 @@
 
 DEFINE_DEVICE_TYPE(KS0164CPU, ks0164_cpu_device, "ks0164cpu", "Samsung KS0164 audio processor")
 
-const u16 ks0164_cpu_device::imask[16] = {
-	0x0001, 0x0003, 0x0007, 0x000f, 0x001f, 0x003f, 0x007f, 0x00ff,
-	0x01ff, 0x03ff, 0x07ff, 0x0fff, 0x1fff, 0x3fff, 0x7fff, 0xffff
-};
-
 ks0164_cpu_device::ks0164_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, KS0164CPU, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16)
@@ -105,7 +100,7 @@ void ks0164_cpu_device::state_string_export(const device_state_entry &entry, std
 
 void ks0164_cpu_device::handle_irq()
 {
-	u16 mask = m_irq & imask[m_r[R_PSW] & 15];
+	u16 mask = m_irq & util::make_bitmask<u16>((m_r[R_PSW] & 15) + 1);
 	if(mask) {
 		int index;
 		for(index = 0; !(mask & (1 << index)); index ++);
@@ -265,10 +260,7 @@ void ks0164_cpu_device::execute_run()
 			case 0xf: default: cond = true; break;
 			}
 			if(cond) {
-				if(opcode & 0x200)
-					m_r[R_PC] += opcode | 0xfc00;
-				else
-					m_r[R_PC] += opcode & 0x3ff;
+				m_r[R_PC] += util::sext(opcode, 10);
 			}
 			break;
 		}

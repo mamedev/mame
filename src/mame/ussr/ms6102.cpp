@@ -55,6 +55,8 @@
 #include "logmacro.h"
 
 
+namespace {
+
 class ms6102_state : public driver_device
 {
 public:
@@ -383,6 +385,9 @@ ROM_START( ms6102 )
 	ROM_REGION(0x0100, "charmap", 0)
 	ROM_LOAD("mc6102_02_k556rt4_d64",     0x0000, 0x0100, CRC(a59fdaa7) SHA1(0851a8b12e838e8f7e5ce840a0262facce303442))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

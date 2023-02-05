@@ -31,6 +31,9 @@
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 
+
+namespace {
+
 class sagitta180_state : public driver_device
 {
 public:
@@ -234,6 +237,9 @@ ROM_START( sagitta180 )
 	ROM_REGION( 0x1000, "chargen", 0 ) /* data copied from ibm-pc-jr driver */
 	ROM_LOAD("cga.chr",  0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card (Actual IC is a 2708 that I was not able to dump yet)
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR    NAME       PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY   FULLNAME       FLAGS */
 COMP( 1979?, sagitta180, 0,      0,      sagitta180, sagitta180, sagitta180_state, empty_init, "Scopus", "Sagitta 180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

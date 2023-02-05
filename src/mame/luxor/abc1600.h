@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef MAME_INCLUDES_ABC1600_H
-#define MAME_INCLUDES_ABC1600_H
+#ifndef MAME_LUXOR_ABC1600_H
+#define MAME_LUXOR_ABC1600_H
 
 #include "bus/abcbus/abcbus.h"
 #include "bus/abckb/abckb.h"
@@ -86,7 +86,7 @@ public:
 	void abc1600(machine_config &config);
 
 private:
-	required_device<m68000_base_device> m_maincpu;
+	required_device<m68008_device> m_maincpu;
 	required_device<abc1600_mac_device> m_mac;
 	required_device<z80dma_device> m_dma0;
 	required_device<z80dma_device> m_dma1;
@@ -167,4 +167,4 @@ private:
 
 
 
-#endif
+#endif // MAME_LUXOR_ABC1600_H

@@ -34,13 +34,14 @@
 #include "maxaflex.lh"
 
 
+namespace {
+
 class maxaflex_state : public atari_common_state
 {
 public:
 	maxaflex_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atari_common_state(mconfig, type, tag)
 		, m_mcu(*this, "mcu")
-		, m_pokey(*this, "pokey")
 		, m_speaker(*this, "speaker")
 		, m_region_maincpu(*this, "maincpu")
 		, m_dsw(*this, "dsw")
@@ -80,7 +81,6 @@ private:
 	uint8_t m_portc_out;
 
 	required_device<m68705p3_device> m_mcu;
-	required_device<pokey_device> m_pokey;
 	required_device<speaker_sound_device> m_speaker;
 	required_region_ptr<uint8_t> m_region_maincpu;
 	required_ioport m_dsw;
@@ -211,7 +211,7 @@ void maxaflex_state::a600xl_mem(address_map &map)
 	map(0xc000, 0xcfff).rom(); /* OS */
 	map(0xd000, 0xd0ff).rw(m_gtia, FUNC(gtia_device::read), FUNC(gtia_device::write));
 	map(0xd100, 0xd1ff).noprw();
-	map(0xd200, 0xd2ff).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
+	map(0xd200, 0xd2ff).rw(m_pokey, FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0xd300, 0xd3ff).rw("pia", FUNC(pia6821_device::read_alt), FUNC(pia6821_device::write_alt));
 	map(0xd400, 0xd4ff).rw(m_antic, FUNC(antic_device::read), FUNC(antic_device::write));
 	map(0xd500, 0xd7ff).noprw();
@@ -253,10 +253,6 @@ static INPUT_PORTS_START( a600xl )
 	PORT_BIT(0x02, 0x02, IPT_BUTTON1) PORT_PLAYER(2)
 	PORT_BIT(0x04, 0x04, IPT_BUTTON1) PORT_PLAYER(3)
 	PORT_BIT(0x08, 0x08, IPT_BUTTON1) PORT_PLAYER(4)
-	PORT_BIT(0x10, 0x10, IPT_BUTTON2) PORT_PLAYER(1)
-	PORT_BIT(0x20, 0x20, IPT_BUTTON2) PORT_PLAYER(2)
-	PORT_BIT(0x40, 0x40, IPT_BUTTON2) PORT_PLAYER(3)
-	PORT_BIT(0x80, 0x80, IPT_BUTTON2) PORT_PLAYER(4)
 
 	/* Max-A-Flex specific ports */
 	PORT_START("coin")
@@ -343,6 +339,7 @@ void maxaflex_state::maxaflex(machine_config &config)
 	ATARI_GTIA(config, m_gtia, 0);
 	m_gtia->set_region(GTIA_NTSC);
 	m_gtia->read_callback().set_ioport("console");
+	m_gtia->trigger_callback().set_ioport("djoy_b");
 
 	ATARI_ANTIC(config, m_antic, 0);
 	m_antic->set_gtia_tag(m_gtia);
@@ -442,6 +439,8 @@ ROM_START(mf_flip)
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD("maxprom.prm", 0x0000, 0x0200, CRC(edf5c950) SHA1(9ad046ea41a61585dd8d2f2d4167a3cc39d2928f))   /* for simulating keystrokes ?*/
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1984, maxaflex, 0,        maxaflex, a600xl, maxaflex_state, empty_init, ROT0, "Exidy",                       "Max-A-Flex",                MACHINE_IS_BIOS_ROOT )

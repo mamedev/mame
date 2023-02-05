@@ -5,8 +5,8 @@
     Chequered Flag
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_CHQFLAG_H
-#define MAME_INCLUDES_CHQFLAG_H
+#ifndef MAME_KONAMI_CHQFLAG_H
+#define MAME_KONAMI_CHQFLAG_H
 
 #pragma once
 
@@ -78,4 +78,4 @@ private:
 	void update_background_shadows(uint8_t data);
 };
 
-#endif // MAME_INCLUDES_CHQFLAG_H
+#endif // MAME_KONAMI_CHQFLAG_H

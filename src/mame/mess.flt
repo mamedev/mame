@@ -45,6 +45,7 @@ apple/apple2.cpp
 apple/apple2e.cpp
 apple/apple2gs.cpp
 apple/apple3.cpp
+apple/imacg3.cpp
 apple/iphone2g.cpp
 apple/lisa.cpp
 apple/lwriter.cpp
@@ -59,6 +60,7 @@ apple/macprtb.cpp
 apple/macpwrbk030.cpp
 apple/macquadra700.cpp
 apple/newton.cpp
+apple/powermacg3.cpp
 apple/tk2000.cpp
 appliedconcepts/boris.cpp
 appliedconcepts/borisdpl.cpp
@@ -195,12 +197,14 @@ ddr/pcm.cpp
 ddr/poly880.cpp
 ddr/sc2.cpp
 ddr/slc1.cpp
+ddr/sprachmg.cpp
 ddr/vcs80.cpp
 dec/dct11em.cpp
 dec/decmate2.cpp
 dec/decstation.cpp
 dec/dectalk.cpp
 dec/decwritr.cpp
+dec/dtc03.cpp
 dec/jensen.cpp
 dec/pdp1.cpp
 dec/pdp11.cpp
@@ -288,7 +292,8 @@ gamepark/gp2x.cpp
 gamepark/gp32.cpp
 gridcomp/gridcomp.cpp
 grundy/newbrain.cpp
-h01x/h01x.cpp
+handheld/chessking.cpp
+handheld/gameking.cpp
 handheld/gmaster.cpp
 handheld/hh_cop400.cpp
 handheld/hh_cops1.cpp
@@ -307,8 +312,8 @@ handheld/rzone.cpp
 handheld/scrablex.cpp
 handheld/talkingbb.cpp
 handheld/talkingfb.cpp
+handheld/teammate.cpp
 handheld/tispeak.cpp
-handheld/tispellb.cpp
 handheld/wildfire.cpp
 hds/hds200.cpp
 heathkit/et3400.cpp
@@ -352,6 +357,7 @@ homebrew/homez80.cpp
 homebrew/lft_chiptune.cpp
 homebrew/lft_craft.cpp
 homebrew/lft_phasor.cpp
+homebrew/minib.cpp
 homebrew/mk1forth.cpp
 homebrew/p112.cpp
 homebrew/phunsy.cpp
@@ -378,6 +384,7 @@ hp/hp48.cpp
 hp/hp49gp.cpp
 hp/hp64k.cpp
 hp/hp700.cpp
+hp/hp7596a.cpp
 hp/hp80.cpp
 hp/hp95lx.cpp
 hp/hp9825.cpp
@@ -392,8 +399,8 @@ husky/hunter2.cpp
 husky/husky.cpp
 ibm/ibm3153.cpp
 ibm/ibm6580.cpp
-ibm/rtpc.cpp
 ibm/rs6000_type7xxx.cpp
+ibm/rtpc.cpp
 informer/informer_207_100.cpp
 informer/informer_207_376.cpp
 informer/informer_213.cpp
@@ -415,13 +422,13 @@ intel/sdk86.cpp
 intergraph/interpro.cpp
 interton/vc4000.cpp
 isc/compucolor.cpp
-kawai/kawai_acr20.cpp
-kawai/kawai_k1.cpp
-kawai/kawai_k4.cpp
-kawai/kawai_k5.cpp
-kawai/kawai_ksp10.cpp
-kawai/kawai_r100.cpp
-kawai/kawai_sx240.cpp
+kawai/acr20.cpp
+kawai/k1.cpp
+kawai/k4.cpp
+kawai/k5.cpp
+kawai/ksp10.cpp
+kawai/r100.cpp
+kawai/sx240.cpp
 kaypro/kaypro.cpp
 koei/pasogo.cpp
 kontron/kdt6.cpp
@@ -482,8 +489,10 @@ miltonbradley/vectrex.cpp
 mips/mips.cpp
 misc/3do.cpp
 misc/eva.cpp
+misc/h01x.cpp
 misc/monon_color.cpp
 misc/mtu130.cpp
+misc/triton.cpp
 misc/z80ne.cpp
 mit/tx0.cpp
 mits/altair.cpp
@@ -510,11 +519,16 @@ motorola/mvme162.cpp
 motorola/powerstack.cpp
 motorola/sys1121.cpp
 motorola/uchroma68.cpp
-msx/msx.cpp
+msx/msx1.cpp
+msx/msx1_bruc100.cpp
+msx/msx1_v9938.cpp
+msx/msx2.cpp
 multitech/mkit09.cpp
 multitech/mpf1.cpp
+multitech/mpf1_88.cpp
 mupid/mdisk.cpp
 mupid/mupid2.cpp
+misc/nabupc.cpp
 nakajima/nakajies.cpp
 nascom/nascom1.cpp
 natsemi/ns32kdb.cpp
@@ -524,6 +538,7 @@ ncd/ncd88k.cpp
 ncd/ncdmips.cpp
 ncd/ncdppc.cpp
 nec/apc.cpp
+nec/bungo.cpp
 nec/ews4800.cpp
 nec/pc100.cpp
 nec/pc6001.cpp
@@ -587,6 +602,7 @@ olympiaint/peoplepc.cpp
 omnibyte/msbc1.cpp
 omnibyte/ob68k1a.cpp
 omron/luna_68k.cpp
+omron/luna_88k.cpp
 openuni/hektor.cpp
 osborne/osbexec.cpp
 osborne/osborne1.cpp
@@ -721,6 +737,7 @@ sega/svmu.cpp
 sequential/prophet600.cpp
 sfrj/galaxy.cpp
 sfrj/galeb.cpp
+sfrj/idpartner.cpp
 sfrj/lola8a.cpp
 sfrj/orao.cpp
 sfrj/pecom.cpp
@@ -843,7 +860,6 @@ skeleton/fk1.cpp
 skeleton/freedom120.cpp
 skeleton/fs3216.cpp
 skeleton/ft68m.cpp
-skeleton/gameking.cpp
 skeleton/gem_rp.cpp
 skeleton/gimix.cpp
 skeleton/gm1000.cpp
@@ -964,6 +980,7 @@ skeleton/testpat.cpp
 skeleton/textelcomp.cpp
 skeleton/ti630.cpp
 skeleton/tk635.cpp
+skeleton/tnshc08.cpp
 skeleton/tr175.cpp
 skeleton/tsispch.cpp
 skeleton/tulip1.cpp
@@ -971,7 +988,7 @@ skeleton/unistar.cpp
 skeleton/v6809.cpp
 skeleton/vanguardmk1.cpp
 skeleton/vd56sp.cpp
-skeleton/vector4.cpp
+skeleton/vector3.cpp
 skeleton/vectrix.cpp
 skeleton/vp415.cpp
 skeleton/vp60.cpp
@@ -1001,6 +1018,7 @@ sony/smc777.cpp
 sony/umatic.cpp
 sord/m5.cpp
 stm/pp.cpp
+stm/stmpc.cpp
 sun/sun1.cpp
 sun/sun2.cpp
 sun/sun3.cpp
@@ -1056,6 +1074,7 @@ ti/cc40.cpp
 ti/evmbug.cpp
 ti/exelv.cpp
 ti/geneve.cpp
+ti/spellb.cpp
 ti/ti74.cpp
 ti/ti85.cpp
 ti/ti89.cpp
@@ -1069,6 +1088,7 @@ ti/ti990_4.cpp
 ti/tm990189.cpp
 tiger/gamecom.cpp
 tiger/k28.cpp
+tiger/k28m2.cpp
 tigertel/gizmondo.cpp
 tiki/tiki100.cpp
 tomy/tomy_princ.cpp
@@ -1090,9 +1110,11 @@ trainer/savia84.cpp
 trainer/selz80.cpp
 trainer/tk80.cpp
 trainer/zapcomputer.cpp
+trs/agvision.cpp
 trs/coco12.cpp
 trs/coco3.cpp
 trs/dgn_beta.cpp
+trs/dgnalpha.cpp
 trs/dragon.cpp
 trs/lnw80.cpp
 trs/max80.cpp
@@ -1175,6 +1197,7 @@ ussr/ie15.cpp
 ussr/im01.cpp
 ussr/intellect02.cpp
 ussr/irisha.cpp
+ussr/krokha.cpp
 ussr/lviv.cpp
 ussr/mikro80.cpp
 ussr/mikrosha.cpp
@@ -1255,6 +1278,8 @@ yamaha/fb01.cpp
 yamaha/tg100.cpp
 yamaha/yman1x.cpp
 yamaha/ymdx100.cpp
+yamaha/ymdx7.cpp
+yamaha/ymdx9.cpp
 yamaha/ymdx11.cpp
 yamaha/ymmu100.cpp
 yamaha/ymmu5.cpp
@@ -1265,6 +1290,7 @@ yamaha/ympsr340.cpp
 yamaha/ympsr40.cpp
 yamaha/ympsr400.cpp
 yamaha/ympsr60.cpp
+yamaha/ympss12.cpp
 yamaha/ymqy70.cpp
 yamaha/ymrx15.cpp
 yamaha/ymsy35.cpp

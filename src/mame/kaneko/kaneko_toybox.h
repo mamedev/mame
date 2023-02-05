@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Luca Elia, Sebastien Volpe
 /* Kaneko Toybox */
-#ifndef MAME_MACHINE_KANEKO_TOYBOX_H
-#define MAME_MACHINE_KANEKO_TOYBOX_H
+#ifndef MAME_KANEKO_KANEKO_TOYBOX_H
+#define MAME_KANEKO_KANEKO_TOYBOX_H
 
 #pragma once
 
@@ -61,4 +61,4 @@ private:
 
 DECLARE_DEVICE_TYPE(KANEKO_TOYBOX, kaneko_toybox_device)
 
-#endif // MAME_MACHINE_KANEKO_TOYBOX_H
+#endif // MAME_KANEKO_KANEKO_TOYBOX_H

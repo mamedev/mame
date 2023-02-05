@@ -30,6 +30,17 @@ sampler DiffuseSampler = sampler_state
 	AddressW = CLAMP;
 };
 
+sampler DiffuseWrapSampler = sampler_state
+{
+	Texture   = <Diffuse>;
+	MipFilter = LINEAR;
+	MinFilter = LINEAR;
+	MagFilter = LINEAR;
+	AddressU = WRAP;
+	AddressV = WRAP;
+	AddressW = WRAP;
+};
+
 sampler2D LutSampler = sampler_state
 {
 	Texture = <LutTexture>;
@@ -181,6 +192,16 @@ float4 ps_ui_main(PS_INPUT Input) : COLOR
 	return BaseTexel;
 }
 
+float4 ps_ui_wrap_main(PS_INPUT Input) : COLOR
+{
+	float4 BaseTexel = tex2D(DiffuseWrapSampler, Input.TexCoord);
+	BaseTexel *= Input.Color;
+
+	if (UiLutEnable)
+		BaseTexel.rgb = apply_lut(BaseTexel.rgb);
+	return BaseTexel;
+}
+
 //-----------------------------------------------------------------------------
 // Primary Techniques
 //-----------------------------------------------------------------------------
@@ -215,5 +236,16 @@ technique UiTechnique
 
 		VertexShader = compile vs_2_0 vs_ui_main();
 		PixelShader  = compile ps_2_0 ps_ui_main();
+	}
+}
+
+technique UiWrapTechnique
+{
+	pass Pass0
+	{
+		Lighting = FALSE;
+
+		VertexShader = compile vs_2_0 vs_ui_main();
+		PixelShader  = compile ps_2_0 ps_ui_wrap_main();
 	}
 }

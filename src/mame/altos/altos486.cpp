@@ -15,6 +15,9 @@
 #include "machine/i8255.h"
 #include "bus/rs232/rs232.h"
 
+
+namespace {
+
 class altos486_state : public driver_device
 {
 public:
@@ -236,5 +239,8 @@ ROM_START( altos486 )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "15020.bin",    0x0000, 0x0020, CRC(6a2bd961) SHA1(e9a9ed235574c9871dc32a80ff5ca4df6bd531e1) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1984, altos486, 0, 0, altos486, 0, altos486_state, empty_init, "Altos Computer Systems", "Altos 486", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -5,8 +5,8 @@
     Taito Triple Screen Games
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_NINJAW_H
-#define MAME_INCLUDES_NINJAW_H
+#ifndef MAME_TAITO_NINJAW_H
+#define MAME_TAITO_NINJAW_H
 
 #pragma once
 
@@ -83,4 +83,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_NINJAW_H
+#endif // MAME_TAITO_NINJAW_H

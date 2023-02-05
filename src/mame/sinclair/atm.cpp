@@ -74,7 +74,7 @@ void atm_state::atm_update_memory()
 
 u16 atm_state::atm_update_memory_get_page(u8 bank)
 {
-	return m_pen ? pen_page(bank) : (~PEN_RAMNROM_MASK & ~PEN_DOS7FFD_MASK);
+	return m_pen ? pen_page(bank) : (u16) (~PEN_RAMNROM_MASK & ~PEN_DOS7FFD_MASK);
 }
 
 void atm_state::atm_ula_w(offs_t offset, u8 data)
@@ -510,7 +510,7 @@ void atm_state::atm(machine_config &config)
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atm);
 
 	BETA_DISK(config, m_beta, 0);
-	ATA_INTERFACE(config, m_ata).options(atm_ata_devices, nullptr, nullptr, false);;
+	ATA_INTERFACE(config, m_ata).options(atm_ata_devices, nullptr, nullptr, false);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "covox");
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));

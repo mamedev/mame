@@ -129,6 +129,11 @@ References:
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/rs232/exorterm.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/pty.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/terminal.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/bankdev.h"
 #include "machine/input_merger.h"
@@ -137,10 +142,12 @@ References:
 #include "machine/mc14411.h"
 #include "machine/m68sfdc.h"
 
-#include "bus/rs232/rs232.h"
 #include "imagedev/printer.h"
 
 #include "formats/mdos_dsk.h"
+
+
+namespace {
 
 class exorciser_state : public driver_device
 {
@@ -207,11 +214,11 @@ private:
 	// RS232 bit rate generator clocks
 	DECLARE_WRITE_LINE_MEMBER(write_f1_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_f3_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f5_clock);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(write_f5_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_f7_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_f8_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_f9_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_f11_clock);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(write_f11_clock);
 	DECLARE_WRITE_LINE_MEMBER(write_f13_clock);
 
 	u8 m_restart_count;
@@ -636,11 +643,6 @@ static DEVICE_INPUT_DEFAULTS_START(printer)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
 DEVICE_INPUT_DEFAULTS_END
 
-#include "bus/rs232/exorterm.h"
-#include "bus/rs232/null_modem.h"
-#include "bus/rs232/pty.h"
-#include "bus/rs232/terminal.h"
-
 void exorciser_state::exorciser_rs232_devices(device_slot_interface &device)
 {
 	device.option_add("exorterm155", SERIAL_TERMINAL_EXORTERM155);
@@ -804,6 +806,9 @@ ROM_START( exorciser )
 	ROMX_LOAD("exbug11.bin", 0x0000, 0x0c00, CRC(5a5db110) SHA1(14f3e14ed809f9ec30b8189e5506ed911127de34), ROM_BIOS(1))
 
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

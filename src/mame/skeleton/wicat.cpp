@@ -39,6 +39,9 @@ Wicat - various systems.
 
 #include "wicat.lh"
 
+
+namespace {
+
 class wicat_state : public driver_device
 {
 public:
@@ -840,6 +843,8 @@ ROM_START( wicat )
 	ROM_LOAD16_BYTE("wd3.u97",    0x00001, 0x0800, CRC(a66619ec) SHA1(5d091ac7c88f2f45b4a05e78bfc7a16c206b31ff) )  // 8X300 code odd
 	ROM_LOAD       ("wd3.u95",    0x01000, 0x0800, CRC(80bb0617) SHA1(ac0f3194fcbef77532571baa3fec78b3010528bf) )  // "Fast IO select" bytes
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

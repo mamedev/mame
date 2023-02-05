@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-10-16 02:30+1100\n"
-"PO-Revision-Date: 2022-09-02 09:48+0800\n"
+"PO-Revision-Date: 2023-01-28 14:40+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_TW\n"
@@ -962,6 +962,9 @@ msgid ""
 "physical interaction or consist of mechanical devices. It is not possible to "
 "fully experience this system.\n"
 msgstr ""
+"\n"
+"此系統的部分元件無法精準模擬, 因其需要實際活動的互動或機械裝置的組合。 "
+"故無法達成此系統的完整體驗。\n"
 
 #: src/frontend/mame/ui/info.cpp:167
 #, c-format
@@ -4494,7 +4497,7 @@ msgstr "投幣孔 12"
 
 #: src/emu/inpttype.ipp:583
 msgctxt "input-name"
-msgid "Bill 1"
+msgid "Banknote 1"
 msgstr "吸鈔口 1"
 
 #: src/emu/inpttype.ipp:588
@@ -4901,102 +4904,102 @@ msgstr "方向盤 V 10"
 
 #: src/emu/inpttype.ipp:742
 msgctxt "input-name"
-msgid "Track X"
+msgid "Trackball X"
 msgstr "軌跡球 X"
 
 #: src/emu/inpttype.ipp:743
 msgctxt "input-name"
-msgid "Track X 2"
+msgid "Trackball X 2"
 msgstr "軌跡球 X 2"
 
 #: src/emu/inpttype.ipp:744
 msgctxt "input-name"
-msgid "Track X 3"
+msgid "Trackball X 3"
 msgstr "軌跡球 X 3"
 
 #: src/emu/inpttype.ipp:745
 msgctxt "input-name"
-msgid "Track X 4"
+msgid "Trackball X 4"
 msgstr "軌跡球 X 4"
 
 #: src/emu/inpttype.ipp:746
 msgctxt "input-name"
-msgid "Track X 5"
+msgid "Trackball X 5"
 msgstr "軌跡球 X 5"
 
 #: src/emu/inpttype.ipp:747
 msgctxt "input-name"
-msgid "Track X 6"
+msgid "Trackball X 6"
 msgstr "軌跡球 X 6"
 
 #: src/emu/inpttype.ipp:748
 msgctxt "input-name"
-msgid "Track X 7"
+msgid "Trackball X 7"
 msgstr "軌跡球 X 7"
 
 #: src/emu/inpttype.ipp:749
 msgctxt "input-name"
-msgid "Track X 8"
+msgid "Trackball X 8"
 msgstr "軌跡球 X 8"
 
 #: src/emu/inpttype.ipp:750
 msgctxt "input-name"
-msgid "Track X 9"
+msgid "Trackball X 9"
 msgstr "軌跡球 X 9"
 
 #: src/emu/inpttype.ipp:751
 msgctxt "input-name"
-msgid "Track X 10"
+msgid "Trackball X 10"
 msgstr "軌跡球 X 10"
 
 #: src/emu/inpttype.ipp:756
 msgctxt "input-name"
-msgid "Track Y"
+msgid "Trackball Y"
 msgstr "軌跡球 Y"
 
 #: src/emu/inpttype.ipp:757
 msgctxt "input-name"
-msgid "Track Y 2"
+msgid "Trackball Y 2"
 msgstr "軌跡球 Y 2"
 
 #: src/emu/inpttype.ipp:758
 msgctxt "input-name"
-msgid "Track Y 3"
+msgid "Trackball Y 3"
 msgstr "軌跡球 Y 3"
 
 #: src/emu/inpttype.ipp:759
 msgctxt "input-name"
-msgid "Track Y 4"
+msgid "Trackball Y 4"
 msgstr "軌跡球 Y 4"
 
 #: src/emu/inpttype.ipp:760
 msgctxt "input-name"
-msgid "Track Y 5"
+msgid "Trackball Y 5"
 msgstr "軌跡球 Y 5"
 
 #: src/emu/inpttype.ipp:761
 msgctxt "input-name"
-msgid "Track Y 6"
+msgid "Trackball Y 6"
 msgstr "軌跡球 Y 6"
 
 #: src/emu/inpttype.ipp:762
 msgctxt "input-name"
-msgid "Track Y 7"
+msgid "Trackball Y 7"
 msgstr "軌跡球 Y 7"
 
 #: src/emu/inpttype.ipp:763
 msgctxt "input-name"
-msgid "Track Y 8"
+msgid "Trackball Y 8"
 msgstr "軌跡球 Y 8"
 
 #: src/emu/inpttype.ipp:764
 msgctxt "input-name"
-msgid "Track Y 9"
+msgid "Trackball Y 9"
 msgstr "軌跡球 Y 9"
 
 #: src/emu/inpttype.ipp:765
 msgctxt "input-name"
-msgid "Track Y 10"
+msgid "Trackball Y 10"
 msgstr "軌跡球 Y 10"
 
 #: src/emu/inpttype.ipp:770
@@ -6495,13 +6498,3 @@ msgid ""
 msgstr ""
 "輸入組合或按下 %s 取消\n"
 "%s"
-
-#~ msgid ""
-#~ "\n"
-#~ "Elements of this system cannot be emulated as they require physical "
-#~ "interaction or consist of mechanical devices. It is not possible to fully "
-#~ "experience this system.\n"
-#~ msgstr ""
-#~ "\n"
-#~ "此系統的部分元件無法模擬, 因其需要實際活動的互動或機械裝置的組合。 故無法"
-#~ "達成此系統的完整體驗。\n"

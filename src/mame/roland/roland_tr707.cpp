@@ -20,6 +20,9 @@
 #include "machine/nvram.h"
 //#include "video/hd61603.h"
 
+
+namespace {
+
 class roland_tr707_state : public driver_device
 {
 public:
@@ -197,6 +200,9 @@ ROM_START(tr727)
 	ROM_REGION(0x8000, "cymbal2", 0) // "Star Chime"
 	ROM_LOAD("hn61256p_15179697.ic22", 0x0000, 0x8000, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1985, tr707, 0, 0, tr707, tr707, roland_tr707_state, empty_init, "Roland", "TR-707 Rhythm Composer", MACHINE_IS_SKELETON)
 SYST(1985, tr727, 0, 0, tr707, tr707, roland_tr707_state, empty_init, "Roland", "TR-727 Rhythm Composer", MACHINE_IS_SKELETON)

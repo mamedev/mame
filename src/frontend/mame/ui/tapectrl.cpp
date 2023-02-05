@@ -56,7 +56,7 @@ menu_tape_control::~menu_tape_control()
 //  populate - populates the main tape control menu
 //-------------------------------------------------
 
-void menu_tape_control::populate(float &customtop, float &custombottom)
+void menu_tape_control::populate()
 {
 	if (current_device())
 	{

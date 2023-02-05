@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Eugene Sandulenko
-#ifndef MAME_INCLUDES_TIAMC1_H
-#define MAME_INCLUDES_TIAMC1_H
+#ifndef MAME_USSR_TIAMC1_H
+#define MAME_USSR_TIAMC1_H
 
 #pragma once
 
@@ -79,4 +79,4 @@ private:
 	void update_bg_palette();
 };
 
-#endif // MAME_INCLUDES_TIAMC1_H
+#endif // MAME_USSR_TIAMC1_H

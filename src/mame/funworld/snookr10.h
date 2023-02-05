@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
-#ifndef MAME_INCLUDES_SNOOKR10_H
-#define MAME_INCLUDES_SNOOKR10_H
+#ifndef MAME_FUNWORLD_SNOOKR10_H
+#define MAME_FUNWORLD_SNOOKR10_H
 
 #pragma once
 
@@ -64,4 +64,4 @@ private:
 	output_finder<7> m_lamps;
 };
 
-#endif // MAME_INCLUDES_SNOOKR10_H
+#endif // MAME_FUNWORLD_SNOOKR10_H

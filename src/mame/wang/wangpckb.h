@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_MACHINE_WANGPCKB_H
-#define MAME_MACHINE_WANGPCKB_H
+#ifndef MAME_WANG_WANGPCKB_H
+#define MAME_WANG_WANGPCKB_H
 
 #pragma once
 
@@ -74,4 +74,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(WANGPC_KEYBOARD, wangpc_keyboard_device)
 
-#endif // MAME_MACHINE_WANGPCKB_H
+#endif // MAME_WANG_WANGPCKB_H

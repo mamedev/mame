@@ -12,8 +12,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_FD1094_H
-#define MAME_MACHINE_FD1094_H
+#ifndef MAME_SEGA_FD1094_H
+#define MAME_SEGA_FD1094_H
 
 #pragma once
 
@@ -127,4 +127,4 @@ struct fd1094_constraint
 	uint16_t  mask;
 };
 
-#endif // MAME_MACHINE_FD1094_H
+#endif // MAME_SEGA_FD1094_H

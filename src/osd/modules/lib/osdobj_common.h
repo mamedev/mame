@@ -2,30 +2,42 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    osdepend.h
+    osdobj_common.h
 
     OS-dependent code interface.
 
 *******************************************************************c********/
-
-#pragma once
-
 #ifndef MAME_OSD_LIB_OSDOBJ_COMMON_H
 #define MAME_OSD_LIB_OSDOBJ_COMMON_H
 
+#pragma once
+
 #include "osdcore.h"
 #include "osdepend.h"
+
 #include "modules/osdmodule.h"
 #include "modules/output/output_module.h"
+
 #include "emuopts.h"
+
 #include "strformat.h"
+
+#include <iosfwd>
 #include <list>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <unordered_map>
+#include <vector>
+
 
 //============================================================
 //  Defines
 //============================================================
 
 #define OSDOPTION_UIMODEKEY             "uimodekey"
+#define OSDOPTION_CONTROLLER_MAP_FILE   "controller_map"
+#define OSDOPTION_BACKGROUND_INPUT      "background_input"
 
 #define OSDCOMMAND_LIST_MIDI_DEVICES    "listmidi"
 #define OSDCOMMAND_LIST_NETWORK_ADAPTERS "listnetwork"
@@ -75,8 +87,9 @@
 #define OSDOPTION_AUDIO_OUTPUT          "audio_output"
 #define OSDOPTION_AUDIO_EFFECT          "audio_effect"
 
-#define OSDOPTVAL_AUTO                  "auto"
-#define OSDOPTVAL_NONE                  "none"
+#define OSDOPTION_MIDI_PROVIDER         "midiprovider"
+
+#define OSDOPTION_NETWORK_PROVIDER      "networkprovider"
 
 #define OSDOPTION_BGFX_PATH             "bgfx_path"
 #define OSDOPTION_BGFX_BACKEND          "bgfx_backend"
@@ -85,6 +98,9 @@
 #define OSDOPTION_BGFX_SHADOW_MASK      "bgfx_shadow_mask"
 #define OSDOPTION_BGFX_LUT              "bgfx_lut"
 #define OSDOPTION_BGFX_AVI_NAME         "bgfx_avi_name"
+
+#define OSDOPTVAL_AUTO                  "auto"
+#define OSDOPTVAL_NONE                  "none"
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -98,6 +114,8 @@ public:
 
 	// keyboard mapping
 	const char *ui_mode_key() const { return value(OSDOPTION_UIMODEKEY); }
+	const char *controller_mapping_file() const { return value(OSDOPTION_CONTROLLER_MAP_FILE); }
+	bool background_input() const { return bool_value(OSDOPTION_BACKGROUND_INPUT); }
 
 	// debugging options
 	const char *debugger() const { return value(OSDOPTION_DEBUGGER); }
@@ -172,15 +190,16 @@ public:
 
 // ======================> osd_interface
 
-class font_module;
-class sound_module;
 class debug_module;
-class midi_module;
+class font_module;
 class input_module;
-class output_module;
+class midi_module;
 class monitor_module;
 class osd_watchdog;
 class osd_window;
+class output_module;
+class render_module;
+class sound_module;
 
 // description of the currently-running machine
 class osd_common_t : public osd_interface, osd_output
@@ -232,18 +251,13 @@ public:
 	virtual void init_subsystems();
 
 	virtual bool video_init();
-	virtual void video_register();
 	virtual bool window_init();
-
-	virtual void input_resume();
 
 	virtual void exit_subsystems();
 	virtual void video_exit();
 	virtual void window_exit();
 
 	virtual void osd_exit();
-
-	virtual void video_options_add(const char *name, void *type);
 
 	virtual osd_options &options() { return m_options; }
 
@@ -254,14 +268,18 @@ public:
 
 	void notify(const char *outname, int32_t value) const { m_output->notify(outname, value); }
 
-	static std::list<std::shared_ptr<osd_window>> s_window_list;
+	virtual void process_events() = 0;
+	virtual bool has_focus() const = 0;
+
+	static const std::list<std::unique_ptr<osd_window> > &window_list() { return s_window_list; }
 
 protected:
 	virtual bool input_init();
-	virtual void input_pause();
 
 	virtual void build_slider_list() { }
 	virtual void update_slider_list() { }
+
+	static std::list<std::unique_ptr<osd_window> > s_window_list;
 
 private:
 	// internal state
@@ -273,28 +291,26 @@ private:
 	osd_module_manager m_mod_man;
 	font_module *m_font_module;
 
-	void update_option(const std::string &key, std::vector<const char *> &values);
+	void update_option(const std::string &key, std::vector<std::string_view> const &values);
 	// FIXME: should be elsewhere
-	osd_module *select_module_options(const core_options &opts, const std::string &opt_name)
+	template<class C>
+	C &select_module_options(const std::string &opt_name)
 	{
-		std::string opt_val = opts.exists(opt_name) ? opts.value(opt_name) : "";
-		if (opt_val.compare("auto")==0)
+		std::string opt_val = options().exists(opt_name) ? options().value(opt_name) : "";
+		if (opt_val == "auto")
+		{
 			opt_val = "";
+		}
 		else if (!m_mod_man.type_has_name(opt_name.c_str(), opt_val.c_str()))
 		{
 			osd_printf_warning("Value %s not supported for option %s - falling back to auto\n", opt_val, opt_name);
 			opt_val = "";
 		}
-		return m_mod_man.select_module(opt_name.c_str(), opt_val.c_str());
-	}
-
-	template<class C>
-	C select_module_options(const core_options &opts, const std::string &opt_name)
-	{
-		return dynamic_cast<C>(select_module_options(opts, opt_name));
+		return m_mod_man.select_module<C>(*this, options(), opt_name.c_str(), opt_val.c_str());
 	}
 
 protected:
+	render_module*  m_render;
 	sound_module*   m_sound;
 	debug_module*   m_debugger;
 	midi_module*    m_midi;
@@ -308,7 +324,6 @@ protected:
 	std::vector<ui::menu_item> m_sliders;
 
 private:
-	std::vector<const char *> m_video_names;
 	std::unordered_map<std::string, std::string> m_option_descs;
 };
 

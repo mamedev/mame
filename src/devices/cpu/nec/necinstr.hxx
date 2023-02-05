@@ -379,7 +379,7 @@ OP( 0x8c, i_mov_wsreg ) { GetModRM;
 		default:   logerror("%06x: MOV Sreg - Invalid register\n",PC());
 	}
 }
-OP( 0x8d, i_lea       ) { uint16_t ModRM = fetch(); (void)(this->*s_GetEA[ModRM])(); RegWord(ModRM)=m_EO;  CLKS(4,4,2); }
+OP( 0x8d, i_lea       ) { uint16_t ModRM = fetch(); if (ModRM >= 0xc0) logerror("LDEA invalid mode %Xh\n", ModRM); else { (void)(this->*s_GetEA[ModRM])(); RegWord(ModRM)=m_EO; }  CLKS(4,4,2); }
 OP( 0x8e, i_mov_sregw ) { uint16_t src; GetModRM; src = GetRMWord(ModRM); CLKR(15,15,7,15,11,5,2,m_EA);
 	switch (ModRM & 0x38) {
 		case 0x00: Sreg(DS1) = src; break; /* mov es,ew */
@@ -655,7 +655,7 @@ OP( 0xf3, i_repe     ) { uint32_t next = fetchop(); uint16_t c = Wreg(CW);
 	}
 	m_seg_prefix=false;
 }
-OP( 0xf4, i_hlt ) { logerror("%06x: HALT\n",PC()); m_halted=1; m_icount=0; }
+OP( 0xf4, i_hlt ) { m_halted=1; m_icount=0; }
 OP( 0xf5, i_cmc ) { m_CarryVal = !CF; CLK(2); }
 OP( 0xf6, i_f6pre ) { uint32_t tmp; uint32_t uresult,uresult2; int32_t result,result2;
 	GetModRM; tmp = GetRMByte(ModRM);

@@ -5,8 +5,8 @@
     Atari Skydiver hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SKYDIVER_H
-#define MAME_INCLUDES_SKYDIVER_H
+#ifndef MAME_ATARI_SKYDIVER_H
+#define MAME_ATARI_SKYDIVER_H
 
 #pragma once
 
@@ -111,4 +111,4 @@ private:
 /*----------- defined in audio/skydiver.c -----------*/
 DISCRETE_SOUND_EXTERN( skydiver_discrete );
 
-#endif // MAME_INCLUDES_SKYDIVER_H
+#endif // MAME_ATARI_SKYDIVER_H

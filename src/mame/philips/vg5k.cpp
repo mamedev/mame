@@ -64,6 +64,8 @@
 #include "formats/vg5k_cas.h"
 
 
+namespace {
+
 class vg5k_state : public driver_device
 {
 public:
@@ -468,6 +470,9 @@ ROM_START( vg5k )
 	ROM_REGION( 0x4000, "ef9345", 0 )
 	ROM_LOAD( "charset.rom", 0x0000, 0x2000, BAD_DUMP CRC(b2f49eb3) SHA1(d0ef530be33bfc296314e7152302d95fdf9520fc) )                // from dcvg5k
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT       COMPANY    FULLNAME   FLAGS

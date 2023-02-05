@@ -26,6 +26,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class mobigo2_state : public generalplus_gpac800_game_state
 {
 public:
@@ -163,6 +165,9 @@ ROM_START( mobigo2 )
 	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "mobigo2_bios_ger.bin", 0x00000, 0x8400000, CRC(d5ab613d) SHA1(6fb104057dc3484fa958e2cb20c5dd0c19589f75) ) // SPANSION S34ML01G100TF100
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 2010, mobigo,  0,      0, mobigo,   mobigo, mobigo_state,  init_mobigo , "VTech", "MobiGo", MACHINE_IS_SKELETON )
 CONS( 2010, mobigos, mobigo, 0, mobigo,   mobigo, mobigo_state,  init_mobigo , "VTech", "MobiGo (Spain)", MACHINE_IS_SKELETON )

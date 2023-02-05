@@ -6,8 +6,8 @@
 
 *************************************************************************/
 
-#ifndef MAME_INCLUDES_MTX_H
-#define MAME_INCLUDES_MTX_H
+#ifndef MAME_MEMOTECH_MTX_H
+#define MAME_MEMOTECH_MTX_H
 
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
@@ -139,4 +139,4 @@ private:
 	void rs128_io(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MTX_H
+#endif // MAME_MEMOTECH_MTX_H

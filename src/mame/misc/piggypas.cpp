@@ -23,6 +23,8 @@ game details unknown
 #include "piggypas.lh"
 
 
+namespace {
+
 class piggypas_state : public driver_device
 {
 public:
@@ -367,6 +369,7 @@ ROM_START( 3lilpigs )
 	ROM_LOAD( "3-pigs.u14", 0x00000, 0x40000, CRC(62eb76e2) SHA1(c4cad241dedf2c290f9bf80038415fe39b3ce17d) )
 ROM_END
 
+} // anonymous namespace
 
 
 // COPYRIGHT (c) 1990, 1991, 1992, DOYLE & ASSOC., INC.   VERSION 04.40

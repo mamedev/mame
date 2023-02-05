@@ -1232,7 +1232,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[0].rmw_i(size);
 						decode(mode, bytes);
 
-						u32 const src1 = s32(quick << 28) >> 28;
+						u32 const src1 = util::sext(quick, 4);
 						u32 const src2 = gen_read(mode[0]);
 
 						u32 const dst = src1 + src2;
@@ -1251,7 +1251,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[0].read_i(size);
 						decode(mode, bytes);
 
-						u32 const src1 = (s32(quick << 28) >> 28) & size_mask[size];
+						u32 const src1 = util::sext(quick, 4) & size_mask[size];
 						u32 const src2 = gen_read(mode[0]);
 
 						m_psr &= ~(PSR_N | PSR_Z | PSR_L);
@@ -1335,7 +1335,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 						mode[0].rmw_i(size);
 						decode(mode, bytes);
 
-						s32 const inc = s32(quick << 28) >> 28;
+						s32 const inc = util::sext(quick, 4);
 						u32 index = gen_read(mode[0]);
 						s32 const dst = displacement(bytes);
 
@@ -1360,7 +1360,7 @@ template <int Width> void ns32000_device<Width>::execute_run()
 					mode[0].write_i(size);
 					decode(mode, bytes);
 
-					gen_write(mode[0], s32(quick << 28) >> 28);
+					gen_write(mode[0], util::sext(quick, 4));
 
 					tex = (mode[0].type == REG) ? 3 : mode[0].tea + 2;
 					break;

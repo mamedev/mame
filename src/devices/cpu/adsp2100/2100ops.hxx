@@ -377,7 +377,7 @@ void adsp21xx_device::write_reg1(int regnum, int32_t val)
 			break;
 
 		case 1:
-			m_m[index] = (int32_t)(val << 18) >> 18;
+			m_m[index] = util::sext(val, 14);
 			break;
 
 		case 2:
@@ -420,7 +420,7 @@ void adsp21xx_device::write_reg2(int regnum, int32_t val)
 			break;
 
 		case 1:
-			m_m[index] = (int32_t)(val << 18) >> 18;
+			m_m[index] = util::sext(val, 14);
 			break;
 
 		case 2:
@@ -443,7 +443,7 @@ void adsp21xx_device::write_reg3(int regnum, int32_t val)
 		case 0x03:  m_imask = val & m_imask_mask; check_irqs();     break;
 		case 0x04:  m_icntl = val & 0x001f; check_irqs();           break;
 		case 0x05:  cntr_stack_push(); m_cntr = val & 0x3fff;       break;
-		case 0x06:  m_core.sb.s = (int32_t)(val << 27) >> 27;         break;
+		case 0x06:  m_core.sb.s = util::sext(val, 5);               break;
 		case 0x07:  m_px = val;                                     break;
 		case 0x09:  if (!m_sport_tx_cb.isnull()) m_sport_tx_cb(0, val, 0xffff); break;
 		case 0x0b:  if (!m_sport_tx_cb.isnull()) m_sport_tx_cb(1, val, 0xffff); break;

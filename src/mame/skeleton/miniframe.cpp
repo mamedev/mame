@@ -19,6 +19,9 @@
 #include "machine/pic8259.h"
 #include "screen.h"
 
+
+namespace {
+
 /***************************************************************************
     DRIVER STATE
 ***************************************************************************/
@@ -45,7 +48,7 @@ private:
 	required_device<floppy_image_device> m_floppy;
 	required_device<address_map_bank_device> m_ramrombank;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	[[maybe_unused]] uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -271,6 +274,8 @@ ROM_START( minifram )
 	ROM_LOAD16_BYTE("72-00357.bin", 0x000001, 0x002000, CRC(17c2749c) SHA1(972b5300b4d6ec65536910eab2b8550b9df9bb4d))
 	ROM_LOAD16_BYTE("72-00356.bin", 0x000000, 0x002000, CRC(28b6c23a) SHA1(479e739a8154b6754e2e9b1fcfeb99d6ceaf9dbe))
 ROM_END
+
+} // anonymous namespace
 
 
 /***************************************************************************

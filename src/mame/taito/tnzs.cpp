@@ -448,7 +448,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
       * ......1. : No
     Notice screen displays "Korea" instead of "Japan".
   - Copyright relies on bits 2 and 3 of the region (code at 0x276d),
-    but table at 0x2781 is the same for any combinaison :
+    but table at 0x2781 is the same for any combination :
       * ....??.. : "NICS CO. LTD. 1992" / "ALL RIGHTS RESERVED"
 
 
@@ -631,7 +631,7 @@ d23f=input port 1 value
   Kageki
   (c) 1988 Taito Corporation
 
-  Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
+  Driver by Takahiro Nogi 1999/11/06
 
 ***************************************************************************/
 

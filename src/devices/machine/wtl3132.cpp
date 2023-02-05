@@ -342,8 +342,8 @@ void wtl3132_device::stage3(unsigned const index)
 			if ((m_mode & MODE_RTN) && OPF(code, ENCN) == 1)
 				m_cr = f32_lt(m_aa_in[1], i32_to_f32(-4194304)) || f32_lt(i32_to_f32(4194304), m_aa_in[1]);
 
-			m_a_out.v = (f32_to_i32(m_aa_in[1], (m_mode & MODE_RTN) ?
-				softfloat_round_near_even : softfloat_round_min, false) << 8) >> 8;
+			m_a_out.v = util::sext(f32_to_i32(m_aa_in[1], (m_mode & MODE_RTN) ?
+				softfloat_round_near_even : softfloat_round_min, false), 24);
 			LOG("slot %d stage 3 fix %f == 0x%08x\n", index, u2f(m_aa_in[1].v), m_a_out.v);
 			break;
 		case MF_FLUT:

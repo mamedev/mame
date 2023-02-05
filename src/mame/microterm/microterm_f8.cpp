@@ -17,6 +17,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class microterm_f8_state : public driver_device
 {
 public:
@@ -569,6 +572,9 @@ ROM_START(act5a)
 	ROM_REGION(0x2000, "chargen", 0)
 	ROM_LOAD("act5a_9316.u55", 0x0000, 0x2000, CRC(8f96b7c8) SHA1(652d420ab5be9412cae322cd1799f8a9e3959c44))
 ROM_END
+
+} // anonymous namespace
+
 
 //COMP(1976, act4, 0, 0, act5a, act5a, microterm_f8_state, empty_init, "Micro-Term", "ACT-IV", MACHINE_NOT_WORKING)
 //COMP(1978, act5, 0, 0, act5a, act5a, microterm_f8_state, empty_init, "Micro-Term", "ACT-V", MACHINE_NOT_WORKING)

@@ -52,7 +52,11 @@ function autofire.startplugin()
 			end
 		end
 		for i, state in pairs(button_states) do
-			state[2]:set_value(state[1])
+			if state[1] ~= 0 then
+				state[2]:set_value(state[1])
+			else
+				state[2]:clear_value()
+			end
 		end
 	end
 

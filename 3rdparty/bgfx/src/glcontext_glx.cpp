@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
 
 #include "bgfx_p.h"
@@ -12,8 +12,9 @@
 #		define GLX_GLXEXT_PROTOTYPES
 #		include <glx/glxext.h>
 
-// will include X11 which #defines None...
+// glxext will include X11 which #defines None, Status, etc.
 #undef None
+#undef Status
 
 namespace bgfx { namespace gl
 {
@@ -89,7 +90,7 @@ namespace bgfx { namespace gl
 		return reinterpret_cast<ProtoT>( (void*)::glXGetProcAddress( (const GLubyte*)_name) );
 	}
 
-	void GlContext::create(uint32_t _width, uint32_t _height)
+	void GlContext::create(uint32_t _width, uint32_t _height, uint32_t /*_flags*/)
 	{
 		BX_UNUSED(_width, _height);
 

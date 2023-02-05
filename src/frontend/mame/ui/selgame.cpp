@@ -78,7 +78,6 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 	{
 		//s_first_start = false; TODO: why wasn't it ever clearing the first start flag?
 		reselect_last::set_driver(moptions.last_used_machine());
-		ui_globals::rpanel = std::min<int>(std::max<int>(moptions.last_right_panel(), RP_FIRST), RP_LAST);
 
 		std::string tmp(moptions.last_used_filter());
 		std::size_t const found = tmp.find_first_of(',');
@@ -108,8 +107,11 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 
 	mui.machine().options().set_value(OPTION_SNAPNAME, "%g/%i", OPTION_PRIORITY_CMDLINE);
 
+	// restore last right panel settings
+	set_right_panel(moptions.system_right_panel());
+	set_right_image(moptions.system_right_image());
+
 	ui_globals::curdats_view = 0;
-	ui_globals::panels_status = moptions.hide_panels();
 	ui_globals::curdats_total = 1;
 }
 
@@ -119,24 +121,25 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 
 menu_select_game::~menu_select_game()
 {
-	std::string error_string, last_driver;
-	ui_system_info const *system;
-	ui_software_info const *swinfo;
-	get_selection(swinfo, system);
-	if (swinfo)
-		last_driver = swinfo->shortname;
-	else if (system)
-		last_driver = system->driver->name;
-
-	std::string const filter(m_persistent_data.filter_data().get_config_string());
-
-	ui_options &mopt = ui().options();
-	mopt.set_value(OPTION_LAST_RIGHT_PANEL, ui_globals::rpanel, OPTION_PRIORITY_CMDLINE);
-	mopt.set_value(OPTION_LAST_USED_FILTER, filter, OPTION_PRIORITY_CMDLINE);
-	mopt.set_value(OPTION_LAST_USED_MACHINE, last_driver, OPTION_PRIORITY_CMDLINE);
-	mopt.set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE);
+	// TODO: reconsider when to do this
 	ui().save_ui_options();
 }
+
+
+//-------------------------------------------------
+//  recompute metrics
+//-------------------------------------------------
+
+void menu_select_game::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu_select_launch::recompute_metrics(width, height, aspect);
+
+	m_icons.clear();
+
+	// configure the custom rendering
+	set_custom_space(3.0F * line_height() + 5.0F * tb_border(), 4.0F * line_height() + 3.0F * tb_border());
+}
+
 
 //-------------------------------------------------
 //  menu_activated
@@ -144,6 +147,8 @@ menu_select_game::~menu_select_game()
 
 void menu_select_game::menu_activated()
 {
+	menu_select_launch::menu_activated();
+
 	// if I have to load datfile, perform a hard reset
 	if (ui_globals::reset)
 	{
@@ -154,8 +159,35 @@ void menu_select_game::menu_activated()
 		ui_globals::reset = false;
 		machine().schedule_hard_reset();
 		stack_reset();
-		return;
 	}
+}
+
+//-------------------------------------------------
+//  menu_deactivated
+//-------------------------------------------------
+
+void menu_select_game::menu_deactivated()
+{
+	menu_select_launch::menu_deactivated();
+
+	// get the "last selected system" string
+	ui_system_info const *system;
+	ui_software_info const *swinfo;
+	get_selection(swinfo, system);
+	std::string last_driver;
+	if (swinfo)
+		last_driver = swinfo->shortname;
+	else if (system)
+		last_driver = system->driver->name;
+
+	// serialise the selected filter settings
+	std::string const filter(m_persistent_data.filter_data().get_config_string());
+
+	ui_options &mopt = ui().options();
+	mopt.set_value(OPTION_LAST_USED_MACHINE,  last_driver,                 OPTION_PRIORITY_CMDLINE);
+	mopt.set_value(OPTION_LAST_USED_FILTER,   filter,                      OPTION_PRIORITY_CMDLINE);
+	mopt.set_value(OPTION_SYSTEM_RIGHT_PANEL, right_panel_config_string(), OPTION_PRIORITY_CMDLINE);
+	mopt.set_value(OPTION_SYSTEM_RIGHT_IMAGE, right_image_config_string(), OPTION_PRIORITY_CMDLINE);
 }
 
 //-------------------------------------------------
@@ -259,33 +291,21 @@ void menu_select_game::handle(event const *ev)
 					break;
 
 				case IPT_UI_LEFT:
-					if (ui_globals::rpanel == RP_IMAGES)
-					{
-						// Images
-						previous_image_view();
-					}
-					else if (ui_globals::rpanel == RP_INFOS)
-					{
-						// Infos
-						change_info_pane(-1);
-					}
+					if (right_panel() == RP_IMAGES)
+						previous_image_view(); // Images
+					else if (right_panel() == RP_INFOS)
+						change_info_pane(-1); // Infos
 					break;
 
 				case IPT_UI_RIGHT:
-					if (ui_globals::rpanel == RP_IMAGES)
-					{
-						// Images
-						next_image_view();
-					}
-					else if (ui_globals::rpanel == RP_INFOS)
-					{
-						// Infos
-						change_info_pane(1);
-					}
+					if (right_panel() == RP_IMAGES)
+						next_image_view(); // Images
+					else if (right_panel() == RP_INFOS)
+						change_info_pane(1); // Infos
 					break;
 
 				case IPT_UI_FAVORITES:
-					if (uintptr_t(ev->itemref) > skip_main_items)
+					if (uintptr_t(ev->itemref) > m_skip_main_items)
 					{
 						favorite_manager &mfav(mame_machine_manager::instance()->favorite());
 						if (!m_populated_favorites)
@@ -329,7 +349,7 @@ void menu_select_game::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void menu_select_game::populate(float &customtop, float &custombottom)
+void menu_select_game::populate()
 {
 	for (auto &icon : m_icons) // TODO: why is this here?  maybe better on resize or setting change?
 		icon.second.texture.reset();
@@ -422,7 +442,8 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 								cloneof = false;
 						}
 
-						item_append(info.longname, cloneof ? FLAG_INVERT : 0, (void *)&info);
+						ui_system_info const &sysinfo = m_persistent_data.systems()[driver_list::find(info.driver->name)];
+						item_append(sysinfo.description, cloneof ? FLAG_INVERT : 0, (void *)&info);
 					}
 					else
 					{
@@ -440,28 +461,21 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 		item_append(menu_item_type::SEPARATOR, 0);
 		item_append(_("General Settings"), 0, (void *)(uintptr_t)CONF_OPTS);
 		item_append(_("System Settings"), 0, (void *)(uintptr_t)CONF_MACHINE);
-		skip_main_items = 3;
+		m_skip_main_items = 3;
 
 		if (m_prev_selected && !have_prev_selected && item_count() > 0)
 			m_prev_selected = item(0).ref();
 	}
 	else
 	{
-		skip_main_items = 0;
+		m_skip_main_items = 0;
 	}
-
-	// configure the custom rendering
-	customtop = 3.0f * ui().get_line_height() + 5.0f * ui().box_tb_border();
-	custombottom = 4.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
 
 	// reselect prior game launched, if any
 	if (old_item_selected != -1)
 	{
 		set_selected_index(old_item_selected);
-		if (ui_globals::visible_main_lines == 0)
-			top_line = (selected_index() != 0) ? selected_index() - 1 : 0;
-		else
-			top_line = selected_index() - (ui_globals::visible_main_lines / 2);
+		centre_selection();
 
 		if (reselect_last::software().empty())
 			reselect_last::reset();
@@ -502,7 +516,7 @@ void menu_select_game::build_available_list()
 	// now check and include NONE_NEEDED
 	if (!ui().options().hide_romless())
 	{
-		// FIXME: can't use the convenience macros tiny ROM entries
+		// FIXME: can't use the convenience macros with tiny ROM entries
 		auto const is_required_rom =
 				[] (tiny_rom_entry const &rom) { return ROMENTRY_ISFILE(rom) && !ROM_ISOPTIONAL(rom) && !std::strchr(rom.hashdata, '!'); };
 		for (std::size_t x = 0; total > x; ++x)
@@ -682,7 +696,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 		}
 		return;
 	}
-	else if (ui_swinfo->startempty == 1)
+	else if (ui_swinfo->startempty)
 	{
 		driver_enumerator enumerator(machine().options(), *ui_swinfo->driver);
 		enumerator.next();
@@ -784,10 +798,10 @@ void menu_select_game::change_info_pane(int delta)
 	get_selection(soft, sys);
 	if (!m_populated_favorites)
 	{
-		if (uintptr_t(sys) > skip_main_items)
+		if (uintptr_t(sys) > m_skip_main_items)
 			cap_delta(ui_globals::curdats_view, ui_globals::curdats_total);
 	}
-	else if (uintptr_t(soft) > skip_main_items)
+	else if (uintptr_t(soft) > m_skip_main_items)
 	{
 		if (soft->startempty)
 			cap_delta(ui_globals::curdats_view, ui_globals::curdats_total);
@@ -928,6 +942,10 @@ render_texture *menu_select_game::get_icon_texture(int linenum, void *selectedre
 	return icon->second.bitmap.valid() ? icon->second.texture.get() : nullptr;
 }
 
+
+//-------------------------------------------------
+//  export displayed list
+//-------------------------------------------------
 
 void menu_select_game::inkey_export()
 {

@@ -82,7 +82,7 @@ cyan to yellow)
 
 ============================================================================
 
-ROM source notes when dumped from another publisher, but confident it's the same:
+ROM source notes when dumped from another title, but confident it's the same:
 - astrocmd: Tandy Astro Command
 - caveman: Tandy Caveman
 - grobot9: Mego Fabulous Fred
@@ -115,6 +115,8 @@ ROM source notes when dumped from another publisher, but confident it's the same
 
 //#include "hh_ucom4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
+
+namespace {
 
 class hh_ucom4_state : public driver_device
 {
@@ -237,8 +239,6 @@ INPUT_CHANGED_MEMBER(hh_ucom4_state::single_interrupt_line)
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
-
-namespace {
 
 /***************************************************************************
 

@@ -5,8 +5,8 @@
     Sega vector hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SEGAG80V_H
-#define MAME_INCLUDES_SEGAG80V_H
+#ifndef MAME_SEGA_SEGAG80V_H
+#define MAME_SEGA_SEGAG80V_H
 
 #pragma once
 
@@ -172,4 +172,4 @@ private:
 	void spacfurybl_speech_io_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SEGAG80V_H
+#endif // MAME_SEGA_SEGAG80V_H

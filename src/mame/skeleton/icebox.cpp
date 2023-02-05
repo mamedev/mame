@@ -161,6 +161,8 @@ SEEK command is completed.
 #include "machine/wd_fdc.h"
 
 
+namespace {
+
 class icebox_state : public driver_device
 {
 public:
@@ -364,6 +366,9 @@ ROM_START( icebox )
 	ROM_LOAD( "ice0.bin", 0x0000, 0x0800, CRC(252092c0) SHA1(8b6c53994dbb1aa76fdb6b72961e12071c100809) )
 	ROM_LOAD( "ice1.bin", 0x0800, 0x0800, CRC(f4dc4b93) SHA1(cd8c3b2a1ceb4e5efb35af9bcac7ebaab6a8a308) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

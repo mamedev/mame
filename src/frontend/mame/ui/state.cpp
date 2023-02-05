@@ -118,7 +118,7 @@ menu_load_save_state_base::~menu_load_save_state_base()
 //  populate
 //-------------------------------------------------
 
-void menu_load_save_state_base::populate(float &customtop, float &custombottom)
+void menu_load_save_state_base::populate()
 {
 	// build the "filename to code" map, if we have not already (if it were not for the
 	// possibility that the system keyboard can be changed at runtime, I would put this
@@ -223,9 +223,6 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 	if (is_one_shot())
 		item_append(_("Cancel"), 0, nullptr);
-
-	// set up custom render proc
-	custombottom = (2.0f * ui().get_line_height()) + (3.0f * ui().box_tb_border());
 
 	// get ready to poll inputs
 	m_switch_poller.reset();
@@ -374,12 +371,10 @@ void menu_load_save_state_base::handle_keys(uint32_t flags, int &iptkey)
 		if (exclusive_input_pressed(iptkey, IPT_UI_SELECT, 0))
 		{
 			// try to remove the file
-			std::string const filename(util::string_format(
-						"%2$s%1$s%3$s%1$s%4$s.sta",
-						PATH_SEPARATOR,
+			std::string const filename(util::path_concat(
 						machine().options().state_directory(),
 						machine().get_statename(machine().options().state_name()),
-						m_confirm_delete->file_name()));
+						m_confirm_delete->file_name() + ".sta"));
 			std::error_condition const err(osd_file::remove(filename));
 			if (err)
 			{
@@ -423,6 +418,19 @@ void menu_load_save_state_base::handle_keys(uint32_t flags, int &iptkey)
 
 
 //-------------------------------------------------
+//  recompute_metrics - recompute metrics
+//-------------------------------------------------
+
+void menu_load_save_state_base::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	autopause_menu<>::recompute_metrics(width, height, aspect);
+
+	// set up custom render proc
+	set_custom_space(0.0F, (2.0F * line_height()) + (3.0F * tb_border()));
+}
+
+
+//-------------------------------------------------
 //  custom_render - perform our special rendering
 //-------------------------------------------------
 
@@ -448,14 +456,14 @@ void menu_load_save_state_base::custom_render(void *selectedref, float top, floa
 	{
 		draw_text_box(
 				std::begin(text), std::next(std::begin(text), count),
-				origx1, origx2, origy2 + ui().box_tb_border(), origy2 + (count * ui().get_line_height()) + (3.0f * ui().box_tb_border()),
+				origx1, origx2, origy2 + tb_border(), origy2 + (count * line_height()) + (3.0F * tb_border()),
 				text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
-				ui().colors().text_color(), ui().colors().background_color(), 1.0f);
+				ui().colors().text_color(), ui().colors().background_color());
 	}
 
 	// draw the confirmation prompt if necessary
 	if (!m_confirm_prompt.empty())
-		ui().draw_text_box(container(), m_confirm_prompt, text_layout::text_justify::CENTER, 0.5f, 0.5f, ui().colors().background_color());
+		ui().draw_text_box(container(), m_confirm_prompt, text_layout::text_justify::CENTER, 0.5F, 0.5F, ui().colors().background_color());
 }
 
 
@@ -485,11 +493,9 @@ const menu_load_save_state_base::file_entry &menu_load_save_state_base::file_ent
 
 std::string menu_load_save_state_base::state_directory() const
 {
-	const char *stateopt = machine().options().state_name();
-	return util::string_format("%s%s%s",
+	return util::path_concat(
 			machine().options().state_directory(),
-			PATH_SEPARATOR,
-			machine().get_statename(stateopt));
+			machine().get_statename(machine().options().state_name()));
 }
 
 

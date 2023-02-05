@@ -38,8 +38,7 @@ private:
 void mpu4redpoint_state::add_ympcm(machine_config &config)
 {
 	YMZ280B(config, m_ympcm, 16'934'400);
-	m_ympcm->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_ympcm->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_ympcm->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void mpu4redpoint_state::memmap_ympcm(address_map &map)
@@ -63,6 +62,7 @@ MACHINE_START_MEMBER(mpu4redpoint_state,mpu4redpoint)
 	mpu4_config_common();
 
 	m_link7a_connected=false;
+	m_link7b_connected=true;
 }
 
 } // anonymous namespace

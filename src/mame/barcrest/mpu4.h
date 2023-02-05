@@ -4,6 +4,8 @@
 #include "mpu4_characteriser_bootleg.h"
 #include "mpu4_characteriser_pal.h"
 #include "mpu4_characteriser_pal_bwb.h"
+#include "mpu4_oki_sampled_sound.h"
+
 
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
@@ -17,7 +19,7 @@
 #include "machine/ticket.h"
 #include "machine/timer.h" //hoppers
 #include "sound/ay8910.h"
-#include "sound/okim6376.h"
+#include "sound/dac.h"
 
 
 #define MPU4_MASTER_CLOCK           XTAL(6'880'000)
@@ -35,7 +37,6 @@
 #define LOG_CHR_FULL(x) do { if (MPU4VERBOSE) logerror x; } while (0)
 #define LOG_IC3(x)  do { if (MPU4VERBOSE) logerror x; } while (0)
 #define LOG_IC8(x)  do { if (MPU4VERBOSE) logerror x; } while (0)
-#define LOG_SS(x)   do { if (MPU4VERBOSE) logerror x; } while (0)
 
 
 //reel info
@@ -130,6 +131,7 @@ namespace mpu4_traits {
 
 		// Features
 		OVER,   // overcurrent detection
+		LVDOFF, // Disable 50hz check
 		P4L,    // use pia4 port a leds
 		SCARDL, // use simple card leds
 	};
@@ -144,27 +146,26 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_vfd(*this, "vfd")
 		, m_6840ptm(*this, "ptm_ic2")
-		, m_ptm_ic3ss(*this, "ptm_ic3ss")
 		, m_pia3(*this, "pia_ic3")
 		, m_pia4(*this, "pia_ic4")
 		, m_pia5(*this, "pia_ic5")
 		, m_pia6(*this, "pia_ic6")
 		, m_pia7(*this, "pia_ic7")
 		, m_pia8(*this, "pia_ic8")
-		, m_pia_ic4ss(*this, "pia_ic4ss")
 		, m_port_mux(*this, {"ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2"})
 		, m_aux1_port(*this, "AUX1")
 		, m_aux2_port(*this, "AUX2")
 		, m_bank1(*this, "bank1")
-		, m_msm6376(*this, "msm6376")
 		, m_reel(*this, "reel%u", 0U)
 		, m_meters(*this, "meters")
 		, m_ay8913(*this, "ay8913")
+		, m_alarmdac(*this, "alarmdac")
 		, m_dataport(*this, "dataport")
 		, m_characteriser(*this, "characteriser")
 		, m_characteriser_bl(*this, "characteriser_bl")
 		, m_characteriser_blastbank(*this, "characteriser_blastbank")
 		, m_characteriser_bwb(*this, "characteriser_bwb")
+		, m_okicard(*this, "okicard")
 		, m_duart68681(*this, "duart68681")
 		, m_hopper1(*this, "hopper")
 		, m_hopper2(*this, "hopper2")
@@ -208,6 +209,7 @@ public:
 	void tr_hnb(machine_config &config);
 	void tr_htw(machine_config &config);
 	void tr_over(machine_config &config);
+	void tr_lvdoff(machine_config &config);
 	void tr_p4l(machine_config &config);
 	void tr_scardl(machine_config &config);
 
@@ -262,6 +264,7 @@ public:
 			case mpu4_traits::HNB:    return &mpu4_state::tr_hnb;
 			case mpu4_traits::HTW:    return &mpu4_state::tr_htw;
 			case mpu4_traits::OVER:   return &mpu4_state::tr_over;
+			case mpu4_traits::LVDOFF: return &mpu4_state::tr_lvdoff;
 			case mpu4_traits::P4L:    return &mpu4_state::tr_p4l;
 			case mpu4_traits::SCARDL: return &mpu4_state::tr_scardl;
 			default: return nullptr; // crash later on invalid arguments
@@ -345,9 +348,10 @@ public:
 
 
 	void mpu4_common(machine_config &config);
-	void mpu4_common2(machine_config &config);
 	void mpu4base(machine_config &config);
 	void mpu4_bacta(machine_config &config);
+
+	DECLARE_WRITE_LINE_MEMBER(pia_gb_cb2_w);
 
 protected:
 	void setup_rom_banks();
@@ -359,14 +363,14 @@ protected:
 	void mpu4_memmap_bootleg_characteriser(address_map &map);
 	void mpu4_memmap_bl_characteriser_blastbank(address_map &map);
 
-	void lamp_extend_small(int data);
-	void lamp_extend_large(int data,int column,int active);
-	void led_write_extender(int latch, int data, int column);
+	void lamp_extend_small(uint8_t data);
+	void lamp_extend_large(uint8_t data, uint8_t column, bool active);
+	void led_write_extender(uint8_t latch, uint8_t data, uint8_t column);
 	void update_meters();
 	void ic23_update();
-	void ic24_output(int data);
+	void ic24_output(uint8_t data);
 	void ic24_setup();
-	void update_ay(device_t *device);
+	void update_ay();
 	void mpu4_install_mod4oki_space(address_space &space);
 	void mpu4_config_common();
 
@@ -380,7 +384,6 @@ protected:
 	uint8_t bankswitch_r();
 	void bankset_w(uint8_t data);
 
-	void ic3ss_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(cpu0_irq);
 	DECLARE_WRITE_LINE_MEMBER(ic2_o1_callback);
 	DECLARE_WRITE_LINE_MEMBER(ic2_o2_callback);
@@ -412,11 +415,7 @@ protected:
 	void pia_ic8_portb_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(pia_ic8_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia_ic8_cb2_w);
-	void pia_gb_porta_w(uint8_t data);
-	void pia_gb_portb_w(uint8_t data);
-	uint8_t pia_gb_portb_r();
-	DECLARE_WRITE_LINE_MEMBER(pia_gb_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_gb_cb2_w);
+
 
 	DECLARE_WRITE_LINE_MEMBER(dataport_rxd);
 
@@ -426,27 +425,26 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<rocvfd_device> m_vfd;
 	optional_device<ptm6840_device> m_6840ptm;
-	optional_device<ptm6840_device> m_ptm_ic3ss;
 	optional_device<pia6821_device> m_pia3;
 	optional_device<pia6821_device> m_pia4;
 	optional_device<pia6821_device> m_pia5;
 	optional_device<pia6821_device> m_pia6;
 	optional_device<pia6821_device> m_pia7;
 	optional_device<pia6821_device> m_pia8;
-	optional_device<pia6821_device> m_pia_ic4ss;
 	required_ioport_array<8> m_port_mux;
 	required_ioport m_aux1_port;
 	required_ioport m_aux2_port;
 	optional_memory_bank m_bank1;
-	optional_device<okim6376_device> m_msm6376;
 	optional_device_array<stepper_device, 8> m_reel;
 	required_device<meters_device> m_meters;
 	optional_device<ay8910_device> m_ay8913;
+	required_device<dac_1bit_device> m_alarmdac;
 	optional_device<bacta_datalogger_device> m_dataport;
 	optional_device<mpu4_characteriser_pal> m_characteriser;
 	optional_device<mpu4_characteriser_bl> m_characteriser_bl;
 	optional_device<mpu4_characteriser_bl_blastbank> m_characteriser_blastbank;
 	optional_device<mpu4_characteriser_pal_bwb> m_characteriser_bwb;
+	optional_device<mpu4_oki_sampled_sound> m_okicard;
 
 	optional_device<mc68681_device> m_duart68681;
 
@@ -476,43 +474,41 @@ protected:
 
 	output_finder<8> m_triacs;
 
-	int m_mmtr_data = 0;
-	int m_ay8913_address = 0;
-	int m_signal_50hz = 0;
-	int m_ic4_input_b = 0;
-	int m_aux1_input = 0;
-	int m_aux2_input = 0;
-	int m_IC23G1 = 0;
-	int m_IC23G2A = 0;
-	int m_IC23G2B = 0;
-	int m_IC23GC = 0;
-	int m_IC23GB = 0;
-	int m_IC23GA = 0;
+	uint8_t m_mmtr_data = 0;
+	uint8_t m_ay8913_address = 0;
+	uint8_t m_signal_50hz = 0;
+	uint8_t m_ic4_input_b = 0;
+	uint8_t m_aux1_input = 0;
+	uint8_t m_aux2_input = 0;
+	uint8_t m_IC23G1 = 0;
+	uint8_t m_IC23G2A = 0;
+	uint8_t m_IC23G2B = 0;
+	uint8_t m_IC23GC = 0;
+	uint8_t m_IC23GB = 0;
+	uint8_t m_IC23GA = 0;
 
-	int m_reel_flag = 0;
+	uint8_t m_reel_flag = 0;
 	bool m_ic23_active = false;
 	emu_timer *m_ic24_timer = nullptr;
-	int m_expansion_latch = 0;
-	int m_global_volume = 0;
-	int m_input_strobe = 0;
+	uint8_t m_input_strobe = 0;
 	uint8_t m_lamp_strobe = 0;
 	uint8_t m_lamp_strobe2 = 0;
 	uint8_t m_lamp_strobe_ext[2] = { 0, 0 };
 	uint8_t m_lamp_strobe_ext_persistence = 0;
 	uint8_t m_led_strobe = 0;
 	uint8_t m_ay_data = 0;
-	int m_optic_pattern = 0;
+	uint8_t m_optic_pattern = 0;
 
-	int m_active_reel = 0;
-	int m_remote_meter = 0;
-	int m_reel_mux = 0;
-	int m_lamp_extender = 0;
-	int m_last_b7 = 0;
-	int m_last_latch = 0;
-	int m_lamp_sense = 0;
-	int m_card_live = 0;
-	int m_led_extender = 0;
-	int m_bwb_bank = 0;
+	uint8_t m_active_reel = 0;
+	uint8_t m_remote_meter = 0;
+	uint8_t m_reel_mux = 0;
+	uint8_t m_lamp_extender = 0;
+	uint8_t m_last_b7 = 0;
+	uint8_t m_last_latch = 0;
+	bool m_lamp_sense = false;
+	bool m_card_live = false;
+	uint8_t m_led_extender = 0;
+	bool m_bwb_bank = false;
 	bool m_default_to_low_bank = false;
 
 	bool m_use_pia4_porta_leds = true;
@@ -523,17 +519,17 @@ protected:
 	uint8_t m_simplecard_leds_base = 0;
 	uint8_t m_simplecard_leds_strobe = 0;
 
-	int m_pageval = 0;
-	int m_pageset = 0;
-	int m_hopper_type = 0;
-	int m_reels = 0;
-	int m_chrdata = 0;
-	int m_t1 = 0;
-	int m_t3l = 0;
-	int m_t3h = 0;
+	uint8_t m_pageval = 0;
+	uint8_t m_pageset = 0;
+	uint8_t m_hopper_type = 0;
+	uint8_t m_reels = 0;
+	uint8_t m_chrdata = 0;
+	uint8_t m_serial_output = 0;
+
 	uint8_t m_numbanks = 0;
 
 	bool m_link7a_connected = false;
+	bool m_link7b_connected = true;
 
 	bool m_overcurrent = false;
 	bool m_undercurrent = false;
@@ -553,6 +549,7 @@ protected:
 	static constexpr uint8_t reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used, this is basically a wire swap
 	static constexpr uint8_t reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 };
+
 
 
 template<const uint8_t* Table> void mpu4_state::mod4oki_cheatchr_pal_f(machine_config &config)

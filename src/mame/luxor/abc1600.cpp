@@ -28,6 +28,8 @@
     <enter>
     <enter>
 
+	ABCenix <= D-NIX <= AT&T Unix System V
+
 */
 
 /*
@@ -865,7 +867,7 @@ void abc1600_state::abc1600(machine_config &config)
 	// devices
 	ABC1600_MAC(config, m_mac, 0);
 	m_mac->set_addrmap(AS_PROGRAM, &abc1600_state::mac_mem);
-	m_mac->fc_cb().set(m_maincpu, FUNC(m68000_base_device::get_fc));
+	m_mac->fc_cb().set(m_maincpu, FUNC(m68000_musashi_device::get_fc));
 	m_mac->buserr_cb().set(FUNC(abc1600_state::buserr_w));
 	m_mac->in_tren0_cb().set(m_bus0i, FUNC(abcbus_slot_device::read_tren)); // TODO bus0x
 	m_mac->out_tren0_cb().set(m_bus0i, FUNC(abcbus_slot_device::write_tren)); // TODO bus0x
@@ -879,8 +881,7 @@ void abc1600_state::abc1600(machine_config &config)
 	m_dma0->out_bao_callback().set(m_dma1, FUNC(z80dma_device::bai_w));
 	m_dma0->in_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_mreq_r));
 	m_dma0->out_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_mreq_w));
-	m_dma0->out_ieo_callback().set(m_bus0i, FUNC(abcbus_slot_device::prac_w)).exor(1);
-	//m_dma0->out_ieo_callback().set(m_bus0x, FUNC(abcbus_slot_device::prac_w)).exor(1);
+	m_dma0->out_ieo_callback().set([this](int state) { m_bus0i->prac_w(state); m_bus0x->prac_w(state); }).exor(1);
 	m_dma0->in_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_iorq_r));
 	m_dma0->out_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_iorq_w));
 

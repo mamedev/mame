@@ -6,8 +6,22 @@
 //
 //============================================================
 
-#ifndef __WIN_D3DCOMM__
-#define __WIN_D3DCOMM__
+#ifndef MAME_RENDER_D3D_D3DCOMM_H
+#define MAME_RENDER_D3D_D3DCOMM_H
+
+#pragma once
+
+// lib/util
+#include "bitmap.h"
+
+#include <windows.h>
+#include <d3d9.h>
+#include <wrl/client.h>
+
+#include <cstring>
+#include <memory>
+#include <vector>
+
 
 //============================================================
 //  CONSTANTS
@@ -60,10 +74,7 @@ public:
 class d3d_texture_manager
 {
 public:
-	d3d_texture_manager(): m_renderer(nullptr), m_yuv_format(), m_texture_caps(0), m_texture_max_aspect(0), m_texture_max_width(0), m_texture_max_height(0), m_default_texture(nullptr)
-	{ }
-
-	d3d_texture_manager(renderer_d3d9 *d3d);
+	d3d_texture_manager(renderer_d3d9 &d3d, IDirect3D9 *d3dobj);
 
 	void                    update_textures();
 
@@ -82,12 +93,12 @@ public:
 
 	texture_info *          get_default_texture() const { return m_default_texture; }
 
-	renderer_d3d9 *         get_d3d() const { return m_renderer; }
+	renderer_d3d9 &         get_d3d() const { return m_renderer; }
 
-	std::vector<std::unique_ptr<texture_info>> m_texture_list;  // list of active textures
+	std::vector<std::unique_ptr<texture_info> > m_texture_list;  // list of active textures
 
 private:
-	renderer_d3d9 *         m_renderer;
+	renderer_d3d9 &         m_renderer;
 	D3DFORMAT               m_yuv_format;               // format to use for YUV textures
 
 	DWORD                   m_texture_caps;             // textureCaps field
@@ -104,7 +115,7 @@ private:
 class texture_info
 {
 public:
-	texture_info(d3d_texture_manager *manager, const render_texinfo *texsource, int prescale, uint32_t flags);
+	texture_info(d3d_texture_manager &manager, const render_texinfo *texsource, int prescale, uint32_t flags);
 	~texture_info();
 
 	render_texinfo &        get_texinfo() { return m_texinfo; }
@@ -125,15 +136,16 @@ public:
 
 	int                     get_cur_frame() const { return m_cur_frame; }
 
-	IDirect3DTexture9 *     get_tex() const { return m_d3dtex; }
-	IDirect3DSurface9 *     get_surface() const { return m_d3dsurface; }
-	IDirect3DTexture9 *     get_finaltex() const { return m_d3dfinaltex; }
+	IDirect3DTexture9 *     get_finaltex() const { return m_d3dfinaltex.Get(); }
 
 	vec2f &                 get_uvstart() { return m_start; }
 	vec2f &                 get_uvstop() { return m_stop; }
 	vec2f &                 get_rawdims() { return m_rawdims; }
 
 private:
+	using IDirect3DTexture9Ptr = Microsoft::WRL::ComPtr<IDirect3DTexture9>;
+	using IDirect3DSurface9Ptr = Microsoft::WRL::ComPtr<IDirect3DSurface9>;
+
 	void prescale();
 	void compute_size(int texwidth, int texheight);
 	void compute_size_subroutine(int texwidth, int texheight, int* p_width, int* p_height);
@@ -145,23 +157,23 @@ private:
 	inline void copyline_yuy16_to_uyvy(uint16_t *dst, const uint16_t *src, int width, const rgb_t *palette);
 	inline void copyline_yuy16_to_argb(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette);
 
-	d3d_texture_manager *   m_texture_manager;          // texture manager pointer
+	d3d_texture_manager &   m_texture_manager;          // texture manager pointer
 
-	renderer_d3d9 *         m_renderer;                 // renderer pointer
+	renderer_d3d9 &         m_renderer;                 // renderer pointer
 
-	uint32_t                m_hash;                     // hash value for the texture
-	uint32_t                m_flags;                    // rendering flags
+	const uint32_t          m_hash;                     // hash value for the texture
+	const uint32_t          m_flags;                    // rendering flags
 	render_texinfo          m_texinfo;                  // copy of the texture info
+	const int               m_type;                     // what type of texture are we?
 	vec2f                   m_start;                    // beggining UV coordinates
 	vec2f                   m_stop;                     // ending UV coordinates
 	vec2f                   m_rawdims;                  // raw dims of the texture
-	int                     m_type;                     // what type of texture are we?
 	int                     m_xprescale, m_yprescale;   // X/Y prescale factor
 	int                     m_xborderpix, m_yborderpix; // X/Y border pixels
 	int                     m_cur_frame;                // what is our current frame?
-	IDirect3DTexture9 *     m_d3dtex;                   // Direct3D texture pointer
-	IDirect3DSurface9 *     m_d3dsurface;               // Direct3D offscreen plain surface pointer
-	IDirect3DTexture9 *     m_d3dfinaltex;              // Direct3D final (post-scaled) texture
+	IDirect3DTexture9Ptr    m_d3dtex;                   // Direct3D texture pointer
+	IDirect3DSurface9Ptr    m_d3dsurface;               // Direct3D offscreen plain surface pointer
+	IDirect3DTexture9Ptr    m_d3dfinaltex;              // Direct3D final (post-scaled) texture
 };
 
 /* poly_info holds information about a single polygon/d3d primitive */
@@ -170,7 +182,7 @@ class poly_info
 public:
 	void init(D3DPRIMITIVETYPE type, uint32_t count, uint32_t numverts,
 				uint32_t flags, texture_info *texture, uint32_t modmode,
-				float prim_width, float prim_height)
+				float prim_width, float prim_height, uint32_t tint)
 	{
 		m_type = type;
 		m_count = count;
@@ -180,6 +192,7 @@ public:
 		m_modmode = modmode;
 		m_prim_width = prim_width;
 		m_prim_height = prim_height;
+		m_tint = tint;
 	}
 
 	D3DPRIMITIVETYPE        type() const { return m_type; }
@@ -193,6 +206,8 @@ public:
 	float                   prim_width() const { return m_prim_width; }
 	float                   prim_height() const { return m_prim_height; }
 
+	DWORD                   tint() const { return m_tint; }
+
 private:
 	D3DPRIMITIVETYPE        m_type;         // type of primitive
 	uint32_t                m_count;        // total number of primitives
@@ -204,6 +219,8 @@ private:
 
 	float                   m_prim_width;   // used by quads
 	float                   m_prim_height;  // used by quads
+
+	uint32_t                m_tint;         // color tint for primitive
 };
 
 /* vertex describes a single vertex */
@@ -222,24 +239,14 @@ class d3d_render_target
 {
 public:
 	// construction/destruction
-	d3d_render_target(): target_width(0), target_height(0), width(0), height(0), screen_index(0), bloom_count(0)
+	d3d_render_target()
+		: target_width(0)
+		, target_height(0)
+		, width(0)
+		, height(0)
+		, screen_index(0)
+		, bloom_count(0)
 	{
-		for (int index = 0; index < MAX_BLOOM_COUNT; index++)
-		{
-			bloom_texture[index] = nullptr;
-			bloom_surface[index] = nullptr;
-		}
-
-		for (int index = 0; index < 2; index++)
-		{
-			source_texture[index] = nullptr;
-			source_surface[index] = nullptr;
-			target_texture[index] = nullptr;
-			target_surface[index] = nullptr;
-		}
-
-		cache_texture = nullptr;
-		cache_surface = nullptr;
 	}
 
 	~d3d_render_target();
@@ -257,20 +264,20 @@ public:
 
 	int screen_index;
 
-	IDirect3DSurface9 *target_surface[2];
-	IDirect3DTexture9 *target_texture[2];
-	IDirect3DSurface9 *source_surface[2];
-	IDirect3DTexture9 *source_texture[2];
+	Microsoft::WRL::ComPtr<IDirect3DSurface9> target_surface[2];
+	Microsoft::WRL::ComPtr<IDirect3DTexture9> target_texture[2];
+	Microsoft::WRL::ComPtr<IDirect3DSurface9> source_surface[2];
+	Microsoft::WRL::ComPtr<IDirect3DTexture9> source_texture[2];
 
-	IDirect3DSurface9 *cache_surface;
-	IDirect3DTexture9 *cache_texture;
+	Microsoft::WRL::ComPtr<IDirect3DSurface9> cache_surface;
+	Microsoft::WRL::ComPtr<IDirect3DTexture9> cache_texture;
 
-	IDirect3DSurface9 *bloom_surface[MAX_BLOOM_COUNT];
-	IDirect3DTexture9 *bloom_texture[MAX_BLOOM_COUNT];
+	Microsoft::WRL::ComPtr<IDirect3DSurface9> bloom_surface[MAX_BLOOM_COUNT];
+	Microsoft::WRL::ComPtr<IDirect3DTexture9> bloom_texture[MAX_BLOOM_COUNT];
 
 	float bloom_dims[MAX_BLOOM_COUNT][2];
 
 	int bloom_count;
 };
 
-#endif
+#endif // MAME_RENDER_D3D_D3DCOMM_H

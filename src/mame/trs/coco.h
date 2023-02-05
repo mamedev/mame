@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_INCLUDES_COCO_H
-#define MAME_INCLUDES_COCO_H
+#ifndef MAME_TRS_COCO_H
+#define MAME_TRS_COCO_H
 
 #pragma once
 
@@ -31,7 +31,6 @@
 
 INPUT_PORTS_EXTERN( coco_analog_control );
 INPUT_PORTS_EXTERN( coco_joystick );
-INPUT_PORTS_EXTERN( coco_rtc );
 INPUT_PORTS_EXTERN( coco_beckerport );
 INPUT_PORTS_EXTERN( coco_beckerport_dw );
 
@@ -270,4 +269,4 @@ protected:
 	bool m_in_floating_bus_read = false;
 };
 
-#endif // MAME_INCLUDES_COCO_H
+#endif // MAME_TRS_COCO_H

@@ -19,6 +19,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 #define MCLK 12000000
 
 
@@ -493,6 +495,8 @@ ROM_START( mjsister )
 	ROM_LOAD( "ms07.bpr", 0x0200,  0x0100, CRC(6cb3a735) SHA1(468ae3d40552dc2ec24f5f2988850093d73948a6) ) // B
 	ROM_LOAD( "ms08.bpr", 0x0300,  0x0100, CRC(da2b3b38) SHA1(4de99c17b227653bc1b904f1309f447f5a0ab516) ) // ?
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

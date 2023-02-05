@@ -5,8 +5,8 @@
     Atari Wolf Pack (prototype) driver
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_WOLFPACK_H
-#define MAME_INCLUDES_WOLFPACK_H
+#ifndef MAME_ATARI_WOLFPACK_H
+#define MAME_ATARI_WOLFPACK_H
 
 #pragma once
 
@@ -106,4 +106,4 @@ private:
 	emu_timer *m_periodic_timer = nullptr;
 };
 
-#endif // MAME_INCLUDES_WOLFPACK_H
+#endif // MAME_ATARI_WOLFPACK_H

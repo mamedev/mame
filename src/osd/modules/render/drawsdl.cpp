@@ -2,7 +2,7 @@
 // copyright-holders:Couriersud, Olivier Galibert, R. Belmont
 //============================================================
 //
-//  drawsdl.c - SDL software and OpenGL implementation
+//  drawsdl.cpp - SDL software and OpenGL implementation
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
@@ -10,28 +10,37 @@
 //
 //============================================================
 
-// standard C headers
-#include <cmath>
-#include <cstdio>
+#include "render_module.h"
+
+#include "modules/osdmodule.h"
+
+#if defined(OSD_SDL)
+
+// from specific OSD implementation
+#include "sdlopts.h"
+#include "window.h"
+
+// general OSD headers
+#include "modules/monitor/monitor_module.h"
 
 // MAME headers
 #include "emucore.h"
-#include "ui/uimain.h"
+#include "render.h"
 #include "rendersw.hxx"
 
-// standard SDL headers
+//#include "ui/uimain.h"
+
 #include <SDL2/SDL.h>
 
-// OSD headers
-#include "osdsdl.h"
-#include "window.h"
+// standard C headers
+#include <cmath>
+#include <cstdio>
+#include <memory>
 
-#include "drawsdl.h"
-#include "modules/monitor/monitor_module.h"
 
-//============================================================
-//  DEBUGGING
-//============================================================
+namespace osd {
+
+namespace {
 
 //============================================================
 //  CONSTANTS
@@ -40,6 +49,76 @@
 #define DRAW2_SCALEMODE_NEAREST "0"
 #define DRAW2_SCALEMODE_LINEAR  "1"
 #define DRAW2_SCALEMODE_BEST    "2"
+
+
+struct sdl_scale_mode
+{
+	const char      *name;
+	int             is_scale;           /* Scale mode?           */
+	int             is_yuv;             /* Yuv mode?             */
+	int             mult_w;             /* Width multiplier      */
+	int             mult_h;             /* Height multiplier     */
+	const char      *sdl_scale_mode_hint;        /* what to use as a hint ? */
+	int             pixel_format;       /* Pixel/Overlay format  */
+	void            (*yuv_blit)(const uint16_t *bitmap, uint8_t *ptr, const int pitch, const uint32_t *lookup, const int width, const int height);
+};
+
+
+// renderer_sdl1 is the information about SDL for the current screen
+class renderer_sdl1 : public osd_renderer
+{
+public:
+
+	renderer_sdl1(osd_window &w, sdl_scale_mode const &scale_mode)
+		: osd_renderer(w)
+		, m_scale_mode(scale_mode)
+		, m_sdl_renderer(nullptr)
+		, m_texture_id(nullptr)
+		, m_yuv_lookup()
+		, m_yuv_bitmap()
+		//, m_hw_scale_width(0)
+		//, m_hw_scale_height(0)
+		, m_last_hofs(0)
+		, m_last_vofs(0)
+		, m_blit_dim(0, 0)
+		, m_last_dim(0, 0)
+	{
+	}
+	virtual ~renderer_sdl1();
+
+	virtual int create() override;
+	virtual int draw(const int update) override;
+	virtual int xy_to_render_target(const int x, const int y, int *xt, int *yt) override;
+	virtual render_primitive_list *get_primitives() override;
+
+private:
+	void show_info(struct SDL_RendererInfo *render_info);
+
+	void destroy_all_textures();
+	void yuv_init();
+	void setup_texture(const osd_dim &size);
+	void yuv_lookup_set(unsigned int pen, unsigned char red,
+				unsigned char green, unsigned char blue);
+
+	int32_t               m_blittimer;
+
+	sdl_scale_mode const &m_scale_mode;
+	SDL_Renderer        *m_sdl_renderer;
+	SDL_Texture         *m_texture_id;
+
+	// YUV overlay
+	std::unique_ptr<uint32_t []> m_yuv_lookup;
+	std::unique_ptr<uint16_t []> m_yuv_bitmap;
+
+	// if we leave scaling to SDL and the underlying driver, this
+	// is the render_target_width/height to use
+
+	int                 m_last_hofs;
+	int                 m_last_vofs;
+	osd_dim             m_blit_dim;
+	osd_dim             m_last_dim;
+};
+
 
 //============================================================
 //  PROTOTYPES
@@ -56,84 +135,41 @@ static void yuv_RGB_to_YUY2(const uint16_t *bitmap, uint8_t *ptr, const int pitc
 static void yuv_RGB_to_YUY2X2(const uint16_t *bitmap, uint8_t *ptr, const int pitch, \
 		const uint32_t *lookup, const int width, const int height);
 
-// Static declarations
-
-static const sdl_scale_mode scale_modes[] =
-{
-		{ "none",    0, 0, 1, 1, DRAW2_SCALEMODE_NEAREST, 0, nullptr },
-		{ "hwblit",  1, 0, 1, 1, DRAW2_SCALEMODE_LINEAR, 0, nullptr },
-		{ "hwbest",  1, 0, 1, 1, DRAW2_SCALEMODE_BEST, 0, nullptr },
-		/* SDL1.2 uses interpolation as well */
-		{ "yv12",    1, 1, 1, 1, DRAW2_SCALEMODE_BEST, SDL_PIXELFORMAT_YV12, yuv_RGB_to_YV12 },
-		{ "yv12x2",  1, 1, 2, 2, DRAW2_SCALEMODE_BEST, SDL_PIXELFORMAT_YV12, yuv_RGB_to_YV12X2 },
-		{ "yuy2",    1, 1, 1, 1, DRAW2_SCALEMODE_BEST, SDL_PIXELFORMAT_YUY2, yuv_RGB_to_YUY2 },
-		{ "yuy2x2",  1, 1, 2, 1, DRAW2_SCALEMODE_BEST, SDL_PIXELFORMAT_YUY2, yuv_RGB_to_YUY2X2 },
-		{ nullptr }
-};
-
-int drawsdl_scale_mode(const char *s)
-{
-	const sdl_scale_mode *sm = scale_modes;
-	int index;
-
-	index = 0;
-	while (sm->name != nullptr)
-	{
-		if (strcmp(sm->name, s) == 0)
-			return index;
-		index++;
-		sm++;
-	}
-	return -1;
-}
-
-//============================================================
-//  drawsdl_init
-//============================================================
-
-void renderer_sdl1::init(running_machine &machine)
-{
-	osd_printf_verbose("Using SDL multi-window soft driver (SDL 2.0+)\n");
-}
-
 //============================================================
 //  setup_texture for window
 //============================================================
 
 void renderer_sdl1::setup_texture(const osd_dim &size)
 {
-	const sdl_scale_mode *sdl_sm = &scale_modes[video_config.scale_mode];
 	SDL_DisplayMode mode;
 	uint32_t fmt;
 
-	auto win = assert_window();
-
 	// Determine preferred pixelformat and set up yuv if necessary
-	SDL_GetCurrentDisplayMode(win->monitor()->oshandle(), &mode);
+	SDL_GetCurrentDisplayMode(window().monitor()->oshandle(), &mode);
 
 	m_yuv_bitmap.reset();
 
-	fmt = (sdl_sm->pixel_format ? sdl_sm->pixel_format : mode.format);
+	fmt = (m_scale_mode.pixel_format ? m_scale_mode.pixel_format : mode.format);
 
-	if (sdl_sm->is_scale)
+	if (m_scale_mode.is_scale)
 	{
 		int m_hw_scale_width = 0;
 		int m_hw_scale_height = 0;
 
-		win->target()->compute_minimum_size(m_hw_scale_width, m_hw_scale_height);
-		if (win->prescale())
+		window().target()->compute_minimum_size(m_hw_scale_width, m_hw_scale_height);
+		if (window().prescale())
 		{
-			m_hw_scale_width *= win->prescale();
-			m_hw_scale_height *= win->prescale();
+			m_hw_scale_width *= window().prescale();
+			m_hw_scale_height *= window().prescale();
 
 			/* This must be a multiple of 2 */
 			m_hw_scale_width = (m_hw_scale_width + 1) & ~1;
 		}
-		if (sdl_sm->is_yuv)
+		if (m_scale_mode.is_yuv)
 			m_yuv_bitmap = std::make_unique<uint16_t []>(m_hw_scale_width * m_hw_scale_height);
 
-		int w = m_hw_scale_width * sdl_sm->mult_w;
-		int h = m_hw_scale_height * sdl_sm->mult_h;
+		int w = m_hw_scale_width * m_scale_mode.mult_w;
+		int h = m_hw_scale_height * m_scale_mode.mult_h;
 
 		m_texture_id = SDL_CreateTexture(m_sdl_renderer, fmt, SDL_TEXTUREACCESS_STREAMING, w, h);
 
@@ -182,26 +218,23 @@ void renderer_sdl1::show_info(struct SDL_RendererInfo *render_info)
 
 int renderer_sdl1::create()
 {
-	const sdl_scale_mode *sm = &scale_modes[video_config.scale_mode];
-
-	auto win = assert_window();
 	// create renderer
 
 	/* set hints ... */
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, sm->sdl_scale_mode_hint);
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, m_scale_mode.sdl_scale_mode_hint);
 
 
 	if (video_config.waitvsync)
-		m_sdl_renderer = SDL_CreateRenderer(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+		m_sdl_renderer = SDL_CreateRenderer(dynamic_cast<sdl_window_info &>(window()).platform_window(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 	else
-		m_sdl_renderer = SDL_CreateRenderer(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window(), -1, SDL_RENDERER_ACCELERATED);
+		m_sdl_renderer = SDL_CreateRenderer(dynamic_cast<sdl_window_info &>(window()).platform_window(), -1, SDL_RENDERER_ACCELERATED);
 
 	if (!m_sdl_renderer)
 	{
 		if (video_config.waitvsync)
-			m_sdl_renderer = SDL_CreateRenderer(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_SOFTWARE);
+			m_sdl_renderer = SDL_CreateRenderer(dynamic_cast<sdl_window_info &>(window()).platform_window(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_SOFTWARE);
 		else
-			m_sdl_renderer = SDL_CreateRenderer(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window(), -1, SDL_RENDERER_SOFTWARE);
+			m_sdl_renderer = SDL_CreateRenderer(dynamic_cast<sdl_window_info &>(window()).platform_window(), -1, SDL_RENDERER_SOFTWARE);
 	}
 
 	if (!m_sdl_renderer)
@@ -216,18 +249,18 @@ int renderer_sdl1::create()
 
 	// Check scale mode
 
-	if (sm->pixel_format)
+	if (m_scale_mode.pixel_format)
 	{
 		int i;
 		int found = 0;
 
 		for (i=0; i < render_info.num_texture_formats; i++)
-			if (sm->pixel_format == render_info.texture_formats[i])
+			if (m_scale_mode.pixel_format == render_info.texture_formats[i])
 				found = 1;
 
 		if (!found)
 		{
-			fatalerror("window: Scale mode %s not supported!", sm->name);
+			fatalerror("window: Scale mode %s not supported!", m_scale_mode.name);
 		}
 	}
 
@@ -288,7 +321,6 @@ void renderer_sdl1::destroy_all_textures()
 
 int renderer_sdl1::draw(int update)
 {
-	const sdl_scale_mode *sm = &scale_modes[video_config.scale_mode];
 	uint8_t *surfptr;
 	int32_t pitch;
 	Uint32 rmask, gmask, bmask;
@@ -296,14 +328,7 @@ int renderer_sdl1::draw(int update)
 	int32_t vofs, hofs, blitwidth, blitheight, ch, cw;
 	int bpp;
 
-	if (video_config.novideo)
-	{
-		return 0;
-	}
-
-	auto win = assert_window();
-
-	osd_dim wdim = win->get_size();
+	osd_dim wdim = window().get_size();
 	if (has_flags(FI_CHANGED) || (wdim != m_last_dim))
 	{
 		destroy_all_textures();
@@ -370,15 +395,15 @@ int renderer_sdl1::draw(int update)
 	m_last_hofs = hofs;
 	m_last_vofs = vofs;
 
-	win->m_primlist->acquire_lock();
+	window().m_primlist->acquire_lock();
 
 	int mamewidth, mameheight;
 
 		Uint32 fmt = 0;
 		int access = 0;
 		SDL_QueryTexture(m_texture_id, &fmt, &access, &mamewidth, &mameheight);
-		mamewidth /= sm->mult_w;
-		mameheight /= sm->mult_h;
+		mamewidth /= m_scale_mode.mult_w;
+		mameheight /= m_scale_mode.mult_h;
 	//printf("w h %d %d %d %d\n", mamewidth, mameheight, blitwidth, blitheight);
 
 	// rescale bounds
@@ -388,7 +413,7 @@ int renderer_sdl1::draw(int update)
 	// FIXME: this could be a lot easier if we get the primlist here!
 	//          Bounds would be set fit for purpose and done!
 
-	for (render_primitive &prim : *win->m_primlist)
+	for (render_primitive &prim : *window().m_primlist)
 	{
 		prim.bounds.x0 = floor(fw * prim.bounds.x0 + 0.5f);
 		prim.bounds.x1 = floor(fw * prim.bounds.x1 + 0.5f);
@@ -397,32 +422,32 @@ int renderer_sdl1::draw(int update)
 	}
 
 	// render to it
-	if (!sm->is_yuv)
+	if (!m_scale_mode.is_yuv)
 	{
 		switch (rmask)
 		{
 			case 0xff000000:
-				software_renderer<uint32_t, 0,0,0, 24,16,8>::draw_primitives(*win->m_primlist, surfptr, mamewidth, mameheight, pitch / 4);
+				software_renderer<uint32_t, 0,0,0, 24,16,8>::draw_primitives(*window().m_primlist, surfptr, mamewidth, mameheight, pitch / 4);
 				break;
 
 			case 0x0000ff00:
-				software_renderer<uint32_t, 0,0,0, 8,16,24>::draw_primitives(*win->m_primlist, surfptr, mamewidth, mameheight, pitch / 4);
+				software_renderer<uint32_t, 0,0,0, 8,16,24>::draw_primitives(*window().m_primlist, surfptr, mamewidth, mameheight, pitch / 4);
 				break;
 
 			case 0x00ff0000:
-				software_renderer<uint32_t, 0,0,0, 16,8,0>::draw_primitives(*win->m_primlist, surfptr, mamewidth, mameheight, pitch / 4);
+				software_renderer<uint32_t, 0,0,0, 16,8,0>::draw_primitives(*window().m_primlist, surfptr, mamewidth, mameheight, pitch / 4);
 				break;
 
 			case 0x000000ff:
-				software_renderer<uint32_t, 0,0,0, 0,8,16>::draw_primitives(*win->m_primlist, surfptr, mamewidth, mameheight, pitch / 4);
+				software_renderer<uint32_t, 0,0,0, 0,8,16>::draw_primitives(*window().m_primlist, surfptr, mamewidth, mameheight, pitch / 4);
 				break;
 
 			case 0xf800:
-				software_renderer<uint16_t, 3,2,3, 11,5,0>::draw_primitives(*win->m_primlist, surfptr, mamewidth, mameheight, pitch / 2);
+				software_renderer<uint16_t, 3,2,3, 11,5,0>::draw_primitives(*window().m_primlist, surfptr, mamewidth, mameheight, pitch / 2);
 				break;
 
 			case 0x7c00:
-				software_renderer<uint16_t, 3,3,3, 10,5,0>::draw_primitives(*win->m_primlist, surfptr, mamewidth, mameheight, pitch / 2);
+				software_renderer<uint16_t, 3,3,3, 10,5,0>::draw_primitives(*window().m_primlist, surfptr, mamewidth, mameheight, pitch / 2);
 				break;
 
 			default:
@@ -434,11 +459,11 @@ int renderer_sdl1::draw(int update)
 	{
 		assert (m_yuv_bitmap != nullptr);
 		assert (surfptr != nullptr);
-		software_renderer<uint16_t, 3,3,3, 10,5,0>::draw_primitives(*win->m_primlist, m_yuv_bitmap.get(), mamewidth, mameheight, mamewidth);
-		sm->yuv_blit(m_yuv_bitmap.get(), surfptr, pitch, m_yuv_lookup.get(), mamewidth, mameheight);
+		software_renderer<uint16_t, 3,3,3, 10,5,0>::draw_primitives(*window().m_primlist, m_yuv_bitmap.get(), mamewidth, mameheight, mamewidth);
+		m_scale_mode.yuv_blit(m_yuv_bitmap.get(), surfptr, pitch, m_yuv_lookup.get(), mamewidth, mameheight);
 	}
 
-	win->m_primlist->release_lock();
+	window().m_primlist->release_lock();
 
 	// unlock and flip
 	SDL_UnlockTexture(m_texture_id);
@@ -666,16 +691,98 @@ static void yuv_RGB_to_YUY2X2(const uint16_t *bitmap, uint8_t *ptr, const int pi
 
 render_primitive_list *renderer_sdl1::get_primitives()
 {
-	auto win = try_getwindow();
-	if (win == nullptr)
-		return nullptr;
-
-	osd_dim nd = win->get_size();
+	osd_dim nd = window().get_size();
 	if (nd != m_blit_dim)
 	{
 		m_blit_dim = nd;
 		notify_changed();
 	}
-	win->target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), win->pixel_aspect());
-	return &win->target()->get_primitives();
+	window().target()->set_bounds(m_blit_dim.width(), m_blit_dim.height(), window().pixel_aspect());
+	return &window().target()->get_primitives();
 }
+
+
+class video_sdl1 : public osd_module, public render_module
+{
+public:
+	video_sdl1()
+		: osd_module(OSD_RENDERER_PROVIDER, "soft")
+		, m_scale_mode(-1)
+	{
+	}
+
+	virtual int init(osd_interface &osd, osd_options const &options) override;
+	virtual void exit() override { }
+
+	virtual std::unique_ptr<osd_renderer> create(osd_window &window) override;
+
+protected:
+	virtual unsigned flags() const override { return FLAG_INTERACTIVE | FLAG_SDL_NEEDS_OPENGL; }
+
+private:
+	static int get_scale_mode(char const *modestr);
+
+	int m_scale_mode;
+
+	static sdl_scale_mode const s_scale_modes[];
+};
+
+int video_sdl1::init(osd_interface &osd, osd_options const &options)
+{
+	osd_printf_verbose("Using SDL multi-window soft driver (SDL 2.0+)\n");
+
+	// yuv settings ...
+	char const *const modestr = dynamic_cast<sdl_options const &>(options).scale_mode();
+	m_scale_mode = get_scale_mode(modestr);
+	if (m_scale_mode < 0)
+	{
+		osd_printf_warning("Invalid yuvmode value %s; reverting to none\n", modestr);
+		m_scale_mode = 0;
+	}
+
+	return 0;
+}
+
+std::unique_ptr<osd_renderer> video_sdl1::create(osd_window &window)
+{
+	return std::make_unique<renderer_sdl1>(window, s_scale_modes[m_scale_mode]);
+}
+
+int video_sdl1::get_scale_mode(char const *modestr)
+{
+	const sdl_scale_mode *sm = s_scale_modes;
+	int index = 0;
+	while (sm->name)
+	{
+		if (!strcmp(sm->name, modestr))
+			return index;
+		index++;
+		sm++;
+	}
+	return -1;
+}
+
+sdl_scale_mode const video_sdl1::s_scale_modes[] = {
+		{ "none",    0, 0, 1, 1, DRAW2_SCALEMODE_NEAREST, 0,                    nullptr },
+		{ "hwblit",  1, 0, 1, 1, DRAW2_SCALEMODE_LINEAR,  0,                    nullptr },
+		{ "hwbest",  1, 0, 1, 1, DRAW2_SCALEMODE_BEST,    0,                    nullptr },
+		/* SDL1.2 uses interpolation as well */
+		{ "yv12",    1, 1, 1, 1, DRAW2_SCALEMODE_BEST,    SDL_PIXELFORMAT_YV12, yuv_RGB_to_YV12 },
+		{ "yv12x2",  1, 1, 2, 2, DRAW2_SCALEMODE_BEST,    SDL_PIXELFORMAT_YV12, yuv_RGB_to_YV12X2 },
+		{ "yuy2",    1, 1, 1, 1, DRAW2_SCALEMODE_BEST,    SDL_PIXELFORMAT_YUY2, yuv_RGB_to_YUY2 },
+		{ "yuy2x2",  1, 1, 2, 1, DRAW2_SCALEMODE_BEST,    SDL_PIXELFORMAT_YUY2, yuv_RGB_to_YUY2X2 },
+		{ nullptr } };
+
+} // anonymous namespace
+
+} // namespace osd
+
+
+#else // defined(OSD_SDL)
+
+namespace osd { namespace { MODULE_NOT_SUPPORTED(video_sdl1, OSD_RENDERER_PROVIDER, "soft") } }
+
+#endif // defined(OSD_SDL)
+
+
+MODULE_DEFINITION(RENDERER_SDL1, osd::video_sdl1)

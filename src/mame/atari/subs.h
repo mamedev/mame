@@ -5,8 +5,8 @@
     Atari Subs hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SUBS_H
-#define MAME_INCLUDES_SUBS_H
+#ifndef MAME_ATARI_SUBS_H
+#define MAME_ATARI_SUBS_H
 
 #pragma once
 
@@ -81,4 +81,4 @@ private:
 
 DISCRETE_SOUND_EXTERN( subs_discrete );
 
-#endif // MAME_INCLUDES_SUBS_H
+#endif // MAME_ATARI_SUBS_H

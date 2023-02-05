@@ -9,7 +9,7 @@
 #include "cd90_640.h"
 #include "formats/thom_dsk.h"
 
-DEFINE_DEVICE_TYPE(CD90_640, cd90_640_device, "cd90_640", "Thomson CD90-640 floppy drive controller")
+DEFINE_DEVICE_TYPE(CD90_640, cd90_640_device, "cd90_640", "Thomson CD 90-640 floppy drive controller")
 
 cd90_640_device::cd90_640_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CD90_640, tag, owner, clock),
@@ -32,8 +32,8 @@ void cd90_640_device::rom_map(address_map &map)
 
 void cd90_640_device::io_map(address_map &map)
 {
-	map(0, 3).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
-	map(8, 8).rw(FUNC(cd90_640_device::control_r), FUNC(cd90_640_device::control_w));
+	map(0x10, 0x13).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
+	map(0x18, 0x18).rw(FUNC(cd90_640_device::control_r), FUNC(cd90_640_device::control_w));
 }
 
 const tiny_rom_entry *cd90_640_device::device_rom_region() const

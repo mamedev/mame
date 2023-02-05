@@ -5,8 +5,8 @@
     Darius
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_DARIUS_H
-#define MAME_INCLUDES_DARIUS_H
+#ifndef MAME_TAITO_DARIUS_H
+#define MAME_TAITO_DARIUS_H
 
 #pragma once
 
@@ -125,4 +125,4 @@ private:
 	void darius_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_DARIUS_H
+#endif // MAME_TAITO_DARIUS_H

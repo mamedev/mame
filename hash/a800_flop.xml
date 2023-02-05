@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
     Atari 400 / 800 floppies
     (skeleton list)
@@ -409,6 +409,7 @@ Runs too fast
 		<description>Jumpman</description>
 		<year>1983</year>
 		<publisher>Epyx</publisher>
+		<info name="usage" value="Hold OPTION key during boot to disable BASIC, requires 32K RAM as minimum" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
 				<rom name="jumpman.atr" size="92176" crc="290a9e56" sha1="96c411a65cfd0b45ac68603021793701d27244b9"/>
@@ -427,6 +428,7 @@ Runs too fast
 ]]></notes>
 		<info name="serial" value="64712" />
 
+		<info name="usage" value="Hold OPTION key during boot to disable BASIC" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92160">
 				<rom name="elektraglide.xfd" size="92160" crc="96185b1c" sha1="fb9825a432b83a2a7e623a2f617d0fa11de08158"/>

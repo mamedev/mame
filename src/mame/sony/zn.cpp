@@ -13,20 +13,8 @@
 #include "emu.h"
 #include "zn.h"
 
-#define VERBOSE_LEVEL ( 0 )
-
-inline void ATTR_PRINTF(3,4) zn_state::verboselog( int n_level, const char *s_fmt, ... )
-{
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror( "%s: %s", machine().describe_context(), buf );
-	}
-}
+#define VERBOSE ( 0 )
+#include "logmacro.h"
 
 void zn_state::machine_start()
 {
@@ -48,13 +36,13 @@ inline void zn_state::psxwriteword( uint32_t *p_n_psxram, uint32_t n_address, ui
 
 uint8_t zn_state::znsecsel_r(offs_t offset, uint8_t mem_mask)
 {
-	verboselog(2, "znsecsel_r( %08x, %08x )\n", offset, mem_mask );
+	LOG("%s: znsecsel_r( %08x, %08x )\n", machine().describe_context(), offset, mem_mask);
 	return m_n_znsecsel;
 }
 
 void zn_state::znsecsel_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	verboselog(2, "znsecsel_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	LOG("%s: znsecsel_w( %08x, %08x, %08x )\n", machine().describe_context(), offset, data, mem_mask);
 
 	if (m_cat702[0]) m_cat702[0]->write_select(BIT(data, 2));
 	if (m_cat702[1]) m_cat702[1]->write_select(BIT(data, 3));
@@ -112,7 +100,7 @@ uint8_t zn_state::boardconfig_r()
 
 uint16_t zn_state::unknown_r(offs_t offset, uint16_t mem_mask)
 {
-	verboselog(0, "unknown_r( %08x, %08x )\n", offset, mem_mask );
+	logerror("%s: unknown_r( %08x, %08x )\n", machine().describe_context(), offset, mem_mask);
 	return 0xffff;
 }
 
@@ -126,7 +114,7 @@ void zn_state::coin_w(uint8_t data)
 	*/
 	if( ( data & ~0x23 ) != 0 )
 	{
-		verboselog(0, "coin_w %08x\n", data );
+		logerror("%s: coin_w %08x\n", machine().describe_context(), data );
 	}
 }
 
@@ -364,7 +352,7 @@ Notes:
 uint16_t capcom_zn_state::kickharness_r(offs_t offset, uint16_t mem_mask)
 {
 	/* required for buttons 4,5&6 */
-	verboselog(2, "capcom_kickharness_r( %08x, %08x )\n", offset, mem_mask );
+	LOG("%s: capcom_kickharness_r( %08x, %08x )\n", machine().describe_context(), offset, mem_mask);
 	return 0xffff;
 }
 
@@ -831,7 +819,7 @@ Notes:
 
 void taito_fx_state::bank_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	verboselog(1, "bank_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	LOG("%s: bank_w( %08x, %08x, %08x )\n", machine().describe_context(), offset, data, mem_mask);
 
 	m_mb3773->write_line_ck((data & 0x20) >> 5);
 
@@ -1143,7 +1131,7 @@ uint16_t primrag2_state::vt83c461_16_r(offs_t offset, uint16_t mem_mask)
 	}
 	else
 	{
-		logerror( "unhandled 16 bit read %04x %04x\n", offset, mem_mask );
+		logerror( "unhandled 16 bit read %04x %04x\n", offset, mem_mask);
 		return 0xffff;
 	}
 }
@@ -1166,7 +1154,7 @@ void primrag2_state::vt83c461_16_w(offs_t offset, uint16_t data, uint16_t mem_ma
 	}
 	else
 	{
-		logerror( "unhandled 16 bit write %04x %04x %04x\n", offset, data, mem_mask );
+		logerror("%s: unhandled 16 bit write %04x %04x %04x\n", machine().describe_context(), offset, data, mem_mask);
 	}
 }
 
@@ -1184,14 +1172,14 @@ uint16_t primrag2_state::vt83c461_32_r(offs_t offset, uint16_t mem_mask)
 	}
 	else
 	{
-		logerror( "unhandled 32 bit read %04x %04x\n", offset, mem_mask );
+		logerror("%s: unhandled 32 bit read %04x %04x\n", machine().describe_context(), offset, mem_mask);
 		return 0xffff;
 	}
 }
 
 void primrag2_state::vt83c461_32_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	logerror( "unhandled 32 bit write %04x %04x %04x\n", offset, data, mem_mask );
+	logerror("%s: unhandled 32 bit write %04x %04x %04x\n", machine().describe_context(), offset, data, mem_mask);
 }
 
 void primrag2_state::machine_start()
@@ -1808,12 +1796,12 @@ WRITE_LINE_MEMBER(jdredd_state::vblank)
 
 void acclaim_zn_state::acpsx_00_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	verboselog(0, "acpsx_00_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	logerror("%s: acpsx_00_w( %08x, %08x, %08x )\n", machine().describe_context(), offset, data, mem_mask);
 }
 
 void nbajamex_state::bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	verboselog(0, "bank_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	LOG("%s: bank_w( %08x, %08x, %08x )\n", machine().describe_context(), offset, data, mem_mask);
 
 	if (offset > 1)
 	{
@@ -1850,7 +1838,7 @@ void nbajamex_state::bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void acclaim_zn_state::acpsx_10_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	verboselog(0, "acpsx_10_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	logerror("%s: acpsx_10_w( %08x, %08x, %08x )\n", machine().describe_context(), offset, data, mem_mask);
 }
 
 // all 16 bits goes to the external soundboard's latch (see sound test menu)
@@ -1862,13 +1850,13 @@ void nbajamex_state::sound_80_w(uint16_t data)
 uint16_t nbajamex_state::sound_08_r(offs_t offset, uint16_t mem_mask)
 {
 	// Sound related
-	verboselog(0, "nbajamex_08_r( %08x, %08x, %08x )\n", offset, 0, mem_mask );
+	logerror("%s: nbajamex_08_r( %08x, %08x, %08x )\n", machine().describe_context(), offset, 0, mem_mask);
 	return 0x400;
 }
 
 uint16_t nbajamex_state::sound_80_r(offs_t offset, uint16_t mem_mask)
 {
-	verboselog(0, "nbajamex_80_r( %08x, %08x, %08x )\n", offset, 0, mem_mask );
+	logerror("%s: nbajamex_80_r( %08x, %08x, %08x )\n", machine().describe_context(), offset, 0, mem_mask);
 	return 0xffff;
 }
 
@@ -2362,7 +2350,7 @@ Notes:
 
 void tecmo_zn_state::bank_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	verboselog(1, "bank_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	LOG("%s: bank_w( %08x, %08x, %08x )\n", machine().describe_context(), offset, data, mem_mask);
 	m_rombank->set_entry( data );
 }
 

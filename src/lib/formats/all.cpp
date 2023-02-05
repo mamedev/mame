@@ -336,6 +336,10 @@
 #include "hti_tape.h"
 #endif
 
+#ifdef HAS_FORMATS_HP300_DSK
+#include "hp300_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_HPI_DSK
 #include "hpi_dsk.h"
 #endif
@@ -720,6 +724,10 @@
 #include "fs_fat.h"
 #endif
 
+#ifdef HAS_FORMATS_FS_HPLIF
+#include "fs_hplif.h"
+#endif
+
 #ifdef HAS_FORMATS_FS_ISIS
 #include "fs_isis.h"
 #endif
@@ -867,11 +875,17 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #ifdef HAS_FORMATS_APOLLO_DSK
 	en.add(FLOPPY_APOLLO_FORMAT); // apollo_dsk.h
 #endif
+#ifdef HAS_FORMATS_HP300_DSK
+	en.add(FLOPPY_HP300_FORMAT); // hp300_dsk.h
+#endif
 #ifdef HAS_FORMATS_HP_IPC_DSK
 	en.add(FLOPPY_HP_IPC_FORMAT); // hp_ipc_dsk.h
 #endif
 #ifdef HAS_FORMATS_HPI_DSK
 	en.add(FLOPPY_HPI_FORMAT); // hpi_dsk.h
+#endif
+#ifdef HAS_FORMATS_FS_HPLIF
+	en.add(fs::HPLIF); // fs_lif.h
 #endif
 
 	en.category("Applix");

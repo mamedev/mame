@@ -12,8 +12,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_INCLUDES_REDALERT_H
-#define MAME_INCLUDES_REDALERT_H
+#ifndef MAME_IREM_REDALERT_H
+#define MAME_IREM_REDALERT_H
 
 #pragma once
 
@@ -82,4 +82,4 @@ private:
 	u8 m_demoneye_bitmap_yoffs = 0;
 };
 
-#endif // MAME_INCLUDES_REDALERT_H
+#endif // MAME_IREM_REDALERT_H

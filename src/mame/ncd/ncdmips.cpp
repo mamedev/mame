@@ -20,6 +20,9 @@
 #include "machine/mc68681.h"
 #include "screen.h"
 
+
+namespace {
+
 class ncd_mips_state : public driver_device
 {
 public:
@@ -51,31 +54,10 @@ private:
 	u32 unk_r();
 	void tty_w(u32 data);
 
-	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
-
 //  u32 m_palette[256];
 //  u8 m_r, m_g, m_b, m_entry, m_stage;
 };
 
-
-#define VERBOSE_LEVEL ( 0 )
-
-#define ENABLE_VERBOSE_LOG (0)
-
-inline void ATTR_PRINTF(3,4) ncd_mips_state::verboselog( int n_level, const char *s_fmt, ... )
-{
-#if ENABLE_VERBOSE_LOG
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror("%s: %s", machine().describe_context(), buf);
-	}
-#endif
-}
 
 void ncd_mips_state::machine_reset()
 {
@@ -151,6 +133,9 @@ ROM_START( hmxpro )
 	ROM_LOAD16_BYTE( "ncdhmx_bm_v2.7.2_b0e.bin", 0x000000, 0x020000, CRC(66072e5c) SHA1(a12dbd3befda55f755e684ba6e5c3b067f2ded93) )
 	ROM_LOAD16_BYTE( "ncdhmx_bm_v2.7.2_b0o.bin", 0x000001, 0x020000, CRC(7f7af795) SHA1(5b31bda8cb42dfb52869d29637fe415e43aa53f4) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT               COMPANY                 FULLNAME           FLAGS
 COMP( 1994, hmxpro, 0,      0,        hmxpro, hmxpro, ncd_mips_state,  empty_init,   "Network Computing Devices", "NCD HMX PRO", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

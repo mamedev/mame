@@ -131,6 +131,8 @@ Notes:
 #include "speaker.h"
 
 
+namespace {
+
 class sigmab98_base_state : public driver_device
 {
 public:
@@ -162,7 +164,7 @@ protected:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sammymdl);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(screen_vblank_sammymdl);
 
 	// Required devices
 	required_device<screen_device> m_screen;
@@ -2274,6 +2276,9 @@ void sammymdl_state::init_haekaka()
 	// force jump out of BIOS loop
 	rom[0x005ac] = 0xc3;
 }
+
+} // anonymous namespace
+
 
 /***************************************************************************
 

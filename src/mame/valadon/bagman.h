@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_BAGMAN_H
-#define MAME_INCLUDES_BAGMAN_H
+#ifndef MAME_VALADON_BAGMAN_H
+#define MAME_VALADON_BAGMAN_H
 
 #pragma once
 
@@ -159,4 +159,4 @@ private:
 #define VBEND               (0x10)
 #define VBSTART             (0xf0)
 
-#endif // MAME_INCLUDES_BAGMAN_H
+#endif // MAME_VALADON_BAGMAN_H
