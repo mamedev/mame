@@ -788,7 +788,7 @@ uint8_t ncr53c90_device::tcounter_lo_r()
 
 void ncr53c90_device::tcount_lo_w(uint8_t data)
 {
-	tcount = (tcount & ~0xff) | data;
+	tcount = (tcount & ~uint32_t(0xff)) | data;
 	LOG("tcount_lo_w %02x (%s)\n", data, machine().describe_context());
 }
 
@@ -800,7 +800,7 @@ uint8_t ncr53c90_device::tcounter_hi_r()
 
 void ncr53c90_device::tcount_hi_w(uint8_t data)
 {
-	tcount = (tcount & ~0xff00) | (data << 8);
+	tcount = (tcount & ~uint32_t(0xff00)) | (uint32_t(data) << 8);
 	LOG("tcount_hi_w %02x (%s)\n", data, machine().describe_context());
 }
 
@@ -1389,6 +1389,6 @@ uint8_t ncr53c94_device::tcounter_hi2_r()
 
 void ncr53c94_device::tcount_hi2_w(uint8_t data)
 {
-	tcount = (tcount & ~0xff0000) | (data << 16);
+	tcount = (tcount & ~uint32_t(0xff0000)) | (uint32_t(data) << 16);
 	LOG("tcount_hi2_w %02x (%s)\n", data, machine().describe_context());
 }
