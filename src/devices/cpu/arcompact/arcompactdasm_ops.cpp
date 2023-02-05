@@ -6,8 +6,7 @@
 \*********************************/
 
 #include "emu.h"
-
-#include "arcompactdasm.h"
+#include "arcompactdasm_internal.h"
 
 
 /************************************************************************************************************************************
@@ -25,10 +24,10 @@ int arcompact_disassembler::handle04_f_a_b_c_helper_dasm(std::ostream &stream, o
 	uint32_t limm = 0;
 	int got_limm = 0;
 
-	uint8_t breg = dasm_common32_get_breg(op);
-	bool F = dasm_common32_get_F(op);
-	uint8_t creg = dasm_common32_get_creg(op);
-	uint8_t areg = dasm_common32_get_areg(op);
+	uint8_t breg = common32_get_breg(op);
+	bool F = common32_get_F(op);
+	uint8_t creg = common32_get_creg(op);
+	uint8_t areg = common32_get_areg(op);
 
 	util::stream_format(stream, "%s%s", optext, flagbit[F ? 1:0]);
 
@@ -94,10 +93,10 @@ int arcompact_disassembler::handle04_f_a_b_u6_helper_dasm(std::ostream &stream, 
 	uint32_t limm = 0;
 //  int got_limm = 0;
 
-	uint8_t breg = dasm_common32_get_breg(op);
-	bool F = dasm_common32_get_F(op);
-	uint32_t u = dasm_common32_get_u6(op);
-	uint8_t areg = dasm_common32_get_areg(op);
+	uint8_t breg = common32_get_breg(op);
+	bool F = common32_get_F(op);
+	uint32_t u = common32_get_u6(op);
+	uint8_t areg = common32_get_areg(op);
 
 	util::stream_format(stream, "%s%s", optext, flagbit[F ? 1:0]);
 
@@ -149,9 +148,9 @@ int arcompact_disassembler::handle04_f_b_b_s12_helper_dasm(std::ostream &stream,
 	uint32_t limm;
 	//int got_limm = 0;
 
-	uint8_t breg = dasm_common32_get_breg(op);
-	bool F = dasm_common32_get_F(op);
-	uint32_t S = dasm_common32_get_s12(op);
+	uint8_t breg = common32_get_breg(op);
+	bool F = common32_get_F(op);
+	uint32_t S = common32_get_s12(op);
 
 	util::stream_format(stream, "%s%s", optext, flagbit[F ? 1:0]);
 
@@ -181,10 +180,10 @@ int arcompact_disassembler::handle04_cc_f_b_b_c_helper_dasm(std::ostream &stream
 	uint32_t limm = 0;
 	int got_limm = 0;
 
-	uint8_t breg = dasm_common32_get_breg(op);
-	bool F = dasm_common32_get_F(op);
-	uint8_t condition = dasm_common32_get_condition(op);
-	uint8_t creg = dasm_common32_get_creg(op);
+	uint8_t breg = common32_get_breg(op);
+	bool F = common32_get_F(op);
+	uint8_t condition = common32_get_condition(op);
+	uint8_t creg = common32_get_creg(op);
 
 	util::stream_format(stream, "%s%s%s", optext, conditions[condition], flagbit[F ? 1:0]);
 
@@ -227,10 +226,10 @@ int arcompact_disassembler::handle04_cc_f_b_b_u6_helper_dasm(std::ostream &strea
 	uint32_t limm;
 	//int got_limm = 0;
 
-	uint8_t breg = dasm_common32_get_breg(op);
-	bool F = dasm_common32_get_F(op);
-	uint8_t condition = dasm_common32_get_condition(op);
-	uint32_t u = dasm_common32_get_u6(op);
+	uint8_t breg = common32_get_breg(op);
+	bool F = common32_get_F(op);
+	uint8_t condition = common32_get_condition(op);
+	uint32_t u = common32_get_u6(op);
 
 	util::stream_format(stream, "%s%s%s", optext, conditions[condition], flagbit[F ? 1:0]);
 
@@ -270,7 +269,7 @@ int arcompact_disassembler::handle04_p11_helper_dasm(std::ostream &stream, offs_
 
 int arcompact_disassembler::handle04_helper_dasm(std::ostream &stream, offs_t pc, uint32_t op, const data_buffer &opcodes, const char* optext, int ignore_dst, int b_reserved)
 {
-	uint8_t p = dasm_common32_get_p(op);
+	uint8_t p = common32_get_p(op);
 
 	switch (p)
 	{
@@ -284,25 +283,25 @@ int arcompact_disassembler::handle04_helper_dasm(std::ostream &stream, offs_t pc
 }
 
 
-int arcompact_disassembler::handle_dasm_illegal(std::ostream& stream, offs_t pc, uint8_t param1, uint8_t param2, uint32_t op, const data_buffer& opcodes)
+int arcompact_disassembler::handle::dasm_illegal(std::ostream& stream, offs_t pc, uint8_t param1, uint8_t param2, uint32_t op, const data_buffer& opcodes)
 {
 	util::stream_format(stream, "<illegal 0x%02x_%02x> (%08x)\n", param1, param2, op);
 	return 4;
 }
 
-int arcompact_disassembler::handle_dasm_illegal(std::ostream& stream, offs_t pc, uint8_t param1, uint8_t param2, uint8_t param3, uint32_t op, const data_buffer& opcodes)
+int arcompact_disassembler::handle::dasm_illegal(std::ostream& stream, offs_t pc, uint8_t param1, uint8_t param2, uint8_t param3, uint32_t op, const data_buffer& opcodes)
 {
 	util::stream_format(stream, "<illegal 0x%02x_%02x_%02x> (%08x)\n", param1, param2, param3, op);
 	return 4;
 }
 
-int arcompact_disassembler::handle_dasm_illegal(std::ostream& stream, offs_t pc, uint8_t param1, uint8_t param2, uint8_t param3, uint8_t param4, uint32_t op, const data_buffer& opcodes)
+int arcompact_disassembler::handle::dasm_illegal(std::ostream& stream, offs_t pc, uint8_t param1, uint8_t param2, uint8_t param3, uint8_t param4, uint32_t op, const data_buffer& opcodes)
 {
 	util::stream_format(stream, "<illegal 0x%02x_%02x_%02x_%02x> (%08x)\n", param1, param2, param3, param4, op);
 	return 4;
 }
 
-int arcompact_disassembler::handle_dasm_reserved(std::ostream& stream, offs_t pc, uint8_t param1, uint8_t param2, uint8_t param3, uint8_t param4, uint32_t op, const data_buffer& opcodes)
+int arcompact_disassembler::handle::dasm_reserved(std::ostream& stream, offs_t pc, uint8_t param1, uint8_t param2, uint8_t param3, uint8_t param4, uint32_t op, const data_buffer& opcodes)
 {
 	util::stream_format(stream, "<reserved 0x%02x_%02x_%02x_%02x> (%08x)\n", param1, param2, param3, param4, op);
 	return 4;

@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "arcompact.h"
+#include "arcompact_helper.ipp"
 
 uint32_t arcompact_device::handle_jump_to_addr(bool delay, bool link, uint32_t address, uint32_t next_addr)
 {

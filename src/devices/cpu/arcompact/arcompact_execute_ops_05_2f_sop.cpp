@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "arcompact.h"
+#include "arcompact_helper.ipp"
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // SWAP - Swap words (optional extension on ARCtangent-A5 / ARC600, built in on ARC700)

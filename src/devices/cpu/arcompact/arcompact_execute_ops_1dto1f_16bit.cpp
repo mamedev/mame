@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "arcompact.h"
+#include "arcompact_helper.ipp"
 
 inline uint32_t arcompact_device::branch_common(uint16_t op, bool cond, unsigned width)
 {
