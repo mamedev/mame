@@ -399,10 +399,7 @@ private:
 	inline uint32_t handle_jump_to_register(bool delay, bool link, uint32_t reg, uint32_t next_addr, int flag);
 	inline uint32_t handleop32_Jcc_f_a_b_c_helper(uint32_t op, bool delay, bool link);
 	inline uint32_t handleop32_Jcc_cc_f_b_b_c_helper(uint32_t op, bool delay, bool link);
-	uint32_t handleop32_Jcc(uint32_t op);
-	uint32_t handleop32_Jcc_D(uint32_t op);
-	uint32_t handleop32_JLcc(uint32_t op);
-	uint32_t handleop32_JLcc_D(uint32_t op);
+	uint32_t handleop32_J(uint32_t op, bool delay, bool link);
 
 	// arcompact_execute_ops_04_aux.cpp
 	uint32_t handleop32_LR(uint32_t op);

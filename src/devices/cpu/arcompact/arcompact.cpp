@@ -1215,7 +1215,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // J u6                            0010 0RRR 0110 0000   0RRR uuuu uuRR RRRR
 // J s12                           0010 0RRR 1010 0000   0RRR ssss ssSS SSSS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_Jcc(op);  // Jcc
+						return handleop32_J(op, false, false);  // Jcc
 					}
 					case 0x21:
 					{
@@ -1230,7 +1230,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // J.D s12                         0010 0RRR 1010 0001   0RRR ssss ssSS SSSS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-						return handleop32_Jcc_D(op);  // Jcc.D
+						return handleop32_J(op, true, false);  // Jcc.D
 					}
 					case 0x22:
 					{
@@ -1244,7 +1244,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // JL u6                           0010 0RRR 0110 0010   0RRR uuuu uuRR RRRR
 // JL s12                          0010 0RRR 1010 0010   0RRR ssss ssSS SSSS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_JLcc(op);  // JLcc
+						return handleop32_J(op, false, true);  // JLcc
 					}
 					case 0x23:
 					{
@@ -1256,7 +1256,7 @@ uint32_t arcompact_device::get_instruction(uint32_t op)
 // JL.D u6                         0010 0RRR 0110 0011   0RRR uuuu uuRR RRRR
 // JL.D s12                        0010 0RRR 1010 0011   0RRR ssss ssSS SSSS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-						return handleop32_JLcc_D(op);  // JLcc.D
+						return handleop32_J(op, true, true);  // JLcc.D
 					}
 					case 0x28:
 					{

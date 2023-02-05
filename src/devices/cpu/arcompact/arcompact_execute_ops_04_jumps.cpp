@@ -58,115 +58,18 @@ uint32_t arcompact_device::handle_jump_to_register(bool delay, bool link, uint32
 
 uint32_t arcompact_device::handleop32_Jcc_f_a_b_c_helper(uint32_t op, bool delay, bool link)
 {
-	int size = 4;
 	uint8_t creg = common32_get_creg(op);
-	bool F = common32_get_F(op);
-	if (creg == REG_LIMM)
-	{
-		get_limm_32bit_opcode();
-		size = 8;
-	}
-
-	if (delay)
-	{
-		return handle_jump_to_register(delay, link, creg, m_pc + size, F);
-	}
-	else
-	{
-		if (F)
-		{
-			if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
-			{
-				return handle_jump_to_register(delay, link, creg, m_pc + size, F);
-			}
-			else
-			{
-				// should not use .F unless jumping to ILINK1/2
-				fatalerror("illegal unimplemented J(L)(.D).F (F should not be set) %08x", op);
-			}
-		}
-		else
-		{
-			if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
-			{
-				// should only jumping to ILINK1/2 if .F is set
-				fatalerror("illegal unimplemented J(L)(.D) (F not set) %08x", op);
-			}
-			else
-			{
-				if (link)
-					m_regs[REG_BLINK] = m_pc + size;
-
-				return m_regs[creg];
-			}
-		}
-	}
-
-	return m_pc + size;
+	int size = check_limm(creg);
+	return handle_jump_to_register(delay, link, creg, m_pc + size, common32_get_F(op));
 }
 
 uint32_t arcompact_device::handleop32_Jcc_cc_f_b_b_c_helper(uint32_t op, bool delay, bool link)
 {
-	int size = 4;
 	uint8_t creg = common32_get_creg(op);
-	uint8_t condition = common32_get_condition(op);
-	bool F = common32_get_F(op);
-	uint32_t c;
-
-	if (creg == REG_LIMM)
-	{
-		get_limm_32bit_opcode();
-		size = 8;
-	}
-
-	c = m_regs[creg];
-
-	if (!check_condition(condition))
+	int size = check_limm(creg);
+	if (!check_condition(common32_get_condition(op)))
 		return m_pc + size;
-
-	if (!F)
-	{
-		// if F isn't set then the destination can't be ILINK1 or ILINK2
-		if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
-		{
-			fatalerror("fatal handleop32_J(L)cc_cc_(.D)f_b_b_c J %08x (F not set but ILINK1 or ILINK2 used as dst)", op);
-		}
-		else
-		{
-			if (delay)
-			{
-				fatalerror("unimplemented J(L)cc.D (p11_m0 type, unimplemented) %08x", op);
-			}
-			else
-			{
-				if (link)
-					m_regs[REG_BLINK] = m_pc + size;
-
-				uint32_t realaddress = c;
-				return realaddress;
-			}
-		}
-	}
-	else
-	{
-		// if F is set then the destination MUST be ILINK1 or ILINK2
-		if ((creg == REG_ILINK1) || (creg == REG_ILINK2))
-		{
-			fatalerror("unimplemented handleop32_J(L)cc_(.D)cc_f_b_b_c J %08x (F set)", op);
-		}
-		else
-		{
-			if (delay)
-			{
-				fatalerror("unimplemented J(L)cc.D.F (p11_m0 type, illegal) %08x", op);
-			}
-			else
-			{
-				fatalerror("fatal handleop32_J(L)cc_cc_f_b_b_c J %08x (F set but not ILINK1 or ILINK2 used as dst)", op);
-			}
-		}
-	}
-	return m_pc + size;
+	return handle_jump_to_register(delay, link, creg, m_pc + size, common32_get_F(op));
 }
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -184,40 +87,6 @@ uint32_t arcompact_device::handleop32_Jcc_cc_f_b_b_c_helper(uint32_t op, bool de
 // J u6                            0010 0RRR 0110 0000   0RRR uuuu uuRR RRRR
 // J s12                           0010 0RRR 1010 0000   0RRR ssss ssSS SSSS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-uint32_t arcompact_device::handleop32_Jcc(uint32_t op)
-{
-	switch ((op & 0x00c00000) >> 22)
-	{
-	case 0x00: return handleop32_Jcc_f_a_b_c_helper(op, false, false);
-	case 0x01:
-	{
-		int size = 4;
-		fatalerror("unimplemented J %08x", op);
-		return m_pc + size;
-	}
-	case 0x02:
-	{
-		int size = 4;
-		fatalerror("unimplemented J %08x", op);
-		return m_pc + size;
-	}
-	case 0x03:
-		switch ((op & 0x00000020) >> 5)
-		{
-		case 0x00: return handleop32_Jcc_cc_f_b_b_c_helper(op, false, false);
-		case 0x01:
-		{
-			int size = 4;
-			fatalerror("unimplemented handleop32_Jcc_cc_f_b_b_u6 J %08x (u6)", op);
-			return m_pc + size;
-		}
-		}
-		return 0;
-	}
-	return 0;
-}
-
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                                 IIII I      SS SSSS
 // Jcc.D u6                        0010 0RRR 1110 0001   0RRR uuuu uu1Q QQQQ
@@ -227,40 +96,6 @@ uint32_t arcompact_device::handleop32_Jcc(uint32_t op)
 // J.D u6                          0010 0RRR 0110 0001   0RRR uuuu uuRR RRRR
 // J.D s12                         0010 0RRR 1010 0001   0RRR ssss ssSS SSSS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-uint32_t arcompact_device::handleop32_Jcc_D(uint32_t op)
-{
-	switch ((op & 0x00c00000) >> 22)
-	{
-	case 0x00: return handleop32_Jcc_f_a_b_c_helper(op, true, false);
-	case 0x01:
-	{
-		int size = 4;
-		fatalerror("unimplemented J.D (u6 type) %08x", op);
-		return m_pc + size;
-	}
-	case 0x02:
-	{
-		int size = 4;
-		fatalerror("unimplemented J.D (s12 type) %08x", op);
-		return m_pc + size;
-	}
-	case 0x03:
-		switch ((op & 0x00000020) >> 5)
-		{
-		case 0x00: return handleop32_Jcc_cc_f_b_b_c_helper(op, true, false);
-		case 0x01:
-		{
-			int size = 4;
-			fatalerror("unimplemented handleop32_Jcc_D_cc_f_b_b_u6 J.D %08x (u6)", op);
-			return m_pc + size;
-		}
-		}
-		return 0;
-	}
-	return 0;
-}
-
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                                 IIII I      SS SSSS
 // JLcc [c]                        0010 0RRR 1110 0010   0RRR CCCC CC0Q QQQQ
@@ -271,40 +106,6 @@ uint32_t arcompact_device::handleop32_Jcc_D(uint32_t op)
 // JL u6                           0010 0RRR 0110 0010   0RRR uuuu uuRR RRRR
 // JL s12                          0010 0RRR 1010 0010   0RRR ssss ssSS SSSS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-uint32_t arcompact_device::handleop32_JLcc(uint32_t op)
-{
-	switch ((op & 0x00c00000) >> 22)
-	{
-	case 0x00: return handleop32_Jcc_f_a_b_c_helper(op, false, true);
-	case 0x01:
-	{
-		int size = 4;
-		fatalerror("unimplemented JL %08x", op);
-		return m_pc + size;
-	}
-	case 0x02:
-	{
-		int size = 4;
-		fatalerror("unimplemented JL %08x", op);
-		return m_pc + size;
-	}
-	case 0x03:
-		switch ((op & 0x00000020) >> 5)
-		{
-		case 0x00: return handleop32_Jcc_cc_f_b_b_c_helper(op, false, true);
-		case 0x01:
-		{
-			int size = 4;
-			fatalerror("unimplemented handleop32_JLcc_cc_f_b_b_u6 JL %08x (u6)", op);
-			return m_pc + size;
-		}
-		}
-		return 0;
-	}
-	return 0;
-}
-
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                                 IIII I      SS SSSS
 // JLcc.D u6                       0010 0RRR 1110 0011   0RRR uuuu uu1Q QQQQ
@@ -314,31 +115,31 @@ uint32_t arcompact_device::handleop32_JLcc(uint32_t op)
 // JL.D s12                        0010 0RRR 1010 0011   0RRR ssss ssSS SSSS
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-uint32_t arcompact_device::handleop32_JLcc_D(uint32_t op)
+uint32_t arcompact_device::handleop32_J(uint32_t op, bool delay, bool link)
 {
 	switch ((op & 0x00c00000) >> 22)
 	{
-	case 0x00: return handleop32_Jcc_f_a_b_c_helper(op, true, true);
+	case 0x00: return handleop32_Jcc_f_a_b_c_helper(op, delay, link);
 	case 0x01:
 	{
 		int size = 4;
-		fatalerror("unimplemented JL.D (u6 type) %08x", op);
+		fatalerror("unimplemented Jump (delay %d link %d) (u6 type) %08x", delay ? 1:0, link? 1:0, op);
 		return m_pc + size;
 	}
 	case 0x02:
 	{
 		int size = 4;
-		fatalerror("unimplemented JL.D (s12 type) %08x", op);
+		fatalerror("unimplemented Jump (delay %d link %d) (u12 type) %08x", delay ? 1:0, link? 1:0, op);
 		return m_pc + size;
 	}
 	case 0x03:
 		switch ((op & 0x00000020) >> 5)
 		{
-		case 0x00: return handleop32_Jcc_cc_f_b_b_c_helper(op, true, true);
+		case 0x00: return handleop32_Jcc_cc_f_b_b_c_helper(op, delay, link);
 		case 0x01:
 		{
 			int size = 4;
-			fatalerror("unimplemented handleop32_JLcc_D_cc_f_b_b_u6 JL.D %08x (u6)", op);
+			fatalerror("unimplemented Jump (delay %d link %d) (CC, u6 type) %08x", delay ? 1:0, link? 1:0, op);
 			return m_pc + size;
 		}
 		}
