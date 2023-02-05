@@ -256,7 +256,7 @@ WRITE_LINE_MEMBER( m68340_cpu_device::set_modck )
 
 void m68340_cpu_device::device_start()
 {
-	reset_cb().append(FUNC(m68340_cpu_device::reset_peripherals));
+	reset_cb().append(*this, FUNC(m68340_cpu_device::reset_peripherals));
 
 	fscpu32_device::device_start();
 

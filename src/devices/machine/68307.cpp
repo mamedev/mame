@@ -230,7 +230,7 @@ uint8_t m68307_cpu_device::int_ack(offs_t offset)
 
 void m68307_cpu_device::device_start()
 {
-	reset_cb().append(FUNC(m68307_cpu_device::reset_peripherals));
+	reset_cb().append(*this, FUNC(m68307_cpu_device::reset_peripherals));
 
 	m68000_device::device_start();
 
