@@ -1,5 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_CPU_ARCOMPACT_ARCOMPACT_HELPER_IPP
+#define MAME_CPU_ARCOMPACT_ARCOMPACT_HELPER_IPP
+
+#pragma once
+
+#include "arcompact.h"
+
 
 inline bool arcompact_device::check_condition(uint8_t condition)
 {
@@ -360,3 +367,5 @@ inline uint32_t arcompact_device::handleop32_general_SOP_group(uint32_t op, opha
 	}
 	return 0;
 }
+
+#endif // MAME_CPU_ARCOMPACT_ARCOMPACT_HELPER_IPP

@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "arcompact.h"
+#include "arcompact_helper.ipp"
 
 uint32_t arcompact_device::handleop32_ARC_EXT06(uint32_t op)
 {
