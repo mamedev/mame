@@ -71,7 +71,6 @@
 # USE_SYSTEM_LIB_SQLITE3 = 1
 # USE_SYSTEM_LIB_PORTMIDI = 1
 # USE_SYSTEM_LIB_PORTAUDIO = 1
-# USE_BUNDLED_LIB_SDL2 = 1
 # USE_SYSTEM_LIB_UTF8PROC = 1
 # USE_SYSTEM_LIB_GLM = 1
 # USE_SYSTEM_LIB_RAPIDJSON = 1
@@ -550,14 +549,6 @@ endif
 
 ifdef USE_SYSTEM_LIB_PUGIXML
 PARAMS += --with-system-pugixml='$(USE_SYSTEM_LIB_PUGIXML)'
-endif
-
-# reverse logic for this one
-
-ifdef USE_BUNDLED_LIB_SDL2
-ifneq '$(USE_BUNDLED_LIB_SDL2)' '0'
-PARAMS += --with-bundled-sdl2
-endif
 endif
 
 #-------------------------------------------------
@@ -1561,12 +1552,7 @@ generate: \
 		$(GEN_FOLDERS) \
 		$(GENDIR)/version.cpp \
 		$(patsubst %.po,%.mo,$(call rwildcard, language/, *.po)) \
-		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
-		$(GENDIR)/includes/SDL2
-
-$(GENDIR)/includes/SDL2:
-	-$(call MKDIR,$@)
-	-$(call COPY,3rdparty/SDL2/include,$(GENDIR)/includes/SDL2)
+		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS))
 
 ifneq ($(NEW_GIT_VERSION),$(OLD_GIT_VERSION))
 stale:
