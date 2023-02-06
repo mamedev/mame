@@ -1058,12 +1058,8 @@ void via6522_device::write(offs_t offset, u8 data)
 		break;
 
 	case VIA_IFR:
-		if (data & INT_ANY)
-		{
-			data = 0x7f;
-		}
 		LOGINT("IFR INT ");
-		clear_int(data);
+		clear_int(data & 0x7f);
 		break;
 	}
 }
