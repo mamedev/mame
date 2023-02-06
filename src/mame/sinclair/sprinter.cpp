@@ -158,6 +158,7 @@ private:
 	void accel_control_r(u8 data);
 	void accel_r_tap(offs_t offset, u8 &data);
 	void accel_w_tap(offs_t offset, u8 &data);
+	u8 &accel_buffer(u8 idx);
 	void update_accel_buffer(u8 idx, u8 data);
 
 	void on_kbd_data(int state);
@@ -183,6 +184,7 @@ private:
 
 	bool m_z80_m1;
 	u16 m_timer_overlap;
+	bool m_wait_requested;
 	std::queue<std::pair<u16, u16>> m_ints;
 
 	bool m_starting;
@@ -214,6 +216,10 @@ private:
 	u8 m_prf_d;
 	u16 m_accel_buffer_size;
 	u8 m_accel_buffer[256] = {};
+	bool m_alt_acc;
+	u16 m_aagr;
+	u8 m_xcnt;
+	u8 m_xagr;
 	accel_state m_accel_state;
 	accel_state m_accel_mode;
 	emu_timer *m_waits_burner = nullptr;
@@ -713,6 +719,14 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		update_memory();
 		break;
 
+	case 0xc7:
+	case 0xcf:
+		m_alt_acc = 1;
+		m_aagr = (offset & 0x300) | data;
+		m_xcnt = BIT(offset, 10, 6);
+		m_xagr = 0;
+		break;
+
 	case 0xd0 ... 0xef:
 		update_memory();
 		break;
@@ -856,7 +870,7 @@ void sprinter_state::accel_w_tap(offs_t offset, u8 &data)
 				const u16 addr = offset + i;
 				if ((m_pages[addr >> 14] & BANK_RAM_MASK) && (~m_pages[addr >> 14] & BANK_WRDISBL_MASK))
 				{
-					data = m_accel_buffer[i];
+					data = accel_buffer(i);
 					ram_w(addr, data);
 				}
 			}
@@ -866,7 +880,7 @@ void sprinter_state::accel_w_tap(offs_t offset, u8 &data)
 			LOGACCEL("Accel wCOPY_VERT: %02x (%x)\n", offset, m_port_y);
 			for (auto i = 0; i < m_accel_buffer_size; i++)
 			{
-				data = m_accel_buffer[i];
+				data = accel_buffer(i);
 				ram_w(offset, data);
 				m_port_y++;
 			}
@@ -878,21 +892,35 @@ void sprinter_state::accel_w_tap(offs_t offset, u8 &data)
 	}
 }
 
+u8 &sprinter_state::accel_buffer(u8 idx)
+{
+	u8 ram_adr = idx;
+	if (m_alt_acc)
+	{
+		ram_adr = m_xcnt;
+		const u16 xcnt_agr = ((m_xcnt << 8) | m_xagr) + m_aagr;
+		m_xcnt = xcnt_agr >> 8;
+		m_xagr = xcnt_agr & 0xff;
+	}
+
+	return m_accel_buffer[ram_adr];
+}
+
 void sprinter_state::update_accel_buffer(u8 idx, u8 data)
 {
 	switch (m_accel_mode)
 	{
 	case MODE_AND:
-		m_accel_buffer[idx] &= data;
+		accel_buffer(idx) &= data;
 		break;
 	case MODE_OR:
-		m_accel_buffer[idx] |= data;
+		accel_buffer(idx) |= data;
 		break;
 	case MODE_XOR:
-		m_accel_buffer[idx] ^= data;
+		accel_buffer(idx) ^= data;
 		break;
 	case MODE_NOP:
-		m_accel_buffer[idx] = data;
+		accel_buffer(idx) = data;
 		break;
 	default:
 		assert(false);
@@ -1130,6 +1158,7 @@ void sprinter_state::machine_reset()
 	m_cbl_timer->adjust(attotime::never);
 	m_waits_burner->adjust(attotime::never);
 	m_timer_overlap = 0;
+	m_wait_requested = false;
 
 	spectrum_128_state::machine_reset();
 
@@ -1148,6 +1177,7 @@ void sprinter_state::machine_reset()
 	m_skip_write = false;
 	m_prf_d = false;
 	m_accel_state = OFF;
+	m_alt_acc = 0;
 
 	m_cbl_xx = 0;
 	m_cbl_wa = 0;
@@ -1216,7 +1246,11 @@ void sprinter_state::do_cpu_wait(u8 count)
 		m_timer_overlap -= allowed;
 		if (m_timer_overlap)
 		{
-			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+			if (!m_wait_requested)
+			{
+				m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+				m_wait_requested = true;
+			}
 			m_waits_burner->adjust(m_maincpu->cycles_to_attotime(m_timer_overlap));
 		}
 	}
@@ -1232,6 +1266,7 @@ TIMER_CALLBACK_MEMBER(sprinter_state::irq_on)
 TIMER_CALLBACK_MEMBER(sprinter_state::wait_exit)
 {
 	m_timer_overlap = 0;
+	m_wait_requested = false;
 	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 }
 
