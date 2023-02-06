@@ -145,4 +145,4 @@ ROM_END
 
 //    YEAR  NAME       PARENT MACHINE    INPUT      CLASS            INIT        ROT   COMPANY      FULLNAME        FLAGS
 GAME( 1990, multibaby, 0,     multibaby, multibaby, multibaby_state, empty_init, ROT0, "Oper Coin", "Multi Baby",   MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 19??, spirulo,   0,     spirulo,   spirulo,   multibaby_state, empty_init, ROT0, "Oper Coin", "Super Pirulo", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1988, spirulo,   0,     spirulo,   spirulo,   multibaby_state, empty_init, ROT0, "Oper Coin", "Super Pirulo", MACHINE_IS_SKELETON_MECHANICAL ) // Year from legal registry date
