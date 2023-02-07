@@ -37,6 +37,7 @@ DEFINE_DEVICE_TYPE(RTC9701, rtc9701_device, "rtc9701", "Epson RTC-9701-JE RTC/EE
 rtc9701_device::rtc9701_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RTC9701, tag, owner, clock)
 	, device_nvram_interface(mconfig, *this)
+	, device_rtc_interface(mconfig, *this)
 	, m_latch(0)
 	, m_reset_line(CLEAR_LINE)
 	, m_clock_line(CLEAR_LINE)
@@ -95,17 +96,6 @@ void rtc9701_device::device_start()
 	m_timer = timer_alloc(FUNC(rtc9701_device::timer_callback), this);
 	m_timer->adjust(attotime::from_hz(clock() / XTAL(32'768)), 0, attotime::from_hz(clock() / XTAL(32'768)));
 
-	system_time systime;
-	machine().base_datetime(systime);
-
-	m_rtc.day = ((systime.local_time.mday / 10)<<4) | ((systime.local_time.mday % 10) & 0xf);
-	m_rtc.month = (((systime.local_time.month+1) / 10) << 4) | (((systime.local_time.month+1) % 10) & 0xf);
-	m_rtc.wday = 1 << systime.local_time.weekday;
-	m_rtc.year = (((systime.local_time.year % 100)/10)<<4) | ((systime.local_time.year % 10) & 0xf);
-	m_rtc.hour = ((systime.local_time.hour / 10)<<4) | ((systime.local_time.hour % 10) & 0xf);
-	m_rtc.min = ((systime.local_time.minute / 10)<<4) | ((systime.local_time.minute % 10) & 0xf);
-	m_rtc.sec = ((systime.local_time.second / 10)<<4) | ((systime.local_time.second % 10) & 0xf);
-
 	rtc_state = state_t::CMD_WAIT;
 	cmd_stream_pos = 0;
 	current_cmd = 0;
@@ -128,6 +118,22 @@ void rtc9701_device::device_start()
 	save_item(NAME(m_rtc.wday));
 	save_item(NAME(m_rtc.month));
 	save_item(NAME(m_rtc.year));
+}
+
+
+//-------------------------------------------------
+//  rtc_clock_updated - update clock with real time
+//-------------------------------------------------
+
+void rtc9701_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	m_rtc.day = ((day / 10)<<4) | ((day % 10) & 0xf);
+	m_rtc.month = ((month / 10) << 4) | ((month % 10) & 0xf);
+	m_rtc.wday = 1 << (day_of_week - 1);
+	m_rtc.year = (((year % 100)/10)<<4) | ((year % 10) & 0xf);
+	m_rtc.hour = ((hour / 10)<<4) | ((hour % 10) & 0xf);
+	m_rtc.min = ((minute / 10)<<4) | ((minute % 10) & 0xf);
+	m_rtc.sec = ((second / 10)<<4) | ((second % 10) & 0xf);
 }
 
 
