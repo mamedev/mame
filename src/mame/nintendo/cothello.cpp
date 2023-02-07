@@ -31,6 +31,7 @@ TODO:
 - It's not known if the screen is color or B&W + overlay, but since the video
   chip is meant for a color tv, let's assume the green tint is from the screen
   itself. Photos of the home version also show a green tint.
+- Is Universal's "Computer R-3" a modified version of this game?
 
 *******************************************************************************/
 
@@ -203,7 +204,7 @@ void cothello_state::sound_w(u8 data)
 
 void cothello_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0bff).rom();
+	map(0x0000, 0x0fff).rom();
 	map(0x4000, 0x40ff).ram();
 	map(0x6000, 0x6000).r(FUNC(cothello_state::input_r));
 	map(0x8000, 0x8000).w(FUNC(cothello_state::sound_w));

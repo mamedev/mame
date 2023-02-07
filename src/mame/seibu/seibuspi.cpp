@@ -1880,7 +1880,7 @@ void seibuspi_state::sxx2e(machine_config &config)
 	config.device_remove("soundfifo2");
 
 	/* sound hardware */
-	 // Single PCBs only output mono sound, SXX2E : unverified
+	// Single PCBs only output mono sound, SXX2E : unverified
 	config.device_remove("lspeaker");
 	config.device_remove("rspeaker");
 	SPEAKER(config, "mono").front_center();

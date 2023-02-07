@@ -27,6 +27,7 @@ known chips:
  @080     uPD553C  1980, Epoch Electronic Football
  *084     uPD553C  1980, Bandai Gunfighter
  *102     uPD553C  1981, Bandai Block Out
+ *103     uPD553C  1981, Bandai Galaxian
  @153     uPD553C  1981, Epoch Galaxy II
  @160     uPD553C  1982, Tomy Pac Man (TN-08)
  *167     uPD553C  1982, Sony SL models (betamax) (have dump)
