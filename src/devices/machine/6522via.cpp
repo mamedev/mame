@@ -11,17 +11,6 @@
 
 **********************************************************************/
 
-/*
-  1999-Dec-22 PeT
-   vc20 random number generation only partly working
-   (reads (uninitialized) timer 1 and timer 2 counter)
-   timer init, reset, read changed
-
-  2017-Feb-15 Edstrom
-   Fixed shift registers to be more accurate, eg 50/50 duty cycle, latching
-   on correct edges and leading and trailing edges added + logging.
- */
-
 #include "emu.h"
 #include "6522via.h"
 
