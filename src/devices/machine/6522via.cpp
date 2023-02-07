@@ -649,6 +649,7 @@ u8 via6522_device::read(offs_t offset)
 	case VIA_PA:
 		/* update the input */
 		if ((PA_LATCH_ENABLE(m_acr) != 0) && ((m_ifr & INT_CA1) != 0))
+		{
 			val = m_latch_a;
 		}
 		else
@@ -676,6 +677,7 @@ u8 via6522_device::read(offs_t offset)
 	case VIA_PANH:
 		/* update the input */
 		if ((PA_LATCH_ENABLE(m_acr) != 0) && ((m_ifr & INT_CA1) != 0))
+		{
 			val = m_latch_a;
 		}
 		else
