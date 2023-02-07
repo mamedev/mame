@@ -803,7 +803,7 @@ apple2gsmt                      // 1991 "Mark Twain" prototype
 apple3                          // May 1980 Apple ///
 
 @source:apple/imacg3.cpp
-imac							// August 15, 1998 Apple iMac (Bondi blue)
+imac                            // August 15, 1998 Apple iMac (Bondi blue)
 
 @source:apple/iphone2g.cpp
 iphone2g                        // (c) 2007 Apple
@@ -891,7 +891,7 @@ mp2000
 mp2100
 
 @source:apple/powermacg3.cpp
-pwrmacg3						// November 10, 1997 Apple Power Macintosh G3 (beige)
+pwrmacg3                        // November 10, 1997 Apple Power Macintosh G3 (beige)
 
 @source:apple/superga2.cpp
 kuzmich
@@ -29554,6 +29554,7 @@ amuse1                          // (c) 1982 Greyhound Electronics
 amuse1a                         // (c) 1983 Greyhound Electronics
 bigjoke                         // (c) 1987 Greyhound Electronics
 findout                         // (c) 1987 [Elettronolo]
+findouta                        // (c) 1989 [Elettronolo]
 geimulti                        // (c) 1992 Grayhound Electronics
 gepoker                         // (c) 1984 Greyhound Electronics
 gepoker1                        // (c) 1984 Greyhound Electronics
