@@ -90,10 +90,6 @@ void arcompact_device::check_interrupts()
 			m_AUX_IRQ_LV12 |= 0x00000002;
 			take_irq(vector);
 		}
-		else
-		{
-			fatalerror("illegal IRQ level\n");
-		}
 	}
 }
 
