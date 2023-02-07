@@ -1613,7 +1613,7 @@ ROM_START( findout )
 	ROM_LOAD( "16.bin",       0x28000, 0x8000, CRC(143f9ac8) SHA1(4411e8ba853d7d5c032115ce23453362ab82e9bb) )
 	ROM_LOAD( "17.bin",       0x30000, 0x8000, CRC(dd743bc7) SHA1(63f7e01ac5cda76a1d3390b6b83f4429b7d3b781) )
 
-	ROM_REGION( 0x0200, "gfx2", 0 )
+	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.bin",   0x0000, 0x0200, CRC(f3b663bb) SHA1(5a683951c8d3a2baac4b49e379d6e10e35465c8a) )    /* unknown */
 
 	ROM_REGION( 0x0800, "nvram", 0 )
@@ -1621,6 +1621,49 @@ ROM_START( findout )
 
 	ROM_REGION( 0x0008, "signature", 0 ) // bytes 0x03 through 0x0a of each question ROM - to prevent ROM swaps
 	ROM_LOAD( "findout.sig",   0x0000, 0x0008, CRC(c8e944a3) SHA1(d34de9e3163ba61fa4e4f2264caff40434fcc9b0) )
+ROM_END
+
+/*
+findouta's 0.bin has 2 bytes changed compared to 12.bin in findout:
+
+findout:  12.bin  0x1bd3:37 & 0x3fff:28
+findouta: 0.bin   0x1bd3:39 & 0x3fff:26
+
+Changes the copyright year from 1987 to 1989 and balances out the checksum
+
+*/
+ROM_START( findouta ) /* PCB marked: 100686A QUIZ 1986 LATO COMP  (copy of a Greyhound PCB) */
+	ROM_REGION( 0x38000, "maincpu", 0 )
+	ROM_LOAD( "0",          0x00000, 0x4000, CRC(4d1306a0) SHA1(cc403c280a2cefbe943e6e0e4d7ee42e339a274d) )
+	ROM_LOAD( "rom",        0x08000, 0x2000, CRC(0014282c) SHA1(c6792f2ff712ba3759ff009950d78750df844d01) )   /* banked */
+	ROM_LOAD( "sport.1",    0x10000, 0x2000, CRC(6139b2d7) SHA1(1aa5b25a7807806f6018cedf91f95f9172750867) )   /* banked ROMs for solution data */
+	ROM_LOAD( "basket.2",   0x18000, 0x2000, CRC(7cc369e0) SHA1(b589707c8186a661f6565a5ae164d7169b9493d8) )   /* smaller question ROMs - HH482764G */
+	ROM_LOAD( "cinema.3",   0x20000, 0x2000, CRC(65d78d41) SHA1(200ffb837dce352349842c37e0a3ebd8234ad254) )
+	ROM_LOAD( "musica.4",   0x28000, 0x2000, CRC(a063f7bf) SHA1(15c82b188e730a89eead0d4c74c916a58733be66) )
+	ROM_LOAD( "calcio_a.5", 0x30000, 0x2000, CRC(60839c64) SHA1(5269e76f890b285768417f8e58609162c913c271) )
+
+	ROM_REGION( 0x0e00, "proms", 0 ) /* unknown, all on main PCB */
+	ROM_LOAD( "am27s29.6f", 0x0000, 0x0200, CRC(19e3f161) SHA1(52da3c1e50c2329454de14cb9c46149e573e562b) )
+	ROM_LOAD( "am27s13.4g", 0x0200, 0x0200, CRC(71df3345) SHA1(3d64c47b2ce093afad56d8963c151a7854451236) ) // all 6 from here on have identical contents
+	ROM_LOAD( "am27s13.4l", 0x0400, 0x0200, CRC(71df3345) SHA1(3d64c47b2ce093afad56d8963c151a7854451236) )
+	ROM_LOAD( "am27s13.4n", 0x0600, 0x0200, CRC(71df3345) SHA1(3d64c47b2ce093afad56d8963c151a7854451236) )
+	ROM_LOAD( "am27s13.9g", 0x0800, 0x0200, CRC(71df3345) SHA1(3d64c47b2ce093afad56d8963c151a7854451236) )
+	ROM_LOAD( "am27s13.9l", 0x0a00, 0x0200, CRC(71df3345) SHA1(3d64c47b2ce093afad56d8963c151a7854451236) )
+	ROM_LOAD( "am27s13.9n", 0x0c00, 0x0200, CRC(71df3345) SHA1(3d64c47b2ce093afad56d8963c151a7854451236) )
+
+	ROM_REGION( 0x0300, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "pal10l8cn",     0x0000, 0x002c, CRC(338cb46a) SHA1(2e0872da385fc13ee800f1cfcd17bca734420ea9) ) // on ROMs PCB
+	ROM_LOAD( "pal10h8cn.2o",  0x0030, 0x002c, CRC(24d06342) SHA1(9b2392a99587958db6e037e02c0b713ef530dad5) ) // on main PCB
+	ROM_LOAD( "pal10l8cn.10c", 0x0060, 0x002c, NO_DUMP ) // on main PCB, hardware error
+	ROM_LOAD( "pal10l8cn.9d",  0x0090, 0x002c, NO_DUMP ) // on ROMs PCB, read protected
+	ROM_LOAD( "pal10l8cn.10d", 0x00c0, 0x002c, NO_DUMP ) // on ROMs PCB, read protected
+	ROM_LOAD( "pal16r8acn",    0x0100, 0x0104, NO_DUMP ) // on ROMs PCB, read protected
+
+	ROM_REGION( 0x0800, "nvram", 0 )
+	ROM_LOAD( "findouta.nvram", 0x0000, 0x0800, CRC(a0e19083) SHA1(76ebba4627667904e618d9fac71c415e852d7c24) ) /* Defaults */
+
+	ROM_REGION( 0x0008, "signature", 0 ) // bytes 0x03 through 0x0a of each question ROM - to prevent ROM swaps
+	ROM_LOAD( "findouta.sig",  0x0000, 0x0008, CRC(5c126c66) SHA1(12dbda545b2b2bf4ad9152e37e6316c6cd49a4e5) )
 ROM_END
 
 ROM_START( gt507uk ) /* All question ROMs used here are "T3" ROMs */
@@ -2081,7 +2124,8 @@ GAME( 1986, quizvid,   0,        quizvid,   quiz,     gei_state, init_bank8k,   
 
 GAME( 1986, reelfun,   0,        findout,   reelfun,  gei_state, init_bank8k,   ROT0, "Grayhound Electronics",  "Reel Fun (Version 7.03)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, reelfun1,  reelfun,  findout,   reelfun,  gei_state, init_bank8k,   ROT0, "Grayhound Electronics",  "Reel Fun (Version 7.01)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, findout,   0,        findout,   findout,  gei_state, init_bank8k,   ROT0, "Elettronolo",            "Find Out (Version 4.04)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, findout,   0,        findout,   findout,  gei_state, init_bank8k,   ROT0, "Elettronolo",            "Find Out (Version 4.04, set 1)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, findouta,  findout,  findout,   findout,  gei_state, init_bank8k,   ROT0, "Elettronolo",            "Find Out (Version 4.04, set 2)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // same program ROMs with year hack, different questions
 
 GAME( 1986, suprpokr,  0,        suprpokr,  suprpokr, gei_state, empty_init,    ROT0, "Grayhound Electronics",  "Super Poker (Version 10.19S)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, suprpokra, suprpokr, suprpokr,  suprpokr, gei_state, empty_init,    ROT0, "Grayhound Electronics",  "Super Poker (Version 10.15S)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
