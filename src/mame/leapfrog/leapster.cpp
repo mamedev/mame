@@ -241,13 +241,15 @@ private:
 	uint32_t leapster_1801004_r();
 	uint32_t leapster_1801008_r();
 	uint32_t leapster_180100c_r();
-	uint32_t leapster_1801018_r();
+	uint32_t leapster_1801018_r();	
+	uint32_t leapster_1802078_r();
 	uint32_t leapster_1809004_r();
 	uint32_t leapster_1809008_r();
 	uint32_t leapster_180b000_r();
 	uint32_t leapster_180b004_r();
 	uint32_t leapster_180b008_r();
 	uint32_t leapster_180d400_r();
+	uint32_t leapster_180d510_r();
 	uint32_t leapster_180d514_r();
 	uint32_t leapster_180d800_r();
 
@@ -273,6 +275,7 @@ private:
 	int m_1a_pointer;
 
 	uint32_t m_counter;
+	uint16_t m_irq_toggle;
 
 	required_device<arcompact_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
@@ -372,6 +375,12 @@ uint32_t leapster_state::leapster_1801018_r()
 	return 0x00000000;
 }
 
+uint32_t leapster_state::leapster_1802078_r()
+{
+	logerror("%s: leapster_1802078_r\n", machine().describe_context());
+	return machine().rand();
+}
+
 uint32_t leapster_state::leapster_1809004_r()
 {
 	logerror("%s: leapster_1809004_r (return usually checked against 0x00200000)\n", machine().describe_context());
@@ -414,11 +423,18 @@ uint32_t leapster_state::leapster_180d400_r()
 	return 0x0030d400;
 }
 
+uint32_t leapster_state::leapster_180d510_r()
+{
+	// code in IRQ handler 0x1b interrupt handler uses this
+	return machine().rand();
+}
+
 uint32_t leapster_state::leapster_180d514_r()
 {
+	// code in IRQ handler 0x1b interrupt handler uses this
 	logerror("%s: leapster_180d514_r (return usually checked against 0x20 or 0x80)\n", machine().describe_context());
 	// leapster -bios 0 does a BRNE in a loop comparing with 0x80
-	return 0x00000080;
+	return machine().rand();
 }
 
 uint32_t leapster_state::leapster_180d800_r()
@@ -427,7 +443,8 @@ uint32_t leapster_state::leapster_180d800_r()
 	// does a BRLO.ND against it
 	// loops against 0x00027100 (160,000)
 	// loops against 0x00003e80 (16,000) in other places 4003A56C for example
-	return 0x00027100;
+	// loops against 0x000c3500 (800,000) 4002B8E2: 0FFF 9F84 000C 3500 BRLO.ND r15, 0x000c3500 to 0x4002b8de
+	return 0x000c3500;
 }
 
 /*
@@ -493,6 +510,8 @@ void leapster_state::machine_reset()
 	m_1a_pointer = 0;
 	for (int i = 0; i < 0x800; i++)
 		m_1a_data[i] = 0;
+
+	m_irq_toggle = 0;
 }
 
 void leapster_state::leapster_map(address_map &map)
@@ -510,6 +529,8 @@ void leapster_state::leapster_map(address_map &map)
 	map(0x0180100c, 0x0180100f).r(FUNC(leapster_state::leapster_180100c_r));
 	map(0x01801018, 0x0180101b).r(FUNC(leapster_state::leapster_1801018_r));
 
+	map(0x01802078, 0x0180207b).r(FUNC(leapster_state::leapster_1802078_r));
+
 	map(0x01809004, 0x01809007).r(FUNC(leapster_state::leapster_1809004_r));
 	map(0x01809008, 0x0180900b).r(FUNC(leapster_state::leapster_1809008_r));
 
@@ -520,10 +541,9 @@ void leapster_state::leapster_map(address_map &map)
 	map(0x0180d084, 0x0180d087).rw(FUNC(leapster_state::leapster_counter_val_r), FUNC(leapster_state::leapster_counter_val_w));
 
 	map(0x0180d400, 0x0180d403).r(FUNC(leapster_state::leapster_180d400_r));
-
-	map(0x0180d514, 0x0180d517).r(FUNC(leapster_state::leapster_180d514_r));
-
 	
+	map(0x0180d510, 0x0180d513).r(FUNC(leapster_state::leapster_180d510_r));
+	map(0x0180d514, 0x0180d517).r(FUNC(leapster_state::leapster_180d514_r));	
 
 	map(0x0180d800, 0x0180d803).r(FUNC(leapster_state::leapster_180d800_r));
 
@@ -552,7 +572,12 @@ void leapster_state::leapster_aux(address_map &map)
 
 INTERRUPT_GEN_MEMBER(leapster_state::testirq)
 {
-	m_maincpu->set_input_line(0x19, ASSERT_LINE);
+	m_irq_toggle ^= 1;
+
+	if (m_irq_toggle == 0)
+		m_maincpu->set_input_line(0x1b, ASSERT_LINE);
+	else
+		m_maincpu->set_input_line(0x18, ASSERT_LINE);
 }
 
 void leapster_state::leapster(machine_config &config)
