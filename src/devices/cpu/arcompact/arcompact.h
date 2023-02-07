@@ -219,6 +219,7 @@ private:
 	// 0x0f - PNZ - Positive Non Zero
 	bool condition_PNZ() { return ((!status32_check_n()) && (!status32_check_z())); }
 
+	void take_irq(int vector);
 	void check_interrupts();
 
 	/************************************************************************************************************************************
@@ -572,7 +573,7 @@ private:
 	bool m_delaylinks;
 	uint32_t m_delayjump;
 	bool m_allow_loop_check;
-	bool m_irq_pending;
+	uint32_t m_irq_pending;
 
 //  f  e  d  c| b  a  9  8| 7  6  5  4| 3  2  1  0
 //  -  -  -  L| Z  N  C  V| U DE AE A2|A1 E2 E1  H

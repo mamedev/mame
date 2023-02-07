@@ -32,11 +32,19 @@
         USB 1.1 (client only) + full-sized SD slot.
 
 
-    many magic numbers in the BIOS ROM match the [strings:VALID_FLAGS] table in
-    https://github.com/tsbiberdorf/MqxSrc/blob/master/tools/tad/mqx.tad
-    does this mean the System is running on the MQX RTOS?
+	NOTES:
+
+	The Leapster runs the MQX RTOS (version 2.50)
     https://www.synopsys.com/dw/ipdir.php?ds=os_mqx_software
-    indicates it was available for ARC processors
+
+	Sources for newer versions of the OS are available eg.
+	https://github.com/wk2325272/MQX_3.8.0
+	https://github.com/wk2325272/MQX_3.8.1
+	and
+	https://github.com/tsbiberdorf/MqxSrc
+	although these lack support for the ARC series as it
+	appears to have been dropped in favour of ARM / PPC and
+	Coldfire.
 
 */
 
@@ -243,6 +251,10 @@ private:
 	uint32_t leapster_180d514_r();
 	uint32_t leapster_180d800_r();
 
+	uint32_t leapster_counter_val_r();
+	void leapster_counter_val_w(uint32_t data);
+
+
 	void leapster_aux0047_w(uint32_t data);
 	uint32_t leapster_aux0048_r();
 	void leapster_aux0048_w(uint32_t data);
@@ -259,6 +271,8 @@ private:
 
 	uint16_t m_1a_data[0x800];
 	int m_1a_pointer;
+
+	uint32_t m_counter;
 
 	required_device<arcompact_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
@@ -402,7 +416,7 @@ uint32_t leapster_state::leapster_180d400_r()
 
 uint32_t leapster_state::leapster_180d514_r()
 {
-	logerror("%s: leapster_180d514_r (return usually checked against 0x0030d400)\n", machine().describe_context());
+	logerror("%s: leapster_180d514_r (return usually checked against 0x20 or 0x80)\n", machine().describe_context());
 	// leapster -bios 0 does a BRNE in a loop comparing with 0x80
 	return 0x00000080;
 }
@@ -415,6 +429,36 @@ uint32_t leapster_state::leapster_180d800_r()
 	// loops against 0x00003e80 (16,000) in other places 4003A56C for example
 	return 0x00027100;
 }
+
+/*
+	Counter / Timer?  0x0180d084
+
+	code in IRQ handler 0x19 at 0x4007664C  (leapster -bios 0)
+	checks if values is Lower/Same against 0x00027100
+
+	if it's higher, it will sit in a loop subtracting 0x270fd from the value
+	and writing it back (while doing a few other things) until it it is Lower/Same
+	against 0x00027100
+
+	after that (once value is <= 0x00027100) it will read the value again
+	add 0x00fd8f03 to the value and write it back as well as writing 0x3 to the
+	address above it, then reading that address back and executing code
+	conditionally
+
+	It is unclear how this works, as manually decreasing the values makes it
+	seem more like this is a RAM address, but that seems unlikely
+*/
+
+uint32_t leapster_state::leapster_counter_val_r()
+{
+	return m_counter;
+}
+
+void leapster_state::leapster_counter_val_w(uint32_t data)
+{
+	m_counter = data;
+}
+
 
 uint32_t leapster_state::screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -473,9 +517,13 @@ void leapster_state::leapster_map(address_map &map)
 	map(0x0180b004, 0x0180b007).r(FUNC(leapster_state::leapster_180b004_r));
 	map(0x0180b008, 0x0180b00b).r(FUNC(leapster_state::leapster_180b008_r));
 
+	map(0x0180d084, 0x0180d087).rw(FUNC(leapster_state::leapster_counter_val_r), FUNC(leapster_state::leapster_counter_val_w));
+
 	map(0x0180d400, 0x0180d403).r(FUNC(leapster_state::leapster_180d400_r));
 
 	map(0x0180d514, 0x0180d517).r(FUNC(leapster_state::leapster_180d514_r));
+
+	
 
 	map(0x0180d800, 0x0180d803).r(FUNC(leapster_state::leapster_180d800_r));
 
@@ -500,9 +548,11 @@ void leapster_state::leapster_aux(address_map &map)
 	map(0x00000004b, 0x00000004b).w(FUNC(leapster_state::leapster_aux004b_w));
 }
 
+// IRQs 0x19, 0x1a and 0x1b appear to be valid
+
 INTERRUPT_GEN_MEMBER(leapster_state::testirq)
 {
-	m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_maincpu->set_input_line(0x19, ASSERT_LINE);
 }
 
 void leapster_state::leapster(machine_config &config)
