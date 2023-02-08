@@ -132,7 +132,7 @@ protected:
 	void vfive_v25_mem(address_map &map);
 };
 
-// ghox; with paddle
+// with paddle
 class ghox_state : public toaplan2_state
 {
 public:
