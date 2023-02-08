@@ -30,16 +30,17 @@ public:
 	// construction/destruction
 	hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// device_option_expansion_interface implementation
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
+
 protected:
-	// device-level overrides
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override;
 private:
-	required_device<wd1000_device>              m_hdd;
+	required_device<wd1000_device> m_hdd;
 };
 
 //-------------------------------------------------
