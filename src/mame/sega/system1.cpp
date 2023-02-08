@@ -2453,6 +2453,8 @@ void system1_state::sys1piox_317_0006(machine_config &config)
 	segacrp2_z80_device &z80(SEGA_317_0006(config.replace(), m_maincpu, MASTER_CLOCK));
 	encrypted_sys1pio_maps(config);
 	z80.set_decrypted_tag(m_decrypted_opcodes);
+
+	SN76489A(config.replace(), "sn2", SOUND_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void system1_state::sys1piox_315_5135(machine_config &config)
@@ -2656,6 +2658,8 @@ void system1_state::sys2_317_0006(machine_config &config)
 	segacrp2_z80_device &z80(SEGA_317_0006(config.replace(), m_maincpu, MASTER_CLOCK));
 	encrypted_sys1ppi_maps(config);
 	z80.set_decrypted_tag(m_decrypted_opcodes);
+
+	SN76489A(config.replace(), "sn2", SOUND_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void system1_state::sys2_317_0007(machine_config &config)
@@ -2664,6 +2668,8 @@ void system1_state::sys2_317_0007(machine_config &config)
 	segacrp2_z80_device &z80(SEGA_317_0007(config.replace(), m_maincpu, MASTER_CLOCK));
 	encrypted_sys1ppi_maps(config);
 	z80.set_decrypted_tag(m_decrypted_opcodes);
+
+	SN76489A(config.replace(), "sn2", SOUND_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void system1_state::sys2xb(machine_config &config)
