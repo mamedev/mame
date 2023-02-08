@@ -33,6 +33,7 @@ Printer Unit:
 
 PSU ("permanent storage unit"?) is just a 256x4 battery-backed RAM (TC5501P)
 module, not sure why it was so expensive (~180DM).
+
 A chess clock accessory was also announced but unreleased.
 
 SciSys Super System IV (AKA MK IV) is on similar hardware. It was supposed to
