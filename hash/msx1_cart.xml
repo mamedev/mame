@@ -4503,7 +4503,7 @@ kept for now until finding out what those bytes affect...
 		<info name="alt_title" value="ディグダグ" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
-ß			<dataarea name="rom" size="0x8000">
+			<dataarea name="rom" size="0x8000">
 				<rom name="dig dug (japan) (alt 1).rom" size="0x8000" crc="7c3d7dea" sha1="e3391daab17710b3f34c70f60ac6c8bfea15b6cc" />
 			</dataarea>
 		</part>
@@ -4996,7 +4996,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Casio</publisher>
 		<info name="serial" value="GPM-129" />
 		<info name="alt_title" value="エクゾイドＺエリア５" />
-		<info name="gtin" valu="04971850104971"/>
+		<info name="gtin" value="04971850104971"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -14275,7 +14275,7 @@ kept for now until finding out what those bytes affect...
 		<year>1986</year>
 		<publisher>Champion Soft</publisher>
 		<info name="alt_title" value="ザ・競馬" />
-		<info nmae="serial" value="MXCP-11005"/>
+		<info name="serial" value="MXCP-11005"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
@@ -16222,7 +16222,6 @@ legacy FM implementations cannot find it.
 		<info name="serial" value="M055" />
 		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
-		<info name="alt_title" value="الذاكرة"/>
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="a_m&amp;d.rom" size="0x8000" crc="241623f9" sha1="860f5180c9028cbf675d9b1e59b7e7487c59ea0c" />
@@ -17407,7 +17406,7 @@ legacy FM implementations cannot find it.
 		<year>1987</year>
 		<publisher>Barq</publisher>
 		<info name="alt_title" value="المرور"/>
-		<info nmae="serial" value="AQ018"/>
+		<info name="serial" value="AQ018"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
