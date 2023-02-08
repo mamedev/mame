@@ -2541,16 +2541,12 @@ end
 
 if (BUSES["VME"]~=null) then
 	files {
+		MAME_DIR .. "src/devices/bus/vme/tp881v.cpp",
+		MAME_DIR .. "src/devices/bus/vme/tp881v.h",
 		MAME_DIR .. "src/devices/bus/vme/vme.cpp",
 		MAME_DIR .. "src/devices/bus/vme/vme.h",
 		MAME_DIR .. "src/devices/bus/vme/vme_cp31.cpp",
 		MAME_DIR .. "src/devices/bus/vme/vme_cp31.h",
-		MAME_DIR .. "src/devices/bus/vme/vme_mzr8300.cpp",
-		MAME_DIR .. "src/devices/bus/vme/vme_mzr8300.h",
-		MAME_DIR .. "src/devices/bus/vme/vme_mvme120.cpp",
-		MAME_DIR .. "src/devices/bus/vme/vme_mvme120.h",
-		MAME_DIR .. "src/devices/bus/vme/vme_mvme350.cpp",
-		MAME_DIR .. "src/devices/bus/vme/vme_mvme350.h",
 		MAME_DIR .. "src/devices/bus/vme/vme_fccpu20.cpp",
 		MAME_DIR .. "src/devices/bus/vme/vme_fccpu20.h",
 		MAME_DIR .. "src/devices/bus/vme/vme_fcisio.cpp",
@@ -2559,16 +2555,20 @@ if (BUSES["VME"]~=null) then
 		MAME_DIR .. "src/devices/bus/vme/vme_fcscsi.h",
 		MAME_DIR .. "src/devices/bus/vme/vme_hcpu30.cpp",
 		MAME_DIR .. "src/devices/bus/vme/vme_hcpu30.h",
-		MAME_DIR .. "src/devices/bus/vme/vme_smvme2000.cpp",
-		MAME_DIR .. "src/devices/bus/vme/vme_smvme2000.h",
+		MAME_DIR .. "src/devices/bus/vme/vme_mvme120.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme_mvme120.h",
 		MAME_DIR .. "src/devices/bus/vme/vme_mvme180.cpp",
 		MAME_DIR .. "src/devices/bus/vme/vme_mvme180.h",
 		MAME_DIR .. "src/devices/bus/vme/vme_mvme181.cpp",
 		MAME_DIR .. "src/devices/bus/vme/vme_mvme181.h",
 		MAME_DIR .. "src/devices/bus/vme/vme_mvme327a.cpp",
 		MAME_DIR .. "src/devices/bus/vme/vme_mvme327a.h",
-		MAME_DIR .. "src/devices/bus/vme/tp881v.cpp",
-		MAME_DIR .. "src/devices/bus/vme/tp881v.h",
+		MAME_DIR .. "src/devices/bus/vme/vme_mvme350.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme_mvme350.h",
+		MAME_DIR .. "src/devices/bus/vme/vme_mzr8300.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme_mzr8300.h",
+		MAME_DIR .. "src/devices/bus/vme/vme_smvme2000.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme_smvme2000.h",
 	}
 end
 

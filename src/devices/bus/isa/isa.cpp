@@ -465,7 +465,7 @@ void isa8_device::nmi()
 
 device_isa8_card_interface::device_isa8_card_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "isa"),
-		m_isa(nullptr), m_isa_dev(nullptr), m_next(nullptr)
+		m_isa(nullptr), m_isa_dev(nullptr)
 {
 }
 

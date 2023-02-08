@@ -89,7 +89,6 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
-	void init_mightguy();
 	void cop01(machine_config &config);
 
 protected:
@@ -97,9 +96,11 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	required_device<cpu_device> m_audiocpu;
-
 	uint8_t sound_command_r();
+
+	void cop01_base(machine_config &config);
+
+	required_device<cpu_device> m_audiocpu;
 
 private:
 	// memory pointers
@@ -150,6 +151,8 @@ public:
 	void mightguy(machine_config &config);
 
 	template <int Mask> DECLARE_READ_LINE_MEMBER(area_r);
+
+	void init_mightguy();
 
 private:
 	void audio_io_map(address_map &map);
@@ -696,9 +699,9 @@ void cop01_state::machine_reset()
 }
 
 
-void cop01_state::cop01(machine_config &config)
+void cop01_state::cop01_base(machine_config &config)
 {
-	static constexpr XTAL MAINCPU_CLOCK = XTAL(12'000'000);
+	constexpr XTAL MAINCPU_CLOCK = XTAL(12'000'000);
 
 	// basic machine hardware
 	Z80(config, m_maincpu, MAINCPU_CLOCK / 2); // unknown clock / divider
@@ -726,6 +729,11 @@ void cop01_state::cop01(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set_inputline(m_audiocpu, 0);
+}
+
+void cop01_state::cop01(machine_config &config)
+{
+	cop01_base(config);
 
 	AY8910(config, "ay1", 1250000).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown clock / divider, hand-tuned to match audio reference
 	AY8910(config, "ay2", 1250000).add_route(ALL_OUTPUTS, "mono", 0.25); // "
@@ -734,9 +742,9 @@ void cop01_state::cop01(machine_config &config)
 
 void mightguy_state::mightguy(machine_config &config)
 {
-	cop01(config);
+	cop01_base(config);
 
-	static constexpr XTAL AUDIOCPU_CLOCK = XTAL(8'000'000);
+	constexpr XTAL AUDIOCPU_CLOCK = XTAL(8'000'000);
 
 	m_audiocpu->set_clock(AUDIOCPU_CLOCK / 2); // unknown divider
 	m_audiocpu->set_addrmap(AS_IO, &mightguy_state::audio_io_map);
@@ -747,10 +755,6 @@ void mightguy_state::mightguy(machine_config &config)
 	YM3526(config, "ymsnd", AUDIOCPU_CLOCK / 2).add_route(ALL_OUTPUTS, "mono", 1.0); // unknown divider
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.5); // unknown DAC
-
-	config.device_remove("ay1");
-	config.device_remove("ay2");
-	config.device_remove("ay3");
 }
 
 
@@ -874,11 +878,10 @@ ROM_END
  *
  *************************************/
 
-void cop01_state::init_mightguy()
+void mightguy_state::init_mightguy()
 {
 #if MIGHTGUY_HACK
-	/* This is a hack to fix the game code to get a fully working
-	   "Starting Area" fake Dip Switch */
+	// This is a hack to fix the game code to get a fully working "Starting Area" fake DIP switch
 	uint8_t *rom = (uint8_t *)memregion("maincpu")->base();
 	rom[0x00e4] = 0x07; // rlca
 	rom[0x00e5] = 0x07; // rlca
