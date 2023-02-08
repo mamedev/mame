@@ -5160,6 +5160,8 @@ if (BUSES["NABU"]~=null) then
 		MAME_DIR .. "src/devices/bus/nabupc/adapter.h",
 		MAME_DIR .. "src/devices/bus/nabupc/fdc.cpp",
 		MAME_DIR .. "src/devices/bus/nabupc/fdc.h",
+		MAME_DIR .. "src/devices/bus/nabupc/hdd.cpp",
+		MAME_DIR .. "src/devices/bus/nabupc/hdd.h",
 		MAME_DIR .. "src/devices/bus/nabupc/option.cpp",
 		MAME_DIR .. "src/devices/bus/nabupc/option.h",
 	}
