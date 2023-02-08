@@ -184,6 +184,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Taito</publisher>
 		<info name="alt_title" value="バブルボブル" />
+		<info name="serial" value="TMS-02" />
 		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
@@ -3104,9 +3105,9 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>19??</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="msx_cart">
-			<feature name="mapper" value="NOMAPPER" />
-			<dataarea name="rom" size="16384">
-				<rom name="stcmsx2p.bin" size="16384" crc="4e4fbe2a" sha1="f29cef9d13d50d9e3158064c6bb381def6ff384d" offset="0x0000" />
+			<feature name="start_page" value="0"/>
+			<dataarea name="rom" size="0x4000">
+				<rom name="stcmsx2p.bin" size="0x4000" crc="4e4fbe2a" sha1="f29cef9d13d50d9e3158064c6bb381def6ff384d" />
 			</dataarea>
 		</part>
 	</software>
@@ -3115,10 +3116,11 @@ LZ93A13 (32 pin) - 8KB banks
 		<description>Cheese 2 (Japan)</description>
 		<year>1985</year>
 		<publisher>Neos</publisher>
+		<info name="usage" value="Requires a mouse in general purpose port 1."/>
 		<part name="cart" interface="msx_cart">
-			<feature name="mapper" value="NOMAPPER" />
-			<dataarea name="rom" size="32768">
-				<rom name="cheese 2 (japan) (program).rom" size="32768" crc="2ffb49c3" sha1="930b4896c1590ebbb74d330447ec36e3feb5cab6" status="baddump" offset="0" />
+			<feature name="start_page" value="1"/>
+			<dataarea name="rom" size="0x8000">
+				<rom name="cheese 2 (japan) (program).rom" size="0x8000" crc="2ffb49c3" sha1="930b4896c1590ebbb74d330447ec36e3feb5cab6" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
