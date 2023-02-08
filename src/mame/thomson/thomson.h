@@ -8,8 +8,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_INCLUDES_THOMSON_H
-#define MAME_INCLUDES_THOMSON_H
+#ifndef MAME_THOMSON_THOMSON_H
+#define MAME_THOMSON_THOMSON_H
 
 #pragma once
 
@@ -653,4 +653,4 @@ protected:
 
 
 
-#endif // MAME_INCLUDES_THOMSON_H
+#endif // MAME_THOMSON_THOMSON_H

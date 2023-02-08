@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_INCLUDES_COCO12_H
-#define MAME_INCLUDES_COCO12_H
+#ifndef MAME_TRS_COCO12_H
+#define MAME_TRS_COCO12_H
 
 #pragma once
 
@@ -109,4 +109,4 @@ protected:
 	required_device<ay8913_device> m_psg;
 };
 
-#endif // MAME_INCLUDES_COCO12_H
+#endif // MAME_TRS_COCO12_H

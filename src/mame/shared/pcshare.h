@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Peter Trauner
-#ifndef MAME_MACHINE_PCSHARE_H
-#define MAME_MACHINE_PCSHARE_H
+#ifndef MAME_SHARED_PCSHARE_H
+#define MAME_SHARED_PCSHARE_H
 
 #pragma once
 
@@ -65,4 +65,4 @@ protected:
 	int m_pit_out2 = 0;
 };
 
-#endif // MAME_MACHINE_PCSHARE_H
+#endif // MAME_SHARED_PCSHARE_H

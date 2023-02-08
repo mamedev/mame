@@ -34,6 +34,9 @@
 #include "bus/rs232/terminal.h"
 #include "machine/fdc37c93x.h"
 
+
+namespace {
+
 class pcipc_state : public driver_device
 {
 public:
@@ -54,7 +57,7 @@ public:
 private:
 	void pcipc_map(address_map &map);
 	void pcipc_map_io(address_map &map);
-	void boot_state_phoenix_w(uint8_t data);
+	[[maybe_unused]] void boot_state_phoenix_w(uint8_t data);
 	void boot_state_phoenix_ver40_rev6_w(uint8_t data);
 	void boot_state_award_w(uint8_t data);
 
@@ -601,6 +604,9 @@ ROM_END
 
 static INPUT_PORTS_START(pcipc)
 INPUT_PORTS_END
+
+} // anonymous namespace
+
 
 COMP(1998, pcipc,   0, 0, pcipc,   pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX)", MACHINE_NO_SOUND)
 COMP(1998, pcipctx, 0, 0, pcipctx, pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430TX)", MACHINE_NO_SOUND)

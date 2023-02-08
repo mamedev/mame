@@ -22,6 +22,8 @@ the Deal 'Em board design, rather than the one they ultimately used, suggesting 
 #include "tilemap.h"
 
 
+namespace {
+
 class mpu4dealem_state : public mpu4_state
 {
 public:
@@ -398,6 +400,9 @@ ROM_START( v4dealem )
 	ROM_REGION( 0x200, "plds", 0 )
 	ROM_LOAD( "zenndlem.u10",   0x000, 0x104, CRC(e3103c05) SHA1(91b7be75c5fb37025039ab54b484e46a033969b5) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*Deal 'Em was a conversion kit designed to make early MPU4 machines into video games by replacing the top glass
 and reel assembly with this kit and a supplied monitor. This explains why the cabinet switch alters lamp data and buttons.

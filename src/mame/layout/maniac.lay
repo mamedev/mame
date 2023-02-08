@@ -4,7 +4,7 @@ license:CC0-1.0
 -->
 <mamelayout version="2">
 
-	<!-- define elements -->
+<!-- define elements -->
 
 	<element name="but">
 		<rect><bounds x="0" y="0" width="1" height="1"/><color red="0.85" green="0.85" blue="0.85" /></rect>
@@ -12,10 +12,10 @@ license:CC0-1.0
 	</element>
 
 	<element name="hl" defstate="0">
-		<text string=" ">
+		<disk>
 			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
-			<color red="0.0" green="0.0" blue="0.0" />
-		</text>
+			<color alpha="0" />
+		</disk>
 		<disk state="1">
 			<bounds x="0.07" y="0.07" width="0.86" height="0.86" />
 			<color red="0.0" green="0.0" blue="0.0" />
@@ -23,11 +23,11 @@ license:CC0-1.0
 	</element>
 
 	<element name="digit" defstate="0">
-		<led7seg><color red="1.0" green="0.2" blue="0.23" /></led7seg>
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
 	</element>
 
 
-	<!-- build screen -->
+<!-- build screen -->
 
 	<view name="Internal Layout">
 		<bounds left="7" right="53" top="7" bottom="48" />

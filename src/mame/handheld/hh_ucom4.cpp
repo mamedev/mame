@@ -27,6 +27,7 @@ known chips:
  @080     uPD553C  1980, Epoch Electronic Football
  *084     uPD553C  1980, Bandai Gunfighter
  *102     uPD553C  1981, Bandai Block Out
+ *103     uPD553C  1981, Bandai Galaxian
  @153     uPD553C  1981, Epoch Galaxy II
  @160     uPD553C  1982, Tomy Pac Man (TN-08)
  *167     uPD553C  1982, Sony SL models (betamax) (have dump)
@@ -115,6 +116,8 @@ ROM source notes when dumped from another title, but confident it's the same:
 
 //#include "hh_ucom4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
+
+namespace {
 
 class hh_ucom4_state : public driver_device
 {
@@ -237,8 +240,6 @@ INPUT_CHANGED_MEMBER(hh_ucom4_state::single_interrupt_line)
   Minidrivers (subclass, I/O, Inputs, Machine Config, ROM Defs)
 
 ***************************************************************************/
-
-namespace {
 
 /***************************************************************************
 

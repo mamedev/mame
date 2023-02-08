@@ -54,7 +54,7 @@ menu_bios_selection::menu_bios_selection(mame_ui_manager &mui, render_container 
 	set_heading(_("BIOS Selection"));
 }
 
-void menu_bios_selection::populate(float &customtop, float &custombottom)
+void menu_bios_selection::populate()
 {
 	// cycle through all devices for this system
 	for (device_t &device : device_enumerator(machine().root_device()))
@@ -159,7 +159,7 @@ menu_network_devices::~menu_network_devices()
     network device menu
 -------------------------------------------------*/
 
-void menu_network_devices::populate(float &customtop, float &custombottom)
+void menu_network_devices::populate()
 {
 	/* cycle through all devices for this system */
 	for (device_network_interface &network : network_interface_enumerator(machine().root_device()))
@@ -268,7 +268,7 @@ void menu_bookkeeping::populate_text(std::optional<text_layout> &layout, float &
 	width = layout->actual_width();
 }
 
-void menu_bookkeeping::populate(float &customtop, float &custombottom)
+void menu_bookkeeping::populate()
 {
 }
 
@@ -397,7 +397,7 @@ menu_crosshair::menu_crosshair(mame_ui_manager &mui, render_container &container
 	set_heading(_("menu-crosshair", "Crosshair Options"));
 }
 
-void menu_crosshair::populate(float &customtop, float &custombottom)
+void menu_crosshair::populate()
 {
 	if (m_data.empty())
 	{
@@ -701,7 +701,7 @@ void menu_export::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void menu_export::populate(float &customtop, float &custombottom)
+void menu_export::populate()
 {
 	// add options items
 	item_append(_("Export list in XML format (like -listxml)"), 0, (void *)(uintptr_t)1);
@@ -811,7 +811,7 @@ void menu_machine_configure::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void menu_machine_configure::populate(float &customtop, float &custombottom)
+void menu_machine_configure::populate()
 {
 	// add options items
 	item_append(_("BIOS"), FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
@@ -930,7 +930,7 @@ void menu_plugins_configure::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void menu_plugins_configure::populate(float &customtop, float &custombottom)
+void menu_plugins_configure::populate()
 {
 	plugin_options const &plugins = mame_machine_manager::instance()->plugins();
 

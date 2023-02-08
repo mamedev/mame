@@ -73,6 +73,19 @@ menu_file_selector::~menu_file_selector()
 
 
 //-------------------------------------------------
+//  recompute_metrics - recompute metrics
+//-------------------------------------------------
+
+void menu_file_selector::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	// set up custom render proc
+	set_custom_space(line_height() + 3.0F * tb_border(), 0.0F);
+}
+
+
+//-------------------------------------------------
 //  custom_render - perform our special rendering
 //-------------------------------------------------
 
@@ -347,7 +360,7 @@ void menu_file_selector::update_search()
 //  populate
 //-------------------------------------------------
 
-void menu_file_selector::populate(float &customtop, float &custombottom)
+void menu_file_selector::populate()
 {
 	const file_selector_entry *selected_entry = nullptr;
 
@@ -426,9 +439,6 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 	// set the selection (if we have one)
 	if (selected_entry)
 		set_selection((void *)selected_entry);
-
-	// set up custom render proc
-	customtop = line_height() + 3.0f * tb_border();
 }
 
 
@@ -504,7 +514,7 @@ menu_select_rw::~menu_select_rw()
 //  populate
 //-------------------------------------------------
 
-void menu_select_rw::populate(float &customtop, float &custombottom)
+void menu_select_rw::populate()
 {
 	item_append(_("Select access mode"), FLAG_DISABLE, nullptr);
 	item_append(_("Read-only"), 0, itemref_from_result(result::READONLY));

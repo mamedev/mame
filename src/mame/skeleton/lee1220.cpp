@@ -19,6 +19,8 @@
 #include <algorithm>
 
 
+namespace {
+
 class lee1220_state : public driver_device
 {
 public:
@@ -142,5 +144,8 @@ ROM_START(lee1220)
 	ROM_REGION(0x400, "kbdmcu", 0)
 	ROM_LOAD("03278_d8748.2", 0x000, 0x400, CRC(a63ce4d8) SHA1(a713f3aae5e9096a627fab13573eee2170b42b1a))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1983, lee1220, 0, 0, lee1220, lee1220, lee1220_state, empty_init, "Lee Data", "1220 Display Terminal", MACHINE_IS_SKELETON)

@@ -95,7 +95,7 @@ void menu_selector::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void menu_selector::populate(float &customtop, float &custombottom)
+void menu_selector::populate()
 {
 	set_heading(util::string_format(_("menu-selector", "%1$s - Search: %2$s_"), m_title, m_search));
 
@@ -124,8 +124,18 @@ void menu_selector::populate(float &customtop, float &custombottom)
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-	custombottom = line_height() + 3.0f * tb_border();
 	m_initial = -1;
+}
+
+//-------------------------------------------------
+//  recompute metrics
+//-------------------------------------------------
+
+void menu_selector::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	set_custom_space(0.0F, line_height() + 3.0F * tb_border());
 }
 
 //-------------------------------------------------

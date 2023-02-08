@@ -31,6 +31,9 @@
 #include "video/mc6845.h"
 #include "screen.h"
 
+
+namespace {
+
 class mbc020_state : public driver_device
 {
 public:
@@ -170,5 +173,8 @@ ROM_START(mbc020) // Silkscreened on PCB: "© 1980 by SYM Systems Corp."
 	ROM_REGION(0x20, "mmap", 0) // Memory mapping PROM (decodes A11–A15)
 	ROM_LOAD("n82s123n.u17", 0x00, 0x20, CRC(f219550d) SHA1(b149f9872bc9091b28b0da65f0206ce9893083be))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(1983, mbc020, 0, 0, mbc020, mbc020, mbc020_state, empty_init, "Sym Systems / Torque Systems", "MBC020-65 CPU/Video Board (Torque Systems OEM)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

@@ -5,8 +5,8 @@
     IREM M-10,M-11 and M-15 based hardware
 
 ****************************************************************************/
-#ifndef MAME_INCLUDES_M10_H
-#define MAME_INCLUDES_M10_H
+#ifndef MAME_IREM_M10_H
+#define MAME_IREM_M10_H
 
 #pragma once
 
@@ -155,4 +155,4 @@ private:
 	void m15_main(address_map &map);
 };
 
-#endif // MAME_INCLUDES_M10_H
+#endif // MAME_IREM_M10_H

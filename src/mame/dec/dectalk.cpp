@@ -248,6 +248,8 @@ dgc (dg(no!spam)cx@mac.com)
 #include "speaker.h"
 
 
+namespace {
+
 class dectalk_state : public driver_device
 {
 public:
@@ -973,8 +975,10 @@ ROM_START( dectalk )
 	ROM_FILL(0xfd, 0x01, 0x02) // "
 	ROM_FILL(0xfe, 0x01, 0x05) // "
 	ROM_FILL(0xff, 0x01, 0x0b) // "
-
 ROM_END
+
+} // anonymous namespace
+
 
 /******************************************************************************
  Drivers

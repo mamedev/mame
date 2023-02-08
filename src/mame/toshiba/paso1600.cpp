@@ -19,6 +19,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class paso1600_state : public driver_device
 {
 public:
@@ -337,6 +339,8 @@ ROM_START( paso1600 )
 	ROM_REGION16_LE( 0x20000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "kanji.rom", 0x0000, 0x20000, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY    FULLNAME        FLAGS

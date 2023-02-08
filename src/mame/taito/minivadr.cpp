@@ -39,6 +39,8 @@ Notes: (all ICs shown)
 #include "screen.h"
 
 
+namespace {
+
 class minivadr_state : public driver_device
 {
 public:
@@ -135,6 +137,8 @@ ROM_START( minivadr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d26-01.ic7", 0x0000, 0x2000, CRC(a96c823d) SHA1(aa9969ff80e94b0fff0f3530863f6b300510162e) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1990, minivadr, 0, minivadr, minivadr, minivadr_state, empty_init, ROT0, "Taito Corporation", "Mini Vaders", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

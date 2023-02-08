@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_ABC800_H
-#define MAME_INCLUDES_ABC800_H
+#ifndef MAME_LUXOR_ABC800_H
+#define MAME_LUXOR_ABC800_H
 
 #pragma once
 
@@ -340,4 +340,4 @@ public:
 	void abc806_mem(address_map &map);
 };
 
-#endif
+#endif // MAME_LUXOR_ABC800_H

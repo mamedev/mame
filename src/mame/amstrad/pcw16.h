@@ -5,8 +5,8 @@
  * includes/pcw16.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_PCW16_H
-#define MAME_INCLUDES_PCW16_H
+#ifndef MAME_AMSTRAD_PCW16_H
+#define MAME_AMSTRAD_PCW16_H
 
 #pragma once
 
@@ -153,4 +153,4 @@ private:
 	int m_video_control = 0;
 };
 
-#endif // MAME_INCLUDES_PCW16_H
+#endif // MAME_AMSTRAD_PCW16_H

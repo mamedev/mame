@@ -25,7 +25,7 @@
    MicroSDHC 8GB card in internal slot
    Realtek RTL8188EU (Wireless)
 
-   There don't appear to be any ROM / SPI / NAND devicesonboard, so must either
+   There don't appear to be any ROM / SPI / NAND devices onboard, so must either
    boot directly from the SD, or have some boot program internal to the SoC
 
    The following pinout was used for the InnoTV / InnoTab MAX cartridges
@@ -69,6 +69,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 #include "screen.h"
+
+
+namespace {
 
 class vtech_innotv_innotabmax_state : public driver_device
 {
@@ -159,5 +162,8 @@ ROM_START( innotv )
 	DISK_REGION( "internalsd" )
 	DISK_IMAGE( "8gb_sdhc_internal", 0, SHA1(443a0a9cc830387317d3218955b72295ee5a88eb) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 2015, innotv,      0,         0,      vtech_innotv_innotabmax,    vtech_innotv_innotabmax,  vtech_innotv_innotabmax_state,  empty_init, "VTech", "InnoTV", MACHINE_IS_SKELETON )

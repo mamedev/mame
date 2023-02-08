@@ -1,32 +1,37 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:Kevin Horton
-/******************************************************************************
+/*******************************************************************************
 
 Tiger Electronics K28: Talking Learning Computer (model 7-230/7-231)
-* PCB marked PB-123 WIZARD, TIGER
-* Intel P8021 MCU with 1KB internal ROM
-* MM5445N VFD driver, 9-digit alphanumeric display same as snmath
-* 2*TMS6100 (32KB VSM)
-* SC-01-A speech chip
 
 3 models exist:
 - 7-230: darkblue case, toy-ish looks
 - 7-231: gray case, hardware is the same
-- 7-232: this one is completely different hw --> driver handheld/tispeak.cpp
+- 7-232: this one is completely different hw --> driver k28m2.cpp
+
+Hardware notes:
+- PCB marked PB-123 WIZARD, TIGER
+- Intel P8021 MCU with 1KB internal ROM
+- MM5445N VFD driver, 9-digit alphanumeric display same as snmath
+- 2*TMS6100 (32KB VSM)
+- SC-01-A speech chip
+- module slot
 
 TODO:
 - external module support (no dumps yet)
 
-******************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/mcs48/mcs48.h"
+#include "machine/timer.h"
+#include "machine/tms6100.h"
 #include "video/mm5445.h"
 #include "video/pwm.h"
-#include "machine/tms6100.h"
-#include "machine/timer.h"
 #include "sound/votrax.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -82,18 +87,8 @@ private:
 	void power_off();
 };
 
-
-// machine start/reset/power
-
 void k28_state::machine_start()
 {
-	// zerofill
-	m_power_on = false;
-	m_inp_mux = 0;
-	m_phoneme = 0x3f;
-	m_speech_strobe = 0;
-	m_vfd_data = 0;
-
 	// register for savestates
 	save_item(NAME(m_power_on));
 	save_item(NAME(m_inp_mux));
@@ -101,6 +96,12 @@ void k28_state::machine_start()
 	save_item(NAME(m_speech_strobe));
 	save_item(NAME(m_vfd_data));
 }
+
+
+
+/*******************************************************************************
+    Power
+*******************************************************************************/
 
 void k28_state::machine_reset()
 {
@@ -125,9 +126,9 @@ void k28_state::power_off()
 
 
 
-/******************************************************************************
+/*******************************************************************************
     I/O
-******************************************************************************/
+*******************************************************************************/
 
 // MM5445 VFD
 
@@ -139,7 +140,7 @@ void k28_state::vfd_output_w(u64 data)
 	m_display->matrix(data >> 16, seg_data);
 
 	// O26: power-off request on falling edge
-	if (~data & m_vfd_data & 0x2000000)
+	if (~data & m_vfd_data & 1 << 25)
 		power_off();
 	m_vfd_data = data;
 }
@@ -179,7 +180,7 @@ u8 k28_state::mcu_p1_r()
 
 	// multiplexed inputs (active low)
 	for (int i = 0; i < 7; i++)
-		if (m_inp_mux >> i & 1)
+		if (BIT(m_inp_mux, i))
 		{
 			data |= m_inputs[i]->read();
 
@@ -210,9 +211,9 @@ void k28_state::mcu_p2_w(u8 data)
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Input Ports
-******************************************************************************/
+*******************************************************************************/
 
 static INPUT_PORTS_START( k28 )
 	PORT_START("IN.0")
@@ -288,13 +289,13 @@ INPUT_PORTS_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Machine Configs
-******************************************************************************/
+*******************************************************************************/
 
 void k28_state::k28(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I8021(config, m_maincpu, 3.579545_MHz_XTAL);
 	m_maincpu->bus_out_cb().set(FUNC(k28_state::mcu_p0_w));
 	m_maincpu->p1_in_cb().set(FUNC(k28_state::mcu_p1_r));
@@ -307,22 +308,22 @@ void k28_state::k28(machine_config &config)
 
 	TIMER(config, "on_button").configure_generic(nullptr);
 
-	/* video hardware */
+	// video hardware
 	MM5445(config, m_vfd).output_cb().set(FUNC(k28_state::vfd_output_w));
 	PWM_DISPLAY(config, m_display).set_size(9, 16);
 	m_display->set_segmask(0x1ff, 0x3fff);
 	config.set_default_layout(layout_k28);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	VOTRAX_SC01(config, "speech", 760000).add_route(ALL_OUTPUTS, "mono", 0.5); // measured 760kHz on its RC pin
 }
 
 
 
-/******************************************************************************
+/*******************************************************************************
     ROM Definitions
-******************************************************************************/
+*******************************************************************************/
 
 ROM_START( k28 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
@@ -337,9 +338,9 @@ ROM_END
 
 
 
-/******************************************************************************
+/*******************************************************************************
     Drivers
-******************************************************************************/
+*******************************************************************************/
 
 //    YEAR  NAME  PARENT CMP MACHINE  INPUT  CLASS      INIT        COMPANY, FULLNAME, FLAGS
 COMP( 1981, k28,  0,      0, k28,     k28,   k28_state, empty_init, "Tiger Electronics", "K28: Talking Learning Computer (model 7-230)", MACHINE_SUPPORTS_SAVE )

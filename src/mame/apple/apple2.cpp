@@ -100,7 +100,7 @@ public:
 	required_device<timer_device> m_scantimer;
 	required_device<ram_device> m_ram;
 	required_device<ay3600_device> m_ay3600;
-	required_device<a2_video_device> m_video;
+	required_device<a2_video_device_composite> m_video;
 	required_device<apple2_common_device> m_a2common;
 	required_device<a2bus_device> m_a2bus;
 	required_device<apple2_gameio_device> m_gameio;
@@ -328,11 +328,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
 {
 	int scanline = param;
 
-	// update the video system's shadow copy of the system config at the end of the frame
 	if (scanline == 192)
 	{
-		m_video->set_sysconfig(m_sysconfig->read());
-
 		// check reset
 		if (m_resetdip.found()) // if reset DIP is present, use it
 		{
@@ -933,12 +930,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::ay3600_repeat)
 
 INPUT_PORTS_START( apple2_sysconfig )
 	PORT_START("a2_config")
-	PORT_CONFNAME(0x03, 0x00, "Composite monitor type")
-	PORT_CONFSETTING(0x00, "Color")
-	PORT_CONFSETTING(0x01, "B&W")
-	PORT_CONFSETTING(0x02, "Green")
-	PORT_CONFSETTING(0x03, "Amber")
-
 	PORT_CONFNAME(0x04, 0x04, "Shift key mod")  // default to installed
 	PORT_CONFSETTING(0x00, "Not present")
 	PORT_CONFSETTING(0x04, "Installed")
@@ -1110,7 +1101,7 @@ void apple2_state::apple2_common(machine_config &config)
 	m_scantimer->configure_scanline(FUNC(apple2_state::apple2_interrupt), "screen", 0, 1);
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	APPLE2_VIDEO(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
+	APPLE2_VIDEO_COMPOSITE(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
 	APPLE2_COMMON(config, m_a2common, XTAL(14'318'181));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

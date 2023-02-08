@@ -16,6 +16,8 @@ Digital Microsystems DMS-5000
 #include "screen.h"
 
 
+namespace {
+
 class dms5000_state : public driver_device
 {
 public:
@@ -111,6 +113,9 @@ ROM_START( dms5000 )
 	ROM_LOAD16_BYTE( "dms-5000_54-8673o.bin", 0x0001, 0x2000, CRC(dce9823e) SHA1(d36ab87d2e6f5e9f02d59a6a7724ad3ce2428a2f))
 	ROM_LOAD16_BYTE( "dms-5000_54-8672e.bin", 0x0000, 0x2000, CRC(94d64c06) SHA1(be5a53da7bb29a5fa9ac31efe550d5d6ff8b77cd))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

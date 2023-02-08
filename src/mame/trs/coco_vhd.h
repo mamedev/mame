@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_COCO_VHD_H
-#define MAME_MACHINE_COCO_VHD_H
+#ifndef MAME_TRS_COCO_VHD_H
+#define MAME_TRS_COCO_VHD_H
 
 #pragma once
 
@@ -70,4 +70,4 @@ DECLARE_DEVICE_TYPE(COCO_VHD, coco_vhd_image_device)
 ***************************************************************************/
 
 
-#endif // MAME_MACHINE_COCO_VHD_H
+#endif // MAME_TRS_COCO_VHD_H

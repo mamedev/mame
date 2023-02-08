@@ -4459,7 +4459,7 @@ msgstr ""
 
 #: src/emu/inpttype.ipp:583
 msgctxt "input-name"
-msgid "Bill 1"
+msgid "Banknote 1"
 msgstr ""
 
 #: src/emu/inpttype.ipp:588
@@ -4866,103 +4866,103 @@ msgstr ""
 
 #: src/emu/inpttype.ipp:742
 msgctxt "input-name"
-msgid "Track X"
-msgstr ""
+msgid "Trackball X"
+msgstr "Трекбол X"
 
 #: src/emu/inpttype.ipp:743
 msgctxt "input-name"
-msgid "Track X 2"
-msgstr ""
+msgid "Trackball X 2"
+msgstr "Трекбол X 2"
 
 #: src/emu/inpttype.ipp:744
 msgctxt "input-name"
-msgid "Track X 3"
-msgstr ""
+msgid "Trackball X 3"
+msgstr "Трекбол X 3"
 
 #: src/emu/inpttype.ipp:745
 msgctxt "input-name"
-msgid "Track X 4"
-msgstr ""
+msgid "Trackball X 4"
+msgstr "Трекбол X 4"
 
 #: src/emu/inpttype.ipp:746
 msgctxt "input-name"
-msgid "Track X 5"
-msgstr ""
+msgid "Trackball X 5"
+msgstr "Трекбол X 5"
 
 #: src/emu/inpttype.ipp:747
 msgctxt "input-name"
-msgid "Track X 6"
-msgstr ""
+msgid "Trackball X 6"
+msgstr "Трекбол X 6"
 
 #: src/emu/inpttype.ipp:748
 msgctxt "input-name"
-msgid "Track X 7"
-msgstr ""
+msgid "Trackball X 7"
+msgstr "Трекбол X 7"
 
 #: src/emu/inpttype.ipp:749
 msgctxt "input-name"
-msgid "Track X 8"
-msgstr ""
+msgid "Trackball X 8"
+msgstr "Трекбол X 8"
 
 #: src/emu/inpttype.ipp:750
 msgctxt "input-name"
-msgid "Track X 9"
-msgstr ""
+msgid "Trackball X 9"
+msgstr "Трекбол X 9"
 
 #: src/emu/inpttype.ipp:751
 msgctxt "input-name"
-msgid "Track X 10"
-msgstr ""
+msgid "Trackball X 10"
+msgstr "Трекбол X 10"
 
 #: src/emu/inpttype.ipp:756
 msgctxt "input-name"
-msgid "Track Y"
-msgstr ""
+msgid "Trackball Y"
+msgstr "Трекбол Y"
 
 #: src/emu/inpttype.ipp:757
 msgctxt "input-name"
-msgid "Track Y 2"
-msgstr ""
+msgid "Trackball Y 2"
+msgstr "Трекбол Y 2"
 
 #: src/emu/inpttype.ipp:758
 msgctxt "input-name"
-msgid "Track Y 3"
-msgstr ""
+msgid "Trackball Y 3"
+msgstr "Трекбол Y 3"
 
 #: src/emu/inpttype.ipp:759
 msgctxt "input-name"
-msgid "Track Y 4"
-msgstr ""
+msgid "Trackball Y 4"
+msgstr "Трекбол Y 4"
 
 #: src/emu/inpttype.ipp:760
 msgctxt "input-name"
-msgid "Track Y 5"
-msgstr ""
+msgid "Trackball Y 5"
+msgstr "Трекбол Y 5"
 
 #: src/emu/inpttype.ipp:761
 msgctxt "input-name"
-msgid "Track Y 6"
-msgstr ""
+msgid "Trackball Y 6"
+msgstr "Трекбол Y 6"
 
 #: src/emu/inpttype.ipp:762
 msgctxt "input-name"
-msgid "Track Y 7"
-msgstr ""
+msgid "Trackball Y 7"
+msgstr "Трекбол Y 7"
 
 #: src/emu/inpttype.ipp:763
 msgctxt "input-name"
-msgid "Track Y 8"
-msgstr ""
+msgid "Trackball Y 8"
+msgstr "Трекбол Y 8"
 
 #: src/emu/inpttype.ipp:764
 msgctxt "input-name"
-msgid "Track Y 9"
-msgstr ""
+msgid "Trackball Y 9"
+msgstr "Трекбол Y 9"
 
 #: src/emu/inpttype.ipp:765
 msgctxt "input-name"
-msgid "Track Y 10"
-msgstr ""
+msgid "Trackball Y 10"
+msgstr "Трекбол Y 10"
 
 #: src/emu/inpttype.ipp:770
 msgctxt "input-name"
@@ -5217,102 +5217,102 @@ msgstr ""
 #: src/emu/inpttype.ipp:840
 msgctxt "input-name"
 msgid "Mouse X"
-msgstr ""
+msgstr "Мышь X"
 
 #: src/emu/inpttype.ipp:841
 msgctxt "input-name"
 msgid "Mouse X 2"
-msgstr ""
+msgstr "Мышь X 2"
 
 #: src/emu/inpttype.ipp:842
 msgctxt "input-name"
 msgid "Mouse X 3"
-msgstr ""
+msgstr "Мышь X 3"
 
 #: src/emu/inpttype.ipp:843
 msgctxt "input-name"
 msgid "Mouse X 4"
-msgstr ""
+msgstr "Мышь X 4"
 
 #: src/emu/inpttype.ipp:844
 msgctxt "input-name"
 msgid "Mouse X 5"
-msgstr ""
+msgstr "Мышь X 5"
 
 #: src/emu/inpttype.ipp:845
 msgctxt "input-name"
 msgid "Mouse X 6"
-msgstr ""
+msgstr "Мышь X 6"
 
 #: src/emu/inpttype.ipp:846
 msgctxt "input-name"
 msgid "Mouse X 7"
-msgstr ""
+msgstr "Мышь X 7"
 
 #: src/emu/inpttype.ipp:847
 msgctxt "input-name"
 msgid "Mouse X 8"
-msgstr ""
+msgstr "Мышь X 8"
 
 #: src/emu/inpttype.ipp:848
 msgctxt "input-name"
 msgid "Mouse X 9"
-msgstr ""
+msgstr "Мышь X 9"
 
 #: src/emu/inpttype.ipp:849
 msgctxt "input-name"
 msgid "Mouse X 10"
-msgstr ""
+msgstr "Мышь X 10"
 
 #: src/emu/inpttype.ipp:854
 msgctxt "input-name"
 msgid "Mouse Y"
-msgstr ""
+msgstr "Мышь Y"
 
 #: src/emu/inpttype.ipp:855
 msgctxt "input-name"
 msgid "Mouse Y 2"
-msgstr ""
+msgstr "Мышь Y 2"
 
 #: src/emu/inpttype.ipp:856
 msgctxt "input-name"
 msgid "Mouse Y 3"
-msgstr ""
+msgstr "Мышь Y 3"
 
 #: src/emu/inpttype.ipp:857
 msgctxt "input-name"
 msgid "Mouse Y 4"
-msgstr ""
+msgstr "Мышь Y 4"
 
 #: src/emu/inpttype.ipp:858
 msgctxt "input-name"
 msgid "Mouse Y 5"
-msgstr ""
+msgstr "Мышь Y 5"
 
 #: src/emu/inpttype.ipp:859
 msgctxt "input-name"
 msgid "Mouse Y 6"
-msgstr ""
+msgstr "Мышь Y 6"
 
 #: src/emu/inpttype.ipp:860
 msgctxt "input-name"
 msgid "Mouse Y 7"
-msgstr ""
+msgstr "Мышь Y 7"
 
 #: src/emu/inpttype.ipp:861
 msgctxt "input-name"
 msgid "Mouse Y 8"
-msgstr ""
+msgstr "Мышь Y 8"
 
 #: src/emu/inpttype.ipp:862
 msgctxt "input-name"
 msgid "Mouse Y 9"
-msgstr ""
+msgstr "Мышь Y 9"
 
 #: src/emu/inpttype.ipp:863
 msgctxt "input-name"
 msgid "Mouse Y 10"
-msgstr ""
+msgstr "Мышь Y 10"
 
 #: src/emu/inpttype.ipp:868
 msgctxt "input-name"

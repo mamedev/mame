@@ -14,6 +14,9 @@
 #include "machine/eepromser.h"
 #include "screen.h"
 
+
+namespace {
+
 class wy30p_state : public driver_device
 {
 public:
@@ -124,5 +127,8 @@ void wy30p_state::driver_start()
 			rom[base | offset] = bitswap<8>(orig[bitswap<13>(offset, 8, 5, 0, 4, 3, 9, 7, 10, 11, 12, 2, 6, 1)], 3, 4, 5, 6, 7, 2, 1, 0);
 	}
 }
+
+} // anonymous namespace
+
 
 COMP(1992, wy30p, 0, 0, wy30p, wy30p, wy30p_state, empty_init, "Wyse Technology", "WY-30+ (v1.8)", MACHINE_IS_SKELETON)

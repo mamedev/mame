@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Robbbert, Wilbert Pol
-#ifndef MAME_INCLUDES_OSI_H
-#define MAME_INCLUDES_OSI_H
+#ifndef MAME_OSI_OSI_H
+#define MAME_OSI_OSI_H
 
 #pragma once
 
@@ -159,4 +159,4 @@ protected:
 	void uk101_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_OSI_H
+#endif // MAME_OSI_OSI_H

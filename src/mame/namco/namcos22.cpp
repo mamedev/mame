@@ -5425,7 +5425,7 @@ ROM_START( alpines )
 	ROM_LOAD( "af1wavea.2l",  0x000000, 0x400000, CRC(28cca494) SHA1(4ff87ab85fd17bf8dbee5b03d99cc5c31dd6349a) )
 ROM_END
 
-ROM_START( alpinesa ) // only 4 different DWORDs at 0x700, watchpoint does not trigger there
+ROM_START( alpinesa ) // only 4 different DWORDs at 0x700, pretty certain it's the serial number
 	ROM_REGION( 0x800000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_BYTE( "af2ver-a_ll.ic2", 0x000003, 0x200000, CRC(d8025e98) SHA1(e1c08557e70d632bf1e99356d6c6f76b5f407b8f) )
 	ROM_LOAD32_BYTE( "af2ver-a_lm.ic3", 0x000002, 0x200000, CRC(5f805d51) SHA1(b7fa9028deeaf1c549e9c2d6099925a0d0ad1598) )

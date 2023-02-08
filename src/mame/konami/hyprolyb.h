@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Hardy
-#ifndef MAME_AUDIO_HYPROLYB_H
-#define MAME_AUDIO_HYPROLYB_H
+#ifndef MAME_KONAMI_HYPROLYB_H
+#define MAME_KONAMI_HYPROLYB_H
 
 #pragma once
 
@@ -39,4 +39,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(HYPROLYB_ADPCM, hyprolyb_adpcm_device)
 
-#endif // MAME_AUDIO_HYPROLYB_H
+#endif // MAME_KONAMI_HYPROLYB_H

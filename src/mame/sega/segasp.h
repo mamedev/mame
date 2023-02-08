@@ -6,8 +6,8 @@
 
 */
 
-#ifndef MAME_INCLUDES_SEGASP_H
-#define MAME_INCLUDES_SEGASP_H
+#ifndef MAME_SEGA_SEGASP_H
+#define MAME_SEGA_SEGASP_H
 
 #pragma once
 
@@ -42,4 +42,4 @@ private:
 	void segasp_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SEGASP_H
+#endif // MAME_SEGA_SEGASP_H

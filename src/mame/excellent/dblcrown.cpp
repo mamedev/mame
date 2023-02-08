@@ -56,6 +56,10 @@
 #include "speaker.h"
 
 #include "dblcrown.lh"
+
+
+namespace {
+
 #define DEBUG_VRAM
 
 class dblcrown_state : public driver_device
@@ -639,6 +643,8 @@ ROM_START( dblcrown )
 	ROM_REGION( 0x0bf1, "plds", 0 )
 	ROM_LOAD("palce16v8h.u39", 0x0000, 0x0117, CRC(c74231ee) SHA1(f1b9e98f1fde53eee64d5da38fb8a6c22b6333e2) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*     YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROT    COMPANY                FULLNAME                FLAGS                    LAYOUT  */

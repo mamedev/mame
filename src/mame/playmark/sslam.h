@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli, Quench
-#ifndef MAME_INCLUDES_SSLAM_H
-#define MAME_INCLUDES_SSLAM_H
+#ifndef MAME_PLAYMARK_SSLAM_H
+#define MAME_PLAYMARK_SSLAM_H
 
 #pragma once
 
@@ -115,4 +115,4 @@ protected:
 	void powerbls_bg_tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 };
 
-#endif // MAME_INCLUDES_SSLAM_H
+#endif // MAME_PLAYMARK_SSLAM_H

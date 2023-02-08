@@ -23,6 +23,8 @@ Date of manufacture unknown, however the chips have date codes of 1994 and 1995.
 #include "cpu/cosmac/cosmac.h"
 
 
+namespace {
+
 class micromon_state : public driver_device
 {
 public:
@@ -92,5 +94,8 @@ ROM_START( micromon7141 )
 	ROM_LOAD( "721421_rev4.0_25_7_95.ic2",  0x0000, 0x1000, CRC(b2a26439) SHA1(66a65d19b3cff185e82b10fc7ecb965c51751b7c) )
 	ROM_LOAD( "702423_rev4.0_25_7_95.ic41", 0x1000, 0x1000, CRC(5efe6b4b) SHA1(b3670c53e2527e824cc22e4a54db9abf5a07239f) )
 ROM_END
+
+} // anonymous namespace
+
 
 SYST( 1995?, micromon7141, 0, 0, micromon, micromon, micromon_state, empty_init, "Kontron Instruments",  "Micromon 7141 ECG unit",  MACHINE_IS_SKELETON | MACHINE_SUPPORTS_SAVE )

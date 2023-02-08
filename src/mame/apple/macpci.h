@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_MACPCI_H
-#define MAME_INCLUDES_MACPCI_H
+#ifndef MAME_APPLE_MACPCI_H
+#define MAME_APPLE_MACPCI_H
 
 #include "machine/8530scc.h"
 #include "machine/6522via.h"
@@ -166,4 +166,4 @@ private:
 	void mac_driver_init(model_t model);
 };
 
-#endif // MAME_INCLUDES_MACPCI_H
+#endif // MAME_APPLE_MACPCI_H

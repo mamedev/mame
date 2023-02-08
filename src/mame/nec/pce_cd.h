@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef MAME_MACHINE_PCE_CD_H
-#define MAME_MACHINE_PCE_CD_H
+#ifndef MAME_NEC_PCE_CD_H
+#define MAME_NEC_PCE_CD_H
 
 #pragma once
 
@@ -221,4 +221,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(PCE_CD, pce_cd_device)
 
-#endif // MAME_MACHINE_PCE_CD_H
+#endif // MAME_NEC_PCE_CD_H

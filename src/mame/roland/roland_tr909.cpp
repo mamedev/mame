@@ -11,6 +11,9 @@
 #include "cpu/upd7810/upd7810.h"
 #include "machine/nvram.h"
 
+
+namespace {
+
 class roland_tr909_state : public driver_device
 {
 public:
@@ -288,6 +291,8 @@ ROM_START(tr909)
 	ROM_REGION(0x8000, "ride", 0)
 	ROM_LOAD("hn61256p__c44.ic54", 0, 0x8000, CRC(01a9b435) SHA1(daa54c58c7e3ae3398f125568537ec82d5bd1dfd))
 ROM_END
+
+} // anonymous namespace
 
 
 SYST(1984, tr909, 0, 0, tr909, tr909, roland_tr909_state, empty_init, "Roland", "TR-909 Rhythm Composer", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

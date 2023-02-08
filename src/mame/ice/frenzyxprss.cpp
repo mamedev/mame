@@ -32,7 +32,7 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "screen.h"
+#include "machine/pci.h"
 
 namespace {
 
@@ -46,56 +46,30 @@ public:
 
 	void frenzyxprss(machine_config &config);
 
-protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
 private:
 	required_device<cpu_device> m_maincpu;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void frenzyxprss_map(address_map &map);
 };
 
-void frenzyxprss_state::video_start()
-{
-}
-
-uint32_t frenzyxprss_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
 
 void frenzyxprss_state::frenzyxprss_map(address_map &map)
 {
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0x20000);
+	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
 }
 
 static INPUT_PORTS_START( frenzyxprss )
 INPUT_PORTS_END
 
-
-void frenzyxprss_state::machine_start()
-{
-}
-
-void frenzyxprss_state::machine_reset()
-{
-}
-
 void frenzyxprss_state::frenzyxprss(machine_config &config)
 {
-	// Basic machine hardware
-	PENTIUM3(config, m_maincpu, 100000000); // Intel Celeron SL5ZF 1GHz
+	PENTIUM3(config, m_maincpu, 100'000'000); // Intel Celeron SL5ZF 1GHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &frenzyxprss_state::frenzyxprss_map);
 
-	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(800, 600); // Guess
-	screen.set_visarea(0, 800-1, 0, 600-1);
-	screen.set_screen_update(FUNC(frenzyxprss_state::screen_update));
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 /***************************************************************************
@@ -105,7 +79,7 @@ void frenzyxprss_state::frenzyxprss(machine_config &config)
 ***************************************************************************/
 
 ROM_START( frenzyxprss )
-	ROM_REGION( 0x40000, "bios", 0 )
+	ROM_REGION32_LE( 0x40000, "bios", 0 )
 	ROM_SYSTEM_BIOS( 0, "750", "2002-04-19" )
 	ROMX_LOAD( "a6309vms_2002-04-19.750.u24", 0x00000, 0x40000, CRC(a227ff2a) SHA1(eea6b336082bf8091f120b6c4cc9bb61c3c3c234), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "740", "2002-02-28" )

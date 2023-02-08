@@ -7,8 +7,8 @@
     driver by Zsolt Vasvari
 
 ****************************************************************************/
-#ifndef MAME_INCLUDES_CARPOLO_H
-#define MAME_INCLUDES_CARPOLO_H
+#ifndef MAME_EXIDY_CARPOLO_H
+#define MAME_EXIDY_CARPOLO_H
 
 #pragma once
 
@@ -159,4 +159,4 @@ private:
 	required_device_array<netlist_mame_logic_input_device, 4> m_player_crash;
 };
 
-#endif // MAME_INCLUDES_CARPOLO_H
+#endif // MAME_EXIDY_CARPOLO_H

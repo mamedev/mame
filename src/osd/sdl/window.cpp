@@ -8,9 +8,17 @@
 //
 //============================================================
 
-#ifdef SDLMAME_WIN32
-#include <windows.h>
-#endif
+// MAME headers
+#include "emu.h"
+#include "emuopts.h"
+#include "render.h"
+#include "screen.h"
+#include "ui/uimain.h"
+
+// OSD headers
+#include "window.h"
+#include "osdsdl.h"
+#include "modules/monitor/monitor_common.h"
 
 // standard SDL headers
 #include <SDL2/SDL.h>
@@ -24,25 +32,10 @@
 #include <list>
 #include <memory>
 
-// MAME headers
-
-#include "emu.h"
-#include "emuopts.h"
-#include "render.h"
-#include "screen.h"
-#include "ui/uimain.h"
-
-// OSD headers
-
-#include "window.h"
-#include "osdsdl.h"
-#include "modules/render/drawbgfx.h"
-#include "modules/render/drawsdl.h"
-#include "modules/render/draw13.h"
-#include "modules/monitor/monitor_common.h"
-#if (USE_OPENGL)
-#include "modules/render/drawogl.h"
+#ifdef SDLMAME_WIN32
+#include <windows.h>
 #endif
+
 
 //============================================================
 //  PARAMETERS
@@ -74,14 +67,6 @@ public:
 	SDL_DisplayMode mode;
 };
 
-// debugger
-//static int in_background;
-
-
-//============================================================
-//  PROTOTYPES
-//============================================================
-
 
 //============================================================
 //  window_init
@@ -92,60 +77,10 @@ bool sdl_osd_interface::window_init()
 {
 	osd_printf_verbose("Enter sdlwindow_init\n");
 
-	// initialize the renderer
-	const int fallbacks[VIDEO_MODE_COUNT] = {
-		-1,                     // NONE -> no fallback
-		-1,                     // No GDI on Linux
-#if defined(USE_OPENGL) && USE_OPENGL
-		VIDEO_MODE_OPENGL,      // BGFX -> OpenGL
-		-1,                     // OpenGL -> no fallback
-#else
-		VIDEO_MODE_SDL2ACCEL,   // BGFX -> SDL2Accel
-#endif
-		-1,                     // SDL2ACCEL -> no fallback
-		-1,                     // No D3D on Linux
-		-1,                     // SOFT -> no fallback
-	};
-
-	int current_mode = video_config.mode;
-	while (current_mode != VIDEO_MODE_NONE)
-	{
-		bool error = false;
-		switch(current_mode)
-		{
-			case VIDEO_MODE_BGFX:
-				error = renderer_bgfx::init(machine());
-				break;
-#if defined(USE_OPENGL) && USE_OPENGL
-			case VIDEO_MODE_OPENGL:
-				renderer_ogl::init(machine());
-				break;
-#endif
-			case VIDEO_MODE_SDL2ACCEL:
-				renderer_sdl2::init(machine());
-				break;
-			case VIDEO_MODE_SOFT:
-				renderer_sdl1::init(machine());
-				break;
-			default:
-				fatalerror("Unknown video mode.");
-				break;
-		}
-		if (error)
-		{
-			current_mode = fallbacks[current_mode];
-		}
-		else
-		{
-			break;
-		}
-	}
-	video_config.mode = current_mode;
-
-	/* We may want to set a number of the hints SDL2 provides.
-	 * The code below will document which hints were set.
-	 */
-	const char * hints[] = { SDL_HINT_FRAMEBUFFER_ACCELERATION,
+	// We may want to set a number of the hints SDL2 provides.
+	// The code below will document which hints were set.
+	char const *const hints[] = {
+			SDL_HINT_FRAMEBUFFER_ACCELERATION,
 			SDL_HINT_RENDER_DRIVER, SDL_HINT_RENDER_OPENGL_SHADERS,
 			SDL_HINT_RENDER_SCALE_QUALITY,
 			SDL_HINT_RENDER_VSYNC,
@@ -167,14 +102,13 @@ bool sdl_osd_interface::window_init()
 			SDL_HINT_WINRT_PRIVACY_POLICY_URL, SDL_HINT_WINRT_PRIVACY_POLICY_LABEL,
 			SDL_HINT_WINRT_HANDLE_BACK_BUTTON,
 #endif
-			nullptr
-	};
+			};
 
 	osd_printf_verbose("\nHints:\n");
-	for (int i = 0; hints[i] != nullptr; i++)
+	for (auto const hintname : hints)
 	{
-		char const *const hint(SDL_GetHint(hints[i]));
-		osd_printf_verbose("\t%-40s %s\n", hints[i], hint ? hint : "(NULL)");
+		char const *const hintvalue(SDL_GetHint(hintname));
+		osd_printf_verbose("\t%-40s %s\n", hintname, hintvalue ? hintvalue : "(NULL)");
 	}
 
 	// set up the window list
@@ -185,7 +119,7 @@ bool sdl_osd_interface::window_init()
 
 void sdl_osd_interface::update_slider_list()
 {
-	for (auto window : osd_common_t::s_window_list)
+	for (auto const &window : osd_common_t::window_list())
 	{
 		// check if any window has dirty sliders
 		if (window->renderer().sliders_dirty())
@@ -200,7 +134,7 @@ void sdl_osd_interface::build_slider_list()
 {
 	m_sliders.clear();
 
-	for (auto window : osd_common_t::s_window_list)
+	for (auto const &window : osd_common_t::window_list())
 	{
 		std::vector<ui::menu_item> window_sliders = window->renderer().get_slider_list();
 		m_sliders.insert(m_sliders.end(), window_sliders.begin(), window_sliders.end());
@@ -217,33 +151,14 @@ void sdl_osd_interface::window_exit()
 	osd_printf_verbose("Enter sdlwindow_exit\n");
 
 	// free all the windows
+	m_focus_window = nullptr;
 	while (!osd_common_t::s_window_list.empty())
 	{
-		auto window = osd_common_t::s_window_list.front();
-
-		// Part of destroy removes the window from the list
+		auto window = std::move(osd_common_t::s_window_list.back());
+		s_window_list.pop_back();
 		window->destroy();
 	}
 
-	switch (video_config.mode)
-	{
-		case VIDEO_MODE_SDL2ACCEL:
-			renderer_sdl1::exit();
-			break;
-		case VIDEO_MODE_SOFT:
-			renderer_sdl1::exit();
-			break;
-		case VIDEO_MODE_BGFX:
-			renderer_bgfx::exit();
-			break;
-#if (USE_OPENGL)
-		case VIDEO_MODE_OPENGL:
-			renderer_ogl::exit();
-			break;
-#endif
-		default:
-			break;
-	}
 	osd_printf_verbose("Leave sdlwindow_exit\n");
 }
 
@@ -345,10 +260,7 @@ void sdl_window_info::toggle_full_screen()
 	}
 	SDL_DestroyWindow(platform_window());
 	set_platform_window(nullptr);
-
 	downcast<sdl_osd_interface &>(machine().osd()).release_keys();
-
-	set_renderer(osd_renderer::make_for_type(video_config.mode, shared_from_this()));
 
 	// toggle the window mode
 	set_fullscreen(!fullscreen());
@@ -377,8 +289,8 @@ void sdl_window_info::modify_prescale(int dir)
 		}
 		else
 		{
-			notify_changed();
 			m_prescale = new_prescale;
+			notify_changed();
 		}
 		machine().ui().popup_time(1, "Prescale %d", prescale());
 	}
@@ -441,8 +353,6 @@ int sdl_window_info::window_init()
 
 	create_target();
 
-	set_renderer(osd_renderer::make_for_type(video_config.mode, static_cast<osd_window*>(this)->shared_from_this()));
-
 	int result = complete_create();
 
 	// handle error conditions
@@ -474,8 +384,9 @@ void sdl_window_info::complete_destroy()
 		SDL_SetWindowFullscreen(platform_window(), SDL_WINDOW_FULLSCREEN);    // Try to set mode
 	}
 
+	renderer_reset();
 	SDL_DestroyWindow(platform_window());
-	// release all keys ...
+	set_platform_window(nullptr);
 	downcast<sdl_osd_interface &>(machine().osd()).release_keys();
 }
 
@@ -675,13 +586,15 @@ int sdl_window_info::complete_create()
 	 *
 	 */
 	osd_printf_verbose("Enter sdl_info::create\n");
-	if (renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL) && !video_config.novideo)
+	if (renderer_sdl_needs_opengl())
 	{
 		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 		m_extra_flags = SDL_WINDOW_OPENGL;
 	}
 	else
+	{
 		m_extra_flags = 0;
+	}
 
 	// We need to workaround an issue in SDL 2.0.4 for OS X where setting the
 	// relative mode on the mouse in fullscreen mode makes mouse events stop
@@ -780,7 +693,7 @@ int sdl_window_info::complete_create()
 
 	if  (sdlwindow == nullptr )
 	{
-		if (renderer().has_flags(osd_renderer::FLAG_NEEDS_OPENGL))
+		if (renderer_sdl_needs_opengl())
 			osd_printf_error("OpenGL not supported on this driver: %s\n", SDL_GetError());
 		else
 			osd_printf_error("Window creation failed: %s\n", SDL_GetError());
@@ -788,6 +701,7 @@ int sdl_window_info::complete_create()
 	}
 
 	set_platform_window(sdlwindow);
+	renderer_create();
 
 	if (fullscreen() && video_config.switchres)
 	{
@@ -825,24 +739,6 @@ int sdl_window_info::complete_create()
 	if (fullscreen())
 		SDL_SetWindowGrab(platform_window(), SDL_TRUE);
 #endif
-
-	// set main window
-	if (index() > 0)
-	{
-		for (auto w : osd_common_t::s_window_list)
-		{
-			if (w->index() == 0)
-			{
-				set_main_window(std::dynamic_pointer_cast<osd_window>(w));
-				break;
-			}
-		}
-	}
-	else
-	{
-		// We must be the main window
-		set_main_window(shared_from_this());
-	}
 
 	// update monitor resolution after mode change to ensure proper pixel aspect
 	monitor()->refresh();
@@ -1155,10 +1051,11 @@ osd_dim sdl_window_info::get_max_bounds(int constrain)
 
 sdl_window_info::sdl_window_info(
 		running_machine &a_machine,
+		render_module &renderprovider,
 		int index,
-		std::shared_ptr<osd_monitor_info> a_monitor,
+		const std::shared_ptr<osd_monitor_info> &a_monitor,
 		const osd_window_config *config)
-	: osd_window_t(a_machine, index, std::move(a_monitor), *config)
+	: osd_window_t(a_machine, renderprovider, index, std::move(a_monitor), *config)
 	, m_startmaximized(0)
 	// Following three are used by input code to defer resizes
 	, m_minimum_dim(0, 0)

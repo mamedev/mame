@@ -21,6 +21,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class roland_s50_state : public driver_device
 {
 public:
@@ -531,6 +534,9 @@ ROM_START(s330)
 	ROM_LOAD16_BYTE("s-330.ic14", 0x0001, 0x2000, NO_DUMP)
 ROM_END
 #endif
+
+} // anonymous namespace
+
 
 SYST(1987, s50,  0,   0, s50,  s50,  roland_s50_state,  empty_init, "Roland", "S-50 Digital Sampling Keyboard", MACHINE_IS_SKELETON)
 SYST(1987, s550, s50, 0, s550, s550, roland_s550_state, empty_init, "Roland", "S-550 Digital Sampler", MACHINE_IS_SKELETON)

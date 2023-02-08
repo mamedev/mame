@@ -6,10 +6,10 @@
 //
 //============================================================
 
-#pragma once
+#ifndef MAME_RENDER_BGFX_SUPPRESSORREADER_H
+#define MAME_RENDER_BGFX_SUPPRESSORREADER_H
 
-#ifndef __DRAWBGFX_SUPPRESSOR_READER__
-#define __DRAWBGFX_SUPPRESSOR_READER__
+#pragma once
 
 #include "statereader.h"
 
@@ -22,11 +22,11 @@ class bgfx_slider;
 class suppressor_reader : public state_reader
 {
 public:
-	static bgfx_suppressor* read_from_value(const Value& value, std::string prefix, std::map<std::string, bgfx_slider*>& sliders);
+	static bgfx_suppressor* read_from_value(const Value& value, const std::string &prefix, std::map<std::string, bgfx_slider*>& sliders);
 
 private:
 	static bool get_values(const Value& value, std::string prefix, std::string name, int* values, const int count);
-	static bool validate_parameters(const Value& value, std::string prefix);
+	static bool validate_parameters(const Value& value, const std::string &prefix);
 
 	static const int CONDITION_COUNT = 2;
 	static const string_to_enum CONDITION_NAMES[CONDITION_COUNT];
@@ -34,4 +34,4 @@ private:
 	static const string_to_enum COMBINE_NAMES[COMBINE_COUNT];
 };
 
-#endif // __DRAWBGFX_SUPPRESSOR_READER__
+#endif // MAME_RENDER_BGFX_SUPPRESSORREADER_H

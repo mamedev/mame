@@ -30,6 +30,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class magiceyes_vr3520f_game_state : public driver_device
 {
 public:
@@ -115,6 +117,8 @@ ROM_START( didj )
 
 	// is there an internal bootloader beyond copying code from NAND into RAM?
 ROM_END
+
+} // anonymous namespace
 
 
 CONS( 2008, didj,      0,       0,      leapfrog_didj, leapfrog_didj, magiceyes_vr3520f_game_state, empty_init, "LeapFrog", "Didj", MACHINE_IS_SKELETON )

@@ -37,13 +37,19 @@ inline menu_analog::item_data::item_data(ioport_field &f, int t) noexcept
 
 inline menu_analog::field_data::field_data(ioport_field &f) noexcept
 	: field(f)
-	, range(f.maxval() - f.minval())
-	, neutral(float(f.analog_reverse() ? (f.maxval() - f.defvalue()) : (f.defvalue() - f.minval())) / range)
-	, origin((f.analog_wraps() && (f.defvalue() != f.minval()) && (f.defvalue() != f.maxval())) ? 0.0f : neutral)
+	, range(0.0F)
+	, neutral(0.0F)
+	, origin(0.0F)
 	, shift(0U)
 	, show_neutral((f.defvalue() != f.minval()) && (f.defvalue() != f.maxval()))
 {
 	for (ioport_value m = f.mask(); m && !BIT(m, 0); m >>= 1, ++shift) { }
+	ioport_value const m(f.mask() >> shift);
+	range = (f.maxval() - f.minval()) & m;
+	ioport_value const n((f.analog_reverse() ? (f.maxval() - f.defvalue()) : (f.defvalue() - f.minval())) & m);
+	neutral = float(n) / range;
+	if (!f.analog_wraps() || (f.defvalue() == f.minval()) || (f.defvalue() == f.maxval()))
+		origin = neutral;
 }
 
 
@@ -63,6 +69,15 @@ menu_analog::menu_analog(mame_ui_manager &mui, render_container &container)
 
 menu_analog::~menu_analog()
 {
+}
+
+
+void menu_analog::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	// space for live display
+	set_custom_space(0.0f, (line_height() * m_visible_fields) + (tb_border() * 3.0f));
 }
 
 
@@ -166,7 +181,7 @@ void menu_analog::custom_render(void *selectedref, float top, float bottom, floa
 
 		ioport_value cur(0U);
 		data.field.get().live().analog->read(cur);
-		cur = (cur >> data.shift) - data.field.get().minval();
+		cur = ((cur >> data.shift) - data.field.get().minval()) & (data.field.get().mask() >> data.shift);
 		float fill(float(cur) / data.range);
 		if (data.field.get().analog_reverse())
 			fill = 1.0f - fill;
@@ -231,8 +246,13 @@ void menu_analog::handle(event const *ev)
 
 			switch (ev->iptkey)
 			{
-			// if selected, reset to default value
+			// flip toggles when selected
 			case IPT_UI_SELECT:
+				if (ANALOG_ITEM_REVERSE == data.type)
+					newval = newval ? 0 : 1;
+				break;
+
+			// if cleared, reset to default value
 			case IPT_UI_CLEAR:
 				newval = data.defvalue;
 				break;
@@ -331,7 +351,7 @@ void menu_analog::handle(event const *ev)
 }
 
 
-void menu_analog::populate(float &customtop, float &custombottom)
+void menu_analog::populate()
 {
 	// loop over input ports
 	if (m_item_data.empty())
@@ -401,7 +421,7 @@ void menu_analog::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 
 	// space for live display
-	custombottom = (line_height() * m_visible_fields) + (tb_border() * 3.0f);
+	set_custom_space(0.0f, (line_height() * m_visible_fields) + (tb_border() * 3.0f));
 }
 
 

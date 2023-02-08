@@ -46,6 +46,9 @@
 #include "video/mc6845.h"
 #include "screen.h"
 
+
+namespace {
+
 #define MASTER_CLOCK XTAL(23'814'000)
 
 class tv950_state : public driver_device
@@ -359,6 +362,9 @@ ROM_START( tv950 )
 	ROM_LOAD( "1800000-003a.a32", 0x0000, 0x1000, CRC(eaef0138) SHA1(7198851299fce07c95d18e32cbfbe936c0dbec2a) )
 	ROM_LOAD( "1800000-002a.a33", 0x0000, 0x1000, CRC(856dd85c) SHA1(e2570017e098b0e1ead7749e9c2ac40be2367433) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY      FULLNAME                            FLAGS

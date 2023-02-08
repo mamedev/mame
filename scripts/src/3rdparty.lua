@@ -211,6 +211,7 @@ end
 		MAME_DIR .. "3rdparty/softfloat/fsincos.c",
 		MAME_DIR .. "3rdparty/softfloat/fpatan.c",
 		MAME_DIR .. "3rdparty/softfloat/fyl2x.c",
+		MAME_DIR .. "3rdparty/softfloat/f2xm1.c",
 	}
 
 
@@ -979,6 +980,7 @@ project "sqlite3"
 			"-Wno-discarded-qualifiers",
 			"-Wno-undef",
 			"-Wno-unused-but-set-variable",
+			"-Wno-unused-variable",
 		}
 if _OPTIONS["gcc"]~=nil then
 	if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
@@ -1251,7 +1253,7 @@ project "bimg"
 	configuration { "mingw*" }
 		defines {
 			"ASTCENC_AVX=0",
-			"ASTCENC_SSE=2",
+			"ASTCENC_SSE=20",
 		}
 	configuration { }
 

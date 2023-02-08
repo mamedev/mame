@@ -10,6 +10,9 @@
 #include "cpu/pic17/pic17c4x.h"
 #include "machine/nvram.h"
 
+
+namespace {
+
 class xbase09_state : public driver_device
 {
 public:
@@ -193,5 +196,8 @@ ROM_START(xbase09)
 	ROM_LOAD("xbase.ic59", 0x1000, 0x0a92, NO_DUMP) // right side of HH ROM
 	ROM_LOAD("xbase.ic60", 0x2000, 0x0a92, NO_DUMP) // left side of HH ROM; confirmed to be a PALCE20V8H-15PC/4
 ROM_END
+
+} // anonymous namespace
+
 
 SYST(1997, xbase09, 0, 0, xbase09, xbase09, xbase09_state, empty_init, "JoMoX", "XBase 09 Midi Controlled Analogue Drum Module", MACHINE_IS_SKELETON)

@@ -108,7 +108,7 @@ void menu_main::menu_activated()
     populate - populate main menu items
 -------------------------------------------------*/
 
-void menu_main::populate(float &customtop, float &custombottom)
+void menu_main::populate()
 {
 	m_phase = machine().phase();
 

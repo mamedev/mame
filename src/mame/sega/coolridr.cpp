@@ -296,6 +296,8 @@ to the same bank as defined through A20.
 #include "aquastge.lh"
 
 
+namespace {
+
 #define CLIPMAXX_FULL (496-1)
 #define CLIPMAXY_FULL (384-1)
 #define CLIPMINX_FULL (0)
@@ -3394,6 +3396,9 @@ void coolridr_state::init_aquastge()
 
 	m_colbase = 0;
 }
+
+} // anonymous namespace
+
 
 GAME(  1995, coolridr, 0, coolridr, coolridr, coolridr_state, init_coolridr, ROT0, "Sega", "Cool Riders", MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN ) // region is set in test mode, this set is for Japan, USA and Export (all regions)
 GAMEL( 1995, aquastge, 0, aquastge, aquastge, coolridr_state, init_aquastge, ROT0, "Sega", "Aqua Stage",  MACHINE_NOT_WORKING, layout_aquastge)

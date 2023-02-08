@@ -24,6 +24,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class vtech_innotab_state : public driver_device
 {
 public:
@@ -214,5 +217,8 @@ ROM_START( innotab2 )
 	// this appears to be a project file used by the dumping software, not a ROM
 	//ROM_LOAD( "emmc_ghost.mpj", 0x000000, 0x3712, CRC(16b705da) SHA1(fdb576385cf46984ea40d8e8b83758d94f67507e) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 2011, innotab2,     0,       0,      vtech_innotab, vtech_innotab, vtech_innotab_state, empty_init, "VTech", "InnoTAB 2 (UK)",   MACHINE_IS_SKELETON )

@@ -172,7 +172,7 @@ In order from top to bottom they are....
 The 2 boxes join together via the Base Board upper connector and Media Board lower connector.
 
 The Microsoft-manufactured XBox board is the lowest board. It's mostly the same as the V1 XBox retail
-board with the exception that it has 128MB of RAM and a NVidia MCPX X2 chip. The retail XBox board has a
+board with the exception that it has 128MB of RAM and a nVidia MCPX X2 chip. The retail XBox board has a
 MCPX X3 chip. The board was probably released to Sega very early in development and the chip was updated
 in the mass-produced retail version.
 

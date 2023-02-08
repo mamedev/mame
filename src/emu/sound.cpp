@@ -12,6 +12,7 @@
 
 #include "config.h"
 #include "emuopts.h"
+#include "main.h"
 #include "speaker.h"
 
 #include "wavwrite.h"

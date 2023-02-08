@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Quench, Yochizo, David Haywood
-#ifndef MAME_INCLUDES_TOAPLAN2_H
-#define MAME_INCLUDES_TOAPLAN2_H
+#ifndef MAME_TOAPLAN_TOAPLAN2_H
+#define MAME_TOAPLAN_TOAPLAN2_H
 
 #pragma once
 
@@ -298,4 +298,4 @@ private:
 	void pwrkick_68k_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_TOAPLAN2_H
+#endif // MAME_TOAPLAN_TOAPLAN2_H

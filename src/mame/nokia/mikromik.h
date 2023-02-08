@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_MIKROMIK_H
-#define MAME_INCLUDES_MIKROMIK_H
+#ifndef MAME_NOKIA_MIKROMIK_H
+#define MAME_NOKIA_MIKROMIK_H
 
 #pragma once
 
@@ -152,4 +152,4 @@ private:
 	void mm1_upd7220_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MIKROMIK_H
+#endif // MAME_NOKIA_MIKROMIK_H

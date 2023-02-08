@@ -59,6 +59,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 // arcadia_state was also defined in mess/includes/arcadia.h
 class arcadia_amiga_state : public amiga_state
 {
@@ -1002,6 +1004,8 @@ void arcadia_amiga_state::init_xeon() { init_arcadia(); generic_decode("user3", 
 void arcadia_amiga_state::init_pm()   { init_arcadia(); generic_decode("user3", 7, 6, 5, 4, 3, 2, 1, 0); } // no scramble
 void arcadia_amiga_state::init_dlta() { init_arcadia(); generic_decode("user3", 4, 1, 7, 6, 2, 0, 3, 5); }
 void arcadia_amiga_state::init_argh() { init_arcadia(); generic_decode("user3", 5, 0, 2, 4, 7, 6, 1, 3); }
+
+} // anonymous namespace
 
 
 /*************************************

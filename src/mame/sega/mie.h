@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_MACHINE_MIE_H
-#define MAME_MACHINE_MIE_H
+#ifndef MAME_SEGA_MIE_H
+#define MAME_SEGA_MIE_H
 
 #pragma once
 
@@ -139,4 +139,4 @@ public:
 DECLARE_DEVICE_TYPE(MIE,     mie_device)
 DECLARE_DEVICE_TYPE(MIE_JVS, mie_jvs_device)
 
-#endif // MAME_MACHINE_MIE_H
+#endif // MAME_SEGA_MIE_H

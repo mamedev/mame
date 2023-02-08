@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles,Ernesto Corvi
-#ifndef MAME_AUDIO_CLIFFHGR_H
-#define MAME_AUDIO_CLIFFHGR_H
+#ifndef MAME_STERN_CLIFFHGR_A_H
+#define MAME_STERN_CLIFFHGR_A_H
 
 #pragma once
 
@@ -9,4 +9,4 @@
 
 DISCRETE_SOUND_EXTERN( cliffhgr_discrete );
 
-#endif // MAME_AUDIO_CLIFFHGR_H
+#endif // MAME_STERN_CLIFFHGR_A_H

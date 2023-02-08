@@ -58,6 +58,8 @@ Note that left-most digit is not wired up, and therefore will always be blank.
 #include "acrnsys1.lh"
 
 
+namespace {
+
 class acrnsys1_state : public driver_device
 {
 public:
@@ -299,6 +301,8 @@ ROM_START( acrnsys1 )
 	ROM_REGION(0x0200, "maincpu", 0)
 	ROM_LOAD("acrnsys1.bin", 0x0000, 0x0200, CRC(43dcfc16) SHA1(b987354c55beb5e2ced761970c3339b895a8c09d))
 ROM_END
+
+} // anonymous namespace
 
 
 /***************************************************************************

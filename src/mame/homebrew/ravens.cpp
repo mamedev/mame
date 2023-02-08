@@ -80,6 +80,8 @@ ToDo:
 #include "ravens.lh"
 
 
+namespace {
+
 class ravens_base : public driver_device
 {
 public:
@@ -430,6 +432,9 @@ ROM_START( ravens2 )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "mon_v2.0.bin", 0x0000, 0x0800, CRC(bcd47c58) SHA1(f261a3f128fbedbf59a8b5480758fff4d7f76de1))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

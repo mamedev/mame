@@ -32,6 +32,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class pwp14_state : public driver_device
 {
 public:
@@ -252,6 +254,9 @@ ROM_START( pwp14 )
 	ROM_REGION(0x2000, "chargen",0)
 	ROM_LOAD( "750504.bin", 0x0000, 0x2000, CRC(b9062df6) SHA1(e79044765093b1d1954254d4a839a9e443d624d6))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

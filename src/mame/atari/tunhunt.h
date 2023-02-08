@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, David Haywood
-#ifndef MAME_INCLUDES_TUNHUNT_H
-#define MAME_INCLUDES_TUNHUNT_H
+#ifndef MAME_ATARI_TUNHUNT_H
+#define MAME_ATARI_TUNHUNT_H
 
 #pragma once
 
@@ -91,4 +91,4 @@ private:
 	uint8_t m_mobjv = 0;
 };
 
-#endif // MAME_INCLUDES_TUNHUNT_H
+#endif // MAME_ATARI_TUNHUNT_H

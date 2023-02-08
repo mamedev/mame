@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -432,7 +432,7 @@ bool Writer1<rapidjson::StringBuffer>::WriteUint(unsigned u) {
     return true;
 }
 
-// Using digits LUT to reduce divsion/modulo
+// Using digits LUT to reduce division/modulo
 template<typename OutputStream>
 class Writer2 {
 public:
@@ -616,7 +616,7 @@ inline bool Writer3<rapidjson::InsituStringStream>::WriteUint64(uint64_t u) {
     return true;
 }
 
-// Using digits LUT to reduce divsion/modulo, two passes
+// Using digits LUT to reduce division/modulo, two passes
 template<typename OutputStream>
 class Writer4 {
 public:

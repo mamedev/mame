@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles,Nicola Salmoria
-#ifndef MAME_INCLUDES_COOLPOOL_H
-#define MAME_INCLUDES_COOLPOOL_H
+#ifndef MAME_MISC_COOLPOOL_H
+#define MAME_MISC_COOLPOOL_H
 
 #pragma once
 
@@ -107,4 +107,4 @@ private:
 	void nballsht_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_COOLPOOL_H
+#endif // MAME_MISC_COOLPOOL_H

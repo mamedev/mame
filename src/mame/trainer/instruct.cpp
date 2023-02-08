@@ -57,6 +57,8 @@ ToDO:
 #include "instruct.lh"
 
 
+namespace {
+
 class instruct_state : public driver_device
 {
 public:
@@ -467,6 +469,9 @@ ROM_START( instruct )
 	ROM_LOAD( "82s123.33",    0x0000, 0x0020, CRC(b7aecef0) SHA1(b39fb35e8b6ab67b31f8f310fd5d56304bcd4123) )
 	ROM_LOAD( "82s103.20",    0x0020, 0x8000, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

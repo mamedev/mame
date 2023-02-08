@@ -50,6 +50,9 @@ SPR128A-099    -  Learning Window speech cart US (rev 3)
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class learnwin_state : public driver_device
 {
 public:
@@ -198,6 +201,8 @@ ROM_START( spielmast )
 	ROM_LOAD( "sp0256-al2.bin",0x8000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc) ) // speech cart voice chip
 	ROM_LOAD( "toshiba_t7984", 0xc000, 0x2000, NO_DUMP ) // unknown - possible MCU
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

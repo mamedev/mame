@@ -18,6 +18,7 @@ TODO:
 - Figure out the controls in 'tehkanwc' (they are told to be better in MAME 0.34)
 - Figure out the controls in 'teedoff'
 - Confirm "Difficulty" Dip Switch in 'teedoff'
+- What does the Z80 I register do here? (HW can latch it during refresh cycles.)
 
 
 Additional notes (Steph 2002.01.14)

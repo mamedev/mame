@@ -33,6 +33,9 @@ Original site died. None of the downloads in the above wayback page work, so fai
 #include "emu.h"
 #include "cpu/sh/sh4.h"
 
+
+namespace {
+
 class sh4robot_state : public driver_device
 {
 public:
@@ -98,6 +101,9 @@ ROM_START( sh4robot )
 	// Root FS at flash blocks from 201 till end (201*32*512)
 	//ROM_LOAD( "shix-linux-v1.0.yaffs", 0x0000, 0x7e9e40, CRC(7a7fdb04) SHA1(0b761e2d179335398399cb046de4e591157cb72f))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

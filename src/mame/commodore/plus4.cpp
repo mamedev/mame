@@ -34,6 +34,9 @@
 #include "sound/mos7360.h"
 #include "sound/t6721a.h"
 
+
+namespace {
+
 #define MOS7360_TAG         "u1"
 #define MOS6551_TAG         "u3"
 #define MOS6529_USER_TAG    "u5"
@@ -1227,6 +1230,7 @@ ROM_START( c116 )
 	ROM_LOAD( "251641-02.u101", 0x00, 0xf5, CRC(83be2076) SHA1(a89b18b2261233443c933c8b4663b108e7630924) )
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************

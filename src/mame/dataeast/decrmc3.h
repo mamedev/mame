@@ -14,8 +14,8 @@
 
 ******************************************************************************/
 
-#ifndef MAME_VIDEO_DECORMC3_H
-#define MAME_VIDEO_DECORMC3_H
+#ifndef MAME_DATAEAST_DECORMC3_H
+#define MAME_DATAEAST_DECORMC3_H
 
 #pragma once
 
@@ -111,4 +111,4 @@ private:
 	memory_array        m_paletteram_ext;       // extended memory
 };
 
-#endif  // MAME_VIDEO_DECORMC3_H
+#endif  // MAME_DATAEAST_DECORMC3_H

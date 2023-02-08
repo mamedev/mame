@@ -1,27 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Tony La Porta
-	/**************************************************************************\
-	*                      Microchip PIC16C5x Emulator                         *
-	*                                                                          *
-	*                    Copyright Tony La Porta                               *
-	*                 Originally written for the MAME project.                 *
-	*                                                                          *
-	*                                                                          *
-	*      Addressing architecture is based on the Harvard addressing scheme.  *
-	*                                                                          *
-	*         Many thanks to those involved in the i8039 Disassembler          *
-	*                        as this was based on it.                          *
-	*                                                                          *
-	*                                                                          *
-	*                                                                          *
-	* A Address to jump to.                                                    *
-	* B Bit address within an 8-bit file register.                             *
-	* D Destination select (0 = store result in W (accumulator))               *
-	*                      (1 = store result in file register)                 *
-	* F Register file address (00-1F).                                         *
-	* K Literal field, constant data.                                          *
-	*                                                                          *
-	\**************************************************************************/
+/*
+
+  Microchip PIC16C5x Emulator
+
+  Copyright Tony La Porta
+  Originally written for the MAME project.
+
+*/
 
 #ifndef MAME_CPU_PIC16C5X_16C5XDSM_H
 #define MAME_CPU_PIC16C5X_16C5XDSM_H

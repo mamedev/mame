@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Curt Coder
 
-#ifndef MAME_INCLUDES_CRVISION_H
-#define MAME_INCLUDES_CRVISION_H
+#ifndef MAME_VTECH_CRVISION_H
+#define MAME_VTECH_CRVISION_H
 
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cassette.h"
@@ -113,4 +113,4 @@ private:
 	virtual void machine_start() override;
 };
 
-#endif // MAME_INCLUDES_CRVISION_H
+#endif // MAME_VTECH_CRVISION_H

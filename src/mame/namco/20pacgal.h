@@ -7,8 +7,8 @@
     driver by Nicola Salmoria
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_20PACGAL_H
-#define MAME_INCLUDES_20PACGAL_H
+#ifndef MAME_NAMCO_20PACGAL_H
+#define MAME_NAMCO_20PACGAL_H
 
 #pragma once
 
@@ -122,4 +122,4 @@ private:
 	void _25pacman_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_20PACGAL_H
+#endif // MAME_NAMCO_20PACGAL_H

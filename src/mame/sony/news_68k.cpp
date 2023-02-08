@@ -49,6 +49,9 @@
 
 #define GRAPHICS 0
 
+
+namespace {
+
 class news_68k_state : public driver_device
 {
 public:
@@ -469,6 +472,9 @@ ROM_START(nws1580)
 	ROM_LOAD64_BYTE("aa1.ic14", 0x00000, 0x20000, CRC(db274954) SHA1(4bc9b8a862ce9bdbf43c70f84921253876e21e58))
 	ROM_LOAD64_BYTE("aa2.ic15", 0x00001, 0x20000, CRC(0d7686c7) SHA1(b0be18166b4690518e6a11ea194cc1c7a1ea6347))
 ROM_END
+
+} // anonymous namespace
+
 
 /*   YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS           INIT         COMPANY  FULLNAME    FLAGS */
 COMP(1988, nws1580, 0,      0,      nws1580, nws15x0, news_68k_state, init_common, "Sony",  "NWS-1580", MACHINE_NOT_WORKING)

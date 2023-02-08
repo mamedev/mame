@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, Nicola Salmoria
-#ifndef MAME_INCLUDES_HOMEDATA_H
-#define MAME_INCLUDES_HOMEDATA_H
+#ifndef MAME_MISC_HOMEDATA_H
+#define MAME_MISC_HOMEDATA_H
 
 #pragma once
 
@@ -190,4 +190,4 @@ private:
 	void reikaids_upd7807_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_HOMEDATA_H
+#endif // MAME_MISC_HOMEDATA_H

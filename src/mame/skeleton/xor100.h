@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_XOR100_H
-#define MAME_INCLUDES_XOR100_H
+#ifndef MAME_SKELETON_XOR100_H
+#define MAME_SKELETON_XOR100_H
 
 #pragma once
 
@@ -110,4 +110,4 @@ private:
 	int m_centronics_select = 0;
 };
 
-#endif // MAME_INCLUDES_XOR100_H
+#endif // MAME_SKELETON_XOR100_H

@@ -53,6 +53,9 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
+
+namespace {
+
 class news_r3k_state : public driver_device
 {
 public:
@@ -519,6 +522,9 @@ ROM_START(nws3260)
 	ROM_REGION32_BE(0x100, "idrom", 0)
 	ROM_LOAD("idrom.bin", 0x000, 0x100, CRC(17a3d9c6) SHA1(d300e6908210f540951211802c38ad7f8037aa15) BAD_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 /*   YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS           INIT         COMPANY  FULLNAME    FLAGS */
 COMP(1991, nws3260, 0,      0,      nws3260, nws3260, news_r3k_state, init_common, "Sony",  "NWS-3260", MACHINE_NO_SOUND)

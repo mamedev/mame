@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder, Olivier Galibert
-#ifndef MAME_VIDEO_ATARIST_H
-#define MAME_VIDEO_ATARIST_H
+#ifndef MAME_ATARI_ATARIST_V_H
+#define MAME_ATARI_ATARIST_V_H
 
 #pragma once
 
@@ -131,4 +131,4 @@ DECLARE_DEVICE_TYPE(STE_VIDEO, ste_video_device)
 //DECLARE_DEVICE_TYPE(STBOOK_VIDEO, stbook_video_device)
 //DECLARE_DEVICE_TYPE(TT_VIDEO, tt_video_device)
 
-#endif // MAME_VIDEO_ATARIST_H
+#endif // MAME_ATARI_ATARIST_V_H

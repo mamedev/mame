@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_MB63H158_H
-#define MAME_MACHINE_MB63H158_H
+#ifndef MAME_KAWAI_MB63H158_H
+#define MAME_KAWAI_MB63H158_H
 
 #pragma once
 
@@ -39,4 +39,4 @@ private:
 // device type declaration
 DECLARE_DEVICE_TYPE(MB63H158, mb63h158_device)
 
-#endif // MAME_MACHINE_MB63H158_H
+#endif // MAME_KAWAI_MB63H158_H

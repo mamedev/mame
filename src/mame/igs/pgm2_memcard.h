@@ -8,8 +8,8 @@
     (based on ng_memcard.h)
 
 *********************************************************************/
-#ifndef MAME_MACHINE_PGM2_MEMCARD_H
-#define MAME_MACHINE_PGM2_MEMCARD_H
+#ifndef MAME_IGS_PGM2_MEMCARD_H
+#define MAME_IGS_PGM2_MEMCARD_H
 
 #pragma once
 
@@ -61,4 +61,4 @@ private:
 DECLARE_DEVICE_TYPE(PGM2_MEMCARD, pgm2_memcard_device)
 
 
-#endif // MAME_MACHINE_PGM2_MEMCARD_H
+#endif // MAME_IGS_PGM2_MEMCARD_H

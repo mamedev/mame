@@ -91,6 +91,7 @@ std::vector<submenu::option> submenu::advanced_options()
 			{ option_type::EMU,  N_("Off-screen reload"),                       OPTION_OFFSCREEN_RELOAD },
 			{ option_type::EMU,  N_("Joystick deadzone"),                       OPTION_JOYSTICK_DEADZONE },
 			{ option_type::EMU,  N_("Joystick saturation"),                     OPTION_JOYSTICK_SATURATION },
+			{ option_type::EMU,  N_("Joystick threshold"),                      OPTION_JOYSTICK_THRESHOLD },
 			{ option_type::EMU,  N_("Natural keyboard"),                        OPTION_NATURAL_KEYBOARD },
 			{ option_type::EMU,  N_("Allow contradictory joystick inputs"),     OPTION_JOYSTICK_CONTRADICTORY },
 			{ option_type::EMU,  N_("Coin impulse"),                            OPTION_COIN_IMPULSE } };
@@ -285,7 +286,7 @@ void submenu::handle(event const *ev)
 						const char *minimum = sm_option.entry->minimum();
 						const char *maximum = sm_option.entry->maximum();
 						f_step = atof(minimum);
-						if (f_step <= 0.0f) {
+						if (f_step <= 0.0F) {
 							int pmin = getprecisionchr(minimum);
 							int pmax = getprecisionchr(maximum);
 							tmptxt = '1' + std::string((pmin > pmax) ? pmin : pmax, '0');
@@ -339,7 +340,7 @@ void submenu::handle(event const *ev)
 //  populate
 //-------------------------------------------------
 
-void submenu::populate(float &customtop, float &custombottom)
+void submenu::populate()
 {
 	// add options
 	for (auto sm_option = m_options.begin(); sm_option < m_options.end(); ++sm_option)
@@ -405,7 +406,7 @@ void submenu::populate(float &customtop, float &custombottom)
 					}
 					else
 					{
-						f_min = 0.0f;
+						f_min = 0.0F;
 						f_max = std::numeric_limits<float>::max();
 					}
 					arrow_flags = get_arrow_flags(f_min, f_max, f_cur);
@@ -446,7 +447,17 @@ void submenu::populate(float &customtop, float &custombottom)
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-	custombottom = ui().get_line_height() + (3.0f * tb_border());
+}
+
+//-------------------------------------------------
+//  recompute metrics
+//-------------------------------------------------
+
+void submenu::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	set_custom_space(0.0F, line_height() + (3.0F * tb_border()));
 }
 
 //-------------------------------------------------

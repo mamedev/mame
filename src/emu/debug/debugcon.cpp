@@ -17,6 +17,7 @@
 
 #include "debugger.h"
 #include "fileio.h"
+#include "main.h"
 
 #include "corestr.h"
 

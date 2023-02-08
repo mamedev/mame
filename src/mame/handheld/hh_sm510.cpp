@@ -5,7 +5,7 @@
 
 Sharp SM5xx family handhelds.
 List of child drivers:
-- rzone: Tiger R-Zone
+- rzone.cpp: Tiger R-Zone
 
 The LCD screen graphics are provided internally with an SVG file.
 MAME external artwork is recommended for the backgrounds inlays.
@@ -1435,6 +1435,8 @@ ROM_END
 
   MC-25 and EG-26 are the same game, it's assumed that the latter was for
   regions where Nintendo wasn't able to license from Disney.
+
+----------------------------------------------------------------------------
 
   In 1984, Электроника (Elektronika, USSR) released an unlicensed clone:
   Ну, погоди! (Nu, pogodi!). This was followed by several other titles that

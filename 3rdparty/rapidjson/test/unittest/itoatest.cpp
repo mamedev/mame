@@ -1,15 +1,15 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
-// 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+//
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
 //
 // http://opensource.org/licenses/MIT
 //
-// Unless required by applicable law or agreed to in writing, software distributed 
-// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
-// CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+// Unless required by applicable law or agreed to in writing, software distributed
+// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+// CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
 #include "unittest.h"
@@ -61,7 +61,7 @@ static void VerifyValue(T value, void(*f)(T, char*), char* (*g)(T, char*)) {
 
     f(value, buffer1);
     *g(value, buffer2) = '\0';
-    
+
 
     EXPECT_STREQ(buffer1, buffer2);
 }
@@ -70,23 +70,23 @@ template <typename T>
 static void Verify(void(*f)(T, char*), char* (*g)(T, char*)) {
     // Boundary cases
     VerifyValue<T>(0, f, g);
-    VerifyValue<T>(std::numeric_limits<T>::min(), f, g);
-    VerifyValue<T>(std::numeric_limits<T>::max(), f, g);
+    VerifyValue<T>((std::numeric_limits<T>::min)(), f, g);
+    VerifyValue<T>((std::numeric_limits<T>::max)(), f, g);
 
     // 2^n - 1, 2^n, 10^n - 1, 10^n until overflow
-    for (uint32_t power = 2; power <= 10; power += 8) {
+    for (int power = 2; power <= 10; power += 8) {
         T i = 1, last;
         do {
             VerifyValue<T>(i - 1, f, g);
             VerifyValue<T>(i, f, g);
-            if (std::numeric_limits<T>::min() < 0) {
+            if ((std::numeric_limits<T>::min)() < 0) {
                 VerifyValue<T>(Traits<T>::Negate(i), f, g);
                 VerifyValue<T>(Traits<T>::Negate(i + 1), f, g);
             }
             last = i;
-            if (i > static_cast<T>(std::numeric_limits<T>::max() / static_cast<T>(power)))
+            if (i > static_cast<T>((std::numeric_limits<T>::max)() / static_cast<T>(power)))
                 break;
-            i *= power;
+            i *= static_cast<T>(power);
         } while (last < i);
     }
 }

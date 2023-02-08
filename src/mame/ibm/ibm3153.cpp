@@ -43,6 +43,8 @@ ToDo:
 #include "screen.h"
 
 
+namespace {
+
 class ibm3153_state : public driver_device
 {
 public:
@@ -128,6 +130,9 @@ ROM_START( ibm3153 )
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "char.bin", 0x0000, 0x2000, NO_DUMP ) // probably inside the video processor
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

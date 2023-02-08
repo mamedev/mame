@@ -5,8 +5,8 @@
     Irem M107 hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_M107_H
-#define MAME_INCLUDES_M107_H
+#ifndef MAME_IREM_M107_H
+#define MAME_IREM_M107_H
 
 #pragma once
 
@@ -103,4 +103,4 @@ private:
 	void wpksoc_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_M107_H
+#endif // MAME_IREM_M107_H

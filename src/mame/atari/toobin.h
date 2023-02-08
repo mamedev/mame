@@ -5,8 +5,8 @@
     Atari Toobin' hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_TOOBIN_H
-#define MAME_INCLUDES_TOOBIN_H
+#ifndef MAME_ATARI_TOOBIN_H
+#define MAME_ATARI_TOOBIN_H
 
 #pragma once
 
@@ -80,4 +80,4 @@ private:
 	static const atari_motion_objects_config s_mob_config;
 };
 
-#endif // MAME_INCLUDES_TOOBIN_H
+#endif // MAME_ATARI_TOOBIN_H

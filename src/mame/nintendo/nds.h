@@ -2,8 +2,8 @@
 // copyright-holders:Ryan Holtz, R. Belmont
 #pragma once
 
-#ifndef MAME_INCLUDES_NDS_H
-#define MAME_INCLUDES_NDS_H
+#ifndef MAME_NINTENDO_NDS_H
+#define MAME_NINTENDO_NDS_H
 
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
@@ -114,4 +114,4 @@ private:
 	void dma_exec(int ch);
 };
 
-#endif // INCLUDES_NDS_H
+#endif // MAME_NINTENDO_NDS_H

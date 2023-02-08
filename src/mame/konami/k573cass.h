@@ -4,8 +4,8 @@
  * Konami 573 Security Cassette
  *
  */
-#ifndef MAME_MACHINE_K573CASS_H
-#define MAME_MACHINE_K573CASS_H
+#ifndef MAME_KONAMI_K573CASS_H
+#define MAME_KONAMI_K573CASS_H
 
 #pragma once
 
@@ -223,4 +223,4 @@ private:
 };
 
 
-#endif // MAME_MACHINE_K573CASS_H
+#endif // MAME_KONAMI_K573CASS_H

@@ -5,8 +5,8 @@
     1942
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_1942_H
-#define MAME_INCLUDES_1942_H
+#ifndef MAME_CAPCOM_1942_H
+#define MAME_CAPCOM_1942_H
 
 #pragma once
 
@@ -107,4 +107,4 @@ protected:
 	required_shared_ptr<uint8_t> m_protopal;
 };
 
-#endif // MAME_INCLUDES_1942_H
+#endif // MAME_CAPCOM_1942_H

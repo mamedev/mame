@@ -33,6 +33,9 @@
 #define VERBOSE         (0)
 #include "logmacro.h"
 
+
+namespace {
+
 class ip15_state : public driver_device
 {
 public:
@@ -68,6 +71,9 @@ ROM_START( 4d410 )
 	ROM_REGION32_BE( 0x20000, "user1", 0 )
 	ROMX_LOAD( "ip15prom.070-040x-008.bin", 0x000000, 0x20000, CRC(7290eb66) SHA1(af4285e8db2a9b44fd0fb8a1df4f92faffe87e45), ROM_GROUPDWORD )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                 FULLNAME  FLAGS
 COMP( 1991, 4d410, 0,      0,      ip15,    ip15,  ip15_state, empty_init, "Silicon Graphics Inc", "4D/410", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

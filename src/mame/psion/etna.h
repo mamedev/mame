@@ -8,8 +8,8 @@
 
 ****************************************************************************/
 
-#ifndef MAME_MACHINE_ETNA_H
-#define MAME_MACHINE_ETNA_H
+#ifndef MAME_PSION_ETNA_H
+#define MAME_PSION_ETNA_H
 
 #pragma once
 
@@ -70,4 +70,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ETNA, etna_device)
 
-#endif // MAME_MACHINE_ETNA_H
+#endif // MAME_PSION_ETNA_H

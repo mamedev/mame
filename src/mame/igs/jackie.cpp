@@ -57,6 +57,8 @@ Note
 #include "tilemap.h"
 
 
+namespace {
+
 class jackie_state : public driver_device
 {
 public:
@@ -610,6 +612,8 @@ ROM_START( jackie )
 	ROM_LOAD( "18cv8.u8",   0x0000, 0x155, NO_DUMP )
 	ROM_LOAD( "18cv8.u9",   0x0000, 0x155, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1993, jackie, 0, jackie, jackie, jackie_state, init_jackie, ROT0, "IGS", "Happy Jackie (v110U)", MACHINE_SUPPORTS_SAVE )

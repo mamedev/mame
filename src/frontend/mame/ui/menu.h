@@ -70,6 +70,9 @@ public:
 	void item_append(menu_item_type type, uint32_t flags = 0);
 	void item_append_on_off(const std::string &text, bool state, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
 
+	// set space required for drawing extra content
+	void set_custom_space(float top, float bottom);
+
 	// reset the menus, clearing everything
 	static void stack_reset(mame_ui_manager &ui) { get_global_state(ui).stack_reset(); }
 
@@ -422,7 +425,7 @@ private:
 	void set_special_main_menu(bool disable);
 
 	// to be implemented in derived classes
-	virtual void populate(float &customtop, float &custombottom) = 0;
+	virtual void populate() = 0;
 
 	// to be implemented in derived classes
 	virtual void handle(event const *ev) = 0;

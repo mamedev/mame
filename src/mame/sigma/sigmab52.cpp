@@ -120,6 +120,8 @@
 #include "sigmab52.lh"
 
 
+namespace {
+
 class sigmab52_state : public driver_device
 {
 public:
@@ -715,6 +717,8 @@ ROM_END
 void sigmab52_state::init_jwildb52()
 {
 }
+
+} // anonymous namespace
 
 
 /*************************

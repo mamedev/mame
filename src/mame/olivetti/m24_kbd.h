@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef MAME_MACHINE_M24_KBD_H
-#define MAME_MACHINE_M24_KBD_H
+#ifndef MAME_OLIVETTI_M24_KBD_H
+#define MAME_OLIVETTI_M24_KBD_H
 
 #pragma once
 
@@ -46,4 +46,4 @@ private:
 
 DECLARE_DEVICE_TYPE(M24_KEYBOARD, m24_keyboard_device)
 
-#endif // MAME_MACHINE_M24_KBD_H
+#endif // MAME_OLIVETTI_M24_KBD_H

@@ -65,6 +65,8 @@ check more info and photo from cjdh2.zip!!!
 #include "screen.h"
 
 
+namespace {
+
 class igs_m036_state : public driver_device
 {
 public:
@@ -357,6 +359,9 @@ void igs_m036_state::init_igsm312()
 	igs036_decryptor decrypter(m312cn_key);
 	decrypter.decrypter_rom((uint16_t*)memregion("user1")->base(), memregion("user1")->bytes(), 0);
 }
+
+} // anonymous namespace
+
 
 /***************************************************************************
 

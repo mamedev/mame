@@ -5,8 +5,8 @@
     Atari Canyon Bomber hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_CANYON_H
-#define MAME_INCLUDES_CANYON_H
+#ifndef MAME_ATARI_CANYON_H
+#define MAME_ATARI_CANYON_H
 
 #pragma once
 
@@ -79,4 +79,4 @@ private:
 /*----------- defined in audio/canyon.c -----------*/
 DISCRETE_SOUND_EXTERN( canyon_discrete );
 
-#endif // MAME_INCLUDES_CANYON_H
+#endif // MAME_ATARI_CANYON_H

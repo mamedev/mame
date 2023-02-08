@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Stefan Jokisch
-#ifndef MAME_INCLUDES_SKYRAID_H
-#define MAME_INCLUDES_SKYRAID_H
+#ifndef MAME_ATARI_SKYRAID_H
+#define MAME_ATARI_SKYRAID_H
 
 #pragma once
 
@@ -64,4 +64,4 @@ private:
 /*----------- defined in audio/skyraid.c -----------*/
 DISCRETE_SOUND_EXTERN( skyraid_discrete );
 
-#endif // MAME_INCLUDES_SKYRAID_H
+#endif // MAME_ATARI_SKYRAID_H

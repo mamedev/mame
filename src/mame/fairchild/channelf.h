@@ -5,8 +5,8 @@
  * includes/channelf.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_CHANNELF_H
-#define MAME_INCLUDES_CHANNELF_H
+#ifndef MAME_FAIRCHILD_CHANNELF_H
+#define MAME_FAIRCHILD_CHANNELF_H
 
 #pragma once
 
@@ -62,4 +62,4 @@ public:
 	void channelf_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_CHANNELF_H
+#endif // MAME_FAIRCHILD_CHANNELF_H

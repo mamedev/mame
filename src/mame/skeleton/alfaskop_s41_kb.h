@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Joakim Larsson Edström
-#ifndef MAME_MACHINE_ALFASKOP_S41_KB_H
-#define MAME_MACHINE_ALFASKOP_S41_KB_H
+#ifndef MAME_SKELETON_ALFASKOP_S41_KB_H
+#define MAME_SKELETON_ALFASKOP_S41_KB_H
 
 #pragma once
 
@@ -45,4 +45,4 @@ protected:
 	void alfaskop_s41_kb_mem(address_map &map);
 };
 
-#endif // MAME_MACHINE_ALFASKOP_S41_KB_H
+#endif // MAME_SKELETON_ALFASKOP_S41_KB_H

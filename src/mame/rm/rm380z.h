@@ -7,8 +7,8 @@ Research Machines RM 380Z
 
 */
 
-#ifndef MAME_INCLUDES_RM380Z_H
-#define MAME_INCLUDES_RM380Z_H
+#ifndef MAME_RM_RM380Z_H
+#define MAME_RM_RM380Z_H
 
 #pragma once
 
@@ -147,4 +147,4 @@ private:
 	void rm480z_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_RM380Z_H
+#endif // MAME_RM_RM380Z_H

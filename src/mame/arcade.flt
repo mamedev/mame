@@ -641,6 +641,7 @@ misc/atronic.cpp
 misc/attckufo.cpp
 misc/avt.cpp
 misc/aztarac.cpp
+misc/babysuprem.cpp
 misc/bailey.cpp
 misc/beaminv.cpp
 misc/beezer.cpp
@@ -663,6 +664,7 @@ misc/chance32.cpp
 misc/changyu.cpp
 misc/chicago.cpp
 misc/chsuper.cpp
+misc/cleartone.cpp
 misc/clowndwn.cpp
 misc/clpoker.cpp
 misc/cocoloco.cpp
@@ -1013,6 +1015,7 @@ nichibutsu/tubep.cpp
 nichibutsu/wiping.cpp
 nintendo/aleck64.cpp
 nintendo/cham24.cpp
+nintendo/cothello.cpp
 nintendo/dkong.cpp
 nintendo/famibox.cpp
 nintendo/mario.cpp

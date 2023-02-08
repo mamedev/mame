@@ -26,7 +26,7 @@ menu_pty_info::~menu_pty_info()
 {
 }
 
-void menu_pty_info::populate(float &customtop, float &custombottom)
+void menu_pty_info::populate()
 {
 	for (device_pty_interface &pty : pty_interface_enumerator(machine().root_device()))
 	{

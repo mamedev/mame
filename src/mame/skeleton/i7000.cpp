@@ -57,6 +57,8 @@
 #include "tilemap.h"
 
 
+namespace {
+
 class i7000_state : public driver_device
 {
 public:
@@ -411,6 +413,9 @@ ROM_START( i7000 )
 	ROM_REGION( 0x1000, "telex", 0 )
 	ROM_LOAD( "i7000_telex_ci09.rom", 0x0000, 0x1000, CRC(c1c8fcc8) SHA1(cbf5fb600e587b998f190a9e3fb398a51d8a5e87) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY    FULLNAME  FLAGS
 COMP( 1982, i7000, 0,      0,      i7000,   i7000, i7000_state, empty_init, "Itautec", "I-7000", MACHINE_NOT_WORKING)

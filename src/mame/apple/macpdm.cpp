@@ -11,13 +11,16 @@
 #include "cuda.h"
 #include "macadb.h"
 #include "machine/mv_sonora.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 #include "machine/ram.h"
 #include "machine/swim3.h"
 #include "machine/timer.h"
 #include "softlist_dev.h"
 #include "sound/awacs.h"
 #include "speaker.h"
+
+
+namespace {
 
 constexpr auto IO_CLOCK = 31.3344_MHz_XTAL;
 constexpr auto ENET_CLOCK = 20_MHz_XTAL;
@@ -108,13 +111,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sndi_err_irq);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	DECLARE_WRITE_LINE_MEMBER(slot2_irq);
-	DECLARE_WRITE_LINE_MEMBER(slot1_irq);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(slot2_irq);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(slot1_irq);
 	DECLARE_WRITE_LINE_MEMBER(slot0_irq);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(sound_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsi_drq);
 
@@ -1154,6 +1157,8 @@ ROM_START( pmac6100 )
 	ROM_REGION64_BE(0x400000, "bootrom", 0)
 	ROM_LOAD( "9feb69b3.rom", 0x000000, 0x400000, CRC(a43fadbc) SHA1(6fac1c4e920a077c077b03902fef9199d5e8f2c3) )
 ROM_END
+
+} // anonymous namespace
 
 
 COMP( 1994, pmac6100,  0, 0, macpdm, macpdm, macpdm_state, driver_init, "Apple Computer", "Power Macintosh 6100/60",  MACHINE_NOT_WORKING )

@@ -5,8 +5,8 @@
     Gradius 3
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_GRADIUS3_H
-#define MAME_INCLUDES_GRADIUS3_H
+#ifndef MAME_KONAMI_GRADIUS3_H
+#define MAME_KONAMI_GRADIUS3_H
 
 #pragma once
 
@@ -75,4 +75,4 @@ private:
 	void gradius3_s_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_GRADIUS3_H
+#endif // MAME_KONAMI_GRADIUS3_H

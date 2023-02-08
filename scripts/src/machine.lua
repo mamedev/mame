@@ -2779,6 +2779,8 @@ if (MACHINES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/machine/lpc-rtc.h",
 		MAME_DIR .. "src/devices/machine/lpc-pit.cpp",
 		MAME_DIR .. "src/devices/machine/lpc-pit.h",
+		MAME_DIR .. "src/devices/machine/mpc106.cpp",
+		MAME_DIR .. "src/devices/machine/mpc106.h",
 		MAME_DIR .. "src/devices/machine/vrc4373.cpp",
 		MAME_DIR .. "src/devices/machine/vrc4373.h",
 		MAME_DIR .. "src/devices/machine/vrc5074.cpp",
@@ -4034,13 +4036,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/ncr5390.h,MACHINES["NCR5390"] = true
+--@src/devices/machine/ncr53c90.h,MACHINES["NCR53C90"] = true
 ---------------------------------------------------
 
-if (MACHINES["NCR5390"]~=null) then
+if (MACHINES["NCR53C90"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/machine/ncr5390.cpp",
-		MAME_DIR .. "src/devices/machine/ncr5390.h",
+		MAME_DIR .. "src/devices/machine/ncr53c90.cpp",
+		MAME_DIR .. "src/devices/machine/ncr53c90.h",
 	}
 end
 
@@ -5111,5 +5113,16 @@ if (MACHINES["MICOMXE1A"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/micomxe1a.cpp",
 		MAME_DIR .. "src/devices/machine/micomxe1a.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/mc88200.h,MACHINES["MC88200"] = true
+---------------------------------------------------
+if (MACHINES["MC88200"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mc88200.cpp",
+		MAME_DIR .. "src/devices/machine/mc88200.h",
 	}
 end

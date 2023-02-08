@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
-#ifndef MAME_AUDIO_ZACCARIA_H
-#define MAME_AUDIO_ZACCARIA_H
+#ifndef MAME_ZACCARIA_ZACCARIA_A_H
+#define MAME_ZACCARIA_ZACCARIA_A_H
 
 #pragma once
 
@@ -123,4 +123,4 @@ protected:
 	u8  m_host_command;
 };
 
-#endif // MAME_AUDIO_ZACCARIA_H
+#endif // MAME_ZACCARIA_ZACCARIA_A_H

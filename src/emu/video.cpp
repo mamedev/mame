@@ -9,14 +9,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
-#include "debugger.h"
-#include "fileio.h"
-#include "ui/uimain.h"
+
 #include "crsshair.h"
-#include "rendersw.hxx"
+#include "debugger.h"
+#include "emuopts.h"
+#include "fileio.h"
+#include "main.h"
 #include "output.h"
 #include "screen.h"
+
+#include "ui/uimain.h"
 
 #include "corestr.h"
 #include "path.h"
@@ -24,6 +26,8 @@
 #include "xmlfile.h"
 
 #include "osdepend.h"
+
+#include "rendersw.hxx"
 
 
 //**************************************************************************

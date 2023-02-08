@@ -65,6 +65,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class easy_karaoke_state : public driver_device
 {
 public:
@@ -174,5 +177,8 @@ ROM_START( easykara )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "ics0303-b.bin", 0x000000, 0x400000, CRC(43d86ae8) SHA1(219dcbf72b92d1b7e00f78f237194ab47dc08f1b) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 2004, easykara,      0,       0,      easy_karaoke, easy_karaoke, easy_karaoke_state, empty_init, "IVL Technologies", "Easy Karaoke Groove Station", MACHINE_IS_SKELETON )

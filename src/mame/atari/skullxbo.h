@@ -5,8 +5,8 @@
     Atari Skull & Crossbones hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SKULLXBO_H
-#define MAME_INCLUDES_SKULLXBO_H
+#ifndef MAME_ATARI_SKULLXBO_H
+#define MAME_ATARI_SKULLXBO_H
 
 #pragma once
 
@@ -71,4 +71,4 @@ private:
 	bool m_scanline_int_state;
 };
 
-#endif // MAME_INCLUDES_SKULLXBO_H
+#endif // MAME_ATARI_SKULLXBO_H

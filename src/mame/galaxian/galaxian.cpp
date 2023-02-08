@@ -12201,6 +12201,30 @@ ROM_START( ataqandr )
 	ROM_LOAD( "ataque_androide_p.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
+// Original Namco PCB. Program ROMs on a piggyback PCB from Bercle S.A.
+ROM_START( mutacion )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "mutacion_i.4", 0x0000, 0x1000, CRC(78290f7e) SHA1(20eb70f4c846873d178d55ef45a0add535891104) )
+	ROM_LOAD( "mutacion_i.3", 0x1000, 0x1000, BAD_DUMP CRC(c47a4d04) SHA1(4d2886de4b8644ff52f00f9e69c19deb951ad077) )
+	ROM_LOAD( "mutacion_i.2", 0x2000, 0x1000, CRC(f6121da2) SHA1(a6b3777989086290f8e5c49ed7643e7e86a694c2) )
+	ROM_LOAD( "mutacion_i.1", 0x3000, 0x1000, CRC(b622b601) SHA1(3bb006dd12239eb3a9fa45699b5cf1cc580d5668) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "mutacion_i.f2", 0x0000, 0x0800, CRC(91664e98) SHA1(dbc192785bf35d0c45ee0f5a690d4c484f32330f) )
+	ROM_LOAD( "mutacion_i.f4", 0x0800, 0x0200, CRC(5a4b17ea) SHA1(8a879dc34fdecc8a121c4a87abb981212fb05945) )
+	ROM_CONTINUE(                      0x0c00, 0x0200 )
+	ROM_CONTINUE(                      0x0a00, 0x0200 )
+	ROM_CONTINUE(                      0x0e00, 0x0200 )
+	ROM_LOAD( "mutacion_i.f1", 0x1000, 0x0800, CRC(4e79ff6b) SHA1(f72386a3766a7fcc7b4b8cedfa58b8d57f911f6f) )
+	ROM_LOAD( "mutacion_i.f3", 0x1800, 0x0200, CRC(e0edccbd) SHA1(0839a4c9b6e863d12253ae8e1732e80e08702228) )
+	ROM_CONTINUE(                      0x1c00, 0x0200 )
+	ROM_CONTINUE(                      0x1a00, 0x0200 )
+	ROM_CONTINUE(                      0x1e00, 0x0200 )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
 ROM_START( sstarcrs )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "ss1",          0x0000, 0x0800, CRC(2ff72897) SHA1(c34c149ee32dd3318a04eda8928f0cd5f997d184) )
@@ -16146,6 +16170,7 @@ GAME( 1980?,mooncptc,    mooncrst, mooncrst,   mooncptc,   galaxian_state, init_
 GAME( 1980?,mouncrst,    mooncrst, mooncrst,   mooncrst,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Jeutel)",             "Moune Creste (Jeutel French Moon Cresta bootleg)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,sirio2,      mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Calfesa S.L.)",       "Sirio II (Calfesa S.L. Spanish Moon Cresta bootleg)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1980?,ataqandr,    mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (FAR S.A.)",           "Ataque Androide - Moon Cresta (FAR S.A. Spanish bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980?,mutacion,    mooncrst, mooncrst,   mooncptc,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Explomatic)",         "Mutacion (Explomatic Spanish Moon Cresta bootleg)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Bad program ROM (bitrot)
 GAME( 1980?,sstarcrs,    mooncrst, mooncrst,   mooncrsg,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Taito do Brasil)",    "Super Star Crest",                                         MACHINE_SUPPORTS_SAVE ) // There may be an alternate version called "Star Crest" according to flyers; is it the same?
 GAME( 198?, mooncmw,     mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg",                      "Moon War (Moon Cresta bootleg)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 198?, starfgmc,    mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Samyra Engineering)", "Starfighter (Moon Cresta bootleg)",                        MACHINE_SUPPORTS_SAVE )

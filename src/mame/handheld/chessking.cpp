@@ -44,6 +44,7 @@ LCD module:
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
 namespace {
 
 class chessking_state : public driver_device
@@ -130,7 +131,7 @@ uint32_t chessking_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 			uint8_t data2 = m_videoram[0x6000 + offset + x/8];
 			uint8_t pix = BIT(data, ~x & 7) | BIT(data2, ~x & 7) << 1;
 
-			rgb_t pens[4] = { rgb_t::white(), rgb_t(0x55,0x55,0x55), rgb_t(0xaa,0xaa,0xaa), rgb_t::black() };
+			static const rgb_t pens[4] = { rgb_t::white(), rgb_t(0x55,0x55,0x55), rgb_t(0xaa,0xaa,0xaa), rgb_t::black() };
 			dst[x] = pens[pix];
 		}
 	}
@@ -168,8 +169,8 @@ void chessking_state::beeper_enable_w(uint8_t data)
 void chessking_state::update_beeper()
 {
 	uint16_t freq = (~m_beeper_freq & 0x1ff) + 1;
-	double step = (9.6_MHz_XTAL).dvalue() / 0x200000;
-	m_beeper->set_clock(freq * step);
+	double base = (9.6_MHz_XTAL).dvalue() / 0x80;
+	m_beeper->set_clock(base / freq);
 }
 
 
@@ -353,8 +354,8 @@ void chessking_state::chesskng(machine_config &config)
 ******************************************************************************/
 
 ROM_START( chesskng )
-	ROM_REGION( 0x040000, "maincpu", 0 )
-	ROM_LOAD( "etmate-cch.u6", 0x000000, 0x040000, CRC(a4d1764b) SHA1(ccfae1e985f6ad316ff192206fbc0f8bcd4e44d5) )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "etmate-cch.u6", 0x00000, 0x40000, CRC(a4d1764b) SHA1(ccfae1e985f6ad316ff192206fbc0f8bcd4e44d5) )
 ROM_END
 
 } // anonymous namespace

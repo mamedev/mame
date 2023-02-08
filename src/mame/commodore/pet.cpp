@@ -177,6 +177,9 @@ ROM sockets:  UA3   2K or 4K character
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
 
+
+namespace {
+
 #define M6502_TAG       "f3"
 #define M6522_TAG       "a5"
 #define M6520_1_TAG     "g8"
@@ -441,9 +444,9 @@ private:
 	DECLARE_MACHINE_START( cbm8296 );
 	DECLARE_MACHINE_RESET( cbm8296 );
 
-	void read_pla1(offs_t offset, int phi2, int brw, int noscreen, int noio, int ramsela, int ramsel9, int ramon, int norom,
-		int &cswff, int &cs9, int &csa, int &csio, int &cse, int &cskb, int &fa12, int &casena1);
-	void read_pla2(offs_t offset, int phi2, int brw, int casena1, int &endra, int &noscreen, int &casena2, int &fa15);
+	[[maybe_unused]] void read_pla1(offs_t offset, int phi2, int brw, int noscreen, int noio, int ramsela, int ramsel9, int ramon, int norom,
+						int &cswff, int &cs9, int &csa, int &csio, int &cse, int &cskb, int &fa12, int &casena1);
+	[[maybe_unused]] void read_pla2(offs_t offset, int phi2, int brw, int casena1, int &endra, int &noscreen, int &casena2, int &fa15);
 
 	void read_pla1_eprom(offs_t offset, int phi2, int brw, int noscreen, int noio, int ramsela, int ramsel9, int ramon, int norom,
 		int &cswff, int &cs9, int &csa, int &csio, int &cse, int &cskb, int &fa12, int &casena1);
@@ -2598,6 +2601,7 @@ ROM_START( cbm8296dgv_de ) // SER.NO.WG 8947
 	ROM_LOAD( "324745-01.ue5", 0x00, 0xf5, NO_DUMP ) // 8700-008
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************

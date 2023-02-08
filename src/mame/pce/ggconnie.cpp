@@ -30,6 +30,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class ggconnie_state : public pce_common_state
 {
 public:
@@ -402,6 +404,9 @@ ROM_START(fishingm)
 	ROM_LOAD( "gal16v8b.u7", 0x200, 0x117, NO_DUMP )
 	ROM_LOAD( "gal16v8b.u8", 0x400, 0x117, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1996, ggconnie, 0, ggconnie, ggconnie, ggconnie_state, init_pce_common, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1997, smf,      0, ggconnie, smf,      ggconnie_state, init_pce_common, ROT0, "Eighting (Capcom license)", "Super Medal Fighters (Japan 970228)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

@@ -25,6 +25,8 @@
 #include "modules/osdmodule.h"
 #include "zippath.h"
 
+namespace osd {
+
 namespace {
 
 class debug_area
@@ -122,7 +124,7 @@ public:
 
 	virtual ~debug_imgui() { }
 
-	virtual int init(const osd_options &options) override { return 0; }
+	virtual int init(osd_interface &osd, const osd_options &options) override { return 0; }
 	virtual void exit() override {};
 
 	virtual void init_debugger(running_machine &machine) override;
@@ -1031,16 +1033,16 @@ void debug_imgui::refresh_filelist()
 			m_filelist.emplace_back(std::move(temp));
 		}
 		first = m_filelist.size();
-		const osd::directory::entry *dirent;
+		const directory::entry *dirent;
 		while((dirent = dir->readdir()) != nullptr)
 		{
 			file_entry temp;
 			switch(dirent->type)
 			{
-				case osd::directory::entry::entry_type::FILE:
+				case directory::entry::entry_type::FILE:
 					temp.type = file_entry_type::FILE;
 					break;
-				case osd::directory::entry::entry_type::DIR:
+				case directory::entry::entry_type::DIR:
 					temp.type = file_entry_type::DIRECTORY;
 					break;
 				default:
@@ -1196,10 +1198,10 @@ void debug_imgui::draw_create_dialog(const char* label)
 		if(ImGui::InputText("##createfilename",m_path,1024,ImGuiInputTextFlags_EnterReturnsTrue))
 		{
 			auto entry = osd_stat(m_path);
-			auto file_type = (entry != nullptr) ? entry->type : osd::directory::entry::entry_type::NONE;
-			if(file_type == osd::directory::entry::entry_type::NONE)
+			auto file_type = (entry != nullptr) ? entry->type : directory::entry::entry_type::NONE;
+			if(file_type == directory::entry::entry_type::NONE)
 				create_image();
-			if(file_type == osd::directory::entry::entry_type::FILE)
+			if(file_type == directory::entry::entry_type::FILE)
 				m_create_confirm_wait = true;
 			// cannot overwrite a directory, so nothing will be none in that case.
 		}
@@ -1246,10 +1248,10 @@ void debug_imgui::draw_create_dialog(const char* label)
 			if(ImGui::Button("OK##mount"))
 			{
 				auto entry = osd_stat(m_path);
-				auto file_type = (entry != nullptr) ? entry->type : osd::directory::entry::entry_type::NONE;
-				if(file_type == osd::directory::entry::entry_type::NONE)
+				auto file_type = (entry != nullptr) ? entry->type : directory::entry::entry_type::NONE;
+				if(file_type == directory::entry::entry_type::NONE)
 					create_image();
-				if(file_type == osd::directory::entry::entry_type::FILE)
+				if(file_type == directory::entry::entry_type::FILE)
 					m_create_confirm_wait = true;
 				// cannot overwrite a directory, so nothing will be none in that case.
 				m_create_open = false;
@@ -1586,4 +1588,6 @@ void debug_imgui::debugger_update()
 
 } // anonymous namespace
 
-MODULE_DEFINITION(DEBUG_IMGUI, debug_imgui)
+} // namespace osd
+
+MODULE_DEFINITION(DEBUG_IMGUI, osd::debug_imgui)

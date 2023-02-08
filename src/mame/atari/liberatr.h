@@ -5,8 +5,8 @@
     Atari Liberator hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_LIBERATR_H
-#define MAME_INCLUDES_LIBERATR_H
+#ifndef MAME_ATARI_LIBERATR_H
+#define MAME_ATARI_LIBERATR_H
 
 #pragma once
 
@@ -126,4 +126,4 @@ private:
 	planet m_planets[2]{};
 };
 
-#endif // MAME_INCLUDES_LIBERATR_H
+#endif // MAME_ATARI_LIBERATR_H

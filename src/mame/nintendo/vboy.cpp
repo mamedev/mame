@@ -42,6 +42,8 @@
 #include "vboy.lh"
 
 
+namespace {
+
 #define READ_BGMAP(bgoffs) m_bgmap[(bgoffs) & 0xffff]
 #define READ_WORLD(wldoffs)   READ_BGMAP((0x1d800 >> 1) + wldoffs)
 #define READ_COLTAB1(wldoffs) READ_BGMAP((0x1dc00 >> 1) + wldoffs)
@@ -1290,6 +1292,9 @@ void vboy_state::vboy(machine_config &config)
 ROM_START( vboy )
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

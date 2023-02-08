@@ -61,6 +61,8 @@ Due to no input checking, misuse of commands can crash the system.
 #include "sound/spkrdev.h"
 
 
+namespace {
+
 class z1013_state : public driver_device
 {
 public:
@@ -565,6 +567,9 @@ ROM_START( z1013k69 )
 	ROM_LOAD ("altfont.bin",     0x0800, 0x0800, CRC(2dc96f9c) SHA1(d0b9b0751cc1e91be731547f6442c649b6dd6979))
 ROM_END
 /* Driver */
+
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT      CLASS        INIT        COMPANY                           FULLNAME               FLAGS
 COMP( 1985, z1013,    0,      0,      z1013,    z1013_8x4, z1013_state, empty_init, "VEB Robotron Electronics Riesa", "Z1013 (matrix 8x4)",  MACHINE_SUPPORTS_SAVE )

@@ -61,6 +61,9 @@ TODO
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class cd2650_state : public driver_device
 {
 public:
@@ -384,6 +387,9 @@ ROM_START( cd2650 )
 	ROM_LOAD_OPTIONAL( "01b_cd_mon_o.bin", 0x9b00, 0x0400, CRC(9d40b4dc) SHA1(35cffcbd983b7b37c878a15af44100568d0659d1))
 	ROM_LOAD_OPTIONAL( "02b_cd_alp.bin",   0x9f00, 0x2a00, CRC(a66b7f32) SHA1(2588f9244b0ec6b861dcebe666d37d3fa88dd043))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 
