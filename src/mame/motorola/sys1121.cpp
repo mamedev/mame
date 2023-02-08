@@ -14,6 +14,7 @@
 #include "bus/vme/vme_mvme181.h"
 #include "bus/vme/vme_mvme327a.h"
 #include "bus/vme/vme_smvme2000.h"
+#include "bus/vme/tp881v.h"
 #include "logmacro.h"
 
 namespace
@@ -43,6 +44,7 @@ namespace
 		device.option_add("mvme180",   VME_MVME180);
 		device.option_add("mvme181",   VME_MVME181);
 		device.option_add("mvme327a",  VME_MVME327A);
+		device.option_add("tp881v",    TP881V);
 	}
 
 	void sys1121_state::sys1121(machine_config &config)
