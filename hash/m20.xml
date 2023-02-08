@@ -40,19 +40,19 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="pcos110d.img" size="286720" crc="e46cd761" sha1="5ccfe628d66f821c41c7d0823d5e0422c4ceaab2"/>
+				<rom name="pcos110d.img" size="286720" crc="e46cd761" sha1="5ccfe628d66f821c41c7d0823d5e0422c4ceaab2" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="pcos13"><!-- Missing FM track0 -->
+	<software name="pcos13" supported="no"><!-- Missing FM track0 -->
 		<description>Olivetti PCOS 1.3</description>
 		<year>1982</year>
 		<publisher>Olivetti</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="pcos-1.3.img" size="286720" crc="ce81c83b" sha1="b216f0c6ee82ebfa9dc417de12982f8893d7f879"/>
+				<rom name="pcos-1.3.img" size="286720" crc="ce81c83b" sha1="b216f0c6ee82ebfa9dc417de12982f8893d7f879" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -64,7 +64,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="pcos13.img" size="286720" crc="da47bdb5" sha1="e94eedd7533d6d3c7fbb016921e391bafae5245c"/>
+				<rom name="pcos13.img" size="286720" crc="da47bdb5" sha1="e94eedd7533d6d3c7fbb016921e391bafae5245c" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -93,14 +93,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="pcos20f" supported="no"><!-- Missing FM track0, Not enough memory to boot PCOS -->
+	<software name="pcos20f" supported="no"><!-- Missing FM track0, boot with -ramsize 512k -->
 		<description>Olivetti PCOS 2.0f</description>
 		<year>1982</year>
 		<publisher>Olivetti</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="pcos20f.img" size="286720" crc="87297648" sha1="10c3247d2d72f6d2f06c3b582704db55ed5a1e28"/>
+				<rom name="pcos20f.img" size="286720" crc="87297648" sha1="10c3247d2d72f6d2f06c3b582704db55ed5a1e28" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -112,7 +112,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="pcos20h.img" size="286720" crc="55f470a7" sha1="7ac52fa8b52954410bc4ac496d6038a9a8204e8f"/>
+				<rom name="pcos20h.img" size="286720" crc="55f470a7" sha1="7ac52fa8b52954410bc4ac496d6038a9a8204e8f" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -124,7 +124,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="pcos30e.img" size="228963" crc="ee2f9763" sha1="7f7dddb7815d0a4615ed4eac8f4709fb67688b46"/>
+				<rom name="pcos30e.img" size="228963" crc="ee2f9763" sha1="7f7dddb7815d0a4615ed4eac8f4709fb67688b46" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -160,25 +160,25 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="pcos_41a.img" size="286720" crc="f2fa9799" sha1="6d01e7ecc91211e588b4af3c77b972b20deee63b"/>
+				<rom name="pcos_41a.img" size="286720" crc="f2fa9799" sha1="6d01e7ecc91211e588b4af3c77b972b20deee63b" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Tools" />
 			<dataarea name="flop" size="286720">
-				<rom name="pcos_41a_tools.img" size="286720" crc="24936905" sha1="d27a2cae62fd62f07dce0e3df397d2dea4c1253b"/>
+				<rom name="pcos_41a_tools.img" size="286720" crc="24936905" sha1="d27a2cae62fd62f07dce0e3df397d2dea4c1253b" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="cpm8k" supported="no"><!-- Missing FM track0, black screen on boot, not readable under pcos -->
+	<software name="cpm8k" supported="no"><!-- Missing FM track0, boot with -ramsize 512k -->
 		<description>CP/M 8000</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="cpm8k.img" size="286720" crc="e0f8dfe3" sha1="9d6a17af5ef2775ad985bface454926ae3f2a322"/>
+				<rom name="cpm8k.img" size="286720" crc="e0f8dfe3" sha1="9d6a17af5ef2775ad985bface454926ae3f2a322" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -222,7 +222,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="adm51.imd" size="8192" crc="8916ea22" sha1="99fec256ae75c6569dff5bb8005f0e7bc301f4d8"/>
+				<rom name="adm51.imd" size="8192" crc="8916ea22" sha1="99fec256ae75c6569dff5bb8005f0e7bc301f4d8" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -234,46 +234,47 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="asm_r2.1.a.img" size="286720" crc="90b0fb9e" sha1="b250ff32d40293da446ce96b513b0000fb7814d1"/>
+				<rom name="asm_r2.1.a.img" size="286720" crc="90b0fb9e" sha1="b250ff32d40293da446ce96b513b0000fb7814d1" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="dietasm" supported="no"><!-- Missing FM track0, Not enough memory to boot PCOS -->
+	<software name="dietasm" supported="no"><!-- Missing FM track0, boot with -ramsize 512k -->
 		<description>ASM Utilities?</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="dieters_asm.img" size="286720" crc="27533432" sha1="9500d75444b84b20c41300f30b9c840e575d6542"/>
+				<rom name="dieters_asm.img" size="286720" crc="27533432" sha1="9500d75444b84b20c41300f30b9c840e575d6542" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="pascal" supported="no"><!-- Missing FM track0 (all) -->
+	<software name="pascal" supported="no"><!-- Missing FM track0 (all), boot with -ramsize 512k -->
+		<!-- launch with > pas? -->
 		<description>Olivetti Pascal</description>
 		<year>19??</year>
 		<publisher>Olivetti</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="pascal1_4.img" size="286720" crc="fe422ff7" sha1="e9d341e3d4f57ba8bcf249fc3d261a1867c92892"/>
+				<rom name="pascal1_4.img" size="286720" crc="fe422ff7" sha1="e9d341e3d4f57ba8bcf249fc3d261a1867c92892" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="pascal2_4.img" size="286720" crc="2131b9b8" sha1="a51bc215b4d22a0b162db6a4f970a32430a78688"/>
+				<rom name="pascal2_4.img" size="286720" crc="2131b9b8" sha1="a51bc215b4d22a0b162db6a4f970a32430a78688" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="pascal3_4.img" size="286720" crc="7a2ffa83" sha1="1b9e760a2bd38a87273387d37b7e8c1e6400465d"/>
+				<rom name="pascal3_4.img" size="286720" crc="7a2ffa83" sha1="1b9e760a2bd38a87273387d37b7e8c1e6400465d" status="baddump"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="pascal4_4.img" size="286720" crc="accf7de5" sha1="4c02cea1a9072ef610085688e57a80b48e82d502"/>
+				<rom name="pascal4_4.img" size="286720" crc="accf7de5" sha1="4c02cea1a9072ef610085688e57a80b48e82d502" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -296,14 +297,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="isam" supported="no"><!-- Missing FM track0 -->
+	<software name="isam" supported="no"><!-- Missing FM track0, boot with -ramsize 512k -->
 		<description>Olivetti Index Sequential Acces Method 2.1.6</description>
 		<year>19??</year>
 		<publisher>Olivetti</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="isam_216.img" size="286720" crc="106f0219" sha1="18bd3efaf49b17e18b4b98db659e4d6d9546017b"/>
+				<rom name="isam_216.img" size="286720" crc="106f0219" sha1="18bd3efaf49b17e18b4b98db659e4d6d9546017b" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -342,7 +343,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="multiplan_de.img" size="286720" crc="39b28757" sha1="2d7071d27f44e336fe0f9c7451f78260d1d244f7"/>
+				<rom name="multiplan_de.img" size="286720" crc="39b28757" sha1="2d7071d27f44e336fe0f9c7451f78260d1d244f7" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -368,7 +369,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="olinum.img" size="286720" crc="f9c09f25" sha1="69d95b74caee1b30c282c29828eafb760cbff7da"/>
+				<rom name="olinum.img" size="286720" crc="f9c09f25" sha1="69d95b74caee1b30c282c29828eafb760cbff7da" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -381,7 +382,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="olisort_206.img" size="286720" crc="08b7a3fd" sha1="704b1dd6211523835b6cf03ec6323e633315ce35"/>
+				<rom name="olisort_206.img" size="286720" crc="08b7a3fd" sha1="704b1dd6211523835b6cf03ec6323e633315ce35" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -394,7 +395,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="olistat.img" size="286720" crc="10a68239" sha1="32427fd58cc3b07d6519d8dbc009dbcb450084e2"/>
+				<rom name="olistat.img" size="286720" crc="10a68239" sha1="32427fd58cc3b07d6519d8dbc009dbcb450084e2" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -443,7 +444,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="oliword10_en.img" size="286720" crc="8b37b0b0" sha1="cf051a43666e4dd3b91afcf664c028471112bfdb"/>
+				<rom name="oliword10_en.img" size="286720" crc="8b37b0b0" sha1="cf051a43666e4dd3b91afcf664c028471112bfdb" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -456,7 +457,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="oliword10_en_1.img" size="286720" crc="6774af6c" sha1="c71434f7b060c8282a948013b2d409b18d0f8e69"/>
+				<rom name="oliword10_en_1.img" size="286720" crc="6774af6c" sha1="c71434f7b060c8282a948013b2d409b18d0f8e69" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -468,7 +469,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="oliword_it.img" size="286720" crc="c80ff355" sha1="3f1041180c5fef029b3620113178004d5d547ca5"/>
+				<rom name="oliword_it.img" size="286720" crc="c80ff355" sha1="3f1041180c5fef029b3620113178004d5d547ca5" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -493,7 +494,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="oliword_de.img" size="286720" crc="5c865d9b" sha1="22384e0f9e5f4e3d5d130405ce539d1ee074c3db"/>
+				<rom name="oliword_de.img" size="286720" crc="5c865d9b" sha1="22384e0f9e5f4e3d5d130405ce539d1ee074c3db" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -506,7 +507,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="giochi.img" size="286720" crc="da3a87aa" sha1="d5c5caa0431f571f6837e2a8d78c47f260690f46"/>
+				<rom name="giochi.img" size="286720" crc="da3a87aa" sha1="d5c5caa0431f571f6837e2a8d78c47f260690f46" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -519,7 +520,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="spiele+uhr.img" size="286720" crc="ea2c4765" sha1="e4de0b1eb6494de14a2e7ac891c4f761967853e4"/>
+				<rom name="spiele+uhr.img" size="286720" crc="ea2c4765" sha1="e4de0b1eb6494de14a2e7ac891c4f761967853e4" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -532,7 +533,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="spiele_ple.img" size="286720" crc="2b45a6c1" sha1="93a2f894caa6bc96aba44fd3e57b19c2ef454a8b"/>
+				<rom name="spiele_ple.img" size="286720" crc="2b45a6c1" sha1="93a2f894caa6bc96aba44fd3e57b19c2ef454a8b" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -544,7 +545,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="startrek_en.img" size="286720" crc="10564b94" sha1="38365a30d3cfaa55483b997aaca2a07b50f18ff6"/>
+				<rom name="startrek_en.img" size="286720" crc="10564b94" sha1="38365a30d3cfaa55483b997aaca2a07b50f18ff6" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -556,7 +557,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="startrek_de.img" size="286720" crc="2f8b7f55" sha1="4a5a684bde42695a5851015b0adc29d6c6ef2435"/>
+				<rom name="startrek_de.img" size="286720" crc="2f8b7f55" sha1="4a5a684bde42695a5851015b0adc29d6c6ef2435" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -584,7 +585,7 @@ license:CC0-1.0
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
-				<rom name="m20gra.img" size="286720" crc="397a763c" sha1="7d8ec6490cc83982a7881b803f4607bd744bedc2"/>
+				<rom name="m20gra.img" size="286720" crc="397a763c" sha1="7d8ec6490cc83982a7881b803f4607bd744bedc2" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
