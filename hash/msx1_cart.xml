@@ -16237,7 +16237,6 @@ legacy FM implementations cannot find it.
 		<info name="serial" value="M055" />
 		<info name="usage" value="Requires an Arabic MSX" />
 		<part name="cart" interface="msx_cart">
-		<info name="alt_title" value="الذاكرة"/>
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
 				<rom name="mult &amp; div.rom" size="0x8000" crc="f7c40d1f" sha1="20effe093026e9209bd3327114e9ad51676cf807" />
