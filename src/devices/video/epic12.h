@@ -6,6 +6,12 @@
 
 #pragma once
 
+// Number of bytes that are read each time Blitter fetches operations from SRAM.
+#define EP1C_OPERATION_CHUNK_SIZE_BYTES 64
+// Approximate time it takes to fetch a chunk of operations.
+// This is composed of the time that the Blitter holds the Bus Request (BREQ) signal
+// of the SH-3, as well as the overhead between requests.
+#define EP1C_OPERATION_READ_CHUNK_INTERVAL_NS 700
 #define DEBUG_VRAM_VIEWER 0 // VRAM viewer for debug
 
 class epic12_device : public device_t, public device_video_interface
@@ -40,6 +46,7 @@ public:
 	int m_gfx_size;
 	std::unique_ptr<bitmap_rgb32> m_bitmaps;
 	rectangle m_clip;
+	int m_num_delays = 0;
 
 	u16* m_use_ram;
 	size_t m_main_ramsize; // type D has double the main ram
@@ -813,6 +820,25 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// Called when a Blitter operation does not cause any draws/uploads to be performed.
+	// If multiple draws in a row are performed outside of an active clipping area,
+	// the Blitter will be reading operations from SRAM in 64 byte chunks, but not
+	// actually performing any work.
+	// This will still be visible from the CPU as Blitter being busy, until the
+	// operation list has exited.
+	// 
+	// TODO: Having 64 bytes of non-drawing operations in a row will only cause the Blitter
+	//   to idle if the operations are read from the same 64 byte chunk (and not split between two).
+	//   More proper handling of this would be to change the reads from SRAM to be done 64 bytes at the time
+	//   into a FIFO, but that's a fair amount of work.
+	inline void idle_blitter(u8 operation_size_bytes) {
+		m_blit_idle_op_bytes += operation_size_bytes;
+		if (m_blit_idle_op_bytes >= EP1C_OPERATION_CHUNK_SIZE_BYTES) {
+			m_blit_idle_op_bytes -= EP1C_OPERATION_CHUNK_SIZE_BYTES;
+			m_blit_delay_ns += EP1C_OPERATION_READ_CHUNK_INTERVAL_NS;
+		}
+	}
+
 	TIMER_CALLBACK_MEMBER(blitter_delay_callback);
 
 	osd_work_queue *m_work_queue;
@@ -821,6 +847,7 @@ protected:
 	// blit timing
 	emu_timer *m_blitter_delay_timer;
 	int m_blitter_busy;
+	u16 m_blit_idle_op_bytes;
 
 	// fpga firmware
 	std::vector<u8> m_firmware;

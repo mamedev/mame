@@ -13,6 +13,8 @@ DEFINE_DEVICE_TYPE(EPIC12, epic12_device, "epic12", "EPIC12 Blitter")
 #define EP1C_VRAM_H_LINE_PERIOD_NANOSEC 63600
 #define EP1C_VRAM_H_LINE_DURATION_NANOSEC 2160
 #define EP1C_FRAME_DURATION_NANOSEC 16666666
+#define EP1C_DRAW_OPERATION_SIZE_BYTES 20
+#define EP1C_CLIP_OPERATION_SIZE_BYTES 2
 #define EP1C_PRINT_BLITTER_DELAYS 0
 
 epic12_device::epic12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -37,6 +39,7 @@ epic12_device::epic12_device(const machine_config &mconfig, const char *tag, dev
 	m_gfx_scroll_1_x_shadowcopy = 0;
 	m_gfx_scroll_1_y_shadowcopy = 0;
 	m_blit_delay_ns = 0;
+	m_blit_idle_op_bytes = 0;
 }
 
 TIMER_CALLBACK_MEMBER(epic12_device::blitter_delay_callback)
@@ -89,6 +92,7 @@ void epic12_device::device_start()
 	save_item(NAME(m_firmware));
 	save_item(NAME(m_firmware_version));
 	save_item(NAME(m_blit_delay_ns));
+	save_item(NAME(m_blit_idle_op_bytes));
 }
 
 void epic12_device::device_reset()
@@ -193,6 +197,7 @@ inline void epic12_device::gfx_upload_shadow_copy(address_space &space, offs_t *
 	// assertion also puts CPU into WAIT, if it needs uncached RAM accesses.
 	int num_sram_clk = (16 + dimx * dimy * 2 ) / 4;
 	m_blit_delay_ns += num_sram_clk * EP1C_SRAM_CLK_NANOSEC;
+	m_blit_idle_op_bytes = 0;
 }
 
 inline void epic12_device::gfx_upload(offs_t *addr)
@@ -333,6 +338,28 @@ const epic12_device::blitfunction epic12_device::f1_ti0_tr0_blit_funcs[64] =
 	epic12_device::draw_sprite_f1_ti0_tr0_s0_d7, epic12_device::draw_sprite_f1_ti0_tr0_s1_d7, epic12_device::draw_sprite_f1_ti0_tr0_s2_d7, epic12_device::draw_sprite_f1_ti0_tr0_s3_d7, epic12_device::draw_sprite_f1_ti0_tr0_s4_d7, epic12_device::draw_sprite_f1_ti0_tr0_s5_d7, epic12_device::draw_sprite_f1_ti0_tr0_s6_d7, epic12_device::draw_sprite_f1_ti0_tr0_s7_d7,
 };
 
+/*
+	Calculate number of VRAM row accesses a draw will perform.
+	Source data will typically be aligned well with VRAM, but this is not the case for the destination.
+	As an example, drawing a 64x32 pixel image will usually read from two VRAM rows for source data,
+	but if the destination start coordinate is (x=10, y=10), each of the 32x32px chunks of source data will
+	touch 4 rows of destination VRAM, leading to a total of 8 destination VRAM accesses.
+*/
+inline u16 calculate_vram_accesses(u16 start_x, u16 start_y, u16 dimx, u16 dimy) {
+	int x_rows = 0;
+	int num_vram_rows = 0;
+	for (int x_pixels = dimx; x_pixels > 0; x_pixels -= 32) {
+		x_rows++;
+		if (((start_x & 31) + std::min(32, x_pixels)) > 32)
+			x_rows++;  // Drawing across multiple horizontal VRAM row boundaries.
+	}
+	for (int y_pixels = dimy; y_pixels > 0; y_pixels -= 32) {
+		num_vram_rows += x_rows;
+		if (((start_y & 31) + std::min(32, y_pixels)) > 32)
+			num_vram_rows += x_rows;  // Drawing across multiple vertical VRAM row boundaries.	
+	}
+	return num_vram_rows;
+}
 
 /*
     Draw command
@@ -373,54 +400,58 @@ inline void epic12_device::gfx_draw_shadow_copy(address_space &space, offs_t *ad
 {
 	COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
-	COPY_NEXT_WORD(space, addr);
-	COPY_NEXT_WORD(space, addr);
+	u16 src_x_start = COPY_NEXT_WORD(space, addr);
+	u16 src_y_start = COPY_NEXT_WORD(space, addr);
 	u16 dst_x_start = COPY_NEXT_WORD(space, addr); 
 	u16 dst_y_start = COPY_NEXT_WORD(space, addr);
-	u16 dimx = (COPY_NEXT_WORD(space, addr) & 0x1fff) + 1;
-	u16 dimy = (COPY_NEXT_WORD(space, addr) & 0x0fff) + 1;
+	u16 src_dimx = (COPY_NEXT_WORD(space, addr) & 0x1fff) + 1;
+	u16 src_dimy = (COPY_NEXT_WORD(space, addr) & 0x0fff) + 1;
 	COPY_NEXT_WORD(space, addr);
 	COPY_NEXT_WORD(space, addr);
 
 	// Calculate Blitter delay for the Draw operation.
-	// Clip the coordinates to draw, to only add delays for non-clipped area.
-	u16 dst_x_end = dst_x_start + dimx;
-	u16 dst_y_end = dst_y_start + dimy;
-
-	if (dst_x_start > m_clip.max_x || dst_x_end < m_clip.min_x || dst_y_start > m_clip.max_y || dst_y_end < m_clip.min_y)
-		return;  // Fully outside clipping area.
-
-	dst_x_start = std::max(dst_x_start, (u16)m_clip.min_x);
-	dst_y_start = std::max(dst_y_start, (u16)m_clip.min_y);
-	dst_x_end = std::min(dst_x_end, (u16)m_clip.max_x);
-	dst_y_end = std::min(dst_y_end, (u16)m_clip.max_y);
+	// On real hardware, the Blitter will read operations into a FIFO queue
+	// by asserting BREQ on the SH3 and then reading from Main RAM.
+	// Since the reads are done concurrently to executions of operations, its
+	// ok to estimate the delay all at once instead for emulation purposes.
 	
-	dimx = dst_x_end - dst_x_start + 1;
-	dimy = dst_y_end - dst_y_start + 1;
+	u16 dst_x_end = dst_x_start + src_dimx - 1;
+	u16 dst_y_end = dst_y_start + src_dimy - 1;
 
-	// Edge case: Draw widths will always be evenly divisable in eight pixels, rounded up.
-	// Blitter will simply draw back same data from destination for the extra writes.
-	if (dimx & 7)
-		dimx += (8 - (dimx & 7)); 
+	// Sprites fully outside of clipping area should not be drawn.
+	if (dst_x_start > m_clip.max_x || dst_x_end < m_clip.min_x || dst_y_start > m_clip.max_y || dst_y_end < m_clip.min_y) {
+		idle_blitter(EP1C_DRAW_OPERATION_SIZE_BYTES);
+		return;
+	}
 
-	// VRAM data is laid out in 32x32 pixel rows. Calculate amount of rows written to. 
-	int vram_row_width = std::ceil( ( (dst_x_start % 32) + dimx ) / 32.0 );
-	int vram_row_height = std::ceil( ( (dst_y_start % 32) + dimy ) / 32.0 );
-	int num_vram_rows = vram_row_height * vram_row_width;
+	m_blit_idle_op_bytes = 0;  // Blitter no longer idle.
+	
+	// VRAM data is laid out in 32x32 pixel rows. Calculate amount of rows accessed. 
+	int src_num_vram_rows = calculate_vram_accesses(src_x_start, src_y_start, src_dimx, src_dimy);
+	int dst_num_vram_rows = calculate_vram_accesses(dst_x_start, dst_y_start, src_dimx, src_dimy);
+
+	// Since draws are done 4 pixels at the time, extend the draw area to coordinates aligned for this.
+	// Doing this after VRAM calculations simplify things a bit, and these extensions will never make the
+	// destination area span additional VRAM rows. 
+	dst_x_start -= dst_x_start & 3;
+	dst_x_end += (4 - ((dst_x_end + 1) & 3)) & 3;
+	u16 dst_dimx = dst_x_end - dst_x_start + 1;
+	u16 dst_dimy = dst_y_end - dst_y_start + 1;
 
 	// Number of VRAM CLK cycles needed to draw a sprite is sum of:
 	// - Number of pixels read from source divided by 4 (Each CLK reads 4 pixels, since 32bit DDR).
 	// - Number of pixels read from destination divided by 4.
 	// - Pixels written to destination divided by 4.
-	// - Aproximately 35 CLK overhead per VRAM row.
-	//   (5 CLK between reads. 20 CLK before the write to destination. 10 CLK when switching VRAM row.)
-	// - 10 CLK of additional overhead per sprite at the end of writing.
+	// - VRAM access overhead:
+	//   - 6 CLK of overhead after each read from a source VRAM row.
+	//   - 20 CLK of overhead between read and write of each destination VRAM row.
+	//   - 11 CLK of overhead after each write to a destination VRAM row.
+	// - 12 CLK of additional overhead per sprite at the end of writing.
 	// Note: Details are from https://buffis.com/docs/CV1000_Blitter_Research_by_buffi.pdf
-	//       There may be mistakes.
-	u32 num_vram_clk = std::ceil(dimx * dimy * 3.0 / 4.0) + num_vram_rows * (5 + 20 + 10) + 10;	
+	//       There may be mistakes.	
+	u32 num_vram_clk = src_dimx * src_dimy / 4 + dst_dimx * dst_dimy / 2 + src_num_vram_rows * 6 + dst_num_vram_rows * (20 + 11) + 12;
 	m_blit_delay_ns += num_vram_clk * EP1C_VRAM_CLK_NANOSEC;
 }
-
 
 inline void epic12_device::gfx_draw(offs_t *addr)
 {
@@ -634,10 +665,10 @@ void epic12_device::gfx_create_shadow_copy(address_space &space)
 {
 	offs_t addr = m_gfx_addr & 0x1fffffff;
 
-	// TODO: Verify that this is the actual clipping area used.
+	// TODO: Stop respecting this clipping area in draw operations not fully outside of it.
 	// For Muchi Muchi Pork, it looks like it draws 32px around visible area, when checking in Special Mode test menu VRAM viewer.
+	// Draws outside of clip area is also visible in logic analyzer for Pink Sweets.
 	m_clip.set(m_gfx_scroll_1_x_shadowcopy, m_gfx_scroll_1_x_shadowcopy + 320-1, m_gfx_scroll_1_y_shadowcopy, m_gfx_scroll_1_y_shadowcopy + 240-1);
-
 	while (1)
 	{
 		// request commands from main CPU RAM
@@ -654,6 +685,7 @@ void epic12_device::gfx_create_shadow_copy(address_space &space)
 					m_clip.set(m_gfx_scroll_1_x_shadowcopy, m_gfx_scroll_1_x_shadowcopy + 320 - 1, m_gfx_scroll_1_y_shadowcopy, m_gfx_scroll_1_y_shadowcopy + 240 - 1);
 				else
 					m_clip.set(0, 0x2000 - 1, 0, 0x1000 - 1);
+				idle_blitter(EP1C_CLIP_OPERATION_SIZE_BYTES);
 				break;
 
 			case 0x2000:
