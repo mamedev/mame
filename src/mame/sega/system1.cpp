@@ -308,7 +308,6 @@ seem to have access to.
 
 #include "machine/segacrpt_device.h"
 #include "cpu/z80/mc8123.h"
-#include "sound/sn76496.h"
 
 #include "speaker.h"
 
@@ -2308,10 +2307,10 @@ void system1_state::sys1ppi(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	SN76489A(config, "sn1", SOUND_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489A(config, m_sn[0], SOUND_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* 2nd SN's clock is selectable via jumper */
-	SN76489A(config, "sn2", SOUND_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489A(config, m_sn[1], SOUND_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 /* reduced visible area for scrolling games */
@@ -2454,7 +2453,7 @@ void system1_state::sys1piox_317_0006(machine_config &config)
 	encrypted_sys1pio_maps(config);
 	z80.set_decrypted_tag(m_decrypted_opcodes);
 
-	SN76489A(config.replace(), "sn2", SOUND_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	m_sn[1]->set_clock(SOUND_CLOCK / 4);
 }
 
 void system1_state::sys1piox_315_5135(machine_config &config)
@@ -2601,7 +2600,7 @@ void system1_state::nob(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &system1_state::nobo_map);
 
-	SN76489A(config.replace(), "sn2", SOUND_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	m_sn[1]->set_clock(SOUND_CLOCK / 4);
 }
 
 void system1_state::nobm(machine_config &config)
@@ -2659,7 +2658,7 @@ void system1_state::sys2_317_0006(machine_config &config)
 	encrypted_sys1ppi_maps(config);
 	z80.set_decrypted_tag(m_decrypted_opcodes);
 
-	SN76489A(config.replace(), "sn2", SOUND_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	m_sn[1]->set_clock(SOUND_CLOCK / 4);
 }
 
 void system1_state::sys2_317_0007(machine_config &config)
@@ -2669,7 +2668,7 @@ void system1_state::sys2_317_0007(machine_config &config)
 	encrypted_sys1ppi_maps(config);
 	z80.set_decrypted_tag(m_decrypted_opcodes);
 
-	SN76489A(config.replace(), "sn2", SOUND_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.50);
+	m_sn[1]->set_clock(SOUND_CLOCK / 4);
 }
 
 void system1_state::sys2xb(machine_config &config)
