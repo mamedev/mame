@@ -82,6 +82,10 @@ Versions known to exist but not dumped:
      PCBs were shown running (and could be played) at a Cave fan show known as Cave Festival 2006. There are
      videos of the game being played floating around the internet and on YouTube. AKA DDP-CV or DDP BLUE ROM
 
+NOTE: Easter egg in Fereron SOS / Dangun Feveron:
+      Insert a coin and with the joystick move: Down, Up, Right, Left, Up, Down, Left, Right
+      If you did the above right, you'll hear a MEOW sound. Start the game and your ship is now a cat!
+
 ***************************************************************************/
 
 #include "emu.h"
