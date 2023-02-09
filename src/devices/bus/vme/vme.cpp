@@ -221,7 +221,6 @@ vme_device::vme_device(const machine_config &mconfig, device_type type, const ch
 vme_device::~vme_device()
 {
 	LOG("%s %s\n", tag(), FUNCNAME);
-	m_device_list.detach_all();
 }
 
 void vme_device::device_start()
@@ -252,7 +251,7 @@ void vme_device::device_reset()
 void vme_device::add_vme_card(device_vme_card_interface *card)
 {
 	LOG("%s %s\n", tag(), FUNCNAME);
-	m_device_list.append(*card);
+	m_device_list.emplace_back(*card);
 }
 
 #if 0
@@ -438,7 +437,6 @@ device_vme_card_interface::device_vme_card_interface(const machine_config &mconf
 	: device_interface(device, "vme")
 	, m_vme(nullptr)
 	, m_slot(0)
-	, m_next(nullptr)
 {
 	m_device = &device;
 	LOG("%s %s\n", m_device->tag(), FUNCNAME);

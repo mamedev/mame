@@ -39,7 +39,8 @@ Constellation Quattro:
 
 Super Sensor IV:
 - MOS MPS6502A @ 2MHz
-- 1KB battery-backed RAM (2*TC5514AP-3)
+- 1KB battery-backed RAM (2*TC5514AP-3). Power-off or power outage triggers
+  an NMI. If this isn't done, the next power-on may fail.
 - 8KB ROM (TMM2364P)
 - 2 ROM sockets for expansion (blue @ u6, white @ u5)
 
@@ -350,7 +351,7 @@ INPUT_PORTS_END
 
 void const_state::nconst(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, 2_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::const_map);
 
@@ -362,11 +363,11 @@ void const_state::nconst(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(250));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(3, 8);
 	config.set_default_layout(layout_novag_const);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 2_MHz_XTAL / 0x800); // ~976Hz
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -376,7 +377,7 @@ void const_state::ssensor4(machine_config &config)
 {
 	nconst(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::ssensor4_map);
 
 	subdevice<clock_device>("irq_clock")->set_pulse_width(attotime::from_usec(39)); // irq active for 39us
@@ -386,7 +387,7 @@ void const_state::ssensor4(machine_config &config)
 
 	config.set_default_layout(layout_novag_ssensor4);
 
-	/* expansion */
+	// expansion
 	GENERIC_SOCKET(config, "exrom", generic_plain_slot, "novag_ssensor4");
 	SOFTWARE_LIST(config, "cart_list").set_original("novag_ssensor4");
 }
@@ -395,7 +396,7 @@ void const_state::nconst36(machine_config &config)
 {
 	nconst(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	M65SC02(config.replace(), m_maincpu, 7.2_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::const_map);
 
@@ -403,7 +404,7 @@ void const_state::nconst36(machine_config &config)
 
 	m_board->set_delay(attotime::from_msec(200));
 
-	/* sound hardware */
+	// sound hardware
 	BEEP(config.replace(), m_beeper, 7.2_MHz_XTAL/2 / 0x800); // ~1758Hz
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -412,14 +413,14 @@ void const_state::nconst36a(machine_config &config)
 {
 	nconst36(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	R65C02(config.replace(), m_maincpu, 7.2_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::const_map);
 
 	// 4020 CLK is 7.2_MHz_XTAL/4, but with IRQ on Q11 instead of Q12, result
 	// frequency and duty cycle are identical to nconst36
 
-	/* sound hardware */
+	// sound hardware
 	BEEP(config.replace(), m_beeper, 7.2_MHz_XTAL/4 / 0x800); // ~879Hz
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -428,14 +429,14 @@ void const_state::nconstq(machine_config &config)
 {
 	nconst36a(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_clock(8_MHz_XTAL/2);
 
 	subdevice<clock_device>("irq_clock")->set_clock(8_MHz_XTAL/4 / 0x1000); // ~488Hz (pulse width same as nconst)
 
 	config.set_default_layout(layout_novag_constq);
 
-	/* sound hardware */
+	// sound hardware
 	BEEP(config.replace(), m_beeper, 8_MHz_XTAL/4 / 0x800); // ~976Hz
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -444,7 +445,7 @@ void const_state::sconst(machine_config &config)
 {
 	nconstq(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config.replace(), m_maincpu, 8_MHz_XTAL/2); // UM6502C
 	m_maincpu->set_addrmap(AS_PROGRAM, &const_state::sconst_map);
 
