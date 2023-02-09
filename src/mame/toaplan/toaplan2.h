@@ -147,13 +147,12 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	optional_ioport_array<2> m_io_pad;
+private:
+	required_ioport_array<2> m_io_pad;
 
-	s8 m_old_p1_paddle_h = 0; /* For Ghox */
-	s8 m_old_p2_paddle_h = 0;
+	s8 m_old_paddle_h[2] = {0};
 
-	u16 ghox_p1_h_analog_r();
-	u16 ghox_p2_h_analog_r();
+	template<unsigned Which> u16 ghox_h_analog_r();
 
 	void ghox_68k_mem(address_map &map);
 	void ghox_hd647180_mem_map(address_map &map);
@@ -196,10 +195,11 @@ protected:
 	virtual void machine_start() override;
 	virtual void device_post_load() override;
 
-	optional_shared_ptr<u16> m_tx_videoram;
-	optional_shared_ptr<u16> m_tx_lineselect;
-	optional_shared_ptr<u16> m_tx_linescroll;
-	optional_shared_ptr<u16> m_tx_gfxram;
+private:
+	required_shared_ptr<u16> m_tx_videoram;
+	required_shared_ptr<u16> m_tx_lineselect;
+	required_shared_ptr<u16> m_tx_linescroll;
+	required_shared_ptr<u16> m_tx_gfxram;
 
 	optional_device<address_map_bank_device> m_dma_space;
 
@@ -288,7 +288,7 @@ public:
 	void pwrkick(machine_config &config);
 
 private:
-	optional_device<upd4992_device> m_rtc;
+	required_device<upd4992_device> m_rtc;
 	optional_device<ticket_dispenser_device> m_hopper;
 
 	void pwrkick_coin_w(u8 data);

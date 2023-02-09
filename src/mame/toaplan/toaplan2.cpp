@@ -418,13 +418,14 @@ constexpr unsigned toaplan2_state::T2PALETTE_LENGTH;
 
 void ghox_state::machine_start()
 {
-	save_item(NAME(m_old_p1_paddle_h));
-	save_item(NAME(m_old_p2_paddle_h));
+	toaplan2_state::machine_start();
+	save_item(NAME(m_old_paddle_h));
 }
 
 
 void truxton2_state::machine_start()
 {
+	toaplan2_state::machine_start();
 	save_item(NAME(m_z80_busreq));
 }
 
@@ -438,13 +439,15 @@ WRITE_LINE_MEMBER(toaplan2_state::toaplan2_reset)
 
 void ghox_state::machine_reset()
 {
-	m_old_p1_paddle_h = 0;
-	m_old_p2_paddle_h = 0;
+	toaplan2_state::machine_reset();
+	m_old_paddle_h[0] = 0;
+	m_old_paddle_h[1] = 0;
 }
 
 
 MACHINE_RESET_MEMBER(truxton2_state, bgaregga)
 {
+	toaplan2_state::machine_reset();
 	for (int chip = 0; chip < 2; chip++)
 	{
 		for (int i = 0; i < 8; i++)
@@ -670,26 +673,16 @@ READ_LINE_MEMBER(toaplan2_state::c2map_r)
 }
 
 
-u16 ghox_state::ghox_p1_h_analog_r()
+template<unsigned Which>
+u16 ghox_state::ghox_h_analog_r()
 {
-	const s8 new_value = m_io_pad[0]->read();
-	if (new_value == m_old_p1_paddle_h) return 0;
-	const s8 value = new_value - m_old_p1_paddle_h;
+	const s8 new_value = m_io_pad[Which]->read();
+	const s8 result = new_value - m_old_paddle_h[Which];
 	if (!machine().side_effects_disabled())
-		m_old_p1_paddle_h = new_value;
-	return value;
+		m_old_paddle_h[Which] = new_value;
+	return result;
 }
 
-
-u16 ghox_state::ghox_p2_h_analog_r()
-{
-	const s8 new_value = m_io_pad[1]->read();
-	if (new_value == m_old_p2_paddle_h) return 0;
-	const s8 value = new_value - m_old_p2_paddle_h;
-	if (!machine().side_effects_disabled())
-		m_old_p2_paddle_h = new_value;
-	return value;
-}
 
 void toaplan2_state::sound_reset_w(u8 data)
 {
@@ -860,10 +853,10 @@ void toaplan2_state::tekipaki_68k_mem(address_map &map)
 void ghox_state::ghox_68k_mem(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x040000, 0x040001).r(FUNC(ghox_state::ghox_p2_h_analog_r));
+	map(0x040000, 0x040001).r(FUNC(ghox_state::ghox_h_analog_r<1>));
 	map(0x080000, 0x083fff).ram();
 	map(0x0c0000, 0x0c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x100000, 0x100001).r(FUNC(ghox_state::ghox_p1_h_analog_r));
+	map(0x100000, 0x100001).r(FUNC(ghox_state::ghox_h_analog_r<0>));
 	map(0x140000, 0x14000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x180000, 0x180fff).rw(FUNC(ghox_state::shared_ram_r), FUNC(ghox_state::shared_ram_w)).umask16(0x00ff);
 	map(0x181001, 0x181001).w(FUNC(ghox_state::coin_w));
