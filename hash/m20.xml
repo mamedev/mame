@@ -175,6 +175,7 @@ license:CC0-1.0
 		<description>CP/M 8000</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Launch with: -ramsize 512k" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
@@ -186,9 +187,10 @@ license:CC0-1.0
 	<software name="msdos20">
 	<!-- "This is a standard 360k MS-DOS disk image, 512 bytes/sector, 9 sectors, 2 sides, 40 tracks." -->
 	<!-- Use with BIOS 2.0 and the 8086 APB -->
-		<description>MS-DOS 2.0</description>
+		<description>Olivetti MS-DOS 2.0</description>
 		<year>1983</year>
 		<publisher>Microsoft</publisher>
+		<info name="usage" value="Launch with: -bios 1" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
@@ -211,16 +213,7 @@ license:CC0-1.0
 				<rom name="adm5.imd" size="33619" crc="f7abfeee" sha1="ee432dc896f9b034c1f7ff3fac67cf5b8e003ff5"/>
 			</dataarea>
 		</part>
-	</software>
-
-	<software name="adm51" supported="no"><!-- Missing MFM track0 -->
-	<!-- "This is a standard 360k MS-DOS disk image, 512 bytes/sector, 9 sectors, 2 sides, 40 tracks." -->
-	<!-- Use with BIOS 2.0 and the 8086 APB - boot with Msdos in drive0 -->
-		<description>ADM51 Terminal Emulator for MS-DOS</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25"><!-- Missing MFM track0 -->
 			<dataarea name="flop" size="368640">
 				<rom name="adm51.imd" size="8192" crc="8916ea22" sha1="99fec256ae75c6569dff5bb8005f0e7bc301f4d8" status="baddump"/>
 			</dataarea>
@@ -501,7 +494,7 @@ license:CC0-1.0
 
 	<software name="gamesi"><!-- Missing FM track0, bootable (pcos13d) -->
 	<!-- Contains 5 games -->
-		<description>Giochi</description>
+		<description>Demo Disk - Giochi</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -514,7 +507,7 @@ license:CC0-1.0
 
 	<software name="gamesd" supported="partial"><!-- Missing FM track0, bootable (pcos20h) -->
 	<!-- Contains 19 games and demos -->
-		<description>Spiele + Uhr</description>
+		<description>Demo Disk - Spiele + Uhr</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -527,7 +520,7 @@ license:CC0-1.0
 
 	<software name="gamesp" cloneof="gamesd"><!-- Missing FM track0, bootable (pcos20h) -->
 	<!-- This is a user disk with 16 games and demos -->
-		<description>Spiele und Uhr (custom)</description>
+		<description>Demo Disk - Spiele + Uhr (custom)</description>
 		<year>1984</year>
 		<publisher>D.Steuer</publisher>
 
