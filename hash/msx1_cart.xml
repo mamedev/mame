@@ -5981,7 +5981,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="ゴルフゲーム" />
 		<info name="serial" value="00040"/>
-		<info name="4871489086"/>
+		<info name="isbn" value="4871489086"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
