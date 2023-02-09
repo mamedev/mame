@@ -196,7 +196,7 @@ protected:
 	uint8_t clock_conv, sync_offset, sync_period, bus_id, select_timeout, seq;
 	uint8_t fifo[16];
 	uint32_t tcount;
-	uint32_t tcounter;
+	uint32_t tcounter, tcounter_mask;
 	int mode, fifo_pos, command_pos;
 	int state, xfr_phase;
 	int command_length;
@@ -231,7 +231,7 @@ protected:
 	void delay(int cycles);
 	void delay_cycles(int cycles);
 
-	virtual void decrement_tcounter(int count = 1);
+	void decrement_tcounter(int count = 1);
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;
@@ -247,7 +247,7 @@ public:
 	virtual uint8_t status_r() override;
 
 	uint8_t conf2_r() { return config2; }
-	void conf2_w(uint8_t data) { config2 = data; }
+	virtual void conf2_w(uint8_t data) { config2 = data; }
 
 	virtual uint8_t read(offs_t offset) override;
 	virtual void write(offs_t offset, uint8_t data) override;
@@ -297,6 +297,8 @@ public:
 
 	virtual void map(address_map &map) override;
 
+	virtual void conf2_w(uint8_t data) override;
+
 	uint8_t conf3_r() { return config3; }
 	void conf3_w(uint8_t data) { config3 = data; }
 
@@ -327,8 +329,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void check_drq() override;
-
-	virtual void decrement_tcounter(int count = 1) override;
 
 private:
 	u8 config3;

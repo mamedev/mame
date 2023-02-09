@@ -137,7 +137,7 @@ ncr53c90_device::ncr53c90_device(const machine_config &mconfig, device_type type
 	: nscsi_device(mconfig, type, tag, owner, clock)
 	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 	, tm(nullptr), config(0), status(0), istatus(0), clock_conv(0), sync_offset(0), sync_period(0), bus_id(0)
-	, select_timeout(0), seq(0), tcount(0), tcounter(0), mode(0), fifo_pos(0), command_pos(0), state(0), xfr_phase(0), command_length(0), dma_dir(0), irq(false), drq(false), test_mode(false)
+	, select_timeout(0), seq(0), tcount(0), tcounter(0), tcounter_mask(0xffff), mode(0), fifo_pos(0), command_pos(0), state(0), xfr_phase(0), command_length(0), dma_dir(0), irq(false), drq(false), test_mode(false)
 	, m_irq_handler(*this)
 	, m_drq_handler(*this)
 {
@@ -201,6 +201,7 @@ void ncr53c90_device::device_start()
 	save_item(NAME(fifo));
 	save_item(NAME(tcount));
 	save_item(NAME(tcounter));
+	save_item(NAME(tcounter_mask));
 	save_item(NAME(mode));
 	save_item(NAME(fifo_pos));
 	save_item(NAME(command_pos));
@@ -245,6 +246,7 @@ void ncr53c90_device::device_reset()
 	scsi_bus->ctrl_w(scsi_refid, 0, S_RST);
 	tcount = 0;
 	tcounter = 0;
+	tcounter_mask = 0xffff;
 
 	reset_disconnect();
 }
@@ -1202,7 +1204,7 @@ void ncr53c90_device::decrement_tcounter(int count)
 	// A tcount of 0 specifies the maximum length count (65536) so this should wrap
 	// from 0 to 65535 only once.
 	if (!(status & S_TC0))
-		tcounter = (tcounter - count) & 0xffff;
+		tcounter = (tcounter - count) & tcounter_mask;
 	else
 		tcounter = 0;
 
@@ -1360,21 +1362,10 @@ void ncr53c94_device::check_drq()
 		ncr53c90_device::check_drq();
 }
 
-void ncr53c94_device::decrement_tcounter(int count)
+void ncr53c94_device::conf2_w(uint8_t data)
 {
-	if (!dma_command)
-		return;
-
-	const uint32_t tcounter_mask = (config2 & S2FE) ? 0xffffff : 0xffff;
-	if (!(status & S_TC0))
-		tcounter = (tcounter - count) & tcounter_mask;
-	else
-		tcounter = 0;
-
-	if (tcounter == 0)
-		status |= S_TC0;
-
-	check_drq();
+	tcounter_mask = (data & S2FE) ? 0xffffff : 0xffff;
+	config2 = data;
 }
 
 uint8_t ncr53c94_device::tcounter_hi2_r()
