@@ -49,8 +49,7 @@ public:
 		m_0c09(*this, "0C09"),
 		m_0c0b(*this, "0C0B"),
 		m_vblank(*this, "VBLANK"),
-		m_stick(*this, "STICK%c", 'X'),
-		m_lamp(*this, "lamp0")
+		m_stick(*this, "STICK%c", 'X')
 	{ }
 
 	void triplhnt(machine_config &config);
@@ -80,7 +79,6 @@ private:
 	required_ioport m_0c0b;
 	required_ioport m_vblank;
 	required_ioport_array<2> m_stick;
-	output_finder<> m_lamp;
 
 	uint8_t m_cmos[16]{};
 	uint8_t m_da_latch = 0;
@@ -293,8 +291,6 @@ uint8_t triplhnt_state::da_latch_r(offs_t offset)
 
 void triplhnt_state::machine_start()
 {
-	m_lamp.resolve();
-
 	m_hit_code = 0;
 }
 
@@ -486,7 +482,7 @@ void triplhnt_state::triplhnt(machine_config &config)
 
 	F9334(config, m_latch); // J7
 	m_latch->q_out_cb<0>().set_nop(); // unused
-	m_latch->q_out_cb<1>().set([this] (int state) { m_lamp = state ? 1 : 0; });
+	m_latch->q_out_cb<1>().set_output("lamp0");
 	m_latch->q_out_cb<1>().append(m_discrete, FUNC(discrete_device::write_line<TRIPLHNT_LAMP_EN>)); // Lamp is used to reset noise
 	m_latch->q_out_cb<2>().set(m_discrete, FUNC(discrete_device::write_line<TRIPLHNT_SCREECH_EN>)); // screech
 	m_latch->q_out_cb<3>().set(FUNC(triplhnt_state::coin_lockout_w));
