@@ -8,7 +8,7 @@
 Emulation of a 4 slot expander for the MSX system.
 
 Some slot expanders have the ability to enable/disable subslots through
-jumpers/switches, or adjustable volume per slot. Non of that is emulated.
+jumpers/switches, or adjustable volume per slot. None of that is emulated.
 
 Known slot expanders:
 - 8bits4ever Slot x4 - audio mixer with adjustable volume per slot not emulated.
