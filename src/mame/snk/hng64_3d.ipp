@@ -985,21 +985,25 @@ void hng64_state::hng64_command3d(const uint16_t* packet)
 		miniPacket[15] = 0x7fff;
 		recoverPolygonBlock(miniPacket, numPolys);
 
+		if (packet[7] == 1)
+		{
+			if (packet[8] == 0x0102)
+			{
+				memset(miniPacket, 0, sizeof(uint16_t) * 16);
+				for (int i = 0; i < 7; i++) miniPacket[i] = packet[i + 8];
+				miniPacket[7] = 0x7fff;
+				miniPacket[11] = 0x7fff;
+				miniPacket[15] = 0x7fff;
+				recoverPolygonBlock(miniPacket, numPolys);
 
-		if (packet[8] == 0x0102)
-		{
-			memset(miniPacket, 0, sizeof(uint16_t) * 16);
-			for (int i = 0; i < 7; i++) miniPacket[i] = packet[i + 8];
-			miniPacket[7] = 0x7fff;
-			miniPacket[11] = 0x7fff;
-			miniPacket[15] = 0x7fff;
-			recoverPolygonBlock(miniPacket, numPolys);
-		}
-		else
-		{
-			/* if the 2nd value isn't 0x0102 don't render it
-			   it could just be that the display list is corrupt at this point tho, see note above
-			*/
+				// packet[15] is always 1?
+			}
+			else
+			{
+				/* if the 2nd value isn't 0x0102 don't render it
+				   it could just be that the display list is corrupt at this point tho, see note above
+				*/
+			}
 		}
 
 		break;

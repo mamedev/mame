@@ -218,8 +218,10 @@ uint16_t l7a1045_sound_device::l7a1045_sound_r(offs_t offset, uint16_t mem_mask)
 
 	//logerror("%s: read at %x (mask %04x)\n", tag(), offset, mem_mask);
 
-	if(offset == 0)
-		printf("sound_select_r?\n");
+	if (offset == 0)
+	{
+		//logerror("sound_select_r?\n");
+	}
 	else
 		return sound_data_r(offset -1);
 
