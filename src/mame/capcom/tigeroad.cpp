@@ -750,12 +750,15 @@ void pushman_state::machine_start()
 	save_item(NAME(m_mcu_latch_ctl));
 }
 
-void pushman_state::pushman(machine_config &config)
+void pushman_state::pushman(machine_config &config) // all clocks measured on PCB
 {
 	f1dream_comad(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pushman_state::pushman_map);
+	m_maincpu->set_clock(XTAL(8'000'000));
 
-	M68705R3(config, m_mcu, XTAL(8'000'000)/2); // 4MHz
+	m_audiocpu->set_clock(XTAL(10'000'000) / 2);
+
+	M68705R3(config, m_mcu, XTAL(8'000'000) / 2);
 	m_mcu->porta_w().set(FUNC(pushman_state::mcu_pa_w));
 	m_mcu->portb_w().set(FUNC(pushman_state::mcu_pb_w));
 	m_mcu->portc_w().set(FUNC(pushman_state::mcu_pc_w));
@@ -1133,37 +1136,44 @@ ROM_START( f1dreamba )
 ROM_END
 
 
+// Seen on both COMAD-01 and COMAD-01A PCBs. Dumps match.
 ROM_START( pushman )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "pushman.012", 0x000000, 0x10000, CRC(330762bc) SHA1(c769b68da40183e6eb84212636bfd1265e5ed2d8) )
-	ROM_LOAD16_BYTE( "pushman.011", 0x000001, 0x10000, CRC(62636796) SHA1(1a205c1b0efff4158439bc9a21cfe3cd8834aef9) )
+	ROM_LOAD16_BYTE( "12.ic212.16n", 0x000000, 0x10000, CRC(330762bc) SHA1(c769b68da40183e6eb84212636bfd1265e5ed2d8) )
+	ROM_LOAD16_BYTE( "11.ic197.16l", 0x000001, 0x10000, CRC(62636796) SHA1(1a205c1b0efff4158439bc9a21cfe3cd8834aef9) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "pushman.013", 0x00000, 0x08000,  CRC(adfe66c1) SHA1(fa4ed13d655c664b06e9b91292d2c0a88cb5a569) )
+	ROM_LOAD( "13.ic216.4n", 0x00000, 0x08000,  CRC(adfe66c1) SHA1(fa4ed13d655c664b06e9b91292d2c0a88cb5a569) )
 
 	ROM_REGION( 0x01000, "mcu", 0 ) // Verified same for all 4 currently dumped versions
-	ROM_LOAD( "pushman68705r3p.ic23",  0x00000, 0x01000, CRC(d7916657) SHA1(89c14c6044f082fffe2a8f86d0a82336f4a110a2) )
+	ROM_LOAD( "pushman68705r3p.ic234",  0x00000, 0x01000, CRC(d7916657) SHA1(89c14c6044f082fffe2a8f86d0a82336f4a110a2) )
 
 	ROM_REGION( 0x10000, "text", 0 )
-	ROM_LOAD( "pushman.001",  0x00000, 0x08000, CRC(626e5865) SHA1(4ab96c8512f439d18390094d71a898f5c576399c) )
+	ROM_LOAD( "1.ic130.20g",  0x00000, 0x08000, CRC(626e5865) SHA1(4ab96c8512f439d18390094d71a898f5c576399c) )
 
 	ROM_REGION( 0x40000, "spritegen", 0 )
-	ROM_LOAD32_BYTE( "pushman.004", 0x00000, 0x10000, CRC(87aafa70) SHA1(560661b23ddac106a3d2762fc32da666b31e7424) )
-	ROM_LOAD32_BYTE( "pushman.005", 0x00001, 0x10000, CRC(7fd1200c) SHA1(15d6781a2d7e3ec2e8f85f8585b1e3fd9fe4fd1d) )
-	ROM_LOAD32_BYTE( "pushman.002", 0x00002, 0x10000, CRC(0a094ab0) SHA1(2ff5dcf0d9439eeadd61601170c9767f4d81f022) )
-	ROM_LOAD32_BYTE( "pushman.003", 0x00003, 0x10000, CRC(73d1f29d) SHA1(0a87fe02b1efd04c540f016b2626d32da70219db) )
+	ROM_LOAD32_BYTE( "4.ic58.1d", 0x00000, 0x10000, CRC(87aafa70) SHA1(560661b23ddac106a3d2762fc32da666b31e7424) )
+	ROM_LOAD32_BYTE( "5.ic59.3d", 0x00001, 0x10000, CRC(7fd1200c) SHA1(15d6781a2d7e3ec2e8f85f8585b1e3fd9fe4fd1d) )
+	ROM_LOAD32_BYTE( "2.ic56.1c", 0x00002, 0x10000, CRC(0a094ab0) SHA1(2ff5dcf0d9439eeadd61601170c9767f4d81f022) )
+	ROM_LOAD32_BYTE( "3.ic57.3c", 0x00003, 0x10000, CRC(73d1f29d) SHA1(0a87fe02b1efd04c540f016b2626d32da70219db) )
 
 	ROM_REGION( 0x40000, "tiles", 0 )
-	ROM_LOAD( "pushman.006", 0x20000, 0x10000, CRC(48ef3da6) SHA1(407d50c2030584bb17a4d4a1bb45e0b04e1a95a4) )
-	ROM_LOAD( "pushman.008", 0x30000, 0x10000, CRC(4b6a3e88) SHA1(c57d0528e942dd77a13e5a4bf39053f52915d44c) )
-	ROM_LOAD( "pushman.007", 0x00000, 0x10000, CRC(b70020bd) SHA1(218ca4a08b87b7dc5c1eed99960f4098c4fc7e0c) )
-	ROM_LOAD( "pushman.009", 0x10000, 0x10000, CRC(cc555667) SHA1(6c79e14fc18d1d836392044779cb3219494a3447) )
+	ROM_LOAD( "6.ic131.1h", 0x20000, 0x10000, CRC(48ef3da6) SHA1(407d50c2030584bb17a4d4a1bb45e0b04e1a95a4) )
+	ROM_LOAD( "8.ic148.1j", 0x30000, 0x10000, CRC(4b6a3e88) SHA1(c57d0528e942dd77a13e5a4bf39053f52915d44c) )
+	ROM_LOAD( "7.ic132.3h", 0x00000, 0x10000, CRC(b70020bd) SHA1(218ca4a08b87b7dc5c1eed99960f4098c4fc7e0c) )
+	ROM_LOAD( "9.ic149.3j", 0x10000, 0x10000, CRC(cc555667) SHA1(6c79e14fc18d1d836392044779cb3219494a3447) )
 
 	ROM_REGION( 0x10000, "bgmap", 0 )
-	ROM_LOAD( "pushman.010", 0x00000, 0x08000, CRC(a500132d) SHA1(26b02c9fea69b51c5f7dc1b43b838cd336ebf862) )
+	ROM_LOAD( "10.ic189.7l", 0x00000, 0x08000, CRC(a500132d) SHA1(26b02c9fea69b51c5f7dc1b43b838cd336ebf862) )
 
 	ROM_REGION( 0x0100, "proms", 0 ) // this is the same as tiger road / f1-dream
-	ROM_LOAD( "n82s129an.ic82",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) ) // priority (not used)
+	ROM_LOAD( "n82s129an.ic82.9e",   0x0000, 0x0100, CRC(ec80ae36) SHA1(397ec8fc1b106c8b8d4bf6798aa429e8768a101a) ) // priority (not used)
+
+	ROM_REGION( 0x0a00, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "ep600pc-3.ic193.11l",   0x0000, 0x32f, CRC(e2659b20) SHA1(2f0448d9e1bdd7e98a6e6ddfb6039824271961af) )
+	ROM_LOAD( "hy18cv8s-30.ic245.20p", 0x0400, 0x155, CRC(c7b824f7) SHA1(70c166b74fabcd1502b446b0b24100324c0f06e1) )
+	ROM_LOAD( "pal16r8acn.ic35.16b",   0x0600, 0x104, CRC(bfe1accc) SHA1(d9d779457f59ff4d9b33af20bdcab2012fda06e0) )
+	ROM_LOAD( "pal16r8acn.ic52.17c",   0x0800, 0x104, CRC(5d032a7b) SHA1(11a3bea070bed09a419a5a5de69b50f7faf8349c) )
 ROM_END
 
 ROM_START( pushmana )
