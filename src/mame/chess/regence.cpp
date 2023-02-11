@@ -3,7 +3,8 @@
 /******************************************************************************
 
 La Régence, French chess computer by "France Double R". German distribution
-by Sandy Electronic, who sub-titled it TSB 4 (Turniersensorbrett).
+by Sandy Electronic, who sub-titled it TSB 4 (Turniersensorbrett), the EPROM
+contents is the same.
 
 The chess engine is Richard Lang's Cyrus.
 
@@ -11,9 +12,11 @@ Hardware notes:
 - PCB label: FRANCE DOUBLE R, MADE IN FRANCE
 - Sharp LH0080A Z80A @ 4 MHz (8MHz XTAL)
 - 3*4KB ROM, sockets support up to 48KB ROM
-- 2KB battery-backed RAM (MSM5128-15RS), 3 sockets, only middle one used. Power-off
-  or power outage triggers an NMI. If this isn't done, the next power-on may fail.
+- 2KB battery-backed RAM (MSM5128-15RS), 3 sockets, only middle one used
 - TTL, piezo, 8*8+4 LEDs, magnetic sensors
+
+The hardware triggers an NMI on power-off (or power-failure). If this isn't done,
+NVRAM fails at next power-on.
 
 ******************************************************************************/
 

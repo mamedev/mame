@@ -39,8 +39,7 @@ Constellation Quattro:
 
 Super Sensor IV:
 - MOS MPS6502A @ 2MHz
-- 1KB battery-backed RAM (2*TC5514AP-3). Power-off or power outage triggers
-  an NMI. If this isn't done, the next power-on may fail.
+- 1KB battery-backed RAM (2*TC5514AP-3)
 - 8KB ROM (TMM2364P)
 - 2 ROM sockets for expansion (blue @ u6, white @ u5)
 
@@ -49,11 +48,16 @@ Known Super Sensor IV expansion ROMs:
 
 Sensor Dynamic's ROM is identical to Super Sensor IV "1I", the hardware is
 basically a low-budget version of it with peripheral ports removed.
+Super Sensor IV triggers an NMI on power-off (or power-failure). If this isn't
+done, NVRAM fails at next power-on.
 
 Super Constellation:
 - UMC UM6502C @ 4 MHz (8MHz XTAL)
 - 4KB battery-backed RAM (2*TC5516APL-2)
 - 2*32KB ROM custom label
+
+Super Constellation also has a power-off NMI, but it doesn't do anything other
+than writing 0x08 to control_w.
 
 TODO:
 - is Dynamic S a program update of ssensor4 or identical?
