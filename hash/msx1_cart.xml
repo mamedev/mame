@@ -925,8 +925,8 @@ kept for now until finding out what those bytes affect...
 			<feature name="slot" value="rtype" />
 			<feature name="mapper" value="IREM TAM-S1" />
 			<dataarea name="rom" size="0x80000">
-				<rom name="lh532163" size="0x40000" crc="c4c12176" sha1="07fb300ce49b2d50a99ea0a2a25148900d2035ea" />
-				<rom name="lh2309hb" size="0x20000" crc="8a5c4661" sha1="1bdb41ecbbb9e5819380ab33dc473a57ffa9d254" offset="0x40000" />
+				<rom name="lh532163" size="0x40000" offset="0x00000" crc="c4c12176" sha1="07fb300ce49b2d50a99ea0a2a25148900d2035ea" />
+				<rom name="lh2309hb" size="0x20000" offset="0x40000" crc="8a5c4661" sha1="1bdb41ecbbb9e5819380ab33dc473a57ffa9d254" />
 				<rom size="0x20000" offset="0x60000" loadflag="reload" />
 			</dataarea>
 		</part>
@@ -981,8 +981,8 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="M60002-0125SP" />
 			<dataarea name="rom" size="0x40000">
 				<!-- Rom labels are likely to be wrong -->
-				<rom name="cxk381000" size="0x20000" crc="6441bb28" sha1="481f5ceafc56085babaa021b52b4aab182a80e3d" />
-				<rom name="cxk38100" size="0x20000" crc="851f71fb" sha1="004bca21757d55951f1a1211128c69982f7a91b8" offset="0x20000" />
+				<rom name="cxk381000" size="0x20000" offset="0x00000" crc="6441bb28" sha1="481f5ceafc56085babaa021b52b4aab182a80e3d" />
+				<rom name="cxk38100" size="0x20000" offset="0x20000" crc="851f71fb" sha1="004bca21757d55951f1a1211128c69982f7a91b8" />
 			</dataarea>
 		</part>
 	</software>
@@ -1101,8 +1101,8 @@ kept for now until finding out what those bytes affect...
             <feature name="slot" value="ascii8" />
             <feature name="mapper" value="LZ93A13" />
             <dataarea name="rom" size="0x40000">
-                <rom name="m5m27512p" size="0x20000" crc="" sha1="" status="nodump" />
-                <rom name="a27512zb" size="0x10000" crc="" sha1="" offset="0x20000" status="nodump" />
+                <rom name="m5m27512p" size="0x20000" offset="0x00000" crc="" sha1="" status="nodump" />
+                <rom name="a27512zb" size="0x10000" offset="0x20000" crc="" sha1="" status="nodump" />
             </dataarea>
         </part>
     </software>
@@ -1653,7 +1653,7 @@ kept for now until finding out what those bytes affect...
 		<year>1985</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="アメリカントラック" />
-		<info name="usage" value="Remap joystick buttons so they do not conflict with cursor keys, or remove player 1 joystick. Otherwise moving to the left will not work."/>
+		<info name="usage" value="Reassign joystick buttons so they do not conflict with cursor keys, or remove player 1 joystick. Otherwise moving to the left will not work."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -1680,7 +1680,7 @@ kept for now until finding out what those bytes affect...
 		<year>1985</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="アメリカントラック" />
-		<info name="usage" value="Remap joystick buttons so they do not conflict with cursor keys, or remove player 1 joystick. Otherwise moving to the left will not work."/>
+		<info name="usage" value="Reassign joystick buttons so they do not conflict with cursor keys, or remove player 1 joystick. Otherwise moving to the left will not work."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
@@ -5288,7 +5288,7 @@ kept for now until finding out what those bytes affect...
 		<year>1985</year>
 		<publisher>dB-Soft</publisher>
 		<info name="serial" value="MS1-G2101-L1" />
-		<info name="alt_title" value="フラッピーリミテッド ~ Flappy Limited (Box?)" />
+		<info name="alt_title" value="フラッピーリミテッド" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
@@ -5302,7 +5302,7 @@ kept for now until finding out what those bytes affect...
 		<year>1985</year>
 		<publisher>dB-Soft</publisher>
 		<info name="serial" value="MS1-G2101-L1" />
-		<info name="alt_title" value="フラッピーリミテッド ~ Flappy Limited (Box?)" />
+		<info name="alt_title" value="フラッピーリミテッド" />
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="2"/>
 			<dataarea name="rom" size="0x4000">
@@ -12917,7 +12917,7 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="thrdrsto.rom" size="0x8000" crc="f052e5fb" sha1="6a7ab69c47cc168dd872d32f395541be4939255e" offset="000000" />
+				<rom name="thrdrsto.rom" size="0x8000" crc="f052e5fb" sha1="6a7ab69c47cc168dd872d32f395541be4939255e" />
 			</dataarea>
 		</part>
 	</software>
@@ -14428,7 +14428,7 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="msxlogo_uk.rom" size="0x8000" crc="ca258fd7" sha1="c07f47c59f83038c16d6d5052aaf6c271bff4334" offset="0" />
+				<rom name="msxlogo_uk.rom" size="0x8000" crc="ca258fd7" sha1="c07f47c59f83038c16d6d5052aaf6c271bff4334" />
 			</dataarea>
 		</part>
 	</software>
@@ -14440,7 +14440,7 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="msxlogo_ar.rom" size="0x8000" crc="0e6ecb9f" sha1="e45ddc5bf1a1e63756d11fb43fc50276ca35cab0" offset="0" />
+				<rom name="msxlogo_ar.rom" size="0x8000" crc="0e6ecb9f" sha1="e45ddc5bf1a1e63756d11fb43fc50276ca35cab0" />
 			</dataarea>
 		</part>
 	</software>
@@ -14452,7 +14452,7 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="msxlogo_br_11.rom" size="0x8000" crc="1ed6cd48" sha1="abb5cd4c8bdde234cadb0e10b794be3249dc51a5" offset="0" />
+				<rom name="msxlogo_br_11.rom" size="0x8000" crc="1ed6cd48" sha1="abb5cd4c8bdde234cadb0e10b794be3249dc51a5" />
 			</dataarea>
 		</part>
 	</software>
@@ -14464,7 +14464,7 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="msxlogo_br_12.rom" size="0x8000" crc="9b841c1c" sha1="a99796b45c92ca6b18e685130ae3eea43946cf2b" offset="0" />
+				<rom name="msxlogo_br_12.rom" size="0x8000" crc="9b841c1c" sha1="a99796b45c92ca6b18e685130ae3eea43946cf2b" />
 			</dataarea>
 		</part>
 	</software>
@@ -14477,7 +14477,7 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="msxlogo_es.rom" size="0x8000" crc="83dd2424" sha1="4141eb7540003f4abd31dee14fa1ee8be1b01a97" offset="0" />
+				<rom name="msxlogo_es.rom" size="0x8000" crc="83dd2424" sha1="4141eb7540003f4abd31dee14fa1ee8be1b01a97" />
 			</dataarea>
 		</part>
 	</software>
@@ -14490,7 +14490,7 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="msxlogo_nl.rom" size="0x8000" crc="7af0aa39" sha1="47663f883f98ab9ddaa0bf0c2831c567919f56f1" offset="0" />
+				<rom name="msxlogo_nl.rom" size="0x8000" crc="7af0aa39" sha1="47663f883f98ab9ddaa0bf0c2831c567919f56f1" />
 			</dataarea>
 		</part>
 	</software>
@@ -14503,7 +14503,7 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x8000">
-				<rom name="msxlogo_pl.rom" size="0x8000" crc="98d394eb" sha1="4354b46484c07c43eec80a92e405e13c2a8fcb73" offset="0" />
+				<rom name="msxlogo_pl.rom" size="0x8000" crc="98d394eb" sha1="4354b46484c07c43eec80a92e405e13c2a8fcb73" />
 			</dataarea>
 		</part>
 	</software>
@@ -15142,7 +15142,7 @@ legacy FM implementations cannot find it.
 				     - DIC3 ROM V1.0 DASR022D1.ic13
 				     - DIC4 ROM V1.0 DASR022E1.ic12
 				-->
-				<rom name="jisyo data (japan) (program).rom" size="0x20000" crc="46e90b77" sha1="765413bb6b03bc3bb888ee8fe00b99ef69c1317a" status="baddump" offset="0x20000" />
+				<rom name="jisyo data (japan) (program).rom" size="0x20000" offset="0x20000" crc="46e90b77" sha1="765413bb6b03bc3bb888ee8fe00b99ef69c1317a" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -17437,7 +17437,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="super_swangi" />
 			<dataarea name="rom" size="0x10000">
-				<rom name="super_swangi.rom" size="0x10000" crc="c59b86a1" sha1="3d330e3c97ee3e2e362c8a0fc2cfac69af5ace81" offset="0x0" />
+				<rom name="super_swangi.rom" size="0x10000" crc="c59b86a1" sha1="3d330e3c97ee3e2e362c8a0fc2cfac69af5ace81" />
 			</dataarea>
 		</part>
 	</software>
@@ -17821,9 +17821,9 @@ legacy FM implementations cannot find it.
 		<part name="ec701" interface="msx_cart">
 			<feature name="slot" value="ec701" />
 			<dataarea name="rom" size="0x80000">
-				<rom name="ec701_program.ic1" size="0x8000" crc="1caec27b" sha1="4cc5be7536c11a89b5ec736a62a2b832361cd23d" />
+				<rom name="ec701_program.ic1" size="0x8000" offset="0x00000" crc="1caec27b" sha1="4cc5be7536c11a89b5ec736a62a2b832361cd23d" />
 				<!-- should be 3 roms at ic2, ic3, and ic4 -->
-				<rom name="ec701_dictionary.rom" size="393216" crc="b3582eb0" sha1="661c7261dc261e9ef2106755946f95d8b9b699b4" status="baddump" offset="0x20000" />
+				<rom name="ec701_dictionary.rom" size="393216" offset="0x20000" crc="b3582eb0" sha1="661c7261dc261e9ef2106755946f95d8b9b699b4" status="baddump" />
 			</dataarea>
 		</part>
 		<!-- Kanji ROM -->
@@ -18118,7 +18118,7 @@ legacy FM implementations cannot find it.
 			<dataarea name="rom" size="0x4000">
 				<!-- Dump contains contents of the memory mapped FDC registers -->
 				<!-- ROM label taken from schematic, possibly incorrect -->
-				<rom name="27128q25-8.ic2" size="0x4000" crc="164f5a6d" sha1="8924e3e11eb1c8c1edcb7efa63c26d2bdc142473" status="baddump" offset="0" />
+				<rom name="27128q25-8.ic2" size="0x4000" crc="164f5a6d" sha1="8924e3e11eb1c8c1edcb7efa63c26d2bdc142473" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
