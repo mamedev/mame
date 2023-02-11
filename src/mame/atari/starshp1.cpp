@@ -821,9 +821,9 @@ GFXDECODE_END
 
 void starshp1_state::starshp1(machine_config &config)
 {
-	static constexpr XTAL MASTER_CLOCK = 12.096_MHz_XTAL;
-	static constexpr XTAL CPU_CLOCK = MASTER_CLOCK / 16;
-	static constexpr XTAL PIXEL_CLOCK = MASTER_CLOCK;
+	constexpr XTAL MASTER_CLOCK = 12.096_MHz_XTAL;
+	constexpr XTAL CPU_CLOCK = MASTER_CLOCK / 16;
+	constexpr XTAL PIXEL_CLOCK = MASTER_CLOCK;
 
 	// basic machine hardware
 
@@ -843,12 +843,12 @@ void starshp1_state::starshp1(machine_config &config)
 
 	// video hardware
 
-	static constexpr int HTOTAL = 0x300;
-	static constexpr int HBEND = 0x000;
-	static constexpr int HBSTART = 0x200;
-	static constexpr int VTOTAL = 0x106;
-	static constexpr int VBEND = 0x000;
-	static constexpr int VBSTART = 0x0f0;
+	constexpr int HTOTAL = 0x300;
+	constexpr int HBEND = 0x000;
+	constexpr int HBSTART = 0x200;
+	constexpr int VTOTAL = 0x106;
+	constexpr int VBEND = 0x000;
+	constexpr int VBSTART = 0x0f0;
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);

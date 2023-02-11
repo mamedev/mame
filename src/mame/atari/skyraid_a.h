@@ -6,6 +6,10 @@
 Sky Raider Audio
 
 ***************************************************************************/
+#ifndef MAME_ATARI_SKYRAID_A_H
+#define MAME_ATARI_SKYRAID_A_H
+
+#pragma once
 
 #include "sound/discrete.h"
 
@@ -20,3 +24,5 @@ Sky Raider Audio
 
 
 DISCRETE_SOUND_EXTERN( skyraid_discrete );
+
+#endif // MAME_ATARI_SKYRAID_A_H

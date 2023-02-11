@@ -6,6 +6,10 @@
 Starship 1 Audio
 
 ***************************************************************************/
+#ifndef MAME_ATARI_STARSHP1_A_H
+#define MAME_ATARI_STARSHP1_A_H
+
+#pragma once
 
 #include "sound/discrete.h"
 
@@ -24,3 +28,5 @@ Starship 1 Audio
 
 
 DISCRETE_SOUND_EXTERN( starshp1_discrete );
+
+#endif // MAME_ATARI_STARSHP1_A_H

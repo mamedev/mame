@@ -6,6 +6,10 @@
 Sprint 8 Audio
 
 ***************************************************************************/
+#ifndef MAME_ATARI_SPRINT8_A_H
+#define MAME_ATARI_SPRINT8_A_H
+
+#pragma once
 
 #include "sound/discrete.h"
 
@@ -25,3 +29,5 @@ Sprint 8 Audio
 
 
 DISCRETE_SOUND_EXTERN( sprint8_discrete );
+
+#endif // MAME_ATARI_SPRINT8_A_H

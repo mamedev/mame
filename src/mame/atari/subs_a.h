@@ -6,6 +6,10 @@
 Subs Audio
 
 ***************************************************************************/
+#ifndef MAME_ATARI_SUBS_A_H
+#define MAME_ATARI_SUBS_A_H
+
+#pragma once
 
 #include "sound/discrete.h"
 
@@ -21,3 +25,5 @@ Subs Audio
 
 
 DISCRETE_SOUND_EXTERN( subs_discrete );
+
+#endif // MAME_ATARI_SUBS_A_H

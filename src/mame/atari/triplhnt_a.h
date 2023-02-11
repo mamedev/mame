@@ -6,6 +6,10 @@
 Triple Hunt Audio
 
 ***************************************************************************/
+#ifndef MAME_ATARI_TRIPLHNT_A_H
+#define MAME_ATARI_TRIPLHNT_A_H
+
+#pragma once
 
 #include "sound/discrete.h"
 
@@ -20,3 +24,5 @@ Triple Hunt Audio
 
 DISCRETE_SOUND_EXTERN( triplhnt_discrete );
 extern const char *const triplhnt_sample_names[];
+
+#endif // MAME_ATARI_TRIPLHNT_A_H

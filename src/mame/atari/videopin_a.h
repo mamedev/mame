@@ -6,6 +6,10 @@
 Video Pinball Audio
 
 ***************************************************************************/
+#ifndef MAME_ATARI_VIDEOPIN_A_H
+#define MAME_ATARI_VIDEOPIN_A_H
+
+#pragma once
 
 #include "sound/discrete.h"
 
@@ -20,3 +24,5 @@ Video Pinball Audio
 
 
 DISCRETE_SOUND_EXTERN( videopin_discrete );
+
+#endif // MAME_ATARI_VIDEOPIN_A_H

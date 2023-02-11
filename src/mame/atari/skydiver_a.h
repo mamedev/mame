@@ -6,6 +6,10 @@
 Sky Diver Audio
 
 ***************************************************************************/
+#ifndef MAME_ATARI_SKYDIVER_A_H
+#define MAME_ATARI_SKYDIVER_A_H
+
+#pragma once
 
 #include "sound/discrete.h"
 
@@ -24,3 +28,5 @@ Sky Diver Audio
 
 
 DISCRETE_SOUND_EXTERN( skydiver_discrete );
+
+#endif // MAME_ATARI_SKYDIVER_A_H

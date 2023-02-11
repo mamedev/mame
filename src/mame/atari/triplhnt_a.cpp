@@ -10,8 +10,6 @@
 
 #include "triplhnt_a.h"
 
-#include "sound/discrete.h"
-
 
 const char *const triplhnt_sample_names[] =
 {

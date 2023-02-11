@@ -6,6 +6,10 @@
 Sprint 2 / Sprint 1 / Dominos Audio
 
 ***************************************************************************/
+#ifndef MAME_ATARI_SPRINT2_A_H
+#define MAME_ATARI_SPRINT2_A_H
+
+#pragma once
 
 #include "sound/discrete.h"
 
@@ -28,3 +32,5 @@ Sprint 2 / Sprint 1 / Dominos Audio
 DISCRETE_SOUND_EXTERN( sprint2_discrete );
 DISCRETE_SOUND_EXTERN( sprint1_discrete );
 DISCRETE_SOUND_EXTERN( dominos_discrete );
+
+#endif // MAME_ATARI_SPRINT2_A_H
