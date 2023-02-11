@@ -96,6 +96,7 @@ protected:
 	address_space &memory_space() const;
 	address_space &io_space() const;
 	cpu_device &maincpu() const;
+	required_device<cpu_device> &required_maincpu();
 	memory_view::memory_view_entry *page(int i) { return m_page[i]; }
 
 private:
