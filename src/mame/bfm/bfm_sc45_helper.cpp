@@ -429,11 +429,7 @@ int find_lamp_strings(running_machine &machine)
 	{
 		for (int x = 0; x < 16; x++)
 		{
-			char tmp[32];
-
-			snprintf(tmp, sizeof(tmp), "(%02d:%02d)", y, x);
-
-			lamps[y][x].lampname = std::string(tmp);
+			lamps[y][x].lampname = util::string_format("(%02d:%02d)", y, x);
 			lamps[y][x].used = false;
 			lamps[y][x].y = (y * 28);
 			lamps[y][x].x = 380 + (x * 24);
@@ -443,7 +439,6 @@ int find_lamp_strings(running_machine &machine)
 			lamps[y][x].lamptypename = "unusedlamp";
 			lamps[y][x].clickport = -1;
 			lamps[y][x].clickmask = 0;
-
 		}
 	}
 

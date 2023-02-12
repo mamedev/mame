@@ -910,23 +910,23 @@ static const char *get_param(m68000_base_device *m68k, uint32_t addr, char type)
 				sb[i] = 0;
 				break;
 			case 'b': // byte (1 byte)
-				snprintf(sb, sizeof(sb), "0x%x", m68k->read8(value));
+				sprintf(sb, "0x%x", m68k->read8(value));
 				break;
 			case 'p': // pointer
-				snprintf(sb, sizeof(sb), "0x%x", value);
+				sprintf(sb, "0x%x", value);
 				break;
 			case 'w': // word (2 byte)
-				snprintf(sb, sizeof(sb), "0x%x", m68k->read16(value));
+				sprintf(sb, "0x%x", m68k->read16(value));
 				break;
 			case 'x': // default  (hex 32 bit)
-				snprintf(sb, sizeof(sb), "0x%x", m68k->read32(value));
+				sprintf(sb, "0x%x", m68k->read32(value));
 				break;
 			case 'u': // uid
-				snprintf(sb, sizeof(sb), "%08x.%08x", m68k->read32(value),
+				sprintf(sb, "%08x.%08x", m68k->read32(value),
 						m68k->read32(value + 4));
 				break;
 			default:
-				snprintf(sb, sizeof(sb), "%c", type);
+				sprintf(sb, "%c", type);
 				break;
 			}
 		}

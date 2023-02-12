@@ -1058,7 +1058,6 @@ static void append_driver_list_table(const char *header, std::string &dirname, u
 	for (prevfile = nullptr, curfile = listhead; curfile != nullptr; prevfile = curfile, curfile = curfile->next)
 	{
 		int rowspan = 0, uniqueshots = 0;
-		char pngdiffname[40];
 
 		/* if this is the first entry in this source file, count how many rows we need to span */
 		if (prevfile == nullptr || strcmp(prevfile->source, curfile->source) != 0)
@@ -1072,19 +1071,19 @@ static void append_driver_list_table(const char *header, std::string &dirname, u
 		}
 
 		/* create screenshots if necessary */
-		pngdiffname[0] = 0;
+		std::string pngdiffname = "";
 		for (listnum = 0; listnum < list_count; listnum++)
 			if (curfile->matchbitmap[listnum] == listnum)
 				uniqueshots++;
 		if (uniqueshots > 1)
 		{
-			snprintf(pngdiffname, sizeof(pngdiffname), "compare_%s.png", curfile->name);
-			if (generate_png_diff(curfile, dirname, pngdiffname) != 0)
-				pngdiffname[0] = 0;
+			pngdiffname = util::string_format("compare_%s.png", curfile->name);
+			if (generate_png_diff(curfile, dirname, pngdiffname.c_str()) != 0)
+				pngdiffname = "";
 		}
 
 		/* create a linked file */
-		create_linked_file(dirname, curfile, prevfile, curfile->next, (pngdiffname[0] == 0) ? nullptr : pngdiffname, tempheader, tempfooter);
+		create_linked_file(dirname, curfile, prevfile, curfile->next, pngdiffname.empty() ? nullptr : pngdiffname.c_str(), tempheader, tempfooter);
 
 		/* create a row */
 		indexfile.printf("\t\t<tr>\n\t\t\t");

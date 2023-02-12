@@ -31,7 +31,6 @@
 
 #include "logmacro.h"
 #include "strformat.h"
-#include <sstream>
 
 /*
     Emulation of the CRT Gate Array of the TI-99/2
@@ -165,15 +164,14 @@ video992_32_device::video992_32_device(const machine_config &mconfig, const char
 
 std::string video992_device::tts(attotime t)
 {
-	std::ostringstream buf;
 	const char *sign = "";
 	if (t.seconds() < 0) {
 		t = attotime::zero - t;
 		sign = "-";
 	}
 	int nsec = t.attoseconds() / ATTOSECONDS_PER_NANOSECOND;
-	util::stream_format(buf, "%s%04d.%03d,%03d,%03d", sign, int(t.seconds()), nsec / 1000000, (nsec / 1000) % 1000, nsec % 1000);
-	return buf.str();
+	auto result = util::string_format("%s%04d.%03d,%03d,%03d", sign, int(t.seconds()), nsec / 1000000, (nsec / 1000) % 1000, nsec % 1000);
+	return result;
 }
 
 TIMER_CALLBACK_MEMBER(video992_device::hold_cpu)

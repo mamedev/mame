@@ -141,7 +141,7 @@ std::vector<u8> image_handler::fload(std::string path)
 {
 	auto fi = fopen(path.c_str(), "rb");
 	if(!fi) {
-		auto msg = "Error opening " + path + " for reading";
+		auto msg = util::string_format("Error opening %s for reading", path.c_str());
 		perror(msg.c_str());
 		exit(1);
 	}
@@ -183,7 +183,7 @@ void image_handler::fsave(std::string path, const std::vector<u8> &data)
 {
 	auto fo = fopen(path.c_str(), "wb");
 	if(!fo) {
-		auto msg = "Error opening " + path + " for writing";
+		auto msg = util::string_format("Error opening %s for writing", path.c_str());
 		perror(msg.c_str());
 		exit(1);
 	}
@@ -207,7 +207,7 @@ void image_handler::fsave_rsrc(std::string path, const std::vector<u8> &data)
 
 	auto fo = fopen(path.c_str(), "wb");
 	if(!fo) {
-		auto msg = "Error opening " + path + " for writing";
+		auto msg = util::string_format("Error opening %s for writing", path.c_str());
 		perror(msg.c_str());
 		exit(1);
 	}
@@ -233,7 +233,7 @@ std::vector<std::pair<u8, const floppy_format_info *>> image_handler::identify(c
 
 	FILE *f = fopen(m_on_disk_path.c_str(), "rb");
 	if (!f) {
-		auto msg = "Error opening " + m_on_disk_path + " for reading";
+		std::string msg = util::string_format("Error opening %s for reading", m_on_disk_path);
 		perror(msg.c_str());
 		return res;
 	}
@@ -256,7 +256,7 @@ bool image_handler::floppy_load(const floppy_format_info *format)
 	std::vector<uint32_t> variants;
 	FILE *f = fopen(m_on_disk_path.c_str(), "rb");
 	if (!f) {
-		auto msg = "Error opening " + m_on_disk_path + " for reading";
+		std::string msg = util::string_format("Error opening %s for reading", m_on_disk_path);
 		perror(msg.c_str());
 		return true;
 	}
@@ -271,7 +271,7 @@ bool image_handler::floppy_save(const floppy_format_info *format)
 	std::vector<uint32_t> variants;
 	FILE *f = fopen(m_on_disk_path.c_str(), "wb");
 	if (!f) {
-		auto msg = "Error opening " + m_on_disk_path + " for writing";
+		auto msg = util::string_format("Error opening %s for writing", m_on_disk_path);
 		perror(msg.c_str());
 		return true;
 	}
