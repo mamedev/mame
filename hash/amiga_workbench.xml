@@ -8,7 +8,7 @@ license:CC0-1.0
 
 	<!-- Version 1.2 -->
 
-	<software name="wbenc12">
+	<software name="wb12">
 		<description>Workbench 1.2</description>
 		<year>1987</year>
 		<publisher>Commodore</publisher>
@@ -27,7 +27,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wbenc12_de" cloneof="wbenc12">
+	<software name="wb12_de" cloneof="wb12">
 		<description>Workbench 1.2 (De)</description>
 		<year>1987</year>
 		<publisher>Commodore</publisher>
@@ -47,7 +47,7 @@ license:CC0-1.0
 
 	<!-- Version 1.3 -->
 
-	<software name="wbenc13">
+	<software name="wb13">
 		<description>Workbench 1.3</description>
 		<year>1988</year>
 		<publisher>Commodore</publisher>
@@ -66,7 +66,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wbenc13_uk" cloneof="wbenc13">
+	<software name="wb13_uk" cloneof="wb13">
 		<description>Workbench 1.3 (UK)</description>
 		<year>1988</year>
 		<publisher>Commodore</publisher>
@@ -85,26 +85,26 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wbenc13_de" cloneof="wbenc13">
+	<software name="wb13_de" cloneof="wb13">
 		<description>Workbench 1.3 (De)</description>
 		<year>1988</year>
 		<publisher>Commodore</publisher>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Workbench 1.3 (De)" />
+			<dataarea name="flop" size="901120">
+				<rom name="317791-01_workbench.adf" size="901120" status="nodump"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
 			<!-- Verified dump -->
 			<feature name="part_id" value="Extras 1.3 (De)" />
 			<dataarea name="flop" size="901120">
 				<rom name="317790-01_extras.adf" size="901120" crc="bc1f2c03" sha1="62dab0a803fe01bcd05d7cf20447e46af09669ff"/>
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Workbench 1.3 (De)" />
-			<dataarea name="flop" size="901120">
-				<rom name="317791-01_workbench.adf" size="901120" status="nodump"/>
-			</dataarea>
-		</part>
 	</software>
 
-	<software name="wbenc132">
+	<software name="wb132">
 		<description>Workbench 1.3.2</description>
 		<year>1988</year>
 		<publisher>Commodore</publisher>
@@ -124,7 +124,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wbenc132_uk" cloneof="wbenc132">
+	<software name="wb132_uk" cloneof="wb132">
 		<description>Workbench 1.3.2 (UK)</description>
 		<year>1988</year>
 		<publisher>Commodore</publisher>
@@ -145,7 +145,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wbenc132_de" cloneof="wbenc132">
+	<software name="wb132_de" cloneof="wb132">
 		<description>Workbench 1.3.2 (De)</description>
 		<year>1988</year>
 		<publisher>Commodore</publisher>
@@ -164,7 +164,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wbenc133">
+	<software name="wb133">
 		<description>Workbench 1.3.3</description>
 		<year>1988</year>
 		<publisher>Commodore</publisher>
@@ -178,10 +178,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wbenc133_uk" cloneof="wbenc133">
+	<software name="wb133_uk" cloneof="wb133">
 		<description>Workbench 1.3.3 (UK)</description>
 		<year>1988</year>
 		<publisher>Commodore</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<!-- Modified -->
+			<feature name="part_id" value="Workbench 1.3.3 (UK)" />
+			<dataarea name="flop" size="901120">
+				<rom name="317789-04_workbench.adf" size="901120" crc="f0ac4901" sha1="598a61b0d41fd16f8af5166067337ceda350c2b5" status="baddump"/>
+			</dataarea>
+		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<!-- Probably good dump -->
 			<feature name="part_id" value="Extras 1.3.3" />
@@ -189,15 +196,9 @@ license:CC0-1.0
 				<rom name="367618-01_extras.adf" size="901120" crc="e8eb34c4" sha1="98b2d23004aa4f70e6e07fae92e36b303ab8e471"/>
 			</dataarea>
 		</part>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Workbench 1.3.3 (UK)" />
-			<dataarea name="flop" size="901120">
-				<rom name="317789-04_workbench.adf" size="901120" status="nodump"/>
-			</dataarea>
-		</part>
 	</software>
 
-	<software name="wbenc133_de" cloneof="wbenc133">
+	<software name="wb133_de" cloneof="wb133">
 		<description>Workbench 1.3.3 (De)</description>
 		<year>1990</year>
 		<publisher>Commodore</publisher>
@@ -218,7 +219,7 @@ license:CC0-1.0
 	<!-- 317746-01 Workbench 1.3 (US) -->
 	<!-- 317746-03 Workbench 1.3.2 (US) -->
 
-	<software name="wbenc133_us" cloneof="wbenc133">
+	<software name="wb133_us" cloneof="wb133">
 		<description>Workbench 1.3.3 (US)</description>
 		<year>1990</year>
 		<publisher>Commodore</publisher>
@@ -238,7 +239,7 @@ license:CC0-1.0
 
 	<!-- Version 2.04 -->
 
-	<software name="wbenc204">
+	<software name="wb204">
 		<description>Workbench 2.04</description>
 		<year>1991</year>
 		<publisher>Commodore</publisher>
@@ -273,7 +274,7 @@ license:CC0-1.0
 
 	<!-- Version 2.05 -->
 
-	<software name="wbenc205">
+	<software name="wb205">
 		<description>Workbench 2.05</description>
 		<year>1992</year>
 		<publisher>Commodore</publisher>
@@ -308,7 +309,7 @@ license:CC0-1.0
 
 	<!-- Version 2.1 -->
 
-	<software name="wbenc21">
+	<software name="wb21">
 		<description>Workbench 2.1</description>
 		<year>1992</year>
 		<publisher>Commodore</publisher>
@@ -351,7 +352,7 @@ license:CC0-1.0
 
 	<!-- Version 3.0 -->
 
-	<software name="wbenc30">
+	<software name="wb30">
 		<description>Workbench 3.0</description>
 		<year>1992</year>
 		<publisher>Commodore</publisher>
@@ -407,7 +408,7 @@ license:CC0-1.0
 
 	<!-- Version 3.1 -->
 
-	<software name="wbenc31">
+	<software name="wb31">
 		<description>Workbench 3.1</description>
 		<year>1995</year>
 		<publisher>ESCOM</publisher>
@@ -455,7 +456,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="wbenc31_a4k" cloneof="wbenc31">
+	<software name="wb31_a4k" cloneof="wb31">
 		<description>Workbench 3.1 (A4000T)</description>
 		<year>1995</year>
 		<publisher>ESCOM</publisher>
