@@ -3156,4 +3156,164 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<software name="msxdos2j">
+		<description>Japanese MSX-DOS 2.20 (Japan, 256KB)</description>
+		<year>1989</year>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="日本語 MSX-DOS 2"/>
+		<info name="serial" value="2307603"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="msxdos2j"/>
+			<feature name="bank_address" value="0x7ffe"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="ascii_msxdos22.rom" size="0x10000" crc="47eea028" sha1="42f4e3360eb134857b0efa82c1abedf342680124"/>
+			</dataarea>
+			<dataarea name="ram" size="0x40000"/>
+		</part>
+		<part name="flope" interface="floppy_3_5">
+			<feature name="part_id" value="English MSX-DOS2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="mdos22de.dsk" size="368640" crc="9be0bfd1" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+			</dataarea>
+		</part>
+		<part name="flopj" interface="floppy_3_5">
+			<feature name="part_id" value="Japanese MSX-DOS2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="mdos22dj.dsk" size="368640" crc="d9ef5567" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxdos2ja" cloneof="msxdos2j">
+		<description>Japanese MSX-DOS 2.20 (Japan, 256KB, alt)</description>
+		<year>1989</year>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="日本語 MSX-DOS 2"/>
+		<info name="serial" value="2307603"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="msxdos2j"/>
+			<feature name="bank_address" value="0x7ffe"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="mdos22v3.rom" size="0x10000" crc="845f5ab6" sha1="6dcf76a0076f8c7f025979d7d060367fb5ed56bc"/>
+			</dataarea>
+			<dataarea name="ram" size="0x40000"/>
+		</part>
+		<part name="flope" interface="floppy_3_5">
+			<feature name="part_id" value="English MSX-DOS2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="mdos22de.dsk" size="368640" crc="9be0bfd1" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+			</dataarea>
+		</part>
+		<part name="flopj" interface="floppy_3_5">
+			<feature name="part_id" value="Japanese MSX-DOS2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="mdos22dj.dsk" size="368640" crc="d9ef5567" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Causes system to reboot and hang -->
+	<software name="msxdos2jb" cloneof="msxdos2j" supported="no">
+		<description>Japanese MSX-DOS 2.20 (Japan, 256KB, alt 2)</description>
+		<year>1989</year>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="日本語 MSX-DOS 2"/>
+		<info name="serial" value="2307603"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="msxdos2j"/>
+			<feature name="bank_address" value="0x6000"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="mdos22v2.rom" size="0x10000" crc="8687c4f1" sha1="9155145d3e8522daf33f821f1ab68ce165960c1a"/>
+			</dataarea>
+			<dataarea name="ram" size="0x40000"/>
+		</part>
+		<part name="flope" interface="floppy_3_5">
+			<feature name="part_id" value="English MSX-DOS2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="mdos22de.dsk" size="368640" crc="9be0bfd1" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+			</dataarea>
+		</part>
+		<part name="flopj" interface="floppy_3_5">
+			<feature name="part_id" value="Japanese MSX-DOS2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="mdos22dj.dsk" size="368640" crc="d9ef5567" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxdos2j_128" cloneof="msxdos2j">
+		<description>Japanese MSX-DOS 2.20 (Japan, 128KB)</description>
+		<year>1988</year>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="日本語 MSX-DOS 2"/>
+		<info name="serial" value="2307601"/>
+		<info name="gtin" value="04988606202515"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="msxdos2j"/>
+			<feature name="bank_address" value="0x6000"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="mdos22v1.rom" size="0x10000" crc="93cccc2d" sha1="ac26be7fc8386d12ed6a3de4f05fd462967599a8"/>
+			</dataarea>
+			<dataarea name="ram" size="0x20000"/>
+		</part>
+		<part name="flope" interface="floppy_3_5">
+			<feature name="part_id" value="English MSX-DOS2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="mdos22de.dsk" size="368640" crc="9be0bfd1" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+			</dataarea>
+		</part>
+		<part name="flopj" interface="floppy_3_5">
+			<feature name="part_id" value="Japanese MSX-DOS2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="mdos22dj.dsk" size="368640" crc="d9ef5567" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxdos2j_0" cloneof="msxdos2j">
+		<description>Japanese MSX-DOS 2.20 (Japan)</description>
+		<year>1988</year>
+		<publisher>ASCII</publisher>
+		<info name="alt_title" value="日本語 MSX-DOS 2"/>
+		<info name="serial" value="2307602"/>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="msxdos2j"/>
+			<feature name="bank_address" value="0x6000"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="mdos22v1.rom" size="0x10000" crc="93cccc2d" sha1="ac26be7fc8386d12ed6a3de4f05fd462967599a8"/>
+			</dataarea>
+		</part>
+		<part name="flope" interface="floppy_3_5">
+			<feature name="part_id" value="English MSX-DOS2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="mdos22de.dsk" size="368640" crc="9be0bfd1" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+			</dataarea>
+		</part>
+		<part name="flopj" interface="floppy_3_5">
+			<feature name="part_id" value="Japanese MSX-DOS2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="mdos22dj.dsk" size="368640" crc="d9ef5567" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msxdos2e">
+		<description>MSX-DOS 2.20 (Europe)</description>
+		<year>1989</year>
+		<publisher>H.S.H.</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="msxdos2e"/>
+			<feature name="bank_address" value="0x6000"/>
+			<dataarea name="rom" size="0x10000">
+				<rom name="msxdos220.rom" size="0x10000" crc="1c430991" sha1="c36c9e0f96738a340381e23b4f97245388801a46"/>
+			</dataarea>
+		</part>
+		<part name="flope" interface="floppy_3_5">
+			<feature name="part_id" value="English MSX-DOS2"/>
+			<dataarea name="flop" size="368640">
+				<rom name="mdos22de.dsk" size="368640" crc="9be0bfd1" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
