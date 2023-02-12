@@ -134,11 +134,17 @@ protected:
 
 	virtual void device_start() override
 	{
-		m_ram.resize(m_ram_size);
-		save_item(NAME(m_ram));
+		m_ram = std::make_unique<u8[]>(m_ram_size);
+		save_pointer(NAME(m_ram), m_ram_size);
 	}
 
-	std::vector<u8> m_ram;
+	u8 *ram_data()
+	{
+		return m_ram.get();
+	}
+
+private:
+	std::unique_ptr<u8[]> m_ram;
 	u32 m_ram_size;
 };
 
@@ -154,7 +160,7 @@ protected:
 	virtual void device_start() override
 	{
 		msx_cart_base_ram_device::device_start();
-		page(2)->install_ram(0x8000, 0xbfff, m_ram.data());
+		page(2)->install_ram(0x8000, 0xbfff, ram_data());
 	}
 };
 
@@ -169,8 +175,8 @@ protected:
 	virtual void device_start() override
 	{
 		msx_cart_base_ram_device::device_start();
-		page(0)->install_ram(0x0000, 0x3fff, m_ram.data());
-		page(1)->install_ram(0x4000, 0x7fff, m_ram.data() + 0x4000);
+		page(0)->install_ram(0x0000, 0x3fff, ram_data());
+		page(1)->install_ram(0x4000, 0x7fff, ram_data() + 0x4000);
 	}
 };
 
@@ -185,9 +191,9 @@ protected:
 	virtual void device_start() override
 	{
 		msx_cart_base_ram_device::device_start();
-		page(0)->install_ram(0x0000, 0x3fff, m_ram.data());
-		page(1)->install_ram(0x4000, 0x7fff, m_ram.data() + 0x4000);
-		page(2)->install_ram(0x8000, 0xbfff, m_ram.data() + 0x8000);
+		page(0)->install_ram(0x0000, 0x3fff, ram_data());
+		page(1)->install_ram(0x4000, 0x7fff, ram_data() + 0x4000);
+		page(2)->install_ram(0x8000, 0xbfff, ram_data() + 0x8000);
 	}
 };
 
@@ -202,10 +208,10 @@ protected:
 	virtual void device_start() override
 	{
 		msx_cart_base_ram_device::device_start();
-		page(0)->install_ram(0x0000, 0x3fff, m_ram.data());
-		page(1)->install_ram(0x4000, 0x7fff, m_ram.data() + 0x4000);
-		page(2)->install_ram(0x8000, 0xbfff, m_ram.data() + 0x8000);
-		page(3)->install_ram(0xc000, 0xffff, m_ram.data() + 0xc000);
+		page(0)->install_ram(0x0000, 0x3fff, ram_data());
+		page(1)->install_ram(0x4000, 0x7fff, ram_data() + 0x4000);
+		page(2)->install_ram(0x8000, 0xbfff, ram_data() + 0x8000);
+		page(3)->install_ram(0xc000, 0xffff, ram_data() + 0xc000);
 	}
 };
 
@@ -231,10 +237,10 @@ void msx_cart_base_mm_ram_device::device_start()
 {
 	msx_cart_base_ram_device::device_start();
 
-	m_rambank[0]->configure_entries(0, m_nr_banks, m_ram.data(), 0x4000);
-	m_rambank[1]->configure_entries(0, m_nr_banks, m_ram.data(), 0x4000);
-	m_rambank[2]->configure_entries(0, m_nr_banks, m_ram.data(), 0x4000);
-	m_rambank[3]->configure_entries(0, m_nr_banks, m_ram.data(), 0x4000);
+	m_rambank[0]->configure_entries(0, m_nr_banks, ram_data(), 0x4000);
+	m_rambank[1]->configure_entries(0, m_nr_banks, ram_data(), 0x4000);
+	m_rambank[2]->configure_entries(0, m_nr_banks, ram_data(), 0x4000);
+	m_rambank[3]->configure_entries(0, m_nr_banks, ram_data(), 0x4000);
 
 	// The MSX system allows multiple devices to react to I/O, so we use taps.
 	io_space().install_write_tap(0xfc, 0xfc, "bank0", [this] (offs_t, u8& data, u8){ this->bank_w<0>(data); });
