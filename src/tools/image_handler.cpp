@@ -139,11 +139,10 @@ const floppy_create_info *formats_table::find_floppy_create_info_by_key(const st
 
 std::vector<u8> image_handler::fload(std::string path)
 {
-	char msg[4096];
-	sprintf(msg, "Error opening %s for reading", path.c_str());
 	auto fi = fopen(path.c_str(), "rb");
 	if(!fi) {
-		perror(msg);
+		auto msg = "Error opening " + path + " for reading";
+		perror(msg.c_str());
 		exit(1);
 	}
 	fseek(fi, 0, SEEK_END);
@@ -182,11 +181,10 @@ std::vector<u8> image_handler::fload_rsrc(std::string path)
 
 void image_handler::fsave(std::string path, const std::vector<u8> &data)
 {
-	char msg[4096];
-	sprintf(msg, "Error opening %s for writing", path.c_str());
 	auto fo = fopen(path.c_str(), "wb");
 	if(!fo) {
-		perror(msg);
+		auto msg = "Error opening " + path + " for writing";
+		perror(msg.c_str());
 		exit(1);
 	}
 
@@ -207,11 +205,10 @@ void image_handler::fsave_rsrc(std::string path, const std::vector<u8> &data)
 	filesystem_t::w32b(head+0x22, 0x2a);        // Offset in the file
 	filesystem_t::w32b(head+0x26, data.size()); // Length
 
-	char msg[4096];
-	sprintf(msg, "Error opening %s for writing", path.c_str());
 	auto fo = fopen(path.c_str(), "wb");
 	if(!fo) {
-		perror(msg);
+		auto msg = "Error opening " + path + " for writing";
+		perror(msg.c_str());
 		exit(1);
 	}
 
@@ -236,7 +233,7 @@ std::vector<std::pair<u8, const floppy_format_info *>> image_handler::identify(c
 
 	FILE *f = fopen(m_on_disk_path.c_str(), "rb");
 	if (!f) {
-		std::string msg = util::string_format("Error opening %s for reading", m_on_disk_path);
+		auto msg = "Error opening " + m_on_disk_path + " for reading";
 		perror(msg.c_str());
 		return res;
 	}
@@ -259,7 +256,7 @@ bool image_handler::floppy_load(const floppy_format_info *format)
 	std::vector<uint32_t> variants;
 	FILE *f = fopen(m_on_disk_path.c_str(), "rb");
 	if (!f) {
-		std::string msg = util::string_format("Error opening %s for reading", m_on_disk_path);
+		auto msg = "Error opening " + m_on_disk_path + " for reading";
 		perror(msg.c_str());
 		return true;
 	}
@@ -272,9 +269,9 @@ bool image_handler::floppy_load(const floppy_format_info *format)
 bool image_handler::floppy_save(const floppy_format_info *format)
 {
 	std::vector<uint32_t> variants;
-	std::string msg = util::string_format("Error opening %s for writing", m_on_disk_path);
 	FILE *f = fopen(m_on_disk_path.c_str(), "wb");
 	if (!f) {
+		auto msg = "Error opening " + m_on_disk_path + " for writing";
 		perror(msg.c_str());
 		return true;
 	}
