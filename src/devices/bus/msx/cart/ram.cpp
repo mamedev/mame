@@ -147,14 +147,14 @@ protected:
 		return m_ram.get();
 	}
 
-	u32 get_ram_size() const
+	const u32 get_ram_size() const
 	{
 		return m_ram_size;
 	}
 
 private:
 	std::unique_ptr<u8[]> m_ram;
-	u32 m_ram_size;
+	const u32 m_ram_size;
 };
 
 
