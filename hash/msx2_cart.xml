@@ -3212,8 +3212,7 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- Causes system to reboot and hang -->
-	<software name="msxdos2jb" cloneof="msxdos2j" supported="no">
+	<software name="msxdos2jb" cloneof="msxdos2j">
 		<description>Japanese MSX-DOS 2.20 (Japan, 256KB, alt 2)</description>
 		<year>1989</year>
 		<publisher>ASCII</publisher>
