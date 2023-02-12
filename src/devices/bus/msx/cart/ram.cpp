@@ -57,6 +57,9 @@ Not supported:
 - R. & J.Jansen Memory Mapper 512
 - Sony HBM-512
 
+768KB Memory Mapper expansions
+- ASCII MEM-768
+
 1MB Memory Mapper expansions
 - 8bits4ever MEGA-MAPPER 1024KB
 - Digital KC MSX Memory Mapper 1024KB
@@ -83,7 +86,6 @@ Not supported:
 
 Not supported memory mappers:
 - 8bits4ever SD-512
-- ASCII MEM-768
 - RBSC Carnivore2
 - Classic PC 16MB Expansion Memory - 4 x 4MB memory mapper
 - GR8NET
@@ -104,6 +106,7 @@ DECLARE_DEVICE_TYPE(MSX_CART_48K_RAM,      msx_cart_interface)
 DECLARE_DEVICE_TYPE(MSX_CART_64K_RAM,      msx_cart_interface)
 DECLARE_DEVICE_TYPE(MSX_CART_256K_MM_RAM,  msx_cart_interface)
 DECLARE_DEVICE_TYPE(MSX_CART_512K_MM_RAM,  msx_cart_interface)
+DECLARE_DEVICE_TYPE(MSX_CART_768K_MM_RAM,  msx_cart_interface)
 DECLARE_DEVICE_TYPE(MSX_CART_1024K_MM_RAM, msx_cart_interface)
 DECLARE_DEVICE_TYPE(MSX_CART_2048K_MM_RAM, msx_cart_interface)
 DECLARE_DEVICE_TYPE(MSX_CART_4096K_MM_RAM, msx_cart_interface)
@@ -116,6 +119,7 @@ void msx_cart_ram_register_options(device_slot_interface &device)
 	device.option_add("ram64k", MSX_CART_64K_RAM);
 	device.option_add("mm256k", MSX_CART_256K_MM_RAM);
 	device.option_add("mm512k", MSX_CART_512K_MM_RAM);
+	device.option_add("mm768k", MSX_CART_768K_MM_RAM);
 	device.option_add("mm1024k", MSX_CART_1024K_MM_RAM);
 	device.option_add("mm2048k", MSX_CART_2048K_MM_RAM);
 	device.option_add("mm4096k", MSX_CART_4096K_MM_RAM);
@@ -141,6 +145,11 @@ protected:
 	u8 *ram_data()
 	{
 		return m_ram.get();
+	}
+
+	u32 get_ram_size() const
+	{
+		return m_ram_size;
 	}
 
 private:
@@ -221,26 +230,31 @@ class msx_cart_base_mm_ram_device : public msx_cart_base_ram_device
 protected:
 	msx_cart_base_mm_ram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 ram_size)
 		: msx_cart_base_ram_device(mconfig, type, tag, owner, clock, ram_size)
-		, m_nr_banks(ram_size / 0x4000)
 		, m_rambank(*this, "rambank%u", 0U)
+		, m_bank_mask(0)
 	{ }
 
 	virtual void device_start() override;
 
 	template <int Bank> void bank_w(u8 data);
 
-	u16 m_nr_banks;
+private:
 	memory_bank_array_creator<4> m_rambank;
+	u8 m_bank_mask;
 };
 
 void msx_cart_base_mm_ram_device::device_start()
 {
 	msx_cart_base_ram_device::device_start();
 
-	m_rambank[0]->configure_entries(0, m_nr_banks, ram_data(), 0x4000);
-	m_rambank[1]->configure_entries(0, m_nr_banks, ram_data(), 0x4000);
-	m_rambank[2]->configure_entries(0, m_nr_banks, ram_data(), 0x4000);
-	m_rambank[3]->configure_entries(0, m_nr_banks, ram_data(), 0x4000);
+	m_bank_mask = device_generic_cart_interface::map_non_power_of_two(
+			unsigned(get_ram_size() / 0x4000),
+			[this] (unsigned entry, unsigned page)
+			{
+				for (int i = 0; i < 4; i++)
+					m_rambank[i]->configure_entry(entry, ram_data() + 0x4000 * page);
+			}
+	);
 
 	// The MSX system allows multiple devices to react to I/O, so we use taps.
 	io_space().install_write_tap(0xfc, 0xfc, "bank0", [this] (offs_t, u8& data, u8){ this->bank_w<0>(data); });
@@ -249,10 +263,10 @@ void msx_cart_base_mm_ram_device::device_start()
 	io_space().install_write_tap(0xff, 0xff, "bank3", [this] (offs_t, u8& data, u8){ this->bank_w<3>(data); });
 
 	// Not all memory mapper expansions allow reading of mapper registers.
-	io_space().install_read_tap(0xfc, 0xfc, "bank0", [this] (offs_t, u8& data, u8){ if (!machine().side_effects_disabled()) data = (~(m_nr_banks - 1)) | m_rambank[0]->entry(); });
-	io_space().install_read_tap(0xfd, 0xfd, "bank1", [this] (offs_t, u8& data, u8){ if (!machine().side_effects_disabled()) data = (~(m_nr_banks - 1)) | m_rambank[1]->entry(); });
-	io_space().install_read_tap(0xfe, 0xfe, "bank2", [this] (offs_t, u8& data, u8){ if (!machine().side_effects_disabled()) data = (~(m_nr_banks - 1)) | m_rambank[2]->entry(); });
-	io_space().install_read_tap(0xff, 0xff, "bank3", [this] (offs_t, u8& data, u8){ if (!machine().side_effects_disabled()) data = (~(m_nr_banks - 1)) | m_rambank[3]->entry(); });
+	io_space().install_read_tap(0xfc, 0xfc, "bank0", [this] (offs_t, u8& data, u8){ if (!machine().side_effects_disabled()) data = ~m_bank_mask | m_rambank[0]->entry(); });
+	io_space().install_read_tap(0xfd, 0xfd, "bank1", [this] (offs_t, u8& data, u8){ if (!machine().side_effects_disabled()) data = ~m_bank_mask | m_rambank[1]->entry(); });
+	io_space().install_read_tap(0xfe, 0xfe, "bank2", [this] (offs_t, u8& data, u8){ if (!machine().side_effects_disabled()) data = ~m_bank_mask | m_rambank[2]->entry(); });
+	io_space().install_read_tap(0xff, 0xff, "bank3", [this] (offs_t, u8& data, u8){ if (!machine().side_effects_disabled()) data = ~m_bank_mask | m_rambank[3]->entry(); });
 
 	page(0)->install_readwrite_bank(0x0000, 0x3fff, m_rambank[0]);
 	page(1)->install_readwrite_bank(0x4000, 0x7fff, m_rambank[1]);
@@ -268,7 +282,7 @@ void msx_cart_base_mm_ram_device::device_start()
 template <int Bank>
 void msx_cart_base_mm_ram_device::bank_w(u8 data)
 {
-	m_rambank[Bank]->set_entry(data % m_nr_banks);
+	m_rambank[Bank]->set_entry(data & m_bank_mask);
 }
 
 
@@ -285,6 +299,14 @@ class msx_cart_512k_mm_ram_device : public msx_cart_base_mm_ram_device
 public:
 	msx_cart_512k_mm_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 		: msx_cart_base_mm_ram_device(mconfig, MSX_CART_512K_MM_RAM, tag, owner, clock, 512 * 1024)
+	{ }
+};
+
+class msx_cart_768k_mm_ram_device : public msx_cart_base_mm_ram_device
+{
+public:
+	msx_cart_768k_mm_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: msx_cart_base_mm_ram_device(mconfig, MSX_CART_768K_MM_RAM, tag, owner, clock, 768 * 1024)
 	{ }
 };
 
@@ -321,6 +343,7 @@ DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_48K_RAM,      msx_cart_interface, msx_cart_4
 DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_64K_RAM,      msx_cart_interface, msx_cart_64k_ram_device,      "msx_cart_64k_ram",      "Generic MSX 64K RAM Expansion")
 DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_256K_MM_RAM,  msx_cart_interface, msx_cart_256k_mm_ram_device,  "msx_cart_256k_mm_ram",  "Generic MSX 256K MM RAM Expansion")
 DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_512K_MM_RAM,  msx_cart_interface, msx_cart_512k_mm_ram_device,  "msx_cart_512k_mm_ram",  "Generic MSX 512K MM RAM Expansion")
+DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_768K_MM_RAM,  msx_cart_interface, msx_cart_768k_mm_ram_device,  "msx_cart_768k_mm_ram",  "Generic MSX 768K MM RAM Expansion")
 DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_1024K_MM_RAM, msx_cart_interface, msx_cart_1024k_mm_ram_device, "msx_cart_1024k_mm_ram", "Generic MSX 1024K MM RAM Expansion")
 DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_2048K_MM_RAM, msx_cart_interface, msx_cart_2048k_mm_ram_device, "msx_cart_2048k_mm_ram", "Generic MSX 2048K MM RAM Expansion")
 DEFINE_DEVICE_TYPE_PRIVATE(MSX_CART_4096K_MM_RAM, msx_cart_interface, msx_cart_4096k_mm_ram_device, "msx_cart_4096k_mm_ram", "Generic MSX 4096K MM RAM Expansion")
