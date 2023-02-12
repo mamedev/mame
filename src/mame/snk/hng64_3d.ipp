@@ -75,7 +75,8 @@ g_profiler.start(PROFILER_USER1);
 	for(int packetStart = 0; packetStart < 0x100; packetStart += 16)
 	{
 		// Send it off to the 3d subsystem.
-		hng64_command3d(&m_dl[packetStart]);
+		if (!hng64_command3d(&m_dl[packetStart]))
+			break;
 	}
 
 	// Schedule a small amount of time to let the 3d hardware rasterize the display buffer
@@ -563,9 +564,16 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			uint16_t explicitPaletteValue1 = ((chunkOffset[1] & 0x0f00) >> 8) * 0x080;
 			uint16_t explicitPaletteValue2 = ((chunkOffset[1] & 0x00f0) >> 4) * 0x008;
 
+			// HACK: this is incorrect, these are 4bpp textures which need different
+			// addressing etc. and just happen to be using extra palette select bits
+			// too, there must be an enable for 4bpp somewhere.
+			// 
 			// The presence of 0x00f0 *probably* sets 0x10-sized palette addressing.
 			if (explicitPaletteValue2) currentPoly.palPageSize = 0x10;
 
+			// HACK: this is not the enable, the cars in roadedge rely on this to switch palettes
+			// on the select screen, where this bit is not enabled.
+			//
 			// Apply the dynamic palette offset if its flag is set, otherwise stick with the fixed one
 			if ((packet[1] & 0x0100))
 			{
@@ -941,7 +949,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 // then we end up with other invalid packets in the 2nd half which should be ignored.
 // This would suggest our processing if flawed in other ways, or there is something else to indicate packet length.
 
-void hng64_state::hng64_command3d(const uint16_t* packet)
+bool hng64_state::hng64_command3d(const uint16_t* packet)
 {
 	int numPolys = 0;
 
@@ -952,7 +960,9 @@ void hng64_state::hng64_command3d(const uint16_t* packet)
 	case 0x0000:    // NOP?
 		 /* Appears to be a NOP (or 'end of list for this frame, ignore everything after' doesn't stop stray 3d objects in game for xrally/roadedge
 		    although does stop a partial hng64 logo being displayed assuming that's meant to be kept onscreen by some other means without valid data) */
+		return false;
 		break;
+
 
 	case 0x0001:    // Camera transformation.
 		setCameraTransformation(packet);
@@ -1030,6 +1040,7 @@ void hng64_state::hng64_command3d(const uint16_t* packet)
 		}
 	}
 	m_poly_renderer->wait();
+	return true;
 }
 
 void hng64_state::clear3d()

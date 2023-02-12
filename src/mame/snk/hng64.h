@@ -457,7 +457,7 @@ private:
 	std::vector<polygon> m_polys;  // HNG64_MAX_POLYGONS
 
 	void clear3d();
-	void hng64_command3d(const uint16_t* packet);
+	bool hng64_command3d(const uint16_t* packet);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void transition_control(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void setCameraTransformation(const uint16_t* packet);
