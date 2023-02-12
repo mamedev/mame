@@ -63,6 +63,8 @@ void hng64_state::dl_unk_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 void hng64_state::dl_upload_w(uint32_t data)
 {
+	//m_paletteState3d = 0; // no, breaks fatfurwa characters
+ 
 	// Data is:
 	// 00000b50 for the sams64 games
 	// 00000f00 for everything else
@@ -498,9 +500,9 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			////////////////////////////////////////////
 			// SINGLE POLY CHUNK FORMAT
 			// [0] 0000 0000 cccc cccc    0 = always 0 | c = chunk type / format of data that follows (see below)
-			// [1] t--l pppp pppp ssss    t = texture, always on for most games, on for the backgrounds only on sams64
+			// [1] t--4 pppp pppp ssss    t = texture, always on for most games, on for the backgrounds only on sams64
 			//                                if not set, u,v fields of vertices are direct palette indices, used on roadedge hng64 logo animation shadows
-			//                            l = low-res texture?  p = palette?  s = texture sheet (1024 x 1024 pages)
+			//                            4 = 4bpp texture  p = palette?  s = texture sheet (1024 x 1024 pages)
 			// [2] S?XX *--- -YY# ----    S = use 4x4 sub-texture pages?  ? = SNK logo roadedge / bbust2 / broken banners in xrally,  XX = horizontal subtexture  * = broken banners in xrally  YY = vertical subtexture  @ = broken banners in xrally
 
 			// we currently use one of the palette bits to enable a different palette mode.. seems hacky...
@@ -558,21 +560,29 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			}
 
 			//uint16_t explicitPaletteValue0 = ((chunkOffset[?] & 0x????) >> ?) * 0x800;
-			uint16_t explicitPaletteValue1 = ((chunkOffset[1] & 0x0f00) >> 8) * 0x080;
-			uint16_t explicitPaletteValue2 = ((chunkOffset[1] & 0x00f0) >> 4) * 0x008;
+			uint16_t explicitPaletteValue = ((chunkOffset[1] & 0x0ff0) >> 4);
+			explicitPaletteValue = explicitPaletteValue << 3;
 
 			// HACK: this is not the enable, the cars in roadedge rely on this to switch palettes
 			// on the select screen, where this bit is not enabled.
 			//
 			// Apply the dynamic palette offset if its flag is set, otherwise stick with the fixed one
-			if ((packet[1] & 0x0100))
-			{
-				explicitPaletteValue1 = m_paletteState3d * 0x80;
-				explicitPaletteValue2 = 0;      // This is probably hiding somewhere in operation 0011
-			}
+			//if ((packet[1] & 0x0100))
+			//{
+			//   logic below was previously here
+			//}	
 
-			currentPoly.palOffset += (explicitPaletteValue1 + explicitPaletteValue2);
+			// bbust2 has m_paletteState3d & 0x40 set, which takes the palette out of range
+			// used for 2nd car on roadedge, used for 2nd player on buriki
+			// used for buildings in fatfurwa intro and characters
+			// set on sams64 / sams64_2 characters, but should not be used in the same way?
+			if (!m_samsho64_3d_hack)
+				explicitPaletteValue |= (m_paletteState3d&0x3f) * 0x80;
 
+			//if (m_paletteState3d)
+			//	printf("%08x\n", m_paletteState3d);
+
+			currentPoly.palOffset += explicitPaletteValue;
 
 #if 0
 			if (((chunkOffset[2] & 0xc000) == 0x4000) && (m_screen->frame_number() & 1))
@@ -1045,6 +1055,8 @@ void hng64_state::clear3d()
 
 	// Clear the 3d rasterizer buffer
 	m_poly_renderer->colorBuffer3d().fill(0x00000000, m_screen->visible_area());
+
+	m_paletteState3d = 0;
 
 	// Set some matrices to the identity...
 	setIdentity(m_projectionMatrix);
