@@ -29,7 +29,7 @@ void mz80_state::machine_reset()
 uint8_t mz80_state::mz80k_8255_portb_r()
 {
 	char kbdrow[8];
-	sprintf(kbdrow,"LINE%d", m_mz80k_keyboard_line);
+	snprintf(kbdrow,sizeof(kbdrow),"LINE%d", m_mz80k_keyboard_line);
 	if (m_mz80k_keyboard_line > 9)
 		return 0xff;
 	else

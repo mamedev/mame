@@ -126,7 +126,7 @@ uint8_t iq151_state::keyboard_row_r()
 
 	for (int i = 0; i < 8; i++)
 	{
-		sprintf(kbdrow,"X%X",i);
+		snprintf(kbdrow,sizeof(kbdrow),"X%X",i);
 		data &= ioport(kbdrow)->read();
 	}
 
@@ -140,7 +140,7 @@ uint8_t iq151_state::keyboard_column_r()
 
 	for (int i = 0; i < 8; i++)
 	{
-		sprintf(kbdrow,"X%X",i);
+		snprintf(kbdrow,sizeof(kbdrow),"X%X",i);
 		if (ioport(kbdrow)->read() == 0xff)
 			data |= (1 << i);
 	}

@@ -1078,7 +1078,7 @@ static void append_driver_list_table(const char *header, std::string &dirname, u
 				uniqueshots++;
 		if (uniqueshots > 1)
 		{
-			sprintf(pngdiffname, "compare_%s.png", curfile->name);
+			snprintf(pngdiffname, sizeof(pngdiffname), "compare_%s.png", curfile->name);
 			if (generate_png_diff(curfile, dirname, pngdiffname) != 0)
 				pngdiffname[0] = 0;
 		}

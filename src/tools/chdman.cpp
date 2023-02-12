@@ -2532,7 +2532,7 @@ static void do_extract_cd(parameters_map &params)
 			if (mode == MODE_GDI)
 			{
 				char temp[11];
-				sprintf(temp, "%02d", tracknum+1);
+				snprintf(temp, sizeof(temp), "%02d", tracknum+1);
 				trackbin_name.append(temp);
 				if (toc.tracks[tracknum].trktype == cdrom_file::CD_TRACK_AUDIO)
 					trackbin_name.append(".raw");

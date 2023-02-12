@@ -86,7 +86,7 @@ void dump_decrypted(running_machine& machine, uint8_t* decrypt)
 {
 	FILE *fp;
 	char filename[256];
-	sprintf(filename,"dat_%s", machine.system().name);
+	snprintf(filename,sizeof(filename),"dat_%s", machine.system().name);
 	fp=fopen(filename, "w+b");
 	if (fp)
 	{

@@ -1551,13 +1551,13 @@ void kaneko_calc3_device::initial_scan_tables()
 
 			if (m_blocksize_offset==3)
 			{
-				sprintf(filename,"data_%s_table_%04x k%02x m%02x u%02x length %04x",
+				snprintf(filename,sizeof(filename),"data_%s_table_%04x k%02x m%02x u%02x length %04x",
 						machine().system().name,
 						x, m_decryption_key_byte, m_mode, m_alternateswaps, length);
 			}
 			else
 			{
-				sprintf(filename,"data_%s_table_%04x k%02x (use indirect size %02x) m%02x u%02x length %04x",
+				snprintf(filename,sizeof(filename),"data_%s_table_%04x k%02x (use indirect size %02x) m%02x u%02x length %04x",
 					machine().system().name,
 					x, m_decryption_key_byte, m_blocksize_offset-3, m_mode, m_alternateswaps, length);
 			}
@@ -1582,7 +1582,7 @@ void kaneko_calc3_device::initial_scan_tables()
 		FILE *fp;
 		char filename[256];
 
-		sprintf(filename,"data_%s_finalblock",
+		snprintf(filename,sizeof(filename),"data_%s_finalblock",
 		machine().system().name);
 
 		fp=fopen(filename, "w+b");
