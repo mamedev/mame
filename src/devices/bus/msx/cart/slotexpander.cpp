@@ -77,15 +77,18 @@ template<int Slot>
 void  msx_cart_slotexpander_device::add_cartslot(machine_config &mconfig)
 {
 	MSX_SLOT_CARTRIDGE(mconfig, m_cartslot[Slot], 0);
-	m_cartslot[Slot]->set_memory_space(required_maincpu(), AS_PROGRAM);
-	m_cartslot[Slot]->set_io_space(required_maincpu(), AS_IO);
-	m_cartslot[Slot]->set_maincpu(required_maincpu());
+	// During validate_device_types the finders from the parent cartridge slot are not present.
+	if (required_maincpu())
+	{
+		m_cartslot[Slot]->set_memory_space(*required_maincpu(), AS_PROGRAM);
+		m_cartslot[Slot]->set_io_space(*required_maincpu(), AS_IO);
+		m_cartslot[Slot]->set_maincpu(*required_maincpu());
+	}
 	m_cartslot[Slot]->option_reset();
 	msx_cart(*m_cartslot[Slot]);
 	m_cartslot[Slot]->set_default_option(nullptr);
 	m_cartslot[Slot]->set_fixed(false);
 	m_cartslot[Slot]->irq_handler().set(m_irq_out, FUNC(input_merger_device::in_w<Slot>));
-
 }
 
 void msx_cart_slotexpander_device::device_add_mconfig(machine_config &mconfig)
