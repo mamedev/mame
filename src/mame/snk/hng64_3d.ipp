@@ -565,22 +565,20 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 
 			// HACK: this is not the enable, the cars in roadedge rely on this to switch palettes
 			// on the select screen, where this bit is not enabled.
+			// (to see the cars on the select screen disable sprite rendering, as there are
+			// currently priority issues)
+			// 
+			// however for sams64 this is enabled on the 2nd character, but not the 1st character
+			// and the additional palette offset definitely only applies to the 2nd
 			//
 			// Apply the dynamic palette offset if its flag is set, otherwise stick with the fixed one
-			//if ((packet[1] & 0x0100))
-			//{
-			//   logic below was previously here
-			//}	
-
-			// bbust2 has m_paletteState3d & 0x40 set, which takes the palette out of range
-			// used for 2nd car on roadedge, used for 2nd player on buriki
-			// used for buildings in fatfurwa intro and characters
-			// set on sams64 / sams64_2 characters, but should not be used in the same way?
-			if (!m_samsho64_3d_hack)
-				explicitPaletteValue |= (m_paletteState3d&0x3f) * 0x80;
-
-			//if (m_paletteState3d)
-			//	printf("%08x\n", m_paletteState3d);
+			if ((packet[1] & 0x0100))
+			{
+				// bbust2 has m_paletteState3d & 0x40 set, which takes the palette out of range
+				// used for 2nd car on roadedge, used for 2nd player on buriki
+				// used for buildings in fatfurwa intro and characters
+				explicitPaletteValue |= (m_paletteState3d & 0x3f) * 0x80;
+			}
 
 			currentPoly.palOffset += explicitPaletteValue;
 
