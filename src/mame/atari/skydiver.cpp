@@ -147,14 +147,6 @@ private:
 	void wram_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(width_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp_s_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp_k_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp_y_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp_d_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp_i_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp_v_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp_e_w);
-	DECLARE_WRITE_LINE_MEMBER(lamp_r_w);
 	void latch3_watchdog_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
