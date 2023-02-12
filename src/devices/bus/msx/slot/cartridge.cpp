@@ -351,7 +351,7 @@ cpu_device &msx_cart_interface::maincpu() const
 	return m_exp->maincpu();
 }
 
-required_device<cpu_device> *msx_cart_interface::required_maincpu()
+required_device<cpu_device> *msx_cart_interface::get_cpu_finder()
 {
 	return m_exp ? m_exp->required_maincpu() : nullptr;
 }

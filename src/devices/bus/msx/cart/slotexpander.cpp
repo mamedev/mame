@@ -78,11 +78,11 @@ void  msx_cart_slotexpander_device::add_cartslot(machine_config &mconfig)
 {
 	MSX_SLOT_CARTRIDGE(mconfig, m_cartslot[Slot], 0);
 	// During validate_device_types the finders from the parent cartridge slot are not present.
-	if (required_maincpu())
+	if (get_cpu_finder())
 	{
-		m_cartslot[Slot]->set_memory_space(*required_maincpu(), AS_PROGRAM);
-		m_cartslot[Slot]->set_io_space(*required_maincpu(), AS_IO);
-		m_cartslot[Slot]->set_maincpu(*required_maincpu());
+		m_cartslot[Slot]->set_memory_space(*get_cpu_finder(), AS_PROGRAM);
+		m_cartslot[Slot]->set_io_space(*get_cpu_finder(), AS_IO);
+		m_cartslot[Slot]->set_maincpu(*get_cpu_finder());
 	}
 	m_cartslot[Slot]->option_reset();
 	msx_cart(*m_cartslot[Slot]);
