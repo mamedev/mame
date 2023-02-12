@@ -432,7 +432,7 @@ logerror("PC %04x: gfxctrl_w %02x\n", m_maincpu->pc(), data);
 {
 #if 0
 	char baf[40];
-	sprintf(baf, "%02x", data);
+	snprintf(baf, sizeof(baf), "%02x", data);
 	popmessage(baf);
 #endif
 }
@@ -469,7 +469,7 @@ void mstworld_state::gfxctrl_w(uint8_t data)
 	logerror("PC %04x: gfxctrl_w %02x\n", m_maincpu->pc(), data);
 {
 	char baf[40];
-	sprintf(baf, "%02x", data);
+	snprintf(baf, sizeof(baf), "%02x", data);
 //  popmessage(baf);
 }
 

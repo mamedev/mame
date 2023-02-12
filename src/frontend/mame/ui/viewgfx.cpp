@@ -21,6 +21,7 @@
 
 #include "util/unicode.h"
 
+#include <array>
 #include <cmath>
 #include <vector>
 
@@ -1003,8 +1004,8 @@ uint32_t gfx_viewer::handle_palette(mame_ui_manager &mui, render_container &cont
 				container.add_point(0.5f * (x0 + cellboxbounds.x0), y0 + 0.5f * cellheight, UI_LINE_WIDTH, rgb_t::white(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 			// draw the row header
-			char buffer[10];
-			sprintf(buffer, "%5X", index);
+			std::array<char, 10> buffer;
+			snprintf(buffer.data(), buffer.size(), "%5X", index);
 			for (int x = 4; x >= 0; x--)
 			{
 				x0 -= ui_font->char_width(chheight, aspect, buffer[x]);
@@ -1209,8 +1210,8 @@ uint32_t gfx_viewer::handle_gfxset(mame_ui_manager &mui, render_container &conta
 				container.add_point(0.5f * (x0 + boxbounds.x0 + 6.0f * chwidth), y0 + 0.5f * cellheight, UI_LINE_WIDTH, rgb_t::white(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 			// draw the row header
-			char buffer[10];
-			sprintf(buffer, "%5X", set.m_offset + (y * xcells));
+			std::array<char, 10> buffer;
+			snprintf(buffer.data(), buffer.size(), "%5X", set.m_offset + (y * xcells));
 			for (int x = 4; x >= 0; x--)
 			{
 				x0 -= ui_font->char_width(chheight, aspect, buffer[x]);

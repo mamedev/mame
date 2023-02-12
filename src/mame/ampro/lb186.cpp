@@ -75,7 +75,7 @@ void lb186_state::drive_sel_w(uint8_t data)
 			return;
 	}
 
-	sprintf(devname, "%d", drive);
+	snprintf(devname, sizeof(devname), "%d", drive);
 	floppy = m_fdc->subdevice<floppy_connector>(devname)->get_device();
 	m_fdc->set_floppy(floppy);
 	floppy->ss_w(BIT(data, 4));

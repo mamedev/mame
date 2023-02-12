@@ -599,7 +599,7 @@ static int thom_find_dirent(thom_floppy* f, unsigned head,
 	if ( d->type == THOM_DIRENT_END ) return 0;
 	if ( d->type == THOM_DIRENT_FILE ) {
 		char buf[13];
-		sprintf( buf, "%s.%s", d->name, d->ext );
+		snprintf( buf, sizeof(buf), "%s.%s", d->name, d->ext );
 		if ( ! strcmp( buf, name ) ) return 1;
 	}
 	n++;
@@ -957,7 +957,7 @@ static imgtoolerr_t thom_read_file(imgtool::partition &part,
 
 	/* convert filename */
 	thom_conv_filename( filename, name, ext );
-	sprintf( fname, "%s.%s", name, ext );
+	snprintf( fname, sizeof(fname), "%s.%s", name, ext );
 
 	if ( ! thom_find_dirent( f, head, fname, &d ) )
 	return IMGTOOLERR_FILENOTFOUND;
@@ -978,7 +978,7 @@ static imgtoolerr_t thom_delete_file(imgtool::partition &part,
 
 	/* convert filename */
 	thom_conv_filename( filename, name, ext );
-	sprintf( fname, "%s.%s", name, ext );
+	snprintf( fname, sizeof(fname), "%s.%s", name, ext );
 
 	if ( ! thom_find_dirent( f, head, fname, &d ) )
 	return IMGTOOLERR_FILENOTFOUND;
@@ -1007,7 +1007,7 @@ static imgtoolerr_t thom_write_file(imgtool::partition &part,
 
 	/* convert filename */
 	thom_conv_filename( filename, name, ext );
-	sprintf( fname, "%s.%s", name, ext );
+	snprintf( fname, sizeof(fname), "%s.%s", name, ext );
 
 	/* check available space & find dir entry */
 	if ( thom_find_dirent( f, head, fname, &d ) ) {

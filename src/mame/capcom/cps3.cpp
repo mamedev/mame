@@ -864,7 +864,7 @@ void cps3_state::decrypt_bios()
 		FILE *fp;
 		const char *gamename = machine().system().name;
 		char filename[256];
-		sprintf(filename, "%s_bios.dump", gamename);
+		snprintf(filename, sizeof(filename), "%s_bios.dump", gamename);
 
 		fp=fopen(filename, "w+b");
 		if (fp)
@@ -2407,7 +2407,7 @@ void cps3_state::copy_from_nvram()
 	    FILE *fp;
 	    const char *gamename = machine().system().name;
 	    char filename[256];
-	    sprintf(filename, "%s_bios.dump", gamename);
+	    snprintf(filename, sizeof(filename), "%s_bios.dump", gamename);
 
 	    fp=fopen(filename, "w+b");
 	    if (fp)

@@ -1273,7 +1273,7 @@ void dragngun_state::dragngun_init_common()
 
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"video.dvi");
+		snprintf(filename,"video.dvi");
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{

@@ -409,7 +409,7 @@ void decwriter_state::machine_start()
 	// look up all 16 tags 'the slow way' but only once on reset
 	for (int i = 0; i < 16; i++)
 	{
-		sprintf(kbdcol,"COL%X", i);
+		snprintf(kbdcol, sizeof(kbdcol), "COL%X", i);
 		m_col_array[i] = ioport(kbdcol);
 	}
 	m_led_7seg_counter = 0;

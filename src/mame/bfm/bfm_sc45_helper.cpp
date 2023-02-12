@@ -431,7 +431,7 @@ int find_lamp_strings(running_machine &machine)
 		{
 			char tmp[32];
 
-			sprintf(tmp, "(%02d:%02d)", y, x);
+			snprintf(tmp, sizeof(tmp), "(%02d:%02d)", y, x);
 
 			lamps[y][x].lampname = std::string(tmp);
 			lamps[y][x].used = false;
@@ -598,7 +598,7 @@ int find_lamp_strings(running_machine &machine)
 	for (int reel = 0; reel < 8; reel++)
 	{
 		char tempname[32];
-		sprintf(tempname, "reel%d ", reel+1);
+		snprintf(tempname, sizeof(tempname), "reel%d ", reel+1);
 
 
 		for (int pos = 0; pos < 3; pos++)

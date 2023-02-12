@@ -118,7 +118,7 @@ uint8_t acrnsys1_state::ins8154_b1_port_a_r()
 		if (BIT(key_line, i))
 		{
 			char kbdrow[6];
-			sprintf(kbdrow,"X%X",i);
+			snprintf(kbdrow,sizeof(kbdrow),"X%X",i);
 			data = (ioport(kbdrow)->read() & 0x38) | m_digit;
 			break;
 		}

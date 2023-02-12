@@ -943,7 +943,7 @@ void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, in
 
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"decrypted_%s", machine().system().name);
+		snprintf(filename, sizeof(filename), "decrypted_%s", machine().system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{
