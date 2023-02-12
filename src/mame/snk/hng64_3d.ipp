@@ -622,8 +622,6 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 					// chunkOffset[6 + (9*m)] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
 					currentPoly.vert[m].texCoords[0] = uToF(chunkOffset[7 + (9*m)]);
 					currentPoly.vert[m].texCoords[1] = uToF(chunkOffset[8 + (9*m)]);
-					currentPoly.vert[m].texCoords[2] = 0.0f;
-					currentPoly.vert[m].texCoords[3] = 1.0f;
 
 					currentPoly.vert[m].normal[0] = uToF(chunkOffset[9  + (9*m)]);
 					currentPoly.vert[m].normal[1] = uToF(chunkOffset[10 + (9*m)]);
@@ -1275,6 +1273,7 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 				float textureS = 0.0f;
 				float textureT = 0.0f;
 
+				// sCorrect and tCorrect have range 0.0f - 1.0f, multiply by 1024 to get texture offset
 				textureS = sCorrect * 1024.0f;
 				textureT = tCorrect * 1024.0f;
 
