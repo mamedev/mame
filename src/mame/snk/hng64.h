@@ -47,13 +47,12 @@ struct polygon
 	bool flatShade = false;              // Flat shaded polygon, no texture, no lighting
 
 	uint8_t texIndex = 0;             // Which texture to draw from (0x00-0x0f)
-	uint8_t texType = 0;              // How to index into the texture
+	uint8_t tex4bpp = 0;              // How to index into the texture
 	uint8_t texPageSmall = 0;         // Does this polygon use 'small' texture pages?
 	uint8_t texPageHorizOffset = 0;   // If it does use small texture pages, how far is this page horizontally offset?
 	uint8_t texPageVertOffset = 0;    // If it does use small texture pages, how far is this page vertically offset?
 
 	uint32_t palOffset = 0;           // The base offset where this object's palette starts.
-	uint32_t palPageSize = 0;         // The size of the palette page that is being pointed to.
 
 	uint32_t debugColor = 0;          // Will go away someday.  Used to explicitly color polygons for debugging.
 };
@@ -82,13 +81,12 @@ typedef frustum_clip_vertex<float, 5> hng64_clip_vertex;
 
 struct hng64_poly_data
 {
-	uint8_t texType = 0;
+	uint8_t tex4bpp = 0;
 	uint8_t texIndex = 0;
 	uint8_t texPageSmall = 0;
 	uint8_t texPageHorizOffset = 0;
 	uint8_t texPageVertOffset = 0;
 	int palOffset = 0;
-	int palPageSize = 0;
 	int debugColor = 0;
 };
 

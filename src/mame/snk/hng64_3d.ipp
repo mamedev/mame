@@ -530,10 +530,8 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			//printf("%d (%08x) : %04x %04x %04x\n", k, address[k]*3*2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
 			//break;
 
-			// TEXTURE
-			// There may be more than just high & low res texture types, so I'm keeping texType as a uint8_t. */
-			if (chunkOffset[1] & 0x1000) currentPoly.texType = 0x1;
-			else                         currentPoly.texType = 0x0;
+			if (chunkOffset[1] & 0x1000) currentPoly.tex4bpp = 0x1;
+			else                         currentPoly.tex4bpp = 0x0;
 
 			currentPoly.texPageSmall       = (chunkOffset[2] & 0xc000)>>14;  // Just a guess.
 			currentPoly.texPageHorizOffset = (chunkOffset[2] & 0x3800) >> 11;
@@ -549,7 +547,6 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 
 			// PALETTE
 			currentPoly.palOffset = 0;
-			currentPoly.palPageSize = 0x100;
 
 			// FIXME: This isn't correct.
 			//        Buriki & Xrally need this line.  Roads Edge needs it removed.
@@ -564,13 +561,6 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			uint16_t explicitPaletteValue1 = ((chunkOffset[1] & 0x0f00) >> 8) * 0x080;
 			uint16_t explicitPaletteValue2 = ((chunkOffset[1] & 0x00f0) >> 4) * 0x008;
 
-			// HACK: this is incorrect, these are 4bpp textures which need different
-			// addressing etc. and just happen to be using extra palette select bits
-			// too, there must be an enable for 4bpp somewhere.
-			// 
-			// The presence of 0x00f0 *probably* sets 0x10-sized palette addressing.
-			if (explicitPaletteValue2) currentPoly.palPageSize = 0x10;
-
 			// HACK: this is not the enable, the cars in roadedge rely on this to switch palettes
 			// on the select screen, where this bit is not enabled.
 			//
@@ -582,6 +572,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			}
 
 			currentPoly.palOffset += (explicitPaletteValue1 + explicitPaletteValue2);
+
 
 #if 0
 			if (((chunkOffset[2] & 0xc000) == 0x4000) && (m_screen->frame_number() & 1))
@@ -1280,18 +1271,9 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 				float textureS = 0.0f;
 				float textureT = 0.0f;
 
-				// Standard & Half-Res textures
-				if (renderData.texType == 0x0)
-				{
-					textureS = sCorrect * 1024.0f;
-					textureT = tCorrect * 1024.0f;
-				}
-				else if (renderData.texType == 0x1)
-				{
-					textureS = sCorrect * 512.0f;
-					textureT = tCorrect * 512.0f;
-				}
-
+				textureS = sCorrect * 1024.0f;
+				textureT = tCorrect * 1024.0f;
+		
 				// Small-Page textures
 				if (renderData.texPageSmall == 2)
 				{
@@ -1310,13 +1292,26 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 					textureS += (128.0f * (renderData.texPageVertOffset>>0));
 				}
 
-				uint8_t paletteEntry = textureOffset[((int)textureS)*1024 + (int)textureT];
+				uint8_t paletteEntry;
+				int t = (int)textureT;
+				if (renderData.tex4bpp)
+				{
+					paletteEntry = textureOffset[((int)textureS) * 512 + (t >> 1)];
+
+					if (t & 1)
+						paletteEntry = (paletteEntry >> 4) & 0x0f;
+					else
+						paletteEntry &= 0x0f;
+				}
+				else
+				{
+					paletteEntry = textureOffset[((int)textureS) * 1024 + t];
+				}
 
 				// Naive Alpha Implementation (?) - don't draw if you're at texture index 0...
 				if (paletteEntry != 0)
 				{
 					// The color out of the texture
-					paletteEntry %= renderData.palPageSize;
 					rgb_t color = m_state.m_palette->pen(renderData.palOffset + paletteEntry);
 
 					// Apply the lighting
@@ -1405,10 +1400,9 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 {
 	// Polygon information for the rasterizer
 	hng64_poly_data rOptions;
-	rOptions.texType = p->texType;
+	rOptions.tex4bpp = p->tex4bpp;
 	rOptions.texIndex = p->texIndex;
 	rOptions.palOffset = p->palOffset;
-	rOptions.palPageSize = p->palPageSize;
 	rOptions.debugColor = p->debugColor;
 	rOptions.texPageSmall = p->texPageSmall;
 	rOptions.texPageHorizOffset = p->texPageHorizOffset;
