@@ -503,7 +503,7 @@ void nes_cart_slot_device::call_load_unif()
 		FILE *prgout;
 		char outname[255];
 
-		sprintf(outname, "%s.prg", filename());
+		snprintf(outname, sizeof(outname), "%s.prg", filename());
 		prgout = fopen(outname, "wb");
 		if (prgout)
 		{
@@ -521,7 +521,7 @@ void nes_cart_slot_device::call_load_unif()
 		FILE *chrout;
 		char outname[255];
 
-		sprintf(outname, "%s.chr", filename());
+		snprintf(outname, sizeof(outname), "%s.chr", filename());
 		chrout= fopen(outname, "wb");
 		if (chrout)
 		{

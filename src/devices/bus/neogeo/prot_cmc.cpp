@@ -728,7 +728,7 @@ void cmc_prot_device::cmc50_m1_decrypt(uint8_t* romcrypt, uint32_t romcrypt_size
 		FILE *fp;
 		const char *gamename = machine().system().name;
 		char filename[256];
-		sprintf(filename, "%s_m1.dump", gamename);
+		snprintf(filename, sizeof(filename), "%s_m1.dump", gamename);
 
 		fp=fopen(filename, "w+b");
 		if (fp)
@@ -745,7 +745,7 @@ void cmc_prot_device::cmc50_m1_decrypt(uint8_t* romcrypt, uint32_t romcrypt_size
 		FILE *fp;
 		const char *gamename = machine().system().name;
 		char filename[256];
-		sprintf(filename, "%s_m1extra.dump", gamename);
+		snprintf(filename, sizeof(filename), "%s_m1extra.dump", gamename);
 
 		fp=fopen(filename, "w+b");
 		if (fp)
