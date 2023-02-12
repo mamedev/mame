@@ -27,7 +27,7 @@ struct polyVert
 {
 	float worldCoords[4]{};   // World space coordinates (X Y Z 1.0)
 
-	float texCoords[4]{};     // Texture coordinates (U V 0 1.0) -> OpenGL style...
+	float texCoords[2]{};     // Texture coordinates (U V 0 1.0) -> OpenGL style...
 
 	float normal[4]{};        // Normal (X Y Z 1.0)
 	float clipCoords[4]{};    // Homogeneous screen space coordinates (X Y Z W)

@@ -660,9 +660,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 					// chunkOffset[6 + (6*m)] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
 					currentPoly.vert[m].texCoords[0] = uToF(chunkOffset[7 + (6*m)]);
 					currentPoly.vert[m].texCoords[1] = uToF(chunkOffset[8 + (6*m)]);
-					currentPoly.vert[m].texCoords[2] = 0.0f;
-					currentPoly.vert[m].texCoords[3] = 1.0f;
-
+	
 					if (currentPoly.flatShade)
 						currentPoly.vert[m].colorIndex = chunkOffset[7 + (6*m)] >> 5;
 
@@ -701,8 +699,6 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				// chunkOffset[6] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
 				currentPoly.vert[0].texCoords[0] = uToF(chunkOffset[7]);
 				currentPoly.vert[0].texCoords[1] = uToF(chunkOffset[8]);
-				currentPoly.vert[0].texCoords[2] = 0.0f;
-				currentPoly.vert[0].texCoords[3] = 1.0f;
 
 				if (currentPoly.flatShade)
 					currentPoly.vert[0].colorIndex = chunkOffset[7] >> 5;
@@ -740,8 +736,6 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				// chunkOffset[6] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
 				currentPoly.vert[0].texCoords[0] = uToF(chunkOffset[7]);
 				currentPoly.vert[0].texCoords[1] = uToF(chunkOffset[8]);
-				currentPoly.vert[0].texCoords[2] = 0.0f;
-				currentPoly.vert[0].texCoords[3] = 1.0f;
 
 				if (currentPoly.flatShade)
 					currentPoly.vert[0].colorIndex = chunkOffset[7] >> 5;
@@ -1283,7 +1277,8 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 
 				textureS = sCorrect * 1024.0f;
 				textureT = tCorrect * 1024.0f;
-		
+
+#if 1
 				// Small-Page textures
 				if (renderData.texPageSmall == 2)
 				{
@@ -1293,14 +1288,16 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 					textureT += (256.0f * (renderData.texPageHorizOffset>>1));
 					textureS += (256.0f * (renderData.texPageVertOffset>>1));
 				}
-				else if (renderData.texPageSmall == 3)
+				else if (renderData.texPageSmall == 3) // this can't be 128x128 textures, it is needed for the road etc. which is 256 wide, but also overhead objects which are 128
 				{
 					textureT = fmod(textureT, 128.0f);
 					textureS = fmod(textureS, 128.0f);
 
-					textureT += (128.0f * (renderData.texPageHorizOffset>>0));
-					textureS += (128.0f * (renderData.texPageVertOffset>>0));
+					textureT += (128.0f * (renderData.texPageHorizOffset >> 0));
+					textureS += (128.0f * (renderData.texPageVertOffset >> 0));
+
 				}
+#endif
 
 				uint8_t paletteEntry;
 				int t = (int)textureT;
