@@ -7,8 +7,6 @@ X Tom 3D
 Customized i440bx Award based BIOS, "OKSAN MK III /EVATE Ver99.04.20"
 "04/20/1999-i440BX-2A69KEIC-00"
 
-Oksan is the old company name that became Andamiro.
-
 TODO:
 - DIR texture folder will throw mangled file structure the second time around (when
   ENABLE_VOODOO is 0 and SVGA is used instead). PAM[5] and [6] areas are written to but
@@ -19,10 +17,20 @@ TODO:
   likely for drawing an error.
 - Pinpoint what i/o $2a8 is for during texture init (alt serial flash transfer?)
 - EEPROM (i/o $2ac r/w)
-- Hookup ISA sound board;
-- Pump it Up is known to run on almost identical HW, except that it uses a boot floppy and a
-  non-El Torito complaint CD-Rom. This implies that it has an extra FDC either on an ISA board or
-  a Super I/O ...
+- Hookup ISA sound board (YMZ280B + YAC516 + 3550A DAC);
+- pumpit1: IDE device doesn't recognize automatic mounting for CD-Rom, side effect of
+  PCI system with MAME internals?
+- pumpit1: black screens all the way with Voodoo enabled, eventually throws a fatal error
+  "pci:01.0:00.0:voodoo: Unsupported cmdFifo packet type 7", may require true AGP comms.
+- Pump it Up: every CD after pumpit1 are really multisession disks, which is unsupported
+  by chdman at the time of this writing (and doesn't seem worth converting atm);
+- Pump it Up: CAT702 ZN protection for later games;
+- MAS 3507D MP3 decoder for pumpito and beyond;
+
+Notes:
+- Oksan is the old company name that became Andamiro.
+- Pump It Up refs:
+  https://github.com/pumpitupdev/pumptools/blob/master/doc/hook/mk3hook.md
   https://github.com/Shizmob/arcade-docs/blob/main/andamiro/board.md#mk3
 
 ===================================================================================================
@@ -187,12 +195,8 @@ void isa16_oksan_rom_disk::write(offs_t offset, u8 data)
 			m_flash_addr |= (data & 0xff) << 16;
 			break;
 		case 0x6:
-			if (data)
-				popmessage("%02x", data);
-			//m_flash_addr &= 0xfe01ffff;
-			//m_flash_addr |= data * 0x20000;
-			//m_flash_addr &= 0x01ffffff;
-			//m_flash_addr |= data * 0x2000000;
+			m_flash_addr &= 0x00ffffff;
+			m_flash_addr |= (data & 0xff) << 24;
 			break;
 		// data port
 		case 0xa:
@@ -289,6 +293,7 @@ void isa16_oksan_lpc::remap(int space_id, offs_t start, offs_t end)
 namespace {
 
 #define PCI_AGP_ID "pci:01.0:00.0"
+#define PCI_IDE_ID "pci:07.1"
 
 class xtom3d_state : public driver_device
 {
@@ -315,6 +320,7 @@ private:
 //  DECLARE_WRITE_LINE_MEMBER(vblank_assert);
 
 	static void romdisk_config(device_t *device);
+//	static void cdrom_config(device_t *device);
 };
 
 
@@ -335,6 +341,12 @@ void xtom3d_state::romdisk_config(device_t *device)
 	romdisk.set_rom_tag("game_rom");
 }
 
+// TODO: stub for drive options (speed/drive type etc.)
+/*void xtom3d_state::cdrom_config(device_t *device)
+{
+}
+*/
+
 // TODO: unverified PCI config space
 void xtom3d_state::xtom3d(machine_config &config)
 {
@@ -354,9 +366,14 @@ void xtom3d_state::xtom3d(machine_config &config)
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 
-	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", 0));
+	i82371eb_ide_device &ide(I82371EB_IDE(config, PCI_IDE_ID, 0));
 	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_mirq0_w));
+
+	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_default_option("cdrom");
+//	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_fixed(true);
+
+	ide.subdevice<bus_master_ide_controller_device>("ide2")->slot(0).set_default_option(nullptr);
 
 	I82371EB_USB (config, "pci:07.2", 0);
 	I82371EB_ACPI(config, "pci:07.3", 0);
@@ -370,7 +387,6 @@ void xtom3d_state::xtom3d(machine_config &config)
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	// Expansion slots, mapping SVGA for debugging
-	// TODO: confirm Voodoo going in J4D2, may really go in AGP slot under bridge instead?
 	#if ENABLE_VOODOO
 	VOODOO_BANSHEE_PCI(config, m_voodoo, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
 	// TODO: confirm values
@@ -409,20 +425,48 @@ ROM_START( xtom3d )
 	ROM_LOAD( "u20", 0x200000, 0x200000, CRC(452131d9) SHA1(f62a0f1a7da9025ac1f7d5de4df90166871ac1e5) )
 ROM_END
 
+// provided dump is half size and definitely don't seem sane,
+// just assume they didn't change that part
+//	ROM_LOAD( "bios.u22", 0x000000, 0x010000, BAD_DUMP CRC(574bb327) SHA1(c24484e9b304b9d570c5ead6be768f563d5c389f) )
+
+#define PUMPITUP_BIOS \
+	ROM_REGION32_LE(0x20000, "pci:07.0", 0) \
+	ROM_LOAD( "bios.u22", 0x000000, 0x020000, CRC(f7c58044) SHA1(fd967d009e0d3c8ed9dd7be852946f2b9dee7671) ) \
+	ROM_REGION32_LE(0x1000000, "board1:game_rom", ROMREGION_ERASEFF ) \
+	ROM_LOAD( "piu10.u8",  0x000000, 0x200000, CRC(5911e31a)  SHA1(295723b9b7da9e55b5dd5586b23b06355f4837ef) ) \
+	ROM_REGION(0x400000, "board3:sound_rom", ROMREGION_ERASEFF ) \
+	ROM_LOAD( "piu10.u9",  0x000000, 0x200000, CRC(9c436cfa) SHA1(480ea52e74721d1963ced41be5c482b7b913ccd2) )
+
+ROM_START( pumpitup )
+	PUMPITUP_BIOS
+ROM_END
+
+ROM_START( pumpit1 )
+	PUMPITUP_BIOS
+
+	DISK_REGION( PCI_IDE_ID":ide1:0:cdrom:image" )
+	DISK_IMAGE_READONLY( "19990930", 0,  SHA1(a848061806c56ba30c75a24233300f175fb3eb9d) )
+ROM_END
+
 } // anonymous namespace
 
 GAME(1999, xtom3d, 0, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro / Jamie System Development", "X Tom 3D", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-// GAME(1999, pumpit1,  0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up: The 1st Dance Floor")
-// GAME(1999, pumpit2,  0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up: The 2nd Dance Floor")
-// GAME(1999, pumpit3,  0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up The O.B.G: The 3rd Dance Floor")
-// GAME(2000, pumpito,  0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up The O.B.G: The Season Evolution Dance Floor"
-// GAME(2000, pumpitc,  0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up: The Collection"
-// GAME(2000, pumpitpc, 0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up: The Perfect Collection")
-// GAME(2001, pumpite,  0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up Extra")
-// GAME(2001, pumpitpr, 0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro","Pump it Up The Premiere: The International Dance Floor")
-// GAME(2001, pumpitpx, 0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX: The International Dance Floor")
-// GAME(2002, pumpit8,  0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up The Rebirth: The 8th Dance Floor")
-// GAME(2002, pumpitp2, 0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up The Premiere 2: The International 2nd Dance Floor"
-// GAME(2002, pumpipx2, 0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX 2")
-// GAME(2003, pumpitp3, 0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up The Premiere 3: The International 3rd Dance Floor")
-// GAME(2003, pumpipx3, 0, pumpitup, 0, pumpitup_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX 3: The International 4th Dance Floor")
+GAME(1999, pumpitup, 0,        xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump It Up BIOS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
+GAME(1999, pumpit1,  pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump It Up: The 1st Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//GAME(1999, pumpit2,  pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up: The 2nd Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//GAME(1999, pumpit3,  pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The O.B.G: The 3rd Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2000, pumpito,  pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The O.B.G: The Season Evolution Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2000, pumpitc,  pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up: The Collection", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2000, pumpitpc, pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up: The Perfect Collection", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2001, pumpite,  pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up Extra", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2001, pumpitpr, pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro","Pump it Up The Premiere: The International Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2001, pumpitpx, pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX: The International Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2002, pumpit8,  pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The Rebirth: The 8th Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2002, pumpitp2, pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The Premiere 2: The International 2nd Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2002, pumpipx2, pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX 2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2003, pumpitp3, pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The Premiere 3: The International 3rd Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// GAME(2003, pumpipx3, pumpitup, xtom3d, 0, xtom3d_state, empty_init, ROT0, "Andamiro", "Pump it Up The PREX 3: The International 4th Dance Floor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+// GAME(1999, "family production,inc", "N3 Heartbreakers Advanced" known to exist on this HW
+// https://namu.wiki/w/%ED%95%98%ED%8A%B8%20%EB%B8%8C%EB%A0%88%EC%9D%B4%EC%BB%A4%EC%A6%88
+// (Korean encoded URL)

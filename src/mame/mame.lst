@@ -44658,7 +44658,9 @@ xorworld                        // (c) 1990 - prototype
 xtheball                        // (c) 1991 Rare
 
 @source:misc/xtom3d.cpp
-xtom3d                          //
+pumpit1                         // (c) 1999 Andamiro
+pumpitup                        // (c) 1999 Andamiro
+xtom3d                          // (c) 1999 Andamiro
 
 @source:upl/xxmissio.cpp
 xxmissio                        // UPL-86001 [1986]
