@@ -1336,7 +1336,7 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 				if (paletteEntry != 0)
 				{
 					// The color out of the texture
-					rgb_t color = m_state.m_palette->pen(renderData.palOffset + paletteEntry);
+					rgb_t color = m_state.m_palette->pen((renderData.palOffset + paletteEntry) & 0xfff);
 
 					// Apply the lighting
 					float rIntensity = rCorrect / 255.0f;
