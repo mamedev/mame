@@ -36,6 +36,8 @@ protected:
 
 	void bank_w(u8 data);
 
+	static inline constexpr unsigned PAGE_SIZE = 0x4000;
+
 	memory_bank_creator m_rombank;
 	u16 m_bank_address;
 };
@@ -72,7 +74,7 @@ image_init_result msx_cart_msxdos2_base_device::initialize_cartridge(std::string
 		return image_init_result::FAIL;
 	}
 
-	m_rombank->configure_entries(0, 4, cart_rom_region()->base(), 0x4000);
+	m_rombank->configure_entries(0, 4, cart_rom_region()->base(), PAGE_SIZE);
 
 	return image_init_result::PASS;
 }
@@ -95,6 +97,7 @@ public:
 		, m_view_page2(*this, "view_page2")
 		, m_view_page3(*this, "view_page3")
 		, m_secondary_slot(0)
+		, m_bank_mask(0)
 	{ }
 
 	virtual image_init_result initialize_cartridge(std::string &message) override;
@@ -113,7 +116,7 @@ private:
 	memory_view m_view_page2;
 	memory_view m_view_page3;
 	u8 m_secondary_slot;
-	u16 m_nr_banks;
+	u8 m_bank_mask;
 };
 
 
@@ -130,9 +133,9 @@ image_init_result msx_cart_msxdos2j_device::initialize_cartridge(std::string &me
 		return result;
 
 	u32 ram_size = cart_ram_region() ? cart_ram_region()->bytes() : 0;
-	if (ram_size != 0 && ram_size != 0x20000 && ram_size != 0x40000)
+	if (ram_size > 256 * PAGE_SIZE || (ram_size & (PAGE_SIZE - 1)) != 0)
 	{
-		message = "msx_cart_msxdos2: Region 'ram' has unsupported size.";
+		message = "msx_cart_msxdos2: Region 'ram' size must be a multiple of 0x4000 and at most 0x400000.";
 		return image_init_result::FAIL;
 	}
 
@@ -161,9 +164,15 @@ image_init_result msx_cart_msxdos2j_device::initialize_cartridge(std::string &me
 	// On-cartridge memory mapper RAM
 	if (ram_size)
 	{
-		m_nr_banks = ram_size / 0x4000;
-		for (int i = 0; i < 4; i++)
-			m_rambank[i]->configure_entries(0, m_nr_banks, cart_ram_region()->base(), 0x4000);
+		m_bank_mask = device_generic_cart_interface::map_non_power_of_two(
+			unsigned(ram_size / PAGE_SIZE),
+			[this] (unsigned entry, unsigned page)
+			{
+				for (int i = 0; i < 4; i++)
+					m_rambank[i]->configure_entry(entry, cart_ram_region()->base() + PAGE_SIZE * page);
+			}
+		);
+
 		m_view_page0[1].install_readwrite_bank(0x0000, 0x3fff, m_rambank[0]);
 		m_view_page1[1].install_readwrite_bank(0x4000, 0x7fff, m_rambank[1]);
 		m_view_page2[1].install_readwrite_bank(0x8000, 0xbfff, m_rambank[2]);
@@ -195,7 +204,7 @@ void msx_cart_msxdos2j_device::secondary_slot_w(u8 data)
 template <int Bank>
 void msx_cart_msxdos2j_device::mm_bank_w(u8 data)
 {
-	m_rambank[Bank]->set_entry(data % m_nr_banks);
+	m_rambank[Bank]->set_entry(data & m_bank_mask);
 }
 
 
