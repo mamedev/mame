@@ -16,7 +16,8 @@ Hardware notes:
 - 3*1KB M58732S 2708 ROM, 4th socket is empty
 - 256 bytes RAM (2*M58722P 2111A)
 - 0.5KB DRAM (M58755S) for framebuffer
-- M58741P Color TV Interface, 64*64 1bpp video
+- M58741P Color TV Interface, 64*64 pixels (192 scanlines), chip supports 3bpp,
+  but this game only uses 1 bit per pixel
 - 7seg time counter (not software controlled)
 - beeper
 
@@ -31,6 +32,7 @@ TODO:
 - It's not known if the screen is color or B&W + overlay, but since the video
   chip is meant for a color tv, let's assume the green tint is from the screen
   itself. Photos of the home version also show a green tint.
+- Is Universal's "Computer R-3" a modified version of this game?
 
 *******************************************************************************/
 
@@ -203,7 +205,7 @@ void cothello_state::sound_w(u8 data)
 
 void cothello_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0bff).rom();
+	map(0x0000, 0x0fff).rom();
 	map(0x4000, 0x40ff).ram();
 	map(0x6000, 0x6000).r(FUNC(cothello_state::input_r));
 	map(0x8000, 0x8000).w(FUNC(cothello_state::sound_w));

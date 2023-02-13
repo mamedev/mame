@@ -45,6 +45,7 @@ apple/apple2.cpp
 apple/apple2e.cpp
 apple/apple2gs.cpp
 apple/apple3.cpp
+apple/imacg3.cpp
 apple/iphone2g.cpp
 apple/lisa.cpp
 apple/lwriter.cpp
@@ -59,6 +60,7 @@ apple/macprtb.cpp
 apple/macpwrbk030.cpp
 apple/macquadra700.cpp
 apple/newton.cpp
+apple/powermacg3.cpp
 apple/tk2000.cpp
 appliedconcepts/boris.cpp
 appliedconcepts/borisdpl.cpp

@@ -308,7 +308,9 @@ Input provider modules are part of the OS-dependent layer (OSD), and are
 not directly exposed to emulation and user interface code.  Input
 provider modules are responsible for detecting available host input
 devices, setting up input devices for the input manager, and providing
-callbacks to read the current state of input device items.
+callbacks to read the current state of input device items.  Input
+provider modules may also provide additional default input assignments
+suitable for host input devices that are present.
 
 The user is given a choice of input modules to use.  One input provider
 module is used for each of the four input device classes (keyboard,

@@ -119,14 +119,13 @@ void menu_input_toggles::handle(event const *ev)
 		bool invalidate = false;
 		switch (ev->iptkey)
 		{
-		case IPT_UI_SELECT: // toggle regular items, set multi-value items to default
+		case IPT_UI_SELECT: // toggle regular items, cycle multi-value items
 			if (field.settings().empty())
-			{
 				field.live().value ^= field.mask();
-				invalidate = true;
-				break;
-			}
-			[[fallthrough]];
+			else
+				field.select_next_setting();
+			invalidate = true;
+			break;
 
 		case IPT_UI_CLEAR: // set to default
 			if (field.defvalue() != field.live().value)

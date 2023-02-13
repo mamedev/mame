@@ -2191,5 +2191,5 @@ CONS( 1979, hccbaskb,  0,       0, hccbaskb,  hccbaskb,  hccbaskb_state,  empty_
 CONS( 1979, ttfball,   0,       0, ttfball,   ttfball,   ttfball_state,   empty_init, "Toytronic", "Football (Toytronic, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 CONS( 1979, ttfballa,  ttfball, 0, ttfballa,  ttfballa,  ttfballa_state,  empty_init, "Toytronic", "Football (Toytronic, set 2)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, uspbball,  0,       0, uspbball,  uspbball,  uspbball_state,  empty_init, "U.S. Games", "Programmable Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1981, us2pfball, 0,       0, us2pfball, us2pfball, us2pfball_state, empty_init, "U.S. Games", "Electronic 2-Player Football", MACHINE_SUPPORTS_SAVE )
+CONS( 1981, uspbball,  0,       0, uspbball,  uspbball,  uspbball_state,  empty_init, "U.S. Games Corporation", "Programmable Baseball", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1981, us2pfball, 0,       0, us2pfball, us2pfball, us2pfball_state, empty_init, "U.S. Games Corporation", "Electronic 2-Player Football", MACHINE_SUPPORTS_SAVE )

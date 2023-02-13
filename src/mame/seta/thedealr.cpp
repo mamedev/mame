@@ -270,7 +270,7 @@ static INPUT_PORTS_START( thedealr )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5   ) // HL5 (hold 5)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HALF   ) // 1/2 (half gamble)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW    ) PORT_NAME("Small") // SML (small)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1      ) PORT_NAME("Reset") // RST (reset)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Attendant Reset") // RST (reset: clears tilt condition)
 
 	PORT_START("IOX1")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED        )
@@ -296,7 +296,7 @@ static INPUT_PORTS_START( thedealr )
 
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE3 ) PORT_NAME("MSN?") // !MSN
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE4 ) PORT_NAME("Attendant Clear?") // !ACL (reset jackpots, only if there are no credits)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MEMORY_RESET ) // !ACL (attendant clear? reset jackpots, only if there are no credits)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // A.P (attendant payout? clears credits, port 0 = ef)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT          ) // TLT (tilt)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM       ) // HOV (hopper?)

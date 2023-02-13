@@ -149,7 +149,7 @@ static const rgb_t amstrad_palette[32] =
 	rgb_t(0x000, 0x060, 0x0ff),             /* sky blue */
 	rgb_t(0x060, 0x000, 0x060),             /* magenta */
 	rgb_t(0x060, 0x0ff, 0x060),             /* pastel green */
-	rgb_t(0x060, 0x0ff, 0x060),             /* lime */
+	rgb_t(0x060, 0x0ff, 0x000),             /* lime */
 	rgb_t(0x060, 0x0ff, 0x0ff),             /* pastel cyan */
 	rgb_t(0x060, 0x000, 0x000),             /* Red */
 	rgb_t(0x060, 0x000, 0x0ff),             /* mauve */

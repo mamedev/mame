@@ -8,7 +8,7 @@ Applied Concepts Great Game Machine (GGM), electronic board game computer.
 
 Hardware notes:
 - 6502A 2MHz, SYP6522 VIA
-- 2KB RAM(4*HM472114AP-2 or 1*M58725P), no ROM on main PCB
+- 2KB battery-backed RAM(4*HM472114AP-2 or 1*M58725P), no ROM on main PCB
 - 2*74164 shift register, 3*6118P VFD driver
 - 8-digit 14seg VFD panel (same one as in Speak & Spell)
 - 5*4 keypad(unlabeled by default), 1-bit sound
@@ -24,7 +24,7 @@ power cycle the machine (or MAME).
 
 Known chess cartridges (*denotes not dumped):
 - Chess/Boris 2.5 (aka Sargon 2.5)
-- *Gruenfeld Edition: Master Chess Openings
+- Gruenfeld Edition: Master Chess Openings
 - Morphy Edition: Master Chess
 - Capablanca Edition: Master Chess Endgame
 - Sandy Edition: Master Chess (German language version of Morphy)
@@ -36,12 +36,17 @@ visible on the module, though the German distributor Sandy Electronic sold them
 (and offered an upgrade service) as Gruenfeld-S and Capablanca-S.
 
 Other games:
-- *Odin Edition: Master Reversi
-- Las Vegas 21: Master Blackjack
 - *Borchek: Championship Checkers
+- Las Vegas 21: Master Blackjack
+- Odin Edition: Master Reversi
+
+There are supposedly 2 versions of Odin, one with 7 levels, and one with 8 levels
+(level 8 is a tournament level). Odin Encore is said to have 7 levels, but that
+can't be right, since the one in MAME was dumped from an Odin Encore. More likely,
+there are 2 revisions, used in both the standalone version and separate module.
 
 Advertised games, presumed they were never released: Backgammon, Lunar Lander,
-Wits End (Mastermind).
+WitsEnd (Mastermind).
 
 TODO:
 - confirm display AP segment, is it used anywhere?
@@ -194,7 +199,7 @@ void ggm_state::update_overlay()
 	static const u16 overlay_lut[16] =
 	{
 		// see input defs for which overlay number is which
-		0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+		0, 1, 1, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 	};
 
 	static const u16 fdigit_lut[][6] =
@@ -202,6 +207,7 @@ void ggm_state::update_overlay()
 		// button labels in same style as MAME digits
 		{ 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000 },
 		{ 0x01fe, 0x1bdc, 0x1bfe, 0x2408, 0x0cac, 0x383e },
+		{ 0x0000, 0x0000, 0x0000, 0x003f, 0x0000, 0x3fff },
 	};
 
 	for (int i = 0; i < 6; i++)
@@ -463,6 +469,36 @@ static INPUT_PORTS_START( overlay_lasvegas )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x04) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( overlay_odin )
+	PORT_MODIFY("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_S) PORT_NAME("Flips")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_A) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("A.1 / Black")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_B) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("B.2 / Erase")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("C.3 / White")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_D) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("D.4")
+
+	PORT_MODIFY("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_E) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("E.5")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_F) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("F.6")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_G) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("G.7")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_H) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("H.8")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_U) PORT_NAME("Audio")
+
+	PORT_MODIFY("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_Y) PORT_NAME("Play / -")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_W) PORT_NAME("B/W")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_K) PORT_NAME("Rank")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_T) PORT_NAME("Time")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CE")
+
+	PORT_MODIFY("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_I) PORT_NAME("Hint")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_X) PORT_NAME("Halt")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_R) PORT_NAME("Restore")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x05) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( ggm )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) OVERLAY(0x00) PORT_CODE(KEYCODE_X) PORT_NAME("Keypad 4-2")
@@ -496,6 +532,7 @@ static INPUT_PORTS_START( ggm )
 	PORT_INCLUDE( overlay_morphy )
 	PORT_INCLUDE( overlay_steinitz )
 	PORT_INCLUDE( overlay_lasvegas )
+	PORT_INCLUDE( overlay_odin )
 
 	PORT_START("IN.4")
 	PORT_CONFNAME( 0x01, 0x00, "Version" ) // factory-set
@@ -510,6 +547,7 @@ static INPUT_PORTS_START( ggm )
 	PORT_CONFSETTING(    0x01, "Boris 2.5" )
 	PORT_CONFSETTING(    0x04, "Las Vegas 21" )
 	PORT_CONFSETTING(    0x02, "Morphy" )
+	PORT_CONFSETTING(    0x05, "Odin" )
 	PORT_CONFSETTING(    0x03, "Steinitz" )
 
 	PORT_START("IN.6")

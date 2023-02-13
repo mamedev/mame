@@ -437,6 +437,18 @@ input_manager::~input_manager()
 
 
 //-------------------------------------------------
+//  class_enabled - return whether input device
+//  class is enabled
+//-------------------------------------------------
+
+bool input_manager::class_enabled(input_device_class devclass) const
+{
+	assert(devclass >= DEVICE_CLASS_FIRST_VALID && devclass <= DEVICE_CLASS_LAST_VALID);
+	return m_class[devclass]->enabled();
+}
+
+
+//-------------------------------------------------
 //  add_device - add a representation of a host
 //  input device
 //-------------------------------------------------
@@ -659,16 +671,22 @@ std::string input_manager::code_name(input_code code) const
 	}
 
 	// append item name - redundant with joystick switch left/right/up/down
-	if ((device_class != DEVICE_CLASS_JOYSTICK) || (code.item_class() == ITEM_CLASS_SWITCH))
+	bool const joydir =
+			(device_class == DEVICE_CLASS_JOYSTICK) &&
+			(code.item_class() == ITEM_CLASS_SWITCH) &&
+			(code.item_modifier() >= ITEM_MODIFIER_LEFT) &&
+			(code.item_modifier() <= ITEM_MODIFIER_DOWN);
+	if (joydir)
 	{
-		if ((code.item_modifier() < ITEM_MODIFIER_LEFT) || (code.item_modifier() > ITEM_MODIFIER_DOWN))
-			str.append(item->name());
+		str.append((*modifier_string_table)[code.item_modifier()]);
 	}
-
-	// append the modifier
-	char const *const modifier = (*modifier_string_table)[code.item_modifier()];
-	if (modifier && *modifier)
-		str.append(" ").append(modifier);
+	else
+	{
+		str.append(item->name());
+		char const *const modifier = (*modifier_string_table)[code.item_modifier()];
+		if (modifier && *modifier)
+			str.append(" ").append(modifier);
+	}
 
 	return str;
 }
@@ -969,7 +987,7 @@ s32 input_manager::seq_axis_value(const input_seq &seq, input_item_class &itemcl
 
 	// saturate mixed absolute values, report neutral type
 	if (ITEM_CLASS_ABSOLUTE == itemclass)
-		result = std::clamp(result, osd::INPUT_ABSOLUTE_MIN, osd::INPUT_ABSOLUTE_MAX);
+		result = std::clamp(result, osd::input_device::ABSOLUTE_MIN, osd::input_device::ABSOLUTE_MAX);
 	else if (ITEM_CLASS_INVALID == itemclass)
 		itemclass = itemclasszero;
 	return result;

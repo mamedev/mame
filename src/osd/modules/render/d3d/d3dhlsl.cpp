@@ -8,15 +8,18 @@
 
 // MAME headers
 #include "emu.h"
+
 #include "drivenum.h"
+#include "emuopts.h"
+#include "fileio.h"
+#include "main.h"
 #include "render.h"
 #include "rendlay.h"
 #include "rendutil.h"
-#include "emuopts.h"
-#include "fileio.h"
+#include "screen.h"
+
 #include "aviio.h"
 #include "png.h"
-#include "screen.h"
 
 // MAMEOS headers
 #include "winmain.h"

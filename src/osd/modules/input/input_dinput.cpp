@@ -323,6 +323,7 @@ void dinput_keyboard_device::configure(input_device &device)
 		// add the item to the device
 		device.add_item(
 				item_name(keynum, defname, nullptr),
+				strmakeupper(defname),
 				itemid,
 				generic_button_get_state<std::uint8_t>,
 				&m_keyboard.state[keynum]);
@@ -355,9 +356,9 @@ void dinput_mouse_device::poll()
 	if (poll_dinput(&m_mouse) == DI_OK)
 	{
 		// scale the axis data
-		m_mouse.lX *= INPUT_RELATIVE_PER_PIXEL;
-		m_mouse.lY *= INPUT_RELATIVE_PER_PIXEL;
-		m_mouse.lZ *= INPUT_RELATIVE_PER_PIXEL;
+		m_mouse.lX *= input_device::RELATIVE_PER_PIXEL;
+		m_mouse.lY *= input_device::RELATIVE_PER_PIXEL;
+		m_mouse.lZ *= input_device::RELATIVE_PER_PIXEL;
 	}
 }
 
@@ -374,6 +375,7 @@ void dinput_mouse_device::configure(input_device &device)
 		// add to the mouse device and optionally to the gun device as well
 		device.add_item(
 				item_name(offsetof(DIMOUSESTATE, lX) + axisnum * sizeof(LONG), default_axis_name[axisnum], nullptr),
+				std::string_view(),
 				input_item_id(ITEM_ID_XAXIS + axisnum),
 				generic_axis_get_state<LONG>,
 				&m_mouse.lX + axisnum);
@@ -387,6 +389,7 @@ void dinput_mouse_device::configure(input_device &device)
 		// add to the mouse device
 		device.add_item(
 				item_name(offset, default_button_name(butnum), nullptr),
+				std::string_view(),
 				input_item_id(ITEM_ID_BUTTON1 + butnum),
 				generic_button_get_state<BYTE>,
 				&m_mouse.rgbButtons[butnum]);
@@ -470,6 +473,7 @@ void dinput_joystick_device::configure(input_device &device)
 		// populate the item description as well
 		device.add_item(
 				item_name(offsetof(DIJOYSTATE2, lX) + axisnum * sizeof(LONG), default_axis_name[axisnum], nullptr),
+				std::string_view(),
 				input_item_id(ITEM_ID_XAXIS + axisnum),
 				generic_axis_get_state<LONG>,
 				&m_joystick.state.lX + axisnum);
@@ -483,6 +487,7 @@ void dinput_joystick_device::configure(input_device &device)
 		// left
 		device.add_item(
 				item_name(offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), "Left"),
+				std::string_view(),
 				input_item_id(povnum * 4 + ITEM_ID_HAT1LEFT),
 				&dinput_joystick_device::pov_get_state,
 				reinterpret_cast<void *>(uintptr_t(povnum * 4 + POVDIR_LEFT)));
@@ -490,6 +495,7 @@ void dinput_joystick_device::configure(input_device &device)
 		// right
 		device.add_item(
 				item_name(offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), "Right"),
+				std::string_view(),
 				input_item_id(povnum * 4 + ITEM_ID_HAT1RIGHT),
 				&dinput_joystick_device::pov_get_state,
 				reinterpret_cast<void *>(uintptr_t(povnum * 4 + POVDIR_RIGHT)));
@@ -497,6 +503,7 @@ void dinput_joystick_device::configure(input_device &device)
 		// up
 		device.add_item(
 				item_name(offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), "Up"),
+				std::string_view(),
 				input_item_id(povnum * 4 + ITEM_ID_HAT1UP),
 				&dinput_joystick_device::pov_get_state,
 				reinterpret_cast<void *>(uintptr_t(povnum * 4 + POVDIR_UP)));
@@ -504,6 +511,7 @@ void dinput_joystick_device::configure(input_device &device)
 		// down
 		device.add_item(
 				item_name(offsetof(DIJOYSTATE2, rgdwPOV) + povnum * sizeof(DWORD), default_pov_name(povnum), "Down"),
+				std::string_view(),
 				input_item_id(povnum * 4 + ITEM_ID_HAT1DOWN),
 				&dinput_joystick_device::pov_get_state,
 				reinterpret_cast<void *>(uintptr_t(povnum * 4 + POVDIR_DOWN)));
@@ -524,6 +532,7 @@ void dinput_joystick_device::configure(input_device &device)
 
 		device.add_item(
 				item_name(offset, default_button_name(butnum), nullptr),
+				std::string_view(),
 				itemid,
 				generic_button_get_state<BYTE>,
 				&m_joystick.state.rgbButtons[butnum]);

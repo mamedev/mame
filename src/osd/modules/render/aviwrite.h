@@ -11,8 +11,6 @@
 
 #pragma once
 
-#include "eminline.h" // attotime.h needs this - add it to attotime.h on the next emu.h update
-
 // emu
 #include "attotime.h"
 

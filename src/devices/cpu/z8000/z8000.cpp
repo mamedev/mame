@@ -252,7 +252,7 @@ uint16_t z8002_device::RDPORT_W(int mode, uint16_t addr)
 {
 	memory_access<16, 1, 0, ENDIANNESS_BIG>::specific &space = (mode == 0) ? m_io : m_sio;
 	if (BIT(addr, 0))
-		return swapendian_int16(space.read_word(addr & ~1, 0x00ff));
+		return swapendian_int16(space.read_word(addr & ~1, 0xffff));
 	else
 		return space.read_word(addr);
 }
@@ -268,7 +268,7 @@ void z8002_device::WRPORT_W(int mode, uint16_t addr, uint16_t value)
 {
 	memory_access<16, 1, 0, ENDIANNESS_BIG>::specific &space = (mode == 0) ? m_io : m_sio;
 	if (BIT(addr, 0))
-		space.write_word(addr & ~1, swapendian_int16(value), 0x00ff);
+		space.write_word(addr & ~1, swapendian_int16(value), 0xffff);
 	else
 		space.write_word(addr, value, 0xffff);
 }

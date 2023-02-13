@@ -802,6 +802,9 @@ apple2gsmt                      // 1991 "Mark Twain" prototype
 @source:apple/apple3.cpp
 apple3                          // May 1980 Apple ///
 
+@source:apple/imacg3.cpp
+imac                            // August 15, 1998 Apple iMac (Bondi blue)
+
 @source:apple/iphone2g.cpp
 iphone2g                        // (c) 2007 Apple
 
@@ -886,6 +889,9 @@ mp130
 emate
 mp2000
 mp2100
+
+@source:apple/powermacg3.cpp
+pwrmacg3                        // November 10, 1997 Apple Power Macintosh G3 (beige)
 
 @source:apple/superga2.cpp
 kuzmich
@@ -18228,6 +18234,7 @@ mshuttle2                       // (c) 1981 Nichibutsu
 mshuttlea                       // (c) 1981 Nichibutsu
 mshuttlej                       // (c) 1981 Nichibutsu
 mshuttlej2                      // (c) 1981 Nichibutsu
+mutacion                        // bootleg (Explomatic)
 namenayo                        // (c) 1982 Cat's
 ncentury                        // bootleg (Petaco S.A.)
 offensiv                        // bootleg (Video Dens)
@@ -29547,6 +29554,7 @@ amuse1                          // (c) 1982 Greyhound Electronics
 amuse1a                         // (c) 1983 Greyhound Electronics
 bigjoke                         // (c) 1987 Greyhound Electronics
 findout                         // (c) 1987 [Elettronolo]
+findouta                        // (c) 1989 [Elettronolo]
 geimulti                        // (c) 1992 Grayhound Electronics
 gepoker                         // (c) 1984 Greyhound Electronics
 gepoker1                        // (c) 1984 Greyhound Electronics
@@ -30695,7 +30703,8 @@ onetwo                          // (c) 1997 Barko
 onetwoe                         // (c) 1997 Barko
 
 @source:misc/opercoin.cpp
-multibaby                       // (c) 1990 oper Coin
+multibaby                       // (c) 1990 Oper Coin
+spirulo                         // (c) 19?? Oper Coin
 
 @source:misc/othello.cpp
 othello                         // (c) 1984 Success.
@@ -31490,6 +31499,7 @@ usg182                          // (c) 1989
 usg185                          // (c) 1990
 usg187c                         // (c) 1991
 usg211c                         // (c) 1991
+usg251                          // (c) 1991
 usg32                           // (c) 1987
 usg82                           // (c) 1988
 usg83x                          // (c) 1988
@@ -32456,14 +32466,14 @@ pacapp                          // 1998.12 Paca Paca Passion (Japan, PPP1/VER.A2
 pacapp2                         // 1999.07 Paca Paca Passion 2 (Japan, PKS1/VER.A)
 pacappsp                        // 1999.12 Paca Paca Passion Special (Japan, PSP1/VER.A)
 ptblank2                        // 1999.?? Point Blank 2 (GNB5/VER.A)
-soulclbr                        // 1998.?? Soul Calibur (World, SOC14/VER.C)
-soulclbraa                      // 1998.?? Soul Calibur (Asia, SOC12/VER.A2)
+soulclbr                        // 1998.?? Soul Calibur (Asia, SOC14/VER.C)
+soulclbra                       // 1998.?? Soul Calibur (World, SOC12/VER.A2)
+soulclbrab                      // 1998.?? Soul Calibur (Asia, SOC14/VER.B)
 soulclbrja                      // 1998.?? Soul Calibur (Japan, SOC11/VER.A2)
 soulclbrjb                      // 1998.?? Soul Calibur (Japan, SOC11/VER.B)
 soulclbrjc                      // 1998.07 Soul Calibur (Japan, SOC11/VER.C)
 soulclbrub                      // 1998.?? Soul Calibur (US, SOC13/VER.B)
 soulclbruc                      // 1998.?? Soul Calibur (US, SOC13/VER.C)
-soulclbrwb                      // 1998.?? Soul Calibur (World, SOC14/VER.B)
 sws2000                         // 2000.03 Super World Stadium 2000 (Japan, SS01/VER.A)
 sws2001                         // 2001.04 Super World Stadium 2001 (Japan, SS11/VER.A)
 sws98                           // 1998.06 Super World Stadium '98 (Japan, SS81/VER.A)
@@ -34504,6 +34514,7 @@ mspacmanbcc                     // bootleg
 mspacmanbco                     // bootleg
 mspacmanbg                      // bootleg
 mspacmanbg2                     // bootleg
+mspacmanbgc                     // bootleg
 mspacmanbgd                     // bootleg
 mspacmanbhe                     // bootleg
 mspacmanbi                      // bootleg

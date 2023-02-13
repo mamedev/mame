@@ -25,8 +25,8 @@
 #include <string_view>
 #include <utility>
 
-#include <dinput.h>
 #include <windows.h>
+#include <dinput.h>
 #include <wrl/client.h>
 
 

@@ -1359,6 +1359,7 @@ protected:
 	inline void x87_set_stack_overflow();
 	int x87_inc_stack();
 	int x87_dec_stack();
+	int x87_ck_over_stack();
 	int x87_check_exceptions(bool store = false);
 	int x87_mf_fault();
 	inline void x87_write_cw(uint16_t cw);

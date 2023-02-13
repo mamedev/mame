@@ -944,10 +944,13 @@ void macquadra_state::macqd700(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi1:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:2", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:3", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi1:4", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi1:4", mac_scsi_devices, "cdrom");
 	NSCSI_CONNECTOR(config, "scsi1:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:6", mac_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi1:7").option_set("ncr5394", NCR53CF94).clock(50_MHz_XTAL / 2).machine_config(
+	// HACK: Max clock for 5394/96 is 25 MHz, but we underrun the FIFO at that speed.
+	// Likely due to inaccurate 68040 and/or NSCSI bus timings; DAFB documentation is clear that there is
+	// no "magic latch" like the 5380 machines use.
+	NSCSI_CONNECTOR(config, "scsi1:7").option_set("ncr5394", NCR53CF94).clock(50_MHz_XTAL).machine_config(
 		[this] (device_t *device)
 		{
 			ncr53cf94_device &adapter = downcast<ncr53cf94_device &>(*device);
@@ -1008,6 +1011,7 @@ void macquadra_state::macqd700(machine_config &config)
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("8M,16M,32M,64M,68M,72M,80M,96M,128M");
 
+	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 }
