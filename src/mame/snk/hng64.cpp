@@ -2141,7 +2141,10 @@ TIMER_CALLBACK_MEMBER(hng64_state::comhack_callback)
 {
 	LOG("comhack_callback %04x\n\n", m_comhack[0]);
 
-	m_comhack[0] = m_comhack[0] | 0x0002;
+	// different network IDs give different default colours for the cars in roadedge
+	uint8_t network_id = 0x01;
+
+	m_comhack[0] = m_comhack[0] | network_id;
 }
 
 
