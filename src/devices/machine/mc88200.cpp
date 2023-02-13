@@ -204,15 +204,12 @@ void mc88200_device::device_start()
 	save_pointer(STRUCT_MEMBER(m_cache, status), CACHE_SETS);
 	// TODO: save state for cache lines
 
-	m_idr = TYPE_MC88200;
+	m_idr = m_id | TYPE_MC88200;
+	m_mbus->install_device(0xfff00000U | ((m_idr & IDR_ID) >> 12), 0xfff00fffU | ((m_idr & IDR_ID) >> 12), *this, &mc88200_device::map);
 }
 
 void mc88200_device::device_reset()
 {
-	m_mbus->unmap_readwrite(0xfff00000U | ((m_idr & IDR_ID) >> 12), 0xfff00fffU | ((m_idr & IDR_ID) >> 12));
-
-	idr_w(m_id);
-
 	m_scr = 0;
 	m_ssr = 0;
 	m_sar = 0; // undefined
@@ -233,7 +230,7 @@ void mc88200_device::device_reset()
 
 	m_bus_error = false;
 
-	m_mbus->install_device(0xfff00000U | ((m_idr & IDR_ID) >> 12), 0xfff00fffU | ((m_idr & IDR_ID) >> 12), *this, &mc88200_device::map);
+	idr_w(m_id);
 }
 
 void mc88200_device::map(address_map &map)
@@ -264,14 +261,12 @@ void mc88200_device::map(address_map &map)
 
 void mc88200_device::idr_w(u32 data)
 {
-	LOG("idr_w 0x%08x (%s)\n", data, machine().describe_context());
-
 	if ((data ^ m_idr) & IDR_ID)
 	{
+		LOG("idr_w 0x%08x (%s)\n", data, machine().describe_context());
+
 		m_mbus->unmap_readwrite(0xfff00000U | ((m_idr & IDR_ID) >> 12), 0xfff00fffU | ((m_idr & IDR_ID) >> 12));
-
 		m_idr = (m_idr & ~IDR_ID) | (data & IDR_ID);
-
 		m_mbus->install_device(0xfff00000U | ((m_idr & IDR_ID) >> 12), 0xfff00fffU | ((m_idr & IDR_ID) >> 12), *this, &mc88200_device::map);
 	}
 }
