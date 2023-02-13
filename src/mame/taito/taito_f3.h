@@ -200,6 +200,10 @@ protected:
 		s16 clip0_r[256]{};
 		s16 clip1_l[256]{};
 		s16 clip1_r[256]{};
+		s16 clip2_l[256]{};
+		s16 clip2_r[256]{};
+		s16 clip3_l[256]{};
+		s16 clip3_r[256]{};
 	};
 
 	int m_game = 0;
