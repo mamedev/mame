@@ -320,6 +320,9 @@ if BASE_TARGETOS=="unix" then
 			local str = backtick(sdlconfigcmd() .. " --libs")
 			addlibfromstring(str)
 			addoptionsfromstring(str)
+			local str_cflags = backtick(sdlconfigcmd() .. " --cflags")
+			addincluderootfromstring(str_cflags, "/SDL2")
+			addcppoptionsfromstring(str_cflags)
 		end
 
 		if _OPTIONS["targetos"]~="haiku" and _OPTIONS["targetos"]~="android" then
