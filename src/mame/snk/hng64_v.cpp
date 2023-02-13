@@ -569,7 +569,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 		// floor mode
 		// life would be easier if the roz we're talking about for complex zoom wasn't setting this as well
 
-		// flogerror(stderr, "Tilemap %d is a floor using :\n", tm);
+		// logerror(stderr, "Tilemap %d is a floor using :\n", tm);
 		// const uint32_t floorAddress = 0x40000 + (scrollbase << 4);
 
 		// TODO: The row count is correct, but how is this layer clipped? m_tcram?
