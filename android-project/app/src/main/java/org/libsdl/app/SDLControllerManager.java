@@ -7,7 +7,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.os.Build;
-import android.os.VibrationEffect;
+//import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.InputDevice;
@@ -50,11 +50,11 @@ public class SDLControllerManager
         }
 
         if (mHapticHandler == null) {
-            if (Build.VERSION.SDK_INT >= 26) {
+            /*if (Build.VERSION.SDK_INT >= 26) {
                 mHapticHandler = new SDLHapticHandler_API26();
-            } else {
-                mHapticHandler = new SDLHapticHandler();
-            }
+            } else {*/
+			mHapticHandler = new SDLHapticHandler();
+            //}
         }
     }
 
@@ -404,6 +404,7 @@ class SDLJoystickHandler_API19 extends SDLJoystickHandler_API16 {
     }
 }
 
+/*
 class SDLHapticHandler_API26 extends SDLHapticHandler {
     @Override
     public void run(int device_id, float intensity, int length) {
@@ -435,7 +436,7 @@ class SDLHapticHandler_API26 extends SDLHapticHandler {
         }
     }
 }
-
+*/
 class SDLHapticHandler {
 
     static class SDLHaptic {
@@ -678,6 +679,7 @@ class SDLGenericMotionListener_API24 extends SDLGenericMotionListener_API12 {
     }
 }
 
+/*
 class SDLGenericMotionListener_API26 extends SDLGenericMotionListener_API24 {
     // Generic Motion (mouse hover, joystick...) events go here
     private boolean mRelativeModeEnabled;
@@ -786,3 +788,4 @@ class SDLGenericMotionListener_API26 extends SDLGenericMotionListener_API24 {
         return event.getY(0);
     }
 }
+*/

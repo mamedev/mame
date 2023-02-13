@@ -224,9 +224,10 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
 
     protected static SDLGenericMotionListener_API12 getMotionListener() {
         if (mMotionListener == null) {
-            if (Build.VERSION.SDK_INT >= 26) {
+            /*if (Build.VERSION.SDK_INT >= 26) {
                 mMotionListener = new SDLGenericMotionListener_API26();
-            } else if (Build.VERSION.SDK_INT >= 24) {
+            } else*/
+			if (Build.VERSION.SDK_INT >= 24) {
                 mMotionListener = new SDLGenericMotionListener_API24();
             } else {
                 mMotionListener = new SDLGenericMotionListener_API12();
