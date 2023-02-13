@@ -79,6 +79,7 @@
 # MESA_INSTALL_ROOT = /opt/mesa
 # SDL_INSTALL_ROOT = /opt/sdl2
 # SDL_FRAMEWORK_PATH = $(HOME)/Library/Frameworks
+# ANDROID_SDL_HOME = /opt/sdl2-android
 # USE_LIBSDL = 1
 # CYGWIN_BUILD = 1
 
@@ -816,6 +817,10 @@ ifdef SDL_INSTALL_ROOT
 PARAMS += --SDL_INSTALL_ROOT='$(SDL_INSTALL_ROOT)'
 endif
 
+ifdef ANDROID_SDL_HOME
+PARAMS += --ANDROID_SDL_HOME='$(ANDROID_SDL_HOME)'
+endif
+
 ifdef SDL_FRAMEWORK_PATH
 PARAMS += --SDL_FRAMEWORK_PATH='$(SDL_FRAMEWORK_PATH)'
 endif
@@ -1178,23 +1183,28 @@ endif
 
 .PHONY: android-ndk
 android-ndk:
-ifndef ANDROID_NDK_LLVM
-	$(error ANDROID_NDK_LLVM is not set)
+ifndef ANDROID_NDK_HOME
+	$(error ANDROID_NDK_HOME is not set)
 endif
-ifndef ANDROID_NDK_ROOT
-	$(error ANDROID_NDK_ROOT is not set)
+ifndef ANDROID_SDL_HOME
+	$(error ANDROID_SDL_HOME is not set)
 endif
-	$(eval CLANG_VERSION := $(shell $(ANDROID_NDK_LLVM)/bin/clang -dumpversion 2> /dev/null))
+ifeq ($(OS),windows)
+	$(eval CLANG_VERSION := $(shell $(ANDROID_NDK_HOME)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang -dumpversion 2> /dev/null))
+else ifeq ($(OS),linux)
+	$(eval CLANG_VERSION := $(shell $(ANDROID_NDK_HOME)/toolchains/llvm/prebuilt/linux-x86_64/bin/clang -dumpversion 2> /dev/null))
+else ifeq ($(OS),macosx)
+	$(eval CLANG_VERSION := $(shell $(ANDROID_NDK_HOME)/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang -dumpversion 2> /dev/null))
+else
+	$(error Unsupported Android build platform)
+endif
 
 #-------------------------------------------------
 # android-arm
 #-------------------------------------------------
 
 $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef ANDROID_NDK_ARM
-	$(error ANDROID_NDK_ARM is not set)
-endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=arm --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --USE_TAPTUN=0 --USE_PCAP=0 --NOASM=1 $(MAKETYPE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=arm --NOASM=1 $(MAKETYPE)
 
 .PHONY: android-arm
 android-arm: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm/Makefile
@@ -1206,10 +1216,7 @@ android-arm: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm/Make
 #-------------------------------------------------
 
 $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef ANDROID_NDK_ARM64
-	$(error ANDROID_NDK_ARM64 is not set)
-endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm64 --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=arm64 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --USE_TAPTUN=0 --USE_PCAP=0 --NOASM=1 $(MAKETYPE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-arm64 --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=arm64 --NOASM=1 $(MAKETYPE)
 
 .PHONY: android-arm64
 android-arm64: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64/Makefile
@@ -1221,10 +1228,7 @@ android-arm64: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-arm64/
 #-------------------------------------------------
 
 $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x86/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef ANDROID_NDK_X86
-	$(error ANDROID_NDK_X86 is not set)
-endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=x86 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --USE_TAPTUN=0 --USE_PCAP=0 $(MAKETYPE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x86 --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=x86 $(MAKETYPE)
 
 .PHONY: android-x86
 android-x86: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x86/Makefile
@@ -1236,10 +1240,7 @@ android-x86: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x86/Make
 #-------------------------------------------------
 
 $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x64/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef ANDROID_NDK_X64
-	$(error ANDROID_NDK_X64 is not set)
-endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x64 --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=x64 --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_X11=1 --USE_TAPTUN=0 --USE_PCAP=0 $(MAKETYPE)
+	$(SILENT) $(GENIE) $(PARAMS) --gcc=android-x64 --gcc_version=$(CLANG_VERSION) --osd=sdl --targetos=android --PLATFORM=x64 $(MAKETYPE)
 
 .PHONY: android-x64
 android-x64: android-ndk generate $(PROJECTDIR_SDL)/$(MAKETYPE)-android-x64/Makefile

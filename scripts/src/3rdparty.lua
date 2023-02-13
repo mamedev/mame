@@ -750,6 +750,11 @@ if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") and str_to_ver
 		}
 end
 
+	configuration { "android-*" }
+		buildoptions {
+			"-Wno-misleading-indentation",
+		}
+
 	configuration { "asmjs" }
 		buildoptions {
 			"-Wno-misleading-indentation",

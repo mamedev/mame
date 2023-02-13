@@ -1218,23 +1218,10 @@ configuration { "asmjs" }
 
 configuration { "android*" }
 	buildoptions {
-		"-Wno-undef",
-		"-Wno-typedef-redefinition",
-		"-Wno-unknown-warning-option",
-		"-Wno-incompatible-ms-struct",
-	}
-	buildoptions_cpp {
-		"-std=c++17",
-		"-Wno-extern-c-compat",
-		"-Wno-tautological-constant-out-of-range-compare",
-		"-Wno-tautological-pointer-compare",
+		"-Wno-undef", -- in ASIO
+		"-Wno-macro-redefined", -- PAGE_SIZE,PAGE_MASK in fairlight/cmi.cpp
 	}
 	archivesplit_size "20"
-
-configuration { "android-arm64" }
-	buildoptions {
-		"-Wno-asm-operand-widths",
-	}
 
 configuration { "linux-*" }
 		links {

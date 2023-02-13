@@ -151,6 +151,10 @@ elseif _OPTIONS["targetos"]=="freebsd" then
 		-- /usr/local/include is not considered a system include director on FreeBSD.  GL.h resides there and throws warnings
 		"-isystem /usr/local/include",
 	}
+elseif _OPTIONS["targetos"]=="android" then
+	includedirs {
+		_OPTIONS["ANDROID_SDL_HOME"] .. "/inc",
+	}
 end
 
 configuration { "osx*" }

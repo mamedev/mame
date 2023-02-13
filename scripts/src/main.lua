@@ -77,25 +77,33 @@ end
 
 	if _OPTIONS["targetos"]=="android" then
 		includedirs {
-			MAME_DIR .. "3rdparty/SDL2/include",
+			_OPTIONS["ANDROID_SDL_HOME"] .. "/inc",
 		}
-
+		
 		files {
-			MAME_DIR .. "3rdparty/SDL2/src/main/android/SDL_android_main.c",
+			MAME_DIR .. "src/osd/sdl/sdlmain.cpp",
 		}
 		targetsuffix ""
 		if _OPTIONS["SEPARATE_BIN"]~="1" then
 			if _OPTIONS["PLATFORM"]=="arm" then
 				targetdir(MAME_DIR .. "android-project/app/src/main/libs/armeabi-v7a")
+				os.copyfile(_OPTIONS["ANDROID_SDL_HOME"] .. "/libs/armeabi-v7a/libSDL2.so", MAME_DIR .. "android-project/app/src/main/libs/armeabi-v7a/libSDL2.so")
+				os.copyfile(androidToolchainRoot() .. "/sysroot/usr/lib/arm-linux-androideabi/libc++_shared.so", MAME_DIR .. "android-project/app/src/main/libs/armeabi-v7a/libc++_shared.so")
 			end
 			if _OPTIONS["PLATFORM"]=="arm64" then
 				targetdir(MAME_DIR .. "android-project/app/src/main/libs/arm64-v8a")
+				os.copyfile(_OPTIONS["ANDROID_SDL_HOME"] .. "/libs/arm64-v8a/libSDL2.so", MAME_DIR .. "android-project/app/src/main/libs/arm64-v8a/libSDL2.so")
+				os.copyfile(androidToolchainRoot() .. "/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so", MAME_DIR .. "android-project/app/src/main/libs/arm64-v8a/libc++_shared.so")
 			end
 			if _OPTIONS["PLATFORM"]=="x86" then
 				targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86")
+				os.copyfile(_OPTIONS["ANDROID_SDL_HOME"] .. "/libs/x86/libSDL2.so", MAME_DIR .. "android-project/app/src/main/libs/x86/libSDL2.so")
+				os.copyfile(androidToolchainRoot() .. "/sysroot/usr/lib/i686-linux-android/libc++_shared.so", MAME_DIR .. "android-project/app/src/main/libs/x86/libc++_shared.so")
 			end
 			if _OPTIONS["PLATFORM"]=="x64" then
 				targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86_64")
+				os.copyfile(_OPTIONS["ANDROID_SDL_HOME"] .. "/libs/x86_64/libSDL2.so", MAME_DIR .. "android-project/app/src/main/libs/x86_64/libSDL2.so")
+				os.copyfile(androidToolchainRoot() .. "/sysroot/usr/lib/x86_64-linux-android/libc++_shared.so", MAME_DIR .. "android-project/app/src/main/libs/x86_64/libc++_shared.so")
 			end
 		end
 	else

@@ -134,7 +134,7 @@ newoption {
 }
 
 if not _OPTIONS["NO_X11"] then
-	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"]=="asmjs" then
+	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"]=="asmjs" or _OPTIONS["targetos"]=="android" then
 		_OPTIONS["NO_X11"] = "1"
 	else
 		_OPTIONS["NO_X11"] = "0"
@@ -151,7 +151,7 @@ newoption {
 }
 
 if not _OPTIONS["NO_USE_XINPUT"] then
-	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"]=="asmjs" then
+	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="haiku" or _OPTIONS["targetos"]=="asmjs" or _OPTIONS["targetos"]=="android" then
 		_OPTIONS["NO_USE_XINPUT"] = "1"
 	else
 		_OPTIONS["NO_USE_XINPUT"] = "0"
@@ -199,6 +199,11 @@ if not _OPTIONS["SDL_FRAMEWORK_PATH"] then
 end
 
 newoption {
+	trigger = "ANDROID_SDL_HOME",
+	description = "Location of prebuilt SDL2 source tree for Android",
+}
+
+newoption {
 	trigger = "USE_LIBSDL",
 	description = "Use SDL library on OS (rather than framework/dll)",
 	allowed = {
@@ -226,6 +231,20 @@ elseif _OPTIONS["targetos"]=="macosx" then
 	SDLOS_TARGETOS      = "macosx"
 end
 
+if _OPTIONS["targetos"]=="android" then
+	if _OPTIONS["PLATFORM"]=="arm" then
+		libdirs { _OPTIONS["ANDROID_SDL_HOME"] .. "/libs/armeabi-v7a" }
+	end
+	if _OPTIONS["PLATFORM"]=="arm64" then
+		libdirs { _OPTIONS["ANDROID_SDL_HOME"] .. "/libs/arm64-v8a" }
+	end
+	if _OPTIONS["PLATFORM"]=="x86" then
+		libdirs { _OPTIONS["ANDROID_SDL_HOME"] .. "/libs/x86" }
+	end
+	if _OPTIONS["PLATFORM"]=="x64" then
+		libdirs { _OPTIONS["ANDROID_SDL_HOME"] .. "/libs/x86_64" }
+	end
+end
 if BASE_TARGETOS=="unix" then
 	if _OPTIONS["targetos"]=="macosx" then
 		local os_version = str_to_version(backtick("sw_vers -productVersion"))
@@ -267,9 +286,15 @@ if BASE_TARGETOS=="unix" then
 				"/usr/openwin/lib",
 			}
 		end
-		local str = backtick(sdlconfigcmd() .. " --libs")
-		addlibfromstring(str)
-		addoptionsfromstring(str)
+		if _OPTIONS["targetos"]=="android" then
+			links {
+				"SDL2",
+			}
+		else
+			local str = backtick(sdlconfigcmd() .. " --libs")
+			addlibfromstring(str)
+			addoptionsfromstring(str)
+		end
 
 		if _OPTIONS["targetos"]~="haiku" and _OPTIONS["targetos"]~="android" then
 			links {
@@ -381,7 +406,6 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/osdwindow.h",
 		MAME_DIR .. "src/osd/sdl/osdsdl.cpp",
 		MAME_DIR .. "src/osd/sdl/osdsdl.h",
-		MAME_DIR .. "src/osd/sdl/sdlmain.cpp",
 		MAME_DIR .. "src/osd/sdl/sdlopts.cpp",
 		MAME_DIR .. "src/osd/sdl/sdlopts.h",
 		MAME_DIR .. "src/osd/sdl/sdlprefix.h",
@@ -390,6 +414,11 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/sdl/window.h",
 	}
 
+	if _OPTIONS["targetos"]~="android" then
+		files {
+			MAME_DIR .. "src/osd/sdl/sdlmain.cpp",
+		}
+	end
 
 project ("ocore_" .. _OPTIONS["osd"])
 	targetsubdir(_OPTIONS["target"] .."_" .. _OPTIONS["subtarget"])
