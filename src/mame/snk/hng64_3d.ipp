@@ -109,7 +109,7 @@ void hng64_state::dl_control_w(uint32_t data)
 	*/
 
 	/*
-	printf("dl_control_w %08x %08x\n", data, mem_mask);
+	logerror("dl_control_w %08x %08x\n", data, mem_mask);
 
 	if(data & 2) // swap buffers
 	{
@@ -139,7 +139,7 @@ void hng64_state::printPacket(const uint16_t* packet, int hex)
 {
 	if (hex)
 	{
-		printf("Packet : %04x %04x  2:%04x %04x  4:%04x %04x  6:%04x %04x  8:%04x %04x  10:%04x %04x  12:%04x %04x  14:%04x %04x\n",
+		logerror("Packet : %04x %04x  2:%04x %04x  4:%04x %04x  6:%04x %04x  8:%04x %04x  10:%04x %04x  12:%04x %04x  14:%04x %04x\n",
 				packet[0],  packet[1],
 				packet[2],  packet[3],
 				packet[4],  packet[5],
@@ -151,7 +151,7 @@ void hng64_state::printPacket(const uint16_t* packet, int hex)
 	}
 	else
 	{
-		printf("Packet : %04x %3.4f  2:%3.4f %3.4f  4:%3.4f %3.4f  6:%3.4f %3.4f  8:%3.4f %3.4f  10:%3.4f %3.4f  12:%3.4f %3.4f  14:%3.4f %3.4f\n",
+		logerror("Packet : %04x %3.4f  2:%3.4f %3.4f  4:%3.4f %3.4f  6:%3.4f %3.4f  8:%3.4f %3.4f  10:%3.4f %3.4f  12:%3.4f %3.4f  14:%3.4f %3.4f\n",
 				packet[0],            uToF(packet[1] )*128,
 				uToF(packet[2] )*128, uToF(packet[3] )*128,
 				uToF(packet[4] )*128, uToF(packet[5] )*128,
@@ -231,8 +231,8 @@ void hng64_state::setLighting(const uint16_t* packet)
 	// [14] - ???? ... ? Used in fatfurwa
 	// [15] - ???? ... ? Used in fatfurwa
 	////////////*/
-	if (packet[1] != 0x0000) printf("ZOMG!  packet[1] in setLighting function is non-zero!\n");
-	if (packet[2] != 0x0000) printf("ZOMG!  packet[2] in setLighting function is non-zero!\n");
+	if (packet[1] != 0x0000) logerror("packet[1] in setLighting function is non-zero!\n");
+	if (packet[2] != 0x0000) logerror("packet[2] in setLighting function is non-zero!\n");
 
 	m_lightVector[0] = uToF(packet[3]);
 	m_lightVector[1] = uToF(packet[4]);
@@ -334,22 +334,14 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 	/*//////////////
 	// PACKET FORMAT
 	// [0]  - 0100 ... ID
-	// [1]  - ?--- ... Flags [?000 = ???
-	//                        0?00 = ???
-	//                        00?0 = ???
-	//                        000? = ???]
-	// [1]  - -?-- ... Flags [?000 = ???
-	//                        0?00 = ???
-	//                        00?0 = ???
-	//                        000x = Dynamic palette bit]
-	// [1]  - --?- ... Flags [?000 = ???
-	//                        0?00 = ???
-	//                        00?0 = ???
-	//                        000? = ???]
-	// [1]  - ---? ... Flags [x000 = Apply lighting bit
-	//                        0?00 = ???
-	//                        00?0 = ???
-	//                        000? = ???]
+	// [1]  - --c- ---p ---b l---
+	//      l = use lighting
+	//      p = use dynamic palette (maybe not just this, wrong for roadedge car select where it isn't set but needs to be)
+	//      b = backface culling?
+	//      c = set on objects a certain distance away (maybe optimization to disable clipping against camera?)
+	// none of these bits appear to be connected to texture size to solve the road/banner problem in xrally/roadedge
+	//
+	//
 	// [2]  - xxxx ... offset into ROM
 	// [3]  - xxxx ... offset into ROM
 	// [4]  - xxxx ... Transformation matrix
@@ -433,7 +425,11 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 
 	if (threeDOffset >= m_vertsrom_size)
 	{
-		printf("Strange geometry packet: (ignoring)\n");
+		// bbust2 quite often spams this invalid pointer
+		if ((packet[2] == 0x2347) && (packet[3] == 0x5056))
+			return;
+
+		logerror("Strange geometry packet: (ignoring)\n");
 		printPacket(packet, 1);
 		return;
 	}
@@ -456,11 +452,11 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 
 	address[2] = threeDPointer[3];
 	address[3] = threeDPointer[4];
-	if (threeDPointer[5] != 0x0000) printf("ZOMG!  3dPointer[5] is non-zero!\n");
+	if (threeDPointer[5] != 0x0000) logerror("3dPointer[5] is non-zero!\n");
 
 	size[0]    = threeDPointer[6];
 	size[1]    = threeDPointer[7];
-	if (threeDPointer[8] != 0x0000) printf("ZOMG!  3dPointer[8] is non-zero!\n");
+	if (threeDPointer[8] != 0x0000) logerror("3dPointer[8] is non-zero!\n");
 
 	size[2]    = threeDPointer[9];
 	size[3]    = threeDPointer[10];
@@ -469,13 +465,13 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 	//           ????         [13]; Used.
 	//           ????         [14]; Used.
 
-	if (threeDPointer[15] != 0x0000) printf("ZOMG!  3dPointer[15] is non-zero!\n");
-	if (threeDPointer[16] != 0x0000) printf("ZOMG!  3dPointer[16] is non-zero!\n");
-	if (threeDPointer[17] != 0x0000) printf("ZOMG!  3dPointer[17] is non-zero!\n");
+	if (threeDPointer[15] != 0x0000) logerror("3dPointer[15] is non-zero!\n");
+	if (threeDPointer[16] != 0x0000) logerror("3dPointer[16] is non-zero!\n");
+	if (threeDPointer[17] != 0x0000) logerror("3dPointer[17] is non-zero!\n");
 
-	if (threeDPointer[18] != 0x0000) printf("ZOMG!  3dPointer[18] is non-zero!\n");
-	if (threeDPointer[19] != 0x0000) printf("ZOMG!  3dPointer[19] is non-zero!\n");
-	if (threeDPointer[20] != 0x0000) printf("ZOMG!  3dPointer[20] is non-zero!\n");
+	if (threeDPointer[18] != 0x0000) logerror("3dPointer[18] is non-zero!\n");
+	if (threeDPointer[19] != 0x0000) logerror("3dPointer[19] is non-zero!\n");
+	if (threeDPointer[20] != 0x0000) logerror("3dPointer[20] is non-zero!\n");
 
 	// Concatenate the megaOffset with the addresses
 	address[0] |= (megaOffset << 16);
@@ -500,10 +496,17 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			////////////////////////////////////////////
 			// SINGLE POLY CHUNK FORMAT
 			// [0] 0000 0000 cccc cccc    0 = always 0 | c = chunk type / format of data that follows (see below)
-			// [1] t--4 pppp pppp ssss    t = texture, always on for most games, on for the backgrounds only on sams64
+			// [1] tu-4 pppp pppp ssss    t = texture, always on for most games, on for the backgrounds only on sams64
 			//                                if not set, u,v fields of vertices are direct palette indices, used on roadedge hng64 logo animation shadows
+			//                            u = unknown, set on sams64 / buriki at times, never on racing games
 			//                            4 = 4bpp texture  p = palette?  s = texture sheet (1024 x 1024 pages)
-			// [2] S?XX *--- -YY# ----    S = use 4x4 sub-texture pages?  ? = SNK logo roadedge / bbust2 / broken banners in xrally,  XX = horizontal subtexture  * = broken banners in xrally  YY = vertical subtexture  @ = broken banners in xrally
+			// [2] S?XX *uuu -YY# uuu-    S = use 4x4 sub-texture pages?
+			//                            ? = SNK logo roadedge / bbust2 / broken banners in xrally
+			//                            X = horizontal subtexture
+			//                            * = broken banners in xrally
+			//                            Y = vertical subtexture
+			//                            # = broken banners in xrally
+			//                            u = unknown, set late on 2nd race+3rd race in xrally
 
 			// we currently use one of the palette bits to enable a different palette mode.. seems hacky...
 			// looks like vertical / horizontal sub-pages might be 3 bits, not 2,  ? could be enable bit for that..
@@ -511,13 +514,12 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			// 'Welcome to South Africa' roadside banner on xrally | 000e 8c0d d870 or 0096 8c0d d870  (8c0d, d870 seems key 1000 1100 0000 1101
 			//                                                                                                               1101 1000 0111 0000 )
 
-
 			uint8_t chunkType = chunkOffset[0] & 0x00ff;
 
 			// Debug - ajg
 			if (chunkOffset[0] & 0xff00)
 			{
-				printf("Weird!  The top byte of the chunkType has a value %04x!\n", chunkOffset[0]);
+				logerror("Weird!  The top byte of the chunkType has a value %04x!\n", chunkOffset[0]);
 				continue;
 			}
 
@@ -529,7 +531,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			//currentPoly.debugColor = tdColor;
 
 			// Debug - ajg
-			//printf("%d (%08x) : %04x %04x %04x\n", k, address[k]*3*2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
+			//logerror("%d (%08x) : %04x %04x %04x\n", k, address[k]*3*2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
 			//break;
 
 			if (chunkOffset[1] & 0x1000) currentPoly.tex4bpp = 0x1;
@@ -588,7 +590,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			//  if (chunkOffset[2] == 0xd870)
 				{
 					currentPoly.debugColor = 0xffff0000;
-					printf("%d (%08x) : %04x %04x %04x\n", k, address[k] * 3 * 2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
+					logerror("%d (%08x) : %04x %04x %04x\n", k, address[k] * 3 * 2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
 				}
 			}
 #endif
@@ -606,6 +608,9 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			// ---- -x-- - 1 = Has per-vert UVs
 			// ---- --x- -
 			// ---- ---x - 1 = Has per-vert normals
+			//
+			// none of these seem directly connected to texture size to solve texturing problem in the racing games
+			// maybe some of the actual packet data is being used incorrectly?
 			/////////////////////////*/
 
 			// 33 word chunk, 3 vertices, per-vertex UVs & normals, per-face normal
@@ -753,21 +758,21 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 
 #if 0
 				// DEBUG
-				printf("0x?6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
+				logerror("0x?6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
 				for (int m = 0; m < 13; m++)
-					printf("%04x ", chunkOffset[m]);
-				printf("\n");
+					logerror("%04x ", chunkOffset[m]);
+				logerror("\n");
 
 				for (int m = 0; m < 13; m++)
-					printf("%3.4f ", uToF(chunkOffset[m]));
-				printf("\n\n");
+					logerror("%3.4f ", uToF(chunkOffset[m]));
+				logerror("\n\n");
 #endif
 
 				chunkLength = 12;
 				break;
 
 			default:
-				printf("UNKNOWN geometry CHUNK TYPE : %02x\n", chunkType);
+				logerror("UNKNOWN geometry CHUNK TYPE : %02x\n", chunkType);
 				chunkLength = 0;
 				break;
 			}
@@ -828,8 +833,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				}
 			}
 
-			// BACKFACE CULL
-			// roadedge has various one-way barriers that you can drive through, but need to be invisible from behind, so needs this culling
+
 			float cullRay[4];
 			float cullNorm[4];
 
@@ -840,11 +844,18 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			// Dot product that with the normal to see if you're negative...
 			vecmatmul4(cullNorm, m_modelViewMatrix, currentPoly.faceNormal);
 
-			const float backfaceCullResult = vecDotProduct(cullRay, cullNorm);
-			if (backfaceCullResult < 0.0f)
-				currentPoly.visible = true;
-			else
-				currentPoly.visible = false;
+			// BACKFACE CULL
+			// roadedge has various one-way barriers that you can drive through, but need to be invisible from behind, so needs this culling
+			// this bit IS set on the objects that roadedge needs to vanish if viewed from behind, but it is NOT set on the bbust2 school bus
+			// which needs to be visible with backfacing polys. further test cases need to be found.
+			if (packet[1] & 0x0010)
+			{
+				const float backfaceCullResult = vecDotProduct(cullRay, cullNorm);
+				if (backfaceCullResult < 0.0f)
+					currentPoly.visible = true;
+				else
+					currentPoly.visible = false;
+			}
 
 			// BEHIND-THE-CAMERA CULL //
 			vecmatmul4(cullRay, m_modelViewMatrix, currentPoly.vert[0].worldCoords);
@@ -944,7 +955,7 @@ bool hng64_state::hng64_command3d(const uint16_t* packet)
 {
 	int numPolys = 0;
 
-	//printf("packet type : %04x %04x|%04x %04x|%04x %04x|%04x %04x  | %04x %04x %04x %04x %04x %04x %04x %04x\n", packet[0],packet[1],packet[2],packet[3],packet[4],packet[5],packet[6],packet[7],     packet[8], packet[9], packet[10], packet[11], packet[12], packet[13], packet[14], packet[15]);
+	//logerror("packet type : %04x %04x|%04x %04x|%04x %04x|%04x %04x  | %04x %04x %04x %04x %04x %04x %04x %04x\n", packet[0],packet[1],packet[2],packet[3],packet[4],packet[5],packet[6],packet[7],     packet[8], packet[9], packet[10], packet[11], packet[12], packet[13], packet[14], packet[15]);
 
 	switch (packet[0])
 	{
@@ -971,12 +982,18 @@ bool hng64_state::hng64_command3d(const uint16_t* packet)
 		setCameraProjectionMatrix(packet);
 		break;
 
-	case 0x0100:
-	case 0x0101:    // Geometry with full transformations
+	case 0x0100:  // Geometry with full transformations
+		// xrally/roadedge cars (not track, that uses 102), buriki, fatfurwa
+		recoverPolygonBlock(packet, numPolys);
+		break;
+
+	case 0x0101: // Geometry with full transformations (same as 0x100?)
+		// sams64, sams64_2, bbust2
 		recoverPolygonBlock(packet, numPolys);
 		break;
 
 	case 0x0102:    // Geometry with only translation
+		// 'world' in roadedge/xrally (track, trackside objects etc.)
 		// Split the packet and call recoverPolygonBlock on each half.
 		uint16_t miniPacket[16];
 		memset(miniPacket, 0, sizeof(uint16_t)*16);
@@ -1010,7 +1027,7 @@ bool hng64_state::hng64_command3d(const uint16_t* packet)
 		break;
 
 	case 0x1000:    // Unknown: Some sort of global flags?
-		//printPacket(packet, 1); printf("\n");
+		//printPacket(packet, 1); logerror("\n");
 		break;
 
 	case 0x1001:    // Unknown: Some sort of global flags?  Almost always comes in a group of 4 with an index [0,3].
@@ -1018,7 +1035,7 @@ bool hng64_state::hng64_command3d(const uint16_t* packet)
 		break;
 
 	default:
-		printf("HNG64: Unknown 3d command %04x.\n", packet[0]);
+		logerror("HNG64: Unknown 3d command %04x.\n", packet[0]);
 		break;
 	}
 
@@ -1287,14 +1304,15 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 					textureT += (256.0f * (renderData.texPageHorizOffset>>1));
 					textureS += (256.0f * (renderData.texPageVertOffset>>1));
 				}
-				else if (renderData.texPageSmall == 3) // this can't be 128x128 textures, it is needed for the road etc. which is 256 wide, but also overhead objects which are 128
+				else if (renderData.texPageSmall == 3)
 				{
+					// this can't be 128x128 textures, it is needed for the road etc. in xrally which is 256 wide,
+					// but also overhead objects which are 128 (eg lamps, near top left hand side on 8bpp texture page 8)
 					textureT = fmod(textureT, 128.0f);
 					textureS = fmod(textureS, 128.0f);
 
 					textureT += (128.0f * (renderData.texPageHorizOffset >> 0));
 					textureS += (128.0f * (renderData.texPageVertOffset >> 0));
-
 				}
 #endif
 
