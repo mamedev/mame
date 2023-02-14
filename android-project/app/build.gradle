@@ -3,18 +3,17 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 24
 
-	defaultConfig {
+    defaultConfig {
         applicationId "org.mamedev.mame"
         minSdkVersion 24
         ndk {
             moduleName 'main'
         }
-
     }
 
-	lintOptions {
-		abortOnError false
-	}
+    lintOptions {
+        abortOnError false
+    }
 
     sourceSets.main {
         jni.srcDirs = []
@@ -29,26 +28,19 @@ android {
     }
 }
 
-task copyFiles_roms(type: Copy)
 task copyFiles_bgfx(type: Copy)
 task copyFiles_language(type: Copy)
 
-copyFiles_roms {
-	from '../../roms'
-	into 'src/main/assets/roms'
-	include('**/*')
-}
 copyFiles_bgfx {
     from '../../bgfx'
     into 'src/main/assets/bgfx'
     include('**/*')
 }
 copyFiles_language {
-	from '../../language'
-	into 'src/main/assets/language'
-	include('**/*')
+    from '../../language'
+    into 'src/main/assets/language'
+    include('**/*.mo')
 }
 
-preBuild.dependsOn copyFiles_roms
 preBuild.dependsOn copyFiles_bgfx
 preBuild.dependsOn copyFiles_language

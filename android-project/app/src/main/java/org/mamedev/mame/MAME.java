@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Miodrag Milanovic, Miso Kim
 package org.mamedev.mame;
 
 import java.io.*;
@@ -18,7 +20,6 @@ public class MAME extends SDLActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		copyAssetAll("roms");
 		copyAssetAll("bgfx");
 		copyAssetAll("language");
     }
