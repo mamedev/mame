@@ -46,10 +46,11 @@ Super Sensor IV:
 Known Super Sensor IV expansion ROMs:
 - Quartz Chess Clock (came with the clock accessory)
 
-Sensor Dynamic's ROM is identical to Super Sensor IV "1I", the hardware is
-basically a low-budget version of it with peripheral ports removed.
 Super Sensor IV triggers an NMI on power-off (or power-failure). If this isn't
 done, NVRAM fails at next power-on.
+
+Sensor Dynamic's ROM is identical to Super Sensor IV "1I", the hardware is
+basically a low-budget version of it with peripheral ports removed.
 
 Super Constellation:
 - UMC UM6502C @ 4 MHz (8MHz XTAL)
