@@ -4,10 +4,18 @@
 
     Skeleton driver for "PlayCenter" PC-based touch games
 
-    Hardware overview for "PlayCenter Champions Tournament":
-    Motherboard: EPoX EP-MVP4F
-    Unknown RAM size, AMD K6 processor (unknown speed)
-    PCI Ethernet card (unknown chipset)
+    "PlayCenter Champions Tournament":
+    The machine was sold with three different hardware configurations (internally named "Epox", 
+    "K6" and "Celeron"), having each one its own "official" recovery image (Norton Ghost images).
+      "Epox" version:
+         -EPoX EP-MVP4F motherboard (Socket 7 with VIA Apollo MVP4 AGP, built-in Trident AGP,
+          VT82C686A, built-in SoundBlaster Pro with AC'97 codec support).
+         -Unknown RAM size, AMD K6 processor (unknown speed).
+         -PCI Ethernet card (unknown chipset).
+      "K6" version:
+         -Unknown AMD K6 CPU based hardware.
+      "Celeron" version:
+         -Unknown Intel Celeron CPU based hardware.
 
     The security scheme is quite simple:
     Each minigame is a VisualBasic executable that receives three numbers when
@@ -23,14 +31,7 @@
     is unique for each single machine (and these hardware parts are not
     replaceble by the user / operator).
 
-Dump contains a raw image for a (c) 1998 Trident video card (C:\videorom.bin)
-The EPoX EP-MVP4F is a Socket 7 MB with VIA Apollo MVP4 AGP, built-in Trident AGP,
-VT82C686A, built-in SoundBlaster Pro with AC'97 codec support
-
-TODO:
-- HDD image doesn't boot in neither shutms11 nor pcipc. The dump contains a
-  Spanish windows partition (named "u") and no autoexec.bat / config.sys.
-  The CHD has -chs 3644,16,58 but WinImage reports back a ~4 GB partition.
+TODO (about the "Epox" version, the only one there's a BIOS dump for):
 - In pcipc it shows a '1' logo then on first boot it tries to install basically
   everything it can possibly install from scratch. Once done it tries to boot the
   main program but it either do one of the following things:
@@ -83,21 +84,46 @@ INPUT_PORTS_END
 
 void playcenter_state::playcenter(machine_config &config)
 {
-	PENTIUM(config, m_maincpu, 166'000'000); // Actually an AMD K6, frequency unknown
+	PENTIUM(config, m_maincpu, 166'000'000); // Actually an AMD K6 or an Intel Celeron, frequency unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &playcenter_state::mem_map);
 
 	PCI_ROOT(config, "pci", 0);
 	// ...
 }
 
+// 'Epox' version.
 ROM_START(plycntrchtr)
 	ROM_REGION32_LE(0x40000, "bios", 0) // Bios date: 03/13/2001
 	ROM_LOAD("vp4f1313.bin", 0x00000, 0x40000, CRC(bd4b155f) SHA1(3eafe71e89bf84b72a42e933187676fe08db0492))
 
 	DISK_REGION( "ide:0:hdd:image" )
-	DISK_IMAGE("playcenter_epox_9.3_tournament", 0, BAD_DUMP SHA1(64a88d4ab10d82ba0bd175511242ba6771cfc5ce))
+	DISK_IMAGE("playcenter_epox_9.3_tournament", 0, SHA1(93a73d32c5b12e1e34e691c6a96717b0da709eee)) // Dump contains a raw image for a (c) 1998 Trident video card (C:\videorom.bin)
+
+ROM_END
+
+/* 'K6' version.
+   Unknown AMD K6 based PC hardware. */
+ROM_START(plycntrchtk)
+	ROM_REGION32_LE(0x40000, "bios", 0)
+	ROM_LOAD("bios.bin", 0x00000, 0x40000, NO_DUMP)
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE("playcenter_k6_9.3_tournament", 0, SHA1(7e8935c45c52eb1e28cd3ea18f9f58f8262ffeb3))
+ROM_END
+
+/* 'Celeron' version.
+   Unknown Intel Celeron based PC hardware. */
+ROM_START(plycntrchtc)
+	ROM_REGION32_LE(0x40000, "bios", 0)
+	ROM_LOAD("bios.bin", 0x00000, 0x40000, NO_DUMP)
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE("playcenter_celeron_9.3_tournament", 0, SHA1(eb98f6af20a98d4bf6dc7311035431467ad56605))
 ROM_END
 
 } // Anonymous namespace
 
-GAME(2000, plycntrchtr, 0, playcenter, playcenter, playcenter_state, empty_init, ROT0, "Recreativos Presas / Undergaming", "PlayCenter Champions Tournament (v9.3)", MACHINE_IS_SKELETON)
+//   YEAR  NAME         PARENT       MACHINE     INPUT       CLASS             INIT        ROT   COMPANY                             FULLNAME                                                      FLAGS
+GAME(2000, plycntrchtr, 0,           playcenter, playcenter, playcenter_state, empty_init, ROT0, "Recreativos Presas / Undergaming", "PlayCenter Champions Tournament (v9.3, 'Epox' hardware)",    MACHINE_IS_SKELETON)
+GAME(2000, plycntrchtk, plycntrchtr, playcenter, playcenter, playcenter_state, empty_init, ROT0, "Recreativos Presas / Undergaming", "PlayCenter Champions Tournament (v9.3, 'K6' hardware)",      MACHINE_IS_SKELETON)
+GAME(2000, plycntrchtc, plycntrchtr, playcenter, playcenter, playcenter_state, empty_init, ROT0, "Recreativos Presas / Undergaming", "PlayCenter Champions Tournament (v9.3, 'Celeron' hardware)", MACHINE_IS_SKELETON)

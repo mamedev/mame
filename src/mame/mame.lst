@@ -30748,6 +30748,8 @@ pipeline                        // (c) 1990 Daehyun Electronics
 pkscram                         // (c) 1993 Cosmo Electronics Corporation
 
 @source:misc/playcenter.cpp
+plycntrchtc                     // (c) 2000 Recreativos Presas / Undergaming
+plycntrchtk                     // (c) 2000 Recreativos Presas / Undergaming
 plycntrchtr                     // (c) 2000 Recreativos Presas / Undergaming
 
 @source:misc/plsonic4.cpp
