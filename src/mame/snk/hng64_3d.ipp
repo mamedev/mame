@@ -944,12 +944,6 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 	}
 }
 
-// note 0x0102 packets are only 8 words, it appears they can be in either the upper or lower half of the 16 word packet.
-// We currently only draw 0x0102 packets where both halves contain 0x0102 (2 calls), but this causes graphics to vanish in
-// xrally because in some cases the 0x0102 packet only exists in the upper or lower half with another value (often 0x0000 - NOP) in the other.
-// If we also treat (0x0000 - NOP) as 8 word  instead of 16 so that we can access a 0x0102 in the 2nd half of the 16 word packet
-// then we end up with other invalid packets in the 2nd half which should be ignored.
-// This would suggest our processing if flawed in other ways, or there is something else to indicate packet length.
 
 bool hng64_state::hng64_command3d(const uint16_t* packet)
 {
@@ -959,9 +953,7 @@ bool hng64_state::hng64_command3d(const uint16_t* packet)
 
 	switch (packet[0])
 	{
-	case 0x0000:    // NOP?
-		 /* Appears to be a NOP (or 'end of list for this frame, ignore everything after' doesn't stop stray 3d objects in game for xrally/roadedge
-		    although does stop a partial hng64 logo being displayed assuming that's meant to be kept onscreen by some other means without valid data) */
+	case 0x0000:    // NOP? / End current list (doesn't stop additional lists being sent this frame)
 		return false;
 		break;
 
