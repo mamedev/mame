@@ -955,8 +955,6 @@ bool hng64_state::hng64_command3d(const uint16_t* packet)
 	{
 	case 0x0000:    // NOP? / End current list (doesn't stop additional lists being sent this frame)
 		return false;
-		break;
-
 
 	case 0x0001:    // Camera transformation.
 		setCameraTransformation(packet);
