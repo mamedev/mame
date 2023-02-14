@@ -1722,16 +1722,14 @@ static const gfx_layout hng64_16x16x8_spritelayout =
 static const uint32_t texlayout_xoffset[1024] = { STEP1024(0,8) };
 static const uint32_t texlayout_yoffset[1024] = { STEP1024(0,8192) };
 
-static uint32_t texlayout_xoffset_4[1024];
-static const uint32_t texlayout_yoffset_4[1024] = { STEP1024(0,4096) };
-
-void hng64_state::texlayout_xoffset_4_create()
+template <uint32_t... Values>
+static auto const &texlayout_xoffset_4(std::integer_sequence<uint32_t, Values...>)
 {
-	for (int i = 0; i < 1024; i++)
-	{
-		texlayout_xoffset_4[i] = (i * 4) ^ 4;
-	}
+	static constexpr uint32_t const s_values[sizeof...(Values)] = { ((Values * 4) ^ 4)... };
+	return s_values;
 }
+
+static const uint32_t texlayout_yoffset_4[1024] = { STEP1024(0,4096) };
 
 
 static const gfx_layout hng64_1024x1024x8_texlayout =
@@ -1756,7 +1754,7 @@ static const gfx_layout hng64_1024x1024x4_texlayout =
 	EXTENDED_XOFFS,
 	EXTENDED_YOFFS,
 	1024*1024*4,
-	texlayout_xoffset_4,
+	texlayout_xoffset_4(std::make_integer_sequence<uint32_t, 1024>()),
 	texlayout_yoffset_4
 };
 

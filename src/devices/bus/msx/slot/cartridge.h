@@ -6,7 +6,6 @@
 #pragma once
 
 #include "slot.h"
-#include "bus/generic/slot.h"
 #include "bus/msx/cart/cartridge.h"
 #include "imagedev/cartrom.h"
 

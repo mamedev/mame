@@ -166,7 +166,6 @@ public:
 		m_samsho64_3d_hack(0),
 		m_roadedge_3d_hack(0)
 	{
-		texlayout_xoffset_4_create();
 	}
 
 	void hng64(machine_config &config);
@@ -181,8 +180,6 @@ public:
 	void init_hng64_shoot();
 	void init_ss64();
 	void init_hng64_fght();
-
-	static void texlayout_xoffset_4_create();
 
 	uint8_t *m_texturerom = nullptr;
 	required_device<screen_device> m_screen;
