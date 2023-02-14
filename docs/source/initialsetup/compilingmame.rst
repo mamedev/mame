@@ -341,6 +341,59 @@ source tree (*cd* command) and follow the normal compilation instructions from
 above in All Platforms.
 
 
+.. _compiling-android:
+
+Android build
+-------------
+
+First, download and install Android NDK r25c or later by unpacking release 
+taken from the `android developer site <https://developer.android.com/ndk/downloads>`_.
+
+To be used, only enviroment variables need to be properly set, as in example:
+
+.. code-block:: bash
+
+    export PATH="$PATH:/opt/android-ndk"
+    export ANDROID_NDK=/opt/android-ndk
+    export ANDROID_NDK_HOME=/opt/android-ndk
+
+Since there is no precompiled SDL2 for Android we need to prepare that as well.
+First is to download latest from `SDL github <https://github.com/libsdl-org/SDL/releases/latest>`_.
+In time of writing version was SDL2-2.26.3, but later version should work fine as well.
+
+Next step is to build SDL2 with Android NDK and prepare include files in required form.
+
+.. code-block:: bash
+
+    tar xvfz SDL2-2.26.3.tar.gz
+    cd SDL2-2.26.3
+
+    ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=Android.mk APP_PLATFORM=android-24
+
+    mkdir -p inc/SDL2
+    cp include/*.h inc/SDL2/.
+
+After this all is ready for MAME to be built. Note that it can be built for android-arm, 
+android-arm64, android-x86 and android-x64. If you are testing with emulator you only need
+android-x86 build, but for real device nowdays android-arm64  will only be needed, and there
+are less and less android-arm.
+
+.. code-block:: bash
+
+    make SUBTARGET=tiny ANDROID_SDL_HOME=~/src/SDL2-2.26.3 android-x86 -j9
+ 
+This prepared binaries, but still we need to deploy application to device.
+Easiest way is to use `Android Studio <https://developer.android.com/studio>`_.
+
+All build features are also available using gradle, next set of commands will
+create debug build and deploy it on connected Android device.
+
+.. code-block:: bash
+
+    gradlew assembleDebug
+    gradlew installDebug
+
+
 .. _compiling-emscripten:
 
 Emscripten Javascript and HTML
