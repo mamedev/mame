@@ -2,7 +2,11 @@
 // copyright-holders:Wilbert Pol
 #include "emu.h"
 #include "ram.h"
+
 #include "bus/msx/slot/cartridge.h"
+
+#include "bus/generic/slot.h"
+
 
 /*
 Emulation of memory expansions for the MSX system.
@@ -147,7 +151,7 @@ protected:
 		return m_ram.get();
 	}
 
-	const u32 get_ram_size() const
+	u32 get_ram_size() const
 	{
 		return m_ram_size;
 	}
