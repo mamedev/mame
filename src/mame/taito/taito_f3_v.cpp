@@ -1566,7 +1566,7 @@ void taito_f3_state::calculate_clip(int y, u16 pri, u32 *clip0, u32 *clip1, int 
 	}
 	else
 	{
-		pri_reduced = 0x0300 | (pri & (1 << (5 + line_t->c0))) >> line_t->c0 \
+		pri_reduced = 0x0300 | (pri & (1 << (4 + line_t->c0))) >> line_t->c0 \
 			| (pri & (1 << (4 + line_t->c1))) >> (line_t->c1 - 1);
 	}
 
@@ -1720,7 +1720,7 @@ void taito_f3_state::get_spritealphaclip_info()
 
 			if (m_line_ram[0x100 + y] & 4) // 5000 control playfield 3
 				clip2_low = (m_line_ram[(clip_base_low + 0x400) / 2] >> 0) & 0xffff;
-			if (m_line_ram[0x000 + y] & 4) // ? 4000 control for combined clip high pf 3/4
+			if (m_line_ram[0x000 + y] & 8) // ? 4000 control for combined clip high pf 3/4
 				clip2_high = (m_line_ram[(clip_base_high + 0x200) / 2] >> 0) & 0xffff;
 			if (m_line_ram[0x100 + y] & 8) // 5000 control playfield 4
 				clip3_low = (m_line_ram[(clip_base_low + 0x600) / 2] >> 0) & 0xffff;
