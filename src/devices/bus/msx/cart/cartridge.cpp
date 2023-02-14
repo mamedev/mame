@@ -25,6 +25,7 @@
 #include "msx_audio.h"
 #include "msxdos2.h"
 #include "nomapper.h"
+#include "ram.h"
 #include "rtype.h"
 #include "softcard.h"
 #include "superloderunner.h"
@@ -37,6 +38,7 @@
 void msx_cart(device_slot_interface &device)
 {
 	msx_cart_disk_register_options(device);
+	msx_cart_ram_register_options(device);
 	device.option_add_internal("arc", MSX_CART_ARC);
 	device.option_add_internal("ascii8", MSX_CART_ASCII8);
 	device.option_add_internal("ascii8_sram", MSX_CART_ASCII8_SRAM);
