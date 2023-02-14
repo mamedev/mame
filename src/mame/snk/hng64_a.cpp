@@ -281,11 +281,11 @@ void hng64_state::sound_comms_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			/* correct? */
 			m_audiocpu->set_input_line(5, CLEAR_LINE);
 			//if(data)
-			//  printf("IRQ ACK %02x?\n",data);
+			//  logerror("IRQ ACK %02x?\n",data);
 			return;
 	}
 
-	//printf("SOUND W %02x %04x\n",offset*2,data);
+	//logerror("SOUND W %02x %04x\n",offset*2,data);
 }
 
 uint16_t hng64_state::sound_comms_r(offs_t offset)
@@ -297,7 +297,7 @@ uint16_t hng64_state::sound_comms_r(offs_t offset)
 		case 0x06:
 			return main_latch[1];
 	}
-	//printf("SOUND R %02x\n",offset*2);
+	//logerror("SOUND R %02x\n",offset*2);
 
 	return 0;
 }
@@ -375,7 +375,7 @@ WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
 	if(i > 7)
 		i = 7;
 
-	//printf("trigger %02x %d\n",i,state);
+	//logerror("trigger %02x %d\n",i,state);
 
 	//if(machine().input().code_pressed_once(KEYCODE_C))
 	{
