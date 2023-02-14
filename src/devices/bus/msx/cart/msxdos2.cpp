@@ -3,6 +3,9 @@
 #include "emu.h"
 #include "msxdos2.h"
 
+#include "bus/generic/slot.h"
+
+
 /*
 Emulation of MSX-DOS2 cartridges.
 
