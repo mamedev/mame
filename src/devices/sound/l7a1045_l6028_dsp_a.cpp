@@ -358,11 +358,11 @@ void l7a1045_sound_device::sound_status_w(uint16_t data)
 #if 0
 		if(vptr->start != 0)
 		{
-		logerror("%08x START\n",vptr->start);
-		logerror("%08x END\n",vptr->end);
+			logerror("%08x START\n",vptr->start);
+			logerror("%08x END\n",vptr->end);
 
-		for(int i=0;i<0x10;i++)
-			logerror("%02x (%02x) = %04x%04x%04x\n",m_audiochannel,i,m_audiodat[i][m_audiochannel].dat[2],m_audiodat[i][m_audiochannel].dat[1],m_audiodat[i][m_audiochannel].dat[0]);
+			for(int i=0;i<0x10;i++)
+				logerror("%02x (%02x) = %04x%04x%04x\n",m_audiochannel,i,m_audiodat[i][m_audiochannel].dat[2],m_audiodat[i][m_audiochannel].dat[1],m_audiodat[i][m_audiochannel].dat[0]);
 		}
 #endif
 
