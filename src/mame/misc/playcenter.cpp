@@ -103,7 +103,7 @@ ROM_END
 
 /* 'K6' version.
    Unknown AMD K6 based PC hardware. */
-ROM_START(plycntrchtk)
+ROM_START(plycntrchtrk)
 	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_LOAD("bios.bin", 0x00000, 0x40000, NO_DUMP)
 
@@ -113,7 +113,7 @@ ROM_END
 
 /* 'Celeron' version.
    Unknown Intel Celeron based PC hardware. */
-ROM_START(plycntrchtc)
+ROM_START(plycntrchtrc)
 	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_LOAD("bios.bin", 0x00000, 0x40000, NO_DUMP)
 
@@ -123,7 +123,7 @@ ROM_END
 
 } // Anonymous namespace
 
-//   YEAR  NAME         PARENT       MACHINE     INPUT       CLASS             INIT        ROT   COMPANY                             FULLNAME                                                      FLAGS
-GAME(2000, plycntrchtr, 0,           playcenter, playcenter, playcenter_state, empty_init, ROT0, "Recreativos Presas / Undergaming", "PlayCenter Champions Tournament (v9.3, 'Epox' hardware)",    MACHINE_IS_SKELETON)
-GAME(2000, plycntrchtk, plycntrchtr, playcenter, playcenter, playcenter_state, empty_init, ROT0, "Recreativos Presas / Undergaming", "PlayCenter Champions Tournament (v9.3, 'K6' hardware)",      MACHINE_IS_SKELETON)
-GAME(2000, plycntrchtc, plycntrchtr, playcenter, playcenter, playcenter_state, empty_init, ROT0, "Recreativos Presas / Undergaming", "PlayCenter Champions Tournament (v9.3, 'Celeron' hardware)", MACHINE_IS_SKELETON)
+//   YEAR  NAME          PARENT       MACHINE     INPUT       CLASS             INIT        ROT   COMPANY                             FULLNAME                                                      FLAGS
+GAME(2000, plycntrchtr,  0,           playcenter, playcenter, playcenter_state, empty_init, ROT0, "Recreativos Presas / Undergaming", "PlayCenter Champions Tournament (v9.3, 'Epox' hardware)",    MACHINE_IS_SKELETON)
+GAME(2000, plycntrchtrk, plycntrchtr, playcenter, playcenter, playcenter_state, empty_init, ROT0, "Recreativos Presas / Undergaming", "PlayCenter Champions Tournament (v9.3, 'K6' hardware)",      MACHINE_IS_SKELETON)
+GAME(2000, plycntrchtrc, plycntrchtr, playcenter, playcenter, playcenter_state, empty_init, ROT0, "Recreativos Presas / Undergaming", "PlayCenter Champions Tournament (v9.3, 'Celeron' hardware)", MACHINE_IS_SKELETON)
