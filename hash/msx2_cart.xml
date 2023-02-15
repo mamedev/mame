@@ -3173,13 +3173,13 @@ LZ93A13 (32 pin) - 8KB banks
 		<part name="flope" interface="floppy_3_5">
 			<feature name="part_id" value="English MSX-DOS2"/>
 			<dataarea name="flop" size="368640">
-				<rom name="mdos22de.dsk" size="368640" crc="9be0bfd1" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+				<rom name="mdos22de.dsk" size="368640" crc="9be0bfd1" sha1="22e88a2ec002f652ffb216bc6e257578ec08b501"/>
 			</dataarea>
 		</part>
 		<part name="flopj" interface="floppy_3_5">
 			<feature name="part_id" value="Japanese MSX-DOS2"/>
 			<dataarea name="flop" size="368640">
-				<rom name="mdos22dj.dsk" size="368640" crc="d9ef5567" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+				<rom name="mdos22dj.dsk" size="368640" crc="d9ef5567" sha1="92f151e4a2220d502f085256fe8091b01dba3327"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3201,13 +3201,13 @@ LZ93A13 (32 pin) - 8KB banks
 		<part name="flope" interface="floppy_3_5">
 			<feature name="part_id" value="English MSX-DOS2"/>
 			<dataarea name="flop" size="368640">
-				<rom name="mdos22de.dsk" size="368640" crc="9be0bfd1" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+				<rom name="mdos22de.dsk" size="368640" crc="9be0bfd1" sha1="22e88a2ec002f652ffb216bc6e257578ec08b501"/>
 			</dataarea>
 		</part>
 		<part name="flopj" interface="floppy_3_5">
 			<feature name="part_id" value="Japanese MSX-DOS2"/>
 			<dataarea name="flop" size="368640">
-				<rom name="mdos22dj.dsk" size="368640" crc="d9ef5567" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+				<rom name="mdos22dj.dsk" size="368640" crc="d9ef5567" sha1="92f151e4a2220d502f085256fe8091b01dba3327"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3229,13 +3229,13 @@ LZ93A13 (32 pin) - 8KB banks
 		<part name="flope" interface="floppy_3_5">
 			<feature name="part_id" value="English MSX-DOS2"/>
 			<dataarea name="flop" size="368640">
-				<rom name="mdos22de.dsk" size="368640" crc="9be0bfd1" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+				<rom name="mdos22de.dsk" size="368640" crc="9be0bfd1" sha1="22e88a2ec002f652ffb216bc6e257578ec08b501"/>
 			</dataarea>
 		</part>
 		<part name="flopj" interface="floppy_3_5">
 			<feature name="part_id" value="Japanese MSX-DOS2"/>
 			<dataarea name="flop" size="368640">
-				<rom name="mdos22dj.dsk" size="368640" crc="d9ef5567" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+				<rom name="mdos22dj.dsk" size="368640" crc="d9ef5567" sha1="92f151e4a2220d502f085256fe8091b01dba3327"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3258,13 +3258,13 @@ LZ93A13 (32 pin) - 8KB banks
 		<part name="flope" interface="floppy_3_5">
 			<feature name="part_id" value="English MSX-DOS2"/>
 			<dataarea name="flop" size="368640">
-				<rom name="mdos22de.dsk" size="368640" crc="9be0bfd1" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+				<rom name="mdos22de.dsk" size="368640" crc="9be0bfd1" sha1="22e88a2ec002f652ffb216bc6e257578ec08b501"/>
 			</dataarea>
 		</part>
 		<part name="flopj" interface="floppy_3_5">
 			<feature name="part_id" value="Japanese MSX-DOS2"/>
 			<dataarea name="flop" size="368640">
-				<rom name="mdos22dj.dsk" size="368640" crc="d9ef5567" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+				<rom name="mdos22dj.dsk" size="368640" crc="d9ef5567" sha1="92f151e4a2220d502f085256fe8091b01dba3327"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3285,13 +3285,13 @@ LZ93A13 (32 pin) - 8KB banks
 		<part name="flope" interface="floppy_3_5">
 			<feature name="part_id" value="English MSX-DOS2"/>
 			<dataarea name="flop" size="368640">
-				<rom name="mdos22de.dsk" size="368640" crc="9be0bfd1" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+				<rom name="mdos22de.dsk" size="368640" crc="9be0bfd1" sha1="22e88a2ec002f652ffb216bc6e257578ec08b501"/>
 			</dataarea>
 		</part>
 		<part name="flopj" interface="floppy_3_5">
 			<feature name="part_id" value="Japanese MSX-DOS2"/>
 			<dataarea name="flop" size="368640">
-				<rom name="mdos22dj.dsk" size="368640" crc="d9ef5567" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+				<rom name="mdos22dj.dsk" size="368640" crc="d9ef5567" sha1="92f151e4a2220d502f085256fe8091b01dba3327"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3310,7 +3310,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<part name="flope" interface="floppy_3_5">
 			<feature name="part_id" value="English MSX-DOS2"/>
 			<dataarea name="flop" size="368640">
-				<rom name="mdos22de.dsk" size="368640" crc="9be0bfd1" sha1="e29b70766f03a7f97082348d8ef3b410655c0612"/>
+				<rom name="mdos22de.dsk" size="368640" crc="9be0bfd1" sha1="22e88a2ec002f652ffb216bc6e257578ec08b501"/>
 			</dataarea>
 		</part>
 	</software>
