@@ -26796,9 +26796,6 @@ vortex                          // 852 [1980] Zilec Electronics Ltd.
 yosakdon                        // (c) 1979 Yosaku To Donbei
 yosakdona                       // (c) 1979 Yosaku To Donbei
 
-@source:midw8080/m79amb.cpp
-m79amb                          // (c) 1977 RamTek
-
 @source:midw8080/mw8080bw.cpp
 280zzzap                        // 610 [1976]
 blueshrk                        // 742 [1978]
@@ -37582,6 +37579,9 @@ hitme                           // (c) 05/1976 Ramtek
 hitme1                          // (c) 05/1976 Ramtek
 mirco21                         // (c) 08/1976 Mirco
 super21                         // (c) 1978 Mirco
+
+@source:ramtek/m79amb.cpp
+m79amb                          // (c) 1977 RamTek
 
 @source:ramtek/ramtek.cpp
 bballrmt                        // (c) 1974 Ramtek

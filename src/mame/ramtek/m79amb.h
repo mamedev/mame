@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Al Kossow
-#ifndef MAME_MIDW8080_M79AMB_H
-#define MAME_MIDW8080_M79AMB_H
+#ifndef MAME_RAMTEK_M79AMB_H
+#define MAME_RAMTEK_M79AMB_H
 
 #pragma once
 
@@ -11,8 +11,8 @@
 class m79amb_state : public driver_device
 {
 public:
-	m79amb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	m79amb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_mask(*this, "mask"),
 		m_discrete(*this, "discrete"),
@@ -24,6 +24,9 @@ public:
 
 	void init_m79amb();
 
+protected:
+	void machine_start() override;
+
 private:
 	void ramtek_videoram_w(offs_t offset, uint8_t data);
 	uint8_t gray5bit_controller0_r();
@@ -32,8 +35,6 @@ private:
 	void m79amb_8002_w(uint8_t data);
 	void m79amb_8003_w(uint8_t data);
 	uint8_t inta_r();
-
-	void machine_start() override;
 
 	uint32_t screen_update_ramtek(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map);
@@ -55,4 +56,4 @@ private:
 
 DISCRETE_SOUND_EXTERN( m79amb_discrete );
 
-#endif // MAME_MIDW8080_M79AMB_H
+#endif // MAME_RAMTEK_M79AMB_H
