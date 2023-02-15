@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_DGN_BETA_H
-#define MAME_INCLUDES_DGN_BETA_H
+#ifndef MAME_TRS_DGN_BETA_H
+#define MAME_TRS_DGN_BETA_H
 
 #pragma once
 
@@ -232,4 +232,4 @@ private:
 	void execute_beta_dat_log(const std::vector<std::string_view> &params);
 };
 
-#endif // MAME_INCLUDES_DGN_BETA_H
+#endif // MAME_TRS_DGN_BETA_H

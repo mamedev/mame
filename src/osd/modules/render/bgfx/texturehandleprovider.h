@@ -7,17 +7,17 @@
 //
 //============================================================
 
-#pragma once
+#ifndef MAME_RENDER_BGFX_TEXTUREHANDLEPROVIDER_H
+#define MAME_RENDER_BGFX_TEXTUREHANDLEPROVIDER_H
 
-#ifndef __DRAWBGFX_TEXTURE_HANDLE_PROVIDER__
-#define __DRAWBGFX_TEXTURE_HANDLE_PROVIDER__
+#pragma once
 
 #include <bgfx/bgfx.h>
 
 class bgfx_texture_handle_provider
 {
 public:
-	virtual ~bgfx_texture_handle_provider() { }
+	virtual ~bgfx_texture_handle_provider() = default;
 
 	// Getters
 	virtual bgfx::TextureHandle texture() const = 0;
@@ -30,4 +30,4 @@ public:
 	virtual int width_mul_factor() const = 0;
 };
 
-#endif // __DRAWBGFX_TEXTURE_HANDLE_PROVIDER__
+#endif // MAME_RENDER_BGFX_TEXTUREHANDLEPROVIDER_H

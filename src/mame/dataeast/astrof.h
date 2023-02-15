@@ -14,8 +14,8 @@
 class astrof_state : public driver_device
 {
 public:
-	astrof_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	astrof_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_astrof_color(*this, "astrof_color"),
 		m_tomahawk_protection(*this, "tomahawk_prot"),
@@ -23,7 +23,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_samples(*this, "samples"),
 		m_sn(*this, "snsnd"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen")
+	{ }
 
 	void init_afire();
 	void init_abattle();

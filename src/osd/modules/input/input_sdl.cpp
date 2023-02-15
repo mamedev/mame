@@ -623,6 +623,7 @@ public:
 
 			device.add_item(
 					defname,
+					std::string_view(),
 					itemid,
 					generic_button_get_state<s32>,
 					&m_keyboard.state[m_trans_table[keynum].sdl_scancode]);
@@ -676,21 +677,25 @@ public:
 		// add the axes
 		device.add_item(
 				"X",
+				std::string_view(),
 				ITEM_ID_XAXIS,
 				generic_axis_get_state<s32>,
 				&m_mouse.lX);
 		device.add_item(
 				"Y",
+				std::string_view(),
 				ITEM_ID_YAXIS,
 				generic_axis_get_state<s32>,
 				&m_mouse.lY);
 		device.add_item(
 				"Scroll V",
+				std::string_view(),
 				ITEM_ID_ZAXIS,
 				generic_axis_get_state<s32>,
 				&m_mouse.lV);
 		device.add_item(
 				"Scroll H",
+				std::string_view(),
 				ITEM_ID_RZAXIS,
 				generic_axis_get_state<s32>,
 				&m_mouse.lH);
@@ -702,6 +707,7 @@ public:
 			int const offset = button ^ (((1 == button) || (2 == button)) ? 3 : 0);
 			device.add_item(
 					default_button_name(button),
+					std::string_view(),
 					itemid,
 					generic_button_get_state<s32>,
 					&m_mouse.buttons[offset]);
@@ -713,8 +719,8 @@ public:
 		switch (event.type)
 		{
 		case SDL_MOUSEMOTION:
-			m_mouse.lX += event.motion.xrel * INPUT_RELATIVE_PER_PIXEL;
-			m_mouse.lY += event.motion.yrel * INPUT_RELATIVE_PER_PIXEL;
+			m_mouse.lX += event.motion.xrel * input_device::RELATIVE_PER_PIXEL;
+			m_mouse.lY += event.motion.yrel * input_device::RELATIVE_PER_PIXEL;
 			break;
 
 		case SDL_MOUSEBUTTONDOWN:
@@ -727,11 +733,11 @@ public:
 
 		case SDL_MOUSEWHEEL:
 #if SDL_VERSION_ATLEAST(2, 0, 18)
-			m_mouse.lV += event.wheel.preciseY * INPUT_RELATIVE_PER_PIXEL;
-			m_mouse.lH += event.wheel.preciseX * INPUT_RELATIVE_PER_PIXEL;
+			m_mouse.lV += event.wheel.preciseY * input_device::RELATIVE_PER_PIXEL;
+			m_mouse.lH += event.wheel.preciseX * input_device::RELATIVE_PER_PIXEL;
 #else
-			m_mouse.lV += event.wheel.y * INPUT_RELATIVE_PER_PIXEL;
-			m_mouse.lH += event.wheel.x * INPUT_RELATIVE_PER_PIXEL;
+			m_mouse.lV += event.wheel.y * input_device::RELATIVE_PER_PIXEL;
+			m_mouse.lH += event.wheel.x * input_device::RELATIVE_PER_PIXEL;
 #endif
 			break;
 		}
@@ -850,6 +856,7 @@ public:
 			snprintf(tempname, sizeof(tempname), "A%d", axis + 1);
 			device.add_item(
 					tempname,
+					std::string_view(),
 					itemid,
 					generic_axis_get_state<s32>,
 					&m_joystick.axes[axis]);
@@ -871,6 +878,7 @@ public:
 
 			device.add_item(
 					default_button_name(button),
+					std::string_view(),
 					itemid,
 					generic_button_get_state<s32>,
 					&m_joystick.buttons[button]);
@@ -885,6 +893,7 @@ public:
 			itemid = input_item_id((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1UP + (4 * hat) : ITEM_ID_OTHER_SWITCH);
 			device.add_item(
 					tempname,
+					std::string_view(),
 					itemid,
 					generic_button_get_state<s32>,
 					&m_joystick.hatsU[hat]);
@@ -893,6 +902,7 @@ public:
 			itemid = input_item_id((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1DOWN + (4 * hat) : ITEM_ID_OTHER_SWITCH);
 			device.add_item(
 					tempname,
+					std::string_view(),
 					itemid,
 					generic_button_get_state<s32>,
 					&m_joystick.hatsD[hat]);
@@ -901,6 +911,7 @@ public:
 			itemid = input_item_id((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1LEFT + (4 * hat) : ITEM_ID_OTHER_SWITCH);
 			device.add_item(
 					tempname,
+					std::string_view(),
 					itemid,
 					generic_button_get_state<s32>,
 					&m_joystick.hatsL[hat]);
@@ -909,6 +920,7 @@ public:
 			itemid = input_item_id((hat < INPUT_MAX_HATS) ? ITEM_ID_HAT1RIGHT + (4 * hat) : ITEM_ID_OTHER_SWITCH);
 			device.add_item(
 					tempname,
+					std::string_view(),
 					itemid,
 					generic_button_get_state<s32>,
 					&m_joystick.hatsR[hat]);
@@ -927,6 +939,7 @@ public:
 			snprintf(tempname, sizeof(tempname), "R%d X", ball + 1);
 			device.add_item(
 					tempname,
+					std::string_view(),
 					input_item_id(itemid),
 					generic_axis_get_state<s32>,
 					&m_joystick.balls[ball * 2]);
@@ -934,6 +947,7 @@ public:
 			snprintf(tempname, sizeof(tempname), "R%d Y", ball + 1);
 			device.add_item(
 					tempname,
+					std::string_view(),
 					input_item_id(itemid + 1),
 					generic_axis_get_state<s32>,
 					&m_joystick.balls[ball * 2 + 1]);
@@ -972,8 +986,8 @@ public:
 			//printf("Ball %d %d\n", event.jball.xrel, event.jball.yrel);
 			if (event.jball.ball < (MAX_AXES / 2))
 			{
-				m_joystick.balls[event.jball.ball * 2] = event.jball.xrel * INPUT_RELATIVE_PER_PIXEL;
-				m_joystick.balls[event.jball.ball * 2 + 1] = event.jball.yrel * INPUT_RELATIVE_PER_PIXEL;
+				m_joystick.balls[event.jball.ball * 2] = event.jball.xrel * input_device::RELATIVE_PER_PIXEL;
+				m_joystick.balls[event.jball.ball * 2 + 1] = event.jball.yrel * input_device::RELATIVE_PER_PIXEL;
 			}
 			break;
 
@@ -1225,6 +1239,7 @@ public:
 			{
 				device.add_item(
 						axisnames[axis],
+						std::string_view(),
 						item,
 						generic_axis_get_state<s32>,
 						&m_controller.axes[axis]);
@@ -1280,6 +1295,7 @@ public:
 				{
 					device.add_item(
 							buttonnames[button],
+							std::string_view(),
 							button_item++,
 							generic_button_get_state<s32>,
 							&m_controller.buttons[button]);
@@ -1308,6 +1324,7 @@ public:
 				{
 					device.add_item(
 							axisnames[axis],
+							std::string_view(),
 							button_item++,
 							[] (void *device_internal, void *item_internal) -> int
 							{
@@ -1349,6 +1366,7 @@ public:
 			{
 				device.add_item(
 						buttonnames[button],
+						std::string_view(),
 						item,
 						generic_button_get_state<s32>,
 						&m_controller.buttons[button]);

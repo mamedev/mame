@@ -254,7 +254,20 @@ Fatal error: Incorrect layout on track 0 head 0, expected_size=50000, current_si
 	<software name="bcquest">
 		<description>BC's Quest for Tires</description>
 		<year>1984</year>
-		<publisher>Sierra</publisher>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sydney Development" />
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="546696">
+				<rom name="BC's Quest for Tires [Sierra] [1984] [5.25SS] [Disk 1 of 1].mfm" size="546696" crc="618773e7" sha1="f788a214b4ded233f4f4cd4237fee9d046fbee8a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bcquest_cr" cloneof="bcquest">
+		<description>BC's Quest for Tires (cracked)</description>
+		<year>1984</year>
+		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Sydney Development" />
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
@@ -8590,9 +8603,12 @@ Disk 2: Side Arms / Street Fighter
 	</software>
 
 	<software name="arknoid2">
-		<description>Arkanoid 2: Revenge of Doh (newer, with CMS Sound support)</description>
+		<description>Arkanoid 2: Revenge of Doh (cracked, newer, with CMS Sound support)</description>
 		<year>1989</year>
 		<publisher>Taito Corporation</publisher>
+		<notes><![CDATA[
+Missing copy protection track
+]]></notes>
 		<info name="developer" value="Taito Corporation" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -8602,9 +8618,12 @@ Disk 2: Side Arms / Street Fighter
 	</software>
 
 	<software name="arknoid2a" cloneof="arknoid2">
-		<description>Arkanoid 2: Revenge of Doh (older)</description>
+		<description>Arkanoid 2: Revenge of Doh (cracked, older)</description>
 		<year>1989</year>
 		<publisher>Taito Corporation</publisher>
+		<notes><![CDATA[
+Missing copy protection track
+]]></notes>
 		<info name="developer" value="Taito Corporation" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -9282,8 +9301,31 @@ ibmpcjr: hangs on title screen with stuck note
 		</part>
 	</software>
 
+	<software name="bublbobl" supported="no">
+		<description>Bubble Bobble (5.25")</description>
+		<year>1989</year>
+		<publisher>Taito Software</publisher>
+		<notes><![CDATA[
+Don't recognize the copy protection track on the Key Disk
+]]></notes>
+		<info name="developer" value="Taito Software" />
+		<info name="ported by" value="NovaLogic" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A (Key Disk)" />
+			<dataarea name="flop" size = "1161863">
+				<rom name="Bubble Bobble [Taito] [1989] [5.25DD] [Disk 1 of 2].mfm" size="1161863" crc="04c951b7" sha1="2e51bdf39df0ab091ab5a90af55167086e479b95"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Bubble Bobble [Taito] [1989] [5.25DD] [Disk 2 of 2].img" size="368640" crc="26d72672" sha1="de10177bd95e576dcc00e90e73ad181bd97f5577"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Game cracked - Missing copy protection track on disk 1 -->
-	<software name="bublbobl">
+	<software name="bublbobl_cr" cloneof="bublbobl">
 		<description>Bubble Bobble (5.25") (cracked)</description>
 		<year>1989</year>
 		<publisher>Taito Software</publisher>
@@ -9312,6 +9354,29 @@ ibmpcjr: hangs on title screen with stuck note
 			<!-- Copy-protected key disk -->
 			<dataarea name="flop" size = "2166169">
 				<rom name="Bubble Bobble [Taito] [1989] [3.5DD] [Disk 1 of 1].mfm" size="2166169" crc="11a8c23d" sha1="5e6a8bb49f98deb370de7b146dc4c22c2324e56a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buckdoom">
+		<description>Buck Rogers: Countdown to Doomsday</description>
+		<year>1990</year>
+		<publisher>SSI</publisher>
+		<info name="developer" value="SSI" />
+		<info name="version" value="1.00" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Buck Rogers - Countdown to Doomsday [SSI] [1990] [5.25DD] [Disk 1 of 3].img" size="368640" crc="b5cef79d" sha1="402baabb800cc9c60507fd29b5f3772e0c5773e9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Buck Rogers - Countdown to Doomsday [SSI] [1990] [5.25DD] [Disk 2 of 3].img" size="368640" crc="0c4c1a1e" sha1="727e9b3a7c471801c147fa4aaa86c5eb293cbd80"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Buck Rogers - Countdown to Doomsday [SSI] [1990] [5.25DD] [Disk 3 of 3].img" size="368640" crc="7a71b302" sha1="38b51886b2a1eb5c2da2b19ac0d449868a1a6768"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10254,9 +10319,29 @@ Hangs after few seconds of gameplay
 	</software>
 
 	<software name="cycles">
-		<description>The Cycles</description>
+		<description>The Cycles: International Grand Prix Racing (5.25")</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
+		<info name="developer" value="Distinctive Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program Disk" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Cycles [Accolade] [1989] [5.25DD] [Disk 1 of 2] [Program].img" size="368640" crc="8b06b67b" sha1="e6c61ef4f555889af3720ab51672edb28ba96a2a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Master Disk" />
+			<dataarea name="flop" size = "368640">
+				<rom name="Cycles [Accolade] [1989] [5.25DD] [Disk 2 of 2] [Master].img" size="368640" crc="7cd9f8b0" sha1="6ad3e23766629f51bc36941ac1de938351b10784"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cycles35" cloneof="cycles">
+		<description>The Cycles: International Grand Prix Racing (3.5")</description>
+		<year>1989</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Distinctive Software" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Cycles, The (1989)(Accolade).dsk" size="737280" crc="7912f6ea" sha1="372e3ecb424556bd3dea4723138e66f952117cad"/>
@@ -11060,6 +11145,23 @@ Prompts user to "press fire" but no correlated keyboard bind, requires unemulate
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="fireforget2.img" size="737280" crc="24ac2704" sha1="737ca587fa78d5f1160557c99a68b0022f1f216c" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="firepowr">
+		<description>Fire Power</description>
+		<year>1988</year>
+		<publisher>MicroIllusions</publisher>
+		<info name="developer" value="Silent Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Fire Power [MicroIllusions] [1988] [5.25DD] [Disk 1 on 2].img" size="368640" crc="d04075f0" sha1="084905e9ec4482eeed565c78d8c3031f2f2d37fd"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Fire Power [MicroIllusions] [1988] [5.25DD] [Disk 2 on 2].img" size="368640" crc="715d21ce" sha1="9cc3f46947ca258591558ce252fde13555d6ef3b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12411,7 +12513,7 @@ Hangs when launching soccer.com
 	</software>
 
 	<software name="lsl">
-		<description>Leisure Suit Larry in the Land of the Lounge Lizards</description>
+		<description>Leisure Suit Larry in the Land of the Lounge Lizards (5.25")</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Sierra On-Line" />
@@ -12425,6 +12527,19 @@ Hangs when launching soccer.com
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Leisure Suit Larry [Sierra] [1987] [5.25DD] [Disk 2 of 2].img" size="368640" crc="15ef74ed" sha1="e9e8789721364c63ab279c2db4d44a0835f9b452"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsl35" cloneof="lsl">
+		<description>Leisure Suit Larry in the Land of the Lounge Lizards (3.5")</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="Ver. 1.00 6/1/87" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "2189776">
+				<rom name="Leisure Suit Larry [Sierra] [1987] [3.5DD] [Disk 1 of 1].mfm" size="2189776" crc="453d9dcf" sha1="c3e1800c4b58addb5e10749686406180d9050a74"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12947,6 +13062,18 @@ Hangs when launching soccer.com
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Magic Pockets [Mindscape] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="244a47f3" sha1="1bfb89a619f6e6f2f7954c85a0d7c5cd8fadbb42"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mandealr">
+		<description>Manhattan Dealers (Europe, The 16-bit Pocket Power Collection release)</description>
+		<year>1988</year>
+		<publisher>Prism Leisure Corporation</publisher>
+		<info name="developer" value="Silmarils" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Manhattan Dealers [Prism Leisure] [1988] [3.5DD] [Disk 1 of 1].img" size="737280" crc="a3ba68cd" sha1="5a12f9f0c009d2fcb7af1e777a4e394f29c45d03"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14241,6 +14368,22 @@ Black screen after listing control scheme. Doesn't pass the protection check, th
 	</software>
 
 	<software name="prehist">
+		<description>Prehistorik</description>
+		<year>1991</year>
+		<publisher>Titus</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1110795">
+				<rom name="Prehistorik [Titus] [1991] [5.25DD] [Disk 1 of 2].mfm" size="1110795" crc="13b3e230" sha1="030ed0d219bc2970fe275258d0e44560f4d001dd"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1110773">
+				<rom name="Prehistorik [Titus] [1991] [5.25DD] [Disk 2 of 2].mfm" size="1110773" crc="0a7a5637" sha1="7a620dc2afd66bffd8b63b5df47f45efaa04e659"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prehist_cr" cloneof="prehist">
 		<description>Prehistorik (cracked)</description>
 		<year>1991</year>
 		<publisher>Titus</publisher>
@@ -14316,7 +14459,7 @@ Black screen after listing control scheme. Doesn't pass the protection check, th
 	</software>
 
 	<software name="ppersia35a" cloneof="ppersia">
-		<description>Prince of Persia (3.5", v1.1, Hit Squad release)</description>
+		<description>Prince of Persia (3.5", v1.1, The Hit Squad release)</description>
 		<year>1992</year>
 		<publisher>The Hit Squad</publisher>
 		<info name="version" value="V1.1" />
@@ -15226,6 +15369,7 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 		<description>Skate or Die (5.25")</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Electronic Arts" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Skate or Die [1988] [Electronic Arts] [5.25] [1 of 2].img" size="368640" crc="20788bdf" sha1="45f13ce79ef36c019cb2870faacab6d64ab0a26a"/>
@@ -15242,9 +15386,27 @@ Fatal error: Incorrect layout on track 39 head 0, expected_size=100000, current_
 		<description>Skate or Die (3.5")</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Electronic Arts" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Skate or Die [1988] [Electronic Arts] [3.5] [1 of 1].img" size="737280" crc="ad1fb4e3" sha1="60a315b8f744258d66c221538830808ae7184f47"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skiordie">
+		<description>Ski or Die</description>
+		<year>1990</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Electronic Arts" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Ski or Die [Electronic Arts] [1990] [5.25DD] [1 of 2].img" size="368640" crc="f83391ec" sha1="2d7bdb6a8ebc904d2fdc2c45ed7bb28949a60e44"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Ski or Die [Electronic Arts] [1990] [5.25DD] [2 of 2].img" size="368640" crc="5f5ae1a7" sha1="63409d157a6b576e5478222c83df07ac805f571c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15302,6 +15464,37 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="the software toolworks game pack 3 disk 5.img" size="737280" crc="f4b8294b" sha1="5585df51c001e0c0181ab5d92e09b4130cd3fbef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spce1889">
+		<description>Space 1889</description>
+		<year>1990</year>
+		<publisher>Paragon Software</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Space 1889 [Paragon] [1990] [5.25DD] [Disk 1 of 5].img" size="368640" crc="168f8883" sha1="1f0eb5b935aab8ab8318aa2085214a332feed3fe"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Space 1889 [Paragon] [1990] [5.25DD] [Disk 2 of 5].img" size="368640" crc="fbb761c3" sha1="cec831600a37f0b88c8e6eee87783fec431cebf9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Space 1889 [Paragon] [1990] [5.25DD] [Disk 3 of 5].img" size="368640" crc="a829050d" sha1="03489e55f6f08e9f6a950c7f5c7f853d532e45ab"/>
+			</dataarea>
+		</part>
+				<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Space 1889 [Paragon] [1990] [5.25DD] [Disk 4 of 5].img" size="368640" crc="86341c79" sha1="998095f71c50729697388a0e5c31b7bc99bef6fa"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Space 1889 [Paragon] [1990] [5.25DD] [Disk 5 of 5].img" size="368640" crc="30945dfd" sha1="12d84cab917ce21fdd0ccb35daaaae7c3f4247a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -15882,13 +16075,51 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 	</software>
 
 	<software name="superski">
+		<description>Super Ski (5.25")</description>
+		<year>1989</year>
+		<publisher>Microïds</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Super Ski [Microids] [1989] [5.25DD] [Disk 1 of 2].img" size="368640" crc="5e10ad30" sha1="9becbe1b6d0a56ff0bdd4c07564f1932baf64051"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Super Ski [Microids] [1989] [5.25DD] [Disk 2 of 2].img" size="368640" crc="2bf1c28b" sha1="681639bdd3dc3b06951b09ac85db928e9680ecb2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superski35" cloneof="superski">
 		<!-- Dumped from a copied disk -->
-		<description>Super Ski</description>
+		<description>Super Ski (3.5")</description>
 		<year>1988</year>
 		<publisher>Microïds</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="[PC] Super Ski [3.5DD] [Disk 1 of 1].img" size="737280" crc="d1a5e858" sha1="9dea0f4e447c1e1569543a2f333cd16bad469c7c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superski35a" cloneof="superski">
+		<description>Super Ski (3.5", alt)</description>
+		<year>1988</year>
+		<publisher>Microïds</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Super Ski [Microids] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="311923c3" sha1="0211c841557187af7b3ac51c5152d50bf8be1dbe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superski35b" cloneof="superski">
+		<description>Super Ski (3.5", alt 2)</description>
+		<year>1988</year>
+		<publisher>Microïds</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Super Ski (Europe) [Microids] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="e6113c15" sha1="402fdd9912fcfaa3b750617fda4fb30b688508f0"/>
 			</dataarea>
 		</part>
 	</software>

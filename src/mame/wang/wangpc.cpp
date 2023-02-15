@@ -37,6 +37,9 @@
 #include "machine/upd765.h"
 #include "wangpckb.h"
 
+
+namespace {
+
 #define I8086_TAG       "i8086"
 #define AM9517A_TAG     "am9517a"
 #define I8259A_TAG      "i8259"
@@ -1389,6 +1392,7 @@ ROM_START( wangpc )
 	ROM_LOAD16_BYTE( "379-0000 r2.l115", 0x0000, 0x2000, CRC(67b37684) SHA1(70d9f68eb88cc2bc9f53f949cc77411c09a4266e) )
 ROM_END
 
+} // anonymous namespace
 
 
 //**************************************************************************

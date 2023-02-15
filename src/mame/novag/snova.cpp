@@ -12,6 +12,7 @@ TODO:
 - beeps are glitchy, as if interrupted for too long
 - nsnova serial port isn't working, MCU emulation problem?
 - nsnova unmapped reads from 0x33/0x34
+- is "Aquamarine / Super Nova" the same rom as nsnova and just a redesign?
 - is the 1st version of supremo(black plastic) the same ROM?
 
 ===============================================================================

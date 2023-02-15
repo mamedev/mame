@@ -5,8 +5,8 @@
     Exidy 440 hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_EXIDY440_H
-#define MAME_INCLUDES_EXIDY440_H
+#ifndef MAME_EXIDY_EXIDY440_H
+#define MAME_EXIDY_EXIDY440_H
 
 #pragma once
 
@@ -123,4 +123,4 @@ private:
 	uint8_t m_topsecex_yscroll = 0U;
 };
 
-#endif // MAME_INCLUDES_EXIDY440_H
+#endif // MAME_EXIDY_EXIDY440_H

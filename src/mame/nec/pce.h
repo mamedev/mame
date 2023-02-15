@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_PCE_H
-#define MAME_INCLUDES_PCE_H
+#ifndef MAME_NEC_PCE_H
+#define MAME_NEC_PCE_H
 
 #include "pce_cd.h"
 
@@ -85,4 +85,4 @@ private:
 	void sgx_mem(address_map &map);
 };
 
-#endif // MAME_INCLUDES_PCE_H
+#endif // MAME_NEC_PCE_H

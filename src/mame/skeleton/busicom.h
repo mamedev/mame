@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_BUSICOM_H
-#define MAME_INCLUDES_BUSICOM_H
+#ifndef MAME_SKELETON_BUSICOM_H
+#define MAME_SKELETON_BUSICOM_H
 
 #pragma once
 
@@ -62,4 +62,4 @@ private:
 	required_ioport_array<10> m_input_lines;
 };
 
-#endif // MAME_INCLUDES_BUSICOM_H
+#endif // MAME_SKELETON_BUSICOM_H

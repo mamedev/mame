@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_PC1403_H
-#define MAME_INCLUDES_PC1403_H
+#ifndef MAME_SHARP_PC1403_H
+#define MAME_SHARP_PC1403_H
 
 #include "pocketc.h"
 
@@ -83,4 +83,4 @@ protected:
 	virtual void video_start() override;
 };
 
-#endif // MAME_INCLUDES_PC1403_H
+#endif // MAME_SHARP_PC1403_H

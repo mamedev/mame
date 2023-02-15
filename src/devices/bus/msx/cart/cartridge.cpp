@@ -25,6 +25,7 @@
 #include "msx_audio.h"
 #include "msxdos2.h"
 #include "nomapper.h"
+#include "ram.h"
 #include "rtype.h"
 #include "slotexpander.h"
 #include "softcard.h"
@@ -38,6 +39,7 @@
 void msx_cart(device_slot_interface &device)
 {
 	msx_cart_disk_register_options(device);
+	msx_cart_ram_register_options(device);
 	device.option_add_internal("arc", MSX_CART_ARC);
 	device.option_add_internal("ascii8", MSX_CART_ASCII8);
 	device.option_add_internal("ascii8_sram", MSX_CART_ASCII8_SRAM);
@@ -64,7 +66,8 @@ void msx_cart(device_slot_interface &device)
 	device.option_add_internal("msxaud_fsca1", MSX_CART_MSX_AUDIO_FSCA1);
 	device.option_add_internal("msxaud_hxmu900", MSX_CART_MSX_AUDIO_HXMU900);
 	device.option_add_internal("msxaud_nms1205", MSX_CART_MSX_AUDIO_NMS1205);
-	device.option_add_internal("msxdos2", MSX_CART_MSXDOS2);
+	device.option_add_internal("msxdos2j", MSX_CART_MSXDOS2J);
+	device.option_add_internal("msxdos2e", MSX_CART_MSXDOS2E);
 	device.option_add_internal("msxwrite", MSX_CART_MSXWRITE);
 	device.option_add_internal("nomapper", MSX_CART_NOMAPPER);
 	device.option_add_internal("rtype", MSX_CART_RTYPE);

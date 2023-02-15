@@ -5,8 +5,8 @@
     Dragon Ball Z
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_DBZ_H
-#define MAME_INCLUDES_DBZ_H
+#ifndef MAME_KONAMI_DBZ_H
+#define MAME_KONAMI_DBZ_H
 
 #pragma once
 
@@ -95,4 +95,4 @@ private:
 	void dbz_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_DBZ_H
+#endif // MAME_KONAMI_DBZ_H

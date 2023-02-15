@@ -21,6 +21,8 @@
 #include "formats/rk_cas.h"
 
 
+namespace {
+
 class mikrosha_state : public radio86_state
 {
 public:
@@ -290,6 +292,9 @@ ROM_START( m86rk )
 	/* here should probably be different rom */
 	ROM_LOAD ("mikrosha.fnt", 0x0000, 0x0800, CRC(b315da1c) SHA1(b5bf9abc0fff75b1aba709a7f08b23d4a89bb04b))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT          COMPANY                                FULLNAME         FLAGS

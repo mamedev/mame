@@ -5,8 +5,8 @@
       Dynax hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_DYNAX_H
-#define MAME_INCLUDES_DYNAX_H
+#ifndef MAME_DYNAX_DYNAX_H
+#define MAME_DYNAX_DYNAX_H
 
 #pragma once
 
@@ -351,4 +351,4 @@ private:
 
 INPUT_PORTS_EXTERN( HANAFUDA_KEYS_BET );
 
-#endif // MAME_INCLUDES_DYNAX_H
+#endif // MAME_DYNAX_DYNAX_H

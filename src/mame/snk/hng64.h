@@ -1,7 +1,7 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner
-#ifndef MAME_INCLUDES_HNG64_H
-#define MAME_INCLUDES_HNG64_H
+#ifndef MAME_SNK_HNG64_H
+#define MAME_SNK_HNG64_H
 
 #pragma once
 
@@ -27,7 +27,7 @@ struct polyVert
 {
 	float worldCoords[4]{};   // World space coordinates (X Y Z 1.0)
 
-	float texCoords[4]{};     // Texture coordinates (U V 0 1.0) -> OpenGL style...
+	float texCoords[2]{};     // Texture coordinates (U V 0 1.0) -> OpenGL style...
 
 	float normal[4]{};        // Normal (X Y Z 1.0)
 	float clipCoords[4]{};    // Homogeneous screen space coordinates (X Y Z W)
@@ -47,13 +47,12 @@ struct polygon
 	bool flatShade = false;              // Flat shaded polygon, no texture, no lighting
 
 	uint8_t texIndex = 0;             // Which texture to draw from (0x00-0x0f)
-	uint8_t texType = 0;              // How to index into the texture
+	uint8_t tex4bpp = 0;              // How to index into the texture
 	uint8_t texPageSmall = 0;         // Does this polygon use 'small' texture pages?
 	uint8_t texPageHorizOffset = 0;   // If it does use small texture pages, how far is this page horizontally offset?
 	uint8_t texPageVertOffset = 0;    // If it does use small texture pages, how far is this page vertically offset?
 
 	uint32_t palOffset = 0;           // The base offset where this object's palette starts.
-	uint32_t palPageSize = 0;         // The size of the palette page that is being pointed to.
 
 	uint32_t debugColor = 0;          // Will go away someday.  Used to explicitly color polygons for debugging.
 };
@@ -82,13 +81,12 @@ typedef frustum_clip_vertex<float, 5> hng64_clip_vertex;
 
 struct hng64_poly_data
 {
-	uint8_t texType = 0;
+	uint8_t tex4bpp = 0;
 	uint8_t texIndex = 0;
 	uint8_t texPageSmall = 0;
 	uint8_t texPageHorizOffset = 0;
 	uint8_t texPageVertOffset = 0;
 	int palOffset = 0;
-	int palPageSize = 0;
 	int debugColor = 0;
 };
 
@@ -167,7 +165,8 @@ public:
 		m_in(*this, "IN%u", 0U),
 		m_samsho64_3d_hack(0),
 		m_roadedge_3d_hack(0)
-	{ }
+	{
+	}
 
 	void hng64(machine_config &config);
 	void hng64_default(machine_config &config);
@@ -457,7 +456,7 @@ private:
 	std::vector<polygon> m_polys;  // HNG64_MAX_POLYGONS
 
 	void clear3d();
-	void hng64_command3d(const uint16_t* packet);
+	bool hng64_command3d(const uint16_t* packet);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void transition_control(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void setCameraTransformation(const uint16_t* packet);
@@ -509,4 +508,4 @@ private:
 	void hng_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_HNG64_H
+#endif // MAME_SNK_HNG64_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Coates
-#ifndef MAME_INCLUDES_ZAC2650_H
-#define MAME_INCLUDES_ZAC2650_H
+#ifndef MAME_ZACCARIA_ZAC2650_H
+#define MAME_ZACCARIA_ZAC2650_H
 
 #pragma once
 
@@ -61,4 +61,4 @@ private:
 	void main_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_ZAC2650_H
+#endif // MAME_ZACCARIA_ZAC2650_H

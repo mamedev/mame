@@ -5,8 +5,8 @@
     Zaccaria Quasar
 
 ****************************************************************************/
-#ifndef MAME_INCLUDES_QUASAR_H
-#define MAME_INCLUDES_QUASAR_H
+#ifndef MAME_CVS_QUASAR_H
+#define MAME_CVS_QUASAR_H
 
 #pragma once
 
@@ -51,4 +51,4 @@ private:
 	uint8_t      m_io_page = 0;
 };
 
-#endif // MAME_INCLUDES_QUASAR_H
+#endif // MAME_CVS_QUASAR_H

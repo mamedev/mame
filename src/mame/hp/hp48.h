@@ -7,8 +7,8 @@
    Hewlett Packard HP48 S/SX & G/GX and HP49 G
 
 **********************************************************************/
-#ifndef MAME_INCLUDES_HP84_H
-#define MAME_INCLUDES_HP84_H
+#ifndef MAME_HP_HP84_H
+#define MAME_HP_HP84_H
 
 #pragma once
 
@@ -215,4 +215,4 @@ private:
 #define HP48_NCE3 4
 #define HP48_NCE1 5
 
-#endif // MAME_INCLUDES_HP84_H
+#endif // MAME_HP_HP84_H

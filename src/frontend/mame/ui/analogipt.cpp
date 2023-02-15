@@ -246,8 +246,13 @@ void menu_analog::handle(event const *ev)
 
 			switch (ev->iptkey)
 			{
-			// if selected, reset to default value
+			// flip toggles when selected
 			case IPT_UI_SELECT:
+				if (ANALOG_ITEM_REVERSE == data.type)
+					newval = newval ? 0 : 1;
+				break;
+
+			// if cleared, reset to default value
 			case IPT_UI_CLEAR:
 				newval = data.defvalue;
 				break;

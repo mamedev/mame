@@ -3,8 +3,8 @@
 /* */
 
 /* todo: remove code from header, linker starts throwing silly messages when I try due to the templates.. make sense of them */
-#ifndef MAME_INCLUDES_K053246_K053247_K055673_H
-#define MAME_INCLUDES_K053246_K053247_K055673_H
+#ifndef MAME_KONAMI_K053246_K053247_K055673_H
+#define MAME_KONAMI_K053246_K053247_K055673_H
 
 #pragma once
 
@@ -467,4 +467,4 @@ private:
 
 DECLARE_DEVICE_TYPE(K055673, k055673_device)
 
-#endif // MAME_INCLUDES_K053246_K053247_K055673_H
+#endif // MAME_KONAMI_K053246_K053247_K055673_H

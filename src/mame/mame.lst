@@ -802,6 +802,9 @@ apple2gsmt                      // 1991 "Mark Twain" prototype
 @source:apple/apple3.cpp
 apple3                          // May 1980 Apple ///
 
+@source:apple/imacg3.cpp
+imac                            // August 15, 1998 Apple iMac (Bondi blue)
+
 @source:apple/iphone2g.cpp
 iphone2g                        // (c) 2007 Apple
 
@@ -886,6 +889,9 @@ mp130
 emate
 mp2000
 mp2100
+
+@source:apple/powermacg3.cpp
+pwrmacg3                        // November 10, 1997 Apple Power Macintosh G3 (beige)
 
 @source:apple/superga2.cpp
 kuzmich
@@ -16247,6 +16253,7 @@ astrof2                         // (c) [1980?]
 astrof3                         // (c) [1980?]
 astroff                         // bootleg (Famaresa)
 astroff2                        // bootleg (Famaresa)
+satsf3d                         //
 spfghmk2                        // (c) [1979] Data East Corporation
 spfghmk22                       // (c) [1979] Data East Corporation
 sstarbtl                        // bootleg
@@ -18227,6 +18234,7 @@ mshuttle2                       // (c) 1981 Nichibutsu
 mshuttlea                       // (c) 1981 Nichibutsu
 mshuttlej                       // (c) 1981 Nichibutsu
 mshuttlej2                      // (c) 1981 Nichibutsu
+mutacion                        // bootleg (Explomatic)
 namenayo                        // (c) 1982 Cat's
 ncentury                        // bootleg (Petaco S.A.)
 offensiv                        // bootleg (Video Dens)
@@ -18288,6 +18296,7 @@ smooncrs                        // Gremlin
 spacbat2                        // bootleg
 spacbatt                        // bootleg
 spacempr                        // bootleg
+spacian2                        //
 spactrai                        //
 spcdrag                         // bootleg
 spcmission                      // bootleg (SegaSA / Sonic)
@@ -26787,9 +26796,6 @@ vortex                          // 852 [1980] Zilec Electronics Ltd.
 yosakdon                        // (c) 1979 Yosaku To Donbei
 yosakdona                       // (c) 1979 Yosaku To Donbei
 
-@source:midw8080/m79amb.cpp
-m79amb                          // (c) 1977 RamTek
-
 @source:midw8080/mw8080bw.cpp
 280zzzap                        // 610 [1976]
 blueshrk                        // 742 [1978]
@@ -28655,6 +28661,7 @@ goldenchip                      // (c) 19?? SegaSA / Sonic
 @source:misc/discoboy.cpp
 discoboy                        // (c) 1993 Soft Art Co.
 discoboyp                       // (c) 1993 Soft Art Co. (Promat license?)
+djgirl
 
 @source:misc/dmainevent.cpp
 dmainevent                      // (c) 1983 Destron
@@ -29545,6 +29552,7 @@ amuse1                          // (c) 1982 Greyhound Electronics
 amuse1a                         // (c) 1983 Greyhound Electronics
 bigjoke                         // (c) 1987 Greyhound Electronics
 findout                         // (c) 1987 [Elettronolo]
+findouta                        // (c) 1989 [Elettronolo]
 geimulti                        // (c) 1992 Grayhound Electronics
 gepoker                         // (c) 1984 Greyhound Electronics
 gepoker1                        // (c) 1984 Greyhound Electronics
@@ -30693,7 +30701,8 @@ onetwo                          // (c) 1997 Barko
 onetwoe                         // (c) 1997 Barko
 
 @source:misc/opercoin.cpp
-multibaby                       // (c) 1990 oper Coin
+multibaby                       // (c) 1990 Oper Coin
+spirulo                         // (c) 19?? Oper Coin
 
 @source:misc/othello.cpp
 othello                         // (c) 1984 Success.
@@ -30737,6 +30746,8 @@ pkscram                         // (c) 1993 Cosmo Electronics Corporation
 
 @source:misc/playcenter.cpp
 plycntrchtr                     // (c) 2000 Recreativos Presas / Undergaming
+plycntrchtrc                    // (c) 2000 Recreativos Presas / Undergaming
+plycntrchtrk                    // (c) 2000 Recreativos Presas / Undergaming
 
 @source:misc/plsonic4.cpp
 plsonic4                        //
@@ -30925,6 +30936,7 @@ quizpun2                        // (c) 1989 Space Computer System of Korea
 radikaldrt                      // (c) 2011? Gaelco Darts
 
 @source:misc/rawthrillspc.cpp
+doodlejmp                       // (c) 2013 ICE / Raw Thrills / Lima Sky
 fnf                             // (c) 2004 Raw Thrills
 guitarheroac                    // (c) 2008 Raw Thrills / Activision / Konami
 
@@ -31488,6 +31500,7 @@ usg182                          // (c) 1989
 usg185                          // (c) 1990
 usg187c                         // (c) 1991
 usg211c                         // (c) 1991
+usg251                          // (c) 1991
 usg32                           // (c) 1987
 usg82                           // (c) 1988
 usg83x                          // (c) 1988
@@ -32422,6 +32435,7 @@ tekken2a                        // 1995.08 Tekken 2 (World, TES2/VER.A)
 tekken2b                        // 1995.09 Tekken 2 Ver.B (World, TES2/VER.B)
 tekken2jb                       // 1995.09 Tekken 2 Ver.B (Japan, TES1/VER.B)
 tekken2jc                       // 1995.11 Tekken 2 Ver.B (Japan, TES1/VER.C)
+tekken2ua                       // 1995.08 Tekken 2 (US, TES3/VER.A)
 tekken2ub                       // 1995.09 Tekken 2 Ver.B (US, TES3/VER.B)
 tekkenac                        // 1995.01 Tekken (Asia, TE4/VER.C)
 tekkenb                         // 1994.12 Tekken (World, TE2/VER.B)
@@ -32453,14 +32467,14 @@ pacapp                          // 1998.12 Paca Paca Passion (Japan, PPP1/VER.A2
 pacapp2                         // 1999.07 Paca Paca Passion 2 (Japan, PKS1/VER.A)
 pacappsp                        // 1999.12 Paca Paca Passion Special (Japan, PSP1/VER.A)
 ptblank2                        // 1999.?? Point Blank 2 (GNB5/VER.A)
-soulclbr                        // 1998.?? Soul Calibur (World, SOC14/VER.C)
-soulclbraa                      // 1998.?? Soul Calibur (Asia, SOC12/VER.A2)
+soulclbr                        // 1998.?? Soul Calibur (Asia, SOC14/VER.C)
+soulclbra                       // 1998.?? Soul Calibur (World, SOC12/VER.A2)
+soulclbrab                      // 1998.?? Soul Calibur (Asia, SOC14/VER.B)
 soulclbrja                      // 1998.?? Soul Calibur (Japan, SOC11/VER.A2)
 soulclbrjb                      // 1998.?? Soul Calibur (Japan, SOC11/VER.B)
 soulclbrjc                      // 1998.07 Soul Calibur (Japan, SOC11/VER.C)
 soulclbrub                      // 1998.?? Soul Calibur (US, SOC13/VER.B)
 soulclbruc                      // 1998.?? Soul Calibur (US, SOC13/VER.C)
-soulclbrwb                      // 1998.?? Soul Calibur (World, SOC14/VER.B)
 sws2000                         // 2000.03 Super World Stadium 2000 (Japan, SS01/VER.A)
 sws2001                         // 2001.04 Super World Stadium 2001 (Japan, SS11/VER.A)
 sws98                           // 1998.06 Super World Stadium '98 (Japan, SS81/VER.A)
@@ -32469,6 +32483,7 @@ technodr                        // 1998.07 Techno Drive (Japan, TD2/VER.B)
 tekken3                         // 1997.03 Tekken 3 (World, TET2/VER.E1)
 tekken3a                        // 1997.?? Tekken 3 (World, TET2/VER.A)
 tekken3b                        // 1997.?? Tekken 3 (World, TET2/VER.B)
+tekken3c                        // 1997.?? Tekken 3 (World, TET2/VER.C)
 tekken3d                        // 1997.?? Tekken 3 (World, TET2/VER.D)
 tekken3ja                       // 1997.?? Tekken 3 (Japan, TET1/VER.A)
 tekken3je1                      // 1997.03 Tekken 3 (Japan, TET1/VER.E1)
@@ -33511,6 +33526,9 @@ cham24                          // 2002
 @source:nintendo/compmahj.cpp
 compmahj                        // 1983 Nintendo Computer Mah-jong Yakuman
 
+@source:nintendo/cothello.cpp
+cothello
+
 @source:nintendo/dkong.cpp
 8ballact                        // (c) 1984 Seatongrove Ltd (Magic Eletronics USA license)
 8ballact2                       // (c) 1984 Seatongrove Ltd (Magic Eletronics USA license)
@@ -34497,6 +34515,7 @@ mspacmanbcc                     // bootleg
 mspacmanbco                     // bootleg
 mspacmanbg                      // bootleg
 mspacmanbg2                     // bootleg
+mspacmanbgc                     // bootleg
 mspacmanbgd                     // bootleg
 mspacmanbhe                     // bootleg
 mspacmanbi                      // bootleg
@@ -36303,6 +36322,7 @@ polic_l4                        //
 spstn_l5                        //
 swrds_l1                        //
 swrds_l2                        //
+swrds_lg2                       //
 taxi_l3                         //
 taxi_l4                         //
 taxi_lg1                        //
@@ -37560,6 +37580,9 @@ hitme1                          // (c) 05/1976 Ramtek
 mirco21                         // (c) 08/1976 Mirco
 super21                         // (c) 1978 Mirco
 
+@source:ramtek/m79amb.cpp
+m79amb                          // (c) 1977 RamTek
+
 @source:ramtek/ramtek.cpp
 bballrmt                        // (c) 1974 Ramtek
 cleanswp                        // (c) 1974 Ramtek
@@ -38407,6 +38430,7 @@ alienfnta                       // 2001.09 Alien Front (Rev A)
 alpilotj                        // 1999.03 Airline Pilots (Japan, Rev A)
 alpilot                         // 1999.?? Airline Pilots (World, Rev B)
 anpanman2                       // 2003.09 Soreike! Anpanman Popcorn Koujou 2 (Rev C)
+anpanman2a                      // 2003.04 Soreike! Anpanman Popcorn Koujou 2 (Rev A)
 asndynmt                        // 2007.07 Dynamite Deka EX - Asian dynamite
 asndynmto                       // 2007.07 Dynamite Deka EX - Asian dynamite (older)
 ausfache                        // 2008.02.20 Akatsuki Blitzkampf Ausf. Achse
@@ -38760,6 +38784,7 @@ ribbitj                         // (c) 1991 Sega
 soniccar                        // (c) 1991 Sega
 sonicpop                        // (c) 1993 Sega
 sonicfgt                        // (c) 1993 Sega
+sonicfgtj                       // (c) 1993 Sega
 ssonicbr                        // (c) 1992 Sega
 stkclmns                        // (c) 1994 Sega
 stkclmnsj                       // (c) 1994 Sega

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
 
-#ifndef MAME_INCLUDES_BW12_H
-#define MAME_INCLUDES_BW12_H
+#ifndef MAME_BONDWELL_BW12_H
+#define MAME_BONDWELL_BW12_H
 
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
@@ -143,4 +143,4 @@ protected:
 	int m_centronics_perror = 0;
 };
 
-#endif
+#endif // MAME_BONDWELL_BW12_H

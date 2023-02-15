@@ -346,6 +346,7 @@ public:
 			// add the item to the device
 			device.add_item(
 					name,
+					util::string_format("SCAN%03d", keynum),
 					itemid,
 					generic_button_get_state<std::uint8_t>,
 					&m_keyboard.state[keynum]);
@@ -391,6 +392,7 @@ public:
 		{
 			device.add_item(
 					default_axis_name[axisnum],
+					std::string_view(),
 					input_item_id(ITEM_ID_XAXIS + axisnum),
 					generic_axis_get_state<LONG>,
 					&m_mouse.lX + axisnum);
@@ -401,6 +403,7 @@ public:
 		{
 			device.add_item(
 					default_button_name(butnum),
+					std::string_view(),
 					input_item_id(ITEM_ID_BUTTON1 + butnum),
 					generic_button_get_state<BYTE>,
 					&m_mouse.rgbButtons[butnum]);
@@ -414,12 +417,12 @@ public:
 		if (rawinput.data.mouse.usFlags == MOUSE_MOVE_RELATIVE)
 		{
 
-			m_mouse.lX += rawinput.data.mouse.lLastX * INPUT_RELATIVE_PER_PIXEL;
-			m_mouse.lY += rawinput.data.mouse.lLastY * INPUT_RELATIVE_PER_PIXEL;
+			m_mouse.lX += rawinput.data.mouse.lLastX * input_device::RELATIVE_PER_PIXEL;
+			m_mouse.lY += rawinput.data.mouse.lLastY * input_device::RELATIVE_PER_PIXEL;
 
 			// update zaxis
 			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
-				m_mouse.lZ += int16_t(rawinput.data.mouse.usButtonData) * INPUT_RELATIVE_PER_PIXEL;
+				m_mouse.lZ += int16_t(rawinput.data.mouse.usButtonData) * input_device::RELATIVE_PER_PIXEL;
 
 			// update the button states; always update the corresponding mouse buttons
 			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) m_mouse.rgbButtons[0] = 0x80;
@@ -472,6 +475,7 @@ public:
 		{
 			device.add_item(
 					default_axis_name[axisnum],
+					std::string_view(),
 					input_item_id(ITEM_ID_XAXIS + axisnum),
 					generic_axis_get_state<LONG>,
 					&m_lightgun.lX + axisnum);
@@ -480,6 +484,7 @@ public:
 		// scroll wheel is always relative if present
 		device.add_item(
 				default_axis_name[2],
+				std::string_view(),
 				ITEM_ID_ADD_RELATIVE1,
 				generic_axis_get_state<LONG>,
 				&m_lightgun.lZ);
@@ -489,6 +494,7 @@ public:
 		{
 			device.add_item(
 					default_button_name(butnum),
+					std::string_view(),
 					input_item_id(ITEM_ID_BUTTON1 + butnum),
 					generic_button_get_state<BYTE>,
 					&m_lightgun.rgbButtons[butnum]);
@@ -502,12 +508,12 @@ public:
 		{
 
 			// update the X/Y positions
-			m_lightgun.lX = normalize_absolute_axis(rawinput.data.mouse.lLastX, 0, INPUT_ABSOLUTE_MAX);
-			m_lightgun.lY = normalize_absolute_axis(rawinput.data.mouse.lLastY, 0, INPUT_ABSOLUTE_MAX);
+			m_lightgun.lX = normalize_absolute_axis(rawinput.data.mouse.lLastX, 0, input_device::ABSOLUTE_MAX);
+			m_lightgun.lY = normalize_absolute_axis(rawinput.data.mouse.lLastY, 0, input_device::ABSOLUTE_MAX);
 
 			// update zaxis
 			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
-				m_lightgun.lZ += int16_t(rawinput.data.mouse.usButtonData) * INPUT_RELATIVE_PER_PIXEL;
+				m_lightgun.lZ += int16_t(rawinput.data.mouse.usButtonData) * input_device::RELATIVE_PER_PIXEL;
 
 			// update the button states; always update the corresponding mouse buttons
 			if (rawinput.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) m_lightgun.rgbButtons[0] = 0x80;
@@ -595,7 +601,7 @@ public:
 		registration.dwFlags = RIDEV_DEVNOTIFY;
 		if (background_input())
 			registration.dwFlags |= RIDEV_INPUTSINK;
-		registration.hwndTarget = std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window();
+		registration.hwndTarget = dynamic_cast<win_window_info &>(*osd_common_t::window_list().front()).platform_window();
 
 		// register the device
 		RegisterRawInputDevices(&registration, 1, sizeof(registration));

@@ -5,8 +5,8 @@
  * includes/lviv.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_LVIV_H
-#define MAME_INCLUDES_LVIV_H
+#ifndef MAME_USSR_LVIV_H
+#define MAME_USSR_LVIV_H
 
 #pragma once
 
@@ -97,4 +97,4 @@ private:
 	static const rgb_t s_palette[8];
 };
 
-#endif // MAME_INCLUDES_LVIV_H
+#endif // MAME_USSR_LVIV_H

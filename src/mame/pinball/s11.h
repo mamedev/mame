@@ -6,8 +6,8 @@
  *  Created on: 2013-01-01
  */
 
-#ifndef MAME_INCLUDES_S11_H
-#define MAME_INCLUDES_S11_H
+#ifndef MAME_PINBALL_S11_H
+#define MAME_PINBALL_S11_H
 
 #include "cpu/m6800/m6800.h"
 #include "pinsnd88.h"
@@ -241,4 +241,4 @@ protected:
 };
 
 
-#endif // MAME_INCLUDES_S11_H
+#endif // MAME_PINBALL_S11_H

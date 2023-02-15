@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef MAME_INCLUDES_M52_H
-#define MAME_INCLUDES_M52_H
+#ifndef MAME_IREM_M52_H
+#define MAME_IREM_M52_H
 
 #pragma once
 
@@ -103,4 +103,4 @@ protected:
 
 };
 
-#endif // MAME_INCLUDES_M52_H
+#endif // MAME_IREM_M52_H

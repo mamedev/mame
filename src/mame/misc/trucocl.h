@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
-#ifndef MAME_INCLUDES_TRUCOCL_H
-#define MAME_INCLUDES_TRUCOCL_H
+#ifndef MAME_MISC_TRUCOCL_H
+#define MAME_MISC_TRUCOCL_H
 
 #pragma once
 
@@ -58,4 +58,4 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
-#endif // MAME_INCLUDES_TRUCOCL_H
+#endif // MAME_MISC_TRUCOCL_H

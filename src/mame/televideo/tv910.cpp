@@ -38,6 +38,9 @@
 
 #include "utf8.h"
 
+
+namespace {
+
 #define ACIA_TAG    "acia"
 #define CRTC_TAG    "crtc"
 #define RS232_TAG   "rs232"
@@ -575,6 +578,9 @@ ROM_START( tv910 )
 	ROM_REGION(0x1000, "keyboard", 0)
 	ROM_LOAD( "1800000-019b_bell_a2_43d6.bin", 0x000000, 0x000800, CRC(de954a77) SHA1(c4f7c19799c15d12d89f08dc31064fc6be9befb0) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY              FULLNAME               FLAGS

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="white"><rect><color red="0.7" green="0.7" blue="0.7" /></rect></element>
+
+	<element name="digit" defstate="0x3f">
+		<led7seg><color red="1.0" green="0.1" blue="0.15" /></led7seg>
+	</element>
+
+	<group name="time">
+		<element name="digit2" ref="digit"><bounds x="0" y="0" width="0.66" height="1" /></element>
+		<element name="digit1" ref="digit"><bounds x="1" y="0" width="0.66" height="1" /></element>
+		<element name="digit0" ref="digit"><bounds x="2" y="0" width="0.66" height="1" /></element>
+	</group>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds x="-125" y="0" width="461" height="240" />
+
+		<element ref="white"><bounds x="-13" y="0" width="5" height="240" /></element>
+		<group ref="time"><bounds x="-109" y="114" width="80" height="28" /></group>
+
+		<screen index="0"><bounds left="0" top="0" right="320" bottom="240" /></screen>
+
+	</view>
+</mamelayout>

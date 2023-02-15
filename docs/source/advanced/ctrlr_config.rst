@@ -257,5 +257,7 @@ Here’s an example numbering two light guns and two XInput game controllers:
         </input>
     </system>
 
-MAME applies ``mapdevice`` elements found inside any applicable ``system``
-element.
+MAME applies ``mapdevice`` elements found inside the first applicable ``system``
+element only.  To avoid confusion, it’s simplest place the ``system`` element
+element applying to all systems (``name`` attribute set to ``default``) first
+in the file, and use it to assign input device numbers.

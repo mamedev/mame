@@ -153,6 +153,9 @@ TODO:
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 
+
+namespace {
+
 class taito_type_x_state : public driver_device
 {
 public:
@@ -189,6 +192,7 @@ void taito_type_x_state::taito_type_x(machine_config &config)
 	// ...
 }
 
+} // anonymous namespace
 
 
 /***************************************************************************

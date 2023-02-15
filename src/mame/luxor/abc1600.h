@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef MAME_INCLUDES_ABC1600_H
-#define MAME_INCLUDES_ABC1600_H
+#ifndef MAME_LUXOR_ABC1600_H
+#define MAME_LUXOR_ABC1600_H
 
 #include "bus/abcbus/abcbus.h"
 #include "bus/abckb/abckb.h"
@@ -167,4 +167,4 @@ private:
 
 
 
-#endif
+#endif // MAME_LUXOR_ABC1600_H

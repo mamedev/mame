@@ -35,6 +35,9 @@
 
 #include "formats/tvc_cas.h"
 
+
+namespace {
+
 #define CENTRONICS_TAG  "centronics"
 
 
@@ -892,6 +895,9 @@ ROM_START( tvc64pru )
 	ROM_REGION( 0x4000, "ext", ROMREGION_ERASEFF )
 	ROM_LOAD( "tvcru_d7.bin", 0x2000, 0x2000, CRC(70cde756) SHA1(c49662af9f6653347ead641e85777c3463cc161b))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

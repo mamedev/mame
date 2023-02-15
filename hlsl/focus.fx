@@ -82,7 +82,7 @@ uniform float2 Defocus = float2(0.0f, 0.0f);
 // now this pass is applied only once with offsets of 0.25, 0.55, 1.0, 1.6 to achieve the same appearance as before till a maximum defocus of 2.0
 static const float2 CoordOffset8[8] =
 {
-	// 0.075x� + 0.225x + 0.25
+	// 0.075x² + 0.225x + 0.25
 	float2(-1.60f,  0.25f),
 	float2(-1.00f, -0.55f),
 	float2(-0.55f,  1.00f),

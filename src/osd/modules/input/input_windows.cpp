@@ -12,7 +12,6 @@
 
 // MAME headers
 #include "emu.h"
-#include "inputdev.h"
 
 #include "input_windows.h"
 
@@ -33,8 +32,8 @@ bool windows_osd_interface::should_hide_mouse() const
 		return false;
 
 	// track if mouse/lightgun is enabled, for mouse hiding purposes
-	bool const mouse_enabled = machine().input().device_class(DEVICE_CLASS_MOUSE).enabled();
-	bool const lightgun_enabled = machine().input().device_class(DEVICE_CLASS_LIGHTGUN).enabled();
+	bool const mouse_enabled = machine().input().class_enabled(DEVICE_CLASS_MOUSE);
+	bool const lightgun_enabled = machine().input().class_enabled(DEVICE_CLASS_LIGHTGUN);
 	if (!mouse_enabled && !lightgun_enabled)
 		return false;
 

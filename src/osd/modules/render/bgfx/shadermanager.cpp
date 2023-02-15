@@ -16,11 +16,10 @@
 #include "osdfile.h"
 #include "modules/lib/osdobj_common.h"
 
+#include <bx/file.h>
 #include <bx/math.h>
 #include <bx/readerwriter.h>
-#include <bx/file.h>
 
-#include <bgfx/bgfx.h>
 
 shader_manager::~shader_manager()
 {
@@ -31,7 +30,7 @@ shader_manager::~shader_manager()
 	m_shaders.clear();
 }
 
-bgfx::ShaderHandle shader_manager::get_or_load_shader(osd_options &options, std::string name)
+bgfx::ShaderHandle shader_manager::get_or_load_shader(const osd_options &options, const std::string &name)
 {
 	std::map<std::string, bgfx::ShaderHandle>::iterator iter = m_shaders.find(name);
 	if (iter != m_shaders.end())
@@ -48,7 +47,7 @@ bgfx::ShaderHandle shader_manager::get_or_load_shader(osd_options &options, std:
 	return handle;
 }
 
-bgfx::ShaderHandle shader_manager::load_shader(osd_options &options, std::string name)
+bgfx::ShaderHandle shader_manager::load_shader(const osd_options &options, const std::string &name)
 {
 	std::string shader_path = make_path_string(options, name);
 	const bgfx::Memory* mem = load_mem(shader_path + name + ".bin");
@@ -60,7 +59,7 @@ bgfx::ShaderHandle shader_manager::load_shader(osd_options &options, std::string
 	return BGFX_INVALID_HANDLE;
 }
 
-bool shader_manager::is_shader_present(osd_options &options, std::string name)
+bool shader_manager::is_shader_present(const osd_options &options, const std::string &name)
 {
 	std::string shader_path = make_path_string(options, name);
 	std::string file_name = shader_path + name + ".bin";
@@ -80,7 +79,7 @@ bool shader_manager::is_shader_present(osd_options &options, std::string name)
 	return false;
 }
 
-std::string shader_manager::make_path_string(osd_options &options, std::string name)
+std::string shader_manager::make_path_string(const osd_options &options, const std::string &name)
 {
 	std::string shader_path(options.bgfx_path());
 	shader_path += PATH_SEPARATOR "shaders" PATH_SEPARATOR;
@@ -123,7 +122,7 @@ std::string shader_manager::make_path_string(osd_options &options, std::string n
 	return shader_path;
 }
 
-const bgfx::Memory* shader_manager::load_mem(std::string name)
+const bgfx::Memory* shader_manager::load_mem(const std::string &name)
 {
 	bx::FileReader reader;
 	if (bx::open(&reader, name.c_str()))
@@ -139,7 +138,7 @@ const bgfx::Memory* shader_manager::load_mem(std::string name)
 	}
 	else
 	{
-		osd_printf_error("Unable to load shader %s\n", name.c_str());
+		osd_printf_error("Unable to load shader %s\n", name);
 	}
 	return nullptr;
 }

@@ -178,12 +178,12 @@ LSX 15  C
 
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
+// emu
+#include "emu.h" // put this here before windows.h defines interface as a macro
+
 #include "input_xinput.h"
 
 #include "modules/lib/osdobj_common.h"
-
-// emu
-#include "emu.h"
 
 // lib/util
 #include "util/coretmpl.h"
@@ -195,9 +195,6 @@ LSX 15  C
 #include <string>
 #include <tuple>
 #include <utility>
-
-// standard windows headers
-#include <windows.h>
 
 
 #define XINPUT_LIBRARIES { "xinput1_4.dll", "xinput9_1_0.dll" }
@@ -794,6 +791,7 @@ void xinput_joystick_device::configure(input_device &device)
 		{
 			device.add_item(
 					axis_names[i],
+					std::string_view(),
 					axis_ids[i],
 					generic_axis_get_state<s32>,
 					&m_axes[AXIS_LSX + i]);
@@ -816,6 +814,7 @@ void xinput_joystick_device::configure(input_device &device)
 		{
 			device.add_item(
 					hat_names[i],
+					std::string_view(),
 					input_item_id(ITEM_ID_HAT1UP + i), // matches up/down/left/right order
 					generic_button_get_state<u8>,
 					&m_switches[SWITCH_DPAD_UP + i]);
@@ -842,6 +841,7 @@ void xinput_joystick_device::configure(input_device &device)
 		{
 			device.add_item(
 					button_names[i],
+					std::string_view(),
 					button_id++,
 					generic_button_get_state<u8>,
 					&m_switches[offset]);
@@ -853,6 +853,7 @@ void xinput_joystick_device::configure(input_device &device)
 	{
 		device.add_item(
 				"Start",
+				std::string_view(),
 				ITEM_ID_START,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_START]);
@@ -861,6 +862,7 @@ void xinput_joystick_device::configure(input_device &device)
 	{
 		device.add_item(
 				"Back",
+				std::string_view(),
 				ITEM_ID_SELECT,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_BACK]);
@@ -875,6 +877,7 @@ void xinput_joystick_device::configure(input_device &device)
 			{
 				device.add_item(
 						axis_names[4 + i],
+						std::string_view(),
 						axis_ids[4 + i],
 						generic_axis_get_state<s32>,
 						&m_axes[AXIS_LT + i]);
@@ -1032,6 +1035,7 @@ void xinput_guitar_device::configure(input_device &device)
 		{
 			device.add_item(
 					name,
+					std::string_view(),
 					item,
 					generic_axis_get_state<s32>,
 					&m_axes[AXIS_SLIDER + i]);
@@ -1045,6 +1049,7 @@ void xinput_guitar_device::configure(input_device &device)
 		{
 			device.add_item(
 					HAT_NAMES_GUITAR[i],
+					std::string_view(),
 					input_item_id(ITEM_ID_HAT1UP + i), // matches up/down/left/right order
 					generic_button_get_state<u8>,
 					&m_switches[SWITCH_DPAD_UP + i]);
@@ -1059,6 +1064,7 @@ void xinput_guitar_device::configure(input_device &device)
 		{
 			device.add_item(
 					BUTTON_NAMES_GUITAR[i],
+					std::string_view(),
 					button_id++,
 					generic_button_get_state<u8>,
 					&m_switches[SWITCH_FRET1 + i]);
@@ -1070,6 +1076,7 @@ void xinput_guitar_device::configure(input_device &device)
 	{
 		device.add_item(
 				"Start",
+				std::string_view(),
 				ITEM_ID_START,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_START]);
@@ -1078,6 +1085,7 @@ void xinput_guitar_device::configure(input_device &device)
 	{
 		device.add_item(
 				"Back",
+				std::string_view(),
 				ITEM_ID_SELECT,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_BACK]);
@@ -1222,6 +1230,7 @@ void xinput_drumkit_device::configure(input_device &device)
 		{
 			device.add_item(
 					name,
+					std::string_view(),
 					item,
 					generic_axis_get_state<s32>,
 					&m_axes[AXIS_GREEN + i]);
@@ -1235,6 +1244,7 @@ void xinput_drumkit_device::configure(input_device &device)
 		{
 			device.add_item(
 					HAT_NAMES_GAMEPAD[i],
+					std::string_view(),
 					input_item_id(ITEM_ID_HAT1UP + i), // matches up/down/left/right order
 					generic_button_get_state<u8>,
 					&m_switches[SWITCH_DPAD_UP + i]);
@@ -1249,6 +1259,7 @@ void xinput_drumkit_device::configure(input_device &device)
 		{
 			device.add_item(
 					BUTTON_NAMES_DRUMKIT[i],
+					std::string_view(),
 					button_id++,
 					generic_button_get_state<u8>,
 					&m_switches[SWITCH_GREEN + i]);
@@ -1260,6 +1271,7 @@ void xinput_drumkit_device::configure(input_device &device)
 	{
 		device.add_item(
 				"Start",
+				std::string_view(),
 				ITEM_ID_START,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_START]);
@@ -1268,6 +1280,7 @@ void xinput_drumkit_device::configure(input_device &device)
 	{
 		device.add_item(
 				"Back",
+				std::string_view(),
 				ITEM_ID_SELECT,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_BACK]);
@@ -1385,7 +1398,7 @@ void xinput_turntable_device::poll()
 			m_switches[SWITCH_GREEN + i] = BIT(trigger_right(), i) ? 0xff : 0x00;
 
 		// translate axes
-		m_axes[AXIS_TURNTABLE] = s32(thumb_left_y()) * INPUT_RELATIVE_PER_PIXEL * 2;
+		m_axes[AXIS_TURNTABLE] = s32(thumb_left_y()) * input_device::RELATIVE_PER_PIXEL * 2;
 		m_axes[AXIS_CROSSFADE] = normalize_absolute_axis(thumb_right_y(), XINPUT_AXIS_MINVALUE, XINPUT_AXIS_MAXVALUE);
 
 		// convert effect dial value to relative displacement
@@ -1396,7 +1409,7 @@ void xinput_turntable_device::poll()
 				effect_delta -= 0x1'0000;
 			else if (-0x8000 > effect_delta)
 				effect_delta += 0x1'0000;
-			m_axes[AXIS_EFFECT] = effect_delta * INPUT_RELATIVE_PER_PIXEL / 128;
+			m_axes[AXIS_EFFECT] = effect_delta * input_device::RELATIVE_PER_PIXEL / 128;
 		}
 		m_prev_effect = u16(thumb_right_x());
 	}
@@ -1422,16 +1435,19 @@ void xinput_turntable_device::configure(input_device &device)
 	// add axes
 	device.add_item(
 			"Turntable",
+			std::string_view(),
 			ITEM_ID_ADD_RELATIVE1,
 			generic_axis_get_state<s32>,
 			&m_axes[AXIS_TURNTABLE]);
 	device.add_item(
 			"Effect",
+			std::string_view(),
 			ITEM_ID_ADD_RELATIVE2,
 			generic_axis_get_state<s32>,
 			&m_axes[AXIS_EFFECT]);
 	device.add_item(
 			"Crossfade",
+			std::string_view(),
 			ITEM_ID_XAXIS,
 			generic_axis_get_state<s32>,
 			&m_axes[AXIS_CROSSFADE]);
@@ -1443,6 +1459,7 @@ void xinput_turntable_device::configure(input_device &device)
 		{
 			device.add_item(
 					HAT_NAMES_GAMEPAD[i],
+					std::string_view(),
 					input_item_id(ITEM_ID_HAT1UP + i), // matches up/down/left/right order
 					generic_button_get_state<u8>,
 					&m_switches[SWITCH_DPAD_UP + i]);
@@ -1457,6 +1474,7 @@ void xinput_turntable_device::configure(input_device &device)
 		{
 			device.add_item(
 					BUTTON_NAMES_KEYBOARD[i],
+					std::string_view(),
 					button_id++,
 					generic_button_get_state<u8>,
 					&m_switches[SWITCH_A + i]);
@@ -1464,16 +1482,19 @@ void xinput_turntable_device::configure(input_device &device)
 	}
 	device.add_item(
 			"Green",
+			std::string_view(),
 			button_id++,
 			generic_button_get_state<u8>,
 			&m_switches[SWITCH_GREEN]);
 	device.add_item(
 			"Red",
+			std::string_view(),
 			button_id++,
 			generic_button_get_state<u8>,
 			&m_switches[SWITCH_RED]);
 	device.add_item(
 			"Blue",
+			std::string_view(),
 			button_id++,
 			generic_button_get_state<u8>,
 			&m_switches[SWITCH_BLUE]);
@@ -1483,6 +1504,7 @@ void xinput_turntable_device::configure(input_device &device)
 	{
 		device.add_item(
 				"Start",
+				std::string_view(),
 				ITEM_ID_START,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_START]);
@@ -1491,6 +1513,7 @@ void xinput_turntable_device::configure(input_device &device)
 	{
 		device.add_item(
 				"Back",
+				std::string_view(),
 				ITEM_ID_SELECT,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_BACK]);
@@ -1630,11 +1653,13 @@ void xinput_keyboard_device::configure(input_device &device)
 	// add axes
 	device.add_item(
 			"Velocity",
+			std::string_view(),
 			ITEM_ID_SLIDER1,
 			generic_axis_get_state<s32>,
 			&m_axes[AXIS_VELOCITY]);
 	device.add_item(
 			"Pedal",
+			std::string_view(),
 			ITEM_ID_SLIDER2,
 			generic_axis_get_state<s32>,
 			&m_axes[AXIS_PEDAL]);
@@ -1646,6 +1671,7 @@ void xinput_keyboard_device::configure(input_device &device)
 		{
 			device.add_item(
 					HAT_NAMES_GAMEPAD[i],
+					std::string_view(),
 					input_item_id(ITEM_ID_HAT1UP + i), // matches up/down/left/right order
 					generic_button_get_state<u8>,
 					&m_switches[SWITCH_DPAD_UP + i]);
@@ -1660,6 +1686,7 @@ void xinput_keyboard_device::configure(input_device &device)
 		{
 			device.add_item(
 					BUTTON_NAMES_KEYBOARD[i],
+					std::string_view(),
 					button_id++,
 					generic_button_get_state<u8>,
 					&m_switches[SWITCH_A + i]);
@@ -1673,6 +1700,7 @@ void xinput_keyboard_device::configure(input_device &device)
 	{
 		device.add_item(
 				util::string_format(key_formats[i % 12], (i / 12) + 1),
+				std::string_view(),
 				(ITEM_ID_BUTTON32 >= button_id) ? button_id++ : ITEM_ID_OTHER_SWITCH,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_C1 + i]);
@@ -1683,6 +1711,7 @@ void xinput_keyboard_device::configure(input_device &device)
 	{
 		device.add_item(
 				"Start",
+				std::string_view(),
 				ITEM_ID_START,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_START]);
@@ -1691,6 +1720,7 @@ void xinput_keyboard_device::configure(input_device &device)
 	{
 		device.add_item(
 				"Back",
+				std::string_view(),
 				ITEM_ID_SELECT,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_BACK]);

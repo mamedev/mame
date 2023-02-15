@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Yochizo, Takahiro Nogi
-#ifndef MAME_INCLUDES_SRMP2_H
-#define MAME_INCLUDES_SRMP2_H
+#ifndef MAME_SETA_SRMP2_H
+#define MAME_SETA_SRMP2_H
 
 #pragma once
 
@@ -99,4 +99,4 @@ private:
 	void srmp3_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_SRMP2_H
+#endif // MAME_SETA_SRMP2_H

@@ -75,6 +75,7 @@
 #include "speaker.h"
 
 
+namespace {
 
 class elan_eu3a14_state : public driver_device
 {
@@ -877,6 +878,9 @@ ROM_START( rad_baskp )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "basketball.bin", 0x000000, 0x400000, CRC(7d6ff53c) SHA1(1c75261d55e0107a3b8e8d4c1eb2854750f2d0e8) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 2006, rad_gtg,  0,        0, radica_eu3a14_altrambase_adc, rad_gtg,       elan_eu3a14_state, empty_init,  "Radica / FarSight Studios (licensed from Incredible Technologies)", "Golden Tee Golf: Home Edition", MACHINE_NOT_WORKING )
 

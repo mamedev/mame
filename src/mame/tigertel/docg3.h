@@ -8,8 +8,8 @@
 
 */
 
-#ifndef MAME_MACHINE_DOCG3_H
-#define MAME_MACHINE_DOCG3_H
+#ifndef MAME_TIGERTEL_DOCG3_H
+#define MAME_TIGERTEL_DOCG3_H
 
 #pragma once
 
@@ -97,4 +97,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(DISKONCHIP_G3, diskonchip_g3_device)
 
-#endif // MAME_MACHINE_DOCG3_H
+#endif // MAME_TIGERTEL_DOCG3_H

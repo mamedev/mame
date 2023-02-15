@@ -494,14 +494,14 @@ public:
 		for (int button = 0; button < m_button_count; button++)
 		{
 			input_item_id const itemid = input_item_id(ITEM_ID_BUTTON1 + button);
-			device.add_item(default_button_name(button), itemid, generic_button_get_state<std::int32_t>, &m_lightgun.buttons[button]);
+			device.add_item(default_button_name(button), std::string_view(), itemid, generic_button_get_state<std::int32_t>, &m_lightgun.buttons[button]);
 		}
 
 		// Add X and Y axis
 		if (1 <= m_axis_count)
-			device.add_item("X", ITEM_ID_XAXIS, generic_axis_get_state<std::int32_t>, &m_lightgun.lX);
+			device.add_item("X", std::string_view(), ITEM_ID_XAXIS, generic_axis_get_state<std::int32_t>, &m_lightgun.lX);
 		if (2 <= m_axis_count)
-			device.add_item("Y", ITEM_ID_YAXIS, generic_axis_get_state<std::int32_t>, &m_lightgun.lY);
+			device.add_item("Y", std::string_view(), ITEM_ID_YAXIS, generic_axis_get_state<std::int32_t>, &m_lightgun.lY);
 	}
 
 	virtual void process_event(XEvent const &xevent) override

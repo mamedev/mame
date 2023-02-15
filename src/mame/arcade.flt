@@ -582,7 +582,6 @@ midcoin/24cdjuke.cpp
 midcoin/wallc.cpp
 midcoin/wink.cpp
 midw8080/8080bw.cpp
-midw8080/m79amb.cpp
 midw8080/mw8080bw.cpp
 midw8080/rotaryf.cpp
 midway/astrocde.cpp
@@ -1015,6 +1014,7 @@ nichibutsu/tubep.cpp
 nichibutsu/wiping.cpp
 nintendo/aleck64.cpp
 nintendo/cham24.cpp
+nintendo/cothello.cpp
 nintendo/dkong.cpp
 nintendo/famibox.cpp
 nintendo/mario.cpp
@@ -1182,6 +1182,7 @@ psikyo/psikyo.cpp
 psikyo/psikyo4.cpp
 psikyo/psikyosh.cpp
 ramtek/hitme.cpp
+ramtek/m79amb.cpp
 ramtek/ramtek.cpp
 ramtek/starcrus.cpp
 rare/btoads.cpp

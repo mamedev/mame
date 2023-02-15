@@ -44,6 +44,8 @@ cha3    $10d8
 #include "speaker.h"
 
 
+namespace {
+
 class cchance_state : public tnzs_base_state
 {
 public:
@@ -262,5 +264,8 @@ ROM_START( cchance )
 	ROM_LOAD( "prom1", 0x0000, 0x0200, NO_DUMP )
 	ROM_LOAD( "prom2", 0x0200, 0x0200, NO_DUMP )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1987?, cchance, 0, cchance, cchance, cchance_state, empty_init, ROT0, "<unknown>", "Cherry Chance", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

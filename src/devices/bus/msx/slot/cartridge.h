@@ -92,6 +92,8 @@ protected:
 	memory_region *cart_kanji_region() { return m_exp ? m_exp->memregion("kanji") : nullptr; }
 	memory_region *cart_ram_region() { return m_exp ? m_exp->memregion("ram") : nullptr; }
 	memory_region *cart_sram_region() { return m_exp ? m_exp->memregion("sram") : nullptr; }
+	const char *get_feature(std::string_view feature_name) { return m_exp ? m_exp->get_feature(feature_name) : nullptr; }
+	bool is_loaded_through_softlist() { return m_exp ? m_exp->loaded_through_softlist() : false; }
 	DECLARE_WRITE_LINE_MEMBER(irq_out);
 	address_space &memory_space() const;
 	address_space &io_space() const;

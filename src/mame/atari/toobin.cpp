@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
+
 /***************************************************************************
 
     Atari Toobin' hardware
@@ -23,16 +24,330 @@
 
 
 #include "emu.h"
-#include "toobin.h"
+
+#include "atarijsa.h"
+#include "atarimo.h"
 
 #include "cpu/m68000/m68010.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
-static constexpr XTAL MASTER_CLOCK = 32_MHz_XTAL;
+
+namespace {
+
+class toobin_state : public driver_device
+{
+public:
+	toobin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_jsa(*this, "jsa"),
+		m_playfield_tilemap(*this, "playfield"),
+		m_alpha_tilemap(*this, "alpha"),
+		m_mob(*this, "mob"),
+		m_palette(*this, "palette"),
+		m_paletteram(*this, "paletteram"),
+		m_interrupt_scan(*this, "interrupt_scan"),
+		m_xscroll(*this, "xscroll"),
+		m_yscroll(*this, "yscroll")
+	{ }
+
+	void toobin(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<atari_jsa_i_device> m_jsa;
+	required_device<tilemap_device> m_playfield_tilemap;
+	required_device<tilemap_device> m_alpha_tilemap;
+	required_device<atari_motion_objects_device> m_mob;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint16_t> m_paletteram;
+	required_shared_ptr<uint16_t> m_interrupt_scan;
+	required_shared_ptr<uint16_t> m_xscroll;
+	required_shared_ptr<uint16_t> m_yscroll;
+
+	double m_brightness = 0;
+	bitmap_ind16 m_pfbitmap;
+
+	emu_timer *m_scanline_interrupt_timer = nullptr;
+
+	TIMER_CALLBACK_MEMBER(scanline_interrupt);
+	void scanline_int_ack_w(uint16_t data);
+
+	void interrupt_scan_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void intensity_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void slip_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
+	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map);
+
+	static const atari_motion_objects_config s_mob_config;
+};
 
 
+// video
+
+/*************************************
+ *
+ *  Tilemap callbacks
+ *
+ *************************************/
+
+TILE_GET_INFO_MEMBER(toobin_state::get_alpha_tile_info)
+{
+	uint16_t const data = m_alpha_tilemap->basemem_read(tile_index);
+	int const code = data & 0x3ff;
+	int const color = (data >> 12) & 0x0f;
+	tileinfo.set(2, code, color, (data >> 10) & 1);
+}
+
+
+TILE_GET_INFO_MEMBER(toobin_state::get_playfield_tile_info)
+{
+	uint32_t const data = m_playfield_tilemap->basemem_read(tile_index);
+	int const code = data & 0x3fff;
+	int const color = (data >> 16) & 0x0f;
+	tileinfo.set(0, code, color, TILE_FLIPYX(data >> 14));
+	tileinfo.category = (data >> 20) & 3;
+}
+
+
+
+/*************************************
+ *
+ *  Video system start
+ *
+ *************************************/
+
+const atari_motion_objects_config toobin_state::s_mob_config =
+{
+	1,                  // index to which gfx system
+	1,                  // number of motion object banks
+	1,                  // are the entries linked?
+	0,                  // are the entries split?
+	0,                  // render in reverse order?
+	1,                  // render in swapped X/Y order?
+	0,                  // does the neighbor bit affect the next object?
+	1024,               // pixels per SLIP entry (0 for no-slip)
+	0,                  // pixel offset for SLIPs
+	0,                  // maximum number of links to visit/scanline (0=all)
+
+	0x100,              // base palette entry
+	0x100,              // maximum number of colors
+	0,                  // transparent pen index
+
+	{{ 0,0,0x00ff,0 }}, // mask for the link
+	{{ 0,0x3fff,0,0 }}, // mask for the code index
+	{{ 0,0,0,0x000f }}, // mask for the color
+	{{ 0,0,0,0xffc0 }}, // mask for the X position
+	{{ 0x7fc0,0,0,0 }}, // mask for the Y position
+	{{ 0x0007,0,0,0 }}, // mask for the width, in tiles
+	{{ 0x0038,0,0,0 }}, // mask for the height, in tiles
+	{{ 0,0x4000,0,0 }}, // mask for the horizontal flip
+	{{ 0,0x8000,0,0 }}, // mask for the vertical flip
+	{{ 0 }},            // mask for the priority
+	{{ 0 }},            // mask for the neighbor
+	{{ 0x8000,0,0,0 }}, // mask for absolute coordinates
+
+	{{ 0 }},            // mask for the special value
+	0                   // resulting value to indicate "special"
+};
+
+void toobin_state::video_start()
+{
+	// allocate a playfield bitmap for rendering
+	m_screen->register_screen_bitmap(m_pfbitmap);
+
+	save_item(NAME(m_brightness));
+}
+
+
+
+/*************************************
+ *
+ *  Palette RAM write handler
+ *
+ *************************************/
+
+void toobin_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_paletteram[offset]);
+	uint16_t newword = m_paletteram[offset];
+
+	{
+		int red = (((newword >> 10) & 31) * 224) >> 5;
+		int green = (((newword >> 5) & 31) * 224) >> 5;
+		int blue = ((newword & 31) * 224) >> 5;
+
+		if (red) red += 38;
+		if (green) green += 38;
+		if (blue) blue += 38;
+
+		m_palette->set_pen_color(offset & 0x3ff, rgb_t(red, green, blue));
+		if (!(newword & 0x8000))
+			m_palette->set_pen_contrast(offset & 0x3ff, m_brightness);
+		else
+			m_palette->set_pen_contrast(offset & 0x3ff, 1.0);
+	}
+}
+
+
+void toobin_state::intensity_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		m_brightness = (double)(~data & 0x1f) / 31.0;
+
+		for (int i = 0; i < 0x400; i++)
+			if (!BIT(m_paletteram[i], 15))
+				m_palette->set_pen_contrast(i, m_brightness);
+	}
+}
+
+
+
+/*************************************
+ *
+ *  X/Y scroll handlers
+ *
+ *************************************/
+
+void toobin_state::xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	uint16_t const oldscroll = *m_xscroll;
+	uint16_t newscroll = oldscroll;
+	COMBINE_DATA(&newscroll);
+
+	// if anything has changed, force a partial update
+	if (newscroll != oldscroll)
+		m_screen->update_partial(m_screen->vpos());
+
+	// update the playfield scrolling - hscroll is clocked on the following scanline
+	m_playfield_tilemap->set_scrollx(0, newscroll >> 6);
+	m_mob->set_xscroll(newscroll >> 6);
+
+	// update the data
+	*m_xscroll = newscroll;
+}
+
+
+void toobin_state::yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	uint16_t const oldscroll = *m_yscroll;
+	uint16_t newscroll = oldscroll;
+	COMBINE_DATA(&newscroll);
+
+	// if anything has changed, force a partial update
+	if (newscroll != oldscroll)
+		m_screen->update_partial(m_screen->vpos());
+
+	// if bit 4 is zero, the scroll value is clocked in right away
+	m_playfield_tilemap->set_scrolly(0, newscroll >> 6);
+	m_mob->set_yscroll((newscroll >> 6) & 0x1ff);
+
+	// update the data
+	*m_yscroll = newscroll;
+}
+
+
+
+/*************************************
+ *
+ *  X/Y scroll handlers
+ *
+ *************************************/
+
+void toobin_state::slip_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	uint16_t const oldslip = m_mob->slipram(offset);
+	uint16_t newslip = oldslip;
+	COMBINE_DATA(&newslip);
+
+	// if the SLIP is changing, force a partial update first
+	if (oldslip != newslip)
+		m_screen->update_partial(m_screen->vpos());
+
+	// update the data
+	m_mob->slipram(offset) = newslip;
+}
+
+
+
+/*************************************
+ *
+ *  Main refresh
+ *
+ *************************************/
+
+uint32_t toobin_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	// start drawing
+	m_mob->draw_async(cliprect);
+
+	// draw the playfield
+	bitmap_ind8 &priority_bitmap = screen.priority();
+	priority_bitmap.fill(0, cliprect);
+	m_playfield_tilemap->draw(screen, m_pfbitmap, cliprect, 0, 0);
+	m_playfield_tilemap->draw(screen, m_pfbitmap, cliprect, 1, 1);
+	m_playfield_tilemap->draw(screen, m_pfbitmap, cliprect, 2, 2);
+	m_playfield_tilemap->draw(screen, m_pfbitmap, cliprect, 3, 3);
+
+	// draw and merge the MO
+	bitmap_ind16 &mobitmap = m_mob->bitmap();
+	pen_t const *const palette = m_palette->pens();
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		uint32_t *const dest = &bitmap.pix(y);
+		uint16_t const *const mo = &mobitmap.pix(y);
+		uint16_t const *const pf = &m_pfbitmap.pix(y);
+		uint8_t const *const pri = &priority_bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+		{
+			uint16_t pix = pf[x];
+			if (mo[x] != 0xffff)
+			{
+				/* not verified: logic is all controlled in a PAL
+
+				   factors: LBPRI1-0, LBPIX3, ANPIX1-0, PFPIX3, PFPRI1-0,
+				            (~LBPIX3 & ~LBPIX2 & ~LBPIX1 & ~LBPIX0)
+				*/
+
+				// only draw if not high priority PF
+				if (!pri[x] || !(pix & 8))
+					pix = mo[x];
+			}
+			dest[x] = palette[pix];
+		}
+	}
+
+	// add the alpha on top
+	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	return 0;
+}
+
+
+// machine
 
 /*************************************
  *
@@ -61,11 +376,11 @@ void toobin_state::machine_start()
 
 void toobin_state::interrupt_scan_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int oldword = m_interrupt_scan[offset];
+	int const oldword = m_interrupt_scan[offset];
 	int newword = oldword;
 	COMBINE_DATA(&newword);
 
-	/* if something changed, update the word in memory */
+	// if something changed, update the word in memory
 	if (oldword != newword)
 	{
 		m_interrupt_scan[offset] = newword;
@@ -86,7 +401,7 @@ void toobin_state::scanline_int_ack_w(uint16_t data)
  *
  *************************************/
 
-/* full address map decoded from schematics */
+// full address map decoded from schematics
 void toobin_state::main_map(address_map &map)
 {
 	map.global_mask(0xc7ffff);
@@ -94,18 +409,18 @@ void toobin_state::main_map(address_map &map)
 	map(0xc00000, 0xc07fff).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
 	map(0xc08000, 0xc097ff).mirror(0x046000).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
 	map(0xc09800, 0xc09fff).mirror(0x046000).ram().share("mob");
-	map(0xc10000, 0xc107ff).mirror(0x047800).ram().w(FUNC(toobin_state::paletteram_w)).share("paletteram");
-	map(0x826000, 0x826001).mirror(0x4500fe).nopr();     /* who knows? read at controls time */
+	map(0xc10000, 0xc107ff).mirror(0x047800).ram().w(FUNC(toobin_state::paletteram_w)).share(m_paletteram);
+	map(0x826000, 0x826001).mirror(0x4500fe).nopr();     // who knows? read at controls time
 	map(0x828000, 0x828001).mirror(0x4500fe).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
 	map(0x828101, 0x828101).mirror(0x4500fe).w(m_jsa, FUNC(atari_jsa_i_device::main_command_w));
 	map(0x828300, 0x828301).mirror(0x45003e).w(FUNC(toobin_state::intensity_w));
-	map(0x828340, 0x828341).mirror(0x45003e).w(FUNC(toobin_state::interrupt_scan_w)).share("interrupt_scan");
+	map(0x828340, 0x828341).mirror(0x45003e).w(FUNC(toobin_state::interrupt_scan_w)).share(m_interrupt_scan);
 	map(0x828380, 0x828381).mirror(0x45003e).ram().w(FUNC(toobin_state::slip_w)).share("mob:slip");
 	map(0x8283c0, 0x8283c1).mirror(0x45003e).w(FUNC(toobin_state::scanline_int_ack_w));
 	map(0x828400, 0x828401).mirror(0x4500fe).w(m_jsa, FUNC(atari_jsa_i_device::sound_reset_w));
 	map(0x828500, 0x828501).mirror(0x4500fe).w("eeprom", FUNC(eeprom_parallel_28xx_device::unlock_write16));
-	map(0x828600, 0x828601).mirror(0x4500fe).w(FUNC(toobin_state::xscroll_w)).share("xscroll");
-	map(0x828700, 0x828701).mirror(0x4500fe).w(FUNC(toobin_state::yscroll_w)).share("yscroll");
+	map(0x828600, 0x828601).mirror(0x4500fe).w(FUNC(toobin_state::xscroll_w)).share(m_xscroll);
+	map(0x828700, 0x828701).mirror(0x4500fe).w(FUNC(toobin_state::yscroll_w)).share(m_yscroll);
 	map(0x828800, 0x828801).mirror(0x4507fe).portr("FF8800");
 	map(0x829000, 0x829001).mirror(0x4507fe).portr("FF9000");
 	map(0x829801, 0x829801).mirror(0x4507fe).r(m_jsa, FUNC(atari_jsa_i_device::main_response_r));
@@ -205,8 +520,10 @@ GFXDECODE_END
 
 void toobin_state::toobin(machine_config &config)
 {
-	/* basic machine hardware */
-	m68010_device &maincpu(M68010(config, m_maincpu, MASTER_CLOCK/4));
+	static constexpr XTAL MASTER_CLOCK = 32_MHz_XTAL;
+
+	// basic machine hardware
+	m68010_device &maincpu(M68010(config, m_maincpu, MASTER_CLOCK / 4));
 	maincpu.set_addrmap(AS_PROGRAM, &toobin_state::main_map);
 	maincpu.disable_interrupt_mixer();
 
@@ -214,22 +531,22 @@ void toobin_state::toobin(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
-	/* video hardware */
-	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 4, 8,8, TILEMAP_SCAN_ROWS, 128,64).set_info_callback(FUNC(toobin_state::get_playfield_tile_info));
-	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64,48, 0).set_info_callback(FUNC(toobin_state::get_alpha_tile_info));
+	// video hardware
+	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 4, 8, 8, TILEMAP_SCAN_ROWS, 128, 64).set_info_callback(FUNC(toobin_state::get_playfield_tile_info));
+	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 48, 0).set_info_callback(FUNC(toobin_state::get_alpha_tile_info));
 
 	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, toobin_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	m_screen->set_raw(MASTER_CLOCK/2, 640, 0, 512, 416, 0, 384);
+	m_screen->set_raw(MASTER_CLOCK / 2, 640, 0, 512, 416, 0, 384);
 	m_screen->set_screen_update(FUNC(toobin_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toobin);
 	PALETTE(config, m_palette).set_entries(1024);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -250,7 +567,7 @@ void toobin_state::toobin(machine_config &config)
  *************************************/
 
 ROM_START( toobin )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "3133-1j.061",  0x000000, 0x010000, CRC(79a92d02) SHA1(72eebb96a3963f94558bb204e0afe08f2b4c1864) )
 	ROM_LOAD16_BYTE( "3137-1f.061",  0x000001, 0x010000, CRC(e389ef60) SHA1(24861fe5eb49de852987993a905fefe4dd43b204) )
 	ROM_LOAD16_BYTE( "3134-2j.061",  0x020000, 0x010000, CRC(3dbe9a48) SHA1(37fe2534fed5708a63995e53ea0cb1d2d23fc1b9) )
@@ -260,7 +577,7 @@ ROM_START( toobin )
 	ROM_LOAD16_BYTE( "1136-5j.061",  0x060000, 0x010000, CRC(5ae3eeac) SHA1(583b6c3f61e8ad4d98449205fedecf3e21ee993c) )
 	ROM_LOAD16_BYTE( "1140-5f.061",  0x060001, 0x010000, CRC(dacbbd94) SHA1(0e3a93f439ff9f3dd57ee13604be02e9c74c8eec) )
 
-	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "1141-2k.061",  0x00000, 0x10000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -305,7 +622,7 @@ ROM_END
 
 
 ROM_START( toobine )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "3733-1j.061",  0x000000, 0x010000, CRC(286c7fad) SHA1(1f06168327bdc356f1bc4cf9a951f914932c491a) )
 	ROM_LOAD16_BYTE( "3737-1f.061",  0x000001, 0x010000, CRC(965c161d) SHA1(30d959a945cb7dc7f00ad4ca9db027a377024030) )
 	ROM_LOAD16_BYTE( "3134-2j.061",  0x020000, 0x010000, CRC(3dbe9a48) SHA1(37fe2534fed5708a63995e53ea0cb1d2d23fc1b9) )
@@ -315,7 +632,7 @@ ROM_START( toobine )
 	ROM_LOAD16_BYTE( "1136-5j.061",  0x060000, 0x010000, CRC(5ae3eeac) SHA1(583b6c3f61e8ad4d98449205fedecf3e21ee993c) )
 	ROM_LOAD16_BYTE( "1140-5f.061",  0x060001, 0x010000, CRC(dacbbd94) SHA1(0e3a93f439ff9f3dd57ee13604be02e9c74c8eec) )
 
-	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "1141-2k.061",  0x00000, 0x10000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -360,7 +677,7 @@ ROM_END
 
 
 ROM_START( toobing )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "3233-1j.061",  0x000000, 0x010000, CRC(b04eb760) SHA1(760525b4f72fad47cfc457e14db70ade30a9ddac) )
 	ROM_LOAD16_BYTE( "3237-1f.061",  0x000001, 0x010000, CRC(4e41a470) SHA1(3a4c9b0d93cf4cff80978c0568bb9ef9eeb878dd) )
 	ROM_LOAD16_BYTE( "3234-2j.061",  0x020000, 0x010000, CRC(8c60f1b4) SHA1(0ff3f4fede83410d73027b6e7445e83044e4b21e) )
@@ -370,7 +687,7 @@ ROM_START( toobing )
 	ROM_LOAD16_BYTE( "1136-5j.061",  0x060000, 0x010000, CRC(5ae3eeac) SHA1(583b6c3f61e8ad4d98449205fedecf3e21ee993c) )
 	ROM_LOAD16_BYTE( "1140-5f.061",  0x060001, 0x010000, CRC(dacbbd94) SHA1(0e3a93f439ff9f3dd57ee13604be02e9c74c8eec) )
 
-	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "1141-2k.061",  0x00000, 0x10000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -415,7 +732,7 @@ ROM_END
 
 
 ROM_START( toobin2e )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "2733-1j.061",  0x000000, 0x010000, CRC(a6334cf7) SHA1(39e540619c24af65bda44160a5bdaebf3600b64b) )
 	ROM_LOAD16_BYTE( "2737-1f.061",  0x000001, 0x010000, CRC(9a52dd20) SHA1(a370ae3e4c7af55ea61b57a203a900f2be3ce6b9) )
 	ROM_LOAD16_BYTE( "2134-2j.061",  0x020000, 0x010000, CRC(2b8164c8) SHA1(aeeaff9df9fda23b295b59efadf52160f084d256) )
@@ -425,7 +742,7 @@ ROM_START( toobin2e )
 	ROM_LOAD16_BYTE( "1136-5j.061",  0x060000, 0x010000, CRC(5ae3eeac) SHA1(583b6c3f61e8ad4d98449205fedecf3e21ee993c) )
 	ROM_LOAD16_BYTE( "1140-5f.061",  0x060001, 0x010000, CRC(dacbbd94) SHA1(0e3a93f439ff9f3dd57ee13604be02e9c74c8eec) )
 
-	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "1141-2k.061",  0x00000, 0x10000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -470,7 +787,7 @@ ROM_END
 
 
 ROM_START( toobin2 )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "2133-1j.061",  0x000000, 0x010000, CRC(2c3382e4) SHA1(39919e9b5b586b630e0581adabfe25d83b2bfaef) )
 	ROM_LOAD16_BYTE( "2137-1f.061",  0x000001, 0x010000, CRC(891c74b1) SHA1(2f39d0e4934ccf48bb5fc0737f34fc5a65cfd903) )
 	ROM_LOAD16_BYTE( "2134-2j.061",  0x020000, 0x010000, CRC(2b8164c8) SHA1(aeeaff9df9fda23b295b59efadf52160f084d256) )
@@ -480,7 +797,7 @@ ROM_START( toobin2 )
 	ROM_LOAD16_BYTE( "1136-5j.061",  0x060000, 0x010000, CRC(5ae3eeac) SHA1(583b6c3f61e8ad4d98449205fedecf3e21ee993c) )
 	ROM_LOAD16_BYTE( "1140-5f.061",  0x060001, 0x010000, CRC(dacbbd94) SHA1(0e3a93f439ff9f3dd57ee13604be02e9c74c8eec) )
 
-	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "1141-2k.061",  0x00000, 0x10000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -525,7 +842,7 @@ ROM_END
 
 
 ROM_START( toobin1 )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 8*64k for 68000 code */
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "1133-1j.061",  0x000000, 0x010000, CRC(caeb5d1b) SHA1(8036871a04b5206fd383ac0fd9a9d3218128088b) )
 	ROM_LOAD16_BYTE( "1137-1f.061",  0x000001, 0x010000, CRC(9713d9d3) SHA1(55791150312de201bdd330bfd4cbb132cb3959e4) )
 	ROM_LOAD16_BYTE( "1134-2j.061",  0x020000, 0x010000, CRC(119f5d7b) SHA1(edd0b1ab29bb9c15c3b80037635c3b6d5fb434dc) )
@@ -535,7 +852,7 @@ ROM_START( toobin1 )
 	ROM_LOAD16_BYTE( "1136-5j.061",  0x060000, 0x010000, CRC(5ae3eeac) SHA1(583b6c3f61e8ad4d98449205fedecf3e21ee993c) )
 	ROM_LOAD16_BYTE( "1140-5f.061",  0x060001, 0x010000, CRC(dacbbd94) SHA1(0e3a93f439ff9f3dd57ee13604be02e9c74c8eec) )
 
-	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) // 6502 code
 	ROM_LOAD( "1141-2k.061",  0x00000, 0x10000, CRC(c0dcce1a) SHA1(285c13f08020cf5827eca2afcc2fa8a3a0a073e0) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -578,6 +895,8 @@ ROM_START( toobin1 )
 	ROM_LOAD( "1142-20h.061", 0x000000, 0x004000, CRC(a6ab551f) SHA1(6a11e16f3965416c81737efcb81e751484ba5ace) )
 ROM_END
 
+} // anonymous namespace
+
 
 /*************************************
  *
@@ -585,9 +904,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, toobin,   0,      toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobin,   0,      toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (rev 3)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1988, toobine,  toobin, toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (Europe, rev 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, toobing,  toobin, toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (German, rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, toobin2,  toobin, toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobin2,  toobin, toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (rev 2)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1988, toobin2e, toobin, toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (Europe, rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, toobin1,  toobin, toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, toobin1,  toobin, toobin, toobin, toobin_state, empty_init, ROT270, "Atari Games", "Toobin' (rev 1)",         MACHINE_SUPPORTS_SAVE )
