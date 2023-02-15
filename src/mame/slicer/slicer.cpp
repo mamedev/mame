@@ -45,13 +45,13 @@ private:
 void slicer_state::sio_out_w(uint8_t data)
 {
 	floppy_image_device *floppy;
- 	int state = (data & 0x80) ? 0 : 1;
- 	char devname[8];
+	int state = (data & 0x80) ? 0 : 1;
+	char devname[8];
 
 	for(int i = 0; i < 4; i++)
 	{
 		sprintf(devname, "%d", i);
- 		floppy = m_fdc->subdevice<floppy_connector>(devname)->get_device();
+		floppy = m_fdc->subdevice<floppy_connector>(devname)->get_device();
 		if(floppy)
 			floppy->mon_w(state);
 	}
@@ -60,11 +60,14 @@ void slicer_state::sio_out_w(uint8_t data)
 template<unsigned int drive>
 WRITE_LINE_MEMBER(slicer_state::drive_sel_w)
 {
+	floppy_image_device *floppy;
+	char devname[8];
+
 	if (!state)
 		return;
 
-	auto devname = std::to_string(drive);
-	auto floppy = m_fdc->subdevice<floppy_connector>(devname)->get_device();
+	sprintf(devname, "%d", drive);
+	floppy = m_fdc->subdevice<floppy_connector>(devname)->get_device();
 	m_fdc->set_floppy(floppy);
 }
 
