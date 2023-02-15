@@ -31,7 +31,7 @@
 #define LOG_CC      (1U << 3)
 #define LOG_ID      (1U << 4)
 
-#define VERBOSE (LOG_GENERAL | LOG_REG | LOG_CC)
+//#define VERBOSE (LOG_GENERAL | LOG_REG | LOG_CC)
 #include "logmacro.h"
 
 
@@ -187,7 +187,8 @@ uint16_t gayle_device::status_r()
 	// ------1-  enable pcmcia digital audio
 	// -------0  disable pcmcia
 
-	LOGMASKED(LOG_REG, "status_r: %02x\n", m_gayle_reg[REG_STATUS]);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_REG, "status_r: %02x\n", m_gayle_reg[REG_STATUS]);
 
 	return (m_gayle_reg[REG_STATUS] << 8) | m_gayle_reg[REG_STATUS];
 }
@@ -230,7 +231,8 @@ uint16_t gayle_device::change_r()
 	// ------1-  generate reset after cc detect change
 	// -------0  generate bus error after cc detect change
 
-	LOGMASKED(LOG_REG, "change_r: %02x\n", m_gayle_reg[REG_CHANGE]);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_REG, "change_r: %02x\n", m_gayle_reg[REG_CHANGE]);
 
 	return (m_gayle_reg[REG_CHANGE] << 8) | m_gayle_reg[REG_CHANGE];
 }
@@ -307,7 +309,8 @@ uint16_t gayle_device::int_r()
 	// ------1-  set interrupt level for battery voltage 1/2
 	// -------0  set interrupt level for busy/interrupt request
 
-	LOGMASKED(LOG_REG, "int_r: %02x\n", m_gayle_reg[REG_INT]);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_REG, "int_r: %02x\n", m_gayle_reg[REG_INT]);
 
 	return (m_gayle_reg[REG_INT] << 8) | m_gayle_reg[REG_INT];
 }
@@ -327,7 +330,8 @@ uint16_t gayle_device::control_r()
 	// ------1-  program 12v
 	// -------0  program 5v
 
-	LOGMASKED(LOG_REG, "control_r: %02x\n", m_gayle_reg[REG_CONTROL]);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_REG, "control_r: %02x\n", m_gayle_reg[REG_CONTROL]);
 
 	return (m_gayle_reg[REG_CONTROL] << 8) | m_gayle_reg[REG_CONTROL];
 }
