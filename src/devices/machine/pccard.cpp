@@ -7,10 +7,10 @@
 #include "logmacro.h"
 
 
-device_pccard_interface::device_pccard_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "pccard")
+device_pccard_interface::device_pccard_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "pccard"),
+	m_slot(dynamic_cast<pccard_slot_device *>(device.owner()))
 {
-	m_slot = dynamic_cast<pccard_slot_device *>(device.owner());
 }
 
 uint16_t device_pccard_interface::read_memory(offs_t offset, uint16_t mem_mask)
