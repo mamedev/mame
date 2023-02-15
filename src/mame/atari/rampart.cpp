@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
+
 /***************************************************************************
 
     Atari Rampart hardware
@@ -25,17 +26,200 @@
 
 
 #include "emu.h"
-#include "rampart.h"
+
+#include "atarimo.h"
+#include "slapstic.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "sound/okim6295.h"
+#include "sound/ymopl.h"
+
 #include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL(14'318'181)
+// configurable logging
+#define LOG_COLBANK     (1U <<  1)
 
+//#define VERBOSE (LOG_GENERAL | LOG_COLBANK)
+
+#include "logmacro.h"
+
+#define LOGCOLBANK(...)     LOGMASKED(LOG_COLBANK,     __VA_ARGS__)
+
+
+namespace {
+
+class rampart_state : public driver_device
+{
+public:
+	rampart_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_slapstic(*this, "slapstic"),
+		m_slapstic_bank(*this, "slapstic_bank"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_mob(*this, "mob"),
+		m_oki(*this, "oki"),
+		m_ym2413(*this, "ymsnd"),
+		m_bitmap(*this, "bitmap")
+	{ }
+
+	void rampart(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<atari_slapstic_device> m_slapstic;
+	required_memory_bank m_slapstic_bank;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<atari_motion_objects_device> m_mob;
+	required_device<okim6295_device> m_oki;
+	required_device<ym2413_device> m_ym2413;
+
+	required_shared_ptr<u16> m_bitmap;
+
+	static const atari_motion_objects_config s_mob_config;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
+	void scanline_int_ack_w(u16 data);
+	void latch_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void bitmap_render(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map);
+};
+
+
+// video
+
+/*************************************
+ *
+ *  Video system start
+ *
+ *************************************/
+
+const atari_motion_objects_config rampart_state::s_mob_config =
+{
+	0,                  // index to which gfx system
+	1,                  // number of motion object banks
+	1,                  // are the entries linked?
+	0,                  // are the entries split?
+	0,                  // render in reverse order?
+	0,                  // render in swapped X/Y order?
+	0,                  // does the neighbor bit affect the next object?
+	8,                  // pixels per SLIP entry (0 for no-slip)
+	0,                  // pixel offset for SLIPs
+	0,                  // maximum number of links to visit/scanline (0=all)
+
+	0x100,              // base palette entry
+	0x100,              // maximum number of colors
+	0,                  // transparent pen index
+
+	{{ 0x00ff,0,0,0 }}, // mask for the link
+	{{ 0,0x7fff,0,0 }}, // mask for the code index
+	{{ 0,0,0x000f,0 }}, // mask for the color
+	{{ 0,0,0xff80,0 }}, // mask for the X position
+	{{ 0,0,0,0xff80 }}, // mask for the Y position
+	{{ 0,0,0,0x0070 }}, // mask for the width, in tiles
+	{{ 0,0,0,0x0007 }}, // mask for the height, in tiles
+	{{ 0,0x8000,0,0 }}, // mask for the horizontal flip
+	{{ 0 }},            // mask for the vertical flip
+	{{ 0 }},            // mask for the priority
+	{{ 0 }},            // mask for the neighbor
+	{{ 0 }},            // mask for absolute coordinates
+
+	{{ 0 }},            // mask for the special value
+	0                   // resulting value to indicate "special"
+};
+
+void rampart_state::video_start()
+{
+	// set the initial scroll offset
+	m_mob->set_xscroll(-12);
+}
+
+
+
+/*************************************
+ *
+ *  Main refresh
+ *
+ *************************************/
+
+uint32_t rampart_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// start drawing
+	m_mob->draw_async(cliprect);
+
+	// draw the playfield
+	bitmap_render(bitmap, cliprect);
+
+	// draw and merge the MO
+	bitmap_ind16 &mobitmap = m_mob->bitmap();
+	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
+		for (int y = rect->top(); y <= rect->bottom(); y++)
+		{
+			uint16_t const *const mo = &mobitmap.pix(y);
+			uint16_t *const pf = &bitmap.pix(y);
+			for (int x = rect->left(); x <= rect->right(); x++)
+				if (mo[x] != 0xffff)
+				{
+					// the PCB supports more complex priorities, but the PAL is not stuffed, so we get the default
+					pf[x] = mo[x];
+				}
+		}
+	return 0;
+}
+
+
+
+/*************************************
+ *
+ *  Bitmap rendering
+ *
+ *************************************/
+
+void rampart_state::bitmap_render(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// update any dirty scanlines
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		uint16_t const *const src = &m_bitmap[256 * y];
+		uint16_t *const dst = &bitmap.pix(y);
+
+		// regenerate the line
+		for (int x = cliprect.left() & ~1; x <= cliprect.right(); x += 2)
+		{
+			int const bits = src[(x - 8) / 2];
+			dst[x + 0] = bits >> 8;
+			dst[x + 1] = bits & 0xff;
+		}
+	}
+}
+
+
+// machine
+
+/*************************************
+ *
+ *  Initialization
+ *
+ *************************************/
+
+void rampart_state::machine_start()
+{
+	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x40000, 0x2000);
+}
 
 /*************************************
  *
@@ -45,7 +229,7 @@
 
 TIMER_DEVICE_CALLBACK_MEMBER(rampart_state::scanline_interrupt)
 {
-	/* generate 32V signals */
+	// generate 32V signals
 	if ((param & 32) == 0)
 		m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 }
@@ -82,16 +266,16 @@ void rampart_state::latch_w(offs_t offset, u16 data, u16 mem_mask)
 	    0x0001 == /YAMRES (YM2413 reset)
 	*/
 
-	/* upper byte being modified? */
+	// upper byte being modified?
 	if (ACCESSING_BITS_8_15)
 	{
 		if (data & 0x1000)
-			logerror("Color bank set to 1!\n");
+			LOGCOLBANK("Color bank set to 1!\n");
 		machine().bookkeeping().coin_counter_w(0, (data >> 9) & 1);
 		machine().bookkeeping().coin_counter_w(1, (data >> 8) & 1);
 	}
 
-	/* lower byte being modified? */
+	// lower byte being modified?
 	if (ACCESSING_BITS_0_7)
 	{
 		m_oki->set_output_gain(ALL_OUTPUTS, (data & 0x0020) ? 1.0f : 0.0f);
@@ -111,14 +295,14 @@ void rampart_state::latch_w(offs_t offset, u16 data, u16 mem_mask)
  *
  *************************************/
 
-/* full memory map deduced from schematics and GALs */
+// full memory map deduced from schematics and GALs
 void rampart_state::main_map(address_map &map)
 {
 	map.global_mask(0x7fffff);
 	map(0x000000, 0x0fffff).rom();
-	map(0x140000, 0x141fff).mirror(0x43e000).bankr(m_slapstic_bank); /* slapstic goes here */
-	map(0x200000, 0x21ffff).ram().share("bitmap");
-	map(0x220000, 0x3bffff).nopw();    /* the code blasts right through this when initializing */
+	map(0x140000, 0x141fff).mirror(0x43e000).bankr(m_slapstic_bank);
+	map(0x200000, 0x21ffff).ram().share(m_bitmap);
+	map(0x220000, 0x3bffff).nopw();    // the code blasts right through this when initializing
 	map(0x3c0000, 0x3c07ff).mirror(0x019800).rw("palette", FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0xff00).share("palette");
 	map(0x3e0000, 0x3e07ff).mirror(0x010000).ram().share("mob");
 	map(0x3e0800, 0x3e3f3f).mirror(0x010000).ram();
@@ -298,20 +482,8 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout molayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0, 4, 8, 12, 16, 20, 24, 28 },
-	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
-	32*8
-};
-
-
 static GFXDECODE_START( gfx_rampart )
-	GFXDECODE_ENTRY( "gfx1", 0, molayout,  256, 16 )
+	GFXDECODE_ENTRY( "gfx", 0, gfx_8x8x4_packed_msb,  256, 16 )
 GFXDECODE_END
 
 
@@ -324,8 +496,10 @@ GFXDECODE_END
 
 void rampart_state::rampart(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, MASTER_CLOCK/2);
+	constexpr XTAL MASTER_CLOCK = XTAL(14'318'181);
+
+	// basic machine hardware
+	M68000(config, m_maincpu, MASTER_CLOCK / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rampart_state::main_map);
 
 	SLAPSTIC(config, m_slapstic, 118);
@@ -338,7 +512,7 @@ void rampart_state::rampart(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
-	/* video hardware */
+	// video hardware
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_rampart);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 512).set_membits(8);
 
@@ -347,19 +521,19 @@ void rampart_state::rampart(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	/* note: these parameters are from published specs, not derived */
-	/* the board uses an SOS-2 chip to generate video signals */
-	m_screen->set_raw(MASTER_CLOCK/2, 456, 0+12, 336+12, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(rampart_state::screen_update_rampart));
+	/* note: these parameters are from published specs, not derived
+	   the board uses an SOS-2 chip to generate video signals */
+	m_screen->set_raw(MASTER_CLOCK / 2, 456, 0+12, 336+12, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(rampart_state::screen_update));
 	m_screen->set_palette("palette");
 	//m_screen->screen_vblank().set(FUNC(rampart_state::video_int_write_line));
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki, MASTER_CLOCK/4/3, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.60);
+	OKIM6295(config, m_oki, MASTER_CLOCK / 4 / 3, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	YM2413(config, m_ym2413, MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YM2413(config, m_ym2413, MASTER_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -377,10 +551,10 @@ ROM_START( rampart )
 	ROM_LOAD16_BYTE( "136082-2031.13l", 0x00000, 0x10000, CRC(07650c7e) SHA1(0a8eec76aefd4fd1515c1a0d5b96f71c674cdce7) )
 	ROM_LOAD16_BYTE( "136082-2030.13h", 0x00001, 0x10000, CRC(e2bf2a26) SHA1(be15b3b0e302382518436441875a1b72954a589a) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x20000, "gfx", ROMREGION_INVERT )
 	ROM_LOAD( "136082-1009.2n",   0x000000, 0x20000, CRC(23b95f59) SHA1(cec8523eaf83d4c9bb0055f34024a6e9c52c4c0c) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM data */
+	ROM_REGION( 0x40000, "oki", 0 ) // ADPCM data
 	ROM_LOAD( "136082-1007.2d", 0x00000, 0x20000, CRC(c96a0fc3) SHA1(6e7e242d0afa4714ca31d77ccbf8ee487bbdb1e4) )
 	ROM_LOAD( "136082-1008.1d", 0x20000, 0x20000, CRC(518218d9) SHA1(edf1b11579dcfa9a872fa4bd866dc2f95fac767d) )
 
@@ -404,10 +578,10 @@ ROM_START( rampart2p )
 	ROM_LOAD16_BYTE( "136082-2051.13kl", 0x00000, 0x20000, CRC(d4e26d0f) SHA1(5106549e6d003711bfd390aa2e19e6e5f33f2cf9) )
 	ROM_LOAD16_BYTE( "136082-2050.13h",  0x00001, 0x20000, CRC(ed2a49bd) SHA1(b97ee41b7f930ba7b8b113c1b19c7729a5880b1f) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x20000, "gfx", ROMREGION_INVERT )
 	ROM_LOAD( "136082-1019.2n",   0x000000, 0x20000, CRC(efa38bef) SHA1(d38448138134e7a0be2a75c3cd6ab0729da5b83b) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM data */
+	ROM_REGION( 0x40000, "oki", 0 ) // ADPCM data
 	ROM_LOAD( "136082-1007.2d", 0x00000, 0x20000, CRC(c96a0fc3) SHA1(6e7e242d0afa4714ca31d77ccbf8ee487bbdb1e4) )
 	ROM_LOAD( "136082-1008.1d", 0x20000, 0x20000, CRC(518218d9) SHA1(edf1b11579dcfa9a872fa4bd866dc2f95fac767d) )
 
@@ -435,10 +609,10 @@ ROM_START( rampart2pa ) // original Atari PCB but with mostly hand-written label
 	ROM_LOAD16_BYTE( "3h.13n",    0xc0000, 0x20000, CRC(c23b1c98) SHA1(abd8e2738bb945476dc9f848290880d7ece92081) )
 	ROM_LOAD16_BYTE( "3l.13k",    0xc0001, 0x20000, CRC(0a12ca83) SHA1(2f44420b94b981af1d65cb775e4799bc43898041) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x20000, "gfx", ROMREGION_INVERT )
 	ROM_LOAD( "atr.2n",   0x000000, 0x20000, CRC(efa38bef) SHA1(d38448138134e7a0be2a75c3cd6ab0729da5b83b) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM data */
+	ROM_REGION( 0x40000, "oki", 0 ) // ADPCM data
 	ROM_LOAD( "arom0_2_player_136082-1007.2d", 0x00000, 0x20000, CRC(c96a0fc3) SHA1(6e7e242d0afa4714ca31d77ccbf8ee487bbdb1e4) )
 	ROM_LOAD( "arom1_2_player_136082-1006.1d", 0x20000, 0x20000, CRC(518218d9) SHA1(edf1b11579dcfa9a872fa4bd866dc2f95fac767d) )
 
@@ -466,10 +640,10 @@ ROM_START( rampartj )
 	ROM_LOAD16_BYTE( "136082-1467.13n",  0xc0000, 0x20000, CRC(e0cfcda5) SHA1(0a1bf083e0589260caf6dfcb4e556b8f5e1ece25) )
 	ROM_LOAD16_BYTE( "136082-1466.13k",  0xc0001, 0x20000, CRC(a7a5a951) SHA1(a9a6adfa315c41cde4cca07d7e7d7f79ecba9f7a) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
+	ROM_REGION( 0x20000, "gfx", ROMREGION_INVERT )
 	ROM_LOAD( "136082-2419.2m",   0x000000, 0x20000, CRC(456a8aae) SHA1(f35a3dc2069e20493661cf35fc0d4f4c4e11e420) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM data */
+	ROM_REGION( 0x40000, "oki", 0 ) // ADPCM data
 	ROM_LOAD( "136082-1007.2d", 0x00000, 0x20000, CRC(c96a0fc3) SHA1(6e7e242d0afa4714ca31d77ccbf8ee487bbdb1e4) )
 	ROM_LOAD( "136082-1008.1d", 0x20000, 0x20000, CRC(518218d9) SHA1(edf1b11579dcfa9a872fa4bd866dc2f95fac767d) )
 
@@ -485,18 +659,7 @@ ROM_START( rampartj )
 	ROM_LOAD( "gal16v8-136082-1005.12c", 0x0a00, 0x0117, CRC(42c05114) SHA1(869a7f07da2d096b5a62f694db0dc1ca62d62242) )
 ROM_END
 
-
-
-/*************************************
- *
- *  Driver initialization
- *
- *************************************/
-
-void rampart_state::machine_start()
-{
-	m_slapstic_bank->configure_entries(0, 4, memregion("maincpu")->base() + 0x40000, 0x2000);
-}
+} // anonymous namespace
 
 
 /*************************************
@@ -505,7 +668,7 @@ void rampart_state::machine_start()
  *
  *************************************/
 
-GAME( 1990, rampart,    0,       rampart, rampart,  rampart_state, empty_init, ROT0, "Atari Games", "Rampart (Trackball)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rampart2p,  rampart, rampart, ramprt2p, rampart_state, empty_init, ROT0, "Atari Games", "Rampart (Joystick, bigger ROMs)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rampart,    0,       rampart, rampart,  rampart_state, empty_init, ROT0, "Atari Games", "Rampart (Trackball)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rampart2p,  rampart, rampart, ramprt2p, rampart_state, empty_init, ROT0, "Atari Games", "Rampart (Joystick, bigger ROMs)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1990, rampart2pa, rampart, rampart, ramprt2p, rampart_state, empty_init, ROT0, "Atari Games", "Rampart (Joystick, smaller ROMs)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, rampartj,   rampart, rampart, rampartj, rampart_state, empty_init, ROT0, "Atari Games", "Rampart (Japan, Joystick)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, rampartj,   rampart, rampart, rampartj, rampart_state, empty_init, ROT0, "Atari Games", "Rampart (Japan, Joystick)",        MACHINE_SUPPORTS_SAVE )

@@ -961,6 +961,7 @@ void ncr53c90_device::start_command()
 
 	case CD_DISABLE_SEL:
 		LOGMASKED(LOG_COMMAND, "Disable selection/reselection\n");
+		function_complete();
 		command_pop_and_chain();
 		break;
 

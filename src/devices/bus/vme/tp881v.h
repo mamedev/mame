@@ -8,7 +8,7 @@
 
 #include "cpu/m88000/m88000.h"
 #include "machine/i82586.h"
-//#include "machine/mc68440.h"
+#include "machine/hd63450.h"
 #include "machine/mc88200.h"
 #include "machine/ncr53c90.h"
 #include "machine/nmc9306.h"
@@ -45,6 +45,7 @@ private:
 	required_device_array<ncr53c90a_device, 2> m_scsi;
 	required_device<i82596_device> m_net;
 	required_device_array<scc8030_device, 2> m_scc;
+	required_device<hd63450_device> m_scc_dma;
 
 	required_device<z8036_device> m_vcs; // vme control and status cio
 	required_device_array<z8036_device, 2> m_gcs; // global control and status cio

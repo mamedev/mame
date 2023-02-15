@@ -18296,6 +18296,7 @@ smooncrs                        // Gremlin
 spacbat2                        // bootleg
 spacbatt                        // bootleg
 spacempr                        // bootleg
+spacian2                        //
 spactrai                        //
 spcdrag                         // bootleg
 spcmission                      // bootleg (SegaSA / Sonic)
@@ -30748,6 +30749,8 @@ pkscram                         // (c) 1993 Cosmo Electronics Corporation
 
 @source:misc/playcenter.cpp
 plycntrchtr                     // (c) 2000 Recreativos Presas / Undergaming
+plycntrchtrc                    // (c) 2000 Recreativos Presas / Undergaming
+plycntrchtrk                    // (c) 2000 Recreativos Presas / Undergaming
 
 @source:misc/plsonic4.cpp
 plsonic4                        //
@@ -30936,6 +30939,7 @@ quizpun2                        // (c) 1989 Space Computer System of Korea
 radikaldrt                      // (c) 2011? Gaelco Darts
 
 @source:misc/rawthrillspc.cpp
+doodlejmp                       // (c) 2013 ICE / Raw Thrills / Lima Sky
 fnf                             // (c) 2004 Raw Thrills
 guitarheroac                    // (c) 2008 Raw Thrills / Activision / Konami
 
@@ -38425,6 +38429,7 @@ alienfnta                       // 2001.09 Alien Front (Rev A)
 alpilotj                        // 1999.03 Airline Pilots (Japan, Rev A)
 alpilot                         // 1999.?? Airline Pilots (World, Rev B)
 anpanman2                       // 2003.09 Soreike! Anpanman Popcorn Koujou 2 (Rev C)
+anpanman2a                      // 2003.04 Soreike! Anpanman Popcorn Koujou 2 (Rev A)
 asndynmt                        // 2007.07 Dynamite Deka EX - Asian dynamite
 asndynmto                       // 2007.07 Dynamite Deka EX - Asian dynamite (older)
 ausfache                        // 2008.02.20 Akatsuki Blitzkampf Ausf. Achse
@@ -38778,6 +38783,7 @@ ribbitj                         // (c) 1991 Sega
 soniccar                        // (c) 1991 Sega
 sonicpop                        // (c) 1993 Sega
 sonicfgt                        // (c) 1993 Sega
+sonicfgtj                       // (c) 1993 Sega
 ssonicbr                        // (c) 1992 Sega
 stkclmns                        // (c) 1994 Sega
 stkclmnsj                       // (c) 1994 Sega
