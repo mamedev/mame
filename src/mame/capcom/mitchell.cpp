@@ -431,9 +431,7 @@ void mitchell_state::gfxctrl_w(uint8_t data)
 logerror("PC %04x: gfxctrl_w %02x\n", m_maincpu->pc(), data);
 {
 #if 0
-	char baf[40];
-	snprintf(baf, sizeof(baf), "%02x", data);
-	popmessage(baf);
+	popmessage("%02x", data);
 #endif
 }
 
@@ -467,11 +465,8 @@ logerror("PC %04x: gfxctrl_w %02x\n", m_maincpu->pc(), data);
 void mstworld_state::gfxctrl_w(uint8_t data)
 {
 	logerror("PC %04x: gfxctrl_w %02x\n", m_maincpu->pc(), data);
-{
-	char baf[40];
-	snprintf(baf, sizeof(baf), "%02x", data);
-//  popmessage(baf);
-}
+
+  popmessage("%02x", data);
 
 	// bit 0 is unknown (used, maybe back color enable?)
 
