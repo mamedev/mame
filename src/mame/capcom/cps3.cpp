@@ -2400,15 +2400,11 @@ void cps3_state::copy_from_nvram()
 
 	/*
 	{
-	    FILE *fp;
-	    const char *gamename = machine().system().name;
-	    char filename[256];
-	    snprintf(filename, sizeof(filename), "%s_bios.dump", gamename);
-
-	    fp=fopen(filename, "w+b");
+	    auto filename = std::string{ machine().system().name } + "_bios.dump";
+	    auto fp = fopen(filename.c_str(), "w+b");
 	    if (fp)
 	    {
-	        fwrite(rom, 0x080000, 1, fp);
+	        fwrite(romdata, 0x080000, 1, fp);
 	        fclose(fp);
 	    }
 	}

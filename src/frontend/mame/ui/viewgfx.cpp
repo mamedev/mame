@@ -21,7 +21,6 @@
 
 #include "util/unicode.h"
 
-#include <array>
 #include <cmath>
 #include <vector>
 
