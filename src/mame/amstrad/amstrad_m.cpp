@@ -2979,7 +2979,7 @@ void amstrad_state::enumerate_roms()
 		for(int i = 0; i < 8; i++)
 		{
 			char str[20];
-			snprintf(str, sizeof(str), "rom%i", i + 1);
+			sprintf(str, "rom%i", i + 1);
 			cpc_rom_image_device* romimage = romexp->subdevice<cpc_rom_image_device>(str);
 			if(romimage != nullptr && romimage->base() != nullptr)
 			{

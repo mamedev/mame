@@ -1152,7 +1152,8 @@ void x68k_state::machine_start()
 
 	for(int drive=0;drive<4;drive++)
 	{
-		auto devname = std::to_string(drive);
+		char devname[16];
+ 		sprintf(devname, "%d", drive);
 		floppy_image_device *floppy = m_upd72065->subdevice<floppy_connector>(devname)->get_device();
 		m_fdc.floppy[drive] = floppy;
 		if(floppy) {

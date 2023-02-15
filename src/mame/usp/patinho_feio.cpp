@@ -44,15 +44,15 @@ void patinho_feio_state::update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_d
 
 	for (int i=0; i<8; i++){
 		if ((m_prev_ACC ^ ACC) & (1 << i)){
-			snprintf(lamp_id, sizeof(lamp_id), "acc%d", i);
+			sprintf(lamp_id, "acc%d", i);
 			m_out->set_value(lamp_id, (ACC >> i) & 1);
 		}
 		if ((m_prev_opcode ^ opcode) & (1 << i)){
-			snprintf(lamp_id, sizeof(lamp_id), "opcode%d", i);
+			sprintf(lamp_id, "opcode%d", i);
 			m_out->set_value(lamp_id, (opcode >> i) & 1);
 		}
 		if ((m_prev_mem_data ^ mem_data) & (1 << i)){
-			snprintf(lamp_id, sizeof(lamp_id), "mem_data%d", i);
+			sprintf(lamp_id, "mem_data%d", i);
 			m_out->set_value(lamp_id, (mem_data >> i) & 1);
 		}
 	}
@@ -62,15 +62,15 @@ void patinho_feio_state::update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_d
 
 	for (int i=0; i<12; i++){
 		if ((m_prev_mem_addr ^ mem_addr) & (1 << i)){
-			snprintf(lamp_id, sizeof(lamp_id), "mem_addr%d", i);
+			sprintf(lamp_id, "mem_addr%d", i);
 			m_out->set_value(lamp_id, (mem_addr >> i) & 1);
 		}
 		if ((m_prev_PC ^ PC) & (1 << i)){
-			snprintf(lamp_id, sizeof(lamp_id), "pc%d", i);
+			sprintf(lamp_id, "pc%d", i);
 			m_out->set_value(lamp_id, (PC >> i) & 1);
 		}
 		if ((m_prev_RC ^ RC) & (1 << i)){
-			snprintf(lamp_id, sizeof(lamp_id), "rc%d", i);
+			sprintf(lamp_id, "rc%d", i);
 			m_out->set_value(lamp_id, (RC >> i) & 1);
 		}
 	}

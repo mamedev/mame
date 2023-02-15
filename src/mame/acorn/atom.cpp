@@ -587,7 +587,7 @@ WRITE_LINE_MEMBER( atom_state::motor_w )
 	for (u8 i = 0; i < 2; i++)
 	{
 		char devname[8];
-		snprintf(devname, sizeof(devname), "%d", i);
+		sprintf(devname, "%d", i);
 		floppy_connector *con = m_fdc->subdevice<floppy_connector>(devname);
 		if (con)
 			con->get_device()->mon_w(!state);

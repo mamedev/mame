@@ -119,7 +119,7 @@ uint8_t pv2000_state::keys_hi_r()
 	case 6:
 	case 7:
 	case 8:
-		snprintf(kbdrow,sizeof(kbdrow),"IN%d",m_keyb_column);
+		sprintf(kbdrow,"IN%d",m_keyb_column);
 		data = ioport( kbdrow )->read() >> 4;
 	}
 

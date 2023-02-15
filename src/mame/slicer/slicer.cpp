@@ -14,7 +14,7 @@
 #include "bus/rs232/rs232.h"
 #include "bus/isa/isa.h"
 #include "bus/scsi/scsi.h"
-#include <string>
+
 
 namespace {
 
@@ -44,12 +44,14 @@ private:
 
 void slicer_state::sio_out_w(uint8_t data)
 {
-	int state = (data & 0x80) ? 0 : 1;
+	floppy_image_device *floppy;
+ 	int state = (data & 0x80) ? 0 : 1;
+ 	char devname[8];
 
 	for(int i = 0; i < 4; i++)
 	{
-		auto devname = std::to_string(i);
-		auto floppy = m_fdc->subdevice<floppy_connector>(devname)->get_device();
+		sprintf(devname, "%d", i);
+ 		floppy = m_fdc->subdevice<floppy_connector>(devname)->get_device();
 		if(floppy)
 			floppy->mon_w(state);
 	}

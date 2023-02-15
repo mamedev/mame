@@ -965,7 +965,7 @@ void vk100_state::machine_start()
 	// look up all 16 tags 'the slow way' but only once on reset
 	for (int i = 0; i < 16; i++)
 	{
-		snprintf(kbdcol, sizeof(kbdcol), "COL%X", i);
+		sprintf(kbdcol,"COL%X", i);
 		m_col_array[i] = ioport(kbdcol);
 	}
 
