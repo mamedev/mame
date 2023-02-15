@@ -384,10 +384,20 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info)
 	// This fixes (at least) the rain in round 6 of Arabian Magic.
 	const u8 extra_planes = ((tile >> (16 + 10)) & 3); // 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp
 
-	tileinfo.set(3,
-			tile & 0xffff,
-			(tile >> 16) & 0x1ff & (~extra_planes),
-			TILE_FLIPYX(tile >> 30));
+    if (m_game == LANDMAKR || m_game == QUIZHUHU)
+	{
+		tileinfo.set(3,
+				tile & 0xffff,
+				(tile >> 16) & 0x1ff,
+				TILE_FLIPYX(tile >> 30));
+	}
+	else
+	{
+		tileinfo.set(3,tile & 0xffff,
+				(tile >> 16) & 0x1ff & (~extra_planes),
+				TILE_FLIPYX(tile >> 30));
+	}
+
 	tileinfo.category =  abtype & 1;      /* alpha blending type */
 	tileinfo.pen_mask = (extra_planes << 4) | 0x0f;
 }
@@ -1757,15 +1767,10 @@ void taito_f3_state::get_spritealphaclip_info()
 		if (line_t->clip3_r[y] < 0) line_t->clip3_r[y] = 0;
 
 		/* Evaluate sprite clipping */
-		if (sprite_clip & 0x080) // TODO: is this correct for sprites, at least?
-		{
-			line_t->sprite_clip0[y] = 0x7fff7fff;
-			line_t->sprite_clip1[y] = 0;
-		}
-		else if (sprite_clip & 0x33)
+		if (sprite_clip & 0xff)
 		{
 			int line_enable = 1;
-			calculate_clip(y, ((sprite_clip & 0x33) << 4), &line_t->sprite_clip0[y], &line_t->sprite_clip1[y], &line_enable);
+			calculate_clip(y, ((sprite_clip & 0xff) << 4), &line_t->sprite_clip0[y], &line_t->sprite_clip1[y], &line_enable);
 			if (line_enable == 0)
 				line_t->sprite_clip0[y] = 0x7fff7fff;
 		}
