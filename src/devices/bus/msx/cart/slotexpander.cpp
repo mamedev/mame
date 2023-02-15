@@ -85,7 +85,7 @@ void  msx_cart_slotexpander_device::add_cartslot(machine_config &mconfig)
 		m_cartslot[Slot]->set_maincpu(*get_cpu_finder());
 	}
 	m_cartslot[Slot]->option_reset();
-	msx_cart(*m_cartslot[Slot]);
+	msx_cart(*m_cartslot[Slot], true);
 	m_cartslot[Slot]->set_default_option(nullptr);
 	m_cartslot[Slot]->set_fixed(false);
 	m_cartslot[Slot]->irq_handler().set(m_irq_out, FUNC(input_merger_device::in_w<Slot>));
