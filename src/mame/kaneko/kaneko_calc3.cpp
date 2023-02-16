@@ -1571,13 +1571,8 @@ void kaneko_calc3_device::initial_scan_tables()
 	// dump out the 0x1000 sized block at the end
 #if VERBOSE_OUTPUT
 	{
-		FILE *fp;
-		char filename[256];
-
-		snprintf(filename,sizeof(filename),"data_%s_finalblock",
-		machine().system().name);
-
-		fp=fopen(filename, "w+b");
+		auto filename = util::string_format("data_%s_finalblock", machine().system().name);
+		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{
 			fwrite(&datarom[m_dataend], 0x1000, 1, fp);
