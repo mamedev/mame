@@ -24,7 +24,13 @@ static INPUT_PORTS_START( nes_zapper )
 	PORT_START("ZAPPER_Y")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_MINMAX(0, 239)
 	PORT_START("ZAPPER_T")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Lightgun Trigger")
+	// The zapper trigger mechanism presses down an internal micro switch part way
+	// through a pull. Pulling further trips a return spring so that by the time
+	// the trigger is fully pulled the micro switch is released. Here we use
+	// port impulse to simulate this motion. Two frames is a bare minimum as
+	// Nintendo's early "black box" games won't recognize a one-frame pull.
+	// TODO: Should this be even longer to simulate capacitance drain delay?
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Lightgun Trigger") PORT_IMPULSE(2)
 INPUT_PORTS_END
 
 
@@ -40,6 +46,12 @@ static INPUT_PORTS_START( nes_bandaihs )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+
+	// In Space Shadow the trigger is held down for automatic machine gun fire.
+	// Since other gun games are programmed to use the Zapper and fire on a falling
+	// edge, they respond to trigger release when played with the Hyper Shot.
+	PORT_MODIFY("ZAPPER_T")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Lightgun Trigger")
 INPUT_PORTS_END
 
 
