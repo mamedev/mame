@@ -5,11 +5,11 @@
 Midway Quicksilver II/Graphite skeleton driver
 
 TODO (BIOS):
-- With BIOS mapped at 0xfff80000 it will ping-pong at I/O $7000 for SMBus
-- Writes to VGA ports but never ever draw anything, probably needs VGA control to be enabled
-  from AGP. Neither Virge PCI nor Voodoo should claim VGA ports, they are both disabled in
-  command ...
-- Accesses missing keyboard and RTC areas, understand how they maps (ACPI?)
+- Accesses missing keyboard and RTC areas, needs to fix up Super I/O type;
+- Currently used SMBus device EEPROM is incompatible with the BIOS used here, it expects a 4 to byte [0x02] (= SDRAM), there's no real code path for currently used DDR SDRAM setting.
+Eventually will throw a "SPD device data missing or inconclusive."
+- Several hang points before VGA drawing text, pinpoint them all;
+- Detects a Pentium II at 700 MHz (?)
 
 TODO:
 - Fix HDD BAD_DUMPs ("primary master hard disk fail" in shutms11):
@@ -40,7 +40,8 @@ All of the games communicate with their I/O boards serially.
 
 Quicksilver II hardware:
 - Main CPU: Intel Celeron (Pentium II) 333/366MHz
-- Motherboard: Intel SE440BX-2
+- Motherboard: Intel SE440BX-2 "4S4EB2X0.86A.0017.P10"
+https://theretroweb.com/motherboards/s/intel-se440bx-2-seattle-2
 - RAM: 64MB PC100-222-620 non-ecc
 - Sound: Integrated YMF740G
 - Networking: SMC EZ Card 10 / SMC1208T (probably 10ec:8029 1113:1208)
@@ -298,6 +299,8 @@ namespace {
 #define PCI_J4D1_ID "pci:0e.0"
 #define PCI_J4C1_ID "pci:0f.0"
 #define PCI_J4B1_ID "pci:10.0"
+// J4E1
+#define PCI_AGP_ID "pci:01.0:00.0"
 
 class midway_quicksilver2_state : public driver_device
 {
@@ -305,7 +308,7 @@ public:
 	midway_quicksilver2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_voodoo2(*this, PCI_J4D2_ID)
+		, m_voodoo2(*this, PCI_AGP_ID)
 	{
 	}
 
@@ -401,7 +404,7 @@ void midway_quicksilver2_state::midqslvr(machine_config &config)
 	// YMF740G goes thru "pci:0c.0"
 	// Expansion slots, mapping SVGA for debugging
 	// TODO: all untested, check clock
-	// TODO: confirm Voodoo going in J4D2
+	// TODO: confirm Voodoo going in AGP slot
 	#if 1
 	VOODOO_2_PCI(config, m_voodoo2, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
 	m_voodoo2->set_fbmem(2);
@@ -413,7 +416,7 @@ void midway_quicksilver2_state::midqslvr(machine_config &config)
 	screen.set_refresh_hz(57);
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
-	screen.set_screen_update(PCI_J4D2_ID, FUNC(voodoo_2_pci_device::screen_update));
+	screen.set_screen_update(PCI_AGP_ID, FUNC(voodoo_2_pci_device::screen_update));
 	#endif
 	// "pci:0d.0" J4D2
 	// "pci:0e.0" J4D1
