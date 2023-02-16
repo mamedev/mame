@@ -167,14 +167,13 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 
 	// look up the opcode
 	const opcodeinfo *op = fetch_opcode(opcodes, p);
-	int opcode_length = p - pc;
 	if (!op)
 	{
 		// illegal opcode
 		util::stream_format(stream, "%-7s$%02X", "FCB", opcodes.r8(pc));
 		for (offs_t q = pc + 1; q < p; q++)
 			util::stream_format(stream, ",$%02X", opcodes.r8(q));
-		return opcode_length | SUPPORTED;
+		return (p - pc) | SUPPORTED;
 	}
 
 	offs_t flags = op->flags();
@@ -254,12 +253,12 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 
 	case REL:
 		offset = (int8_t)params.r8(ppc);
-		util::stream_format(stream, "$%04X", (pc + opcode_length + offset) & 0xffff);
+		util::stream_format(stream, "$%04X", (pc + (p - pc) + offset) & 0xffff);
 		break;
 
 	case LREL:
 		offset = (int16_t)params.r16(ppc);
-		util::stream_format(stream, "$%04X", (pc + opcode_length + offset) & 0xffff);
+		util::stream_format(stream, "$%04X", (pc + (p - pc) + offset) & 0xffff);
 		break;
 
 	case EXT:
@@ -338,7 +337,7 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		throw false;
 	}
 
-	return (opcode_length + op->operand_length()) | flags | SUPPORTED;
+	return (p - pc) | flags | SUPPORTED;
 }
 
 
