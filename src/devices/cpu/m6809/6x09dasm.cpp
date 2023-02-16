@@ -106,7 +106,7 @@ const m6x09_base_disassembler::opcodeinfo *m6x09_base_disassembler::fetch_opcode
 		// did we find something?
 		if (iter == m_opcodes.end())
 		{
-			// on the 6809 an unimplemented page 2 or 3 opcodes fall thru to the first page.
+			// on the 6809 an unimplemented page 2 or 3 opcodes fall through to the first page.
 			if (!(m_level & HD6309_EXCLUSIVE) && (page != 0))
 			{
 				// backup the opcode pointer and disassemble the bare opcode.
