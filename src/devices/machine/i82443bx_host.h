@@ -34,9 +34,12 @@ private:
 	virtual std::tuple<bool, bool> read_memory_holes() override;
 
 	u8 m_fdhc = 0;
+	u8 m_bspad[8]{};
 
-	uint8_t fdhc_r();
-	void fdhc_w(uint8_t data);
+	u8 fdhc_r();
+	void fdhc_w(u8 data);
+	u8 bspad_r(offs_t offset);
+	void bspad_w(offs_t offset, u8 data);
 };
 
 class i82443bx_bridge_device : public pci_bridge_device

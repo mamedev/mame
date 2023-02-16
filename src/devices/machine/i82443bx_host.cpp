@@ -51,6 +51,7 @@ void i82443bx_host_device::config_map(address_map &map)
 	// TODO: midqslvr.cpp r/ws the AGPCTRL register but don't seem to match what's in datasheet
 	// I also haven't yet enabled CAPPTR lolwut?
 	//map(0xb0, 0xb3)
+	map(0xd0, 0xd7).rw(FUNC(i82443bx_host_device::bspad_r), FUNC(i82443bx_host_device::bspad_w));
 }
 
 void i82443bx_host_device::apbase_map(address_map &map)
@@ -64,6 +65,9 @@ void i82443bx_host_device::device_start()
 
 	// TODO: size
 	add_map(8*1024*1024, M_MEM, FUNC(i82443bx_host_device::apbase_map));
+	
+	save_item(NAME(m_fdhc));
+	save_pointer(NAME(m_bspad), 8);
 }
 
 void i82443bx_host_device::device_reset()
@@ -71,6 +75,8 @@ void i82443bx_host_device::device_reset()
 	i82439hx_host_device::device_reset();
 
 	m_fdhc = 0;
+	for (int i = 0; i < 8; i++)
+		m_bspad[i] = 0;
 }
 
 u8 i82443bx_host_device::capptr_r()
@@ -92,11 +98,27 @@ u8 i82443bx_host_device::fdhc_r()
 	return m_fdhc;
 }
 
-void i82443bx_host_device::fdhc_w(uint8_t data)
+void i82443bx_host_device::fdhc_w(u8 data)
 {
 	m_fdhc = data;
 	LOGIO("FDHC = %02x\n", data);
 	remap_cb();
+}
+
+/*
+ * BSPAD - BIOS Scratch Pad Register
+ * 8 bytes of pseudo-RAM
+ */
+u8 i82443bx_host_device::bspad_r(offs_t offset)
+{
+	LOGIO("BSPAD[%d] R\n", offset);
+	return m_bspad[offset];
+}
+
+void i82443bx_host_device::bspad_w(offs_t offset, u8 data)
+{
+	LOGIO("BSPAD[%d] = %02x\n", offset, data);
+	m_bspad[offset] = data;
 }
 
 /*****************************
