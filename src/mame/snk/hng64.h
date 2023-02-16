@@ -436,6 +436,8 @@ private:
 	uint16_t get_tileregs(int tm);
 	uint16_t get_scrollbase(int tm);
 
+	int get_blend_mode(int tm);
+
 	void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags);
 
 	void hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,

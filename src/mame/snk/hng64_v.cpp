@@ -3,8 +3,6 @@
 #include "emu.h"
 #include "hng64.h"
 
-#define BLEND_TEST 0
-
 #define HNG64_VIDEO_DEBUG 0
 
 
@@ -23,7 +21,7 @@ void hng64_state::hng64_mark_tile_dirty( int tilemap, int tile_index )
 }
 
 
-// make this a function!
+// make this a template function!
 // pppppppp ffattttt tttttttt tttttttt
 #define HNG64_GET_TILE_INFO                                                     \
 {                                                                               \
@@ -604,7 +602,7 @@ void hng64_state::hng64_drawtilemap_linemode(screen_device &screen, bitmap_rgb32
 			hng64_tilemap_draw_roz(screen, bitmap,clip,tilemap,xtopleft,ytopleft,
 					xinc<<1,0,0,yinc<<1,
 					1,
-					flags,0, m_additive_tilemap_debug&(1 << tm)?HNG64_TILEMAP_ADDITIVE:HNG64_TILEMAP_NORMAL);
+					flags,0, (hng64trans_t)get_blend_mode(tm));
 		}
 	}
 }
@@ -612,7 +610,7 @@ void hng64_state::hng64_drawtilemap_linemode(screen_device &screen, bitmap_rgb32
 void hng64_state::hng64_drawtilemap_nolinemode(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, tilemap_t* tilemap, uint16_t scrollbase, uint8_t bppBit)
 {
 	// Set the transmask so our manual copy is correct
-	const int transmask = bppBit ? 0xff : 0xf;
+	//const int transmask = bppBit ? 0xff : 0xf;
 
 	// 0x1000 is set up the buriki 2nd title screen with rotating logo and in fatal fury at various times?
 
@@ -666,52 +664,12 @@ void hng64_state::hng64_drawtilemap_nolinemode(screen_device &screen, bitmap_rgb
 		const int xinc2 = (xalt-xtopleft) / 512;
 		const int yinc2 = (yalt-ytopleft) /512;
 
-		/* manual copy = slooow */
-		if (BLEND_TEST)
-		{
-			const bitmap_ind16 &bm = tilemap->pixmap();
-			const int bmheight = bm.height();
-			const int bmwidth = bm.width();
-			pen_t const *const paldata = m_palette->pens();
 
-			//logerror("start %08x end %08x start %08x end %08x\n", xtopleft, xmiddle, ytopleft, ymiddle);
 
-			for (int yy=0; yy<448; yy++)
-			{
-				uint32_t *dstptr = &bitmap.pix(yy);
-
-				int tmp = xtopleft;
-				int tmp2 = ytopleft;
-
-				for (int xx=0; xx<512; xx++)
-				{
-					int realsrcx = (xtopleft>>16)&(bmwidth-1);
-					int realsrcy = (ytopleft>>16)&(bmheight-1);
-
-					uint16_t const *const srcptr = &bm.pix(realsrcy);
-
-					uint16_t pen = srcptr[realsrcx];
-
-					if (pen&transmask)
-						*dstptr = paldata[pen];
-
-					xtopleft+= xinc<<1;
-					ytopleft+= yinc2<<1;
-					++dstptr;
-				}
-
-				ytopleft = tmp2 + (yinc<<1);
-				xtopleft = tmp + (xinc2<<1);
-			}
-		}
-		else
-		{
-			hng64_tilemap_draw_roz(screen, bitmap,cliprect,tilemap,xtopleft,ytopleft,
-					xinc<<1,yinc2<<1,xinc2<<1,yinc<<1,
-					1,
-					flags,0, m_additive_tilemap_debug&(1 << tm)?HNG64_TILEMAP_ADDITIVE:HNG64_TILEMAP_NORMAL);
-		}
-
+		hng64_tilemap_draw_roz(screen, bitmap,cliprect,tilemap,xtopleft,ytopleft,
+				xinc<<1,yinc2<<1,xinc2<<1,yinc<<1,
+				1,
+				flags,0,(hng64trans_t)get_blend_mode(tm));
 	}
 	else
 	{
@@ -758,50 +716,10 @@ void hng64_state::hng64_drawtilemap_nolinemode(screen_device &screen, bitmap_rgb
 		const int xinc = (xmiddle - xtopleft) / 512;
 		const int yinc = (ymiddle - ytopleft) / 512;
 
-		/* manual copy = slooow */
-		if (BLEND_TEST)
-		{
-			const bitmap_ind16 &bm = tilemap->pixmap();
-			const int bmheight = bm.height();
-			const int bmwidth = bm.width();
-			pen_t const *const paldata = m_palette->pens();
-
-			int tmp = xtopleft;
-
-			//logerror("start %08x end %08x start %08x end %08x\n", xtopleft, xmiddle, ytopleft, ymiddle);
-
-			for (int yy=0; yy<448; yy++)
-			{
-				int realsrcy = (ytopleft>>16)&(bmheight-1);
-
-				uint32_t *dstptr = &bitmap.pix(yy);
-				uint16_t const *const srcptr = &bm.pix(realsrcy);
-
-				xtopleft = tmp;
-
-				for (int xx=0; xx<512; xx++)
-				{
-					int realsrcx = (xtopleft>>16)&(bmwidth-1);
-
-					uint16_t pen = srcptr[realsrcx];
-
-					if (pen&transmask)
-						*dstptr = paldata[pen];
-
-					xtopleft+= xinc<<1;
-					++dstptr;
-				}
-
-				ytopleft+= yinc<<1;
-			}
-		}
-		else
-		{
-			hng64_tilemap_draw_roz(screen, bitmap,cliprect,tilemap,xtopleft,ytopleft,
-					xinc<<1,0,0,yinc<<1,
-					1,
-					flags,0, m_additive_tilemap_debug&(1 << tm)?HNG64_TILEMAP_ADDITIVE:HNG64_TILEMAP_NORMAL);
-		}
+		hng64_tilemap_draw_roz(screen, bitmap,cliprect,tilemap,xtopleft,ytopleft,
+				xinc<<1,0,0,yinc<<1,
+				1,
+				flags,0,(hng64trans_t)get_blend_mode(tm));
 	}
 }
 
@@ -828,6 +746,20 @@ uint16_t hng64_state::get_scrollbase(int tm)
 	}
 	return 0;
 }
+
+int hng64_state::get_blend_mode(int tm)
+{
+	// this is based on xrally and sams64/sams64_2 use, it could be incorrect
+	// it doesn't seem to be 100% on sams64_2 select screen when the mode select circle moves down
+
+	// m_tcram[0x14/4] may be some additional per layer for this?
+	hng64trans_t blendmode = HNG64_TILEMAP_NORMAL;
+	if ((m_tcram[0x0c / 4] & 0x04000000) && (tm == 1)) // only enable it for the 2nd tilemap right now, find other use cases!
+		blendmode = HNG64_TILEMAP_ADDITIVE;
+
+	return blendmode;
+}
+
 
 void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags)
 {
@@ -1008,7 +940,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	if (0)
 		popmessage("%08x %08x %08x %08x %08x", m_spriteregs[0], m_spriteregs[1], m_spriteregs[2], m_spriteregs[3], m_spriteregs[4]);
 
-	if (1)
+	if (0)
 	popmessage("%08x %08x TR(%04x %04x %04x %04x) SB(%04x %04x %04x %04x) %08x %08x %08x %08x %08x AA(%08x %08x) %08x",
 		m_videoregs[0x00],
 		m_videoregs[0x01],
@@ -1029,7 +961,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 		m_videoregs[0x0c],
 		m_videoregs[0x0d]);
 
-	if (0)
+	if (1)
 		popmessage("TC: %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x",
 		m_tcram[0x00/4],
 		m_tcram[0x04/4],
@@ -1055,6 +987,16 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 		m_tcram[0x54/4],
 		m_tcram[0x58/4],
 		m_tcram[0x5c/4]);
+
+	/*
+		m_tcram[0x0c/4]
+		05002201  blending?
+		01002201 
+  
+		m_tcram[0x14/4],
+		0011057f  blending?
+		0001057f
+	*/
 
 	if ( machine().input().code_pressed_once(KEYCODE_T) )
 	{
