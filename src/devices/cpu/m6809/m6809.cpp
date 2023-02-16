@@ -218,7 +218,7 @@ void m6809_base_device::device_start()
 	save_item(NAME(m_addressing_mode));
 	save_item(NAME(m_reg));
 	save_item(NAME(m_cond));
-	save_item(NAME(m_hcf));
+	save_item(NAME(m_free_run));
 
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -238,7 +238,7 @@ void m6809_base_device::device_reset()
 	m_firq_line = false;
 	m_irq_line = false;
 	m_lds_encountered = false;
-	m_hcf = false;
+	m_free_run = false;
 
 	m_dp = 0x00;        // reset direct page register
 
