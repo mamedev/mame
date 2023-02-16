@@ -97,6 +97,9 @@ private:
 	void scc_w(offs_t offset, u16 data);
 	u8 scc_macrisc_r(offs_t offset);
 	void scc_macrisc_w(offs_t offset, u8 data);
+
+	u32 m_toggle;
+	u32 unk_r(offs_t offset);
 };
 
 class paddington_device : public heathrow_device
