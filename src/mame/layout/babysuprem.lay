@@ -267,9 +267,9 @@ license:CC0
 			<bounds x="0" y="25" width="7" height="7"/>
 		</element>
 
-<!--
-win leds
--->
+		<!--
+		win leds
+		-->
 		<element name="digit0" ref="digit">
 			<bounds x="120" y="15" width="4" height="10"/>
 		</element>
@@ -280,9 +280,9 @@ win leds
 			<bounds x="130" y="15" width="4" height="10"/>
 		</element>
 
-<!--
-credit leds
--->
+		<!--
+		credit leds
+		-->
 		<element name="digit3" ref="digit">
 			<bounds x="140" y="15" width="4" height="10"/>
 		</element>
@@ -293,10 +293,10 @@ credit leds
 			<bounds x="150" y="15" width="4" height="10"/>
 		</element>
 
-<!--
-left hand bonus coins
--->
-	<element name="lamp30" ref="coinlp">
+		<!--
+		left hand bonus coins
+		-->
+		<element name="lamp30" ref="coinlp">
 			<bounds x="20" y="70" width="7" height="7"/>
 		</element>
 		<element name="lamp31" ref="coinlp">
@@ -333,9 +333,9 @@ left hand bonus coins
 			<bounds x="12" y="50" width="7" height="7"/>
 		</element>
 
-<!--
-right hand bonus coins
--->
+		<!--
+		right hand bonus coins
+		-->
 		<element name="lamp14" ref="coinlp">
 			<bounds x="118" y="70" width="7" height="7"/>
 		</element>
@@ -373,9 +373,9 @@ right hand bonus coins
 			<bounds x="110" y="50" width="7" height="7"/>
 		</element>
 
-<!--
-unknown or not used lamps
--->
+		<!--
+		unknown or not used lamps
+		-->
 		<element name="lamp10" ref="unknownlp">
 			<bounds x="40" y="48" width="7" height="7"/>
 		</element>
@@ -396,9 +396,9 @@ unknown or not used lamps
 			<bounds x="80" y="48" width="7" height="7"/>
 		</element>
 
-<!--
-stake winplan lamps
--->
+		<!--
+		stake winplan lamps
+		-->
 		<element name="lamp24" ref="stake2lp">
 			<bounds x="40" y="64" width="7" height="7"/>
 		</element>
@@ -412,9 +412,9 @@ stake winplan lamps
 			<bounds x="64" y="64" width="7" height="7"/>
 		</element>
 
-<!--
-double or half gamble lamps
--->
+		<!--
+		double or half gamble lamps
+		-->
 		<element name="lamp39" ref="doubleorlp">
 			<bounds x="88" y="64" width="8" height="7"/>
 		</element>
@@ -422,9 +422,9 @@ double or half gamble lamps
 			<bounds x="96" y="64" width="8" height="7"/>
 		</element>
 
-<!--
-button panel
--->
+		<!--
+		button panel
+		-->
 		<element name="button0" ref="L1">
 			<bounds x="0" y="80" width="15" height="8" />
 		</element>
