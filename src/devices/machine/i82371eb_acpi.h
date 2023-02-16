@@ -28,7 +28,6 @@ protected:
 	virtual void config_map(address_map &map) override;
 
 	void io_map(address_map &map);
-	void smbus_map(address_map &map);
 
 private:
 	required_device<lpc_acpi_device> m_acpi;

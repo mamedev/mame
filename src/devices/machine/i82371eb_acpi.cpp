@@ -62,11 +62,6 @@ void i82371eb_acpi_device::io_map(address_map &map)
 {
 }
 
-// TODO: convert to lpc-smbus
-void i82371eb_acpi_device::smbus_map(address_map &map)
-{
-	map(0x00, 0x00).lr8(NAME([]() { return 0x02; }));
-}
 
 void i82371eb_acpi_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
@@ -93,9 +88,6 @@ void i82371eb_acpi_device::map_extra(uint64_t memory_window_start, uint64_t memo
 	{
 		LOGMAP("- SMBBA %04x-%04x (%08x %08x)\n", m_smbba, m_smbba + 0xf, io_window_start, io_window_end);
 		io_space->install_device(m_smbba, m_smbba | 0xf, *m_smbus, &smbus_device::map);
-
-//		m_smbus->map_device(memory_window_start, memory_window_end, 0, memory_space, m_smbba, m_smbba + 0xf, 0, io_space);
-		//io_space->install_device(m_smbba, m_smbba + 0xf, *this, &i82371eb_acpi_device::smbus_map);
 	}
 }
 
