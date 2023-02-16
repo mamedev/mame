@@ -91,6 +91,7 @@ bool m6x09_base_disassembler::opcodeinfo::compare::operator()(opcodeinfo const& 
 
 const m6x09_base_disassembler::opcodeinfo *m6x09_base_disassembler::fetch_opcode(const data_buffer &opcodes, offs_t &p)
 {
+	int infloop = 0;
 	uint16_t page = 0;
 	const opcodeinfo *op = nullptr;
 
@@ -133,6 +134,13 @@ const m6x09_base_disassembler::opcodeinfo *m6x09_base_disassembler::fetch_opcode
 					// multiple pages are illegal on the 6309
 					return nullptr;
 				}
+
+				if (infloop++ > 65534)
+				{
+					// detect infinite loop of page opcodes
+					return nullptr;
+				}
+
 				break;
 
 			default:
