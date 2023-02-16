@@ -218,8 +218,10 @@ uint16_t l7a1045_sound_device::l7a1045_sound_r(offs_t offset, uint16_t mem_mask)
 
 	//logerror("%s: read at %x (mask %04x)\n", tag(), offset, mem_mask);
 
-	if(offset == 0)
-		printf("sound_select_r?\n");
+	if (offset == 0)
+	{
+		//logerror("sound_select_r?\n");
+	}
 	else
 		return sound_data_r(offset -1);
 
@@ -255,7 +257,7 @@ void l7a1045_sound_device::sound_data_w(offs_t offset, uint16_t data)
 	l7a1045_voice *vptr = &m_voice[m_audiochannel];
 
 	//if(m_audioregister != 0 && m_audioregister != 1 && m_audioregister != 7)
-	//  printf("%04x %04x (%04x %04x)\n",offset,data,m_audioregister,m_audiochannel);
+	//  logerror("%04x %04x (%04x %04x)\n",offset,data,m_audioregister,m_audiochannel);
 
 	m_audiodat[m_audioregister][m_audiochannel].dat[offset] = data;
 
@@ -281,9 +283,9 @@ void l7a1045_sound_device::sound_data_w(offs_t offset, uint16_t data)
 			break;
 		case 0x01:
 			// relative to start
-				//printf("%04x\n",m_audiodat[m_audioregister][m_audiochannel].dat[0]);
-				//printf("%04x\n",m_audiodat[m_audioregister][m_audiochannel].dat[1]);
-				//printf("%04x\n",m_audiodat[m_audioregister][m_audiochannel].dat[2]);
+				//logerror("%04x\n",m_audiodat[m_audioregister][m_audiochannel].dat[0]);
+				//logerror("%04x\n",m_audiodat[m_audioregister][m_audiochannel].dat[1]);
+				//logerror("%04x\n",m_audiodat[m_audioregister][m_audiochannel].dat[2]);
 
 			if(m_audiodat[m_audioregister][m_audiochannel].dat[2] & 0x100)
 			{
@@ -312,7 +314,7 @@ void l7a1045_sound_device::sound_data_w(offs_t offset, uint16_t data)
 			vptr->r_volume = (vptr->r_volume) | (vptr->r_volume << 8);
 			vptr->l_volume = (m_audiodat[m_audioregister][m_audiochannel].dat[0] >> 8) & 0xff;
 			vptr->l_volume = (vptr->l_volume) | (vptr->l_volume << 8);
-			//printf("%04x %02x %02x\n",m_audiodat[m_audioregister][m_audiochannel].dat[0],vptr->l_volume,vptr->r_volume);
+			//logerror("%04x %02x %02x\n",m_audiodat[m_audioregister][m_audiochannel].dat[0],vptr->l_volume,vptr->r_volume);
 
 			break;
 	}
@@ -321,7 +323,7 @@ void l7a1045_sound_device::sound_data_w(offs_t offset, uint16_t data)
 
 uint16_t l7a1045_sound_device::sound_data_r(offs_t offset)
 {
-	//printf("%04x (%04x %04x)\n",offset,m_audioregister,m_audiochannel);
+	//logerror("%04x (%04x %04x)\n",offset,m_audioregister,m_audiochannel);
 	//machine().debug_break();
 	l7a1045_voice *vptr = &m_voice[m_audiochannel];
 
@@ -356,11 +358,11 @@ void l7a1045_sound_device::sound_status_w(uint16_t data)
 #if 0
 		if(vptr->start != 0)
 		{
-		printf("%08x START\n",vptr->start);
-		printf("%08x END\n",vptr->end);
+			logerror("%08x START\n",vptr->start);
+			logerror("%08x END\n",vptr->end);
 
-		for(int i=0;i<0x10;i++)
-			printf("%02x (%02x) = %04x%04x%04x\n",m_audiochannel,i,m_audiodat[i][m_audiochannel].dat[2],m_audiodat[i][m_audiochannel].dat[1],m_audiodat[i][m_audiochannel].dat[0]);
+			for(int i=0;i<0x10;i++)
+				logerror("%02x (%02x) = %04x%04x%04x\n",m_audiochannel,i,m_audiodat[i][m_audiochannel].dat[2],m_audiodat[i][m_audiochannel].dat[1],m_audiodat[i][m_audiochannel].dat[0]);
 		}
 #endif
 

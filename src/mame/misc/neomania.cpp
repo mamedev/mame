@@ -86,7 +86,7 @@ ROM_START( neomania )
 
 	// Portuguese version with 48 games, from 2003
 	DISK_REGION( "ide:0:hdd:image" ) // From a Norton Ghost recovery image
-	DISK_IMAGE( "neomania", 0, BAD_DUMP SHA1(4a865d1ed67901b98b37f94cfdd591fad38b404a) )
+	DISK_IMAGE( "neomania", 0, SHA1(4338be8214ca5a9aa6808a94d73e0820a4d34b98) )
 ROM_END
 
 } // Anonymous namespace

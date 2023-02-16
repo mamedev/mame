@@ -9,7 +9,8 @@
  *  - TPIX/88K version 1.06 source code
  *
  * TODO:
- *  - dma controller
+ *  - scsi dma controllers
+ *  - serial dma
  *  - vme interface
  *  - interrupt enables/masking
  *  - multiprocessor configurations
@@ -38,6 +39,7 @@ tp881v_device::tp881v_device(machine_config const &mconfig, char const *tag, dev
 	, m_scsi(*this, "scsi%u:7:ncr53c90a", 0U)
 	, m_net(*this, "net")
 	, m_scc(*this, "scc%u", 0U)
+	, m_scc_dma(*this, "scc_dma")
 	, m_vcs(*this, "vcs")
 	, m_gcs(*this, "gcs%u", 0U)
 	, m_eeprom(*this, "eeprom")
@@ -85,35 +87,47 @@ void tp881v_device::device_add_mconfig(machine_config &config)
 	MC88100(config, m_cpu, 40_MHz_XTAL / 2);
 	m_cpu->set_addrmap(AS_PROGRAM, &tp881v_device::cpu_mem);
 
-	MC88200(config, m_mmu[1], 40_MHz_XTAL / 2, 0x01);
-	m_mmu[1]->set_mbus(m_cpu, AS_PROGRAM);
-	m_cpu->set_cmmu_i(m_mmu[1]);
-
 	MC88200(config, m_mmu[0], 40_MHz_XTAL / 2, 0x00);
 	m_mmu[0]->set_mbus(m_cpu, AS_PROGRAM);
-	m_cpu->set_cmmu_d(m_mmu[0]);
+	m_cpu->set_cmmu_i(m_mmu[0]);
+
+	MC88200(config, m_mmu[1], 40_MHz_XTAL / 2, 0x01);
+	m_mmu[1]->set_mbus(m_cpu, AS_PROGRAM);
+	m_cpu->set_cmmu_d(m_mmu[1]);
 
 	// per-jp interrupt controllers
 	// 4MHz input clock, ct3 gives 100Hz clock, ct2 counts at 10kHz
-	// port a bit 0: porta int?
-	// port a bit 1: ethernet
-	// port a bit 2: scc dma
-	// port a bit 3: scsi0
-	// port a bit 4: scsi1
-	// port a bit 5: scc
-	// port a bit 6: acfail
-	// port a bit 7: parity
-
-	// port b bit 0: port b
-	// port b bit 1: mbus err
-	// port b bit 2: port b err
-	// port b bit 3: vme
-	// port b bit 4: vme mailbox
-	// port b bit 5: port b err
-	// port b bit 6: software interrupt
-	// port b bit 7: vsb
-
 	Z8036(config, m_cio[0], 4'000'000); // Z0803606VSC
+	/*
+	 * port a bit mode ddr 0xff
+	 * bit  i/o  function
+	 *  0    i   porta int?
+	 *  1    i   ethernet
+	 *  2    i   scc dma
+	 *  3    i   scsi0
+	 *  4    i   scsi1
+	 *  5    i   scc
+	 *  6    i   acfail
+	 *  7    i   parity
+	 *
+	 * port b bit mode ddr 0xbf
+	 * bit  i/o  function
+	 *  0    i   port b
+	 *  1    i   mbus err
+	 *  2    i   port b err
+	 *  3    i   vme
+	 *  4    i   vme mailbox
+	 *  5    i   port b err
+	 *  6    o   software interrupt
+	 *  7    i   vsb
+	 *
+	 * port c ? ddr 0xf
+	 * bit  i/o  function
+	 *  0    i
+	 *  1    i
+	 *  2    i
+	 *  3    i
+	 */
 	m_cio[0]->irq_wr_cb().set_inputline(m_cpu, INPUT_LINE_IRQ0);
 
 	Z8036(config, m_cio[1], 4'000'000); // Z0803606VSC
@@ -166,27 +180,16 @@ void tp881v_device::device_add_mconfig(machine_config &config)
 	m_net->out_irq_cb().set(m_cio[0], FUNC(z8036_device::pa1_w));
 	m_net->set_addrmap(0, &tp881v_device::net_mem);
 
-	// TODO: find out what is connected to scc_drq
-	input_merger_any_high_device &scc_drq(INPUT_MERGER_ANY_HIGH(config, "scc_drq"));
 	input_merger_any_high_device &scc_irq(INPUT_MERGER_ANY_HIGH(config, "scc_irq"));
-	scc_drq.output_handler().set(m_cio[0], FUNC(z8036_device::pa2_w));
 	scc_irq.output_handler().set(m_cio[0], FUNC(z8036_device::pa5_w));
 
 	SCC8030(config, m_scc[0], 3.6864_MHz_XTAL); // Z0803006VSC
 	m_scc[0]->configure_channels(m_scc[0]->clock(), m_scc[0]->clock(), m_scc[0]->clock(), m_scc[0]->clock());
 	m_scc[0]->out_int_callback().set(scc_irq, FUNC(input_merger_any_high_device::in_w<0>));
-	m_scc[0]->out_rxdrqa_callback().set(scc_drq, FUNC(input_merger_any_high_device::in_w<0>));
-	m_scc[0]->out_rxdrqb_callback().set(scc_drq, FUNC(input_merger_any_high_device::in_w<1>));
-	m_scc[0]->out_txdrqa_callback().set(scc_drq, FUNC(input_merger_any_high_device::in_w<2>));
-	m_scc[0]->out_txdrqb_callback().set(scc_drq, FUNC(input_merger_any_high_device::in_w<3>));
 
 	SCC8030(config, m_scc[1], 3.6864_MHz_XTAL); // Z0803006VSC
 	m_scc[1]->configure_channels(m_scc[1]->clock(), m_scc[1]->clock(), m_scc[1]->clock(), m_scc[1]->clock());
 	m_scc[1]->out_int_callback().set(scc_irq, FUNC(input_merger_any_high_device::in_w<1>));
-	m_scc[1]->out_rxdrqa_callback().set(scc_drq, FUNC(input_merger_any_high_device::in_w<4>));
-	m_scc[1]->out_rxdrqb_callback().set(scc_drq, FUNC(input_merger_any_high_device::in_w<5>));
-	m_scc[1]->out_txdrqa_callback().set(scc_drq, FUNC(input_merger_any_high_device::in_w<6>));
-	m_scc[1]->out_txdrqb_callback().set(scc_drq, FUNC(input_merger_any_high_device::in_w<7>));
 
 	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
 	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
@@ -222,13 +225,71 @@ void tp881v_device::device_add_mconfig(machine_config &config)
 	m_serial[3]->dcd_handler().set(m_scc[1], FUNC(z80scc_device::dcdb_w));
 	m_serial[3]->cts_handler().set(m_scc[1], FUNC(z80scc_device::ctsb_w));
 
+	// TODO: MC68440 is function and pin compatible with MC68450/HD63450, but
+	// has only two DMA channels instead of four.
+	HD63450(config, m_scc_dma, 10'000'000); // MC68440FN10
+	m_scc_dma->set_cpu_tag(m_cpu);
+	m_scc_dma->irq_callback().set(m_cio[0], FUNC(z8036_device::pa2_w));
+
+	// VME control and status CIO
 	Z8036(config, m_vcs, 4'000'000); // Z0803606VSC
-	// port (a & 0x7f) << 25 gives vme address of dram?
+	/*
+	 * port a
+	 * bit  i/o  function
+	 *  0    i   vme dram address bit 25
+	 *  1    i   vme dram address bit 26
+	 *  2    i   vme dram address bit 27
+	 *  3    i   vme dram address bit 28
+	 *  4    i   vme dram address bit 29
+	 *  5    i   vme dram address bit 30
+	 *  6    i   vme dram address bit 31
+	 *  7    ?
+	 */
 
+	// general control and status CIO 0
 	Z8036(config, m_gcs[0], 4'000'000); // Z0803606VSC
-	// port used to control scsi dma direction?
+	/*
+	 * port a ddr 0x01
+	 * bit  i/o  function
+	 *  0    i
+	 *  1    o
+	 *  2    o
+	 *  3    o   fail led
+	 *  4    o   user led
+	 *  5    o
+	 *  6    o
+	 *  7    o
+	 *
+	 * port b ddr 0x00
+	 * bit  i/o  function
+	 *  0    o
+	 *  1    o
+	 *  2    o
+	 *  3    o
+	 *  4    o
+	 *  5    o
+	 *  6    o   scsi1 dma memory->device
+	 *  7    o   scsi0 dma memory->device
+	 *
+	 * port c 0xe
+	 * bit  i/o  function
+	 *  0    o
+	 *  1    i   vme irq level bit 0
+	 *  2    i   vme irq level bit 1
+	 *  3    i   vme irq level bit 2
+	 */
+	// back panel has scsi0, scsi1, vme, net, sysfail, user,
 
+	 // general control and status CIO 1
 	Z8036(config, m_gcs[1], 4'000'000); // Z0803606VSC
+	/*
+	 * port c ddr 0x1
+	 * bit  i/o  function
+	 *  0    i   eeprom data in
+	 *  1    o   eeprom data out
+	 *  2    o   eeprom chip select
+	 *  3    o   eeprom clock
+	 */
 	m_gcs[1]->pc_wr_cb().set(
 		[this](u8 data)
 		{
@@ -256,7 +317,6 @@ void tp881v_device::cpu_mem(address_map &map)
 	map(0x4000'0000, 0x41ff'ffff).ram().share("ram");
 	//map(0x8000'0000, 0x80ff'ffff); // vme extended space (a32 d32)
 	//map(0xc000'0000, 0xc0ff'ffff); // vsb space
-	//map(0xfff0'0000, 0xffff'ffff); // i/o
 
 	map(0xfff3'0000, 0xfff3'003f).m(m_scsi[0], FUNC(ncr53c90a_device::map)).umask32(0x000000ff);
 	//0xfff30080; // dmac scsi0

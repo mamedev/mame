@@ -17558,6 +17558,7 @@ ts28                            // 1983
 feleg
 felega
 felega1
+felega2
 
 @source:fidelity/card.cpp
 bridgec
@@ -18296,6 +18297,7 @@ smooncrs                        // Gremlin
 spacbat2                        // bootleg
 spacbatt                        // bootleg
 spacempr                        // bootleg
+spacian2                        //
 spactrai                        //
 spcdrag                         // bootleg
 spcmission                      // bootleg (SegaSA / Sonic)
@@ -26795,9 +26797,6 @@ vortex                          // 852 [1980] Zilec Electronics Ltd.
 yosakdon                        // (c) 1979 Yosaku To Donbei
 yosakdona                       // (c) 1979 Yosaku To Donbei
 
-@source:midw8080/m79amb.cpp
-m79amb                          // (c) 1977 RamTek
-
 @source:midw8080/mw8080bw.cpp
 280zzzap                        // 610 [1976]
 blueshrk                        // 742 [1978]
@@ -30748,6 +30747,8 @@ pkscram                         // (c) 1993 Cosmo Electronics Corporation
 
 @source:misc/playcenter.cpp
 plycntrchtr                     // (c) 2000 Recreativos Presas / Undergaming
+plycntrchtrc                    // (c) 2000 Recreativos Presas / Undergaming
+plycntrchtrk                    // (c) 2000 Recreativos Presas / Undergaming
 
 @source:misc/plsonic4.cpp
 plsonic4                        //
@@ -30936,6 +30937,7 @@ quizpun2                        // (c) 1989 Space Computer System of Korea
 radikaldrt                      // (c) 2011? Gaelco Darts
 
 @source:misc/rawthrillspc.cpp
+doodlejmp                       // (c) 2013 ICE / Raw Thrills / Lima Sky
 fnf                             // (c) 2004 Raw Thrills
 guitarheroac                    // (c) 2008 Raw Thrills / Activision / Konami
 
@@ -36321,6 +36323,7 @@ polic_l4                        //
 spstn_l5                        //
 swrds_l1                        //
 swrds_l2                        //
+swrds_lg2                       //
 taxi_l3                         //
 taxi_l4                         //
 taxi_lg1                        //
@@ -37578,6 +37581,9 @@ hitme1                          // (c) 05/1976 Ramtek
 mirco21                         // (c) 08/1976 Mirco
 super21                         // (c) 1978 Mirco
 
+@source:ramtek/m79amb.cpp
+m79amb                          // (c) 1977 RamTek
+
 @source:ramtek/ramtek.cpp
 bballrmt                        // (c) 1974 Ramtek
 cleanswp                        // (c) 1974 Ramtek
@@ -38425,6 +38431,7 @@ alienfnta                       // 2001.09 Alien Front (Rev A)
 alpilotj                        // 1999.03 Airline Pilots (Japan, Rev A)
 alpilot                         // 1999.?? Airline Pilots (World, Rev B)
 anpanman2                       // 2003.09 Soreike! Anpanman Popcorn Koujou 2 (Rev C)
+anpanman2a                      // 2003.04 Soreike! Anpanman Popcorn Koujou 2 (Rev A)
 asndynmt                        // 2007.07 Dynamite Deka EX - Asian dynamite
 asndynmto                       // 2007.07 Dynamite Deka EX - Asian dynamite (older)
 ausfache                        // 2008.02.20 Akatsuki Blitzkampf Ausf. Achse
@@ -38778,6 +38785,7 @@ ribbitj                         // (c) 1991 Sega
 soniccar                        // (c) 1991 Sega
 sonicpop                        // (c) 1993 Sega
 sonicfgt                        // (c) 1993 Sega
+sonicfgtj                       // (c) 1993 Sega
 ssonicbr                        // (c) 1992 Sega
 stkclmns                        // (c) 1994 Sega
 stkclmnsj                       // (c) 1994 Sega

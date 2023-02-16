@@ -569,7 +569,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 		// floor mode
 		// life would be easier if the roz we're talking about for complex zoom wasn't setting this as well
 
-		// fprintf(stderr, "Tilemap %d is a floor using :\n", tm);
+		// logerror(stderr, "Tilemap %d is a floor using :\n", tm);
 		// const uint32_t floorAddress = 0x40000 + (scrollbase << 4);
 
 		// TODO: The row count is correct, but how is this layer clipped? m_tcram?
@@ -587,7 +587,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 		//
 		//    lineCount++;
 		//}
-		//printf("lines %d\n", lineCount);
+		//logerror("lines %d\n", lineCount);
 
 		// Buriki uses a 2x mosaic effect on its floor, so its line count is half
 		// (but so does fatfurwa - maybe it overdraws a bunch of pixels?)
@@ -734,7 +734,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 				const int bmwidth = bm.width();
 				pen_t const *const paldata = m_palette->pens();
 
-				//printf("start %08x end %08x start %08x end %08x\n", xtopleft, xmiddle, ytopleft, ymiddle);
+				//logerror("start %08x end %08x start %08x end %08x\n", xtopleft, xmiddle, ytopleft, ymiddle);
 
 				for (int yy=0; yy<448; yy++)
 				{
@@ -826,7 +826,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 
 				int tmp = xtopleft;
 
-				//printf("start %08x end %08x start %08x end %08x\n", xtopleft, xmiddle, ytopleft, ymiddle);
+				//logerror("start %08x end %08x start %08x end %08x\n", xtopleft, xmiddle, ytopleft, ymiddle);
 
 				for (int yy=0; yy<448; yy++)
 				{

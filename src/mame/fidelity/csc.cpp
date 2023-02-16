@@ -148,7 +148,7 @@ LED display:
 -----
 88:88
 
-The LED display is four 7 segment digits.  normal ABCDEFG lettering is used for segments.
+The LED display is four 7 segment digits. Normal ABCDEFG lettering is used for segments.
 
 The upper dot is connected to digit 3 common
 The lower dot is connected to digit 4 common
