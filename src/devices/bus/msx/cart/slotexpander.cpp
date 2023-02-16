@@ -45,7 +45,7 @@ public:
 	msx_cart_slotexpander_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 		: device_t(mconfig, MSX_CART_SLOTEXPANDER, tag, owner, clock)
 		, msx_cart_interface(mconfig, *this)
-		, m_cartslot(*this, "cartslot%u", 0)
+		, m_cartslot(*this, "cartslot%u", 1)
 		, m_irq_out(*this, "irq_out")
 		, m_view0(*this, "view0")
 		, m_view1(*this, "view1")
@@ -58,6 +58,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_resolve_objects() override;
+	virtual void device_config_complete() override;
 
 private:
 	template<int Slot> void add_cartslot(machine_config &mconfig);
@@ -77,13 +78,6 @@ template<int Slot>
 void  msx_cart_slotexpander_device::add_cartslot(machine_config &mconfig)
 {
 	MSX_SLOT_CARTRIDGE(mconfig, m_cartslot[Slot], 0);
-	// During validate_device_types the finders from the parent cartridge slot are not present.
-	if (get_cpu_finder())
-	{
-		m_cartslot[Slot]->set_memory_space(*get_cpu_finder(), AS_PROGRAM);
-		m_cartslot[Slot]->set_io_space(*get_cpu_finder(), AS_IO);
-		m_cartslot[Slot]->set_maincpu(*get_cpu_finder());
-	}
 	m_cartslot[Slot]->option_reset();
 	msx_cart(*m_cartslot[Slot], true);
 	m_cartslot[Slot]->set_default_option(nullptr);
@@ -99,6 +93,18 @@ void msx_cart_slotexpander_device::device_add_mconfig(machine_config &mconfig)
 	add_cartslot<3>(mconfig);
 
 	INPUT_MERGER_ANY_HIGH(mconfig, m_irq_out).output_handler().set(*this, FUNC(msx_cart_slotexpander_device::irq_out));
+}
+
+void msx_cart_slotexpander_device::device_config_complete()
+{
+	static const char *tags[4] = {
+		"cartslot1", "cartslot2", "cartslot3", "cartslot4"
+	};
+	for (int subslot = 0; subslot < 4; subslot++) {
+		subdevice<msx_slot_cartridge_device>(tags[subslot])->set_memory_space(*get_cpu_finder(), AS_PROGRAM);
+		subdevice<msx_slot_cartridge_device>(tags[subslot])->set_io_space(*get_cpu_finder(), AS_IO);
+		subdevice<msx_slot_cartridge_device>(tags[subslot])->set_maincpu(*get_cpu_finder());
+	}
 }
 
 void msx_cart_slotexpander_device::device_resolve_objects()

@@ -34,7 +34,7 @@ public:
 	address_space &memory_space() const { return *m_mem_space; }
 	address_space &io_space() const { return *m_io_space; }
 	cpu_device &maincpu() const { return *m_maincpu; }
-	required_device<cpu_device> *required_maincpu() { return &m_maincpu; }
+	required_device<cpu_device> *get_cpu_finder() { return &m_maincpu; }
 	bool page_configured(int i) { return bool(m_page[i]); }
 	memory_view::memory_view_entry *page(int i)
 	{

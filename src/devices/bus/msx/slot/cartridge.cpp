@@ -353,7 +353,7 @@ cpu_device &msx_cart_interface::maincpu() const
 
 required_device<cpu_device> *msx_cart_interface::get_cpu_finder()
 {
-	return m_exp ? m_exp->required_maincpu() : nullptr;
+	return m_exp ? m_exp->get_cpu_finder() : nullptr;
 }
 
 void msx_cart_interface::set_views(memory_view::memory_view_entry *page0, memory_view::memory_view_entry *page1, memory_view::memory_view_entry *page2, memory_view::memory_view_entry *page3)
