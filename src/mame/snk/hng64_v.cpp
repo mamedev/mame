@@ -493,7 +493,7 @@ inline void hng64_state::hng64_tilemap_draw_roz(screen_device &screen, bitmap_rg
  */
 
 
-void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm)
+void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags)
 {
 	// Useful bits from the global tilemap flags
 	const uint32_t& global_tileregs = m_videoregs[0x00];
@@ -540,13 +540,22 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	const uint8_t floorModeBit     = (tileregs & 0x0800) >> 11;
 	const uint8_t bppBit           = (tileregs & 0x0400) >> 10;
 	const uint8_t bigTilemapBit    = (tileregs & 0x0200) >>  9;
-	const uint8_t tilemapEnableBit = (tileregs & 0x0040) >>  6; (void)tilemapEnableBit;
+	const uint8_t tilemapEnableBit = (tileregs & 0x0040) >>  6;
 
-	// Tilemap drawing enable (sams64_2 demo mode says this is legit)
-	//if (!tilemapEnableBit)
-	//{
-	//    return;
-	//}
+	// Tilemap drawing enable?
+	//
+	// Definitely used to disable tilemaps in sams64_2 demo mode
+	// and is also set on the 'debug layer' of buriki
+	// however the floor layer of fatfurwa also has it set, and that must be enabled!
+	//
+	// Speculate that floormode ignores this flag, because lines can be disabled on
+	// a per-line basis?
+	//
+	// Could also just be another priority bits with some priorities being filtered
+	if (!tilemapEnableBit && floorModeBit)
+	{
+	    return;
+	}
 
 	// Select the proper tilemap size
 	tilemap_t* tilemap = nullptr;
@@ -673,7 +682,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 				hng64_tilemap_draw_roz(screen, bitmap,clip,tilemap,xtopleft,ytopleft,
 						xinc<<1,0,0,yinc<<1,
 						1,
-						0,0, debug_blend_enabled?HNG64_TILEMAP_ADDITIVE:HNG64_TILEMAP_NORMAL);
+						flags,0, debug_blend_enabled?HNG64_TILEMAP_ADDITIVE:HNG64_TILEMAP_NORMAL);
 			}
 		}
 	}
@@ -769,7 +778,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 				hng64_tilemap_draw_roz(screen, bitmap,cliprect,tilemap,xtopleft,ytopleft,
 						xinc<<1,yinc2<<1,xinc2<<1,yinc<<1,
 						1,
-						0,0, debug_blend_enabled?HNG64_TILEMAP_ADDITIVE:HNG64_TILEMAP_NORMAL);
+						flags,0, debug_blend_enabled?HNG64_TILEMAP_ADDITIVE:HNG64_TILEMAP_NORMAL);
 			}
 
 		}
@@ -858,7 +867,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 				hng64_tilemap_draw_roz(screen, bitmap,cliprect,tilemap,xtopleft,ytopleft,
 						xinc<<1,0,0,yinc<<1,
 						1,
-						0,0, debug_blend_enabled?HNG64_TILEMAP_ADDITIVE:HNG64_TILEMAP_NORMAL);
+						flags,0, debug_blend_enabled?HNG64_TILEMAP_ADDITIVE:HNG64_TILEMAP_NORMAL);
 			}
 		}
 	}
@@ -882,9 +891,12 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	}
 #endif
 
-
 	// Initialize some buffers
-	bitmap.fill(m_tcram[0x50/4] & 0x10000 ? m_palette->black_pen() : m_palette->pen(0), cliprect); //FIXME: Is the register correct? check with HW tests
+	if(m_fbcontrol[0] & 0x01) //FIXME: Is the register correct? check with HW tests
+		bitmap.fill(m_palette->pen(0), cliprect); 
+	else
+		bitmap.fill(m_palette->black_pen(), cliprect);
+
 	screen.priority().fill(0x00, cliprect);
 
 	// If the screen is disabled, don't draw anything (m_screen_dis is a shady variable at best)
@@ -938,10 +950,11 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	}
 
 	// Draw the four tilemaps
-	hng64_drawtilemap(screen,bitmap,cliprect, 3);
-	hng64_drawtilemap(screen,bitmap,cliprect, 2);
-	hng64_drawtilemap(screen,bitmap,cliprect, 1);
-	hng64_drawtilemap(screen,bitmap,cliprect, 0);
+	//hng64_drawtilemap(screen,bitmap,cliprect, 3, TILEMAP_DRAW_OPAQUE);
+	hng64_drawtilemap(screen,bitmap,cliprect, 3, 0);
+	hng64_drawtilemap(screen,bitmap,cliprect, 2, 0);
+	hng64_drawtilemap(screen,bitmap,cliprect, 1, 0);
+	hng64_drawtilemap(screen,bitmap,cliprect, 0, 0);
 
 	// 3d gets drawn next
 	if(!(m_fbcontrol[0] & 0x01))
