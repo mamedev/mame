@@ -76,6 +76,8 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/font/font_osx.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_sdl.cpp",
 		MAME_DIR .. "src/osd/modules/font/font_windows.cpp",
+		MAME_DIR .. "src/osd/modules/input/assignmenthelper.cpp",
+		MAME_DIR .. "src/osd/modules/input/assignmenthelper.h",
 		MAME_DIR .. "src/osd/modules/input/input_common.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_common.h",
 		MAME_DIR .. "src/osd/modules/input/input_dinput.cpp",

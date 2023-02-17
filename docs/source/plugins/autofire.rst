@@ -66,10 +66,10 @@ Experiment with different values to get the best effect.
 When adding a new autofire button, there is a **Cancel** option that changes to
 **Create** after you set the input and hotkey.  Select **Create** to finish
 creating the autofire button and return to the list of autofire buttons.  The
-new autofire button will be added at the end of the list.  Press the UI Cancel
-key (Escape/Esc on the keyboard by default), or select **Cancel** before setting
-the input/hotkey, to return to the previous menu without creating the new
-autofire button.
+new autofire button will be added at the end of the list.  Press the UI Back key
+(Escape/Esc on the keyboard by default), or select **Cancel** before setting the
+input/hotkey, to return to the previous menu without creating the new autofire
+button.
 
 When modifying an existing autofire button, select **Done** or press the UI
 Cancel key to return to the list of autofire buttons.  Changes take effect

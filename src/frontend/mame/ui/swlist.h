@@ -65,7 +65,7 @@ public:
 	virtual ~menu_software_list() override;
 
 protected:
-	virtual bool custom_ui_cancel() override { return !m_search.empty(); }
+	virtual bool custom_ui_back() override { return !m_search.empty(); }
 
 private:
 	struct entry_info

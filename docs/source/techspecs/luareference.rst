@@ -2549,6 +2549,10 @@ manager.machine.uiinput
 Methods
 ^^^^^^^
 
+uiinput:reset()
+    Clears pending events and UI input states.  Should be called when leaving a
+    modal state where input is handled directly (e.g. configuring an input
+    combination).
 uiinput:find_mouse()
     Returns host system mouse pointer X position, Y position, button state, and
     the :ref:`render target <luareference-render-target>` it falls in.  The

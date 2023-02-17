@@ -117,7 +117,7 @@ menu_file_create::menu_file_create(mame_ui_manager &mui, render_container &conta
 	, m_current_format(nullptr)
 {
 	m_image = image;
-	m_ok = true;
+	m_ok = false;
 
 	m_filename.reserve(1024);
 	m_filename = core_filename_extract_base(current_file);
@@ -158,13 +158,22 @@ void menu_file_create::custom_render(void *selectedref, float top, float bottom,
 
 
 //-------------------------------------------------
+//  custom_ui_back - override back handling
+//-------------------------------------------------
+
+bool menu_file_create::custom_ui_back()
+{
+	return (get_selection_ref() == ITEMREF_NEW_IMAGE_NAME) && !m_filename.empty();
+}
+
+
+//-------------------------------------------------
 //  populate - populates the file creator menu
 //-------------------------------------------------
 
 void menu_file_create::populate()
 {
 	std::string buffer;
-	const image_device_format *format;
 	const std::string *new_image_name;
 
 	// append the "New Image Name" item
@@ -180,9 +189,10 @@ void menu_file_create::populate()
 	item_append(_("New Image Name:"), *new_image_name, 0, ITEMREF_NEW_IMAGE_NAME);
 
 	// do we support multiple formats?
-	if (ENABLE_FORMATS) format = m_image->formatlist().front().get();
-	if (ENABLE_FORMATS && (format != nullptr))
+	image_device_format const *const format = ENABLE_FORMATS ? m_image->formatlist().front().get() : nullptr;
+	if (format)
 	{
+		// FIXME: is this in the right order?  It reassigns m_current_format after reading it.
 		item_append(_("Image Format:"), m_current_format->description(), 0, ITEMREF_FORMAT);
 		m_current_format = format;
 	}
@@ -212,31 +222,38 @@ void menu_file_create::handle(event const *ev)
 				if (tmp_file.find('.') != -1 && tmp_file.find('.') < tmp_file.length() - 1)
 				{
 					m_current_file = m_filename;
+					m_ok = true;
 					stack_pop();
 				}
 				else
+				{
 					ui().popup_time(1, "%s", _("Please enter a file extension too"));
+				}
 			}
 			break;
 
 		case IPT_UI_PASTE:
-			if (get_selection_ref() == ITEMREF_NEW_IMAGE_NAME)
+			if (ev->itemref == ITEMREF_NEW_IMAGE_NAME)
 			{
 				if (paste_text(m_filename, &osd_is_valid_filename_char))
-					reset(reset_options::REMEMBER_POSITION);
+					ev->item->set_subtext(m_filename + "_");
 			}
 			break;
 
 		case IPT_SPECIAL:
-			if (get_selection_ref() == ITEMREF_NEW_IMAGE_NAME)
+			if (ev->itemref == ITEMREF_NEW_IMAGE_NAME)
 			{
 				if (input_character(m_filename, ev->unichar, &osd_is_valid_filename_char))
-					reset(reset_options::REMEMBER_POSITION);
+					ev->item->set_subtext(m_filename + "_");
 			}
 			break;
 
 		case IPT_UI_CANCEL:
-			m_ok = false;
+			if ((ev->itemref == ITEMREF_NEW_IMAGE_NAME) && !m_filename.empty())
+			{
+				m_filename.clear();
+				ev->item->set_subtext("_");
+			}
 			break;
 		}
 	}
