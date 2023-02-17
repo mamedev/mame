@@ -398,6 +398,8 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 	int incyx = xinc2 << 1;
 	int incyy = yinc << 1;
 
+	// we have the scroll values for the current line, draw
+
 	pen_t const *const clut = &m_palette->pen(blit->tilemap_priority_code >> 16);
 	bitmap_ind8 &priority_bitmap = screen.priority();
 	bitmap_rgb32 &destbitmap = *blit->bitmap;
@@ -411,10 +413,6 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 	uint8_t mask = blit->mask;
 	uint8_t value = blit->value;
 	uint8_t alpha = blit->alpha;
-
-
-	// TODO, should probably get scroll values here, as it looks like when Mosaic is enabled
-	//       the scroll values are from the virtual line too (buriki floor)
 
 	/* pre-advance based on the cliprect */
 	startx += blit->cliprect.min_x * incxx + source_line_to_use * incyx;
@@ -459,8 +457,8 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 			{
 				uint16_t srcoffset = cx >> 16;
 
-				uint16_t masksrc;
-				uint16_t datasrc;
+				uint16_t masksrc = 0;
+				uint16_t datasrc = 0;
 
 				if (mosaic_counter == 0)
 				{
@@ -507,8 +505,8 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 			uint16_t srcoffset = (cx >> 16) & xmask;
 			uint16_t srcyoffset = (cy >> 16) & ymask;
 
-			uint16_t masksrc;
-			uint16_t datasrc;
+			uint16_t masksrc = 0;
+			uint16_t datasrc = 0;
 
 			if (mosaic_counter == 0)
 			{
@@ -557,8 +555,8 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 			int mosaic_counter = 0;
 			if (cx < widthshifted && cy < heightshifted)
 			{
-				uint16_t masksrc;
-				uint16_t datasrc;
+				uint16_t masksrc = 0;
+				uint16_t datasrc = 0;
 
 				if (mosaic_counter == 0)
 				{
