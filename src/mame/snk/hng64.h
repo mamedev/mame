@@ -430,8 +430,7 @@ private:
 	void hng64_mark_all_tiles_dirty(int tilemap);
 	void hng64_mark_tile_dirty(int tilemap, int tile_index);
 
-	void hng64_drawtilemap_linemode(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, tilemap_t* tilemap, uint16_t scrollbase, int line, uint8_t mosaic);
-	void hng64_drawtilemap_nolinemode(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, tilemap_t* tilemap, uint16_t scrollbase, uint8_t bppBit, int line, uint8_t mosaic);
+	void hng64_drawtilemap_nolinemode(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, tilemap_t* tilemap, uint8_t bppBit, int line, uint8_t mosaic);
 
 	uint16_t get_tileregs(int tm);
 	uint16_t get_scrollbase(int tm);
