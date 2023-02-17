@@ -714,7 +714,7 @@ function cheat.startplugin()
 	local function menu_callback(index, event)
 		manager.machine:popmessage()
 		if hotkeymenu then
-			if event == "cancel" then
+			if event == "back" then
 				hotkeymenu = false
 				return true
 			else

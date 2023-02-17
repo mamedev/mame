@@ -350,7 +350,7 @@ protected:
 	void set_process_flags(uint32_t flags) { m_process_flags = flags; }
 	virtual void handle_events(uint32_t flags, event &ev);
 	virtual void handle_keys(uint32_t flags, int &iptkey);
-	virtual bool custom_ui_cancel() { return false; }
+	virtual bool custom_ui_back() { return false; }
 	virtual bool custom_mouse_down() { return false; }
 	virtual bool custom_mouse_scroll(int lines) { return false; }
 

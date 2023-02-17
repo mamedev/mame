@@ -124,7 +124,7 @@ void simple_menu_select_game::handle(event const *ev)
 		else
 		{
 			// handle selections
-			switch(ev->iptkey)
+			switch (ev->iptkey)
 			{
 			case IPT_UI_SELECT:
 				inkey_select(*ev);

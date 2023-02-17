@@ -85,7 +85,7 @@ void windows_osd_interface::customize_input_type_list(std::vector<input_type_ent
 		{
 			// disable the config menu if the ALT key is down
 			// (allows ALT-TAB to switch between windows apps)
-			case IPT_UI_CONFIGURE:
+			case IPT_UI_MENU:
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_TAB, input_seq::not_code, KEYCODE_LALT, input_seq::not_code, KEYCODE_RALT);
 				break;
 			// configurable UI mode switch

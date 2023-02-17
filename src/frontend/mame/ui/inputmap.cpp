@@ -394,22 +394,12 @@ void menu_input::handle(event const *ev)
 
 		if (machine().ui_input().pressed(IPT_UI_CANCEL))
 		{
-			// if UI_CANCEL is pressed, abort
+			// if UI_CANCEL is pressed, abort and abandon changes
 			pollingitem = nullptr;
 			set_process_flags(PROCESS_LR_ALWAYS);
-			if (!seq_poll->modified() || modified_ticks == osd_ticks())
-			{
-				// cancelled immediately - toggle between default and none
-				record_next = false;
-				toggle_none_default(item->seq, starting_seq, *item->defseq);
-				seqchangeditem = item;
-			}
-			else
-			{
-				// entered something before cancelling - abandon change
-				invalidate = true;
-			}
+			invalidate = true;
 			seq_poll.reset();
+			machine().ui_input().reset();
 		}
 		else if (seq_poll->poll()) // poll again; if finished, update the sequence
 		{
@@ -429,6 +419,7 @@ void menu_input::handle(event const *ev)
 				erroritem = item;
 			}
 			seq_poll.reset();
+			machine().ui_input().reset();
 		}
 	}
 	else if (ev && ev->itemref)
