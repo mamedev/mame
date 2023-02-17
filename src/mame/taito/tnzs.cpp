@@ -672,6 +672,7 @@ d23f=input port 1 value
 #include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
+#include "logmacro.h"
 
 
 SAMPLES_START_CB_MEMBER(kageki_state::init_samples)
@@ -748,13 +749,13 @@ void kageki_state::csport_w(uint8_t data)
 		{
 			// play samples
 			m_samples->start_raw(0, m_sampledata[data].get(), m_samplesize[data], 7000);
-			// popmessage("VOICE:%02X PLAY", data);
+			LOG("VOICE:%02X PLAY", data);
 		}
 		else
 		{
 			// stop samples
 			m_samples->stop(0);
-			// popmessage("VOICE:%02X STOP", data);
+			LOG("VOICE:%02X STOP", data);
 		}
 	}
 }
