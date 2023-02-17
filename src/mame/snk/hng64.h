@@ -430,8 +430,8 @@ private:
 	void hng64_mark_all_tiles_dirty(int tilemap);
 	void hng64_mark_tile_dirty(int tilemap, int tile_index);
 
-	void hng64_drawtilemap_linemode(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, tilemap_t* tilemap, uint16_t scrollbase, int line);
-	void hng64_drawtilemap_nolinemode(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, tilemap_t* tilemap, uint16_t scrollbase, uint8_t bppBit, int line);
+	void hng64_drawtilemap_linemode(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, tilemap_t* tilemap, uint16_t scrollbase, int line, uint8_t mosaic);
+	void hng64_drawtilemap_nolinemode(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, tilemap_t* tilemap, uint16_t scrollbase, uint8_t bppBit, int line, uint8_t mosaic);
 
 	uint16_t get_tileregs(int tm);
 	uint16_t get_scrollbase(int tm);
@@ -441,15 +441,15 @@ private:
 	void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, int line);
 
 	void hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
-		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound);
+		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound, uint8_t mosaic);
 
 	void hng64_tilemap_draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
 		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy,
-		int wraparound, uint32_t flags, uint8_t priority, hng64trans_t drawformat);
+		int wraparound, uint32_t flags, uint8_t priority, hng64trans_t drawformat, uint8_t mosaic);
 
 	void hng64_tilemap_draw_roz_primask(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
 		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy,
-		int wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat);
+		int wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat, uint8_t mosaic);
 
 	static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, bitmap_rgb32 &dest, const rectangle &cliprect, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat);
 

@@ -236,7 +236,7 @@ do {                                                                            
 } while (0)
 
 void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
-		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound)
+		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound, uint8_t mosaic)
 {
 	pen_t const *const clut = &m_palette->pen(blit->tilemap_priority_code >> 16);
 	bitmap_ind8 &priority_bitmap = screen.priority();
@@ -252,15 +252,20 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 	uint8_t value = blit->value;
 	uint8_t alpha = blit->alpha;
 
+	int source_line_to_use = blit->cliprect.min_y;
+	source_line_to_use = (source_line_to_use / (mosaic+1)) * (mosaic+1);
+
+	// TODO, should probably get scroll values here, as it looks like when Mosaic is enabled
+	//       the scroll values are from the virtual line too (buriki floor)
+
 	/* pre-advance based on the cliprect */
-	startx += blit->cliprect.min_x * incxx + blit->cliprect.min_y * incyx;
-	starty += blit->cliprect.min_x * incxy + blit->cliprect.min_y * incyy;
+	startx += blit->cliprect.min_x * incxx + source_line_to_use * incyx;
+	starty += blit->cliprect.min_x * incxy + source_line_to_use * incyy;
 
 	/* extract start/end points */
 	int sx = blit->cliprect.min_x;
 	int sy = blit->cliprect.min_y;
 	int ex = blit->cliprect.max_x;
-	int ey = blit->cliprect.max_y;
 
 	/* optimized loop for the not rotated case */
 	if (incxy == 0 && incyx == 0 && !wraparound)
@@ -276,125 +281,151 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 		if (sx > ex)
 			return;
 
-		/* loop over rows */
-		while (sy <= ey)
-		{
-			/* only draw if Y is within range */
-			if (starty < heightshifted)
-			{
-				/* initialize X counters */
-				int x = sx;
-				uint32_t cx = startx;
-				uint32_t cy = starty >> 16;
-
-				/* get source and priority pointers */
-				uint8_t *pri = &priority_bitmap.pix(sy, sx);
-				uint16_t const *const src = &srcbitmap.pix(cy);
-				uint8_t const *const maskptr = &flagsmap.pix(cy);
-				uint32_t *dest = &destbitmap.pix(sy, sx);
-
-				/* loop over columns */
-				while (x <= ex && cx < widthshifted)
-				{
-					/* plot if we match the mask */
-					if ((maskptr[cx >> 16] & mask) == value)
-					{
-						HNG64_ROZ_PLOT_PIXEL(src[cx >> 16]);
-						*pri = (*pri & (priority >> 8)) | priority;
-					}
-
-					/* advance in X */
-					cx += incxx;
-					x++;
-					dest++;
-					pri++;
-				}
-			}
-
-			/* advance in Y */
-			starty += incyy;
-			sy++;
-		}
-	}
-
-	/* wraparound case */
-	else if (wraparound)
-	{
-		/* loop over rows */
-		while (sy <= ey)
+		/* only draw if Y is within range */
+		if (starty < heightshifted)
 		{
 			/* initialize X counters */
 			int x = sx;
 			uint32_t cx = startx;
-			uint32_t cy = starty;
+			uint32_t cy = starty >> 16;
 
-			/* get dest and priority pointers */
-			uint32_t *dest = &destbitmap.pix(sy, sx);
+			/* get source and priority pointers */
 			uint8_t *pri = &priority_bitmap.pix(sy, sx);
+			uint16_t const *const src = &srcbitmap.pix(cy);
+			uint8_t const *const maskptr = &flagsmap.pix(cy);
+			uint32_t *dest = &destbitmap.pix(sy, sx);
 
 			/* loop over columns */
-			while (x <= ex)
+			int mosaic_counter = 0;
+			while (x <= ex && cx < widthshifted)
 			{
-				/* plot if we match the mask */
-				if ((flagsmap.pix((cy >> 16) & ymask, (cx >> 16) & xmask) & mask) == value)
+				uint16_t srcoffset = cx >> 16;
+
+				uint16_t masksrc;
+				uint16_t datasrc;
+
+				if (mosaic_counter == 0)
 				{
-					HNG64_ROZ_PLOT_PIXEL(srcbitmap.pix((cy >> 16) & ymask, (cx >> 16) & xmask));
+					masksrc = (maskptr[srcoffset] & mask);
+					datasrc = src[srcoffset];
+					mosaic_counter = mosaic;
+				}
+				else
+				{
+					mosaic_counter--;
+				}
+
+				/* plot if we match the mask */
+				if (masksrc == value)
+				{
+					HNG64_ROZ_PLOT_PIXEL(datasrc);
 					*pri = (*pri & (priority >> 8)) | priority;
 				}
 
 				/* advance in X */
 				cx += incxx;
-				cy += incxy;
 				x++;
 				dest++;
 				pri++;
 			}
-
-			/* advance in Y */
-			startx += incyx;
-			starty += incyy;
-			sy++;
 		}
 	}
+	/* wraparound case */
+	else if (wraparound)
+	{
+		/* initialize X counters */
+		int x = sx;
+		uint32_t cx = startx;
+		uint32_t cy = starty;
 
+		/* get dest and priority pointers */
+		uint32_t *dest = &destbitmap.pix(sy, sx);
+		uint8_t *pri = &priority_bitmap.pix(sy, sx);
+
+		/* loop over columns */
+		int mosaic_counter = 0;
+		while (x <= ex)
+		{
+			uint16_t srcoffset = (cx >> 16) & xmask;
+			uint16_t srcyoffset = (cy >> 16) & ymask;
+
+			uint16_t masksrc;
+			uint16_t datasrc;
+
+			if (mosaic_counter == 0)
+			{
+				masksrc = (flagsmap.pix(srcyoffset, srcoffset) & mask);
+				datasrc = srcbitmap.pix(srcyoffset, srcoffset);
+				mosaic_counter = mosaic;
+			}
+			else
+			{
+				mosaic_counter--;
+			}
+			/* plot if we match the mask */
+			if (masksrc == value)
+			{
+				HNG64_ROZ_PLOT_PIXEL(datasrc);
+				*pri = (*pri & (priority >> 8)) | priority;
+			}
+
+			/* advance in X */
+			cx += incxx;
+			cy += incxy;
+			x++;
+			dest++;
+			pri++;
+		}
+	}
 	/* non-wraparound case */
 	else
 	{
-		/* loop over rows */
-		while (sy <= ey)
+		/* initialize X counters */
+		int x = sx;
+		uint32_t cx = startx;
+		uint32_t cy = starty;
+
+		/* get dest and priority pointers */
+		uint32_t *dest = &destbitmap.pix(sy, sx);
+		uint8_t *pri = &priority_bitmap.pix(sy, sx);
+
+		/* loop over columns */
+		while (x <= ex)
 		{
-			/* initialize X counters */
-			int x = sx;
-			uint32_t cx = startx;
-			uint32_t cy = starty;
+			uint16_t srcoffset = cx >> 16;
+			uint16_t srcyoffset = cy >> 16;
 
-			/* get dest and priority pointers */
-			uint32_t *dest = &destbitmap.pix(sy, sx);
-			uint8_t *pri = &priority_bitmap.pix(sy, sx);
-
-			/* loop over columns */
-			while (x <= ex)
+			/* plot if we're within the bitmap and we match the mask */
+			int mosaic_counter = 0;
+			if (cx < widthshifted && cy < heightshifted)
 			{
-				/* plot if we're within the bitmap and we match the mask */
-				if (cx < widthshifted && cy < heightshifted)
-					if ((flagsmap.pix(cy >> 16, cx >> 16) & mask) == value)
-					{
-						HNG64_ROZ_PLOT_PIXEL(srcbitmap.pix(cy >> 16, cx >> 16));
-						*pri = (*pri & (priority >> 8)) | priority;
-					}
+				uint16_t masksrc;
+				uint16_t datasrc;
 
-				/* advance in X */
-				cx += incxx;
-				cy += incxy;
-				x++;
-				dest++;
-				pri++;
+				if (mosaic_counter == 0)
+				{
+					masksrc = (flagsmap.pix(srcyoffset, srcoffset) & mask);
+					datasrc = srcbitmap.pix(srcyoffset, srcoffset);
+					mosaic_counter = mosaic;
+				}
+				else
+				{
+					mosaic_counter--;
+				}
+
+				if (masksrc == value)
+				{
+					HNG64_ROZ_PLOT_PIXEL(datasrc);
+					*pri = (*pri & (priority >> 8)) | priority;
+				}
+
 			}
-
-			/* advance in Y */
-			startx += incyx;
-			starty += incyy;
-			sy++;
+			/* advance in X */
+			cx += incxx;
+			cy += incxy;
+			x++;
+			dest++;
+			pri++;
 		}
 	}
 }
@@ -403,7 +434,7 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 
 void hng64_state::hng64_tilemap_draw_roz_primask(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
 		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy,
-		int wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat)
+		int wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat, uint8_t mosaic)
 {
 	blit_parameters blit;
 
@@ -423,16 +454,16 @@ g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
 	tmap->pixmap();
 
 	/* then do the roz copy */
-	hng64_tilemap_draw_roz_core(screen, tmap, &blit, startx, starty, incxx, incxy, incyx, incyy, wraparound);
+	hng64_tilemap_draw_roz_core(screen, tmap, &blit, startx, starty, incxx, incxy, incyx, incyy, wraparound, mosaic);
 g_profiler.stop();
 }
 
 
 inline void hng64_state::hng64_tilemap_draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
 		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy,
-		int wraparound, uint32_t flags, uint8_t priority, hng64trans_t drawformat)
+		int wraparound, uint32_t flags, uint8_t priority, hng64trans_t drawformat, uint8_t mosaic)
 {
-	hng64_tilemap_draw_roz_primask(screen, dest, cliprect, tmap, startx, starty, incxx, incxy, incyx, incyy, wraparound, flags, priority, 0xff, drawformat);
+	hng64_tilemap_draw_roz_primask(screen, dest, cliprect, tmap, startx, starty, incxx, incxy, incyx, incyy, wraparound, flags, priority, 0xff, drawformat, mosaic);
 }
 
 
@@ -491,131 +522,56 @@ inline void hng64_state::hng64_tilemap_draw_roz(screen_device &screen, bitmap_rg
  */
 
 
-void hng64_state::hng64_drawtilemap_linemode(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, tilemap_t* tilemap, uint16_t scrollbase, int line)
+void hng64_state::hng64_drawtilemap_linemode(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, int tm, int flags, tilemap_t* tilemap, uint16_t scrollbase, int line, uint8_t mosaic)
 {
-	// floor mode
-	// it would be easier if the roz we're talking about for complex zoom wasn't setting this as well
-
-	// const uint32_t floorAddress = 0x40000 + (scrollbase << 4);
-
-	// TODO: The row count is correct, but how is this layer clipped? m_tcram?
-
-	// See how many lines we have in the data region
-	// DEBUG: Change this to a loop that goes over each line and draws them - it's just for visualization now
-	//int lineCount = 0;
-	//for (int ii = 0; ii < 0x2000/4; ii += 4)
-	//{
-	//    const int realAddress = floorAddress/4;
-	//    if (m_videoram[realAddress+ii] == 0xffffff00 && m_videoram[realAddress+ii+1] == 0xffffff00)
-	//        continue;
-	//    if (m_videoram[realAddress+ii] == 0x00000000 && m_videoram[realAddress+ii+1] == 0x00000000)
-	//        continue;
-	//
-	//    lineCount++;
-	//}
-	//logerror("lines %d\n", lineCount);
-
-	// Buriki uses a 2x mosaic effect on its floor, so its line count is half
-	// (but so does fatfurwa - maybe it overdraws a bunch of pixels?)
-	//if (m_mcu_type == BURIKI_MCU)
-	//    lineCount *= 2;
-
-	// DEBUG - draw a horizontal green line where the uppermost line of the floor is drawn
-
-	//if (lineCount < visarea.height())
-	//{
-	//    for (int ii = 0; ii < visarea.width(); ii++)
-	//        bitmap.pix((visarea.height()-lineCount), ii) = 0xff00ff00;
-	//}
-
-	// HACK : Clear RAM - this is "needed" in fatfurwa since it doesn't clear its own ram (buriki does)
-	//        Figure out what the difference between the two programs is.  It's possible writing to
-	//        the linescroll ram fills a buffer and it's cleared automatically between frames?
-	// for (int ii = 0; ii < 0x2000/4; ii++)
-	//{
-	//  const int realAddress = floorAddress/4;
-	//  m_videoram[realAddress+ii] = 0x00000000;
-	// }
-
-
-	// Floor mode - per pixel simple / complex modes? -- every other line?
-	//  (there doesn't seem to be enough data in Buriki for every line at least)
-
-	// this was wrong, see below
-//      if (global_alt_scroll_register_format) // globally selects alt scroll register layout???
-//      {
-		// Logic would dictate that this should be the 'complex' scroll register layout,
-		// but per-line.  That doesn't work however.
-		//
-		// You only have line data for the number of lines on the screen, not enough for
-		// the complex register layout
-		//
-		// HOWEVER, using the code below doesn't work either.  This might be because
-		// they have mosaic turned on, and it adopts a new meaning in linescroll modes?
-		//
-		// The code below could also be wrong, and rowscroll simply acts the same in all
-		// modes, this is hard to know because ss64_2 barely uses it.
-		//
-		// buriki line data is at 20146000 (physical)
-
-//#if HNG64_VIDEO_DEBUG
-//          popmessage("Unhandled rowscroll %02x", tileregs>>12);
-//#endif
-//      }
-//      else // 'simple' mode with linescroll, used in some ss64_2 levels (assumed to be correct, but doesn't do much with it.. so could be wrong)
-
-
-
-	int32_t xtopleft, xmiddle;
-	int32_t ytopleft, ymiddle;
-
-	const uint32_t& global_tileregs = m_videoregs[0x00];
-	const int global_zoom_disable = global_tileregs & 0x00010000;
-	if (global_zoom_disable) // disable all scrolling / zoom (test screen) (maybe)
+	const int global_alt_scroll_register_format = m_videoregs[0x00] & 0x04000000;
+	if (global_alt_scroll_register_format) // globally selects alt scroll register layout???
 	{
-		// If this bit is active the scroll registers don't seem valid at all?
-		// It either disables zooming, or disables use of the scroll registers completely
-		// - used at startup
-
-		xtopleft = 0;
-		xmiddle = 256<<16;
-
-		ytopleft = 0;
-		ymiddle = 256<<16;
+		popmessage("global_alt_scroll_register_format in linemode");
 	}
-	else
+	//else
 	{
-		xtopleft = (m_videoram[(0x40000+(line*0x10)+(scrollbase<<4))/4]);
-		xmiddle  = (m_videoram[(0x40004+(line*0x10)+(scrollbase<<4))/4]); // middle screen point
-		ytopleft = (m_videoram[(0x40008+(line*0x10)+(scrollbase<<4))/4]);
-		ymiddle  = (m_videoram[(0x4000c+(line*0x10)+(scrollbase<<4))/4]); // middle screen point
-	}
+		int32_t xtopleft, xmiddle;
+		int32_t ytopleft, ymiddle;
 
-	const int xinc = (xmiddle - xtopleft) / 512;
-	const int yinc = (ymiddle - ytopleft) / 512;
-	// TODO: if global_alt_scroll_register_format is enabled uses incxy / incyx into calculation somehow ...
+		const uint32_t& global_tileregs = m_videoregs[0x00];
+		const int global_zoom_disable = global_tileregs & 0x00010000;
+		if (global_zoom_disable) // disable all scrolling / zoom (test screen) (maybe)
+		{
+			// If this bit is active the scroll registers don't seem valid at all?
+			// It either disables zooming, or disables use of the scroll registers completely
+			// - used at startup
 
-	hng64_tilemap_draw_roz(screen, bitmap,cliprect,tilemap,xtopleft,ytopleft,
-			xinc<<1,0,0,yinc<<1,
+			xtopleft = 0;
+			xmiddle = 256 << 16;
+
+			ytopleft = 0;
+			ymiddle = 256 << 16;
+		}
+		else
+		{
+			xtopleft = (m_videoram[(0x40000 + (line * 0x10) + (scrollbase << 4)) / 4]);
+			xmiddle = (m_videoram[(0x40004 + (line * 0x10) + (scrollbase << 4)) / 4]); // middle screen point
+			ytopleft = (m_videoram[(0x40008 + (line * 0x10) + (scrollbase << 4)) / 4]);
+			ymiddle = (m_videoram[(0x4000c + (line * 0x10) + (scrollbase << 4)) / 4]); // middle screen point
+		}
+
+		const int xinc = (xmiddle - xtopleft) / 512;
+		const int yinc = (ymiddle - ytopleft) / 512;
+		// TODO: if global_alt_scroll_register_format is enabled uses incxy / incyx into calculation somehow ...
+
+		hng64_tilemap_draw_roz(screen, bitmap, cliprect, tilemap, xtopleft, ytopleft,
+			xinc << 1, 0, 0, yinc << 1,
 			1,
-			flags,0, (hng64trans_t)get_blend_mode(tm));
-
-	
+			flags, 0, (hng64trans_t)get_blend_mode(tm), mosaic);
+	}
 }
 
-void hng64_state::hng64_drawtilemap_nolinemode(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, tilemap_t* tilemap, uint16_t scrollbase, uint8_t bppBit, int line)
+void hng64_state::hng64_drawtilemap_nolinemode(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, tilemap_t* tilemap, uint16_t scrollbase, uint8_t bppBit, int line, uint8_t mosaic)
 {
-	// Set the transmask so our manual copy is correct
-	//const int transmask = bppBit ? 0xff : 0xf;
-
 	// 0x1000 is set up the buriki 2nd title screen with rotating logo and in fatal fury at various times?
 
-	const uint32_t& global_tileregs = m_videoregs[0x00];
-	//const int global_dimensions = (global_tileregs & 0x03000000) >> 24;
-	const int global_alt_scroll_register_format = global_tileregs & 0x04000000;
-
-
-
+	const int global_alt_scroll_register_format =  m_videoregs[0x00] & 0x04000000;
 
 	if (global_alt_scroll_register_format) // globally selects alt scroll register layout???
 	{
@@ -670,7 +626,7 @@ void hng64_state::hng64_drawtilemap_nolinemode(screen_device &screen, bitmap_rgb
 		hng64_tilemap_draw_roz(screen, bitmap,cliprect,tilemap,xtopleft,ytopleft,
 				xinc<<1,yinc2<<1,xinc2<<1,yinc<<1,
 				1,
-				flags,0,(hng64trans_t)get_blend_mode(tm));
+				flags,0,(hng64trans_t)get_blend_mode(tm), mosaic);
 	}
 	else
 	{
@@ -679,7 +635,7 @@ void hng64_state::hng64_drawtilemap_nolinemode(screen_device &screen, bitmap_rgb
 			this allows simple zooming, but not rotation */
 
 #if HNG64_VIDEO_DEBUG
-		if (1)
+		if (0)
 			if (tm==3)
 				popmessage("%08x %08x %08x %08x",
 					m_videoram[(0x40010+(scrollbase<<4))/4],
@@ -720,7 +676,7 @@ void hng64_state::hng64_drawtilemap_nolinemode(screen_device &screen, bitmap_rgb
 		hng64_tilemap_draw_roz(screen, bitmap,cliprect,tilemap,xtopleft,ytopleft,
 				xinc<<1,0,0,yinc<<1,
 				1,
-				flags,0,(hng64trans_t)get_blend_mode(tm));
+				flags,0,(hng64trans_t)get_blend_mode(tm), mosaic);
 	}
 }
 
@@ -790,7 +746,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	uint16_t scrollbase = get_scrollbase(tm);
 
 	// Useful bits from the tilemap registers
-	const uint8_t mosaicValueBits  = (tileregs & 0xf000) >> 12; (void)mosaicValueBits;
+	const uint8_t mosaicValueBits  = (tileregs & 0xf000) >> 12;;
 	const uint8_t floorModeBit     = (tileregs & 0x0800) >> 11;
 	const uint8_t bppBit           = (tileregs & 0x0400) >> 10;
 	const uint8_t bigTilemapBit    = (tileregs & 0x0200) >>  9;
@@ -829,11 +785,11 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	if (floorModeBit == 0x0000)
 	{
-		hng64_drawtilemap_linemode(screen, bitmap, clip, tm, flags, tilemap, scrollbase, line);
+		hng64_drawtilemap_linemode(screen, bitmap, clip, tm, flags, tilemap, scrollbase, line, mosaicValueBits);
 	}
 	else
 	{
-		hng64_drawtilemap_nolinemode(screen, bitmap, clip, tm, flags, tilemap, scrollbase, bppBit, line);
+		hng64_drawtilemap_nolinemode(screen, bitmap, clip, tm, flags, tilemap, scrollbase, bppBit, line, mosaicValueBits);
 	}
 }
 
@@ -958,7 +914,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	if (0)
 		popmessage("%08x %08x %08x %08x %08x", m_spriteregs[0], m_spriteregs[1], m_spriteregs[2], m_spriteregs[3], m_spriteregs[4]);
 
-	if (0)
+	if (1)
 	popmessage("%08x %08x TR(%04x %04x %04x %04x) SB(%04x %04x %04x %04x) %08x %08x %08x %08x %08x AA(%08x %08x) %08x",
 		m_videoregs[0x00],
 		m_videoregs[0x01],
