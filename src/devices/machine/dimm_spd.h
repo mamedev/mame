@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#ifndef MAME_APPLE_DIMM_SPD_H
-#define MAME_APPLE_DIMM_SPD_H
+#ifndef MAME_MACHINE_DIMM_SPD_H
+#define MAME_MACHINE_DIMM_SPD_H
 
 #pragma once
 
@@ -15,10 +15,9 @@ class dimm_spd_device :  public device_t
 {
 public:
 	// construction/destruction
-	dimm_spd_device(const machine_config &mconfig, const char *tag, device_t *owner, int address)
+	dimm_spd_device(const machine_config &mconfig, const char *tag, device_t *owner)
 		: dimm_spd_device(mconfig, tag, owner, (uint32_t)0)
 	{
-		set_address(address);
 	}
 
 	dimm_spd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -68,4 +67,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(DIMM_SPD, dimm_spd_device)
 
-#endif // MAME_APPLE_DIMM_SPD_H
+#endif // MAME_MACHINE_DIMM_SPD_H
