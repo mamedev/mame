@@ -757,12 +757,13 @@ int hng64_state::get_blend_mode(int tm)
 	if ((m_tcram[0x0c / 4] & 0x04000000) && (tm == 1)) // only enable it for the 2nd tilemap right now, find other use cases!
 		blendmode = HNG64_TILEMAP_ADDITIVE;
 
-	// this bit also gets set for certain blending effects
+
+	// the bit below also gets set for certain blending effects
 	// for example a mist effect in the long tunnel on the South America course
 	// ( https://youtu.be/9rOPkNHTmYA?t=403 6:43 )
 	// this is the only course which has this bit set (it is set all the time) and is the only course using blending
 	// 
-	// the problem here however is that the used for blending has a lower tilemap priority than the background tilemap?!
+	// the problem here however is that the tilemap used for blending has a lower tilemap priority than the background tilemap?!
 	// the bit also gets set on the buriki title screen, and how that blends is unclear even with reference footage  
 	//if ((m_tcram[0x0c / 4] & 0x00000004) && (tm == 3))
 	//	blendmode = HNG64_TILEMAP_ADDITIVE;
