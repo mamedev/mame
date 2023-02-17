@@ -236,8 +236,168 @@ do {                                                                            
 } while (0)
 
 void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
-		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound, uint8_t mosaic)
+		int wraparound, uint8_t mosaic, uint8_t tm)
 {
+	int source_line_to_use = blit->cliprect.min_y;
+	source_line_to_use = (source_line_to_use / (mosaic+1)) * (mosaic+1);
+
+	int xinc, xinc2, yinc, yinc2;
+	int32_t xtopleft;
+	int32_t ytopleft;
+	uint16_t scrollbase = get_scrollbase(tm);
+	uint16_t tileregs = get_tileregs(tm);
+	const uint8_t notLineMode = (tileregs & 0x0800) >> 11;
+
+	if (notLineMode)
+	{
+		// 0x1000 is set up the buriki 2nd title screen with rotating logo and in fatal fury at various times?
+		const int global_alt_scroll_register_format = m_videoregs[0x00] & 0x04000000;
+
+		if (global_alt_scroll_register_format) // globally selects alt scroll register layout???
+		{
+			// xrally 'mist in tunnel' does NOT use this mode
+			// buriki title screen tm==3 DOES use this mode
+
+			/* complex zoom mode? */
+			/* with this scroll register layout rotation effects are possible
+				the most obvious use of rotation is the Buriki One logo after
+				attract mode; the text around the outside of the logo is rotated
+				onto the screen
+
+				see 1:32 in http://www.youtube.com/watch?v=PoYaHOILuGs
+
+				Xtreme Rally seems to have an issue with this mode on the communication check
+				screen at startup, however during the period in which the values are invalid
+				it looks like the display shouldn't even be enabled (only gets enabled when
+				the value starts counting up)
+
+			*/
+#if HNG64_VIDEO_DEBUG
+			if (0)
+				if (tm == 3)
+					popmessage("X %08x X %08x X %08x X(?) %08x | Y %08x Y %08x Y %08x Y(?) %08x",
+						m_videoram[(0x40000 + (scrollbase << 4)) / 4],
+						m_videoram[(0x40004 + (scrollbase << 4)) / 4],
+						m_videoram[(0x40010 + (scrollbase << 4)) / 4],
+						m_videoram[(0x40014 + (scrollbase << 4)) / 4],  // unused? (dupe value on fatfurwa, 00 on rest)
+
+						m_videoram[(0x40008 + (scrollbase << 4)) / 4],
+						m_videoram[(0x40018 + (scrollbase << 4)) / 4],
+						m_videoram[(0x4000c + (scrollbase << 4)) / 4],
+						m_videoram[(0x4001c + (scrollbase << 4)) / 4]); // unused? (dupe value on fatfurwa, 00 on rest)
+#endif
+
+			xtopleft = (m_videoram[(0x40000 + (scrollbase << 4)) / 4]);
+			const int32_t xalt = (m_videoram[(0x40004 + (scrollbase << 4)) / 4]); // middle screen point
+			const int32_t xmiddle = (m_videoram[(0x40010 + (scrollbase << 4)) / 4]);
+
+			ytopleft = (m_videoram[(0x40008 + (scrollbase << 4)) / 4]);
+			const int32_t yalt = (m_videoram[(0x40018 + (scrollbase << 4)) / 4]); // middle screen point
+			const int32_t ymiddle = (m_videoram[(0x4000c + (scrollbase << 4)) / 4]);
+
+			xinc = (xmiddle - xtopleft) / 512;
+			yinc = (ymiddle - ytopleft) / 512;
+			xinc2 = (xalt - xtopleft) / 512;
+			yinc2 = (yalt - ytopleft) / 512;
+		}
+		else
+		{
+			/* simple zoom mode? - only 4 regs? */
+			/* in this mode they can only specify the top left and middle screen points for each tilemap,
+				this allows simple zooming, but not rotation */
+
+#if HNG64_VIDEO_DEBUG
+			if (0)
+				if (tm == 3)
+					popmessage("%08x %08x %08x %08x",
+						m_videoram[(0x40010 + (scrollbase << 4)) / 4],
+						m_videoram[(0x40014 + (scrollbase << 4)) / 4],
+						m_videoram[(0x40018 + (scrollbase << 4)) / 4],
+						m_videoram[(0x4001c + (scrollbase << 4)) / 4]);
+#endif
+
+			int32_t xmiddle;
+			int32_t ymiddle;
+
+			const uint32_t& global_tileregs = m_videoregs[0x00];
+			const int global_zoom_disable = global_tileregs & 0x00010000;
+			if (global_zoom_disable) // disable all scrolling / zoom (test screen) (maybe)
+			{
+				/* If this bit is active the scroll registers don't seem valid at all?
+					It either disables zooming, or disables use of the scroll registers completely
+					- used at startup
+				*/
+
+				xtopleft = 0;
+				xmiddle = 256 << 16;
+
+				ytopleft = 0;
+				ymiddle = 256 << 16;
+			}
+			else
+			{
+				xtopleft = (m_videoram[(0x40000 + (scrollbase << 4)) / 4]);
+				xmiddle = (m_videoram[(0x40004 + (scrollbase << 4)) / 4]); // middle screen point
+				ytopleft = (m_videoram[(0x40008 + (scrollbase << 4)) / 4]);
+				ymiddle = (m_videoram[(0x4000c + (scrollbase << 4)) / 4]); // middle screen point
+			}
+
+			xinc = (xmiddle - xtopleft) / 512;
+			yinc = (ymiddle - ytopleft) / 512;
+			xinc2 = 0;
+			yinc2 = 0;
+		}
+	}
+	else // line mode
+	{
+		const int global_alt_scroll_register_format = m_videoregs[0x00] & 0x04000000;
+		if (global_alt_scroll_register_format) // globally selects alt scroll register layout???
+		{
+			popmessage("global_alt_scroll_register_format in linemode");
+		}
+		//else
+		{
+			int32_t xmiddle;
+			int32_t ymiddle;
+
+			const uint32_t& global_tileregs = m_videoregs[0x00];
+			const int global_zoom_disable = global_tileregs & 0x00010000;
+			if (global_zoom_disable) // disable all scrolling / zoom (test screen) (maybe)
+			{
+				// If this bit is active the scroll registers don't seem valid at all?
+				// It either disables zooming, or disables use of the scroll registers completely
+				// - used at startup
+
+				xtopleft = 0;
+				xmiddle = 256 << 16;
+
+				ytopleft = 0;
+				ymiddle = 256 << 16;
+			}
+			else
+			{
+				uint16_t line = source_line_to_use;
+				xtopleft = (m_videoram[(0x40000 + (line * 0x10) + (scrollbase << 4)) / 4]);
+				xmiddle = (m_videoram[(0x40004 + (line * 0x10) + (scrollbase << 4)) / 4]); // middle screen point
+				ytopleft = (m_videoram[(0x40008 + (line * 0x10) + (scrollbase << 4)) / 4]);
+				ymiddle = (m_videoram[(0x4000c + (line * 0x10) + (scrollbase << 4)) / 4]); // middle screen point
+			}
+
+			xinc = (xmiddle - xtopleft) / 512;
+			yinc = (ymiddle - ytopleft) / 512;
+			// TODO: if global_alt_scroll_register_format is enabled uses incxy / incyx into calculation somehow ...
+			xinc2 = 0;
+			yinc2 = 0;
+		}
+	}
+
+	uint32_t startx = xtopleft;
+	uint32_t starty = ytopleft;
+	int incxx = xinc << 1;
+	int incxy = yinc2 << 1;
+	int incyx = xinc2 << 1;
+	int incyy = yinc << 1;
+
 	pen_t const *const clut = &m_palette->pen(blit->tilemap_priority_code >> 16);
 	bitmap_ind8 &priority_bitmap = screen.priority();
 	bitmap_rgb32 &destbitmap = *blit->bitmap;
@@ -252,8 +412,6 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 	uint8_t value = blit->value;
 	uint8_t alpha = blit->alpha;
 
-	int source_line_to_use = blit->cliprect.min_y;
-	source_line_to_use = (source_line_to_use / (mosaic+1)) * (mosaic+1);
 
 	// TODO, should probably get scroll values here, as it looks like when Mosaic is enabled
 	//       the scroll values are from the virtual line too (buriki floor)
@@ -433,8 +591,7 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 
 
 void hng64_state::hng64_tilemap_draw_roz_primask(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy,
-		int wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat, uint8_t mosaic)
+		int wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat, uint8_t mosaic, uint8_t tm)
 {
 	blit_parameters blit;
 
@@ -454,7 +611,7 @@ g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
 	tmap->pixmap();
 
 	/* then do the roz copy */
-	hng64_tilemap_draw_roz_core(screen, tmap, &blit, startx, starty, incxx, incxy, incyx, incyy, wraparound, mosaic);
+	hng64_tilemap_draw_roz_core(screen, tmap, &blit, wraparound, mosaic, tm);
 g_profiler.stop();
 }
 
@@ -515,169 +672,6 @@ g_profiler.stop();
  */
 
 
-void hng64_state::hng64_drawtilemap_nolinemode(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, int tm, int flags, tilemap_t* tilemap, uint8_t bppBit, int line, uint8_t mosaic)
-{
-	int xinc, xinc2, yinc, yinc2;
-	int32_t xtopleft;
-	int32_t ytopleft;
-	uint16_t scrollbase = get_scrollbase(tm);
-	uint16_t tileregs = get_tileregs(tm);
-	const uint8_t floorModeBit     = (tileregs & 0x0800) >> 11;
-
-	if (floorModeBit)
-	{
-		// 0x1000 is set up the buriki 2nd title screen with rotating logo and in fatal fury at various times?
-		const int global_alt_scroll_register_format = m_videoregs[0x00] & 0x04000000;
-
-		if (global_alt_scroll_register_format) // globally selects alt scroll register layout???
-		{
-			// xrally 'mist in tunnel' does NOT use this mode
-			// buriki title screen tm==3 DOES use this mode
-
-			/* complex zoom mode? */
-			/* with this scroll register layout rotation effects are possible
-				the most obvious use of rotation is the Buriki One logo after
-				attract mode; the text around the outside of the logo is rotated
-				onto the screen
-
-				see 1:32 in http://www.youtube.com/watch?v=PoYaHOILuGs
-
-				Xtreme Rally seems to have an issue with this mode on the communication check
-				screen at startup, however during the period in which the values are invalid
-				it looks like the display shouldn't even be enabled (only gets enabled when
-				the value starts counting up)
-
-			*/
-#if HNG64_VIDEO_DEBUG
-			if (0)
-				if (tm == 3)
-					popmessage("X %08x X %08x X %08x X(?) %08x | Y %08x Y %08x Y %08x Y(?) %08x",
-						m_videoram[(0x40000 + (scrollbase << 4)) / 4],
-						m_videoram[(0x40004 + (scrollbase << 4)) / 4],
-						m_videoram[(0x40010 + (scrollbase << 4)) / 4],
-						m_videoram[(0x40014 + (scrollbase << 4)) / 4],  // unused? (dupe value on fatfurwa, 00 on rest)
-
-						m_videoram[(0x40008 + (scrollbase << 4)) / 4],
-						m_videoram[(0x40018 + (scrollbase << 4)) / 4],
-						m_videoram[(0x4000c + (scrollbase << 4)) / 4],
-						m_videoram[(0x4001c + (scrollbase << 4)) / 4]); // unused? (dupe value on fatfurwa, 00 on rest)
-#endif
-
-			xtopleft = (m_videoram[(0x40000 + (scrollbase << 4)) / 4]);
-			const int32_t xalt = (m_videoram[(0x40004 + (scrollbase << 4)) / 4]); // middle screen point
-			const int32_t xmiddle = (m_videoram[(0x40010 + (scrollbase << 4)) / 4]);
-
-			ytopleft = (m_videoram[(0x40008 + (scrollbase << 4)) / 4]);
-			const int32_t yalt = (m_videoram[(0x40018 + (scrollbase << 4)) / 4]); // middle screen point
-			const int32_t ymiddle = (m_videoram[(0x4000c + (scrollbase << 4)) / 4]);
-
-			xinc = (xmiddle - xtopleft) / 512;
-			yinc = (ymiddle - ytopleft) / 512;
-			xinc2 = (xalt - xtopleft) / 512;
-			yinc2 = (yalt - ytopleft) / 512;
-		}
-		else
-		{
-			/* simple zoom mode? - only 4 regs? */
-			/* in this mode they can only specify the top left and middle screen points for each tilemap,
-				this allows simple zooming, but not rotation */
-
-#if HNG64_VIDEO_DEBUG
-			if (0)
-				if (tm == 3)
-					popmessage("%08x %08x %08x %08x",
-						m_videoram[(0x40010 + (scrollbase << 4)) / 4],
-						m_videoram[(0x40014 + (scrollbase << 4)) / 4],
-						m_videoram[(0x40018 + (scrollbase << 4)) / 4],
-						m_videoram[(0x4001c + (scrollbase << 4)) / 4]);
-#endif
-
-			int32_t xmiddle;
-			int32_t ymiddle;
-
-			const uint32_t& global_tileregs = m_videoregs[0x00];
-			const int global_zoom_disable = global_tileregs & 0x00010000;
-			if (global_zoom_disable) // disable all scrolling / zoom (test screen) (maybe)
-			{
-				/* If this bit is active the scroll registers don't seem valid at all?
-					It either disables zooming, or disables use of the scroll registers completely
-					- used at startup
-				*/
-
-				xtopleft = 0;
-				xmiddle = 256 << 16;
-
-				ytopleft = 0;
-				ymiddle = 256 << 16;
-			}
-			else
-			{
-				xtopleft = (m_videoram[(0x40000 + (scrollbase << 4)) / 4]);
-				xmiddle = (m_videoram[(0x40004 + (scrollbase << 4)) / 4]); // middle screen point
-				ytopleft = (m_videoram[(0x40008 + (scrollbase << 4)) / 4]);
-				ymiddle = (m_videoram[(0x4000c + (scrollbase << 4)) / 4]); // middle screen point
-			}
-
-			xinc = (xmiddle - xtopleft) / 512;
-			yinc = (ymiddle - ytopleft) / 512;
-			xinc2 = 0;
-			yinc2 = 0;
-		}
-
-		hng64_tilemap_draw_roz_primask(screen, bitmap, cliprect, tilemap, xtopleft, ytopleft,
-			xinc << 1, yinc2 << 1, xinc2 << 1, yinc << 1,
-			1,
-			flags, 0, 0xff, (hng64trans_t)get_blend_mode(tm), mosaic);
-
-	}
-	else // line mode
-	{
-		const int global_alt_scroll_register_format = m_videoregs[0x00] & 0x04000000;
-		if (global_alt_scroll_register_format) // globally selects alt scroll register layout???
-		{
-			popmessage("global_alt_scroll_register_format in linemode");
-		}
-		//else
-		{
-			int32_t xmiddle;
-			int32_t ymiddle;
-
-			const uint32_t& global_tileregs = m_videoregs[0x00];
-			const int global_zoom_disable = global_tileregs & 0x00010000;
-			if (global_zoom_disable) // disable all scrolling / zoom (test screen) (maybe)
-			{
-				// If this bit is active the scroll registers don't seem valid at all?
-				// It either disables zooming, or disables use of the scroll registers completely
-				// - used at startup
-
-				xtopleft = 0;
-				xmiddle = 256 << 16;
-
-				ytopleft = 0;
-				ymiddle = 256 << 16;
-			}
-			else
-			{
-				xtopleft = (m_videoram[(0x40000 + (line * 0x10) + (scrollbase << 4)) / 4]);
-				xmiddle = (m_videoram[(0x40004 + (line * 0x10) + (scrollbase << 4)) / 4]); // middle screen point
-				ytopleft = (m_videoram[(0x40008 + (line * 0x10) + (scrollbase << 4)) / 4]);
-				ymiddle = (m_videoram[(0x4000c + (line * 0x10) + (scrollbase << 4)) / 4]); // middle screen point
-			}
-
-			xinc = (xmiddle - xtopleft) / 512;
-			yinc = (ymiddle - ytopleft) / 512;
-			// TODO: if global_alt_scroll_register_format is enabled uses incxy / incyx into calculation somehow ...
-			xinc2 = 0;
-			yinc2 = 0;
-		}
-	}
-
-	hng64_tilemap_draw_roz_primask(screen, bitmap, cliprect, tilemap, xtopleft, ytopleft,
-		xinc << 1, yinc2 << 1, xinc2 << 1, yinc << 1,
-		1,
-		flags, 0, 0xff, (hng64trans_t)get_blend_mode(tm), mosaic);
-
-}
 
 uint16_t hng64_state::get_tileregs(int tm)
 {
@@ -745,8 +739,8 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	// Useful bits from the tilemap registers
 	const uint8_t mosaicValueBits  = (tileregs & 0xf000) >> 12;;
-	const uint8_t floorModeBit     = (tileregs & 0x0800) >> 11;
-	const uint8_t bppBit           = (tileregs & 0x0400) >> 10;
+	const uint8_t notLineMode     = (tileregs & 0x0800) >> 11;
+	//const uint8_t bppBit           = (tileregs & 0x0400) >> 10;
 	const uint8_t bigTilemapBit    = (tileregs & 0x0200) >>  9;
 	const uint8_t tilemapEnableBit = (tileregs & 0x0040) >>  6;
 
@@ -760,7 +754,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	// a per-line basis?
 	//
 	// Could also just be another priority bits with some priorities being filtered
-	if (!tilemapEnableBit && floorModeBit)
+	if (!tilemapEnableBit && notLineMode)
 	{
 	    return;
 	}
@@ -781,8 +775,8 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	rectangle clip = cliprect;
 	clip.min_y = clip.max_y = line;
 
-	hng64_drawtilemap_nolinemode(screen, bitmap, clip, tm, flags, tilemap, bppBit, line, mosaicValueBits);
-
+	hng64_tilemap_draw_roz_primask(screen, bitmap, clip, tilemap,
+		1, 0, 0, 0xff, (hng64trans_t)get_blend_mode(tm), mosaicValueBits, tm);
 }
 
 
