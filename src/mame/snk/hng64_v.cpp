@@ -459,13 +459,6 @@ g_profiler.stop();
 }
 
 
-inline void hng64_state::hng64_tilemap_draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy,
-		int wraparound, uint32_t flags, uint8_t priority, hng64trans_t drawformat, uint8_t mosaic)
-{
-	hng64_tilemap_draw_roz_primask(screen, dest, cliprect, tmap, startx, starty, incxx, incxy, incyx, incyy, wraparound, flags, priority, 0xff, drawformat, mosaic);
-}
-
 
 
 /*
@@ -524,6 +517,10 @@ inline void hng64_state::hng64_tilemap_draw_roz(screen_device &screen, bitmap_rg
 
 void hng64_state::hng64_drawtilemap_linemode(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, int tm, int flags, tilemap_t* tilemap, uint16_t scrollbase, int line, uint8_t mosaic)
 {
+	int xinc, xinc2, yinc, yinc2;
+	int32_t xtopleft;
+	int32_t ytopleft;
+
 	const int global_alt_scroll_register_format = m_videoregs[0x00] & 0x04000000;
 	if (global_alt_scroll_register_format) // globally selects alt scroll register layout???
 	{
@@ -531,8 +528,8 @@ void hng64_state::hng64_drawtilemap_linemode(screen_device& screen, bitmap_rgb32
 	}
 	//else
 	{
-		int32_t xtopleft, xmiddle;
-		int32_t ytopleft, ymiddle;
+		int32_t xmiddle;
+		int32_t ymiddle;
 
 		const uint32_t& global_tileregs = m_videoregs[0x00];
 		const int global_zoom_disable = global_tileregs & 0x00010000;
@@ -556,20 +553,27 @@ void hng64_state::hng64_drawtilemap_linemode(screen_device& screen, bitmap_rgb32
 			ymiddle = (m_videoram[(0x4000c + (line * 0x10) + (scrollbase << 4)) / 4]); // middle screen point
 		}
 
-		const int xinc = (xmiddle - xtopleft) / 512;
-		const int yinc = (ymiddle - ytopleft) / 512;
+		xinc = (xmiddle - xtopleft) / 512;
+		yinc = (ymiddle - ytopleft) / 512;
 		// TODO: if global_alt_scroll_register_format is enabled uses incxy / incyx into calculation somehow ...
+		xinc2 = 0;
+		yinc2 = 0;
 
-		hng64_tilemap_draw_roz(screen, bitmap, cliprect, tilemap, xtopleft, ytopleft,
-			xinc << 1, 0, 0, yinc << 1,
-			1,
-			flags, 0, (hng64trans_t)get_blend_mode(tm), mosaic);
 	}
+
+	hng64_tilemap_draw_roz_primask(screen, bitmap,cliprect,tilemap,xtopleft,ytopleft,
+			xinc<<1,yinc2<<1,xinc2<<1,yinc<<1,
+			1,
+			flags,0,0xff,(hng64trans_t)get_blend_mode(tm), mosaic);
+
 }
 
 void hng64_state::hng64_drawtilemap_nolinemode(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, tilemap_t* tilemap, uint16_t scrollbase, uint8_t bppBit, int line, uint8_t mosaic)
 {
 	// 0x1000 is set up the buriki 2nd title screen with rotating logo and in fatal fury at various times?
+	int xinc, xinc2, yinc, yinc2;
+	int32_t xtopleft;
+	int32_t ytopleft;
 
 	const int global_alt_scroll_register_format =  m_videoregs[0x00] & 0x04000000;
 
@@ -608,25 +612,18 @@ void hng64_state::hng64_drawtilemap_nolinemode(screen_device &screen, bitmap_rgb
 					m_videoram[(0x4001c+(scrollbase<<4))/4]); // unused? (dupe value on fatfurwa, 00 on rest)
 #endif
 
-		int32_t xtopleft        = (m_videoram[(0x40000+(scrollbase<<4))/4]);
+		xtopleft        = (m_videoram[(0x40000+(scrollbase<<4))/4]);
 		const int32_t xalt      = (m_videoram[(0x40004+(scrollbase<<4))/4]); // middle screen point
 		const int32_t xmiddle   = (m_videoram[(0x40010+(scrollbase<<4))/4]);
 
-		int32_t ytopleft        = (m_videoram[(0x40008+(scrollbase<<4))/4]);
+		ytopleft        = (m_videoram[(0x40008+(scrollbase<<4))/4]);
 		const int32_t yalt      = (m_videoram[(0x40018+(scrollbase<<4))/4]); // middle screen point
 		const int32_t ymiddle   = (m_videoram[(0x4000c+(scrollbase<<4))/4]);
 
-		const int xinc = (xmiddle - xtopleft) / 512;
-		const int yinc = (ymiddle - ytopleft) / 512;
-		const int xinc2 = (xalt-xtopleft) / 512;
-		const int yinc2 = (yalt-ytopleft) /512;
-
-
-
-		hng64_tilemap_draw_roz(screen, bitmap,cliprect,tilemap,xtopleft,ytopleft,
-				xinc<<1,yinc2<<1,xinc2<<1,yinc<<1,
-				1,
-				flags,0,(hng64trans_t)get_blend_mode(tm), mosaic);
+		xinc = (xmiddle - xtopleft) / 512;
+		yinc = (ymiddle - ytopleft) / 512;
+		xinc2 = (xalt-xtopleft) / 512;
+		yinc2 = (yalt-ytopleft) /512;
 	}
 	else
 	{
@@ -644,8 +641,8 @@ void hng64_state::hng64_drawtilemap_nolinemode(screen_device &screen, bitmap_rgb
 					m_videoram[(0x4001c+(scrollbase<<4))/4]);
 #endif
 
-		int32_t xtopleft,xmiddle;
-		int32_t ytopleft,ymiddle;
+		int32_t xmiddle;
+		int32_t ymiddle;
 
 		const uint32_t& global_tileregs = m_videoregs[0x00];
 		const int global_zoom_disable = global_tileregs & 0x00010000;
@@ -670,14 +667,16 @@ void hng64_state::hng64_drawtilemap_nolinemode(screen_device &screen, bitmap_rgb
 			ymiddle   = (m_videoram[(0x4000c+(scrollbase<<4))/4]); // middle screen point
 		}
 
-		const int xinc = (xmiddle - xtopleft) / 512;
-		const int yinc = (ymiddle - ytopleft) / 512;
-
-		hng64_tilemap_draw_roz(screen, bitmap,cliprect,tilemap,xtopleft,ytopleft,
-				xinc<<1,0,0,yinc<<1,
-				1,
-				flags,0,(hng64trans_t)get_blend_mode(tm), mosaic);
+		xinc = (xmiddle - xtopleft) / 512;
+		yinc = (ymiddle - ytopleft) / 512;
+		xinc2 = 0;
+		yinc2 = 0;
 	}
+
+	hng64_tilemap_draw_roz_primask(screen, bitmap,cliprect,tilemap,xtopleft,ytopleft,
+			xinc<<1,yinc2<<1,xinc2<<1,yinc<<1,
+			1,
+			flags,0,0xff,(hng64trans_t)get_blend_mode(tm), mosaic);
 }
 
 uint16_t hng64_state::get_tileregs(int tm)
