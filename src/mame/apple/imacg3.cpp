@@ -140,11 +140,11 @@ void imac_state::imac(machine_config &config)
 	m_cuda->iic_sda_callback().append(m_dimm0, FUNC(dimm_spd_device::sda_write));
 	m_cuda->iic_sda_callback().append(m_dimm1, FUNC(dimm_spd_device::sda_write));
 
-	DIMM_SPD(config, m_dimm0, 0x50);
+	DIMM_SPD(config, m_dimm0).set_address(0x50);
 	m_cuda->iic_scl_callback().set(m_dimm0, FUNC(dimm_spd_device::scl_write));
 	m_dimm0->sda_callback().set(sda_merger, FUNC(input_merger_device::in_w<1>));
 
-	DIMM_SPD(config, m_dimm1, 0x51);
+	DIMM_SPD(config, m_dimm1).set_address(0x51);
 	m_cuda->iic_scl_callback().append(m_dimm1, FUNC(dimm_spd_device::scl_write));
 	m_dimm1->sda_callback().set(sda_merger, FUNC(input_merger_device::in_w<2>));
 

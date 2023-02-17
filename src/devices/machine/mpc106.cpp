@@ -81,7 +81,6 @@ void mpc106_host_device::device_start()
 	m_rom_size = device().machine().root_device().memregion(m_rom_tag)->bytes();
 
 	m_pwrconfig1 = m_pwrconfig2 = 0;
-	m_last_config_address = -1;
 
 	u64 rom_base = 0x100000000ULL - m_rom_size;
 	m_cpu_space->install_rom(rom_base, 0xffffffff, m_rom);
@@ -111,6 +110,12 @@ void mpc106_host_device::device_start()
 
 		m_cpu_space->install_device(0xfec00000, 0xfeefffff, *static_cast<mpc106_host_device *>(this), &mpc106_host_device::access_map);
 	}
+
+	save_item(NAME(m_pwrconfig1));
+	save_item(NAME(m_pwrconfig2));
+	save_item(NAME(m_memory_starts));
+	save_item(NAME(m_memory_ends));
+	save_item(NAME(m_memory_bank_enable));
 }
 
 device_memory_interface::space_config_vector mpc106_host_device::memory_space_config() const
@@ -129,7 +134,6 @@ void mpc106_host_device::reset_all_mappings()
 void mpc106_host_device::device_reset()
 {
 	pci_host_device::device_reset();
-	m_last_config_address = -1;
 }
 
 void mpc106_host_device::access_map(address_map &map)
@@ -152,7 +156,6 @@ void mpc106_host_device::be_config_address_w(offs_t offset, u32 data, u32 mem_ma
 
 	tempdata = (data >> 24) | (data << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8);
 	pci_host_device::config_address_w(offset, tempdata, mem_mask);
-	m_last_config_address = tempdata & 0xffffff00;
 }
 
 u32 mpc106_host_device::be_config_data_r(offs_t offset, u32 mem_mask)
