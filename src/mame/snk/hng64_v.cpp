@@ -173,63 +173,24 @@ void hng64_state::hng64_videoram_w(offs_t offset, uint32_t data, uint32_t mem_ma
 
 /* internal set of transparency states for rendering */
 
-
-void hng64_state::hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, uint32_t flags, uint8_t priority, uint8_t priority_mask, uint8_t drawformat)
-{
-	/* start with nothing */
-	memset(blit, 0, sizeof(*blit));
-
-	/* set the priority code and alpha */
-	blit->alpha = (flags & TILEMAP_DRAW_ALPHA_FLAG) ? (flags >> 24) : 0xff;
-
-	blit->drawformat = drawformat;
-
-	/* tile priority; unless otherwise specified, draw anything in layer 0 */
-	blit->mask = TILEMAP_PIXEL_CATEGORY_MASK;
-	blit->value = flags & TILEMAP_PIXEL_CATEGORY_MASK;
-
-	/* if no layers specified, draw layer 0 */
-	if ((flags & (TILEMAP_DRAW_LAYER0 | TILEMAP_DRAW_LAYER1 | TILEMAP_DRAW_LAYER2)) == 0)
-		flags |= TILEMAP_DRAW_LAYER0;
-
-	/* OR in the bits from the draw masks */
-	blit->mask |= flags & (TILEMAP_DRAW_LAYER0 | TILEMAP_DRAW_LAYER1 | TILEMAP_DRAW_LAYER2);
-	blit->value |= flags & (TILEMAP_DRAW_LAYER0 | TILEMAP_DRAW_LAYER1 | TILEMAP_DRAW_LAYER2);
-
-	/* for all-opaque rendering, don't check any of the layer bits */
-	if (flags & TILEMAP_DRAW_OPAQUE)
-	{
-		blit->mask &= ~(TILEMAP_PIXEL_LAYER0 | TILEMAP_PIXEL_LAYER1 | TILEMAP_PIXEL_LAYER2);
-		blit->value &= ~(TILEMAP_PIXEL_LAYER0 | TILEMAP_PIXEL_LAYER1 | TILEMAP_PIXEL_LAYER2);
-	}
-
-	/* don't check category if requested */
-	if (flags & TILEMAP_DRAW_ALL_CATEGORIES)
-	{
-		blit->mask &= ~TILEMAP_PIXEL_CATEGORY_MASK;
-		blit->value &= ~TILEMAP_PIXEL_CATEGORY_MASK;
-	}
-}
-
-
 /*-------------------------------------------------
     tilemap_draw_roz_core - render the tilemap's
     pixmap to the destination with rotation
     and zoom
 -------------------------------------------------*/
 
-#define HNG64_ROZ_PLOT_PIXEL(INPUT_VAL)                                                 \
-do {                                                                                    \
-	if (blit->drawformat == 1)                                       \
-		*(uint32_t *)dest = clut[INPUT_VAL];                                            \
-	else if (blit->drawformat == 2)                                \
-		*(uint32_t *)dest = add_blend_r32(*(uint32_t *)dest, clut[INPUT_VAL]);          \
-	else if (blit->drawformat == 3)                                   \
+#define HNG64_ROZ_PLOT_PIXEL(INPUT_VAL) \
+do { \
+	if (drawformat == 1) \
+		*(uint32_t *)dest = clut[INPUT_VAL]; \
+	else if (drawformat == 2) \
+		*(uint32_t *)dest = add_blend_r32(*(uint32_t *)dest, clut[INPUT_VAL]); \
+	else if (drawformat == 3) \
 		*(uint32_t *)dest = alpha_blend_r32(*(uint32_t *)dest, clut[INPUT_VAL], alpha); \
 } while (0)
 
-void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap, const blit_parameters *blit,
-		int wraparound, uint8_t mosaic, uint8_t tm)
+void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
+		int wraparound, uint8_t drawformat, uint8_t alpha, uint8_t mosaic, uint8_t tm)
 {
 	int source_line_to_use = cliprect.min_y;
 	source_line_to_use = (source_line_to_use / (mosaic+1)) * (mosaic+1);
@@ -239,9 +200,9 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, bitmap_rgb3
 	int32_t ytopleft;
 	uint16_t scrollbase = get_scrollbase(tm);
 	uint16_t tileregs = get_tileregs(tm);
-	const uint8_t notLineMode = (tileregs & 0x0800) >> 11;
+	const uint8_t not_line_mode = (tileregs & 0x0800) >> 11;
 
-	if (notLineMode)
+	if (not_line_mode)
 	{
 		// 0x1000 is set up the buriki 2nd title screen with rotating logo and in fatal fury at various times?
 		const int global_alt_scroll_register_format = m_videoregs[0x00] & 0x04000000;
@@ -403,9 +364,8 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, bitmap_rgb3
 	const int widthshifted = srcbitmap.width() << 16;
 	const int heightshifted = srcbitmap.height() << 16;
 	uint32_t priority = 0;
-	uint8_t mask = blit->mask;
-	uint8_t value = blit->value;
-	uint8_t alpha = blit->alpha;
+	uint8_t mask = 0x1f;
+	uint8_t value = 0x10;
 
 	/* pre-advance based on the cliprect */
 	startx += cliprect.min_x * incxx + source_line_to_use * incyx;
@@ -585,25 +545,12 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, bitmap_rgb3
 void hng64_state::hng64_tilemap_draw_roz_primask(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
 		int wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask, uint8_t drawformat, uint8_t mosaic, uint8_t tm)
 {
-	blit_parameters blit;
-
-	// notes:
-	// - startx and starty MUST be uint32_t for calculations to work correctly
-	// - srcbitmap->width and height are assumed to be a power of 2 to speed up wraparound
-
-	// skip if disabled
-	//if (!tmap->enable)
-	//  return;
-
 g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
-	/* configure the blit parameters */
-	hng64_configure_blit_parameters(&blit, tmap, flags, priority, priority_mask, drawformat);
-
 	/* get the full pixmap for the tilemap */
 	tmap->pixmap();
 
 	/* then do the roz copy */
-	hng64_tilemap_draw_roz_core(screen, dest, cliprect, tmap, &blit, wraparound, mosaic, tm);
+	hng64_tilemap_draw_roz_core_line(screen, dest, cliprect, tmap, wraparound, drawformat, 0x80, mosaic, tm);
 g_profiler.stop();
 }
 
@@ -731,7 +678,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	// Useful bits from the tilemap registers
 	const uint8_t mosaicValueBits  = (tileregs & 0xf000) >> 12;;
-	const uint8_t notLineMode     = (tileregs & 0x0800) >> 11;
+	const uint8_t not_line_mode     = (tileregs & 0x0800) >> 11;
 	//const uint8_t bppBit           = (tileregs & 0x0400) >> 10;
 	const uint8_t bigTilemapBit    = (tileregs & 0x0200) >>  9;
 	const uint8_t tilemapEnableBit = (tileregs & 0x0040) >>  6;
@@ -746,7 +693,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	// a per-line basis?
 	//
 	// Could also just be another priority bits with some priorities being filtered
-	if (!tilemapEnableBit && notLineMode)
+	if (!tilemapEnableBit && not_line_mode)
 	{
 	    return;
 	}
@@ -949,27 +896,6 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 		0011057f  blending?
 		0001057f
 	*/
-
-	if ( machine().input().code_pressed_once(KEYCODE_T) )
-	{
-		m_additive_tilemap_debug ^= 1;
-		popmessage("blend changed %02x", m_additive_tilemap_debug);
-	}
-	if ( machine().input().code_pressed_once(KEYCODE_Y) )
-	{
-		m_additive_tilemap_debug ^= 2;
-		popmessage("blend changed %02x", m_additive_tilemap_debug);
-	}
-	if ( machine().input().code_pressed_once(KEYCODE_U) )
-	{
-		m_additive_tilemap_debug ^= 4;
-		popmessage("blend changed %02x", m_additive_tilemap_debug);
-	}
-	if ( machine().input().code_pressed_once(KEYCODE_I) )
-	{
-		m_additive_tilemap_debug ^= 8;
-		popmessage("blend changed %02x", m_additive_tilemap_debug);
-	}
 #endif
 
 	return 0;
@@ -1182,9 +1108,6 @@ void hng64_state::video_start()
 		elem.m_tilemap_16x16->set_transparent_pen(0);
 		elem.m_tilemap_16x16_alt->set_transparent_pen(0);
 	}
-
-	// Debug switch, turn on / off additive blending on a per-tilemap basis
-	m_additive_tilemap_debug = 0;
 
 	// Rasterizer creation
 	m_poly_renderer = std::make_unique<hng64_poly_renderer>(*this);
