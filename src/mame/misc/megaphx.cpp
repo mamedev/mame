@@ -67,7 +67,7 @@ Sub / Sound board:
     (this sticker is also present on the other PCB)
 
  PCB configuration for YoYo Spell:
- 
+
   Inder 60808
   ____________________________________________________________________________
  |  _______________   _______________   _______________   _______________    |

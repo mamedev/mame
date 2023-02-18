@@ -5,7 +5,7 @@
     Skeleton driver for "PlayCenter" PC-based touch games
 
     "PlayCenter Champions Tournament":
-    The machine was sold with three different hardware configurations (internally named "Epox", 
+    The machine was sold with three different hardware configurations (internally named "Epox",
     "K6" and "Celeron"), having each one its own "official" recovery image (Norton Ghost images).
       "Epox" version:
          -EPoX EP-MVP4F motherboard (Socket 7 with VIA Apollo MVP4 AGP, built-in Trident AGP,

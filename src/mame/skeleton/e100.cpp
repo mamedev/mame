@@ -128,7 +128,7 @@
  *   Both rev1 and rev2 has a matrix keyboard PCB with a 74LS145 connected to J402 (PIA2)
  */
 
- 
+
  namespace {
 
 /* Esselte 100 driver class */

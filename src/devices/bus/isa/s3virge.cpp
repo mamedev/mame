@@ -1424,7 +1424,7 @@ void s3virge_vga_device::bitblt_monosrc_step()
 				dst = read_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current, dest_stride());
 
 				if (de)
-				{ 
+				{
 					if(src & (1 << x))
 						write_pixel16(dst_base,s3virge.s3d.bitblt_x_current,s3virge.s3d.bitblt_y_current,GetROP(rop, s3virge.s3d.cmd_fifo[s3virge.s3d.cmd_fifo_current_ptr].reg[S3D_REG_SRC_FG_CLR], dst, pat) & 0xffff);
 					else if(!(current_command & 0x200)) // only draw background colour if transparency is not set

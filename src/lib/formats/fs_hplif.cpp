@@ -41,13 +41,13 @@ public:
 
 	struct hplif_dirent
 	{
-		char		m_file_name[10];
-		u16			m_file_type;
-		u32			m_starting_sector;
-		u32			m_sector_count;
-		hplif_time	m_time;
-		u16			m_volume_number;
-		u32			m_general_purpose;
+		char        m_file_name[10];
+		u16         m_file_type;
+		u32         m_starting_sector;
+		u32         m_sector_count;
+		hplif_time  m_time;
+		u16         m_volume_number;
+		u32         m_general_purpose;
 	};
 
 	class block_iterator
@@ -60,10 +60,10 @@ public:
 		u8 size() const;
 
 	private:
-		const impl &		m_fs;
-		fsblk_t::block_t	m_block;
-		u8					m_sector;
-		u32					m_sector_count;
+		const impl &        m_fs;
+		fsblk_t::block_t    m_block;
+		u8                  m_sector;
+		u32                 m_sector_count;
 	};
 
 	impl(fsblk_t &blockdev);
@@ -303,9 +303,10 @@ std::pair<err_t, std::vector<u8>> impl::file_read(const std::vector<std::string>
 	u32 sector_count = big_endianize_int32(dirent->m_sector_count);
 	hplif_dirent hdr = dirent.value();
 	std::vector<u8> result;
-	result.insert(result.end(),
-		      reinterpret_cast<const u8 *>(&hdr),
-		      reinterpret_cast<const u8 *>(&hdr) + 32);
+	result.insert(
+			result.end(),
+			reinterpret_cast<const u8 *>(&hdr),
+			reinterpret_cast<const u8 *>(&hdr) + 32);
 	result.reserve(sector_count * 256 + 32);
 	block_iterator iter(*this, big_endianize_int32(dirent->m_starting_sector), sector_count);
 	while (iter.next())
@@ -473,12 +474,12 @@ err_t impl::format(const meta_data &meta)
 	if (volume_name.size() > 6)
 		volume_name.resize(6);
 
-	block.w16b(0, 0x8000);	// LIF magic
+	block.w16b(0, 0x8000);  // LIF magic
 	block.wstr(2, volume_name);
-	block.w32b(8, 2);	// directory start
-	block.w16b(12, 0x1000);	// LIF identifier
-	block.w32b(16, 14);	// directory size
-	block.w16b(20, 1);	// LIF version
+	block.w32b(8, 2);       // directory start
+	block.w16b(12, 0x1000); // LIF identifier
+	block.w32b(16, 14);     // directory size
+	block.w16b(20, 1);      // LIF version
 	return ERR_OK;
 }
 
