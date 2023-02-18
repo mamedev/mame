@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "hng64.h"
 
-#define HNG64_VIDEO_DEBUG 0
+#define HNG64_VIDEO_DEBUG 1
 
 
 void hng64_state::hng64_mark_all_tiles_dirty(int tilemap)
@@ -833,27 +833,37 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			m_videoregs[0x0c],
 			m_videoregs[0x0d]);
 
-	if (0)
-		popmessage("TC: %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x",
+	if (1)
+		popmessage("TC: %08x %08x %08x %08x : %08x %08x\n%08x %08x\n%08x %08x\n%08x %08x : %08x %08x %08x %08x : %08x %08x\n%08x %08x : %08x %08x %08x %08x",
 			m_tcram[0x00 / 4],
 			m_tcram[0x04 / 4],
 			m_tcram[0x08 / 4], // tilemaps 0/1 ?
 			m_tcram[0x0c / 4], // ss64_2 debug 04000000 = 'half' on tm1   00000004 = 'half' on tm3  (used in transitions?)
 			m_tcram[0x10 / 4],
 			m_tcram[0x14 / 4],
-			m_tcram[0x18 / 4],
-			m_tcram[0x1c / 4],
-			m_tcram[0x20 / 4],
-			m_tcram[0x24 / 4],
-			m_tcram[0x28 / 4],
-			m_tcram[0x2c / 4],
+
+			// these are used for 'fade to black' in most cases, but
+			// in xrally attract, when one image is meant to fade into another, one value increases while the other decreases
+			m_tcram[0x18 / 4],  // xRGB fade values? (roadedge attract)
+			m_tcram[0x1c / 4],  // xRGB fade values? (roadedge attract) fades on fatfurwa before buildings in intro
+
+			m_tcram[0x20 / 4],  // something else?
+			m_tcram[0x24 / 4],  // something else?
+
+			// 7 of these fade during the buriki SNK logo (probably redundant)
+			// in roadedge they're just set to
+			// 0x00000000, 0x01000000, 0x02000000, 0x03000000, 0x04000000, 0x05000000, 0x06000000, 0x07000000
+			m_tcram[0x28 / 4],  // ?RGB fade values (buriki jumbotron)  fades on fatfurwa before high score table etc. + bottom value only on 'fade to red' part of fatfurywa intro
+			m_tcram[0x2c / 4],  // ?RGB fade values (buriki jumbotron)
 			m_tcram[0x30 / 4],
 			m_tcram[0x34 / 4],
 			m_tcram[0x38 / 4],
 			m_tcram[0x3c / 4],
 			m_tcram[0x40 / 4],
 			m_tcram[0x44 / 4],
-			m_tcram[0x48 / 4],
+
+
+			m_tcram[0x48 / 4], // this is where the 'vblank' thing lives
 			m_tcram[0x4c / 4],
 			m_tcram[0x50 / 4],
 			m_tcram[0x54 / 4],
