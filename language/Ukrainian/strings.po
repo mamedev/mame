@@ -708,10 +708,11 @@ msgid "On"
 msgstr "Увімкнути"
 
 #: src/frontend/mame/ui/menu.cpp:372 src/frontend/mame/ui/menu.cpp:741
-#: src/frontend/mame/ui/videoopt.cpp:185 src/frontend/mame/ui/inputtoggle.cpp:91
-#: src/frontend/mame/ui/custui.cpp:488 src/frontend/mame/ui/analogipt.cpp:527
-#: plugins/cheatfind/init.lua:763 plugins/cheatfind/init.lua:774
-#: plugins/cheat/init.lua:682 plugins/cheat/init.lua:691
+#: src/frontend/mame/ui/videoopt.cpp:185
+#: src/frontend/mame/ui/inputtoggle.cpp:91 src/frontend/mame/ui/custui.cpp:488
+#: src/frontend/mame/ui/analogipt.cpp:527 plugins/cheatfind/init.lua:763
+#: plugins/cheatfind/init.lua:774 plugins/cheat/init.lua:682
+#: plugins/cheat/init.lua:691
 msgid "Off"
 msgstr "Вимкнути"
 
