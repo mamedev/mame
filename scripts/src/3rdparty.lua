@@ -1257,7 +1257,7 @@ project "bimg"
 		}
 	configuration { }
 
-	configuration { "x86", "mingw*" }
+	configuration { "x32", "mingw*" }
 		defines {
 			"ASTCENC_AVX=0",
 			"ASTCENC_SSE=0",
