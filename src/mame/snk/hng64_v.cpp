@@ -453,12 +453,12 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 
 			/* loop over columns */
 			int mosaic_counter = 0;
+			uint16_t masksrc = 0;
+			uint16_t datasrc = 0;
+
 			while (x <= ex && cx < widthshifted)
 			{
 				uint16_t srcoffset = cx >> 16;
-
-				uint16_t masksrc = 0;
-				uint16_t datasrc = 0;
 
 				if (mosaic_counter == 0)
 				{
@@ -500,13 +500,13 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 
 		/* loop over columns */
 		int mosaic_counter = 0;
+		uint16_t masksrc = 0;
+		uint16_t datasrc = 0;
+
 		while (x <= ex)
 		{
 			uint16_t srcoffset = (cx >> 16) & xmask;
 			uint16_t srcyoffset = (cy >> 16) & ymask;
-
-			uint16_t masksrc = 0;
-			uint16_t datasrc = 0;
 
 			if (mosaic_counter == 0)
 			{
@@ -545,6 +545,10 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 		uint32_t *dest = &destbitmap.pix(sy, sx);
 		uint8_t *pri = &priority_bitmap.pix(sy, sx);
 
+		int mosaic_counter = 0;
+		uint16_t masksrc = 0;
+		uint16_t datasrc = 0;
+
 		/* loop over columns */
 		while (x <= ex)
 		{
@@ -552,12 +556,9 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 			uint16_t srcyoffset = cy >> 16;
 
 			/* plot if we're within the bitmap and we match the mask */
-			int mosaic_counter = 0;
+
 			if (cx < widthshifted && cy < heightshifted)
 			{
-				uint16_t masksrc = 0;
-				uint16_t datasrc = 0;
-
 				if (mosaic_counter == 0)
 				{
 					masksrc = (flagsmap.pix(srcyoffset, srcoffset) & mask);
