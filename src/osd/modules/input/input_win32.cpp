@@ -18,7 +18,7 @@
 #include "window.h"
 
 // emu
-#include "emu.h"
+#include "inpttype.h"
 
 #include "strconv.h"
 

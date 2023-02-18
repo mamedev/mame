@@ -141,8 +141,7 @@ std::vector<u8> image_handler::fload(std::string path)
 {
 	auto fi = fopen(path.c_str(), "rb");
 	if(!fi) {
-		auto msg = util::string_format("Error opening %s for reading", path.c_str());
-		perror(msg.c_str());
+		perror(util::string_format("Error opening %s for reading", path).c_str());
 		exit(1);
 	}
 	fseek(fi, 0, SEEK_END);
@@ -183,8 +182,7 @@ void image_handler::fsave(std::string path, const std::vector<u8> &data)
 {
 	auto fo = fopen(path.c_str(), "wb");
 	if(!fo) {
-		auto msg = util::string_format("Error opening %s for writing", path.c_str());
-		perror(msg.c_str());
+		perror(util::string_format("Error opening %s for writing", path).c_str());
 		exit(1);
 	}
 
@@ -207,8 +205,7 @@ void image_handler::fsave_rsrc(std::string path, const std::vector<u8> &data)
 
 	auto fo = fopen(path.c_str(), "wb");
 	if(!fo) {
-		auto msg = util::string_format("Error opening %s for writing", path.c_str());
-		perror(msg.c_str());
+		perror(util::string_format("Error opening %s for writing", path).c_str());
 		exit(1);
 	}
 

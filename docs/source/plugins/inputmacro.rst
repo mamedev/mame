@@ -55,7 +55,7 @@ whole:
   descriptive.  Press the UI Select key (Return/Enter on the keyboard or the
   first button on the first joystick by default) to edit the current name, or
   press the UI Clear key to type a new name.  Press the UI Select key before
-  moving to another menu item to save the new name; press the UI Cancel key
+  moving to another menu item to save the new name; press the UI Back key
   (Escape/Esc on the keyboard by default) to change discard the new name.
 * Select **Activation combination** to set the control (or combination of
   controls) you want to use to activate the macro.  Keep in mind that regular
@@ -112,11 +112,11 @@ When creating a new macro, there is a **Cancel** option that changes to
 **Create** after you set the activating sequence and the first input for the
 initially created step.  Select **Create** to finish creating the macro and
 return to the list of input macros.  The new macro will be added at the end of
-the list.  Press the UI Cancel key, or select **Cancel** before setting the
+the list.  Press the UI Back key, or select **Cancel** before setting the
 activation sequence/input, to return to the previous menu without creating the
 new macro.
 
-When editing an existing macro, select **Done** or press the UI Cancel key to
+When editing an existing macro, select **Done** or press the UI Back key to
 return to the list of input macros.  Changes take effect immediately.
 
 

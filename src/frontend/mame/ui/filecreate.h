@@ -49,6 +49,7 @@ public:
 protected:
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual bool custom_ui_back() override;
 
 private:
 	virtual void populate() override;

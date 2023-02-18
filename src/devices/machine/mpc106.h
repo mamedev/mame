@@ -83,7 +83,6 @@ private:
 	address_space *m_cpu_space;
 	u16 m_pwrconfig1;
 	u8 m_pwrconfig2;
-	u32 m_last_config_address;
 	u32 m_memory_starts[4];
 	u32 m_memory_ends[4];
 	u8 m_memory_bank_enable;

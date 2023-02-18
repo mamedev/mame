@@ -1450,24 +1450,34 @@ void menu_select_launch::handle_keys(u32 flags, int &iptkey)
 		return;
 	}
 
-	if (exclusive_input_pressed(iptkey, IPT_UI_CANCEL, 0))
+	if (exclusive_input_pressed(iptkey, IPT_UI_BACK, 0))
 	{
 		if (m_ui_error)
 		{
 			// dismiss error
+			return;
 		}
-		else if (!m_search.empty())
+		else if (!is_special_main_menu() && m_search.empty())
+		{
+			// pop the stack if this isn't the root session menu
+			stack_pop();
+			return;
+		}
+	}
+
+	if (exclusive_input_pressed(iptkey, IPT_UI_CANCEL, 0))
+	{
+		if (!m_search.empty())
 		{
 			// escape pressed with non-empty search text clears it
 			m_search.clear();
 			reset(reset_options::REMEMBER_REF);
 		}
-		else
+		else if (is_special_main_menu())
 		{
-			// otherwise pop the stack
+			// this is the root session menu, exit
 			stack_pop();
-			if (is_special_main_menu())
-				machine().schedule_exit();
+			machine().schedule_exit();
 		}
 		return;
 	}
@@ -1779,7 +1789,7 @@ void menu_select_launch::handle_events(u32 flags, event &ev)
 				}
 				else if (hover() == HOVER_BACKTRACK)
 				{
-					ev.iptkey = IPT_UI_CANCEL;
+					ev.iptkey = IPT_UI_BACK;
 					stack_pop();
 					if (is_special_main_menu())
 						machine().schedule_exit();

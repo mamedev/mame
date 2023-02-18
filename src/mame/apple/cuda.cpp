@@ -253,7 +253,7 @@ uint8_t cuda_device::ports_r(offs_t offset)
 			incoming |= tip<<3;
 			incoming |= via_data<<5;
 			incoming |= iic_sda ? 0x40 : 0;
-			incoming |= 0xc0;
+			incoming |= 0x80;
 			break;
 
 		case 2:     // port C

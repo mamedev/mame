@@ -42,9 +42,11 @@
 
 #include "emu.h"
 #include "ctrl.h"
+
 // slot devices
 #include "4score.h"
 #include "arkpaddle.h"
+#include "bandaihs.h"
 #include "bcbattle.h"
 #include "dorepiano.h"
 #include "fckeybrd.h"

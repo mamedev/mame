@@ -76,6 +76,15 @@ void dimm_spd_device::device_start()
 	m_sda = m_scl = 1;
 	m_last_address = 0;
 	m_data_offset = 0;
+
+	save_item(NAME(m_latch));
+	save_item(NAME(m_bit));
+	save_item(NAME(m_state));
+	save_item(NAME(m_state_next));
+	save_item(NAME(m_data_offset));
+	save_item(NAME(m_just_acked));
+
+	write_sda(1);
 }
 
 void dimm_spd_device::set_dimm_size(dimm_size_t size)
@@ -212,7 +221,7 @@ void dimm_spd_device::scl_write(int state)
 						{
 							if (m_state == STATE_GET_ADDRESS)
 							{
-								LOGMASKED(LOG_GENERAL, "%s: Got address %02x (r/w %d)\n", tag(), m_latch >> 1, m_latch & 1);
+								LOGMASKED(LOG_GENERAL, "%s: Got address %02x (ours is %02x r/w %d)\n", tag(), m_latch >> 1, m_address, m_latch & 1);
 								// check if reading
 								if (m_latch & 1)
 								{
