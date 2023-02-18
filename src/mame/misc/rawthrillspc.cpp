@@ -136,9 +136,9 @@ ROM_START( doodlejmp )
 	DISK_IMAGE( "doodlejmp", 0, NO_DUMP )
 
 	/* Recovery DVD:
-          -Doodle Jump 1.16
-          -OS 00.07
-          -8-Feb-2013 */
+	      -Doodle Jump 1.16
+	      -OS 00.07
+	      -8-Feb-2013 */
 	DISK_REGION( "recovery116" )
 	DISK_IMAGE_READONLY( "doodlejump_recover_dvd_1_16", 0, SHA1(67f2bc3d9d71fc924f8f784e62eaf3dd39c88f45) )
 ROM_END

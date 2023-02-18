@@ -129,7 +129,7 @@ READ_LINE_MEMBER(dtc03_state::bio_line_r)
 {
 	// TODO: reading the bio line doesn't cause any direct external effects so this is wrong
 	//if(m_bio == ASSERT_LINE)
-	//	m_maincpu->drq0_w(1);
+	//  m_maincpu->drq0_w(1);
 	return m_bio;
 }
 
@@ -164,7 +164,7 @@ void dtc03_state::ctl_w(u16 data)
 
 WRITE_LINE_MEMBER(dtc03_state::dsp_clock_w)
 {
-	/*
+#if 0
 	if (((m_ctl&0x2000) && state))
 	{
 		attotime dbgtime = (machine().time() - m_dbgclk);
@@ -175,7 +175,7 @@ WRITE_LINE_MEMBER(dtc03_state::dsp_clock_w)
 	{
 		logerror("dsp clock cleared\n");
 	}
-	*/
+#endif
 	//m_dsp->set_input_line(INPUT_LINE_IRQ0, (!(m_ctl & 0x2000) || state) ? CLEAR_LINE : ASSERT_LINE);
 	m_dsp->set_input_line(INPUT_LINE_IRQ0, ((m_ctl&0x2000) && state) ? ASSERT_LINE : CLEAR_LINE);
 	//m_dsp->set_input_line(0, ((m_ctl&0x2000) && state) ? ASSERT_LINE : CLEAR_LINE)); // TMS32010 INT

@@ -28,7 +28,7 @@
     <enter>
     <enter>
 
-	ABCenix <= D-NIX <= AT&T Unix System V
+    ABCenix <= D-NIX <= AT&T Unix System V
 
 */
 

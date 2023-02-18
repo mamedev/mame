@@ -11,7 +11,7 @@
 [:mac] ':3f' (08058) BUS ERROR R fefe4:0007e4 (NONX 1 WP 0 TASK 3 FC 1 MAGIC 1)
 
 [:mac] TASK 3 SEGMENT 31 PAGE 13 MEM fe800-fefff 000000-0007ff X W[:mac]  000000-0007ff X W
-[:mac] TASK 3 SEGMENT 31 PAGE 15 MEM ff800-fffff 07d800-07dfff    [:mac]  07d800-07dfff    
+[:mac] TASK 3 SEGMENT 31 PAGE 15 MEM ff800-fffff 07d800-07dfff    [:mac]  07d800-07dfff
 */
 
 #include "emu.h"

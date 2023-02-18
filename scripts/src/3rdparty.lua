@@ -1290,7 +1290,7 @@ project "bimg"
 		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_symbolic_physical.cpp",
 		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_weight_align.cpp",
 		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_weight_quant_xfer_tables.cpp",
-		
+
 		MAME_DIR .. "3rdparty/bimg/3rdparty/tinyexr/deps/miniz/miniz.c",
 	}
 

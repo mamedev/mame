@@ -520,7 +520,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 			if (is_80_column)
 			{
 				words[col] = get_text_character<Model, Invert, Flip>(aux_page[aux_address + col], row & 7)
-				          + (get_text_character<Model, Invert, Flip>(m_ram_ptr[address + col], row & 7) << 7);
+						  + (get_text_character<Model, Invert, Flip>(m_ram_ptr[address + col], row & 7) << 7);
 			}
 			else
 			{
