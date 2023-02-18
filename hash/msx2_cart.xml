@@ -153,8 +153,8 @@ LZ93A13 (32 pin) - 8KB banks
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="LZ93A13" />
 			<dataarea name="rom" size="0x40000">
-				<rom name="lh532064.0" size="0x20000" crc="4b3fcd15" sha1="edc60b3cea0d07a642ee8a6af9f885253775602f" offset="0"/>
-				<rom name="lh532064.1" size="0x20000" crc="2e2c013e" sha1="29c50e5ea62613a3a936573ceeeb205d8e19f5d9" offset="0x20000"/>
+				<rom name="lh532064.0" size="0x20000" offset="0x00000" crc="4b3fcd15" sha1="edc60b3cea0d07a642ee8a6af9f885253775602f"/>
+				<rom name="lh532064.1" size="0x20000" offset="0x20000" crc="2e2c013e" sha1="29c50e5ea62613a3a936573ceeeb205d8e19f5d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -756,10 +756,10 @@ LZ93A13 (32 pin) - 8KB banks
             <feature name="mapper" value="M60002-0115FP" />
             <feature name="sram" value="D4464C-20L" />
             <dataarea name="rom" size="">
-                <rom name="jr_mate_1_v1.0" size="0x20000" crc="" sha1=""status="nodump" />
-                <rom name="jr_mate_2_v1.0" size="0x20000" crc="" sha1="" offset="0x20000" status="nodump" />
+                <rom name="jr_mate_1_v1.0" size="0x20000" offset="0x00000" crc="" sha1="" status="nodump" />
+                <rom name="jr_mate_2_v1.0" size="0x20000" offset="0x20000" crc="" sha1="" status="nodump" />
                 <!- Kanji rom ->
-                <rom name="tc531000p-6616" size="0x20000" crc="" sha1="" offset="0x40000" status="nodump" />
+                <rom name="tc531000p-6616" size="0x20000" offset="0x40000" crc="" sha1="" status="nodump" />
             </dataarea>
         </part>
     </software>
@@ -1107,8 +1107,8 @@ LZ93A13 (32 pin) - 8KB banks
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="LZ93A13" />
 			<dataarea name="rom" size="0x40000">
-				<rom name="hn27512p-25" size="0x20000" crc="8a39b738" sha1="58ad36c600ba8da36796440051df81d54036b0c4" offset="0"/>
-				<rom name="m27512zb" size="0x20000" crc="3c242580" sha1="3d9d0356242a6b5395f4fa9e8473184797d55fe6" offset="0x20000"/>
+				<rom name="hn27512p-25" size="0x20000" offset="0x00000" crc="8a39b738" sha1="58ad36c600ba8da36796440051df81d54036b0c4"/>
+				<rom name="m27512zb" size="0x20000" offset="0x20000" crc="3c242580" sha1="3d9d0356242a6b5395f4fa9e8473184797d55fe6"/>
 			</dataarea>
 		</part>
 	</software>
