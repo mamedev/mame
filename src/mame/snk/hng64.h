@@ -199,22 +199,12 @@ private:
 	static constexpr int VBEND = 0;
 	static constexpr int VBSTART = 224*2;
 
-	enum hng64trans_t
-	{
-		HNG64_TILEMAP_NORMAL = 1,
-		HNG64_TILEMAP_ADDITIVE,
-		HNG64_TILEMAP_ALPHA
-	};
-
 	struct blit_parameters
 	{
-		bitmap_rgb32 *      bitmap = nullptr;
-		rectangle           cliprect;
-		uint32_t            tilemap_priority_code = 0;
 		uint8_t             mask = 0;
 		uint8_t             value = 0;
 		uint8_t             alpha = 0;
-		hng64trans_t        drawformat;
+		uint8_t             drawformat;
 	};
 
 	required_device<mips3_device> m_maincpu;
@@ -430,8 +420,6 @@ private:
 	void hng64_mark_all_tiles_dirty(int tilemap);
 	void hng64_mark_tile_dirty(int tilemap, int tile_index);
 
-	void hng64_drawtilemap_nolinemode(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, tilemap_t* tilemap, uint8_t bppBit, int line, uint8_t mosaic);
-
 	uint16_t get_tileregs(int tm);
 	uint16_t get_scrollbase(int tm);
 
@@ -439,15 +427,13 @@ private:
 
 	void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, int line);
 
-	void hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
+	void hng64_tilemap_draw_roz_core(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap, const blit_parameters *blit,
 		int wraparound, uint8_t mosaic, uint8_t tm);
 
 	void hng64_tilemap_draw_roz_primask(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		int wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat, uint8_t mosaic, uint8_t tm);
+		int wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask, uint8_t drawformat, uint8_t mosaic, uint8_t tm);
 
-	static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, bitmap_rgb32 &dest, const rectangle &cliprect, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat);
-
-
+	static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, uint32_t flags, uint8_t priority, uint8_t priority_mask, uint8_t drawformat);
 
 	std::unique_ptr<hng64_poly_renderer> m_poly_renderer;
 

@@ -174,19 +174,12 @@ void hng64_state::hng64_videoram_w(offs_t offset, uint32_t data, uint32_t mem_ma
 /* internal set of transparency states for rendering */
 
 
-void hng64_state::hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, bitmap_rgb32 &dest, const rectangle &cliprect, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat)
+void hng64_state::hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, uint32_t flags, uint8_t priority, uint8_t priority_mask, uint8_t drawformat)
 {
 	/* start with nothing */
 	memset(blit, 0, sizeof(*blit));
 
-	/* set the target bitmap */
-	blit->bitmap = &dest;
-
-	/* if we have a cliprect, copy */
-	blit->cliprect = cliprect;
-
 	/* set the priority code and alpha */
-	//blit->tilemap_priority_code = priority | (priority_mask << 8) | (tmap->palette_offset << 16); // fixit
 	blit->alpha = (flags & TILEMAP_DRAW_ALPHA_FLAG) ? (flags >> 24) : 0xff;
 
 	blit->drawformat = drawformat;
@@ -227,18 +220,18 @@ void hng64_state::hng64_configure_blit_parameters(blit_parameters *blit, tilemap
 
 #define HNG64_ROZ_PLOT_PIXEL(INPUT_VAL)                                                 \
 do {                                                                                    \
-	if (blit->drawformat == HNG64_TILEMAP_NORMAL)                                       \
+	if (blit->drawformat == 1)                                       \
 		*(uint32_t *)dest = clut[INPUT_VAL];                                            \
-	else if (blit->drawformat == HNG64_TILEMAP_ADDITIVE)                                \
+	else if (blit->drawformat == 2)                                \
 		*(uint32_t *)dest = add_blend_r32(*(uint32_t *)dest, clut[INPUT_VAL]);          \
-	else if (blit->drawformat == HNG64_TILEMAP_ALPHA)                                   \
+	else if (blit->drawformat == 3)                                   \
 		*(uint32_t *)dest = alpha_blend_r32(*(uint32_t *)dest, clut[INPUT_VAL], alpha); \
 } while (0)
 
-void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
+void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap, const blit_parameters *blit,
 		int wraparound, uint8_t mosaic, uint8_t tm)
 {
-	int source_line_to_use = blit->cliprect.min_y;
+	int source_line_to_use = cliprect.min_y;
 	source_line_to_use = (source_line_to_use / (mosaic+1)) * (mosaic+1);
 
 	int xinc, xinc2, yinc, yinc2;
@@ -400,28 +393,28 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 
 	// we have the scroll values for the current line, draw
 
-	pen_t const *const clut = &m_palette->pen(blit->tilemap_priority_code >> 16);
+	pen_t const *const clut = &m_palette->pen(0);
 	bitmap_ind8 &priority_bitmap = screen.priority();
-	bitmap_rgb32 &destbitmap = *blit->bitmap;
+	bitmap_rgb32 &destbitmap = dest;
 	const bitmap_ind16 &srcbitmap = tmap->pixmap();
 	const bitmap_ind8 &flagsmap = tmap->flagsmap();
 	const int xmask = srcbitmap.width()-1;
 	const int ymask = srcbitmap.height()-1;
 	const int widthshifted = srcbitmap.width() << 16;
 	const int heightshifted = srcbitmap.height() << 16;
-	uint32_t priority = blit->tilemap_priority_code;
+	uint32_t priority = 0;
 	uint8_t mask = blit->mask;
 	uint8_t value = blit->value;
 	uint8_t alpha = blit->alpha;
 
 	/* pre-advance based on the cliprect */
-	startx += blit->cliprect.min_x * incxx + source_line_to_use * incyx;
-	starty += blit->cliprect.min_x * incxy + source_line_to_use * incyy;
+	startx += cliprect.min_x * incxx + source_line_to_use * incyx;
+	starty += cliprect.min_x * incxy + source_line_to_use * incyy;
 
 	/* extract start/end points */
-	int sx = blit->cliprect.min_x;
-	int sy = blit->cliprect.min_y;
-	int ex = blit->cliprect.max_x;
+	int sx = cliprect.min_x;
+	int sy = cliprect.min_y;
+	int ex = cliprect.max_x;
 
 	/* optimized loop for the not rotated case */
 	if (incxy == 0 && incyx == 0 && !wraparound)
@@ -590,7 +583,7 @@ void hng64_state::hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *
 
 
 void hng64_state::hng64_tilemap_draw_roz_primask(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		int wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat, uint8_t mosaic, uint8_t tm)
+		int wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask, uint8_t drawformat, uint8_t mosaic, uint8_t tm)
 {
 	blit_parameters blit;
 
@@ -604,13 +597,13 @@ void hng64_state::hng64_tilemap_draw_roz_primask(screen_device &screen, bitmap_r
 
 g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
 	/* configure the blit parameters */
-	hng64_configure_blit_parameters(&blit, tmap, dest, cliprect, flags, priority, priority_mask, drawformat);
+	hng64_configure_blit_parameters(&blit, tmap, flags, priority, priority_mask, drawformat);
 
 	/* get the full pixmap for the tilemap */
 	tmap->pixmap();
 
 	/* then do the roz copy */
-	hng64_tilemap_draw_roz_core(screen, tmap, &blit, wraparound, mosaic, tm);
+	hng64_tilemap_draw_roz_core(screen, dest, cliprect, tmap, &blit, wraparound, mosaic, tm);
 g_profiler.stop();
 }
 
@@ -702,9 +695,9 @@ int hng64_state::get_blend_mode(int tm)
 	// it doesn't seem to be 100% on sams64_2 select screen when the mode select circle moves down
 
 	// m_tcram[0x14/4] may be some additional per layer for this?
-	hng64trans_t blendmode = HNG64_TILEMAP_NORMAL;
+	uint8_t blendmode = 1;
 	if ((m_tcram[0x0c / 4] & 0x04000000) && (tm == 1)) // only enable it for the 2nd tilemap right now, find other use cases!
-		blendmode = HNG64_TILEMAP_ADDITIVE;
+		blendmode = 2;
 
 
 	// the bit below also gets set for certain blending effects
@@ -715,7 +708,7 @@ int hng64_state::get_blend_mode(int tm)
 	// the problem here however is that the tilemap used for blending has a lower tilemap priority than the background tilemap?!
 	// the bit also gets set on the buriki title screen, and how that blends is unclear even with reference footage  
 	//if ((m_tcram[0x0c / 4] & 0x00000004) && (tm == 3))
-	//	blendmode = HNG64_TILEMAP_ADDITIVE;
+	//	blendmode = 2;
 
 	return blendmode;
 }
@@ -775,7 +768,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	clip.min_y = clip.max_y = line;
 
 	hng64_tilemap_draw_roz_primask(screen, bitmap, clip, tilemap,
-		1, 0, 0, 0xff, (hng64trans_t)get_blend_mode(tm), mosaicValueBits, tm);
+		1, 0, 0, 0xff, (uint8_t)get_blend_mode(tm), mosaicValueBits, tm);
 }
 
 
