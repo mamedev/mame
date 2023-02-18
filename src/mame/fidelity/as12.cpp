@@ -21,6 +21,8 @@ magnetic chess board sensors. See sc12.cpp for a more technical description.
 The first RAM chip is low-power, and battery-backed with a capacitor. This is
 also mentioned in the manual. Maybe it does not apply to older PCBs.
 
+Like with EAS, the new game command is: RE -> D8 -> CL.
+
 TODO:
 - is the initial AS12 3MHz version the same ROM as felega1? When it's configured
   at 3MHz and the CPU divider set to 2, the pace is the same as fscc12a.
@@ -281,14 +283,28 @@ ROM_START( feleg ) // model 6085, serial 613623xx
 	ROM_LOAD("feleg.e000", 0xe000, 0x2000, CRC(b1fb49aa) SHA1(d8c9687dd564f0fa603e6d684effb1d113ac64b4) ) // "
 ROM_END
 
-ROM_START( felega ) // model AS12, serial 427921xx
+ROM_START( felega ) // model AS12, serial 427921xx, but roms were upgraded
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("felega.8000", 0x8000, 0x2000, CRC(e86453ed) SHA1(8279cf9a7f471f893922d53d901dae65fabbd33f) ) // MBM2764-25, no meaningful label
+	ROM_LOAD("felega.c000", 0xc000, 0x1000, CRC(4a2b6946) SHA1(fd7d11e2589e654f91f7c2f667b927075bd49339) ) // TMS2732AJL-45, "
+	ROM_LOAD("felega.e000", 0xe000, 0x2000, CRC(823083ad) SHA1(4ea6a679edc7c149f1467113e9e5736ee0d5f643) ) // MBM27C64-20, "
+ROM_END
+
+ROM_START( felega1 ) // model AS12, only 1 byte difference compared with felega2 (evidently not a bad dump)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("felega1.8000", 0x8000, 0x2000, CRC(8ddd71fb) SHA1(d856b42706df0a0e6ec7f44c49ec38d84155c1ef) ) // unknown label
+	ROM_LOAD("felega1.c000", 0xc000, 0x1000, CRC(fcc48302) SHA1(f60d34229721e8659e9f81c267177daec7723d8f) ) // "
+	ROM_LOAD("felega1.e000", 0xe000, 0x2000, CRC(b7c55d19) SHA1(45df961c2c3a1e9c8ec79efb7a1a82500425df2f) ) // "
+ROM_END
+
+ROM_START( felega2 ) // model AS12, serial 427921xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("blue.8000",  0x8000, 0x2000, CRC(2e07e657) SHA1(3238f21bdbf2277851e5a32e18c043e654123f00) ) // M5L2764K-2
 	ROM_LOAD("green.c000", 0xc000, 0x1000, CRC(fcc48302) SHA1(f60d34229721e8659e9f81c267177daec7723d8f) ) // TMS2732AJL-45
 	ROM_LOAD("black.e000", 0xe000, 0x2000, CRC(b7c55d19) SHA1(45df961c2c3a1e9c8ec79efb7a1a82500425df2f) ) // TMS2764JL-25
 ROM_END
 
-ROM_START( felega1 ) // model AS12, serial 427917xx
+ROM_START( felega3 ) // model AS12, serial 427917xx
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("blue.8000",  0x8000, 0x2000, CRC(2e07e657) SHA1(3238f21bdbf2277851e5a32e18c043e654123f00) ) // M5L2764K-2
 	ROM_LOAD("green.c000", 0xc000, 0x1000, CRC(fcc48302) SHA1(f60d34229721e8659e9f81c267177daec7723d8f) ) // TMS2732AJL-45
@@ -307,3 +323,5 @@ ROM_END
 CONS( 1986, feleg,   0,       0,  feleg,   feleg,   as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model 6085)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
 CONS( 1984, felega,  feleg,   0,  felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
 CONS( 1984, felega1, feleg,   0,  felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, felega2, feleg,   0,  felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1984, felega3, feleg,   0,  felega,  felega,  as12_state, empty_init, "Fidelity Electronics", "Elegance Chess Challenger (model AS12, set 4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )

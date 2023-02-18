@@ -17558,6 +17558,8 @@ ts28                            // 1983
 feleg
 felega
 felega1
+felega2
+felega3
 
 @source:fidelity/card.cpp
 bridgec
@@ -26795,9 +26797,6 @@ ultrainv                        //
 vortex                          // 852 [1980] Zilec Electronics Ltd.
 yosakdon                        // (c) 1979 Yosaku To Donbei
 yosakdona                       // (c) 1979 Yosaku To Donbei
-
-@source:midw8080/m79amb.cpp
-m79amb                          // (c) 1977 RamTek
 
 @source:midw8080/mw8080bw.cpp
 280zzzap                        // 610 [1976]
@@ -36325,6 +36324,7 @@ polic_l4                        //
 spstn_l5                        //
 swrds_l1                        //
 swrds_l2                        //
+swrds_lg2                       //
 taxi_l3                         //
 taxi_l4                         //
 taxi_lg1                        //
@@ -37581,6 +37581,9 @@ hitme                           // (c) 05/1976 Ramtek
 hitme1                          // (c) 05/1976 Ramtek
 mirco21                         // (c) 08/1976 Mirco
 super21                         // (c) 1978 Mirco
+
+@source:ramtek/m79amb.cpp
+m79amb                          // (c) 1977 RamTek
 
 @source:ramtek/ramtek.cpp
 bballrmt                        // (c) 1974 Ramtek

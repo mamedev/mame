@@ -51,6 +51,7 @@ void heathrow_device::map(address_map &map)
 	map(0x12000, 0x12fff).rw(FUNC(heathrow_device::scc_r), FUNC(heathrow_device::scc_w));
 	map(0x13000, 0x13fff).rw(FUNC(heathrow_device::scc_macrisc_r), FUNC(heathrow_device::scc_macrisc_w));
 	map(0x14000, 0x1401f).rw(m_awacs, FUNC(awacs_device::read), FUNC(awacs_device::write));
+	map(0x14020, 0x14023).r(FUNC(heathrow_device::unk_r));
 	map(0x15000, 0x15fff).rw(FUNC(heathrow_device::fdc_r), FUNC(heathrow_device::fdc_w));
 	map(0x16000, 0x17fff).rw(FUNC(heathrow_device::mac_via_r), FUNC(heathrow_device::mac_via_w));
 	map(0x60000, 0x7ffff).rw(FUNC(heathrow_device::nvram_r), FUNC(heathrow_device::nvram_w));
@@ -124,6 +125,7 @@ heathrow_device::heathrow_device(const machine_config &mconfig, device_type type
 	  m_hdsel(0)
 {
 	set_ids(0x106b0010, 0x01, 0xff000001, 0x000000);
+	m_toggle = 0;
 }
 
 heathrow_device::heathrow_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -153,6 +155,7 @@ void heathrow_device::common_init()
 
 	add_map(0x80000, M_MEM, FUNC(heathrow_device::map));
 	command = 2; // enable our memory range
+	revision = 1;
 }
 
 void heathrow_device::device_start()
@@ -397,5 +400,11 @@ void heathrow_device::scc_macrisc_w(offs_t offset, u8 data)
 		case 3:
 			return m_scc->da_w(0, data);
 	}
+}
+
+u32 heathrow_device::unk_r(offs_t offset)
+{
+	m_toggle ^= 0xffffffff;
+	return m_toggle;
 }
 

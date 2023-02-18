@@ -45,7 +45,7 @@ public:
 	virtual ~menu_plugin_opt();
 
 protected:
-	virtual bool custom_ui_cancel() override { return true; }
+	virtual bool custom_ui_back() override { return true; }
 
 private:
 	virtual void populate() override;

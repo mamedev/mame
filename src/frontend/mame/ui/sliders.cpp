@@ -99,7 +99,6 @@ void menu_sliders::handle(event const *ev)
 					break;
 
 				// restore default
-				case IPT_UI_SELECT:
 				case IPT_UI_CLEAR:
 					increment = slider->defval - curvalue;
 					break;

@@ -21,7 +21,7 @@
 #include "strconv.h"
 
 // MAME headers
-#include "emu.h"
+#include "inpttype.h"
 
 #include <algorithm>
 #include <cassert>

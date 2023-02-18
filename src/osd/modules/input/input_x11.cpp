@@ -19,7 +19,7 @@
 #include "sdl/osdsdl.h"
 
 // MAME headers
-#include "emu.h"
+#include "inpttype.h"
 
 // standard SDL header
 #include <SDL2/SDL.h>

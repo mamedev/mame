@@ -1044,7 +1044,7 @@ function cheatfind.startplugin()
 	end
 
 	local function menu_callback(index, event)
-		if event == "cancel" and pausesel == 1 then
+		if event == "back" and pausesel == 1 then
 			emu.unpause()
 			menu_is_showing = false
 			return false -- return false so menu will be popped off the stack

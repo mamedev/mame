@@ -127,7 +127,7 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 				util::string_format(
 					_("Cancel audit?\n\nPress %1$s to cancel\nPress %2$s to continue"),
 					ui().get_general_input_setting(IPT_UI_SELECT),
-					ui().get_general_input_setting(IPT_UI_CANCEL)),
+					ui().get_general_input_setting(IPT_UI_BACK)),
 				text_layout::text_justify::CENTER,
 				0.5F, 0.5F,
 				UI_RED_COLOR);
@@ -136,7 +136,7 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 }
 
 
-bool menu_audit::custom_ui_cancel()
+bool menu_audit::custom_ui_back()
 {
 	return m_phase != phase::CONFIRMATION;
 }
@@ -162,7 +162,7 @@ void menu_audit::handle(event const *ev)
 				set_process_flags(PROCESS_CUSTOM_ONLY | PROCESS_NOINPUT);
 				m_phase = phase::AUDIT;
 				m_fast = ITEMREF_START_FAST == ev->itemref;
-				m_prompt = util::string_format(_("Press %1$s to cancel\n"), ui().get_general_input_setting(IPT_UI_CANCEL));
+				m_prompt = util::string_format(_("Press %1$s to cancel\n"), ui().get_general_input_setting(IPT_UI_BACK));
 				m_future.resize(std::thread::hardware_concurrency());
 				for (auto &future : m_future)
 					future = std::async(std::launch::async, [this] () { return do_audit(); });
@@ -185,7 +185,7 @@ void menu_audit::handle(event const *ev)
 			}
 			stack_pop();
 		}
-		else if (machine().ui_input().pressed(IPT_UI_CANCEL))
+		else if (machine().ui_input().pressed(IPT_UI_BACK))
 		{
 			if (phase::AUDIT == m_phase)
 				m_phase = phase::CANCELLATION;

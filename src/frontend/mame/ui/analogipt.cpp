@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "ui/analogipt.h"
 
+#include "ui/textbox.h"
+
 #include <algorithm>
 #include <iterator>
 #include <string>
@@ -18,6 +20,20 @@
 
 
 namespace ui {
+
+namespace {
+
+char const HELP_TEXT[] = N_p("menu-analoginput",
+		"Show/hide settings  \t\t%1$s\n"
+		"Decrease value  \t\t%2$s\n"
+		"Increase value  \t\t%3$s\n"
+		"Restore default value  \t\t%4$s\n"
+		"Previous device  \t\t%5$s\n"
+		"Next device  \t\t%6$s\n"
+		"Return to previous menu  \t\t%7$s");
+
+} // anonymous namespace
+
 
 inline menu_analog::item_data::item_data(ioport_field &f, int t) noexcept
 	: field(f)
@@ -63,7 +79,7 @@ menu_analog::menu_analog(mame_ui_manager &mui, render_container &container)
 	, m_hide_menu(false)
 {
 	set_process_flags(PROCESS_LR_REPEAT);
-	set_heading(_("Analog Input Adjustments"));
+	set_heading(_("menu-analoginput", "Analog Input Adjustments"));
 }
 
 
@@ -102,7 +118,7 @@ void menu_analog::custom_render(void *selectedref, float top, float bottom, floa
 	if (m_hide_menu)
 	{
 		if (m_prompt.empty())
-			m_prompt = util::string_format(_("Press %s to show menu"), ui().get_general_input_setting(IPT_UI_ON_SCREEN_DISPLAY));
+			m_prompt = util::string_format(_("menu-analoginput", "Press %s to show settings"), ui().get_general_input_setting(IPT_UI_ON_SCREEN_DISPLAY));
 		draw_text_box(
 				&m_prompt, &m_prompt + 1,
 				boxleft, boxright, y - top, y - top + line_height() + (tb_border() * 2.0f),
@@ -220,6 +236,22 @@ void menu_analog::handle(event const *ev)
 		{
 			m_hide_menu = !m_hide_menu;
 			set_process_flags(PROCESS_LR_REPEAT | (m_hide_menu ? (PROCESS_CUSTOM_NAV | PROCESS_CUSTOM_ONLY) : 0));
+		}
+		else if (IPT_UI_HELP == ev->iptkey)
+		{
+			stack_push<menu_fixed_textbox>(
+					ui(),
+					container(),
+					_("menu-analoginput", "Analog Input Adjustments Help"),
+					util::string_format(
+						_(HELP_TEXT),
+						ui().get_general_input_setting(IPT_UI_ON_SCREEN_DISPLAY),
+						ui().get_general_input_setting(IPT_UI_LEFT),
+						ui().get_general_input_setting(IPT_UI_RIGHT),
+						ui().get_general_input_setting(IPT_UI_CLEAR),
+						ui().get_general_input_setting(IPT_UI_PREV_GROUP),
+						ui().get_general_input_setting(IPT_UI_NEXT_GROUP),
+						ui().get_general_input_setting(IPT_UI_BACK)));
 		}
 		else if (m_hide_menu)
 		{
@@ -386,22 +418,22 @@ void menu_analog::populate()
 		{
 		default:
 		case ANALOG_ITEM_KEYSPEED:
-			text = string_format(_("%1$s Increment/Decrement Speed"), field->name());
+			text = string_format(_("menu-analoginput", "%1$s Increment/Decrement Speed"), field->name());
 			data.cur = settings.delta;
 			break;
 
 		case ANALOG_ITEM_CENTERSPEED:
-			text = string_format(_("%1$s Auto-centering Speed"), field->name());
+			text = string_format(_("menu-analoginput", "%1$s Auto-centering Speed"), field->name());
 			data.cur = settings.centerdelta;
 			break;
 
 		case ANALOG_ITEM_REVERSE:
-			text = string_format(_("%1$s Reverse"), field->name());
+			text = string_format(_("menu-analoginput", "%1$s Reverse"), field->name());
 			data.cur = settings.reverse;
 			break;
 
 		case ANALOG_ITEM_SENSITIVITY:
-			text = string_format(_("%1$s Sensitivity"), field->name());
+			text = string_format(_("menu-analoginput", "%1$s Sensitivity"), field->name());
 			data.cur = settings.sensitivity;
 			break;
 		}
@@ -416,7 +448,7 @@ void menu_analog::populate()
 
 	// display a message if there are toggle inputs enabled
 	if (!prev_owner)
-		item_append(_("[no analog inputs are enabled]"), FLAG_DISABLE, nullptr);
+		item_append(_("menu-analoginput", "[no analog inputs are enabled]"), FLAG_DISABLE, nullptr);
 
 	item_append(menu_item_type::SEPARATOR);
 
