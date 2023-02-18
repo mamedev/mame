@@ -347,10 +347,10 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
 
 	uint32_t startx = xtopleft;
 	uint32_t starty = ytopleft;
-	int incxx = xinc << 1;
-	int incxy = yinc2 << 1;
-	int incyx = xinc2 << 1;
-	int incyy = yinc << 1;
+	const int incxx = xinc << 1;
+	const int incxy = yinc2 << 1;
+	const int incyx = xinc2 << 1;
+	const int incyy = yinc << 1;
 
 	// we have the scroll values for the current line, draw
 
@@ -664,9 +664,7 @@ int hng64_state::get_blend_mode(int tm)
 void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, int line)
 {
 	// Useful bits from the global tilemap flags
-	const uint32_t& global_tileregs = m_videoregs[0x00];
-	const int global_dimensions = (global_tileregs & 0x03000000) >> 24;
-	//const int global_alt_scroll_register_format = global_tileregs & 0x04000000;
+	const int global_dimensions = (m_videoregs[0x00] & 0x03000000) >> 24;
 
 #if HNG64_VIDEO_DEBUG
 	if ((global_dimensions != 0) && (global_dimensions != 3))
@@ -677,11 +675,11 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	uint16_t tileregs = get_tileregs(tm);
 
 	// Useful bits from the tilemap registers
-	const uint8_t mosaicValueBits  = (tileregs & 0xf000) >> 12;;
-	const uint8_t not_line_mode     = (tileregs & 0x0800) >> 11;
-	//const uint8_t bppBit           = (tileregs & 0x0400) >> 10;
-	const uint8_t bigTilemapBit    = (tileregs & 0x0200) >>  9;
-	const uint8_t tilemapEnableBit = (tileregs & 0x0040) >>  6;
+	const uint8_t mosaic = (tileregs & 0xf000) >> 12;
+	const uint8_t not_line_mode = (tileregs & 0x0800) >> 11;
+	//const uint8_t bpp = (tileregs & 0x0400) >> 10; // not used?
+	const uint8_t big = (tileregs & 0x0200) >>  9;
+	const uint8_t enable = (tileregs & 0x0040) >>  6;
 
 	// Tilemap drawing enable?
 	//
@@ -693,7 +691,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	// a per-line basis?
 	//
 	// Could also just be another priority bits with some priorities being filtered
-	if (!tilemapEnableBit && not_line_mode)
+	if (!enable && not_line_mode)
 	{
 	    return;
 	}
@@ -702,12 +700,12 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	tilemap_t* tilemap = nullptr;
 	if (global_dimensions==0)
 	{
-		if (bigTilemapBit) tilemap = m_tilemap[tm].m_tilemap_16x16;
+		if (big) tilemap = m_tilemap[tm].m_tilemap_16x16;
 		else tilemap = m_tilemap[tm].m_tilemap_8x8;
 	}
 	else
 	{
-		if (bigTilemapBit) tilemap = m_tilemap[tm].m_tilemap_16x16_alt;
+		if (big) tilemap = m_tilemap[tm].m_tilemap_16x16_alt;
 		else tilemap = m_tilemap[tm].m_tilemap_8x8; // _alt
 	}
 
@@ -715,7 +713,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	clip.min_y = clip.max_y = line;
 
 	hng64_tilemap_draw_roz_primask(screen, bitmap, clip, tilemap,
-		1, 0, 0, 0xff, (uint8_t)get_blend_mode(tm), mosaicValueBits, tm);
+		1, 0, 0, 0xff, (uint8_t)get_blend_mode(tm), mosaic, tm);
 }
 
 
