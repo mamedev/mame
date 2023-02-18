@@ -1,6 +1,6 @@
 # Ukrainian translations for MAME package.
 # Український переклад MAME-пакета
-# Copyright (C) 1997-2022 MAMEdev and contributors
+# Copyright (C) 1997-2023 MAMEdev and contributors
 # This file is distributed under the same license as the MAME package.
 # Automatically generated, 2023.
 #
@@ -9,16 +9,16 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-18 05:29+1100\n"
-"PO-Revision-Date: 2022-10-17 23:14+0300\n"
+"PO-Revision-Date: 2023-02-18 13:18+0200\n"
 "Last-Translator: Stanley Kid <stanley.udr.kid@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Poedit 3.1.1\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : "
+"n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Poedit 3.2.2\n"
 
 #: src/frontend/mame/ui/ui.cpp:474 src/frontend/mame/ui/ui.cpp:547
 msgid ""
@@ -581,7 +581,7 @@ msgstr "Насиченість джойстика"
 
 #: src/frontend/mame/ui/submenu.cpp:94
 msgid "Joystick threshold"
-msgstr ""
+msgstr "Межа джойстика"
 
 #: src/frontend/mame/ui/submenu.cpp:95
 msgid "Natural keyboard"
@@ -689,7 +689,7 @@ msgstr "Примусове співвідношення сторін"
 
 #: src/frontend/mame/ui/submenu.cpp:134
 msgid "Start Out Maximized"
-msgstr "Розпочинати розгорнутим"
+msgstr "Розпочинати розгорнуто"
 
 #: src/frontend/mame/ui/submenu.cpp:135
 msgid "Synchronized Refresh"
@@ -697,7 +697,7 @@ msgstr "Синхронізоване оновлення"
 
 #: src/frontend/mame/ui/submenu.cpp:136
 msgid "Wait Vertical Sync"
-msgstr "Дочекатися вертикальної синхронізації"
+msgstr "Чекати вертикальну синхронізацію"
 
 #: src/frontend/mame/ui/menu.cpp:372 src/frontend/mame/ui/menu.cpp:738
 #: src/frontend/mame/ui/videoopt.cpp:169
@@ -2004,8 +2004,7 @@ msgid ""
 "The software selected is missing one or more required ROM or CHD images.\n"
 "Please acquire the correct files or select a different one."
 msgstr ""
-"У вибраній програмі відсутній один або декілька необхідних ROM / CHD-"
-"образів.\n"
+"У вибраній програмі відсутній один або декілька необхідних ROM / CHD-образів.\n"
 "Знайди правильні файли чи вибери інший."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:151
@@ -2840,6 +2839,13 @@ msgid ""
 "Next device  \t\t%6$s\n"
 "Return to previous menu  \t\t%7$s"
 msgstr ""
+"Показати / приховати налаштування  \t\t%1$s\n"
+"Зменшити значення  \t\t%2$s\n"
+"Збільшити значення  \t\t%3$s\n"
+"Відновити типове значення  \t\t%4$s\n"
+"Попередній пристрій  \t\t%5$s\n"
+"Наступний пристрій  \t\t%6$s\n"
+"Повернутися до попереднього меню  \t\t%7$s"
 
 #: src/frontend/mame/ui/analogipt.cpp:82
 msgctxt "menu-analoginput"
@@ -2850,12 +2856,12 @@ msgstr "Призначення аналогового керування"
 #, c-format
 msgctxt "menu-analoginput"
 msgid "Press %s to show settings"
-msgstr ""
+msgstr "Натисни %s для показу налаштувань."
 
 #: src/frontend/mame/ui/analogipt.cpp:245
 msgctxt "menu-analoginput"
 msgid "Analog Input Adjustments Help"
-msgstr "Натисни %s для показу меню."
+msgstr "Довідка призначення аналогового керування"
 
 #: src/frontend/mame/ui/analogipt.cpp:421
 #, c-format
@@ -3039,7 +3045,7 @@ msgstr "Зображення"
 
 #: src/frontend/mame/ui/selmenu.cpp:56
 msgid "Info"
-msgstr ""
+msgstr "Відомості"
 
 #: src/frontend/mame/ui/selmenu.cpp:83
 msgctxt "selmenu-artwork"
@@ -3206,8 +3212,8 @@ msgid ""
 "Please acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
-"Необхідні образи ROM'у / диска для вибраної програми відсутні чи "
-"неправильні. Знайди правильні файли чи вибери іншу програму.\n"
+"Необхідні образи ROM'у / диска для вибраної програми відсутні чи неправильні. "
+"Знайди правильні файли чи вибери іншу програму.\n"
 "\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2643
@@ -5410,7 +5416,7 @@ msgstr "Клавіатура"
 #: src/emu/inpttype.ipp:874
 msgctxt "input-name"
 msgid "Show/Hide Menu"
-msgstr ""
+msgstr "Показати / приховати меню"
 
 #: src/emu/inpttype.ipp:875
 msgctxt "input-name"
@@ -5420,7 +5426,7 @@ msgstr "UI Вибрати"
 #: src/emu/inpttype.ipp:876
 msgctxt "input-name"
 msgid "UI Back"
-msgstr ""
+msgstr "UI Назад"
 
 #: src/emu/inpttype.ipp:877
 msgctxt "input-name"
@@ -5435,7 +5441,7 @@ msgstr "UI Очистити"
 #: src/emu/inpttype.ipp:879
 msgctxt "input-name"
 msgid "UI Help"
-msgstr ""
+msgstr "UI Довідка"
 
 #: src/emu/inpttype.ipp:880
 msgctxt "input-name"
@@ -5495,7 +5501,7 @@ msgstr "Відображати на екрані"
 #: src/emu/inpttype.ipp:891
 msgctxt "input-name"
 msgid "Toggle UI Controls"
-msgstr ""
+msgstr "Перемкнути UI-керування"
 
 #: src/emu/inpttype.ipp:892
 msgctxt "input-name"
@@ -6551,14 +6557,3 @@ msgid ""
 msgstr ""
 "Укажи комбінацію чи натисни %s для скасування.\n"
 "%s"
-
-#~ msgid "Infos"
-#~ msgstr "Відомості"
-
-#~ msgctxt "input-name"
-#~ msgid "Config Menu"
-#~ msgstr "Меню конфігурації"
-
-#~ msgctxt "input-name"
-#~ msgid "UI Toggle"
-#~ msgstr "UI Перемкнути"
