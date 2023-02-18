@@ -139,6 +139,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_vblank(*this, "VBLANK"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_iomcu(*this, "iomcu"),
@@ -184,6 +185,7 @@ public:
 	uint8_t *m_texturerom = nullptr;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_ioport m_vblank;
 
 private:
 	static constexpr int HNG64_MASTER_CLOCK = 50'000'000;
@@ -419,9 +421,6 @@ private:
 
 	void hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
 		int wraparound, uint8_t drawformat, uint8_t alpha, uint8_t mosaic, uint8_t tm);
-
-	void hng64_tilemap_draw_roz_primask(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		int wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask, uint8_t drawformat, uint8_t mosaic, uint8_t tm);
 
 	std::unique_ptr<hng64_poly_renderer> m_poly_renderer;
 

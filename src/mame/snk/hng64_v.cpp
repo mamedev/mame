@@ -6,20 +6,19 @@
 #define HNG64_VIDEO_DEBUG 0
 
 
-void hng64_state::hng64_mark_all_tiles_dirty( int tilemap )
+void hng64_state::hng64_mark_all_tiles_dirty(int tilemap)
 {
 	m_tilemap[tilemap].m_tilemap_8x8->mark_all_dirty();
 	m_tilemap[tilemap].m_tilemap_16x16->mark_all_dirty();
 	m_tilemap[tilemap].m_tilemap_16x16_alt->mark_all_dirty();
 }
 
-void hng64_state::hng64_mark_tile_dirty( int tilemap, int tile_index )
+void hng64_state::hng64_mark_tile_dirty(int tilemap, int tile_index)
 {
 	m_tilemap[tilemap].m_tilemap_8x8->mark_tile_dirty(tile_index);
 	m_tilemap[tilemap].m_tilemap_16x16->mark_tile_dirty(tile_index);
 	m_tilemap[tilemap].m_tilemap_16x16_alt->mark_tile_dirty(tile_index);
 }
-
 
 // make this a template function!
 // pppppppp ffattttt tttttttt tttttttt
@@ -150,21 +149,21 @@ void hng64_state::hng64_videoram_w(offs_t offset, uint32_t data, uint32_t mem_ma
 	const int realoff = (offset * 4);
 	COMBINE_DATA(&m_videoram[offset]);
 
-	if ((realoff>=0) && (realoff<0x10000))
+	if ((realoff >= 0) && (realoff < 0x10000))
 	{
-		hng64_mark_tile_dirty(0, offset&0x3fff);
+		hng64_mark_tile_dirty(0, offset & 0x3fff);
 	}
-	else if ((realoff>=0x10000) && (realoff<0x20000))
+	else if ((realoff >= 0x10000) && (realoff < 0x20000))
 	{
-		hng64_mark_tile_dirty(1, offset&0x3fff);
+		hng64_mark_tile_dirty(1, offset & 0x3fff);
 	}
-	else if ((realoff>=0x20000) && (realoff<0x30000))
+	else if ((realoff >= 0x20000) && (realoff < 0x30000))
 	{
-		hng64_mark_tile_dirty(2, offset&0x3fff);
+		hng64_mark_tile_dirty(2, offset & 0x3fff);
 	}
-	else if ((realoff>=0x30000) && (realoff<0x40000))
+	else if ((realoff >= 0x30000) && (realoff < 0x40000))
 	{
-		hng64_mark_tile_dirty(3, offset&0x3fff);
+		hng64_mark_tile_dirty(3, offset & 0x3fff);
 	}
 	// Offsets 0x40000 - 0x58000 are for "floor" scanline control
 
@@ -214,16 +213,16 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
 
 			/* complex zoom mode? */
 			/* with this scroll register layout rotation effects are possible
-				the most obvious use of rotation is the Buriki One logo after
-				attract mode; the text around the outside of the logo is rotated
-				onto the screen
+			    the most obvious use of rotation is the Buriki One logo after
+			    attract mode; the text around the outside of the logo is rotated
+			    onto the screen
 
-				see 1:32 in http://www.youtube.com/watch?v=PoYaHOILuGs
+			    see 1:32 in http://www.youtube.com/watch?v=PoYaHOILuGs
 
-				Xtreme Rally seems to have an issue with this mode on the communication check
-				screen at startup, however during the period in which the values are invalid
-				it looks like the display shouldn't even be enabled (only gets enabled when
-				the value starts counting up)
+			    Xtreme Rally seems to have an issue with this mode on the communication check
+			    screen at startup, however during the period in which the values are invalid
+			    it looks like the display shouldn't even be enabled (only gets enabled when
+			    the value starts counting up)
 
 			*/
 #if HNG64_VIDEO_DEBUG
@@ -258,7 +257,7 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
 		{
 			/* simple zoom mode? - only 4 regs? */
 			/* in this mode they can only specify the top left and middle screen points for each tilemap,
-				this allows simple zooming, but not rotation */
+			    this allows simple zooming, but not rotation */
 
 #if HNG64_VIDEO_DEBUG
 			if (0)
@@ -278,8 +277,8 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
 			if (global_zoom_disable) // disable all scrolling / zoom (test screen) (maybe)
 			{
 				/* If this bit is active the scroll registers don't seem valid at all?
-					It either disables zooming, or disables use of the scroll registers completely
-					- used at startup
+				    It either disables zooming, or disables use of the scroll registers completely
+				    - used at startup
 				*/
 
 				xtopleft = 0;
@@ -307,7 +306,7 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
 		const int global_alt_scroll_register_format = m_videoregs[0x00] & 0x04000000;
 		if (global_alt_scroll_register_format) // globally selects alt scroll register layout???
 		{
-			popmessage("global_alt_scroll_register_format in linemode");
+			//popmessage("global_alt_scroll_register_format in linemode");
 		}
 		//else
 		{
@@ -541,22 +540,6 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
 }
 
 
-
-void hng64_state::hng64_tilemap_draw_roz_primask(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		int wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask, uint8_t drawformat, uint8_t mosaic, uint8_t tm)
-{
-g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
-	/* get the full pixmap for the tilemap */
-	tmap->pixmap();
-
-	/* then do the roz copy */
-	hng64_tilemap_draw_roz_core_line(screen, dest, cliprect, tmap, wraparound, drawformat, 0x80, mosaic, tm);
-g_profiler.stop();
-}
-
-
-
-
 /*
  * Video Regs Format (appear to just be tilemap regs)
  * --------------------------------------------------
@@ -651,11 +634,11 @@ int hng64_state::get_blend_mode(int tm)
 	// for example a mist effect in the long tunnel on the South America course
 	// ( https://youtu.be/9rOPkNHTmYA?t=403 6:43 )
 	// this is the only course which has this bit set (it is set all the time) and is the only course using blending
-	// 
+	//
 	// the problem here however is that the tilemap used for blending has a lower tilemap priority than the background tilemap?!
-	// the bit also gets set on the buriki title screen, and how that blends is unclear even with reference footage  
+	// the bit also gets set on the buriki title screen, and how that blends is unclear even with reference footage
 	//if ((m_tcram[0x0c / 4] & 0x00000004) && (tm == 3))
-	//	blendmode = 2;
+	//  blendmode = 2;
 
 	return blendmode;
 }
@@ -693,7 +676,7 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	// Could also just be another priority bits with some priorities being filtered
 	if (!enable && not_line_mode)
 	{
-	    return;
+		return;
 	}
 
 	// Select the proper tilemap size
@@ -712,20 +695,26 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 	rectangle clip = cliprect;
 	clip.min_y = clip.max_y = line;
 
-	hng64_tilemap_draw_roz_primask(screen, bitmap, clip, tilemap,
-		1, 0, 0, 0xff, (uint8_t)get_blend_mode(tm), mosaic, tm);
+g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
+	/* get the full pixmap for the tilemap */
+	tilemap->pixmap();
+
+	/* then do the roz copy */
+	hng64_tilemap_draw_roz_core_line(screen, bitmap, clip, tilemap, 1, get_blend_mode(tm), 0x80, mosaic, tm);
+g_profiler.stop();
+
 }
 
 
-uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hng64_state::screen_update_hng64(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
 #if 0
 	// press in sams64_2 attract mode for a nice debug screen from the game
 	// not sure how functional it is, and it doesn't appear to test everything (rowscroll modes etc.)
 	// but it could be useful
-	if ( machine().input().code_pressed_once(KEYCODE_L) )
+	if (machine().input().code_pressed_once(KEYCODE_L))
 	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
+		address_space& space = m_maincpu->space(AS_PROGRAM);
 
 		if (!strcmp(machine().system().name, "sams64_2"))
 		{
@@ -735,8 +724,8 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 #endif
 
 	// Initialize some buffers
-	if(m_fbcontrol[0] & 0x01) //FIXME: Is the register correct? check with HW tests
-		bitmap.fill(m_palette->pen(0), cliprect); 
+	if (m_fbcontrol[0] & 0x01) //FIXME: Is the register correct? check with HW tests
+		bitmap.fill(m_palette->pen(0), cliprect);
 	else
 		bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -752,21 +741,21 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	if ((m_old_animmask != animmask) || (m_old_animbits != animbits))
 	{
 		int tile_index;
-		for (tile_index=0;tile_index<128*128;tile_index++)
+		for (tile_index = 0; tile_index < 128 * 128; tile_index++)
 		{
-			if (m_videoram[tile_index+(0x00000/4)] & 0x200000)
+			if (m_videoram[tile_index + (0x00000 / 4)] & 0x200000)
 			{
 				hng64_mark_tile_dirty(0, tile_index);
 			}
-			if (m_videoram[tile_index+(0x10000/4)] & 0x200000)
+			if (m_videoram[tile_index + (0x10000 / 4)] & 0x200000)
 			{
 				hng64_mark_tile_dirty(1, tile_index);
 			}
-			if (m_videoram[tile_index+(0x20000/4)] & 0x200000)
+			if (m_videoram[tile_index + (0x20000 / 4)] & 0x200000)
 			{
 				hng64_mark_tile_dirty(2, tile_index);
 			}
-			if (m_videoram[tile_index+(0x30000/4)] & 0x200000)
+			if (m_videoram[tile_index + (0x30000 / 4)] & 0x200000)
 			{
 				hng64_mark_tile_dirty(3, tile_index);
 			}
@@ -807,17 +796,17 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	}
 
 	// 3d gets drawn next
-	if(!(m_fbcontrol[0] & 0x01))
+	if (!(m_fbcontrol[0] & 0x01))
 	{
 		// Blit the color buffer into the primary bitmap
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			const uint32_t *src = &m_poly_renderer->colorBuffer3d().pix(y, cliprect.min_x);
-			uint32_t *dst = &bitmap.pix(y, cliprect.min_x);
+			const uint32_t* src = &m_poly_renderer->colorBuffer3d().pix(y, cliprect.min_x);
+			uint32_t* dst = &bitmap.pix(y, cliprect.min_x);
 
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
-				if(*src & 0xff000000)
+				if (*src & 0xff000000)
 					*dst = *src;
 
 				dst++;
@@ -838,61 +827,61 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 		popmessage("%08x %08x %08x %08x %08x", m_spriteregs[0], m_spriteregs[1], m_spriteregs[2], m_spriteregs[3], m_spriteregs[4]);
 
 	if (1)
-	popmessage("%08x %08x TR(%04x %04x %04x %04x) SB(%04x %04x %04x %04x) %08x %08x %08x %08x %08x AA(%08x %08x) %08x",
-		m_videoregs[0x00],
-		m_videoregs[0x01],
-		(m_videoregs[0x02]>>16)&0xffff,
-		(m_videoregs[0x02]>>0)&0xffff,  //       ss64_2 debug mode indicates that 0x0040 is enable!
-		(m_videoregs[0x03]>>16)&0xffff, //       buriki agrees (debug data on text layer) xrally agress (pink layer)
-		(m_videoregs[0x03]>>0)&0xffff,  //       fatal fury doesn't (all backgrounds have it set) joy
-		(m_videoregs[0x04]>>16)&0xffff,
-		(m_videoregs[0x04]>>0)&0xffff,
-		(m_videoregs[0x05]>>16)&0xffff,
-		(m_videoregs[0x05]>>0)&0xffff,
-		m_videoregs[0x06],
-		m_videoregs[0x07],
-		m_videoregs[0x08],
-		m_videoregs[0x09],
-		m_videoregs[0x0a],
-		m_videoregs[0x0b],
-		m_videoregs[0x0c],
-		m_videoregs[0x0d]);
+		popmessage("%08x %08x TR(%04x %04x %04x %04x) SB(%04x %04x %04x %04x) %08x %08x %08x %08x %08x AA(%08x %08x) %08x",
+			m_videoregs[0x00],
+			m_videoregs[0x01],
+			(m_videoregs[0x02] >> 16) & 0xffff,
+			(m_videoregs[0x02] >> 0) & 0xffff,  //       ss64_2 debug mode indicates that 0x0040 is enable!
+			(m_videoregs[0x03] >> 16) & 0xffff, //       buriki agrees (debug data on text layer) xrally agress (pink layer)
+			(m_videoregs[0x03] >> 0) & 0xffff,  //       fatal fury doesn't (all backgrounds have it set) joy
+			(m_videoregs[0x04] >> 16) & 0xffff,
+			(m_videoregs[0x04] >> 0) & 0xffff,
+			(m_videoregs[0x05] >> 16) & 0xffff,
+			(m_videoregs[0x05] >> 0) & 0xffff,
+			m_videoregs[0x06],
+			m_videoregs[0x07],
+			m_videoregs[0x08],
+			m_videoregs[0x09],
+			m_videoregs[0x0a],
+			m_videoregs[0x0b],
+			m_videoregs[0x0c],
+			m_videoregs[0x0d]);
 
 	if (0)
 		popmessage("TC: %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x",
-		m_tcram[0x00/4],
-		m_tcram[0x04/4],
-		m_tcram[0x08/4], // tilemaps 0/1 ?
-		m_tcram[0x0c/4], // ss64_2 debug 04000000 = 'half' on tm1   00000004 = 'half' on tm3  (used in transitions?)
-		m_tcram[0x10/4],
-		m_tcram[0x14/4],
-		m_tcram[0x18/4],
-		m_tcram[0x1c/4],
-		m_tcram[0x20/4],
-		m_tcram[0x24/4],
-		m_tcram[0x28/4],
-		m_tcram[0x2c/4],
-		m_tcram[0x30/4],
-		m_tcram[0x34/4],
-		m_tcram[0x38/4],
-		m_tcram[0x3c/4],
-		m_tcram[0x40/4],
-		m_tcram[0x44/4],
-		m_tcram[0x48/4],
-		m_tcram[0x4c/4],
-		m_tcram[0x50/4],
-		m_tcram[0x54/4],
-		m_tcram[0x58/4],
-		m_tcram[0x5c/4]);
+			m_tcram[0x00 / 4],
+			m_tcram[0x04 / 4],
+			m_tcram[0x08 / 4], // tilemaps 0/1 ?
+			m_tcram[0x0c / 4], // ss64_2 debug 04000000 = 'half' on tm1   00000004 = 'half' on tm3  (used in transitions?)
+			m_tcram[0x10 / 4],
+			m_tcram[0x14 / 4],
+			m_tcram[0x18 / 4],
+			m_tcram[0x1c / 4],
+			m_tcram[0x20 / 4],
+			m_tcram[0x24 / 4],
+			m_tcram[0x28 / 4],
+			m_tcram[0x2c / 4],
+			m_tcram[0x30 / 4],
+			m_tcram[0x34 / 4],
+			m_tcram[0x38 / 4],
+			m_tcram[0x3c / 4],
+			m_tcram[0x40 / 4],
+			m_tcram[0x44 / 4],
+			m_tcram[0x48 / 4],
+			m_tcram[0x4c / 4],
+			m_tcram[0x50 / 4],
+			m_tcram[0x54 / 4],
+			m_tcram[0x58 / 4],
+			m_tcram[0x5c / 4]);
 
 	/*
-		m_tcram[0x0c/4]
-		05002201  blending?
-		01002201 
-  
-		m_tcram[0x14/4],
-		0011057f  blending?
-		0001057f
+	    m_tcram[0x0c/4]
+	    05002201  blending?
+	    01002201
+
+	    m_tcram[0x14/4],
+	    0011057f  blending?
+	    0001057f
 	*/
 #endif
 
@@ -902,7 +891,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 WRITE_LINE_MEMBER(hng64_state::screen_vblank_hng64)
 {
 	// rising edge and buffer swap
-	if (state && (m_tcram[0x50/4] & 0x10000))
+	if (state && (m_tcram[0x50 / 4] & 0x10000))
 		clear3d();
 }
 
@@ -949,11 +938,11 @@ WRITE_LINE_MEMBER(hng64_state::screen_vblank_hng64)
 // Transition Control memory.
 void hng64_state::tcram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	uint32_t *hng64_tcram = m_tcram;
+	uint32_t* hng64_tcram = m_tcram;
 
-	COMBINE_DATA (&hng64_tcram[offset]);
+	COMBINE_DATA(&hng64_tcram[offset]);
 
-	if(offset == 0x02)
+	if (offset == 0x02)
 	{
 		rectangle visarea = m_screen->visible_area();
 
@@ -962,7 +951,7 @@ void hng64_state::tcram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		const uint16_t max_x = (hng64_tcram[2] & 0xffff0000) >> 16;
 		const uint16_t max_y = (hng64_tcram[2] & 0x0000ffff) >> 0;
 
-		if(max_x == 0 || max_y == 0) // bail out if values are invalid, Fatal Fury WA sets this to disable the screen.
+		if (max_x == 0 || max_y == 0) // bail out if values are invalid, Fatal Fury WA sets this to disable the screen.
 		{
 			m_screen_dis = 1;
 			return;
@@ -971,7 +960,7 @@ void hng64_state::tcram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		m_screen_dis = 0;
 
 		visarea.set(min_x, min_x + max_x - 1, min_y, min_y + max_y - 1);
-		m_screen->configure(HTOTAL, VTOTAL, visarea, m_screen->frame_period().attoseconds() );
+		m_screen->configure(HTOTAL, VTOTAL, visarea, m_screen->frame_period().attoseconds());
 	}
 }
 
@@ -979,16 +968,16 @@ uint32_t hng64_state::tcram_r(offs_t offset)
 {
 	/* is this really a port? this seems treated like RAM otherwise, check if there's code anywhere
 	   to write the desired value here instead */
-	if ((offset*4) == 0x48)
-		return ioport("VBLANK")->read();
+	if ((offset * 4) == 0x48)
+		return m_vblank->read();
 
 	return m_tcram[offset];
 }
 
 // Very much a work in progress - no hard testing has been done
-void hng64_state::transition_control( bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void hng64_state::transition_control(bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
-//  float colorScaleR, colorScaleG, colorScaleB;
+	//  float colorScaleR, colorScaleG, colorScaleB;
 	int32_t finR, finG, finB;
 
 	int32_t darkR, darkG, darkB;
@@ -997,19 +986,19 @@ void hng64_state::transition_control( bitmap_rgb32 &bitmap, const rectangle &cli
 	// If either of the fading memory regions is non-zero...
 	if (m_tcram[0x00000007] != 0x00000000 || m_tcram[0x0000000a] != 0x00000000)
 	{
-		darkR = (int32_t)( m_tcram[0x00000007]        & 0xff);
-		darkG = (int32_t)((m_tcram[0x00000007] >> 8)  & 0xff);
+		darkR = (int32_t)(m_tcram[0x00000007] & 0xff);
+		darkG = (int32_t)((m_tcram[0x00000007] >> 8) & 0xff);
 		darkB = (int32_t)((m_tcram[0x00000007] >> 16) & 0xff);
 
-		brigR = (int32_t)( m_tcram[0x0000000a]        & 0xff);
-		brigG = (int32_t)((m_tcram[0x0000000a] >> 8)  & 0xff);
+		brigR = (int32_t)(m_tcram[0x0000000a] & 0xff);
+		brigG = (int32_t)((m_tcram[0x0000000a] >> 8) & 0xff);
 		brigB = (int32_t)((m_tcram[0x0000000a] >> 16) & 0xff);
 
 		for (int i = cliprect.min_x; i < cliprect.max_x; i++)
 		{
 			for (int j = cliprect.min_y; j < cliprect.max_y; j++)
 			{
-				rgb_t* thePixel = reinterpret_cast<rgb_t *>(&bitmap.pix(j, i));
+				rgb_t* thePixel = reinterpret_cast<rgb_t*>(&bitmap.pix(j, i));
 
 				finR = (int32_t)thePixel->r();
 				finG = (int32_t)thePixel->g();
@@ -1017,18 +1006,18 @@ void hng64_state::transition_control( bitmap_rgb32 &bitmap, const rectangle &cli
 
 #if 0
 				// Apply the darkening pass (0x07)...
-				colorScaleR = 1.0f - (float)( m_tcram[0x00000007] & 0xff)        / 255.0f;
-				colorScaleG = 1.0f - (float)((m_tcram[0x00000007] >> 8)  & 0xff) / 255.0f;
+				colorScaleR = 1.0f - (float)(m_tcram[0x00000007] & 0xff) / 255.0f;
+				colorScaleG = 1.0f - (float)((m_tcram[0x00000007] >> 8) & 0xff) / 255.0f;
 				colorScaleB = 1.0f - (float)((m_tcram[0x00000007] >> 16) & 0xff) / 255.0f;
 
-				finR = ((float)thePixel->r()   * colorScaleR);
+				finR = ((float)thePixel->r() * colorScaleR);
 				finG = ((float)thePixel->g() * colorScaleG);
-				finB = ((float)thePixel->b()  * colorScaleB);
+				finB = ((float)thePixel->b() * colorScaleB);
 
 
 				// Apply the lightening pass (0x0a)...
-				colorScaleR = 1.0f + (float)( m_tcram[0x0000000a] & 0xff)        / 255.0f;
-				colorScaleG = 1.0f + (float)((m_tcram[0x0000000a] >> 8)  & 0xff) / 255.0f;
+				colorScaleR = 1.0f + (float)(m_tcram[0x0000000a] & 0xff) / 255.0f;
+				colorScaleG = 1.0f + (float)((m_tcram[0x0000000a] >> 8) & 0xff) / 255.0f;
 				colorScaleB = 1.0f + (float)((m_tcram[0x0000000a] >> 16) & 0xff) / 255.0f;
 
 				finR *= colorScaleR;
@@ -1084,23 +1073,23 @@ void hng64_state::video_start()
 	m_old_tileflags[2] = -1;
 	m_old_tileflags[3] = -1;
 
-	m_tilemap[0].m_tilemap_8x8       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile0_8x8_info)),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); // 128x128x4 = 0x10000
-	m_tilemap[0].m_tilemap_16x16     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile0_16x16_info)), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); // 128x128x4 = 0x10000
-	m_tilemap[0].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile0_16x16_info)), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); // 128x128x4 = 0x10000
+	m_tilemap[0].m_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile0_8x8_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[0].m_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile0_16x16_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[0].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile0_16x16_info)), TILEMAP_SCAN_ROWS, 16, 16, 256, 64); // 128x128x4 = 0x10000
 
-	m_tilemap[1].m_tilemap_8x8       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile1_8x8_info)),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); // 128x128x4 = 0x10000
-	m_tilemap[1].m_tilemap_16x16     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile1_16x16_info)), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); // 128x128x4 = 0x10000
-	m_tilemap[1].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile1_16x16_info)), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); // 128x128x4 = 0x10000
+	m_tilemap[1].m_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile1_8x8_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[1].m_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile1_16x16_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[1].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile1_16x16_info)), TILEMAP_SCAN_ROWS, 16, 16, 256, 64); // 128x128x4 = 0x10000
 
-	m_tilemap[2].m_tilemap_8x8       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile2_8x8_info)),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); // 128x128x4 = 0x10000
-	m_tilemap[2].m_tilemap_16x16     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile2_16x16_info)), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); // 128x128x4 = 0x10000
-	m_tilemap[2].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile2_16x16_info)), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); // 128x128x4 = 0x10000
+	m_tilemap[2].m_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile2_8x8_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[2].m_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile2_16x16_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[2].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile2_16x16_info)), TILEMAP_SCAN_ROWS, 16, 16, 256, 64); // 128x128x4 = 0x10000
 
-	m_tilemap[3].m_tilemap_8x8       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile3_8x8_info)),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); // 128x128x4 = 0x10000
-	m_tilemap[3].m_tilemap_16x16     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile3_16x16_info)), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); // 128x128x4 = 0x10000
-	m_tilemap[3].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile3_16x16_info)), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); // 128x128x4 = 0x10000
+	m_tilemap[3].m_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile3_8x8_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[3].m_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile3_16x16_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[3].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile3_16x16_info)), TILEMAP_SCAN_ROWS, 16, 16, 256, 64); // 128x128x4 = 0x10000
 
-	for (auto & elem : m_tilemap)
+	for (auto& elem : m_tilemap)
 	{
 		elem.m_tilemap_8x8->set_transparent_pen(0);
 		elem.m_tilemap_16x16->set_transparent_pen(0);
