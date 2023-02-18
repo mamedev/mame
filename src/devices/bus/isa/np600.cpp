@@ -105,7 +105,7 @@ ROM_START(np600a3)
 	ROM_LOAD16_BYTE("258-0033-00_rev_ba.u39", 0x0001, 0x2000, CRC(0e0f726c) SHA1(520773e235a826438b025381cd3861df86d4965d))
 
 	ROM_REGION(0x20, "enetaddr", 0)
-	ROM_LOAD("020701079bfa.u29", 0x00, 0x20, NO_DUMP) // 16-pin device, probably SN74S288 or equivalent and different label and contents for each PCB
+	ROM_LOAD("020701079bfa.u29", 0x00, 0x20, NO_DUMP) // MMI 63S081N (or equivalent PROM, probably having different label and contents for each PCB)
 
 	// Other undumped small devices (mostly or all PLDs):
 	// 258-0037-00 REV AA (U17, 20 pins)
