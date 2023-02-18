@@ -16,8 +16,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3;plural=(n%10==1&&n%100!=11?0:"
-"n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?1:2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : "
+"n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Poedit 3.2.2\n"
 
 #: src/frontend/mame/ui/ui.cpp:474 src/frontend/mame/ui/ui.cpp:547
@@ -700,10 +700,10 @@ msgid "Wait Vertical Sync"
 msgstr "Чекати вертикальну синхронізацію"
 
 #: src/frontend/mame/ui/menu.cpp:372 src/frontend/mame/ui/menu.cpp:738
-#: src/frontend/mame/ui/videoopt.cpp:169 src/frontend/mame/ui/inputtoggle.cpp:96
-#: src/frontend/mame/ui/custui.cpp:488 src/frontend/mame/ui/analogipt.cpp:527
-#: plugins/cheatfind/init.lua:766 plugins/cheatfind/init.lua:777
-#: plugins/cheat/init.lua:679
+#: src/frontend/mame/ui/videoopt.cpp:169
+#: src/frontend/mame/ui/inputtoggle.cpp:96 src/frontend/mame/ui/custui.cpp:488
+#: src/frontend/mame/ui/analogipt.cpp:527 plugins/cheatfind/init.lua:766
+#: plugins/cheatfind/init.lua:777 plugins/cheat/init.lua:679
 msgid "On"
 msgstr "Увімкнути"
 
@@ -719,7 +719,8 @@ msgstr "Вимкнути"
 msgid "Auto"
 msgstr "Автоматично"
 
-#: src/frontend/mame/ui/menu.cpp:1272 src/frontend/mame/ui/simpleselgame.cpp:283
+#: src/frontend/mame/ui/menu.cpp:1272
+#: src/frontend/mame/ui/simpleselgame.cpp:283
 #: src/frontend/mame/ui/selmenu.cpp:1307
 msgid "Return to Previous Menu"
 msgstr "Повернутися до попереднього меню"
@@ -728,15 +729,17 @@ msgstr "Повернутися до попереднього меню"
 msgid "File Manager"
 msgstr "Менеджер файлів"
 
-#: src/frontend/mame/ui/filemngr.cpp:152 src/frontend/mame/ui/confswitch.cpp:119
-#: src/frontend/mame/ui/inputmap.cpp:581 src/frontend/mame/ui/inputtoggle.cpp:75
+#: src/frontend/mame/ui/filemngr.cpp:152
+#: src/frontend/mame/ui/confswitch.cpp:119
+#: src/frontend/mame/ui/inputmap.cpp:581
+#: src/frontend/mame/ui/inputtoggle.cpp:75
 #: src/frontend/mame/ui/analogipt.cpp:412
 #, c-format
 msgid "[root%1$s]"
 msgstr ""
 
-#: src/frontend/mame/ui/filemngr.cpp:166 src/frontend/mame/ui/confswitch.cpp:170
-#: src/frontend/mame/ui/slotopt.cpp:204
+#: src/frontend/mame/ui/filemngr.cpp:166
+#: src/frontend/mame/ui/confswitch.cpp:170 src/frontend/mame/ui/slotopt.cpp:204
 msgid "Reset System"
 msgstr "Перезавантажити систему"
 
@@ -889,8 +892,8 @@ msgstr "глобальна мережа"
 
 #: src/frontend/mame/ui/info.cpp:70
 msgid ""
-"One or more ROMs/disk images for this system are incorrect. The system may not "
-"run correctly.\n"
+"One or more ROMs/disk images for this system are incorrect. The system may "
+"not run correctly.\n"
 msgstr ""
 "Один або декілька ROM'ів / образів дисків системи неправильні. Система може "
 "неналежно працювати.\n"
@@ -905,8 +908,10 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:88
 msgid ""
-"One or more ROMs/disk images for this system have not been correctly dumped.\n"
-msgstr "Один або декілька ROM'ів / образів дисків системи неналежно задамплено.\n"
+"One or more ROMs/disk images for this system have not been correctly "
+"dumped.\n"
+msgstr ""
+"Один або декілька ROM'ів / образів дисків системи неналежно задамплено.\n"
 
 #: src/frontend/mame/ui/info.cpp:96
 msgid "Completely unemulated features: "
@@ -955,8 +960,8 @@ msgstr ""
 msgid ""
 "\n"
 "THIS SYSTEM DOESN'T WORK. The emulation for this system is not yet complete. "
-"There is nothing you can do to fix this problem except wait for the developers "
-"to improve the emulation.\n"
+"There is nothing you can do to fix this problem except wait for the "
+"developers to improve the emulation.\n"
 msgstr ""
 "\n"
 "Система не працює, її емуляцію не завершено. Дочекайся виправлення проблеми "
@@ -965,13 +970,14 @@ msgstr ""
 #: src/frontend/mame/ui/info.cpp:145
 msgid ""
 "\n"
-"Elements of this system cannot be emulated accurately as they require physical "
-"interaction or consist of mechanical devices. It is not possible to fully "
-"experience this system.\n"
+"Elements of this system cannot be emulated accurately as they require "
+"physical interaction or consist of mechanical devices. It is not possible to "
+"fully experience this system.\n"
 msgstr ""
 "\n"
-"Елементи системи неможливо точно емулювати, необхідна фізична взаємодія чи вони "
-"складаються з механічних пристроїв. Повністю випробувати систему неможливо.\n"
+"Елементи системи неможливо точно емулювати, необхідна фізична взаємодія чи "
+"вони складаються з механічних пристроїв. Повністю випробувати систему "
+"неможливо.\n"
 
 #: src/frontend/mame/ui/info.cpp:167
 #, c-format
@@ -1159,7 +1165,8 @@ msgid "Emulated"
 msgstr "Емульована"
 
 #: src/frontend/mame/ui/keyboard.cpp:60 src/frontend/mame/ui/confswitch.cpp:117
-#: src/frontend/mame/ui/inputmap.cpp:579 src/frontend/mame/ui/inputtoggle.cpp:73
+#: src/frontend/mame/ui/inputmap.cpp:579
+#: src/frontend/mame/ui/inputtoggle.cpp:73
 #: src/frontend/mame/ui/analogipt.cpp:410
 #, c-format
 msgid "%1$s [root%2$s]"
@@ -2006,8 +2013,8 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
-"У вибраній грі відсутній один або декілька необхідних ROM / CHD-образів. Вибери "
-"іншу гру.\n"
+"У вибраній грі відсутній один або декілька необхідних ROM / CHD-образів. "
+"Вибери іншу гру.\n"
 "\n"
 "Натисни для продовження."
 
@@ -2026,14 +2033,14 @@ msgid ""
 "No system ROMs found. Please check the rompath setting specified in the %1$s."
 "ini file.\n"
 "\n"
-"If this is your first time using %2$s, please see the %2$s.pdf file in the docs "
-"folder for information on setting up and using %2$s."
+"If this is your first time using %2$s, please see the %2$s.pdf file in the "
+"docs folder for information on setting up and using %2$s."
 msgstr ""
-"Не знайдено системних ROM'ів. Перевір указане налаштування шляху ROM'ів у %1$s."
-"ini.\n"
+"Не знайдено системних ROM'ів. Перевір указане налаштування шляху ROM'ів у "
+"%1$s.ini.\n"
 "\n"
-"При першому використанні %2$s переглянь %2$s.pdf у теці \"docs\" для отримання "
-"відомостей налаштування та використання %2$s."
+"При першому використанні %2$s переглянь %2$s.pdf у теці \"docs\" для "
+"отримання відомостей налаштування та використання %2$s."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:329
 #, c-format
@@ -2059,43 +2066,53 @@ msgstr ""
 msgid "Driver: %1$s"
 msgstr "Драйвер: %1$s"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:373 src/frontend/mame/ui/selmenu.cpp:735
+#: src/frontend/mame/ui/simpleselgame.cpp:373
+#: src/frontend/mame/ui/selmenu.cpp:735
 msgid "Overall: NOT WORKING"
 msgstr "Загалом: Неробоче"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:375 src/frontend/mame/ui/selmenu.cpp:737
+#: src/frontend/mame/ui/simpleselgame.cpp:375
+#: src/frontend/mame/ui/selmenu.cpp:737
 msgid "Overall: Unemulated Protection"
 msgstr "Загалом: Неемульований захист"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:377 src/frontend/mame/ui/selmenu.cpp:739
+#: src/frontend/mame/ui/simpleselgame.cpp:377
+#: src/frontend/mame/ui/selmenu.cpp:739
 msgid "Overall: Working"
 msgstr "Загалом: Робоче"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:381 src/frontend/mame/ui/selmenu.cpp:743
+#: src/frontend/mame/ui/simpleselgame.cpp:381
+#: src/frontend/mame/ui/selmenu.cpp:743
 msgid "Graphics: Unimplemented, "
 msgstr "Графіка: Не реалізовано, "
 
-#: src/frontend/mame/ui/simpleselgame.cpp:383 src/frontend/mame/ui/selmenu.cpp:745
+#: src/frontend/mame/ui/simpleselgame.cpp:383
+#: src/frontend/mame/ui/selmenu.cpp:745
 msgid "Graphics: Imperfect, "
 msgstr "Графіка: Недосконало, "
 
-#: src/frontend/mame/ui/simpleselgame.cpp:385 src/frontend/mame/ui/selmenu.cpp:747
+#: src/frontend/mame/ui/simpleselgame.cpp:385
+#: src/frontend/mame/ui/selmenu.cpp:747
 msgid "Graphics: OK, "
 msgstr "Графіка: OK, "
 
-#: src/frontend/mame/ui/simpleselgame.cpp:388 src/frontend/mame/ui/selmenu.cpp:750
+#: src/frontend/mame/ui/simpleselgame.cpp:388
+#: src/frontend/mame/ui/selmenu.cpp:750
 msgid "Sound: None"
 msgstr "Аудіо: Не вказано"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:390 src/frontend/mame/ui/selmenu.cpp:752
+#: src/frontend/mame/ui/simpleselgame.cpp:390
+#: src/frontend/mame/ui/selmenu.cpp:752
 msgid "Sound: Unimplemented"
 msgstr "Аудіо: Не реалізовано"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:392 src/frontend/mame/ui/selmenu.cpp:754
+#: src/frontend/mame/ui/simpleselgame.cpp:392
+#: src/frontend/mame/ui/selmenu.cpp:754
 msgid "Sound: Imperfect"
 msgstr "Аудіо: Недосконало"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:394 src/frontend/mame/ui/selmenu.cpp:756
+#: src/frontend/mame/ui/simpleselgame.cpp:394
+#: src/frontend/mame/ui/selmenu.cpp:756
 msgid "Sound: OK"
 msgstr "Аудіо: OK"
 
@@ -5927,8 +5944,8 @@ msgstr "Тестувати / Записати отримане значення"
 
 #: plugins/cheatfind/init.lua:747
 msgid ""
-"Use this if you want to poke the Slot 1 value (eg. You started with something "
-"but lost it)"
+"Use this if you want to poke the Slot 1 value (eg. You started with "
+"something but lost it)"
 msgstr ""
 
 #: plugins/cheatfind/init.lua:749
@@ -6047,7 +6064,8 @@ msgctxt "plugin-autofire"
 msgid "[no autofire buttons]"
 msgstr "[відсутні турбокнопки]"
 
-#: plugins/autofire/autofire_menu.lua:109 plugins/autofire/autofire_menu.lua:263
+#: plugins/autofire/autofire_menu.lua:109
+#: plugins/autofire/autofire_menu.lua:263
 msgctxt "plugin-autofire"
 msgid "Add autofire button"
 msgstr "Додати турбокнопку"
@@ -6057,7 +6075,8 @@ msgctxt "plugin-autofire"
 msgid "n/a"
 msgstr "Не доступно"
 
-#: plugins/autofire/autofire_menu.lua:152 plugins/autofire/autofire_menu.lua:154
+#: plugins/autofire/autofire_menu.lua:152
+#: plugins/autofire/autofire_menu.lua:154
 msgctxt "plugin-autofire"
 msgid "[not set]"
 msgstr "[не встановлено]"
