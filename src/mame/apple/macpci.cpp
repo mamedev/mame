@@ -109,6 +109,9 @@ void macpci_state::pippin_map(address_map &map)
 	map(0x03c00000, 0x03c01007).ram();
 
 	map(0x40000000, 0x403fffff).rom().region("bootrom", 0).mirror(0x0fc00000);   // mirror of ROM for 680x0 emulation
+	map(0x5ffffffc, 0x5fffffff).lr32(NAME([](offs_t offset) { return 0xa55a7001; }));
+
+	map(0xf00dfff8, 0xf00dffff).lr64(NAME([](offs_t offset) { return (uint64_t)0xe1 << 32; }));	// PC=0xfff04810
 
 	map(0xf2000000, 0xf2ffffff).m(m_bandit, FUNC(bandit_host_device::map));
 
@@ -153,10 +156,6 @@ void macpci_state::pippin(machine_config &config)
 
 	PCI_ROOT(config, "pci", 0);
 	BANDIT(config, m_bandit, 66000000, "maincpu").set_dev_offset(1);
-
-	cdda_device &cdda(CDDA(config, "cdda"));
-	cdda.add_route(0, "lspeaker", 1.00);
-	cdda.add_route(1, "rspeaker", 1.00);
 
 	cdrom_image_device &cdrom(CDROM(config, "cdrom", 0));
 	cdrom.set_interface("pippin_cdrom");

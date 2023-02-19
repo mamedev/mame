@@ -19,7 +19,7 @@ enum
 	AS_PCI_IO = 2
 };
 
-DEFINE_DEVICE_TYPE(BANDIT, bandit_host_device, "bandit", "Apple Bandit PowerPC-to-PCI Bridge")
+DEFINE_DEVICE_TYPE(BANDIT, bandit_host_device, "banditpci", "Apple Bandit PowerPC-to-PCI Bridge")
 
 void bandit_host_device::config_map(address_map &map)
 {
