@@ -271,7 +271,6 @@ private:
 
 	//uint32_t *q2 = nullptr;
 
-	std::vector< std::pair <int, uint32_t *> > m_spritelist;
 
 	bitmap_ind16 m_sprite_bitmap;
 	bitmap_ind16 m_sprite_zbuffer;
@@ -437,14 +436,13 @@ private:
 
 	void clear3d();
 	bool hng64_command3d(const uint16_t* packet);
-	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_sprites_buffer(screen_device &screen, const rectangle &cliprect);
 
-	void zoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect,
+	void zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
 		gfx_element *gfx, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, u32 trans_pen);
+		u32 scalex, u32 scaley, u32 trans_pen, u32 zval, bool zrev, bool blend);
 
-	void drawgfxzoom_core(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 trans_pen, u32 color);
+	void drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect, gfx_element *gfx, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 trans_pen, u32 color, u32 zval, bool zrev);
 
 	void transition_control(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void setCameraTransformation(const uint16_t* packet);

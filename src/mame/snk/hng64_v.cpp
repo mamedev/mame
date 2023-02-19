@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "hng64.h"
 
-#define HNG64_VIDEO_DEBUG 1
+#define HNG64_VIDEO_DEBUG 0
 
 
 void hng64_state::hng64_mark_all_tiles_dirty(int tilemap)
@@ -813,8 +813,18 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			if (*src & 0xfff0)
-				*dst = clut[*src];
+			uint16_t srcpix = *src;
+			if (srcpix & 0x7ff0)
+			{
+				if (srcpix & 0x8000)
+				{
+					*dst = add_blend_r32(*dst, clut[srcpix & 0x7fff]);
+				}
+				else
+				{
+					*dst = clut[srcpix & 0x7fff];
+				}
+			}
 
 			dst++;
 			src++;
