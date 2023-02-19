@@ -258,6 +258,7 @@ protected:
 	uint16_t hdadsp_speedup_r();
 	uint16_t hdds3_speedup_r();
 
+	void display_speedups();
 
 	DECLARE_WRITE_LINE_MEMBER(hdds3sdsp_timer_enable_callback);
 	void hdds3sdsp_serial_tx_callback(uint32_t data);

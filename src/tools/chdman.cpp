@@ -2429,8 +2429,7 @@ static void do_extract_cd(parameters_map &params)
 	int chop = default_name.find_last_of('.');
 	if (chop != -1)
 		default_name.erase(chop, default_name.size());
-	char basename[128];
-	strncpy(basename, default_name.c_str(), 127);
+	std::string basename = default_name;
 	default_name.append(".bin");
 	std::string *output_bin_file_str;
 	if (output_bin_file_fnd == params.end())
@@ -2527,17 +2526,15 @@ static void do_extract_cd(parameters_map &params)
 		std::vector<uint8_t> buffer;
 		for (int tracknum = 0; tracknum < toc.numtrks; tracknum++)
 		{
-			std::string trackbin_name(basename);
+			std::string trackbin_name = basename;
 
 			if (mode == MODE_GDI)
 			{
-				char temp[11];
-				sprintf(temp, "%02d", tracknum+1);
-				trackbin_name.append(temp);
+				trackbin_name += util::string_format("%02d", tracknum+1);
 				if (toc.tracks[tracknum].trktype == cdrom_file::CD_TRACK_AUDIO)
-					trackbin_name.append(".raw");
+					trackbin_name += ".raw";
 				else
-					trackbin_name.append(".bin");
+					trackbin_name += ".bin";
 
 				output_bin_file.reset();
 
