@@ -1250,10 +1250,17 @@ project "bimg"
 		"BX_CONFIG_DEBUG=0",
 	}
 
-	configuration { "mingw*" }
+	configuration { "x64", "mingw*" }
 		defines {
 			"ASTCENC_AVX=0",
 			"ASTCENC_SSE=20",
+		}
+	configuration { }
+
+	configuration { "x32", "mingw*" }
+		defines {
+			"ASTCENC_AVX=0",
+			"ASTCENC_SSE=0",
 		}
 	configuration { }
 

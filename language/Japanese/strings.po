@@ -579,7 +579,7 @@ msgstr "ジョイスティックサチュレーション"
 
 #: src/frontend/mame/ui/submenu.cpp:94
 msgid "Joystick threshold"
-msgstr ""
+msgstr "ジョイスティックしきい値"
 
 #: src/frontend/mame/ui/submenu.cpp:95
 msgid "Natural keyboard"
@@ -2836,6 +2836,13 @@ msgid ""
 "Next device  \t\t%6$s\n"
 "Return to previous menu  \t\t%7$s"
 msgstr ""
+"設定の表示／非表示  \t\t%1$s\n"
+"値の減少  \t\t%2$s\n"
+"値の増加  \t\t%3$s\n"
+"初期値に戻す  \t\t%4$s\n"
+"前のデバイス  \t\t%5$s\n"
+"次のデバイス  \t\t%6$s\n"
+"前のメニューに戻る  \t\t%7$s"
 
 #: src/frontend/mame/ui/analogipt.cpp:82
 msgctxt "menu-analoginput"
@@ -2851,7 +2858,7 @@ msgstr "%s で設定を表示"
 #: src/frontend/mame/ui/analogipt.cpp:245
 msgctxt "menu-analoginput"
 msgid "Analog Input Adjustments Help"
-msgstr ""
+msgstr "アナログ入力調整のヘルプ"
 
 #: src/frontend/mame/ui/analogipt.cpp:421
 #, c-format
@@ -5406,7 +5413,7 @@ msgstr "キーボード"
 #: src/emu/inpttype.ipp:874
 msgctxt "input-name"
 msgid "Show/Hide Menu"
-msgstr "メニュー"
+msgstr "メニューの表示／非表示"
 
 #: src/emu/inpttype.ipp:875
 msgctxt "input-name"
@@ -5491,7 +5498,7 @@ msgstr "オンスクリーンディスプレイ"
 #: src/emu/inpttype.ipp:891
 msgctxt "input-name"
 msgid "Toggle UI Controls"
-msgstr ""
+msgstr "UIコントロール切り替え"
 
 #: src/emu/inpttype.ipp:892
 msgctxt "input-name"
