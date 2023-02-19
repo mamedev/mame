@@ -1723,7 +1723,7 @@ std::string n64_rdp::disassemble(uint64_t *cmd_buf)
 		default:    util::stream_format(buffer, "Unknown (%08X %08X)", uint32_t(cmd_buf[0] >> 32), (uint32_t)cmd_buf[0]); break;
 	}
 
-	return buffer.str();
+	return std::move(buffer).str();
 }
 
 /*****************************************************************************/
