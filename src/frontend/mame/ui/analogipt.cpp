@@ -244,7 +244,7 @@ void menu_analog::handle(event const *ev)
 					container(),
 					_("menu-analoginput", "Analog Input Adjustments Help"),
 					util::string_format(
-						_(HELP_TEXT),
+						_("menu-analoginput", HELP_TEXT),
 						ui().get_general_input_setting(IPT_UI_ON_SCREEN_DISPLAY),
 						ui().get_general_input_setting(IPT_UI_LEFT),
 						ui().get_general_input_setting(IPT_UI_RIGHT),
