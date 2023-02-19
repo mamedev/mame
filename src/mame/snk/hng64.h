@@ -273,6 +273,10 @@ private:
 
 	std::vector< std::pair <int, uint32_t *> > m_spritelist;
 
+	bitmap_ind16 m_sprite_bitmap;
+	bitmap_ind16 m_sprite_zbuffer;
+
+
 	uint8_t m_screen_dis = 0U;
 
 	struct hng64_tilemap {
@@ -434,7 +438,7 @@ private:
 	void clear3d();
 	bool hng64_command3d(const uint16_t* packet);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_sprites_buffer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_sprites_buffer(screen_device &screen, const rectangle &cliprect);
 
 	void zoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect,
 		gfx_element *gfx, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,

@@ -802,7 +802,24 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	}
 
 	// Draw the sprites on top of everything
-	draw_sprites_buffer(screen, bitmap, cliprect);
+	draw_sprites_buffer(screen, cliprect);
+
+	// copy sprites into display
+	pen_t const *const clut = &m_palette->pen(0);
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		const uint16_t *src = &m_sprite_bitmap.pix(y, cliprect.min_x);
+		uint32_t *dst = &bitmap.pix(y, cliprect.min_x);
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			if (*src & 0xfff0)
+				*dst = clut[*src];
+
+			dst++;
+			src++;
+		}
+	}
 
 	// Layer the global frame buffer operations on top of everything
 	// transition_control(bitmap, cliprect);
@@ -1095,7 +1112,12 @@ void hng64_state::video_start()
 	m_texturerom = memregion("textures")->base();
 	m_vertsrom = (uint16_t*)memregion("verts")->base();
 	m_vertsrom_size = memregion("verts")->bytes();
+
+	m_screen->register_screen_bitmap(m_sprite_bitmap);
+	m_screen->register_screen_bitmap(m_sprite_zbuffer);
+
 }
+
 
 #include "hng64_3d.ipp"
 #include "hng64_sprite.ipp"

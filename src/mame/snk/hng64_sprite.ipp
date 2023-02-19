@@ -379,16 +379,19 @@ void hng64_state::zoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect,
 
 
 
-void hng64_state::draw_sprites_buffer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cliprect)
 {
-	gfx_element *gfx;
-//	uint32_t *start = m_spriteram;
-//	uint32_t *end   = m_spriteram + 0xc000/4;
+	m_sprite_bitmap.fill(0x0000, cliprect);
+	m_sprite_zbuffer.fill(0x0000, cliprect);
+
+	gfx_element* gfx;
+	//	uint32_t *start = m_spriteram;
+	//	uint32_t *end   = m_spriteram + 0xc000/4;
 
 
-	// global offsets in sprite regs
-	int spriteoffsx = (m_spriteregs[1]>>0)&0xffff;
-	int spriteoffsy = (m_spriteregs[1]>>16)&0xffff;
+		// global offsets in sprite regs
+	int spriteoffsx = (m_spriteregs[1] >> 0) & 0xffff;
+	int spriteoffsy = (m_spriteregs[1] >> 16) & 0xffff;
 
 	// This flips between ingame and other screens for roadedge, where the sprites which are filtered definitely needs to change and the game explicitly swaps the values in the sprite list at the same time.
 	// m_spriteregs[2] could also play a part as it also flips between 0x00000000 and 0x000fffff at the same time
@@ -398,20 +401,18 @@ void hng64_state::draw_sprites_buffer(screen_device &screen, bitmap_rgb32 &bitma
 
 
 
-	for (uint32_t* source=m_spriteram;source<m_spriteram + 0xc000/4;source+=8)
+	for (uint32_t* source = m_spriteram; source < m_spriteram + 0xc000 / 4; source += 8)
 	{
-		int tileno,chainx,chainy,xflip;
-		int pal,xinc,yinc,yflip;
+		int tileno, chainx, chainy, xflip;
+		int pal, xinc, yinc, yflip;
 		uint16_t xpos, ypos;
-		int xdrw,ydrw;
+		int xdrw, ydrw;
 		int chaini;
-		uint32_t zoomx,zoomy;
+		uint32_t zoomx, zoomy;
 		float foomX, foomY;
 		//int blend;
 
 		uint16_t zval = (source[2] & 0x07ff0000) >> 16;
-
-
 
 		if (!zsort)
 			if (zval == 0x07ff)
@@ -422,24 +423,24 @@ void hng64_state::draw_sprites_buffer(screen_device &screen, bitmap_rgb32 &bitma
 				continue;
 
 
-		ypos = (source[0]&0xffff0000)>>16;
-		xpos = (source[0]&0x0000ffff)>>0;
+		ypos = (source[0] & 0xffff0000) >> 16;
+		xpos = (source[0] & 0x0000ffff) >> 0;
 		xpos += (spriteoffsx);
 		ypos += (spriteoffsy);
 
-		tileno= (source[4]&0x0007ffff);
+		tileno = (source[4] & 0x0007ffff);
 		//blend=  (source[4]&0x00800000);
-		yflip=  (source[4]&0x01000000)>>24;
-		xflip=  (source[4]&0x02000000)>>25;
+		yflip = (source[4] & 0x01000000) >> 24;
+		xflip = (source[4] & 0x02000000) >> 25;
 
-		pal =(source[3]&0x00ff0000)>>16;
+		pal = (source[3] & 0x00ff0000) >> 16;
 
-		chainy=(source[2]&0x0000000f);
-		chainx=(source[2]&0x000000f0)>>4;
-		chaini=(source[2]&0x00000100);
+		chainy = (source[2] & 0x0000000f);
+		chainx = (source[2] & 0x000000f0) >> 4;
+		chaini = (source[2] & 0x00000100);
 
-		zoomy = (source[1]&0xffff0000)>>16;
-		zoomx = (source[1]&0x0000ffff)>>0;
+		zoomy = (source[1] & 0xffff0000) >> 16;
+		zoomx = (source[1] & 0x0000ffff) >> 0;
 
 		/* Calculate the zoom */
 		{
@@ -447,8 +448,8 @@ void hng64_state::draw_sprites_buffer(screen_device &screen, bitmap_rgb32 &bitma
 
 			/* FIXME: regular zoom mode has precision bugs, can be easily seen in Samurai Shodown 64 intro */
 			zoom_factor = (m_spriteregs[0] & 0x08000000) ? 0x1000 : 0x100;
-			if(!zoomx) zoomx=zoom_factor;
-			if(!zoomy) zoomy=zoom_factor;
+			if (!zoomx) zoomx = zoom_factor;
+			if (!zoomy) zoomy = zoom_factor;
 
 			/* First, prevent any possible divide by zero errors */
 			foomX = (float)(zoom_factor) / (float)zoomx;
@@ -463,78 +464,78 @@ void hng64_state::draw_sprites_buffer(screen_device &screen, bitmap_rgb32 &bitma
 
 		if (m_spriteregs[0] & 0x00800000) //bpp switch
 		{
-			gfx= m_gfxdecode->gfx(4);
+			gfx = m_gfxdecode->gfx(4);
 		}
 		else
 		{
-			gfx= m_gfxdecode->gfx(5);
-			tileno>>=1;
-			pal&=0xf;
+			gfx = m_gfxdecode->gfx(5);
+			tileno >>= 1;
+			pal &= 0xf;
 		}
 
 		// Accommodate for chaining and flipping
-		if(xflip)
+		if (xflip)
 		{
-			xinc=-(int)(16.0f*foomX);
-			xpos-=xinc*chainx;
+			xinc = -(int)(16.0f * foomX);
+			xpos -= xinc * chainx;
 		}
 		else
 		{
-			xinc=(int)(16.0f*foomX);
+			xinc = (int)(16.0f * foomX);
 		}
 
-		if(yflip)
+		if (yflip)
 		{
-			yinc=-(int)(16.0f*foomY);
-			ypos-=yinc*chainy;
+			yinc = -(int)(16.0f * foomY);
+			ypos -= yinc * chainy;
 		}
 		else
 		{
-			yinc=(int)(16.0f*foomY);
+			yinc = (int)(16.0f * foomY);
 		}
 
 
-		for(ydrw=0;ydrw<=chainy;ydrw++)
+		for (ydrw = 0; ydrw <= chainy; ydrw++)
 		{
-			for(xdrw=0;xdrw<=chainx;xdrw++)
+			for (xdrw = 0; xdrw <= chainx; xdrw++)
 			{
-				int16_t drawx = xpos+(xinc*xdrw);
-				int16_t drawy = ypos+(yinc*ydrw);
+				int16_t drawx = xpos + (xinc * xdrw);
+				int16_t drawy = ypos + (yinc * ydrw);
 
 				// 0x3ff (0x200 sign bit) based on sams64_2 char select
 				drawx &= 0x3ff;
 				drawy &= 0x3ff;
 
-				if (drawx&0x0200)drawx-=0x400;
-				if (drawy&0x0200)drawy-=0x400;
+				if (drawx & 0x0200)drawx -= 0x400;
+				if (drawy & 0x0200)drawy -= 0x400;
 
 				if (!chaini)
 				{
 					// (!blend)
-					gfx->zoom_transpen(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,0);
+					zoom_transpen(m_sprite_bitmap, cliprect, gfx, tileno, pal, xflip, yflip, drawx, drawy, zoomx, zoomy/*0x10000*/, 0);
 					//else gfx->prio_zoom_transpen_additive(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
 					tileno++;
 				}
 				else // inline chain mode, used by ss64
 				{
-					tileno=(source[4]&0x0007ffff);
-					pal =(source[3]&0x00ff0000)>>16;
+					tileno = (source[4] & 0x0007ffff);
+					pal = (source[3] & 0x00ff0000) >> 16;
 
 					if (m_spriteregs[0] & 0x00800000) //bpp switch
 					{
-						gfx= m_gfxdecode->gfx(4);
+						gfx = m_gfxdecode->gfx(4);
 					}
 					else
 					{
-						gfx= m_gfxdecode->gfx(5);
-						tileno>>=1;
-						pal&=0xf;
+						gfx = m_gfxdecode->gfx(5);
+						tileno >>= 1;
+						pal &= 0xf;
 					}
 
 					//if (!blend)
-					gfx->zoom_transpen(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,0);
+					zoom_transpen(m_sprite_bitmap, cliprect, gfx, tileno, pal, xflip, yflip, drawx, drawy, zoomx, zoomy/*0x10000*/, 0);
 					//else gfx->prio_zoom_transpen_additive(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
-					source +=8;
+					source += 8;
 				}
 			}
 		}
