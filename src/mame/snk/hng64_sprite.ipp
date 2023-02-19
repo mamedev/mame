@@ -14,11 +14,13 @@
  *   1    | YYYY YYYY YYYY YYYY XXXX XXXX XXXX XXXX | x/y zoom (*)
  *   2    | ---- -zzz zzzz zzzz ---- ---I cccc CCCC | Z-buffer value, 'Inline' chain flag, x/y chain
  *   3    | ---- ---- pppp pppp ---- ---- ---- ---- | palette entry
- *   4    | mmmm -?fF a??? tttt tttt tttt tttt tttt | mosaic factor, unknown (**) , flip bits, additive blending, unknown (***), tile number
+ *   4    | mmmm -cfF aggg tttt tttt tttt tttt tttt | mosaic factor, unknown (x1), checkerboard, flip bits, blend, group?, tile number
  *   5    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
  *   6    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
  *   7    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
  *
+ *  in (4) ggg seems to be either group, or priority against OTHER layers (7 being the lowest, 0 being the highest in normal situations eg most of the time in buriki)
+ * 
  * (*) Fatal Fury WA standard elements are 0x1000-0x1000, all the other games sets 0x100-0x100, related to the bit 27 of sprite regs 0?
  * (**) setted by black squares in ranking screen in Samurai Shodown 64 1, sprite disable?
  * (***) bit 22 is setted on some Fatal Fury WA snow (not all of them), bit 21 is setted on Xrally how to play elements in attract mode
@@ -300,55 +302,43 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 
 	while (source < end)
 	{
-		int tileno, chainx, chainy, xflip;
-		int pal, xinc, yinc, yflip;
-		uint16_t xpos, ypos;
-		int xdrw, ydrw;
-		int chaini;
-		uint32_t zoomx, zoomy;
-		float foomX, foomY;
-
 		uint16_t zval = (source[2] & 0x07ff0000) >> 16;
 
-		ypos = (source[0] & 0xffff0000) >> 16;
-		xpos = (source[0] & 0x0000ffff) >> 0;
+		uint16_t ypos = (source[0] & 0xffff0000) >> 16;
+		uint16_t xpos = (source[0] & 0x0000ffff) >> 0;
 		xpos += (spriteoffsx);
 		ypos += (spriteoffsy);
 
-		tileno = (source[4] & 0x0007ffff);
+		int tileno = (source[4] & 0x0007ffff);
 		bool blend = (source[4] & 0x00800000);
 		bool checkerboard = (source[4] & 0x04000000);
-		yflip = (source[4] & 0x01000000) >> 24;
-		xflip = (source[4] & 0x02000000) >> 25;
+		int yflip = (source[4] & 0x01000000) >> 24;
+		int xflip = (source[4] & 0x02000000) >> 25;
 
-		pal = (source[3] & 0x00ff0000) >> 16;
+		int pal = (source[3] & 0x00ff0000) >> 16;
 
-		chainy = (source[2] & 0x0000000f);
-		chainx = (source[2] & 0x000000f0) >> 4;
-		chaini = (source[2] & 0x00000100);
+		int chainy = (source[2] & 0x0000000f);
+		int chainx = (source[2] & 0x000000f0) >> 4;
+		int chaini = (source[2] & 0x00000100);
 
-		zoomy = (source[1] & 0xffff0000) >> 16;
-		zoomx = (source[1] & 0x0000ffff) >> 0;
+		uint32_t zoomy = (source[1] & 0xffff0000) >> 16;
+		uint32_t zoomx = (source[1] & 0x0000ffff) >> 0;
 
 		/* Calculate the zoom */
-		{
-			int zoom_factor;
+		/* FIXME: regular zoom mode has precision bugs, can be easily seen in Samurai Shodown 64 intro */
+		int zoom_factor = (m_spriteregs[0] & 0x08000000) ? 0x1000 : 0x100;
+		if (!zoomx) zoomx = zoom_factor;
+		if (!zoomy) zoomy = zoom_factor;
 
-			/* FIXME: regular zoom mode has precision bugs, can be easily seen in Samurai Shodown 64 intro */
-			zoom_factor = (m_spriteregs[0] & 0x08000000) ? 0x1000 : 0x100;
-			if (!zoomx) zoomx = zoom_factor;
-			if (!zoomy) zoomy = zoom_factor;
+		/* First, prevent any possible divide by zero errors */
+		float foomX = (float)(zoom_factor) / (float)zoomx;
+		float foomY = (float)(zoom_factor) / (float)zoomy;
 
-			/* First, prevent any possible divide by zero errors */
-			foomX = (float)(zoom_factor) / (float)zoomx;
-			foomY = (float)(zoom_factor) / (float)zoomy;
+		zoomx = ((int)foomX) << 16;
+		zoomy = ((int)foomY) << 16;
 
-			zoomx = ((int)foomX) << 16;
-			zoomy = ((int)foomY) << 16;
-
-			zoomx += (int)((foomX - floor(foomX)) * (float)0x10000);
-			zoomy += (int)((foomY - floor(foomY)) * (float)0x10000);
-		}
+		zoomx += (int)((foomX - floor(foomX)) * (float)0x10000);
+		zoomy += (int)((foomY - floor(foomY)) * (float)0x10000);
 
 		if (m_spriteregs[0] & 0x00800000) //bpp switch
 		{
@@ -361,6 +351,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 			pal &= 0xf;
 		}
 
+		int xinc, yinc;
 		// Accommodate for chaining and flipping
 		if (xflip)
 		{
@@ -383,9 +374,9 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 		}
 
 
-		for (ydrw = 0; ydrw <= chainy; ydrw++)
+		for (int ydrw = 0; ydrw <= chainy; ydrw++)
 		{
-			for (xdrw = 0; xdrw <= chainx; xdrw++)
+			for (int xdrw = 0; xdrw <= chainx; xdrw++)
 			{
 				int16_t drawx = xpos + (xinc * xdrw);
 				int16_t drawy = ypos + (yinc * ydrw);
