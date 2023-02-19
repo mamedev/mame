@@ -1529,13 +1529,13 @@ void kaneko_calc3_device::initial_scan_tables()
 	//printf("crc %04x\n",m_mcu_crc);
 
 #if VERBOSE_OUTPUT
-	auto numregions = datarom[0];
+	uint8_t numregions = datarom[0];
 
 	for (int x=0; x<numregions; x++)
 	{
 		std::vector<uint8_t> tmpdstram(0x2000, 0x00);
 
-		auto length = decompress_table(x, tmpdstram.data(), 0);
+		int length = decompress_table(x, tmpdstram.data(), 0);
 		// dump to file
 		if (length)
 		{
