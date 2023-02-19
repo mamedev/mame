@@ -1257,10 +1257,10 @@ project "bimg"
 		}
 	configuration { }
 
-	configuration { "x32", "mingw*" }
+	configuration { "x32" }
 		defines {
 			"ASTCENC_AVX=0",
-			"ASTCENC_SSE=0",
+			"ASTCENC_SSE=0", -- assumes x86-64 ALU is present when using SSE
 		}
 	configuration { }
 
