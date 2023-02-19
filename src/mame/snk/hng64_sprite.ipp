@@ -278,7 +278,8 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 		float foomX, foomY;
 		bool blend;
 
-		if (source[4] & 0x04000000) // disable bit, ss64 rankings ?
+		// disable bit? ss64 rankings ? - not disable!, used in buriki for sprites with a dithering effect (fake transparency?)
+		if (source[4] & 0x04000000) 
 		{
 			source += 8;
 			continue;
