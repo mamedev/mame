@@ -30,7 +30,6 @@
 #define VERBOSE (LOG_GENERAL | LOG_WARN)
 
 #include "logmacro.h"
-#include "strformat.h"
 
 /*
     Emulation of the CRT Gate Array of the TI-99/2

@@ -672,6 +672,8 @@ d23f=input port 1 value
 #include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
+
+//#define VERBOSE 1
 #include "logmacro.h"
 
 

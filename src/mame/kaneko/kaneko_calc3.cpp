@@ -1522,7 +1522,7 @@ void kaneko_calc3_device::initial_scan_tables()
 	uint8_t* datarom = memregion(":calc3_rom")->base();
 
 	m_mcu_crc = 0;
-	for (auto x=0;x<0x20000;x++)
+	for (int x=0;x<0x20000;x++)
 	{
 		m_mcu_crc+=datarom[x];
 	}
@@ -1531,11 +1531,11 @@ void kaneko_calc3_device::initial_scan_tables()
 #if VERBOSE_OUTPUT
 	auto numregions = datarom[0];
 
-	for (auto x=0U; x<numregions; x++)
+	for (int x=0; x<numregions; x++)
 	{
 		std::vector<uint8_t> tmpdstram(0x2000, 0x00);
 
-		auto length = decompress_table(x, tmpdstram, 0);
+		auto length = decompress_table(x, tmpdstram.data(), 0);
 		// dump to file
 		if (length)
 		{
@@ -1543,7 +1543,7 @@ void kaneko_calc3_device::initial_scan_tables()
 
 			if (m_blocksize_offset==3)
 			{
-				filename = util::format_string("data_%s_table_%04x k%02x m%02x u%02x length %04x",
+				filename = util::string_format("data_%s_table_%04x k%02x m%02x u%02x length %04x",
 					machine().system().name,
 					x, m_decryption_key_byte, m_mode, m_alternateswaps, length);
 			}
@@ -1557,7 +1557,7 @@ void kaneko_calc3_device::initial_scan_tables()
 			auto fp = fopen(filename.c_str(), "w+b");
 			if (fp)
 			{
-				fwrite(tmpdstram, length, 1, fp);
+				fwrite(tmpdstram.data(), length, 1, fp);
 				fclose(fp);
 			}
 		}

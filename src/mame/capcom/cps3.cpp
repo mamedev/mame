@@ -2396,20 +2396,6 @@ void cps3_state::copy_from_nvram()
 			flashnum+=2;
 		}
 	}
-
-
-	/*
-	{
-	    auto filename = std::string{ machine().system().name } + "_bios.dump";
-	    auto fp = fopen(filename.c_str(), "w+b");
-	    if (fp)
-	    {
-	        fwrite(romdata, 0x080000, 1, fp);
-	        fclose(fp);
-	    }
-	}
-	*/
-
 }
 
 
