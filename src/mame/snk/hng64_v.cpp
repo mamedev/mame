@@ -814,7 +814,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			uint16_t srcpix = *src;
-			if (srcpix & 0x7ff0)
+			if (srcpix & 0x7fff)
 			{
 				if (srcpix & 0x8000)
 				{
