@@ -861,12 +861,8 @@ void cps3_state::decrypt_bios()
 #if 0
 	/* Dump to file */
 	{
-		FILE *fp;
-		const char *gamename = machine().system().name;
-		char filename[256];
-		sprintf(filename, "%s_bios.dump", gamename);
-
-		fp=fopen(filename, "w+b");
+		auto filename = std::string{ machine().system().name } + "_bios.dump";
+		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{
 			fwrite(m_decrypted_bios, 0x080000, 1, fp);
@@ -2400,24 +2396,6 @@ void cps3_state::copy_from_nvram()
 			flashnum+=2;
 		}
 	}
-
-
-	/*
-	{
-	    FILE *fp;
-	    const char *gamename = machine().system().name;
-	    char filename[256];
-	    sprintf(filename, "%s_bios.dump", gamename);
-
-	    fp=fopen(filename, "w+b");
-	    if (fp)
-	    {
-	        fwrite(rom, 0x080000, 1, fp);
-	        fclose(fp);
-	    }
-	}
-	*/
-
 }
 
 

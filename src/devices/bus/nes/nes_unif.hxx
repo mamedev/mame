@@ -500,11 +500,8 @@ void nes_cart_slot_device::call_load_unif()
 
 #if SPLIT_PRG
 	{
-		FILE *prgout;
-		char outname[255];
-
-		sprintf(outname, "%s.prg", filename());
-		prgout = fopen(outname, "wb");
+		auto outname  = std::string{ filename() } + ".prg";
+		auto prgout = fopen(outname.c_str(), "wb");
 		if (prgout)
 		{
 			fwrite(m_cart->get_prg_base(), 1, 0x4000 * m_cart->get_prg_size(), prgout);
@@ -518,11 +515,8 @@ void nes_cart_slot_device::call_load_unif()
 #if SPLIT_CHR
 	if (state->m_chr_chunks > 0)
 	{
-		FILE *chrout;
-		char outname[255];
-
-		sprintf(outname, "%s.chr", filename());
-		chrout= fopen(outname, "wb");
+		auto outname  = std::string{ filename() } + ".chr";
+		auto chrout = fopen(outname.c_str(), "wb");
 		if (chrout)
 		{
 			fwrite(m_cart->get_vrom_base(), 1, m_cart->get_vrom_size(), chrout);

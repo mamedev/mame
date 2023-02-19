@@ -266,9 +266,9 @@ bool image_handler::floppy_load(const floppy_format_info *format)
 bool image_handler::floppy_save(const floppy_format_info *format)
 {
 	std::vector<uint32_t> variants;
-	std::string msg = util::string_format("Error opening %s for writing", m_on_disk_path);
 	FILE *f = fopen(m_on_disk_path.c_str(), "wb");
 	if (!f) {
+		auto msg = util::string_format("Error opening %s for writing", m_on_disk_path);
 		perror(msg.c_str());
 		return true;
 	}
