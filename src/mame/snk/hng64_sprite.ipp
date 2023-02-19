@@ -72,8 +72,24 @@ do \
 } \
 while (0)
 
+#define PIX_CHECKERBOARD \
+if (!checkerboard) \
+{ \
+	srcpix = srcptr[cursrcx >> 16]; \
+} \
+else \
+{ \
+	if (cursrcx & 0x10000) \
+	{ \
+		srcpix = (srcy & 0x10000) ? srcptr[cursrcx >> 16] : 0; \
+	} \
+	else \
+	{ \
+		srcpix = (srcy & 0x10000) ? 0 : srcptr[cursrcx >> 16]; \
+	} \
+}
 
-inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect, gfx_element *gfx, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 trans_pen, u32 color, u32 zval, bool zrev)
+inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect, gfx_element *gfx, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 trans_pen, u32 color, u32 zval, bool zrev, bool checkerboard)
 {
 	g_profiler.start(PROFILER_DRAWGFX);
 	do {
@@ -164,13 +180,18 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 			{
 				for (s32 curx = 0; curx < numblocks; curx++)
 				{
-					PIXEL_OP_REBASE_TRANSPEN_REV(destptr[0], destzptr[0], srcptr[cursrcx >> 16]);
+					uint16_t srcpix;
+					PIX_CHECKERBOARD
+					PIXEL_OP_REBASE_TRANSPEN_REV(destptr[0], destzptr[0], srcpix );
 					cursrcx += dx;
-					PIXEL_OP_REBASE_TRANSPEN_REV(destptr[1], destzptr[1], srcptr[cursrcx >> 16]);
+					PIX_CHECKERBOARD
+					PIXEL_OP_REBASE_TRANSPEN_REV(destptr[1], destzptr[1], srcpix);
 					cursrcx += dx;
-					PIXEL_OP_REBASE_TRANSPEN_REV(destptr[2], destzptr[2], srcptr[cursrcx >> 16]);
+					PIX_CHECKERBOARD
+					PIXEL_OP_REBASE_TRANSPEN_REV(destptr[2], destzptr[2], srcpix);
 					cursrcx += dx;
-					PIXEL_OP_REBASE_TRANSPEN_REV(destptr[3], destzptr[3], srcptr[cursrcx >> 16]);
+					PIX_CHECKERBOARD
+					PIXEL_OP_REBASE_TRANSPEN_REV(destptr[3], destzptr[3], srcpix);
 					cursrcx += dx;
 					destptr += 4;
 					destzptr += 4;
@@ -180,7 +201,9 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 				// iterate over leftover pixels
 				for (s32 curx = 0; curx < leftovers; curx++)
 				{
-					PIXEL_OP_REBASE_TRANSPEN_REV(destptr[0], destzptr[0], srcptr[cursrcx >> 16]);
+					uint16_t srcpix;
+					PIX_CHECKERBOARD
+					PIXEL_OP_REBASE_TRANSPEN_REV(destptr[0], destzptr[0], srcpix);
 					cursrcx += dx;
 					destptr++;
 					destzptr++;
@@ -190,13 +213,18 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 			{
 				for (s32 curx = 0; curx < numblocks; curx++)
 				{
-					PIXEL_OP_REBASE_TRANSPEN(destptr[0], destzptr[0], srcptr[cursrcx >> 16]);
+					uint16_t srcpix;
+					PIX_CHECKERBOARD
+					PIXEL_OP_REBASE_TRANSPEN(destptr[0], destzptr[0], srcpix);
 					cursrcx += dx;
-					PIXEL_OP_REBASE_TRANSPEN(destptr[1], destzptr[1], srcptr[cursrcx >> 16]);
+					PIX_CHECKERBOARD
+					PIXEL_OP_REBASE_TRANSPEN(destptr[1], destzptr[1], srcpix);
 					cursrcx += dx;
-					PIXEL_OP_REBASE_TRANSPEN(destptr[2], destzptr[2], srcptr[cursrcx >> 16]);
+					PIX_CHECKERBOARD
+					PIXEL_OP_REBASE_TRANSPEN(destptr[2], destzptr[2], srcpix);
 					cursrcx += dx;
-					PIXEL_OP_REBASE_TRANSPEN(destptr[3], destzptr[3], srcptr[cursrcx >> 16]);
+					PIX_CHECKERBOARD
+					PIXEL_OP_REBASE_TRANSPEN(destptr[3], destzptr[3], srcpix);
 					cursrcx += dx;
 					destptr += 4;
 					destzptr += 4;
@@ -206,7 +234,9 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 				// iterate over leftover pixels
 				for (s32 curx = 0; curx < leftovers; curx++)
 				{
-					PIXEL_OP_REBASE_TRANSPEN(destptr[0], destzptr[0], srcptr[cursrcx >> 16]);
+					uint16_t srcpix;
+					PIX_CHECKERBOARD
+					PIXEL_OP_REBASE_TRANSPEN(destptr[0], destzptr[0], srcpix);
 					cursrcx += dx;
 					destptr++;
 					destzptr++;
@@ -219,9 +249,8 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 
 void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
 		gfx_element *gfx, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, u32 trans_pen, u32 zval, bool zrev, bool blend)
+		u32 scalex, u32 scaley, u32 trans_pen, u32 zval, bool zrev, bool blend, bool checkerboard)
 {
-#if 0
 	// use pen usage to optimize
 	code %= gfx->elements();
 	if (gfx->has_pen_usage())
@@ -231,7 +260,6 @@ void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const r
 		if ((usage & ~(1 << trans_pen)) == 0)
 			return;
 	}
-#endif
 
 	// render
 	color = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
@@ -239,7 +267,7 @@ void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const r
 	if (blend)
 		color |= 0x8000;
 
-	drawgfxzoom_core(dest, destz, cliprect, gfx, code, flipx, flipy, destx, desty, scalex, scaley, trans_pen, color, zval, zrev);
+	drawgfxzoom_core(dest, destz, cliprect, gfx, code, flipx, flipy, destx, desty, scalex, scaley, trans_pen, color, zval, zrev, checkerboard);
 }
 
 
@@ -276,14 +304,6 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 		int chaini;
 		uint32_t zoomx, zoomy;
 		float foomX, foomY;
-		bool blend;
-
-		// disable bit? ss64 rankings ? - not disable!, used in buriki for sprites with a dithering effect (fake transparency?)
-		if (source[4] & 0x04000000) 
-		{
-			source += 8;
-			continue;
-		}
 
 		uint16_t zval = (source[2] & 0x07ff0000) >> 16;
 
@@ -293,7 +313,8 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 		ypos += (spriteoffsy);
 
 		tileno = (source[4] & 0x0007ffff);
-		blend = (source[4] & 0x00800000);
+		bool blend = (source[4] & 0x00800000);
+		bool checkerboard = (source[4] & 0x04000000);
 		yflip = (source[4] & 0x01000000) >> 24;
 		xflip = (source[4] & 0x02000000) >> 25;
 
@@ -375,7 +396,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 
 				if (!chaini)
 				{
-					zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, gfx, tileno, pal, xflip, yflip, drawx, drawy, zoomx, zoomy/*0x10000*/, 0, zval, zsort, blend);
+					zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, gfx, tileno, pal, xflip, yflip, drawx, drawy, zoomx, zoomy/*0x10000*/, 0, zval, zsort, blend, checkerboard);
 					tileno++;
 				}
 				else // inline chain mode, used by ss64
@@ -395,7 +416,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 						pal &= 0xf;
 					}
 
-					zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, gfx, tileno, pal, xflip, yflip, drawx, drawy, zoomx, zoomy/*0x10000*/, 0, zval, zsort, blend);
+					zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, gfx, tileno, pal, xflip, yflip, drawx, drawy, zoomx, zoomy/*0x10000*/, 0, zval, zsort, blend, checkerboard);
 					source += 8;
 				}
 			}
