@@ -110,6 +110,8 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(irq_on) override;
 	TIMER_CALLBACK_MEMBER(irq_off) override;
+	TIMER_CALLBACK_MEMBER(wait_on);
+	TIMER_CALLBACK_MEMBER(wait_off);
 	TIMER_CALLBACK_MEMBER(cbl_tick);
 
 	void sprinter_palette(palette_device &palette) const;
@@ -118,6 +120,8 @@ protected:
 	void screen_update_graph(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<tmpz84c015_device> m_maincpu;
+	emu_timer *m_wait_on_timer = nullptr;
+	emu_timer *m_wait_off_timer = nullptr;
 
 private:
 
@@ -296,10 +300,7 @@ void sprinter_state::update_memory()
 
 void sprinter_state::update_cpu()
 {
-	double clock = m_maincpu->clock();
-	m_maincpu->set_clock(X_SP / ((m_turbo && m_turbo_hard) ? 2 : 12)); // 1 - 21MHz, 0 - 3.5MHz
-	clock /= m_maincpu->clock();
-	m_timer_overlap /= clock;
+	m_maincpu->set_clock_scale((m_turbo && m_turbo_hard) ? 6 : 1); // 1 - 21MHz, 0 - 3.5MHz
 }
 
 void sprinter_state::sprinter_palette(palette_device &palette) const
@@ -1178,6 +1179,8 @@ void sprinter_state::machine_start()
 
 void sprinter_state::machine_reset()
 {
+	m_wait_on_timer->adjust(attotime::never);
+	m_wait_off_timer->adjust(attotime::never);
 	m_cbl_timer->adjust(attotime::never);
 	m_timer_overlap = 0;
 
@@ -1233,6 +1236,8 @@ void sprinter_state::video_start()
 	m_contention_pattern = {};
 	init_taps();
 
+	m_wait_on_timer = timer_alloc(FUNC(sprinter_state::wait_on), this);
+	m_wait_off_timer = timer_alloc(FUNC(sprinter_state::wait_off), this);
 	m_cbl_timer = timer_alloc(FUNC(sprinter_state::cbl_tick), this);
 }
 
@@ -1260,35 +1265,37 @@ void sprinter_state::do_cpu_wait(bool is_io)
 	{
 		const u8 over = m_maincpu->total_cycles() % count;
 		m_timer_overlap += count + (over ? (count - over) : 0);
-	}
-	const s32 allowed = std::min<s32>(m_timer_overlap, m_maincpu->cycles_remaining() - count);
-	if (allowed > 0)
-	{
-		m_maincpu->adjust_icount(-allowed);
-		m_timer_overlap -= allowed;
+		if (m_timer_overlap <= (m_maincpu->cycles_remaining() - count))
+		{
+			m_maincpu->adjust_icount(-m_timer_overlap);
+			m_timer_overlap = 0;
+		} else
+			m_wait_on_timer->adjust(attotime::zero);
 	}
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_on)
 {
-	const attotime to = attotime::from_hz(3.5_MHz_XTAL / 32);
-	const attotime now = m_maincpu->cycles_to_attotime(m_timer_overlap);
-	if (m_timer_overlap < 10)
-	{
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-		m_irq_off_timer->adjust(to);
-		update_int(false);
-	}
-	else if (now < to)
-		m_irq_on_timer->adjust(now);
-	else
-		update_int(false);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
+	update_int(false);
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_off)
 {
-	m_maincpu->set_input_line(0, CLEAR_LINE);
-	update_int(false);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(sprinter_state::wait_on)
+{
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+	m_wait_off_timer->adjust(m_maincpu->cycles_to_attotime(m_timer_overlap));
+}
+
+TIMER_CALLBACK_MEMBER(sprinter_state::wait_off)
+{
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+	m_timer_overlap = 0;
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
@@ -1300,7 +1307,7 @@ TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
 	if (CBL_INT_ENA && !(m_cbl_cnt & 0x7f))
 	{
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-		m_irq_off_timer->enable(false);
+		m_irq_off_timer->adjust(attotime::never);
 	}
 }
 
