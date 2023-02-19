@@ -231,3 +231,313 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		}
 	}
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// the version below draws to a buffer using Z checks instead
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+#define PIXEL_OP_REBASE_TRANSPEN(DEST, SOURCE) \
+do \
+{ \
+	u32 srcdata = (SOURCE); \
+	if (srcdata != trans_pen) \
+		(DEST) = color + srcdata; \
+} \
+while (0)
+
+
+inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 trans_pen, u32 color)
+{
+	g_profiler.start(PROFILER_DRAWGFX);
+	do {
+		assert(dest.valid());
+		assert(dest.cliprect().contains(cliprect));
+
+		// ignore empty/invalid cliprects
+		if (cliprect.empty())
+			break;
+
+		// compute scaled size
+		u32 dstwidth = (scalex * gfx->width() + 0x8000) >> 16;
+		u32 dstheight = (scaley * gfx->height() + 0x8000) >> 16;
+		if (dstwidth < 1 || dstheight < 1)
+			break;
+
+		// compute 16.16 source steps in dx and dy
+		s32 dx = (gfx->width() << 16) / dstwidth;
+		s32 dy = (gfx->height() << 16) / dstheight;
+
+		// compute final pixel in X and exit if we are entirely clipped
+		s32 destendx = destx + dstwidth - 1;
+		if (destx > cliprect.right() || destendx < cliprect.left())
+			break;
+
+		// apply left clip
+		s32 srcx = 0;
+		if (destx < cliprect.left())
+		{
+			srcx = (cliprect.left() - destx) * dx;
+			destx = cliprect.left();
+		}
+
+		// apply right clip
+		if (destendx > cliprect.right())
+			destendx = cliprect.right();
+
+		// compute final pixel in Y and exit if we are entirely clipped
+		s32 destendy = desty + dstheight - 1;
+		if (desty > cliprect.bottom() || destendy < cliprect.top())
+			break;
+
+		// apply top clip
+		s32 srcy = 0;
+		if (desty < cliprect.top())
+		{
+			srcy = (cliprect.top() - desty) * dy;
+			desty = cliprect.top();
+		}
+
+		// apply bottom clip
+		if (destendy > cliprect.bottom())
+			destendy = cliprect.bottom();
+
+		// apply X flipping
+		if (flipx)
+		{
+			srcx = (dstwidth - 1) * dx - srcx;
+			dx = -dx;
+		}
+
+		// apply Y flipping
+		if (flipy)
+		{
+			srcy = (dstheight - 1) * dy - srcy;
+			dy = -dy;
+		}
+
+		// fetch the source data
+		const u8 *srcdata = gfx->get_data(code);
+
+		// compute how many blocks of 4 pixels we have
+		u32 numblocks = (destendx + 1 - destx) / 4;
+		u32 leftovers = (destendx + 1 - destx) - 4 * numblocks;
+
+		// iterate over pixels in Y
+		for (s32 cury = desty; cury <= destendy; cury++)
+		{
+			auto *destptr = &dest.pix(cury, destx);
+			const u8 *srcptr = srcdata + (srcy >> 16) * gfx->rowbytes();
+			s32 cursrcx = srcx;
+			srcy += dy;
+
+			// iterate over unrolled blocks of 4
+			for (s32 curx = 0; curx < numblocks; curx++)
+			{
+				PIXEL_OP_REBASE_TRANSPEN(destptr[0], srcptr[cursrcx >> 16]);
+				cursrcx += dx;
+				PIXEL_OP_REBASE_TRANSPEN(destptr[1], srcptr[cursrcx >> 16]);
+				cursrcx += dx;
+				PIXEL_OP_REBASE_TRANSPEN(destptr[2], srcptr[cursrcx >> 16]);
+				cursrcx += dx;
+				PIXEL_OP_REBASE_TRANSPEN(destptr[3], srcptr[cursrcx >> 16]);
+				cursrcx += dx;
+
+				destptr += 4;
+			}
+
+			// iterate over leftover pixels
+			for (s32 curx = 0; curx < leftovers; curx++)
+			{
+				PIXEL_OP_REBASE_TRANSPEN(destptr[0], srcptr[cursrcx >> 16]);
+				cursrcx += dx;
+				destptr++;
+			}
+		}
+	} while (0);
+	g_profiler.stop();
+}
+
+void hng64_state::zoom_transpen(bitmap_ind16 &dest, const rectangle &cliprect,
+		gfx_element *gfx, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
+		u32 scalex, u32 scaley, u32 trans_pen)
+{
+	// use pen usage to optimize
+	code %= gfx->elements();
+	if (gfx->has_pen_usage())
+	{
+		// fully transparent; do nothing
+		u32 usage = gfx->pen_usage(code);
+		if ((usage & ~(1 << trans_pen)) == 0)
+			return;
+	}
+
+	// render
+	color = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
+	drawgfxzoom_core(dest, cliprect, gfx, code, flipx, flipy, destx, desty, scalex, scaley, trans_pen, color);
+}
+
+
+
+void hng64_state::draw_sprites_buffer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	gfx_element *gfx;
+//	uint32_t *start = m_spriteram;
+//	uint32_t *end   = m_spriteram + 0xc000/4;
+
+
+	// global offsets in sprite regs
+	int spriteoffsx = (m_spriteregs[1]>>0)&0xffff;
+	int spriteoffsy = (m_spriteregs[1]>>16)&0xffff;
+
+	// This flips between ingame and other screens for roadedge, where the sprites which are filtered definitely needs to change and the game explicitly swaps the values in the sprite list at the same time.
+	// m_spriteregs[2] could also play a part as it also flips between 0x00000000 and 0x000fffff at the same time
+	// Samsho games also set the upper 3 bits which could be related, samsho games still have some unwanted sprites (but also use the other 'sprite clear' mechanism)
+	// Could also be draw order related, check if it inverts the z value?
+	bool zsort = !(m_spriteregs[0] & 0x01000000);
+
+
+
+	for (uint32_t* source=m_spriteram;source<m_spriteram + 0xc000/4;source+=8)
+	{
+		int tileno,chainx,chainy,xflip;
+		int pal,xinc,yinc,yflip;
+		uint16_t xpos, ypos;
+		int xdrw,ydrw;
+		int chaini;
+		uint32_t zoomx,zoomy;
+		float foomX, foomY;
+		//int blend;
+
+		uint16_t zval = (source[2] & 0x07ff0000) >> 16;
+
+
+
+		if (!zsort)
+			if (zval == 0x07ff)
+				continue;
+
+		if (zsort)
+			if (zval == 0x0000)
+				continue;
+
+
+		ypos = (source[0]&0xffff0000)>>16;
+		xpos = (source[0]&0x0000ffff)>>0;
+		xpos += (spriteoffsx);
+		ypos += (spriteoffsy);
+
+		tileno= (source[4]&0x0007ffff);
+		//blend=  (source[4]&0x00800000);
+		yflip=  (source[4]&0x01000000)>>24;
+		xflip=  (source[4]&0x02000000)>>25;
+
+		pal =(source[3]&0x00ff0000)>>16;
+
+		chainy=(source[2]&0x0000000f);
+		chainx=(source[2]&0x000000f0)>>4;
+		chaini=(source[2]&0x00000100);
+
+		zoomy = (source[1]&0xffff0000)>>16;
+		zoomx = (source[1]&0x0000ffff)>>0;
+
+		/* Calculate the zoom */
+		{
+			int zoom_factor;
+
+			/* FIXME: regular zoom mode has precision bugs, can be easily seen in Samurai Shodown 64 intro */
+			zoom_factor = (m_spriteregs[0] & 0x08000000) ? 0x1000 : 0x100;
+			if(!zoomx) zoomx=zoom_factor;
+			if(!zoomy) zoomy=zoom_factor;
+
+			/* First, prevent any possible divide by zero errors */
+			foomX = (float)(zoom_factor) / (float)zoomx;
+			foomY = (float)(zoom_factor) / (float)zoomy;
+
+			zoomx = ((int)foomX) << 16;
+			zoomy = ((int)foomY) << 16;
+
+			zoomx += (int)((foomX - floor(foomX)) * (float)0x10000);
+			zoomy += (int)((foomY - floor(foomY)) * (float)0x10000);
+		}
+
+		if (m_spriteregs[0] & 0x00800000) //bpp switch
+		{
+			gfx= m_gfxdecode->gfx(4);
+		}
+		else
+		{
+			gfx= m_gfxdecode->gfx(5);
+			tileno>>=1;
+			pal&=0xf;
+		}
+
+		// Accommodate for chaining and flipping
+		if(xflip)
+		{
+			xinc=-(int)(16.0f*foomX);
+			xpos-=xinc*chainx;
+		}
+		else
+		{
+			xinc=(int)(16.0f*foomX);
+		}
+
+		if(yflip)
+		{
+			yinc=-(int)(16.0f*foomY);
+			ypos-=yinc*chainy;
+		}
+		else
+		{
+			yinc=(int)(16.0f*foomY);
+		}
+
+
+		for(ydrw=0;ydrw<=chainy;ydrw++)
+		{
+			for(xdrw=0;xdrw<=chainx;xdrw++)
+			{
+				int16_t drawx = xpos+(xinc*xdrw);
+				int16_t drawy = ypos+(yinc*ydrw);
+
+				// 0x3ff (0x200 sign bit) based on sams64_2 char select
+				drawx &= 0x3ff;
+				drawy &= 0x3ff;
+
+				if (drawx&0x0200)drawx-=0x400;
+				if (drawy&0x0200)drawy-=0x400;
+
+				if (!chaini)
+				{
+					// (!blend)
+					gfx->zoom_transpen(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,0);
+					//else gfx->prio_zoom_transpen_additive(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
+					tileno++;
+				}
+				else // inline chain mode, used by ss64
+				{
+					tileno=(source[4]&0x0007ffff);
+					pal =(source[3]&0x00ff0000)>>16;
+
+					if (m_spriteregs[0] & 0x00800000) //bpp switch
+					{
+						gfx= m_gfxdecode->gfx(4);
+					}
+					else
+					{
+						gfx= m_gfxdecode->gfx(5);
+						tileno>>=1;
+						pal&=0xf;
+					}
+
+					//if (!blend)
+					gfx->zoom_transpen(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,0);
+					//else gfx->prio_zoom_transpen_additive(bitmap,cliprect,tileno,pal,xflip,yflip,drawx,drawy,zoomx,zoomy/*0x10000*/,screen.priority(), 0,0);
+					source +=8;
+				}
+			}
+		}
+	}
+}
+

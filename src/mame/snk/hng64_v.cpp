@@ -802,7 +802,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	}
 
 	// Draw the sprites on top of everything
-	draw_sprites(screen, bitmap, cliprect);
+	draw_sprites_buffer(screen, bitmap, cliprect);
 
 	// Layer the global frame buffer operations on top of everything
 	// transition_control(bitmap, cliprect);
