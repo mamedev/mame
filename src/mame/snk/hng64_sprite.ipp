@@ -79,14 +79,15 @@ if (!checkerboard) \
 } \
 else \
 { \
-	if (cursrcx & 0x10000) \
+	if (cb & 1) \
 	{ \
-		srcpix = (srcy & 0x10000) ? srcptr[cursrcx >> 16] : 0; \
+		srcpix = (cury & 1) ? srcptr[cursrcx >> 16] : 0; \
 	} \
 	else \
 	{ \
-		srcpix = (srcy & 0x10000) ? 0 : srcptr[cursrcx >> 16]; \
+		srcpix = (cury & 1) ? 0 : srcptr[cursrcx >> 16]; \
 	} \
+	cb++; \
 }
 
 inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect, gfx_element *gfx, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 trans_pen, u32 color, u32 zval, bool zrev, bool checkerboard)
@@ -178,6 +179,7 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 			// iterate over unrolled blocks of 4
 			if (zrev)
 			{
+				uint8_t cb = 0;
 				for (s32 curx = 0; curx < numblocks; curx++)
 				{
 					uint16_t srcpix;
@@ -211,6 +213,7 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 			}
 			else
 			{
+				uint8_t cb = 0;
 				for (s32 curx = 0; curx < numblocks; curx++)
 				{
 					uint16_t srcpix;
