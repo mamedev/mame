@@ -1344,10 +1344,10 @@ std::string n64_rdp::disassemble(uint64_t *cmd_buf)
 	char drde[32], dgde[32], dbde[32], dade[32];
 
 	const int32_t tile = (cmd_buf[0] >> 56) & 0x7;
-	snprintf(sl, sizeof(sl), "%4.2f", (float)((cmd_buf[0] >> 44) & 0xfff) / 4.0f);
-	snprintf(tl, sizeof(tl), "%4.2f", (float)((cmd_buf[0] >> 32) & 0xfff) / 4.0f);
-	snprintf(sh, sizeof(sh), "%4.2f", (float)((cmd_buf[0] >> 12) & 0xfff) / 4.0f);
-	snprintf(th, sizeof(th), "%4.2f", (float)((cmd_buf[0] >>  0) & 0xfff) / 4.0f);
+	snprintf(sl, std::size(sl), "%4.2f", (float)((cmd_buf[0] >> 44) & 0xfff) / 4.0f);
+	snprintf(tl, std::size(tl), "%4.2f", (float)((cmd_buf[0] >> 32) & 0xfff) / 4.0f);
+	snprintf(sh, std::size(sh), "%4.2f", (float)((cmd_buf[0] >> 12) & 0xfff) / 4.0f);
+	snprintf(th, std::size(th), "%4.2f", (float)((cmd_buf[0] >>  0) & 0xfff) / 4.0f);
 
 	const char* format = s_image_format[(cmd_buf[0] >> 53) & 0x7];
 	const char* size = s_image_size[(cmd_buf[0] >> 51) & 0x3];
@@ -1365,15 +1365,15 @@ std::string n64_rdp::disassemble(uint64_t *cmd_buf)
 		{
 			const int32_t lft = (cmd_buf[0] >> 55) & 0x1;
 
-			snprintf(yl,     sizeof(yl),    "%4.4f", (float)((cmd_buf[0] >> 32) & 0x1fff) / 4.0f);
-			snprintf(ym,     sizeof(ym),    "%4.4f", (float)((cmd_buf[0] >> 16) & 0x1fff) / 4.0f);
-			snprintf(yh,     sizeof(yh),    "%4.4f", (float)((cmd_buf[0] >>  0) & 0x1fff) / 4.0f);
-			snprintf(xl,     sizeof(xl),    "%4.4f", (float)int32_t(cmd_buf[1] >> 32) / 65536.0f);
-			snprintf(dxldy,  sizeof(dxldy), "%4.4f", (float)int32_t(cmd_buf[1])       / 65536.0f);
-			snprintf(xh,     sizeof(xh),    "%4.4f", (float)int32_t(cmd_buf[2] >> 32) / 65536.0f);
-			snprintf(dxhdy,  sizeof(dxhdy), "%4.4f", (float)int32_t(cmd_buf[2])       / 65536.0f);
-			snprintf(xm,     sizeof(xm),    "%4.4f", (float)int32_t(cmd_buf[3] >> 32) / 65536.0f);
-			snprintf(dxmdy,  sizeof(dxmdy), "%4.4f", (float)int32_t(cmd_buf[3])       / 65536.0f);
+			snprintf(yl,     std::size(yl),    "%4.4f", (float)((cmd_buf[0] >> 32) & 0x1fff) / 4.0f);
+			snprintf(ym,     std::size(ym),    "%4.4f", (float)((cmd_buf[0] >> 16) & 0x1fff) / 4.0f);
+			snprintf(yh,     std::size(yh),    "%4.4f", (float)((cmd_buf[0] >>  0) & 0x1fff) / 4.0f);
+			snprintf(xl,     std::size(xl),    "%4.4f", (float)int32_t(cmd_buf[1] >> 32) / 65536.0f);
+			snprintf(dxldy,  std::size(dxldy), "%4.4f", (float)int32_t(cmd_buf[1])       / 65536.0f);
+			snprintf(xh,     std::size(xh),    "%4.4f", (float)int32_t(cmd_buf[2] >> 32) / 65536.0f);
+			snprintf(dxhdy,  std::size(dxhdy), "%4.4f", (float)int32_t(cmd_buf[2])       / 65536.0f);
+			snprintf(xm,     std::size(xm),    "%4.4f", (float)int32_t(cmd_buf[3] >> 32) / 65536.0f);
+			snprintf(dxmdy,  std::size(dxmdy), "%4.4f", (float)int32_t(cmd_buf[3])       / 65536.0f);
 
 			util::stream_format(buffer, "Tri_NoShade            %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
 			break;
@@ -1382,15 +1382,15 @@ std::string n64_rdp::disassemble(uint64_t *cmd_buf)
 		{
 			const int32_t lft = (cmd_buf[0] >> 55) & 0x1;
 
-			snprintf(yl,     sizeof(yl),    "%4.4f", (float)((cmd_buf[0] >> 32) & 0x1fff) / 4.0f);
-			snprintf(ym,     sizeof(ym),    "%4.4f", (float)((cmd_buf[0] >> 16) & 0x1fff) / 4.0f);
-			snprintf(yh,     sizeof(yh),    "%4.4f", (float)((cmd_buf[0] >>  0) & 0x1fff) / 4.0f);
-			snprintf(xl,     sizeof(xl),    "%4.4f", (float)int32_t(cmd_buf[1] >> 32) / 65536.0f);
-			snprintf(dxldy,  sizeof(dxldy), "%4.4f", (float)int32_t(cmd_buf[1])       / 65536.0f);
-			snprintf(xh,     sizeof(xh),    "%4.4f", (float)int32_t(cmd_buf[2] >> 32) / 65536.0f);
-			snprintf(dxhdy,  sizeof(dxhdy), "%4.4f", (float)int32_t(cmd_buf[2])       / 65536.0f);
-			snprintf(xm,     sizeof(xm),    "%4.4f", (float)int32_t(cmd_buf[3] >> 32) / 65536.0f);
-			snprintf(dxmdy,  sizeof(dxmdy), "%4.4f", (float)int32_t(cmd_buf[3])       / 65536.0f);
+			snprintf(yl,     std::size(yl),    "%4.4f", (float)((cmd_buf[0] >> 32) & 0x1fff) / 4.0f);
+			snprintf(ym,     std::size(ym),    "%4.4f", (float)((cmd_buf[0] >> 16) & 0x1fff) / 4.0f);
+			snprintf(yh,     std::size(yh),    "%4.4f", (float)((cmd_buf[0] >>  0) & 0x1fff) / 4.0f);
+			snprintf(xl,     std::size(xl),    "%4.4f", (float)int32_t(cmd_buf[1] >> 32) / 65536.0f);
+			snprintf(dxldy,  std::size(dxldy), "%4.4f", (float)int32_t(cmd_buf[1])       / 65536.0f);
+			snprintf(xh,     std::size(xh),    "%4.4f", (float)int32_t(cmd_buf[2] >> 32) / 65536.0f);
+			snprintf(dxhdy,  std::size(dxhdy), "%4.4f", (float)int32_t(cmd_buf[2])       / 65536.0f);
+			snprintf(xm,     std::size(xm),    "%4.4f", (float)int32_t(cmd_buf[3] >> 32) / 65536.0f);
+			snprintf(dxmdy,  std::size(dxmdy), "%4.4f", (float)int32_t(cmd_buf[3])       / 65536.0f);
 
 			util::stream_format(buffer, "Tri_NoShadeZ            %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
 			break;
@@ -1399,28 +1399,28 @@ std::string n64_rdp::disassemble(uint64_t *cmd_buf)
 		{
 			const int32_t lft = (cmd_buf[0] >> 55) & 0x1;
 
-			snprintf(yl,     sizeof(yl),    "%4.4f", (float)((cmd_buf[0] >> 32) & 0x1fff) / 4.0f);
-			snprintf(ym,     sizeof(ym),    "%4.4f", (float)((cmd_buf[0] >> 16) & 0x1fff) / 4.0f);
-			snprintf(yh,     sizeof(yh),    "%4.4f", (float)((cmd_buf[0] >>  0) & 0x1fff) / 4.0f);
-			snprintf(xl,     sizeof(xl),    "%4.4f", (float)int32_t(cmd_buf[1] >> 32) / 65536.0f);
-			snprintf(dxldy,  sizeof(dxldy), "%4.4f", (float)int32_t(cmd_buf[1])       / 65536.0f);
-			snprintf(xh,     sizeof(xh),    "%4.4f", (float)int32_t(cmd_buf[2] >> 32) / 65536.0f);
-			snprintf(dxhdy,  sizeof(dxhdy), "%4.4f", (float)int32_t(cmd_buf[2])       / 65536.0f);
-			snprintf(xm,     sizeof(xm),    "%4.4f", (float)int32_t(cmd_buf[3] >> 32) / 65536.0f);
-			snprintf(dxmdy,  sizeof(dxmdy), "%4.4f", (float)int32_t(cmd_buf[3])       / 65536.0f);
+			snprintf(yl,     std::size(yl),    "%4.4f", (float)((cmd_buf[0] >> 32) & 0x1fff) / 4.0f);
+			snprintf(ym,     std::size(ym),    "%4.4f", (float)((cmd_buf[0] >> 16) & 0x1fff) / 4.0f);
+			snprintf(yh,     std::size(yh),    "%4.4f", (float)((cmd_buf[0] >>  0) & 0x1fff) / 4.0f);
+			snprintf(xl,     std::size(xl),    "%4.4f", (float)int32_t(cmd_buf[1] >> 32) / 65536.0f);
+			snprintf(dxldy,  std::size(dxldy), "%4.4f", (float)int32_t(cmd_buf[1])       / 65536.0f);
+			snprintf(xh,     std::size(xh),    "%4.4f", (float)int32_t(cmd_buf[2] >> 32) / 65536.0f);
+			snprintf(dxhdy,  std::size(dxhdy), "%4.4f", (float)int32_t(cmd_buf[2])       / 65536.0f);
+			snprintf(xm,     std::size(xm),    "%4.4f", (float)int32_t(cmd_buf[3] >> 32) / 65536.0f);
+			snprintf(dxmdy,  std::size(dxmdy), "%4.4f", (float)int32_t(cmd_buf[3])       / 65536.0f);
 
-			snprintf(s,      sizeof(s),    "%4.4f", (float)int32_t( ((cmd_buf[4] >> 32) & 0xffff0000)        | ((cmd_buf[ 6] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(t,      sizeof(t),    "%4.4f", (float)int32_t((((cmd_buf[4] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 6] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(w,      sizeof(w),    "%4.4f", (float)int32_t(  (cmd_buf[4]        & 0xffff0000)        | ((cmd_buf[ 6] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dsdx,   sizeof(dsdx), "%4.4f", (float)int32_t( ((cmd_buf[5] >> 32) & 0xffff0000)        | ((cmd_buf[ 7] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dtdx,   sizeof(dtdx), "%4.4f", (float)int32_t((((cmd_buf[5] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 7] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dwdx,   sizeof(dwdx), "%4.4f", (float)int32_t(  (cmd_buf[5]        & 0xffff0000)        | ((cmd_buf[ 7] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dsde,   sizeof(dsde), "%4.4f", (float)int32_t( ((cmd_buf[8] >> 32) & 0xffff0000)        | ((cmd_buf[10] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dtde,   sizeof(dtde), "%4.4f", (float)int32_t((((cmd_buf[8] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[10] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dwde,   sizeof(dwde), "%4.4f", (float)int32_t(  (cmd_buf[8]        & 0xffff0000)        | ((cmd_buf[10] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dsdy,   sizeof(dsdy), "%4.4f", (float)int32_t( ((cmd_buf[9] >> 32) & 0xffff0000)        | ((cmd_buf[11] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dtdy,   sizeof(dtdy), "%4.4f", (float)int32_t((((cmd_buf[9] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[11] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dwdy,   sizeof(dwdy), "%4.4f", (float)int32_t(  (cmd_buf[9]        & 0xffff0000)        | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(s,      std::size(s),    "%4.4f", (float)int32_t( ((cmd_buf[4] >> 32) & 0xffff0000)        | ((cmd_buf[ 6] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(t,      std::size(t),    "%4.4f", (float)int32_t((((cmd_buf[4] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 6] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(w,      std::size(w),    "%4.4f", (float)int32_t(  (cmd_buf[4]        & 0xffff0000)        | ((cmd_buf[ 6] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dsdx,   std::size(dsdx), "%4.4f", (float)int32_t( ((cmd_buf[5] >> 32) & 0xffff0000)        | ((cmd_buf[ 7] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dtdx,   std::size(dtdx), "%4.4f", (float)int32_t((((cmd_buf[5] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 7] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dwdx,   std::size(dwdx), "%4.4f", (float)int32_t(  (cmd_buf[5]        & 0xffff0000)        | ((cmd_buf[ 7] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dsde,   std::size(dsde), "%4.4f", (float)int32_t( ((cmd_buf[8] >> 32) & 0xffff0000)        | ((cmd_buf[10] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dtde,   std::size(dtde), "%4.4f", (float)int32_t((((cmd_buf[8] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[10] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dwde,   std::size(dwde), "%4.4f", (float)int32_t(  (cmd_buf[8]        & 0xffff0000)        | ((cmd_buf[10] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dsdy,   std::size(dsdy), "%4.4f", (float)int32_t( ((cmd_buf[9] >> 32) & 0xffff0000)        | ((cmd_buf[11] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dtdy,   std::size(dtdy), "%4.4f", (float)int32_t((((cmd_buf[9] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[11] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dwdy,   std::size(dwdy), "%4.4f", (float)int32_t(  (cmd_buf[9]        & 0xffff0000)        | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f);
 
 			util::stream_format(buffer, "Tri_Tex               %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
 			buffer << "                              ";
@@ -1437,28 +1437,28 @@ std::string n64_rdp::disassemble(uint64_t *cmd_buf)
 		{
 			const int32_t lft = (cmd_buf[0] >> 55) & 0x1;
 
-			snprintf(yl,     sizeof(yl),    "%4.4f", (float)((cmd_buf[0] >> 32) & 0x1fff) / 4.0f);
-			snprintf(ym,     sizeof(ym),    "%4.4f", (float)((cmd_buf[0] >> 16) & 0x1fff) / 4.0f);
-			snprintf(yh,     sizeof(yh),    "%4.4f", (float)((cmd_buf[0] >>  0) & 0x1fff) / 4.0f);
-			snprintf(xl,     sizeof(xl),    "%4.4f", (float)int32_t(cmd_buf[1] >> 32) / 65536.0f);
-			snprintf(dxldy,  sizeof(dxldy), "%4.4f", (float)int32_t(cmd_buf[1])       / 65536.0f);
-			snprintf(xh,     sizeof(xh),    "%4.4f", (float)int32_t(cmd_buf[2] >> 32) / 65536.0f);
-			snprintf(dxhdy,  sizeof(dxhdy), "%4.4f", (float)int32_t(cmd_buf[2])       / 65536.0f);
-			snprintf(xm,     sizeof(xm),    "%4.4f", (float)int32_t(cmd_buf[3] >> 32) / 65536.0f);
-			snprintf(dxmdy,  sizeof(dxmdy), "%4.4f", (float)int32_t(cmd_buf[3])       / 65536.0f);
+			snprintf(yl,     std::size(yl),    "%4.4f", (float)((cmd_buf[0] >> 32) & 0x1fff) / 4.0f);
+			snprintf(ym,     std::size(ym),    "%4.4f", (float)((cmd_buf[0] >> 16) & 0x1fff) / 4.0f);
+			snprintf(yh,     std::size(yh),    "%4.4f", (float)((cmd_buf[0] >>  0) & 0x1fff) / 4.0f);
+			snprintf(xl,     std::size(xl),    "%4.4f", (float)int32_t(cmd_buf[1] >> 32) / 65536.0f);
+			snprintf(dxldy,  std::size(dxldy), "%4.4f", (float)int32_t(cmd_buf[1])       / 65536.0f);
+			snprintf(xh,     std::size(xh),    "%4.4f", (float)int32_t(cmd_buf[2] >> 32) / 65536.0f);
+			snprintf(dxhdy,  std::size(dxhdy), "%4.4f", (float)int32_t(cmd_buf[2])       / 65536.0f);
+			snprintf(xm,     std::size(xm),    "%4.4f", (float)int32_t(cmd_buf[3] >> 32) / 65536.0f);
+			snprintf(dxmdy,  std::size(dxmdy), "%4.4f", (float)int32_t(cmd_buf[3])       / 65536.0f);
 
-			snprintf(s,      sizeof(s),    "%4.4f", (float)int32_t( ((cmd_buf[4] >> 32) & 0xffff0000)        | ((cmd_buf[ 6] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(t,      sizeof(t),    "%4.4f", (float)int32_t((((cmd_buf[4] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 6] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(w,      sizeof(w),    "%4.4f", (float)int32_t(  (cmd_buf[4]        & 0xffff0000)        | ((cmd_buf[ 6] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dsdx,   sizeof(dsdx), "%4.4f", (float)int32_t( ((cmd_buf[5] >> 32) & 0xffff0000)        | ((cmd_buf[ 7] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dtdx,   sizeof(dtdx), "%4.4f", (float)int32_t((((cmd_buf[5] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 7] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dwdx,   sizeof(dwdx), "%4.4f", (float)int32_t(  (cmd_buf[5]        & 0xffff0000)        | ((cmd_buf[ 7] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dsde,   sizeof(dsde), "%4.4f", (float)int32_t( ((cmd_buf[8] >> 32) & 0xffff0000)        | ((cmd_buf[10] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dtde,   sizeof(dtde), "%4.4f", (float)int32_t((((cmd_buf[8] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[10] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dwde,   sizeof(dwde), "%4.4f", (float)int32_t(  (cmd_buf[8]        & 0xffff0000)        | ((cmd_buf[10] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dsdy,   sizeof(dsdy), "%4.4f", (float)int32_t( ((cmd_buf[9] >> 32) & 0xffff0000)        | ((cmd_buf[11] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dtdy,   sizeof(dtdy), "%4.4f", (float)int32_t((((cmd_buf[9] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[11] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dwdy,   sizeof(dwdy), "%4.4f", (float)int32_t(  (cmd_buf[9]        & 0xffff0000)        | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(s,      std::size(s),    "%4.4f", (float)int32_t( ((cmd_buf[4] >> 32) & 0xffff0000)        | ((cmd_buf[ 6] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(t,      std::size(t),    "%4.4f", (float)int32_t((((cmd_buf[4] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 6] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(w,      std::size(w),    "%4.4f", (float)int32_t(  (cmd_buf[4]        & 0xffff0000)        | ((cmd_buf[ 6] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dsdx,   std::size(dsdx), "%4.4f", (float)int32_t( ((cmd_buf[5] >> 32) & 0xffff0000)        | ((cmd_buf[ 7] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dtdx,   std::size(dtdx), "%4.4f", (float)int32_t((((cmd_buf[5] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 7] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dwdx,   std::size(dwdx), "%4.4f", (float)int32_t(  (cmd_buf[5]        & 0xffff0000)        | ((cmd_buf[ 7] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dsde,   std::size(dsde), "%4.4f", (float)int32_t( ((cmd_buf[8] >> 32) & 0xffff0000)        | ((cmd_buf[10] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dtde,   std::size(dtde), "%4.4f", (float)int32_t((((cmd_buf[8] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[10] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dwde,   std::size(dwde), "%4.4f", (float)int32_t(  (cmd_buf[8]        & 0xffff0000)        | ((cmd_buf[10] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dsdy,   std::size(dsdy), "%4.4f", (float)int32_t( ((cmd_buf[9] >> 32) & 0xffff0000)        | ((cmd_buf[11] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dtdy,   std::size(dtdy), "%4.4f", (float)int32_t((((cmd_buf[9] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[11] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dwdy,   std::size(dwdy), "%4.4f", (float)int32_t(  (cmd_buf[9]        & 0xffff0000)        | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f);
 
 			util::stream_format(buffer, "Tri_TexZ               %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
 			buffer << "                              ";
@@ -1475,32 +1475,32 @@ std::string n64_rdp::disassemble(uint64_t *cmd_buf)
 		{
 			const int32_t lft = (cmd_buf[0] >> 23) & 0x1;
 
-			snprintf(yl,     sizeof(yl),    "%4.4f", (float)((cmd_buf[0] >> 32) & 0x1fff) / 4.0f);
-			snprintf(ym,     sizeof(ym),    "%4.4f", (float)((cmd_buf[0] >> 16) & 0x1fff) / 4.0f);
-			snprintf(yh,     sizeof(yh),    "%4.4f", (float)((cmd_buf[0] >>  0) & 0x1fff) / 4.0f);
-			snprintf(xl,     sizeof(xl),    "%4.4f", (float)int32_t(cmd_buf[1] >> 32) / 65536.0f);
-			snprintf(dxldy,  sizeof(dxldy), "%4.4f", (float)int32_t(cmd_buf[1])       / 65536.0f);
-			snprintf(xh,     sizeof(xh),    "%4.4f", (float)int32_t(cmd_buf[2] >> 32) / 65536.0f);
-			snprintf(dxhdy,  sizeof(dxhdy), "%4.4f", (float)int32_t(cmd_buf[2])       / 65536.0f);
-			snprintf(xm,     sizeof(xm),    "%4.4f", (float)int32_t(cmd_buf[3] >> 32) / 65536.0f);
-			snprintf(dxmdy,  sizeof(dxmdy), "%4.4f", (float)int32_t(cmd_buf[3])       / 65536.0f);
+			snprintf(yl,     std::size(yl),    "%4.4f", (float)((cmd_buf[0] >> 32) & 0x1fff) / 4.0f);
+			snprintf(ym,     std::size(ym),    "%4.4f", (float)((cmd_buf[0] >> 16) & 0x1fff) / 4.0f);
+			snprintf(yh,     std::size(yh),    "%4.4f", (float)((cmd_buf[0] >>  0) & 0x1fff) / 4.0f);
+			snprintf(xl,     std::size(xl),    "%4.4f", (float)int32_t(cmd_buf[1] >> 32) / 65536.0f);
+			snprintf(dxldy,  std::size(dxldy), "%4.4f", (float)int32_t(cmd_buf[1])       / 65536.0f);
+			snprintf(xh,     std::size(xh),    "%4.4f", (float)int32_t(cmd_buf[2] >> 32) / 65536.0f);
+			snprintf(dxhdy,  std::size(dxhdy), "%4.4f", (float)int32_t(cmd_buf[2])       / 65536.0f);
+			snprintf(xm,     std::size(xm),    "%4.4f", (float)int32_t(cmd_buf[3] >> 32) / 65536.0f);
+			snprintf(dxmdy,  std::size(dxmdy), "%4.4f", (float)int32_t(cmd_buf[3])       / 65536.0f);
 
-			snprintf(rt,     sizeof(rt),   "%4.4f", (float)int32_t( ((cmd_buf[4] >> 32) & 0xffff0000)        | ((cmd_buf[ 6] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(gt,     sizeof(gt),   "%4.4f", (float)int32_t((((cmd_buf[4] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 6] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(bt,     sizeof(bt),   "%4.4f", (float)int32_t(  (cmd_buf[4]        & 0xffff0000)        | ((cmd_buf[ 6] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(at,     sizeof(at),   "%4.4f", (float)int32_t( ((cmd_buf[4]        & 0x0000ffff) << 16) | ( cmd_buf[ 6]        & 0xffff)) / 65536.0f);
-			snprintf(drdx,   sizeof(drdx), "%4.4f", (float)int32_t( ((cmd_buf[5] >> 32) & 0xffff0000)        | ((cmd_buf[ 7] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dgdx,   sizeof(dgdx), "%4.4f", (float)int32_t((((cmd_buf[5] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 7] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dbdx,   sizeof(dbdx), "%4.4f", (float)int32_t(  (cmd_buf[5]        & 0xffff0000)        | ((cmd_buf[ 7] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dadx,   sizeof(dadx), "%4.4f", (float)int32_t( ((cmd_buf[5]        & 0x0000ffff) << 16) | ( cmd_buf[ 7]        & 0xffff)) / 65536.0f);
-			snprintf(drde,   sizeof(drde), "%4.4f", (float)int32_t( ((cmd_buf[8] >> 32) & 0xffff0000)        | ((cmd_buf[10] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dgde,   sizeof(dgde), "%4.4f", (float)int32_t((((cmd_buf[8] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[10] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dbde,   sizeof(dbde), "%4.4f", (float)int32_t(  (cmd_buf[8]        & 0xffff0000)        | ((cmd_buf[10] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dade,   sizeof(dade), "%4.4f", (float)int32_t( ((cmd_buf[8]        & 0x0000ffff) << 16) | ( cmd_buf[10]        & 0xffff)) / 65536.0f);
-			snprintf(drdy,   sizeof(drdy), "%4.4f", (float)int32_t( ((cmd_buf[9] >> 32) & 0xffff0000)        | ((cmd_buf[11] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dgdy,   sizeof(dgdy), "%4.4f", (float)int32_t((((cmd_buf[9] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[11] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dbdy,   sizeof(dbdy), "%4.4f", (float)int32_t(  (cmd_buf[9]        & 0xffff0000)        | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dady,   sizeof(dady), "%4.4f", (float)int32_t( ((cmd_buf[9]        & 0x0000ffff) << 16) | ( cmd_buf[11]        & 0xffff)) / 65536.0f);
+			snprintf(rt,     std::size(rt),   "%4.4f", (float)int32_t( ((cmd_buf[4] >> 32) & 0xffff0000)        | ((cmd_buf[ 6] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(gt,     std::size(gt),   "%4.4f", (float)int32_t((((cmd_buf[4] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 6] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(bt,     std::size(bt),   "%4.4f", (float)int32_t(  (cmd_buf[4]        & 0xffff0000)        | ((cmd_buf[ 6] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(at,     std::size(at),   "%4.4f", (float)int32_t( ((cmd_buf[4]        & 0x0000ffff) << 16) | ( cmd_buf[ 6]        & 0xffff)) / 65536.0f);
+			snprintf(drdx,   std::size(drdx), "%4.4f", (float)int32_t( ((cmd_buf[5] >> 32) & 0xffff0000)        | ((cmd_buf[ 7] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dgdx,   std::size(dgdx), "%4.4f", (float)int32_t((((cmd_buf[5] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 7] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dbdx,   std::size(dbdx), "%4.4f", (float)int32_t(  (cmd_buf[5]        & 0xffff0000)        | ((cmd_buf[ 7] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dadx,   std::size(dadx), "%4.4f", (float)int32_t( ((cmd_buf[5]        & 0x0000ffff) << 16) | ( cmd_buf[ 7]        & 0xffff)) / 65536.0f);
+			snprintf(drde,   std::size(drde), "%4.4f", (float)int32_t( ((cmd_buf[8] >> 32) & 0xffff0000)        | ((cmd_buf[10] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dgde,   std::size(dgde), "%4.4f", (float)int32_t((((cmd_buf[8] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[10] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dbde,   std::size(dbde), "%4.4f", (float)int32_t(  (cmd_buf[8]        & 0xffff0000)        | ((cmd_buf[10] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dade,   std::size(dade), "%4.4f", (float)int32_t( ((cmd_buf[8]        & 0x0000ffff) << 16) | ( cmd_buf[10]        & 0xffff)) / 65536.0f);
+			snprintf(drdy,   std::size(drdy), "%4.4f", (float)int32_t( ((cmd_buf[9] >> 32) & 0xffff0000)        | ((cmd_buf[11] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dgdy,   std::size(dgdy), "%4.4f", (float)int32_t((((cmd_buf[9] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[11] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dbdy,   std::size(dbdy), "%4.4f", (float)int32_t(  (cmd_buf[9]        & 0xffff0000)        | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dady,   std::size(dady), "%4.4f", (float)int32_t( ((cmd_buf[9]        & 0x0000ffff) << 16) | ( cmd_buf[11]        & 0xffff)) / 65536.0f);
 
 			util::stream_format(buffer, "Tri_Shade              %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
 			buffer << "                              ";
@@ -1517,32 +1517,32 @@ std::string n64_rdp::disassemble(uint64_t *cmd_buf)
 		{
 			const int32_t lft = (cmd_buf[0] >> 23) & 0x1;
 
-			snprintf(yl,     sizeof(yl),    "%4.4f", (float)((cmd_buf[0] >> 32) & 0x1fff) / 4.0f);
-			snprintf(ym,     sizeof(ym),    "%4.4f", (float)((cmd_buf[0] >> 16) & 0x1fff) / 4.0f);
-			snprintf(yh,     sizeof(yh),    "%4.4f", (float)((cmd_buf[0] >>  0) & 0x1fff) / 4.0f);
-			snprintf(xl,     sizeof(xl),    "%4.4f", (float)int32_t(cmd_buf[1] >> 32) / 65536.0f);
-			snprintf(dxldy,  sizeof(dxldy), "%4.4f", (float)int32_t(cmd_buf[1])       / 65536.0f);
-			snprintf(xh,     sizeof(xh),    "%4.4f", (float)int32_t(cmd_buf[2] >> 32) / 65536.0f);
-			snprintf(dxhdy,  sizeof(dxhdy), "%4.4f", (float)int32_t(cmd_buf[2])       / 65536.0f);
-			snprintf(xm,     sizeof(xm),    "%4.4f", (float)int32_t(cmd_buf[3] >> 32) / 65536.0f);
-			snprintf(dxmdy,  sizeof(dxmdy), "%4.4f", (float)int32_t(cmd_buf[3])       / 65536.0f);
+			snprintf(yl,     std::size(yl),    "%4.4f", (float)((cmd_buf[0] >> 32) & 0x1fff) / 4.0f);
+			snprintf(ym,     std::size(ym),    "%4.4f", (float)((cmd_buf[0] >> 16) & 0x1fff) / 4.0f);
+			snprintf(yh,     std::size(yh),    "%4.4f", (float)((cmd_buf[0] >>  0) & 0x1fff) / 4.0f);
+			snprintf(xl,     std::size(xl),    "%4.4f", (float)int32_t(cmd_buf[1] >> 32) / 65536.0f);
+			snprintf(dxldy,  std::size(dxldy), "%4.4f", (float)int32_t(cmd_buf[1])       / 65536.0f);
+			snprintf(xh,     std::size(xh),    "%4.4f", (float)int32_t(cmd_buf[2] >> 32) / 65536.0f);
+			snprintf(dxhdy,  std::size(dxhdy), "%4.4f", (float)int32_t(cmd_buf[2])       / 65536.0f);
+			snprintf(xm,     std::size(xm),    "%4.4f", (float)int32_t(cmd_buf[3] >> 32) / 65536.0f);
+			snprintf(dxmdy,  std::size(dxmdy), "%4.4f", (float)int32_t(cmd_buf[3])       / 65536.0f);
 
-			snprintf(rt,     sizeof(rt),   "%4.4f", (float)int32_t( ((cmd_buf[4] >> 32) & 0xffff0000)        | ((cmd_buf[ 6] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(gt,     sizeof(gt),   "%4.4f", (float)int32_t((((cmd_buf[4] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 6] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(bt,     sizeof(bt),   "%4.4f", (float)int32_t(  (cmd_buf[4]        & 0xffff0000)        | ((cmd_buf[ 6] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(at,     sizeof(at),   "%4.4f", (float)int32_t( ((cmd_buf[4]        & 0x0000ffff) << 16) | ( cmd_buf[ 6]        & 0xffff)) / 65536.0f);
-			snprintf(drdx,   sizeof(drdx), "%4.4f", (float)int32_t( ((cmd_buf[5] >> 32) & 0xffff0000)        | ((cmd_buf[ 7] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dgdx,   sizeof(dgdx), "%4.4f", (float)int32_t((((cmd_buf[5] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 7] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dbdx,   sizeof(dbdx), "%4.4f", (float)int32_t(  (cmd_buf[5]        & 0xffff0000)        | ((cmd_buf[ 7] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dadx,   sizeof(dadx), "%4.4f", (float)int32_t( ((cmd_buf[5]        & 0x0000ffff) << 16) | ( cmd_buf[ 7]        & 0xffff)) / 65536.0f);
-			snprintf(drde,   sizeof(drde), "%4.4f", (float)int32_t( ((cmd_buf[8] >> 32) & 0xffff0000)        | ((cmd_buf[10] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dgde,   sizeof(dgde), "%4.4f", (float)int32_t((((cmd_buf[8] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[10] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dbde,   sizeof(dbde), "%4.4f", (float)int32_t(  (cmd_buf[8]        & 0xffff0000)        | ((cmd_buf[10] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dade,   sizeof(dade), "%4.4f", (float)int32_t( ((cmd_buf[8]        & 0x0000ffff) << 16) | ( cmd_buf[10]        & 0xffff)) / 65536.0f);
-			snprintf(drdy,   sizeof(drdy), "%4.4f", (float)int32_t( ((cmd_buf[9] >> 32) & 0xffff0000)        | ((cmd_buf[11] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dgdy,   sizeof(dgdy), "%4.4f", (float)int32_t((((cmd_buf[9] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[11] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dbdy,   sizeof(dbdy), "%4.4f", (float)int32_t(  (cmd_buf[9]        & 0xffff0000)        | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dady,   sizeof(dady), "%4.4f", (float)int32_t( ((cmd_buf[9]        & 0x0000ffff) << 16) | ( cmd_buf[11]        & 0xffff)) / 65536.0f);
+			snprintf(rt,     std::size(rt),   "%4.4f", (float)int32_t( ((cmd_buf[4] >> 32) & 0xffff0000)        | ((cmd_buf[ 6] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(gt,     std::size(gt),   "%4.4f", (float)int32_t((((cmd_buf[4] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 6] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(bt,     std::size(bt),   "%4.4f", (float)int32_t(  (cmd_buf[4]        & 0xffff0000)        | ((cmd_buf[ 6] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(at,     std::size(at),   "%4.4f", (float)int32_t( ((cmd_buf[4]        & 0x0000ffff) << 16) | ( cmd_buf[ 6]        & 0xffff)) / 65536.0f);
+			snprintf(drdx,   std::size(drdx), "%4.4f", (float)int32_t( ((cmd_buf[5] >> 32) & 0xffff0000)        | ((cmd_buf[ 7] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dgdx,   std::size(dgdx), "%4.4f", (float)int32_t((((cmd_buf[5] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 7] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dbdx,   std::size(dbdx), "%4.4f", (float)int32_t(  (cmd_buf[5]        & 0xffff0000)        | ((cmd_buf[ 7] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dadx,   std::size(dadx), "%4.4f", (float)int32_t( ((cmd_buf[5]        & 0x0000ffff) << 16) | ( cmd_buf[ 7]        & 0xffff)) / 65536.0f);
+			snprintf(drde,   std::size(drde), "%4.4f", (float)int32_t( ((cmd_buf[8] >> 32) & 0xffff0000)        | ((cmd_buf[10] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dgde,   std::size(dgde), "%4.4f", (float)int32_t((((cmd_buf[8] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[10] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dbde,   std::size(dbde), "%4.4f", (float)int32_t(  (cmd_buf[8]        & 0xffff0000)        | ((cmd_buf[10] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dade,   std::size(dade), "%4.4f", (float)int32_t( ((cmd_buf[8]        & 0x0000ffff) << 16) | ( cmd_buf[10]        & 0xffff)) / 65536.0f);
+			snprintf(drdy,   std::size(drdy), "%4.4f", (float)int32_t( ((cmd_buf[9] >> 32) & 0xffff0000)        | ((cmd_buf[11] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dgdy,   std::size(dgdy), "%4.4f", (float)int32_t((((cmd_buf[9] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[11] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dbdy,   std::size(dbdy), "%4.4f", (float)int32_t(  (cmd_buf[9]        & 0xffff0000)        | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dady,   std::size(dady), "%4.4f", (float)int32_t( ((cmd_buf[9]        & 0x0000ffff) << 16) | ( cmd_buf[11]        & 0xffff)) / 65536.0f);
 
 			util::stream_format(buffer, "Tri_ShadeZ              %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
 			buffer << "                              ";
@@ -1559,45 +1559,45 @@ std::string n64_rdp::disassemble(uint64_t *cmd_buf)
 		{
 			const int32_t lft = (cmd_buf[0] >> 23) & 0x1;
 
-			snprintf(yl,     sizeof(yl),    "%4.4f", (float)((cmd_buf[0] >> 32) & 0x1fff) / 4.0f);
-			snprintf(ym,     sizeof(ym),    "%4.4f", (float)((cmd_buf[0] >> 16) & 0x1fff) / 4.0f);
-			snprintf(yh,     sizeof(yh),    "%4.4f", (float)((cmd_buf[0] >>  0) & 0x1fff) / 4.0f);
-			snprintf(xl,     sizeof(xl),    "%4.4f", (float)int32_t(cmd_buf[1] >> 32) / 65536.0f);
-			snprintf(dxldy,  sizeof(dxldy), "%4.4f", (float)int32_t(cmd_buf[1])       / 65536.0f);
-			snprintf(xh,     sizeof(xh),    "%4.4f", (float)int32_t(cmd_buf[2] >> 32) / 65536.0f);
-			snprintf(dxhdy,  sizeof(dxhdy), "%4.4f", (float)int32_t(cmd_buf[2])       / 65536.0f);
-			snprintf(xm,     sizeof(xm),    "%4.4f", (float)int32_t(cmd_buf[3] >> 32) / 65536.0f);
-			snprintf(dxmdy,  sizeof(dxmdy), "%4.4f", (float)int32_t(cmd_buf[3])       / 65536.0f);
+			snprintf(yl,     std::size(yl),    "%4.4f", (float)((cmd_buf[0] >> 32) & 0x1fff) / 4.0f);
+			snprintf(ym,     std::size(ym),    "%4.4f", (float)((cmd_buf[0] >> 16) & 0x1fff) / 4.0f);
+			snprintf(yh,     std::size(yh),    "%4.4f", (float)((cmd_buf[0] >>  0) & 0x1fff) / 4.0f);
+			snprintf(xl,     std::size(xl),    "%4.4f", (float)int32_t(cmd_buf[1] >> 32) / 65536.0f);
+			snprintf(dxldy,  std::size(dxldy), "%4.4f", (float)int32_t(cmd_buf[1])       / 65536.0f);
+			snprintf(xh,     std::size(xh),    "%4.4f", (float)int32_t(cmd_buf[2] >> 32) / 65536.0f);
+			snprintf(dxhdy,  std::size(dxhdy), "%4.4f", (float)int32_t(cmd_buf[2])       / 65536.0f);
+			snprintf(xm,     std::size(xm),    "%4.4f", (float)int32_t(cmd_buf[3] >> 32) / 65536.0f);
+			snprintf(dxmdy,  std::size(dxmdy), "%4.4f", (float)int32_t(cmd_buf[3])       / 65536.0f);
 
-			snprintf(rt,     sizeof(rt),   "%4.4f", (float)int32_t( ((cmd_buf[4] >> 32) & 0xffff0000)        | ((cmd_buf[ 6] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(gt,     sizeof(gt),   "%4.4f", (float)int32_t((((cmd_buf[4] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 6] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(bt,     sizeof(bt),   "%4.4f", (float)int32_t(  (cmd_buf[4]        & 0xffff0000)        | ((cmd_buf[ 6] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(at,     sizeof(at),   "%4.4f", (float)int32_t( ((cmd_buf[4]        & 0x0000ffff) << 16) | ( cmd_buf[ 6]        & 0xffff)) / 65536.0f);
-			snprintf(drdx,   sizeof(drdx), "%4.4f", (float)int32_t( ((cmd_buf[5] >> 32) & 0xffff0000)        | ((cmd_buf[ 7] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dgdx,   sizeof(dgdx), "%4.4f", (float)int32_t((((cmd_buf[5] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 7] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dbdx,   sizeof(dbdx), "%4.4f", (float)int32_t(  (cmd_buf[5]        & 0xffff0000)        | ((cmd_buf[ 7] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dadx,   sizeof(dadx), "%4.4f", (float)int32_t( ((cmd_buf[5]        & 0x0000ffff) << 16) | ( cmd_buf[ 7]        & 0xffff)) / 65536.0f);
-			snprintf(drde,   sizeof(drde), "%4.4f", (float)int32_t( ((cmd_buf[8] >> 32) & 0xffff0000)        | ((cmd_buf[10] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dgde,   sizeof(dgde), "%4.4f", (float)int32_t((((cmd_buf[8] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[10] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dbde,   sizeof(dbde), "%4.4f", (float)int32_t(  (cmd_buf[8]        & 0xffff0000)        | ((cmd_buf[10] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dade,   sizeof(dade), "%4.4f", (float)int32_t( ((cmd_buf[8]        & 0x0000ffff) << 16) | ( cmd_buf[10]        & 0xffff)) / 65536.0f);
-			snprintf(drdy,   sizeof(drdy), "%4.4f", (float)int32_t( ((cmd_buf[9] >> 32) & 0xffff0000)        | ((cmd_buf[11] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dgdy,   sizeof(dgdy), "%4.4f", (float)int32_t((((cmd_buf[9] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[11] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dbdy,   sizeof(dbdy), "%4.4f", (float)int32_t(  (cmd_buf[9]        & 0xffff0000)        | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dady,   sizeof(dady), "%4.4f", (float)int32_t( ((cmd_buf[9]        & 0x0000ffff) << 16) | ( cmd_buf[11]        & 0xffff)) / 65536.0f);
+			snprintf(rt,     std::size(rt),   "%4.4f", (float)int32_t( ((cmd_buf[4] >> 32) & 0xffff0000)        | ((cmd_buf[ 6] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(gt,     std::size(gt),   "%4.4f", (float)int32_t((((cmd_buf[4] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 6] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(bt,     std::size(bt),   "%4.4f", (float)int32_t(  (cmd_buf[4]        & 0xffff0000)        | ((cmd_buf[ 6] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(at,     std::size(at),   "%4.4f", (float)int32_t( ((cmd_buf[4]        & 0x0000ffff) << 16) | ( cmd_buf[ 6]        & 0xffff)) / 65536.0f);
+			snprintf(drdx,   std::size(drdx), "%4.4f", (float)int32_t( ((cmd_buf[5] >> 32) & 0xffff0000)        | ((cmd_buf[ 7] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dgdx,   std::size(dgdx), "%4.4f", (float)int32_t((((cmd_buf[5] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 7] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dbdx,   std::size(dbdx), "%4.4f", (float)int32_t(  (cmd_buf[5]        & 0xffff0000)        | ((cmd_buf[ 7] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dadx,   std::size(dadx), "%4.4f", (float)int32_t( ((cmd_buf[5]        & 0x0000ffff) << 16) | ( cmd_buf[ 7]        & 0xffff)) / 65536.0f);
+			snprintf(drde,   std::size(drde), "%4.4f", (float)int32_t( ((cmd_buf[8] >> 32) & 0xffff0000)        | ((cmd_buf[10] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dgde,   std::size(dgde), "%4.4f", (float)int32_t((((cmd_buf[8] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[10] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dbde,   std::size(dbde), "%4.4f", (float)int32_t(  (cmd_buf[8]        & 0xffff0000)        | ((cmd_buf[10] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dade,   std::size(dade), "%4.4f", (float)int32_t( ((cmd_buf[8]        & 0x0000ffff) << 16) | ( cmd_buf[10]        & 0xffff)) / 65536.0f);
+			snprintf(drdy,   std::size(drdy), "%4.4f", (float)int32_t( ((cmd_buf[9] >> 32) & 0xffff0000)        | ((cmd_buf[11] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dgdy,   std::size(dgdy), "%4.4f", (float)int32_t((((cmd_buf[9] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[11] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dbdy,   std::size(dbdy), "%4.4f", (float)int32_t(  (cmd_buf[9]        & 0xffff0000)        | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dady,   std::size(dady), "%4.4f", (float)int32_t( ((cmd_buf[9]        & 0x0000ffff) << 16) | ( cmd_buf[11]        & 0xffff)) / 65536.0f);
 
-			snprintf(s,      sizeof(s),    "%4.4f", (float)int32_t( ((cmd_buf[4] >> 32) & 0xffff0000)        | ((cmd_buf[ 6] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(t,      sizeof(t),    "%4.4f", (float)int32_t((((cmd_buf[4] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 6] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(w,      sizeof(w),    "%4.4f", (float)int32_t(  (cmd_buf[4]        & 0xffff0000)        | ((cmd_buf[ 6] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dsdx,   sizeof(dsdx), "%4.4f", (float)int32_t( ((cmd_buf[5] >> 32) & 0xffff0000)        | ((cmd_buf[ 7] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dtdx,   sizeof(dtdx), "%4.4f", (float)int32_t((((cmd_buf[5] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 7] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dwdx,   sizeof(dwdx), "%4.4f", (float)int32_t(  (cmd_buf[5]        & 0xffff0000)        | ((cmd_buf[ 7] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dsde,   sizeof(dsde), "%4.4f", (float)int32_t( ((cmd_buf[8] >> 32) & 0xffff0000)        | ((cmd_buf[10] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dtde,   sizeof(dtde), "%4.4f", (float)int32_t((((cmd_buf[8] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[10] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dwde,   sizeof(dwde), "%4.4f", (float)int32_t(  (cmd_buf[8]        & 0xffff0000)        | ((cmd_buf[10] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dsdy,   sizeof(dsdy), "%4.4f", (float)int32_t( ((cmd_buf[9] >> 32) & 0xffff0000)        | ((cmd_buf[11] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dtdy,   sizeof(dtdy), "%4.4f", (float)int32_t((((cmd_buf[9] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[11] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dwdy,   sizeof(dwdy), "%4.4f", (float)int32_t(  (cmd_buf[9]        & 0xffff0000)        | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(s,      std::size(s),    "%4.4f", (float)int32_t( ((cmd_buf[4] >> 32) & 0xffff0000)        | ((cmd_buf[ 6] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(t,      std::size(t),    "%4.4f", (float)int32_t((((cmd_buf[4] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 6] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(w,      std::size(w),    "%4.4f", (float)int32_t(  (cmd_buf[4]        & 0xffff0000)        | ((cmd_buf[ 6] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dsdx,   std::size(dsdx), "%4.4f", (float)int32_t( ((cmd_buf[5] >> 32) & 0xffff0000)        | ((cmd_buf[ 7] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dtdx,   std::size(dtdx), "%4.4f", (float)int32_t((((cmd_buf[5] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 7] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dwdx,   std::size(dwdx), "%4.4f", (float)int32_t(  (cmd_buf[5]        & 0xffff0000)        | ((cmd_buf[ 7] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dsde,   std::size(dsde), "%4.4f", (float)int32_t( ((cmd_buf[8] >> 32) & 0xffff0000)        | ((cmd_buf[10] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dtde,   std::size(dtde), "%4.4f", (float)int32_t((((cmd_buf[8] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[10] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dwde,   std::size(dwde), "%4.4f", (float)int32_t(  (cmd_buf[8]        & 0xffff0000)        | ((cmd_buf[10] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dsdy,   std::size(dsdy), "%4.4f", (float)int32_t( ((cmd_buf[9] >> 32) & 0xffff0000)        | ((cmd_buf[11] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dtdy,   std::size(dtdy), "%4.4f", (float)int32_t((((cmd_buf[9] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[11] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dwdy,   std::size(dwdy), "%4.4f", (float)int32_t(  (cmd_buf[9]        & 0xffff0000)        | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f);
 
 			util::stream_format(buffer, "Tri_TexShade           %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
 			buffer << "                              ";
@@ -1623,45 +1623,45 @@ std::string n64_rdp::disassemble(uint64_t *cmd_buf)
 		{
 			const int32_t lft = (cmd_buf[0] >> 23) & 0x1;
 
-			snprintf(yl,     sizeof(yl),    "%4.4f", (float)((cmd_buf[0] >> 32) & 0x1fff) / 4.0f);
-			snprintf(ym,     sizeof(ym),    "%4.4f", (float)((cmd_buf[0] >> 16) & 0x1fff) / 4.0f);
-			snprintf(yh,     sizeof(yh),    "%4.4f", (float)((cmd_buf[0] >>  0) & 0x1fff) / 4.0f);
-			snprintf(xl,     sizeof(xl),    "%4.4f", (float)int32_t(cmd_buf[1] >> 32) / 65536.0f);
-			snprintf(dxldy,  sizeof(dxldy), "%4.4f", (float)int32_t(cmd_buf[1])       / 65536.0f);
-			snprintf(xh,     sizeof(xh),    "%4.4f", (float)int32_t(cmd_buf[2] >> 32) / 65536.0f);
-			snprintf(dxhdy,  sizeof(dxhdy), "%4.4f", (float)int32_t(cmd_buf[2])       / 65536.0f);
-			snprintf(xm,     sizeof(xm),    "%4.4f", (float)int32_t(cmd_buf[3] >> 32) / 65536.0f);
-			snprintf(dxmdy,  sizeof(dxmdy), "%4.4f", (float)int32_t(cmd_buf[3])       / 65536.0f);
+			snprintf(yl,     std::size(yl),    "%4.4f", (float)((cmd_buf[0] >> 32) & 0x1fff) / 4.0f);
+			snprintf(ym,     std::size(ym),    "%4.4f", (float)((cmd_buf[0] >> 16) & 0x1fff) / 4.0f);
+			snprintf(yh,     std::size(yh),    "%4.4f", (float)((cmd_buf[0] >>  0) & 0x1fff) / 4.0f);
+			snprintf(xl,     std::size(xl),    "%4.4f", (float)int32_t(cmd_buf[1] >> 32) / 65536.0f);
+			snprintf(dxldy,  std::size(dxldy), "%4.4f", (float)int32_t(cmd_buf[1])       / 65536.0f);
+			snprintf(xh,     std::size(xh),    "%4.4f", (float)int32_t(cmd_buf[2] >> 32) / 65536.0f);
+			snprintf(dxhdy,  std::size(dxhdy), "%4.4f", (float)int32_t(cmd_buf[2])       / 65536.0f);
+			snprintf(xm,     std::size(xm),    "%4.4f", (float)int32_t(cmd_buf[3] >> 32) / 65536.0f);
+			snprintf(dxmdy,  std::size(dxmdy), "%4.4f", (float)int32_t(cmd_buf[3])       / 65536.0f);
 
-			snprintf(rt,     sizeof(rt),   "%4.4f", (float)int32_t( ((cmd_buf[4] >> 32) & 0xffff0000)        | ((cmd_buf[ 6] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(gt,     sizeof(gt),   "%4.4f", (float)int32_t((((cmd_buf[4] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 6] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(bt,     sizeof(bt),   "%4.4f", (float)int32_t(  (cmd_buf[4]        & 0xffff0000)        | ((cmd_buf[ 6] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(at,     sizeof(at),   "%4.4f", (float)int32_t( ((cmd_buf[4]        & 0x0000ffff) << 16) | ( cmd_buf[ 6]        & 0xffff)) / 65536.0f);
-			snprintf(drdx,   sizeof(drdx), "%4.4f", (float)int32_t( ((cmd_buf[5] >> 32) & 0xffff0000)        | ((cmd_buf[ 7] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dgdx,   sizeof(dgdx), "%4.4f", (float)int32_t((((cmd_buf[5] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 7] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dbdx,   sizeof(dbdx), "%4.4f", (float)int32_t(  (cmd_buf[5]        & 0xffff0000)        | ((cmd_buf[ 7] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dadx,   sizeof(dadx), "%4.4f", (float)int32_t( ((cmd_buf[5]        & 0x0000ffff) << 16) | ( cmd_buf[ 7]        & 0xffff)) / 65536.0f);
-			snprintf(drde,   sizeof(drde), "%4.4f", (float)int32_t( ((cmd_buf[8] >> 32) & 0xffff0000)        | ((cmd_buf[10] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dgde,   sizeof(dgde), "%4.4f", (float)int32_t((((cmd_buf[8] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[10] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dbde,   sizeof(dbde), "%4.4f", (float)int32_t(  (cmd_buf[8]        & 0xffff0000)        | ((cmd_buf[10] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dade,   sizeof(dade), "%4.4f", (float)int32_t( ((cmd_buf[8]        & 0x0000ffff) << 16) | ( cmd_buf[10]        & 0xffff)) / 65536.0f);
-			snprintf(drdy,   sizeof(drdy), "%4.4f", (float)int32_t( ((cmd_buf[9] >> 32) & 0xffff0000)        | ((cmd_buf[11] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dgdy,   sizeof(dgdy), "%4.4f", (float)int32_t((((cmd_buf[9] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[11] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dbdy,   sizeof(dbdy), "%4.4f", (float)int32_t(  (cmd_buf[9]        & 0xffff0000)        | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dady,   sizeof(dady), "%4.4f", (float)int32_t( ((cmd_buf[9]        & 0x0000ffff) << 16) | ( cmd_buf[11]        & 0xffff)) / 65536.0f);
+			snprintf(rt,     std::size(rt),   "%4.4f", (float)int32_t( ((cmd_buf[4] >> 32) & 0xffff0000)        | ((cmd_buf[ 6] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(gt,     std::size(gt),   "%4.4f", (float)int32_t((((cmd_buf[4] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 6] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(bt,     std::size(bt),   "%4.4f", (float)int32_t(  (cmd_buf[4]        & 0xffff0000)        | ((cmd_buf[ 6] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(at,     std::size(at),   "%4.4f", (float)int32_t( ((cmd_buf[4]        & 0x0000ffff) << 16) | ( cmd_buf[ 6]        & 0xffff)) / 65536.0f);
+			snprintf(drdx,   std::size(drdx), "%4.4f", (float)int32_t( ((cmd_buf[5] >> 32) & 0xffff0000)        | ((cmd_buf[ 7] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dgdx,   std::size(dgdx), "%4.4f", (float)int32_t((((cmd_buf[5] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 7] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dbdx,   std::size(dbdx), "%4.4f", (float)int32_t(  (cmd_buf[5]        & 0xffff0000)        | ((cmd_buf[ 7] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dadx,   std::size(dadx), "%4.4f", (float)int32_t( ((cmd_buf[5]        & 0x0000ffff) << 16) | ( cmd_buf[ 7]        & 0xffff)) / 65536.0f);
+			snprintf(drde,   std::size(drde), "%4.4f", (float)int32_t( ((cmd_buf[8] >> 32) & 0xffff0000)        | ((cmd_buf[10] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dgde,   std::size(dgde), "%4.4f", (float)int32_t((((cmd_buf[8] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[10] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dbde,   std::size(dbde), "%4.4f", (float)int32_t(  (cmd_buf[8]        & 0xffff0000)        | ((cmd_buf[10] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dade,   std::size(dade), "%4.4f", (float)int32_t( ((cmd_buf[8]        & 0x0000ffff) << 16) | ( cmd_buf[10]        & 0xffff)) / 65536.0f);
+			snprintf(drdy,   std::size(drdy), "%4.4f", (float)int32_t( ((cmd_buf[9] >> 32) & 0xffff0000)        | ((cmd_buf[11] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dgdy,   std::size(dgdy), "%4.4f", (float)int32_t((((cmd_buf[9] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[11] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dbdy,   std::size(dbdy), "%4.4f", (float)int32_t(  (cmd_buf[9]        & 0xffff0000)        | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dady,   std::size(dady), "%4.4f", (float)int32_t( ((cmd_buf[9]        & 0x0000ffff) << 16) | ( cmd_buf[11]        & 0xffff)) / 65536.0f);
 
-			snprintf(s,      sizeof(s),    "%4.4f", (float)int32_t( ((cmd_buf[4] >> 32) & 0xffff0000)        | ((cmd_buf[ 6] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(t,      sizeof(t),    "%4.4f", (float)int32_t((((cmd_buf[4] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 6] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(w,      sizeof(w),    "%4.4f", (float)int32_t(  (cmd_buf[4]        & 0xffff0000)        | ((cmd_buf[ 6] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dsdx,   sizeof(dsdx), "%4.4f", (float)int32_t( ((cmd_buf[5] >> 32) & 0xffff0000)        | ((cmd_buf[ 7] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dtdx,   sizeof(dtdx), "%4.4f", (float)int32_t((((cmd_buf[5] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 7] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dwdx,   sizeof(dwdx), "%4.4f", (float)int32_t(  (cmd_buf[5]        & 0xffff0000)        | ((cmd_buf[ 7] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dsde,   sizeof(dsde), "%4.4f", (float)int32_t( ((cmd_buf[8] >> 32) & 0xffff0000)        | ((cmd_buf[10] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dtde,   sizeof(dtde), "%4.4f", (float)int32_t((((cmd_buf[8] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[10] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dwde,   sizeof(dwde), "%4.4f", (float)int32_t(  (cmd_buf[8]        & 0xffff0000)        | ((cmd_buf[10] >> 16) & 0xffff)) / 65536.0f);
-			snprintf(dsdy,   sizeof(dsdy), "%4.4f", (float)int32_t( ((cmd_buf[9] >> 32) & 0xffff0000)        | ((cmd_buf[11] >> 48) & 0xffff)) / 65536.0f);
-			snprintf(dtdy,   sizeof(dtdy), "%4.4f", (float)int32_t((((cmd_buf[9] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[11] >> 32) & 0xffff)) / 65536.0f);
-			snprintf(dwdy,   sizeof(dwdy), "%4.4f", (float)int32_t(  (cmd_buf[9]        & 0xffff0000)        | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(s,      std::size(s),    "%4.4f", (float)int32_t( ((cmd_buf[4] >> 32) & 0xffff0000)        | ((cmd_buf[ 6] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(t,      std::size(t),    "%4.4f", (float)int32_t((((cmd_buf[4] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 6] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(w,      std::size(w),    "%4.4f", (float)int32_t(  (cmd_buf[4]        & 0xffff0000)        | ((cmd_buf[ 6] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dsdx,   std::size(dsdx), "%4.4f", (float)int32_t( ((cmd_buf[5] >> 32) & 0xffff0000)        | ((cmd_buf[ 7] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dtdx,   std::size(dtdx), "%4.4f", (float)int32_t((((cmd_buf[5] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[ 7] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dwdx,   std::size(dwdx), "%4.4f", (float)int32_t(  (cmd_buf[5]        & 0xffff0000)        | ((cmd_buf[ 7] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dsde,   std::size(dsde), "%4.4f", (float)int32_t( ((cmd_buf[8] >> 32) & 0xffff0000)        | ((cmd_buf[10] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dtde,   std::size(dtde), "%4.4f", (float)int32_t((((cmd_buf[8] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[10] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dwde,   std::size(dwde), "%4.4f", (float)int32_t(  (cmd_buf[8]        & 0xffff0000)        | ((cmd_buf[10] >> 16) & 0xffff)) / 65536.0f);
+			snprintf(dsdy,   std::size(dsdy), "%4.4f", (float)int32_t( ((cmd_buf[9] >> 32) & 0xffff0000)        | ((cmd_buf[11] >> 48) & 0xffff)) / 65536.0f);
+			snprintf(dtdy,   std::size(dtdy), "%4.4f", (float)int32_t((((cmd_buf[9] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[11] >> 32) & 0xffff)) / 65536.0f);
+			snprintf(dwdy,   std::size(dwdy), "%4.4f", (float)int32_t(  (cmd_buf[9]        & 0xffff0000)        | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f);
 
 			util::stream_format(buffer, "Tri_TexShadeZ           %d, XL: %s, XM: %s, XH: %s, YL: %s, YM: %s, YH: %s\n", lft, xl,xm,xh,yl,ym,yh);
 			buffer << "                              ";
@@ -1686,10 +1686,10 @@ std::string n64_rdp::disassemble(uint64_t *cmd_buf)
 		case 0x24:
 		case 0x25:
 		{
-			snprintf(s,    sizeof(s), "%4.4f", (float)int16_t((cmd_buf[1] >> 48) & 0xffff) / 32.0f);
-			snprintf(t,    sizeof(t), "%4.4f", (float)int16_t((cmd_buf[1] >> 32) & 0xffff) / 32.0f);
-			snprintf(dsdx, sizeof(dsdx), "%4.4f", (float)int16_t((cmd_buf[1] >> 16) & 0xffff) / 1024.0f);
-			snprintf(dtdy, sizeof(dtdy), "%4.4f", (float)int16_t((cmd_buf[1] >>  0) & 0xffff) / 1024.0f);
+			snprintf(s,    std::size(s), "%4.4f", (float)int16_t((cmd_buf[1] >> 48) & 0xffff) / 32.0f);
+			snprintf(t,    std::size(t), "%4.4f", (float)int16_t((cmd_buf[1] >> 32) & 0xffff) / 32.0f);
+			snprintf(dsdx, std::size(dsdx), "%4.4f", (float)int16_t((cmd_buf[1] >> 16) & 0xffff) / 1024.0f);
+			snprintf(dtdy, std::size(dtdy), "%4.4f", (float)int16_t((cmd_buf[1] >>  0) & 0xffff) / 1024.0f);
 
 			if (command == 0x24)
 					util::stream_format(buffer, "Texture_Rectangle      %d, %s, %s, %s, %s,  %s, %s, %s, %s", tile, sh, th, sl, tl, s, t, dsdx, dtdy);
