@@ -36,15 +36,8 @@
 		#include <OpenGL/gl.h>
 		#include <OpenGL/glext.h>
 	#else
-	#include <SDL2/SDL_version.h>
-
-	#if (SDL_VERSION_ATLEAST(1,2,10))
-	#if defined(SDLMAME_WIN32)
-		// Avoid that winnt.h (included via sdl_opengl.h, windows.h, windef.h includes intrin.h
-		#define __INTRIN_H_
-	#endif
-	#include <SDL2/SDL_opengl.h>
-	#endif
+		#include <SDL2/SDL_version.h>
+		#include <SDL2/SDL_opengl.h>
 	#endif
 
 	class osd_gl_context
