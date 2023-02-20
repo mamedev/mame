@@ -25,6 +25,8 @@ void tmpz84c015_device::internal_io_map(address_map &map)
 	map(0xf0, 0xf0).mirror(0xff00).rw(FUNC(tmpz84c015_device::wdtmr_r), FUNC(tmpz84c015_device::wdtmr_w));
 	map(0xf1, 0xf1).mirror(0xff00).w(FUNC(tmpz84c015_device::wdtcr_w));
 	map(0xf4, 0xf4).mirror(0xff00).w(FUNC(tmpz84c015_device::irq_priority_w));
+	map(0xee, 0xee).mirror(0xff00).rw(FUNC(tmpz84c015_device::scrp_r), FUNC(tmpz84c015_device::scrp_w));
+	map(0xef, 0xef).mirror(0xff00).rw(FUNC(tmpz84c015_device::scdp_r), FUNC(tmpz84c015_device::scdp_w));
 }
 
 
@@ -113,6 +115,11 @@ void tmpz84c015_device::device_start()
 	m_out_pb_cb.resolve_safe();
 	m_out_brdy_cb.resolve_safe();
 
+	m_wcr = 0;
+	m_mwbr = 0;
+	m_csbr = 0;
+	m_mcr = 0;
+
 	m_wdtout_cb.resolve();
 
 	// setup watchdog timer
@@ -121,6 +128,11 @@ void tmpz84c015_device::device_start()
 	// register for save states
 	save_item(NAME(m_irq_priority));
 	save_item(NAME(m_wdtmr));
+	m_scrp;
+	m_wcr;
+	m_mwbr;
+	m_csbr;
+	m_mcr;
 }
 
 
@@ -131,6 +143,7 @@ void tmpz84c015_device::device_start()
 void tmpz84c015_device::device_reset()
 {
 	irq_priority_w(0);
+	scrp_w(0);
 	m_wdtmr = 0xfb;
 	watchdog_clear();
 
@@ -189,6 +202,29 @@ void tmpz84c015_device::irq_priority_w(uint8_t data)
 
 		m_irq_priority = data;
 	}
+}
+
+u8 tmpz84c015_device::scdp_r()
+{
+	if (m_scrp < 0x04)
+	{
+		const u8 regs[4] = { m_wcr, m_mwbr, m_csbr, m_mcr };
+		return regs[m_scrp];
+	}
+	else
+		return 0xff;
+}
+
+void tmpz84c015_device::scdp_w(u8 data)
+{
+	if (m_scrp == 0x00)
+		m_wcr = data;
+	else if (m_scrp == 0x01)
+		m_mwbr = data;
+	else if (m_scrp == 0x02)
+		m_csbr = data;
+	else if (m_scrp == 0x03)
+		m_mcr = data;
 }
 
 

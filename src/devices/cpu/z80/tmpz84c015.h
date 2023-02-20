@@ -134,6 +134,13 @@ private:
 	uint8_t m_wdtmr;
 	emu_timer *m_watchdog_timer;
 
+	// system control registers
+	u8 m_scrp;
+	u8 m_wcr;
+	u8 m_mwbr;
+	u8 m_csbr;
+	u8 m_mcr;
+
 	// callbacks
 	devcb_write_line m_out_txda_cb;
 	devcb_write_line m_out_dtra_cb;
@@ -171,6 +178,11 @@ private:
 	TIMER_CALLBACK_MEMBER(watchdog_timeout);
 
 	void irq_priority_w(uint8_t data);
+
+	u8 scrp_r() { return m_scrp; };
+	void scrp_w(u8 data) { m_scrp = data; };
+	u8 scdp_r();
+	void scdp_w(u8 data);
 
 	void internal_io_map(address_map &map);
 

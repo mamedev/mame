@@ -435,12 +435,6 @@ void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bi
 u8 sprinter_state::dcp_r(offs_t offset)
 {
 	if (m_starting) m_starting = 0;
-	if ((offset & 0xfe) == 0xee)
-	{
-		// TODO ee, ef z84 internal ports must be handled by cpu which is not implemented yet.
-		LOGIO("Skipped IO read %04X\n", offset);
-		return 0;
-	}
 
 	if (!machine().side_effects_disabled())
 	{
@@ -556,12 +550,8 @@ u8 sprinter_state::dcp_r(offs_t offset)
 
 void sprinter_state::dcp_w(offs_t offset, u8 data)
 {
-	if (((offset & 0xfe) == 0xee) || m_starting)
-	{
-		// see: dcp_r
-		LOGIO("Skipped IO write %04X = %02x\n", offset, data);
+	if (m_starting)
 		return;
-	}
 
 	do_cpu_wait(true);
 
@@ -1260,16 +1250,17 @@ void sprinter_state::on_kbd_data(int state)
 
 void sprinter_state::do_cpu_wait(bool is_io)
 {
-	const u8 count = is_io ? 4 : 3;
 	if ((m_turbo && m_turbo_hard))
 	{
+		const u8 count = is_io ? 4 : 3;
+		const bool is_overlap_started = !m_timer_overlap;
 		const u8 over = m_maincpu->total_cycles() % count;
 		m_timer_overlap += count + (over ? (count - over) : 0);
 		if (m_timer_overlap <= (m_maincpu->cycles_remaining() - count))
 		{
 			m_maincpu->adjust_icount(-m_timer_overlap);
 			m_timer_overlap = 0;
-		} else
+		} else if (is_overlap_started)
 			m_wait_on_timer->adjust(attotime::zero);
 	}
 }
