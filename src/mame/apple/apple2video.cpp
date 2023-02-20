@@ -314,7 +314,7 @@ void a2_video_device::render_line(uint16_t *out, uint16_t const *in, int startco
 		{
 		default:
 			color_mode = 0;
-			// fall through
+			[[fallthrough]];
 		case 0: case 1:
 			// Pixel-run coloring
 			render_line_artifact_color(out, in, startcol, stopcol, is_80_column, artifact_color_lut[color_mode]);
