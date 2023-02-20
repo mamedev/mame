@@ -1345,7 +1345,7 @@ namespace
 		// auto dxhdy = int32_t(cmd_buf[2]) / 65536.0f;
 		// auto dxmdy = int32_t(cmd_buf[3]) / 65536.0f;
 
-		return util::string_format("%-20s    %d, XL: %4.4f, XM: %4.4f, XH: %4.4f, YL: %4.4f, YM: %4.4f, YH: %4.4f\n", op_name, lft, xl, xm, xh, yl, ym, yh);
+		return util::string_format("%-20s   %d, XL: %4.4f, XM: %4.4f, XH: %4.4f, YL: %4.4f, YM: %4.4f, YH: %4.4f\n", op_name, lft, xl, xm, xh, yl, ym, yh);
 	}
 
 	std::string disassemble_rgb(const uint64_t *cmd_buf)
@@ -1368,13 +1368,13 @@ namespace
 		float dady = int32_t(((cmd_buf[9] & 0x0000ffff) << 16) | (cmd_buf[11] & 0xffff)) / 65536.0f;
 
 		std::ostringstream buffer;
-		buffer << "                              ";
+		buffer << "                             ";
 		util::stream_format(buffer, "                       R: %4.4f, G: %4.4f, B: %4.4f, A: %4.4f\n", rt, gt, bt, at);
-		buffer << "                              ";
+		buffer << "                             ";
 		util::stream_format(buffer, "                       DRDX: %4.4f, DGDX: %4.4f, DBDX: %4.4f, DADX: %4.4f\n", drdx, dgdx, dbdx, dadx);
-		buffer << "                              ";
+		buffer << "                             ";
 		util::stream_format(buffer, "                       DRDE: %4.4f, DGDE: %4.4f, DBDE: %4.4f, DADE: %4.4f\n", drde, dgde, dbde, dade);
-		buffer << "                              ";
+		buffer << "                             ";
 		util::stream_format(buffer, "                       DRDY: %4.4f, DGDY: %4.4f, DBDY: %4.4f, DADY: %4.4f\n", drdy, dgdy, dbdy, dady);
 		return std::move(buffer).str();
 	}
@@ -1395,19 +1395,19 @@ namespace
 		float dwdy = int32_t((cmd_buf[9] & 0xffff0000) | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f;
 
 		std::ostringstream buffer;
-		buffer << "                              ";
+		buffer << "                             ";
 		util::stream_format(buffer, "                       S: %4.4f, T: %4.4f, W: %4.4f\n", s, t, w);
-		buffer << "                              ";
+		buffer << "                             ";
 		util::stream_format(buffer, "                       DSDX: %4.4f, DTDX: %4.4f, DWDX: %4.4f\n", dsdx, dtdx, dwdx);
-		buffer << "                              ";
+		buffer << "                             ";
 		util::stream_format(buffer, "                       DSDE: %4.4f, DTDE: %4.4f, DWDE: %4.4f\n", dsde, dtde, dwde);
-		buffer << "                              ";
+		buffer << "                             ";
 		util::stream_format(buffer, "                       DSDY: %4.4f, DTDY: %4.4f, DWDY: %4.4f\n", dsdy, dtdy, dwdy);
 		return std::move(buffer).str();
 	}
 }
 
-std::string n64_rdp::disassemble(uint64_t *cmd_buf)
+std::string n64_rdp::disassemble(const uint64_t *cmd_buf)
 {
 	std::ostringstream buffer;
 
