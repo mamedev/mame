@@ -14,6 +14,7 @@
 #include <bgfx/bgfx.h>
 
 #include <cmath>
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
