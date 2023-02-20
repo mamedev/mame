@@ -12,7 +12,7 @@
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
  *   0    | yyyy yyyy yyyy yyyy xxxx xxxx xxxx xxxx | x/y position
  *   1    | YYYY YYYY YYYY YYYY XXXX XXXX XXXX XXXX | x/y zoom (*)
- *   2    | ---- -zzz zzzz zzzz ---- ---I cccc CCCC | Z-buffer value, 'Inline' chain flag, x/y chain
+ *   2    | ---- Szzz zzzz zzzz ---- ---I cccc CCCC | S = set on CPU car markers above cars (in roadedge) z = Z-buffer value, i = 'Inline' chain flag, cC = x/y chain
  *   3    | ---- ---- pppp pppp ---- ---- ---- ---- | palette entry
  *   4    | mmmm -cfF aggg tttt tttt tttt tttt tttt | mosaic factor, unknown (x1), checkerboard, flip bits, blend, group?, tile number
  *   5    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
@@ -22,8 +22,6 @@
  *  in (4) ggg seems to be either group, or priority against OTHER layers (7 being the lowest, 0 being the highest in normal situations eg most of the time in buriki)
  * 
  * (*) Fatal Fury WA standard elements are 0x1000-0x1000, all the other games sets 0x100-0x100, related to the bit 27 of sprite regs 0?
- * (**) setted by black squares in ranking screen in Samurai Shodown 64 1, sprite disable?
- * (***) bit 22 is setted on some Fatal Fury WA snow (not all of them), bit 21 is setted on Xrally how to play elements in attract mode
  ** Sprite Global Registers
  * -----------------------
  *

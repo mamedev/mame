@@ -2141,6 +2141,13 @@ TIMER_CALLBACK_MEMBER(hng64_state::comhack_callback)
 	// different network IDs give different default colours for the cars in roadedge
 	uint8_t network_id = 0x01;
 
+	// this fixes the stuck scroller text in the xrally intro (largest pink text) but prevents the inputs from working.
+	// It's probably trying to sync the scroller with another unit? however the original machines can run as singles
+	// if you loop some of the pins on the network connector back, so maybe MAME is just confused about the mode it's
+	// running in.
+	// network_id |= 0x08;
+
+
 	m_comhack[0] = m_comhack[0] | network_id;
 }
 
