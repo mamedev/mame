@@ -90,7 +90,7 @@ else \
 	cb++; \
 }
 
-inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect, gfx_element *gfx, u32 code, int flipx, int flipy, s32 destx, s32 desty, u32 scalex, u32 scaley, u32 trans_pen, u32 color, u32 zval, bool zrev, bool checkerboard)
+inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect, gfx_element *gfx, u32 code, int flipx, int flipy, s32 destx, s32 desty, s32 dx, s32 dy, u32 dstwidth, u32 dstheight, u32 trans_pen, u32 color, u32 zval, bool zrev, bool checkerboard)
 {
 	g_profiler.start(PROFILER_DRAWGFX);
 	do {
@@ -101,15 +101,8 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 		if (cliprect.empty())
 			break;
 
-		// compute scaled size
-		u32 dstwidth = (scalex * gfx->width() + 0x8000) >> 16;
-		u32 dstheight = (scaley * gfx->height() + 0x8000) >> 16;
 		if (dstwidth < 1 || dstheight < 1)
 			break;
-
-		// compute 16.16 source steps in dx and dy
-		s32 dx = (gfx->width() << 16) / dstwidth;
-		s32 dy = (gfx->height() << 16) / dstheight;
 
 		// compute final pixel in X and exit if we are entirely clipped
 		s32 destendx = destx + dstwidth - 1;
@@ -252,7 +245,7 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 
 void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
 		gfx_element *gfx, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		u32 scalex, u32 scaley, u32 trans_pen, u32 zval, bool zrev, bool blend, bool checkerboard)
+		s32 dx, s32 dy, u32 dstwidth, u32 dstheight, u32 trans_pen, u32 zval, bool zrev, bool blend, bool checkerboard)
 {
 	// use pen usage to optimize
 	code %= gfx->elements();
@@ -270,7 +263,7 @@ void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const r
 	if (blend)
 		color |= 0x8000;
 
-	drawgfxzoom_core(dest, destz, cliprect, gfx, code, flipx, flipy, destx, desty, scalex, scaley, trans_pen, color, zval, zrev, checkerboard);
+	drawgfxzoom_core(dest, destz, cliprect, gfx, code, flipx, flipy, destx, desty, dx, dy, dstwidth, dstheight, trans_pen, color, zval, zrev, checkerboard);
 }
 
 
@@ -328,15 +321,41 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 		if (!zoomx) zoomx = zoom_factor;
 		if (!zoomy) zoomy = zoom_factor;
 
-		/* First, prevent any possible divide by zero errors */
-		float foomX = (float)(zoom_factor) / (float)zoomx;
-		float foomY = (float)(zoom_factor) / (float)zoomy;
+		s32 dx, dy;
 
-		zoomx = ((int)foomX) << 16;
-		zoomy = ((int)foomY) << 16;
+		if (zoom_factor == 0x100)
+		{
+			dx = zoomx << 8;
+			dy = zoomy << 8;
+		}
+		else
+		{
+			dx = zoomx << 4;
+			dy = zoomy << 4;
+		}
 
-		zoomx += (int)((foomX - floor(foomX)) * (float)0x10000);
-		zoomy += (int)((foomY - floor(foomY)) * (float)0x10000);
+		uint32_t srcpix_x;
+		uint32_t srcpix_y;
+
+		// calculate the total height
+		uint32_t total_srcpix_y = 0;
+		uint32_t total_dstheight = 0;
+		do
+		{
+			total_srcpix_y += dy;
+			total_dstheight++;
+
+		} while (total_srcpix_y < (chainy * 0x100000));
+
+		// calculate the total width
+		uint32_t total_srcpix_x = 0;
+		uint32_t total_dstwidth = 0;
+		do
+		{
+			total_srcpix_x += dx;
+			total_dstwidth++;
+
+		} while (total_srcpix_x < (chainx * 0x100000));
 
 		if (m_spriteregs[0] & 0x00800000) //bpp switch
 		{
@@ -349,36 +368,46 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 			pal &= 0xf;
 		}
 
-		int xinc, yinc;
 		// Accommodate for chaining and flipping
 		if (xflip)
 		{
-			xinc = -(int)(16.0f * foomX);
-			xpos -= xinc * chainx;
-		}
-		else
-		{
-			xinc = (int)(16.0f * foomX);
+			xpos += total_dstwidth;
 		}
 
 		if (yflip)
 		{
-			yinc = -(int)(16.0f * foomY);
-			ypos -= yinc * chainy;
-		}
-		else
-		{
-			yinc = (int)(16.0f * foomY);
+			ypos += total_dstheight;
 		}
 
-
+		int16_t drawy = ypos;
+		srcpix_y = 0;
 		for (int ydrw = 0; ydrw <= chainy; ydrw++)
 		{
+			
+			uint32_t dstheight = 0;
+			do
+			{
+				srcpix_y += dy;
+				dstheight++;
+
+			} while (srcpix_y < 0x100000);
+			srcpix_y &= 0x0fffff;
+			
+
+			int16_t drawx = xpos;// +(xinc * xdrw);
+
 			for (int xdrw = 0; xdrw <= chainx; xdrw++)
 			{
-				int16_t drawx = xpos + (xinc * xdrw);
-				int16_t drawy = ypos + (yinc * ydrw);
+				
+				uint32_t dstwidth = 0;
+				do
+				{
+					srcpix_x += dx;
+					dstwidth++;
 
+				} while (srcpix_x < 0x100000);
+				srcpix_x &= 0x0fffff;
+				
 				// 0x3ff (0x200 sign bit) based on sams64_2 char select
 				drawx &= 0x3ff;
 				drawy &= 0x3ff;
@@ -388,13 +417,14 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 
 				if (!chaini)
 				{
-					zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, gfx, tileno, pal, xflip, yflip, drawx, drawy, zoomx, zoomy/*0x10000*/, 0, zval, zsort, blend, checkerboard);
+					zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, gfx, tileno, pal, xflip, yflip, drawx, drawy, dx, dy, dstwidth, dstheight, 0, zval, zsort, blend, checkerboard);
 					tileno++;
 				}
 				else // inline chain mode, used by ss64
 				{
 
 					tileno = (source[4] & 0x0007ffff);
+
 					pal = (source[3] & 0x00ff0000) >> 16;
 
 					if (m_spriteregs[0] & 0x00800000) //bpp switch
@@ -408,10 +438,22 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 						pal &= 0xf;
 					}
 
-					zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, gfx, tileno, pal, xflip, yflip, drawx, drawy, zoomx, zoomy/*0x10000*/, 0, zval, zsort, blend, checkerboard);
+					zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, gfx, tileno, pal, xflip, yflip, drawx, drawy, dx, dy, dstwidth, dstheight, 0, zval, zsort, blend, checkerboard);
 					source += 8;
 				}
+				
+				if (xflip)
+					drawx -= dstwidth;
+				else
+					drawx += dstwidth;
 			}
+
+			if (yflip)
+				drawy -= dstheight;
+			else
+				drawy += dstheight;
+
+			srcpix_x = 0;
 		}
 		if (!chaini)
 			source += 8;
