@@ -5,7 +5,7 @@ license:CC0-1.0
 -->
 <softwarelist name="chessking_cart" description="Chess King cartridges">
 
-	<software name="chn_dic">
+	<software name="dctionry">
 		<description>Yīnghàn Zìdiǎn Dictionary</description>
 		<year>1994</year>
 		<publisher>I-Star Co., Ltd.</publisher>
