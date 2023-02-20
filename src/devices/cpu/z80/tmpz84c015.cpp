@@ -128,11 +128,11 @@ void tmpz84c015_device::device_start()
 	// register for save states
 	save_item(NAME(m_irq_priority));
 	save_item(NAME(m_wdtmr));
-	m_scrp;
-	m_wcr;
-	m_mwbr;
-	m_csbr;
-	m_mcr;
+	save_item(NAME(m_scrp));
+	save_item(NAME(m_wcr));
+	save_item(NAME(m_mwbr));
+	save_item(NAME(m_csbr));
+	save_item(NAME(m_mcr));
 }
 
 
