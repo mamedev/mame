@@ -578,7 +578,7 @@ msgstr "摇杆饱和值"
 
 #: src/frontend/mame/ui/submenu.cpp:94
 msgid "Joystick threshold"
-msgstr ""
+msgstr "摇杆阈值"
 
 #: src/frontend/mame/ui/submenu.cpp:95
 msgid "Natural keyboard"
@@ -2834,7 +2834,7 @@ msgstr "类比输入调整"
 #, c-format
 msgctxt "menu-analoginput"
 msgid "Press %s to show settings"
-msgstr ""
+msgstr "按下 %s 显示设定"
 
 #: src/frontend/mame/ui/analogipt.cpp:245
 msgctxt "menu-analoginput"
@@ -5394,7 +5394,7 @@ msgstr "键盘"
 #: src/emu/inpttype.ipp:874
 msgctxt "input-name"
 msgid "Show/Hide Menu"
-msgstr ""
+msgstr "显示/隐藏菜单"
 
 #: src/emu/inpttype.ipp:875
 msgctxt "input-name"
@@ -5404,7 +5404,7 @@ msgstr "菜单 选定键"
 #: src/emu/inpttype.ipp:876
 msgctxt "input-name"
 msgid "UI Back"
-msgstr ""
+msgstr "菜单 返回"
 
 #: src/emu/inpttype.ipp:877
 msgctxt "input-name"
@@ -5419,7 +5419,7 @@ msgstr "菜单 清除键"
 #: src/emu/inpttype.ipp:879
 msgctxt "input-name"
 msgid "UI Help"
-msgstr ""
+msgstr "菜单 帮助"
 
 #: src/emu/inpttype.ipp:880
 msgctxt "input-name"
@@ -6535,14 +6535,6 @@ msgid ""
 msgstr ""
 "输入组合或按下 %s 取消\n"
 "%s"
-
-#, c-format
-#~ msgid "Press %s to show menu"
-#~ msgstr "按下 %s 显示菜单"
-
-#~ msgctxt "input-name"
-#~ msgid "Config Menu"
-#~ msgstr "组态菜单"
 
 #~ msgctxt "input-name"
 #~ msgid "UI Toggle"
