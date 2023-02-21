@@ -7098,9 +7098,8 @@ ROM_START( hachamf )
 	ROM_LOAD16_BYTE( "7.93",  0x00000, 0x20000, CRC(9d847c31) SHA1(1d370d8db9cadadb9c2cb213e32f681947d81b7f) ) // internally reports as 19th Sep. 1991
 	ROM_LOAD16_BYTE( "6.94",  0x00001, 0x20000, CRC(de6408a0) SHA1(2df77fecd44d2d8b0444abd4545923213ed76b2d) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // for the NMK-113 custom (a TMP90C041 MCU in disguise with internal program ROM)
-	ROM_LOAD( "1.70",    0x00000, 0x10000, CRC(9e6f48fc) SHA1(aeb5bfecc025b5478f6de874792fc0f7f54932be) )
-	ROM_LOAD( "nmk-113", 0x00000, 0x04000, NO_DUMP ) // internal ROM, maps over the first 0x4000 of the above external ROM
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // unknown  - sound CPU ??????
+	ROM_LOAD( "1.70",  0x00000, 0x10000, CRC(9e6f48fc) SHA1(aeb5bfecc025b5478f6de874792fc0f7f54932be) )
 
 	ROM_REGION( 0x020000, "fgtile", 0 )
 	ROM_LOAD( "5.95",  0x000000, 0x020000, CRC(29fb04a2) SHA1(9654b90a66d0e2a0f9cd369cab29cdd0c6f77869) )   // 8x8 tiles
@@ -7125,9 +7124,8 @@ ROM_START( hachamfa) // reportedly a Korean PCB / version
 	ROM_LOAD16_BYTE( "7.ic93",  0x00000, 0x20000, CRC(f437e52b) SHA1(061a75a7a9734034d1c499fc0bc2d8a61bb26da4) ) // internally reports as 19th Sep. 1991
 	ROM_LOAD16_BYTE( "6.ic94",  0x00001, 0x20000, CRC(60d340d0) SHA1(3c6f862901b403d6ddf58823af7d6e3f67573788) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // for the NMK-113 custom (a TMP90C041 MCU in disguise with internal program ROM)
-	ROM_LOAD( "1.70",    0x00000, 0x10000, CRC(9e6f48fc) SHA1(aeb5bfecc025b5478f6de874792fc0f7f54932be) )
-	ROM_LOAD( "nmk-113", 0x00000, 0x04000, NO_DUMP ) // internal ROM, maps over the first 0x4000 of the above external ROM
+	ROM_REGION( 0x10000, "audiocpu", 0 )        // unknown  - sound CPU ??????
+	ROM_LOAD( "1.70",  0x00000, 0x10000, CRC(9e6f48fc) SHA1(aeb5bfecc025b5478f6de874792fc0f7f54932be) )
 
 	ROM_REGION( 0x020000, "fgtile", 0 ) // Smaller NMK logo plus alternate  Distributed by UPL  Company Limited  starting at tile 0xF80
 	ROM_LOAD( "5.ic95",  0x000000, 0x020000, CRC(a2c1e25d) SHA1(cf09cbfd9afc7e3907fef6b26fb269b743f2e036) )   // 8x8 tiles
