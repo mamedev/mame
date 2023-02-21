@@ -381,12 +381,13 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info)
 	const u32 tile = (m_pf_data[Layer][tile_index * 2 + 0] << 16) | (m_pf_data[Layer][tile_index * 2 + 1] & 0xffff);
 	const u8 abtype = (tile >> (16 + 9)) & 1;
 	// tiles can be configured to use 4, 5, or 6 bpp data.
-	// if tiles use more than 4bpp, the bottom bits of the color code must be masked out.
-	// This fixes (at least) the rain in round 6 of Arabian Magic.
 	const u8 extra_planes = ((tile >> (16 + 10)) & 3); // 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp
 
-	// some games don't want this. maybe not bpp-based truncation?
-	// (landmakr win mes load to palette 0xBE, quizhuhu fade effects)
+	// FIXME: some (5bpp?) games need the bottom bits of the color code to be masked out.
+	// (mt00895 arabian magic stage 6 rain (color 0x105->104), mt01925 rayforce explosion, mt01917 rayforce ships, mt00900 kaiser knuckle azteca throw)
+	// however, there are (6bpp) cases which *don't* want any adjustment that this breaks:
+	// (quizhuhu fade palette 0x7, landmakrj win message palette 0xBE)
+	// special case until better understood.
 	if (m_game == LANDMAKR || m_game == QUIZHUHU)
 	{
 		tileinfo.set(3,
@@ -396,7 +397,8 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info)
 	}
 	else
 	{
-		tileinfo.set(3,tile & 0xffff,
+		tileinfo.set(3,
+				tile & 0xffff,
 				(tile >> 16) & 0x1ff & (~extra_planes),
 				TILE_FLIPYX(tile >> 30));
 	}
