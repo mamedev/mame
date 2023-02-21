@@ -1548,7 +1548,7 @@ ROM_START( jclub2bl )
 	ROM_LOAD32_WORD_SWAP( "154.4002", 0x00000, 0x80000, CRC(b892c254) SHA1(c1c31d878f41e4751048c07055d426803cd3332d) ) // 27 JUN. 1997
 	ROM_LOAD32_WORD_SWAP( "155.4002", 0x00002, 0x80000, CRC(3d9061c0) SHA1(efd2c8d742d3ac097f0228c2b71453b3261a6d83) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 ) // not dumped yet
+	ROM_REGION( 0x400000, "gfx1", 0 ) // not dumped yet, should be closer to the original (no Dark Horse GFX)
 	ROM_LOAD( "gfx1", 0x000000, 0x80000, BAD_DUMP CRC(e9fe9967) SHA1(a79d75c09f0eac6372de8d6e98c5eecf38ef750c) )
 	ROM_LOAD( "gfx2", 0x080000, 0x80000, BAD_DUMP CRC(0853c5c5) SHA1(2b49ffe607278817f1f8219a79f5906be53ee6f4) )
 	ROM_LOAD( "gfx3", 0x100000, 0x80000, BAD_DUMP CRC(6e89278f) SHA1(044c15e00ea95fd3f108fa916000a1000789c8e8) )
@@ -1613,4 +1613,4 @@ GAME( 1997, jclub2v205, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_
 GAME( 1998, jclub2v220, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.20X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // Bootleg hardware
 GAME( 2001, darkhors,   jclub2v112, darkhors, darkhors,   darkhors_state, init_darkhors, ROT0, "bootleg", "Dark Horse (USA v4.00, bootleg of Jockey Club II)",     MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2001, jclub2bl,   jclub2v112, darkhorsa,darkhors,   darkhors_state, init_darkhors, ROT0, "bootleg", "Jockey Club II (USA v4.00, bootleg)",                   MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, jclub2bl,   jclub2v112, darkhorsa,darkhors,   darkhors_state, init_darkhors, ROT0, "bootleg", "Jockey Club II (USA v4.00, bootleg)",                   MACHINE_IMPERFECT_GRAPHICS )

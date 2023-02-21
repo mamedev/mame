@@ -8,6 +8,7 @@
 #ifndef MAME_OSD_MODULES_MONITOR_MONITORMODULE_H
 #define MAME_OSD_MODULES_MONITOR_MONITORMODULE_H
 
+#include <cstdint>
 #include <vector>
 
 #include "modules/osdmodule.h"
