@@ -1579,6 +1579,8 @@ void taito_f3_state::calculate_clip(int y, u16 pri, u32 *clip0, u32 *clip1, int 
 	else
 		*clip1 = clipl | (clipr << 16);
 }
+#undef CALC_CLIP_INV
+#undef CALC_CLIP
 
 void taito_f3_state::get_spritealphaclip_info()
 {
