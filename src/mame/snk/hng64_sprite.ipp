@@ -395,6 +395,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 			
 
 			int16_t drawx = xpos;// +(xinc * xdrw);
+			srcpix_x = 0;
 
 			for (int xdrw = 0; xdrw <= chainx; xdrw++)
 			{
@@ -453,7 +454,6 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 			else
 				drawy += dstheight;
 
-			srcpix_x = 0;
 		}
 		if (!chaini)
 			source += 8;
