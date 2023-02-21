@@ -345,7 +345,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 			total_srcpix_y += dy;
 			total_dstheight++;
 
-		} while (total_srcpix_y < (chainy * 0x100000));
+		} while (total_srcpix_y < ((chainy+1) * 0x100000));
 
 		// calculate the total width
 		uint32_t total_srcpix_x = 0;
@@ -355,7 +355,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 			total_srcpix_x += dx;
 			total_dstwidth++;
 
-		} while (total_srcpix_x < (chainx * 0x100000));
+		} while (total_srcpix_x < ((chainx+1) * 0x100000));
 
 		if (m_spriteregs[0] & 0x00800000) //bpp switch
 		{
@@ -393,9 +393,11 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 			} while (srcpix_y < 0x100000);
 			srcpix_y &= 0x0fffff;
 			
-
-			int16_t drawx = xpos;// +(xinc * xdrw);
+			int16_t drawx = xpos;
 			srcpix_x = 0;
+
+			if (yflip)
+				drawy -= dstheight;
 
 			for (int xdrw = 0; xdrw <= chainx; xdrw++)
 			{
@@ -408,7 +410,10 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 
 				} while (srcpix_x < 0x100000);
 				srcpix_x &= 0x0fffff;
-				
+
+				if (xflip)
+					drawx -= dstwidth;
+
 				// 0x3ff (0x200 sign bit) based on sams64_2 char select
 				drawx &= 0x3ff;
 				drawy &= 0x3ff;
@@ -443,15 +448,11 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 					source += 8;
 				}
 				
-				if (xflip)
-					drawx -= dstwidth;
-				else
+				if (!xflip)
 					drawx += dstwidth;
 			}
 
-			if (yflip)
-				drawy -= dstheight;
-			else
+			if (!yflip)
 				drawy += dstheight;
 
 		}
