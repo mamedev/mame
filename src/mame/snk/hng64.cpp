@@ -2589,7 +2589,8 @@ void hng64_state::hng64_fight(machine_config &config)
 	ROM_REGION( 0x100, "eeprom", 0 ) /* EEPROMs on the I/O boards, mostly empty, currently not used by the emulation */ \
 	ROM_LOAD( "lvs-ioj-br9020f.u2", 0x000, 0x100, CRC(78b7020d) SHA1(2b8549532ef5e1e8102dbe71af55fdfb27ccbba6) ) \
 	ROM_LOAD( "lvs-igx-br9020f.u3", 0x000, 0x100, CRC(af9f4287) SHA1(6df0e35c77dbfee2fab7ff490dcd651db420e367) ) \
-	ROM_LOAD( "lvs-jam-br9020f.u3", 0x000, 0x100, CRC(dabec5d2) SHA1(19c5be89c57387d6ea563b3dc55674d0692af98e) )
+	ROM_LOAD( "lvs-jam-br9020f.u3", 0x000, 0x100, CRC(dabec5d2) SHA1(19c5be89c57387d6ea563b3dc55674d0692af98e) ) \
+	ROM_DEFAULT_BIOS( "export" )
 
 ROM_START( hng64 )
 	/* BIOS */
@@ -2937,6 +2938,13 @@ ROM_START( fatfurwa )
 	ROM_LOAD( "006sd02a.78", 0x0400000, 0x400000, CRC(f7f020c7) SHA1(b72fde4ff6384b80166a3cb67d31bf7afda750bc) )
 	ROM_LOAD( "006sd03a.79", 0x0800000, 0x400000, CRC(1a678084) SHA1(f52efb6145102d289f332d8341d89a5d231ba003) )
 	ROM_LOAD( "006sd04a.80", 0x0c00000, 0x400000, CRC(3c280a5c) SHA1(9d3fc78e18de45382878268db47ff9d9716f1505) )
+
+	/* this game does not initialize EEPROM automatically otherwise (each region requires different defaults) */
+	ROM_REGION( 0x4000, "nvram", 0 )
+	ROMX_LOAD( "default_nvram_japan",  0x00000, 0x4000, CRC(1f618d44) SHA1(c007c5f94b28b8c56c8c539d2f82336515c0ed84), ROM_BIOS(0) )
+	ROMX_LOAD( "default_nvram_usa",    0x00000, 0x4000, CRC(f139f4a5) SHA1(6f7e2fc5d902c1499f3c55f9ca2ef7becc49103b), ROM_BIOS(1) )
+	ROMX_LOAD( "default_nvram_others", 0x00000, 0x4000, CRC(bf1c3e4a) SHA1(454c6e5e505293bfdeb87d08e72420bba84c3b7b), ROM_BIOS(2) )
+	ROMX_LOAD( "default_nvram_korea",  0x00000, 0x4000, CRC(e8fb68df) SHA1(3170e7465b93319c0550f35f8906b5bdc5332eec), ROM_BIOS(3) )
 ROM_END
 
 
