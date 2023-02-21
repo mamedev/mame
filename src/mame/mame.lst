@@ -34193,6 +34193,8 @@ vandykejal2                     // UPL-90064 (c) Jaleco
 @source:nmk/nmkmedal.cpp
 drail                           // NTC / NMK
 hpierrot                        // NTC / NMK
+omatsuri                        // NMK
+sweethrt                        // NMK
 trocana                         // NTC / NMK
 
 @source:nmk/powerins.cpp
