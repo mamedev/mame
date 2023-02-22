@@ -26,6 +26,7 @@ class tmpz84c015_device : public z80_device
 {
 public:
 	tmpz84c015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
+	tmpz84c015_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t, address_map_constructor io_map);
 
 	// configuration helpers
 	template <int Channel> void set_clk_trg(u32 clock) { if (m_ctc) m_ctc->set_clk<Channel>(clock); else subdevice<z80ctc_device>(m_ctc.finder_tag())->set_clk<Channel>(clock); }
@@ -121,6 +122,7 @@ protected:
 
 	const address_space_config m_io_space_config;
 
+	virtual void internal_io_map(address_map &map);
 	virtual space_config_vector memory_space_config() const override;
 
 private:
@@ -133,13 +135,6 @@ private:
 	uint8_t m_irq_priority;
 	uint8_t m_wdtmr;
 	emu_timer *m_watchdog_timer;
-
-	// system control registers
-	u8 m_scrp;
-	u8 m_wcr;
-	u8 m_mwbr;
-	u8 m_csbr;
-	u8 m_mcr;
 
 	// callbacks
 	devcb_write_line m_out_txda_cb;
@@ -178,13 +173,6 @@ private:
 	TIMER_CALLBACK_MEMBER(watchdog_timeout);
 
 	void irq_priority_w(uint8_t data);
-
-	u8 scrp_r() { return m_scrp; };
-	void scrp_w(u8 data) { m_scrp = data; };
-	u8 scdp_r();
-	void scdp_w(u8 data);
-
-	void internal_io_map(address_map &map);
 
 	DECLARE_WRITE_LINE_MEMBER( out_txda_cb_trampoline_w ) { m_out_txda_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER( out_dtra_cb_trampoline_w ) { m_out_dtra_cb(state); }

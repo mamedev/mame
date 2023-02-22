@@ -19,7 +19,7 @@ Sprinter Sp2000 (Peters Plus Ltd)
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/z80/tmpz84c015.h"
+#include "cpu/z80/z84c015.h"
 #include "machine/ds128x.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -119,7 +119,7 @@ protected:
 	void screen_update_txt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_update_graph(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	required_device<tmpz84c015_device> m_maincpu;
+	required_device<z84c015_device> m_maincpu;
 	emu_timer *m_wait_on_timer = nullptr;
 	emu_timer *m_wait_off_timer = nullptr;
 
@@ -149,6 +149,7 @@ private:
 	u8 dcp_r(offs_t offset);
 	void dcp_w(offs_t offset, u8 data);
 
+	u8 cs_r(offs_t offset);
 	u8 ram_r(offs_t offset);
 	void ram_w(offs_t offset, u8 data);
 	void vram_w(offs_t offset, u8 data);
@@ -189,6 +190,7 @@ private:
 	u16 m_timer_overlap;
 	std::list<std::pair<u16, u16>> m_ints;
 
+	bool m_conf_loading;
 	bool m_starting;
 	bool m_dos; // 0-on, 1-off
 	bool m_cash_on;
@@ -236,6 +238,13 @@ private:
 
 void sprinter_state::update_memory()
 {
+	if (m_conf_loading && m_starting)
+	{
+		m_bank_view0.disable();
+		m_bank_view3.disable();
+		return;
+	}
+
 	const bool pre_rom = m_rom_sys || m_cash_on;
 	const bool pre_cash = !m_cash_on;
 	if (!pre_rom && pre_cash)
@@ -622,6 +631,10 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 	case 0x2b: // HDD2 - primary
 		m_ata_selected = 0;
 		break;
+	case 0x2e:
+		m_conf_loading = 1;
+		machine().schedule_soft_reset();
+		break;
 
 	case 0x88:
 		if (CBL_MODE)
@@ -909,17 +922,45 @@ void sprinter_state::update_accel_buffer(u8 idx, u8 data)
 	}
 }
 
+u8 sprinter_state::cs_r(offs_t offset)
+{
+	u8 data = 0xff;
+	if (m_maincpu->cs0_r(offset))
+	{
+		memory_region *rom = memregion("maincpu");
+		data = rom->base()[(0x0c << 14) + offset];
+	}
+	else if (m_maincpu->cs1_r(offset))
+	{
+		data = m_fastram.target()[offset];
+	}
+
+	return data;
+}
+
 u8 sprinter_state::ram_r(offs_t offset)
 {
-	const u8 bank = offset >> 14;
-	return ((m_pages[bank] & 0xf0) == 0x50)
-		? m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)]
-		: reinterpret_cast<u8 *>(m_bank_ram[bank]->base())[offset & 0x3fff];
+	if (m_conf_loading && m_starting)
+		return cs_r(offset);
+	else
+	{
+		const u8 bank = offset >> 14;
+		return ((m_pages[bank] & 0xf0) == 0x50)
+			? m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)]
+			: reinterpret_cast<u8 *>(m_bank_ram[bank]->base())[offset & 0x3fff];
+	}
 }
 
 void sprinter_state::ram_w(offs_t offset, u8 data)
 {
-	if (m_skip_write)
+	if (m_conf_loading && m_starting)
+	{
+		m_conf_loading = 0;
+		m_ram_pages[0x2e] = m_maincpu->cs1_r(0x1000) ? 0x41 : 0x00;
+		machine().schedule_soft_reset();
+		return;
+	}
+	else if (m_skip_write)
 	{
 		m_skip_write = false;
 		return;
@@ -1104,6 +1145,7 @@ void sprinter_state::machine_start()
 	save_item(NAME(m_pages));
 	save_item(NAME(m_z80_m1));
 	save_item(NAME(m_timer_overlap));
+	save_item(NAME(m_conf_loading));
 	save_item(NAME(m_starting));
 	save_item(NAME(m_dos));
 	save_item(NAME(m_cash_on));
@@ -1165,6 +1207,7 @@ void sprinter_state::machine_start()
 	m_port_y   = 0x00; // c4
 	m_rgmod    = 0x00; // c5
 	m_hold     = 0x77; // cb
+	m_conf_loading = 1;
 }
 
 void sprinter_state::machine_reset()
@@ -1336,7 +1379,7 @@ void sprinter_state::sprinter(machine_config &config)
 
 	m_ram->set_default_size("64M");
 
-	TMPZ84C015(config.replace(), m_maincpu, X_SP / 12); // 3.5MHz default
+	Z84C015(config.replace(), m_maincpu, X_SP / 12); // 3.5MHz default
 	m_maincpu->set_m1_map(&sprinter_state::map_fetch);
 	m_maincpu->set_memory_map(&sprinter_state::map_mem);
 	m_maincpu->set_io_map(&sprinter_state::map_io);
@@ -1350,9 +1393,9 @@ void sprinter_state::sprinter(machine_config &config)
 	PALETTE(config, "palette", FUNC(sprinter_state::sprinter_palette), 256 * 8);
 
 	PC_KBDC(config, m_kbd, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
-	m_kbd->out_data_cb().set(m_maincpu, FUNC(tmpz84c015_device::rxa_w)); // KBD_DATR
-	m_kbd->out_clock_cb().set(m_maincpu, FUNC(tmpz84c015_device::rxca_w)); // KBD_CLKR
-	m_kbd->out_clock_cb().append(m_maincpu, FUNC(tmpz84c015_device::txca_w));
+	m_kbd->out_data_cb().set(m_maincpu, FUNC(z84c015_device::rxa_w)); // KBD_DATR
+	m_kbd->out_clock_cb().set(m_maincpu, FUNC(z84c015_device::rxca_w)); // KBD_CLKR
+	m_kbd->out_clock_cb().append(m_maincpu, FUNC(z84c015_device::txca_w));
 	m_kbd->out_clock_cb().append(FUNC(sprinter_state::on_kbd_data));
 
 	m_maincpu->set_clk_trg<0>(X_SP / 48);
@@ -1363,11 +1406,11 @@ void sprinter_state::sprinter(machine_config &config)
 	m_rs232.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
 	m_rs232.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
 	m_rs232.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
-	m_rs232.rxd_handler().set(m_maincpu, FUNC(tmpz84c015_device::rxb_w)); // MOUSE_D
+	m_rs232.rxd_handler().set(m_maincpu, FUNC(z84c015_device::rxb_w)); // MOUSE_D
 	m_maincpu->out_txdb_callback().set("rs232", FUNC(rs232_port_device::write_txd)); // TXDB
-	m_maincpu->zc_callback<0>().set(m_maincpu, FUNC(tmpz84c015_device::rxcb_w)); // CLK_COM1
-	m_maincpu->zc_callback<0>().append(m_maincpu, FUNC(tmpz84c015_device::txcb_w));
-	m_maincpu->zc_callback<2>().set(m_maincpu, FUNC(tmpz84c015_device::trg3));
+	m_maincpu->zc_callback<0>().set(m_maincpu, FUNC(z84c015_device::rxcb_w)); // CLK_COM1
+	m_maincpu->zc_callback<0>().append(m_maincpu, FUNC(z84c015_device::txcb_w));
+	m_maincpu->zc_callback<2>().set(m_maincpu, FUNC(z84c015_device::trg3));
 
 	DS12885(config, m_rtc, XTAL(32'768)); // should be DS12887A
 	ATA_INTERFACE(config, m_ata[0]).options(sprinter_ata_devices, "hdd", "hdd", false);
