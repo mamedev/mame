@@ -58,7 +58,6 @@ public:
 	virtual void window_exit() override;
 
 	// sdl specific
-	void poll_inputs(running_machine &machine);
 	void release_keys();
 	bool should_hide_mouse();
 	void process_events_buf();

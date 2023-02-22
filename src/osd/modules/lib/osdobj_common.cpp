@@ -675,6 +675,14 @@ bool osd_common_t::input_init()
 	return true;
 }
 
+void osd_common_t::poll_input_modules()
+{
+	m_keyboard_input->poll_if_necessary();
+	m_mouse_input->poll_if_necessary();
+	m_lightgun_input->poll_if_necessary();
+	m_joystick_input->poll_if_necessary();
+}
+
 void osd_common_t::exit_subsystems()
 {
 	video_exit();

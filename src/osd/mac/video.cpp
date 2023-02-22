@@ -23,6 +23,8 @@
 #include "modules/lib/osdlib.h"
 #include "modules/monitor/monitor_module.h"
 
+extern void MacPollInputs(); // in windowcontroller.mm
+
 //============================================================
 //  CONSTANTS
 //============================================================
@@ -124,7 +126,8 @@ void mac_osd_interface::input_update()
 {
 	// poll the joystick values here
 	process_events_buf();
-	poll_inputs(machine());
+	MacPollInputs();
+	poll_input_modules();
 	check_osd_inputs(machine());
 }
 
