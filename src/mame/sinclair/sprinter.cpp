@@ -175,6 +175,7 @@ private:
 	required_ioport m_io_turbo;
 	required_device<device_palette_interface> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
+	memory_region *m_rom;
 	memory_share_creator<u8> m_vram;
 	memory_share_creator<u8> m_fastram;
 	memory_bank_creator m_bank0_fastram;
@@ -935,14 +936,9 @@ u8 sprinter_state::cs_r(offs_t offset)
 {
 	u8 data = 0xff;
 	if (m_maincpu->cs0_r(offset))
-	{
-		memory_region *rom = memregion("maincpu");
-		data = rom->base()[(0x0c << 14) + offset];
-	}
+		data = m_rom->as_u8((0x0c << 14) + offset);
 	else if (m_maincpu->cs1_r(offset))
-	{
 		data = m_fastram.target()[offset];
-	}
 
 	return data;
 }
@@ -1197,8 +1193,8 @@ void sprinter_state::machine_start()
 	m_beta->enable();
 
 	// reconfigure ROMs
-	memory_region *rom = memregion("maincpu");
-	m_bank_rom[0]->configure_entries(0, rom->bytes() / 0x4000, rom->base(), 0x4000);
+	m_rom = memregion("maincpu");
+	m_bank_rom[0]->configure_entries(0, m_rom->bytes() / 0x4000, m_rom->base(), 0x4000);
 	m_bank0_fastram->configure_entries(0, m_fastram.bytes() / 0x4000, m_fastram.target(), 0x4000);
 	for (auto i = 0; i < 4; i++)
 		m_bank_ram[i]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
