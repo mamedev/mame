@@ -146,6 +146,7 @@ public:
 	virtual void init(running_machine &machine) override;
 	virtual void update(bool skip_redraw) override;
 	virtual void input_update() override;
+	virtual void check_osd_inputs() override;
 
 	// input overridables
 	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) override;
@@ -189,8 +190,6 @@ private:
 
 	void process_window_event(SDL_Event const &event);
 	void process_textinput_event(SDL_Event const &event);
-
-	void check_osd_inputs();
 
 	bool mouse_over_window() const { return m_mouse_over_window > 0; }
 	template <typename T> sdl_window_info *focus_window(T const &event) const;

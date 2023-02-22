@@ -60,6 +60,7 @@ public:
 	virtual void init(running_machine &machine) override;
 	virtual void update(bool skip_redraw) override;
 	virtual void input_update() override;
+	virtual void check_osd_inputs() override;
 
 	// input overrideables
 	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) override;
@@ -91,8 +92,6 @@ public:
 protected:
 	virtual void build_slider_list() override;
 	virtual void update_slider_list() override;
-
-	void check_osd_inputs();
 
 private:
 	void process_events(bool ingame, bool nodispatch);
