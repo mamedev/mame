@@ -53,12 +53,14 @@ void m68000_device::do_post_run()
 
 u64 m68000_device::vpa_sync(offs_t, u64 current_time)
 {
+	if(m_last_vpa_time >= current_time)
+		return m_last_vpa_time;
 	u64 mod = current_time % 10;
 	if(mod < 7)
-		current_time = current_time - mod + 10;
+		m_last_vpa_time = current_time - mod + 10;
 	else
-		current_time = current_time - mod + 20;
-	return current_time;
+		m_last_vpa_time = current_time - mod + 20;
+	return m_last_vpa_time;
 }
 
 u32 m68000_device::vpa_after(offs_t)
@@ -223,6 +225,8 @@ void m68000_device::device_start()
 	save_item(NAME(m_t));
 	save_item(NAME(m_post_run));
 	save_item(NAME(m_post_run_cycles));
+	save_item(NAME(m_nmi_uses_generic));
+	save_item(NAME(m_last_vpa_time));
 
 	memset(m_da, 0, sizeof(m_da));
 	m_ipc = 0;
@@ -257,6 +261,8 @@ void m68000_device::device_start()
 	m_count_before_instruction_step = 0;
 	m_bcount = 0;
 	m_t = 0;
+	m_nmi_uses_generic = false;
+	m_last_vpa_time = 0;
 
 	state_add(STATE_GENPCBASE, "PC",  m_ipc).callimport();
 	state_add(STATE_GENPC,     "rPC", m_pc);
@@ -338,8 +344,12 @@ void m68000_device::update_user_super()
 
 void m68000_device::execute_set_input(int inputnum, int state)
 {
-	if(inputnum == INPUT_LINE_NMI)
+	if(inputnum == INPUT_LINE_NMI) {
 		inputnum = 7;
+		m_nmi_uses_generic = true;
+	} else if(inputnum == 7)
+		m_nmi_uses_generic = false;
+
 	if(inputnum > (m_interrupt_mixer ? 7 : 3))
 		return;
 
@@ -420,7 +430,7 @@ void m68000_device::start_interrupt_vector_lookup()
 
 	int level = m_next_state >> 24;
 	if(m_interrupt_mixer)
-		standard_irq_callback(level);
+		standard_irq_callback(level == 7 && m_nmi_uses_generic ? INPUT_LINE_NMI : level);
 	else {
 		for(int i=0; i<3; i++)
 			if(level & (1<<i))
