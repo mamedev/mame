@@ -298,7 +298,6 @@ void sdl_osd_interface::input_update()
 {
 	process_events_buf();
 	poll_input_modules();
-	check_osd_inputs();
 }
 
 

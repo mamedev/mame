@@ -397,7 +397,7 @@ class input_module_base : public osd_module, public input_module
 {
 private:
 	// 10 milliseconds polling interval
-	static constexpr inline unsigned MIN_POLLING_INTERVAL = 10;
+	static constexpr inline unsigned MIN_POLLING_INTERVAL = 2;
 
 	using clock_type = std::chrono::high_resolution_clock;
 	using timepoint_type =  std::chrono::time_point<std::chrono::high_resolution_clock>;
