@@ -218,7 +218,8 @@ void video_manager::frame_update(bool from_debugger)
 	bool const update_screens = (phase == machine_phase::RUNNING) && (!machine().paused() || machine().options().update_in_pause());
 	bool anything_changed = update_screens && finish_screen_updates();
 
-	// draw the user interface
+	// update inputs and draw the user interface
+	machine().osd().input_update();
 	emulator_info::draw_user_interface(machine());
 
 	// let plugins draw over the UI
@@ -245,9 +246,6 @@ void video_manager::frame_update(bool from_debugger)
 	// we synchronize after rendering instead of before, if low latency mode is enabled
 	if (!from_debugger && !skipped_it && phase > machine_phase::INIT && m_low_latency && effective_throttle())
 		update_throttle(current_time);
-
-	// get most recent input now
-	machine().osd().input_update();
 
 	emulator_info::periodic_check();
 
