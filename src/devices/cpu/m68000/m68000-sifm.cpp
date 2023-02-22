@@ -781,7 +781,6 @@ void m68000_device::state_interrupt_ifm()
 	m_base_ssw = SSW_CPU | SSW_R | SSW_N;
 	start_interrupt_vector_lookup();
 	m_edb = m_mmu->read_cpu(m_aob, 0xffff);
-	end_interrupt_vector_lookup();
 	m_icount -= 4;
 	if(m_icount <= m_bcount) {
 		if(access_to_be_redone()) {
@@ -791,6 +790,7 @@ void m68000_device::state_interrupt_ifm()
 			m_inst_substate = 4;
 		return;
 	}
+	end_interrupt_vector_lookup();
 	if(m_aob & 1) {
 		m_icount -= 4;
 		m_inst_state = S_ADDRESS_ERROR;

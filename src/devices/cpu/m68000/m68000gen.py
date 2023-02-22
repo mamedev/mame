@@ -2095,6 +2095,10 @@ def generate_source_from_code(code, gen_mode):
                     ssw += " | SSW_CRITICAL"
                 ssw += ";"
                 source.append(ssw)
+                is_interrupt_vector_lookup = not ci[4] and ci[2] == 2
+                if is_interrupt_vector_lookup:
+                    source.append("\tstart_interrupt_vector_lookup();")
+		    
                 if not (gen_mode & GEN.full):
                     source.append("\t[[fallthrough]]; case %d:" % (ci[1]))
                 if ci[4]:
@@ -2119,12 +2123,10 @@ def generate_source_from_code(code, gen_mode):
                 else:
                     if ci[2] == 2:
                         # cpu space access, e.g. interrupt vector lookup
-                        source.append("\tstart_interrupt_vector_lookup();")
                         if gen_mode & GEN.direct:
                             source.append("\tm_edb = m_cpu_space.read_interruptible(m_aob);")
                         else:
                             source.append("\tm_edb = m_mmu->read_cpu(m_aob, 0xffff);")
-                        source.append("\tend_interrupt_vector_lookup();")
                     elif ci[3]:
                         if gen_mode & GEN.direct:
                             source.append("\tm_edb = %s.read_interruptible(m_aob & ~1, m_aob & 1 ? 0x00ff : 0xff00);" % (["m_opcodes", "m_program"][ci[2]]))
@@ -2148,6 +2150,8 @@ def generate_source_from_code(code, gen_mode):
                 source.append("\t}")
                 if not (gen_mode & GEN.full):
                     source.append("\t[[fallthrough]]; case %d:" % (ci[1]+1))
+                if is_interrupt_vector_lookup:
+                    source.append("\tend_interrupt_vector_lookup();")
                 if not ci[3]:
                     source.append("\tif(m_aob & 1) {")
                     source.append("\t\tm_icount -= 4;")
