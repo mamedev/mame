@@ -319,7 +319,6 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 		uint32_t zoomx = (source[1] & 0x0000ffff) >> 0;
 
 		/* Calculate the zoom */
-		/* FIXME: regular zoom mode has precision bugs, can be easily seen in Samurai Shodown 64 intro */
 		int zoom_factor = (m_spriteregs[0] & 0x08000000) ? 0x1000 : 0x100;
 		if (!zoomx) zoomx = zoom_factor;
 		if (!zoomy) zoomy = zoom_factor;
