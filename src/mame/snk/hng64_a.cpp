@@ -89,10 +89,8 @@ void hng64_state::hng64_soundram_w(offs_t offset, uint32_t data, uint32_t mem_ma
 		if (offset==0x7ffff)
 		{
 			logerror("dumping sound program in m_soundram\n");
-			FILE *fp;
-			char filename[256];
-			sprintf(filename,"soundram_%s", machine().system().name);
-			fp=fopen(filename, "w+b");
+			auto filename = std::string{"soundram_"} + machine().system().name;
+			auto fp = fopen(filename.c_str(), "w+b");
 			if (fp)
 			{
 				fwrite((uint8_t*)m_soundram.get(), 0x80000*4, 1, fp);

@@ -3190,6 +3190,8 @@ if (BUSES["NES_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes_ctrl/4score.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/arkpaddle.cpp",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/arkpaddle.h",
+		MAME_DIR .. "src/devices/bus/nes_ctrl/bandaihs.cpp",
+		MAME_DIR .. "src/devices/bus/nes_ctrl/bandaihs.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/bcbattle.cpp",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/bcbattle.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/dorepiano.cpp",

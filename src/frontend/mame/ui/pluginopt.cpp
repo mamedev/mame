@@ -103,6 +103,9 @@ void menu_plugin_opt::handle(event const *ev)
 		case IPT_UI_CLEAR:
 			key = "clear";
 			break;
+		case IPT_UI_BACK:
+			key = "back";
+			break;
 		case IPT_UI_CANCEL:
 			key = "cancel";
 			break;
@@ -120,7 +123,7 @@ void menu_plugin_opt::handle(event const *ev)
 			set_selection(reinterpret_cast<void *>(uintptr_t(*result.second)));
 		if (result.first)
 			reset(reset_options::REMEMBER_REF);
-		else if (ev && (ev->iptkey == IPT_UI_CANCEL))
+		else if (ev && (ev->iptkey == IPT_UI_BACK))
 			stack_pop();
 	}
 }

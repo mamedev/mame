@@ -1,14 +1,14 @@
 # Brazilian Portuguese translation for the MAME Project.
 # Tradução pro Português Brasileiro para o Projeto MAME.
-# Copyright (C) 1997-2022  MAMEDev and contributors
+# Copyright (C) 1997-2023  MAMEDev and contributors
 # This file is distributed under the same license as the MAME Project.
-# Automatically generated, 2022.
+# Automatically generated, 2023.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: MAME 0.249\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-16 02:30+1100\n"
+"POT-Creation-Date: 2023-02-18 05:29+1100\n"
 "PO-Revision-Date: 2022-10-27 20:16-0300\n"
 "Last-Translator: Felipe <felipefplzx@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
@@ -38,7 +38,7 @@ msgstr ""
 "Este sistema requer que as imagens de mídia estejam montadas para os "
 "seguinte(s) dispositivo(s): "
 
-#: src/frontend/mame/ui/ui.cpp:1254
+#: src/frontend/mame/ui/ui.cpp:1275
 #, c-format
 msgid ""
 "UI controls enabled\n"
@@ -47,7 +47,7 @@ msgstr ""
 "Os controles da IU foram ativados\n"
 "Use o %1$s para alternar"
 
-#: src/frontend/mame/ui/ui.cpp:1256
+#: src/frontend/mame/ui/ui.cpp:1277
 #, c-format
 msgid ""
 "UI controls disabled\n"
@@ -56,185 +56,185 @@ msgstr ""
 "Os controles da IU foram desativados\n"
 "Use o %1$s para alternar"
 
-#: src/frontend/mame/ui/ui.cpp:1465
+#: src/frontend/mame/ui/ui.cpp:1486
 msgid "Master Volume"
 msgstr "Volume Mestre"
 
-#: src/frontend/mame/ui/ui.cpp:1474
+#: src/frontend/mame/ui/ui.cpp:1495
 #, c-format
 msgid "%1$s Volume"
 msgstr "Volume com %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1496
+#: src/frontend/mame/ui/ui.cpp:1517
 #, c-format
 msgid "Overclock CPU %1$s"
 msgstr "Overclock da CPU %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1504
+#: src/frontend/mame/ui/ui.cpp:1525
 #, c-format
 msgid "Overclock %1$s sound"
 msgstr "Overclock %1$s do áudio"
 
-#: src/frontend/mame/ui/ui.cpp:1523
+#: src/frontend/mame/ui/ui.cpp:1544
 #, c-format
 msgid "%1$s Refresh Rate"
 msgstr "Taxa de Atualização da %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1528
+#: src/frontend/mame/ui/ui.cpp:1549
 #, c-format
 msgid "%1$s Brightness"
 msgstr "Brilho da %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1530
+#: src/frontend/mame/ui/ui.cpp:1551
 #, c-format
 msgid "%1$s Contrast"
 msgstr "Contraste da %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1532
+#: src/frontend/mame/ui/ui.cpp:1553
 #, c-format
 msgid "%1$s Gamma"
 msgstr "Gama da %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1536
+#: src/frontend/mame/ui/ui.cpp:1557
 #, c-format
 msgid "%1$s Horiz Stretch"
 msgstr "Extensão Horizontal da %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1538
+#: src/frontend/mame/ui/ui.cpp:1559
 #, c-format
 msgid "%1$s Horiz Position"
 msgstr "Posição Horizontal da %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1540
+#: src/frontend/mame/ui/ui.cpp:1561
 #, c-format
 msgid "%1$s Vert Stretch"
 msgstr "Extensão Vertical da %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1542
+#: src/frontend/mame/ui/ui.cpp:1563
 #, c-format
 msgid "%1$s Vert Position"
 msgstr "Posição Vertical da %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1558
+#: src/frontend/mame/ui/ui.cpp:1579
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
 msgstr "Laserdisc '%1$s' Extensão Horizontal"
 
-#: src/frontend/mame/ui/ui.cpp:1561
+#: src/frontend/mame/ui/ui.cpp:1582
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
 msgstr "Laserdisc '%1$s' Posição Horizontal"
 
-#: src/frontend/mame/ui/ui.cpp:1563
+#: src/frontend/mame/ui/ui.cpp:1584
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
 msgstr "Laserdisc '%1$s' Extensão Vertical"
 
-#: src/frontend/mame/ui/ui.cpp:1566
+#: src/frontend/mame/ui/ui.cpp:1587
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
 msgstr "Laserdisc '%1$s' Posição Vertical"
 
-#: src/frontend/mame/ui/ui.cpp:1576
+#: src/frontend/mame/ui/ui.cpp:1597
 msgid "Vector Flicker"
 msgstr "Tremulação Vetorial"
 
-#: src/frontend/mame/ui/ui.cpp:1577
+#: src/frontend/mame/ui/ui.cpp:1598
 msgid "Beam Width Minimum"
 msgstr "Largura Mínima do Beam"
 
-#: src/frontend/mame/ui/ui.cpp:1578
+#: src/frontend/mame/ui/ui.cpp:1599
 msgid "Beam Width Maximum"
 msgstr "Largura Máxima do Beam"
 
-#: src/frontend/mame/ui/ui.cpp:1579
+#: src/frontend/mame/ui/ui.cpp:1600
 msgid "Beam Dot Size"
 msgstr "Tamanho do Ponto do Beam"
 
-#: src/frontend/mame/ui/ui.cpp:1580
+#: src/frontend/mame/ui/ui.cpp:1601
 msgid "Beam Intensity Weight"
 msgstr "Peso da Intensidade do Beam"
 
-#: src/frontend/mame/ui/ui.cpp:1593
+#: src/frontend/mame/ui/ui.cpp:1614
 #, c-format
 msgid "Crosshair Scale %1$s"
 msgstr "Escala da Mira da %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1593 src/frontend/mame/ui/ui.cpp:1595
+#: src/frontend/mame/ui/ui.cpp:1614 src/frontend/mame/ui/ui.cpp:1616
 msgid "X"
 msgstr "X"
 
-#: src/frontend/mame/ui/ui.cpp:1593 src/frontend/mame/ui/ui.cpp:1595
+#: src/frontend/mame/ui/ui.cpp:1614 src/frontend/mame/ui/ui.cpp:1616
 msgid "Y"
 msgstr "Y"
 
-#: src/frontend/mame/ui/ui.cpp:1595
+#: src/frontend/mame/ui/ui.cpp:1616
 #, c-format
 msgid "Crosshair Offset %1$s"
 msgstr "Deslocamento da Mira %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1623
+#: src/frontend/mame/ui/ui.cpp:1644
 #, c-format
 msgid "%1$3ddB"
 msgstr "%1$3ddB"
 
-#: src/frontend/mame/ui/ui.cpp:1666
+#: src/frontend/mame/ui/ui.cpp:1687
 #, c-format
 msgid "%1$d%%"
 msgstr "%1$d%%"
 
-#: src/frontend/mame/ui/ui.cpp:1681
+#: src/frontend/mame/ui/ui.cpp:1702
 #, c-format
 msgid "%1$3.0f%%"
 msgstr "%1$3.0f%%"
 
-#: src/frontend/mame/ui/ui.cpp:1704 src/frontend/mame/ui/ui.cpp:1724
-#: src/frontend/mame/ui/ui.cpp:1743 src/frontend/mame/ui/ui.cpp:1761
-#: src/frontend/mame/ui/ui.cpp:1780 src/frontend/mame/ui/ui.cpp:1799
-#: src/frontend/mame/ui/ui.cpp:1818 src/frontend/mame/ui/ui.cpp:1837
-#: src/frontend/mame/ui/ui.cpp:1858 src/frontend/mame/ui/ui.cpp:1879
-#: src/frontend/mame/ui/ui.cpp:1900 src/frontend/mame/ui/ui.cpp:1921
+#: src/frontend/mame/ui/ui.cpp:1725 src/frontend/mame/ui/ui.cpp:1745
+#: src/frontend/mame/ui/ui.cpp:1764 src/frontend/mame/ui/ui.cpp:1782
+#: src/frontend/mame/ui/ui.cpp:1801 src/frontend/mame/ui/ui.cpp:1820
+#: src/frontend/mame/ui/ui.cpp:1839 src/frontend/mame/ui/ui.cpp:1858
+#: src/frontend/mame/ui/ui.cpp:1879 src/frontend/mame/ui/ui.cpp:1900
+#: src/frontend/mame/ui/ui.cpp:1921 src/frontend/mame/ui/ui.cpp:1942
 #, c-format
 msgid "%1$.3f"
 msgstr "%1$.3f"
 
-#: src/frontend/mame/ui/ui.cpp:1936 src/frontend/mame/ui/ui.cpp:1951
-#: src/frontend/mame/ui/ui.cpp:1966 src/frontend/mame/ui/ui.cpp:1981
-#: src/frontend/mame/ui/ui.cpp:1996
+#: src/frontend/mame/ui/ui.cpp:1957 src/frontend/mame/ui/ui.cpp:1972
+#: src/frontend/mame/ui/ui.cpp:1987 src/frontend/mame/ui/ui.cpp:2002
+#: src/frontend/mame/ui/ui.cpp:2017
 #, c-format
 msgid "%1$1.2f"
 msgstr "%1$1.2f"
 
-#: src/frontend/mame/ui/ui.cpp:2012
+#: src/frontend/mame/ui/ui.cpp:2033
 #, c-format
 msgid "Crosshair Scale X %1$1.3f"
 msgstr "Escala da Mira X %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2012
+#: src/frontend/mame/ui/ui.cpp:2033
 #, c-format
 msgid "Crosshair Scale Y %1$1.3f"
 msgstr "Escala da Mira Y %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2029
+#: src/frontend/mame/ui/ui.cpp:2050
 #, c-format
 msgid "Crosshair Offset X %1$1.3f"
 msgstr "Deslocamento da Mira X %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2029
+#: src/frontend/mame/ui/ui.cpp:2050
 #, c-format
 msgid "Crosshair Offset Y %1$1.3f"
 msgstr "Deslocamento da Mira Y %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2116
+#: src/frontend/mame/ui/ui.cpp:2137
 msgid "**Error saving ui.ini**"
 msgstr "**Houve um erro ao salvar o ui.ini**"
 
-#: src/frontend/mame/ui/ui.cpp:2175
+#: src/frontend/mame/ui/ui.cpp:2196
 #, c-format
 msgid "**Error saving %s.ini**"
 msgstr "**Houve um erro ao salvar o %s.ini**"
 
-#: src/frontend/mame/ui/ui.cpp:2179 src/frontend/mame/ui/miscmenu.cpp:773
+#: src/frontend/mame/ui/ui.cpp:2200 src/frontend/mame/ui/miscmenu.cpp:773
 msgid ""
 "\n"
 "    Settings saved    \n"
@@ -244,7 +244,7 @@ msgstr ""
 "    Configurações salvas    \n"
 "\n"
 
-#: src/frontend/mame/ui/selsoft.cpp:487 src/frontend/mame/ui/selgame.cpp:298
+#: src/frontend/mame/ui/selsoft.cpp:510 src/frontend/mame/ui/selgame.cpp:318
 #, c-format
 msgid ""
 "%s\n"
@@ -253,8 +253,8 @@ msgstr ""
 "%s\n"
 " foi adicionado à lista de favoritos."
 
-#: src/frontend/mame/ui/selsoft.cpp:492 src/frontend/mame/ui/selgame.cpp:303
-#: src/frontend/mame/ui/selgame.cpp:309
+#: src/frontend/mame/ui/selsoft.cpp:515 src/frontend/mame/ui/selgame.cpp:323
+#: src/frontend/mame/ui/selgame.cpp:329
 #, c-format
 msgid ""
 "%s\n"
@@ -263,40 +263,40 @@ msgstr ""
 "%s\n"
 " foi removido da lista de favoritos."
 
-#: src/frontend/mame/ui/selsoft.cpp:525
+#: src/frontend/mame/ui/selsoft.cpp:576
 msgid "[Start empty]"
 msgstr "[Inicia vazio]"
 
-#: src/frontend/mame/ui/selsoft.cpp:525
+#: src/frontend/mame/ui/selsoft.cpp:576
 msgid "[Use file manager]"
 msgstr "[Use o gerenciador de arquivos]"
 
-#: src/frontend/mame/ui/selsoft.cpp:708
+#: src/frontend/mame/ui/selsoft.cpp:756
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
 msgstr "%1$s %2$s ( %3$d / %4$d pacotes do software )"
 
-#: src/frontend/mame/ui/selsoft.cpp:709
+#: src/frontend/mame/ui/selsoft.cpp:757
 #, c-format
 msgid "%1$s - select software"
 msgstr "%1$s - selecionar software"
 
-#: src/frontend/mame/ui/selsoft.cpp:714 src/frontend/mame/ui/selgame.cpp:1074
+#: src/frontend/mame/ui/selsoft.cpp:762 src/frontend/mame/ui/selgame.cpp:1092
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
 msgstr "%1$s: %2$s - Busca: %3$s_"
 
-#: src/frontend/mame/ui/selsoft.cpp:716 src/frontend/mame/ui/selgame.cpp:1076
+#: src/frontend/mame/ui/selsoft.cpp:764 src/frontend/mame/ui/selgame.cpp:1094
 #, c-format
 msgid "Search: %1$s_"
 msgstr "Busca: %1$s_"
 
-#: src/frontend/mame/ui/selsoft.cpp:723
+#: src/frontend/mame/ui/selsoft.cpp:771
 #, c-format
 msgid "Software list/item: %1$s:%2$s"
 msgstr "Lista/item do software: %1$s:%2$s"
 
-#: src/frontend/mame/ui/optsmenu.cpp:45 src/frontend/mame/ui/selgame.cpp:441
+#: src/frontend/mame/ui/optsmenu.cpp:45 src/frontend/mame/ui/selgame.cpp:462
 msgid "General Settings"
 msgstr "Configurações Gerais"
 
@@ -320,15 +320,15 @@ msgstr "Dispositivos de Entrada"
 msgid "Save Settings"
 msgstr "Salvar Configurações"
 
-#: src/frontend/mame/ui/optsmenu.cpp:185 src/frontend/mame/ui/optsmenu.cpp:227
+#: src/frontend/mame/ui/optsmenu.cpp:183 src/frontend/mame/ui/optsmenu.cpp:225
 msgid "System Filter"
 msgstr "Filtro do Sistema"
 
-#: src/frontend/mame/ui/optsmenu.cpp:197 src/frontend/mame/ui/custui.cpp:83
+#: src/frontend/mame/ui/optsmenu.cpp:195 src/frontend/mame/ui/custui.cpp:84
 msgid "Customize UI"
 msgstr "Personalizar a IU"
 
-#: src/frontend/mame/ui/optsmenu.cpp:198 src/frontend/mame/ui/dirmenu.cpp:535
+#: src/frontend/mame/ui/optsmenu.cpp:196 src/frontend/mame/ui/dirmenu.cpp:579
 msgid "Configure Folders"
 msgstr "Configurar Pastas"
 
@@ -336,41 +336,41 @@ msgstr "Configurar Pastas"
 msgid "Plugin Options"
 msgstr "Opções dos Plugins"
 
-#: src/frontend/mame/ui/filesel.cpp:221 src/frontend/mame/ui/swlist.cpp:89
-#: src/frontend/mame/ui/slotopt.cpp:221
+#: src/frontend/mame/ui/filesel.cpp:234 src/frontend/mame/ui/swlist.cpp:89
+#: src/frontend/mame/ui/slotopt.cpp:231
 msgid "[empty slot]"
 msgstr "[slot vazio]"
 
-#: src/frontend/mame/ui/filesel.cpp:225
+#: src/frontend/mame/ui/filesel.cpp:238
 msgid "[create]"
 msgstr "[cria]"
 
-#: src/frontend/mame/ui/filesel.cpp:229 src/frontend/mame/ui/swlist.cpp:100
+#: src/frontend/mame/ui/filesel.cpp:242 src/frontend/mame/ui/swlist.cpp:100
 msgid "[software list]"
 msgstr "[lista dos softwares]"
 
-#: src/frontend/mame/ui/filesel.cpp:285
+#: src/frontend/mame/ui/filesel.cpp:298
 #, c-format
 msgid "Error accessing %s"
 msgstr "Houve um erro ao acessar o %s"
 
-#: src/frontend/mame/ui/filesel.cpp:509
+#: src/frontend/mame/ui/filesel.cpp:519
 msgid "Select access mode"
 msgstr "Selecione o modo de acesso"
 
-#: src/frontend/mame/ui/filesel.cpp:510
+#: src/frontend/mame/ui/filesel.cpp:520
 msgid "Read-only"
 msgstr "Somente-leitura"
 
-#: src/frontend/mame/ui/filesel.cpp:512
+#: src/frontend/mame/ui/filesel.cpp:522
 msgid "Read-write"
 msgstr "Somente-gravação"
 
-#: src/frontend/mame/ui/filesel.cpp:513
+#: src/frontend/mame/ui/filesel.cpp:523
 msgid "Read this image, write to another image"
 msgstr "Ler esta imagem, gravar em outra imagem"
 
-#: src/frontend/mame/ui/filesel.cpp:514
+#: src/frontend/mame/ui/filesel.cpp:524
 msgid "Read this image, write to diff"
 msgstr "Ler esta imagem, gravar no diff"
 
@@ -583,145 +583,149 @@ msgid "Joystick saturation"
 msgstr "Saturação do joystick"
 
 #: src/frontend/mame/ui/submenu.cpp:94
+msgid "Joystick threshold"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:95
 msgid "Natural keyboard"
 msgstr "Teclado natural"
 
-#: src/frontend/mame/ui/submenu.cpp:95
+#: src/frontend/mame/ui/submenu.cpp:96
 msgid "Allow contradictory joystick inputs"
 msgstr "Permitir entradas contraditórias dos joysticks"
 
-#: src/frontend/mame/ui/submenu.cpp:96
+#: src/frontend/mame/ui/submenu.cpp:97
 msgid "Coin impulse"
 msgstr "Impulso da ficha"
 
-#: src/frontend/mame/ui/submenu.cpp:102
+#: src/frontend/mame/ui/submenu.cpp:103
 msgid "Input Device Options"
 msgstr "Opções dos Dispositivo de Entrada"
 
-#: src/frontend/mame/ui/submenu.cpp:103
+#: src/frontend/mame/ui/submenu.cpp:104
 msgid "Lightgun Device Assignment"
 msgstr "Atribuição do Dispositivo Lightgun"
 
-#: src/frontend/mame/ui/submenu.cpp:104
+#: src/frontend/mame/ui/submenu.cpp:105
 msgid "Trackball Device Assignment"
 msgstr "Atribuição do Dispositivo Trackball"
 
-#: src/frontend/mame/ui/submenu.cpp:105
+#: src/frontend/mame/ui/submenu.cpp:106
 msgid "Pedal Device Assignment"
 msgstr "Atribuição do Dispositivo Pedal"
 
-#: src/frontend/mame/ui/submenu.cpp:106
+#: src/frontend/mame/ui/submenu.cpp:107
 msgid "AD Stick Device Assignment"
 msgstr "Atribuição do dispositivo alavanca AD"
 
-#: src/frontend/mame/ui/submenu.cpp:107
+#: src/frontend/mame/ui/submenu.cpp:108
 msgid "Paddle Device Assignment"
 msgstr "Atribuição do Dispositivo Paddle"
 
-#: src/frontend/mame/ui/submenu.cpp:108
+#: src/frontend/mame/ui/submenu.cpp:109
 msgid "Dial Device Assignment"
 msgstr "Atribuição do Dispositivo Dial"
 
-#: src/frontend/mame/ui/submenu.cpp:109
+#: src/frontend/mame/ui/submenu.cpp:110
 msgid "Positional Device Assignment"
 msgstr "Atribuição do Dispositivo Posicional"
 
-#: src/frontend/mame/ui/submenu.cpp:110
+#: src/frontend/mame/ui/submenu.cpp:111
 msgid "Mouse Device Assignment"
 msgstr "Atribuição do Dispositivo Mouse"
 
-#: src/frontend/mame/ui/submenu.cpp:112
+#: src/frontend/mame/ui/submenu.cpp:113
 msgid "Keyboard Input Provider"
 msgstr "Fornecedor de Entrada do Teclado"
 
-#: src/frontend/mame/ui/submenu.cpp:113
+#: src/frontend/mame/ui/submenu.cpp:114
 msgid "Mouse Input Provider"
 msgstr "Fornecedor de Entrada do Mouse"
 
-#: src/frontend/mame/ui/submenu.cpp:114
+#: src/frontend/mame/ui/submenu.cpp:115
 msgid "Lightgun Input Provider"
 msgstr "Fornecedor de Entrada da Lightgun"
 
-#: src/frontend/mame/ui/submenu.cpp:115
+#: src/frontend/mame/ui/submenu.cpp:116
 msgid "Joystick Input Provider"
 msgstr "Fornecedor de Entrada do Joystick"
 
-#: src/frontend/mame/ui/submenu.cpp:121 src/frontend/mame/ui/videoopt.cpp:42
+#: src/frontend/mame/ui/submenu.cpp:122 src/frontend/mame/ui/videoopt.cpp:42
 msgid "Video Options"
 msgstr "Opções de Vídeo"
 
-#: src/frontend/mame/ui/submenu.cpp:122
+#: src/frontend/mame/ui/submenu.cpp:123
 msgid "Video Mode"
 msgstr "Modo de Vídeo"
 
-#: src/frontend/mame/ui/submenu.cpp:123
+#: src/frontend/mame/ui/submenu.cpp:124
 msgid "Number Of Screens"
 msgstr "Número de Telas"
 
-#: src/frontend/mame/ui/submenu.cpp:125
+#: src/frontend/mame/ui/submenu.cpp:126
 msgid "Triple Buffering"
 msgstr "Triplo Buffering"
 
-#: src/frontend/mame/ui/submenu.cpp:126
+#: src/frontend/mame/ui/submenu.cpp:127
 msgid "HLSL"
 msgstr "HLSL"
 
-#: src/frontend/mame/ui/submenu.cpp:128
+#: src/frontend/mame/ui/submenu.cpp:129
 msgid "GLSL"
 msgstr "GLSL"
 
-#: src/frontend/mame/ui/submenu.cpp:129
+#: src/frontend/mame/ui/submenu.cpp:130
 msgid "Bilinear Filtering"
 msgstr "Filtragem Bilinear"
 
-#: src/frontend/mame/ui/submenu.cpp:130
+#: src/frontend/mame/ui/submenu.cpp:131
 msgid "Bitmap Prescaling"
 msgstr "Pré-dimensionamento do Bitmap"
 
-#: src/frontend/mame/ui/submenu.cpp:131
+#: src/frontend/mame/ui/submenu.cpp:132
 msgid "Window Mode"
 msgstr "Modo Janela"
 
-#: src/frontend/mame/ui/submenu.cpp:132
+#: src/frontend/mame/ui/submenu.cpp:133
 msgid "Enforce Aspect Ratio"
 msgstr "Forçar a Proporção do Aspecto"
 
-#: src/frontend/mame/ui/submenu.cpp:133
+#: src/frontend/mame/ui/submenu.cpp:134
 msgid "Start Out Maximized"
 msgstr "Iniciar Maximizado"
 
-#: src/frontend/mame/ui/submenu.cpp:134
+#: src/frontend/mame/ui/submenu.cpp:135
 msgid "Synchronized Refresh"
 msgstr "Atualização Sincronizada"
 
-#: src/frontend/mame/ui/submenu.cpp:135
+#: src/frontend/mame/ui/submenu.cpp:136
 msgid "Wait Vertical Sync"
 msgstr "Aguardar Sincronização Vertical"
 
-#: src/frontend/mame/ui/menu.cpp:364 src/frontend/mame/ui/menu.cpp:722
+#: src/frontend/mame/ui/menu.cpp:372 src/frontend/mame/ui/menu.cpp:738
 #: src/frontend/mame/ui/videoopt.cpp:169
-#: src/frontend/mame/ui/inputtoggle.cpp:96 src/frontend/mame/ui/custui.cpp:480
-#: src/frontend/mame/ui/analogipt.cpp:478 plugins/cheatfind/init.lua:766
+#: src/frontend/mame/ui/inputtoggle.cpp:96 src/frontend/mame/ui/custui.cpp:488
+#: src/frontend/mame/ui/analogipt.cpp:527 plugins/cheatfind/init.lua:766
 #: plugins/cheatfind/init.lua:777 plugins/cheat/init.lua:679
 msgid "On"
 msgstr "Ligado"
 
-#: src/frontend/mame/ui/menu.cpp:364 src/frontend/mame/ui/menu.cpp:725
+#: src/frontend/mame/ui/menu.cpp:372 src/frontend/mame/ui/menu.cpp:741
 #: src/frontend/mame/ui/videoopt.cpp:185
-#: src/frontend/mame/ui/inputtoggle.cpp:91 src/frontend/mame/ui/custui.cpp:480
-#: src/frontend/mame/ui/analogipt.cpp:478 plugins/cheatfind/init.lua:763
+#: src/frontend/mame/ui/inputtoggle.cpp:91 src/frontend/mame/ui/custui.cpp:488
+#: src/frontend/mame/ui/analogipt.cpp:527 plugins/cheatfind/init.lua:763
 #: plugins/cheatfind/init.lua:774 plugins/cheat/init.lua:682
 #: plugins/cheat/init.lua:691
 msgid "Off"
 msgstr "Desligado"
 
-#: src/frontend/mame/ui/menu.cpp:728
+#: src/frontend/mame/ui/menu.cpp:744
 msgid "Auto"
 msgstr "Automático"
 
-#: src/frontend/mame/ui/menu.cpp:1233
+#: src/frontend/mame/ui/menu.cpp:1272
 #: src/frontend/mame/ui/simpleselgame.cpp:283
-#: src/frontend/mame/ui/selmenu.cpp:1248
+#: src/frontend/mame/ui/selmenu.cpp:1307
 msgid "Return to Previous Menu"
 msgstr "Retornar pro Menu Anterior"
 
@@ -729,21 +733,21 @@ msgstr "Retornar pro Menu Anterior"
 msgid "File Manager"
 msgstr "Gerenciador de Arquivos"
 
-#: src/frontend/mame/ui/filemngr.cpp:140
+#: src/frontend/mame/ui/filemngr.cpp:152
 #: src/frontend/mame/ui/confswitch.cpp:119
-#: src/frontend/mame/ui/inputmap.cpp:580
+#: src/frontend/mame/ui/inputmap.cpp:581
 #: src/frontend/mame/ui/inputtoggle.cpp:75
-#: src/frontend/mame/ui/analogipt.cpp:363
+#: src/frontend/mame/ui/analogipt.cpp:412
 #, c-format
 msgid "[root%1$s]"
 msgstr "[root%1$s]"
 
-#: src/frontend/mame/ui/filemngr.cpp:154
+#: src/frontend/mame/ui/filemngr.cpp:166
 #: src/frontend/mame/ui/confswitch.cpp:170 src/frontend/mame/ui/slotopt.cpp:204
 msgid "Reset System"
 msgstr "Resetar o Sistema"
 
-#: src/frontend/mame/ui/filemngr.cpp:154
+#: src/frontend/mame/ui/filemngr.cpp:166
 msgid "Start System"
 msgstr "Iniciar Sistema"
 
@@ -954,8 +958,8 @@ msgid ""
 "This system has no sound hardware, MAME will produce no sounds, this is "
 "expected behaviour.\n"
 msgstr ""
-"Este sistema não possui hardware de áudio, o MAME não produzirá qualquer som, "
-"este já é um comportamento esperado.\n"
+"Este sistema não possui hardware de áudio, o MAME não produzirá qualquer "
+"som, este já é um comportamento esperado.\n"
 
 #: src/frontend/mame/ui/info.cpp:143
 msgid ""
@@ -977,9 +981,9 @@ msgid ""
 "fully experience this system.\n"
 msgstr ""
 "\n"
-"Os componentes deste sistema não podem ser emulados com precisão, pois exigem "
-"uma interação física ou são compostos por dispositivos mecânicos. Não é possível "
-"experimentar este sistema por completo.\n"
+"Os componentes deste sistema não podem ser emulados com precisão, pois "
+"exigem uma interação física ou são compostos por dispositivos mecânicos. Não "
+"é possível experimentar este sistema por completo.\n"
 
 #: src/frontend/mame/ui/info.cpp:167
 #, c-format
@@ -1121,27 +1125,27 @@ msgstr "Não"
 msgid "Yes"
 msgstr "Sim"
 
-#: src/frontend/mame/ui/filecreate.cpp:168
+#: src/frontend/mame/ui/filecreate.cpp:189
 msgid "New Image Name:"
 msgstr "Novo Nome da Imagem:"
 
-#: src/frontend/mame/ui/filecreate.cpp:174
+#: src/frontend/mame/ui/filecreate.cpp:196
 msgid "Image Format:"
 msgstr "Formato da Imagem:"
 
-#: src/frontend/mame/ui/filecreate.cpp:180
+#: src/frontend/mame/ui/filecreate.cpp:202
 msgid "Create"
 msgstr "Cria"
 
-#: src/frontend/mame/ui/filecreate.cpp:208
+#: src/frontend/mame/ui/filecreate.cpp:230
 msgid "Please enter a file extension too"
 msgstr "Insira também o nome da extensão do arquivo"
 
-#: src/frontend/mame/ui/filecreate.cpp:268
+#: src/frontend/mame/ui/filecreate.cpp:295
 msgid "Select image format"
 msgstr "Selecione o formato da imagem"
 
-#: src/frontend/mame/ui/filecreate.cpp:327
+#: src/frontend/mame/ui/filecreate.cpp:354
 msgid "Select initial contents"
 msgstr "Selecione os conteúdos iniciais"
 
@@ -1166,9 +1170,9 @@ msgid "Emulated"
 msgstr "Emulado"
 
 #: src/frontend/mame/ui/keyboard.cpp:60 src/frontend/mame/ui/confswitch.cpp:117
-#: src/frontend/mame/ui/inputmap.cpp:578
+#: src/frontend/mame/ui/inputmap.cpp:579
 #: src/frontend/mame/ui/inputtoggle.cpp:73
-#: src/frontend/mame/ui/analogipt.cpp:361
+#: src/frontend/mame/ui/analogipt.cpp:410
 #, c-format
 msgid "%1$s [root%2$s]"
 msgstr "%1$s [root%2$s]"
@@ -1527,16 +1531,16 @@ msgstr "Incluir clones"
 msgid "Category File"
 msgstr "Arquivo da Categoria"
 
-#: src/frontend/mame/ui/utils.cpp:2030 src/frontend/mame/ui/inifile.cpp:301
+#: src/frontend/mame/ui/utils.cpp:2026 src/frontend/mame/ui/inifile.cpp:301
 msgctxt "swlist-info"
 msgid "Software list/item"
 msgstr "Lista/item do software"
 
-#: src/frontend/mame/ui/datmenu.cpp:88 src/frontend/mame/ui/selmenu.cpp:2685
+#: src/frontend/mame/ui/datmenu.cpp:88 src/frontend/mame/ui/selmenu.cpp:2752
 msgid "Software List Info"
 msgstr "Informações da Lista do Software"
 
-#: src/frontend/mame/ui/datmenu.cpp:316
+#: src/frontend/mame/ui/datmenu.cpp:307
 #, c-format
 msgid "Revision: %1$s"
 msgstr "Revisão: %1$s"
@@ -1670,7 +1674,8 @@ msgstr "Exporta a lista em formato XML (igual -listxml)"
 #: src/frontend/mame/ui/miscmenu.cpp:708
 msgid "Export list in XML format (like -listxml, but exclude devices)"
 msgstr ""
-"Exporta a lista em formato XML (igual -listxml, mas excluindo os dispositivos)"
+"Exporta a lista em formato XML (igual -listxml, mas excluindo os "
+"dispositivos)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:709
 msgid "Export list in TXT format (like -listfull)"
@@ -1705,7 +1710,7 @@ msgstr "Remove dos Favoritos"
 msgid "Save System Settings"
 msgstr "Salvar Configurações do Sistema"
 
-#: src/frontend/mame/ui/miscmenu.cpp:871 src/frontend/mame/ui/selmenu.cpp:2625
+#: src/frontend/mame/ui/miscmenu.cpp:871 src/frontend/mame/ui/selmenu.cpp:2698
 msgid " (default)"
 msgstr " (padrão)"
 
@@ -1746,7 +1751,7 @@ msgstr "[Não foram achados save states]"
 msgid "Cancel"
 msgstr "Cancela"
 
-#: src/frontend/mame/ui/state.cpp:265
+#: src/frontend/mame/ui/state.cpp:262
 #, c-format
 msgid ""
 "Delete saved state %1$s?\n"
@@ -1757,39 +1762,39 @@ msgstr ""
 "Pressione %2$s pra apagar\n"
 "Pressione %3$s pra cancelar"
 
-#: src/frontend/mame/ui/state.cpp:393
+#: src/frontend/mame/ui/state.cpp:388
 #, c-format
 msgid "Error removing saved state file %1$s"
 msgstr "Houve um erro ao remover o arquivo do estado salvo %1$s"
 
-#: src/frontend/mame/ui/state.cpp:442
+#: src/frontend/mame/ui/state.cpp:450
 #, c-format
 msgid "Press %1$s to delete"
 msgstr "Pressione %1$s pra apagar"
 
-#: src/frontend/mame/ui/state.cpp:515
+#: src/frontend/mame/ui/state.cpp:521
 msgid "Load State"
 msgstr "Carrega State"
 
-#: src/frontend/mame/ui/state.cpp:515
+#: src/frontend/mame/ui/state.cpp:521
 msgid "Select state to load"
 msgstr "Selecione o state pra carregar"
 
-#: src/frontend/mame/ui/state.cpp:539
+#: src/frontend/mame/ui/state.cpp:545
 msgid "Save State"
 msgstr "Salva State"
 
-#: src/frontend/mame/ui/state.cpp:539
+#: src/frontend/mame/ui/state.cpp:545
 msgid "Press a key or joystick button, or select state to overwrite"
 msgstr ""
 "Pressione uma tecla ou botão de joystick ou selecione o state pra "
 "sobrescrever"
 
-#: src/frontend/mame/ui/confswitch.cpp:314
+#: src/frontend/mame/ui/confswitch.cpp:318
 msgid "DIP Switches"
 msgstr "Chaves DIP"
 
-#: src/frontend/mame/ui/confswitch.cpp:508
+#: src/frontend/mame/ui/confswitch.cpp:521
 msgid "Machine Configuration"
 msgstr "Configuração da Máquina"
 
@@ -1832,7 +1837,7 @@ msgstr "Atribuições de entrada (este sistema)"
 msgid "[no assignable inputs are enabled]"
 msgstr "[nenhuma entrada atribuível está ativada]"
 
-#: src/frontend/mame/ui/inputmap.cpp:348
+#: src/frontend/mame/ui/inputmap.cpp:358
 msgid "Pressed"
 msgstr "Pressionado"
 
@@ -1840,71 +1845,72 @@ msgstr "Pressionado"
 msgid "Invalid combination entered"
 msgstr "Uma combinação inválida foi inserida"
 
-#: src/frontend/mame/ui/inputmap.cpp:563
+#: src/frontend/mame/ui/inputmap.cpp:564
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog"
 msgstr "Analógico %1$s"
 
-#: src/frontend/mame/ui/inputmap.cpp:564
+#: src/frontend/mame/ui/inputmap.cpp:565
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Inc"
 msgstr "Aumentar Analógico %1$s"
 
-#: src/frontend/mame/ui/inputmap.cpp:565
+#: src/frontend/mame/ui/inputmap.cpp:566
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Dec"
 msgstr "Diminuir Analógico %1$s"
 
-#: src/frontend/mame/ui/inputmap.cpp:607
+#: src/frontend/mame/ui/inputmap.cpp:608
 #, c-format
 msgid "Press %1$s to set\n"
 msgstr "Pressione o %1$s para configurar\n"
 
-#: src/frontend/mame/ui/inputmap.cpp:608
+#: src/frontend/mame/ui/inputmap.cpp:609
 #, c-format
 msgid "Press %1$s to append\n"
 msgstr "Pressione o %1$s pra anexar\n"
 
-#: src/frontend/mame/ui/inputmap.cpp:609
+#: src/frontend/mame/ui/inputmap.cpp:610
 #, c-format
 msgid "Press %1$s to clear\n"
 msgstr "Pressione o %1$s pra limpar\n"
 
-#: src/frontend/mame/ui/inputmap.cpp:610
+#: src/frontend/mame/ui/inputmap.cpp:611
 #, c-format
 msgid "Press %1$s to restore default\n"
 msgstr "Pressione o %1$s pra restaurar o padrão\n"
 
-#: src/frontend/mame/ui/inputdevices.cpp:32
+#: src/frontend/mame/ui/inputdevices.cpp:33
 #, c-format
 msgctxt "menu-inputdev"
 msgid "%1$s (%2$s %3$d)"
 msgstr "%1$s (%2$s %3$d)"
 
-#: src/frontend/mame/ui/inputdevices.cpp:88
+#: src/frontend/mame/ui/inputdevices.cpp:116
 msgctxt "menu-inputdev"
 msgid "Copy Device ID"
 msgstr "Copia a ID do dispositivo"
 
-#: src/frontend/mame/ui/inputdevices.cpp:122
+#: src/frontend/mame/ui/inputdevices.cpp:148
 msgctxt "menu-inputdev"
 msgid "Copied device ID to clipboard"
 msgstr "A ID do dispositivo foi copiada para a área de transferência"
 
-#: src/frontend/mame/ui/inputdevices.cpp:124
+#: src/frontend/mame/ui/inputdevices.cpp:150
 msgctxt "menu-inputdev"
 msgid "Error copying device ID to clipboard"
-msgstr "Houve um erro ao copiar a ID do dispositivo para a área de transferência"
+msgstr ""
+"Houve um erro ao copiar a ID do dispositivo para a área de transferência"
 
-#: src/frontend/mame/ui/inputdevices.cpp:162
+#: src/frontend/mame/ui/inputdevices.cpp:189
 msgctxt "menu-inputdev"
 msgid "Input Devices"
 msgstr "Dispositivos de Entrada"
 
-#: src/frontend/mame/ui/inputdevices.cpp:203
+#: src/frontend/mame/ui/inputdevices.cpp:230
 msgctxt "menu-inputdev"
 msgid "[no input devices are enabled]"
 msgstr "[nenhum dispositivo de entrada ativado]"
@@ -2027,11 +2033,11 @@ msgid "Configure Options"
 msgstr "Opções da Configuração"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:279
-#: src/frontend/mame/ui/selmenu.cpp:1248
+#: src/frontend/mame/ui/selmenu.cpp:1307
 msgid "Exit"
 msgstr "Sair"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:304
+#: src/frontend/mame/ui/simpleselgame.cpp:313
 #, c-format
 msgid ""
 "No system ROMs found. Please check the rompath setting specified in the %1$s."
@@ -2046,77 +2052,77 @@ msgstr ""
 "Se esta é a primeira vez que usa o %2$s por favor veja o arquivo %2$s.pdf na "
 "pasta docs pra informações sobre configurar e usar o %2$s."
 
-#: src/frontend/mame/ui/simpleselgame.cpp:320
+#: src/frontend/mame/ui/simpleselgame.cpp:329
 #, c-format
 msgid "Type name or select: %1$s_"
 msgstr "Digite o nome ou selecione: %1$s_"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:322
+#: src/frontend/mame/ui/simpleselgame.cpp:331
 msgid "Type name or select: (random)"
 msgstr "Digite o nome ou selecione: (aleatório)"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:336
+#: src/frontend/mame/ui/simpleselgame.cpp:345
 #, c-format
 msgid "%1$-.100s"
 msgstr "%1$-.100s"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:339
+#: src/frontend/mame/ui/simpleselgame.cpp:348
 #, c-format
 msgid "%1$s, %2$-.100s"
 msgstr "%1$s, %2$-.100s"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:348
+#: src/frontend/mame/ui/simpleselgame.cpp:357
 #, c-format
 msgid "Driver: %1$s"
 msgstr "Driver: %1$s"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:364
-#: src/frontend/mame/ui/selmenu.cpp:690
+#: src/frontend/mame/ui/simpleselgame.cpp:373
+#: src/frontend/mame/ui/selmenu.cpp:735
 msgid "Overall: NOT WORKING"
 msgstr "Geral: NÃO FUNCIONA"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:366
-#: src/frontend/mame/ui/selmenu.cpp:692
+#: src/frontend/mame/ui/simpleselgame.cpp:375
+#: src/frontend/mame/ui/selmenu.cpp:737
 msgid "Overall: Unemulated Protection"
 msgstr "Geral: Proteção Não Emulada"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:368
-#: src/frontend/mame/ui/selmenu.cpp:694
+#: src/frontend/mame/ui/simpleselgame.cpp:377
+#: src/frontend/mame/ui/selmenu.cpp:739
 msgid "Overall: Working"
 msgstr "Geral: Funciona"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:372
-#: src/frontend/mame/ui/selmenu.cpp:698
+#: src/frontend/mame/ui/simpleselgame.cpp:381
+#: src/frontend/mame/ui/selmenu.cpp:743
 msgid "Graphics: Unimplemented, "
 msgstr "Gráficos: Não Implementados, "
 
-#: src/frontend/mame/ui/simpleselgame.cpp:374
-#: src/frontend/mame/ui/selmenu.cpp:700
+#: src/frontend/mame/ui/simpleselgame.cpp:383
+#: src/frontend/mame/ui/selmenu.cpp:745
 msgid "Graphics: Imperfect, "
 msgstr "Gráficos: Imperfeitos, "
 
-#: src/frontend/mame/ui/simpleselgame.cpp:376
-#: src/frontend/mame/ui/selmenu.cpp:702
+#: src/frontend/mame/ui/simpleselgame.cpp:385
+#: src/frontend/mame/ui/selmenu.cpp:747
 msgid "Graphics: OK, "
 msgstr "Gráficos: OK, "
 
-#: src/frontend/mame/ui/simpleselgame.cpp:379
-#: src/frontend/mame/ui/selmenu.cpp:705
+#: src/frontend/mame/ui/simpleselgame.cpp:388
+#: src/frontend/mame/ui/selmenu.cpp:750
 msgid "Sound: None"
 msgstr "Áudio: Nenhum"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:381
-#: src/frontend/mame/ui/selmenu.cpp:707
+#: src/frontend/mame/ui/simpleselgame.cpp:390
+#: src/frontend/mame/ui/selmenu.cpp:752
 msgid "Sound: Unimplemented"
 msgstr "Áudio: Não Implementado"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:383
-#: src/frontend/mame/ui/selmenu.cpp:709
+#: src/frontend/mame/ui/simpleselgame.cpp:392
+#: src/frontend/mame/ui/selmenu.cpp:754
 msgid "Sound: Imperfect"
 msgstr "Áudio: Imperfeito"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:385
-#: src/frontend/mame/ui/selmenu.cpp:711
+#: src/frontend/mame/ui/simpleselgame.cpp:394
+#: src/frontend/mame/ui/selmenu.cpp:756
 msgid "Sound: OK"
 msgstr "Áudio: OK"
 
@@ -2141,323 +2147,323 @@ msgstr "Resetar Tudo"
 msgid "Reload All"
 msgstr "Recarrega Tudo"
 
-#: src/frontend/mame/ui/dirmenu.cpp:44
+#: src/frontend/mame/ui/dirmenu.cpp:40
 msgctxt "path-option"
 msgid "ROMs"
 msgstr "ROMs"
 
-#: src/frontend/mame/ui/dirmenu.cpp:45
+#: src/frontend/mame/ui/dirmenu.cpp:41
 msgctxt "path-option"
 msgid "Software Media"
 msgstr "Mídia do Software"
 
-#: src/frontend/mame/ui/dirmenu.cpp:46
+#: src/frontend/mame/ui/dirmenu.cpp:42
 msgctxt "path-option"
 msgid "Sound Samples"
 msgstr "Amostras do Som"
 
-#: src/frontend/mame/ui/dirmenu.cpp:47
+#: src/frontend/mame/ui/dirmenu.cpp:43
 msgctxt "path-option"
 msgid "Artwork"
 msgstr "Trabalhos de Arte"
 
-#: src/frontend/mame/ui/dirmenu.cpp:48
+#: src/frontend/mame/ui/dirmenu.cpp:44
 msgctxt "path-option"
 msgid "Crosshairs"
 msgstr "Miras"
 
-#: src/frontend/mame/ui/dirmenu.cpp:49
+#: src/frontend/mame/ui/dirmenu.cpp:45
 msgctxt "path-option"
 msgid "Cheat Files"
 msgstr "Arquivos das Trapaças"
 
-#: src/frontend/mame/ui/dirmenu.cpp:50
+#: src/frontend/mame/ui/dirmenu.cpp:46
 msgctxt "path-option"
 msgid "Plugins"
 msgstr "Plugins"
 
-#: src/frontend/mame/ui/dirmenu.cpp:51
+#: src/frontend/mame/ui/dirmenu.cpp:47
 msgctxt "path-option"
 msgid "UI Translations"
 msgstr "Traduções da IU"
 
-#: src/frontend/mame/ui/dirmenu.cpp:52
+#: src/frontend/mame/ui/dirmenu.cpp:48
 msgctxt "path-option"
 msgid "Software Lists"
 msgstr "Listas de Softwares"
 
-#: src/frontend/mame/ui/dirmenu.cpp:53
+#: src/frontend/mame/ui/dirmenu.cpp:49
 msgctxt "path-option"
 msgid "INIs"
 msgstr "INIs"
 
-#: src/frontend/mame/ui/dirmenu.cpp:54
+#: src/frontend/mame/ui/dirmenu.cpp:50
 msgctxt "path-option"
 msgid "UI Settings"
 msgstr "Configurações da IU"
 
-#: src/frontend/mame/ui/dirmenu.cpp:55
+#: src/frontend/mame/ui/dirmenu.cpp:51
 msgctxt "path-option"
 msgid "Plugin Data"
 msgstr "Dados do Plugin"
 
-#: src/frontend/mame/ui/dirmenu.cpp:56
+#: src/frontend/mame/ui/dirmenu.cpp:52
 msgctxt "path-option"
 msgid "DATs"
 msgstr "DATs"
 
-#: src/frontend/mame/ui/dirmenu.cpp:57
+#: src/frontend/mame/ui/dirmenu.cpp:53
 msgctxt "path-option"
 msgid "Category INIs"
 msgstr "INIs da Categoria"
 
-#: src/frontend/mame/ui/dirmenu.cpp:58
+#: src/frontend/mame/ui/dirmenu.cpp:54
 msgctxt "path-option"
 msgid "Snapshots"
 msgstr "Snapshots"
 
-#: src/frontend/mame/ui/dirmenu.cpp:59
+#: src/frontend/mame/ui/dirmenu.cpp:55
 msgctxt "path-option"
 msgid "Icons"
 msgstr "Ícones"
 
-#: src/frontend/mame/ui/dirmenu.cpp:60
+#: src/frontend/mame/ui/dirmenu.cpp:56
 msgctxt "path-option"
 msgid "Control Panels"
 msgstr "Painéis de Controle"
 
-#: src/frontend/mame/ui/dirmenu.cpp:61
+#: src/frontend/mame/ui/dirmenu.cpp:57
 msgctxt "path-option"
 msgid "Cabinets"
 msgstr "Gabinetes"
 
-#: src/frontend/mame/ui/dirmenu.cpp:62
+#: src/frontend/mame/ui/dirmenu.cpp:58
 msgctxt "path-option"
 msgid "Marquees"
 msgstr "Marquises"
 
-#: src/frontend/mame/ui/dirmenu.cpp:63
+#: src/frontend/mame/ui/dirmenu.cpp:59
 msgctxt "path-option"
 msgid "PCBs"
 msgstr "PCBs"
 
-#: src/frontend/mame/ui/dirmenu.cpp:64
+#: src/frontend/mame/ui/dirmenu.cpp:60
 msgctxt "path-option"
 msgid "Flyers"
 msgstr "Panfletos"
 
-#: src/frontend/mame/ui/dirmenu.cpp:65
+#: src/frontend/mame/ui/dirmenu.cpp:61
 msgctxt "path-option"
 msgid "Title Screens"
 msgstr "Telas Títulos"
 
-#: src/frontend/mame/ui/dirmenu.cpp:66
+#: src/frontend/mame/ui/dirmenu.cpp:62
 msgctxt "path-option"
 msgid "Game Endings"
 msgstr "Finais dos Jogos"
 
-#: src/frontend/mame/ui/dirmenu.cpp:67
+#: src/frontend/mame/ui/dirmenu.cpp:63
 msgctxt "path-option"
 msgid "Bosses"
 msgstr "Chefes"
 
-#: src/frontend/mame/ui/dirmenu.cpp:68
+#: src/frontend/mame/ui/dirmenu.cpp:64
 msgctxt "path-option"
 msgid "Artwork Previews"
 msgstr "Pré-Visualização do Trabalho de Arte"
 
-#: src/frontend/mame/ui/dirmenu.cpp:69
+#: src/frontend/mame/ui/dirmenu.cpp:65
 msgctxt "path-option"
 msgid "Select"
 msgstr "Selecionar"
 
-#: src/frontend/mame/ui/dirmenu.cpp:70
+#: src/frontend/mame/ui/dirmenu.cpp:66
 msgctxt "path-option"
 msgid "Game Over Screens"
 msgstr "Telas do Game Over"
 
-#: src/frontend/mame/ui/dirmenu.cpp:71
+#: src/frontend/mame/ui/dirmenu.cpp:67
 msgctxt "path-option"
 msgid "HowTo"
 msgstr "Como Fazer"
 
-#: src/frontend/mame/ui/dirmenu.cpp:72
+#: src/frontend/mame/ui/dirmenu.cpp:68
 msgctxt "path-option"
 msgid "Logos"
 msgstr "Logos"
 
-#: src/frontend/mame/ui/dirmenu.cpp:73
+#: src/frontend/mame/ui/dirmenu.cpp:69
 msgctxt "path-option"
 msgid "Scores"
 msgstr "Pontuações"
 
-#: src/frontend/mame/ui/dirmenu.cpp:74
+#: src/frontend/mame/ui/dirmenu.cpp:70
 msgctxt "path-option"
 msgid "Versus"
 msgstr "Versus"
 
-#: src/frontend/mame/ui/dirmenu.cpp:75
+#: src/frontend/mame/ui/dirmenu.cpp:71
 msgctxt "path-option"
 msgid "Covers"
 msgstr "Capas"
 
-#: src/frontend/mame/ui/dirmenu.cpp:105
+#: src/frontend/mame/ui/dirmenu.cpp:101
 #, c-format
 msgid "Remove %1$s Folder"
 msgstr "Remover a Pasta %1$s"
 
-#: src/frontend/mame/ui/dirmenu.cpp:352
-#, c-format
-msgid "Change %1$s Folder - Search: %2$s_"
-msgstr "Mudar %1$s Pasta - Busca: %2$s_"
-
-#: src/frontend/mame/ui/dirmenu.cpp:352
+#: src/frontend/mame/ui/dirmenu.cpp:357
 #, c-format
 msgid "Add %1$s Folder - Search: %2$s_"
 msgstr "Adicionar %1$s Pasta - Busca: %2$s_"
 
-#: src/frontend/mame/ui/dirmenu.cpp:363
+#: src/frontend/mame/ui/dirmenu.cpp:357
+#, c-format
+msgid "Change %1$s Folder - Search: %2$s_"
+msgstr "Mudar %1$s Pasta - Busca: %2$s_"
+
+#: src/frontend/mame/ui/dirmenu.cpp:368
 msgid "Press TAB to set"
 msgstr "Pressione TAB pra configurar"
 
-#: src/frontend/mame/ui/dirmenu.cpp:431
+#: src/frontend/mame/ui/dirmenu.cpp:438
 #, c-format
 msgid "%1$s Folders"
 msgstr "Pastas %1$s"
 
-#: src/frontend/mame/ui/dirmenu.cpp:431
+#: src/frontend/mame/ui/dirmenu.cpp:438
 #, c-format
 msgid "%1$s Folder"
 msgstr "Pasta %1$s"
 
-#: src/frontend/mame/ui/dirmenu.cpp:494
-msgid "Change Folder"
-msgstr "Mudar a Pasta"
-
-#: src/frontend/mame/ui/dirmenu.cpp:494
+#: src/frontend/mame/ui/dirmenu.cpp:523
 msgid "Add Folder"
 msgstr "Adicionar Pasta"
 
-#: src/frontend/mame/ui/dirmenu.cpp:497
+#: src/frontend/mame/ui/dirmenu.cpp:525
 msgid "Remove Folder"
 msgstr "Remover Pasta"
 
-#: src/frontend/mame/ui/viewgfx.cpp:789 src/frontend/mame/ui/viewgfx.cpp:794
+#: src/frontend/mame/ui/dirmenu.cpp:530
+msgid "Change Folder"
+msgstr "Mudar a Pasta"
+
+#: src/frontend/mame/ui/viewgfx.cpp:790 src/frontend/mame/ui/viewgfx.cpp:795
 #, c-format
 msgctxt "gfxview"
 msgid "Zoom = 1/%1$d"
 msgstr "Zoom = 1/%1$d"
 
-#: src/frontend/mame/ui/viewgfx.cpp:789 src/frontend/mame/ui/viewgfx.cpp:794
+#: src/frontend/mame/ui/viewgfx.cpp:790 src/frontend/mame/ui/viewgfx.cpp:795
 #, c-format
 msgctxt "gfxview"
 msgid "Zoom = %1$d"
 msgstr "Zoom = %1$d"
 
-#: src/frontend/mame/ui/viewgfx.cpp:799
+#: src/frontend/mame/ui/viewgfx.cpp:800
 msgctxt "gfxview"
 msgid "Expand to fit"
 msgstr "Expande pra encaixar"
 
-#: src/frontend/mame/ui/viewgfx.cpp:822
+#: src/frontend/mame/ui/viewgfx.cpp:823
 msgctxt "gfxview"
 msgid "All categories"
 msgstr "Todas as categorias"
 
-#: src/frontend/mame/ui/viewgfx.cpp:824 src/frontend/mame/ui/viewgfx.cpp:829
+#: src/frontend/mame/ui/viewgfx.cpp:825 src/frontend/mame/ui/viewgfx.cpp:830
 #, c-format
 msgctxt "gfxview"
 msgid "Category %1$d"
 msgstr "Categoria %1$d"
 
-#: src/frontend/mame/ui/viewgfx.cpp:926
+#: src/frontend/mame/ui/viewgfx.cpp:927
 #, c-format
 msgctxt "gfxview"
 msgid "[root%1$s]"
 msgstr "[root%1$s]"
 
-#: src/frontend/mame/ui/viewgfx.cpp:926
+#: src/frontend/mame/ui/viewgfx.cpp:927
 #, c-format
 msgctxt "gfxview"
 msgid "[root%1$s] colors"
 msgstr "[root%1$s] cores"
 
-#: src/frontend/mame/ui/viewgfx.cpp:926
+#: src/frontend/mame/ui/viewgfx.cpp:927
 #, c-format
 msgctxt "gfxview"
 msgid "[root%1$s] pens"
 msgstr "[root%1$s] canetas"
 
-#: src/frontend/mame/ui/viewgfx.cpp:940
+#: src/frontend/mame/ui/viewgfx.cpp:941
 #, c-format
 msgctxt "gfxview"
 msgid " #%1$X → %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"
 msgstr " #%1$X → %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"
 
-#: src/frontend/mame/ui/viewgfx.cpp:947
+#: src/frontend/mame/ui/viewgfx.cpp:948
 #, c-format
 msgctxt "gfxview"
 msgid " #%1$X = %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"
 msgstr " #%1$X = %2$X (A:%3$02X R:%4$02X G:%5$02X B:%6$02X)"
 
-#: src/frontend/mame/ui/viewgfx.cpp:954
+#: src/frontend/mame/ui/viewgfx.cpp:955
 #, c-format
 msgctxt "gfxview"
 msgid " #%1$X (A:%2$02X R:%3$02X G:%4$02X B:%5$02X)"
 msgstr " #%1$X (A:%2$02X R:%3$02X G:%4$02X B:%5$02X)"
 
-#: src/frontend/mame/ui/viewgfx.cpp:1134
+#: src/frontend/mame/ui/viewgfx.cpp:1135
 #, c-format
 msgctxt "gfxview"
 msgid "[root%1$s] %2$d/%3$d"
 msgstr "[root%1$s] %2$d/%3$d"
 
-#: src/frontend/mame/ui/viewgfx.cpp:1157
+#: src/frontend/mame/ui/viewgfx.cpp:1158
 #, c-format
 msgctxt "gfxview"
 msgid " #%1$X:%2$X (%3$d %4$d) = %5$X"
 msgstr " #%1$X:%2$X (%3$d %4$d) = %5$X"
 
-#: src/frontend/mame/ui/viewgfx.cpp:1165
+#: src/frontend/mame/ui/viewgfx.cpp:1166
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d color %3$X/%4$X"
 msgstr " %1$d×%2$d cor %3$X/%4$X"
 
-#: src/frontend/mame/ui/viewgfx.cpp:1305
+#: src/frontend/mame/ui/viewgfx.cpp:1306
 #, c-format
 msgctxt "gfxview"
 msgid "Tilemap %1$d/%2$d category %3$u"
 msgstr "Mapa dos ladrilhos %1$d/%2$d categoria %3$u"
 
-#: src/frontend/mame/ui/viewgfx.cpp:1305
+#: src/frontend/mame/ui/viewgfx.cpp:1306
 #, c-format
 msgctxt "gfxview"
 msgid "Tilemap %1$d/%2$d "
 msgstr "Mapa dos ladrilhos %1$d/%2$d "
 
-#: src/frontend/mame/ui/viewgfx.cpp:1327
+#: src/frontend/mame/ui/viewgfx.cpp:1328
 #, c-format
 msgctxt "gfxview"
 msgid " (%1$u %2$u) = GFX%3$u #%4$X:%5$X"
 msgstr " (%1$u %2$u) = GFX%3$u #%4$X:%5$X"
 
-#: src/frontend/mame/ui/viewgfx.cpp:1334
+#: src/frontend/mame/ui/viewgfx.cpp:1335
 #, c-format
 msgctxt "gfxview"
 msgid " %1$d×%2$d origin (%3$d %4$d)"
 msgstr " %1$d×%2$d origin (%3$d %4$d)"
 
-#: src/frontend/mame/ui/selgame.cpp:442
+#: src/frontend/mame/ui/selgame.cpp:463
 msgid "System Settings"
 msgstr "Configurações do Sistema"
 
-#: src/frontend/mame/ui/selgame.cpp:1058
+#: src/frontend/mame/ui/selgame.cpp:1076
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d systems (%5$d BIOS) )"
 msgstr "%1$s %2$s ( %3$d / %4$d sistemas (%5$d BIOS) )"
 
-#: src/frontend/mame/ui/selgame.cpp:1086
+#: src/frontend/mame/ui/selgame.cpp:1104
 #, c-format
 msgid "System: %1$-.100s"
 msgstr "Sistema: %1$-.100s"
@@ -2478,22 +2484,22 @@ msgctxt "menu-selector"
 msgid "[no choices]"
 msgstr "[nenhuma escolha]"
 
-#: src/frontend/mame/ui/selector.cpp:138
+#: src/frontend/mame/ui/selector.cpp:148
 #, c-format
 msgctxt "menu-selector"
 msgid "Double-click or press %1$s to select"
 msgstr "Faça um clique duplo ou pressione %1$s para selecionar"
 
-#: src/frontend/mame/ui/auditmenu.cpp:59
+#: src/frontend/mame/ui/auditmenu.cpp:60
 msgid "Audit Media"
 msgstr "Audita a Mídia"
 
-#: src/frontend/mame/ui/auditmenu.cpp:63
+#: src/frontend/mame/ui/auditmenu.cpp:64
 #, c-format
 msgid "Results will be saved to %1$s"
 msgstr "Os resultados serão salvos em %1$s"
 
-#: src/frontend/mame/ui/auditmenu.cpp:101
+#: src/frontend/mame/ui/auditmenu.cpp:110
 #, c-format
 msgid ""
 "Auditing media for system %2$u of %3$u...\n"
@@ -2502,7 +2508,7 @@ msgstr ""
 "Auditando a mídia pro sistema %2$u do %3$u...\n"
 "%1$s"
 
-#: src/frontend/mame/ui/auditmenu.cpp:119
+#: src/frontend/mame/ui/auditmenu.cpp:128
 #, c-format
 msgid ""
 "Cancel audit?\n"
@@ -2515,17 +2521,17 @@ msgstr ""
 "Pressione %1$s para cancelar\n"
 "Pressione %2$s para continuar"
 
-#: src/frontend/mame/ui/auditmenu.cpp:139
+#: src/frontend/mame/ui/auditmenu.cpp:148
 #, c-format
 msgid "Audit media for %1$u systems marked unavailable"
 msgstr "Auditar a mídia pros %1$u sistemas marcados como indisponíveis"
 
-#: src/frontend/mame/ui/auditmenu.cpp:140
+#: src/frontend/mame/ui/auditmenu.cpp:149
 #, c-format
 msgid "Audit media for all %1$u systems"
 msgstr "Auditar a mídia pra todos os %1$u sistemas"
 
-#: src/frontend/mame/ui/auditmenu.cpp:157
+#: src/frontend/mame/ui/auditmenu.cpp:165
 #, c-format
 msgid "Press %1$s to cancel\n"
 msgstr "Pressione %1$s para cancelar\n"
@@ -2546,267 +2552,267 @@ msgstr "Esconde a Info/Imagem"
 msgid "Hide Both"
 msgstr "Esconde Ambos"
 
-#: src/frontend/mame/ui/custui.cpp:143
+#: src/frontend/mame/ui/custui.cpp:144
 msgid "UI Language"
 msgstr "Idioma da IU"
 
-#: src/frontend/mame/ui/custui.cpp:168 src/frontend/mame/ui/custui.cpp:221
+#: src/frontend/mame/ui/custui.cpp:169 src/frontend/mame/ui/custui.cpp:222
 msgid "System Names"
 msgstr "Nomes do Sistema"
 
-#: src/frontend/mame/ui/custui.cpp:194 src/frontend/mame/ui/custui.cpp:224
+#: src/frontend/mame/ui/custui.cpp:195 src/frontend/mame/ui/custui.cpp:225
 msgid "Show Side Panels"
 msgstr "Mostra os Painéis Laterais"
 
-#: src/frontend/mame/ui/custui.cpp:214
+#: src/frontend/mame/ui/custui.cpp:215
 msgid "Fonts"
 msgstr "Fontes"
 
-#: src/frontend/mame/ui/custui.cpp:215
+#: src/frontend/mame/ui/custui.cpp:216
 msgid "Colors"
 msgstr "Cores"
 
-#: src/frontend/mame/ui/custui.cpp:218
+#: src/frontend/mame/ui/custui.cpp:219
 msgid "Language"
 msgstr "Idioma"
 
-#: src/frontend/mame/ui/custui.cpp:235 src/frontend/mame/ui/custui.cpp:279
+#: src/frontend/mame/ui/custui.cpp:236 src/frontend/mame/ui/custui.cpp:280
 msgid "[built-in]"
 msgstr "[incorporado]"
 
-#: src/frontend/mame/ui/custui.cpp:335
+#: src/frontend/mame/ui/custui.cpp:337
 msgid "UI Fonts"
 msgstr "Fontes da IU"
 
-#: src/frontend/mame/ui/custui.cpp:364
+#: src/frontend/mame/ui/custui.cpp:366
 msgid "default"
 msgstr "padrão"
 
-#: src/frontend/mame/ui/custui.cpp:459 src/frontend/mame/ui/custui.cpp:499
+#: src/frontend/mame/ui/custui.cpp:465 src/frontend/mame/ui/custui.cpp:507
 msgid "UI Font"
 msgstr "Fonte da IU"
 
-#: src/frontend/mame/ui/custui.cpp:504
+#: src/frontend/mame/ui/custui.cpp:512
 msgid "Bold"
 msgstr "Negrito"
 
-#: src/frontend/mame/ui/custui.cpp:505
+#: src/frontend/mame/ui/custui.cpp:513
 msgid "Italic"
 msgstr "Itálico"
 
-#: src/frontend/mame/ui/custui.cpp:510
+#: src/frontend/mame/ui/custui.cpp:518
 msgid "Lines"
 msgstr "Linhas"
 
-#: src/frontend/mame/ui/custui.cpp:515
+#: src/frontend/mame/ui/custui.cpp:523
 msgid "Infos text size"
 msgstr "Tamanho do texto das informações"
 
-#: src/frontend/mame/ui/custui.cpp:530
+#: src/frontend/mame/ui/custui.cpp:547
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 msgstr ""
 "Texto de exemplo - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
-#: src/frontend/mame/ui/custui.cpp:546
+#: src/frontend/mame/ui/custui.cpp:563
 msgid "UI Colors"
 msgstr "Cores da IU"
 
-#: src/frontend/mame/ui/custui.cpp:609
+#: src/frontend/mame/ui/custui.cpp:626
 msgctxt "color-option"
 msgid "Normal text"
 msgstr "Texto normal"
 
-#: src/frontend/mame/ui/custui.cpp:610
+#: src/frontend/mame/ui/custui.cpp:627
 msgctxt "color-option"
 msgid "Selected color"
 msgstr "Cor selecionada"
 
-#: src/frontend/mame/ui/custui.cpp:611
+#: src/frontend/mame/ui/custui.cpp:628
 msgctxt "color-option"
 msgid "Normal text background"
 msgstr "Fundo do texto normal"
 
-#: src/frontend/mame/ui/custui.cpp:612
+#: src/frontend/mame/ui/custui.cpp:629
 msgctxt "color-option"
 msgid "Selected background color"
 msgstr "Cor de fundo da seleção"
 
-#: src/frontend/mame/ui/custui.cpp:613
+#: src/frontend/mame/ui/custui.cpp:630
 msgctxt "color-option"
 msgid "Subitem color"
 msgstr "Cor do subitem"
 
-#: src/frontend/mame/ui/custui.cpp:614
+#: src/frontend/mame/ui/custui.cpp:631
 msgctxt "color-option"
 msgid "Clone"
 msgstr "Clone"
 
-#: src/frontend/mame/ui/custui.cpp:615
+#: src/frontend/mame/ui/custui.cpp:632
 msgctxt "color-option"
 msgid "Border"
 msgstr "Borda"
 
-#: src/frontend/mame/ui/custui.cpp:616
+#: src/frontend/mame/ui/custui.cpp:633
 msgctxt "color-option"
 msgid "Background"
 msgstr "Fundo"
 
-#: src/frontend/mame/ui/custui.cpp:617
+#: src/frontend/mame/ui/custui.cpp:634
 msgctxt "color-option"
 msgid "DIP switch"
 msgstr "Chave DIP"
 
-#: src/frontend/mame/ui/custui.cpp:618
+#: src/frontend/mame/ui/custui.cpp:635
 msgctxt "color-option"
 msgid "Unavailable color"
 msgstr "Cor indisponível"
 
-#: src/frontend/mame/ui/custui.cpp:619
+#: src/frontend/mame/ui/custui.cpp:636
 msgctxt "color-option"
 msgid "Slider color"
 msgstr "Cor do slider"
 
-#: src/frontend/mame/ui/custui.cpp:620
+#: src/frontend/mame/ui/custui.cpp:637
 msgctxt "color-option"
 msgid "Graphics viewer background"
 msgstr "Visualizador gráfico do fundo"
 
-#: src/frontend/mame/ui/custui.cpp:621
+#: src/frontend/mame/ui/custui.cpp:638
 msgctxt "color-option"
 msgid "Mouse over color"
 msgstr "Cor da sobreposição do mouse"
 
-#: src/frontend/mame/ui/custui.cpp:622
+#: src/frontend/mame/ui/custui.cpp:639
 msgctxt "color-option"
 msgid "Mouse over background color"
 msgstr "Cor de fundo da sobreposição do mouse"
 
-#: src/frontend/mame/ui/custui.cpp:623
+#: src/frontend/mame/ui/custui.cpp:640
 msgctxt "color-option"
 msgid "Mouse down color"
 msgstr "Cor da sub-posição do mouse"
 
-#: src/frontend/mame/ui/custui.cpp:624
+#: src/frontend/mame/ui/custui.cpp:641
 msgctxt "color-option"
 msgid "Mouse down background color"
 msgstr "Cor da sub-posição do cenário do fundo do mouse"
 
-#: src/frontend/mame/ui/custui.cpp:628
+#: src/frontend/mame/ui/custui.cpp:645
 msgid "Restore default colors"
 msgstr "Restaura as cores originais"
 
-#: src/frontend/mame/ui/custui.cpp:640
+#: src/frontend/mame/ui/custui.cpp:666
 #, c-format
 msgid "Double-click or press %1$s to change color"
 msgstr "Faça um clique duplo ou pressione %1$s para alterar o valor da cor"
 
-#: src/frontend/mame/ui/custui.cpp:648
+#: src/frontend/mame/ui/custui.cpp:674
 msgid "Menu Preview"
 msgstr "Pré-Visualização do Menu"
 
-#: src/frontend/mame/ui/custui.cpp:662
+#: src/frontend/mame/ui/custui.cpp:681
 msgctxt "color-sample"
 msgid "Normal"
 msgstr "Normal"
 
-#: src/frontend/mame/ui/custui.cpp:663
+#: src/frontend/mame/ui/custui.cpp:682
 msgctxt "color-sample"
 msgid "Subitem"
 msgstr "Subitem"
 
-#: src/frontend/mame/ui/custui.cpp:664
+#: src/frontend/mame/ui/custui.cpp:683
 msgctxt "color-sample"
 msgid "Selected"
 msgstr "Selecionado"
 
-#: src/frontend/mame/ui/custui.cpp:665
+#: src/frontend/mame/ui/custui.cpp:684
 msgctxt "color-sample"
 msgid "Mouse Over"
 msgstr "Sobreposição do Mouse"
 
-#: src/frontend/mame/ui/custui.cpp:666
+#: src/frontend/mame/ui/custui.cpp:685
 msgctxt "color-sample"
 msgid "Clone"
 msgstr "Clone"
 
-#: src/frontend/mame/ui/custui.cpp:881
+#: src/frontend/mame/ui/custui.cpp:901
 msgid "ARGB Settings"
 msgstr "Configurações do ARGB"
 
-#: src/frontend/mame/ui/custui.cpp:886 src/frontend/mame/ui/custui.cpp:889
+#: src/frontend/mame/ui/custui.cpp:906 src/frontend/mame/ui/custui.cpp:909
 msgctxt "color-channel"
 msgid "Alpha"
 msgstr "Alpha"
 
-#: src/frontend/mame/ui/custui.cpp:894 src/frontend/mame/ui/custui.cpp:897
+#: src/frontend/mame/ui/custui.cpp:914 src/frontend/mame/ui/custui.cpp:917
 msgctxt "color-channel"
 msgid "Red"
 msgstr "Vermelho"
 
-#: src/frontend/mame/ui/custui.cpp:902 src/frontend/mame/ui/custui.cpp:905
+#: src/frontend/mame/ui/custui.cpp:922 src/frontend/mame/ui/custui.cpp:925
 msgctxt "color-channel"
 msgid "Green"
 msgstr "Verde"
 
-#: src/frontend/mame/ui/custui.cpp:910 src/frontend/mame/ui/custui.cpp:913
+#: src/frontend/mame/ui/custui.cpp:930 src/frontend/mame/ui/custui.cpp:933
 msgctxt "color-channel"
 msgid "Blue"
 msgstr "Azul"
 
-#: src/frontend/mame/ui/custui.cpp:916
+#: src/frontend/mame/ui/custui.cpp:936
 msgid "Choose from palette"
 msgstr "Escolha da paleta"
 
-#: src/frontend/mame/ui/custui.cpp:931
+#: src/frontend/mame/ui/custui.cpp:959
 msgid "Color preview:"
 msgstr "Visualização prévia da cor:"
 
-#: src/frontend/mame/ui/custui.cpp:1029
+#: src/frontend/mame/ui/custui.cpp:1052
 msgctxt "color-preset"
 msgid "White"
 msgstr "Branco"
 
-#: src/frontend/mame/ui/custui.cpp:1030
+#: src/frontend/mame/ui/custui.cpp:1053
 msgctxt "color-preset"
 msgid "Silver"
 msgstr "Prata"
 
-#: src/frontend/mame/ui/custui.cpp:1031
+#: src/frontend/mame/ui/custui.cpp:1054
 msgctxt "color-preset"
 msgid "Gray"
 msgstr "Cinza"
 
-#: src/frontend/mame/ui/custui.cpp:1032
+#: src/frontend/mame/ui/custui.cpp:1055
 msgctxt "color-preset"
 msgid "Black"
 msgstr "Preto"
 
-#: src/frontend/mame/ui/custui.cpp:1033
+#: src/frontend/mame/ui/custui.cpp:1056
 msgctxt "color-preset"
 msgid "Red"
 msgstr "Vermelho"
 
-#: src/frontend/mame/ui/custui.cpp:1034
+#: src/frontend/mame/ui/custui.cpp:1057
 msgctxt "color-preset"
 msgid "Orange"
 msgstr "Laranja"
 
-#: src/frontend/mame/ui/custui.cpp:1035
+#: src/frontend/mame/ui/custui.cpp:1058
 msgctxt "color-preset"
 msgid "Yellow"
 msgstr "Amarelo"
 
-#: src/frontend/mame/ui/custui.cpp:1036
+#: src/frontend/mame/ui/custui.cpp:1059
 msgctxt "color-preset"
 msgid "Green"
 msgstr "Verde"
 
-#: src/frontend/mame/ui/custui.cpp:1037
+#: src/frontend/mame/ui/custui.cpp:1060
 msgctxt "color-preset"
 msgid "Blue"
 msgstr "Azul"
 
-#: src/frontend/mame/ui/custui.cpp:1038
+#: src/frontend/mame/ui/custui.cpp:1061
 msgctxt "color-preset"
 msgid "Violet"
 msgstr "Violeta"
@@ -2829,36 +2835,61 @@ msgctxt "about-header"
 msgid "Revision: %1$s"
 msgstr "Revisão:  %1$s"
 
-#: src/frontend/mame/ui/analogipt.cpp:60
+#: src/frontend/mame/ui/analogipt.cpp:27
+#, c-format
+msgctxt "menu-analoginput"
+msgid ""
+"Show/hide settings  \t\t%1$s\n"
+"Decrease value  \t\t%2$s\n"
+"Increase value  \t\t%3$s\n"
+"Restore default value  \t\t%4$s\n"
+"Previous device  \t\t%5$s\n"
+"Next device  \t\t%6$s\n"
+"Return to previous menu  \t\t%7$s"
+msgstr ""
+
+#: src/frontend/mame/ui/analogipt.cpp:82
+msgctxt "menu-analoginput"
 msgid "Analog Input Adjustments"
 msgstr "Ajustes de Entrada Analógicos"
 
-#: src/frontend/mame/ui/analogipt.cpp:92
+#: src/frontend/mame/ui/analogipt.cpp:121
 #, c-format
-msgid "Press %s to show menu"
-msgstr "Pressione %s para mostrar o menu"
+msgctxt "menu-analoginput"
+msgid "Press %s to show settings"
+msgstr ""
 
-#: src/frontend/mame/ui/analogipt.cpp:372
+#: src/frontend/mame/ui/analogipt.cpp:245
+msgctxt "menu-analoginput"
+msgid "Analog Input Adjustments Help"
+msgstr ""
+
+#: src/frontend/mame/ui/analogipt.cpp:421
 #, c-format
+msgctxt "menu-analoginput"
 msgid "%1$s Increment/Decrement Speed"
 msgstr "Velocidade de Incremento/Decréscimo %1$s"
 
-#: src/frontend/mame/ui/analogipt.cpp:377
+#: src/frontend/mame/ui/analogipt.cpp:426
 #, c-format
+msgctxt "menu-analoginput"
 msgid "%1$s Auto-centering Speed"
 msgstr "Velocidade de Auto-Centralização %1$s"
 
-#: src/frontend/mame/ui/analogipt.cpp:382
+#: src/frontend/mame/ui/analogipt.cpp:431
 #, c-format
+msgctxt "menu-analoginput"
 msgid "%1$s Reverse"
 msgstr "Reverso da %1$s"
 
-#: src/frontend/mame/ui/analogipt.cpp:387
+#: src/frontend/mame/ui/analogipt.cpp:436
 #, c-format
+msgctxt "menu-analoginput"
 msgid "%1$s Sensitivity"
 msgstr "Sensibilidade %1$s"
 
-#: src/frontend/mame/ui/analogipt.cpp:402
+#: src/frontend/mame/ui/analogipt.cpp:451
+msgctxt "menu-analoginput"
 msgid "[no analog inputs are enabled]"
 msgstr "[nenhuma entrada analógica está ativada]"
 
@@ -3009,164 +3040,164 @@ msgctxt "menu-main"
 msgid "Close Menu"
 msgstr "Fecha o Menu"
 
-#: src/frontend/mame/ui/selmenu.cpp:77
+#: src/frontend/mame/ui/selmenu.cpp:55
+msgid "Images"
+msgstr "Imagens"
+
+#: src/frontend/mame/ui/selmenu.cpp:56
+msgid "Info"
+msgstr ""
+
+#: src/frontend/mame/ui/selmenu.cpp:83
 msgctxt "selmenu-artwork"
 msgid "Snapshots"
 msgstr "Snapshots"
 
-#: src/frontend/mame/ui/selmenu.cpp:78
+#: src/frontend/mame/ui/selmenu.cpp:84
 msgctxt "selmenu-artwork"
 msgid "Cabinet"
 msgstr "Gabinete"
 
-#: src/frontend/mame/ui/selmenu.cpp:79
+#: src/frontend/mame/ui/selmenu.cpp:85
 msgctxt "selmenu-artwork"
 msgid "Control Panel"
 msgstr "Painel de Controle"
 
-#: src/frontend/mame/ui/selmenu.cpp:80
+#: src/frontend/mame/ui/selmenu.cpp:86
 msgctxt "selmenu-artwork"
 msgid "PCB"
 msgstr "PCB"
 
-#: src/frontend/mame/ui/selmenu.cpp:81
+#: src/frontend/mame/ui/selmenu.cpp:87
 msgctxt "selmenu-artwork"
 msgid "Flyer"
 msgstr "Folheto"
 
-#: src/frontend/mame/ui/selmenu.cpp:82
+#: src/frontend/mame/ui/selmenu.cpp:88
 msgctxt "selmenu-artwork"
 msgid "Title Screen"
 msgstr "Telas Título"
 
-#: src/frontend/mame/ui/selmenu.cpp:83
+#: src/frontend/mame/ui/selmenu.cpp:89
 msgctxt "selmenu-artwork"
 msgid "Ending"
 msgstr "Final"
 
-#: src/frontend/mame/ui/selmenu.cpp:84
+#: src/frontend/mame/ui/selmenu.cpp:90
 msgctxt "selmenu-artwork"
 msgid "Artwork Preview"
 msgstr "Pré-Visualização do Trabalho de Arte"
 
-#: src/frontend/mame/ui/selmenu.cpp:85
+#: src/frontend/mame/ui/selmenu.cpp:91
 msgctxt "selmenu-artwork"
 msgid "Bosses"
 msgstr "Chefes"
 
-#: src/frontend/mame/ui/selmenu.cpp:86
+#: src/frontend/mame/ui/selmenu.cpp:92
 msgctxt "selmenu-artwork"
 msgid "Logo"
 msgstr "Logo"
 
-#: src/frontend/mame/ui/selmenu.cpp:87
+#: src/frontend/mame/ui/selmenu.cpp:93
 msgctxt "selmenu-artwork"
 msgid "Versus"
 msgstr "Versus"
 
-#: src/frontend/mame/ui/selmenu.cpp:88
+#: src/frontend/mame/ui/selmenu.cpp:94
 msgctxt "selmenu-artwork"
 msgid "Game Over"
 msgstr "Game Over"
 
-#: src/frontend/mame/ui/selmenu.cpp:89
+#: src/frontend/mame/ui/selmenu.cpp:95
 msgctxt "selmenu-artwork"
 msgid "HowTo"
 msgstr "Como Fazer"
 
-#: src/frontend/mame/ui/selmenu.cpp:90
+#: src/frontend/mame/ui/selmenu.cpp:96
 msgctxt "selmenu-artwork"
 msgid "Scores"
 msgstr "Pontuações"
 
-#: src/frontend/mame/ui/selmenu.cpp:91
+#: src/frontend/mame/ui/selmenu.cpp:97
 msgctxt "selmenu-artwork"
 msgid "Select"
 msgstr "Selecionar"
 
-#: src/frontend/mame/ui/selmenu.cpp:92
+#: src/frontend/mame/ui/selmenu.cpp:98
 msgctxt "selmenu-artwork"
 msgid "Marquee"
 msgstr "Marquise"
 
-#: src/frontend/mame/ui/selmenu.cpp:93
+#: src/frontend/mame/ui/selmenu.cpp:99
 msgctxt "selmenu-artwork"
 msgid "Covers"
 msgstr "Capas"
 
-#: src/frontend/mame/ui/selmenu.cpp:97
+#: src/frontend/mame/ui/selmenu.cpp:103
 msgid "Add or remove favorite"
 msgstr "Adiciona ou remove um favorito"
 
-#: src/frontend/mame/ui/selmenu.cpp:98
+#: src/frontend/mame/ui/selmenu.cpp:104
 msgid "Export displayed list to file"
 msgstr "Exporta a lista exibida para um arquivo"
 
-#: src/frontend/mame/ui/selmenu.cpp:99
+#: src/frontend/mame/ui/selmenu.cpp:105
 msgid "Audit media"
 msgstr "Audita a mídia"
 
-#: src/frontend/mame/ui/selmenu.cpp:100
+#: src/frontend/mame/ui/selmenu.cpp:106
 msgid "Show DATs view"
 msgstr "Mostrar visualização dos DATs"
 
-#: src/frontend/mame/ui/selmenu.cpp:260
+#: src/frontend/mame/ui/selmenu.cpp:268
 msgid "Select Software Package Part"
 msgstr "Selecione a Parte do Pacote do Software"
 
-#: src/frontend/mame/ui/selmenu.cpp:330
+#: src/frontend/mame/ui/selmenu.cpp:338
 msgid "Select System BIOS"
 msgstr "Selecione a BIOS do sistema"
 
-#: src/frontend/mame/ui/selmenu.cpp:644 src/frontend/mame/ui/selmenu.cpp:675
+#: src/frontend/mame/ui/selmenu.cpp:689 src/frontend/mame/ui/selmenu.cpp:720
 #, c-format
 msgid "%1$s, %2$s"
 msgstr "%1$s, %2$s"
 
-#: src/frontend/mame/ui/selmenu.cpp:648
+#: src/frontend/mame/ui/selmenu.cpp:693
 #, c-format
 msgid "Software is clone of: %1$s"
 msgstr "O software é clone do: %1$s"
 
-#: src/frontend/mame/ui/selmenu.cpp:650
+#: src/frontend/mame/ui/selmenu.cpp:695
 msgid "Software is parent"
 msgstr "O software é pai"
 
-#: src/frontend/mame/ui/selmenu.cpp:655
+#: src/frontend/mame/ui/selmenu.cpp:700
 msgid "Supported: No"
 msgstr "Suportado: Não"
 
-#: src/frontend/mame/ui/selmenu.cpp:660
+#: src/frontend/mame/ui/selmenu.cpp:705
 msgid "Supported: Partial"
 msgstr "Suportado: Parcial"
 
-#: src/frontend/mame/ui/selmenu.cpp:665
+#: src/frontend/mame/ui/selmenu.cpp:710
 msgid "Supported: Yes"
 msgstr "Suportado: Sim"
 
-#: src/frontend/mame/ui/selmenu.cpp:681
+#: src/frontend/mame/ui/selmenu.cpp:726
 msgid "System is parent"
 msgstr "O sistema é pai"
 
-#: src/frontend/mame/ui/selmenu.cpp:683 src/frontend/mame/ui/selmenu.cpp:685
+#: src/frontend/mame/ui/selmenu.cpp:728 src/frontend/mame/ui/selmenu.cpp:730
 #, c-format
 msgid "System is clone of: %1$s"
 msgstr "O sistema é clone do: %1$s"
 
-#: src/frontend/mame/ui/selmenu.cpp:721
+#: src/frontend/mame/ui/selmenu.cpp:766
 #, c-format
 msgid "%1$s %2$s"
 msgstr "%1$s %2$s"
 
-#: src/frontend/mame/ui/selmenu.cpp:2222
-msgid "Images"
-msgstr "Imagens"
-
-#: src/frontend/mame/ui/selmenu.cpp:2223
-msgid "Infos"
-msgstr "Informações"
-
-#: src/frontend/mame/ui/selmenu.cpp:2538
+#: src/frontend/mame/ui/selmenu.cpp:2611
 msgid ""
 "Required ROM/disk images for the selected system are missing or incorrect. "
 "Please acquire the correct files or select a different system.\n"
@@ -3177,7 +3208,7 @@ msgstr ""
 "selecione um sistema diferente.\n"
 "\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2554
+#: src/frontend/mame/ui/selmenu.cpp:2627
 msgid ""
 "Required ROM/disk images for the selected software are missing or incorrect. "
 "Please acquire the correct files or select a different software item.\n"
@@ -3188,333 +3219,333 @@ msgstr ""
 "selecione um item de software diferente.\n"
 "\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2570
+#: src/frontend/mame/ui/selmenu.cpp:2643
 msgid "incorrect checksum"
 msgstr "checksum incorreto"
 
-#: src/frontend/mame/ui/selmenu.cpp:2573
+#: src/frontend/mame/ui/selmenu.cpp:2646
 msgid "incorrect length"
 msgstr "tamanho incorreto"
 
-#: src/frontend/mame/ui/selmenu.cpp:2576
+#: src/frontend/mame/ui/selmenu.cpp:2649
 msgid "not found"
 msgstr "não foi encontrado"
 
-#: src/frontend/mame/ui/selmenu.cpp:2587
+#: src/frontend/mame/ui/selmenu.cpp:2660
 #, c-format
 msgid "%1$s (%2$s) - %3$s\n"
 msgstr "%1$s (%2$s) - %3$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2589
+#: src/frontend/mame/ui/selmenu.cpp:2662
 #, c-format
 msgid "%1$s - %2$s\n"
 msgstr "%1$s - %2$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2593
+#: src/frontend/mame/ui/selmenu.cpp:2666
 msgid "Press any key to continue."
 msgstr "Pressione qualquer tecla para continuar."
 
-#: src/frontend/mame/ui/selmenu.cpp:2722
+#: src/frontend/mame/ui/selmenu.cpp:2789
 msgid "General Info"
 msgstr "Informações Gerais"
 
-#: src/frontend/mame/ui/selmenu.cpp:2874
+#: src/frontend/mame/ui/selmenu.cpp:2935
 #, c-format
 msgid "Short Name\t%1$s\n"
 msgstr "Nome Curto\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2875
+#: src/frontend/mame/ui/selmenu.cpp:2936
 #, c-format
 msgid "Year\t%1$s\n"
 msgstr "Ano\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2876
+#: src/frontend/mame/ui/selmenu.cpp:2937
 #, c-format
 msgid "Manufacturer\t%1$s\n"
 msgstr "Fabricante\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2883
+#: src/frontend/mame/ui/selmenu.cpp:2944
 #, c-format
 msgid "System is Clone of\t%1$s\n"
 msgstr "O Sistem é Clone do\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2888
+#: src/frontend/mame/ui/selmenu.cpp:2949
 msgid "System is Parent\t\n"
 msgstr "O Sistema é Pai\t\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2892
+#: src/frontend/mame/ui/selmenu.cpp:2953
 msgid "Analog Controls\tYes\n"
 msgstr "Controles Analógicos\tSim\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2894
+#: src/frontend/mame/ui/selmenu.cpp:2955
 msgid "Keyboard Inputs\tYes\n"
 msgstr "Entradas do Teclado\tSim\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2897
+#: src/frontend/mame/ui/selmenu.cpp:2958
 msgid "Overall\tNOT WORKING\n"
 msgstr "Geral\tNÃO FUNCIONA\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2899
+#: src/frontend/mame/ui/selmenu.cpp:2960
 msgid "Overall\tUnemulated Protection\n"
 msgstr "Geral\tProteção não Emulada\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2901
+#: src/frontend/mame/ui/selmenu.cpp:2962
 msgid "Overall\tWorking\n"
 msgstr "Geral\tFunciona\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2904
+#: src/frontend/mame/ui/selmenu.cpp:2965
 msgid "Graphics\tUnimplemented\n"
 msgstr "Gráficos\tNão implementado\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2906
+#: src/frontend/mame/ui/selmenu.cpp:2967
 msgid "Graphics\tWrong Colors\n"
 msgstr "Graficos\tCores erradas\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2908
+#: src/frontend/mame/ui/selmenu.cpp:2969
 msgid "Graphics\tImperfect Colors\n"
 msgstr "Gráficos\tCores imperfeitas\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2910
+#: src/frontend/mame/ui/selmenu.cpp:2971
 msgid "Graphics\tImperfect\n"
 msgstr "Gráficos\tImperfeitos\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2912
+#: src/frontend/mame/ui/selmenu.cpp:2973
 msgid "Graphics\tOK\n"
 msgstr "Gráficos\tOK\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2915
+#: src/frontend/mame/ui/selmenu.cpp:2976
 msgid "Sound\tNone\n"
 msgstr "Áudio\tNenhum\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2917
+#: src/frontend/mame/ui/selmenu.cpp:2978
 msgid "Sound\tUnimplemented\n"
 msgstr "Áudio\tNão implementado\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2919
+#: src/frontend/mame/ui/selmenu.cpp:2980
 msgid "Sound\tImperfect\n"
 msgstr "Áudio\tImperfeito\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2921
+#: src/frontend/mame/ui/selmenu.cpp:2982
 msgid "Sound\tOK\n"
 msgstr "Áudio\tOK\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2924
+#: src/frontend/mame/ui/selmenu.cpp:2985
 msgid "Capture\tUnimplemented\n"
 msgstr "Captura\tNão implementada\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2926
+#: src/frontend/mame/ui/selmenu.cpp:2987
 msgid "Capture\tImperfect\n"
 msgstr "Captura\tImperfeita\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2929
+#: src/frontend/mame/ui/selmenu.cpp:2990
 msgid "Camera\tUnimplemented\n"
 msgstr "Câmera\tNão implementada\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2931
+#: src/frontend/mame/ui/selmenu.cpp:2992
 msgid "Camera\tImperfect\n"
 msgstr "Câmera\tImperfeita\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2934
+#: src/frontend/mame/ui/selmenu.cpp:2995
 msgid "Microphone\tUnimplemented\n"
 msgstr "Microfone\tNão implementado\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2936
+#: src/frontend/mame/ui/selmenu.cpp:2997
 msgid "Microphone\tImperfect\n"
 msgstr "Microfone\tImperfeito\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2939
+#: src/frontend/mame/ui/selmenu.cpp:3000
 msgid "Controls\tUnimplemented\n"
 msgstr "Controles\tNão implementados\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2941
+#: src/frontend/mame/ui/selmenu.cpp:3002
 msgid "Controls\tImperfect\n"
 msgstr "Controles\tImperfeitos\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2944
+#: src/frontend/mame/ui/selmenu.cpp:3005
 msgid "Keyboard\tUnimplemented\n"
 msgstr "Teclado\tNão implementado\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2946
+#: src/frontend/mame/ui/selmenu.cpp:3007
 msgid "Keyboard\tImperfect\n"
 msgstr "Teclado\tImperfeito\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2949
+#: src/frontend/mame/ui/selmenu.cpp:3010
 msgid "Mouse\tUnimplemented\n"
 msgstr "Mouse\tNão implementado\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2951
+#: src/frontend/mame/ui/selmenu.cpp:3012
 msgid "Mouse\tImperfect\n"
 msgstr "Mouse\tImperfeito\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2954
+#: src/frontend/mame/ui/selmenu.cpp:3015
 msgid "Media\tUnimplemented\n"
 msgstr "Mídia\tNão implementada\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2956
+#: src/frontend/mame/ui/selmenu.cpp:3017
 msgid "Media\tImperfect\n"
 msgstr "Mídia\tImperfeita\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2959
+#: src/frontend/mame/ui/selmenu.cpp:3020
 msgid "Disk\tUnimplemented\n"
 msgstr "Disco\tNão implementado\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2961
+#: src/frontend/mame/ui/selmenu.cpp:3022
 msgid "Disk\tImperfect\n"
 msgstr "Disco\tImperfeito\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2964
+#: src/frontend/mame/ui/selmenu.cpp:3025
 msgid "Printer\tUnimplemented\n"
 msgstr "Impressora\tNão implementada\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2966
+#: src/frontend/mame/ui/selmenu.cpp:3027
 msgid "Printer\tImperfect\n"
 msgstr "Impressora\tImperfeita\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2969
+#: src/frontend/mame/ui/selmenu.cpp:3030
 msgid "Mag. Tape\tUnimplemented\n"
 msgstr "Fita Magnética\tNão implementada\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2971
+#: src/frontend/mame/ui/selmenu.cpp:3032
 msgid "Mag. Tape\tImperfect\n"
 msgstr "Fita Magnética\tImperfeita\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2974
+#: src/frontend/mame/ui/selmenu.cpp:3035
 msgid "Punch Tape\tUnimplemented\n"
 msgstr "Punch Tape\tNão implementada\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2976
+#: src/frontend/mame/ui/selmenu.cpp:3037
 msgid "Punch Tape\tImperfect\n"
 msgstr "Punch Tape\tImperfeita\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2979
+#: src/frontend/mame/ui/selmenu.cpp:3040
 msgid "Mag. Drum\tUnimplemented\n"
 msgstr "Bateria Magnética\tNão implementada\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2981
+#: src/frontend/mame/ui/selmenu.cpp:3042
 msgid "Mag. Drum\tImperfect\n"
 msgstr "Bateria Magnética\tImperfeita\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2984
+#: src/frontend/mame/ui/selmenu.cpp:3045
 msgid "(EP)ROM\tUnimplemented\n"
 msgstr "(EP)ROM\tNão implementado\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2986
+#: src/frontend/mame/ui/selmenu.cpp:3047
 msgid "(EP)ROM\tImperfect\n"
 msgstr "(EP)ROM\tImperfeito\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2989
+#: src/frontend/mame/ui/selmenu.cpp:3050
 msgid "Communications\tUnimplemented\n"
 msgstr "Comunicações\tNão implementadas\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2991
+#: src/frontend/mame/ui/selmenu.cpp:3052
 msgid "Communications\tImperfect\n"
 msgstr "Comunicações\tImperfeitas\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2994
+#: src/frontend/mame/ui/selmenu.cpp:3055
 msgid "LAN\tUnimplemented\n"
 msgstr "LAN\tNão implementada\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2996
+#: src/frontend/mame/ui/selmenu.cpp:3057
 msgid "LAN\tImperfect\n"
 msgstr "LAN\tImperfeita\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2999
+#: src/frontend/mame/ui/selmenu.cpp:3060
 msgid "WAN\tUnimplemented\n"
 msgstr "WAN\tNão implementada\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3001
+#: src/frontend/mame/ui/selmenu.cpp:3062
 msgid "WAN\tImperfect\n"
 msgstr "WAN\tImperfeita\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3004
+#: src/frontend/mame/ui/selmenu.cpp:3065
 msgid "Timing\tUnimplemented\n"
 msgstr "Cronometragem\tNão implementada\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3006
+#: src/frontend/mame/ui/selmenu.cpp:3067
 msgid "Timing\tImperfect\n"
 msgstr "Cronometragem\tImperfeita\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3008
+#: src/frontend/mame/ui/selmenu.cpp:3069
 msgid "Mechanical System\tYes\n"
 msgstr "Sistema Mecânico\tSim\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3008
+#: src/frontend/mame/ui/selmenu.cpp:3069
 msgid "Mechanical System\tNo\n"
 msgstr "Sistema Mecânico\tNão\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3009
+#: src/frontend/mame/ui/selmenu.cpp:3070
 msgid "Requires Artwork\tYes\n"
 msgstr "Requer Trabalho de Arte\tSim\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3009
+#: src/frontend/mame/ui/selmenu.cpp:3070
 msgid "Requires Artwork\tNo\n"
 msgstr "Requer Trabalho de Arte\tNão\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3010
+#: src/frontend/mame/ui/selmenu.cpp:3071
 msgid "Requires Clickable Artwork\tYes\n"
 msgstr "Requer Arte Clicável\tSim\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3010
+#: src/frontend/mame/ui/selmenu.cpp:3071
 msgid "Requires Clickable Artwork\tNo\n"
 msgstr "Requer Arte Clicável\tNão\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3012
+#: src/frontend/mame/ui/selmenu.cpp:3073
 msgid "Support Cocktail\tNo\n"
 msgstr "Suporte ao Coquetel\tNão\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3013
+#: src/frontend/mame/ui/selmenu.cpp:3074
 msgid "System is BIOS\tYes\n"
 msgstr "O Sistema é BIOS\tSim\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3013
+#: src/frontend/mame/ui/selmenu.cpp:3074
 msgid "System is BIOS\tNo\n"
 msgstr "O Sistema é BIOS\tNão\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3014
+#: src/frontend/mame/ui/selmenu.cpp:3075
 msgid "Support Save\tYes\n"
 msgstr "Suporte pro Salvamento\tSim\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3014
+#: src/frontend/mame/ui/selmenu.cpp:3075
 msgid "Support Save\tNo\n"
 msgstr "Suporte pro Salvamento\tNão\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3015
+#: src/frontend/mame/ui/selmenu.cpp:3076
 msgid "Screen Orientation\tVertical\n"
 msgstr "Orientação da Tela\tVertical\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3015
+#: src/frontend/mame/ui/selmenu.cpp:3076
 msgid "Screen Orientation\tHorizontal\n"
 msgstr "Orientação da Tela\tHorizontal\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3025
+#: src/frontend/mame/ui/selmenu.cpp:3086
 msgid "Requires CHD\tYes\n"
 msgstr "Requer CHD\tSim\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3025
+#: src/frontend/mame/ui/selmenu.cpp:3086
 msgid "Requires CHD\tNo\n"
 msgstr "Requer CHD\tNão\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3038
+#: src/frontend/mame/ui/selmenu.cpp:3099
 msgid "Media Audit Result\tOK\n"
 msgstr "Resultado da Auditoria da Mídia\tOK\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3040
+#: src/frontend/mame/ui/selmenu.cpp:3101
 msgid "Media Audit Result\tBAD\n"
 msgstr "Resultado da Auditoria da Mídia\tRUIM\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3043
+#: src/frontend/mame/ui/selmenu.cpp:3104
 msgid "Samples Audit Result\tNone Needed\n"
 msgstr "Resultado da Auditoria das Amostras\tNenhuma Necessária\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3045
+#: src/frontend/mame/ui/selmenu.cpp:3106
 msgid "Samples Audit Result\tOK\n"
 msgstr "Resultado da Auditoria das Amostras\tOK\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3047
+#: src/frontend/mame/ui/selmenu.cpp:3108
 msgid "Samples Audit Result\tBAD\n"
 msgstr "Resultado da Auditoria das Amostras\tRUIM\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3051
+#: src/frontend/mame/ui/selmenu.cpp:3112
 msgid ""
 "Media Audit\tDisabled\n"
 "Samples Audit\tDisabled\n"
@@ -3688,74 +3719,74 @@ msgstr "* Opções de Slot:\n"
 msgid "[None]\n"
 msgstr "[Nenhum]\n"
 
-#: src/emu/render.cpp:1833
+#: src/emu/render.cpp:1834
 #, c-format
 msgctxt "view-name"
 msgid "Screen %1$u Standard (%2$u:%3$u)"
 msgstr "Tela %1$u Padrão (%2$u:%3$u)"
 
-#: src/emu/render.cpp:1859
+#: src/emu/render.cpp:1860
 #, c-format
 msgctxt "view-name"
 msgid "Screen %1$u Pixel Aspect (%2$u:%3$u)"
 msgstr "Tela %1$u Aspecto dos Pixeis (%2$u:%3$u)"
 
-#: src/emu/render.cpp:1881 src/emu/render.cpp:2016
+#: src/emu/render.cpp:1882 src/emu/render.cpp:2017
 msgctxt "view-name"
 msgid "Cocktail"
 msgstr "Coquetel"
 
-#: src/emu/render.cpp:2001
+#: src/emu/render.cpp:2002
 msgctxt "view-name"
 msgid "Left-to-Right"
 msgstr "Da-Esquerda-pra-Direita"
 
-#: src/emu/render.cpp:2002
+#: src/emu/render.cpp:2003
 msgctxt "view-name"
 msgid "Left-to-Right (Gapless)"
 msgstr "Da-Esquerda-pra-Direita (Sem Espaços)"
 
-#: src/emu/render.cpp:2003
+#: src/emu/render.cpp:2004
 msgctxt "view-name"
 msgid "Top-to-Bottom"
 msgstr "Do Topo-até-o-Rodapé"
 
-#: src/emu/render.cpp:2004
+#: src/emu/render.cpp:2005
 msgctxt "view-name"
 msgid "Top-to-Bottom (Gapless)"
 msgstr "Do Topo-até-o-Rodapé (Sem Espaço)"
 
-#: src/emu/render.cpp:2055
+#: src/emu/render.cpp:2056
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom"
 msgstr "%1$u×%2$u Da-Esquerda-pra-Direita, Do Topo-até-o-Rodapé"
 
-#: src/emu/render.cpp:2064
+#: src/emu/render.cpp:2065
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom (Gapless)"
 msgstr "%1$u×%2$u Da-Esquerda-pra-Direita, Do Topo-até-o-Rodapé (Sem Espaço)"
 
-#: src/emu/render.cpp:2073
+#: src/emu/render.cpp:2074
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right"
 msgstr "%1$u×%2$u Do Topo-até-o-Rodapé, Da-Esquerda-pra-Direita"
 
-#: src/emu/render.cpp:2082
+#: src/emu/render.cpp:2083
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right (Gapless)"
 msgstr "%1$u×%2$u Do Topo-até-o-Rodapé, Da-Esquerda-pra-Direita (Sem Espaço)"
 
-#: src/emu/ioport.cpp:333
+#: src/emu/ioport.cpp:271
 #, c-format
 msgctxt "input-name"
 msgid "P%1$u"
 msgstr "P%1$u"
 
-#: src/emu/ioport.cpp:2052
+#: src/emu/ioport.cpp:1991
 msgctxt "input-name"
 msgid "???"
 msgstr "???"
@@ -5387,223 +5418,223 @@ msgstr "Teclado"
 
 #: src/emu/inpttype.ipp:874
 msgctxt "input-name"
-msgid "On Screen Display"
-msgstr "Visor na Tela"
+msgid "Show/Hide Menu"
+msgstr ""
 
 #: src/emu/inpttype.ipp:875
-msgctxt "input-name"
-msgid "Break in Debugger"
-msgstr "Parar no Debugger"
-
-#: src/emu/inpttype.ipp:876
-msgctxt "input-name"
-msgid "Config Menu"
-msgstr "Menu da Configuração"
-
-#: src/emu/inpttype.ipp:877
-msgctxt "input-name"
-msgid "Pause"
-msgstr "Pausa"
-
-#: src/emu/inpttype.ipp:878
-msgctxt "input-name"
-msgid "Pause - Single Step"
-msgstr "Pausa - Passo Único"
-
-#: src/emu/inpttype.ipp:879
-msgctxt "input-name"
-msgid "Rewind - Single Step"
-msgstr "Rebobina - Passo Único"
-
-#: src/emu/inpttype.ipp:880
-msgctxt "input-name"
-msgid "Reset Machine"
-msgstr "Resetar a Máquina"
-
-#: src/emu/inpttype.ipp:881
-msgctxt "input-name"
-msgid "Soft Reset"
-msgstr "Reset Leve"
-
-#: src/emu/inpttype.ipp:882
-msgctxt "input-name"
-msgid "Show Decoded Graphics"
-msgstr "Mostrar Gráficos Decodificados"
-
-#: src/emu/inpttype.ipp:883
-msgctxt "input-name"
-msgid "Frameskip Dec"
-msgstr "Diminuir Frameskip"
-
-#: src/emu/inpttype.ipp:884
-msgctxt "input-name"
-msgid "Frameskip Inc"
-msgstr "Aumentar Frameskip"
-
-#: src/emu/inpttype.ipp:885
-msgctxt "input-name"
-msgid "Throttle"
-msgstr "Acelerar"
-
-#: src/emu/inpttype.ipp:886
-msgctxt "input-name"
-msgid "Fast Forward"
-msgstr "Avanço Rápido"
-
-#: src/emu/inpttype.ipp:887
-msgctxt "input-name"
-msgid "Show FPS"
-msgstr "Mostra FPS"
-
-#: src/emu/inpttype.ipp:888
-msgctxt "input-name"
-msgid "Save Snapshot"
-msgstr "Salvar Snapshot"
-
-#: src/emu/inpttype.ipp:889
-msgctxt "input-name"
-msgid "Record MNG"
-msgstr "Grava MNG"
-
-#: src/emu/inpttype.ipp:890
-msgctxt "input-name"
-msgid "Record AVI"
-msgstr "Grava AVI"
-
-#: src/emu/inpttype.ipp:891
-msgctxt "input-name"
-msgid "Toggle Cheat"
-msgstr "Alternar Trapaça"
-
-#: src/emu/inpttype.ipp:892
-msgctxt "input-name"
-msgid "UI Up"
-msgstr "IU Pra Cima"
-
-#: src/emu/inpttype.ipp:893
-msgctxt "input-name"
-msgid "UI Down"
-msgstr "IU Pra Baixo"
-
-#: src/emu/inpttype.ipp:894
-msgctxt "input-name"
-msgid "UI Left"
-msgstr "IU Esquerdo"
-
-#: src/emu/inpttype.ipp:895
-msgctxt "input-name"
-msgid "UI Right"
-msgstr "IU Direito"
-
-#: src/emu/inpttype.ipp:896
-msgctxt "input-name"
-msgid "UI Home"
-msgstr "IU Home"
-
-#: src/emu/inpttype.ipp:897
-msgctxt "input-name"
-msgid "UI End"
-msgstr "IU End"
-
-#: src/emu/inpttype.ipp:898
-msgctxt "input-name"
-msgid "UI Page Up"
-msgstr "IU Page Up"
-
-#: src/emu/inpttype.ipp:899
-msgctxt "input-name"
-msgid "UI Page Down"
-msgstr "IU Page Down"
-
-#: src/emu/inpttype.ipp:900
-msgctxt "input-name"
-msgid "UI Focus Next"
-msgstr "Foco da IU em Seguida"
-
-#: src/emu/inpttype.ipp:901
-msgctxt "input-name"
-msgid "UI Focus Previous"
-msgstr "Foco Anterior da IU"
-
-#: src/emu/inpttype.ipp:902
 msgctxt "input-name"
 msgid "UI Select"
 msgstr "IU Seleciona"
 
-#: src/emu/inpttype.ipp:903
+#: src/emu/inpttype.ipp:876
+msgctxt "input-name"
+msgid "UI Back"
+msgstr ""
+
+#: src/emu/inpttype.ipp:877
 msgctxt "input-name"
 msgid "UI Cancel"
 msgstr "IU Cancela"
 
-#: src/emu/inpttype.ipp:904
-msgctxt "input-name"
-msgid "UI Display Comment"
-msgstr "Exibir Comentário na IU"
-
-#: src/emu/inpttype.ipp:905
+#: src/emu/inpttype.ipp:878
 msgctxt "input-name"
 msgid "UI Clear"
 msgstr "IU Limpa"
 
-#: src/emu/inpttype.ipp:906
+#: src/emu/inpttype.ipp:879
 msgctxt "input-name"
-msgid "UI Zoom In"
-msgstr "Aumentar Zoom da IU"
+msgid "UI Help"
+msgstr ""
 
-#: src/emu/inpttype.ipp:907
+#: src/emu/inpttype.ipp:880
 msgctxt "input-name"
-msgid "UI Zoom Out"
-msgstr "Diminuir Zoom da IU"
+msgid "UI Up"
+msgstr "IU Pra Cima"
 
-#: src/emu/inpttype.ipp:908
+#: src/emu/inpttype.ipp:881
 msgctxt "input-name"
-msgid "UI Default Zoom"
-msgstr "Zoom Padrão da IU"
+msgid "UI Down"
+msgstr "IU Pra Baixo"
 
-#: src/emu/inpttype.ipp:909
+#: src/emu/inpttype.ipp:882
+msgctxt "input-name"
+msgid "UI Left"
+msgstr "IU Esquerdo"
+
+#: src/emu/inpttype.ipp:883
+msgctxt "input-name"
+msgid "UI Right"
+msgstr "IU Direito"
+
+#: src/emu/inpttype.ipp:884
+msgctxt "input-name"
+msgid "UI Home"
+msgstr "IU Home"
+
+#: src/emu/inpttype.ipp:885
+msgctxt "input-name"
+msgid "UI End"
+msgstr "IU End"
+
+#: src/emu/inpttype.ipp:886
+msgctxt "input-name"
+msgid "UI Page Up"
+msgstr "IU Page Up"
+
+#: src/emu/inpttype.ipp:887
+msgctxt "input-name"
+msgid "UI Page Down"
+msgstr "IU Page Down"
+
+#: src/emu/inpttype.ipp:888
 msgctxt "input-name"
 msgid "UI Previous Group"
 msgstr "Grupo Anterioro da IU"
 
-#: src/emu/inpttype.ipp:910
+#: src/emu/inpttype.ipp:889
 msgctxt "input-name"
 msgid "UI Next Group"
 msgstr "Próximo Grupo da IU"
 
-#: src/emu/inpttype.ipp:911
+#: src/emu/inpttype.ipp:890
 msgctxt "input-name"
-msgid "UI Rotate"
-msgstr "IU Rotaciona"
+msgid "On Screen Display"
+msgstr "Visor na Tela"
 
-#: src/emu/inpttype.ipp:912
+#: src/emu/inpttype.ipp:891
 msgctxt "input-name"
-msgid "Show Profiler"
-msgstr "Mostrar o Criador de Perfil"
+msgid "Toggle UI Controls"
+msgstr ""
 
-#: src/emu/inpttype.ipp:913
+#: src/emu/inpttype.ipp:892
 msgctxt "input-name"
-msgid "UI Toggle"
-msgstr "IU Alterna"
+msgid "Break in Debugger"
+msgstr "Parar no Debugger"
 
-#: src/emu/inpttype.ipp:914
+#: src/emu/inpttype.ipp:893
 msgctxt "input-name"
-msgid "UI Release Pointer"
-msgstr "Ponteiro do Lançamento da IU"
+msgid "Pause"
+msgstr "Pausa"
 
-#: src/emu/inpttype.ipp:915
+#: src/emu/inpttype.ipp:894
 msgctxt "input-name"
-msgid "UI Paste Text"
-msgstr "Colar Texto na IU"
+msgid "Pause - Single Step"
+msgstr "Pausa - Passo Único"
 
-#: src/emu/inpttype.ipp:916
+#: src/emu/inpttype.ipp:895
+msgctxt "input-name"
+msgid "Rewind - Single Step"
+msgstr "Rebobina - Passo Único"
+
+#: src/emu/inpttype.ipp:896
 msgctxt "input-name"
 msgid "Save State"
 msgstr "Salvar State"
 
-#: src/emu/inpttype.ipp:917
+#: src/emu/inpttype.ipp:897
 msgctxt "input-name"
 msgid "Load State"
 msgstr "Carregar State"
+
+#: src/emu/inpttype.ipp:898
+msgctxt "input-name"
+msgid "Reset Machine"
+msgstr "Resetar a Máquina"
+
+#: src/emu/inpttype.ipp:899
+msgctxt "input-name"
+msgid "Soft Reset"
+msgstr "Reset Leve"
+
+#: src/emu/inpttype.ipp:900
+msgctxt "input-name"
+msgid "Show Decoded Graphics"
+msgstr "Mostrar Gráficos Decodificados"
+
+#: src/emu/inpttype.ipp:901
+msgctxt "input-name"
+msgid "Frameskip Dec"
+msgstr "Diminuir Frameskip"
+
+#: src/emu/inpttype.ipp:902
+msgctxt "input-name"
+msgid "Frameskip Inc"
+msgstr "Aumentar Frameskip"
+
+#: src/emu/inpttype.ipp:903
+msgctxt "input-name"
+msgid "Throttle"
+msgstr "Acelerar"
+
+#: src/emu/inpttype.ipp:904
+msgctxt "input-name"
+msgid "Fast Forward"
+msgstr "Avanço Rápido"
+
+#: src/emu/inpttype.ipp:905
+msgctxt "input-name"
+msgid "Show FPS"
+msgstr "Mostra FPS"
+
+#: src/emu/inpttype.ipp:906
+msgctxt "input-name"
+msgid "Save Snapshot"
+msgstr "Salvar Snapshot"
+
+#: src/emu/inpttype.ipp:907
+msgctxt "input-name"
+msgid "Record MNG"
+msgstr "Grava MNG"
+
+#: src/emu/inpttype.ipp:908
+msgctxt "input-name"
+msgid "Record AVI"
+msgstr "Grava AVI"
+
+#: src/emu/inpttype.ipp:909
+msgctxt "input-name"
+msgid "Toggle Cheat"
+msgstr "Alternar Trapaça"
+
+#: src/emu/inpttype.ipp:910
+msgctxt "input-name"
+msgid "UI Display Comment"
+msgstr "Exibir Comentário na IU"
+
+#: src/emu/inpttype.ipp:911
+msgctxt "input-name"
+msgid "UI Zoom In"
+msgstr "Aumentar Zoom da IU"
+
+#: src/emu/inpttype.ipp:912
+msgctxt "input-name"
+msgid "UI Zoom Out"
+msgstr "Diminuir Zoom da IU"
+
+#: src/emu/inpttype.ipp:913
+msgctxt "input-name"
+msgid "UI Default Zoom"
+msgstr "Zoom Padrão da IU"
+
+#: src/emu/inpttype.ipp:914
+msgctxt "input-name"
+msgid "UI Rotate"
+msgstr "IU Rotaciona"
+
+#: src/emu/inpttype.ipp:915
+msgctxt "input-name"
+msgid "Show Profiler"
+msgstr "Mostrar o Criador de Perfil"
+
+#: src/emu/inpttype.ipp:916
+msgctxt "input-name"
+msgid "UI Release Pointer"
+msgstr "Ponteiro do Lançamento da IU"
+
+#: src/emu/inpttype.ipp:917
+msgctxt "input-name"
+msgid "UI Paste Text"
+msgstr "Colar Texto na IU"
 
 #: src/emu/inpttype.ipp:918
 msgctxt "input-name"
@@ -5617,57 +5648,65 @@ msgstr "(Primeira) Parada da Fita da IU"
 
 #: src/emu/inpttype.ipp:920
 msgctxt "input-name"
-msgid "UI External DAT View"
-msgstr "Visualização Externa do DAT da IU"
+msgid "UI Focus Next"
+msgstr "Foco da IU em Seguida"
 
 #: src/emu/inpttype.ipp:921
 msgctxt "input-name"
-msgid "UI Add/Remove favorite"
-msgstr "Adicionar/Remover favoritos da IU"
+msgid "UI Focus Previous"
+msgstr "Foco Anterior da IU"
 
 #: src/emu/inpttype.ipp:922
+msgctxt "input-name"
+msgid "UI External DAT View"
+msgstr "Visualização Externa do DAT da IU"
+
+#: src/emu/inpttype.ipp:923
+msgctxt "input-name"
+msgid "UI Add/Remove Favorite"
+msgstr "Adicionar/Remover Favoritos da IU"
+
+#: src/emu/inpttype.ipp:924
 msgctxt "input-name"
 msgid "UI Export List"
 msgstr "Exportar Lista da IU"
 
-#: src/emu/inpttype.ipp:923
+#: src/emu/inpttype.ipp:925
 msgctxt "input-name"
 msgid "UI Audit Media"
 msgstr "Auditar Mídia da IU"
 
-#: src/osd/modules/input/input_windows.cpp:110
-#: src/osd/modules/input/input_sdlcommon.cpp:173
+#: src/osd/modules/input/input_windows.cpp:111 src/osd/sdl/osdsdl.cpp:339
 msgctxt "input-name"
 msgid "Toggle Fullscreen"
 msgstr "Alternar Tela Cheia"
 
-#: src/osd/modules/input/input_windows.cpp:116
+#: src/osd/modules/input/input_windows.cpp:117
 msgctxt "input-name"
 msgid "Take Rendered Snapshot"
 msgstr "Tirar Snapshot Renderizado"
 
-#: src/osd/modules/input/input_windows.cpp:127
-#: src/osd/modules/input/input_sdlcommon.cpp:221
+#: src/osd/modules/input/input_windows.cpp:128 src/osd/sdl/osdsdl.cpp:388
 msgctxt "input-name"
 msgid "Record Rendered Video"
 msgstr "Gravar Vídeo Renderizado"
 
-#: src/osd/modules/input/input_windows.cpp:143
+#: src/osd/modules/input/input_windows.cpp:144
 msgctxt "input-name"
 msgid "Toggle Post-Processing"
 msgstr "Alternar Pós-Processamento"
 
-#: src/osd/modules/input/input_sdlcommon.cpp:199
+#: src/osd/sdl/osdsdl.cpp:365
 msgctxt "input-name"
 msgid "Toggle Filter"
 msgstr "Alternar os Filtros"
 
-#: src/osd/modules/input/input_sdlcommon.cpp:205
+#: src/osd/sdl/osdsdl.cpp:371
 msgctxt "input-name"
 msgid "Decrease Prescaling"
 msgstr "Diminuir o pré-dimensionamento"
 
-#: src/osd/modules/input/input_sdlcommon.cpp:215
+#: src/osd/sdl/osdsdl.cpp:382
 msgctxt "input-name"
 msgid "Increase Prescaling"
 msgstr "Aumentar o pré-dimensionamento"
@@ -5996,12 +6035,12 @@ msgstr "Nome das portas de entrada salvo em %s"
 msgid "Input ports"
 msgstr "Portas de entrada"
 
-#: plugins/autofire/init.lua:94
+#: plugins/autofire/init.lua:98
 msgctxt "plugin-autofire"
 msgid "Failed to load autofire menu"
 msgstr "Falhou em carregar o menu do auto-disparar"
 
-#: plugins/autofire/init.lua:101
+#: plugins/autofire/init.lua:105
 msgctxt "plugin-autofire"
 msgid "Autofire"
 msgstr "Auto-disparar"
@@ -6185,7 +6224,7 @@ msgctxt "plugin-timecode"
 msgid "Hotkey"
 msgstr "Tecla de Atalho"
 
-#: plugins/inputmacro/init.lua:135 plugins/inputmacro/inputmacro_menu.lua:560
+#: plugins/inputmacro/init.lua:135 plugins/inputmacro/inputmacro_menu.lua:562
 msgctxt "plugin-inputmacro"
 msgid "Input Macros"
 msgstr "Macros de entrada"
@@ -6206,138 +6245,138 @@ msgctxt "plugin-inputmacro"
 msgid "Set Input"
 msgstr "Definir Entrada"
 
-#: plugins/inputmacro/inputmacro_menu.lua:350
+#: plugins/inputmacro/inputmacro_menu.lua:352
 msgctxt "plugin-inputmacro"
 msgid "Name"
 msgstr "Nome"
 
-#: plugins/inputmacro/inputmacro_menu.lua:358
-#: plugins/inputmacro/inputmacro_menu.lua:400
+#: plugins/inputmacro/inputmacro_menu.lua:360
+#: plugins/inputmacro/inputmacro_menu.lua:402
 msgctxt "plugin-inputmacro"
 msgid "[not set]"
 msgstr "[não definido]"
 
-#: plugins/inputmacro/inputmacro_menu.lua:359
+#: plugins/inputmacro/inputmacro_menu.lua:361
 msgctxt "plugin-inputmacro"
 msgid "Activation combination"
 msgstr "Combinação de ativação"
 
-#: plugins/inputmacro/inputmacro_menu.lua:362
+#: plugins/inputmacro/inputmacro_menu.lua:364
 msgctxt "plugin-inputmacro"
 msgid "Stop immediately"
 msgstr "Pare imediatamente"
 
-#: plugins/inputmacro/inputmacro_menu.lua:362
+#: plugins/inputmacro/inputmacro_menu.lua:364
 msgctxt "plugin-inputmacro"
 msgid "Complete macro"
 msgstr "Conclua a macro"
 
-#: plugins/inputmacro/inputmacro_menu.lua:363
+#: plugins/inputmacro/inputmacro_menu.lua:365
 msgctxt "plugin-inputmacro"
 msgid "On release"
 msgstr "Não lançamento"
 
-#: plugins/inputmacro/inputmacro_menu.lua:369
+#: plugins/inputmacro/inputmacro_menu.lua:371
 msgctxt "plugin-inputmacro"
 msgid "Release"
 msgstr "Lançamento"
 
-#: plugins/inputmacro/inputmacro_menu.lua:372
+#: plugins/inputmacro/inputmacro_menu.lua:374
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Loop to step %d"
 msgstr "Loop pro passo %d"
 
-#: plugins/inputmacro/inputmacro_menu.lua:377
+#: plugins/inputmacro/inputmacro_menu.lua:379
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Prolong step %d"
 msgstr "Prolongar o passo %d"
 
-#: plugins/inputmacro/inputmacro_menu.lua:379
+#: plugins/inputmacro/inputmacro_menu.lua:381
 msgctxt "plugin-inputmacro"
 msgid "When held"
 msgstr "Quando segurado"
 
-#: plugins/inputmacro/inputmacro_menu.lua:383
+#: plugins/inputmacro/inputmacro_menu.lua:385
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Step %d"
 msgstr "Passo %d"
 
-#: plugins/inputmacro/inputmacro_menu.lua:384
+#: plugins/inputmacro/inputmacro_menu.lua:386
 msgctxt "plugin-inputmacro"
 msgid "Delay (frames)"
 msgstr "Atraso (frames)"
 
-#: plugins/inputmacro/inputmacro_menu.lua:390
+#: plugins/inputmacro/inputmacro_menu.lua:392
 msgctxt "plugin-inputmacro"
 msgid "Duration (frames)"
 msgstr "Duração (frames)"
 
-#: plugins/inputmacro/inputmacro_menu.lua:398
+#: plugins/inputmacro/inputmacro_menu.lua:400
 msgctxt "plugin-inputmacro"
 msgid "n/a"
 msgstr "n/d"
 
-#: plugins/inputmacro/inputmacro_menu.lua:402
+#: plugins/inputmacro/inputmacro_menu.lua:404
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Input %d"
 msgstr "Entrada %d"
 
-#: plugins/inputmacro/inputmacro_menu.lua:407
+#: plugins/inputmacro/inputmacro_menu.lua:409
 msgctxt "plugin-inputmacro"
 msgid "Add input"
 msgstr "Adicionar entrada"
 
-#: plugins/inputmacro/inputmacro_menu.lua:412
+#: plugins/inputmacro/inputmacro_menu.lua:414
 msgctxt "plugin-inputmacro"
 msgid "Delete step"
 msgstr "Apagar passo"
 
-#: plugins/inputmacro/inputmacro_menu.lua:428
+#: plugins/inputmacro/inputmacro_menu.lua:430
 msgctxt "plugin-inputmacro"
 msgid "Add step at position"
 msgstr "Adicionar passo na posição"
 
-#: plugins/inputmacro/inputmacro_menu.lua:474
+#: plugins/inputmacro/inputmacro_menu.lua:476
 msgctxt "plugin-inputmacro"
 msgid "Add Input Macro"
 msgstr "Adicionar Macro de Entrada"
 
-#: plugins/inputmacro/inputmacro_menu.lua:481
+#: plugins/inputmacro/inputmacro_menu.lua:483
 msgctxt "plugin-inputmacro"
 msgid "Create"
 msgstr "Cria"
 
-#: plugins/inputmacro/inputmacro_menu.lua:483
+#: plugins/inputmacro/inputmacro_menu.lua:485
 msgctxt "plugin-inputmacro"
 msgid "Cancel"
 msgstr "Cancela"
 
-#: plugins/inputmacro/inputmacro_menu.lua:499
+#: plugins/inputmacro/inputmacro_menu.lua:501
 msgctxt "plugin-inputmacro"
 msgid "Edit Input Macro"
 msgstr "Editar Macro de Entrada"
 
-#: plugins/inputmacro/inputmacro_menu.lua:505
+#: plugins/inputmacro/inputmacro_menu.lua:507
 msgctxt "plugin-inputmacro"
 msgid "Done"
 msgstr "Feito"
 
-#: plugins/inputmacro/inputmacro_menu.lua:561
+#: plugins/inputmacro/inputmacro_menu.lua:563
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Press %s to delete"
 msgstr "Pressione %s para excluir"
 
-#: plugins/inputmacro/inputmacro_menu.lua:573
+#: plugins/inputmacro/inputmacro_menu.lua:575
 msgctxt "plugin-inputmacro"
 msgid "[no macros]"
 msgstr "[nenhuma macro]"
 
-#: plugins/inputmacro/inputmacro_menu.lua:578
+#: plugins/inputmacro/inputmacro_menu.lua:580
 msgctxt "plugin-inputmacro"
 msgid "Add macro"
 msgstr "Nova macro"
@@ -6512,12 +6551,12 @@ msgctxt "plugin-commonui"
 msgid "Cancel"
 msgstr "Cancela"
 
-#: plugins/commonui/init.lua:197
+#: plugins/commonui/init.lua:199
 msgctxt "plugin-commonui"
 msgid "Invalid combination entered"
 msgstr "Combinação inválida inserida"
 
-#: plugins/commonui/init.lua:203
+#: plugins/commonui/init.lua:205
 #, lua-format
 msgctxt "plugin-commonui"
 msgid ""
@@ -6526,3 +6565,18 @@ msgid ""
 msgstr ""
 "Insira a combinação ou pressione %s pra cancelar\n"
 "%s"
+
+#, c-format
+#~ msgid "Press %s to show menu"
+#~ msgstr "Pressione %s para mostrar o menu"
+
+#~ msgid "Infos"
+#~ msgstr "Informações"
+
+#~ msgctxt "input-name"
+#~ msgid "Config Menu"
+#~ msgstr "Menu da Configuração"
+
+#~ msgctxt "input-name"
+#~ msgid "UI Toggle"
+#~ msgstr "IU Alterna"

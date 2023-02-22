@@ -38,7 +38,7 @@ void menu_confirm_quit::custom_render(void *selectedref, float top, float bottom
 				"Press %1$s to quit\n"
 				"Press %2$s to return to emulation"),
 				ui().get_general_input_setting(IPT_UI_SELECT),
-				ui().get_general_input_setting(IPT_UI_CANCEL)),
+				ui().get_general_input_setting(IPT_UI_BACK)),
 			text_layout::text_justify::CENTER,
 			0.5f, 0.5f,
 			UI_RED_COLOR);
@@ -54,7 +54,7 @@ void menu_confirm_quit::handle(event const *ev)
 {
 	if (machine().ui_input().pressed(IPT_UI_SELECT))
 		machine().schedule_exit();
-	else if (machine().ui_input().pressed(IPT_UI_CANCEL))
+	else if (machine().ui_input().pressed(IPT_UI_BACK))
 		stack_pop();
 }
 

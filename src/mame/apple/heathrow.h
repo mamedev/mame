@@ -97,6 +97,13 @@ private:
 	void scc_w(offs_t offset, u16 data);
 	u8 scc_macrisc_r(offs_t offset);
 	void scc_macrisc_w(offs_t offset, u8 data);
+
+	u32 m_toggle;
+	u32 unk_r(offs_t offset);
+
+	// DMA
+	u32 sound_dma_output(offs_t offset);
+	void sound_dma_input(offs_t offset, u32 value);
 };
 
 class paddington_device : public heathrow_device
@@ -110,8 +117,32 @@ protected:
 	virtual void device_start() override;
 };
 
+class grandcentral_device : public heathrow_device
+{
+public:
+	// construction/destruction
+	grandcentral_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+};
+
+class ohare_device : public heathrow_device
+{
+public:
+	// construction/destruction
+	ohare_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+};
+
 // device type definition
+DECLARE_DEVICE_TYPE(GRAND_CENTRAL, grandcentral_device)
 DECLARE_DEVICE_TYPE(HEATHROW, heathrow_device)
 DECLARE_DEVICE_TYPE(PADDINGTON, paddington_device)
+DECLARE_DEVICE_TYPE(OHARE, ohare_device)
 
 #endif // MAME_APPLE_HEATHROW_H

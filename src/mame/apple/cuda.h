@@ -66,6 +66,7 @@ public:
 	void set_via_data(uint8_t dat) { via_data = dat; }
 	uint8_t get_via_clock() { return via_clock; }
 	void set_adb_line(int linestate) { adb_in = (linestate == ASSERT_LINE) ? true : false; }
+	void set_iic_sda(uint8_t data) { iic_sda = (data & 1); }
 	int get_adb_dtime() { return m_adb_dtime; }
 
 	int rom_offset;
@@ -74,8 +75,10 @@ public:
 	auto linechange_callback() { return write_linechange.bind(); }
 	auto via_clock_callback() { return write_via_clock.bind(); }
 	auto via_data_callback() { return write_via_data.bind(); }
+	auto iic_scl_callback() { return write_iic_scl.bind(); }
+	auto iic_sda_callback() { return write_iic_sda.bind(); }
 
-	devcb_write_line write_reset, write_linechange, write_via_clock, write_via_data;
+	devcb_write_line write_reset, write_linechange, write_via_clock, write_via_data, write_iic_scl, write_iic_sda;
 
 	void cuda_map(address_map &map);
 protected:
@@ -98,6 +101,7 @@ private:
 	uint8_t timer_counter = 0, ripple_counter = 0;
 	uint8_t onesec = 0;
 	uint8_t treq = 0, byteack = 0, tip = 0, via_data = 0, via_clock = 0, last_adb = 0;
+	uint8_t iic_sda;
 	uint64_t last_adb_time = 0;
 	bool cuda_controls_power = false;
 	bool adb_in = false;

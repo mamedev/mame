@@ -32,7 +32,7 @@ rom 5 and 6 are prg roms
 
 
 namespace {
-	
+
 class fresh_state : public driver_device
 {
 public:

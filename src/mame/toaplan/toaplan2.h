@@ -170,8 +170,9 @@ public:
 		, m_tx_gfxram(*this, "tx_gfxram")
 		, m_dma_space(*this, "dma_space")
 		, m_audiobank(*this, "audiobank")
-		, m_raizing_okibank{{*this, "raizing_okibank0_%u", 0U},
-							{*this, "raizing_okibank1_%u", 0U}}
+		, m_raizing_okibank{
+			{ *this, "raizing_okibank0_%u", 0U },
+			{ *this, "raizing_okibank1_%u", 0U } }
 		, m_eepromout(*this, "EEPROMOUT")
 	{ }
 
@@ -197,9 +198,9 @@ protected:
 
 private:
 	required_shared_ptr<u16> m_tx_videoram;
-	required_shared_ptr<u16> m_tx_lineselect;
-	required_shared_ptr<u16> m_tx_linescroll;
-	required_shared_ptr<u16> m_tx_gfxram;
+	optional_shared_ptr<u16> m_tx_lineselect;
+	optional_shared_ptr<u16> m_tx_linescroll;
+	optional_shared_ptr<u16> m_tx_gfxram;
 
 	optional_device<address_map_bank_device> m_dma_space;
 

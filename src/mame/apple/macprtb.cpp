@@ -425,7 +425,7 @@ void macportable_state::scsi_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void macportable_state::scsi_berr_w(uint8_t data)
 {
-	m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
+	m_maincpu->trigger_bus_error();
 }
 
 /***************************************************************************

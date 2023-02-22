@@ -22,7 +22,7 @@ Hardware notes:
 - beeper
 
 TODO:
-- verify video timing
+- verify video timing, maybe 3.57MHz / 2 / (262*114)
 - beeper duration and base frequency is approximated (divisor is correct)
 - CPU speed is wrong, it's likely running at 1.79MHz. But that's way too fast
   compared to videos of the game. 0.9MHz(XTAL/4) is also too fast. It's probably
@@ -117,7 +117,7 @@ u32 cothello_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	{
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			int pixel = m_vram[(y << 8 | x) & 0x3fff] & 1;
+			int pixel = m_vram[((y / 3) << 8 | x) & 0x3fff] & 1;
 			bitmap.pix(y, x) = pixel ? rgb_t(0x00, 0xff, 0x80) : rgb_t::black();
 		}
 	}
@@ -278,8 +278,8 @@ void cothello_state::cothello(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_size(64, 64);
-	m_screen->set_visarea(0, 64-1, 0, 64-1);
+	m_screen->set_size(64, 192);
+	m_screen->set_visarea(0, 64-1, 0, 192-1);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_screen_update(FUNC(cothello_state::screen_update));
 

@@ -278,7 +278,7 @@ void pic16c5x_device::update_internalram_ptr()
 // ******** The following is the Config Flag register definition. ********
 // | 11 | 10 | 9 | 8 | 7 | 6 | 5 | 4 | 3 |   2  | 1 | 0 |
 // |              CP                     | WDTE |  FOSC |
-                            // CP       Code Protect (ROM read protect)
+							// CP       Code Protect (ROM read protect)
 #define WDTE_FLAG   0x04    // WDTE     WatchDog Timer enable
 #define FOSC_FLAG   0x03    // FOSC     Oscillator source select
 

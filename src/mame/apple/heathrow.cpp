@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
 /*
-    Apple "Heathrow" and "Paddington" PCI ASICs
+    Apple "Grand Central", "O'Hare", "Heathrow" and "Paddington" PCI ASICs
     Emulation by R. Belmont
 
-    These ASICs sit on the PCI bus and provide "legacy" Mac I/O,
+    These ASICs sit on the PCI bus and provide what came to be known as "Mac I/O",
     including:
     - A VIA to interface with Cuda
     - Serial
@@ -13,7 +13,7 @@
     - ATA
     - Ethernet (10 Mbps for Heathrow, 10/100 for Paddington)
     - Audio
-    - Descriptor-based DMA engine, as originally seen in the "PDM" Power Macs
+    - Descriptor-based DMA engine, as described in "Macintosh Technology in the Common Hardware Reference Platform"
 */
 
 #include "emu.h"
@@ -31,18 +31,21 @@ static constexpr u32 C15M = (C7M * 2);
 
 DEFINE_DEVICE_TYPE(HEATHROW, heathrow_device, "heathrow", "Apple Heathrow PCI I/O ASIC")
 DEFINE_DEVICE_TYPE(PADDINGTON, paddington_device, "paddington", "Apple Paddington PCI I/O ASIC")
+DEFINE_DEVICE_TYPE(OHARE, ohare_device, "ohare", "Apple O'Hare PCI I/O ASIC")
+DEFINE_DEVICE_TYPE(GRAND_CENTRAL, grandcentral_device, "grndctrl", "Apple Grand Central PCI I/O ASIC")
 
 //-------------------------------------------------
 //  ADDRESS_MAP
 //-------------------------------------------------
 /*
     A "Kanga" G3 PowerBook says:
-    F3016000 : VIA
-    F3012000 : SCC Rd
-    F3012000 : SCC Wr
-    F3015000 : IWM/SWIM
-    F3010000 : SCSI
+    16000 : VIA
+    12000 : SCC Rd
+    12000 : SCC Wr
+    15000 : IWM/SWIM
+    10000 : SCSI
 
+	DMA is at 8xxx (audio DMA at 88xx)
     ATA is at 20000
 */
 void heathrow_device::map(address_map &map)
@@ -51,6 +54,7 @@ void heathrow_device::map(address_map &map)
 	map(0x12000, 0x12fff).rw(FUNC(heathrow_device::scc_r), FUNC(heathrow_device::scc_w));
 	map(0x13000, 0x13fff).rw(FUNC(heathrow_device::scc_macrisc_r), FUNC(heathrow_device::scc_macrisc_w));
 	map(0x14000, 0x1401f).rw(m_awacs, FUNC(awacs_device::read), FUNC(awacs_device::write));
+	map(0x14020, 0x14023).r(FUNC(heathrow_device::unk_r));
 	map(0x15000, 0x15fff).rw(FUNC(heathrow_device::fdc_r), FUNC(heathrow_device::fdc_w));
 	map(0x16000, 0x17fff).rw(FUNC(heathrow_device::mac_via_r), FUNC(heathrow_device::mac_via_w));
 	map(0x60000, 0x7ffff).rw(FUNC(heathrow_device::nvram_r), FUNC(heathrow_device::nvram_w));
@@ -70,6 +74,8 @@ void heathrow_device::device_add_mconfig(machine_config &config)
 	m_via1->irq_handler().set(FUNC(heathrow_device::via1_irq));
 
 	AWACS(config, m_awacs, 45.1584_MHz_XTAL / 2);
+	m_awacs->dma_output().set(FUNC(heathrow_device::sound_dma_output));
+	m_awacs->dma_input().set(FUNC(heathrow_device::sound_dma_input));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -123,7 +129,7 @@ heathrow_device::heathrow_device(const machine_config &mconfig, device_type type
 	  m_cur_floppy(nullptr),
 	  m_hdsel(0)
 {
-	set_ids(0x106b0010, 0x01, 0xff000001, 0x000000);
+	m_toggle = 0;
 }
 
 heathrow_device::heathrow_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -133,6 +139,16 @@ heathrow_device::heathrow_device(const machine_config &mconfig, const char *tag,
 
 paddington_device::paddington_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: heathrow_device(mconfig, PADDINGTON, tag, owner, clock)
+{
+}
+
+grandcentral_device::grandcentral_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: heathrow_device(mconfig, GRAND_CENTRAL, tag, owner, clock)
+{
+}
+
+ohare_device::ohare_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: heathrow_device(mconfig, OHARE, tag, owner, clock)
 {
 }
 
@@ -153,16 +169,31 @@ void heathrow_device::common_init()
 
 	add_map(0x80000, M_MEM, FUNC(heathrow_device::map));
 	command = 2; // enable our memory range
+	revision = 1;
 }
 
 void heathrow_device::device_start()
 {
 	common_init();
+	set_ids(0x106b0010, 0x01, 0xff000001, 0x000000);
 }
 
 void paddington_device::device_start()
 {
 	common_init();
+	set_ids(0x106b0017, 0x01, 0xff000001, 0x000000);
+}
+
+void grandcentral_device::device_start()
+{
+	common_init();
+	set_ids(0x106b0002, 0x01, 0xff000001, 0x000000);
+}
+
+void ohare_device::device_start()
+{
+	common_init();
+	set_ids(0x106b0007, 0x01, 0xff000001, 0x000000);
 }
 
 //-------------------------------------------------
@@ -399,3 +430,21 @@ void heathrow_device::scc_macrisc_w(offs_t offset, u8 data)
 	}
 }
 
+u32 heathrow_device::unk_r(offs_t offset)
+{
+	m_toggle ^= 0xffffffff;
+	return m_toggle;
+}
+
+// *****************************************************
+// DMA
+// *****************************************************
+
+u32 heathrow_device::sound_dma_output(offs_t offset)
+{
+	return 0;
+}
+
+void heathrow_device::sound_dma_input(offs_t offset, u32 value)
+{
+}

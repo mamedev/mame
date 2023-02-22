@@ -13,8 +13,8 @@
 
     TODO:
     - Hook up link for Multi Player game mode. Currently they boot with
-	  link set to multiple, but the ID changes every boot (and will black
-	  out if a multiplayer game is started).
+      link set to multiple, but the ID changes every boot (and will black
+      out if a multiplayer game is started).
 
     f1gp:
     - gfxctrl register not understood - handling of fg/sprite priority to fix

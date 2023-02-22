@@ -2,18 +2,18 @@
 // copyright-holders:Miodrag Milanovic
 /******************************************************************************
 
-	Iskra Delta produced:
-		1984 - Partner series
-			model with Winchester disk + floppy
-			model with 2 floppy disks
-		1987 - Partner G series
-			1F/G - model with 1 floppy disk
-			2F/G - model with 2 floppy disks
-			WF/G - model with Winchester disk + floppy
+    Iskra Delta produced:
+        1984 - Partner series
+            model with Winchester disk + floppy
+            model with 2 floppy disks
+        1987 - Partner G series
+            1F/G - model with 1 floppy disk
+            2F/G - model with 2 floppy disks
+            WF/G - model with Winchester disk + floppy
 
-	Schematics and info at :
-		https://github.com/tstih/idp-doc/tree/main/iskra-delta
-		http://matejhorvat.si/sl/slorac/delta/partner/index.htm
+    Schematics and info at :
+        https://github.com/tstih/idp-doc/tree/main/iskra-delta
+        http://matejhorvat.si/sl/slorac/delta/partner/index.htm
 
 *******************************************************************************/
 
@@ -177,10 +177,10 @@ void idpartner_state::io_map(address_map &map)
 	map(0x88,0x8f).rw(FUNC(idpartner_state::bank1_r), FUNC(idpartner_state::bank1_w)); // RAM bank 1
 	map(0x90,0x97).rw(FUNC(idpartner_state::bank2_r), FUNC(idpartner_state::bank2_w)); // RAM bank 2
 	//map(0x98,0x9f) // floppy motors
-	//map(0xa0,0xa7) // 
-	//map(0xa8,0xaf) // 
+	//map(0xa0,0xa7) //
+	//map(0xa8,0xaf) //
 	//map(0xb0,0xb7) // RTC - mm58167
-	//map(0xb8,0xbf) // 
+	//map(0xb8,0xbf) //
 	//map(0xc0,0xc7) // DMA
 	map(0xc8,0xcb).mirror(0x04).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));  // CTC - A2 not connected
 	//map(0xd0,0xd7) // PIO - A2 not connected
@@ -188,7 +188,7 @@ void idpartner_state::io_map(address_map &map)
 	map(0xe0,0xe3).mirror(0x04).rw("sio2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)); // SIO2 - A2 not connected
 	map(0xe8,0xef).w(FUNC(idpartner_state::fdc_vector_w)); // FDC interrupt vector
 	map(0xf0,0xf1).mirror(0x06).m(m_fdc, FUNC(i8272a_device::map));
-	//map(0xf8,0xff) // 
+	//map(0xf8,0xff) //
 }
 
 /* Input ports */
@@ -222,7 +222,7 @@ void idpartner_state::write_f1_clock(int state)
 
 	m_sio1->txcb_w(state);
 	m_sio1->rxcb_w(state);
-	
+
 	m_sio2->txca_w(state);
 	m_sio2->rxca_w(state);
 

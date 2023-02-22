@@ -190,17 +190,6 @@ void menu_confswitch::handle(event const *ev)
 
 			switch (ev->iptkey)
 			{
-			// if selected, reset to default value
-			case IPT_UI_SELECT:
-				{
-					ioport_field::user_settings settings;
-					field.get_user_settings(settings);
-					settings.value = field.defvalue();
-					field.set_user_settings(settings);
-				}
-				changed = true;
-				break;
-
 			// left goes to previous setting
 			case IPT_UI_LEFT:
 				field.select_previous_setting();
@@ -208,9 +197,24 @@ void menu_confswitch::handle(event const *ev)
 				break;
 
 			// right goes to next setting
+			case IPT_UI_SELECT:
 			case IPT_UI_RIGHT:
 				field.select_next_setting();
 				changed = true;
+				break;
+
+			// if cleared, reset to default value
+			case IPT_UI_CLEAR:
+				{
+					ioport_field::user_settings settings;
+					field.get_user_settings(settings);
+					if (field.defvalue() != settings.value)
+					{
+						settings.value = field.defvalue();
+						field.set_user_settings(settings);
+						changed = true;
+					}
+				}
 				break;
 
 			// trick to get previous group - depend on headings having null reference

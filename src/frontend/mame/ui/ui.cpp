@@ -441,7 +441,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				machine().schedule_exit();
 				return UI_HANDLER_CANCEL;
 			}
-			else if (machine().ui_input().pressed(IPT_UI_CONFIGURE))
+			else if (machine().ui_input().pressed(IPT_UI_MENU))
 			{
 				config_menu = true;
 				return UI_HANDLER_CANCEL;
@@ -1301,7 +1301,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	}
 
 	// turn on menus if requested
-	if (machine().ui_input().pressed(IPT_UI_CONFIGURE))
+	if (machine().ui_input().pressed(IPT_UI_MENU))
 	{
 		show_menu();
 		return 0;

@@ -4,8 +4,8 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="org.mamedev.mame"
-      android:versionCode="251"
-      android:versionName="0.251"
+      android:versionCode="252"
+      android:versionName="0.252"
       android:installLocation="auto">
 
     <!-- OpenGL ES 2.0 -->
