@@ -1444,7 +1444,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="onyx2demo1">
+	<!-- requires Onyx2 -->
+	<software name="onyx2demo1" supported="no">
 		<description>Onyx2 - As Real As it Gets Demo CD - Volume 1</description>
 		<year>1998</year> <!-- 09/98 -->
 		<publisher>Silicon Graphics</publisher>
@@ -1457,7 +1458,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="onyx2demo2">
+	<!-- requires Onyx2 -->
+	<software name="onyx2demo2" supported="no">
 		<description>Onyx2 - As Real As it Gets Demo CD - Volume 2</description>
 		<year>1998</year> <!-- 09/98 -->
 		<publisher>Silicon Graphics</publisher>
@@ -1470,7 +1472,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="onyx2demo3">
+	<!-- requires Onyx2 -->
+	<software name="onyx2demo3" supported="no">
 		<description>Onyx2 - As Real As it Gets Demo CD - Volume 3</description>
 		<year>1998</year> <!-- 09/98 -->
 		<publisher>Silicon Graphics</publisher>

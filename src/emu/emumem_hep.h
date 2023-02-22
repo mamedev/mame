@@ -10,7 +10,7 @@ template<int Width, int AddrShift> class handler_entry_read_passthrough : public
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
-	handler_entry_read_passthrough(address_space *space, emu::detail::memory_passthrough_handler_impl &mph) : handler_entry_read<Width, AddrShift>(space, handler_entry::F_PASSTHROUGH), m_mph(mph), m_next(nullptr) {}
+	handler_entry_read_passthrough(address_space *space, emu::detail::memory_passthrough_handler_impl &mph, u32 prio) : handler_entry_read<Width, AddrShift>(space, handler_entry::f_pt(prio)), m_mph(mph), m_next(nullptr) {}
 	~handler_entry_read_passthrough();
 
 	virtual handler_entry_read_passthrough<Width, AddrShift> *instantiate(handler_entry_read<Width, AddrShift> *next) const = 0;
@@ -23,7 +23,7 @@ protected:
 	emu::detail::memory_passthrough_handler_impl &m_mph;
 	handler_entry_read<Width, AddrShift> *m_next;
 
-	handler_entry_read_passthrough(address_space *space, emu::detail::memory_passthrough_handler_impl &mph, handler_entry_read<Width, AddrShift> *next) : handler_entry_read<Width, AddrShift>(space, handler_entry::F_PASSTHROUGH), m_mph(mph), m_next(next) { next->ref(); mph.add_handler(this); }
+	handler_entry_read_passthrough(address_space *space, emu::detail::memory_passthrough_handler_impl &mph, u32 prio, handler_entry_read<Width, AddrShift> *next) : handler_entry_read<Width, AddrShift>(space, handler_entry::f_pt(prio)), m_mph(mph), m_next(next) { next->ref(); mph.add_handler(this); }
 };
 
 template<int Width, int AddrShift> class handler_entry_write_passthrough : public handler_entry_write<Width, AddrShift>
@@ -31,7 +31,7 @@ template<int Width, int AddrShift> class handler_entry_write_passthrough : publi
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 
-	handler_entry_write_passthrough(address_space *space, emu::detail::memory_passthrough_handler_impl &mph) : handler_entry_write<Width, AddrShift>(space, handler_entry::F_PASSTHROUGH), m_mph(mph), m_next(nullptr) {}
+	handler_entry_write_passthrough(address_space *space, emu::detail::memory_passthrough_handler_impl &mph, u32 prio) : handler_entry_write<Width, AddrShift>(space, handler_entry::f_pt(prio)), m_mph(mph), m_next(nullptr) {}
 	~handler_entry_write_passthrough();
 
 	virtual handler_entry_write_passthrough<Width, AddrShift> *instantiate(handler_entry_write<Width, AddrShift> *next) const = 0;
@@ -44,5 +44,5 @@ protected:
 	emu::detail::memory_passthrough_handler_impl &m_mph;
 	handler_entry_write<Width, AddrShift> *m_next;
 
-	handler_entry_write_passthrough(address_space *space, emu::detail::memory_passthrough_handler_impl &mph, handler_entry_write<Width, AddrShift> *next) : handler_entry_write<Width, AddrShift>(space, handler_entry::F_PASSTHROUGH), m_mph(mph), m_next(next) { next->ref(); mph.add_handler(this); }
+	handler_entry_write_passthrough(address_space *space, emu::detail::memory_passthrough_handler_impl &mph, u32 prio, handler_entry_write<Width, AddrShift> *next) : handler_entry_write<Width, AddrShift>(space, handler_entry::f_pt(prio)), m_mph(mph), m_next(next) { next->ref(); mph.add_handler(this); }
 };

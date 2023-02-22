@@ -64,7 +64,7 @@ void hng64_state::dl_unk_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 void hng64_state::dl_upload_w(uint32_t data)
 {
 	//m_paletteState3d = 0; // no, breaks fatfurwa characters
- 
+
 	// Data is:
 	// 00000b50 for the sams64 games
 	// 00000f00 for everything else
@@ -569,7 +569,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			// on the select screen, where this bit is not enabled.
 			// (to see the cars on the select screen disable sprite rendering, as there are
 			// currently priority issues)
-			// 
+			//
 			// however for sams64 this is enabled on the 2nd character, but not the 1st character
 			// and the additional palette offset definitely only applies to the 2nd
 			//
@@ -663,7 +663,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 					// chunkOffset[6 + (6*m)] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
 					currentPoly.vert[m].texCoords[0] = uToF(chunkOffset[7 + (6*m)]);
 					currentPoly.vert[m].texCoords[1] = uToF(chunkOffset[8 + (6*m)]);
-	
+
 					if (currentPoly.flatShade)
 						currentPoly.vert[m].colorIndex = chunkOffset[7 + (6*m)] >> 5;
 

@@ -458,12 +458,11 @@ static uint8_t dec_7seg(int data)
 /* Display a seven digit counter on layout - Index points to less significant digit*/
 void videopkr_state::count_7dig(unsigned long data, uint8_t index)
 {
-	uint8_t i;
-	char strn[8];
-	sprintf(strn,"%7lu",data);
-
-	for (i = 0; i < 7; i++)
-		m_digits[index+i] = dec_7seg((strn[6 - i] | 0x10) - 0x30);
+	for (auto i = 0; i < 7; i++)
+	{
+		m_digits[index+i] = dec_7seg(data % 10);
+		data /= 10;
+	}
 }
 
 void videopkr_state::videopkr_palette(palette_device &palette) const

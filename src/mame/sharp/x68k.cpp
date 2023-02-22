@@ -706,6 +706,11 @@ TIMER_CALLBACK_MEMBER(x68k_state::bus_error)
 
 void x68k_state::set_bus_error(uint32_t address, bool rw, uint16_t mem_mask)
 {
+	if(m_maincpu->type() == M68000) {
+		downcast<m68000_device *>(m_maincpu.target())->trigger_bus_error();
+		return;
+	}
+
 	if(m_bus_error)
 		return;
 	else if(!m_maincpu->executing())

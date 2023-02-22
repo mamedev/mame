@@ -86,8 +86,6 @@ private:
 
 	void send_key(uint8_t val);
 
-	uint16_t invalid_r(offs_t offset);
-	void invalid_w(offs_t offset, uint16_t data);
 	uint16_t memmap_r();
 	void memmap_w(uint16_t data);
 	DECLARE_WRITE_LINE_MEMBER(adir_w);
@@ -148,7 +146,7 @@ void wicat_state::main_mem(address_map &map)
 	map(0x000000, 0x001fff).rom().region("c2", 0x0000);
 	map(0x020000, 0x1fffff).ram();
 	map(0x200000, 0x2fffff).ram();
-	map(0x300000, 0xdfffff).rw(FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
+	map(0x300000, 0xdfffff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 	map(0xeff800, 0xeffbff).ram();  // memory mapping SRAM, used during boot sequence for storing various data (TODO)
 	map(0xeffc00, 0xeffc01).rw(FUNC(wicat_state::memmap_r), FUNC(wicat_state::memmap_w));
 	map(0xf00000, 0xf00007).rw(m_uart[0], FUNC(scn2661c_device::read), FUNC(scn2661c_device::write)).umask16(0xff00);  // UARTs
@@ -164,7 +162,7 @@ void wicat_state::main_mem(address_map &map)
 	map(0xf000d0, 0xf000d0).w("ledlatch", FUNC(ls259_device::write_nibble_d3));
 	map(0xf00180, 0xf0018f).rw(FUNC(wicat_state::hdc_r), FUNC(wicat_state::hdc_w));  // WD1000
 	map(0xf00190, 0xf0019f).rw(FUNC(wicat_state::fdc_r), FUNC(wicat_state::fdc_w));  // FD1795
-	map(0xf00f00, 0xf00fff).rw(FUNC(wicat_state::invalid_r), FUNC(wicat_state::invalid_w));
+	map(0xf00f00, 0xf00fff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 }
 
 void wicat_state::video_mem(address_map &map)
@@ -372,27 +370,6 @@ void wicat_state::via_b_w(uint8_t data)
 {
 	m_portB = data;
 	logerror("VIA: write %02x to port B\n",data);
-}
-
-uint16_t wicat_state::invalid_r(offs_t offset)
-{
-	if(!machine().side_effects_disabled())
-	{
-		m_maincpu->set_buserror_details(0x300000+offset*2-2,true,m_maincpu->get_fc());
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	}
-	return 0xff;
-}
-
-void wicat_state::invalid_w(offs_t offset, uint16_t data)
-{
-	if(!machine().side_effects_disabled())
-	{
-		m_maincpu->set_buserror_details(0x300000+offset*2-2,false,m_maincpu->get_fc());
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	}
 }
 
 // TODO

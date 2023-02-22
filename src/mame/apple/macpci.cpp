@@ -37,32 +37,68 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "macpci.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/mn1880/mn1880.h"
 #include "imagedev/chd_cd.h"
+#include "machine/ram.h"
 #include "sound/cdda.h"
-#include "emupal.h"
-#include "screen.h"
+
+#include "bandit.h"
+#include "cuda.h"
+#include "heathrow.h"
+#include "macadb.h"
 #include "softlist.h"
 #include "speaker.h"
 
-uint64_t macpci_state::unk1_r()
+class macpci_state : public driver_device
 {
-	m_unk1_test ^= 0x0400; //PC=ff808760
+public:
+	void pippin(machine_config &config);
 
-	return m_unk1_test << 16;
+	macpci_state(const machine_config &mconfig, device_type type, const char *tag);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<bandit_host_device> m_bandit;
+	required_device<cuda_device> m_cuda;
+	required_device<macadb_device> m_macadb;
+	required_device<ram_device> m_ram;
+
+private:
+	void pippin_map(address_map &map);
+	void cdmcu_mem(address_map &map);
+	void cdmcu_data(address_map &map);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	WRITE_LINE_MEMBER(cuda_reset_w)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
+	}
+};
+
+macpci_state::macpci_state(const machine_config &mconfig, device_type type, const char *tag) :
+	driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_bandit(*this, "pci:00.0"),
+	m_cuda(*this, "cuda"),
+	m_macadb(*this, "macadb"),
+	m_ram(*this, RAM_TAG)
+{
 }
 
-uint64_t macpci_state::unk2_r(offs_t offset, uint64_t mem_mask)
+void macpci_state::machine_start()
 {
-	if (ACCESSING_BITS_32_47)
-		return (uint64_t)0xe1 << 32; //PC=fff04810
-
-	return 0;
 }
 
-void macpci_state::pippin_mem(address_map &map)
+void macpci_state::machine_reset()
+{
+	// the PPC can't run until Cuda's ready
+	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+}
+
+void macpci_state::pippin_map(address_map &map)
 {
 	map(0x00000000, 0x005fffff).ram();
 
@@ -73,11 +109,11 @@ void macpci_state::pippin_mem(address_map &map)
 	map(0x03c00000, 0x03c01007).ram();
 
 	map(0x40000000, 0x403fffff).rom().region("bootrom", 0).mirror(0x0fc00000);   // mirror of ROM for 680x0 emulation
+	map(0x5ffffffc, 0x5fffffff).lr32(NAME([](offs_t offset) { return 0xa55a7001; }));
 
-	map(0xf00dfff8, 0xf00dffff).r(FUNC(macpci_state::unk2_r));
-	map(0xf3008800, 0xf3008807).r(FUNC(macpci_state::unk1_r));
+	map(0xf00dfff8, 0xf00dffff).lr64(NAME([](offs_t offset) { return (uint64_t)0xe1 << 32; }));	// PC=0xfff04810
 
-	map(0xf3016000, 0xf3017fff).rw(FUNC(macpci_state::mac_via_r), FUNC(macpci_state::mac_via_w));
+	map(0xf2000000, 0xf2ffffff).m(m_bandit, FUNC(bandit_host_device::map));
 
 	map(0xffc00000, 0xffffffff).rom().region("bootrom", 0);
 }
@@ -112,36 +148,14 @@ void macpci_state::cdmcu_data(address_map &map)
 static INPUT_PORTS_START( pippin )
 INPUT_PORTS_END
 
-
-uint32_t macpci_state::screen_update_pippin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
-
 void macpci_state::pippin(machine_config &config)
 {
 	/* basic machine hardware */
 	PPC603(config, m_maincpu, 66000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &macpci_state::pippin_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &macpci_state::pippin_map);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
-	screen.set_screen_update(FUNC(macpci_state::screen_update_pippin));
-	screen.set_palette("palette");
-
-	PALETTE(config, "palette", palette_device::MONOCHROME);
-
-	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	cdda_device &cdda(CDDA(config, "cdda"));
-	cdda.add_route(0, "lspeaker", 1.00);
-	cdda.add_route(1, "rspeaker", 1.00);
+	PCI_ROOT(config, "pci", 0);
+	BANDIT(config, m_bandit, 66000000, "maincpu").set_dev_offset(1);
 
 	cdrom_image_device &cdrom(CDROM(config, "cdrom", 0));
 	cdrom.set_interface("pippin_cdrom");
@@ -150,27 +164,28 @@ void macpci_state::pippin(machine_config &config)
 	RAM(config, m_ram);
 	m_ram->set_default_size("32M");
 
-	R65NC22(config, m_via1, C7M/10);
-	m_via1->readpa_handler().set(FUNC(macpci_state::mac_via_in_a));
-	m_via1->readpb_handler().set(FUNC(macpci_state::mac_via_in_b));
-	m_via1->writepa_handler().set(FUNC(macpci_state::mac_via_out_a));
-	m_via1->writepb_handler().set(FUNC(macpci_state::mac_via_out_b));
-	m_via1->cb2_handler().set(FUNC(macpci_state::mac_adb_via_out_cb2));
-	m_via1->irq_handler().set(FUNC(macpci_state::mac_via_irq));
+	grandcentral_device &grandcentral(GRAND_CENTRAL(config, "pci:05.0", 0));
+	grandcentral.set_maincpu_tag("maincpu");
 
-	//scc8530_t &scc(SCC8530(config, "scc", C7M));
-	//scc.intrq_callback().set(FUNC(macpci_state::set_scc_interrupt));
-	CUDA(config, m_cuda, 0);
-	m_cuda->set_type(CUDA_341S0060);
+	MACADB(config, m_macadb, 15.6672_MHz_XTAL);
+
+	CUDA(config, m_cuda, CUDA_341S0060);
 	m_cuda->reset_callback().set(FUNC(macpci_state::cuda_reset_w));
-	m_cuda->linechange_callback().set(FUNC(macpci_state::cuda_adb_linechange_w));
-	m_cuda->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
-	m_cuda->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
+	m_cuda->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_cuda->via_clock_callback().set(grandcentral, FUNC(heathrow_device::cb1_w));
+	m_cuda->via_data_callback().set(grandcentral, FUNC(heathrow_device::cb2_w));
+	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
 	config.set_perfect_quantum(m_maincpu);
+
+	grandcentral.pb3_callback().set(m_cuda, FUNC(cuda_device::get_treq));
+	grandcentral.pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
+	grandcentral.pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
+	grandcentral.cb2_callback().set(m_cuda, FUNC(cuda_device::set_via_data));
 
 	mn1880_device &cdmcu(MN1880(config, "cdmcu", 8388608)); // type and clock unknown
 	cdmcu.set_addrmap(AS_PROGRAM, &macpci_state::cdmcu_mem);
 	cdmcu.set_addrmap(AS_DATA, &macpci_state::cdmcu_data);
+	cdmcu.set_disable();
 }
 
 /* ROM definition */

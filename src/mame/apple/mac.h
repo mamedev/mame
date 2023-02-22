@@ -27,7 +27,7 @@
 #include "macrtc.h"
 #include "macscsi.h"
 #include "sound/asc.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68kmusashi.h"
 #include "emupal.h"
 #include "screen.h"
 

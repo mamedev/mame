@@ -139,6 +139,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_vblank(*this, "VBLANK"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_iomcu(*this, "iomcu"),
@@ -184,6 +185,7 @@ public:
 	uint8_t *m_texturerom = nullptr;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_ioport m_vblank;
 
 private:
 	static constexpr int HNG64_MASTER_CLOCK = 50'000'000;
@@ -198,24 +200,6 @@ private:
 	static constexpr int VTOTAL = 264*2;
 	static constexpr int VBEND = 0;
 	static constexpr int VBSTART = 224*2;
-
-	enum hng64trans_t
-	{
-		HNG64_TILEMAP_NORMAL = 1,
-		HNG64_TILEMAP_ADDITIVE,
-		HNG64_TILEMAP_ALPHA
-	};
-
-	struct blit_parameters
-	{
-		bitmap_rgb32 *      bitmap = nullptr;
-		rectangle           cliprect;
-		uint32_t            tilemap_priority_code = 0;
-		uint8_t             mask = 0;
-		uint8_t             value = 0;
-		uint8_t             alpha = 0;
-		hng64trans_t        drawformat;
-	};
 
 	required_device<mips3_device> m_maincpu;
 	required_device<v53a_device> m_audiocpu;
@@ -298,8 +282,6 @@ private:
 	};
 
 	hng64_tilemap m_tilemap[4]{};
-
-	uint8_t m_additive_tilemap_debug = 0U;
 
 	uint32_t m_old_animmask = 0U;
 	uint32_t m_old_animbits = 0U;
@@ -429,22 +411,16 @@ private:
 
 	void hng64_mark_all_tiles_dirty(int tilemap);
 	void hng64_mark_tile_dirty(int tilemap, int tile_index);
-	void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm);
 
-	void hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
-		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound);
+	uint16_t get_tileregs(int tm);
+	uint16_t get_scrollbase(int tm);
 
-	void hng64_tilemap_draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy,
-		int wraparound, uint32_t flags, uint8_t priority, hng64trans_t drawformat);
+	int get_blend_mode(int tm);
 
-	void hng64_tilemap_draw_roz_primask(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy,
-		int wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat);
+	void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, int line);
 
-	static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, bitmap_rgb32 &dest, const rectangle &cliprect, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat);
-
-
+	void hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
+		int wraparound, uint8_t drawformat, uint8_t alpha, uint8_t mosaic, uint8_t tm);
 
 	std::unique_ptr<hng64_poly_renderer> m_poly_renderer;
 

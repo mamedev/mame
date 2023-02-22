@@ -165,7 +165,7 @@ if opt_tool(CPUS, "ARCOMPACT") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_04_3x.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_05.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_05_2f_sop.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_06to0b.cpp")	
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_06to0b.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/arcompact/arcompactdasm_ops_16bit.cpp")
 end
 
@@ -1933,6 +1933,18 @@ if CPUS["M680X0"] then
 		MAME_DIR .. "src/devices/cpu/m68000/m68kcommon.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68000.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68000.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000.lst",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000gen.py",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-decode.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-head.h",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sdf.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sif.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sdp.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sip.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sdfm.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sifm.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sdpm.cpp",
+		MAME_DIR .. "src/devices/cpu/m68000/m68000-sipm.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68008.h",
 		MAME_DIR .. "src/devices/cpu/m68000/m68008.cpp",
 		MAME_DIR .. "src/devices/cpu/m68000/m68010.h",

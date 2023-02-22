@@ -1239,6 +1239,9 @@ void mame_ui_manager::image_handler_ingame()
 
 uint32_t mame_ui_manager::handler_ingame(render_container &container)
 {
+	// let the OSD do its thing first
+	machine().osd().check_osd_inputs();
+
 	bool is_paused = machine().paused();
 
 	// first draw the FPS counter

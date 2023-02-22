@@ -70,6 +70,11 @@ template<int Width, int AddrShift, typename READ> typename emu::detail::handler_
 	return read_impl<READ>(offset, mem_mask);
 }
 
+template<int Width, int AddrShift, typename READ> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_delegate<Width, AddrShift, READ>::read_interruptible(offs_t offset, uX mem_mask) const
+{
+	return read_impl<READ>(offset, mem_mask);
+}
+
 template<int Width, int AddrShift, typename READ> std::pair<typename emu::detail::handler_entry_size<Width>::uX, u16> handler_entry_read_delegate<Width, AddrShift, READ>::read_flags(offs_t offset, uX mem_mask) const
 {
 	return std::pair<uX, u16>(read_impl<READ>(offset, mem_mask), this->m_flags);
@@ -150,6 +155,11 @@ template<int Width, int AddrShift, typename WRITE> void handler_entry_write_dele
 	write_impl<WRITE>(offset, data, mem_mask);
 }
 
+template<int Width, int AddrShift, typename WRITE> void handler_entry_write_delegate<Width, AddrShift, WRITE>::write_interruptible(offs_t offset, uX data, uX mem_mask) const
+{
+	write_impl<WRITE>(offset, data, mem_mask);
+}
+
 template<int Width, int AddrShift, typename WRITE> u16 handler_entry_write_delegate<Width, AddrShift, WRITE>::write_flags(offs_t offset, uX data, uX mem_mask) const
 {
 	write_impl<WRITE>(offset, data, mem_mask);
@@ -174,6 +184,11 @@ template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Widt
 	return m_port->read();
 }
 
+template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_ioport<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
+{
+	return m_port->read();
+}
+
 template<int Width, int AddrShift> std::pair<typename emu::detail::handler_entry_size<Width>::uX, u16> handler_entry_read_ioport<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
 {
 	return std::pair<uX, u16>(m_port->read(), this->m_flags);
@@ -190,6 +205,11 @@ template<int Width, int AddrShift> std::string handler_entry_read_ioport<Width, 
 }
 
 template<int Width, int AddrShift> void handler_entry_write_ioport<Width, AddrShift>::write(offs_t offset, uX data, uX mem_mask) const
+{
+	m_port->write(data, mem_mask);
+}
+
+template<int Width, int AddrShift> void handler_entry_write_ioport<Width, AddrShift>::write_interruptible(offs_t offset, uX data, uX mem_mask) const
 {
 	m_port->write(data, mem_mask);
 }

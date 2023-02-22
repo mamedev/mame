@@ -6108,7 +6108,7 @@ GAME( 1992, fixeightat,  fixeight, fixeight,   fixeight,   truxton2_state, init_
 GAME( 1992, fixeightut,  fixeight, fixeight,   fixeight,   truxton2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (USA, Taito license)",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1992, fixeightjt,  fixeight, fixeight,   fixeight,   truxton2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight - Jigoku no Eiyuu Densetsu (Japan, Taito license)",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, fixeightbl,  fixeight, fixeightbl, fixeightbl, truxton2_state, init_fixeightbl, ROT270,"bootleg", "FixEight (Korea, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightbl,  fixeight, fixeightbl, fixeightbl, truxton2_state, init_fixeightbl, ROT270, "bootleg", "FixEight (Korea, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, grindstm,    0,        vfive,      grindstm,   toaplan2_state, init_vfive,      ROT270, "Toaplan", "Grind Stormer",             MACHINE_SUPPORTS_SAVE )
 GAME( 1992, grindstma,   grindstm, vfive,      grindstma,  toaplan2_state, init_vfive,      ROT270, "Toaplan", "Grind Stormer (older set)", MACHINE_SUPPORTS_SAVE )

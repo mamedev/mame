@@ -64,7 +64,6 @@ protected:
 	TIMER_CALLBACK_MEMBER(free_cpu);
 
 private:
-	std::string tts(attotime t);
 	devcb_read8   m_mem_read_cb; // Callback to read memory
 	devcb_write_line m_hold_cb;
 	devcb_write_line m_int_cb;

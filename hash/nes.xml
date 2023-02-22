@@ -64898,6 +64898,27 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Cart dumped with Chris Covell's TapeDump, needs to be redumped for verification. -->
+<!-- Header from original dump has been stripped. Board info is unknown, and has been copied from parent US set. -->
+<!-- The game crashes upon reaching Stage 3, like all other versions in MAME due to emulation problems, but works fine in other emulators. -->
+<!-- The game is NTSC, is hacked to skip Stage 2 so it works on clone consoles, and has been partially translated to Brazilian Portuguese. -->
+	<software name="btoadsbrc" cloneof="btoads" supported="no">
+		<description>Battletoads (Brazil, Conector pirate)</description>
+		<year>1991</year>
+		<publisher>Conector</publisher>
+		<info name="alt_title" value="Sapos Guerreiros"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="axrom" />
+			<feature name="bus_conflict" value="no" />
+			<dataarea name="prg" size="262144">
+				<rom name="battletoads [conector - br].prg" size="262144" crc="147504bb" sha1="b45b65590c74de89b14a7401c3cc83afb7ae6d59" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="beatnbox">
 		<description>Beat n Box (Kor)</description>
 		<year>19??</year>

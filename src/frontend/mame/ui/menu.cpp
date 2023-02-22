@@ -25,6 +25,8 @@
 #include "rendutil.h"
 #include "uiinput.h"
 
+#include "osdepend.h"
+
 #include <algorithm>
 #include <cassert>
 #include <cmath>
@@ -1250,6 +1252,9 @@ void menu::validate_selection(int scandir)
 
 void menu::do_handle()
 {
+	// let OSD do its thing
+	machine().osd().check_osd_inputs();
+
 	// recompute metrics if necessary
 	render_manager &render(machine().render());
 	render_target &target(render.ui_target());

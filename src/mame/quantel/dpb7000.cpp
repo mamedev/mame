@@ -160,9 +160,6 @@ private:
 	void tablet_program_map(address_map &map);
 	void tablet_data_map(address_map &map);
 
-	uint16_t bus_error_r(offs_t offset);
-	void bus_error_w(offs_t offset, uint16_t data);
-
 	void csr_w(uint8_t data);
 	uint8_t csr_r();
 
@@ -212,7 +209,7 @@ private:
 	void process_byte_from_disc(uint8_t data_byte);
 	uint8_t process_byte_to_disc();
 
-	required_device<m68000_base_device> m_maincpu;
+	required_device<m68000_device> m_maincpu;
 	required_device_array<acia6850_device, 3> m_acia;
 	required_device<input_merger_device> m_p_int;
 	required_device<com8116_device> m_brg;
@@ -486,11 +483,11 @@ void dpb7000_state::main_map(address_map &map)
 {
 	map(0x000000, 0x09ffff).rom().region("monitor", 0);
 	map(0x0006aa, 0x0006ab).nopw();
-	map(0xb00000, 0xb7ffff).rw(FUNC(dpb7000_state::bus_error_r), FUNC(dpb7000_state::bus_error_w));
+	map(0xb00000, 0xb7ffff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 	map(0xb80000, 0xbfffff).ram();
-	//map(0xb00000, 0xbfffff).rw(FUNC(dpb7000_state::bus_error_r), FUNC(dpb7000_state::bus_error_w));
+	//map(0xb00000, 0xbfffff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 	//map(0xfc0000, 0xffd3ff).ram();
-	map(0xffd000, 0xffd3ff).rw(FUNC(dpb7000_state::bus_error_r), FUNC(dpb7000_state::bus_error_w));
+	map(0xffd000, 0xffd3ff).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 	map(0xffe000, 0xffefff).ram().share("vduram").umask16(0x00ff);
 	map(0xfff801, 0xfff801).rw(m_crtc, FUNC(sy6545_1_device::status_r), FUNC(sy6545_1_device::address_w)).cswidth(16);
 	map(0xfff803, 0xfff803).rw(m_crtc, FUNC(sy6545_1_device::register_r), FUNC(sy6545_1_device::register_w)).cswidth(16);
@@ -1158,29 +1155,6 @@ MC6845_UPDATE_ROW(dpb7000_state::crtc_update_row)
 
 MC6845_ON_UPDATE_ADDR_CHANGED(dpb7000_state::crtc_addr_changed)
 {
-}
-
-uint16_t dpb7000_state::bus_error_r(offs_t offset)
-{
-	if(!machine().side_effects_disabled())
-	{
-		m68000_musashi_device *cpuptr = downcast<m68000_musashi_device *>(m_maincpu.target());
-		cpuptr->set_buserror_details(0xb00000 + offset*2, true, cpuptr->get_fc());
-		cpuptr->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		cpuptr->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	}
-	return 0xff;
-}
-
-void dpb7000_state::bus_error_w(offs_t offset, uint16_t data)
-{
-	if(!machine().side_effects_disabled())
-	{
-		m68000_musashi_device *cpuptr = downcast<m68000_musashi_device *>(m_maincpu.target());
-		cpuptr->set_buserror_details(0xb00000 + offset*2, false, cpuptr->get_fc());
-		cpuptr->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		cpuptr->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	}
 }
 
 void dpb7000_state::csr_w(uint8_t data)

@@ -256,6 +256,8 @@ WRITE_LINE_MEMBER( m68340_cpu_device::set_modck )
 
 void m68340_cpu_device::device_start()
 {
+	reset_cb().append(*this, FUNC(m68340_cpu_device::reset_peripherals));
+
 	fscpu32_device::device_start();
 
 	m_m68340SIM    = new m68340_sim();
@@ -271,7 +273,7 @@ void m68340_cpu_device::device_start()
 	m_internal = &space(AS_PROGRAM);
 }
 
-void m68340_cpu_device::m68k_reset_peripherals()
+WRITE_LINE_MEMBER(m68340_cpu_device::reset_peripherals)
 {
 	m_m68340SIM->module_reset();
 	m_m68340DMA->module_reset();

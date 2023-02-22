@@ -1168,7 +1168,6 @@ int32_t dinput_joystick_device::pov_get_state(void *device_internal, void *item_
 	int const povdir = uintptr_t(item_internal) % 4;
 
 	// get the current state
-	devinfo->module().poll_if_necessary();
 	DWORD const pov = devinfo->m_joystick.state.rgdwPOV[povnum];
 
 	// if invalid, return 0

@@ -289,7 +289,7 @@ private:
 	{
 		auto &device = add_base_slot(config, std::forward<T>(type), std::forward<U>(tag), prim, expanded, sec, 0, 4);
 		device.option_reset();
-		intf(device);
+		intf(device, expanded);
 		device.set_default_option(deft);
 		device.set_fixed(false);
 		device.irq_handler().set(m_mainirq, FUNC(input_merger_device::in_w<N>));
