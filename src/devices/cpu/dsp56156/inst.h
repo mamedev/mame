@@ -207,7 +207,6 @@ public:
 		char temp[32];
 		sprintf(temp, "#$%x,%s", m_immediate, regIdAsString(m_destination).c_str());
 		retString = "andi " + std::string(temp);
-		// NEW // sprintf(opcode_str, "and(i)");
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -377,7 +376,6 @@ public:
 		char temp[32];
 		sprintf(temp, "#$%x", m_iVal);
 		retString = m_opcode + " " + std::string(temp) + "," + dString;
-		// NEW // sprintf(temp, "#$%04x", iVal);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -443,7 +441,6 @@ public:
 		std::string destination = temp;
 
 		retString = m_opcode + " " + source + "," + destination;
-		// NEW // sprintf(temp, "#$%04x", m_iVal);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -506,7 +503,6 @@ public:
 		std::string source = temp;
 
 		retString = m_opcode + " " + source + "," + regIdAsString(m_destination);
-		// NEW // sprintf(temp, "#$%04x", m_iVal);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -536,11 +532,9 @@ public:
 	void disassemble(std::string& retString) const override
 	{
 		std::string opcode = "b" + opMnemonicAsString(m_mnem);
-		// NEW // sprintf(opcode_str, "b.%s", M);
 
 		char temp[32];
 		sprintf(temp, ">*+$%x", 2 + m_immediate);
-		// NEW // sprintf(temp, "$%04x (%d)", pc + 2 + (int16_t)word1, (int16_t)word1);
 		retString = opcode + " " + std::string(temp);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
@@ -571,12 +565,10 @@ public:
 	void disassemble(std::string& retString) const override
 	{
 		std::string opcode = "b" + opMnemonicAsString(m_mnem);
-		// NEW // sprintf(opcode_str, "b.%s", M);
 
 		char temp[32];
 		if (m_immediate >= 0) sprintf(temp, "<*+$%x", m_immediate + 1);
 		else                  sprintf(temp, "<*-$%x", 1 - m_immediate - 2);
-		// NEW // sprintf(temp, "$%04x (%d)", pc + 1 + relativeInt, relativeInt);
 
 		retString = opcode + " " + std::string(temp);
 	}
@@ -608,7 +600,6 @@ public:
 	{
 		std::string opcode = "b" + opMnemonicAsString(m_mnem);
 		retString = opcode + " " + regIdAsString(m_destination);
-		// NEW // sprintf(opcode_str, "b.%s", M);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -636,7 +627,6 @@ public:
 	{
 		char temp[32];
 		sprintf(temp, ">*+$%x", 2 + m_immediate);
-		// NEW // sprintf(temp, "$%04x (%d)", pc + 2 + word1, (int16_t)word1);
 		retString = "bra " + std::string(temp);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
@@ -666,7 +656,6 @@ public:
 		char temp[32];
 		if (m_immediate >= 0) sprintf(temp, "<*+$%x", 1 + m_immediate);
 		else                  sprintf(temp, "<*-$%x", 1 - m_immediate - 2);
-		// NEW // sprintf(temp, "$%04x (%d)", pc + 1 + iVal, iVal);
 		retString = "bra " + std::string(temp);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
@@ -717,7 +706,6 @@ public:
 	{
 		std::string opcode = "brk" + opMnemonicAsString(m_mnem);
 		retString = opcode;
-		// NEW // sprintf(opcode_str, "brk.%s", M);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -746,13 +734,10 @@ public:
 	void disassemble(std::string& retString) const override
 	{
 		std::string opcode = "bs" + opMnemonicAsString(m_mnem);
-		// NEW // sprintf(opcode_str, "bs.%s", M);
 
 		char temp[32];
 		if (m_immediate >= 0) sprintf(temp, ">*+$%x", 2 + m_immediate);
 		else                  sprintf(temp, ">*-$%x", 1 - m_immediate - 1 - 2);
-		//sprintf(temp, ">*+$%x", 2 + m_immediate);
-		// NEW // sprintf(temp, "$%04x (%d)", pc + 2 + (int16_t)word1, (int16_t)word1);
 		retString = opcode + " " + std::string(temp);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
@@ -784,7 +769,6 @@ public:
 	{
 		std::string opcode = "bs" + opMnemonicAsString(m_mnem);
 		retString = opcode + " " + regIdAsString(m_destination);
-		// NEW // sprintf(opcode_str, "bs.%s", M);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -814,7 +798,6 @@ public:
 		char temp[32];
 		if (m_immediate >= 0) sprintf(temp, ">*+$%x", 2 + m_immediate);
 		else                  sprintf(temp, ">*-$%x", 1 - m_immediate - 1 - 2);
-		// NEW // sprintf(temp, "$%04x (%d)", pc + 2 + (int16_t)word1, (int16_t)word1);
 		retString = "bsr " + std::string(temp);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
@@ -1003,7 +986,6 @@ public:
 	{
 		std::string opcode = "debug" + opMnemonicAsString(m_mnem);
 		retString = opcode;
-		// NEW // sprintf(opcode_str, "debug.%s", M);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1106,7 +1088,6 @@ public:
 		retString = opcode + " " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
-		// NEW // sprintf(opcode_str, "dmac(%s)", A);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1137,7 +1118,6 @@ public:
 		char temp[32];
 		sprintf(temp, "*+$%x", 2 + m_immediate);
 		std::string destination = temp;
-		// NEW // sprintf(temp, "X:(R%d),$%02x", Rnum, pc + 2 + word1);
 
 		sprintf(temp, "X:(%s)", regIdAsString(m_source).c_str());
 		std::string source = temp;
@@ -1172,7 +1152,6 @@ public:
 	{
 		char temp[32];
 		sprintf(temp, "#<$%x,*+$%x", m_immediate, 2 + m_displacement);
-		// NEW // sprintf(temp, "#$%02x,$%04x", BITSn(word0,0x00ff), pc + 2 + word1);
 		retString = "do " + std::string(temp);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
@@ -1206,7 +1185,6 @@ public:
 	{
 		char temp[32];
 		sprintf(temp, "*+$%x", 2 + m_displacement);
-		// NEW // sprintf(temp, "%s,$%04x", S1, pc + 2 + word1);
 		retString = "do " + regIdAsString(m_source) + "," + std::string(temp);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
@@ -1235,8 +1213,6 @@ public:
 	{
 		char temp[32];
 		sprintf(temp, "*+$%x", m_displacement + 2);
-		// NEW // sprintf(temp, "*+$%x", pc + word1);
-		// NEW // sprintf(temp, "$%04x", pc + 2 + word1);
 		retString = "do forever, " + std::string(temp);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
@@ -1455,11 +1431,9 @@ public:
 	void disassemble(std::string& retString) const override
 	{
 		std::string opcode = "j" + opMnemonicAsString(m_mnem);
-		// NEW // sprintf(opcode_str, "j.%s", M);
 
 		char temp[32];
 		sprintf(temp, ">$%x", m_displacement);
-		// NEW // sprintf(temp, "$%04x", word1);
 		retString = opcode + " " + std::string(temp);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
@@ -1490,7 +1464,6 @@ public:
 	{
 		std::string opcode = "j" + opMnemonicAsString(m_mnem);
 		retString = opcode + " " + regIdAsString(m_destination);
-		// NEW // sprintf(opcode_str, "j.%s", M);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1518,7 +1491,6 @@ public:
 	{
 		char temp[32];
 		sprintf(temp, ">$%x", m_displacement);
-		// NEW // sprintf(temp, "$%04x", word1);
 		retString = "jmp " + std::string(temp);
 	}
 	void evaluate(dsp56156_core* cpustate) override
@@ -1586,11 +1558,9 @@ public:
 	void disassemble(std::string& retString) const override
 	{
 		std::string opcode = "js" + opMnemonicAsString(m_mnem);
-		// NEW // sprintf(opcode_str, "js.%s", M);
 
 		char temp[32];
 		sprintf(temp, ">$%x", m_displacement);
-		// NEW // sprintf(temp, "$%04x", word1);
 		retString = opcode + " " + std::string(temp);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
@@ -1622,7 +1592,6 @@ public:
 	{
 		std::string opcode = "js" + opMnemonicAsString(m_mnem);
 		retString = opcode + " " + regIdAsString(m_destination);
-		// NEW // sprintf(opcode_str, "js.%s", M);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1651,7 +1620,6 @@ public:
 	{
 		char temp[32];
 		sprintf(temp, ">$%x", m_displacement);
-		// NEW // sprintf(temp, "$%04x", word1);
 		retString = "jsr " + std::string(temp);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
@@ -1681,7 +1649,6 @@ public:
 	{
 		char temp[32];
 		sprintf(temp, "<$%x", m_bAddr);
-		// NEW // sprintf(temp, "#$%02x", BITSn(word0,0x00ff));
 		retString = "jsr " + std::string(temp);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
@@ -1727,7 +1694,7 @@ public:
 	}
 	bool decode(const uint16_t word0, const uint16_t word1) override
 	{
-		if ((word0 & 0x000c) == 0) return false;  // NEW TODO //
+		if ((word0 & 0x000c) == 0) return false;
 
 		decode_TT_table(BITSn(word0,0x0030), m_destination);
 
@@ -1759,7 +1726,7 @@ public:
 	}
 	bool decode(const uint16_t word0, const uint16_t word1) override
 	{
-		if ((word0 & 0x000c) == 0) return false;  // NEW TODO //
+		if ((word0 & 0x000c) == 0) return false;
 
 		decode_NN_table(BITSn(word0,0x0030), m_destination);
 
@@ -2010,7 +1977,6 @@ public:
 		retString = opcode + " " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
-		// NEW // sprintf(opcode_str, "mac(%s)", A);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2153,7 +2119,6 @@ public:
 		std::string destination;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source, destination);
 		retString = "move " + source + "," + destination;
-		// NEW // sprintf(opcode_str, "move(c)");
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2192,7 +2157,6 @@ public:
 		std::string destination;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source, destination);
 		retString = "move " + source + "," + destination;
-		// NEW // sprintf(opcode_str, "move(c)");
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2230,7 +2194,6 @@ public:
 		std::string destination;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source, destination);
 		retString = "move " + source + "," + destination;
-		// NEW // sprintf(opcode_str, "move(c)");
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2276,7 +2239,6 @@ public:
 		retString = "move ";
 		if (m_W) retString += ea + "," + regIdAsString(m_sd);
 		else     retString += regIdAsString(m_sd) + "," + ea;
-		// NEW // sprintf(opcode_str, "move(c)");
 	}
 	void evaluate(dsp56156_core* cpustate) override
 	{
@@ -2341,7 +2303,6 @@ public:
 	void disassemble(std::string& retString) const override
 	{
 		retString = "move " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
-		// NEW // sprintf(opcode_str, "move(c)");
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2373,7 +2334,6 @@ public:
 		std::string destination;
 		assemble_reg_from_W_table(m_W, 'X', m_SD, m_b, source, destination);
 		retString = "move " + source + "," + destination;
-		// NEW // opcode = "move(c)";
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -2406,11 +2366,9 @@ public:
 		char temp[32];
 		if (m_immediate >= 0) sprintf(temp, "#<+$%x", m_immediate);
 		else                  sprintf(temp, "#<-$%x", 1 - m_immediate - 1);
-		// NEW // sprintf(temp, "#$%02x,%s", BITSn(word0,0x00ff), D1);
 
 		retString = "move " +
 			std::string(temp) + "," + regIdAsString(m_destination);
-		// NEW // sprintf(opcode_str, "move(i)");
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2446,7 +2404,6 @@ public:
 		std::string destination;
 		assemble_arguments_from_W_table(m_W, 'P', m_SD, m_ea, source, destination);
 		retString = "move " + source + "," + destination;
-		// NEW // sprintf(opcode_str, "move(m)");
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2490,7 +2447,6 @@ public:
 			destination = "X:" + m_ea2;
 		}
 		retString = "move " + source + "," + destination;
-		// NEW // sprintf(opcode_str, "move(m)*");
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2526,7 +2482,6 @@ public:
 		std::string destination;
 		assemble_reg_from_W_table(m_W, 'P', m_SD, m_b, source, destination);
 		retString = "move " + source + "," + destination;
-		// NEW // opcode = "move(m)";
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -2566,7 +2521,6 @@ public:
 		std::string destination;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source, destination);
 		retString = "movep " + source + "," + destination;
-		// NEW // sprintf(opcode_str, "move(p)");
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2600,7 +2554,6 @@ public:
 
 		m_W = BITSn(word0,0x0100);
 		m_SD = "X:<<$" + fullAddy;
-		// NEW // sprintf(SD, "X:$%s", fullAddy);
 		return true;
 	}
 	void disassemble(std::string& retString) const override
@@ -2609,7 +2562,6 @@ public:
 		std::string destination;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source, destination);
 		retString = "movep " + source + "," + destination;
-		// NEW // sprintf(opcode_str, "move(p)*");
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2649,7 +2601,6 @@ public:
 		std::string destination;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source, destination);
 		retString = "moves " + source + "," + destination;
-		// NEW // sprintf(opcode_str, "move(s)");
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2849,7 +2800,6 @@ public:
 		retString = opcode + " " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
-		// NEW // sprintf(opcode_str, "mpy(%s)", A);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3013,9 +2963,7 @@ public:
 	{
 		char temp[32];
 		sprintf(temp, "#$%x", m_immediate);
-		// NEW // sprintf(temp, "#$%02x", BITSn(word0,0x00ff));
 		retString = "ori " + std::string(temp) + "," + regIdAsString(m_destination);
-		// NEW // sprintf(opcode_str, "or(i)");
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3067,7 +3015,6 @@ public:
 	{
 		char temp[32];
 		sprintf(temp, "#$%x", m_immediate);
-		// NEW // sprintf(temp, "#$%02x (%d)", BITSn(word0,0x00ff), BITSn(word0,0x00ff));
 		retString = "rep " + std::string(temp);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
@@ -3119,7 +3066,6 @@ public:
 	{
 		std::string opcode = "rep" + opMnemonicAsString(m_mnem);
 		retString = opcode;
-		// NEW // sprintf(opcode_str, "rep.%s", M);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3459,7 +3405,6 @@ public:
 	void disassemble(std::string& retString) const override
 	{
 		std::string opcode = "t" + opMnemonicAsString(m_mnem);
-		// NEW // sprintf(opcode_str, "t.%s", M);
 
 		retString = opcode;
 		if (m_source != m_destination)
