@@ -118,6 +118,7 @@ protected:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_update_txt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_update_graph(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_update_tunder(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<z84c015_device> m_maincpu;
 	emu_timer *m_wait_on_timer = nullptr;
@@ -190,6 +191,7 @@ private:
 	u16 m_timer_overlap;
 	std::list<std::pair<u16, u16>> m_ints;
 
+	u8 m_conf;
 	bool m_conf_loading;
 	bool m_starting;
 	bool m_dos; // 0-on, 1-off
@@ -320,8 +322,13 @@ void sprinter_state::sprinter_palette(palette_device &palette) const
 
 u32 sprinter_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen_update_graph(screen, bitmap, cliprect);
-	screen_update_txt(screen, bitmap, cliprect);
+	if (m_conf)
+		screen_update_tunder(screen, bitmap, cliprect);
+	else
+	{
+		screen_update_graph(screen, bitmap, cliprect);
+		screen_update_txt(screen, bitmap, cliprect);
+	}
 
 	return 0;
 }
@@ -435,6 +442,54 @@ void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bi
 			else
 			{
 				const u8 color = m_vram[(y + ((b8 & 7) >> BIT(mode[2], 2))) * 1024 + x + ((a16 & 15) >> (1 + BIT(mode[2], 2)))];
+				*pix++ = pal + (BIT(mode[0], 5) ? color : ((a16 & 1) ? (color & 0x0f) : (color >> 4)));
+			}
+		}
+	}
+}
+
+void sprinter_state::screen_update_tunder(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const s8 dy = 7 - (m_hold >> 4);
+	const s8 dx = (7 - (m_hold & 0x0f)) * 2;
+	for(u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
+	{
+		const u16 b8 = (SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT;
+
+		u8* line1 = nullptr;
+		u8* mode = nullptr;
+		u16 pal, x;
+		u8 y;
+		u16 *pix = &(bitmap.pix(vpos, cliprect.left()));
+		for(u16 hpos = cliprect.left(); hpos <= cliprect.right(); hpos++)
+		{
+			const u16 a16 = (SPRINT_WIDTH + hpos - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
+			if ((line1 == nullptr) || ((a16 & 15) == 0))
+			{
+				// 16x8 block descriptor
+				line1 = m_vram + (1 + (a16 >> 4) * 2 + 0x80 * (m_rgmod & 1)) * 1024 + 0x300;
+				mode = line1 + (b8 >> 3) * 4;
+				if(!BIT(mode[0], 4))
+				{
+					pal = BIT(mode[0], 6, 2) << 8;
+					x = (BIT(mode[0], 0, 2) << 8) | mode[1];
+					y = mode[2];
+					if (BIT(mode[0], 4))
+					{
+						x += 4 * BIT(mode[2], 0);
+						y += 4 * BIT(mode[2], 1);
+					}
+				}
+			}
+
+			if (BIT(mode[0], 4)) // skip txt block
+			{
+				hpos += 15 - (a16 & 15); // skip to the last of 16px block
+				pix += 16 - (a16 & 15);
+			}
+			else
+			{
+				const u8 color = m_vram[(y + ((b8 & 7) >> BIT(mode[0], 4))) * 1024 + x + ((a16 & 15) >> (1 + BIT(mode[0], 4)))];
 				*pix++ = pal + (BIT(mode[0], 5) ? color : ((a16 & 1) ? (color & 0x0f) : (color >> 4)));
 			}
 		}
@@ -957,6 +1012,7 @@ void sprinter_state::ram_w(offs_t offset, u8 data)
 	{
 		m_conf_loading = 0;
 		m_ram_pages[0x2e] = m_maincpu->cs1_r(0x1000) ? 0x41 : 0x00;
+		m_conf = m_maincpu->cs1_r(0x1000);
 		machine().schedule_soft_reset();
 		return;
 	}
@@ -1145,6 +1201,7 @@ void sprinter_state::machine_start()
 	save_item(NAME(m_pages));
 	save_item(NAME(m_z80_m1));
 	save_item(NAME(m_timer_overlap));
+	save_item(NAME(m_conf));
 	save_item(NAME(m_conf_loading));
 	save_item(NAME(m_starting));
 	save_item(NAME(m_dos));
@@ -1208,6 +1265,7 @@ void sprinter_state::machine_start()
 	m_rgmod    = 0x00; // c5
 	m_hold     = 0x77; // cb
 	m_conf_loading = 1;
+	m_conf = 0;
 }
 
 void sprinter_state::machine_reset()
