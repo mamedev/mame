@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 /***************************************************************************
 
-    Zilog Z84C015, MPUZ80/TLCS-Z80 ASSP Family
+    Zilog Z84C015, MPUZ80/Z8400/84C00 Family
     Z80 CPU, SIO, CTC, CGC, PIO, WDT
 
 ***************************************************************************/
@@ -27,8 +27,6 @@ public:
     int cs0_r(u16 addr);
     int cs1_r(u16 addr);
 
-    u8 csbr_r() { return m_csbr; }
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -37,7 +35,7 @@ protected:
 	virtual void internal_io_map(address_map &map) override;
 
 private:
-   	// system control registers
+	// system control registers
 	u8 m_scrp;
 	u8 m_wcr;
 	u8 m_mwbr;
