@@ -266,12 +266,6 @@ void msx_cart_base_mm_ram_device::device_start()
 	io_space().install_write_tap(0xfe, 0xfe, "bank2", [this] (offs_t, u8& data, u8){ this->bank_w<2>(data); });
 	io_space().install_write_tap(0xff, 0xff, "bank3", [this] (offs_t, u8& data, u8){ this->bank_w<3>(data); });
 
-	// Not all memory mapper expansions allow reading of mapper registers.
-	io_space().install_read_tap(0xfc, 0xfc, "bank0", [this] (offs_t, u8& data, u8){ if (!machine().side_effects_disabled()) data = ~m_bank_mask | m_rambank[0]->entry(); });
-	io_space().install_read_tap(0xfd, 0xfd, "bank1", [this] (offs_t, u8& data, u8){ if (!machine().side_effects_disabled()) data = ~m_bank_mask | m_rambank[1]->entry(); });
-	io_space().install_read_tap(0xfe, 0xfe, "bank2", [this] (offs_t, u8& data, u8){ if (!machine().side_effects_disabled()) data = ~m_bank_mask | m_rambank[2]->entry(); });
-	io_space().install_read_tap(0xff, 0xff, "bank3", [this] (offs_t, u8& data, u8){ if (!machine().side_effects_disabled()) data = ~m_bank_mask | m_rambank[3]->entry(); });
-
 	page(0)->install_readwrite_bank(0x0000, 0x3fff, m_rambank[0]);
 	page(1)->install_readwrite_bank(0x4000, 0x7fff, m_rambank[1]);
 	page(2)->install_readwrite_bank(0x8000, 0xbfff, m_rambank[2]);
