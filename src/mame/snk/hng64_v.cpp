@@ -860,7 +860,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			m_videoregs[0x0c],
 			m_videoregs[0x0d]);
 
-	if (1)
+	if (0)
 		popmessage("TC: %08x %08x %08x %08x : %08x %08x\n%08x %08x\n%08x %08x\n%08x %08x : %08x %08x %08x %08x : %08x %08x\n%08x %08x : %08x %08x %08x %08x",
 			m_tcram[0x00 / 4],
 			m_tcram[0x04 / 4],

@@ -73,22 +73,26 @@ do \
 while (0)
 
 #define PIX_CHECKERBOARD \
-if (!checkerboard) \
+do \
 { \
-	srcpix = srcptr[cursrcx >> 16]; \
-} \
-else \
-{ \
-	if (cb & 1) \
+	if (!checkerboard) \
 	{ \
-		srcpix = (cury & 1) ? srcptr[cursrcx >> 16] : 0; \
+		srcpix = srcptr[cursrcx >> 16]; \
 	} \
 	else \
 	{ \
-		srcpix = (cury & 1) ? 0 : srcptr[cursrcx >> 16]; \
+		if (cb & 1) \
+		{ \
+			srcpix = (cury & 1) ? srcptr[cursrcx >> 16] : 0; \
+		} \
+		else \
+		{ \
+			srcpix = (cury & 1) ? 0 : srcptr[cursrcx >> 16]; \
+		} \
+		cb++; \
 	} \
-	cb++; \
-}
+} \
+while (0)
 
 inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect, gfx_element *gfx, u32 code, int flipx, int flipy, s32 destx, s32 desty, s32 dx, s32 dy, u32 dstwidth, u32 dstheight, u32 trans_pen, u32 color, u32 zval, bool zrev, bool checkerboard)
 {
@@ -176,16 +180,16 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 				for (s32 curx = 0; curx < numblocks; curx++)
 				{
 					uint16_t srcpix;
-					PIX_CHECKERBOARD
+					PIX_CHECKERBOARD;
 					PIXEL_OP_REBASE_TRANSPEN_REV(destptr[0], destzptr[0], srcpix );
 					cursrcx += dx;
-					PIX_CHECKERBOARD
+					PIX_CHECKERBOARD;
 					PIXEL_OP_REBASE_TRANSPEN_REV(destptr[1], destzptr[1], srcpix);
 					cursrcx += dx;
-					PIX_CHECKERBOARD
+					PIX_CHECKERBOARD;
 					PIXEL_OP_REBASE_TRANSPEN_REV(destptr[2], destzptr[2], srcpix);
 					cursrcx += dx;
-					PIX_CHECKERBOARD
+					PIX_CHECKERBOARD;
 					PIXEL_OP_REBASE_TRANSPEN_REV(destptr[3], destzptr[3], srcpix);
 					cursrcx += dx;
 					destptr += 4;
@@ -197,7 +201,7 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 				for (s32 curx = 0; curx < leftovers; curx++)
 				{
 					uint16_t srcpix;
-					PIX_CHECKERBOARD
+					PIX_CHECKERBOARD;
 					PIXEL_OP_REBASE_TRANSPEN_REV(destptr[0], destzptr[0], srcpix);
 					cursrcx += dx;
 					destptr++;
@@ -210,16 +214,16 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 				for (s32 curx = 0; curx < numblocks; curx++)
 				{
 					uint16_t srcpix;
-					PIX_CHECKERBOARD
+					PIX_CHECKERBOARD;
 					PIXEL_OP_REBASE_TRANSPEN(destptr[0], destzptr[0], srcpix);
 					cursrcx += dx;
-					PIX_CHECKERBOARD
+					PIX_CHECKERBOARD;
 					PIXEL_OP_REBASE_TRANSPEN(destptr[1], destzptr[1], srcpix);
 					cursrcx += dx;
-					PIX_CHECKERBOARD
+					PIX_CHECKERBOARD;
 					PIXEL_OP_REBASE_TRANSPEN(destptr[2], destzptr[2], srcpix);
 					cursrcx += dx;
-					PIX_CHECKERBOARD
+					PIX_CHECKERBOARD;
 					PIXEL_OP_REBASE_TRANSPEN(destptr[3], destzptr[3], srcpix);
 					cursrcx += dx;
 					destptr += 4;
@@ -231,7 +235,7 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 				for (s32 curx = 0; curx < leftovers; curx++)
 				{
 					uint16_t srcpix;
-					PIX_CHECKERBOARD
+					PIX_CHECKERBOARD;
 					PIXEL_OP_REBASE_TRANSPEN(destptr[0], destzptr[0], srcpix);
 					cursrcx += dx;
 					destptr++;
@@ -271,7 +275,6 @@ void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const r
 void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cliprect)
 {
 	m_sprite_bitmap.fill(0x0000, cliprect);
-	gfx_element* gfx;
 
 	// global offsets in sprite regs
 	int spriteoffsx = (m_spriteregs[1] >> 0) & 0xffff;
@@ -321,7 +324,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 		if (!zoomx) zoomx = zoom_factor;
 		if (!zoomy) zoomy = zoom_factor;
 
-		s32 dx, dy;
+		int32_t dx, dy;
 
 		if (zoom_factor == 0x100)
 		{
@@ -334,8 +337,6 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 			dy = zoomy << 4;
 		}
 
-		uint32_t srcpix_x;
-		uint32_t srcpix_y;
 
 		// calculate the total height
 		uint32_t total_srcpix_y = 0;
@@ -357,6 +358,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 
 		} while (total_srcpix_x < ((chainx+1) * 0x100000));
 
+		gfx_element* gfx;
 		if (m_spriteregs[0] & 0x00800000) //bpp switch
 		{
 			gfx = m_gfxdecode->gfx(4);
@@ -380,7 +382,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 		}
 
 		int16_t drawy = ypos;
-		srcpix_y = 0;
+		uint32_t srcpix_y = 0;
 		for (int ydrw = 0; ydrw <= chainy; ydrw++)
 		{
 			
@@ -394,7 +396,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 			srcpix_y &= 0x0fffff;
 			
 			int16_t drawx = xpos;
-			srcpix_x = 0;
+			uint32_t srcpix_x = 0;
 
 			if (yflip)
 				drawy -= dstheight;
