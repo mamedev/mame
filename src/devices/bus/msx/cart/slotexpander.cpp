@@ -97,15 +97,12 @@ void msx_cart_slotexpander_device::device_add_mconfig(machine_config &mconfig)
 
 void msx_cart_slotexpander_device::device_config_complete()
 {
-	static const char *tags[4] = {
-		"cartslot1", "cartslot2", "cartslot3", "cartslot4"
-	};
-	for (int subslot = 0; subslot < 4; subslot++) {
-		if (get_cpu_finder())
+	if (parent_slot())
+	{
+		for (auto &subslot : m_cartslot)
 		{
-			subdevice<msx_slot_cartridge_device>(tags[subslot])->set_memory_space(*get_cpu_finder(), AS_PROGRAM);
-			subdevice<msx_slot_cartridge_device>(tags[subslot])->set_io_space(*get_cpu_finder(), AS_IO);
-			subdevice<msx_slot_cartridge_device>(tags[subslot])->set_maincpu(*get_cpu_finder());
+			auto target = subslot.finder_target();
+			parent_slot()->configure_subslot(*target.first.subdevice<msx_slot_cartridge_device>(target.second));
 		}
 	}
 }
