@@ -90675,12 +90675,9 @@ void m68000_device::tas_ais_dfm() // 4ad0 fff8
 	if(!(m_aob & 1))
 		m_edb >>= 8;
 	m_icount -= 4;
-	if(m_icount <= m_bcount) {
-		if(access_to_be_redone()) {
-			m_icount += 4;
-			m_inst_substate = 1;
-		} else
-			m_inst_substate = 2;
+	if(m_icount <= m_bcount && access_to_be_redone()) {
+		m_icount += 4;
+		m_inst_substate = 1;
 		return;
 	}
 	m_dcr = m_da[m_movems];
@@ -90704,7 +90701,7 @@ void m68000_device::tas_ais_dfm() // 4ad0 fff8
 	if(m_icount <= m_bcount) {
 		if(access_to_be_redone()) {
 			m_icount += 4;
-			m_inst_substate = 3;
+			m_inst_substate = 1;
 		} else
 			m_inst_substate = 4;
 		return;
@@ -90765,12 +90762,9 @@ void m68000_device::tas_aips_dfm() // 4ad8 fff8
 	if(!(m_aob & 1))
 		m_edb >>= 8;
 	m_icount -= 4;
-	if(m_icount <= m_bcount) {
-		if(access_to_be_redone()) {
-			m_icount += 4;
-			m_inst_substate = 1;
-		} else
-			m_inst_substate = 2;
+	if(m_icount <= m_bcount && access_to_be_redone()) {
+		m_icount += 4;
+		m_inst_substate = 1;
 		return;
 	}
 	m_da[ry] = m_au;
@@ -90796,7 +90790,7 @@ void m68000_device::tas_aips_dfm() // 4ad8 fff8
 	if(m_icount <= m_bcount) {
 		if(access_to_be_redone()) {
 			m_icount += 4;
-			m_inst_substate = 3;
+			m_inst_substate = 1;
 		} else
 			m_inst_substate = 4;
 		return;
@@ -90858,12 +90852,9 @@ void m68000_device::tas_pais_dfm() // 4ae0 fff8
 	if(!(m_aob & 1))
 		m_edb >>= 8;
 	m_icount -= 4;
-	if(m_icount <= m_bcount) {
-		if(access_to_be_redone()) {
-			m_icount += 4;
-			m_inst_substate = 1;
-		} else
-			m_inst_substate = 2;
+	if(m_icount <= m_bcount && access_to_be_redone()) {
+		m_icount += 4;
+		m_inst_substate = 1;
 		return;
 	}
 	m_at = m_au;
@@ -90890,7 +90881,7 @@ void m68000_device::tas_pais_dfm() // 4ae0 fff8
 	if(m_icount <= m_bcount) {
 		if(access_to_be_redone()) {
 			m_icount += 4;
-			m_inst_substate = 3;
+			m_inst_substate = 1;
 		} else
 			m_inst_substate = 4;
 		return;
@@ -90971,12 +90962,9 @@ void m68000_device::tas_das_dfm() // 4ae8 fff8
 	if(!(m_aob & 1))
 		m_edb >>= 8;
 	m_icount -= 4;
-	if(m_icount <= m_bcount) {
-		if(access_to_be_redone()) {
-			m_icount += 4;
-			m_inst_substate = 3;
-		} else
-			m_inst_substate = 4;
+	if(m_icount <= m_bcount && access_to_be_redone()) {
+		m_icount += 4;
+		m_inst_substate = 3;
 		return;
 	}
 	m_dcr = m_da[m_movems];
@@ -91000,7 +90988,7 @@ void m68000_device::tas_das_dfm() // 4ae8 fff8
 	if(m_icount <= m_bcount) {
 		if(access_to_be_redone()) {
 			m_icount += 4;
-			m_inst_substate = 5;
+			m_inst_substate = 3;
 		} else
 			m_inst_substate = 6;
 		return;
@@ -91121,12 +91109,9 @@ adsw2:
 	if(!(m_aob & 1))
 		m_edb >>= 8;
 	m_icount -= 4;
-	if(m_icount <= m_bcount) {
-		if(access_to_be_redone()) {
-			m_icount += 4;
-			m_inst_substate = 3;
-		} else
-			m_inst_substate = 4;
+	if(m_icount <= m_bcount && access_to_be_redone()) {
+		m_icount += 4;
+		m_inst_substate = 3;
 		return;
 	}
 	m_dcr = m_da[m_movems];
@@ -91150,7 +91135,7 @@ adsw2:
 	if(m_icount <= m_bcount) {
 		if(access_to_be_redone()) {
 			m_icount += 4;
-			m_inst_substate = 5;
+			m_inst_substate = 3;
 		} else
 			m_inst_substate = 6;
 		return;
@@ -91229,12 +91214,9 @@ void m68000_device::tas_adr16_dfm() // 4af8 ffff
 	if(!(m_aob & 1))
 		m_edb >>= 8;
 	m_icount -= 4;
-	if(m_icount <= m_bcount) {
-		if(access_to_be_redone()) {
-			m_icount += 4;
-			m_inst_substate = 3;
-		} else
-			m_inst_substate = 4;
+	if(m_icount <= m_bcount && access_to_be_redone()) {
+		m_icount += 4;
+		m_inst_substate = 3;
 		return;
 	}
 	m_au = m_pc + 2;
@@ -91259,7 +91241,7 @@ void m68000_device::tas_adr16_dfm() // 4af8 ffff
 	if(m_icount <= m_bcount) {
 		if(access_to_be_redone()) {
 			m_icount += 4;
-			m_inst_substate = 5;
+			m_inst_substate = 3;
 		} else
 			m_inst_substate = 6;
 		return;
@@ -91360,12 +91342,9 @@ void m68000_device::tas_adr32_dfm() // 4af9 ffff
 	if(!(m_aob & 1))
 		m_edb >>= 8;
 	m_icount -= 4;
-	if(m_icount <= m_bcount) {
-		if(access_to_be_redone()) {
-			m_icount += 4;
-			m_inst_substate = 5;
-		} else
-			m_inst_substate = 6;
+	if(m_icount <= m_bcount && access_to_be_redone()) {
+		m_icount += 4;
+		m_inst_substate = 5;
 		return;
 	}
 	m_au = m_pc + 2;
@@ -91390,7 +91369,7 @@ void m68000_device::tas_adr32_dfm() // 4af9 ffff
 	if(m_icount <= m_bcount) {
 		if(access_to_be_redone()) {
 			m_icount += 4;
-			m_inst_substate = 7;
+			m_inst_substate = 5;
 		} else
 			m_inst_substate = 8;
 		return;

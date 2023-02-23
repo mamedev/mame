@@ -2098,7 +2098,6 @@ def generate_source_from_code(code, gen_mode):
                 is_interrupt_vector_lookup = not ci[4] and ci[2] == 2
                 if is_interrupt_vector_lookup:
                     source.append("\tstart_interrupt_vector_lookup();")
-		    
                 if not (gen_mode & GEN.full):
                     source.append("\t[[fallthrough]]; case %d:" % (ci[1]))
                 if ci[4]:
@@ -2140,14 +2139,31 @@ def generate_source_from_code(code, gen_mode):
                         else:
                             source.append("\tm_edb = m_mmu->read_%s(m_aob & ~1, 0xffff);" % (["program", "data"][ci[2]]))
                 source.append("\tm_icount -= 4;")
-                source.append("\tif(m_icount <= %s) {" % ("m_bcount" if gen_mode & GEN.mcu else "0"))
-                source.append("\t\tif(access_to_be_redone()) {")
-                source.append("\t\t\tm_icount += 4;")
-                source.append("\t\t\tm_inst_substate = %d;" % ci[1])
-                source.append("\t\t} else")
-                source.append("\t\t\tm_inst_substate = %d;" % (ci[1]+1))
-                source.append("\t\treturn;")
-                source.append("\t}")
+                if ci[8]:
+                    if ci[4]:
+                        source.append("\tif(m_icount <= %s) {" % ("m_bcount" if gen_mode & GEN.mcu else "0"))
+                        source.append("\t\tif(access_to_be_redone()) {")
+                        source.append("\t\t\tm_icount += 4;")
+                        source.append("\t\t\tm_inst_substate = %d;" % (ci[1]-2))
+                        source.append("\t\t} else")
+                        source.append("\t\t\tm_inst_substate = %d;" % (ci[1]+1))
+                        source.append("\t\treturn;")
+                        source.append("\t}")
+                    else:
+                        source.append("\tif(m_icount <= %s && access_to_be_redone()) {" % ("m_bcount" if gen_mode & GEN.mcu else "0"))
+                        source.append("\t\tm_icount += 4;")
+                        source.append("\t\tm_inst_substate = %d;" % ci[1])
+                        source.append("\t\treturn;")
+                        source.append("\t}")
+                else:
+                    source.append("\tif(m_icount <= %s) {" % ("m_bcount" if gen_mode & GEN.mcu else "0"))
+                    source.append("\t\tif(access_to_be_redone()) {")
+                    source.append("\t\t\tm_icount += 4;")
+                    source.append("\t\t\tm_inst_substate = %d;" % ci[1])
+                    source.append("\t\t} else")
+                    source.append("\t\t\tm_inst_substate = %d;" % (ci[1]+1))
+                    source.append("\t\treturn;")
+                    source.append("\t}")
                 if not (gen_mode & GEN.full):
                     source.append("\t[[fallthrough]]; case %d:" % (ci[1]+1))
                 if is_interrupt_vector_lookup:
