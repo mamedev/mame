@@ -119,7 +119,8 @@ ROM_END
 
 /*
  Doodle Jump Arcade, by default, uses a different PC than other Raw Thrills games:
-   -HP with an Asus M2N68-LA motherboard (socket AM3, Fintek F8000 + Realtek RTL8201EL + Realtek ALC662 + nVidia NF-6100-430-N-A3 + ST L6740L).
+   -HP with an Asus M2N68-LA "Narra 3" motherboard (Socket AM3, nForce-based, nVidia MCP61P chipset)
+     * Fintek F8000 + Realtek RTL8201EL + Realtek ALC662 + nVidia NF-6100-430-N-A3 + ST L6740L.
    -CPU Athlon II CPU (ADX2400CK23GQ).
    -2GB RAM (single SIMM, PC3-12800) [HP P/N 655409-150].
    -nVidia Club3D CGNX-G942LI.
