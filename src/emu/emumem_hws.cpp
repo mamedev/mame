@@ -12,8 +12,13 @@ template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Widt
 
 template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_before_time<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
 {
-	u32 tc = m_cpu.total_cycles();
-	if(m_cpu.access_before_time(m_ws(offset, tc), tc))
+	u64 tc = m_cpu.total_cycles();
+	u64 ac = m_ws(offset, tc);
+
+	if(ac < tc)
+		ac = tc;
+
+	if(m_cpu.access_before_time(ac, tc))
 		return 0;
 
 	return this->m_next->read_interruptible(offset, mem_mask);
@@ -47,8 +52,13 @@ template<int Width, int AddrShift> void handler_entry_write_before_time<Width, A
 
 template<int Width, int AddrShift> void handler_entry_write_before_time<Width, AddrShift>::write_interruptible(offs_t offset, uX data, uX mem_mask) const
 {
-	u32 tc = m_cpu.total_cycles();
-	if(m_cpu.access_before_time(m_ws(offset, tc), tc))
+	u64 tc = m_cpu.total_cycles();
+	u64 ac = m_ws(offset, tc);
+
+	if(ac < tc)
+		ac = tc;
+
+	if(m_cpu.access_before_time(ac, tc))
 		return;
 	this->m_next->write_interruptible(offset, data, mem_mask);
 }
