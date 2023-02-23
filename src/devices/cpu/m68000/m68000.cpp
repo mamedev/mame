@@ -322,6 +322,7 @@ void m68000_device::device_reset()
 	m_count_before_instruction_step = 0;
 	m_post_run = 0;
 	m_post_run_cycles = 0;
+	m_last_vpa_time = 0;
 	update_user_super();
 }
 
