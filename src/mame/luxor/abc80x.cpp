@@ -1958,11 +1958,6 @@ void abc806_state::machine_reset()
 	m_dfd_in = 0;
 
 	m_hrs = 0;
-
-	// clear STO lines
-	for (int i = 0; i < 8; i++) {
-		sto_w(i);
-	}
 }
 
 
