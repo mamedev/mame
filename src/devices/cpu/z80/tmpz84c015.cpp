@@ -17,7 +17,7 @@
 
 DEFINE_DEVICE_TYPE(TMPZ84C015, tmpz84c015_device, "tmpz84c015", "Toshiba TMPZ84C015")
 
-void tmpz84c015_device::internal_io_map(address_map &map)
+void tmpz84c015_device::internal_io_map(address_map &map) const
 {
 	map(0x10, 0x13).mirror(0xff00).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x18, 0x1b).mirror(0xff00).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));

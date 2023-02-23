@@ -419,10 +419,18 @@ void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bi
 				if(!BIT(mode[0], 4))
 				{
 					pal = BIT(mode[0], 6, 2) << 8;
-					if (m_conf)
+					if (m_conf) // Thunder in the Deep
 					{
 						x = (BIT(mode[0], 0, 2) << 8) | mode[1];
 						y = mode[2];
+						/* TODO scroll
+						if (BIT(mode[0], 2))
+						{
+							x += mode[3] & 0x0f;
+							y += mode[3] >> 4;
+						}
+						*/
+
 					}
 					else
 					{

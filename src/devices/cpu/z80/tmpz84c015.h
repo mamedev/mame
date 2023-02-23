@@ -122,7 +122,7 @@ protected:
 
 	const address_space_config m_io_space_config;
 
-	virtual void internal_io_map(address_map &map);
+	void internal_io_map(address_map &map) const;
 	virtual space_config_vector memory_space_config() const override;
 
 private:
