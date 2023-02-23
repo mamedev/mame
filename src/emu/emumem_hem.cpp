@@ -10,6 +10,11 @@ template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Widt
 	return m_base[((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift)];
 }
 
+template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_memory<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
+{
+	return m_base[((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift)];
+}
+
 template<int Width, int AddrShift> std::pair<typename emu::detail::handler_entry_size<Width>::uX, u16> handler_entry_read_memory<Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
 {
 	return std::pair<uX, u16>(m_base[((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift)], this->m_flags);
@@ -37,6 +42,12 @@ template<int Width, int AddrShift> void handler_entry_write_memory<Width, AddrSh
 	m_base[off] = (m_base[off] & ~mem_mask) | (data & mem_mask);
 }
 
+template<int Width, int AddrShift> void handler_entry_write_memory<Width, AddrShift>::write_interruptible(offs_t offset, uX data, uX mem_mask) const
+{
+	offs_t off = ((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift);
+	m_base[off] = (m_base[off] & ~mem_mask) | (data & mem_mask);
+}
+
 template<int Width, int AddrShift> u16 handler_entry_write_memory<Width, AddrShift>::write_flags(offs_t offset, uX data, uX mem_mask) const
 {
 	offs_t off = ((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift);
@@ -50,6 +61,11 @@ template<int Width, int AddrShift> u16 handler_entry_write_memory<Width, AddrShi
 }
 
 template<> void handler_entry_write_memory<0, 0>::write(offs_t offset, u8 data, u8 mem_mask) const
+{
+	m_base[(offset - this->m_address_base) & this->m_address_mask] = data;
+}
+
+template<> void handler_entry_write_memory<0, 0>::write_interruptible(offs_t offset, u8 data, u8 mem_mask) const
 {
 	m_base[(offset - this->m_address_base) & this->m_address_mask] = data;
 }
@@ -75,6 +91,11 @@ template<int Width, int AddrShift> std::string handler_entry_write_memory<Width,
 
 
 template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_memory_bank<Width, AddrShift>::read(offs_t offset, uX mem_mask) const
+{
+	return static_cast<uX *>(m_bank.base())[((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift)];
+}
+
+template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_memory_bank<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
 {
 	return static_cast<uX *>(m_bank.base())[((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift)];
 }
@@ -106,6 +127,12 @@ template<int Width, int AddrShift> void handler_entry_write_memory_bank<Width, A
 	static_cast<uX *>(m_bank.base())[off] = (static_cast<uX *>(m_bank.base())[off] & ~mem_mask) | (data & mem_mask);
 }
 
+template<int Width, int AddrShift> void handler_entry_write_memory_bank<Width, AddrShift>::write_interruptible(offs_t offset, uX data, uX mem_mask) const
+{
+	offs_t off = ((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift);
+	static_cast<uX *>(m_bank.base())[off] = (static_cast<uX *>(m_bank.base())[off] & ~mem_mask) | (data & mem_mask);
+}
+
 template<int Width, int AddrShift> u16 handler_entry_write_memory_bank<Width, AddrShift>::write_flags(offs_t offset, uX data, uX mem_mask) const
 {
 	offs_t off = ((offset - this->m_address_base) & this->m_address_mask) >> (Width + AddrShift);
@@ -119,6 +146,11 @@ template<int Width, int AddrShift> u16 handler_entry_write_memory_bank<Width, Ad
 }
 
 template<> void handler_entry_write_memory_bank<0, 0>::write(offs_t offset, u8 data, u8 mem_mask) const
+{
+	static_cast<uX *>(m_bank.base())[(offset - this->m_address_base) & this->m_address_mask] = data;
+}
+
+template<> void handler_entry_write_memory_bank<0, 0>::write_interruptible(offs_t offset, u8 data, u8 mem_mask) const
 {
 	static_cast<uX *>(m_bank.base())[(offset - this->m_address_base) & this->m_address_mask] = data;
 }

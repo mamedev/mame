@@ -21,6 +21,8 @@
 
 #include "util/unicode.h"
 
+#include "osdepend.h"
+
 #include <cmath>
 #include <vector>
 
@@ -55,6 +57,9 @@ public:
 		// implicitly cancel if there's nothing to display
 		if (!is_relevant())
 			return cancel(uistate);
+
+		// let the OSD do its thing
+		mui.machine().osd().check_osd_inputs();
 
 		// always mark the bitmap dirty if not paused
 		if (!m_machine.paused())

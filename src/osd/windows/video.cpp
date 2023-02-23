@@ -118,8 +118,7 @@ void windows_osd_interface::input_update()
 {
 	// poll the joystick values here
 	process_events(true, false);
-	poll_input(machine());
-	check_osd_inputs();
+	poll_input_modules();
 }
 
 //============================================================

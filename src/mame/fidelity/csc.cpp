@@ -410,10 +410,8 @@ u8 csc_state::pia0_read(offs_t offset)
 	// CA1/CB1: button row 6/7
 	if (!machine().side_effects_disabled())
 	{
-		if (offset == 1)
-			m_pia[0]->ca1_w(BIT(read_inputs(), 6));
-		else if (offset == 3)
-			m_pia[0]->cb1_w(BIT(read_inputs(), 7));
+		m_pia[0]->ca1_w(BIT(read_inputs(), 6));
+		m_pia[0]->cb1_w(BIT(read_inputs(), 7));
 	}
 
 	return m_pia[0]->read(offset);

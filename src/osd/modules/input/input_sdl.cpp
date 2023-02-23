@@ -1502,7 +1502,6 @@ public:
 							button_item++,
 							[] (void *device_internal, void *item_internal) -> int
 							{
-								static_cast<device_info *>(device_internal)->module().poll_if_necessary();
 								return (*reinterpret_cast<s32 const *>(item_internal) <= -16'384) ? 1 : 0;
 							},
 							&m_controller.axes[axis]);

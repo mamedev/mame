@@ -15793,10 +15793,11 @@ cmpchess2
 cncchess
 
 @source:chess/conchess.cpp
-concply5
-concply8
-concplyv
-concstd
+conc
+concams5
+concams8
+concgla
+concvicp
 
 @source:chess/conic_cchess2.cpp
 cncchess2
@@ -34193,6 +34194,8 @@ vandykejal2                     // UPL-90064 (c) Jaleco
 @source:nmk/nmkmedal.cpp
 drail                           // NTC / NMK
 hpierrot                        // NTC / NMK
+omatsuri                        // NMK
+sweethrt                        // NMK
 trocana                         // NTC / NMK
 
 @source:nmk/powerins.cpp

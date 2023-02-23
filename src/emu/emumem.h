@@ -173,6 +173,12 @@ using write32smo_delegate = device_delegate<void (u32)>;
 using write64smo_delegate = device_delegate<void (u64)>;
 
 
+// =====================-> Wait states delegates
+
+using ws_time_delegate  = device_delegate<u64 (offs_t, u64)>;
+using ws_delay_delegate = device_delegate<u32 (offs_t)>;
+
+
 namespace emu::detail {
 
 // TODO: replace with std::void_t when we move to C++17
@@ -518,11 +524,14 @@ class handler_entry
 
 public:
 	// Typing flags (low 16 bits are for the user)
-	static constexpr u32 F_UNMAP       = 0x00010000; // the unmapped memory accessed handler
-	static constexpr u32 F_DISPATCH    = 0x00020000; // handler that forwards the access to other handlers
-	static constexpr u32 F_UNITS       = 0x00040000; // handler that merges/splits an access among multiple handlers (unitmask support)
-	static constexpr u32 F_PASSTHROUGH = 0x00080000; // handler that passes through the request to another handler
-	static constexpr u32 F_VIEW        = 0x00100000; // handler for a view (kinda like dispatch except not entirely)
+	static constexpr u32 F_UNMAP       = 0x00010000;     // the unmapped memory accessed handler
+	static constexpr u32 F_DISPATCH    = 0x00020000;     // handler that forwards the access to other handlers
+	static constexpr u32 F_UNITS       = 0x00040000;     // handler that merges/splits an access among multiple handlers (unitmask support)
+	static constexpr u32 F_VIEW        = 0x00080000;     // handler for a view (kinda like dispatch except not entirely)
+	static constexpr u32 F_PT_BITS     = 24;             // position of the 4-bit priority for a passthrough handler.  The highest the priority the earlier it is called in the chain. 0 = not passthrough
+	static constexpr u32 F_PT_REPLACE  = 1 << F_PT_BITS; // a passthrough with a odd priority can only happen once in a path
+
+	static constexpr u32 f_pt(u32 priority) { return (priority << F_PT_BITS); }
 
 	// Start/end of range flags
 	static constexpr u8 START = 1;
@@ -552,7 +561,8 @@ public:
 	inline bool is_dispatch() const { return m_flags & F_DISPATCH; }
 	inline bool is_view() const { return m_flags & F_VIEW; }
 	inline bool is_units() const { return m_flags & F_UNITS; }
-	inline bool is_passthrough() const { return m_flags & F_PASSTHROUGH; }
+	inline bool is_passthrough() const { return f_get_pt() != 0; }
+	inline u32 f_get_pt() const { return (m_flags >> F_PT_BITS) & 15; }
 
 	virtual void dump_map(std::vector<memory_entry> &map) const;
 
@@ -611,6 +621,7 @@ public:
 	~handler_entry_read() {}
 
 	virtual uX read(offs_t offset, uX mem_mask) const = 0;
+	virtual uX read_interruptible(offs_t offset, uX mem_mask) const = 0;
 	virtual std::pair<uX, u16> read_flags(offs_t offset, uX mem_mask) const = 0;
 	virtual u16 lookup_flags(offs_t offset, uX mem_mask) const = 0;
 	virtual void *get_ptr(offs_t offset) const;
@@ -685,6 +696,7 @@ public:
 	virtual ~handler_entry_write() {}
 
 	virtual void write(offs_t offset, uX data, uX mem_mask) const = 0;
+	virtual void write_interruptible(offs_t offset, uX data, uX mem_mask) const = 0;
 	virtual u16 write_flags(offs_t offset, uX data, uX mem_mask) const = 0;
 	virtual u16 lookup_flags(offs_t offset, uX mem_mask) const = 0;
 	virtual void *get_ptr(offs_t offset) const;
@@ -1605,6 +1617,21 @@ template<int Level, int Width, int AddrShift> u16 dispatch_lookup_write_flags(of
 }
 
 
+
+template<int Level, int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX dispatch_read_interruptible(offs_t mask, offs_t offset, typename emu::detail::handler_entry_size<Width>::uX mem_mask, const handler_entry_read<Width, AddrShift> *const *dispatch)
+{
+	static constexpr u32 LowBits  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
+	return dispatch[(offset & mask) >> LowBits]->read_interruptible(offset, mem_mask);
+}
+
+
+template<int Level, int Width, int AddrShift> void dispatch_write_interruptible(offs_t mask, offs_t offset, typename emu::detail::handler_entry_size<Width>::uX data, typename emu::detail::handler_entry_size<Width>::uX mem_mask, const handler_entry_write<Width, AddrShift> *const *dispatch)
+{
+	static constexpr u32 LowBits  = emu::detail::handler_entry_dispatch_level_to_lowbits(Level, Width, AddrShift);
+	return dispatch[(offset & mask) >> LowBits]->write_interruptible(offset, data, mem_mask);
+}
+
+
 // ======================> memory_access_specific
 
 // memory_access_specific does uncached but faster accesses by shortcutting the address_space virtual call
@@ -1724,6 +1751,14 @@ public:
 	u16 lookup_write_qword_flags(offs_t address, u64 mask) { return lookup_memory_write_generic_flags<Width, AddrShift, Endian, 3, true>(wop(), address, mask); }
 	u16 lookup_write_qword_unaligned_flags(offs_t address) { return lookup_memory_write_generic_flags<Width, AddrShift, Endian, 3, false>(lwopf(), address, 0xffffffffffffffffU); }
 	u16 lookup_write_qword_unaligned_flags(offs_t address, u64 mask) { return lookup_memory_write_generic_flags<Width, AddrShift, Endian, 3, false>(lwopf(), address, mask); }
+
+	NativeType read_interruptible(offs_t address, NativeType mask = ~NativeType(0)) {
+		return dispatch_read_interruptible<Level, Width, AddrShift>(offs_t(-1), address & m_addrmask, mask, m_dispatch_read);
+	}
+
+	void write_interruptible(offs_t address, NativeType data, NativeType mask = ~NativeType(0)) {
+		dispatch_write_interruptible<Level, Width, AddrShift>(offs_t(-1), address & m_addrmask, data, mask, m_dispatch_write);
+	}
 
 private:
 	address_space *             m_space;
@@ -2102,6 +2137,28 @@ public:
 	void install_view(offs_t addrstart, offs_t addrend, memory_view &view) { install_view(addrstart, addrend, 0, view); }
 	virtual void install_view(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_view &view) = 0;
 
+	// install wait state handlers
+	void install_read_before_time(offs_t addrstart, offs_t addrend, ws_time_delegate ws) { install_read_before_time(addrstart, addrend, 0, ws); }
+	virtual void install_read_before_time(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_time_delegate ws) = 0;
+	void install_read_before_delay(offs_t addrstart, offs_t addrend, ws_delay_delegate ws) { install_read_before_delay(addrstart, addrend, 0, ws); }
+	virtual void install_read_before_delay(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_delay_delegate ws) = 0;
+	void install_read_after_delay(offs_t addrstart, offs_t addrend, ws_delay_delegate ws) { install_read_after_delay(addrstart, addrend, 0, ws); }
+	virtual void install_read_after_delay(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_delay_delegate ws) = 0;
+
+	void install_write_before_time(offs_t addrstart, offs_t addrend, ws_time_delegate ws) { install_write_before_time(addrstart, addrend, 0, ws); }
+	virtual void install_write_before_time(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_time_delegate ws) = 0;
+	void install_write_before_delay(offs_t addrstart, offs_t addrend, ws_delay_delegate ws) { install_write_before_delay(addrstart, addrend, 0, ws); }
+	virtual void install_write_before_delay(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_delay_delegate ws) = 0;
+	void install_write_after_delay(offs_t addrstart, offs_t addrend, ws_delay_delegate ws) { install_write_after_delay(addrstart, addrend, 0, ws); }
+	virtual void install_write_after_delay(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_delay_delegate ws) = 0;
+
+	void install_readwrite_before_time(offs_t addrstart, offs_t addrend, ws_time_delegate ws) { install_readwrite_before_time(addrstart, addrend, 0, ws); }
+	virtual void install_readwrite_before_time(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_time_delegate ws) = 0;
+	void install_readwrite_before_delay(offs_t addrstart, offs_t addrend, ws_delay_delegate ws) { install_readwrite_before_delay(addrstart, addrend, 0, ws); }
+	virtual void install_readwrite_before_delay(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_delay_delegate ws) = 0;
+	void install_readwrite_after_delay(offs_t addrstart, offs_t addrend, ws_delay_delegate ws) { install_readwrite_after_delay(addrstart, addrend, 0, ws); }
+	virtual void install_readwrite_after_delay(offs_t addrstart, offs_t addrend, offs_t addrmirror, ws_delay_delegate ws) = 0;
+
 	// install new-style delegate handlers (short form)
 	void install_read_handler(offs_t addrstart, offs_t addrend, read8_delegate rhandler, u64 unitmask = 0, int cswidth = 0, u16 flags = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask, cswidth, flags); }
 	void install_write_handler(offs_t addrstart, offs_t addrend, write8_delegate whandler, u64 unitmask = 0, int cswidth = 0, u16 flags = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask, cswidth, flags); }
@@ -2360,6 +2417,7 @@ public:
 	u64 unmap() const { return m_unmap; }
 
 	std::shared_ptr<emu::detail::memory_passthrough_handler_impl> make_mph(memory_passthrough_handler *mph);
+	std::shared_ptr<emu::detail::memory_passthrough_handler_impl> get_default_mpl() { return m_default_mpl; }
 
 	// debug helpers
 	virtual std::string get_handler_string(read_or_write readorwrite, offs_t byteaddress) const = 0;
@@ -2440,6 +2498,9 @@ protected:
 
 	util::notifier<read_or_write> m_notifiers;  // notifier list for address map change
 	u32                     m_in_notification;  // notification(s) currently being done
+
+	// passthrough handler used for wait states
+	std::shared_ptr<emu::detail::memory_passthrough_handler_impl> m_default_mpl;
 };
 
 
