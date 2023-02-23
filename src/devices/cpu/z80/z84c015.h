@@ -32,7 +32,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void internal_io_map(address_map &map) override;
+	void internal_io_map(address_map &map) const;
 
 private:
 	// system control registers

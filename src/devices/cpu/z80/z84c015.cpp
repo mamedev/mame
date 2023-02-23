@@ -11,7 +11,7 @@
 
 DEFINE_DEVICE_TYPE(Z84C015, z84c015_device, "z84c015", "Zilog Z84C015")
 
-void z84c015_device::internal_io_map(address_map &map)
+void z84c015_device::internal_io_map(address_map &map) const
 {
     tmpz84c015_device::internal_io_map(map);
 	map(0xee, 0xee).mirror(0xff00).rw(FUNC(z84c015_device::scrp_r), FUNC(z84c015_device::scrp_w));
