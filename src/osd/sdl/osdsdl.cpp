@@ -269,7 +269,7 @@ void sdl_osd_interface::init(running_machine &machine)
 	}
 
 	// bgfx does not work with wayland
-	if ((strcmp(SDL_GetCurrentVideoDriver(), "wayland") == 0) && ((strcmp(options().video(), "auto") == 0) || (strcmp(options().video(), "bgfx") == 0)))
+	if ((strcmp(SDL_GetCurrentVideoDriver(), "wayland") == 0) && (strcmp(options().video(), "bgfx") == 0))
 		fatalerror("Error: BGFX video does not work with wayland videodriver. Please change either of the options.");
 
 	osd_sdl_info();
