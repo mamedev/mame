@@ -17,12 +17,12 @@ namespace bx
 
 	bool isSpace(char _ch)
 	{
-		return ' '  == _ch
-			|| '\t' == _ch
-			|| '\n' == _ch
-			|| '\v' == _ch
-			|| '\f' == _ch
-			|| '\r' == _ch
+		return ' '  == _ch // Space.
+			|| '\t' == _ch // Horizontal tab.
+			|| '\n' == _ch // Line feed / new line.
+			|| '\r' == _ch // Carriage return.
+			|| '\v' == _ch // Vertical tab.
+			|| '\f' == _ch // Form feed / new page.
 			;
 	}
 
@@ -544,7 +544,7 @@ namespace bx
 					return StringView(ptr, ii + 1);
 				}
 			}
-			
+
 			return StringView(_str.getPtr(), _str.getPtr());
 		}
 
