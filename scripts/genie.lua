@@ -1212,8 +1212,8 @@ configuration { "asmjs" }
 
 configuration { "android*" }
 	buildoptions {
-		"-Wno-undef", -- in ASIO
-		"-Wno-macro-redefined", -- PAGE_SIZE,PAGE_MASK in fairlight/cmi.cpp
+		"-Wno-error=undef", -- in ASIO
+		"-Wno-error=macro-redefined", -- PAGE_SIZE,PAGE_MASK in fairlight/cmi.cpp
 	}
 	archivesplit_size "20"
 
