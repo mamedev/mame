@@ -46,7 +46,7 @@ private:
 	enum { VISIBLE_SEARCH_ITEMS = 200 };
 
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	void find_matches(const char *str);
 

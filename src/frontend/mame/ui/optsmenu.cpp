@@ -60,11 +60,9 @@ menu_simple_game_options::~menu_simple_game_options()
 //  handle
 //-------------------------------------------------
 
-void menu_simple_game_options::handle(event const *ev)
+bool menu_simple_game_options::handle(event const *ev)
 {
-	// process the menu
-	if (ev && ev->itemref)
-		handle_item_event(*ev);
+	return ev && ev->itemref && handle_item_event(*ev);
 }
 
 //-------------------------------------------------
@@ -91,7 +89,7 @@ void menu_simple_game_options::populate()
 //  handle item
 //-------------------------------------------------
 
-void menu_simple_game_options::handle_item_event(event const &menu_event)
+bool menu_simple_game_options::handle_item_event(event const &menu_event)
 {
 	if (IPT_UI_SELECT == menu_event.iptkey)
 	{
@@ -130,6 +128,7 @@ void menu_simple_game_options::handle_item_event(event const &menu_event)
 			break;
 		}
 	}
+	return false;
 }
 
 
@@ -161,11 +160,9 @@ menu_game_options::~menu_game_options()
 //  handle
 //-------------------------------------------------
 
-void menu_game_options::handle(event const *ev)
+bool menu_game_options::handle(event const *ev)
 {
-	// process the menu
-	if (ev && ev->itemref)
-		handle_item_event(*ev);
+	return ev && ev->itemref && handle_item_event(*ev);
 }
 
 //-------------------------------------------------
@@ -203,7 +200,7 @@ void menu_game_options::populate()
 //  handle item
 //-------------------------------------------------
 
-void menu_game_options::handle_item_event(event const &menu_event)
+bool menu_game_options::handle_item_event(event const &menu_event)
 {
 	bool changed = false;
 
@@ -268,12 +265,14 @@ void menu_game_options::handle_item_event(event const &menu_event)
 			menu::stack_push<menu_custom_ui>(ui(), container(), [this] () { reset(reset_options::REMEMBER_REF); });
 		break;
 	default:
-		menu_simple_game_options::handle_item_event(menu_event);
-		return;
+		return menu_simple_game_options::handle_item_event(menu_event);
 	}
 
 	if (changed)
 		reset(reset_options::REMEMBER_REF);
+
+	// triggers an item reset for any changes
+	return false;
 }
 
 } // namespace ui

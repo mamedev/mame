@@ -21,7 +21,7 @@ public:
 	virtual ~input_module() = default;
 
 	virtual void input_init(running_machine &machine) = 0;
-	virtual void poll_if_necessary() = 0;
+	virtual void poll_if_necessary(bool relative_reset) = 0;
 };
 
 //============================================================

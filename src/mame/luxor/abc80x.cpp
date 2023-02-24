@@ -789,43 +789,66 @@ uint8_t abc806_state::sti_r()
 
 void abc806_state::sto_w(uint8_t data)
 {
-	int level = BIT(data, 7);
+	m_sto->write_bit(data & 0x07, BIT(data, 7));
+}
 
-	switch (data & 0x07)
-	{
-	case 0:
-		// external memory enable
-		LOG("%s EME %u\n", machine().describe_context(), level);
-		m_eme = level;
-		break;
-	case 1:
-		// 40/80 column display
-		m_40 = level;
-		break;
-	case 2:
-		// HRU II address line 8, PROT A0
-		m_hru2_a8 = level;
-		break;
-	case 3:
-		// PROT INI
-		break;
-	case 4:
-		// text display enable
-		m_txoff = level;
-		break;
-	case 5:
-		// RTC chip select
-		m_rtc->cs_w(!level);
-		break;
-	case 6:
-		// RTC clock
-		m_rtc->clk_w(level);
-		break;
-	case 7:
-		// RTC data in, PROT DIN
-		m_rtc->dio_w(level);
-		break;
-	}
+
+//-------------------------------------------------
+//  eme_w - external memory enable
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(abc806_state::eme_w)
+{
+	LOG("%s EME %u\n", machine().describe_context(), state);
+	m_eme = state;
+}
+
+
+//-------------------------------------------------
+//  _40_w - 40/80 column display
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(abc806_state::_40_w)
+{
+	m_40 = state;
+}
+
+
+//-------------------------------------------------
+//  hru2_a8_w - HRU II address line 8, PROT A0
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(abc806_state::hru2_a8_w)
+{
+	m_hru2_a8 = state;
+}
+
+
+//-------------------------------------------------
+//  prot_ini_w - PROT INI
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(abc806_state::prot_ini_w)
+{
+}
+
+
+//-------------------------------------------------
+//  txoff_w - text display enable
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(abc806_state::txoff_w)
+{
+	m_txoff = state;
+}
+
+
+//-------------------------------------------------
+//  prot_din_w - PROT DIN
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(abc806_state::prot_din_w)
+{
 }
 
 
@@ -1935,11 +1958,6 @@ void abc806_state::machine_reset()
 	m_dfd_in = 0;
 
 	m_hrs = 0;
-
-	// clear STO lines
-	for (int i = 0; i < 8; i++) {
-		sto_w(i);
-	}
 }
 
 
@@ -2175,6 +2193,17 @@ void abc806_state::abc806(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &abc806_state::abc806_mem);
 	m_maincpu->set_addrmap(AS_IO, &abc806_state::abc806_io);
+
+	LS259(config, m_sto); // 74ALS259 @ 13G
+	m_sto->q_out_cb<0>().set(FUNC(abc806_state::eme_w));
+	m_sto->q_out_cb<1>().set(FUNC(abc806_state::_40_w));
+	m_sto->q_out_cb<2>().set(FUNC(abc806_state::hru2_a8_w));
+	m_sto->q_out_cb<3>().set(FUNC(abc806_state::prot_ini_w));
+	m_sto->q_out_cb<4>().set(FUNC(abc806_state::txoff_w));
+	m_sto->q_out_cb<5>().set(m_rtc, FUNC(e0516_device::cs_w)).invert();
+	m_sto->q_out_cb<6>().set(m_rtc, FUNC(e0516_device::clk_w));
+	m_sto->q_out_cb<7>().set(m_rtc, FUNC(e0516_device::dio_w)); // 74LS125A buffer as fake open collector
+	m_sto->q_out_cb<7>().append(FUNC(abc806_state::prot_din_w));
 
 	// video hardware
 	abc806_video(config);

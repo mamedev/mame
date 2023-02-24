@@ -3383,7 +3383,7 @@ ioport_configurer& ioport_configurer::setting_alloc(ioport_value value, const ch
 {
 	// make sure we have a field
 	if (!m_curfield)
-		throw emu_fatalerror("alloc_setting called with no active field (value=%X name=%s)\n", value, name);
+		throw emu_fatalerror("setting_alloc called with no active field (value=%X name=%s)\n", value, name);
 
 	// append a new setting
 	m_cursetting = &m_curfield->m_settinglist.emplace_back(*m_curfield, value & m_curfield->mask(), string_from_token(name));

@@ -284,7 +284,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	if (BaseCoord.x < 0.0f - TexelDims.x || BaseCoord.y < 0.0f - TexelDims.y ||
 		BaseCoord.x > 1.0f + TexelDims.x || BaseCoord.y > 1.0f + TexelDims.y)
 	{
-		discard;
+		return float4(0, 0, 0, 1);
 	}
 
 	// Color

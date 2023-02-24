@@ -3,7 +3,7 @@
 
 /*
  * TODO
- *   - 16 bit dma order, alignment and last byte handling
+ *   - 16 bit dma alignment and last byte handling
  *   - clean up variable naming and protection
  */
 
@@ -23,6 +23,7 @@
 DEFINE_DEVICE_TYPE(NCR53C90, ncr53c90_device, "ncr53c90", "NCR 53C90 SCSI Controller")
 DEFINE_DEVICE_TYPE(NCR53C90A, ncr53c90a_device, "ncr53c90a", "NCR 53C90A Advanced SCSI Controller")
 DEFINE_DEVICE_TYPE(NCR53C94, ncr53c94_device, "ncr53c94", "NCR 53C94 Advanced SCSI Controller")
+DEFINE_DEVICE_TYPE(NCR53C96, ncr53c96_device, "ncr53c96", "NCR 53C96 Advanced SCSI Controller")
 DEFINE_DEVICE_TYPE(NCR53CF94, ncr53cf94_device, "ncr53cf94", "NCR 53CF94-2 Fast SCSI Controller") // TODO: differences not emulated
 DEFINE_DEVICE_TYPE(NCR53CF96, ncr53cf96_device, "ncr53cf96", "NCR 53CF96-2 Fast SCSI Controller") // TODO: differences not emulated
 
@@ -137,7 +138,7 @@ ncr53c90_device::ncr53c90_device(const machine_config &mconfig, device_type type
 	: nscsi_device(mconfig, type, tag, owner, clock)
 	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 	, tm(nullptr), config(0), status(0), istatus(0), clock_conv(0), sync_offset(0), sync_period(0), bus_id(0)
-	, select_timeout(0), seq(0), tcount(0), tcounter(0), tcounter_mask(0xffff), mode(0), fifo_pos(0), command_pos(0), state(0), xfr_phase(0), command_length(0), dma_dir(0), irq(false), drq(false), test_mode(false)
+	, select_timeout(0), seq(0), tcount(0), tcounter(0), tcounter_mask(0xffff), mode(0), fifo_pos(0), command_pos(0), state(0), xfr_phase(0), command_length(0), dma_dir(0), irq(false), drq(false), test_mode(false), stepping(0)
 	, m_irq_handler(*this)
 	, m_drq_handler(*this)
 {
@@ -171,6 +172,11 @@ ncr53c94_device::ncr53c94_device(const machine_config &mconfig, device_type type
 	, family_id(0x02)
 	, revision_level(0x02)
 	, m_busmd(BUSMD_0)
+{
+}
+
+ncr53c96_device::ncr53c96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ncr53c94_device(mconfig, NCR53C96, tag, owner, clock)
 {
 }
 
@@ -233,6 +239,7 @@ void ncr53c90_device::device_reset()
 	seq = 0;
 	config &= 7;
 	status = 0;
+	command_length = 0;
 	istatus = 0;
 	irq = false;
 	m_irq_handler(irq);
@@ -269,7 +276,9 @@ void ncr53c90_device::scsi_ctrl_changed()
 		return;
 	}
 
-	step(false);
+	// disallow further recursion from here
+	if(!stepping)
+		step(false);
 }
 
 TIMER_CALLBACK_MEMBER(ncr53c90_device::update_tick)
@@ -283,9 +292,11 @@ void ncr53c90_device::step(bool timeout)
 	uint32_t data = scsi_bus->data_r();
 	uint8_t c     = command[0] & 0x7f;
 
-	LOGMASKED(LOG_STATE, "state=%d.%d %s\n",
+	LOGMASKED(LOG_STATE, "state=%d.%d %s @ %s\n",
 		state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT,
-		timeout ? "timeout" : "change");
+		timeout ? "timeout" : "change", machine().time().to_string());
+
+	stepping++;
 
 	if(mode == MODE_I && !(ctrl & S_BSY)) {
 		state = IDLE;
@@ -465,6 +476,14 @@ void ncr53c90_device::step(bool timeout)
 		break;
 
 	case DISC_SEL_ARBITRATION_INIT:
+		if(!timeout)
+			break;
+
+		state = DISC_SEL_ARBITRATION;
+		step(false);
+		break;
+
+	case DISC_SEL_ARBITRATION:
 		// wait until a command is in the fifo
 		if (!fifo_pos) {
 			// this sequence isn't documented for initiator selection, but
@@ -476,20 +495,13 @@ void ncr53c90_device::step(bool timeout)
 			break;
 		}
 
-		command_length = fifo_pos + tcounter;
-		state = DISC_SEL_ARBITRATION;
-		step(false);
-		break;
-
-	case DISC_SEL_ARBITRATION:
 		if(c == CD_SELECT) {
 			state = DISC_SEL_WAIT_REQ;
 		} else
 			state = DISC_SEL_ATN_WAIT_REQ;
 
 		scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
-		if(ctrl & S_REQ)
-			step(false);
+		step(false);
 		break;
 
 	case DISC_SEL_ATN_WAIT_REQ:
@@ -506,12 +518,14 @@ void ncr53c90_device::step(bool timeout)
 		break;
 
 	case DISC_SEL_ATN_SEND_BYTE:
-		command_length--;
+		if(command_length)
+			command_length--;
 		if(c == CD_SELECT_ATN_STOP) {
 			seq = 2;
 			function_bus_complete();
 		} else {
 			state = DISC_SEL_WAIT_REQ;
+			step(false);
 		}
 		break;
 
@@ -519,7 +533,7 @@ void ncr53c90_device::step(bool timeout)
 		if(!(ctrl & S_REQ))
 			break;
 		if((ctrl & S_PHASE_MASK) != S_PHASE_COMMAND) {
-			if(!command_length)
+			if(dma_command ? (status & S_TC0) && !command_length : !fifo_pos)
 				seq = 4;
 			else
 				seq = 2;
@@ -527,6 +541,8 @@ void ncr53c90_device::step(bool timeout)
 			function_bus_complete();
 			break;
 		}
+		if(!fifo_pos)
+			break;
 		if(seq < 3)
 			seq = 3;
 		state = DISC_SEL_SEND_BYTE;
@@ -534,18 +550,22 @@ void ncr53c90_device::step(bool timeout)
 		break;
 
 	case DISC_SEL_SEND_BYTE:
-		if(command_length) {
+		if(!dma_command && !fifo_pos)
+			seq = 4;
+		else if(dma_command && (status & S_TC0) && command_length) {
 			command_length--;
 			if(!command_length)
 				seq = 4;
 		}
 
 		state = DISC_SEL_WAIT_REQ;
+		step(false);
 		break;
 
 	case INIT_CPT_RECV_BYTE_ACK:
 		state = INIT_CPT_RECV_WAIT_REQ;
 		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+		step(false);
 		break;
 
 	case INIT_CPT_RECV_WAIT_REQ:
@@ -641,6 +661,7 @@ void ncr53c90_device::step(bool timeout)
 	case INIT_XFR_RECV_BYTE_ACK:
 		state = INIT_XFR_WAIT_REQ;
 		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+		step(false);
 		break;
 
 	case INIT_XFR_RECV_BYTE_NACK:
@@ -657,7 +678,8 @@ void ncr53c90_device::step(bool timeout)
 
 	case INIT_XFR_BUS_COMPLETE:
 		// wait for dma transfer to complete and fifo to drain
-		if (dma_command && (!(status & S_TC0) || fifo_pos))
+		// (FIFO may still contain one residual byte if enabled for 16-bit DMA)
+		if (dma_command && drq)
 			break;
 		bus_complete();
 		break;
@@ -670,6 +692,8 @@ void ncr53c90_device::step(bool timeout)
 			command_pos = 0;
 			bus_complete();
 		} else {
+			if(!fifo_pos)
+				break;
 			state = INIT_XFR_SEND_PAD;
 			send_byte();
 		}
@@ -712,6 +736,9 @@ void ncr53c90_device::step(bool timeout)
 			state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT);
 		exit(0);
 	}
+
+	assert(stepping > 0);
+	stepping--;
 }
 
 void ncr53c90_device::send_byte()
@@ -720,9 +747,9 @@ void ncr53c90_device::send_byte()
 		fatalerror("ncr53c90_device::send_byte - !fifo_pos\n");
 
 	state = (state & STATE_MASK) | (SEND_WAIT_SETTLE << SUB_SHIFT);
-	if((state & STATE_MASK) != INIT_XFR_SEND_PAD &&
+	if((state & STATE_MASK) != INIT_XFR_SEND_PAD /*&&
 		((state & STATE_MASK) != DISC_SEL_SEND_BYTE ||
-		command_length))
+		!(status & S_TC0) || command_length)*/)
 		scsi_bus->data_w(scsi_refid, fifo_pop());
 	else
 		scsi_bus->data_w(scsi_refid, 0);
@@ -847,6 +874,7 @@ void ncr53c90_device::fifo_w(uint8_t data)
 		fifo[fifo_pos++] = data;
 
 	check_drq();
+	step(false);
 }
 
 uint8_t ncr53c90_device::command_r()
@@ -1055,7 +1083,7 @@ uint8_t ncr53c90_device::status_r()
 {
 	uint32_t ctrl = scsi_bus->ctrl_r();
 	uint8_t res = status | (ctrl & S_MSG ? 4 : 0) | (ctrl & S_CTL ? 2 : 0) | (ctrl & S_INP ? 1 : 0);
-	LOG("status_r %02x (%s)\n", res, machine().describe_context());
+	//LOG("status_r %02x (%s)\n", res, machine().describe_context());
 
 	return res;
 }
@@ -1070,17 +1098,20 @@ uint8_t ncr53c90_device::istatus_r()
 {
 	uint8_t res = istatus;
 
-	if (irq)
+	if (!machine().side_effects_disabled())
 	{
-		status &= ~(S_GROSS_ERROR | S_PARITY | S_TCC);
-		istatus = 0;
-		seq = 0;
-	}
-	check_irq();
-	if(res)
-		command_pop_and_chain();
+		if (irq)
+		{
+			status &= ~(S_GROSS_ERROR | S_PARITY | S_TCC);
+			istatus = 0;
+			seq = 0;
+		}
+		check_irq();
+		if(res)
+			command_pop_and_chain();
 
-	LOG("istatus_r %02x (%s)\n", res, machine().describe_context());
+		LOG("istatus_r %02x (%s)\n", res, machine().describe_context());
+	}
 	return res;
 }
 
@@ -1158,6 +1189,9 @@ void ncr53c90_device::dma_w(uint8_t val)
 
 uint8_t ncr53c90_device::dma_r()
 {
+	if (machine().side_effects_disabled())
+		return fifo[0];
+
 	uint8_t r = fifo_pop();
 
 	if ((sync_offset != 0) || ((scsi_bus->ctrl_r() & S_PHASE_MASK) != S_PHASE_DATA_IN))
@@ -1209,8 +1243,11 @@ void ncr53c90_device::decrement_tcounter(int count)
 	else
 		tcounter = 0;
 
-	if (tcounter == 0)
+	if (tcounter == 0 && !(status & S_TC0))
+	{
 		status |= S_TC0;
+		command_length = fifo_pos;
+	}
 
 	check_drq();
 }
@@ -1254,8 +1291,8 @@ uint8_t ncr53c90a_device::status_r()
 {
 	uint32_t ctrl = scsi_bus->ctrl_r();
 	uint8_t res = (irq ? S_INTERRUPT : 0) | status | (ctrl & S_MSG ? 4 : 0) | (ctrl & S_CTL ? 2 : 0) | (ctrl & S_INP ? 1 : 0);
-	LOG("status_r %02x (%s)\n", res, machine().describe_context());
-	if (irq)
+	//LOG("status_r %02x (%s)\n", res, machine().describe_context());
+	if (irq && !machine().side_effects_disabled())
 		status &= ~(S_GROSS_ERROR | S_PARITY | S_TCC);
 	return res;
 }
@@ -1295,21 +1332,24 @@ u16 ncr53c94_device::dma16_r()
 {
 	// check fifo underflow
 	if (fifo_pos < 2)
-		fatalerror("ncr53c94_device::dma16_r fifo_pos %d\n", fifo_pos);
+		return dma_r() | 0xff00;
 
 	// pop two bytes from fifo
-	u16 const data = (fifo[0] << 8) | fifo[1];
-	fifo_pos -= 2;
-	memmove(fifo, fifo + 2, fifo_pos);
-
-	// update drq
-	if ((sync_offset != 0) || ((scsi_bus->ctrl_r() & S_PHASE_MASK) != S_PHASE_DATA_IN))
+	u16 const data = fifo[0] | (fifo[1] << 8);
+	if (!machine().side_effects_disabled())
 	{
-		decrement_tcounter(2);
-	}
-	check_drq();
+		fifo_pos -= 2;
+		memmove(fifo, fifo + 2, fifo_pos);
 
-	step(false);
+		// update drq
+		if ((sync_offset != 0) || ((scsi_bus->ctrl_r() & S_PHASE_MASK) != S_PHASE_DATA_IN))
+		{
+			decrement_tcounter(2);
+		}
+		check_drq();
+
+		step(false);
+	}
 
 	return data;
 }
@@ -1317,12 +1357,15 @@ u16 ncr53c94_device::dma16_r()
 void ncr53c94_device::dma16_w(u16 data)
 {
 	// check fifo overflow
-	if (fifo_pos > 14)
-		fatalerror("ncr53c94_device::dma16_w fifo_pos %d\n", fifo_pos);
+	if (fifo_pos > 14 || tcounter == 1)
+	{
+		dma_w(data & 0x00ff);
+		return;
+	}
 
 	// push two bytes into fifo
-	fifo[fifo_pos++] = data >> 8;
 	fifo[fifo_pos++] = data;
+	fifo[fifo_pos++] = data >> 8;
 
 	// update drq
 	decrement_tcounter(2);
@@ -1342,11 +1385,11 @@ void ncr53c94_device::check_drq()
 			drq_state = false;
 			break;
 
-		case DMA_IN: // device to memory
+		case DMA_IN: // device to memory (optionally save last remaining byte for processor)
 			if (sync_offset == 0)
-				drq_state = (fifo_pos > 1);
+				drq_state = fifo_pos > (BIT(config3, 2) ? 1 : 0);
 			else
-				drq_state = !(status & S_TC0) && fifo_pos > 1;
+				drq_state = !(status & S_TC0) && fifo_pos > (BIT(config3, 2) ? 1 : 0);
 			break;
 
 		case DMA_OUT: // memory to device

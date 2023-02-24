@@ -72,7 +72,7 @@ void menu_sound_options::menu_dismissed()
 //  handle
 //-------------------------------------------------
 
-void menu_sound_options::handle(event const *ev)
+bool menu_sound_options::handle(event const *ev)
 {
 	bool changed = false;
 
@@ -130,8 +130,9 @@ void menu_sound_options::handle(event const *ev)
 		}
 	}
 
-	if (changed)
+	if (changed) // FIXME: most changes only require the item sub text to be updated
 		reset(reset_options::REMEMBER_REF);
+	return false;
 
 }
 

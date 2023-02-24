@@ -21,6 +21,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="居眠り流 阿佐田哲也のA級麻雀" />
+		<info name="serial" value="R58Y5151"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M016S" />
 			<!-- LZ93A13 with 16KB banks?? -->
@@ -37,6 +38,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="アレスタ" />
+		<info name="serial" value="IA-8801"/>
+		<info name="gtin" value="04988161800010"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="2M-16KB" />
 			<feature name="slot" value="ascii16" />
@@ -52,6 +55,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="反生命戦機アンドロギュヌス" />
+		<info name="gtin" value="04988624920064"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M016-03M" />
 			<!-- LZ93A13 with 16KB banks?? -->
@@ -68,6 +72,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1989</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="A列車で行こう" />
+		<info name="serial" value="R78Y5121"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M216A" />
 			<feature name="slot" value="ascii16_sram" />
@@ -81,11 +86,14 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<!-- Release includes controller. -->
 	<software name="arknoid2">
 		<description>Arkanoid 2 (Japan)</description>
 		<year>1987</year>
 		<publisher>Nidecom</publisher>
 		<info name="alt_title" value="アルカノイドII" />
+		<info name="serial" value="MSX-12"/>
+		<info name="gtin" value="04988611870228"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M008S" />
 			<feature name="slot" value="ascii8" />
@@ -99,8 +107,9 @@ LZ93A13 (32 pin) - 8KB banks
 	<software name="ashguine">
 		<description>Densetsu no Seisenshi Ashguine (Japan)</description>
 		<year>1987</year>
-		<publisher>Bit²</publisher>
+		<publisher>Panasoft</publisher>
 		<info name="alt_title" value="伝説の聖戦士 アシュギーネ" />
+		<info name="serial" value="PANA-010"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -111,12 +120,14 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<!-- Bottom line of status bar flickers; is it supposed to be like that? -->
 	<software name="ashguin2">
 		<description>Ashguine 2 - Kokuu no Gajou (Japan)</description>
 		<year>1987</year>
 		<publisher>Panasoft / T&amp;E Soft</publisher>
 		<info name="serial" value="SW-M002" />
 		<info name="alt_title" value="アシュギーネ 虚空の牙城" />
+		<info name="gtin" value="04902704840011"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -133,6 +144,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<publisher>Panasoft / Micro Cabin</publisher>
 		<info name="serial" value="SW-M003" />
 		<info name="alt_title" value="アシュギーネ 復讐の炎" />
+		<info name="gtin" value="04902704840028"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -148,6 +160,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Panasoft / Micro Cabin</publisher>
 		<info name="alt_title" value="アシュギーネ 復讐の炎" />
+		<info name="serial" value="SW-M003"/>
+		<info name="gtin" value="04902704840028"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -164,6 +178,9 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Nihon Falcom</publisher>
 		<info name="alt_title" value="太陽の神殿 アステカII" />
+		<info name="alt_title" value="Templo del Sol (Asteka II)"/>
+		<info name="serial" value="MXTS32001"/>
+		<info name="gtin" value="04961355677025"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-2M208-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -177,15 +194,12 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this -->
 	<software name="bublbobl">
 		<description>Bubble Bobble (Japan)</description>
 		<year>1987</year>
 		<publisher>Taito</publisher>
 		<info name="alt_title" value="バブルボブル" />
 		<info name="serial" value="TMS-02" />
-		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -201,6 +215,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Nidecom</publisher>
 		<info name="alt_title" value="ザ・コックピット" />
+		<info name="serial" value="MSX-14"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-16KB" />
 			<!-- NEOS MR6401 -->
@@ -215,8 +230,10 @@ LZ93A13 (32 pin) - 8KB banks
 	<software name="crimson">
 		<description>Crimson (Japan)</description>
 		<year>1987</year>
-		<publisher>Xtal Soft</publisher>
+		<publisher>Scaptrust</publisher>
 		<info name="alt_title" value="クリムゾン" />
+		<info name="serial" value="EF1811"/>
+		<info name="gtin" value="04988660561115"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -232,6 +249,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1990</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="大航海時代" />
+		<info name="gtin" value="04988615001857"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -250,6 +268,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1986</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="大戦略" />
+		<info name="serial" value="71180"/>
+		<info name="gtin" value="04988608711800"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621N" />
 			<feature name="slot" value="ascii16_sram" />
@@ -280,9 +300,11 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="dires">
-		<description>Dires (Japan)</description>
+		<description>[Dires] - Giger . Loop (Japan)</description>
 		<year>1988</year>
-		<publisher>Bothtec</publisher>
+		<publisher>The Links</publisher>
+		<info name="alt_title" value="ダイレスガイガーループ"/>
+		<info name="serial" value="NGS-002"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621-8K" />
 			<feature name="slot" value="ascii8_sram" />
@@ -301,7 +323,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<description>Bishoujo Shashinkan - The Double Vision (Japan)</description>
 		<year>1988</year>
 		<publisher>Hard</publisher>
-		<info name="alt_title" value="ダブル・ヴィジョン" />
+		<info name="alt_title" value="美少女写真館ダブルヴィジョン" />
+		<info name="usage" value="Requires a Japanese system."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
 			<feature name="slot" value="ascii8" />
@@ -315,8 +338,10 @@ LZ93A13 (32 pin) - 8KB banks
 	<software name="dquest">
 		<description>Dragon Quest (Japan)</description>
 		<year>1986</year>
-		<publisher>enix</publisher>
+		<publisher>Sony</publisher>
 		<info name="alt_title" value="ドラゴンクエスト" />
+		<info name="serial" value="E-G184 / HBJ-G061C"/>
+		<info name="gtin" value="04988601001847"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -327,11 +352,14 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="dquest2">
+	<!-- Title has overlap graphics issue. -->
+	<software name="dquest2" supported="partial">
 		<description>Dragon Quest II - Akuryou no Kamigami (Japan)</description>
 		<year>1987</year>
 		<publisher>Enix</publisher>
 		<info name="alt_title" value="ドラゴンクエストII 悪霊の神々" />
+		<info name="serial" value="EG207"/>
+		<info name="gtin" value="04988601002073"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -345,8 +373,10 @@ LZ93A13 (32 pin) - 8KB banks
 	<software name="drwn4078">
 		<description>Darwin 4078 (Japan)</description>
 		<year>1987</year>
-		<publisher>Hudson Soft</publisher>
+		<publisher>Panasoft</publisher>
 		<info name="alt_title" value="ダーウィン4078" />
+		<info name="serial" value="PANA-6"/>
+		<info name="gtin" value="04988607102418"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -357,14 +387,12 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- Doesn't boot in msx2 driver, works in some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this -->
 	<software name="dslayer4">
 		<description>Dragon Slayer IV - Drasle Family (Japan)</description>
 		<year>1987</year>
 		<publisher>Nihon Falcom</publisher>
-		<info name="alt_title" value="ドラゴンスレイヤーIV" />
-		<info name="usage" value="Requires a Japanese system" />
+		<info name="alt_title" value="ドラゴンスレイヤーIVドラスレファミリー" />
+		<info name="serial" value="MXNW12001"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
 			<feature name="slot" value="ascii8" />
@@ -380,6 +408,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Toshiba EMI</publisher>
 		<info name="alt_title" value="ダイナマイトボウル" />
+		<info name="serial" value="PS-2021G"/>
+		<info name="gtin" value="04988006010758"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii16" />
@@ -390,14 +420,12 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- Freezes at title screen in the generic msx2 driver, works fine in some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this -->
 	<software name="eidolon">
 		<description>The Eidolon (Japan)</description>
 		<year>1986</year>
 		<publisher>PonyCa</publisher>
 		<info name="alt_title" value="アイドロン" />
-		<info name="usage" value="Requires a Japanese system" />
+		<info name="serial" value="R58Y5515"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -413,6 +441,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1990</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="ランペルール" />
+		<info name="gtin" value="04988615002106"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -431,6 +460,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="ヨーロッパ戦線" />
+		<info name="gtin" value="04988615003318"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -449,6 +479,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>System Soft</publisher>
 		<info name="alt_title" value="F-15ストライクイーグル" />
+		<info name="serial" value="005834"/><!-- This may just be a cartridge serial instead of a game serial. -->
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-8KB" />
 			<feature name="slot" value="ascii8" />
@@ -464,12 +495,14 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Pack-In-Video</publisher>
 		<info name="alt_title" value="ファミリービリヤード" />
+		<info name="serial" value="MS-14"/>
+		<info name="gtin" value="04988110800146"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-8K" />
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="NEOS MR6401" />
 			<dataarea name="rom" size="0x20000">
-				<!-- Not sure if dump is correct?? it should be 1Mbit -->
+				<!-- Not sure if dump is correct. It is marked as MegaROM on box but the dump is only 64KB. -->
 				<rom name="m27512zb" size="0x10000" crc="7c867d98" sha1="924fcf87b3747dae06e621975903ee73c42016f2"/>
 			</dataarea>
 		</part>
@@ -480,6 +513,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="ファミリーボクシング" />
+		<info name="serial" value="HBS-G066C"/>
+		<info name="gtin" value="04901780081790"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="IS-03-001-0" />
 			<feature name="slot" value="ascii8" />
@@ -495,6 +530,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="ファミクルパロディック" />
+		<info name="serial" value="BM-801"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -510,6 +546,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1989</year>
 		<publisher>Namco</publisher>
 		<info name="alt_title" value="プロ野球ファミリースタジアム ペナントレース" />
+		<info name="serial" value="NMX-890828"/>
+		<info name="gtin" value="04907892030206"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M016-03M" />
 			<feature name="slot" value="ascii16" />
@@ -525,6 +563,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ファンタジーゾーンII ～オパオパの涙～" />
+		<info name="serial" value="R68Y5815"/>
+		<info name="gtin" value="04988013017092"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-2M" />
 			<feature name="slot" value="ascii16" />
@@ -540,6 +580,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>HummingBird</publisher>
 		<info name="alt_title" value="ファイア・ボール" />
+		<info name="serial" value="12421"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M-008S" />
 			<feature name="slot" value="ascii8" />
@@ -555,6 +596,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1990</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="フリートコマンダーII 黄昏の海域" />
+		<info name="gtin" value="04988606207121"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="FLEET COMMANDER II" />
 			<feature name="slot" value="ascii8" />
@@ -570,6 +612,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Game Arts</publisher>
 		<info name="alt_title" value="ぎゅわんぶらあ自己中心派2 自称! 強豪雀士編" />
+		<info name="gtin" value="04988649922029"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="2M-8KB" />
 			<feature name="slot" value="ascii8" />
@@ -585,13 +628,14 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Wachi Software</publisher>
 		<info name="alt_title" value="お絵描きソフト 画楽多 ~ Oekaki Soft Garakuta" />
+		<info name="gtin" value="04958494341016"/>
+		<info name="usage" value="Requires a mouse in general purpose port 1."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M016S" />
 			<!-- 16KB banks -->
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="LZ93A13-16" />
 			<dataarea name="rom" size="0x20000">
-				<!-- Is likely to be a single 1Mbit ROM -->
 				<rom name="lh31434" size="0x10000" crc="33c37313" sha1="f4da2be2ee712ba2e7cccf56fcd15483fe0023ed"/>
 				<rom size="0x10000" offset="0x10000" loadflag="reload" />
 			</dataarea>
@@ -603,6 +647,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1992</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="蒼き狼と白き牝鹿 元朝秘史" />
+		<info name="gtin" value="04988615003899"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -621,6 +666,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="蒼き狼と白き牝鹿 ジンギスカン" />
+		<info name="serial" value="MXKN12006"/>
+		<info name="gtin" value="04988615000287"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-02A" /> <!-- also seen TA-621 KAGA -->
 			<feature name="slot" value="ascii8_sram" />
@@ -639,6 +686,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>The Links</publisher>
 		<info name="alt_title" value="ガーリーブロック" />
+		<info name="serial" value="NGS-001"/>
+		<info name="gtin" value="04953973010018"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M016S" />
 			<feature name="slot" value="ascii16" />
@@ -653,6 +702,9 @@ LZ93A13 (32 pin) - 8KB banks
 		<description>Hardball (Japan)</description>
 		<year>1987</year>
 		<publisher>Sony</publisher>
+		<info name="alt_title" value="ハードボール"/>
+		<info name="serial" value="HBS-G060C"/>
+		<info name="gtin" value="04901780066483"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -669,6 +721,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="alt_title" value="ホール・イン・ワン スペシャル" />
+		<info name="serial" value="HM-022"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii16" />
@@ -684,6 +737,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="alt_title" value="ハイドライド3" />
+		<info name="serial" value="TEX-80"/>
+		<info name="gtin" value="04988604030806"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -699,6 +754,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Pack-In Video</publisher>
 		<info name="alt_title" value="井出洋介名人の実戦麻雀" />
+		<info name="serial" value="MS-18"/>
+		<info name="gtin" value="04988110800184"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-8KB" />
 			<feature name="slot" value="ascii8" />
@@ -714,6 +771,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="伊忍道 打倒信長" />
+		<info name="gtin" value="04988615002694"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-64" />
 			<feature name="slot" value="ascii8_sram" />
@@ -732,6 +790,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1989</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="維新の嵐" />
+		<info name="gtin" value="04988615001185"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -761,6 +820,7 @@ LZ93A13 (32 pin) - 8KB banks
                 <!- Kanji rom ->
                 <rom name="tc531000p-6616" size="0x20000" offset="0x40000" crc="" sha1="" status="nodump" />
             </dataarea>
+            <dataarea name="sram" size="0x2000"/>
         </part>
     </software>
 -->
@@ -770,6 +830,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1986</year>
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="奇々怪界" />
+		<info name="serial" value="HBS-G063C"/>
+		<info name="gtin" value="04901780068777"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="IS-02-030-0" />
 			<feature name="slot" value="ascii8" />
@@ -785,6 +847,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="棋聖" />
+		<info name="serial" value="HBS-G057C"/>
+		<info name="gtin" value="04901780066469"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621-8K" />
 			<feature name="slot" value="ascii8_sram" />
@@ -803,6 +867,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1986</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="本格将棋 棋太平" />
+		<info name="serial" value="MIC-M022R"/>
+		<info name="gtin" value="04988608651809"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -813,14 +879,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this -->
 	<software name="lupin">
 		<description>Lupin Sansei - Cagliostro no Shiro (Japan)</description>
 		<year>1987</year>
 		<publisher>Toho</publisher>
 		<info name="alt_title" value="ルパン三世 カリオストロの城" />
-		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -854,6 +917,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="めぞん一刻" />
+		<info name="serial" value="66580"/>
+		<info name="gtin" value="04988608665806"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
 			<feature name="slot" value="ascii8" />
@@ -869,6 +934,9 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="めぞん一刻 完結篇" />
+		<info name="serial" value="82580"/>
+		<info name="gtin" value="04988608825804"/>
+		<info name="usage" value="Requires a Japanese system."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -880,10 +948,12 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="mississp">
-		<description>Mississippi Satsujin Jiken (Japan)</description>
+		<description>Murder on the Mississippi (Japan)</description>
 		<year>1987</year>
 		<publisher>Jaleco</publisher>
 		<info name="alt_title" value="ミシシッピー殺人事件" />
+		<info name="serial" value="JX-15"/>
+		<info name="gtin" value="04907659102115"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M008S" />
 			<feature name="slot" value="ascii8" />
@@ -895,11 +965,12 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<!-- This features a upd7756 for audio playback -->
-	<software name="moeronet">
+	<software name="moeronet" supported="partial">
 		<description>Moero! Nettou Yakyuu '88 (Japan)</description>
 		<year>1988</year>
 		<publisher>Jaleco</publisher>
 		<info name="alt_title" value="燃えろ!!熱闘野球'88" />
+		<info name="serial" value="JX-16"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="JX-16" />
 			<feature name="slot" value="ascii8" />
@@ -917,7 +988,9 @@ LZ93A13 (32 pin) - 8KB banks
 		<description>Mon Mon Monster (Japan)</description>
 		<year>1989</year>
 		<publisher>Hot-B</publisher>
-		<info name="alt_title" value="ンモンモンスター" />
+		<info name="alt_title" value="モンモンモンスター" />
+		<info name="serial" value="MXHB22003"/>
+		<info name="gtin" value="04967948000249"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="IS-02-030-0" />
 			<feature name="slot" value="ascii8" />
@@ -928,8 +1001,6 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- Does not boot in the generic msx2 driver, works fine in some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this (probably needs Kanji rom?) -->
 	<software name="murdclub">
 		<description>Final Mystery Murder Club - Satsujin Club (Japan)</description>
 		<year>1988</year>
@@ -951,6 +1022,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="alt_title" value="忍者くん 阿修羅の章" />
+		<info name="serial" value="HM-028"/>
+		<info name="gtin" value="04988610115283"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M008S" />
 			<feature name="slot" value="ascii8" />
@@ -966,6 +1039,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1989</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="信長の野望 戦国群雄伝" />
+		<info name="serial" value="MXKN12009"/>
+		<info name="gtin" value="04988615000843"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -984,6 +1059,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="信長の野望 全国版" />
+		<info name="serial" value="MXKN12003"/>
+		<info name="gtin" value="04988615000140"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -1002,6 +1079,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="信長の野望 武将風雲録" />
+		<info name="gtin" value="04988615002410"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -1020,6 +1098,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1986</year>
 		<publisher>System Soft</publisher>
 		<info name="alt_title" value="オーガ" />
+		<info name="serial" value="008736"/><!-- This may just be a cartridge serial instead of a game serial. -->
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii16" />
@@ -1046,13 +1125,12 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- Does not boot in the generic msx2 driver, works fine in some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this (probably needs Kanji rom?) -->
 	<software name="profmjg">
 		<description>Professional Mahjong Gokuu (Japan)</description>
 		<year>1988</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="プロフェッショナル麻雀悟空" />
+		<info name="gtin" value="04988606201525"/>
 		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-621N" />
@@ -1072,6 +1150,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Pony</publisher>
 		<info name="alt_title" value="プロジェクトA2 史上最大の標的" />
+		<info name="serial" value="R58Y5109"/>
+		<info name="gtin" value="04988013011496"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -1087,6 +1167,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="プロ野球FAN" />
+		<info name="serial" value="04988624920057"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M016-03M" />
 			<feature name="slot" value="ascii8" />
@@ -1102,6 +1183,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="クインプル" />
+		<info name="serial" value="BM-802"/>
+		<info name="gtin" value="04988655220188"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-2M008-E2M" />
 			<feature name="slot" value="ascii8" />
@@ -1118,6 +1201,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Taito</publisher>
 		<info name="alt_title" value="ラスタン・サーガ" />
+		<info name="serial" value="TMS-05"/>
+		<info name="gtin" value="04988611870303"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -1128,13 +1213,13 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- does not seem to work in the generic msx2 driver, works on some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this -->
 	<software name="relics">
 		<description>Relics (Japan)</description>
 		<year>1986</year>
-		<publisher>Bothtec</publisher>
+		<publisher>Bothtec / Sony</publisher>
 		<info name="alt_title" value="レリクス" />
+		<info name="serial" value="LL-8515 / HBJ-G058C"/>
+		<info name="gtin" value="04901780054213"/>
 		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
@@ -1151,6 +1236,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="レプリカート" />
+		<info name="serial" value="HBS-G062C"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="MSX-2MX" />
 			<feature name="slot" value="ascii8" />
@@ -1166,6 +1252,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Carry Lab</publisher>
 		<info name="alt_title" value="リターン・オブ・ジェルダ" />
+		<info name="serial" value="GA-431"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M008S" />
 			<feature name="slot" value="ascii8" />
@@ -1181,6 +1268,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1986</year>
 		<publisher>Nihon Falcom</publisher>
 		<info name="alt_title" value="ロマンシア" />
+		<info name="serial" value="PANA-5"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="MSX-2MX" />
 			<feature name="slot" value="ascii16" />
@@ -1197,6 +1285,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="ロイヤルブラッド" />
+		<info name="serial" value="KN10201050"/>
+		<info name="gtin" value="04988615003103"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-64" />
 			<feature name="slot" value="ascii8_sram" />
@@ -1215,6 +1305,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Namco</publisher>
 		<info name="alt_title" value="イシターの復活" />
+		<info name="gtin" value="04907892030145"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M016-03M" />
 			<!-- LZ93A13 with 16KB banks?? -->
@@ -1231,6 +1322,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="三国志II" />
+		<info name="serial" value="MXKN12021"/>
+		<info name="gtin" value="04988615001505"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -1249,7 +1342,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Taito</publisher>
 		<info name="alt_title" value="スクランブルフォーメーション" />
-		<info name="usage" value="Requires a Japanese system" />
+		<info name="serial" value="TMS-01"/>
+		<info name="gtin" value="04988611870129"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
 			<feature name="slot" value="ascii8" />
@@ -1265,6 +1359,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="聖飢魔IIスペシャル 悪魔の逆襲" />
+		<info name="serial" value="HBS-G064C"/>
+		<info name="gtin" value="04901780064885"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -1280,6 +1376,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Victor Music Industry</publisher>
 		<info name="alt_title" value="死霊戦線" />
+		<info name="serial" value="M-2010"/>
+		<info name="gtin" value="04988002142712"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-2M208-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -1297,6 +1395,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<description>Strategic Mars (Japan)</description>
 		<year>1989</year>
 		<publisher>db-Soft</publisher>
+		<info name="alt_title" value="マース"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M016S" />
 			<feature name="slot" value="ascii16" />
@@ -1312,6 +1411,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1989</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="水滸伝 天命の誓い" />
+		<info name="serial" value="MXKN12014"/>
+		<info name="gtin" value="04988615000928"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M208-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -1330,6 +1431,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="SUPER大戦略" />
+		<info name="serial" value="85180"/>
+		<info name="gtin" value="04988608851803"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M116-03A" />
 			<feature name="slot" value="ascii16_sram" />
@@ -1348,6 +1451,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="スーパーランナー" />
+		<info name="serial" value="R58Y5111"/>
+		<info name="gtin" value="04988013012097"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="1M-8KB" />
 			<!-- MR6401 -->
@@ -1364,6 +1469,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1986</year>
 		<publisher>Xain Soft</publisher>
 		<info name="alt_title" value="スーパートリトーン" />
+		<info name="serial" value="MXZS-12001"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -1379,6 +1485,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1991</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="提督の決断" />
+		<info name="serial" value="KN10051050"/>
+		<info name="gtin" value="04988615002229"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-8M308-03A" />
 			<feature name="slot" value="ascii8_sram" />
@@ -1397,6 +1505,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Taito</publisher>
 		<info name="alt_title" value="天国よいとこ" />
+		<info name="serial" value="TMS-03"/>
+		<info name="gtin" value="04988611870235"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M008S" />   <!-- Also seen with TAS-1M016S with 16KB mapper? -->
 			<feature name="slot" value="ascii8" />
@@ -1412,7 +1522,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>BPS</publisher>
 		<info name="alt_title" value="テトリス" />
-		<info name="usage" value="Requires a Japanese system" />
+		<info name="serial" value="MXBP-12003"/>
+		<info name="gtin" value="04988627100142"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M-008S" />
 			<feature name="slot" value="ascii8" />
@@ -1427,6 +1538,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<description>Topple Zip (Japan)</description>
 		<year>1988</year>
 		<publisher>Bothtec</publisher>
+		<info name="alt_title" value="トップルジップ"/>
+		<info name="serial" value="LL-8618"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -1442,6 +1555,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ウルティマ 恐怖のエクソダス ~ Ultima - Kyoufu no Exodus (Box?)" />
+		<info name="serial" value="R68Y5552"/>
+		<info name="gtin" value="04988013013292"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-2M208-03M" />
 			<feature name="slot" value="ascii8_sram" />
@@ -1460,6 +1575,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Micro Cabin</publisher>
 		<info name="alt_title" value="うる星やつら" />
+		<info name="serial" value="72480"/>
+		<info name="gtin" value="04988608724800"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -1470,12 +1587,13 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- the Japanese text only works fine on Japanese machines, like hbf1 or hbf12 -->
 	<software name="victnin2">
 		<description>Victorious Nine II - Koukou Yakyuu Hen (Japan)</description>
 		<year>1987</year>
 		<publisher>Nidecom</publisher>
 		<info name="alt_title" value="ビクトリアス・ナインII 高校野球編" />
+		<info name="serial" value="MSX-11"/>
+		<info name="gtin" value="04988611870211"/>
 		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M016S" />
@@ -1492,6 +1610,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>dB-Soft</publisher>
 		<info name="alt_title" value="うっでぃぽこ" />
+		<info name="serial" value="MXDF-12001 (box) / MS2-G2116-P1 (box) / MS2-G2116-L1 (cartridge)"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<!-- 16KB banks -->
@@ -1508,6 +1627,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1989</year>
 		<publisher>Namco</publisher>
 		<info name="alt_title" value="ゼビウス ファードラウト伝説" />
+		<info name="gtin" value="04907892030152"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M016-03M" />
 			<feature name="slot" value="ascii16" />
@@ -1522,6 +1642,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<description>Yaksa (Japan)</description>
 		<year>1987</year>
 		<publisher>Wolf Team</publisher>
+		<info name="alt_title" value="ヤシャ"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -1537,6 +1658,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Taito</publisher>
 		<info name="alt_title" value="京都龍の寺殺人事件" />
+		<info name="serial" value="TMS-04"/>
+		<info name="gtin" value="04988611870198"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -1552,6 +1675,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>System Sacom</publisher>
 		<info name="alt_title" value="幽霊君" />
+		<info name="gtin" value="04956375414149"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-4M-008M" />
 			<feature name="slot" value="ascii8" />
@@ -1567,6 +1691,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1986</year>
 		<publisher>Pony</publisher>
 		<info name="alt_title" value="ザナック EX" />
+		<info name="serial" value="R58Y5093"/>
+		<info name="gtin" value="04988013008397"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii16" />
@@ -1582,6 +1708,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Toshiba EMI</publisher>
 		<info name="alt_title" value="ゾイド 中央大陸の戦い" />
+		<info name="serial" value="PS-2022G"/>
+		<info name="gtin" value="04988006027466"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TAS-1M016S" />
 			<feature name="slot" value="ascii16" />
@@ -1597,6 +1725,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="alt_title" value="ずっこけやじきた隠密道中" />
+		<info name="serial" value="HM-026"/>
+		<info name="usage" value="Requires a Japanese system otherwise the system will reset after entering a passnumber."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
@@ -1614,6 +1744,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<description>1942 (Japan)</description>
 		<year>1987</year>
 		<publisher>ASCII</publisher>
+		<info name="serial" value="2019002"/>
+		<info name="isbn" value="4871485323"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -1641,6 +1773,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>System Soft</publisher>
 		<info name="alt_title" value="アクロジェット" />
+		<info name="serial" value="006953 / 005638"/><!-- These may just be a cartridge serial instead of a game serial. -->
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -1665,13 +1798,14 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="alibaba">
-		<description>Ali Baba (Arab)</description>
+		<description>Ali Baba (Arab, v1.04)</description>
 		<year>1989</year>
 		<publisher>Al Alamiah</publisher>
+		<info name="alt_title" value="علي بابا"/>
 		<info name="serial" value="L093" />
 		<info name="usage" value="Requires an Arabic MSX2" />
 		<part name="cart" interface="msx_cart">
-			<feature name="mapper" value="NOMAPPER" />
+			<feature name="slot" value="ascii8" />
 			<dataarea name="rom" size="0x20000">
 				<rom name="ali baba (al-alamiah, 1989).rom" size="0x20000" crc="f5427547" sha1="f9e8cc6e47d5632e3b28500197f8e9187295c52b"/>
 			</dataarea>
@@ -1683,6 +1817,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Nidecom</publisher>
 		<info name="alt_title" value="アメリカンサッカー" />
+		<info name="serial" value="MSX-15"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -1697,6 +1832,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="反生命戦機アンドロギュヌス" />
+		<info name="gtin" value="04988624920064"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -1707,10 +1843,12 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="arabpoet">
-		<description>Arab Poetry (Arab)</description>
+		<description>Arab Poetry (Arab, v1.20)</description>
 		<year>1989</year>
 		<publisher>Al Alamiah</publisher>
+		<info name="alt_ttile" value="الشعر العربي"/>
 		<info name="serial" value="A094" />
+		<info name="usage" value="Requires an Arabic MSX2"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -1725,6 +1863,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1989</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="アークティック" />
+		<info name="serial" value="R58Y5120"/>
+		<info name="gtin" value="04988013017597"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -1739,6 +1879,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1989</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="アークティック" />
+		<info name="serial" value="R58Y5120"/>
+		<info name="gtin" value="04988013017597"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -1748,14 +1890,12 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this -->
 	<software name="bublbobla" cloneof="bublbobl">
 		<description>Bubble Bobble (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Taito</publisher>
 		<info name="alt_title" value="バブルボブル" />
-		<info name="usage" value="Requires a Japanese system" />
+		<info name="serial" value="TMS-02"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -1770,6 +1910,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1989</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="魂斗羅" />
+		<info name="serial" value="RC762"/>
+		<info name="gtin" value="04988602544763"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -1784,6 +1926,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="alt_title" value="ダーウィン4078" />
+		<info name="serial" value="PANA-6"/>
+		<info name="gtin" value="04988607102418"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -1798,6 +1942,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="alt_title" value="ダーウィン4078" />
+		<info name="serial" value="PANA-6"/>
+		<info name="gtin" value="04988607102418"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -1812,6 +1958,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Xain Soft</publisher>
 		<info name="alt_title" value="ディープフォレスト" />
+		<info name="serial" value="MXZS-12003"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -1826,6 +1973,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Xain Soft</publisher>
 		<info name="alt_title" value="ディープフォレスト" />
+		<info name="serial" value="MXZS-12003"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -1835,11 +1983,14 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<!-- Title has overlap graphics issue. -->
 	<software name="dquest2a" cloneof="dquest2">
 		<description>Dragon Quest II - Akuryou no Kamigami (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Enix</publisher>
 		<info name="alt_title" value="ドラゴンクエストII 悪霊の神々" />
+		<info name="serial" value="EG207"/>
+		<info name="gtin" value="04988601002073"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -1849,14 +2000,13 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- Doesn't boot in msx2 driver, works in some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this -->
 	<software name="dslayer4a" cloneof="dslayer4">
 		<description>Dragon Slayer IV - Drasle Family (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Nihon Falcom</publisher>
-		<info name="alt_title" value="ドラゴンスレイヤーIV" />
-		<info name="usage" value="Requires a Japanese system" />
+		<info name="alt_title" value="ドラゴンスレイヤーIVドラスレファミリー" />
+		<info name="serial" value="MXNW12001"/>
+		<info name="usage" value="Requires a Japanese system." />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -1871,6 +2021,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Jaleco</publisher>
 		<info name="alt_title" value="ドルイド" />
+		<info name="serial" value="ND-08MR"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -1885,6 +2036,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Jaleco</publisher>
 		<info name="alt_title" value="ドルイド" />
+		<info name="serial" value="ND-08MR"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -1899,6 +2051,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Toshiba EMI</publisher>
 		<info name="alt_title" value="ダイナマイトボウル" />
+		<info name="serial" value="PS-2021G"/>
+		<info name="gtin" value="04988006010758"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -1908,13 +2062,13 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this -->
 	<software name="elthlead">
 		<description>Elthlead (Japan)</description>
 		<year>1988</year>
 		<publisher>NCS</publisher>
 		<info name="alt_title" value="エルスリード" />
+		<info name="serial" value="MXNC22001"/>
+		<info name="gtin" value="04988616000156"/>
 		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8_sram" />
@@ -1932,6 +2086,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ファンタジーゾーンII ～オパオパの涙～" />
+		<info name="serial" value="R68Y5815"/>
+		<info name="gtin" value="04988013017092"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -1960,6 +2116,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Xain Soft</publisher>
 		<info name="alt_title" value="牙龍王" />
+		<info name="serial" value="MXZS-12004"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -1974,6 +2131,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Xain Soft</publisher>
 		<info name="alt_title" value="牙龍王" />
+		<info name="serial" value="MXZS-12004"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -1983,14 +2141,13 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- works only some times in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this -->
 	<software name="gekipenn">
 		<description>Gekitotsu Pennant Race - The Pro Yakyuu (Japan)</description>
 		<year>1988</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ＴＨＥプロ野球 激突ペナントレース" />
-		<info name="usage" value="Requires a Japanese system" />
+		<info name="serial" value="RC757"/>
+		<info name="gtin" value="04988602532401"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -2000,14 +2157,13 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- works only some times in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this -->
 	<software name="gekipenna" cloneof="gekipenn">
 		<description>Gekitotsu Pennant Race - The Pro Yakyuu (Japan, alt)</description>
 		<year>1988</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ＴＨＥプロ野球 激突ペナントレース" />
-		<info name="usage" value="Requires a Japanese system" />
+		<info name="serial" value="RC757"/>
+		<info name="gtin" value="04988602532401"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -2017,14 +2173,13 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- works only some times in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this -->
 	<software name="gekipennb" cloneof="gekipenn">
 		<description>Gekitotsu Pennant Race - The Pro Yakyuu (Japan, alt 2)</description>
 		<year>1988</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ＴＨＥプロ野球 激突ペナントレース" />
-		<info name="usage" value="Requires a Japanese system" />
+		<info name="serial" value="RC757"/>
+		<info name="gtin" value="04988602532401"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -2034,14 +2189,13 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- works only some times in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this -->
 	<software name="gekipennc" cloneof="gekipenn">
 		<description>Gekitotsu Pennant Race - The Pro Yakyuu (Japan, alt 3)</description>
 		<year>1988</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ＴＨＥプロ野球 激突ペナントレース" />
-		<info name="usage" value="Requires a Japanese system" />
+		<info name="serial" value="RC757"/>
+		<info name="gtin" value="04988602532401"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -2056,6 +2210,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1989</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="激突ペナントレース2" />
+		<info name="serial" value="RC766"/>
+		<info name="gtin" value="04988602553673"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -2070,6 +2226,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="がんばれゴエモン!からくり道中" />
+		<info name="serial" value="RC748"/>
+		<info name="gtin" value="04988602524604"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -2084,6 +2242,9 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ハッカー" />
+		<info name="serial" value="R58Y5519"/>
+		<info name="gtin" value="04988013012493"/>
+		<info name="usage" value="Password to start the game: AUSTRALIA."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2098,6 +2259,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1989</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="牌の魔術師" />
+		<info name="serial" value="RC765"/>
+		<info name="gtin" value="04988602549102"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="majutsushi" />
 			<feature name="mapper" value="MAJUTSUSHI" />
@@ -2107,13 +2270,14 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- the version with Japanese text only works fine on some Japanese machines, like hbf1 or hbf12 -->
 	<software name="herolanc">
 		<description>Heroes of the Lance (Japan)</description>
 		<year>1991</year>
 		<publisher>Pony Canyon</publisher>
-		<info name="usage" value="Requires a Japanese system for the Japanese text" />
 		<info name="alt_title" value="ヒーローオブザランス" />
+		<info name="serial" value="R75Y5122"/>
+		<info name="gtin" value="04988013023697"/>
+		<info name="usage" value="Requires a Japanese system for the Japanese text" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8_sram" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2125,13 +2289,14 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- the Japanese text only works fine on Japanese machines, like hbf1 or hbf12 -->
 	<software name="higemaru">
 		<description>Higemaru Makaijima - Nanatsu no Shima Daibouken (Japan)</description>
 		<year>1987</year>
-		<publisher>Capcom</publisher>
-		<info name="usage" value="Requires a Japanese system" />
+		<publisher>ASCII</publisher>
 		<info name="alt_title" value="魔界島 七つの島大冒険" />
+		<info name="serial" value="CAP-201"/>
+		<info name="gtin" value="04988606201006"/>
+		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2146,6 +2311,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ハイスクール!奇面組" />
+		<info name="serial" value="R58Y5813"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2160,6 +2326,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="火の鳥鳳凰編" />
+		<info name="serial" value="RC747"/>
+		<info name="gtin" value="04988602524369"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -2174,6 +2342,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="火の鳥鳳凰編" />
+		<info name="serial" value="RC747"/>
+		<info name="gtin" value="04988602524369"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -2188,6 +2358,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="火の鳥鳳凰編" />
+		<info name="serial" value="RC747"/>
+		<info name="gtin" value="04988602524369"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -2202,6 +2374,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="alt_title" value="ホール・イン・ワン スペシャル" />
+		<info name="serial" value="HM-022"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2211,14 +2384,13 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this -->
 	<software name="ikari">
 		<description>Ikari (Japan)</description>
 		<year>1987</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="怒" />
-		<info name="usage" value="Requires a Japanese system" />
+		<info name="serial" value="SFX-IK"/>
+		<info name="gtin" value="04964808000043"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2228,14 +2400,13 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this -->
 	<software name="ikaria" cloneof="ikari">
 		<description>Ikari (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>SNK</publisher>
 		<info name="alt_title" value="怒" />
-		<info name="usage" value="Requires a Japanese system" />
+		<info name="serial" value="SFX-IK"/>
+		<info name="gtin" value="04964808000043"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2250,6 +2421,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1986</year>
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="雀聖" />
+		<info name="serial" value="HBS-G059C"/>
+		<info name="gtin" value="04901780056637"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16_sram" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2266,6 +2439,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1986</year>
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="雀聖" />
+		<info name="serial" value="HBS-G059C"/>
+		<info name="gtin" value="04901780056637"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16_sram" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2282,10 +2457,13 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="ケンペレンチェス" />
+		<info name="serial" value="R55Y5152"/>
+		<info name="gtin" value="04988013014695"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="0x20000">
+				<!-- PCB has 2 ROMs labeled "5152 No.1" and "5152 No.2" -->
 				<rom name="kempelen chess (japan).rom" size="0x20000" crc="053aa66e" sha1="a0c486d0f25a3dc586717d5d3e1f5a46d36735fc" status="baddump"/>
 			</dataarea>
 		</part>
@@ -2296,6 +2474,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1986</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="キングコング2 甦る伝説" />
+		<info name="serial" value="RC745"/>
+		<info name="gtin" value="04988602512748"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -2323,6 +2503,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="コロニスリフト" />
+		<info name="serial" value="R68Y5516"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2332,12 +2513,13 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- the Japanese text only works fine on Japanese machines, like hbf1 or hbf12 -->
 	<software name="labyrint">
 		<description>Labyrinth (Japan)</description>
 		<year>1987</year>
 		<publisher>Pack-In Video</publisher>
 		<info name="alt_title" value="ラビリンス" />
+		<info name="serial" value="MS-10"/>
+		<info name="gtin" value="04988110800108"/>
 		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
@@ -2348,12 +2530,13 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- the Japanese text only works fine on Japanese machines, like hbf1 or hbf12 -->
 	<software name="labyrinta" cloneof="labyrint">
 		<description>Labyrinth (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Pack-In Video</publisher>
 		<info name="alt_title" value="ラビリンス" />
+		<info name="serial" value="MS-10"/>
+		<info name="gtin" value="04988110800108"/>
 		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
@@ -2369,6 +2552,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Toho</publisher>
 		<info name="alt_title" value="ルパン3 世バビロンの黄金伝説" />
+		<info name="serial" value="CS11-011R"/>
+		<info name="gtin" value="04988104004840"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2383,6 +2568,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Toho</publisher>
 		<info name="alt_title" value="ルパン3 世バビロンの黄金伝説" />
+		<info name="serial" value="CS11-011R"/>
+		<info name="gtin" value="04988104004840"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2392,14 +2579,11 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this -->
 	<software name="lupina" cloneof="lupin">
 		<description>Lupin Sansei - Cagliostro no Shiro (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Toho</publisher>
 		<info name="alt_title" value="ルパン三世 カリオストロの城" />
-		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2409,14 +2593,12 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this -->
 	<software name="madrider">
 		<description>Mad Rider (Japan)</description>
 		<year>1987</year>
 		<publisher>Carry Lab</publisher>
 		<info name="alt_title" value="マッドライダー" />
-		<info name="usage" value="Requires a Japanese system" />
+		<info name="serial" value="GA-421"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2426,14 +2608,12 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this -->
 	<software name="madridera" cloneof="madrider">
 		<description>Mad Rider (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Carry Lab</publisher>
 		<info name="alt_title" value="マッドライダー" />
-		<info name="usage" value="Requires a Japanese system" />
+		<info name="serial" value="GA-421"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2448,6 +2628,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="マラヤの秘宝" />
+		<info name="serial" value="R58Y5115"/>
+		<info name="gtin" value="04988013014497"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2457,12 +2639,12 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-<!-- Legit or fan translated??? -->
-	<!-- Konami -->
 	<software name="mgear">
-		<description>Metal Gear (Europe?)</description>
+		<description>Metal Gear (Europe, translated)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>
+		<info name="serial" value="RC750"/>
+		<info name="gtin" value="04988602527230"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -2472,14 +2654,14 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- does not work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this -->
 	<software name="mgearj" cloneof="mgear">
 		<description>Metal Gear (Japan)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="メタルギア" />
-		<info name="usage" value="Requires a Japanese system" />
+		<info name="serial" value="RC750"/>
+		<info name="gtin" value="04988602527230"/>
+		<info name="usage" value="Requires a Japanese system. Game resets on a non-Japanese system."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -2494,7 +2676,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>2010</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="メタルギア" />
-		<info name="usage" value="Requires a Japanese system" />
+		<info name="usage" value="Requires a Japanese system. Game resets on a non-Japanese system."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -2509,6 +2691,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1990</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ソリッドスネークメタルギア2" />
+		<info name="serial" value="RC767"/>
+		<info name="gtin" value="04988602553932"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -2551,6 +2735,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Xain Soft</publisher>
 		<info name="alt_title" value="未来" />
+		<info name="serial" value="MXZS-12002"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2565,6 +2750,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1989</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="熱血柔道" />
+		<info name="serial" value="R68Y5118"/>
+		<info name="gtin" value="04988013016293"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2579,6 +2766,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1989</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="熱血柔道" />
+		<info name="serial" value="R68Y5118"/>
+		<info name="gtin" value="04988013016293"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2593,6 +2782,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1986</year>
 		<publisher>System Soft</publisher>
 		<info name="alt_title" value="オーガ" />
+		<info name="serial" value="008736"/><!-- This may just be a cartridge serial instead of a game serial. -->
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2607,6 +2797,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="エルギーザの封印" />
+		<info name="serial" value="RC761"/>
+		<info name="gtin" value="04988602542059"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -2635,6 +2827,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="アウトラン" />
+		<info name="serial" value="R68Y5814"/>
+		<info name="gtin" value="04988013014091"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2649,6 +2843,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="alt_title" value="パチプロ伝説" />
+		<info name="serial" value="HM-029"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2663,6 +2858,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="ぺんぎんくんウォーズ２" />
+		<info name="gtin" value="04988606202980"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2677,6 +2873,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="ぺんぎんくんウォーズ２" />
+		<info name="gtin" value="04988606202980"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2691,6 +2888,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Pack-In Video</publisher>
 		<info name="alt_title" value="プレデター" />
+		<info name="serial" value="MS-17"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2705,6 +2903,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1990</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="クォース" />
+		<info name="serial" value="RC769"/>
+		<info name="gtin" value="04988602560572"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -2717,7 +2917,8 @@ LZ93A13 (32 pin) - 8KB banks
 	<software name="quarthk" cloneof="quarth">
 		<description>Quarth (Korea)</description>
 		<year>1990</year>
-		<publisher>Konami</publisher>
+		<publisher>Daou</publisher>
+		<info name="alt_title" value="사각의 비밀"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -2746,6 +2947,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>HummingBird</publisher>
 		<info name="alt_title" value="りっくとみっくの大冒険" />
+		<info name="serial" value="114214"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2755,12 +2957,13 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- the Japanese text only works fine on Japanese machines, like hbf1 or hbf12 -->
 	<software name="sangokus">
 		<description>Sangokushi (Japan)</description>
 		<year>1988</year>
 		<publisher>Koei</publisher>
 		<info name="alt_title" value="三國志" />
+		<info name="serial" value="MXKN12002"/>
+		<info name="gtin" value="04988615000096"/>
 		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8_sram" />
@@ -2778,6 +2981,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Victor Ongaku Sangyou</publisher>
 		<info name="alt_title" value="釣りキチ三平ブルーマリン編" />
+		<info name="serial" value="M-2011"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2787,8 +2991,6 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this -->
 	<software name="sanpei2">
 		<description>Tsuri Kichi Sanpei - Tsuri Sennin Hen (Japan)</description>
 		<year>1989</year>
@@ -2809,6 +3011,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Sony</publisher>
 		<info name="alt_title" value="聖飢魔IIスペシャル 悪魔の逆襲" />
+		<info name="serial" value="HBS-G064C"/>
+		<info name="gtin" value="04901780064885"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2823,6 +3027,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>System Soft</publisher>
 		<info name="alt_title" value="上海" />
+		<info name="serial" value="008055 / 007761"/><!-- These may just be a cartridge serial instead of a game serial. -->
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -2837,6 +3042,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1989</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="スペースマンボウ" />
+		<info name="serial" value="RC768"/>
+		<info name="gtin" value="04988602554137"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami_scc" />
 			<feature name="mapper" value="KONAMI-SCC" />
@@ -2846,12 +3053,13 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- the Japanese text only works fine on Japanese machines, like hbf1 or hbf12 -->
 	<software name="srambosp">
 		<description>Super Rambo Special (Japan)</description>
 		<year>1986</year>
 		<publisher>Pack-In Video</publisher>
 		<info name="alt_title" value="スーパーランボースペシャル" />
+		<info name="serial" value="MS-5"/>
+		<info name="gtin" value="04988110800054"/>
 		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
@@ -2867,6 +3075,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="スターヴァージン" />
+		<info name="serial" value="R58Y5112"/>
+		<info name="gtin" value="04988013013490"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2881,6 +3091,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="スターヴァージン" />
+		<info name="serial" value="R58Y5112"/>
+		<info name="gtin" value="04988013013490"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2895,23 +3107,24 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Irem</publisher>
 		<info name="alt_title" value="スーパーロードランナー" />
+		<info name="serial" value="IM-03"/>
+		<info name="gtin" value="04962891300033"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="superloderunner" />
 			<feature name="mapper" value="SUPERLODE" />
 			<dataarea name="rom" size="0x20000">
-				<rom name="super load runner (japan).rom" size="0x20000" crc="80ecac11" sha1="4164dcdfe0613d0f4c53b6f3581548bbbad5eb43" status="baddump"/>
+				<rom name="irem_slr_lh231065.rom" size="0x20000" crc="80ecac11" sha1="4164dcdfe0613d0f4c53b6f3581548bbbad5eb43" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
-	<!-- TODO: investigate better which machine supports this -->
 	<software name="tkshogi2">
 		<description>Tanigawa Kouji no Shougi Shinan II (Japan)</description>
 		<year>1988</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="alt_title" value="谷川浩司の将棋指南II" />
-		<info name="usage" value="Requires a Japanese system" />
+		<info name="serial" value="R55Y5110"/>
+		<info name="gtin" value="04988013013193"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8_sram" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -2928,6 +3141,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ウシャス" />
+		<info name="serial" value="RC753"/>
+		<info name="gtin" value="04988602528787"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -2942,6 +3157,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ウシャス" />
+		<info name="serial" value="RC753"/>
+		<info name="gtin" value="04988602528787"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -2956,6 +3173,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1986</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="悪魔城ドラキュラ" />
+		<info name="serial" value="RC744"/>
+		<info name="gtin" value="04988602512472"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -2970,6 +3189,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1986</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="悪魔城ドラキュラ" />
+		<info name="serial" value="RC744"/>
+		<info name="gtin" value="04988602512472"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -2984,6 +3205,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1986</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="悪魔城ドラキュラ" />
+		<info name="serial" value="RC744"/>
+		<info name="gtin" value="04988602512472"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -2998,6 +3221,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1986</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="悪魔城ドラキュラ" />
+		<info name="serial" value="RC744"/>
+		<info name="gtin" value="04988602512472"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="konami" />
 			<feature name="mapper" value="KONAMI" />
@@ -3007,8 +3232,8 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<!-- the Japanese text only works fine on Japanese machines, like hbf1 or hbf12 -->
-	<software name="wizardry" supported="partial">
+	<!-- Cannot get past SRAM selection screen. -->
+	<software name="wizardry" supported="no">
 		<description>Wizardry - Proving Grounds of Mad Overlord! (Japan)</description>
 		<year>1988</year>
 		<publisher>ASCII</publisher>
@@ -3030,6 +3255,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>dB-Soft</publisher>
 		<info name="alt_title" value="うっでぃぽこ" />
+		<info name="serial" value="MXDF-12001 (box) / MS2-G2116-P1 (box) / MS2-G2116-L1 (cartridge)"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -3044,6 +3270,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1989</year>
 		<publisher>Namco</publisher>
 		<info name="alt_title" value="ゼビウス ファードラウト伝説" />
+		<info name="gtin" value="04907892030152"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -3058,6 +3285,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1986</year>
 		<publisher>Pony</publisher>
 		<info name="alt_title" value="ザナック EX" />
+		<info name="serial" value="R58Y5093"/>
+		<info name="gtin" value="04988013008397"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii16" />
 			<feature name="mapper" value="M60002-0125SP-16" />
@@ -3086,6 +3315,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="alt_title" value="ずっこけやじきた隠密道中" />
+		<info name="serial" value="HM-026"/>
+		<info name="usage" value="Requires a Japanese system otherwise the system will reset after entering a passnumber."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -3100,6 +3331,7 @@ LZ93A13 (32 pin) - 8KB banks
 
 	<!-- Non-Games -->
 
+	<!-- Unknown how this was supposed to be used. -->
 	<software name="testcart" supported="no">
 		<description>Service Test Cart MSX2 (Europe?)</description>
 		<year>19??</year>
@@ -3116,6 +3348,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<description>Cheese 2 (Japan)</description>
 		<year>1985</year>
 		<publisher>Neos</publisher>
+		<info name="serial" value="RC-30"/>
 		<info name="usage" value="Requires a mouse in general purpose port 1."/>
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
@@ -3125,12 +3358,13 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-<!-- Needs Kanji rom? -->
+<!-- Missing Kanji rom. -->
 	<software name="msxwrit2" supported="no">
 		<description>Japanese MSX-Write II (Japan)</description>
 		<year>1988</year>
 		<publisher>ASCII</publisher>
 		<info name="alt_title" value="日本語ＭＳＸ－ＷｒｉｔｅII" />
+		<info name="serial" value="VJE-80A"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8_sram" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -3138,6 +3372,9 @@ LZ93A13 (32 pin) - 8KB banks
 				<rom name="japanese msx-write ii (japan) (program).rom" size="0x80000" crc="459478cb" sha1="9afdee40e7b243f99cc50dd1ad710ab0928dd820" status="baddump"/>
 			</dataarea>
 			<dataarea name="sram" size="0x2000">
+			</dataarea>
+			<dataarea name="kanji" size="0x20000">
+				<rom name="kanjifont.rom" size="0x20000" status="nodump" />
 			</dataarea>
 		</part>
 	</software>
@@ -3147,6 +3384,8 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1988</year>
 		<publisher>Bit²</publisher>
 		<info name="alt_title" value="シンセサウルス" />
+		<info name="serial" value="BM-813"/>
+		<info name="gtin" value="04988655321182"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="ascii8" />
 			<feature name="mapper" value="M60002-0125SP" />
