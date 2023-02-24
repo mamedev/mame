@@ -1590,8 +1590,10 @@ if opt_tool(CPUS, "M37710") then
 end
 
 --------------------------------------------------
--- Mostek 6502 and its many derivatives
+-- MOS Technology 6502 and its many derivatives
 --@src/devices/cpu/m6502/deco16.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/gew7.h,CPUS["M6502"] = true
+--@src/devices/cpu/m6502/gew12.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m3745x.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m4510.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/m50734.h,CPUS["M6502"] = true
@@ -1625,6 +1627,10 @@ if CPUS["M6502"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/m6502/deco16.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/deco16.h",
+		MAME_DIR .. "src/devices/cpu/m6502/gew7.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/gew7.h",
+		MAME_DIR .. "src/devices/cpu/m6502/gew12.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/gew12.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m3745x.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/m3745x.h",
 		MAME_DIR .. "src/devices/cpu/m6502/m4510.cpp",

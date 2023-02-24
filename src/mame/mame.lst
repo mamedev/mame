@@ -45247,14 +45247,29 @@ psr40                           // 1985 PSR-40
 psr60                           // 1985 PSR-60
 psr70                           // 1985 PSR-70
 
+@source:yamaha/ympsr150.cpp
+psr110                          // 1993
+psr150                          // 1992
+psr180                          // 1994
+psr75                           // 1992
+psr76                           // 1994
+psr78                           // 1996
+pss11                           // 1992
+pss12                           // 1994
+pss21                           // 1992
+pss31                           // 1992
+pss6                            // 1994
+
+@source:yamaha/ympsr260.cpp
+psr160                          // 2000
+psr260                          // 2000
+psr79                           // 1998
+
 @source:yamaha/ympsr340.cpp
 psr340                          // 1999 PSR-340
 
 @source:yamaha/ympsr400.cpp
 psr500                          // 1991 PSR-500
-
-@source:yamaha/ympss12.cpp
-pss12                           //
 
 @source:yamaha/ymqy70.cpp
 qy70                            // 1997 QY-70

@@ -1,0 +1,493 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<!-- general grey backdrop -->
+	<element name="greyback">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.1" green="0.1" blue="0.1" />
+		</rect>
+	</element>
+
+	<element name="border">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.05" green="0.05" blue="0.05" />
+		</rect>
+	</element>
+
+	<!-- text elements -->
+	<element name="voice"><text string="VOICE" /></element>
+	<element name="song"><text string="SONG" /></element>
+	<element name="style"><text string="STYLE" /></element>
+	<element name="minus_one"><text string="MINUS ONE" align="1" /></element>
+	<element name="start_stop"><text string="START/STOP" align="1" /></element>
+	<element name="one_touch"><text string="ONE TOUCH SETTING" align="1" /></element>
+	<element name="tempo"><text string="TEMPO" align="1" /></element>
+	<element name="sync_start"><text string="SYNC-START" align="2" /></element>
+	<element name="fill_in"><text string="/ FILL IN" align="2" /></element>
+	<element name="power"><text string="POWER" align="1" /></element>
+	<element name="on_off"><text string="ON/OFF" align="1" /></element>
+	<element name="kp0"><text string="0" /></element>
+	<element name="kp1"><text string="1" /></element>
+	<element name="kp2"><text string="2" /></element>
+	<element name="kp3"><text string="3" /></element>
+	<element name="kp4"><text string="4" /></element>
+	<element name="kp5"><text string="5" /></element>
+	<element name="kp6"><text string="6" /></element>
+	<element name="kp7"><text string="7" /></element>
+	<element name="kp8"><text string="8" /></element>
+	<element name="kp9"><text string="9" /></element>
+	<element name="plus"><text string="+" /></element>
+	<element name="minus"><text string="-" /></element>
+	<element name="chord_keys"><text string="&#x25c0; AUTO ACCOMP. SECTION" align="1" /></element>
+	<element name="sound_effect"><text string="SOUND EFFECT" /></element>
+	<element name="drum"><text string="DRUM" /></element>
+
+	<!-- button primitives -->
+	<element name="button-back">
+		<image state="0">
+			<bounds left="-8" top="-2" right="8" bottom="2"/>
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="-8 -2 16 4" version="1.1">
+					<path d="M 1.05 0 A 1.05 1.05 0 0 1 0.596 0.864" stroke="#111" fill="none" stroke-width="0.2" transform="rotate(3)" />
+					<path d="M 1.05 0 A 1.05 1.05 0 0 1 0.959 0.427" stroke="#111" fill="none" stroke-width="0.2" transform="rotate(120.5)" />
+					<path d="M 0.7 0 A 0.7 0.7 0 0 1 0.517 0.472" stroke="#111" fill="none" stroke-width="0.2" transform="rotate(89.5)" />
+					<path d="M 0.75 0 A 0.75 0.75 0 0 1 0.705 0.257" stroke="#111" fill="none" stroke-width="0.3" transform="rotate(215)" />
+
+					<circle cx="0" cy="0" r="0.9" stroke="#111" fill="none" stroke-width="0.06" />
+					<rect x="-0.725" y="-0.25" width="0.58" height="0.45" fill="black" />
+
+					<rect x="1.775" y="1.05" width="0.8" height="0.1" fill="#444" />
+					<rect x="2.825" y="1.05" width="0.8" height="0.1" fill="#444" />
+
+					<path d="M -1.08 -0.4 L -1.4 -0.9 H -5.8 V -0.05 H -1.4 Z" fill="#444" />
+					<path d="M -1.08 0.37 L -1.4 0.9 H -5.8 V 0.05 H -1.4 Z" fill="#444" />
+					<path d="M 1.08 -0.4 L 1.4 -0.9 H 3.6 V -0.05 H 1.4 Z" fill="#444" />
+				</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<element name="button-minus-one" defstate="0">
+		<image state="0">
+			<bounds left="-2" top="-2" right="2" bottom="2"/>
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0.8 0.07 0.35 0.35" version="1.1">
+					<path d="M 1.05 0 A 1.05 1.05 0 0 1 1.014 0.272" stroke="#ff4" stroke-width="0.14" transform="rotate(5)" />
+				</svg>
+			]]></data>
+		</image>
+		<image state="1">
+			<bounds left="-2" top="-2" right="2" bottom="2"/>
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0.8 0.07 0.35 0.35" version="1.1">
+					<path d="M 1.05 0 A 1.05 1.05 0 0 1 1.014 0.272" stroke="#bb2" stroke-width="0.14" transform="rotate(5)" />
+				</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="button-start-stop" defstate="0">
+		<image state="0">
+			<bounds left="-2" top="-2" right="2" bottom="2"/>
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0.7 0.38 0.33 0.33" version="1.1">
+					<path d="M 1.05 0 A 1.05 1.05 0 0 1 1.014 0.272" stroke="#f80" stroke-width="0.14" transform="rotate(23)" />
+				</svg>
+			]]></data>
+		</image>
+		<image state="1">
+			<bounds left="-2" top="-2" right="2" bottom="2"/>
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0.7 0.38 0.33 0.33" version="1.1">
+					<path d="M 1.05 0 A 1.05 1.05 0 0 1 1.014 0.272" stroke="#b50" stroke-width="0.14" transform="rotate(23)" />
+				</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="button-one-touch" defstate="0">
+		<image state="0">
+			<bounds left="-2" top="-2" right="2" bottom="2"/>
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0.53 0.63 0.32 0.3" version="1.1">
+					<path d="M 1.05 0 A 1.05 1.05 0 0 1 1.014 0.272" stroke="#ff4" stroke-width="0.14" transform="rotate(41)" />
+				</svg>
+			]]></data>
+		</image>
+		<image state="1">
+			<bounds left="-2" top="-2" right="2" bottom="2"/>
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0.53 0.63 0.32 0.3" version="1.1">
+					<path d="M 1.05 0 A 1.05 1.05 0 0 1 1.014 0.272" stroke="#bb2" stroke-width="0.14" transform="rotate(41)" />
+				</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="button-sync-start" defstate="0">
+		<image state="0">
+			<bounds left="-2" top="-2" right="2" bottom="2"/>
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.89 0.59 0.38 0.38" version="1.1">
+					<path d="M 1.05 0 A 1.05 1.05 0 0 1 0.986 0.359" stroke="#24b" stroke-width="0.14" transform="rotate(122)" />
+				</svg>
+			]]></data>
+		</image>
+		<image state="1">
+			<bounds left="-2" top="-2" right="2" bottom="2"/>
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.89 0.59 0.38 0.38" version="1.1">
+					<path d="M 1.05 0 A 1.05 1.05 0 0 1 0.986 0.359" stroke="#128" stroke-width="0.14" transform="rotate(122)" />
+				</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="button-tempo-up" defstate="0">
+		<image state="0">
+			<bounds left="-2" top="-2" right="2" bottom="2"/>
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.23 0.57 0.22 0.22" version="1.1">
+					<path d="M 0.7 0 A 0.7 0.7 0 0 1 0.676 0.181" stroke="#444" stroke-width="0.14" transform="rotate(92)" />
+				</svg>
+			]]></data>
+		</image>
+		<image state="1">
+			<bounds left="-2" top="-2" right="2" bottom="2"/>
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.23 0.57 0.22 0.22" version="1.1">
+					<path d="M 0.7 0 A 0.7 0.7 0 0 1 0.676 0.181" stroke="#222" stroke-width="0.14" transform="rotate(92)" />
+				</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="button-tempo-down" defstate="0">
+		<image state="0">
+			<bounds left="-2" top="-2" right="2" bottom="2"/>
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 0.48 0.26 0.24" version="1.1">
+					<path d="M 0.7 0 A 0.7 0.7 0 0 1 0.676 0.181" stroke="#444" stroke-width="0.14" transform="rotate(114)" />
+				</svg>
+			]]></data>
+		</image>
+		<image state="1">
+			<bounds left="-2" top="-2" right="2" bottom="2"/>
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.5 0.48 0.26 0.24" version="1.1">
+					<path d="M 0.7 0 A 0.7 0.7 0 0 1 0.676 0.181" stroke="#222" stroke-width="0.14" transform="rotate(114)" />
+				</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="button-power" defstate="0">
+		<image state="0">
+			<bounds left="-2" top="-2" right="2" bottom="2"/>
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.62 -0.63 0.26 0.26" version="1.1">
+					<path d="M 0.7 0 A 0.7 0.7 0 0 1 0.676 0.181" stroke="#f80" stroke-width="0.14" transform="rotate(218)" />
+				</svg>
+			]]></data>
+		</image>
+		<image state="1">
+			<bounds left="-2" top="-2" right="2" bottom="2"/>
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="-0.62 -0.63 0.26 0.26" version="1.1">
+					<path d="M 0.7 0 A 0.7 0.7 0 0 1 0.676 0.181" stroke="#b50" stroke-width="0.14" transform="rotate(218)" />
+				</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="button-circ" defstate="0">
+		<disk><color red="0" green="0" blue="0" /></disk>
+		<disk state="0"><bounds xc="0.5" yc="0.5" width="0.8" height="0.8" /><color red="0.8" green="0.8" blue="0.8" /></disk>
+		<disk state="1"><bounds xc="0.5" yc="0.5" width="0.8" height="0.8" /><color red="0.4" green="0.4" blue="0.4" /></disk>
+	</element>
+	<element name="button-circ-num" defstate="0">
+		<disk><color red="0" green="0" blue="0" /></disk>
+		<disk state="0"><bounds xc="0.5" yc="0.5" width="0.8" height="0.8" /><color red="0.05" green="0.6" blue="0.73" /></disk>
+		<disk state="1"><bounds xc="0.5" yc="0.5" width="0.8" height="0.8" /><color red="0.03" green="0.4" blue="0.5" /></disk>
+	</element>
+	<element name="button-pad" defstate="0">
+		<disk><color red="0" green="0" blue="0" /></disk>
+		<disk state="0"><bounds xc="0.5" yc="0.5" width="0.9" height="0.9" /><color red="0.13" green="0.27" blue="0.73" /></disk>
+		<disk state="1"><bounds xc="0.5" yc="0.5" width="0.9" height="0.9" /><color red="0.07" green="0.09" blue="0.53" /></disk>
+	</element>
+
+	<!-- LED primitive -->
+	<element name="led" defstate="0">
+		<disk><color red="0" green="0" blue="0" /></disk>
+		<disk state="0"><bounds xc="0.5" yc="0.5" width="0.8" height="0.8" /><color red="0.1" green="0.0" blue="0.0" /></disk>
+		<disk state="1"><bounds xc="0.5" yc="0.5" width="0.8" height="0.8" /><color red="1.0" green="0.1" blue="0.1" /></disk>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.1" blue="0.1" /></led7seg>
+	</element>
+
+	<!-- keyboard primitives -->
+	<element name="keyfill"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="whitekey" defstate="0">
+		<rect state="0"><bounds x="0" y="0" width="45" height="504" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0" y="0" width="45" height="504" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-l" defstate="0">
+		<rect state="0"><bounds x="0" y="0" width="45" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="0" y="0" width="45" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-m" defstate="0">
+		<rect state="0"><bounds x="13" y="0" width="53" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="13" y="0" width="53" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-lm" defstate="0">
+		<rect state="0"><bounds x="10" y="0" width="44" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="10" y="0" width="44" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-rm" defstate="0">
+		<rect state="0"><bounds x="22" y="0" width="44" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="22" y="0" width="44" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="whitekey-r" defstate="0">
+		<rect state="0"><bounds x="34" y="0" width="45" height="332" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><bounds x="0" y="332" width="79" height="172" /><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><bounds x="34" y="0" width="45" height="332" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+		<rect state="1"><bounds x="0" y="332" width="79" height="172" /><color red="0.9" green="0.9" blue="0.9" /></rect>
+	</element>
+	<element name="blackkey" defstate="0">
+		<rect state="0"><bounds x="0" y="0" width="44" height="324" /><color red="0.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="4" y="0" width="36" height="320" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="1"><bounds x="0" y="0" width="44" height="324" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect state="1"><bounds x="4" y="0" width="36" height="320" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+	</element>
+
+	<!-- button group -->
+	<group name="buttons">
+		<bounds x="-8" y="-2" width="16" height="4" />
+
+		<element ref="button-back"><bounds x="-8" y="-2" width="16" height="4" /></element>
+
+		<element ref="led" name="0.0"><bounds xc="1.05" yc="-0.06" width="0.08" height="0.08" /></element>
+		<element ref="button-minus-one" inputtag="KEY15" inputmask="0x10"><bounds x="0.8" y="0.07" width="0.35" height="0.35"/></element>
+		<element ref="minus_one"><bounds x="1.15" yc="0.25" width="1" height="0.1"/></element>
+		<element ref="button-one-touch" inputtag="KEY15" inputmask="0x01"><bounds x="0.53" y="0.63" width="0.32" height="0.3"/></element>
+		<element ref="one_touch"><bounds x="0.85" yc="0.875" width="1" height="0.1"/></element>
+		<element ref="button-start-stop" inputtag="KEY15" inputmask="0x08"><bounds x="0.7" y="0.38" width="0.33" height="0.33"/></element>
+		<element ref="start_stop"><bounds x="1.05" yc="0.575" width="1" height="0.1"/></element>
+
+		<element ref="led" name="0.7"><bounds xc="0.436" yc="0.955" width="0.08" height="0.08" /></element>
+		<element ref="button-sync-start" inputtag="KEY16" inputmask="0x10"><bounds x="-0.89" y="0.59" width="0.38" height="0.38"/></element>
+		<element ref="sync_start"><bounds x="-1.825" yc="0.825" width="1" height="0.1"/></element>
+		<element ref="fill_in"><bounds x="-1.75" yc="0.9" width="1" height="0.1"/></element>
+
+		<element ref="button-tempo-up" inputtag="KEY15" inputmask="0x04"><bounds x="-0.23" y="0.57" width="0.22" height="0.22"/></element>
+		<element ref="plus"><bounds xc="-0.12" yc="0.68" width="0.14" height="0.14"/></element>
+		<element ref="button-tempo-down" inputtag="KEY14" inputmask="0x04"><bounds x="-0.5" y="0.48" width="0.26" height="0.24"/></element>
+		<element ref="minus"><bounds xc="-0.37" yc="0.6" width="0.14" height="0.14"/></element>
+		<element ref="tempo"><bounds x="0.05" yc="0.7" width="1" height="0.1"/></element>
+
+		<element ref="button-power" inputtag="PC" inputmask="0x02"><bounds x="-0.62" y="-0.63" width="0.26" height="0.26"/></element>
+		<element ref="power"><bounds x="-0.325" yc="-0.7" width="1" height="0.1"/></element>
+		<element ref="on_off"><bounds x="-0.325" yc="-0.625" width="1" height="0.1"/></element>
+
+		<!-- voice -->
+		<element ref="led" name="0.6"><bounds xc="-1.05" yc="-0.65" width="0.08" height="0.08" /></element>
+		<element ref="button-circ" inputtag="KEY13" inputmask="0x04"><bounds xc="-1.05" yc="-0.4" width="0.2" height="0.2" /></element>
+		<element ref="voice"><bounds xc="-1.05" yc="-0.55" width="0.5" height="0.1"/></element>
+		<!-- style -->
+		<element ref="led" name="0.4"><bounds xc="-1.05" yc="0.12" width="0.08" height="0.08" /></element>
+		<element ref="button-circ" inputtag="KEY18" inputmask="0x04"><bounds xc="-1.05" yc="0.37" width="0.2" height="0.2" /></element>
+		<element ref="style"><bounds xc="-1.05" yc="0.22" width="0.5" height="0.1"/></element>
+		<!-- song -->
+		<element ref="led" name="0.5"><bounds xc="1.05" yc="-0.65" width="0.08" height="0.08" /></element>
+		<element ref="button-circ" inputtag="KEY15" inputmask="0x20"><bounds xc="1.05" yc="-0.4" width="0.2" height="0.2" /></element>
+		<element ref="song"><bounds xc="1.05" yc="-0.55" width="0.5" height="0.1"/></element>
+
+		<element ref="digit" name="digit2"><bounds x="-0.675" y="-0.175" width="0.225" height="0.325" /></element>
+		<element ref="digit" name="digit1"><bounds x="-0.425" y="-0.175" width="0.225" height="0.325" /></element>
+
+		<element ref="button-circ-num" inputtag="KEY13" inputmask="0x20"><bounds x="0" y="-0.5" width="0.2" height="0.2" /></element>
+		<element ref="kp1"><bounds xc="0.1" yc="-0.4" width="0.14" height="0.14"/></element>
+		<element ref="button-circ-num" inputtag="KEY18" inputmask="0x20"><bounds x="0.25" y="-0.5" width="0.2" height="0.2" /></element>
+		<element ref="kp2"><bounds xc="0.35" yc="-0.4" width="0.14" height="0.14"/></element>
+		<element ref="button-circ-num" inputtag="KEY14" inputmask="0x20"><bounds x="0.5" y="-0.5" width="0.2" height="0.2" /></element>
+		<element ref="kp3"><bounds xc="0.6" yc="-0.4" width="0.14" height="0.14"/></element>
+
+		<element ref="button-circ-num" inputtag="KEY13" inputmask="0x10"><bounds x="0" y="-0.25" width="0.2" height="0.2" /></element>
+		<element ref="kp4"><bounds xc="0.1" yc="-0.15" width="0.14" height="0.14"/></element>
+		<element ref="button-circ-num" inputtag="KEY18" inputmask="0x10"><bounds x="0.25" y="-0.25" width="0.2" height="0.2" /></element>
+		<element ref="kp5"><bounds xc="0.35" yc="-0.15" width="0.14" height="0.14"/></element>
+		<element ref="button-circ-num" inputtag="KEY14" inputmask="0x10"><bounds x="0.5" y="-0.25" width="0.2" height="0.2" /></element>
+		<element ref="kp6"><bounds xc="0.6" yc="-0.15" width="0.14" height="0.14"/></element>
+
+		<element ref="button-circ-num" inputtag="KEY13" inputmask="0x08"><bounds x="0" y="0" width="0.2" height="0.2" /></element>
+		<element ref="kp7"><bounds xc="0.1" yc="0.1" width="0.14" height="0.14"/></element>
+		<element ref="button-circ-num" inputtag="KEY18" inputmask="0x08"><bounds x="0.25" y="0" width="0.2" height="0.2" /></element>
+		<element ref="kp8"><bounds xc="0.35" yc="0.1" width="0.14" height="0.14"/></element>
+		<element ref="button-circ-num" inputtag="KEY14" inputmask="0x08"><bounds x="0.5" y="0" width="0.2" height="0.2" /></element>
+		<element ref="kp9"><bounds xc="0.6" yc="0.1" width="0.14" height="0.14"/></element>
+
+		<element ref="button-circ-num" inputtag="KEY13" inputmask="0x01"><bounds x="0" y="0.25" width="0.2" height="0.2" /></element>
+		<element ref="minus"><bounds xc="0.1" yc="0.35" width="0.14" height="0.14"/></element>
+		<element ref="button-circ-num" inputtag="KEY18" inputmask="0x01"><bounds x="0.25" y="0.25" width="0.2" height="0.2" /></element>
+		<element ref="kp0"><bounds xc="0.35" yc="0.35" width="0.14" height="0.14"/></element>
+		<element ref="button-circ-num" inputtag="KEY14" inputmask="0x01"><bounds x="0.5" y="0.25" width="0.2" height="0.2" /></element>
+		<element ref="plus"><bounds xc="0.6" yc="0.35" width="0.14" height="0.14"/></element>
+
+		<element ref="button-pad" inputtag="KEY17" inputmask="0x20"><bounds x="0.7" y="1.25" width="0.6" height="0.3" /></element>
+		<element ref="button-pad" inputtag="KEY16" inputmask="0x20"><bounds x="1.4" y="1.25" width="0.6" height="0.3" /></element>
+		<element ref="button-pad" inputtag="KEY11" inputmask="0x20"><bounds x="2.1" y="1.25" width="0.6" height="0.3" /></element>
+		<element ref="button-pad" inputtag="KEY12" inputmask="0x20"><bounds x="2.8" y="1.25" width="0.6" height="0.3" /></element>
+
+		<element ref="sound_effect"><bounds xc="2.175" yc="1.1" width="1" height="0.1"/></element>
+		<element ref="button-circ" inputtag="KEY12" inputmask="0x10"><bounds xc="2.65" yc="1.1" width="0.175" height="0.175" /></element>
+
+		<element ref="drum"><bounds xc="3.225" yc="1.1" width="1" height="0.1"/></element>
+		<element ref="button-circ" inputtag="KEY11" inputmask="0x10"><bounds xc="3.7" yc="1.1" width="0.175" height="0.175" /></element>
+
+	</group>
+
+	<!-- keyboard group -->
+	<group name="keyboard">
+		<element ref="keyfill"><bounds x="72" y="98" width="2970" height="524" /></element>
+
+		<element ref="chord_keys"><bounds x="980" y="630" width="500" height="25"/></element>
+
+		<!-- octave 1 -->
+		<element ref="blackkey"    inputtag="KEY4" inputmask="0x02"><bounds x="130" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="KEY4" inputmask="0x10"><bounds x="233" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="KEY4" inputmask="0x04"><bounds x="373" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="KEY3" inputmask="0x20"><bounds x="467" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="KEY3" inputmask="0x08"><bounds x="561" y="108" width="44" height="324" /></element>
+		<element ref="whitekey-l"  inputtag="KEY1" inputmask="0x04"><bounds x="82" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-m"  inputtag="KEY4" inputmask="0x20"><bounds x="164" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-r"  inputtag="KEY4" inputmask="0x08"><bounds x="246" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-l"  inputtag="KEY4" inputmask="0x01"><bounds x="328" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-lm" inputtag="KEY3" inputmask="0x02"><bounds x="410" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-rm" inputtag="KEY3" inputmask="0x10"><bounds x="492" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-r"  inputtag="KEY3" inputmask="0x01"><bounds x="574" y="108" width="79" height="504" /></element>
+
+		<!-- octave 2 -->
+		<element ref="blackkey"    inputtag="KEY2" inputmask="0x02"><bounds x="704" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="KEY2" inputmask="0x10"><bounds x="807" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="KEY2" inputmask="0x04"><bounds x="947" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="KEY0" inputmask="0x20"><bounds x="1041" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="KEY0" inputmask="0x08"><bounds x="1135" y="108" width="44" height="324" /></element>
+		<element ref="whitekey-l"  inputtag="KEY3" inputmask="0x04"><bounds x="656" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-m"  inputtag="KEY2" inputmask="0x20"><bounds x="738" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-r"  inputtag="KEY2" inputmask="0x08"><bounds x="820" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-l"  inputtag="KEY2" inputmask="0x01"><bounds x="902" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-lm" inputtag="KEY0" inputmask="0x02"><bounds x="984" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-rm" inputtag="KEY0" inputmask="0x10"><bounds x="1066" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-r"  inputtag="KEY0" inputmask="0x01"><bounds x="1148" y="108" width="79" height="504" /></element>
+
+		<!-- octave 3 -->
+		<element ref="blackkey"    inputtag="KEY6" inputmask="0x02"><bounds x="1278" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="KEY6" inputmask="0x10"><bounds x="1381" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="KEY6" inputmask="0x04"><bounds x="1521" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="KEY7" inputmask="0x20"><bounds x="1615" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="KEY7" inputmask="0x08"><bounds x="1709" y="108" width="44" height="324" /></element>
+		<element ref="whitekey-l"  inputtag="KEY0" inputmask="0x04"><bounds x="1230" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-m"  inputtag="KEY6" inputmask="0x20"><bounds x="1312" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-r"  inputtag="KEY6" inputmask="0x08"><bounds x="1394" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-l"  inputtag="KEY6" inputmask="0x01"><bounds x="1476" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-lm" inputtag="KEY7" inputmask="0x02"><bounds x="1558" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-rm" inputtag="KEY7" inputmask="0x10"><bounds x="1640" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-r"  inputtag="KEY7" inputmask="0x01"><bounds x="1722" y="108" width="79" height="504" /></element>
+
+		<!-- octave 4 -->
+		<element ref="blackkey"    inputtag="KEY5" inputmask="0x02"><bounds x="1852" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="KEY5" inputmask="0x10"><bounds x="1955" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="KEY5" inputmask="0x04"><bounds x="2095" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="KEY8" inputmask="0x20"><bounds x="2189" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="KEY8" inputmask="0x08"><bounds x="2283" y="108" width="44" height="324" /></element>
+		<element ref="whitekey-l"  inputtag="KEY7" inputmask="0x04"><bounds x="1804" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-m"  inputtag="KEY5" inputmask="0x20"><bounds x="1886" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-r"  inputtag="KEY5" inputmask="0x08"><bounds x="1968" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-l"  inputtag="KEY5" inputmask="0x01"><bounds x="2050" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-lm" inputtag="KEY8" inputmask="0x02"><bounds x="2132" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-rm" inputtag="KEY8" inputmask="0x10"><bounds x="2214" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-r"  inputtag="KEY8" inputmask="0x01"><bounds x="2296" y="108" width="79" height="504" /></element>
+
+		<!-- octave 5 -->
+		<element ref="blackkey"    inputtag="KEY9" inputmask="0x02"><bounds x="2426" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="KEY9" inputmask="0x10"><bounds x="2529" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="KEY9" inputmask="0x04"><bounds x="2669" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="KEY10" inputmask="0x08"><bounds x="2857" y="108" width="44" height="324" /></element>
+		<element ref="blackkey"    inputtag="KEY10" inputmask="0x20"><bounds x="2763" y="108" width="44" height="324" /></element>
+		<element ref="whitekey-l"  inputtag="KEY8" inputmask="0x04"><bounds x="2378" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-m"  inputtag="KEY9" inputmask="0x20"><bounds x="2460" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-r"  inputtag="KEY9" inputmask="0x08"><bounds x="2542" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-l"  inputtag="KEY9" inputmask="0x01"><bounds x="2624" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-lm" inputtag="KEY10" inputmask="0x02"><bounds x="2706" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-rm" inputtag="KEY10" inputmask="0x10"><bounds x="2788" y="108" width="79" height="504" /></element>
+		<element ref="whitekey-r"  inputtag="KEY10" inputmask="0x01"><bounds x="2870" y="108" width="79" height="504" /></element>
+
+		<!-- final key -->
+		<element ref="whitekey"    inputtag="KEY10" inputmask="0x04"><bounds x="2952" y="108" width="79" height="504" /></element>
+	</group>
+
+	<!-- speaker grill -->
+	<element name="speaker">
+		<rect><bounds x="0" y="0" width="500" height="480" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<disk><bounds xc="250" yc="240" width="450" height="420" /><color red="0.0" green="0.0" blue="0.0" /></disk>
+		<rect><bounds x="2" y="2" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="2" y="25" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="2" y="48" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="2" y="71" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="2" y="94" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="2" y="117" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="2" y="140" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="2" y="163" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="2" y="186" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="2" y="209" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="2" y="232" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="2" y="255" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="2" y="278" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="2" y="301" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="2" y="324" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="2" y="347" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="2" y="370" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="2" y="393" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="2" y="416" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="2" y="439" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="2" y="462" width="496" height="15" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+	</element>
+
+	<view name="Keyboard">
+		<bounds x="0" y="-220" width="3154" height="1174" />
+		<!-- overall background -->
+		<element ref="greyback"><bounds x="0" y="-220" width="3154" height="1174" /></element>
+
+		<!-- speakers -->
+		<element ref="speaker"><bounds x="0" y="-200" width="500" height="528"/></element>
+		<element ref="speaker"><bounds x="2654" y="-200" width="500" height="528"/></element>
+
+		<!-- buttons -->
+		<group ref="buttons"><bounds x="190" y="-325" width="3200" height="800" /></group>
+
+		<!-- keyboard -->
+		<group ref="keyboard"><bounds x="72" y="400" width="3010" height="530" /></group>
+	</view>
+</mamelayout>

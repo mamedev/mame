@@ -5154,5 +5154,14 @@ if (MACHINES["PCCARD_SRAM"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/pccard_sram.cpp",
 		MAME_DIR .. "src/devices/machine/pccard_sram.h",
+
+---------------------------------------------------
+--
+--@src/devices/machine/gew12_uart.h,MACHINES["GEW12"] = true
+---------------------------------------------------
+if (MACHINES["GEW12"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/gew12_uart.cpp",
+		MAME_DIR .. "src/devices/machine/gew12_uart.h",
 	}
 end
