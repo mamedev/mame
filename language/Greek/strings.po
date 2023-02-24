@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-18 05:29+1100\n"
-"PO-Revision-Date: 2022-11-19 18:27+0200\n"
+"PO-Revision-Date: 2023-02-21 16:54+0200\n"
 "Last-Translator: Mame.gr - BraiNKilleR\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.2\n"
+"X-Generator: Poedit 3.2.2\n"
 
 #: src/frontend/mame/ui/ui.cpp:474 src/frontend/mame/ui/ui.cpp:547
 msgid ""
@@ -580,7 +580,7 @@ msgstr "Κορεσμός μοχλού"
 
 #: src/frontend/mame/ui/submenu.cpp:94
 msgid "Joystick threshold"
-msgstr ""
+msgstr "Κατώτατα όρια μοχλού"
 
 #: src/frontend/mame/ui/submenu.cpp:95
 msgid "Natural keyboard"
@@ -2843,6 +2843,13 @@ msgid ""
 "Next device  \t\t%6$s\n"
 "Return to previous menu  \t\t%7$s"
 msgstr ""
+"Εμφάνιση/απόκρυψη ρυθμίσεων  \t\t%1$s\n"
+"Μείωση αξίας  \t\t%2$s\n"
+"Αύξηση αξίας  \t\t%3$s\n"
+"Επαναφορά προεπιλεγμένης αξίας  \t\t%4$s\n"
+"Προηγούμενη συσκευή  \t\t%5$s\n"
+"Επόμενη συσκευή  \t\t%6$s\n"
+"Επιστροφή στο προηγούμενο μενού  \t\t%7$s"
 
 #: src/frontend/mame/ui/analogipt.cpp:82
 msgctxt "menu-analoginput"
@@ -2853,12 +2860,12 @@ msgstr "Ρύθμισεις Αναλογικών Εισαγωγών"
 #, c-format
 msgctxt "menu-analoginput"
 msgid "Press %s to show settings"
-msgstr ""
+msgstr "Πατήστε %s για προβολή των ρυθμίσεων"
 
 #: src/frontend/mame/ui/analogipt.cpp:245
 msgctxt "menu-analoginput"
 msgid "Analog Input Adjustments Help"
-msgstr ""
+msgstr "Βοήθεια Ρυθμίσεων Αναλογικής Εισαγωγής"
 
 #: src/frontend/mame/ui/analogipt.cpp:421
 #, c-format
@@ -5416,7 +5423,7 @@ msgstr "Πληκτρολόγιο"
 #: src/emu/inpttype.ipp:874
 msgctxt "input-name"
 msgid "Show/Hide Menu"
-msgstr ""
+msgstr "Εμφάνιση/Απόκρυψη Μενού"
 
 #: src/emu/inpttype.ipp:875
 msgctxt "input-name"
@@ -5426,7 +5433,7 @@ msgstr "UI Επιλογή"
 #: src/emu/inpttype.ipp:876
 msgctxt "input-name"
 msgid "UI Back"
-msgstr ""
+msgstr "UI Πίσω"
 
 #: src/emu/inpttype.ipp:877
 msgctxt "input-name"
@@ -5441,7 +5448,7 @@ msgstr "UI Καθαρισμός"
 #: src/emu/inpttype.ipp:879
 msgctxt "input-name"
 msgid "UI Help"
-msgstr ""
+msgstr "Βοήθεια UI"
 
 #: src/emu/inpttype.ipp:880
 msgctxt "input-name"
@@ -5501,7 +5508,7 @@ msgstr "Μενού οθόνης"
 #: src/emu/inpttype.ipp:891
 msgctxt "input-name"
 msgid "Toggle UI Controls"
-msgstr ""
+msgstr "Εναλλαγή Στοιχείων Ελέγχου UI"
 
 #: src/emu/inpttype.ipp:892
 msgctxt "input-name"
@@ -5661,7 +5668,7 @@ msgstr "UI Προβολή εξωτερικού DAT"
 #: src/emu/inpttype.ipp:923
 msgctxt "input-name"
 msgid "UI Add/Remove Favorite"
-msgstr ""
+msgstr "UI Προσθήκη/Αφαίρεση Αγαπημένου"
 
 #: src/emu/inpttype.ipp:924
 msgctxt "input-name"

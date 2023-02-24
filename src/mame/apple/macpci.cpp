@@ -2,14 +2,13 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-  macpci.cpp: second-generation Old World PowerMacs based on PCI instead of NuBus
-
+  macpci.cpp: Apple/Bandai Pippin
   Preliminary driver by R. Belmont (based on pippin.c skeleton by Angelo Salese)
-
-  Pippin:
 
   Apple ASICs identified:
   -----------------------
+  343S0152    Aspen (Bandit derived PCI host bridge and RAM controller)
+  343S0153    Taos (640x480 framebuffer with double-buffering and convolution to fix interlace flicker)
   343S1125    Grand Central (SWIM III, Sound, VIA)
   341S0060    Cuda (68HC05 MCU, handles ADB and parameter ("CMOS") RAM)
   343S1146    ??? (likely SCSI due to position on board)
@@ -22,13 +21,23 @@
   Bt856 video DAC
 
   Pippin-type map
-  F3000000 : Grand Central DMA/IRQ controller
-  F3012000 : SCC
-  F3013000 : Grand Central system controller
+  00000000 : RAM
+  80000000 : PCI memory (to EFFFFFFF)
+  F0000000 : 1 MB video RAM
+  F0100000 : Space for second 1 MB of video RAM (unused in Pippin)
+  (2 MB VRAM space mirrors every 0x00200000 until F0800000)
+  F0800000 : Taos registers
+  F1000000 : Palette for 256 color mode
+  F3000000 : Grand Central I/O controller
+  F3008000 : DMA channel registers
+  F3010000 : SCSI0
+  F3011000 : MACE Ethernet
+  F3012000 : SCC (68K Mac style addressing)
+  F3013000 : SCC (MacRISC addressing)
   F3014000 : AWACS audio
-  F3015000 : SWIM III
-  F3016000 : VIA1
-  F3018000 : SCSI (53C96)
+  F3015000 : SWIM III floppy
+  F3016000 : VIA1 (interface to Cuda)
+  F3018000 : SCSI1
 
   NOTE: the PowerPC starts off disabled; the Cuda 68HC05 starts it up once it's booted.
 
@@ -58,7 +67,7 @@ public:
 	macpci_state(const machine_config &mconfig, device_type type, const char *tag);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<bandit_host_device> m_bandit;
+	required_device<aspen_host_device> m_bandit;
 	required_device<cuda_device> m_cuda;
 	required_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
@@ -111,9 +120,7 @@ void macpci_state::pippin_map(address_map &map)
 	map(0x40000000, 0x403fffff).rom().region("bootrom", 0).mirror(0x0fc00000);   // mirror of ROM for 680x0 emulation
 	map(0x5ffffffc, 0x5fffffff).lr32(NAME([](offs_t offset) { return 0xa55a7001; }));
 
-	map(0xf00dfff8, 0xf00dffff).lr64(NAME([](offs_t offset) { return (uint64_t)0xe1 << 32; }));	// PC=0xfff04810
-
-	map(0xf2000000, 0xf2ffffff).m(m_bandit, FUNC(bandit_host_device::map));
+	map(0xf00dfff8, 0xf00dffff).lr64(NAME([](offs_t offset) { return (uint64_t)0xe1 << 32; })); // PC=0xfff04810
 
 	map(0xffc00000, 0xffffffff).rom().region("bootrom", 0);
 }
@@ -155,7 +162,7 @@ void macpci_state::pippin(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &macpci_state::pippin_map);
 
 	PCI_ROOT(config, "pci", 0);
-	BANDIT(config, m_bandit, 66000000, "maincpu").set_dev_offset(1);
+	ASPEN(config, m_bandit, 66000000, "maincpu").set_dev_offset(1);
 
 	cdrom_image_device &cdrom(CDROM(config, "cdrom", 0));
 	cdrom.set_interface("pippin_cdrom");

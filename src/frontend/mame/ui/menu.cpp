@@ -25,6 +25,8 @@
 #include "rendutil.h"
 #include "uiinput.h"
 
+#include "osdepend.h"
+
 #include <algorithm>
 #include <cassert>
 #include <cmath>
@@ -193,8 +195,7 @@ uint32_t menu::global_state::ui_handler(render_container &container)
 
 	// update the menu state
 	m_hide = false;
-	if (m_stack)
-		m_stack->do_handle();
+	bool need_update = m_stack && m_stack->do_handle();
 
 	// clear up anything pending being released
 	clear_free_list();
@@ -214,10 +215,10 @@ uint32_t menu::global_state::ui_handler(render_container &container)
 				m_stack->menu_deactivated();
 			}
 		}
-		return UI_HANDLER_CANCEL;
+		return mame_ui_manager::HANDLER_CANCEL;
 	}
 
-	return 0;
+	return need_update ? mame_ui_manager::HANDLER_UPDATE : 0;
 }
 
 
@@ -390,7 +391,7 @@ void menu::set_custom_space(float top, float bottom)
 //  and returning any interesting events
 //-------------------------------------------------
 
-const menu::event *menu::process()
+std::pair<const menu::event *, bool> menu::process()
 {
 	// reset the event
 	m_event.iptkey = IPT_INVALID;
@@ -412,6 +413,8 @@ const menu::event *menu::process()
 		container().add_rect(0.0F, 0.0F, 1.0F, 1.0F, rgb_t(114, 0, 0, 0), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	// draw the menu proper
+	// FIXME: this should happen after processing events to fix the egregious latency
+	// The main thing preventing this is that mouse handling is mixed up with drawing
 	draw(m_process_flags);
 
 	// process input
@@ -430,11 +433,11 @@ const menu::event *menu::process()
 	{
 		m_event.itemref = get_selection_ref();
 		m_event.item = &m_items[m_selected];
-		return &m_event;
+		return std::make_pair(&m_event, false);
 	}
 	else
 	{
-		return nullptr;
+		return std::make_pair(nullptr, false);
 	}
 }
 
@@ -1248,8 +1251,13 @@ void menu::validate_selection(int scandir)
     MENU STACK MANAGEMENT
 ***************************************************************************/
 
-void menu::do_handle()
+bool menu::do_handle()
 {
+	bool need_update = false;
+
+	// let OSD do its thing
+	machine().osd().check_osd_inputs();
+
 	// recompute metrics if necessary
 	render_manager &render(machine().render());
 	render_target &target(render.ui_target());
@@ -1260,6 +1268,7 @@ void menu::do_handle()
 		m_last_size = uisize;
 		m_last_aspect = aspect;
 		recompute_metrics(uisize.first, uisize.second, aspect);
+		need_update = true;
 	}
 
 	if (m_items.empty())
@@ -1273,6 +1282,7 @@ void menu::do_handle()
 
 			// let implementation add other items
 			populate();
+			need_update = true;
 		}
 		catch (...)
 		{
@@ -1282,7 +1292,11 @@ void menu::do_handle()
 		}
 		m_rebuilding = false;
 	}
-	handle(process());
+
+	auto [eventptr, changed] = process();
+	need_update = need_update || changed;
+	need_update = handle(eventptr) || need_update;
+	return need_update;
 }
 
 

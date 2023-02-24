@@ -195,7 +195,7 @@ void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 	show_all();
 
 	// run input polling to ensure that our status is in sync
-	downcast<windows_osd_interface&>(machine().osd()).poll_input(*m_machine);
+	downcast<windows_osd_interface&>(machine().osd()).poll_input_modules(false);
 
 	// get and process messages
 	MSG message;

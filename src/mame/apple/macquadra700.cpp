@@ -60,7 +60,7 @@ public:
 		m_floppy(*this, "fdc:%d", 0U),
 		m_rtc(*this,"rtc"),
 		m_scsibus1(*this, "scsi1"),
-		m_ncr1(*this, "scsi1:7:ncr5394"),
+		m_ncr1(*this, "scsi1:7:ncr53c96"),
 		m_sonic(*this, "sonic"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -87,7 +87,7 @@ private:
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<rtc3430042_device> m_rtc;
 	required_device<nscsi_bus_device> m_scsibus1;
-	required_device<ncr53cf94_device> m_ncr1;
+	required_device<ncr53c96_device> m_ncr1;
 	required_device<dp83932c_device> m_sonic;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -768,29 +768,12 @@ TIMER_CALLBACK_MEMBER(macquadra_state::mac_6015_tick)
 
 uint8_t macquadra_state::mac_5396_r(offs_t offset)
 {
-	if (offset < 0x100)
-	{
-		return m_ncr1->read(offset>>4);
-	}
-	else    // pseudo-DMA: read from the FIFO
-	{
-		return m_ncr1->dma_r();
-	}
-
-	// never executed
-	return 0;
+	return m_ncr1->read(offset>>4);
 }
 
 void macquadra_state::mac_5396_w(offs_t offset, uint8_t data)
 {
-	if (offset < 0x100)
-	{
-		m_ncr1->write(offset>>4, data);
-	}
-	else    // pseudo-DMA: write to the FIFO
-	{
-		m_ncr1->dma_w(data);
-	}
+	m_ncr1->write(offset>>4, data);
 }
 
 /***************************************************************************
@@ -805,7 +788,8 @@ void macquadra_state::quadra700_map(address_map &map)
 // 50008000 = Ethernet MAC ID PROM
 // 5000a000 = Sonic (DP83932) ethernet
 // 5000f000 = SCSI cf96, 5000f402 = SCSI #2 cf96
-	map(0x5000f000, 0x5000f401).rw(FUNC(macquadra_state::mac_5396_r), FUNC(macquadra_state::mac_5396_w)).mirror(0x00fc0000);
+	map(0x5000f000, 0x5000f0ff).rw(FUNC(macquadra_state::mac_5396_r), FUNC(macquadra_state::mac_5396_w)).mirror(0x00fc0000);
+	map(0x5000f100, 0x5000f101).rw(m_ncr1, FUNC(ncr53c94_device::dma16_swap_r), FUNC(ncr53c94_device::dma16_swap_w)).mirror(0x00fc0000);
 	map(0x5000c000, 0x5000dfff).rw(FUNC(macquadra_state::mac_scc_r), FUNC(macquadra_state::mac_scc_2_w)).mirror(0x00fc0000);
 	map(0x50014000, 0x50015fff).rw(m_easc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00fc0000);
 	map(0x5001e000, 0x5001ffff).rw(FUNC(macquadra_state::swim_r), FUNC(macquadra_state::swim_w)).mirror(0x00fc0000);
@@ -950,12 +934,12 @@ void macquadra_state::macqd700(machine_config &config)
 	// HACK: Max clock for 5394/96 is 25 MHz, but we underrun the FIFO at that speed.
 	// Likely due to inaccurate 68040 and/or NSCSI bus timings; DAFB documentation is clear that there is
 	// no "magic latch" like the 5380 machines use.
-	NSCSI_CONNECTOR(config, "scsi1:7").option_set("ncr5394", NCR53CF94).clock(50_MHz_XTAL).machine_config(
+	NSCSI_CONNECTOR(config, "scsi1:7").option_set("ncr53c96", NCR53C96).clock(50_MHz_XTAL).machine_config(
 		[this] (device_t *device)
 		{
-			ncr53cf94_device &adapter = downcast<ncr53cf94_device &>(*device);
+			ncr53c96_device &adapter = downcast<ncr53c96_device &>(*device);
 
-			adapter.set_busmd(ncr53cf94_device::BUSMD_0);
+			adapter.set_busmd(ncr53c96_device::BUSMD_1);
 			adapter.irq_handler_cb().set(*this, FUNC(macquadra_state::irq_539x_1_w));
 			adapter.drq_handler_cb().set(*this, FUNC(macquadra_state::drq_539x_1_w));
 		});

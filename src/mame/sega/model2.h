@@ -274,7 +274,7 @@ private:
 	bool m_render_unk = false;
 	bool m_render_mode = false;
 	bool m_render_test_mode = false;
-	int16 m_crtc_xoffset = 0, m_crtc_yoffset = 0;
+	int16_t m_crtc_xoffset = 0, m_crtc_yoffset = 0;
 
 	u32 *geo_process_command( geo_state *geo, u32 opcode, u32 *input, bool *end_code );
 	// geo commands
@@ -660,8 +660,8 @@ public:
 	bitmap_rgb32& destmap() { return m_destmap; }
 
 	void model2_3d_render(triangle *tri, const rectangle &cliprect);
-	void set_xoffset(int16 xoffs) { m_xoffs = xoffs; }
-	void set_yoffset(int16 yoffs) { m_yoffs = yoffs; }
+	void set_xoffset(int16_t xoffs) { m_xoffs = xoffs; }
+	void set_yoffset(int16_t yoffs) { m_yoffs = yoffs; }
 
 	/* checker = 0, textured = 0, transparent = 0 */
 	#define MODEL2_FUNC 0

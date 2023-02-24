@@ -294,11 +294,10 @@ void sdl_osd_interface::init(running_machine &machine)
 }
 
 
-void sdl_osd_interface::input_update()
+void sdl_osd_interface::input_update(bool relative_reset)
 {
 	process_events_buf();
-	poll_inputs();
-	check_osd_inputs();
+	poll_input_modules(relative_reset);
 }
 
 
@@ -418,15 +417,6 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 			break;
 		}
 	}
-}
-
-
-void sdl_osd_interface::poll_inputs()
-{
-	m_keyboard_input->poll_if_necessary();
-	m_mouse_input->poll_if_necessary();
-	m_lightgun_input->poll_if_necessary();
-	m_joystick_input->poll_if_necessary();
 }
 
 

@@ -118,7 +118,7 @@ protected:
 	virtual void device_post_load() override;
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	// MVS-specific devices
 	optional_device<ym2610_device> m_ym;

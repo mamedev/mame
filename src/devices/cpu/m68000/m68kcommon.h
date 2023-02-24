@@ -42,7 +42,9 @@ class m68000_base_device : public cpu_device
 {
 public:
 	enum {
-		AS_CPU_SPACE = 4
+		AS_CPU_SPACE = 4,
+		AS_USER_PROGRAM = 5,
+		AS_USER_OPCODES = 6,
 	};
 
 	static constexpr u8 autovector(int level) { return 0x18 + level; }
@@ -51,27 +53,23 @@ public:
 	void set_cpu_space(int space_id) { m_cpu_space_id = space_id; }
 	void disable_interrupt_mixer() { m_interrupt_mixer = false; }
 	auto reset_cb() { return m_reset_cb.bind(); }
-	template <typename... T> void set_tas_write_callback(T &&... args) { m_tas_write_callback.set(std::forward<T>(args)...); }
 
 	virtual u32 execute_input_lines() const noexcept override { return m_interrupt_mixer ? 8 : 3; } // number of input lines
 	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return m_interrupt_mixer ? inputnum == M68K_IRQ_7 : false; }
 
 	virtual bool supervisor_mode() const noexcept = 0;
+	virtual u16 get_fc() const noexcept = 0;
 
 protected:
 	bool   m_interrupt_mixer = true; /* Indicates whether to put a virtual 8->3 priority mixer on the input lines */
 	int    m_cpu_space_id = AS_CPU_SPACE;    /* CPU space address space id */
 	devcb_write_line m_reset_cb;
-	write8sm_delegate m_tas_write_callback;               /* Called instead of normal write8 by the TAS instruction,
-	                                                        allowing writeback to be disabled globally or selectively
-	                                                        or other side effects to be implemented */
 
 	m68000_base_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, u32 clock) :
 		cpu_device(mconfig, type, tag, owner, clock),
 		m_interrupt_mixer(true),
 		m_cpu_space_id(AS_CPU_SPACE),
-		m_reset_cb(*this),
-		m_tas_write_callback(*this)
+		m_reset_cb(*this)
 	{ }
 };
 

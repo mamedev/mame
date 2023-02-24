@@ -573,9 +573,9 @@ public:
 	{
 	}
 
-	virtual void poll() override
+	virtual void poll(bool relative_reset) override
 	{
-		sdl_device::poll();
+		sdl_device::poll(relative_reset);
 
 #ifdef __APPLE__
 		if (m_keyboard.state[SDL_SCANCODE_CAPSLOCK] && (std::chrono::steady_clock::now() > (m_capslock_pressed + std::chrono::milliseconds(30))))
@@ -655,22 +655,30 @@ class sdl_mouse_device : public sdl_device
 public:
 	sdl_mouse_device(std::string &&name, std::string &&id, input_module &module) :
 		sdl_device(std::move(name), std::move(id), module),
-		m_mouse({0})
+		m_mouse({0}),
+		m_x(0),
+		m_y(0),
+		m_v(0),
+		m_h(0)
 	{
 	}
 
-	virtual void poll() override
+	virtual void poll(bool relative_reset) override
 	{
-		m_mouse.lX = 0;
-		m_mouse.lY = 0;
-		m_mouse.lV = 0;
-		m_mouse.lH = 0;
-		sdl_device::poll();
+		sdl_device::poll(relative_reset);
+		if (relative_reset)
+		{
+			m_mouse.lX = std::exchange(m_x, 0);
+			m_mouse.lY = std::exchange(m_y, 0);
+			m_mouse.lV = std::exchange(m_v, 0);
+			m_mouse.lH = std::exchange(m_h, 0);
+		}
 	}
 
 	virtual void reset() override
 	{
 		memset(&m_mouse, 0, sizeof(m_mouse));
+		m_x = m_y = m_v = m_h = 0;
 	}
 
 	virtual void configure(input_device &device) override
@@ -720,8 +728,8 @@ public:
 		switch (event.type)
 		{
 		case SDL_MOUSEMOTION:
-			m_mouse.lX += event.motion.xrel * input_device::RELATIVE_PER_PIXEL;
-			m_mouse.lY += event.motion.yrel * input_device::RELATIVE_PER_PIXEL;
+			m_x += event.motion.xrel * input_device::RELATIVE_PER_PIXEL;
+			m_y += event.motion.yrel * input_device::RELATIVE_PER_PIXEL;
 			break;
 
 		case SDL_MOUSEBUTTONDOWN:
@@ -734,11 +742,11 @@ public:
 
 		case SDL_MOUSEWHEEL:
 #if SDL_VERSION_ATLEAST(2, 0, 18)
-			m_mouse.lV += event.wheel.preciseY * input_device::RELATIVE_PER_PIXEL;
-			m_mouse.lH += event.wheel.preciseX * input_device::RELATIVE_PER_PIXEL;
+			m_v += event.wheel.preciseY * input_device::RELATIVE_PER_PIXEL;
+			m_h += event.wheel.preciseX * input_device::RELATIVE_PER_PIXEL;
 #else
-			m_mouse.lV += event.wheel.y * input_device::RELATIVE_PER_PIXEL;
-			m_mouse.lH += event.wheel.x * input_device::RELATIVE_PER_PIXEL;
+			m_v += event.wheel.y * input_device::RELATIVE_PER_PIXEL;
+			m_h += event.wheel.x * input_device::RELATIVE_PER_PIXEL;
 #endif
 			break;
 		}
@@ -753,6 +761,7 @@ private:
 	};
 
 	mouse_state m_mouse;
+	s32 m_x, m_y, m_v, m_h;
 };
 
 
@@ -1502,7 +1511,6 @@ public:
 							button_item++,
 							[] (void *device_internal, void *item_internal) -> int
 							{
-								static_cast<device_info *>(device_internal)->module().poll_if_necessary();
 								return (*reinterpret_cast<s32 const *>(item_internal) <= -16'384) ? 1 : 0;
 							},
 							&m_controller.axes[axis]);

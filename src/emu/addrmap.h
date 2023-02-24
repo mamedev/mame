@@ -212,6 +212,60 @@ public:
 	// view initialization
 	void view(memory_view &mv);
 
+
+	// wait-states, implicit base -> delegate converter
+	template <typename T>
+	address_map_entry &before_time(u64 (T::*ws)(offs_t, u64), const char *name)
+	{ m_before_time = ws_time_delegate(*make_pointer<T>(m_devbase), ws, name); return *this; }
+
+	template <typename T>
+	address_map_entry &before_delay(u32 (T::*ws)(offs_t), const char *name)
+	{ m_before_delay = ws_delay_delegate(*make_pointer<T>(m_devbase), ws, name); return *this; }
+
+	template <typename T>
+	address_map_entry &after_delay(u32 (T::*ws)(offs_t), const char *name)
+	{ m_after_delay = ws_delay_delegate(*make_pointer<T>(m_devbase), ws, name); return *this; }
+
+	// wait-states, device tag -> delegate converter
+	template <typename T>
+	address_map_entry &before_time(const char *tag, u64 (T::*ws)(offs_t, u64), const char *name)
+	{ m_before_time = ws_time_delegate(m_devbase, tag, ws, name); return *this; }
+
+	template <typename T>
+	address_map_entry &before_delay(const char *tag, u32 (T::*ws)(offs_t), const char *name)
+	{ m_before_delay = ws_delay_delegate(m_devbase, tag, ws, name); return *this; }
+
+	template <typename T>
+	address_map_entry &after_delay(const char *tag, u32 (T::*ws)(offs_t), const char *name)
+	{ m_after_delay = ws_delay_delegate(m_devbase, tag, ws, name); return *this; }
+
+	// wait-states, device reference -> delegate converter
+	template <typename T, typename U>
+	address_map_entry &before_time(T &obj, u64 (U::*ws)(offs_t, u64), const char *name)
+	{ m_before_time = ws_time_delegate(obj, ws, name); return *this; }
+
+	template <typename T, typename U>
+	address_map_entry &before_delay(T &obj, u32 (U::*ws)(offs_t), const char *name)
+	{ m_before_delay = ws_delay_delegate(obj, ws, name); return *this; }
+
+	template <typename T, typename U>
+	address_map_entry &after_delay(T &obj, u32 (U::*ws)(offs_t), const char *name)
+	{ m_after_delay = ws_delay_delegate(obj, ws, name); return *this; }
+
+	// wait-states, lambda -> delegate converter
+	template <typename T>
+	address_map_entry &before_time(T &&ws, const char *name)
+	{ m_before_time = ws_time_delegate(m_devbase, std::forward<T>(ws), name); return *this; }
+
+	template <typename T>
+	address_map_entry &before_delay(T &&ws, const char *name)
+	{ m_before_delay = ws_delay_delegate(m_devbase, std::forward<T>(ws), name); return *this; }
+
+	template <typename T>
+	address_map_entry &after_delay(T &&ws, const char *name)
+	{ m_after_delay = ws_delay_delegate(m_devbase, std::forward<T>(ws), name); return *this; }
+
+
 	// implicit base -> delegate converter
 	template <typename T, typename Ret, typename... Params>
 	address_map_entry &r(Ret (T::*read)(Params...), const char *read_name)
@@ -374,6 +428,9 @@ public:
 	const char *            m_share;                // tag of a shared memory block
 	const char *            m_region;               // tag of region containing the memory backing this entry
 	offs_t                  m_rgnoffs;              // offset within the region
+	ws_time_delegate        m_before_time;          // before-time wait-state
+	ws_delay_delegate       m_before_delay;         // before-delay wait-state
+	ws_delay_delegate       m_after_delay;          // after-delay wait-state
 
 	// handlers
 	read8_delegate          m_rproto8;              // 8-bit read proto-delegate
