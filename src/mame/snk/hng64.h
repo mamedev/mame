@@ -442,9 +442,7 @@ private:
 
 	void zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
 		gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
-		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard);
-
-	void drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect, gfx_element *gfx, uint32_t code, int flipx, int flipy, int32_t destx, int32_t desty, int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t color, uint32_t zval, bool zrev, bool checkerboard);
+		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic);
 
 	void transition_control(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void setCameraTransformation(const uint16_t* packet);

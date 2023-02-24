@@ -94,8 +94,27 @@ do \
 } \
 while (0)
 
-inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect, gfx_element *gfx, uint32_t code, int flipx, int flipy, int32_t destx, int32_t desty, int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t color, uint32_t zval, bool zrev, bool checkerboard)
+
+void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
+		gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
+		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic)
 {
+	// use pen usage to optimize
+	code %= gfx->elements();
+	if (gfx->has_pen_usage())
+	{
+		// fully transparent; do nothing
+		uint32_t usage = gfx->pen_usage(code);
+		if ((usage & ~(1 << trans_pen)) == 0)
+			return;
+	}
+
+	// render
+	color = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
+
+	if (blend)
+		color |= 0x8000;
+
 	g_profiler.start(PROFILER_DRAWGFX);
 	do {
 		assert(dest.valid());
@@ -247,29 +266,6 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 	g_profiler.stop();
 }
 
-void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
-		gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
-		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard)
-{
-	// use pen usage to optimize
-	code %= gfx->elements();
-	if (gfx->has_pen_usage())
-	{
-		// fully transparent; do nothing
-		uint32_t usage = gfx->pen_usage(code);
-		if ((usage & ~(1 << trans_pen)) == 0)
-			return;
-	}
-
-	// render
-	color = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
-
-	if (blend)
-		color |= 0x8000;
-
-	drawgfxzoom_core(dest, destz, cliprect, gfx, code, flipx, flipy, destx, desty, dx, dy, dstwidth, dstheight, trans_pen, color, zval, zrev, checkerboard);
-}
-
 void hng64_state::get_tile_details(bool chain, uint16_t spritenum, uint8_t xtile, uint8_t ytile, uint8_t xsize, uint8_t ysize, bool xflip, bool yflip, uint32_t& tileno, uint16_t& pal, uint8_t &gfxregion)
 {
 	int offset;
@@ -356,6 +352,8 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 
 		bool blend = (m_spriteram[(currentsprite * 8) + 4] & 0x00800000);
 		bool checkerboard = (m_spriteram[(currentsprite * 8) + 4] & 0x04000000);
+		uint8_t mosaic = (m_spriteram[(currentsprite * 8) + 4] & 0xf0000000) >> 28;
+
 		int yflip = (m_spriteram[(currentsprite * 8) + 4] & 0x01000000) >> 24;
 		int xflip = (m_spriteram[(currentsprite * 8) + 4] & 0x02000000) >> 25;
 
@@ -431,7 +429,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 
 				get_tile_details(chaini, currentsprite, xdrw, ydrw, chainx, chainy, xflip, yflip, tileno, pal, gfxregion);
 
-				zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, m_gfxdecode->gfx(gfxregion), tileno, pal, xflip, yflip, drawx, drawy, dx, dy, dstwidth, dstheight, 0, zval, zsort, blend, checkerboard);
+				zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, m_gfxdecode->gfx(gfxregion), tileno, pal, xflip, yflip, drawx, drawy, dx, dy, dstwidth, dstheight, 0, zval, zsort, blend, checkerboard, mosaic);
 
 				drawx += dstwidth;
 			}
