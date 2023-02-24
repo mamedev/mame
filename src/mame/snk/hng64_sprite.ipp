@@ -270,8 +270,24 @@ void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const r
 	drawgfxzoom_core(dest, destz, cliprect, gfx, code, flipx, flipy, destx, desty, dx, dy, dstwidth, dstheight, trans_pen, color, zval, zrev, checkerboard);
 }
 
-void hng64_state::get_tile_details(bool chain, uint16_t spritenum, uint8_t xtile, uint8_t ytile, uint8_t xsize, bool xflip, uint32_t& tileno, uint16_t& pal, uint8_t &gfxregion)
+void hng64_state::get_tile_details(bool chain, uint16_t spritenum, uint8_t xtile, uint8_t ytile, uint8_t xsize, uint8_t ysize, bool xflip, bool yflip, uint32_t& tileno, uint16_t& pal, uint8_t &gfxregion)
 {
+	int offset;
+	if (!xflip)
+	{
+		if (!yflip)
+			offset = (xtile + (ytile * (xsize + 1)));
+		else
+			offset = (xtile + ((ysize - ytile) * (xsize + 1)));
+	}
+	else
+	{
+		if (!yflip)
+			offset = ((xsize - xtile) + (ytile * (xsize + 1)));
+		else
+			offset = ((xsize - xtile) + ((ysize - ytile) * (xsize + 1)));
+	}
+
 	if (!chain)
 	{
 		tileno = (m_spriteram[(spritenum * 8) + 4] & 0x0007ffff);
@@ -288,23 +304,10 @@ void hng64_state::get_tile_details(bool chain, uint16_t spritenum, uint8_t xtile
 			pal &= 0xf;
 		}
 
-		int offset;
-		if (!xflip)
-			offset = (xtile + (ytile * (xsize + 1)));
-		else
-			offset = ((xsize-xtile) + (ytile * (xsize + 1)));
-
 		tileno += offset;
-
 	}
 	else
 	{
-		int offset;
-		if (!xflip)
-			offset = (xtile + (ytile * (xsize + 1)));
-		else
-			offset = ((xsize-xtile) + (ytile * (xsize + 1)));
-
 		tileno = (m_spriteram[((spritenum + offset) * 8) + 4] & 0x0007ffff);
 		pal = (m_spriteram[((spritenum + offset) * 8) + 3] & 0x00ff0000) >> 16;
 		if (m_spriteregs[0] & 0x00800000) //bpp switch
@@ -390,32 +393,6 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 			dy = zoomy << 4;
 		}
 
-		// calculate the total height
-		uint32_t total_srcpix_y = 0;
-		uint32_t total_dstheight = 0;
-		do
-		{
-			total_srcpix_y += dy;
-			total_dstheight++;
-
-		} while (total_srcpix_y < ((chainy + 1) * 0x100000));
-
-		// calculate the total width
-		uint32_t total_srcpix_x = 0;
-		uint32_t total_dstwidth = 0;
-		do
-		{
-			total_srcpix_x += dx;
-			total_dstwidth++;
-
-		} while (total_srcpix_x < ((chainx + 1) * 0x100000));
-
-		// Accommodate for chaining and flipping
-		if (yflip)
-		{
-			ypos += total_dstheight;
-		}
-
 		int16_t drawy = ypos;
 		uint32_t srcpix_y = 0;
 		for (int ydrw = 0; ydrw <= chainy; ydrw++)
@@ -425,15 +402,11 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 			{
 				srcpix_y += dy;
 				dstheight++;
-
 			} while (srcpix_y < 0x100000);
 			srcpix_y &= 0x0fffff;
 
 			int16_t drawx = xpos;
 			uint32_t srcpix_x = 0;
-
-			if (yflip)
-				drawy -= dstheight;
 
 			for (int xdrw = 0; xdrw <= chainx; xdrw++)
 			{
@@ -442,7 +415,6 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 				{
 					srcpix_x += dx;
 					dstwidth++;
-
 				} while (srcpix_x < 0x100000);
 				srcpix_x &= 0x0fffff;
 
@@ -457,16 +429,14 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 				uint16_t pal;
 				uint8_t gfxregion;
 
-				get_tile_details(chaini, currentsprite, xdrw, ydrw, chainx, xflip, tileno, pal, gfxregion);
+				get_tile_details(chaini, currentsprite, xdrw, ydrw, chainx, chainy, xflip, yflip, tileno, pal, gfxregion);
 
 				zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, m_gfxdecode->gfx(gfxregion), tileno, pal, xflip, yflip, drawx, drawy, dx, dy, dstwidth, dstheight, 0, zval, zsort, blend, checkerboard);
 
 				drawx += dstwidth;
 			}
 
-			if (!yflip)
-				drawy += dstheight;
-
+			drawy += dstheight;
 		}
 		currentsprite = nextsprite;
 	}
