@@ -12,8 +12,13 @@ template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Widt
 
 template<int Width, int AddrShift> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_before_time<Width, AddrShift>::read_interruptible(offs_t offset, uX mem_mask) const
 {
-	u32 tc = m_cpu.total_cycles();
-	if(m_cpu.access_before_time(m_ws(offset, tc), tc))
+	u64 tc = m_cpu.total_cycles();
+	u64 ac = m_ws(offset, tc);
+
+	if(ac < tc)
+		ac = tc;
+
+	if(m_cpu.access_before_time(ac, tc))
 		return 0;
 
 	return this->m_next->read_interruptible(offset, mem_mask);
@@ -47,8 +52,13 @@ template<int Width, int AddrShift> void handler_entry_write_before_time<Width, A
 
 template<int Width, int AddrShift> void handler_entry_write_before_time<Width, AddrShift>::write_interruptible(offs_t offset, uX data, uX mem_mask) const
 {
-	u32 tc = m_cpu.total_cycles();
-	if(m_cpu.access_before_time(m_ws(offset, tc), tc))
+	u64 tc = m_cpu.total_cycles();
+	u64 ac = m_ws(offset, tc);
+
+	if(ac < tc)
+		ac = tc;
+
+	if(m_cpu.access_before_time(ac, tc))
 		return;
 	this->m_next->write_interruptible(offset, data, mem_mask);
 }
@@ -131,7 +141,7 @@ template<int Width, int AddrShift> u16 handler_entry_read_before_delay<Width, Ad
 
 template<int Width, int AddrShift> std::string handler_entry_read_before_delay<Width, AddrShift>::name() const
 {
-	return util::string_format("(bt %s) %s", m_ws.name(), this->m_next->name());
+	return util::string_format("(bd %s) %s", m_ws.name(), this->m_next->name());
 }
 
 template<int Width, int AddrShift> handler_entry_read_before_delay<Width, AddrShift> *handler_entry_read_before_delay<Width, AddrShift>::instantiate(handler_entry_read<Width, AddrShift> *next) const
@@ -164,7 +174,7 @@ template<int Width, int AddrShift> u16 handler_entry_write_before_delay<Width, A
 
 template<int Width, int AddrShift> std::string handler_entry_write_before_delay<Width, AddrShift>::name() const
 {
-	return util::string_format("(bt %s) %s", m_ws.name(), this->m_next->name());
+	return util::string_format("(bd %s) %s", m_ws.name(), this->m_next->name());
 }
 
 
@@ -229,7 +239,7 @@ template<int Width, int AddrShift> u16 handler_entry_read_after_delay<Width, Add
 
 template<int Width, int AddrShift> std::string handler_entry_read_after_delay<Width, AddrShift>::name() const
 {
-	return util::string_format("(bt %s) %s", m_ws.name(), this->m_next->name());
+	return util::string_format("(ad %s) %s", m_ws.name(), this->m_next->name());
 }
 
 template<int Width, int AddrShift> handler_entry_read_after_delay<Width, AddrShift> *handler_entry_read_after_delay<Width, AddrShift>::instantiate(handler_entry_read<Width, AddrShift> *next) const
@@ -261,7 +271,7 @@ template<int Width, int AddrShift> u16 handler_entry_write_after_delay<Width, Ad
 
 template<int Width, int AddrShift> std::string handler_entry_write_after_delay<Width, AddrShift>::name() const
 {
-	return util::string_format("(bt %s) %s", m_ws.name(), this->m_next->name());
+	return util::string_format("(ad %s) %s", m_ws.name(), this->m_next->name());
 }
 
 

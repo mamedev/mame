@@ -95,6 +95,7 @@ protected:
 	const char *get_feature(std::string_view feature_name) { return m_exp ? m_exp->get_feature(feature_name) : nullptr; }
 	bool is_loaded_through_softlist() { return m_exp ? m_exp->loaded_through_softlist() : false; }
 	DECLARE_WRITE_LINE_MEMBER(irq_out);
+	msx_slot_cartridge_device *parent_slot() const { return m_exp; }
 	address_space &memory_space() const;
 	address_space &io_space() const;
 	cpu_device &maincpu() const;

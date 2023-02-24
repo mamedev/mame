@@ -26,14 +26,19 @@
     no dips
 
     TODO:
+    general:
     - everything is guesswork and should be taken with a grain of salt, especially the M66220FP hook up;
     - are the correct sounds played at the right times?
-    - hopper / medal (main roadblock before it can be considered playable);
+    sbmjb:
     - at boot the game zero-fills the 0x020000-0x020fff range in the tc0091lvc VRAM space, which is currently unmapped in tc009xlvc.cpp.
       Doesn't seem to use it afterwards, though.
+    - hopper / medal (main roadblock before it can be considered playable);
+    honooinv:
+    - almost immediately stops with 'coin in time out error'
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/tc009xlvc.h"
 #include "machine/te7750.h"
@@ -41,6 +46,7 @@
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -134,6 +140,28 @@ static INPUT_PORTS_START( sbmjb ) // no dips on PCB, game options selectable in 
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN ) // No effect in test mode
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( honooinv ) // no dips on PCB, game options selectable in test mode
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 
 TIMER_DEVICE_CALLBACK_MEMBER(sbmjb_state::scanline_callback) // TODO: copy-pasted from other drivers using same chip, to be verified
 {
@@ -213,7 +241,30 @@ ROM_START( sbmjb ) // all labels were peeled off / unreadable
 	ROM_LOAD( "e41-03.ic24", 0x200, 0x117, CRC(d906c8ea) SHA1(eae9c9c25b4affe4baf7ba034c61670d24f5c4d1) )
 ROM_END
 
-} // Anonymous namespace
+ROM_START( honooinv )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "e41-08.ic12", 0x00000, 0x10000, CRC(71fc6a58) SHA1(8e95f42fa227e7bbf80dc7690a016f5e43a8125d) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "e41-07.ic5", 0x00000, 0x10000, CRC(0f1faa0b) SHA1(ff8a242507207be3ced2a77705b24a5b6dd1189c) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "vdpcpu", 0 )
+	ROM_LOAD( "e41-04.ic52", 0x00000, 0x80000, CRC(2e236b65) SHA1(4c5dda35d083742ad708d575e1d8cd158fa89210) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x100000, "vdpcpu:gfx", 0 )
+	ROM_LOAD16_BYTE( "e41-05.ic49", 0x00000, 0x80000, CRC(493ddfac) SHA1(b37ac65c08dda284e15446bdc545cca889e03ba7) )
+	ROM_LOAD16_BYTE( "e41-06.ic48", 0x00001, 0x80000, CRC(edb38f82) SHA1(d94f05f96a7acdb9e3c98646cbdd797fdc3b92b7) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "e41-09.ic3", 0x00000, 0x40000, CRC(5d25fb77) SHA1(b474be05cdb2e57632595caee7f8c27572db8935) )
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "e41-02.ic51", 0x000, 0x117, CRC(67fd54e0) SHA1(f64fb33b9a4a935af5662b5103709131727c8411) )
+	ROM_LOAD( "e41-03.ic24", 0x200, 0x117, CRC(d906c8ea) SHA1(eae9c9c25b4affe4baf7ba034c61670d24f5c4d1) )
+ROM_END
+
+} // anonymous namespace
 
 
-GAME( 1998, sbmjb, 0, sbmjb, sbmjb, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Sonic Blast Man's Janken Battle (main ver. 1.1, video ver. 1.0)", MACHINE_NOT_WORKING )
+GAME( 1998, sbmjb,    0, sbmjb, sbmjb,    sbmjb_state, empty_init, ROT0, "Taito Corporation", "Sonic Blast Man's Janken Battle (main ver. 1.1, video ver. 1.0)", MACHINE_NOT_WORKING )
+GAME( 1997, honooinv, 0, sbmjb, honooinv, sbmjb_state, empty_init, ROT0, "Taito Corporation", "Honoo no Invader",                                                MACHINE_NOT_WORKING )

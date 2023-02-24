@@ -175,7 +175,6 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_font()
 	, m_handler_callback()
 	, m_handler_callback_type(ui_callback_type::GENERAL)
-	, m_handler_param(0)
 	, m_single_step(false)
 	, m_showfps(false)
 	, m_showfps_end(0)
@@ -184,6 +183,8 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_mouse_bitmap(32, 32)
 	, m_mouse_arrow_texture(nullptr)
 	, m_mouse_show(false)
+	, m_mouse_target(-1)
+	, m_mouse_position(0, 0)
 	, m_target_font_height(0)
 	, m_has_warnings(false)
 	, m_unthrottle_mute(false)
@@ -439,17 +440,17 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 			{
 				// if the user cancels, exit out completely
 				machine().schedule_exit();
-				return UI_HANDLER_CANCEL;
+				return HANDLER_CANCEL;
 			}
 			else if (machine().ui_input().pressed(IPT_UI_MENU))
 			{
 				config_menu = true;
-				return UI_HANDLER_CANCEL;
+				return HANDLER_CANCEL;
 			}
 			else if (poller.poll() != INPUT_CODE_INVALID)
 			{
 				// if any key is pressed, just exit
-				return UI_HANDLER_CANCEL;
+				return HANDLER_CANCEL;
 			}
 
 			return 0;
@@ -632,7 +633,7 @@ void mame_ui_manager::set_startup_text(const char *text, bool force)
 //  render it; called by video.c
 //-------------------------------------------------
 
-void mame_ui_manager::update_and_render(render_container &container)
+bool mame_ui_manager::update_and_render(render_container &container)
 {
 	// always start clean
 	container.empty();
@@ -668,7 +669,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 		mame_machine_manager::instance()->cheat().render_text(*this, container);
 
 	// call the current UI handler
-	m_handler_param = m_handler_callback(container);
+	uint32_t const handler_result = m_handler_callback(container);
 
 	// display any popup messages
 	if (osd_ticks() < m_popup_text_end)
@@ -677,28 +678,42 @@ void mame_ui_manager::update_and_render(render_container &container)
 		m_popup_text_end = 0;
 
 	// display the internal mouse cursor
+	bool mouse_moved = false;
 	if (m_mouse_show || (is_menu_active() && machine().options().ui_mouse()))
 	{
 		int32_t mouse_target_x, mouse_target_y;
 		bool mouse_button;
-		render_target *mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
+		render_target *const mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
 
-		if (mouse_target != nullptr)
+		float mouse_y = -1, mouse_x = -1;
+		if (mouse_target && mouse_target->map_point_container(mouse_target_x, mouse_target_y, container, mouse_x, mouse_y))
 		{
-			float mouse_y=-1,mouse_x=-1;
-			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, container, mouse_x, mouse_y))
+			const float cursor_size = 0.6 * get_line_height();
+			container.add_quad(mouse_x, mouse_y, mouse_x + cursor_size * container.manager().ui_aspect(&container), mouse_y + cursor_size, colors().text_color(), m_mouse_arrow_texture, PRIMFLAG_ANTIALIAS(1) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			if ((m_mouse_target != mouse_target->index()) || (std::make_pair(mouse_x, mouse_y) != m_mouse_position))
 			{
-				const float cursor_size = 0.6 * get_line_height();
-				container.add_quad(mouse_x, mouse_y, mouse_x + cursor_size * container.manager().ui_aspect(&container), mouse_y + cursor_size, colors().text_color(), m_mouse_arrow_texture, PRIMFLAG_ANTIALIAS(1) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				m_mouse_target = mouse_target->index();
+				m_mouse_position = std::make_pair(mouse_x, mouse_y);
+				mouse_moved = true;
 			}
 		}
+		else if (0 <= m_mouse_target)
+		{
+			m_mouse_target = -1;
+			mouse_moved = true;
+		}
+	}
+	else if (0 <= m_mouse_target)
+	{
+		m_mouse_target = -1;
+		mouse_moved = true;
 	}
 
-	// cancel takes us back to the ingame handler
-	if (m_handler_param == UI_HANDLER_CANCEL)
-	{
+	// cancel takes us back to the in-game handler
+	if (handler_result & HANDLER_CANCEL)
 		set_handler(ui_callback_type::GENERAL, handler_callback_func(&mame_ui_manager::handler_ingame, this));
-	}
+
+	return mouse_moved || (handler_result & HANDLER_UPDATE);
 }
 
 
@@ -1239,6 +1254,9 @@ void mame_ui_manager::image_handler_ingame()
 
 uint32_t mame_ui_manager::handler_ingame(render_container &container)
 {
+	// let the OSD do its thing first
+	machine().osd().check_osd_inputs();
+
 	bool is_paused = machine().paused();
 
 	// first draw the FPS counter

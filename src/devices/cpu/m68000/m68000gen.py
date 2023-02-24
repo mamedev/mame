@@ -2095,6 +2095,9 @@ def generate_source_from_code(code, gen_mode):
                     ssw += " | SSW_CRITICAL"
                 ssw += ";"
                 source.append(ssw)
+                is_interrupt_vector_lookup = not ci[4] and ci[2] == 2
+                if is_interrupt_vector_lookup:
+                    source.append("\tstart_interrupt_vector_lookup();")
                 if not (gen_mode & GEN.full):
                     source.append("\t[[fallthrough]]; case %d:" % (ci[1]))
                 if ci[4]:
@@ -2119,12 +2122,10 @@ def generate_source_from_code(code, gen_mode):
                 else:
                     if ci[2] == 2:
                         # cpu space access, e.g. interrupt vector lookup
-                        source.append("\tstart_interrupt_vector_lookup();")
                         if gen_mode & GEN.direct:
                             source.append("\tm_edb = m_cpu_space.read_interruptible(m_aob);")
                         else:
                             source.append("\tm_edb = m_mmu->read_cpu(m_aob, 0xffff);")
-                        source.append("\tend_interrupt_vector_lookup();")
                     elif ci[3]:
                         if gen_mode & GEN.direct:
                             source.append("\tm_edb = %s.read_interruptible(m_aob & ~1, m_aob & 1 ? 0x00ff : 0xff00);" % (["m_opcodes", "m_program"][ci[2]]))
@@ -2138,16 +2139,35 @@ def generate_source_from_code(code, gen_mode):
                         else:
                             source.append("\tm_edb = m_mmu->read_%s(m_aob & ~1, 0xffff);" % (["program", "data"][ci[2]]))
                 source.append("\tm_icount -= 4;")
-                source.append("\tif(m_icount <= %s) {" % ("m_bcount" if gen_mode & GEN.mcu else "0"))
-                source.append("\t\tif(access_to_be_redone()) {")
-                source.append("\t\t\tm_icount += 4;")
-                source.append("\t\t\tm_inst_substate = %d;" % ci[1])
-                source.append("\t\t} else")
-                source.append("\t\t\tm_inst_substate = %d;" % (ci[1]+1))
-                source.append("\t\treturn;")
-                source.append("\t}")
+                if ci[8]:
+                    if ci[4]:
+                        source.append("\tif(m_icount <= %s) {" % ("m_bcount" if gen_mode & GEN.mcu else "0"))
+                        source.append("\t\tif(access_to_be_redone()) {")
+                        source.append("\t\t\tm_icount += 4;")
+                        source.append("\t\t\tm_inst_substate = %d;" % (ci[1]-2))
+                        source.append("\t\t} else")
+                        source.append("\t\t\tm_inst_substate = %d;" % (ci[1]+1))
+                        source.append("\t\treturn;")
+                        source.append("\t}")
+                    else:
+                        source.append("\tif(m_icount <= %s && access_to_be_redone()) {" % ("m_bcount" if gen_mode & GEN.mcu else "0"))
+                        source.append("\t\tm_icount += 4;")
+                        source.append("\t\tm_inst_substate = %d;" % ci[1])
+                        source.append("\t\treturn;")
+                        source.append("\t}")
+                else:
+                    source.append("\tif(m_icount <= %s) {" % ("m_bcount" if gen_mode & GEN.mcu else "0"))
+                    source.append("\t\tif(access_to_be_redone()) {")
+                    source.append("\t\t\tm_icount += 4;")
+                    source.append("\t\t\tm_inst_substate = %d;" % ci[1])
+                    source.append("\t\t} else")
+                    source.append("\t\t\tm_inst_substate = %d;" % (ci[1]+1))
+                    source.append("\t\treturn;")
+                    source.append("\t}")
                 if not (gen_mode & GEN.full):
                     source.append("\t[[fallthrough]]; case %d:" % (ci[1]+1))
+                if is_interrupt_vector_lookup:
+                    source.append("\tend_interrupt_vector_lookup();")
                 if not ci[3]:
                     source.append("\tif(m_aob & 1) {")
                     source.append("\t\tm_icount -= 4;")
@@ -2159,7 +2179,7 @@ def generate_source_from_code(code, gen_mode):
             elif ci[0] == "=":
                 source.append("\t%s = %s;" % (regname[ci[1]], make_expression(ci[2:])))
             elif ci[0] == "=sr":
-                source.append("\t%s = %s & (SR_CCR|SR_SR);" % (regname[ci[1]], make_expression(ci[2:])))
+                source.append("\t%s = m_isr = %s & (SR_CCR|SR_SR);" % (regname[ci[1]], make_expression(ci[2:])))
                 source.append("\tupdate_user_super();")
                 source.append("\tupdate_interrupt();")
             elif ci[0] == "=sri7":
@@ -2169,7 +2189,7 @@ def generate_source_from_code(code, gen_mode):
                 source.append("\t%s = (%s & ~SR_I) | ((m_next_state >> 16) & SR_I);" % (regname[R.sr], regname[R.sr]))
                 source.append("\tupdate_interrupt();")
             elif ci[0] == "=ccr":
-                source.append("\t%s = (%s & SR_CCR) | (%s & SR_SR);" % (regname[ci[1]], make_expression(ci[2:]), regname[ci[1]]))
+                source.append("\t%s = m_isr = (%s & SR_CCR) | (%s & SR_SR);" % (regname[ci[1]], make_expression(ci[2:]), regname[ci[1]]))
             elif ci[0] == "=8":
                 source.append("\tset_8(%s, %s);" % (regname[ci[1]], make_expression(ci[2:])))
             elif ci[0] == "=8h":
@@ -2285,6 +2305,7 @@ def generate_source_file(fname, cmd, gen_mode):
     print("//", file=out)
     print("// Generated by m68000gen.py %s"  % cmd, file=out)
     print("", file=out)
+    print("#include \"emu.h\"", file=out)
     print("#include \"m68000.h\"", file=out)
     print("", file=out)
 
@@ -2364,6 +2385,7 @@ if sys.argv[1] == 'decode':
     print("//", file=out)
     print("// Generated by m68000gen.py %s" % ' '.join(sys.argv[1:]), file=out)
     print("", file=out)
+    print("#include \"emu.h\"", file=out)
     print("#include \"m68000.h\"", file=out)
     print("", file=out)
     print("const m68000_device::decode_entry m68000_device::s_packed_decode_table[] = {", file=out)

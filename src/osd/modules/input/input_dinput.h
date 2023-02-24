@@ -160,7 +160,7 @@ public:
 			LPCDIDATAFORMAT format);
 
 	void reset() override;
-	void poll() override;
+	void poll(bool relative_reset) override;
 	void configure(input_device &device) override;
 
 private:

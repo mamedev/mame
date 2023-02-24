@@ -294,11 +294,10 @@ void sdl_osd_interface::init(running_machine &machine)
 }
 
 
-void sdl_osd_interface::input_update()
+void sdl_osd_interface::input_update(bool relative_reset)
 {
 	process_events_buf();
-	poll_input_modules();
-	check_osd_inputs();
+	poll_input_modules(relative_reset);
 }
 
 
