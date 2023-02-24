@@ -4,6 +4,27 @@
 
 Sprinter Sp2000 (Peters Plus Ltd)
 
+Hardware:
+- CPU                   Z84C15 (21MHz/3.5MHz)
+- RAM                   4Mb (64Mb)
+- Fast RAM              64Kb
+- ROM                   256Kb
+- Video RAM             256Kb (512Kb)
+- FDD controller        WD1793
+- Support FDD:          3,5" disk (1.44Mb/720Kb) / 5,25" disk (720Kb)
+- CMOS                  DALLAS
+- HDD controller        IDE/AT
+- Keyboard controler    101key/AT
+- Mouse controller      MS-Mouse
+- Slots                 ISA-8
+- Audio out             AY-3-8910 (in PLD), Stereo 8 bit (16 bit)
+- Video out             TV, CGA analog monitor, RGB
+- Graphic mode          320x256x256, 640x256x16, Spectrum standard screen
+- Text mode             80x32x16
+
+Refs:
+	https://web.archive.org/web/20030208004427/http://www.petersplus.com/sprinter/
+
 *******************************************************************************************/
 
 #include "emu.h"
@@ -110,8 +131,6 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(irq_on) override;
 	TIMER_CALLBACK_MEMBER(irq_off) override;
-	TIMER_CALLBACK_MEMBER(wait_on);
-	TIMER_CALLBACK_MEMBER(wait_off);
 	TIMER_CALLBACK_MEMBER(cbl_tick);
 
 	void sprinter_palette(palette_device &palette) const;
@@ -121,8 +140,6 @@ protected:
 	std::pair<u8, u8> get_scroll(u32 offset);
 
 	required_device<z84c015_device> m_maincpu;
-	emu_timer *m_wait_on_timer = nullptr;
-	emu_timer *m_wait_off_timer = nullptr;
 
 private:
 
@@ -189,7 +206,6 @@ private:
 	u16 m_pages[4] = {}; // internal state for faster calculations
 
 	bool m_z80_m1;
-	u16 m_timer_overlap;
 	std::list<std::pair<u16, u16>> m_ints;
 
 	u8 m_conf;
@@ -408,6 +424,7 @@ void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bi
 		u8* mode = nullptr;
 		u16 pal, x;
 		u8 y;
+		bool lowres = 0;
 		std::pair<u8, u8> scroll;
 		u16 *pix = &(bitmap.pix(vpos, cliprect.left()));
 
@@ -439,7 +456,8 @@ void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bi
 					{
 						x = (BIT(mode[0], 0, 4) << 6) | (BIT(mode[1], 0, 3) << 3);
 						y = BIT(mode[1], 3, 5) << 3;
-						if (BIT(mode[2], 2))
+						lowres = BIT(mode[2], 2);
+						if (lowres)
 						{
 							x += 4 * BIT(mode[2], 0);
 							y += 4 * BIT(mode[2], 1);
@@ -455,7 +473,7 @@ void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bi
 			}
 			else
 			{
-				const u8 color = m_vram[(y + ((b8 & 7) >> BIT(mode[2], 2))) * 1024 + x + ((a16 & 15) >> (1 + BIT(mode[2], 2)))];
+				const u8 color = m_vram[(y + ((b8 & 7) >> lowres)) * 1024 + x + ((a16 & 15) >> (1 + lowres))];
 				*pix++ = pal + (BIT(mode[0], 5) ? color : ((a16 & 1) ? (color & 0x0f) : (color >> 4)));
 			}
 		}
@@ -473,7 +491,7 @@ std::pair<u8, u8> sprinter_state::get_scroll(u32 offset)
 			if ((mode[0] & 0x14) == 0x04)
 				return { mode[3] & 0x0f, mode[3] >> 4 };
 		}
-		ref += 0x20000;
+		ref += 56 * 2 * 1024;
 	}
 
 	return { 0, 0 };
@@ -1178,7 +1196,6 @@ void sprinter_state::machine_start()
 	save_item(NAME(m_ram_pages));
 	save_item(NAME(m_pages));
 	save_item(NAME(m_z80_m1));
-	save_item(NAME(m_timer_overlap));
 	save_item(NAME(m_conf));
 	save_item(NAME(m_conf_loading));
 	save_item(NAME(m_starting));
@@ -1248,10 +1265,7 @@ void sprinter_state::machine_start()
 
 void sprinter_state::machine_reset()
 {
-	m_wait_on_timer->adjust(attotime::never);
-	m_wait_off_timer->adjust(attotime::never);
 	m_cbl_timer->adjust(attotime::never);
-	m_timer_overlap = 0;
 
 	spectrum_128_state::machine_reset();
 
@@ -1305,8 +1319,6 @@ void sprinter_state::video_start()
 	m_contention_pattern = {};
 	init_taps();
 
-	m_wait_on_timer = timer_alloc(FUNC(sprinter_state::wait_on), this);
-	m_wait_off_timer = timer_alloc(FUNC(sprinter_state::wait_off), this);
 	m_cbl_timer = timer_alloc(FUNC(sprinter_state::cbl_tick), this);
 }
 
@@ -1331,16 +1343,10 @@ void sprinter_state::do_cpu_wait(bool is_io)
 {
 	if ((m_turbo && m_turbo_hard))
 	{
-		const u8 count = is_io ? 4 : 3;
-		//const bool is_overlap_started = !m_timer_overlap;
+		u8 count = is_io ? 4 : 3;
 		const u8 over = m_maincpu->total_cycles() % count;
-		m_timer_overlap /*+*/= count + (over ? (count - over) : 0);
-		//if (m_timer_overlap <= (m_maincpu->cycles_remaining() - count))
-		//{
-			m_maincpu->adjust_icount(-m_timer_overlap);
-			m_timer_overlap = 0;
-		//} else if (is_overlap_started)
-		//	m_wait_on_timer->adjust(attotime::zero);
+		count = count + (over ? (count - over) : 0);
+		m_maincpu->adjust_icount(-count);
 	}
 }
 
@@ -1354,18 +1360,6 @@ TIMER_CALLBACK_MEMBER(sprinter_state::irq_on)
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_off)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-}
-
-TIMER_CALLBACK_MEMBER(sprinter_state::wait_on)
-{
-	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
-	m_wait_off_timer->adjust(m_maincpu->cycles_to_attotime(m_timer_overlap));
-}
-
-TIMER_CALLBACK_MEMBER(sprinter_state::wait_off)
-{
-	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
-	m_timer_overlap = 0;
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
