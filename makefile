@@ -79,7 +79,6 @@
 # MESA_INSTALL_ROOT = /opt/mesa
 # SDL_INSTALL_ROOT = /opt/sdl2
 # SDL_FRAMEWORK_PATH = $(HOME)/Library/Frameworks
-# ANDROID_SDL_HOME = /opt/sdl2-android
 # USE_LIBSDL = 1
 # CYGWIN_BUILD = 1
 
@@ -817,10 +816,6 @@ ifdef SDL_INSTALL_ROOT
 PARAMS += --SDL_INSTALL_ROOT='$(SDL_INSTALL_ROOT)'
 endif
 
-ifdef ANDROID_SDL_HOME
-PARAMS += --ANDROID_SDL_HOME='$(ANDROID_SDL_HOME)'
-endif
-
 ifdef SDL_FRAMEWORK_PATH
 PARAMS += --SDL_FRAMEWORK_PATH='$(SDL_FRAMEWORK_PATH)'
 endif
@@ -1186,8 +1181,8 @@ android-ndk:
 ifndef ANDROID_NDK_HOME
 	$(error ANDROID_NDK_HOME is not set)
 endif
-ifndef ANDROID_SDL_HOME
-	$(error ANDROID_SDL_HOME is not set)
+ifndef SDL_INSTALL_ROOT
+	$(error SDL_INSTALL_ROOT is not set)
 endif
 ifeq ($(OS),windows)
 	$(eval CLANG_VERSION := $(shell $(ANDROID_NDK_HOME)/toolchains/llvm/prebuilt/windows-x86_64/bin/clang -dumpversion 2> /dev/null))

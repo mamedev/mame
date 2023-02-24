@@ -107,6 +107,10 @@ if BASE_TARGETOS=="unix" then
 				backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL2::'"),
 			}
 		end
+	elseif _OPTIONS["targetos"]=="android" then
+		buildoptions {
+			backtick(sdlconfigcmd() .. " --cflags | sed 's:/SDL2::'"),
+		}
 	else
 		buildoptions {
 			backtick(sdlconfigcmd() .. " --cflags"),
@@ -150,10 +154,6 @@ elseif _OPTIONS["targetos"]=="freebsd" then
 	buildoptions {
 		-- /usr/local/include is not considered a system include director on FreeBSD.  GL.h resides there and throws warnings
 		"-isystem /usr/local/include",
-	}
-elseif _OPTIONS["targetos"]=="android" then
-	includedirs {
-		_OPTIONS["ANDROID_SDL_HOME"] .. "/inc",
 	}
 end
 
