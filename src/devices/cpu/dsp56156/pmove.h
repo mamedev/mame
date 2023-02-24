@@ -20,7 +20,7 @@ public:
 	virtual ~ParallelMove() {}
 
 	virtual bool decode(const uint16_t word0, const uint16_t word1) = 0;
-	virtual void disassemble(std::string& retString) const = 0;
+	virtual std::string disassemble() const = 0;
 	virtual void evaluate() = 0;
 
 	static std::unique_ptr<ParallelMove> decodeParallelMove(const Opcode* opc, const uint16_t word0, const uint16_t word1);
@@ -70,9 +70,9 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = m_source + "," + m_destination;
+		return m_source + "," + m_destination;
 	}
 	void evaluate() override {}
 
@@ -112,9 +112,9 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = m_source + "," + m_destination;
+		return m_source + "," + m_destination;
 	}
 	void evaluate() override {}
 
@@ -163,9 +163,9 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = parallelMove + " " + parallelMove2;
+		return parallelMove + " " + parallelMove2;
 	}
 	void evaluate() override {}
 
@@ -210,13 +210,13 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		// (?,?) is a parallel nop
 		if (m_source == iWEIRD && m_destination == iWEIRD)
-			retString = "";
+			return "";
 		else
-			retString = regIdAsString(m_source) + "," + regIdAsString(m_destination);
+			return regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate() override {}
 
@@ -253,9 +253,9 @@ public:
 		pms2 = util::string_format("%s,%s", regIdAsString(S), regIdAsString(Dnot));
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = pms + " " + pms2;
+		return pms + " " + pms2;
 	}
 	void evaluate() override {}
 
@@ -282,9 +282,9 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = m_ea;
+		return m_ea;
 	}
 	void evaluate() override {}
 
@@ -313,9 +313,9 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = m_source + "," + m_destination;
+		return m_source + "," + m_destination;
 	}
 	void evaluate() override {}
 

@@ -32,10 +32,8 @@ std::string Opcode::disassemble() const
 		return dcString();
 
 	// Disassemble what you can.
-	std::string opString = "";
-	std::string pmString = "";
-	if (m_instruction) m_instruction->disassemble(opString);
-	if (m_parallelMove) m_parallelMove->disassemble(pmString);
+	auto opString = m_instruction ? m_instruction->disassemble() : "";
+	auto pmString = m_parallelMove ? m_parallelMove->disassemble() : "";
 
 	return opString + " " + pmString;
 }
