@@ -2354,30 +2354,24 @@ void xinput_turntable_device::poll(bool relative_reset)
 		// translate axes
 		m_axes[AXIS_TURNTABLE] = s32(thumb_left_y()) * input_device::RELATIVE_PER_PIXEL * 2;
 		m_axes[AXIS_CROSSFADE] = normalize_absolute_axis(thumb_right_y(), XINPUT_AXIS_MINVALUE, XINPUT_AXIS_MAXVALUE);
-
-		// handle effect dial
-		if (was_reset)
-		{
-			// just grab the current count after regaining focus
-			m_prev_effect = u16(thumb_right_x());
-		}
-		else if (relative_reset)
-		{
-			// convert value to relative displacement
-			s32 effect_delta = s32(u32(u16(thumb_right_x()))) - s32(u32(m_prev_effect));
-			m_prev_effect = u16(thumb_right_x());
-			if (0x8000 < effect_delta)
-				effect_delta -= 0x1'0000;
-			else if (-0x8000 > effect_delta)
-				effect_delta += 0x1'0000;
-			m_axes[AXIS_EFFECT] = effect_delta * input_device::RELATIVE_PER_PIXEL / 128;
-		}
 	}
-	else
+
+	// handle effect dial
+	if (was_reset)
 	{
-		// we know nothing changed so we can skip most of the logic
+		// just grab the current count after regaining focus
 		m_prev_effect = u16(thumb_right_x());
-		m_axes[AXIS_EFFECT] = 0;
+	}
+	else if (relative_reset)
+	{
+		// convert value to relative displacement
+		s32 effect_delta = s32(u32(u16(thumb_right_x()))) - s32(u32(m_prev_effect));
+		m_prev_effect = u16(thumb_right_x());
+		if (0x8000 < effect_delta)
+			effect_delta -= 0x1'0000;
+		else if (-0x8000 > effect_delta)
+			effect_delta += 0x1'0000;
+		m_axes[AXIS_EFFECT] = effect_delta * input_device::RELATIVE_PER_PIXEL / 128;
 	}
 }
 
