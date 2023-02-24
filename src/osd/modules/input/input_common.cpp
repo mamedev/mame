@@ -286,16 +286,16 @@ void input_module_base::input_init(running_machine &machine)
 	m_manager = &machine.input();
 }
 
-void input_module_base::poll_if_necessary()
+void input_module_base::poll_if_necessary(bool relative_reset)
 {
 	timepoint_type const now = m_clock.now();
-	if (now >= (m_last_poll + std::chrono::milliseconds(MIN_POLLING_INTERVAL)))
+	if (relative_reset || (now >= (m_last_poll + std::chrono::milliseconds(MIN_POLLING_INTERVAL))))
 	{
 		// grab the current time
 		m_last_poll = now;
 
 		before_poll();
 
-		poll();
+		poll(relative_reset);
 	}
 }

@@ -49,46 +49,47 @@ menu_selector::~menu_selector()
 //  handle
 //-------------------------------------------------
 
-void menu_selector::handle(event const *ev)
+bool menu_selector::handle(event const *ev)
 {
-	// process the menu
-	if (ev)
+	if (!ev)
+		return false;
+
+	switch (ev->iptkey)
 	{
-		switch (ev->iptkey)
+	case IPT_UI_SELECT:
+		if (ev->itemref)
 		{
-		case IPT_UI_SELECT:
-			if (ev->itemref)
-			{
-				int selection(-1);
-				for (size_t idx = 0; (m_str_items.size() > idx) && (0 > selection); ++idx)
-					if ((void*)&m_str_items[idx] == ev->itemref)
-						selection = int(unsigned(idx));
+			int selection(-1);
+			for (size_t idx = 0; (m_str_items.size() > idx) && (0 > selection); ++idx)
+				if ((void*)&m_str_items[idx] == ev->itemref)
+					selection = int(unsigned(idx));
 
-				m_handler(selection);
-				stack_pop();
-			}
-			break;
-
-		case IPT_UI_PASTE:
-			if (paste_text(m_search, uchar_is_printable))
-				reset(reset_options::SELECT_FIRST);
-			break;
-
-		case IPT_SPECIAL:
-			if (input_character(m_search, ev->unichar, uchar_is_printable))
-				reset(reset_options::SELECT_FIRST);
-			break;
-
-		case IPT_UI_CANCEL:
-			if (!m_search.empty())
-			{
-				// escape pressed with non-empty search text clears the search text
-				m_search.clear();
-				reset(reset_options::SELECT_FIRST);
-			}
-			break;
+			m_handler(selection);
+			stack_pop();
 		}
+		break;
+
+	case IPT_UI_PASTE:
+		if (paste_text(m_search, uchar_is_printable))
+			reset(reset_options::SELECT_FIRST);
+		break;
+
+	case IPT_SPECIAL:
+		if (input_character(m_search, ev->unichar, uchar_is_printable))
+			reset(reset_options::SELECT_FIRST);
+		break;
+
+	case IPT_UI_CANCEL:
+		if (!m_search.empty())
+		{
+			// escape pressed with non-empty search text clears the search text
+			m_search.clear();
+			reset(reset_options::SELECT_FIRST);
+		}
+		break;
 	}
+
+	return false; // any changes will trigger an item reset
 }
 
 //-------------------------------------------------

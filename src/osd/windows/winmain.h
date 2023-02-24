@@ -59,7 +59,7 @@ public:
 	// general overridables
 	virtual void init(running_machine &machine) override;
 	virtual void update(bool skip_redraw) override;
-	virtual void input_update() override;
+	virtual void input_update(bool relative_reset) override;
 	virtual void check_osd_inputs() override;
 
 	// input overrideables

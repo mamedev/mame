@@ -226,7 +226,7 @@ public:
 	input_module &module() const { return m_module; }
 
 	// Poll and reset methods
-	virtual void poll() { }
+	virtual void poll(bool relative_reset) = 0;
 	virtual void reset() = 0;
 	virtual void configure(osd::input_device &device) = 0;
 };
@@ -266,7 +266,7 @@ public:
 			m_event_queue.pop();
 	}
 
-	void virtual poll() override
+	void virtual poll(bool relative_reset) override
 	{
 		std::lock_guard<std::mutex> scope_lock(m_device_lock);
 
@@ -296,10 +296,10 @@ public:
 	auto begin() const { return m_list.begin(); }
 	auto end() const { return m_list.end(); }
 
-	void poll_devices()
+	void poll_devices(bool relative_reset)
 	{
 		for (auto &device: m_list)
-			device->poll();
+			device->poll(relative_reset);
 	}
 
 	void reset_devices()
@@ -408,7 +408,7 @@ private:
 	const osd_options *   m_options;
 	osd::input_manager *  m_manager;
 
-	virtual void poll() = 0;
+	virtual void poll(bool relative_reset) = 0;
 
 protected:
 	input_module_base(char const *type, char const *name);
@@ -423,7 +423,7 @@ public:
 	virtual int init(osd_interface &osd, const osd_options &options) override;
 
 	virtual void input_init(running_machine &machine) override;
-	virtual void poll_if_necessary() override;
+	virtual void poll_if_necessary(bool relative_reset) override;
 
 	virtual void reset_devices() = 0; // SDL OSD uses this to forcibly release keys
 };
@@ -490,11 +490,11 @@ protected:
 	}
 
 private:
-	virtual void poll() override final
+	virtual void poll(bool relative_reset) override final
 	{
 		// poll all of the devices
 		if (should_poll_devices())
-			m_devicelist.poll_devices();
+			m_devicelist.poll_devices(relative_reset);
 		else
 			m_devicelist.reset_devices();
 	}

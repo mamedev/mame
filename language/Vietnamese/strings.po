@@ -294,7 +294,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/optsmenu.cpp:85
 msgid "Input Devices"
-msgstr ""
+msgstr "Thiết bị đưa vào"
 
 #: src/frontend/mame/ui/optsmenu.cpp:87
 msgid "Save Settings"
@@ -340,11 +340,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/filesel.cpp:520
 msgid "Read-only"
-msgstr ""
+msgstr "Chỉ đọc"
 
 #: src/frontend/mame/ui/filesel.cpp:522
 msgid "Read-write"
-msgstr ""
+msgstr "Đọc/ghi"
 
 #: src/frontend/mame/ui/filesel.cpp:523
 msgid "Read this image, write to another image"
@@ -524,11 +524,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:84
 msgid "Mouse"
-msgstr ""
+msgstr "Chuột"
 
 #: src/frontend/mame/ui/submenu.cpp:85
 msgid "Joystick"
-msgstr ""
+msgstr "Cần điều khiển"
 
 #: src/frontend/mame/ui/submenu.cpp:86
 msgid "Lightgun"
@@ -688,7 +688,7 @@ msgstr ""
 #: src/frontend/mame/ui/analogipt.cpp:527 plugins/cheatfind/init.lua:766
 #: plugins/cheatfind/init.lua:777 plugins/cheat/init.lua:679
 msgid "On"
-msgstr ""
+msgstr "Bật"
 
 #: src/frontend/mame/ui/menu.cpp:372 src/frontend/mame/ui/menu.cpp:741
 #: src/frontend/mame/ui/videoopt.cpp:185
@@ -697,11 +697,11 @@ msgstr ""
 #: plugins/cheatfind/init.lua:774 plugins/cheat/init.lua:682
 #: plugins/cheat/init.lua:691
 msgid "Off"
-msgstr ""
+msgstr "Tắt"
 
 #: src/frontend/mame/ui/menu.cpp:744
 msgid "Auto"
-msgstr ""
+msgstr "Tự động"
 
 #: src/frontend/mame/ui/menu.cpp:1272
 #: src/frontend/mame/ui/simpleselgame.cpp:283
@@ -1243,7 +1243,7 @@ msgstr ""
 #: src/frontend/mame/ui/utils.cpp:88
 msgctxt "machine-filter"
 msgid "Not Working"
-msgstr ""
+msgstr "Không hoạt động"
 
 #: src/frontend/mame/ui/utils.cpp:89
 msgctxt "machine-filter"

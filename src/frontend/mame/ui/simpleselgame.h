@@ -37,11 +37,11 @@ private:
 	enum { VISIBLE_GAMES_IN_LIST = 15 };
 
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	// internal methods
 	void build_driver_list();
-	void inkey_select(const event &menu_event);
+	bool inkey_select(const event &menu_event);
 	void inkey_cancel();
 	void inkey_special(const event &menu_event);
 

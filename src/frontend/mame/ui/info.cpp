@@ -552,10 +552,9 @@ void menu_game_info::populate()
 {
 }
 
-void menu_game_info::handle(event const *ev)
+bool menu_game_info::handle(event const *ev)
 {
-	if (ev)
-		handle_key(ev->iptkey);
+	return ev && handle_key(ev->iptkey);
 }
 
 
@@ -617,10 +616,9 @@ void menu_warn_info::populate()
 {
 }
 
-void menu_warn_info::handle(event const *ev)
+bool menu_warn_info::handle(event const *ev)
 {
-	if (ev)
-		handle_key(ev->iptkey);
+	return ev && handle_key(ev->iptkey);
 }
 
 
@@ -648,8 +646,9 @@ void menu_image_info::populate()
 		image_info(&image);
 }
 
-void menu_image_info::handle(event const *ev)
+bool menu_image_info::handle(event const *ev)
 {
+	return false;
 }
 
 

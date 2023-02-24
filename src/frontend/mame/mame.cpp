@@ -458,9 +458,9 @@ int emulator_info::start_frontend(emu_options &options, osd_interface &osd, int 
 	return start_frontend(options, osd, args);
 }
 
-void emulator_info::draw_user_interface(running_machine& machine)
+bool emulator_info::draw_user_interface(running_machine& machine)
 {
-	mame_machine_manager::instance()->ui().update_and_render(machine.render().ui_container());
+	return mame_machine_manager::instance()->ui().update_and_render(machine.render().ui_container());
 }
 
 void emulator_info::periodic_check()
