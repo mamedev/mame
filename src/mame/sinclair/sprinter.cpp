@@ -118,6 +118,7 @@ protected:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_update_txt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_update_graph(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	std::pair<u8, u8> get_scroll(u32 offset);
 
 	required_device<z84c015_device> m_maincpu;
 	emu_timer *m_wait_on_timer = nullptr;
@@ -402,35 +403,37 @@ void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bi
 	for(u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
 		const u16 b8 = (SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT;
+		const u16 la = 0x300 + (b8 >> 3) * 4;
 
-		u8* line1 = nullptr;
 		u8* mode = nullptr;
 		u16 pal, x;
 		u8 y;
+		std::pair<u8, u8> scroll;
 		u16 *pix = &(bitmap.pix(vpos, cliprect.left()));
+
 		for(u16 hpos = cliprect.left(); hpos <= cliprect.right(); hpos++)
 		{
 			const u16 a16 = (SPRINT_WIDTH + hpos - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
-			if ((line1 == nullptr) || ((a16 & 15) == 0))
+			if ((mode == nullptr) || ((a16 & 15) == 0))
 			{
+				const u32 line1 = (1 + (a16 >> 4) * 2 + 0x80 * (m_rgmod & 1)) * 1024;
+				if (m_conf)
+				{
+					if (mode == nullptr)
+						scroll = get_scroll(line1 + la);
+					else if ((mode[0] & 0x14) == 0x04)
+						scroll = {mode[3] & 0x0f, mode[3] >> 4};
+				}
+
 				// 16x8 block descriptor
-				line1 = m_vram + (1 + (a16 >> 4) * 2 + 0x80 * (m_rgmod & 1)) * 1024 + 0x300;
-				mode = line1 + (b8 >> 3) * 4;
+				mode = m_vram + line1 + la;
 				if(!BIT(mode[0], 4))
 				{
 					pal = BIT(mode[0], 6, 2) << 8;
 					if (m_conf) // Thunder in the Deep
 					{
-						x = (BIT(mode[0], 0, 2) << 8) | mode[1];
-						y = mode[2];
-						/* TODO scroll
-						if (BIT(mode[0], 2))
-						{
-							x += mode[3] & 0x0f;
-							y += mode[3] >> 4;
-						}
-						*/
-
+						x = ((BIT(mode[0], 0, 2) << 8) | mode[1]) + scroll.first;
+						y = mode[2] + scroll.second;
 					}
 					else
 					{
@@ -457,6 +460,23 @@ void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bi
 			}
 		}
 	}
+}
+
+std::pair<u8, u8> sprinter_state::get_scroll(u32 offset)
+{
+	u32 ref = offset;
+	for(; (ref & 0x3ff) >= 0x300; ref -= 4)
+	{
+		for (; (~offset ^ ref) & 0x20000 ; ref -= 2048)
+		{
+			const u8* mode = m_vram + ref;
+			if ((mode[0] & 0x14) == 0x04)
+				return { mode[3] & 0x0f, mode[3] >> 4 };
+		}
+		ref += 0x20000;
+	}
+
+	return { 0, 0 };
 }
 
 u8 sprinter_state::dcp_r(offs_t offset)
@@ -1312,15 +1332,15 @@ void sprinter_state::do_cpu_wait(bool is_io)
 	if ((m_turbo && m_turbo_hard))
 	{
 		const u8 count = is_io ? 4 : 3;
-		const bool is_overlap_started = !m_timer_overlap;
+		//const bool is_overlap_started = !m_timer_overlap;
 		const u8 over = m_maincpu->total_cycles() % count;
-		m_timer_overlap += count + (over ? (count - over) : 0);
-		if (m_timer_overlap <= (m_maincpu->cycles_remaining() - count))
-		{
+		m_timer_overlap /*+*/= count + (over ? (count - over) : 0);
+		//if (m_timer_overlap <= (m_maincpu->cycles_remaining() - count))
+		//{
 			m_maincpu->adjust_icount(-m_timer_overlap);
 			m_timer_overlap = 0;
-		} else if (is_overlap_started)
-			m_wait_on_timer->adjust(attotime::zero);
+		//} else if (is_overlap_started)
+		//	m_wait_on_timer->adjust(attotime::zero);
 	}
 }
 
