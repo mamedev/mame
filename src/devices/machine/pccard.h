@@ -20,7 +20,7 @@ public:
 protected:
 	device_pccard_interface(const machine_config &mconfig, device_t &device);
 
-	pccard_slot_device *m_slot;
+	pccard_slot_device *const m_slot;
 };
 
 DECLARE_DEVICE_TYPE(PCCARD_SLOT, pccard_slot_device)
