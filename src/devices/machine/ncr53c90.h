@@ -206,6 +206,7 @@ protected:
 	bool irq, drq;
 	bool dma_command;
 	bool test_mode;
+	int stepping;
 
 	void dma_set(int dir);
 	virtual void check_drq();
@@ -316,6 +317,9 @@ public:
 	u16 dma16_r();
 	void dma16_w(u16 data);
 
+	u16 dma16_swap_r() { return swapendian_int16(dma16_r()); }
+	void dma16_swap_w(u16 data) { return dma16_w(swapendian_int16(data)); }
+
 protected:
 	ncr53c94_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -339,6 +343,12 @@ private:
 	busmd_t m_busmd;
 };
 
+class ncr53c96_device : public ncr53c94_device
+{
+public:
+	ncr53c96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 class ncr53cf94_device : public ncr53c94_device
 {
 public:
@@ -354,6 +364,7 @@ public:
 DECLARE_DEVICE_TYPE(NCR53C90, ncr53c90_device)
 DECLARE_DEVICE_TYPE(NCR53C90A, ncr53c90a_device)
 DECLARE_DEVICE_TYPE(NCR53C94, ncr53c94_device)
+DECLARE_DEVICE_TYPE(NCR53C96, ncr53c96_device)
 DECLARE_DEVICE_TYPE(NCR53CF94, ncr53cf94_device)
 DECLARE_DEVICE_TYPE(NCR53CF96, ncr53cf96_device)
 
