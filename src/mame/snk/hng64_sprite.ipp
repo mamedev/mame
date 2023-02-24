@@ -7,7 +7,7 @@
  * Sprite Format
  * ------------------
  *
- * uint32_t | Bits                                    | Use
+ * offset | Bits                                    | Use
  *        | 3322 2222 2222 1111 1111 11             |
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
  *   0    | yyyy yyyy yyyy yyyy xxxx xxxx xxxx xxxx | x/y position
@@ -25,7 +25,7 @@
  ** Sprite Global Registers
  * -----------------------
  *
- * uint32_t | Bits                                    | Use
+ * offset | Bits                                    | Use
  *        | 3322 2222 2222 1111 1111 11             |
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
  *   0    | ssss z--f b--- -aap ---- ---- ---- ---- | s = unknown, samsho  z = zooming mode, f = priority sort mode (unset set in roadedge ingame) b = bpp select a = always, p = post, disable?
@@ -46,7 +46,7 @@ do \
 { \
 	if (zval < (DESTZ)) \
 	{ \
-		u32 srcdata = (SOURCE); \
+		uint32_t srcdata = (SOURCE); \
 		if (srcdata != trans_pen) \
 		{ \
 			(DESTZ) = zval; \
@@ -62,7 +62,7 @@ do \
 { \
 	if (zval > (DESTZ)) \
 	{ \
-		u32 srcdata = (SOURCE); \
+		uint32_t srcdata = (SOURCE); \
 		if (srcdata != trans_pen) \
 		{ \
 			(DESTZ) = zval; \
@@ -94,7 +94,7 @@ do \
 } \
 while (0)
 
-inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect, gfx_element *gfx, u32 code, int flipx, int flipy, s32 destx, s32 desty, s32 dx, s32 dy, u32 dstwidth, u32 dstheight, u32 trans_pen, u32 color, u32 zval, bool zrev, bool checkerboard)
+inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect, gfx_element *gfx, uint32_t code, int flipx, int flipy, int32_t destx, int32_t desty, int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t color, uint32_t zval, bool zrev, bool checkerboard)
 {
 	g_profiler.start(PROFILER_DRAWGFX);
 	do {
@@ -109,12 +109,12 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 			break;
 
 		// compute final pixel in X and exit if we are entirely clipped
-		s32 destendx = destx + dstwidth - 1;
+		int32_t destendx = destx + dstwidth - 1;
 		if (destx > cliprect.right() || destendx < cliprect.left())
 			break;
 
 		// apply left clip
-		s32 srcx = 0;
+		int32_t srcx = 0;
 		if (destx < cliprect.left())
 		{
 			srcx = (cliprect.left() - destx) * dx;
@@ -126,12 +126,12 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 			destendx = cliprect.right();
 
 		// compute final pixel in Y and exit if we are entirely clipped
-		s32 destendy = desty + dstheight - 1;
+		int32_t destendy = desty + dstheight - 1;
 		if (desty > cliprect.bottom() || destendy < cliprect.top())
 			break;
 
 		// apply top clip
-		s32 srcy = 0;
+		int32_t srcy = 0;
 		if (desty < cliprect.top())
 		{
 			srcy = (cliprect.top() - desty) * dy;
@@ -160,24 +160,24 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 		const u8 *srcdata = gfx->get_data(code);
 
 		// compute how many blocks of 4 pixels we have
-		u32 numblocks = (destendx + 1 - destx) / 4;
-		u32 leftovers = (destendx + 1 - destx) - 4 * numblocks;
+		uint32_t numblocks = (destendx + 1 - destx) / 4;
+		uint32_t leftovers = (destendx + 1 - destx) - 4 * numblocks;
 
 		// iterate over pixels in Y
-		for (s32 cury = desty; cury <= destendy; cury++)
+		for (int32_t cury = desty; cury <= destendy; cury++)
 		{
 			auto *destptr = &dest.pix(cury, destx);
 			auto *destzptr = &destz.pix(cury, destx);
 
 			const u8 *srcptr = srcdata + (srcy >> 16) * gfx->rowbytes();
-			s32 cursrcx = srcx;
+			int32_t cursrcx = srcx;
 			srcy += dy;
 
 			// iterate over unrolled blocks of 4
 			if (zrev)
 			{
 				uint8_t cb = 0;
-				for (s32 curx = 0; curx < numblocks; curx++)
+				for (int32_t curx = 0; curx < numblocks; curx++)
 				{
 					uint16_t srcpix;
 					PIX_CHECKERBOARD;
@@ -198,7 +198,7 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 				}
 
 				// iterate over leftover pixels
-				for (s32 curx = 0; curx < leftovers; curx++)
+				for (int32_t curx = 0; curx < leftovers; curx++)
 				{
 					uint16_t srcpix;
 					PIX_CHECKERBOARD;
@@ -211,7 +211,7 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 			else
 			{
 				uint8_t cb = 0;
-				for (s32 curx = 0; curx < numblocks; curx++)
+				for (int32_t curx = 0; curx < numblocks; curx++)
 				{
 					uint16_t srcpix;
 					PIX_CHECKERBOARD;
@@ -232,7 +232,7 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 				}
 
 				// iterate over leftover pixels
-				for (s32 curx = 0; curx < leftovers; curx++)
+				for (int32_t curx = 0; curx < leftovers; curx++)
 				{
 					uint16_t srcpix;
 					PIX_CHECKERBOARD;
@@ -248,15 +248,15 @@ inline void hng64_state::drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &dest
 }
 
 void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
-		gfx_element *gfx, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		s32 dx, s32 dy, u32 dstwidth, u32 dstheight, u32 trans_pen, u32 zval, bool zrev, bool blend, bool checkerboard)
+		gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
+		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard)
 {
 	// use pen usage to optimize
 	code %= gfx->elements();
 	if (gfx->has_pen_usage())
 	{
 		// fully transparent; do nothing
-		u32 usage = gfx->pen_usage(code);
+		uint32_t usage = gfx->pen_usage(code);
 		if ((usage & ~(1 << trans_pen)) == 0)
 			return;
 	}
@@ -270,7 +270,42 @@ void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const r
 	drawgfxzoom_core(dest, destz, cliprect, gfx, code, flipx, flipy, destx, desty, dx, dy, dstwidth, dstheight, trans_pen, color, zval, zrev, checkerboard);
 }
 
+void hng64_state::get_tile_details(bool chain, uint16_t spritenum, uint8_t xtile, uint8_t ytile, uint8_t xsize, uint32_t& tileno, uint16_t& pal, uint8_t &gfxregion)
+{
+	if (!chain)
+	{
+		tileno = (m_spriteram[(spritenum * 8) + 4] & 0x0007ffff);
+		pal = (m_spriteram[(spritenum * 8) + 3] & 0x00ff0000) >> 16;
 
+		if (m_spriteregs[0] & 0x00800000) //bpp switch
+		{
+			gfxregion = 4;
+		}
+		else
+		{
+			gfxregion = 5;
+			tileno >>= 1;
+			pal &= 0xf;
+		}
+
+		tileno += (xtile + (ytile * (xsize + 1)));
+	}
+	else
+	{
+		tileno = (m_spriteram[((spritenum + (xtile + (ytile * (xsize + 1)))) * 8) + 4] & 0x0007ffff);
+		pal = (m_spriteram[((spritenum + (xtile + (ytile * (xsize + 1)))) * 8) + 3] & 0x00ff0000) >> 16;
+		if (m_spriteregs[0] & 0x00800000) //bpp switch
+		{
+			gfxregion = 4;
+		}
+		else
+		{
+			gfxregion = 5;
+			tileno >>= 1;
+			pal &= 0xf;
+		}
+	}
+}
 
 void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cliprect)
 {
@@ -291,32 +326,38 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 	else
 		m_sprite_zbuffer.fill(0x07ff, cliprect);
 
-	uint32_t* source = m_spriteram;
-	uint32_t* end = m_spriteram + (0xc000 / 4);
+	int nextsprite = 0;
+	int currentsprite = 0;
 
-	while (source < end)
+	while (currentsprite < ((0xc000 / 4) / 8))
 	{
-		uint16_t zval = (source[2] & 0x07ff0000) >> 16;
+		uint16_t zval = (m_spriteram[(currentsprite * 8) + 2] & 0x07ff0000) >> 16;
 
-		uint16_t ypos = (source[0] & 0xffff0000) >> 16;
-		uint16_t xpos = (source[0] & 0x0000ffff) >> 0;
+		uint16_t ypos = (m_spriteram[(currentsprite * 8) + 0] & 0xffff0000) >> 16;
+		uint16_t xpos = (m_spriteram[(currentsprite * 8) + 0] & 0x0000ffff) >> 0;
 		xpos += (spriteoffsx);
 		ypos += (spriteoffsy);
 
-		int tileno = (source[4] & 0x0007ffff);
-		bool blend = (source[4] & 0x00800000);
-		bool checkerboard = (source[4] & 0x04000000);
-		int yflip = (source[4] & 0x01000000) >> 24;
-		int xflip = (source[4] & 0x02000000) >> 25;
+		bool blend = (m_spriteram[(currentsprite * 8) + 4] & 0x00800000);
+		bool checkerboard = (m_spriteram[(currentsprite * 8) + 4] & 0x04000000);
+		int yflip = (m_spriteram[(currentsprite * 8) + 4] & 0x01000000) >> 24;
+		int xflip = (m_spriteram[(currentsprite * 8) + 4] & 0x02000000) >> 25;
 
-		int pal = (source[3] & 0x00ff0000) >> 16;
+		int chainy = (m_spriteram[(currentsprite * 8) + 2] & 0x0000000f);
+		int chainx = (m_spriteram[(currentsprite * 8) + 2] & 0x000000f0) >> 4;
+		int chaini = (m_spriteram[(currentsprite * 8) + 2] & 0x00000100);
 
-		int chainy = (source[2] & 0x0000000f);
-		int chainx = (source[2] & 0x000000f0) >> 4;
-		int chaini = (source[2] & 0x00000100);
+		if (!chaini)
+		{
+			nextsprite = currentsprite + 1;
+		}
+		else
+		{
+			nextsprite = currentsprite + ((chainx + 1) * (chainy + 1));
+		}
 
-		uint32_t zoomy = (source[1] & 0xffff0000) >> 16;
-		uint32_t zoomx = (source[1] & 0x0000ffff) >> 0;
+		uint32_t zoomy = (m_spriteram[(currentsprite * 8) + 1] & 0xffff0000) >> 16;
+		uint32_t zoomx = (m_spriteram[(currentsprite * 8) + 1] & 0x0000ffff) >> 0;
 
 		/* Calculate the zoom */
 		int zoom_factor = (m_spriteregs[0] & 0x08000000) ? 0x1000 : 0x100;
@@ -336,7 +377,6 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 			dy = zoomy << 4;
 		}
 
-
 		// calculate the total height
 		uint32_t total_srcpix_y = 0;
 		uint32_t total_dstheight = 0;
@@ -345,7 +385,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 			total_srcpix_y += dy;
 			total_dstheight++;
 
-		} while (total_srcpix_y < ((chainy+1) * 0x100000));
+		} while (total_srcpix_y < ((chainy + 1) * 0x100000));
 
 		// calculate the total width
 		uint32_t total_srcpix_x = 0;
@@ -355,19 +395,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 			total_srcpix_x += dx;
 			total_dstwidth++;
 
-		} while (total_srcpix_x < ((chainx+1) * 0x100000));
-
-		gfx_element* gfx;
-		if (m_spriteregs[0] & 0x00800000) //bpp switch
-		{
-			gfx = m_gfxdecode->gfx(4);
-		}
-		else
-		{
-			gfx = m_gfxdecode->gfx(5);
-			tileno >>= 1;
-			pal &= 0xf;
-		}
+		} while (total_srcpix_x < ((chainx + 1) * 0x100000));
 
 		// Accommodate for chaining and flipping
 		if (xflip)
@@ -384,7 +412,6 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 		uint32_t srcpix_y = 0;
 		for (int ydrw = 0; ydrw <= chainy; ydrw++)
 		{
-			
 			uint32_t dstheight = 0;
 			do
 			{
@@ -393,7 +420,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 
 			} while (srcpix_y < 0x100000);
 			srcpix_y &= 0x0fffff;
-			
+
 			int16_t drawx = xpos;
 			uint32_t srcpix_x = 0;
 
@@ -402,7 +429,6 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 
 			for (int xdrw = 0; xdrw <= chainx; xdrw++)
 			{
-				
 				uint32_t dstwidth = 0;
 				do
 				{
@@ -422,33 +448,14 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 				if (drawx & 0x0200)drawx -= 0x400;
 				if (drawy & 0x0200)drawy -= 0x400;
 
-				if (!chaini)
-				{
-					zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, gfx, tileno, pal, xflip, yflip, drawx, drawy, dx, dy, dstwidth, dstheight, 0, zval, zsort, blend, checkerboard);
-					tileno++;
-				}
-				else // inline chain mode, used by ss64
-				{
+				uint32_t tileno;
+				uint16_t pal;
+				uint8_t gfxregion;
 
-					tileno = (source[4] & 0x0007ffff);
+				get_tile_details(chaini, currentsprite, xdrw, ydrw, chainx, tileno, pal, gfxregion);
 
-					pal = (source[3] & 0x00ff0000) >> 16;
+				zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, m_gfxdecode->gfx(gfxregion), tileno, pal, xflip, yflip, drawx, drawy, dx, dy, dstwidth, dstheight, 0, zval, zsort, blend, checkerboard);
 
-					if (m_spriteregs[0] & 0x00800000) //bpp switch
-					{
-						gfx = m_gfxdecode->gfx(4);
-					}
-					else
-					{
-						gfx = m_gfxdecode->gfx(5);
-						tileno >>= 1;
-						pal &= 0xf;
-					}
-
-					zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, gfx, tileno, pal, xflip, yflip, drawx, drawy, dx, dy, dstwidth, dstheight, 0, zval, zsort, blend, checkerboard);
-					source += 8;
-				}
-				
 				if (!xflip)
 					drawx += dstwidth;
 			}
@@ -457,8 +464,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 				drawy += dstheight;
 
 		}
-		if (!chaini)
-			source += 8;
+		currentsprite = nextsprite;
 	}
 }
 

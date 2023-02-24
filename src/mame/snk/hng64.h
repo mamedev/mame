@@ -436,13 +436,15 @@ private:
 
 	void clear3d();
 	bool hng64_command3d(const uint16_t* packet);
+
+	void get_tile_details(bool chain, uint16_t spritenum, uint8_t xtile, uint8_t ytile, uint8_t xsize, uint32_t& tileno, uint16_t& pal, uint8_t &gfxregion);
 	void draw_sprites_buffer(screen_device &screen, const rectangle &cliprect);
 
 	void zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
-		gfx_element *gfx, u32 code, u32 color, int flipx, int flipy, s32 destx, s32 desty,
-		s32 dx, s32 dy, u32 dstwidth, u32 dstheight, u32 trans_pen, u32 zval, bool zrev, bool blend, bool checkerboard);
+		gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
+		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard);
 
-	void drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect, gfx_element *gfx, u32 code, int flipx, int flipy, s32 destx, s32 desty, s32 dx, s32 dy, u32 dstwidth, u32 dstheight, u32 trans_pen, u32 color, u32 zval, bool zrev, bool checkerboard);
+	void drawgfxzoom_core(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect, gfx_element *gfx, uint32_t code, int flipx, int flipy, int32_t destx, int32_t desty, int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t color, uint32_t zval, bool zrev, bool checkerboard);
 
 	void transition_control(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void setCameraTransformation(const uint16_t* packet);
