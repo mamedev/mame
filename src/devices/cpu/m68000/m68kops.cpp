@@ -25436,7 +25436,7 @@ void m68000_musashi_device::xf548_ptest_l_4()
 {
 	if(m_has_pmmu)
 	{
-		logerror("68040: unhandled PTEST\n");
+		//logerror("68040: unhandled PTEST\n");
 	}
 	else
 	{
@@ -31185,8 +31185,7 @@ void m68000_musashi_device::xf400_cinv_l_4()
 }
 void m68000_musashi_device::xf420_cpush_l_4()
 {
-	logerror("%s at %08x: called unimplemented instruction %04x (cpush)\n",
-					tag(), m_ppc, m_ir);
+	//logerror("%s at %08x: called unimplemented instruction %04x (cpush)\n", tag(), m_ppc, m_ir);
 
 
 }
