@@ -270,7 +270,7 @@ void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const r
 	drawgfxzoom_core(dest, destz, cliprect, gfx, code, flipx, flipy, destx, desty, dx, dy, dstwidth, dstheight, trans_pen, color, zval, zrev, checkerboard);
 }
 
-void hng64_state::get_tile_details(bool chain, uint16_t spritenum, uint8_t xtile, uint8_t ytile, uint8_t xsize, uint32_t& tileno, uint16_t& pal, uint8_t &gfxregion)
+void hng64_state::get_tile_details(bool chain, uint16_t spritenum, uint8_t xtile, uint8_t ytile, uint8_t xsize, bool xflip, uint32_t& tileno, uint16_t& pal, uint8_t &gfxregion)
 {
 	if (!chain)
 	{
@@ -288,12 +288,25 @@ void hng64_state::get_tile_details(bool chain, uint16_t spritenum, uint8_t xtile
 			pal &= 0xf;
 		}
 
-		tileno += (xtile + (ytile * (xsize + 1)));
+		int offset;
+		if (!xflip)
+			offset = (xtile + (ytile * (xsize + 1)));
+		else
+			offset = ((xsize-xtile) + (ytile * (xsize + 1)));
+
+		tileno += offset;
+
 	}
 	else
 	{
-		tileno = (m_spriteram[((spritenum + (xtile + (ytile * (xsize + 1)))) * 8) + 4] & 0x0007ffff);
-		pal = (m_spriteram[((spritenum + (xtile + (ytile * (xsize + 1)))) * 8) + 3] & 0x00ff0000) >> 16;
+		int offset;
+		if (!xflip)
+			offset = (xtile + (ytile * (xsize + 1)));
+		else
+			offset = ((xsize-xtile) + (ytile * (xsize + 1)));
+
+		tileno = (m_spriteram[((spritenum + offset) * 8) + 4] & 0x0007ffff);
+		pal = (m_spriteram[((spritenum + offset) * 8) + 3] & 0x00ff0000) >> 16;
 		if (m_spriteregs[0] & 0x00800000) //bpp switch
 		{
 			gfxregion = 4;
@@ -398,11 +411,6 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 		} while (total_srcpix_x < ((chainx + 1) * 0x100000));
 
 		// Accommodate for chaining and flipping
-		if (xflip)
-		{
-			xpos += total_dstwidth;
-		}
-
 		if (yflip)
 		{
 			ypos += total_dstheight;
@@ -438,9 +446,6 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 				} while (srcpix_x < 0x100000);
 				srcpix_x &= 0x0fffff;
 
-				if (xflip)
-					drawx -= dstwidth;
-
 				// 0x3ff (0x200 sign bit) based on sams64_2 char select
 				drawx &= 0x3ff;
 				drawy &= 0x3ff;
@@ -452,12 +457,11 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 				uint16_t pal;
 				uint8_t gfxregion;
 
-				get_tile_details(chaini, currentsprite, xdrw, ydrw, chainx, tileno, pal, gfxregion);
+				get_tile_details(chaini, currentsprite, xdrw, ydrw, chainx, xflip, tileno, pal, gfxregion);
 
 				zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, m_gfxdecode->gfx(gfxregion), tileno, pal, xflip, yflip, drawx, drawy, dx, dy, dstwidth, dstheight, 0, zval, zsort, blend, checkerboard);
 
-				if (!xflip)
-					drawx += dstwidth;
+				drawx += dstwidth;
 			}
 
 			if (!yflip)

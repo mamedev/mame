@@ -437,7 +437,7 @@ private:
 	void clear3d();
 	bool hng64_command3d(const uint16_t* packet);
 
-	void get_tile_details(bool chain, uint16_t spritenum, uint8_t xtile, uint8_t ytile, uint8_t xsize, uint32_t& tileno, uint16_t& pal, uint8_t &gfxregion);
+	void get_tile_details(bool chain, uint16_t spritenum, uint8_t xtile, uint8_t ytile, uint8_t xsize, bool xflip, uint32_t& tileno, uint16_t& pal, uint8_t &gfxregion);
 	void draw_sprites_buffer(screen_device &screen, const rectangle &cliprect);
 
 	void zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
