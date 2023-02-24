@@ -728,6 +728,7 @@ misc/fungames.cpp
 misc/funkball.cpp
 misc/galaxi.cpp
 misc/galgame.cpp
+misc/gameace.cpp
 misc/gambl186.cpp
 misc/gamemasters.cpp
 misc/gammagic.cpp
