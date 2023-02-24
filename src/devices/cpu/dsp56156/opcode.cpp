@@ -73,9 +73,7 @@ size_t Opcode::instAccumulatorBitsModified() const { return m_instruction->accum
 
 std::string Opcode::dcString() const
 {
-	char tempStr[1024];
-	sprintf(tempStr, "dc $%x", m_word0);
-	return std::string(tempStr);
+	return util::string_format("dc $%x", m_word0);
 }
 
 }

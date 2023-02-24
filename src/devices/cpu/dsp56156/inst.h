@@ -204,9 +204,7 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		char temp[32];
-		sprintf(temp, "#$%x,%s", m_immediate, regIdAsString(m_destination).c_str());
-		retString = "andi " + std::string(temp);
+		retString = util::string_format("andi #$%x,%s", m_immediate, regIdAsString(m_destination));
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -373,9 +371,7 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		char temp[32];
-		sprintf(temp, "#$%x", m_iVal);
-		retString = m_opcode + " " + std::string(temp) + "," + dString;
+		retString = m_opcode + util::string_format(" #$%x,%s", m_iVal, dString);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -433,14 +429,7 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		char temp[32];
-		sprintf(temp, "#$%x", m_iVal);
-		std::string source = temp;
-
-		sprintf(temp, "X:(%s)", regIdAsString(m_r).c_str());
-		std::string destination = temp;
-
-		retString = m_opcode + " " + source + "," + destination;
+		retString = m_opcode + util::string_format(" #$%x,X:(%s)", m_iVal, regIdAsString(m_r));
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -498,11 +487,7 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		char temp[32];
-		sprintf(temp, "#$%x", m_iVal);
-		std::string source = temp;
-
-		retString = m_opcode + " " + source + "," + regIdAsString(m_destination);
+		retString = m_opcode + util::string_format(" #$%x,%s", m_iVal, regIdAsString(m_destination));
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -531,11 +516,8 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		std::string opcode = "b" + opMnemonicAsString(m_mnem);
-
-		char temp[32];
-		sprintf(temp, ">*+$%x", 2 + m_immediate);
-		retString = opcode + " " + std::string(temp);
+		auto opcode = "b" + opMnemonicAsString(m_mnem);
+		retString = opcode + util::string_format(" >*+$%x", 2 + m_immediate);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -564,13 +546,11 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		std::string opcode = "b" + opMnemonicAsString(m_mnem);
+		auto opcode = "b" + opMnemonicAsString(m_mnem);
 
-		char temp[32];
-		if (m_immediate >= 0) sprintf(temp, "<*+$%x", m_immediate + 1);
-		else                  sprintf(temp, "<*-$%x", 1 - m_immediate - 2);
-
-		retString = opcode + " " + std::string(temp);
+		retString = opcode + (m_immediate >= 0 ?
+			util::string_format(" <*+$%x", m_immediate + 1) :
+			util::string_format(" <*-$%x", 1 - m_immediate - 2));
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -625,9 +605,7 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		char temp[32];
-		sprintf(temp, ">*+$%x", 2 + m_immediate);
-		retString = "bra " + std::string(temp);
+		retString = util::string_format("bra >*+$%x", 2 + m_immediate);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -653,10 +631,9 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		char temp[32];
-		if (m_immediate >= 0) sprintf(temp, "<*+$%x", 1 + m_immediate);
-		else                  sprintf(temp, "<*-$%x", 1 - m_immediate - 2);
-		retString = "bra " + std::string(temp);
+		retString = "bra " + (m_immediate >= 0 ?
+			util::string_format("<*+$%x", 1 + m_immediate) :
+			util::string_format("<*-$%x", 1 - m_immediate - 2));
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -735,10 +712,9 @@ public:
 	{
 		std::string opcode = "bs" + opMnemonicAsString(m_mnem);
 
-		char temp[32];
-		if (m_immediate >= 0) sprintf(temp, ">*+$%x", 2 + m_immediate);
-		else                  sprintf(temp, ">*-$%x", 1 - m_immediate - 1 - 2);
-		retString = opcode + " " + std::string(temp);
+		retString = opcode + (m_immediate >= 0 ?
+			util::string_format(" >*+$%x", 2 + m_immediate) :
+			util::string_format(" >*-$%x", 1 - m_immediate - 1 - 2));
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -795,10 +771,9 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		char temp[32];
-		if (m_immediate >= 0) sprintf(temp, ">*+$%x", 2 + m_immediate);
-		else                  sprintf(temp, ">*-$%x", 1 - m_immediate - 1 - 2);
-		retString = "bsr " + std::string(temp);
+		retString = "bsr " + (m_immediate >= 0 ?
+			util::string_format(">*+$%x", 2 + m_immediate) :
+			util::string_format(">*-$%x", 1 - m_immediate - 1 - 2));
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -1115,14 +1090,7 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		char temp[32];
-		sprintf(temp, "*+$%x", 2 + m_immediate);
-		std::string destination = temp;
-
-		sprintf(temp, "X:(%s)", regIdAsString(m_source).c_str());
-		std::string source = temp;
-
-		retString = "do " + source + "," + destination;
+		retString = util::string_format("do X:(%s),*+$%x", regIdAsString(m_source), 2 + m_immediate);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -1150,9 +1118,7 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		char temp[32];
-		sprintf(temp, "#<$%x,*+$%x", m_immediate, 2 + m_displacement);
-		retString = "do " + std::string(temp);
+		retString = util::string_format("do #<$%x,*+$%x", m_immediate, 2 + m_displacement);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -1183,9 +1149,7 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		char temp[32];
-		sprintf(temp, "*+$%x", 2 + m_displacement);
-		retString = "do " + regIdAsString(m_source) + "," + std::string(temp);
+		retString = util::string_format("do %s,*+$%x", regIdAsString(m_source), 2 + m_displacement);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -1211,9 +1175,7 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		char temp[32];
-		sprintf(temp, "*+$%x", m_displacement + 2);
-		retString = "do forever, " + std::string(temp);
+		retString = util::string_format("do forever, *+$%x", m_displacement + 2);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -1430,11 +1392,8 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		std::string opcode = "j" + opMnemonicAsString(m_mnem);
-
-		char temp[32];
-		sprintf(temp, ">$%x", m_displacement);
-		retString = opcode + " " + std::string(temp);
+		auto opcode = "j" + opMnemonicAsString(m_mnem);
+		retString = opcode + util::string_format(" >$%x", m_displacement);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -1489,9 +1448,7 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		char temp[32];
-		sprintf(temp, ">$%x", m_displacement);
-		retString = "jmp " + std::string(temp);
+		retString = util::string_format("jmp >$%x", m_displacement);
 	}
 	void evaluate(dsp56156_core* cpustate) override
 	{
@@ -1557,11 +1514,8 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		std::string opcode = "js" + opMnemonicAsString(m_mnem);
-
-		char temp[32];
-		sprintf(temp, ">$%x", m_displacement);
-		retString = opcode + " " + std::string(temp);
+		auto opcode = "js" + opMnemonicAsString(m_mnem);
+		retString = opcode + util::string_format(" >$%x", m_displacement);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -1618,9 +1572,7 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		char temp[32];
-		sprintf(temp, ">$%x", m_displacement);
-		retString = "jsr " + std::string(temp);
+		retString = util::string_format("jsr >$%x", m_displacement);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -1647,9 +1599,7 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		char temp[32];
-		sprintf(temp, "<$%x", m_bAddr);
-		retString = "jsr " + std::string(temp);
+		retString = util::string_format("jsr <$%x", m_bAddr);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2363,12 +2313,10 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		char temp[32];
-		if (m_immediate >= 0) sprintf(temp, "#<+$%x", m_immediate);
-		else                  sprintf(temp, "#<-$%x", 1 - m_immediate - 1);
-
-		retString = "move " +
-			std::string(temp) + "," + regIdAsString(m_destination);
+		retString = "move " + (m_immediate >= 0 ?
+			util::string_format("#<+$%x", m_immediate) :
+			util::string_format("#<-$%x", 1 - m_immediate - 1))
+			+ "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2587,11 +2535,7 @@ public:
 	bool decode(const uint16_t word0, const uint16_t word1) override
 	{
 		decode_HH_table(BITSn(word0,0x00c0), m_SD);
-
-		char temp[32];
-		sprintf(temp, "<$%x", BITSn(word0,0x001f));
-		m_ea = temp;
-
+		m_ea = util::string_format("<$%x", BITSn(word0,0x001f));
 		m_W = BITSn(word0,0x0100);
 		return true;
 	}
@@ -2961,9 +2905,7 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		char temp[32];
-		sprintf(temp, "#$%x", m_immediate);
-		retString = "ori " + std::string(temp) + "," + regIdAsString(m_destination);
+		retString = util::string_format("ori #$%x,%s", m_immediate, regIdAsString(m_destination));
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2988,9 +2930,7 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		char temp[32];
-		sprintf(temp, "X:(%s)", regIdAsString(m_source).c_str());
-		retString = "rep " + std::string(temp);
+		retString = util::string_format("rep X:(%s)", regIdAsString(m_source));
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3013,9 +2953,7 @@ public:
 	}
 	void disassemble(std::string& retString) const override
 	{
-		char temp[32];
-		sprintf(temp, "#$%x", m_immediate);
-		retString = "rep " + std::string(temp);
+		retString = util::string_format("rep #$%x", m_immediate);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }

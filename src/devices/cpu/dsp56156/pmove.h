@@ -158,11 +158,8 @@ public:
 		/* D1 and D2 may not specify the same register : A-142 */
 		if (r == iR3) return false;
 
-		char temp[32];
-		sprintf(temp,  "X:%s,%s", ea1.c_str(), regIdAsString(D1).c_str());
-		parallelMove = temp;
-		sprintf(temp, "X:%s,%s", ea2.c_str(), regIdAsString(D2).c_str());
-		parallelMove2 = temp;
+		parallelMove = util::string_format("X:%s,%s", ea1, regIdAsString(D1));
+		parallelMove2 = util::string_format("X:%s,%s", ea2, regIdAsString(D2));
 
 		return true;
 	}
@@ -244,8 +241,6 @@ public:
 		reg_id r;
 		reg_id S;
 		reg_id Dnot;
-		char parallel_move_str[128];
-		char parallel_move_str2[128];
 
 		if (opDestination() == iA) Dnot = iB;
 		else                       Dnot = iA;
@@ -254,10 +249,8 @@ public:
 		decode_RR_table(BITSn(word0,0x00c0), r);
 		decode_DD_table(BITSn(word0,0x0030), S);
 
-		sprintf(parallel_move_str,  "%s,X:(R%d)+N%d", regIdAsString(Dnot).c_str(), regIDAsNum(r), regIDAsNum(r));
-		sprintf(parallel_move_str2, "%s,%s", regIdAsString(S).c_str(), regIdAsString(Dnot).c_str());
-		pms = parallel_move_str;
-		pms2 = parallel_move_str2;
+		pms = util::string_format("%s,X:(R%d)+N%d", regIdAsString(Dnot), regIDAsNum(r), regIDAsNum(r));
+		pms2 = util::string_format("%s,%s", regIdAsString(S), regIdAsString(Dnot));
 		return true;
 	}
 	void disassemble(std::string& retString) const override
