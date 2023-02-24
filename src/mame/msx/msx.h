@@ -48,6 +48,13 @@ class msx_state : public driver_device
 protected:
 	msx_state(const machine_config &mconfig, device_type type, const char *tag);
 
+	enum internal_drives
+	{
+		NO_DRIVES,
+		DRIVES_1,
+		DRIVES_2
+	};
+
 	enum ay8910_type
 	{
 		SND_AY8910,
@@ -65,8 +72,8 @@ protected:
 		VDP_TMS9929A
 	};
 
-	void msx_base(ay8910_type ay8910_type, machine_config &config, XTAL xtal, int cpu_divider);
-	void msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config);
+	void msx_base(ay8910_type ay8910_type, machine_config &config, XTAL xtal, int cpu_divider, internal_drives internal_drives);
+	void msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives = NO_DRIVES);
 	void msx1_add_softlists(machine_config &config);
 
 	// configuration helpers
@@ -322,13 +329,13 @@ protected:
 
 	virtual void machine_start() override;
 
-	void msx2_base(ay8910_type ay8910_type, machine_config &config);
-	void msx2(ay8910_type ay8910_type, machine_config &config);
-	void msx2_pal(ay8910_type ay8910_type, machine_config &config);
-	void msx2plus_base(ay8910_type ay8910_type, machine_config &config);
-	void msx2plus(ay8910_type ay8910_type, machine_config &config);
-	void msx2plus_pal(ay8910_type ay8910_type, machine_config &config);
-	void turbor(ay8910_type ay8910_type, machine_config &config);
+	void msx2_base(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives);
+	void msx2(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives = NO_DRIVES);
+	void msx2_pal(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives = NO_DRIVES);
+	void msx2plus_base(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives);
+	void msx2plus(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives = NO_DRIVES);
+	void msx2plus_pal(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives = NO_DRIVES);
+	void turbor(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives = NO_DRIVES);
 	void msx2_add_softlists(machine_config &config);
 	void msx2plus_add_softlists(machine_config &config);
 	void turbor_add_softlists(machine_config &config);

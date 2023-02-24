@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+
+Basic display of LEDs for an MSX
+-->
+
+<mamelayout version="2">
+	<element name="access_led">
+<!--
+		<disk state="0">
+			<color red="0.0" green="0.8" blue="0.0" />
+		</disk>
+-->
+		<rect state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="0.6" blue="0.0" />
+		</rect>
+	</element>
+	<element name="drv0">
+		<text string="Drive A">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<view name="System LEDs">
+		<screen index="0">
+			<bounds x="75" y="0" width="1024" height="768" />
+		</screen>
+		<element name="int_drv0text" ref="drv0">
+			<bounds left="0" right="74" top="0" bottom="30" />
+		</element>
+		<element name="access_int_drv0" ref="access_led">
+			<bounds left="0" right="20" top="31" bottom="39" />
+		</element>
+	</view>
+</mamelayout>
