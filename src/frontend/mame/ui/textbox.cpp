@@ -102,33 +102,36 @@ void menu_textbox::reset_layout()
 }
 
 
-void menu_textbox::handle_key(int key)
+bool menu_textbox::handle_key(int key)
 {
 	switch (key)
 	{
 	case IPT_UI_UP:
 		--m_top_line;
-		break;
+		return true;
 
 	case IPT_UI_DOWN:
 		++m_top_line;
-		break;
+		return true;
 
 	case IPT_UI_PAGE_UP:
 		m_top_line -= m_window_lines - 3;
-		break;
+		return true;
 
 	case IPT_UI_PAGE_DOWN:
 		m_top_line += m_window_lines - 3;
-		break;
+		return true;
 
 	case IPT_UI_HOME:
 		m_top_line = 0;
-		break;
+		return true;
 
 	case IPT_UI_END:
 		m_top_line = m_layout->lines() - m_window_lines;
-		break;
+		return true;
+
+	default:
+		return false;
 	}
 }
 
@@ -365,10 +368,9 @@ void menu_fixed_textbox::populate()
 }
 
 
-void menu_fixed_textbox::handle(event const *ev)
+bool menu_fixed_textbox::handle(event const *ev)
 {
-	if (ev)
-		handle_key(ev->iptkey);
+	return ev && handle_key(ev->iptkey);
 }
 
 } // namespace ui

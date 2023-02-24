@@ -22,7 +22,7 @@
 //  CONSTANTS / MACROS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ST_VIDEO, st_video_device, "st_video", "Atari ST Video ASICs")
+DEFINE_DEVICE_TYPE(STX_VIDEO, stx_video_device, "stx_video", "Atari ST Video ASICs")
 DEFINE_DEVICE_TYPE(STE_VIDEO, ste_video_device, "ste_video", "Atari STe Video ASICs")
 //DEFINE_DEVICE_TYPE(STBOOK_VIDEO, stbook_video_device, "stbook_video", "Atari STbook Video ASICs")
 //DEFINE_DEVICE_TYPE(TT_VIDEO, tt_video_device, "tt_video", "Atari TT Video ASICs")
@@ -56,7 +56,7 @@ static const int BLITTER_NOPS[16][4] =
 //  shift_mode_0 -
 //-------------------------------------------------
 
-inline pen_t st_video_device::shift_mode_0()
+inline pen_t stx_video_device::shift_mode_0()
 {
 	int color = (BIT(m_shifter_rr[3], 15) << 3) | (BIT(m_shifter_rr[2], 15) << 2) | (BIT(m_shifter_rr[1], 15) << 1) | BIT(m_shifter_rr[0], 15);
 
@@ -73,7 +73,7 @@ inline pen_t st_video_device::shift_mode_0()
 //  shift_mode_1 -
 //-------------------------------------------------
 
-inline pen_t st_video_device::shift_mode_1()
+inline pen_t stx_video_device::shift_mode_1()
 {
 	int color = (BIT(m_shifter_rr[1], 15) << 1) | BIT(m_shifter_rr[0], 15);
 
@@ -97,7 +97,7 @@ inline pen_t st_video_device::shift_mode_1()
 //  shift_mode_2 -
 //-------------------------------------------------
 
-inline pen_t st_video_device::shift_mode_2()
+inline pen_t stx_video_device::shift_mode_2()
 {
 	int color = BIT(m_shifter_rr[0], 15);
 
@@ -134,7 +134,7 @@ inline pen_t st_video_device::shift_mode_2()
 //  shifter_tick -
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER(st_video_device::shifter_tick)
+TIMER_CALLBACK_MEMBER(stx_video_device::shifter_tick)
 {
 	int y = screen().vpos();
 	int x = screen().hpos();
@@ -168,7 +168,7 @@ TIMER_CALLBACK_MEMBER(st_video_device::shifter_tick)
 //  shifter_load -
 //-------------------------------------------------
 
-inline void st_video_device::shifter_load()
+inline void stx_video_device::shifter_load()
 {
 	uint16_t data = m_ram_space->read_word(m_shifter_ofs);
 
@@ -192,13 +192,13 @@ inline void st_video_device::shifter_load()
 //  glue_tick -
 //-------------------------------------------------
 
-void st_video_device::draw_pixel(int x, int y, u32 pen)
+void stx_video_device::draw_pixel(int x, int y, u32 pen)
 {
 	if(x < m_bitmap.width() && y < m_bitmap.height())
 		m_bitmap.pix(y, x) = pen;
 }
 
-TIMER_CALLBACK_MEMBER(st_video_device::glue_tick)
+TIMER_CALLBACK_MEMBER(stx_video_device::glue_tick)
 {
 	int y = screen().vpos();
 	int x = screen().hpos();
@@ -293,7 +293,7 @@ TIMER_CALLBACK_MEMBER(st_video_device::glue_tick)
 //  set_screen_parameters -
 //-------------------------------------------------
 
-void st_video_device::set_screen_parameters()
+void stx_video_device::set_screen_parameters()
 {
 	if (m_shifter_sync & 0x02)
 	{
@@ -320,7 +320,7 @@ void st_video_device::set_screen_parameters()
 //  shifter_base_r -
 //-------------------------------------------------
 
-uint8_t st_video_device::shifter_base_r(offs_t offset)
+uint8_t stx_video_device::shifter_base_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -343,7 +343,7 @@ uint8_t st_video_device::shifter_base_r(offs_t offset)
 //  shifter_base_w -
 //-------------------------------------------------
 
-void st_video_device::shifter_base_w(offs_t offset, uint8_t data)
+void stx_video_device::shifter_base_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -364,7 +364,7 @@ void st_video_device::shifter_base_w(offs_t offset, uint8_t data)
 //  shifter_counter_r -
 //-------------------------------------------------
 
-uint8_t st_video_device::shifter_counter_r(offs_t offset)
+uint8_t stx_video_device::shifter_counter_r(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -391,7 +391,7 @@ uint8_t st_video_device::shifter_counter_r(offs_t offset)
 //  shifter_sync_r -
 //-------------------------------------------------
 
-uint8_t st_video_device::shifter_sync_r()
+uint8_t stx_video_device::shifter_sync_r()
 {
 	return m_shifter_sync;
 }
@@ -401,7 +401,7 @@ uint8_t st_video_device::shifter_sync_r()
 //  shifter_sync_w -
 //-------------------------------------------------
 
-void st_video_device::shifter_sync_w(uint8_t data)
+void stx_video_device::shifter_sync_w(uint8_t data)
 {
 	m_shifter_sync = data;
 	logerror("SHIFTER Sync %x\n", m_shifter_sync);
@@ -413,7 +413,7 @@ void st_video_device::shifter_sync_w(uint8_t data)
 //  shifter_mode_r -
 //-------------------------------------------------
 
-uint8_t st_video_device::shifter_mode_r()
+uint8_t stx_video_device::shifter_mode_r()
 {
 	return m_shifter_mode;
 }
@@ -423,7 +423,7 @@ uint8_t st_video_device::shifter_mode_r()
 //  shifter_mode_w -
 //-------------------------------------------------
 
-void st_video_device::shifter_mode_w(uint8_t data)
+void stx_video_device::shifter_mode_w(uint8_t data)
 {
 	m_shifter_mode = data;
 	logerror("SHIFTER Mode %x\n", m_shifter_mode);
@@ -434,7 +434,7 @@ void st_video_device::shifter_mode_w(uint8_t data)
 //  shifter_palette_r -
 //-------------------------------------------------
 
-uint16_t st_video_device::shifter_palette_r(offs_t offset)
+uint16_t stx_video_device::shifter_palette_r(offs_t offset)
 {
 	return m_shifter_palette[offset] | 0xf888;
 }
@@ -444,7 +444,7 @@ uint16_t st_video_device::shifter_palette_r(offs_t offset)
 //  shifter_palette_w -
 //-------------------------------------------------
 
-void st_video_device::shifter_palette_w(offs_t offset, uint16_t data)
+void stx_video_device::shifter_palette_w(offs_t offset, uint16_t data)
 {
 	m_shifter_palette[offset] = data;
 	//  logerror("SHIFTER Palette[%x] = %x\n", offset, data);
@@ -596,7 +596,7 @@ void ste_video_device::shifter_pixelofs_w(uint8_t data)
 //  VIDEO
 //**************************************************************************
 
-st_video_device::st_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+stx_video_device::stx_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_palette_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this, true)
@@ -606,27 +606,27 @@ st_video_device::st_video_device(const machine_config &mconfig, device_type type
 {
 }
 
-st_video_device::st_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: st_video_device(mconfig, ST_VIDEO, tag, owner, clock)
+stx_video_device::stx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: stx_video_device(mconfig, STX_VIDEO, tag, owner, clock)
 {
 }
 
 ste_video_device::ste_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: st_video_device(mconfig, STE_VIDEO, tag, owner, clock)
+	: stx_video_device(mconfig, STE_VIDEO, tag, owner, clock)
 {
 }
 
 
-void st_video_device::device_resolve_objects()
+void stx_video_device::device_resolve_objects()
 {
 	m_de_callback.resolve_safe();
 }
 
 
-void st_video_device::device_start()
+void stx_video_device::device_start()
 {
-	m_shifter_timer = timer_alloc(FUNC(st_video_device::shifter_tick), this);
-	m_glue_timer = timer_alloc(FUNC(st_video_device::glue_tick), this);
+	m_shifter_timer = timer_alloc(FUNC(stx_video_device::shifter_tick), this);
+	m_glue_timer = timer_alloc(FUNC(stx_video_device::glue_tick), this);
 
 //  m_shifter_timer->adjust(screen().time_until_pos(0), 0, clocks_to_attotime(4)); // 125 ns
 	m_glue_timer->adjust(screen().time_until_pos(0), 0, clocks_to_attotime(16)); // 500 ns
@@ -656,7 +656,7 @@ void st_video_device::device_start()
 
 void ste_video_device::device_start()
 {
-	st_video_device::device_start();
+	stx_video_device::device_start();
 
 	// register for state saving
 	save_item(NAME(m_shifter_lineofs));
@@ -664,13 +664,13 @@ void ste_video_device::device_start()
 }
 
 
-void st_video_device::device_reset()
+void stx_video_device::device_reset()
 {
 	// TODO: reset glue chip
 }
 
 
-uint32_t st_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t stx_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;

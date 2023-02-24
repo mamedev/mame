@@ -101,8 +101,7 @@ public:
 	void init_symbolics();
 
 private:
-	required_device<m68000_base_device> m_maincpu;
-	[[maybe_unused]] uint16_t buserror_r();
+	required_device<m68000_device> m_maincpu;
 	[[maybe_unused]] uint16_t fep_paddle_id_prom_r();
 	//uint16_t ram_parity_hack_r(offs_t offset);
 	//void ram_parity_hack_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -117,16 +116,6 @@ private:
 
 	//TIMER_CALLBACK_MEMBER(outfifo_read_cb);
 };
-
-uint16_t symbolics_state::buserror_r()
-{
-	if(!machine().side_effects_disabled())
-	{
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	}
-	return 0;
-}
 
 uint16_t symbolics_state::fep_paddle_id_prom_r() // bits 8 and 9 do something special if both are set.
 {
@@ -265,7 +254,7 @@ void symbolics_state::m68k_mem(address_map &map)
 	//map(0x020002, 0x03ffff).ram().region("fepdram", 0); /* Local FEP ram seems to be here? there are 18 mcm4164s on the pcb which probably map here, plus 2 parity bits? */
 	// 2x AM9128-10PC 2048x8 SRAMs @F7 and @G7 map somewhere
 	// 6x AM2148-50 1024x4bit SRAMs @F22-F27 map somewhere
-	//map(0x040000, 0xffffff).r(FUNC(symbolics_state::buserror_r));
+	//map(0x040000, 0xffffff).r(m_maincpu, FUNC(m68000_device::berr_r));
 	//map(0x800000, 0xffffff).ram(); /* paged access to lispm ram? */
 	//FF00B0 is readable, may be to read the MC/SQ/DP/AU continuity lines?
 	map(0xff00a0, 0xff00bf).rom().region("fep_paddle_prom",0);

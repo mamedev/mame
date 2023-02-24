@@ -39,8 +39,9 @@ void menu_pty_info::populate()
 	}
 }
 
-void menu_pty_info::handle(event const *ev)
+bool menu_pty_info::handle(event const *ev)
 {
+	return false;
 }
 
 } // namespace ui

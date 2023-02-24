@@ -163,7 +163,7 @@ public:
 			DIDEVCAPS const &caps,
 			LPCDIDATAFORMAT format);
 
-	virtual void poll() override;
+	virtual void poll(bool relative_reset) override;
 	virtual void reset() override;
 	virtual void configure(input_device &device) override;
 
@@ -184,7 +184,7 @@ dinput_keyboard_device::dinput_keyboard_device(
 {
 }
 
-void dinput_keyboard_device::poll()
+void dinput_keyboard_device::poll(bool relative_reset)
 {
 	// poll the DirectInput immediate state
 	std::lock_guard<std::mutex> scope_lock(m_device_lock);
@@ -233,7 +233,7 @@ public:
 			DIDEVCAPS const &caps,
 			LPCDIDATAFORMAT format);
 
-	void poll() override;
+	void poll(bool relative_reset) override;
 	void reset() override;
 	virtual void configure(input_device &device) override;
 
@@ -256,10 +256,10 @@ dinput_mouse_device::dinput_mouse_device(
 	m_caps.dwButtons = std::min(m_caps.dwButtons, DWORD((m_format == &c_dfDIMouse) ? 4 : 8));
 }
 
-void dinput_mouse_device::poll()
+void dinput_mouse_device::poll(bool relative_reset)
 {
 	// poll
-	if (poll_dinput(&m_mouse) == DI_OK)
+	if (relative_reset && (poll_dinput(&m_mouse) == DI_OK))
 	{
 		// scale the axis data
 		m_mouse.lX *= input_device::RELATIVE_PER_PIXEL;
@@ -566,7 +566,7 @@ void dinput_joystick_device::reset()
 	std::fill(std::begin(m_joystick.state.rgdwPOV), std::end(m_joystick.state.rgdwPOV), 0xffff);
 }
 
-void dinput_joystick_device::poll()
+void dinput_joystick_device::poll(bool relative_reset)
 {
 	// poll the device first
 	if (dinput_device::poll_dinput(&m_joystick.state) == DI_OK)
@@ -1168,7 +1168,6 @@ int32_t dinput_joystick_device::pov_get_state(void *device_internal, void *item_
 	int const povdir = uintptr_t(item_internal) % 4;
 
 	// get the current state
-	devinfo->module().poll_if_necessary();
 	DWORD const pov = devinfo->m_joystick.state.rgdwPOV[povnum];
 
 	// if invalid, return 0

@@ -46,7 +46,7 @@ protected:
 	uint32_t screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_megadriv);
 
-	required_device<m68000_base_device> m_maincpu;
+	required_device<m68000_device> m_maincpu;
 	required_device<timer_device> m_scan_timer;
 	required_device<sega315_5313_device> m_vdp;
 	optional_device<screen_device> m_screen;

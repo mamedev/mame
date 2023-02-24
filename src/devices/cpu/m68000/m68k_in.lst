@@ -2797,9 +2797,6 @@ b1c0 f1c0 cmpa     l A+-DXWLdxI 01:6 7:7 234fc:4
 	u32 dst = DY();
 	u32 res = dst - src;
 
-	if (!m_cmpild_instr_callback.isnull())
-		(m_cmpild_instr_callback)(m_ir & 7, src);
-
 	m_n_flag = NFLAG_32(res);
 	m_not_z_flag = MASK_OUT_ABOVE_32(res);
 	m_v_flag = VFLAG_SUB_32(src, dst, res);
@@ -6231,7 +6228,7 @@ f000 fe00 pmmu     l .          234fc:8p
 f548 ffd8 ptest    l .          4:8p
 	if(m_has_pmmu)
 	{
-		logerror("68040: unhandled PTEST\n");
+		//logerror("68040: unhandled PTEST\n");
 	}
 	else
 	{
@@ -6242,7 +6239,6 @@ f548 ffd8 ptest    l .          4:8p
 4e70 ffff reset    . .          071234fc:0p
 	if(m_s_flag) {
 		m_reset_cb(1);
-		m68k_reset_peripherals();
 		m_icount -= m_cyc_reset;
 		m_reset_cb(0);
 	} else {
@@ -6855,8 +6851,6 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 234fc:5
 		u32 new_sr;
 		u32 new_pc;
 
-		if (!m_rte_instr_callback.isnull())
-			(m_rte_instr_callback)(1);
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 
 		new_sr = m68ki_pull_16();
@@ -6877,8 +6871,6 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 234fc:5
 		u32 new_pc;
 		u32 format_word;
 
-		if (!m_rte_instr_callback.isnull())
-			(m_rte_instr_callback)(1);
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 
 		format_word = m68ki_read_16(REG_A()[7]+6) >> 12;
@@ -6932,8 +6924,6 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 234fc:5
 		u32 new_pc;
 		u32 format_word;
 
-		if (!m_rte_instr_callback.isnull())
-			(m_rte_instr_callback)(1);
 		m68ki_trace_t0();              /* auto-disable (see m68kcpu.h) */
 
 	rte_loop:
@@ -7804,15 +7794,7 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 234fc:5
 	m_v_flag = VFLAG_CLEAR;
 	m_c_flag = CFLAG_CLEAR;
 
-	/* On the 68000 and 68010, the TAS instruction uses a unique bus cycle that may have
-	   side effects (e.g. delaying DMA) or may fail to write back at all depending on the
-	   bus implementation.
-	   In particular, the Genesis/Megadrive games Gargoyles and Ex-Mutants need the TAS
-	   to fail to write back in order to function properly. */
-	if (CPU_TYPE_IS_010_LESS() && !m_tas_write_callback.isnull())
-		(m_tas_write_callback)(ea, dst | 0x80);
-	else
-		m68ki_write_8(ea, dst | 0x80);
+	m68ki_write_8(ea, dst | 0x80);
 
 
 4e40 fff0 trap     . .          071234fc:4
@@ -8110,7 +8092,6 @@ f400 ff20 cinv     l .          4:16
 
 
 f420 ff20 cpush    l .          4:16
-	logerror("%s at %08x: called unimplemented instruction %04x (cpush)\n",
-					tag(), m_ppc, m_ir);
+	//logerror("%s at %08x: called unimplemented instruction %04x (cpush)\n", tag(), m_ppc, m_ir);
 
 

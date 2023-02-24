@@ -131,7 +131,7 @@ public:
 	}
 
 protected:
-	mc68328_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 addr_bits, address_map_constructor internal_map_ctor);
+	mc68328_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -629,7 +629,7 @@ protected:
 	u8   m_ivr;         // Interrupt Vector Register
 	u16  m_icr;         // Interrupt Control Register
 	u32  m_imr;         // Interrupt Mask Register
-	u32  m_isr;         // Interrupt Status Register
+	u32  m_gisr;        // (global) Interrupt Status Register
 	u32  m_ipr;         // Interrupt Pending Register
 
 	// $(FF)FFF400

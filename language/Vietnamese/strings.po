@@ -294,7 +294,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/optsmenu.cpp:85
 msgid "Input Devices"
-msgstr ""
+msgstr "Thiết bị đưa vào"
 
 #: src/frontend/mame/ui/optsmenu.cpp:87
 msgid "Save Settings"
@@ -340,11 +340,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/filesel.cpp:520
 msgid "Read-only"
-msgstr ""
+msgstr "Chỉ đọc"
 
 #: src/frontend/mame/ui/filesel.cpp:522
 msgid "Read-write"
-msgstr ""
+msgstr "Đọc/ghi"
 
 #: src/frontend/mame/ui/filesel.cpp:523
 msgid "Read this image, write to another image"
@@ -524,11 +524,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:84
 msgid "Mouse"
-msgstr ""
+msgstr "Chuột"
 
 #: src/frontend/mame/ui/submenu.cpp:85
 msgid "Joystick"
-msgstr ""
+msgstr "Cần điều khiển"
 
 #: src/frontend/mame/ui/submenu.cpp:86
 msgid "Lightgun"
@@ -688,7 +688,7 @@ msgstr ""
 #: src/frontend/mame/ui/analogipt.cpp:527 plugins/cheatfind/init.lua:766
 #: plugins/cheatfind/init.lua:777 plugins/cheat/init.lua:679
 msgid "On"
-msgstr ""
+msgstr "Bật"
 
 #: src/frontend/mame/ui/menu.cpp:372 src/frontend/mame/ui/menu.cpp:741
 #: src/frontend/mame/ui/videoopt.cpp:185
@@ -697,11 +697,11 @@ msgstr ""
 #: plugins/cheatfind/init.lua:774 plugins/cheat/init.lua:682
 #: plugins/cheat/init.lua:691
 msgid "Off"
-msgstr ""
+msgstr "Tắt"
 
 #: src/frontend/mame/ui/menu.cpp:744
 msgid "Auto"
-msgstr ""
+msgstr "Tự động"
 
 #: src/frontend/mame/ui/menu.cpp:1272
 #: src/frontend/mame/ui/simpleselgame.cpp:283
@@ -802,12 +802,12 @@ msgstr ""
 #: src/frontend/mame/ui/info.cpp:47
 msgctxt "emulation-feature"
 msgid "camera"
-msgstr ""
+msgstr "camera"
 
 #: src/frontend/mame/ui/info.cpp:48
 msgctxt "emulation-feature"
 msgid "microphone"
-msgstr ""
+msgstr "micrô"
 
 #: src/frontend/mame/ui/info.cpp:49
 msgctxt "emulation-feature"
@@ -817,12 +817,12 @@ msgstr ""
 #: src/frontend/mame/ui/info.cpp:50
 msgctxt "emulation-feature"
 msgid "keyboard"
-msgstr ""
+msgstr "bàn phím"
 
 #: src/frontend/mame/ui/info.cpp:51
 msgctxt "emulation-feature"
 msgid "mouse"
-msgstr ""
+msgstr "chuột"
 
 #: src/frontend/mame/ui/info.cpp:52
 msgctxt "emulation-feature"
@@ -837,7 +837,7 @@ msgstr ""
 #: src/frontend/mame/ui/info.cpp:54
 msgctxt "emulation-feature"
 msgid "printer"
-msgstr ""
+msgstr "máy in"
 
 #: src/frontend/mame/ui/info.cpp:55
 msgctxt "emulation-feature"
@@ -1243,7 +1243,7 @@ msgstr ""
 #: src/frontend/mame/ui/utils.cpp:88
 msgctxt "machine-filter"
 msgid "Not Working"
-msgstr ""
+msgstr "Không hoạt động"
 
 #: src/frontend/mame/ui/utils.cpp:89
 msgctxt "machine-filter"
@@ -2478,15 +2478,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/custui.cpp:215
 msgid "Fonts"
-msgstr ""
+msgstr "Phông"
 
 #: src/frontend/mame/ui/custui.cpp:216
 msgid "Colors"
-msgstr ""
+msgstr "Màu"
 
 #: src/frontend/mame/ui/custui.cpp:219
 msgid "Language"
-msgstr ""
+msgstr "Ngôn ngữ"
 
 #: src/frontend/mame/ui/custui.cpp:236 src/frontend/mame/ui/custui.cpp:280
 msgid "[built-in]"
@@ -2498,7 +2498,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/custui.cpp:366
 msgid "default"
-msgstr ""
+msgstr "mặc định"
 
 #: src/frontend/mame/ui/custui.cpp:465 src/frontend/mame/ui/custui.cpp:507
 msgid "UI Font"
@@ -2506,11 +2506,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/custui.cpp:512
 msgid "Bold"
-msgstr ""
+msgstr "Đậm"
 
 #: src/frontend/mame/ui/custui.cpp:513
 msgid "Italic"
-msgstr ""
+msgstr "Nghiêng"
 
 #: src/frontend/mame/ui/custui.cpp:518
 msgid "Lines"
@@ -2676,57 +2676,57 @@ msgstr ""
 
 #: src/frontend/mame/ui/custui.cpp:959
 msgid "Color preview:"
-msgstr ""
+msgstr "Xem trước màu:"
 
 #: src/frontend/mame/ui/custui.cpp:1052
 msgctxt "color-preset"
 msgid "White"
-msgstr ""
+msgstr "Trắng"
 
 #: src/frontend/mame/ui/custui.cpp:1053
 msgctxt "color-preset"
 msgid "Silver"
-msgstr ""
+msgstr "Bạc"
 
 #: src/frontend/mame/ui/custui.cpp:1054
 msgctxt "color-preset"
 msgid "Gray"
-msgstr ""
+msgstr "Xám"
 
 #: src/frontend/mame/ui/custui.cpp:1055
 msgctxt "color-preset"
 msgid "Black"
-msgstr ""
+msgstr "Đen"
 
 #: src/frontend/mame/ui/custui.cpp:1056
 msgctxt "color-preset"
 msgid "Red"
-msgstr ""
+msgstr "Đỏ"
 
 #: src/frontend/mame/ui/custui.cpp:1057
 msgctxt "color-preset"
 msgid "Orange"
-msgstr ""
+msgstr "Cam"
 
 #: src/frontend/mame/ui/custui.cpp:1058
 msgctxt "color-preset"
 msgid "Yellow"
-msgstr ""
+msgstr "Vàng"
 
 #: src/frontend/mame/ui/custui.cpp:1059
 msgctxt "color-preset"
 msgid "Green"
-msgstr ""
+msgstr "Xanh lục"
 
 #: src/frontend/mame/ui/custui.cpp:1060
 msgctxt "color-preset"
 msgid "Blue"
-msgstr ""
+msgstr "Xanh lam"
 
 #: src/frontend/mame/ui/custui.cpp:1061
 msgctxt "color-preset"
 msgid "Violet"
-msgstr ""
+msgstr "Tím"
 
 #: src/frontend/mame/ui/about.cpp:42
 #, c-format
@@ -2934,7 +2934,7 @@ msgstr ""
 #, c-format
 msgctxt "menu-main"
 msgid "About %1$s"
-msgstr ""
+msgstr "Giới thiệu về %1$s"
 
 #: src/frontend/mame/ui/mainmenu.cpp:195
 msgctxt "menu-main"
@@ -3456,7 +3456,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/sndmenu.cpp:114 src/frontend/mame/ui/sndmenu.cpp:150
 msgid "Sample Rate"
-msgstr ""
+msgstr "Tốc độ lấy mẫu"
 
 #: src/frontend/mame/ui/sndmenu.cpp:148
 msgid "Sound"

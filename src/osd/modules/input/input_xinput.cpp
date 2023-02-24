@@ -713,7 +713,7 @@ public:
 			XINPUT_CAPABILITIES const &caps,
 			xinput_api_helper const &helper);
 
-	virtual void poll() override;
+	virtual void poll(bool relative_reset) override;
 	virtual void reset() override;
 	virtual void configure(input_device &device) override;
 
@@ -805,7 +805,7 @@ xinput_joystick_device::xinput_joystick_device(
 }
 
 
-void xinput_joystick_device::poll()
+void xinput_joystick_device::poll(bool relative_reset)
 {
 	// poll the device first, and skip if nothing changed
 	if (!read_state())
@@ -1255,7 +1255,7 @@ public:
 			XINPUT_CAPABILITIES const &caps,
 			xinput_api_helper const &helper);
 
-	virtual void poll() override;
+	virtual void poll(bool relative_reset) override;
 	virtual void reset() override;
 	virtual void configure(input_device &device) override;
 
@@ -1335,7 +1335,7 @@ xinput_flight_stick_device::xinput_flight_stick_device(
 }
 
 
-void xinput_flight_stick_device::poll()
+void xinput_flight_stick_device::poll(bool relative_reset)
 {
 	// poll the device first, and skip if nothing changed
 	if (!read_state())
@@ -1717,7 +1717,7 @@ public:
 			XINPUT_CAPABILITIES const &caps,
 			xinput_api_helper const &helper);
 
-	virtual void poll() override;
+	virtual void poll(bool relative_reset) override;
 	virtual void reset() override;
 	virtual void configure(input_device &device) override;
 
@@ -1796,7 +1796,7 @@ xinput_guitar_device::xinput_guitar_device(
 }
 
 
-void xinput_guitar_device::poll()
+void xinput_guitar_device::poll(bool relative_reset)
 {
 	// poll the device first, and skip if nothing changed
 	if (!read_state())
@@ -2002,7 +2002,7 @@ public:
 			XINPUT_CAPABILITIES const &caps,
 			xinput_api_helper const &helper);
 
-	virtual void poll() override;
+	virtual void poll(bool relative_reset) override;
 	virtual void reset() override;
 	virtual void configure(input_device &device) override;
 
@@ -2078,7 +2078,7 @@ xinput_drumkit_device::xinput_drumkit_device(
 }
 
 
-void xinput_drumkit_device::poll()
+void xinput_drumkit_device::poll(bool relative_reset)
 {
 	// poll the device first, and skip if nothing changed
 	if (!read_state())
@@ -2258,7 +2258,7 @@ public:
 			XINPUT_CAPABILITIES const &caps,
 			xinput_api_helper const &helper);
 
-	virtual void poll() override;
+	virtual void poll(bool relative_reset) override;
 	virtual void reset() override;
 	virtual void configure(input_device &device) override;
 
@@ -2337,7 +2337,7 @@ xinput_turntable_device::xinput_turntable_device(
 }
 
 
-void xinput_turntable_device::poll()
+void xinput_turntable_device::poll(bool relative_reset)
 {
 	// poll the device first
 	bool const was_reset = is_reset();
@@ -2354,24 +2354,24 @@ void xinput_turntable_device::poll()
 		// translate axes
 		m_axes[AXIS_TURNTABLE] = s32(thumb_left_y()) * input_device::RELATIVE_PER_PIXEL * 2;
 		m_axes[AXIS_CROSSFADE] = normalize_absolute_axis(thumb_right_y(), XINPUT_AXIS_MINVALUE, XINPUT_AXIS_MAXVALUE);
+	}
 
-		// convert effect dial value to relative displacement
-		s32 effect_delta = s32(u32(u16(thumb_right_x()))) - s32(u32(m_prev_effect));
-		if (!was_reset)
-		{
-			if (0x8000 < effect_delta)
-				effect_delta -= 0x1'0000;
-			else if (-0x8000 > effect_delta)
-				effect_delta += 0x1'0000;
-			m_axes[AXIS_EFFECT] = effect_delta * input_device::RELATIVE_PER_PIXEL / 128;
-		}
+	// handle effect dial
+	if (was_reset)
+	{
+		// just grab the current count after regaining focus
 		m_prev_effect = u16(thumb_right_x());
 	}
-	else
+	else if (relative_reset)
 	{
-		// we know nothing changed so we can skip most of the logic
+		// convert value to relative displacement
+		s32 effect_delta = s32(u32(u16(thumb_right_x()))) - s32(u32(m_prev_effect));
 		m_prev_effect = u16(thumb_right_x());
-		m_axes[AXIS_EFFECT] = 0;
+		if (0x8000 < effect_delta)
+			effect_delta -= 0x1'0000;
+		else if (-0x8000 > effect_delta)
+			effect_delta += 0x1'0000;
+		m_axes[AXIS_EFFECT] = effect_delta * input_device::RELATIVE_PER_PIXEL / 128;
 	}
 }
 
@@ -2683,7 +2683,7 @@ public:
 			XINPUT_CAPABILITIES const &caps,
 			xinput_api_helper const &helper);
 
-	virtual void poll() override;
+	virtual void poll(bool relative_reset) override;
 	virtual void reset() override;
 	virtual void configure(input_device &device) override;
 
@@ -2758,7 +2758,7 @@ xinput_keyboard_device::xinput_keyboard_device(
 }
 
 
-void xinput_keyboard_device::poll()
+void xinput_keyboard_device::poll(bool relative_reset)
 {
 	// TODO: how many bits are really velocity?
 	// TODO: how are touch strip and overdrive read?

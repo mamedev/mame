@@ -137,9 +137,12 @@ public:
 	{
 	}
 
-	virtual void poll() override
+	virtual void poll(bool relative_reset) override
 	{
-		event_based_device::poll();
+		event_based_device::poll(relative_reset);
+
+		if (!relative_reset)
+			return;
 
 		CURSORINFO cursor_info = {0};
 		cursor_info.cbSize = sizeof(CURSORINFO);
@@ -202,10 +205,6 @@ protected:
 	{
 		// set the button state
 		m_mouse.rgbButtons[args.button] = args.keydown ? 0x80 : 0x00;
-
-		// Make sure we have a fresh mouse position on button down
-		if (args.keydown)
-			module().poll_if_necessary();
 	}
 
 private:
@@ -322,9 +321,9 @@ public:
 	{
 	}
 
-	virtual void poll() override
+	virtual void poll(bool relative_reset) override
 	{
-		event_based_device::poll();
+		event_based_device::poll(relative_reset);
 
 		int32_t xpos = 0, ypos = 0;
 

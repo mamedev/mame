@@ -37,7 +37,7 @@ private:
 	};
 
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	device_slot_interface::slot_option const *get_current_option(device_slot_interface &slot) const;
 	void set_slot_device(device_slot_interface &slot, std::string_view val);
