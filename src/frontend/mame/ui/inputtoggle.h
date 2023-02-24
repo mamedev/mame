@@ -32,7 +32,7 @@ protected:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	std::vector<std::reference_wrapper<ioport_field> > m_fields;
 };

@@ -675,12 +675,12 @@ bool osd_common_t::input_init()
 	return true;
 }
 
-void osd_common_t::poll_input_modules()
+void osd_common_t::poll_input_modules(bool relative_reset)
 {
-	m_keyboard_input->poll_if_necessary();
-	m_mouse_input->poll_if_necessary();
-	m_lightgun_input->poll_if_necessary();
-	m_joystick_input->poll_if_necessary();
+	m_keyboard_input->poll_if_necessary(relative_reset);
+	m_mouse_input->poll_if_necessary(relative_reset);
+	m_lightgun_input->poll_if_necessary(relative_reset);
+	m_joystick_input->poll_if_necessary(relative_reset);
 }
 
 void osd_common_t::exit_subsystems()

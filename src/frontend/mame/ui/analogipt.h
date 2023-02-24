@@ -68,7 +68,7 @@ private:
 	using field_data_vector = std::vector<field_data>;
 
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	void find_fields();
 
