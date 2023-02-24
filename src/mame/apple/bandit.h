@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont
 /**********************************************************************
 
-    bandit.h - Apple "Bandit" 60x bus/PCI bridge
+    bandit.h - Apple "Bandit" and "Aspen" 60x bus/PCI bridges
 
 **********************************************************************/
 
@@ -14,6 +14,7 @@
 #include "machine/pci.h"
 
 class bandit_host_device : public pci_host_device {
+	friend class aspen_host_device;
 public:
 	template <typename T>
 	bandit_host_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpu_tag)
@@ -21,12 +22,11 @@ public:
 	{
 		set_cpu_tag(std::forward<T>(cpu_tag));
 	}
+	bandit_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 	bandit_host_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	void set_dev_offset(int devOffset) { m_dev_offset = devOffset; }
-
-	void map(address_map &map);
 
 protected:
 	virtual void device_start() override;
@@ -42,8 +42,9 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 private:
-	u32 be_config_address_r();
-	void be_config_address_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void cpu_map(address_map &map);
+	virtual u32 be_config_address_r();
+	virtual void be_config_address_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 be_config_data_r(offs_t offset, u32 mem_mask = ~0);
 	void be_config_data_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	template <u32 Base> u32 pci_memory_r(offs_t offset, u32 mem_mask);
@@ -57,6 +58,25 @@ private:
 	int m_dev_offset;
 };
 
+class aspen_host_device : public bandit_host_device
+{
+public:
+	template <typename T>
+	aspen_host_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpu_tag)
+		: aspen_host_device(mconfig, tag, owner, clock)
+	{
+		set_cpu_tag(std::forward<T>(cpu_tag));
+	}
+	aspen_host_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+
+private:
+	virtual u32 be_config_address_r() override;
+	virtual void be_config_address_w(offs_t offset, u32 data, u32 mem_mask = ~0) override;
+};
+
 DECLARE_DEVICE_TYPE(BANDIT, bandit_host_device)
+DECLARE_DEVICE_TYPE(ASPEN, aspen_host_device)
 
 #endif // MAME_APPLE_BANDIT_H
