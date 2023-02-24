@@ -94,6 +94,88 @@ do \
 } \
 while (0)
 
+void hng64_state::zoom_transpen_line(bitmap_ind16 & dest, bitmap_ind16 & destz, const rectangle & cliprect,
+	gfx_element * gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
+	int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, int cury, const u8 *srcdata, int32_t srcx, int32_t &srcy, uint32_t numblocks, uint32_t leftovers)
+{
+
+	auto* destptr = &dest.pix(cury, destx);
+	auto* destzptr = &destz.pix(cury, destx);
+
+	const u8* srcptr = srcdata + (srcy >> 16) * gfx->rowbytes();
+	int32_t cursrcx = srcx;
+	srcy += dy;
+
+	// iterate over unrolled blocks of 4
+	if (zrev)
+	{
+		uint8_t cb = 0;
+		for (int32_t curx = 0; curx < numblocks; curx++)
+		{
+			uint16_t srcpix;
+			PIX_CHECKERBOARD;
+			PIXEL_OP_REBASE_TRANSPEN_REV(destptr[0], destzptr[0], srcpix);
+			cursrcx += dx;
+			PIX_CHECKERBOARD;
+			PIXEL_OP_REBASE_TRANSPEN_REV(destptr[1], destzptr[1], srcpix);
+			cursrcx += dx;
+			PIX_CHECKERBOARD;
+			PIXEL_OP_REBASE_TRANSPEN_REV(destptr[2], destzptr[2], srcpix);
+			cursrcx += dx;
+			PIX_CHECKERBOARD;
+			PIXEL_OP_REBASE_TRANSPEN_REV(destptr[3], destzptr[3], srcpix);
+			cursrcx += dx;
+			destptr += 4;
+			destzptr += 4;
+
+		}
+
+		// iterate over leftover pixels
+		for (int32_t curx = 0; curx < leftovers; curx++)
+		{
+			uint16_t srcpix;
+			PIX_CHECKERBOARD;
+			PIXEL_OP_REBASE_TRANSPEN_REV(destptr[0], destzptr[0], srcpix);
+			cursrcx += dx;
+			destptr++;
+			destzptr++;
+		}
+	}
+	else
+	{
+		uint8_t cb = 0;
+		for (int32_t curx = 0; curx < numblocks; curx++)
+		{
+			uint16_t srcpix;
+			PIX_CHECKERBOARD;
+			PIXEL_OP_REBASE_TRANSPEN(destptr[0], destzptr[0], srcpix);
+			cursrcx += dx;
+			PIX_CHECKERBOARD;
+			PIXEL_OP_REBASE_TRANSPEN(destptr[1], destzptr[1], srcpix);
+			cursrcx += dx;
+			PIX_CHECKERBOARD;
+			PIXEL_OP_REBASE_TRANSPEN(destptr[2], destzptr[2], srcpix);
+			cursrcx += dx;
+			PIX_CHECKERBOARD;
+			PIXEL_OP_REBASE_TRANSPEN(destptr[3], destzptr[3], srcpix);
+			cursrcx += dx;
+			destptr += 4;
+			destzptr += 4;
+
+		}
+
+		// iterate over leftover pixels
+		for (int32_t curx = 0; curx < leftovers; curx++)
+		{
+			uint16_t srcpix;
+			PIX_CHECKERBOARD;
+			PIXEL_OP_REBASE_TRANSPEN(destptr[0], destzptr[0], srcpix);
+			cursrcx += dx;
+			destptr++;
+			destzptr++;
+		}
+	}
+}
 
 void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
 		gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
@@ -185,82 +267,10 @@ void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const r
 		// iterate over pixels in Y
 		for (int32_t cury = desty; cury <= destendy; cury++)
 		{
-			auto *destptr = &dest.pix(cury, destx);
-			auto *destzptr = &destz.pix(cury, destx);
+			zoom_transpen_line(dest, destz, cliprect,
+				gfx, code, color, flipx, flipy, destx, desty,
+				dx, dy, dstwidth, dstheight, trans_pen, zval, zrev, blend, checkerboard, mosaic, cury, srcdata, srcx, srcy, numblocks, leftovers);
 
-			const u8 *srcptr = srcdata + (srcy >> 16) * gfx->rowbytes();
-			int32_t cursrcx = srcx;
-			srcy += dy;
-
-			// iterate over unrolled blocks of 4
-			if (zrev)
-			{
-				uint8_t cb = 0;
-				for (int32_t curx = 0; curx < numblocks; curx++)
-				{
-					uint16_t srcpix;
-					PIX_CHECKERBOARD;
-					PIXEL_OP_REBASE_TRANSPEN_REV(destptr[0], destzptr[0], srcpix );
-					cursrcx += dx;
-					PIX_CHECKERBOARD;
-					PIXEL_OP_REBASE_TRANSPEN_REV(destptr[1], destzptr[1], srcpix);
-					cursrcx += dx;
-					PIX_CHECKERBOARD;
-					PIXEL_OP_REBASE_TRANSPEN_REV(destptr[2], destzptr[2], srcpix);
-					cursrcx += dx;
-					PIX_CHECKERBOARD;
-					PIXEL_OP_REBASE_TRANSPEN_REV(destptr[3], destzptr[3], srcpix);
-					cursrcx += dx;
-					destptr += 4;
-					destzptr += 4;
-
-				}
-
-				// iterate over leftover pixels
-				for (int32_t curx = 0; curx < leftovers; curx++)
-				{
-					uint16_t srcpix;
-					PIX_CHECKERBOARD;
-					PIXEL_OP_REBASE_TRANSPEN_REV(destptr[0], destzptr[0], srcpix);
-					cursrcx += dx;
-					destptr++;
-					destzptr++;
-				}
-			}
-			else
-			{
-				uint8_t cb = 0;
-				for (int32_t curx = 0; curx < numblocks; curx++)
-				{
-					uint16_t srcpix;
-					PIX_CHECKERBOARD;
-					PIXEL_OP_REBASE_TRANSPEN(destptr[0], destzptr[0], srcpix);
-					cursrcx += dx;
-					PIX_CHECKERBOARD;
-					PIXEL_OP_REBASE_TRANSPEN(destptr[1], destzptr[1], srcpix);
-					cursrcx += dx;
-					PIX_CHECKERBOARD;
-					PIXEL_OP_REBASE_TRANSPEN(destptr[2], destzptr[2], srcpix);
-					cursrcx += dx;
-					PIX_CHECKERBOARD;
-					PIXEL_OP_REBASE_TRANSPEN(destptr[3], destzptr[3], srcpix);
-					cursrcx += dx;
-					destptr += 4;
-					destzptr += 4;
-
-				}
-
-				// iterate over leftover pixels
-				for (int32_t curx = 0; curx < leftovers; curx++)
-				{
-					uint16_t srcpix;
-					PIX_CHECKERBOARD;
-					PIXEL_OP_REBASE_TRANSPEN(destptr[0], destzptr[0], srcpix);
-					cursrcx += dx;
-					destptr++;
-					destzptr++;
-				}
-			}
 		}
 	} while (0);
 	g_profiler.stop();
