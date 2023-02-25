@@ -41,7 +41,7 @@ public:
 			SDL_GL_DeleteContext(m_context);
 	}
 
-	virtual explicit operator bool() const
+	virtual explicit operator bool() const override
 	{
 		return bool(m_context);
 	}
