@@ -442,7 +442,7 @@ private:
 
 	void drawline(bitmap_ind16& dest, bitmap_ind16& destz, const rectangle& cliprect,
 		gfx_element* gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
-		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, int cury, const u8* srcdata, int32_t srcx, int32_t srcy_copy, uint32_t numblocks, uint32_t leftovers, int line);
+		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, int cury, const u8* srcdata, int32_t srcx, int32_t srcy_copy, uint32_t leftovers, int line);
 
 	void zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
 		gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
