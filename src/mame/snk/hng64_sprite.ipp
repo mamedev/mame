@@ -81,19 +81,24 @@ while (0)
 #define PIX_CHECKERBOARD \
 do \
 { \
-	if (!checkerboard) \
-	{ \
+	if (!mosaic) \
 		srcpix = srcptr[(cursrcx >> 16) & 0xf]; \
-	} \
 	else \
+	{ \
+		srcpix = machine().rand() & 0xf; \
+	} \
+	\
+	if (checkerboard) \
 	{ \
 		if (cb & 1) \
 		{ \
-			srcpix = (cury & 1) ? srcptr[(cursrcx >> 16) & 0xf] : 0; \
+			if (!(cury & 1)) \
+				srcpix = 0; \
 		} \
 		else \
 		{ \
-			srcpix = (cury & 1) ? 0 : srcptr[(cursrcx >> 16) & 0xf]; \
+			if ((cury & 1)) \
+				srcpix = 0; \
 		} \
 		cb++; \
 	} \
@@ -102,7 +107,7 @@ while (0)
 
 void hng64_state::drawline(bitmap_ind16 & dest, bitmap_ind16 & destz, const rectangle & cliprect,
 	gfx_element * gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
-	int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, int cury, const u8 *srcdata, int32_t srcx, int32_t srcy_copy, uint32_t leftovers, int line)
+	int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, int cury, const u8 *srcdata, int32_t srcx, int32_t srcy_copy, uint32_t leftovers, int line, uint16_t &srcpix)
 {
 	int srcy = dy * line + srcy_copy;
 
@@ -119,7 +124,6 @@ void hng64_state::drawline(bitmap_ind16 & dest, bitmap_ind16 & destz, const rect
 		// iterate over leftover pixels
 		for (int32_t curx = 0; curx < leftovers; curx++)
 		{
-			uint16_t srcpix;
 			int xdrawpos = destx + curx;
 			PIX_CHECKERBOARD;
 			PIXEL_OP_REBASE_TRANSPEN_REV(destptr[xdrawpos], destzptr[xdrawpos], srcpix);
@@ -132,7 +136,6 @@ void hng64_state::drawline(bitmap_ind16 & dest, bitmap_ind16 & destz, const rect
 		// iterate over leftover pixels
 		for (int32_t curx = 0; curx < leftovers; curx++)
 		{
-			uint16_t srcpix;
 			int xdrawpos = destx + curx;
 			PIX_CHECKERBOARD;
 			PIXEL_OP_REBASE_TRANSPEN(destptr[xdrawpos], destzptr[xdrawpos], srcpix);
@@ -143,7 +146,7 @@ void hng64_state::drawline(bitmap_ind16 & dest, bitmap_ind16 & destz, const rect
 
 void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
 		gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
-		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, int line)
+		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, int line, uint16_t &srcpix)
 {
 	// use pen usage to optimize
 	code %= gfx->elements();
@@ -199,7 +202,7 @@ void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const r
 
 	drawline(dest, destz, cliprect,
 		gfx, code, color, flipx, flipy, destx, desty,
-		dx, dy, dstwidth, dstheight, trans_pen, zval, zrev, blend, checkerboard, mosaic, desty, srcdata, srcx, srcycopy, leftovers, line);
+		dx, dy, dstwidth, dstheight, trans_pen, zval, zrev, blend, checkerboard, mosaic, desty, srcdata, srcx, srcycopy, leftovers, line, srcpix);
 
 }
 
@@ -348,6 +351,8 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 				int16_t drawx = xpos;
 				uint32_t srcpix_x = 0;
 
+				uint16_t srcpix = 0;
+
 				for (int xdrw = 0; xdrw <= chainx; xdrw++)
 				{
 					uint32_t dstwidth = 0;
@@ -370,11 +375,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 					uint8_t gfxregion;
 
 					get_tile_details(chaini, currentsprite, xdrw, ydrw, chainx, chainy, xflip, yflip, tileno, pal, gfxregion);
-
-
-					zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, m_gfxdecode->gfx(gfxregion), tileno, pal, xflip, yflip, drawx, cury, dx, dy, dstwidth, dstheight, 0, zval, zsort, blend, checkerboard, mosaic, line);
-
-
+					zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, m_gfxdecode->gfx(gfxregion), tileno, pal, xflip, yflip, drawx, cury, dx, dy, dstwidth, dstheight, 0, zval, zsort, blend, checkerboard, mosaic, line, srcpix);
 					drawx += dstwidth;
 				}
 			}
