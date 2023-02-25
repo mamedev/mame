@@ -49,8 +49,14 @@ do \
 		uint32_t srcdata = (SOURCE); \
 		if (srcdata != trans_pen) \
 		{ \
-			(DESTZ) = zval; \
-			(DEST) = color + srcdata; \
+			if (cury > cliprect.bottom() || cury < cliprect.top()) \
+			{ \
+			} \
+			else \
+			{ \
+				(DESTZ) = zval; \
+				(DEST) = color + srcdata; \
+			} \
 		} \
 	} \
 } \
@@ -65,8 +71,14 @@ do \
 		uint32_t srcdata = (SOURCE); \
 		if (srcdata != trans_pen) \
 		{ \
-			(DESTZ) = zval; \
-			(DEST) = color + srcdata; \
+			if (cury > cliprect.bottom() || cury < cliprect.top()) \
+			{ \
+			} \
+			else \
+			{ \
+				(DESTZ) = zval; \
+				(DEST) = color + srcdata; \
+			} \
 		} \
 	} \
 } \
@@ -94,7 +106,7 @@ do \
 } \
 while (0)
 
-void hng64_state::zoom_transpen_line(bitmap_ind16 & dest, bitmap_ind16 & destz, const rectangle & cliprect,
+void hng64_state::drawline(bitmap_ind16 & dest, bitmap_ind16 & destz, const rectangle & cliprect,
 	gfx_element * gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
 	int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, int cury, const u8 *srcdata, int32_t srcx, int32_t srcy_copy, uint32_t numblocks, uint32_t leftovers, int line)
 {
@@ -226,20 +238,9 @@ void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const r
 
 	// compute final pixel in Y and exit if we are entirely clipped
 	int32_t destendy = desty + dstheight - 1;
-	if (desty > cliprect.bottom() || destendy < cliprect.top())
-		return;
 
 	// apply top clip
 	int32_t srcy = 0;
-	if (desty < cliprect.top())
-	{
-		srcy = (cliprect.top() - desty) * dy;
-		desty = cliprect.top();
-	}
-
-	// apply bottom clip
-	if (destendy > cliprect.bottom())
-		destendy = cliprect.bottom();
 
 	// apply X flipping
 	if (flipx)
@@ -268,7 +269,7 @@ void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const r
 
 	for (int32_t cury = desty; cury <= destendy; cury++)
 	{
-		zoom_transpen_line(dest, destz, cliprect,
+		drawline(dest, destz, cliprect,
 			gfx, code, color, flipx, flipy, destx, desty,
 			dx, dy, dstwidth, dstheight, trans_pen, zval, zrev, blend, checkerboard, mosaic, cury, srcdata, srcx, srcycopy, numblocks, leftovers, line);
 
