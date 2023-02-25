@@ -9,7 +9,7 @@ ACE9412
 DM941204
 |------------------------------------------|
 |UPC1241 YM3012 YM2151       3.BIN         |
-|TL084 TL084 6116      15MHz 4.BIN         |
+|TL084 TL084 6116      30MHz 4.BIN         |
 |9.BIN    1.BIN                            |
 |M6295    Z80B(2)                          |
 |     4MHz                                 |
@@ -34,7 +34,7 @@ Notes:
       6264      - 8k x8 SRAM
       62256     - 32k x8 SRAM
 
-The 15 MHz XTAL has also been seen as 30MHz on a second PCB
+The 30 MHz XTAL (silkscreened as such on PCB) has also been seen as 15MHz on a second PCB
 */
 
 #include "emu.h"
@@ -220,20 +220,38 @@ void gameace_state::init_hotbody()
 	std::vector<uint8_t> buffer(0x40000);
 	memcpy(&buffer[0], rom, 0x40000);
 
-	for (int i = 0x00000; i < 0x40000; i += 0x10) // TODO: simplify this
+	for (int i = 0x00000; i < 0x40000; i++) // TODO: simplify this
 	{
-		std::swap(rom[i], rom[i + 0x02]);
-		std::swap(rom[i + 0x03], rom[i + 0x05]);
-		std::swap(rom[i + 0x07], rom[i + 0x09]);
-		std::swap(rom[i + 0x05], rom[i + 0x09]);
-		std::swap(rom[i + 0x08], rom[i + 0x0c]);
-		std::swap(rom[i + 0x0a], rom[i + 0x0e]);
-		std::swap(rom[i + 0x0b], rom[i + 0x0d]);
-		std::swap(rom[i + 0x07], rom[i + 0x0b]);
-		std::swap(rom[i + 0x09], rom[i + 0x0f]);
+		uint8_t col = i & 0x0f;
+		uint32_t addr;
+
+		switch (col)
+		{
+			case 0x00: addr = 0x02; break;
+			case 0x01: addr = 0x01; break;
+			case 0x02: addr = 0x00; break;
+			case 0x03: addr = 0x05; break;
+			case 0x04: addr = 0x04; break;
+			case 0x05: addr = 0x07; break;
+			case 0x06: addr = 0x06; break;
+			case 0x07: addr = 0x0d; break;
+			case 0x08: addr = 0x0c; break;
+			case 0x09: addr = 0x0f; break;
+			case 0x0a: addr = 0x0e; break;
+			case 0x0b: addr = 0x09; break;
+			case 0x0c: addr = 0x08; break;
+			case 0x0d: addr = 0x0b; break;
+			case 0x0e: addr = 0x0a; break;
+			case 0x0f: addr = 0x03; break;
+		}
+
+		addr = (i & 0x3fff0) | addr;
+
+		if (((addr & 0x0000f) == 0x00003) && (addr < 0x3fff0))
+			addr += 0x10;
+
+		rom[i] = buffer[addr];
 	}
-	for (int i = 0x00000; i < 0x40000; i += 0x10)
-		std::swap(rom[i + 0x0f], rom[i - 0x01]);
 }
 
 } // anonymous namespace
