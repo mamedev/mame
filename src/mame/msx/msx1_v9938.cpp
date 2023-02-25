@@ -184,7 +184,7 @@ void msx1_v9938_state::svi738(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 4);  // 64KB RAM
 	add_cartridge_slot<1>(config, 2);
 	add_internal_slot_irq<2>(config, MSX_SLOT_RS232_SVI738, "rs232", 3, 0, 1, 1, "rs232rom");
-	add_internal_disk_mirrored(config, MSX_SLOT_DISK2_FD1793_SS, "disk", 3, 1, 1, 2, "diskrom");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK2_FD1793_SS, "disk", 3, 1, 1, 2, "diskrom").use_motor_for_led();
 
 	msx1_v9938_pal(SND_AY8910, config);
 }
