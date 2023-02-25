@@ -37,7 +37,7 @@ private:
 	enum class phase { CONFIRMATION, AUDIT, CANCELLATION };
 
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	bool do_audit();
 	void save_available_machines();

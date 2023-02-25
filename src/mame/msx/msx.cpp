@@ -107,6 +107,9 @@
 #include "screen.h"
 #include "softlist_dev.h"
 
+#include "msx_1drive.lh"
+#include "msx_2drives.lh"
+
 
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
@@ -607,6 +610,16 @@ void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, XTAL x
 		m_cassette->set_default_state(CASSETTE_PLAY);
 		m_cassette->add_route(ALL_OUTPUTS, m_speaker, 0.05);
 		m_cassette->set_interface("msx_cass");
+	}
+
+	switch (m_hw_def.get_internal_drives())
+	{
+	case 1:
+		config.set_default_layout(layout_msx_1drive);
+		break;
+	case 2:
+		config.set_default_layout(layout_msx_2drives);
+		break;
 	}
 }
 

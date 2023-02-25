@@ -29,7 +29,7 @@ public:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 };
 
 
@@ -84,7 +84,7 @@ private:
 	osd_ticks_t modified_ticks;
 	input_seq starting_seq;
 
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 	virtual void update_input(input_item_data &seqchangeditem) = 0;
 };
 

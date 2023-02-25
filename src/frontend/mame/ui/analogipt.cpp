@@ -227,158 +227,171 @@ void menu_analog::menu_activated()
 }
 
 
-void menu_analog::handle(event const *ev)
+bool menu_analog::handle(event const *ev)
 {
-	// handle events
-	if (ev)
+	if (!ev)
 	{
-		if (IPT_UI_ON_SCREEN_DISPLAY == ev->iptkey)
+		return false;
+	}
+	else if (IPT_UI_ON_SCREEN_DISPLAY == ev->iptkey)
+	{
+		m_hide_menu = !m_hide_menu;
+		set_process_flags(PROCESS_LR_REPEAT | (m_hide_menu ? (PROCESS_CUSTOM_NAV | PROCESS_CUSTOM_ONLY) : 0));
+		return true;
+	}
+	else if (IPT_UI_HELP == ev->iptkey)
+	{
+		stack_push<menu_fixed_textbox>(
+				ui(),
+				container(),
+				_("menu-analoginput", "Analog Input Adjustments Help"),
+				util::string_format(
+					_("menu-analoginput", HELP_TEXT),
+					ui().get_general_input_setting(IPT_UI_ON_SCREEN_DISPLAY),
+					ui().get_general_input_setting(IPT_UI_LEFT),
+					ui().get_general_input_setting(IPT_UI_RIGHT),
+					ui().get_general_input_setting(IPT_UI_CLEAR),
+					ui().get_general_input_setting(IPT_UI_PREV_GROUP),
+					ui().get_general_input_setting(IPT_UI_NEXT_GROUP),
+					ui().get_general_input_setting(IPT_UI_BACK)));
+		return false;
+	}
+	else if (m_hide_menu)
+	{
+		switch (ev->iptkey)
 		{
-			m_hide_menu = !m_hide_menu;
-			set_process_flags(PROCESS_LR_REPEAT | (m_hide_menu ? (PROCESS_CUSTOM_NAV | PROCESS_CUSTOM_ONLY) : 0));
+		case IPT_UI_UP:
+			--m_top_field;
+			return true;
+		case IPT_UI_DOWN:
+			++m_top_field;
+			return true;
+		case IPT_UI_HOME:
+			m_top_field = 0;
+			return true;
+		case IPT_UI_END:
+			m_top_field = m_field_data.size();
+			return true;
+		default:
+			return false;
 		}
-		else if (IPT_UI_HELP == ev->iptkey)
+	}
+	else if (ev->itemref)
+	{
+		item_data &data(*reinterpret_cast<item_data *>(ev->itemref));
+		int newval(data.cur);
+
+		switch (ev->iptkey)
 		{
-			stack_push<menu_fixed_textbox>(
-					ui(),
-					container(),
-					_("menu-analoginput", "Analog Input Adjustments Help"),
-					util::string_format(
-						_("menu-analoginput", HELP_TEXT),
-						ui().get_general_input_setting(IPT_UI_ON_SCREEN_DISPLAY),
-						ui().get_general_input_setting(IPT_UI_LEFT),
-						ui().get_general_input_setting(IPT_UI_RIGHT),
-						ui().get_general_input_setting(IPT_UI_CLEAR),
-						ui().get_general_input_setting(IPT_UI_PREV_GROUP),
-						ui().get_general_input_setting(IPT_UI_NEXT_GROUP),
-						ui().get_general_input_setting(IPT_UI_BACK)));
-		}
-		else if (m_hide_menu)
-		{
-			switch (ev->iptkey)
+		// flip toggles when selected
+		case IPT_UI_SELECT:
+			if (ANALOG_ITEM_REVERSE == data.type)
+				newval = newval ? 0 : 1;
+			break;
+
+		// if cleared, reset to default value
+		case IPT_UI_CLEAR:
+			newval = data.defvalue;
+			break;
+
+		// left decrements
+		case IPT_UI_LEFT:
+			newval -= machine().input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
+			break;
+
+		// right increments
+		case IPT_UI_RIGHT:
+			newval += machine().input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
+			break;
+
+		// move to first item for previous device
+		case IPT_UI_PREV_GROUP:
 			{
-			case IPT_UI_UP:
-				--m_top_field;
-				break;
-			case IPT_UI_DOWN:
-				++m_top_field;
-				break;
-			case IPT_UI_HOME:
-				m_top_field = 0;
-				break;
-			case IPT_UI_END:
-				m_top_field = m_field_data.size();
-				break;
-			}
-		}
-		else if (ev->itemref)
-		{
-			item_data &data(*reinterpret_cast<item_data *>(ev->itemref));
-			int newval(data.cur);
-
-			switch (ev->iptkey)
-			{
-			// flip toggles when selected
-			case IPT_UI_SELECT:
-				if (ANALOG_ITEM_REVERSE == data.type)
-					newval = newval ? 0 : 1;
-				break;
-
-			// if cleared, reset to default value
-			case IPT_UI_CLEAR:
-				newval = data.defvalue;
-				break;
-
-			// left decrements
-			case IPT_UI_LEFT:
-				newval -= machine().input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
-				break;
-
-			// right increments
-			case IPT_UI_RIGHT:
-				newval += machine().input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
-				break;
-
-			// move to first item for previous device
-			case IPT_UI_PREV_GROUP:
+				auto current = std::distance(m_item_data.data(), &data);
+				device_t const *dev(&data.field.get().device());
+				bool found_break = false;
+				while (0 < current)
 				{
-					auto current = std::distance(m_item_data.data(), &data);
-					device_t const *dev(&data.field.get().device());
-					bool found_break = false;
-					while (0 < current)
+					if (!found_break)
 					{
-						if (!found_break)
+						device_t const *prev(&m_item_data[--current].field.get().device());
+						if (prev != dev)
 						{
-							device_t const *prev(&m_item_data[--current].field.get().device());
-							if (prev != dev)
-							{
-								dev = prev;
-								found_break = true;
-							}
-						}
-						else if (&m_item_data[current - 1].field.get().device() != dev)
-						{
-							set_selection(&m_item_data[current]);
-							set_top_line(selected_index() - 1);
-							break;
-						}
-						else
-						{
-							--current;
-						}
-						if (found_break && !current)
-						{
-							set_selection(&m_item_data[current]);
-							set_top_line(selected_index() - 1);
-							break;
+							dev = prev;
+							found_break = true;
 						}
 					}
-				}
-				break;
-
-			// move to first item for next device
-			case IPT_UI_NEXT_GROUP:
-				{
-					auto current = std::distance(m_item_data.data(), &data);
-					device_t const *const dev(&data.field.get().device());
-					while (m_item_data.size() > ++current)
+					else if (&m_item_data[current - 1].field.get().device() != dev)
 					{
-						if (&m_item_data[current].field.get().device() != dev)
-						{
-							set_selection(&m_item_data[current]);
-							set_top_line(selected_index() - 1);
-							break;
-						}
+						set_selection(&m_item_data[current]);
+						set_top_line(selected_index() - 1);
+						return true;
+					}
+					else
+					{
+						--current;
+					}
+					if (found_break && !current)
+					{
+						set_selection(&m_item_data[current]);
+						set_top_line(selected_index() - 1);
+						return true;
 					}
 				}
-				break;
 			}
+			break;
 
-			// clamp to range
-			newval = std::clamp(newval, data.min, data.max);
-
-			// if things changed, update
-			if (newval != data.cur)
+		// move to first item for next device
+		case IPT_UI_NEXT_GROUP:
 			{
-				ioport_field::user_settings settings;
-
-				// get the settings and set the new value
-				data.field.get().get_user_settings(settings);
-				switch (data.type)
+				auto current = std::distance(m_item_data.data(), &data);
+				device_t const *const dev(&data.field.get().device());
+				while (m_item_data.size() > ++current)
 				{
-					case ANALOG_ITEM_KEYSPEED:      settings.delta = newval;        break;
-					case ANALOG_ITEM_CENTERSPEED:   settings.centerdelta = newval;  break;
-					case ANALOG_ITEM_REVERSE:       settings.reverse = newval;      break;
-					case ANALOG_ITEM_SENSITIVITY:   settings.sensitivity = newval;  break;
+					if (&m_item_data[current].field.get().device() != dev)
+					{
+						set_selection(&m_item_data[current]);
+						set_top_line(selected_index() - 1);
+						return true;
+					}
 				}
-				data.field.get().set_user_settings(settings);
-				data.cur = newval;
-
-				// update the menu item
-				ev->item->set_subtext(item_text(data.type, newval));
-				ev->item->set_flags((data.cur <= data.min) ? FLAG_RIGHT_ARROW : (data.cur >= data.max) ? FLAG_LEFT_ARROW : FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW);
 			}
+			break;
 		}
+
+		// clamp to range
+		newval = std::clamp(newval, data.min, data.max);
+
+		// if things changed, update
+		if (newval != data.cur)
+		{
+			ioport_field::user_settings settings;
+
+			// get the settings and set the new value
+			data.field.get().get_user_settings(settings);
+			switch (data.type)
+			{
+				case ANALOG_ITEM_KEYSPEED:      settings.delta = newval;        break;
+				case ANALOG_ITEM_CENTERSPEED:   settings.centerdelta = newval;  break;
+				case ANALOG_ITEM_REVERSE:       settings.reverse = newval;      break;
+				case ANALOG_ITEM_SENSITIVITY:   settings.sensitivity = newval;  break;
+			}
+			data.field.get().set_user_settings(settings);
+			data.cur = newval;
+
+			// update the menu item
+			ev->item->set_subtext(item_text(data.type, newval));
+			ev->item->set_flags((data.cur <= data.min) ? FLAG_RIGHT_ARROW : (data.cur >= data.max) ? FLAG_LEFT_ARROW : FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
 	}
 }
 

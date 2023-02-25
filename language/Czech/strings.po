@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-18 05:29+1100\n"
-"PO-Revision-Date: 2022-10-28 19:22+0200\n"
+"PO-Revision-Date: 2023-02-25 15:21+0100\n"
 "Last-Translator: Milan Galcik <milan.galcik@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
 "Language: cs\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Poedit 3.2\n"
+"X-Generator: Poedit 3.2.2\n"
 
 #: src/frontend/mame/ui/ui.cpp:474 src/frontend/mame/ui/ui.cpp:547
 msgid ""
@@ -2838,6 +2838,13 @@ msgid ""
 "Next device  \t\t%6$s\n"
 "Return to previous menu  \t\t%7$s"
 msgstr ""
+"Zobrazit/skrýt nastavení  \t\t%1$s\n"
+"Snížit hodnotu  \t\t%2$s\n"
+"Zvýšit hodnotu  \t\t%3$s\n"
+"Vrátit původní hodnotu  \t\t%4$s\n"
+"Předchozí zařízení  \t\t%5$s\n"
+"Následující zařízení  \t\t%6$s\n"
+"Návrat do předchozího menu  \t\t%7$s"
 
 #: src/frontend/mame/ui/analogipt.cpp:82
 msgctxt "menu-analoginput"
@@ -2848,12 +2855,12 @@ msgstr "Přizpůsobení analogového vstupu"
 #, c-format
 msgctxt "menu-analoginput"
 msgid "Press %s to show settings"
-msgstr ""
+msgstr "Stiskněte %s pro zobrazení nastavení"
 
 #: src/frontend/mame/ui/analogipt.cpp:245
 msgctxt "menu-analoginput"
 msgid "Analog Input Adjustments Help"
-msgstr ""
+msgstr "Nápověda k seřízení analogového vstupu"
 
 #: src/frontend/mame/ui/analogipt.cpp:421
 #, c-format
@@ -5408,7 +5415,7 @@ msgstr "Klávesnice"
 #: src/emu/inpttype.ipp:874
 msgctxt "input-name"
 msgid "Show/Hide Menu"
-msgstr ""
+msgstr "Zobrazit/Skrýt menu"
 
 #: src/emu/inpttype.ipp:875
 msgctxt "input-name"
@@ -5418,7 +5425,7 @@ msgstr "Uživ. rozhraní - Vybrat"
 #: src/emu/inpttype.ipp:876
 msgctxt "input-name"
 msgid "UI Back"
-msgstr ""
+msgstr "Uživ. rozhraní - Zpět"
 
 #: src/emu/inpttype.ipp:877
 msgctxt "input-name"
@@ -5433,7 +5440,7 @@ msgstr "Uživ. rozhraní - Smazat"
 #: src/emu/inpttype.ipp:879
 msgctxt "input-name"
 msgid "UI Help"
-msgstr ""
+msgstr "Uživ. rozhraní - Nápověda"
 
 #: src/emu/inpttype.ipp:880
 msgctxt "input-name"
@@ -5993,42 +6000,42 @@ msgstr "Zapsat"
 
 #: plugins/cheatfind/init.lua:1003
 msgid "Watch"
-msgstr ""
+msgstr "Sledovat"
 
 #: plugins/cheatfind/init.lua:1020
 msgid "Page"
-msgstr ""
+msgstr "Strana"
 
 #: plugins/cheatfind/init.lua:1039
 msgid "Clear Watches"
-msgstr ""
+msgstr "Vymazat Sledované"
 
 #: plugins/cheatfind/init.lua:1055
 msgid "Cheat Finder"
-msgstr ""
+msgstr "Vyhledávač cheatů"
 
 #: plugins/portname/init.lua:103
 msgid "Save input names to file"
-msgstr ""
+msgstr "Uložit input names do souboru"
 
 #: plugins/portname/init.lua:134 plugins/portname/init.lua:139
 #: plugins/portname/init.lua:155
 msgid "Failed to save input name file"
-msgstr ""
+msgstr "Chyba při ukládání input name souboru"
 
 #: plugins/portname/init.lua:167
 #, lua-format
 msgid "Input port name file saved to %s"
-msgstr ""
+msgstr "Input port name soubor uložen jako %s"
 
 #: plugins/portname/init.lua:172
 msgid "Input ports"
-msgstr ""
+msgstr "Vstupní porty"
 
 #: plugins/autofire/init.lua:98
 msgctxt "plugin-autofire"
 msgid "Failed to load autofire menu"
-msgstr ""
+msgstr "Chyba při načítavání autofire menu"
 
 #: plugins/autofire/init.lua:105
 msgctxt "plugin-autofire"
@@ -6038,13 +6045,13 @@ msgstr ""
 #: plugins/autofire/autofire_menu.lua:74
 msgctxt "plugin-autofire"
 msgid "Autofire buttons"
-msgstr ""
+msgstr "Tlačítka autofire"
 
 #: plugins/autofire/autofire_menu.lua:75
 #, lua-format
 msgctxt "plugin-autofire"
 msgid "Press %s to delete"
-msgstr ""
+msgstr "Pro smazání stiskněte %s"
 
 #: plugins/autofire/autofire_menu.lua:93
 #, lua-format

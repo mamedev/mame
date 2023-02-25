@@ -114,8 +114,8 @@ protected:
 
 	focused_menu get_focus() const { return m_focus; }
 	void set_focus(focused_menu focus) { m_focus = focus; }
-	void next_image_view();
-	void previous_image_view();
+	bool next_image_view();
+	bool previous_image_view();
 
 	bool dismiss_error();
 	void set_error(reset_options ropt, std::string &&message);

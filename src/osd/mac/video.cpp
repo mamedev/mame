@@ -122,12 +122,12 @@ void mac_osd_interface::update(bool skip_redraw)
 //  input_update
 //============================================================
 
-void mac_osd_interface::input_update()
+void mac_osd_interface::input_update(bool relative_reset)
 {
 	// poll the joystick values here
 	process_events_buf();
 	MacPollInputs();
-	poll_input_modules();
+	poll_input_modules(relative_reset);
 }
 
 //============================================================

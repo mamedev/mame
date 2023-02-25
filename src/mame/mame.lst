@@ -29353,6 +29353,10 @@ magjoker                        // (c) 2000 BRL S.R.L. Bologna
 @source:misc/galgame.cpp
 galgame                         // (c) 1971 Computer Recreations, Inc
 
+@source:misc/gameace.cpp
+hotbody
+hotbodya
+
 @source:misc/gambl186.cpp
 gambl186                        // EGD
 gambl186a                       // EGD
@@ -30705,7 +30709,7 @@ onetwoe                         // (c) 1997 Barko
 
 @source:misc/opercoin.cpp
 multibaby                       // (c) 1990 Oper Coin
-spirulo                         // (c) 19?? Oper Coin
+spirulo                         // (c) 1988 Oper Coin
 
 @source:misc/othello.cpp
 othello                         // (c) 1984 Success.
@@ -42324,7 +42328,8 @@ rollace                         // (c) 1983 Williams
 rollace2                        // (c) 1983 Williams
 
 @source:taito/sbmjb.cpp
-sbmjb                           // E41 (c) 1998 Taito
+honooinv                        // E41 (c) 1997 Taito
+sbmjb                           // ??? (c) 1998 Taito
 
 @source:taito/sbowling.cpp
 sbowling                        // KB  (c) 1982 Taito Corporation
@@ -42971,6 +42976,7 @@ holeland2                       // (c) 1984
 sauro                           // (c) 1987
 sauroa                          // (c) 1987
 saurob                          // (c) 1987
+sauroc                          // (c) 1987
 saurobl                         // (c) 1987 bootleg
 saurop                          // (c) 1987
 saurorr                         // (c) 1987

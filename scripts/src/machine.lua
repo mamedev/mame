@@ -5138,3 +5138,15 @@ if (MACHINES["MC88200"]~=null) then
 		MAME_DIR .. "src/devices/machine/mc88200.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/pccard_sram.h,MACHINES["PCCARD_SRAM"] = true
+---------------------------------------------------
+
+if (MACHINES["PCCARD_SRAM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/pccard_sram.cpp",
+		MAME_DIR .. "src/devices/machine/pccard_sram.h",
+	}
+end
