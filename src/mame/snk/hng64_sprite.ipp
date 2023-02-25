@@ -161,7 +161,7 @@ void hng64_state::drawline(bitmap_ind16 & dest, bitmap_ind16 & destz, const rect
 
 void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
 		gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
-		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic)
+		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, int line)
 {
 	// use pen usage to optimize
 	code %= gfx->elements();
@@ -213,18 +213,11 @@ void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const r
 	uint32_t leftovers = (destendx + 1 - destx);
 
 	// iterate over pixels in Y
-	int line = 0;
 	int32_t srcycopy = srcy;
 
-	int32_t destendy = desty + dstheight - 1;
-	for (int32_t cury = desty; cury <= destendy; cury++)
-	{
-		drawline(dest, destz, cliprect,
-			gfx, code, color, flipx, flipy, destx, desty,
-			dx, dy, dstwidth, dstheight, trans_pen, zval, zrev, blend, checkerboard, mosaic, cury, srcdata, srcx, srcycopy, leftovers, line);
-
-		line++;
-	}
+	drawline(dest, destz, cliprect,
+		gfx, code, color, flipx, flipy, destx, desty,
+		dx, dy, dstwidth, dstheight, trans_pen, zval, zrev, blend, checkerboard, mosaic, desty, srcdata, srcx, srcycopy, leftovers, line);
 
 }
 
@@ -391,7 +384,13 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 
 				get_tile_details(chaini, currentsprite, xdrw, ydrw, chainx, chainy, xflip, yflip, tileno, pal, gfxregion);
 
-				zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, m_gfxdecode->gfx(gfxregion), tileno, pal, xflip, yflip, drawx, drawy, dx, dy, dstwidth, dstheight, 0, zval, zsort, blend, checkerboard, mosaic);
+				int32_t destendy = drawy + dstheight - 1;
+				int line = 0;
+				for (int32_t cury = drawy; cury <= destendy; cury++)
+				{
+					zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, m_gfxdecode->gfx(gfxregion), tileno, pal, xflip, yflip, drawx, cury, dx, dy, dstwidth, dstheight, 0, zval, zsort, blend, checkerboard, mosaic, line);
+					line++;
+				}
 
 				drawx += dstwidth;
 			}
