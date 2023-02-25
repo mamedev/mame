@@ -94,13 +94,13 @@ protected:
 
 	virtual void device_start() override;
 	template <typename FDCType> void add_mconfig(machine_config &config, FDCType &&type, bool force_ready, int nr_of_drives, bool double_sided);
-	void set_led_bit(u8 led_bit) { m_led_bit = led_bit; }
-	u8 get_led_bit() const { return m_led_bit; }
+	void set_control_led_bit(u8 control_led_bit) { m_control_led_bit = control_led_bit; }
+	u8 get_control_led_bit() const { return m_control_led_bit; }
 
 	required_device<wd_fdc_analog_device_base> m_fdc;
 
 private:
-	u8 m_led_bit;
+	u8 m_control_led_bit; // For the implementations that need it, which bit of a control write controls the LED bit.
 };
 
 
@@ -119,7 +119,7 @@ protected:
 class msx_slot_disk1_base_device : public msx_slot_wd_disk_device
 {
 public:
-	virtual void use_motor_for_led() override { set_led_bit(7); }
+	virtual void use_motor_for_led() override { set_control_led_bit(7); }
 
 protected:
 	msx_slot_disk1_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -214,7 +214,7 @@ protected:
 class msx_slot_disk2_base_device : public msx_slot_wd_disk_device
 {
 public:
-	virtual void use_motor_for_led() override { set_led_bit(3); }
+	virtual void use_motor_for_led() override { set_control_led_bit(3); }
 
 protected:
 	msx_slot_disk2_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);

@@ -125,7 +125,7 @@ void msx_slot_disk_device::set_led(int led, int state)
 msx_slot_wd_disk_device::msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: msx_slot_disk_device(mconfig, type, tag, owner, clock)
 	, m_fdc(*this, "fdc")
-	, m_led_bit(0)
+	, m_control_led_bit(0)
 {
 }
 
@@ -172,7 +172,7 @@ msx_slot_disk1_base_device::msx_slot_disk1_base_device(const machine_config &mco
 	, m_side_control(0)
 	, m_control(0)
 {
-	set_led_bit(6);
+	set_control_led_bit(6);
 }
 
 void msx_slot_disk1_base_device::device_start()
@@ -251,14 +251,14 @@ void msx_slot_disk1_base_device::set_control(u8 data)
 	case 0:
 	case 2:
 		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
-		set_led(0, BIT(m_control, get_led_bit()));
+		set_led(0, BIT(m_control, get_control_led_bit()));
 		set_led(1, 0);
 		break;
 
 	case 1:
 		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
 		set_led(0, 0);
-		set_led(1, BIT(m_control, get_led_bit()));
+		set_led(1, BIT(m_control, get_control_led_bit()));
 		break;
 
 	default:
@@ -387,7 +387,7 @@ msx_slot_disk2_base_device::msx_slot_disk2_base_device(const machine_config &mco
 	: msx_slot_wd_disk_device(mconfig, type, tag, owner, clock)
 	, m_control(0)
 {
-	set_led_bit(6);
+	set_control_led_bit(6);
 }
 
 void msx_slot_disk2_base_device::device_start()
@@ -439,14 +439,14 @@ void msx_slot_disk2_base_device::set_control(u8 data)
 	{
 	case 1:
 		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
-		set_led(0, BIT(m_control, get_led_bit()));
+		set_led(0, BIT(m_control, get_control_led_bit()));
 		set_led(1, 0);
 		break;
 
 	case 2:
 		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
 		set_led(0, 0);
-		set_led(1, BIT(m_control, get_led_bit()));
+		set_led(1, BIT(m_control, get_control_led_bit()));
 		break;
 
 	default:
