@@ -121,7 +121,13 @@ private:
 	void cio_w(offs_t offset, uint8_t data);
 	void fw0_w(uint8_t data);
 	void fw1_w(uint8_t data);
-	void spec_contr_reg_w(uint8_t data);
+
+	DECLARE_WRITE_LINE_MEMBER(cs7_w);
+	DECLARE_WRITE_LINE_MEMBER(btce_w);
+	DECLARE_WRITE_LINE_MEMBER(atce_w);
+	DECLARE_WRITE_LINE_MEMBER(dmadis_w);
+	DECLARE_WRITE_LINE_MEMBER(sysscc_w);
+	DECLARE_WRITE_LINE_MEMBER(sysfs_w);
 
 	void dbrq_w(int state);
 
@@ -132,7 +138,6 @@ private:
 	void cio_pc_w(uint8_t data);
 
 	void nmi_w(int state);
-	void buserr_w(offs_t offset, uint8_t data);
 
 	void cpu_space_map(address_map &map);
 

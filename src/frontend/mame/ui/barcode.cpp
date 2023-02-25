@@ -75,66 +75,74 @@ void menu_barcode_reader::populate()
 //  handle - manages inputs in the barcode input menu
 //-------------------------------------------------
 
-void menu_barcode_reader::handle(event const *ev)
+bool menu_barcode_reader::handle(event const *ev)
 {
-	// process the event
-	if (ev)
+	if (!ev)
+		return false;
+
+	switch (ev->iptkey)
 	{
-		// handle selections
-		switch (ev->iptkey)
+	case IPT_UI_LEFT:
+		if (ev->itemref == ITEMREF_SELECT_READER)
+			return previous();
+		break;
+
+	case IPT_UI_RIGHT:
+		if (ev->itemref == ITEMREF_SELECT_READER)
+			return next();
+		break;
+
+	case IPT_UI_SELECT:
+		if (ev->itemref == ITEMREF_ENTER_BARCODE)
 		{
-		case IPT_UI_LEFT:
-			if (ev->itemref == ITEMREF_SELECT_READER)
-				previous();
-			break;
-
-		case IPT_UI_RIGHT:
-			if (ev->itemref == ITEMREF_SELECT_READER)
-				next();
-			break;
-
-		case IPT_UI_SELECT:
-			if (ev->itemref == ITEMREF_ENTER_BARCODE)
+			//osd_printf_verbose("code %s\n", m_barcode_buffer);
+			if (!current_device()->is_valid(m_barcode_buffer.length()))
 			{
-				std::string tmp_file(m_barcode_buffer);
-				//printf("code %s\n", m_barcode_buffer);
-				if (!current_device()->is_valid(tmp_file.length()))
-					ui().popup_time(5, "%s", _("Barcode length invalid!"));
-				else
-				{
-					current_device()->write_code(tmp_file.c_str(), tmp_file.length());
-					// if sending was successful, reset char buffer
-					m_barcode_buffer.clear();
-					reset(reset_options::REMEMBER_POSITION);
-				}
+				ui().popup_time(5, "%s", _("Barcode length invalid!"));
 			}
-			break;
-
-		case IPT_UI_CLEAR:
-			if (get_selection_ref() == ITEMREF_NEW_BARCODE)
+			else
 			{
+				current_device()->write_code(m_barcode_buffer.c_str(), m_barcode_buffer.length());
+				// if sending was successful, reset char buffer
 				m_barcode_buffer.clear();
 				reset(reset_options::REMEMBER_POSITION);
 			}
-			break;
-
-		case IPT_UI_PASTE:
-			if (get_selection_ref() == ITEMREF_NEW_BARCODE)
-			{
-				if (paste_text(m_barcode_buffer, uchar_is_digit))
-					ev->item->set_subtext(m_barcode_buffer);
-			}
-			break;
-
-		case IPT_SPECIAL:
-			if (get_selection_ref() == ITEMREF_NEW_BARCODE)
-			{
-				if (input_character(m_barcode_buffer, ev->unichar, uchar_is_digit))
-					ev->item->set_subtext(m_barcode_buffer);
-			}
-			break;
 		}
+		break;
+
+	case IPT_UI_CLEAR:
+		if (ev->itemref == ITEMREF_NEW_BARCODE)
+		{
+			m_barcode_buffer.clear();
+			ev->item->set_subtext(m_barcode_buffer);
+			return true;
+		}
+		break;
+
+	case IPT_UI_PASTE:
+		if (get_selection_ref() == ITEMREF_NEW_BARCODE)
+		{
+			if (paste_text(m_barcode_buffer, uchar_is_digit))
+			{
+				ev->item->set_subtext(m_barcode_buffer);
+				return true;
+			}
+		}
+		break;
+
+	case IPT_SPECIAL:
+		if (get_selection_ref() == ITEMREF_NEW_BARCODE)
+		{
+			if (input_character(m_barcode_buffer, ev->unichar, uchar_is_digit))
+			{
+				ev->item->set_subtext(m_barcode_buffer);
+				return true;
+			}
+		}
+		break;
 	}
+
+	return false;
 }
 
 } // namespace ui

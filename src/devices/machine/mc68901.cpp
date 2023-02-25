@@ -275,7 +275,6 @@ inline void mc68901_device::timer_input(int index, int value)
 			timer_count(index);
 		}
 
-		m_ti[index] = value;
 		break;
 
 	case TCR_TIMER_PULSE_4:
@@ -294,10 +293,10 @@ inline void mc68901_device::timer_input(int index, int value)
 				take_interrupt(INT_MASK_GPIO[bit]);
 			}
 		}
-
-		m_ti[index] = value;
 		break;
 	}
+
+	m_ti[index] = value;
 }
 
 

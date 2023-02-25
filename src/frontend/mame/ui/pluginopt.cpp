@@ -19,13 +19,14 @@
 
 namespace ui {
 
-void menu_plugin::handle(event const *ev)
+bool menu_plugin::handle(event const *ev)
 {
 	if (ev && ev->itemref)
 	{
 		if (ev->iptkey == IPT_UI_SELECT)
 			menu::stack_push<menu_plugin_opt>(ui(), container(), (char *)ev->itemref);
 	}
+	return false;
 }
 
 menu_plugin::menu_plugin(mame_ui_manager &mui, render_container &container) :
@@ -68,7 +69,7 @@ menu_plugin_opt::menu_plugin_opt(mame_ui_manager &mui, render_container &contain
 {
 }
 
-void menu_plugin_opt::handle(event const *ev)
+bool menu_plugin_opt::handle(event const *ev)
 {
 	void *const itemref = ev ? ev->itemref : get_selection_ref();
 	std::string key;
@@ -116,16 +117,19 @@ void menu_plugin_opt::handle(event const *ev)
 			break;
 		}
 	}
-	if (!key.empty() || m_need_idle)
-	{
-		auto const result = mame_machine_manager::instance()->lua()->menu_callback(m_menu, uintptr_t(itemref), key);
-		if (result.second)
-			set_selection(reinterpret_cast<void *>(uintptr_t(*result.second)));
-		if (result.first)
-			reset(reset_options::REMEMBER_REF);
-		else if (ev && (ev->iptkey == IPT_UI_BACK))
-			stack_pop();
-	}
+
+	if (key.empty() && !m_need_idle)
+		return false;
+
+	auto const result = mame_machine_manager::instance()->lua()->menu_callback(m_menu, uintptr_t(itemref), key);
+	if (result.second)
+		set_selection(reinterpret_cast<void *>(uintptr_t(*result.second)));
+	if (result.first)
+		reset(reset_options::REMEMBER_REF);
+	else if (ev && (ev->iptkey == IPT_UI_BACK))
+		stack_pop();
+
+	return result.second && !result.first;
 }
 
 void menu_plugin_opt::populate()

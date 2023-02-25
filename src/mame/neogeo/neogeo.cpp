@@ -1906,7 +1906,7 @@ INPUT_CHANGED_MEMBER(aes_base_state::aes_jp1)
 {
 	// Shorting JP1 causes a 68000 /BERR (Bus Error). On Dev Bios, this pops up the debug monitor.
 	if (newval)
-		m_maincpu->set_input_line(M68K_LINE_BUSERROR, HOLD_LINE);
+		m_maincpu->trigger_bus_error();
 }
 
 

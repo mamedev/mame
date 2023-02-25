@@ -166,32 +166,36 @@ void menu_dats_view::add_info_text(text_layout &layout, std::string_view text, r
 //  handle
 //-------------------------------------------------
 
-void menu_dats_view::handle(event const *ev)
+bool menu_dats_view::handle(event const *ev)
 {
-	if (ev)
+	if (!ev)
+		return false;
+
+	switch (ev->iptkey)
 	{
-		switch (ev->iptkey)
+	case IPT_UI_LEFT:
+		if (m_actual > 0)
 		{
-		case IPT_UI_LEFT:
-			if (m_actual > 0)
-			{
-				m_actual--;
-				reset_layout();
-			}
-			break;
-
-		case IPT_UI_RIGHT:
-			if ((m_actual + 1) < m_items_list.size())
-			{
-				m_actual++;
-				reset_layout();
-			}
-			break;
-
-		default:
-			handle_key(ev->iptkey);
+			m_actual--;
+			reset_layout();
+			return true;
 		}
+		break;
+
+	case IPT_UI_RIGHT:
+		if ((m_actual + 1) < m_items_list.size())
+		{
+			m_actual++;
+			reset_layout();
+			return true;
+		}
+		break;
+
+	default:
+		return handle_key(ev->iptkey);
 	}
+
+	return false;
 }
 
 //-------------------------------------------------

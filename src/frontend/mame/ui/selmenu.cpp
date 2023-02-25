@@ -173,7 +173,7 @@ public:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	ui_software_info const &m_uiinfo;
 	s_parts const          m_parts;
@@ -190,7 +190,7 @@ private:
 	bios_selection(mame_ui_manager &mui, render_container &container, s_bios &&biosname, void const *driver, bool software, bool inlist);
 
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	void const  *m_driver;
 	bool        m_software, m_inlist;
@@ -297,9 +297,8 @@ void menu_select_launch::software_parts::populate()
 //  handle
 //-------------------------------------------------
 
-void menu_select_launch::software_parts::handle(event const *ev)
+bool menu_select_launch::software_parts::handle(event const *ev)
 {
-	// process the menu
 	if (ev && (ev->iptkey == IPT_UI_SELECT) && ev->itemref)
 	{
 		for (auto const &elem : m_parts)
@@ -311,6 +310,8 @@ void menu_select_launch::software_parts::handle(event const *ev)
 			}
 		}
 	}
+
+	return false;
 }
 
 
@@ -362,9 +363,8 @@ void menu_select_launch::bios_selection::populate()
 //  handle
 //-------------------------------------------------
 
-void menu_select_launch::bios_selection::handle(event const *ev)
+bool menu_select_launch::bios_selection::handle(event const *ev)
 {
-	// process the menu
 	if (ev && (ev->iptkey == IPT_UI_SELECT) && ev->itemref)
 	{
 		for (auto & elem : m_bios)
@@ -402,6 +402,8 @@ void menu_select_launch::bios_selection::handle(event const *ev)
 			}
 		}
 	}
+
+	return false;
 }
 
 
@@ -526,22 +528,32 @@ menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &c
 }
 
 
-void menu_select_launch::next_image_view()
+bool menu_select_launch::next_image_view()
 {
 	if (LAST_VIEW > m_image_view)
 	{
 		++m_image_view;
 		set_switch_image();
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 
 
-void menu_select_launch::previous_image_view()
+bool menu_select_launch::previous_image_view()
 {
 	if (FIRST_VIEW < m_image_view)
 	{
 		--m_image_view;
 		set_switch_image();
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 

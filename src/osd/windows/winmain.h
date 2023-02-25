@@ -59,7 +59,8 @@ public:
 	// general overridables
 	virtual void init(running_machine &machine) override;
 	virtual void update(bool skip_redraw) override;
-	virtual void input_update() override;
+	virtual void input_update(bool relative_reset) override;
+	virtual void check_osd_inputs() override;
 
 	// input overrideables
 	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) override;
@@ -78,7 +79,6 @@ public:
 	// windows OSD specific
 	bool handle_input_event(input_event eventid, void *eventdata) const;
 	bool should_hide_mouse() const;
-	void poll_input(running_machine &machine) const;
 
 	virtual bool has_focus() const override;
 	virtual void process_events() override;
@@ -87,11 +87,11 @@ public:
 
 	int window_count();
 
+	using osd_common_t::poll_input_modules; // Win32 debugger calls this directly, which it shouldn't
+
 protected:
 	virtual void build_slider_list() override;
 	virtual void update_slider_list() override;
-
-	void check_osd_inputs();
 
 private:
 	void process_events(bool ingame, bool nodispatch);
