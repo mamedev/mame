@@ -96,15 +96,15 @@ while (0)
 
 void hng64_state::zoom_transpen_line(bitmap_ind16 & dest, bitmap_ind16 & destz, const rectangle & cliprect,
 	gfx_element * gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
-	int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, int cury, const u8 *srcdata, int32_t srcx, int32_t &srcy, uint32_t numblocks, uint32_t leftovers)
+	int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, int cury, const u8 *srcdata, int32_t srcx, int32_t srcy_copy, uint32_t numblocks, uint32_t leftovers, int line)
 {
+	int srcy = dy * line + srcy_copy;
 
 	auto* destptr = &dest.pix(cury, destx);
 	auto* destzptr = &destz.pix(cury, destx);
 
 	const u8* srcptr = srcdata + (srcy >> 16) * gfx->rowbytes();
 	int32_t cursrcx = srcx;
-	srcy += dy;
 
 	// iterate over unrolled blocks of 4
 	if (zrev)
@@ -197,83 +197,84 @@ void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const r
 	if (blend)
 		color |= 0x8000;
 
-	g_profiler.start(PROFILER_DRAWGFX);
-	do {
-		assert(dest.valid());
-		assert(dest.cliprect().contains(cliprect));
+	assert(dest.valid());
+	assert(dest.cliprect().contains(cliprect));
 
-		// ignore empty/invalid cliprects
-		if (cliprect.empty())
-			break;
+	// ignore empty/invalid cliprects
+	if (cliprect.empty())
+		return;
 
-		if (dstwidth < 1 || dstheight < 1)
-			break;
+	if (dstwidth < 1 || dstheight < 1)
+		return;
 
-		// compute final pixel in X and exit if we are entirely clipped
-		int32_t destendx = destx + dstwidth - 1;
-		if (destx > cliprect.right() || destendx < cliprect.left())
-			break;
+	// compute final pixel in X and exit if we are entirely clipped
+	int32_t destendx = destx + dstwidth - 1;
+	if (destx > cliprect.right() || destendx < cliprect.left())
+		return;
 
-		// apply left clip
-		int32_t srcx = 0;
-		if (destx < cliprect.left())
-		{
-			srcx = (cliprect.left() - destx) * dx;
-			destx = cliprect.left();
-		}
+	// apply left clip
+	int32_t srcx = 0;
+	if (destx < cliprect.left())
+	{
+		srcx = (cliprect.left() - destx) * dx;
+		destx = cliprect.left();
+	}
 
-		// apply right clip
-		if (destendx > cliprect.right())
-			destendx = cliprect.right();
+	// apply right clip
+	if (destendx > cliprect.right())
+		destendx = cliprect.right();
 
-		// compute final pixel in Y and exit if we are entirely clipped
-		int32_t destendy = desty + dstheight - 1;
-		if (desty > cliprect.bottom() || destendy < cliprect.top())
-			break;
+	// compute final pixel in Y and exit if we are entirely clipped
+	int32_t destendy = desty + dstheight - 1;
+	if (desty > cliprect.bottom() || destendy < cliprect.top())
+		return;
 
-		// apply top clip
-		int32_t srcy = 0;
-		if (desty < cliprect.top())
-		{
-			srcy = (cliprect.top() - desty) * dy;
-			desty = cliprect.top();
-		}
+	// apply top clip
+	int32_t srcy = 0;
+	if (desty < cliprect.top())
+	{
+		srcy = (cliprect.top() - desty) * dy;
+		desty = cliprect.top();
+	}
 
-		// apply bottom clip
-		if (destendy > cliprect.bottom())
-			destendy = cliprect.bottom();
+	// apply bottom clip
+	if (destendy > cliprect.bottom())
+		destendy = cliprect.bottom();
 
-		// apply X flipping
-		if (flipx)
-		{
-			srcx = (dstwidth - 1) * dx - srcx;
-			dx = -dx;
-		}
+	// apply X flipping
+	if (flipx)
+	{
+		srcx = (dstwidth - 1) * dx - srcx;
+		dx = -dx;
+	}
 
-		// apply Y flipping
-		if (flipy)
-		{
-			srcy = (dstheight - 1) * dy - srcy;
-			dy = -dy;
-		}
+	// apply Y flipping
+	if (flipy)
+	{
+		srcy = (dstheight - 1) * dy - srcy;
+		dy = -dy;
+	}
 
-		// fetch the source data
-		const u8 *srcdata = gfx->get_data(code);
+	// fetch the source data
+	const u8 *srcdata = gfx->get_data(code);
 
-		// compute how many blocks of 4 pixels we have
-		uint32_t numblocks = (destendx + 1 - destx) / 4;
-		uint32_t leftovers = (destendx + 1 - destx) - 4 * numblocks;
+	// compute how many blocks of 4 pixels we have
+	uint32_t numblocks = (destendx + 1 - destx) / 4;
+	uint32_t leftovers = (destendx + 1 - destx) - 4 * numblocks;
 
-		// iterate over pixels in Y
-		for (int32_t cury = desty; cury <= destendy; cury++)
-		{
-			zoom_transpen_line(dest, destz, cliprect,
-				gfx, code, color, flipx, flipy, destx, desty,
-				dx, dy, dstwidth, dstheight, trans_pen, zval, zrev, blend, checkerboard, mosaic, cury, srcdata, srcx, srcy, numblocks, leftovers);
+	// iterate over pixels in Y
+	int line = 0;
+	int32_t srcycopy = srcy;
 
-		}
-	} while (0);
-	g_profiler.stop();
+	for (int32_t cury = desty; cury <= destendy; cury++)
+	{
+		zoom_transpen_line(dest, destz, cliprect,
+			gfx, code, color, flipx, flipy, destx, desty,
+			dx, dy, dstwidth, dstheight, trans_pen, zval, zrev, blend, checkerboard, mosaic, cury, srcdata, srcx, srcycopy, numblocks, leftovers, line);
+
+		line++;
+	}
+
 }
 
 void hng64_state::get_tile_details(bool chain, uint16_t spritenum, uint8_t xtile, uint8_t ytile, uint8_t xsize, uint8_t ysize, bool xflip, bool yflip, uint32_t& tileno, uint16_t& pal, uint8_t &gfxregion)
