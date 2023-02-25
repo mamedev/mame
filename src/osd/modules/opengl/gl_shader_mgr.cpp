@@ -82,12 +82,12 @@ public:
 		: glsl_shader_info(gld)
 #endif
 	{
-		std::fill(std::begin(mamebm_programs), std::end(mamebm_programs), 0);
-		std::fill(std::begin(mamebm_vsh_shader), std::end(mamebm_vsh_shader), 0);
-		std::fill(std::begin(mamebm_fsh_shader), std::end(mamebm_fsh_shader), 0);
-		std::fill(std::begin(scrn_programs), std::end(scrn_programs), 0);
-		std::fill(std::begin(scrn_vsh_shader), std::end(scrn_vsh_shader), 0);
-		std::fill(std::begin(scrn_fsh_shader), std::end(scrn_fsh_shader), 0);
+		std::fill(std::begin(mamebm_programs), std::end(mamebm_programs), GLhandleARB(0));
+		std::fill(std::begin(mamebm_vsh_shader), std::end(mamebm_vsh_shader), GLhandleARB(0));
+		std::fill(std::begin(mamebm_fsh_shader), std::end(mamebm_fsh_shader), GLhandleARB(0));
+		std::fill(std::begin(scrn_programs), std::end(scrn_programs), GLhandleARB(0));
+		std::fill(std::begin(scrn_vsh_shader), std::end(scrn_vsh_shader), GLhandleARB(0));
+		std::fill(std::begin(scrn_fsh_shader), std::end(scrn_fsh_shader), GLhandleARB(0));
 	}
 
 	bool initalize(osd_gl_context &gl_ctx)
