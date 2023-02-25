@@ -68,7 +68,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	void add_drive_mconfig(machine_config &config, int nr_of_drives, bool double_sided);
-	void set_led(int led, int state);
+	void set_drive_access_led_state(int drive, int led_state);
 
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
