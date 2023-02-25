@@ -371,7 +371,7 @@ public:
 	}
 	std::string disassemble() const override
 	{
-		return m_opcode + util::string_format(" #$%x,%s", m_iVal, dString);
+		return util::string_format("%s #$%x,%s", m_opcode, m_iVal, dString);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -429,7 +429,7 @@ public:
 	}
 	std::string disassemble() const override
 	{
-		return m_opcode + util::string_format(" #$%x,X:(%s)", m_iVal, regIdAsString(m_r));
+		return util::string_format("%s #$%x,X:(%s)", m_opcode, m_iVal, regIdAsString(m_r));
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -487,7 +487,7 @@ public:
 	}
 	std::string disassemble() const override
 	{
-		return m_opcode + util::string_format(" #$%x,%s", m_iVal, regIdAsString(m_destination));
+		return util::string_format("%s #$%x,%s", m_opcode, m_iVal, regIdAsString(m_destination));
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -516,8 +516,7 @@ public:
 	}
 	std::string disassemble() const override
 	{
-		auto opcode = "b" + opMnemonicAsString(m_mnem);
-		return opcode + util::string_format(" >*+$%x", 2 + m_immediate);
+		return util::string_format("b%s >*+$%x", opMnemonicAsString(m_mnem), 2 + m_immediate);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -546,11 +545,10 @@ public:
 	}
 	std::string disassemble() const override
 	{
-		auto opcode = "b" + opMnemonicAsString(m_mnem);
-
-		return opcode + (m_immediate >= 0 ?
-			util::string_format(" <*+$%x", m_immediate + 1) :
-			util::string_format(" <*-$%x", 1 - m_immediate - 2));
+		if (m_immediate >= 0)
+			return util::string_format("b%s <*+$%x", opMnemonicAsString(m_mnem), m_immediate + 1);
+		else
+			return util::string_format("b%s <*-$%x", opMnemonicAsString(m_mnem), 1 - m_immediate - 2);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -631,9 +629,10 @@ public:
 	}
 	std::string disassemble() const override
 	{
-		return "bra " + (m_immediate >= 0 ?
-			util::string_format("<*+$%x", 1 + m_immediate) :
-			util::string_format("<*-$%x", 1 - m_immediate - 2));
+		if (m_immediate >= 0)
+			return util::string_format("bra <*+$%x", 1 + m_immediate);
+		else
+			return util::string_format("bra <*-$%x", 1 - m_immediate - 2);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -709,11 +708,10 @@ public:
 	}
 	std::string disassemble() const override
 	{
-		std::string opcode = "bs" + opMnemonicAsString(m_mnem);
-
-		return opcode + (m_immediate >= 0 ?
-			util::string_format(" >*+$%x", 2 + m_immediate) :
-			util::string_format(" >*-$%x", 1 - m_immediate - 1 - 2));
+		if (m_immediate >= 0)
+			return util::string_format("bs%s >*+$%x", opMnemonicAsString(m_mnem), 2 + m_immediate);
+		else
+			return util::string_format("bs%s >*-$%x", opMnemonicAsString(m_mnem), 1 - m_immediate - 1 - 2);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -770,9 +768,10 @@ public:
 	}
 	std::string disassemble() const override
 	{
-		return "bsr " + (m_immediate >= 0 ?
-			util::string_format(">*+$%x", 2 + m_immediate) :
-			util::string_format(">*-$%x", 1 - m_immediate - 1 - 2));
+		if (m_immediate >= 0)
+			return util::string_format("bsr >*+$%x", 2 + m_immediate);
+		else
+			return util::string_format("bsr >*-$%x", 1 - m_immediate - 1 - 2);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -1391,8 +1390,7 @@ public:
 	}
 	std::string disassemble() const override
 	{
-		auto opcode = "j" + opMnemonicAsString(m_mnem);
-		return opcode + util::string_format(" >$%x", m_displacement);
+		return util::string_format("j%s >$%x", opMnemonicAsString(m_mnem), m_displacement);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -1513,8 +1511,7 @@ public:
 	}
 	std::string disassemble() const override
 	{
-		auto opcode = "js" + opMnemonicAsString(m_mnem);
-		return opcode + util::string_format(" >$%x", m_displacement);
+		return util::string_format("js%s >$%x", opMnemonicAsString(m_mnem), m_displacement);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -2314,10 +2311,10 @@ public:
 	}
 	std::string disassemble() const override
 	{
-		return "move " + (m_immediate >= 0 ?
-			util::string_format("#<+$%x", m_immediate) :
-			util::string_format("#<-$%x", 1 - m_immediate - 1))
-			+ "," + regIdAsString(m_destination);
+		if (m_immediate >= 0)
+			return util::string_format("move #<+$%x,%s", m_immediate, regIdAsString(m_destination));
+		else
+			return util::string_format("move #<-$%x,%s", 1 - m_immediate - 1, regIdAsString(m_destination));
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
