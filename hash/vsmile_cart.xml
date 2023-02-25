@@ -737,9 +737,9 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
 			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="0x600000">
-				<rom name="alphaprkr2.u1" size="0x400000" crc="4e635c94" sha1="96792d607a94f8fb36dbfff8c68f720c68c742a8" offset="0x000000" />
-				<rom name="alphaprkr2.u2" size="0x200000" crc="2feee80a" sha1="d1ca700602c3b2bce2a8920f017370cb0ef322de" offset="0x400000" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="alphaprkr2.u1" size="0x400000" offset="0x000000" crc="4e635c94" sha1="96792d607a94f8fb36dbfff8c68f720c68c742a8" />
+				<rom name="alphaprkr2.u2" size="0x200000" offset="0x400000" crc="2feee80a" sha1="d1ca700602c3b2bce2a8920f017370cb0ef322de" />
 			</dataarea>
 		</part>
 	</software>
@@ -788,9 +788,9 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" />
 			<feature name="u2" value="U2" />
-			<dataarea name="rom" size="0x600000">
-				<rom name="Alphabet Park Adventure 92000(US) [TWO CHIP] LOW.bin" size="0x400000" crc="402681b7" sha1="5ff1ba9a016d10e09408b5638aaf759cac2cc97a" offset="0x000000" />
-				<rom name="Alphabet Park Adventure 92000(US) [TWO CHIP] HIGH.bin" size="0x200000" crc="2feee80a" sha1="d1ca700602c3b2bce2a8920f017370cb0ef322de" offset="0x400000" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Alphabet Park Adventure 92000(US) [TWO CHIP] LOW.bin"  size="0x400000" offset="0x000000" crc="402681b7" sha1="5ff1ba9a016d10e09408b5638aaf759cac2cc97a" />
+				<rom name="Alphabet Park Adventure 92000(US) [TWO CHIP] HIGH.bin" size="0x200000" offset="0x400000" crc="2feee80a" sha1="d1ca700602c3b2bce2a8920f017370cb0ef322de" />
 			</dataarea>
 		</part>
 	</software>
@@ -837,9 +837,9 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
 			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="0x600000">
-				<rom name="092003.u1" size="0x400000" crc="402681b7" sha1="5ff1ba9a016d10e09408b5638aaf759cac2cc97a" offset="0x000000" /> <!-- U1 is the same as U1 on 80-092000(US) -->
-				<rom name="092003.u2" size="0x200000" crc="60cfb1b4" sha1="f37ad4dd774c26abb998f616ab7ad0adce83359d" offset="0x400000" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092003.u1" size="0x400000" offset="0x000000" crc="402681b7" sha1="5ff1ba9a016d10e09408b5638aaf759cac2cc97a" /> <!-- U1 is the same as U1 on 80-092000(US) -->
+				<rom name="092003.u2" size="0x200000" offset="0x400000" crc="60cfb1b4" sha1="f37ad4dd774c26abb998f616ab7ad0adce83359d" />
 			</dataarea>
 		</part>
 	</software>
@@ -1339,9 +1339,9 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<feature name="u2" value="U2" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="0x600000">
-				<rom name="Care Bears - A Lesson in Caring 92180(US) [TWO CHIP] LOW.bin" size="0x400000" crc="f0f2bd0f" sha1="a27f105fe32c3bfeb0ac4d745faafe1a12859045" offset="0x000000" />
-				<rom name="Care Bears - A Lesson in Caring 92180(US) [TWO CHIP] HIGH.bin" size="0x200000" crc="ffb5790d" sha1="f84a8af1859e8f749856c3293f5d2fb01a7c1449" offset="0x400000" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="Care Bears - A Lesson in Caring 92180(US) [TWO CHIP] LOW.bin" size="0x400000"  offset="0x000000" crc="f0f2bd0f" sha1="a27f105fe32c3bfeb0ac4d745faafe1a12859045" />
+				<rom name="Care Bears - A Lesson in Caring 92180(US) [TWO CHIP] HIGH.bin" size="0x200000" offset="0x400000" crc="ffb5790d" sha1="f84a8af1859e8f749856c3293f5d2fb01a7c1449" />
 			</dataarea>
 		</part>
 	</software>
@@ -2413,9 +2413,9 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb" value="92060" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
 			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="0x600000">
-				<rom name="vsmile92100.blob1.bin" size="0x400000" crc="8a2317fb" sha1="44d397ada00f1fedb48622e716189f4a129ff5a7" offset="0x000000" />
-				<rom name="vsmile92100.blob2.bin" size="0x200000" crc="dded069c" sha1="29f1f464f9f5c8fa06410d54538b984f3fc52f01" offset="0x400000" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="vsmile92100.blob1.bin" size="0x400000" offset="0x000000" crc="8a2317fb" sha1="44d397ada00f1fedb48622e716189f4a129ff5a7" />
+				<rom name="vsmile92100.blob2.bin" size="0x200000" offset="0x400000" crc="dded069c" sha1="29f1f464f9f5c8fa06410d54538b984f3fc52f01" />
 			</dataarea>
 		</part>
 	</software>
@@ -2730,9 +2730,9 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="cart_type" value="lilac" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="0x600000">
-				<rom name="52-92083.u1" size="0x400000" crc="1036ec3b" sha1="78aae01287a10986e10918db1e5dfaab693c1871" offset="0x000000" />
-				<rom name="52-92083.u2" size="0x200000" crc="d2939ca7" sha1="a674aca956dc3d856e34995dae668911523362ee" offset="0x400000" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="52-92083.u1" size="0x400000" offset="0x000000" crc="1036ec3b" sha1="78aae01287a10986e10918db1e5dfaab693c1871" />
+				<rom name="52-92083.u2" size="0x200000" offset="0x400000" crc="d2939ca7" sha1="a674aca956dc3d856e34995dae668911523362ee" />
 			</dataarea>
 		</part>
 	</software>
@@ -4016,9 +4016,9 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
 			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="0x600000">
-				<rom name="092143.u1" size="0x400000" crc="987d99d6" sha1="78901c0029d0c4df7f151c7654c86bc43147e4cd" offset="0x000000" />
-				<rom name="092143.u2" size="0x200000" crc="3eae10c6" sha1="1124233305e3b28753007c57ef356a2351cbd117" offset="0x400000" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="092143.u1" size="0x400000" offset="0x000000" crc="987d99d6" sha1="78901c0029d0c4df7f151c7654c86bc43147e4cd" />
+				<rom name="092143.u2" size="0x200000" offset="0x400000" crc="3eae10c6" sha1="1124233305e3b28753007c57ef356a2351cbd117" />
 			</dataarea>
 		</part>
 	</software>
@@ -4766,9 +4766,9 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="pcb" value="92060" />
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM --> <!-- 2 globs, uses /CS2 for 2nd glob -->
 			<feature name="u2" value="" /> <!-- EPOXY BLOB ROM -->
-			<dataarea name="rom" size="0x600000">
-				<rom name="vsmile92060.blob1.bin" size="0x400000" crc="c34fd808" sha1="2800b89068e3c09a66223392e11982dd2193244b" offset="0x000000" />
-				<rom name="vsmile92060.blob2.bin" size="0x200000" crc="b7261f74" sha1="40bc8d9284a2f307023502ec67f8fc8e974966ea" offset="0x400000" />
+			<dataarea name="rom" size="0x800000">
+				<rom name="vsmile92060.blob1.bin" size="0x400000" offset="0x000000" crc="c34fd808" sha1="2800b89068e3c09a66223392e11982dd2193244b" />
+				<rom name="vsmile92060.blob2.bin" size="0x200000" offset="0x400000" crc="b7261f74" sha1="40bc8d9284a2f307023502ec67f8fc8e974966ea" />
 			</dataarea>
 		</part>
 	</software>
@@ -4817,8 +4817,8 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" />
 			<feature name="u2" value="" />
 			<dataarea name="rom" size="0x0800000">
-				<rom name="vsmile92063.blob1.bin" size="0x0400000" crc="24efb09a" sha1="c67a19edcc521e987fee546f3a0bc4bc0dbcfdb5" offset="0x0000000"/>
-				<rom name="vsmile92063.blob2.bin" size="0x0200000" crc="b7261f74" sha1="40bc8d9284a2f307023502ec67f8fc8e974966ea" offset="0x0400000" />
+				<rom name="vsmile92063.blob1.bin" size="0x0400000" offset="0x0000000" crc="24efb09a" sha1="c67a19edcc521e987fee546f3a0bc4bc0dbcfdb5" />
+				<rom name="vsmile92063.blob2.bin" size="0x0200000" offset="0x0400000" crc="b7261f74" sha1="40bc8d9284a2f307023502ec67f8fc8e974966ea" />
 			</dataarea>
 		</part>
 	</software>
