@@ -49,13 +49,19 @@ do \
 		uint32_t srcdata = (SOURCE); \
 		if (srcdata != trans_pen) \
 		{ \
-			if (cury > cliprect.bottom() || cury < cliprect.top()) \
+			if (xdrawpos > cliprect.right() || xdrawpos < cliprect.left()) \
 			{ \
 			} \
 			else \
 			{ \
-				(DESTZ) = zval; \
-				(DEST) = color + srcdata; \
+				if (cury > cliprect.bottom() || cury < cliprect.top()) \
+				{ \
+				} \
+				else \
+				{ \
+					(DESTZ) = zval; \
+					(DEST) = color + srcdata; \
+				} \
 			} \
 		} \
 	} \
@@ -71,13 +77,19 @@ do \
 		uint32_t srcdata = (SOURCE); \
 		if (srcdata != trans_pen) \
 		{ \
-			if (cury > cliprect.bottom() || cury < cliprect.top()) \
+			if (xdrawpos > cliprect.right() || xdrawpos < cliprect.left()) \
 			{ \
 			} \
 			else \
 			{ \
-				(DESTZ) = zval; \
-				(DEST) = color + srcdata; \
+				if (cury > cliprect.bottom() || cury < cliprect.top()) \
+				{ \
+				} \
+				else \
+				{ \
+					(DESTZ) = zval; \
+					(DEST) = color + srcdata; \
+				} \
 			} \
 		} \
 	} \
@@ -112,8 +124,8 @@ void hng64_state::drawline(bitmap_ind16 & dest, bitmap_ind16 & destz, const rect
 {
 	int srcy = dy * line + srcy_copy;
 
-	auto* destptr = &dest.pix(cury, destx);
-	auto* destzptr = &destz.pix(cury, destx);
+	auto* destptr = &dest.pix(cury, 0);
+	auto* destzptr = &destz.pix(cury, 0);
 
 	const u8* srcptr = srcdata + (srcy >> 16) * gfx->rowbytes();
 	int32_t cursrcx = srcx;
@@ -126,11 +138,10 @@ void hng64_state::drawline(bitmap_ind16 & dest, bitmap_ind16 & destz, const rect
 		for (int32_t curx = 0; curx < leftovers; curx++)
 		{
 			uint16_t srcpix;
+			int xdrawpos = destx + curx;
 			PIX_CHECKERBOARD;
-			PIXEL_OP_REBASE_TRANSPEN_REV(destptr[0], destzptr[0], srcpix);
+			PIXEL_OP_REBASE_TRANSPEN_REV(destptr[xdrawpos], destzptr[xdrawpos], srcpix);
 			cursrcx += dx;
-			destptr++;
-			destzptr++;
 		}
 	}
 	else
@@ -140,11 +151,10 @@ void hng64_state::drawline(bitmap_ind16 & dest, bitmap_ind16 & destz, const rect
 		for (int32_t curx = 0; curx < leftovers; curx++)
 		{
 			uint16_t srcpix;
+			int xdrawpos = destx + curx;
 			PIX_CHECKERBOARD;
-			PIXEL_OP_REBASE_TRANSPEN(destptr[0], destzptr[0], srcpix);
+			PIXEL_OP_REBASE_TRANSPEN(destptr[xdrawpos], destzptr[xdrawpos], srcpix);
 			cursrcx += dx;
-			destptr++;
-			destzptr++;
 		}
 	}
 }
@@ -179,29 +189,7 @@ void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const r
 	if (dstwidth < 1 || dstheight < 1)
 		return;
 
-	// compute final pixel in X and exit if we are entirely clipped
-	int32_t destendx = destx + dstwidth - 1;
-	if (destx > cliprect.right() || destendx < cliprect.left())
-		return;
-
-	// apply left clip
 	int32_t srcx = 0;
-	if (destx < cliprect.left())
-	{
-		srcx = (cliprect.left() - destx) * dx;
-		destx = cliprect.left();
-	}
-
-	// apply right clip
-	if (destendx > cliprect.right())
-		destendx = cliprect.right();
-
-	// compute final pixel in Y and exit if we are entirely clipped
-	int32_t destendy = desty + dstheight - 1;
-
-	// apply top clip
-	int32_t srcy = 0;
-
 	// apply X flipping
 	if (flipx)
 	{
@@ -209,6 +197,7 @@ void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const r
 		dx = -dx;
 	}
 
+	int32_t srcy = 0;
 	// apply Y flipping
 	if (flipy)
 	{
@@ -220,12 +209,14 @@ void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const r
 	const u8 *srcdata = gfx->get_data(code);
 
 	// compute how many blocks of 4 pixels we have
+	int32_t destendx = destx + dstwidth - 1;
 	uint32_t leftovers = (destendx + 1 - destx);
 
 	// iterate over pixels in Y
 	int line = 0;
 	int32_t srcycopy = srcy;
 
+	int32_t destendy = desty + dstheight - 1;
 	for (int32_t cury = desty; cury <= destendy; cury++)
 	{
 		drawline(dest, destz, cliprect,
