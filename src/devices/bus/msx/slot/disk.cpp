@@ -79,7 +79,7 @@ void msx_slot_disk_device::floppy_formats(format_registration &fr)
 }
 
 
-msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int nr_drives)
 	: msx_slot_rom_device(mconfig, type, tag, owner, clock)
 	, m_floppy0(*this, "fdc:0")
 	, m_floppy1(*this, "fdc:1")
@@ -87,19 +87,20 @@ msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device
 	, m_floppy3(*this, "fdc:3")
 	, m_floppy(nullptr)
 	, m_access_int_drv_out(*this, "access_int_drv%u", 0U)
+	, m_nr_drives(nr_drives)
 {
 }
 
-void msx_slot_disk_device::add_drive_mconfig(machine_config &config, int nr_of_drives, bool double_sided)
+void msx_slot_disk_device::add_drive_mconfig(machine_config &config, bool double_sided)
 {
-	if (nr_of_drives > NO_DRIVES)
+	if (m_nr_drives > NO_DRIVES)
 		FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
-	if (nr_of_drives > DRIVES_1)
+	if (m_nr_drives > DRIVES_1)
 		FLOPPY_CONNECTOR(config, m_floppy1, msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
-	if (nr_of_drives > DRIVES_2)
-		FLOPPY_CONNECTOR(config, m_floppy1, msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
-	if (nr_of_drives > DRIVES_3)
-		FLOPPY_CONNECTOR(config, m_floppy1, msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
+	if (m_nr_drives > DRIVES_2)
+		FLOPPY_CONNECTOR(config, m_floppy2, msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
+	if (m_nr_drives > DRIVES_3)
+		FLOPPY_CONNECTOR(config, m_floppy3, msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
 }
 
 void msx_slot_disk_device::device_start()
@@ -122,8 +123,8 @@ void msx_slot_disk_device::set_drive_access_led_state(int drive, int led_state)
 }
 
 
-msx_slot_wd_disk_device::msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: msx_slot_disk_device(mconfig, type, tag, owner, clock)
+msx_slot_wd_disk_device::msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int nr_drives)
+	: msx_slot_disk_device(mconfig, type, tag, owner, clock, nr_drives)
 	, m_fdc(*this, "fdc")
 	, m_control_led_bit(0)
 {
@@ -135,26 +136,26 @@ void msx_slot_wd_disk_device::device_start()
 }
 
 template <typename FDCType>
-void msx_slot_wd_disk_device::add_mconfig(machine_config &config, FDCType &&type, bool force_ready, int nr_of_drives, bool double_sided)
+void msx_slot_wd_disk_device::add_mconfig(machine_config &config, FDCType &&type, bool force_ready, bool double_sided)
 {
 	std::forward<FDCType>(type)(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->set_force_ready(force_ready);
-	add_drive_mconfig(config, nr_of_drives, double_sided);
+	add_drive_mconfig(config, double_sided);
 }
 
 
 
-msx_slot_tc8566_disk_device::msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: msx_slot_disk_device(mconfig, type, tag, owner, clock)
+msx_slot_tc8566_disk_device::msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int nr_drives)
+	: msx_slot_disk_device(mconfig, type, tag, owner, clock, nr_drives)
 	, m_fdc(*this, "fdc")
 {
 }
 
-void msx_slot_tc8566_disk_device::add_mconfig(machine_config &config, int nr_of_drives)
+void msx_slot_tc8566_disk_device::add_mconfig(machine_config &config)
 {
 	TC8566AF(config, m_fdc, 16'000'000);
 
-	add_drive_mconfig(config, nr_of_drives, DS);
+	add_drive_mconfig(config, DS);
 }
 
 void msx_slot_tc8566_disk_device::dor_w(u8 data)
@@ -167,8 +168,8 @@ void msx_slot_tc8566_disk_device::dor_w(u8 data)
 
 
 
-msx_slot_disk1_base_device::msx_slot_disk1_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_wd_disk_device(mconfig, type, tag, owner, clock)
+msx_slot_disk1_base_device::msx_slot_disk1_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int nr_drives)
+	: msx_slot_wd_disk_device(mconfig, type, tag, owner, clock, nr_drives)
 	, m_side_control(0)
 	, m_control(0)
 {
@@ -294,97 +295,97 @@ u8 msx_slot_disk1_base_device::status_r()
 
 
 msx_slot_disk1_fd1793_device::msx_slot_disk1_fd1793_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_FD1793, tag, owner, clock)
+	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_FD1793, tag, owner, clock, DRIVES_1)
 {
 }
 
 void msx_slot_disk1_fd1793_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, FD1793, NO_FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, FD1793, NO_FORCE_READY, DS);
 }
 
 
 msx_slot_disk1_mb8877_device::msx_slot_disk1_mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_MB8877, tag, owner, clock)
+	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_MB8877, tag, owner, clock, DRIVES_1)
 {
 }
 
 void msx_slot_disk1_mb8877_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, MB8877, FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, MB8877, FORCE_READY, DS);
 }
 
 
 msx_slot_disk1_wd2793_n_device::msx_slot_disk1_wd2793_n_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_N, tag, owner, clock)
+	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_N, tag, owner, clock, DRIVES_1)
 {
 }
 
 void msx_slot_disk1_wd2793_n_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, NO_FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, WD2793, NO_FORCE_READY, DS);
 }
 
 
 msx_slot_disk1_wd2793_n_2_drives_device::msx_slot_disk1_wd2793_n_2_drives_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_N_2_DRIVES, tag, owner, clock)
+	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_N_2_DRIVES, tag, owner, clock, DRIVES_2)
 {
 }
 
 void msx_slot_disk1_wd2793_n_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, NO_FORCE_READY, DRIVES_2, DS);
+	add_mconfig(config, WD2793, NO_FORCE_READY, DS);
 }
 
 
 msx_slot_disk1_wd2793_device::msx_slot_disk1_wd2793_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793, tag, owner, clock)
+	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793, tag, owner, clock, DRIVES_1)
 {
 }
 
 void msx_slot_disk1_wd2793_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, WD2793, FORCE_READY, DS);
 }
 
 
 msx_slot_disk1_wd2793_0_device::msx_slot_disk1_wd2793_0_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_0, tag, owner, clock)
+	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_0, tag, owner, clock, NO_DRIVES)
 {
 }
 
 void msx_slot_disk1_wd2793_0_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, FORCE_READY, NO_DRIVES, DS);
+	add_mconfig(config, WD2793, FORCE_READY, DS);
 }
 
 
 msx_slot_disk1_wd2793_ss_device::msx_slot_disk1_wd2793_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_SS, tag, owner, clock)
+	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_SS, tag, owner, clock, DRIVES_1)
 {
 }
 
 void msx_slot_disk1_wd2793_ss_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, FORCE_READY, DRIVES_1, SS);
+	add_mconfig(config, WD2793, FORCE_READY, SS);
 }
 
 
 msx_slot_disk1_wd2793_2_drives_device::msx_slot_disk1_wd2793_2_drives_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_2_DRIVES, tag, owner, clock)
+	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_2_DRIVES, tag, owner, clock, DRIVES_2)
 {
 }
 
 void msx_slot_disk1_wd2793_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, FORCE_READY, DRIVES_2, DS);
+	add_mconfig(config, WD2793, FORCE_READY, DS);
 }
 
 
 
 
-msx_slot_disk2_base_device::msx_slot_disk2_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_wd_disk_device(mconfig, type, tag, owner, clock)
+msx_slot_disk2_base_device::msx_slot_disk2_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int nr_drives)
+	: msx_slot_wd_disk_device(mconfig, type, tag, owner, clock, nr_drives)
 	, m_control(0)
 {
 	set_control_led_bit(6);
@@ -472,68 +473,68 @@ u8 msx_slot_disk2_base_device::status_r()
 
 
 msx_slot_disk2_fd1793_ss_device::msx_slot_disk2_fd1793_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_FD1793_SS, tag, owner, clock)
+	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_FD1793_SS, tag, owner, clock, DRIVES_1)
 {
 }
 
 void msx_slot_disk2_fd1793_ss_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, FD1793, FORCE_READY, DRIVES_1, SS);
+	add_mconfig(config, FD1793, FORCE_READY, SS);
 }
 
 
 msx_slot_disk2_mb8877_device::msx_slot_disk2_mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_MB8877, tag, owner, clock)
+	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_MB8877, tag, owner, clock, DRIVES_1)
 {
 }
 
 void msx_slot_disk2_mb8877_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, MB8877, FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, MB8877, FORCE_READY, DS);
 }
 
 
 msx_slot_disk2_mb8877_ss_device::msx_slot_disk2_mb8877_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_MB8877_SS, tag, owner, clock)
+	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_MB8877_SS, tag, owner, clock, DRIVES_1)
 {
 }
 
 void msx_slot_disk2_mb8877_ss_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, MB8877, FORCE_READY, DRIVES_1, SS);
+	add_mconfig(config, MB8877, FORCE_READY, SS);
 }
 
 
 msx_slot_disk2_mb8877_2_drives_device::msx_slot_disk2_mb8877_2_drives_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_MB8877_2_DRIVES, tag, owner, clock)
+	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_MB8877_2_DRIVES, tag, owner, clock, DRIVES_2)
 {
 }
 
 void msx_slot_disk2_mb8877_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, MB8877, FORCE_READY, DRIVES_2, DS);
+	add_mconfig(config, MB8877, FORCE_READY, DS);
 }
 
 
 msx_slot_disk2_wd2793_device::msx_slot_disk2_wd2793_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_WD2793, tag, owner, clock)
+	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_WD2793, tag, owner, clock, DRIVES_1)
 {
 }
 
 void msx_slot_disk2_wd2793_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, WD2793, FORCE_READY, DS);
 }
 
 
 msx_slot_disk2_wd2793_2_drives_device::msx_slot_disk2_wd2793_2_drives_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_WD2793_2_DRIVES, tag, owner, clock)
+	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_WD2793_2_DRIVES, tag, owner, clock, DRIVES_2)
 {
 }
 
 void msx_slot_disk2_wd2793_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, FORCE_READY, DRIVES_2, DS);
+	add_mconfig(config, WD2793, FORCE_READY, DS);
 }
 
 
@@ -542,18 +543,18 @@ void msx_slot_disk2_wd2793_2_drives_device::device_add_mconfig(machine_config &c
 
 
 msx_slot_disk3_tc8566_device::msx_slot_disk3_tc8566_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk3_tc8566_device(mconfig, MSX_SLOT_DISK3_TC8566, tag, owner, clock)
+	: msx_slot_disk3_tc8566_device(mconfig, MSX_SLOT_DISK3_TC8566, tag, owner, clock, DRIVES_1)
 {
 }
 
-msx_slot_disk3_tc8566_device::msx_slot_disk3_tc8566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_tc8566_disk_device(mconfig, type, tag, owner, clock)
+msx_slot_disk3_tc8566_device::msx_slot_disk3_tc8566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int nr_drives)
+	: msx_slot_tc8566_disk_device(mconfig, type, tag, owner, clock, nr_drives)
 {
 }
 
 void msx_slot_disk3_tc8566_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, DRIVES_1);
+	add_mconfig(config);
 }
 
 void msx_slot_disk3_tc8566_device::device_start()
@@ -576,13 +577,13 @@ void msx_slot_disk3_tc8566_device::device_start()
 
 
 msx_slot_disk3_tc8566_2_drives_device::msx_slot_disk3_tc8566_2_drives_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk3_tc8566_device(mconfig, MSX_SLOT_DISK3_TC8566_2_DRIVES, tag, owner, clock)
+	: msx_slot_disk3_tc8566_device(mconfig, MSX_SLOT_DISK3_TC8566_2_DRIVES, tag, owner, clock, DRIVES_2)
 {
 }
 
 void msx_slot_disk3_tc8566_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, DRIVES_2);
+	add_mconfig(config);
 }
 
 
@@ -591,7 +592,7 @@ void msx_slot_disk3_tc8566_2_drives_device::device_add_mconfig(machine_config &c
 
 
 msx_slot_disk4_tc8566_device::msx_slot_disk4_tc8566_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msx_slot_tc8566_disk_device(mconfig, MSX_SLOT_DISK4_TC8566, tag, owner, clock)
+	: msx_slot_tc8566_disk_device(mconfig, MSX_SLOT_DISK4_TC8566, tag, owner, clock, DRIVES_1)
 {
 }
 
@@ -610,21 +611,21 @@ void msx_slot_disk4_tc8566_device::device_start()
 
 void msx_slot_disk4_tc8566_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, DRIVES_1);
+	add_mconfig(config);
 }
 
 
 
 
 msx_slot_disk5_wd2793_device::msx_slot_disk5_wd2793_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK5_WD2793, tag, owner, clock)
+	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK5_WD2793, tag, owner, clock, DRIVES_1)
 	, m_control(0)
 {
 }
 
 void msx_slot_disk5_wd2793_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, WD2793, FORCE_READY, DS);
 }
 
 void msx_slot_disk5_wd2793_device::device_start()
@@ -723,7 +724,7 @@ u8 msx_slot_disk5_wd2793_device::status_r()
 
 
 msx_slot_disk6_wd2793_n_device::msx_slot_disk6_wd2793_n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK6_WD2793_N, tag, owner, clock)
+	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK6_WD2793_N, tag, owner, clock, DRIVES_1)
 	, m_side_motor(0)
 	, m_drive_select(0)
 	, m_drive_present(false)
@@ -733,7 +734,7 @@ msx_slot_disk6_wd2793_n_device::msx_slot_disk6_wd2793_n_device(const machine_con
 
 void msx_slot_disk6_wd2793_n_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, NO_FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, WD2793, NO_FORCE_READY, DS);
 }
 
 void msx_slot_disk6_wd2793_n_device::device_start()
@@ -863,14 +864,14 @@ void msx_slot_disk6_wd2793_n_device::unknown_w(u8 data)
 
 
 msx_slot_disk7_mb8877_device::msx_slot_disk7_mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK7_MB8877, tag, owner, clock)
+	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK7_MB8877, tag, owner, clock, DRIVES_1)
 	, m_drive_side_motor(0)
 {
 }
 
 void msx_slot_disk7_mb8877_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, MB8877, FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, MB8877, FORCE_READY, DS);
 }
 
 void msx_slot_disk7_mb8877_device::device_start()
@@ -973,19 +974,19 @@ u8 msx_slot_disk7_mb8877_device::status_r()
 
 
 msx_slot_disk8_mb8877_device::msx_slot_disk8_mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msx_slot_disk8_mb8877_device(mconfig, MSX_SLOT_DISK8_MB8877, tag, owner, clock)
+	: msx_slot_disk8_mb8877_device(mconfig, MSX_SLOT_DISK8_MB8877, tag, owner, clock, DRIVES_1)
 {
 }
 
-msx_slot_disk8_mb8877_device::msx_slot_disk8_mb8877_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_wd_disk_device(mconfig, type, tag, owner, clock)
+msx_slot_disk8_mb8877_device::msx_slot_disk8_mb8877_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int nr_drives)
+	: msx_slot_wd_disk_device(mconfig, type, tag, owner, clock, nr_drives)
 	, m_control(0)
 {
 }
 
 void msx_slot_disk8_mb8877_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, MB8877, FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, MB8877, FORCE_READY, DS);
 }
 
 void msx_slot_disk8_mb8877_device::device_start()
@@ -1073,27 +1074,27 @@ u8 msx_slot_disk8_mb8877_device::status_r()
 
 
 msx_slot_disk8_wd2793_2_drives_device::msx_slot_disk8_wd2793_2_drives_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msx_slot_disk8_mb8877_device(mconfig, MSX_SLOT_DISK8_WD2793_2_DRIVES, tag, owner, clock)
+	: msx_slot_disk8_mb8877_device(mconfig, MSX_SLOT_DISK8_WD2793_2_DRIVES, tag, owner, clock, DRIVES_2)
 {
 }
 
 void msx_slot_disk8_wd2793_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, FORCE_READY, DRIVES_2, DS);
+	add_mconfig(config, WD2793, FORCE_READY, DS);
 }
 
 
 
 
 msx_slot_disk9_wd2793_n_device::msx_slot_disk9_wd2793_n_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK9_WD2793_N, tag, owner, clock)
+	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK9_WD2793_N, tag, owner, clock, DRIVES_1)
 	, m_control(0)
 {
 }
 
 void msx_slot_disk9_wd2793_n_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, NO_FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, WD2793, NO_FORCE_READY, DS);
 }
 
 void msx_slot_disk9_wd2793_n_device::device_start()
@@ -1169,19 +1170,19 @@ u8 msx_slot_disk9_wd2793_n_device::status_r()
 
 
 msx_slot_disk10_mb8877_device::msx_slot_disk10_mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk10_mb8877_device(mconfig, MSX_SLOT_DISK10_MB8877, tag, owner, clock)
+	: msx_slot_disk10_mb8877_device(mconfig, MSX_SLOT_DISK10_MB8877, tag, owner, clock, DRIVES_1)
 {
 }
 
-msx_slot_disk10_mb8877_device::msx_slot_disk10_mb8877_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_wd_disk_device(mconfig, type, tag, owner, clock)
+msx_slot_disk10_mb8877_device::msx_slot_disk10_mb8877_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int nr_drives)
+	: msx_slot_wd_disk_device(mconfig, type, tag, owner, clock, nr_drives)
 	, m_control(0)
 {
 }
 
 void msx_slot_disk10_mb8877_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, MB8877, FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, MB8877, FORCE_READY, DS);
 }
 
 void msx_slot_disk10_mb8877_device::device_start()
@@ -1257,19 +1258,19 @@ u8 msx_slot_disk10_mb8877_device::status_r()
 
 
 msx_slot_disk10_mb8877_2_drives_device::msx_slot_disk10_mb8877_2_drives_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk10_mb8877_device(mconfig, MSX_SLOT_DISK10_MB8877_2_DRIVES, tag, owner, clock)
+	: msx_slot_disk10_mb8877_device(mconfig, MSX_SLOT_DISK10_MB8877_2_DRIVES, tag, owner, clock, DRIVES_2)
 {
 }
 
 void msx_slot_disk10_mb8877_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, MB8877, FORCE_READY, DRIVES_2, DS);
+	add_mconfig(config, MB8877, FORCE_READY, DS);
 }
 
 
 
 msx_slot_disk11_wd2793_device::msx_slot_disk11_wd2793_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK11_WD2793, tag, owner, clock)
+	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK11_WD2793, tag, owner, clock, DRIVES_1)
 	, m_side_control(0)
 	, m_control(0)
 {
@@ -1277,7 +1278,7 @@ msx_slot_disk11_wd2793_device::msx_slot_disk11_wd2793_device(const machine_confi
 
 void msx_slot_disk11_wd2793_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, WD2793, FORCE_READY, DS);
 }
 
 void msx_slot_disk11_wd2793_device::device_start()

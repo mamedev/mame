@@ -56,8 +56,8 @@ public:
 	void yis503ii(machine_config &config);
 
 protected:
-	void msx1_v9938(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives = NO_DRIVES);
-	void msx1_v9938_pal(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives = NO_DRIVES);
+	void msx1_v9938(ay8910_type ay8910_type, machine_config &config);
+	void msx1_v9938_pal(ay8910_type ay8910_type, machine_config &config);
 
 	void io_map(address_map &map);
 
@@ -76,9 +76,9 @@ void msx1_v9938_state::io_map(address_map &map)
 	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
 }
 
-void msx1_v9938_state::msx1_v9938(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives)
+void msx1_v9938_state::msx1_v9938(ay8910_type ay8910_type, machine_config &config)
 {
-	msx_base(ay8910_type, config, 21.477272_MHz_XTAL, 6, internal_drives);
+	msx_base(ay8910_type, config, 21.477272_MHz_XTAL, 6);
 
 	m_maincpu->set_addrmap(AS_IO, &msx1_v9938_state::io_map);
 
@@ -92,9 +92,9 @@ void msx1_v9938_state::msx1_v9938(ay8910_type ay8910_type, machine_config &confi
 	msx1_add_softlists(config);
 }
 
-void msx1_v9938_state::msx1_v9938_pal(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives)
+void msx1_v9938_state::msx1_v9938_pal(ay8910_type ay8910_type, machine_config &config)
 {
-	msx1_v9938(ay8910_type, config, internal_drives);
+	msx1_v9938(ay8910_type, config);
 	m_v9938->set_screen_pal(m_screen);
 }
 
@@ -186,7 +186,7 @@ void msx1_v9938_state::svi738(machine_config &config)
 	add_internal_slot_irq<2>(config, MSX_SLOT_RS232_SVI738, "rs232", 3, 0, 1, 1, "rs232rom");
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK2_FD1793_SS, "disk", 3, 1, 1, 2, "diskrom").use_motor_for_led();
 
-	msx1_v9938_pal(SND_AY8910, config, DRIVES_1);
+	msx1_v9938_pal(SND_AY8910, config);
 }
 
 /* MSX - Spectravideo SVI-738 Arabic */

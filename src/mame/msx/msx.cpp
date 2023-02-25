@@ -553,7 +553,7 @@ void msx_state::kanji_w(offs_t offset, u8 data)
 		m_kanji_latch = (m_kanji_latch & 0x1f800) | ((data & 0x3f) << 5);
 }
 
-void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, XTAL xtal, int cpu_divider, internal_drives internal_drives)
+void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, XTAL xtal, int cpu_divider)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, xtal / cpu_divider);         // 3.579545 MHz
@@ -612,14 +612,12 @@ void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, XTAL x
 		m_cassette->set_interface("msx_cass");
 	}
 
-	switch (internal_drives)
+	switch (m_hw_def.get_internal_drives())
 	{
-	case NO_DRIVES:
-		break;
-	case DRIVES_1:
+	case 1:
 		config.set_default_layout(layout_msx_1drive);
 		break;
-	case DRIVES_2:
+	case 2:
 		config.set_default_layout(layout_msx_2drives);
 		break;
 	}
@@ -637,9 +635,9 @@ void msx_state::msx1_add_softlists(machine_config &config)
 		SOFTWARE_LIST(config, "flop_list").set_original("msx1_flop");
 }
 
-void msx_state::msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives)
+void msx_state::msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config)
 {
-	msx_base(ay8910_type, config, 10.738635_MHz_XTAL, 3, internal_drives);
+	msx_base(ay8910_type, config, 10.738635_MHz_XTAL, 3);
 
 	m_maincpu->set_addrmap(AS_IO, &msx_state::msx1_io_map);
 
@@ -820,17 +818,17 @@ void msx2_base_state::turbor_add_softlists(machine_config &config)
 	}
 }
 
-void msx2_base_state::msx2_base(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives)
+void msx2_base_state::msx2_base(ay8910_type ay8910_type, machine_config &config)
 {
-	msx_base(ay8910_type, config, 21.477272_MHz_XTAL, 6, internal_drives);
+	msx_base(ay8910_type, config, 21.477272_MHz_XTAL, 6);
 
 	// real time clock
 	RP5C01(config, m_rtc, 32.768_kHz_XTAL);
 }
 
-void msx2_base_state::msx2(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives)
+void msx2_base_state::msx2(ay8910_type ay8910_type, machine_config &config)
 {
-	msx2_base(ay8910_type, config, internal_drives);
+	msx2_base(ay8910_type, config);
 
 	m_maincpu->set_addrmap(AS_IO, &msx2_base_state::msx2_io_map);
 
@@ -844,15 +842,15 @@ void msx2_base_state::msx2(ay8910_type ay8910_type, machine_config &config, inte
 	msx2_add_softlists(config);
 }
 
-void msx2_base_state::msx2_pal(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives)
+void msx2_base_state::msx2_pal(ay8910_type ay8910_type, machine_config &config)
 {
-	msx2(ay8910_type, config, internal_drives);
+	msx2(ay8910_type, config);
 	m_v9938->set_screen_pal(m_screen);
 }
 
-void msx2_base_state::msx2plus_base(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives)
+void msx2_base_state::msx2plus_base(ay8910_type ay8910_type, machine_config &config)
 {
-	msx2_base(ay8910_type, config, internal_drives);
+	msx2_base(ay8910_type, config);
 
 	m_maincpu->set_addrmap(AS_IO, &msx2_base_state::msx2plus_io_map);
 
@@ -863,23 +861,23 @@ void msx2_base_state::msx2plus_base(ay8910_type ay8910_type, machine_config &con
 	m_v9958->int_cb().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
 }
 
-void msx2_base_state::msx2plus(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives)
+void msx2_base_state::msx2plus(ay8910_type ay8910_type, machine_config &config)
 {
-	msx2plus_base(ay8910_type, config, internal_drives);
+	msx2plus_base(ay8910_type, config);
 
 	// Software lists
 	msx2plus_add_softlists(config);
 }
 
-void msx2_base_state::msx2plus_pal(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives)
+void msx2_base_state::msx2plus_pal(ay8910_type ay8910_type, machine_config &config)
 {
-	msx2plus(ay8910_type, config, internal_drives);
+	msx2plus(ay8910_type, config);
 	m_v9958->set_screen_pal(m_screen);
 }
 
-void msx2_base_state::turbor(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives)
+void msx2_base_state::turbor(ay8910_type ay8910_type, machine_config &config)
 {
-	msx2plus_base(ay8910_type, config, internal_drives);
+	msx2plus_base(ay8910_type, config);
 
 	R800(config.replace(), m_maincpu, 28.636363_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &msx2_base_state::memory_map);

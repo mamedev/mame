@@ -31,29 +31,25 @@ public:
 	bool has_printer_port() const { return m_has_printer_port; }
 	bool has_cartslot() const { return m_has_cartslot; }
 	bool has_fdc() const { return m_has_fdc; }
+	int get_internal_drives() const { return m_internal_drives; }
 	msx_hw_def &has_cassette(bool has_cassette) { m_has_cassette = has_cassette; return *this;}
 	msx_hw_def &has_printer_port(bool has_printer_port) { m_has_printer_port = has_printer_port; return *this; }
 	msx_hw_def &has_cartslot(bool has_cartslot) { m_has_cartslot = has_cartslot; return *this; }
 	msx_hw_def &has_fdc(bool has_fdc) { m_has_fdc = has_fdc; return *this; }
+	msx_hw_def &internal_drives(int internal_drives) { m_internal_drives = internal_drives; return *this; }
 
 private:
 	bool m_has_cassette = true;
 	bool m_has_printer_port = true;
 	bool m_has_cartslot = false;
 	bool m_has_fdc = false;
+	int m_internal_drives = 0;
 };
 
 class msx_state : public driver_device
 {
 protected:
 	msx_state(const machine_config &mconfig, device_type type, const char *tag);
-
-	enum internal_drives
-	{
-		NO_DRIVES,
-		DRIVES_1,
-		DRIVES_2
-	};
 
 	enum ay8910_type
 	{
@@ -72,8 +68,8 @@ protected:
 		VDP_TMS9929A
 	};
 
-	void msx_base(ay8910_type ay8910_type, machine_config &config, XTAL xtal, int cpu_divider, internal_drives internal_drives);
-	void msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives = NO_DRIVES);
+	void msx_base(ay8910_type ay8910_type, machine_config &config, XTAL xtal, int cpu_divider);
+	void msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config);
 	void msx1_add_softlists(machine_config &config);
 
 	// configuration helpers
@@ -274,6 +270,7 @@ private:
 	{
 		auto &device = add_internal_slot(config, std::forward<T>(type), std::forward<U>(tag), prim, true, sec, page, numpages, region, offset);
 		m_hw_def.has_fdc(true);
+		m_hw_def.internal_drives(device.get_nr_drives());
 		return device;
 	}
 	template <int N, typename T, typename U>
@@ -329,13 +326,13 @@ protected:
 
 	virtual void machine_start() override;
 
-	void msx2_base(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives);
-	void msx2(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives = NO_DRIVES);
-	void msx2_pal(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives = NO_DRIVES);
-	void msx2plus_base(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives);
-	void msx2plus(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives = NO_DRIVES);
-	void msx2plus_pal(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives = NO_DRIVES);
-	void turbor(ay8910_type ay8910_type, machine_config &config, internal_drives internal_drives = NO_DRIVES);
+	void msx2_base(ay8910_type ay8910_type, machine_config &config);
+	void msx2(ay8910_type ay8910_type, machine_config &config);
+	void msx2_pal(ay8910_type ay8910_type, machine_config &config);
+	void msx2plus_base(ay8910_type ay8910_type, machine_config &config);
+	void msx2plus(ay8910_type ay8910_type, machine_config &config);
+	void msx2plus_pal(ay8910_type ay8910_type, machine_config &config);
+	void turbor(ay8910_type ay8910_type, machine_config &config);
 	void msx2_add_softlists(machine_config &config);
 	void msx2plus_add_softlists(machine_config &config);
 	void turbor_add_softlists(machine_config &config);

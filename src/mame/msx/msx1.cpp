@@ -1007,7 +1007,7 @@ void msx1_state::expertdp(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  // 64KB RAM
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK2_MB8877, "diskrom", 3, 3, 1, 2, "diskrom");
 
-	msx1(VDP_TMS9928A, SND_AY8910, config, DRIVES_1);
+	msx1(VDP_TMS9928A, SND_AY8910, config);
 }
 
 /* MSX - Gradiente Expert Plus */
@@ -1499,7 +1499,7 @@ void msx1_state::cf3300(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  // 64KB RAM
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK2_MB8877_SS, "diskrom", 3, 1, 1, 2, "diskrom");
 
-	msx1(VDP_TMS9928A, SND_AY8910, config, DRIVES_1);
+	msx1(VDP_TMS9928A, SND_AY8910, config);
 }
 
 /* MSX - National FS-1300 */
@@ -2795,7 +2795,7 @@ void msx1_state::hb701fd(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 0, 0, 4);  // 64KB RAM
 	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793_SS, "disk", 3, 1, 1, 2, "diskrom");
 
-	msx1(VDP_TMS9928A, SND_YM2149, config, DRIVES_1);
+	msx1(VDP_TMS9928A, SND_YM2149, config);
 }
 
 /* MSX - Spectravideo SVI-728 */
