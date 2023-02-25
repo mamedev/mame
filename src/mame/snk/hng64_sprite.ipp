@@ -397,7 +397,3 @@ void hng64_state::draw_sprite_line(screen_device& screen, const rectangle& clipr
 	}
 	
 }
-
-
-
-
