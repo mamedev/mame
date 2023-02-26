@@ -77,14 +77,15 @@
 
     TODO:
     - Sample format needs to be double checked;
-    - Octave Control/BPM/Pitch, xrally Network BGM wants 66150 Hz which is definitely too fast for most fatfurwa samples.
-    - Key Off, non-loop samples repeats;
+    - Octave Control/BPM/Pitch, xrally Network BGM wants 66150 Hz which is definitely too fast for
+	  most fatfurwa samples;
+    - Key Off for looping samples (fatfurwa should stop all samples when user insert a credit,
+      cfr. reg[0] readback);
+    - Most non-looping samples are setup to repeat twice on different channels (cfr. fatfurwa);
     - Fix relative sample end positions (non-loop);
     - ADSR (registers 2 & 4?);
     - How DMA really works?
-    - fatfurwa: should stop all samples when user insert a credit,
-      is there a full key off/reset mechanism trigger?
-
+      
 **************************************************************************************************/
 
 #include "emu.h"
@@ -347,6 +348,9 @@ uint16_t l7a1045_sound_device::sound_data_r(offs_t offset)
 			uint32_t current_addr;
 			uint16_t res;
 
+			// TODO: fatfurwa reads offset == 2, ANDs with 0xf and compares against a sample buffer value if it's bigger, smaller or equal
+			// Returning 0xffff here for looping samples and they will silence out when user insert a coin ...
+			
 			current_addr = vptr->start + vptr->pos;
 			if(offset == 0)
 				res = (current_addr & 0xf) << 12; // TODO: frac
