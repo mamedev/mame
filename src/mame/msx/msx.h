@@ -237,6 +237,7 @@ protected:
 	u8 m_secondary_slot[4];
 	u8 m_port_c_old;
 	u8 m_keylatch;
+	output_finder<> m_caps_led;
 
 private:
 	// configuration helpers

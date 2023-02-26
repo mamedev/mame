@@ -162,6 +162,7 @@ msx_state::msx_state(const machine_config &mconfig, device_type type, const char
 	, m_secondary_slot{0, 0, 0, 0}
 	, m_port_c_old(0)
 	, m_keylatch(0)
+	, m_caps_led(*this, "caps_led")
 {
 	m_view[0] = &m_view_page0;
 	m_view[1] = &m_view_page1;
@@ -309,6 +310,7 @@ void msx_state::machine_reset()
 void msx_state::machine_start()
 {
 	m_leds.resolve();
+	m_caps_led.resolve();
 	m_port_c_old = 0xff;
 }
 
@@ -482,6 +484,7 @@ void msx_state::ppi_port_c_w(u8 data)
 	m_keylatch = data & 0x0f;
 
 	// caps lock
+	m_caps_led = BIT(~data, 6);
 	if (BIT(m_port_c_old ^ data, 6))
 		m_leds[0] = BIT(~data, 6);
 
@@ -612,15 +615,7 @@ void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, XTAL x
 		m_cassette->set_interface("msx_cass");
 	}
 
-	switch (m_hw_def.get_internal_drives())
-	{
-	case 1:
-		config.set_default_layout(layout_msx_1drive);
-		break;
-	case 2:
-		config.set_default_layout(layout_msx_2drives);
-		break;
-	}
+	config.set_default_layout(layout_msx_1drive);
 }
 
 void msx_state::msx1_add_softlists(machine_config &config)
