@@ -189,6 +189,8 @@ public:
 
 	void nws3410(machine_config &config);
 
+	static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }
+
 protected:
 	void nws3410_map(address_map &map);
 };
