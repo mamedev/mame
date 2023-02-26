@@ -15520,7 +15520,7 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<part name="flop1" interface="floppy_5_25">
 			<!-- Copy-protected key disk -->
 			<dataarea name="flop" size = "2882752">
-				<rom name="sq2_1.mfm" size="2882752" crc="7da46c43" sha1="931fa509a3a4f5627777f571a298065c024ba6b4"/>
+				<rom name="sq2_1.mfm" size="1092364" crc="a48e26ff" sha1="4d79585edbbf1ac357b70fae355f5307fc07ff17"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
