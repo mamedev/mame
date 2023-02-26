@@ -53,7 +53,7 @@ newoption {
 	description = "Set Android platform version (default: android-24).",
 }
 
-local android = {};
+local android = {}
 
 function androidToolchainRoot()
 	if android.toolchainRoot == nil then
@@ -62,7 +62,7 @@ function androidToolchainRoot()
 			linux   = "linux-x86_64",
 			macosx  = "darwin-x86_64"
 		}
-		android.toolchainRoot = os.getenv("ANDROID_NDK_HOME") .. "/toolchains/llvm/prebuilt/" .. hostTags[os.get()]
+		android.toolchainRoot = (os.getenv("ANDROID_NDK_HOME") or "") .. "/toolchains/llvm/prebuilt/" .. hostTags[os.get()]
 	end
 
 	return android.toolchainRoot;

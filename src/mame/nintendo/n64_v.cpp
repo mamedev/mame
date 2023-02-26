@@ -1328,84 +1328,85 @@ int32_t const n64_rdp::s_rdp_command_length[64] =
 	8           // 0x3f, Set_Color_Image
 };
 
-namespace
+namespace {
+
+std::string disassemble_vertices(const std::string &op_name, int32_t lft, const uint64_t *cmd_buf)
 {
-	std::string disassemble_vertices(const std::string &op_name, int32_t lft, const uint64_t *cmd_buf)
-	{
-		float yl = ((cmd_buf[0] >> 32) & 0x1fff) / 4.0f;
-		float ym = ((cmd_buf[0] >> 16) & 0x1fff) / 4.0f;
-		float yh = ((cmd_buf[0] >> 0) & 0x1fff) / 4.0f;
+	const float yl = ((cmd_buf[0] >> 32) & 0x1fff) / 4.0f;
+	const float ym = ((cmd_buf[0] >> 16) & 0x1fff) / 4.0f;
+	const float yh = ((cmd_buf[0] >> 0) & 0x1fff) / 4.0f;
 
-		float xl = int32_t(cmd_buf[1] >> 32) / 65536.0f;
-		float xh = int32_t(cmd_buf[2] >> 32) / 65536.0f;
-		float xm = int32_t(cmd_buf[3] >> 32) / 65536.0f;
+	const float xl = int32_t(cmd_buf[1] >> 32) / 65536.0f;
+	const float xh = int32_t(cmd_buf[2] >> 32) / 65536.0f;
+	const float xm = int32_t(cmd_buf[3] >> 32) / 65536.0f;
 
-		// (Currently?) not displayed
-		// auto dxldy = int32_t(cmd_buf[1]) / 65536.0f;
-		// auto dxhdy = int32_t(cmd_buf[2]) / 65536.0f;
-		// auto dxmdy = int32_t(cmd_buf[3]) / 65536.0f;
+	// (Currently?) not displayed
+	[[maybe_unused]] const float dxldy = int32_t(cmd_buf[1]) / 65536.0f;
+	[[maybe_unused]] const float dxhdy = int32_t(cmd_buf[2]) / 65536.0f;
+	[[maybe_unused]] const float dxmdy = int32_t(cmd_buf[3]) / 65536.0f;
 
-		return util::string_format("%-20s   %d, XL: %4.4f, XM: %4.4f, XH: %4.4f, YL: %4.4f, YM: %4.4f, YH: %4.4f\n", op_name, lft, xl, xm, xh, yl, ym, yh);
-	}
-
-	std::string disassemble_rgb(const uint64_t *cmd_buf)
-	{
-		float rt = int32_t(((cmd_buf[4] >> 32) & 0xffff0000) | ((cmd_buf[6] >> 48) & 0xffff)) / 65536.0f;
-		float gt = int32_t((((cmd_buf[4] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[6] >> 32) & 0xffff)) / 65536.0f;
-		float bt = int32_t((cmd_buf[4] & 0xffff0000) | ((cmd_buf[6] >> 16) & 0xffff)) / 65536.0f;
-		float at = int32_t(((cmd_buf[4] & 0x0000ffff) << 16) | (cmd_buf[6] & 0xffff)) / 65536.0f;
-		float drdx = int32_t(((cmd_buf[5] >> 32) & 0xffff0000) | ((cmd_buf[7] >> 48) & 0xffff)) / 65536.0f;
-		float dgdx = int32_t((((cmd_buf[5] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[7] >> 32) & 0xffff)) / 65536.0f;
-		float dbdx = int32_t((cmd_buf[5] & 0xffff0000) | ((cmd_buf[7] >> 16) & 0xffff)) / 65536.0f;
-		float dadx = int32_t(((cmd_buf[5] & 0x0000ffff) << 16) | (cmd_buf[7] & 0xffff)) / 65536.0f;
-		float drde = int32_t(((cmd_buf[8] >> 32) & 0xffff0000) | ((cmd_buf[10] >> 48) & 0xffff)) / 65536.0f;
-		float dgde = int32_t((((cmd_buf[8] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[10] >> 32) & 0xffff)) / 65536.0f;
-		float dbde = int32_t((cmd_buf[8] & 0xffff0000) | ((cmd_buf[10] >> 16) & 0xffff)) / 65536.0f;
-		float dade = int32_t(((cmd_buf[8] & 0x0000ffff) << 16) | (cmd_buf[10] & 0xffff)) / 65536.0f;
-		float drdy = int32_t(((cmd_buf[9] >> 32) & 0xffff0000) | ((cmd_buf[11] >> 48) & 0xffff)) / 65536.0f;
-		float dgdy = int32_t((((cmd_buf[9] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[11] >> 32) & 0xffff)) / 65536.0f;
-		float dbdy = int32_t((cmd_buf[9] & 0xffff0000) | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f;
-		float dady = int32_t(((cmd_buf[9] & 0x0000ffff) << 16) | (cmd_buf[11] & 0xffff)) / 65536.0f;
-
-		std::ostringstream buffer;
-		buffer << "                             ";
-		util::stream_format(buffer, "                       R: %4.4f, G: %4.4f, B: %4.4f, A: %4.4f\n", rt, gt, bt, at);
-		buffer << "                             ";
-		util::stream_format(buffer, "                       DRDX: %4.4f, DGDX: %4.4f, DBDX: %4.4f, DADX: %4.4f\n", drdx, dgdx, dbdx, dadx);
-		buffer << "                             ";
-		util::stream_format(buffer, "                       DRDE: %4.4f, DGDE: %4.4f, DBDE: %4.4f, DADE: %4.4f\n", drde, dgde, dbde, dade);
-		buffer << "                             ";
-		util::stream_format(buffer, "                       DRDY: %4.4f, DGDY: %4.4f, DBDY: %4.4f, DADY: %4.4f\n", drdy, dgdy, dbdy, dady);
-		return std::move(buffer).str();
-	}
-
-	std::string disassemble_stw(const uint64_t *cmd_buf)
-	{
-		float s = int32_t(((cmd_buf[4] >> 32) & 0xffff0000) | ((cmd_buf[6] >> 48) & 0xffff)) / 65536.0f;
-		float t = int32_t((((cmd_buf[4] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[6] >> 32) & 0xffff)) / 65536.0f;
-		float w = int32_t((cmd_buf[4] & 0xffff0000) | ((cmd_buf[6] >> 16) & 0xffff)) / 65536.0f;
-		float dsdx = int32_t(((cmd_buf[5] >> 32) & 0xffff0000) | ((cmd_buf[7] >> 48) & 0xffff)) / 65536.0f;
-		float dtdx = int32_t((((cmd_buf[5] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[7] >> 32) & 0xffff)) / 65536.0f;
-		float dwdx = int32_t((cmd_buf[5] & 0xffff0000) | ((cmd_buf[7] >> 16) & 0xffff)) / 65536.0f;
-		float dsde = int32_t(((cmd_buf[8] >> 32) & 0xffff0000) | ((cmd_buf[10] >> 48) & 0xffff)) / 65536.0f;
-		float dtde = int32_t((((cmd_buf[8] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[10] >> 32) & 0xffff)) / 65536.0f;
-		float dwde = int32_t((cmd_buf[8] & 0xffff0000) | ((cmd_buf[10] >> 16) & 0xffff)) / 65536.0f;
-		float dsdy = int32_t(((cmd_buf[9] >> 32) & 0xffff0000) | ((cmd_buf[11] >> 48) & 0xffff)) / 65536.0f;
-		float dtdy = int32_t((((cmd_buf[9] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[11] >> 32) & 0xffff)) / 65536.0f;
-		float dwdy = int32_t((cmd_buf[9] & 0xffff0000) | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f;
-
-		std::ostringstream buffer;
-		buffer << "                             ";
-		util::stream_format(buffer, "                       S: %4.4f, T: %4.4f, W: %4.4f\n", s, t, w);
-		buffer << "                             ";
-		util::stream_format(buffer, "                       DSDX: %4.4f, DTDX: %4.4f, DWDX: %4.4f\n", dsdx, dtdx, dwdx);
-		buffer << "                             ";
-		util::stream_format(buffer, "                       DSDE: %4.4f, DTDE: %4.4f, DWDE: %4.4f\n", dsde, dtde, dwde);
-		buffer << "                             ";
-		util::stream_format(buffer, "                       DSDY: %4.4f, DTDY: %4.4f, DWDY: %4.4f\n", dsdy, dtdy, dwdy);
-		return std::move(buffer).str();
-	}
+	return util::string_format("%-20s   %d, XL: %4.4f, XM: %4.4f, XH: %4.4f, YL: %4.4f, YM: %4.4f, YH: %4.4f\n", op_name, lft, xl, xm, xh, yl, ym, yh);
 }
+
+std::string disassemble_rgb(const uint64_t *cmd_buf)
+{
+	const float rt = int32_t(((cmd_buf[4] >> 32) & 0xffff0000) | ((cmd_buf[6] >> 48) & 0xffff)) / 65536.0f;
+	const float gt = int32_t((((cmd_buf[4] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[6] >> 32) & 0xffff)) / 65536.0f;
+	const float bt = int32_t((cmd_buf[4] & 0xffff0000) | ((cmd_buf[6] >> 16) & 0xffff)) / 65536.0f;
+	const float at = int32_t(((cmd_buf[4] & 0x0000ffff) << 16) | (cmd_buf[6] & 0xffff)) / 65536.0f;
+	const float drdx = int32_t(((cmd_buf[5] >> 32) & 0xffff0000) | ((cmd_buf[7] >> 48) & 0xffff)) / 65536.0f;
+	const float dgdx = int32_t((((cmd_buf[5] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[7] >> 32) & 0xffff)) / 65536.0f;
+	const float dbdx = int32_t((cmd_buf[5] & 0xffff0000) | ((cmd_buf[7] >> 16) & 0xffff)) / 65536.0f;
+	const float dadx = int32_t(((cmd_buf[5] & 0x0000ffff) << 16) | (cmd_buf[7] & 0xffff)) / 65536.0f;
+	const float drde = int32_t(((cmd_buf[8] >> 32) & 0xffff0000) | ((cmd_buf[10] >> 48) & 0xffff)) / 65536.0f;
+	const float dgde = int32_t((((cmd_buf[8] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[10] >> 32) & 0xffff)) / 65536.0f;
+	const float dbde = int32_t((cmd_buf[8] & 0xffff0000) | ((cmd_buf[10] >> 16) & 0xffff)) / 65536.0f;
+	const float dade = int32_t(((cmd_buf[8] & 0x0000ffff) << 16) | (cmd_buf[10] & 0xffff)) / 65536.0f;
+	const float drdy = int32_t(((cmd_buf[9] >> 32) & 0xffff0000) | ((cmd_buf[11] >> 48) & 0xffff)) / 65536.0f;
+	const float dgdy = int32_t((((cmd_buf[9] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[11] >> 32) & 0xffff)) / 65536.0f;
+	const float dbdy = int32_t((cmd_buf[9] & 0xffff0000) | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f;
+	const float dady = int32_t(((cmd_buf[9] & 0x0000ffff) << 16) | (cmd_buf[11] & 0xffff)) / 65536.0f;
+
+	std::ostringstream buffer;
+	buffer << "                             ";
+	util::stream_format(buffer, "                       R: %4.4f, G: %4.4f, B: %4.4f, A: %4.4f\n", rt, gt, bt, at);
+	buffer << "                             ";
+	util::stream_format(buffer, "                       DRDX: %4.4f, DGDX: %4.4f, DBDX: %4.4f, DADX: %4.4f\n", drdx, dgdx, dbdx, dadx);
+	buffer << "                             ";
+	util::stream_format(buffer, "                       DRDE: %4.4f, DGDE: %4.4f, DBDE: %4.4f, DADE: %4.4f\n", drde, dgde, dbde, dade);
+	buffer << "                             ";
+	util::stream_format(buffer, "                       DRDY: %4.4f, DGDY: %4.4f, DBDY: %4.4f, DADY: %4.4f\n", drdy, dgdy, dbdy, dady);
+	return std::move(buffer).str();
+}
+
+std::string disassemble_stw(const uint64_t *cmd_buf)
+{
+	const float s = int32_t(((cmd_buf[4] >> 32) & 0xffff0000) | ((cmd_buf[6] >> 48) & 0xffff)) / 65536.0f;
+	const float t = int32_t((((cmd_buf[4] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[6] >> 32) & 0xffff)) / 65536.0f;
+	const float w = int32_t((cmd_buf[4] & 0xffff0000) | ((cmd_buf[6] >> 16) & 0xffff)) / 65536.0f;
+	const float dsdx = int32_t(((cmd_buf[5] >> 32) & 0xffff0000) | ((cmd_buf[7] >> 48) & 0xffff)) / 65536.0f;
+	const float dtdx = int32_t((((cmd_buf[5] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[7] >> 32) & 0xffff)) / 65536.0f;
+	const float dwdx = int32_t((cmd_buf[5] & 0xffff0000) | ((cmd_buf[7] >> 16) & 0xffff)) / 65536.0f;
+	const float dsde = int32_t(((cmd_buf[8] >> 32) & 0xffff0000) | ((cmd_buf[10] >> 48) & 0xffff)) / 65536.0f;
+	const float dtde = int32_t((((cmd_buf[8] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[10] >> 32) & 0xffff)) / 65536.0f;
+	const float dwde = int32_t((cmd_buf[8] & 0xffff0000) | ((cmd_buf[10] >> 16) & 0xffff)) / 65536.0f;
+	const float dsdy = int32_t(((cmd_buf[9] >> 32) & 0xffff0000) | ((cmd_buf[11] >> 48) & 0xffff)) / 65536.0f;
+	const float dtdy = int32_t((((cmd_buf[9] >> 32) & 0x0000ffff) << 16) | ((cmd_buf[11] >> 32) & 0xffff)) / 65536.0f;
+	const float dwdy = int32_t((cmd_buf[9] & 0xffff0000) | ((cmd_buf[11] >> 16) & 0xffff)) / 65536.0f;
+
+	std::ostringstream buffer;
+	buffer << "                             ";
+	util::stream_format(buffer, "                       S: %4.4f, T: %4.4f, W: %4.4f\n", s, t, w);
+	buffer << "                             ";
+	util::stream_format(buffer, "                       DSDX: %4.4f, DTDX: %4.4f, DWDX: %4.4f\n", dsdx, dtdx, dwdx);
+	buffer << "                             ";
+	util::stream_format(buffer, "                       DSDE: %4.4f, DTDE: %4.4f, DWDE: %4.4f\n", dsde, dtde, dwde);
+	buffer << "                             ";
+	util::stream_format(buffer, "                       DSDY: %4.4f, DTDY: %4.4f, DWDY: %4.4f\n", dsdy, dtdy, dwdy);
+	return std::move(buffer).str();
+}
+
+} // anonymous namespace
 
 std::string n64_rdp::disassemble(const uint64_t *cmd_buf)
 {
@@ -1488,10 +1489,10 @@ std::string n64_rdp::disassemble(const uint64_t *cmd_buf)
 		case 0x24:
 		case 0x25:
 		{
-			float s = int16_t((cmd_buf[1] >> 48) & 0xffff) / 32.0f;
-			float t = int16_t((cmd_buf[1] >> 32) & 0xffff) / 32.0f;
-			float dsdx = int16_t((cmd_buf[1] >> 16) & 0xffff) / 1024.0f;
-			float dtdy = int16_t((cmd_buf[1] >> 0) & 0xffff) / 1024.0f;
+			const float s = int16_t((cmd_buf[1] >> 48) & 0xffff) / 32.0f;
+			const float t = int16_t((cmd_buf[1] >> 32) & 0xffff) / 32.0f;
+			const float dsdx = int16_t((cmd_buf[1] >> 16) & 0xffff) / 1024.0f;
+			const float dtdy = int16_t((cmd_buf[1] >> 0) & 0xffff) / 1024.0f;
 
 			if (command == 0x24)
 					util::stream_format(buffer, "Texture_Rectangle      %d, %s, %s, %s, %s,  %4.4f, %4.4f, %4.4f, %4.4f", tile, sh, th, sl, tl, s, t, dsdx, dtdy);

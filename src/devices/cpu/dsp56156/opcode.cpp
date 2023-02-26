@@ -1,12 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
 #include "emu.h"
-#include <cstdio>
-
 #include "opcode.h"
 
-namespace DSP_56156
-{
+#include <cstdio>
+
+
+namespace DSP_56156 {
+
 Opcode::Opcode(uint16_t w0, uint16_t w1) : m_word0(w0)/*, m_word1(w1)*/
 {
 	m_instruction = Instruction::decodeInstruction(this, w0, w1);
@@ -39,26 +40,10 @@ std::string Opcode::disassemble() const
 }
 
 
-void Opcode::evaluate(dsp56156_core* cpustate) const
-{
-	if (m_instruction) m_instruction->evaluate(cpustate);
-	if (m_parallelMove) m_parallelMove->evaluate();
-}
-
-
 size_t Opcode::size() const
 {
 	if (m_instruction && m_instruction->valid())
 		return m_instruction->size() + m_instruction->sizeIncrement();
-
-	// Opcode failed to decode, so push it past dc
-	return 1;
-}
-
-size_t Opcode::evalSize() const
-{
-	if (m_instruction && m_instruction->valid())
-		return m_instruction->evalSize(); // Probably doesn't matter : + m_instruction->sizeIncrement();
 
 	// Opcode failed to decode, so push it past dc
 	return 1;
@@ -74,4 +59,4 @@ std::string Opcode::dcString() const
 	return util::string_format("dc $%x", m_word0);
 }
 
-}
+} // namespace DSP_56156

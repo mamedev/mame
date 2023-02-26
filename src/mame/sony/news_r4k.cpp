@@ -131,6 +131,8 @@ namespace {
 class news_r4k_state : public driver_device
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }
+
 	news_r4k_state(machine_config const &mconfig, device_type type, char const *tag) :
 		driver_device(mconfig, type, tag),
 		m_cpu(*this, "cpu"),
@@ -157,8 +159,6 @@ public:
 	}
 
 	void nws5000x(machine_config &config);
-
-	static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }
 
 protected:
 
