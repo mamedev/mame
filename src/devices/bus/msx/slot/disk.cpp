@@ -81,26 +81,18 @@ void msx_slot_disk_device::floppy_formats(format_registration &fr)
 
 msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int nr_drives)
 	: msx_slot_rom_device(mconfig, type, tag, owner, clock)
-	, m_floppy0(*this, "fdc:0")
-	, m_floppy1(*this, "fdc:1")
-	, m_floppy2(*this, "fdc:2")
-	, m_floppy3(*this, "fdc:3")
-	, m_floppy(nullptr)
+	, m_floppy(*this, "fdc:%u", 0U)
+	, m_current_floppy(nullptr)
 	, m_access_int_drv_out(*this, "access_int_drv%u", 0U)
+	, m_int_drv_name_out(*this, "name_int_drv%u", 0U)
 	, m_nr_drives(nr_drives)
 {
 }
 
 void msx_slot_disk_device::add_drive_mconfig(machine_config &config, bool double_sided)
 {
-	if (m_nr_drives > NO_DRIVES)
-		FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
-	if (m_nr_drives > DRIVES_1)
-		FLOPPY_CONNECTOR(config, m_floppy1, msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
-	if (m_nr_drives > DRIVES_2)
-		FLOPPY_CONNECTOR(config, m_floppy2, msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
-	if (m_nr_drives > DRIVES_3)
-		FLOPPY_CONNECTOR(config, m_floppy3, msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
+	for (int drive = 0; drive < m_nr_drives; drive++)
+		FLOPPY_CONNECTOR(config, m_floppy[drive], msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
 }
 
 void msx_slot_disk_device::device_start()
@@ -108,18 +100,22 @@ void msx_slot_disk_device::device_start()
 	msx_slot_rom_device::device_start();
 
 	m_access_int_drv_out.resolve();
+	m_int_drv_name_out.resolve();
 }
 
 void msx_slot_disk_device::device_reset()
 {
 	msx_slot_rom_device::device_reset();
 	for (int i = 0; i < m_access_int_drv_out.size(); i++)
-		m_access_int_drv_out[i] = 0;
+	{
+		m_int_drv_name_out[i] = m_floppy[i] ? 1 : 0;
+		set_drive_access_led_state(i, 0);
+	}
 }
 
 void msx_slot_disk_device::set_drive_access_led_state(int drive, int led_state)
 {
-	m_access_int_drv_out[drive] = led_state;
+	m_access_int_drv_out[drive] = m_floppy[drive] ? 1 + led_state : 0;
 }
 
 
@@ -231,9 +227,9 @@ void msx_slot_disk1_base_device::set_side_control(u8 data)
 {
 	m_side_control = data;
 
-	if (m_floppy)
+	if (m_current_floppy)
 	{
-		m_floppy->ss_w(BIT(m_side_control, 0));
+		m_current_floppy->ss_w(BIT(m_side_control, 0));
 	}
 }
 
@@ -251,31 +247,31 @@ void msx_slot_disk1_base_device::set_control(u8 data)
 	{
 	case 0:
 	case 2:
-		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
+		m_current_floppy = m_floppy[0] ? m_floppy[0]->get_device() : nullptr;
 		set_drive_access_led_state(0, BIT(m_control, get_control_led_bit()));
 		set_drive_access_led_state(1, 0);
 		break;
 
 	case 1:
-		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
+		m_current_floppy = m_floppy[1] ? m_floppy[1]->get_device() : nullptr;
 		set_drive_access_led_state(0, 0);
 		set_drive_access_led_state(1, BIT(m_control, get_control_led_bit()));
 		break;
 
 	default:
-		m_floppy = nullptr;
+		m_current_floppy = nullptr;
 		set_drive_access_led_state(0, 0);
 		set_drive_access_led_state(1, 0);
 		break;
 	}
 
-	if (m_floppy)
+	if (m_current_floppy)
 	{
-		m_floppy->mon_w(BIT(m_control, 7) ? 0 : 1);
-		m_floppy->ss_w(BIT(m_side_control, 0));
+		m_current_floppy->mon_w(BIT(m_control, 7) ? 0 : 1);
+		m_current_floppy->ss_w(BIT(m_side_control, 0));
 	}
 
-	m_fdc->set_floppy(m_floppy);
+	m_fdc->set_floppy(m_current_floppy);
 }
 
 u8 msx_slot_disk1_base_device::side_control_r()
@@ -439,31 +435,31 @@ void msx_slot_disk2_base_device::set_control(u8 data)
 	switch (m_control & 3)
 	{
 	case 1:
-		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
+		m_current_floppy = m_floppy[0] ? m_floppy[0]->get_device() : nullptr;
 		set_drive_access_led_state(0, BIT(m_control, get_control_led_bit()));
 		set_drive_access_led_state(1, 0);
 		break;
 
 	case 2:
-		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
+		m_current_floppy = m_floppy[1] ? m_floppy[1]->get_device() : nullptr;
 		set_drive_access_led_state(0, 0);
 		set_drive_access_led_state(1, BIT(m_control, get_control_led_bit()));
 		break;
 
 	default:
-		m_floppy = nullptr;
+		m_current_floppy = nullptr;
 		set_drive_access_led_state(0, 0);
 		set_drive_access_led_state(1, 0);
 		break;
 	}
 
-	if (m_floppy)
+	if (m_current_floppy)
 	{
-		m_floppy->mon_w(BIT(m_control, 3) ? 0 : 1);
-		m_floppy->ss_w(BIT(m_control, 2) ? 1 : 0);
+		m_current_floppy->mon_w(BIT(m_control, 3) ? 0 : 1);
+		m_current_floppy->ss_w(BIT(m_control, 2) ? 1 : 0);
 	}
 
-	m_fdc->set_floppy(m_floppy);
+	m_fdc->set_floppy(m_current_floppy);
 }
 
 u8 msx_slot_disk2_base_device::status_r()
@@ -667,7 +663,7 @@ void msx_slot_disk5_wd2793_device::control_w(u8 control)
 	switch (m_control & 0x0f)
 	{
 	case 0x01:
-		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
+		m_current_floppy = m_floppy[0] ? m_floppy[0]->get_device() : nullptr;
 		set_drive_access_led_state(0, BIT(m_control, 6));
 		set_drive_access_led_state(1, 0);
 		set_drive_access_led_state(2, 0);
@@ -675,7 +671,7 @@ void msx_slot_disk5_wd2793_device::control_w(u8 control)
 		break;
 
 	case 0x02:
-		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
+		m_current_floppy = m_floppy[1] ? m_floppy[1]->get_device() : nullptr;
 		set_drive_access_led_state(0, 0);
 		set_drive_access_led_state(1, BIT(m_control, 6));
 		set_drive_access_led_state(2, 0);
@@ -683,7 +679,7 @@ void msx_slot_disk5_wd2793_device::control_w(u8 control)
 		break;
 
 	case 0x04:
-		m_floppy = m_floppy2 ? m_floppy2->get_device() : nullptr;
+		m_current_floppy = m_floppy[2] ? m_floppy[2]->get_device() : nullptr;
 		set_drive_access_led_state(0, 0);
 		set_drive_access_led_state(1, 0);
 		set_drive_access_led_state(2, BIT(m_control, 6));
@@ -691,7 +687,7 @@ void msx_slot_disk5_wd2793_device::control_w(u8 control)
 		break;
 
 	case 0x08:
-		m_floppy = m_floppy3 ? m_floppy3->get_device() : nullptr;
+		m_current_floppy = m_floppy[3] ? m_floppy[3]->get_device() : nullptr;
 		set_drive_access_led_state(0, 0);
 		set_drive_access_led_state(1, 0);
 		set_drive_access_led_state(2, 0);
@@ -699,7 +695,7 @@ void msx_slot_disk5_wd2793_device::control_w(u8 control)
 		break;
 
 	default:
-		m_floppy = nullptr;
+		m_current_floppy = nullptr;
 		set_drive_access_led_state(0, 0);
 		set_drive_access_led_state(1, 0);
 		set_drive_access_led_state(2, 0);
@@ -707,13 +703,13 @@ void msx_slot_disk5_wd2793_device::control_w(u8 control)
 		break;
 	}
 
-	if (m_floppy)
+	if (m_current_floppy)
 	{
-		m_floppy->mon_w(BIT(m_control, 5) ? 0 : 1);
-		m_floppy->ss_w(BIT(m_control, 4) ? 1 : 0);
+		m_current_floppy->mon_w(BIT(m_control, 5) ? 0 : 1);
+		m_current_floppy->ss_w(BIT(m_control, 4) ? 1 : 0);
 	}
 
-	m_fdc->set_floppy(m_floppy);
+	m_fdc->set_floppy(m_current_floppy);
 }
 
 u8 msx_slot_disk5_wd2793_device::status_r()
@@ -782,26 +778,26 @@ void msx_slot_disk6_wd2793_n_device::select_drive()
 {
 	if (BIT(m_drive_select, 0))
 	{
-		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
-		m_drive_present = m_floppy;
+		m_current_floppy = m_floppy[1] ? m_floppy[1]->get_device() : nullptr;
+		m_drive_present = m_current_floppy;
 	}
 	else
 	{
-		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
-		m_drive_present = m_floppy;
+		m_current_floppy = m_floppy[0] ? m_floppy[0]->get_device() : nullptr;
+		m_drive_present = m_current_floppy;
 	}
 
-	m_fdc->set_floppy(m_floppy);
+	m_fdc->set_floppy(m_current_floppy);
 
 	set_side_motor();
 }
 
 void msx_slot_disk6_wd2793_n_device::set_side_motor()
 {
-	if (m_floppy)
+	if (m_current_floppy)
 	{
-		m_floppy->mon_w(BIT(m_side_motor, 1) ? 0 : 1);
-		m_floppy->ss_w(BIT(m_side_motor, 0));
+		m_current_floppy->mon_w(BIT(m_side_motor, 1) ? 0 : 1);
+		m_current_floppy->ss_w(BIT(m_side_motor, 0));
 	}
 	if (BIT(m_drive_select, 0))
 	{
@@ -831,7 +827,7 @@ u8 msx_slot_disk6_wd2793_n_device::select0_r()
 u8 msx_slot_disk6_wd2793_n_device::dskchg_r()
 {
 	// Disk change status for selected drive
-	return 0xfe | (m_floppy && m_floppy->dskchg_r() ? 0 : 1);
+	return 0xfe | (m_current_floppy && m_current_floppy->dskchg_r() ? 0 : 1);
 }
 
 u8 msx_slot_disk6_wd2793_n_device::status_r()
@@ -918,17 +914,17 @@ void msx_slot_disk7_mb8877_device::device_post_load()
 void msx_slot_disk7_mb8877_device::select_drive()
 {
 	// No separate bit for the drive LEDs? Assuming LEDs are triggered by the motor on signal.
-	m_floppy = nullptr;
+	m_current_floppy = nullptr;
 
 	switch (m_drive_side_motor & 0x03)
 	{
 	case 0:
-		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
+		m_current_floppy = m_floppy[0] ? m_floppy[0]->get_device() : nullptr;
 		set_drive_access_led_state(0, BIT(~m_drive_side_motor, 3));
 		set_drive_access_led_state(1, 0);
 		break;
 	case 1:
-		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
+		m_current_floppy = m_floppy[1] ? m_floppy[1]->get_device() : nullptr;
 		set_drive_access_led_state(0, 0);
 		set_drive_access_led_state(1, BIT(~m_drive_side_motor, 3));
 		break;
@@ -938,17 +934,17 @@ void msx_slot_disk7_mb8877_device::select_drive()
 		break;
 	}
 
-	m_fdc->set_floppy(m_floppy);
+	m_fdc->set_floppy(m_current_floppy);
 }
 
 void msx_slot_disk7_mb8877_device::set_drive_side_motor()
 {
 	select_drive();
 
-	if (m_floppy)
+	if (m_current_floppy)
 	{
-		m_floppy->mon_w(BIT(m_drive_side_motor, 3) ? 0 : 1);
-		m_floppy->ss_w(BIT(m_drive_side_motor, 2));
+		m_current_floppy->mon_w(BIT(m_drive_side_motor, 3) ? 0 : 1);
+		m_current_floppy->ss_w(BIT(m_drive_side_motor, 2));
 	}
 }
 
@@ -965,8 +961,8 @@ void msx_slot_disk7_mb8877_device::side_motor_w(u8 data)
 u8 msx_slot_disk7_mb8877_device::status_r()
 {
 	return (m_drive_side_motor & 0x0f)
-		| (m_floppy && m_floppy->dskchg_r() ? 0x00 : 0x10)
-		| (m_floppy && m_floppy->ready_r() ? 0x00 : 0x20)
+		| (m_current_floppy && m_current_floppy->dskchg_r() ? 0x00 : 0x10)
+		| (m_current_floppy && m_current_floppy->ready_r() ? 0x00 : 0x20)
 		| (m_fdc->intrq_r() ? 0x40 : 0x00)
 		| (m_fdc->drq_r() ? 0x80 : 0x00);
 }
@@ -1040,31 +1036,31 @@ void msx_slot_disk8_mb8877_device::set_control(u8 data)
 	switch (m_control & 3)
 	{
 	case 1:
-		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
+		m_current_floppy = m_floppy[0] ? m_floppy[0]->get_device() : nullptr;
 		set_drive_access_led_state(0, BIT(m_control, 6));
 		set_drive_access_led_state(1, 0);
 		break;
 
 	case 2:
-		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
+		m_current_floppy = m_floppy[1] ? m_floppy[1]->get_device() : nullptr;
 		set_drive_access_led_state(0, 0);
 		set_drive_access_led_state(1, BIT(m_control, 6));
 		break;
 
 	default:
-		m_floppy = nullptr;
+		m_current_floppy = nullptr;
 		set_drive_access_led_state(0, 0);
 		set_drive_access_led_state(1, 0);
 		break;
 	}
 
-	if (m_floppy)
+	if (m_current_floppy)
 	{
-		m_floppy->mon_w(BIT(m_control, 3) ? 0 : 1);
-		m_floppy->ss_w(BIT(m_control, 2) ? 1 : 0);
+		m_current_floppy->mon_w(BIT(m_control, 3) ? 0 : 1);
+		m_current_floppy->ss_w(BIT(m_control, 2) ? 1 : 0);
 	}
 
-	m_fdc->set_floppy(m_floppy);
+	m_fdc->set_floppy(m_current_floppy);
 }
 
 u8 msx_slot_disk8_mb8877_device::status_r()
@@ -1134,31 +1130,31 @@ void msx_slot_disk9_wd2793_n_device::control_w(u8 data)
 	switch (m_control & 0x03)
 	{
 	case 1:
-		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
+		m_current_floppy = m_floppy[0] ? m_floppy[0]->get_device() : nullptr;
 		set_drive_access_led_state(0, BIT(m_control, 6));
 		set_drive_access_led_state(1, 0);
 		break;
 
 	case 2:
-		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
+		m_current_floppy = m_floppy[1] ? m_floppy[1]->get_device() : nullptr;
 		set_drive_access_led_state(0, 0);
 		set_drive_access_led_state(1, BIT(m_control, 6));
 		break;
 
 	default:
-		m_floppy = nullptr;
+		m_current_floppy = nullptr;
 		set_drive_access_led_state(0, 0);
 		set_drive_access_led_state(1, 0);
 		break;
 	}
 
-	if (m_floppy)
+	if (m_current_floppy)
 	{
-		m_floppy->mon_w(BIT(m_control, 3) ? 0 : 1);
-		m_floppy->ss_w(BIT(m_control, 2));
+		m_current_floppy->mon_w(BIT(m_control, 3) ? 0 : 1);
+		m_current_floppy->ss_w(BIT(m_control, 2));
 	}
 
-	m_fdc->set_floppy(m_floppy);
+	m_fdc->set_floppy(m_current_floppy);
 }
 
 u8 msx_slot_disk9_wd2793_n_device::status_r()
@@ -1223,27 +1219,27 @@ void msx_slot_disk10_mb8877_device::control_w(u8 data)
 	// Assuming drive LEDs are connected to the motor signals
 	if (BIT(m_control, 2))
 	{
-		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
+		m_current_floppy = m_floppy[1] ? m_floppy[1]->get_device() : nullptr;
 		set_drive_access_led_state(0, 0);
 		set_drive_access_led_state(1, BIT(m_control, 1));
 	}
 	else
 	{
-		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
+		m_current_floppy = m_floppy[0] ? m_floppy[0]->get_device() : nullptr;
 		set_drive_access_led_state(0, BIT(m_control, 0));
 		set_drive_access_led_state(1, 0);
 	}
 
-	if (m_floppy && !BIT(m_control, 2))
-		m_floppy->mon_w(BIT(m_control, 0) ? 0 : 1);
+	if (m_current_floppy && !BIT(m_control, 2))
+		m_current_floppy->mon_w(BIT(m_control, 0) ? 0 : 1);
 
-	if (m_floppy && BIT(m_control, 2))
-		m_floppy->mon_w(BIT(m_control, 1) ? 0 : 1);
+	if (m_current_floppy && BIT(m_control, 2))
+		m_current_floppy->mon_w(BIT(m_control, 1) ? 0 : 1);
 
-	if (m_floppy)
-		m_floppy->ss_w(BIT(m_control, 3));
+	if (m_current_floppy)
+		m_current_floppy->ss_w(BIT(m_control, 3));
 
-	m_fdc->set_floppy(m_floppy);
+	m_fdc->set_floppy(m_current_floppy);
 }
 
 u8 msx_slot_disk10_mb8877_device::status_r()
@@ -1251,7 +1247,7 @@ u8 msx_slot_disk10_mb8877_device::status_r()
 	return 0x23
 		| (m_control & 0x04)
 		| ((m_control & 0x08) ^ 0x08)
-		| ((m_floppy && m_floppy->mon_r()) ? 0 : 0x10)
+		| ((m_current_floppy && m_current_floppy->mon_r()) ? 0 : 0x10)
 		| (m_fdc->drq_r() ? 0x40 : 0)
 		| (m_fdc->intrq_r() ? 0x80 : 0);
 }
@@ -1333,8 +1329,8 @@ void msx_slot_disk11_wd2793_device::side_control_w(u8 data)
 {
 	m_side_control = data;
 
-	if (m_floppy)
-		m_floppy->ss_w(BIT(m_side_control, 0));
+	if (m_current_floppy)
+		m_current_floppy->ss_w(BIT(m_side_control, 0));
 }
 
 void msx_slot_disk11_wd2793_device::control_w(u8 data)
@@ -1344,31 +1340,31 @@ void msx_slot_disk11_wd2793_device::control_w(u8 data)
 	switch (m_control & 0x03)
 	{
 	case 0:
-		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
+		m_current_floppy = m_floppy[0] ? m_floppy[0]->get_device() : nullptr;
 		set_drive_access_led_state(0, BIT(m_control, 6));  // Wild guess based on other floppy interfaces
 		set_drive_access_led_state(1, 0);
 		break;
 
 	case 1:
-		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
+		m_current_floppy = m_floppy[1] ? m_floppy[1]->get_device() : nullptr;
 		set_drive_access_led_state(0, 0);
 		set_drive_access_led_state(1, BIT(m_control, 6));  // Wild guess based on other floppy interfaces
 		break;
 	
 	default:
-		m_floppy = nullptr;
+		m_current_floppy = nullptr;
 		set_drive_access_led_state(0, 0);
 		set_drive_access_led_state(1, 0);
 		break;
 	}
 
-	if (m_floppy)
+	if (m_current_floppy)
 	{
-		m_floppy->mon_w(BIT(m_control, 7) ? 0 : 1);
-		m_floppy->ss_w(BIT(m_side_control, 0));
+		m_current_floppy->mon_w(BIT(m_control, 7) ? 0 : 1);
+		m_current_floppy->ss_w(BIT(m_side_control, 0));
 	}
 
-	m_fdc->set_floppy(m_floppy);
+	m_fdc->set_floppy(m_current_floppy);
 }
 
 u8 msx_slot_disk11_wd2793_device::side_control_r()
