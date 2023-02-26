@@ -30,7 +30,7 @@ public:
 	virtual ~Instruction() {}
 
 	virtual bool decode(const uint16_t word0, const uint16_t word1) = 0;
-	virtual void disassemble(std::string& retString) const = 0;
+	virtual std::string disassemble() const = 0;
 	virtual void evaluate(dsp56156_core* cpustate) = 0;
 
 	virtual size_t size() const = 0;
@@ -78,9 +78,9 @@ public:
 		decode_F_table(BITSn(word0,0x08), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "abs " + regIdAsString(m_destination);
+		return "abs " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -101,9 +101,9 @@ public:
 						m_source, m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "adc " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		return "adc " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -124,9 +124,9 @@ public:
 							m_source, m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "add " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		return "add " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -151,9 +151,9 @@ public:
 		// TODO: m_opcode = "add";
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = m_opcode + " " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		return m_opcode + " " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -178,9 +178,9 @@ public:
 							m_source, m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "and " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		return "and " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -202,12 +202,9 @@ public:
 		decode_EE_table(BITSn(word0,0x0600), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		char temp[32];
-		sprintf(temp, "#$%x,%s", m_immediate, regIdAsString(m_destination).c_str());
-		retString = "andi " + std::string(temp);
-		// NEW // sprintf(opcode_str, "and(i)");
+		return util::string_format("andi #$%x,%s", m_immediate, regIdAsString(m_destination));
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -230,9 +227,9 @@ public:
 		decode_F_table(BITSn(word0,0x08), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "asl " + regIdAsString(m_destination);
+		return "asl " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -252,9 +249,9 @@ public:
 		decode_F_table(BITSn(word0,0x0008), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "asl4 " + regIdAsString(m_destination);
+		return "asl4 " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -274,9 +271,9 @@ public:
 		decode_F_table(BITSn(word0,0x08), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "asr " + regIdAsString(m_destination);
+		return "asr " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -296,9 +293,9 @@ public:
 		decode_F_table(BITSn(word0,0x0008), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "asr4 " + regIdAsString(m_destination);
+		return "asr4 " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -318,9 +315,9 @@ public:
 		decode_F_table(BITSn(word0,0x0008), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "asr16 " + regIdAsString(m_destination);
+		return "asr16 " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -372,12 +369,9 @@ public:
 		}
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		char temp[32];
-		sprintf(temp, "#$%x", m_iVal);
-		retString = m_opcode + " " + std::string(temp) + "," + dString;
-		// NEW // sprintf(temp, "#$%04x", iVal);
+		return util::string_format("%s #$%x,%s", m_opcode, m_iVal, dString);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -433,17 +427,9 @@ public:
 		}
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		char temp[32];
-		sprintf(temp, "#$%x", m_iVal);
-		std::string source = temp;
-
-		sprintf(temp, "X:(%s)", regIdAsString(m_r).c_str());
-		std::string destination = temp;
-
-		retString = m_opcode + " " + source + "," + destination;
-		// NEW // sprintf(temp, "#$%04x", m_iVal);
+		return util::string_format("%s #$%x,X:(%s)", m_opcode, m_iVal, regIdAsString(m_r));
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -499,14 +485,9 @@ public:
 		}
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		char temp[32];
-		sprintf(temp, "#$%x", m_iVal);
-		std::string source = temp;
-
-		retString = m_opcode + " " + source + "," + regIdAsString(m_destination);
-		// NEW // sprintf(temp, "#$%04x", m_iVal);
+		return util::string_format("%s #$%x,%s", m_opcode, m_iVal, regIdAsString(m_destination));
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -533,15 +514,9 @@ public:
 		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		std::string opcode = "b" + opMnemonicAsString(m_mnem);
-		// NEW // sprintf(opcode_str, "b.%s", M);
-
-		char temp[32];
-		sprintf(temp, ">*+$%x", 2 + m_immediate);
-		// NEW // sprintf(temp, "$%04x (%d)", pc + 2 + (int16_t)word1, (int16_t)word1);
-		retString = opcode + " " + std::string(temp);
+		return util::string_format("b%s >*+$%x", opMnemonicAsString(m_mnem), 2 + m_immediate);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -568,17 +543,12 @@ public:
 		m_immediate = get_6_bit_signed_value(BITSn(word0,0x003f));
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		std::string opcode = "b" + opMnemonicAsString(m_mnem);
-		// NEW // sprintf(opcode_str, "b.%s", M);
-
-		char temp[32];
-		if (m_immediate >= 0) sprintf(temp, "<*+$%x", m_immediate + 1);
-		else                  sprintf(temp, "<*-$%x", 1 - m_immediate - 2);
-		// NEW // sprintf(temp, "$%04x (%d)", pc + 1 + relativeInt, relativeInt);
-
-		retString = opcode + " " + std::string(temp);
+		if (m_immediate >= 0)
+			return util::string_format("b%s <*+$%x", opMnemonicAsString(m_mnem), m_immediate + 1);
+		else
+			return util::string_format("b%s <*-$%x", opMnemonicAsString(m_mnem), 1 - m_immediate - 2);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -604,11 +574,10 @@ public:
 		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string opcode = "b" + opMnemonicAsString(m_mnem);
-		retString = opcode + " " + regIdAsString(m_destination);
-		// NEW // sprintf(opcode_str, "b.%s", M);
+		return opcode + " " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -632,12 +601,9 @@ public:
 		m_immediate = (int16_t)word1;
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		char temp[32];
-		sprintf(temp, ">*+$%x", 2 + m_immediate);
-		// NEW // sprintf(temp, "$%04x (%d)", pc + 2 + word1, (int16_t)word1);
-		retString = "bra " + std::string(temp);
+		return util::string_format("bra >*+$%x", 2 + m_immediate);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -661,13 +627,12 @@ public:
 		m_immediate = (int8_t)BITSn(word0,0x00ff);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		char temp[32];
-		if (m_immediate >= 0) sprintf(temp, "<*+$%x", 1 + m_immediate);
-		else                  sprintf(temp, "<*-$%x", 1 - m_immediate - 2);
-		// NEW // sprintf(temp, "$%04x (%d)", pc + 1 + iVal, iVal);
-		retString = "bra " + std::string(temp);
+		if (m_immediate >= 0)
+			return util::string_format("bra <*+$%x", 1 + m_immediate);
+		else
+			return util::string_format("bra <*-$%x", 1 - m_immediate - 2);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -690,9 +655,9 @@ public:
 		decode_RR_table(BITSn(word0,0x0003), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "bra " + regIdAsString(m_destination);
+		return "bra " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -713,11 +678,9 @@ public:
 		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		std::string opcode = "brk" + opMnemonicAsString(m_mnem);
-		retString = opcode;
-		// NEW // sprintf(opcode_str, "brk.%s", M);
+		return "brk" + opMnemonicAsString(m_mnem);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -743,17 +706,12 @@ public:
 		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		std::string opcode = "bs" + opMnemonicAsString(m_mnem);
-		// NEW // sprintf(opcode_str, "bs.%s", M);
-
-		char temp[32];
-		if (m_immediate >= 0) sprintf(temp, ">*+$%x", 2 + m_immediate);
-		else                  sprintf(temp, ">*-$%x", 1 - m_immediate - 1 - 2);
-		//sprintf(temp, ">*+$%x", 2 + m_immediate);
-		// NEW // sprintf(temp, "$%04x (%d)", pc + 2 + (int16_t)word1, (int16_t)word1);
-		retString = opcode + " " + std::string(temp);
+		if (m_immediate >= 0)
+			return util::string_format("bs%s >*+$%x", opMnemonicAsString(m_mnem), 2 + m_immediate);
+		else
+			return util::string_format("bs%s >*-$%x", opMnemonicAsString(m_mnem), 1 - m_immediate - 1 - 2);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -780,11 +738,10 @@ public:
 		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string opcode = "bs" + opMnemonicAsString(m_mnem);
-		retString = opcode + " " + regIdAsString(m_destination);
-		// NEW // sprintf(opcode_str, "bs.%s", M);
+		return opcode + " " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -809,13 +766,12 @@ public:
 		m_immediate = (int16_t)word1;
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		char temp[32];
-		if (m_immediate >= 0) sprintf(temp, ">*+$%x", 2 + m_immediate);
-		else                  sprintf(temp, ">*-$%x", 1 - m_immediate - 1 - 2);
-		// NEW // sprintf(temp, "$%04x (%d)", pc + 2 + (int16_t)word1, (int16_t)word1);
-		retString = "bsr " + std::string(temp);
+		if (m_immediate >= 0)
+			return util::string_format("bsr >*+$%x", 2 + m_immediate);
+		else
+			return util::string_format("bsr >*-$%x", 1 - m_immediate - 1 - 2);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -839,9 +795,9 @@ public:
 		decode_RR_table(BITSn(word0,0x0003), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "bsr " + regIdAsString(m_destination);
+		return "bsr " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -861,9 +817,9 @@ public:
 	{
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "chkaau";
+		return "chkaau";
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -883,9 +839,9 @@ public:
 		decode_F_table(BITSn(word0,0x08), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "clr " + regIdAsString(m_destination);
+		return "clr " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -905,9 +861,9 @@ public:
 		decode_F_table(BITSn(word0,0x08), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "clr24 " + regIdAsString(m_destination);
+		return "clr24 " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -930,9 +886,9 @@ public:
 							m_source, m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "cmp " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		return "cmp " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -955,9 +911,9 @@ public:
 							m_source, m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "cmpm " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		return "cmpm " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -976,9 +932,9 @@ public:
 	{
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "debug";
+		return "debug";
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -999,11 +955,10 @@ public:
 		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string opcode = "debug" + opMnemonicAsString(m_mnem);
-		retString = opcode;
-		// NEW // sprintf(opcode_str, "debug.%s", M);
+		return opcode;
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1026,9 +981,9 @@ public:
 		decode_F_table(BITSn(word0,0x08), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "dec " + regIdAsString(m_destination);
+		return "dec " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1048,9 +1003,9 @@ public:
 		decode_F_table(BITSn(word0,0x08), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "dec24 " + regIdAsString(m_destination);
+		return "dec24 " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1071,9 +1026,9 @@ public:
 							m_source, m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "div " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		return "div " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1099,14 +1054,13 @@ public:
 		if (m_mnem == oINVALID) return false;
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string opcode = "dmac" + opMnemonicAsString(m_mnem);
 
-		retString = opcode + " " +
+		return opcode + " " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
-		// NEW // sprintf(opcode_str, "dmac(%s)", A);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1132,17 +1086,9 @@ public:
 		decode_RR_table(BITSn(word0,0x0003), m_source);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		char temp[32];
-		sprintf(temp, "*+$%x", 2 + m_immediate);
-		std::string destination = temp;
-		// NEW // sprintf(temp, "X:(R%d),$%02x", Rnum, pc + 2 + word1);
-
-		sprintf(temp, "X:(%s)", regIdAsString(m_source).c_str());
-		std::string source = temp;
-
-		retString = "do " + source + "," + destination;
+		return util::string_format("do X:(%s),*+$%x", regIdAsString(m_source), 2 + m_immediate);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -1168,12 +1114,9 @@ public:
 		m_displacement = word1;
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		char temp[32];
-		sprintf(temp, "#<$%x,*+$%x", m_immediate, 2 + m_displacement);
-		// NEW // sprintf(temp, "#$%02x,$%04x", BITSn(word0,0x00ff), pc + 2 + word1);
-		retString = "do " + std::string(temp);
+		return util::string_format("do #<$%x,*+$%x", m_immediate, 2 + m_displacement);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -1202,12 +1145,9 @@ public:
 		if (m_source == iINVALID) return false;
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		char temp[32];
-		sprintf(temp, "*+$%x", 2 + m_displacement);
-		// NEW // sprintf(temp, "%s,$%04x", S1, pc + 2 + word1);
-		retString = "do " + regIdAsString(m_source) + "," + std::string(temp);
+		return util::string_format("do %s,*+$%x", regIdAsString(m_source), 2 + m_displacement);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -1231,13 +1171,9 @@ public:
 		m_displacement = word1;
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		char temp[32];
-		sprintf(temp, "*+$%x", m_displacement + 2);
-		// NEW // sprintf(temp, "*+$%x", pc + word1);
-		// NEW // sprintf(temp, "$%04x", pc + 2 + word1);
-		retString = "do forever, " + std::string(temp);
+		return util::string_format("do forever, *+$%x", m_displacement + 2);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -1259,9 +1195,9 @@ public:
 	{
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "enddo";
+		return "enddo";
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1282,9 +1218,9 @@ public:
 							m_source, m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "eor " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		return "eor " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1304,9 +1240,9 @@ public:
 		decode_F_table(BITSn(word0,0x0008), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "ext " + regIdAsString(m_destination);
+		return "ext " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1325,9 +1261,9 @@ public:
 	{
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "illegal";
+		return "illegal";
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1349,9 +1285,9 @@ public:
 							m_source, m_source2, m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "imac " +
+		return "imac " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -1378,9 +1314,9 @@ public:
 							m_source, m_source2, m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "impy " +
+		return "impy " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -1405,9 +1341,9 @@ public:
 		decode_F_table(BITSn(word0,0x08), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "inc " + regIdAsString(m_destination);
+		return "inc " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1427,9 +1363,9 @@ public:
 		decode_F_table(BITSn(word0,0x08), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "inc24 " + regIdAsString(m_destination);
+		return "inc24 " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1452,15 +1388,9 @@ public:
 		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		std::string opcode = "j" + opMnemonicAsString(m_mnem);
-		// NEW // sprintf(opcode_str, "j.%s", M);
-
-		char temp[32];
-		sprintf(temp, ">$%x", m_displacement);
-		// NEW // sprintf(temp, "$%04x", word1);
-		retString = opcode + " " + std::string(temp);
+		return util::string_format("j%s >$%x", opMnemonicAsString(m_mnem), m_displacement);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -1486,11 +1416,10 @@ public:
 		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string opcode = "j" + opMnemonicAsString(m_mnem);
-		retString = opcode + " " + regIdAsString(m_destination);
-		// NEW // sprintf(opcode_str, "j.%s", M);
+		return opcode + " " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1514,12 +1443,9 @@ public:
 		m_displacement = word1;
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		char temp[32];
-		sprintf(temp, ">$%x", m_displacement);
-		// NEW // sprintf(temp, "$%04x", word1);
-		retString = "jmp " + std::string(temp);
+		return util::string_format("jmp >$%x", m_displacement);
 	}
 	void evaluate(dsp56156_core* cpustate) override
 	{
@@ -1549,9 +1475,9 @@ public:
 		decode_RR_table(BITSn(word0,0x0003), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "jmp " + regIdAsString(m_destination);
+		return "jmp " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override
 	{
@@ -1583,15 +1509,9 @@ public:
 		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		std::string opcode = "js" + opMnemonicAsString(m_mnem);
-		// NEW // sprintf(opcode_str, "js.%s", M);
-
-		char temp[32];
-		sprintf(temp, ">$%x", m_displacement);
-		// NEW // sprintf(temp, "$%04x", word1);
-		retString = opcode + " " + std::string(temp);
+		return util::string_format("js%s >$%x", opMnemonicAsString(m_mnem), m_displacement);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -1618,11 +1538,10 @@ public:
 		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string opcode = "js" + opMnemonicAsString(m_mnem);
-		retString = opcode + " " + regIdAsString(m_destination);
-		// NEW // sprintf(opcode_str, "js.%s", M);
+		return opcode + " " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1647,12 +1566,9 @@ public:
 		m_displacement = word1;
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		char temp[32];
-		sprintf(temp, ">$%x", m_displacement);
-		// NEW // sprintf(temp, "$%04x", word1);
-		retString = "jsr " + std::string(temp);
+		return util::string_format("jsr >$%x", m_displacement);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -1677,12 +1593,9 @@ public:
 		m_bAddr = BITSn(word0,0x00ff);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		char temp[32];
-		sprintf(temp, "<$%x", m_bAddr);
-		// NEW // sprintf(temp, "#$%02x", BITSn(word0,0x00ff));
-		retString = "jsr " + std::string(temp);
+		return util::string_format("jsr <$%x", m_bAddr);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1706,9 +1619,9 @@ public:
 		decode_RR_table(BITSn(word0,0x0003), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "jsr " + regIdAsString(m_destination);
+		return "jsr " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1727,7 +1640,7 @@ public:
 	}
 	bool decode(const uint16_t word0, const uint16_t word1) override
 	{
-		if ((word0 & 0x000c) == 0) return false;  // NEW TODO //
+		if ((word0 & 0x000c) == 0) return false;
 
 		decode_TT_table(BITSn(word0,0x0030), m_destination);
 
@@ -1736,10 +1649,10 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		// HACK
-		retString = "lea " + m_ea + "," + regIdAsString(m_destination);
+		return "lea " + m_ea + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1759,7 +1672,7 @@ public:
 	}
 	bool decode(const uint16_t word0, const uint16_t word1) override
 	{
-		if ((word0 & 0x000c) == 0) return false;  // NEW TODO //
+		if ((word0 & 0x000c) == 0) return false;
 
 		decode_NN_table(BITSn(word0,0x0030), m_destination);
 
@@ -1768,10 +1681,10 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		// HACK
-		retString = "lea " + m_ea + "," + regIdAsString(m_destination);
+		return "lea " + m_ea + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1794,9 +1707,9 @@ public:
 		decode_F_table(BITSn(word0,0x08), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "lsl " + regIdAsString(m_destination);
+		return "lsl " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1816,9 +1729,9 @@ public:
 		decode_F_table(BITSn(word0,0x08), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "lsr " + regIdAsString(m_destination);
+		return "lsr " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -1843,11 +1756,11 @@ public:
 		decode_kSign_table(BITSn(word0,0x40), m_sign);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string ts = m_sign;
 		if (ts.compare("-") != 0) ts = "";
-		retString = "mac " +
+		return "mac " +
 					ts +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
@@ -1876,9 +1789,9 @@ public:
 							m_source, m_source2, m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "mac " +
+		return "mac " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -1905,9 +1818,9 @@ public:
 							m_source, m_source2, m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "mac " +
+		return "mac " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -1937,11 +1850,11 @@ public:
 		decode_kSign_table(BITSn(word0,0x40), m_sign);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string ts = m_sign;
 		if (ts.compare("-") != 0) ts = "";
-		retString = "macr " +
+		return "macr " +
 					ts +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
@@ -1970,9 +1883,9 @@ public:
 							m_source, m_source2, m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "macr " +
+		return "macr " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -2003,14 +1916,13 @@ public:
 		decode_s_table(BITSn(word0,0x0004), m_mnem);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string opcode = "mac" + opMnemonicAsString(m_mnem);
 
-		retString = opcode + " " +
+		return opcode + " " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
-		// NEW // sprintf(opcode_str, "mac(%s)", A);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2048,12 +1960,12 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		if (m_isNop)
-			retString = "nop";
+			return "nop";
 		else
-			retString = "move";
+			return "move";
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2082,9 +1994,9 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "move";
+		return "move";
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2109,12 +2021,12 @@ public:
 		decode_HHH_table(BITSn(word1,0x0e00), m_SD);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string source;
 		std::string destination;
 		assemble_reg_from_W_table(m_W, 'X', m_SD, m_b, source, destination);
-		retString = "move " + source + "," + destination;
+		return "move " + source + "," + destination;
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -2147,13 +2059,12 @@ public:
 		if (m_SD == iINVALID) return false;
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string source;
 		std::string destination;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source, destination);
-		retString = "move " + source + "," + destination;
-		// NEW // sprintf(opcode_str, "move(c)");
+		return "move " + source + "," + destination;
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2186,13 +2097,12 @@ public:
 		if (m_SD == iINVALID) return false;
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string source;
 		std::string destination;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source, destination);
-		retString = "move " + source + "," + destination;
-		// NEW // sprintf(opcode_str, "move(c)");
+		return "move " + source + "," + destination;
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2224,13 +2134,12 @@ public:
 		if (m_SD == iINVALID) return false;
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string source;
 		std::string destination;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source, destination);
-		retString = "move " + source + "," + destination;
-		// NEW // sprintf(opcode_str, "move(c)");
+		return "move " + source + "," + destination;
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2268,15 +2177,16 @@ public:
 
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string ea;
 		assemble_ea_from_t_table(m_t, m_value, ea);
 
-		retString = "move ";
+		std::string retString = "move ";
 		if (m_W) retString += ea + "," + regIdAsString(m_sd);
 		else     retString += regIdAsString(m_sd) + "," + ea;
-		// NEW // sprintf(opcode_str, "move(c)");
+
+		return retString;
 	}
 	void evaluate(dsp56156_core* cpustate) override
 	{
@@ -2338,10 +2248,9 @@ public:
 		if (m_source == iSSH && m_destination == iSSH) return false;
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "move " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
-		// NEW // sprintf(opcode_str, "move(c)");
+		return "move " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2367,13 +2276,12 @@ public:
 		decode_DDDDD_table(BITSn(word1,0x03e0), m_SD);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string source;
 		std::string destination;
 		assemble_reg_from_W_table(m_W, 'X', m_SD, m_b, source, destination);
-		retString = "move " + source + "," + destination;
-		// NEW // opcode = "move(c)";
+		return "move " + source + "," + destination;
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -2401,16 +2309,12 @@ public:
 		decode_DD_table(BITSn(word0,0x0300), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		char temp[32];
-		if (m_immediate >= 0) sprintf(temp, "#<+$%x", m_immediate);
-		else                  sprintf(temp, "#<-$%x", 1 - m_immediate - 1);
-		// NEW // sprintf(temp, "#$%02x,%s", BITSn(word0,0x00ff), D1);
-
-		retString = "move " +
-			std::string(temp) + "," + regIdAsString(m_destination);
-		// NEW // sprintf(opcode_str, "move(i)");
+		if (m_immediate >= 0)
+			return util::string_format("move #<+$%x,%s", m_immediate, regIdAsString(m_destination));
+		else
+			return util::string_format("move #<-$%x,%s", 1 - m_immediate - 1, regIdAsString(m_destination));
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2440,13 +2344,12 @@ public:
 		m_W = BITSn(word0,0x0100);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string source;
 		std::string destination;
 		assemble_arguments_from_W_table(m_W, 'P', m_SD, m_ea, source, destination);
-		retString = "move " + source + "," + destination;
-		// NEW // sprintf(opcode_str, "move(m)");
+		return "move " + source + "," + destination;
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2475,7 +2378,7 @@ public:
 		assemble_eas_from_mm_table(BITSn(word0,0x000c), BITSn(word0,0x00c0), BITSn(word0,0x0003), m_ea, m_ea2);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string source;
 		std::string destination;
@@ -2489,8 +2392,7 @@ public:
 			source = "P:" + m_ea;
 			destination = "X:" + m_ea2;
 		}
-		retString = "move " + source + "," + destination;
-		// NEW // sprintf(opcode_str, "move(m)*");
+		return "move " + source + "," + destination;
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2520,13 +2422,12 @@ public:
 		decode_HHH_table(BITSn(word1,0x0007), m_SD);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string source;
 		std::string destination;
 		assemble_reg_from_W_table(m_W, 'P', m_SD, m_b, source, destination);
-		retString = "move " + source + "," + destination;
-		// NEW // opcode = "move(m)";
+		return "move " + source + "," + destination;
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 2; }
@@ -2560,13 +2461,12 @@ public:
 		m_W = BITSn(word0,0x0100);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string source;
 		std::string destination;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source, destination);
-		retString = "movep " + source + "," + destination;
-		// NEW // sprintf(opcode_str, "move(p)");
+		return "movep " + source + "," + destination;
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2600,16 +2500,14 @@ public:
 
 		m_W = BITSn(word0,0x0100);
 		m_SD = "X:<<$" + fullAddy;
-		// NEW // sprintf(SD, "X:$%s", fullAddy);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string source;
 		std::string destination;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source, destination);
-		retString = "movep " + source + "," + destination;
-		// NEW // sprintf(opcode_str, "move(p)*");
+		return "movep " + source + "," + destination;
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2635,21 +2533,16 @@ public:
 	bool decode(const uint16_t word0, const uint16_t word1) override
 	{
 		decode_HH_table(BITSn(word0,0x00c0), m_SD);
-
-		char temp[32];
-		sprintf(temp, "<$%x", BITSn(word0,0x001f));
-		m_ea = temp;
-
+		m_ea = util::string_format("<$%x", BITSn(word0,0x001f));
 		m_W = BITSn(word0,0x0100);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string source;
 		std::string destination;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source, destination);
-		retString = "moves " + source + "," + destination;
-		// NEW // sprintf(opcode_str, "move(s)");
+		return "moves " + source + "," + destination;
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2681,11 +2574,11 @@ public:
 		decode_kSign_table(BITSn(word0,0x40), m_sign);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string ts = m_sign;
 		if (ts.compare("-")!=0) ts = "";
-		retString = "mpy " +
+		return "mpy " +
 					ts +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
@@ -2714,9 +2607,9 @@ public:
 							m_source, m_source2, m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "mpy " +
+		return "mpy " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -2743,9 +2636,9 @@ public:
 							m_source, m_source2, m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "mpy " +
+		return "mpy " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -2777,11 +2670,11 @@ public:
 		decode_kSign_table(BITSn(word0,0x40), m_sign);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string ts = m_sign;
 		if (ts.compare("-") != 0) ts = "";
-		retString = "mpyr " +
+		return "mpyr " +
 					ts +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
@@ -2810,9 +2703,9 @@ public:
 							m_source, m_source2, m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "mpyr " +
+		return "mpyr " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -2842,14 +2735,13 @@ public:
 		decode_s_table(BITSn(word0,0x0004), m_mnem);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string opcode = "mpy" + opMnemonicAsString(m_mnem);
 
-		retString = opcode + " " +
+		return opcode + " " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
-		// NEW // sprintf(opcode_str, "mpy(%s)", A);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2873,9 +2765,9 @@ public:
 		decode_F_table(BITSn(word0,0x08), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "neg " + regIdAsString(m_destination);
+		return "neg " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2895,9 +2787,9 @@ public:
 		decode_F_table(BITSn(word0,0x0008), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "negc " + regIdAsString(m_destination);
+		return "negc " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2916,9 +2808,9 @@ public:
 	{
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "nop";
+		return "nop";
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2940,9 +2832,9 @@ public:
 		decode_RR_table(BITSn(word0,0x0003), m_source);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "norm " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		return "norm " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2962,9 +2854,9 @@ public:
 		decode_F_table(BITSn(word0,0x08), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "not " + regIdAsString(m_destination);
+		return "not " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -2985,9 +2877,9 @@ public:
 							m_source, m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "or " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		return "or " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3009,13 +2901,9 @@ public:
 		decode_EE_table(BITSn(word0,0x0600), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		char temp[32];
-		sprintf(temp, "#$%x", m_immediate);
-		// NEW // sprintf(temp, "#$%02x", BITSn(word0,0x00ff));
-		retString = "ori " + std::string(temp) + "," + regIdAsString(m_destination);
-		// NEW // sprintf(opcode_str, "or(i)");
+		return util::string_format("ori #$%x,%s", m_immediate, regIdAsString(m_destination));
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3038,11 +2926,9 @@ public:
 		decode_RR_table(BITSn(word0,0x0003), m_source);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		char temp[32];
-		sprintf(temp, "X:(%s)", regIdAsString(m_source).c_str());
-		retString = "rep " + std::string(temp);
+		return util::string_format("rep X:(%s)", regIdAsString(m_source));
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3063,12 +2949,9 @@ public:
 		m_immediate = BITSn(word0,0x00ff);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		char temp[32];
-		sprintf(temp, "#$%x", m_immediate);
-		// NEW // sprintf(temp, "#$%02x (%d)", BITSn(word0,0x00ff), BITSn(word0,0x00ff));
-		retString = "rep " + std::string(temp);
+		return util::string_format("rep #$%x", m_immediate);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3092,9 +2975,9 @@ public:
 		if (m_source == iINVALID) return false;
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "rep " + regIdAsString(m_source);
+		return "rep " + regIdAsString(m_source);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3115,11 +2998,10 @@ public:
 		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string opcode = "rep" + opMnemonicAsString(m_mnem);
-		retString = opcode;
-		// NEW // sprintf(opcode_str, "rep.%s", M);
+		return opcode;
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3141,9 +3023,9 @@ public:
 	{
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "reset";
+		return "reset";
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3163,9 +3045,9 @@ public:
 		decode_F_table(BITSn(word0,0x08), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "rnd " + regIdAsString(m_destination);
+		return "rnd " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3185,9 +3067,9 @@ public:
 		decode_F_table(BITSn(word0,0x08), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "rol " + regIdAsString(m_destination);
+		return "rol " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3207,9 +3089,9 @@ public:
 		decode_F_table(BITSn(word0,0x08), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "ror " + regIdAsString(m_destination);
+		return "ror " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3228,9 +3110,9 @@ public:
 	{
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "rti";
+		return "rti";
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3250,9 +3132,9 @@ public:
 	{
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "rts";
+		return "rts";
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3274,9 +3156,9 @@ public:
 						m_source, m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "sbc " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		return "sbc " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3295,9 +3177,9 @@ public:
 	{
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "stop";
+		return "stop";
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3318,9 +3200,9 @@ public:
 							m_source, m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "sub " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		return "sub " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3344,9 +3226,9 @@ public:
 		// TODO // m_opcode = "sub";
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = m_opcode + " " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		return m_opcode + " " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3379,9 +3261,9 @@ public:
 		}
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "subl " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		return "subl " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3401,9 +3283,9 @@ public:
 		decode_F_table(BITSn(word0,0x0008), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "swap " + regIdAsString(m_destination);
+		return "swap " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3422,9 +3304,9 @@ public:
 	{
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "swi";
+		return "swi";
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3456,17 +3338,16 @@ public:
 
 		return false;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		std::string opcode = "t" + opMnemonicAsString(m_mnem);
-		// NEW // sprintf(opcode_str, "t.%s", M);
-
-		retString = opcode;
+		std::string retString = "t" + opMnemonicAsString(m_mnem);
 		if (m_source != m_destination)
 			retString += std::string(" ") + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 
 		if (m_destination2 != iR0)
 			retString += std::string(" R0,") + regIdAsString(m_destination2);
+
+		return retString;
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3491,9 +3372,9 @@ public:
 							m_source, m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "tfr " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		return "tfr " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3514,9 +3395,9 @@ public:
 							m_source, m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "tfr " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		return "tfr " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3537,9 +3418,9 @@ public:
 						m_destination, m_source);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "tfr2 " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		return "tfr2 " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3574,12 +3455,12 @@ public:
 		m_W = BITSn(word0,0x0100);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
 		std::string source2;
 		std::string destination2;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source2, destination2);
-		retString = "tfr3 " +
+		return "tfr3 " +
 					regIdAsString(m_source) + "," + regIdAsString(m_destination) + " " +
 					source2 + "," + destination2;
 	}
@@ -3608,9 +3489,9 @@ public:
 		decode_F_table(BITSn(word0,0x08), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "tst " + regIdAsString(m_destination);
+		return "tst " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3630,9 +3511,9 @@ public:
 		decode_DD_table(BITSn(word0,0x0003), m_source);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "tst2 " + regIdAsString(m_source);
+		return "tst2 " + regIdAsString(m_source);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3651,9 +3532,9 @@ public:
 	{
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "wait";
+		return "wait";
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3673,9 +3554,9 @@ public:
 		decode_F_table(BITSn(word0,0x0008), m_destination);
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "zero " + regIdAsString(m_destination);
+		return "zero " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56156_core* cpustate) override {}
 	size_t size() const override { return 1; }
@@ -3712,9 +3593,9 @@ public:
 		}
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "shfl " +
+		return "shfl " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -3756,9 +3637,9 @@ public:
 		}
 		return true;
 	}
-	void disassemble(std::string& retString) const override
+	std::string disassemble() const override
 	{
-		retString = "shfr " +
+		return "shfr " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}

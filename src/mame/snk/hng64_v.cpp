@@ -304,44 +304,57 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
 	else // line mode
 	{
 		const int global_alt_scroll_register_format = m_videoregs[0x00] & 0x04000000;
+		int32_t xmiddle;
+		int32_t ymiddle;
+
+		const uint32_t& global_tileregs = m_videoregs[0x00];
+		const int global_zoom_disable = global_tileregs & 0x00010000;
+		if (global_zoom_disable) // disable all scrolling / zoom (test screen) (maybe)
+		{
+			// If this bit is active the scroll registers don't seem valid at all?
+			// It either disables zooming, or disables use of the scroll registers completely
+			// - used at startup
+
+			xtopleft = 0;
+			xmiddle = 256 << 16;
+
+			ytopleft = 0;
+			ymiddle = 256 << 16;
+		}
+		else
+		{
+			uint16_t line = source_line_to_use;
+			xtopleft = (m_videoram[(0x40000 + (scrollbase << 4)) / 4]);
+			xmiddle = (m_videoram[(0x40004 + (scrollbase << 4)) / 4]); // middle screen point
+
+			uint32_t xtopleft2 = (m_videoram[(0x40000 + (line * 0x10) + (scrollbase << 4)) / 4]);
+			uint32_t xmiddle2 = (m_videoram[(0x40004 + (line * 0x10) + (scrollbase << 4)) / 4]); // middle screen point
+
+			if ((xtopleft2 & 0xff) == 0x00)// set to 0x00 if we should use the line data?
+				xtopleft = xtopleft2;
+
+			if ((xmiddle2 & 0xff) == 0x00) // also set to 0x00 if we should use the line data?
+				xmiddle = xmiddle2;
+
+			ytopleft = (m_videoram[(0x40008 + (line * 0x10) + (scrollbase << 4)) / 4]);
+			ymiddle = (m_videoram[(0x4000c + (line * 0x10) + (scrollbase << 4)) / 4]); // middle screen point
+		}
+
 		if (global_alt_scroll_register_format) // globally selects alt scroll register layout???
 		{
-			//popmessage("global_alt_scroll_register_format in linemode");
+			xinc = (xmiddle - xtopleft) / 512;
+			yinc = 0;
+			xinc2 = 0;
+			yinc2 = (ymiddle - ytopleft) / 512;
 		}
-		//else
+		else
 		{
-			int32_t xmiddle;
-			int32_t ymiddle;
-
-			const uint32_t& global_tileregs = m_videoregs[0x00];
-			const int global_zoom_disable = global_tileregs & 0x00010000;
-			if (global_zoom_disable) // disable all scrolling / zoom (test screen) (maybe)
-			{
-				// If this bit is active the scroll registers don't seem valid at all?
-				// It either disables zooming, or disables use of the scroll registers completely
-				// - used at startup
-
-				xtopleft = 0;
-				xmiddle = 256 << 16;
-
-				ytopleft = 0;
-				ymiddle = 256 << 16;
-			}
-			else
-			{
-				uint16_t line = source_line_to_use;
-				xtopleft = (m_videoram[(0x40000 + (line * 0x10) + (scrollbase << 4)) / 4]);
-				xmiddle = (m_videoram[(0x40004 + (line * 0x10) + (scrollbase << 4)) / 4]); // middle screen point
-				ytopleft = (m_videoram[(0x40008 + (line * 0x10) + (scrollbase << 4)) / 4]);
-				ymiddle = (m_videoram[(0x4000c + (line * 0x10) + (scrollbase << 4)) / 4]); // middle screen point
-			}
-
 			xinc = (xmiddle - xtopleft) / 512;
 			yinc = (ymiddle - ytopleft) / 512;
-			// TODO: if global_alt_scroll_register_format is enabled uses incxy / incyx into calculation somehow ...
 			xinc2 = 0;
 			yinc2 = 0;
 		}
+		
 	}
 
 	uint32_t startx = xtopleft;
@@ -547,12 +560,13 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
  * uint32_t | Bits                                    | Use
  *        | 3322 2222 2222 1111 1111 11             |
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
- *   0    | ---- -Cdd ---- -??Z ---- ---- ---- ---- |  C = global complex zoom
+ *   0    | ---- -Cdd ---- -??Z ---- ---- ---- ---u |  C = global complex zoom
           | 0000 0011  - road edge alt 1            | dd = global tilemap dimension selector
           | 0000 0111  - road edge alt 2            |  ? = Always Set?
           |                                         |  Z = Global Zoom Disable?
- *   1    | oooo oooo oooo oooo ---- ---- ---- ---- | unknown - 0001 is a popular value.  Explore.
- *   1    | ---- ---- ---- ---- oooo oooo oooo oooo | unknown - untouched in sams64 games, initialized elsewhere
+		  |                                         |  u = explicitly cleared from initialized value in sams64
+ *   1    | oooo oooo oooo oooX ---- ---- ---- ---- | unknown - X is sometimes used (1 in demo of xrally, 0 in game) not always initialized  whole register gets set to 0xffff during mosaic bit of roadedge intro
+ *   1    | ---- ---- ---- ---- oooo oooo oYoo oooo | unknown - untouched in sams64 games, initialized elsewhere  Y gets set to 4 at some points in xrally attract
  *   2    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap0 per layer flags
  *   2    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap1 per layer flags
  *   3    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap2 per layer flags
@@ -561,15 +575,14 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
  *   4    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap1 scrollbase when not floor, lineram offset when floor
  *   5    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap3 scrollbase when not floor, lineram offset when floor
  *   5    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap4 scrollbase when not floor, lineram offset when floor
- *   6    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 000001ff (fatfurwa)
- *   7    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 000001ff (fatfurwa)
- *   8    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 80008000 (fatfurwa)
+ *   6    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 000001ff (fatfurwa)  ---- bfff (xrally, and fatfurwa despite comment? maybe reads MAME initialized value and changes it?)
+ *   7    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 000001ff (fatfurwa)  5e00 3fff (xrally ^^ )
+ *   8    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 80008000 (fatfurwa)  9e00 be00 (xrally ^^ )
  *   9    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 00000000 (fatfurwa)
  *   a    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 00000000 (fatfurwa)
  *   b    | mmmm mmmm mmmm mmmm mmmm mmmm mmmm mmmm | auto animation mask for tilemaps
  *   c    | xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx | auto animation bits for tilemaps
  *   d    | oooo oooo oooo oooo oooo oooo oooo oooo | not used ??
- *   e    | oooo oooo oooo oooo oooo oooo oooo oooo | not used ??
 
     // tilemap0 per layer flags
     // 0840 - startup tests, 8x8x4 layer
@@ -802,7 +815,34 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	}
 
 	// Draw the sprites on top of everything
-	draw_sprites(screen, bitmap, cliprect);
+	draw_sprites_buffer(screen, cliprect);
+
+	// copy sprites into display
+	pen_t const *const clut = &m_palette->pen(0);
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		const uint16_t *src = &m_sprite_bitmap.pix(y, cliprect.min_x);
+		uint32_t *dst = &bitmap.pix(y, cliprect.min_x);
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			uint16_t srcpix = *src;
+			if (srcpix & 0x7fff)
+			{
+				if (srcpix & 0x8000)
+				{
+					*dst = add_blend_r32(*dst, clut[srcpix & 0x7fff]);
+				}
+				else
+				{
+					*dst = clut[srcpix & 0x7fff];
+				}
+			}
+
+			dst++;
+			src++;
+		}
+	}
 
 	// Layer the global frame buffer operations on top of everything
 	// transition_control(bitmap, cliprect);
@@ -812,7 +852,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	if (0)
 		popmessage("%08x %08x %08x %08x %08x", m_spriteregs[0], m_spriteregs[1], m_spriteregs[2], m_spriteregs[3], m_spriteregs[4]);
 
-	if (1)
+	if (0)
 		popmessage("%08x %08x TR(%04x %04x %04x %04x) SB(%04x %04x %04x %04x) %08x %08x %08x %08x %08x AA(%08x %08x) %08x",
 			m_videoregs[0x00],
 			m_videoregs[0x01],
@@ -834,26 +874,36 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			m_videoregs[0x0d]);
 
 	if (0)
-		popmessage("TC: %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x : %08x %08x %08x %08x",
+		popmessage("TC: %08x %08x %08x %08x : %08x %08x\n%08x %08x\n%08x %08x\n%08x %08x : %08x %08x %08x %08x : %08x %08x\n%08x %08x : %08x %08x %08x %08x",
 			m_tcram[0x00 / 4],
 			m_tcram[0x04 / 4],
 			m_tcram[0x08 / 4], // tilemaps 0/1 ?
 			m_tcram[0x0c / 4], // ss64_2 debug 04000000 = 'half' on tm1   00000004 = 'half' on tm3  (used in transitions?)
 			m_tcram[0x10 / 4],
 			m_tcram[0x14 / 4],
-			m_tcram[0x18 / 4],
-			m_tcram[0x1c / 4],
-			m_tcram[0x20 / 4],
-			m_tcram[0x24 / 4],
-			m_tcram[0x28 / 4],
-			m_tcram[0x2c / 4],
+
+			// these are used for 'fade to black' in most cases, but
+			// in xrally attract, when one image is meant to fade into another, one value increases while the other decreases
+			m_tcram[0x18 / 4],  // xRGB fade values? (roadedge attract)
+			m_tcram[0x1c / 4],  // xRGB fade values? (roadedge attract) fades on fatfurwa before buildings in intro
+
+			m_tcram[0x20 / 4],  // something else?
+			m_tcram[0x24 / 4],  // something else?
+
+			// 7 of these fade during the buriki SNK logo (probably redundant)
+			// in roadedge they're just set to
+			// 0x00000000, 0x01000000, 0x02000000, 0x03000000, 0x04000000, 0x05000000, 0x06000000, 0x07000000
+			m_tcram[0x28 / 4],  // ?RGB fade values (buriki jumbotron)  fades on fatfurwa before high score table etc. + bottom value only on 'fade to red' part of fatfurywa intro
+			m_tcram[0x2c / 4],  // ?RGB fade values (buriki jumbotron)
 			m_tcram[0x30 / 4],
 			m_tcram[0x34 / 4],
 			m_tcram[0x38 / 4],
 			m_tcram[0x3c / 4],
 			m_tcram[0x40 / 4],
 			m_tcram[0x44 / 4],
-			m_tcram[0x48 / 4],
+
+
+			m_tcram[0x48 / 4], // this is where the 'vblank' thing lives
 			m_tcram[0x4c / 4],
 			m_tcram[0x50 / 4],
 			m_tcram[0x54 / 4],
@@ -1085,7 +1135,12 @@ void hng64_state::video_start()
 	m_texturerom = memregion("textures")->base();
 	m_vertsrom = (uint16_t*)memregion("verts")->base();
 	m_vertsrom_size = memregion("verts")->bytes();
+
+	m_screen->register_screen_bitmap(m_sprite_bitmap);
+	m_screen->register_screen_bitmap(m_sprite_zbuffer);
+
 }
+
 
 #include "hng64_3d.ipp"
 #include "hng64_sprite.ipp"

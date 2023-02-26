@@ -1002,10 +1002,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	m_screen->update_partial(scanline);
 
 	/* check scanline interrupt bits if we're in super hi-res and the current scanline is within the active display area */
-	if ((m_video->get_newvideo() & 0x80) && (scanline >= (BORDER_TOP-1)) && (scanline < (200+BORDER_TOP-1)))
+	if ((m_video->get_newvideo() & 0x80) && (scanline >= BORDER_TOP) && (scanline < (200+BORDER_TOP)))
 	{
 		u8 scb;
-		const int shrline = scanline - BORDER_TOP + 1;
+		const int shrline = scanline - BORDER_TOP;
 
 		if (shrline & 1)
 		{
