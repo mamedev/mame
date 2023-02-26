@@ -220,11 +220,6 @@ floppy_connector::~floppy_connector()
 {
 }
 
-void floppy_connector::set_formats(std::function<void (format_registration &fr)> _formats)
-{
-	formats = _formats;
-}
-
 void floppy_connector::device_start()
 {
 }
