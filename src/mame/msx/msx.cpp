@@ -107,8 +107,7 @@
 #include "screen.h"
 #include "softlist_dev.h"
 
-#include "msx_1drive.lh"
-#include "msx_2drives.lh"
+#include "msx.lh"
 
 
 //#define VERBOSE (LOG_GENERAL)
@@ -615,7 +614,7 @@ void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, XTAL x
 		m_cassette->set_interface("msx_cass");
 	}
 
-	config.set_default_layout(layout_msx_1drive);
+	config.set_default_layout(layout_msx);
 }
 
 void msx_state::msx1_add_softlists(machine_config &config)
