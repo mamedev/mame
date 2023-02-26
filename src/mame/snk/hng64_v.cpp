@@ -873,10 +873,10 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			m_videoregs[0x0d]);
 
 	if (1)
-		popmessage("TC: %08x %08x %08x\nBLEND ENABLES? %02x %02x %02x | %02x %02x %02x\nUNUSED?(%04x)\n%04x\n%04x\nMASTER FADES?(%08x %08x)\nUNUSED?(%08x)\nBITFIELD REGS(%04x %04x)\n PALFADES?(%08x %08x : %08x %08x : %08x %08x : %08x %08x)\n % 08x % 08x : % 08x % 08x % 08x % 08x",
+		popmessage("TC: %08x MINX(%d) MINY(%d) MAXX(%d) MAXY(%d)\nBLEND ENABLES? %02x %02x %02x | %02x %02x %02x\nUNUSED?(%04x)\n%04x\n%04x\nMASTER FADES?(%08x %08x)\nUNUSED?(%08x)\nBITFIELD REGS(%04x)\nPALEFFECT_ENABLES(%d %d %d %d %d %d %d %d)\n PALFADES?(%08x %08x : %08x %08x : %08x %08x : %08x %08x)\n % 08x % 08x : % 08x % 08x % 08x % 08x",
 			m_tcram[0x00 / 4], // 0007 00e4 (fatfurwa, bbust2)
-			m_tcram[0x04 / 4], // 0000 0010 (fatfurwa) 0000 0000 (bbust2, xrally)
-			m_tcram[0x08 / 4], // 0200 01b0 (fatfurwa) 0200 01c0 (bbust2, xrally)
+			(m_tcram[0x04 / 4] >> 16) & 0xffff, (m_tcram[0x04 / 4] >> 0) & 0xffff, // 0000 0010 (fatfurwa) 0000 0000 (bbust2, xrally)
+			(m_tcram[0x08 / 4] >> 16) & 0xffff, (m_tcram[0x08 / 4] >> 0) & 0xffff, // 0200 01b0 (fatfurwa) 0200 01c0 (bbust2, xrally)
 
 			(m_tcram[0x0c / 4] >> 24) & 0xff, // 04 = 'blend' on tm1  
 			(m_tcram[0x0c / 4] >> 16) & 0xff, // 04 = blend all sprites? (buriki intro, text fades?)
@@ -899,11 +899,21 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 
 			// some kind of bitfields
 			(m_tcram[0x24 / 4] >> 16) & 0xffff, // 0002 gets set in roadedge during some transitions (layers are disabled? blacked out?) 0001 set on SNK logo in roadedge 
-			(m_tcram[0x24 / 4] >> 0) & 0xffff,  // 0001 gets set when in a tunnel on roadedge in 1st person mode (state isn't updated otherwise, switching back to 3rd person in a tunnel leaves it set until you flick back to 1st person)  briefly set to 3c on roadedge car select during 'no fb clear' effect?
+			(m_tcram[0x24 / 4] >> 0) & 0x3, // 0001 gets set when in a tunnel on roadedge in 1st person mode (state isn't updated otherwise, switching back to 3rd person in a tunnel leaves it set until you flick back to 1st person)  briefly set to 3c on roadedge car select during 'no fb clear' effect?
+			(m_tcram[0x24 / 4] >> 2) & 0x3,
+			(m_tcram[0x24 / 4] >> 4) & 0x3,
+			(m_tcram[0x24 / 4] >> 6) & 0x3,
+			(m_tcram[0x24 / 4] >> 8) & 0x3,
+			(m_tcram[0x24 / 4] >> 10) & 0x3,
+			(m_tcram[0x24 / 4] >> 12) & 0x3,
+			(m_tcram[0x24 / 4] >> 14) & 0x3,
 
 			// 7 of these fade during the buriki SNK logo (probably redundant)
 			// in roadedge they're just set to
 			// 0x00000000, 0x01000000, 0x02000000, 0x03000000, 0x04000000, 0x05000000, 0x06000000, 0x07000000
+			// the first 8 bits seem to be which palette this affects (so 0x0b is colours 0xb00-0xbff as you see with xrally 1st person?)
+			// enabled with m_tcram[0x24 / 4] regs above? (see note)
+
 			m_tcram[0x28 / 4],  // ?RGB fade values (buriki jumbotron)  fades on fatfurwa before high score table etc. + bottom value only on 'fade to red' part of fatfurywa intro
 			m_tcram[0x2c / 4],  // ?RGB fade values (buriki jumbotron)
 			m_tcram[0x30 / 4],
@@ -930,6 +940,21 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	    0011057f  blending?
 	    0001057f
 	*/
+
+	
+	/*
+		palette manipulation note
+	 
+		pal7 pal6 pal5 pal4 pal3 pal2 pal1 pal0  // which fade register those bits relate to?
+ 		00   00   11   00   00   00   10   10    // bits in  (m_tcram[0x24 / 4] >> 0)  (set to 0c0a in this example)
+
+		an entry of 00 means palette effect not in use?
+		an entry of 11 means subtractive?
+		an entry of 10 means addition?
+		an entry of 01 means??
+	*/
+
+
 #endif
 
 	return 0;
