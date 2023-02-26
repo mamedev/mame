@@ -104,7 +104,6 @@ private:
 
 	void phases_w(uint8_t phases);
 	void devsel_w(uint8_t devsel);
-	WRITE_LINE_MEMBER(hdsel_w);
 
 	uint32_t biu_r(offs_t offset, uint32_t mem_mask = ~0);
 	void biu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -379,18 +378,6 @@ void maciifx_state::devsel_w(uint8_t devsel)
 	m_fdc->set_floppy(m_cur_floppy);
 	if (m_cur_floppy)
 		m_cur_floppy->ss_w(m_hdsel);
-}
-
-WRITE_LINE_MEMBER(maciifx_state::hdsel_w)
-{
-	if (state != m_hdsel)
-	{
-		if (m_cur_floppy)
-		{
-			m_cur_floppy->ss_w(state);
-		}
-	}
-	m_hdsel = state;
 }
 
 uint32_t maciifx_state::biu_r(offs_t offset, uint32_t mem_mask)
