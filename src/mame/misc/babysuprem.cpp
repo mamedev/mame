@@ -63,9 +63,12 @@ public:
 	}
 
 	void bsuprem(machine_config &config);
-	void bsuprem_map(address_map &map);
 
 	DECLARE_INPUT_CHANGED_MEMBER(test_pressed);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -95,11 +98,9 @@ private:
 	void u9_w(offs_t offset, uint8_t data);
 	void u10_w(offs_t offset, uint8_t data);
 
-	INTERRUPT_GEN_MEMBER(mains_irq);
+	void bsuprem_map(address_map &map);
 
-protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	INTERRUPT_GEN_MEMBER(mains_irq);
 
 };
 
@@ -189,12 +190,12 @@ void bsuprem_state::bsuprem(machine_config &config)
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, m_psg[0], 2.4576_MHz_XTAL); // divider not verified
-	m_psg[0]->add_route(ALL_OUTPUTS, "mono", 0.30);
-	AY8910(config, m_psg[1], 2.4576_MHz_XTAL); // divider not verified
-	m_psg[1]->add_route(ALL_OUTPUTS, "mono", 0.30);
-
 	m_psg[0]->port_a_write_callback().set(FUNC(bsuprem_state::ay8910_u1_porta_w));
 	m_psg[0]->port_b_write_callback().set(FUNC(bsuprem_state::ay8910_u1_portb_w));
+	m_psg[0]->add_route(ALL_OUTPUTS, "mono", 0.30);
+
+	AY8910(config, m_psg[1], 2.4576_MHz_XTAL); // divider not verified
+	m_psg[1]->add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
 void bsuprem_state::bsuprem_map(address_map &map)
@@ -348,7 +349,7 @@ void bsuprem_state::u10_w(offs_t offset, uint8_t data)
 	// bit 7 = hopper 100
 	m_u10_data = data;
 
-	m_hopper_100->motor_w(BIT(data, 7) );
+	m_hopper_100->motor_w(BIT(data, 7));
 }
 
 INTERRUPT_GEN_MEMBER(bsuprem_state::mains_irq)
@@ -378,5 +379,5 @@ ROM_END
 } // Anonymous namespace
 
 
-//    YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        ROT   COMPANY           FULLNAME       FLAGS
+//     YEAR  NAME     PARENT  MACHINE  INPUT    CLASS          INIT        ROT   COMPANY           FULLNAME       FLAGS
 GAMEL( 198?, bsuprem, 0,      bsuprem, bsuprem, bsuprem_state, empty_init, ROT0, "Andra / Vifico", "Baby Suprem", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_babysuprem )
