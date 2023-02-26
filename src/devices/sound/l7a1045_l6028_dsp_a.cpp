@@ -1,6 +1,6 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, ElSemi
-/***************************************************************************
+/**************************************************************************************************
 
     L7A1045 L6028 DSP-A
     (QFP120 package)
@@ -77,11 +77,15 @@
 
     TODO:
     - Sample format needs to be double checked;
-    - Octave Control/BPM/Pitch, right now XRally Network BGM wants 66150 Hz which is definitely too fast for Terry Bogard speech;
-    - Key Off;
+    - Octave Control/BPM/Pitch, xrally Network BGM wants 66150 Hz which is definitely too fast for most fatfurwa samples.
+    - Key Off, non-loop samples repeats;
+    - Fix relative sample end positions (non-loop);
     - ADSR (registers 2 & 4?);
+    - How DMA really works?
+    - fatfurwa: should stop all samples when user insert a credit,
+      is there a full key off/reset mechanism trigger?
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "l7a1045_l6028_dsp_a.h"
@@ -120,7 +124,9 @@ void l7a1045_sound_device::device_start()
 	assert(!(m_rom.length() & (m_rom.length() - 1)));
 
 	// Allocate the stream
-	m_stream = stream_alloc(0, 2, 66150); //clock() / 384);
+//	m_stream = stream_alloc(0, 2, 66150); //clock() / 384);
+	// TODO: confirm frequency
+	m_stream = stream_alloc(0, 2, 44100);
 
 	save_item(STRUCT_MEMBER(m_voice, start));
 	save_item(STRUCT_MEMBER(m_voice, end));
@@ -135,6 +141,10 @@ void l7a1045_sound_device::device_start()
 	save_item(STRUCT_MEMBER(m_audiodat, dat));
 }
 
+void l7a1045_sound_device::device_reset()
+{
+	m_key = 0;
+}
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
@@ -289,6 +299,9 @@ void l7a1045_sound_device::sound_data_w(offs_t offset, uint16_t data)
 
 			if(m_audiodat[m_audioregister][m_audiochannel].dat[2] & 0x100)
 			{
+				// TODO: definitely wrong
+				// fatfurwa title screen sample 0x45a (0x8000?)
+				// fatfurwa coin 0x3a0 (0x2000?)
 				vptr->end = (m_audiodat[m_audioregister][m_audiochannel].dat[0] & 0xffff) << 2;
 				vptr->end += vptr->start;
 				vptr->mode = false;
@@ -346,6 +359,9 @@ uint16_t l7a1045_sound_device::sound_data_r(offs_t offset)
 		}
 	}
 
+	// TODO: at least regs [3] and [5], relative position read-back?
+	// TODO: reg [6]
+
 	return 0;
 }
 
@@ -372,6 +388,7 @@ void l7a1045_sound_device::sound_status_w(uint16_t data)
 	}
 }
 
+// TODO: stub functions not really used
 WRITE_LINE_MEMBER(l7a1045_sound_device::dma_hreq_cb)
 {
 //  m_maincpu->hack_w(1);
