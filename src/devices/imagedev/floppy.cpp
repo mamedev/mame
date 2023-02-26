@@ -620,7 +620,7 @@ image_init_result floppy_image_device::call_load()
 	init_floppy_load(output_format != nullptr);
 
 	if (!cur_load_cb.isnull())
-		return cur_load_cb(this);
+		cur_load_cb(this);
 
 	flux_image_prepare();
 
