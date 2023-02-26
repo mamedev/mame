@@ -282,9 +282,9 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 		xpos = util::sext(xpos, 10);
 		ypos = util::sext(ypos, 10);
 
+		// should the offsets also be sign extended?
 		xpos += (spriteoffsx);
 		ypos += (spriteoffsy);
-
 
 		bool blend = (m_spriteram[(currentsprite * 8) + 4] & 0x00800000);
 		bool checkerboard = (m_spriteram[(currentsprite * 8) + 4] & 0x04000000);

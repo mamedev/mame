@@ -566,20 +566,22 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
           |                                         |  Z = Global Zoom Disable?
 		  |                                         |  u = explicitly cleared from initialized value in sams64
  *   1    | oooo oooo oooo oooX ---- ---- ---- ---- | unknown - X is sometimes used (1 in demo of xrally, 0 in game) not always initialized  whole register gets set to 0xffff during mosaic bit of roadedge intro
- *   1    | ---- ---- ---- ---- oooo oooo oYoo oooo | unknown - untouched in sams64 games, initialized elsewhere  Y gets set to 4 at some points in xrally attract
+ *        | ---- ---- ---- ---- oooo oooo oYoo oooo | unknown - untouched in sams64 games, initialized elsewhere  Y gets set to 4 at some points in xrally attract
  *   2    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap0 per layer flags
- *   2    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap1 per layer flags
+ *        | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap1 per layer flags
  *   3    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap2 per layer flags
- *   3    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap3 per layer flags
+ *        | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap3 per layer flags
  *   4    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap0 scrollbase when not floor, lineram offset when floor
- *   4    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap1 scrollbase when not floor, lineram offset when floor
+ *        | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap1 scrollbase when not floor, lineram offset when floor
  *   5    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap3 scrollbase when not floor, lineram offset when floor
- *   5    | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap4 scrollbase when not floor, lineram offset when floor
+ *        | ---- ---- ---- ---- xxxx xxxx xxxx xxxx | tilemap4 scrollbase when not floor, lineram offset when floor
  *   6    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 000001ff (fatfurwa)  ---- bfff (xrally, and fatfurwa despite comment? maybe reads MAME initialized value and changes it?)
  *   7    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 000001ff (fatfurwa)  5e00 3fff (xrally ^^ )
  *   8    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 80008000 (fatfurwa)  9e00 be00 (xrally ^^ )
- *   9    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 00000000 (fatfurwa)
- *   a    | oooo oooo oooo oooo oooo oooo oooo oooo | unknown - always seems to be 00000000 (fatfurwa)
+ *   9    | oooo oooo oooo oooo ---- ---- ---- ---- | some kind of tilemap split effect?
+          | ---- ---- ---- ---- oooo oooo oooo oooo | ^
+ *   a    | oooo oooo oooo oooo ---- ---- ---- ---- | ^
+ *        | ---- ---- ---- ---- oooo oooo oooo oooo | ^
  *   b    | mmmm mmmm mmmm mmmm mmmm mmmm mmmm mmmm | auto animation mask for tilemaps
  *   c    | xxxx xxxx xxxx xxxx xxxx xxxx xxxx xxxx | auto animation bits for tilemaps
  *   d    | oooo oooo oooo oooo oooo oooo oooo oooo | not used ??
@@ -852,25 +854,22 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	if (0)
 		popmessage("%08x %08x %08x %08x %08x", m_spriteregs[0], m_spriteregs[1], m_spriteregs[2], m_spriteregs[3], m_spriteregs[4]);
 
-	if (0)
-		popmessage("%08x %08x TR(%04x %04x %04x %04x) SB(%04x %04x %04x %04x) %08x %08x %08x %08x %08x AA(%08x %08x) %08x",
-			m_videoregs[0x00],
-			m_videoregs[0x01],
-			(m_videoregs[0x02] >> 16) & 0xffff,
-			(m_videoregs[0x02] >> 0) & 0xffff,  //       ss64_2 debug mode indicates that 0x0040 is enable!
-			(m_videoregs[0x03] >> 16) & 0xffff, //       buriki agrees (debug data on text layer) xrally agress (pink layer)
-			(m_videoregs[0x03] >> 0) & 0xffff,  //       fatal fury doesn't (all backgrounds have it set) joy
-			(m_videoregs[0x04] >> 16) & 0xffff,
-			(m_videoregs[0x04] >> 0) & 0xffff,
-			(m_videoregs[0x05] >> 16) & 0xffff,
-			(m_videoregs[0x05] >> 0) & 0xffff,
-			m_videoregs[0x06],
-			m_videoregs[0x07],
-			m_videoregs[0x08],
-			m_videoregs[0x09],
-			m_videoregs[0x0a],
-			m_videoregs[0x0b],
-			m_videoregs[0x0c],
+	// see notes at top for more detailed info on these
+	if (1)
+		popmessage("%08x %08x\nTR(%04x %04x %04x %04x)\nSB(%04x %04x %04x %04x)\n%08x %08x %08x\nSPLIT?(%04x %04x %04x %04x)\nAA(%08x %08x)\n%08x",
+			// global tilemap control regs?
+			m_videoregs[0x00], m_videoregs[0x01],
+			// Tilemap regis
+			(m_videoregs[0x02] >> 16) & 0xffff, (m_videoregs[0x02] >> 0) & 0xffff, (m_videoregs[0x03] >> 16) & 0xffff, (m_videoregs[0x03] >> 0) & 0xffff,
+			// scrollbase regs
+			(m_videoregs[0x04] >> 16) & 0xffff, (m_videoregs[0x04] >> 0) & 0xffff, (m_videoregs[0x05] >> 16) & 0xffff, (m_videoregs[0x05] >> 0) & 0xffff,
+			// initialized to fixed values?
+			m_videoregs[0x06], m_videoregs[0x07], m_videoregs[0x08],
+			// used when a single tilemap gets 'split' on Buriki player entrances?
+			(m_videoregs[0x09] >> 16) & 0xffff, (m_videoregs[0x09] >> 0) & 0xffff, (m_videoregs[0x0a] >> 16) & 0xffff, (m_videoregs[0x0a] >> 0) & 0xffff,
+			// Auto Animation registers
+			m_videoregs[0x0b], m_videoregs[0x0c],
+			// unused?
 			m_videoregs[0x0d]);
 
 	if (0)
