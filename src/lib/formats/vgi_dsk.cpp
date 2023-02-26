@@ -13,10 +13,10 @@ http://www.bitsavers.org/pdf/micropolis/metafloppy/1084-01_1040_1050_Users_Manua
 
 *********************************************************************/
 
-#include <cstring>
-
 #include "vgi_dsk.h"
 #include "ioprocs.h"
+
+#include <cstring>
 
 static const int track_size = 100'000;
 static const int half_bitcell_size = 2000;
@@ -64,7 +64,7 @@ bool micropolis_vgi_format::load(util::random_read &io, uint32_t form_factor, co
 {
 	uint64_t file_size;
 	if (io.length(file_size))
-		return 0;
+		return false;
 	const format fmt = find_format(file_size);
 	if (!fmt.head_count)
 		return false;
@@ -78,7 +78,8 @@ bool micropolis_vgi_format::load(util::random_read &io, uint32_t form_factor, co
 				for (int i = 0; i < 40; i++)
 					mfm_w(buf, 8, 0, half_bitcell_size);
 				std::size_t actual;
-				io.read(sector_bytes, std::size(sector_bytes), actual);
+				if (io.read(sector_bytes, std::size(sector_bytes), actual))
+					return false;
 				for (int i = 0; i < std::size(sector_bytes); i++)
 					mfm_w(buf, 8, sector_bytes[i], half_bitcell_size);
 				while (buf.size() < track_size/16 * (sector+1))
@@ -101,7 +102,6 @@ bool micropolis_vgi_format::save(util::random_read_write &io, const std::vector<
 	if (!fmt.head_count) {
 		int heads, tracks;
 		image->get_actual_geometry(tracks, heads);
-		printf("heads: %d tracks %d\n", heads, tracks);
 		if (heads == 0 && tracks == 0)
 			return false; // Brand-new image; we don't know the size yet
 		for (int i = 0; formats[i].head_count; i++)
@@ -111,7 +111,8 @@ bool micropolis_vgi_format::save(util::random_read_write &io, const std::vector<
 	if (!fmt.head_count)
 		return false;
 
-	io.seek(0, SEEK_SET);
+	if (io.seek(0, SEEK_SET))
+		return false;
 	uint8_t sector_bytes[275];
 	for (int head = 0; head < fmt.head_count; head++) {
 		for (int track = 0; track < fmt.track_count; track++) {
@@ -134,7 +135,8 @@ bool micropolis_vgi_format::save(util::random_read_write &io, const std::vector<
 				}
 
 				std::size_t actual;
-				io.write(sector_bytes, std::size(sector_bytes), actual);
+				if (io.write(sector_bytes, std::size(sector_bytes), actual))
+					return false;
 			}
 		}
 	}

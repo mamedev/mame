@@ -24,8 +24,8 @@ TODO:
 ****************************************************************************/
 
 #include "emu.h"
+#include "vectordualmode.h"
 
-#include "bus/s100/vectordualmode.h"
 #include "formats/vgi_dsk.h"
 
 static const attotime half_bitcell_size = attotime::from_usec(2);
@@ -85,6 +85,7 @@ TIMER_CALLBACK_MEMBER(s100_vector_dualmode_device::motor_off)
 
 bool s100_vector_dualmode_device::hdd_selected()
 {
+	// TODO: HDD support
 	return m_drive == 0 && false;
 }
 
@@ -114,9 +115,13 @@ uint8_t s100_vector_dualmode_device::s100_sinp_r(offs_t offset)
 			loss_of_sync = false;
 		}
 
-		data = write_protect | (ready << 1) | (track0 << 2)
-		    | (write_fault << 3) | (seek_complete << 4) | (loss_of_sync << 5)
-			| 0xc0;
+		data = (write_protect ? 0x01 : 0)
+		    | (ready ? 0x02 : 0)
+		    | (track0 ? 0x04 : 0)
+		    | (write_fault ? 0x08 : 0)
+		    | (seek_complete ? 0x10 : 0)
+		    | (loss_of_sync ? 0x20 : 0)
+		    | 0xc0;
 	} else if (offset == 0xc1) { // status (1) port
 		bool floppy_disk_selected;
 		bool controller_busy = m_sector_timer->enabled();
@@ -129,11 +134,17 @@ uint8_t s100_vector_dualmode_device::s100_sinp_r(offs_t offset)
 			floppy_disk_selected = true;
 			motor_on = m_motor_on_timer->enabled();
 		}
-		data = floppy_disk_selected | (controller_busy << 1) | (motor_on << 2)
-		    | (type_of_hard_disk << 3) | 0xf0;
+		data = (floppy_disk_selected ? 0x01 : 0)
+		    | (controller_busy ? 0x02 : 0)
+		    | (motor_on ? 0x04 : 0)
+		    | (type_of_hard_disk ? 0x08 : 0)
+		    | 0xf0;
 	} else if (offset == 0xc2) { // data port
-		data = m_ram[m_cmar++];
-		m_cmar &= 0x1ff;
+		data = m_ram[m_cmar];
+		if (!machine().side_effects_disabled()) {
+			m_cmar++;
+			m_cmar &= 0x1ff;
+		}
 	} else if (offset == 0xc3) { // reset port
 		m_cmar = 0;
 		data = 0xff;
@@ -203,7 +214,7 @@ bool s100_vector_dualmode_device::get_next_bit(attotime &tm, const attotime &lim
 
 TIMER_CALLBACK_MEMBER(s100_vector_dualmode_device::sector_cb)
 {
-	switch (static_cast<sector_timer_state>(param)) {
+	switch (param) {
 	case SECTOR_START:
 		if (m_read) {
 			m_pll.set_clock(half_bitcell_size);

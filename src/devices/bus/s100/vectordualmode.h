@@ -47,7 +47,7 @@ private:
 	emu_timer *m_byte_timer;
 	emu_timer *m_sector_timer;
 	uint16_t m_pending_byte;
-	unsigned int m_pending_size;
+	uint8_t m_pending_size;
 };
 
 DECLARE_DEVICE_TYPE(S100_VECTOR_DUALMODE, s100_vector_dualmode_device)
