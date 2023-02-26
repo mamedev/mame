@@ -139,6 +139,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_paletteram(*this, "paletteram"),
 		m_vblank(*this, "VBLANK"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -185,6 +186,7 @@ public:
 	uint8_t *m_texturerom = nullptr;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<u32> m_paletteram;
 	required_ioport m_vblank;
 
 private:
@@ -342,6 +344,7 @@ private:
 	void dl_unk_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t dl_vreg_r();
 
+	void pal_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	void tcram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t tcram_r(offs_t offset);
 
@@ -449,7 +452,6 @@ private:
 		gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t xpos, int32_t ypos,
 		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int line, uint16_t &srcpix);
 
-	void transition_control(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void setCameraTransformation(const uint16_t* packet);
 	void setLighting(const uint16_t* packet);
 	void set3dFlags(const uint16_t* packet);

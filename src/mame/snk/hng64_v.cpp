@@ -851,8 +851,6 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 		}
 	}
 
-	// Layer the global frame buffer operations on top of everything
-	// transition_control(bitmap, cliprect);
 
 
 #if HNG64_VIDEO_DEBUG
@@ -1012,6 +1010,12 @@ WRITE_LINE_MEMBER(hng64_state::screen_vblank_hng64)
  *  Or maybe they set transition type (there seems to be a cute scaling-squares transition in there somewhere)...
  */
 
+void hng64_state::pal_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	COMBINE_DATA(&m_paletteram[offset]);
+	m_palette->set_pen_color(offset, (data >> 16) & 0xff, (data >> 8) & 0xff, (data >> 0) & 0xff);
+}
+
 // Transition Control memory.
 void hng64_state::tcram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
@@ -1051,88 +1055,6 @@ uint32_t hng64_state::tcram_r(offs_t offset)
 	return m_tcram[offset];
 }
 
-// Very much a work in progress - no hard testing has been done
-void hng64_state::transition_control(bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	// If either of the fading memory regions is non-zero...
-	if (m_tcram[0x00000007] != 0x00000000 || m_tcram[0x0000000a] != 0x00000000)
-	{
-		const int32_t darkR = int32_t(m_tcram[0x00000007] & 0xff);
-		const int32_t darkG = int32_t((m_tcram[0x00000007] >> 8) & 0xff);
-		const int32_t darkB = int32_t((m_tcram[0x00000007] >> 16) & 0xff);
-
-		const int32_t brigR = int32_t(m_tcram[0x0000000a] & 0xff);
-		const int32_t brigG = int32_t((m_tcram[0x0000000a] >> 8) & 0xff);
-		const int32_t brigB = int32_t((m_tcram[0x0000000a] >> 16) & 0xff);
-
-		for (int i = cliprect.min_x; i < cliprect.max_x; i++)
-		{
-			for (int j = cliprect.min_y; j < cliprect.max_y; j++)
-			{
-				rgb_t *thePixel = reinterpret_cast<rgb_t *>(&bitmap.pix(j, i));
-
-				int32_t finR = (int32_t)thePixel->r();
-				int32_t finG = (int32_t)thePixel->g();
-				int32_t finB = (int32_t)thePixel->b();
-
-#if 0
-				float colorScaleR, colorScaleG, colorScaleB;
-
-				// Apply the darkening pass (0x07)...
-				colorScaleR = 1.0f - (float)(m_tcram[0x00000007] & 0xff) / 255.0f;
-				colorScaleG = 1.0f - (float)((m_tcram[0x00000007] >> 8) & 0xff) / 255.0f;
-				colorScaleB = 1.0f - (float)((m_tcram[0x00000007] >> 16) & 0xff) / 255.0f;
-
-				finR = ((float)thePixel->r() * colorScaleR);
-				finG = ((float)thePixel->g() * colorScaleG);
-				finB = ((float)thePixel->b() * colorScaleB);
-
-				// Apply the lightening pass (0x0a)...
-				colorScaleR = 1.0f + (float)(m_tcram[0x0000000a] & 0xff) / 255.0f;
-				colorScaleG = 1.0f + (float)((m_tcram[0x0000000a] >> 8) & 0xff) / 255.0f;
-				colorScaleB = 1.0f + (float)((m_tcram[0x0000000a] >> 16) & 0xff) / 255.0f;
-
-				finR *= colorScaleR;
-				finG *= colorScaleG;
-				finB *= colorScaleB;
-
-				// Clamp
-				if (finR > 255.0f) finR = 255.0f;
-				if (finG > 255.0f) finG = 255.0f;
-				if (finB > 255.0f) finB = 255.0f;
-#endif
-
-				// Subtractive fading
-				if (m_tcram[0x00000007] != 0x00000000)
-				{
-					finR -= darkR;
-					finG -= darkG;
-					finB -= darkB;
-				}
-
-				// Additive fading
-				if (m_tcram[0x0000000a] != 0x00000000)
-				{
-					finR += brigR;
-					finG += brigG;
-					finB += brigB;
-				}
-
-				// Clamp the high end
-				if (finR > 255) finR = 255;
-				if (finG > 255) finG = 255;
-				if (finB > 255) finB = 255;
-
-				// Clamp the low end
-				if (finR < 0) finR = 0;
-				if (finG < 0) finG = 0;
-				if (finB < 0) finB = 0;
-
-				*thePixel = rgb_t(255, (uint8_t)finR, (uint8_t)finG, (uint8_t)finB);
-			}
-		}
-	}
-}
 
 void hng64_state::video_start()
 {
