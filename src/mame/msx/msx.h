@@ -189,7 +189,6 @@ protected:
 	required_device<msx_general_purpose_port_device> m_gen_port1;
 	required_device<msx_general_purpose_port_device> m_gen_port2;
 	required_ioport_array<11> m_io_key;
-	output_finder<2> m_leds;
 	msx_hw_def m_hw_def;
 	// This is here until more direct rom dumps from kanji font roms become available.
 	bool m_kanji_fsa1fx = false;
@@ -238,6 +237,7 @@ protected:
 	u8 m_port_c_old;
 	u8 m_keylatch;
 	output_finder<> m_caps_led;
+	output_finder<> m_kana_arab_led;
 
 private:
 	// configuration helpers

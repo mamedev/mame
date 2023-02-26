@@ -133,7 +133,6 @@ msx_state::msx_state(const machine_config &mconfig, device_type type, const char
 	, m_gen_port1(*this, "gen1")
 	, m_gen_port2(*this, "gen2")
 	, m_io_key(*this, "KEY%u", 0U)
-	, m_leds(*this, "led%u", 1U)
 	, m_view_page0(*this, "view0")
 	, m_view_page1(*this, "view1")
 	, m_view_page2(*this, "view2")
@@ -162,6 +161,7 @@ msx_state::msx_state(const machine_config &mconfig, device_type type, const char
 	, m_port_c_old(0)
 	, m_keylatch(0)
 	, m_caps_led(*this, "caps_led")
+	, m_kana_arab_led(*this, "kana_arab_led")
 {
 	m_view[0] = &m_view_page0;
 	m_view[1] = &m_view_page1;
@@ -308,8 +308,8 @@ void msx_state::machine_reset()
 
 void msx_state::machine_start()
 {
-	m_leds.resolve();
 	m_caps_led.resolve();
+	m_kana_arab_led.resolve();
 	m_port_c_old = 0xff;
 }
 
@@ -454,8 +454,7 @@ void msx_state::psg_port_a_w(u8 data)
 void msx_state::psg_port_b_w(u8 data)
 {
 	// Arabic or kana mode led
-	if ((data ^ m_psg_b) & 0x80)
-		m_leds[1] = BIT(~data, 7);
+	m_kana_arab_led = BIT(~data, 7);
 
 	m_gen_port1->pin_6_w(BIT(data, 0));
 	m_gen_port1->pin_7_w(BIT(data, 1));
@@ -484,8 +483,6 @@ void msx_state::ppi_port_c_w(u8 data)
 
 	// caps lock
 	m_caps_led = BIT(~data, 6);
-	if (BIT(m_port_c_old ^ data, 6))
-		m_leds[0] = BIT(~data, 6);
 
 	// key click
 	if (BIT(m_port_c_old ^ data, 7))

@@ -14,11 +14,6 @@ Basic display of LEDs for an MSX
 			<color red="0.0" green="1.0" blue="0.0" />
 		</rect>
 	</element>
-	<element name="caps">
-		<text string="Caps" align="1">
-			<color red="1.0" green="1.0" blue="1.0" />
-		</text>
-	</element>
 	<element name="optional_orange_led">
 		<rect state="1">
 			<color red="0.2" green="0.2" blue="0.2" />
@@ -26,6 +21,16 @@ Basic display of LEDs for an MSX
 		<rect state="2">
 			<color red="1.0" green="0.6" blue="0.0" />
 		</rect>
+	</element>
+	<element name="caps">
+		<text string="Caps" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="kana_arab">
+		<text string="Kana/Arab" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
 	</element>
 	<element name="drv0">
 		<text string="Drive A" align="1" state="1">
@@ -48,17 +53,23 @@ Basic display of LEDs for an MSX
 		<element name="caps_led" ref="green_led">
 			<bounds left="0" right="20" top="31" bottom="39" />
 		</element>
-		<element name="name_int_drv0" ref="drv0">
+		<element name="kana_arab_text" ref="kana_arab">
 			<bounds left="0" right="74" top="40" bottom="70" />
 		</element>
-		<element name="access_int_drv0" ref="optional_orange_led">
+		<element name="kana_arab_led" ref="green_led">
 			<bounds left="0" right="20" top="71" bottom="79" />
 		</element>
-		<element name="name_int_drv1" ref="drv1">
+		<element name="name_int_drv0" ref="drv0">
 			<bounds left="0" right="74" top="80" bottom="110" />
 		</element>
-		<element name="access_int_drv1" ref="optional_orange_led">
+		<element name="access_int_drv0" ref="optional_orange_led">
 			<bounds left="0" right="20" top="111" bottom="119" />
+		</element>
+		<element name="name_int_drv1" ref="drv1">
+			<bounds left="0" right="74" top="120" bottom="150" />
+		</element>
+		<element name="access_int_drv1" ref="optional_orange_led">
+			<bounds left="0" right="20" top="151" bottom="159" />
 		</element>
 	</view>
 </mamelayout>
