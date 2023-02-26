@@ -260,6 +260,9 @@ void sdl_osd_interface::init(running_machine &machine)
 		}
 	}
 
+#if defined(SDLMAME_ANDROID)
+	SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "1");
+#endif
 	/* Initialize SDL */
 
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO))
@@ -269,7 +272,7 @@ void sdl_osd_interface::init(running_machine &machine)
 	}
 
 	// bgfx does not work with wayland
-	if ((strcmp(SDL_GetCurrentVideoDriver(), "wayland") == 0) && ((strcmp(options().video(), "auto") == 0) || (strcmp(options().video(), "bgfx") == 0)))
+	if ((strcmp(SDL_GetCurrentVideoDriver(), "wayland") == 0) && (strcmp(options().video(), "bgfx") == 0))
 		fatalerror("Error: BGFX video does not work with wayland videodriver. Please change either of the options.");
 
 	osd_sdl_info();
@@ -294,11 +297,10 @@ void sdl_osd_interface::init(running_machine &machine)
 }
 
 
-void sdl_osd_interface::input_update()
+void sdl_osd_interface::input_update(bool relative_reset)
 {
 	process_events_buf();
-	poll_inputs();
-	check_osd_inputs();
+	poll_input_modules(relative_reset);
 }
 
 
@@ -418,15 +420,6 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 			break;
 		}
 	}
-}
-
-
-void sdl_osd_interface::poll_inputs()
-{
-	m_keyboard_input->poll_if_necessary();
-	m_mouse_input->poll_if_necessary();
-	m_lightgun_input->poll_if_necessary();
-	m_joystick_input->poll_if_necessary();
 }
 
 

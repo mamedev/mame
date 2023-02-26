@@ -64,7 +64,7 @@ protected:
 	unsigned active_switch_groups() const { return m_active_switch_groups; }
 
 private:
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	void find_fields();
 

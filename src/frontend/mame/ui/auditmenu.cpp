@@ -150,7 +150,7 @@ void menu_audit::populate()
 	item_append(menu_item_type::SEPARATOR, 0);
 }
 
-void menu_audit::handle(event const *ev)
+bool menu_audit::handle(event const *ev)
 {
 	switch (m_phase)
 	{
@@ -166,6 +166,7 @@ void menu_audit::handle(event const *ev)
 				m_future.resize(std::thread::hardware_concurrency());
 				for (auto &future : m_future)
 					future = std::async(std::launch::async, [this] () { return do_audit(); });
+				return true;
 			}
 		}
 		break;
@@ -191,13 +192,17 @@ void menu_audit::handle(event const *ev)
 				m_phase = phase::CANCELLATION;
 			else
 				m_phase = phase::AUDIT;
+			return true;
 		}
 		else if ((phase::CANCELLATION == m_phase) && machine().ui_input().pressed(IPT_UI_SELECT))
 		{
 			m_cancel.store(true);
+			return true;
 		}
 		break;
 	}
+
+	return false;
 }
 
 bool menu_audit::do_audit()

@@ -1216,18 +1216,14 @@ void arm7_cpu_device::HandleMul(uint32_t insn)
 // todo: add proper cycle counts
 void arm7_cpu_device::HandleSMulLong(uint32_t insn)
 {
-	int32_t rm, rs;
-	uint32_t rhi, rlo;
-	int64_t res;
-
 	// MULL takes 1S + (m+1)I and MLAL 1S + (m+2)I cycles to execute, where m is the
 	// number of 8 bit multiplier array cycles required to complete the multiply, which is
 	// controlled by the value of the multiplier operand specified by Rs.
 
-	rm  = (int32_t)GetRegister(insn & 0xf);
-	rs  = (int32_t)GetRegister(((insn >> 8) & 0xf));
-	rhi = (insn >> 16) & 0xf;
-	rlo = (insn >> 12) & 0xf;
+	int32_t  rm  = (int32_t)GetRegister(insn & 0xf);
+	int32_t  rs  = (int32_t)GetRegister(((insn >> 8) & 0xf));
+	uint32_t rhi = (insn >> 16) & 0xf;
+	uint32_t rlo = (insn >> 12) & 0xf;
 
 #if ARM7_DEBUG_CORE
 		if ((insn & 0xf) == 15 || ((insn >> 8) & 0xf) == 15 || ((insn >> 16) & 0xf) == 15 || ((insn >> 12) & 0xf) == 15)
@@ -1235,7 +1231,7 @@ void arm7_cpu_device::HandleSMulLong(uint32_t insn)
 #endif
 
 	/* Perform the multiplication */
-	res = (int64_t)rm * rs;
+	int64_t res = mul_32x32(rm, rs);
 
 	/* Add on Rn if this is a MLA */
 	if (insn & INSN_MUL_A)
@@ -1268,18 +1264,14 @@ void arm7_cpu_device::HandleSMulLong(uint32_t insn)
 // todo: add proper cycle counts
 void arm7_cpu_device::HandleUMulLong(uint32_t insn)
 {
-	uint32_t rm, rs;
-	uint32_t rhi, rlo;
-	uint64_t res;
-
 	// MULL takes 1S + (m+1)I and MLAL 1S + (m+2)I cycles to execute, where m is the
 	// number of 8 bit multiplier array cycles required to complete the multiply, which is
 	// controlled by the value of the multiplier operand specified by Rs.
 
-	rm  = (int32_t)GetRegister(insn & 0xf);
-	rs  = (int32_t)GetRegister(((insn >> 8) & 0xf));
-	rhi = (insn >> 16) & 0xf;
-	rlo = (insn >> 12) & 0xf;
+	uint32_t rm  = GetRegister(insn & 0xf);
+	uint32_t rs  = GetRegister(((insn >> 8) & 0xf));
+	uint32_t rhi = (insn >> 16) & 0xf;
+	uint32_t rlo = (insn >> 12) & 0xf;
 
 #if ARM7_DEBUG_CORE
 		if (((insn & 0xf) == 15) || (((insn >> 8) & 0xf) == 15) || (((insn >> 16) & 0xf) == 15) || (((insn >> 12) & 0xf) == 15))
@@ -1287,7 +1279,7 @@ void arm7_cpu_device::HandleUMulLong(uint32_t insn)
 #endif
 
 	/* Perform the multiplication */
-	res = (uint64_t)rm * rs;
+	uint64_t res = mulu_32x32(rm, rs);
 
 	/* Add on Rn if this is a MLA */
 	if (insn & INSN_MUL_A)
@@ -1705,9 +1697,8 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 	{
 		int32_t src1 = GetRegister(insn&0xf);
 		int32_t src2 = GetRegister((insn>>16)&0xf);
-		int64_t res;
 
-		res = saturate_qbit_overflow((int64_t)src1 + (int64_t)src2);
+		int64_t res = saturate_qbit_overflow((int64_t)src1 + (int64_t)src2);
 
 		SetRegister((insn>>12)&0xf, (int32_t)res);
 		R15 += 4;
@@ -1716,10 +1707,9 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 	{
 		int32_t src1 = GetRegister(insn&0xf);
 		int32_t src2 = GetRegister((insn>>16)&0xf);
-		int64_t res;
 
 		// check if doubling operation will overflow
-		res = (int64_t)src2 * 2;
+		int64_t res = (int64_t)src2 * 2;
 		saturate_qbit_overflow(res);
 
 		src2 *= 2;
@@ -1732,9 +1722,8 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 	{
 		int32_t src1 = GetRegister(insn&0xf);
 		int32_t src2 = GetRegister((insn>>16)&0xf);
-		int64_t res;
 
-		res = saturate_qbit_overflow((int64_t)src1 - (int64_t)src2);
+		int64_t res = saturate_qbit_overflow((int64_t)src1 - (int64_t)src2);
 
 		SetRegister((insn>>12)&0xf, (int32_t)res);
 		R15 += 4;
@@ -1743,10 +1732,9 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 	{
 		int32_t src1 = GetRegister(insn&0xf);
 		int32_t src2 = GetRegister((insn>>16)&0xf);
-		int64_t res;
 
 		// check if doubling operation will overflow
-		res = (int64_t)src2 * 2;
+		int64_t res = (int64_t)src2 * 2;
 		saturate_qbit_overflow(res);
 
 		src2 *= 2;
@@ -1763,26 +1751,14 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 
 		// select top and bottom halves of src1/src2 and sign extend if necessary
 		if (insn & 0x20)
-		{
 			src1 >>= 16;
-		}
-
-		src1 &= 0xffff;
-		if (src1 & 0x8000)
-		{
-			src1 |= 0xffff0000;
-		}
+		else
+			src1 = util::sext(src1, 16);
 
 		if (insn & 0x40)
-		{
 			src2 >>= 16;
-		}
-
-		src2 &= 0xffff;
-		if (src2 & 0x8000)
-		{
-			src2 |= 0xffff0000;
-		}
+		else
+			src2 = util::sext(src2, 16);
 
 		// do the signed multiply
 		res1 = src1 * src2;
@@ -1796,13 +1772,12 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 	{
 		int32_t src1 = GetRegister(insn&0xf);
 		int32_t src2 = GetRegister((insn>>8)&0xf);
-		int64_t dst;
 
-		dst = (int64_t)GetRegister((insn>>12)&0xf);
+		int64_t dst = (int64_t)GetRegister((insn>>12)&0xf);
 		dst |= (int64_t)GetRegister((insn>>16)&0xf)<<32;
 
 		// do the multiply and accumulate
-		dst += (int64_t)src1 * (int64_t)src2;
+		dst += mul_32x32(src1, src2);
 
 		// write back the result
 		SetRegister((insn>>12)&0xf, (uint32_t)dst);
@@ -1813,32 +1788,19 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 	{
 		int32_t src1 = GetRegister(insn&0xf);
 		int32_t src2 = GetRegister((insn>>8)&0xf);
-		int32_t res;
 
 		// select top and bottom halves of src1/src2 and sign extend if necessary
 		if (insn & 0x20)
-		{
 			src1 >>= 16;
-		}
-
-		src1 &= 0xffff;
-		if (src1 & 0x8000)
-		{
-			src1 |= 0xffff0000;
-		}
+		else
+			src1 = util::sext(src1, 16);
 
 		if (insn & 0x40)
-		{
 			src2 >>= 16;
-		}
+		else
+			src2 = util::sext(src2, 16);
 
-		src2 &= 0xffff;
-		if (src2 & 0x8000)
-		{
-			src2 |= 0xffff0000;
-		}
-
-		res = src1 * src2;
+		int32_t res = src1 * src2;
 		SetRegister((insn>>16)&0xf, res);
 		R15 += 4;
 	}
@@ -1846,21 +1808,13 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 	{
 		int32_t src1 = GetRegister(insn&0xf);
 		int32_t src2 = GetRegister((insn>>8)&0xf);
-		int64_t res;
 
 		if (insn & 0x40)
-		{
 			src2 >>= 16;
-		}
+		else
+			src2 = util::sext(src2, 16);
 
-		src2 &= 0xffff;
-		if (src2 & 0x8000)
-		{
-			src2 |= 0xffff0000;
-		}
-
-		res = (int64_t)src1 * (int64_t)src2;
-		res >>= 16;
+		int32_t res = mul_32x32_shift(src1, src2, 16);
 		SetRegister((insn>>16)&0xf, (uint32_t)res);
 		R15 += 4;
 	}
@@ -1869,27 +1823,19 @@ void arm7_cpu_device::arm7ops_0123(uint32_t insn)
 		int32_t src1 = GetRegister(insn&0xf);
 		int32_t src2 = GetRegister((insn>>8)&0xf);
 		int32_t src3 = GetRegister((insn>>12)&0xf);
-		int64_t res;
 
 		if (insn & 0x40)
-		{
 			src2 >>= 16;
-		}
+		else
+			src2 = util::sext(src2, 16);
 
-		src2 &= 0xffff;
-		if (src2 & 0x8000)
-		{
-			src2 |= 0xffff0000;
-		}
-
-		res = (int64_t)src1 * (int64_t)src2;
-		res >>= 16;
+		int32_t res = mul_32x32_shift(src1, src2, 16);
 
 		// check for overflow and set the Q bit
 		saturate_qbit_overflow((int64_t)src3 + res);
 
 		// do the real accumulate
-		src3 += (int32_t)res;
+		src3 += res;
 
 		// write the result back
 		SetRegister((insn>>16)&0xf, (uint32_t)res);

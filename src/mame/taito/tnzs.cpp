@@ -673,6 +673,9 @@ d23f=input port 1 value
 #include "screen.h"
 #include "speaker.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 SAMPLES_START_CB_MEMBER(kageki_state::init_samples)
 {
@@ -737,8 +740,6 @@ uint8_t kageki_state::csport_r()
 
 void kageki_state::csport_w(uint8_t data)
 {
-	char mess[80];
-
 	if (data > 0x3f)
 	{
 		// read dipsw port
@@ -750,15 +751,14 @@ void kageki_state::csport_w(uint8_t data)
 		{
 			// play samples
 			m_samples->start_raw(0, m_sampledata[data].get(), m_samplesize[data], 7000);
-			sprintf(mess, "VOICE:%02X PLAY", data);
+			LOG("VOICE:%02X PLAY", data);
 		}
 		else
 		{
 			// stop samples
 			m_samples->stop(0);
-			sprintf(mess, "VOICE:%02X STOP", data);
+			LOG("VOICE:%02X STOP", data);
 		}
-	//  popmessage(mess);
 	}
 }
 

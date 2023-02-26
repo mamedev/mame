@@ -236,7 +236,7 @@ bool msa_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	uint8_t sectdata[11*512];
 	desc_s sectors[11];
 	for(int i=0; i<sect; i++) {
-		sectors[i].data = sectdata + 512*1;
+		sectors[i].data = sectdata + 512*i;
 		sectors[i].size = 512;
 		sectors[i].sector_id = i + 1;
 	}

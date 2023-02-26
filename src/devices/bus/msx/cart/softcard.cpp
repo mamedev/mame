@@ -14,7 +14,7 @@ This cartridge allows SoftCards to be used on an MSX system.
 #include "softlist_dev.h"
 
 
-DEFINE_DEVICE_TYPE(MSX_CART_SOFTCARD, msx_cart_softcard_device, "msx_cart_softcard", "Electric Softward Astron SoftCard Adaptor")
+DEFINE_DEVICE_TYPE(MSX_CART_SOFTCARD, msx_cart_softcard_device, "msx_cart_softcard", "Electric Software Astron SoftCard Adaptor")
 
 
 msx_cart_softcard_device::msx_cart_softcard_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)

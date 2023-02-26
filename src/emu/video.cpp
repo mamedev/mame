@@ -218,8 +218,9 @@ void video_manager::frame_update(bool from_debugger)
 	bool const update_screens = (phase == machine_phase::RUNNING) && (!machine().paused() || machine().options().update_in_pause());
 	bool anything_changed = update_screens && finish_screen_updates();
 
-	// draw the user interface
-	emulator_info::draw_user_interface(machine());
+	// update inputs and draw the user interface
+	machine().osd().input_update(true);
+	anything_changed = emulator_info::draw_user_interface(machine()) || anything_changed;
 
 	// let plugins draw over the UI
 	anything_changed = emulator_info::frame_hook() || anything_changed;
@@ -234,7 +235,7 @@ void video_manager::frame_update(bool from_debugger)
 
 	// if we're throttling, synchronize before rendering
 	attotime current_time = machine().time();
-	if (!from_debugger && !skipped_it && phase > machine_phase::INIT && !m_low_latency && effective_throttle())
+	if (!from_debugger && phase > machine_phase::INIT && !m_low_latency && effective_throttle())
 		update_throttle(current_time);
 
 	// ask the OSD to update
@@ -243,12 +244,10 @@ void video_manager::frame_update(bool from_debugger)
 	g_profiler.stop();
 
 	// we synchronize after rendering instead of before, if low latency mode is enabled
-	if (!from_debugger && !skipped_it && phase > machine_phase::INIT && m_low_latency && effective_throttle())
+	if (!from_debugger && phase > machine_phase::INIT && m_low_latency && effective_throttle())
 		update_throttle(current_time);
 
-	// get most recent input now
-	machine().osd().input_update();
-
+	machine().osd().input_update(false);
 	emulator_info::periodic_check();
 
 	if (!from_debugger)

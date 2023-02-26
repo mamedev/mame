@@ -1043,8 +1043,8 @@ void fga002_device::check_interrupts()()
  */
 
  } // anonymous namespace
- 
- 
+
+
 /* Driver */
 /*    YEAR  NAME            PARENT   COMPAT  MACHINE        INPUT  CLASS        INIT             COMPANY                 FULLNAME                  FLAGS */
 COMP( 1988, fccpu30,        0,       0,      cpu30,         cpu30, cpu30_state, empty_init,      "Force Computers GmbH", "SYS68K/CPU-30",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

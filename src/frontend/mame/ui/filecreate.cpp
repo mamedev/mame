@@ -53,11 +53,11 @@ CONFIRM SAVE AS MENU
 //  ctor
 //-------------------------------------------------
 
-menu_confirm_save_as::menu_confirm_save_as(mame_ui_manager &mui, render_container &container, bool *yes)
+menu_confirm_save_as::menu_confirm_save_as(mame_ui_manager &mui, render_container &container, bool &yes)
 	: menu(mui, container)
+	, m_yes(yes)
 {
-	m_yes = yes;
-	*m_yes = false;
+	m_yes = false;
 }
 
 
@@ -86,17 +86,19 @@ void menu_confirm_save_as::populate()
 //  handle - confirm save as menu
 //-------------------------------------------------
 
-void menu_confirm_save_as::handle(event const *ev)
+bool menu_confirm_save_as::handle(event const *ev)
 {
 	// process the event
 	if (ev && (ev->iptkey == IPT_UI_SELECT))
 	{
 		if (ev->itemref == ITEMREF_YES)
-			*m_yes = true;
+			m_yes = true;
 
 		// no matter what, pop out
 		stack_pop();
 	}
+
+	return false;
 }
 
 
@@ -207,56 +209,64 @@ void menu_file_create::populate()
 //  handle - file creator menu
 //-------------------------------------------------
 
-void menu_file_create::handle(event const *ev)
+bool menu_file_create::handle(event const *ev)
 {
-	// process the event
-	if (ev)
+	if (!ev)
+		return false;
+
+	// handle selections
+	switch (ev->iptkey)
 	{
-		// handle selections
-		switch (ev->iptkey)
+	case IPT_UI_SELECT:
+		if ((ev->itemref == ITEMREF_CREATE) || (ev->itemref == ITEMREF_NEW_IMAGE_NAME))
 		{
-		case IPT_UI_SELECT:
-			if ((ev->itemref == ITEMREF_CREATE) || (ev->itemref == ITEMREF_NEW_IMAGE_NAME))
+			std::string tmp_file(m_filename);
+			if (tmp_file.find('.') != -1 && tmp_file.find('.') < tmp_file.length() - 1)
 			{
-				std::string tmp_file(m_filename);
-				if (tmp_file.find('.') != -1 && tmp_file.find('.') < tmp_file.length() - 1)
-				{
-					m_current_file = m_filename;
-					m_ok = true;
-					stack_pop();
-				}
-				else
-				{
-					ui().popup_time(1, "%s", _("Please enter a file extension too"));
-				}
+				m_current_file = m_filename;
+				m_ok = true;
+				stack_pop();
 			}
-			break;
-
-		case IPT_UI_PASTE:
-			if (ev->itemref == ITEMREF_NEW_IMAGE_NAME)
+			else
 			{
-				if (paste_text(m_filename, &osd_is_valid_filename_char))
-					ev->item->set_subtext(m_filename + "_");
+				ui().popup_time(1, "%s", _("Please enter a file extension too"));
 			}
-			break;
-
-		case IPT_SPECIAL:
-			if (ev->itemref == ITEMREF_NEW_IMAGE_NAME)
-			{
-				if (input_character(m_filename, ev->unichar, &osd_is_valid_filename_char))
-					ev->item->set_subtext(m_filename + "_");
-			}
-			break;
-
-		case IPT_UI_CANCEL:
-			if ((ev->itemref == ITEMREF_NEW_IMAGE_NAME) && !m_filename.empty())
-			{
-				m_filename.clear();
-				ev->item->set_subtext("_");
-			}
-			break;
 		}
+		break;
+
+	case IPT_UI_PASTE:
+		if (ev->itemref == ITEMREF_NEW_IMAGE_NAME)
+		{
+			if (paste_text(m_filename, &osd_is_valid_filename_char))
+			{
+				ev->item->set_subtext(m_filename + "_");
+				return true;
+			}
+		}
+		break;
+
+	case IPT_SPECIAL:
+		if (ev->itemref == ITEMREF_NEW_IMAGE_NAME)
+		{
+			if (input_character(m_filename, ev->unichar, &osd_is_valid_filename_char))
+			{
+				ev->item->set_subtext(m_filename + "_");
+				return true;
+			}
+		}
+		break;
+
+	case IPT_UI_CANCEL:
+		if ((ev->itemref == ITEMREF_NEW_IMAGE_NAME) && !m_filename.empty())
+		{
+			m_filename.clear();
+			ev->item->set_subtext("_");
+			return true;
+		}
+		break;
 	}
+
+	return false;
 }
 
 
@@ -308,7 +318,7 @@ void menu_select_format::populate()
 //  handle
 //-------------------------------------------------
 
-void menu_select_format::handle(event const *ev)
+bool menu_select_format::handle(event const *ev)
 {
 	// process the menu
 	if (ev && ev->iptkey == IPT_UI_SELECT)
@@ -316,6 +326,8 @@ void menu_select_format::handle(event const *ev)
 		*m_result = (floppy_image_format_t *)ev->itemref;
 		stack_pop();
 	}
+
+	return false;
 }
 
 
@@ -362,7 +374,7 @@ void menu_select_floppy_init::populate()
 //  handle
 //-------------------------------------------------
 
-void menu_select_floppy_init::handle(event const *ev)
+bool menu_select_floppy_init::handle(event const *ev)
 {
 	// process the menu
 	if (ev && ev->iptkey == IPT_UI_SELECT)
@@ -370,6 +382,8 @@ void menu_select_floppy_init::handle(event const *ev)
 		*m_result = int(uintptr_t(ev->itemref));
 		stack_pop();
 	}
+
+	return false;
 }
 
 

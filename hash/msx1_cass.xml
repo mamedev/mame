@@ -5115,7 +5115,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Tecno Soft</publisher>
 		<info name="serial" value="TMS-001"/>
- 		<info name="usage" value="Load with CLOAD + RUN. Requires a Japanese machine."/>
+		<info name="usage" value="Load with CLOAD + RUN. Requires a Japanese machine."/>
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="28798">

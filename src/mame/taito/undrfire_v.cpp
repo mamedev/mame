@@ -452,12 +452,9 @@ u32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind16 &
 /* Enable this to see rotation (?) control words */
 #if 0
 	{
-		char buf[80];
-		int i;
-
-		for (i = 0; i < 8; i += 1)
+		for (auto i = 0; i < 8; i += 1)
 		{
-			sprintf (buf, "%02x: %04x", i, m_rotate_ctrl[i]);
+			auto buf = util::string_format("%02x: %04x", i, m_rotate_ctrl[i]);
 			ui_draw_text (buf, 0, i*8);
 		}
 	}
@@ -607,12 +604,9 @@ u32 undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind16 &
 /* Enable this to see rotation (?) control words */
 #if 0
 	{
-		char buf[80];
-		int i;
-
-		for (i = 0; i < 8; i += 1)
+		for (auto i = 0; i < 8; i += 1)
 		{
-			sprintf (buf, "%02x: %04x", i, m_rotate_ctrl[i]);
+			auto buf = util::string_format("%02x: %04x", i, m_rotate_ctrl[i]);
 			ui_draw_text (buf, 0, i*8);
 		}
 	}

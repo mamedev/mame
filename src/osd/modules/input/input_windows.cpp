@@ -65,14 +65,6 @@ bool windows_osd_interface::handle_input_event(input_event eventid, void *eventd
 	return handled;
 }
 
-void windows_osd_interface::poll_input(running_machine &machine) const
-{
-	m_keyboard_input->poll_if_necessary();
-	m_mouse_input->poll_if_necessary();
-	m_lightgun_input->poll_if_necessary();
-	m_joystick_input->poll_if_necessary();
-}
-
 //============================================================
 //  customize_input_type_list
 //============================================================

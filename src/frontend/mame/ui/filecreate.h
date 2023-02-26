@@ -27,14 +27,14 @@ namespace ui {
 class menu_confirm_save_as : public menu
 {
 public:
-	menu_confirm_save_as(mame_ui_manager &mui, render_container &container, bool *yes);
+	menu_confirm_save_as(mame_ui_manager &mui, render_container &container, bool &yes);
 	virtual ~menu_confirm_save_as() override;
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
-	bool *m_yes;
+	bool &m_yes;
 };
 
 
@@ -53,7 +53,7 @@ protected:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	bool &                          m_ok;
 	device_image_interface *        m_image;
@@ -74,7 +74,7 @@ public:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	// internal state
 	std::vector<const floppy_image_format_t *> m_formats;
@@ -93,7 +93,7 @@ public:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	// internal state
 	std::vector<std::reference_wrapper<const floppy_image_device::fs_info>> m_fs;

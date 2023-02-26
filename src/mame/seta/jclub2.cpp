@@ -241,6 +241,7 @@ public:
 	void init_darkhors();
 
 	void darkhors(machine_config &config);
+	void darkhorsa(machine_config &config);
 
 protected:
 	virtual void video_start() override;
@@ -260,6 +261,7 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void darkhors_map(address_map &map);
+	void darkhorsa_map(address_map &map);
 
 	required_shared_ptr<uint32_t> m_tmapram;
 	required_shared_ptr<uint32_t> m_tmapscroll;
@@ -840,6 +842,15 @@ void darkhors_state::darkhors_map(address_map &map)
 	map(0x8c0130, 0x8c013f).writeonly().share("tmapscroll2");
 }
 
+void darkhors_state::darkhorsa_map(address_map &map)
+{
+	darkhors_map(map);
+
+	map(0x8c0020, 0x8c002f).writeonly().share("tmapscroll");
+	map(0x8c0030, 0x8c003f).writeonly().share("tmapscroll2");
+	map(0x8c0120, 0x8c012f).unmaprw();
+	map(0x8c0130, 0x8c013f).unmaprw();
+}
 
 /***************************************************************************
 
@@ -1267,6 +1278,12 @@ void darkhors_state::darkhors(machine_config &config)
 	OKIM6295(config, "oki", 528000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
 }
 
+void darkhors_state::darkhorsa(machine_config &config)
+{
+	darkhors(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &darkhors_state::darkhorsa_map);
+}
 
 /***************************************************************************
 
@@ -1526,6 +1543,30 @@ ROM_START( darkhors )
 ROM_END
 
 
+ROM_START( jclub2bl )
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68EC020 code
+	ROM_LOAD32_WORD_SWAP( "154.4002", 0x00000, 0x80000, CRC(b892c254) SHA1(c1c31d878f41e4751048c07055d426803cd3332d) ) // 27 JUN. 1997
+	ROM_LOAD32_WORD_SWAP( "155.4002", 0x00002, 0x80000, CRC(3d9061c0) SHA1(efd2c8d742d3ac097f0228c2b71453b3261a6d83) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) // not dumped yet, should be closer to the original (no Dark Horse GFX)
+	ROM_LOAD( "gfx1", 0x000000, 0x80000, BAD_DUMP CRC(e9fe9967) SHA1(a79d75c09f0eac6372de8d6e98c5eecf38ef750c) )
+	ROM_LOAD( "gfx2", 0x080000, 0x80000, BAD_DUMP CRC(0853c5c5) SHA1(2b49ffe607278817f1f8219a79f5906be53ee6f4) )
+	ROM_LOAD( "gfx3", 0x100000, 0x80000, BAD_DUMP CRC(6e89278f) SHA1(044c15e00ea95fd3f108fa916000a1000789c8e8) )
+	ROM_LOAD( "gfx4", 0x180000, 0x80000, BAD_DUMP CRC(f28407ab) SHA1(47933719cff8099fc079fd736b4b08176f3aff66) )
+	ROM_LOAD( "gfx5", 0x200000, 0x80000, BAD_DUMP CRC(281402cd) SHA1(77f8e5e02c6e7161299c06e65a078c1cdda1ba66) )
+	ROM_LOAD( "gfx6", 0x280000, 0x80000, BAD_DUMP CRC(8ea0149b) SHA1(7792fd7e07a7baa4e15f50b6528c78fb15b40b40) )
+	ROM_LOAD( "gfx7", 0x300000, 0x80000, BAD_DUMP CRC(504bf849) SHA1(13a184ec9e176371808938015111f8918cb4df7d) ) // FIXED BITS (11111111)
+	ROM_FILL(         0x300000, 0x80000, 0x00 ) // a zero-fill seems fine
+	ROM_LOAD( "gfx8", 0x380000, 0x80000, BAD_DUMP CRC(590bec2a) SHA1(7fdbb21f1a3eccde65e91eb2443a0e01487c59c3) ) // 000xxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x80000, "oki", 0 ) // Samples
+	ROM_LOAD( "snd", 0x00000, 0x80000, CRC(7aeb12d3) SHA1(3e81725fc206baa7559da87552a0cd73b7616155) ) // same as darkhors
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // EEPROM
+	ROM_LOAD( "93c46", 0x000, 0x080, CRC(32ea730a) SHA1(20a6a8259425c3c867319db49b27700b75e8e471) ) // (SETA1997JC2W400 )
+ROM_END
+
+
 /***************************************************************************
 
                                 Game Drivers
@@ -1572,3 +1613,4 @@ GAME( 1997, jclub2v205, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_
 GAME( 1998, jclub2v220, jclub2v112, jclub2,   jclub2v112, jclub2_state,   empty_init,    ROT0, "Seta",    "Jockey Club II (v2.20X, newer hardware)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // Bootleg hardware
 GAME( 2001, darkhors,   jclub2v112, darkhors, darkhors,   darkhors_state, init_darkhors, ROT0, "bootleg", "Dark Horse (USA v4.00, bootleg of Jockey Club II)",     MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, jclub2bl,   jclub2v112, darkhorsa,darkhors,   darkhors_state, init_darkhors, ROT0, "bootleg", "Jockey Club II (USA v4.00, bootleg)",                   MACHINE_IMPERFECT_GRAPHICS )

@@ -1493,7 +1493,7 @@ void debug_imgui::init_debugger(running_machine &machine)
 	m_mapping[ITEM_ID_LEFT] = ImGuiKey_LeftArrow;
 	m_mapping[ITEM_ID_RIGHT] = ImGuiKey_RightArrow;
 	m_mapping[ITEM_ID_UP] = ImGuiKey_UpArrow;
-	m_mapping[ITEM_ID_DOWN] = ImGuiKey_DownArrow;	
+	m_mapping[ITEM_ID_DOWN] = ImGuiKey_DownArrow;
 	m_mapping[ITEM_ID_F3] = ImGuiKey_F3;
 	m_mapping[ITEM_ID_F5] = ImGuiKey_F5;
 	m_mapping[ITEM_ID_F6] = ImGuiKey_F6;

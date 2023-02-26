@@ -23,6 +23,8 @@
 #include "modules/lib/osdlib.h"
 #include "modules/monitor/monitor_module.h"
 
+extern void MacPollInputs(); // in windowcontroller.mm
+
 //============================================================
 //  CONSTANTS
 //============================================================
@@ -120,46 +122,46 @@ void mac_osd_interface::update(bool skip_redraw)
 //  input_update
 //============================================================
 
-void mac_osd_interface::input_update()
+void mac_osd_interface::input_update(bool relative_reset)
 {
 	// poll the joystick values here
 	process_events_buf();
-	poll_inputs(machine());
-	check_osd_inputs(machine());
+	MacPollInputs();
+	poll_input_modules(relative_reset);
 }
 
 //============================================================
 //  check_osd_inputs
 //============================================================
 
-static void check_osd_inputs(running_machine &machine)
+void mac_osd_interface::check_osd_inputs()
 {
 	// check for toggling fullscreen mode
-	if (machine.ui_input().pressed(IPT_OSD_1))
+	if (machine().ui_input().pressed(IPT_OSD_1))
 	{
 		// destroy the renderers first so that the render module can bounce if it depends on having a window handle
-		for (auto it = osd_common_t::window_list().rbegin(); osd_common_t::window_list().rend() != it; ++it)
+		for (auto it = window_list().rbegin(); window_list().rend() != it; ++it)
 			(*it)->renderer_reset();
-		for (auto const &curwin : osd_common_t::window_list())
+		for (auto const &curwin : window_list())
 			dynamic_cast<mac_window_info &>(*curwin).toggle_full_screen();
 	}
 
-	auto const &window = osd_common_t::window_list().front();
+	auto const &window = window_list().front();
 
 	//FIXME: on a per window basis
-	if (machine.ui_input().pressed(IPT_OSD_5))
+	if (machine().ui_input().pressed(IPT_OSD_5))
 	{
 		video_config.filter = !video_config.filter;
-		machine.ui().popup_time(1, "Filter %s", video_config.filter? "enabled":"disabled");
+		machine().ui().popup_time(1, "Filter %s", video_config.filter? "enabled":"disabled");
 	}
 
-	if (machine.ui_input().pressed(IPT_OSD_6))
+	if (machine().ui_input().pressed(IPT_OSD_6))
 		dynamic_cast<mac_window_info &>(*window).modify_prescale(-1);
 
-	if (machine.ui_input().pressed(IPT_OSD_7))
+	if (machine().ui_input().pressed(IPT_OSD_7))
 		dynamic_cast<mac_window_info &>(*window).modify_prescale(1);
 
-	if (machine.ui_input().pressed(IPT_OSD_8))
+	if (machine().ui_input().pressed(IPT_OSD_8))
 		window->renderer().record();
 }
 

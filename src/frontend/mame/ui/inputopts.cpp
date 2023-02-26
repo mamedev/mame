@@ -111,7 +111,7 @@ void menu_input_options::populate()
 }
 
 
-void menu_input_options::handle(event const *ev)
+bool menu_input_options::handle(event const *ev)
 {
 	if (ev && (IPT_UI_SELECT == ev->iptkey))
 	{
@@ -137,6 +137,8 @@ void menu_input_options::handle(event const *ev)
 			break;
 		}
 	}
+
+	return false;
 }
 
 } // namespace ui

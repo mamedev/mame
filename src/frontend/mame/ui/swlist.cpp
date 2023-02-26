@@ -124,9 +124,8 @@ void menu_software_parts::populate()
 //  handle
 //-------------------------------------------------
 
-void menu_software_parts::handle(event const *ev)
+bool menu_software_parts::handle(event const *ev)
 {
-	// process the menu
 	if (ev && (ev->iptkey == IPT_UI_SELECT) && ev->itemref)
 	{
 		software_part_menu_entry *entry = (software_part_menu_entry *)ev->itemref;
@@ -134,6 +133,8 @@ void menu_software_parts::handle(event const *ev)
 		*m_selected_part = entry->part;
 		stack_pop();
 	}
+
+	return false;
 }
 
 
@@ -286,54 +287,78 @@ void menu_software_list::populate()
 //  handle
 //-------------------------------------------------
 
-void menu_software_list::handle(event const *ev)
+bool menu_software_list::handle(event const *ev)
 {
-	// process the menu
-	if (ev)
+	if (!ev)
 	{
-		if (ev->iptkey == IPT_UI_SELECT)
+		return false;
+	}
+	else if (ev->iptkey == IPT_UI_SELECT)
+	{
+		if (ev->itemref == ITEMREF_SWITCH_ITEM_ORDERING)
 		{
-			if (ev->itemref == ITEMREF_SWITCH_ITEM_ORDERING)
-			{
-				m_ordered_by_shortname = !m_ordered_by_shortname;
+			m_ordered_by_shortname = !m_ordered_by_shortname;
 
-				// reset the char buffer if we change ordering criterion
-				m_search.clear();
+			// reset the char buffer if we change ordering criterion
+			m_search.clear();
 
-				// reload the menu with the new order
-				reset(reset_options::REMEMBER_REF);
-				machine().popmessage(
-						m_ordered_by_shortname
-							? _("Switched Order: entries now ordered by shortname")
-							: _("Switched Order: entries now ordered by description"));
-			}
-			else if (ev->itemref)
-			{
-				// handle selections
-				entry_info *info = (entry_info *)ev->itemref;
-				m_result = info->short_name;
-				stack_pop();
-			}
+			// reload the menu with the new order
+			reset(reset_options::REMEMBER_REF);
+			machine().popmessage(
+					m_ordered_by_shortname
+						? _("Switched Order: entries now ordered by shortname")
+						: _("Switched Order: entries now ordered by description"));
 		}
-		else if (ev->iptkey == IPT_UI_PASTE)
+		else if (ev->itemref)
 		{
-			if (paste_text(m_search, m_ordered_by_shortname ? is_valid_softlist_part_char : uchar_is_printable))
-				update_search(ev->itemref);
+			// handle selections
+			entry_info *info = (entry_info *)ev->itemref;
+			m_result = info->short_name;
+			stack_pop();
 		}
-		else if (ev->iptkey == IPT_SPECIAL)
+		return false;
+	}
+	else if (ev->iptkey == IPT_UI_PASTE)
+	{
+		if (paste_text(m_search, m_ordered_by_shortname ? is_valid_softlist_part_char : uchar_is_printable))
 		{
-			if (input_character(m_search, ev->unichar, m_ordered_by_shortname ? is_valid_softlist_part_char : uchar_is_printable))
-				update_search(ev->itemref);
+			update_search(ev->itemref);
+			return true;
 		}
-		else if (ev->iptkey == IPT_UI_CANCEL)
+		else
 		{
-			// reset the char buffer also in this case
-			if (!m_search.empty())
-			{
-				m_search.clear();
-				ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_search);
-			}
+			return false;
 		}
+	}
+	else if (ev->iptkey == IPT_SPECIAL)
+	{
+		if (input_character(m_search, ev->unichar, m_ordered_by_shortname ? is_valid_softlist_part_char : uchar_is_printable))
+		{
+			update_search(ev->itemref);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else if (ev->iptkey == IPT_UI_CANCEL)
+	{
+		// reset the char buffer also in this case
+		if (!m_search.empty())
+		{
+			m_search.clear();
+			ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_search);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
 	}
 }
 
@@ -420,15 +445,16 @@ void menu_software::populate()
 //  handle
 //-------------------------------------------------
 
-void menu_software::handle(event const *ev)
+bool menu_software::handle(event const *ev)
 {
-	// process the menu
 	if (ev && (ev->iptkey == IPT_UI_SELECT))
 	{
 		//menu::stack_push<menu_software_list>(ui(), container(), (software_list_config *)ev->itemref, image);
 		*m_result = reinterpret_cast<software_list_device *>(ev->itemref);
 		stack_pop();
 	}
+
+	return false;
 }
 
 } // namespace ui

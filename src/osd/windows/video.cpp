@@ -114,12 +114,11 @@ void windows_osd_interface::update(bool skip_redraw)
 //  input_update
 //============================================================
 
-void windows_osd_interface::input_update()
+void windows_osd_interface::input_update(bool relative_reset)
 {
 	// poll the joystick values here
 	process_events(true, false);
-	poll_input(machine());
-	check_osd_inputs();
+	poll_input_modules(relative_reset);
 }
 
 //============================================================

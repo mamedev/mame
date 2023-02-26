@@ -2655,19 +2655,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/ncr539x.h,MACHINES["NCR539x"] = true
----------------------------------------------------
-
-if (MACHINES["NCR539x"]~=null) then
-	MACHINES["SCSI"] = true
-	files {
-		MAME_DIR .. "src/devices/machine/ncr539x.cpp",
-		MAME_DIR .. "src/devices/machine/ncr539x.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/nmc9306.h,MACHINES["NMC9306"] = true
 ---------------------------------------------------
 
@@ -5136,5 +5123,17 @@ if (MACHINES["MC88200"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/mc88200.cpp",
 		MAME_DIR .. "src/devices/machine/mc88200.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/pccard_sram.h,MACHINES["PCCARD_SRAM"] = true
+---------------------------------------------------
+
+if (MACHINES["PCCARD_SRAM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/pccard_sram.cpp",
+		MAME_DIR .. "src/devices/machine/pccard_sram.h",
 	}
 end

@@ -15793,10 +15793,11 @@ cmpchess2
 cncchess
 
 @source:chess/conchess.cpp
-concply5
-concply8
-concplyv
-concstd
+conc
+concams5
+concams8
+concgla
+concvicp
 
 @source:chess/conic_cchess2.cpp
 cncchess2
@@ -29352,6 +29353,10 @@ magjoker                        // (c) 2000 BRL S.R.L. Bologna
 @source:misc/galgame.cpp
 galgame                         // (c) 1971 Computer Recreations, Inc
 
+@source:misc/gameace.cpp
+hotbody
+hotbodya
+
 @source:misc/gambl186.cpp
 gambl186                        // EGD
 gambl186a                       // EGD
@@ -30629,7 +30634,7 @@ npusagif                        //
 
 @source:misc/news.cpp
 news                            // "Virus"??? ((c) 1993 Poby in ROM VIRUS.4)
-newsa                           // "Jeansole / Poby
+newsa                           // "Jeansole / Poby"
 
 @source:misc/nexus3d.cpp
 acheart                         //
@@ -30704,7 +30709,7 @@ onetwoe                         // (c) 1997 Barko
 
 @source:misc/opercoin.cpp
 multibaby                       // (c) 1990 Oper Coin
-spirulo                         // (c) 19?? Oper Coin
+spirulo                         // (c) 1988 Oper Coin
 
 @source:misc/othello.cpp
 othello                         // (c) 1984 Success.
@@ -34193,6 +34198,8 @@ vandykejal2                     // UPL-90064 (c) Jaleco
 @source:nmk/nmkmedal.cpp
 drail                           // NTC / NMK
 hpierrot                        // NTC / NMK
+omatsuri                        // NMK
+sweethrt                        // NMK
 trocana                         // NTC / NMK
 
 @source:nmk/powerins.cpp
@@ -37873,6 +37880,7 @@ tkingb
 sstar28k
 sstar36k
 tstar432
+tstar432a
 
 @source:samcoupe/samcoupe.cpp
 samcoupe                        // 1989 Sam Coupe
@@ -40087,6 +40095,7 @@ hanaawas                        // (c) SetaKikaku
 
 @source:seta/jclub2.cpp
 darkhors                        // bootleg of Jockey Club II
+jclub2bl                        // bootleg of Jockey Club II
 jclub2v100                      // v1.00       5 OCT. 1994
 jclub2v101                      // v1.01      20 FEB. 1995
 jclub2v110                      // v1.10X      5 MAY. 1996
@@ -41487,6 +41496,7 @@ nws1580                         // Sony NEWS NWS-1580
 
 @source:sony/news_r3k.cpp
 nws3260                         // Sony NEWS NWS-3260
+nws3410                         // Sony NEWS NWS-3410
 
 @source:sony/news_r4k.cpp
 nws5000x                        // Sony NEWS NWS-5000X
@@ -42322,7 +42332,8 @@ rollace                         // (c) 1983 Williams
 rollace2                        // (c) 1983 Williams
 
 @source:taito/sbmjb.cpp
-sbmjb                           // E41 (c) 1998 Taito
+honooinv                        // E41 (c) 1997 Taito
+sbmjb                           // ??? (c) 1998 Taito
 
 @source:taito/sbowling.cpp
 sbowling                        // KB  (c) 1982 Taito Corporation
@@ -42969,6 +42980,7 @@ holeland2                       // (c) 1984
 sauro                           // (c) 1987
 sauroa                          // (c) 1987
 saurob                          // (c) 1987
+sauroc                          // (c) 1987
 saurobl                         // (c) 1987 bootleg
 saurop                          // (c) 1987
 saurorr                         // (c) 1987
