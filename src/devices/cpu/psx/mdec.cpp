@@ -17,7 +17,7 @@
 #define LOG_COMMAND (1U << 2)
 
 #define VERBOSE ( 0 )
-#include "logerror.h"
+#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(PSX_MDEC, psxmdec_device, "psxmdec", "Sony PSX MDEC")
 

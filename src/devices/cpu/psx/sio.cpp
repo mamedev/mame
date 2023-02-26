@@ -13,8 +13,8 @@
 //#define LOG_GENERAL (1U << 0)
 #define LOG_TIMER (1U << 1)
 
-#define VERBOSE_LEVEL ( 0 )
-#include "logerror.h"
+#define VERBOSE ( 0 )
+#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(PSX_SIO0, psxsio0_device, "psxsio0", "Sony PSX SIO-0")
 DEFINE_DEVICE_TYPE(PSX_SIO1, psxsio1_device, "psxsio1", "Sony PSX SIO-1")
@@ -323,7 +323,7 @@ uint32_t psxsio_device::read(offs_t offset, uint32_t mem_mask)
 		break;
 	default:
 		data = 0;
-		logerror( "%s: psx_sio_r( %08x, %08x ) %08x\n", machine().describe_context() offset, mem_mask, data );
+		logerror( "%s: psx_sio_r( %08x, %08x ) %08x\n", machine().describe_context(), offset, mem_mask, data );
 		break;
 	}
 	return data;
