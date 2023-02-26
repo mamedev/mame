@@ -10,22 +10,12 @@
 #include "emu.h"
 #include "dma.h"
 
-#include <cstdarg>
+//#define LOG_GENERAL (1U << 0)
+#define LOG_CONTROL (1U << 1)
+#define LOG_INTERRUPT (1U << 2)
 
-#define VERBOSE_LEVEL ( 0 )
-
-static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, const char *s_fmt, ... )
-{
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		device.logerror( "%s: %s", device.machine().describe_context(), buf );
-	}
-}
+#define VERBOSE (0)
+#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(PSX_DMA, psxdma_device, "psxdma", "Sony PSX DMA")
 
@@ -119,13 +109,13 @@ void psxdma_device::dma_interrupt_update()
 
 	if( ( n_mask & 0x80 ) != 0 && ( n_int & n_mask ) != 0 )
 	{
-		verboselog( *this, 2, "dma_interrupt_update( %02x, %02x ) interrupt triggered\n", n_int, n_mask );
+		LOGMASKED( LOG_INTERRUPT, "dma_interrupt_update( %02x, %02x ) interrupt triggered\n", machine().describe_context(), n_int, n_mask );
 		m_dicr |= 0x80000000;
 		m_irq_handler(1);
 	}
 	else if( n_int != 0 )
 	{
-		verboselog( *this, 2, "dma_interrupt_update( %02x, %02x ) interrupt not enabled\n", n_int, n_mask );
+		LOGMASKED( LOG_INTERRUPT, "dma_interrupt_update( %02x, %02x ) interrupt not enabled\n", machine().describe_context(), n_int, n_mask );
 	}
 	m_dicr &= 0x00ffffff | ( m_dicr << 8 );
 }
@@ -218,15 +208,15 @@ void psxdma_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 		switch( offset % 4 )
 		{
 		case 0:
-			verboselog( *this, 2, "dmabase( %d ) = %08x\n", index, data );
+			LOGMASKED( LOG_CONTROL, "%s: dmabase( %d ) = %08x\n", machine().describe_context(), index, data );
 			dma->n_base = data;
 			break;
 		case 1:
-			verboselog( *this, 2, "dmablockcontrol( %d ) = %08x\n", index, data );
+			LOGMASKED( LOG_CONTROL, "%s: dmablockcontrol( %d ) = %08x\n", machine().describe_context(), index, data );
 			dma->n_blockcontrol = data;
 			break;
 		case 2:
-			verboselog( *this, 2, "dmachannelcontrol( %d ) = %08x\n", index, data );
+			LOGMASKED( LOG_CONTROL, "%s: dmachannelcontrol( %d ) = %08x\n", machine().describe_context(), index, data );
 			dma->n_channelcontrol = data;
 			if( ( dma->n_channelcontrol & ( 1L << 0x18 ) ) != 0 && ( m_dpcp & ( 1 << ( 3 + ( index * 4 ) ) ) ) != 0 )
 			{
@@ -253,14 +243,14 @@ void psxdma_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 				if( dma->n_channelcontrol == 0x01000000 &&
 					!dma->fn_read.isnull() )
 				{
-					verboselog( *this, 1, "dma %d read block %08x %08x\n", index, n_address, n_size );
+					LOG( "%s: dma %d read block %08x %08x\n", machine().describe_context(), index, n_address, n_size );
 					dma->fn_read( m_ram, n_address, n_size );
 					dma_finished( index );
 				}
 				else if ((dma->n_channelcontrol & 0xffbffeff) == 0x11000000 && // CD DMA
 					!dma->fn_read.isnull() )
 				{
-					verboselog( *this, 1, "dma %d read block %08x %08x\n", index, n_address, n_size );
+					LOG( "%s: dma %d read block %08x %08x\n", machine().describe_context(), index, n_address, n_size );
 
 					// pSX's CD DMA size calc formula
 					int oursize = (dma->n_blockcontrol>>16);
@@ -273,7 +263,7 @@ void psxdma_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 				else if( dma->n_channelcontrol == 0x01000200 &&
 					!dma->fn_read.isnull() )
 				{
-					verboselog( *this, 1, "dma %d read block %08x %08x\n", index, n_address, n_size );
+					LOG( "%s: dma %d read block %08x %08x\n", machine().describe_context(), index, n_address, n_size );
 					dma->fn_read( m_ram, n_address, n_size );
 					if( index == 1 )
 					{
@@ -287,7 +277,7 @@ void psxdma_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 				else if( dma->n_channelcontrol == 0x01000201 &&
 					!dma->fn_write.isnull() )
 				{
-					verboselog( *this, 1, "dma %d write block %08x %08x\n", index, n_address, n_size );
+					LOG( "%s: dma %d write block %08x %08x\n", machine().describe_context(), index, n_address, n_size );
 					dma->fn_write( m_ram, n_address, n_size );
 					dma_finished( index );
 				}
@@ -295,7 +285,7 @@ void psxdma_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 					!dma->fn_write.isnull() )
 				{
 					/* todo: check this is a write not a read... */
-					verboselog( *this, 1, "dma %d write block %08x %08x\n", index, n_address, n_size );
+					LOG( "%s: dma %d write block %08x %08x\n", machine().describe_context(), index, n_address, n_size );
 					dma->fn_write( m_ram, n_address, n_size );
 					dma_finished( index );
 				}
@@ -303,7 +293,7 @@ void psxdma_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 					!dma->fn_write.isnull() )
 				{
 					/* todo: check this is a write not a read... */
-					verboselog( *this, 1, "dma %d write block %08x %08x\n", index, n_address, n_size );
+					LOG( "%s: dma %d write block %08x %08x\n", machine().describe_context(), index, n_address, n_size );
 					dma->fn_write( m_ram, n_address, n_size );
 					dma_finished( index );
 				}
@@ -311,16 +301,14 @@ void psxdma_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 					index == 2 &&
 					!dma->fn_write.isnull() )
 				{
-					verboselog( *this, 1, "dma %d write linked list %08x\n",
-						index, dma->n_base );
+					LOG( "%s: dma %d write linked list %08x\n", machine().describe_context(), index, dma->n_base );
 
 					dma_finished( index );
 				}
 				else if( dma->n_channelcontrol == 0x11000002 &&
 					index == 6 )
 				{
-					verboselog( *this, 1, "dma 6 reverse clear %08x %08x\n",
-						dma->n_base, dma->n_blockcontrol );
+					LOG( "%s: dma 6 reverse clear %08x %08x\n", machine().describe_context(), dma->n_base, dma->n_blockcontrol );
 					if( n_size > 0 )
 					{
 						n_size--;
@@ -337,16 +325,16 @@ void psxdma_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 				}
 				else
 				{
-					verboselog( *this, 1, "dma %d unknown mode %08x\n", index, dma->n_channelcontrol );
+					LOG( "%s: dma %d unknown mode %08x\n", machine().describe_context(), index, dma->n_channelcontrol );
 				}
 			}
 			else if( dma->n_channelcontrol != 0 )
 			{
-				verboselog( *this, 1, "psx_dma_w( %04x, %08x, %08x ) channel not enabled\n", offset, dma->n_channelcontrol, mem_mask );
+				LOG( "%s: psx_dma_w( %04x, %08x, %08x ) channel not enabled\n", machine().describe_context(), offset, dma->n_channelcontrol, mem_mask );
 			}
 			break;
 		default:
-			verboselog( *this, 1, "psx_dma_w( %04x, %08x, %08x ) Unknown dma channel register\n", offset, data, mem_mask );
+			LOG( "%s: psx_dma_w( %04x, %08x, %08x ) Unknown dma channel register\n", machine().describe_context(), offset, data, mem_mask );
 			break;
 		}
 	}
@@ -355,7 +343,7 @@ void psxdma_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 		switch( offset % 4 )
 		{
 		case 0x0:
-			verboselog( *this, 1, "psx_dma_w( %04x, %08x, %08x ) dpcp\n", offset, data, mem_mask );
+			LOG( "%s: psx_dma_w( %04x, %08x, %08x ) dpcp\n", machine().describe_context(), offset, data, mem_mask );
 			m_dpcp = ( m_dpcp & ~mem_mask ) | data;
 			break;
 		case 0x1:
@@ -366,14 +354,14 @@ void psxdma_device::write(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 			if( ( m_dicr & 0x80000000 ) != 0 && ( m_dicr & 0x7f000000 ) == 0 )
 			{
-				verboselog( *this, 2, "dma interrupt cleared\n" );
+				LOGMASKED( LOG_INTERRUPT, "%s: dma interrupt cleared\n", machine().describe_context() );
 				m_dicr &= ~0x80000000;
 			}
 
-			verboselog( *this, 1, "psx_dma_w( %04x, %08x, %08x ) dicr -> %08x\n", offset, data, mem_mask, m_dicr );
+			LOG( "%s: psx_dma_w( %04x, %08x, %08x ) dicr -> %08x\n", machine().describe_context(), offset, data, mem_mask, m_dicr );
 			break;
 		default:
-			verboselog( *this, 0, "psx_dma_w( %04x, %08x, %08x ) Unknown dma control register\n", offset, data, mem_mask );
+			logerror( "%s: psx_dma_w( %04x, %08x, %08x ) Unknown dma control register\n", machine().describe_context(), offset, data, mem_mask );
 			break;
 		}
 	}
@@ -389,16 +377,16 @@ uint32_t psxdma_device::read(offs_t offset, uint32_t mem_mask)
 		switch( offset % 4 )
 		{
 		case 0:
-			verboselog( *this, 1, "psx_dma_r dmabase[ %d ] ( %08x )\n", index, dma->n_base );
+			LOG( "%s: psx_dma_r dmabase[ %d ] ( %08x )\n", machine().describe_context(), index, dma->n_base );
 			return dma->n_base;
 		case 1:
-			verboselog( *this, 1, "psx_dma_r dmablockcontrol[ %d ] ( %08x )\n", index, dma->n_blockcontrol );
+			LOG( "%s: psx_dma_r dmablockcontrol[ %d ] ( %08x )\n", machine().describe_context(), index, dma->n_blockcontrol );
 			return dma->n_blockcontrol;
 		case 2:
-			verboselog( *this, 1, "psx_dma_r dmachannelcontrol[ %d ] ( %08x )\n", index, dma->n_channelcontrol );
+			LOG( "%s: psx_dma_r dmachannelcontrol[ %d ] ( %08x )\n", machine().describe_context(), index, dma->n_channelcontrol );
 			return dma->n_channelcontrol;
 		default:
-			verboselog( *this, 0, "psx_dma_r( %08x, %08x ) Unknown dma channel register\n", offset, mem_mask );
+			logerror( "%s: psx_dma_r( %08x, %08x ) Unknown dma channel register\n", machine().describe_context(), offset, mem_mask );
 			break;
 		}
 	}
@@ -407,13 +395,13 @@ uint32_t psxdma_device::read(offs_t offset, uint32_t mem_mask)
 		switch( offset % 4 )
 		{
 		case 0x0:
-			verboselog( *this, 1, "psx_dma_r dpcp ( %08x )\n", m_dpcp );
+			LOG( "%s: psx_dma_r dpcp ( %08x )\n", machine().describe_context(), m_dpcp );
 			return m_dpcp;
 		case 0x1:
-			verboselog( *this, 1, "psx_dma_r dicr ( %08x )\n", m_dicr );
+			LOG( "%s: psx_dma_r dicr ( %08x )\n", machine().describe_context(), m_dicr );
 			return m_dicr;
 		default:
-			verboselog( *this, 0, "psx_dma_r( %08x, %08x ) Unknown dma control register\n", offset, mem_mask );
+			logerror( "%s: psx_dma_r( %08x, %08x ) Unknown dma control register\n", machine().describe_context(), offset, mem_mask );
 			break;
 		}
 	}
