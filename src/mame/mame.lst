@@ -824,7 +824,6 @@ mac2fdhd                        // 1988 Apple Macintosh II (FDHD)
 macii                           // 1987 Apple Macintosh II
 maciici                         // 1989 Apple Macintosh IIci
 maciicx                         // 1989 Apple Macintosh IIcx
-maciifx                         // 1990 Apple Macintosh IIfx
 maciihmu                        // 1987 Apple Macintosh II (w/o 68851 MMU)
 maciisi                         // 1990 Apple Macintosh IIsi
 maciix                          // 1988 Apple Macintosh IIx
@@ -840,6 +839,9 @@ macse                           // 1987 Apple Macintosh SE
 macsefd                         // 1988 Apple Macintosh SE (FDHD)
 unitron                         // 1985 Unitron
 utrn1024                        // 1986 Unitron 1024
+
+@source:apple/maciifx.cpp
+maciifx                         // 1990 Apple Macintosh IIfx
 
 @source:apple/maciivx.cpp
 maciivx                         // 1993 Apple Macintosh IIvx
