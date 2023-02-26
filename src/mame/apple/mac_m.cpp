@@ -15,7 +15,6 @@
                                 CPU             FDC     Kbd/Mouse  PRAM     Video
          - Mac II               020             IWM     MacII ADB  ext      NuBus card
          - Mac IIx              030             SWIM    MacII ADB  ext      NuBus card
-         - Mac IIfx             030             SWIM    IOP ADB    ext      NuBus card
          - Mac SE/30            030             SWIM    MacII ADB  ext      Internal fake NuBus card
          - Mac IIcx             030             SWIM    MacII ADB  ext      NuBus card
          - Mac IIci             030             SWIM    MacII ADB  ext      Internal "RBV" type
@@ -101,24 +100,17 @@ void mac_state::field_interrupts()
 {
 	int take_interrupt = -1;
 
-	if (m_model != MODEL_MAC_IIFX)
+	if (m_scc_interrupt)
 	{
-		if (m_scc_interrupt)
-		{
-			take_interrupt = 4;
-		}
-		else if (m_via2_interrupt)
-		{
-			take_interrupt = 2;
-		}
-		else if (m_via_interrupt)
-		{
-			take_interrupt = 1;
-		}
+		take_interrupt = 4;
 	}
-	else
+	else if (m_via2_interrupt)
 	{
-		return; // no interrupts for IIfx yet
+		take_interrupt = 2;
+	}
+	else if (m_via_interrupt)
+	{
+		take_interrupt = 1;
 	}
 
 	if (m_last_taken_interrupt > -1)
@@ -168,7 +160,7 @@ WRITE_LINE_MEMBER(mac_state::mac_asc_irq)
 			rbv_recalc_irqs();
 		}
 	}
-	else if (m_model != MODEL_MAC_IIFX)
+	else
 	{
 		m_via2->write_cb1(state^1);
 	}
@@ -244,12 +236,6 @@ void mac_state::set_memory_overlay(int overlay)
 				// switch ROM region to direct access instead of through rom_switch_r
 				mac_install_memory(0x40000000, 0x4007ffff, memory_size, memory_data, is_rom);
 			}
-		}
-		else if (m_model == MODEL_MAC_IIFX)
-		{
-			address_space& space = m_maincpu->space(AS_PROGRAM);
-			space.unmap_write(0x000000, 0x9fffff);
-			mac_install_memory(0x000000, memory_size-1, memory_size, memory_data, is_rom);
 		}
 		else if ((m_model >= MODEL_MAC_II) && (m_model <= MODEL_MAC_SE30))
 		{
@@ -559,9 +545,6 @@ uint8_t mac_state::mac_via_in_a()
 		case MODEL_MAC_IISI:
 			return 0x81 | PA4 | PA2 | PA1;
 
-		case MODEL_MAC_IIFX:
-			return 0x81 | PA6 | PA4 | PA1;
-
 		case MODEL_MAC_IICX:
 			return 0x81 | PA6;
 
@@ -844,10 +827,7 @@ void mac_state::machine_start()
 		m_adbupdate_timer->adjust(attotime::from_hz(70));
 	}
 
-	if (m_model != MODEL_MAC_IIFX)
-		m_6015_timer = timer_alloc(FUNC(mac_state::mac_6015_tick), this);
-	else
-		m_6015_timer = timer_alloc(FUNC(mac_state::oss_6015_tick), this);
+	m_6015_timer = timer_alloc(FUNC(mac_state::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
 
 	save_item(NAME(m_nubus_irq_state));
@@ -869,7 +849,6 @@ void mac_state::machine_start()
 	save_item(NAME(m_via2_interrupt));
 	save_item(NAME(m_scsi_interrupt));
 	save_item(NAME(m_last_taken_interrupt));
-	save_item(NAME(m_oss_regs));
 	save_item(NAME(m_via2_ca1_hack));
 }
 
@@ -890,7 +869,7 @@ void mac_state::machine_reset()
 	}
 
 	// start 60.15 Hz timer for most systems
-	if ((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IIFX))
+	if ((m_model >= MODEL_MAC_IICI) && (m_model <= MODEL_MAC_IISI))
 	{
 		m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
 	}
@@ -909,12 +888,9 @@ void mac_state::machine_reset()
 	/* setup videoram */
 	this->m_screen_buffer = 1;
 
-	if (m_model != MODEL_MAC_IIFX)  // prime CB1 for ASC and slot interrupts
-	{
-		m_via2_ca1_hack = 1;
-		m_via2->write_ca1(1);
-		m_via2->write_cb1(1);
-	}
+	m_via2_ca1_hack = 1;
+	m_via2->write_ca1(1);
+	m_via2->write_cb1(1);
 
 	m_scsi_interrupt = 0;
 
@@ -996,7 +972,6 @@ MAC_DRIVER_INIT(maciici, MODEL_MAC_IICI)
 MAC_DRIVER_INIT(maciisi, MODEL_MAC_IISI)
 MAC_DRIVER_INIT(macii, MODEL_MAC_II)
 MAC_DRIVER_INIT(macse30, MODEL_MAC_SE30)
-MAC_DRIVER_INIT(maciifx, MODEL_MAC_IIFX)
 MAC_DRIVER_INIT(maciicx, MODEL_MAC_IICX)
 MAC_DRIVER_INIT(maciifdhd, MODEL_MAC_II_FDHD)
 MAC_DRIVER_INIT(maciix, MODEL_MAC_IIX)
@@ -1017,7 +992,7 @@ void mac_state::nubus_slot_interrupt(uint8_t slot, uint32_t state)
 		m_nubus_irq_state |= masks[slot];
 	}
 
-	if ((m_model != MODEL_MAC_IIFX) && (!INTS_RBV))
+	if (!INTS_RBV)
 	{
 		if ((m_nubus_irq_state & mask) != mask)
 		{

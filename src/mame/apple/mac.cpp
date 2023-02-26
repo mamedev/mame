@@ -7,7 +7,6 @@
 
     TODO:
     - Move RBV machines (IIci/IIsi) to separate driver?
-    - Move IIfx to separate driver?
     - Rewrite this driver in the newer (maclc3/maciivx/maclc) style as macii.cpp?
 
 ****************************************************************************/
@@ -23,7 +22,6 @@
 #include "cpu/m68000/m68020.h"
 #include "cpu/m68000/m68030.h"
 #include "cpu/m6805/m6805.h"
-#include "machine/applepic.h"
 #include "machine/iwm.h"
 #include "machine/swim1.h"
 #include "machine/swim2.h"
@@ -288,96 +286,6 @@ uint16_t mac_state::mac_config_r()
 	return 0xffff;  // returns nonzero if no PDS RAM expansion, 0 if present
 }
 
-// IIfx
-uint32_t mac_state::biu_r(offs_t offset, uint32_t mem_mask)
-{
-//  printf("biu_r @ %x, mask %08x\n", offset, mem_mask);
-	return 0;
-}
-
-void mac_state::biu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-//  printf("biu_w %x @ %x, mask %08x\n", data, offset, mem_mask);
-}
-
-template <int N> WRITE_LINE_MEMBER(mac_state::oss_interrupt)
-{
-	if (state == ASSERT_LINE)
-		m_oss_regs[N >= 8 ? 0x202 : 0x203] |= 1 << (N & 7);
-	else
-		m_oss_regs[N >= 8 ? 0x202 : 0x203] &= ~(1 << (N & 7));
-
-	int take_interrupt = 0;
-	for (int n = 0; n < 8; n++)
-	{
-		if (BIT(m_oss_regs[0x203], n) && take_interrupt < m_oss_regs[n])
-			take_interrupt = m_oss_regs[n];
-		if (BIT(m_oss_regs[0x202], n) && take_interrupt < m_oss_regs[8 + n])
-			take_interrupt = m_oss_regs[8 + n];
-	}
-
-	if (m_last_taken_interrupt > -1)
-	{
-		m_maincpu->set_input_line(m_last_taken_interrupt, CLEAR_LINE);
-		m_last_taken_interrupt = -1;
-		m_oss_regs[0x200] &= 0x7f;
-	}
-
-	if (take_interrupt > 0)
-	{
-		m_maincpu->set_input_line(take_interrupt, ASSERT_LINE);
-		m_last_taken_interrupt = take_interrupt;
-		m_oss_regs[0x200] |= 0x80;
-	}
-}
-
-TIMER_CALLBACK_MEMBER(mac_state::oss_6015_tick)
-{
-	m_via1->write_ca1(0);
-	m_via1->write_ca1(1);
-	oss_interrupt<10>(ASSERT_LINE);
-}
-
-uint8_t mac_state::oss_r(offs_t offset)
-{
-//  printf("oss_r @ %x\n", offset);
-//  if (offset <= 0xe)  // for interrupt mask registers, we're intended to return something different than is written in the low 3 bits (?)
-//  {
-//      return m_oss_regs[offset]<<4;
-//  }
-
-	if (offset < std::size(m_oss_regs))
-		return m_oss_regs[offset];
-	else
-		return 0;
-}
-
-void mac_state::oss_w(offs_t offset, uint8_t data)
-{
-//  printf("oss_w %x @ %x\n", data, offset);
-	if (offset == 0x207)
-		oss_interrupt<10>(CLEAR_LINE);
-	else if (offset < std::size(m_oss_regs))
-		m_oss_regs[offset] = data;
-}
-
-uint32_t mac_state::buserror_r()
-{
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	return 0;
-}
-
-uint8_t mac_state::maciifx_8010_r()
-{
-	return 0x40;
-}
-
-uint8_t mac_state::maciifx_8040_r()
-{
-	return 0;
-}
-
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
@@ -432,28 +340,6 @@ void mac_state::macse30_map(address_map &map)
 	map(0xfe000000, 0xfe00ffff).ram().share("vram");
 	map(0xfee00000, 0xfee0ffff).ram().share("vram").mirror(0x000f0000);
 	map(0xfeffe000, 0xfeffffff).rom().region("se30vrom", 0x0);
-}
-
-void mac_state::maciifx_map(address_map &map)
-{
-	map(0x40000000, 0x4007ffff).rom().region("bootrom", 0).mirror(0x0ff80000);
-
-	map(0x50000000, 0x50001fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
-	map(0x50004000, 0x50005fff).rw("sccpic", FUNC(applepic_device::host_r), FUNC(applepic_device::host_w)).mirror(0x00f00000).umask32(0xff00ff00);
-	map(0x50004000, 0x50005fff).rw("sccpic", FUNC(applepic_device::host_r), FUNC(applepic_device::host_w)).mirror(0x00f00000).umask32(0x00ff00ff);
-	map(0x50008010, 0x50008010).r(FUNC(mac_state::maciifx_8010_r)).mirror(0x00f00000);
-	map(0x50008040, 0x50008040).r(FUNC(mac_state::maciifx_8040_r)).mirror(0x00f00000);
-	map(0x5000a000, 0x5000bfff).rw(FUNC(mac_state::macplus_scsi_r), FUNC(mac_state::macii_scsi_w)).mirror(0x00f00000);
-	map(0x5000c060, 0x5000c063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
-	map(0x5000d000, 0x5000d003).w(FUNC(mac_state::macii_scsi_drq_w)).mirror(0x00f00000);
-	map(0x5000d060, 0x5000d063).r(FUNC(mac_state::macii_scsi_drq_r)).mirror(0x00f00000);
-	map(0x50010000, 0x50011fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
-	map(0x50012000, 0x50013fff).rw("swimpic", FUNC(applepic_device::host_r), FUNC(applepic_device::host_w)).mirror(0x00f00000).umask32(0xff00ff00);
-	map(0x50012000, 0x50013fff).rw("swimpic", FUNC(applepic_device::host_r), FUNC(applepic_device::host_w)).mirror(0x00f00000).umask32(0x00ff00ff);
-	map(0x50018000, 0x50019fff).rw(FUNC(mac_state::biu_r), FUNC(mac_state::biu_w)).mirror(0x00f00000);
-	map(0x5001a000, 0x5001bfff).rw(FUNC(mac_state::oss_r), FUNC(mac_state::oss_w)).mirror(0x00f00000);
-	map(0x50024000, 0x50027fff).r(FUNC(mac_state::buserror_r)).mirror(0x00f00000);   // must bus error on access here so ROM can determine we're an FMC
-	map(0x50040000, 0x50041fff).rw(FUNC(mac_state::mac_via_r), FUNC(mac_state::mac_via_w)).mirror(0x00f00000);
 }
 
 /***************************************************************************
@@ -673,64 +559,6 @@ void mac_state::maciihd(machine_config &config)
 	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
 }
 
-void mac_state::maciifx(machine_config &config)
-{
-	/* basic machine hardware */
-	M68030(config, m_maincpu, 40000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::maciifx_map);
-	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
-
-	add_asc(config, asc_device::asc_type::ASC);
-	add_base_devices(config, true, 1);
-	add_scsi(config);
-
-	m_asc->irqf_callback().set(FUNC(mac_state::oss_interrupt<8>));
-	subdevice<nscsi_connector>("scsi:7")->set_option_machine_config("ncr5380", [this](device_t *device) {
-		ncr53c80_device &adapter = downcast<ncr53c80_device &>(*device);
-		adapter.irq_handler().set(*this, FUNC(mac_state::oss_interrupt<9>));
-		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
-	});
-
-	R65NC22(config, m_via1, C7M/10);
-	m_via1->readpa_handler().set(FUNC(mac_state::mac_via_in_a));
-	m_via1->readpb_handler().set(FUNC(mac_state::mac_via_in_b_ii));
-	m_via1->writepa_handler().set(FUNC(mac_state::mac_via_out_a));
-	m_via1->writepb_handler().set(FUNC(mac_state::mac_via_out_b));
-	m_via1->cb2_handler().set(FUNC(mac_state::mac_adb_via_out_cb2));
-	m_via1->irq_handler().set(FUNC(mac_state::oss_interrupt<11>));
-
-	applepic_device &sccpic(APPLEPIC(config, "sccpic", C15M));
-	sccpic.prd_callback().set(m_scc, FUNC(scc8530_legacy_device::reg_r));
-	sccpic.pwr_callback().set(m_scc, FUNC(scc8530_legacy_device::reg_w));
-	sccpic.hint_callback().set(FUNC(mac_state::oss_interrupt<7>));
-
-	m_scc->intrq_callback().set("sccpic", FUNC(applepic_device::pint_w));
-	//m_scc->dtr_reqa_callback().set("sccpic", FUNC(applepic_device::reqa_w));
-	//m_scc->dtr_reqb_callback().set("sccpic", FUNC(applepic_device::reqb_w));
-
-	applepic_device &swimpic(APPLEPIC(config, "swimpic", C15M));
-	swimpic.prd_callback().set(m_fdc, FUNC(applefdintf_device::read));
-	swimpic.pwr_callback().set(m_fdc, FUNC(applefdintf_device::write));
-	swimpic.hint_callback().set(FUNC(mac_state::oss_interrupt<6>));
-
-	m_fdc->dat1byte_cb().set("swimpic", FUNC(applepic_device::reqa_w));
-
-	RAM(config, m_ram);
-	m_ram->set_default_size("4M");
-	m_ram->set_extra_options("8M,16M,32M,64M,96M,128M");
-
-	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
-
-	add_nubus(config);
-	nubus_device &nubus(*subdevice<nubus_device>("nubus"));
-	nubus.out_irq9_callback().set(FUNC(mac_state::oss_interrupt<0>));
-	nubus.out_irqa_callback().set(FUNC(mac_state::oss_interrupt<1>));
-	nubus.out_irqb_callback().set(FUNC(mac_state::oss_interrupt<2>));
-	nubus.out_irqc_callback().set(FUNC(mac_state::oss_interrupt<3>));
-	nubus.out_irqd_callback().set(FUNC(mac_state::oss_interrupt<4>));
-	nubus.out_irqe_callback().set(FUNC(mac_state::oss_interrupt<5>));
-}
-
 void mac_state::maciix(machine_config &config, bool nubus_bank1, bool nubus_bank2)
 {
 	macii(config, false, asc_device::asc_type::ASC, true, nubus_bank1, nubus_bank2);
@@ -935,11 +763,6 @@ ROM_START( macse30 )
 	ROM_LOAD( "se30vrom.uk6", 0x000000, 0x002000, CRC(b74c3463) SHA1(584201cc67d9452b2488f7aaaf91619ed8ce8f03) )
 ROM_END
 
-ROM_START( maciifx )
-	ROM_REGION32_BE(0x80000, "bootrom", 0)
-	ROM_LOAD( "4147dd77.rom", 0x000000, 0x080000, CRC(ef441bbd) SHA1(9fba3d4f672a630745d65788b1d1119afa2c6728) )
-ROM_END
-
 ROM_START( maciici )
 	ROM_REGION32_BE(0x80000, "bootrom", 0)
 	ROM_LOAD32_BYTE( "341-0736.um12", 0x000000, 0x020000, CRC(7a1906e6) SHA1(3e39c80b52f40798502fcbdfc97b315545c4c4d3) )
@@ -961,5 +784,4 @@ COMP( 1988, maciix,    mac2fdhd, 0,      maciix,   macadb,  mac_state, init_maci
 COMP( 1989, macse30,   mac2fdhd, 0,      macse30,  macadb,  mac_state, init_macse30,       "Apple Computer", "Macintosh SE/30",  MACHINE_SUPPORTS_SAVE )
 COMP( 1989, maciicx,   mac2fdhd, 0,      maciicx,  macadb,  mac_state, init_maciicx,       "Apple Computer", "Macintosh IIcx",  MACHINE_SUPPORTS_SAVE )
 COMP( 1989, maciici,   0,        0,      maciici,  maciici, mac_state, init_maciici,       "Apple Computer", "Macintosh IIci", MACHINE_SUPPORTS_SAVE )
-COMP( 1990, maciifx,   0,        0,      maciifx,  macadb,  mac_state, init_maciifx,       "Apple Computer", "Macintosh IIfx",  MACHINE_NOT_WORKING )
 COMP( 1990, maciisi,   0,        0,      maciisi,  maciici, mac_state, init_maciisi,       "Apple Computer", "Macintosh IIsi", MACHINE_SUPPORTS_SAVE )
