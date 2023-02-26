@@ -127,7 +127,7 @@
 #include "emu.h"
 #include "vme_fcisio.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "machine/scnxx562.h"
 #include "machine/68230pit.h"
 #include "machine/68153bim.h"
@@ -461,4 +461,4 @@ uint8_t vme_fcisio1_card_device::config_rd(){
 
 // This info isn't kept in a card driver atm so storing it as a comment for later use
 //      YEAR  NAME           PARENT  COMPAT  MACHINE       INPUT    CLASS             INIT COMPANY                  FULLNAME           FLAGS
-//COMP( 1986, fcisio1,       0,      0,      fcisio1,      fcisio1, driver_device,     0,  "Force Computers Gmbh",  "SYS68K/ISIO-1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+//COMP( 1986, fcisio1,       0,      0,      fcisio1,      fcisio1, driver_device,     0,  "Force Computers Gmbh",  "SYS68K/ISIO-1",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

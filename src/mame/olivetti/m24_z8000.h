@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef MAME_MACHINE_M24_Z8000_H
-#define MAME_MACHINE_M24_Z8000_H
+#ifndef MAME_OLIVETTI_M24_Z8000_H
+#define MAME_OLIVETTI_M24_Z8000_H
 
 #pragma once
 
@@ -61,4 +61,4 @@ private:
 
 DECLARE_DEVICE_TYPE(M24_Z8000, m24_z8000_device)
 
-#endif // MAME_MACHINE_M24_Z8000_H
+#endif // MAME_OLIVETTI_M24_Z8000_H

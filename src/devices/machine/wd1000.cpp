@@ -58,7 +58,7 @@ void wd1000_device::set_sector_base(uint32_t base)
 void wd1000_device::device_start()
 {
 	// Resolve callbacks
-	m_intrq_cb.resolve();
+	m_intrq_cb.resolve_safe();
 	m_drq_cb.resolve();
 
 	// Allocate timers

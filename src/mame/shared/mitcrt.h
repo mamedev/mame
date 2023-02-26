@@ -8,8 +8,8 @@
 
 *************************************************************************/
 
-#ifndef MAME_VIDEO_CRT_H
-#define MAME_VIDEO_CRT_H
+#ifndef MAME_SHARED_CRT_H
+#define MAME_SHARED_CRT_H
 
 #pragma once
 
@@ -73,4 +73,4 @@ DECLARE_DEVICE_TYPE(CRT, crt_device)
 
 
 
-#endif // MAME_VIDEO_CRT_H
+#endif // MAME_SHARED_CRT_H

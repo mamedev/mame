@@ -2,8 +2,8 @@
 // copyright-holders:David Haywood
 /* Scorpion 4 + 5 driver related includes */
 /* mainly used for stuff which is currently shared between sc4 / 5 sets to avoid duplication */
-#ifndef MAME_INCLUDES_BFP_SC4_H
-#define MAME_INCLUDES_BFP_SC4_H
+#ifndef MAME_BFM_BFP_SC4_H
+#define MAME_BFM_BFP_SC4_H
 
 #pragma once
 
@@ -653,11 +653,11 @@ public:
 		, m_adder4cpu(*this, "adder4")
 	{ }
 
-	required_region_ptr<uint32_t> m_adder4cpuregion;
-	std::unique_ptr<uint32_t[]> m_adder4ram{};
+	required_region_ptr<uint16_t> m_adder4cpuregion;
+	std::unique_ptr<uint16_t[]> m_adder4ram{};
 
-	uint32_t adder4_mem_r(offs_t offset, uint32_t mem_mask = ~0);
-	void adder4_mem_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint16_t adder4_mem_r(offs_t offset, uint16_t mem_mask = ~0);
+	void adder4_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	virtual void machine_start() override;
 
 	// devices
@@ -3375,4 +3375,4 @@ INPUT_PORTS_EXTERN( sc4_raw );
 	/* not for either of these games? */ \
 	ROM_LOAD( "casroysnd.bin", 0x00000, 0x80000, CRC(cf1d4b59) SHA1(1b2bc74c6fcc43197a6f295bc34554da01f7b517) )
 
-#endif // MAME_INCLUDES_BFP_SC4_H
+#endif // MAME_BFM_BFP_SC4_H

@@ -454,16 +454,11 @@ void z80dma_device::do_search()
 	}
 }
 
-int z80dma_device::do_write()
+void z80dma_device::do_write()
 {
-	int done;
 	uint8_t mode;
 
 	mode = TRANSFER_MODE;
-	if (m_count == 0x0000)
-	{
-		//FIXME: Any signal here
-	}
 	switch(mode) {
 		case TM_TRANSFER:
 			do_transfer_write();
@@ -487,14 +482,6 @@ int z80dma_device::do_write()
 	m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
 
 	m_byte_counter++;
-	m_count--;
-	done = (m_count == 0xFFFF); //correct?
-
-	if (done)
-	{
-		//FIXME: interrupt ?
-	}
-	return done;
 }
 
 
@@ -504,8 +491,6 @@ int z80dma_device::do_write()
 
 TIMER_CALLBACK_MEMBER(z80dma_device::timerproc)
 {
-	int done;
-
 	if (--m_cur_cycle)
 	{
 		return;
@@ -517,18 +502,20 @@ TIMER_CALLBACK_MEMBER(z80dma_device::timerproc)
 	{
 		/* TODO: there's a nasty recursion bug with Alpha for Sharp X1 Turbo on the transfers with this function! */
 		do_read();
-		done = 0;
 		m_is_read = false;
 		m_cur_cycle = (PORTA_IS_SOURCE ? PORTA_CYCLE_LEN : PORTB_CYCLE_LEN);
 	}
 	else
 	{
-		done = do_write();
+		do_write();
 		m_is_read = true;
 		m_cur_cycle = (PORTB_IS_SOURCE ? PORTA_CYCLE_LEN : PORTB_CYCLE_LEN);
+
+		// param==1 indicates final transfer
+		m_timer->set_param(m_byte_counter == m_count);
 	}
 
-	if (done)
+	if (m_is_read && param)
 	{
 		m_dma_enabled = 0; //FIXME: Correct?
 		m_status = 0x09;
@@ -555,6 +542,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::timerproc)
 			m_count = BLOCKLEN;
 			m_byte_counter = 0;
 			m_status |= 0x30;
+			m_timer->set_param(0);
 		}
 	}
 }
@@ -576,7 +564,7 @@ void z80dma_device::update_status()
 		attotime const next = attotime::from_hz(clock());
 		m_timer->adjust(
 			attotime::zero,
-			0,
+			m_timer->param(),
 			// 1 byte transferred in 4 clock cycles
 			next);
 	}
@@ -747,6 +735,7 @@ void z80dma_device::write(uint8_t data)
 					m_count = BLOCKLEN;
 					m_byte_counter = 0;
 					m_status |= 0x30;
+					m_timer->set_param(0);
 
 					LOG("Z80DMA Load A: %x B: %x N: %x\n", m_addressA, m_addressB, m_count);
 					break;
@@ -769,6 +758,7 @@ void z80dma_device::write(uint8_t data)
 					m_dma_enabled = 1;
 					//"match not found" & "end of block" status flags zeroed here
 					m_status |= 0x30;
+					m_timer->set_param(0);
 					break;
 				case COMMAND_RESET_PORT_A_TIMING:
 					LOG("Z80DMA Reset Port A Timing\n");

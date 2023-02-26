@@ -55,7 +55,7 @@
     Track data
     ----------
 
-    (first possible occurance at 0x0400)
+    (first possible occurrence at 0x0400)
 
     Each track is encoded in a sequence of cell levels which are represented
     by bits in the data.

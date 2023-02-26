@@ -245,6 +245,9 @@ void battlane_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 			if (attr & 0x10) // Y Double
 			{
+				if (flip_screen())
+					sy += 16;
+
 				for (int i = 0; i < 2; i++)
 					m_gfxdecode->gfx(0)->transpen(bitmap, cliprect,
 						code + i,
@@ -282,7 +285,7 @@ void battlane_state::draw_fg_bitmap(bitmap_ind16 &bitmap, const rectangle &clipr
 				}
 
 				if (cliprect.contains(px, py))
-					bitmap.pix(y, x) = data;
+					bitmap.pix(py, px) = data;
 			}
 		}
 	}

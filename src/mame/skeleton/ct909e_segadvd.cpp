@@ -21,6 +21,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class ct909e_megatrix_state : public driver_device
 {
 public:
@@ -88,5 +91,8 @@ ROM_START( megatrix )
 	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "segadvd_en29lv320b_007f22f9.bin", 0x000000, 0x400000, CRC(33fea2ff) SHA1(85295fd31a06149112295a9b6a8218a4a4c50893) )
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 2007, megatrix,    0,       0,      megatrix, megatrix, ct909e_megatrix_state, empty_init, "<unknown>", "MeGaTrix (Spain)", MACHINE_IS_SKELETON )

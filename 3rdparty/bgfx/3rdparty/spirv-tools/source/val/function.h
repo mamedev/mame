@@ -73,8 +73,8 @@ class Function {
 
   /// Registers a variable in the current block
   ///
-  /// @param[in] type_id The type ID of the varaible
-  /// @param[in] id      The ID of the varaible
+  /// @param[in] type_id The type ID of the variable
+  /// @param[in] id      The ID of the variable
   /// @param[in] storage The storage of the variable
   /// @param[in] init_id The initializer ID of the variable
   ///
@@ -184,12 +184,12 @@ class Function {
       std::function<const std::vector<BasicBlock*>*(const BasicBlock*)>;
   /// Returns the block successors function for the augmented CFG.
   GetBlocksFunction AugmentedCFGSuccessorsFunction() const;
-  /// Like AugmentedCFGSuccessorsFunction, but also includes a forward edge from
-  /// a loop header block to its continue target, if they are different blocks.
-  GetBlocksFunction
-  AugmentedCFGSuccessorsFunctionIncludingHeaderToContinueEdge() const;
   /// Returns the block predecessors function for the augmented CFG.
   GetBlocksFunction AugmentedCFGPredecessorsFunction() const;
+  /// Returns the block structural successors function for the augmented CFG.
+  GetBlocksFunction AugmentedStructuralCFGSuccessorsFunction() const;
+  /// Returns the block structural predecessors function for the augmented CFG.
+  GetBlocksFunction AugmentedStructuralCFGPredecessorsFunction() const;
 
   /// Returns the control flow nesting depth of the given basic block.
   /// This function only works when you have structured control flow.
@@ -197,10 +197,10 @@ class Function {
   /// been identified and dominators have been computed.
   int GetBlockDepth(BasicBlock* bb);
 
-  /// Prints a GraphViz digraph of the CFG of the current funciton
+  /// Prints a GraphViz digraph of the CFG of the current function
   void PrintDotGraph() const;
 
-  /// Prints a directed graph of the CFG of the current funciton
+  /// Prints a directed graph of the CFG of the current function
   void PrintBlocks() const;
 
   /// Registers execution model limitation such as "Feature X is only available
@@ -285,7 +285,7 @@ class Function {
   /// The type of the return value
   uint32_t result_type_id_;
 
-  /// The control fo the funciton
+  /// The control fo the function
   SpvFunctionControlMask function_control_;
 
   /// The type of declaration of each function

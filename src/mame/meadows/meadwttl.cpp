@@ -23,6 +23,9 @@
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 
+
+namespace {
+
 // copied by Pong, not accurate for this driver!
 // start
 #define MASTER_CLOCK    7159000
@@ -162,6 +165,7 @@ ROM_START( mead4in1 )
 	ROM_LOAD( "hockey.b2",     0x0000, 0x0020, CRC(2dab2259) SHA1(1d20d6a3e3ee1719b7e9e92765aea3109be4e375) )
 ROM_END
 
+} // anonymous namespace
 
 
 GAME( 1976, bombaway,  0,        meadows,  0,  meadwttl_state, empty_init, ROT0, "Meadows",  "Bombs Away [TTL]", MACHINE_IS_SKELETON )

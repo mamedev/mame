@@ -646,7 +646,7 @@ void m68hc05_device::burn_cycles(unsigned count)
 	unsigned const ps_mask((1 << ps_opt) - 1);
 	unsigned const increments((count + (m_prescaler & ps_mask)) >> ps_opt);
 	u32 const new_counter(u32(m_counter) + increments);
-	bool const timer_rollover((0x010000 > m_counter) && (0x010000 <= new_counter));
+	bool const timer_rollover(0x010000 <= new_counter);
 	bool const output_compare_match((m_ocr > m_counter) && (m_ocr <= new_counter));
 	m_prescaler = (count + m_prescaler) & ps_mask;
 	m_counter = u16(new_counter);

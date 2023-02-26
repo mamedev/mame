@@ -53,11 +53,11 @@ CONFIRM SAVE AS MENU
 //  ctor
 //-------------------------------------------------
 
-menu_confirm_save_as::menu_confirm_save_as(mame_ui_manager &mui, render_container &container, bool *yes)
+menu_confirm_save_as::menu_confirm_save_as(mame_ui_manager &mui, render_container &container, bool &yes)
 	: menu(mui, container)
+	, m_yes(yes)
 {
-	m_yes = yes;
-	*m_yes = false;
+	m_yes = false;
 }
 
 
@@ -74,7 +74,7 @@ menu_confirm_save_as::~menu_confirm_save_as()
 //  populate
 //-------------------------------------------------
 
-void menu_confirm_save_as::populate(float &customtop, float &custombottom)
+void menu_confirm_save_as::populate()
 {
 	item_append(_("File Already Exists - Override?"), FLAG_DISABLE, nullptr);
 	item_append(menu_item_type::SEPARATOR);
@@ -86,17 +86,19 @@ void menu_confirm_save_as::populate(float &customtop, float &custombottom)
 //  handle - confirm save as menu
 //-------------------------------------------------
 
-void menu_confirm_save_as::handle(event const *ev)
+bool menu_confirm_save_as::handle(event const *ev)
 {
 	// process the event
 	if (ev && (ev->iptkey == IPT_UI_SELECT))
 	{
 		if (ev->itemref == ITEMREF_YES)
-			*m_yes = true;
+			m_yes = true;
 
 		// no matter what, pop out
 		stack_pop();
 	}
+
+	return false;
 }
 
 
@@ -117,7 +119,7 @@ menu_file_create::menu_file_create(mame_ui_manager &mui, render_container &conta
 	, m_current_format(nullptr)
 {
 	m_image = image;
-	m_ok = true;
+	m_ok = false;
 
 	m_filename.reserve(1024);
 	m_filename = core_filename_extract_base(current_file);
@@ -134,14 +136,36 @@ menu_file_create::~menu_file_create()
 
 
 //-------------------------------------------------
+//  recompute_metrics - recompute metrics
+//-------------------------------------------------
+
+void menu_file_create::recompute_metrics(uint32_t width, uint32_t height, float aspect)
+{
+	menu::recompute_metrics(width, height, aspect);
+
+	set_custom_space(line_height() + 3.0F * tb_border(), 0.0F);
+}
+
+
+//-------------------------------------------------
 //  custom_render - perform our special rendering
 //-------------------------------------------------
 
 void menu_file_create::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	extra_text_render(top, bottom, origx1, origy1, origx2, origy2,
-		m_current_directory,
-		std::string_view());
+			m_current_directory,
+			std::string_view());
+}
+
+
+//-------------------------------------------------
+//  custom_ui_back - override back handling
+//-------------------------------------------------
+
+bool menu_file_create::custom_ui_back()
+{
+	return (get_selection_ref() == ITEMREF_NEW_IMAGE_NAME) && !m_filename.empty();
 }
 
 
@@ -149,10 +173,9 @@ void menu_file_create::custom_render(void *selectedref, float top, float bottom,
 //  populate - populates the file creator menu
 //-------------------------------------------------
 
-void menu_file_create::populate(float &customtop, float &custombottom)
+void menu_file_create::populate()
 {
 	std::string buffer;
-	const image_device_format *format;
 	const std::string *new_image_name;
 
 	// append the "New Image Name" item
@@ -168,9 +191,10 @@ void menu_file_create::populate(float &customtop, float &custombottom)
 	item_append(_("New Image Name:"), *new_image_name, 0, ITEMREF_NEW_IMAGE_NAME);
 
 	// do we support multiple formats?
-	if (ENABLE_FORMATS) format = m_image->formatlist().front().get();
-	if (ENABLE_FORMATS && (format != nullptr))
+	image_device_format const *const format = ENABLE_FORMATS ? m_image->formatlist().front().get() : nullptr;
+	if (format)
 	{
+		// FIXME: is this in the right order?  It reassigns m_current_format after reading it.
 		item_append(_("Image Format:"), m_current_format->description(), 0, ITEMREF_FORMAT);
 		m_current_format = format;
 	}
@@ -178,8 +202,6 @@ void menu_file_create::populate(float &customtop, float &custombottom)
 	// finish up the menu
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Create"), 0, ITEMREF_CREATE);
-
-	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 
@@ -187,49 +209,64 @@ void menu_file_create::populate(float &customtop, float &custombottom)
 //  handle - file creator menu
 //-------------------------------------------------
 
-void menu_file_create::handle(event const *ev)
+bool menu_file_create::handle(event const *ev)
 {
-	// process the event
-	if (ev)
+	if (!ev)
+		return false;
+
+	// handle selections
+	switch (ev->iptkey)
 	{
-		// handle selections
-		switch (ev->iptkey)
+	case IPT_UI_SELECT:
+		if ((ev->itemref == ITEMREF_CREATE) || (ev->itemref == ITEMREF_NEW_IMAGE_NAME))
 		{
-		case IPT_UI_SELECT:
-			if ((ev->itemref == ITEMREF_CREATE) || (ev->itemref == ITEMREF_NEW_IMAGE_NAME))
+			std::string tmp_file(m_filename);
+			if (tmp_file.find('.') != -1 && tmp_file.find('.') < tmp_file.length() - 1)
 			{
-				std::string tmp_file(m_filename);
-				if (tmp_file.find('.') != -1 && tmp_file.find('.') < tmp_file.length() - 1)
-				{
-					m_current_file = m_filename;
-					stack_pop();
-				}
-				else
-					ui().popup_time(1, "%s", _("Please enter a file extension too"));
+				m_current_file = m_filename;
+				m_ok = true;
+				stack_pop();
 			}
-			break;
-
-		case IPT_UI_PASTE:
-			if (get_selection_ref() == ITEMREF_NEW_IMAGE_NAME)
+			else
 			{
-				if (paste_text(m_filename, &osd_is_valid_filename_char))
-					reset(reset_options::REMEMBER_POSITION);
+				ui().popup_time(1, "%s", _("Please enter a file extension too"));
 			}
-			break;
-
-		case IPT_SPECIAL:
-			if (get_selection_ref() == ITEMREF_NEW_IMAGE_NAME)
-			{
-				if (input_character(m_filename, ev->unichar, &osd_is_valid_filename_char))
-					reset(reset_options::REMEMBER_POSITION);
-			}
-			break;
-
-		case IPT_UI_CANCEL:
-			m_ok = false;
-			break;
 		}
+		break;
+
+	case IPT_UI_PASTE:
+		if (ev->itemref == ITEMREF_NEW_IMAGE_NAME)
+		{
+			if (paste_text(m_filename, &osd_is_valid_filename_char))
+			{
+				ev->item->set_subtext(m_filename + "_");
+				return true;
+			}
+		}
+		break;
+
+	case IPT_SPECIAL:
+		if (ev->itemref == ITEMREF_NEW_IMAGE_NAME)
+		{
+			if (input_character(m_filename, ev->unichar, &osd_is_valid_filename_char))
+			{
+				ev->item->set_subtext(m_filename + "_");
+				return true;
+			}
+		}
+		break;
+
+	case IPT_UI_CANCEL:
+		if ((ev->itemref == ITEMREF_NEW_IMAGE_NAME) && !m_filename.empty())
+		{
+			m_filename.clear();
+			ev->item->set_subtext("_");
+			return true;
+		}
+		break;
 	}
+
+	return false;
 }
 
 
@@ -263,7 +300,7 @@ menu_select_format::~menu_select_format()
 //  populate
 //-------------------------------------------------
 
-void menu_select_format::populate(float &customtop, float &custombottom)
+void menu_select_format::populate()
 {
 	item_append(_("Select image format"), FLAG_DISABLE, nullptr);
 	for (unsigned int i = 0; i != m_formats.size(); i++)
@@ -281,7 +318,7 @@ void menu_select_format::populate(float &customtop, float &custombottom)
 //  handle
 //-------------------------------------------------
 
-void menu_select_format::handle(event const *ev)
+bool menu_select_format::handle(event const *ev)
 {
 	// process the menu
 	if (ev && ev->iptkey == IPT_UI_SELECT)
@@ -289,6 +326,8 @@ void menu_select_format::handle(event const *ev)
 		*m_result = (floppy_image_format_t *)ev->itemref;
 		stack_pop();
 	}
+
+	return false;
 }
 
 
@@ -322,7 +361,7 @@ menu_select_floppy_init::~menu_select_floppy_init()
 //  populate
 //-------------------------------------------------
 
-void menu_select_floppy_init::populate(float &customtop, float &custombottom)
+void menu_select_floppy_init::populate()
 {
 	item_append(_("Select initial contents"), FLAG_DISABLE, nullptr);
 	int id = 0;
@@ -335,7 +374,7 @@ void menu_select_floppy_init::populate(float &customtop, float &custombottom)
 //  handle
 //-------------------------------------------------
 
-void menu_select_floppy_init::handle(event const *ev)
+bool menu_select_floppy_init::handle(event const *ev)
 {
 	// process the menu
 	if (ev && ev->iptkey == IPT_UI_SELECT)
@@ -343,6 +382,8 @@ void menu_select_floppy_init::handle(event const *ev)
 		*m_result = int(uintptr_t(ev->itemref));
 		stack_pop();
 	}
+
+	return false;
 }
 
 

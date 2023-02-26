@@ -1,7 +1,7 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, ElSemi, Andrew Gardner
-#ifndef MAME_INCLUDES_HNG64_H
-#define MAME_INCLUDES_HNG64_H
+#ifndef MAME_SNK_HNG64_H
+#define MAME_SNK_HNG64_H
 
 #pragma once
 
@@ -27,7 +27,7 @@ struct polyVert
 {
 	float worldCoords[4]{};   // World space coordinates (X Y Z 1.0)
 
-	float texCoords[4]{};     // Texture coordinates (U V 0 1.0) -> OpenGL style...
+	float texCoords[2]{};     // Texture coordinates (U V 0 1.0) -> OpenGL style...
 
 	float normal[4]{};        // Normal (X Y Z 1.0)
 	float clipCoords[4]{};    // Homogeneous screen space coordinates (X Y Z W)
@@ -47,13 +47,12 @@ struct polygon
 	bool flatShade = false;              // Flat shaded polygon, no texture, no lighting
 
 	uint8_t texIndex = 0;             // Which texture to draw from (0x00-0x0f)
-	uint8_t texType = 0;              // How to index into the texture
+	uint8_t tex4bpp = 0;              // How to index into the texture
 	uint8_t texPageSmall = 0;         // Does this polygon use 'small' texture pages?
 	uint8_t texPageHorizOffset = 0;   // If it does use small texture pages, how far is this page horizontally offset?
 	uint8_t texPageVertOffset = 0;    // If it does use small texture pages, how far is this page vertically offset?
 
 	uint32_t palOffset = 0;           // The base offset where this object's palette starts.
-	uint32_t palPageSize = 0;         // The size of the palette page that is being pointed to.
 
 	uint32_t debugColor = 0;          // Will go away someday.  Used to explicitly color polygons for debugging.
 };
@@ -82,13 +81,12 @@ typedef frustum_clip_vertex<float, 5> hng64_clip_vertex;
 
 struct hng64_poly_data
 {
-	uint8_t texType = 0;
+	uint8_t tex4bpp = 0;
 	uint8_t texIndex = 0;
 	uint8_t texPageSmall = 0;
 	uint8_t texPageHorizOffset = 0;
 	uint8_t texPageVertOffset = 0;
 	int palOffset = 0;
-	int palPageSize = 0;
 	int debugColor = 0;
 };
 
@@ -141,6 +139,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_vblank(*this, "VBLANK"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_iomcu(*this, "iomcu"),
@@ -167,7 +166,8 @@ public:
 		m_in(*this, "IN%u", 0U),
 		m_samsho64_3d_hack(0),
 		m_roadedge_3d_hack(0)
-	{ }
+	{
+	}
 
 	void hng64(machine_config &config);
 	void hng64_default(machine_config &config);
@@ -185,6 +185,7 @@ public:
 	uint8_t *m_texturerom = nullptr;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_ioport m_vblank;
 
 private:
 	static constexpr int HNG64_MASTER_CLOCK = 50'000'000;
@@ -199,24 +200,6 @@ private:
 	static constexpr int VTOTAL = 264*2;
 	static constexpr int VBEND = 0;
 	static constexpr int VBSTART = 224*2;
-
-	enum hng64trans_t
-	{
-		HNG64_TILEMAP_NORMAL = 1,
-		HNG64_TILEMAP_ADDITIVE,
-		HNG64_TILEMAP_ALPHA
-	};
-
-	struct blit_parameters
-	{
-		bitmap_rgb32 *      bitmap = nullptr;
-		rectangle           cliprect;
-		uint32_t            tilemap_priority_code = 0;
-		uint8_t             mask = 0;
-		uint8_t             value = 0;
-		uint8_t             alpha = 0;
-		hng64trans_t        drawformat;
-	};
 
 	required_device<mips3_device> m_maincpu;
 	required_device<v53a_device> m_audiocpu;
@@ -288,7 +271,10 @@ private:
 
 	//uint32_t *q2 = nullptr;
 
-	std::vector< std::pair <int, uint32_t *> > m_spritelist;
+
+	bitmap_ind16 m_sprite_bitmap;
+	bitmap_ind16 m_sprite_zbuffer;
+
 
 	uint8_t m_screen_dis = 0U;
 
@@ -299,8 +285,6 @@ private:
 	};
 
 	hng64_tilemap m_tilemap[4]{};
-
-	uint8_t m_additive_tilemap_debug = 0U;
 
 	uint32_t m_old_animmask = 0U;
 	uint32_t m_old_animbits = 0U;
@@ -430,22 +414,16 @@ private:
 
 	void hng64_mark_all_tiles_dirty(int tilemap);
 	void hng64_mark_tile_dirty(int tilemap, int tile_index);
-	void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm);
 
-	void hng64_tilemap_draw_roz_core(screen_device &screen, tilemap_t *tmap, const blit_parameters *blit,
-		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound);
+	uint16_t get_tileregs(int tm);
+	uint16_t get_scrollbase(int tm);
 
-	void hng64_tilemap_draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy,
-		int wraparound, uint32_t flags, uint8_t priority, hng64trans_t drawformat);
+	int get_blend_mode(int tm);
 
-	void hng64_tilemap_draw_roz_primask(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy,
-		int wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat);
+	void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, int line);
 
-	static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, bitmap_rgb32 &dest, const rectangle &cliprect, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat);
-
-
+	void hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
+		int wraparound, uint8_t drawformat, uint8_t alpha, uint8_t mosaic, uint8_t tm);
 
 	std::unique_ptr<hng64_poly_renderer> m_poly_renderer;
 
@@ -457,8 +435,19 @@ private:
 	std::vector<polygon> m_polys;  // HNG64_MAX_POLYGONS
 
 	void clear3d();
-	void hng64_command3d(const uint16_t* packet);
-	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	bool hng64_command3d(const uint16_t* packet);
+
+	void get_tile_details(bool chain, uint16_t spritenum, uint8_t xtile, uint8_t ytile, uint8_t xsize, uint8_t ysize, bool xflip, bool yflip, uint32_t& tileno, uint16_t& pal, uint8_t &gfxregion);
+	void draw_sprites_buffer(screen_device &screen, const rectangle &cliprect);
+
+	void drawline(bitmap_ind16& dest, bitmap_ind16& destz, const rectangle& cliprect,
+		gfx_element* gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
+		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int cury, const u8* srcdata, int32_t srcx, int32_t srcy_copy, uint32_t leftovers, int line, uint16_t &srcpix);
+
+	void zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
+		gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
+		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int line, uint16_t &srcpix);
+
 	void transition_control(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void setCameraTransformation(const uint16_t* packet);
 	void setLighting(const uint16_t* packet);
@@ -509,4 +498,4 @@ private:
 	void hng_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_HNG64_H
+#endif // MAME_SNK_HNG64_H

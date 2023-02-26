@@ -6,36 +6,45 @@
 
     Sampling drum machine
 
-    Sound ROM info:
+    Hardware:
+    - uPD7811G-120
+    - HN4872128G25 (program rom)
+    - uPD4364C (data ram, battery backed)
+    - 2x uPD934G (percussion generator)
+    - 2x HN613256P (sample rom)
+    - 2x uPD4364C-15L (sample ram, battery backed)
+    - EXK-F19Z2064 (10-bit DAC)
 
-    Each ROM chip holds 1.49s of sounds and can be opened as raw
-    PCM data: signed 8-bit, mono, 20,000 Hz.
-
-    * Sound A: Toms 1~3, Kick, Snare, Rimshot, Closed Hi-Hat, Open Hi-Hat,
-        and Metronome Click (in that order).
-
-    * Sound B: Clap, Ride, Cowbell, and Crash (in that order).
-
-    Note: Holding EDIT/RECORD, DELETE, INSERT/AUTO-COMPENSATE and
-    CHAIN/BEAT at startup causes the system to go into a RAM test.
+    Notes:
+    - Each sample ROM holds 1.49s of sounds in the following format:
+      PCM data, signed 8-bit, mono, 20,000 Hz
+    - Holding EDIT/RECORD, DELETE, INSERT/AUTO-COMPENSATE and
+      CHAIN/BEAT at startup causes the system to go into a RAM test.
 
     TODO:
     - Metronome
-    - MIDI
-    - Cassette
-    - Audio input
+    - Make audio input generic (core support needed)
 
 ***************************************************************************/
 
 #include "emu.h"
+#include "bus/midi/midiinport.h"
+#include "bus/midi/midioutport.h"
+#include "cpu/upd7810/upd7811.h"
+#include "formats/trs_cas.h"
+#include "imagedev/cassette.h"
+#include "machine/nvram.h"
+#include "sound/upd934g.h"
+#include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"
-#include "cpu/upd7810/upd7811.h"
-#include "video/hd44780.h"
-#include "sound/upd934g.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "rz1.lh"
+
+
+namespace {
 
 
 //**************************************************************************
@@ -49,20 +58,21 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_hd44780(*this, "hd44780"),
-		m_pg{ {*this, "upd934g_c"}, {*this, "upd934g_b"} },
-		m_samples{ {*this, "samples_a"}, {*this, "samples_b"} },
-		m_keys(*this, "kc%u", 0),
+		m_pg(*this, "pg%u", 0U),
+		m_cassette(*this, "cassette"),
+		m_linein(*this, "linein"),
+		m_keys(*this, "kc%u", 0U),
+		m_foot(*this, "foot"),
+		m_led_sampling(*this, "led_sampling"),
 		m_led_song(*this, "led_song"),
 		m_led_pattern(*this, "led_pattern"),
 		m_led_startstop(*this, "led_startstop"),
 		m_port_a(0),
-		m_port_b(0xff)
+		m_port_b(0xff),
+		m_midi_rx(1)
 	{ }
 
 	void rz1(machine_config &config);
-
-	void rz1_palette(palette_device &palette) const;
-	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
 protected:
 	virtual void machine_start() override;
@@ -71,15 +81,30 @@ protected:
 private:
 	required_device<upd7811_device> m_maincpu;
 	required_device<hd44780_device> m_hd44780;
-	required_device<upd934g_device> m_pg[2];
-	required_memory_region m_samples[2];
+	required_device_array<upd934g_device, 2> m_pg;
+	required_device<cassette_image_device> m_cassette;
+	required_device<cassette_image_device> m_linein;
 	required_ioport_array<8> m_keys;
+	required_ioport m_foot;
 
+	output_finder<> m_led_sampling;
 	output_finder<> m_led_song;
 	output_finder<> m_led_pattern;
 	output_finder<> m_led_startstop;
 
 	void map(address_map &map);
+	void pg0_map(address_map &map);
+	void pg1_map(address_map &map);
+
+	uint8_t key_r();
+
+	void rz1_palette(palette_device &palette) const;
+	HD44780_PIXEL_UPDATE(lcd_pixel_update);
+	void leds_w(uint8_t data);
+
+	void upd934g_c_w(offs_t offset, uint8_t data);
+	void upd934g_b_w(offs_t offset, uint8_t data);
+	uint8_t analog_r();
 
 	uint8_t port_a_r();
 	void port_a_w(uint8_t data);
@@ -87,15 +112,9 @@ private:
 	uint8_t port_c_r();
 	void port_c_w(uint8_t data);
 
-	uint8_t upd934g_c_data_r(offs_t offset);
-	void upd934g_c_w(offs_t offset, uint8_t data);
-	uint8_t upd934g_b_data_r(offs_t offset);
-	void upd934g_b_w(offs_t offset, uint8_t data);
-	uint8_t key_r();
-	void leds_w(uint8_t data);
-
 	uint8_t m_port_a;
 	uint8_t m_port_b;
+	int m_midi_rx;
 };
 
 
@@ -106,13 +125,25 @@ private:
 void rz1_state::map(address_map &map)
 {
 //  map(0x0000, 0x0fff).rom().region("maincpu", 0);
-	map(0x2000, 0x3fff).ram();
+	map(0x2000, 0x3fff).ram().share("dataram");
 	map(0x4000, 0x7fff).rom().region("program", 0);
 	map(0x8000, 0x8fff).w(FUNC(rz1_state::upd934g_c_w));
 	map(0x9000, 0x9fff).rw(FUNC(rz1_state::key_r), FUNC(rz1_state::upd934g_b_w));
-	map(0xa000, 0xbfff).ram(); // sample ram 1
-	map(0xc000, 0xdfff).ram(); // sample ram 2
+	map(0xa000, 0xbfff).ram().share("sample1");
+	map(0xc000, 0xdfff).ram().share("sample2");
 	map(0xe000, 0xe001).w(FUNC(rz1_state::leds_w));
+}
+
+void rz1_state::pg0_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x9fff).ram().share("sample1");
+	map(0xa000, 0xbfff).ram().share("sample2");
+}
+
+void rz1_state::pg1_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
 }
 
 
@@ -192,12 +223,38 @@ static INPUT_PORTS_START( rz1 )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\xe2\x96\xb3 (YES)") PORT_CODE(KEYCODE_UP)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("\xe2\x96\xbd (NO)")  PORT_CODE(KEYCODE_DOWN)
 	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("foot")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Foot Switch")        PORT_CODE(KEYCODE_SPACE)
 INPUT_PORTS_END
 
 
 //**************************************************************************
-//  MACHINE EMULATION
+//  KEYBOARD
 //**************************************************************************
+
+uint8_t rz1_state::key_r()
+{
+	uint8_t data = 0;
+
+	for (int i = 0; i < 8; i++)
+		if (BIT(m_port_a, i) == 0)
+			data |= m_keys[i]->read();
+
+	return data;
+}
+
+
+//**************************************************************************
+//  VIDEO EMULATION
+//**************************************************************************
+
+void rz1_state::rz1_palette(palette_device &palette) const
+{
+	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
+	palette.set_pen_color(1, rgb_t(92, 83, 88));    // lcd pixel on
+	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
+}
 
 HD44780_PIXEL_UPDATE( rz1_state::lcd_pixel_update )
 {
@@ -209,26 +266,26 @@ HD44780_PIXEL_UPDATE( rz1_state::lcd_pixel_update )
 		bitmap.pix(1 + y, 1 + line*8*6 + pos*6 + x) = state ? 1 : 2;
 }
 
-uint8_t rz1_state::upd934g_c_data_r(offs_t offset)
+void rz1_state::leds_w(uint8_t data)
 {
-	if (offset < 0x8000)
-		return m_samples[1]->base()[offset];
-	else
-	{
-		if (offset < 0xc000)
-			return m_maincpu->space(AS_PROGRAM).read_byte(offset + 0x2000);
-		else
-			return 0;
-	}
+	// 76------  unknown
+	// --5-----  sampling led
+	// ---4----  start/stop led
+	// ----3---  pattern led red
+	// -----2--  pattern led green
+	// ------1-  song led red
+	// -------0  song led green
+
+	m_led_song = BIT(~data, 0, 2);
+	m_led_pattern = BIT(~data, 2, 2);
+	m_led_startstop = BIT(~data, 4);
+	m_led_sampling = BIT(~data, 5);
 }
 
-uint8_t rz1_state::upd934g_b_data_r(offs_t offset)
-{
-	if (offset < 0x8000)
-		return m_samples[0]->base()[offset];
-	else
-		return 0;
-}
+
+//**************************************************************************
+//  AUDIO EMULATION
+//**************************************************************************
 
 void rz1_state::upd934g_c_w(offs_t offset, uint8_t data)
 {
@@ -239,6 +296,16 @@ void rz1_state::upd934g_b_w(offs_t offset, uint8_t data)
 {
 	m_pg[1]->write(offset >> 8, data);
 }
+
+uint8_t rz1_state::analog_r()
+{
+	return uint8_t(int8_t(m_linein->input() * 127.0) + 127);
+}
+
+
+//**************************************************************************
+//  MACHINE EMULATION
+//**************************************************************************
 
 uint8_t rz1_state::port_a_r()
 {
@@ -260,68 +327,54 @@ void rz1_state::port_a_w(uint8_t data)
 		m_hd44780->write(BIT(m_port_b, 5), data);
 }
 
-// 7-------  lcd e
-// -6------  lcd rw
-// --5-----  lcd rs
-// ---4----  percussion generator reset
-// ----3---  metronome trigger
-// -----2--  power-on mute for line-out
-// ------1-  change-over signal tom3/bd
-// -------0  change-over signal tom1/tom2
-
 void rz1_state::port_b_w(uint8_t data)
 {
+	// 7-------  lcd e
+	// -6------  lcd rw
+	// --5-----  lcd rs
+	// ---4----  percussion generator reset
+	// ----3---  metronome trigger
+	// -----2--  power-on mute for line-out
+	// ------1-  change-over signal tom3/bd
+	// -------0  change-over signal tom1/tom2
+
 	if (0)
 		logerror("port_b_w: %02x\n", data);
 
 	m_port_b = data;
 }
 
-// 7-------  foot-sustain input
-// -6------  cassette data out
-// --5-----  cassette remote control
-// ---4----  change-over signal for sampling ram
-// ----3---  cassette data in
-// -----2--  control signal for percussion generator c
-// ------1-  midi in
-// -------0  midi out
-
 uint8_t rz1_state::port_c_r()
 {
-	return 0;
-}
+	// 7-------  foot-sustain input
+	// -6------  cassette data out
+	// --5-----  cassette remote control
+	// ---4----  change-over signal for sampling ram
+	// ----3---  cassette data in
+	// -----2--  control signal for percussion generator c
+	// ------1-  midi in (handled elsewhere: cpu rxd)
+	// -------0  midi out (handled elsewhere: cpu txd)
 
-void rz1_state::port_c_w(uint8_t data)
-{
-	logerror("port_c_w: %02x\n", data);
-}
-
-uint8_t rz1_state::key_r()
-{
 	uint8_t data = 0;
 
-	if (BIT(m_port_a, 0) == 0) data |= m_keys[0]->read();
-	if (BIT(m_port_a, 1) == 0) data |= m_keys[1]->read();
-	if (BIT(m_port_a, 2) == 0) data |= m_keys[2]->read();
-	if (BIT(m_port_a, 3) == 0) data |= m_keys[3]->read();
-	if (BIT(m_port_a, 4) == 0) data |= m_keys[4]->read();
-	if (BIT(m_port_a, 5) == 0) data |= m_keys[5]->read();
-	if (BIT(m_port_a, 6) == 0) data |= m_keys[6]->read();
-	if (BIT(m_port_a, 7) == 0) data |= m_keys[7]->read();
+	data |= (m_cassette->input() > 0 ? 0 : 1) << 3;
+	data |= m_foot->read() << 7;
 
 	return data;
 }
 
-void rz1_state::leds_w(uint8_t data)
+void rz1_state::port_c_w(uint8_t data)
 {
-	m_led_song =      BIT(data, 0) == 0 ? 1 : BIT(data, 1) == 0 ? 2 : 0;
-	m_led_pattern =   BIT(data, 2) == 0 ? 1 : BIT(data, 3) == 0 ? 2 : 0;
-	m_led_startstop = BIT(data, 4) == 0 ? 1 : 0;
+	m_cassette->change_state(BIT(data, 5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	m_cassette->output(BIT(data, 6) ? -1.0 : 1.0);
+
+	logerror("port_c_w: %02x\n", data);
 }
 
 void rz1_state::machine_start()
 {
 	// resolve output finders
+	m_led_sampling.resolve();
 	m_led_song.resolve();
 	m_led_pattern.resolve();
 	m_led_startstop.resolve();
@@ -329,18 +382,14 @@ void rz1_state::machine_start()
 	// register for save states
 	save_item(NAME(m_port_a));
 	save_item(NAME(m_port_b));
+	save_item(NAME(m_midi_rx));
 }
 
 void rz1_state::machine_reset()
 {
+	m_midi_rx = 1;
 }
 
-void rz1_state::rz1_palette(palette_device &palette) const
-{
-	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
-	palette.set_pen_color(1, rgb_t(92, 83, 88));    // lcd pixel on
-	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
-}
 
 //**************************************************************************
 //  MACHINE DEFINTIONS
@@ -355,6 +404,20 @@ void rz1_state::rz1(machine_config &config)
 	m_maincpu->pb_out_cb().set(FUNC(rz1_state::port_b_w));
 	m_maincpu->pc_in_cb().set(FUNC(rz1_state::port_c_r));
 	m_maincpu->pc_out_cb().set(FUNC(rz1_state::port_c_w));
+	m_maincpu->rxd_func().set([this]() { return m_midi_rx; });
+	m_maincpu->txd_func().set("mdout", FUNC(midi_port_device::write_txd));
+	m_maincpu->an0_func().set(FUNC(rz1_state::analog_r));
+	m_maincpu->an1_func().set(FUNC(rz1_state::analog_r));
+	m_maincpu->an2_func().set(FUNC(rz1_state::analog_r));
+	m_maincpu->an3_func().set(FUNC(rz1_state::analog_r));
+	m_maincpu->an4_func().set(FUNC(rz1_state::analog_r));
+	m_maincpu->an5_func().set(FUNC(rz1_state::analog_r));
+	m_maincpu->an6_func().set(FUNC(rz1_state::analog_r));
+	m_maincpu->an7_func().set(FUNC(rz1_state::analog_r));
+
+	NVRAM(config, "dataram", nvram_device::DEFAULT_NONE);
+	NVRAM(config, "sample1", nvram_device::DEFAULT_NONE);
+	NVRAM(config, "sample2", nvram_device::DEFAULT_NONE);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
@@ -373,13 +436,38 @@ void rz1_state::rz1(machine_config &config)
 
 	config.set_default_layout(layout_rz1);
 
+	// audio hardware
 	SPEAKER(config, "speaker").front_center();
 	UPD934G(config, m_pg[0], 1333000);
-	m_pg[0]->data_callback().set(FUNC(rz1_state::upd934g_c_data_r));
+	m_pg[0]->set_addrmap(0, &rz1_state::pg0_map);
 	m_pg[0]->add_route(ALL_OUTPUTS, "speaker", 1.0);
 	UPD934G(config, m_pg[1], 1280000);
-	m_pg[1]->data_callback().set(FUNC(rz1_state::upd934g_b_data_r));
+	m_pg[1]->set_addrmap(0, &rz1_state::pg1_map);
 	m_pg[1]->add_route(ALL_OUTPUTS, "speaker", 1.0);
+
+	// midi
+	midi_port_device &mdin(MIDI_PORT(config, "mdin", midiin_slot, "midiin"));
+	mdin.rxd_handler().set([this](int state) { m_midi_rx = state; });
+	mdin.rxd_handler().append("mdthru", FUNC(midi_port_device::write_txd));
+
+	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
+
+	MIDI_PORT(config, "mdthru", midiout_slot, "midiout");
+
+	// mt (magnetic tape)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(trs80l2_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("rz1_cass");
+	m_cassette->add_route(ALL_OUTPUTS, "speaker", 0.05);
+
+	// should be a generic audio input port, using cassette for now
+	CASSETTE(config, m_linein);
+	m_linein->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_linein->set_interface("audio_cass");
+	m_linein->add_route(ALL_OUTPUTS, "speaker", 0.05);
+
+	SOFTWARE_LIST(config, "cass_list").set_original("rz1_cass");
 }
 
 
@@ -394,12 +482,17 @@ ROM_START( rz1 )
 	ROM_REGION(0x4000, "program", 0)
 	ROM_LOAD("program.bin", 0x0000, 0x4000, CRC(b44b2652) SHA1(b77f8daece9adb177b6ce1ef518fc3238b8c0a9c))
 
-	ROM_REGION(0x8000, "samples_a", 0)
-	ROM_LOAD("sound_a.cm5", 0x0000, 0x8000, CRC(c643ff24) SHA1(e886314d22a9a5473bfa2cb237ecafcf0daedfc1)) // HN613256P
+	// Clap, Ride, Cowbell and Crash
+	ROM_REGION(0x8000, "pg0", 0)
+	ROM_LOAD("sound_b.cm6", 0x0000, 0x8000, CRC(ee5b703e) SHA1(cbf2e92c68901f236678d704e9e695a5c84ff49e))
 
-	ROM_REGION(0x8000, "samples_b", 0)
-	ROM_LOAD("sound_b.cm6", 0x0000, 0x8000, CRC(ee5b703e) SHA1(cbf2e92c68901f236678d704e9e695a5c84ff49e)) // HN613256P
+	// Toms 1~3, Kick, Snare, Rimshot, Closed Hi-Hat, Open Hi-Hat and Metronome Click
+	ROM_REGION(0x8000, "pg1", 0)
+	ROM_LOAD("sound_a.cm5", 0x0000, 0x8000, CRC(c643ff24) SHA1(e886314d22a9a5473bfa2cb237ecafcf0daedfc1))
 ROM_END
+
+
+} // anonymous namespace
 
 
 //**************************************************************************

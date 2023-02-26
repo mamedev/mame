@@ -111,11 +111,11 @@ void zaccaria_state::palette(palette_device &palette) const
 
 TILE_GET_INFO_MEMBER(zaccaria_state::get_tile_info)
 {
-	uint8_t attr = m_videoram[tile_index + 0x400];
-	tileinfo.set(0,
-			m_videoram[tile_index] + ((attr & 0x03) << 8),
-			((attr & 0x0c) >> 2) + ((m_attributesram[2 * (tile_index % 32) + 1] & 0x07) << 2),
-			0);
+	uint8_t attr = m_videoram[tile_index | 0x400];
+	uint16_t code = m_videoram[tile_index] | ((attr & 0x03) << 8);
+	attr = (attr & 0x0c) >> 2 | (read_attr(tile_index, 1) & 0x07) << 2;
+
+	tileinfo.set(0, code, attr, 0);
 }
 
 
@@ -149,21 +149,38 @@ void zaccaria_state::videoram_w(offs_t offset, uint8_t data)
 
 void zaccaria_state::attributes_w(offs_t offset, uint8_t data)
 {
-	if (offset & 1)
-	{
-		if (m_attributesram[offset] != data)
-			for (int i = offset / 2; i < 0x400; i += 32)
-				m_bg_tilemap->mark_tile_dirty(i);
-	}
-	else
-		m_bg_tilemap->set_scrolly(offset / 2,data);
-
+	uint8_t prev = m_attributesram[offset];
 	m_attributesram[offset] = data;
+
+	if (prev != data)
+	{
+		if (offset & 1)
+		{
+			uint8_t mask = flip_screen_x() ? 0x1f : 0;
+			for (int i = offset / 2; i < 0x400; i += 0x20)
+				m_bg_tilemap->mark_tile_dirty(i ^ mask);
+		}
+		else
+			update_colscroll();
+	}
+}
+
+uint8_t zaccaria_state::read_attr(offs_t offset, int which)
+{
+	if (flip_screen_x()) offset ^= 0x1f;
+	return m_attributesram[(offset << 1 & 0x3f) | (which & 1)];
+}
+
+void zaccaria_state::update_colscroll()
+{
+	for (int i = 0; i < 0x20; i++)
+		m_bg_tilemap->set_scrolly(i, read_attr(i, 0));
 }
 
 WRITE_LINE_MEMBER(zaccaria_state::flip_screen_x_w)
 {
 	flip_screen_x_set(state);
+	update_colscroll();
 }
 
 WRITE_LINE_MEMBER(zaccaria_state::flip_screen_y_w)
@@ -196,15 +213,10 @@ offsets 1 and 2 are swapped if accessed from spriteram2
 */
 void zaccaria_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, int color, int section)
 {
-	int o1 = 1,o2 = 2;
+	int o1 = 1 + section;
+	int o2 = 2 - section;
 
-	if (section)
-	{
-		o1 = 2;
-		o2 = 1;
-	}
-
-	for (int offs = 0;offs < 0x20;offs += 4)
+	for (int offs = 0; offs < 0x20; offs += 4)
 	{
 		int sx = spriteram[offs + 3] + 1;
 		int sy = 242 - spriteram[offs];
@@ -233,7 +245,7 @@ void zaccaria_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 uint32_t zaccaria_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect);
 
 	// 3 layers of sprites, each with their own palette and priorities
 	// Not perfect yet, does spriteram(1) layer have a priority bit somewhere?

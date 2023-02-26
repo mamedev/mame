@@ -51,6 +51,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class alphatro_state : public driver_device
 {
 public:
@@ -946,6 +948,9 @@ ROM_START( alphatrob )
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROMX_LOAD( "b40r_ic1067.bin",    0x0000, 0x1000, CRC(543e3ee8) SHA1(3e6c6f8c85d3a5d0735edfec52709c5670ff1646), ROM_BIOS(0) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1983, alphatro,  0,        0, alphatro, alphatro, alphatro_pal_state,   empty_init, "Triumph-Adler", "Alphatronic PC (PAL)",            MACHINE_SUPPORTS_SAVE )
 COMP( 1983, alphatron, alphatro, 0, alphatro, alphatro, alphatro_ntsc_state,  empty_init, "Triumph-Adler", "Alphatronic PC (NTSC)",           MACHINE_SUPPORTS_SAVE )

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia, David Haywood
-#ifndef MAME_VIDEO_FUUKIFH_H
-#define MAME_VIDEO_FUUKIFH_H
+#ifndef MAME_FUUKI_FUUKIFH_H
+#define MAME_FUUKI_FUUKIFH_H
 
 #pragma once
 
@@ -35,4 +35,4 @@ private:
 
 DECLARE_DEVICE_TYPE(FUUKI_VIDEO, fuukivid_device)
 
-#endif // MAME_VIDEO_FUUKIFH_H
+#endif // MAME_FUUKI_FUUKIFH_H

@@ -100,6 +100,7 @@ function maintargetosdoptions(_target,_subtarget)
 			configuration { }
 		end
 		links {
+			"dinput8",
 			"psapi",
 		}
 	elseif _OPTIONS["targetos"]=="haiku" then
@@ -266,6 +267,7 @@ if BASE_TARGETOS=="unix" then
 		linkoptions {
 			"-framework QuartzCore",
 			"-framework OpenGL",
+			"-framework IOKit",
 		}
 
 
@@ -425,20 +427,18 @@ project ("osd_" .. _OPTIONS["osd"])
 	end
 
 	files {
-		MAME_DIR .. "src/osd/sdl/osdsdl.h",
-		MAME_DIR .. "src/osd/sdl/sdlprefix.h",
-		MAME_DIR .. "src/osd/sdl/sdlmain.cpp",
 		MAME_DIR .. "src/osd/osdepend.h",
+		MAME_DIR .. "src/osd/modules/osdwindow.cpp",
+		MAME_DIR .. "src/osd/modules/osdwindow.h",
+		MAME_DIR .. "src/osd/sdl/osdsdl.cpp",
+		MAME_DIR .. "src/osd/sdl/osdsdl.h",
+		MAME_DIR .. "src/osd/sdl/sdlmain.cpp",
+		MAME_DIR .. "src/osd/sdl/sdlopts.cpp",
+		MAME_DIR .. "src/osd/sdl/sdlopts.h",
+		MAME_DIR .. "src/osd/sdl/sdlprefix.h",
 		MAME_DIR .. "src/osd/sdl/video.cpp",
 		MAME_DIR .. "src/osd/sdl/window.cpp",
 		MAME_DIR .. "src/osd/sdl/window.h",
-		MAME_DIR .. "src/osd/modules/osdwindow.cpp",
-		MAME_DIR .. "src/osd/modules/osdwindow.h",
-		MAME_DIR .. "src/osd/modules/render/drawsdl.cpp",
-	}
-	files {
-		MAME_DIR .. "src/osd/modules/render/draw13.cpp",
-		MAME_DIR .. "src/osd/modules/render/blit13.h",
 	}
 
 

@@ -6,12 +6,17 @@
 
 ********************************************************************************************/
 
-#ifndef MAME_INCLUDES_PC8801_H
-#define MAME_INCLUDES_PC8801_H
+#ifndef MAME_NEC_PC8801_H
+#define MAME_NEC_PC8801_H
 
 #pragma once
 
 #include "pc8001.h"
+
+#include "bus/centronics/ctronics.h"
+#include "bus/msx/ctrl/ctrl.h"
+#include "bus/pc8801/pc8801_31.h"
+#include "bus/pc8801/pc8801_exp.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
@@ -23,16 +28,14 @@
 #include "pc80s31k.h"
 #include "sound/beep.h"
 #include "sound/ymopn.h"
-#include "bus/centronics/ctronics.h"
-#include "bus/pc8801/pc8801_31.h"
-#include "bus/pc8801/pc8801_exp.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
+
 #define I8214_TAG       "i8214"
-#define UPD1990A_TAG    "upd1990a"
 
 class pc8801_state : public pc8001_base_state
 {
@@ -43,7 +46,6 @@ public:
 		, m_screen(*this, "screen")
 		, m_pc80s31(*this, "pc80s31")
 		, m_pic(*this, I8214_TAG)
-		, m_rtc(*this, UPD1990A_TAG)
 		, m_usart(*this, "usart")
 //      , m_cassette(*this, "cassette")
 		, m_beeper(*this, "beeper")
@@ -55,6 +57,7 @@ public:
 //      , m_cg_rom(*this, "cgrom")
 		, m_kanji_rom(*this, "kanji")
 		, m_kanji_lv2_rom(*this, "kanji_lv2")
+		, m_mouse_port(*this, "mouseport") // labelled "マウス" (mouse) - can't use "mouse" because of core -mouse option
 		, m_exp(*this, "exp")
 	{
 	}
@@ -73,8 +76,6 @@ protected:
 
 	virtual uint8_t dma_mem_r(offs_t offset) override;
 
-	virtual attotime mouse_limit_hz();
-
 	virtual uint8_t dictionary_rom_r(offs_t offset);
 	virtual bool dictionary_rom_enable();
 
@@ -86,7 +87,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<pc80s31_device> m_pc80s31;
 	optional_device<i8214_device> m_pic;
-	required_device<upd1990a_device> m_rtc;
+//  required_device<upd1990a_device> m_rtc;
 	required_device<i8251_device> m_usart;
 //  required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;
@@ -98,19 +99,11 @@ protected:
 //  required_region_ptr<u8> m_cg_rom;
 	required_region_ptr<u8> m_kanji_rom;
 	required_region_ptr<u8> m_kanji_lv2_rom;
+	required_device<msx_general_purpose_port_device> m_mouse_port;
 	required_device<pc8801_exp_slot_device> m_exp;
 
 	DECLARE_WRITE_LINE_MEMBER(int4_irq_w);
 
-	struct mouse_t {
-		uint8_t phase = 0;
-		int8_t prev_dx = 0, prev_dy = 0;
-		uint8_t lx = 0, ly = 0;
-
-		attotime time = attotime::never;
-	};
-
-	mouse_t m_mouse;
 	uint8_t m_gfx_ctrl = 0;
 
 private:
@@ -183,7 +176,7 @@ private:
 	void alu_ctrl2_w(uint8_t data);
 	template <unsigned kanji_level> uint8_t kanji_r(offs_t offset);
 	template <unsigned kanji_level> void kanji_w(offs_t offset, uint8_t data);
-	void rtc_w(uint8_t data);
+//  void rtc_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 
@@ -238,6 +231,7 @@ protected:
 	virtual void main_io(address_map &map) override;
 
 	uint8_t opn_porta_r();
+	uint8_t opn_portb_r();
 
 private:
 	optional_device<ym2203_device> m_opn;
@@ -258,8 +252,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void main_io(address_map &map) override;
-
-	virtual attotime mouse_limit_hz() override;
 
 private:
 	required_device<ym2608_device> m_opna;
@@ -328,4 +320,4 @@ private:
 	bool m_cdrom_bank = true;
 };
 
-#endif // MAME_INCLUDES_PC8801_H
+#endif // MAME_NEC_PC8801_H

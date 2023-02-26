@@ -5,8 +5,8 @@
     Irem M92 hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_M92_H
-#define MAME_INCLUDES_M92_H
+#ifndef MAME_IREM_M92_H
+#define MAME_IREM_M92_H
 
 #pragma once
 
@@ -130,4 +130,4 @@ private:
 	TIMER_CALLBACK_MEMBER(spritebuffer_done);
 };
 
-#endif // MAME_INCLUDES_M92_H
+#endif // MAME_IREM_M92_H

@@ -24,7 +24,7 @@ struct optrom_region {
 	const char *m_tag;
 };
 
-constexpr std::array<struct optrom_region , 8> region_tab =
+constexpr std::array<struct optrom_region , 9> region_tab =
 	{{
 	  { 0x3000 , 0x400 , "rom3000" },
 	  { 0x3400 , 0x400 , "rom3400" },
@@ -33,7 +33,8 @@ constexpr std::array<struct optrom_region , 8> region_tab =
 	  { 0x4000 , 0x400 , "rom4000" },
 	  { 0x4400 , 0x800 , "rom4400" },
 	  { 0x4c00 , 0x400 , "rom4c00" },
-	  { 0x5c00 ,0x2000 , "rom5c00" }
+	  { 0x5c00 ,0x2000 , "rom5c00" },
+	  { 0x3000 ,0x1000 , "rom3000_3fff" }
 	}};
 
 // +--------------------+
@@ -70,6 +71,9 @@ void hp9825_optrom_device::install_rw_handlers(address_space *space_r , address_
 		uint8_t *ptr = get_software_region(reg.m_tag);
 		if (ptr != nullptr) {
 			LOG("%s loaded\n" , reg.m_tag);
+			if (reg.m_start >= m_rom_limit) {
+				throw emu_fatalerror(util::string_format("ROM @%04x is not compatible with current amount of RAM", reg.m_start));
+			}
 			if (reg.m_start == 0x5c00) {
 				space_r->install_rom(0x3000 , 0x33ff , ptr);
 				space_r->install_device(0x5c00 , 0x5fff , *m_bank , &address_map_bank_device::amap16);
@@ -111,15 +115,9 @@ image_init_result hp9825_optrom_device::call_load()
 
 	for (const struct optrom_region& reg : region_tab) {
 		auto len = get_software_region_length(reg.m_tag) / 2;
-		if (len != 0) {
-			if (len != reg.m_size) {
-				LOG("Region %s: wrong size (%u should be %u)\n" , reg.m_tag , len , reg.m_size);
-				return image_init_result::FAIL;
-			}
-			if (reg.m_start >= m_rom_limit) {
-				LOG("Region %s beyond ROM limit (start=%04x , limit=%04x)\n" , reg.m_tag , reg.m_start , m_rom_limit);
-				return image_init_result::FAIL;
-			}
+		if (len != 0 && len != reg.m_size) {
+			LOG("Region %s: wrong size (%u should be %u)\n" , reg.m_tag , len , reg.m_size);
+			return image_init_result::FAIL;
 		}
 	}
 

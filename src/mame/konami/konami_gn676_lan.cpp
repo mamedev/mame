@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ville Linde
+// copyright-holders:Ville Linde, windyfairy
 
 /*
 Hardware info by Guru
@@ -22,9 +22,9 @@ Notes:
       CN1      - Connector joining to CPU board CN4
       CN2/3    - RCA jacks for network cable
       HYC2485S - Hybrid ceramic module for RS485
-      CY7C199  - 32k x8 SRAM
-      XC5204   - Xilinx XC5204 FPGA
-      XC5210   - Xilink XC5210 FPGA
+      CY7C199  - 32k x8 SRAM (labeled 3C)
+      XC5204   - Xilinx XC5204 FPGA (labeled 7C)
+      XC5210   - Xilink XC5210 FPGA (labeled 6F)
       N676H1   - PALCE16V8Q-15 stamped 'N676H1'
 
 Network PCB (Racing Jam 2 and Thrill Drive (NWK-TR))
@@ -52,8 +52,32 @@ This pcb is the same as the A version but with one added chip:
                  timekeeper back to factory settings for the new kitted game installed. If the region ID in
                  serialflash and timekeeper do not match, the game boots with a "hardware error" message.
 
-TODO:
-- Add X76F041 device when dumps will be available and get rid of the work_ram hack
+
+FPGA Bitstreams
+---------------
+- Racing Jam (racingj)
+    - Uses type A board
+    - Firmware (CRC32 92fde8df, 29491 bytes)
+
+- Racing Jam 2 (racingj2, racingj2j)
+    - Uses type B board with x76 chip? (x76 isn't used?)
+    - Firmware (CRC32 dfc74cc9, 29491 bytes)
+
+- Thrill Drive (thrilld, thrilldb, thrilldbu)
+    - Uses type B board with x76 chip (except thrilldbu which uses type A without the x76 chip)
+    - Firmware #1 (CRC32 3760e3ce, 29490 bytes)
+        - Used during initial device test (does not get uploaded with skip post)
+        - Tests every register and expects to be able to read back the values it wrote for every register *except* 0x05, 0x06, and 0x09 on lanc2
+        - Seems to be a stubbed version of the normal firmware with the logic for all registers stubbed except memory-related registers
+    - Firmware #2 (CRC32 a8c97a75, 29490 bytes)
+        - Uploaded after boot sequence (even with skip post)
+        - Allows usage of x76 chip
+    - Firmware #3 (CRC32 93b86e35, 29490 bytes)
+        - Uploaded after security check (boot finishes, just as it starts the actual game)
+        - x76 chip capability unknown (TODO: this should be tested on real hardware)
+
+Racing Jam 1 and 2 are both programmed to send one extra 0xff at the end of the upload sequence. The Thrill Drive a8c97a75 firmware
+and the Racing Jam 2 dfc74cc9 firmware are actually the same except for the final 0xff.
 */
 
 #include "emu.h"
@@ -64,177 +88,299 @@ TODO:
 
 #include "logmacro.h"
 
+#define DUMP_FIRMWARE 0
 
-DEFINE_DEVICE_TYPE(KONAMI_GN676_LAN, konami_gn676_lan_device, "konami_gn676_lan", "Konami GN676 Network PCB")
 
-konami_gn676_lan_device::konami_gn676_lan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, KONAMI_GN676_LAN, tag, owner, clock),
-	m_fpga_uploaded(false),
-	m_lanc2_ram_r(0),
-	m_lanc2_ram_w(0),
-	m_lanc2_ram(nullptr),
-	m_work_ram(*this, finder_base::DUMMY_TAG)
+DEFINE_DEVICE_TYPE(KONAMI_GN676A_LAN, konami_gn676a_lan_device, "konami_gn676a_lan", "Konami GN676-PWB(H)A Network PCB")
+DEFINE_DEVICE_TYPE(KONAMI_GN676B_LAN, konami_gn676b_lan_device, "konami_gn676b_lan", "Konami GN676-PWB(H)B Network PCB")
+
+konami_gn676_lan_device::konami_gn676_lan_device(const machine_config &mconfig, const device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
+	m_x76f041(*this, "eeprom"),
+	m_lanc2_ram(nullptr)
 {
-	std::fill(std::begin(m_lanc2_reg), std::end(m_lanc2_reg), 0);
 }
 
+konami_gn676a_lan_device::konami_gn676a_lan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: konami_gn676_lan_device(mconfig, KONAMI_GN676A_LAN, tag, owner, clock)
+{
+}
+
+konami_gn676b_lan_device::konami_gn676b_lan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: konami_gn676_lan_device(mconfig, KONAMI_GN676B_LAN, tag, owner, clock)
+{
+}
+
+void konami_gn676b_lan_device::device_add_mconfig(machine_config &config)
+{
+	X76F041(config, m_x76f041);
+}
 
 void konami_gn676_lan_device::device_start()
 {
 	m_lanc2_ram = std::make_unique<uint8_t[]>(0x8000);
 
-	save_item(NAME(m_fpga_uploaded));
 	save_item(NAME(m_lanc2_ram_r));
 	save_item(NAME(m_lanc2_ram_w));
 	save_item(NAME(m_lanc2_reg));
+	save_item(NAME(m_network_buffer_max_size));
+	save_item(NAME(m_network_id));
+	save_item(NAME(m_fpga_reset_state));
+	save_item(NAME(m_fpga_uploaded));
+	save_item(NAME(m_fpga_waiting_firmware));
+	save_item(NAME(m_fpga_receiving));
+	save_item(NAME(m_fpga_is_stubbed));
+	save_item(NAME(m_fpga_firmware_size));
+	save_item(NAME(m_fpga_firmware_crc));
+	save_item(NAME(m_x76f041_enabled));
+	save_item(NAME(m_x76f041_read_enabled));
+	save_item(NAME(m_x76f041_rst_triggered));
+
 	save_pointer(NAME(m_lanc2_ram), 0x8000);
 }
-
-
-uint32_t konami_gn676_lan_device::lanc1_r(offs_t offset)
+void konami_gn676_lan_device::device_reset()
 {
-	switch (offset)
-	{
-		case 0x40/4:
-		{
-			uint32_t r = 0;
+	std::fill_n(m_lanc2_ram.get(), 0x8000, 0);
 
-			r |= (m_fpga_uploaded) ? (1 << 6) : 0;
-			r |= 1 << 5;
-
-			return (r) << 24;
-		}
-
-		default:
-		{
-			LOG("lanc1_r: %08X at %08X\n", offset, machine().describe_context());
-			return 0xffffffff;
-		}
-	}
+	m_fpga_reset_state = true;
+	reset_fpga_state(false);
 }
 
-void konami_gn676_lan_device::lanc1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+uint8_t konami_gn676_lan_device::lanc1_r(offs_t offset)
 {
-	LOG("lanc1_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, machine().describe_context());
-}
+	uint8_t r = 0xff;
 
-uint32_t konami_gn676_lan_device::lanc2_r(offs_t offset, uint32_t mem_mask)
-{
-	uint32_t r = 0;
+	if (offset == 0x40)
+	{
+		r = (m_fpga_receiving << 6) | (m_fpga_waiting_firmware << 5);
 
-	if (offset == 0)
-	{
-		if (ACCESSING_BITS_0_7)
-		{
-			r |= m_lanc2_ram[m_lanc2_ram_r & 0x7fff];
-			m_lanc2_ram_r++;
-		}
-		else
-		{
-			r |= 0xffffff00;
-		}
-	}
-	else if (offset == 1)
-	{
-		r |= 0x00005555;        // set all other machines as disconnected
-	}
-	else if (offset == 3)
-	{
-		r |= 0xffffffff;
-	}
-	else if (offset == 4)
-	{
-		if (ACCESSING_BITS_24_31)
-		{
-			r |= 0x00000000;
-		}
+		// racingj/racingj2 polls expecting to see bit 5 set and bit 6 unset before
+		// it'll start uploading the firmware, so only set it after being polled.
+		m_fpga_receiving = true;
 	}
 
-	LOG("lanc2_r: %08X, %08X at %08X\n", offset, mem_mask, machine().describe_context());
+	LOG("%s: lanc1_r: read %02X from %08X\n", tag(), r, offset, machine().describe_context());
 
 	return r;
 }
 
-void konami_gn676_lan_device::lanc2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void konami_gn676_lan_device::lanc1_w(offs_t offset, uint8_t data)
 {
-	if (offset == 0)
+	LOG("%s: lanc1_w: wrote %02X to %08X\n", machine().describe_context(), data, offset);
+
+	if (offset == 0x20)
 	{
-		if (ACCESSING_BITS_24_31)
+		if (BIT(data, 7))
 		{
-			uint8_t value = data >> 24;
-
-			value = ((value >> 7) & 0x01) |
-					((value >> 5) & 0x02) |
-					((value >> 3) & 0x04) |
-					((value >> 1) & 0x08) |
-					((value << 1) & 0x10) |
-					((value << 3) & 0x20) |
-					((value << 5) & 0x40) |
-					((value << 7) & 0x80);
-
 			m_fpga_uploaded = true;
-			m_lanc2_reg[0] = (uint8_t)(data >> 24);
+			m_fpga_waiting_firmware = false;
+			m_fpga_receiving = false;
+			m_fpga_firmware_crc = util::crc32_creator::simple(m_lanc2_ram.get(), m_fpga_firmware_size);
 
-			LOG("lanc2_fpga_w: %02X at %08X\n", value, machine().describe_context());
-		}
-		if (ACCESSING_BITS_8_15)
-		{
-			m_lanc2_ram_r = 0;
-			m_lanc2_ram_w = 0;
-			m_lanc2_reg[1] = (uint8_t)(data >> 8);
+			LOG("%s: lanc1_fpga: Found firmware with hash of %08x\n", tag(), m_fpga_firmware_crc, machine().describe_context());
 
-			if (data & 0x1000)
+			m_x76f041_enabled = m_fpga_firmware_crc == 0xa8c97a75 || m_fpga_firmware_crc == 0xdfc74cc9 || m_fpga_firmware_crc == 0x93b86e35;
+			m_fpga_is_stubbed = m_fpga_firmware_crc == 0x3760e3ce;
+
+			if (DUMP_FIRMWARE)
 			{
-				// send out frame for this machine
-			}
-			else
-			{
-				// read from other machines
-				//int machine_id = (m_lanc2_reg[2] >> 4) & 7;
-				//int self = m_lanc2_reg[2] & 1;
-
-				for (auto j = 0; j < 0x110; j++)
+				// DEBUG: Dump firmware for quick comparison
+				FILE *f = fopen(util::string_format("firmware_%08x.bin", m_fpga_firmware_crc).c_str(), "wb");
+				if (f)
 				{
-					m_lanc2_ram[j] = 0xff;
+					fwrite(m_lanc2_ram.get(), 1, m_fpga_firmware_size, f);
+					fclose(f);
 				}
 			}
-		}
-		if (ACCESSING_BITS_16_23)
-		{
-			m_lanc2_reg[2] = (uint8_t)(data >> 16);
-		}
-		if (ACCESSING_BITS_0_7)
-		{
-			m_lanc2_ram[m_lanc2_ram_w & 0x7fff] = data & 0xff;
-			m_lanc2_ram_w++;
+
+			std::fill_n(m_lanc2_ram.get(), 0x8000, 0);
 		}
 	}
-	if (offset == 4) // only type B has the chip at 2G
+}
+
+uint8_t konami_gn676_lan_device::lanc2_r(offs_t offset)
+{
+	if (m_fpga_waiting_firmware)
 	{
-		// TODO: HACK! The data below would normally be present on the serialflash at 2G.
-
-		if (strcmp(machine().system().name, "thrilld") == 0 ||
-			strcmp(machine().system().name, "thrilldb") == 0 ||
-			strcmp(machine().system().name, "thrilldbe") == 0)
-		{
-			m_work_ram[(0x3ffed0/4) + 0] = 0x472a3731;      // G*71
-			m_work_ram[(0x3ffed0/4) + 1] = 0x33202020;      // 3
-			m_work_ram[(0x3ffed0/4) + 2] = 0x2d2d2a2a;      // --**
-			m_work_ram[(0x3ffed0/4) + 3] = 0x2a207878;      // *
-
-			m_work_ram[(0x3fff40/4) + 0] = 0x47433731;      // GC71
-			m_work_ram[(0x3fff40/4) + 1] = 0x33000000;      // 3
-			m_work_ram[(0x3fff40/4) + 2] = 0x19994a41;      //   JA
-			m_work_ram[(0x3fff40/4) + 3] = 0x4100a9b1;      // A
-		}
-		else if (strcmp(machine().system().name, "racingj2") == 0)
-		{
-			m_work_ram[(0x3ffc80/4) + 0] = 0x47453838;      // GE88
-			m_work_ram[(0x3ffc80/4) + 1] = 0x38003030;      // 8 00
-			m_work_ram[(0x3ffc80/4) + 2] = 0x39374541;      // 97EA
-			m_work_ram[(0x3ffc80/4) + 3] = 0x410058da;      // A
-		}
+		if (offset == 0)
+			return 0x80; // Required to be set for firmware to be written
+		return 0;
 	}
 
-	LOG("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, machine().describe_context());
+	uint8_t r = m_lanc2_reg[offset];
+	switch (offset)
+	{
+		case 1:
+			r = BIT(m_lanc2_ram_r, 8, 8);
+			break;
+
+		case 2:
+			r = BIT(m_lanc2_ram_r, 0, 8);
+			break;
+
+		case 3:
+			r = m_lanc2_ram[m_lanc2_ram_r];
+			m_lanc2_ram_r = (m_lanc2_ram_r + 1) & 0x7fff;
+
+			if (!m_fpga_is_stubbed)
+				r = 0xff; // HACK: network traffic isn't implemented so give dummy data
+			break;
+
+		case 6:
+		case 7:
+			if (m_fpga_is_stubbed)
+			{
+				// Thrill Drive's boot test checks for this specific logic
+				r = (m_lanc2_reg[offset] + 3) & 0x7f;
+				m_lanc2_reg[offset]++;
+			}
+			else
+				r = 0x55; // HACK: force clients to show as disconnected
+			break;
+
+		case 9:
+		{
+			// Thrill Drive's boot test checks for this specific logic
+			uint8_t a = m_lanc2_reg[offset] + 6;
+			uint8_t b = BIT(a, 4, 2) & BIT(a, 5, 2) & BIT(a, 6, 2);
+			r = (b << 4) | (a & 0x0f);
+
+			if (m_fpga_is_stubbed)
+				m_lanc2_reg[offset]++;
+			break;
+		}
+
+		case 0x0c:
+		case 0x0d:
+			// Used with reg 6/7 to determine info about clients
+			break;
+
+		case 0x10:
+			if (m_x76f041 && m_x76f041_enabled && m_x76f041_read_enabled)
+				r = m_x76f041->read_sda();
+			break;
+	}
+
+	LOG("%s: lanc2_r: read %02X from %08X\n", tag(), r, offset, machine().describe_context());
+
+	return r;
+}
+
+void konami_gn676_lan_device::lanc2_w(offs_t offset, uint8_t data)
+{
+	if (m_fpga_waiting_firmware)
+	{
+		if (offset == 0)
+			m_lanc2_ram[m_fpga_firmware_size++] = data;
+		return;
+	}
+
+	LOG("%s: lanc2_w: wrote %02X to %08X\n", tag(), data, offset, machine().describe_context());
+
+	m_lanc2_reg[offset] = data;
+
+	switch (offset)
+	{
+		case 0:
+			// This shouldn't actually be used in practice but Thrill Drive's boot test explicitly writes
+			// (addr >> 16) & 1 to this register which would put it out of the available RAM space.
+			break;
+
+		case 1:
+			m_lanc2_ram_r = (m_lanc2_ram_r & 0x100ff) | (data << 8);
+			m_lanc2_ram_w = (m_lanc2_ram_w & 0x100ff) | (data << 8);
+			break;
+
+		case 2:
+			m_lanc2_ram_r = (m_lanc2_ram_r & 0x1ff00) | data;
+			m_lanc2_ram_w = (m_lanc2_ram_w & 0x1ff00) | data;
+			break;
+
+		case 3:
+			m_lanc2_ram[m_lanc2_ram_w] = data;
+			m_lanc2_ram_w = (m_lanc2_ram_w + 1) & 0x7fff;
+			break;
+
+		case 4:
+			// Network enabled flag?
+			// Set to 0 after firmware is uploaded, set to 1 when setting self network ID and similar info
+			break;
+
+		case 5:
+			m_network_id = data;
+			break;
+
+		case 0x10:
+			if (m_x76f041 && m_x76f041_enabled)
+			{
+				/*
+				    0x01 = x76 SDA
+				    0x02 = x76 RST
+				    0x04 = x76 CS???
+				    0x08 = x76 SCL
+				    0x10 = Controls direction of x76 SDA
+				*/
+
+				if (BIT(data, 1))
+					m_x76f041_rst_triggered = true;
+
+				m_x76f041_read_enabled = BIT(data, 4);
+				m_x76f041->write_rst(BIT(data, 1));
+				m_x76f041->write_scl(BIT(data, 3));
+
+				if (!m_x76f041_read_enabled)
+				{
+					if (m_x76f041_rst_triggered && BIT(data, 1) == 0)
+					{
+						// HACK: RST was triggered previously and now we're exiting read mode, so reset
+						// the x76 state so we're not stuck in a loop reading the reset response.
+						// My guess is bit 2 is used in some way for this but the usage doesn't make
+						// sense (if used as CS then it'll reset the chip state entirely during ACK
+						// polling in normal usage). FPGA magic?
+						m_x76f041->write_cs(1);
+						m_x76f041->write_cs(0);
+						m_x76f041_rst_triggered = false;
+					}
+
+					m_x76f041->write_sda(BIT(data, 0));
+				}
+			}
+			break;
+
+		case 0x1c:
+			m_network_buffer_max_size = (data << 8) | (m_network_buffer_max_size & 0xff);
+			break;
+
+		case 0x1d:
+			m_network_buffer_max_size = (m_network_buffer_max_size & 0xff00) | data;
+			break;
+	}
+}
+
+void konami_gn676_lan_device::reset_fpga_state(bool state)
+{
+	if (state == m_fpga_reset_state)
+		return;
+
+	// Reset state of FPGA so that it's waiting for new firmware until
+	// bit 7 of lanc1_w addr 0x20 is set.
+	m_fpga_reset_state = state;
+
+	m_fpga_waiting_firmware = true;
+	m_fpga_uploaded = false;
+	m_fpga_receiving = false;
+	m_fpga_is_stubbed = false;
+	m_fpga_firmware_size = 0;
+	m_fpga_firmware_crc = 0;
+
+	m_x76f041_enabled = false;
+	m_x76f041_read_enabled = false;
+	m_x76f041_rst_triggered = false;
+
+	m_lanc2_ram_r = m_lanc2_ram_w = 0;
+
+	m_network_buffer_max_size = 0;
+	m_network_id = 0;
+
+	std::fill(std::begin(m_lanc2_reg), std::end(m_lanc2_reg), 0);
 }

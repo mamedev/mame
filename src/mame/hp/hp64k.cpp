@@ -164,6 +164,9 @@
 #include "machine/phi.h"
 #include "bus/ieee488/ieee488.h"
 
+
+namespace {
+
 #define BIT_MASK(n) (1U << (n))
 
 // Macros to clear/set single bits
@@ -1490,6 +1493,9 @@ ROM_START(hp64k)
 	ROM_REGION(0x800 , "chargen" , 0)
 	ROM_LOAD("1816_1496_82s191.bin" , 0 , 0x800 , CRC(32a52664) SHA1(8b2a49a32510103ff424e8481d5ed9887f609f2f))
 ROM_END
+
+} // anonymous namespace
+
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME */
 COMP( 1979, hp64k, 0,      0,      hp64k,   hp64k, hp64k_state, empty_init, "HP",    "HP 64000" , 0)

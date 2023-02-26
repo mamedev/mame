@@ -8,8 +8,8 @@
  * to the APbus while providing DMA capabilities. Each FIFO chip can support up to 4 devices.
  */
 
-#ifndef MAME_MACHINE_CXD8442Q_H
-#define MAME_MACHINE_CXD8442Q_H
+#ifndef MAME_SONY_CXD8442Q_H
+#define MAME_SONY_CXD8442Q_H
 
 #pragma once
 
@@ -144,4 +144,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(CXD8442Q, cxd8442q_device)
 
-#endif // MAME_MACHINE_CXD8442Q_H
+#endif // MAME_SONY_CXD8442Q_H

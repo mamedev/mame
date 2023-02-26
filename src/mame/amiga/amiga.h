@@ -9,12 +9,15 @@ Ernesto Corvi & Mariusz Wojcieszek
 
 ***************************************************************************/
 
-#ifndef MAME_INCLUDES_AMIGA_H
-#define MAME_INCLUDES_AMIGA_H
+#ifndef MAME_AMIGA_AMIGA_H
+#define MAME_AMIGA_AMIGA_H
 
 #pragma once
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
+#include "cpu/m68000/m68030.h"
+#include "cpu/m68000/m68040.h"
 #include "machine/bankdev.h"
 #include "bus/rs232/rs232.h"
 #include "bus/centronics/ctronics.h"
@@ -726,4 +729,4 @@ private:
 	uint32_t amiga_gethvpos();
 };
 
-#endif // MAME_INCLUDES_AMIGA_H
+#endif // MAME_AMIGA_AMIGA_H

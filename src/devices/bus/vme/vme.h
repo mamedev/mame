@@ -50,6 +50,10 @@
 
 #pragma once
 
+#include <functional>
+#include <utility>
+#include <vector>
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -190,7 +194,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	simple_list<device_vme_card_interface> m_device_list;
+	std::vector<std::reference_wrapper<device_vme_card_interface> > m_device_list;
 
 	virtual space_config_vector memory_space_config() const override;
 
@@ -202,7 +206,7 @@ protected:
 	int m_prgwidth;
 	bool m_allocspaces;
 
-	const char                 *m_cputag;
+	const char *m_cputag;
 
 };
 
@@ -213,7 +217,6 @@ DECLARE_DEVICE_TYPE(VME_SLOT, vme_slot_device)
 
 class device_vme_card_interface : public device_interface
 {
-	template <class ElementType> friend class simple_list;
 public:
 	// inline configuration
 	void set_vme_bus(vme_device &vme, int slot) { m_vme = &vme; m_slot = slot; }
@@ -233,9 +236,6 @@ protected:
 
 	vme_device  *m_vme;
 	int m_slot;
-
-private:
-	device_vme_card_interface *m_next;
 };
 
 #endif // MAME_BUS_VME_VME_H

@@ -29,9 +29,10 @@
 	"vertex": "chains/misc/vs_deposterize-pass0",
 	"fragment": "chains/misc/fs_deposterize-pass0",
 	"uniforms": [
-		{ "name": "decal",        "type": "int",  "values": [ 1.0 ] },
-		{ "name": "EQ_THRESH1",   "type": "vec4", "values": [ 0.01, 0.0, 0.0, 0.0 ] },
-		{ "name": "DIFF_THRESH1", "type": "vec4", "values": [ 0.06, 0.0, 0.0, 0.0 ] },
-		{ "name": "u_tex_size0",  "type": "vec4", "values": [ 1.0,  1.0, 0.0, 0.0 ] }
+		{ "name": "decal",           "type": "int",  "values": [ 1.0 ] },
+		{ "name": "EQ_THRESH1",      "type": "vec4", "values": [ 0.01, 0.0, 0.0, 0.0 ] },
+		{ "name": "DIFF_THRESH1",    "type": "vec4", "values": [ 0.06, 0.0, 0.0, 0.0 ] },
+		{ "name": "u_tex_size0",     "type": "vec4", "values": [ 1.0,  1.0, 0.0, 0.0 ] },
+		{ "name": "u_inv_view_dims", "type": "vec4", "values": [ 1.0,  1.0, 0.0, 0.0 ] }
 	]
 }

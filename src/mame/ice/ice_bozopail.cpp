@@ -21,6 +21,9 @@ http://www.highwaygames.com/arcade-machines/bozo-s-grand-prize-game-6751/
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "speaker.h"
 
+
+namespace {
+
 class ice_bozopail_state : public driver_device
 {
 public:
@@ -75,5 +78,8 @@ ROM_START( ice_bozo )
 	ROM_LOAD( "ice-bozo.u18", 0x000000, 0x100000, CRC(00500a8b) SHA1(50b8a784ae61510a08cafbfb8529ec2a8ac1bf06) )
 	ROM_LOAD( "ice-bozo.u9",  0x100000, 0x100000, CRC(26fd9d60) SHA1(41fe8d42db1eb16b413bd5a0f16bf0d081c3cc97) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1997?, ice_bozo, 0, ice_bozo, ice_bozo, ice_bozopail_state, empty_init, ROT0, "Innovative Creations in Entertainment", "Bozo's Pail Toss (v2.07)", MACHINE_IS_SKELETON_MECHANICAL )

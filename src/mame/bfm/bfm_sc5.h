@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_INCLUDES_BFM_SC5_H
-#define MAME_INCLUDES_BFM_SC5_H
+#ifndef MAME_BFM_BFM_SC5_H
+#define MAME_BFM_BFM_SC5_H
 
 #pragma once
 
 #include "bfm_sc4.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/mcf5206e.h"
 
 class bfm_sc5_state : public bfm_sc45_state
 {
@@ -41,4 +41,4 @@ protected:
 
 INPUT_PORTS_EXTERN( bfm_sc5 );
 
-#endif // MAME_INCLUDES_BFM_SC5_H
+#endif // MAME_BFM_BFM_SC5_H

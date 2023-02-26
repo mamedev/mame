@@ -1,10 +1,11 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="misterx" description="Yeno MisterX cartridges">
-	<software name="ftrivia">
+
+	<software name="ftrivia" supported="no">
 		<description>Fantasie-Trivia</description>
 		<year>1989</year>
 		<publisher>Video Technology / Yeno</publisher>
@@ -16,14 +17,26 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="allgeme2">
+	<software name="allgeme2" supported="no">
 		<description>Allgemeinwissen II</description>
 		<year>1989</year>
 		<publisher>Video Technology / Yeno</publisher>
 		<part name="cart" interface="genius_cart">
 			<dataarea name="rom" size="0x20000">
-				<rom name="27-5041-00-0.bin" size="0x20000" crc="cf68c0ec" sha1="d582f454195a416e4bcc235558af0311b543aab0" offset="0" />
+				<rom name="27-5041-00-0.bin" size="0x20000" crc="cf68c0ec" sha1="d582f454195a416e4bcc235558af0311b543aab0" />
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="megaquiz" supported="no"> <!-- contains a second, not enabled game: Explorations -->
+		<description>Mega-Quiz</description>
+		<year>1991</year>
+		<publisher>Video Technology / Yeno</publisher>
+		<part name="cart" interface="genius_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom name="lh531a71.u1" size="0x20000" crc="0bc51c1b" sha1="9636e19df58df6a7d779adf743ea807703bacd2e" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

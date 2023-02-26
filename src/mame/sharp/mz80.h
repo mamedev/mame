@@ -5,8 +5,8 @@
  * includes/mz80.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_MZ80_H
-#define MAME_INCLUDES_MZ80_H
+#ifndef MAME_SHARP_MZ80_H
+#define MAME_SHARP_MZ80_H
 
 #pragma once
 
@@ -77,4 +77,4 @@ private:
 extern const gfx_layout mz80k_charlayout;
 extern const gfx_layout mz80kj_charlayout;
 
-#endif // MAME_INCLUDES_MZ80_H
+#endif // MAME_SHARP_MZ80_H

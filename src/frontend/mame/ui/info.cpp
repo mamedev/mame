@@ -142,7 +142,7 @@ void get_system_warnings(std::ostream &buf, running_machine &machine, machine_fl
 	if (flags & ::machine_flags::NOT_WORKING)
 		buf << _("\nTHIS SYSTEM DOESN'T WORK. The emulation for this system is not yet complete. There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n");
 	if (flags & ::machine_flags::MECHANICAL)
-		buf << _("\nElements of this system cannot be emulated as they require physical interaction or consist of mechanical devices. It is not possible to fully experience this system.\n");
+		buf << _("\nElements of this system cannot be emulated accurately as they require physical interaction or consist of mechanical devices. It is not possible to fully experience this system.\n");
 
 	if ((flags & MACHINE_ERRORS) || ((machine.system().type.unemulated_features() | machine.system().type.imperfect_features()) & device_t::feature::PROTECTION))
 	{
@@ -541,21 +541,20 @@ void menu_game_info::populate_text(std::optional<text_layout> &layout, float &wi
 	if (!layout || (layout->width() != width))
 	{
 		rgb_t const color = ui().colors().text_color();
-		layout.emplace(ui().create_layout(container(), width));
+		layout.emplace(create_layout(width));
 		layout->add_text(ui().machine_info().game_info_string(), color);
 		lines = layout->lines();
 	}
 	width = layout->actual_width();
 }
 
-void menu_game_info::populate(float &customtop, float &custombottom)
+void menu_game_info::populate()
 {
 }
 
-void menu_game_info::handle(event const *ev)
+bool menu_game_info::handle(event const *ev)
 {
-	if (ev)
-		handle_key(ev->iptkey);
+	return ev && handle_key(ev->iptkey);
 }
 
 
@@ -606,21 +605,20 @@ void menu_warn_info::populate_text(std::optional<text_layout> &layout, float &wi
 		}
 
 		rgb_t const color(ui().colors().text_color());
-		layout.emplace(ui().create_layout(container(), width));
+		layout.emplace(create_layout(width));
 		layout->add_text(std::move(buf).str(), color);
 		lines = layout->lines();
 	}
 	width = layout->actual_width();
 }
 
-void menu_warn_info::populate(float &customtop, float &custombottom)
+void menu_warn_info::populate()
 {
 }
 
-void menu_warn_info::handle(event const *ev)
+bool menu_warn_info::handle(event const *ev)
 {
-	if (ev)
-		handle_key(ev->iptkey);
+	return ev && handle_key(ev->iptkey);
 }
 
 
@@ -642,14 +640,15 @@ void menu_image_info::menu_activated()
 	reset(reset_options::REMEMBER_POSITION);
 }
 
-void menu_image_info::populate(float &customtop, float &custombottom)
+void menu_image_info::populate()
 {
 	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 		image_info(&image);
 }
 
-void menu_image_info::handle(event const *ev)
+bool menu_image_info::handle(event const *ev)
 {
+	return false;
 }
 
 

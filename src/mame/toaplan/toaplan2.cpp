@@ -416,10 +416,16 @@ constexpr unsigned toaplan2_state::T2PALETTE_LENGTH;
 ***************************************************************************/
 
 
-void toaplan2_state::machine_start()
+void ghox_state::machine_start()
 {
-	save_item(NAME(m_old_p1_paddle_h));
-	save_item(NAME(m_old_p2_paddle_h));
+	toaplan2_state::machine_start();
+	save_item(NAME(m_old_paddle_h));
+}
+
+
+void truxton2_state::machine_start()
+{
+	toaplan2_state::machine_start();
 	save_item(NAME(m_z80_busreq));
 }
 
@@ -431,26 +437,17 @@ WRITE_LINE_MEMBER(toaplan2_state::toaplan2_reset)
 }
 
 
-MACHINE_RESET_MEMBER(toaplan2_state,toaplan2)
+void ghox_state::machine_reset()
 {
-	// All games execute a RESET instruction on init, presumably to reset the sound CPU.
-	// This is important for games with common RAM; the RAM test will fail
-	// when leaving service mode if the sound CPU is not reset.
-	m_maincpu->set_reset_callback(*this, FUNC(toaplan2_state::toaplan2_reset));
+	toaplan2_state::machine_reset();
+	m_old_paddle_h[0] = 0;
+	m_old_paddle_h[1] = 0;
 }
 
 
-MACHINE_RESET_MEMBER(toaplan2_state,ghox)
+MACHINE_RESET_MEMBER(truxton2_state, bgaregga)
 {
-	MACHINE_RESET_CALL_MEMBER(toaplan2);
-	m_old_p1_paddle_h = 0;
-	m_old_p2_paddle_h = 0;
-}
-
-
-MACHINE_RESET_MEMBER(toaplan2_state,bgaregga)
-{
-	MACHINE_RESET_CALL_MEMBER(toaplan2);
+	toaplan2_state::machine_reset();
 	for (int chip = 0; chip < 2; chip++)
 	{
 		for (int i = 0; i < 8; i++)
@@ -468,7 +465,7 @@ void toaplan2_state::init_dogyuun()
 }
 
 
-void toaplan2_state::init_fixeight()
+void truxton2_state::init_fixeight()
 {
 	m_sound_reset_bit = 0x08;
 }
@@ -501,7 +498,7 @@ void toaplan2_state::init_pipibibsbl()
 	}
 }
 
-void toaplan2_state::install_raizing_okibank(int chip)
+void truxton2_state::install_raizing_okibank(int chip)
 {
 	assert(m_oki_rom[chip] && m_raizing_okibank[chip][0]);
 
@@ -516,7 +513,7 @@ void toaplan2_state::install_raizing_okibank(int chip)
 	}
 }
 
-void toaplan2_state::init_bgaregga()
+void truxton2_state::init_bgaregga()
 {
 	u8 *Z80 = memregion("audiocpu")->base();
 
@@ -526,7 +523,7 @@ void toaplan2_state::init_bgaregga()
 }
 
 
-void toaplan2_state::init_batrider()
+void truxton2_state::init_batrider()
 {
 	u8 *Z80 = memregion("audiocpu")->base();
 
@@ -537,7 +534,7 @@ void toaplan2_state::init_batrider()
 }
 
 
-void toaplan2_state::init_bbakraid()
+void truxton2_state::init_bbakraid()
 {
 	m_sndirq_line = 2;
 }
@@ -622,7 +619,7 @@ void toaplan2_state::coin_w(u8 data)
 	}
 }
 
-void toaplan2_state::pwrkick_coin_w(u8 data)
+void pwrkick_state::pwrkick_coin_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1)); // medal
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 3)); // 10 yen
@@ -630,7 +627,7 @@ void toaplan2_state::pwrkick_coin_w(u8 data)
 	m_hopper->motor_w(BIT(data, 7));
 }
 
-void toaplan2_state::pwrkick_coin_lockout_w(u8 data)
+void pwrkick_state::pwrkick_coin_lockout_w(u8 data)
 {
 	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 2));
 	machine().bookkeeping().coin_lockout_w(1, BIT(~data, 2));
@@ -647,7 +644,7 @@ void toaplan2_state::coin_sound_reset_w(u8 data)
 }
 
 
-void toaplan2_state::shippumd_coin_w(u8 data)
+void truxton2_state::shippumd_coin_w(u8 data)
 {
 	coin_w(data & ~0x10);
 	m_oki[0]->set_rom_bank(BIT(data, 4));
@@ -672,30 +669,20 @@ READ_LINE_MEMBER(toaplan2_state::c2map_r)
 	// bit 4 high signifies secondary CPU is ready
 	// bit 5 is tested low before V-Blank bit ???
 
-	return m_soundlatch->pending_r() ? 0x00 : 0x01;
+	return m_soundlatch[0]->pending_r() ? 0x00 : 0x01;
 }
 
 
-u16 toaplan2_state::ghox_p1_h_analog_r()
+template<unsigned Which>
+u16 ghox_state::ghox_h_analog_r()
 {
-	const s8 new_value = m_io_pad[0]->read();
-	if (new_value == m_old_p1_paddle_h) return 0;
-	const s8 value = new_value - m_old_p1_paddle_h;
+	const s8 new_value = m_io_pad[Which]->read();
+	const s8 result = new_value - m_old_paddle_h[Which];
 	if (!machine().side_effects_disabled())
-		m_old_p1_paddle_h = new_value;
-	return value;
+		m_old_paddle_h[Which] = new_value;
+	return result;
 }
 
-
-u16 toaplan2_state::ghox_p2_h_analog_r()
-{
-	const s8 new_value = m_io_pad[1]->read();
-	if (new_value == m_old_p2_paddle_h) return 0;
-	const s8 value = new_value - m_old_p2_paddle_h;
-	if (!machine().side_effects_disabled())
-		m_old_p2_paddle_h = new_value;
-	return value;
-}
 
 void toaplan2_state::sound_reset_w(u8 data)
 {
@@ -720,7 +707,7 @@ void toaplan2_state::fixeightbl_oki_bankswitch_w(u8 data)
 ***************************************************************************/
 
 
-void toaplan2_state::raizing_z80_bankswitch_w(u8 data)
+void truxton2_state::raizing_z80_bankswitch_w(u8 data)
 {
 	m_audiobank->set_entry(data & 0x0f);
 }
@@ -731,7 +718,7 @@ void toaplan2_state::raizing_z80_bankswitch_w(u8 data)
 // it may not be a coincidence that the composer and sound designer for
 // these two games, Manabu "Santaruru" Namiki, came to Raizing from NMK...
 
-void toaplan2_state::raizing_oki_bankswitch_w(offs_t offset, u8 data)
+void truxton2_state::raizing_oki_bankswitch_w(offs_t offset, u8 data)
 {
 	m_raizing_okibank[(offset & 4) >> 2][offset & 3]->set_entry(data & 0xf);
 	m_raizing_okibank[(offset & 4) >> 2][4 + (offset & 3)]->set_entry(data & 0xf);
@@ -742,15 +729,15 @@ void toaplan2_state::raizing_oki_bankswitch_w(offs_t offset, u8 data)
 }
 
 
-u8 toaplan2_state::bgaregga_E01D_r()
+u8 truxton2_state::bgaregga_E01D_r()
 {
 	// the Z80 reads this address during its IRQ routine,
 	// and reads the soundlatch only if the lowest bit is clear.
-	return m_soundlatch->pending_r() ? 0 : 1;
+	return m_soundlatch[0]->pending_r() ? 0 : 1;
 }
 
 
-u16 toaplan2_state::batrider_z80_busack_r()
+u16 truxton2_state::batrider_z80_busack_r()
 {
 	// Bit 0x01 returns the status of BUSAK from the Z80.
 	// These accesses are made when the 68K wants to read the Z80
@@ -760,39 +747,39 @@ u16 toaplan2_state::batrider_z80_busack_r()
 }
 
 
-void toaplan2_state::batrider_z80_busreq_w(u8 data)
+void truxton2_state::batrider_z80_busreq_w(u8 data)
 {
 	m_z80_busreq = (data & 0x01);   // see batrider_z80_busack_r above
 }
 
 
-u16 toaplan2_state::batrider_z80rom_r(offs_t offset)
+u16 truxton2_state::batrider_z80rom_r(offs_t offset)
 {
 	return m_z80_rom[offset];
 }
 
 // these two latches are always written together, via a single move.l instruction
-void toaplan2_state::batrider_soundlatch_w(u8 data)
+void truxton2_state::batrider_soundlatch_w(u8 data)
 {
-	m_soundlatch->write(data & 0xff);
+	m_soundlatch[0]->write(data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
-void toaplan2_state::batrider_soundlatch2_w(u8 data)
+void truxton2_state::batrider_soundlatch2_w(u8 data)
 {
-	m_soundlatch2->write(data & 0xff);
+	m_soundlatch[1]->write(data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-void toaplan2_state::batrider_unknown_sound_w(u16 data)
+void truxton2_state::batrider_unknown_sound_w(u16 data)
 {
 	// the 68K writes here when it wants a sound acknowledge IRQ from the Z80
 	// for bbakraid this is on every sound command; for batrider, only on certain commands
 }
 
 
-void toaplan2_state::batrider_clear_sndirq_w(u16 data)
+void truxton2_state::batrider_clear_sndirq_w(u16 data)
 {
 	// not sure whether this is correct
 	// the 68K writes here during the sound IRQ handler, and nowhere else...
@@ -800,20 +787,20 @@ void toaplan2_state::batrider_clear_sndirq_w(u16 data)
 }
 
 
-void toaplan2_state::batrider_sndirq_w(u8 data)
+void truxton2_state::batrider_sndirq_w(u8 data)
 {
 	// if batrider_clear_sndirq_w() is correct, should this be ASSERT_LINE?
 	m_maincpu->set_input_line(m_sndirq_line, HOLD_LINE);
 }
 
 
-void toaplan2_state::batrider_clear_nmi_w(u8 data)
+void truxton2_state::batrider_clear_nmi_w(u8 data)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
-u16 toaplan2_state::bbakraid_eeprom_r()
+u16 truxton2_state::bbakraid_eeprom_r()
 {
 	// Bit 0x01 returns the status of BUSAK from the Z80.
 	// BUSRQ is activated via bit 0x10 on the EEPROM write port.
@@ -828,7 +815,7 @@ u16 toaplan2_state::bbakraid_eeprom_r()
 }
 
 
-void toaplan2_state::bbakraid_eeprom_w(u8 data)
+void truxton2_state::bbakraid_eeprom_w(u8 data)
 {
 	if (data & ~0x1f)
 		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %02X\n",m_maincpu->pc(),data);
@@ -839,7 +826,7 @@ void toaplan2_state::bbakraid_eeprom_w(u8 data)
 }
 
 
-INTERRUPT_GEN_MEMBER(toaplan2_state::bbakraid_snd_interrupt)
+INTERRUPT_GEN_MEMBER(truxton2_state::bbakraid_snd_interrupt)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
 }
@@ -859,20 +846,20 @@ void toaplan2_state::tekipaki_68k_mem(address_map &map)
 	map(0x180041, 0x180041).w(FUNC(toaplan2_state::coin_w));
 	map(0x180050, 0x180051).portr("IN1");
 	map(0x180060, 0x180061).portr("IN2");
-	map(0x180071, 0x180071).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x180071, 0x180071).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 }
 
 
-void toaplan2_state::ghox_68k_mem(address_map &map)
+void ghox_state::ghox_68k_mem(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x040000, 0x040001).r(FUNC(toaplan2_state::ghox_p2_h_analog_r));
+	map(0x040000, 0x040001).r(FUNC(ghox_state::ghox_h_analog_r<1>));
 	map(0x080000, 0x083fff).ram();
 	map(0x0c0000, 0x0c0fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x100000, 0x100001).r(FUNC(toaplan2_state::ghox_p1_h_analog_r));
+	map(0x100000, 0x100001).r(FUNC(ghox_state::ghox_h_analog_r<0>));
 	map(0x140000, 0x14000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
-	map(0x180000, 0x180fff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w)).umask16(0x00ff);
-	map(0x181001, 0x181001).w(FUNC(toaplan2_state::coin_w));
+	map(0x180000, 0x180fff).rw(FUNC(ghox_state::shared_ram_r), FUNC(ghox_state::shared_ram_w)).umask16(0x00ff);
+	map(0x181001, 0x181001).w(FUNC(ghox_state::coin_w));
 	map(0x18100c, 0x18100d).portr("JMPR");
 }
 
@@ -930,18 +917,18 @@ void toaplan2_state::kbash2_68k_mem(address_map &map)
 }
 
 
-void toaplan2_state::truxton2_68k_mem(address_map &map)
+void truxton2_state::truxton2_68k_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x10ffff).ram();
 	map(0x200000, 0x20000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x300000, 0x300fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x400000, 0x401fff).ram().w(FUNC(toaplan2_state::tx_videoram_w)).share("tx_videoram");
-	map(0x402000, 0x402fff).ram().share("tx_lineselect");
-	map(0x403000, 0x4031ff).ram().w(FUNC(toaplan2_state::tx_linescroll_w)).share("tx_linescroll");
+	map(0x400000, 0x401fff).ram().w(FUNC(truxton2_state::tx_videoram_w)).share(m_tx_videoram);
+	map(0x402000, 0x402fff).ram().share(m_tx_lineselect);
+	map(0x403000, 0x4031ff).ram().w(FUNC(truxton2_state::tx_linescroll_w)).share(m_tx_linescroll);
 	map(0x403200, 0x403fff).ram();
-	map(0x500000, 0x50ffff).ram().w(FUNC(toaplan2_state::tx_gfxram_w)).share("tx_gfxram");
-	map(0x600000, 0x600001).r(FUNC(toaplan2_state::video_count_r));
+	map(0x500000, 0x50ffff).ram().w(FUNC(truxton2_state::tx_gfxram_w)).share(m_tx_gfxram);
+	map(0x600000, 0x600001).r(FUNC(truxton2_state::video_count_r));
 	map(0x700000, 0x700001).portr("DSWA");
 	map(0x700002, 0x700003).portr("DSWB");
 	map(0x700004, 0x700005).portr("JMPR");
@@ -950,7 +937,7 @@ void toaplan2_state::truxton2_68k_mem(address_map &map)
 	map(0x70000a, 0x70000b).portr("SYS");
 	map(0x700011, 0x700011).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x700014, 0x700017).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
-	map(0x70001f, 0x70001f).w(FUNC(toaplan2_state::coin_w));
+	map(0x70001f, 0x70001f).w(FUNC(truxton2_state::coin_w));
 }
 
 
@@ -994,7 +981,7 @@ void toaplan2_state::pipibibi_bootleg_68k_mem(address_map &map)
 }
 
 
-void toaplan2_state::fixeight_68k_mem(address_map &map)
+void truxton2_state::fixeight_68k_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram();
@@ -1002,20 +989,20 @@ void toaplan2_state::fixeight_68k_mem(address_map &map)
 	map(0x200004, 0x200005).portr("IN2");
 	map(0x200008, 0x200009).portr("IN3");
 	map(0x200010, 0x200011).portr("SYS");
-	map(0x20001d, 0x20001d).w(FUNC(toaplan2_state::coin_w));
-	map(0x280000, 0x28ffff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w)).umask16(0x00ff);
+	map(0x20001d, 0x20001d).w(FUNC(truxton2_state::coin_w));
+	map(0x280000, 0x28ffff).rw(FUNC(truxton2_state::shared_ram_r), FUNC(truxton2_state::shared_ram_w)).umask16(0x00ff);
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::tx_videoram_w)).share("tx_videoram");
-	map(0x502000, 0x5021ff).ram().share("tx_lineselect");
-	map(0x503000, 0x5031ff).ram().w(FUNC(toaplan2_state::tx_linescroll_w)).share("tx_linescroll");
-	map(0x600000, 0x60ffff).ram().w(FUNC(toaplan2_state::tx_gfxram_w)).share("tx_gfxram");
-	map(0x700000, 0x700001).w(FUNC(toaplan2_state::sound_reset_w)).umask16(0x00ff).cswidth(16);
-	map(0x800000, 0x800001).r(FUNC(toaplan2_state::video_count_r));
+	map(0x500000, 0x501fff).ram().w(FUNC(truxton2_state::tx_videoram_w)).share(m_tx_videoram);
+	map(0x502000, 0x5021ff).ram().share(m_tx_lineselect);
+	map(0x503000, 0x5031ff).ram().w(FUNC(truxton2_state::tx_linescroll_w)).share(m_tx_linescroll);
+	map(0x600000, 0x60ffff).ram().w(FUNC(truxton2_state::tx_gfxram_w)).share(m_tx_gfxram);
+	map(0x700000, 0x700001).w(FUNC(truxton2_state::sound_reset_w)).umask16(0x00ff).cswidth(16);
+	map(0x800000, 0x800001).r(FUNC(truxton2_state::video_count_r));
 }
 
 
-void toaplan2_state::fixeightbl_68k_mem(address_map &map)
+void truxton2_state::fixeightbl_68k_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();     // 0-7ffff ?
 	map(0x100000, 0x10ffff).ram();     // 100000-107fff  105000-105xxx  106000-106xxx  108000 - related to sound ?
@@ -1024,13 +1011,13 @@ void toaplan2_state::fixeightbl_68k_mem(address_map &map)
 	map(0x200008, 0x200009).portr("IN3");
 	map(0x20000c, 0x20000d).portr("DSWB");
 	map(0x200010, 0x200011).portr("SYS");
-	map(0x200015, 0x200015).w(FUNC(toaplan2_state::fixeightbl_oki_bankswitch_w));  // Sound banking. Code at $4084c, $5070
+	map(0x200015, 0x200015).w(FUNC(truxton2_state::fixeightbl_oki_bankswitch_w));  // Sound banking. Code at $4084c, $5070
 	map(0x200019, 0x200019).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x20001c, 0x20001d).portr("DSWA");
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::tx_videoram_w)).share("tx_videoram");
-	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));
+	map(0x500000, 0x501fff).ram().w(FUNC(truxton2_state::tx_videoram_w)).share(m_tx_videoram);
+	map(0x700000, 0x700001).r(FUNC(truxton2_state::video_count_r));
 	map(0x800000, 0x87ffff).rom().region("maincpu", 0x80000);
 }
 
@@ -1086,7 +1073,7 @@ void toaplan2_state::batsugunbl_68k_mem(address_map &map)
 	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));
 }
 
-void toaplan2_state::pwrkick_68k_mem(address_map &map)
+void pwrkick_state::pwrkick_68k_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram().share("nvram"); // Only 10022C-10037B is actually saved as NVRAM
@@ -1097,19 +1084,19 @@ void toaplan2_state::pwrkick_68k_mem(address_map &map)
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x600001, 0x600001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));
+	map(0x700000, 0x700001).r(FUNC(pwrkick_state::video_count_r));
 	map(0x700004, 0x700005).portr("DSWA");
 	map(0x700008, 0x700009).portr("DSWB");
 	map(0x70000c, 0x70000d).portr("IN1");
 	map(0x700014, 0x700015).portr("IN2");
 	map(0x700018, 0x700019).portr("DSWC");
 	map(0x70001c, 0x70001d).portr("SYS");
-	map(0x700031, 0x700031).w(FUNC(toaplan2_state::oki_bankswitch_w<0>));
-	map(0x700035, 0x700035).w(FUNC(toaplan2_state::pwrkick_coin_w));
-	map(0x700039, 0x700039).w(FUNC(toaplan2_state::pwrkick_coin_lockout_w));
+	map(0x700031, 0x700031).w(FUNC(pwrkick_state::oki_bankswitch_w<0>));
+	map(0x700035, 0x700035).w(FUNC(pwrkick_state::pwrkick_coin_w));
+	map(0x700039, 0x700039).w(FUNC(pwrkick_state::pwrkick_coin_lockout_w));
 }
 
-void toaplan2_state::othldrby_68k_mem(address_map &map)
+void pwrkick_state::othldrby_68k_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram().share("nvram"); // Only 10331E-103401 is actually saved as NVRAM
@@ -1120,14 +1107,14 @@ void toaplan2_state::othldrby_68k_mem(address_map &map)
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x600001, 0x600001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	map(0x700000, 0x700001).r(FUNC(toaplan2_state::video_count_r));
+	map(0x700000, 0x700001).r(FUNC(pwrkick_state::video_count_r));
 	map(0x700004, 0x700005).portr("DSWA");
 	map(0x700008, 0x700009).portr("DSWB");
 	map(0x70000c, 0x70000d).portr("IN1");
 	map(0x700010, 0x700011).portr("IN2");
 	map(0x70001c, 0x70001d).portr("SYS");
-	map(0x700031, 0x700031).w(FUNC(toaplan2_state::oki_bankswitch_w<0>));
-	map(0x700035, 0x700035).w(FUNC(toaplan2_state::coin_w));
+	map(0x700031, 0x700031).w(FUNC(pwrkick_state::oki_bankswitch_w<0>));
+	map(0x700035, 0x700035).w(FUNC(pwrkick_state::coin_w));
 }
 
 
@@ -1193,149 +1180,149 @@ void toaplan2_state::snowbro2_68k_mem(address_map &map)
 }
 
 
-void toaplan2_state::mahoudai_68k_mem(address_map &map)
+void truxton2_state::mahoudai_68k_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x10ffff).ram();
-	map(0x218000, 0x21bfff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w)).umask16(0x00ff);
-	map(0x21c01d, 0x21c01d).w(FUNC(toaplan2_state::coin_w));
+	map(0x218000, 0x21bfff).rw(FUNC(truxton2_state::shared_ram_r), FUNC(truxton2_state::shared_ram_w)).umask16(0x00ff);
+	map(0x21c01d, 0x21c01d).w(FUNC(truxton2_state::coin_w));
 	map(0x21c020, 0x21c021).portr("IN1");
 	map(0x21c024, 0x21c025).portr("IN2");
 	map(0x21c028, 0x21c029).portr("SYS");
 	map(0x21c02c, 0x21c02d).portr("DSWA");
 	map(0x21c030, 0x21c031).portr("DSWB");
 	map(0x21c034, 0x21c035).portr("JMPR");
-	map(0x21c03c, 0x21c03d).r(FUNC(toaplan2_state::video_count_r));
+	map(0x21c03c, 0x21c03d).r(FUNC(truxton2_state::video_count_r));
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x401000, 0x4017ff).ram();                         // Unused palette RAM
-	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::tx_videoram_w)).share("tx_videoram");
-	map(0x502000, 0x502fff).ram().share("tx_lineselect");
-	map(0x503000, 0x5031ff).ram().w(FUNC(toaplan2_state::tx_linescroll_w)).share("tx_linescroll");
+	map(0x500000, 0x501fff).ram().w(FUNC(truxton2_state::tx_videoram_w)).share(m_tx_videoram);
+	map(0x502000, 0x502fff).ram().share(m_tx_lineselect);
+	map(0x503000, 0x5031ff).ram().w(FUNC(truxton2_state::tx_linescroll_w)).share(m_tx_linescroll);
 	map(0x503200, 0x503fff).ram();
 }
 
 
-void toaplan2_state::shippumd_68k_mem(address_map &map)
+void truxton2_state::shippumd_68k_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram();
-	map(0x218000, 0x21bfff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w)).umask16(0x00ff);
+	map(0x218000, 0x21bfff).rw(FUNC(truxton2_state::shared_ram_r), FUNC(truxton2_state::shared_ram_w)).umask16(0x00ff);
 //  map(0x21c008, 0x21c009).nopw();                    // ???
-	map(0x21c01d, 0x21c01d).w(FUNC(toaplan2_state::shippumd_coin_w)); // Coin count/lock + oki bankswitch
+	map(0x21c01d, 0x21c01d).w(FUNC(truxton2_state::shippumd_coin_w)); // Coin count/lock + oki bankswitch
 	map(0x21c020, 0x21c021).portr("IN1");
 	map(0x21c024, 0x21c025).portr("IN2");
 	map(0x21c028, 0x21c029).portr("SYS");
 	map(0x21c02c, 0x21c02d).portr("DSWA");
 	map(0x21c030, 0x21c031).portr("DSWB");
 	map(0x21c034, 0x21c035).portr("JMPR");
-	map(0x21c03c, 0x21c03d).r(FUNC(toaplan2_state::video_count_r));
+	map(0x21c03c, 0x21c03d).r(FUNC(truxton2_state::video_count_r));
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x401000, 0x4017ff).ram();                         // Unused palette RAM
-	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::tx_videoram_w)).share("tx_videoram");
-	map(0x502000, 0x502fff).ram().share("tx_lineselect");
-	map(0x503000, 0x5031ff).ram().w(FUNC(toaplan2_state::tx_linescroll_w)).share("tx_linescroll");
+	map(0x500000, 0x501fff).ram().w(FUNC(truxton2_state::tx_videoram_w)).share(m_tx_videoram);
+	map(0x502000, 0x502fff).ram().share(m_tx_lineselect);
+	map(0x503000, 0x5031ff).ram().w(FUNC(truxton2_state::tx_linescroll_w)).share(m_tx_linescroll);
 	map(0x503200, 0x503fff).ram();
 }
 
 
-void toaplan2_state::bgaregga_68k_mem(address_map &map)
+void truxton2_state::bgaregga_68k_mem(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10ffff).ram();
-	map(0x218000, 0x21bfff).rw(FUNC(toaplan2_state::shared_ram_r), FUNC(toaplan2_state::shared_ram_w)).umask16(0x00ff);
-	map(0x21c01d, 0x21c01d).w(FUNC(toaplan2_state::coin_w));
+	map(0x218000, 0x21bfff).rw(FUNC(truxton2_state::shared_ram_r), FUNC(truxton2_state::shared_ram_w)).umask16(0x00ff);
+	map(0x21c01d, 0x21c01d).w(FUNC(truxton2_state::coin_w));
 	map(0x21c020, 0x21c021).portr("IN1");
 	map(0x21c024, 0x21c025).portr("IN2");
 	map(0x21c028, 0x21c029).portr("SYS");
 	map(0x21c02c, 0x21c02d).portr("DSWA");
 	map(0x21c030, 0x21c031).portr("DSWB");
 	map(0x21c034, 0x21c035).portr("JMPR");
-	map(0x21c03c, 0x21c03d).r(FUNC(toaplan2_state::video_count_r));
+	map(0x21c03c, 0x21c03d).r(FUNC(truxton2_state::video_count_r));
 	map(0x300000, 0x30000d).rw(m_vdp[0], FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x500000, 0x501fff).ram().w(FUNC(toaplan2_state::tx_videoram_w)).share("tx_videoram");
-	map(0x502000, 0x502fff).ram().share("tx_lineselect");
-	map(0x503000, 0x5031ff).ram().w(FUNC(toaplan2_state::tx_linescroll_w)).share("tx_linescroll");
+	map(0x500000, 0x501fff).ram().w(FUNC(truxton2_state::tx_videoram_w)).share(m_tx_videoram);
+	map(0x502000, 0x502fff).ram().share(m_tx_lineselect);
+	map(0x503000, 0x5031ff).ram().w(FUNC(truxton2_state::tx_linescroll_w)).share(m_tx_linescroll);
 	map(0x503200, 0x503fff).ram();
-	map(0x600001, 0x600001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x600001, 0x600001).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 }
 
 
-void toaplan2_state::batrider_dma_mem(address_map &map)
+void truxton2_state::batrider_dma_mem(address_map &map)
 {
-	map(0x0000, 0x1fff).ram().w(FUNC(toaplan2_state::tx_videoram_w)).share("tx_videoram");
+	map(0x0000, 0x1fff).ram().w(FUNC(truxton2_state::tx_videoram_w)).share(m_tx_videoram);
 	map(0x2000, 0x2fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x3000, 0x31ff).ram().share("tx_lineselect");
-	map(0x3200, 0x33ff).ram().w(FUNC(toaplan2_state::tx_linescroll_w)).share("tx_linescroll");
+	map(0x3000, 0x31ff).ram().share(m_tx_lineselect);
+	map(0x3200, 0x33ff).ram().w(FUNC(truxton2_state::tx_linescroll_w)).share(m_tx_linescroll);
 	map(0x3400, 0x7fff).ram();
-	map(0x8000, 0xffff).ram().w(FUNC(toaplan2_state::batrider_tx_gfxram_w)).share("tx_gfxram");
+	map(0x8000, 0xffff).ram().w(FUNC(truxton2_state::batrider_tx_gfxram_w)).share(m_tx_gfxram);
 }
 
 
-void toaplan2_state::batrider_68k_mem(address_map &map)
+void truxton2_state::batrider_68k_mem(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 	// actually 200000 - 20ffff is probably all main RAM, and the text and palette RAM are written via DMA
-	map(0x200000, 0x207fff).ram().share("mainram");
+	map(0x200000, 0x207fff).ram().share(m_mainram);
 	map(0x208000, 0x20ffff).ram();
-	map(0x300000, 0x37ffff).r(FUNC(toaplan2_state::batrider_z80rom_r));
+	map(0x300000, 0x37ffff).r(FUNC(truxton2_state::batrider_z80rom_r));
 	map(0x400000, 0x40000d).lrw16(
 							NAME([this](offs_t offset, u16 mem_mask) { return m_vdp[0]->read(offset ^ (0xc/2), mem_mask); }),
 							NAME([this](offs_t offset, u16 data, u16 mem_mask) { m_vdp[0]->write(offset ^ (0xc/2), data, mem_mask); }));
 	map(0x500000, 0x500001).portr("IN");
 	map(0x500002, 0x500003).portr("SYS-DSW");
 	map(0x500004, 0x500005).portr("DSW");
-	map(0x500006, 0x500007).r(FUNC(toaplan2_state::video_count_r));
-	map(0x500009, 0x500009).r("soundlatch3", FUNC(generic_latch_8_device::read));
-	map(0x50000b, 0x50000b).r("soundlatch4", FUNC(generic_latch_8_device::read));
-	map(0x50000c, 0x50000d).r(FUNC(toaplan2_state::batrider_z80_busack_r));
-	map(0x500011, 0x500011).w(FUNC(toaplan2_state::coin_w));
-	map(0x500021, 0x500021).w(FUNC(toaplan2_state::batrider_soundlatch_w));
-	map(0x500023, 0x500023).w(FUNC(toaplan2_state::batrider_soundlatch2_w));
-	map(0x500024, 0x500025).w(FUNC(toaplan2_state::batrider_unknown_sound_w));
-	map(0x500026, 0x500027).w(FUNC(toaplan2_state::batrider_clear_sndirq_w));
-	map(0x500061, 0x500061).w(FUNC(toaplan2_state::batrider_z80_busreq_w));
-	map(0x500080, 0x500081).w(FUNC(toaplan2_state::batrider_textdata_dma_w));
-	map(0x500082, 0x500083).w(FUNC(toaplan2_state::batrider_pal_text_dma_w));
-	map(0x5000c0, 0x5000cf).w(FUNC(toaplan2_state::batrider_objectbank_w)).umask16(0x00ff);
+	map(0x500006, 0x500007).r(FUNC(truxton2_state::video_count_r));
+	map(0x500009, 0x500009).r(m_soundlatch[2], FUNC(generic_latch_8_device::read));
+	map(0x50000b, 0x50000b).r(m_soundlatch[3], FUNC(generic_latch_8_device::read));
+	map(0x50000c, 0x50000d).r(FUNC(truxton2_state::batrider_z80_busack_r));
+	map(0x500011, 0x500011).w(FUNC(truxton2_state::coin_w));
+	map(0x500021, 0x500021).w(FUNC(truxton2_state::batrider_soundlatch_w));
+	map(0x500023, 0x500023).w(FUNC(truxton2_state::batrider_soundlatch2_w));
+	map(0x500024, 0x500025).w(FUNC(truxton2_state::batrider_unknown_sound_w));
+	map(0x500026, 0x500027).w(FUNC(truxton2_state::batrider_clear_sndirq_w));
+	map(0x500061, 0x500061).w(FUNC(truxton2_state::batrider_z80_busreq_w));
+	map(0x500080, 0x500081).w(FUNC(truxton2_state::batrider_textdata_dma_w));
+	map(0x500082, 0x500083).w(FUNC(truxton2_state::batrider_pal_text_dma_w));
+	map(0x5000c0, 0x5000cf).w(FUNC(truxton2_state::batrider_objectbank_w)).umask16(0x00ff);
 }
 
 
-void toaplan2_state::bbakraid_68k_mem(address_map &map)
+void truxton2_state::bbakraid_68k_mem(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
 	// actually 200000 - 20ffff is probably all main RAM, and the text and palette RAM are written via DMA
-	map(0x200000, 0x207fff).ram().share("mainram");
+	map(0x200000, 0x207fff).ram().share(m_mainram);
 	map(0x208000, 0x20ffff).ram();
-	map(0x300000, 0x33ffff).r(FUNC(toaplan2_state::batrider_z80rom_r));
+	map(0x300000, 0x33ffff).r(FUNC(truxton2_state::batrider_z80rom_r));
 	map(0x400000, 0x40000d).lrw16(
 							NAME([this](offs_t offset, u16 mem_mask) { return m_vdp[0]->read(offset ^ (0xc/2), mem_mask); }),
 							NAME([this](offs_t offset, u16 data, u16 mem_mask) { m_vdp[0]->write(offset ^ (0xc/2), data, mem_mask); }));
 	map(0x500000, 0x500001).portr("IN");
 	map(0x500002, 0x500003).portr("SYS-DSW");
 	map(0x500004, 0x500005).portr("DSW");
-	map(0x500006, 0x500007).r(FUNC(toaplan2_state::video_count_r));
-	map(0x500009, 0x500009).w(FUNC(toaplan2_state::coin_w));
-	map(0x500011, 0x500011).r("soundlatch3", FUNC(generic_latch_8_device::read));
-	map(0x500013, 0x500013).r("soundlatch4", FUNC(generic_latch_8_device::read));
-	map(0x500015, 0x500015).w(FUNC(toaplan2_state::batrider_soundlatch_w));
-	map(0x500017, 0x500017).w(FUNC(toaplan2_state::batrider_soundlatch2_w));
-	map(0x500018, 0x500019).r(FUNC(toaplan2_state::bbakraid_eeprom_r));
-	map(0x50001a, 0x50001b).w(FUNC(toaplan2_state::batrider_unknown_sound_w));
-	map(0x50001c, 0x50001d).w(FUNC(toaplan2_state::batrider_clear_sndirq_w));
-	map(0x50001f, 0x50001f).w(FUNC(toaplan2_state::bbakraid_eeprom_w));
-	map(0x500080, 0x500081).w(FUNC(toaplan2_state::batrider_textdata_dma_w));
-	map(0x500082, 0x500083).w(FUNC(toaplan2_state::batrider_pal_text_dma_w));
-	map(0x5000c0, 0x5000cf).w(FUNC(toaplan2_state::batrider_objectbank_w)).umask16(0x00ff);
+	map(0x500006, 0x500007).r(FUNC(truxton2_state::video_count_r));
+	map(0x500009, 0x500009).w(FUNC(truxton2_state::coin_w));
+	map(0x500011, 0x500011).r(m_soundlatch[2], FUNC(generic_latch_8_device::read));
+	map(0x500013, 0x500013).r(m_soundlatch[3], FUNC(generic_latch_8_device::read));
+	map(0x500015, 0x500015).w(FUNC(truxton2_state::batrider_soundlatch_w));
+	map(0x500017, 0x500017).w(FUNC(truxton2_state::batrider_soundlatch2_w));
+	map(0x500018, 0x500019).r(FUNC(truxton2_state::bbakraid_eeprom_r));
+	map(0x50001a, 0x50001b).w(FUNC(truxton2_state::batrider_unknown_sound_w));
+	map(0x50001c, 0x50001d).w(FUNC(truxton2_state::batrider_clear_sndirq_w));
+	map(0x50001f, 0x50001f).w(FUNC(truxton2_state::bbakraid_eeprom_w));
+	map(0x500080, 0x500081).w(FUNC(truxton2_state::batrider_textdata_dma_w));
+	map(0x500082, 0x500083).w(FUNC(truxton2_state::batrider_pal_text_dma_w));
+	map(0x5000c0, 0x5000cf).w(FUNC(truxton2_state::batrider_objectbank_w)).umask16(0x00ff);
 }
 
 
-void toaplan2_state::nprobowl_68k_mem(address_map &map) // TODO: verify everything, implement oki banking
+void truxton2_state::nprobowl_68k_mem(address_map &map) // TODO: verify everything, implement oki banking
 {
 	map(0x000000, 0x0fffff).rom();
-	map(0x200000, 0x207fff).ram().share("mainram");
+	map(0x200000, 0x207fff).ram().share(m_mainram);
 	map(0x208000, 0x20ffff).ram();
 	map(0x400000, 0x40000d).lrw16(
 							NAME([this](offs_t offset, u16 mem_mask) { return m_vdp[0]->read(offset ^ (0xc/2), mem_mask); }),
@@ -1349,85 +1336,85 @@ void toaplan2_state::nprobowl_68k_mem(address_map &map) // TODO: verify everythi
 	//map(0x500040, 0x500041).w();
 	//map(0x500042, 0x500043).w();
 	map(0x500060, 0x500061).lr16(NAME([this] () -> u16 { return machine().rand(); })); // TODO: Hack, probably checks something in the mechanical part, verify
-	map(0x500080, 0x500081).w(FUNC(toaplan2_state::batrider_textdata_dma_w));
-	map(0x500082, 0x500083).w(FUNC(toaplan2_state::batrider_pal_text_dma_w));
+	map(0x500080, 0x500081).w(FUNC(truxton2_state::batrider_textdata_dma_w));
+	map(0x500082, 0x500083).w(FUNC(truxton2_state::batrider_pal_text_dma_w));
 }
 
 
 void toaplan2_state::pipibibs_sound_z80_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x87ff).ram().share("shared_ram");
+	map(0x8000, 0x87ff).ram().share(m_shared_ram);
 	map(0xe000, 0xe001).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 }
 
 
-void toaplan2_state::raizing_sound_z80_mem(address_map &map)
+void truxton2_state::raizing_sound_z80_mem(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xdfff).ram().share("shared_ram");
+	map(0xc000, 0xdfff).ram().share(m_shared_ram);
 	map(0xe000, 0xe001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xe004, 0xe004).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xe00e, 0xe00e).w(FUNC(toaplan2_state::coin_w));
+	map(0xe00e, 0xe00e).w(FUNC(truxton2_state::coin_w));
 }
 
 
-void toaplan2_state::bgaregga_sound_z80_mem(address_map &map)
+void truxton2_state::bgaregga_sound_z80_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("audiobank");
-	map(0xc000, 0xdfff).ram().share("shared_ram");
+	map(0x8000, 0xbfff).bankr(m_audiobank);
+	map(0xc000, 0xdfff).ram().share(m_shared_ram);
 	map(0xe000, 0xe001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xe004, 0xe004).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xe006, 0xe008).w(FUNC(toaplan2_state::raizing_oki_bankswitch_w));
-	map(0xe00a, 0xe00a).w(FUNC(toaplan2_state::raizing_z80_bankswitch_w));
-	map(0xe00c, 0xe00c).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
-	map(0xe01c, 0xe01c).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0xe01d, 0xe01d).r(FUNC(toaplan2_state::bgaregga_E01D_r));
+	map(0xe006, 0xe008).w(FUNC(truxton2_state::raizing_oki_bankswitch_w));
+	map(0xe00a, 0xe00a).w(FUNC(truxton2_state::raizing_z80_bankswitch_w));
+	map(0xe00c, 0xe00c).w(m_soundlatch[0], FUNC(generic_latch_8_device::acknowledge_w));
+	map(0xe01c, 0xe01c).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
+	map(0xe01d, 0xe01d).r(FUNC(truxton2_state::bgaregga_E01D_r));
 }
 
 
-void toaplan2_state::batrider_sound_z80_mem(address_map &map)
+void truxton2_state::batrider_sound_z80_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("audiobank");
+	map(0x8000, 0xbfff).bankr(m_audiobank);
 	map(0xc000, 0xdfff).ram();
 }
 
 
-void toaplan2_state::batrider_sound_z80_port(address_map &map)
+void truxton2_state::batrider_sound_z80_port(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x40).w("soundlatch3", FUNC(generic_latch_8_device::write));
-	map(0x42, 0x42).w("soundlatch4", FUNC(generic_latch_8_device::write));
-	map(0x44, 0x44).w(FUNC(toaplan2_state::batrider_sndirq_w));
-	map(0x46, 0x46).w(FUNC(toaplan2_state::batrider_clear_nmi_w));
-	map(0x48, 0x48).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x4a, 0x4a).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
+	map(0x40, 0x40).w(m_soundlatch[2], FUNC(generic_latch_8_device::write));
+	map(0x42, 0x42).w(m_soundlatch[3], FUNC(generic_latch_8_device::write));
+	map(0x44, 0x44).w(FUNC(truxton2_state::batrider_sndirq_w));
+	map(0x46, 0x46).w(FUNC(truxton2_state::batrider_clear_nmi_w));
+	map(0x48, 0x48).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
+	map(0x4a, 0x4a).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
 	map(0x80, 0x81).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x82, 0x82).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x84, 0x84).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x88, 0x88).w(FUNC(toaplan2_state::raizing_z80_bankswitch_w));
-	map(0xc0, 0xc6).w(FUNC(toaplan2_state::raizing_oki_bankswitch_w));
+	map(0x88, 0x88).w(FUNC(truxton2_state::raizing_z80_bankswitch_w));
+	map(0xc0, 0xc6).w(FUNC(truxton2_state::raizing_oki_bankswitch_w));
 }
 
 
-void toaplan2_state::bbakraid_sound_z80_mem(address_map &map)
+void truxton2_state::bbakraid_sound_z80_mem(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();     // No banking? ROM only contains code and data up to 0x28DC
 	map(0xc000, 0xffff).ram();
 }
 
 
-void toaplan2_state::bbakraid_sound_z80_port(address_map &map)
+void truxton2_state::bbakraid_sound_z80_port(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x40).w("soundlatch3", FUNC(generic_latch_8_device::write));
-	map(0x42, 0x42).w("soundlatch4", FUNC(generic_latch_8_device::write));
-	map(0x44, 0x44).w(FUNC(toaplan2_state::batrider_sndirq_w));
-	map(0x46, 0x46).w(FUNC(toaplan2_state::batrider_clear_nmi_w));
-	map(0x48, 0x48).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-	map(0x4a, 0x4a).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
+	map(0x40, 0x40).w(m_soundlatch[2], FUNC(generic_latch_8_device::write));
+	map(0x42, 0x42).w(m_soundlatch[3], FUNC(generic_latch_8_device::write));
+	map(0x44, 0x44).w(FUNC(truxton2_state::batrider_sndirq_w));
+	map(0x46, 0x46).w(FUNC(truxton2_state::batrider_clear_nmi_w));
+	map(0x48, 0x48).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
+	map(0x4a, 0x4a).r(m_soundlatch[1], FUNC(generic_latch_8_device::read));
 	map(0x80, 0x81).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
 }
 
@@ -1436,51 +1423,51 @@ void toaplan2_state::v25_mem(address_map &map)
 {
 	map(0x00000, 0x00001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x00004, 0x00004).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x80000, 0x87fff).mirror(0x78000).ram().share("shared_ram");
+	map(0x80000, 0x87fff).mirror(0x78000).ram().share(m_shared_ram);
 }
 
 
 void toaplan2_state::kbash_v25_mem(address_map &map)
 {
-	map(0x00000, 0x007ff).ram().share("shared_ram");
+	map(0x00000, 0x007ff).ram().share(m_shared_ram);
 	map(0x04000, 0x04001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x04002, 0x04002).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x80000, 0x87fff).mirror(0x78000).rom().region("audiocpu", 0);
 }
 
 
-void toaplan2_state::fixeight_v25_mem(address_map &map)
+void truxton2_state::fixeight_v25_mem(address_map &map)
 {
 	map(0x00000, 0x00000).portr("IN1");
 	map(0x00002, 0x00002).portr("IN2");
 	map(0x00004, 0x00004).portr("IN3");
 	map(0x0000a, 0x0000b).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x0000c, 0x0000c).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x80000, 0x87fff).mirror(0x78000).ram().share("shared_ram");
+	map(0x80000, 0x87fff).mirror(0x78000).ram().share(m_shared_ram);
 }
 
 
 void toaplan2_state::vfive_v25_mem(address_map &map)
 {
 	map(0x00000, 0x00001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x80000, 0x87fff).mirror(0x78000).ram().share("shared_ram");
+	map(0x80000, 0x87fff).mirror(0x78000).ram().share(m_shared_ram);
 }
 
 
 void toaplan2_state::fixeightbl_oki(address_map &map)
 {
 	map(0x00000, 0x2ffff).rom();
-	map(0x30000, 0x3ffff).bankr("okibank");
+	map(0x30000, 0x3ffff).bankr(m_okibank);
 }
 
 void toaplan2_state::enmadaio_oki(address_map &map)
 {
-	map(0x00000, 0x3ffff).bankr("okibank");
+	map(0x00000, 0x3ffff).bankr(m_okibank);
 }
 
 // similar as NMK112, but GAL-driven; NOT actual NMK112 is present
 template<unsigned Chip>
-void toaplan2_state::raizing_oki(address_map &map)
+void truxton2_state::raizing_oki(address_map &map)
 {
 	map(0x00000, 0x000ff).bankr(m_raizing_okibank[Chip][0]);
 	map(0x00100, 0x001ff).bankr(m_raizing_okibank[Chip][1]);
@@ -1495,7 +1482,7 @@ void toaplan2_state::raizing_oki(address_map &map)
 
 u8 toaplan2_state::tekipaki_cmdavailable_r()
 {
-	if (m_soundlatch->pending_r()) return 0xff;
+	if (m_soundlatch[0]->pending_r()) return 0xff;
 	else return 0x00;
 };
 
@@ -1505,16 +1492,16 @@ void toaplan2_state::hd647180_io_map(address_map &map)
 
 	map(0x60, 0x60).nopr();
 	map(0x70, 0x75).nopw(); // DDRs are written with the wrong upper addresses!
-	map(0x84, 0x84).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0x84, 0x84).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 
 	map(0x82, 0x82).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
 	map(0x83, 0x83).w("ymsnd", FUNC(ym3812_device::data_w));
 }
 
 
-void toaplan2_state::ghox_hd647180_mem_map(address_map &map)
+void ghox_state::ghox_hd647180_mem_map(address_map &map)
 {
-	map(0x40000, 0x407ff).ram().share("shared_ram");
+	map(0x40000, 0x407ff).ram().share(m_shared_ram);
 
 	map(0x80002, 0x80002).portr("DSWA");
 	map(0x80004, 0x80004).portr("DSWB");
@@ -3343,6 +3330,7 @@ void toaplan2_state::tekipaki(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10_MHz_XTAL);         // 10MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::tekipaki_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	hd647180x_device &audiocpu(HD647180X(config, m_audiocpu, 10_MHz_XTAL));
 	// 16k byte ROM and 512 byte RAM are internal
@@ -3350,8 +3338,6 @@ void toaplan2_state::tekipaki(machine_config &config)
 	audiocpu.in_pa_callback().set(FUNC(toaplan2_state::tekipaki_cmdavailable_r));
 
 	config.set_maximum_quantum(attotime::from_hz(600));
-
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3375,25 +3361,24 @@ void toaplan2_state::tekipaki(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
 
 	ym3812_device &ymsnd(YM3812(config, "ymsnd", 27_MHz_XTAL/8));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void toaplan2_state::ghox(machine_config &config)
+void ghox_state::ghox(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10_MHz_XTAL);         /* verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::ghox_68k_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ghox_state::ghox_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(ghox_state::toaplan2_reset));
 
 	HD647180X(config, m_audiocpu, 10_MHz_XTAL);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::ghox_hd647180_mem_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &ghox_state::ghox_hd647180_mem_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
-
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,ghox)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3402,8 +3387,8 @@ void toaplan2_state::ghox(machine_config &config)
 	//m_screen->set_refresh_hz(60);
 	//m_screen->set_size(432, 262);
 	//m_screen->set_visarea(0, 319, 0, 239);
-	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_toaplan2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
+	m_screen->set_screen_update(FUNC(ghox_state::screen_update_toaplan2));
+	m_screen->screen_vblank().set(FUNC(ghox_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
@@ -3412,7 +3397,7 @@ void toaplan2_state::ghox(machine_config &config)
 	m_vdp[0]->set_palette(m_palette);
 	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
+	MCFG_VIDEO_START_OVERRIDE(ghox_state,toaplan2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3475,6 +3460,7 @@ void toaplan2_state::dogyuun(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 25_MHz_XTAL/2);           /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::dogyuun_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	v25_device &audiocpu(V25(config, m_audiocpu, 25_MHz_XTAL/2));         /* NEC V25 type Toaplan marked CPU ??? */
 	audiocpu.set_addrmap(AS_PROGRAM, &toaplan2_state::v25_mem);
@@ -3518,6 +3504,7 @@ void toaplan2_state::kbash(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);         /* 16MHz Oscillator */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::kbash_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	/* ROM based v25 */
 	v25_device &audiocpu(V25(config, m_audiocpu, 16_MHz_XTAL));         /* NEC V25 type Toaplan marked CPU ??? */
@@ -3562,6 +3549,7 @@ void toaplan2_state::kbash2(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);         /* 16MHz Oscillator */
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::kbash2_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3593,18 +3581,19 @@ void toaplan2_state::kbash2(machine_config &config)
 }
 
 
-void toaplan2_state::truxton2(machine_config &config)
+void truxton2_state::truxton2(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);         /* verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::truxton2_68k_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &truxton2_state::truxton2_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(truxton2_state::toaplan2_reset));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_truxton2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
+	m_screen->set_screen_update(FUNC(truxton2_state::screen_update_truxton2));
+	m_screen->screen_vblank().set(FUNC(truxton2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_truxton2);
@@ -3614,7 +3603,7 @@ void toaplan2_state::truxton2(machine_config &config)
 	m_vdp[0]->set_palette(m_palette);
 	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_2);
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,truxton2)
+	MCFG_VIDEO_START_OVERRIDE(truxton2_state,truxton2)
 
 	/* sound hardware */
 #ifdef TRUXTON2_STEREO  // music data is stereo...
@@ -3642,13 +3631,12 @@ void toaplan2_state::pipibibs(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 10_MHz_XTAL);         // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pipibibs_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	Z80(config, m_audiocpu, 27_MHz_XTAL/8);         // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pipibibs_sound_z80_mem);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
-
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3684,13 +3672,12 @@ void toaplan2_state::pipibibsbl(machine_config &config)
 	M68000(config, m_maincpu, 12_MHz_XTAL); // ??? (position labeled "68000-12" but 10 MHz-rated parts used)
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pipibibi_bootleg_68k_mem);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &toaplan2_state::cpu_space_pipibibsbl_map);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	Z80(config, m_audiocpu, 12_MHz_XTAL / 2); // GoldStar Z8400B; clock source and divider unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pipibibs_sound_z80_mem);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
-
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3755,14 +3742,15 @@ static const u8 ts001turbo_decryption_table[256] = {
 };
 
 
-void toaplan2_state::fixeight(machine_config &config)
+void truxton2_state::fixeight(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);         // verified on PCB
-	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::fixeight_68k_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &truxton2_state::fixeight_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(truxton2_state::toaplan2_reset));
 
 	v25_device &audiocpu(V25(config, m_audiocpu, 16_MHz_XTAL));           // NEC V25 type Toaplan marked CPU ???
-	audiocpu.set_addrmap(AS_PROGRAM, &toaplan2_state::fixeight_v25_mem);
+	audiocpu.set_addrmap(AS_PROGRAM, &truxton2_state::fixeight_v25_mem);
 	audiocpu.set_decryption_table(ts001turbo_decryption_table);
 	audiocpu.p0_in_cb().set_ioport("EEPROM");
 	audiocpu.p0_out_cb().set_ioport("EEPROM");
@@ -3773,8 +3761,8 @@ void toaplan2_state::fixeight(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240); // verified on PCB
-	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_truxton2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
+	m_screen->set_screen_update(FUNC(truxton2_state::screen_update_truxton2));
+	m_screen->screen_vblank().set(FUNC(truxton2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_truxton2);
@@ -3784,7 +3772,7 @@ void toaplan2_state::fixeight(machine_config &config)
 	m_vdp[0]->set_palette(m_palette);
 	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,truxton2)
+	MCFG_VIDEO_START_OVERRIDE(truxton2_state,truxton2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3796,12 +3784,13 @@ void toaplan2_state::fixeight(machine_config &config)
 }
 
 
-void toaplan2_state::fixeightbl(machine_config &config)
+void truxton2_state::fixeightbl(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(10'000'000));         /* 10MHz Oscillator */
-	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::fixeightbl_68k_mem);
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &toaplan2_state::cpu_space_fixeightbl_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &truxton2_state::fixeightbl_68k_mem);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &truxton2_state::cpu_space_fixeightbl_map);
+	m_maincpu->reset_cb().set(FUNC(truxton2_state::toaplan2_reset));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3810,8 +3799,8 @@ void toaplan2_state::fixeightbl(machine_config &config)
 	//m_screen->set_refresh_hz(60);
 	//m_screen->set_size(432, 262);
 	//m_screen->set_visarea(0, 319, 0, 239);
-	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_bootleg));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
+	m_screen->set_screen_update(FUNC(truxton2_state::screen_update_bootleg));
+	m_screen->screen_vblank().set(FUNC(truxton2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_textrom);
@@ -3821,14 +3810,14 @@ void toaplan2_state::fixeightbl(machine_config &config)
 	m_vdp[0]->set_palette(m_palette);
 	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_2, ASSERT_LINE);
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,fixeightbl)
+	MCFG_VIDEO_START_OVERRIDE(truxton2_state,fixeightbl)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	OKIM6295(config, m_oki[0], 14_MHz_XTAL/16, okim6295_device::PIN7_LOW);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
-	m_oki[0]->set_addrmap(0, &toaplan2_state::fixeightbl_oki);
+	m_oki[0]->set_addrmap(0, &truxton2_state::fixeightbl_oki);
 }
 
 
@@ -3837,6 +3826,7 @@ void toaplan2_state::vfive(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 20_MHz_XTAL/2);   // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::vfive_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	v25_device &audiocpu(V25(config, m_audiocpu, 20_MHz_XTAL/2)); // Verified on PCB, NEC V25 type Toaplan mark scratched out
 	audiocpu.set_addrmap(AS_PROGRAM, &toaplan2_state::vfive_v25_mem);
@@ -3874,6 +3864,7 @@ void toaplan2_state::batsugun(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);           // 16MHz, 32MHz Oscillator
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::batsugun_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	v25_device &audiocpu(V25(config, m_audiocpu, 32_MHz_XTAL/2));         // NEC V25 type Toaplan marked CPU ???
 	audiocpu.set_addrmap(AS_PROGRAM, &toaplan2_state::v25_mem);
@@ -3930,11 +3921,12 @@ void toaplan2_state::batsugunbl(machine_config &config)
 	m_oki[0]->set_addrmap(0, &toaplan2_state::fixeightbl_oki);
 }
 
-void toaplan2_state::pwrkick(machine_config &config)
+void pwrkick_state::pwrkick(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pwrkick_68k_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pwrkick_state::pwrkick_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(pwrkick_state::toaplan2_reset));
 
 	UPD4992(config, m_rtc, 32'768);
 
@@ -3946,8 +3938,8 @@ void toaplan2_state::pwrkick(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_toaplan2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
+	m_screen->set_screen_update(FUNC(pwrkick_state::screen_update_toaplan2));
+	m_screen->screen_vblank().set(FUNC(pwrkick_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
@@ -3956,7 +3948,7 @@ void toaplan2_state::pwrkick(machine_config &config)
 	m_vdp[0]->set_palette(m_palette);
 	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
+	MCFG_VIDEO_START_OVERRIDE(pwrkick_state,toaplan2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -3965,11 +3957,12 @@ void toaplan2_state::pwrkick(machine_config &config)
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
-void toaplan2_state::othldrby(machine_config &config)
+void pwrkick_state::othldrby(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::othldrby_68k_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pwrkick_state::othldrby_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(pwrkick_state::toaplan2_reset));
 
 	UPD4992(config, m_rtc, 32'768);
 
@@ -3979,8 +3972,8 @@ void toaplan2_state::othldrby(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_toaplan2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
+	m_screen->set_screen_update(FUNC(pwrkick_state::screen_update_toaplan2));
+	m_screen->screen_vblank().set(FUNC(pwrkick_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, T2PALETTE_LENGTH);
@@ -3989,7 +3982,7 @@ void toaplan2_state::othldrby(machine_config &config)
 	m_vdp[0]->set_palette(m_palette);
 	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
+	MCFG_VIDEO_START_OVERRIDE(pwrkick_state,toaplan2)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4004,6 +3997,7 @@ void toaplan2_state::enmadaio(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 20_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::enmadaio_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -4036,6 +4030,7 @@ void toaplan2_state::snowbro2(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::snowbro2_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -4066,18 +4061,17 @@ void toaplan2_state::snowbro2(machine_config &config)
 }
 
 
-void toaplan2_state::mahoudai(machine_config &config)
+void truxton2_state::mahoudai(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator
-	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::mahoudai_68k_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &truxton2_state::mahoudai_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(truxton2_state::toaplan2_reset));
 
 	Z80(config, m_audiocpu, 32_MHz_XTAL/8);     // 4MHz, 32MHz Oscillator
-	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::raizing_sound_z80_mem);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &truxton2_state::raizing_sound_z80_mem);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
-
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -4086,8 +4080,8 @@ void toaplan2_state::mahoudai(machine_config &config)
 	//m_screen->set_refresh_hz(60);
 	//m_screen->set_size(432, 262);
 	//m_screen->set_visarea(0, 319, 0, 239);
-	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_truxton2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
+	m_screen->set_screen_update(FUNC(truxton2_state::screen_update_truxton2));
+	m_screen->screen_vblank().set(FUNC(truxton2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_textrom);
@@ -4097,7 +4091,7 @@ void toaplan2_state::mahoudai(machine_config &config)
 	m_vdp[0]->set_palette(m_palette);
 	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgaregga)
+	MCFG_VIDEO_START_OVERRIDE(truxton2_state,bgaregga)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4109,25 +4103,26 @@ void toaplan2_state::mahoudai(machine_config &config)
 }
 
 
-void toaplan2_state::shippumd(machine_config &config)
+void truxton2_state::shippumd(machine_config &config)
 {
 	mahoudai(config);
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::shippumd_68k_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &truxton2_state::shippumd_68k_mem);
 }
 
-void toaplan2_state::bgaregga(machine_config &config)
+void truxton2_state::bgaregga(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator
-	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::bgaregga_68k_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &truxton2_state::bgaregga_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(truxton2_state::toaplan2_reset));
 
 	Z80(config, m_audiocpu, 32_MHz_XTAL/8);     // 4MHz, 32MHz Oscillator
-	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::bgaregga_sound_z80_mem);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &truxton2_state::bgaregga_sound_z80_mem);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,bgaregga)
+	MCFG_MACHINE_RESET_OVERRIDE(truxton2_state,bgaregga)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -4136,8 +4131,8 @@ void toaplan2_state::bgaregga(machine_config &config)
 	//m_screen->set_refresh_hz(60);
 	//m_screen->set_size(432, 262);
 	//m_screen->set_visarea(0, 319, 0, 239);
-	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_truxton2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
+	m_screen->set_screen_update(FUNC(truxton2_state::screen_update_truxton2));
+	m_screen->screen_vblank().set(FUNC(truxton2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_textrom);
@@ -4147,47 +4142,48 @@ void toaplan2_state::bgaregga(machine_config &config)
 	m_vdp[0]->set_palette(m_palette);
 	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgaregga)
+	MCFG_VIDEO_START_OVERRIDE(truxton2_state,bgaregga)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
-	m_soundlatch->set_separate_acknowledge(true);
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	m_soundlatch[0]->data_pending_callback().set_inputline(m_audiocpu, 0);
+	m_soundlatch[0]->set_separate_acknowledge(true);
 
 	YM2151(config, "ymsnd", 32_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.35);
 
 	OKIM6295(config, m_oki[0], 32_MHz_XTAL/16, okim6295_device::PIN7_HIGH);
-	m_oki[0]->set_addrmap(0, &toaplan2_state::raizing_oki<0>);
+	m_oki[0]->set_addrmap(0, &truxton2_state::raizing_oki<0>);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.7);
 }
 
 
-void toaplan2_state::bgareggabl(machine_config &config)
+void truxton2_state::bgareggabl(machine_config &config)
 {
 	bgaregga(config);
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,bgareggabl)
+	MCFG_VIDEO_START_OVERRIDE(truxton2_state,bgareggabl)
 
-	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_bootleg));
+	m_screen->set_screen_update(FUNC(truxton2_state::screen_update_bootleg));
 }
 
-void toaplan2_state::batrider(machine_config &config)
+void truxton2_state::batrider(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator (verified)
-	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::batrider_68k_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &truxton2_state::batrider_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(truxton2_state::toaplan2_reset));
 
 	Z80(config, m_audiocpu, 32_MHz_XTAL/6);     // 5.333MHz, 32MHz Oscillator (verified)
-	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::batrider_sound_z80_mem);
-	m_audiocpu->set_addrmap(AS_IO, &toaplan2_state::batrider_sound_z80_port);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &truxton2_state::batrider_sound_z80_mem);
+	m_audiocpu->set_addrmap(AS_IO, &truxton2_state::batrider_sound_z80_port);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,bgaregga)
+	MCFG_MACHINE_RESET_OVERRIDE(truxton2_state,bgaregga)
 
 	ADDRESS_MAP_BANK(config, m_dma_space, 0);
-	m_dma_space->set_addrmap(0, &toaplan2_state::batrider_dma_mem);
+	m_dma_space->set_addrmap(0, &truxton2_state::batrider_dma_mem);
 	m_dma_space->set_endianness(ENDIANNESS_BIG);
 	m_dma_space->set_data_width(16);
 	m_dma_space->set_addr_width(16);
@@ -4200,8 +4196,8 @@ void toaplan2_state::batrider(machine_config &config)
 	//m_screen->set_refresh_hz(60);
 	//m_screen->set_size(432, 262);
 	//m_screen->set_visarea(0, 319, 0, 239);
-	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_truxton2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
+	m_screen->set_screen_update(FUNC(truxton2_state::screen_update_truxton2));
+	m_screen->screen_vblank().set(FUNC(truxton2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_batrider);
@@ -4209,51 +4205,50 @@ void toaplan2_state::batrider(machine_config &config)
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
-	m_vdp[0]->set_tile_callback(FUNC(toaplan2_state::batrider_bank_cb));
+	m_vdp[0]->set_tile_callback(FUNC(truxton2_state::batrider_bank_cb));
 	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_2);
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,batrider)
+	MCFG_VIDEO_START_OVERRIDE(truxton2_state,batrider)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	// these two latches are always written together, via a single move.l instruction
-	GENERIC_LATCH_8(config, "soundlatch");
-	GENERIC_LATCH_8(config, "soundlatch2");
-	GENERIC_LATCH_8(config, "soundlatch3");
-	GENERIC_LATCH_8(config, "soundlatch4");
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
+	GENERIC_LATCH_8(config, m_soundlatch[2]);
+	GENERIC_LATCH_8(config, m_soundlatch[3]);
 
 	YM2151(config, "ymsnd", 32_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.25); // 4MHz, 32MHz Oscillator (verified)
 
 	OKIM6295(config, m_oki[0], 32_MHz_XTAL/10, okim6295_device::PIN7_HIGH);
-	m_oki[0]->set_addrmap(0, &toaplan2_state::raizing_oki<0>);
+	m_oki[0]->set_addrmap(0, &truxton2_state::raizing_oki<0>);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 
 	OKIM6295(config, m_oki[1], 32_MHz_XTAL/10, okim6295_device::PIN7_LOW);
-	m_oki[1]->set_addrmap(0, &toaplan2_state::raizing_oki<1>);
+	m_oki[1]->set_addrmap(0, &truxton2_state::raizing_oki<1>);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 
-void toaplan2_state::bbakraid(machine_config &config)
+void truxton2_state::bbakraid(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 32_MHz_XTAL/2);   // 16MHz, 32MHz Oscillator
-	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::bbakraid_68k_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &truxton2_state::bbakraid_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(truxton2_state::toaplan2_reset));
 
 	Z80(config, m_audiocpu, XTAL(32'000'000)/6);     /* 5.3333MHz , 32MHz Oscillator */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::bbakraid_sound_z80_mem);
-	m_audiocpu->set_addrmap(AS_IO, &toaplan2_state::bbakraid_sound_z80_port);
-	m_audiocpu->set_periodic_int(FUNC(toaplan2_state::bbakraid_snd_interrupt), attotime::from_hz(XTAL(32'000'000) / 6 / 12000)); // sound CPU clock (divider unverified)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &truxton2_state::bbakraid_sound_z80_mem);
+	m_audiocpu->set_addrmap(AS_IO, &truxton2_state::bbakraid_sound_z80_port);
+	m_audiocpu->set_periodic_int(FUNC(truxton2_state::bbakraid_snd_interrupt), attotime::from_hz(XTAL(32'000'000) / 6 / 12000)); // sound CPU clock (divider unverified)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
-
-	EEPROM_93C66_8BIT(config, "eeprom");
+	EEPROM_93C66_8BIT(config, m_eeprom);
 
 	ADDRESS_MAP_BANK(config, m_dma_space, 0);
-	m_dma_space->set_addrmap(0, &toaplan2_state::batrider_dma_mem);
+	m_dma_space->set_addrmap(0, &truxton2_state::batrider_dma_mem);
 	m_dma_space->set_endianness(ENDIANNESS_BIG);
 	m_dma_space->set_data_width(16);
 	m_dma_space->set_addr_width(16);
@@ -4266,8 +4261,8 @@ void toaplan2_state::bbakraid(machine_config &config)
 	//m_screen->set_refresh_hz(60);
 	//m_screen->set_size(432, 262);
 	//m_screen->set_visarea(0, 319, 0, 239);
-	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_truxton2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
+	m_screen->set_screen_update(FUNC(truxton2_state::screen_update_truxton2));
+	m_screen->screen_vblank().set(FUNC(truxton2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_batrider);
@@ -4275,33 +4270,34 @@ void toaplan2_state::bbakraid(machine_config &config)
 
 	GP9001_VDP(config, m_vdp[0], 27_MHz_XTAL);
 	m_vdp[0]->set_palette(m_palette);
-	m_vdp[0]->set_tile_callback(FUNC(toaplan2_state::batrider_bank_cb));
+	m_vdp[0]->set_tile_callback(FUNC(truxton2_state::batrider_bank_cb));
 	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_1);
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,batrider)
+	MCFG_VIDEO_START_OVERRIDE(truxton2_state,batrider)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	// these two latches are always written together, via a single move.l instruction
-	GENERIC_LATCH_8(config, "soundlatch");
-	GENERIC_LATCH_8(config, "soundlatch2");
-	GENERIC_LATCH_8(config, "soundlatch3");
-	GENERIC_LATCH_8(config, "soundlatch4");
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
+	GENERIC_LATCH_8(config, m_soundlatch[2]);
+	GENERIC_LATCH_8(config, m_soundlatch[3]);
 
 	YMZ280B(config, "ymz", 16.9344_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
 	// IRQ not used ???  Connected to a test pin (TP082)
 }
 
 
-void toaplan2_state::nprobowl(machine_config &config)
+void truxton2_state::nprobowl(machine_config &config)
 {
 	// basic machine hardware
 	M68000(config, m_maincpu, 32_MHz_XTAL / 2);   // 32MHz Oscillator, divisor not verified
-	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::nprobowl_68k_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &truxton2_state::nprobowl_68k_mem);
+	m_maincpu->reset_cb().set(FUNC(truxton2_state::toaplan2_reset));
 
 	ADDRESS_MAP_BANK(config, m_dma_space, 0);
-	m_dma_space->set_addrmap(0, &toaplan2_state::batrider_dma_mem);
+	m_dma_space->set_addrmap(0, &truxton2_state::batrider_dma_mem);
 	m_dma_space->set_endianness(ENDIANNESS_BIG);
 	m_dma_space->set_data_width(16);
 	m_dma_space->set_addr_width(16);
@@ -4314,8 +4310,8 @@ void toaplan2_state::nprobowl(machine_config &config)
 	//m_screen->set_refresh_hz(60);
 	//m_screen->set_size(432, 262);
 	//m_screen->set_visarea(0, 319, 0, 239);
-	m_screen->set_screen_update(FUNC(toaplan2_state::screen_update_truxton2));
-	m_screen->screen_vblank().set(FUNC(toaplan2_state::screen_vblank));
+	m_screen->set_screen_update(FUNC(truxton2_state::screen_update_truxton2));
+	m_screen->screen_vblank().set(FUNC(truxton2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_batrider);
@@ -4325,7 +4321,7 @@ void toaplan2_state::nprobowl(machine_config &config)
 	m_vdp[0]->set_palette(m_palette);
 	m_vdp[0]->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_2);
 
-	MCFG_VIDEO_START_OVERRIDE(toaplan2_state, batrider)
+	MCFG_VIDEO_START_OVERRIDE(truxton2_state, batrider)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -6044,6 +6040,22 @@ ROM_START( nprobowl )
 	ROM_LOAD( "newprobowl-adpcm1-u0835", 0x80000, 0x80000, CRC(8c191e60) SHA1(f81c2849ffc553d921fc680cd50c2997b834c44a) )
 ROM_END
 
+ROM_START( probowl2 ) // identical to New Pro Bowl but for slight mods to the GFX ROMs to display the different title
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "probowl2.prg0.u021", 0x000000, 0x080000, CRC(3a57f122) SHA1(cc361c295f23bc0479ba49eb15de2ec6ca535a56) ) // 11xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "probowl2.prg1.u024", 0x000001, 0x080000, CRC(9e9bb58a) SHA1(3d2159bde418dee5d89e3df9a248b4b1989e6ee9) ) // 11xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "gp9001_0", 0 )
+	ROM_LOAD16_BYTE( "probowl2.chr1.u0519", 0x000000, 0x80000, CRC(66a5c9cd) SHA1(b8edc6a66e3929af2a1399e5fb6fc341b9789136) )
+	ROM_LOAD16_BYTE( "probowl2.chr0.u0518", 0x000001, 0x80000, CRC(b4439673) SHA1(5ca19d9c3c3cce9485fb9bd5224f0b14abe07f49) )
+	ROM_LOAD16_BYTE( "probowl2.chr2.u0520", 0x100000, 0x80000, CRC(e05be3a0) SHA1(922c6f094358cf3df790063e68d5dd4a32d46b06) )
+	ROM_LOAD16_BYTE( "probowl2.chr3.u0521", 0x100001, 0x80000, CRC(55e2565f) SHA1(b6a570b736a9b30e26d2a59b53f218ef5cd6f0f6) )
+
+	ROM_REGION( 0x100000, "oki1", 0 )
+	ROM_LOAD( "probowl2.adpcm0.u0834", 0x00000, 0x80000, CRC(be2fb43f) SHA1(f3f9bc522f4668852b751f291cef0000bb86b779) )
+	ROM_LOAD( "probowl2.adpcm1.u0835", 0x80000, 0x80000, CRC(8c191e60) SHA1(f81c2849ffc553d921fc680cd50c2997b834c44a) )
+ROM_END
+
 
 // The following is in order of Toaplan Board/game numbers
 // See list at top of file
@@ -6052,9 +6064,9 @@ ROM_END
 GAME( 1991, tekipaki,    0,        tekipaki,     tekipaki,   toaplan2_state, empty_init,    ROT0,   "Toaplan",         "Teki Paki",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tekipakit,   tekipaki, tekipaki,     tekipaki,   toaplan2_state, empty_init,    ROT0,   "Toaplan",         "Teki Paki (location test)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, ghox,        0,        ghox,         ghox,       toaplan2_state, empty_init,    ROT270, "Toaplan",         "Ghox (spinner)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ghoxj,       ghox,     ghox,         ghox,       toaplan2_state, empty_init,    ROT270, "Toaplan",         "Ghox (joystick)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ghoxjo,      ghox,     ghox,         ghoxjo,     toaplan2_state, empty_init,    ROT270, "Toaplan",         "Ghox (joystick, older)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ghox,        0,        ghox,         ghox,       ghox_state,     empty_init,    ROT270, "Toaplan",         "Ghox (spinner)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ghoxj,       ghox,     ghox,         ghox,       ghox_state,     empty_init,    ROT270, "Toaplan",         "Ghox (joystick)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ghoxjo,      ghox,     ghox,         ghoxjo,     ghox_state,     empty_init,    ROT270, "Toaplan",         "Ghox (joystick, older)",    MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, dogyuun,     0,        dogyuun,      dogyuun,    toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1992, dogyuuna,    dogyuun,  dogyuun,      dogyuuna,   toaplan2_state, init_dogyuun,  ROT270, "Toaplan",         "Dogyuun (older set)",       MACHINE_SUPPORTS_SAVE )
@@ -6067,7 +6079,7 @@ GAME( 1993, kbashp,      kbash,    kbash,        kbash,      toaplan2_state, emp
 
 GAME( 1999, kbash2,      0,        kbash2,       kbash2,     toaplan2_state, empty_init,    ROT0,   "bootleg",         "Knuckle Bash 2 (bootleg)",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, truxton2,    0,        truxton2,     truxton2,   toaplan2_state, empty_init,    ROT270, "Toaplan",         "Truxton II / Tatsujin Oh",  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, truxton2,    0,        truxton2,     truxton2,   truxton2_state, empty_init,    ROT270, "Toaplan",         "Truxton II / Tatsujin Oh",  MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, pipibibs,    0,        pipibibs,     pipibibs,   toaplan2_state, empty_init,    ROT0,   "Toaplan",         "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, pipibibsa,   pipibibs, pipibibs,     pipibibs,   toaplan2_state, empty_init,    ROT0,   "Toaplan",         "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 2)", MACHINE_SUPPORTS_SAVE )
@@ -6081,22 +6093,22 @@ GAME( 1991, pipibibsbl3, pipibibs, pipibibsbl,   pipibibsbl, toaplan2_state, emp
 GAME( 1993, enmadaio,    0,        enmadaio,     enmadaio,   toaplan2_state, init_enmadaio, ROT0,   "Toaplan / Taito",  "Enma Daio (Japan)", 0 ) // TP-031
 
 // region is in eeprom (and also requires correct return value from a v25 mapped address??)
-GAME( 1992, fixeight,    0,        fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Europe)",                                           MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightk,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Korea)",                                            MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeighth,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Hong Kong)",                                        MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeighttw,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Taiwan)",                                           MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeighta,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Southeast Asia)",                                   MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightu,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (USA)",                                              MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightj,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight - Jigoku no Eiyuu Densetsu (Japan)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightt,   fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Europe, Taito license)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightkt,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Korea, Taito license)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightht,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Hong Kong, Taito license)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeighttwt, fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Taiwan, Taito license)",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightat,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Southeast Asia, Taito license)",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightut,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (USA, Taito license)",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1992, fixeightjt,  fixeight, fixeight,   fixeight,   toaplan2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight - Jigoku no Eiyuu Densetsu (Japan, Taito license)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeight,    0,        fixeight,   fixeight,   truxton2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Europe)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightk,   fixeight, fixeight,   fixeight,   truxton2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Korea)",                                            MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeighth,   fixeight, fixeight,   fixeight,   truxton2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Hong Kong)",                                        MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeighttw,  fixeight, fixeight,   fixeight,   truxton2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Taiwan)",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeighta,   fixeight, fixeight,   fixeight,   truxton2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (Southeast Asia)",                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightu,   fixeight, fixeight,   fixeight,   truxton2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight (USA)",                                              MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightj,   fixeight, fixeight,   fixeight,   truxton2_state, init_fixeight,   ROT270, "Toaplan",                 "FixEight - Jigoku no Eiyuu Densetsu (Japan)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightt,   fixeight, fixeight,   fixeight,   truxton2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Europe, Taito license)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightkt,  fixeight, fixeight,   fixeight,   truxton2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Korea, Taito license)",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightht,  fixeight, fixeight,   fixeight,   truxton2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Hong Kong, Taito license)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeighttwt, fixeight, fixeight,   fixeight,   truxton2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Taiwan, Taito license)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightat,  fixeight, fixeight,   fixeight,   truxton2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (Southeast Asia, Taito license)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightut,  fixeight, fixeight,   fixeight,   truxton2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight (USA, Taito license)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightjt,  fixeight, fixeight,   fixeight,   truxton2_state, init_fixeight,   ROT270, "Toaplan (Taito license)", "FixEight - Jigoku no Eiyuu Densetsu (Japan, Taito license)",  MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, fixeightbl,  fixeight, fixeightbl, fixeightbl, toaplan2_state, init_fixeightbl, ROT270,"bootleg", "FixEight (Korea, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, fixeightbl,  fixeight, fixeightbl, fixeightbl, truxton2_state, init_fixeightbl, ROT270, "bootleg", "FixEight (Korea, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, grindstm,    0,        vfive,      grindstm,   toaplan2_state, init_vfive,      ROT270, "Toaplan", "Grind Stormer",             MACHINE_SUPPORTS_SAVE )
 GAME( 1992, grindstma,   grindstm, vfive,      grindstma,  toaplan2_state, init_vfive,      ROT270, "Toaplan", "Grind Stormer (older set)", MACHINE_SUPPORTS_SAVE )
@@ -6109,51 +6121,52 @@ GAME( 1993, batsugunb,   batsugun, batsugun,   batsugun,   toaplan2_state, init_
 GAME( 1993, batsugunsp,  batsugun, batsugun,   batsugun,   toaplan2_state, init_dogyuun,    ROT270, "Toaplan", "Batsugun - Special Version", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, batsugunbl,  batsugun, batsugunbl, batsugunbl, toaplan2_state, init_fixeightbl, ROT270, "Toaplan", "Batsugun (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // needs correct GFX offsets and oki banking fix
 
-GAME( 1994, pwrkick,     0,        pwrkick,    pwrkick,    toaplan2_state, empty_init,      ROT0,   "Sunwise",  "Power Kick (Japan)",    0 )
-GAME( 1995, othldrby,    0,        othldrby,   othldrby,   toaplan2_state, empty_init,      ROT0,   "Sunwise",  "Othello Derby (Japan)", 0 )
+GAME( 1994, pwrkick,     0,        pwrkick,    pwrkick,    pwrkick_state,  empty_init,      ROT0,   "Sunwise",  "Power Kick (Japan)",    0 )
+GAME( 1995, othldrby,    0,        othldrby,   othldrby,   pwrkick_state,  empty_init,      ROT0,   "Sunwise",  "Othello Derby (Japan)", 0 )
 
 GAME( 1994, snowbro2,    0,        snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "Hanafram",         "Snow Bros. 2 - With New Elves / Otenki Paradise (Hanafram)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1994, snowbro2ny,  snowbro2, snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "Nyanko",           "Snow Bros. 2 - With New Elves / Otenki Paradise (Nyanko)",         MACHINE_SUPPORTS_SAVE ) // not a bootleg, has original parts (the "GP9001 L7A0498 TOA PLAN" IC and the three mask ROMs)
 GAME( 1998, snowbro2b,   snowbro2, snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "bootleg",          "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, snowbro2b2,  snowbro2, snowbro2,   snowbro2,   toaplan2_state, empty_init,      ROT0,   "bootleg (Q Elec)", "Snow Bros. 2 - With New Elves / Otenki Paradise (bootleg, set 2)", MACHINE_SUPPORTS_SAVE ) // possibly not a bootleg, has some original parts
 
-GAME( 1993, sstriker,    0,        mahoudai,   sstriker,   toaplan2_state, empty_init,      ROT270, "Raizing",                         "Sorcer Striker",           MACHINE_SUPPORTS_SAVE ) // verified on two different PCBs
-GAME( 1993, sstrikerk,   sstriker, mahoudai,   sstrikerk,  toaplan2_state, empty_init,      ROT270, "Raizing (Unite Trading license)", "Sorcer Striker (Korea)" ,  MACHINE_SUPPORTS_SAVE ) // Although the region jumper is functional, it's a Korean board / version
-GAME( 1993, mahoudai,    sstriker, mahoudai,   mahoudai,   toaplan2_state, empty_init,      ROT270, "Raizing (Able license)",          "Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sstriker,    0,        mahoudai,   sstriker,   truxton2_state, empty_init,      ROT270, "Raizing",                         "Sorcer Striker",           MACHINE_SUPPORTS_SAVE ) // verified on two different PCBs
+GAME( 1993, sstrikerk,   sstriker, mahoudai,   sstrikerk,  truxton2_state, empty_init,      ROT270, "Raizing (Unite Trading license)", "Sorcer Striker (Korea)" ,  MACHINE_SUPPORTS_SAVE ) // Although the region jumper is functional, it's a Korean board / version
+GAME( 1993, mahoudai,    sstriker, mahoudai,   mahoudai,   truxton2_state, empty_init,      ROT270, "Raizing (Able license)",          "Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, kingdmgp,    0,        shippumd,   kingdmgp,   toaplan2_state, empty_init,      ROT270, "Raizing / Eighting", "Kingdom Grandprix",               MACHINE_SUPPORTS_SAVE ) // from Korean board, missing letters on credits screen but this is correct
-GAME( 1994, shippumd,    kingdmgp, shippumd,   shippumd,   toaplan2_state, empty_init,      ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, kingdmgp,    0,        shippumd,   kingdmgp,   truxton2_state, empty_init,      ROT270, "Raizing / Eighting", "Kingdom Grandprix",               MACHINE_SUPPORTS_SAVE ) // from Korean board, missing letters on credits screen but this is correct
+GAME( 1994, shippumd,    kingdmgp, shippumd,   shippumd,   truxton2_state, empty_init,      ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, bgaregga,    0,        bgaregga,   bgaregga,   toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bgareggat,   bgaregga, bgaregga,   bgaregga,   toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (location test) (Wed Jan 17 1996)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bgareggahk,  bgaregga, bgaregga,   bgareggahk, toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Austria / Hong Kong) (Sat Feb 3 1996)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bgareggatw,  bgaregga, bgaregga,   bgareggatw, toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Taiwan / Germany) (Thu Feb 1 1996)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bgareggak,   bgaregga, bgaregga,   bgareggak,  toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Korea / Greece) (Wed Feb 7 1996)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bgaregganv,  bgaregga, bgaregga,   bgareggahk, toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - New Version (Austria / Hong Kong) (Sat Mar 2 1996)" , MACHINE_SUPPORTS_SAVE ) // displays New Version only when set to HK
-GAME( 1996, bgareggat2,  bgaregga, bgaregga,   bgaregga,   toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Europe / USA / Japan / Asia) (Sat Mar 2 1996)" , MACHINE_SUPPORTS_SAVE ) // displays Type 2 only when set to Europe
-GAME( 1996, bgareggacn,  bgaregga, bgaregga,   bgareggacn, toaplan2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Denmark / China) (Tue Apr 2 1996)", MACHINE_SUPPORTS_SAVE ) // displays Type 2 only when set to Denmark
-GAME( 1996, bgareggabl,  bgaregga, bgareggabl, bgareggacn, toaplan2_state, init_bgaregga,   ROT270, "bootleg",            "1945 Part-2 (Chinese hack of Battle Garegga)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bgareggabla, bgaregga, bgareggabl, bgareggacn, toaplan2_state, init_bgaregga,   ROT270, "bootleg",            "Lei Shen Zhuan Thunder Deity Biography (Chinese hack of Battle Garegga)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bgareggablj, bgaregga, bgareggabl, bgaregga,   toaplan2_state, init_bgaregga,   ROT270, "bootleg",            "Battle Garegga (Japan, bootleg) (Sat Feb 3 1996)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgaregga,    0,        bgaregga,   bgaregga,   truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgareggat,   bgaregga, bgaregga,   bgaregga,   truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (location test) (Wed Jan 17 1996)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgareggahk,  bgaregga, bgaregga,   bgareggahk, truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Austria / Hong Kong) (Sat Feb 3 1996)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgareggatw,  bgaregga, bgaregga,   bgareggatw, truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Taiwan / Germany) (Thu Feb 1 1996)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgareggak,   bgaregga, bgaregga,   bgareggak,  truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Korea / Greece) (Wed Feb 7 1996)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgaregganv,  bgaregga, bgaregga,   bgareggahk, truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - New Version (Austria / Hong Kong) (Sat Mar 2 1996)" , MACHINE_SUPPORTS_SAVE ) // displays New Version only when set to HK
+GAME( 1996, bgareggat2,  bgaregga, bgaregga,   bgaregga,   truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Europe / USA / Japan / Asia) (Sat Mar 2 1996)" , MACHINE_SUPPORTS_SAVE ) // displays Type 2 only when set to Europe
+GAME( 1996, bgareggacn,  bgaregga, bgaregga,   bgareggacn, truxton2_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Denmark / China) (Tue Apr 2 1996)", MACHINE_SUPPORTS_SAVE ) // displays Type 2 only when set to Denmark
+GAME( 1996, bgareggabl,  bgaregga, bgareggabl, bgareggacn, truxton2_state, init_bgaregga,   ROT270, "bootleg",            "1945 Part-2 (Chinese hack of Battle Garegga)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgareggabla, bgaregga, bgareggabl, bgareggacn, truxton2_state, init_bgaregga,   ROT270, "bootleg",            "Lei Shen Zhuan Thunder Deity Biography (Chinese hack of Battle Garegga)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bgareggablj, bgaregga, bgareggabl, bgaregga,   truxton2_state, init_bgaregga,   ROT270, "bootleg",            "Battle Garegga (Japan, bootleg) (Sat Feb 3 1996)", MACHINE_SUPPORTS_SAVE )
 
 // these are all based on Version B, even if only the Japan version states 'version B'
-GAME( 1998, batrider,    0,        batrider,   batrider,   toaplan2_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Europe) (Fri Feb 13 1998)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1998, batrideru,   batrider, batrider,   batrider,   toaplan2_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (USA) (Fri Feb 13 1998)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1998, batriderc,   batrider, batrider,   batrider,   toaplan2_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (China) (Fri Feb 13 1998)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1998, batriderj,   batrider, batrider,   batriderj,  toaplan2_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan, B version) (Fri Feb 13 1998)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, batriderk,   batrider, batrider,   batrider,   toaplan2_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Korea) (Fri Feb 13 1998)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batrider,    0,        batrider,   batrider,   truxton2_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Europe) (Fri Feb 13 1998)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batrideru,   batrider, batrider,   batrider,   truxton2_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (USA) (Fri Feb 13 1998)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batriderc,   batrider, batrider,   batrider,   truxton2_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (China) (Fri Feb 13 1998)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batriderj,   batrider, batrider,   batriderj,  truxton2_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan, B version) (Fri Feb 13 1998)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batriderk,   batrider, batrider,   batrider,   truxton2_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Korea) (Fri Feb 13 1998)",            MACHINE_SUPPORTS_SAVE )
 // older revision of the code
-GAME( 1998, batriderja,  batrider, batrider,   batriderj,  toaplan2_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan, older version) (Mon Dec 22 1997)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, batriderhk,  batrider, batrider,   batrider,   toaplan2_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Hong Kong) (Mon Dec 22 1997)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1998, batridert,   batrider, batrider,   batrider,   toaplan2_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Taiwan) (Mon Dec 22 1997)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batriderja,  batrider, batrider,   batriderj,  truxton2_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan, older version) (Mon Dec 22 1997)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batriderhk,  batrider, batrider,   batrider,   truxton2_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Hong Kong) (Mon Dec 22 1997)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1998, batridert,   batrider, batrider,   batrider,   truxton2_state, init_batrider,   ROT270, "Raizing / Eighting", "Armed Police Batrider (Taiwan) (Mon Dec 22 1997)",               MACHINE_SUPPORTS_SAVE )
 
 // Battle Bakraid
 // the 'unlimited' version is a newer revision of the code
-GAME( 1999, bbakraid,    0,        bbakraid,   bbakraid,   toaplan2_state, init_bbakraid,   ROT270, "Eighting", "Battle Bakraid - Unlimited Version (USA) (Tue Jun 8 1999)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1999, bbakraidc,   bbakraid, bbakraid,   bbakraid,   toaplan2_state, init_bbakraid,   ROT270, "Eighting", "Battle Bakraid - Unlimited Version (China) (Tue Jun 8 1999)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, bbakraidj,   bbakraid, bbakraid,   bbakraid,   toaplan2_state, init_bbakraid,   ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bbakraid,    0,        bbakraid,   bbakraid,   truxton2_state, init_bbakraid,   ROT270, "Eighting", "Battle Bakraid - Unlimited Version (USA) (Tue Jun 8 1999)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bbakraidc,   bbakraid, bbakraid,   bbakraid,   truxton2_state, init_bbakraid,   ROT270, "Eighting", "Battle Bakraid - Unlimited Version (China) (Tue Jun 8 1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bbakraidj,   bbakraid, bbakraid,   bbakraid,   truxton2_state, init_bbakraid,   ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", MACHINE_SUPPORTS_SAVE )
 // older revision of the code
-GAME( 1999, bbakraidja,  bbakraid, bbakraid,   bbakraid,   toaplan2_state, init_bbakraid,   ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bbakraidja,  bbakraid, bbakraid,   bbakraid,   truxton2_state, init_bbakraid,   ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", MACHINE_SUPPORTS_SAVE )
 
 // dedicated PCB
-GAME( 1996, nprobowl,    0,        nprobowl,   nprobowl,   toaplan2_state, empty_init,      ROT0,   "Zuck / Able Corp", "New Pro Bowl", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // bad GFXs, no sound banking, controls, etc
+GAME( 1996, nprobowl,    0,        nprobowl,   nprobowl,   truxton2_state, empty_init,      ROT0,   "Zuck / Able Corp", "New Pro Bowl", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // bad GFXs, no sound banking, controls, etc
+GAME( 1996, probowl2,    nprobowl, nprobowl,   nprobowl,   truxton2_state, empty_init,      ROT0,   "Zuck / Able Corp", "Pro Bowl 2",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE ) // bad GFXs, no sound banking, controls, etc

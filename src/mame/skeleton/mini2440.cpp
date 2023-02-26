@@ -14,6 +14,10 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include <cstdarg>
+
+
+namespace {
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -283,5 +287,8 @@ ROM_START( mini2440 )
 	ROM_SYSTEM_BIOS( 2, "android", "Android 1.5 (2009/05/13)" )
 	ROMX_LOAD( "android.bin", 0, 0x8400000, CRC(4721837d) SHA1(88fcf553b106d9fc624c9615d9c1da9c705ccb46), ROM_BIOS(2) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(2009, mini2440, 0, 0, mini2440, mini2440, mini2440_state, init_mini2440, "FriendlyARM", "Mini2440", 0)

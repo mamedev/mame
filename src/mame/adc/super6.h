@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_SUPER6_H
-#define MAME_INCLUDES_SUPER6_H
+#ifndef MAME_ADC_SUPER6_H
+#define MAME_ADC_SUPER6_H
 
 #pragma once
 
@@ -88,4 +88,4 @@ private:
 	uint8_t m_bank1 = 0;
 };
 
-#endif // MAME_INCLUDES_SUPER6_H
+#endif // MAME_ADC_SUPER6_H

@@ -34,14 +34,14 @@ namcos21_dsp_c67_device::namcos21_dsp_c67_device(const machine_config &mconfig, 
 
 void namcos21_dsp_c67_device::device_start()
 {
-	m_dspram16.resize(0x10000/2); // 0x8000 16-bit words
-	std::fill(std::begin(m_dspram16), std::end(m_dspram16), 0x0000);
+	m_dspram16 = std::make_unique<uint16_t []>(0x10000/2); // 0x8000 16-bit words
+	std::fill_n(m_dspram16.get(), 0x10000/2, 0x0000);
 
 	m_yield_hack_cb.resolve_safe();
 	m_pointram = std::make_unique<uint8_t[]>(PTRAM_SIZE);
 	m_mpDspState = std::make_unique<dsp_state>();
 
-	save_item(NAME(m_dspram16));
+	save_pointer(NAME(m_dspram16), 0x10000/2);
 
 	save_item(NAME(m_mpDspState->masterSourceAddr));
 	save_item(NAME(m_mpDspState->slaveInputBuffer));
@@ -213,24 +213,23 @@ void namcos21_dsp_c67_device::transmit_word_to_slave(uint16_t data)
 void namcos21_dsp_c67_device::transfer_dsp_data()
 {
 	uint16_t addr = m_mpDspState->masterSourceAddr;
-	int mode = addr&0x8000;
-	addr&=0x7fff;
-	if( addr )
+	bool const mode = BIT(addr, 15);
+	addr &= 0x7fff;
+	if (addr)
 	{
-		for(;;)
+		for (;;)
 		{
-			int i;
-			uint16_t old = addr;
-			uint16_t code = m_dspram16[addr++];
-			if( code == 0xffff )
+			uint16_t const old = addr;
+			uint16_t const code = m_dspram16[addr++];
+			if (code == 0xffff)
 			{
-				if( mode )
+				if (mode)
 				{
 					addr = m_dspram16[addr];
 					m_mpDspState->masterSourceAddr = addr;
-					if (ENABLE_LOGGING) logerror( "LOOP:0x%04x\n", addr );
-					addr&=0x7fff;
-					if( old==addr )
+					if (ENABLE_LOGGING) logerror("LOOP:0x%04x\n", addr);
+					addr &= 0x7fff;
+					if (old == addr)
 					{
 						return;
 					}
@@ -241,71 +240,70 @@ void namcos21_dsp_c67_device::transfer_dsp_data()
 					return;
 				}
 			}
-			else if( mode==0 )
-			{ /* direct data transfer */
-				if (ENABLE_LOGGING) logerror( "DATA TFR(0x%x)\n", code );
+			else if (!mode)
+			{
+				// direct data transfer
+				if (ENABLE_LOGGING) logerror("DATA TFR(0x%x)\n", code);
 				transmit_word_to_slave(code);
-				for( i=0; i<code; i++ )
+				for (int i = 0; i < code; i++)
 				{
-					uint16_t data = m_dspram16[addr++];
+					uint16_t const data = m_dspram16[addr++];
 					transmit_word_to_slave(data);
 				}
 			}
-			else if( code==0x18 || code==0x1a )
+			else if (code == 0x18 || code == 0x1a)
 			{
-				if (ENABLE_LOGGING) logerror( "HEADER TFR(0x%x)\n", code );
-				transmit_word_to_slave(code+1);
-				for( i=0; i<code; i++ )
+				if (ENABLE_LOGGING) logerror("HEADER TFR(0x%x)\n", code);
+				transmit_word_to_slave(code + 1);
+				for (int i = 0; i < code; i++)
 				{
-					uint16_t data = m_dspram16[addr++];
+					uint16_t const data = m_dspram16[addr++];
 					transmit_word_to_slave(data);
 				}
 			}
 			else
 			{
+				if (ENABLE_LOGGING) logerror("OBJ TFR(0x%x)\n", code);
 				int32_t masterAddr = read_pointrom_data(code);
-				if (ENABLE_LOGGING) logerror( "OBJ TFR(0x%x)\n", code );
+				uint16_t const len = m_dspram16[addr++];
+				for (;;)
 				{
-					uint16_t len = m_dspram16[addr++];
-					for(;;)
+					int subAddr = read_pointrom_data(masterAddr++);
+					if (subAddr == 0xffffff)
 					{
-						int subAddr = read_pointrom_data(masterAddr++);
-						if( subAddr==0xffffff )
+						break;
+					}
+					else
+					{
+						int const primWords = (uint16_t)read_pointrom_data(subAddr++);
+						// TODO: this function causes an IDC overflow in Solvalou, something else failed prior to that?
+						// In Header TFR when bad parameters happens there's a suspicious 0x000f 0x0003 as first two words,
+						// maybe it's supposed to have a different length there ...
+						// cfr: object code 0x17 in service mode
+						if (primWords > 2)
 						{
-							break;
+							transmit_word_to_slave(0); // pad1
+							transmit_word_to_slave(len + 1);
+							for (int i = 0; i < len; i++)
+							{ // transform
+								transmit_word_to_slave(m_dspram16[addr + i]);
+							}
+							transmit_word_to_slave(0); // pad2
+							transmit_word_to_slave(primWords + 1);
+							for (int i = 0; i < primWords; i++)
+							{
+								transmit_word_to_slave((uint16_t)read_pointrom_data(subAddr + i));
+							}
 						}
 						else
 						{
-							int primWords = (uint16_t)read_pointrom_data(subAddr++);
-							// TODO: this function causes an IDC overflow in Solvalou, something else failed prior to that?
-							// In Header TFR when bad parameters happens there's a suspicious 0x000f 0x0003 as first two words,
-							// maybe it's supposed to have a different length there ...
-							// cfr: object code 0x17 in service mode
-							if( primWords>2 )
-							{
-								transmit_word_to_slave(0); /* pad1 */
-								transmit_word_to_slave(len+1);
-								for( i=0; i<len; i++ )
-								{ /* transform */
-									transmit_word_to_slave(m_dspram16[addr+i]);
-								}
-								transmit_word_to_slave(0); /* pad2 */
-								transmit_word_to_slave(primWords+1);
-								for( i=0; i<primWords; i++ )
-								{
-									transmit_word_to_slave((uint16_t)read_pointrom_data(subAddr+i));
-								}
-							}
-							else
-							{
-								if (ENABLE_LOGGING) logerror( "TFR NOP?\n" );
-							}
+							if (ENABLE_LOGGING) logerror("TFR NOP?\n");
 						}
-					} /* for(;;) */
-					addr+=len;
-				}
+					}
+				} // for (;;)
+				addr += len;
 			}
-		} /* for(;;) */
+		} // for(;;)
 	}
 }
 

@@ -97,7 +97,7 @@ they 'borrowed' code. They also added a piezo circuit.
 Hardware notes:
 - Fairchild 3850PK CPU @ 2MHz (LC circuit), 3853PK
 - 2KB ROM (3216), 256 bytes RAM (2*2111A)
-- 555, 4001, 4011 for display blinking and beeper
+- discrete sound
 
 "bP" buttons are F, G, H (instead of A, B, C)
 

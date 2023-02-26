@@ -47,6 +47,8 @@ System80 is based on the SRU platform, but with more outputs and finally a separ
 #include "j80wsprt2.lh"
 
 
+namespace {
+
 class jpms80_state : public driver_device
 {
 public:
@@ -354,6 +356,7 @@ ROM_START( j80plsnd )
 	ROM_LOAD( "plus_p5.bin", 0x1000, 0x000400, CRC(d111b2c6) SHA1(c0182a4b163e4dbb67f1c98251b93fa878bff2e2) )
 ROM_END
 
+} // anonymous namespace
 
 
 GAMEL( 198?, j80bac,    0,        jpms80,jpms80, jpms80_state, init_jpms80, ROT0, "JPM", "Bank A Coin (JPM) (SYSTEM80)", MACHINE_IS_SKELETON_MECHANICAL, layout_j80bac )

@@ -1,30 +1,34 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
+#ifndef MAME_RENDER_DRAWBGFX_H
+#define MAME_RENDER_DRAWBGFX_H
+
 #pragma once
 
-#ifndef RENDER_BGFX
-#define RENDER_BGFX
+#include "binpacker.h"
+#include "bgfx/chain.h"
+#include "bgfx/chainmanager.h"
+#include "bgfx/vertex.h"
+#include "sliderdirtynotifier.h"
+
+#include "modules/osdwindow.h"
+
+#include "notifier.h"
 
 #include <bgfx/bgfx.h>
 
 #include <map>
+#include <memory>
 #include <vector>
 
-#include "binpacker.h"
-#include "bgfx/vertex.h"
-#include "bgfx/chain.h"
-#include "bgfx/chainmanager.h"
-#include "sliderdirtynotifier.h"
 
 class texture_manager;
 class target_manager;
 class shader_manager;
 class effect_manager;
-class chain_manager;
 class bgfx_texture;
 class bgfx_effect;
 class bgfx_target;
-class bgfx_chain;
 class bgfx_view;
 class osd_options;
 class avi_write;
@@ -33,11 +37,10 @@ class avi_write;
 class renderer_bgfx : public osd_renderer, public slider_dirty_notifier
 {
 public:
-	renderer_bgfx(std::shared_ptr<osd_window> w);
-	virtual ~renderer_bgfx();
+	class parent_module;
 
-	static bool init(running_machine &machine);
-	static void exit();
+	renderer_bgfx(osd_window &window, parent_module &parent_module);
+	virtual ~renderer_bgfx();
 
 	virtual int create() override;
 	virtual int draw(const int update) override;
@@ -62,7 +65,24 @@ public:
 	static char const *const WINDOW_PREFIX;
 
 private:
-	void init_bgfx_library();
+	enum buffer_status
+	{
+		BUFFER_PRE_FLUSH,
+		BUFFER_FLUSH,
+		BUFFER_SCREEN,
+		BUFFER_EMPTY,
+		BUFFER_DONE
+	};
+
+	class parent_module_holder
+	{
+	public:
+		parent_module_holder(parent_module &parent);
+		~parent_module_holder();
+		parent_module &operator()() const { return m_parent; }
+	private:
+		parent_module &m_parent;
+	};
 
 	void vertex(ScreenVertex* vertex, float x, float y, float z, uint32_t rgba, float u, float v);
 	void render_avi_quad();
@@ -73,18 +93,10 @@ private:
 	void setup_ortho_view();
 
 	void allocate_buffer(render_primitive *prim, uint32_t blend, bgfx::TransientVertexBuffer *buffer);
-	enum buffer_status
-	{
-		BUFFER_PRE_FLUSH,
-		BUFFER_FLUSH,
-		BUFFER_SCREEN,
-		BUFFER_EMPTY,
-		BUFFER_DONE
-	};
-	buffer_status buffer_primitives(bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer, int32_t screen);
+	buffer_status buffer_primitives(bool atlas_valid, render_primitive** prim, bgfx::TransientVertexBuffer* buffer, int32_t screen, int window_index);
 
-	void render_textured_quad(render_primitive* prim, bgfx::TransientVertexBuffer* buffer);
-	void render_post_screen_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer, int32_t screen);
+	void render_textured_quad(render_primitive* prim, bgfx::TransientVertexBuffer* buffer, int window_index);
+	void render_post_screen_quad(int view, render_primitive* prim, bgfx::TransientVertexBuffer* buffer, int32_t screen, int window_index);
 
 	void put_packed_quad(render_primitive *prim, uint32_t hash, ScreenVertex* vertex);
 	void put_packed_line(render_primitive *prim, ScreenVertex* vertex);
@@ -100,8 +112,10 @@ private:
 	void process_atlas_packs(std::vector<std::vector<rectangle_packer::packed_rectangle>>& packed);
 	uint32_t get_texture_hash(render_primitive *prim);
 
-	osd_options& m_options;
-	bgfx::PlatformData m_platform_data;
+	void load_config(util::xml::data_node const &parentnode);
+	void save_config(util::xml::data_node &parentnode);
+
+	parent_module_holder m_module; // keep this where it will be destructed last
 
 	bgfx_target *m_framebuffer;
 	bgfx_texture *m_texture_cache;
@@ -109,11 +123,11 @@ private:
 	// Original display_mode
 	osd_dim m_dimensions;
 
-	texture_manager *m_textures;
-	target_manager *m_targets;
-	shader_manager *m_shaders;
-	effect_manager *m_effects;
-	chain_manager *m_chains;
+	std::unique_ptr<texture_manager> m_textures;
+	std::unique_ptr<target_manager> m_targets;
+	std::unique_ptr<shader_manager> m_shaders;
+	std::unique_ptr<effect_manager> m_effects;
+	std::unique_ptr<chain_manager> m_chains;
 
 	bgfx_effect *m_gui_effect[4];
 	bgfx_effect *m_screen_effect[4];
@@ -124,7 +138,7 @@ private:
 	rectangle_packer m_packer;
 
 	uint32_t m_white[16*16];
-	bgfx_view *m_ortho_view;
+	std::unique_ptr<bgfx_view> m_ortho_view;
 	uint32_t m_max_view;
 
 	bgfx_view *m_avi_view;
@@ -134,14 +148,17 @@ private:
 	bitmap_rgb32 m_avi_bitmap;
 	uint8_t *m_avi_data;
 
+	std::unique_ptr<util::xml::file> m_config;
+	const util::notifier_subscription m_load_sub;
+	const util::notifier_subscription m_save_sub;
+
 	static const uint16_t CACHE_SIZE;
 	static const uint32_t PACKABLE_SIZE;
 	static const uint32_t WHITE_HASH;
 
 	static uint32_t s_current_view;
-	static bool s_bgfx_library_initialized;
 	static uint32_t s_width[16];
 	static uint32_t s_height[16];
 };
 
-#endif // RENDER_BGFX
+#endif // MAME_RENDER_DRAWBGFX_H

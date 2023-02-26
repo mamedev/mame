@@ -137,6 +137,8 @@ It's a very rare computer. It has 2 processors, Z80 and 8088, so it can run both
 #include "speaker.h"
 
 
+namespace {
+
 class octopus_state : public driver_device
 {
 public:
@@ -180,7 +182,7 @@ private:
 	uint8_t vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);
 	uint8_t get_slave_ack(offs_t offset);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(fdc_drq);
 	uint8_t bank_sel_r(offs_t offset);
 	void bank_sel_w(offs_t offset, uint8_t data);
 	uint8_t dma_read(offs_t offset);
@@ -1028,6 +1030,9 @@ ROM_START( octopus )
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "octopus_gfx_card",  0x0000, 0x2000, CRC(b2386534) SHA1(5e3c4682afb4eb222e48a7203269a16d26911836) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Quench
 /* toaplan SCU */
-#ifndef MAME_VIDEO_TOAPLAN_SCU_H
-#define MAME_VIDEO_TOAPLAN_SCU_H
+#ifndef MAME_TOAPLAN_TOAPLAN_SCU_H
+#define MAME_TOAPLAN_TOAPLAN_SCU_H
 
 #pragma once
 
@@ -42,4 +42,4 @@ private:
 DECLARE_DEVICE_TYPE(TOAPLAN_SCU, toaplan_scu_device)
 
 
-#endif // MAME_VIDEO_TOAPLAN_SCU_H
+#endif // MAME_TOAPLAN_TOAPLAN_SCU_H

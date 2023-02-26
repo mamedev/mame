@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_BEBOX_H
-#define MAME_INCLUDES_BEBOX_H
+#ifndef MAME_BE_BEBOX_H
+#define MAME_BE_BEBOX_H
 
 #include "cpu/powerpc/ppc.h"
 
@@ -136,4 +136,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_BEBOX_H
+#endif // MAME_BE_BEBOX_H

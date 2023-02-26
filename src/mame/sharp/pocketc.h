@@ -5,8 +5,8 @@
  * includes/pocketc.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_POCKETC_H
-#define MAME_INCLUDES_POCKETC_H
+#ifndef MAME_SHARP_POCKETC_H
+#define MAME_SHARP_POCKETC_H
 
 #pragma once
 
@@ -64,4 +64,4 @@ protected:
 	static const rgb_t indirect_palette[6];
 };
 
-#endif // MAME_INCLUDES_POCKETC_H
+#endif // MAME_SHARP_POCKETC_H

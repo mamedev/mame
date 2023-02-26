@@ -56,7 +56,7 @@ protected:
 
 		int44 operator+( int64_t add )
 		{
-			int64_t value = ( ( m_value + add ) << 20 ) >> 20;
+			int64_t value = util::sext( m_value + add, 44 );
 
 			return int44( value,
 				m_positive_overflow || ( value < 0 && m_value >= 0 && add >= 0 ),

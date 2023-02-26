@@ -37,13 +37,15 @@
 *****************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "cpu/tms34010/tms34010.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class skimaxx_state : public driver_device
 {
@@ -613,6 +615,8 @@ ROM_START( skimaxx )
 	ROM_REGION( 0x80000, "oki4", 0 )
 	ROM_LOAD( "main2_0.u4", 0x000000, 0x80000, CRC(c84b3c46) SHA1(b956358518495aa822a5b699cbad1abac212dd09) )   // identical to main2_0.u2
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************

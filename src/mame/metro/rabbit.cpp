@@ -80,7 +80,7 @@ Custom: Imagetek I5000 (2ch video & 2ch sound)
 */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/eepromser.h"
 #include "sound/i5000.h"
 #include "emupal.h"
@@ -88,6 +88,8 @@ Custom: Imagetek I5000 (2ch video & 2ch sound)
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
 
 class rabbit_state : public driver_device
 {
@@ -1083,6 +1085,9 @@ ROM_START( rabbitjt )
 	ROM_REGION( 0x0800, "plds", 0 )
 	ROM_LOAD( "epm7032.u1",   0x0000, 0x0798, CRC(bb1c930e) SHA1(7513ed6a0d797276dab1e3446fe346a9c340e69d) ) // unprotected
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1997, rabbit,   0,      rabbit,  rabbit, rabbit_state, empty_init, ROT0, "Aorn / Electronic Arts", "Rabbit (Asia 3/6)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, English text, (C) 1997
 GAME( 1996, rabbita,  rabbit, rabbit,  rabbit, rabbit_state, empty_init, ROT0, "Aorn / Electronic Arts", "Rabbit (Asia 1/28?)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // For use in Japan notice, English text, (C) 1996

@@ -23,6 +23,9 @@ ToDo:
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class mc8020_state : public driver_device
 {
 public:
@@ -372,6 +375,8 @@ ROM_START( mc8020 )
 	ROM_LOAD( "mo15.rom", 0x5800, 0x0400, CRC(e32f54c4) SHA1(c3d9ca2204e7adbc625cf96031acb8c1df0447c7))
 	ROM_LOAD( "mo16.rom", 0x5c00, 0x0400, CRC(403be935) SHA1(4e74355a78ab090ce180437156fed8e4a1d1c787))
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

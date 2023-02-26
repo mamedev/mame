@@ -5,8 +5,8 @@
     Track'n'Field
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_TRACKFLD_H
-#define MAME_INCLUDES_TRACKFLD_H
+#ifndef MAME_KONAMI_TRACKFLD_H
+#define MAME_KONAMI_TRACKFLD_H
 
 #pragma once
 
@@ -132,4 +132,4 @@ private:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 
-#endif // MAME_INCLUDES_TRACKFLD_H
+#endif // MAME_KONAMI_TRACKFLD_H

@@ -686,9 +686,6 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	save_item(NAME(m_en_68k));
 	save_item(NAME(m_scsp_last_line));
 	save_item(NAME(m_vdp2.odd));
-
-	// TODO: trampoline
-	m_audiocpu->set_reset_callback(*this, FUNC(saturn_state::m68k_reset_callback));
 }
 
 /* Die Hard Trilogy tests RAM address 0x25e7ffe bit 2 with Slave during FRT minit irq, in-development tool for breaking execution of it? */
@@ -827,6 +824,7 @@ void sat_console_state::saturn(machine_config &config)
 
 	M68000(config, m_audiocpu, 11289600); //256 x 44100 Hz = 11.2896 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sat_console_state::sound_mem);
+	m_audiocpu->reset_cb().set(FUNC(sat_console_state::m68k_reset_callback));
 
 	SEGA_SCU(config, m_scu, 0);
 	m_scu->set_hostcpu(m_maincpu);

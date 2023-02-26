@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 
 <softwarelist name="apple2gs_flop_orig" description="Apple IIgs original disks">
@@ -4018,6 +4018,70 @@ license:CC0
 			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="819200">
 				<rom name="LemminGS3.po" size="819200" crc="18303b46" sha1="0327ea6286b18104dcb7dfc59e888a07e06c77d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mthbpl11">
+		<description>Math Blaster Plus! (Version 1.1)</description>
+		<year>1989</year>
+		<publisher>Davidson and Associates</publisher>
+		<info name="release" value="2022-09-10"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs ROM1 or later. -->
+		<!--"Math Blaster Plus!" is an educational program designed by Jan Davidson and Cathy Johnson, developed by C.K. Haun, and distributed by Davidson and Associates. This is version 1.1. It requires a 512K Apple IIgs ROM1 or later.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296196">
+				<rom name="math blaster plus iigs.woz" size="1296196" crc="35b57e45" sha1="1f98ce4e9ecb1cc0ae2a94709aecd9d6367f6ac8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frltwrd">
+		<description>First Letters and Words (Version 1.0)</description>
+		<year>????</year>
+		<publisher>First Byte</publisher>
+		<info name="release" value="2022-09-10"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"First Letters and Words" is an educational program developed and distributed by First Byte. This is version 1.0. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1328918">
+				<rom name="first letters and words iigs.woz" size="1328918" crc="151447a3" sha1="b9fc33e0088cbef7aad7647ee4475d1841ab1a24"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frshapes">
+		<description>First Shapes (Version 1.0)</description>
+		<year>????</year>
+		<publisher>First Byte</publisher>
+		<info name="release" value="2022-09-10"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 768K Apple IIgs. -->
+		<!--"First Shapes" is an educational program developed and distributed by First Byte. This is version 1.0. It requires a 768K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1328907">
+				<rom name="first shapes iigs.woz" size="1328907" crc="3b89aba9" sha1="9698b857684446bfb3f43b8e2d263f4b8a687f1e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="canalmeu">
+		<description>Canal Meurtre</description>
+		<year>2022</year>
+		<publisher>Brutal Deluxe Software</publisher>
+		<info name="release" value="2022-9-30"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!--  Apple IIgs version by Antoine Vignau and Olivier Zardini -->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="819272">
+				<rom name="canalmeurtre.2mg" size="819272" crc="b5c3cf6d" sha1="be8b75f6352d4e77146e75a911f4b8bbc54f5480"/>
 			</dataarea>
 		</part>
 	</software>

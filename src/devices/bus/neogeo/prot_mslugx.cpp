@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:S. Smith,David Haywood,Fabio Priuli
+// copyright-holders:S. Smith, David Haywood, Fabio Priuli, iq_132
 
 #include "emu.h"
 #include "prot_mslugx.h"

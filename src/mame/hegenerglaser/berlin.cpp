@@ -17,6 +17,7 @@ TODO:
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "machine/nvram.h"
 #include "mmboard.h"
 #include "mmdisplay2.h"
@@ -24,6 +25,8 @@ TODO:
 // internal artwork
 #include "mephisto_berlin.lh"
 
+
+namespace {
 
 class berlin_state : public driver_device
 {
@@ -190,6 +193,8 @@ ROM_START( berlinpl ) // B500 53CA 3DCE
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD("berlin_020_london.u2", 0x00000, 0x40000, CRC(d75e170f) SHA1(ac0ebdaa114abd4fef87361a03df56928768b1ae) )
 ROM_END
+
+} // anonymous namespace
 
 
 

@@ -75,40 +75,6 @@ void mos6532_new_device::io_map(address_map &map)
 	map(0x04, 0x07).mirror(0x8).w(FUNC(mos6532_new_device::edge_w));
 }
 
-uint8_t mos6532_new_device::io_r(offs_t offset)
-{
-	offset &= 0x1f;
-	uint8_t ret = 0;
-
-	if (offset == 0x00 || offset == 0x08 || offset == 0x10 || offset == 0x18) ret = pa_data_r();
-	if (offset == 0x01 || offset == 0x09 || offset == 0x11 || offset == 0x19) ret = pa_ddr_r();
-	if (offset == 0x02 || offset == 0x0a || offset == 0x12 || offset == 0x1a) ret = pb_data_r();
-	if (offset == 0x03 || offset == 0x0b || offset == 0x13 || offset == 0x1b) ret = pb_ddr_r();
-
-	if (offset == 0x04 || offset == 0x06 || offset == 0x14 || offset == 0x16) ret = timer_off_r();
-	if (offset == 0x0c || offset == 0x0e || offset == 0x1c || offset == 0x1e) ret = timer_on_r();
-
-	if (offset == 0x05 || offset == 0x07 || offset == 0x0d || offset == 0x0f) ret = irq_r();
-	if (offset == 0x15 || offset == 0x17 || offset == 0x1d || offset == 0x1f) ret = irq_r();
-
-	return ret;
-}
-
-void mos6532_new_device::io_w(offs_t offset, uint8_t data)
-{
-	offset &= 0x1f;
-
-	if (offset == 0x00 || offset == 0x08 || offset == 0x10 || offset == 0x18) pa_data_w(data);
-	if (offset == 0x01 || offset == 0x09 || offset == 0x11 || offset == 0x19) pa_ddr_w(data);
-	if (offset == 0x02 || offset == 0x0a || offset == 0x12 || offset == 0x1a) pb_data_w(data);
-	if (offset == 0x03 || offset == 0x0b || offset == 0x13 || offset == 0x1b) pb_ddr_w(data);
-	if (offset == 0x14 || offset == 0x15 || offset == 0x16 || offset == 0x17) timer_off_w(offset&3, data);
-	if (offset == 0x1c || offset == 0x1d || offset == 0x1e || offset == 0x1f) timer_on_w(offset&3, data);
-
-	if (offset == 0x04 || offset == 0x05 || offset == 0x06 || offset == 0x07) edge_w(data);
-	if (offset == 0x0c || offset == 0x0d || offset == 0xea || offset == 0x0f) edge_w(data);
-}
-
 
 //**************************************************************************
 //  LIVE DEVICE

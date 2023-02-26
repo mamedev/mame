@@ -3,8 +3,6 @@
 #include "emu.h"
 #include "sh_dasm.h"
 
-#define SIGNX8(x)   (((int32_t)(x) << 24) >> 24)
-#define SIGNX12(x)  (((int32_t)(x) << 20) >> 20)
 #define Rn  ((opcode>>8)&15)
 #define Rm  ((opcode>>4)&15)
 
@@ -466,16 +464,16 @@ uint32_t sh_disassembler::op1000(std::ostream &stream, uint32_t pc, uint16_t opc
 		util::stream_format(stream, "CMP/EQ  #$%02X,R0", (opcode & 0xff));
 		break;
 	case  9:
-		util::stream_format(stream, "BT      $%08X", pc + SIGNX8(opcode & 0xff) * 2 + 2);
+		util::stream_format(stream, "BT      $%08X", pc + int8_t(opcode & 0xff) * 2 + 2);
 		return STEP_COND;
 	case 11:
-		util::stream_format(stream, "BF      $%08X", pc + SIGNX8(opcode & 0xff) * 2 + 2);
+		util::stream_format(stream, "BF      $%08X", pc + int8_t(opcode & 0xff) * 2 + 2);
 		return STEP_COND;
 	case 13:
-		util::stream_format(stream, "BTS     $%08X", pc + SIGNX8(opcode & 0xff) * 2 + 2);
+		util::stream_format(stream, "BTS     $%08X", pc + int8_t(opcode & 0xff) * 2 + 2);
 		return STEP_COND | step_over_extra(1);
 	case 15:
-		util::stream_format(stream, "BFS     $%08X", pc + SIGNX8(opcode & 0xff) * 2 + 2);
+		util::stream_format(stream, "BFS     $%08X", pc + int8_t(opcode & 0xff) * 2 + 2);
 		return STEP_COND | step_over_extra(1);
 	default :
 		util::stream_format(stream, "invalid $%04X", opcode);
@@ -491,13 +489,13 @@ uint32_t sh_disassembler::op1001(std::ostream &stream, uint32_t pc, uint16_t opc
 
 uint32_t sh_disassembler::op1010(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
-	util::stream_format(stream, "BRA     $%08X", SIGNX12(opcode & 0xfff) * 2 + pc + 2);
+	util::stream_format(stream, "BRA     $%08X", util::sext(opcode & 0xfff, 12) * 2 + pc + 2);
 	return 0;
 }
 
 uint32_t sh_disassembler::op1011(std::ostream &stream, uint32_t pc, uint16_t opcode)
 {
-	util::stream_format(stream, "BSR     $%08X", SIGNX12(opcode & 0xfff) * 2 + pc + 2);
+	util::stream_format(stream, "BSR     $%08X", util::sext(opcode & 0xfff, 12) * 2 + pc + 2);
 	return STEP_OVER | step_over_extra(1);
 }
 

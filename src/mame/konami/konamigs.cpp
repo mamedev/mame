@@ -20,7 +20,6 @@
     *Muscle Ranking Spray Hitter
      Muscle Ranking Struck Out
      Neratte Don Don
-     Pikkari Chance
     *Run Run Puppy / らんらんぱぴぃ
      Soreike! Hanapuu
 
@@ -48,6 +47,9 @@
 #include "sound/ymz280b.h"
 #include "speaker.h"
 #include "screen.h"
+
+
+namespace {
 
 class gsan_state : public driver_device
 {
@@ -1123,6 +1125,8 @@ ROM_START( runpuppy )
 	DISK_REGION( "ata:0:cfcard:image" )
 	DISK_IMAGE( "an10311003", 0, SHA1(5f972e29c201cdd6697f25140b37a11f02b605f5) )
 ROM_END
+
+} // anonymous namespace
 
 
 //**************************************************************************

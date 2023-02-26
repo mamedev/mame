@@ -173,6 +173,8 @@ Notes:
 #include "screen.h"
 
 
+namespace {
+
 class kpython_state : public driver_device
 {
 public:
@@ -338,6 +340,8 @@ ROM_START( popn9 )
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "c00jab", 0, BAD_DUMP SHA1(3763aaded9b45388a664edd84a3f7f8ff4101be4) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME(2002, kpython,          0,   kpython,   kpython, kpython_state, empty_init, ROT0, "Konami", "Konami Python BIOS",                            MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)

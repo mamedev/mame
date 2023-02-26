@@ -141,6 +141,37 @@ private:
 };
 
 
+
+//**************************************************************************
+//  16 KiB fixed at 0x0000, 8 KiB switchable at 0x4000 and 0x6000
+//**************************************************************************
+
+class mbc_8k_device_base : public device_t, public device_gb_cart_interface
+{
+protected:
+	mbc_8k_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+
+	virtual void device_start() override ATTR_COLD;
+
+	void set_bank_bits_rom(unsigned bits) { m_bank_bits_rom = bits; }
+
+	bool check_rom(std::string &message) ATTR_COLD;
+	void install_rom(address_space_installer &fixedspace, address_space_installer &lowspace, address_space_installer &highspace) ATTR_COLD;
+
+	void set_bank_rom_low(u16 entry);
+	void set_bank_rom_high(u16 entry);
+
+private:
+	static inline constexpr unsigned PAGE_ROM_SIZE = 0x2000;
+
+	memory_bank_array_creator<2> m_bank_rom;
+
+	unsigned m_bank_bits_rom;
+	u16 m_bank_mask_rom;
+};
+
+
+
 //**************************************************************************
 //  32 KiB switchable at 0x0000
 //**************************************************************************

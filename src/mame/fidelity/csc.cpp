@@ -148,7 +148,7 @@ LED display:
 -----
 88:88
 
-The LED display is four 7 segment digits.  normal ABCDEFG lettering is used for segments.
+The LED display is four 7 segment digits. Normal ABCDEFG lettering is used for segments.
 
 The upper dot is connected to digit 3 common
 The lower dot is connected to digit 4 common
@@ -410,10 +410,8 @@ u8 csc_state::pia0_read(offs_t offset)
 	// CA1/CB1: button row 6/7
 	if (!machine().side_effects_disabled())
 	{
-		if (offset == 1)
-			m_pia[0]->ca1_w(BIT(read_inputs(), 6));
-		else if (offset == 3)
-			m_pia[0]->cb1_w(BIT(read_inputs(), 7));
+		m_pia[0]->ca1_w(BIT(read_inputs(), 6));
+		m_pia[0]->cb1_w(BIT(read_inputs(), 7));
 	}
 
 	return m_pia[0]->read(offset);

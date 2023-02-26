@@ -11,6 +11,8 @@
 #include "softlist_dev.h"
 
 
+namespace {
+
 class icanguit_state : public spg2xx_game_state
 {
 public:
@@ -501,6 +503,8 @@ ROM_START( icanpian )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	// no internal ROM, requires a cartridge
 ROM_END
+
+} // anonymous namespace
 
 
 // Fisher-Price games

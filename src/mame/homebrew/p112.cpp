@@ -39,6 +39,8 @@ Some of the parts:
 #include "screen.h"
 
 
+namespace {
+
 class p112_state : public driver_device
 {
 public:
@@ -128,6 +130,8 @@ ROM_START( p112 )
 	ROM_SYSTEM_BIOS( 7, "5b1", "ver 5b1" )
 	ROMX_LOAD( "romv5b1.bin", 0x00000, 0x8000, CRC(047296f7) SHA1(380f8e4237525636c605b7e37d989ace8437beb4), ROM_BIOS(7))
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

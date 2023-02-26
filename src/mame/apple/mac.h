@@ -7,8 +7,8 @@
  * Macintosh II driver declarations
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_MAC_H
-#define MAME_INCLUDES_MAC_H
+#ifndef MAME_APPLE_MAC_H
+#define MAME_APPLE_MAC_H
 
 #pragma once
 
@@ -18,6 +18,7 @@
 #include "machine/nscsi_bus.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
+#include "adbmodem.h"
 #include "egret.h"
 #include "macadb.h"
 #include "bus/nubus/nubus.h"
@@ -26,7 +27,7 @@
 #include "macrtc.h"
 #include "macscsi.h"
 #include "sound/asc.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68kmusashi.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -42,6 +43,8 @@
 #define MAC_H_TOTAL (704)  // (512+192)
 #define MAC_V_TOTAL (370) // (342+28)
 
+#define MACII_USE_ADBMODEM (0)
+
 // Mac driver data
 
 class mac_state:public driver_device
@@ -54,6 +57,7 @@ public:
 		m_via2(*this, "via6522_1"),
 		m_asc(*this, "asc"),
 		m_egret(*this, EGRET_TAG),
+		m_adbmodem(*this, "adbmodem"),
 		m_macadb(*this, "macadb"),
 		m_ram(*this, RAM_TAG),
 		m_scc(*this, "scc"),
@@ -124,6 +128,7 @@ private:
 	optional_device<via6522_device> m_via2;
 	optional_device<asc_device> m_asc;
 	optional_device<egret_device> m_egret;
+	optional_device<adbmodem_device> m_adbmodem;
 	optional_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
 	required_device<scc8530_legacy_device> m_scc;
@@ -288,4 +293,4 @@ private:
 	void mac_install_memory(offs_t memory_begin, offs_t memory_end, offs_t memory_size, void *memory_data, int is_rom);
 };
 
-#endif // MAME_INCLUDES_MAC_H
+#endif // MAME_APPLE_MAC_H

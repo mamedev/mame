@@ -140,6 +140,9 @@ RAM4 is HMC HM6264LP-70
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class gstream_state : public driver_device
 {
 public:
@@ -1129,6 +1132,8 @@ void gstream_state::init_x2222()
 
 	m_xoffset = 0;
 }
+
+} // anonymous namespace
 
 
 GAME( 2002, gstream, 0,     gstream, gstream, gstream_state, init_gstream, ROT270, "Oriental Soft Japan",    "G-Stream G2020",            MACHINE_SUPPORTS_SAVE )

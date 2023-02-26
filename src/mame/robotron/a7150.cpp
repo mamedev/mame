@@ -44,6 +44,8 @@ To do:
 #include "screen.h"
 
 
+namespace {
+
 #define SCREEN_TAG          "screen"
 #define Z80_TAG             "gfxcpu"
 #define Z80CTC_TAG          "z80ctc"
@@ -89,7 +91,7 @@ private:
 	void kgs_host_w(offs_t offset, uint8_t data);
 	void kgs_iml_w(int state);
 	void ifss_loopback_w(int state);
-	void kbd_put(uint8_t data);
+	[[maybe_unused]] void kbd_put(uint8_t data);
 	void kgs_memory_remap();
 
 	bool m_kgs_msel = 0, m_kgs_iml = 0;
@@ -97,7 +99,7 @@ private:
 	bool m_ifss_loopback = 0;
 
 	uint32_t screen_update_k7072(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	[[maybe_unused]] void screen_eof(screen_device &screen, bool state);
 
 	required_device<i8086_cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart8251;
@@ -608,6 +610,9 @@ ROM_START( a7150 )
 //  ROM_LOAD( "kgs7070-153.rom", 0x0000, 0x2000, CRC(a72fe820) SHA1(4b77ab2b59ea8c3632986847ff359df26b16196b))
 //  ROM_LOAD( "kgs7070-154.rom", 0x0000, 0x2000, CRC(2995ade0) SHA1(62516f2e1cb62698445f80fd823d39a1a78a7807))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

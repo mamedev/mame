@@ -53,6 +53,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class pgm3_state : public driver_device
 {
 public:
@@ -169,6 +171,8 @@ ROM_END
 void pgm3_state::init_kov3hd()
 {
 }
+
+} // anonymous namespace
 
 
 // all dumped sets might be China region, unless region info comes from elsewhere

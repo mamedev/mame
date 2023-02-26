@@ -990,7 +990,7 @@ void hng64_state::hng64_sysregs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 
 #if 0
 	if(((offset*4) & 0xff00) == 0x1100)
-		printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
+		logerror("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
 #endif
 
 	switch(offset*4)
@@ -1720,19 +1720,44 @@ static const gfx_layout hng64_16x16x8_spritelayout =
 };
 
 static const uint32_t texlayout_xoffset[1024] = { STEP1024(0,8) };
-static const uint32_t texlayout_yoffset[512] = { STEP512(0,8192) };
-static const gfx_layout hng64_texlayout =
+static const uint32_t texlayout_yoffset[1024] = { STEP1024(0,8192) };
+
+template <uint32_t... Values>
+static auto const &texlayout_xoffset_4(std::integer_sequence<uint32_t, Values...>)
 {
-	1024, 512,
+	static constexpr uint32_t const s_values[sizeof...(Values)] = { ((Values * 4) ^ 4)... };
+	return s_values;
+}
+
+static const uint32_t texlayout_yoffset_4[1024] = { STEP1024(0,4096) };
+
+
+static const gfx_layout hng64_1024x1024x8_texlayout =
+{
+	1024, 1024,
 	RGN_FRAC(1,1),
 	8,
 	{ 0,1,2,3,4,5,6,7 },
 	EXTENDED_XOFFS,
 	EXTENDED_YOFFS,
-	1024*512*8,
+	1024*1024*8,
 	texlayout_xoffset,
 	texlayout_yoffset
 };
+
+static const gfx_layout hng64_1024x1024x4_texlayout =
+{
+	1024, 1024,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	1024*1024*4,
+	texlayout_xoffset_4(std::make_integer_sequence<uint32_t, 1024>()),
+	texlayout_yoffset_4
+};
+
 
 static GFXDECODE_START( gfx_hng64 )
 	/* tilemap tiles */
@@ -1745,7 +1770,10 @@ static GFXDECODE_START( gfx_hng64 )
 	GFXDECODE_ENTRY( "sprtile", 0, hng64_16x16x4_spritelayout, 0x0, 0x100 )
 	GFXDECODE_ENTRY( "sprtile", 0, hng64_16x16x8_spritelayout, 0x0, 0x10 )
 
-	GFXDECODE_ENTRY( "textures", 0, hng64_texlayout,     0x0, 0x10 )  /* textures */
+	/* texture pages (not used by rendering code) */
+	GFXDECODE_ENTRY( "textures", 0, hng64_1024x1024x4_texlayout, 0x0, 0x100 )
+	GFXDECODE_ENTRY( "textures", 0, hng64_1024x1024x8_texlayout, 0x0, 0x10 )
+
 GFXDECODE_END
 
 static void hng64_reorder( uint8_t* gfxregion, size_t gfxregionsize)
@@ -2110,7 +2138,17 @@ TIMER_CALLBACK_MEMBER(hng64_state::comhack_callback)
 {
 	LOG("comhack_callback %04x\n\n", m_comhack[0]);
 
-	m_comhack[0] = m_comhack[0] | 0x0002;
+	// different network IDs give different default colours for the cars in roadedge
+	uint8_t network_id = 0x01;
+
+	// this fixes the stuck scroller text in the xrally intro (largest pink text) but prevents the inputs from working.
+	// It's probably trying to sync the scroller with another unit? however the original machines can run as singles
+	// if you loop some of the pins on the network connector back, so maybe MAME is just confused about the mode it's
+	// running in.
+	// network_id |= 0x08;
+
+
+	m_comhack[0] = m_comhack[0] | network_id;
 }
 
 
@@ -2551,7 +2589,8 @@ void hng64_state::hng64_fight(machine_config &config)
 	ROM_REGION( 0x100, "eeprom", 0 ) /* EEPROMs on the I/O boards, mostly empty, currently not used by the emulation */ \
 	ROM_LOAD( "lvs-ioj-br9020f.u2", 0x000, 0x100, CRC(78b7020d) SHA1(2b8549532ef5e1e8102dbe71af55fdfb27ccbba6) ) \
 	ROM_LOAD( "lvs-igx-br9020f.u3", 0x000, 0x100, CRC(af9f4287) SHA1(6df0e35c77dbfee2fab7ff490dcd651db420e367) ) \
-	ROM_LOAD( "lvs-jam-br9020f.u3", 0x000, 0x100, CRC(dabec5d2) SHA1(19c5be89c57387d6ea563b3dc55674d0692af98e) )
+	ROM_LOAD( "lvs-jam-br9020f.u3", 0x000, 0x100, CRC(dabec5d2) SHA1(19c5be89c57387d6ea563b3dc55674d0692af98e) ) \
+	ROM_DEFAULT_BIOS( "export" )
 
 ROM_START( hng64 )
 	/* BIOS */
@@ -2899,6 +2938,13 @@ ROM_START( fatfurwa )
 	ROM_LOAD( "006sd02a.78", 0x0400000, 0x400000, CRC(f7f020c7) SHA1(b72fde4ff6384b80166a3cb67d31bf7afda750bc) )
 	ROM_LOAD( "006sd03a.79", 0x0800000, 0x400000, CRC(1a678084) SHA1(f52efb6145102d289f332d8341d89a5d231ba003) )
 	ROM_LOAD( "006sd04a.80", 0x0c00000, 0x400000, CRC(3c280a5c) SHA1(9d3fc78e18de45382878268db47ff9d9716f1505) )
+
+	/* this game does not initialize EEPROM automatically otherwise (each region requires different defaults) */
+	ROM_REGION( 0x4000, "nvram", 0 )
+	ROMX_LOAD( "default_nvram_japan",  0x00000, 0x4000, CRC(1f618d44) SHA1(c007c5f94b28b8c56c8c539d2f82336515c0ed84), ROM_BIOS(0) )
+	ROMX_LOAD( "default_nvram_usa",    0x00000, 0x4000, CRC(f139f4a5) SHA1(6f7e2fc5d902c1499f3c55f9ca2ef7becc49103b), ROM_BIOS(1) )
+	ROMX_LOAD( "default_nvram_others", 0x00000, 0x4000, CRC(bf1c3e4a) SHA1(454c6e5e505293bfdeb87d08e72420bba84c3b7b), ROM_BIOS(2) )
+	ROMX_LOAD( "default_nvram_korea",  0x00000, 0x4000, CRC(e8fb68df) SHA1(3170e7465b93319c0550f35f8906b5bdc5332eec), ROM_BIOS(3) )
 ROM_END
 
 
@@ -2969,13 +3015,13 @@ ROM_START( buriki )
 ROM_END
 
 /* Bios */
-GAME( 1997, hng64,    0,     hng64_default, hng64,          hng64_state, init_hng64,       ROT0, "SNK", "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND|MACHINE_IS_BIOS_ROOT )
+GAME( 1997, hng64,    0,     hng64_default, hng64,          hng64_state, init_hng64,       ROT0, "SNK",       "Hyper NeoGeo 64 Bios", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND|MACHINE_IS_BIOS_ROOT )
 
 /* Games */
-GAME( 1997, roadedge, hng64, hng64_drive,   hng64_drive,    hng64_state, init_roadedge,    ROT0, "SNK", "Roads Edge / Round Trip RV (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 001 */
-GAME( 1998, sams64,   hng64, hng64_fight,   hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 002 */
-GAME( 1998, xrally,   hng64, hng64_drive,   hng64_drive,    hng64_state, init_hng64_drive, ROT0, "SNK", "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 003 */
-GAME( 1998, bbust2,   hng64, hng64_shoot,   hng64_shoot,    hng64_state, init_hng64_shoot, ROT0, "SNK", "Beast Busters: Second Nightmare", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 004 */
-GAME( 1998, sams64_2, hng64, hng64_fight,   hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK", "Samurai Shodown 64: Warriors Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 005 */
-GAME( 1998, fatfurwa, hng64, hng64_fight,   hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Fatal Fury: Wild Ambition / Garou Densetsu: Wild Ambition (rev.A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 006 */
-GAME( 1999, buriki,   hng64, hng64_fight,   hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK", "Buriki One: World Grapple Tournament '99 in Tokyo (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 007 */
+GAME( 1997, roadedge, hng64, hng64_drive,   hng64_drive,    hng64_state, init_roadedge,    ROT0, "SNK",       "Roads Edge / Round Trip RV (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 001 */
+GAME( 1998, sams64,   hng64, hng64_fight,   hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK",       "Samurai Shodown 64 / Samurai Spirits 64", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 002 */
+GAME( 1998, xrally,   hng64, hng64_drive,   hng64_drive,    hng64_state, init_hng64_drive, ROT0, "SNK",       "Xtreme Rally / Off Beat Racer!", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 003 */
+GAME( 1998, bbust2,   hng64, hng64_shoot,   hng64_shoot,    hng64_state, init_hng64_shoot, ROT0, "SNK / ADK", "Beast Busters: Second Nightmare", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 004 */ // ADK credited in the ending sequence
+GAME( 1998, sams64_2, hng64, hng64_fight,   hng64_fight,    hng64_state, init_ss64,        ROT0, "SNK",       "Samurai Shodown 64: Warriors Rage / Samurai Spirits 2: Asura Zanmaden", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND ) /* 005 */
+GAME( 1998, fatfurwa, hng64, hng64_fight,   hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK",       "Fatal Fury: Wild Ambition / Garou Densetsu: Wild Ambition (rev.A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 006 */
+GAME( 1999, buriki,   hng64, hng64_fight,   hng64_fight,    hng64_state, init_hng64_fght,  ROT0, "SNK",       "Buriki One: World Grapple Tournament '99 in Tokyo (rev.B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND )  /* 007 */

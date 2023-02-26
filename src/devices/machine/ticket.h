@@ -61,6 +61,8 @@ public:
 		m_hopper_type = hopper_type;
 	}
 
+	auto dispense_handler() { return m_dispense_handler.bind(); }
+
 	// read/write handlers
 	DECLARE_READ_LINE_MEMBER( line_r );
 	DECLARE_WRITE_LINE_MEMBER( motor_w );
@@ -89,6 +91,7 @@ protected:
 	bool m_power;
 	emu_timer *m_timer;
 	output_finder<> m_output;
+	devcb_write_line m_dispense_handler;
 };
 
 class hopper_device : public ticket_dispenser_device
@@ -102,6 +105,9 @@ public:
 		set_senses(motor_sense, status_sense, true);
 	}
 	hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+private:
+
 };
 
 #endif // MAME_MACHINE_TICKET_H

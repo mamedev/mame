@@ -54,6 +54,8 @@ TODO:
 #include "speaker.h"
 
 
+namespace {
+
 class sangho_state : public driver_device
 {
 public:
@@ -577,6 +579,9 @@ void pzlestar_state::init_pzlestar()
 	ROM[0x12ca7] = 0x00;
 	ROM[0x12ca8] = 0x00;
 }
+
+} // anonymous namespace
+
 
 GAME( 1991, pzlestar,  0,        pzlestar, pzlestar, pzlestar_state, init_pzlestar, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
 GAME( 1992, sexyboom,  0,        sexyboom, sexyboom, sexyboom_state, empty_init,    ROT270, "Sang Ho Soft", "Sexy Boom", 0 )

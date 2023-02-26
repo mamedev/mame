@@ -711,7 +711,7 @@ void tsconf_state::tsconf_port_77_zctr_w(offs_t port, u8 data)
 
 u8 tsconf_state::tsconf_port_77_zctr_r(offs_t port)
 {
-	return 0x02 | !m_sdcard->get_card_present();
+	return 0x02 | (m_sdcard->get_card_present() ? 0x00 : 0x01);
 }
 
 void tsconf_state::tsconf_port_57_zctr_w(offs_t port, u8 data)
@@ -729,8 +729,14 @@ void tsconf_state::tsconf_port_57_zctr_w(offs_t port, u8 data)
 
 u8 tsconf_state::tsconf_port_57_zctr_r(offs_t port)
 {
-	tsconf_port_57_zctr_w(0, 0xff);
-	return m_zctl_cs ? 0xff : m_zctl_di;
+	if (m_zctl_cs)
+		return 0xff;
+
+	u8 data = m_zctl_di;
+	if (!machine().side_effects_disabled())
+		tsconf_port_57_zctr_w(0, 0xff);
+
+	return data;
 }
 
 void tsconf_state::tsconf_spi_miso_w(u8 data)
@@ -819,7 +825,8 @@ u8 tsconf_state::beta_neutral_r(offs_t offset)
 
 u8 tsconf_state::beta_enable_r(offs_t offset)
 {
-	if (!(machine().side_effects_disabled())) {
+	if (!machine().side_effects_disabled())
+	{
 		if (!W0_RAM && m_bank_rom[0]->entry() == 3)
 		{
 			if (m_beta->started() && !m_beta->is_active())
@@ -834,7 +841,8 @@ u8 tsconf_state::beta_enable_r(offs_t offset)
 
 u8 tsconf_state::beta_disable_r(offs_t offset)
 {
-	if (!(machine().side_effects_disabled())) {
+	if (!machine().side_effects_disabled())
+	{
 		if (m_beta->started() && m_beta->is_active())
 		{
 			m_beta->disable();

@@ -34,7 +34,7 @@ function timecode.startplugin()
 
 
 	local function get_settings_path()
-		return emu.subst_env(manager.machine.options.entries.homepath:value():match('([^;]+)')) .. '/timecode'
+		return manager.machine.options.entries.homepath:value():match('([^;]+)') .. '/timecode'
 	end
 
 

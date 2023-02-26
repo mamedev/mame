@@ -95,16 +95,7 @@ void es8712_device::device_reset()
 
 
 //-------------------------------------------------
-//  rom_bank_updated - nothing for now
-//-------------------------------------------------
-
-void es8712_device::rom_bank_updated()
-{
-}
-
-
-//-------------------------------------------------
-//   state save support for MAME
+//  state save support for MAME
 //-------------------------------------------------
 
 void es8712_device::es8712_state_save_register()
@@ -127,6 +118,7 @@ void es8712_device::es8712_state_save_register()
 void es8712_device::play()
 {
 	assert(m_msm.found());
+
 	if (m_start < m_end)
 	{
 		if (!m_playing)
@@ -181,23 +173,31 @@ void es8712_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
-		case 00:    m_start &= 0x000fff00;
-					m_start |= ((data & 0xff) <<  0); break;
-		case 01:    m_start &= 0x000f00ff;
-					m_start |= ((data & 0xff) <<  8); break;
-		case 02:    m_start &= 0x0000ffff;
-					m_start |= ((data & 0x0f) << 16); break;
-		case 03:    m_end   &= 0x000fff00;
-					m_end   |= ((data & 0xff) <<  0); break;
-		case 04:    m_end   &= 0x000f00ff;
-					m_end   |= ((data & 0xff) <<  8); break;
-		case 05:    m_end   &= 0x0000ffff;
-					m_end   |= ((data & 0x0f) << 16); break;
-		case 06:
-					play(); break;
-		default:    break;
+		case 0: case 1: case 2:
+		{
+			uint8_t shift = offset * 8;
+			m_start &= ~(0xff << shift);
+			m_start |= data << shift;
+			m_start &= 0xfffff;
+			break;
+		}
+
+		case 3: case 4: case 5:
+		{
+			uint8_t shift = (offset - 3) * 8;
+			m_end &= ~(0xff << shift);
+			m_end |= data << shift;
+			m_end &= 0xfffff;
+			break;
+		}
+
+		case 6:
+			play();
+			break;
+
+		default:
+			break;
 	}
-	m_start &= 0xfffff; m_end &= 0xfffff;
 }
 
 uint8_t es8712_device::read(offs_t offset)
@@ -218,6 +218,7 @@ void es8712_device::msm_int(int state)
 {
 	if (!state || !m_playing)
 		return;
+
 	if (m_base_offset >= 0x100000 || m_base_offset > m_end)
 	{
 		m_playing = 0;

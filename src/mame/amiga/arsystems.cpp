@@ -59,6 +59,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 // arcadia_state was also defined in mess/includes/arcadia.h
 class arcadia_amiga_state : public amiga_state
 {
@@ -321,6 +323,7 @@ void arcadia_amiga_state::arcadia(machine_config &config)
 	/* basic machine hardware */
 	M68000(config, m_maincpu, amiga_state::CLK_7M_NTSC);
 	m_maincpu->set_addrmap(AS_PROGRAM, &arcadia_amiga_state::arcadia_map);
+	m_maincpu->reset_cb().set(FUNC(amiga_state::m68k_reset));
 
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&arcadia_amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&arcadia_amiga_state::ocs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
@@ -938,10 +941,8 @@ void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, in
 		uint8_t *ROM = memregion(tag)->base();
 	//  int size = memregion(tag)->bytes();
 
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"decrypted_%s", machine().system().name);
-		fp=fopen(filename, "w+b");
+		auto filename = std::string{ "decrypted_" } + machine().system().name;
+		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{
 			for (i = 0; i < 0x20000; i++)
@@ -1001,6 +1002,8 @@ void arcadia_amiga_state::init_xeon() { init_arcadia(); generic_decode("user3", 
 void arcadia_amiga_state::init_pm()   { init_arcadia(); generic_decode("user3", 7, 6, 5, 4, 3, 2, 1, 0); } // no scramble
 void arcadia_amiga_state::init_dlta() { init_arcadia(); generic_decode("user3", 4, 1, 7, 6, 2, 0, 3, 5); }
 void arcadia_amiga_state::init_argh() { init_arcadia(); generic_decode("user3", 5, 0, 2, 4, 7, 6, 1, 3); }
+
+} // anonymous namespace
 
 
 /*************************************

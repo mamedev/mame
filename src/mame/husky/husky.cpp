@@ -31,6 +31,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class husky_state : public driver_device
 {
 public:
@@ -532,6 +534,9 @@ ROM_START( husky )
 	ROMX_LOAD( "03-jun-03.ic24", 0xc000, 0x2000, CRC(8fd629d1) SHA1(ef2821c9ce1c1375326d80cad3bfc74e75548172), ROM_BIOS(2) )
 	ROM_RELOAD(                  0xe000, 0x2000)
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                 FULLNAME  FLAGS
 COMP( 1981, husky, 0,      0,      husky,   husky, husky_state, init_husky, "DVW Microelectronics", "Husky",  0 )

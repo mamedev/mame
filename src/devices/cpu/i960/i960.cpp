@@ -357,20 +357,12 @@ uint32_t i960_cpu_device::get_2_ci(uint32_t opcode)
 
 uint32_t i960_cpu_device::get_disp(uint32_t opcode)
 {
-	uint32_t disp;
-	disp = opcode & 0xffffff;
-	if(disp & 0x00800000)
-		disp |= 0xff000000;
-	return disp-4;
+	return util::sext(opcode, 24) - 4;
 }
 
 uint32_t i960_cpu_device::get_disp_s(uint32_t opcode)
 {
-	uint32_t disp;
-	disp = opcode & 0x1fff;
-	if(disp & 0x00001000)
-		disp |= 0xffffe000;
-	return disp-4;
+	return util::sext(opcode, 13) - 4;
 }
 
 void i960_cpu_device::cmp_s(int32_t v1, int32_t v2)
@@ -1152,7 +1144,7 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_icount--;
 				t1 = get_1_ri(opcode) & 0x1f;
 				t2 = get_2_ri(opcode);
-				set_ri(opcode, (t2<<t1)|(t2>>(32-t1)));
+				set_ri(opcode, rotl_32(t2, t1));
 				break;
 
 			case 0xe: // shli

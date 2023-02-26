@@ -1,6 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ivan Vangelista
 /*
+
+TODO:
+- Jumps to PC=0xfb000 after the first 2 PCI dword configs, which points to empty 0xff opcodes.
+  $3a000 contains an "= Award Decompression Bios =" header
+
 Thanks to Guru for hardware infos and pics for Ez2dancer 2nd Move.
 Later games in the series might run on newer, beefier hardware.
 
@@ -40,7 +45,10 @@ Ez2DJ series:
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "screen.h"
+#include "machine/pci.h"
+
+
+namespace {
 
 class ez2d_state : public driver_device
 {
@@ -55,51 +63,29 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void ez2d_map(address_map &map);
 };
 
-void ez2d_state::video_start()
-{
-}
-
-uint32_t ez2d_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
 
 void ez2d_state::ez2d_map(address_map &map)
 {
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0x20000);
+	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);
 }
 
 static INPUT_PORTS_START( ez2d )
 INPUT_PORTS_END
 
 
-void ez2d_state::machine_start()
-{
-}
-
-void ez2d_state::machine_reset()
-{
-}
-
 void ez2d_state::ez2d(machine_config &config)
 {
 	/* basic machine hardware */
-	PENTIUM3(config, m_maincpu, 100000000); // actually a Celeron at 533 MHz
+	PENTIUM3(config, m_maincpu, 100'000'000); // actually a Celeron at 533 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &ez2d_state::ez2d_map);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(640, 480);
-	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(ez2d_state::screen_update));
+	PCI_ROOT(config, "pci", 0);
+	// ...
 }
 
 /***************************************************************************
@@ -109,14 +95,19 @@ void ez2d_state::ez2d(machine_config &config)
 ***************************************************************************/
 
 ROM_START( ez2d2m )
-	ROM_REGION(0x40000, "bios", 0) \
+	ROM_REGION32_LE(0x40000, "bios", 0) \
 	ROM_LOAD("ez2dancer2ndmove_motherboard_v29c51002t_award_bios", 0x00000, 0x40000, CRC(02a5e84b) SHA1(94b341d268ce9d42597c68bc98c3b8b62e137205) ) // 29f020
 
-	ROM_REGION( 0x10000, "vbios", 0 )   // video card BIOS, not dumped but downloaded from internet
+	ROM_REGION( 0x10000, "vbios", 0 )
+	// nVidia TNT2 Model 64 video BIOS (not from provided dump)
+	// TODO: move to PCI device once we have one
 	ROM_LOAD( "62090211.rom", 0x000000, 0x00b000, CRC(5669135b) SHA1(b704ce0d20b71e40563d12bcc45bd1240227be74) )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "ez2d2m", 0, SHA1(431f0bef3b81f83dad3818bca8994faa8ce9d5b7) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 2001, ez2d2m, 0, ez2d, ez2d, ez2d_state, empty_init, ROT0, "Amuse World", "Ez2dancer 2nd Move",  MACHINE_IS_SKELETON )

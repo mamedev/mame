@@ -18,6 +18,8 @@ Floppies were 8 inch IBM format.
 #include "screen.h"
 
 
+namespace {
+
 class terak_state : public driver_device
 {
 public:
@@ -132,6 +134,9 @@ ROM_START( terak )
 	ROM_LOAD( "82s129.z2", 0x0000, 0x0100, CRC(a5dce419) SHA1(819197a03eb9b6ea3318f5afc37c0b436dd747a7) )
 	ROM_LOAD( "82s129.z1", 0x0100, 0x0100, CRC(f34e061f) SHA1(3cb354b2680056d4b3234c680958d4591279ac8a) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

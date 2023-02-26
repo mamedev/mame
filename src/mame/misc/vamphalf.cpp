@@ -121,6 +121,7 @@ public:
 	void init_jmpbreaka();
 	void init_poosho();
 	void init_newxpang();
+	void init_newxpanga();
 	void init_worldadv();
 	void init_dtfamily();
 	void init_dquizgo2();
@@ -1267,7 +1268,6 @@ void vamphalf_state::newxpang(machine_config &config)
 {
 	common(config);
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_state::mrdig_io);
-	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
 
 	sound_ym_oki(config);
 }
@@ -1276,7 +1276,6 @@ void vamphalf_state::worldadv(machine_config &config)
 {
 	common(config);
 	m_maincpu->set_addrmap(AS_IO, &vamphalf_state::worldadv_io);
-	m_maincpu->set_vblank_int("screen", FUNC(vamphalf_state::irq1_line_hold));
 
 	sound_ym_oki(config);
 }
@@ -1840,6 +1839,21 @@ ROM_START( newxpang ) /* Released January 1999 */
 	ROM_LOAD32_WORD( "romu01.bin", 0x400002, 0x200000, CRC(73907b33) SHA1(63320131f9c1c07ab537c98cf5f31a077fb70799) )
 
 	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
+	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(0f339d68) SHA1(9dc128aa35d37c84c2caee839f69bd0d090bae8f) )
+ROM_END
+
+ROM_START( newxpanga ) // F-E1-16-002, too, but uses jmpbreak I/O map
+	ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 ) // Hyperstone CPU Code
+	// ROM1 empty
+	ROM_LOAD( "rom2.bin", 0x80000, 0x80000, CRC(325c2c4f) SHA1(8019032cb714d85f182bb15650f9dad4fe89d8f0) ) // sldh
+
+	ROM_REGION( 0x800000, "gfx", 0 ) // 16x16x8 sprites, not dumped for this set, seem to work fine
+	ROM_LOAD32_WORD( "roml00.bin", 0x000000, 0x200000, BAD_DUMP CRC(4f8253d3) SHA1(0a4d5db879da6412326bff3edc3007402883fb02) )
+	ROM_LOAD32_WORD( "romu00.bin", 0x000002, 0x200000, BAD_DUMP CRC(0ac8f8e4) SHA1(af89b1bb422faa42f5a0980a999803150e7d9f39) )
+	ROM_LOAD32_WORD( "roml01.bin", 0x400000, 0x200000, BAD_DUMP CRC(66e6e05e) SHA1(032fa6155590bea879ce09ce8d08101c9eed8b7b) )
+	ROM_LOAD32_WORD( "romu01.bin", 0x400002, 0x200000, BAD_DUMP CRC(73907b33) SHA1(63320131f9c1c07ab537c98cf5f31a077fb70799) )
+
+	ROM_REGION( 0x40000, "oki1", 0 )
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(0f339d68) SHA1(9dc128aa35d37c84c2caee839f69bd0d090bae8f) )
 ROM_END
 
@@ -3626,6 +3640,14 @@ void vamphalf_state::init_newxpang()
 	m_palshift = 0;
 }
 
+void vamphalf_state::init_newxpanga()
+{
+	// m_maincpu->space(AS_PROGRAM).install_read_handler(0x061218, 0x061219, read16smo_delegate(*this, FUNC(vamphalf_state::newxpanga_speedup_r))); // TODO
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, write16smo_delegate(*this, FUNC(vamphalf_state::jmpbreak_flipscreen_w)));
+
+	m_palshift = 0;
+}
+
 void vamphalf_state::init_worldadv()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c5e78, 0x0c5e79, read16smo_delegate(*this, FUNC(vamphalf_state::worldadv_speedup_r)));
@@ -3653,13 +3675,14 @@ GAME( 1999, coolminii,  coolmini, coolmini,  common,   vamphalf_state,      init
 GAME( 1999, jmpbreak,   0,        jmpbreak,  common,   vamphalf_state,      init_jmpbreak,  ROT0,   "F2 System",                     "Jumping Break (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, jmpbreaka,  jmpbreak, jmpbreak,  common,   vamphalf_state,      init_jmpbreaka, ROT0,   "F2 System",                     "Jumping Break (set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, poosho,     0,        jmpbreak,  common,   vamphalf_state,      init_poosho,    ROT0,   "F2 System",                     "Poosho Poosho" , MACHINE_SUPPORTS_SAVE )
+GAME( 1999, poosho,     0,        jmpbreak,  common,   vamphalf_state,      init_poosho,    ROT0,   "F2 System",                     "Poosho Poosho", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1999, newxpang,   0,        newxpang,  common,   vamphalf_state,      init_newxpang,  ROT0,   "F2 System",                     "New Cross Pang" , MACHINE_SUPPORTS_SAVE )
+GAME( 1999, newxpang,   0,        newxpang,  common,   vamphalf_state,      init_newxpang,  ROT0,   "F2 System",                     "New Cross Pang (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, newxpanga,  newxpang, jmpbreak,  common,   vamphalf_state,      init_newxpanga, ROT0,   "F2 System",                     "New Cross Pang (set 2)", MACHINE_SUPPORTS_SAVE ) // TODO: speed up for this set
 
-GAME( 1999, worldadv,   0,        worldadv,  common,   vamphalf_state,      init_worldadv,  ROT0,   "Logic / F2 System",             "World Adventure" , MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // game starts to stall for several seconds at a time after it's been running for a certain amount of time
+GAME( 1999, worldadv,   0,        worldadv,  common,   vamphalf_state,      init_worldadv,  ROT0,   "Logic / F2 System",             "World Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // game starts to stall for several seconds at a time after it's been running for a certain amount of time
 
-GAME( 1999, suplup,     0,        suplup,    common,   vamphalf_state,      init_suplup,    ROT0,   "Omega System",                  "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)" , MACHINE_SUPPORTS_SAVE )
+GAME( 1999, suplup,     0,        suplup,    common,   vamphalf_state,      init_suplup,    ROT0,   "Omega System",                  "Super Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 4.0 / 990518)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, luplup,     suplup,   suplup,    common,   vamphalf_state,      init_luplup,    ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 3.0 / 990128)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, luplup29,   suplup,   suplup,    common,   vamphalf_state,      init_luplup29,  ROT0,   "Omega System",                  "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 2.9 / 990108)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, luplup10,   suplup,   suplup,    common,   vamphalf_state,      init_luplup10,  ROT0,   "Omega System (Adko license)",   "Lup Lup Puzzle / Zhuan Zhuan Puzzle (version 1.05 / 981214)", MACHINE_SUPPORTS_SAVE )
@@ -3670,7 +3693,7 @@ GAME( 1999, vamphalf,   0,        vamphalf,  common,   vamphalf_state,      init
 GAME( 1999, vamphalfr1, vamphalf, vamphalf,  common,   vamphalf_state,      init_vamphalfr1,ROT0,   "Danbi / F2 System",             "Vamf x1/2 (Europe, version 1.0.0903)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, vamphalfk,  vamphalf, vamphalf,  common,   vamphalf_state,      init_vamphafk,  ROT0,   "Danbi / F2 System",             "Vamp x1/2 (Korea, version 1.1.0908)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, dquizgo2,   0,        coolmini,  common,   vamphalf_state,      init_dquizgo2,  ROT0,   "SemiCom",                       "Date Quiz Go Go Episode 2" , MACHINE_SUPPORTS_SAVE )
+GAME( 2000, dquizgo2,   0,        coolmini,  common,   vamphalf_state,      init_dquizgo2,  ROT0,   "SemiCom",                       "Date Quiz Go Go Episode 2", MACHINE_SUPPORTS_SAVE )
 
 GAME( 2000, misncrft,   0,        misncrft,  common,   vamphalf_qdsp_state, init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.7)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // game starts to stall for several seconds at a time after it's been running for a certain amount of time (you can usually complete 1 loop)
 GAME( 2000, misncrfta,  misncrft, misncrft,  common,   vamphalf_qdsp_state, init_misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.4)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

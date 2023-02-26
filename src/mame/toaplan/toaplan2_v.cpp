@@ -33,7 +33,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(toaplan2_state::get_text_tile_info)
+TILE_GET_INFO_MEMBER(truxton2_state::get_text_tile_info)
 {
 	const u16 attrib = m_tx_videoram[tile_index];
 	const u32 tile_number = attrib & 0x3ff;
@@ -51,9 +51,9 @@ TILE_GET_INFO_MEMBER(toaplan2_state::get_text_tile_info)
 ***************************************************************************/
 
 
-void toaplan2_state::create_tx_tilemap(int dx, int dx_flipped)
+void truxton2_state::create_tx_tilemap(int dx, int dx_flipped)
 {
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(toaplan2_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(truxton2_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_tx_tilemap->set_scroll_rows(8*32); /* line scrolling */
 	m_tx_tilemap->set_scroll_cols(1);
@@ -61,7 +61,7 @@ void toaplan2_state::create_tx_tilemap(int dx, int dx_flipped)
 	m_tx_tilemap->set_transparent_pen(0);
 }
 
-void toaplan2_state::device_post_load()
+void truxton2_state::device_post_load()
 {
 	if (m_tx_gfxram != nullptr)
 		m_gfxdecode->gfx(0)->mark_all_dirty();
@@ -85,7 +85,7 @@ VIDEO_START_MEMBER(toaplan2_state,toaplan2)
 	}
 }
 
-VIDEO_START_MEMBER(toaplan2_state,truxton2)
+VIDEO_START_MEMBER(truxton2_state,truxton2)
 {
 	VIDEO_START_CALL_MEMBER(toaplan2);
 
@@ -95,7 +95,7 @@ VIDEO_START_MEMBER(toaplan2_state,truxton2)
 	create_tx_tilemap(0x1d5, 0x16a);
 }
 
-VIDEO_START_MEMBER(toaplan2_state,fixeightbl)
+VIDEO_START_MEMBER(truxton2_state,fixeightbl)
 {
 	VIDEO_START_CALL_MEMBER(toaplan2);
 
@@ -130,7 +130,7 @@ VIDEO_START_MEMBER(toaplan2_state, batsugunbl)
 	m_vdp[1]->init_scroll_regs();
 }
 
-VIDEO_START_MEMBER(toaplan2_state,bgaregga)
+VIDEO_START_MEMBER(truxton2_state,bgaregga)
 {
 	VIDEO_START_CALL_MEMBER(toaplan2);
 
@@ -138,7 +138,7 @@ VIDEO_START_MEMBER(toaplan2_state,bgaregga)
 	create_tx_tilemap(0x1d4, 0x16b);
 }
 
-VIDEO_START_MEMBER(toaplan2_state,bgareggabl)
+VIDEO_START_MEMBER(truxton2_state,bgareggabl)
 {
 	VIDEO_START_CALL_MEMBER(toaplan2);
 
@@ -146,7 +146,7 @@ VIDEO_START_MEMBER(toaplan2_state,bgareggabl)
 	create_tx_tilemap(4, 4);
 }
 
-VIDEO_START_MEMBER(toaplan2_state,batrider)
+VIDEO_START_MEMBER(truxton2_state,batrider)
 {
 	VIDEO_START_CALL_MEMBER(toaplan2);
 
@@ -161,14 +161,14 @@ VIDEO_START_MEMBER(toaplan2_state,batrider)
 	save_item(NAME(m_gfxrom_bank));
 }
 
-void toaplan2_state::tx_videoram_w(offs_t offset, u16 data, u16 mem_mask)
+void truxton2_state::tx_videoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_tx_videoram[offset]);
 	if (offset < 64*32)
 		m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-void toaplan2_state::tx_linescroll_w(offs_t offset, u16 data, u16 mem_mask)
+void truxton2_state::tx_linescroll_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/*** Line-Scroll RAM for Text Layer ***/
 	COMBINE_DATA(&m_tx_linescroll[offset]);
@@ -176,7 +176,7 @@ void toaplan2_state::tx_linescroll_w(offs_t offset, u16 data, u16 mem_mask)
 	m_tx_tilemap->set_scrollx(offset, m_tx_linescroll[offset]);
 }
 
-void toaplan2_state::tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask)
+void truxton2_state::tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/*** Dynamic GFX decoding for Truxton 2 / FixEight ***/
 
@@ -189,7 +189,7 @@ void toaplan2_state::tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 }
 
-void toaplan2_state::batrider_tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask)
+void truxton2_state::batrider_tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	/*** Dynamic GFX decoding for Batrider / Battle Bakraid ***/
 
@@ -202,7 +202,7 @@ void toaplan2_state::batrider_tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 }
 
-void toaplan2_state::batrider_textdata_dma_w(u16 data)
+void truxton2_state::batrider_textdata_dma_w(u16 data)
 {
 	/*** Dynamic Text GFX decoding for Batrider ***/
 	/*** Only done once during start-up ***/
@@ -213,7 +213,7 @@ void toaplan2_state::batrider_textdata_dma_w(u16 data)
 	}
 }
 
-void toaplan2_state::batrider_pal_text_dma_w(u16 data)
+void truxton2_state::batrider_pal_text_dma_w(u16 data)
 {
 	// FIXME: In batrider and bbakraid, the text layer and palette RAM
 	// are probably DMA'd from main RAM by writing here at every vblank,
@@ -225,7 +225,7 @@ void toaplan2_state::batrider_pal_text_dma_w(u16 data)
 	}
 }
 
-void toaplan2_state::batrider_objectbank_w(offs_t offset, u8 data)
+void truxton2_state::batrider_objectbank_w(offs_t offset, u8 data)
 {
 	data &= 0xf;
 	if (m_gfxrom_bank[offset] != data)
@@ -235,7 +235,7 @@ void toaplan2_state::batrider_objectbank_w(offs_t offset, u8 data)
 	}
 }
 
-void toaplan2_state::batrider_bank_cb(u8 layer, u32 &code)
+void truxton2_state::batrider_bank_cb(u8 layer, u32 &code)
 {
 	code = (m_gfxrom_bank[code >> 15] << 15) | (code & 0x7fff);
 }
@@ -363,7 +363,7 @@ u32 toaplan2_state::screen_update_toaplan2(screen_device &screen, bitmap_ind16 &
 
 
 /* fixeightbl and bgareggabl do not use the lineselect or linescroll tables */
-u32 toaplan2_state::screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 truxton2_state::screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update_toaplan2(screen, bitmap, cliprect);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0);
@@ -371,7 +371,7 @@ u32 toaplan2_state::screen_update_bootleg(screen_device &screen, bitmap_ind16 &b
 }
 
 
-u32 toaplan2_state::screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 truxton2_state::screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update_toaplan2(screen, bitmap, cliprect);
 

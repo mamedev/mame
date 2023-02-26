@@ -142,10 +142,7 @@ void mame_machine_manager::start_luaengine()
 		std::string pluginpath;
 		while (iter.next(pluginpath))
 		{
-			// user may specify environment variables; subsitute them
-			pluginpath = osd_subst_env(pluginpath);
-
-			// and then scan the directory recursively
+			// scan the directory recursively
 			m_plugins->scan_directory(pluginpath, true);
 		}
 
@@ -202,7 +199,7 @@ void mame_machine_manager::start_luaengine()
 		std::error_condition const filerr = file.open("boot.lua");
 		if (!filerr)
 		{
-			const std::string exppath = osd_subst_env(file.fullpath());
+			const std::string exppath = file.fullpath();
 			auto &l(*lua());
 			auto load_result = l.load_script(exppath);
 			if (!load_result.valid())
@@ -266,7 +263,7 @@ int mame_machine_manager::execute()
 			m_options.revert(OPTION_PRIORITY_INI);
 
 			std::ostringstream errors;
-			mame_options::parse_standard_inis(m_options, errors);
+			mame_options::parse_standard_inis(m_options, errors, system);
 		}
 
 		// otherwise, perform validity checks before anything else
@@ -300,7 +297,10 @@ int mame_machine_manager::execute()
 		else
 		{
 			if (machine.exit_pending())
+			{
 				m_options.set_system_name("");
+				m_options.set_value(OPTION_BIOS, "", OPTION_PRIORITY_CMDLINE);
+			}
 		}
 
 		if (machine.exit_pending() && (!started_empty || is_empty))
@@ -352,8 +352,6 @@ ui_manager* mame_machine_manager::create_ui(running_machine& machine)
 	m_ui->init();
 
 	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&mame_machine_manager::reset, this));
-
-	m_ui->set_startup_text("Initializing...", true);
 
 	return m_ui.get();
 }
@@ -460,9 +458,9 @@ int emulator_info::start_frontend(emu_options &options, osd_interface &osd, int 
 	return start_frontend(options, osd, args);
 }
 
-void emulator_info::draw_user_interface(running_machine& machine)
+bool emulator_info::draw_user_interface(running_machine& machine)
 {
-	mame_machine_manager::instance()->ui().update_and_render(machine.render().ui_container());
+	return mame_machine_manager::instance()->ui().update_and_render(machine.render().ui_container());
 }
 
 void emulator_info::periodic_check()

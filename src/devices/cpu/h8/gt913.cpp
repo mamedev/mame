@@ -50,6 +50,12 @@ void gt913_device::map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).rw(FUNC(gt913_device::data_r), FUNC(gt913_device::data_w));
 	map(0xc000, 0xf7ff).rom();
+
+	/* ctk530 writes here to latch LED matrix data, which generates an active high strobe on pin 99 (PLE/P16)
+	   there's otherwise no external address decoding (or the usual read/write strobes) used for the LED latches.
+	   just treat as a 16-bit write-only port for now */
+	map(0xe000, 0xe001).lw16(NAME([this](uint16_t data) { io.write_word(h8_device::PORT_4, data); }));
+
 	map(0xfac0, 0xffbf).ram();
 
 	/* ffc0-ffcb: sound */

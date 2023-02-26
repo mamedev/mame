@@ -16,7 +16,7 @@
 #include "emu.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "bus/isa/com.h"
 #include "bus/isa/fdc.h"
 #include "bus/isa/ide.h"
@@ -26,6 +26,9 @@
 #include "machine/mc68901.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
+
+
+namespace {
 
 #define ISABUS_TAG "isa"
 
@@ -141,6 +144,9 @@ ROM_START( indiana )
 	ROM_SYSTEM_BIOS( 2, "v7", "ver 0.7" )
 	ROMX_LOAD( "prom0_7.bin", 0x0000, 0x10000, CRC(d6a3b6bc) SHA1(01d8cee989ab29646d9d3f8b7262b10055653d41), ROM_BIOS(2))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

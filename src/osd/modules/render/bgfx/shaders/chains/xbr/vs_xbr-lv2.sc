@@ -7,10 +7,14 @@ $output v_texcoord0, v_texcoord1, v_texcoord2, v_texcoord3, v_texcoord4, v_texco
 #include "common.sh"
 
 uniform vec4 u_tex_size0;
+uniform vec4 u_inv_view_dims;
 
 void main()
 {
 	gl_Position = mul(u_viewProj, vec4(a_position.xy, 0.0, 1.0));
+#if BGFX_SHADER_LANGUAGE_HLSL && BGFX_SHADER_LANGUAGE_HLSL <= 300
+	gl_Position.xy += u_inv_view_dims.xy * gl_Position.w;
+#endif
 	v_texcoord0 = a_texcoord0;
 
 	vec2 ps = 1.0 / u_tex_size0.xy;

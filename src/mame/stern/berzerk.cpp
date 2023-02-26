@@ -61,6 +61,7 @@ Game difference analysis by The Cutting Room Floor (tcrf.net)
 #include "cpu/z80/z80.h"
 #include "machine/74181.h"
 #include "machine/nvram.h"
+#include "sound/flt_vol.h"
 #include "sound/s14001a.h"
 
 #include "screen.h"
@@ -77,6 +78,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_s14001a(*this, "speech"),
+		m_s14001a_volume(*this, "s14001a_volume"),
 		m_ls181_10c(*this, "ls181_10c"),
 		m_ls181_12c(*this, "ls181_12c"),
 		m_custom(*this, "exidy"),
@@ -100,6 +102,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s14001a_device> m_s14001a;
+	required_device<filter_volume_device> m_s14001a_volume;
 	required_device<ttl74181_device> m_ls181_10c;
 	required_device<ttl74181_device> m_ls181_12c;
 	required_device<exidy_sound_device> m_custom;
@@ -590,7 +593,7 @@ void berzerk_state::audio_w(offs_t offset, uint8_t data)
 		case 0:
 			m_s14001a->data_w(data & 0x3f);
 
-			/* clock the chip -- via a 555 timer */
+			/* clock the chip via a 555 timer */
 			m_s14001a->start_w(1);
 			m_s14001a->start_w(0);
 
@@ -598,9 +601,8 @@ void berzerk_state::audio_w(offs_t offset, uint8_t data)
 
 		case 1:
 		{
-			/* volume */
-			m_s14001a->force_update();
-			m_s14001a->set_output_gain(0, ((data >> 3 & 0xf) + 1) / 16.0);
+			/* volume - 0 appears to be inaudible */
+			m_s14001a_volume->flt_volume_set_volume((data >> 3 & 7) / 7.0);
 
 			/* clock control - the first LS161 divides the clock by 9 to 16, the 2nd by 8,
 			   giving a final clock from 19.5kHz to 34.7kHz */
@@ -633,7 +635,7 @@ uint8_t berzerk_state::audio_r(offs_t offset)
 	{
 	/* offset 4 reads from the S14001A */
 	case 4:
-		return (m_s14001a->busy_r()) ? 0xc0 : 0x40;
+		return (m_s14001a->busy_r()) ? 0x00 : 0x40;
 	/* offset 6 is open bus */
 	case 6:
 		logerror("attempted read from berzerk audio reg 6 (sfxctrl)!\n");
@@ -643,7 +645,6 @@ uint8_t berzerk_state::audio_r(offs_t offset)
 		return m_custom->sh6840_r(offset);
 	}
 }
-
 
 
 void berzerk_state::sound_reset()
@@ -995,7 +996,7 @@ uint8_t berzerk_state::moonwarp_p1_r()
 	// one difference is it lacks the strobe input (does it?), which if not active causes
 	// the dial input to go open bus. This is used in moon war 2 to switch between player 1
 	// and player 2 dials, which share a single port. moonwarp uses separate ports for the dials.
-	signed char dialread = ioport("P1_DIAL")->read();
+	int8_t dialread = ioport("P1_DIAL")->read();
 	uint8_t ret;
 	uint8_t buttons = (ioport("P1")->read()&0xe0);
 	if (dialread < 0) m_p1_direction = 0;
@@ -1010,7 +1011,7 @@ uint8_t berzerk_state::moonwarp_p1_r()
 uint8_t berzerk_state::moonwarp_p2_r()
 {
 	// same as above, but for player 2 in cocktail mode
-	signed char dialread = ioport("P2_DIAL")->read();
+	int8_t dialread = ioport("P2_DIAL")->read();
 	uint8_t ret;
 	uint8_t buttons = (ioport("P2")->read()&0xe0);
 	if (dialread < 0) m_p2_direction = 0;
@@ -1187,7 +1188,10 @@ void berzerk_state::berzerk(machine_config &config)
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	S14001A(config, m_s14001a, S14001_CLOCK/16/8).add_route(ALL_OUTPUTS, "mono", 1.00); /* placeholder - the clock is software controllable */
+	S14001A(config, m_s14001a, S14001_CLOCK/16/8); // placeholder clock - it is software controllable
+	m_s14001a->add_route(ALL_OUTPUTS, "s14001a_volume", 0.5);
+	FILTER_VOLUME(config, m_s14001a_volume).add_route(ALL_OUTPUTS, "mono", 1.0);
+
 	EXIDY(config, m_custom, 0).add_route(ALL_OUTPUTS, "mono", 0.33);
 }
 

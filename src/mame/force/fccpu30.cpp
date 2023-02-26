@@ -195,7 +195,7 @@
  ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68030.h"
 #include "bus/vme/vme.h"
 #include "bus/vme/vme_fcisio.h"
 #include "bus/vme/vme_fcscsi.h"
@@ -230,6 +230,9 @@
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
+
+
+namespace {
 
 #define DUSCC_CLOCK XTAL(14'745'600) /* Verified */
 
@@ -308,7 +311,7 @@ private:
 
 	void cpu30_mem(address_map &map);
 
-	required_device<m68000_base_device> m_maincpu;
+	required_device<m68000_musashi_device> m_maincpu;
 	required_device<ram_device> m_ram;
 
 	required_device<duscc68562_device> m_dusccterm;
@@ -1038,6 +1041,9 @@ void fga002_device::check_interrupts()()
 void cpu30_state::fga_irq_callback(int)(01)
 void fga002_device::check_interrupts()()
  */
+
+ } // anonymous namespace
+
 
 /* Driver */
 /*    YEAR  NAME            PARENT   COMPAT  MACHINE        INPUT  CLASS        INIT             COMPANY                 FULLNAME                  FLAGS */

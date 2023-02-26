@@ -24,8 +24,8 @@
     * = encrypted
 
 ***************************************************************************/
-#ifndef MAME_AUDIO_SEIBU_H
-#define MAME_AUDIO_SEIBU_H
+#ifndef MAME_SHARED_SEIBU_H
+#define MAME_SHARED_SEIBU_H
 
 #pragma once
 
@@ -127,7 +127,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override { }
-	virtual void rom_bank_updated() override { }
 };
 
 DECLARE_DEVICE_TYPE(SEI80BU, sei80bu_device)
@@ -193,4 +192,4 @@ DECLARE_DEVICE_TYPE(SEIBU_ADPCM, seibu_adpcm_device)
 
 /**************************************************************************/
 
-#endif // MAME_AUDIO_SEIBU_H
+#endif // MAME_SHARED_SEIBU_H

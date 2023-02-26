@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_FANTLAND_H
-#define MAME_INCLUDES_FANTLAND_H
+#ifndef MAME_EDEVICES_FANTLAND_H
+#define MAME_EDEVICES_FANTLAND_H
 
 #pragma once
 
@@ -111,4 +111,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_FANTLAND_H
+#endif // MAME_EDEVICES_FANTLAND_H

@@ -60,7 +60,10 @@
 
 #include "emu.h"
 #include "logmacro.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
+#include "cpu/m68000/m68020.h"
+#include "cpu/m68000/m68030.h"
+#include "cpu/m68000/m68040.h"
 #include "machine/6840ptm.h"
 #include "bus/hp_dio/hp_dio.h"
 
@@ -94,13 +97,12 @@ public:
 	void hp9k382(machine_config &config);
 
 protected:
-	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void driver_start() override;
 
 private:
 	void hp9k300(machine_config &config);
-	required_device<m68000_base_device> m_maincpu;
+	required_device<m68000_musashi_device> m_maincpu;
 
 	output_finder<8> m_diag_led;
 
@@ -224,13 +226,6 @@ void hp9k3xx_state::driver_start()
 	m_diag_led.resolve();
 }
 
-void hp9k3xx_state::machine_reset()
-{
-	auto *dio = subdevice<bus::hp_dio::dio16_device>("diobus");
-	if (dio)
-		m_maincpu->set_reset_callback(*dio, FUNC(bus::hp_dio::dio16_device::reset_in));
-}
-
 void hp9k3xx_state::machine_start()
 {
 	m_bus_error_timer = timer_alloc(FUNC(hp9k3xx_state::bus_error_timeout), this);
@@ -264,6 +259,7 @@ void hp9k3xx_state::add_dio16_bus(machine_config &config)
 {
 	bus::hp_dio::dio16_device &dio16(DIO16(config, "diobus", 0));
 	dio16.set_program_space(m_maincpu, AS_PROGRAM);
+	m_maincpu->reset_cb().set(dio16, FUNC(bus::hp_dio::dio16_device::reset_in));
 
 	dio16.irq1_out_cb().set(FUNC(hp9k3xx_state::dio_irq1_w));
 	dio16.irq2_out_cb().set(FUNC(hp9k3xx_state::dio_irq2_w));

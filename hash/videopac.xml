@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 The softwarelist is sorted alphabetically per title, not counting clone sets.
 ROM hacks are not included(exceptions aside), but those can still be loaded with -cart.
@@ -22,11 +22,8 @@ Undumped (or dumped but not public):
 - misc. homebrew cartridges
 
 Protos:
-- Bastion         youtube.com/watch?v=cFdmgs4r7_E
-- Catburglar      youtube.com/watch?v=DDsWDFxy0oE
-- Himalaya        youtube.com/watch?v=L_lvOs6EnA4
-- Terrahawks      youtube.com/watch?v=AXk7OSA6NGg
-- Spaans (spanish to dutch translator)
+- Catburglar (youtube.com/watch?v=DDsWDFxy0oE)
+- Spaans (Spanish to Dutch translator)
 - Melrep
 - Crazy Horses
 
@@ -1999,6 +1996,30 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 
 <!-- VP/O2, unreleased, or in-house tools -->
 
+	<software name="bastion">
+		<description>Bastion (Europe, prototype)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="0x1000">
+				<rom name="pr_bastion.bin" size="0x1000" crc="48ed8408" sha1="00b23edd4aa76a50905a6321c2503d7e413242af" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="himalaya">
+		<description>Himalaya (Europe, prototype)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="pr_himalaya.bin" size="0x2000" crc="b7734475" sha1="71f8509173359d6c4f027ff13d53de23204c5077" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="interpol">
 		<description>Interpol (Europe, prototype)</description>
 		<year>198?</year>
@@ -2139,6 +2160,20 @@ distinguished by the changed copyright from Magnavox to N.A.P. (North American P
 			<feature name="slot" value="o2_rom" />
 			<dataarea name="rom" size="0x2000">
 				<rom name="pr_spiderman_alt.bin" size="0x2000" crc="3e5f71f3" sha1="69661c91c984aa26bb971e989fe3aaca93ab718c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hawksp">
+		<!-- not the same game as timelord/hawks -->
+		<!-- a repro cartridge was sold in 2013 by Classic Consoles Center as Videopac 70, titled Terrahawks: The Second Assault -->
+		<description>Terrahawks (Europe, prototype)</description>
+		<year>198?</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="0x2000">
+				<rom name="pr_terrahawks2.bin" size="0x2000" crc="9d1c529c" sha1="9ff605a8318a67fc13c852493322d55bf4a098d0" />
 			</dataarea>
 		</part>
 	</software>

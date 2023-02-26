@@ -326,9 +326,8 @@ void phantom_state::update_lcd(u8 select)
 
 void phantom_state::control_w(offs_t offset, u8 data)
 {
-	u8 lcd_prev = m_select;
-
 	// a0-a2,d1: 74259
+	u8 prev = m_select;
 	u8 mask = 1 << offset;
 	m_select = (m_select & ~mask) | ((data & 0x02) ? mask : 0);
 
@@ -342,7 +341,7 @@ void phantom_state::control_w(offs_t offset, u8 data)
 	m_rombank->set_entry(BIT(m_select, 6));
 
 	// 74259 Q7: lcd polarity
-	update_lcd(lcd_prev);
+	update_lcd(prev);
 }
 
 void chessterp_state::control_w(offs_t offset, u8 data)
@@ -548,7 +547,7 @@ static INPUT_PORTS_START( cphantom )
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("Move / No/Stop")
 
 	PORT_START("IN.1") // motion sensor is inverted here, eg. hold down key to pretend noone's there
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F1) PORT_NAME("Motion Sensor")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_CODE(KEYCODE_F1) PORT_NAME("Motion Sensor")
 INPUT_PORTS_END
 
 

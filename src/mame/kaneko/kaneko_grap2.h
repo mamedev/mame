@@ -71,8 +71,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void rom_bank_updated() override;
-
 	// device_palette_interface overrides
 	virtual uint32_t palette_entries() const noexcept override { return PALETTE_SIZE; }
 };

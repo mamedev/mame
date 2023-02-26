@@ -175,7 +175,6 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_font()
 	, m_handler_callback()
 	, m_handler_callback_type(ui_callback_type::GENERAL)
-	, m_handler_param(0)
 	, m_single_step(false)
 	, m_showfps(false)
 	, m_showfps_end(0)
@@ -184,6 +183,8 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_mouse_bitmap(32, 32)
 	, m_mouse_arrow_texture(nullptr)
 	, m_mouse_show(false)
+	, m_mouse_target(-1)
+	, m_mouse_position(0, 0)
 	, m_target_font_height(0)
 	, m_has_warnings(false)
 	, m_unthrottle_mute(false)
@@ -439,17 +440,17 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 			{
 				// if the user cancels, exit out completely
 				machine().schedule_exit();
-				return UI_HANDLER_CANCEL;
+				return HANDLER_CANCEL;
 			}
-			else if (machine().ui_input().pressed(IPT_UI_CONFIGURE))
+			else if (machine().ui_input().pressed(IPT_UI_MENU))
 			{
 				config_menu = true;
-				return UI_HANDLER_CANCEL;
+				return HANDLER_CANCEL;
 			}
 			else if (poller.poll() != INPUT_CODE_INVALID)
 			{
 				// if any key is pressed, just exit
-				return UI_HANDLER_CANCEL;
+				return HANDLER_CANCEL;
 			}
 
 			return 0;
@@ -632,7 +633,7 @@ void mame_ui_manager::set_startup_text(const char *text, bool force)
 //  render it; called by video.c
 //-------------------------------------------------
 
-void mame_ui_manager::update_and_render(render_container &container)
+bool mame_ui_manager::update_and_render(render_container &container)
 {
 	// always start clean
 	container.empty();
@@ -668,7 +669,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 		mame_machine_manager::instance()->cheat().render_text(*this, container);
 
 	// call the current UI handler
-	m_handler_param = m_handler_callback(container);
+	uint32_t const handler_result = m_handler_callback(container);
 
 	// display any popup messages
 	if (osd_ticks() < m_popup_text_end)
@@ -677,28 +678,42 @@ void mame_ui_manager::update_and_render(render_container &container)
 		m_popup_text_end = 0;
 
 	// display the internal mouse cursor
+	bool mouse_moved = false;
 	if (m_mouse_show || (is_menu_active() && machine().options().ui_mouse()))
 	{
 		int32_t mouse_target_x, mouse_target_y;
 		bool mouse_button;
-		render_target *mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
+		render_target *const mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
 
-		if (mouse_target != nullptr)
+		float mouse_y = -1, mouse_x = -1;
+		if (mouse_target && mouse_target->map_point_container(mouse_target_x, mouse_target_y, container, mouse_x, mouse_y))
 		{
-			float mouse_y=-1,mouse_x=-1;
-			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, container, mouse_x, mouse_y))
+			const float cursor_size = 0.6 * get_line_height();
+			container.add_quad(mouse_x, mouse_y, mouse_x + cursor_size * container.manager().ui_aspect(&container), mouse_y + cursor_size, colors().text_color(), m_mouse_arrow_texture, PRIMFLAG_ANTIALIAS(1) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			if ((m_mouse_target != mouse_target->index()) || (std::make_pair(mouse_x, mouse_y) != m_mouse_position))
 			{
-				const float cursor_size = 0.6 * get_line_height();
-				container.add_quad(mouse_x, mouse_y, mouse_x + cursor_size * container.manager().ui_aspect(&container), mouse_y + cursor_size, colors().text_color(), m_mouse_arrow_texture, PRIMFLAG_ANTIALIAS(1) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				m_mouse_target = mouse_target->index();
+				m_mouse_position = std::make_pair(mouse_x, mouse_y);
+				mouse_moved = true;
 			}
 		}
+		else if (0 <= m_mouse_target)
+		{
+			m_mouse_target = -1;
+			mouse_moved = true;
+		}
+	}
+	else if (0 <= m_mouse_target)
+	{
+		m_mouse_target = -1;
+		mouse_moved = true;
 	}
 
-	// cancel takes us back to the ingame handler
-	if (m_handler_param == UI_HANDLER_CANCEL)
-	{
+	// cancel takes us back to the in-game handler
+	if (handler_result & HANDLER_CANCEL)
 		set_handler(ui_callback_type::GENERAL, handler_callback_func(&mame_ui_manager::handler_ingame, this));
-	}
+
+	return mouse_moved || (handler_result & HANDLER_UPDATE);
 }
 
 
@@ -720,40 +735,37 @@ render_font *mame_ui_manager::get_font()
 //  of a line
 //-------------------------------------------------
 
-float mame_ui_manager::get_line_height()
+float mame_ui_manager::get_line_height(float scale)
 {
-	int32_t raw_font_pixel_height = get_font()->pixel_height();
-	render_target &ui_target = machine().render().ui_target();
-	int32_t target_pixel_height = ui_target.height();
-	float one_to_one_line_height;
-	float scale_factor;
+	int32_t const raw_font_pixel_height = get_font()->pixel_height();
+	float target_pixel_height = machine().render().ui_target().height();
 
 	// compute the font pixel height at the nominal size
-	one_to_one_line_height = (float)raw_font_pixel_height / (float)target_pixel_height;
+	float const one_to_one_line_height = float(raw_font_pixel_height) / target_pixel_height;
 
 	// determine the scale factor
-	scale_factor = target_font_height() / one_to_one_line_height;
+	float scale_factor = target_font_height() * scale / one_to_one_line_height;
 
 	// if our font is small-ish, do integral scaling
 	if (raw_font_pixel_height < 24)
 	{
 		// do we want to scale smaller? only do so if we exceed the threshold
-		if (scale_factor <= 1.0f)
+		if (scale_factor <= 1.0F)
 		{
 			if (one_to_one_line_height < UI_MAX_FONT_HEIGHT || raw_font_pixel_height < 12)
-				scale_factor = 1.0f;
+				scale_factor = 1.0F;
 		}
-
-		// otherwise, just ensure an integral scale factor
 		else
+		{
+			// otherwise, just ensure an integral scale factor
 			scale_factor = floor(scale_factor);
+		}
 	}
-
-	// otherwise, just make sure we hit an even number of pixels
 	else
 	{
-		int32_t height = scale_factor * one_to_one_line_height * (float)target_pixel_height;
-		scale_factor = (float)height / (one_to_one_line_height * (float)target_pixel_height);
+		// otherwise, just make sure we hit an even number of pixels
+		int32_t height = scale_factor * one_to_one_line_height * target_pixel_height;
+		scale_factor = float(height) / (one_to_one_line_height * target_pixel_height);
 	}
 
 	return scale_factor * one_to_one_line_height;
@@ -776,9 +788,14 @@ float mame_ui_manager::get_char_width(char32_t ch)
 //  character string
 //-------------------------------------------------
 
+float mame_ui_manager::get_string_width(std::string_view s)
+{
+	return get_string_width(s, get_line_height());
+}
+
 float mame_ui_manager::get_string_width(std::string_view s, float text_size)
 {
-	return get_font()->utf8string_width(get_line_height() * text_size, machine().render().ui_aspect(), s);
+	return get_font()->utf8string_width(text_size, machine().render().ui_aspect(), s);
 }
 
 
@@ -837,18 +854,37 @@ void mame_ui_manager::draw_text_full(
 		float x, float y, float origwrapwidth,
 		ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap,
 		draw_mode draw, rgb_t fgcolor, rgb_t bgcolor,
+		float *totalwidth, float *totalheight)
+{
+	draw_text_full(
+			container,
+			origs,
+			x, y, origwrapwidth,
+			justify, wrap,
+			draw, fgcolor, bgcolor,
+			totalwidth, totalheight,
+			get_line_height());
+}
+
+void mame_ui_manager::draw_text_full(
+		render_container &container,
+		std::string_view origs,
+		float x, float y, float origwrapwidth,
+		ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap,
+		draw_mode draw, rgb_t fgcolor, rgb_t bgcolor,
 		float *totalwidth, float *totalheight,
 		float text_size)
 {
 	// create the layout
-	auto layout = create_layout(container, origwrapwidth, justify, wrap);
+	ui::text_layout layout(
+			*get_font(), machine().render().ui_aspect(&container) * text_size, text_size,
+			origwrapwidth, justify, wrap);
 
 	// append text to it
 	layout.add_text(
 			origs,
 			fgcolor,
-			(draw == OPAQUE_) ? bgcolor : rgb_t::transparent(),
-			text_size);
+			(draw == OPAQUE_) ? bgcolor : rgb_t::transparent());
 
 	// and emit it (if we are asked to do so)
 	if (draw != NONE)
@@ -1218,6 +1254,9 @@ void mame_ui_manager::image_handler_ingame()
 
 uint32_t mame_ui_manager::handler_ingame(render_container &container)
 {
+	// let the OSD do its thing first
+	machine().osd().check_osd_inputs();
+
 	bool is_paused = machine().paused();
 
 	// first draw the FPS counter
@@ -1280,7 +1319,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	}
 
 	// turn on menus if requested
-	if (machine().ui_input().pressed(IPT_UI_CONFIGURE))
+	if (machine().ui_input().pressed(IPT_UI_MENU))
 	{
 		show_menu();
 		return 0;
@@ -2039,8 +2078,8 @@ int32_t mame_ui_manager::slider_crossoffset(ioport_field &field, std::string *st
 ui::text_layout mame_ui_manager::create_layout(render_container &container, float width, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap)
 {
 	// determine scale factors
-	float yscale = get_line_height();
-	float xscale = yscale * machine().render().ui_aspect(&container);
+	float const yscale = get_line_height();
+	float const xscale = yscale * machine().render().ui_aspect(&container);
 
 	// create the layout
 	return ui::text_layout(*get_font(), xscale, yscale, width, justify, wrap);

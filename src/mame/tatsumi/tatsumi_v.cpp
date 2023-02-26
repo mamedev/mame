@@ -804,7 +804,7 @@ pos is 11.5 fixed point
 		int shift=data[0];
 		int shift2=data[2];
 		int pal = 4; //(data[3]>>8)&0xf;
-		int step=((data[1]&0xff)<<8)|((data[1]&0xff00)>>8);
+		int step = swapendian_int16(data[1]);
 		int samplePos=0;
 		uint16_t const *const linedata=m_road_pixel_ram;// + (0x100 * pal);
 		int startPos=0, endPos=0;

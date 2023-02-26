@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
 There appear to exist some undumped N64 protos
 
@@ -10926,6 +10926,18 @@ patched out (+ a fix for internal checksum)
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="0xc00000">
 				<rom name="sim city 2000 (japan).bin" size="0xc00000" crc="f7a96b81" sha1="2a5b25809a5470b85db9cc0a1e6c5c44f225747b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcopt">
+		<description>SimCopter 64 (prototype 19970616)</description>
+		<year>1997</year>
+		<publisher>Maxis</publisher>
+		<info name="alt_title" value="シムコプター64"/>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="0x1000000">
+				<rom name="simcop11.bin" size="0x1000000" crc="5334451f" sha1="f7aa2b5f1df09e48aa3093ede2ea6f6ab0828211" />
 			</dataarea>
 		</part>
 	</software>

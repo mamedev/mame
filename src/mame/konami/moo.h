@@ -5,8 +5,8 @@
     Wild West C.O.W.boys of Moo Mesa / Bucky O'Hare
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_MOO_H
-#define MAME_INCLUDES_MOO_H
+#ifndef MAME_KONAMI_MOO_H
+#define MAME_KONAMI_MOO_H
 
 #pragma once
 
@@ -102,4 +102,4 @@ private:
 	void sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_MOO_H
+#endif // MAME_KONAMI_MOO_H

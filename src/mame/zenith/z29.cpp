@@ -14,6 +14,9 @@
 #include "video/i8275.h"
 #include "screen.h"
 
+
+namespace {
+
 class z29_state : public driver_device
 {
 public:
@@ -170,6 +173,8 @@ ROM_START(z29) // All EPROMs on 85-2835-1 terminal board are HN482732AG-30
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD("u429.bin", 0x0000, 0x1000, CRC(5e3bc5bf) SHA1(18d73e3d74a9768bee8b063ea45891f955558ae7))
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(1983, z29, 0, 0, z29, z29, z29_state, empty_init, "Zenith Data Systems", "Z-29", MACHINE_IS_SKELETON)

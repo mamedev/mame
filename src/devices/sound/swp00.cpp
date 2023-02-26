@@ -28,7 +28,7 @@ void swp00_device::device_reset()
 {
 }
 
-void swp00_device::rom_bank_updated()
+void swp00_device::rom_bank_pre_change()
 {
 	m_stream->update();
 }

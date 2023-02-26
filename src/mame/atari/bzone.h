@@ -5,8 +5,8 @@
     Atari Battle Zone hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_BZONE_H
-#define MAME_INCLUDES_BZONE_H
+#ifndef MAME_ATARI_BZONE_H
+#define MAME_ATARI_BZONE_H
 
 #pragma once
 
@@ -90,4 +90,4 @@ private:
 	uint8_t m_rb_input_select = 0U;
 };
 
-#endif // MAME_INCLUDES_BZONE_H
+#endif // MAME_ATARI_BZONE_H

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
-#ifndef MAME_INCLUDES_SETA_H
-#define MAME_INCLUDES_SETA_H
+#ifndef MAME_SETA_SETA_H
+#define MAME_SETA_SETA_H
 
 #pragma once
 
@@ -18,10 +18,12 @@
 #include "machine/timer.h"
 #include "machine/upd4701.h"
 #include "machine/upd4992.h"
+#include "sound/okim6295.h"
 #include "sound/x1_010.h"
 #include "video/x1_001.h"
 #include "x1_012.h"
 #include "emupal.h"
+#include "screen.h"
 #include "tilemap.h"
 
 
@@ -40,20 +42,24 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_screen(*this, "screen"),
 		m_spritegen(*this, "spritegen"),
 		m_layers(*this, "layer%u", 1U),
 		m_x1snd(*this, "x1snd"),
 		m_soundlatch(*this, "soundlatch"),
+		m_oki(*this, "oki"),
 		m_dsw(*this, "DSW"),
 		m_coins(*this, "COINS"),
 		m_extra_port(*this, "EXTRA"),
 		m_paletteram(*this, "paletteram%u", 1U),
 		m_x1_bank(*this, "x1_bank"),
+		m_oki_bank(*this, "oki_bank"),
 		m_palette(*this, "palette"),
 		m_tilemaps_flip(0)
 	{ }
 
 	void madshark(machine_config &config);
+	void madsharkbl(machine_config &config);
 	void jjsquawb(machine_config &config);
 	void oisipuzl(machine_config &config);
 	void zingzipbl(machine_config &config);
@@ -93,6 +99,7 @@ public:
 	void init_wiggie();
 	void init_bankx1();
 	void init_eightfrc();
+	void init_madsharkbl();
 
 	void palette_init_RRRRRGGGGGBBBBB_proms(palette_device &palette) const;
 
@@ -107,10 +114,12 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	required_device<screen_device> m_screen;
 	required_device<x1_001_device> m_spritegen;
 	optional_device_array<x1_012_device, 2> m_layers;
 	optional_device<x1_010_device> m_x1snd;
 	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device<okim6295_device> m_oki;
 
 	optional_ioport m_dsw;
 	optional_ioport m_coins;
@@ -119,6 +128,7 @@ protected:
 	optional_shared_ptr_array<u16, 2> m_paletteram;
 
 	optional_memory_bank m_x1_bank;
+	optional_memory_bank m_oki_bank;
 
 	required_device<palette_device> m_palette;
 
@@ -155,6 +165,7 @@ protected:
 	void ipl1_ack_w(u16 data);
 	u16 ipl2_ack_r();
 	void ipl2_ack_w(u16 data);
+	void vram_layer0_vctrl_raster_trampoline_w(offs_t offset, u16 data, u16 mem_mask);
 	void uPD71054_update_timer(device_t *cpu, int no);
 	INTERRUPT_GEN_MEMBER(wrofaero_interrupt);
 	TIMER_CALLBACK_MEMBER(uPD71054_timer_callback);
@@ -183,6 +194,8 @@ protected:
 	void kamenrid_map(address_map &map);
 	void krzybowl_map(address_map &map);
 	void madshark_map(address_map &map);
+	void madsharkbl_map(address_map &map);
+	void madsharkbl_oki_map(address_map &map);
 	void msgundam_map(address_map &map);
 	void msgundamb_map(address_map &map);
 	void oisipuzl_map(address_map &map);
@@ -599,4 +612,4 @@ private:
 	void show_outputs();
 };
 
-#endif // MAME_INCLUDES_SETA_H
+#endif // MAME_SETA_SETA_H

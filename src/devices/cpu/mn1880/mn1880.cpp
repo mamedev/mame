@@ -64,6 +64,17 @@
       contents of locations about to be written to may show misleading
       values. Likewise, PCs at which watchpoint hits occur may be
       incorrectly reported for writes.
+    * Due to the pipelining of writes, an interrupt may be accepted during
+      an instruction which attempts to disable interrupts by setting the
+      IEMASK bit, which may be cleared instead when control reaches the next
+      sequential instruction from a RETI. This sequencing glitch is
+      documented in the MN187XX23 user's manual, along with a failsafe way
+      of setting IEMASK, and similar workarounds in extant program code
+      suggest it is likewise present in the MN1880 series.
+    * The optional MMU, which expands the memory spaces in certain models
+      which contain neither internal ROM nor RAM, has been emulated only
+      to the extent required by psr500, though it likely has a few other
+      features and quirks.
 
 ***************************************************************************/
 

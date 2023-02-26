@@ -199,6 +199,8 @@ Undumped VTech laptops possibly on similar hardware:
 #include "softlist_dev.h"
 
 
+namespace {
+
 class geniusjr_state : public driver_device
 {
 public:
@@ -407,6 +409,8 @@ ROM_START( gls )
 	ROM_REGION( 0x40000, "extrom", 0 )
 	ROM_LOAD( "27-5635-00.u2", 0x000000, 0x40000, CRC(bc3c0587) SHA1(fe98f162bd80d96ce3264087b5869f4505955464))
 ROM_END
+
+} // anonymous namespace
 
 
 //    YEAR   NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY    FULLNAME                             FLAGS

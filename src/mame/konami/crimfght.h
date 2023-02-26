@@ -5,12 +5,12 @@
     Crime Fighters
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_CRIMFGHT_H
-#define MAME_INCLUDES_CRIMFGHT_H
+#ifndef MAME_KONAMI_CRIMFGHT_H
+#define MAME_KONAMI_CRIMFGHT_H
 
 #pragma once
 
-#include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
+#include "cpu/m6809/konami.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "sound/k007232.h"
@@ -70,4 +70,4 @@ private:
 	int m_init = 0;
 };
 
-#endif // MAME_INCLUDES_CRIMFGHT_H
+#endif // MAME_KONAMI_CRIMFGHT_H

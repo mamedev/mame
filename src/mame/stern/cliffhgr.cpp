@@ -86,6 +86,8 @@ Side 2 = 0x8F7DDD (or 0x880000 | ( 0x77 << 12 ) | 0x0DDD)
 #include "speaker.h"
 
 
+namespace {
+
 #define CLIFF_ENABLE_SND_1  NODE_01
 #define CLIFF_ENABLE_SND_2  NODE_02
 
@@ -773,6 +775,8 @@ ROM_START( goaltogo )
 	DISK_IMAGE_READONLY( "goaltog1", 0, NO_DUMP )
 ROM_END
 
+} // anonymous namespace
+
 
 /*************************************
  *
@@ -782,5 +786,5 @@ ROM_END
 
 GAME( 1983, cliffhgr,  0,        cliffhgr, cliffhgr,  cliffhgr_state, empty_init, ROT0, "Stern Electronics", "Cliff Hanger (set 1)", 0 )
 GAME( 1983, cliffhgra, cliffhgr, cliffhgr, cliffhgra, cliffhgr_state, empty_init, ROT0, "Stern Electronics", "Cliff Hanger (set 2)", 0 )
-GAME( 1983, cliffhgra2,cliffhgr, cliffhgr, cliffhgra, cliffhgr_state, empty_init, ROT0, "Stern Electronics", "Cliff Hanger (set 3)", MACHINE_NOT_WORKING ) // seems to fail the third startup check, bypassable by doing bpset 0x3f5 and at the third occurance do PC = 0x3f7
+GAME( 1983, cliffhgra2,cliffhgr, cliffhgr, cliffhgra, cliffhgr_state, empty_init, ROT0, "Stern Electronics", "Cliff Hanger (set 3)", MACHINE_NOT_WORKING ) // seems to fail the third startup check, bypassable by doing bpset 0x3f5 and at the third occurrence do PC = 0x3f7
 GAME( 1983, goaltogo,  0,        cliffhgr, goaltogo,  cliffhgr_state, empty_init, ROT0, "Stern Electronics", "Goal To Go",           MACHINE_NOT_WORKING )

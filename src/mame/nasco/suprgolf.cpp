@@ -7,8 +7,9 @@
  driver by Tomasz Slanina & Angelo Salese
 
  TODO:
- - remove the patch and understand what needs to be modified for the gfxs, game
-   doesn't crash anymore (note: I suspect it's actually a ppi port C bug);
+ - remove the rom patch and understand what needs to be modified for the gfxs,
+   it reads from 0x06(PPI1 port C) and then fails to fill bg vram correctly.
+   PPI1 ports configuration is very standard, so it's not a 8255 device bug;
  - Some weird framebuffer vertical gaps with some object, namely the green and the
    trees (zooming?)
  - not sure if the analog inputs are handled correctly;
@@ -50,6 +51,7 @@ public:
 	void suprgolf(machine_config &config);
 
 	void init_suprgolf();
+	void init_suprgolfj();
 
 protected:
 	virtual void machine_start() override;
@@ -69,14 +71,11 @@ private:
 	std::unique_ptr<uint8_t[]> m_bg_vram;
 	std::unique_ptr<uint16_t[]> m_bg_fb;
 	std::unique_ptr<uint16_t[]> m_fg_fb;
-	uint8_t m_rom_bank = 0;
 	uint8_t m_bg_bank = 0;
-	uint8_t m_vreg_bank = 0;
 	uint8_t m_msm5205next = 0;
 	uint8_t m_msm_nmi_mask = 0;
 	uint8_t m_vreg_pen = 0;
 	uint8_t m_palette_switch = 0;
-	uint8_t m_bg_vreg_test = 0;
 	uint8_t m_toggle = 0;
 
 	uint8_t videoram_r(offs_t offset);
@@ -86,9 +85,7 @@ private:
 	void pen_w(uint8_t data);
 	void adpcm_data_w(uint8_t data);
 	void rom2_bank_select_w(uint8_t data);
-	uint8_t vregs_r();
 	void vregs_w(uint8_t data);
-	uint8_t rom_bank_select_r();
 	void rom_bank_select_w(uint8_t data);
 	uint8_t pedal_extra_bits_r();
 	uint8_t p1_r();
@@ -126,10 +123,8 @@ void suprgolf_state::video_start()
 	m_tilemap->set_transparent_pen(15);
 
 	save_item(NAME(m_bg_bank));
-	save_item(NAME(m_vreg_bank));
 	save_item(NAME(m_vreg_pen));
 	save_item(NAME(m_palette_switch));
-	save_item(NAME(m_bg_vreg_test));
 	save_pointer(NAME(m_paletteram), 0x1000);
 	save_pointer(NAME(m_bg_vram), 0x2000*0x20);
 	save_pointer(NAME(m_bg_fb), 0x2000*0x20);
@@ -205,21 +200,13 @@ void suprgolf_state::videoram_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t suprgolf_state::vregs_r()
-{
-	return m_vreg_bank;
-}
-
 void suprgolf_state::vregs_w(uint8_t data)
 {
 	//printf("%02x\n",data);
 
 	//bits 0,1,2 and probably 3 controls the background vram banking
-	m_vreg_bank = data;
 	m_palette_switch = (data & 0x80);
 	m_bg_bank = (data & 0x1f);
-
-	m_bg_vreg_test = data & 0x20;
 
 	//if(data & 0x60)
 	//  printf("Video regs with data %02x activated\n",data);
@@ -280,7 +267,6 @@ void suprgolf_state::machine_start()
 	membank("bank1")->configure_entries(0, 16, memregion("user2")->base(), 0x4000);
 	membank("bank2")->configure_entries(0, 64, memregion("user1")->base(), 0x4000);
 
-	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_msm5205next));
 	save_item(NAME(m_msm_nmi_mask));
 	save_item(NAME(m_toggle));
@@ -296,15 +282,8 @@ void suprgolf_state::adpcm_data_w(uint8_t data)
 	m_msm5205next = data;
 }
 
-uint8_t suprgolf_state::rom_bank_select_r()
-{
-	return m_rom_bank;
-}
-
 void suprgolf_state::rom_bank_select_w(uint8_t data)
 {
-	m_rom_bank = data;
-
 	//popmessage("%08x %02x",((data & 0x3f) * 0x4000),data);
 	//osd_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,m_maincpu->pcbase());
 	membank("bank2")->set_entry(data & 0x3f);
@@ -318,8 +297,8 @@ void suprgolf_state::rom2_bank_select_w(uint8_t data)
 	//osd_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,m_maincpu->pcbase());
 	membank("bank1")->set_entry(data & 0x0f);
 
-	if(data & 0xf0)
-		printf("Rom bank select 2 with data %02x activated\n",data);
+	//if(data & 0xf0)
+	//  printf("Rom bank select 2 with data %02x activated\n",data);
 }
 
 uint8_t suprgolf_state::pedal_extra_bits_r()
@@ -361,7 +340,7 @@ void suprgolf_state::io_map(address_map &map)
 	map(0x04, 0x07).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x08, 0x09).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x0c, 0x0c).w(FUNC(suprgolf_state::adpcm_data_w));
-	}
+}
 
 static INPUT_PORTS_START( suprgolf )
 	PORT_START("P1")
@@ -499,9 +478,7 @@ void suprgolf_state::suprgolf(machine_config &config)
 
 	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
 	ppi1.in_pa_callback().set_ioport("SYSTEM");
-	ppi1.in_pb_callback().set(FUNC(suprgolf_state::rom_bank_select_r));
 	ppi1.out_pb_callback().set(FUNC(suprgolf_state::rom_bank_select_w));
-	ppi1.in_pc_callback().set(FUNC(suprgolf_state::vregs_r));
 	ppi1.out_pc_callback().set(FUNC(suprgolf_state::vregs_w));
 
 	/* video hardware */
@@ -663,20 +640,27 @@ ROM_START( albatross )
 ROM_END
 
 
-
-
 void suprgolf_state::init_suprgolf()
 {
 	uint8_t *ROM = memregion("user2")->base();
 
 	ROM[0x74f4-0x4000] = 0x00;
 	ROM[0x74f5-0x4000] = 0x00;
-	ROM[0x6d72+(0x4000*3)-0x4000] = 0x20; //patch ROM check
+	ROM[0x74fa+(0x4000*3)-0x4000] = 0x20; // patch ROM check
+}
+
+void suprgolf_state::init_suprgolfj()
+{
+	uint8_t *ROM = memregion("user2")->base();
+
+	ROM[0x74f4-0x4000] = 0x00;
+	ROM[0x74f5-0x4000] = 0x00;
+	ROM[0x6d72+(0x4000*3)-0x4000] = 0x20; // patch ROM check
 }
 
 } // Anonymous namespace
 
 
-GAME( 1989, suprgolf,  0,         suprgolf,  suprgolf, suprgolf_state, empty_init,    ROT0, "Nasco", "Super Crowns Golf (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, suprgolfj, suprgolf,  suprgolf,  suprgolf, suprgolf_state, init_suprgolf, ROT0, "Nasco", "Super Crowns Golf (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, albatross, suprgolf,  suprgolf,  suprgolf, suprgolf_state, empty_init,    ROT0, "Nasco", "Albatross (US Prototype?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL| MACHINE_SUPPORTS_SAVE )
+GAME( 1989, suprgolf,  0,         suprgolf,  suprgolf, suprgolf_state, init_suprgolf,  ROT0, "Nasco", "Super Crowns Golf (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, suprgolfj, suprgolf,  suprgolf,  suprgolf, suprgolf_state, init_suprgolfj, ROT0, "Nasco", "Super Crowns Golf (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, albatross, suprgolf,  suprgolf,  suprgolf, suprgolf_state, init_suprgolf,  ROT0, "Nasco (Technos license)", "Albatross (US prototype?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL| MACHINE_SUPPORTS_SAVE )

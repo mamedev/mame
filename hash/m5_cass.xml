@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 
     Cassettes that load with CHAIN cannot auto-start correctly.
     Mount the BASIC-I cart first, then the cassette to load + run them.

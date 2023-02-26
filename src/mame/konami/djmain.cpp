@@ -70,7 +70,7 @@ hard drive  3.5 adapter     long 3.5 IDE cable      3.5 adapter   PCB
 
 #include "bus/ata/ataintf.h"
 #include "bus/ata/idehd.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
 #include "sound/k054539.h"
 
 #include "screen.h"
@@ -1530,6 +1530,27 @@ ROM_START( bm3rdmix )
 	DISK_IMAGE( "825jaa11", 0, SHA1(048919977232bbce046406a7212586cf39b77cf2) ) /* ver 1.00 JA */
 ROM_END
 
+ROM_START( bm3rdeaa )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* MC68EC020FG25 MPU */
+	ROM_LOAD16_BYTE( "825eaa01.6a", 0x000000, 0x80000, CRC(a7303584) SHA1(222d1c469a72f17ea9316cfaf22ba965b24260d6) )
+	ROM_LOAD16_BYTE( "825eaa02.8a", 0x000001, 0x80000, CRC(45e65086) SHA1(0daf53379d7c64b2819a0bdc192ee4ea72160643) )
+
+	ROM_REGION( 0x200000, "gfx1", 0)        /* SPRITE */
+	ROM_LOAD16_BYTE( "825eaa03.19a", 0x000000, 0x80000, CRC(ecd62652) SHA1(bceab4052dce2c843358f0a98aacc6e1124e3068) )
+	ROM_LOAD16_BYTE( "825eaa04.20a", 0x000001, 0x80000, CRC(437a576f) SHA1(f30fd15d4f0d776e9b29ccfcd6e26861fb42e51a) )
+	ROM_LOAD16_BYTE( "825eaa05.22a", 0x100000, 0x80000, CRC(9f9a3369) SHA1(d8b20127336af89b9e886289fb4f5a2e0db65f9b) )
+	ROM_LOAD16_BYTE( "825eaa06.24a", 0x100001, 0x80000, CRC(e7a3991a) SHA1(6c8cb481e721428e1365f784e97bb6f6d421ed5a) )
+
+	ROM_REGION( 0x200000, "k056832", 0 )       /* TILEMAP */
+	ROM_LOAD16_BYTE( "825eaa07.22d", 0x000000, 0x80000, CRC(3a2fe19e) SHA1(65c07a8471579cb20885a45af6a9f12c9f088625) )
+	ROM_LOAD16_BYTE( "825eaa08.23d", 0x000001, 0x80000, CRC(98b16689) SHA1(e2bebf40d098365e6757b83ffee924f9d3995d12) )
+	ROM_LOAD16_BYTE( "825eaa09.25d", 0x100000, 0x80000, CRC(829000ca) SHA1(f52494869cca78e7bc6125d329292eaa15fffed5) )
+	ROM_LOAD16_BYTE( "825eaa10.27d", 0x100001, 0x80000, CRC(345ee6e5) SHA1(ce5d05b26900ed09fb3996a60edaf332e3acd720) )
+
+	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_IMAGE( "825jab11", 0, SHA1(f506a83d43aeed87a7a32c3f7312d2a2b7d60d91) )  /* ver 1.01 JA */
+ROM_END
+
 ROM_START( bmcompmx )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* MC68EC020FG25 MPU */
 	ROM_LOAD16_BYTE( "858jac01.6a", 0x000000, 0x80000, CRC(b32693ca) SHA1(6518a8acbd070bb6f9039c4f9997dda2720e8e16) )
@@ -2264,6 +2285,7 @@ GAME( 1997, bm1stmix, 0,        djmainj, bm1stmix,  djmain_state, init_beatmania
 GAME( 1998, bm2ndmix, 0,        djmainj, bm2ndmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 2nd MIX (ver JA-B)", 0 )
 GAME( 1998, bm2ndmxa, bm2ndmix, djmainj, bm2ndmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 2nd MIX (ver JA-A)", 0 )
 GAME( 1998, bm3rdmix, 0,        djmainj, bm3rdmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver JA-A)", 0 )
+GAME( 1998, bm3rdeaa, bm3rdmix, djmainu, bm3rdmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver EA-A)", 0 )
 GAME( 1999, bmcompmx, 0,        djmainj, bmcompmx,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania complete MIX (ver JA-C)", 0 )
 GAME( 1999, bmcompmxb,bmcompmx, djmainj, bmcompmx,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania complete MIX (ver JA-B)", 0 )
 GAME( 1999, bmcmxaac, bmcompmx, djmainu, bmcompmx,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania complete MIX (ver AA-C)", 0 )

@@ -735,10 +735,10 @@ void pioneer_ldv4200hle_device::device_reset()
 	// reset our state
 	m_vbi_fetch->adjust(attotime::never);
 
-	std::fill_n(m_cmd_buffer, 0, std::size(m_cmd_buffer));
+	std::fill_n(m_cmd_buffer, std::size(m_cmd_buffer), 0);
 	m_cmd_length = 0;
 	m_cmd_running = false;
-	std::fill_n(m_reply_buffer, 0, std::size(m_reply_buffer));
+	std::fill_n(m_reply_buffer, std::size(m_reply_buffer), 0);
 	m_reply_write_index = 0;
 	m_reply_read_index = 0;
 	m_replying = false;
@@ -801,7 +801,7 @@ TIMER_CALLBACK_MEMBER(pioneer_ldv4200hle_device::process_vbi_data)
 				int32_t old_delta = (int32_t)m_mark_frame - (int32_t)old_frame;
 				int32_t curr_delta = (int32_t)m_mark_frame - (int32_t)m_curr_frame;
 				LOGMASKED(LOG_STOPS, "%s: Stop Mark is currently %d, old frame is %d, current frame is %d, old delta %d, curr delta %d\n", machine().describe_context(), m_mark_frame, old_frame, m_curr_frame, old_delta, curr_delta);
-				if (curr_delta == 0 || std::signbit(old_delta) != std::signbit(curr_delta))
+				if (curr_delta == 0 || (old_delta < 0) != (curr_delta < 0))
 				{
 					m_mark_frame = ~uint32_t(0);
 					if (is_cav_disc())
@@ -919,7 +919,7 @@ int32_t pioneer_ldv4200hle_device::player_update(const vbi_metadata &vbi, int fi
 			int32_t jump_frame = (int32_t)m_curr_frame + elapsed_tracks;
 			int32_t curr_delta = (int32_t)m_mark_frame - (int32_t)m_curr_frame;
 			int32_t next_delta = (int32_t)m_mark_frame - (int32_t)jump_frame;
-			if (std::signbit(curr_delta) != std::signbit(next_delta))
+			if ((curr_delta < 0) != (next_delta < 0))
 			{
 				elapsed_tracks = curr_delta;
 			}

@@ -135,8 +135,6 @@ void thepit_state::video_start()
 
 	m_dummy_tile = make_unique_clear<uint8_t[]>(8*8);
 
-	m_graphics_bank = 0;    /* only used in intrepid */
-
 	m_vsync_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thepit_state::vsync_callback), this));
 
 	save_item(NAME(m_graphics_bank));
@@ -222,18 +220,16 @@ void thepit_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	{
 		if (((m_spriteram[offs + 2] & 0x08) >> 3) == priority_to_draw)
 		{
-			uint8_t y, x, flipx, flipy;
-
 			if ((m_spriteram[offs + 0] == 0) || (m_spriteram[offs + 3] == 0))
 			{
 				continue;
 			}
 
-			y = 240 - m_spriteram[offs];
-			x = m_spriteram[offs + 3] + 1;
+			uint8_t y = 240 - m_spriteram[offs];
+			uint8_t x = m_spriteram[offs + 3] + 1;
 
-			flipx = m_spriteram[offs + 1] & 0x40;
-			flipy = m_spriteram[offs + 1] & 0x80;
+			uint8_t flipx = m_spriteram[offs + 1] & 0x40;
+			uint8_t flipy = m_spriteram[offs + 1] & 0x80;
 
 			if (m_flip_y)
 			{
@@ -251,14 +247,14 @@ void thepit_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 			if (offs < 16) y++;
 
 			m_gfxdecode->gfx(2 * m_graphics_bank + 1)->transpen(bitmap,cliprect,
-			m_spriteram[offs + 1] & 0x3f,
-			m_spriteram[offs + 2],
-			flipx, flipy, x, y, 0);
+					m_spriteram[offs + 1] & 0x3f,
+					m_spriteram[offs + 2],
+					flipx, flipy, x, y, 0);
 
 			m_gfxdecode->gfx(2 * m_graphics_bank + 1)->transpen(bitmap,cliprect,
-			m_spriteram[offs + 1] & 0x3f,
-			m_spriteram[offs + 2],
-			flipx, flipy, x-256, y, 0);
+					m_spriteram[offs + 1] & 0x3f,
+					m_spriteram[offs + 2],
+					flipx, flipy, x-256, y, 0);
 		}
 	}
 }
@@ -266,8 +262,12 @@ void thepit_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 uint32_t thepit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const rectangle spritevisiblearea(2*8+1, 32*8-1, 2*8, 30*8-1);
-	const rectangle spritevisibleareaflipx(0*8, 30*8-2, 2*8, 30*8-1);
+	rectangle spriterect;
+	if (m_flip_x)
+		spriterect.set(0*8, 30*8-2, 2*8, 30*8-1);
+	else
+		spriterect.set(2*8+1, 32*8-1, 2*8, 30*8-1);
+	spriterect &= cliprect;
 
 	for (int offs = 0; offs < 32; offs++)
 	{
@@ -280,21 +280,25 @@ uint32_t thepit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	/* low priority sprites */
-	draw_sprites(bitmap, m_flip_x ? spritevisibleareaflipx : spritevisiblearea, 0);
+	draw_sprites(bitmap, spriterect, 0);
 
 	/* high priority tiles */
 	m_solid_tilemap->draw(screen, bitmap, cliprect, 1, 1);
 
 	/* high priority sprites */
-	draw_sprites(bitmap, m_flip_x ? spritevisibleareaflipx : spritevisiblearea, 1);
+	draw_sprites(bitmap, spriterect, 1);
 
 	return 0;
 }
 
 uint32_t thepit_state::screen_update_desertdan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const rectangle spritevisiblearea(0*8+1, 24*8-1, 2*8, 30*8-1);
-	const rectangle spritevisibleareaflipx(8*8, 32*8-2, 2*8, 30*8-1);
+	rectangle spriterect;
+	if (m_flip_y)
+		spriterect.set(8*8, 32*8-2, 2*8, 30*8-1);
+	else
+		spriterect.set(0*8+1, 24*8-1, 2*8, 30*8-1);
+	spriterect &= cliprect;
 
 	for (int offs = 0; offs < 32; offs++)
 	{
@@ -309,15 +313,17 @@ uint32_t thepit_state::screen_update_desertdan(screen_device &screen, bitmap_ind
 
 	/* low priority sprites */
 	m_graphics_bank = 1;
-	draw_sprites(bitmap, m_flip_y ? spritevisibleareaflipx : spritevisiblearea, 0);
+	draw_sprites(bitmap, spriterect, 0);
 
-	/* high priority tiles */ // not sure about this, draws a white block over the title logo sprite, looks like it should be behind?
+	/* high priority tiles */
 	m_graphics_bank = 0;
 	m_solid_tilemap->draw(screen, bitmap, cliprect, 1, 1);
 
 	/* high priority sprites */
 	m_graphics_bank = 1;
-	draw_sprites(bitmap, m_flip_y ? spritevisibleareaflipx : spritevisiblearea, 1);
+	draw_sprites(bitmap, spriterect, 1);
+
+	m_graphics_bank = 0;
 
 	return 0;
 }

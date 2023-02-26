@@ -12,20 +12,22 @@
 
 #include "ui/imgcntrl.h"
 
-#include "ui/ui.h"
-#include "ui/filesel.h"
 #include "ui/filecreate.h"
+#include "ui/filesel.h"
 #include "ui/swlist.h"
+#include "ui/ui.h"
 
 #include "audit.h"
 #include "drivenum.h"
 #include "emuopts.h"
 #include "image.h"
 #include "softlist_dev.h"
-#include "zippath.h"
+
+#include "util/zippath.h"
 
 
 namespace ui {
+
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
@@ -184,7 +186,7 @@ void menu_control_device_image::hook_load(const std::string &name)
 //  populate
 //-------------------------------------------------
 
-void menu_control_device_image::populate(float &customtop, float &custombottom)
+void menu_control_device_image::populate()
 {
 	throw emu_fatalerror("menu_control_device_image::populate: Shouldn't get here!");
 }
@@ -194,7 +196,7 @@ void menu_control_device_image::populate(float &customtop, float &custombottom)
 //  handle
 //-------------------------------------------------
 
-void menu_control_device_image::handle(event const *ev)
+bool menu_control_device_image::handle(event const *ev)
 {
 	throw emu_fatalerror("menu_control_device_image::handle: Shouldn't get here!");
 }
@@ -338,7 +340,7 @@ void menu_control_device_image::menu_activated()
 			{
 				if (need_confirm)
 				{
-					menu::stack_push<menu_confirm_save_as>(ui(), container(), &m_create_confirmed);
+					menu::stack_push<menu_confirm_save_as>(ui(), container(), m_create_confirmed);
 					m_state = CREATE_CONFIRM;
 				}
 				else

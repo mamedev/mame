@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef MAME_AUDIO_WSWAN_H
-#define MAME_AUDIO_WSWAN_H
+#ifndef MAME_SHARED_WSWAN_H
+#define MAME_SHARED_WSWAN_H
 
 #pragma once
 
@@ -51,7 +51,7 @@ protected:
 	virtual void device_clock_changed() override;
 	virtual void device_reset() override;
 
-	virtual void rom_bank_updated() override;
+	virtual void rom_bank_pre_change() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -83,4 +83,4 @@ private:
 
 DECLARE_DEVICE_TYPE(WSWAN_SND, wswan_sound_device)
 
-#endif // MAME_AUDIO_WSWAN_H
+#endif // MAME_SHARED_WSWAN_H

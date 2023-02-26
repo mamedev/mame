@@ -143,7 +143,6 @@ K051316_CB_MEMBER(bottom9_state::zoom_callback)
 {
 	enum { zoom_colorbase = 768 / 16 };
 
-	*flags = (*color & 0x40) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8);
 	*color = zoom_colorbase + ((*color & 0x3c) >> 2);
 }

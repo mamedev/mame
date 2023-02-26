@@ -1990,7 +1990,46 @@ Namco/Midway, 1981
 
 */
 
-ROM_START( bosco )
+ROM_START( bosco ) // 23209611 (23209631) main PCB + 23169612 (23169632) sub PCB
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for code for the first CPU  */
+	ROM_LOAD( "bos5_1.3p",    0x0000, 0x1000, CRC(b1482ad1) SHA1(32d0402fc4882cae2c3655f24087f9f1911f99c1) )
+	ROM_LOAD( "bos5_2.3m",    0x1000, 0x1000, CRC(e0828ef8) SHA1(2633c7518bf0918f33dac8fbed7aa7053a4793f0) )
+	ROM_LOAD( "bos5_3.2m",    0x2000, 0x1000, CRC(229edd51) SHA1(6e34837b1d18637b94b3e772ff1b61ffe70e8fcc) )
+	ROM_LOAD( "bos5_4.2l",   0x3000, 0x1000, CRC(928a39a0) SHA1(dfc5a7ff62a0eabc900b43ef6b8e86e4d46125fe) )
+
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
+	ROM_LOAD( "bos5_5.3f",   0x0000, 0x1000, CRC(84f7c1ea) SHA1(53a1242490575938fca9e738546c93edf82ad7d3) )
+	ROM_LOAD( "bos5_6.3j",   0x1000, 0x1000, CRC(7fa34d5e) SHA1(c99feb051ab62ef3f7278a411938cd09e731fc19) )
+
+	ROM_REGION( 0x10000, "sub2", 0 )    /* 64k for the third CPU  */
+	ROM_LOAD( "bos1_7.2c",    0x0000, 0x1000, CRC(d45a4911) SHA1(547236adca9174f5cc0ec05b9649618bb92ba630) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "bos1_14.5d",   0x0000, 0x1000, CRC(a956d3c5) SHA1(c5a9d7b1f9b4acda8fb9762414e085cb5fb80c9e) )
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "bos1_13.5e",   0x0000, 0x1000, CRC(e869219c) SHA1(425614cd0642743a82ef9c1aada29774a92203ea) )
+
+	ROM_REGION( 0x0100, "gfx3", 0 )
+	ROM_LOAD( "bos1-4.2r",    0x0000, 0x0100, CRC(9b69b543) SHA1(47af3f67e50794e839b74fe61197af2228084efd) )    /* dots */
+
+	ROM_REGION( 0x0260, "proms", 0 )
+	ROM_LOAD( "bos1-6.6b",    0x0000, 0x0020, CRC(d2b96fb0) SHA1(54c100ec9d173d7dd48a453ebed5f625053cb6e0) )    /* palette */
+	ROM_LOAD( "bos1-5.4m",    0x0020, 0x0100, CRC(4e15d59c) SHA1(3542ead6421d169c3569e121ec2be304e108787c) )    /* lookup table */
+	ROM_LOAD( "bos1-3.2d",    0x0120, 0x0020, CRC(b88d5ba9) SHA1(7b97a38a540b7ca4b7d9ae338ec38b9b1a337846) )    /* video layout (not used) */
+	ROM_LOAD( "bos1-7.7h",    0x0140, 0x0020, CRC(87d61353) SHA1(c7493e52662c921625676a4a4e8cf4371bd938b7) )    /* video timing (not used) */
+
+	ROM_REGION( 0x0200, "namco", 0 )
+	ROM_LOAD( "bos1-1.1d",    0x0000, 0x0100, CRC(de2316c6) SHA1(0e55c56046331888d1d3f0d9823d2ceb203e7d3f) )
+	ROM_LOAD( "bos1-2.5c",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    /* timing - not used */
+
+	ROM_REGION( 0x3000, "52xx", 0 ) /* ROMs for digitised speech */
+	ROM_LOAD( "bos1_9.5n",    0x0000, 0x1000, CRC(09acc978) SHA1(2b264aaeb6eba70ad91593413dca733990e5467b) )
+	ROM_LOAD( "bos1_10.5m",   0x1000, 0x1000, CRC(e571e959) SHA1(9c81d7bec73bc605f7dd9a089171b0f34c4bb09a) )
+	ROM_LOAD( "bos1_11.5k",   0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
+ROM_END
+
+ROM_START( bosco3 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for code for the first CPU  */
 	ROM_LOAD( "bos3_1.3n",    0x0000, 0x1000, CRC(96021267) SHA1(bd49b0caabcccf9df45a272d767456a4fc8a7c07) )
 	ROM_LOAD( "bos1_2.3m",    0x1000, 0x1000, CRC(2d8f3ebe) SHA1(75de1cba7531ae4bf7fbbef7b8e37b9fec4ed0d0) )
@@ -2029,7 +2068,7 @@ ROM_START( bosco )
 	ROM_LOAD( "bos1_11.5k",   0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
 ROM_END
 
-ROM_START( boscoo )
+ROM_START( bosco1 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for code for the first CPU  */
 	ROM_LOAD( "bos1_1.3n",    0x0000, 0x1000, CRC(0d9920e7) SHA1(e7633233f603ccb5b7a970ed5b58ef361ef2c94e) )
 	ROM_LOAD( "bos1_2.3m",    0x1000, 0x1000, CRC(2d8f3ebe) SHA1(75de1cba7531ae4bf7fbbef7b8e37b9fec4ed0d0) )
@@ -2068,7 +2107,7 @@ ROM_START( boscoo )
 	ROM_LOAD( "bos1_11.5k",   0x2000, 0x1000, CRC(17ac9511) SHA1(266f3fae90d2fe38d109096d352863a52b379899) )
 ROM_END
 
-ROM_START( boscoo2 )
+ROM_START( bosco1o )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for code for the first CPU  */
 	ROM_LOAD( "bos1_1.3n",    0x0000, 0x1000, CRC(0d9920e7) SHA1(e7633233f603ccb5b7a970ed5b58ef361ef2c94e) )
 	ROM_LOAD( "bos1_2.3m",    0x1000, 0x1000, CRC(2d8f3ebe) SHA1(75de1cba7531ae4bf7fbbef7b8e37b9fec4ed0d0) )
@@ -3475,9 +3514,10 @@ void battles_state::driver_start()
 /* Original Namco hardware, with Namco Customs */
 
 //    YEAR, NAME,      PARENT,  MACHINE, INPUT,    STATE,         INIT,         MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1981, bosco,     0,       bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (new version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, boscoo,    bosco,   bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (old version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, boscoo2,   bosco,   bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (older version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, bosco,     0,       bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (version 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, bosco3,    bosco,   bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (version 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, bosco1,    bosco,   bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (version 1, newer)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, bosco1o,   bosco,   bosco,   bosco,    bosco_state,   empty_init,   ROT0,   "Namco", "Bosconian - Star Destroyer (version 1, older)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, boscomd,   bosco,   bosco,   boscomd,  bosco_state,   empty_init,   ROT0,   "Namco (Midway license)", "Bosconian - Star Destroyer (Midway, new version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, boscomdo,  bosco,   bosco,   boscomd,  bosco_state,   empty_init,   ROT0,   "Namco (Midway license)", "Bosconian - Star Destroyer (Midway, old version)", MACHINE_SUPPORTS_SAVE )
 

@@ -39,6 +39,8 @@
 #include "logmacro.h"
 
 
+namespace {
+
 class gpl162xx_lcdtype_state : public driver_device
 {
 public:
@@ -880,6 +882,8 @@ ROM_START( bkid218 )
 	ROM_REGION( 0x800000, "spi", ROMREGION_ERASEFF )
 	ROM_LOAD( "218n1_25q64csig_c84017.bin", 0x000000, 0x800000, CRC(94f35dbd) SHA1(a1bd6defd2465ae14753cd83be5c31f99e9158ec) )
 ROM_END
+
+} // anonymous namespace
 
 
 CONS( 200?, pcp8718,      0,       0,      gpl162xx_lcdtype,   gpl162xx_lcdtype, gpl162xx_lcdtype_state, empty_init, "PCP", "PCP 8718 - HD 360 Degrees Rocker Palm Eyecare Console - 788 in 1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -541,9 +541,6 @@ void segaorun_state::machine_reset()
 		m_mapper->configure_explicit(m_custom_map);
 	m_segaic16vid->tilemap_reset(*m_screen);
 
-	// hook the RESET line, which resets CPU #1
-	m_maincpu->set_reset_callback(*this, FUNC(segaorun_state::m68k_reset_callback));
-
 	// start timers to track interrupts
 	m_scanline_timer->adjust(m_screen->time_until_pos(223), 223);
 }
@@ -1155,6 +1152,7 @@ void segaorun_state::outrun_base(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
+	m_maincpu->reset_cb().set(FUNC(segaorun_state::m68k_reset_callback));
 
 	M68000(config, m_subcpu, MASTER_CLOCK/4);
 	m_subcpu->set_addrmap(AS_PROGRAM, &segaorun_state::sub_map);
@@ -1238,6 +1236,7 @@ void segaorun_state::outrun_fd1094(machine_config &config)
 	FD1094(config.replace(), m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &segaorun_state::decrypted_opcodes_map);
+	m_maincpu->reset_cb().set(FUNC(segaorun_state::m68k_reset_callback));
 }
 
 void segaorun_state::outrun_fd1089a(machine_config &config)
@@ -1247,6 +1246,7 @@ void segaorun_state::outrun_fd1089a(machine_config &config)
 	// basic machine hardware
 	FD1089A(config.replace(), m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
+	m_maincpu->reset_cb().set(FUNC(segaorun_state::m68k_reset_callback));
 }
 
 void segaorun_state::shangon(machine_config &config)
@@ -1277,6 +1277,7 @@ void segaorun_state::shangon_fd1089b(machine_config &config)
 	// basic machine hardware
 	FD1089B(config.replace(), m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
+	m_maincpu->reset_cb().set(FUNC(segaorun_state::m68k_reset_callback));
 }
 
 

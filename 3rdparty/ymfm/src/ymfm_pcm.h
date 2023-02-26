@@ -212,8 +212,8 @@ public:
 		uint32_t result = memory_address();
 		uint32_t newval = result + 1;
 		m_regdata[0x05] = newval >> 0;
-		m_regdata[0x06] = newval >> 8;
-		m_regdata[0x07] = (newval >> 16) & 0x3f;
+		m_regdata[0x04] = newval >> 8;
+		m_regdata[0x03] = (newval >> 16) & 0x3f;
 		return result;
 	}
 

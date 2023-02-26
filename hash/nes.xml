@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-license:CC0
+license:CC0-1.0
 -->
 <softwarelist name="nes" description="Nintendo Entertainment System cartridges">
 
@@ -98,7 +98,7 @@ license:CC0
 	</software>
 
 	<software name="10yard">
-		<description>10-Yard Fight (Euro, USA)</description><!-- Dump still to be confirmed from a EU cart -->
+		<description>10-Yard Fight (Europe, USA)</description><!-- Dump still to be confirmed from a EU cart -->
 		<year>1985</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-TY-USA"/>
@@ -436,7 +436,7 @@ license:CC0
 	</software>
 
 	<software name="actionny">
-		<description>Action In New York (Euro)</description>
+		<description>Action In New York (Europe)</description>
 		<year>1991</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="NES-FV-UKV"/>
@@ -473,7 +473,7 @@ license:CC0
 	</software>
 
 	<software name="addfam">
-		<description>The Addams Family (Euro)</description>
+		<description>The Addams Family (Europe)</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="NES-6Z (FRA/SCN/ESP)"/>
@@ -511,7 +511,7 @@ license:CC0
 
 <!-- Glitches on NTSC -->
 	<software name="pugshunt">
-		<description>The Addams Family - Pugsley's Scavenger Hunt (Euro)</description>
+		<description>The Addams Family - Pugsley's Scavenger Hunt (Europe)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="NES-FM-FRA"/>
@@ -529,7 +529,7 @@ license:CC0
 	</software>
 
 	<software name="pugshuntp" cloneof="pugshunt">
-		<description>The Addams Family - Pugsley's Scavenger Hunt (Euro, prototype)</description>
+		<description>The Addams Family - Pugsley's Scavenger Hunt (Europe, prototype)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="nes_cart">
@@ -565,7 +565,7 @@ license:CC0
 	</software>
 
 	<software name="advislnd">
-		<description>Adventure Island in the Pacific - Classic (Euro)</description>
+		<description>Adventure Island in the Pacific - Classic (Europe)</description>
 		<year>1992</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NES-TB (NOE/ESP)"/>
@@ -602,7 +602,7 @@ license:CC0
 	</software>
 
 	<software name="advisln2">
-		<description>The Adventure Island II (Euro)</description>
+		<description>The Adventure Island II (Europe)</description>
 		<year>1992</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NES-V7 (AUS/SCN/ESP/NOE)"/>
@@ -658,7 +658,7 @@ license:CC0
 	</software>
 
 	<software name="magickdm">
-		<description>Disney's Adventures in the Magic Kingdom (Euro)</description>
+		<description>Disney's Adventures in the Magic Kingdom (Europe)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-VD (SCN/ESP)"/>
@@ -698,7 +698,7 @@ license:CC0
 
 <!-- glitches on NTSC -->
 	<software name="bayoubil">
-		<description>The Adventures of Bayou Billy (Euro)</description>
+		<description>The Adventures of Bayou Billy (Europe)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-MU-EEC"/>
@@ -817,7 +817,7 @@ license:CC0
 	</software>
 
 	<software name="lolo">
-		<description>Adventures of Lolo (Euro)</description>
+		<description>Adventures of Lolo (Europe)</description>
 		<year>1990</year>
 		<publisher>HAL Laboratory</publisher>
 		<info name="serial" value="NES-AV-EEC"/>
@@ -875,7 +875,7 @@ license:CC0
 	</software>
 
 	<software name="lolo2">
-		<description>Adventures of Lolo 2 (Euro)</description>
+		<description>Adventures of Lolo 2 (Europe)</description>
 		<year>1991</year>
 		<publisher>HAL Laboratory</publisher>
 		<info name="serial" value="NES-A4 (EEC/FRG)"/>
@@ -913,7 +913,7 @@ license:CC0
 	</software>
 
 	<software name="lolo3">
-		<description>Adventures of Lolo 3 (Euro)</description>
+		<description>Adventures of Lolo 3 (Europe)</description>
 		<year>1992</year>
 		<publisher>HAL Laboratory</publisher>
 		<info name="serial" value="NES-QL (SCN/ESP)"/>
@@ -951,7 +951,7 @@ license:CC0
 	</software>
 
 	<software name="radgrav">
-		<description>The Adventures of Rad Gravity (Euro)</description>
+		<description>The Adventures of Rad Gravity (Europe)</description>
 		<year>1991</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="NES-2A (EEC/ESP)"/>
@@ -1086,7 +1086,7 @@ license:CC0
 	</software>
 
 	<software name="airfortr">
-		<description>Air Fortress (Euro)</description>
+		<description>Air Fortress (Europe)</description>
 		<year>1989</year>
 		<publisher>HAL Laboratory</publisher>
 		<info name="serial" value="NES-AI (EEC/AUS)"/>
@@ -1168,7 +1168,7 @@ license:CC0
 	</software>
 
 	<software name="airwolf">
-		<description>Airwolf (Euro)</description>
+		<description>Airwolf (Europe)</description>
 		<year>1990</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-AF (EEC/NOE)"/>
@@ -1186,8 +1186,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Game has no sound. Could this be related to sound issue in early Enix games? -->
-	<software name="ajyureir" supported="no">
+	<software name="ajyureir">
 		<description>Akagawa Jirou no Yuurei Ressha (Japan)</description>
 		<year>1991</year>
 		<publisher>King Records</publisher>
@@ -1361,7 +1360,7 @@ license:CC0
 
 <!-- glitches on NTSC -->
 	<software name="aladdin">
-		<description>Disney's Aladdin (Euro)</description>
+		<description>Disney's Aladdin (Europe)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="NES-AJ (FRA/SCN)"/>
@@ -1434,7 +1433,7 @@ license:CC0
 	</software>
 
 	<software name="alien3" supported="partial">
-		<description>Alien³ (Euro)</description>
+		<description>Alien³ (Europe)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="NES-X3 (FRA/NOE)"/>
@@ -1491,7 +1490,7 @@ license:CC0
 	</software>
 
 	<software name="alphamis">
-		<description>Alpha Mission (Euro)</description>
+		<description>Alpha Mission (Europe)</description>
 		<year>1989</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NES-AM-EEC"/>
@@ -1713,7 +1712,7 @@ license:CC0
 	</software>
 
 	<software name="anticip">
-		<description>Anticipation (Euro)</description>
+		<description>Anticipation (Europe)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-AP-EEC"/>
@@ -1823,7 +1822,7 @@ license:CC0
 	</software>
 
 	<software name="archrivl">
-		<description>Arch Rivals - A Basketbrawl! (Euro)</description>
+		<description>Arch Rivals - A Basketbrawl! (Europe)</description>
 		<year>1991</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-Q4 (ESP/NOE)"/>
@@ -2106,7 +2105,7 @@ license:CC0
 	</software>
 
 	<software name="astyanax">
-		<description>Astyanax (Euro)</description>
+		<description>Astyanax (Europe)</description>
 		<year>1990</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="NES-YX (ESP/NOE)"/>
@@ -2125,7 +2124,7 @@ license:CC0
 
 <!-- glitches on NTSC -->
 	<software name="asterix">
-		<description>Astérix (Euro)</description>
+		<description>Astérix (Europe)</description>
 		<year>1993</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="NES-AX (UKV/ESP)"/>
@@ -2202,7 +2201,7 @@ license:CC0
 	</software>
 
 	<software name="athlwrld">
-		<description>Athletic World (Euro)</description>
+		<description>Athletic World (Europe)</description>
 		<year>1988</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="NES-AW (EEC/ITA)"/>
@@ -2299,7 +2298,7 @@ license:CC0
 	</software>
 
 	<software name="killtomt">
-		<description>Attack of the Killer Tomatoes (Euro)</description>
+		<description>Attack of the Killer Tomatoes (Europe)</description>
 		<year>1993</year>
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="NES-47-NOE"/>
@@ -2318,7 +2317,7 @@ license:CC0
 	</software>
 
 	<software name="aussie">
-		<description>Aussie Rules Footy (Euro)</description>
+		<description>Aussie Rules Footy (Europe)</description>
 		<year>1992</year>
 		<publisher>Laser Beam</publisher>
 		<info name="serial" value="NES-28-AUS"/>
@@ -2455,7 +2454,7 @@ license:CC0
 	</software>
 
 	<software name="baddudes">
-		<description>Bad Dudes vs. Dragon Ninja (Euro)</description>
+		<description>Bad Dudes vs. Dragon Ninja (Europe)</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="NES-55 (ESP/FRA)"/>
@@ -2690,7 +2689,7 @@ license:CC0
 	</software>
 
 	<software name="balonfgt">
-		<description>Balloon Fight (Euro)</description>
+		<description>Balloon Fight (Europe)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-BF-EEC"/>
@@ -2854,7 +2853,7 @@ license:CC0
 	</software>
 
 	<software name="barbie">
-		<description>Barbie (Euro)</description>
+		<description>Barbie (Europe)</description>
 		<year>1992</year>
 		<publisher>Hi Tech Expressions</publisher>
 		<info name="serial" value="NES-8V-AUS"/>
@@ -2987,7 +2986,7 @@ license:CC0
 	</software>
 
 	<software name="barkbill">
-		<description>Barker Bill's Trick Shooting (Euro)</description>
+		<description>Barker Bill's Trick Shooting (Europe)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-ZT-SCN"/>
@@ -3074,7 +3073,7 @@ license:CC0
 	</software>
 
 	<software name="baseball">
-		<description>Baseball (Euro, USA)</description>
+		<description>Baseball (Europe, USA)</description>
 		<year>1985</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-BA-USA, NES-BA-(ESP/GBR)"/>
@@ -3361,7 +3360,7 @@ license:CC0
 	</software>
 
 	<software name="batman">
-		<description>Batman - The Video Game (Euro)</description>
+		<description>Batman - The Video Game (Europe)</description>
 		<year>1990</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="NES-B4 (EEC/FRG/ESP)"/>
@@ -3399,7 +3398,7 @@ license:CC0
 	</software>
 
 	<software name="batmanrn">
-		<description>Batman Returns (Euro)</description>
+		<description>Batman Returns (Europe)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-BX-FRA"/>
@@ -3467,7 +3466,7 @@ license:CC0
 
 <!-- glitches on NTSC -->
 	<software name="batmanrj" supported="partial">
-		<description>Batman - Return of the Joker (Euro)</description>
+		<description>Batman - Return of the Joker (Europe)</description>
 		<year>1992</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="NES-48 (NOE/SCN/ESP)"/>
@@ -3679,7 +3678,7 @@ license:CC0
 	</software>
 
 	<software name="olympus">
-		<description>The Battle of Olympus (Euro)</description>
+		<description>The Battle of Olympus (Europe)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-AD (SCN/ESP)"/>
@@ -3717,7 +3716,7 @@ license:CC0
 	</software>
 
 	<software name="bship">
-		<description>Battleship (Euro)</description>
+		<description>Battleship (Europe)</description>
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="NES-BH-NOE"/>
@@ -3735,7 +3734,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="btoadsj" cloneof="btoads">
+<!-- Same issue as US release -->
+	<software name="btoadsj" cloneof="btoads" supported="no">
 		<description>Battletoads (Japan)</description>
 		<year>1991</year>
 		<publisher>Masaya</publisher>
@@ -3755,7 +3755,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="btoadsu" cloneof="btoads">
+<!-- Game hangs at start of level 3 (turbo tunnel). Sprite 0 hit issue? -->
+	<software name="btoadsu" cloneof="btoads" supported="no">
 		<description>Battletoads (USA)</description>
 		<year>1991</year>
 		<publisher>Tradewest</publisher>
@@ -3780,9 +3781,10 @@ license:CC0
 		</part>
 	</software>
 
+<!-- Same issue as US release -->
 <!-- glitches on NTSC -->
-	<software name="btoads" supported="partial">
-		<description>Battletoads (Euro)</description>
+	<software name="btoads" supported="no">
+		<description>Battletoads (Europe)</description>
 		<year>1993</year>
 		<publisher>Tradewest</publisher>
 		<info name="serial" value="NES-8T-(SCN/ESP/FRG)"/>
@@ -3800,8 +3802,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="btoadsdd">
-		<description>Battletoads &amp; Double Dragon - The Ultimate Team (Euro)</description>
+<!-- Same issue as US release -->
+	<software name="btoadsdd" supported="no">
+		<description>Battletoads &amp; Double Dragon - The Ultimate Team (Europe)</description>
 		<year>1993</year>
 		<publisher>Tradewest</publisher>
 		<info name="serial" value="NES-U8-UKV"/>
@@ -3818,7 +3821,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="btoadsddu" cloneof="btoadsdd">
+<!-- Crashes at level 1-2 Abobo. Code falls off the rails at D2B2: jmp ($0021). Apparently game depends on an open bus read from $6xxx some time before that. -->
+	<software name="btoadsddu" cloneof="btoadsdd" supported="no">
 		<description>Battletoads &amp; Double Dragon - The Ultimate Team (USA)</description>
 		<year>1993</year>
 		<publisher>Tradewest</publisher>
@@ -4068,7 +4072,7 @@ license:CC0
 
 <!-- glitches on NTSC -->
 	<software name="bestof">
-		<description>Best of the Best - Championship Karate (Euro)</description>
+		<description>Best of the Best - Championship Karate (Europe)</description>
 		<year>1993</year>
 		<publisher>Loriciel</publisher>
 		<info name="serial" value="NES-BB-ESP"/>
@@ -4268,7 +4272,7 @@ license:CC0
 	</software>
 
 	<software name="bigfoot">
-		<description>Bigfoot (Euro)</description>
+		<description>Bigfoot (Europe)</description>
 		<year>1991</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-A8 (EEC/ESP)"/>
@@ -4459,7 +4463,7 @@ license:CC0
 	</software>
 
 	<software name="bionicc">
-		<description>Bionic Commando (Euro)</description>
+		<description>Bionic Commando (Europe)</description>
 		<year>1990</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-CM (EEC/FRG)"/>
@@ -4594,7 +4598,7 @@ license:CC0
 	</software>
 
 	<software name="bladestl">
-		<description>Blades of Steel (Euro)</description>
+		<description>Blades of Steel (Europe)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-VS (FRG/SCN/EEC)"/>
@@ -4649,7 +4653,7 @@ license:CC0
 	</software>
 
 	<software name="bmaster">
-		<description>Blaster Master (Euro)</description>
+		<description>Blaster Master (Europe)</description>
 		<year>1991</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="NES-VM (EEC/FRG/SCN)"/>
@@ -4732,7 +4736,7 @@ license:CC0
 	</software>
 
 	<software name="blueshad">
-		<description>Blue Shadow (Euro)</description>
+		<description>Blue Shadow (Europe)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="NES-27 (FRG/SCN)"/>
@@ -4751,7 +4755,7 @@ license:CC0
 	</software>
 
 	<software name="bluesb">
-		<description>The Blues Brothers (Euro)</description>
+		<description>The Blues Brothers (Europe)</description>
 		<year>1992</year>
 		<publisher>Titus</publisher>
 		<info name="serial" value="NES-4Z-FRG"/>
@@ -5013,7 +5017,7 @@ license:CC0
 	</software>
 
 	<software name="bdash">
-		<description>Boulder Dash (Euro)</description>
+		<description>Boulder Dash (Europe)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-XB (ESP/FRG)"/>
@@ -5051,7 +5055,7 @@ license:CC0
 	</software>
 
 	<software name="boynblob">
-		<description>David Crane's A Boy and His Blob - Trouble on Blobolonia (Euro, rev. A)</description>
+		<description>David Crane's A Boy and His Blob - Trouble on Blobolonia (Europe, rev. A)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-B5 (FRA/NOE/GBR)"/>
@@ -5070,7 +5074,7 @@ license:CC0
 	</software>
 
 	<software name="boynbloba" cloneof="boynblob">
-		<description>David Crane's A Boy and His Blob - Trouble on Blobolonia (Euro)</description>
+		<description>David Crane's A Boy and His Blob - Trouble on Blobolonia (Europe)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-B5 (EEC/NOE)"/>
@@ -5111,7 +5115,7 @@ license:CC0
 	</software>
 
 	<software name="dracula">
-		<description>Bram Stoker's Dracula (Euro)</description>
+		<description>Bram Stoker's Dracula (Europe)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
 		<info name="serial" value="NES-DR-(NOE/UKV)"/>
@@ -5188,7 +5192,7 @@ license:CC0
 	</software>
 
 	<software name="bublbobl">
-		<description>Bubble Bobble (Euro)</description>
+		<description>Bubble Bobble (Europe)</description>
 		<year>1990</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="NES-B2 (EEC/FRA/FRG/SCN)"/>
@@ -5266,7 +5270,7 @@ license:CC0
 	</software>
 
 	<software name="bucky">
-		<description>Bucky O'Hare (Euro)</description>
+		<description>Bucky O'Hare (Europe)</description>
 		<year>1992</year>
 		<publisher>Palcom</publisher>
 		<info name="serial" value="NES-56 (NOE/SCN/UKV)"/>
@@ -5327,7 +5331,7 @@ license:CC0
 	</software>
 
 	<software name="bugsbb">
-		<description>The Bugs Bunny Blowout (Euro)</description>
+		<description>The Bugs Bunny Blowout (Europe)</description>
 		<year>1992</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="NES-H8 (NOE/ESP/FRG)"/>
@@ -5432,7 +5436,7 @@ license:CC0
 	</software>
 
 	<software name="burai">
-		<description>Burai Fighter (Euro)</description>
+		<description>Burai Fighter (Europe)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-UF (FRA/ESP)"/>
@@ -5567,7 +5571,7 @@ license:CC0
 	</software>
 
 	<software name="calgames">
-		<description>California Games (Euro)</description>
+		<description>California Games (Europe)</description>
 		<year>1991</year>
 		<publisher>Milton Bradley</publisher>
 		<info name="serial" value="NES-CG-(NOE/ESP)"/>
@@ -5651,7 +5655,7 @@ license:CC0
 	</software>
 
 	<software name="goldmedl">
-		<description>Capcom's Gold Medal Challenge '92 (Euro)</description>
+		<description>Capcom's Gold Medal Challenge '92 (Europe)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-GM-SCN"/>
@@ -5750,7 +5754,7 @@ license:CC0
 	</software>
 
 	<software name="captplan">
-		<description>Captain Planet and the Planeteers (Euro)</description>
+		<description>Captain Planet and the Planeteers (Europe)</description>
 		<year>1992</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="NES-5C (NOE/SCN/UKV)"/>
@@ -5825,7 +5829,7 @@ license:CC0
 	</software>
 
 	<software name="captskyh">
-		<description>Captain SkyHawk (Euro)</description>
+		<description>Captain SkyHawk (Europe)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-YW (FRA/ESP)"/>
@@ -5941,7 +5945,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="castelnu" cloneof="casteln">
+<!-- no background music in game -->
+	<software name="castelnu" cloneof="casteln" supported="partial">
 		<description>Castelian (USA)</description>
 		<year>1991</year>
 		<publisher>Triffix</publisher>
@@ -5961,8 +5966,8 @@ license:CC0
 	</software>
 
 <!-- a proto has been found too, containing the same data, with labels "CASTELIAN 2/4/92 CHK$985A" -->
-	<software name="casteln" supported="no"> <!-- freezes when you start game -->
-		<description>Castelian (Euro)</description>
+	<software name="casteln" supported="partial"> <!-- buzz instead of music -->
+		<description>Castelian (Europe)</description>
 		<year>1992</year>
 		<publisher>Storm</publisher>
 		<info name="serial" value="NES-4C-ESP"/>
@@ -6097,7 +6102,7 @@ license:CC0
 	</software>
 
 	<software name="cvania">
-		<description>Castlevania (Euro)</description>
+		<description>Castlevania (Europe)</description>
 		<year>1988</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-CV (EEC/NOE)"/>
@@ -6135,7 +6140,7 @@ license:CC0
 	</software>
 
 	<software name="cvania2">
-		<description>Castlevania II - Simon's Quest (Euro)</description>
+		<description>Castlevania II - Simon's Quest (Europe)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-QU-(EEC/FRG)"/>
@@ -6153,7 +6158,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cvania3u" cloneof="cvania3">
+<!-- Graphics corrupt on parts of attract mode film reel. Once those have been viewed, in-game graphics flicker (wild nametable flipping) when picking up weapon upgrades, going through doors, etc. -->
+	<software name="cvania3u" cloneof="cvania3" supported="partial">
 		<description>Castlevania III - Dracula's Curse (USA)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
@@ -6179,8 +6185,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cvania3">
-		<description>Castlevania III - Dracula's Curse (Euro)</description>
+<!-- Crashes if you watch the attract mode film roll reel -->
+	<software name="cvania3" supported="partial">
+		<description>Castlevania III - Dracula's Curse (Europe)</description>
 		<year>1992</year>
 		<publisher>Palcom</publisher>
 		<info name="serial" value="NES-VN (FRG/SCN)"/>
@@ -6358,7 +6365,7 @@ license:CC0
 	</software>
 
 	<software name="chrally">
-		<description>Championship Rally (Euro)</description>
+		<description>Championship Rally (Europe)</description>
 		<year>1991</year>
 		<publisher>HAL Laboratory</publisher>
 		<info name="serial" value="NES-29-ESP"/>
@@ -6421,7 +6428,7 @@ license:CC0
 	</software>
 
 	<software name="chessmst">
-		<description>The Chessmaster (Euro)</description>
+		<description>The Chessmaster (Europe)</description>
 		<year>1991</year>
 		<publisher>Hi Tech Expressions</publisher>
 		<info name="serial" value="NES-EM (GPS/FRG/SCN/ESP)"/>
@@ -6571,7 +6578,7 @@ license:CC0
 	</software>
 
 	<software name="chipndl2">
-		<description>Disney's Chip 'n Dale Rescue Rangers 2 (Euro)</description>
+		<description>Disney's Chip 'n Dale Rescue Rangers 2 (Europe)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-DV (SCN/NOE)"/>
@@ -6657,7 +6664,7 @@ license:CC0
 	</software>
 
 	<software name="chipndal">
-		<description>Disney's Chip 'n Dale Rescue Rangers (Euro)</description>
+		<description>Disney's Chip 'n Dale Rescue Rangers (Europe)</description>
 		<year>1991</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-RU (NOE/SCN/ESP)"/>
@@ -6941,7 +6948,7 @@ license:CC0
 	</software>
 
 	<software name="citycon">
-		<description>City Connection (Euro)</description>
+		<description>City Connection (Europe)</description>
 		<year>1988?</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="NES-CI-ESP"/>
@@ -7115,7 +7122,7 @@ license:CC0
 	</software>
 
 	<software name="cobratr">
-		<description>Cobra Triangle (Euro)</description>
+		<description>Cobra Triangle (Europe)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-CU (EEC/ESP)"/>
@@ -7360,7 +7367,7 @@ license:CC0
 	</software>
 
 	<software name="corvetz1">
-		<description>Corvette ZR-1 Challenge (Euro)</description>
+		<description>Corvette ZR-1 Challenge (Europe)</description>
 		<year>1990</year>
 		<publisher>Milton Bradley</publisher>
 		<info name="serial" value="NES-ZJ (ESP/NOE)"/>
@@ -7399,7 +7406,7 @@ license:CC0
 	</software>
 
 	<software name="cosmic">
-		<description>Cosmic Spacehead (Euro)</description>
+		<description>Cosmic Spacehead (Europe)</description>
 		<year>19??</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="nes_cart">
@@ -7479,7 +7486,7 @@ license:CC0
 	</software>
 
 	<software name="crackout">
-		<description>CrackOut (Euro)</description>
+		<description>CrackOut (Europe)</description>
 		<year>1991</year>
 		<publisher>Palcom</publisher>
 		<info name="serial" value="NES-37-(NOE/UKV)"/>
@@ -7567,6 +7574,23 @@ license:CC0
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crazyland" cloneof="trollscl">
+		<description>Crazy Land (USA, prototype)</description>
+		<year>1991</year>
+		<publisher>Vap</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="NES-TKEPROM-01" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="crazy land prg 5-27 3bdb.u1" size="0x20000" crc="96ddee6e" sha1="dd19c0437fb9efd0a27c4277c7b1b7d32c59a643" /> <!-- original label: CRAZY LAND PRG 5/27 3BDB -->
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="crazy land chr 5-27 6017.u5" size="0x20000" crc="cc045b61" sha1="c474fcb5af3440caec27870a705b19339e004ff2" /> <!-- original label: CRAZY LAND CHR 5/27 6017 -->
 			</dataarea>
 		</part>
 	</software>
@@ -7920,7 +7944,7 @@ license:CC0
 	</software>
 
 	<software name="darkman">
-		<description>Darkman (Euro)</description>
+		<description>Darkman (Europe)</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="NES-N8-ESP"/>
@@ -7975,7 +7999,7 @@ license:CC0
 	</software>
 
 	<software name="darkwing">
-		<description>Disney's Darkwing Duck (Euro)</description>
+		<description>Disney's Darkwing Duck (Europe)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-DZ (UKV/SCN)"/>
@@ -8110,7 +8134,7 @@ license:CC0
 	</software>
 
 	<software name="daysthnd">
-		<description>Days of Thunder (Euro)</description>
+		<description>Days of Thunder (Europe)</description>
 		<year>1991</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="NES-YH (EEC/ESP)"/>
@@ -8289,7 +8313,7 @@ license:CC0
 	</software>
 
 	<software name="defcrown">
-		<description>Defender of the Crown (Euro)</description>
+		<description>Defender of the Crown (Europe)</description>
 		<year>1991</year>
 		<publisher>Palcom</publisher>
 		<info name="serial" value="NES-U3-EEC"/>
@@ -8546,7 +8570,7 @@ license:CC0
 	</software>
 
 	<software name="devlwrld">
-		<description>Devil World (Euro)</description>
+		<description>Devil World (Europe)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-DD-EEC"/>
@@ -8635,7 +8659,7 @@ license:CC0
 	</software>
 
 	<software name="diehard">
-		<description>Die Hard (Euro)</description>
+		<description>Die Hard (Europe)</description>
 		<year>1992</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="NES-57 (AUS/SCN/ESP)"/>
@@ -8732,7 +8756,7 @@ license:CC0
 
 <!-- glitches on NTSC -->
 	<software name="diggertr">
-		<description>Digger T. Rock - The Legend of the Lost City (Euro)</description>
+		<description>Digger T. Rock - The Legend of the Lost City (Europe)</description>
 		<year>1991</year>
 		<publisher>Milton Bradley</publisher>
 		<info name="serial" value="NES-8D (NOE/ESP"/>
@@ -8957,7 +8981,7 @@ license:CC0
 	</software>
 
 	<software name="dkongcl">
-		<description>Donkey Kong Classics (Euro, USA)</description>
+		<description>Donkey Kong Classics (Europe, USA)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-DJ-USA, NES-DJ-(GBR/EEC/NOE/ESP/UKV)"/>
@@ -9018,7 +9042,7 @@ license:CC0
 	</software>
 
 	<software name="dkongjrm">
-		<description>Donkey Kong Jr. Math (Euro, USA)</description>
+		<description>Donkey Kong Jr. Math (Europe, USA)</description>
 		<year>1985</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-CA-USA, NES-CA-EEC"/>
@@ -9083,8 +9107,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Game has no sound and freezes as soon as you get killed by any enemy -->
-	<software name="doordoor" supported="no">
+	<software name="doordoor">
 		<description>Door Door (Japan)</description>
 		<year>1985</year>
 		<publisher>Enix</publisher>
@@ -9234,7 +9257,7 @@ license:CC0
 	</software>
 
 	<software name="ddragon">
-		<description>Double Dragon (Euro)</description>
+		<description>Double Dragon (Europe)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-WD-ESP"/>
@@ -9311,7 +9334,7 @@ license:CC0
 	</software>
 
 	<software name="ddragon2">
-		<description>Double Dragon II - The Revenge (Euro)</description>
+		<description>Double Dragon II - The Revenge (Europe)</description>
 		<year>1990</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-W2 (AUS/EEC/FRG/ESP)"/>
@@ -9368,7 +9391,7 @@ license:CC0
 	</software>
 
 	<software name="ddragon3">
-		<description>Double Dragon III - The Sacred Stones (Euro)</description>
+		<description>Double Dragon III - The Sacred Stones (Europe)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-3W (SCN/ESP/UKV)"/>
@@ -9425,7 +9448,7 @@ license:CC0
 	</software>
 
 	<software name="ddribble">
-		<description>Double Dribble (Euro)</description>
+		<description>Double Dribble (Europe)</description>
 		<year>1989</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-DW (EEC/FRG)"/>
@@ -9667,7 +9690,7 @@ license:CC0
 	</software>
 
 	<software name="drmario">
-		<description>Dr. Mario (Euro)</description>
+		<description>Dr. Mario (Europe)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-VU-(NOE/SCN/ESP)"/>
@@ -9754,7 +9777,7 @@ license:CC0
 	</software>
 
 	<software name="dballa" cloneof="dball">
-		<description>Dragon Ball - Le Secret du Dragon (Euro)</description>
+		<description>Dragon Ball - Le Secret du Dragon (Europe)</description>
 		<year>1990</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="NES-B8-EEC"/>
@@ -9773,7 +9796,7 @@ license:CC0
 	</software>
 
 	<software name="dball">
-		<description>Dragon Ball - Le Secret du Dragon (Euro, rev. A)</description>
+		<description>Dragon Ball - Le Secret du Dragon (Europe, rev. A)</description>
 		<year>1990</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="NES-B8 (EEC/FRA)"/>
@@ -10064,8 +10087,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Game has no sound and freezes once you win any battle -->
-	<software name="dquest" cloneof="dwarr" supported="no">
+	<software name="dquest" cloneof="dwarr">
 		<description>Dragon Quest (Japan)</description>
 		<year>1986</year>
 		<publisher>Enix</publisher>
@@ -10085,8 +10107,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Game has no sound. Will this freeze up at some point like the other early Enix games? -->
-	<software name="dquest2" cloneof="dwarr2" supported="no">
+	<software name="dquest2" cloneof="dwarr2">
 		<description>Dragon Quest II - Akuryou no Kamigami (Japan)</description>
 		<year>1987</year>
 		<publisher>Enix</publisher>
@@ -10421,7 +10442,7 @@ license:CC0
 	</software>
 
 	<software name="dlair">
-		<description>Dragon's Lair (Euro)</description>
+		<description>Dragon's Lair (Europe)</description>
 		<year>1992</year>
 		<publisher>Elite</publisher>
 		<info name="serial" value="NES-L9 (SCN/ESP)"/>
@@ -10503,7 +10524,7 @@ license:CC0
 	</software>
 
 	<software name="dropzone">
-		<description>Dropzone (Euro)</description>
+		<description>Dropzone (Europe)</description>
 		<year>1992</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="NES-D5-NOE"/>
@@ -10601,7 +10622,7 @@ license:CC0
 	</software>
 
 	<software name="ducktal2">
-		<description>Disney's DuckTales 2 (Euro)</description>
+		<description>Disney's DuckTales 2 (Europe)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-DL-SCN"/>
@@ -10681,7 +10702,7 @@ license:CC0
 	</software>
 
 	<software name="ducktale">
-		<description>DuckTales (Euro)</description>
+		<description>DuckTales (Europe)</description>
 		<year>1990</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-UK (EEC/FRG/SCN/NOE)"/>
@@ -10827,7 +10848,7 @@ license:CC0
 	</software>
 
 	<software name="dynablas">
-		<description>Dynablaster (Euro)</description>
+		<description>Dynablaster (Europe)</description>
 		<year>1991</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NES-49 (ESP/FRG)"/>
@@ -11053,7 +11074,7 @@ license:CC0
 	</software>
 
 	<software name="eliminat">
-		<description>Eliminator Boat Duel (Euro)</description>
+		<description>Eliminator Boat Duel (Europe)</description>
 		<year>1993</year>
 		<publisher>Electro Brain</publisher>
 		<info name="serial" value="NES-6R-SCN"/>
@@ -11072,7 +11093,7 @@ license:CC0
 	</software>
 
 	<software name="elite" supported="no">
-		<description>Elite (Euro)</description>
+		<description>Elite (Europe)</description>
 		<year>1992</year>
 		<publisher>Imagineering</publisher>
 		<info name="serial" value="NES-EL (NOE/ESP/UKV)"/>
@@ -11294,7 +11315,7 @@ license:CC0
 	</software>
 
 	<software name="excitbik">
-		<description>Excitebike (Euro)</description>
+		<description>Excitebike (Europe)</description>
 		<year>1986</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-EB (EEC/NOE/ESP)"/>
@@ -11529,7 +11550,7 @@ license:CC0
 	</software>
 
 	<software name="f15se">
-		<description>F-15 Strike Eagle (Euro)</description>
+		<description>F-15 Strike Eagle (Europe)</description>
 		<year>1992</year>
 		<publisher>Microprose</publisher>
 		<info name="serial" value="NES-8F-UKV"/>
@@ -11685,6 +11706,7 @@ license:CC0
 		</part>
 	</software>
 
+<!-- Game will not run on initial boot if SRAM is filled with 0x00 -->
 	<software name="famijmp2">
 		<description>Famicom Jump II - Saikyou no 7-nin (Japan)</description>
 		<year>1991</year>
@@ -11704,7 +11726,7 @@ license:CC0
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+				<rom value="0xff" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -11873,11 +11895,11 @@ license:CC0
 		<info name="serial" value="HVC-BS"/>
 		<info name="release" value="19840621"/>
 		<info name="alt_title" value="ファミリーベーシック"/>
+		<sharedfeat name="exp_default" value="fc_keyboard"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb_model" value="FB-R-128-01" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-fb1-1 a" size="16384" crc="12b97208" sha1="2fc97bdb035d308f0ecd7b58e44fa1571b99fe27" offset="00000" />
 				<rom name="hvc-fb1-1 b" size="16384" crc="b099376c" sha1="17fb9644dc23173d77d288c1428e560ea8a7a9ef" offset="0x04000" />
@@ -11899,11 +11921,11 @@ license:CC0
 		<info name="serial" value="HVC-BS"/>
 		<info name="release" value="19840621"/>
 		<info name="alt_title" value="ファミリーベーシック"/>
+		<sharedfeat name="exp_default" value="fc_keyboard"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb_model" value="FB-N-128-02" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-fb1-2 a" size="16384" crc="1048e43d" sha1="d50b0352a358e73e29199b981456f33f6cc78131" offset="00000" />
 				<rom name="hvc-fb1-2 b" size="16384" crc="9fbfb6ba" sha1="39e7d7ede468036d04db0bf40f34a07c958f874a" offset="0x04000" />
@@ -11925,11 +11947,11 @@ license:CC0
 		<info name="serial" value="HVC-VT"/>
 		<info name="release" value="19850221"/>
 		<info name="alt_title" value="ファミリーベーシックV3"/>
+		<sharedfeat name="exp_default" value="fc_keyboard"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb_model" value="VT-N-256-41" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-vt-0w" size="32768" crc="3aaeed3f" sha1="dcb8e7d48afcc0f5b4b7e98874f9c79da419cf04" offset="00000" />
 			</dataarea>
@@ -12193,11 +12215,11 @@ license:CC0
 		<info name="serial" value="FT-01"/>
 		<info name="release" value="19861112"/>
 		<info name="alt_title" value="ファミリートレーナー① アスレチックワールド"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="BANDAI-CNROM" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="bandai 86 sp p" size="32768" crc="8c8fa83b" sha1="0ab64ab0a5629f60aebe7fe32910a4136e99e6b0" offset="00000" />
 			</dataarea>
@@ -12214,11 +12236,11 @@ license:CC0
 		<info name="serial" value="FT-01"/>
 		<info name="release" value="19861112"/>
 		<info name="alt_title" value="ファミリートレーナー① アスレチックワールド"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="BANDAI-CNROM" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="sp p" size="32768" crc="87738f85" sha1="5c8a3081990e6a9ef127e70e05b38c5c37cd58c6" offset="00000" />
 			</dataarea>
@@ -12235,11 +12257,11 @@ license:CC0
 		<info name="serial" value="FT-02"/>
 		<info name="release" value="19861223"/>
 		<info name="alt_title" value="ファミリートレーナー② ランニングスタジアム"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="BANDAI-CNROM" />
 			<feature name="mirroring" value="horizontal" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="runp" size="32768" crc="8a5b72c0" sha1="796122db71ecf4cc639d5c45b6b824b1f8b02957" offset="00000" />
 			</dataarea>
@@ -12256,11 +12278,11 @@ license:CC0
 		<info name="serial" value="FT-03"/>
 		<info name="release" value="19870226"/>
 		<info name="alt_title" value="ファミリートレーナー③ エアロビスタジオ"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bandai_pt554" />
 			<feature name="pcb" value="BANDAI-PT-554" />
 			<feature name="mirroring" value="horizontal" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="aerob pr" size="32768" crc="f8da2506" sha1="c14075b1b7c98b684870e8d85b7ff2b462e3cd10" offset="00000" />
 			</dataarea>
@@ -12281,11 +12303,11 @@ license:CC0
 		<info name="serial" value="FT-04"/>
 		<info name="release" value="19870528"/>
 		<info name="alt_title" value="ファミリートレーナー④ ジョギングレース"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="BANDAI-74*161/32" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="bandai87 jg pr" size="32768" crc="7e704a14" sha1="4b5af9b5622e1cec310e8cb741db642ac38126ef" offset="00000" />
 			</dataarea>
@@ -12302,11 +12324,11 @@ license:CC0
 		<info name="serial" value="FT-05"/>
 		<info name="release" value="19870731"/>
 		<info name="alt_title" value="ファミリートレーナー⑤ 迷路大作戦"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="discrete_74x161" />
 			<feature name="pcb" value="BANDAI-74*161/161/32" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="131072">
 				<rom name="ba-87 md-p" size="131072" crc="ad3df455" sha1="a8a5d1e7cc7d8a726a8edc66d947ef0de9f94ba4" offset="00000" />
 			</dataarea>
@@ -12323,11 +12345,11 @@ license:CC0
 		<info name="serial" value="FT-07"/>
 		<info name="release" value="19871127"/>
 		<info name="alt_title" value="ファミリートレーナー⑦ ファミトレ大運動会"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="BANDAI-CNROM" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="ba-87 ft7-prg" size="32768" crc="ca26a0f1" sha1="f4bcd81e2eba429e0c4bd829ba034a8f1a05ff42" offset="00000" />
 			</dataarea>
@@ -12344,11 +12366,11 @@ license:CC0
 		<info name="serial" value="FT-08"/>
 		<info name="release" value="19871201"/>
 		<info name="alt_title" value="ファミリートレーナー⑧ 突撃!風雲たけし城"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="BANDAI-CNROM" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="32768">
 				<rom name="ba-takeshi-prg" size="32768" crc="59794f2d" sha1="06f424509451b30682362b7bc6c23d02d34ee930" offset="00000" />
 			</dataarea>
@@ -12365,11 +12387,11 @@ license:CC0
 		<info name="serial" value="FT-09"/>
 		<info name="release" value="19881220"/>
 		<info name="alt_title" value="ファミリートレーナー⑨ 風雲たけし城二"/>
+		<sharedfeat name="exp_default" value="family_trainer"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="gxrom" />
 			<feature name="pcb" value="BANDAI-GNROM" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="prg" size="131072">
 				<rom name="ba-takeshi 2 pro" size="131072" crc="ee11fe78" sha1="e95b3a144d6e43f7f7d583339e1ef244f1eb08c8" offset="00000" />
 			</dataarea>
@@ -12684,7 +12706,7 @@ license:CC0
 	</software>
 
 	<software name="faxanadu">
-		<description>Faxanadu (Euro)</description>
+		<description>Faxanadu (Europe)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-FX (EEC/NOE/FRA/ESP/UKV)"/>
@@ -12745,7 +12767,7 @@ license:CC0
 	</software>
 
 	<software name="felix">
-		<description>Felix the Cat (Euro)</description>
+		<description>Felix the Cat (Europe)</description>
 		<year>1992</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NES-FC-FRA"/>
@@ -12785,7 +12807,7 @@ license:CC0
 	</software>
 
 	<software name="ferrari">
-		<description>Ferrari Grand Prix Challenge (Euro)</description>
+		<description>Ferrari Grand Prix Challenge (Europe)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-FG (AUS/NOE/FRA)"/>
@@ -12842,7 +12864,7 @@ license:CC0
 	</software>
 
 	<software name="festrqst">
-		<description>Fester's Quest (Euro)</description>
+		<description>Fester's Quest (Europe)</description>
 		<year>1990</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="NES-EQ-EEC"/>
@@ -13364,7 +13386,7 @@ license:CC0
 	</software>
 
 	<software name="flint">
-		<description>The Flintstones - The Rescue of Dino &amp; Hoppy (Euro)</description>
+		<description>The Flintstones - The Rescue of Dino &amp; Hoppy (Europe)</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="NES-5Z (SCN/ESP)"/>
@@ -13402,7 +13424,7 @@ license:CC0
 	</software>
 
 	<software name="flintsdp">
-		<description>The Flintstones - The Surprise at Dinosaur Peak! (Euro)</description>
+		<description>The Flintstones - The Surprise at Dinosaur Peak! (Europe)</description>
 		<year>1994</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="NES-FT-SCN"/>
@@ -13558,7 +13580,7 @@ license:CC0
 	</software>
 
 	<software name="f1senstn">
-		<description>Formula 1 Sensation (Euro)</description>
+		<description>Formula 1 Sensation (Europe)</description>
 		<year>1993</year>
 		<publisher>Palcom</publisher>
 		<info name="serial" value="NES-FL-NOE"/>
@@ -13603,7 +13625,7 @@ license:CC0
 	</software>
 
 	<software name="4ptennis">
-		<description>Four Players' Tennis (Euro)</description>
+		<description>Four Players' Tennis (Europe)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-74 (FRG/ESP)"/>
@@ -13862,7 +13884,7 @@ license:CC0
 	</software>
 
 	<software name="galaga">
-		<description>Galaga - Demons of Death (Euro)</description>
+		<description>Galaga - Demons of Death (Europe)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="NES-AG-EEC"/>
@@ -13928,6 +13950,23 @@ license:CC0
 		<publisher>Activision</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="NES-TKEPROM-01" />
+			<feature name="mmc3_type" value="MMC3A" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="p.u1" size="0x20000" crc="6a28dab9" sha1="cee41dfc69e3a3a296a993ebf30a6da0311ace64" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="c.u5" size="0x20000" crc="18da922d" sha1="31af2992ffefef7bfe6b9c945c74e2d0a51d096a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxy5kup1" cloneof="galaxy5k">
+		<description>Galaxy 5000 - Racing in the 51st Century (USA, prototype, earlier)</description>
+		<year>1991</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
 			<feature name="mmc3_type" value="MMC3A" />
 			<dataarea name="prg" size="131072">
@@ -13940,7 +13979,7 @@ license:CC0
 	</software>
 
 	<software name="galaxy5k">
-		<description>Galaxy 5000 - Racing in the 51st Century (Euro)</description>
+		<description>Galaxy 5000 - Racing in the 51st Century (Europe)</description>
 		<year>1992</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="NES-Y5 (ESP/NOE)"/>
@@ -14180,7 +14219,7 @@ license:CC0
 	</software>
 
 	<software name="gargoyl2">
-		<description>Gargoyle's Quest II (Euro)</description>
+		<description>Gargoyle's Quest II (Europe)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-G2-SCN"/>
@@ -14284,7 +14323,7 @@ license:CC0
 	</software>
 
 	<software name="gauntlt2">
-		<description>Gauntlet II (Euro)</description>
+		<description>Gauntlet II (Europe)</description>
 		<year>1991</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="NES-2U (EEC/NOE/SCN)"/>
@@ -14326,7 +14365,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="gegege" cloneof="ninjakid" supported="no">
+	<software name="gegege" cloneof="ninjakid">
 		<description>GeGeGe no Kitarou - Youkai Daimakyou (Japan)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
@@ -14536,7 +14575,7 @@ license:CC0
 	</software>
 
 	<software name="georgeko">
-		<description>George Foreman's KO Boxing (Euro)</description>
+		<description>George Foreman's KO Boxing (Europe)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-KB-ESP"/>
@@ -14641,7 +14680,7 @@ license:CC0
 	</software>
 
 	<software name="ghostbs2">
-		<description>Ghostbusters II (Euro)</description>
+		<description>Ghostbusters II (Europe)</description>
 		<year>1990</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="NES-VV (EEC/ITA/NOE)"/>
@@ -14687,7 +14726,7 @@ license:CC0
 	</software>
 
 	<software name="gng">
-		<description>Ghosts'n Goblins (Euro)</description>
+		<description>Ghosts'n Goblins (Europe)</description>
 		<year>1991</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-GG (FRG/EEC)"/>
@@ -14849,7 +14888,7 @@ license:CC0
 	</software>
 
 	<software name="goal">
-		<description>Goal! (Euro)</description>
+		<description>Goal! (Europe)</description>
 		<year>1991</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="NES-JG (UKV/ESP/FRA)"/>
@@ -14869,7 +14908,7 @@ license:CC0
 
 	<software name="goal2">
 		<!-- Alt. Title: Eric Cantona Football Challenge Goal! 2 (French box and label) -->
-		<description>Goal! 2 (Euro)</description>
+		<description>Goal! 2 (Europe)</description>
 		<year>1992</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="NES-GT (ESP/FRA)"/>
@@ -14946,7 +14985,7 @@ license:CC0
 	</software>
 
 	<software name="godzilla">
-		<description>Godzilla - Monster of Monsters! (Euro)</description>
+		<description>Godzilla - Monster of Monsters! (Europe)</description>
 		<year>1990</year>
 		<publisher>Toho</publisher>
 		<info name="serial" value="NES-GZ-(FRA/UKV)"/>
@@ -15024,7 +15063,7 @@ license:CC0
 	</software>
 
 	<software name="golf">
-		<description>Golf (Euro, rev. M)</description>
+		<description>Golf (Europe, rev. M)</description>
 		<year>1986</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-GF (EEC/ESP/FRA)"/>
@@ -15280,7 +15319,7 @@ license:CC0
 	</software>
 
 	<software name="goonies2">
-		<description>The Goonies II (Euro)</description>
+		<description>The Goonies II (Europe)</description>
 		<year>1988</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-GU-EEC"/>
@@ -15418,7 +15457,7 @@ license:CC0
 	</software>
 
 	<software name="gradius">
-		<description>Gradius (Euro)</description>
+		<description>Gradius (Europe)</description>
 		<year>1988</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-GR (EEC/NOE)"/>
@@ -15623,7 +15662,7 @@ license:CC0
 	</software>
 
 	<software name="gremlin2">
-		<description>Gremlins 2 - The New Batch (Euro)</description>
+		<description>Gremlins 2 - The New Batch (Europe)</description>
 		<year>1991</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="NES-2Z (EEC/FRG/ITA))"/>
@@ -15641,7 +15680,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="guardlgnu" cloneof="guardlgn" supported="no">
+<!-- intermittent major status bar flickering (DMC IRQ timing issue?) -->
+	<software name="guardlgnu" cloneof="guardlgn" supported="partial">
 		<description>The Guardian Legend (USA)</description>
 		<year>1989</year>
 		<publisher>Brøderbund</publisher>
@@ -15660,8 +15700,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="guardlgn" supported="no">
-		<description>The Guardian Legend (Euro)</description>
+<!-- intermittent major status bar flickering (DMC IRQ timing issue?) -->
+	<software name="guardlgn" supported="partial">
+		<description>The Guardian Legend (Europe)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-GD (SCN/ESP)"/>
@@ -15679,7 +15720,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="guardic" cloneof="guardlgn" supported="no">
+<!-- intermittent major status bar flickering (DMC IRQ timing issue?) -->
+	<software name="guardic" cloneof="guardlgn" supported="partial">
 		<description>Guardic Gaiden (Japan)</description>
 		<year>1987</year>
 		<publisher>Irem</publisher>
@@ -15700,7 +15742,7 @@ license:CC0
 	</software>
 
 	<software name="gwar">
-		<description>Guerrilla War (Euro)</description>
+		<description>Guerrilla War (Europe)</description>
 		<year>1989</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NES-GW-AUS"/>
@@ -15757,7 +15799,7 @@ license:CC0
 	</software>
 
 	<software name="gumshoe">
-		<description>Gumshoe (Euro, USA)</description>
+		<description>Gumshoe (Europe, USA)</description>
 		<year>1986</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-GS-USA, NES-GS-EEC"/>
@@ -15881,7 +15923,7 @@ license:CC0
 	</software>
 
 	<software name="gunsmoke">
-		<description>Gun.Smoke (Euro)</description>
+		<description>Gun.Smoke (Europe)</description>
 		<year>1989</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-GK (EEC/UKV)"/>
@@ -15920,17 +15962,17 @@ license:CC0
 	</software>
 
 	<software name="gyromite" supported="partial">
-		<description>Gyromite (Euro, USA) ~ Gyro (Japan)</description>
+		<description>Gyromite (Europe, USA) ~ Gyro (Japan)</description>
 		<year>1985</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="HVC-GY, NES-GY-USA, NES-GY-(FRA/GBR)"/>
 		<info name="release" value="19850813 (JPN), 198510xx (USA), 1985xxxx (Euro)"/>
 		<info name="alt_title" value="ジャイロ"/>
+		<sharedfeat name="special_default" value="rob"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="HVC-NROM-256" /> <!-- also found with NES-NROM-256 pcb -->
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="rob" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-gy-0 prg" size="32768" crc="21b099f3" sha1="76103abe07c1cca6fc4107e35847f4e959f5e5bb" offset="00000" />
 			</dataarea>
@@ -15981,7 +16023,7 @@ license:CC0
 	</software>
 
 	<software name="hharry">
-		<description>Hammerin' Harry (Euro)</description>
+		<description>Hammerin' Harry (Europe)</description>
 		<year>1992</year>
 		<publisher>Irem</publisher>
 		<info name="serial" value="NES-59 (ESP/FRG)"/>
@@ -16399,7 +16441,7 @@ license:CC0
 	</software>
 
 	<software name="heroqst">
-		<description>Hero Quest (Euro, prototype)</description>
+		<description>Hero Quest (Europe, prototype)</description>
 		<year>1991</year>
 		<publisher>Gremlin Interactive</publisher>
 		<part name="cart" interface="nes_cart">
@@ -16545,7 +16587,7 @@ license:CC0
 	</software>
 
 	<software name="highsped">
-		<description>High Speed (Euro)</description>
+		<description>High Speed (Europe)</description>
 		<year>1994</year>
 		<publisher>Tradewest</publisher>
 		<info name="serial" value="NES-8H (FRA/FRG)"/>
@@ -17074,7 +17116,7 @@ license:CC0
 	</software>
 
 	<software name="homea2">
-		<description>Home Alone 2 - Lost In New York (Euro)</description>
+		<description>Home Alone 2 - Lost In New York (Europe)</description>
 		<year>1992</year>
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="NES-HM-NOE"/>
@@ -17222,7 +17264,7 @@ license:CC0
 	</software>
 
 	<software name="hook">
-		<description>Hook (Euro)</description>
+		<description>Hook (Europe)</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="NES-7Q-(NOE/UKV/ESP)"/>
@@ -17259,7 +17301,7 @@ license:CC0
 	</software>
 
 	<software name="hoops">
-		<description>Hoops (Euro)</description>
+		<description>Hoops (Europe)</description>
 		<year>1989</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="NES-2B-AUS"/>
@@ -17291,6 +17333,23 @@ license:CC0
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-2b-0 chr" size="131072" crc="4ba913d0" sha1="2724a1eed2a995337e974e40d7b140795df0ea7c" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hoopsup" cloneof="hoops">
+		<description>Hoops (USA, prototype)</description>
+		<year>1989</year>
+		<publisher>Jaleco</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb_model" value="NES-SKEPROM-01" />
+			<feature name="mmc1_type" value="MMC1A" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="hoops p.ic1" size="0x20000" crc="514b8c43" sha1="ea87587491a18fdb3b4a2f91b7aa733ea17ff11c" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="hoops c.ic3" size="0x20000" crc="0ea4d276" sha1="13866ec46255892f01d2c14a7b0e576c0a601331" />
 			</dataarea>
 		</part>
 	</software>
@@ -17423,7 +17482,7 @@ license:CC0
 	</software>
 
 	<software name="hudsonh">
-		<description>Hudson Hawk (Euro)</description>
+		<description>Hudson Hawk (Europe)</description>
 		<year>1991</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="NES-Y4 (FRA/ESP)"/>
@@ -17441,7 +17500,7 @@ license:CC0
 	</software>
 
 	<software name="huntred">
-		<description>The Hunt For Red October (Euro)</description>
+		<description>The Hunt For Red October (Europe)</description>
 		<year>1991</year>
 		<publisher>Hi Tech Expressions</publisher>
 		<info name="serial" value="NES-7H (FRA/FRG)"/>
@@ -17712,7 +17771,7 @@ license:CC0
 	</software>
 
 	<software name="iceclimb">
-		<description>Ice Climber (Euro, USA, Kor)</description>
+		<description>Ice Climber (Europe, USA, Korea)</description>
 		<year>1985</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-IC-USA"/>
@@ -17761,7 +17820,7 @@ license:CC0
 	</software>
 
 	<software name="icehocky">
-		<description>Ice Hockey (Euro)</description>
+		<description>Ice Hockey (Europe)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-HY (EEC/ESP)"/>
@@ -17971,7 +18030,7 @@ license:CC0
 	</software>
 
 	<software name="ikari">
-		<description>Ikari Warriors (Euro)</description>
+		<description>Ikari Warriors (Europe)</description>
 		<year>1989</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NES-IW-EEC"/>
@@ -18192,7 +18251,7 @@ license:CC0
 	</software>
 
 	<software name="crashdum">
-		<description>The Incredible Crash Dummies (Euro)</description>
+		<description>The Incredible Crash Dummies (Europe)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="NES-CQ (NOE/SCN)"/>
@@ -18322,7 +18381,7 @@ license:CC0
 	</software>
 
 	<software name="indycrus">
-		<description>Indiana Jones and the Last Crusade (Euro)</description>
+		<description>Indiana Jones and the Last Crusade (Europe)</description>
 		<year>1993</year>
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="NES-LR-FRA"/>
@@ -18439,7 +18498,7 @@ license:CC0
 	</software>
 
 	<software name="irontank">
-		<description>Iron Tank - The Invasion of Normandy (Euro)</description>
+		<description>Iron Tank - The Invasion of Normandy (Europe)</description>
 		<year>1988</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NES-IT-AUS"/>
@@ -18475,6 +18534,23 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="irontankup" cloneof="irontank">
+		<description>Iron Tank - The Invasion of Normandy (USA, prototype)</description>
+		<year>1988</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb_model" value="HVC-SKEPROM-01" />
+			<feature name="mmc1_type" value="MMC1A" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="2 a7004 usa.prg" size="0x20000" crc="e767160a" sha1="296f56202a898126f018fc2fa18353834c4b0650" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="1 a7004 usa.chr" size="0x20000" crc="c2551ea2" sha1="719ca2a44a3ddd300e385aa30cc759d53d06a960" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ironswrdu" cloneof="ironswrd">
 		<description>IronSword - Wizards &amp; Warriors II (USA)</description>
 		<year>1989</year>
@@ -18501,7 +18577,7 @@ license:CC0
 	</software>
 
 	<software name="ironswrd">
-		<description>IronSword - Wizards &amp; Warriors II (Euro)</description>
+		<description>IronSword - Wizards &amp; Warriors II (Europe)</description>
 		<year>1990</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-IR (EEC/FRG/ESP"/>
@@ -18597,7 +18673,7 @@ license:CC0
 	</software>
 
 	<software name="isolatwr">
-		<description>Isolated Warrior (Euro)</description>
+		<description>Isolated Warrior (Europe)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-W6 (ESP/UKV)"/>
@@ -18704,7 +18780,7 @@ license:CC0
 	</software>
 
 	<software name="nicklaus">
-		<description>Jack Nicklaus' Greatest 18 Holes of Major Championship Golf (Euro)</description>
+		<description>Jack Nicklaus' Greatest 18 Holes of Major Championship Golf (Europe)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-JC-EEC"/>
@@ -18781,7 +18857,7 @@ license:CC0
 	</software>
 
 	<software name="jchan">
-		<description>Jackie Chan's Action Kung-Fu (Euro)</description>
+		<description>Jackie Chan's Action Kung-Fu (Europe)</description>
 		<year>1991</year>
 		<publisher>Hudson Soft</publisher>
 		<info name="serial" value="NES-V5 (ESP/UKV)"/>
@@ -18862,7 +18938,7 @@ license:CC0
 	</software>
 
 	<software name="jbjr">
-		<description>James Bond Jr (Euro)</description>
+		<description>James Bond Jr (Europe)</description>
 		<year>1992</year>
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="NES-JB-(NOE/UKV)"/>
@@ -19042,7 +19118,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="jesus" supported="no">
+	<software name="jesus">
 		<description>Jesus - Kyoufu no Bio Monster (Japan)</description>
 		<year>1989</year>
 		<publisher>King Records</publisher>
@@ -19082,7 +19158,7 @@ license:CC0
 	</software>
 
 	<software name="jetsons">
-		<description>The Jetsons - Cogswell's Caper! (Euro)</description>
+		<description>The Jetsons - Cogswell's Caper! (Europe)</description>
 		<year>1993</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="NES-JN (FRG/SCN)"/>
@@ -19160,7 +19236,7 @@ license:CC0
 	</software>
 
 	<software name="connors">
-		<description>Jimmy Connors Tennis (Euro)</description>
+		<description>Jimmy Connors Tennis (Europe)</description>
 		<year>1993</year>
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="NES-JT-UKV"/>
@@ -19198,7 +19274,7 @@ license:CC0
 	</software>
 
 	<software name="joemac">
-		<description>Joe &amp; Mac - Caveman Ninja (Euro)</description>
+		<description>Joe &amp; Mac - Caveman Ninja (Europe)</description>
 		<year>1992</year>
 		<publisher>Data East</publisher>
 		<info name="serial" value="NES-CJ (FRG/ESP/SCN/UKV))"/>
@@ -19311,7 +19387,7 @@ license:CC0
 	</software>
 
 	<software name="silius">
-		<description>Journey to Silius (Euro)</description>
+		<description>Journey to Silius (Europe)</description>
 		<year>1991</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="NES-4S-EEC"/>
@@ -19457,7 +19533,7 @@ license:CC0
 	</software>
 
 	<software name="jungle">
-		<description>Disney's The Jungle Book (Euro)</description>
+		<description>Disney's The Jungle Book (Europe)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="NES-JJ (SCN/NOE)"/>
@@ -19499,7 +19575,7 @@ license:CC0
 	</software>
 
 	<software name="jpark">
-		<description>Jurassic Park (Euro)</description>
+		<description>Jurassic Park (Europe)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="NES-J9-SCN"/>
@@ -19613,7 +19689,7 @@ license:CC0
 	</software>
 
 	<software name="kabuki">
-		<description>Kabuki - Quantum Fighter (Euro)</description>
+		<description>Kabuki - Quantum Fighter (Europe)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-3K (NOE/SCN/ESP)"/>
@@ -20187,7 +20263,7 @@ license:CC0
 
 <!-- glitches on NTSC -->
 	<software name="kickoff">
-		<description>Kick Off (Euro)</description>
+		<description>Kick Off (Europe)</description>
 		<year>1992</year>
 		<publisher>Imagineering</publisher>
 		<info name="serial" value="NES-54 (SCN/ESP/UKV)"/>
@@ -20206,7 +20282,7 @@ license:CC0
 	</software>
 
 	<software name="kickle">
-		<description>Kickle Cubicle (Euro)</description>
+		<description>Kickle Cubicle (Europe)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-QC-(NOE/UKV)"/>
@@ -20243,7 +20319,7 @@ license:CC0
 	</software>
 
 	<software name="kidicars1" cloneof="kidicars">
-		<description>Kid Icarus (Euro, USA)</description>
+		<description>Kid Icarus (Europe, USA)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-KI-(USA/CAN), NES-KI-EEC"/>
@@ -20265,7 +20341,7 @@ license:CC0
 	</software>
 
 	<software name="kidicars">
-		<description>Kid Icarus (Euro, rev. A)</description>
+		<description>Kid Icarus (Europe, rev. A)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-KI(EEC/ESP)"/>
@@ -20767,7 +20843,7 @@ license:CC0
 	</software>
 
 	<software name="kirby">
-		<description>Kirby's Adventure (Euro)</description>
+		<description>Kirby's Adventure (Europe)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-KR-SCN"/>
@@ -20905,7 +20981,7 @@ license:CC0
 	</software>
 
 	<software name="knightr">
-		<description>Knight Rider (Euro)</description>
+		<description>Knight Rider (Europe)</description>
 		<year>1990</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-NR-EEC"/>
@@ -20924,7 +21000,7 @@ license:CC0
 	</software>
 
 	<software name="hyprsocr">
-		<description>Konami Hyper Soccer (Euro)</description>
+		<description>Konami Hyper Soccer (Europe)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-86 (NOE/ESP/FRA)"/>
@@ -21071,7 +21147,7 @@ license:CC0
 	</software>
 
 	<software name="krustyfh">
-		<description>Krusty's Fun House (Euro)</description>
+		<description>Krusty's Fun House (Europe)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-KF-AUS"/>
@@ -21172,7 +21248,7 @@ license:CC0
 	</software>
 
 	<software name="kungfu">
-		<description>Kung Fu (Euro)</description>
+		<description>Kung Fu (Europe)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-SX (EEC/ESP/NOE/GBR/UKV)"/>
@@ -21727,7 +21803,7 @@ license:CC0
 	</software>
 
 	<software name="leetrevn">
-		<description>Lee Trevino's Fighting Golf (Euro)</description>
+		<description>Lee Trevino's Fighting Golf (Europe)</description>
 		<year>1990</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NES-FI-EEC"/>
@@ -21784,7 +21860,7 @@ license:CC0
 	</software>
 
 	<software name="valiant">
-		<description>The Legend of Prince Valiant (Euro)</description>
+		<description>The Legend of Prince Valiant (Europe)</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="NES-PX (FRA/ESP)"/>
@@ -21849,7 +21925,7 @@ license:CC0
 	</software>
 
 	<software name="zeldaa" cloneof="zelda">
-		<description>The Legend of Zelda (Euro)</description>
+		<description>The Legend of Zelda (Europe)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-ZL-EEC"/>
@@ -21872,7 +21948,7 @@ license:CC0
 	</software>
 
 	<software name="zelda">
-		<description>The Legend of Zelda (Euro, rev. A)</description>
+		<description>The Legend of Zelda (Europe, rev. A)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-ZL (EEC/FRG/ESP/FRA)"/>
@@ -21982,7 +22058,7 @@ license:CC0
 	</software>
 
 	<software name="lemmings">
-		<description>Lemmings (Euro)</description>
+		<description>Lemmings (Europe)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="NES-LG (SCN/ESP)"/>
@@ -22020,7 +22096,7 @@ license:CC0
 	</software>
 
 	<software name="lweapon">
-		<description>Lethal Weapon (Euro)</description>
+		<description>Lethal Weapon (Europe)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="NES-LY-FRA"/>
@@ -22058,7 +22134,7 @@ license:CC0
 	</software>
 
 	<software name="salamand">
-		<description>Life Force Salamander (Euro)</description>
+		<description>Life Force Salamander (Europe)</description>
 		<year>1989</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-LF (EEC/ESP)"/>
@@ -22096,7 +22172,7 @@ license:CC0
 
 <!-- glitches on NTSC -->
 	<software name="lionking">
-		<description>Disney's The Lion King (Euro)</description>
+		<description>Disney's The Lion King (Europe)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="NES-KL (SCN/NOE/ITA/ESP)"/>
@@ -22223,7 +22299,7 @@ license:CC0
 	</software>
 
 	<software name="nemo">
-		<description>Little Nemo - The Dream Master (Euro)</description>
+		<description>Little Nemo - The Dream Master (Europe)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-LN (NOE/SCN/ESP)"/>
@@ -22261,7 +22337,7 @@ license:CC0
 	</software>
 
 	<software name="lilninjb">
-		<description>Little Ninja Brothers (Euro)</description>
+		<description>Little Ninja Brothers (Europe)</description>
 		<year>1992</year>
 		<publisher>Culture Brain</publisher>
 		<info name="serial" value="NES-C2-FRG"/>
@@ -22299,7 +22375,7 @@ license:CC0
 	</software>
 
 	<software name="lilsamsn">
-		<description>Little Samson (Euro)</description>
+		<description>Little Samson (Europe)</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="NES-LT (SCN/ESP)"/>
@@ -22476,7 +22552,7 @@ license:CC0
 	</software>
 
 	<software name="lowgman">
-		<description>Low G Man - The Low Gravity Man (Euro)</description>
+		<description>Low G Man - The Low Gravity Man (Europe)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-L7-ESP"/>
@@ -22515,7 +22591,7 @@ license:CC0
 	</software>
 
 	<software name="lunarpol">
-		<description>Lunar Pool (Euro)</description>
+		<description>Lunar Pool (Europe)</description>
 		<year>1991</year>
 		<publisher>FCI</publisher>
 		<info name="serial" value="NES-LP-(FRA/UKV)"/>
@@ -22716,7 +22792,7 @@ license:CC0
 
 <!-- glitches on NTSC -->
 	<software name="machridr">
-		<description>Mach Rider (Euro)</description>
+		<description>Mach Rider (Europe)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-MR (GBR/EEC)"/>
@@ -23145,7 +23221,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mjtaikai" supported="no">
+	<software name="mjtaikai">
 		<description>Mahjong Taikai (Japan)</description>
 		<year>1989</year>
 		<publisher>Koei</publisher>
@@ -23606,7 +23682,7 @@ license:CC0
 	</software>
 
 	<software name="marble">
-		<description>Marble Madness (Euro)</description>
+		<description>Marble Madness (Europe)</description>
 		<year>1991</year>
 		<publisher>Milton Bradley</publisher>
 		<info name="serial" value="NES-MV-NOE"/>
@@ -23624,7 +23700,7 @@ license:CC0
 	</software>
 
 	<software name="marioyos" supported="partial">
-		<description>Mario &amp; Yoshi (Euro)</description>
+		<description>Mario &amp; Yoshi (Europe)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-YM (NOE/SCN)"/>
@@ -23664,7 +23740,7 @@ license:CC0
 	</software>
 
 	<software name="mario">
-		<description>Mario Bros. (Euro, rev. A)</description>
+		<description>Mario Bros. (Europe, rev. A)</description>
 		<year>1986</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-MA (EEC/FRG)"/>
@@ -23684,7 +23760,7 @@ license:CC0
 	</software>
 
 	<software name="mariocs">
-		<description>Mario Bros. (Classic Series) (Euro)</description>
+		<description>Mario Bros. (Classic Series) (Europe)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-MC-NOE"/>
@@ -23914,7 +23990,7 @@ license:CC0
 	</software>
 
 	<software name="mckids">
-		<description>M.C. Kids (Euro)</description>
+		<description>M.C. Kids (Europe)</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="NES-4Q-SCN"/>
@@ -23976,7 +24052,7 @@ license:CC0
 	</software>
 
 	<software name="megaman">
-		<description>Mega Man (Euro)</description>
+		<description>Mega Man (Europe)</description>
 		<year>1989</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-MN (EEC/FRG)"/>
@@ -24020,7 +24096,7 @@ license:CC0
 	</software>
 
 	<software name="megaman2">
-		<description>Mega Man 2 (Euro)</description>
+		<description>Mega Man 2 (Europe)</description>
 		<year>1990</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-XR (EEC/FRG/NOE)"/>
@@ -24082,7 +24158,7 @@ license:CC0
 	</software>
 
 	<software name="megaman3">
-		<description>Mega Man 3 (Euro, rev. A)</description>
+		<description>Mega Man 3 (Europe, rev. A)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-XU-FRA"/>
@@ -24101,7 +24177,7 @@ license:CC0
 	</software>
 
 	<software name="megaman3a" cloneof="megaman3">
-		<description>Mega Man 3 (Euro)</description>
+		<description>Mega Man 3 (Europe)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-XU (FRG/SCN/ESP)"/>
@@ -24164,7 +24240,7 @@ license:CC0
 	</software>
 
 	<software name="megaman4">
-		<description>Mega Man 4 (Euro)</description>
+		<description>Mega Man 4 (Europe)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-4V (FRG/SCN)"/>
@@ -24202,7 +24278,7 @@ license:CC0
 	</software>
 
 	<software name="megaman5">
-		<description>Mega Man 5 (Euro)</description>
+		<description>Mega Man 5 (Europe)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-MZ (FRA/NOE/SCN)"/>
@@ -24406,7 +24482,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mendel" supported="no">
+	<software name="mendel">
 		<description>Mendel Palace (USA)</description>
 		<year>1990</year>
 		<publisher>Hudson Soft</publisher>
@@ -24501,7 +24577,7 @@ license:CC0
 	</software>
 
 	<software name="mgear">
-		<description>Metal Gear (Euro)</description>
+		<description>Metal Gear (Europe)</description>
 		<year>1989</year>
 		<publisher>Palcom</publisher>
 		<info name="serial" value="NES-ME-EEC"/>
@@ -24650,7 +24726,7 @@ license:CC0
 	</software>
 
 	<software name="metroid">
-		<description>Metroid (Euro)</description>
+		<description>Metroid (Europe)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-MT (EEC/ESP)"/>
@@ -24729,6 +24805,94 @@ license:CC0
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-w4-0 chr" size="131072" crc="45784a2c" sha1="1aa46bb47d15d2b4ccaaa3af7eb6ebc875f3e21f" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- These five prototypes were development builds found in zip files -->
+	<software name="mickmack">
+		<!-- Build date: 9 July 1993 11:32:06 -->
+		<description>Mick &amp; Mack as the Global Gladiators (prototype, 19930709)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="global.bin" size="0x20000" crc="38960ce6" sha1="973ecc6714098115719235e68f4bd5d49710f7d6" />
+				<!-- "Fixed" ROM had this change. Changes an IRQ disable to a bank select. Needed? -->
+				<!-- <rom value="0x80" size="1" offset="0x1e028" loadflag="fill" /> -->
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="char.bin" size="0x1e400" crc="e708cfcf" sha1="4267be581c9aa147024eea020736aa0435df9e5f" />
+				<rom value="0x00" size="0x1c00" offset="0x1e400" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickmack1" cloneof="mickmack">
+		<!-- Build date: 30 June 1993 14:11:52 -->
+		<description>Mick &amp; Mack as the Global Gladiators (prototype, 19930630)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="global.bin" size="0x20000" crc="38593a7d" sha1="9f0dde1399073f4d66496308bfa32c2193cce138" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="char.bin" size="0x1e400" crc="e708cfcf" sha1="4267be581c9aa147024eea020736aa0435df9e5f" />
+				<rom value="0x00" size="0x1c00" offset="0x1e400" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickmack2" cloneof="mickmack">
+		<!-- Build date: 16 June 1993 16:27:08 -->
+		<description>Mick &amp; Mack as the Global Gladiators (prototype, 19930616)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="global.bin" size="0x20000" crc="363cf68f" sha1="0b6a02662893618197f14ed97660074073915363" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="char.bin" size="0x16400" crc="0f6b18b5" sha1="a41ae5747c149e91b92889f7f3338eef07a6d7bb" />
+				<rom value="0x00" size="0x9c00" offset="0x16400" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickmack3" cloneof="mickmack">
+		<!-- Build date: 28 May 1993 18:16:30 -->
+		<description>Mick &amp; Mack as the Global Gladiators (prototype, 19930528)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="global.bin" size="0x20000" crc="dd4ca37f" sha1="ad6c20f26781a5d804a82b8b19eef5c2f5feba0f" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="char.bin" size="0x15800" crc="5df34bc5" sha1="a7fb017a86143aaabb9e8162f0d3d4406fdee7a4" />
+				<rom value="0x00" size="0xa800" offset="0x15800" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickmack4" cloneof="mickmack">
+		<!-- Build date: 28 May 1993 19:18:24 -->
+		<description>Mick &amp; Mack as the Global Gladiators (prototype, 19930528, alt)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="global.bin" size="0x20000" crc="251b679f" sha1="6354c17c54e76daee57748a325650e0439fb4ca7" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="char.bin" size="0x15800" crc="5df34bc5" sha1="a7fb017a86143aaabb9e8162f0d3d4406fdee7a4" />
+				<rom value="0x00" size="0xa800" offset="0x15800" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -24833,7 +24997,7 @@ license:CC0
 	</software>
 
 	<software name="micromac">
-		<description>Micro Machines (Euro)</description>
+		<description>Micro Machines (Europe)</description>
 		<year>1992</year>
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="COBIC-7403-MM"/>
@@ -24962,7 +25126,7 @@ license:CC0
 
 <!-- UNF file by Kevin Horton has a 16kb CHR (crc32 613c45a3)!!... check -->
 	<software name="mightybj">
-		<description>Mighty Bomb Jack (Euro)</description>
+		<description>Mighty Bomb Jack (Europe)</description>
 		<year>1992</year>
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="NES-BJ-ESP"/>
@@ -25020,7 +25184,7 @@ license:CC0
 	</software>
 
 	<software name="mffight">
-		<description>Mighty Final Fight (Euro)</description>
+		<description>Mighty Final Fight (Europe)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-MF-NOE"/>
@@ -25075,7 +25239,7 @@ license:CC0
 	</software>
 
 	<software name="tysonpo1" cloneof="tysonpo">
-		<description>Mike Tyson's Punch-Out!! (Euro)</description>
+		<description>Mike Tyson's Punch-Out!! (Europe)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-PT (EEC/ESP/GBR)"/>
@@ -25093,7 +25257,7 @@ license:CC0
 	</software>
 
 	<software name="tysonpo">
-		<description>Mike Tyson's Punch-Out!! (Euro, rev. A)</description>
+		<description>Mike Tyson's Punch-Out!! (Europe, rev. A)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-PT-(EEC/FRA)"/>
@@ -25391,7 +25555,7 @@ license:CC0
 	</software>
 
 	<software name="missimp">
-		<description>Mission: Impossible (Euro)</description>
+		<description>Mission: Impossible (Europe)</description>
 		<year>1991</year>
 		<publisher>Palcom</publisher>
 		<info name="serial" value="NES-U4 (SCN/NOE)"/>
@@ -25871,7 +26035,7 @@ license:CC0
 	</software>
 
 	<software name="monstpok">
-		<description>Monster In My Pocket (Euro)</description>
+		<description>Monster In My Pocket (Europe)</description>
 		<year>1992</year>
 		<publisher>Palcom</publisher>
 		<info name="serial" value="NES-1Y-(NOE/UKV)"/>
@@ -26106,7 +26270,7 @@ license:CC0
 
 <!-- a proto has been found too, containing the same data, without labels -->
 	<software name="gimmick">
-		<description>Mr. Gimmick (Euro)</description>
+		<description>Mr. Gimmick (Europe)</description>
 		<year>1993</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="NES-G8-SCN"/>
@@ -26223,7 +26387,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mutantv" supported="no">
+	<software name="mutantv">
 		<description>The Mutant Virus (USA)</description>
 		<year>1992</year>
 		<publisher>American Softworks</publisher>
@@ -26352,7 +26516,7 @@ license:CC0
 	</software>
 
 	<software name="nesgolf">
-		<description>NES Open Tournament Golf (Euro)</description>
+		<description>NES Open Tournament Golf (Europe)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-UG (NOE/SCN)"/>
@@ -26736,7 +26900,7 @@ license:CC0
 	</software>
 
 	<software name="nghostb2">
-		<description>New Ghostbusters II (Euro)</description>
+		<description>New Ghostbusters II (Europe)</description>
 		<year>1990</year>
 		<publisher>HAL Laboratory</publisher>
 		<info name="serial" value="NES-QD (AUS/FRA)"/>
@@ -26794,7 +26958,7 @@ license:CC0
 	</software>
 
 	<software name="tnzs">
-		<description>The New Zealand Story (Euro)</description>
+		<description>The New Zealand Story (Europe)</description>
 		<year>1991</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="NES-38-ESP"/>
@@ -26857,7 +27021,7 @@ license:CC0
 	</software>
 
 	<software name="mansell">
-		<description>Nigel Mansell's World Championship Racing (Euro)</description>
+		<description>Nigel Mansell's World Championship Racing (Europe)</description>
 		<year>1993</year>
 		<publisher>Gremlin</publisher>
 		<info name="serial" value="NES-NC-NOE"/>
@@ -27093,8 +27257,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Missing sprites -->
-	<software name="ninjajag" cloneof="squashed" supported="no">
+	<software name="ninjajag" cloneof="squashed">
 		<description>Ninja Jajamaru - Ginga Daisakusen (Japan)</description>
 		<year>1991</year>
 		<publisher>Jaleco</publisher>
@@ -27113,7 +27276,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ninjakid" supported="no">
+	<software name="ninjakid">
 		<description>Ninja Kid (USA)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
@@ -27152,6 +27315,7 @@ license:CC0
 		</part>
 	</software>
 
+<!-- Unlike the other clones this plays the entire intro song to a black screen THEN plays the intro story scenes sans music -->
 	<software name="nryuken2" cloneof="shadwar2" supported="partial">
 		<description>Ninja Ryukenden II - Ankoku no Jashinken (Japan)</description>
 		<year>1990</year>
@@ -27282,7 +27446,7 @@ license:CC0
 	</software>
 
 	<software name="nintenwca" cloneof="nintenwc">
-		<description>Nintendo World Cup (Euro, rev. A)</description>
+		<description>Nintendo World Cup (Europe, rev. A)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-XZ (NOE)"/>
@@ -27301,7 +27465,7 @@ license:CC0
 	</software>
 
 	<software name="nintenwcb" cloneof="nintenwc">
-		<description>Nintendo World Cup (Euro)</description>
+		<description>Nintendo World Cup (Europe)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-XZ (FRA/NOE/SCN)"/>
@@ -27382,7 +27546,7 @@ license:CC0
 
 <!-- a proto has been found too, containing the same data, with labels "RP100 P" and "RP100 C" -->
 	<software name="noah">
-		<description>Noah's Ark (Euro)</description>
+		<description>Noah's Ark (Europe)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-NH-NOE"/>
@@ -27562,7 +27726,7 @@ license:CC0
 	</software>
 
 	<software name="northns">
-		<description>North &amp; South (Euro)</description>
+		<description>North &amp; South (Europe)</description>
 		<year>1992</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="NES-N5 (SCN/ESP)"/>
@@ -27828,7 +27992,7 @@ license:CC0
 	</software>
 
 	<software name="opwolf" supported="partial">
-		<description>Operation Wolf - Take no Prisoners (Euro)</description>
+		<description>Operation Wolf - Take no Prisoners (Europe)</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="NES-OW (AUS/ESP/UKV)"/>
@@ -27952,7 +28116,7 @@ license:CC0
 	</software>
 
 	<software name="overhorz">
-		<description>Over Horizon (Euro)</description>
+		<description>Over Horizon (Europe)</description>
 		<year>1992</year>
 		<publisher>Takara</publisher>
 		<info name="serial" value="NES-Z6-NOE"/>
@@ -28034,7 +28198,7 @@ license:CC0
 	</software>
 
 	<software name="pow">
-		<description>P.O.W. - Prisoners of War (Euro)</description>
+		<description>P.O.W. - Prisoners of War (Europe)</description>
 		<year>1991</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NES-EW (ESP/ITA)"/>
@@ -28526,7 +28690,7 @@ license:CC0
 	</software>
 
 	<software name="panicrst">
-		<description>Panic Restaurant (Euro)</description>
+		<description>Panic Restaurant (Europe)</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="NES-PR (NOE/ESP)"/>
@@ -28584,7 +28748,7 @@ license:CC0
 	</software>
 
 	<software name="paperboy">
-		<description>Paperboy (Euro)</description>
+		<description>Paperboy (Europe)</description>
 		<year>1990</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="NES-PY (EEC/FRG/SCN)"/>
@@ -28622,7 +28786,7 @@ license:CC0
 	</software>
 
 	<software name="paperbo2">
-		<description>Paperboy 2 (Euro)</description>
+		<description>Paperboy 2 (Europe)</description>
 		<year>1992</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="NES-Y7 (NOE/ESP)"/>
@@ -28661,7 +28825,7 @@ license:CC0
 	</software>
 
 	<software name="parasolp" cloneof="parasol">
-		<description>Parasol Stars - The Story of Bubble Bobble III (Euro, prototype)</description>
+		<description>Parasol Stars - The Story of Bubble Bobble III (Europe, prototype)</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="nes_cart">
@@ -28698,7 +28862,7 @@ license:CC0
 	</software>
 
 	<software name="parodius">
-		<description>Parodius (Euro)</description>
+		<description>Parodius (Europe)</description>
 		<year>1992</year>
 		<publisher>Palcom</publisher>
 		<info name="serial" value="NES-PV-NOE"/>
@@ -28858,7 +29022,7 @@ license:CC0
 	</software>
 
 	<software name="phantom">
-		<description>Phantom Air Mission (Euro)</description>
+		<description>Phantom Air Mission (Europe)</description>
 		<year>1992?</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="NES-PH-ESP"/>
@@ -28918,7 +29082,7 @@ license:CC0
 
 <!-- Glitched in NTSC -->
 	<software name="pinbot">
-		<description>Pin-Bot (Euro)</description>
+		<description>Pin-Bot (Europe)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-IO (EEC/NOE/FRA/ESP)"/>
@@ -28988,7 +29152,7 @@ license:CC0
 	</software>
 
 	<software name="pinball">
-		<description>Pinball (Euro, rev. A)</description>
+		<description>Pinball (Europe, rev. A)</description>
 		<year>1986</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-PN-(EEC/NOE/ESP)"/>
@@ -29335,8 +29499,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Game has no sound and freezes when you dial a phone number -->
-	<software name="portopia" supported="no">
+	<software name="portopia">
 		<description>Portopia Renzoku Satsujin Jiken (Japan)</description>
 		<year>1985</year>
 		<publisher>Enix</publisher>
@@ -29376,7 +29539,7 @@ license:CC0
 	</software>
 
 	<software name="powblade">
-		<description>Power Blade (Euro)</description>
+		<description>Power Blade (Europe)</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="NES-7T (FRG/SCN)"/>
@@ -29535,7 +29698,7 @@ license:CC0
 	</software>
 
 	<software name="ppersia">
-		<description>Prince of Persia (Euro)</description>
+		<description>Prince of Persia (Europe)</description>
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="NES-PA-SCN"/>
@@ -29705,7 +29868,7 @@ license:CC0
 	</software>
 
 	<software name="prowres">
-		<description>Pro Wrestling (Euro)</description>
+		<description>Pro Wrestling (Europe)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-PW (EEC/FRA/ESP)"/>
@@ -29808,7 +29971,7 @@ license:CC0
 	</software>
 
 	<software name="probot">
-		<description>Probotector (Euro)</description>
+		<description>Probotector (Europe)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-77 (EEC/FRG)"/>
@@ -29827,7 +29990,7 @@ license:CC0
 	</software>
 
 	<software name="probot2">
-		<description>Probotector II - Return of the Evil Forces (Euro)</description>
+		<description>Probotector II - Return of the Evil Forces (Europe)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-PD-NOE"/>
@@ -29862,7 +30025,7 @@ license:CC0
 	</software>
 
 	<software name="punchout">
-		<description>Punch-Out!! (Euro)</description>
+		<description>Punch-Out!! (Europe)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-QP-(EEC/ESP/UKV)"/>
@@ -29993,7 +30156,7 @@ license:CC0
 	</software>
 
 	<software name="puzznic">
-		<description>Puzznic (Euro)</description>
+		<description>Puzznic (Europe)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="NES-ZP (EEC/NOE)"/>
@@ -30068,7 +30231,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="qix" supported="no">
+	<software name="qix">
 		<description>Qix (USA)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
@@ -30186,7 +30349,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="quinty" cloneof="mendel" supported="no">
+	<software name="quinty" cloneof="mendel">
 		<description>Quinty (Japan)</description>
 		<year>1989</year>
 		<publisher>Namcot</publisher>
@@ -30260,6 +30423,22 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="rbibb2p" cloneof="rbibb2">
+		<description>R.B.I. Baseball 2 (USA, prototype, 19900307)</description>
+		<year>1990</year>
+		<publisher>Tengen</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="tengen_800032" />
+			<feature name="pcb" value="TENGEN-800032" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="rbi 2 nes prg 3-7 053c.prg" size="0x20000" crc="5e36afda" sha1="3dce69df6bfcbddb28b7e1ef94f4116d84482d1c" />
+			</dataarea>
+			<dataarea name="chr" size="0x10000">
+				<rom name="rbi 2 nes chr 2-28 1c8f.chr" size="0x10000" crc="8585d41c" sha1="22e01150578fff75f71697d3b29d43b0c68e1975" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rbibb3">
 		<description>R.B.I. Baseball 3 (USA)</description>
 		<year>1991</year>
@@ -30323,7 +30502,7 @@ license:CC0
 	</software>
 
 	<software name="rcproama" cloneof="rcproam">
-		<description>R.C. Pro-Am (Euro)</description>
+		<description>R.C. Pro-Am (Europe)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-PM-EEC"/>
@@ -30342,7 +30521,7 @@ license:CC0
 	</software>
 
 	<software name="rcproam">
-		<description>R.C. Pro-Am (Euro, rev. A)</description>
+		<description>R.C. Pro-Am (Europe, rev. A)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-PM-ESP"/>
@@ -30381,7 +30560,7 @@ license:CC0
 	</software>
 
 	<software name="rcproam2">
-		<description>R.C. Pro-Am II (Euro)</description>
+		<description>R.C. Pro-Am II (Europe)</description>
 		<year>1993</year>
 		<publisher>Tradewest</publisher>
 		<info name="serial" value="NES-R2-SCN"/>
@@ -30561,7 +30740,7 @@ license:CC0
 	</software>
 
 	<software name="racketat">
-		<description>Racket Attack (Euro)</description>
+		<description>Racket Attack (Europe)</description>
 		<year>1994</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="NES-RE-ESP"/>
@@ -30600,7 +30779,7 @@ license:CC0
 	</software>
 
 	<software name="radracer" supported="partial">
-		<description>Rad Racer (Euro)</description>
+		<description>Rad Racer (Europe)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-RC (EEC/NOE/ESP)"/>
@@ -30804,7 +30983,7 @@ license:CC0
 	</software>
 
 	<software name="rbisland">
-		<description>Rainbow Islands - The Story of Bubble Bobble 2 (Euro)</description>
+		<description>Rainbow Islands - The Story of Bubble Bobble 2 (Europe)</description>
 		<year>1991</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="NES-64-(ESP/UKV)"/>
@@ -30836,6 +31015,23 @@ license:CC0
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rallybikp" cloneof="rallybik">
+		<description>Rally Bike (USA, prototype, 19900226)</description>
+		<year>1990</year>
+		<publisher>Romstar</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb_model" value="NES-UNEPROM-01" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="rally bike death 2-26-90.prg" size="0x20000" crc="f43be259" sha1="22d4cca9d826d62731026448a41dde61b6766c23" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="0x2000">
 			</dataarea>
 		</part>
 	</software>
@@ -30918,7 +31114,7 @@ license:CC0
 	</software>
 
 	<software name="rampart">
-		<description>Rampart (Euro)</description>
+		<description>Rampart (Europe)</description>
 		<year>1992</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="NES-73-NOE"/>
@@ -31089,7 +31285,7 @@ license:CC0
 	</software>
 
 	<software name="rescue">
-		<description>Rescue - The Embassy Mission (Euro)</description>
+		<description>Rescue - The Embassy Mission (Europe)</description>
 		<year>1991</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="NES-HZ-EEC"/>
@@ -31187,7 +31383,7 @@ license:CC0
 	</software>
 
 	<software name="roadfght">
-		<description>Road Fighter (Euro)</description>
+		<description>Road Fighter (Europe)</description>
 		<year>1992</year>
 		<publisher>Palcom</publisher>
 		<info name="serial" value="NES-39 (NOE/SCN/AUS/ESP)"/>
@@ -31224,7 +31420,7 @@ license:CC0
 	</software>
 
 	<software name="roadblst">
-		<description>RoadBlasters (Euro)</description>
+		<description>RoadBlasters (Europe)</description>
 		<year>1990</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="NES-VE-NOE"/>
@@ -31319,7 +31515,7 @@ license:CC0
 	</software>
 
 	<software name="robinh">
-		<description>Robin Hood - Prince of Thieves (Euro)</description>
+		<description>Robin Hood - Prince of Thieves (Europe)</description>
 		<year>1992</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="NES-7R-SCN"/>
@@ -31376,7 +31572,7 @@ license:CC0
 	</software>
 
 	<software name="robowarr">
-		<description>Robo Warrior (Euro)</description>
+		<description>Robo Warrior (Europe)</description>
 		<year>1989</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="NES-RR-EEC"/>
@@ -31434,7 +31630,7 @@ license:CC0
 	</software>
 
 	<software name="robocop">
-		<description>RoboCop (Euro)</description>
+		<description>RoboCop (Europe)</description>
 		<year>1991</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="NES-CP-EEC"/>
@@ -31511,7 +31707,7 @@ license:CC0
 	</software>
 
 	<software name="robocop2">
-		<description>RoboCop 2 (Euro)</description>
+		<description>RoboCop 2 (Europe)</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="NES-2C (ESP/AUS)"/>
@@ -31550,7 +31746,7 @@ license:CC0
 
 <!-- glitches on NTSC -->
 	<software name="robocop3">
-		<description>RoboCop 3 (Euro)</description>
+		<description>RoboCop 3 (Europe)</description>
 		<year>1994</year>
 		<publisher>Ocean</publisher>
 		<info name="serial" value="NES-R3-ESP"/>
@@ -31644,7 +31840,7 @@ license:CC0
 	</software>
 
 	<software name="rockinkt">
-		<description>Rockin' Kats (Euro)</description>
+		<description>Rockin' Kats (Europe)</description>
 		<year>1992</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="NES-7A (SCN/ESP)"/>
@@ -31802,7 +31998,7 @@ license:CC0
 	</software>
 
 	<software name="rodland">
-		<description>Rod Land (Euro)</description>
+		<description>Rod Land (Europe)</description>
 		<year>1993</year>
 		<publisher>Storm</publisher>
 		<info name="serial" value="NES-R8-ESP"/>
@@ -31821,7 +32017,7 @@ license:CC0
 	</software>
 
 	<software name="rodlandp" cloneof="rodland">
-		<description>Rod Land (Euro, prototype)</description>
+		<description>Rod Land (Europe, prototype)</description>
 		<year>1993</year>
 		<publisher>Storm</publisher>
 		<part name="cart" interface="nes_cart">
@@ -31970,7 +32166,7 @@ license:CC0
 	</software>
 
 	<software name="rollerg">
-		<description>Rollergames (Euro)</description>
+		<description>Rollergames (Europe)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-U5 (NOE/SCN)"/>
@@ -32079,7 +32275,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="romancia" supported="no"> <!-- frozen on black screen at power on -->
+<!-- severe status bar flickering (DMC IRQ timing issue?) -->
+	<software name="romancia" supported="no">
 		<description>Romancia (Japan)</description>
 		<year>1987</year>
 		<publisher>Tokyo Shoseki</publisher>
@@ -32123,7 +32320,7 @@ license:CC0
 	</software>
 
 	<software name="roundbal">
-		<description>Roundball - 2-on-2 Challenge (Euro)</description>
+		<description>Roundball - 2-on-2 Challenge (Europe)</description>
 		<year>1992</year>
 		<publisher>Mindscape</publisher>
 		<info name="serial" value="NES-RW-NOE"/>
@@ -32210,7 +32407,7 @@ license:CC0
 	</software>
 
 	<software name="rushatck">
-		<description>Rush'n Attack (Euro)</description>
+		<description>Rush'n Attack (Europe)</description>
 		<year>1989</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-RA (EEC/ESP)"/>
@@ -32267,7 +32464,7 @@ license:CC0
 	</software>
 
 	<software name="rygar">
-		<description>Rygar (Euro)</description>
+		<description>Rygar (Europe)</description>
 		<year>1990</year>
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="NES-RY-(EEC/ESP/FRG)"/>
@@ -33145,7 +33342,7 @@ license:CC0
 	</software>
 
 	<software name="smurfs">
-		<description>The Smurfs (Euro)</description>
+		<description>The Smurfs (Europe)</description>
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="NES-SF (FRA/NOE)"/>
@@ -33218,7 +33415,7 @@ license:CC0
 	</software>
 
 	<software name="sectionz">
-		<description>Section-Z (Euro)</description>
+		<description>Section-Z (Europe)</description>
 		<year>1989</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-SZ-EEC"/>
@@ -33540,7 +33737,7 @@ license:CC0
 	</software>
 
 	<software name="shadwarr">
-		<description>Shadow Warriors (Euro)</description>
+		<description>Shadow Warriors (Europe)</description>
 		<year>1991</year>
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="NES-66 (UKV/SCN/ESP)"/>
@@ -33559,7 +33756,7 @@ license:CC0
 	</software>
 
 	<software name="shadwar2" supported="partial">
-		<description>Shadow Warriors II - The Dark Sword of Chaos (Euro)</description>
+		<description>Shadow Warriors II - The Dark Sword of Chaos (Europe)</description>
 		<year>1991</year>
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="NES-67 (FRG/ESP)"/>
@@ -33591,6 +33788,23 @@ license:CC0
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-jl-0 chr" size="131072" crc="30b96bf4" sha1="8d6bed7477f4bd16bfeedea6189dfecff2440803" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shadninjp" cloneof="blueshad">
+		<description>Shadow of the Ninja (USA, sample)</description>
+		<year>1990</year>
+		<publisher>Natsume</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="NES-TKEPROM-01" />
+			<feature name="mmc3_type" value="MMC3B" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="ninja prg 10-16.u1" size="0x20000" crc="8b2ffbcc" sha1="440ee7ff29af54de2ce526b0a66fa71b28d0a7e3" /> <!-- original label: NINJA PRG 10/16 -->
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="ninja chr 10-16.u5" size="0x20000" crc="49c1f66d" sha1="af9a84e55cae2fa646d36bdd8ea5eb4a4a9bffcc" /> <!-- original label: NINJA CHR 10/16 -->
 			</dataarea>
 		</part>
 	</software>
@@ -33643,7 +33857,7 @@ license:CC0
 	</software>
 
 	<software name="shadgate">
-		<description>Shadowgate (Euro)</description>
+		<description>Shadowgate (Europe)</description>
 		<year>1991</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="NES-3S-HOL"/>
@@ -33794,7 +34008,7 @@ license:CC0
 	</software>
 
 	<software name="shatterh">
-		<description>Shatterhand (Euro)</description>
+		<description>Shatterhand (Europe)</description>
 		<year>1992</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="NES-9H (NOE/SCN/ESP)"/>
@@ -33852,6 +34066,7 @@ license:CC0
 		</part>
 	</software>
 
+<!-- Among the many issues the entire screen oddly and incessantly scrolls down no matter what's on it -->
 	<software name="shin4num" supported="no">
 		<description>Shin 4-nin Uchi Mahjong - Yakuman Tengoku (Japan)</description>
 		<year>1991</year>
@@ -34223,7 +34438,7 @@ license:CC0
 	</software>
 
 	<software name="sidepock">
-		<description>Side Pocket (Euro)</description>
+		<description>Side Pocket (Europe)</description>
 		<year>1992</year>
 		<publisher>Data East</publisher>
 		<info name="serial" value="NES-PK-SCN"/>
@@ -34298,7 +34513,7 @@ license:CC0
 	</software>
 
 	<software name="silentsr" supported="partial">
-		<description>Silent Service (Euro)</description>
+		<description>Silent Service (Europe)</description>
 		<year>1990</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-IV-EEC"/>
@@ -34331,6 +34546,23 @@ license:CC0
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-lk-0 chr" size="131072" crc="b7000942" sha1="29b617582ed611715d1dbe06c8006295dda97f83" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="silkwormp" cloneof="silkworm">
+		<description>Silkworm (USA, prototype)</description>
+		<year>1990</year>
+		<publisher>American Sammy</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb_model" value="NES-SKEPROM-01" />
+			<feature name="mmc1_type" value="MMC1A" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="silkworm prg nes ver 1.ic1" size="0x20000" crc="0530a8b7" sha1="cc54cd29674138ca5f11380cb703fe82bda7ab61" /> <!-- original label: シルクワーム PRG NES Ver 1 -->
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="sw nes chr ver 1 5-25.ic3" size="0x20000" crc="b7000942" sha1="29b617582ed611715d1dbe06c8006295dda97f83" /> <!-- original label: SW NES CHR Ver 1 5/25 -->
 			</dataarea>
 		</part>
 	</software>
@@ -34462,7 +34694,7 @@ license:CC0
 	</software>
 
 	<software name="bartvssm">
-		<description>The Simpsons - Bart vs. The Space Mutants (Euro)</description>
+		<description>The Simpsons - Bart vs. The Space Mutants (Europe)</description>
 		<year>1991</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-Q5 (FRA/SCN/ESP/UKV)"/>
@@ -34499,7 +34731,7 @@ license:CC0
 	</software>
 
 	<software name="bartvsw">
-		<description>The Simpsons - Bart vs. The World (Euro)</description>
+		<description>The Simpsons - Bart vs. The World (Europe)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-Y9 (AUS/SCN/ESP)"/>
@@ -34535,7 +34767,7 @@ license:CC0
 	</software>
 
 	<software name="bartman">
-		<description>The Simpsons - Bartman Meets Radioactive Man (Euro)</description>
+		<description>The Simpsons - Bartman Meets Radioactive Man (Europe)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-RN-FRA"/>
@@ -34591,7 +34823,7 @@ license:CC0
 	</software>
 
 	<software name="skatedie">
-		<description>Skate or Die! (Euro)</description>
+		<description>Skate or Die! (Europe)</description>
 		<year>1990</year>
 		<publisher>Palcom</publisher>
 		<info name="serial" value="NES-DI (EEC/ESP/GPS)"/>
@@ -34629,7 +34861,7 @@ license:CC0
 	</software>
 
 	<software name="skiordie">
-		<description>Ski or Die (Euro)</description>
+		<description>Ski or Die (Europe)</description>
 		<year>1991</year>
 		<publisher>Palcom</publisher>
 		<info name="serial" value="NES-7S-(SCN/ESP)"/>
@@ -34763,7 +34995,7 @@ license:CC0
 	</software>
 
 	<software name="slalom">
-		<description>Slalom (Euro)</description>
+		<description>Slalom (Europe)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-SL-EEC"/>
@@ -34802,7 +35034,7 @@ license:CC0
 	</software>
 
 	<software name="smashtv">
-		<description>Smash T.V. (Euro)</description>
+		<description>Smash T.V. (Europe)</description>
 		<year>1991</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-5V-ESP"/>
@@ -34840,7 +35072,7 @@ license:CC0
 	</software>
 
 	<software name="snakernr">
-		<description>Snake Rattle 'n Roll (Euro)</description>
+		<description>Snake Rattle 'n Roll (Europe)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-RJ (EEC/SCN/ESP)"/>
@@ -34878,7 +35110,7 @@ license:CC0
 	</software>
 
 	<software name="mgear2">
-		<description>Snake's Revenge (Euro)</description>
+		<description>Snake's Revenge (Europe)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-E2-SCN"/>
@@ -34935,7 +35167,7 @@ license:CC0
 	</software>
 
 	<software name="snowbros">
-		<description>Snow Brothers (Euro)</description>
+		<description>Snow Brothers (Europe)</description>
 		<year>1991</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-7L (FRG/ESP)"/>
@@ -34973,7 +35205,7 @@ license:CC0
 	</software>
 
 	<software name="soccer">
-		<description>Soccer (Euro, rev. A)</description>
+		<description>Soccer (Europe, rev. A)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-SC (EEC/NOE/ESP)"/>
@@ -35012,7 +35244,7 @@ license:CC0
 	</software>
 
 	<software name="solarjet" supported="partial">
-		<description>Solar Jetman - Hunt for the Golden Warpship (Euro)</description>
+		<description>Solar Jetman - Hunt for the Golden Warpship (Europe)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-LJ (EEC/ESP/NOE/SCN)"/>
@@ -35114,7 +35346,7 @@ license:CC0
 	</software>
 
 	<software name="solomon">
-		<description>Solomon's Key (Euro)</description>
+		<description>Solomon's Key (Europe)</description>
 		<year>1990</year>
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="NES-KE (EEC/ESP)"/>
@@ -35157,7 +35389,7 @@ license:CC0
 	</software>
 
 	<software name="solomon2">
-		<description>Solomon's Key 2 (Euro)</description>
+		<description>Solomon's Key 2 (Europe)</description>
 		<year>1993</year>
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="NES-K2 (ESP/FRG/SCN)"/>
@@ -35176,7 +35408,7 @@ license:CC0
 	</software>
 
 	<software name="solstice">
-		<description>Solstice - The Quest for the Staff of Demnos (Euro)</description>
+		<description>Solstice - The Quest for the Staff of Demnos (Europe)</description>
 		<year>1991</year>
 		<publisher>Software Creations</publisher>
 		<info name="serial" value="NES-LX (FRG/ESP/FRA/SCN)"/>
@@ -35470,7 +35702,7 @@ license:CC0
 	</software>
 
 	<software name="spidermn">
-		<description>Spider-Man - Return of the Sinister Six (Euro)</description>
+		<description>Spider-Man - Return of the Sinister Six (Europe)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="NES-RX-ESP"/>
@@ -35652,7 +35884,7 @@ license:CC0
 	</software>
 
 	<software name="spyvsspy">
-		<description>Spy vs. Spy (Euro)</description>
+		<description>Spy vs. Spy (Europe)</description>
 		<year>1990</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="NES-SP-EEC"/>
@@ -35733,8 +35965,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- Missing sprites -->
-	<software name="squashed" supported="no">
+	<software name="squashed">
 		<description>Squashed (USA, prototype)</description>
 		<year>1991</year>
 		<publisher>Jaleco</publisher>
@@ -35762,11 +35993,11 @@ license:CC0
 		<info name="release" value="198510xx (USA)"/>
 		<info name="release" value="1985? (Europe)"/>
 		<info name="alt_title" value="ブロック"/>
+		<sharedfeat name="special_default" value="rob"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="HVC-NROM-256" /> <!-- also found with NES-NROM-256 pcb -->
 			<feature name="mirroring" value="horizontal" />
-			<feature name="peripheral" value="rob" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-bl-0 prg" size="32768" crc="4ee735c1" sha1="36b6b30f451c3b4a48464bee9a144c873ae04cc7" offset="00000" />
 			</dataarea>
@@ -35797,7 +36028,7 @@ license:CC0
 	</software>
 
 	<software name="stadevnt" cloneof="wctmeet">
-		<description>Stadium Events (Euro)</description>
+		<description>Stadium Events (Europe)</description>
 		<year>1988?</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="NES-SD-EEC"/>
@@ -35893,7 +36124,7 @@ license:CC0
 	</software>
 
 	<software name="starfrce">
-		<description>Star Force (Euro)</description>
+		<description>Star Force (Europe)</description>
 		<year>1990</year>
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="NES-FO-EEC"/>
@@ -36115,7 +36346,7 @@ license:CC0
 	</software>
 
 	<software name="starwars">
-		<description>Star Wars (Euro)</description>
+		<description>Star Wars (Europe)</description>
 		<year>1992</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="NES-7V (NOE/SCN/ESP)"/>
@@ -36156,7 +36387,7 @@ license:CC0
 	</software>
 
 	<software name="esb">
-		<description>Star Wars - The Empire Strikes Back (Euro)</description>
+		<description>Star Wars - The Empire Strikes Back (Europe)</description>
 		<year>1992</year>
 		<publisher>JVC</publisher>
 		<info name="serial" value="NES-EK (NOE/ESP)"/>
@@ -36203,7 +36434,7 @@ license:CC0
 	</software>
 
 	<software name="startrpc">
-		<description>StarTropics (Euro)</description>
+		<description>StarTropics (Europe)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-OC (NOE/FRG/SCN)"/>
@@ -36262,7 +36493,7 @@ license:CC0
 	</software>
 
 	<software name="stealth">
-		<description>Stealth ATF (Euro)</description>
+		<description>Stealth ATF (Europe)</description>
 		<year>1991</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="NES-LH (EEC/SCN/ESP)"/>
@@ -36383,7 +36614,7 @@ license:CC0
 	</software>
 
 	<software name="streetgn">
-		<description>Street Gangs (Euro)</description>
+		<description>Street Gangs (Europe)</description>
 		<year>1992</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="NES-ST (SCN/UKV)"/>
@@ -36530,7 +36761,7 @@ license:CC0
 	</software>
 
 	<software name="sunman">
-		<description>Sunman (Euro, prototype)</description>
+		<description>Sunman (Europe, prototype)</description>
 		<year>1992</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="nes_cart">
@@ -36547,7 +36778,7 @@ license:CC0
 	</software>
 
 	<software name="saq">
-		<description>Super Adventure Quests (Euro)</description>
+		<description>Super Adventure Quests (Europe)</description>
 		<year>19??</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="nes_cart">
@@ -36795,7 +37026,7 @@ license:CC0
 	</software>
 
 	<software name="smb">
-		<description>Super Mario Bros. (Euro, rev. A)</description>
+		<description>Super Mario Bros. (Europe, rev. A)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-SM (EEC/NOE/SCN/ESP)"/>
@@ -36844,7 +37075,7 @@ license:CC0
 	</software>
 
 	<software name="smbdh">
-		<description>Super Mario Bros. / Duck Hunt (Euro)</description>
+		<description>Super Mario Bros. / Duck Hunt (Europe)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-MH (EEC/ESP)"/>
@@ -36903,7 +37134,7 @@ license:CC0
 	</software>
 
 	<software name="smbtnwca" cloneof="smbtnwc">
-		<description>Super Mario Bros. / Tetris / Nintendo World Cup (Euro)</description>
+		<description>Super Mario Bros. / Tetris / Nintendo World Cup (Europe)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-ZZ (FRG/SCN)"/>
@@ -36922,7 +37153,7 @@ license:CC0
 	</software>
 
 	<software name="smbtnwc">
-		<description>Super Mario Bros. / Tetris / Nintendo World Cup (Euro, rev. A)</description>
+		<description>Super Mario Bros. / Tetris / Nintendo World Cup (Europe, rev. A)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-ZZ-FRG"/>
@@ -36985,7 +37216,7 @@ license:CC0
 	</software>
 
 	<software name="smb2">
-		<description>Super Mario Bros. 2 (Euro)</description>
+		<description>Super Mario Bros. 2 (Europe)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-MW-(EEC/NOE/SCN/ESP)"/>
@@ -37116,7 +37347,7 @@ license:CC0
 	</software>
 
 	<software name="smb3">
-		<description>Super Mario Bros. 3 (Euro)</description>
+		<description>Super Mario Bros. 3 (Europe)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-UM (GBR/FRG/NOE/SCN/ESP)"/>
@@ -37225,7 +37456,7 @@ license:CC0
 	</software>
 
 	<software name="offroad">
-		<description>Ivan 'Ironman' Stewart's Super Off Road (Euro)</description>
+		<description>Ivan 'Ironman' Stewart's Super Off Road (Europe)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-WU (EEC/ESP)"/>
@@ -37344,7 +37575,7 @@ license:CC0
 	</software>
 
 	<software name="spikvbal">
-		<description>Super Spike V'Ball (Euro)</description>
+		<description>Super Spike V'Ball (Europe)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-VJ (NOE/SCN/ESP/UKV)"/>
@@ -37440,7 +37671,7 @@ license:CC0
 	</software>
 
 	<software name="sspyhunt">
-		<description>Super Spy Hunter (Euro)</description>
+		<description>Super Spy Hunter (Europe)</description>
 		<year>1992</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="NES-UY-ESP"/>
@@ -37499,7 +37730,7 @@ license:CC0
 	</software>
 
 	<software name="sturric">
-		<description>Super Turrican (Euro)</description>
+		<description>Super Turrican (Europe)</description>
 		<year>1993</year>
 		<publisher>Imagineering</publisher>
 		<info name="serial" value="NES-TU (SCN/ESP)"/>
@@ -37636,7 +37867,7 @@ license:CC0
 	</software>
 
 	<software name="swamp">
-		<description>Swamp Thing (Euro)</description>
+		<description>Swamp Thing (Europe)</description>
 		<year>1992</year>
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="NES-SW-NOE"/>
@@ -37697,7 +37928,7 @@ license:CC0
 	</software>
 
 	<software name="swordmst">
-		<description>Sword Master (Euro)</description>
+		<description>Sword Master (Europe)</description>
 		<year>1993</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="NES-8S (SCN/ESP)"/>
@@ -37736,7 +37967,7 @@ license:CC0
 	</software>
 
 	<software name="swordsrp">
-		<description>Swords and Serpents (Euro)</description>
+		<description>Swords and Serpents (Europe)</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-WP (AUS/SCN/UKV/NOE)"/>
@@ -37830,7 +38061,7 @@ license:CC0
 	</software>
 
 	<software name="term2">
-		<description>T2 - Terminator 2 - Judgment Day (Euro)</description>
+		<description>T2 - Terminator 2 - Judgment Day (Europe)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="NES-62 (NOE/SCN/ESP/UKV)"/>
@@ -38235,7 +38466,7 @@ license:CC0
 	</software>
 
 	<software name="talespin">
-		<description>TaleSpin (Euro)</description>
+		<description>TaleSpin (Europe)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-68 (FRA/SCN/ESP)"/>
@@ -38546,7 +38777,7 @@ license:CC0
 	</software>
 
 	<software name="tecmocup">
-		<description>Tecmo Cup - Football Game (Euro)</description>
+		<description>Tecmo Cup - Football Game (Europe)</description>
 		<year>1992</year>
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="NES-TP-SCN"/>
@@ -38751,7 +38982,7 @@ license:CC0
 	</software>
 
 	<software name="tecmowc">
-		<description>Tecmo World Cup Soccer (Euro)</description>
+		<description>Tecmo World Cup Soccer (Europe)</description>
 		<year>1991</year>
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="NES-WC (FRG/ESP)"/>
@@ -38789,7 +39020,7 @@ license:CC0
 	</software>
 
 	<software name="tecmowrs">
-		<description>Tecmo World Wrestling (Euro)</description>
+		<description>Tecmo World Wrestling (Europe)</description>
 		<year>1990</year>
 		<publisher>Tecmo</publisher>
 		<info name="serial" value="NES-PZ-(EEC/SCN/ESP/FRG)"/>
@@ -38808,7 +39039,7 @@ license:CC0
 	</software>
 
 	<software name="tmnt">
-		<description>Teenage Mutant Hero Turtles (Euro)</description>
+		<description>Teenage Mutant Hero Turtles (Europe)</description>
 		<year>1990</year>
 		<publisher>Palcom</publisher>
 		<info name="serial" value="NES-88 (EEC/SCN/GPS)"/>
@@ -38827,7 +39058,7 @@ license:CC0
 	</software>
 
 	<software name="tmnt2">
-		<description>Teenage Mutant Hero Turtles II - The Arcade Game (Euro)</description>
+		<description>Teenage Mutant Hero Turtles II - The Arcade Game (Europe)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-89 (FRA/SCN/ESP)"/>
@@ -38846,7 +39077,7 @@ license:CC0
 	</software>
 
 	<software name="tmnttf">
-		<description>Teenage Mutant Hero Turtles - Tournament Fighters (Euro)</description>
+		<description>Teenage Mutant Hero Turtles - Tournament Fighters (Europe)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-HK-NOE"/>
@@ -39135,7 +39366,7 @@ license:CC0
 	</software>
 
 	<software name="tennis">
-		<description>Tennis (Euro)</description>
+		<description>Tennis (Europe)</description>
 		<year>1986</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-TE (EEC/ESP)"/>
@@ -39312,7 +39543,7 @@ license:CC0
 	</software>
 
 	<software name="tetris">
-		<description>Tetris (Euro)</description>
+		<description>Tetris (Europe)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-EI (EEC/ESP/FRA)"/>
@@ -39331,7 +39562,7 @@ license:CC0
 	</software>
 
 	<software name="tetris2">
-		<description>Tetris 2 (Euro)</description>
+		<description>Tetris 2 (Europe)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-TS-UKV"/>
@@ -39640,7 +39871,7 @@ license:CC0
 	</software>
 
 	<software name="tigerhela" cloneof="tigerhel">
-		<description>Tiger-Heli (Euro)</description>
+		<description>Tiger-Heli (Europe)</description>
 		<year>1990</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-TI-EEC"/>
@@ -39676,7 +39907,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="timelordu" cloneof="timelord">
+<!-- intermittent major status bar flickering (DMC IRQ timing issue?) -->
+	<software name="timelordu" cloneof="timelord" supported="partial">
 		<description>Time Lord (USA)</description>
 		<year>1990</year>
 		<publisher>Milton Bradley</publisher>
@@ -39694,8 +39926,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="timelord">
-		<description>Time Lord (Euro)</description>
+<!-- intermittent major status bar flickering (DMC IRQ timing issue?) -->
+	<software name="timelord" supported="partial">
+		<description>Time Lord (Europe)</description>
 		<year>1991</year>
 		<publisher>Milton Bradley</publisher>
 		<info name="serial" value="NES-LZ-(NOE/ESP/UKV)"/>
@@ -39811,7 +40044,7 @@ license:CC0
 	</software>
 
 	<software name="ttoonadv">
-		<description>Tiny Toon Adventures (Euro)</description>
+		<description>Tiny Toon Adventures (Europe)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-NI (NOE/SCN)"/>
@@ -39869,7 +40102,7 @@ license:CC0
 	</software>
 
 	<software name="ttoon2">
-		<description>Tiny Toon Adventures 2 - Trouble in Wackyland (Euro)</description>
+		<description>Tiny Toon Adventures 2 - Trouble in Wackyland (Europe)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-T2 (NOE/SCN)"/>
@@ -39910,7 +40143,7 @@ license:CC0
 	</software>
 
 	<software name="ttooncw">
-		<description>Tiny Toon Adventures - Cartoon Workshop (Euro)</description>
+		<description>Tiny Toon Adventures - Cartoon Workshop (Europe)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-CW-NOE"/>
@@ -39994,7 +40227,7 @@ license:CC0
 	</software>
 
 	<software name="toearth" supported="partial">
-		<description>To The Earth (Euro)</description>
+		<description>To The Earth (Europe)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-ZE (EEC/ESP)"/>
@@ -40150,7 +40383,7 @@ license:CC0
 	</software>
 
 	<software name="tomjerry">
-		<description>Tom &amp; Jerry (Euro)</description>
+		<description>Tom &amp; Jerry (Europe)</description>
 		<year>1992</year>
 		<publisher>Hi Tech Expressions</publisher>
 		<info name="serial" value="NES-5Y (SCN/ESP)"/>
@@ -40284,7 +40517,7 @@ license:CC0
 	</software>
 
 	<software name="topgun">
-		<description>Top Gun (Euro)</description>
+		<description>Top Gun (Europe)</description>
 		<year>1988</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-TG (EEC/NOE)"/>
@@ -40342,7 +40575,7 @@ license:CC0
 	</software>
 
 	<software name="topgun2">
-		<description>Top Gun - The Second Mission (Euro)</description>
+		<description>Top Gun - The Second Mission (Europe)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-OG (SCN/ESP/UKV)"/>
@@ -40443,7 +40676,7 @@ license:CC0
 	</software>
 
 	<software name="totrecal">
-		<description>Total Recall (Euro)</description>
+		<description>Total Recall (Europe)</description>
 		<year>1991</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-L4 (EEC/NOE)"/>
@@ -40481,7 +40714,7 @@ license:CC0
 	</software>
 
 	<software name="totalrad">
-		<description>Totally Rad (Euro)</description>
+		<description>Totally Rad (Europe)</description>
 		<year>1992</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="NES-6T-NOE"/>
@@ -40654,7 +40887,7 @@ license:CC0
 	</software>
 
 	<software name="trackfl2">
-		<description>Track &amp; Field II (Euro)</description>
+		<description>Track &amp; Field II (Europe)</description>
 		<year>1989</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-F2 (EEC/SCN)"/>
@@ -40673,7 +40906,7 @@ license:CC0
 	</software>
 
 	<software name="trackbar">
-		<description>Track &amp; Field in Barcelona (Euro)</description>
+		<description>Track &amp; Field in Barcelona (Europe)</description>
 		<year>1992</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="NES-9I (AUS/SCN/ESP)"/>
@@ -40757,7 +40990,7 @@ license:CC0
 	</software>
 
 	<software name="trog">
-		<description>Trog! (Euro)</description>
+		<description>Trog! (Europe)</description>
 		<year>1991</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-4A-AUS"/>
@@ -40802,7 +41035,7 @@ license:CC0
 	</software>
 
 	<software name="trojan">
-		<description>Trojan (Euro)</description>
+		<description>Trojan (Europe)</description>
 		<year>1989</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-TJ-EEC"/>
@@ -40902,7 +41135,7 @@ license:CC0
 	</software>
 
 	<software name="turborac">
-		<description>Turbo Racing (Euro)</description>
+		<description>Turbo Racing (Europe)</description>
 		<year>1992</year>
 		<publisher>Data East</publisher>
 		<info name="serial" value="NES-44-FRG"/>
@@ -41032,7 +41265,7 @@ license:CC0
 	</software>
 
 	<software name="ufouria">
-		<description>U-four-ia - The Saga (Euro)</description>
+		<description>U-four-ia - The Saga (Europe)</description>
 		<year>1992</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="NES-6U (NOE/SCN/ESP)"/>
@@ -41265,7 +41498,7 @@ license:CC0
 	</software>
 
 	<software name="uaircomb">
-		<description>Ultimate Air Combat (Euro)</description>
+		<description>Ultimate Air Combat (Europe)</description>
 		<year>1992</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="NES-3Z-AUS"/>
@@ -41859,7 +42092,7 @@ license:CC0
 	</software>
 
 	<software name="volley">
-		<description>Volleyball (Euro, USA)</description>
+		<description>Volleyball (Europe, USA)</description>
 		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-VB-USA, NES-VB-(EEC/FRA)"/>
@@ -41921,7 +42154,7 @@ license:CC0
 	</software>
 
 	<software name="wwfking">
-		<description>WWF King of the Ring (Euro)</description>
+		<description>WWF King of the Ring (Europe)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="NES-K6-NOE"/>
@@ -41956,7 +42189,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wmaniau" cloneof="wmania" supported="no">
+	<software name="wmaniau" cloneof="wmania">
 		<description>WWF WrestleMania (USA)</description>
 		<year>1989</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -41982,8 +42215,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wmania" supported="no">
-		<description>WWF WrestleMania (Euro)</description>
+	<software name="wmania">
+		<description>WWF WrestleMania (Europe)</description>
 		<year>1992</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-HN-ESP"/>
@@ -42021,7 +42254,7 @@ license:CC0
 	</software>
 
 	<software name="wmaniach">
-		<description>WWF WrestleMania Challenge (Euro)</description>
+		<description>WWF WrestleMania Challenge (Europe)</description>
 		<year>1991</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="NES-W9-(UKV/NOE)"/>
@@ -42040,7 +42273,7 @@ license:CC0
 	</software>
 
 	<software name="wwfsteel">
-		<description>WWF WrestleMania - Steel Cage Challenge (Euro)</description>
+		<description>WWF WrestleMania - Steel Cage Challenge (Europe)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="NES-WS-(NOE/UKV)"/>
@@ -42324,7 +42557,7 @@ license:CC0
 	</software>
 
 	<software name="wariowd">
-		<description>Wario's Woods (Euro)</description>
+		<description>Wario's Woods (Europe)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-WB-NOE"/>
@@ -42425,7 +42658,7 @@ license:CC0
 	</software>
 
 	<software name="werewolf">
-		<description>Werewolf - The Last Warrior (Euro)</description>
+		<description>Werewolf - The Last Warrior (Europe)</description>
 		<year>1991</year>
 		<publisher>Data East</publisher>
 		<info name="serial" value="NES-W8-SCN"/>
@@ -42794,7 +43027,7 @@ license:CC0
 	</software>
 
 	<software name="willow">
-		<description>Willow (Euro)</description>
+		<description>Willow (Europe)</description>
 		<year>1991</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="NES-WI (FRG/SCN/ESP)"/>
@@ -43077,7 +43310,7 @@ license:CC0
 	</software>
 
 	<software name="wizardw">
-		<description>Wizards &amp; Warriors (Euro)</description>
+		<description>Wizards &amp; Warriors (Europe)</description>
 		<year>1990</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-WW-EEC"/>
@@ -43115,7 +43348,7 @@ license:CC0
 	</software>
 
 	<software name="wizardw3">
-		<description>Wizards &amp; Warriors III - Kuros... Visions of Power (Euro)</description>
+		<description>Wizards &amp; Warriors III - Kuros... Visions of Power (Europe)</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-8W (SCN/ESP)"/>
@@ -43193,7 +43426,7 @@ license:CC0
 	</software>
 
 	<software name="worldchm">
-		<description>World Champ - Super Boxing Great Fight (Euro)</description>
+		<description>World Champ - Super Boxing Great Fight (Europe)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="NES-5E (NOE/ESP)"/>
@@ -43353,7 +43586,7 @@ license:CC0
 	</software>
 
 	<software name="blackmnt">
-		<description>Wrath of the Black Manta (Euro)</description>
+		<description>Wrath of the Black Manta (Europe)</description>
 		<year>1991</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="NES-WK (EEC/ESP)"/>
@@ -43451,7 +43684,7 @@ license:CC0
 	</software>
 
 	<software name="xevious">
-		<description>Xevious (Euro)</description>
+		<description>Xevious (Europe)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="NES-XV-EEC"/>
@@ -43721,7 +43954,7 @@ license:CC0
 	</software>
 
 	<software name="yoshicok">
-		<description>Yoshi's Cookie (Euro)</description>
+		<description>Yoshi's Cookie (Europe)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-CH-SCN"/>
@@ -43936,7 +44169,7 @@ license:CC0
 	</software>
 
 	<software name="zelda2b" cloneof="zelda2">
-		<description>Zelda II - The Adventure of Link (Euro)</description>
+		<description>Zelda II - The Adventure of Link (Europe)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-AL-EEC"/>
@@ -43959,7 +44192,7 @@ license:CC0
 	</software>
 
 	<software name="zelda2a" cloneof="zelda2">
-		<description>Zelda II - The Adventure of Link (Euro, rev. A)</description>
+		<description>Zelda II - The Adventure of Link (Europe, rev. A)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-AL-EEC"/>
@@ -43982,7 +44215,7 @@ license:CC0
 	</software>
 
 	<software name="zelda2">
-		<description>Zelda II - The Adventure of Link (Euro, rev. B)</description>
+		<description>Zelda II - The Adventure of Link (Europe, rev. B)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-AL (EEC/NOE/ESP)"/>
@@ -44029,7 +44262,7 @@ license:CC0
 	</software>
 
 	<software name="zen">
-		<description>Zen - Intergalactic Ninja (Euro)</description>
+		<description>Zen - Intergalactic Ninja (Europe)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="NES-ZN-NOE"/>
@@ -44499,10 +44732,10 @@ We should eventually add it to MAME as a separate driver with a NES CPU and a GB
 		<description>Playbox BASIC (Japan, V1.0)</description>
 		<year>198?</year>
 		<publisher>Nintendo / Hudson Soft / Sharp</publisher>
+		<sharedfeat name="exp_default" value="fc_keyboard"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="playbox basic v1.0.prg" size="32768" crc="da03d908" sha1="474869bb5882928a481e58ced0adcbb1b1ad18f9" status="baddump" />
 			</dataarea>
@@ -44520,11 +44753,11 @@ We should eventually add it to MAME as a separate driver with a NES CPU and a GB
 		<description>Playbox BASIC (Japan, V0.0)</description>
 		<year>198?</year>
 		<publisher>Nintendo / Hudson Soft / Sharp</publisher>
+		<sharedfeat name="exp_default" value="fc_keyboard"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb" value="HVC-FAMILYBASIC" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="2" size="16384" crc="c8c15b11" sha1="eba73a34e44191e60b4411886b83f53cc92d69b1" offset="0x0000" />
 				<rom name="1" size="16384" crc="2a5e0348" sha1="aa09440f89b0ecd6a4a6e00a90b79e0d313c753e" offset="0x4000" />
@@ -44696,12 +44929,13 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<info name="alt_title" value="アバドックス"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
-			<feature name="pcb" value="NES-SLROM" />
+			<feature name="pcb_model" value="HVC-SLROM-03" />
+			<feature name="mmc1_type" value="MMC1B2" />
 			<dataarea name="chr" size="131072">
-				<rom name="abadox (japan).chr" size="131072" crc="f1569df0" sha1="623c95592c972c3c569f8195951684c904aa5c6c" offset="00000" />
+				<rom name="nat-a3-0 chr" size="131072" crc="f1569df0" sha1="623c95592c972c3c569f8195951684c904aa5c6c" />
 			</dataarea>
 			<dataarea name="prg" size="131072">
-				<rom name="abadox (japan).prg" size="131072" crc="e675ba2a" sha1="566a4484df0dd2a0a19553d93d24c29f26113942" offset="00000" />
+				<rom name="nat-a3-0 prg" size="131072" crc="e675ba2a" sha1="566a4484df0dd2a0a19553d93d24c29f26113942" />
 			</dataarea>
 		</part>
 	</software>
@@ -44761,7 +44995,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="advisln3p" cloneof="advisln3">
-		<description>Adventure Island 3 (Euro, prototype)</description>
+		<description>Adventure Island 3 (Europe, prototype)</description>
 		<year>1992</year>
 		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="nes_cart">
@@ -44886,7 +45120,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="alfred">
-		<description>Alfred Chicken (Euro)</description>
+		<description>Alfred Chicken (Europe)</description>
 		<year>1994</year>
 		<publisher>Mindscape</publisher>
 		<part name="cart" interface="nes_cart">
@@ -45216,7 +45450,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="batmanrnp" cloneof="batmanrn">
-		<description>Batman Returns (Euro, prototype)</description>
+		<description>Batman Returns (Europe, prototype)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="nes_cart">
@@ -45256,7 +45490,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 
 <!-- glitches on NTSC -->
 	<software name="beauty">
-		<description>Beauty and the Beast (Euro)</description>
+		<description>Beauty and the Beast (Europe)</description>
 		<year>1994</year>
 		<publisher>Hudson Soft</publisher>
 		<part name="cart" interface="nes_cart">
@@ -45498,7 +45732,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="bugtris">
-		<description>BugTris (Kor)</description>
+		<description>BugTris (Korea)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -45680,6 +45914,23 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cheetacr">
+		<description>The Cheetahmen: The Creation (USA)</description>
+		<year>2011</year>
+		<publisher>Active Enterprises</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="discrete_74x377" />
+			<feature name="pcb_model" value="Sealie Computing ReproPak CD 10/21/10 revB" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="32768">
+				<rom name="at27c256r.chr" size="32768" crc="adcc1de8" sha1="51a93aad86a69a2c17d573d958dc4499473ffde4" offset="00000"/>
+			</dataarea>
+			<dataarea name="prg" size="65536">
+				<rom name="at27c512r.prg" size="65536" crc="a0bb3588" sha1="a32abaef0b6e6ea125df4b494eaf872cea11f41d" offset="00000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -46138,7 +46389,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="indyheat">
-		<description>Danny Sullivan's Indy Heat (Euro)</description>
+		<description>Danny Sullivan's Indy Heat (Europe)</description>
 		<year>1992?</year>
 		<publisher>Tradewest</publisher>
 		<part name="cart" interface="nes_cart">
@@ -46679,7 +46930,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="ducktal2p" cloneof="ducktal2">
-		<description>Disney's DuckTales 2 (Euro, prototype)</description>
+		<description>Disney's DuckTales 2 (Europe, prototype)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="nes_cart">
@@ -46978,11 +47229,11 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="HVC-BS"/>
 		<info name="release" value="19840621"/>
 		<info name="alt_title" value="ファミリーベーシック"/>
+		<sharedfeat name="exp_default" value="fc_keyboard"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="hvc_basic" />
 			<feature name="pcb_model" value="FB-R-128-01" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="fc_keyboard" />
 			<dataarea name="prg" size="32768">
 				<rom name="hvc-fb1-0 a" size="16384" crc="8ece0244" sha1="fa16715f19dc326b855687a701459f3f46353d9f" offset="0x00000" />
 				<rom name="hvc-fb1-0 b" size="16384" crc="e61e0cda" sha1="d415da86ae1d36f9924183dc8c1ab0ce61b5a270" offset="0x04000" />
@@ -47356,7 +47607,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="gegegep" cloneof="ninjakid" supported="no">
+	<software name="gegegep" cloneof="ninjakid">
 		<description>GeGeGe no Kitarou - Youkai Daimakyou (Japan, prototype)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
@@ -47461,12 +47712,13 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="ゴッドスレイヤー はるか天空のソナタ"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />
+			<feature name="pcb_model" value="HVC-TKROM-02" />
+			<feature name="mmc3_type" value="MMC3B" />
 			<dataarea name="chr" size="131072">
-				<rom name="god slayer - haruka tenkuu no sonata (japan).chr" size="131072" crc="da0003d7" sha1="01d49e3450077acfa29c21679951e13d93577344" offset="00000" />
+				<rom name="sfx-g0-0 chr" size="131072" crc="da0003d7" sha1="01d49e3450077acfa29c21679951e13d93577344" />
 			</dataarea>
 			<dataarea name="prg" size="262144">
-				<rom name="god slayer - haruka tenkuu no sonata (japan).prg" size="262144" crc="c17ae2dc" sha1="3da15f3afe11a5266708d60a589b791ae2884e61" offset="00000" />
+				<rom name="sfx-g0-0 prg" size="262144" crc="c17ae2dc" sha1="3da15f3afe11a5266708d60a589b791ae2884e61" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge, battery backed up -->
 			<dataarea name="bwram" size="8192">
@@ -47584,7 +47836,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="gremlin2p" cloneof="gremlin2">
-		<description>Gremlins 2 - The New Batch (Euro, prototype)</description>
+		<description>Gremlins 2 - The New Batch (Europe, prototype)</description>
 		<year>1991</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="nes_cart">
@@ -48070,7 +48322,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="janggun">
-		<description>Janggun ui Adeul (Kor)</description>
+		<description>Janggun ui Adeul (Korea)</description>
 		<year>1992</year>
 		<publisher>Daou Infosys</publisher>
 		<info name="serial" value="DIF-002"/>
@@ -48443,7 +48695,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="koko" cloneof="buzzwald">
-		<description>Ko Ko Eo Deu Ben Ce (Kor)</description>
+		<description>Ko Ko Eo Deu Ben Ce (Korea)</description>
 		<year>199?</year>
 		<publisher>Daou Infosys</publisher>
 		<info name="serial" value="DS-F301"/>
@@ -48493,7 +48745,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="kyorolnd" cloneof="casteln">
+<!-- has buzz instead of background music in game -->
+	<software name="kyorolnd" cloneof="casteln" supported="partial">
 		<description>Kyoro-chan Land (Japan)</description>
 		<year>1992</year>
 		<publisher>Hiro</publisher>
@@ -48719,10 +48972,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="グナム危機一髪危機一発 エンパイアシティ1931"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="uxrom" />
-			<feature name="pcb" value="NES-UNROM" />
+			<feature name="pcb_model" value="HVC-UNROM-03" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
-				<rom name="magnum kiki ippatsu - empire city - 1931 (japan).prg" size="131072" crc="8e7abdfc" sha1="c8d644b58d442651748ad81b5552c5e890c10a58" offset="00000" />
+				<rom name="tfs-mg-0 prg" size="131072" crc="8e7abdfc" sha1="c8d644b58d442651748ad81b5552c5e890c10a58" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -48788,7 +49041,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="mmansion">
-		<description>Maniac Mansion (Euro)</description>
+		<description>Maniac Mansion (Europe)</description>
 		<year>1992</year>
 		<publisher>Jaleco</publisher>
 		<part name="cart" interface="nes_cart">
@@ -48848,7 +49101,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="mariomis">
-		<description>Mario is Missing! (Euro)</description>
+		<description>Mario is Missing! (Europe)</description>
 		<year>1993</year>
 		<publisher>The Software Toolworks</publisher>
 		<part name="cart" interface="nes_cart">
@@ -49714,8 +49967,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Missing sprites -->
-	<software name="ninjajagp" cloneof="squashed" supported="no">
+	<software name="ninjajagp" cloneof="squashed">
 		<description>Ninja Jajamaru - Ginga Daisakusen (Japan, prototype)</description>
 		<year>1991</year>
 		<publisher>Jaleco</publisher>
@@ -49775,7 +50027,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="nintenwc">
-		<description>Nintendo World Cup (Euro, rev. B)</description>
+		<description>Nintendo World Cup (Europe, rev. B)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -49953,7 +50205,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="pacman">
-		<description>Pac-Man (Euro)</description>
+		<description>Pac-Man (Europe)</description>
 		<year>1993</year>
 		<publisher>Namcot</publisher>
 		<part name="cart" interface="nes_cart">
@@ -50014,7 +50266,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="parasol">
-		<description>Parasol Stars - The Story of Bubble Bobble III (Euro)</description>
+		<description>Parasol Stars - The Story of Bubble Bobble III (Europe)</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
 		<info name="alt_title" value="Parasol Stars - Rainbow Islands II - The Story of Bubble Bobble III (Box)"/>
@@ -50031,7 +50283,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="parodiusp" cloneof="parodius">
-		<description>Parodius (Euro, prototype)</description>
+		<description>Parodius (Europe, prototype)</description>
 		<year>1992</year>
 		<publisher>Palcom</publisher>
 		<part name="cart" interface="nes_cart">
@@ -50051,7 +50303,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- Glitched in NTSC -->
 	<software name="pirates">
-		<description>Pirates! (Euro)</description>
+		<description>Pirates! (Europe)</description>
 		<year>1991</year>
 		<publisher>Palcom</publisher>
 		<part name="cart" interface="nes_cart">
@@ -50274,7 +50526,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="racktriv">
-		<description>Rackets &amp; Rivals (Euro)</description>
+		<description>Rackets &amp; Rivals (Europe)</description>
 		<year>1993</year>
 		<publisher>Palcom</publisher>
 		<part name="cart" interface="nes_cart">
@@ -50386,6 +50638,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="nes-hz-0 chr" size="131072" crc="31ed51a8" sha1="024475acd8706f6228c2bf28496c8f9ea1864da1" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roadblstup" cloneof="roadblst">
+		<description>RoadBlasters (USA, prototype)</description>
+		<year>1990</year>
+		<publisher>Mindscape</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="NES-SLROM" />
+			<feature name="mmc1_type" value="MMC1B2" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="roadblasters (prototype).prg" size="0x20000" crc="c66bf6b6" sha1="aa7b2f6f17c7b84469afb20b4b835d4841883e72" />
+			</dataarea>
+			<dataarea name="chr" size="0x20000">
+				<rom name="roadblasters (prototype).chr" size="0x20000" crc="605caf59" sha1="010331e23cb615f0f89f810a2f3464216f5d2d55" />
 			</dataarea>
 		</part>
 	</software>
@@ -50940,7 +51209,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="smurfsp" cloneof="smurfs">
-		<description>The Smurfs (Euro, prototype)</description>
+		<description>The Smurfs (Europe, prototype)</description>
 		<year>1994</year>
 		<publisher>Infogrames</publisher>
 		<info name="alt_title" value="Les Schtroumpfs"/>
@@ -50978,7 +51247,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="snowchal">
-		<description>Snowboard Challenge (Euro)</description>
+		<description>Snowboard Challenge (Europe)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -51455,7 +51724,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- BMX Simulator doesn't respond to start on its title screen -->
 	<software name="supsporta" cloneof="supsport" supported="partial">
-		<description>Super Sports Challenge (Euro, plug-thru cart)</description>
+		<description>Super Sports Challenge (Europe, plug-thru cart)</description>
 		<year>19??</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="nes_cart">
@@ -51473,7 +51742,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- BMX Simulator doesn't respond to start on its title screen -->
 	<software name="supsport" supported="partial">
-		<description>Super Sports Challenge (Euro)</description>
+		<description>Super Sports Challenge (Europe)</description>
 		<year>19??</year>
 		<publisher>Codemasters</publisher>
 		<part name="cart" interface="nes_cart">
@@ -51956,7 +52225,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="tigerhel">
-		<description>Tiger-Heli (Euro, rev. A)</description>
+		<description>Tiger-Heli (Europe, rev. A)</description>
 		<year>1990</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="NES-TI-EEC"/>
@@ -52087,7 +52356,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="trollscl">
-		<description>The Trolls In Crazyland (Euro)</description>
+		<description>The Trolls In Crazyland (Europe)</description>
 		<year>199?</year>
 		<publisher>ASC</publisher>
 		<part name="cart" interface="nes_cart">
@@ -52165,7 +52434,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="ufouriap" cloneof="ufouria">
-		<description>U-four-ia - The Saga (Euro, prototype)</description>
+		<description>U-four-ia - The Saga (Europe, prototype)</description>
 		<year>1992</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="nes_cart">
@@ -52197,7 +52466,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="uaircombp" cloneof="uaircomb">
-		<description>Ultimate Air Combat (Euro, prototype)</description>
+		<description>Ultimate Air Combat (Europe, prototype)</description>
 		<year>1992</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="nes_cart">
@@ -52411,7 +52680,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="discrete_74x377" />
 			<feature name="pcb" value="AVE-NINA-07" />
 			<feature name="mirroring" value="vertical" />
-			<dataarea name="rom" size="65536">
+			<dataarea name="chr" size="65536">
 				<rom name="wally bear and the no gang (usa) (beta) (unl).chr" size="65536" crc="a0f170f1" sha1="813567db923c71f01c416da0086a768778a6142c" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="65536">
@@ -52507,7 +52776,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="wlddizzy" supported="no">
-		<description>Wonderland Dizzy (Euro, prototype)</description>
+		<description>Wonderland Dizzy (Europe, prototype)</description>
 		<year>1991</year>
 		<publisher>Camerica</publisher>
 		<part name="cart" interface="nes_cart">
@@ -52631,7 +52900,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 <!-- Non game cartridges, unconfirmed dumps -->
 
 	<software name="parb" cloneof="par" supported="no">
-		<description>Pro Action Replay (Euro, v1.0)</description>
+		<description>Pro Action Replay (Europe, v1.0)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -52648,7 +52917,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="para" cloneof="par" supported="no">
-		<description>Pro Action Replay (Euro, v1.2, Cart Present)</description>
+		<description>Pro Action Replay (Europe, v1.2, Cart Present)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -52665,7 +52934,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="par" supported="no">
-		<description>Pro Action Replay (Euro, v1.2, no Cart Present)</description>
+		<description>Pro Action Replay (Europe, v1.2, no Cart Present)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -64629,6 +64898,27 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- Cart dumped with Chris Covell's TapeDump, needs to be redumped for verification. -->
+<!-- Header from original dump has been stripped. Board info is unknown, and has been copied from parent US set. -->
+<!-- The game crashes upon reaching Stage 3, like all other versions in MAME due to emulation problems, but works fine in other emulators. -->
+<!-- The game is NTSC, is hacked to skip Stage 2 so it works on clone consoles, and has been partially translated to Brazilian Portuguese. -->
+	<software name="btoadsbrc" cloneof="btoads" supported="no">
+		<description>Battletoads (Brazil, Conector pirate)</description>
+		<year>1991</year>
+		<publisher>Conector</publisher>
+		<info name="alt_title" value="Sapos Guerreiros"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="axrom" />
+			<feature name="bus_conflict" value="no" />
+			<dataarea name="prg" size="262144">
+				<rom name="battletoads [conector - br].prg" size="262144" crc="147504bb" sha1="b45b65590c74de89b14a7401c3cc83afb7ae6d59" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="beatnbox">
 		<description>Beat n Box (Kor)</description>
 		<year>19??</year>
@@ -71316,8 +71606,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-<!-- Game has no sound and freezes as soon as you get killed by any enemy -->
-	<software name="doordoorh" cloneof="doordoor" supported="no">
+	<software name="doordoorh" cloneof="doordoor">
 		<description>Door Door (FMG pirate)</description>
 		<year>1987</year>
 		<publisher>FMG</publisher>
@@ -71616,7 +71905,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		</part>
 	</software>
 
-	<software name="gegegeh" cloneof="ninjakid" supported="no">
+	<software name="gegegeh" cloneof="ninjakid">
 		<description>GeGeGe no Kitarou - Youkai Daimakyou (FMG pirate)</description>
 		<year>1987</year>
 		<publisher>FMG</publisher>
@@ -75622,7 +75911,7 @@ Other
 	</software>
 
 <!-- is the following also hacked?!? -->
-	<software name="btoadsddh" cloneof="btoadsdd">
+	<software name="btoadsddh" cloneof="btoadsdd" supported="no"> <!-- Same issue as US release -->
 		<description>Battletoads &amp; Double Dragon - The Ultimate Team (pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -78442,7 +78731,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="golfgc" cloneof="golf">
-		<description>Golf (Euro, ripped from GC Animal Crossing)</description>
+		<description>Golf (Europe, ripped from GC Animal Crossing)</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78496,7 +78785,7 @@ We include them here as reference if they should coincide with later revisions o
 	</software>
 
 	<software name="dkoe" cloneof="dkong">
-		<description>Donkey Kong - Original Edition (Euro, ripped from Wii)</description>
+		<description>Donkey Kong - Original Edition (Europe, ripped from Wii)</description>
 		<year>2010</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="nes_cart">
@@ -78561,7 +78850,8 @@ We include them here as reference if they should coincide with later revisions o
 		</part>
 	</software>
 
-	<software name="cvania3kc" cloneof="cvania3">
+<!-- Same issue as US release -->
+	<software name="cvania3kc" cloneof="cvania3" supported="partial">
 		<description>Castlevania III - Dracula's Curse (ripped from PC Konami Classics)</description>
 		<year>200?</year>
 		<publisher>Konami</publisher>
@@ -80477,6 +80767,24 @@ be better to redump them properly. -->
 
 <!-- These are more recent dumps of unlicensed homebrew games that have been released on cartridge. They need to be verified against physical carts. -->
 
+	<software name="2gemsiam">
+		<description>2 in 1 - GEMiNIM &amp; Siamond</description>
+		<year>2008</year>
+		<publisher>RetroZone</publisher>
+		<info name="serial" value="SIV-M1-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="axrom" />
+			<feature name="pcb_model" value="Sealie Computing ReproPak revC" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="39sf010a.prg" size="0x20000" crc="bf3c0601" sha1="ea92849c5e7285b61a00f3ac37cdc773ba6758a3" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="puritans">
 		<description>2A03Puritans</description>
 		<year>2013</year>
@@ -80705,6 +81013,23 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas22" supported="partial">
+		<description>8-bit Xmas 2022</description>
+		<year>2022</year>
+		<publisher>retroUSB</publisher>
+		<info name="serial" value="RET-Y2-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x20000">
+				<rom name="xmas22demo.prg" size="0x20000" crc="e43ef334" sha1="a8f31da27ad2cc81e21cf03f84c6d9d805597988" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge? -->
+			<dataarea name="vram" size="0x8000">
 			</dataarea>
 		</part>
 	</software>
@@ -80938,6 +81263,25 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="creepyb">
+		<description>Creepy Brawlers</description>
+		<year>2017</year>
+		<publisher>Mega Cat Studios</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x40000">
+				<rom name="creepy brawlers (usa) (aftermarket).prg" size="0x40000" crc="114e8959" sha1="93127b42f0ebd76f1de3d64355403125606d9db2" />
+			</dataarea>
+			<dataarea name="chr" size="0x40000">
+				<rom name="creepy brawlers (usa) (aftermarket).chr" size="0x40000" crc="55afb7cf" sha1="61764329355281f725dafbfec3a5e1bb80efd139" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="0x2000">
+				<rom value="0x00" size="0x2000" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dushlan">
 		<description>Dúshlán</description>
 		<year>2016</year>
@@ -81020,6 +81364,52 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="haunt85">
+		<description>Haunted: Halloween '85</description>
+		<year>2016</year>
+		<publisher>Retrotainment Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bnrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="0x80000">
+				<rom name="haunted - halloween '85 (world) (aftermarket).prg" size="0x80000" crc="043e2545" sha1="d7fa0d2da67cc43036eb45e7efb01a4de68e54ea" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="haunt86">
+		<description>Haunted: Halloween '86 - The Curse of Possum Hollow</description>
+		<year>2017</year>
+		<publisher>Retrotainment Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x80000">
+				<rom name="haunted - halloween '86 (world) (aftermarket).prg" size="0x80000" crc="a7682169" sha1="c0b2995d09ee75386e34db79910df3f0d26f70d0" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge -->
+			<dataarea name="vram" size="0x8000">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="haunt86a" cloneof="haunt86">
+		<description>Haunted: Halloween '86 - The Curse of Possum Hollow (alt)</description>
+		<year>2017</year>
+		<publisher>Retrotainment Games</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="0x80000">
+				<rom name="haunted - halloween '86 (world) (aftermarket) (alt).prg" size="0x80000" crc="f401d3ee" sha1="871a477a63fdfb9dd051ccde5448bc84af633601" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge -->
+			<dataarea name="vram" size="0x8000">
 			</dataarea>
 		</part>
 	</software>
@@ -81197,6 +81587,23 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="nightbas">
+		<description>Nighttime Bastards</description>
+		<year>2014</year>
+		<publisher>Infinite NES Lives</publisher>
+		<info name="serial" value="OBG-01"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="nighttime bastards.prg" size="0x8000" crc="c45ca4db" sha1="afe7a747539bf64554a3edcdc781ffa12033c0c3" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="nighttime bastards.chr" size="0x2000" crc="39a54075" sha1="7336854e7ea9ae679aa3177aba456d2abb594587" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nomolos">
 		<description>Nomolos - Storming the Catsle (v1.01)</description>
 		<year>2014</year>
@@ -81312,6 +81719,24 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 32k VRAM on cartridge -->
 			<dataarea name="vram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Glitchy music continues to play during game. Should only have movement sfx? -->
+	<software name="sudoku07" supported="partial">
+		<description>Sudoku 2007</description>
+		<year>2007</year>
+		<publisher>RetroZone</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb_model" value="Sealie Computing ReproPak revC" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="0x8000">
+				<rom name="at27c010.prg" size="0x8000" crc="737a2c4b" sha1="8113124890165d33b2828cf73c196d7de42c66f3" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="0x2000">
+				<rom name="at27c512.chr" size="0x2000" crc="aaf8120e" sha1="bfbc8d480ff73b3af746401510f98b1b2c18af86" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

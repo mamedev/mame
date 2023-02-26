@@ -263,6 +263,13 @@ ROM_START( tstar432 )
 	ROM_LOAD("yo1d-j.u6", 0x8000, 0x8000, CRC(aa993096) SHA1(06db69a284eaf022b26e1087e09d8d459d270d03) )
 ROM_END
 
+ROM_START( tstar432a ) // only 1 byte difference (plus checksum), compared to sstar36k
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("tstar432a_80.bin", 0x8000, 0x4000, CRC(4f19f20c) SHA1(b921a440e8ab09a2a5e5f85d8aad3e4d7d815182) )
+	ROM_LOAD("tstar432a_c0.bin", 0xc000, 0x2000, CRC(aae43b1b) SHA1(9acef9593f19ec3a6e9a671e82196d7bd054960e) )
+	ROM_LOAD("tstar432a_e0.bin", 0xe000, 0x2000, CRC(6c504920) SHA1(588e23c9daff8a301c2f3d4f0c3fe62709f3accc) )
+ROM_END
+
 ROM_START( sstar36k )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("yo1d.u6", 0x8000, 0x8000, CRC(270c9a81) SHA1(5c9ef3a140651d7c9d9b801f2524cb93b0f92bb4) )
@@ -276,8 +283,9 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME      PARENT  COMP MACHINE   INPUT     STATE       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1983, sstar28k, 0,        0, sstar28k, sstar28k, star_state, empty_init, "SciSys", "Superstar 28K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME       PARENT  COMP MACHINE   INPUT     STATE       INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1983, sstar28k,  0,        0, sstar28k, sstar28k, star_state, empty_init, "SciSys", "Superstar 28K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1985, tstar432, 0,        0, tstar432, sstar28k, star_state, empty_init, "SciSys", "Kasparov Turbostar 432", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1985, sstar36k, tstar432, 0, sstar36k, sstar28k, star_state, empty_init, "SciSys", "Superstar 36K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, tstar432,  0,        0, tstar432, sstar28k, star_state, empty_init, "SciSys", "Kasparov Turbostar 432 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, tstar432a, tstar432, 0, tstar432, sstar28k, star_state, empty_init, "SciSys", "Kasparov Turbostar 432 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1985, sstar36k,  tstar432, 0, sstar36k, sstar28k, star_state, empty_init, "SciSys", "Superstar 36K", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

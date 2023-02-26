@@ -43,7 +43,8 @@
 
 #include "emu.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
+#include "cpu/m68000/m68020.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/am9513.h"
 #include "machine/bankdev.h"
@@ -57,6 +58,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class tek440x_state : public driver_device
 {
@@ -422,6 +425,9 @@ ROM_START( tek4404 )
 	ROM_REGION( 0x2000, "scsimfm", 0 )
 	ROM_LOAD( "scsi_mfm.bin", 0x000000, 0x002000, CRC(b4293435) SHA1(5e2b96c19c4f5c63a5afa2de504d29fe64a4c908) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*************************************
  *

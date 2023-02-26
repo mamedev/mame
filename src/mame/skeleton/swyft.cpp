@@ -256,7 +256,7 @@ ToDo:
 // Includes
 #include "emu.h"
 #include "bus/centronics/ctronics.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68008.h"
 #include "machine/74259.h"
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
@@ -300,6 +300,8 @@ ToDo:
 //#define VERBOSE (LOG_VIA0 | LOG_VIA1)
 #include "logmacro.h"
 
+
+namespace {
 
 class swyft_state : public driver_device
 {
@@ -873,6 +875,9 @@ ROM_START( swyft )
 	ROM_LOAD( "video_2b.ampal16r4.u25.jed", 0x2000, 0xb08, CRC(caf91148) SHA1(3f8ddcb512a1c05395c74ad9a6ba7b87027ce4ec))
 	ROM_LOAD( "disk_3.5c.ampal16r4.u28.jed", 0x3000, 0xb08, CRC(fd994d02) SHA1(f910ab16587dd248d63017da1e5b37855e4c1a0c))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

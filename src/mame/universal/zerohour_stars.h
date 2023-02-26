@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Frank Palazzolo
-#ifndef MAME_VIDEO_ZEROHOUR_STARS_H
-#define MAME_VIDEO_ZEROHOUR_STARS_H
+#ifndef MAME_UNIVERSAL_ZEROHOUR_STARS_H
+#define MAME_UNIVERSAL_ZEROHOUR_STARS_H
 
 #pragma once
 
@@ -39,4 +39,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ZEROHOUR_STARS, zerohour_stars_device)
 
-#endif // MAME_VIDEO_ZEROHOUR_STARS_H
+#endif // MAME_UNIVERSAL_ZEROHOUR_STARS_H

@@ -1182,7 +1182,16 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 
 	// look up priority and destination base addresses for y1
 	bitmap_ind8 &priority_bitmap = *blit.priority;
-	u8 *priority_baseaddr = &priority_bitmap.pix(y1, xpos);
+	u8 *priority_baseaddr = nullptr;
+	int prio_rowpixels = 0;
+	if (priority_bitmap.valid())
+	{
+		prio_rowpixels = priority_bitmap.rowpixels();
+		priority_baseaddr = &priority_bitmap.pix(y1, xpos);
+	}
+	else
+		assert((blit.tilemap_priority_code & 0xffff) == 0xff00);
+
 	typename _BitmapClass::pixel_t *dest_baseaddr = nullptr;
 	int dest_rowpixels = 0;
 	if (dest.valid())
@@ -1260,7 +1269,7 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 			{
 				const u16 *source0 = source_baseaddr + x_start;
 				typename _BitmapClass::pixel_t *dest0 = dest_baseaddr + x_start;
-				u8 *pmap0 = priority_baseaddr + x_start;
+				u8 *pmap0 = priority_baseaddr ? (priority_baseaddr + x_start) : nullptr;
 
 				// if we were opaque, use the opaque renderer
 				if (prev_trans == WHOLLY_OPAQUE)
@@ -1278,7 +1287,7 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 
 						dest0 += dest_rowpixels;
 						source0 += m_pixmap.rowpixels();
-						pmap0 += priority_bitmap.rowpixels();
+						pmap0 += prio_rowpixels;
 					}
 				}
 
@@ -1300,7 +1309,7 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 						dest0 += dest_rowpixels;
 						source0 += m_pixmap.rowpixels();
 						mask0 += m_flagsmap.rowpixels();
-						pmap0 += priority_bitmap.rowpixels();
+						pmap0 += prio_rowpixels;
 					}
 				}
 			}
@@ -1315,7 +1324,7 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 			break;
 
 		// advance to the next row on all our bitmaps
-		priority_baseaddr += priority_bitmap.rowpixels() * (nexty - y);
+		priority_baseaddr += prio_rowpixels * (nexty - y);
 		source_baseaddr += m_pixmap.rowpixels() * (nexty - y);
 		mask_baseaddr += m_flagsmap.rowpixels() * (nexty - y);
 		dest_baseaddr += dest_rowpixels * (nexty - y);
@@ -1559,10 +1568,14 @@ void tilemap_t::get_info_debug(u32 col, u32 row, u8 &gfxnum, u32 &code, u32 &col
 	// get the GFX number and code
 	gfxnum = m_tileinfo.gfxnum;
 	code = m_tileinfo.code;
+	color = m_tileinfo.palette_base;
 
-	// work back from the palette base to get the color
-	const gfx_element &gfx = *m_tileinfo.decoder->gfx(gfxnum);
-	color = (m_tileinfo.palette_base - gfx.colorbase()) / gfx.granularity();
+	if (gfxnum != 0xff)
+	{
+		// work back from the palette base to get the color
+		const gfx_element &gfx = *m_tileinfo.decoder->gfx(gfxnum);
+		color = (color - gfx.colorbase()) / gfx.granularity();
+	}
 }
 
 
@@ -1604,8 +1617,7 @@ tilemap_manager::~tilemap_manager()
 
 
 //-------------------------------------------------
-//  set_flip_all - set a global flip for all the
-//  tilemaps
+//  create - allocate a tilemap
 //-------------------------------------------------
 
 tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, tilemap_t *allocated)

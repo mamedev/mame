@@ -343,9 +343,6 @@ void segaxbd_state::device_reset()
 {
 	m_segaic16vid->tilemap_reset(*m_screen);
 
-	// hook the RESET line, which resets CPU #1
-	m_maincpu->set_reset_callback(*this, FUNC(segaxbd_state::m68k_reset_callback));
-
 	// start timers to track interrupts
 	m_scanline_timer->adjust(m_screen->time_until_pos(0), 0);
 }
@@ -1663,6 +1660,7 @@ void segaxbd_state::xboard_base_mconfig(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaxbd_state::main_map);
+	m_maincpu->reset_cb().set(FUNC(segaxbd_state::m68k_reset_callback));
 
 	M68000(config, m_subcpu, MASTER_CLOCK/4);
 	m_subcpu->set_addrmap(AS_PROGRAM, &segaxbd_state::sub_map);
@@ -1766,6 +1764,7 @@ void segaxbd_fd1094_state::device_add_mconfig(machine_config &config)
 	FD1094(config.replace(), m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaxbd_fd1094_state::main_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &segaxbd_fd1094_state::decrypted_opcodes_map);
+	m_maincpu->reset_cb().set(FUNC(segaxbd_fd1094_state::m68k_reset_callback));
 }
 
 void segaxbd_new_state::sega_xboard_fd1094(machine_config &config)
@@ -1821,6 +1820,7 @@ void segaxbd_lastsurv_fd1094_state::device_add_mconfig(machine_config &config)
 	FD1094(config.replace(), m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaxbd_lastsurv_fd1094_state::main_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &segaxbd_lastsurv_fd1094_state::decrypted_opcodes_map);
+	m_maincpu->reset_cb().set(FUNC(segaxbd_lastsurv_fd1094_state::m68k_reset_callback));
 
 	// basic machine hardware
 	// TODO: network board
@@ -1883,6 +1883,7 @@ void segaxbd_smgp_fd1094_state::device_add_mconfig(machine_config &config)
 	FD1094(config.replace(), m_maincpu, MASTER_CLOCK/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaxbd_smgp_fd1094_state::main_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &segaxbd_smgp_fd1094_state::decrypted_opcodes_map);
+	m_maincpu->reset_cb().set(FUNC(segaxbd_smgp_fd1094_state::m68k_reset_callback));
 
 	// basic machine hardware
 	Z80(config, m_soundcpu2, SOUND_CLOCK/4);
@@ -2089,7 +2090,7 @@ ROM_END
 //
 ROM_START( aburner2 )
 	ROM_REGION( 0x80000, "mainpcb:maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "epr-11107.58",  0x00000, 0x20000, CRC(6d87bab7) SHA1(ab34fe78f1f216037b3e3dca3e61f1b31c05cedf) )
+	ROM_LOAD16_BYTE( "epr-11107.58", 0x00000, 0x20000, CRC(6d87bab7) SHA1(ab34fe78f1f216037b3e3dca3e61f1b31c05cedf) )
 	ROM_LOAD16_BYTE( "epr-11108.63", 0x00001, 0x20000, CRC(202a3e1d) SHA1(cf2018bbad366de4b222eae35942636ca68aa581) )
 
 	ROM_REGION( 0x80000, "mainpcb:subcpu", 0 ) // 2nd 68000 code
@@ -4707,10 +4708,10 @@ void segaxbd_new_state_double::init_gprider_double()
 	m_mainpcb->install_gprider();
 	m_subpcb->install_gprider();
 
-	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_read_handler(0x2F0000, 0x2F003f, read16sm_delegate(*this, FUNC(segaxbd_new_state_double::shareram1_r)));
-	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_write_handler(0x2F0000, 0x2F003f, write16s_delegate(*this, FUNC(segaxbd_new_state_double::shareram1_w)));
-	m_subpcb->m_maincpu->space(AS_PROGRAM).install_read_handler(0x2F0000, 0x2F003f, read16sm_delegate(*this, FUNC(segaxbd_new_state_double::shareram2_r)));
-	m_subpcb->m_maincpu->space(AS_PROGRAM).install_write_handler(0x2F0000, 0x2F003f, write16s_delegate(*this, FUNC(segaxbd_new_state_double::shareram2_w)));
+	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_read_handler(0x2f0000, 0x2f003f, read16sm_delegate(*this, FUNC(segaxbd_new_state_double::shareram1_r)));
+	m_mainpcb->m_maincpu->space(AS_PROGRAM).install_write_handler(0x2f0000, 0x2f003f, write16s_delegate(*this, FUNC(segaxbd_new_state_double::shareram1_w)));
+	m_subpcb->m_maincpu->space(AS_PROGRAM).install_read_handler(0x2f0000, 0x2f003f, read16sm_delegate(*this, FUNC(segaxbd_new_state_double::shareram2_r)));
+	m_subpcb->m_maincpu->space(AS_PROGRAM).install_write_handler(0x2f0000, 0x2f003f, write16s_delegate(*this, FUNC(segaxbd_new_state_double::shareram2_w)));
 }
 
 

@@ -24,6 +24,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class vt240_state : public driver_device
 {
 public:
@@ -769,6 +771,9 @@ ROM_START( vt240 )
 	ROM_REGION( 0x100, "x2212", 0 ) // default nvram to avoid error 10
 	ROM_LOAD( "x2212", 0x000, 0x100, CRC(31c90c64) SHA1(21a0f1d4eec1ced04b85923151783bf23d18bfbd) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                          FULLNAME  FLAGS */
 COMP( 1983, vt240,  0,      0,      vt240,   vt240, vt240_state, empty_init, "Digital Equipment Corporation", "VT240",  MACHINE_IMPERFECT_GRAPHICS )

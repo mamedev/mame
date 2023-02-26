@@ -5,8 +5,8 @@
     Kyugo hardware games
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_KYUGO_H
-#define MAME_INCLUDES_KYUGO_H
+#ifndef MAME_MISC_KYUGO_H
+#define MAME_MISC_KYUGO_H
 
 #pragma once
 
@@ -100,4 +100,4 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-#endif // MAME_INCLUDES_KYUGO_H
+#endif // MAME_MISC_KYUGO_H

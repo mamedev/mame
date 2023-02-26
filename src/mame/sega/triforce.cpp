@@ -462,6 +462,8 @@ Notes:
 #include "screen.h"
 
 
+namespace {
+
 class triforce_state : public driver_device
 {
 public:
@@ -1293,6 +1295,9 @@ ROM_START( fzeroaxm )
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	ROM_LOAD("317-0373-com.pic", 0x00, 0x4000, CRC(0e48f645) SHA1(ec057b0f536c3e9ce5353c02676cf17e96bb3239) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Main board */
 /*Triforce*/GAME( 2002, triforce, 0,        triforce_base, triforce, triforce_state, empty_init, ROT0, "Sega",                               "Triforce Bios", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT )

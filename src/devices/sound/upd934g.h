@@ -13,21 +13,19 @@
 
 #pragma once
 
+#include "dirom.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class upd934g_device : public device_t, public device_sound_interface
+class upd934g_device : public device_t, public device_sound_interface, public device_rom_interface<16>
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
 	// construction/destruction
 	upd934g_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// configuration
-	auto data_callback() { return m_data_cb.bind(); }
 
 	void write(offs_t offset, uint8_t data);
 
@@ -39,7 +37,6 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
-	devcb_read8 m_data_cb;
 	sound_stream *m_stream;
 
 	uint16_t m_addr[16];
@@ -49,6 +46,7 @@ private:
 		uint16_t pos;
 		int playing;
 		int volume;
+		int effect;
 	}
 	m_channel[4];
 

@@ -19,7 +19,7 @@
     Zoku Mahjong Housoukyoku Honbanchuu
     (c)199? Nihon Bussan Co.,Ltd.
 
-    Driver by Takahiro Nogi <nogi@kt.rim.or.jp> 2000/12/23 -
+    Driver by Takahiro Nogi 2000/12/23 -
 
 ******************************************************************************/
 /******************************************************************************

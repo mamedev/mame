@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_INCLUDES_BFM_ADR2_H
-#define MAME_INCLUDES_BFM_ADR2_H
+#ifndef MAME_BFM_BFM_ADR2_H
+#define MAME_BFM_BFM_ADR2_H
 
 #pragma once
 
@@ -71,4 +71,4 @@ private:
 DECLARE_DEVICE_TYPE(BFM_ADDER2, bfm_adder2_device)
 
 
-#endif // MAME_INCLUDES_BFM_ADR2_H
+#endif // MAME_BFM_BFM_ADR2_H

@@ -5,12 +5,12 @@
     Super Contra / Thunder Cross
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_THUNDERX_H
-#define MAME_INCLUDES_THUNDERX_H
+#ifndef MAME_KONAMI_THUNDERX_H
+#define MAME_KONAMI_THUNDERX_H
 
 #pragma once
 
-#include "cpu/m6809/konami.h" // for the callback and the firq irq definition
+#include "cpu/m6809/konami.h"
 #include "machine/bankdev.h"
 #include "sound/k007232.h"
 #include "k051960.h"
@@ -96,4 +96,4 @@ private:
 	void thunderx_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_THUNDERX_H
+#endif // MAME_KONAMI_THUNDERX_H

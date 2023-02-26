@@ -417,7 +417,7 @@ uint32_t vortex_state::screen_update_vortex(screen_device &screen, bitmap_rgb32 
 			{
 				offs_t const offs = (offs_t(y) << 5) | (x >> 3);
 				video_data = m_main_ram[offs];
-				uint8_t const pix = BIT(m_main_ram[offs + 1], 0);
+				uint8_t const pix = BIT(m_main_ram[(offs + 1) & 0x1fff], 0);
 				col = rgb_t(pix ? 0 : 255, pix ? 255 : 0, BIT(x, 5) ? 255 : 0);
 			}
 

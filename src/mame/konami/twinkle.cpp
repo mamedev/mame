@@ -282,6 +282,9 @@ Notes:
 
 #include "bmiidx.lh"
 
+
+namespace {
+
 class twinkle_state : public driver_device
 {
 public:
@@ -1628,6 +1631,9 @@ ROM_START( bmiidxc2 )
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE_READONLY( "983hdda01", 0, SHA1(bcbbf55acf8bebc5773ffc5769420a0129f4da57) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAMEL( 1999, gq863,    0,       twinkle,  twinkle,  twinkle_state, empty_init, ROT0, "Konami", "Twinkle System", MACHINE_IS_BIOS_ROOT, layout_bmiidx )
 

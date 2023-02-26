@@ -1784,8 +1784,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	extra.transcolor = (texmode & 0x180) ? 0 : 0x100;
 	extra.texbase = WAVERAM_BLOCK0_EXT(m_state->zeus_texbase);
 	extra.depth_min_enable = true;// (m_state->m_renderRegs[0x14] & 0x008000);
-	extra.zbuf_min = int32_t((m_state->m_renderRegs[0x15]) << 8) >> 8;
-	//extra.zbuf_min = m_state->m_renderRegs[0x15];
+	extra.zbuf_min = util::sext(m_state->m_renderRegs[0x15], 24);
 	extra.depth_test_enable = !(m_state->m_renderRegs[0x14] & 0x000020);
 	//extra.depth_test_enable &= !(m_state->m_renderRegs[0x14] & 0x008000);
 	extra.depth_write_enable = !(m_state->m_renderRegs[0x14] & 0x001000);

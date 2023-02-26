@@ -58,6 +58,7 @@
 #include "speaker.h"
 
 
+namespace {
 
 class diverboy_state : public driver_device
 {
@@ -332,6 +333,7 @@ ROM_START( diverboy )
 	ROM_RELOAD(            0xe0000, 0x20000 )
 ROM_END
 
+} // anonymous namespace
 
 
 GAME( 1992, diverboy, 0, diverboy, diverboy, diverboy_state, empty_init, ORIENTATION_FLIP_X, "Gamart (Electronic Devices Italy license)", "Diver Boy", MACHINE_SUPPORTS_SAVE )

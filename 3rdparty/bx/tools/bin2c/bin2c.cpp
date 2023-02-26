@@ -1,6 +1,6 @@
 /*
- * Copyright 2011-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #include <bx/allocator.h>
@@ -196,8 +196,8 @@ void help(const char* _error = NULL)
 
 	bx::write(stdOut, &err
 		, "bin2c, binary to C\n"
-		  "Copyright 2011-2021 Branimir Karadzic. All rights reserved.\n"
-		  "License: https://github.com/bkaradzic/bx#license-bsd-2-clause\n\n"
+		  "Copyright 2011-2022 Branimir Karadzic. All rights reserved.\n"
+		  "License: https://github.com/bkaradzic/bx/blob/master/LICENSE\n\n"
 		);
 
 	bx::write(stdOut, &err
@@ -252,14 +252,14 @@ int main(int _argc, const char* _argv[])
 
 		bx::DefaultAllocator allocator;
 		data = BX_ALLOC(&allocator, size);
-		bx::read(&fr, data, size);
+		bx::read(&fr, data, size, bx::ErrorAssert{});
 		bx::close(&fr);
 
 		bx::FileWriter fw;
 		if (bx::open(&fw, outFilePath) )
 		{
 			Bin2cWriter writer(&allocator, name);
-			bx::write(&writer, data, size);
+			bx::write(&writer, data, size, bx::ErrorAssert{});
 
 			writer.output(&fw);
 			bx::close(&fw);

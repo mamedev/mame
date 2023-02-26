@@ -41,6 +41,9 @@ Paste test:
 #include "speaker.h"
 #include "pmi80.lh"
 
+
+namespace {
+
 class pmi80_state : public driver_device
 {
 public:
@@ -242,6 +245,9 @@ ROM_START( pmi80 )
 	ROM_LOAD( "pmi80_monitor.io5", 0x0000, 0x0400, CRC(b93f4407) SHA1(43153441070ed0572f33d2815635eb7bae878e38))
 	//ROM_LOAD("expansion.io11", 0x0400, 0x0400, NO_DUMP)   Empty ROM socket
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

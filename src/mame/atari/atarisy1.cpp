@@ -123,7 +123,7 @@
     B00200-B003FF   R/W   xxxxxxxx xxxxxxxx   Motion object palette RAM (256 entries)
     B00400-B005FF   R/W   xxxxxxxx xxxxxxxx   Playfield palette RAM (256 entries)
     B00600-B007FF   R/W   xxxxxxxx xxxxxxxx   Translucency palette RAM (256 entries)
-    F00000-F00FFF   R/W   -------- xxxxxxxx   EEPROM
+    F00000-F003FF   R/W   -------- xxxxxxxx   EEPROM
     F20000-F20007   R     -------- xxxxxxxx   Analog inputs
     F40000-F4001F   R     -------- xxxxxxxx   Joystick inputs
     F40000-F4001F     W   -------- --------   Joystick IRQ enable
@@ -195,7 +195,7 @@ RoadBlasters (aka Future Vette):005*
 
 #include "emu.h"
 #include "atarisy1.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
@@ -420,7 +420,7 @@ void atarisy1_state::main_map(address_map &map)
 	map(0xa02000, 0xa02fff).ram().w(FUNC(atarisy1_state::atarisy1_spriteram_w)).share("mob");
 	map(0xa03000, 0xa03fff).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
 	map(0xb00000, 0xb007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xf00000, 0xf00fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0xf00000, 0xf003ff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0xf20000, 0xf20007).r(FUNC(atarisy1_state::trakball_r));
 	map(0xf40000, 0xf4001f).rw(FUNC(atarisy1_state::adc_r), FUNC(atarisy1_state::adc_w)).umask16(0x00ff);
 	map(0xf60000, 0xf60003).portr("F60000");

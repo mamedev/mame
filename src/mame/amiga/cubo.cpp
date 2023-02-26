@@ -323,6 +323,8 @@ routines :
 #include "speaker.h"
 
 
+namespace {
+
 /* set to 0 to use control panel with only buttons (as in quiz games) - joy is default in dispenser setup */
 #define MGPREM11_USE_JOY    1
 #define MGNUMBER_USE_JOY    1
@@ -1068,6 +1070,7 @@ void cubo_state::cubo(machine_config &config)
 	/* basic machine hardware */
 	M68EC020(config, m_maincpu, amiga_state::CLK_28M_PAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cubo_state::cubo_mem);
+	m_maincpu->reset_cb().set(FUNC(amiga_state::m68k_reset));
 
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&cubo_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&cubo_state::aga_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
@@ -1362,6 +1365,8 @@ void cubo_state::init_mgprem11()
 	init_cubo();
 	m_input_hack = &cubo_state::mgprem11_input_hack;
 }
+
+} // anonymous namespace
 
 
 GAME( 1993, cubo,      0,    cubo, cubo,     cubo_state, init_cubo,     ROT0, "Commodore",     "Cubo BIOS",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IS_BIOS_ROOT )

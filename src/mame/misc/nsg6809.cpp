@@ -41,6 +41,8 @@
 #include "machine/watchdog.h"
 
 
+namespace {
+
 class nsg6809_state : public driver_device
 {
 public:
@@ -103,6 +105,8 @@ ROM_START( pitchhit )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "ph101c__ck_a790.u14", 0x0000, 0x8000, CRC(1d306ab7) SHA1(13faf7c6dca8e5482672b2d09a99616896c4ae55) )
 ROM_END
+
+} // anonymous namespace
 
 
 GAME(1993, pitchhit, 0, pitchhit, pitchhit, nsg6809_state, empty_init, ROT0, "National Sports Games", "Pitch Hitter - Baseball Challenge", MACHINE_IS_SKELETON_MECHANICAL )

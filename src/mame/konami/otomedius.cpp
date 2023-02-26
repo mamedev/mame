@@ -19,6 +19,9 @@
 #include "cpu/i386/i386.h"
 #include "screen.h"
 
+
+namespace {
+
 class konami_pc_state : public driver_device
 {
 public:
@@ -98,5 +101,8 @@ ROM_START( otomedius )
 	DISK_REGION( "ide:0:hdd:image" ) // Seagate ST340015A 40GB PATA drive
 	DISK_IMAGE( "otomedius", 0, SHA1(9283f8b7cd747be7b8e7321953adbf6cbe926f25) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 2007, otomedius,  0,   konami_pc, konami_pc, konami_pc_state, empty_init, ROT0, "Konami", "Otomedius (ver GGG:J:A:A:2008041801)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

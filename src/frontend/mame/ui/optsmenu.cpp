@@ -60,18 +60,16 @@ menu_simple_game_options::~menu_simple_game_options()
 //  handle
 //-------------------------------------------------
 
-void menu_simple_game_options::handle(event const *ev)
+bool menu_simple_game_options::handle(event const *ev)
 {
-	// process the menu
-	if (ev && ev->itemref)
-		handle_item_event(*ev);
+	return ev && ev->itemref && handle_item_event(*ev);
 }
 
 //-------------------------------------------------
 //  populate
 //-------------------------------------------------
 
-void menu_simple_game_options::populate(float &customtop, float &custombottom)
+void menu_simple_game_options::populate()
 {
 	item_append(_(submenu::video_options()[0].description), 0, (void *)(uintptr_t)DISPLAY_MENU);
 	item_append(_("Sound Options"), 0, (void *)(uintptr_t)SOUND_MENU);
@@ -85,15 +83,13 @@ void menu_simple_game_options::populate(float &customtop, float &custombottom)
 	item_append(_("Input Devices"), 0, (void *)(uintptr_t)INPUTDEV_MENU);
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Save Settings"), 0, (void *)(uintptr_t)SAVE_CONFIG);
-
-	custombottom = 2.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
 
 //-------------------------------------------------
 //  handle item
 //-------------------------------------------------
 
-void menu_simple_game_options::handle_item_event(event const &menu_event)
+bool menu_simple_game_options::handle_item_event(event const &menu_event)
 {
 	if (IPT_UI_SELECT == menu_event.iptkey)
 	{
@@ -132,6 +128,7 @@ void menu_simple_game_options::handle_item_event(event const &menu_event)
 			break;
 		}
 	}
+	return false;
 }
 
 
@@ -163,18 +160,16 @@ menu_game_options::~menu_game_options()
 //  handle
 //-------------------------------------------------
 
-void menu_game_options::handle(event const *ev)
+bool menu_game_options::handle(event const *ev)
 {
-	// process the menu
-	if (ev && ev->itemref)
-		handle_item_event(*ev);
+	return ev && ev->itemref && handle_item_event(*ev);
 }
 
 //-------------------------------------------------
 //  populate
 //-------------------------------------------------
 
-void menu_game_options::populate(float &customtop, float &custombottom)
+void menu_game_options::populate()
 {
 	// set filter arrow
 	std::string fbuff;
@@ -198,14 +193,14 @@ void menu_game_options::populate(float &customtop, float &custombottom)
 	item_append(_("Configure Folders"), 0, (void *)(uintptr_t)CONF_DIR);
 
 	// add the options that don't relate to the UI
-	menu_simple_game_options::populate(customtop, custombottom);
+	menu_simple_game_options::populate();
 }
 
 //-------------------------------------------------
 //  handle item
 //-------------------------------------------------
 
-void menu_game_options::handle_item_event(event const &menu_event)
+bool menu_game_options::handle_item_event(event const &menu_event)
 {
 	bool changed = false;
 
@@ -270,12 +265,14 @@ void menu_game_options::handle_item_event(event const &menu_event)
 			menu::stack_push<menu_custom_ui>(ui(), container(), [this] () { reset(reset_options::REMEMBER_REF); });
 		break;
 	default:
-		menu_simple_game_options::handle_item_event(menu_event);
-		return;
+		return menu_simple_game_options::handle_item_event(menu_event);
 	}
 
 	if (changed)
 		reset(reset_options::REMEMBER_REF);
+
+	// triggers an item reset for any changes
+	return false;
 }
 
 } // namespace ui

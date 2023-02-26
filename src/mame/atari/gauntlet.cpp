@@ -29,7 +29,7 @@
     038000-03FFFF   R     xxxxxxxx xxxxxxxx   Slapstic-protected ROM
     040000-07FFFF   R     xxxxxxxx xxxxxxxx   Program ROM
     800000-801FFF   R/W   xxxxxxxx xxxxxxxx   Program RAM
-    802000-802FFF   R/W   -------- xxxxxxxx   EEPROM
+    802000-8023FF   R/W   -------- xxxxxxxx   EEPROM
     803000          R     -------- xxxxxxxx   Input port 1
     803002          R     -------- xxxxxxxx   Input port 2
     803004          R     -------- xxxxxxxx   Input port 3
@@ -122,7 +122,7 @@
 
 #include "emu.h"
 #include "gauntlet.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
@@ -264,7 +264,7 @@ void gauntlet_state::main_map(address_map &map)
 
 	// MBUS
 	map(0x800000, 0x801fff).mirror(0x2fc000).ram();
-	map(0x802000, 0x802fff).mirror(0x2fc000).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
+	map(0x802000, 0x8023ff).mirror(0x2fcc00).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x803000, 0x803001).mirror(0x2fcef0).portr("803000");
 	map(0x803002, 0x803003).mirror(0x2fcef0).portr("803002");
 	map(0x803004, 0x803005).mirror(0x2fcef0).portr("803004");

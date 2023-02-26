@@ -300,8 +300,7 @@ void upd765_family_device::soft_reset()
 		flopi[i].st0_filled = false;
 	}
 	clr_drive_busy();
-	data_irq = false;
-	other_irq = false;
+	irq = false;
 	internal_drq = false;
 	fifo_pos = 0;
 	command_pos = 0;
@@ -521,11 +520,6 @@ uint8_t upd765_family_device::msr_r()
 		}
 	msr |= get_drive_busy();
 
-	if(data_irq && !machine().side_effects_disabled()) {
-		data_irq = false;
-		check_irq();
-	}
-
 	return msr;
 }
 
@@ -546,6 +540,11 @@ void upd765_family_device::set_rate(int rate)
 uint8_t upd765_family_device::fifo_r()
 {
 	uint8_t r = 0xff;
+	if(!machine().side_effects_disabled())
+	{
+		irq = false;
+		check_irq();
+	}
 	switch(main_phase) {
 	case PHASE_CMD:
 		if(machine().side_effects_disabled())
@@ -591,11 +590,12 @@ void upd765_family_device::fifo_w(uint8_t data)
 	if(!BIT(dor, 2))
 		LOGWARN("%s: fifo_w(%02x) in reset\n", machine().describe_context(), data);
 
+	irq = false;
+	check_irq();
+
 	switch(main_phase) {
 	case PHASE_CMD: {
 		command[command_pos++] = data;
-		other_irq = false;
-		check_irq();
 		int cmd = check_command();
 		if(cmd == C_INCOMPLETE)
 			break;
@@ -1509,8 +1509,6 @@ void upd765_family_device::execute_command(int cmd)
 		LOGCOMMAND("command sense interrupt status (fid=%d %02x %02x) (%s)\n", fid, result[0], result[1], machine().describe_context());
 		result_pos = 2;
 
-		other_irq = false;
-		check_irq();
 		break;
 	}
 
@@ -1594,12 +1592,9 @@ void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 {
 	LOGDONE("command done (%s) - %s\n", data_completion ? "data" : "seek", results());
 	fi.main_state = fi.sub_state = IDLE;
-	if(data_completion)
-		data_irq = true;
-	else {
-		other_irq = true;
+	irq = true;
+	if(!data_completion)
 		fi.st0_filled = true;
-	}
 	check_irq();
 }
 
@@ -1899,6 +1894,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 				return;
 			}
 			st1 &= ~ST1_ND;
+			st2 &= ~ST2_WC;
 			LOGRW("reading sector %02x %02x %02x %02x\n",
 						cur_live.idbuf[0],
 						cur_live.idbuf[1],
@@ -2514,7 +2510,7 @@ void upd765_family_device::read_id_continue(floppy_info &fi)
 void upd765_family_device::check_irq()
 {
 	bool old_irq = cur_irq;
-	cur_irq = data_irq || other_irq || internal_drq;
+	cur_irq = irq || internal_drq;
 	cur_irq = cur_irq && (dor & 4) && (mode != mode_t::AT || (dor & 8));
 	if(cur_irq != old_irq) {
 		LOGTCIRQ("irq = %d\n", cur_irq);
@@ -2577,7 +2573,7 @@ TIMER_CALLBACK_MEMBER(upd765_family_device::run_drive_ready_polling)
 			if(!flopi[fid].st0_filled) {
 				flopi[fid].st0 = ST0_ABRT | fid;
 				flopi[fid].st0_filled = true;
-				other_irq = true;
+				irq = true;
 			}
 		}
 	}
@@ -3157,7 +3153,7 @@ void dp8473_device::soft_reset()
 	upd765_family_device::soft_reset();
 
 	// "interrupt is generated when ... Internal Ready signal changes state immediately after a hardware or software reset"
-	other_irq = true;
+	irq = true;
 }
 
 pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ps2_fdc_device(mconfig, PC8477A, tag, owner, clock)

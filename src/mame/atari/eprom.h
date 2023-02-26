@@ -5,8 +5,8 @@
     Atari Escape hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_EPROM_H
-#define MAME_INCLUDES_EPROM_H
+#ifndef MAME_ATARI_EPROM_H
+#define MAME_ATARI_EPROM_H
 
 #pragma once
 
@@ -80,4 +80,4 @@ private:
 	void main_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_EPROM_H
+#endif // MAME_ATARI_EPROM_H

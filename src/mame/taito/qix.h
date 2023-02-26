@@ -6,8 +6,8 @@
     Taito Qix hardware
 
 ***************************************************************************/
-#ifndef MAME_INCLUDES_QIX_H
-#define MAME_INCLUDES_QIX_H
+#ifndef MAME_TAITO_QIX_H
+#define MAME_TAITO_QIX_H
 
 #pragma once
 
@@ -94,9 +94,9 @@ protected:
 	required_shared_ptr<uint8_t> m_videoram_address;
 	optional_shared_ptr<uint8_t> m_videoram_mask;
 	required_shared_ptr<uint8_t> m_scanline_latch;
-	uint8_t  m_flip;
-	uint8_t  m_palette_bank;
-	uint8_t  m_leds;
+	uint8_t  m_flip = 0U;
+	uint8_t  m_palette_bank = 0U;
+	uint8_t  m_leds = 0U;
 
 	optional_memory_bank m_bank0;
 	optional_memory_bank m_bank1;
@@ -104,7 +104,7 @@ protected:
 	std::unique_ptr<uint8_t[]> m_decrypted;
 	std::unique_ptr<uint8_t[]> m_decrypted2;
 
-	pen_t m_pens[0x400];
+	pen_t m_pens[0x400]{};
 	void qix_data_firq_w(uint8_t data);
 	void qix_data_firq_ack_w(uint8_t data);
 	uint8_t qix_data_firq_r(address_space &space);
@@ -211,4 +211,4 @@ private:
 	required_memory_bank m_vidbank;
 };
 
-#endif // MAME_INCLUDES_QIX_H
+#endif // MAME_TAITO_QIX_H

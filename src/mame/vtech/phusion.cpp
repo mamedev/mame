@@ -67,7 +67,7 @@ void phusion_state::phusion(machine_config &config)
 	CR16B(config, m_maincpu, 10000000); // FIXME: determine exact type and clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &phusion_state::phusion_map);
 
-	AMD_29F800B_16BIT(config, "flash", 0);
+	TC58FVT800(config, "flash");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);

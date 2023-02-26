@@ -45,6 +45,8 @@ Notes/Tidbits:
 #include "speaker.h"
 
 
+namespace {
+
 class scobra_state : public scramble_state
 {
 public:
@@ -339,11 +341,7 @@ void scobra_state::minefldfe_map(address_map &map)
 	map(0x4C00, 0x4C03).mirror(0x00fc).rw(m_ppi8255_1, FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x4B00, 0x4B03).mirror(0x00fc).rw(m_ppi8255_0, FUNC(i8255_device::read), FUNC(i8255_device::write));
 
-
-
-
 	map(0x1D98, 0x1D98).r("watchdog", FUNC(watchdog_timer_device::reset_r)); // 0xb000
-
 
 	// addresses below are WRONG, just moved to keep things out the way while the rom mapping is figured out
 	map(0xf802, 0xf802).w(FUNC(scobra_state::galaxold_coin_counter_w));
@@ -1793,6 +1791,9 @@ ROM_START( mimonkeyug ) // this bootleg has significant hardware changes: no aud
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "sn74s288n.6l",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1981, stratgyx,   0,        stratgyx,   stratgyx,   scobra_state,  init_stratgyx, ROT0,   "Konami",                             "Strategy X", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, stratgys,   stratgyx, stratgyx,   stratgyx,   scobra_state,  init_stratgyx, ROT0,   "Konami (Stern Electronics license)", "Strategy X (Stern Electronics)", MACHINE_SUPPORTS_SAVE )

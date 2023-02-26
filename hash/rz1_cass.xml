@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+
+license:CC0-1.0
+
+Casio RZ-1 tapes
+
+-->
+
+<softwarelist name="rz1_cass" description="Casio RZ-1 cassettes">
+
+	<!-- Audio Tapes (for the line-in port) -->
+
+	<!-- Created from an MP3 -->
+	<software name="rz1sc">
+		<description>Casio RZ-1 Sound Collection</description>
+		<year>1983</year>
+		<publisher>Casio</publisher>
+		<info name="usage" value="Hold SAMPLING, push sample number(s) then let go to start sampling" />
+		<part name="sidea" interface="audio_cass">
+			<dataarea name="cass" size="39426360">
+				<rom name="rz1_sound_collection_side_a.wav" size="39426360" crc="CB00C86C" sha1="869672d3b429033bd0073e0ccf743f26dc6b6bd2" />
+			</dataarea>
+		</part>
+		<part name="sideb" interface="audio_cass">
+			<dataarea name="cass" size="34800258">
+				<rom name="rz1_sound_collection_side_b.wav" size="34800258" crc="9F0B0628" sha1="47c88b973e4be88a62144c57719b86e1b90b34d9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Data Tapes (for the MT port) -->
+
+	<!-- Provided by R-Massive from http://zine.r-massive.com/casio-rz-1-mt-jack/ -->
+	<software name="80sdrums">
+		<description>80's Drums (samples)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="usage" value="Push MT LOAD, push NO to select samples, push YES to load" />
+		<part name="cass1" interface="rz1_cass">
+			<dataarea name="cass" size="21406">
+				<rom name="80s_drums.cas" size="21406" crc="5428108b" sha1="560afbe28fc2112e9cda4811eba78e833e219169" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Provided by R-Massive from http://zine.r-massive.com/casio-rz-1-mt-jack/ -->
+	<software name="fourcymb">
+		<description>Four Cymbals (samples)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="usage" value="Push MT LOAD, push NO to select samples, push YES to load" />
+		<part name="cass1" interface="rz1_cass">
+			<dataarea name="cass" size="8379044">
+				<rom name="four_cymbals.wav" size="8379044" crc="5b1bce12" sha1="1a2ea236819aed674de199b7fcb8f829ce1167dd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Provided by R-Massive from http://zine.r-massive.com/casio-rz-1-mt-jack/ -->
+	<software name="harddrum">
+		<description>Hard Drums (samples)</description>
+		<year>2016</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="usage" value="Push MT LOAD, push NO to select samples, push YES to load" />
+		<part name="cass1" interface="rz1_cass">
+			<dataarea name="cass" size="21406">
+				<rom name="hard_drums.cas" size="21406" crc="4f4aee44" sha1="f16d9f967689fc1d0929f0f17d5f3e31f57cdda9" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

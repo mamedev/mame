@@ -5,8 +5,8 @@
     Zaccaria Galaxia HW
 
 ****************************************************************************/
-#ifndef MAME_INCLUDES_GALAXIA_H
-#define MAME_INCLUDES_GALAXIA_H
+#ifndef MAME_CVS_GALAXIA_H
+#define MAME_CVS_GALAXIA_H
 
 #pragma once
 
@@ -51,4 +51,4 @@ private:
 	void galaxia_mem_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_GALAXIA_H
+#endif // MAME_CVS_GALAXIA_H

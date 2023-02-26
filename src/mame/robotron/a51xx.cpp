@@ -18,6 +18,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class a51xx_state : public driver_device
 {
 public:
@@ -185,6 +187,9 @@ ROM_START( a5130 )
 	ROM_LOAD( "bab47_1_lat.bin", 0x0000, 0x0400, CRC(93220886) SHA1(a5a1ab4e2e06eabc58c84991caa6a1cf55f1462d))
 	ROM_LOAD( "bab46_2_lat.bin", 0x0400, 0x0400, CRC(7a578ec8) SHA1(d17d3f1c182c23e9e9fd4dd56f3ac3de4c18fb1a))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

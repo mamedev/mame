@@ -23,7 +23,7 @@ end
 function hiscore.startplugin()
 
 	local function get_data_path()
-		return emu.subst_env(manager.machine.options.entries.homepath:value():match('([^;]+)')) .. '/hiscore'
+		return manager.machine.options.entries.homepath:value():match('([^;]+)') .. '/hiscore'
 	end
 
 	-- configuration

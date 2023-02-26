@@ -5,8 +5,8 @@
     Lock-On hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_LOCKON_H
-#define MAME_INCLUDES_LOCKON_H
+#ifndef MAME_TATSUMI_LOCKON_H
+#define MAME_TATSUMI_LOCKON_H
 
 #pragma once
 
@@ -158,4 +158,4 @@ private:
 	void sound_prg(address_map &map);
 };
 
-#endif // MAME_INCLUDES_LOCKON_H
+#endif // MAME_TATSUMI_LOCKON_H

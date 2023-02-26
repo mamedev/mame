@@ -55,6 +55,8 @@
 #include "vt100.lh"
 
 
+namespace {
+
 class vt100_state : public driver_device
 {
 public:
@@ -863,6 +865,9 @@ ROM_START( vt180 )
 	ROM_LOAD( "23-021e3-00.bin", 0x0000, 0x1000, CRC(a2a575d2) SHA1(47a2c40aaec89e8476240f25515d75ab157f2911))
 	ROM_LOAD( "23-017e3-00.bin", 0x1000, 0x1000, CRC(4bdd2398) SHA1(84f288def6c143a2d2ed9dedf947c862c66bb18e))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

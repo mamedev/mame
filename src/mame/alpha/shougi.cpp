@@ -78,16 +78,20 @@ PROM  : Type MB7051
 **************************************************************************/
 
 #include "emu.h"
-#include "machine/74259.h"
+
 #include "alpha8201.h"
+
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+namespace {
 
 class shougi_state : public driver_device
 {
@@ -127,13 +131,8 @@ private:
 	int m_r = 0;
 };
 
-
 void shougi_state::machine_start()
 {
-	// zerofill
-	m_nmi_enabled = 0;
-	m_r = 0;
-
 	// register for savestates
 	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_r));
@@ -243,6 +242,15 @@ WRITE_LINE_MEMBER(shougi_state::nmi_enable_w)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 		m_subcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
+}
+
+INTERRUPT_GEN_MEMBER(shougi_state::vblank_nmi)
+{
+	if (m_nmi_enabled)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -360,16 +368,6 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(shougi_state::vblank_nmi)
-{
-	if (m_nmi_enabled)
-	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	}
-}
-
-
 void shougi_state::shougi(machine_config &config)
 {
 	/* basic machine hardware */
@@ -464,6 +462,8 @@ ROM_START( shougi2 )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "pr.2l",   0x0000, 0x0020, CRC(cd3559ff) SHA1(a1291b06a8a337943660b2ef62c94c49d58a6fb5) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*    YEAR  NAME     PARENT  MACHINE  INPUT    STATE         INIT        MONITOR  COMPANY                              FULLNAME          FLAGS */

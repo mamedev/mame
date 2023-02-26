@@ -53,7 +53,6 @@ const filter_getinfoproc filters[] =
 	filter_eoln_getinfo,
 	filter_cocobas_getinfo,
 	filter_dragonbas_getinfo,
-	filter_macbinary_getinfo,
 	filter_vzsnapshot_getinfo,
 	filter_vzbas_getinfo,
 	filter_thombas5_getinfo,

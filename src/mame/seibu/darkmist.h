@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Nicola Salmoria, Tomasz Slanina
-#ifndef MAME_INCLUDES_DARKMIST_H
-#define MAME_INCLUDES_DARKMIST_H
+#ifndef MAME_SEIBU_DARKMIST_H
+#define MAME_SEIBU_DARKMIST_H
 
 #pragma once
 
@@ -84,4 +84,4 @@ private:
 	void memmap(address_map &map);
 };
 
-#endif // MAME_INCLUDES_DARKMIST_H
+#endif // MAME_SEIBU_DARKMIST_H

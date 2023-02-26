@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
-#ifndef MAME_INCLUDES_TWIN16_H
-#define MAME_INCLUDES_TWIN16_H
+#ifndef MAME_KONAMI_TWIN16_H
+#define MAME_KONAMI_TWIN16_H
 
 #pragma once
 
@@ -152,4 +152,4 @@ private:
 	uint16_t m_nvram[0x400 * 0x20 / 2]{};
 };
 
-#endif // MAME_INCLUDES_TWIN16_H
+#endif // MAME_KONAMI_TWIN16_H

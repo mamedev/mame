@@ -577,7 +577,7 @@ uint32_t *jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, in
 		uint32_t lower2 = objdata[3];
 
 		/* extract data */
-		int32_t xpos = (int32_t)(lower2 << 20) >> 20;
+		int32_t xpos = util::sext(lower2, 12);
 		uint8_t depth = 1 << ((lower2 >> 12) & 7);
 		uint8_t pitch = (lower2 >> 15) & 7;
 		uint32_t dwidth = (lower2 >> 18) & 0x3ff;
@@ -598,7 +598,7 @@ uint32_t *jaguar_state::process_bitmap(uint16_t *scanline, uint32_t *objdata, in
 		uint32_t lower2 = objdata[3];
 
 		/* extract data */
-		int32_t xpos = (int32_t)(lower2 << 20) >> 20;
+		int32_t xpos = util::sext(lower2, 12);
 		uint8_t depthlog = (lower2 >> 12) & 7;
 		uint8_t pitch = (lower2 >> 15) & 7;
 		uint32_t dwidth = (lower2 >> 18) & 0x3ff;
@@ -759,7 +759,7 @@ uint32_t *jaguar_state::process_scaled_bitmap(uint16_t *scanline, uint32_t *objd
 		uint32_t lower2 = objdata[3];
 
 		/* extract data */
-		int32_t xpos = (int32_t)(lower2 << 20) >> 20;
+		int32_t xpos = util::sext(lower2, 12);
 		uint8_t depth = 1 << ((lower2 >> 12) & 7);
 		uint8_t pitch = (lower2 >> 15) & 7;
 		uint32_t dwidth = (lower2 >> 18) & 0x3ff;
@@ -784,7 +784,7 @@ uint32_t *jaguar_state::process_scaled_bitmap(uint16_t *scanline, uint32_t *objd
 		uint32_t lower2 = objdata[3];
 
 		/* extract data */
-		int32_t xpos = (int32_t)(lower2 << 20) >> 20;
+		int32_t xpos = util::sext(lower2, 12);
 		uint8_t depthlog = (lower2 >> 12) & 7;
 		uint8_t pitch = (lower2 >> 15) & 7;
 		uint32_t dwidth = (lower2 >> 18) & 0x3ff;

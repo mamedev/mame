@@ -448,7 +448,7 @@ void hcastle_state::machine_reset()
 void hcastle_state::hcastle(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, 3000000);    // Derived from 24 MHz clock
+	KONAMI(config, m_maincpu, 12000000);    // Derived from 24 MHz clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &hcastle_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(hcastle_state::irq0_line_hold));
 

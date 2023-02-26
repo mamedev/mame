@@ -9,8 +9,8 @@ DEC VT Terminal video emulation
 
 **********************************************************************/
 
-#ifndef MAME_VIDEO_VTVIDEO_H
-#define MAME_VIDEO_VTVIDEO_H
+#ifndef MAME_DEC_VTVIDEO_H
+#define MAME_DEC_VTVIDEO_H
 
 #pragma once
 
@@ -109,4 +109,4 @@ DECLARE_DEVICE_TYPE(VT100_VIDEO, vt100_video_device)
 DECLARE_DEVICE_TYPE(RAINBOW_VIDEO, rainbow_video_device)
 
 
-#endif // MAME_VIDEO_VTVIDEO_H
+#endif // MAME_DEC_VTVIDEO_H

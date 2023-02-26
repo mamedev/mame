@@ -1,152 +1,202 @@
 // license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
-/*****************************************************************************
- *
- *   scmpdasm.c
- *
- *   National Semiconductor SC/MP CPU Disassembly
- *
- *****************************************************************************/
+// copyright-holders:AJR
+/***************************************************************************
+
+    National Semiconductor SC/MP disassembler
+
+    The pseudo-instruction "JS Pn, dest" (not handled by this disassembler)
+    awkwardly effects a subroutine call by the following sequence of five
+    instructions:
+
+        LDI     H(dest-1)
+        XPAH    Pn
+        LDI     L(dest-1)
+        XPAL    Pn
+        XPPC    Pn
+
+    The Programming and Assembler manual also mentions stacks, which are
+    only supported as a software convention. The .DBYTE directive stores
+    16-bit data in big-endian format, though no single instruction loads
+    more than 8 bits.
+
+    All address arithmetic operates within 4 KB pages, passing bits 15-12
+    of pointer registers unchanged.
+
+***************************************************************************/
 
 #include "emu.h"
 #include "scmpdasm.h"
+
+scmp_disassembler::scmp_disassembler()
+	: util::disasm_interface()
+{
+}
 
 u32 scmp_disassembler::opcode_alignment() const
 {
 	return 1;
 }
 
+u32 scmp_disassembler::interface_flags() const
+{
+	return PAGED;
+}
+
+u32 scmp_disassembler::page_address_bits() const
+{
+	return 12;
+}
+
+namespace {
+
+const char *const s_mref_insts[8] =
+{
+	"LD", "ST", "AND", "OR", "XOR", "DAD", "ADD", "CAD"
+};
+
+const char *const s_alu_ops[8] =
+{
+	"LD", "ST", "AN", "OR", "XR", "DA", "AD", "CA"
+};
+
+const char *const s_xfer_insts[4] =
+{
+	"JMP", "JP", "JZ", "JNZ"
+};
+
+const char *const s_ptr_regs[4] =
+{
+	"PC", "P1", "P2", "P3"
+};
+
+} // anonymous namespace
+
+void scmp_disassembler::format_disp(std::ostream &stream, offs_t pc, u8 op, u8 disp)
+{
+	if (disp == 0x80)
+		util::stream_format(stream, "E(%s)", s_ptr_regs[BIT(op, 0, 2)]);
+	else if (BIT(op, 0, 2) == 0)
+		util::stream_format(stream, "X'%04X", (pc & 0xf000) | ((pc + ((op & 0xf0) == 0x90 ? 2 : 1) + s8(disp)) & 0x0fff));
+	else
+	{
+		if (s8(disp) < 0)
+		{
+			stream << '-';
+			disp = -disp;
+		}
+		if (disp > 9)
+			stream << "X'";
+		util::stream_format(stream, "%X(%s)", disp, s_ptr_regs[BIT(op, 0, 2)]);
+	}
+}
+
 offs_t scmp_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	unsigned PC = pc;
-	uint8_t op = opcodes.r8(pc++);
-	uint8_t ptr = op & 3;
-
-	if (BIT(op,7)) {
-		// two-byte instructions
-		char as[10];
-		uint8_t arg = params.r8(pc++);
-		if (arg==0x80) {
-			sprintf(as,"E");
-		} else if (arg & 0x80) {
-			sprintf(as,"-$%02x",0x100-arg);
-		} else {
-			sprintf(as,"+$%02x",arg);
-		}
-
-		switch (op)
+	u8 op = opcodes.r8(pc);
+	if (op >= 0xc0 && op != 0xcc)
+	{
+		if (BIT(op, 0, 3) == 4)
 		{
-			// Memory Reference Instructions
-			case 0xc0 : util::stream_format(stream, "ld %s",as); break;
-			case 0xc1 : case 0xc2 : case 0xc3 :
-						util::stream_format(stream, "ld %s(%d)",as,ptr);break;
-			case 0xc5 : case 0xc6 : case 0xc7 :
-						util::stream_format(stream, "ld @%s(%d)",as,ptr); break;
-			case 0xc8 : util::stream_format(stream, "st %s",as); break;
-			case 0xc9 : case 0xca : case 0xcb :
-						util::stream_format(stream, "st %s(%d)",as,ptr);break;
-			case 0xcd : case 0xce : case 0xcf :
-						util::stream_format(stream, "st @%s(%d)",as,ptr); break;
-			case 0xd0 : util::stream_format(stream, "and %s",as); break;
-			case 0xd1 : case 0xd2 : case 0xd3 :
-						util::stream_format(stream, "and %s(%d)",as,ptr);break;
-			case 0xd5 : case 0xd6 : case 0xd7 :
-						util::stream_format(stream, "and @%s(%d)",as,ptr); break;
-			case 0xd8 : util::stream_format(stream, "or %s",as); break;
-			case 0xd9 : case 0xda : case 0xdb :
-						util::stream_format(stream, "or %s(%d)",as,ptr);break;
-			case 0xdd : case 0xde : case 0xdf :
-						util::stream_format(stream, "or @%s(%d)",as,ptr); break;
-			case 0xe0 : util::stream_format(stream, "xor %s",as); break;
-			case 0xe1 : case 0xe2 : case 0xe3 :
-						util::stream_format(stream, "xor %s(%d)",as,ptr);break;
-			case 0xe5 : case 0xe6 : case 0xe7 :
-						util::stream_format(stream, "xor @%s(%d)",as,ptr); break;
-			case 0xe8 : util::stream_format(stream, "dad %s",as); break;
-			case 0xe9 : case 0xea : case 0xeb :
-						util::stream_format(stream, "dad %s(%d)",as,ptr);break;
-			case 0xed : case 0xee : case 0xef :
-						util::stream_format(stream, "dad @%s(%d)",as,ptr); break;
-			case 0xf0 : util::stream_format(stream, "add %s",as); break;
-			case 0xf1 : case 0xf2 : case 0xf3 :
-						util::stream_format(stream, "add %s(%d)",as,ptr);break;
-			case 0xf5 : case 0xf6 : case 0xf7 :
-						util::stream_format(stream, "add @%s(%d)",as,ptr); break;
-			case 0xf8 : util::stream_format(stream, "cad %s",as); break;
-			case 0xf9 : case 0xfa : case 0xfb :
-						util::stream_format(stream, "cad %s(%d)",as,ptr);break;
-			case 0xfd : case 0xfe : case 0xff :
-						util::stream_format(stream, "cad @%s(%d)",as,ptr); break;
-			// Memory Increment/Decrement Instructions
-			case 0xa8 : case 0xa9 : case 0xaa : case 0xab :
-						util::stream_format(stream, "ild %s(%d)",as,ptr); break;
-			case 0xb8 : case 0xb9 : case 0xba : case 0xbb :
-						util::stream_format(stream, "dld %s(%d)",as,ptr); break;
-			// Immediate Instructions
-			case 0xc4 : util::stream_format(stream, "ldi $%02x",arg); break;
-			case 0xd4 : util::stream_format(stream, "ani $%02x",arg); break;
-			case 0xdc : util::stream_format(stream, "ori $%02x",arg); break;
-			case 0xe4 : util::stream_format(stream, "xri $%02x",arg); break;
-			case 0xec : util::stream_format(stream, "dai $%02x",arg); break;
-			case 0xf4 : util::stream_format(stream, "adi $%02x",arg); break;
-			case 0xfc : util::stream_format(stream, "cai $%02x",arg); break;
-			// Transfer Instructions
-			case 0x90 : util::stream_format(stream, "jmp %s",as);break;
-			case 0x91 : case 0x92 : case 0x93 :
-						util::stream_format(stream, "jmp %s(%d)",as,ptr);break;
-			case 0x94 : util::stream_format(stream, "jp %s",as); break;
-			case 0x95 : case 0x96 : case 0x97 :
-						util::stream_format(stream, "jp %s(%d)",as,ptr); break;
-			case 0x98 : util::stream_format(stream, "jz %s",as); break;
-			case 0x99 : case 0x9a : case 0x9b :
-						util::stream_format(stream, "jz %s(%d)",as,ptr); break;
-			case 0x9c : util::stream_format(stream, "jnz %s",as); break;
-			case 0x9d : case 0x9e : case 0x9f :
-						util::stream_format(stream, "jnz %s(%d)",as,ptr); break;
-			// Double-Byte Miscellaneous Instructions
-			case 0x8f:  util::stream_format(stream, "dly $%02x",arg); break;
-			// Others are illegal
-			default : util::stream_format(stream, "illegal"); pc--; break; // Illegal we consider without param
+			// Immediate instructions
+			util::stream_format(stream, "%s%-6cX'%02X", s_alu_ops[BIT(op, 3, 3)], 'I', opcodes.r8(pc + 1));
 		}
-	} else {
-		// one byte instructions
-		switch (op)
+		else
 		{
-			// Extension Register Instructions
-			case 0x40:  util::stream_format(stream, "lde"); break;
-			case 0x01:  util::stream_format(stream, "xae"); break;
-			case 0x50:  util::stream_format(stream, "ane"); break;
-			case 0x58:  util::stream_format(stream, "ore"); break;
-			case 0x60:  util::stream_format(stream, "xre"); break;
-			case 0x68:  util::stream_format(stream, "dae"); break;
-			case 0x70:  util::stream_format(stream, "ade"); break;
-			case 0x78:  util::stream_format(stream, "cae"); break;
-			// Pointer Register Move Instructions
-			case 0x30:  case 0x31 :case 0x32: case 0x33:
-						util::stream_format(stream, "xpal %d",ptr); break;
-			case 0x34:  case 0x35 :case 0x36: case 0x37:
-						util::stream_format(stream, "xpah %d",ptr); break;
-			case 0x3c:  case 0x3d :case 0x3e: case 0x3f:
-						util::stream_format(stream, "xppc %d",ptr); break;
-			// Shift, Rotate, Serial I/O Instructions
-			case 0x19:  util::stream_format(stream, "sio"); break;
-			case 0x1c:  util::stream_format(stream, "sr"); break;
-			case 0x1d:  util::stream_format(stream, "srl"); break;
-			case 0x1e:  util::stream_format(stream, "rr"); break;
-			case 0x1f:  util::stream_format(stream, "rrl"); break;
-			// Single Byte Miscellaneous Instructions
-			case 0x00:  util::stream_format(stream, "halt"); break;
-			case 0x02:  util::stream_format(stream, "ccl"); break;
-			case 0x03:  util::stream_format(stream, "scl"); break;
-			case 0x04:  util::stream_format(stream, "dint"); break;
-			case 0x05:  util::stream_format(stream, "ien"); break;
-			case 0x06:  util::stream_format(stream, "csa"); break;
-			case 0x07:  util::stream_format(stream, "cas"); break;
-			case 0x08:  util::stream_format(stream, "nop"); break;
-			// Others are illegal
-			default : util::stream_format(stream, "illegal"); break;
+			// Memory reference instructions
+			util::stream_format(stream, "%-8s", s_mref_insts[BIT(op, 3, 3)]);
+			if (BIT(op, 2))
+				stream << '@'; // "Auto-indexed" (post-increment or pre-decrement)
+			format_disp(stream, pc, op, opcodes.r8(pc + 1));
 		}
+		return 2 | SUPPORTED;
 	}
+	else if ((op & 0xec) == 0xa8)
+	{
+		// Memory increment/decrement instructions
+		util::stream_format(stream, "%-8s", BIT(op, 4) ? "DLD" : "ILD");
+		format_disp(stream, pc, op, opcodes.r8(pc + 1));
+		return 2 | SUPPORTED;
+	}
+	else if ((op & 0xf0) == 0x90)
+	{
+		// Transfer instructions (effective address is off by 1)
+		util::stream_format(stream, "%-8s", s_xfer_insts[BIT(op, 2, 2)]);
+		format_disp(stream, pc, op, opcodes.r8(pc + 1));
+		return 2 | (BIT(op, 2, 2) != 0 ? STEP_COND : 0) | SUPPORTED;
+	}
+	else if (op == 0x8f)
+	{
+		util::stream_format(stream, "%-8s%d", "DLY", opcodes.r8(pc + 1));
+		return 2 | SUPPORTED;
+	}
+	else
+	{
+		// Single-byte instructions
+		switch (op)
+		{
+		case 0x00:
+			stream << "HALT";
+			break;
 
-	return (pc - PC);
+		case 0x01:
+			stream << "XAE";
+			break;
+
+		case 0x02: case 0x03:
+			util::stream_format(stream, "%cCL", BIT(op, 0) ? 'S' : 'C');
+			break;
+
+		case 0x04:
+			stream << "DINT";
+			break;
+
+		case 0x05:
+			stream << "IEN";
+			break;
+
+		case 0x06:
+			stream << "CSA";
+			break;
+
+		case 0x07:
+			stream << "CAS";
+			break;
+
+		case 0x08:
+			stream << "NOP";
+			break;
+
+		case 0x19:
+			stream << "SIO";
+			break;
+
+		case 0x1c: case 0x1d: case 0x1e: case 0x1f:
+			// Shift and rotate instructions
+			util::stream_format(stream, "%cR", BIT(op, 1) ? 'R' : 'S');
+			if (BIT(op, 0))
+				stream << 'L';
+			break;
+
+		case 0x30: case 0x31: case 0x32: case 0x33:
+		case 0x34: case 0x35: case 0x36: case 0x37:
+			// Exchange pointer with AC
+			util::stream_format(stream, "%-8s%s", BIT(op, 2) ? "XPAH" : "XPAL", s_ptr_regs[BIT(op, 0, 2)]);
+			break;
+
+		case 0x3c: case 0x3d: case 0x3e: case 0x3f:
+			// Exchange pointer with PC
+			util::stream_format(stream, "%-8s%s", "XPPC", s_ptr_regs[BIT(op, 0, 2)]);
+			return 1 | STEP_OUT | SUPPORTED;
+
+		case 0x40: case 0x50: case 0x58: case 0x60: case 0x68: case 0x70: case 0x78:
+			// Extension register instructions
+			util::stream_format(stream, "%sE", s_alu_ops[BIT(op, 3, 3)]);
+			break;
+
+		default:
+			util::stream_format(stream, "%-8sX'%02X", ".BYTE", op);;
+			break;
+		}
+		return 1 | SUPPORTED;
+	}
 }

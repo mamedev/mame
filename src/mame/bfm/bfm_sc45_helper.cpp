@@ -429,11 +429,7 @@ int find_lamp_strings(running_machine &machine)
 	{
 		for (int x = 0; x < 16; x++)
 		{
-			char tmp[32];
-
-			sprintf(tmp, "(%02d:%02d)", y, x);
-
-			lamps[y][x].lampname = std::string(tmp);
+			lamps[y][x].lampname = util::string_format("(%02d:%02d)", y, x);
 			lamps[y][x].used = false;
 			lamps[y][x].y = (y * 28);
 			lamps[y][x].x = 380 + (x * 24);
@@ -443,7 +439,6 @@ int find_lamp_strings(running_machine &machine)
 			lamps[y][x].lamptypename = "unusedlamp";
 			lamps[y][x].clickport = -1;
 			lamps[y][x].clickmask = 0;
-
 		}
 	}
 
@@ -598,8 +593,7 @@ int find_lamp_strings(running_machine &machine)
 	for (int reel = 0; reel < 8; reel++)
 	{
 		char tempname[32];
-		sprintf(tempname, "reel%d ", reel+1);
-
+		snprintf(tempname, std::size(tempname), "reel%d ", reel+1);
 
 		for (int pos = 0; pos < 3; pos++)
 		{
@@ -608,7 +602,6 @@ int find_lamp_strings(running_machine &machine)
 			if (pos == 0) snprintf(tempname2, std::size(tempname2), "%stop", tempname);
 			if (pos == 1) snprintf(tempname2, std::size(tempname2), "%smid", tempname);
 			if (pos == 2) snprintf(tempname2, std::size(tempname2), "%sbot", tempname);
-
 
 			for (auto & lamp : lamps)
 			{
@@ -624,14 +617,11 @@ int find_lamp_strings(running_machine &machine)
 						lamp[x].width = 50;
 						lamp[x].height = 17;
 						lamp[x].lamptypename = "reellamp";
-
-
 					}
 					else
 					{
 						//printf("%s:%s:\n", tempname2, lamps[y][x].lampname_alt.c_str());
 					}
-
 				}
 			}
 		}
@@ -656,8 +646,6 @@ int find_lamp_strings(running_machine &machine)
 		set_clickable_temp(machine, "cash bust", 8, 0x04);
 
 		// no 'refill' lamp?
-
-
 	}
 
 

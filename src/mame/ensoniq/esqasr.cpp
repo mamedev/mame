@@ -40,6 +40,7 @@
 #include "emu.h"
 
 #include "cpu/es5510/es5510.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/68340.h"
 #include "esqvfd.h"
 #include "machine/upd765.h"
@@ -48,6 +49,8 @@
 
 #include "speaker.h"
 
+
+namespace {
 
 class esqasr_state : public driver_device
 {
@@ -219,6 +222,9 @@ ROM_END
 void esqasr_state::init_asr()
 {
 }
+
+} // anonymous namespace
+
 
 CONS( 1992, asr10, 0, 0, asr, asr, esqasr_state, init_asr, "Ensoniq", "ASR-10", MACHINE_NOT_WORKING )
 CONS( 1997, asrx,  0, 0, asrx,asr, esqasr_state, init_asr, "Ensoniq", "ASR-X",  MACHINE_NOT_WORKING )

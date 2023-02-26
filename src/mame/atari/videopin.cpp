@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sebastien Monassa
+
 /*************************************************************************
 
     Atari Video Pinball driver
@@ -18,19 +19,177 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "videopin.h"
+
+#include "videopin_a.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "videopin.lh"
 
 
+namespace {
+
+class videopin_state : public driver_device
+{
+public:
+	videopin_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_discrete(*this, "discrete"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_video_ram(*this, "video_ram"),
+		m_in(*this, "IN%u", 1U),
+		m_leds(*this, "LED%02u", 1U)
+	{ }
+
+	void videopin(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<discrete_device> m_discrete;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_video_ram;
+	required_ioport_array<2> m_in;
+	output_finder<32> m_leds;
+
+	attotime m_time_pushed;
+	attotime m_time_released;
+	uint8_t m_prev = 0;
+	uint8_t m_mask = 0;
+	uint8_t m_ball_x = 0;
+	uint8_t m_ball_y = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	emu_timer *m_interrupt_timer = nullptr;
+
+	void main_map(address_map &map);
+
+	uint8_t misc_r();
+	void led_w(uint8_t data);
+	void ball_w(uint8_t data);
+	void video_ram_w(offs_t offset, uint8_t data);
+	void out1_w(uint8_t data);
+	void out2_w(uint8_t data);
+	void note_dvsr_w(uint8_t data);
+
+	TILEMAP_MAPPER_MEMBER(get_memory_offset);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TIMER_CALLBACK_MEMBER(interrupt_callback);
+	void update_plunger();
+	double calc_plunger_pos();
+};
+
+
+// video
+
+TILEMAP_MAPPER_MEMBER(videopin_state::get_memory_offset)
+{
+	return num_rows * ((col + 16) % 48) + row;
+}
+
+
+TILE_GET_INFO_MEMBER(videopin_state::get_tile_info)
+{
+	uint8_t const code = m_video_ram[tile_index];
+
+	tileinfo.set(0, code, 0, (code & 0x40) ? TILE_FLIPY : 0);
+}
+
+
+void videopin_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(videopin_state::get_tile_info)), tilemap_mapper_delegate(*this, FUNC(videopin_state::get_memory_offset)), 8, 8, 48, 32);
+
+	save_item(NAME(m_ball_x));
+	save_item(NAME(m_ball_y));
+}
+
+
+uint32_t videopin_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->set_scrollx(0, -8);   // account for delayed loading of shift reg C6
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	for (int row = 0; row < 32; row++)
+	{
+		for (int col = 0; col < 48; col++)
+		{
+			uint32_t const offset = m_bg_tilemap->memory_index(col, row);
+
+			if (m_video_ram[offset] & 0x80)   // ball bit found
+			{
+				int x = 8 * col;
+				int y = 8 * row;
+
+				x += 4;   // account for delayed loading of flip-flop C4
+
+				rectangle rect(x, x + 15, y, y + 15);
+				rect &= cliprect;
+
+				x -= m_ball_x;
+				y -= m_ball_y;
+
+				// ball placement is still 0.5 pixels off but don't tell anyone
+
+				for (int i = 0; i < 2; i++)
+				{
+					for (int j = 0; j < 2; j++)
+					{
+						m_gfxdecode->gfx(1)->transpen(bitmap, rect,
+							0, 0,
+							0, 0,
+							x + 16 * i,
+							y + 16 * j, 0);
+					}
+				}
+
+				return 0;   // keep things simple and ignore the rest
+			}
+		}
+	}
+	return 0;
+}
+
+
+void videopin_state::ball_w(uint8_t data)
+{
+	m_ball_x = data & 15;
+	m_ball_y = data >> 4;
+}
+
+
+void videopin_state::video_ram_w(offs_t offset, uint8_t data)
+{
+	m_video_ram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+
+// machine
+
 void videopin_state::update_plunger()
 {
-	uint8_t val = ioport("IN2")->read();
+	uint8_t const val = m_in[1]->read();
 
 	if (m_prev != val)
 	{
@@ -82,7 +241,7 @@ void videopin_state::machine_reset()
 {
 	m_interrupt_timer->adjust(m_screen->time_until_pos(32), 32);
 
-	/* both output latches are cleared on reset */
+	// both output latches are cleared on reset
 
 	out1_w(0);
 	out2_w(0);
@@ -108,15 +267,15 @@ uint8_t videopin_state::misc_r()
 	// signals received. This results in the MPU displaying the
 	// ball being shot onto the playfield at a certain speed.
 
-	uint8_t val = ioport("IN1")->read();
+	uint8_t val = m_in[0]->read();
 
 	if (plunger >= 0.000 && plunger <= 0.001)
 	{
-		val &= ~1;   /* PLUNGER1 */
+		val &= ~1;   // PLUNGER1
 	}
 	if (plunger >= 0.006 && plunger <= 0.007)
 	{
-		val &= ~2;   /* PLUNGER2 */
+		val &= ~2;   // PLUNGER2
 	}
 
 	return val;
@@ -140,7 +299,7 @@ void videopin_state::led_w(uint8_t data)
 	};
 
 	// anode from 32V,64V,128V
-	int a = m_screen->vpos() >> 5 & 7;
+	int const a = m_screen->vpos() >> 5 & 7;
 
 	for (int c = 0; c < 4; c++)
 		m_leds[matrix[a][c] - 1] = BIT(data, c);
@@ -151,14 +310,14 @@ void videopin_state::led_w(uint8_t data)
 
 void videopin_state::out1_w(uint8_t data)
 {
-	/* D0 => OCTAVE0  */
-	/* D1 => OCTACE1  */
-	/* D2 => OCTAVE2  */
-	/* D3 => LOCKOUT  */
-	/* D4 => NMIMASK  */
-	/* D5 => NOT USED */
-	/* D6 => NOT USED */
-	/* D7 => NOT USED */
+	// D0 => OCTAVE0
+	// D1 => OCTACE1
+	// D2 => OCTAVE2
+	// D3 => LOCKOUT
+	// D4 => NMIMASK
+	// D5 => NOT USED
+	// D6 => NOT USED
+	// D7 => NOT USED
 
 	m_mask = ~data & 0x10;
 
@@ -167,21 +326,21 @@ void videopin_state::out1_w(uint8_t data)
 
 	machine().bookkeeping().coin_lockout_global_w(~data & 0x08);
 
-	/* Convert octave data to divide value and write to sound */
+	// Convert octave data to divide value and write to sound
 	m_discrete->write(VIDEOPIN_OCTAVE_DATA, (0x01 << (~data & 0x07)) & 0xfe);
 }
 
 
 void videopin_state::out2_w(uint8_t data)
 {
-	/* D0 => VOL0      */
-	/* D1 => VOL1      */
-	/* D2 => VOL2      */
-	/* D3 => NOT USED  */
-	/* D4 => COIN CNTR */
-	/* D5 => BONG      */
-	/* D6 => BELL      */
-	/* D7 => ATTRACT   */
+	// D0 => VOL0
+	// D1 => VOL1
+	// D2 => VOL2
+	// D3 => NOT USED
+	// D4 => COIN CNTR
+	// D5 => BONG
+	// D6 => BELL
+	// D7 => ATTRACT
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x10);
 
@@ -194,7 +353,7 @@ void videopin_state::out2_w(uint8_t data)
 
 void videopin_state::note_dvsr_w(uint8_t data)
 {
-	/* note data */
+	// note data
 	m_discrete->write(VIDEOPIN_NOTE_DATA, ~data &0xff);
 }
 
@@ -208,7 +367,7 @@ void videopin_state::note_dvsr_w(uint8_t data)
 void videopin_state::main_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();
-	map(0x0200, 0x07ff).ram().w(FUNC(videopin_state::video_ram_w)).share("video_ram");
+	map(0x0200, 0x07ff).ram().w(FUNC(videopin_state::video_ram_w)).share(m_video_ram);
 	map(0x0800, 0x0800).r(FUNC(videopin_state::misc_r)).w(FUNC(videopin_state::note_dvsr_w));
 	map(0x0801, 0x0801).w(FUNC(videopin_state::led_w));
 	map(0x0802, 0x0802).w("watchdog", FUNC(watchdog_timer_device::reset_w));
@@ -229,7 +388,7 @@ void videopin_state::main_map(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( videopin )
-	PORT_START("IN0")   /* IN0 */
+	PORT_START("IN0")   // IN0
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Flipper") PORT_CODE(KEYCODE_LCONTROL)
@@ -239,7 +398,7 @@ static INPUT_PORTS_START( videopin )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW")   /* IN1 */
+	PORT_START("DSW")   // IN1
 	PORT_DIPNAME( 0xc0, 0x80, DEF_STR( Coinage ) )      PORT_DIPLOCATION("DSW:8,7")
 	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) )
@@ -263,9 +422,9 @@ static INPUT_PORTS_START( videopin )
 	PORT_DIPSETTING(    0x00, "180000 (3 balls) / 300000 (5 balls)" )
 	PORT_DIPSETTING(    0x01, "210000 (3 balls) / 350000 (5 balls)" )
 
-	PORT_START("IN1")   /* IN2 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) /* PLUNGER 1 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) /* PLUNGER 2 */
+	PORT_START("IN1")   // IN2
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) // PLUNGER 1
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) // PLUNGER 2
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -298,22 +457,6 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const gfx_layout tile_layout =
-{
-	8, 8,
-	64,
-	1,
-	{ 0 },
-	{
-		0, 1, 2, 3, 4, 5, 6, 7
-	},
-	{
-		0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38
-	},
-	0x40
-};
-
-
 static const gfx_layout ball_layout =
 {
 	16, 16,
@@ -334,8 +477,8 @@ static const gfx_layout ball_layout =
 
 
 static GFXDECODE_START( gfx_videopin )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, tile_layout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0x0000, ball_layout, 0, 1 )
+	GFXDECODE_ENTRY( "tiles", 0x0000, gfx_8x8x1,   0, 1 )
+	GFXDECODE_ENTRY( "ball",  0x0000, ball_layout, 0, 1 )
 GFXDECODE_END
 
 
@@ -348,13 +491,13 @@ GFXDECODE_END
 
 void videopin_state::videopin(machine_config &config)
 {
-	/* basic machine hardware */
-	M6502(config, m_maincpu, 12096000 / 16);
+	// basic machine hardware
+	M6502(config, m_maincpu, 12'096'000 / 16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &videopin_state::main_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(304, 263);
@@ -366,7 +509,7 @@ void videopin_state::videopin(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	DISCRETE(config, m_discrete, videopin_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -403,15 +546,15 @@ ROM_START( videopin )
 	ROM_LOAD_NIB_HIGH( "34241-01.f0", 0x3c00, 0x0400, CRC(5bfb83da) SHA1(9f392b0d4a972b6ae15ec12913a7e66761f4175d) )
 	ROM_RELOAD(                       0xfc00, 0x0400 )
 
-	ROM_REGION( 0x0200, "gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x0200, "tiles", 0 )
 	ROM_LOAD_NIB_LOW ( "34259-01.d5", 0x0000, 0x0200, CRC(6cd98c06) SHA1(48bf077b7abbd2f529a19bdf85700b93014f39f9) )
 	ROM_LOAD_NIB_HIGH( "34258-01.c5", 0x0000, 0x0200, CRC(91a5f117) SHA1(03ac6b0b3da0ed5faf1ba6695d16918d12ceeff5) )
 
-	ROM_REGION( 0x0020, "gfx2", 0 ) /* ball */
+	ROM_REGION( 0x0020, "ball", 0 )
 	ROM_LOAD( "34257-01.m1", 0x0000, 0x0020, CRC(50245866) SHA1(b0692bc8d44f127f6e7182a1ce75a785e22ac5b9) )
 
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "9402-01.h4",  0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) ) /* sync */
+	ROM_REGION( 0x0100, "sync_prom", 0 )
+	ROM_LOAD( "9402-01.h4",  0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )
 ROM_END
 
 // This is an even later revision (marked -02) with 4 EPROMs (4096x8 according to manual, while 2048x8 in reality)
@@ -423,15 +566,15 @@ ROM_START( videopina )
 	ROM_LOAD( "034256-01.k2", 0x3800, 0x0800, CRC(9f24428c) SHA1(df35225afebb4cc18a593ec665e94f677b3606ee) )
 	ROM_COPY( "maincpu" , 0x3c00, 0xfc00, 0x400 )
 
-	ROM_REGION( 0x0200, "gfx1", 0 ) // tiles
+	ROM_REGION( 0x0200, "tiles", 0 )
 	ROM_LOAD_NIB_LOW ( "34259-01.d5", 0x0000, 0x0200, CRC(6cd98c06) SHA1(48bf077b7abbd2f529a19bdf85700b93014f39f9) )
 	ROM_LOAD_NIB_HIGH( "34258-01.c5", 0x0000, 0x0200, CRC(91a5f117) SHA1(03ac6b0b3da0ed5faf1ba6695d16918d12ceeff5) )
 
-	ROM_REGION( 0x0020, "gfx2", 0 ) // ball
+	ROM_REGION( 0x0020, "ball", 0 )
 	ROM_LOAD( "34257-01.m1", 0x0000, 0x0020, CRC(50245866) SHA1(b0692bc8d44f127f6e7182a1ce75a785e22ac5b9) )
 
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "9402-01.h4",  0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) ) // sync
+	ROM_REGION( 0x0100, "sync_prom", 0 )
+	ROM_LOAD( "9402-01.h4",  0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )
 ROM_END
 
 ROM_START( solarwar )
@@ -455,16 +598,18 @@ ROM_START( solarwar )
 	ROM_LOAD_NIB_HIGH( "36158-02.f0", 0x3c00, 0x0400, CRC(2606b87e) SHA1(ea72e36837eccf29cd5c82fe9a6a018a1a94730c) )
 	ROM_RELOAD(                       0xfc00, 0x0400 )
 
-	ROM_REGION( 0x0200, "gfx1", 0 ) /* tiles */
+	ROM_REGION( 0x0200, "tiles", 0 )
 	ROM_LOAD_NIB_LOW ( "34259-01.d5", 0x0000, 0x0200, CRC(6cd98c06) SHA1(48bf077b7abbd2f529a19bdf85700b93014f39f9) )
 	ROM_LOAD_NIB_HIGH( "34258-01.c5", 0x0000, 0x0200, CRC(91a5f117) SHA1(03ac6b0b3da0ed5faf1ba6695d16918d12ceeff5) )
 
-	ROM_REGION( 0x0020, "gfx2", 0 ) /* ball */
+	ROM_REGION( 0x0020, "ball", 0 )
 	ROM_LOAD( "34257-01.m1", 0x0000, 0x0020, CRC(50245866) SHA1(b0692bc8d44f127f6e7182a1ce75a785e22ac5b9) )
 
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "9402-01.h4",  0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) ) /* sync */
+	ROM_REGION( 0x0100, "sync_prom", 0 )
+	ROM_LOAD( "9402-01.h4",  0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )
 ROM_END
+
+} // anonymous namespace
 
 
 /*************************************
@@ -474,5 +619,5 @@ ROM_END
  *************************************/
 
 GAMEL( 1979, videopin,  0,        videopin, videopin, videopin_state, empty_init, ROT270, "Atari", "Video Pinball (16 PROMs version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK, layout_videopin )
-GAMEL( 1979, videopina, videopin, videopin, videopin, videopin_state, empty_init, ROT270, "Atari", "Video Pinball (4 ROMs version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK, layout_videopin )
-GAMEL( 1979, solarwar,  0,        videopin, solarwar, videopin_state, empty_init, ROT270, "Atari", "Solar War", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK, layout_videopin )
+GAMEL( 1979, videopina, videopin, videopin, videopin, videopin_state, empty_init, ROT270, "Atari", "Video Pinball (4 ROMs version)",   MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK, layout_videopin )
+GAMEL( 1979, solarwar,  0,        videopin, solarwar, videopin_state, empty_init, ROT270, "Atari", "Solar War",                        MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK, layout_videopin )

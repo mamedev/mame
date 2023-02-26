@@ -18,7 +18,7 @@
 #include "bt54x.h"
 
 #include "bus/nscsi/devices.h"
-#include "machine/ncr5390.h"
+#include "machine/ncr53c90.h"
 //#include "machine/ncr86c05.h"
 
 DEFINE_DEVICE_TYPE(BT542B, bt542b_device, "bt542b", "BusTek BT-542B SCSI Host Adapter") // Rev. G or earlier

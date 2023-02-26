@@ -8,15 +8,17 @@
  *
  */
 
-#ifndef MAME_INCLUDES_APOLLO_H
-#define MAME_INCLUDES_APOLLO_H
+#ifndef MAME_APOLLO_APOLLO_H
+#define MAME_APOLLO_APOLLO_H
 
 #pragma once
 
 
 #include "apollo_kbd.h"
 
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
+#include "cpu/m68000/m68030.h"
+#include "cpu/m68000/m68040.h"
 
 #include "machine/6840ptm.h"
 #include "machine/am9517a.h"
@@ -69,7 +71,7 @@
 std::string apollo_cpu_context(running_machine &machine);
 
 // enable/disable the FPU
-void apollo_set_cpu_has_fpu(m68000_base_device *device, int onoff);
+void apollo_set_cpu_has_fpu(m68000_musashi_device *device, int onoff);
 
 // check for excessive logging
 void apollo_check_log();
@@ -166,7 +168,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	required_device<m68000_base_device> m_maincpu;
+	required_device<m68000_musashi_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_shared_ptr<uint32_t> m_messram_ptr;
 
@@ -714,4 +716,4 @@ private:
 DECLARE_DEVICE_TYPE(APOLLO_STDIO, apollo_stdio_device)
 #endif /* APOLLO_XXL */
 
-#endif // MAME_INCLUDES_APOLLO_H
+#endif // MAME_APOLLO_APOLLO_H

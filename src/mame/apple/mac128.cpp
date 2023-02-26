@@ -84,6 +84,7 @@ Scanline 0 is the start of vblank.
 
 #include "emu.h"
 
+#include "adbmodem.h"
 #include "macrtc.h"
 #include "mactoolbox.h"
 
@@ -114,6 +115,9 @@ Scanline 0 is the start of vblank.
 #include "softlist.h"
 #include "speaker.h"
 
+
+namespace {
+
 #define C7M (15.6672_MHz_XTAL / 2)
 #define C3_7M (15.6672_MHz_XTAL / 4).value()
 
@@ -134,6 +138,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_via(*this, "via6522_0"),
+		m_adbmodem(*this, "adbmodem"),
 		m_macadb(*this, "macadb"),
 		m_ram(*this, RAM_TAG),
 		m_scsibus(*this, "scsibus"),
@@ -142,7 +147,7 @@ public:
 		m_iwm(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
 		m_mackbd(*this, "kbd"),
-		m_rtc(*this,"rtc"),
+		m_rtc(*this, "rtc"),
 		m_screen(*this, "screen"),
 		m_dac(*this, "macdac"),
 		m_filter(*this, "dacfilter"),
@@ -170,6 +175,7 @@ public:
 private:
 	required_device<m68000_device> m_maincpu;
 	required_device<via6522_device> m_via;
+	optional_device<adbmodem_device> m_adbmodem;
 	optional_device<macadb_device> m_macadb;
 	required_device<ram_device> m_ram;
 	optional_device<nscsi_bus_device> m_scsibus;
@@ -201,8 +207,6 @@ private:
 	void ram_w_se(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t ram_600000_r(offs_t offset);
 	void ram_600000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~ 0);
-	void via_sync();
-	void via_sync_end();
 	uint16_t mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, uint16_t data);
 	uint16_t mac_autovector_r(offs_t offset);
@@ -605,7 +609,7 @@ WRITE_LINE_MEMBER(mac128_state::scsi_drq_w)
 
 void mac128_state::scsi_berr_w(uint8_t data)
 {
-	m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
+	m_maincpu->trigger_bus_error();
 }
 
 uint16_t mac128_state::macplus_scsi_r(offs_t offset, uint16_t mem_mask)
@@ -716,36 +720,6 @@ WRITE_LINE_MEMBER(mac128_state::mac_via_irq)
 	set_via_interrupt(state);
 }
 
-void mac128_state::via_sync()
-{
-	// The VIA runs from the E clock of the 68k and uses VPA.
-
-	// That means:
-	// - The 68000 starts the access cycle, with AS and the address bus.  It's validated at cycle+1.
-
-	// - The glue chip sets VPA.  The 68000 sees it and acts on it at cycle+2.
-
-	// - Between cycle+2 and cycle+11, the E clock goes up.  The VIA
-	// is synced on that clock, so that's at a multiple of 10 in
-	// absolute time
-
-	// - 4 cycles later E goes down and that's the end of the access,
-
-	// We sync on the start of cycle (so that the via timings go ok)
-	// then on the end on via_sync_end()
-
-	uint64_t cur_cycle = m_maincpu->total_cycles();
-	uint64_t vpa_cycle = cur_cycle+2;
-	uint64_t via_start_cycle = (vpa_cycle + 9) / 10;
-	uint64_t m68k_start_cycle = via_start_cycle * 10;
-	m_maincpu->adjust_icount(cur_cycle - m68k_start_cycle); // 4 cycles already counted by the core
-}
-
-void mac128_state::via_sync_end()
-{
-	m_maincpu->adjust_icount(-4);
-}
-
 uint16_t mac128_state::mac_via_r(offs_t offset)
 {
 	uint16_t data;
@@ -753,11 +727,7 @@ uint16_t mac128_state::mac_via_r(offs_t offset)
 	offset >>= 8;
 	offset &= 0x0f;
 
-	via_sync();
-
 	data = m_via->read(offset);
-
-	via_sync_end();
 	return (data & 0xff) | (data << 8);
 }
 
@@ -766,11 +736,7 @@ void mac128_state::mac_via_w(offs_t offset, uint16_t data)
 	offset >>= 8;
 	offset &= 0x0f;
 
-	via_sync();
-
 	m_via->write(offset, (data >> 8) & 0xff);
-
-	via_sync_end();
 }
 
 void mac128_state::mac_autovector_w(offs_t offset, uint16_t data)
@@ -808,7 +774,7 @@ uint8_t mac128_state::mac_via_in_b()
 
 uint8_t mac128_state::mac_via_in_b_se()
 {
-	int val = m_macadb->get_adb_state()<<4;
+	int val = 0;
 
 	if (!m_adb_irq_pending)
 	{
@@ -900,7 +866,7 @@ void mac128_state::mac_via_out_b_se(uint8_t data)
 
 	m_scsiirq_enable = (data & 0x40) ? 0 : 1;
 
-	m_macadb->mac_adb_newaction((data & 0x30) >> 4);
+	m_adbmodem->set_via_state((data & 0x30) >> 4);
 
 	m_rtc->ce_w((data & 0x04)>>2);
 	m_rtc->data_w(data & 0x01);
@@ -1072,7 +1038,7 @@ void mac128_state::mac512ke_map(address_map &map)
 	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::dc_ab_r)).umask16(0xff00);
 	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
 	map(0xc00000, 0xdfffff).rw(FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
-	map(0xe80000, 0xefffff).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
+	map(0xe80000, 0xefffff).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
 	map(0xfffff0, 0xffffff).rw(FUNC(mac128_state::mac_autovector_r), FUNC(mac128_state::mac_autovector_w));
 }
 
@@ -1084,7 +1050,7 @@ void mac128_state::macplus_map(address_map &map)
 	map(0x800000, 0x9fffff).r(m_scc, FUNC(z80scc_device::dc_ab_r)).umask16(0xff00);
 	map(0xa00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
 	map(0xc00000, 0xdfffff).rw(FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
-	map(0xe80000, 0xefffff).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
+	map(0xe80000, 0xefffff).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
 	map(0xfffff0, 0xffffff).rw(FUNC(mac128_state::mac_autovector_r), FUNC(mac128_state::mac_autovector_w));
 }
 
@@ -1096,7 +1062,7 @@ void mac128_state::macse_map(address_map &map)
 	map(0x900000, 0x9fffff).r(m_scc, FUNC(z80scc_device::dc_ab_r)).umask16(0xff00);
 	map(0xb00000, 0xbfffff).w(m_scc, FUNC(z80scc_device::dc_ab_w)).umask16(0x00ff);
 	map(0xd00000, 0xdfffff).rw(FUNC(mac128_state::mac_iwm_r), FUNC(mac128_state::mac_iwm_w));
-	map(0xe80000, 0xefffff).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
+	map(0xe80000, 0xefffff).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).rw(FUNC(mac128_state::mac_via_r), FUNC(mac128_state::mac_via_w));
 	map(0xfffff0, 0xffffff).rw(FUNC(mac128_state::mac_autovector_r), FUNC(mac128_state::mac_autovector_w));
 }
 
@@ -1179,6 +1145,8 @@ void mac128_state::mac128k(machine_config &config)
 	mac512ke(config);
 	m_ram->set_default_size("128K");
 
+	RTC3430040(config.replace(), m_rtc, 32.768_kHz_XTAL);
+
 	IWM(config.replace(), m_iwm, C7M);
 	m_iwm->phases_cb().set(FUNC(mac128_state::phases_w));
 	m_iwm->devsel_cb().set(FUNC(mac128_state::devsel_w));
@@ -1254,17 +1222,21 @@ void mac128_state::macse(machine_config &config)
 		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
 	});
 
+	ADBMODEM(config, m_adbmodem, C7M);
+	m_adbmodem->via_clock_callback().set(m_via, FUNC(via6522_device::write_cb1));
+	m_adbmodem->via_data_callback().set(m_via, FUNC(via6522_device::write_cb2));
+	m_adbmodem->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_adbmodem->irq_callback().set(FUNC(mac128_state::adb_irq_w));
+
 	MACADB(config, m_macadb, C7M);
-	m_macadb->via_clock_callback().set(m_via, FUNC(via6522_device::write_cb1));
-	m_macadb->via_data_callback().set(m_via, FUNC(via6522_device::write_cb2));
-	m_macadb->adb_irq_callback().set(FUNC(mac128_state::adb_irq_w));
+	m_macadb->adb_data_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
 
 	R65NC22(config.replace(), m_via, C7M/10);
 	m_via->readpa_handler().set(FUNC(mac128_state::mac_via_in_a));
 	m_via->readpb_handler().set(FUNC(mac128_state::mac_via_in_b_se));
 	m_via->writepa_handler().set(FUNC(mac128_state::mac_via_out_a_se));
 	m_via->writepb_handler().set(FUNC(mac128_state::mac_via_out_b_se));
-	m_via->cb2_handler().set(m_macadb, FUNC(macadb_device::adb_data_w));
+	m_via->cb2_handler().set(m_adbmodem, FUNC(adbmodem_device::set_via_data));
 	m_via->irq_handler().set(FUNC(mac128_state::mac_via_irq));
 
 	/* internal ram */
@@ -1522,6 +1494,9 @@ ROM_START( macclasc )
 	// this dump is big endian
 	ROM_LOAD( "341-0813__=c=1983-90_apple__japan__910d_d.27c4096_be.ue1", 0x000000, 0x080000, CRC(510d7d38) SHA1(ccd10904ddc0fb6a1d216b2e9effd5ec6cf5a83d) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS         INIT              COMPANY              FULLNAME */
 //COMP( 1983, mactw,    0,       0,      mac128k,  macplus, mac128_state, mac_driver_init, "Apple Computer",    "Macintosh (4.3T Prototype)",  MACHINE_SUPPORTS_SAVE )

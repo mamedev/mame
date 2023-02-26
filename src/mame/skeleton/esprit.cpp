@@ -23,6 +23,9 @@ Espirit3: 2x R6551AP, HD46850P (6850), R6502BP, R6545-1AP, R6522AP, RO-3-9333B, 
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class esprit_state : public driver_device
 {
 public:
@@ -221,6 +224,9 @@ ROM_START( esprit3 )
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "hazeltine_espritiii.u19", 0x0000, 0x1000, CRC(33e4a8ef) SHA1(e19c84a3c5f94812928ea84bab3ede7970dd5e72) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1981, esprit,  0,      0, esprit,  esprit, esprit_state, init_init,  "Hazeltine", "Esprit",     MACHINE_IS_SKELETON )
 COMP( 1981, esprit3, esprit, 0, esprit3, esprit, esprit_state, empty_init, "Hazeltine", "Esprit III", MACHINE_IS_SKELETON )

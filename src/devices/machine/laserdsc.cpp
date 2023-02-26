@@ -192,8 +192,10 @@ uint32_t laserdisc_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 		screen.container().empty();
 
 		// add the video texture
-		if (m_videoenable)
-			screen.container().add_quad(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(0xff,0xff,0xff,0xff), m_videotex, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+		rgb_t videocolor = 0xffffffff; // Fully visible, white
+		if (!m_videoenable)
+			videocolor = 0xff000000; // Blank the texture's RGB of the texture
+		screen.container().add_quad(0.0f, 0.0f, 1.0f, 1.0f, videocolor, m_videotex, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
 
 		// add the overlay
 		if (m_overenable && overbitmap.valid())

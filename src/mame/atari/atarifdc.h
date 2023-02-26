@@ -5,8 +5,8 @@
 
 */
 
-#ifndef MAME_MACHINE_ATARIFDC_H
-#define MAME_MACHINE_ATARIFDC_H
+#ifndef MAME_ATARI_ATARIFDC_H
+#define MAME_ATARI_ATARIFDC_H
 
 #include "imagedev/flopdrv.h"
 #include "machine/6821pia.h"
@@ -71,4 +71,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ATARI_FDC, atari_fdc_device)
 
-#endif // MAME_MACHINE_ATARIFDC_H
+#endif // MAME_ATARI_ATARIFDC_H

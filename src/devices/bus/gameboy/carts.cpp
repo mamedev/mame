@@ -13,11 +13,14 @@
 #include "gbck003.h"
 #include "huc1.h"
 #include "huc3.h"
+#include "liebao.h"
 #include "mbc.h"
 #include "mbc2.h"
+#include "mbc3.h"
 #include "mbc6.h"
 #include "mbc7.h"
 #include "mmm01.h"
+#include "ntnew.h"
 #include "rom.h"
 #include "slmulti.h"
 #include "tama5.h"
@@ -48,12 +51,16 @@ char const *const GB_HUC1           = "rom_huc1";
 char const *const GB_HUC3           = "rom_huc3";
 char const *const GB_TAMA5          = "rom_tama5";
 char const *const GB_CAMERA         = "rom_camera";
+char const *const GB_TFANGBOOT      = "rom_tfboot";
+char const *const GB_BBD            = "rom_bbd";
+char const *const GB_DSHGGB81       = "rom_dshggb81";
 char const *const GB_SINTAX         = "rom_sintax";
 char const *const GB_CHONGWU        = "rom_chong";
 char const *const GB_LICHENG        = "rom_licheng";
 char const *const GB_NEWGBCHK       = "rom_newgbchk";
 char const *const GB_VF001          = "rom_vf001";
-char const *const GB_DIGIMON        = "rom_digimon";
+char const *const GB_LIEBAO         = "rom_liebao";
+char const *const GB_NTNEW          = "rom_ntnew";
 char const *const GB_SLMULTI        = "rom_slmulti";
 char const *const GB_GBCK003        = "rom_gbck003";
 
@@ -80,7 +87,7 @@ void gameboy_cartridges(device_slot_interface &device)
 	device.option_add_internal(slotoptions::GB_MBC1,            GB_ROM_MBC1);
 	device.option_add_internal(slotoptions::GB_MBC2,            GB_ROM_MBC2);
 	device.option_add_internal(slotoptions::GB_MBC3,            GB_ROM_MBC3);
-	device.option_add_internal(slotoptions::GB_MBC30,           GB_ROM_MBC3); // MBC3 and MBC30 treated as the same thing for now
+	device.option_add_internal(slotoptions::GB_MBC30,           GB_ROM_MBC30);
 	device.option_add_internal(slotoptions::GB_MBC5,            GB_ROM_MBC5);
 	device.option_add_internal(slotoptions::GB_MBC6,            GB_ROM_MBC6);
 	device.option_add_internal(slotoptions::GB_MBC7_2K,         GB_ROM_MBC7_2K);
@@ -91,12 +98,16 @@ void gameboy_cartridges(device_slot_interface &device)
 	device.option_add_internal(slotoptions::GB_HUC1,            GB_ROM_HUC1);
 	device.option_add_internal(slotoptions::GB_HUC3,            GB_ROM_HUC3);
 	device.option_add_internal(slotoptions::GB_TAMA5,           GB_ROM_TAMA5);
+	device.option_add_internal(slotoptions::GB_TFANGBOOT,       GB_ROM_TFANGBOOT);
+	device.option_add_internal(slotoptions::GB_BBD,             GB_ROM_BBD);
+	device.option_add_internal(slotoptions::GB_DSHGGB81,        GB_ROM_DSHGGB81);
 	device.option_add_internal(slotoptions::GB_SINTAX,          GB_ROM_SINTAX);
 	device.option_add_internal(slotoptions::GB_CHONGWU,         GB_ROM_CHONGWU);
 	device.option_add_internal(slotoptions::GB_LICHENG,         GB_ROM_LICHENG);
 	device.option_add_internal(slotoptions::GB_NEWGBCHK,        GB_ROM_NEWGBCHK);
 	device.option_add_internal(slotoptions::GB_VF001,           GB_ROM_VF001);
-	device.option_add_internal(slotoptions::GB_DIGIMON,         GB_ROM_DIGIMON);
+	device.option_add_internal(slotoptions::GB_LIEBAO,          GB_ROM_LIEBAO);
+	device.option_add_internal(slotoptions::GB_NTNEW,           GB_ROM_NTNEW);
 	device.option_add_internal(slotoptions::GB_SLMULTI,         GB_ROM_SLMULTI);
 	device.option_add_internal(slotoptions::GB_GBCK003,         GB_ROM_GBCK003);
 }

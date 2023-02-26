@@ -27,6 +27,9 @@
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class psr340_state : public driver_device
 {
 public:
@@ -315,5 +318,8 @@ ROM_START( psr340 )
 	ROM_REGION(0x5704b, "screen", 0)
 	ROM_LOAD("psr340-lcd.svg", 0, 0x5704b, CRC(d93af0a9) SHA1(76156443025e0b4089259417bb266888c547b2d7))
 ROM_END
+
+} // anonymous namespace
+
 
 CONS(1994, psr340, 0, 0, psr340, psr340, psr340_state, empty_init, "Yamaha", "PSR-340 PortaSound", MACHINE_NOT_WORKING)

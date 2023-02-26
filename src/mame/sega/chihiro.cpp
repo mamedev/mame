@@ -172,7 +172,7 @@ In order from top to bottom they are....
 The 2 boxes join together via the Base Board upper connector and Media Board lower connector.
 
 The Microsoft-manufactured XBox board is the lowest board. It's mostly the same as the V1 XBox retail
-board with the exception that it has 128MB of RAM and a NVidia MCPX X2 chip. The retail XBox board has a
+board with the exception that it has 128MB of RAM and a nVidia MCPX X2 chip. The retail XBox board has a
 MCPX X3 chip. The board was probably released to Sega very early in development and the chip was updated
 in the mass-produced retail version.
 
@@ -442,7 +442,6 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "machine/jvshost.h"
 #include "naomigd.h"
 
-#include "debug/debugcmd.h"
 #include "debug/debugcon.h"
 #include "debugger.h"
 
@@ -787,9 +786,9 @@ void chihiro_state::jamtable_disasm_command(const std::vector<std::string_view> 
 
 	if (params.size() < 3)
 		return;
-	if (!machine().debugger().commands().validate_number_parameter(params[1], addr))
+	if (!machine().debugger().console().validate_number_parameter(params[1], addr))
 		return;
-	if (!machine().debugger().commands().validate_number_parameter(params[2], size))
+	if (!machine().debugger().console().validate_number_parameter(params[2], size))
 		return;
 	jamtable_disasm(space, (uint32_t)addr, (uint32_t)size);
 }

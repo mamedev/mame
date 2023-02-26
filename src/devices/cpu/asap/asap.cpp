@@ -612,7 +612,7 @@ void asap_device::bsp()
 {
 	if ((int32_t)m_znflag > 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
 		fetch_instruction_debug();
 		m_pc = m_nextpc;
@@ -627,7 +627,7 @@ void asap_device::bmz()
 {
 	if ((int32_t)m_znflag <= 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
 		fetch_instruction_debug();
 		m_pc = m_nextpc;
@@ -642,7 +642,7 @@ void asap_device::bgt()
 {
 	if (m_znflag != 0 && (int32_t)(m_znflag ^ m_vflag) >= 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
 		fetch_instruction_debug();
 		m_pc = m_nextpc;
@@ -657,7 +657,7 @@ void asap_device::ble()
 {
 	if (m_znflag == 0 || (int32_t)(m_znflag ^ m_vflag) < 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
 		fetch_instruction_debug();
 		m_pc = m_nextpc;
@@ -672,7 +672,7 @@ void asap_device::bge()
 {
 	if ((int32_t)(m_znflag ^ m_vflag) >= 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
 		fetch_instruction_debug();
 		m_pc = m_nextpc;
@@ -687,7 +687,7 @@ void asap_device::blt()
 {
 	if ((int32_t)(m_znflag ^ m_vflag) < 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
 		fetch_instruction_debug();
 		m_pc = m_nextpc;
@@ -702,7 +702,7 @@ void asap_device::bhi()
 {
 	if (m_znflag != 0 && m_cflag)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
 		fetch_instruction_debug();
 		m_pc = m_nextpc;
@@ -717,7 +717,7 @@ void asap_device::bls()
 {
 	if (m_znflag == 0 || !m_cflag)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
 		fetch_instruction_debug();
 		m_pc = m_nextpc;
@@ -732,7 +732,7 @@ void asap_device::bcc()
 {
 	if (!m_cflag)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
 		fetch_instruction_debug();
 		m_pc = m_nextpc;
@@ -747,7 +747,7 @@ void asap_device::bcs()
 {
 	if (m_cflag)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
 		fetch_instruction_debug();
 		m_pc = m_nextpc;
@@ -762,7 +762,7 @@ void asap_device::bpl()
 {
 	if ((int32_t)m_znflag >= 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
 		fetch_instruction_debug();
 		m_pc = m_nextpc;
@@ -777,7 +777,7 @@ void asap_device::bmi()
 {
 	if ((int32_t)m_znflag < 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
 		fetch_instruction_debug();
 		m_pc = m_nextpc;
@@ -792,7 +792,7 @@ void asap_device::bne()
 {
 	if (m_znflag != 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
 		fetch_instruction_debug();
 		m_pc = m_nextpc;
@@ -807,7 +807,7 @@ void asap_device::beq()
 {
 	if (m_znflag == 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
 		fetch_instruction_debug();
 		m_pc = m_nextpc;
@@ -822,7 +822,7 @@ void asap_device::bvc()
 {
 	if ((int32_t)m_vflag >= 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
 		fetch_instruction_debug();
 		m_pc = m_nextpc;
@@ -837,7 +837,7 @@ void asap_device::bvs()
 {
 	if ((int32_t)m_vflag < 0)
 	{
-		m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+		m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
 		fetch_instruction_debug();
 		m_pc = m_nextpc;
@@ -853,7 +853,7 @@ void asap_device::bvs()
 void asap_device::bsr()
 {
 	DSTVAL = m_pc + 4;
-	m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+	m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
 	fetch_instruction_debug();
 	m_pc = m_nextpc;
@@ -865,7 +865,7 @@ void asap_device::bsr()
 
 void asap_device::bsr_0()
 {
-	m_nextpc = m_ppc + ((int32_t)(m_op << 10) >> 8);
+	m_nextpc = m_ppc + util::sext(m_op << 2, 24);
 
 	fetch_instruction_debug();
 	m_pc = m_nextpc;

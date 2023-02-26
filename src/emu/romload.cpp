@@ -14,12 +14,15 @@
 #include "drivenum.h"
 #include "emuopts.h"
 #include "fileio.h"
+#include "main.h"
 #include "softlist_dev.h"
+
 #include "ui/uimain.h"
 
 #include "corestr.h"
 
 #include <algorithm>
+#include <cstdarg>
 #include <set>
 
 

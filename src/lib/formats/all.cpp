@@ -104,6 +104,10 @@
 #include "asst128_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_AS_DSK
+#include "as_dsk.h"
+#endif
+
 #ifdef HAS_FORMATS_ATARI_DSK
 #include "atari_dsk.h"
 #endif
@@ -330,6 +334,10 @@
 
 #ifdef HAS_FORMATS_HTI_TAP
 #include "hti_tape.h"
+#endif
+
+#ifdef HAS_FORMATS_HP300_DSK
+#include "hp300_dsk.h"
 #endif
 
 #ifdef HAS_FORMATS_HPI_DSK
@@ -716,6 +724,14 @@
 #include "fs_fat.h"
 #endif
 
+#ifdef HAS_FORMATS_FS_HPLIF
+#include "fs_hplif.h"
+#endif
+
+#ifdef HAS_FORMATS_FS_ISIS
+#include "fs_isis.h"
+#endif
+
 void mame_formats_full_list(mame_formats_enumerator &en)
 {
 	en.category("Generic");
@@ -753,9 +769,11 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_A216S_PRODOS_FORMAT); // ap2_dsk.h
 	en.add(FLOPPY_RWTS18_FORMAT); // ap2_dsk.h
 	en.add(FLOPPY_EDD_FORMAT); // ap2_dsk.h
-	en.add(FLOPPY_WOZ_FORMAT); // ap2_dsk.h
-	en.add(FLOPPY_MOOF_FORMAT); // ap2_dsk.h
 	en.add(FLOPPY_NIB_FORMAT); // ap2_dsk.h
+#endif
+#ifdef HAS_FORMATS_AS_DSK
+	en.add(FLOPPY_WOZ_FORMAT); // as_dsk.h
+	en.add(FLOPPY_MOOF_FORMAT); // as_dsk.h
 #endif
 #ifdef HAS_FORMATS_AIM_DSK
 	en.add(FLOPPY_AIM_FORMAT); // aim_dsk.h
@@ -857,11 +875,17 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #ifdef HAS_FORMATS_APOLLO_DSK
 	en.add(FLOPPY_APOLLO_FORMAT); // apollo_dsk.h
 #endif
+#ifdef HAS_FORMATS_HP300_DSK
+	en.add(FLOPPY_HP300_FORMAT); // hp300_dsk.h
+#endif
 #ifdef HAS_FORMATS_HP_IPC_DSK
 	en.add(FLOPPY_HP_IPC_FORMAT); // hp_ipc_dsk.h
 #endif
 #ifdef HAS_FORMATS_HPI_DSK
 	en.add(FLOPPY_HPI_FORMAT); // hpi_dsk.h
+#endif
+#ifdef HAS_FORMATS_FS_HPLIF
+	en.add(fs::HPLIF); // fs_lif.h
 #endif
 
 	en.category("Applix");
@@ -1073,6 +1097,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Intel");
 #ifdef HAS_FORMATS_IMG_DSK
 	en.add(FLOPPY_IMG_FORMAT); // img_dsk.h
+#endif
+#ifdef HAS_FORMATS_FS_ISIS
+	en.add(fs::ISIS);
 #endif
 
 	en.category("IQ151");

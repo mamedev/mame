@@ -1,0 +1,14 @@
+blank_issues_enabled: true
+contact_links:
+  - name: MAME Testers
+    url: https://mametesters.org/
+    about: For reporting user-facing bugs in released versions of MAME.
+  - name: MAMEdev Discussions on GitHub
+    url: https://github.com/orgs/mamedev/discussions
+    about: For questions and discussion.
+  - name: MAMEdev Forum
+    url: https://forum.mamedev.org/
+    about: Official MAMEdev forums.
+  - name: r/MAME
+    url: https://www.reddit.com/r/MAME/
+    about: Community forum for discussion and support.

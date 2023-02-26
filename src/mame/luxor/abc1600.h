@@ -2,13 +2,13 @@
 // copyright-holders:Curt Coder
 #pragma once
 
-#ifndef MAME_INCLUDES_ABC1600_H
-#define MAME_INCLUDES_ABC1600_H
+#ifndef MAME_LUXOR_ABC1600_H
+#define MAME_LUXOR_ABC1600_H
 
 #include "bus/abcbus/abcbus.h"
 #include "bus/abckb/abckb.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68008.h"
 #include "formats/abc1600_dsk.h"
 #include "imagedev/floppy.h"
 #include "abc1600mac.h"
@@ -86,7 +86,7 @@ public:
 	void abc1600(machine_config &config);
 
 private:
-	required_device<m68000_base_device> m_maincpu;
+	required_device<m68008_device> m_maincpu;
 	required_device<abc1600_mac_device> m_mac;
 	required_device<z80dma_device> m_dma0;
 	required_device<z80dma_device> m_dma1;
@@ -121,7 +121,13 @@ private:
 	void cio_w(offs_t offset, uint8_t data);
 	void fw0_w(uint8_t data);
 	void fw1_w(uint8_t data);
-	void spec_contr_reg_w(uint8_t data);
+
+	DECLARE_WRITE_LINE_MEMBER(cs7_w);
+	DECLARE_WRITE_LINE_MEMBER(btce_w);
+	DECLARE_WRITE_LINE_MEMBER(atce_w);
+	DECLARE_WRITE_LINE_MEMBER(dmadis_w);
+	DECLARE_WRITE_LINE_MEMBER(sysscc_w);
+	DECLARE_WRITE_LINE_MEMBER(sysfs_w);
 
 	void dbrq_w(int state);
 
@@ -132,7 +138,6 @@ private:
 	void cio_pc_w(uint8_t data);
 
 	void nmi_w(int state);
-	void buserr_w(offs_t offset, uint8_t data);
 
 	void cpu_space_map(address_map &map);
 
@@ -167,4 +172,4 @@ private:
 
 
 
-#endif
+#endif // MAME_LUXOR_ABC1600_H

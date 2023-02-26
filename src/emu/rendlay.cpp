@@ -14,6 +14,7 @@
 
 #include "emuopts.h"
 #include "fileio.h"
+#include "main.h"
 #include "rendfont.h"
 #include "rendutil.h"
 #include "video/rgbutil.h"
@@ -224,12 +225,18 @@ private:
 			{
 				if (m_float_valid)
 				{
-					m_text = std::to_string(m_float);
+					std::ostringstream stream;
+					stream.imbue(std::locale::classic());
+					stream << m_float;
+					m_text = std::move(stream).str();
 					m_text_valid = true;
 				}
 				else if (m_int_valid)
 				{
-					m_text = std::to_string(m_int);
+					std::ostringstream stream;
+					stream.imbue(std::locale::classic());
+					stream << m_int;
+					m_text = std::move(stream).str();
 					m_text_valid = true;
 				}
 			}

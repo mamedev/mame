@@ -205,6 +205,9 @@
 
 #include "logmacro.h"
 
+
+namespace {
+
 #define GENEVE_SRAM_TAG  "sram"
 #define GENEVE_SRAMX_TAG "sramexp"
 #define GENEVE_DRAM_TAG  "dram"
@@ -422,10 +425,10 @@ static INPUT_PORTS_START(genmod)
 	PORT_INCLUDE(geneve_common)
 
 	PORT_START( "GENMODDIPS" )
-	PORT_DIPNAME( GENEVE_GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CHANGED_MEMBER(DEVICE_SELF, geneve_state, setgm_changed, 1)
+	PORT_DIPNAME( GENEVE_GM_TURBO, GENEVE_GM_TURBO, "Genmod Turbo mode") PORT_CHANGED_MEMBER(DEVICE_SELF, geneve_state, setgm_changed, 1)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GENEVE_GM_TURBO, DEF_STR( On ))
-	PORT_DIPNAME( GENEVE_GM_TIM, GENEVE_GM_TIM, "Genmod TI mode") PORT_CHANGED_MEMBER(DEVICE_SELF, geneve_state, setgm_changed, 2)
+	PORT_DIPNAME( GENEVE_GM_TIM, 0, "Genmod TI mode") PORT_CHANGED_MEMBER(DEVICE_SELF, geneve_state, setgm_changed, 2)
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ))
 		PORT_CONFSETTING( GENEVE_GM_TIM, DEF_STR( On ))
 
@@ -1266,6 +1269,9 @@ ROM_START(genmod)
 	ROM_SYSTEM_BIOS(1, "2.00", "Geneve Mod Boot ROM 2.00 (2021)")
 	ROMX_LOAD("gnmbt200.bin", 0x0000, 0x4000, CRC(0a66c714) SHA1(139ed03d365b21123295cd99c73736ee424dbb74), ROM_BIOS(1))
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE      INPUT   CLASS         INIT         COMPANY  FULLNAME       FLAGS
 COMP( 1987, geneve, 0,      0,      geneve,      geneve, geneve_state, init_geneve, "Myarc", "Geneve 9640", MACHINE_SUPPORTS_SAVE)

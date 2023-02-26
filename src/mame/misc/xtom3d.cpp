@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Guru
-/***************************************************************************
+/**************************************************************************************************
 
 X Tom 3D
 
 TODO:
 - clears a work RAM snippet then jumps to that snippet ... it doesn't do
   that if you soft reset emulation.
-- understand how to load game ROMs
+- understand how to load game ROMs. u3 contains a FAT12 file system for DOS/Windows
+partition.
 
 This game runs on PC-based hardware.
 Major components are....
@@ -15,7 +16,7 @@ Major components are....
 MAIN BOARD
 ----------
     CPU: Intel Celeron (socket 370) 333MHz
-Chipset: Intel AGPset FW822443ZX, PCIset FW82371EB
+Chipset: Intel AGPset FW82443ZX, PCIset FW82371EB
     RAM: Samsung KMM366S823CTS 8M x 64-bit SDRAM DIMM
   Video: 3DFX 500-0013-04 PCB-mounted BGA
          EliteMT M32L1632512A video RAM (x4)
@@ -37,7 +38,7 @@ ROM BOARD
 ---------
 MX29F1610MC 16M FlashROM (x7)
 
-***************************************************************************/
+**************************************************************************************************/
 
 
 #include "emu.h"
@@ -426,7 +427,6 @@ void xtom3d_state::xtom3d(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &xtom3d_state::xtom3d_map);
 	m_maincpu->set_addrmap(AS_IO, &xtom3d_state::xtom3d_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
-
 
 	pcat_common(config);
 

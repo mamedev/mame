@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_MACHINE_DMAC_0448_H
-#define MAME_MACHINE_DMAC_0448_H
+#ifndef MAME_SONY_DMAC_0448_H
+#define MAME_SONY_DMAC_0448_H
 
 #pragma once
 
@@ -96,4 +96,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(DMAC_0448, dmac_0448_device)
 
-#endif // MAME_MACHINE_DMAC_0448_H
+#endif // MAME_SONY_DMAC_0448_H

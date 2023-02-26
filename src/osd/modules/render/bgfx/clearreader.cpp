@@ -6,13 +6,13 @@
 //
 //============================================================
 
-#include <bgfx/bgfx.h>
-
 #include "clearreader.h"
 
 #include "clear.h"
 
-clear_state* clear_reader::read_from_value(const Value& value, std::string prefix)
+#include <bgfx/bgfx.h>
+
+clear_state* clear_reader::read_from_value(const Value& value, const std::string &prefix)
 {
 	if (!validate_parameters(value, prefix))
 	{
@@ -29,7 +29,7 @@ clear_state* clear_reader::read_from_value(const Value& value, std::string prefi
 		const Value& colors = value["clearcolor"];
 		for (int i = 0; i < colors.Size(); i++)
 		{
-			if (!READER_CHECK(colors[i].IsNumber(), (prefix + "clearcolor[" + std::to_string(i) + "] must be a numeric value\n").c_str())) return nullptr;
+			if (!READER_CHECK(colors[i].IsNumber(), "%sclearcolor[%d] must be a numeric value\n", prefix, i)) return nullptr;
 			auto val = int32_t(float(colors[i].GetDouble()) * 255.0f);
 			if (val > 255) val = 255;
 			if (val < 0) val = 0;
@@ -53,10 +53,10 @@ clear_state* clear_reader::read_from_value(const Value& value, std::string prefi
 	return new clear_state(clear_flags, clear_color, clear_depth, clear_stencil);
 }
 
-bool clear_reader::validate_parameters(const Value& value, std::string prefix)
+bool clear_reader::validate_parameters(const Value& value, const std::string &prefix)
 {
-	if (!READER_CHECK(!value.HasMember("clearcolor") || (value["clearcolor"].IsArray() && value["clearcolor"].GetArray().Size() == 4), (prefix + "'clearcolor' must be an array of four numeric RGBA values representing the color to which to clear the color buffer\n").c_str())) return false;
-	if (!READER_CHECK(!value.HasMember("cleardepth") || value["cleardepth"].IsNumber(), (prefix + "'cleardepth' must be a numeric value representing the depth to which to clear the depth buffer\n").c_str())) return false;
-	if (!READER_CHECK(!value.HasMember("clearstencil") || value["clearstencil"].IsNumber(), (prefix + "'clearstencil' must be a numeric value representing the stencil value to which to clear the stencil buffer\n").c_str())) return false;
+	if (!READER_CHECK(!value.HasMember("clearcolor") || (value["clearcolor"].IsArray() && value["clearcolor"].GetArray().Size() == 4), "%s'clearcolor' must be an array of four numeric RGBA values representing the color to which to clear the color buffer\n", prefix)) return false;
+	if (!READER_CHECK(!value.HasMember("cleardepth") || value["cleardepth"].IsNumber(), "%s'cleardepth' must be a numeric value representing the depth to which to clear the depth buffer\n", prefix)) return false;
+	if (!READER_CHECK(!value.HasMember("clearstencil") || value["clearstencil"].IsNumber(), "%s'clearstencil' must be a numeric value representing the stencil value to which to clear the stencil buffer\n", prefix)) return false;
 	return true;
 }

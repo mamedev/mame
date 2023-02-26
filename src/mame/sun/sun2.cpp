@@ -120,7 +120,7 @@ How the architecture works:
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "machine/ram.h"
 #include "machine/am9513.h"
 #include "machine/i82586.h"
@@ -130,6 +130,9 @@ How the architecture works:
 #include "machine/input_merger.h"
 #include "bus/rs232/rs232.h"
 #include "screen.h"
+
+
+namespace {
 
 #define SCC1_TAG        "scc1"
 #define SCC2_TAG        "scc2"
@@ -823,6 +826,9 @@ ROM_START( sun2_50 )
 	ROM_REGION(0x20, "idprom", ROMREGION_ERASEFF)
 	ROM_LOAD("sun250-idprom.bin", 0x000000, 0x000020, CRC(927744ab) SHA1(d29302b69128165e69dd3a79b8c8d45f2163b88a))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

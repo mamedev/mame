@@ -5,8 +5,8 @@
     Luxor ABC-80 keyboard emulation
 
 **********************************************************************/
-#ifndef MAME_MACHINE_ABC80KB_H
-#define MAME_MACHINE_ABC80KB_H
+#ifndef MAME_LUXOR_ABC80KB_H
+#define MAME_LUXOR_ABC80KB_H
 
 #pragma once
 
@@ -58,4 +58,4 @@ DECLARE_DEVICE_TYPE(ABC80_KEYBOARD, abc80_keyboard_device)
 
 
 
-#endif // MAME_MACHINE_ABC80KB_H
+#endif // MAME_LUXOR_ABC80KB_H

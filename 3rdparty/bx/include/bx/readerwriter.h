@@ -1,6 +1,6 @@
 /*
- * Copyright 2010-2021 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
+ * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
 #ifndef BX_READERWRITER_H_HEADER_GUARD
@@ -81,7 +81,7 @@ namespace bx
 		virtual ~ReaderOpenI() = 0;
 
 		///
-		virtual bool open(const FilePath& _filePath, Error* _err) = 0;
+		virtual bool open(const FilePath& _filePath, Error* _err = ErrorIgnore{}) = 0;
 	};
 
 	/// Open for writing interface.
@@ -91,7 +91,7 @@ namespace bx
 		virtual ~WriterOpenI() = 0;
 
 		///
-		virtual bool open(const FilePath& _filePath, bool _append, Error* _err) = 0;
+		virtual bool open(const FilePath& _filePath, bool _append = false, Error* _err = ErrorIgnore{}) = 0;
 	};
 
 	/// Open process interface.
@@ -101,7 +101,7 @@ namespace bx
 		virtual ~ProcessOpenI() = 0;
 
 		///
-		virtual bool open(const FilePath& _filePath, const StringView& _args, Error* _err) = 0;
+		virtual bool open(const FilePath& _filePath, const StringView& _args, Error* _err = ErrorIgnore{}) = 0;
 	};
 
 	/// Closer interface.
@@ -174,7 +174,7 @@ namespace bx
 		uint32_t    m_size;
 	};
 
-	/// Sizer writer. Dummy writter that only counts number of bytes written into it.
+	/// Sizer writer. Dummy writer that only counts number of bytes written into it.
 	class SizerWriter : public WriterSeekerI
 	{
 	public:
@@ -265,25 +265,25 @@ namespace bx
 	};
 
 	/// Read data.
-	int32_t read(ReaderI* _reader, void* _data, int32_t _size, Error* _err = NULL);
+	int32_t read(ReaderI* _reader, void* _data, int32_t _size, Error* _err);
 
 	/// Read value.
 	template<typename Ty>
-	int32_t read(ReaderI* _reader, Ty& _value, Error* _err = NULL);
+	int32_t read(ReaderI* _reader, Ty& _value, Error* _err);
 
-	/// Read value and converts it to host endianess. _fromLittleEndian specifies
-	/// underlying stream endianess.
+	/// Read value and converts it to host endianness. _fromLittleEndian specifies
+	/// underlying stream endianness.
 	template<typename Ty>
-	int32_t readHE(ReaderI* _reader, Ty& _value, bool _fromLittleEndian, Error* _err = NULL);
+	int32_t readHE(ReaderI* _reader, Ty& _value, bool _fromLittleEndian, Error* _err);
 
 	/// Write data.
-	int32_t write(WriterI* _writer, const void* _data, int32_t _size, Error* _err = NULL);
+	int32_t write(WriterI* _writer, const void* _data, int32_t _size, Error* _err);
 
 	/// Write C string.
-	int32_t write(WriterI* _writer, const char* _str, Error* _err = NULL);
+	int32_t write(WriterI* _writer, const char* _str, Error* _err);
 
 	/// Write string view.
-	int32_t write(WriterI* _writer, const StringView& _str, Error* _err = NULL);
+	int32_t write(WriterI* _writer, const StringView& _str, Error* _err);
 
 	/// Write formatted string.
 	int32_t write(WriterI* _writer, const StringView& _format, va_list _argList, Error* _err);
@@ -295,19 +295,19 @@ namespace bx
 	int32_t write(WriterI* _writer, Error* _err, const char* _format, ...);
 
 	/// Write repeat the same value.
-	int32_t writeRep(WriterI* _writer, uint8_t _byte, int32_t _size, Error* _err = NULL);
+	int32_t writeRep(WriterI* _writer, uint8_t _byte, int32_t _size, Error* _err);
 
 	/// Write value.
 	template<typename Ty>
-	int32_t write(WriterI* _writer, const Ty& _value, Error* _err = NULL);
+	int32_t write(WriterI* _writer, const Ty& _value, Error* _err);
 
 	/// Write value as little endian.
 	template<typename Ty>
-	int32_t writeLE(WriterI* _writer, const Ty& _value, Error* _err = NULL);
+	int32_t writeLE(WriterI* _writer, const Ty& _value, Error* _err);
 
 	/// Write value as big endian.
 	template<typename Ty>
-	int32_t writeBE(WriterI* _writer, const Ty& _value, Error* _err = NULL);
+	int32_t writeBE(WriterI* _writer, const Ty& _value, Error* _err);
 
 	/// Skip _offset bytes forward.
 	int64_t skip(SeekerI* _seeker, int64_t _offset);
@@ -322,26 +322,26 @@ namespace bx
 	int64_t getRemain(SeekerI* _seeker);
 
 	/// Peek data.
-	int32_t peek(ReaderSeekerI* _reader, void* _data, int32_t _size, Error* _err = NULL);
+	int32_t peek(ReaderSeekerI* _reader, void* _data, int32_t _size, Error* _err);
 
 	/// Peek value.
 	template<typename Ty>
-	int32_t peek(ReaderSeekerI* _reader, Ty& _value, Error* _err = NULL);
+	int32_t peek(ReaderSeekerI* _reader, Ty& _value, Error* _err);
 
 	/// Align reader stream.
-	int32_t align(ReaderSeekerI* _reader, uint32_t _alignment, Error* _err = NULL);
+	int32_t align(ReaderSeekerI* _reader, uint32_t _alignment, Error* _err);
 
 	/// Align writer stream (pads stream with zeros).
-	int32_t align(WriterSeekerI* _writer, uint32_t _alignment, Error* _err = NULL);
+	int32_t align(WriterSeekerI* _writer, uint32_t _alignment, Error* _err);
 
 	/// Open for read.
-	bool open(ReaderOpenI* _reader, const FilePath& _filePath, Error* _err = NULL);
+	bool open(ReaderOpenI* _reader, const FilePath& _filePath, Error* _err = ErrorIgnore{});
 
 	/// Open for write.
-	bool open(WriterOpenI* _writer, const FilePath& _filePath, bool _append = false, Error* _err = NULL);
+	bool open(WriterOpenI* _writer, const FilePath& _filePath, bool _append = false, Error* _err = ErrorIgnore{});
 
 	/// Open process.
-	bool open(ProcessOpenI* _process, const FilePath& _filePath, const StringView& _args, Error* _err = NULL);
+	bool open(ProcessOpenI* _process, const FilePath& _filePath, const StringView& _args, Error* _err = ErrorIgnore{});
 
 	/// Close.
 	void close(CloserI* _reader);

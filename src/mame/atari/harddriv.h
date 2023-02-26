@@ -5,8 +5,8 @@
     Driver for Atari polygon racer games
 
 **************************************************************************/
-#ifndef MAME_INCLUDES_HARDDRIV_H
-#define MAME_INCLUDES_HARDDRIV_H
+#ifndef MAME_ATARI_HARDDRIV_H
+#define MAME_ATARI_HARDDRIV_H
 
 #pragma once
 
@@ -18,6 +18,7 @@
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/dsp32/dsp32.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68010.h"
 #include "cpu/tms32010/tms32010.h"
 #include "cpu/tms34010/tms34010.h"
 
@@ -257,6 +258,7 @@ protected:
 	uint16_t hdadsp_speedup_r();
 	uint16_t hdds3_speedup_r();
 
+	void display_speedups();
 
 	DECLARE_WRITE_LINE_MEMBER(hdds3sdsp_timer_enable_callback);
 	void hdds3sdsp_serial_tx_callback(uint32_t data);
@@ -746,4 +748,4 @@ protected:
 	virtual void device_start() override;
 };
 
-#endif // MAME_INCLUDES_HARDDRIV_H
+#endif // MAME_ATARI_HARDDRIV_H

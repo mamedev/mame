@@ -6,8 +6,8 @@
     Neo-Geo hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_NEOGEO_H
-#define MAME_INCLUDES_NEOGEO_H
+#ifndef MAME_NEOGEO_NEOGEO_H
+#define MAME_NEOGEO_NEOGEO_H
 
 #pragma once
 
@@ -118,7 +118,7 @@ protected:
 	virtual void device_post_load() override;
 
 	// devices
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	// MVS-specific devices
 	optional_device<ym2610_device> m_ym;
@@ -280,4 +280,4 @@ private:
 INPUT_PORTS_EXTERN(neogeo);
 INPUT_PORTS_EXTERN(aes);
 
-#endif // MAME_INCLUDES_NEOGEO_H
+#endif // MAME_NEOGEO_NEOGEO_H

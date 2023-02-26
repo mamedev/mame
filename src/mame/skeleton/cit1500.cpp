@@ -41,6 +41,9 @@ DS1302S trickle-charge timekeeping
 //#include "video/upd7225.h"
 //#include "screen.h"
 
+
+namespace {
+
 class cit1500_state : public driver_device
 {
 public:
@@ -105,6 +108,8 @@ ROM_START(teletup)
 	ROM_REGION(0x1000, "cit1300", 0)
 	ROM_LOAD("tue2a-xbaa_br24c32.cit1300", 0x0000, 0x1000, CRC(dd447884) SHA1(8ae677f46cd39015355a38a7f1147a7abc412674))
 ROM_END
+
+} // anonymous namespace
 
 
 SYST(2001, trmavia, 0, 0, cit1500, cit1500, cit1500_state, empty_init, "Alcatel / Telefonica", "TRMA VIA", MACHINE_IS_SKELETON)

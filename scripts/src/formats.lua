@@ -361,6 +361,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/as_dsk.h,FORMATS["AS_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "AS_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/as_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/as_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/atari_dsk.h,FORMATS["ATARI_DSK"] = true
 --------------------------------------------------
 
@@ -1076,6 +1088,18 @@ if opt_tool(FORMATS, "HTI_TAP") then
 	files {
 		MAME_DIR.. "src/lib/formats/hti_tape.cpp",
 		MAME_DIR.. "src/lib/formats/hti_tape.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/hp_ipc_dsk.h,FORMATS["HP300_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "HP300_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/hp300_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/hp300_dsk.h",
 	}
 end
 
@@ -2162,6 +2186,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/fs_hplif.h,FORMATS["FS_HPLIF"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_HPLIF") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_hplif.cpp",
+		MAME_DIR.. "src/lib/formats/fs_hplif.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/fs_oric_jasmin.h,FORMATS["FS_ORIC_JASMIN"] = true
 --------------------------------------------------
 
@@ -2205,6 +2241,18 @@ if opt_tool(FORMATS, "FS_COCO_OS9") then
 	files {
 		MAME_DIR.. "src/lib/formats/fs_coco_os9.cpp",
 		MAME_DIR.. "src/lib/formats/fs_coco_os9.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/fs_isis.h,FORMATS["FS_ISIS"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_ISIS") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_isis.cpp",
+		MAME_DIR.. "src/lib/formats/fs_isis.h",
 	}
 end
 

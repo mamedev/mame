@@ -44,7 +44,7 @@ class DevicesWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	DevicesWindow(running_machine &machine, QWidget *parent = nullptr);
+	DevicesWindow(DebuggerQt &debugger, QWidget *parent = nullptr);
 	virtual ~DevicesWindow();
 
 public slots:
@@ -58,28 +58,6 @@ private:
 	QTreeView *m_devices_view;
 	DevicesWindowModel m_devices_model;
 	device_t *m_selected_device;
-};
-
-
-
-
-//=========================================================================
-//  A way to store the configuration of a window long enough to read/write.
-//=========================================================================
-class DevicesWindowQtConfig : public WindowQtConfig
-{
-public:
-	DevicesWindowQtConfig() :
-		WindowQtConfig(WINDOW_TYPE_DEVICES_VIEWER)
-	{
-	}
-
-	~DevicesWindowQtConfig() {}
-
-	void buildFromQWidget(QWidget *widget);
-	void applyToQWidget(QWidget *widget);
-	void addToXmlDataNode(util::xml::data_node &node) const;
-	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
 } // namespace osd::debugger::qt

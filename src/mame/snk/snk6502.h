@@ -5,8 +5,8 @@
     rokola hardware
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_SNK6502_H
-#define MAME_INCLUDES_SNK6502_H
+#ifndef MAME_SNK_SNK6502_H
+#define MAME_SNK_SNK6502_H
 
 #pragma once
 
@@ -139,4 +139,4 @@ private:
 	required_device<fantasy_sound_device> m_sound;
 };
 
-#endif // MAME_INCLUDES_SNK6502_H
+#endif // MAME_SNK_SNK6502_H

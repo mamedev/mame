@@ -6,23 +6,9 @@
  ************************************************************************/
 
 #include "emu.h"
-#include "sprint8.h"
 
-#include "speaker.h"
+#include "sprint8_a.h"
 
-
-/* Discrete Sound Input Nodes */
-#define SPRINT8_CRASH_EN            NODE_01
-#define SPRINT8_SCREECH_EN          NODE_02
-#define SPRINT8_ATTRACT_EN          NODE_03
-#define SPRINT8_MOTOR1_EN           NODE_04
-#define SPRINT8_MOTOR2_EN           NODE_05
-#define SPRINT8_MOTOR3_EN           NODE_06
-#define SPRINT8_MOTOR4_EN           NODE_07
-#define SPRINT8_MOTOR5_EN           NODE_08
-#define SPRINT8_MOTOR6_EN           NODE_09
-#define SPRINT8_MOTOR7_EN           NODE_10
-#define SPRINT8_MOTOR8_EN           NODE_11
 
 /* Discrete Sound Output Nodes */
 #define SPRINT8_NOISE               NODE_12
@@ -295,41 +281,3 @@ DISCRETE_SOUND_START( sprint8_discrete )
 	DISCRETE_OUTPUT(SPRINT8_AUDIO_4_8, 65500.0/8)
 	DISCRETE_TASK_END()
 DISCRETE_SOUND_END
-
-void sprint8_state::sprint8_audio(machine_config &config)
-{
-	/* sound hardware */
-	/* the proper way is to hook up 4 speakers, but they are not really
-	 * F/R/L/R speakers.  Though you can pretend the 1-2 mix is the front. */
-	SPEAKER(config, "speaker_1_2", 0.0, 0.0, 1.0);      // front
-	SPEAKER(config, "speaker_3_7", -0.2, 0.0, 1.0);     // left
-	SPEAKER(config, "speaker_5_6",  0.0, 0.0, -0.5);    // back
-	SPEAKER(config, "speaker_4_8", 0.2, 0.0, 1.0);      // right
-
-	DISCRETE(config, m_discrete, sprint8_discrete);
-	m_discrete->add_route(0, "speaker_1_2", 1.0);
-	/* volumes on other channels defaulted to off, */
-	/* user can turn them up if needed. */
-	/* The game does not sound good with all channels mixed to stereo. */
-	m_discrete->add_route(1, "speaker_3_7", 0.0);
-	m_discrete->add_route(2, "speaker_5_6", 0.0);
-	m_discrete->add_route(3, "speaker_4_8", 0.0);
-
-	f9334_device &latch(F9334(config, "latch"));
-	latch.q_out_cb<0>().set(FUNC(sprint8_state::int_reset_w));
-	latch.q_out_cb<1>().set(m_discrete, FUNC(discrete_device::write_line<SPRINT8_CRASH_EN>));
-	latch.q_out_cb<2>().set(m_discrete, FUNC(discrete_device::write_line<SPRINT8_SCREECH_EN>));
-	latch.q_out_cb<5>().set(FUNC(sprint8_state::team_w));
-	latch.q_out_cb<6>().set(m_discrete, FUNC(discrete_device::write_line<SPRINT8_ATTRACT_EN>));
-
-	f9334_device &motor(F9334(config, "motor"));
-	motor.q_out_cb<0>().set(m_discrete, FUNC(discrete_device::write_line<SPRINT8_MOTOR1_EN>));
-	motor.q_out_cb<1>().set(m_discrete, FUNC(discrete_device::write_line<SPRINT8_MOTOR2_EN>));
-	motor.q_out_cb<2>().set(m_discrete, FUNC(discrete_device::write_line<SPRINT8_MOTOR3_EN>));
-	motor.q_out_cb<3>().set(m_discrete, FUNC(discrete_device::write_line<SPRINT8_MOTOR4_EN>));
-	motor.q_out_cb<4>().set(m_discrete, FUNC(discrete_device::write_line<SPRINT8_MOTOR5_EN>));
-	motor.q_out_cb<5>().set(m_discrete, FUNC(discrete_device::write_line<SPRINT8_MOTOR6_EN>));
-	motor.q_out_cb<6>().set(m_discrete, FUNC(discrete_device::write_line<SPRINT8_MOTOR7_EN>));
-	motor.q_out_cb<7>().set(m_discrete, FUNC(discrete_device::write_line<SPRINT8_MOTOR8_EN>));
-}
-;
