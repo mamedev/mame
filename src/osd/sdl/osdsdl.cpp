@@ -260,6 +260,9 @@ void sdl_osd_interface::init(running_machine &machine)
 		}
 	}
 
+#if defined(SDLMAME_ANDROID)
+	SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "1");
+#endif
 	/* Initialize SDL */
 
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO))
