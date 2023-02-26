@@ -275,15 +275,16 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 	{
 		uint16_t zval = (m_spriteram[(currentsprite * 8) + 2] & 0x07ff0000) >> 16;
 
-		uint16_t ypos = (m_spriteram[(currentsprite * 8) + 0] & 0xffff0000) >> 16;
-		uint16_t xpos = (m_spriteram[(currentsprite * 8) + 0] & 0x0000ffff) >> 0;
+		int16_t ypos = (m_spriteram[(currentsprite * 8) + 0] & 0xffff0000) >> 16;
+		int16_t xpos = (m_spriteram[(currentsprite * 8) + 0] & 0x0000ffff) >> 0;
+
+		// sams64_2 wants bit 0x200 to be the sign bit on character select screen
+		xpos = util::sext(xpos, 10);
+		ypos = util::sext(ypos, 10);
+
 		xpos += (spriteoffsx);
 		ypos += (spriteoffsy);
 
-		// 0x3ff (0x200 sign bit) based on sams64_2 char select
-		xpos &= 0x3ff;
-		if (xpos & 0x0200)
-			xpos -= 0x400;
 
 		bool blend = (m_spriteram[(currentsprite * 8) + 4] & 0x00800000);
 		bool checkerboard = (m_spriteram[(currentsprite * 8) + 4] & 0x04000000);
@@ -357,7 +358,6 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 			}
 
 			uint32_t full_srcpix_y2 = realline * dy;
-
 			int used_ysource_pos = full_srcpix_y2 >> 16;
 			int ytilebbb = used_ysource_pos / 0x10;
 			int use_tile_line = used_ysource_pos & 0xf;
