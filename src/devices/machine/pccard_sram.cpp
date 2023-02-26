@@ -21,6 +21,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
+DEFINE_DEVICE_TYPE(PCCARD_SRAM_CENTENNIAL_1M, pccard_centennial_sl01m_15_11194_device, "centennial_sl01m_15_11194", "Centennial 1 MB SRAM")
 DEFINE_DEVICE_TYPE(PCCARD_SRAM_CENTENNIAL_2M, pccard_centennial_sl02m_15_11194_device, "centennial_sl02m_15_11194", "Centennial 2 MB SRAM")
 DEFINE_DEVICE_TYPE(PCCARD_SRAM_CENTENNIAL_4M, pccard_centennial_sl04m_15_11194_device, "centennial_sl04m_15_11194", "Centennial 4 MB SRAM")
 
@@ -158,6 +159,7 @@ void pccard_sram_device::card_inserted(bool state)
 
     Centennial SRAM
 
+    SL01M-15-11194: 1 MB SRAM w/ Write Protect - 150 ns Rechargeable Lithium Battery
     SL02M-15-11194: 2 MB SRAM w/ Write Protect - 150 ns Rechargeable Lithium Battery
     SL04M-15-11194: 4 MB SRAM w/ Write Protect - 150 ns Rechargeable Lithium Battery
 
@@ -231,6 +233,33 @@ void pccard_centennial_sram_device::call_unload()
 	std::fill_n(&m_eeprom[0], m_eeprom.length(), 0);
 
 	card_inserted(false);
+}
+
+pccard_centennial_sl01m_15_11194_device::pccard_centennial_sl01m_15_11194_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pccard_centennial_sram_device(mconfig, PCCARD_SRAM_CENTENNIAL_1M, tag, owner, clock)
+{
+	m_memory_space_config = address_space_config("memory", ENDIANNESS_LITTLE, 16, 20, 0, address_map_constructor(FUNC(pccard_centennial_sl01m_15_11194_device::memory_map), this));
+	m_attribute_space_config = address_space_config("attribute", ENDIANNESS_LITTLE, 16, 14, 0, address_map_constructor(FUNC(pccard_centennial_sl01m_15_11194_device::attribute_map), this));
+}
+
+void pccard_centennial_sl01m_15_11194_device::memory_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).ram().share("sram");
+}
+
+void pccard_centennial_sl01m_15_11194_device::attribute_map(address_map &map)
+{
+	map(0x00000, 0x03fff).ram().share("eeprom");
+}
+
+ROM_START( eeprom_01 )
+	ROM_REGION(0x2000, "eeprom", 0)
+	ROM_LOAD("eeprom.bin", 0x0000, 0x2000, BAD_DUMP CRC(2caacff3) SHA1(8141459dccf63a64f4bdf4e2171b0884f2cc390d))
+ROM_END
+
+const tiny_rom_entry *pccard_centennial_sl01m_15_11194_device::device_rom_region() const
+{
+	return ROM_NAME( eeprom_01 );
 }
 
 pccard_centennial_sl02m_15_11194_device::pccard_centennial_sl02m_15_11194_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

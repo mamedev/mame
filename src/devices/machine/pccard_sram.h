@@ -87,6 +87,21 @@ private:
 	required_memory_region m_eeprom_default;
 };
 
+class pccard_centennial_sl01m_15_11194_device : public pccard_centennial_sram_device
+{
+public:
+	// construction/destruction
+	pccard_centennial_sl01m_15_11194_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	// device_t overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+private:
+	void memory_map(address_map &map);
+	void attribute_map(address_map &map);
+};
+
 class pccard_centennial_sl02m_15_11194_device : public pccard_centennial_sram_device
 {
 public:
@@ -118,6 +133,7 @@ private:
 };
 
 // device type definition
+DECLARE_DEVICE_TYPE(PCCARD_SRAM_CENTENNIAL_1M, pccard_centennial_sl01m_15_11194_device)
 DECLARE_DEVICE_TYPE(PCCARD_SRAM_CENTENNIAL_2M, pccard_centennial_sl02m_15_11194_device)
 DECLARE_DEVICE_TYPE(PCCARD_SRAM_CENTENNIAL_4M, pccard_centennial_sl04m_15_11194_device)
 
