@@ -12,12 +12,12 @@ license:CC0
 
 	<element name="unknownlp" defstate="0">
 		<rect state="1"> <color red="1.0" green="1.0" blue="1.0" /> </rect>
-		<rect state="0"> <color red="0.3" green="0.3" blue="0.3" />	</rect>
+		<rect state="0"> <color red="0.3" green="0.3" blue="0.3" /> </rect>
 		<text string="?">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
 		</text>
-	</element>	
+	</element>
 
 	<element name="coinlp" defstate="0">
 		<disk state ="0"> <color red="0.3" green="0.3" blue="0.0" /> </disk>
@@ -51,7 +51,7 @@ license:CC0
 
 	<element name="yellow1lp" defstate="0">
 		<rect state="1"> <color red="1.0" green="1.0" blue="0.0" /> </rect>
-		<rect state="0"> <color red="0.3" green="0.3" blue="0.0" />	</rect>
+		<rect state="0"> <color red="0.3" green="0.3" blue="0.0" /> </rect>
 		<text string="1">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
@@ -60,7 +60,7 @@ license:CC0
 
 	<element name="yellow2lp" defstate="0">
 		<rect state="1"> <color red="1.0" green="1.0" blue="0.0" /> </rect>
-		<rect state="0"> <color red="0.3" green="0.3" blue="0.0" />	</rect>
+		<rect state="0"> <color red="0.3" green="0.3" blue="0.0" /> </rect>
 		<text string="2">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
@@ -69,7 +69,7 @@ license:CC0
 
 	<element name="orange3lp" defstate="0">
 		<rect state="1"> <color red="1.0" green="0.65" blue="0.0" /> </rect>
-		<rect state="0"> <color red="0.3" green="0.2" blue="0.0" />	</rect>
+		<rect state="0"> <color red="0.3" green="0.2" blue="0.0" /> </rect>
 		<text string="3">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
@@ -78,7 +78,7 @@ license:CC0
 
 	<element name="orange4lp" defstate="0">
 		<rect state="1"> <color red="1.0" green="0.65" blue="0.0" /> </rect>
-		<rect state="0"> <color red="0.3" green="0.2" blue="0.0" />	</rect>
+		<rect state="0"> <color red="0.3" green="0.2" blue="0.0" /> </rect>
 		<text string="4">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
@@ -87,7 +87,7 @@ license:CC0
 
 	<element name="red5lp" defstate="0">
 		<rect state="1"> <color red="1.0" green="0.0" blue="0.0" /> </rect>
-		<rect state="0"> <color red="0.3" green="0.0" blue="0.0" />	</rect>
+		<rect state="0"> <color red="0.3" green="0.0" blue="0.0" /> </rect>
 		<text string="5">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
@@ -96,7 +96,7 @@ license:CC0
 
 	<element name="red6lp" defstate="0">
 		<rect state="1"> <color red="1.0" green="0.0" blue="0.0" /> </rect>
-		<rect state="0"> <color red="0.3" green="0.0" blue="0.0" />	</rect>
+		<rect state="0"> <color red="0.3" green="0.0" blue="0.0" /> </rect>
 		<text string="6">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
@@ -105,7 +105,7 @@ license:CC0
 
 	<element name="stake2lp" defstate="0">
 		<rect state="1"> <color red="1.0" green="0.65" blue="0.0" /> </rect>
-		<rect state="0"> <color red="0.3" green="0.2" blue="0.0" />	</rect>
+		<rect state="0"> <color red="0.3" green="0.2" blue="0.0" /> </rect>
 		<text string="STK2">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
@@ -114,7 +114,7 @@ license:CC0
 
 	<element name="stake3lp" defstate="0">
 		<rect state="1"> <color red="1.0" green="0.0" blue="0.0" /> </rect>
-		<rect state="0"> <color red="0.3" green="0.0" blue="0.0" />	</rect>
+		<rect state="0"> <color red="0.3" green="0.0" blue="0.0" /> </rect>
 		<text string="STK3">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
@@ -123,7 +123,7 @@ license:CC0
 
 	<element name="stake4lp" defstate="0">
 		<rect state="1"> <color red="0.0" green="0.0" blue="1.0" /> </rect>
-		<rect state="0"> <color red="0.0" green="0.0" blue="0.3" />	</rect>
+		<rect state="0"> <color red="0.0" green="0.0" blue="0.3" /> </rect>
 		<text string="STK4">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
@@ -132,7 +132,7 @@ license:CC0
 
 	<element name="stake5lp" defstate="0">
 		<rect state="1"> <color red="0.0" green="1.0" blue="0.0" /> </rect>
-		<rect state="0"> <color red="0.0" green="0.3" blue="0.0" />	</rect>
+		<rect state="0"> <color red="0.0" green="0.3" blue="0.0" /> </rect>
 		<text string="STK5">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
@@ -141,7 +141,7 @@ license:CC0
 
 	<element name="halflp" defstate="0">
 		<rect state="1"> <color red="1.0" green="1.0" blue="1.0" /> </rect>
-		<rect state="0"> <color red="0.3" green="0.3" blue="0.3" />	</rect>
+		<rect state="0"> <color red="0.3" green="0.3" blue="0.3" /> </rect>
 		<text string="HALF">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
@@ -150,7 +150,7 @@ license:CC0
 
 	<element name="doubleorlp" defstate="0">
 		<rect state="1"> <color red="1.0" green="1.0" blue="1.0" /> </rect>
-		<rect state="0"> <color red="0.3" green="0.3" blue="0.3" />	</rect>
+		<rect state="0"> <color red="0.3" green="0.3" blue="0.3" /> </rect>
 		<text string="DOUBLE">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.05" y="0.05" width="0.9" height="0.45" />
@@ -160,7 +160,7 @@ license:CC0
 			<bounds x="0.05" y="0.5" width="0.9" height="0.45" />
 		</text>
 	</element>
-	
+
 	<element name="nixie">
 		<rect><color red="0.1" green="0.06" blue="0.02" /></rect>
 		<text state="0" string="Melon"><color red="1.0" green="0.6" blue="0.3" /> </text>
@@ -175,7 +175,7 @@ license:CC0
 
 	<element name="L1" defstate="0">
 		<rect state="1"> <color red="1.0" green="1.0" blue="0.0" /> </rect>
-		<rect state="0"> <color red="0.3" green="0.3" blue="0.0" />	</rect>
+		<rect state="0"> <color red="0.3" green="0.3" blue="0.0" /> </rect>
 		<text string="APUESTA">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.05" y="0.05" width="0.9" height="0.45" />
@@ -188,7 +188,7 @@ license:CC0
 
 	<element name="L2" defstate="0">
 		<rect state="1"> <color red="1.0" green="0.0" blue="0.0" /> </rect>
-		<rect state="0"> <color red="0.3" green="0.0" blue="0.0" />	</rect>
+		<rect state="0"> <color red="0.3" green="0.0" blue="0.0" /> </rect>
 		<text string="STOP1">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
@@ -197,7 +197,7 @@ license:CC0
 
 	<element name="L3" defstate="0">
 		<rect state="1"> <color red="1.0" green="0.0" blue="0.0" /> </rect>
-		<rect state="0"> <color red="0.3" green="0.0" blue="0.0" />	</rect>
+		<rect state="0"> <color red="0.3" green="0.0" blue="0.0" /> </rect>
 		<text string="STOP2">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
@@ -206,7 +206,7 @@ license:CC0
 
 	<element name="L4" defstate="0">
 		<rect state="1"> <color red="1.0" green="0.0" blue="0.0" /> </rect>
-		<rect state="0"> <color red="0.3" green="0.0" blue="0.0" />	</rect>
+		<rect state="0"> <color red="0.3" green="0.0" blue="0.0" /> </rect>
 		<text string="STOP3">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.05" y="0.05" width="0.9" height="0.9" />
@@ -215,7 +215,7 @@ license:CC0
 
 	<element name="L5" defstate="0">
 		<rect state="1"> <color red="0.0" green="1.0" blue="0.0" /> </rect>
-		<rect state="0"> <color red="0.0" green="0.3" blue="0.0" />	</rect>
+		<rect state="0"> <color red="0.0" green="0.3" blue="0.0" /> </rect>
 		<text string="START">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0.05" y="0.05" width="0.9" height="0.45" />
