@@ -72,7 +72,6 @@ private:
 	required_device<tms9914_device> m_tms9914;
 	required_device<ieee488_device> m_ieee488;
 	emu_timer *m_timer_10ms;
-	int m_irq;
 
 	uint32_t m_bus_address;
 	uint16_t m_bus_mem_mask;
@@ -80,6 +79,7 @@ private:
 	uint8_t m_gpib_reg1;
 	uint8_t m_reg5;
 	uint8_t m_reg6;
+	uint8_t m_irq;
 
 	bool m_installed;
 	bool m_ack_buscycle;
