@@ -11,7 +11,7 @@
 #include "rcnt.h"
 
 #define VERBOSE ( 0 )
-#include "logerror.h"
+#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(PSX_RCNT, psxrcnt_device, "psxrcnt", "Sony PSX RCNT")
 
