@@ -873,7 +873,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			m_videoregs[0x0d]);
 
 	if (1)
-		popmessage("TC: %08x %08x %08x\nBLEND ENABLES? %02x %02x %02x | %02x %02x %02x\n%04x % 08x\nMASTER FADES?(%08x %08x)\n % 08x % 08x\n % 08x % 08x : % 08x % 08x % 08x % 08x : % 08x % 08x\n % 08x % 08x : % 08x % 08x % 08x % 08x",
+		popmessage("TC: %08x %08x %08x\nBLEND ENABLES? %02x %02x %02x | %02x %02x %02x\nUNUSED?(%04x)\n%04x\n%04x\nMASTER FADES?(%08x %08x)\nUNUSED?(%08x)\nBITFIELD REGS(%04x %04x)\n PALFADES?(%08x %08x : %08x %08x : %08x %08x : %08x %08x)\n % 08x % 08x : % 08x % 08x % 08x % 08x",
 			m_tcram[0x00 / 4], // 0007 00e4 (fatfurwa, bbust2)
 			m_tcram[0x04 / 4], // 0000 0010 (fatfurwa) 0000 0000 (bbust2, xrally)
 			m_tcram[0x08 / 4], // 0200 01b0 (fatfurwa) 0200 01c0 (bbust2, xrally)
@@ -885,16 +885,21 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			(m_tcram[0x10 / 4] >> 24) & 0xff,
 			(m_tcram[0x10 / 4] >> 16) & 0xff,
 
-			m_tcram[0x10 / 4] & 0xffff,
-			m_tcram[0x14 / 4],
+			m_tcram[0x10 / 4] & 0xffff, // unused?
+
+			(m_tcram[0x14 / 4] >> 16) & 0xffff,  // typically 0007 or 0001, - 0011 on ss64 ingame, 0009 on continue screen
+			(m_tcram[0x14 / 4] >> 0) & 0xffff,   // 0xxx ?  (often 0555 or 0fff, seen 56a, 57f too)
 
 			// these are used for 'fade to black' in most cases, but
 			// in xrally attract, when one image is meant to fade into another, one value increases while the other decreases
 			m_tcram[0x18 / 4],  // xRGB fade values? (roadedge attract)
 			m_tcram[0x1c / 4],  // xRGB fade values? (roadedge attract) fades on fatfurwa before buildings in intro
 
-			m_tcram[0x20 / 4],  // something else?
-			m_tcram[0x24 / 4],  // something else? 0x00000001 gets set when in a tunnel on roadedge in 1st person mode (state isn't updated otherwise, switching back to 3rd person in a tunnel leaves it set until you flick back to 1st person)  
+			m_tcram[0x20 / 4],  //  unused?
+
+			// some kind of bitfields
+			(m_tcram[0x24 / 4] >> 16) & 0xffff, // 0002 gets set in roadedge during some transitions (layers are disabled? blacked out?) 0001 set on SNK logo in roadedge 
+			(m_tcram[0x24 / 4] >> 0) & 0xffff,  // 0001 gets set when in a tunnel on roadedge in 1st person mode (state isn't updated otherwise, switching back to 3rd person in a tunnel leaves it set until you flick back to 1st person)  briefly set to 3c on roadedge car select during 'no fb clear' effect?
 
 			// 7 of these fade during the buriki SNK logo (probably redundant)
 			// in roadedge they're just set to
