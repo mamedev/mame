@@ -6,11 +6,11 @@ Basic display of LEDs for an MSX
 -->
 
 <mamelayout version="2">
-	<element name="green_led">
-		<rect state="0">
+	<element name="optional_green_led">
+		<rect state="1">
 			<color red="0.2" green="0.2" blue="0.2" />
 		</rect>
-		<rect state="1">
+		<rect state="2">
 			<color red="0.0" green="1.0" blue="0.0" />
 		</rect>
 	</element>
@@ -22,13 +22,28 @@ Basic display of LEDs for an MSX
 			<color red="1.0" green="0.6" blue="0.0" />
 		</rect>
 	</element>
-	<element name="caps">
-		<text string="Caps" align="1">
+	<element name="caps_name">
+		<text string="Caps" align="1" state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
-	<element name="kana_arab">
-		<text string="Kana/Arab" align="1">
+	<element name="code_name">
+		<text string="Code" align="1" state="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+		<text string="カナ" align="1" state="2">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+<!-- This is the text from the keys but does not seem to get rendered properly.
+		<text string="عالي" align="1" state="3">
+-->
+		<text string="Arabic" align="1" state="3">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+		<text string="한글" align="1" state="4">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+		<text string="РУС" align="1" state="5">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
 	</element>
@@ -47,16 +62,16 @@ Basic display of LEDs for an MSX
 		<screen index="0">
 			<bounds x="75" y="0" width="1024" height="768" />
 		</screen>
-		<element name="caps_text" ref="caps">
+		<element name="caps_led_name" ref="caps_name">
 			<bounds left="0" right="74" top="0" bottom="30" />
 		</element>
-		<element name="caps_led" ref="green_led">
+		<element name="caps_led" ref="optional_green_led">
 			<bounds left="0" right="20" top="31" bottom="39" />
 		</element>
-		<element name="kana_arab_text" ref="kana_arab">
+		<element name="code_led_name" ref="code_name">
 			<bounds left="0" right="74" top="40" bottom="70" />
 		</element>
-		<element name="kana_arab_led" ref="green_led">
+		<element name="code_led" ref="optional_green_led">
 			<bounds left="0" right="20" top="71" bottom="79" />
 		</element>
 		<element name="name_int_drv0" ref="drv0">

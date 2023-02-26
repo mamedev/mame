@@ -56,8 +56,9 @@ public:
 	void yis503ii(machine_config &config);
 
 protected:
-	void msx1_v9938(ay8910_type ay8910_type, machine_config &config);
-	void msx1_v9938_pal(ay8910_type ay8910_type, machine_config &config);
+	void msx1_v9938(ay8910_type ay8910_type, machine_config &config, region_type region);
+	void msx1_v9938_pal(ay8910_type ay8910_type, machine_config &config, region_type region);
+	void svi738_base(machine_config &config, region_type region);
 
 	void io_map(address_map &map);
 
@@ -76,9 +77,9 @@ void msx1_v9938_state::io_map(address_map &map)
 	map(0x98, 0x9b).rw(m_v9938, FUNC(v9938_device::read), FUNC(v9938_device::write));
 }
 
-void msx1_v9938_state::msx1_v9938(ay8910_type ay8910_type, machine_config &config)
+void msx1_v9938_state::msx1_v9938(ay8910_type ay8910_type, machine_config &config, region_type region)
 {
-	msx_base(ay8910_type, config, 21.477272_MHz_XTAL, 6);
+	msx_base(ay8910_type, config, 21.477272_MHz_XTAL, 6, region);
 
 	m_maincpu->set_addrmap(AS_IO, &msx1_v9938_state::io_map);
 
@@ -92,9 +93,9 @@ void msx1_v9938_state::msx1_v9938(ay8910_type ay8910_type, machine_config &confi
 	msx1_add_softlists(config);
 }
 
-void msx1_v9938_state::msx1_v9938_pal(ay8910_type ay8910_type, machine_config &config)
+void msx1_v9938_state::msx1_v9938_pal(ay8910_type ay8910_type, machine_config &config, region_type region)
 {
-	msx1_v9938(ay8910_type, config);
+	msx1_v9938(ay8910_type, config, region);
 	m_v9938->set_screen_pal(m_screen);
 }
 
@@ -124,7 +125,7 @@ void msx1_v9938_state::ax200(machine_config &config)
 	add_cartridge_slot<2>(config, 2);
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, msx_yamaha_60pin, nullptr);
 
-	msx1_v9938_pal(SND_YM2149, config);
+	msx1_v9938_pal(SND_YM2149, config, REGION_ARAB);
 }
 
 /* MSX - Sakhr AX-200 (Arabic/French) */
@@ -156,7 +157,7 @@ void msx1_v9938_state::ax200m(machine_config &config)
 	// Dumped unit had a SFG05 with version M5.00.011 rom
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, msx_yamaha_60pin, "sfg05");
 
-	msx1_v9938_pal(SND_YM2149, config);
+	msx1_v9938_pal(SND_YM2149, config, REGION_ARAB);
 }
 
 /* MSX - Spectravideo SVI-738 */
@@ -172,6 +173,17 @@ ROM_START(svi738)
 	ROM_LOAD("738232c.rom", 0x0000, 0x2000, CRC(3353dcc6) SHA1(4e9384c9d137f0ab65ffc5a78f04cd8c9df6c8b7))
 ROM_END
 
+void msx1_v9938_state::svi738_base(machine_config &config, region_type region)
+{
+	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
+	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 4);  // 64KB RAM
+	add_cartridge_slot<1>(config, 2);
+	add_internal_slot_irq<2>(config, MSX_SLOT_RS232_SVI738, "rs232", 3, 0, 1, 1, "rs232rom");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK2_FD1793_SS, "disk", 3, 1, 1, 2, "diskrom").use_motor_for_led();
+
+	msx1_v9938_pal(SND_AY8910, config, region);
+}
+
 void msx1_v9938_state::svi738(machine_config &config)
 {
 	// AY8910
@@ -180,13 +192,8 @@ void msx1_v9938_state::svi738(machine_config &config)
 	// builtin 80 columns card (V9938)
 	// RS-232C interface
 
-	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
-	add_internal_slot(config, MSX_SLOT_RAM, "ram", 1, 0, 4);  // 64KB RAM
-	add_cartridge_slot<1>(config, 2);
-	add_internal_slot_irq<2>(config, MSX_SLOT_RS232_SVI738, "rs232", 3, 0, 1, 1, "rs232rom");
-	add_internal_disk_mirrored(config, MSX_SLOT_DISK2_FD1793_SS, "disk", 3, 1, 1, 2, "diskrom").use_motor_for_led();
-
-	msx1_v9938_pal(SND_AY8910, config);
+	m_hw_def.no_code_led();
+	svi738_base(config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Spectravideo SVI-738 Arabic */
@@ -207,7 +214,7 @@ ROM_END
 
 void msx1_v9938_state::svi738ar(machine_config &config)
 {
-	svi738(config);
+	svi738_base(config, REGION_ARAB);
 	add_internal_slot(config, MSX_SLOT_ROM, "arab", 3, 3, 1, 2, "arab");
 }
 
@@ -284,7 +291,8 @@ void msx1_v9938_state::tadpc200a(machine_config &config)
 	add_cartridge_slot<1>(config, 2);
 	// Expansion slot
 
-	msx1_v9938_pal(SND_YM2149, config);
+	m_hw_def.no_code_led();
+	msx1_v9938_pal(SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Yamaha CX5MII-128A (Australia, New Zealand) */
@@ -320,7 +328,8 @@ void msx1_v9938_state::cx5m128(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000);   // 128KB Mapper RAM
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, "sfg05");
 
-	msx1_v9938_pal(SND_YM2149, config);
+	m_hw_def.no_code_led();
+	msx1_v9938_pal(SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Yamaha CX5MII-128 C (Canada) */
@@ -370,7 +379,8 @@ void msx1_v9938_state::cx5miib(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x10000);   // 64KB Mapper RAM
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, "sfg05");
 
-	msx1_v9938_pal(SND_YM2149, config);
+	m_hw_def.no_code_led();
+	msx1_v9938_pal(SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Yamaha CX5MIIC (Canada) */
@@ -408,7 +418,8 @@ void msx1_v9938_state::yis503ii(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  // 64KB RAM
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
 
-	msx1_v9938(SND_YM2149, config);
+	m_hw_def.no_code_led();
+	msx1_v9938(SND_YM2149, config, REGION_INTERNATIONAL);
 }
 
 /* MSX - Yamaha YIS503-IIR Russian */
@@ -438,7 +449,7 @@ void msx1_v9938_state::y503iir(machine_config &config)
 	// This should have a serial network interface by default
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
 
-	msx1_v9938_pal(SND_YM2149, config);
+	msx1_v9938_pal(SND_YM2149, config, REGION_RUSSIA);
 }
 
 /* MSX - Yamaha YIS503-IIR Estonian */
@@ -468,7 +479,7 @@ void msx1_v9938_state::y503iir2(machine_config &config)
 	// This should have a serial network interface by default
 	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
 
-	msx1_v9938_pal(SND_YM2149, config);
+	msx1_v9938_pal(SND_YM2149, config, REGION_RUSSIA);
 }
 
 } // anonymous namespace

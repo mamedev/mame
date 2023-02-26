@@ -161,7 +161,10 @@ msx_state::msx_state(const machine_config &mconfig, device_type type, const char
 	, m_port_c_old(0)
 	, m_keylatch(0)
 	, m_caps_led(*this, "caps_led")
-	, m_kana_arab_led(*this, "kana_arab_led")
+	, m_caps_led_name(*this, "caps_led_name")
+	, m_code_led(*this, "code_led")
+	, m_code_led_name(*this, "code_led_name")
+	, m_region(REGION_UNKNOWN)
 {
 	m_view[0] = &m_view_page0;
 	m_view[1] = &m_view_page1;
@@ -304,12 +307,18 @@ void msx_state::machine_reset()
 		m_view_slot0_page2.select(0);
 		m_view_slot0_page3.select(0);
 	}
+	m_caps_led_name = m_hw_def.has_caps_led() ? 1 : 0;
+	m_caps_led = m_hw_def.has_caps_led() ? 1 : 0;
+	m_code_led_name = m_hw_def.has_code_led() ? m_region : 0;
+	m_code_led = m_hw_def.has_code_led() ? 1 : 0;
 }
 
 void msx_state::machine_start()
 {
 	m_caps_led.resolve();
-	m_kana_arab_led.resolve();
+	m_caps_led_name.resolve();
+	m_code_led.resolve();
+	m_code_led_name.resolve();
 	m_port_c_old = 0xff;
 }
 
@@ -453,8 +462,9 @@ void msx_state::psg_port_a_w(u8 data)
 
 void msx_state::psg_port_b_w(u8 data)
 {
-	// Arabic or kana mode led
-	m_kana_arab_led = BIT(~data, 7);
+	// Code(/Kana/Arabic/Hangul) led
+	if (m_hw_def.has_code_led())
+		m_code_led = 1 + BIT(~data, 7);
 
 	m_gen_port1->pin_6_w(BIT(data, 0));
 	m_gen_port1->pin_7_w(BIT(data, 1));
@@ -482,7 +492,8 @@ void msx_state::ppi_port_c_w(u8 data)
 	m_keylatch = data & 0x0f;
 
 	// caps lock
-	m_caps_led = BIT(~data, 6);
+	if (m_hw_def.has_caps_led())
+		m_caps_led = 1 + BIT(~data, 6);
 
 	// key click
 	if (BIT(m_port_c_old ^ data, 7))
@@ -552,8 +563,9 @@ void msx_state::kanji_w(offs_t offset, u8 data)
 		m_kanji_latch = (m_kanji_latch & 0x1f800) | ((data & 0x3f) << 5);
 }
 
-void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, XTAL xtal, int cpu_divider)
+void msx_state::msx_base(ay8910_type ay8910_type, machine_config &config, XTAL xtal, int cpu_divider, region_type region)
 {
+	m_region = region;
 	// basic machine hardware
 	Z80(config, m_maincpu, xtal / cpu_divider);         // 3.579545 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &msx_state::memory_map);
@@ -626,9 +638,9 @@ void msx_state::msx1_add_softlists(machine_config &config)
 		SOFTWARE_LIST(config, "flop_list").set_original("msx1_flop");
 }
 
-void msx_state::msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config)
+void msx_state::msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config, region_type region)
 {
-	msx_base(ay8910_type, config, 10.738635_MHz_XTAL, 3);
+	msx_base(ay8910_type, config, 10.738635_MHz_XTAL, 3, region);
 
 	m_maincpu->set_addrmap(AS_IO, &msx_state::msx1_io_map);
 
@@ -809,17 +821,17 @@ void msx2_base_state::turbor_add_softlists(machine_config &config)
 	}
 }
 
-void msx2_base_state::msx2_base(ay8910_type ay8910_type, machine_config &config)
+void msx2_base_state::msx2_base(ay8910_type ay8910_type, machine_config &config, region_type region)
 {
-	msx_base(ay8910_type, config, 21.477272_MHz_XTAL, 6);
+	msx_base(ay8910_type, config, 21.477272_MHz_XTAL, 6, region);
 
 	// real time clock
 	RP5C01(config, m_rtc, 32.768_kHz_XTAL);
 }
 
-void msx2_base_state::msx2(ay8910_type ay8910_type, machine_config &config)
+void msx2_base_state::msx2(ay8910_type ay8910_type, machine_config &config, region_type region)
 {
-	msx2_base(ay8910_type, config);
+	msx2_base(ay8910_type, config, region);
 
 	m_maincpu->set_addrmap(AS_IO, &msx2_base_state::msx2_io_map);
 
@@ -833,15 +845,15 @@ void msx2_base_state::msx2(ay8910_type ay8910_type, machine_config &config)
 	msx2_add_softlists(config);
 }
 
-void msx2_base_state::msx2_pal(ay8910_type ay8910_type, machine_config &config)
+void msx2_base_state::msx2_pal(ay8910_type ay8910_type, machine_config &config, region_type region)
 {
-	msx2(ay8910_type, config);
+	msx2(ay8910_type, config, region);
 	m_v9938->set_screen_pal(m_screen);
 }
 
-void msx2_base_state::msx2plus_base(ay8910_type ay8910_type, machine_config &config)
+void msx2_base_state::msx2plus_base(ay8910_type ay8910_type, machine_config &config, region_type region)
 {
-	msx2_base(ay8910_type, config);
+	msx2_base(ay8910_type, config, region);
 
 	m_maincpu->set_addrmap(AS_IO, &msx2_base_state::msx2plus_io_map);
 
@@ -852,23 +864,23 @@ void msx2_base_state::msx2plus_base(ay8910_type ay8910_type, machine_config &con
 	m_v9958->int_cb().set(m_mainirq, FUNC(input_merger_device::in_w<0>));
 }
 
-void msx2_base_state::msx2plus(ay8910_type ay8910_type, machine_config &config)
+void msx2_base_state::msx2plus(ay8910_type ay8910_type, machine_config &config, region_type region)
 {
-	msx2plus_base(ay8910_type, config);
+	msx2plus_base(ay8910_type, config, region);
 
 	// Software lists
 	msx2plus_add_softlists(config);
 }
 
-void msx2_base_state::msx2plus_pal(ay8910_type ay8910_type, machine_config &config)
+void msx2_base_state::msx2plus_pal(ay8910_type ay8910_type, machine_config &config, region_type region)
 {
-	msx2plus(ay8910_type, config);
+	msx2plus(ay8910_type, config, region);
 	m_v9958->set_screen_pal(m_screen);
 }
 
-void msx2_base_state::turbor(ay8910_type ay8910_type, machine_config &config)
+void msx2_base_state::turbor(ay8910_type ay8910_type, machine_config &config, region_type region)
 {
-	msx2plus_base(ay8910_type, config);
+	msx2plus_base(ay8910_type, config, region);
 
 	R800(config.replace(), m_maincpu, 28.636363_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &msx2_base_state::memory_map);
