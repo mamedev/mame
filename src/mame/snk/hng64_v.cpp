@@ -1025,9 +1025,9 @@ void hng64_state::update_palette_entry(int entry)
 
 		if (tcregion == (entry >> 8))
 		{
-			uint8_t rmod = (tcdata >> 16) & 0xff;
+			uint8_t bmod = (tcdata >> 16) & 0xff;
 			uint8_t gmod = (tcdata >> 8) & 0xff;
-			uint8_t bmod = (tcdata >> 0) & 0xff;
+			uint8_t rmod = (tcdata >> 0) & 0xff;
 
 			uint8_t tcreg = (m_tcram[0x24 / 4] >> (i << 1)) & 3;
 			switch (tcreg)
