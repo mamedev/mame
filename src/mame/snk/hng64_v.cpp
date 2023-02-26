@@ -855,7 +855,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 		popmessage("%08x %08x %08x %08x %08x", m_spriteregs[0], m_spriteregs[1], m_spriteregs[2], m_spriteregs[3], m_spriteregs[4]);
 
 	// see notes at top for more detailed info on these
-	if (1)
+	if (0)
 		popmessage("%08x %08x\nTR(%04x %04x %04x %04x)\nSB(%04x %04x %04x %04x)\n%08x %08x %08x\nSPLIT?(%04x %04x %04x %04x)\nAA(%08x %08x)\n%08x",
 			// global tilemap control regs?
 			m_videoregs[0x00], m_videoregs[0x01],
@@ -872,13 +872,20 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			// unused?
 			m_videoregs[0x0d]);
 
-	if (0)
-		popmessage("TC: %08x %08x %08x %08x : %08x %08x\n%08x %08x\n%08x %08x\n%08x %08x : %08x %08x %08x %08x : %08x %08x\n%08x %08x : %08x %08x %08x %08x",
-			m_tcram[0x00 / 4],
-			m_tcram[0x04 / 4],
-			m_tcram[0x08 / 4], // tilemaps 0/1 ?
-			m_tcram[0x0c / 4], // ss64_2 debug 04000000 = 'half' on tm1   00000004 = 'half' on tm3  (used in transitions?)
-			m_tcram[0x10 / 4],
+	if (1)
+		popmessage("TC: %08x %08x %08x\nBLEND ENABLES? %02x %02x %02x | %02x %02x %02x\n%04x % 08x\nMASTER FADES?(%08x %08x)\n % 08x % 08x\n % 08x % 08x : % 08x % 08x % 08x % 08x : % 08x % 08x\n % 08x % 08x : % 08x % 08x % 08x % 08x",
+			m_tcram[0x00 / 4], // 0007 00e4 (fatfurwa, bbust2)
+			m_tcram[0x04 / 4], // 0000 0010 (fatfurwa) 0000 0000 (bbust2, xrally)
+			m_tcram[0x08 / 4], // 0200 01b0 (fatfurwa) 0200 01c0 (bbust2, xrally)
+
+			(m_tcram[0x0c / 4] >> 24) & 0xff, // 04 = 'blend' on tm1  
+			(m_tcram[0x0c / 4] >> 16) & 0xff, // 04 = blend all sprites? (buriki intro, text fades?)
+			(m_tcram[0x0c / 4] >> 8) & 0xff,
+			(m_tcram[0x0c / 4] >> 0) & 0xff, //  04 = 'blend' on tm3  (used in transitions?)
+			(m_tcram[0x10 / 4] >> 24) & 0xff,
+			(m_tcram[0x10 / 4] >> 16) & 0xff,
+
+			m_tcram[0x10 / 4] & 0xffff,
 			m_tcram[0x14 / 4],
 
 			// these are used for 'fade to black' in most cases, but
@@ -887,7 +894,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			m_tcram[0x1c / 4],  // xRGB fade values? (roadedge attract) fades on fatfurwa before buildings in intro
 
 			m_tcram[0x20 / 4],  // something else?
-			m_tcram[0x24 / 4],  // something else?
+			m_tcram[0x24 / 4],  // something else? 0x00000001 gets set when in a tunnel on roadedge in 1st person mode (state isn't updated otherwise, switching back to 3rd person in a tunnel leaves it set until you flick back to 1st person)  
 
 			// 7 of these fade during the buriki SNK logo (probably redundant)
 			// in roadedge they're just set to
@@ -897,7 +904,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			m_tcram[0x30 / 4],
 			m_tcram[0x34 / 4],
 			m_tcram[0x38 / 4],
-			m_tcram[0x3c / 4],
+			m_tcram[0x3c / 4],  // gets used for the 1st person view on xrally - maybe some fade effect on the front of the car?
 			m_tcram[0x40 / 4],
 			m_tcram[0x44 / 4],
 
