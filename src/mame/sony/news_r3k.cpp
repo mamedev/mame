@@ -157,8 +157,7 @@ protected:
 class nws3260_state : public news_r3k_base_state
 {
 public:
-
-nws3260_state(machine_config const &mconfig, device_type type, char const *tag)
+	nws3260_state(machine_config const &mconfig, device_type type, char const *tag)
 		: news_r3k_base_state(mconfig, type, tag)
 		, m_lcd(*this, "lcd")
 		, m_vram(*this, "vram")
@@ -169,6 +168,7 @@ nws3260_state(machine_config const &mconfig, device_type type, char const *tag)
 
 protected:
 	virtual void machine_start() override;
+
 	void nws3260_map(address_map &map);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect);
 
@@ -182,8 +182,7 @@ protected:
 class nws3410_state : public news_r3k_base_state
 {
 public:
-
-nws3410_state(machine_config const &mconfig, device_type type, char const *tag)
+	nws3410_state(machine_config const &mconfig, device_type type, char const *tag)
 		: news_r3k_base_state(mconfig, type, tag)
 	{
 	}
@@ -245,10 +244,10 @@ void nws3260_state::nws3260_map(address_map &map)
 {
 	cpu_map(map);
 	map(0x10000000, 0x101fffff).rom().region("krom", 0);
-	map(0x10000000, 0x10000003).lw32([this](u32 data) { m_lcd_enable = bool(data); }, "lcd_enable_w");
-	map(0x10100000, 0x10100003).lw32([this](u32 data) { m_lcd_dim = BIT(data, 0); }, "lcd_dim_w");
+	map(0x10000000, 0x10000003).lw32([this] (u32 data) { m_lcd_enable = bool(data); }, "lcd_enable_w");
+	map(0x10100000, 0x10100003).lw32([this] (u32 data) { m_lcd_dim = BIT(data, 0); }, "lcd_dim_w");
 	map(0x10200000, 0x1021ffff).ram().share("vram").mirror(0xa0000000);
-	map(0x1ff60000, 0x1ff6001b).lw8([this](offs_t offset, u8 data) { LOG("crtc offset %x 0x%02x\n", offset, data); }, "lfbm_crtc_w"); // TODO: HD64646FS
+	map(0x1ff60000, 0x1ff6001b).lw8([this] (offs_t offset, u8 data) { LOG("crtc offset %x 0x%02x\n", offset, data); }, "lfbm_crtc_w"); // TODO: HD64646FS
 }
 
 void nws3410_state::nws3410_map(address_map &map)
@@ -280,7 +279,7 @@ void news_r3k_base_state::cpu_map(address_map &map)
 	map(0x1fe00000, 0x1fe0000f).m(m_dma, FUNC(dmac_0448_device::map));
 	map(0x1fe00100, 0x1fe0010f).m(m_scsi, FUNC(cxd1185_device::map));
 	map(0x1fe00200, 0x1fe00203).m(m_fdc, FUNC(upd72067_device::map));
-	map(0x1fe00300, 0x1fe00300).lr8([]() { return 0xff; }, "sound_r"); // HACK: disable sound
+	map(0x1fe00300, 0x1fe00300).lr8([] () { return 0xff; }, "sound_r"); // HACK: disable sound
 	//map(0x1fe00300, 0x1fe00307); // sound
 	map(0x1fe40000, 0x1fe40003).portr("SW2");
 	//map(0x1fe70000, 0x1fe9ffff).ram(); // ??
@@ -291,8 +290,8 @@ void news_r3k_base_state::cpu_map(address_map &map)
 
 	map(0x1ff80000, 0x1ff80003).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w));
 	map(0x1ffc0000, 0x1ffc3fff).lrw16(
-		[this](offs_t offset) { return m_net_ram[offset]; }, "net_ram_r",
-		[this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_net_ram[offset]); }, "net_ram_w");
+			[this] (offs_t offset) { return m_net_ram[offset]; }, "net_ram_r",
+			[this] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_net_ram[offset]); }, "net_ram_w");
 }
 
 static INPUT_PORTS_START(nws3260)
@@ -528,14 +527,14 @@ void news_r3k_base_state::common(machine_config &config)
 
 	// scsi host adapter
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("cxd1185", CXD1185).clock(16_MHz_XTAL).machine_config(
-		[this](device_t *device)
+		[this] (device_t *device)
 		{
 			cxd1185_device &adapter = downcast<cxd1185_device &>(*device);
 
 			adapter.irq_out_cb().set(m_dma, FUNC(dmac_0448_device::irq<0>));
 			adapter.drq_out_cb().set(m_dma, FUNC(dmac_0448_device::drq<0>));
 			adapter.port_out_cb().set(
-				[this](u8 data)
+				[this] (u8 data)
 				{
 					LOG("floppy %s\n", BIT(data, 0) ? "mount" : "eject");
 				});
