@@ -41,7 +41,7 @@ class floppy_image_device : public device_t,
 							public device_image_interface
 {
 public:
-	typedef delegate<image_init_result (floppy_image_device *)> load_cb;
+	typedef delegate<void (floppy_image_device *)> load_cb;
 	typedef delegate<void (floppy_image_device *)> unload_cb;
 	typedef delegate<void (floppy_image_device *, int)> index_pulse_cb;
 	typedef delegate<void (floppy_image_device *, int)> ready_cb;
