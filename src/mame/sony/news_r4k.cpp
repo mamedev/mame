@@ -158,6 +158,8 @@ public:
 
 	void nws5000x(machine_config &config);
 
+	static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }
+
 protected:
 
 	enum irq0_number : uint32_t
@@ -1253,4 +1255,4 @@ ROM_END
 
 // Machine definitions
 //   YEAR  NAME      P  CM MACHINE   INPUT    CLASS           INIT        COMPANY FULLNAME                      FLAGS
-COMP(1994, nws5000x, 0, 0, nws5000x, nws5000, news_r4k_state, empty_init, "Sony", "NET WORK STATION NWS-5000X", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+COMP(1994, nws5000x, 0, 0, nws5000x, nws5000, news_r4k_state, empty_init, "Sony", "NET WORK STATION NWS-5000X", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND)
