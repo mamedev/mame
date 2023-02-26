@@ -736,6 +736,11 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	if (m_screen_dis)
 		return 0;
 
+	// set during transitions, could be 'disable all palette output'?
+	if ((m_tcram[0x24 / 4] >> 16) & 0x0002)
+		return 0;
+
+
 	// If the auto-animation mask or bits have changed search for tiles using them and mark as dirty
 	const uint32_t animmask = m_videoregs[0x0b];
 	const uint32_t animbits = m_videoregs[0x0c];
