@@ -344,6 +344,7 @@ private:
 	void dl_unk_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t dl_vreg_r();
 
+	void update_palette_entry(int entry);
 	void pal_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	void tcram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t tcram_r(offs_t offset);

@@ -1010,10 +1010,65 @@ WRITE_LINE_MEMBER(hng64_state::screen_vblank_hng64)
  *  Or maybe they set transition type (there seems to be a cute scaling-squares transition in there somewhere)...
  */
 
+void hng64_state::update_palette_entry(int entry)
+{
+	uint32_t data = m_paletteram[entry];
+
+	int16_t r = (data >> 16) & 0xff;
+	int16_t g = (data >> 8) & 0xff;
+	int16_t b = (data >> 0) & 0xff;
+
+	for (int i = 0; i < 8; i++)
+	{
+		uint32_t tcdata = m_tcram[(0x28 / 4) + i];
+		uint8_t tcregion = (tcdata & 0x0f000000) >> 24;
+
+		if (tcregion == (entry >> 8))
+		{
+			uint8_t rmod = (tcdata >> 16) & 0xff;
+			uint8_t gmod = (tcdata >> 8) & 0xff;
+			uint8_t bmod = (tcdata >> 0) & 0xff;
+
+			uint8_t tcreg = (m_tcram[0x24 / 4] >> (i << 1)) & 3;
+			switch (tcreg)
+			{
+			case 0x00: // this entry is disabled
+				break;
+			case 0x01: // this entry is disabled(?)
+				break;
+			case 0x02: // additive blending
+				r = r + rmod;
+				if (r > 0xff)
+					r = 0xff;
+				g = g + gmod;
+				if (g > 0xff)
+					g = 0xff;
+				b = b + bmod;
+				if (b > 0xff)
+					b = 0xff;
+				break;
+			case 0x03: // subtractive blending
+				r = r - rmod;
+				if (r < 0x00)
+					r = 0x00;
+				g = g - gmod;
+				if (g < 0x00)
+					g = 0x00;
+				b = b - bmod;
+				if (b < 0x00)
+					b = 0x00;
+				break;
+			}
+		}
+	}
+
+	m_palette->set_pen_color(entry, r,g,b);
+}
+
 void hng64_state::pal_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_paletteram[offset]);
-	m_palette->set_pen_color(offset, (data >> 16) & 0xff, (data >> 8) & 0xff, (data >> 0) & 0xff);
+	update_palette_entry(offset);
 }
 
 // Transition Control memory.
@@ -1021,6 +1076,7 @@ void hng64_state::tcram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint32_t *hng64_tcram = m_tcram;
 
+	uint32_t old_data = hng64_tcram[offset];
 	COMBINE_DATA(&hng64_tcram[offset]);
 
 	if (offset == 0x02)
@@ -1042,6 +1098,39 @@ void hng64_state::tcram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 		visarea.set(min_x, min_x + max_x - 1, min_y, min_y + max_y - 1);
 		m_screen->configure(HTOTAL, VTOTAL, visarea, m_screen->frame_period().attoseconds());
+	}
+
+	if ((offset >= (0x28 / 4)) && (offset < (0x48 / 4)))
+	{
+		uint32_t new_data = hng64_tcram[offset];
+		if (old_data != new_data)
+		{
+			// the old blend value no longer applies, so update the colours referenced by that
+			uint8_t old_tcregion = (old_data & 0x0f000000) >> 24;
+			for (int i = 0; i < 0x100; i++)
+			{
+				update_palette_entry((old_tcregion * 0x100) + i);
+			}
+			// update the colours referenced by the new blend register
+			uint8_t new_tcregion = (new_data & 0x0f000000) >> 24;
+			for (int i = 0; i < 0x100; i++)
+			{
+				update_palette_entry((new_tcregion * 0x100) + i);
+			}
+		}
+	}
+
+	if (offset == (0x24 / 4))
+	{
+		// lazy, just update the lot
+		uint32_t new_data = hng64_tcram[offset];
+		if (old_data != new_data)
+		{
+			for (int i = 0; i < 0x1000; i++)
+			{
+				update_palette_entry(i);
+			}
+		}
 	}
 }
 
