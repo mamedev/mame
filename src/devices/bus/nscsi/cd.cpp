@@ -229,7 +229,7 @@ void nscsi_cdrom_device::scsi_command()
 		int size = scsi_cmdbuf[4];
 		switch(page) {
 		case 0:
-			std::fill_n(scsi_cmdbuf, 36, 0);
+			std::fill_n(scsi_cmdbuf, size, 0);
 
 			if (lun != 0)
 				scsi_cmdbuf[0] = 0x7f;
@@ -249,8 +249,6 @@ void nscsi_cdrom_device::scsi_command()
 				if(scsi_cmdbuf[i] == 0)
 					scsi_cmdbuf[i] = 0x20;
 
-			if(size > 36)
-				size = 36;
 			scsi_data_in(SBUF_MAIN, size);
 			break;
 		}

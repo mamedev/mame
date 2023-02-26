@@ -10,8 +10,8 @@
  *
  ******************************************************************************/
 
-#ifndef MAME_INCLUDES_MICROTAN_H
-#define MAME_INCLUDES_MICROTAN_H
+#ifndef MAME_TANGERINE_MICROTAN_H
+#define MAME_TANGERINE_MICROTAN_H
 
 #pragma once
 
@@ -117,4 +117,4 @@ private:
 	void bffx_w(offs_t offset, uint8_t data);
 };
 
-#endif // MAME_INCLUDES_MICROTAN_H
+#endif // MAME_TANGERINE_MICROTAN_H

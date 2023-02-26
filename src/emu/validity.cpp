@@ -12,6 +12,7 @@
 #include "validity.h"
 
 #include "emuopts.h"
+#include "main.h"
 #include "romload.h"
 #include "speaker.h"
 #include "video/rgbutil.h"
@@ -2150,28 +2151,38 @@ void validity_checker::validate_roms(device_t &root)
 				int const bios_flags = ROM_GETBIOSFLAGS(romp);
 				char const *const biosname = romp->name;
 				if (bios_flags != last_bios + 1)
-					osd_printf_error("Non-sequential BIOS %s (specified as %d, expected to be %d)\n", biosname, bios_flags - 1, last_bios);
+					osd_printf_error("Non-sequential BIOS %s (specified as %d, expected to be %d)\n", biosname ? biosname : "UNNAMED", bios_flags - 1, last_bios);
 				last_bios = bios_flags;
 
 				// validate the name
-				if (strlen(biosname) > 16)
-					osd_printf_error("BIOS name %s exceeds maximum 16 characters\n", biosname);
-				for (char const *s = biosname; *s; ++s)
+				if (!biosname || biosname[0] == 0)
+					osd_printf_error("BIOS %d is missing a name\n", bios_flags - 1);
+				else
 				{
-					if (((*s < '0') || (*s > '9')) && ((*s < 'a') || (*s > 'z')) && (*s != '.') && (*s != '_') && (*s != '-'))
+					if (strlen(biosname) > 16)
+						osd_printf_error("BIOS name %s exceeds maximum 16 characters\n", biosname);
+					for (char const *s = biosname; *s; ++s)
 					{
-						osd_printf_error("BIOS name %s contains invalid characters\n", biosname);
-						break;
+						if (((*s < '0') || (*s > '9')) && ((*s < 'a') || (*s > 'z')) && (*s != '.') && (*s != '_') && (*s != '-'))
+						{
+							osd_printf_error("BIOS name %s contains invalid characters\n", biosname);
+							break;
+						}
+					}
+
+					// check for duplicate names/descriptions
+					auto const nameins = bios_names.emplace(biosname, bios_flags);
+					if (!nameins.second)
+						osd_printf_error("Duplicate BIOS name %s specified (%d and %d)\n", biosname, nameins.first->second, bios_flags - 1);
+					if (!romp->hashdata || romp->hashdata[0] == 0)
+						osd_printf_error("BIOS %s has empty description\n", biosname);
+					else
+					{
+						auto const descins = bios_descs.emplace(romp->hashdata, biosname);
+						if (!descins.second)
+							osd_printf_error("BIOS %s has duplicate description '%s' (was %s)\n", biosname, romp->hashdata, descins.first->second);
 					}
 				}
-
-				// check for duplicate names/descriptions
-				auto const nameins = bios_names.emplace(biosname, bios_flags);
-				if (!nameins.second)
-					osd_printf_error("Duplicate BIOS name %s specified (%d and %d)\n", biosname, nameins.first->second, bios_flags - 1);
-				auto const descins = bios_descs.emplace(romp->hashdata, biosname);
-				if (!descins.second)
-					osd_printf_error("BIOS %s has duplicate description '%s' (was %s)\n", biosname, romp->hashdata, descins.first->second);
 			}
 			else if (ROMENTRY_ISDEFAULT_BIOS(romp)) // if this is a default BIOS setting, remember it so it to check at the end
 			{
@@ -2324,7 +2335,7 @@ void validity_checker::validate_dip_settings(const ioport_field &field)
 {
 	char const *const demo_sounds = ioport_string_from_index(INPUT_STRING_Demo_Sounds);
 	char const *const flipscreen = ioport_string_from_index(INPUT_STRING_Flip_Screen);
-	char const *const name = field.specific_name();
+	char const *const name = field.specific_name() ? field.specific_name() : "UNNAMED";
 	u8 coin_list[__input_string_coinage_end + 1 - __input_string_coinage_start] = { 0 };
 	bool coin_error = false;
 
@@ -2393,6 +2404,12 @@ void validity_checker::validate_dip_settings(const ioport_field &field)
 
 void validity_checker::validate_condition(const ioport_condition &condition, device_t &device)
 {
+	if (condition.tag() == nullptr)
+	{
+		osd_printf_error("Condition referencing null ioport tag\n");
+		return;
+	}
+
 	// resolve the tag, then find a matching port
 	if (m_ioport_set.find(device.subtag(condition.tag())) == m_ioport_set.end())
 		osd_printf_error("Condition referencing non-existent ioport tag '%s'\n", condition.tag());
@@ -2457,34 +2474,43 @@ void validity_checker::validate_inputs(device_t &root)
 				if (field.is_analog())
 					validate_analog_input_field(field);
 
-				// look for invalid (0) types which should be mapped to IPT_OTHER
-				if (field.type() == IPT_INVALID)
-					osd_printf_error("Field has an invalid type (0); use IPT_OTHER instead\n");
-
-				if (field.type() == IPT_SPECIAL)
-					osd_printf_error("Field has an invalid type IPT_SPECIAL\n");
-
-				// verify dip switches
-				if (field.type() == IPT_DIPSWITCH)
+				// checks based on field type
+				if ((field.type() > IPT_UI_FIRST) && (field.type() < IPT_UI_LAST))
 				{
-					// dip switch fields must have a specific name
+					osd_printf_error("Field has invalid UI control type\n");
+				}
+				else if (field.type() == IPT_INVALID)
+				{
+					osd_printf_error("Field has an invalid type (0); use IPT_OTHER instead\n");
+				}
+				else if (field.type() == IPT_SPECIAL)
+				{
+					osd_printf_error("Field has an invalid type IPT_SPECIAL\n");
+				}
+				else if (field.type() == IPT_DIPSWITCH)
+				{
+					// DIP switch fields must have a specific name
 					if (field.specific_name() == nullptr)
 						osd_printf_error("DIP switch has no specific name\n");
 
 					// verify the settings list
 					validate_dip_settings(field);
 				}
-
-				// verify config settings
-				if (field.type() == IPT_CONFIG)
+				else if (field.type() == IPT_CONFIG)
 				{
 					// config fields must have a specific name
 					if (field.specific_name() == nullptr)
 						osd_printf_error("Config switch has no specific name\n");
 				}
+				else if (field.type() == IPT_ADJUSTER)
+				{
+					// adjuster fields must have a specific name
+					if (field.specific_name() == nullptr)
+						osd_printf_error("Adjuster has no specific name\n");
+				}
 
 				// verify names
-				const char *name = field.specific_name();
+				char const *const name = field.specific_name();
 				if (name != nullptr)
 				{
 					// check for empty string

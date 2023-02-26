@@ -22,6 +22,9 @@
 #include "video/i8275.h"
 #include "screen.h"
 
+
+namespace {
+
 class systel1_state : public driver_device
 {
 public:
@@ -228,5 +231,8 @@ ROM_START(systel100)
 	ROM_REGION(0x800, "chargen", 0) // TMS2516JL-45
 	ROM_LOAD("u16.bin", 0x000, 0x800, CRC(61a8d742) SHA1(69dada638a17353f91bff34a1e2319a35d8a3ebf))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(198?, systel100, 0, 0, systel1, systel1, systel1_state, empty_init, "Systel Computers", "System 100", MACHINE_IS_SKELETON)

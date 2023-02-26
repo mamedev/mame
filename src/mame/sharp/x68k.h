@@ -8,8 +8,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_INCLUDES_X68K_H
-#define MAME_INCLUDES_X68K_H
+#ifndef MAME_SHARP_X68K_H
+#define MAME_SHARP_X68K_H
 
 #pragma once
 
@@ -344,4 +344,4 @@ protected:
 	void x68030_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_X68K_H
+#endif // MAME_SHARP_X68K_H

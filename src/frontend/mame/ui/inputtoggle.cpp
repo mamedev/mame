@@ -110,110 +110,111 @@ void menu_input_toggles::populate()
 }
 
 
-void menu_input_toggles::handle(event const *ev)
+bool menu_input_toggles::handle(event const *ev)
 {
-	if (ev && ev->itemref)
+	if (!ev || !ev->itemref)
+		return false;
+
+	auto const ref = reinterpret_cast<std::reference_wrapper<ioport_field> *>(ev->itemref);
+	ioport_field &field = ref->get();
+	bool invalidate = false;
+	switch (ev->iptkey)
 	{
-		auto const ref = reinterpret_cast<std::reference_wrapper<ioport_field> *>(ev->itemref);
-		ioport_field &field = ref->get();
-		bool invalidate = false;
-		switch (ev->iptkey)
+	case IPT_UI_SELECT: // toggle regular items, cycle multi-value items
+		if (field.settings().empty())
+			field.live().value ^= field.mask();
+		else
+			field.select_next_setting();
+		invalidate = true;
+		break;
+
+	case IPT_UI_CLEAR: // set to default
+		if (field.defvalue() != field.live().value)
 		{
-		case IPT_UI_SELECT: // toggle regular items, set multi-value items to default
-			if (field.settings().empty())
-			{
-				field.live().value ^= field.mask();
-				invalidate = true;
-				break;
-			}
-			[[fallthrough]];
-
-		case IPT_UI_CLEAR: // set to default
-			if (field.defvalue() != field.live().value)
-			{
-				field.live().value = field.defvalue();
-				invalidate = true;
-			}
-			break;
-
-		case IPT_UI_LEFT: // toggle or select previous setting
-			if (field.settings().empty())
-				field.live().value ^= field.mask();
-			else
-				field.select_previous_setting();
+			field.live().value = field.defvalue();
 			invalidate = true;
-			break;
+		}
+		break;
 
-		case IPT_UI_RIGHT: // toggle or select next setting
-			if (field.settings().empty())
-				field.live().value ^= field.mask();
-			else
-				field.select_next_setting();
-			invalidate = true;
-			break;
+	case IPT_UI_LEFT: // toggle or select previous setting
+		if (field.settings().empty())
+			field.live().value ^= field.mask();
+		else
+			field.select_previous_setting();
+		invalidate = true;
+		break;
 
-		case IPT_UI_PREV_GROUP: // previous device if any
+	case IPT_UI_RIGHT: // toggle or select next setting
+		if (field.settings().empty())
+			field.live().value ^= field.mask();
+		else
+			field.select_next_setting();
+		invalidate = true;
+		break;
+
+	case IPT_UI_PREV_GROUP: // previous device if any
+		{
+			auto current = std::distance(m_fields.data(), ref);
+			device_t const *dev = &field.device();
+			bool found_break = false;
+			void *candidate = nullptr;
+			while (0 < current)
 			{
-				auto current = std::distance(m_fields.data(), ref);
-				device_t const *dev = &field.device();
-				bool found_break = false;
-				void *candidate = nullptr;
-				while (0 < current)
+				if (!found_break)
 				{
-					if (!found_break)
+					if (m_fields[--current].get().enabled())
 					{
-						if (m_fields[--current].get().enabled())
+						device_t const *prev = &m_fields[current].get().device();
+						if (prev != dev)
 						{
-							device_t const *prev = &m_fields[current].get().device();
-							if (prev != dev)
-							{
-								dev = prev;
-								found_break = true;
-								candidate = &m_fields[current];
-							}
+							dev = prev;
+							found_break = true;
+							candidate = &m_fields[current];
 						}
 					}
-					else if (&m_fields[--current].get().device() != dev)
-					{
-						set_selection(candidate);
-						set_top_line(selected_index() - 1);
-						break;
-					}
-					else if (m_fields[current].get().enabled())
-					{
-						candidate = &m_fields[current];
-					}
-					if (found_break && !current)
-					{
-						set_selection(candidate);
-						set_top_line(selected_index() - 1);
-						break;
-					}
 				}
-			}
-			break;
-
-		case IPT_UI_NEXT_GROUP: // next device if any
-			{
-				auto current = std::distance(m_fields.data(), ref);
-				device_t const *const dev = &field.device();
-				while (m_fields.size() > ++current)
+				else if (&m_fields[--current].get().device() != dev)
 				{
-					if (m_fields[current].get().enabled() && (&m_fields[current].get().device() != dev))
-					{
-						set_selection(&m_fields[current]);
-						set_top_line(selected_index() - 1);
-						break;
-					}
+					set_selection(candidate);
+					set_top_line(selected_index() - 1);
+					return true;
+				}
+				else if (m_fields[current].get().enabled())
+				{
+					candidate = &m_fields[current];
+				}
+				if (found_break && !current)
+				{
+					set_selection(candidate);
+					set_top_line(selected_index() - 1);
+					return true;
 				}
 			}
-			break;
 		}
+		break;
 
-		// changing value can enable or disable other fields
-		if (invalidate)
-			reset(reset_options::REMEMBER_REF);
+	case IPT_UI_NEXT_GROUP: // next device if any
+		{
+			auto current = std::distance(m_fields.data(), ref);
+			device_t const *const dev = &field.device();
+			while (m_fields.size() > ++current)
+			{
+				if (m_fields[current].get().enabled() && (&m_fields[current].get().device() != dev))
+				{
+					set_selection(&m_fields[current]);
+					set_top_line(selected_index() - 1);
+					return true;
+				}
+			}
+		}
+		break;
 	}
+
+	// changing value can enable or disable other fields
+	if (invalidate)
+		reset(reset_options::REMEMBER_REF);
+
+	return false;
 }
 
 } // namespace ui

@@ -22,6 +22,9 @@
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 class ax20_state : public driver_device
 {
 public:
@@ -164,6 +167,9 @@ ROM_START( ax20 )
 	ROM_REGION( 0x4000, "chargen", 0 )
 	ROM_LOAD( "ax20-g.rom", 0x0000, 0x0800, CRC(90bcef80) SHA1(922067fd7316de9e69b9600c793ada5c87197eeb))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

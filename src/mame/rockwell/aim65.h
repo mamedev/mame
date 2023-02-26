@@ -7,8 +7,8 @@
  * Rockwell AIM-65
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_AIM65_H
-#define MAME_INCLUDES_AIM65_H
+#ifndef MAME_ROCKWELL_AIM65_H
+#define MAME_ROCKWELL_AIM65_H
 
 #pragma once
 
@@ -130,4 +130,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_AIM65_H
+#endif // MAME_ROCKWELL_AIM65_H

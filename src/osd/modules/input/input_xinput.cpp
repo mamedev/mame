@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Brad Hughes
+// copyright-holders:Brad Hughes, Vas Crabb
 //============================================================
 //
 //  input_xinput.cpp - XInput API input support for Windows
@@ -144,7 +144,7 @@ A  X  B
    LB
 
 
-Rock band keyboards use axes as bit fields:
+Rock Band keyboards use axes as bit fields:
 
 LT   7  C
 LT   6  C#
@@ -176,17 +176,26 @@ LSX 15  C
 
 #include "modules/osdmodule.h"
 
-#if defined(OSD_WINDOWS)
-
-#include "emu.h"
+#if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
 #include "input_xinput.h"
 
-// standard windows headers
-#include <windows.h>
+#include "assignmenthelper.h"
+
+#include "interface/inputseq.h"
+#include "modules/lib/osdobj_common.h"
+
+// emu
+#include "inpttype.h"
+
+// lib/util
+#include "util/coretmpl.h"
+
+#include "eminline.h"
 
 #include <algorithm>
 #include <cstdint>
+#include <iterator>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -200,6 +209,9 @@ LSX 15  C
 namespace osd {
 
 namespace {
+
+using util::BIT;
+
 
 char const *const AXIS_NAMES_GAMEPAD[]{
 		"LSX",
@@ -217,14 +229,6 @@ char const *const AXIS_NAMES_WHEEL[]{
 		"Brake",
 		"Accelerator" };
 
-char const *const AXIS_NAMES_FLIGHT_STICK[]{
-		"Joystick X",
-		"Joystick Y",
-		nullptr,
-		nullptr,
-		"Rudder",
-		"Throttle" };
-
 char const *const AXIS_NAMES_GUITAR[]{
 		"LSX",
 		"LSY",
@@ -240,14 +244,6 @@ input_item_id const AXIS_IDS_GAMEPAD[]{
 		ITEM_ID_RZAXIS,
 		ITEM_ID_SLIDER1,
 		ITEM_ID_SLIDER2 };
-
-input_item_id const AXIS_IDS_FLIGHT_STICK[]{
-		ITEM_ID_XAXIS,
-		ITEM_ID_YAXIS,
-		ITEM_ID_INVALID,
-		ITEM_ID_INVALID,
-		ITEM_ID_RZAXIS,
-		ITEM_ID_ZAXIS };
 
 char const *const HAT_NAMES_GAMEPAD[]{
 		"D-pad Up",
@@ -282,6 +278,16 @@ char const *const BUTTON_NAMES_GAMEPAD[]{
 		"Y",
 		"LT",
 		"RT",
+		"LB",
+		"RB",
+		"LSB",
+		"RSB" };
+
+char const *const BUTTON_NAMES_FLIGHT_STICK[]{
+		"A",
+		"B",
+		"X",
+		"Y",
 		"LB",
 		"RB",
 		"LSB",
@@ -323,20 +329,16 @@ char const *const BUTTON_NAMES_KEYBOARD[]{
 //  base class for XInput controller handlers
 //============================================================
 
-class xinput_device_base : public device_info
+class xinput_device_base : public device_info, protected joystick_assignment_helper
 {
-public:
-	virtual void configure() = 0;
-
 protected:
 	xinput_device_base(
-			running_machine &machine,
 			std::string &&name,
 			std::string &&id,
 			input_module &module,
 			u32 player,
 			XINPUT_CAPABILITIES const &caps,
-			std::shared_ptr<xinput_api_helper> const &helper);
+			xinput_api_helper const &helper);
 
 	// capabilities
 	BYTE device_type() const { return m_capabilities.Type; }
@@ -362,6 +364,28 @@ protected:
 	bool is_reset() const { return m_reset; }
 	void set_reset() { m_reset = true; }
 
+protected:
+	template <unsigned M, unsigned N>
+	static bool assign_ui_button(
+			input_device::assignment_vector &assignments,
+			ioport_type type,
+			unsigned preferred,
+			input_item_id (&switch_ids)[M],
+			unsigned const (&numbered_buttons)[N],
+			unsigned button_count);
+
+	template <unsigned M, unsigned N>
+	static void assign_ui_actions(
+			input_device::assignment_vector &assignments,
+			unsigned preferred_back,
+			unsigned preferred_clear,
+			unsigned preferred_help,
+			unsigned start,
+			unsigned back,
+			input_item_id (&switch_ids)[M],
+			unsigned const (&numbered_buttons)[N],
+			unsigned button_count);
+
 private:
 	bool probe_extended_type();
 
@@ -370,19 +394,18 @@ private:
 	XINPUT_STATE        m_xinput_state;
 	bool                m_reset;
 
-	std::shared_ptr<xinput_api_helper> m_xinput_helper;
+	xinput_api_helper const &m_xinput_helper;
 };
 
 
 xinput_device_base::xinput_device_base(
-		running_machine &machine,
 		std::string &&name,
 		std::string &&id,
 		input_module &module,
 		u32 player,
 		XINPUT_CAPABILITIES const &caps,
-		std::shared_ptr<xinput_api_helper> const &helper) :
-	device_info(machine, std::move(name), std::move(id), DEVICE_CLASS_JOYSTICK, module),
+		xinput_api_helper const &helper) :
+	device_info(std::move(name), std::move(id), module),
 	m_player_index(player),
 	m_capabilities(caps),
 	m_xinput_state{ 0 },
@@ -522,7 +545,7 @@ bool xinput_device_base::read_state()
 {
 	// save previous packet number and try to read peripheral state
 	DWORD const prevpacket = m_xinput_state.dwPacketNumber;
-	HRESULT const result = m_xinput_helper->xinput_get_state(m_player_index, &m_xinput_state);
+	HRESULT const result = m_xinput_helper.xinput_get_state(m_player_index, &m_xinput_state);
 
 	// only update if it succeeded and the packed number changed
 	if (FAILED(result))
@@ -538,6 +561,96 @@ bool xinput_device_base::read_state()
 	{
 		return prevpacket != m_xinput_state.dwPacketNumber;
 	}
+}
+
+
+template <unsigned M, unsigned N>
+bool xinput_device_base::assign_ui_button(
+		input_device::assignment_vector &assignments,
+		ioport_type type,
+		unsigned preferred,
+		input_item_id (&switch_ids)[M],
+		unsigned const (&numbered_buttons)[N],
+		unsigned button_count)
+{
+	assert(N >= button_count);
+
+	// use preferred button if available
+	if (add_button_assignment(assignments, type, { switch_ids[preferred] }))
+	{
+		switch_ids[preferred] = ITEM_ID_INVALID;
+		return true;
+	}
+
+	// otherwise find next available button
+	for (unsigned i = 0; button_count > i; ++i)
+	{
+		if (add_button_assignment(assignments, type, { switch_ids[numbered_buttons[i]] }))
+		{
+			switch_ids[numbered_buttons[i]] = ITEM_ID_INVALID;
+			return true;
+		}
+	}
+
+	// didn't find a suitable button
+	return false;
+}
+
+
+template <unsigned M, unsigned N>
+void xinput_device_base::assign_ui_actions(
+		input_device::assignment_vector &assignments,
+		unsigned preferred_back,
+		unsigned preferred_clear,
+		unsigned preferred_help,
+		unsigned start,
+		unsigned back,
+		input_item_id (&switch_ids)[M],
+		unsigned const (&numbered_buttons)[N],
+		unsigned button_count)
+{
+	// the first button is always UI select if present, or we can fall back to start
+	if (1U <= button_count)
+	{
+		add_button_assignment(assignments, IPT_UI_SELECT, { switch_ids[numbered_buttons[0]] });
+		switch_ids[numbered_buttons[0]] = ITEM_ID_INVALID;
+	}
+	else if (add_button_assignment(assignments, IPT_UI_SELECT, { switch_ids[start] }))
+	{
+		switch_ids[start] = ITEM_ID_INVALID;
+	}
+
+	// UI clear is usually X
+	assign_ui_button(
+			assignments,
+			IPT_UI_CLEAR,
+			preferred_clear,
+			switch_ids,
+			numbered_buttons,
+			button_count);
+
+	// UI back can fall back from B to the back button
+	bool const assigned_back = assign_ui_button(
+			assignments,
+			IPT_UI_BACK,
+			preferred_back,
+			switch_ids,
+			numbered_buttons,
+			button_count);
+	if (!assigned_back)
+	{
+		if (add_button_assignment(assignments, IPT_UI_BACK, { switch_ids[back] }))
+			switch_ids[back] = ITEM_ID_INVALID;
+	}
+
+	// help takes Y if present
+	assign_ui_button(
+			assignments,
+			IPT_UI_HELP,
+			preferred_help,
+			switch_ids,
+			numbered_buttons,
+			button_count);
 }
 
 
@@ -593,18 +706,16 @@ class xinput_joystick_device : public xinput_device_base
 {
 public:
 	xinput_joystick_device(
-			running_machine &machine,
 			std::string &&name,
 			std::string &&id,
 			input_module &module,
 			u32 player,
 			XINPUT_CAPABILITIES const &caps,
-			std::shared_ptr<xinput_api_helper> const &helper);
+			xinput_api_helper const &helper);
 
-	virtual void poll() override;
+	virtual void poll(bool relative_reset) override;
 	virtual void reset() override;
-
-	virtual void configure() override;
+	virtual void configure(input_device &device) override;
 
 private:
 	static inline constexpr USHORT SWITCH_BITS[] =
@@ -644,11 +755,6 @@ private:
 		SWITCH_DPAD_LEFT,
 		SWITCH_DPAD_RIGHT,
 
-		SWITCH_HAT_UP,      // for flight stick with POV hat as right stick
-		SWITCH_HAT_DOWN,
-		SWITCH_HAT_LEFT,
-		SWITCH_HAT_RIGHT,
-
 		SWITCH_LT,          // for arcade stick/pad with LT/RT buttons
 		SWITCH_RT,
 
@@ -665,11 +771,20 @@ private:
 		AXIS_RSX,
 		AXIS_RSY,
 
-		AXIS_RUDDER,        // LT/RT mapped differently for flight sticks
-		AXIS_THROTTLE,
-
 		AXIS_TOTAL
 	};
+
+	static bool assign_pedal(
+			input_device::assignment_vector &assignments,
+			bool fallback_shoulder,
+			ioport_type type,
+			input_item_id preferred_axis,
+			input_item_id fallback_axis1,
+			input_item_id fallback_axis2,
+			input_item_modifier fallback_axis_modifier,
+			input_item_id trigger_button,
+			input_item_id shoulder_button,
+			input_item_id numbered_button);
 
 	u8  m_switches[SWITCH_TOTAL];
 	s32 m_axes[AXIS_TOTAL];
@@ -677,21 +792,20 @@ private:
 
 
 xinput_joystick_device::xinput_joystick_device(
-		running_machine &machine,
 		std::string &&name,
 		std::string &&id,
 		input_module &module,
 		u32 player,
 		XINPUT_CAPABILITIES const &caps,
-		std::shared_ptr<xinput_api_helper> const &helper) :
-	xinput_device_base(machine, std::move(name), std::move(id), module, player, caps, helper)
+		xinput_api_helper const &helper) :
+	xinput_device_base(std::move(name), std::move(id), module, player, caps, helper)
 {
 	std::fill(std::begin(m_switches), std::end(m_switches), 0);
 	std::fill(std::begin(m_axes), std::end(m_axes), 0);
 }
 
 
-void xinput_joystick_device::poll()
+void xinput_joystick_device::poll(bool relative_reset)
 {
 	// poll the device first, and skip if nothing changed
 	if (!read_state())
@@ -714,16 +828,6 @@ void xinput_joystick_device::poll()
 	// translate LT/RT switches for arcade sticks/pads
 	m_switches[SWITCH_LT] = (0x80 <= trigger_left()) ? 0xff : 0x00;
 	m_switches[SWITCH_RT] = (0x80 <= trigger_right()) ? 0xff : 0x00;
-
-	// translate POV hat for flight sticks
-	m_switches[SWITCH_HAT_UP] = (16'384 <= thumb_right_y()) ? 0xff : 0x00;
-	m_switches[SWITCH_HAT_DOWN] = (-16'384 >= thumb_right_y()) ? 0xff : 0x00;
-	m_switches[SWITCH_HAT_LEFT] = (-16'384 >= thumb_right_x()) ? 0xff : 0x00;
-	m_switches[SWITCH_HAT_RIGHT] = (16'384 <= thumb_right_x()) ? 0xff : 0x00;
-
-	// translate rudder and throttle for flight sticks
-	m_axes[AXIS_RUDDER] = normalize_absolute_axis(trigger_left(), 0, 255);
-	m_axes[AXIS_THROTTLE] = normalize_absolute_axis(trigger_right(), 0, 255);
 }
 
 
@@ -735,16 +839,16 @@ void xinput_joystick_device::reset()
 }
 
 
-void xinput_joystick_device::configure()
+void xinput_joystick_device::configure(input_device &device)
 {
 	// TODO: proper support for dance mat controllers
 
 	// default characteristics for a gamepad
+	bool button_diamond = true;
+	bool pedal_fallback_shoulder = true;
 	bool lt_rt_button = false;
-	bool lt_rt_fullaxis = false;
-	bool rstick_hat = false;
 	char const *const *axis_names = AXIS_NAMES_GAMEPAD;
-	input_item_id const *axis_ids = AXIS_IDS_GAMEPAD;
+	input_item_id const *preferred_axis_ids = AXIS_IDS_GAMEPAD;
 	char const *const *hat_names = HAT_NAMES_GAMEPAD;
 	char const *const *button_names = BUTTON_NAMES_GAMEPAD;
 
@@ -755,45 +859,52 @@ void xinput_joystick_device::configure()
 		switch (device_subtype())
 		{
 		case XINPUT_DEVSUBTYPE_WHEEL:
+			pedal_fallback_shoulder = false;
 			axis_names = AXIS_NAMES_WHEEL;
 			break;
 		case XINPUT_DEVSUBTYPE_ARCADE_STICK:
+			button_diamond = false;
 			lt_rt_button = true;
 			hat_names = HAT_NAMES_ARCADE_STICK;
 			break;
-		case 0x04: // XINPUT_DEVSUBTYPE_FLIGHT_STICK: work around MinGW header issues
-			lt_rt_fullaxis = true;
-			rstick_hat = true;
-			axis_names = AXIS_NAMES_FLIGHT_STICK;
-			axis_ids = AXIS_IDS_FLIGHT_STICK;
-			break;
 		case XINPUT_DEVSUBTYPE_DANCE_PAD:
 			// TODO: proper support
+			button_diamond = false;
 			break;
 		case XINPUT_DEVSUBTYPE_ARCADE_PAD:
+			button_diamond = false;
 			lt_rt_button = true;
 			break;
 		}
 		break;
 	}
 
+	// track item IDs for setting up default assignments
+	input_device::assignment_vector assignments;
+	input_item_id axis_ids[AXIS_TOTAL];
+	input_item_id switch_ids[SWITCH_TOTAL];
+	std::fill(std::begin(switch_ids), std::end(switch_ids), ITEM_ID_INVALID);
+
 	// add bidirectional axes
 	bool const axis_caps[]{
 			has_thumb_left_x(),
 			has_thumb_left_y(),
-			!rstick_hat && has_thumb_right_x(),
-			!rstick_hat && has_thumb_right_y(),
-			lt_rt_fullaxis && has_trigger_left(),
-			lt_rt_fullaxis && has_trigger_right() };
+			has_thumb_right_x(),
+			has_thumb_right_y() };
 	for (unsigned i = 0; std::size(axis_caps) > i; ++i)
 	{
 		if (axis_caps[i])
 		{
-			device()->add_item(
+			axis_ids[AXIS_LSX + i] = device.add_item(
 					axis_names[i],
-					axis_ids[i],
+					std::string_view(),
+					preferred_axis_ids[i],
 					generic_axis_get_state<s32>,
 					&m_axes[AXIS_LSX + i]);
+		}
+		else
+		{
+			axis_ids[AXIS_LSX + i] = ITEM_ID_INVALID;
 		}
 	}
 
@@ -802,17 +913,14 @@ void xinput_joystick_device::configure()
 			has_button(XINPUT_GAMEPAD_DPAD_UP),
 			has_button(XINPUT_GAMEPAD_DPAD_DOWN),
 			has_button(XINPUT_GAMEPAD_DPAD_LEFT),
-			has_button(XINPUT_GAMEPAD_DPAD_RIGHT),
-			rstick_hat && has_thumb_right_x(),
-			rstick_hat && has_thumb_right_x(),
-			rstick_hat && has_thumb_right_y(),
-			rstick_hat && has_thumb_right_y() };
-	for (unsigned i = 0; (SWITCH_HAT_RIGHT - SWITCH_DPAD_UP) >= i; ++i)
+			has_button(XINPUT_GAMEPAD_DPAD_RIGHT) };
+	for (unsigned i = 0; (SWITCH_DPAD_RIGHT - SWITCH_DPAD_UP) >= i; ++i)
 	{
 		if (hat_caps[i])
 		{
-			device()->add_item(
+			switch_ids[SWITCH_DPAD_UP + i] = device.add_item(
 					hat_names[i],
+					std::string_view(),
 					input_item_id(ITEM_ID_HAT1UP + i), // matches up/down/left/right order
 					generic_button_get_state<u8>,
 					&m_switches[SWITCH_DPAD_UP + i]);
@@ -832,52 +940,764 @@ void xinput_joystick_device::configure()
 			{ SWITCH_LSB, has_button(XINPUT_GAMEPAD_LEFT_THUMB) },
 			{ SWITCH_RSB, has_button(XINPUT_GAMEPAD_RIGHT_THUMB) } };
 	input_item_id button_id = ITEM_ID_BUTTON1;
+	unsigned button_count = 0;
+	unsigned numbered_buttons[SWITCH_RSB - SWITCH_A + 1];
 	for (unsigned i = 0; std::size(button_caps) > i; ++i)
 	{
 		auto const [offset, supported] = button_caps[i];
 		if (supported)
 		{
-			device()->add_item(
+			switch_ids[offset] = device.add_item(
 					button_names[i],
+					std::string_view(),
 					button_id++,
 					generic_button_get_state<u8>,
 					&m_switches[offset]);
+			numbered_buttons[button_count] = offset;
+
+			// use these for automatically numbered buttons
+			assignments.emplace_back(
+					ioport_type(IPT_BUTTON1 + button_count++),
+					SEQ_TYPE_STANDARD,
+					input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, switch_ids[offset])));
 		}
 	}
 
 	// add start/back
 	if (has_button(XINPUT_GAMEPAD_START))
 	{
-		device()->add_item(
+		switch_ids[SWITCH_START] = device.add_item(
 				"Start",
+				std::string_view(),
 				ITEM_ID_START,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_START]);
+		add_button_assignment(assignments, IPT_START, { switch_ids[SWITCH_START] });
 	}
 	if (has_button(XINPUT_GAMEPAD_BACK))
 	{
-		device()->add_item(
+		switch_ids[SWITCH_BACK] = device.add_item(
 				"Back",
+				std::string_view(),
 				ITEM_ID_SELECT,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_BACK]);
+		add_button_assignment(assignments, IPT_SELECT, { switch_ids[SWITCH_BACK] });
 	}
 
 	// add triggers/pedals
-	if (!lt_rt_button && !lt_rt_fullaxis)
+	if (!lt_rt_button)
 	{
 		for (unsigned i = 0; (AXIS_RT - AXIS_LT) >= i; ++i)
 		{
 			if (i ? has_trigger_right() : has_trigger_left())
 			{
-				device()->add_item(
-						axis_names[4 + i],
-						axis_ids[4 + i],
+				axis_ids[AXIS_LT + i] = device.add_item(
+						axis_names[std::size(axis_caps) + i],
+						std::string_view(),
+						preferred_axis_ids[std::size(axis_caps) + i],
 						generic_axis_get_state<s32>,
 						&m_axes[AXIS_LT + i]);
 			}
+			else
+			{
+				axis_ids[AXIS_LT + i] = ITEM_ID_INVALID;
+			}
 		}
 	}
+
+	// try to get a "complete" joystick for primary movement controls
+	input_item_id directional_axes[2][2];
+	choose_primary_stick(
+			directional_axes,
+			axis_ids[AXIS_LSX],
+			axis_ids[AXIS_LSY],
+			axis_ids[AXIS_RSX],
+			axis_ids[AXIS_RSY]);
+
+	// now set up controls using the primary joystick
+	add_directional_assignments(
+			assignments,
+			directional_axes[0][0],
+			directional_axes[0][1],
+			switch_ids[SWITCH_DPAD_LEFT],
+			switch_ids[SWITCH_DPAD_RIGHT],
+			switch_ids[SWITCH_DPAD_UP],
+			switch_ids[SWITCH_DPAD_DOWN]);
+
+	// assign a secondary stick axis to joystick Z if available
+	bool const stick_z = add_assignment(
+			assignments,
+			IPT_AD_STICK_Z,
+			SEQ_TYPE_STANDARD,
+			ITEM_CLASS_ABSOLUTE,
+			ITEM_MODIFIER_NONE,
+			{ directional_axes[1][1], directional_axes[1][0] });
+	if (!stick_z)
+	{
+		// if both triggers are present, combine them, or failing that, fall back to a pair of buttons
+		if ((ITEM_ID_INVALID != axis_ids[AXIS_LT]) && (ITEM_ID_INVALID != axis_ids[AXIS_RT]))
+		{
+			assignments.emplace_back(
+					IPT_AD_STICK_Z,
+					SEQ_TYPE_STANDARD,
+					input_seq(
+							make_code(ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, axis_ids[AXIS_LT]),
+							make_code(ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_REVERSE, axis_ids[AXIS_RT])));
+		}
+		else if (add_axis_inc_dec_assignment(assignments, IPT_AD_STICK_Z, switch_ids[SWITCH_LB], switch_ids[SWITCH_RB]))
+		{
+			// took shoulder buttons
+		}
+		else if (add_axis_inc_dec_assignment(assignments, IPT_AD_STICK_Z, switch_ids[SWITCH_LT], switch_ids[SWITCH_RT]))
+		{
+			// took trigger buttons
+		}
+	}
+
+	// prefer trigger axes for pedals, otherwise take half axes and buttons
+	unsigned pedal_button = 0;
+	bool const pedal1_numbered_button = assign_pedal(
+			assignments,
+			pedal_fallback_shoulder,
+			IPT_PEDAL,
+			axis_ids[AXIS_RT],
+			directional_axes[1][1],
+			directional_axes[0][1],
+			ITEM_MODIFIER_NEG,
+			switch_ids[SWITCH_RT],
+			switch_ids[SWITCH_RB],
+			(pedal_button < button_count)
+				? switch_ids[numbered_buttons[pedal_button]]
+				: ITEM_ID_INVALID);
+	if (pedal1_numbered_button)
+		++pedal_button;
+	bool const pedal2_numbered_button = assign_pedal(
+			assignments,
+			pedal_fallback_shoulder,
+			IPT_PEDAL2,
+			axis_ids[AXIS_LT],
+			directional_axes[1][1],
+			directional_axes[0][1],
+			ITEM_MODIFIER_POS,
+			switch_ids[SWITCH_LT],
+			switch_ids[SWITCH_LB],
+			(pedal_button < button_count)
+				? switch_ids[numbered_buttons[pedal_button]]
+				: ITEM_ID_INVALID);
+	if (pedal2_numbered_button)
+		++pedal_button;
+	if (pedal_button < button_count)
+	{
+		input_item_id const pedal_button_id = switch_ids[numbered_buttons[pedal_button]];
+		assignments.emplace_back(
+				IPT_PEDAL3,
+				SEQ_TYPE_INCREMENT,
+				input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, pedal_button_id)));
+	}
+
+	// potentially use thumb sticks and/or D-pad and A/B/X/Y diamond for twin sticks
+	add_twin_stick_assignments(
+			assignments,
+			axis_ids[AXIS_LSX],
+			axis_ids[AXIS_LSY],
+			axis_ids[AXIS_RSX],
+			axis_ids[AXIS_RSY],
+			button_diamond ? switch_ids[SWITCH_DPAD_LEFT]  : ITEM_ID_INVALID,
+			button_diamond ? switch_ids[SWITCH_DPAD_RIGHT] : ITEM_ID_INVALID,
+			button_diamond ? switch_ids[SWITCH_DPAD_UP]    : ITEM_ID_INVALID,
+			button_diamond ? switch_ids[SWITCH_DPAD_DOWN]  : ITEM_ID_INVALID,
+			button_diamond ? switch_ids[SWITCH_X]          : ITEM_ID_INVALID,
+			button_diamond ? switch_ids[SWITCH_B]          : ITEM_ID_INVALID,
+			button_diamond ? switch_ids[SWITCH_Y]          : ITEM_ID_INVALID,
+			button_diamond ? switch_ids[SWITCH_A]          : ITEM_ID_INVALID);
+
+	// assign UI select/back/clear/help
+	assign_ui_actions(
+			assignments,
+			SWITCH_B,
+			SWITCH_X,
+			SWITCH_Y,
+			SWITCH_START,
+			SWITCH_BACK,
+			switch_ids,
+			numbered_buttons,
+			button_count);
+
+	// try to get a matching pair of buttons for previous/next group
+	if (consume_button_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, switch_ids[SWITCH_LT], switch_ids[SWITCH_RT]))
+	{
+		// took digital triggers
+	}
+	else if (consume_trigger_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, axis_ids[AXIS_LT], axis_ids[AXIS_RT]))
+	{
+		// took analog triggers
+	}
+	else if (consume_axis_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, directional_axes[1][1]))
+	{
+		// took secondary Y
+	}
+	else if (consume_axis_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, directional_axes[1][0]))
+	{
+		// took secondary X
+	}
+
+	// try to assign secondary stick to page up/down
+	consume_axis_pair(assignments, IPT_UI_PAGE_UP, IPT_UI_PAGE_DOWN, directional_axes[1][1]);
+
+	// put focus previous/next on the shoulder buttons if available - this can be overloaded with zoom
+	if (add_button_pair_assignment(assignments, IPT_UI_FOCUS_PREV, IPT_UI_FOCUS_NEXT, switch_ids[SWITCH_LB], switch_ids[SWITCH_RB]))
+	{
+		// took shoulder buttons
+	}
+	else if (add_axis_pair_assignment(assignments, IPT_UI_FOCUS_PREV, IPT_UI_FOCUS_NEXT, directional_axes[1][0]))
+	{
+		// took secondary X
+	}
+
+	// put zoom on the secondary stick if available, or fall back to shoulder buttons
+	if (add_axis_pair_assignment(assignments, IPT_UI_ZOOM_OUT, IPT_UI_ZOOM_IN, directional_axes[1][0]))
+	{
+		// took secondary X
+		if (axis_ids[AXIS_LSX] == directional_axes[1][0])
+			add_button_assignment(assignments, IPT_UI_ZOOM_DEFAULT, { switch_ids[SWITCH_LSB] });
+		else if (axis_ids[AXIS_RSX] == directional_axes[1][0])
+			add_button_assignment(assignments, IPT_UI_ZOOM_DEFAULT, { switch_ids[SWITCH_RSB] });
+		directional_axes[1][0] = ITEM_ID_INVALID;
+	}
+	else if (consume_button_pair(assignments, IPT_UI_ZOOM_OUT, IPT_UI_ZOOM_IN, switch_ids[SWITCH_LB], switch_ids[SWITCH_RB]))
+	{
+		// took shoulder buttons
+	}
+
+	// set default assignments
+	device.set_default_assignments(std::move(assignments));
+}
+
+
+bool xinput_joystick_device::assign_pedal(
+		input_device::assignment_vector &assignments,
+		bool fallback_shoulder,
+		ioport_type type,
+		input_item_id preferred_axis,
+		input_item_id fallback_axis1,
+		input_item_id fallback_axis2,
+		input_item_modifier fallback_axis_modifier,
+		input_item_id trigger_button,
+		input_item_id shoulder_button,
+		input_item_id numbered_button)
+{
+	// first try the preferred trigger/pedal axis
+	if (ITEM_ID_INVALID != preferred_axis)
+	{
+		assignments.emplace_back(
+				type,
+				SEQ_TYPE_STANDARD,
+				input_seq(make_code(ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NEG, preferred_axis)));
+		return false;
+	}
+
+	// try adding half a joystick axis
+	add_assignment(
+			assignments,
+			type,
+			SEQ_TYPE_STANDARD,
+			ITEM_CLASS_ABSOLUTE,
+			fallback_axis_modifier,
+			{ fallback_axis1, fallback_axis2 });
+
+	// try a trigger button
+	if (ITEM_ID_INVALID != trigger_button)
+	{
+		assignments.emplace_back(
+				type,
+				SEQ_TYPE_INCREMENT,
+				input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, trigger_button)));
+		return false;
+	}
+
+	// try a shoulder button if appropriate
+	if (fallback_shoulder && (ITEM_ID_INVALID != shoulder_button))
+	{
+		assignments.emplace_back(
+				type,
+				SEQ_TYPE_INCREMENT,
+				input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, shoulder_button)));
+		return false;
+	}
+
+	// if no numbered button, nothing can be done
+	if (ITEM_ID_INVALID == numbered_button)
+		return false;
+
+	// last resort
+	assignments.emplace_back(
+			type,
+			SEQ_TYPE_INCREMENT,
+			input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, numbered_button)));
+	return true;
+}
+
+
+
+//============================================================
+//  XInput flight stick handler
+//============================================================
+
+class xinput_flight_stick_device : public xinput_device_base
+{
+public:
+	xinput_flight_stick_device(
+			std::string &&name,
+			std::string &&id,
+			input_module &module,
+			u32 player,
+			XINPUT_CAPABILITIES const &caps,
+			xinput_api_helper const &helper);
+
+	virtual void poll(bool relative_reset) override;
+	virtual void reset() override;
+	virtual void configure(input_device &device) override;
+
+private:
+	static inline constexpr USHORT SWITCH_BITS[] =
+	{
+		XINPUT_GAMEPAD_A,
+		XINPUT_GAMEPAD_B,
+		XINPUT_GAMEPAD_X,
+		XINPUT_GAMEPAD_Y,
+		XINPUT_GAMEPAD_LEFT_SHOULDER,
+		XINPUT_GAMEPAD_RIGHT_SHOULDER,
+		XINPUT_GAMEPAD_LEFT_THUMB,
+		XINPUT_GAMEPAD_RIGHT_THUMB,
+		XINPUT_GAMEPAD_START,
+		XINPUT_GAMEPAD_BACK,
+
+		XINPUT_GAMEPAD_DPAD_UP,
+		XINPUT_GAMEPAD_DPAD_DOWN,
+		XINPUT_GAMEPAD_DPAD_LEFT,
+		XINPUT_GAMEPAD_DPAD_RIGHT
+	};
+
+	enum
+	{
+		SWITCH_A,           // button bits
+		SWITCH_B,
+		SWITCH_X,
+		SWITCH_Y,
+		SWITCH_LB,
+		SWITCH_RB,
+		SWITCH_LSB,
+		SWITCH_RSB,
+		SWITCH_START,
+		SWITCH_BACK,
+
+		SWITCH_DPAD_UP,     // D-pad bits
+		SWITCH_DPAD_DOWN,
+		SWITCH_DPAD_LEFT,
+		SWITCH_DPAD_RIGHT,
+
+		SWITCH_HAT_UP,      // for POV hat as right stick
+		SWITCH_HAT_DOWN,
+		SWITCH_HAT_LEFT,
+		SWITCH_HAT_RIGHT,
+
+		SWITCH_TOTAL
+	};
+
+	enum
+	{
+		AXIS_RUDDER,        // LT/RT mapped as bidirectional axes
+		AXIS_THROTTLE,
+
+		AXIS_X,             // full-precision axes
+		AXIS_Y,
+
+		AXIS_TOTAL
+	};
+
+	u8  m_switches[SWITCH_TOTAL];
+	s32 m_axes[AXIS_TOTAL];
+};
+
+
+xinput_flight_stick_device::xinput_flight_stick_device(
+		std::string &&name,
+		std::string &&id,
+		input_module &module,
+		u32 player,
+		XINPUT_CAPABILITIES const &caps,
+		xinput_api_helper const &helper) :
+	xinput_device_base(std::move(name), std::move(id), module, player, caps, helper)
+{
+	std::fill(std::begin(m_switches), std::end(m_switches), 0);
+	std::fill(std::begin(m_axes), std::end(m_axes), 0);
+}
+
+
+void xinput_flight_stick_device::poll(bool relative_reset)
+{
+	// poll the device first, and skip if nothing changed
+	if (!read_state())
+		return;
+
+	// translate button bits
+	for (unsigned i = 0; std::size(SWITCH_BITS) > i; ++i)
+		m_switches[SWITCH_A + i] = (buttons() & SWITCH_BITS[i]) ? 0xff : 0x00;
+
+	// translate rudder and throttle
+	m_axes[AXIS_RUDDER] = normalize_absolute_axis(trigger_left(), 0, 255);
+	m_axes[AXIS_THROTTLE] = normalize_absolute_axis(trigger_right(), 0, 255);
+
+	// translate full-precision axes - Y direction is opposite to what MAME uses
+	m_axes[AXIS_X] = normalize_absolute_axis(thumb_left_x(), XINPUT_AXIS_MINVALUE, XINPUT_AXIS_MAXVALUE);
+	m_axes[AXIS_Y] = normalize_absolute_axis(-thumb_left_y(), XINPUT_AXIS_MINVALUE, XINPUT_AXIS_MAXVALUE);
+
+	// translate right stick as POV hat
+	m_switches[SWITCH_HAT_UP] = (16'384 <= thumb_right_y()) ? 0xff : 0x00;
+	m_switches[SWITCH_HAT_DOWN] = (-16'384 >= thumb_right_y()) ? 0xff : 0x00;
+	m_switches[SWITCH_HAT_LEFT] = (-16'384 >= thumb_right_x()) ? 0xff : 0x00;
+	m_switches[SWITCH_HAT_RIGHT] = (16'384 <= thumb_right_x()) ? 0xff : 0x00;
+}
+
+
+void xinput_flight_stick_device::reset()
+{
+	set_reset();
+	std::fill(std::begin(m_switches), std::end(m_switches), 0);
+	std::fill(std::begin(m_axes), std::end(m_axes), 0);
+}
+
+
+void xinput_flight_stick_device::configure(input_device &device)
+{
+	// track item IDs for setting up default assignments
+	input_device::assignment_vector assignments;
+	input_item_id switch_ids[SWITCH_TOTAL];
+	std::fill(std::begin(switch_ids), std::end(switch_ids), ITEM_ID_INVALID);
+
+	// add bidirectional axes
+	std::tuple<input_item_id, char const *, bool> const axis_caps[]{
+			{ ITEM_ID_RZAXIS, "Rudder",     has_trigger_left() },
+			{ ITEM_ID_ZAXIS,  "Throttle",   has_trigger_right() },
+			{ ITEM_ID_XAXIS,  "Joystick X", has_thumb_left_x() },
+			{ ITEM_ID_YAXIS,  "Joystick Y", has_thumb_left_y() } };
+	input_item_id axis_ids[AXIS_TOTAL];
+	for (unsigned i = 0; AXIS_TOTAL > i; ++i)
+	{
+		auto const [id, name, supported] = axis_caps[i];
+		if (supported)
+		{
+			axis_ids[i] = device.add_item(
+					name,
+					std::string_view(),
+					id,
+					generic_axis_get_state<s32>,
+					&m_axes[i]);
+		}
+		else
+		{
+			axis_ids[i] = ITEM_ID_INVALID;
+		}
+	}
+
+	// add hats
+	bool const hat_caps[]{
+			has_button(XINPUT_GAMEPAD_DPAD_UP),
+			has_button(XINPUT_GAMEPAD_DPAD_DOWN),
+			has_button(XINPUT_GAMEPAD_DPAD_LEFT),
+			has_button(XINPUT_GAMEPAD_DPAD_RIGHT),
+			has_thumb_right_x(),
+			has_thumb_right_x(),
+			has_thumb_right_y(),
+			has_thumb_right_y() };
+	for (unsigned i = 0; (SWITCH_HAT_RIGHT - SWITCH_DPAD_UP) >= i; ++i)
+	{
+		if (hat_caps[i])
+		{
+			switch_ids[SWITCH_DPAD_UP + i] = device.add_item(
+					HAT_NAMES_GAMEPAD[i],
+					std::string_view(),
+					input_item_id(ITEM_ID_HAT1UP + i), // matches up/down/left/right order
+					generic_button_get_state<u8>,
+					&m_switches[SWITCH_DPAD_UP + i]);
+		}
+	}
+
+	// add buttons
+	input_item_id button_id = ITEM_ID_BUTTON1;
+	unsigned button_count = 0;
+	unsigned numbered_buttons[SWITCH_RSB - SWITCH_A + 1];
+	for (unsigned i = 0; (SWITCH_RSB - SWITCH_A) >= i; ++i)
+	{
+		if (has_button(SWITCH_BITS[i]))
+		{
+			switch_ids[SWITCH_A + i] = device.add_item(
+					BUTTON_NAMES_FLIGHT_STICK[i],
+					std::string_view(),
+					button_id++,
+					generic_button_get_state<u8>,
+					&m_switches[SWITCH_A + i]);
+			numbered_buttons[button_count] = SWITCH_A + i;
+
+			// use these for automatically numbered buttons and pedals
+			input_seq const seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, switch_ids[SWITCH_A + i]));
+			assignments.emplace_back(ioport_type(IPT_BUTTON1 + button_count), SEQ_TYPE_STANDARD, seq);
+			if (3 > button_count)
+				assignments.emplace_back(ioport_type(IPT_PEDAL + button_count), SEQ_TYPE_INCREMENT, seq);
+			++button_count;
+		}
+	}
+
+	// add start/back
+	if (has_button(XINPUT_GAMEPAD_START))
+	{
+		switch_ids[SWITCH_START] = device.add_item(
+				"Start",
+				std::string_view(),
+				ITEM_ID_START,
+				generic_button_get_state<u8>,
+				&m_switches[SWITCH_START]);
+		add_button_assignment(assignments, IPT_START, { switch_ids[SWITCH_START] });
+	}
+	if (has_button(XINPUT_GAMEPAD_BACK))
+	{
+		switch_ids[SWITCH_BACK] = device.add_item(
+				"Back",
+				std::string_view(),
+				ITEM_ID_SELECT,
+				generic_button_get_state<u8>,
+				&m_switches[SWITCH_BACK]);
+		add_button_assignment(assignments, IPT_SELECT, { switch_ids[SWITCH_BACK] });
+	}
+
+	// use throttle for joystick Z, or rudder if it isn't available
+	add_assignment(
+			assignments,
+			IPT_AD_STICK_Z,
+			SEQ_TYPE_STANDARD,
+			ITEM_CLASS_ABSOLUTE,
+			ITEM_MODIFIER_NONE,
+			{ axis_ids[AXIS_THROTTLE], axis_ids[AXIS_RUDDER] });
+
+	// if throttle is available, use it for first two pedals, too
+	if (ITEM_ID_INVALID != axis_ids[AXIS_THROTTLE])
+	{
+		assignments.emplace_back(
+				IPT_PEDAL,
+				SEQ_TYPE_STANDARD,
+				input_seq(make_code(ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NEG, axis_ids[AXIS_THROTTLE])));
+		assignments.emplace_back(
+				IPT_PEDAL2,
+				SEQ_TYPE_STANDARD,
+				input_seq(make_code(ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_POS, axis_ids[AXIS_THROTTLE])));
+	}
+
+	// find something to use for directional controls and navigation
+	bool const axis_missing = (ITEM_ID_INVALID == axis_ids[AXIS_X]) || (ITEM_ID_INVALID == axis_ids[AXIS_Y]);
+	bool const hat_complete = has_thumb_right_x() && has_thumb_right_y();
+	if (axis_missing && hat_complete)
+	{
+		// X or Y missing - rely on POV hat
+		add_directional_assignments(
+				assignments,
+				axis_ids[AXIS_X],
+				axis_ids[AXIS_Y],
+				switch_ids[SWITCH_HAT_LEFT],
+				switch_ids[SWITCH_HAT_RIGHT],
+				switch_ids[SWITCH_HAT_UP],
+				switch_ids[SWITCH_HAT_DOWN]);
+
+		// choose something for previous/next group
+		if (consume_button_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, switch_ids[SWITCH_DPAD_UP], switch_ids[SWITCH_DPAD_DOWN]))
+		{
+			// took D-pad up/down
+		}
+		else if (consume_button_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, switch_ids[SWITCH_DPAD_LEFT], switch_ids[SWITCH_DPAD_RIGHT]))
+		{
+			// took D-pad left/right
+		}
+		else if (consume_axis_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, axis_ids[AXIS_RUDDER]))
+		{
+			// took rudder
+		}
+		else if (consume_axis_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, axis_ids[AXIS_THROTTLE]))
+		{
+			// took throttle
+		}
+
+		// choose something for zoom and focus previous/next
+		if (add_axis_pair_assignment(assignments, IPT_UI_ZOOM_OUT, IPT_UI_ZOOM_IN, axis_ids[AXIS_THROTTLE]))
+		{
+			if (!add_axis_pair_assignment(assignments, IPT_UI_FOCUS_PREV, IPT_UI_FOCUS_NEXT, axis_ids[AXIS_RUDDER]))
+				add_axis_pair_assignment(assignments, IPT_UI_FOCUS_PREV, IPT_UI_FOCUS_NEXT, axis_ids[AXIS_THROTTLE]);
+		}
+		else if (add_axis_pair_assignment(assignments, IPT_UI_ZOOM_OUT, IPT_UI_ZOOM_IN, axis_ids[AXIS_RUDDER]))
+		{
+			add_axis_pair_assignment(assignments, IPT_UI_FOCUS_PREV, IPT_UI_FOCUS_NEXT, axis_ids[AXIS_RUDDER]);
+		}
+		else if (add_button_pair_assignment(assignments, IPT_UI_ZOOM_OUT, IPT_UI_ZOOM_IN, switch_ids[SWITCH_DPAD_LEFT], switch_ids[SWITCH_DPAD_RIGHT]))
+		{
+			consume_button_pair(assignments, IPT_UI_FOCUS_PREV, IPT_UI_FOCUS_NEXT, switch_ids[SWITCH_DPAD_LEFT], switch_ids[SWITCH_DPAD_RIGHT]);
+		}
+	}
+	else
+	{
+		// only use stick for the primary directional controls
+		add_directional_assignments(
+				assignments,
+				axis_ids[AXIS_X],
+				axis_ids[AXIS_Y],
+				ITEM_ID_INVALID,
+				ITEM_ID_INVALID,
+				ITEM_ID_INVALID,
+				ITEM_ID_INVALID);
+
+		// assign the POV hat differently depending on whether rudder and/or throttle are present
+		if ((ITEM_ID_INVALID != axis_ids[AXIS_RUDDER]) || (ITEM_ID_INVALID != axis_ids[AXIS_THROTTLE]))
+		{
+			// previous/next group
+			if (consume_button_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, switch_ids[SWITCH_HAT_LEFT], switch_ids[SWITCH_HAT_RIGHT]))
+			{
+				// took hat left/right
+			}
+			else if (consume_button_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, switch_ids[SWITCH_DPAD_LEFT], switch_ids[SWITCH_DPAD_RIGHT]))
+			{
+				// took D-pad left/right
+			}
+			else if (consume_button_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, switch_ids[SWITCH_HAT_UP], switch_ids[SWITCH_HAT_DOWN]))
+			{
+				// took hat up/down
+			}
+			else if (consume_button_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, switch_ids[SWITCH_DPAD_UP], switch_ids[SWITCH_DPAD_DOWN]))
+			{
+				// took D-pad up/down
+			}
+			else if (consume_axis_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, axis_ids[AXIS_RUDDER]))
+			{
+				// took rudder
+			}
+			else if (consume_axis_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, axis_ids[AXIS_THROTTLE]))
+			{
+				// took throttle
+			}
+
+			// page up/down
+			if (consume_button_pair(assignments, IPT_UI_PAGE_UP, IPT_UI_PAGE_DOWN, switch_ids[SWITCH_HAT_UP], switch_ids[SWITCH_HAT_DOWN]))
+			{
+				// took hat up/down
+			}
+			else if (consume_button_pair(assignments, IPT_UI_PAGE_UP, IPT_UI_PAGE_DOWN, switch_ids[SWITCH_DPAD_UP], switch_ids[SWITCH_DPAD_DOWN]))
+			{
+				// took D-pad up/down
+			}
+			else if (consume_button_pair(assignments, IPT_UI_PAGE_UP, IPT_UI_PAGE_DOWN, switch_ids[SWITCH_DPAD_LEFT], switch_ids[SWITCH_DPAD_RIGHT]))
+			{
+				// took D-pad left/right
+			}
+
+			// home/end
+			if (consume_button_pair(assignments, IPT_UI_HOME, IPT_UI_END, switch_ids[SWITCH_DPAD_UP], switch_ids[SWITCH_DPAD_DOWN]))
+			{
+				// took D-pad up/down
+			}
+			else if (consume_button_pair(assignments, IPT_UI_HOME, IPT_UI_END, switch_ids[SWITCH_DPAD_LEFT], switch_ids[SWITCH_DPAD_RIGHT]))
+			{
+				// took D-pad left/right
+			}
+
+			// assign something for zoom - this can overlap with focus previous/next
+			if (add_axis_pair_assignment(assignments, IPT_UI_ZOOM_OUT, IPT_UI_ZOOM_IN, axis_ids[AXIS_THROTTLE]))
+			{
+				// took throttle
+			}
+			else if (add_button_pair_assignment(assignments, IPT_UI_ZOOM_OUT, IPT_UI_ZOOM_IN, switch_ids[SWITCH_DPAD_LEFT], switch_ids[SWITCH_DPAD_RIGHT]))
+			{
+				// took D-pad left/right
+			}
+			else if (add_axis_pair_assignment(assignments, IPT_UI_ZOOM_OUT, IPT_UI_ZOOM_IN, axis_ids[AXIS_RUDDER]))
+			{
+				// took rudder
+			}
+
+			// assign something for focus previous/next
+			if (add_axis_pair_assignment(assignments, IPT_UI_FOCUS_PREV, IPT_UI_FOCUS_NEXT, axis_ids[AXIS_RUDDER]))
+			{
+				// took rudder
+			}
+			else if (add_button_pair_assignment(assignments, IPT_UI_FOCUS_PREV, IPT_UI_FOCUS_NEXT, switch_ids[SWITCH_DPAD_LEFT], switch_ids[SWITCH_DPAD_RIGHT]))
+			{
+				// took D-pad left/right
+			}
+			else if (add_axis_pair_assignment(assignments, IPT_UI_FOCUS_PREV, IPT_UI_FOCUS_NEXT, axis_ids[AXIS_THROTTLE]))
+			{
+				// took throttle
+			}
+		}
+		else
+		{
+			// previous/next group
+			if (consume_button_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, switch_ids[SWITCH_HAT_UP], switch_ids[SWITCH_HAT_DOWN]))
+			{
+				// took hat up/down
+			}
+			else if (consume_button_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, switch_ids[SWITCH_DPAD_UP], switch_ids[SWITCH_DPAD_DOWN]))
+			{
+				// took D-pad up/down
+			}
+			else if (consume_button_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, switch_ids[SWITCH_HAT_LEFT], switch_ids[SWITCH_HAT_RIGHT]))
+			{
+				// took hat left/right
+			}
+			else if (consume_button_pair(assignments, IPT_UI_PREV_GROUP, IPT_UI_NEXT_GROUP, switch_ids[SWITCH_DPAD_LEFT], switch_ids[SWITCH_DPAD_RIGHT]))
+			{
+				// took D-pad left/right
+			}
+
+			// try to choose something for focus previous/next
+			if (add_button_pair_assignment(assignments, IPT_UI_FOCUS_PREV, IPT_UI_FOCUS_NEXT, switch_ids[SWITCH_HAT_LEFT], switch_ids[SWITCH_HAT_RIGHT]))
+			{
+				// took hat left/right - use it for zoom as well
+				consume_button_pair(assignments, IPT_UI_ZOOM_OUT, IPT_UI_ZOOM_IN, switch_ids[SWITCH_HAT_LEFT], switch_ids[SWITCH_HAT_RIGHT]);
+			}
+			else if (add_button_pair_assignment(assignments, IPT_UI_FOCUS_PREV, IPT_UI_FOCUS_NEXT, switch_ids[SWITCH_DPAD_LEFT], switch_ids[SWITCH_DPAD_RIGHT]))
+			{
+				// took D-pad left/right - use it for zoom as well
+				consume_button_pair(assignments, IPT_UI_ZOOM_OUT, IPT_UI_ZOOM_IN, switch_ids[SWITCH_DPAD_LEFT], switch_ids[SWITCH_DPAD_RIGHT]);
+			}
+			else if (add_button_pair_assignment(assignments, IPT_UI_FOCUS_PREV, IPT_UI_FOCUS_NEXT, switch_ids[SWITCH_DPAD_UP], switch_ids[SWITCH_DPAD_DOWN]))
+			{
+				// took D-pad left/right - use it for zoom as well
+				consume_button_pair(assignments, IPT_UI_ZOOM_OUT, IPT_UI_ZOOM_IN, switch_ids[SWITCH_DPAD_UP], switch_ids[SWITCH_DPAD_DOWN]);
+			}
+
+			// use D-pad for page up/down and home/end if it's still available
+			if (consume_button_pair(assignments, IPT_UI_PAGE_UP, IPT_UI_PAGE_DOWN, switch_ids[SWITCH_DPAD_UP], switch_ids[SWITCH_DPAD_DOWN]))
+			{
+				// took D-pad up/down
+			}
+			else if (consume_button_pair(assignments, IPT_UI_PAGE_UP, IPT_UI_PAGE_DOWN, switch_ids[SWITCH_DPAD_LEFT], switch_ids[SWITCH_DPAD_RIGHT]))
+			{
+				// took D-pad left/right
+			}
+			consume_button_pair(assignments, IPT_UI_HOME, IPT_UI_END, switch_ids[SWITCH_DPAD_LEFT], switch_ids[SWITCH_DPAD_RIGHT]);
+		}
+	}
+
+	// assign UI select/back/clear/help
+	assign_ui_actions(
+			assignments,
+			SWITCH_B,
+			SWITCH_X,
+			SWITCH_Y,
+			SWITCH_START,
+			SWITCH_BACK,
+			switch_ids,
+			numbered_buttons,
+			button_count);
+
+	// set default assignments
+	device.set_default_assignments(std::move(assignments));
 }
 
 
@@ -890,18 +1710,16 @@ class xinput_guitar_device : public xinput_device_base
 {
 public:
 	xinput_guitar_device(
-			running_machine &machine,
 			std::string &&name,
 			std::string &&id,
 			input_module &module,
 			u32 player,
 			XINPUT_CAPABILITIES const &caps,
-			std::shared_ptr<xinput_api_helper> const &helper);
+			xinput_api_helper const &helper);
 
-	virtual void poll() override;
+	virtual void poll(bool relative_reset) override;
 	virtual void reset() override;
-
-	virtual void configure() override;
+	virtual void configure(input_device &device) override;
 
 private:
 	static inline constexpr USHORT SWITCH_BITS[] =
@@ -965,21 +1783,20 @@ private:
 
 
 xinput_guitar_device::xinput_guitar_device(
-		running_machine &machine,
 		std::string &&name,
 		std::string &&id,
 		input_module &module,
 		u32 player,
 		XINPUT_CAPABILITIES const &caps,
-		std::shared_ptr<xinput_api_helper> const &helper) :
-	xinput_device_base(machine, std::move(name), std::move(id), module, player, caps, helper)
+		xinput_api_helper const &helper) :
+	xinput_device_base(std::move(name), std::move(id), module, player, caps, helper)
 {
 	std::fill(std::begin(m_switches), std::end(m_switches), 0);
 	std::fill(std::begin(m_axes), std::end(m_axes), 0);
 }
 
 
-void xinput_guitar_device::poll()
+void xinput_guitar_device::poll(bool relative_reset)
 {
 	// poll the device first, and skip if nothing changed
 	if (!read_state())
@@ -1012,9 +1829,14 @@ void xinput_guitar_device::reset()
 }
 
 
-void xinput_guitar_device::configure()
+void xinput_guitar_device::configure(input_device &device)
 {
 	// TODO: does subtype 0x06 indicate digital neck orientation sensor or lack of three-axis accelerometer?
+
+	// track item IDs for setting up default assignments
+	input_device::assignment_vector assignments;
+	input_item_id switch_ids[SWITCH_TOTAL];
+	std::fill(std::begin(switch_ids), std::end(switch_ids), ITEM_ID_INVALID);
 
 	// add axes
 	std::tuple<input_item_id, char const *, bool> const axis_caps[]{
@@ -1025,16 +1847,22 @@ void xinput_guitar_device::configure()
 			{ ITEM_ID_XAXIS,   "Bridge Orientation", has_trigger_left() && has_trigger_right() },
 			{ ITEM_ID_ZAXIS,   "Body Orientation",   has_trigger_right() },
 			{ ITEM_ID_SLIDER2, "Pickup Selector",    has_trigger_left() && !has_trigger_right() } };
-	for (unsigned i = 0; (AXIS_PICKUP - AXIS_SLIDER) >= i; ++i)
+	input_item_id axis_ids[AXIS_TOTAL];
+	for (unsigned i = 0; AXIS_TOTAL > i; ++i)
 	{
 		auto const [item, name, supported] = axis_caps[i];
 		if (supported)
 		{
-			device()->add_item(
+			axis_ids[i] = device.add_item(
 					name,
+					std::string_view(),
 					item,
 					generic_axis_get_state<s32>,
-					&m_axes[AXIS_SLIDER + i]);
+					&m_axes[i]);
+		}
+		else
+		{
+			axis_ids[i] = ITEM_ID_INVALID;
 		}
 	}
 
@@ -1043,8 +1871,9 @@ void xinput_guitar_device::configure()
 	{
 		if (has_button(SWITCH_BITS[SWITCH_DPAD_UP + i]))
 		{
-			device()->add_item(
+			switch_ids[SWITCH_DPAD_UP + i] = device.add_item(
 					HAT_NAMES_GUITAR[i],
+					std::string_view(),
 					input_item_id(ITEM_ID_HAT1UP + i), // matches up/down/left/right order
 					generic_button_get_state<u8>,
 					&m_switches[SWITCH_DPAD_UP + i]);
@@ -1053,35 +1882,107 @@ void xinput_guitar_device::configure()
 
 	// add buttons
 	input_item_id button_id = ITEM_ID_BUTTON1;
+	unsigned button_count = 0;
+	unsigned numbered_buttons[SWITCH_FRET5 - SWITCH_FRET1 + 1];
 	for (unsigned i = 0; (SWITCH_RSB - SWITCH_FRET1) >= i; ++i)
 	{
 		if (has_button(SWITCH_BITS[i]))
 		{
-			device()->add_item(
+			switch_ids[SWITCH_FRET1 + i] = device.add_item(
 					BUTTON_NAMES_GUITAR[i],
+					std::string_view(),
 					button_id++,
 					generic_button_get_state<u8>,
 					&m_switches[SWITCH_FRET1 + i]);
+
+			// use fret buttons for automatically numbered buttons and pedals
+			if ((SWITCH_FRET5 - SWITCH_FRET1) >= i)
+			{
+				numbered_buttons[button_count] = SWITCH_FRET1 + i;
+				input_seq const seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, switch_ids[SWITCH_FRET1 + i]));
+				assignments.emplace_back(ioport_type(IPT_BUTTON1 + button_count), SEQ_TYPE_STANDARD, seq);
+				if (((ITEM_ID_INVALID != axis_ids[AXIS_WHAMMY]) ? 2 : 3) > button_count)
+				{
+					ioport_type const first_pedal = (ITEM_ID_INVALID != axis_ids[AXIS_WHAMMY])
+							? IPT_PEDAL2
+							: IPT_PEDAL;
+					assignments.emplace_back(
+							ioport_type(first_pedal + button_count),
+							SEQ_TYPE_INCREMENT,
+							seq);
+				}
+				++button_count;
+			}
 		}
 	}
 
 	// add start/back
 	if (has_button(XINPUT_GAMEPAD_START))
 	{
-		device()->add_item(
+		switch_ids[SWITCH_START] = device.add_item(
 				"Start",
+				std::string_view(),
 				ITEM_ID_START,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_START]);
+		add_button_assignment(assignments, IPT_START, { switch_ids[SWITCH_START] });
 	}
 	if (has_button(XINPUT_GAMEPAD_BACK))
 	{
-		device()->add_item(
+		switch_ids[SWITCH_BACK] = device.add_item(
 				"Back",
+				std::string_view(),
 				ITEM_ID_SELECT,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_BACK]);
+		add_button_assignment(assignments, IPT_SELECT, { switch_ids[SWITCH_BACK] });
 	}
+
+	// use the D-pad for directional controls - accelerometers are an annoyance
+	add_directional_assignments(
+			assignments,
+			ITEM_ID_INVALID,
+			ITEM_ID_INVALID,
+			switch_ids[SWITCH_DPAD_LEFT],
+			switch_ids[SWITCH_DPAD_RIGHT],
+			switch_ids[SWITCH_DPAD_UP],
+			switch_ids[SWITCH_DPAD_DOWN]);
+
+	// use the whammy bar for the first pedal and focus next if present
+	if (ITEM_ID_INVALID != axis_ids[AXIS_WHAMMY])
+	{
+		assignments.emplace_back(
+				IPT_PEDAL,
+				SEQ_TYPE_STANDARD,
+				input_seq(make_code(ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NEG, axis_ids[AXIS_WHAMMY])));
+		assignments.emplace_back(
+				IPT_UI_FOCUS_NEXT,
+				SEQ_TYPE_STANDARD,
+				input_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, axis_ids[AXIS_WHAMMY])));
+	}
+
+	// use the neck slider for a couple of things if it's present
+	if (ITEM_ID_INVALID != axis_ids[AXIS_SLIDER])
+	{
+		input_seq const seq(make_code(ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, axis_ids[AXIS_SLIDER]));
+		assignments.emplace_back(IPT_PADDLE,     SEQ_TYPE_STANDARD, seq);
+		assignments.emplace_back(IPT_AD_STICK_X, SEQ_TYPE_STANDARD, seq);
+	}
+
+	// assign UI select/back/clear/help
+	assign_ui_actions(
+			assignments,
+			SWITCH_FRET2,
+			SWITCH_FRET3,
+			SWITCH_FRET4,
+			SWITCH_START,
+			SWITCH_BACK,
+			switch_ids,
+			numbered_buttons,
+			button_count);
+
+	// set default assignments
+	device.set_default_assignments(std::move(assignments));
 }
 
 
@@ -1094,18 +1995,16 @@ class xinput_drumkit_device : public xinput_device_base
 {
 public:
 	xinput_drumkit_device(
-			running_machine &machine,
 			std::string &&name,
 			std::string &&id,
 			input_module &module,
 			u32 player,
 			XINPUT_CAPABILITIES const &caps,
-			std::shared_ptr<xinput_api_helper> const &helper);
+			xinput_api_helper const &helper);
 
-	virtual void poll() override;
+	virtual void poll(bool relative_reset) override;
 	virtual void reset() override;
-
-	virtual void configure() override;
+	virtual void configure(input_device &device) override;
 
 private:
 	static inline constexpr USHORT SWITCH_BITS[] =
@@ -1166,21 +2065,20 @@ private:
 
 
 xinput_drumkit_device::xinput_drumkit_device(
-		running_machine &machine,
 		std::string &&name,
 		std::string &&id,
 		input_module &module,
 		u32 player,
 		XINPUT_CAPABILITIES const &caps,
-		std::shared_ptr<xinput_api_helper> const &helper) :
-	xinput_device_base(machine, std::move(name), std::move(id), module, player, caps, helper)
+		xinput_api_helper const &helper) :
+	xinput_device_base(std::move(name), std::move(id), module, player, caps, helper)
 {
 	std::fill(std::begin(m_switches), std::end(m_switches), 0);
 	std::fill(std::begin(m_axes), std::end(m_axes), 0);
 }
 
 
-void xinput_drumkit_device::poll()
+void xinput_drumkit_device::poll(bool relative_reset)
 {
 	// poll the device first, and skip if nothing changed
 	if (!read_state())
@@ -1208,8 +2106,13 @@ void xinput_drumkit_device::reset()
 }
 
 
-void xinput_drumkit_device::configure()
+void xinput_drumkit_device::configure(input_device &device)
 {
+	// track item IDs for setting up default assignments
+	input_device::assignment_vector assignments;
+	input_item_id switch_ids[SWITCH_TOTAL];
+	std::fill(std::begin(switch_ids), std::end(switch_ids), ITEM_ID_INVALID);
+
 	// add axes
 	std::tuple<input_item_id, char const *, bool> const axis_caps[]{
 			{ ITEM_ID_XAXIS,  "Green Velocity",     has_thumb_left_y() },
@@ -1223,8 +2126,9 @@ void xinput_drumkit_device::configure()
 		auto const [item, name, supported] = axis_caps[i];
 		if (supported)
 		{
-			device()->add_item(
+			device.add_item(
 					name,
+					std::string_view(),
 					item,
 					generic_axis_get_state<s32>,
 					&m_axes[AXIS_GREEN + i]);
@@ -1236,8 +2140,9 @@ void xinput_drumkit_device::configure()
 	{
 		if (has_button(SWITCH_BITS[SWITCH_DPAD_UP + i]))
 		{
-			device()->add_item(
+			switch_ids[SWITCH_DPAD_UP + i] = device.add_item(
 					HAT_NAMES_GAMEPAD[i],
+					std::string_view(),
 					input_item_id(ITEM_ID_HAT1UP + i), // matches up/down/left/right order
 					generic_button_get_state<u8>,
 					&m_switches[SWITCH_DPAD_UP + i]);
@@ -1245,36 +2150,95 @@ void xinput_drumkit_device::configure()
 	}
 
 	// add buttons
-	input_item_id button_id = ITEM_ID_BUTTON1;
+	unsigned button_count = 0;
+	unsigned numbered_buttons[SWITCH_RSB - SWITCH_GREEN + 1];
 	for (unsigned i = 0; (SWITCH_RSB - SWITCH_GREEN) >= i; ++i)
 	{
 		if (has_button(SWITCH_BITS[i]))
 		{
-			device()->add_item(
+			switch_ids[SWITCH_GREEN + i] = device.add_item(
 					BUTTON_NAMES_DRUMKIT[i],
-					button_id++,
+					std::string_view(),
+					input_item_id(ITEM_ID_BUTTON1 + button_count),
 					generic_button_get_state<u8>,
 					&m_switches[SWITCH_GREEN + i]);
+			numbered_buttons[button_count] = SWITCH_GREEN + i;
+
+			// use these for automatically numbered buttons and pedals
+			input_seq const seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, switch_ids[SWITCH_GREEN + i]));
+			assignments.emplace_back(ioport_type(IPT_BUTTON1 + button_count), SEQ_TYPE_STANDARD, seq);
+			if (3 > button_count)
+				assignments.emplace_back(ioport_type(IPT_PEDAL + button_count), SEQ_TYPE_INCREMENT, seq);
+			++button_count;
 		}
 	}
 
 	// add start/back
 	if (has_button(XINPUT_GAMEPAD_START))
 	{
-		device()->add_item(
+		switch_ids[SWITCH_START] = device.add_item(
 				"Start",
+				std::string_view(),
 				ITEM_ID_START,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_START]);
+		add_button_assignment(assignments, IPT_START, { switch_ids[SWITCH_START] });
 	}
 	if (has_button(XINPUT_GAMEPAD_BACK))
 	{
-		device()->add_item(
+		switch_ids[SWITCH_BACK] = device.add_item(
 				"Back",
+				std::string_view(),
 				ITEM_ID_SELECT,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_BACK]);
+		add_button_assignment(assignments, IPT_SELECT, { switch_ids[SWITCH_BACK] });
 	}
+
+	// use the D-pad for directional controls
+	add_directional_assignments(
+			assignments,
+			ITEM_ID_INVALID,
+			ITEM_ID_INVALID,
+			switch_ids[SWITCH_DPAD_LEFT],
+			switch_ids[SWITCH_DPAD_RIGHT],
+			switch_ids[SWITCH_DPAD_UP],
+			switch_ids[SWITCH_DPAD_DOWN]);
+
+	// use the D-pad and A/B/X/Y diamond for twin sticks
+	add_twin_stick_assignments(
+			assignments,
+			ITEM_ID_INVALID,
+			ITEM_ID_INVALID,
+			ITEM_ID_INVALID,
+			ITEM_ID_INVALID,
+			switch_ids[SWITCH_DPAD_LEFT],
+			switch_ids[SWITCH_DPAD_RIGHT],
+			switch_ids[SWITCH_DPAD_UP],
+			switch_ids[SWITCH_DPAD_DOWN],
+			switch_ids[SWITCH_BLUE],
+			switch_ids[SWITCH_RED],
+			switch_ids[SWITCH_YELLOW],
+			switch_ids[SWITCH_GREEN]);
+
+	// assign UI select/back/clear/help
+	assign_ui_actions(
+			assignments,
+			SWITCH_RED,
+			SWITCH_BLUE,
+			SWITCH_YELLOW,
+			SWITCH_START,
+			SWITCH_BACK,
+			switch_ids,
+			numbered_buttons,
+			button_count);
+
+	// use bass drum pedal for focus next if available to make the system selection menu usable
+	if (add_button_assignment(assignments, IPT_UI_FOCUS_NEXT, { switch_ids[SWITCH_BASS_DRUM] }))
+		switch_ids[SWITCH_BASS_DRUM] = ITEM_ID_INVALID;
+
+	// set default assignments
+	device.set_default_assignments(std::move(assignments));
 }
 
 
@@ -1287,18 +2251,16 @@ class xinput_turntable_device : public xinput_device_base
 {
 public:
 	xinput_turntable_device(
-			running_machine &machine,
 			std::string &&name,
 			std::string &&id,
 			input_module &module,
 			u32 player,
 			XINPUT_CAPABILITIES const &caps,
-			std::shared_ptr<xinput_api_helper> const &helper);
+			xinput_api_helper const &helper);
 
-	virtual void poll() override;
+	virtual void poll(bool relative_reset) override;
 	virtual void reset() override;
-
-	virtual void configure() override;
+	virtual void configure(input_device &device) override;
 
 private:
 	static inline constexpr USHORT SWITCH_BITS[] =
@@ -1361,14 +2323,13 @@ private:
 
 
 xinput_turntable_device::xinput_turntable_device(
-		running_machine &machine,
 		std::string &&name,
 		std::string &&id,
 		input_module &module,
 		u32 player,
 		XINPUT_CAPABILITIES const &caps,
-		std::shared_ptr<xinput_api_helper> const &helper) :
-	xinput_device_base(machine, std::move(name), std::move(id), module, player, caps, helper),
+		xinput_api_helper const &helper) :
+	xinput_device_base(std::move(name), std::move(id), module, player, caps, helper),
 	m_prev_effect(0)
 {
 	std::fill(std::begin(m_switches), std::end(m_switches), 0);
@@ -1376,7 +2337,7 @@ xinput_turntable_device::xinput_turntable_device(
 }
 
 
-void xinput_turntable_device::poll()
+void xinput_turntable_device::poll(bool relative_reset)
 {
 	// poll the device first
 	bool const was_reset = is_reset();
@@ -1391,26 +2352,26 @@ void xinput_turntable_device::poll()
 			m_switches[SWITCH_GREEN + i] = BIT(trigger_right(), i) ? 0xff : 0x00;
 
 		// translate axes
-		m_axes[AXIS_TURNTABLE] = s32(thumb_left_y()) * INPUT_RELATIVE_PER_PIXEL * 2;
+		m_axes[AXIS_TURNTABLE] = s32(thumb_left_y()) * input_device::RELATIVE_PER_PIXEL * 2;
 		m_axes[AXIS_CROSSFADE] = normalize_absolute_axis(thumb_right_y(), XINPUT_AXIS_MINVALUE, XINPUT_AXIS_MAXVALUE);
+	}
 
-		// convert effect dial value to relative displacement
-		s32 effect_delta = s32(u32(u16(thumb_right_x()))) - s32(u32(m_prev_effect));
-		if (!was_reset)
-		{
-			if (0x8000 < effect_delta)
-				effect_delta -= 0x1'0000;
-			else if (-0x8000 > effect_delta)
-				effect_delta += 0x1'0000;
-			m_axes[AXIS_EFFECT] = effect_delta * INPUT_RELATIVE_PER_PIXEL / 128;
-		}
+	// handle effect dial
+	if (was_reset)
+	{
+		// just grab the current count after regaining focus
 		m_prev_effect = u16(thumb_right_x());
 	}
-	else
+	else if (relative_reset)
 	{
-		// we know nothing changed so we can skip most of the logic
+		// convert value to relative displacement
+		s32 effect_delta = s32(u32(u16(thumb_right_x()))) - s32(u32(m_prev_effect));
 		m_prev_effect = u16(thumb_right_x());
-		m_axes[AXIS_EFFECT] = 0;
+		if (0x8000 < effect_delta)
+			effect_delta -= 0x1'0000;
+		else if (-0x8000 > effect_delta)
+			effect_delta += 0x1'0000;
+		m_axes[AXIS_EFFECT] = effect_delta * input_device::RELATIVE_PER_PIXEL / 128;
 	}
 }
 
@@ -1423,21 +2384,29 @@ void xinput_turntable_device::reset()
 }
 
 
-void xinput_turntable_device::configure()
+void xinput_turntable_device::configure(input_device &device)
 {
+	// track item IDs for setting up default assignments
+	input_device::assignment_vector assignments;
+	input_item_id switch_ids[SWITCH_TOTAL];
+	std::fill(std::begin(switch_ids), std::end(switch_ids), ITEM_ID_INVALID);
+
 	// add axes
-	device()->add_item(
+	input_item_id const turntable_id = device.add_item(
 			"Turntable",
+			std::string_view(),
 			ITEM_ID_ADD_RELATIVE1,
 			generic_axis_get_state<s32>,
 			&m_axes[AXIS_TURNTABLE]);
-	device()->add_item(
+	input_item_id const effect_id = device.add_item(
 			"Effect",
+			std::string_view(),
 			ITEM_ID_ADD_RELATIVE2,
 			generic_axis_get_state<s32>,
 			&m_axes[AXIS_EFFECT]);
-	device()->add_item(
+	input_item_id const crossfade_id = device.add_item(
 			"Crossfade",
+			std::string_view(),
 			ITEM_ID_XAXIS,
 			generic_axis_get_state<s32>,
 			&m_axes[AXIS_CROSSFADE]);
@@ -1447,8 +2416,9 @@ void xinput_turntable_device::configure()
 	{
 		if (has_button(SWITCH_BITS[SWITCH_DPAD_UP + i]))
 		{
-			device()->add_item(
+			switch_ids[SWITCH_DPAD_UP + i] = device.add_item(
 					HAT_NAMES_GAMEPAD[i],
+					std::string_view(),
 					input_item_id(ITEM_ID_HAT1UP + i), // matches up/down/left/right order
 					generic_button_get_state<u8>,
 					&m_switches[SWITCH_DPAD_UP + i]);
@@ -1457,29 +2427,45 @@ void xinput_turntable_device::configure()
 
 	// add buttons
 	input_item_id button_id = ITEM_ID_BUTTON1;
+	unsigned button_count = 0;
+	unsigned numbered_buttons[SWITCH_RSB - SWITCH_A + 1];
 	for (unsigned i = 0; (SWITCH_RSB - SWITCH_A) >= i; ++i)
 	{
 		if (has_button(SWITCH_BITS[i]))
 		{
-			device()->add_item(
+			switch_ids[SWITCH_A + i] = device.add_item(
 					BUTTON_NAMES_KEYBOARD[i],
+					std::string_view(),
 					button_id++,
 					generic_button_get_state<u8>,
 					&m_switches[SWITCH_A + i]);
+			numbered_buttons[button_count] = SWITCH_A + i;
+
+			// use these for automatically numbered buttons and pedals
+			input_seq const seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, switch_ids[SWITCH_A + i]));
+			assignments.emplace_back(ioport_type(IPT_BUTTON1 + button_count), SEQ_TYPE_STANDARD, seq);
+			if (3 > button_count)
+				assignments.emplace_back(ioport_type(IPT_PEDAL + button_count), SEQ_TYPE_INCREMENT, seq);
+			++button_count;
 		}
 	}
-	device()->add_item(
+
+	// turntable buttons activate these as well as A/B/X
+	switch_ids[SWITCH_GREEN] = device.add_item(
 			"Green",
+			std::string_view(),
 			button_id++,
 			generic_button_get_state<u8>,
 			&m_switches[SWITCH_GREEN]);
-	device()->add_item(
+	switch_ids[SWITCH_RED] = device.add_item(
 			"Red",
+			std::string_view(),
 			button_id++,
 			generic_button_get_state<u8>,
 			&m_switches[SWITCH_RED]);
-	device()->add_item(
+	switch_ids[SWITCH_BLUE] = device.add_item(
 			"Blue",
+			std::string_view(),
 			button_id++,
 			generic_button_get_state<u8>,
 			&m_switches[SWITCH_BLUE]);
@@ -1487,20 +2473,197 @@ void xinput_turntable_device::configure()
 	// add start/back
 	if (has_button(XINPUT_GAMEPAD_START))
 	{
-		device()->add_item(
+		switch_ids[SWITCH_START] = device.add_item(
 				"Start",
+				std::string_view(),
 				ITEM_ID_START,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_START]);
+		add_button_assignment(assignments, IPT_START, { switch_ids[SWITCH_START] });
 	}
 	if (has_button(XINPUT_GAMEPAD_BACK))
 	{
-		device()->add_item(
+		switch_ids[SWITCH_BACK] = device.add_item(
 				"Back",
+				std::string_view(),
 				ITEM_ID_SELECT,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_BACK]);
+		add_button_assignment(assignments, IPT_SELECT, { switch_ids[SWITCH_BACK] });
 	}
+
+	// use D-pad and A/B/X/Y diamond for twin sticks
+	add_twin_stick_assignments(
+			assignments,
+			ITEM_ID_INVALID,
+			ITEM_ID_INVALID,
+			ITEM_ID_INVALID,
+			ITEM_ID_INVALID,
+			switch_ids[SWITCH_DPAD_LEFT],
+			switch_ids[SWITCH_DPAD_RIGHT],
+			switch_ids[SWITCH_DPAD_UP],
+			switch_ids[SWITCH_DPAD_DOWN],
+			switch_ids[SWITCH_X],
+			switch_ids[SWITCH_B],
+			switch_ids[SWITCH_Y],
+			switch_ids[SWITCH_A]);
+
+	// for most analog player controls, use turntable for X and effect for Y
+	input_seq const turntable_seq(make_code(ITEM_CLASS_RELATIVE, ITEM_MODIFIER_NONE, turntable_id));
+	input_seq const effect_seq(make_code(ITEM_CLASS_RELATIVE, ITEM_MODIFIER_NONE, effect_id));
+	input_seq const crossfade_seq(make_code(ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, crossfade_id));
+	input_seq joystick_left_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, turntable_id));
+	input_seq joystick_right_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, turntable_id));
+	input_seq joystick_up_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, effect_id));
+	input_seq joystick_down_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, effect_id));
+	assignments.emplace_back(IPT_PADDLE,       SEQ_TYPE_STANDARD, turntable_seq);
+	assignments.emplace_back(IPT_PADDLE_V,     SEQ_TYPE_STANDARD, effect_seq);
+	assignments.emplace_back(IPT_POSITIONAL,   SEQ_TYPE_STANDARD, crossfade_seq);
+	assignments.emplace_back(IPT_POSITIONAL_V, SEQ_TYPE_STANDARD, effect_seq);
+	assignments.emplace_back(IPT_DIAL,         SEQ_TYPE_STANDARD, turntable_seq);
+	assignments.emplace_back(IPT_DIAL_V,       SEQ_TYPE_STANDARD, effect_seq);
+	assignments.emplace_back(IPT_TRACKBALL_X,  SEQ_TYPE_STANDARD, turntable_seq);
+	assignments.emplace_back(IPT_TRACKBALL_Y,  SEQ_TYPE_STANDARD, effect_seq);
+	assignments.emplace_back(IPT_AD_STICK_X,   SEQ_TYPE_STANDARD, turntable_seq);
+	assignments.emplace_back(IPT_AD_STICK_Y,   SEQ_TYPE_STANDARD, effect_seq);
+	assignments.emplace_back(IPT_AD_STICK_Z,   SEQ_TYPE_STANDARD, crossfade_seq);
+	assignments.emplace_back(IPT_LIGHTGUN_X,   SEQ_TYPE_STANDARD, turntable_seq);
+	assignments.emplace_back(IPT_LIGHTGUN_Y,   SEQ_TYPE_STANDARD, effect_seq);
+	assignments.emplace_back(IPT_MOUSE_X,      SEQ_TYPE_STANDARD, turntable_seq);
+	assignments.emplace_back(IPT_MOUSE_Y,      SEQ_TYPE_STANDARD, effect_seq);
+
+	// use D-pad for analog controls as well if present
+	bool const have_dpad_left = ITEM_ID_INVALID != switch_ids[SWITCH_DPAD_LEFT];
+	bool const have_dpad_right = ITEM_ID_INVALID != switch_ids[SWITCH_DPAD_RIGHT];
+	bool const have_dpad_up = ITEM_ID_INVALID != switch_ids[SWITCH_DPAD_UP];
+	bool const have_dpad_down = ITEM_ID_INVALID != switch_ids[SWITCH_DPAD_DOWN];
+	if (have_dpad_left)
+	{
+		input_code const code(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, switch_ids[SWITCH_DPAD_LEFT]));
+		input_seq const left_seq(code);
+		joystick_left_seq += input_seq::or_code;
+		joystick_left_seq += code;
+		assignments.emplace_back(IPT_PADDLE,      SEQ_TYPE_DECREMENT, left_seq);
+		assignments.emplace_back(IPT_POSITIONAL,  SEQ_TYPE_DECREMENT, left_seq);
+		assignments.emplace_back(IPT_DIAL,        SEQ_TYPE_DECREMENT, left_seq);
+		assignments.emplace_back(IPT_TRACKBALL_X, SEQ_TYPE_DECREMENT, left_seq);
+		assignments.emplace_back(IPT_AD_STICK_X,  SEQ_TYPE_DECREMENT, left_seq);
+		assignments.emplace_back(IPT_LIGHTGUN_X,  SEQ_TYPE_DECREMENT, left_seq);
+	}
+	if (have_dpad_right)
+	{
+		input_code const code(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, switch_ids[SWITCH_DPAD_RIGHT]));
+		input_seq const right_seq(code);
+		joystick_right_seq += input_seq::or_code;
+		joystick_right_seq += code;
+		assignments.emplace_back(IPT_PADDLE,      SEQ_TYPE_INCREMENT, right_seq);
+		assignments.emplace_back(IPT_POSITIONAL,  SEQ_TYPE_INCREMENT, right_seq);
+		assignments.emplace_back(IPT_DIAL,        SEQ_TYPE_INCREMENT, right_seq);
+		assignments.emplace_back(IPT_TRACKBALL_X, SEQ_TYPE_INCREMENT, right_seq);
+		assignments.emplace_back(IPT_AD_STICK_X,  SEQ_TYPE_INCREMENT, right_seq);
+		assignments.emplace_back(IPT_LIGHTGUN_X,  SEQ_TYPE_INCREMENT, right_seq);
+	}
+	if (have_dpad_up)
+	{
+		input_code const code(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, switch_ids[SWITCH_DPAD_UP]));
+		input_seq const up_seq(code);
+		joystick_up_seq += input_seq::or_code;
+		joystick_up_seq += code;
+		assignments.emplace_back(IPT_PADDLE_V,     SEQ_TYPE_DECREMENT, up_seq);
+		assignments.emplace_back(IPT_POSITIONAL_V, SEQ_TYPE_DECREMENT, up_seq);
+		assignments.emplace_back(IPT_DIAL_V,       SEQ_TYPE_DECREMENT, up_seq);
+		assignments.emplace_back(IPT_TRACKBALL_Y,  SEQ_TYPE_DECREMENT, up_seq);
+		assignments.emplace_back(IPT_AD_STICK_Y,   SEQ_TYPE_DECREMENT, up_seq);
+		assignments.emplace_back(IPT_LIGHTGUN_Y,   SEQ_TYPE_DECREMENT, up_seq);
+	}
+	if (have_dpad_down)
+	{
+		input_code const code(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, switch_ids[SWITCH_DPAD_DOWN]));
+		input_seq const down_seq(code);
+		joystick_down_seq += input_seq::or_code;
+		joystick_down_seq += code;
+		assignments.emplace_back(IPT_PADDLE_V,     SEQ_TYPE_INCREMENT, down_seq);
+		assignments.emplace_back(IPT_POSITIONAL_V, SEQ_TYPE_INCREMENT, down_seq);
+		assignments.emplace_back(IPT_DIAL_V,       SEQ_TYPE_INCREMENT, down_seq);
+		assignments.emplace_back(IPT_TRACKBALL_Y,  SEQ_TYPE_INCREMENT, down_seq);
+		assignments.emplace_back(IPT_AD_STICK_Y,   SEQ_TYPE_INCREMENT, down_seq);
+		assignments.emplace_back(IPT_LIGHTGUN_Y,   SEQ_TYPE_INCREMENT, down_seq);
+	}
+	assignments.emplace_back(IPT_JOYSTICK_LEFT,  SEQ_TYPE_STANDARD, joystick_left_seq);
+	assignments.emplace_back(IPT_JOYSTICK_RIGHT, SEQ_TYPE_STANDARD, joystick_right_seq);
+	assignments.emplace_back(IPT_JOYSTICK_UP,    SEQ_TYPE_STANDARD, joystick_up_seq);
+	assignments.emplace_back(IPT_JOYSTICK_DOWN,  SEQ_TYPE_STANDARD, joystick_down_seq);
+
+	// choose navigation controls
+	input_seq ui_up_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, turntable_id));
+	input_seq ui_down_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, turntable_id));
+	input_seq ui_left_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, effect_id));
+	input_seq ui_right_seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, effect_id));
+	if ((have_dpad_up && have_dpad_down) || !have_dpad_left || !have_dpad_right)
+	{
+		if (have_dpad_up)
+		{
+			ui_up_seq += input_seq::or_code;
+			ui_up_seq += make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, switch_ids[SWITCH_DPAD_UP]);
+		}
+		if (have_dpad_down)
+		{
+			ui_down_seq += input_seq::or_code;
+			ui_down_seq += make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, switch_ids[SWITCH_DPAD_DOWN]);
+		}
+		if (have_dpad_left)
+		{
+			ui_left_seq += input_seq::or_code;
+			ui_left_seq += make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, switch_ids[SWITCH_DPAD_LEFT]);
+		}
+		if (have_dpad_right)
+		{
+			ui_right_seq += input_seq::or_code;
+			ui_right_seq += make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, switch_ids[SWITCH_DPAD_RIGHT]);
+		}
+	}
+	else
+	{
+		if (have_dpad_left)
+		{
+			ui_up_seq += input_seq::or_code;
+			ui_up_seq += make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, switch_ids[SWITCH_DPAD_LEFT]);
+		}
+		if (have_dpad_right)
+		{
+			ui_down_seq += input_seq::or_code;
+			ui_down_seq += make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, switch_ids[SWITCH_DPAD_RIGHT]);
+		}
+		if (have_dpad_up)
+		{
+			ui_left_seq += input_seq::or_code;
+			ui_left_seq += make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, switch_ids[SWITCH_DPAD_UP]);
+		}
+		if (have_dpad_down)
+		{
+			ui_right_seq += input_seq::or_code;
+			ui_right_seq += make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, switch_ids[SWITCH_DPAD_DOWN]);
+		}
+	}
+	assignments.emplace_back(IPT_UI_UP,    SEQ_TYPE_STANDARD, ui_up_seq);
+	assignments.emplace_back(IPT_UI_DOWN,  SEQ_TYPE_STANDARD, ui_down_seq);
+	assignments.emplace_back(IPT_UI_LEFT,  SEQ_TYPE_STANDARD, ui_left_seq);
+	assignments.emplace_back(IPT_UI_RIGHT, SEQ_TYPE_STANDARD, ui_right_seq);
+
+	// assign UI select/back/clear/help
+	assign_ui_actions(
+			assignments,
+			SWITCH_B,
+			SWITCH_X,
+			SWITCH_Y,
+			SWITCH_START,
+			SWITCH_BACK,
+			switch_ids,
+			numbered_buttons,
+			std::min<unsigned>(button_count, 4));
+
+	// set default assignments
+	device.set_default_assignments(std::move(assignments));
 }
 
 
@@ -1513,18 +2676,16 @@ class xinput_keyboard_device : public xinput_device_base
 {
 public:
 	xinput_keyboard_device(
-			running_machine &machine,
 			std::string &&name,
 			std::string &&id,
 			input_module &module,
 			u32 player,
 			XINPUT_CAPABILITIES const &caps,
-			std::shared_ptr<xinput_api_helper> const &helper);
+			xinput_api_helper const &helper);
 
-	virtual void poll() override;
+	virtual void poll(bool relative_reset) override;
 	virtual void reset() override;
-
-	virtual void configure() override;
+	virtual void configure(input_device &device) override;
 
 private:
 	static inline constexpr USHORT SWITCH_BITS[] =
@@ -1584,21 +2745,20 @@ private:
 
 
 xinput_keyboard_device::xinput_keyboard_device(
-		running_machine &machine,
 		std::string &&name,
 		std::string &&id,
 		input_module &module,
 		u32 player,
 		XINPUT_CAPABILITIES const &caps,
-		std::shared_ptr<xinput_api_helper> const &helper) :
-	xinput_device_base(machine, std::move(name), std::move(id), module, player, caps, helper)
+		xinput_api_helper const &helper) :
+	xinput_device_base(std::move(name), std::move(id), module, player, caps, helper)
 {
 	std::fill(std::begin(m_switches), std::end(m_switches), 0);
 	std::fill(std::begin(m_axes), std::end(m_axes), 0);
 }
 
 
-void xinput_keyboard_device::poll()
+void xinput_keyboard_device::poll(bool relative_reset)
 {
 	// TODO: how many bits are really velocity?
 	// TODO: how are touch strip and overdrive read?
@@ -1634,27 +2794,39 @@ void xinput_keyboard_device::reset()
 }
 
 
-void xinput_keyboard_device::configure()
+void xinput_keyboard_device::configure(input_device &device)
 {
+	// track item IDs for setting up default assignments
+	input_device::assignment_vector assignments;
+	input_item_id switch_ids[SWITCH_TOTAL];
+	std::fill(std::begin(switch_ids), std::end(switch_ids), ITEM_ID_INVALID);
+
 	// add axes
-	device()->add_item(
+	device.add_item(
 			"Velocity",
+			std::string_view(),
 			ITEM_ID_SLIDER1,
 			generic_axis_get_state<s32>,
 			&m_axes[AXIS_VELOCITY]);
-	device()->add_item(
+	input_item_id const pedal_id = device.add_item(
 			"Pedal",
+			std::string_view(),
 			ITEM_ID_SLIDER2,
 			generic_axis_get_state<s32>,
 			&m_axes[AXIS_PEDAL]);
+	assignments.emplace_back(
+			IPT_PEDAL,
+			SEQ_TYPE_STANDARD,
+			input_seq(make_code(ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NEG, pedal_id)));
 
 	// add hats
 	for (unsigned i = 0; (SWITCH_DPAD_RIGHT - SWITCH_DPAD_UP) >= i; ++i)
 	{
 		if (has_button(SWITCH_BITS[SWITCH_DPAD_UP + i]))
 		{
-			device()->add_item(
+			switch_ids[SWITCH_DPAD_UP + i] = device.add_item(
 					HAT_NAMES_GAMEPAD[i],
+					std::string_view(),
 					input_item_id(ITEM_ID_HAT1UP + i), // matches up/down/left/right order
 					generic_button_get_state<u8>,
 					&m_switches[SWITCH_DPAD_UP + i]);
@@ -1663,47 +2835,137 @@ void xinput_keyboard_device::configure()
 
 	// add buttons
 	input_item_id button_id = ITEM_ID_BUTTON1;
+	unsigned button_count = 0;
+	unsigned numbered_buttons[SWITCH_RSB - SWITCH_A + 1];
 	for (unsigned i = 0; (SWITCH_RSB - SWITCH_A) >= i; ++i)
 	{
 		if (has_button(SWITCH_BITS[i]))
 		{
-			device()->add_item(
+			switch_ids[SWITCH_A + i] = device.add_item(
 					BUTTON_NAMES_KEYBOARD[i],
+					std::string_view(),
 					button_id++,
 					generic_button_get_state<u8>,
 					&m_switches[SWITCH_A + i]);
+			numbered_buttons[button_count] = SWITCH_A + i;
+
+			// use these for automatically numbered buttons and pedals
+			input_seq const seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, switch_ids[SWITCH_A + i]));
+			assignments.emplace_back(ioport_type(IPT_BUTTON1 + button_count), SEQ_TYPE_STANDARD, seq);
+			if (3 > button_count)
+				assignments.emplace_back(ioport_type(IPT_PEDAL + button_count), SEQ_TYPE_INCREMENT, seq);
+			++button_count;
 		}
 	}
 
 	// add keys
 	char const *const key_formats[]{
 			"C %d", "C# %d", "D %d", "D# %d", "E %d", "F %d", "F# %d", "G %d", "G# %d", "A %d", "A# %d", "B %d" };
+	std::pair<ioport_type, ioport_type> const key_ids[]{
+			{ IPT_MAHJONG_A,           IPT_HANAFUDA_A   },   // C
+			{ IPT_MAHJONG_SCORE,       IPT_INVALID      },   // C#
+			{ IPT_MAHJONG_B,           IPT_HANAFUDA_B   },   // D
+			{ IPT_MAHJONG_DOUBLE_UP,   IPT_INVALID      },   // D#
+			{ IPT_MAHJONG_C,           IPT_HANAFUDA_C   },   // E
+			{ IPT_MAHJONG_D,           IPT_HANAFUDA_D   },   // F
+			{ IPT_MAHJONG_BIG,         IPT_INVALID      },   // F#
+			{ IPT_MAHJONG_E,           IPT_HANAFUDA_E   },   // G
+			{ IPT_MAHJONG_SMALL,       IPT_INVALID      },   // G#
+			{ IPT_MAHJONG_F,           IPT_HANAFUDA_F   },   // A
+			{ IPT_MAHJONG_LAST_CHANCE, IPT_INVALID      },   // A#
+			{ IPT_MAHJONG_G,           IPT_HANAFUDA_G   },   // B
+			{ IPT_MAHJONG_H,           IPT_HANAFUDA_H   },   // C
+			{ IPT_MAHJONG_KAN,         IPT_INVALID      },   // C#
+			{ IPT_MAHJONG_I,           IPT_INVALID      },   // D
+			{ IPT_MAHJONG_PON,         IPT_INVALID      },   // D#
+			{ IPT_MAHJONG_J,           IPT_INVALID      },   // E
+			{ IPT_MAHJONG_K,           IPT_INVALID      },   // F
+			{ IPT_MAHJONG_CHI,         IPT_INVALID      },   // F#
+			{ IPT_MAHJONG_L,           IPT_INVALID      },   // G
+			{ IPT_MAHJONG_REACH,       IPT_INVALID      },   // G#
+			{ IPT_MAHJONG_M,           IPT_HANAFUDA_YES },   // A
+			{ IPT_MAHJONG_RON,         IPT_INVALID      },   // A#
+			{ IPT_MAHJONG_N,           IPT_HANAFUDA_NO  },   // B
+			{ IPT_MAHJONG_O,           IPT_INVALID      } }; // C
 	for (unsigned i = 0; (SWITCH_C3 - SWITCH_C1) >= i; ++i)
 	{
-		device()->add_item(
+		switch_ids[SWITCH_C1 + i] = device.add_item(
 				util::string_format(key_formats[i % 12], (i / 12) + 1),
+				std::string_view(),
 				(ITEM_ID_BUTTON32 >= button_id) ? button_id++ : ITEM_ID_OTHER_SWITCH,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_C1 + i]);
+
+		// add mahjong/hanafuda control assignments
+		input_seq const seq(make_code(ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, switch_ids[SWITCH_C1 + i]));
+		if (IPT_INVALID != key_ids[i].first)
+			assignments.emplace_back(key_ids[i].first, SEQ_TYPE_STANDARD, seq);
+		if (IPT_INVALID != key_ids[i].second)
+			assignments.emplace_back(key_ids[i].second, SEQ_TYPE_STANDARD, seq);
 	}
 
 	// add start/back
 	if (has_button(XINPUT_GAMEPAD_START))
 	{
-		device()->add_item(
+		switch_ids[SWITCH_START] = device.add_item(
 				"Start",
+				std::string_view(),
 				ITEM_ID_START,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_START]);
+		add_button_assignment(assignments, IPT_START, { switch_ids[SWITCH_START] });
 	}
 	if (has_button(XINPUT_GAMEPAD_BACK))
 	{
-		device()->add_item(
+		switch_ids[SWITCH_BACK] = device.add_item(
 				"Back",
+				std::string_view(),
 				ITEM_ID_SELECT,
 				generic_button_get_state<u8>,
 				&m_switches[SWITCH_BACK]);
+		add_button_assignment(assignments, IPT_SELECT, { switch_ids[SWITCH_BACK] });
 	}
+
+	// use the D-pad for directional controls
+	add_directional_assignments(
+			assignments,
+			ITEM_ID_INVALID,
+			ITEM_ID_INVALID,
+			switch_ids[SWITCH_DPAD_LEFT],
+			switch_ids[SWITCH_DPAD_RIGHT],
+			switch_ids[SWITCH_DPAD_UP],
+			switch_ids[SWITCH_DPAD_DOWN]);
+
+	// use the D-pad and A/B/X/Y diamond for twin sticks
+	add_twin_stick_assignments(
+			assignments,
+			ITEM_ID_INVALID,
+			ITEM_ID_INVALID,
+			ITEM_ID_INVALID,
+			ITEM_ID_INVALID,
+			switch_ids[SWITCH_DPAD_LEFT],
+			switch_ids[SWITCH_DPAD_RIGHT],
+			switch_ids[SWITCH_DPAD_UP],
+			switch_ids[SWITCH_DPAD_DOWN],
+			switch_ids[SWITCH_X],
+			switch_ids[SWITCH_B],
+			switch_ids[SWITCH_Y],
+			switch_ids[SWITCH_A]);
+
+	// assign UI select/back/clear/help
+	assign_ui_actions(
+			assignments,
+			SWITCH_B,
+			SWITCH_X,
+			SWITCH_Y,
+			SWITCH_START,
+			SWITCH_BACK,
+			switch_ids,
+			numbered_buttons,
+			button_count);
+
+	// set default assignments
+	device.set_default_assignments(std::move(assignments));
 }
 
 
@@ -1712,22 +2974,24 @@ void xinput_keyboard_device::configure()
 //  XInput joystick module
 //============================================================
 
-class xinput_joystick_module : public wininput_module
+class xinput_joystick_module : public input_module_impl<device_info, osd_common_t>
 {
 public:
-	xinput_joystick_module() : wininput_module(OSD_JOYSTICKINPUT_PROVIDER, "xinput")
+	xinput_joystick_module() : input_module_impl<device_info, osd_common_t>(OSD_JOYSTICKINPUT_PROVIDER, "xinput")
 	{
 	}
 
-	int init(const osd_options &options) override
+	virtual int init(osd_interface &osd, const osd_options &options) override
 	{
+		int status;
+
 		// Call the base
-		int status = wininput_module::init(options);
+		status = input_module_impl<device_info, osd_common_t>::init(osd, options);
 		if (status != 0)
 			return status;
 
 		// Create and initialize our helper
-		m_xinput_helper = std::make_shared<xinput_api_helper>();
+		m_xinput_helper = std::make_unique<xinput_api_helper>();
 		status = m_xinput_helper->initialize();
 		if (status != 0)
 		{
@@ -1738,22 +3002,29 @@ public:
 		return 0;
 	}
 
-protected:
 	virtual void input_init(running_machine &machine) override
 	{
+		input_module_impl<device_info, osd_common_t>::input_init(machine);
+
 		// Loop through each gamepad to determine if they are connected
 		for (UINT i = 0; i < XUSER_MAX_COUNT; i++)
 		{
-			XINPUT_STATE state{ 0 };
-
 			// allocate and link in a new device
-			if (m_xinput_helper->xinput_get_state(i, &state) == ERROR_SUCCESS)
-				m_xinput_helper->create_xinput_device(machine, i, *this);
+			auto devinfo = m_xinput_helper->create_xinput_device(i, *this);
+			if (devinfo)
+				add_device(DEVICE_CLASS_JOYSTICK, std::move(devinfo));
 		}
 	}
 
+	virtual void exit() override
+	{
+		input_module_impl<device_info, osd_common_t>::exit();
+
+		m_xinput_helper.reset();
+	}
+
 private:
-	std::shared_ptr<xinput_api_helper> m_xinput_helper;
+	std::unique_ptr<xinput_api_helper> m_xinput_helper;
 };
 
 } // anonymous namespace
@@ -1781,9 +3052,14 @@ int xinput_api_helper::initialize()
 //  create_xinput_device
 //============================================================
 
-device_info *xinput_api_helper::create_xinput_device(running_machine &machine, UINT index, wininput_module &module)
+std::unique_ptr<device_info> xinput_api_helper::create_xinput_device(
+		UINT index,
+		input_module_base &module)
 {
 	// If we can't get the capabilities skip this device
+	XINPUT_STATE state{ 0 };
+	if (xinput_get_state(index, &state) != ERROR_SUCCESS)
+		return nullptr;
 	XINPUT_CAPABILITIES caps{ 0 };
 	if (FAILED(xinput_get_capabilities(index, 0, &caps)))
 		return nullptr;
@@ -1791,91 +3067,75 @@ device_info *xinput_api_helper::create_xinput_device(running_machine &machine, U
 	char device_name[16];
 	snprintf(device_name, sizeof(device_name), "XInput Player %u", index + 1);
 
-	// allocate the device object
-	xinput_device_base *devinfo;
+	// allocate specialised device objects
 	switch (caps.Type)
 	{
 	case XINPUT_DEVTYPE_GAMEPAD:
 		switch (caps.SubType)
 		{
+		case 0x04: // XINPUT_DEVSUBTYPE_FLIGHT_STICK: work around MinGW header issues
+			return std::make_unique<xinput_flight_stick_device>(
+					device_name,
+					device_name,
+					module,
+					index,
+					caps,
+					*this);
 		case XINPUT_DEVSUBTYPE_GUITAR:
 		case XINPUT_DEVSUBTYPE_GUITAR_ALTERNATE:
 		case XINPUT_DEVSUBTYPE_GUITAR_BASS:
-			devinfo = &module.devicelist().create_device<xinput_guitar_device>(
-					machine,
+			return std::make_unique<xinput_guitar_device>(
 					device_name,
 					device_name,
 					module,
 					index,
 					caps,
-					shared_from_this());
-			break;
+					*this);
 		case XINPUT_DEVSUBTYPE_DRUM_KIT:
-			devinfo = &module.devicelist().create_device<xinput_drumkit_device>(
-					machine,
+			return std::make_unique<xinput_drumkit_device>(
 					device_name,
 					device_name,
 					module,
 					index,
 					caps,
-					shared_from_this());
-			break;
+					*this);
 		case 0x0f:
-			devinfo = &module.devicelist().create_device<xinput_keyboard_device>(
-					machine,
+			return std::make_unique<xinput_keyboard_device>(
 					device_name,
 					device_name,
 					module,
 					index,
 					caps,
-					shared_from_this());
-			break;
+					*this);
 		case 0x17:
-			devinfo = &module.devicelist().create_device<xinput_turntable_device>(
-					machine,
+			return std::make_unique<xinput_turntable_device>(
 					device_name,
 					device_name,
 					module,
 					index,
 					caps,
-					shared_from_this());
-			break;
-		default:
-			devinfo = &module.devicelist().create_device<xinput_joystick_device>(
-					machine,
-					device_name,
-					device_name,
-					module,
-					index,
-					caps,
-					shared_from_this());
+					*this);
 		}
-		break;
-	default:
-		devinfo = &module.devicelist().create_device<xinput_joystick_device>(
-				machine,
-				device_name,
-				device_name,
-				module,
-				index,
-				caps,
-				shared_from_this());
 	}
 
-	// configure each controller to add buttons, axes, etc.
-	devinfo->configure();
-
-	return devinfo;
+	// create default general-purpose device
+	return std::make_unique<xinput_joystick_device>(
+			device_name,
+			device_name,
+			module,
+			index,
+			caps,
+			*this);
 }
 
 } // namespace osd
 
-#else // defined(OSD_WINDOWS)
+#else // defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
 #include "input_module.h"
 
-namespace osd { MODULE_NOT_SUPPORTED(xinput_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "xinput") }
+namespace osd { namespace { MODULE_NOT_SUPPORTED(xinput_joystick_module, OSD_JOYSTICKINPUT_PROVIDER, "xinput") } }
 
-#endif // defined(OSD_WINDOWS)
+#endif // defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
 MODULE_DEFINITION(JOYSTICKINPUT_XINPUT, osd::xinput_joystick_module)

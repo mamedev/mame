@@ -2023,10 +2023,12 @@ private:
 	help_map m_help_list;
 	help_item const *m_uncached_help = std::begin(f_static_help_list);
 
+	util::ovectorstream m_message_buffer;
+
 	help_manager() = default;
 
 public:
-	char const *find(std::string_view tag)
+	std::string_view find(std::string_view tag)
 	{
 		// find a cached exact match if possible
 		std::string const lower = strmakelower(tag);
@@ -2062,16 +2064,17 @@ public:
 			if ((m_help_list.end() == next) || (next->first.substr(0, lower.length()) != lower))
 				return candidate->second;
 
-			// TODO: pointers to static strings are bad, mmmkay?
-			static char ambig_message[1024];
-			int msglen = std::sprintf(ambig_message, "Ambiguous help request, did you mean:\n");
+			m_message_buffer.clear();
+			m_message_buffer.reserve(1024);
+			m_message_buffer.seekp(0, util::ovectorstream::beg);
+			m_message_buffer << "Ambiguous help request, did you mean:\n";
 			do
 			{
-				msglen += std::sprintf(&ambig_message[msglen], "  help %.*s?\n", int(candidate->first.length()), &candidate->first[0]);
+				util::stream_format(m_message_buffer, "  help %.*s?\n", int(candidate->first.length()), &candidate->first[0]);
 				++candidate;
 			}
 			while ((m_help_list.end() != candidate) && (candidate->first.substr(0, lower.length()) == lower));
-			return ambig_message;
+			return util::buf_to_string_view(m_message_buffer);
 		}
 
 		// take the first help entry if no matches at all
@@ -2093,7 +2096,7 @@ public:
     PUBLIC INTERFACE
 ***************************************************************************/
 
-const char *debug_get_help(std::string_view tag)
+std::string_view debug_get_help(std::string_view tag)
 {
 	return help_manager::instance().find(tag);
 }

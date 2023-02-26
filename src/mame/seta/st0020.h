@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia,David Haywood
-#ifndef MAME_VIDEO_ST0020_H
-#define MAME_VIDEO_ST0020_H
+#ifndef MAME_SETA_ST0020_H
+#define MAME_SETA_ST0020_H
 
 #pragma once
 
@@ -73,4 +73,4 @@ private:
 DECLARE_DEVICE_TYPE(ST0020_SPRITES, st0020_device)
 
 
-#endif // MAME_VIDEO_ST0020_H
+#endif // MAME_SETA_ST0020_H

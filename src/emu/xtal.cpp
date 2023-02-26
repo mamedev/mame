@@ -142,7 +142,7 @@ const double XTAL::known_xtals[] = {
 	  7'000'000, /* 7_MHz_XTAL             Jaleco Mega System PCBs */
 	  7'056'000, /* 7.056_MHz_XTAL         Alesis QS FXCHIP (LCM of 44.1 kHz and 48 kHz) */
 	  7'159'090, /* 7.15909_MHz_XTAL       Blood Bros (2x NTSC subcarrier) */
-	  7'200'000, /* 7.2_MHz_XTAL           Image Fight bootleg I80C031 MCU */
+	  7'200'000, /* 7.2_MHz_XTAL           Novag Constellation (later models, with /2 divider), Kawai K1 keyscan IC */
 	  7'372'800, /* 7.3728_MHz_XTAL        - */
 	  7'864'300, /* 7.8643_MHz_XTAL        Used on InterFlip games as video clock */
 	  7'987'000, /* 7.987_MHz_XTAL         PC9801-86 YM2608 clock */
@@ -334,7 +334,7 @@ const double XTAL::known_xtals[] = {
 	 22'321'000, /* 22.321_MHz_XTAL        Apple LaserWriter II NT */
 	 22'464'000, /* 22.464_MHz_XTAL        CIT-101 132-column display clock */
 	 22'579'000, /* 22.579_MHz_XTAL        Sega System H1 SCSP clock */
-	 22'579'200, /* 22.5792_MHz_XTAL       (44100 * 512) */
+	 22'579'200, /* 22.5792_MHz_XTAL       Enhanced Apple Digital Sound Chip clock (44100 * 512) */
 	 22'656'000, /* 22.656_MHz_XTAL        Super Pinball Action (~1440x NTSC line rate) */
 	 22'680'000, /* 22.680_MHz_XTAL        HDS200 80-columns display clock */
 	 22'896'000, /* 22.896_MHz_XTAL        DEC VT220 132-column display clock */

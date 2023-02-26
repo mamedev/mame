@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
-#ifndef MAME_INCLUDES_TAITO_F3_H
-#define MAME_INCLUDES_TAITO_F3_H
+#ifndef MAME_TAITO_TAITO_F3_H
+#define MAME_TAITO_TAITO_F3_H
 
 #pragma once
 
@@ -396,4 +396,4 @@ private:
 	void bubsympb_oki_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_TAITO_F3_H
+#endif // MAME_TAITO_TAITO_F3_H

@@ -1,0 +1,27 @@
+// license:BSD-3-Clause
+// copyright-holders:Ryan Holtz
+//===============================================================
+//
+//  texconv_argb32.json: An basic texture-to-target copy.
+//
+//===============================================================
+{
+	"blend": {
+		"equation": "add",
+		"srcColor": "1",
+		"dstColor": "0",
+		"srcAlpha": "1",
+		"dstAlpha": "0"
+	},
+	"depth": { "function": "always", "writeenable": false },
+	"cull": { "mode": "none" },
+	"write": { "rgb": true, "alpha": true },
+	"vertex": "chains/misc/vs_resize_blit",
+	"fragment": "chains/misc/fs_blit",
+	"uniforms": [
+		{ "name": "s_tex",           "type": "int",  "values": [ 1.0 ] },
+		{ "name": "s_pal",           "type": "int",  "values": [ 1.0 ] },
+		{ "name": "u_inv_view_dims", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] },
+		{ "name": "u_tex_bounds0",   "type": "vec4", "values": [ 0.0, 0.0, 1.0, 1.0 ] }
+	]
+}

@@ -47,6 +47,8 @@ TODO:
 #include "bus/ti99x/990_dk.h"
 
 
+namespace {
+
 class ti990_4_state : public driver_device
 {
 public:
@@ -356,6 +358,9 @@ ROM_START(ti990_4v)
 	/* VDT911 character definitions */
 	ROM_REGION(vdt911_device::chr_region_len, vdt911_chr_region, ROMREGION_ERASEFF)
 ROM_END
+
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  CLASS          INIT        COMPANY              FULLNAME                                                           FLAGS
 COMP( 1976, ti990_4,  0,       0,      ti990_4,  0,     ti990_4_state, empty_init, "Texas Instruments", "TI Model 990/4 Microcomputer System",                             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

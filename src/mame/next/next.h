@@ -2,8 +2,8 @@
 // copyright-holders:Olivier Galibert
 #pragma once
 
-#ifndef MAME_INCLUDES_NEXT_H
-#define MAME_INCLUDES_NEXT_H
+#ifndef MAME_NEXT_NEXT_H
+#define MAME_NEXT_NEXT_H
 
 #include "cpu/m68000/m68030.h"
 #include "cpu/m68000/m68040.h"
@@ -219,4 +219,4 @@ private:
 	void dma_end(int slot);
 };
 
-#endif
+#endif // MAME_NEXT_NEXT_H

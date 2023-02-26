@@ -20,6 +20,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 static INPUT_PORTS_START( mu50 )
 	PORT_START("O0")
 	PORT_BIT(0x83, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -77,7 +79,7 @@ private:
 
 	u8 cur_p6, cur_pa, cur_pb, cur_pc;
 
-	u16 adc_zero_r();
+	[[maybe_unused]] u16 adc_zero_r();
 	u16 adc_ar_r();
 	u16 adc_al_r();
 	u16 adc_midisw_r();
@@ -260,5 +262,8 @@ ROM_START( mu50 )
 	ROM_LOAD( "xq057b00.ic18", 0x000000, 0x200000, NO_DUMP)
 	ROM_LOAD( "xq058b00.ic18", 0x200000, 0x200000, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
+
 
 CONS( 1995, mu50, 0, 0, mu50,  mu50, mu50_state, empty_init, "Yamaha", "MU50", MACHINE_NOT_WORKING )

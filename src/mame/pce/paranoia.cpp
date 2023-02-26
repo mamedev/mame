@@ -48,6 +48,8 @@ HuC6280A (Hudson)
 #include "speaker.h"
 
 
+namespace {
+
 class paranoia_state : public pce_common_state
 {
 public:
@@ -225,5 +227,8 @@ ROM_START(paranoia)
 	ROM_LOAD( "3.317", 0x10000, 0x8000, CRC(e3e48ec1) SHA1(299820d0e4fb2fd947c7a52f1c49e2e4d0dd050a) )
 	ROM_LOAD( "4.352", 0x18000, 0x8000, CRC(11297fed) SHA1(17a294e65ba1c4806307602dee4c7c627ad1fcfd) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 1990, paranoia, 0, paranoia, paranoia, paranoia_state, init_pce_common, ROT0, "Naxat Soft", "Paranoia", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

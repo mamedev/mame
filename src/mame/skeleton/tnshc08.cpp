@@ -2,29 +2,29 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-	http://www.sapi.cz/tns/hc08.php
+    http://www.sapi.cz/tns/hc08.php
 
-	IC104 - address decoder
-	/A5, /A3, /A3, /A2
-	 0    0    0    0     CS0 - not connected
-	 0    0    0    1     CS1 - SLOT 1/2
-	 0    0    1    0     CS2 - SLOT 1/2
-	 0    0    1    1     CS3 - not connected
-	 0    1    0    0     CS4 - 7474 clear (IC61)
-	 0    1    0    1     CS5 - 8255 (IC90) and 7474 clear (IC61)
-	 0    1    1    0     CS6 - 7474 preset (IC81)
-	 0    1    1    1     CS7 - mod on 7495 (IC62)
-	 1    0    0    0     CS8 - 7474 (IC77)
-	 1    0    0    1     CS9 - SLOT 1/2
-	 1    0    1    0     CS10 - SLOT 1/2
-	 1    0    1    1     CS11 - 8255 (IC89) and 74154 (IC111)
-	 1    1    0    0     CS12 - SIO (IC86)
-	 1    1    0    1     CS13 - PIO (IC51)
-	 1    1    1    0     CS14 - CTC (IC87)
-	 1    1    1    1     CS15 - CTC (IC88)
+    IC104 - address decoder
+    /A5, /A3, /A3, /A2
+     0    0    0    0     CS0 - not connected
+     0    0    0    1     CS1 - SLOT 1/2
+     0    0    1    0     CS2 - SLOT 1/2
+     0    0    1    1     CS3 - not connected
+     0    1    0    0     CS4 - 7474 clear (IC61)
+     0    1    0    1     CS5 - 8255 (IC90) and 7474 clear (IC61)
+     0    1    1    0     CS6 - 7474 preset (IC81)
+     0    1    1    1     CS7 - mod on 7495 (IC62)
+     1    0    0    0     CS8 - 7474 (IC77)
+     1    0    0    1     CS9 - SLOT 1/2
+     1    0    1    0     CS10 - SLOT 1/2
+     1    0    1    1     CS11 - 8255 (IC89) and 74154 (IC111)
+     1    1    0    0     CS12 - SIO (IC86)
+     1    1    0    1     CS13 - PIO (IC51)
+     1    1    1    0     CS14 - CTC (IC87)
+     1    1    1    1     CS15 - CTC (IC88)
 
-	8 x 4164   64K
-	8 x 41256 256K
+    8 x 4164   64K
+    8 x 41256 256K
 
 ****************************************************************************/
 

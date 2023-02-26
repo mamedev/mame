@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MAME_INCLUDES_MODEL1_H
-#define MAME_INCLUDES_MODEL1_H
+#ifndef MAME_SEGA_MODEL1_H
+#define MAME_SEGA_MODEL1_H
 
 #pragma once
 
@@ -353,4 +353,4 @@ private:
 	void drive_board_w(uint8_t data);
 };
 
-#endif // MAME_INCLUDES_MODEL1_H
+#endif // MAME_SEGA_MODEL1_H

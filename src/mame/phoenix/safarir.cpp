@@ -58,6 +58,9 @@ modified by Hau
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
+
 class safarir_state : public driver_device
 {
 public:
@@ -485,6 +488,7 @@ ROM_START( safarir ) // Taito PCB, labels are the same as Japan ver.
 	ROM_LOAD( "rl-07.40", 0x0000, 0x0400, CRC(ba525203) SHA1(1c261cc1259787a7a248766264fefe140226e465) )
 ROM_END
 
+} // anonymous namespace
 
 
 /*************************************

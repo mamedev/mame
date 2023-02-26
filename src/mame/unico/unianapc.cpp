@@ -31,6 +31,9 @@
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 
+
+namespace {
+
 class unianapc_state : public driver_device
 {
 public:
@@ -95,6 +98,9 @@ ROM_START( hogwild )
 	DISK_REGION( "ide:0:hdd:image" ) // DM Storage DM2560V00 IDE flash storage
 	DISK_IMAGE( "hog wild", 0, BAD_DUMP SHA1(f05b7f64830d995db2e2a2f7f95ae0100de5dab1) )
 ROM_END
+
+} // anonymous namespace
+
 
 GAME( 2002, dhunting,  0,   unianapc, unianapc, unianapc_state, empty_init, ROT0, "Game Box Entertainment", "Dream Hunting (US)",  MACHINE_IS_SKELETON ) // Ver 1007?
 GAME( 2003, hogwild,   0,   unianapc, unianapc, unianapc_state, empty_init, ROT0, "Uniana",                 "Hog Wild (US)",       MACHINE_IS_SKELETON ) // Ver.00.26.b?

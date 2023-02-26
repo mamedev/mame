@@ -5,8 +5,8 @@
     Run and Gun / Slam Dunk
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_RUNGUN_H
-#define MAME_INCLUDES_RUNGUN_H
+#ifndef MAME_KONAMI_RUNGUN_H
+#define MAME_KONAMI_RUNGUN_H
 
 #pragma once
 
@@ -122,4 +122,4 @@ private:
 	void rungun_sound_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_RUNGUN_H
+#endif // MAME_KONAMI_RUNGUN_H

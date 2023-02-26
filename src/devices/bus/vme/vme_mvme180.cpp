@@ -23,7 +23,7 @@ vme_mvme180_device::vme_mvme180_device(machine_config const &mconfig, char const
 	: device_t(mconfig, VME_MVME180, tag, owner, clock)
 	, device_vme_card_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")
-	//, m_mmu(*this, "mmu%u", 0U)
+	, m_mmu(*this, "mmu%u", 0U)
 	, m_duart(*this, "duart")
 	, m_serial(*this, "serial%u", 0U)
 	, m_boot(*this, "boot")
@@ -67,7 +67,7 @@ void vme_mvme180_device::device_add_mconfig(machine_config &config)
 {
 	MC88100(config, m_cpu, 40_MHz_XTAL / 2);
 	m_cpu->set_addrmap(AS_PROGRAM, &vme_mvme180_device::cpu_mem);
-#if 0
+
 	MC88200(config, m_mmu[0], 40_MHz_XTAL / 2, 0x7e);
 	m_mmu[0]->set_mbus(m_cpu, AS_PROGRAM);
 	m_cpu->set_cmmu_i(m_mmu[0]);
@@ -75,9 +75,10 @@ void vme_mvme180_device::device_add_mconfig(machine_config &config)
 	MC88200(config, m_mmu[1], 40_MHz_XTAL / 2, 0x7f);
 	m_mmu[1]->set_mbus(m_cpu, AS_PROGRAM);
 	m_cpu->set_cmmu_d(m_mmu[1]);
-#endif
+
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
 	m_duart->irq_cb().set(FUNC(vme_mvme180_device::irq_w<6>));
+	m_duart->outport_cb().set([this](u8 data) { LOG("port 0x%02x\n", data); });
 
 	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
 	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
@@ -103,6 +104,8 @@ void vme_mvme180_device::cpu_mem(address_map &map)
 		{
 			LOG("imr 0x%08x (%s)\n", data, machine().describe_context());
 			m_imr = data;
+
+			m_boot.select(1);
 
 			interrupt();
 		}, "imr");

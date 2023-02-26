@@ -158,13 +158,13 @@ void m24_z8000_device::dmem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t m24_z8000_device::i86_io_r(offs_t offset, uint16_t mem_mask)
 {
-	uint16_t ret = m_maincpu->space(AS_IO).read_word(offset << 1, swapendian_int16(mem_mask));
+	uint16_t ret = m_maincpu->space(AS_IO).read_word(offset << 1, mem_mask == 0xffff ? 0xff00 : swapendian_int16(mem_mask));
 	return swapendian_int16(ret);
 }
 
 void m24_z8000_device::i86_io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_maincpu->space(AS_IO).write_word(offset << 1, swapendian_int16(data), swapendian_int16(mem_mask));
+	m_maincpu->space(AS_IO).write_word(offset << 1, swapendian_int16(data), mem_mask == 0xffff ? 0xff00 : swapendian_int16(mem_mask));
 }
 
 void m24_z8000_device::irqctl_w(uint8_t data)

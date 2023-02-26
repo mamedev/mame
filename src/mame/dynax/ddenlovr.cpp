@@ -10029,11 +10029,11 @@ WRITE_LINE_MEMBER(mmpanic_state::mmpanic_rtc_irq)
 void mmpanic_state::mmpanic(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 8000000);
+	Z80(config, m_maincpu, XTAL(16'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmpanic_state::mmpanic_map);
 	m_maincpu->set_addrmap(AS_IO, &mmpanic_state::mmpanic_portmap);
 
-	Z80(config, m_soundcpu, 3579545);
+	Z80(config, m_soundcpu, XTAL(14'318'181) / 4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &mmpanic_state::mmpanic_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &mmpanic_state::mmpanic_sound_portmap);
 
@@ -10062,11 +10062,11 @@ void mmpanic_state::mmpanic(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
-	YM2413(config, "ym2413", 3579545).add_route(ALL_OUTPUTS, "mono", 0.80);
+	YM2413(config, "ym2413", XTAL(14'318'181) / 4).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	AY8910(config, "aysnd", 3579545).add_route(ALL_OUTPUTS, "mono", 0.30);
+	AY8910(config, "aysnd", XTAL(14'318'181) / 8).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	OKIM6295(config, m_oki, 1022720, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, XTAL(14'318'181) / 14, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* devices */
@@ -10090,7 +10090,7 @@ void mmpanic_state::mmpanic(machine_config &config)
 void hanakanz_state::hanakanz(machine_config &config)
 {
 	/* basic machine hardware */
-	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, 20'000'000));
+	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, XTAL(20'000'000)));
 	maincpu.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
 	maincpu.set_addrmap(AS_IO, &hanakanz_state::hanakanz_portmap);
 	maincpu.in_p0_callback().set(FUNC(hanakanz_state::hanakanz_busy_r));
@@ -10122,9 +10122,9 @@ void hanakanz_state::hanakanz(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	YM2413(config, "ym2413", 3579545).add_route(ALL_OUTPUTS, "mono", 0.80);
+	YM2413(config, "ym2413", XTAL(28'375'160) / 8).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	OKIM6295(config, m_oki, 1022720, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, XTAL(28'375'160) / 28, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* devices */
@@ -10181,7 +10181,7 @@ void hanakanz_state::kotbinyo(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* devices */
-//  MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set("maincpu:kp69", FUNC(kp69_device::ir_w<1>));
+	//MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set("maincpu:kp69", FUNC(kp69_device::ir_w<1>));
 }
 
 void hanakanz_state::kotbinsp(machine_config &config)
@@ -10210,6 +10210,7 @@ void hanakanz_state::mjreach1(machine_config &config)
     0xf8 is vblank
     0xfa is from the 6242RTC
  */
+
 void hanakanz_state::mjchuuka(machine_config &config)
 {
 	hanakanz(config);
@@ -10366,7 +10367,6 @@ void ddenlovr_state::mjmyster(machine_config &config)
     0xfa and/or 0xfc are from the blitter (almost identical)
     0xee triggered by the RTC
  */
-
 
 void ddenlovr_state::hginga(machine_config &config)
 {
@@ -10783,7 +10783,6 @@ void ddenlovr_state::seljan2(machine_config &config)
 /***************************************************************************
                             Mahjong Daimyojin
 ***************************************************************************/
-
 
 void hanakanz_state::daimyojn(machine_config &config)
 {

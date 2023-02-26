@@ -26,6 +26,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class rd100_state : public driver_device
 {
 public:
@@ -279,6 +281,9 @@ ROM_START( rd100 )
 	ROM_REGION( 0x8000, "roms", 0 )
 	ROM_LOAD( "pak3-01.bin",  0x0000, 0x8000, CRC(cf5bbf01) SHA1(0673f4048d700b84c30781af23fbeabe0b994306) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

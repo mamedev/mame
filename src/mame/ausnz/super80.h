@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
-#ifndef MAME_INCLUDES_SUPER80_H
-#define MAME_INCLUDES_SUPER80_H
+#ifndef MAME_AUSNZ_SUPER80_H
+#define MAME_AUSNZ_SUPER80_H
 
 #pragma once
 
@@ -185,4 +185,4 @@ private:
 };
 
 
-#endif // MAME_INCLUDES_SUPER80_H
+#endif // MAME_AUSNZ_SUPER80_H

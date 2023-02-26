@@ -6,8 +6,8 @@
     Jack the Giant Killer
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_JACK_H
-#define MAME_INCLUDES_JACK_H
+#ifndef MAME_CINEMATRONICS_JACK_H
+#define MAME_CINEMATRONICS_JACK_H
 
 #pragma once
 
@@ -109,4 +109,4 @@ private:
 	void unclepoo_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_JACK_H
+#endif // MAME_CINEMATRONICS_JACK_H

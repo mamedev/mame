@@ -81,6 +81,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class ngen_state : public driver_device
 {
 public:
@@ -166,7 +168,7 @@ private:
 
 	void hfd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t hfd_r(offs_t offset, uint16_t mem_mask = ~0);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	void fdc_control_w(uint8_t data);
 	uint8_t irq_cb();
 	void hdc_control_w(uint8_t data);
@@ -1197,6 +1199,8 @@ ROM_START( 386i )
 	ROM_REGION( 0x2000, "video", 0)
 	ROM_LOAD( "72-1630_gc-104_vga.bin",  0x000000, 0x002000, CRC(4e4d8ebe) SHA1(50c96ccb4d0bd1beb2d1aee0d18b2c462d25fc8f) )
 ROM_END
+
+} // anonymous namespace
 
 
 COMP( 1983, ngen,    0,    0, ngen,    ngen, ngen_state,    empty_init, "Convergent Technologies",  "NGEN CP-001", MACHINE_IS_SKELETON )

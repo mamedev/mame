@@ -11,6 +11,7 @@
 #include "emu.h"
 
 #include "fileio.h"
+#include "main.h"
 #include "screen.h"
 
 #include "aviio.h"

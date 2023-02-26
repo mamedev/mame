@@ -431,6 +431,7 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 		texinfo.base = m_bitmap->raw_pixptr(m_sbounds.top(), m_sbounds.left());
 		texinfo.rowpixels = m_bitmap->rowpixels();
 		texinfo.width = swidth;
+		texinfo.width_margin = m_sbounds.left();
 		texinfo.height = sheight;
 		// palette will be set later
 		texinfo.seqid = ++m_curseq;

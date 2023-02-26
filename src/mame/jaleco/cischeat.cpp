@@ -4030,13 +4030,13 @@ void captflag_state::init_captflag()
 /***************************************************************************
 
                          Vs. Super Captain Flag
- 
+
  PCB IDs:
 
  CF-93153 EB93041-20091
- 
+
  CF-92128B EB92027-20060
- 
+
  GP-9189 EB90015-20038
 
 **************************************************************************/
@@ -4094,7 +4094,7 @@ ROM_END
 void captflag_state::init_vscaptfl()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	
+
 	space.unmap_readwrite(0x100044, 0x100045);
 	space.unmap_readwrite(0x100048, 0x100049);
 

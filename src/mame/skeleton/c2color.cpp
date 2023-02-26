@@ -39,6 +39,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class c2_color_state : public driver_device
 {
 public:
@@ -179,6 +182,9 @@ ROM_START( c2color )
 	ROM_REGION( 0x400000, "spi2", ROMREGION_ERASEFF )
 	ROM_LOAD( "spi.u16", 0x000000, 0x400000, CRC(9101b02a) SHA1(8c31e7641f4667bd8d5d7cc991cd5976828a0628) )
 ROM_END
+
+} // anonymous namespace
+
 
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags
 CONS( 201?, c2color,      0,       0,      c2_color,   c2_color, c2_color_state, empty_init, "Baiyi Animation", "C2 Color (China)", MACHINE_IS_SKELETON )

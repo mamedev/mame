@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include "dirtc.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -22,7 +24,8 @@
 // ======================> rtc9701_device
 
 class rtc9701_device :  public device_t,
-						public device_nvram_interface
+						public device_nvram_interface,
+						public device_rtc_interface
 {
 public:
 	// construction/destruction
@@ -64,6 +67,11 @@ protected:
 	virtual bool nvram_write(util::write_stream &file) override;
 	inline uint8_t rtc_read(uint8_t offset);
 	inline void rtc_write(uint8_t offset,uint8_t data);
+
+	// device_rtc_interface overrides
+	virtual bool rtc_feature_y2k() const override { return false; }
+	virtual bool rtc_feature_leap_year() const override { return true; }
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 	int                     m_latch;
 	int                     m_reset_line;

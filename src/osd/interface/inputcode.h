@@ -4,7 +4,7 @@
 
     inputcode.h
 
-    Codes for representing host inputs
+    Codes for representing host controls
 
 ***************************************************************************/
 #ifndef MAME_OSD_INTERFACE_INPUTCODE_H

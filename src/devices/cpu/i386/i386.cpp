@@ -2017,6 +2017,16 @@ void i386_device::i386_common_init()
 	save_item(NAME(m_nmi_latched));
 	save_item(NAME(m_smbase));
 	save_item(NAME(m_lock));
+
+	save_item(NAME(m_x87_cw));
+	save_item(NAME(m_x87_tw));
+	save_item(NAME(m_x87_sw));
+	save_item(NAME(m_x87_cs));
+	save_item(NAME(m_x87_ds));
+	save_item(NAME(m_x87_inst_ptr));
+	save_item(NAME(m_x87_data_ptr));
+	save_item(NAME(m_x87_opcode));
+
 	machine().save().register_postload(save_prepost_delegate(FUNC(i386_device::i386_postload), this));
 
 	m_smiact.resolve_safe();
@@ -2133,14 +2143,14 @@ void i386_device::register_state_i386_x87()
 	state_add( X87_CTRL,   "x87_CW", m_x87_cw).formatstr("%04X");
 	state_add( X87_STATUS, "x87_SW", m_x87_sw).formatstr("%04X");
 	state_add( X87_TAG,    "x87_TAG", m_x87_tw).formatstr("%04X");
-	state_add( X87_ST0,    "ST0", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST1,    "ST1", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST2,    "ST2", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST3,    "ST3", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST4,    "ST4", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST5,    "ST5", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST6,    "ST6", m_debugger_temp ).formatstr("%15s");
-	state_add( X87_ST7,    "ST7", m_debugger_temp ).formatstr("%15s");
+	state_add( X87_ST0,    "ST0", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST1,    "ST1", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST2,    "ST2", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST3,    "ST3", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST4,    "ST4", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST5,    "ST5", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST6,    "ST6", m_debugger_temp ).callexport().formatstr("%15s");
+	state_add( X87_ST7,    "ST7", m_debugger_temp ).callexport().formatstr("%15s");
 }
 
 void i386_device::register_state_i386_x87_xmm()
@@ -2196,6 +2206,30 @@ void i386_device::state_export(const device_state_entry &entry)
 	{
 		case I386_IP:
 			m_debugger_temp = m_eip & 0xffff;
+			break;
+		case X87_ST0:
+			m_debugger_temp = floatx80_to_float64(ST(0));
+			break;
+		case X87_ST1:
+			m_debugger_temp = floatx80_to_float64(ST(1));
+			break;
+		case X87_ST2:
+			m_debugger_temp = floatx80_to_float64(ST(2));
+			break;
+		case X87_ST3:
+			m_debugger_temp = floatx80_to_float64(ST(3));
+			break;
+		case X87_ST4:
+			m_debugger_temp = floatx80_to_float64(ST(4));
+			break;
+		case X87_ST5:
+			m_debugger_temp = floatx80_to_float64(ST(5));
+			break;
+		case X87_ST6:
+			m_debugger_temp = floatx80_to_float64(ST(6));
+			break;
+		case X87_ST7:
+			m_debugger_temp = floatx80_to_float64(ST(7));
 			break;
 	}
 }

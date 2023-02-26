@@ -15,7 +15,7 @@ TODO:
 <softwarelist name="amiga_demos" description="Commodore Amiga demos">
 
 	<software name="drgnmega" supported="no">
-		<description>Dragons Megademo I (Demo)</description>
+		<description>Dragons Megademo I (demo)</description>
 		<year>1990</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Dragons"/>
@@ -28,7 +28,7 @@ TODO:
 	</software>
 
 	<software name="miseryd2" supported="no">
-		<description>Misery Dentro 2 (Demo)</description>
+		<description>Misery Dentro 2 (demo)</description>
 		<year>1993</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Masque of TRSI, Tristar and Red Sector Inc."/>
@@ -43,7 +43,7 @@ TODO:
 	</software>
 
 	<software name="elysium" supported="no">
-		<description>Sanity Elysium (Demo)</description>
+		<description>Sanity Elysium (demo)</description>
 		<year>1991</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="developer" value="Sanity"/>

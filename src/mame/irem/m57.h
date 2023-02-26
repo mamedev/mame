@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
-#ifndef MAME_INCLUDES_M57_H
-#define MAME_INCLUDES_M57_H
+#ifndef MAME_IREM_M57_H
+#define MAME_IREM_M57_H
 
 #pragma once
 
@@ -46,4 +46,4 @@ private:
 	void main_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_M57_H
+#endif // MAME_IREM_M57_H

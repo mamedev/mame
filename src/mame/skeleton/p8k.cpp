@@ -80,6 +80,8 @@ p8k_16_daisy_device::p8k_16_daisy_device(const machine_config &mconfig, const ch
 	, z80_daisy_chain_interface(mconfig, *this) {}
 
 
+namespace {
+
 class p8k_state : public driver_device
 {
 public:
@@ -101,7 +103,7 @@ private:
 	void port0_w(offs_t offset, uint8_t data);
 	DECLARE_MACHINE_RESET(p8k);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_WRITE_LINE_MEMBER(p8k_daisy_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(p8k_dma_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(p8k_16_daisy_interrupt );
@@ -562,6 +564,9 @@ ROM_START( p8000_16 )
 	ROM_LOAD("p8t_zs",    0x0000, 0x0800, CRC(f9321251) SHA1(a6a796b58d50ec4a416f2accc34bd76bc83f18ea))
 	ROM_LOAD("p8tdzs.2",  0x0800, 0x0800, CRC(32736503) SHA1(6a1d7c55dddc64a7d601dfdbf917ce1afaefbb0a))
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

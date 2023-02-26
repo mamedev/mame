@@ -5,8 +5,8 @@
  Atari Lynx
 
 ******************************************************************************/
-#ifndef MAME_INCLUDES_LYNX_H
-#define MAME_INCLUDES_LYNX_H
+#ifndef MAME_ATARI_LYNX_H
+#define MAME_ATARI_LYNX_H
 
 #pragma once
 
@@ -410,4 +410,4 @@ private:
 #define SCB_STRETCH     0x0F    // L H H/V Size Adder
 #define SCB_TILT        0x11    // L,H H Position Adder
 
-#endif // MAME_INCLUDES_LYNX_H
+#endif // MAME_ATARI_LYNX_H

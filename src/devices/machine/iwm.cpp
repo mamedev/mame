@@ -238,6 +238,9 @@ u8 iwm_device::control(int offset, u8 data)
 		m_devsel_cb(devsel);
 	}
 
+	if((m_control & 0xc0) == 0x40 && m_active == MODE_ACTIVE && m_rw == MODE_READ)
+		m_rsh = 0;
+
 	if(0) {
 		u8 s = m_control & 0xc0;
 		const char *slot = "?";

@@ -5,8 +5,8 @@
     includes/micronic.h
 
 *****************************************************************************/
-#ifndef MAME_INCLUDES_MICRONIC_H
-#define MAME_INCLUDES_MICRONIC_H
+#ifndef MAME_SKELETON_MICRONIC_H
+#define MAME_SKELETON_MICRONIC_H
 
 #pragma once
 
@@ -105,4 +105,4 @@ private:
 	optional_device<cassette_image_device> m_cassette;
 };
 
-#endif // MAME_INCLUDES_MICRONIC_H
+#endif // MAME_SKELETON_MICRONIC_H

@@ -1147,6 +1147,18 @@ if (MACHINES["CXD1095"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/machine/dimm_spd.h,MACHINES["DIMM_SPD"] = true
+---------------------------------------------------
+
+if (MACHINES["DIMM_SPD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/dimm_spd.cpp",
+		MAME_DIR .. "src/devices/machine/dimm_spd.h",
+	}
+end
+
 --@src/devices/machine/dl11.h,MACHINES["DL11"] = true
 ---------------------------------------------------
 
@@ -2643,19 +2655,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/ncr539x.h,MACHINES["NCR539x"] = true
----------------------------------------------------
-
-if (MACHINES["NCR539x"]~=null) then
-	MACHINES["SCSI"] = true
-	files {
-		MAME_DIR .. "src/devices/machine/ncr539x.cpp",
-		MAME_DIR .. "src/devices/machine/ncr539x.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/machine/nmc9306.h,MACHINES["NMC9306"] = true
 ---------------------------------------------------
 
@@ -2789,6 +2788,8 @@ if (MACHINES["PCI"]~=null) then
 		MAME_DIR .. "src/devices/machine/lpc-rtc.h",
 		MAME_DIR .. "src/devices/machine/lpc-pit.cpp",
 		MAME_DIR .. "src/devices/machine/lpc-pit.h",
+		MAME_DIR .. "src/devices/machine/mpc106.cpp",
+		MAME_DIR .. "src/devices/machine/mpc106.h",
 		MAME_DIR .. "src/devices/machine/vrc4373.cpp",
 		MAME_DIR .. "src/devices/machine/vrc4373.h",
 		MAME_DIR .. "src/devices/machine/vrc5074.cpp",
@@ -5121,5 +5122,28 @@ if (MACHINES["MICOMXE1A"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/micomxe1a.cpp",
 		MAME_DIR .. "src/devices/machine/micomxe1a.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/mc88200.h,MACHINES["MC88200"] = true
+---------------------------------------------------
+if (MACHINES["MC88200"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/mc88200.cpp",
+		MAME_DIR .. "src/devices/machine/mc88200.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/pccard_sram.h,MACHINES["PCCARD_SRAM"] = true
+---------------------------------------------------
+
+if (MACHINES["PCCARD_SRAM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/pccard_sram.cpp",
+		MAME_DIR .. "src/devices/machine/pccard_sram.h",
 	}
 end

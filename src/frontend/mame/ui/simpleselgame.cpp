@@ -110,37 +110,36 @@ void simple_menu_select_game::build_driver_list()
 //  handle - handle the game select menu
 //-------------------------------------------------
 
-void simple_menu_select_game::handle(event const *ev)
+bool simple_menu_select_game::handle(event const *ev)
 {
-	// process the menu
-	if (ev)
+	if (!ev)
+		return false;
+
+	if (m_error)
 	{
-		if (m_error)
-		{
-			// reset the error on any subsequent menu event
-			m_error = false;
-			machine().ui_input().reset();
-		}
-		else
-		{
-			// handle selections
-			switch(ev->iptkey)
-			{
-			case IPT_UI_SELECT:
-				inkey_select(*ev);
-				break;
-			case IPT_UI_CANCEL:
-				inkey_cancel();
-				break;
-			case IPT_UI_PASTE:
-				if (paste_text(m_search, uchar_is_printable))
-					reset(reset_options::SELECT_FIRST);
-				break;
-			case IPT_SPECIAL:
-				inkey_special(*ev);
-				break;
-			}
-		}
+		// reset the error on any subsequent menu event
+		m_error = false;
+		machine().ui_input().reset();
+		return true;
+	}
+
+	// handle selections
+	bool changed = false;
+	switch (ev->iptkey)
+	{
+	case IPT_UI_SELECT:
+		changed = inkey_select(*ev);
+		break;
+	case IPT_UI_CANCEL:
+		inkey_cancel();
+		break;
+	case IPT_UI_PASTE:
+		if (paste_text(m_search, uchar_is_printable))
+			reset(reset_options::SELECT_FIRST);
+		break;
+	case IPT_SPECIAL:
+		inkey_special(*ev);
+		break;
 	}
 
 	// if we're in an error state, overlay an error message
@@ -152,6 +151,7 @@ void simple_menu_select_game::handle(event const *ev)
 				"Please select a different game.\n\nPress any key to continue."),
 				text_layout::text_justify::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 	}
+	return changed;
 }
 
 
@@ -159,7 +159,7 @@ void simple_menu_select_game::handle(event const *ev)
 //  inkey_select
 //-------------------------------------------------
 
-void simple_menu_select_game::inkey_select(const event &menu_event)
+bool simple_menu_select_game::inkey_select(const event &menu_event)
 {
 	const game_driver *driver = (const game_driver *)menu_event.itemref;
 
@@ -169,10 +169,12 @@ void simple_menu_select_game::inkey_select(const event &menu_event)
 				ui(),
 				container(),
 				[this] () { reset(reset_options::SELECT_FIRST); });
+		return false;
 	}
 	else if (!driver) // special case for previous menu
 	{
 		stack_pop();
+		return false;
 	}
 	else // anything else is a driver
 	{
@@ -188,12 +190,14 @@ void simple_menu_select_game::inkey_select(const event &menu_event)
 			mame_machine_manager::instance()->schedule_new_driver(*driver);
 			machine().schedule_hard_reset();
 			stack_reset();
+			return false;
 		}
 		else
 		{
 			// otherwise, display an error
 			reset(reset_options::REMEMBER_REF);
 			m_error = true;
+			return true;
 		}
 	}
 }

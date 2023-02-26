@@ -1,6 +1,6 @@
 // Tencent is pleased to support the open source community by making RapidJSON available.
 // 
-// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip. All rights reserved.
+// Copyright (C) 2015 THL A29 Limited, a Tencent company, and Milo Yip.
 //
 // Licensed under the MIT License (the "License"); you may not use this file except
 // in compliance with the License. You may obtain a copy of the License at
@@ -91,7 +91,7 @@ TEST(Strtod, CheckApproximationCase) {
     }
 
     // Remove common power of two factor from all three scaled values
-    int common_Exp2 = std::min(dS_Exp2, std::min(bS_Exp2, hS_Exp2));
+    int common_Exp2 = (std::min)(dS_Exp2, (std::min)(bS_Exp2, hS_Exp2));
     dS_Exp2 -= common_Exp2;
     bS_Exp2 -= common_Exp2;
     hS_Exp2 -= common_Exp2;

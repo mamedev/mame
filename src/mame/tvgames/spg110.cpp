@@ -32,6 +32,9 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+
+namespace {
+
 class spg110_game_state : public driver_device
 {
 public:
@@ -625,6 +628,8 @@ ROM_START( sstarkar )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	// no internal BIOS
 ROM_END
+
+} // anonymous namespace
 
 
 // JAKKS Pacific Inc TV games

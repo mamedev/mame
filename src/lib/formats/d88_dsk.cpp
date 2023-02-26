@@ -37,6 +37,8 @@
 
 #define D88_HEADER_LEN 0x2b0
 
+#define SPOT_DUPLICATES 0
+
 struct d88_tag
 {
 	uint32_t image_size;
@@ -280,14 +282,15 @@ static void d88_get_header(floppy_image_legacy* floppy,uint32_t* size, uint8_t* 
 
 	floppy_image_read(floppy,header,0,D88_HEADER_LEN);
 
-#ifdef SPOT_DUPLICATES
+	if(SPOT_DUPLICATES)
+	{
 		// there exist many .d88 files with same data and different headers and
 		// this allows to spot duplicates, making easier to debug softlists.
 		uint32_t temp_size = floppy_image_size(floppy);
-		uint8_t tmp_copy[temp_size - D88_HEADER_LEN];
-		floppy_image_read(floppy,tmp_copy,D88_HEADER_LEN,temp_size - D88_HEADER_LEN);
-		printf("CRC16: %d\n", ccitt_crc16(0xffff, tmp_copy, temp_size - D88_HEADER_LEN));
-#endif
+		auto tmp_copy = std::make_unique<uint8_t[]>(temp_size - D88_HEADER_LEN);
+		floppy_image_read(floppy,tmp_copy.get(),D88_HEADER_LEN,temp_size - D88_HEADER_LEN);
+		printf("CRC16: %d\n", ccitt_crc16(0xffff, tmp_copy.get(), temp_size - D88_HEADER_LEN));
+	}
 
 	if(prot)
 		*prot = header[0x1a];

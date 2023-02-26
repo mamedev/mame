@@ -873,7 +873,7 @@ MOS Atari-made game NTSC ROMs had a CO16xxx number and PAL ROMs had CO17xxx numb
 	<software name="mad">
 		<description>M.A.D.</description>
 		<year>1982</year>
-		<publisher>US Games</publisher>
+		<publisher>U.S. Games Corporation</publisher>
 		<info name="serial" value="VC1012" />
 		<sharedfeat name="compatibility" value="NTSC" />
 		<part name="cart" interface="a2600_cart">

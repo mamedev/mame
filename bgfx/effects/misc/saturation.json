@@ -24,7 +24,8 @@
 	"vertex": "chains/misc/vs_saturation",
 	"fragment": "chains/misc/fs_saturation",
 	"uniforms": [
-		{ "name": "s_tex",        "type": "int",  "values": [ 1.0 ] },
-		{ "name": "u_saturation", "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] }
+		{ "name": "s_tex",           "type": "int",  "values": [ 1.0 ] },
+		{ "name": "u_saturation",    "type": "vec4", "values": [ 1.0, 0.0, 0.0, 0.0 ] },
+		{ "name": "u_inv_view_dims", "type": "vec4", "values": [ 1.0, 1.0, 0.0, 0.0 ] }
 	]
 }

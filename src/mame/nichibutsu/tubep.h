@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
-#ifndef MAME_INCLUDES_TUBEP_H
-#define MAME_INCLUDES_TUBEP_H
+#ifndef MAME_NICHIBUTSU_TUBEP_H
+#define MAME_NICHIBUTSU_TUBEP_H
 
 #pragma once
 
@@ -166,4 +166,4 @@ private:
 	bool m_msm5205_toggle = 0;
 };
 
-#endif // MAME_INCLUDES_TUBEP_H
+#endif // MAME_NICHIBUTSU_TUBEP_H

@@ -6,8 +6,8 @@
  *  Created on: 2/10/2013
  */
 
-#ifndef MAME_AUDIO_S11C_BG_H
-#define MAME_AUDIO_S11C_BG_H
+#ifndef MAME_SHARED_S11C_BG_H
+#define MAME_SHARED_S11C_BG_H
 
 #pragma once
 
@@ -122,4 +122,4 @@ DECLARE_DEVICE_TYPE(S11_OBG, s11_obg_device)
 DECLARE_DEVICE_TYPE(S11_BGM, s11_bgm_device)
 DECLARE_DEVICE_TYPE(S11_BGS, s11_bgs_device)
 
-#endif // MAME_AUDIO_S11C_BG_H
+#endif // MAME_SHARED_S11C_BG_H

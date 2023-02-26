@@ -13,7 +13,6 @@
 
 #include "screen.h"
 
-#define LOG_GENERAL (1U << 0)
 #define LOG_COMMANDS (1U << 1)
 #define LOG_DATASTREAM (1U << 2)
 //#define VERBOSE (LOG_GENERAL | LOG_COMMANDS | LOG_DATASTREAM)
@@ -269,16 +268,17 @@ void i82730_device::mode_set()
 	m_mode_set = true;
 
 	// output some debug info
-	if (VERBOSE)
-	{
-		logerror("%s('%s'): ---- modeset ----\n", shortname(), basetag());
-		logerror("%s('%s'): dma burst length %02x, space %02x\n", shortname(), basetag(), m_mb.burst_length, m_mb.burst_space);
-		logerror("%s('%s'): margin %02x, lpr %02x\n", shortname(), basetag(), m_mb.scroll_margin, m_mb.lpr);
-		logerror("%s('%s'): hsyncstp: %02x, line_length: %02x, hfldstrt: %02x, hbrdstart: %02x, hfldstop: %02x, hbrdstop: %02x\n",
-			shortname(), basetag(), m_mb.hsyncstp, m_mb.line_length, m_mb.hfldstrt, m_mb.hbrdstrt, m_mb.hfldstp, m_mb.hbrdstp);
-		logerror("%s('%s'): frame_length %04x, vsyncstp: %04x, vfldstrt: %04x, vfldstp: %04x\n",
-			shortname(), basetag(), m_mb.frame_length, m_mb.vsyncstp, m_mb.vfldstrt, m_mb.vfldstp);
-	}
+	LOG(
+			"%s: ---- modeset ----\n"
+			"    dma burst length %02x, space %02x\n"
+			"    margin %02x, lpr %02x\n"
+			"    hsyncstp: %02x, line_length: %02x, hfldstrt: %02x, hbrdstart: %02x, hfldstop: %02x, hbrdstop: %02x\n"
+			"    frame_length %04x, vsyncstp: %04x, vfldstrt: %04x, vfldstp: %04x\n",
+			shortname(),
+			m_mb.burst_length, m_mb.burst_space,
+			m_mb.scroll_margin, m_mb.lpr,
+			m_mb.hsyncstp, m_mb.line_length, m_mb.hfldstrt, m_mb.hbrdstrt, m_mb.hfldstp, m_mb.hbrdstp,
+			m_mb.frame_length, m_mb.vsyncstp, m_mb.vfldstrt, m_mb.vfldstp);
 }
 
 void i82730_device::execute_command()
@@ -814,15 +814,16 @@ WRITE_LINE_MEMBER( i82730_device::ca_w )
 			m_initialized = true;
 
 			// output some debug info
-			if (VERBOSE)
-			{
-				logerror("%s('%s'): ---- initializing ----\n", shortname(), basetag());
-				logerror("%s('%s'): %s system bus\n", shortname(), basetag(), sysbus_16bit() ? "16-bit" : "8-bit");
-				logerror("%s('%s'): intermediate block pointer: %08x\n", shortname(), basetag(), m_ibp);
-				logerror("%s('%s'): addrbus: %s, clno: %d, clpos: %d, mode: %s, dtw16: %s, srdy: %s\n", shortname(), basetag(),
-					BIT(scb, 0) ? "32-bit" : "16-bit", (scb >> 1) & 0x03, (scb >> 3) & 0x03,
-					BIT(scb, 5) ? "master" : "slave", BIT(scb, 6) ? "16-bit" : "8-bit", BIT(scb, 7) ? "synchronous" : "asynchronous");
-			}
+			LOG(
+					"%s: ---- initializing ----\n"
+					"    %s-bit system bus\n"
+					"    intermediate block pointer: %08x\n"
+					"    addrbus: %s-bit, clno: %d, clpos: %d, mode: %s, dtw16: %s-bit, srdy: %s\n",
+					shortname(),
+					sysbus_16bit() ? "16" : "8",
+					m_ibp,
+					BIT(scb, 0) ? "32" : "16", BIT(scb, 1, 2), BIT(scb, 3, 2),
+					BIT(scb, 5) ? "master" : "slave", BIT(scb, 6) ? "16" : "8", BIT(scb, 7) ? "synchronous" : "asynchronous");
 		}
 
 		attention();

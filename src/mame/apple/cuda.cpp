@@ -19,8 +19,8 @@
 
     Port B:
 
-    x-------  O  DFAC bit clock
-    -x------  B  DFAC data I/O (used in both directions)
+    x-------  O  DFAC bit clock (IIC SCL, pulled up to +5V externally)
+    -x------  B  DFAC data I/O (IIC SDA, used in both directions, pulled up to +5V externally)
     --x-----  B  VIA shift register data (used in both directions)
     ---x----  O  VIA clock
     ----x---  I  VIA TIP
@@ -201,11 +201,27 @@ uint8_t cuda_device::ddr_r(offs_t offset)
 
 void cuda_device::ddr_w(offs_t offset, uint8_t data)
 {
-//    printf("%02x to PORT %c DDR (PC=%x)\n", data, 'A' + offset, m_maincpu->pc());
+	//printf("%02x to PORT %c DDR (PC=%x)\n", data, 'A' + offset, m_maincpu->pc());
 
 	send_port(offset, ports[offset] & data);
 
 	ddrs[offset] = data;
+
+	if (offset == 1)    // port B
+	{
+		// For IIC, Cuda sets the SCL and SDA data bits to 0 and toggles the lines
+		// purely with the DDRs.  When DDR is set, the 0 is driven onto the line and
+		// the line is 0.  When DDR is clear, the line is not driven by the 68HC05 and
+		// external pullup resistors drive the line to a 1.
+
+		// If both SCL and SDA data are 0, we're doing IIC
+		if ((ports[offset] & 0x80) == 0)
+		{
+			u8 iic_data = (data & 0xc0) ^ 0xc0;
+			write_iic_sda(BIT(iic_data, 6));
+			write_iic_scl(BIT(iic_data, 7));
+		}
+	}
 }
 
 uint8_t cuda_device::ports_r(offs_t offset)
@@ -236,7 +252,8 @@ uint8_t cuda_device::ports_r(offs_t offset)
 			incoming |= byteack<<2;
 			incoming |= tip<<3;
 			incoming |= via_data<<5;
-			incoming |= 0xc0;   // show DFAC lines high
+			incoming |= iic_sda ? 0x40 : 0;
+			incoming |= 0x80;
 			break;
 
 		case 2:     // port C
@@ -388,6 +405,8 @@ cuda_device::cuda_device(const machine_config &mconfig, const char *tag, device_
 	write_linechange(*this),
 	write_via_clock(*this),
 	write_via_data(*this),
+	write_iic_scl(*this),
+	write_iic_sda(*this),
 	m_maincpu(*this, CUDA_CPU_TAG)
 {
 }
@@ -402,6 +421,8 @@ void cuda_device::device_start()
 	write_linechange.resolve_safe();
 	write_via_clock.resolve_safe();
 	write_via_data.resolve_safe();
+	write_iic_scl.resolve_safe();
+	write_iic_sda.resolve_safe();
 
 	m_timer = timer_alloc(FUNC(cuda_device::seconds_tick), this);
 	m_prog_timer = timer_alloc(FUNC(cuda_device::timer_tick), this);

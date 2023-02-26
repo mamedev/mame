@@ -7,8 +7,8 @@
  * Macintosh II driver declarations
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_MAC_H
-#define MAME_INCLUDES_MAC_H
+#ifndef MAME_APPLE_MAC_H
+#define MAME_APPLE_MAC_H
 
 #pragma once
 
@@ -27,7 +27,7 @@
 #include "macrtc.h"
 #include "macscsi.h"
 #include "sound/asc.h"
-#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68kmusashi.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -293,4 +293,4 @@ private:
 	void mac_install_memory(offs_t memory_begin, offs_t memory_end, offs_t memory_size, void *memory_data, int is_rom);
 };
 
-#endif // MAME_INCLUDES_MAC_H
+#endif // MAME_APPLE_MAC_H

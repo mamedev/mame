@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ariane Fugmann
-#ifndef MAME_AUDIO_VICDUAL_97271P_H
-#define MAME_AUDIO_VICDUAL_97271P_H
+#ifndef MAME_SEGA_VICDUAL_97271P_H
+#define MAME_SEGA_VICDUAL_97271P_H
 
 #pragma once
 
@@ -35,4 +35,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(S97271P, s97271p_device)
 
-#endif // MAME_AUDIO_VICDUAL_97271P_H
+#endif // MAME_SEGA_VICDUAL_97271P_H

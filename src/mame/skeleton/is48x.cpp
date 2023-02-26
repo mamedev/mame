@@ -13,6 +13,9 @@
 #include "video/mc6845.h"
 #include "screen.h"
 
+
+namespace {
+
 class is48x_state : public driver_device
 {
 public:
@@ -103,5 +106,8 @@ ROM_START(is482) // "IS-488-A" on case
 	ROM_REGION(0x80000, "program", 0)
 	ROM_LOAD("is-482_u67_s008533243.bin", 0x00000, 0x80000, CRC(1e23ac17) SHA1(aadc73bc0454c5b1c33d440dc511009dc6b7f9e0)) // M27C4001-10FI
 ROM_END
+
+} // anonymous namespace
+
 
 COMP(199?, is482, 0, 0, is482, is482, is48x_state, empty_init, "Decision Data", "IS-482 Workstation", MACHINE_IS_SKELETON)

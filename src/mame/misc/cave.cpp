@@ -82,6 +82,10 @@ Versions known to exist but not dumped:
      PCBs were shown running (and could be played) at a Cave fan show known as Cave Festival 2006. There are
      videos of the game being played floating around the internet and on YouTube. AKA DDP-CV or DDP BLUE ROM
 
+NOTE: Easter egg in Fereron SOS / Dangun Feveron:
+      Insert a coin and with the joystick move: Down, Up, Right, Left, Up, Down, Left, Right
+      If you did the above right, you'll hear a MEOW sound. Start the game and your ship is now a cat!
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -5070,8 +5074,8 @@ actual International production release.
 
 ROM_START( uopoko )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "u26.int", 0x000000, 0x080000, CRC(b445c9ac) SHA1(4dda1c6e19de629ea4d9061560c32a9f0deabd53) )
-	ROM_LOAD16_BYTE( "u25.int", 0x000001, 0x080000, CRC(a1258482) SHA1(7f4adc4a6d069032aaf3d93eb60fde16b59483f8) )
+	ROM_LOAD16_BYTE( "u26.u26", 0x000000, 0x080000, CRC(b445c9ac) SHA1(4dda1c6e19de629ea4d9061560c32a9f0deabd53) )
+	ROM_LOAD16_BYTE( "u25.u25", 0x000001, 0x080000, CRC(a1258482) SHA1(7f4adc4a6d069032aaf3d93eb60fde16b59483f8) )
 
 	ROM_REGION( 0x400000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "cave_cv-02_u33.u33", 0x000000, 0x400000, CRC(5d142ad2) SHA1(f26abcf7a625a322b83df44fbd6e852bfb03663c) ) /* mask ROM */
@@ -5088,8 +5092,8 @@ ROM_END
 
 ROM_START( uopokoj )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
-	ROM_LOAD16_BYTE( "u26.bin", 0x000000, 0x080000, CRC(e7eec050) SHA1(cf3a77741029f96dbbec5ca7217a1723e4233cff) )
-	ROM_LOAD16_BYTE( "u25.bin", 0x000001, 0x080000, CRC(68cb6211) SHA1(a6db0bc2e3e54b6992a44b7d52395917e66db49b) )
+	ROM_LOAD16_BYTE( "u26j.u26", 0x000000, 0x080000, CRC(e7eec050) SHA1(cf3a77741029f96dbbec5ca7217a1723e4233cff) )
+	ROM_LOAD16_BYTE( "u25j.u25", 0x000001, 0x080000, CRC(68cb6211) SHA1(a6db0bc2e3e54b6992a44b7d52395917e66db49b) )
 
 	ROM_REGION( 0x400000, "sprites0", 0 )        /* Sprites: * 2 */
 	ROM_LOAD( "cave_cv-02_u33.u33", 0x000000, 0x400000, CRC(5d142ad2) SHA1(f26abcf7a625a322b83df44fbd6e852bfb03663c) ) /* mask ROM */

@@ -17,6 +17,8 @@
 #include "screen.h"
 
 
+namespace {
+
 class textelcomp_state : public driver_device
 {
 public:
@@ -381,6 +383,8 @@ ROM_START(a1010)
 	ROM_REGION(0x8000, "chargen", 0)
 	ROM_LOAD("chargen.bin", 0x0000, 0x8000, CRC(07daa70e) SHA1(8066a0ac238b06fbeeb99c3a2a8a9e70a27db7a9))
 ROM_END
+
+} // anonymous namespace
 
 
 COMP(1993, a1010, 0, 0, textelcomp, textelcomp, textelcomp_state, empty_init, "Humantechnik", "Textel Compact A1010-0", MACHINE_IS_SKELETON)

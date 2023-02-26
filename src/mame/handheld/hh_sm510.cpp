@@ -1436,6 +1436,8 @@ ROM_END
   MC-25 and EG-26 are the same game, it's assumed that the latter was for
   regions where Nintendo wasn't able to license from Disney.
 
+----------------------------------------------------------------------------
+
   In 1984, Электроника (Elektronika, USSR) released an unlicensed clone:
   Ну, погоди! (Nu, pogodi!). This was followed by several other titles that
   were the same under the hood, only differing in graphics. They also made a

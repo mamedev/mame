@@ -5,8 +5,8 @@
     Competition Golf Final Round
 
 *************************************************************************/
-#ifndef MAME_INCLUDES_COMPGOLF_H
-#define MAME_INCLUDES_COMPGOLF_H
+#ifndef MAME_DATAEAST_COMPGOLF_H
+#define MAME_DATAEAST_COMPGOLF_H
 
 #pragma once
 
@@ -66,4 +66,4 @@ private:
 	void compgolf_map(address_map &map);
 };
 
-#endif // MAME_INCLUDES_COMPGOLF_H
+#endif // MAME_DATAEAST_COMPGOLF_H

@@ -65,7 +65,7 @@ protected:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	std::vector<option> m_options;
 	game_driver const *const m_driver;

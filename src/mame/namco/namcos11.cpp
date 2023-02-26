@@ -34,6 +34,7 @@ tekken2ub  Tekken 2 Ver.B (TES3/VER.B)             COH-100             SYSTEM11 
 tekken2b   Tekken 2 Ver.B (TES2/VER.B)             COH-100             "                        "                       "        "
 tekken2jc  Tekken 2 Ver.B (TES1/VER.C)             COH-100             "                        "                       "        "
 tekken2a   Tekken 2 (TES2/VER.A)                   COH-100             "                        "                       "        "
+tekken2ua  Tekken 2 (TES3/VER.A)                   COH-100             "                        "                       "        "
 souledge   Soul Edge Ver. II (SO4/VER.C)           COH-100 / COH-110   SYSTEM11 MOTHER PCB      SYSTEM11 ROM8 PCB       C409     6
 souledgeuc Soul Edge Ver. II (SO3/VER.C)           COH-100 / COH-110   "                        "                       "        "
 souledgeua Soul Edge (SO3/VER.A)                   COH-100 / COH-110   "                        "                       "        "
@@ -1660,6 +1661,30 @@ ROM_START( tekken2ub )
 	ROM_LOAD( "tes1wave.8k",  0x800000, 0x400000, CRC(34a34eab) SHA1(8e83a579abdcd419dc5cff8aa4c1d7e6c3add773) )
 ROM_END
 
+ROM_START( tekken2ua )
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "tes3vera.2l",  0x0000000, 0x100000, CRC(0276680b) SHA1(508bb1c8a0ce929181508108ad3797e67ddd3df8) )
+	ROM_LOAD16_BYTE( "tes3vera.2j",  0x0000001, 0x100000, CRC(80e9b5ec) SHA1(2f6313492f0d78b9745303418cd77347d14acc8c) )
+	ROM_LOAD16_BYTE( "tes1vera.2k",  0x0200000, 0x100000, CRC(78e2ce1a) SHA1(fb242725dc72fa234bd7df81cec57fe010cf58f3) )
+	ROM_LOAD16_BYTE( "tes1vera.2f",  0x0200001, 0x100000, CRC(fbb0b146) SHA1(08b11ac0fbfeed62910c5cb5ff7b5939ecbca142) )
+
+	ROM_REGION32_LE( 0x1000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "tes1rom0l.ic6", 0x0000000, 0x200000, CRC(fc904ede) SHA1(cea378ba86f94beadb3d67685f1b8c141f478abe) )
+	ROM_LOAD16_BYTE( "tes1rom0u.ic5", 0x0000001, 0x200000, CRC(57b38f5d) SHA1(edb4beab47b1339a5b1bc8071086abfcba57722e) )
+	ROM_LOAD16_BYTE( "tes1rom1l.ic8", 0x0400000, 0x200000, CRC(aa48f04b) SHA1(f7383d2b3a84c4e649a27c0ad1e6af4702ec0a17) )
+	ROM_LOAD16_BYTE( "tes1rom1u.ic3", 0x0400001, 0x200000, CRC(b147c543) SHA1(c4b18c218999ec73d04c92e06fb3e6165ceebf2b) )
+	ROM_LOAD16_BYTE( "tes1rom2l.ic7", 0x0800000, 0x200000, CRC(b08da52c) SHA1(31fe2021d0fe37c16555650dd10d26ed80d9b493) )
+	ROM_LOAD16_BYTE( "tes1rom2u.ic4", 0x0800001, 0x200000, CRC(8a1561b8) SHA1(ebc02c9e7033d54aefb5034c97a3c8cd749b5600) )
+	ROM_LOAD16_BYTE( "tes1rom3l.ic9", 0x0c00000, 0x200000, CRC(d5ac0f18) SHA1(342d063f7974bd1f90b5ca4832dfa4fbc9605453) )
+	ROM_LOAD16_BYTE( "tes1rom3u.ic1", 0x0c00001, 0x200000, CRC(44ed509d) SHA1(27e26aaf5ce72ab686f3f05743b1d91b5334b4e0) )
+
+	ROM_REGION16_LE( 0x80000, "c76", 0 ) /* sound data */
+	ROM_LOAD( "tes1sprog.6d", 0x0000000, 0x040000, CRC(af18759f) SHA1(aabd7d1384925781d37f860605a5d4622e0fc2e4) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "tes1wave.8k",  0x800000, 0x400000, CRC(34a34eab) SHA1(8e83a579abdcd419dc5cff8aa4c1d7e6c3add773) )
+ROM_END
+
 ROM_START( tekken2b )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 ) /* main prg */
 	ROM_LOAD16_BYTE( "tes2verb.2l",  0x0000000, 0x100000, CRC(aa9a4503) SHA1(e6fdd34216591510593bbda0232ddc0fcd80e80b) )
@@ -1825,6 +1850,9 @@ ROM_START( xevi3dgj )
 	ROM_RELOAD( 0x800000, 0x400000 )
 ROM_END
 
+} // anonymous namespace
+
+
 /*
 1 = Japan
 2 = World
@@ -1832,9 +1860,6 @@ ROM_END
 4 = Asia specific
 9 = Location Test
 */
-
-} // anonymous namespace
-
 
 GAME( 1994, tekken,     0,        tekken,     tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken (World, TE2/VER.C)",                    0 )
 GAME( 1994, tekkenac,   tekken,   tekken,     tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken (Asia, TE4/VER.C)",                     0 )
@@ -1846,6 +1871,7 @@ GAME( 1995, tekken2b,   tekken2,  tekken2o,   tekken,     namcos11_state, empty_
 GAME( 1995, tekken2jc,  tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (Japan, TES1/VER.C)",           0 )
 GAME( 1995, tekken2jb,  tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 Ver.B (Japan, TES1/VER.B)",           0 )
 GAME( 1995, tekken2a,   tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 (World, TES2/VER.A)",                 0 )
+GAME( 1995, tekken2ua,  tekken2,  tekken2o,   tekken,     namcos11_state, empty_init, ROT0, "Namco",         "Tekken 2 (US, TES3/VER.A)",                    0 )
 GAME( 1996, souledge,   0,        souledge,   souledge,   namcos11_state, empty_init, ROT0, "Namco",         "Soul Edge Ver. II (Asia, SO4/VER.C)",          0 )
 GAME( 1995, souledgeuc, souledge, souledge,   souledge,   namcos11_state, empty_init, ROT0, "Namco",         "Soul Edge Ver. II (US, SO3/VER.C)",            0 )
 GAME( 1995, souledgea,  souledge, souledge,   souledge,   namcos11_state, empty_init, ROT0, "Namco",         "Soul Edge (World, SO2/VER.A)",                 0 )
@@ -1864,8 +1890,8 @@ GAME( 1996, pocketrc,   0,        pocketrc,   pocketrc,   namcos11_state, empty_
 GAME( 1997, starswep,   0,        starswep,   namcos11,   namcos11_state, empty_init, ROT0, "Axela / Namco", "Star Sweep (World, STP2/VER.A)",               0 )
 GAME( 1997, starswepj,  starswep, starswep,   namcos11,   namcos11_state, empty_init, ROT0, "Axela / Namco", "Star Sweep (Japan, STP1/VER.A)",               0 )
 GAME( 1998, myangel3,   0,        myangel3,   myangel3,   namcos11_state, empty_init, ROT0, "MOSS / Namco",  "Kosodate Quiz My Angel 3 (Japan, KQT1/VER.A)", 0 )
-GAME( 1999, ptblank2a,  ptblank2 ,ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (World, GNB2/VER.A)",            0 )
-GAME( 1999, ptblank2b,  ptblank2 ,ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (World, GNB2/VER.A alt)",        0 )
-GAME( 1999, ptblank2c,  ptblank2 ,ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (unknown region)",               0 )
+GAME( 1999, ptblank2a,  ptblank2, ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (World, GNB2/VER.A)",            0 )
+GAME( 1999, ptblank2b,  ptblank2, ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (World, GNB2/VER.A alt)",        0 )
+GAME( 1999, ptblank2c,  ptblank2, ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (World, unknown version)",       0 )
 GAME( 1999, ptblank2ua, ptblank2, ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Point Blank 2 (US, GNB3/VER.A)",               0 )
 GAME( 1999, gunbarla,   ptblank2, ptblank2ua, ptblank2ua, namcos11_state, empty_init, ROT0, "Namco",         "Gunbarl (Japan, GNB1/VER.A)",                  0 )

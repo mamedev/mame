@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_TRS80M2_H
-#define MAME_INCLUDES_TRS80M2_H
+#ifndef MAME_TRS_TRS80M2_H
+#define MAME_TRS_TRS80M2_H
 
 #pragma once
 
@@ -173,4 +173,4 @@ protected:
 	uint8_t m_offset[2];
 };
 
-#endif // MAME_INCLUDES_TRS80M2_H
+#endif // MAME_TRS_TRS80M2_H

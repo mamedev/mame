@@ -90,57 +90,64 @@ menu_bios_selection::~menu_bios_selection()
     menu_bios_selection - menu that
 -------------------------------------------------*/
 
-void menu_bios_selection::handle(event const *ev)
+bool menu_bios_selection::handle(event const *ev)
 {
-	// process the menu
-	if (ev && ev->itemref)
+	if (!ev || !ev->itemref)
+		return false;
+
+	if ((uintptr_t)ev->itemref == 1 && ev->iptkey == IPT_UI_SELECT)
 	{
-		if ((uintptr_t)ev->itemref == 1 && ev->iptkey == IPT_UI_SELECT)
-			machine().schedule_hard_reset();
+		machine().schedule_hard_reset();
+		return false;
+	}
+
+	device_t *const dev = (device_t *)ev->itemref;
+	int bios_val = 0;
+
+	switch (ev->iptkey)
+	{
+	// reset to default
+	case IPT_UI_CLEAR:
+		bios_val = dev->default_bios();
+		break;
+
+	// previous/next BIOS setting
+	case IPT_UI_SELECT:
+	case IPT_UI_LEFT:
+	case IPT_UI_RIGHT:
+		{
+			int const cnt = ([bioses = romload::entries(dev->rom_region()).get_system_bioses()] () { return std::distance(bioses.begin(), bioses.end()); })();
+			bios_val = dev->system_bios() + ((ev->iptkey == IPT_UI_LEFT) ? -1 : +1);
+
+			// wrap
+			if (bios_val < 1)
+				bios_val = cnt;
+			if (bios_val > cnt)
+				bios_val = 1;
+		}
+		break;
+
+	default:
+		break;
+	}
+
+	if (bios_val > 0)
+	{
+		dev->set_system_bios(bios_val);
+		if (!strcmp(dev->tag(), ":"))
+		{
+			machine().options().set_value("bios", bios_val - 1, OPTION_PRIORITY_CMDLINE);
+		}
 		else
 		{
-			device_t *dev = (device_t *)ev->itemref;
-			int bios_val = 0;
-
-			switch (ev->iptkey)
-			{
-				// reset to default
-				case IPT_UI_SELECT:
-					bios_val = dev->default_bios();
-					break;
-
-				// previous/next bios setting
-				case IPT_UI_LEFT: case IPT_UI_RIGHT:
-				{
-					int const cnt = ([bioses = romload::entries(dev->rom_region()).get_system_bioses()] () { return std::distance(bioses.begin(), bioses.end()); })();
-					bios_val = dev->system_bios() + ((ev->iptkey == IPT_UI_LEFT) ? -1 : +1);
-
-					// wrap
-					if (bios_val < 1)
-						bios_val = cnt;
-					if (bios_val > cnt)
-						bios_val = 1;
-
-					break;
-				}
-
-				default:
-					break;
-			}
-
-			if (bios_val > 0)
-			{
-				dev->set_system_bios(bios_val);
-				if (strcmp(dev->tag(),":")==0) {
-					machine().options().set_value("bios", bios_val-1, OPTION_PRIORITY_CMDLINE);
-				} else {
-					const char *slot_option_name = dev->owner()->tag() + 1;
-					machine().options().slot_option(slot_option_name).set_bios(string_format("%d", bios_val - 1));
-				}
-				reset(reset_options::REMEMBER_REF);
-			}
+			const char *slot_option_name = dev->owner()->tag() + 1;
+			machine().options().slot_option(slot_option_name).set_bios(string_format("%d", bios_val - 1));
 		}
+		reset(reset_options::REMEMBER_REF);
 	}
+
+	// triggers an item reset for any change
+	return false;
 }
 
 
@@ -166,15 +173,16 @@ void menu_network_devices::populate()
 	{
 		int curr = network.get_interface();
 		const char *title = nullptr;
-		for(auto &entry : get_netdev_list())
+		for (auto &entry : get_netdev_list())
 		{
-			if(entry->id==curr) {
+			if (entry->id == curr)
+			{
 				title = entry->description;
 				break;
 			}
 		}
 
-		item_append(network.device().tag(),  (title) ? title : "------", FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)&network);
+		item_append(network.device().tag(), title ? title : "------", FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)&network);
 	}
 
 	item_append(menu_item_type::SEPARATOR);
@@ -184,24 +192,41 @@ void menu_network_devices::populate()
     menu_network_devices - menu that
 -------------------------------------------------*/
 
-void menu_network_devices::handle(event const *ev)
+bool menu_network_devices::handle(event const *ev)
 {
-	// process the menu
-	if (ev && ev->itemref)
+	if (!ev || !ev->itemref)
 	{
-		if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
+		return false;
+	}
+	else if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
+	{
+		device_network_interface *const network = (device_network_interface *)ev->itemref;
+		int curr = network->get_interface();
+		if (ev->iptkey == IPT_UI_LEFT)
+			curr--;
+		else
+			curr++;
+		if (curr == -2)
+			curr = netdev_count() - 1;
+		network->set_interface(curr);
+
+		curr = network->get_interface();
+		const char *title = nullptr;
+		for (auto &entry : get_netdev_list())
 		{
-			device_network_interface *network = (device_network_interface *)ev->itemref;
-			int curr = network->get_interface();
-			if (ev->iptkey == IPT_UI_LEFT)
-				curr--;
-			else
-				curr++;
-			if (curr == -2)
-				curr = netdev_count() - 1;
-			network->set_interface(curr);
-			reset(reset_options::REMEMBER_REF);
+			if (entry->id == curr)
+			{
+				title = entry->description;
+				break;
+			}
 		}
+
+		ev->item->set_subtext(title ? title : "------");
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 
@@ -272,16 +297,20 @@ void menu_bookkeeping::populate()
 {
 }
 
-void menu_bookkeeping::handle(event const *ev)
+bool menu_bookkeeping::handle(event const *ev)
 {
 	// if the time has rolled over another second, regenerate
 	// TODO: what about other bookkeeping events happening with the menu open?
 	attotime const curtime = machine().time();
 	if (curtime.seconds() != prevtime.seconds())
+	{
 		reset_layout();
-
-	if (ev)
-		handle_key(ev->iptkey);
+		return true;
+	}
+	else
+	{
+		return ev && handle_key(ev->iptkey);
+	}
 }
 
 
@@ -290,7 +319,7 @@ void menu_bookkeeping::handle(event const *ev)
     menu
 -------------------------------------------------*/
 
-void menu_crosshair::handle(event const *ev)
+bool menu_crosshair::handle(event const *ev)
 {
 	// handle events
 	if (ev && ev->itemref)
@@ -383,6 +412,9 @@ void menu_crosshair::handle(event const *ev)
 		if (changed)
 			reset(reset_options::REMEMBER_REF); // rebuild the menu
 	}
+
+	// triggers an item reset for any changes
+	return false;
 }
 
 
@@ -601,7 +633,7 @@ menu_export::~menu_export()
 //  handle the export menu
 //-------------------------------------------------
 
-void menu_export::handle(event const *ev)
+bool menu_export::handle(event const *ev)
 {
 	// process the menu
 	if (ev && ev->itemref)
@@ -640,7 +672,7 @@ void menu_export::handle(event const *ev)
 						auto iter = std::find_if(
 							driver_list.begin(),
 							driver_list.end(),
-							[shortname](const game_driver *driver) { return !strcmp(shortname, driver->name); });
+							[shortname] (const game_driver *driver) { return !strcmp(shortname, driver->name); });
 						return iter != driver_list.end();
 					};
 
@@ -695,6 +727,8 @@ void menu_export::handle(event const *ev)
 			break;
 		}
 	}
+
+	return false;
 }
 
 //-------------------------------------------------
@@ -752,7 +786,7 @@ menu_machine_configure::~menu_machine_configure()
 //  handle the machine options menu
 //-------------------------------------------------
 
-void menu_machine_configure::handle(event const *ev)
+bool menu_machine_configure::handle(event const *ev)
 {
 	// process the menu
 	if (ev && ev->itemref)
@@ -805,6 +839,9 @@ void menu_machine_configure::handle(event const *ev)
 			reset(reset_options::REMEMBER_POSITION);
 		}
 	}
+
+	// triggers an item reset for any changes
+	return false;
 }
 
 //-------------------------------------------------
@@ -905,25 +942,25 @@ menu_plugins_configure::~menu_plugins_configure()
 //  handle the plugins menu
 //-------------------------------------------------
 
-void menu_plugins_configure::handle(event const *ev)
+bool menu_plugins_configure::handle(event const *ev)
 {
-	// process the menu
-	bool changed = false;
-	plugin_options &plugins = mame_machine_manager::instance()->plugins();
-	if (ev && ev->itemref)
+	if (!ev || !ev->itemref)
+		return false;
+
+	if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT || ev->iptkey == IPT_UI_SELECT)
 	{
-		if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT || ev->iptkey == IPT_UI_SELECT)
+		plugin_options &plugins = mame_machine_manager::instance()->plugins();
+		plugin_options::plugin *p = plugins.find((const char*)ev->itemref);
+		if (p)
 		{
-			plugin_options::plugin *p = plugins.find((const char*)ev->itemref);
-			if (p)
-			{
-				p->m_start = !p->m_start;
-				changed = true;
-			}
+			p->m_start = !p->m_start;
+			ev->item->set_subtext(p->m_start ? _("On") : _("Off"));
+			ev->item->set_flags(p->m_start ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW);
+			return true;
 		}
 	}
-	if (changed)
-		reset(reset_options::REMEMBER_REF);
+
+	return false;
 }
 
 //-------------------------------------------------

@@ -5,8 +5,8 @@
  * sega/sms.h
  *
  ****************************************************************************/
-#ifndef MAME_INCLUDES_SMS_H
-#define MAME_INCLUDES_SMS_H
+#ifndef MAME_SEGA_SMS_H
+#define MAME_SEGA_SMS_H
 
 #pragma once
 
@@ -359,4 +359,4 @@ private:
 #define IO_BIOS_ROM     (0x08)  /* BIOS ROM disabled (1= disabled, 0= enabled) */
 #define IO_CHIP         (0x04)  /* I/O chip disabled (1= disabled, 0= enabled) */
 
-#endif // MAME_INCLUDES_SMS_H
+#endif // MAME_SEGA_SMS_H

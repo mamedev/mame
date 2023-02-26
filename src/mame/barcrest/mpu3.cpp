@@ -170,7 +170,7 @@ TODO: - Distinguish door switches using manual
 
 #define LOG(x)  do { if (MPU3VERBOSE) logerror x; } while (0)
 
-	
+
 namespace {
 
 class mpu3_state : public driver_device

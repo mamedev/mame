@@ -36,6 +36,8 @@ A sticker on the back panel says: GenRad, Culver City CA, Model 2301-9001
 #include "screen.h"
 
 
+namespace {
+
 class grfd2301_state : public driver_device
 {
 public:
@@ -142,5 +144,8 @@ ROM_START( grfd2301 )
 	ROM_REGION( 0x2000, "chargen", 0 )
 	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 198?, grfd2301, 0, 0, grfd2301, grfd2301, grfd2301_state, empty_init, "Genrad", "Futuredata 2301 Network Processor", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

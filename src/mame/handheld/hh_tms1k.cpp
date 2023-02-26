@@ -121,6 +121,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP2110   TMS1370   1980, Gakken Invader/Tandy Fire Away
  @MP2139   TMS1370   1981, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
  @MP2726   TMS1040   1979, Tomy Break Up
+ *MP2787   TMS1040?  1980, Bandai Race Time (? note: VFD-capable)
  *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
  @MP3200   TMS1000   1978, Parker Brothers Electronic Master Mind
@@ -224,6 +225,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "screen.h"
 #include "speaker.h"
 
+// netlist
 #include "nl_bship.h"
 
 // internal artwork
@@ -2217,7 +2219,7 @@ class h2hbaskb_state : public hh_tms1k_state
 public:
 	h2hbaskb_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_tms1k_state(mconfig, type, tag),
-		m_cap_empty_timer(*this, "cap_empty")
+		m_cap_discharge(*this, "cap_discharge")
 	{ }
 
 	void h2hbaskb(machine_config &config);
@@ -2227,9 +2229,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	required_device<timer_device> m_cap_empty_timer;
-	TIMER_DEVICE_CALLBACK_MEMBER(cap_empty_callback);
-	bool m_cap_state = false;
+	required_device<timer_device> m_cap_discharge;
 	attotime m_cap_charge = attotime::zero;
 
 	void update_display();
@@ -2243,17 +2243,10 @@ void h2hbaskb_state::machine_start()
 	hh_tms1k_state::machine_start();
 
 	// register for savestates
-	save_item(NAME(m_cap_state));
 	save_item(NAME(m_cap_charge));
 }
 
 // handlers
-
-TIMER_DEVICE_CALLBACK_MEMBER(h2hbaskb_state::cap_empty_callback)
-{
-	if (~m_r & 0x200)
-		m_cap_state = false;
-}
 
 void h2hbaskb_state::update_display()
 {
@@ -2276,12 +2269,10 @@ void h2hbaskb_state::write_r(u32 data)
 	// R9: K8 and 15uF cap to V- (used as timer)
 	// rising edge, remember the time
 	if (data & ~m_r & 0x200)
-	{
-		m_cap_state = true;
 		m_cap_charge = machine().time();
-	}
+
 	// falling edge, determine how long K8 should stay up
-	if (~data & m_r & 0x200)
+	else if (~data & m_r & 0x200)
 	{
 		const attotime full = attotime::from_usec(1300); // approx. charge time
 		const int factor = 27; // approx. factor for charge/discharge to logic 0
@@ -2290,7 +2281,7 @@ void h2hbaskb_state::write_r(u32 data)
 		if (charge > full)
 			charge = full;
 
-		m_cap_empty_timer->adjust(charge * factor);
+		m_cap_discharge->adjust(charge * factor);
 	}
 
 	// R0-R7: led select
@@ -2308,7 +2299,8 @@ void h2hbaskb_state::write_o(u16 data)
 u8 h2hbaskb_state::read_k()
 {
 	// K1-K4: multiplexed inputs, K8: R9 and capacitor
-	return (read_inputs(4) & 7) | (m_cap_state ? 8 : 0);
+	u8 cap_state = (m_r & 0x200 || m_cap_discharge->enabled()) ? 8 : 0;
+	return (read_inputs(4) & 7) | cap_state;
 }
 
 // config
@@ -2355,7 +2347,7 @@ void h2hbaskb_state::h2hbaskb(machine_config &config)
 	m_maincpu->write_r().set(FUNC(h2hbaskb_state::write_r));
 	m_maincpu->write_o().set(FUNC(h2hbaskb_state::write_o));
 
-	TIMER(config, "cap_empty").configure_generic(FUNC(h2hbaskb_state::cap_empty_callback));
+	TIMER(config, "cap_discharge").configure_generic(nullptr);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6+6, 7);
@@ -15243,8 +15235,8 @@ CONS( 1980, phpball,    0,         0, phpball,   phpball,   phpball_state,   emp
 CONS( 1982, tdracula,   0,         0, tdracula,  tdracula,  tdracula_state,  empty_init, "Tsukuda", "The Dracula (Tsukuda)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, slepachi,   0,         0, slepachi,  slepachi,  slepachi_state,  empty_init, "Tsukuda", "Slot Elepachi", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1980, scruiser,   0,         0, scruiser,  scruiser,  scruiser_state,  empty_init, "U.S. Games", "Space Cruiser (U.S. Games)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1980, ssports4,   0,         0, ssports4,  ssports4,  ssports4_state,  empty_init, "U.S. Games", "Super Sports-4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1980, scruiser,   0,         0, scruiser,  scruiser,  scruiser_state,  empty_init, "U.S. Games Corporation", "Space Cruiser (U.S. Games)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1980, ssports4,   0,         0, ssports4,  ssports4,  ssports4_state,  empty_init, "U.S. Games Corporation", "Super Sports-4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 CONS( 1983, xl25,       0,         0, xl25,      xl25,      xl25_state,      empty_init, "Vulcan Electronics", "XL 25", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 

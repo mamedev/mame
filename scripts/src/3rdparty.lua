@@ -1250,10 +1250,17 @@ project "bimg"
 		"BX_CONFIG_DEBUG=0",
 	}
 
-	configuration { "mingw*" }
+	configuration { "x64", "mingw*" }
 		defines {
 			"ASTCENC_AVX=0",
 			"ASTCENC_SSE=20",
+		}
+	configuration { }
+
+	configuration { "x32" }
+		defines {
+			"ASTCENC_AVX=0",
+			"ASTCENC_SSE=0", -- assumes x86-64 ALU is present when using SSE
 		}
 	configuration { }
 
@@ -1290,7 +1297,7 @@ project "bimg"
 		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_symbolic_physical.cpp",
 		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_weight_align.cpp",
 		MAME_DIR .. "3rdparty/bimg/3rdparty/astc-encoder/source/astcenc_weight_quant_xfer_tables.cpp",
-		
+
 		MAME_DIR .. "3rdparty/bimg/3rdparty/tinyexr/deps/miniz/miniz.c",
 	}
 

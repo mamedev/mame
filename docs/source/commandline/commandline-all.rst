@@ -396,6 +396,25 @@ overwritten.
             000-lo.lo                            131072 CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a)
             sfix.sfix                            131072 CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3)
 
+.. _mame-commandline-listbios:
+
+**-listbios** [*<pattern>*...]
+
+    Displays a list of alternate ROM BIOSes for supported systems/devices that
+    match the specified pattern(s).  If no patterns are specified, the results
+    will include *all* supported systems and devices.
+
+    Example:
+        .. code-block:: bash
+
+            mame -listbios 3do
+            4 BIOSes available for driver "3do".
+            Name:             Description:
+            panafz10          "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer"
+            goldstar          "Goldstar 3DO Interactive Multiplayer v1.01m"
+            panafz1           "Panasonic FZ-1 R.E.A.L. 3DO Interactive Multiplayer"
+            sanyotry          "Sanyo TRY 3DO Interactive Multiplayer"
+
 .. _mame-commandline-listsamples:
 
 **-listsamples** [<*pattern*>]
@@ -724,9 +743,12 @@ OSD-related Options
 **-[no]background_input**
 
     Sets whether input is accepted or ignored when MAME does not have UI focus.
-    Currently supported for RawInput mouse/keyboard input on Windows, and SDL
-    game controller/joystick input.  This setting is ignored when the debugger
-    is enabled.  The default is OFF (**-nobackground_input**).
+    This setting is ignored when the debugger is enabled.  The default is OFF
+    (**-nobackground_input**).
+
+    Currently supported for RawInput mouse/keyboard input, DirectInput
+    mouse/keyboard/joystick input and XInput joystick input on Windows, and SDL
+    game controller/joystick input.
 
     Example:
         .. code-block:: bash
@@ -953,7 +975,7 @@ Example:
 
 ..  rubric:: Footnotes
 
-..  [#JIPAutoWindows] On Windows, auto will default to ``winhybrid``.
+..  [#JIPAutoWindows] On Windows native, auto will default to ``winhybrid``.
 
 ..  [#JIPAutoSDL] On SDL, auto will default to ``sdlgame``.
 
@@ -983,11 +1005,46 @@ Example:
 
         mame mk2 -joystickprovider winhybrid
 
+.. _mame-commandline-midiprovider:
+
+**-midiprovider** *<module>*
+
+    Chooses how MAME will communicate with MIDI devices and applications (e.g.
+    music keyboards and synthesisers).  Supported options are ``pm`` to use the
+    PortMidi library, or ``none`` to disable MIDI input and output (MIDI files
+    can still be played).  The default is ``auto``, which will use PortMidi if
+    available.
+
+Example:
+    .. code-block:: bash
+
+        mame -midiprovider none dx100 -midiin canyon.mid
+
+.. _mame-commandline-networkprovider:
+
+**-networkprovider** *<module>*
+
+    Chooses how MAME will provide communication for emulated packet-oriented
+    network interfaces (e.g. Ethernet cards).  Supported options are ``taptun``
+    to use the TUN/TAP, TAP-Windows or similar, ``pcap`` to use a pcap library,
+    or ``none`` to disable communication for emulated network interfaces.
+    Available options depend on your operating system.  By default, ``taptun``
+    and ``none`` are available on Windows and Linux, and ``pcap`` and ``none``
+    are available on macOS.
+
+    The default is ``auto`` which will use ``taptun`` if available, falling back
+    to ``pcap``.
+
+Example:
+    .. code-block:: bash
+
+        mame -networkprovider pcap apple2ee -sl3 uthernet
+
 
 .. _mame-commandline-cliverbs:
 
-OSD CLI Verbs
--------------
+OSD Command-Line Verbs
+----------------------
 
 .. _mame-commandline-listmidi:
 
@@ -2073,35 +2130,35 @@ Core Video Options
 
     Generally Available:
 
-      |	Using ``bgfx`` specifies the new hardware accelerated renderer.
-      |
-      |	Using ``opengl`` tells MAME to render video using OpenGL acceleration.
-      |
-      |	Using ``none`` displays no windows and does no drawing.  This is primarily present for doing CPU benchmarks without the overhead of the video system.
-      |
+    * Using ``bgfx`` specifies the new hardware accelerated renderer.
+    * Using ``opengl`` tells MAME to render video using OpenGL acceleration.
+    * Using ``none`` displays no windows and does no drawing.  This is primarily
+      intended for benchmarking emulation without the overhead of the video
+      system.
 
     On Windows:
 
-      |	Using ``gdi`` tells MAME to render video using older standard Windows graphics drawing calls.  This is the slowest but most compatible option on older versions of Windows.
-      |
-      |	Using ``d3d`` tells MAME to use Direct3D for rendering.  This produces the better quality output than ``gdi`` and enables additional rendering options.  It is recommended if you have a semi-recent (2002+) video card or onboard Intel video of the HD3000 line or better.
-      |
+    * Using ``gdi`` tells MAME to render video using older standard Windows
+      graphics drawing calls.  This is the slowest but most compatible option on
+      older versions of Windows or buggy graphics hardware drivers.
+    * Using ``d3d`` tells MAME to use Direct3D 9 for rendering.  This produces
+      better quality output than ``gdi`` and enables additional rendering
+      options.  It is recommended if you have a 3D-capable video card or onboard
+      Intel video of the HD3000 line or better.
 
     On other platforms (including SDL on Windows):
 
-      |	Using ``accel`` tells MAME to render video using SDL's 2D acceleration if possible.
-      |
-      |	Using ``soft`` uses software rendering for video output.  This isn't as fast or as nice as OpenGL but will work on any platform.
-      |
+    * Using ``accel`` tells MAME to render video using SDL’s 2D acceleration if
+      possible.
+    * Using ``soft`` uses software rendering for video output.  This isn’t as
+      fast or as nice as OpenGL, but it will work on any platform.
 
     Defaults:
 
-      |	The default on Windows is ``d3d``.
-      |
-      |	The default for Mac OS X is ``opengl`` because OS X is guaranteed to have a compliant OpenGL stack.
-      |
-      |	The default on all other systems is ``soft``.
-      |
+    * The default on Windows is ``d3d``.
+    * The default for macOS is ``opengl`` because OS X is guaranteed to have a
+      compliant OpenGL stack.
+    * The default on all other systems is ``soft``.
 
     Example:
         .. code-block:: bash
@@ -3048,7 +3105,16 @@ Core Input Options
 
     Controls whether or not MAME makes use of mouse controllers.  When this is
     enabled, you will likely be unable to use your mouse for other purposes
-    until you exit or pause the system.
+    until you exit or pause the system.  Supported mouse controllers depend on
+    your :ref:`mouseprovider setting <mame-commandline-mouseprovider>`.
+
+    Note that if this setting is off (**-nomouse**), mouse input may still be
+    enabled depending on the inputs present on the emulated system and your
+    :ref:`automatic input enable settings <mame-commandline-inputenable>`.  In
+    particular, the default is to enable mouse input when the emulated system
+    has mouse inputs (**-mouse_device mouse**), so MAME will capture your mouse
+    pointer when you run a system with mouse inputs unless you also change
+    the **mouse_device** setting.
 
     The default is OFF (**-nomouse**).
 
@@ -3061,10 +3127,16 @@ Core Input Options
 
 **-[no]joystick** / **-[no]joy**
 
-    Controls whether or not MAME makes use of joystick/gamepad controllers.
+    Controls whether or not MAME makes use of game controllers (e.g. joysticks,
+    gamepads and simulation controls).  Supported game controllers depend on
+    your :ref:`joystickprovider setting <mame-commandline-joystickprovider>`.
 
     When this is enabled, MAME will ask the system about which controllers are
     connected.
+
+    Note that if this setting is off (**-nojoystick**), joystick input may still
+    be enabled depending on the inputs present on the emulated system and your
+    :ref:`automatic input enable settings <mame-commandline-inputenable>`.
 
     The default is OFF (**-nojoystick**).
 
@@ -3078,8 +3150,14 @@ Core Input Options
 **-[no]lightgun** / **-[no]gun**
 
     Controls whether or not MAME makes use of lightgun controllers.  Note that
-    most lightguns map to the mouse, so using **-lightgun** and **-mouse**
-    together may produce strange results.
+    most lightguns also produce mouse input, so enabling mouse and lightgun
+    controllers simultaneously (using **-lightgun** and **-mouse** together) may
+    produce strange behaviour.  Supported lightgun controllers depend on your
+    :ref:`lightgunprovider setting <mame-commandline-lightgunprovider>`.
+
+    Note that if this setting is off (**-nolightgun**), lightgun input may still
+    be enabled depending on the inputs present on the emulated system and your
+    :ref:`automatic input enable settings <mame-commandline-inputenable>`.
 
     The default is OFF (**-nolightgun**).
 
@@ -3312,17 +3390,17 @@ Core Input Options
 
 **-joystick_deadzone** *<value>* / **-joy_deadzone** *<value>* / **-jdz** *<value>*
 
-  If you play with an analog joystick, the center can drift a little.
-  joystick_deadzone tells how far along an axis you must move before the axis
-  starts to change. This option expects a float in the range of 0.0 to 1.0.
-  Where 0 is the center of the joystick and 1 is the outer limit.
+    If you play with an analog joystick, the center can drift a little.
+    joystick_deadzone tells how far along an axis you must move before the axis
+    starts to change. This option expects a float in the range of 0.0 to 1.0.
+    Where 0 is the center of the joystick and 1 is the outer limit.
 
-  The default is ``0.3``.
+    The default is ``0.15``.
 
     Example:
         .. code-block:: bash
 
-            mame sinistar -joystick_deadzone 0.45
+            mame sinistar -joystick_deadzone 0.3
 
 .. _mame-commandline-joysticksaturation:
 
@@ -3341,6 +3419,29 @@ Core Input Options
 
             mame sinistar -joystick_saturation 1.0
 
+.. _mame-commandline-joystickthreshold:
+
+**-joystick_threshold** *<value>* / **joy_threshold** *<value>* / **-jthresh** *<value>*
+
+    When a joystick axis (or other absolute analog axis) is assigned to a
+    digital input, this controls how far it must be moved from the neutral
+    position (or centre) to be considered active or switched on.  This option
+    expects a float in the range of 0.0 to 1.0, where 0 means any movement from
+    the neutral position is considered active, and 1 means only the outer limits
+    are considered active.  This threshold is **not** adjusted to the range
+    between the dead zone and saturation point.
+
+    Note that if a :ref:`joystick map <mame-commandline-joystickmap>` is
+    configured, that will take precedence over this setting when a joystick’s
+    main X/Y axes are assigned to digital inputs.
+
+    The default is ``0.3``.
+
+    Example:
+        .. code-block:: bash
+
+            mame raiden -joystick_threshold 0.2
+
 .. _mame-commandline-natural:
 
 **\-[no]natural**
@@ -3357,18 +3458,22 @@ Core Input Options
     presses/releases the emulated key.
 
     In "natural keyboard" mode, MAME attempts to translate characters to
-    keystrokes.  The OS translates keystrokes to characters
-    (similarly when you type into a text editor), and MAME attempts to translate
-    these characters to emulated keystrokes.
+    keystrokes.  The OS translates keystrokes to characters (similarly to when
+    you type into a text editor), and MAME attempts to translate these
+    characters to emulated keystrokes.
 
     **There are a number of unavoidable limitations in "natural keyboard" mode:**
 
-      * The emulated system driver and/or keyboard device or has to support it.
-      * The selected keyboard *must* match the keyboard layout selected in the emulated OS!
-      * Keystrokes that don't produce characters can't be translated. (e.g. pressing a modifier on its own such as **shift**, **ctrl**, or **alt**)
-      * Holding a key until the character repeats will cause the emulated key to be pressed repeatedly as opposed to being held down.
-      * Dead key sequences are cumbersome to use at best.
-      * It won't work at all if IME edit is involved. (e.g. for Chinese/Japanese/Korean)
+    * The emulated system driver and/or keyboard device has to support it.
+    * The selected keyboard layout *must* match the keyboard layout selected in
+      the emulated OS!
+    * Keystrokes that don’t produce characters can’t be translated (e.g.
+      pressing a modifier on its own such as **shift**, **ctrl**, or **alt**).
+    * Holding a key until the character repeats will cause the emulated key to
+      be pressed repeatedly as opposed to being held down.
+    * Dead key sequences are cumbersome to use at best.
+    * It won’t work at all if IME edit is involved (e.g. for Chinese, Japanese
+      or Korean language input).
 
     Example:
         .. code-block:: bash
@@ -3441,20 +3546,29 @@ Core Input Automatic Enable Options
 
 **-mouse_device** ( ``none`` | ``keyboard`` | ``mouse`` | ``lightgun`` | ``joystick`` )
 
-    Each of these options controls autoenabling the mouse, joystick, or lightgun
-    depending on the presence of a particular class of analog control for a
-    particular system.  For example, if you specify the option
-    **-paddle mouse**, then any game that has a paddle control will
-    automatically enable mouse controls just as if you had explicitly specified
-    **-mouse**.
+    Each of these options sets whether mouse, joystick or lightgun controllers
+    should be enabled when running an emulated system that uses a particular
+    class of analog inputs.  These options can effectively set
+    :ref:`-mouse <mame-commandline-nomouse>`, :ref:`-joystick
+    <mame-commandline-nojoystick>` and/or :ref:`-lightgun
+    <mame-commandline-nolightgun>` depending on the type of inputs present on
+    the emulated system.
+
+    For example, if you specify the option **-paddle_device mouse**, then mouse
+    controls will automatically be enabled when you run a game that has paddle
+    controls (e.g. Super Breakout), even if you specified **-nomouse**.
+
+    The default is to automatically enable mouse controls when running emulated
+    systems with mouse inputs (**-mouse_device mouse**).
 
     Example:
         .. code-block:: bash
 
             mame sbrkout -paddle_device mouse
 
-.. Tip:: Note that these controls override the values of **-[no]mouse**,
-         **-[no]joystick**, etc.
+.. Tip:: Note that these settings can override **-nomouse**, **-nojoystick**
+         and/or **-nolightgun** depending on the inputs present on the emulated
+         system.
 
 
 .. _mame-commandline-debugging:
@@ -3800,8 +3914,8 @@ Core Misc Options
 **-bios** *<biosname>*
 
     Specifies the specific BIOS to use with the current system, for systems that
-    make use of a BIOS. The **-listxml** output will list all of the possible
-    BIOS names for a system.
+    make use of a BIOS. The **-listbios** output will list all of the possible
+    BIOS names for a system, as does the **-listxml** output.
 
     The default is ``default``.
 

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef MAME_INCLUDES_COSMICOS_H
-#define MAME_INCLUDES_COSMICOS_H
+#ifndef MAME_SKELETON_COSMICOS_H
+#define MAME_SKELETON_COSMICOS_H
 
 #pragma once
 
@@ -144,4 +144,4 @@ private:
 	output_finder<14> m_leds;
 };
 
-#endif // MAME_INCLUDES_COSMICOS_H
+#endif // MAME_SKELETON_COSMICOS_H

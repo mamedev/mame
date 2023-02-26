@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_AUDIO_CCLIMBER_H
-#define MAME_AUDIO_CCLIMBER_H
+#ifndef MAME_SHARED_CCLIMBER_A_H
+#define MAME_SHARED_CCLIMBER_A_H
 
 #pragma once
 
@@ -58,4 +58,4 @@ private:
 };
 
 
-#endif // MAME_AUDIO_CCLIMBER_H
+#endif // MAME_SHARED_CCLIMBER_A_H

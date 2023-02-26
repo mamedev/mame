@@ -157,6 +157,7 @@ struct render_texinfo
 	void *              base;               // base of the data
 	u32                 rowpixels;          // pixels per row
 	u32                 width;              // width of the image
+	u32                 width_margin;       // left margin of the scaled bounds, if applicable
 	u32                 height;             // height of the image
 	u32                 seqid;              // sequence ID
 	u64                 unique_id;          // unique identifier to pass to osd

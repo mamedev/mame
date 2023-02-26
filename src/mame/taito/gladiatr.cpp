@@ -165,15 +165,11 @@ Notes:
 - The fg tilemap is a 1bpp layer which selects the second palette bank when
   active, so it could be used for some cool effects. Gladiator just sets the
   whole palette to white so we can just treat it as a monochromatic layer.
-- Tilemap Y scroll is not implemented because the game doesn't use it so I
-  can't verify it's right.
-- gladiatr and clones start with one credit due to the way MAME initialises
-  memory and the dodgy code the bootleg MCUs use to synchronise with the host
-  CPUs.  On an F3 reset they randomly start with one credit or no credits.
-- gladiatr and clones don't show player inputs in service mode.
 
 TODO:
 -----
+- Tilemap Y scroll is not implemented because the game doesn't use it so I
+  can't verify it's right.
 - gladiatr_irq_patch_w, which triggers irq on the second CPU, is a kludge. It
   shouldn't work that way, that address should actually reset the second CPU
   (but the main CPU never asserts the line). The schematics are too fuzzy to
@@ -184,8 +180,10 @@ TODO:
 - YM2203 some sound effects just don't sound correct
 - Audio Filter Switch not hooked up (might solve YM2203 mixing issue)
 - Ports 60,61,80,81 not fully understood yet...
-- Three 8741 dumps come from an unprotected bootleg, we need dumps from
-  original boards.
+- Three gladiatr 8741 dumps come from an unprotected bootleg, we need dumps
+  from original boards.
+- 2 of the bootleg gladiatr 8741 dumps are suspected to be bad, see rom patch
+  at driver init.
 
 ***************************************************************************/
 
@@ -323,9 +321,9 @@ READ_LINE_MEMBER(gladiatr_state::ucpu_t1_r)
 
 u8 gladiatr_state::ucpu_p1_r()
 {
-	 // p10 connected to corresponding line on other MCU
-	 // p11 connected to t1 on other MCU
-	 // other lines floating
+	// p10 connected to corresponding line on other MCU
+	// p11 connected to t1 on other MCU
+	// other lines floating
 	return m_csnd_p1 |= 0xfe;
 }
 
@@ -342,9 +340,9 @@ READ_LINE_MEMBER(gladiatr_state::csnd_t1_r)
 
 u8 gladiatr_state::csnd_p1_r()
 {
-	 // p10 connected to corresponding line on other MCU
-	 // p11 connected to t1 on other MCU
-	 // other lines floating
+	// p10 connected to corresponding line on other MCU
+	// p11 connected to t1 on other MCU
+	// other lines floating
 	return m_ucpu_p1 |= 0xfe;
 }
 
@@ -405,10 +403,9 @@ u8 ppking_state::ppking_f1_r()
 
 inline bool ppking_state::mcu_parity_check()
 {
-	int i;
 	u8 res = 0;
 
-	for(i=0;i<8;i++)
+	for(int i=0;i<8;i++)
 	{
 		if(m_mcu[0].rxd & (1 << i))
 			res++;
@@ -884,8 +881,8 @@ static INPUT_PORTS_START( gladiatr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )                    PORT_COCKTAIL
 
 	PORT_START("COINS") // ccpu test, cctl test
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -1302,10 +1299,10 @@ ROM_START( greatgur )
 	ROM_LOAD( "q4.5s",          0x00020, 0x0020, CRC(e325808e) SHA1(5fd92ad4eff24f6ccf2df19d268a6cafba72202e) )
 
 	ROM_REGION( 0x0400, "cctl", 0 ) /* I/O MCU */
-	ROM_LOAD( "gladcctl.1",     0x00000, 0x0400, CRC(b30d225f) SHA1(f383286530975c440589c276aa8c46fdfe5292b6) )
+	ROM_LOAD( "gladcctl.1",     0x00000, 0x0400, CRC(b30d225f) SHA1(f383286530975c440589c276aa8c46fdfe5292b6) BAD_DUMP )
 
 	ROM_REGION( 0x0400, "ccpu", 0 ) /* I/O MCU */
-	ROM_LOAD( "gladccpu.2",     0x00000, 0x0400, CRC(1d02cd5f) SHA1(f7242039788c66a1d91b01852d7d447330b847c4) )
+	ROM_LOAD( "gladccpu.2",     0x00000, 0x0400, CRC(1d02cd5f) SHA1(f7242039788c66a1d91b01852d7d447330b847c4) BAD_DUMP )
 
 	ROM_REGION( 0x0400, "ucpu", 0 ) /* comms MCU */
 	ROM_LOAD( "gladucpu.17",    0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) )
@@ -1316,11 +1313,11 @@ ROM_END
 
 ROM_START( gcastle )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "gc0_5",          0x00000, 0x4000, BAD_DUMP CRC(25b19efb) SHA1(c41344278f6c7f3d6527aced3e459ed1ba86dea5) ) // not dumped, placeholder taken from ogonsiro
-	ROM_LOAD( "gc0_4",          0x04000, 0x2000, BAD_DUMP CRC(347ec794) SHA1(51100f9fef2e96f00e94fce709eed6583b01a2eb) ) // "
-	ROM_LOAD( "gc0_1",          0x10000, 0x2000, BAD_DUMP CRC(040c9839) SHA1(8c0d9a246847461a59eb5e6a53a94218e701d6c3) ) // "
+	ROM_LOAD( "gc0_5",          0x00000, 0x4000, CRC(25b19efb) SHA1(c41344278f6c7f3d6527aced3e459ed1ba86dea5) BAD_DUMP ) // not dumped, placeholder taken from ogonsiro
+	ROM_LOAD( "gc0_4",          0x04000, 0x2000, CRC(347ec794) SHA1(51100f9fef2e96f00e94fce709eed6583b01a2eb) BAD_DUMP ) // "
+	ROM_LOAD( "gc0_1",          0x10000, 0x2000, CRC(040c9839) SHA1(8c0d9a246847461a59eb5e6a53a94218e701d6c3) BAD_DUMP ) // "
 	ROM_CONTINUE(               0x16000, 0x2000 )
-	ROM_LOAD( "gc0_3",          0x12000, 0x4000, BAD_DUMP CRC(d6a342e7) SHA1(96274ae3bda4679108a25fcc514b625552abda30) ) // "
+	ROM_LOAD( "gc0_3",          0x12000, 0x4000, CRC(d6a342e7) SHA1(96274ae3bda4679108a25fcc514b625552abda30) BAD_DUMP ) // "
 	ROM_CONTINUE(               0x18000, 0x4000 )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* Code for the 2nd CPU */
@@ -1372,8 +1369,8 @@ ROM_END
 
 void gladiatr_state::init_gladiatr()
 {
-	u8 *rom = memregion("gfx2")->base();
 	// unpack 3bpp graphics
+	u8 *rom = memregion("gfx2")->base();
 	for (int j = 3; j >= 0; j--)
 	{
 		for (int i = 0; i < 0x2000; i++)
@@ -1385,9 +1382,8 @@ void gladiatr_state::init_gladiatr()
 	// sort data
 	std::swap_ranges(rom + 0x14000, rom + 0x18000, rom + 0x18000);
 
-
-	rom = memregion("gfx3")->base();
 	// unpack 3bpp graphics
+	rom = memregion("gfx3")->base();
 	for (int j = 5; j >= 0; j--)
 	{
 		for (int i = 0; i < 0x2000; i++)
@@ -1402,10 +1398,17 @@ void gladiatr_state::init_gladiatr()
 	std::swap_ranges(rom + 0x26000, rom + 0x28000, rom + 0x2c000);
 	std::swap_ranges(rom + 0x24000, rom + 0x28000, rom + 0x28000);
 
+	// 2 of the bootleg MCU ROM dumps are suspected to be bad, this patch changes
+	// the 1st byte from 0x26 to 0x22. The init routine makes more sense with it
+	// and becomes identical to the bootleg ucpu/csnd init routine. Without it,
+	// the game starts with 1 credit inserted.
+	*memregion("cctl")->base() = 0x22;
+	*memregion("ccpu")->base() = 0x22;
+
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x6000);
 	membank("bank2")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0xc000);
 
-	/* make sure bank is valid in cpu-reset */
+	// make sure bank is valid in cpu-reset
 	membank("bank2")->set_entry(0);
 
 	m_tclk_val = false;
@@ -1424,15 +1427,15 @@ void gladiatr_state::init_gladiatr()
 
 void ppking_state::init_ppking()
 {
-	u8 *rom = memregion("gfx2")->base();
 	// unpack 3bpp graphics
+	u8 *rom = memregion("gfx2")->base();
 	for (int i = 0; i < 0x2000; i++)
 	{
 		rom[i+0x2000] = rom[i] >> 4;
 	}
 
-	rom = memregion("gfx3")->base();
 	// unpack 3bpp graphics
+	rom = memregion("gfx3")->base();
 	for (int j = 1; j >= 0; j--)
 	{
 		for (int i = 0; i < 0x2000; i++)
@@ -1442,9 +1445,8 @@ void ppking_state::init_ppking()
 		}
 	}
 
-	rom = memregion("sub")->base();
-
 	// patch audio CPU crash + ROM checksums
+	rom = memregion("sub")->base();
 	rom[0x1b9] = 0x00;
 	rom[0x1ba] = 0x00;
 	rom[0x1bb] = 0x00;
@@ -1461,5 +1463,5 @@ void ppking_state::init_ppking()
 GAME( 1985, ppking,   0,        ppking,   ppking,   ppking_state,   init_ppking,   ROT90, "Taito America Corporation",           "Ping-Pong King",                                MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_NODEVICE_LAN )
 GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation",         "Ougon no Shiro (Japan)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1986, greatgur, gladiatr, greatgur, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation",         "Great Gurianos (Japan?)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, greatgur, gladiatr, greatgur, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation",         "Great Gurianos (bootleg?)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gcastle,  gladiatr, gladiatr, gladiatr, gladiatr_state, init_gladiatr, ROT0,  "Allumer / Taito Corporation",         "Golden Castle (prototype?)",                    MACHINE_SUPPORTS_SAVE ) // incomplete dump

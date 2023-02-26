@@ -33,10 +33,11 @@ public:
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	std::vector<std::string> &m_plugins;
 };
+
 
 class menu_plugin_opt : public menu
 {
@@ -45,11 +46,11 @@ public:
 	virtual ~menu_plugin_opt();
 
 protected:
-	virtual bool custom_ui_cancel() override { return true; }
+	virtual bool custom_ui_back() override { return true; }
 
 private:
 	virtual void populate() override;
-	virtual void handle(event const *ev) override;
+	virtual bool handle(event const *ev) override;
 
 	std::string const m_menu;
 	bool m_need_idle;

@@ -941,10 +941,8 @@ void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, in
 		uint8_t *ROM = memregion(tag)->base();
 	//  int size = memregion(tag)->bytes();
 
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"decrypted_%s", machine().system().name);
-		fp=fopen(filename, "w+b");
+		auto filename = std::string{ "decrypted_" } + machine().system().name;
+		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{
 			for (i = 0; i < 0x20000; i++)
