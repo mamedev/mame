@@ -33,7 +33,7 @@ struct polyVert
 
 	float light;         // The intensity of the illumination at this point
 
-	uint16_t colorIndex = 0;    // Flat shaded polygons, no texture, no lighting
+	//uint16_t colorIndex = 0;    // Flat shaded polygons, no texture, no lighting
 };
 
 struct polygon
@@ -52,8 +52,7 @@ struct polygon
 	uint8_t texPageVertOffset = 0;    // If it does use small texture pages, how far is this page vertically offset?
 
 	uint32_t palOffset = 0;           // The base offset where this object's palette starts.
-
-	uint32_t debugColor = 0;          // Will go away someday.  Used to explicitly color polygons for debugging.
+	uint16_t colorIndex = 0;
 };
 
 
@@ -85,8 +84,8 @@ struct hng64_poly_data
 	uint8_t texPageSmall = 0;
 	uint8_t texPageHorizOffset = 0;
 	uint8_t texPageVertOffset = 0;
-	int palOffset = 0;
-	int debugColor = 0;
+	uint32_t palOffset = 0;
+	uint16_t colorIndex = 0;
 };
 
 class hng64_state;

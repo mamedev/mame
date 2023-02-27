@@ -613,7 +613,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 					currentPoly.vert[m].normal[3] = 0.0f;
 
 					if (currentPoly.flatShade)
-						currentPoly.vert[m].colorIndex = chunkOffset[7 + (9*m)] >> 5;
+						currentPoly.colorIndex = chunkOffset[7 + (9*m)] >> 5;
 				}
 
 				// Redundantly called, but it works...
@@ -644,7 +644,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 					currentPoly.vert[m].texCoords[1] = uToF(chunkOffset[8 + (6*m)]);
 
 					if (currentPoly.flatShade)
-						currentPoly.vert[m].colorIndex = chunkOffset[7 + (6*m)] >> 5;
+						currentPoly.colorIndex = chunkOffset[7 + (6*m)] >> 5;
 
 					currentPoly.vert[m].normal[0] = uToF(chunkOffset[21]);
 					currentPoly.vert[m].normal[1] = uToF(chunkOffset[22]);
@@ -683,7 +683,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				currentPoly.vert[0].texCoords[1] = uToF(chunkOffset[8]);
 
 				if (currentPoly.flatShade)
-					currentPoly.vert[0].colorIndex = chunkOffset[7] >> 5;
+					currentPoly.colorIndex = chunkOffset[7] >> 5;
 
 				currentPoly.vert[0].normal[0] = uToF(chunkOffset[9]);
 				currentPoly.vert[0].normal[1] = uToF(chunkOffset[10]);
@@ -720,7 +720,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				currentPoly.vert[0].texCoords[1] = uToF(chunkOffset[8]);
 
 				if (currentPoly.flatShade)
-					currentPoly.vert[0].colorIndex = chunkOffset[7] >> 5;
+					currentPoly.colorIndex = chunkOffset[7] >> 5;
 
 				// This normal could be right, but I'm not entirely sure - there is no normal in the 18 bytes!
 				currentPoly.vert[0].normal[0] = lastPoly.faceNormal[0];
@@ -1298,14 +1298,7 @@ void hng64_poly_renderer::render_flat_scanline(int32_t scanline, const extent_t&
 {
 	// Pull the parameters out of the extent structure
 	float z = extent.param[0].start;
-	float r = extent.param[1].start;
-	float g = extent.param[2].start;
-	float b = extent.param[3].start;
-
 	const float dz = extent.param[0].dpdx;
-	const float dr = extent.param[1].dpdx;
-	const float dg = extent.param[2].dpdx;
-	const float db = extent.param[3].dpdx;
 
 	// Pointers to the pixel buffers
 	uint16_t* colorBuffer = &m_colorBuffer3d.pix(scanline, extent.startx);
@@ -1316,14 +1309,11 @@ void hng64_poly_renderer::render_flat_scanline(int32_t scanline, const extent_t&
 	{
 		if (z < *depthBuffer)
 		{
-			*colorBuffer = rand() & 0xfff;
+			*colorBuffer = renderData.palOffset + renderData.colorIndex;
 			*depthBuffer = z;
 		}
 
 		z += dz;
-		r += dr;
-		g += dg;
-		b += db;
 
 		colorBuffer++;
 		depthBuffer++;
@@ -1340,6 +1330,7 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 	rOptions.texPageSmall = p->texPageSmall;
 	rOptions.texPageHorizOffset = p->texPageHorizOffset;
 	rOptions.texPageVertOffset = p->texPageVertOffset;
+	rOptions.colorIndex = p->colorIndex;
 
 	// Pass the render data into the rasterizer
 	hng64_poly_data& renderData = object_data().next();
@@ -1354,34 +1345,21 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 		{
 			// Build some MAME rasterizer vertices from the hng64 vertices
 			vertex_t pVert[3];
-			rgb_t color;
 
 			const polyVert& pv0 = p->vert[0];
-			color = m_state.m_palette->pen(renderData.palOffset + pv0.colorIndex);
 			pVert[0].x = pv0.clipCoords[0];
 			pVert[0].y = pv0.clipCoords[1];
 			pVert[0].p[0] = pv0.clipCoords[2];
-			pVert[0].p[1] = color.r();
-			pVert[0].p[2] = color.g();
-			pVert[0].p[3] = color.b();
 
 			const polyVert& pvj = p->vert[j];
-			color = m_state.m_palette->pen(renderData.palOffset + pvj.colorIndex);
 			pVert[1].x = pvj.clipCoords[0];
 			pVert[1].y = pvj.clipCoords[1];
 			pVert[1].p[0] = pvj.clipCoords[2];
-			pVert[1].p[1] = color.r();
-			pVert[1].p[2] = color.g();
-			pVert[1].p[3] = color.b();
 
 			const polyVert& pvjp1 = p->vert[j+1];
-			color = m_state.m_palette->pen(renderData.palOffset + pvjp1.colorIndex);
 			pVert[2].x = pvjp1.clipCoords[0];
 			pVert[2].y = pvjp1.clipCoords[1];
 			pVert[2].p[0] = pvjp1.clipCoords[2];
-			pVert[2].p[1] = color.r();
-			pVert[2].p[2] = color.g();
-			pVert[2].p[3] = color.b();
 
 			render_triangle<4>(visibleArea, render_delegate(&hng64_poly_renderer::render_flat_scanline, this), pVert[0], pVert[1], pVert[2]);
 		}
