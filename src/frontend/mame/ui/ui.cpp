@@ -54,18 +54,6 @@
 
 
 /***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-enum
-{
-	LOADSAVE_NONE,
-	LOADSAVE_LOAD,
-	LOADSAVE_SAVE
-};
-
-
-/***************************************************************************
     LOCAL VARIABLES
 ***************************************************************************/
 
@@ -1193,28 +1181,6 @@ void mame_ui_manager::draw_profiler(render_container &container)
 
 
 //-------------------------------------------------
-//  start_save_state
-//-------------------------------------------------
-
-void mame_ui_manager::start_save_state()
-{
-	show_menu();
-	ui::menu::stack_push<ui::menu_save_state>(*this, machine().render().ui_container(), true);
-}
-
-
-//-------------------------------------------------
-//  start_load_state
-//-------------------------------------------------
-
-void mame_ui_manager::start_load_state()
-{
-	show_menu();
-	ui::menu::stack_push<ui::menu_load_state>(*this, machine().render().ui_container(), true);
-}
-
-
-//-------------------------------------------------
 //  image_handler_ingame - execute display
 //  callback function for each image device
 //-------------------------------------------------
@@ -1329,8 +1295,8 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	if (!(machine().debug_flags & DEBUG_FLAG_ENABLED) && machine().ui_input().pressed(IPT_UI_ON_SCREEN_DISPLAY))
 	{
 		ui::menu::stack_push<ui::menu_sliders>(*this, machine().render().ui_container(), true);
-		set_handler(ui_callback_type::MENU, ui::menu::get_ui_handler(*this));
-		return 1;
+		show_menu();
+		return 0;
 	}
 
 	// handle a reset request
@@ -1352,7 +1318,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 					{
 						return ui_gfx_ui_handler(container, *this, is_paused);
 					}));
-		return is_paused ? 1 : 0;
+		return 0;
 	}
 
 	// handle a tape control key
@@ -1376,15 +1342,17 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	// handle a save state request
 	if (machine().ui_input().pressed(IPT_UI_SAVE_STATE))
 	{
-		start_save_state();
-		return LOADSAVE_SAVE;
+		ui::menu::stack_push<ui::menu_save_state>(*this, machine().render().ui_container(), true);
+		show_menu();
+		return 0;
 	}
 
 	// handle a load state request
 	if (machine().ui_input().pressed(IPT_UI_LOAD_STATE))
 	{
-		start_load_state();
-		return LOADSAVE_LOAD;
+		ui::menu::stack_push<ui::menu_load_state>(*this, machine().render().ui_container(), true);
+		show_menu();
+		return 0;
 	}
 
 	// handle a save snapshot request
@@ -1469,8 +1437,8 @@ void mame_ui_manager::request_quit()
 	}
 	else
 	{
-		show_menu();
 		ui::menu::stack_push<ui::menu_confirm_quit>(*this, machine().render().ui_container());
+		show_menu();
 	}
 }
 
@@ -1483,7 +1451,7 @@ void mame_ui_manager::request_quit()
 //  ui_get_slider_list - get the list of sliders
 //-------------------------------------------------
 
-std::vector<ui::menu_item>& mame_ui_manager::get_slider_list(void)
+std::vector<ui::menu_item> &mame_ui_manager::get_slider_list()
 {
 	return slider_list;
 }

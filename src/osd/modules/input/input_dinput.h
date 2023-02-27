@@ -37,14 +37,6 @@ namespace osd {
 //  dinput_device - base directinput device
 //============================================================
 
-class device_enum_interface
-{
-public:
-	virtual ~device_enum_interface() = default;
-
-	virtual BOOL device_enum_callback(LPCDIDEVICEINSTANCE instance) = 0;
-};
-
 enum class dinput_cooperative_level
 {
 	FOREGROUND,
@@ -92,7 +84,18 @@ public:
 				format);
 	}
 
-	HRESULT enum_attached_devices(int devclass, device_enum_interface &enumerate_interface) const;
+	template <typename T>
+	HRESULT enum_attached_devices(int devclass, T &&callback) const
+	{
+		return m_dinput->EnumDevices(
+				devclass,
+				[] (LPCDIDEVICEINSTANCE instance, LPVOID ref) -> BOOL
+				{
+					return (*reinterpret_cast<T *>(ref))(instance);
+				},
+				reinterpret_cast<LPVOID>(&callback),
+				DIEDFL_ATTACHEDONLY);
+	}
 
 	template <typename T>
 	static HRESULT set_dword_property(

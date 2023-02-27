@@ -45,7 +45,7 @@
 do \
 { \
 	uint32_t srcdata = (SOURCE); \
-	if (xdrawpos <= cliprect.right() && xdrawpos >= cliprect.left() && cury <= cliprect.bottom() && cury >= cliprect.top()) \
+	if (xdrawpos <= cliprect.right() && xdrawpos >= cliprect.left() && ypos <= cliprect.bottom() && ypos >= cliprect.top()) \
 	{ \
 		if (zval < (DESTZ)) \
 		{ \
@@ -64,7 +64,7 @@ while (0)
 do \
 { \
 	uint32_t srcdata = (SOURCE); \
-	if (xdrawpos <= cliprect.right() && xdrawpos >= cliprect.left() && cury <= cliprect.bottom() && cury >= cliprect.top()) \
+	if (xdrawpos <= cliprect.right() && xdrawpos >= cliprect.left() && ypos <= cliprect.bottom() && ypos >= cliprect.top()) \
 	{ \
 		if (zval > (DESTZ)) \
 		{ \
@@ -98,41 +98,36 @@ do \
 	\
 	if (checkerboard) \
 	{ \
-		if (cb & 1) \
+		if (curx & 1) \
 		{ \
-			if (!(cury & 1)) \
+			if (!(ypos & 1)) \
 				srcpix = 0; \
 		} \
 		else \
 		{ \
-			if ((cury & 1)) \
+			if ((ypos & 1)) \
 				srcpix = 0; \
 		} \
-		cb++; \
 	} \
 } \
 while (0)
 
 void hng64_state::drawline(bitmap_ind16 & dest, bitmap_ind16 & destz, const rectangle & cliprect,
-	gfx_element * gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
-	int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int cury, const u8 *srcdata, int32_t srcx, int32_t srcy_copy, uint32_t leftovers, int line, uint16_t &srcpix)
+	gfx_element * gfx, uint32_t code, uint32_t color, int flipy, int32_t xpos,
+	int32_t dx, int32_t dy, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int32_t ypos, const u8 *srcdata, int32_t srcx, uint32_t leftovers, int curyy, uint16_t &srcpix)
 {
-	int srcy = dy * line + srcy_copy;
+	auto* destptr = &dest.pix(ypos, 0);
+	auto* destzptr = &destz.pix(ypos, 0);
 
-	auto* destptr = &dest.pix(cury, 0);
-	auto* destzptr = &destz.pix(cury, 0);
-
-	const u8* srcptr = srcdata + ((srcy >> 16) & 0xf) * gfx->rowbytes();
+	const u8* srcptr = srcdata + (flipy ? ((15-curyy) & 0xf) : (curyy & 0xf)) * gfx->rowbytes();
 	int32_t cursrcx = srcx;
 
-	// iterate over unrolled blocks of 4
 	if (zrev)
 	{
-		uint8_t cb = 0;
 		// iterate over leftover pixels
 		for (int32_t curx = 0; curx < leftovers; curx++)
 		{
-			int xdrawpos = destx + curx;
+			int xdrawpos = xpos + curx;
 			PIX_CHECKERBOARD;
 			PIXEL_OP_REBASE_TRANSPEN_REV(destptr[xdrawpos], destzptr[xdrawpos], srcpix);
 			cursrcx += dx;
@@ -140,11 +135,10 @@ void hng64_state::drawline(bitmap_ind16 & dest, bitmap_ind16 & destz, const rect
 	}
 	else
 	{
-		uint8_t cb = 0;
 		// iterate over leftover pixels
 		for (int32_t curx = 0; curx < leftovers; curx++)
 		{
-			int xdrawpos = destx + curx;
+			int xdrawpos = xpos + curx;
 			PIX_CHECKERBOARD;
 			PIXEL_OP_REBASE_TRANSPEN(destptr[xdrawpos], destzptr[xdrawpos], srcpix);
 			cursrcx += dx;
@@ -153,8 +147,8 @@ void hng64_state::drawline(bitmap_ind16 & dest, bitmap_ind16 & destz, const rect
 }
 
 void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
-		gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
-		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int line, uint16_t &srcpix)
+		gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t xpos, int32_t ypos,
+		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int curyy, uint16_t &srcpix)
 {
 	// use pen usage to optimize
 	code %= gfx->elements();
@@ -179,7 +173,7 @@ void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const r
 	if (cliprect.empty())
 		return;
 
-	if (dstwidth < 1 || dstheight < 1)
+	if (dstwidth < 1)
 		return;
 
 	int32_t srcx = 0;
@@ -190,27 +184,15 @@ void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const r
 		dx = -dx;
 	}
 
-	int32_t srcy = 0;
-	// apply Y flipping
-	if (flipy)
-	{
-		srcy = (dstheight - 1) * dy - srcy;
-		dy = -dy;
-	}
-
 	// fetch the source data
 	const u8 *srcdata = gfx->get_data(code);
 
-	// compute how many blocks of 4 pixels we have
-	int32_t destendx = destx + dstwidth - 1;
-	uint32_t leftovers = (destendx + 1 - destx);
-
-	// iterate over pixels in Y
-	int32_t srcycopy = srcy;
+	int32_t destendx = xpos + dstwidth - 1;
+	uint32_t leftovers = (destendx + 1 - xpos);
 
 	drawline(dest, destz, cliprect,
-		gfx, code, color, flipx, flipy, destx, desty,
-		dx, dy, dstwidth, dstheight, trans_pen, zval, zrev, blend, checkerboard, mosaic, mosaic_count_x, desty, srcdata, srcx, srcycopy, leftovers, line, srcpix);
+		gfx, code, color, flipy, xpos,
+		dx, dy, trans_pen, zval, zrev, blend, checkerboard, mosaic, mosaic_count_x, ypos, srcdata, srcx, leftovers, curyy, srcpix);
 
 }
 
@@ -293,10 +275,16 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 	{
 		uint16_t zval = (m_spriteram[(currentsprite * 8) + 2] & 0x07ff0000) >> 16;
 
-		uint16_t ypos = (m_spriteram[(currentsprite * 8) + 0] & 0xffff0000) >> 16;
-		uint16_t xpos = (m_spriteram[(currentsprite * 8) + 0] & 0x0000ffff) >> 0;
+		int16_t ypos = (m_spriteram[(currentsprite * 8) + 0] & 0xffff0000) >> 16;
+		int16_t xpos = (m_spriteram[(currentsprite * 8) + 0] & 0x0000ffff) >> 0;
+
+		// should the offsets also be sign extended?
 		xpos += (spriteoffsx);
 		ypos += (spriteoffsy);
+
+		// sams64_2 wants bit 0x200 to be the sign bit on character select screen
+		xpos = util::sext(xpos, 10);
+		ypos = util::sext(ypos, 10);
 
 		bool blend = (m_spriteram[(currentsprite * 8) + 4] & 0x00800000);
 		bool checkerboard = (m_spriteram[(currentsprite * 8) + 4] & 0x04000000);
@@ -339,59 +327,73 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 			dy = zoomy << 4;
 		}
 
-		int16_t drawy = ypos;
-		uint32_t srcpix_y = 0;
 
-		for (int ydrw = 0; ydrw <= chainy; ydrw++)
+		uint32_t full_srcpix_y = 0;
+		uint32_t full_dstheight = 0;
+		do
 		{
-			uint32_t dstheight = 0;
+			full_srcpix_y += dy;
+			full_dstheight++;
+		} while (full_srcpix_y < ((chainy+1) * 0x100000));
 
-			do
+		int realline = 0;
+		int mosaic_y_counter = 0;
+		for (int32_t curyy = 0; curyy <= full_dstheight - 1; curyy++)
+		{
+			if (!mosaic)
 			{
-				srcpix_y += dy;
-				dstheight++;
-			} while (srcpix_y < 0x100000);
-			srcpix_y &= 0x0fffff;
-
-			int32_t destendy = drawy + dstheight - 1;
-			for (int32_t cury = drawy, line = 0; cury <= destendy; line++, cury++)
+				realline = curyy;
+			}
+			else
 			{
-				int16_t drawx = xpos;
-				uint32_t srcpix_x = 0;
-
-				uint16_t srcpix = 0;
-
-				uint8_t mosaic_count_x = 0;
-
-				for (int xdrw = 0; xdrw <= chainx; xdrw++)
+				if (mosaic_y_counter == 0)
 				{
-					uint32_t dstwidth = 0;
-					do
-					{
-						srcpix_x += dx;
-						dstwidth++;
-					} while (srcpix_x < 0x100000);
-					srcpix_x &= 0x0fffff;
-
-					// 0x3ff (0x200 sign bit) based on sams64_2 char select
-					drawx &= 0x3ff;
-					drawy &= 0x3ff;
-
-					if (drawx & 0x0200)drawx -= 0x400;
-					if (drawy & 0x0200)drawy -= 0x400;
-
-					uint32_t tileno;
-					uint16_t pal;
-					uint8_t gfxregion;
-
-					get_tile_details(chaini, currentsprite, xdrw, ydrw, chainx, chainy, xflip, yflip, tileno, pal, gfxregion);
-					zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, m_gfxdecode->gfx(gfxregion), tileno, pal, xflip, yflip, drawx, cury, dx, dy, dstwidth, dstheight, 0, zval, zsort, blend, checkerboard, mosaic, mosaic_count_x, line, srcpix);
-					drawx += dstwidth;
+					realline = curyy;
+					mosaic_y_counter = mosaic;
+				}
+				else
+				{
+					mosaic_y_counter--;
 				}
 			}
-			drawy += dstheight;
+
+			uint32_t full_srcpix_y2 = realline * dy;
+			int used_ysource_pos = full_srcpix_y2 >> 16;
+			int ytilebbb = used_ysource_pos / 0x10;
+			int use_tile_line = used_ysource_pos & 0xf;
+			draw_sprite_line(screen, cliprect, use_tile_line, ypos, xpos, chainx, dx, dy, ytilebbb, chaini, currentsprite, chainy, xflip, yflip, zval, zsort, blend, checkerboard, mosaic);
+			ypos++;
 		}
+
 		currentsprite = nextsprite;
 	}
 }
 
+
+void hng64_state::draw_sprite_line(screen_device& screen, const rectangle& cliprect, int32_t curyy, int16_t ypos, int16_t xpos, int chainx, int32_t dx, int32_t dy, int ytileblock, int chaini, int currentsprite, int chainy, int xflip, int yflip, uint16_t zval, bool zsort, bool blend, bool checkerboard, uint8_t mosaic)
+{
+	uint32_t srcpix_x = 0;
+	uint16_t srcpix = 0;
+
+	uint8_t mosaic_count_x = 0;
+
+	for (int xdrw = 0; xdrw <= chainx; xdrw++)
+	{
+		uint32_t dstwidth = 0;
+		do
+		{
+			srcpix_x += dx;
+			dstwidth++;
+		} while (srcpix_x < 0x100000);
+		srcpix_x &= 0x0fffff;
+
+		uint32_t tileno;
+		uint16_t pal;
+		uint8_t gfxregion;
+
+		get_tile_details(chaini, currentsprite, xdrw, ytileblock, chainx, chainy, xflip, yflip, tileno, pal, gfxregion);
+		zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, m_gfxdecode->gfx(gfxregion), tileno, pal, xflip, yflip, xpos, ypos, dx, dy, dstwidth, 0, zval, zsort, blend, checkerboard, mosaic, mosaic_count_x, curyy, srcpix);
+		xpos += dstwidth;
+	}
+	
+}
