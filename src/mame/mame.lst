@@ -44640,6 +44640,9 @@ squaitsa                        // (c) 1985
 @source:valadon/tankbust.cpp
 tankbust                        // (c) 1985
 
+@source:vectorgraphic/vector4.cpp
+vector4                         //
+
 @source:venture/looping.cpp
 looping                         // (c) 1982 Video Games GmbH
 loopingv                        // (c) 1982 Video Games GmbH (Venture Line license)
