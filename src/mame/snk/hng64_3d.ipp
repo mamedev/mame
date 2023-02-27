@@ -1209,12 +1209,7 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 	const float dt = extent.param[6].dpdx;
 
 	// Pointers to the pixel buffers
-#ifdef USE_32BIT_3DBUFFER
-	uint32_t* colorBuffer = &m_colorBuffer3d.pix(scanline, extent.startx);
-#else
 	uint16_t* colorBuffer = &m_colorBuffer3d.pix(scanline, extent.startx);
-#endif
-
 	float*  depthBuffer = &m_depthBuffer3d[(scanline * m_state.m_screen->visible_area().width()) + extent.startx];
 
 	const uint8_t *textureOffset = &m_state.m_texturerom[renderData.texIndex * 1024 * 1024];
@@ -1280,23 +1275,8 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 				if (paletteEntry != 0)
 				{
 					float rIntensity = rCorrect / 255.0f;
-#ifdef USE_32BIT_3DBUFFER
-					// The color out of the texture
-					rgb_t color = m_state.m_palette->pen((renderData.palOffset + paletteEntry) & 0xfff);
-
-					// Apply the lighting
-					float red   = color.r() * rIntensity;
-
-					// Clamp and finalize
-					red = color.r() + red;
-
-					if (red >= 255) red = 255;
-
-					color = rgb_t(255, (uint8_t)red, (uint8_t)red, (uint8_t)red);
-#else
 					uint8_t lightval = (uint8_t)(rIntensity / 16.0f);
 					uint16_t color = ((renderData.palOffset + paletteEntry) & 0xfff) | (lightval << 12);
-#endif
 					*colorBuffer = color;
 					*depthBuffer = z;
 				}
@@ -1328,11 +1308,7 @@ void hng64_poly_renderer::render_flat_scanline(int32_t scanline, const extent_t&
 	const float db = extent.param[3].dpdx;
 
 	// Pointers to the pixel buffers
-#ifdef USE_32BIT_3DBUFFER
-	uint32_t* colorBuffer = &m_colorBuffer3d.pix(scanline, extent.startx);
-#else
 	uint16_t* colorBuffer = &m_colorBuffer3d.pix(scanline, extent.startx);
-#endif
 	float*  depthBuffer = &m_depthBuffer3d[(scanline * m_state.m_screen->visible_area().width()) + extent.startx];
 
 	// Step over each pixel in the horizontal span
@@ -1340,17 +1316,7 @@ void hng64_poly_renderer::render_flat_scanline(int32_t scanline, const extent_t&
 	{
 		if (z < *depthBuffer)
 		{
-#ifdef USE_32BIT_3DBUFFER
-			// Clamp and finalize
-			if (r >= 255) r = 255;
-			if (g >= 255) g = 255;
-			if (b >= 255) b = 255;
-
-			rgb_t color = rgb_t(255, (uint8_t)r, (uint8_t)g, (uint8_t)b);
-			*colorBuffer = color;
-#else
 			*colorBuffer = rand() & 0xfff;
-#endif
 			*depthBuffer = z;
 		}
 

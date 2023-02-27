@@ -803,25 +803,23 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 
 	pen_t const *const clut = &m_palette->pen(0);
 
+	/*
+	   Each framebuffer has enough RAM for 24 bits of data for a 512x256
+	   layer (screen is interlaced, so it doesn't really have 448 pixels
+	   in height)
+   
+	   theory: 11 bit palette index (can use either half of palette)
+				1 bit 'blend'
+				4 bit 'light'
+				8 bit depth?
+	*/
+
 	// 3d gets drawn next
 	if (!(m_fbcontrol[0] & 0x01))
 	{
 		// Blit the color buffer into the primary bitmap
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-#ifdef USE_32BIT_3DBUFFER
-			const uint32_t *src = &m_poly_renderer->colorBuffer3d().pix(y, cliprect.min_x);
-			uint32_t *dst = &bitmap.pix(y, cliprect.min_x);
-
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-			{
-				if (*src & 0xff000000)
-					*dst = *src;
-
-				dst++;
-				src++;
-			}
-#else
 			const uint16_t *src = &m_poly_renderer->colorBuffer3d().pix(y, cliprect.min_x);
 			uint32_t *dst = &bitmap.pix(y, cliprect.min_x);
 
@@ -836,7 +834,6 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 				dst++;
 				src++;
 			}
-#endif
 		}
 	}
 
