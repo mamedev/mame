@@ -137,7 +137,8 @@ protected:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_update_txt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_update_graph(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	std::pair<u8, u8> get_scroll(u32 offset);
+	void screen_update_game(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	std::pair<u8, u8> lookback_scroll(u8 a, u8 b);
 
 	required_device<z84c015_device> m_maincpu;
 
@@ -339,8 +340,13 @@ void sprinter_state::sprinter_palette(palette_device &palette) const
 
 u32 sprinter_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen_update_graph(screen, bitmap, cliprect);
-	screen_update_txt(screen, bitmap, cliprect);
+	if (m_conf)
+		screen_update_game(screen, bitmap, cliprect);
+	else
+	{
+		screen_update_graph(screen, bitmap, cliprect);
+		screen_update_txt(screen, bitmap, cliprect);
+	}
 
 	return 0;
 }
@@ -424,8 +430,6 @@ void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bi
 		u8* mode = nullptr;
 		u16 pal, x;
 		u8 y;
-		bool lowres = 0;
-		std::pair<u8, u8> scroll;
 		u16 *pix = &(bitmap.pix(vpos, cliprect.left()));
 
 		for(u16 hpos = cliprect.left(); hpos <= cliprect.right(); hpos++)
@@ -434,34 +438,17 @@ void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bi
 			if ((mode == nullptr) || ((a16 & 15) == 0))
 			{
 				const u32 line1 = (1 + (a16 >> 4) * 2 + 0x80 * (m_rgmod & 1)) * 1024;
-				if (m_conf)
-				{
-					if (mode == nullptr)
-						scroll = get_scroll(line1 + la);
-					else if ((mode[0] & 0x14) == 0x04)
-						scroll = {mode[3] & 0x0f, mode[3] >> 4};
-				}
-
 				// 16x8 block descriptor
 				mode = m_vram + line1 + la;
 				if(!BIT(mode[0], 4))
 				{
 					pal = BIT(mode[0], 6, 2) << 8;
-					if (m_conf) // Thunder in the Deep
+					x = (BIT(mode[0], 0, 4) << 6) | (BIT(mode[1], 0, 3) << 3);
+					y = BIT(mode[1], 3, 5) << 3;
+					if (BIT(mode[2], 2)) // lowres
 					{
-						x = ((BIT(mode[0], 0, 2) << 8) | mode[1]) + scroll.first;
-						y = mode[2] + scroll.second;
-					}
-					else
-					{
-						x = (BIT(mode[0], 0, 4) << 6) | (BIT(mode[1], 0, 3) << 3);
-						y = BIT(mode[1], 3, 5) << 3;
-						lowres = BIT(mode[2], 2);
-						if (lowres)
-						{
-							x += 4 * BIT(mode[2], 0);
-							y += 4 * BIT(mode[2], 1);
-						}
+						x += 4 * BIT(mode[2], 0);
+						y += 4 * BIT(mode[2], 1);
 					}
 				}
 			}
@@ -473,25 +460,75 @@ void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bi
 			}
 			else
 			{
-				const u8 color = m_vram[(y + ((b8 & 7) >> lowres)) * 1024 + x + ((a16 & 15) >> (1 + lowres))];
+				const u8 color = m_vram[(y + ((b8 & 7) >> BIT(mode[2], 2))) * 1024 + x + ((a16 & 15) >> (1 + BIT(mode[2], 2)))];
 				*pix++ = pal + (BIT(mode[0], 5) ? color : ((a16 & 1) ? (color & 0x0f) : (color >> 4)));
 			}
 		}
 	}
 }
 
-std::pair<u8, u8> sprinter_state::get_scroll(u32 offset)
+ // Game Config - used in Thunder in the Deep
+void sprinter_state::screen_update_game(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	u32 ref = offset;
-	for(; (ref & 0x3ff) >= 0x300; ref -= 4)
+	const s8 dy = 7 - (m_hold >> 4);
+	const s8 dx = (7 - (m_hold & 0x0f)) * 2;
+	for(u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
-		for (; (~offset ^ ref) & 0x20000 ; ref -= 2048)
+		const u8 a = ((SPRINT_WIDTH + cliprect.left() - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH) >> 4;
+		const u8 b = ((SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT) >> 3;
+		std::pair<u8, u8> scroll = lookback_scroll(a, b);
+
+		u8* mode = nullptr;
+		u16 pal, x;
+		u8 y;
+		u16 *pix = &(bitmap.pix(vpos, cliprect.left()));
+
+		for(u16 hpos = cliprect.left(); hpos <= cliprect.right(); hpos++)
 		{
-			const u8* mode = m_vram + ref;
-			if ((mode[0] & 0x14) == 0x04)
+			const u16 a16 = (SPRINT_WIDTH + hpos + (scroll.first << 1) - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
+			const u16 b8 = (SPRINT_HEIGHT + vpos + scroll.second - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT;
+			if (mode == nullptr)
+			{
+				const u16 la = 0x300 + (b8 >> 3) * 4;
+				// 16x8 block descriptor
+				const u32 line1 = (1 + (a16 >> 4) * 2 + 0x80 * (m_rgmod & 1)) * 1024;
+				mode = m_vram + line1 + la;
+				pal = BIT(mode[0], 6, 2) << 8;
+				x = ((BIT(mode[0], 0, 2) << 8) | mode[1]);
+				y = mode[2];
+			}
+
+			const u8 color = m_vram[(y + (b8 & 7)) * 1024 + x + ((a16 & 15) >> 1)];
+			*pix++ = pal + color;
+
+			if ((a16 & 15) == 15)
+			{
+				if (BIT(mode[0], 2))
+					scroll = {mode[3] & 0x0f, mode[3] >> 4};
+				mode = nullptr;
+			}
+		}
+	}
+}
+
+std::pair<u8, u8> sprinter_state::lookback_scroll(u8 a, u8 b)
+{
+	const u32 offset = (1 + 0x80 * (m_rgmod & 1)) * 1024 + 0x300;
+	if (!a--)
+	{
+		a = 55;
+		if(!b--)
+			b = 39;
+	}
+
+	for (; b; b--, a = 55)
+	{
+		for(; a; a--)
+		{
+			const u8* mode = m_vram + offset + a * 2 * 1024 + b * 4;
+			if (BIT(mode[0], 2))
 				return { mode[3] & 0x0f, mode[3] >> 4 };
 		}
-		ref += 56 * 2 * 1024;
 	}
 
 	return { 0, 0 };
