@@ -1243,7 +1243,12 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 	const float dt = extent.param[6].dpdx;
 
 	// Pointers to the pixel buffers
+#ifdef USE_32BIT_3DBUFFER
 	uint32_t* colorBuffer = &m_colorBuffer3d.pix(scanline, extent.startx);
+#else
+	uint16_t* colorBuffer = &m_colorBuffer3d.pix(scanline, extent.startx);
+#endif
+
 	float*  depthBuffer = &m_depthBuffer3d[(scanline * m_state.m_screen->visible_area().width()) + extent.startx];
 
 	const uint8_t *textureOffset = &m_state.m_texturerom[renderData.texIndex * 1024 * 1024];
@@ -1256,24 +1261,37 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 			// Multiply back through by w for everything that was interpolated perspective-correctly
 			const float sCorrect = s / w;
 			const float tCorrect = t / w;
+#ifdef USE_32BIT_3DBUFFER
 			const float rCorrect = lightR / w;
 			const float gCorrect = lightG / w;
 			const float bCorrect = lightB / w;
-
+#endif
 			if ((renderData.debugColor & 0xff000000) == 0x01000000)
 			{
+#ifdef USE_32BIT_3DBUFFER
 				// ST color mode
 				*colorBuffer = rgb_t(255, uint8_t(sCorrect*255.0f), uint8_t(tCorrect*255.0f), uint8_t(0));
+#else
+				*colorBuffer = 0x0002;
+#endif
 			}
 			else if ((renderData.debugColor & 0xff000000) == 0x02000000)
 			{
+#ifdef USE_32BIT_3DBUFFER
 				// Lighting only
 				*colorBuffer = rgb_t(255, (uint8_t)rCorrect, (uint8_t)gCorrect, (uint8_t)bCorrect);
+#else
+				*colorBuffer = 0x0003;
+#endif
 			}
 			else if ((renderData.debugColor & 0xff000000) == 0xff000000)
 			{
+#ifdef USE_32BIT_3DBUFFER
 				// Debug color mode
 				*colorBuffer = renderData.debugColor;
+#else
+				*colorBuffer = 0x0001;
+#endif
 			}
 			else
 			{
@@ -1325,6 +1343,7 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 				// Naive Alpha Implementation (?) - don't draw if you're at texture index 0...
 				if (paletteEntry != 0)
 				{
+#ifdef USE_32BIT_3DBUFFER
 					// The color out of the texture
 					rgb_t color = m_state.m_palette->pen((renderData.palOffset + paletteEntry) & 0xfff);
 
@@ -1346,7 +1365,9 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 					if (blue >= 255) blue = 255;
 
 					color = rgb_t(255, (uint8_t)red, (uint8_t)green, (uint8_t)blue);
-
+#else
+					uint16_t color = ((renderData.palOffset + paletteEntry) & 0xfff);
+#endif
 					*colorBuffer = color;
 					*depthBuffer = z;
 				}
@@ -1380,7 +1401,11 @@ void hng64_poly_renderer::render_flat_scanline(int32_t scanline, const extent_t&
 	const float db = extent.param[3].dpdx;
 
 	// Pointers to the pixel buffers
+#ifdef USE_32BIT_3DBUFFER
 	uint32_t* colorBuffer = &m_colorBuffer3d.pix(scanline, extent.startx);
+#else
+	uint16_t* colorBuffer = &m_colorBuffer3d.pix(scanline, extent.startx);
+#endif
 	float*  depthBuffer = &m_depthBuffer3d[(scanline * m_state.m_screen->visible_area().width()) + extent.startx];
 
 	// Step over each pixel in the horizontal span
@@ -1388,15 +1413,17 @@ void hng64_poly_renderer::render_flat_scanline(int32_t scanline, const extent_t&
 	{
 		if (z < *depthBuffer)
 		{
-
+#ifdef USE_32BIT_3DBUFFER
 			// Clamp and finalize
 			if (r >= 255) r = 255;
 			if (g >= 255) g = 255;
 			if (b >= 255) b = 255;
 
 			rgb_t color = rgb_t(255, (uint8_t)r, (uint8_t)g, (uint8_t)b);
-
 			*colorBuffer = color;
+#else
+			*colorBuffer = r;
+#endif
 			*depthBuffer = z;
 		}
 

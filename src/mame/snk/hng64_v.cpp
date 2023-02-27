@@ -801,12 +801,15 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 		}
 	}
 
+	pen_t const *const clut = &m_palette->pen(0);
+
 	// 3d gets drawn next
 	if (!(m_fbcontrol[0] & 0x01))
 	{
 		// Blit the color buffer into the primary bitmap
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
+#ifdef USE_32BIT_3DBUFFER
 			const uint32_t *src = &m_poly_renderer->colorBuffer3d().pix(y, cliprect.min_x);
 			uint32_t *dst = &bitmap.pix(y, cliprect.min_x);
 
@@ -818,6 +821,22 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 				dst++;
 				src++;
 			}
+#else
+			const uint16_t *src = &m_poly_renderer->colorBuffer3d().pix(y, cliprect.min_x);
+			uint32_t *dst = &bitmap.pix(y, cliprect.min_x);
+
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			{
+				uint16_t srcpix = *src;
+				if (srcpix & 0x7fff)
+				{
+					*dst = clut[srcpix & 0x7fff];
+				}
+
+				dst++;
+				src++;
+			}
+#endif
 		}
 	}
 
@@ -825,7 +844,12 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	draw_sprites_buffer(screen, cliprect);
 
 	// copy sprites into display
-	pen_t const *const clut = &m_palette->pen(0);
+
+	// this correctly allows buriki intro sprites to use regular alpha, not additive
+	// while also being correct for sams64, which wants additive, but appears to be
+	// incorrect for Fatal Fury's "hit effects which want additive
+	uint8_t spriteblendtype = (m_tcram[0x10 / 4] >> 16) & 0x10;
+
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		const uint16_t *src = &m_sprite_bitmap.pix(y, cliprect.min_x);
@@ -838,7 +862,10 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			{
 				if (srcpix & 0x8000)
 				{
-					*dst = add_blend_r32(*dst, clut[srcpix & 0x7fff]);
+					if (spriteblendtype)
+						*dst = alpha_blend_r32(*(uint32_t *)dst, clut[srcpix & 0x7fff], 0x80);
+					else
+						*dst = add_blend_r32(*dst, clut[srcpix & 0x7fff]);
 				}
 				else
 				{
@@ -876,17 +903,19 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			m_videoregs[0x0d]);
 
 	if (1)
-		popmessage("TC: %08x MINX(%d) MINY(%d) MAXX(%d) MAXY(%d)\nBLEND ENABLES? %02x %02x %02x | %02x %02x %02x\nUNUSED?(%04x)\n%04x\n%04x\nMASTER FADES?(%08x %08x)\nUNUSED?(%08x)\nBITFIELD REGS(%04x)\nPALEFFECT_ENABLES(%d %d %d %d %d %d %d %d)\n PALFADES?(%08x %08x : %08x %08x : %08x %08x : %08x %08x)\n % 08x % 08x : % 08x % 08x % 08x % 08x",
+		popmessage("TC: %08x MINX(%d) MINY(%d) MAXX(%d) MAXY(%d)\nBLEND ENABLES? %02x %02x %02x | %02x %02x %02x\nUNUSED?(%04x)\n%04x\n%04x\nMASTER FADES - ADD?(%08x) - SUBTRACT?(%08x)\nUNUSED?(%08x)\nBITFIELD REGS(%04x)\nPALEFFECT_ENABLES(%d %d %d %d %d %d %d %d)\n PALFADES?(%08x %08x : %08x %08x : %08x %08x : %08x %08x)\n % 08x % 08x : % 08x % 08x % 08x % 08x",
 			m_tcram[0x00 / 4], // 0007 00e4 (fatfurwa, bbust2)
 			(m_tcram[0x04 / 4] >> 16) & 0xffff, (m_tcram[0x04 / 4] >> 0) & 0xffff, // 0000 0010 (fatfurwa) 0000 0000 (bbust2, xrally)
 			(m_tcram[0x08 / 4] >> 16) & 0xffff, (m_tcram[0x08 / 4] >> 0) & 0xffff, // 0200 01b0 (fatfurwa) 0200 01c0 (bbust2, xrally)
 
+			// is this 2 groups of 3 regS?
 			(m_tcram[0x0c / 4] >> 24) & 0xff, // 04 = 'blend' on tm1  
 			(m_tcram[0x0c / 4] >> 16) & 0xff, // 04 = blend all sprites? (buriki intro, text fades?)
-			(m_tcram[0x0c / 4] >> 8) & 0xff,
+			(m_tcram[0x0c / 4] >> 8) & 0xff,  // 10 gets set here in some cases when blended sprites are used too (blend type against a different input layer?)
+			// 2nd group?
 			(m_tcram[0x0c / 4] >> 0) & 0xff, //  04 = 'blend' on tm3  (used in transitions?)
 			(m_tcram[0x10 / 4] >> 24) & 0xff,
-			(m_tcram[0x10 / 4] >> 16) & 0xff,
+			(m_tcram[0x10 / 4] >> 16) & 0xff, // 10 being set seems to change sprite blend mode (maybe blend type against one input layer)
 
 			m_tcram[0x10 / 4] & 0xffff, // unused?
 
@@ -1021,6 +1050,12 @@ void hng64_state::update_palette_entry(int entry)
 	for (int i = 0; i < 8; i++)
 	{
 		uint32_t tcdata = m_tcram[(0x28 / 4) + i];
+
+		// correct for buriki (jumbotron fading images) and xrally / roadedge (palette effect on front of car in first person view)
+		//
+		// however this logic fails on fatal fury fades, as the msb is 00, indicating apply to palette entries 000-0ff but the actual
+		// palette needing the changes is 0x900 - 0x9ff (hng64 logo white flash) so there must be further ways in which this is
+		// configured
 		uint8_t tcregion = (tcdata & 0x0f000000) >> 24;
 
 		if (tcregion == (entry >> 8))

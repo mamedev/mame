@@ -18,6 +18,24 @@
 #include "screen.h"
 #include "tilemap.h"
 
+/* Having a 32 bit buffer with RGB values in it doesn't make
+   logical sense for the mixing stage, nor do the RAM tests
+   indicate that there would be enough framebuffer RAM for
+   one if even a single alpha bit is to be included.
+
+   However, it is unclear how the 'lighting' and non-textured
+   polygons work without storing RGB in the framebuffer at present.
+
+   Each framebuffer has enough RAM for 24 bits of data for a 512x256
+   layer (screen is interlaced, so it doesn't really have 448 pixels
+   in height)
+   
+   theory: 11 bit palette index (can use either half of palette)
+            1 bit 'blend'
+            4 bit 'light'
+            8 bit depth?
+*/
+//#define USE_32BIT_3DBUFFER
 
 /////////////////
 /// 3d Engine ///
@@ -102,14 +120,22 @@ public:
 	void render_flat_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
 
 	hng64_state& state() { return m_state; }
+#ifdef USE_32BIT_3DBUFFER
 	bitmap_rgb32& colorBuffer3d() { return m_colorBuffer3d; }
+#else
+	bitmap_ind16& colorBuffer3d() { return m_colorBuffer3d; }
+#endif
 	float* depthBuffer3d() { return m_depthBuffer3d.get(); }
 
 private:
 	hng64_state& m_state;
 
 	// (Temporarily class members - someday they will live in the memory map)
+#ifdef USE_32BIT_3DBUFFER
 	bitmap_rgb32 m_colorBuffer3d;
+#else
+	bitmap_ind16 m_colorBuffer3d;
+#endif
 	std::unique_ptr<float[]> m_depthBuffer3d;
 };
 
