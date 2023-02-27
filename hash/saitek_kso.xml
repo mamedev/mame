@@ -20,7 +20,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ksoa" cloneof="kso">>
+	<software name="ksoa" cloneof="kso">
 		<description>Kasparov Selected Openings (set 2)</description>
 		<year>1985</year>
 		<publisher>SciSys</publisher>
