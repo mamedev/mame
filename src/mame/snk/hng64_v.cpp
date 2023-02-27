@@ -847,8 +847,15 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 
 	// this correctly allows buriki intro sprites to use regular alpha, not additive
 	// while also being correct for sams64, which wants additive, but appears to be
-	// incorrect for Fatal Fury's "hit effects which want additive
-	uint8_t spriteblendtype = (m_tcram[0x10 / 4] >> 16) & 0x10;
+	// incorrect for Fatal Fury's hit effects which want additive
+	// 
+	// the 6 regs around here have the same values in fatfur and buriki, so are unlikely
+	// to control the blend type.
+	//uint8_t spriteblendtype = (m_tcram[0x10 / 4] >> 16) & 0x10;
+
+	// would be an odd place for it, after the 'vblank' flag but...
+	uint8_t spriteblendtype = (m_tcram[0x4c / 4] >> 16) & 0x01;
+
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -957,7 +964,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 
 
 			m_tcram[0x48 / 4], // this is where the 'vblank' thing lives
-			m_tcram[0x4c / 4],
+			m_tcram[0x4c / 4], // 0001 0000 or 0000 0000 - works(?) as blend type selection for sprite mixing?
 			m_tcram[0x50 / 4],
 			m_tcram[0x54 / 4],
 			m_tcram[0x58 / 4],
