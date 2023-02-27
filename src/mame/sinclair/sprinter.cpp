@@ -472,12 +472,11 @@ void sprinter_state::screen_update_game(screen_device &screen, bitmap_ind16 &bit
 {
 	const s8 dy = 7 - (m_hold >> 4);
 	const s8 dx = (7 - (m_hold & 0x0f)) * 2;
+	const u8 b = ((SPRINT_HEIGHT + cliprect.top() - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT) >> 3;
+	const u8 a = ((SPRINT_WIDTH + cliprect.left() - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH) >> 4;
+	std::pair<u8, u8> scroll = lookback_scroll(a, b);
 	for(u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
-		const u8 a = ((SPRINT_WIDTH + cliprect.left() - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH) >> 4;
-		const u8 b = ((SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT) >> 3;
-		std::pair<u8, u8> scroll = lookback_scroll(a, b);
-
 		u8* mode = nullptr;
 		u16 pal, x;
 		u8 y;
@@ -490,7 +489,6 @@ void sprinter_state::screen_update_game(screen_device &screen, bitmap_ind16 &bit
 			if (mode == nullptr)
 			{
 				const u16 la = 0x300 + (b8 >> 3) * 4;
-				// 16x8 block descriptor
 				const u32 line1 = (1 + (a16 >> 4) * 2 + 0x80 * (m_rgmod & 1)) * 1024;
 				mode = m_vram + line1 + la;
 				pal = BIT(mode[0], 6, 2) << 8;
@@ -498,8 +496,10 @@ void sprinter_state::screen_update_game(screen_device &screen, bitmap_ind16 &bit
 				y = mode[2];
 			}
 
-			const u8 color = m_vram[(y + (b8 & 7)) * 1024 + x + ((a16 & 15) >> 1)];
-			*pix++ = pal + color;
+			if ((BIT(mode[0], 5, 3) == 7))
+				*pix++ = 0x400 | (((mode[0] & 0x0c) == 0x0c) ? 0 : ((m_port_fe_data & 0x07) << 3) | (m_port_fe_data & 0x07));
+			else
+				*pix++ = pal + m_vram[(y + (b8 & 7)) * 1024 + x + ((a16 & 15) >> 1)];
 
 			if ((a16 & 15) == 15)
 			{
