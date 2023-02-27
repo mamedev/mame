@@ -139,7 +139,7 @@ Line ram memory map:
         Playfield 2 & 4 registers seem to be interleaved, playfield 2 Y zoom is stored where you would
         expect playfield 4 y zoom to be and vice versa.
 
-   0x9000: Palette add (can affect opacity (<- really?))
+    0x9000: Palette add (can affect opacity)
 
     0xa000: Playfield 1 rowscroll (1 word per line, 256 lines)
     0xa200: Playfield 2 rowscroll
@@ -1324,7 +1324,7 @@ void taito_f3_state::init_alpha_blend_func()
 	{ \
 		m_tval = *m_tsrc[pf_num]; \
 		if (m_tval & 0xf0) \
-			if ((this->*m_dpix_lp[pf_num][m_pval >> 4])(clut[*m_src[pf_num] + m_pal_add[pf_num]])) { *dsti = m_dval; break; } \
+			if ((this->*m_dpix_lp[pf_num][m_pval >> 4])(clut[(*m_src[pf_num] + m_pal_add[pf_num]) & 0x1fff])) { *dsti = m_dval; break; } \
 	}
 
 
@@ -1818,7 +1818,7 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 				colscroll = (m_line_ram[col_base / 2] >> 0) & 0x3ff;
 
 			if (m_line_ram[0x500 + y] & bit_select)
-				pal_add = m_line_ram[pal_add_base / 2] & 0x1ff;
+				pal_add = (m_line_ram[pal_add_base / 2] & 0x1ff) * 16;
 		}
 
 		if (!pri || (!m_flipscreen && y < 24) || (m_flipscreen && y > 231) ||
@@ -1853,7 +1853,7 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 		line_t->x_zoom[y] = 0x10000 - (line_zoom & 0xff00);
 		line_t->alpha_mode[y] = line_enable;
 		line_t->pri[y] = pri;
-		line_t->pal_add[y] = pal_add * 16;
+		line_t->pal_add[y] = pal_add;
 
 		zoom_base += inc;
 		line_base += inc;
