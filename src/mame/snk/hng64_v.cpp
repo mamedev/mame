@@ -828,7 +828,24 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 				uint16_t srcpix = *src;
 				if (srcpix & 0x0fff)
 				{
-					*dst = clut[srcpix & 0x0fff];
+					rgb_t col = clut[srcpix & 0x0fff];
+					uint8_t intensity = (srcpix & 0xf000) >> 8;
+					uint16_t r = col.r();
+					uint16_t g = col.g();
+					uint16_t b = col.b();
+
+					r = r + intensity;
+					g = g + intensity;
+					b = b + intensity;
+
+					if (r > 255)
+						r = 255;
+					if (g > 255)
+						g = 255;
+					if (b > 255)
+						b = 255;
+
+					*dst = rgb_t(r, g, b);
 				}
 
 				dst++;

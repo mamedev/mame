@@ -1274,8 +1274,8 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 				// Naive Alpha Implementation (?) - don't draw if you're at texture index 0...
 				if (paletteEntry != 0)
 				{
-					float rIntensity = rCorrect / 255.0f;
-					uint8_t lightval = (uint8_t)(rIntensity / 16.0f);
+					float rIntensity = rCorrect / 16.0f;
+					uint8_t lightval = (uint8_t)rIntensity;
 					uint16_t color = ((renderData.palOffset + paletteEntry) & 0xfff) | (lightval << 12);
 					*colorBuffer = color;
 					*depthBuffer = z;
