@@ -125,12 +125,6 @@ namespace osd {
 
 namespace {
 
-BOOL CALLBACK device_enum_interface_callback(LPCDIDEVICEINSTANCE instance, LPVOID ref)
-{
-	return static_cast<device_enum_interface *>(ref)->device_enum_callback(instance);
-}
-
-
 std::string guid_to_string(GUID const &guid)
 {
 	// size of a GUID string with dashes plus NUL terminator
@@ -307,11 +301,8 @@ void dinput_mouse_device::configure(input_device &device)
 //  dinput_module - base DirectInput module
 //============================================================
 
-class dinput_module : public input_module_impl<dinput_device, osd_common_t>, public device_enum_interface
+class dinput_module : public input_module_impl<dinput_device, osd_common_t>
 {
-protected:
-	std::unique_ptr<dinput_api_helper> m_dinput_helper;
-
 public:
 	dinput_module(const char* type, const char* name) :
 		input_module_impl<dinput_device, osd_common_t>(type, name),
@@ -343,13 +334,18 @@ public:
 	{
 		input_module_impl<dinput_device, osd_common_t>::input_init(machine);
 
-		HRESULT result = m_dinput_helper->enum_attached_devices(dinput_devclass(), *this);
+		HRESULT const result = m_dinput_helper->enum_attached_devices(
+				dinput_devclass(),
+				[this] (LPCDIDEVICEINSTANCE instance) { return device_enum_callback(instance); });
 		if (result != DI_OK)
 			fatalerror("DirectInput: Unable to enumerate devices (result=%08X)\n", uint32_t(result));
 	}
 
 protected:
 	virtual int dinput_devclass() = 0;
+	virtual BOOL device_enum_callback(LPCDIDEVICEINSTANCE instance) = 0;
+
+	std::unique_ptr<dinput_api_helper> m_dinput_helper;
 };
 
 
@@ -361,6 +357,7 @@ public:
 	{
 	}
 
+protected:
 	virtual int dinput_devclass() override
 	{
 		return DI8DEVCLASS_KEYBOARD;
@@ -392,6 +389,7 @@ public:
 	{
 	}
 
+protected:
 	virtual int dinput_devclass() override
 	{
 		return DI8DEVCLASS_POINTER;
@@ -438,6 +436,7 @@ public:
 	{
 	}
 
+protected:
 	virtual int dinput_devclass() override
 	{
 		return DI8DEVCLASS_GAMECTRL;
@@ -1209,12 +1208,6 @@ int dinput_api_helper::initialize()
 
 	osd_printf_verbose("DirectInput: Using DirectInput %d\n", DIRECTINPUT_VERSION >> 8);
 	return 0;
-}
-
-
-HRESULT dinput_api_helper::enum_attached_devices(int devclass, device_enum_interface &enumerate_interface) const
-{
-	return m_dinput->EnumDevices(devclass, device_enum_interface_callback, &enumerate_interface, DIEDFL_ATTACHEDONLY);
 }
 
 
