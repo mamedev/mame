@@ -54,18 +54,6 @@
 
 
 /***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-enum
-{
-	LOADSAVE_NONE,
-	LOADSAVE_LOAD,
-	LOADSAVE_SAVE
-};
-
-
-/***************************************************************************
     LOCAL VARIABLES
 ***************************************************************************/
 
@@ -1376,15 +1364,17 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	// handle a save state request
 	if (machine().ui_input().pressed(IPT_UI_SAVE_STATE))
 	{
+		osd_printf_info("Save requested\n");
 		start_save_state();
-		return LOADSAVE_SAVE;
+		return 0;
 	}
 
 	// handle a load state request
 	if (machine().ui_input().pressed(IPT_UI_LOAD_STATE))
 	{
+		osd_printf_info("Load requested\n");
 		start_load_state();
-		return LOADSAVE_LOAD;
+		return 0;
 	}
 
 	// handle a save snapshot request

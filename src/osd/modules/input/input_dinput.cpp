@@ -1221,7 +1221,7 @@ std::pair<Microsoft::WRL::ComPtr<IDirectInputDevice8>, LPCDIDATAFORMAT> dinput_a
 
 	// attempt to create a device
 	Microsoft::WRL::ComPtr<IDirectInputDevice8> device;
-	result = m_dinput->CreateDevice(instance->guidInstance, device.GetAddressOf(), nullptr);
+	result = m_dinput->CreateDevice(instance->guidInstance, &device, nullptr);
 	if (result != DI_OK)
 	{
 		osd_printf_error("DirectInput: Unable to create device.\n");
@@ -1245,7 +1245,13 @@ std::pair<Microsoft::WRL::ComPtr<IDirectInputDevice8>, LPCDIDATAFORMAT> dinput_a
 	}
 
 	// default window to the first window in the list
-	HWND window_handle;
+	// For now, we always use the desktop window due to multiple issues:
+	// * MAME recreates windows on toggling fullscreen.  DirectInput really doesn't like this.
+	// * DirectInput doesn't like the window used for D3D fullscreen exclusive mode.
+	// * With multiple windows, the first window needs to have focus when using foreground mode.
+	// This makes it impossible to use force feedback as that requires foreground exclusive mode.
+	// The only way to get around this would be to reopen devices on focus changes.
+	[[maybe_unused]] HWND window_handle;
 	DWORD di_cooperative_level;
 #if defined(OSD_WINDOWS)
 	auto const &window = dynamic_cast<win_window_info &>(*osd_common_t::window_list().front());
@@ -1278,7 +1284,8 @@ std::pair<Microsoft::WRL::ComPtr<IDirectInputDevice8>, LPCDIDATAFORMAT> dinput_a
 			di_cooperative_level = DISCL_BACKGROUND | DISCL_NONEXCLUSIVE;
 			break;
 		case dinput_cooperative_level::FOREGROUND:
-			di_cooperative_level = DISCL_FOREGROUND | DISCL_NONEXCLUSIVE;
+			//di_cooperative_level = DISCL_FOREGROUND | DISCL_NONEXCLUSIVE;
+			di_cooperative_level = DISCL_BACKGROUND | DISCL_NONEXCLUSIVE;
 			break;
 		default:
 			throw false;
@@ -1286,7 +1293,7 @@ std::pair<Microsoft::WRL::ComPtr<IDirectInputDevice8>, LPCDIDATAFORMAT> dinput_a
 	}
 
 	// set the cooperative level
-	result = device->SetCooperativeLevel(window_handle, di_cooperative_level);
+	result = device->SetCooperativeLevel(GetDesktopWindow(), di_cooperative_level);
 	if (result != DI_OK)
 	{
 		osd_printf_error("DirectInput: Unable to set cooperative level.\n");
