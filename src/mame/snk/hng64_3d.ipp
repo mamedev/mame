@@ -479,12 +479,6 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 	address[2] |= (megaOffset << 16);
 	address[3] |= (megaOffset << 16);
 
-	// Debug - ajg
-	//uint32_t tdColor = 0xff000000;
-	//if (threeDPointer[14] & 0x0002) tdColor |= 0x00ff0000;
-	//if (threeDPointer[14] & 0x0001) tdColor |= 0x0000ff00;
-	//if (threeDPointer[14] & 0x0000) tdColor |= 0x000000ff;
-
 	// For all 4 polygon chunks
 	for (int k = 0; k < 4; k++)
 	{
@@ -525,10 +519,6 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 
 			// Syntactical simplification
 			polygon& currentPoly = m_polys[numPolys];
-
-			// Debug - Colors polygons with certain flags bright blue! ajg
-			currentPoly.debugColor = 0;
-			//currentPoly.debugColor = tdColor;
 
 			// Debug - ajg
 			//logerror("%d (%08x) : %04x %04x %04x\n", k, address[k]*3*2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
@@ -583,17 +573,6 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			}
 
 			currentPoly.palOffset += explicitPaletteValue;
-
-#if 0
-			if (((chunkOffset[2] & 0xc000) == 0x4000) && (m_screen->frame_number() & 1))
-			{
-			//  if (chunkOffset[2] == 0xd870)
-				{
-					currentPoly.debugColor = 0xffff0000;
-					logerror("%d (%08x) : %04x %04x %04x\n", k, address[k] * 3 * 2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
-				}
-			}
-#endif
 
 			uint8_t chunkLength = 0;
 			switch(chunkType)
@@ -817,9 +796,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 					intensity *= 128.0;                     // Maps intensity to the range [0.0, 2.0]
 					if (intensity >= 255.0f) intensity = 255.0f;
 
-					currentPoly.vert[v].light[0] = intensity;
-					currentPoly.vert[v].light[1] = intensity;
-					currentPoly.vert[v].light[2] = intensity;
+					currentPoly.vert[v].light = intensity;
 				}
 			}
 			else
@@ -827,12 +804,9 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				// Just clear out the light values
 				for (int v = 0; v < 3; v++)
 				{
-					currentPoly.vert[v].light[0] = 0;
-					currentPoly.vert[v].light[1] = 0;
-					currentPoly.vert[v].light[2] = 0;
+					currentPoly.vert[v].light = 0;
 				}
 			}
-
 
 			float cullRay[4];
 			float cullNorm[4];
@@ -883,9 +857,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 					clipVerts[m].w = currentPoly.vert[m].clipCoords[3];
 					clipVerts[m].p[0] = currentPoly.vert[m].texCoords[0];
 					clipVerts[m].p[1] = currentPoly.vert[m].texCoords[1];
-					clipVerts[m].p[2] = currentPoly.vert[m].light[0];
-					clipVerts[m].p[3] = currentPoly.vert[m].light[1];
-					clipVerts[m].p[4] = currentPoly.vert[m].light[2];
+					clipVerts[m].p[2] = currentPoly.vert[m].light;
 				}
 
 				if (currentPoly.visible)
@@ -903,9 +875,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 						currentPoly.vert[m].clipCoords[3] = clipVerts[m].w;
 						currentPoly.vert[m].texCoords[0] = clipVerts[m].p[0];
 						currentPoly.vert[m].texCoords[1] = clipVerts[m].p[1];
-						currentPoly.vert[m].light[0] = clipVerts[m].p[2];
-						currentPoly.vert[m].light[1] = clipVerts[m].p[3];
-						currentPoly.vert[m].light[2] = clipVerts[m].p[4];
+						currentPoly.vert[m].light = clipVerts[m].p[2];
 					}
 
 					const rectangle& visarea = m_screen->visible_area();
@@ -1228,17 +1198,13 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 	// Pull the parameters out of the extent structure
 	float z = extent.param[0].start;
 	float w = extent.param[1].start;
-	float lightR = extent.param[2].start;
-	float lightG = extent.param[3].start;
-	float lightB = extent.param[4].start;
+	float light = extent.param[2].start;
 	float s = extent.param[5].start;
 	float t = extent.param[6].start;
 
 	const float dz = extent.param[0].dpdx;
 	const float dw = extent.param[1].dpdx;
-	const float dlightR = extent.param[2].dpdx;
-	const float dlightG = extent.param[3].dpdx;
-	const float dlightB = extent.param[4].dpdx;
+	const float dlight = extent.param[2].dpdx;
 	const float ds = extent.param[5].dpdx;
 	const float dt = extent.param[6].dpdx;
 
@@ -1261,39 +1227,9 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 			// Multiply back through by w for everything that was interpolated perspective-correctly
 			const float sCorrect = s / w;
 			const float tCorrect = t / w;
-#ifdef USE_32BIT_3DBUFFER
-			const float rCorrect = lightR / w;
-			const float gCorrect = lightG / w;
-			const float bCorrect = lightB / w;
-#endif
-			if ((renderData.debugColor & 0xff000000) == 0x01000000)
-			{
-#ifdef USE_32BIT_3DBUFFER
-				// ST color mode
-				*colorBuffer = rgb_t(255, uint8_t(sCorrect*255.0f), uint8_t(tCorrect*255.0f), uint8_t(0));
-#else
-				*colorBuffer = 0x0002;
-#endif
-			}
-			else if ((renderData.debugColor & 0xff000000) == 0x02000000)
-			{
-#ifdef USE_32BIT_3DBUFFER
-				// Lighting only
-				*colorBuffer = rgb_t(255, (uint8_t)rCorrect, (uint8_t)gCorrect, (uint8_t)bCorrect);
-#else
-				*colorBuffer = 0x0003;
-#endif
-			}
-			else if ((renderData.debugColor & 0xff000000) == 0xff000000)
-			{
-#ifdef USE_32BIT_3DBUFFER
-				// Debug color mode
-				*colorBuffer = renderData.debugColor;
-#else
-				*colorBuffer = 0x0001;
-#endif
-			}
-			else
+
+			const float rCorrect = light / w;
+
 			{
 				float textureS = 0.0f;
 				float textureT = 0.0f;
@@ -1343,30 +1279,23 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 				// Naive Alpha Implementation (?) - don't draw if you're at texture index 0...
 				if (paletteEntry != 0)
 				{
+					float rIntensity = rCorrect / 255.0f;
 #ifdef USE_32BIT_3DBUFFER
 					// The color out of the texture
 					rgb_t color = m_state.m_palette->pen((renderData.palOffset + paletteEntry) & 0xfff);
 
 					// Apply the lighting
-					float rIntensity = rCorrect / 255.0f;
-					float gIntensity = gCorrect / 255.0f;
-					float bIntensity = bCorrect / 255.0f;
 					float red   = color.r() * rIntensity;
-					float green = color.g() * gIntensity;
-					float blue  = color.b() * bIntensity;
 
 					// Clamp and finalize
 					red = color.r() + red;
-					green = color.g() + green;
-					blue = color.b() + blue;
 
 					if (red >= 255) red = 255;
-					if (green >= 255) green = 255;
-					if (blue >= 255) blue = 255;
 
-					color = rgb_t(255, (uint8_t)red, (uint8_t)green, (uint8_t)blue);
+					color = rgb_t(255, (uint8_t)red, (uint8_t)red, (uint8_t)red);
 #else
-					uint16_t color = ((renderData.palOffset + paletteEntry) & 0xfff);
+					uint8_t lightval = (uint8_t)(rIntensity / 16.0f);
+					uint16_t color = ((renderData.palOffset + paletteEntry) & 0xfff) | (lightval << 12);
 #endif
 					*colorBuffer = color;
 					*depthBuffer = z;
@@ -1376,9 +1305,7 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 
 		z += dz;
 		w += dw;
-		lightR += dlightR;
-		lightG += dlightG;
-		lightB += dlightB;
+		light += dlight;
 		s += ds;
 		t += dt;
 
@@ -1422,7 +1349,7 @@ void hng64_poly_renderer::render_flat_scanline(int32_t scanline, const extent_t&
 			rgb_t color = rgb_t(255, (uint8_t)r, (uint8_t)g, (uint8_t)b);
 			*colorBuffer = color;
 #else
-			*colorBuffer = r;
+			*colorBuffer = rand() & 0xfff;
 #endif
 			*depthBuffer = z;
 		}
@@ -1444,7 +1371,6 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 	rOptions.tex4bpp = p->tex4bpp;
 	rOptions.texIndex = p->texIndex;
 	rOptions.palOffset = p->palOffset;
-	rOptions.debugColor = p->debugColor;
 	rOptions.texPageSmall = p->texPageSmall;
 	rOptions.texPageHorizOffset = p->texPageHorizOffset;
 	rOptions.texPageVertOffset = p->texPageVertOffset;
@@ -1501,9 +1427,7 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 		for (int j = 0; j < p->n; j++)
 		{
 			p->vert[j].clipCoords[3] = 1.0f / p->vert[j].clipCoords[3];
-			p->vert[j].light[0]      = p->vert[j].light[0]     * p->vert[j].clipCoords[3];
-			p->vert[j].light[1]      = p->vert[j].light[1]     * p->vert[j].clipCoords[3];
-			p->vert[j].light[2]      = p->vert[j].light[2]     * p->vert[j].clipCoords[3];
+			p->vert[j].light      = p->vert[j].light     * p->vert[j].clipCoords[3];
 			p->vert[j].texCoords[0]  = p->vert[j].texCoords[0] * p->vert[j].clipCoords[3];
 			p->vert[j].texCoords[1]  = p->vert[j].texCoords[1] * p->vert[j].clipCoords[3];
 		}
@@ -1519,9 +1443,7 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 			pVert[0].y = pv0.clipCoords[1];
 			pVert[0].p[0] = pv0.clipCoords[2];
 			pVert[0].p[1] = pv0.clipCoords[3];
-			pVert[0].p[2] = pv0.light[0];
-			pVert[0].p[3] = pv0.light[1];
-			pVert[0].p[4] = pv0.light[2];
+			pVert[0].p[2] = pv0.light;
 			pVert[0].p[5] = pv0.texCoords[0];
 			pVert[0].p[6] = pv0.texCoords[1];
 
@@ -1530,9 +1452,7 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 			pVert[1].y = pvj.clipCoords[1];
 			pVert[1].p[0] = pvj.clipCoords[2];
 			pVert[1].p[1] = pvj.clipCoords[3];
-			pVert[1].p[2] = pvj.light[0];
-			pVert[1].p[3] = pvj.light[1];
-			pVert[1].p[4] = pvj.light[2];
+			pVert[1].p[2] = pvj.light;
 			pVert[1].p[5] = pvj.texCoords[0];
 			pVert[1].p[6] = pvj.texCoords[1];
 
@@ -1541,9 +1461,7 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 			pVert[2].y = pvjp1.clipCoords[1];
 			pVert[2].p[0] = pvjp1.clipCoords[2];
 			pVert[2].p[1] = pvjp1.clipCoords[3];
-			pVert[2].p[2] = pvjp1.light[0];
-			pVert[2].p[3] = pvjp1.light[1];
-			pVert[2].p[4] = pvjp1.light[2];
+			pVert[2].p[2] = pvjp1.light;
 			pVert[2].p[5] = pvjp1.texCoords[0];
 			pVert[2].p[6] = pvjp1.texCoords[1];
 

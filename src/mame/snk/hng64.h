@@ -50,7 +50,7 @@ struct polyVert
 	float normal[4]{};        // Normal (X Y Z 1.0)
 	float clipCoords[4]{};    // Homogeneous screen space coordinates (X Y Z W)
 
-	float light[3]{};         // The intensity of the illumination at this point
+	float light;         // The intensity of the illumination at this point
 
 	uint16_t colorIndex = 0;    // Flat shaded polygons, no texture, no lighting
 };
