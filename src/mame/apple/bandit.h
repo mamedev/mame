@@ -13,7 +13,8 @@
 
 #include "machine/pci.h"
 
-class bandit_host_device : public pci_host_device {
+class bandit_host_device : public pci_host_device
+{
 public:
 	template <typename T>
 	bandit_host_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpu_tag)

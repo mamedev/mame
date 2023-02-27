@@ -17,6 +17,13 @@
 
 #include "emu.h"
 
+#include "cuda.h"
+#include "egret.h"
+#include "macadb.h"
+#include "macscsi.h"
+#include "mactoolbox.h"
+#include "sonora.h"
+
 #include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68030.h"
@@ -25,12 +32,6 @@
 #include "machine/z80scc.h"
 #include "machine/nscsi_bus.h"
 #include "machine/ncr5380.h"
-#include "cuda.h"
-#include "egret.h"
-#include "macadb.h"
-#include "macscsi.h"
-#include "mactoolbox.h"
-#include "sonora.h"
 
 #include "emupal.h"
 #include "screen.h"

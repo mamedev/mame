@@ -17,6 +17,11 @@
 
 #include "emu.h"
 
+#include "macadb.h"
+#include "macrtc.h"
+#include "macscsi.h"
+#include "mactoolbox.h"
+
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/nubus.h"
 #include "bus/nubus/cards.h"
@@ -33,10 +38,6 @@
 #include "machine/timer.h"
 #include "machine/z80scc.h"
 #include "sound/asc.h"
-#include "macadb.h"
-#include "macrtc.h"
-#include "macscsi.h"
-#include "mactoolbox.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -73,6 +74,10 @@ public:
 	void maciifx(machine_config &config);
 	void maciifx_map(address_map &map);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<m68030_device> m_maincpu;
 	required_device<via6522_device> m_via1;
@@ -87,8 +92,18 @@ private:
 	required_device<scc8530_legacy_device> m_scc;
 	required_device<asc_device> m_asc;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	floppy_image_device *m_cur_floppy = nullptr;
+	int m_hdsel;
+
+	uint8_t m_oss_regs[0x400]{};
+	int m_last_taken_interrupt;
+	emu_timer *m_6015_timer;
+
+	bool m_overlay;
+	u32 *m_rom_ptr = nullptr;
+	u32 m_rom_size = 0;
+
+	int m_adb_in;
 
 	u16 scsi_r(offs_t offset, u16 mem_mask = ~0);
 	void scsi_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -99,9 +114,6 @@ private:
 	{
 		m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
 	}
-
-	floppy_image_device *m_cur_floppy = nullptr;
-	int m_hdsel;
 
 	void phases_w(uint8_t phases);
 	void devsel_w(uint8_t devsel);
@@ -117,10 +129,6 @@ private:
 	uint8_t maciifx_8010_r();
 	uint8_t maciifx_8040_r();
 
-	uint8_t m_oss_regs[0x400]{};
-	int m_last_taken_interrupt;
-	emu_timer *m_6015_timer;
-
 	uint16_t mac_via_r(offs_t offset);
 	void mac_via_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint8_t mac_via_in_a();
@@ -130,11 +138,7 @@ private:
 	void mac_via_sync();
 
 	uint32_t rom_switch_r(offs_t offset);
-	bool m_overlay;
-	u32 *m_rom_ptr = nullptr;
-	u32 m_rom_size = 0;
 
-	int m_adb_in;
 	void set_adb_line(int linestate) { m_adb_in = (linestate == ASSERT_LINE) ? true : false; }
 	int adbin_r() { return m_adb_in; }
 };
