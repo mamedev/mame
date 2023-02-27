@@ -146,7 +146,8 @@ uint8_t s100_vector_dualmode_device::s100_sinp_r(offs_t offset)
 			m_cmar &= 0x1ff;
 		}
 	} else if (offset == 0xc3) { // reset port
-		m_cmar = 0;
+		if (!machine().side_effects_disabled())
+			m_cmar = 0;
 		data = 0xff;
 	} else {
 		data = 0xff;
