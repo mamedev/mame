@@ -9,7 +9,9 @@
 
     This was the fastest 68030 Mac, with a 40 MHz clock speed and 2 65C02
     coprocessors plus DMA capability.  MacOS used almost none of the extra
-    hardware so the machine never reached its full potential.
+    hardware so the machine never reached its full potential.  However, its
+    DMA and I/O coprocessors were reused in the LaserWriter IIf/IIg and
+    Quadra 900/950.
 
 ****************************************************************************/
 
@@ -43,9 +45,8 @@
 
 namespace {
 
-#define C32M    (31.3344_MHz_XTAL)
-#define C15M    (C32M/2)
-#define C7M     (C32M/4)
+#define C15M    (15.6672_MHz_XTAL)
+#define C7M     (C15M/2)
 
 class maciifx_state : public driver_device
 {
