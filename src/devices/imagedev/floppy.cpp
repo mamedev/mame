@@ -220,11 +220,6 @@ floppy_connector::~floppy_connector()
 {
 }
 
-void floppy_connector::set_formats(std::function<void (format_registration &fr)> _formats)
-{
-	formats = _formats;
-}
-
 void floppy_connector::device_start()
 {
 }
@@ -625,7 +620,7 @@ image_init_result floppy_image_device::call_load()
 	init_floppy_load(output_format != nullptr);
 
 	if (!cur_load_cb.isnull())
-		return cur_load_cb(this);
+		cur_load_cb(this);
 
 	flux_image_prepare();
 

@@ -1221,6 +1221,7 @@ ussr/unior.cpp
 ussr/ut88.cpp
 ussr/vector06.cpp
 ussr/vta2000.cpp
+vectorgraphic/vector4.cpp
 verifone/tranz330.cpp
 vidbrain/vidbrain.cpp
 videoton/tvc.cpp

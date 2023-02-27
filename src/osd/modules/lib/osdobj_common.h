@@ -183,7 +183,7 @@ public:
 	// PortAudio options
 	const char *pa_api() const { return value(OSDOPTION_PA_API); }
 	const char *pa_device() const { return value(OSDOPTION_PA_DEVICE); }
-	const float pa_latency() const { return float_value(OSDOPTION_PA_LATENCY); }
+	float pa_latency() const { return float_value(OSDOPTION_PA_LATENCY); }
 
 	static const options_entry s_option_entries[];
 };

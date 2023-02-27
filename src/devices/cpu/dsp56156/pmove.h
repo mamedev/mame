@@ -21,7 +21,6 @@ public:
 
 	virtual bool decode(const uint16_t word0, const uint16_t word1) = 0;
 	virtual std::string disassemble() const = 0;
-	virtual void evaluate() = 0;
 
 	static std::unique_ptr<ParallelMove> decodeParallelMove(const Opcode* opc, const uint16_t word0, const uint16_t word1);
 
@@ -74,7 +73,6 @@ public:
 	{
 		return m_source + "," + m_destination;
 	}
-	void evaluate() override {}
 
 private:
 	std::string m_source;
@@ -116,7 +114,6 @@ public:
 	{
 		return m_source + "," + m_destination;
 	}
-	void evaluate() override {}
 
 private:
 	std::string m_source;
@@ -167,7 +164,6 @@ public:
 	{
 		return parallelMove + " " + parallelMove2;
 	}
-	void evaluate() override {}
 
 private:
 	std::string parallelMove;
@@ -218,7 +214,6 @@ public:
 		else
 			return regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
-	void evaluate() override {}
 
 private:
 	reg_id m_source;
@@ -257,7 +252,6 @@ public:
 	{
 		return pms + " " + pms2;
 	}
-	void evaluate() override {}
 
 private:
 	std::string pms;    // TODO
@@ -286,7 +280,6 @@ public:
 	{
 		return m_ea;
 	}
-	void evaluate() override {}
 
 private:
 	std::string m_ea;
@@ -317,7 +310,6 @@ public:
 	{
 		return m_source + "," + m_destination;
 	}
-	void evaluate() override {}
 
 private:
 	std::string m_source;

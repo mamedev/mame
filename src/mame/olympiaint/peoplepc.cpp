@@ -92,7 +92,7 @@ private:
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	static void floppy_formats(format_registration &fr);
-	image_init_result floppy_load(floppy_image_device *dev);
+	void floppy_load(floppy_image_device *dev);
 	void floppy_unload(floppy_image_device *dev);
 
 	uint8_t m_dma0pg = 0, m_p7c = 0;
@@ -191,10 +191,9 @@ void peoplepc_state::memory_write_byte(offs_t offset, uint8_t data)
 	prog_space.write_byte(offset | (m_dma0pg << 16), data);
 }
 
-image_init_result peoplepc_state::floppy_load(floppy_image_device *dev)
+void peoplepc_state::floppy_load(floppy_image_device *dev)
 {
 	dev->mon_w(0);
-	return image_init_result::PASS;
 }
 
 void peoplepc_state::floppy_unload(floppy_image_device *dev)
