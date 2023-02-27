@@ -27,7 +27,6 @@ class pccard_sram_device :
 	public device_pccard_interface
 {
 public:
-	void card_detect_w(int state) { m_slot->card_detect_w(state); }
 	void battery_voltage_1_w(int state) { m_slot->battery_voltage_1_w(state); }
 	void battery_voltage_2_w(int state) { m_slot->battery_voltage_2_w(state); }
 	void write_protect_w(int state) { m_slot->write_protect_w(state); }

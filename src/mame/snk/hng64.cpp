@@ -1185,7 +1185,7 @@ void hng64_state::hng_map(address_map &map)
 	map(0x20190000, 0x20190037).ram().w(FUNC(hng64_state::hng64_vregs_w)).share("videoregs");
 
 	// Mixing
-	map(0x20200000, 0x20203fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x20200000, 0x20203fff).ram().w(FUNC(hng64_state::pal_w)).share("paletteram");
 	map(0x20208000, 0x2020805f).w(FUNC(hng64_state::tcram_w)).share("tcram");   // Transition Control
 	map(0x20208000, 0x2020805f).r(FUNC(hng64_state::tcram_r));
 

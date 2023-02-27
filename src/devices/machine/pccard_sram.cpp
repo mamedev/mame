@@ -37,7 +37,7 @@ static INPUT_PORTS_START( card )
 	PORT_DIPSETTING(   0x02, DEF_STR(Yes))
 	PORT_DIPSETTING(   0x00, DEF_STR(No))
 	PORT_DIPNAME(0x04, 0x04, "Write Protect")  PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, pccard_sram_device, write_protect_w)
-	PORT_DIPSETTING(   0x08, DEF_STR(No))
+	PORT_DIPSETTING(   0x04, DEF_STR(No))
 	PORT_DIPSETTING(   0x00, DEF_STR(Yes))
 INPUT_PORTS_END
 
@@ -123,7 +123,7 @@ uint16_t pccard_sram_device::read_memory(offs_t offset, uint16_t mem_mask)
 
 void pccard_sram_device::write_memory(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (m_card_detect && BIT(m_switches->read(), 3))
+	if (m_card_detect && BIT(m_switches->read(), 2))
 		space(0).write_word(offset * 2, data, mem_mask);
 }
 
@@ -143,7 +143,7 @@ void pccard_sram_device::write_reg(offs_t offset, uint16_t data, uint16_t mem_ma
 {
 	LOGMASKED(LOG_ATTRIBUTE, "attribute memory w: %06x = %04x & %04x\n", offset, data, mem_mask);
 
-	if (m_card_detect && BIT(m_switches->read(), 3))
+	if (m_card_detect && BIT(m_switches->read(), 2))
 		space(1).write_word(offset * 2, data & 0x00ff, mem_mask);
 }
 

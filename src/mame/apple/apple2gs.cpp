@@ -1002,10 +1002,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 	m_screen->update_partial(scanline);
 
 	/* check scanline interrupt bits if we're in super hi-res and the current scanline is within the active display area */
-	if ((m_video->get_newvideo() & 0x80) && (scanline >= (BORDER_TOP-1)) && (scanline < (200+BORDER_TOP-1)))
+	if ((m_video->get_newvideo() & 0x80) && (scanline >= BORDER_TOP) && (scanline < (200+BORDER_TOP)))
 	{
 		u8 scb;
-		const int shrline = scanline - BORDER_TOP + 1;
+		const int shrline = scanline - BORDER_TOP;
 
 		if (shrline & 1)
 		{
@@ -1501,28 +1501,11 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 	switch (offset)
 	{
-		case 0x00:  // keyboard latch
+		// keyboard latch
+		case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06:
+		case 0x07: case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d:
+		case 0x0e: case 0x0f:
 			return uKeyboard;
-
-		case 0x02:  // RAMRDOFF
-			m_ramrd = false;
-			auxbank_update();
-			break;
-
-		case 0x03:  // RAMRDON
-			m_ramrd = true;
-			auxbank_update();
-			break;
-
-		case 0x04:  // RAMWRTOFF
-			m_ramwrt = false;
-			auxbank_update();
-			break;
-
-		case 0x05:  // RAMWRTON
-			m_ramwrt = true;
-			auxbank_update();
-			break;
 
 		case 0x10:  // read any key down, reset keyboard strobe
 			keyglu_816_write(GLU_C010, 0);

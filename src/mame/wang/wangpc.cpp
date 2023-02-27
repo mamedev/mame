@@ -192,9 +192,9 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
 
-	image_init_result on_disk0_load(floppy_image_device *image);
+	void on_disk0_load(floppy_image_device *image);
 	void on_disk0_unload(floppy_image_device *image);
-	image_init_result on_disk1_load(floppy_image_device *image);
+	void on_disk1_load(floppy_image_device *image);
 	void on_disk1_unload(floppy_image_device *image);
 
 	void wangpc_io(address_map &map);
@@ -1227,11 +1227,9 @@ void wangpc_state::machine_reset()
 //  on_disk0_change -
 //-------------------------------------------------
 
-image_init_result wangpc_state::on_disk0_load(floppy_image_device *image)
+void wangpc_state::on_disk0_load(floppy_image_device *image)
 {
 	on_disk0_unload(image);
-
-	return image_init_result::PASS;
 }
 
 void wangpc_state::on_disk0_unload(floppy_image_device *image)
@@ -1247,11 +1245,9 @@ void wangpc_state::on_disk0_unload(floppy_image_device *image)
 //  on_disk1_change -
 //-------------------------------------------------
 
-image_init_result wangpc_state::on_disk1_load(floppy_image_device *image)
+void wangpc_state::on_disk1_load(floppy_image_device *image)
 {
 	on_disk1_unload(image);
-
-	return image_init_result::PASS;
 }
 
 void wangpc_state::on_disk1_unload(floppy_image_device *image)
