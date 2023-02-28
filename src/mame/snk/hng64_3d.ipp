@@ -325,6 +325,23 @@ void hng64_state::setCameraProjectionMatrix(const uint16_t* packet)
 	m_projectionMatrix[15] = 0.0f;
 }
 
+void hng64_state::recoverStandardVerts(polygon& currentPoly, int m, uint16_t* chunkOffset_verts, int& counter)
+{
+	currentPoly.vert[m].worldCoords[0] = uToF(chunkOffset_verts[counter++]);
+	currentPoly.vert[m].worldCoords[1] = uToF(chunkOffset_verts[counter++]);
+	currentPoly.vert[m].worldCoords[2] = uToF(chunkOffset_verts[counter++]);
+	currentPoly.vert[m].worldCoords[3] = 1.0f;
+	currentPoly.n = 3;
+
+	[[maybe_unused]] uint16_t unused = chunkOffset_verts[counter++]; // chunkOffset_verts[ xxxx+3 ] is set to 0x70 on some 'blended' objects (fatfurwa translucent globe, buriki shadows, but not on fatfurwa shadows)
+
+	currentPoly.vert[m].texCoords[0] = uToF(chunkOffset_verts[counter]);
+	if (currentPoly.flatShade)
+		currentPoly.colorIndex = chunkOffset_verts[counter] >> 5;
+	counter++;
+	currentPoly.vert[m].texCoords[1] = uToF(chunkOffset_verts[counter++]);
+}
+
 // Operation 0100
 // Polygon rasterization.
 void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
@@ -479,12 +496,6 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 	address[2] |= (megaOffset << 16);
 	address[3] |= (megaOffset << 16);
 
-	// Debug - ajg
-	//uint32_t tdColor = 0xff000000;
-	//if (threeDPointer[14] & 0x0002) tdColor |= 0x00ff0000;
-	//if (threeDPointer[14] & 0x0001) tdColor |= 0x0000ff00;
-	//if (threeDPointer[14] & 0x0000) tdColor |= 0x000000ff;
-
 	// For all 4 polygon chunks
 	for (int k = 0; k < 4; k++)
 	{
@@ -525,10 +536,6 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 
 			// Syntactical simplification
 			polygon& currentPoly = m_polys[numPolys];
-
-			// Debug - Colors polygons with certain flags bright blue! ajg
-			currentPoly.debugColor = 0;
-			//currentPoly.debugColor = tdColor;
 
 			// Debug - ajg
 			//logerror("%d (%08x) : %04x %04x %04x\n", k, address[k]*3*2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
@@ -584,18 +591,8 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 
 			currentPoly.palOffset += explicitPaletteValue;
 
-#if 0
-			if (((chunkOffset[2] & 0xc000) == 0x4000) && (m_screen->frame_number() & 1))
-			{
-			//  if (chunkOffset[2] == 0xd870)
-				{
-					currentPoly.debugColor = 0xffff0000;
-					logerror("%d (%08x) : %04x %04x %04x\n", k, address[k] * 3 * 2, chunkOffset[0], chunkOffset[1], chunkOffset[2]);
-				}
-			}
-#endif
-
 			uint8_t chunkLength = 0;
+			int counter = 3;
 			switch(chunkType)
 			{
 			/*/////////////////////////
@@ -616,35 +613,26 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			// 33 word chunk, 3 vertices, per-vertex UVs & normals, per-face normal
 			case 0x05:  // 0000 0101
 			case 0x0f:  // 0000 1111
+			{
 				for (int m = 0; m < 3; m++)
 				{
-					currentPoly.vert[m].worldCoords[0] = uToF(chunkOffset[3 + (9*m)]);
-					currentPoly.vert[m].worldCoords[1] = uToF(chunkOffset[4 + (9*m)]);
-					currentPoly.vert[m].worldCoords[2] = uToF(chunkOffset[5 + (9*m)]);
-					currentPoly.vert[m].worldCoords[3] = 1.0f;
-					currentPoly.n = 3;
+					recoverStandardVerts(currentPoly, m, chunkOffset, counter);
 
-					// chunkOffset[6 + (9*m)] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-					currentPoly.vert[m].texCoords[0] = uToF(chunkOffset[7 + (9*m)]);
-					currentPoly.vert[m].texCoords[1] = uToF(chunkOffset[8 + (9*m)]);
-
-					currentPoly.vert[m].normal[0] = uToF(chunkOffset[9  + (9*m)]);
-					currentPoly.vert[m].normal[1] = uToF(chunkOffset[10 + (9*m)]);
-					currentPoly.vert[m].normal[2] = uToF(chunkOffset[11 + (9*m)]);
+					currentPoly.vert[m].normal[0] = uToF(chunkOffset[counter++]);
+					currentPoly.vert[m].normal[1] = uToF(chunkOffset[counter++]);
+					currentPoly.vert[m].normal[2] = uToF(chunkOffset[counter++]);
 					currentPoly.vert[m].normal[3] = 0.0f;
-
-					if (currentPoly.flatShade)
-						currentPoly.vert[m].colorIndex = chunkOffset[7 + (9*m)] >> 5;
 				}
 
 				// Redundantly called, but it works...
-				currentPoly.faceNormal[0] = uToF(chunkOffset[30]);
-				currentPoly.faceNormal[1] = uToF(chunkOffset[31]);
-				currentPoly.faceNormal[2] = uToF(chunkOffset[32]);
+				currentPoly.faceNormal[0] = uToF(chunkOffset[counter++]);
+				currentPoly.faceNormal[1] = uToF(chunkOffset[counter++]);
+				currentPoly.faceNormal[2] = uToF(chunkOffset[counter++]);
 				currentPoly.faceNormal[3] = 0.0f;
 
-				chunkLength = 33;
+				chunkLength = counter;
 				break;
+			}
 
 
 			// 24 word chunk, 3 vertices, per-vertex UVs
@@ -652,26 +640,16 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			case 0x0e:  // 0000 1110
 			case 0x24:  // 0010 0100
 			case 0x2e:  // 0010 1110
+			{
 				for (int m = 0; m < 3; m++)
 				{
-					currentPoly.vert[m].worldCoords[0] = uToF(chunkOffset[3 + (6*m)]);
-					currentPoly.vert[m].worldCoords[1] = uToF(chunkOffset[4 + (6*m)]);
-					currentPoly.vert[m].worldCoords[2] = uToF(chunkOffset[5 + (6*m)]);
-					currentPoly.vert[m].worldCoords[3] = 1.0f;
-					currentPoly.n = 3;
-
-					// chunkOffset[6 + (6*m)] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-					currentPoly.vert[m].texCoords[0] = uToF(chunkOffset[7 + (6*m)]);
-					currentPoly.vert[m].texCoords[1] = uToF(chunkOffset[8 + (6*m)]);
-
-					if (currentPoly.flatShade)
-						currentPoly.vert[m].colorIndex = chunkOffset[7 + (6*m)] >> 5;
-
-					currentPoly.vert[m].normal[0] = uToF(chunkOffset[21]);
-					currentPoly.vert[m].normal[1] = uToF(chunkOffset[22]);
-					currentPoly.vert[m].normal[2] = uToF(chunkOffset[23]);
-					currentPoly.vert[m].normal[3] = 0.0f;
+					recoverStandardVerts(currentPoly, m, chunkOffset, counter);
 				}
+
+				currentPoly.vert[0].normal[0] = currentPoly.vert[1].normal[0] = currentPoly.vert[2].normal[0] = uToF(chunkOffset[counter++]);
+				currentPoly.vert[0].normal[1] = currentPoly.vert[1].normal[1] = currentPoly.vert[2].normal[1] = uToF(chunkOffset[counter++]);
+				currentPoly.vert[0].normal[2] = currentPoly.vert[1].normal[2] = currentPoly.vert[2].normal[2] = uToF(chunkOffset[counter++]);
+				currentPoly.vert[0].normal[3] = currentPoly.vert[1].normal[3] = currentPoly.vert[2].normal[3] = 0.0f;
 
 				// Redundantly called, but it works...
 				currentPoly.faceNormal[0] = currentPoly.vert[2].normal[0];
@@ -679,46 +657,35 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				currentPoly.faceNormal[2] = currentPoly.vert[2].normal[2];
 				currentPoly.faceNormal[3] = 0.0f;
 
-				chunkLength = 24;
+				chunkLength = counter;
 				break;
-
+			}
 
 			// 15 word chunk, 1 vertex, per-vertex UVs & normals, face normal
 			case 0x87:  // 1000 0111
 			case 0x97:  // 1001 0111
 			case 0xd7:  // 1101 0111
 			case 0xc7:  // 1100 0111
+			{
 				// Copy over the proper vertices from the previous triangle...
 				memcpy(&currentPoly.vert[1], &lastPoly.vert[0], sizeof(polyVert));
 				memcpy(&currentPoly.vert[2], &lastPoly.vert[2], sizeof(polyVert));
 
-				// Fill in the appropriate data...
-				currentPoly.vert[0].worldCoords[0] = uToF(chunkOffset[3]);
-				currentPoly.vert[0].worldCoords[1] = uToF(chunkOffset[4]);
-				currentPoly.vert[0].worldCoords[2] = uToF(chunkOffset[5]);
-				currentPoly.vert[0].worldCoords[3] = 1.0f;
-				currentPoly.n = 3;
+				recoverStandardVerts(currentPoly, 0, chunkOffset, counter);
 
-				// chunkOffset[6] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-				currentPoly.vert[0].texCoords[0] = uToF(chunkOffset[7]);
-				currentPoly.vert[0].texCoords[1] = uToF(chunkOffset[8]);
-
-				if (currentPoly.flatShade)
-					currentPoly.vert[0].colorIndex = chunkOffset[7] >> 5;
-
-				currentPoly.vert[0].normal[0] = uToF(chunkOffset[9]);
-				currentPoly.vert[0].normal[1] = uToF(chunkOffset[10]);
-				currentPoly.vert[0].normal[2] = uToF(chunkOffset[11]);
+				currentPoly.vert[0].normal[0] = uToF(chunkOffset[counter++]);
+				currentPoly.vert[0].normal[1] = uToF(chunkOffset[counter++]);
+				currentPoly.vert[0].normal[2] = uToF(chunkOffset[counter++]);
 				currentPoly.vert[0].normal[3] = 0.0f;
 
-				currentPoly.faceNormal[0] = uToF(chunkOffset[12]);
-				currentPoly.faceNormal[1] = uToF(chunkOffset[13]);
-				currentPoly.faceNormal[2] = uToF(chunkOffset[14]);
+				currentPoly.faceNormal[0] = uToF(chunkOffset[counter++]);
+				currentPoly.faceNormal[1] = uToF(chunkOffset[counter++]);
+				currentPoly.faceNormal[2] = uToF(chunkOffset[counter++]);
 				currentPoly.faceNormal[3] = 0.0f;
 
-				chunkLength = 15;
+				chunkLength = counter;
 				break;
-
+			}
 
 			// 12 word chunk, 1 vertex, per-vertex UVs
 			case 0x86:  // 1000 0110
@@ -726,22 +693,12 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			case 0xb6:  // 1011 0110
 			case 0xc6:  // 1100 0110
 			case 0xd6:  // 1101 0110
+			{
 				// Copy over the proper vertices from the previous triangle...
 				memcpy(&currentPoly.vert[1], &lastPoly.vert[0], sizeof(polyVert));
 				memcpy(&currentPoly.vert[2], &lastPoly.vert[2], sizeof(polyVert));
 
-				currentPoly.vert[0].worldCoords[0] = uToF(chunkOffset[3]);
-				currentPoly.vert[0].worldCoords[1] = uToF(chunkOffset[4]);
-				currentPoly.vert[0].worldCoords[2] = uToF(chunkOffset[5]);
-				currentPoly.vert[0].worldCoords[3] = 1.0f;
-				currentPoly.n = 3;
-
-				// chunkOffset[6] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-				currentPoly.vert[0].texCoords[0] = uToF(chunkOffset[7]);
-				currentPoly.vert[0].texCoords[1] = uToF(chunkOffset[8]);
-
-				if (currentPoly.flatShade)
-					currentPoly.vert[0].colorIndex = chunkOffset[7] >> 5;
+				recoverStandardVerts(currentPoly, 0, chunkOffset, counter);
 
 				// This normal could be right, but I'm not entirely sure - there is no normal in the 18 bytes!
 				currentPoly.vert[0].normal[0] = lastPoly.faceNormal[0];
@@ -755,25 +712,17 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				currentPoly.faceNormal[3] = lastPoly.faceNormal[3];
 
 				// TODO: I'm not reading 3 necessary words here (maybe face normal)
+				[[maybe_unused]] uint16_t unused;
+				unused = chunkOffset[counter++];
+				unused = chunkOffset[counter++];
+				unused = chunkOffset[counter++];
 
-#if 0
-				// DEBUG
-				logerror("0x?6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
-				for (int m = 0; m < 13; m++)
-					logerror("%04x ", chunkOffset[m]);
-				logerror("\n");
-
-				for (int m = 0; m < 13; m++)
-					logerror("%3.4f ", uToF(chunkOffset[m]));
-				logerror("\n\n");
-#endif
-
-				chunkLength = 12;
+				chunkLength = counter;
 				break;
-
+			}
 			default:
 				logerror("UNKNOWN geometry CHUNK TYPE : %02x\n", chunkType);
-				chunkLength = 0;
+				chunkLength = counter;
 				break;
 			}
 
@@ -817,9 +766,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 					intensity *= 128.0;                     // Maps intensity to the range [0.0, 2.0]
 					if (intensity >= 255.0f) intensity = 255.0f;
 
-					currentPoly.vert[v].light[0] = intensity;
-					currentPoly.vert[v].light[1] = intensity;
-					currentPoly.vert[v].light[2] = intensity;
+					currentPoly.vert[v].light = intensity;
 				}
 			}
 			else
@@ -827,12 +774,9 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				// Just clear out the light values
 				for (int v = 0; v < 3; v++)
 				{
-					currentPoly.vert[v].light[0] = 0;
-					currentPoly.vert[v].light[1] = 0;
-					currentPoly.vert[v].light[2] = 0;
+					currentPoly.vert[v].light = 0;
 				}
 			}
-
 
 			float cullRay[4];
 			float cullNorm[4];
@@ -883,9 +827,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 					clipVerts[m].w = currentPoly.vert[m].clipCoords[3];
 					clipVerts[m].p[0] = currentPoly.vert[m].texCoords[0];
 					clipVerts[m].p[1] = currentPoly.vert[m].texCoords[1];
-					clipVerts[m].p[2] = currentPoly.vert[m].light[0];
-					clipVerts[m].p[3] = currentPoly.vert[m].light[1];
-					clipVerts[m].p[4] = currentPoly.vert[m].light[2];
+					clipVerts[m].p[2] = currentPoly.vert[m].light;
 				}
 
 				if (currentPoly.visible)
@@ -903,9 +845,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 						currentPoly.vert[m].clipCoords[3] = clipVerts[m].w;
 						currentPoly.vert[m].texCoords[0] = clipVerts[m].p[0];
 						currentPoly.vert[m].texCoords[1] = clipVerts[m].p[1];
-						currentPoly.vert[m].light[0] = clipVerts[m].p[2];
-						currentPoly.vert[m].light[1] = clipVerts[m].p[3];
-						currentPoly.vert[m].light[2] = clipVerts[m].p[4];
+						currentPoly.vert[m].light = clipVerts[m].p[2];
 					}
 
 					const rectangle& visarea = m_screen->visible_area();
@@ -1228,22 +1168,18 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 	// Pull the parameters out of the extent structure
 	float z = extent.param[0].start;
 	float w = extent.param[1].start;
-	float lightR = extent.param[2].start;
-	float lightG = extent.param[3].start;
-	float lightB = extent.param[4].start;
+	float light = extent.param[2].start;
 	float s = extent.param[5].start;
 	float t = extent.param[6].start;
 
 	const float dz = extent.param[0].dpdx;
 	const float dw = extent.param[1].dpdx;
-	const float dlightR = extent.param[2].dpdx;
-	const float dlightG = extent.param[3].dpdx;
-	const float dlightB = extent.param[4].dpdx;
+	const float dlight = extent.param[2].dpdx;
 	const float ds = extent.param[5].dpdx;
 	const float dt = extent.param[6].dpdx;
 
 	// Pointers to the pixel buffers
-	uint32_t* colorBuffer = &m_colorBuffer3d.pix(scanline, extent.startx);
+	uint16_t* colorBuffer = &m_colorBuffer3d.pix(scanline, extent.startx);
 	float*  depthBuffer = &m_depthBuffer3d[(scanline * m_state.m_screen->visible_area().width()) + extent.startx];
 
 	const uint8_t *textureOffset = &m_state.m_texturerom[renderData.texIndex * 1024 * 1024];
@@ -1256,26 +1192,9 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 			// Multiply back through by w for everything that was interpolated perspective-correctly
 			const float sCorrect = s / w;
 			const float tCorrect = t / w;
-			const float rCorrect = lightR / w;
-			const float gCorrect = lightG / w;
-			const float bCorrect = lightB / w;
 
-			if ((renderData.debugColor & 0xff000000) == 0x01000000)
-			{
-				// ST color mode
-				*colorBuffer = rgb_t(255, uint8_t(sCorrect*255.0f), uint8_t(tCorrect*255.0f), uint8_t(0));
-			}
-			else if ((renderData.debugColor & 0xff000000) == 0x02000000)
-			{
-				// Lighting only
-				*colorBuffer = rgb_t(255, (uint8_t)rCorrect, (uint8_t)gCorrect, (uint8_t)bCorrect);
-			}
-			else if ((renderData.debugColor & 0xff000000) == 0xff000000)
-			{
-				// Debug color mode
-				*colorBuffer = renderData.debugColor;
-			}
-			else
+			const float rCorrect = light / w;
+
 			{
 				float textureS = 0.0f;
 				float textureT = 0.0f;
@@ -1325,28 +1244,9 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 				// Naive Alpha Implementation (?) - don't draw if you're at texture index 0...
 				if (paletteEntry != 0)
 				{
-					// The color out of the texture
-					rgb_t color = m_state.m_palette->pen((renderData.palOffset + paletteEntry) & 0xfff);
-
-					// Apply the lighting
-					float rIntensity = rCorrect / 255.0f;
-					float gIntensity = gCorrect / 255.0f;
-					float bIntensity = bCorrect / 255.0f;
-					float red   = color.r() * rIntensity;
-					float green = color.g() * gIntensity;
-					float blue  = color.b() * bIntensity;
-
-					// Clamp and finalize
-					red = color.r() + red;
-					green = color.g() + green;
-					blue = color.b() + blue;
-
-					if (red >= 255) red = 255;
-					if (green >= 255) green = 255;
-					if (blue >= 255) blue = 255;
-
-					color = rgb_t(255, (uint8_t)red, (uint8_t)green, (uint8_t)blue);
-
+					float rIntensity = rCorrect / 16.0f;
+					uint8_t lightval = (uint8_t)rIntensity;
+					uint16_t color = ((renderData.palOffset + paletteEntry) & 0xfff) | (lightval << 12);
 					*colorBuffer = color;
 					*depthBuffer = z;
 				}
@@ -1355,9 +1255,7 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 
 		z += dz;
 		w += dw;
-		lightR += dlightR;
-		lightG += dlightG;
-		lightB += dlightB;
+		light += dlight;
 		s += ds;
 		t += dt;
 
@@ -1370,17 +1268,10 @@ void hng64_poly_renderer::render_flat_scanline(int32_t scanline, const extent_t&
 {
 	// Pull the parameters out of the extent structure
 	float z = extent.param[0].start;
-	float r = extent.param[1].start;
-	float g = extent.param[2].start;
-	float b = extent.param[3].start;
-
 	const float dz = extent.param[0].dpdx;
-	const float dr = extent.param[1].dpdx;
-	const float dg = extent.param[2].dpdx;
-	const float db = extent.param[3].dpdx;
 
 	// Pointers to the pixel buffers
-	uint32_t* colorBuffer = &m_colorBuffer3d.pix(scanline, extent.startx);
+	uint16_t* colorBuffer = &m_colorBuffer3d.pix(scanline, extent.startx);
 	float*  depthBuffer = &m_depthBuffer3d[(scanline * m_state.m_screen->visible_area().width()) + extent.startx];
 
 	// Step over each pixel in the horizontal span
@@ -1388,22 +1279,11 @@ void hng64_poly_renderer::render_flat_scanline(int32_t scanline, const extent_t&
 	{
 		if (z < *depthBuffer)
 		{
-
-			// Clamp and finalize
-			if (r >= 255) r = 255;
-			if (g >= 255) g = 255;
-			if (b >= 255) b = 255;
-
-			rgb_t color = rgb_t(255, (uint8_t)r, (uint8_t)g, (uint8_t)b);
-
-			*colorBuffer = color;
+			*colorBuffer = renderData.palOffset + renderData.colorIndex;
 			*depthBuffer = z;
 		}
 
 		z += dz;
-		r += dr;
-		g += dg;
-		b += db;
 
 		colorBuffer++;
 		depthBuffer++;
@@ -1417,10 +1297,10 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 	rOptions.tex4bpp = p->tex4bpp;
 	rOptions.texIndex = p->texIndex;
 	rOptions.palOffset = p->palOffset;
-	rOptions.debugColor = p->debugColor;
 	rOptions.texPageSmall = p->texPageSmall;
 	rOptions.texPageHorizOffset = p->texPageHorizOffset;
 	rOptions.texPageVertOffset = p->texPageVertOffset;
+	rOptions.colorIndex = p->colorIndex;
 
 	// Pass the render data into the rasterizer
 	hng64_poly_data& renderData = object_data().next();
@@ -1435,34 +1315,21 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 		{
 			// Build some MAME rasterizer vertices from the hng64 vertices
 			vertex_t pVert[3];
-			rgb_t color;
 
 			const polyVert& pv0 = p->vert[0];
-			color = m_state.m_palette->pen(renderData.palOffset + pv0.colorIndex);
 			pVert[0].x = pv0.clipCoords[0];
 			pVert[0].y = pv0.clipCoords[1];
 			pVert[0].p[0] = pv0.clipCoords[2];
-			pVert[0].p[1] = color.r();
-			pVert[0].p[2] = color.g();
-			pVert[0].p[3] = color.b();
 
 			const polyVert& pvj = p->vert[j];
-			color = m_state.m_palette->pen(renderData.palOffset + pvj.colorIndex);
 			pVert[1].x = pvj.clipCoords[0];
 			pVert[1].y = pvj.clipCoords[1];
 			pVert[1].p[0] = pvj.clipCoords[2];
-			pVert[1].p[1] = color.r();
-			pVert[1].p[2] = color.g();
-			pVert[1].p[3] = color.b();
 
 			const polyVert& pvjp1 = p->vert[j+1];
-			color = m_state.m_palette->pen(renderData.palOffset + pvjp1.colorIndex);
 			pVert[2].x = pvjp1.clipCoords[0];
 			pVert[2].y = pvjp1.clipCoords[1];
 			pVert[2].p[0] = pvjp1.clipCoords[2];
-			pVert[2].p[1] = color.r();
-			pVert[2].p[2] = color.g();
-			pVert[2].p[3] = color.b();
 
 			render_triangle<4>(visibleArea, render_delegate(&hng64_poly_renderer::render_flat_scanline, this), pVert[0], pVert[1], pVert[2]);
 		}
@@ -1474,9 +1341,7 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 		for (int j = 0; j < p->n; j++)
 		{
 			p->vert[j].clipCoords[3] = 1.0f / p->vert[j].clipCoords[3];
-			p->vert[j].light[0]      = p->vert[j].light[0]     * p->vert[j].clipCoords[3];
-			p->vert[j].light[1]      = p->vert[j].light[1]     * p->vert[j].clipCoords[3];
-			p->vert[j].light[2]      = p->vert[j].light[2]     * p->vert[j].clipCoords[3];
+			p->vert[j].light      = p->vert[j].light     * p->vert[j].clipCoords[3];
 			p->vert[j].texCoords[0]  = p->vert[j].texCoords[0] * p->vert[j].clipCoords[3];
 			p->vert[j].texCoords[1]  = p->vert[j].texCoords[1] * p->vert[j].clipCoords[3];
 		}
@@ -1492,9 +1357,7 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 			pVert[0].y = pv0.clipCoords[1];
 			pVert[0].p[0] = pv0.clipCoords[2];
 			pVert[0].p[1] = pv0.clipCoords[3];
-			pVert[0].p[2] = pv0.light[0];
-			pVert[0].p[3] = pv0.light[1];
-			pVert[0].p[4] = pv0.light[2];
+			pVert[0].p[2] = pv0.light;
 			pVert[0].p[5] = pv0.texCoords[0];
 			pVert[0].p[6] = pv0.texCoords[1];
 
@@ -1503,9 +1366,7 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 			pVert[1].y = pvj.clipCoords[1];
 			pVert[1].p[0] = pvj.clipCoords[2];
 			pVert[1].p[1] = pvj.clipCoords[3];
-			pVert[1].p[2] = pvj.light[0];
-			pVert[1].p[3] = pvj.light[1];
-			pVert[1].p[4] = pvj.light[2];
+			pVert[1].p[2] = pvj.light;
 			pVert[1].p[5] = pvj.texCoords[0];
 			pVert[1].p[6] = pvj.texCoords[1];
 
@@ -1514,9 +1375,7 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 			pVert[2].y = pvjp1.clipCoords[1];
 			pVert[2].p[0] = pvjp1.clipCoords[2];
 			pVert[2].p[1] = pvjp1.clipCoords[3];
-			pVert[2].p[2] = pvjp1.light[0];
-			pVert[2].p[3] = pvjp1.light[1];
-			pVert[2].p[4] = pvjp1.light[2];
+			pVert[2].p[2] = pvjp1.light;
 			pVert[2].p[5] = pvjp1.texCoords[0];
 			pVert[2].p[6] = pvjp1.texCoords[1];
 

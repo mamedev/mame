@@ -1800,13 +1800,6 @@ void hng64_state::init_hng64_reorder_gfx()
 
 void hng64_state::init_hng64()
 {
-	/* 1 meg of virtual address space for the com cpu */
-	m_com_virtual_mem = std::make_unique<uint8_t[]>(0x100000);
-	m_com_op_base     = std::make_unique<uint8_t[]>(0x10000);
-
-	m_soundram = std::make_unique<uint16_t[]>(0x200000/2);
-	m_soundram2 = std::make_unique<uint16_t[]>(0x200000/2);
-
 	init_hng64_reorder_gfx();
 }
 
@@ -2113,13 +2106,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(hng64_state::hng64_irq)
 
 void hng64_state::machine_start()
 {
+	/* 1 meg of virtual address space for the com cpu */
+	m_com_virtual_mem = std::make_unique<uint8_t[]>(0x100000);
+	m_com_op_base = std::make_unique<uint8_t[]>(0x10000);
+
+	m_soundram = std::make_unique<uint16_t[]>(0x200000 / 2);
+	m_soundram2 = std::make_unique<uint16_t[]>(0x200000 / 2);
+
 	/* set the fastest DRC options */
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions */
 	m_maincpu->add_fastram(0x00000000, 0x00ffffff, false, m_mainram);
-	m_maincpu->add_fastram(0x04000000, 0x05ffffff, true,  m_cart);
-	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, true,  m_rombase);
+	m_maincpu->add_fastram(0x04000000, 0x05ffffff, true, m_cart);
+	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, true, m_rombase);
 
 	for (int i = 0; i < 0x38 / 4; i++)
 	{
@@ -2132,6 +2132,43 @@ void hng64_state::machine_start()
 	m_comhack_timer = timer_alloc(FUNC(hng64_state::comhack_callback), this);
 
 	init_io();
+
+	save_pointer(NAME(m_com_virtual_mem), 0x100000);
+	save_pointer(NAME(m_com_op_base), 0x10000);
+	save_pointer(NAME(m_soundram), 0x200000 / 2);
+	save_pointer(NAME(m_soundram2), 0x200000 / 2);
+
+	save_item(NAME(m_fbcontrol));
+
+	save_item(NAME(m_dma_start));
+	save_item(NAME(m_dma_dst));
+	save_item(NAME(m_dma_len));
+
+	save_item(NAME(m_mcu_en));
+
+	save_item(NAME(m_activeDisplayList));
+	save_item(NAME(m_no_machine_error_code));
+
+	save_item(NAME(m_unk_vreg_toggle));
+	save_item(NAME(m_p1_trig));
+
+	save_item(NAME(m_screen_dis));
+
+	save_item(NAME(m_old_animmask));
+	save_item(NAME(m_old_animbits));
+	save_item(NAME(m_old_tileflags));
+
+	save_item(NAME(m_port7));
+	save_item(NAME(m_port1));
+	save_item(NAME(m_ex_ramaddr));
+	save_item(NAME(m_ex_ramaddr_upper));
+
+	save_item(NAME(m_irq_pending));
+
+	save_item(NAME(m_irq_level));
+
+	save_item(NAME(main_latch));
+	save_item(NAME(sound_latch));
 }
 
 TIMER_CALLBACK_MEMBER(hng64_state::comhack_callback)
@@ -2472,6 +2509,7 @@ void hng64_state::hng64(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(hng64_state::screen_vblank_hng64));
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x1000);
+	PALETTE(config, m_palette_3d).set_format(palette_device::xRGB_888, 0x1000 * 0x10);
 
 	hng64_audio(config);
 	hng64_network(config);
