@@ -801,19 +801,34 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 		}
 	}
 
+	/*
+	   Each framebuffer has enough RAM for 24 bits of data for a 512x256
+	   layer (screen is interlaced, so it doesn't really have 448 pixels
+	   in height)
+   
+	   theory: 11 bit palette index (can use either half of palette)
+				1 bit 'blend'
+				4 bit 'light'
+				8 bit depth?
+	*/
+
 	// 3d gets drawn next
+	pen_t const *const clut_3d = &m_palette_3d->pen(0);
 	if (!(m_fbcontrol[0] & 0x01))
 	{
 		// Blit the color buffer into the primary bitmap
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			const uint32_t *src = &m_poly_renderer->colorBuffer3d().pix(y, cliprect.min_x);
+			const uint16_t *src = &m_poly_renderer->colorBuffer3d().pix(y, cliprect.min_x);
 			uint32_t *dst = &bitmap.pix(y, cliprect.min_x);
 
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
-				if (*src & 0xff000000)
-					*dst = *src;
+				uint16_t srcpix = *src;
+				if (srcpix & 0x0fff)
+				{
+					*dst = clut_3d[srcpix];
+				}
 
 				dst++;
 				src++;
@@ -825,6 +840,18 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	draw_sprites_buffer(screen, cliprect);
 
 	// copy sprites into display
+
+	// this correctly allows buriki intro sprites to use regular alpha, not additive
+	// while also being correct for sams64, which wants additive, but appears to be
+	// incorrect for Fatal Fury's hit effects which want additive
+	// 
+	// the 6 regs around here have the same values in fatfur and buriki, so are unlikely
+	// to control the blend type.
+	//uint8_t spriteblendtype = (m_tcram[0x10 / 4] >> 16) & 0x10;
+
+	// would be an odd place for it, after the 'vblank' flag but...
+	uint8_t spriteblendtype = (m_tcram[0x4c / 4] >> 16) & 0x01;
+
 	pen_t const *const clut = &m_palette->pen(0);
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -838,7 +865,10 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			{
 				if (srcpix & 0x8000)
 				{
-					*dst = add_blend_r32(*dst, clut[srcpix & 0x7fff]);
+					if (spriteblendtype)
+						*dst = alpha_blend_r32(*(uint32_t *)dst, clut[srcpix & 0x7fff], 0x80);
+					else
+						*dst = add_blend_r32(*dst, clut[srcpix & 0x7fff]);
 				}
 				else
 				{
@@ -876,17 +906,19 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			m_videoregs[0x0d]);
 
 	if (1)
-		popmessage("TC: %08x MINX(%d) MINY(%d) MAXX(%d) MAXY(%d)\nBLEND ENABLES? %02x %02x %02x | %02x %02x %02x\nUNUSED?(%04x)\n%04x\n%04x\nMASTER FADES?(%08x %08x)\nUNUSED?(%08x)\nBITFIELD REGS(%04x)\nPALEFFECT_ENABLES(%d %d %d %d %d %d %d %d)\n PALFADES?(%08x %08x : %08x %08x : %08x %08x : %08x %08x)\n % 08x % 08x : % 08x % 08x % 08x % 08x",
+		popmessage("TC: %08x MINX(%d) MINY(%d) MAXX(%d) MAXY(%d)\nBLEND ENABLES? %02x %02x %02x | %02x %02x %02x\nUNUSED?(%04x)\n%04x\n%04x\nMASTER FADES - ADD?(%08x) - SUBTRACT?(%08x)\nUNUSED?(%08x)\nBITFIELD REGS(%04x)\nPALEFFECT_ENABLES(%d %d %d %d %d %d %d %d)\n PALFADES?(%08x %08x : %08x %08x : %08x %08x : %08x %08x)\n % 08x % 08x : % 08x % 08x % 08x % 08x",
 			m_tcram[0x00 / 4], // 0007 00e4 (fatfurwa, bbust2)
 			(m_tcram[0x04 / 4] >> 16) & 0xffff, (m_tcram[0x04 / 4] >> 0) & 0xffff, // 0000 0010 (fatfurwa) 0000 0000 (bbust2, xrally)
 			(m_tcram[0x08 / 4] >> 16) & 0xffff, (m_tcram[0x08 / 4] >> 0) & 0xffff, // 0200 01b0 (fatfurwa) 0200 01c0 (bbust2, xrally)
 
+			// is this 2 groups of 3 regS?
 			(m_tcram[0x0c / 4] >> 24) & 0xff, // 04 = 'blend' on tm1  
-			(m_tcram[0x0c / 4] >> 16) & 0xff, // 04 = blend all sprites? (buriki intro, text fades?)
-			(m_tcram[0x0c / 4] >> 8) & 0xff,
+			(m_tcram[0x0c / 4] >> 16) & 0xff, // 04 = set when fades are going on with blended sprites in buriki intro? otherwise usually 00
+			(m_tcram[0x0c / 4] >> 8) & 0xff,  // upper bit not used? value usually 2x, 4x, 5x or 6x
+			// 2nd group?
 			(m_tcram[0x0c / 4] >> 0) & 0xff, //  04 = 'blend' on tm3  (used in transitions?)
-			(m_tcram[0x10 / 4] >> 24) & 0xff,
-			(m_tcram[0x10 / 4] >> 16) & 0xff,
+			(m_tcram[0x10 / 4] >> 24) & 0xff, // usually (always?) 00
+			(m_tcram[0x10 / 4] >> 16) & 0xff, // upper bit not used? value usually 2x, 4x, 5x or 6x
 
 			m_tcram[0x10 / 4] & 0xffff, // unused?
 
@@ -928,7 +960,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 
 
 			m_tcram[0x48 / 4], // this is where the 'vblank' thing lives
-			m_tcram[0x4c / 4],
+			m_tcram[0x4c / 4], // 0001 0000 or 0000 0000 - works(?) as blend type selection for sprite mixing?
 			m_tcram[0x50 / 4],
 			m_tcram[0x54 / 4],
 			m_tcram[0x58 / 4],
@@ -1010,6 +1042,33 @@ WRITE_LINE_MEMBER(hng64_state::screen_vblank_hng64)
  *  Or maybe they set transition type (there seems to be a cute scaling-squares transition in there somewhere)...
  */
 
+inline void hng64_state::set_single_palette_entry(int entry, uint8_t r, uint8_t g, uint8_t b)
+{
+	m_palette->set_pen_color(entry, r, g, b);
+
+	// our code assumes the 'lighting' values from the 3D framebuffer can be 4-bit precision
+	// based on 'banding' seen in buriki reference videos.  precalculate those here to avoid
+	// having to do it in the video update function
+	//
+	// note, it is unlikely intensity is meant to be added, probably instead it should
+	// be multipled, reducing overall brightness, not increasing beyond max?
+	for (int intensity = 0; intensity < 0x10; intensity++)
+	{
+		uint16_t newr = r + (intensity << 2);
+		uint16_t newg = g + (intensity << 2);
+		uint16_t newb = b + (intensity << 2);
+
+		if (newr > 255)
+			newr = 255;
+		if (newg > 255)
+			newg = 255;
+		if (newb > 255)
+			newb = 255;
+
+		m_palette_3d->set_pen_color((intensity * 0x1000) + entry, newr, newg, newb);
+	}
+}
+
 void hng64_state::update_palette_entry(int entry)
 {
 	uint32_t data = m_paletteram[entry];
@@ -1021,6 +1080,12 @@ void hng64_state::update_palette_entry(int entry)
 	for (int i = 0; i < 8; i++)
 	{
 		uint32_t tcdata = m_tcram[(0x28 / 4) + i];
+
+		// correct for buriki (jumbotron fading images) and xrally / roadedge (palette effect on front of car in first person view)
+		//
+		// however this logic fails on fatal fury fades, as the msb is 00, indicating apply to palette entries 000-0ff but the actual
+		// palette needing the changes is 0x900 - 0x9ff (hng64 logo white flash) so there must be further ways in which this is
+		// configured
 		uint8_t tcregion = (tcdata & 0x0f000000) >> 24;
 
 		if (tcregion == (entry >> 8))
@@ -1062,7 +1127,7 @@ void hng64_state::update_palette_entry(int entry)
 		}
 	}
 
-	m_palette->set_pen_color(entry, r,g,b);
+	set_single_palette_entry(entry, r, g, b);
 }
 
 void hng64_state::pal_w(offs_t offset, uint32_t data, uint32_t mem_mask)
