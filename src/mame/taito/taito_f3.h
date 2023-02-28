@@ -184,8 +184,8 @@ protected:
 		u8 *tsrc[256]{}, *tsrc_s[256]{};
 		int x_count[256]{};
 		u32 x_zoom[256]{};
-		u32 clip0[256]{};
-		u32 clip1[256]{};
+		u32 clip_in[256]{};
+		u32 clip_ex[256]{};
 		u16 pal_add[256]{};
 	};
 
@@ -194,16 +194,10 @@ protected:
 		u16 alpha_level[256]{};
 		u16 spri[256]{};
 		u16 sprite_alpha[256]{};
-		u32 sprite_clip0[256]{};
-		u32 sprite_clip1[256]{};
-		s16 clip0_l[256]{};
-		s16 clip0_r[256]{};
-		s16 clip1_l[256]{};
-		s16 clip1_r[256]{};
-		s16 clip2_l[256]{};
-		s16 clip2_r[256]{};
-		s16 clip3_l[256]{};
-		s16 clip3_r[256]{};
+		u32 sprite_clip_in[256]{};
+		u32 sprite_clip_ex[256]{};
+		s16 clip_l[4][256]{};
+		s16 clip_r[4][256]{};
 	};
 
 	int m_game = 0;
