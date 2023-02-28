@@ -613,7 +613,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 					currentPoly.vert[m].normal[3] = 0.0f;
 
 					if (currentPoly.flatShade)
-						currentPoly.colorIndex = chunkOffset[7 + (9*m)] >> 5;
+						currentPoly.colorIndex = chunkOffset[7] >> 5;
 				}
 
 				// Redundantly called, but it works...
@@ -644,7 +644,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 					currentPoly.vert[m].texCoords[1] = uToF(chunkOffset[8 + (6*m)]);
 
 					if (currentPoly.flatShade)
-						currentPoly.colorIndex = chunkOffset[7 + (6*m)] >> 5;
+						currentPoly.colorIndex = chunkOffset[7] >> 5;
 
 					currentPoly.vert[m].normal[0] = uToF(chunkOffset[21]);
 					currentPoly.vert[m].normal[1] = uToF(chunkOffset[22]);
