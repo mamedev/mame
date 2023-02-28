@@ -613,7 +613,7 @@ void msx2_state::mbh70(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
-	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793_N_2_DRIVES, "disk", 3, 0, 1, 2, "diskrom");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793_N_2_DRIVES, "disk", 3, 0, 1, 2, "diskrom").use_motor_for_led();
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000); // 128KB Mapper RAM
 
 	MSX_S1985(config, "s1985", 0);
@@ -727,7 +727,7 @@ void msx2_state::mlg3(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
-	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793_N, "disk", 3, 0, 1, 2, "diskrom");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793_N, "disk", 3, 0, 1, 2, "diskrom").use_motor_for_led();
 	add_cartridge_slot<3>(config, 3, 1);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x10000); // 64KB Mapper RAM
 	add_internal_slot_irq<4>(config, MSX_SLOT_RS232_MITSUBISHI, "rs232", 3, 3, 1, 1, "rs232");
@@ -798,7 +798,7 @@ void msx2_state::mlg30(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
-	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793_N, "disk", 3, 0, 1, 2, "diskrom");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793_N, "disk", 3, 0, 1, 2, "diskrom").use_motor_for_led();
 	add_cartridge_slot<3>(config, 3, 1);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000);   // 128KB Mapper RAM
 	add_cartridge_slot<4>(config, 3, 3);
@@ -838,7 +838,7 @@ void msx2_state::mlg30_2(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
-	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793_N_2_DRIVES, "disk", 3, 0, 1, 2, "diskrom");
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_WD2793_N_2_DRIVES, "disk", 3, 0, 1, 2, "diskrom").use_motor_for_led();
 	add_cartridge_slot<3>(config, 3, 1);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000);   // 128KB Mapper RAM
 	add_internal_slot_irq<4>(config, MSX_SLOT_RS232_MITSUBISHI, "rs232", 3, 3, 1, 1, "rs232");
@@ -1944,7 +1944,7 @@ ROM_END
 void msx2_state::ucv102(machine_config &config)
 {
 	// YM2149 (in S1985)
-	// FDC: wd1793, 2 3.5" DSDD drives
+	// FDC: wd1793, 1 3.5" DSDD drives (could be upgraded to 2)
 	// 1 Cartridge slots
 	// S1985
 	// RS232
@@ -1957,7 +1957,7 @@ void msx2_state::ucv102(machine_config &config)
 	// Expansion slot 1 connects to slots 2-1 and 3-1 (2x 50 pin)
 	// Expansion slot 2 connects to slots 2-2 and 3-2 (2x 50 pin)
 	// Expansion slot 3 connects to slots 2-3 and 3-3 (2x 50 pin)
-	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_FD1793, "disk", 3, 1, 2, "diskrom"); // Mitsubishi MSW1793
+	add_internal_disk_mirrored(config, MSX_SLOT_DISK1_FD1793, "disk", 3, 1, 2, "diskrom").use_motor_for_led(); // Mitsubishi MSW1793
 
 	MSX_S1985(config, "s1985", 0);
 

@@ -79,73 +79,101 @@ void msx_slot_disk_device::floppy_formats(format_registration &fr)
 }
 
 
-msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int nr_drives)
 	: msx_slot_rom_device(mconfig, type, tag, owner, clock)
 	, m_floppy0(*this, "fdc:0")
 	, m_floppy1(*this, "fdc:1")
 	, m_floppy2(*this, "fdc:2")
 	, m_floppy3(*this, "fdc:3")
 	, m_floppy(nullptr)
+	, m_access_int_drv_out(*this, "access_int_drv%u", 0U)
+	, m_nr_drives(nr_drives)
 {
 }
 
-void msx_slot_disk_device::add_drive_mconfig(machine_config &config, int nr_of_drives, bool double_sided)
+void msx_slot_disk_device::add_drive_mconfig(machine_config &config, bool double_sided)
 {
-	if (nr_of_drives > NO_DRIVES)
+	if (m_nr_drives > NO_DRIVES)
 		FLOPPY_CONNECTOR(config, m_floppy0, msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
-	if (nr_of_drives > DRIVES_1)
+	if (m_nr_drives > DRIVES_1)
 		FLOPPY_CONNECTOR(config, m_floppy1, msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
-	if (nr_of_drives > DRIVES_2)
-		FLOPPY_CONNECTOR(config, m_floppy1, msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
-	if (nr_of_drives > DRIVES_3)
-		FLOPPY_CONNECTOR(config, m_floppy1, msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
+	if (m_nr_drives > DRIVES_2)
+		FLOPPY_CONNECTOR(config, m_floppy2, msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
+	if (m_nr_drives > DRIVES_3)
+		FLOPPY_CONNECTOR(config, m_floppy3, msx_floppies, double_sided ? "35dd" : "35ssdd", msx_slot_disk_device::floppy_formats);
+}
+
+void msx_slot_disk_device::device_start()
+{
+	msx_slot_rom_device::device_start();
+
+	m_access_int_drv_out.resolve();
+}
+
+void msx_slot_disk_device::device_reset()
+{
+	msx_slot_rom_device::device_reset();
+	for (int i = 0; i < m_access_int_drv_out.size(); i++)
+		m_access_int_drv_out[i] = 0;
+}
+
+void msx_slot_disk_device::set_drive_access_led_state(int drive, int led_state)
+{
+	m_access_int_drv_out[drive] = led_state;
 }
 
 
-
-msx_slot_wd_disk_device::msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: msx_slot_disk_device(mconfig, type, tag, owner, clock)
+msx_slot_wd_disk_device::msx_slot_wd_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int nr_drives)
+	: msx_slot_disk_device(mconfig, type, tag, owner, clock, nr_drives)
 	, m_fdc(*this, "fdc")
-	, m_led(*this, "led0")
+	, m_control_led_bit(0)
 {
 }
 
 void msx_slot_wd_disk_device::device_start()
 {
 	msx_slot_disk_device::device_start();
-	m_led.resolve();
 }
 
 template <typename FDCType>
-void msx_slot_wd_disk_device::add_mconfig(machine_config &config, FDCType &&type, bool force_ready, int nr_of_drives, bool double_sided)
+void msx_slot_wd_disk_device::add_mconfig(machine_config &config, FDCType &&type, bool force_ready, bool double_sided)
 {
 	std::forward<FDCType>(type)(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->set_force_ready(force_ready);
-	add_drive_mconfig(config, nr_of_drives, double_sided);
+	add_drive_mconfig(config, double_sided);
 }
 
 
 
-msx_slot_tc8566_disk_device::msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: msx_slot_disk_device(mconfig, type, tag, owner, clock)
+msx_slot_tc8566_disk_device::msx_slot_tc8566_disk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int nr_drives)
+	: msx_slot_disk_device(mconfig, type, tag, owner, clock, nr_drives)
 	, m_fdc(*this, "fdc")
 {
 }
 
-void msx_slot_tc8566_disk_device::add_mconfig(machine_config &config, int nr_of_drives)
+void msx_slot_tc8566_disk_device::add_mconfig(machine_config &config)
 {
 	TC8566AF(config, m_fdc, 16'000'000);
 
-	add_drive_mconfig(config, nr_of_drives, DS);
+	add_drive_mconfig(config, DS);
+}
+
+void msx_slot_tc8566_disk_device::dor_w(u8 data)
+{
+	// Assuming drive LEDs are connected to the motor signal
+	set_drive_access_led_state(0, BIT(data, 4));
+	set_drive_access_led_state(1, BIT(data, 5));
+	m_fdc->dor_w(data);
 }
 
 
 
-msx_slot_disk1_base_device::msx_slot_disk1_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_wd_disk_device(mconfig, type, tag, owner, clock)
+msx_slot_disk1_base_device::msx_slot_disk1_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int nr_drives)
+	: msx_slot_wd_disk_device(mconfig, type, tag, owner, clock, nr_drives)
 	, m_side_control(0)
 	, m_control(0)
 {
+	set_control_led_bit(6);
 }
 
 void msx_slot_disk1_base_device::device_start()
@@ -190,6 +218,7 @@ void msx_slot_disk1_base_device::device_start()
 
 void msx_slot_disk1_base_device::device_reset()
 {
+	msx_slot_disk_device::device_reset();
 	m_fdc->dden_w(false);
 }
 
@@ -216,8 +245,6 @@ void msx_slot_disk1_base_device::set_control(u8 data)
 	// ------1- drive 1 select (0 = selected)
 	// -------0 drive 0 select (0 = selected)
 
-	const u8 old_m_control = m_control;
-
 	m_control = data;
 
 	switch (m_control & 0x03)
@@ -225,14 +252,20 @@ void msx_slot_disk1_base_device::set_control(u8 data)
 	case 0:
 	case 2:
 		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
+		set_drive_access_led_state(0, BIT(m_control, get_control_led_bit()));
+		set_drive_access_led_state(1, 0);
 		break;
 
 	case 1:
 		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
+		set_drive_access_led_state(0, 0);
+		set_drive_access_led_state(1, BIT(m_control, get_control_led_bit()));
 		break;
 
 	default:
 		m_floppy = nullptr;
+		set_drive_access_led_state(0, 0);
+		set_drive_access_led_state(1, 0);
 		break;
 	}
 
@@ -243,9 +276,6 @@ void msx_slot_disk1_base_device::set_control(u8 data)
 	}
 
 	m_fdc->set_floppy(m_floppy);
-
-	if ((old_m_control ^ m_control) & 0x40)
-		m_led =  BIT(~m_control, 6);
 }
 
 u8 msx_slot_disk1_base_device::side_control_r()
@@ -265,99 +295,100 @@ u8 msx_slot_disk1_base_device::status_r()
 
 
 msx_slot_disk1_fd1793_device::msx_slot_disk1_fd1793_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_FD1793, tag, owner, clock)
+	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_FD1793, tag, owner, clock, DRIVES_1)
 {
 }
 
 void msx_slot_disk1_fd1793_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, FD1793, NO_FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, FD1793, NO_FORCE_READY, DS);
 }
 
 
 msx_slot_disk1_mb8877_device::msx_slot_disk1_mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_MB8877, tag, owner, clock)
+	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_MB8877, tag, owner, clock, DRIVES_1)
 {
 }
 
 void msx_slot_disk1_mb8877_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, MB8877, FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, MB8877, FORCE_READY, DS);
 }
 
 
 msx_slot_disk1_wd2793_n_device::msx_slot_disk1_wd2793_n_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_N, tag, owner, clock)
+	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_N, tag, owner, clock, DRIVES_1)
 {
 }
 
 void msx_slot_disk1_wd2793_n_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, NO_FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, WD2793, NO_FORCE_READY, DS);
 }
 
 
 msx_slot_disk1_wd2793_n_2_drives_device::msx_slot_disk1_wd2793_n_2_drives_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_N_2_DRIVES, tag, owner, clock)
+	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_N_2_DRIVES, tag, owner, clock, DRIVES_2)
 {
 }
 
 void msx_slot_disk1_wd2793_n_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, NO_FORCE_READY, DRIVES_2, DS);
+	add_mconfig(config, WD2793, NO_FORCE_READY, DS);
 }
 
 
 msx_slot_disk1_wd2793_device::msx_slot_disk1_wd2793_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793, tag, owner, clock)
+	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793, tag, owner, clock, DRIVES_1)
 {
 }
 
 void msx_slot_disk1_wd2793_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, WD2793, FORCE_READY, DS);
 }
 
 
 msx_slot_disk1_wd2793_0_device::msx_slot_disk1_wd2793_0_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_0, tag, owner, clock)
+	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_0, tag, owner, clock, NO_DRIVES)
 {
 }
 
 void msx_slot_disk1_wd2793_0_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, FORCE_READY, NO_DRIVES, DS);
+	add_mconfig(config, WD2793, FORCE_READY, DS);
 }
 
 
 msx_slot_disk1_wd2793_ss_device::msx_slot_disk1_wd2793_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_SS, tag, owner, clock)
+	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_SS, tag, owner, clock, DRIVES_1)
 {
 }
 
 void msx_slot_disk1_wd2793_ss_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, FORCE_READY, DRIVES_1, SS);
+	add_mconfig(config, WD2793, FORCE_READY, SS);
 }
 
 
 msx_slot_disk1_wd2793_2_drives_device::msx_slot_disk1_wd2793_2_drives_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_2_DRIVES, tag, owner, clock)
+	: msx_slot_disk1_base_device(mconfig, MSX_SLOT_DISK1_WD2793_2_DRIVES, tag, owner, clock, DRIVES_2)
 {
 }
 
 void msx_slot_disk1_wd2793_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, FORCE_READY, DRIVES_2, DS);
+	add_mconfig(config, WD2793, FORCE_READY, DS);
 }
 
 
 
 
-msx_slot_disk2_base_device::msx_slot_disk2_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_wd_disk_device(mconfig, type, tag, owner, clock)
+msx_slot_disk2_base_device::msx_slot_disk2_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int nr_drives)
+	: msx_slot_wd_disk_device(mconfig, type, tag, owner, clock, nr_drives)
 	, m_control(0)
 {
+	set_control_led_bit(6);
 }
 
 void msx_slot_disk2_base_device::device_start()
@@ -392,6 +423,7 @@ void msx_slot_disk2_base_device::device_start()
 
 void msx_slot_disk2_base_device::device_reset()
 {
+	msx_slot_disk_device::device_reset();
 	m_fdc->dden_w(false);
 }
 
@@ -402,22 +434,26 @@ void msx_slot_disk2_base_device::device_post_load()
 
 void msx_slot_disk2_base_device::set_control(u8 data)
 {
-	const u8 old_m_control = m_control;
-
 	m_control = data;
 
 	switch (m_control & 3)
 	{
 	case 1:
 		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
+		set_drive_access_led_state(0, BIT(m_control, get_control_led_bit()));
+		set_drive_access_led_state(1, 0);
 		break;
 
 	case 2:
 		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
+		set_drive_access_led_state(0, 0);
+		set_drive_access_led_state(1, BIT(m_control, get_control_led_bit()));
 		break;
 
 	default:
 		m_floppy = nullptr;
+		set_drive_access_led_state(0, 0);
+		set_drive_access_led_state(1, 0);
 		break;
 	}
 
@@ -428,9 +464,6 @@ void msx_slot_disk2_base_device::set_control(u8 data)
 	}
 
 	m_fdc->set_floppy(m_floppy);
-
-	if ((old_m_control ^ m_control) & 0x40)
-		m_led = BIT(~m_control, 6);
 }
 
 u8 msx_slot_disk2_base_device::status_r()
@@ -440,68 +473,68 @@ u8 msx_slot_disk2_base_device::status_r()
 
 
 msx_slot_disk2_fd1793_ss_device::msx_slot_disk2_fd1793_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_FD1793_SS, tag, owner, clock)
+	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_FD1793_SS, tag, owner, clock, DRIVES_1)
 {
 }
 
 void msx_slot_disk2_fd1793_ss_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, FD1793, FORCE_READY, DRIVES_1, SS);
+	add_mconfig(config, FD1793, FORCE_READY, SS);
 }
 
 
 msx_slot_disk2_mb8877_device::msx_slot_disk2_mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_MB8877, tag, owner, clock)
+	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_MB8877, tag, owner, clock, DRIVES_1)
 {
 }
 
 void msx_slot_disk2_mb8877_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, MB8877, FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, MB8877, FORCE_READY, DS);
 }
 
 
 msx_slot_disk2_mb8877_ss_device::msx_slot_disk2_mb8877_ss_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_MB8877_SS, tag, owner, clock)
+	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_MB8877_SS, tag, owner, clock, DRIVES_1)
 {
 }
 
 void msx_slot_disk2_mb8877_ss_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, MB8877, FORCE_READY, DRIVES_1, SS);
+	add_mconfig(config, MB8877, FORCE_READY, SS);
 }
 
 
 msx_slot_disk2_mb8877_2_drives_device::msx_slot_disk2_mb8877_2_drives_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_MB8877_2_DRIVES, tag, owner, clock)
+	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_MB8877_2_DRIVES, tag, owner, clock, DRIVES_2)
 {
 }
 
 void msx_slot_disk2_mb8877_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, MB8877, FORCE_READY, DRIVES_2, DS);
+	add_mconfig(config, MB8877, FORCE_READY, DS);
 }
 
 
 msx_slot_disk2_wd2793_device::msx_slot_disk2_wd2793_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_WD2793, tag, owner, clock)
+	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_WD2793, tag, owner, clock, DRIVES_1)
 {
 }
 
 void msx_slot_disk2_wd2793_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, WD2793, FORCE_READY, DS);
 }
 
 
 msx_slot_disk2_wd2793_2_drives_device::msx_slot_disk2_wd2793_2_drives_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_WD2793_2_DRIVES, tag, owner, clock)
+	: msx_slot_disk2_base_device(mconfig, MSX_SLOT_DISK2_WD2793_2_DRIVES, tag, owner, clock, DRIVES_2)
 {
 }
 
 void msx_slot_disk2_wd2793_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, FORCE_READY, DRIVES_2, DS);
+	add_mconfig(config, WD2793, FORCE_READY, DS);
 }
 
 
@@ -510,18 +543,18 @@ void msx_slot_disk2_wd2793_2_drives_device::device_add_mconfig(machine_config &c
 
 
 msx_slot_disk3_tc8566_device::msx_slot_disk3_tc8566_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk3_tc8566_device(mconfig, MSX_SLOT_DISK3_TC8566, tag, owner, clock)
+	: msx_slot_disk3_tc8566_device(mconfig, MSX_SLOT_DISK3_TC8566, tag, owner, clock, DRIVES_1)
 {
 }
 
-msx_slot_disk3_tc8566_device::msx_slot_disk3_tc8566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_tc8566_disk_device(mconfig, type, tag, owner, clock)
+msx_slot_disk3_tc8566_device::msx_slot_disk3_tc8566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int nr_drives)
+	: msx_slot_tc8566_disk_device(mconfig, type, tag, owner, clock, nr_drives)
 {
 }
 
 void msx_slot_disk3_tc8566_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, DRIVES_1);
+	add_mconfig(config);
 }
 
 void msx_slot_disk3_tc8566_device::device_start()
@@ -531,26 +564,26 @@ void msx_slot_disk3_tc8566_device::device_start()
 	page(1)->install_rom(0x4000, 0x7fff, rom_base());
 	page(1)->install_read_handler(0x7ffa, 0x7ffa, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::msr_r)));
 	page(1)->install_read_handler(0x7ffb, 0x7ffb, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_r)));
-	page(1)->install_write_handler(0x7ff8, 0x7ff8, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::dor_w)));
+	page(1)->install_write_handler(0x7ff8, 0x7ff8, write8smo_delegate(*this, FUNC(msx_slot_disk3_tc8566_device::dor_w)));
 	page(1)->install_write_handler(0x7ff9, 0x7ff9, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
 	page(1)->install_write_handler(0x7ffb, 0x7ffb, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_w)));
 
 	page(2)->install_read_handler(0xbffa, 0xbffa, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::msr_r)));
 	page(2)->install_read_handler(0xbffb, 0xbffb, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_r)));
-	page(2)->install_write_handler(0xbff8, 0xbff8, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::dor_w)));
+	page(2)->install_write_handler(0xbff8, 0xbff8, write8smo_delegate(*this, FUNC(msx_slot_disk3_tc8566_device::dor_w)));
 	page(2)->install_write_handler(0xbff9, 0xbff9, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
 	page(2)->install_write_handler(0xbffb, 0xbffb, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_w)));
 }
 
 
 msx_slot_disk3_tc8566_2_drives_device::msx_slot_disk3_tc8566_2_drives_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk3_tc8566_device(mconfig, MSX_SLOT_DISK3_TC8566_2_DRIVES, tag, owner, clock)
+	: msx_slot_disk3_tc8566_device(mconfig, MSX_SLOT_DISK3_TC8566_2_DRIVES, tag, owner, clock, DRIVES_2)
 {
 }
 
 void msx_slot_disk3_tc8566_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, DRIVES_2);
+	add_mconfig(config);
 }
 
 
@@ -559,7 +592,7 @@ void msx_slot_disk3_tc8566_2_drives_device::device_add_mconfig(machine_config &c
 
 
 msx_slot_disk4_tc8566_device::msx_slot_disk4_tc8566_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msx_slot_tc8566_disk_device(mconfig, MSX_SLOT_DISK4_TC8566, tag, owner, clock)
+	: msx_slot_tc8566_disk_device(mconfig, MSX_SLOT_DISK4_TC8566, tag, owner, clock, DRIVES_1)
 {
 }
 
@@ -569,7 +602,7 @@ void msx_slot_disk4_tc8566_device::device_start()
 
 	page(1)->install_rom(0x4000, 0x7fff, rom_base());
 	// 0x7ff1 media change register
-	page(1)->install_write_handler(0x7ff2, 0x7ff2, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::dor_w)));
+	page(1)->install_write_handler(0x7ff2, 0x7ff2, write8smo_delegate(*this, FUNC(msx_slot_disk4_tc8566_device::dor_w)));
 	page(1)->install_write_handler(0x7ff3, 0x7ff3, write8smo_delegate(*m_fdc, FUNC(tc8566af_device::cr1_w)));
 	page(1)->install_read_handler(0x7ff4, 0x7ff4, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::msr_r)));
 	page(1)->install_read_handler(0x7ff5, 0x7ff5, read8smo_delegate(*m_fdc, FUNC(tc8566af_device::fifo_r)));
@@ -578,21 +611,21 @@ void msx_slot_disk4_tc8566_device::device_start()
 
 void msx_slot_disk4_tc8566_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, DRIVES_1);
+	add_mconfig(config);
 }
 
 
 
 
 msx_slot_disk5_wd2793_device::msx_slot_disk5_wd2793_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK5_WD2793, tag, owner, clock)
+	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK5_WD2793, tag, owner, clock, DRIVES_1)
 	, m_control(0)
 {
 }
 
 void msx_slot_disk5_wd2793_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, WD2793, FORCE_READY, DS);
 }
 
 void msx_slot_disk5_wd2793_device::device_start()
@@ -618,6 +651,7 @@ void msx_slot_disk5_wd2793_device::device_start()
 
 void msx_slot_disk5_wd2793_device::device_reset()
 {
+	msx_slot_disk_device::device_reset();
 	m_fdc->dden_w(false);
 }
 
@@ -634,22 +668,42 @@ void msx_slot_disk5_wd2793_device::control_w(u8 control)
 	{
 	case 0x01:
 		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
+		set_drive_access_led_state(0, BIT(m_control, 6));
+		set_drive_access_led_state(1, 0);
+		set_drive_access_led_state(2, 0);
+		set_drive_access_led_state(3, 0);
 		break;
 
 	case 0x02:
 		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
+		set_drive_access_led_state(0, 0);
+		set_drive_access_led_state(1, BIT(m_control, 6));
+		set_drive_access_led_state(2, 0);
+		set_drive_access_led_state(3, 0);
 		break;
 
 	case 0x04:
 		m_floppy = m_floppy2 ? m_floppy2->get_device() : nullptr;
+		set_drive_access_led_state(0, 0);
+		set_drive_access_led_state(1, 0);
+		set_drive_access_led_state(2, BIT(m_control, 6));
+		set_drive_access_led_state(3, 0);
 		break;
 
 	case 0x08:
 		m_floppy = m_floppy3 ? m_floppy3->get_device() : nullptr;
+		set_drive_access_led_state(0, 0);
+		set_drive_access_led_state(1, 0);
+		set_drive_access_led_state(2, 0);
+		set_drive_access_led_state(3, BIT(m_control, 6));
 		break;
 
 	default:
 		m_floppy = nullptr;
+		set_drive_access_led_state(0, 0);
+		set_drive_access_led_state(1, 0);
+		set_drive_access_led_state(2, 0);
+		set_drive_access_led_state(3, 0);
 		break;
 	}
 
@@ -670,16 +724,17 @@ u8 msx_slot_disk5_wd2793_device::status_r()
 
 
 msx_slot_disk6_wd2793_n_device::msx_slot_disk6_wd2793_n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK6_WD2793_N, tag, owner, clock)
+	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK6_WD2793_N, tag, owner, clock, DRIVES_1)
 	, m_side_motor(0)
-	, m_drive_select0(0)
-	, m_drive_select1(0)
+	, m_drive_select(0)
+	, m_drive_present(false)
+	, m_unknown(0)
 {
 }
 
 void msx_slot_disk6_wd2793_n_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, NO_FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, WD2793, NO_FORCE_READY, DS);
 }
 
 void msx_slot_disk6_wd2793_n_device::device_start()
@@ -687,8 +742,9 @@ void msx_slot_disk6_wd2793_n_device::device_start()
 	msx_slot_wd_disk_device::device_start();
 
 	save_item(NAME(m_side_motor));
-	save_item(NAME(m_drive_select0));
-	save_item(NAME(m_drive_select1));
+	save_item(NAME(m_drive_select));
+	save_item(NAME(m_drive_present));
+	save_item(NAME(m_unknown));
 
 	page(1)->install_rom(0x4000, 0x7fff, rom_base());
 	page(1)->install_read_handler(0x7ff0, 0x7ff0, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::status_r)));
@@ -697,20 +753,24 @@ void msx_slot_disk6_wd2793_n_device::device_start()
 	page(1)->install_read_handler(0x7ff3, 0x7ff3, 0, 0x0008, 0, read8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_r)));
 	page(1)->install_read_handler(0x7ff4, 0x7ff4, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::side_motor_r)));
 	page(1)->install_read_handler(0x7ff5, 0x7ff5, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::select0_r)));
-	page(1)->install_read_handler(0x7ff6, 0x7ff6, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::select1_r)));
+	page(1)->install_read_handler(0x7ff6, 0x7ff6, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::dskchg_r)));
 	page(1)->install_read_handler(0x7ff7, 0x7ff7, 0, 0x0008, 0, read8smo_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::status_r)));
 	page(1)->install_write_handler(0x7ff0, 0x7ff0, 0, 0x0008, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::cmd_w)));
 	page(1)->install_write_handler(0x7ff1, 0x7ff1, 0, 0x0008, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::track_w)));
 	page(1)->install_write_handler(0x7ff2, 0x7ff2, 0, 0x0008, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::sector_w)));
 	page(1)->install_write_handler(0x7ff3, 0x7ff3, 0, 0x0008, 0, write8smo_delegate(*m_fdc, FUNC(wd_fdc_analog_device_base::data_w)));
 	page(1)->install_write_handler(0x7ff4, 0x7ff4, 0, 0x0008, 0, write8smo_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::side_motor_w)));
-	page(1)->install_write_handler(0x7ff5, 0x7ff5, 0, 0x0008, 0, write8smo_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::select0_w)));
-	page(1)->install_write_handler(0x7ff6, 0x7ff6, 0, 0x0008, 0, write8smo_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::select1_w)));
+	page(1)->install_write_handler(0x7ff5, 0x7ff5, 0, 0x0008, 0, write8smo_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::select_w)));
+	page(1)->install_write_handler(0x7ff6, 0x7ff6, 0, 0x0008, 0, write8smo_delegate(*this, FUNC(msx_slot_disk6_wd2793_n_device::unknown_w)));
 }
 
 void msx_slot_disk6_wd2793_n_device::device_reset()
 {
+	msx_slot_disk_device::device_reset();
 	m_fdc->dden_w(false);
+	m_drive_select = 0;
+	m_drive_present = false;
+	m_unknown = 0;
 }
 
 void msx_slot_disk6_wd2793_n_device::device_post_load()
@@ -720,22 +780,15 @@ void msx_slot_disk6_wd2793_n_device::device_post_load()
 
 void msx_slot_disk6_wd2793_n_device::select_drive()
 {
-	if (m_drive_select1)
+	if (BIT(m_drive_select, 0))
 	{
 		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
-		if (!m_floppy)
-		{
-			m_drive_select1 = 0;
-		}
+		m_drive_present = m_floppy;
 	}
-
-	if (m_drive_select0)
+	else
 	{
 		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
-		if (!m_floppy)
-		{
-			m_drive_select0 = 0;
-		}
+		m_drive_present = m_floppy;
 	}
 
 	m_fdc->set_floppy(m_floppy);
@@ -750,6 +803,16 @@ void msx_slot_disk6_wd2793_n_device::set_side_motor()
 		m_floppy->mon_w(BIT(m_side_motor, 1) ? 0 : 1);
 		m_floppy->ss_w(BIT(m_side_motor, 0));
 	}
+	if (BIT(m_drive_select, 0))
+	{
+		set_drive_access_led_state(0, 0);
+		set_drive_access_led_state(1, BIT(m_side_motor, 1));
+	}
+	else
+	{
+		set_drive_access_led_state(0, BIT(m_side_motor, 1));
+		set_drive_access_led_state(1, 0);
+	}
 }
 
 u8 msx_slot_disk6_wd2793_n_device::side_motor_r()
@@ -761,14 +824,14 @@ u8 msx_slot_disk6_wd2793_n_device::side_motor_r()
 
 u8 msx_slot_disk6_wd2793_n_device::select0_r()
 {
-	// This reads back a 1 in bit 0 if drive0 is present and selected
-	return 0xfe | m_drive_select0;
+	// This reads back a 0 in bit 0 if selected drive is present
+	return 0xfe | (m_drive_present ? 0 : 1);
 }
 
-u8 msx_slot_disk6_wd2793_n_device::select1_r()
+u8 msx_slot_disk6_wd2793_n_device::dskchg_r()
 {
-	// This reads back a 1 in bit 0 if drive1 is present and selected
-	return 0xfe | m_drive_select1;
+	// Disk change status for selected drive
+	return 0xfe | (m_floppy && m_floppy->dskchg_r() ? 0 : 1);
 }
 
 u8 msx_slot_disk6_wd2793_n_device::status_r()
@@ -785,31 +848,30 @@ void msx_slot_disk6_wd2793_n_device::side_motor_w(u8 data)
 	set_side_motor();
 }
 
-void msx_slot_disk6_wd2793_n_device::select0_w(u8 data)
+void msx_slot_disk6_wd2793_n_device::select_w(u8 data)
 {
-	// bit 0 - select drive 0
-	m_drive_select0 = data;
+	// bit 0 - select drive 0/1
+	m_drive_select = data;
 	select_drive();
 }
 
-void msx_slot_disk6_wd2793_n_device::select1_w(u8 data)
+void msx_slot_disk6_wd2793_n_device::unknown_w(u8 data)
 {
-	// bit 1 - select drive 1
-	m_drive_select1 = data;
-	select_drive();
+	// bit 0 - ? inverse of what is written to drive select.
+	m_unknown = data;
 }
 
 
 
 msx_slot_disk7_mb8877_device::msx_slot_disk7_mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK7_MB8877, tag, owner, clock)
+	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK7_MB8877, tag, owner, clock, DRIVES_1)
 	, m_drive_side_motor(0)
 {
 }
 
 void msx_slot_disk7_mb8877_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, MB8877, FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, MB8877, FORCE_READY, DS);
 }
 
 void msx_slot_disk7_mb8877_device::device_start()
@@ -844,6 +906,7 @@ void msx_slot_disk7_mb8877_device::device_start()
 
 void msx_slot_disk7_mb8877_device::device_reset()
 {
+	msx_slot_disk_device::device_reset();
 	m_fdc->dden_w(false);
 }
 
@@ -854,15 +917,24 @@ void msx_slot_disk7_mb8877_device::device_post_load()
 
 void msx_slot_disk7_mb8877_device::select_drive()
 {
+	// No separate bit for the drive LEDs? Assuming LEDs are triggered by the motor on signal.
 	m_floppy = nullptr;
 
 	switch (m_drive_side_motor & 0x03)
 	{
 	case 0:
 		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
+		set_drive_access_led_state(0, BIT(~m_drive_side_motor, 3));
+		set_drive_access_led_state(1, 0);
 		break;
 	case 1:
 		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
+		set_drive_access_led_state(0, 0);
+		set_drive_access_led_state(1, BIT(~m_drive_side_motor, 3));
+		break;
+	default:
+		set_drive_access_led_state(0, 0);
+		set_drive_access_led_state(1, 0);
 		break;
 	}
 
@@ -902,19 +974,19 @@ u8 msx_slot_disk7_mb8877_device::status_r()
 
 
 msx_slot_disk8_mb8877_device::msx_slot_disk8_mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msx_slot_disk8_mb8877_device(mconfig, MSX_SLOT_DISK8_MB8877, tag, owner, clock)
+	: msx_slot_disk8_mb8877_device(mconfig, MSX_SLOT_DISK8_MB8877, tag, owner, clock, DRIVES_1)
 {
 }
 
-msx_slot_disk8_mb8877_device::msx_slot_disk8_mb8877_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_wd_disk_device(mconfig, type, tag, owner, clock)
+msx_slot_disk8_mb8877_device::msx_slot_disk8_mb8877_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int nr_drives)
+	: msx_slot_wd_disk_device(mconfig, type, tag, owner, clock, nr_drives)
 	, m_control(0)
 {
 }
 
 void msx_slot_disk8_mb8877_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, MB8877, FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, MB8877, FORCE_READY, DS);
 }
 
 void msx_slot_disk8_mb8877_device::device_start()
@@ -950,6 +1022,7 @@ void msx_slot_disk8_mb8877_device::device_start()
 
 void msx_slot_disk8_mb8877_device::device_reset()
 {
+	msx_slot_disk_device::device_reset();
 	m_fdc->dden_w(false);
 }
 
@@ -962,22 +1035,26 @@ void msx_slot_disk8_mb8877_device::device_post_load()
 
 void msx_slot_disk8_mb8877_device::set_control(u8 data)
 {
-	const u8 old_m_control = m_control;
-
 	m_control = data;
 
 	switch (m_control & 3)
 	{
 	case 1:
 		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
+		set_drive_access_led_state(0, BIT(m_control, 6));
+		set_drive_access_led_state(1, 0);
 		break;
 
 	case 2:
 		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
+		set_drive_access_led_state(0, 0);
+		set_drive_access_led_state(1, BIT(m_control, 6));
 		break;
 
 	default:
 		m_floppy = nullptr;
+		set_drive_access_led_state(0, 0);
+		set_drive_access_led_state(1, 0);
 		break;
 	}
 
@@ -988,11 +1065,6 @@ void msx_slot_disk8_mb8877_device::set_control(u8 data)
 	}
 
 	m_fdc->set_floppy(m_floppy);
-
-	if ((old_m_control ^ m_control) & 0x40)
-	{
-		m_led = BIT(~m_control, 6);
-	}
 }
 
 u8 msx_slot_disk8_mb8877_device::status_r()
@@ -1002,27 +1074,27 @@ u8 msx_slot_disk8_mb8877_device::status_r()
 
 
 msx_slot_disk8_wd2793_2_drives_device::msx_slot_disk8_wd2793_2_drives_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msx_slot_disk8_mb8877_device(mconfig, MSX_SLOT_DISK8_WD2793_2_DRIVES, tag, owner, clock)
+	: msx_slot_disk8_mb8877_device(mconfig, MSX_SLOT_DISK8_WD2793_2_DRIVES, tag, owner, clock, DRIVES_2)
 {
 }
 
 void msx_slot_disk8_wd2793_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, FORCE_READY, DRIVES_2, DS);
+	add_mconfig(config, WD2793, FORCE_READY, DS);
 }
 
 
 
 
 msx_slot_disk9_wd2793_n_device::msx_slot_disk9_wd2793_n_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK9_WD2793_N, tag, owner, clock)
+	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK9_WD2793_N, tag, owner, clock, DRIVES_1)
 	, m_control(0)
 {
 }
 
 void msx_slot_disk9_wd2793_n_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, NO_FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, WD2793, NO_FORCE_READY, DS);
 }
 
 void msx_slot_disk9_wd2793_n_device::device_start()
@@ -1046,6 +1118,7 @@ void msx_slot_disk9_wd2793_n_device::device_start()
 
 void msx_slot_disk9_wd2793_n_device::device_reset()
 {
+	msx_slot_disk_device::device_reset();
 	m_fdc->dden_w(false);
 }
 
@@ -1056,22 +1129,26 @@ void msx_slot_disk9_wd2793_n_device::device_post_load()
 
 void msx_slot_disk9_wd2793_n_device::control_w(u8 data)
 {
-	const u8 old_m_control = m_control;
-
 	m_control = data;
 
 	switch (m_control & 0x03)
 	{
 	case 1:
 		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
+		set_drive_access_led_state(0, BIT(m_control, 6));
+		set_drive_access_led_state(1, 0);
 		break;
 
 	case 2:
 		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
+		set_drive_access_led_state(0, 0);
+		set_drive_access_led_state(1, BIT(m_control, 6));
 		break;
 
 	default:
 		m_floppy = nullptr;
+		set_drive_access_led_state(0, 0);
+		set_drive_access_led_state(1, 0);
 		break;
 	}
 
@@ -1082,11 +1159,6 @@ void msx_slot_disk9_wd2793_n_device::control_w(u8 data)
 	}
 
 	m_fdc->set_floppy(m_floppy);
-
-	if ((old_m_control ^ m_control) & 0x40)
-	{
-		m_led =  BIT(m_control, 6);
-	}
 }
 
 u8 msx_slot_disk9_wd2793_n_device::status_r()
@@ -1098,19 +1170,19 @@ u8 msx_slot_disk9_wd2793_n_device::status_r()
 
 
 msx_slot_disk10_mb8877_device::msx_slot_disk10_mb8877_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk10_mb8877_device(mconfig, MSX_SLOT_DISK10_MB8877, tag, owner, clock)
+	: msx_slot_disk10_mb8877_device(mconfig, MSX_SLOT_DISK10_MB8877, tag, owner, clock, DRIVES_1)
 {
 }
 
-msx_slot_disk10_mb8877_device::msx_slot_disk10_mb8877_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_wd_disk_device(mconfig, type, tag, owner, clock)
+msx_slot_disk10_mb8877_device::msx_slot_disk10_mb8877_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int nr_drives)
+	: msx_slot_wd_disk_device(mconfig, type, tag, owner, clock, nr_drives)
 	, m_control(0)
 {
 }
 
 void msx_slot_disk10_mb8877_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, MB8877, FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, MB8877, FORCE_READY, DS);
 }
 
 void msx_slot_disk10_mb8877_device::device_start()
@@ -1135,6 +1207,7 @@ void msx_slot_disk10_mb8877_device::device_start()
 
 void msx_slot_disk10_mb8877_device::device_reset()
 {
+	msx_slot_disk_device::device_reset();
 	m_fdc->dden_w(false);
 }
 
@@ -1145,14 +1218,21 @@ void msx_slot_disk10_mb8877_device::device_post_load()
 
 void msx_slot_disk10_mb8877_device::control_w(u8 data)
 {
-	const u8 old_m_control = m_control;
-
 	m_control = data;
 
+	// Assuming drive LEDs are connected to the motor signals
 	if (BIT(m_control, 2))
+	{
 		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
+		set_drive_access_led_state(0, 0);
+		set_drive_access_led_state(1, BIT(m_control, 1));
+	}
 	else
+	{
 		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
+		set_drive_access_led_state(0, BIT(m_control, 0));
+		set_drive_access_led_state(1, 0);
+	}
 
 	if (m_floppy && !BIT(m_control, 2))
 		m_floppy->mon_w(BIT(m_control, 0) ? 0 : 1);
@@ -1164,12 +1244,6 @@ void msx_slot_disk10_mb8877_device::control_w(u8 data)
 		m_floppy->ss_w(BIT(m_control, 3));
 
 	m_fdc->set_floppy(m_floppy);
-
-	// TODO Verify
-	if ((old_m_control ^ m_control) & 0x40)
-	{
-		m_led =  BIT(m_control, 6);
-	}
 }
 
 u8 msx_slot_disk10_mb8877_device::status_r()
@@ -1184,19 +1258,19 @@ u8 msx_slot_disk10_mb8877_device::status_r()
 
 
 msx_slot_disk10_mb8877_2_drives_device::msx_slot_disk10_mb8877_2_drives_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_disk10_mb8877_device(mconfig, MSX_SLOT_DISK10_MB8877_2_DRIVES, tag, owner, clock)
+	: msx_slot_disk10_mb8877_device(mconfig, MSX_SLOT_DISK10_MB8877_2_DRIVES, tag, owner, clock, DRIVES_2)
 {
 }
 
 void msx_slot_disk10_mb8877_2_drives_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, MB8877, FORCE_READY, DRIVES_2, DS);
+	add_mconfig(config, MB8877, FORCE_READY, DS);
 }
 
 
 
 msx_slot_disk11_wd2793_device::msx_slot_disk11_wd2793_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK11_WD2793, tag, owner, clock)
+	: msx_slot_wd_disk_device(mconfig, MSX_SLOT_DISK11_WD2793, tag, owner, clock, DRIVES_1)
 	, m_side_control(0)
 	, m_control(0)
 {
@@ -1204,7 +1278,7 @@ msx_slot_disk11_wd2793_device::msx_slot_disk11_wd2793_device(const machine_confi
 
 void msx_slot_disk11_wd2793_device::device_add_mconfig(machine_config &config)
 {
-	add_mconfig(config, WD2793, FORCE_READY, DRIVES_1, DS);
+	add_mconfig(config, WD2793, FORCE_READY, DS);
 }
 
 void msx_slot_disk11_wd2793_device::device_start()
@@ -1246,6 +1320,7 @@ void msx_slot_disk11_wd2793_device::device_start()
 
 void msx_slot_disk11_wd2793_device::device_reset()
 {
+	msx_slot_disk_device::device_reset();
 	m_fdc->dden_w(false);
 }
 
@@ -1264,19 +1339,26 @@ void msx_slot_disk11_wd2793_device::side_control_w(u8 data)
 
 void msx_slot_disk11_wd2793_device::control_w(u8 data)
 {
-	const u8 old_m_control = m_control;
-
 	m_control = data;
 
-	m_floppy = nullptr;
 	switch (m_control & 0x03)
 	{
 	case 0:
 		m_floppy = m_floppy0 ? m_floppy0->get_device() : nullptr;
+		set_drive_access_led_state(0, BIT(m_control, 6));  // Wild guess based on other floppy interfaces
+		set_drive_access_led_state(1, 0);
 		break;
 
 	case 1:
 		m_floppy = m_floppy1 ? m_floppy1->get_device() : nullptr;
+		set_drive_access_led_state(0, 0);
+		set_drive_access_led_state(1, BIT(m_control, 6));  // Wild guess based on other floppy interfaces
+		break;
+	
+	default:
+		m_floppy = nullptr;
+		set_drive_access_led_state(0, 0);
+		set_drive_access_led_state(1, 0);
 		break;
 	}
 
@@ -1287,11 +1369,6 @@ void msx_slot_disk11_wd2793_device::control_w(u8 data)
 	}
 
 	m_fdc->set_floppy(m_floppy);
-
-	if ((old_m_control ^ m_control) & 0x40)
-	{
-		m_led =  BIT(~m_control, 6);
-	}
 }
 
 u8 msx_slot_disk11_wd2793_device::side_control_r()

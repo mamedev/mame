@@ -334,7 +334,7 @@ bool video_bgfx::init_bgfx_library(osd_window &window)
 	init.resolution.width = wdim.width();
 	init.resolution.height = wdim.height();
 	init.resolution.numBackBuffers = 1;
-	init.resolution.reset = BGFX_RESET_NONE;
+	init.resolution.reset = video_config.waitvsync ? BGFX_RESET_VSYNC : BGFX_RESET_NONE;
 	if (!set_platform_data(init.platformData, window))
 	{
 		osd_printf_error("Setting BGFX platform data failed\n");

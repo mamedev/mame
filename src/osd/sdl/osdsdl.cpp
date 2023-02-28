@@ -260,6 +260,9 @@ void sdl_osd_interface::init(running_machine &machine)
 		}
 	}
 
+#if defined(SDLMAME_ANDROID)
+	SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "1");
+#endif
 	/* Initialize SDL */
 
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO))
@@ -269,7 +272,7 @@ void sdl_osd_interface::init(running_machine &machine)
 	}
 
 	// bgfx does not work with wayland
-	if ((strcmp(SDL_GetCurrentVideoDriver(), "wayland") == 0) && ((strcmp(options().video(), "auto") == 0) || (strcmp(options().video(), "bgfx") == 0)))
+	if ((strcmp(SDL_GetCurrentVideoDriver(), "wayland") == 0) && (strcmp(options().video(), "bgfx") == 0))
 		fatalerror("Error: BGFX video does not work with wayland videodriver. Please change either of the options.");
 
 	osd_sdl_info();
@@ -651,6 +654,8 @@ void sdl_osd_interface::process_window_event(SDL_Event const &event)
 		break;
 
 	case SDL_WINDOWEVENT_FOCUS_LOST:
+		if (window == m_focus_window)
+			m_focus_window = nullptr;
 		machine().ui_input().push_window_defocus_event(window->target());
 		break;
 

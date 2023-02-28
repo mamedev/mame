@@ -125,12 +125,6 @@ namespace osd {
 
 namespace {
 
-BOOL CALLBACK device_enum_interface_callback(LPCDIDEVICEINSTANCE instance, LPVOID ref)
-{
-	return static_cast<device_enum_interface *>(ref)->device_enum_callback(instance);
-}
-
-
 std::string guid_to_string(GUID const &guid)
 {
 	// size of a GUID string with dashes plus NUL terminator
@@ -307,11 +301,8 @@ void dinput_mouse_device::configure(input_device &device)
 //  dinput_module - base DirectInput module
 //============================================================
 
-class dinput_module : public input_module_impl<dinput_device, osd_common_t>, public device_enum_interface
+class dinput_module : public input_module_impl<dinput_device, osd_common_t>
 {
-protected:
-	std::unique_ptr<dinput_api_helper> m_dinput_helper;
-
 public:
 	dinput_module(const char* type, const char* name) :
 		input_module_impl<dinput_device, osd_common_t>(type, name),
@@ -343,13 +334,18 @@ public:
 	{
 		input_module_impl<dinput_device, osd_common_t>::input_init(machine);
 
-		HRESULT result = m_dinput_helper->enum_attached_devices(dinput_devclass(), *this);
+		HRESULT const result = m_dinput_helper->enum_attached_devices(
+				dinput_devclass(),
+				[this] (LPCDIDEVICEINSTANCE instance) { return device_enum_callback(instance); });
 		if (result != DI_OK)
 			fatalerror("DirectInput: Unable to enumerate devices (result=%08X)\n", uint32_t(result));
 	}
 
 protected:
 	virtual int dinput_devclass() = 0;
+	virtual BOOL device_enum_callback(LPCDIDEVICEINSTANCE instance) = 0;
+
+	std::unique_ptr<dinput_api_helper> m_dinput_helper;
 };
 
 
@@ -361,6 +357,7 @@ public:
 	{
 	}
 
+protected:
 	virtual int dinput_devclass() override
 	{
 		return DI8DEVCLASS_KEYBOARD;
@@ -392,6 +389,7 @@ public:
 	{
 	}
 
+protected:
 	virtual int dinput_devclass() override
 	{
 		return DI8DEVCLASS_POINTER;
@@ -438,6 +436,7 @@ public:
 	{
 	}
 
+protected:
 	virtual int dinput_devclass() override
 	{
 		return DI8DEVCLASS_GAMECTRL;
@@ -1212,12 +1211,6 @@ int dinput_api_helper::initialize()
 }
 
 
-HRESULT dinput_api_helper::enum_attached_devices(int devclass, device_enum_interface &enumerate_interface) const
-{
-	return m_dinput->EnumDevices(devclass, device_enum_interface_callback, &enumerate_interface, DIEDFL_ATTACHEDONLY);
-}
-
-
 std::pair<Microsoft::WRL::ComPtr<IDirectInputDevice8>, LPCDIDATAFORMAT> dinput_api_helper::open_device(
 		LPCDIDEVICEINSTANCE instance,
 		LPCDIDATAFORMAT format1,
@@ -1228,7 +1221,7 @@ std::pair<Microsoft::WRL::ComPtr<IDirectInputDevice8>, LPCDIDATAFORMAT> dinput_a
 
 	// attempt to create a device
 	Microsoft::WRL::ComPtr<IDirectInputDevice8> device;
-	result = m_dinput->CreateDevice(instance->guidInstance, device.GetAddressOf(), nullptr);
+	result = m_dinput->CreateDevice(instance->guidInstance, &device, nullptr);
 	if (result != DI_OK)
 	{
 		osd_printf_error("DirectInput: Unable to create device.\n");
@@ -1252,7 +1245,13 @@ std::pair<Microsoft::WRL::ComPtr<IDirectInputDevice8>, LPCDIDATAFORMAT> dinput_a
 	}
 
 	// default window to the first window in the list
-	HWND window_handle;
+	// For now, we always use the desktop window due to multiple issues:
+	// * MAME recreates windows on toggling fullscreen.  DirectInput really doesn't like this.
+	// * DirectInput doesn't like the window used for D3D fullscreen exclusive mode.
+	// * With multiple windows, the first window needs to have focus when using foreground mode.
+	// This makes it impossible to use force feedback as that requires foreground exclusive mode.
+	// The only way to get around this would be to reopen devices on focus changes.
+	[[maybe_unused]] HWND window_handle;
 	DWORD di_cooperative_level;
 #if defined(OSD_WINDOWS)
 	auto const &window = dynamic_cast<win_window_info &>(*osd_common_t::window_list().front());
@@ -1285,7 +1284,8 @@ std::pair<Microsoft::WRL::ComPtr<IDirectInputDevice8>, LPCDIDATAFORMAT> dinput_a
 			di_cooperative_level = DISCL_BACKGROUND | DISCL_NONEXCLUSIVE;
 			break;
 		case dinput_cooperative_level::FOREGROUND:
-			di_cooperative_level = DISCL_FOREGROUND | DISCL_NONEXCLUSIVE;
+			//di_cooperative_level = DISCL_FOREGROUND | DISCL_NONEXCLUSIVE;
+			di_cooperative_level = DISCL_BACKGROUND | DISCL_NONEXCLUSIVE;
 			break;
 		default:
 			throw false;
@@ -1293,7 +1293,7 @@ std::pair<Microsoft::WRL::ComPtr<IDirectInputDevice8>, LPCDIDATAFORMAT> dinput_a
 	}
 
 	// set the cooperative level
-	result = device->SetCooperativeLevel(window_handle, di_cooperative_level);
+	result = device->SetCooperativeLevel(GetDesktopWindow(), di_cooperative_level);
 	if (result != DI_OK)
 	{
 		osd_printf_error("DirectInput: Unable to set cooperative level.\n");

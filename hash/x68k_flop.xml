@@ -27299,9 +27299,10 @@ sold through Takeru vending machines -->
 	<!-- missing track 78 which contains copy protection, disabled are original, enabled are cracked -->
 	<software name="lasttemp">
 		<description>The Last Tempest</description>
-		<year>1994</year>
+		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
-		<info name="developer" value="Koucha Kikaku" />
+		<info name="alt_title" value="ラスト テンペスト" />
+		<info name="developer" value="Tea Planning/Koucha Kikaku" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261824">
@@ -27314,6 +27315,19 @@ sold through Takeru vending machines -->
 			<dataarea name="flop" size="1261824">
 				<!--<rom name="last tempest, the (1994)(koucha kikaku)(disk 2 of 2)(disk b).dim" size="1261824" crc="6cbba9cd" sha1="3b48f44ea9c2c3b76f32017444f3703359b77174" status="baddump" />-->
 				<rom name="Last_Tempest_B.dim" size="1261824" crc="3d67e52f" sha1="d78d68763971c6a02bfbee9bc083d402b32d3338" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lasttempa" cloneof="lasttemp">
+		<description>The Last Tempest (older)</description>
+		<year>1994</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="ラスト テンペスト" />
+		<info name="developer" value="Harusawa. K and Tea Planning" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261824">
+				<rom name="Last_Tempest.dim" size="1261824" crc="dc262e21" sha1="759b1cd0337c774ec2197745aa9eb9165d8e008b" />
 			</dataarea>
 		</part>
 	</software>

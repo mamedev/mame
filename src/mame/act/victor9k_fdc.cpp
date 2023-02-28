@@ -129,12 +129,10 @@ void victor_9000_fdc_device::add_floppy_drive(machine_config &config, const char
 	connector.set_formats(floppy_formats);
 }
 
-image_init_result victor_9000_fdc_device::load0_cb(floppy_image_device *device)
+void victor_9000_fdc_device::load0_cb(floppy_image_device *device)
 {
 	// DOOR OPEN 0
 	m_via4->write_ca1(0);
-
-	return image_init_result::PASS;
 }
 
 void victor_9000_fdc_device::unload0_cb(floppy_image_device *device)
@@ -143,12 +141,10 @@ void victor_9000_fdc_device::unload0_cb(floppy_image_device *device)
 	m_via4->write_ca1(1);
 }
 
-image_init_result victor_9000_fdc_device::load1_cb(floppy_image_device *device)
+void victor_9000_fdc_device::load1_cb(floppy_image_device *device)
 {
 	// DOOR OPEN 1
 	m_via4->write_cb1(0);
-
-	return image_init_result::PASS;
 }
 
 void victor_9000_fdc_device::unload1_cb(floppy_image_device *device)

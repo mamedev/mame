@@ -3,20 +3,22 @@
 
 #include "emu.h"
 
-#include "bus/nubus/nubus.h"
+#include "cuda.h"
+#include "macadb.h"
+
 #include "bus/nscsi/devices.h"
+#include "bus/nubus/nubus.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/6522via.h"
 #include "machine/8530scc.h"
-#include "cuda.h"
-#include "macadb.h"
 #include "machine/mv_sonora.h"
 #include "machine/ncr53c90.h"
 #include "machine/ram.h"
 #include "machine/swim3.h"
 #include "machine/timer.h"
-#include "softlist_dev.h"
 #include "sound/awacs.h"
+
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

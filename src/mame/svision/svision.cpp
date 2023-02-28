@@ -1,5 +1,6 @@
 // license:GPL-2.0+
 // copyright-holders:Peter Trauner
+
 /******************************************************************************
  watara supervision handheld
 
@@ -7,7 +8,15 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "svision.h"
+
+#include "svis_snd.h"
+
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "cpu/m6502/m65c02.h"
+#include "machine/timer.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -15,11 +24,127 @@
 #include "svision.lh"
 
 
-#define MAKE8_RGB32(red3, green3, blue2) ( ( (red3)<<(16+5)) | ( (green3)<<(8+5)) | ( (blue2)<<(0+6)) )
-#define MAKE9_RGB32(red3, green3, blue3) ( ( (red3)<<(16+5)) | ( (green3)<<(8+5)) | ( (blue3)<<(0+5)) )
-#define MAKE12_RGB32(red4, green4, blue4) ( ( (red4)<<(16+4)) | ((green4)<<(8+4)) | ((blue4)<<(0+4)) )
-#define MAKE24_RGB32(red8, green8, blue8) ( (((red8)&0xf8)<<16) | (((green8)&0xf8)<<8) | (((blue8)&0xf8)) )
+// configurable logging
+#define LOG_REGS     (1U <<  1)
 
+//#define VERBOSE (LOG_GENERAL | LOG_REGS)
+
+#include "logmacro.h"
+
+#define LOGREGS(...)     LOGMASKED(LOG_REGS,     __VA_ARGS__)
+
+
+namespace {
+
+class svision_state : public driver_device
+{
+public:
+	svision_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_sound(*this, "custom")
+		, m_cart(*this, "cartslot")
+		, m_reg(*this, "reg")
+		, m_videoram(*this, "videoram")
+		, m_screen(*this, "screen")
+		, m_joy(*this, "JOY")
+		, m_joy2(*this, "JOY2")
+		, m_palette(*this, "palette")
+		, m_bank(*this, "bank%u", 1U)
+	{ }
+
+	void svisionp(machine_config &config);
+	void svisions(machine_config &config);
+	void tvlinkp(machine_config &config);
+	void svision(machine_config &config);
+	void svisionn(machine_config &config);
+	void svision_base(machine_config &config);
+
+	void init_svisions();
+	void init_svision();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	required_device<cpu_device> m_maincpu;
+	required_device<svision_sound_device> m_sound;
+	required_device<generic_slot_device> m_cart;
+	required_shared_ptr<uint8_t> m_reg;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_device<screen_device> m_screen;
+	required_ioport m_joy;
+	optional_ioport m_joy2;
+	required_device<palette_device> m_palette;
+
+	required_memory_bank_array<2> m_bank;
+
+	memory_region *m_cart_rom = nullptr;
+
+	enum
+	{
+		XSIZE = 0x00,
+		XPOS  = 0x02,
+		YPOS  = 0x03,
+		BANK  = 0x26,
+	};
+
+	struct svision_t
+	{
+		emu_timer *timer1 = nullptr;
+		uint8_t timer_shot = 0;
+	};
+
+	struct svision_pet_t
+	{
+		uint8_t state = 0;
+		uint8_t on = 0, clock = 0, data = 0;
+		uint8_t input = 0;
+		emu_timer *timer = nullptr;
+	};
+
+	struct tvlink_t
+	{
+		uint32_t palette[4]; // 0x40? rgb8
+		uint8_t palette_on;
+	};
+
+	svision_t m_svision;
+	svision_pet_t m_pet;
+	tvlink_t m_tvlink;
+	bool m_dma_finished = false;
+
+	DECLARE_WRITE_LINE_MEMBER(sound_irq_w);
+	uint8_t regs_r(offs_t offset);
+	void regs_w(offs_t offset, uint8_t data);
+	uint8_t tvlink_r(offs_t offset);
+	void tvlink_w(offs_t offset, uint8_t data);
+
+	uint32_t screen_update_svision(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tvlink(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(frame_int_w);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
+	void svision_palette(palette_device &palette) const;
+	void svisionp_palette(palette_device &palette) const;
+	void svisionn_palette(palette_device &palette) const;
+	DECLARE_MACHINE_RESET(tvlink);
+
+	uint32_t make8_rgb32(uint8_t red3, uint8_t green3, uint8_t blue2) { return (red3 << (16 + 5)) | (green3 << (8 + 5)) | (blue2 << (0 + 6)); }
+	uint32_t make9_rgb32(uint8_t red3, uint8_t green3, uint8_t blue3) { return (red3 << (16 + 5)) | (green3 << (8 + 5)) | (blue3 << (0 + 5)); }
+	uint32_t make12_rgb32(uint8_t red4, uint8_t green4, uint8_t blue4) { return (red4 << (16 + 4)) | (green4 << (8 + 4)) | (blue4 << (0 + 4)); }
+	uint32_t make24_rgb32(uint8_t red8, uint8_t green8, uint8_t blue8) { return ((red8 & 0xf8) << 16) | ((green8 & 0xf8) << 8) | (blue8 & 0xf8); }
+
+	void check_irq();
+
+	TIMER_CALLBACK_MEMBER(svision_pet_timer);
+	TIMER_CALLBACK_MEMBER(svision_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(svision_pet_timer_dev);
+
+	void svision_mem(address_map &map);
+	void tvlink_mem(address_map &map);
+};
 
 TIMER_CALLBACK_MEMBER(svision_state::svision_pet_timer)
 {
@@ -76,7 +201,7 @@ TIMER_CALLBACK_MEMBER(svision_state::svision_timer)
 	check_irq();
 }
 
-uint8_t svision_state::svision_r(offs_t offset)
+uint8_t svision_state::regs_r(offs_t offset)
 {
 	int data = m_reg[offset];
 	switch (offset)
@@ -123,14 +248,14 @@ uint8_t svision_state::svision_r(offs_t offset)
 			break;
 
 		default:
-			logerror("%.6f svision read %04x %02x\n", machine().time().as_double(),offset,data);
+			LOGREGS("%.6f svision read %04x %02x\n", machine().time().as_double(), offset, data);
 			break;
 	}
 
 	return data;
 }
 
-void svision_state::svision_w(offs_t offset, uint8_t data)
+void svision_state::regs_w(offs_t offset, uint8_t data)
 {
 	m_reg[offset] = data;
 
@@ -140,16 +265,16 @@ void svision_state::svision_w(offs_t offset, uint8_t data)
 		case 0x03:
 			break;
 
-		case 0x26: /* bits 5,6 memory management for a000? */
+		case 0x26: // bits 5,6 memory management for a000?
 		{
-			logerror("%.6f svision write %04x %02x\n", machine().time().as_double(), offset, data);
-			int bank = ((m_reg[0x26] & 0xe0) >> 5) % (m_cart_rom->bytes() / 0x4000);
-			m_bank1->set_base(m_cart_rom->base() + (bank * 0x4000));
+			LOGREGS("%.6f svision write %04x %02x\n", machine().time().as_double(), offset, data);
+			const int bank = ((m_reg[0x26] & 0xe0) >> 5) % (m_cart_rom->bytes() / 0x4000);
+			m_bank[0]->set_entry(bank);
 			check_irq();
 			break;
 		}
 
-		case 0x23: /* delta hero irq routine write */
+		case 0x23: // delta hero irq routine write
 		{
 			int delay = (data == 0) ? 0x100 : data;
 			delay *= (BIT(m_reg[BANK], 4)) ? 0x4000 : 0x100;
@@ -175,7 +300,7 @@ void svision_state::svision_w(offs_t offset, uint8_t data)
 			break;
 
 		default:
-			logerror("%.6f svision write %04x %02x\n", machine().time().as_double(), offset, data);
+			LOGREGS("%.6f svision write %04x %02x\n", machine().time().as_double(), offset, data);
 			break;
 	}
 }
@@ -187,12 +312,12 @@ uint8_t svision_state::tvlink_r(offs_t offset)
 		default:
 			if (offset >= 0x800 && offset < 0x840)
 			{
-				/* strange effects when modifying palette */
-				return svision_r(offset);
+				// strange effects when modifying palette
+				return regs_r(offset);
 			}
 			else
 			{
-				return svision_r(offset);
+				return regs_r(offset);
 			}
 	}
 }
@@ -206,44 +331,44 @@ void svision_state::tvlink_w(offs_t offset, uint8_t data)
 			m_tvlink.palette_on = data & 1;
 			if (m_tvlink.palette_on)
 			{
-				// hack, normally initialising with palette from ram
-				m_tvlink.palette[0] = MAKE12_RGB32(163/16,172/16,115/16); // these are the tron colors messured from screenshot
-				m_tvlink.palette[1] = MAKE12_RGB32(163/16,155/16,153/16);
-				m_tvlink.palette[2] = MAKE12_RGB32(77/16,125/16,73/16);
-				m_tvlink.palette[3] = MAKE12_RGB32(59/16,24/16,20/16);
+				// hack, normally initialising with palette from RAM
+				m_tvlink.palette[0] = make12_rgb32(163 / 16, 172 / 16, 115 / 16); // these are the tron colors measured from screenshot
+				m_tvlink.palette[1] = make12_rgb32(163 / 16, 155 / 16, 153 / 16);
+				m_tvlink.palette[2] = make12_rgb32(77 / 16, 125 / 16, 73 / 16);
+				m_tvlink.palette[3] = make12_rgb32(59 / 16, 24 / 16, 20 / 16);
 			}
 			else
 			{
 				// cleaner to use colors from compile time palette, or compose from "fixed" palette values
-				m_tvlink.palette[0]=MAKE12_RGB32(0,0,0);
-				m_tvlink.palette[1]=MAKE12_RGB32(5*16/256,18*16/256,9*16/256);
-				m_tvlink.palette[2]=MAKE12_RGB32(48*16/256,76*16/256,100*16/256);
-				m_tvlink.palette[3]=MAKE12_RGB32(190*16/256,190*16/256,190*16/256);
+				m_tvlink.palette[0] = make12_rgb32(0, 0, 0);
+				m_tvlink.palette[1] = make12_rgb32(5 * 16 / 256, 18 * 16 / 256, 9 * 16 / 256);
+				m_tvlink.palette[2] = make12_rgb32(48 * 16 / 256, 76 * 16 / 256, 100 * 16 / 256);
+				m_tvlink.palette[3] = make12_rgb32(190 * 16 / 256, 190 * 16 / 256, 190 * 16 / 256);
 			}
 			break;
 		default:
-			svision_w(offset,data);
+			regs_w(offset, data);
 			if (offset >= 0x800 && offset < 0x840)
 			{
 				if (offset == 0x803 && data == 0x07)
 				{
-					/* tron hack */
+					// tron hack
 					m_reg[0x0804] = 0x00;
 					m_reg[0x0805] = 0x01;
 					m_reg[0x0806] = 0x00;
 					m_reg[0x0807] = 0x00;
 				}
 				uint16_t c = m_reg[0x800] | (m_reg[0x804] << 8);
-				m_tvlink.palette[0] = MAKE9_RGB32( (c>>0)&7, (c>>3)&7, (c>>6)&7);
+				m_tvlink.palette[0] = make9_rgb32((c >> 0) & 7, (c >> 3) & 7, (c >> 6) & 7);
 				c = m_reg[0x801] | (m_reg[0x805] << 8);
-				m_tvlink.palette[1] = MAKE9_RGB32( (c>>0)&7, (c>>3)&7, (c>>6)&7);
+				m_tvlink.palette[1] = make9_rgb32((c >> 0) & 7, (c >> 3) & 7, (c >> 6) & 7);
 				c = m_reg[0x802] | (m_reg[0x806]<<8);
-				m_tvlink.palette[2]=MAKE9_RGB32( (c>>0)&7, (c>>3)&7, (c>>6)&7);
+				m_tvlink.palette[2] = make9_rgb32((c >> 0) & 7, (c >> 3) & 7, (c >> 6) & 7);
 				c = m_reg[0x803] | (m_reg[0x807]<<8);
-				m_tvlink.palette[3]=MAKE9_RGB32( (c>>0)&7, (c>>3)&7, (c>>6)&7);
-				/* writes to palette effect video color immediately */
-				/* some writes modify other registers, */
-				/* encoding therefor not known (rgb8 or rgb9) */
+				m_tvlink.palette[3] = make9_rgb32((c >> 0) & 7, (c >> 3) & 7, (c >> 6) & 7);
+				/* writes to palette effect video color immediately
+				   some writes modify other registers,
+				   encoding therefor not known (rgb8 or rgb9) */
 			}
 	}
 }
@@ -251,11 +376,11 @@ void svision_state::tvlink_w(offs_t offset, uint8_t data)
 void svision_state::svision_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2000, 0x3fff).rw(FUNC(svision_state::svision_r), FUNC(svision_state::svision_w)).share(m_reg);
+	map(0x2000, 0x3fff).rw(FUNC(svision_state::regs_r), FUNC(svision_state::regs_w)).share(m_reg);
 	map(0x4000, 0x5fff).ram().share(m_videoram);
 	map(0x6000, 0x7fff).noprw();
-	map(0x8000, 0xbfff).bankr(m_bank1);
-	map(0xc000, 0xffff).bankr(m_bank2);
+	map(0x8000, 0xbfff).bankr(m_bank[0]);
+	map(0xc000, 0xffff).bankr(m_bank[1]);
 }
 
 void svision_state::tvlink_mem(address_map &map)
@@ -264,8 +389,8 @@ void svision_state::tvlink_mem(address_map &map)
 	map(0x2000, 0x3fff).rw(FUNC(svision_state::tvlink_r), FUNC(svision_state::tvlink_w)).share(m_reg);
 	map(0x4000, 0x5fff).ram().share(m_videoram);
 	map(0x6000, 0x7fff).noprw();
-	map(0x8000, 0xbfff).bankr(m_bank1);
-	map(0xc000, 0xffff).bankr(m_bank2);
+	map(0x8000, 0xbfff).bankr(m_bank[0]);
+	map(0xc000, 0xffff).bankr(m_bank[1]);
 }
 
 static INPUT_PORTS_START( svision )
@@ -301,7 +426,7 @@ static INPUT_PORTS_START( svisions )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START) PORT_NAME("2nd Start/Pause") PORT_PLAYER(2)
 INPUT_PORTS_END
 
-// most games contain their graphics in roms, and have hardware to draw complete rectangular objects
+// most games contain their graphics in ROMs, and have hardware to draw complete rectangular objects
 
 // palette in red, green, blue triples
 static constexpr rgb_t svision_pens[] =
@@ -313,7 +438,7 @@ static constexpr rgb_t svision_pens[] =
 	{ 74, 107, 101 },
 	{ 54,  78,  85 }
 #else
-	// grabbed from chris covell's black white pics
+	// grabbed from Chris Covell's black & white pics
 	{ 0xe0, 0xe0, 0xe0 },
 	{ 0xb9, 0xb9, 0xb9 },
 	{ 0x54, 0x54, 0x54 },
@@ -363,9 +488,9 @@ uint32_t svision_state::screen_update_svision(screen_device &screen, bitmap_ind1
 			const int start_x = 3 - (m_reg[XPOS] & 3);
 			const int end_x = std::min(163, m_reg[XSIZE] | 3);
 			uint16_t *line = &bitmap.pix(y, start_x);
-			for (int x = start_x, i = 0; x < end_x; x+=4, i++)
+			for (int x = start_x, i = 0; x < end_x; x += 4, i++)
 			{
-				uint8_t b = m_videoram[j+i];
+				uint8_t b = m_videoram[j + i];
 				for (int pix = 0; pix < 4; pix++)
 				{
 					*line = b & 3;
@@ -467,10 +592,23 @@ void svision_state::machine_start()
 
 	if (m_cart_rom)
 	{
-		int num_banks = m_cart_rom->bytes() / 0x4000;
-		m_bank1->set_base(m_cart_rom->base());
-		m_bank2->set_base(m_cart_rom->base() + (num_banks - 1) * 0x4000); // bank2 is set to the last bank
+		const int num_banks = m_cart_rom->bytes() / 0x4000;
+		m_bank[0]->configure_entries(0, num_banks, m_cart_rom->base(), 0x4000);
+		m_bank[1]->set_base(m_cart_rom->base() + (num_banks - 1) * 0x4000); // bank2 is set to the last bank
 	}
+
+	save_item(STRUCT_MEMBER(m_svision, timer_shot));
+
+	save_item(STRUCT_MEMBER(m_pet, state));
+	save_item(STRUCT_MEMBER(m_pet, on));
+	save_item(STRUCT_MEMBER(m_pet, clock));
+	save_item(STRUCT_MEMBER(m_pet, data));
+	save_item(STRUCT_MEMBER(m_pet, input));
+
+	save_item(STRUCT_MEMBER(m_tvlink, palette));
+	save_item(STRUCT_MEMBER(m_tvlink, palette_on));
+
+	save_item(NAME(m_dma_finished));
 }
 
 void svision_state::machine_reset()
@@ -488,10 +626,10 @@ MACHINE_RESET_MEMBER(svision_state,tvlink)
 	memset(m_reg + 0x800, 0xff, 0x40); // normally done from m_tvlink microcontroller
 	m_reg[0x82a] = 0xdf;
 
-	m_tvlink.palette[0] = MAKE24_RGB32(svisionp_pens[0].r(), svisionp_pens[0].g(), svisionp_pens[0].b());
-	m_tvlink.palette[1] = MAKE24_RGB32(svisionp_pens[1].r(), svisionp_pens[1].g(), svisionp_pens[1].b());
-	m_tvlink.palette[2] = MAKE24_RGB32(svisionp_pens[2].r(), svisionp_pens[2].g(), svisionp_pens[2].b());
-	m_tvlink.palette[3] = MAKE24_RGB32(svisionp_pens[3].r(), svisionp_pens[3].g(), svisionp_pens[3].b());
+	m_tvlink.palette[0] = make24_rgb32(svisionp_pens[0].r(), svisionp_pens[0].g(), svisionp_pens[0].b());
+	m_tvlink.palette[1] = make24_rgb32(svisionp_pens[1].r(), svisionp_pens[1].g(), svisionp_pens[1].b());
+	m_tvlink.palette[2] = make24_rgb32(svisionp_pens[2].r(), svisionp_pens[2].g(), svisionp_pens[2].b());
+	m_tvlink.palette[3] = make24_rgb32(svisionp_pens[3].r(), svisionp_pens[3].g(), svisionp_pens[3].b());
 }
 
 void svision_state::svision_base(machine_config &config)
@@ -500,7 +638,7 @@ void svision_state::svision_base(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	SVISION_SND(config, m_sound, 4000000, m_maincpu, m_bank1);
+	SVISION_SND(config, m_sound, 4'000'000, m_maincpu, m_bank[0]);
 	m_sound->add_route(0, "lspeaker", 0.50);
 	m_sound->add_route(1, "rspeaker", 0.50);
 	m_sound->irq_cb().set(FUNC(svision_state::sound_irq_w));
@@ -516,7 +654,7 @@ void svision_state::svision(machine_config &config)
 {
 	svision_base(config);
 
-	M65C02(config, m_maincpu, 4000000);
+	M65C02(config, m_maincpu, 4'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &svision_state::svision_mem);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
@@ -540,7 +678,7 @@ void svision_state::svisionp(machine_config &config)
 {
 	svision(config);
 
-	m_maincpu->set_clock(4430000);
+	m_maincpu->set_clock(4'430'000);
 	m_screen->set_refresh(HZ_TO_ATTOSECONDS(50));
 	m_palette->set_init(FUNC(svision_state::svisionp_palette));
 }
@@ -548,7 +686,7 @@ void svision_state::svisionp(machine_config &config)
 void svision_state::svisionn(machine_config &config)
 {
 	svision(config);
-	m_maincpu->set_clock(3560000/*?*/);
+	m_maincpu->set_clock(3'560'000); // ?
 	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
 	m_palette->set_init(FUNC(svision_state::svisionn_palette));
 }
@@ -568,6 +706,16 @@ ROM_START(svision)
 	ROM_REGION(0x80000, "maincpu", ROMREGION_ERASE00)
 ROM_END
 
+ROM_START(tvlinkp)
+	ROM_REGION(0x80000, "maincpu", ROMREGION_ERASE00)
+
+	ROM_REGION(0x10000, "bezel", 0 )
+	ROM_LOAD( "9307md_512d.glob", 0x00000, 0x10000, CRC(bc8b981b) SHA1(3328da4fd9462286e8cefe4372ffd17c8f5a229e) )
+ROM_END
+
+} // anonymous namespace
+
+
 /***************************************************************************
 
   Game driver(s)
@@ -577,16 +725,15 @@ ROM_END
 #define rom_svisions rom_svision
 #define rom_svisionn rom_svision
 #define rom_svisionp rom_svision
-#define rom_tvlinkp  rom_svision
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     STATE          INIT           COMPANY   FULLNAME                                       FLAGS
 // marketed under a ton of firms and names
-CONS(1992,  svision,  0,       0,      svision,  svision,  svision_state, init_svision,  "Watara", "Super Vision",                                0 )
+CONS(1992,  svision,  0,       0,      svision,  svision,  svision_state, init_svision,  "Watara", "Super Vision",                                MACHINE_SUPPORTS_SAVE )
 // svdual 2 connected via communication port
-CONS( 1992, svisions, svision, 0,      svisions, svisions, svision_state, init_svisions, "Watara", "Super Vision (PeT Communication Simulation)", 0 )
+CONS( 1992, svisions, svision, 0,      svisions, svisions, svision_state, init_svisions, "Watara", "Super Vision (PeT Communication Simulation)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1993, svisionp, svision, 0,      svisionp, svision,  svision_state, init_svision,  "Watara", "Super Vision (PAL TV Link Colored)",          0 )
-CONS( 1993, svisionn, svision, 0,      svisionn, svision,  svision_state, init_svision,  "Watara", "Super Vision (NTSC TV Link Colored)",         0 )
+CONS( 1993, svisionp, svision, 0,      svisionp, svision,  svision_state, init_svision,  "Watara", "Super Vision (PAL TV Link Colored)",          MACHINE_SUPPORTS_SAVE )
+CONS( 1993, svisionn, svision, 0,      svisionn, svision,  svision_state, init_svision,  "Watara", "Super Vision (NTSC TV Link Colored)",         MACHINE_SUPPORTS_SAVE )
 // svtvlink (2 supervisions)
 // tvlink (pad supervision simulated)
-CONS( 199?, tvlinkp,  svision, 0,      tvlinkp,  svision,  svision_state, init_svision,  "Watara", "TV Link PAL",                                 0 )
+CONS( 199?, tvlinkp,  svision, 0,      tvlinkp,  svision,  svision_state, init_svision,  "Watara", "TV Link PAL",                                 MACHINE_SUPPORTS_SAVE )

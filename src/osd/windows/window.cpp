@@ -212,6 +212,8 @@ win_window_info::win_window_info(
 	, m_lastclickx(0)
 	, m_lastclicky(0)
 	, m_last_surrogate(0)
+	, m_dc(nullptr)
+	, m_resize_state(RESIZE_STATE_NORMAL)
 	, m_main(nullptr)
 	, m_attached_mode(false)
 {
