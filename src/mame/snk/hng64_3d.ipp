@@ -333,7 +333,7 @@ void hng64_state::recoverStandardVerts(polygon& currentPoly, int m, uint16_t* ch
 	currentPoly.vert[m].worldCoords[3] = 1.0f;
 	currentPoly.n = 3;
 
-	uint16_t unused = chunkOffset_verts[counter++]; (void)unused; // chunkOffset_verts[ xxxx+3 ] is set to 0x70 on some 'blended' objects (fatfurwa translucent globe, buriki shadows, but not on fatfurwa shadows)
+	[[maybe_unused]] uint16_t unused = chunkOffset_verts[counter++]; // chunkOffset_verts[ xxxx+3 ] is set to 0x70 on some 'blended' objects (fatfurwa translucent globe, buriki shadows, but not on fatfurwa shadows)
 
 	currentPoly.vert[m].texCoords[0] = uToF(chunkOffset_verts[counter]);
 	if (currentPoly.flatShade)
@@ -712,11 +712,10 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				currentPoly.faceNormal[3] = lastPoly.faceNormal[3];
 
 				// TODO: I'm not reading 3 necessary words here (maybe face normal)
-				uint16_t unused;
+				[[maybe_unused]] uint16_t unused;
 				unused = chunkOffset[counter++];
 				unused = chunkOffset[counter++];
 				unused = chunkOffset[counter++];
-				(void)unused;
 
 				chunkLength = counter;
 				break;
