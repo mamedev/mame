@@ -2344,7 +2344,7 @@ void pnchmn_state::init_pnchmn()
 
 void ksys573_state::gunmania_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	char s[ 1024 ] = "";
+	std::string message;
 
 	switch( offset )
 	{
@@ -2356,41 +2356,40 @@ void ksys573_state::gunmania_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		switch( data & 0xa0 )
 		{
 		case 0x20:
-			strcat( s, "cable holder motor release " );
-
+			message += "cable holder motor release ";
 			m_cable_holder_release = 1;
 			break;
 
 		case 0x80:
-			strcat( s, "cable holder motor catch " );
+			message += "cable holder motor catch ";
 
 			m_cable_holder_release = 0;
 			break;
 
 		case 0xa0:
-			strcat( s, "cable holder motor stop " );
+			message += "cable holder motor stop ";
 			break;
 		}
 
 		switch( data & 0x50 )
 		{
 		case 0x10:
-			strcat( s, "bullet supply motor rotate " );
+			message += "bullet supply motor rotate ";
 			break;
 
 		case 0x40:
-			strcat( s, "bullet supply motor reverse " );
+			message += "bullet supply motor reverse ";
 			break;
 
 		case 0x50:
-			strcat( s, "bullet shutter motor unknown " );
+			message += "bullet shutter motor unknown ";
 			break;
 		}
 
 		switch( data & 0x0a )
 		{
 		case 0x02:
-			strcat( s, "tank shutter motor close " );
+			message += "tank shutter motor close ";
 
 			if( m_tank_shutter_position > 0 )
 			{
@@ -2400,7 +2399,7 @@ void ksys573_state::gunmania_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			break;
 
 		case 0x08:
-			strcat( s, "tank shutter motor open " );
+			message += "tank shutter motor open ";
 
 			if( m_tank_shutter_position < 100 )
 			{
@@ -2410,20 +2409,18 @@ void ksys573_state::gunmania_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			break;
 
 		case 0x0a:
-			strcat( s, "tank shutter motor unknown " );
+			message += "tank shutter motor unknown ";
 			break;
 		}
 
 		if( ( data & ~0xfa ) != 0 )
 		{
-			char unknown[ 128 ];
-			sprintf( unknown, "unknown bits %08x", data & ~0xfa );
-			strcat( s, unknown );
+			message += util::string_format("unknown bits %08x", data & ~0xfa);
 		}
 
-		if( s[ 0 ] != 0 )
+		if( !message.empty() )
 		{
-//          popmessage( "%s", s );
+          LOG( message );
 		}
 
 		break;

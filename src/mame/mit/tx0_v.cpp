@@ -232,9 +232,6 @@ void tx0_state::tx0_draw_hline(bitmap_ind16 &bitmap, int x, int y, int width, in
 */
 void tx0_state::tx0_draw_panel_backdrop(bitmap_ind16 &bitmap)
 {
-	int i;
-	char buf[3];
-
 	/* fill with black */
 	const rectangle panel_bitmap_bounds(0, panel_window_width-1,    0, panel_window_height-1);
 	m_panel_bitmap.fill(pen_panel_bg, panel_bitmap_bounds);
@@ -251,10 +248,10 @@ void tx0_state::tx0_draw_panel_backdrop(bitmap_ind16 &bitmap)
 	tx0_draw_string(bitmap, "cm", x_panel_col1a_offset+8, y_panel_tss_offset, color_panel_caption);
 	tx0_draw_string(bitmap, "TSS", x_panel_col1a_offset+24, y_panel_tss_offset, color_panel_caption);
 	tx0_draw_string(bitmap, "lr", x_panel_col1a_offset+168, y_panel_tss_offset, color_panel_caption);
-	for (i=0; i<16; i++)
+	for (int i=0; i<16; i++)
 	{
-		sprintf(buf, "%2o", i);
-		tx0_draw_string(bitmap, buf, x_panel_col1a_offset, y_panel_tss_offset+8+i*8, color_panel_caption);
+		auto buf = util::string_format("%2o", i);
+		tx0_draw_string(bitmap, buf.c_str(), x_panel_col1a_offset, y_panel_tss_offset+8+i*8, color_panel_caption);
 	}
 
 	/* column separator */

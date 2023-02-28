@@ -1807,12 +1807,10 @@ void namcos23_state::c435_state_set_projection_matrix_line(const uint16_t *param
 	//   line 2: 0 1 -(sy-b)/(sx/t) 0  0 -1 -(sy+b)/(sx/t) 0
 	//   line 3: 0 0 -1             c  0  0              0 sx/t
 
-	char buf[4096];
-	char *p = buf;
-	p += sprintf(p, "projection matrix line:");
+	std::string buf = "projection matrix line:";
 	for(int i=0; i<8; i++)
-		p += sprintf(p, " %f", f24_to_f32((param[2*i+1] << 16) | param[2*i+2]));
-	p += sprintf(p, "\n");
+		buf += util::string_format(" %f", f24_to_f32((param[2*i+1] << 16) | param[2*i+2]));
+	buf += "\n";
 	logerror(buf);
 }
 
@@ -1822,12 +1820,10 @@ void namcos23_state::c435_state_set(uint16_t type, const uint16_t *param)
 	case 0x0001: c435_state_set_interrupt(param); break;
 	case 0x00c8: c435_state_set_projection_matrix_line(param); break;
 	default: {
-		char buf[4096];
-		char *p = buf;
-		p += sprintf(buf, "WARNING: Unhandled state type %04x :", type);
+		auto buf = util::string_format("WARNING: Unhandled state type %04x :", type);
 		for(int i=0; i<c435_get_state_entry_size(type); i++)
-			p += sprintf(p, " %04x", param[i]);
-		p += sprintf(p, "\n");
+			buf += util::string_format(" %04x", param[i]);
+		buf += "\n";
 		logerror(buf);
 		break;
 	}
@@ -2069,12 +2065,10 @@ void namcos23_state::c435_pio_w(uint16_t data)
 	}
 
 	if(!known) {
-		char buf[4096];
-		char *p = buf;
-		p += sprintf(p, "c435 -");
+		std::string buf = "c435 -";
 		for(int i=0; i<m_c435_buffer_pos; i++)
-			p += sprintf(p, " %04x", m_c435_buffer[i]);
-		p += sprintf(p, "\n");
+			buf += util::string_format(" %04x", m_c435_buffer[i]);
+		buf += "\n";
 		logerror(buf);
 	}
 

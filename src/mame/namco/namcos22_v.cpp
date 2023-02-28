@@ -1494,9 +1494,7 @@ void namcos22_state::simulate_slavedsp()
 				int i = 0;
 				for (; i < len && i < 0x20; i++)
 				{
-					char h[8];
-					sprintf(h, " %06x", src[i] & 0xffffff);
-					polydata += h;
+					polydata += util::string_format(" %06x", src[i] & 0xffffff);
 				}
 				if (i < len)
 					polydata += " (...)";

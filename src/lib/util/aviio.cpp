@@ -11,6 +11,7 @@
 #include "aviio.h"
 #include "osdcomm.h"
 #include "osdfile.h"
+#include "strformat.h"
 
 #include <array>
 #include <cassert>
@@ -712,22 +713,23 @@ inline void put_64bits(std::uint8_t *data, std::uint64_t value)
 
 
 /**
- * @fn  static void u64toa(std::uint64_t val, char *output)
+ * @fn  static std::string u64toa(std::uint64_t val)
  *
  * @brief   64toas.
  *
  * @param   val             The value.
- * @param [in,out]  output  If non-null, the output.
- */
+  *
+ * @return  string representation of val.
+*/
 
-inline void u64toa(std::uint64_t val, char *output)
+inline std::string u64toa(std::uint64_t val)
 {
 	auto lo = std::uint32_t(val & 0xffffffff);
 	auto hi = std::uint32_t(val >> 32);
 	if (hi != 0)
-		sprintf(output, "%X%08X", hi, lo);
+		return util::string_format("%X%08X", hi, lo);
 	else
-		sprintf(output, "%X", lo);
+		return util::string_format("%X", lo);
 }
 
 
@@ -3577,7 +3579,6 @@ avi_file::error avi_file_impl::soundbuf_flush(bool only_flush_full)
 
 void avi_file_impl::printf_chunk_recursive(avi_chunk const *container, int indent)
 {
-	char size[20], offset[20];
 	avi_chunk curchunk;
 	error avierr;
 
@@ -3587,14 +3588,13 @@ void avi_file_impl::printf_chunk_recursive(avi_chunk const *container, int inden
 		std::uint32_t chunksize = curchunk.size;
 		bool recurse = false;
 
-		u64toa(curchunk.size, size);
-		u64toa(curchunk.offset, offset);
 		printf("%*schunk = %c%c%c%c, size=%s (%s)\n", indent, "",
 				std::uint8_t(curchunk.type >> 0),
 				std::uint8_t(curchunk.type >> 8),
 				std::uint8_t(curchunk.type >> 16),
 				std::uint8_t(curchunk.type >> 24),
-				size, offset);
+				u64toa(curchunk.size).c_str(),
+				u64toa(curchunk.offset).c_str());
 
 		/* certain chunks are just containers; recurse into them */
 		switch (curchunk.type)

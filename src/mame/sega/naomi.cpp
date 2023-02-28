@@ -10648,10 +10648,8 @@ void naomi_state::create_pic_from_retdat()
 			{
 				uint8_t* newregion = rgn_newregion->base();
 
-				FILE *fp;
-				char filename[256];
-				sprintf(filename,"picbin_%s", machine().system().name);
-				fp=fopen(filename, "w+b");
+				auto filename = "picbin_" + std::string{ machine().system().name };
+				auto fp = fopen(filename.c_str(), "w+b");
 				if (fp)
 				{
 					fwrite(newregion, outcount, 1, fp);
