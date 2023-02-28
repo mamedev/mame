@@ -77,6 +77,9 @@ Line ram memory map:
                 Where bit 2 of x enables effect on playfield 3
                 Where bit 3 of x enables effect on playfield 4
 
+    0x1000: Unknown control word?
+        (usually 0x00f0; gseeker, spcinvdj, twinqix, puchicar set 0x0000)
+
     0x4000: Column scroll & clipping info
 
     0x5000: Clip plane 0 (low bits (high in 4400))
@@ -159,7 +162,7 @@ Line ram memory map:
         0x0400 = If set enable clip plane 2
         0x0800 = If set enable clip plane 3
         0x1000 = Affects interpretation of inverse mode bits. If on, 1 = invert. if off, 0 = invert.
-        0xe000 = Blend mode, 0x2000 = Normal, 0x6000 = Alpha A, 0xa000 = Alpha B, others disable line
+        0xe000 = Blend mode, 0x3000 = Normal, 0x7000 = Alpha A, 0xb000 = Alpha B, others disable line
 
     0xc000 - 0xffff: Unused.
 
