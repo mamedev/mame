@@ -45,7 +45,7 @@
 do \
 { \
 	uint32_t srcdata = (SOURCE); \
-	if (xdrawpos <= cliprect.right() && xdrawpos >= cliprect.left() && ypos <= cliprect.bottom() && ypos >= cliprect.top()) \
+	if (xdrawpos <= cliprect.right() && xdrawpos >= cliprect.left()) \
 	{ \
 		if (zval < (DESTZ)) \
 		{ \
@@ -64,7 +64,7 @@ while (0)
 do \
 { \
 	uint32_t srcdata = (SOURCE); \
-	if (xdrawpos <= cliprect.right() && xdrawpos >= cliprect.left() && ypos <= cliprect.bottom() && ypos >= cliprect.top()) \
+	if (xdrawpos <= cliprect.right() && xdrawpos >= cliprect.left()) \
 	{ \
 		if (zval > (DESTZ)) \
 		{ \
@@ -357,11 +357,14 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 				}
 			}
 
-			uint32_t full_srcpix_y2 = realline * dy;
-			int used_ysource_pos = full_srcpix_y2 >> 16;
-			int ytilebbb = used_ysource_pos / 0x10;
-			int use_tile_line = used_ysource_pos & 0xf;
-			draw_sprite_line(screen, cliprect, use_tile_line, ypos, xpos, chainx, dx, dy, ytilebbb, chaini, currentsprite, chainy, xflip, yflip, zval, zsort, blend, checkerboard, mosaic);
+			if (ypos <= cliprect.bottom() && ypos >= cliprect.top())
+			{
+				uint32_t full_srcpix_y2 = realline * dy;
+				int used_ysource_pos = full_srcpix_y2 >> 16;
+				int ytilebbb = used_ysource_pos / 0x10;
+				int use_tile_line = used_ysource_pos & 0xf;
+				draw_sprite_line(screen, cliprect, use_tile_line, ypos, xpos, chainx, dx, dy, ytilebbb, chaini, currentsprite, chainy, xflip, yflip, zval, zsort, blend, checkerboard, mosaic);
+			}
 			ypos++;
 		}
 
