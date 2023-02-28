@@ -455,6 +455,7 @@ private:
 	void setLighting(const uint16_t* packet);
 	void set3dFlags(const uint16_t* packet);
 	void setCameraProjectionMatrix(const uint16_t* packet);
+	void recoverStandardVerts(polygon& currentPoly, int m, uint16_t* chunkOffset_verts, int& counter);
 	void recoverPolygonBlock(const uint16_t* packet, int& numPolys);
 	void printPacket(const uint16_t* packet, int hex);
 	float uToF(uint16_t input);

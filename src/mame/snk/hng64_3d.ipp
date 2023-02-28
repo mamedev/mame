@@ -325,6 +325,23 @@ void hng64_state::setCameraProjectionMatrix(const uint16_t* packet)
 	m_projectionMatrix[15] = 0.0f;
 }
 
+void hng64_state::recoverStandardVerts(polygon& currentPoly, int m, uint16_t* chunkOffset_verts, int& counter)
+{
+	currentPoly.vert[m].worldCoords[0] = uToF(chunkOffset_verts[counter++]);
+	currentPoly.vert[m].worldCoords[1] = uToF(chunkOffset_verts[counter++]);
+	currentPoly.vert[m].worldCoords[2] = uToF(chunkOffset_verts[counter++]);
+	currentPoly.vert[m].worldCoords[3] = 1.0f;
+	currentPoly.n = 3;
+
+	uint16_t unused = chunkOffset_verts[counter++]; (void)unused; // chunkOffset_verts[ xxxx+3 ] is set to 0x70 on some 'blended' objects (fatfurwa translucent globe, buriki shadows, but not on fatfurwa shadows)
+
+	currentPoly.vert[m].texCoords[0] = uToF(chunkOffset_verts[counter]);
+	if (currentPoly.flatShade)
+		currentPoly.colorIndex = chunkOffset_verts[counter] >> 5;
+	counter++;
+	currentPoly.vert[m].texCoords[1] = uToF(chunkOffset_verts[counter++]);
+}
+
 // Operation 0100
 // Polygon rasterization.
 void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
@@ -575,6 +592,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			currentPoly.palOffset += explicitPaletteValue;
 
 			uint8_t chunkLength = 0;
+			int counter = 3;
 			switch(chunkType)
 			{
 			/*/////////////////////////
@@ -595,35 +613,26 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			// 33 word chunk, 3 vertices, per-vertex UVs & normals, per-face normal
 			case 0x05:  // 0000 0101
 			case 0x0f:  // 0000 1111
+			{
 				for (int m = 0; m < 3; m++)
 				{
-					currentPoly.vert[m].worldCoords[0] = uToF(chunkOffset[3 + (9*m)]);
-					currentPoly.vert[m].worldCoords[1] = uToF(chunkOffset[4 + (9*m)]);
-					currentPoly.vert[m].worldCoords[2] = uToF(chunkOffset[5 + (9*m)]);
-					currentPoly.vert[m].worldCoords[3] = 1.0f;
-					currentPoly.n = 3;
+					recoverStandardVerts(currentPoly, m, chunkOffset, counter);
 
-					// chunkOffset[6 + (9*m)] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-					currentPoly.vert[m].texCoords[0] = uToF(chunkOffset[7 + (9*m)]);
-					currentPoly.vert[m].texCoords[1] = uToF(chunkOffset[8 + (9*m)]);
-
-					currentPoly.vert[m].normal[0] = uToF(chunkOffset[9  + (9*m)]);
-					currentPoly.vert[m].normal[1] = uToF(chunkOffset[10 + (9*m)]);
-					currentPoly.vert[m].normal[2] = uToF(chunkOffset[11 + (9*m)]);
+					currentPoly.vert[m].normal[0] = uToF(chunkOffset[counter++]);
+					currentPoly.vert[m].normal[1] = uToF(chunkOffset[counter++]);
+					currentPoly.vert[m].normal[2] = uToF(chunkOffset[counter++]);
 					currentPoly.vert[m].normal[3] = 0.0f;
-
-					if (currentPoly.flatShade)
-						currentPoly.colorIndex = chunkOffset[7] >> 5;
 				}
 
 				// Redundantly called, but it works...
-				currentPoly.faceNormal[0] = uToF(chunkOffset[30]);
-				currentPoly.faceNormal[1] = uToF(chunkOffset[31]);
-				currentPoly.faceNormal[2] = uToF(chunkOffset[32]);
+				currentPoly.faceNormal[0] = uToF(chunkOffset[counter++]);
+				currentPoly.faceNormal[1] = uToF(chunkOffset[counter++]);
+				currentPoly.faceNormal[2] = uToF(chunkOffset[counter++]);
 				currentPoly.faceNormal[3] = 0.0f;
 
-				chunkLength = 33;
+				chunkLength = counter;
 				break;
+			}
 
 
 			// 24 word chunk, 3 vertices, per-vertex UVs
@@ -631,26 +640,16 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			case 0x0e:  // 0000 1110
 			case 0x24:  // 0010 0100
 			case 0x2e:  // 0010 1110
+			{
 				for (int m = 0; m < 3; m++)
 				{
-					currentPoly.vert[m].worldCoords[0] = uToF(chunkOffset[3 + (6*m)]);
-					currentPoly.vert[m].worldCoords[1] = uToF(chunkOffset[4 + (6*m)]);
-					currentPoly.vert[m].worldCoords[2] = uToF(chunkOffset[5 + (6*m)]);
-					currentPoly.vert[m].worldCoords[3] = 1.0f;
-					currentPoly.n = 3;
-
-					// chunkOffset[6 + (6*m)] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-					currentPoly.vert[m].texCoords[0] = uToF(chunkOffset[7 + (6*m)]);
-					currentPoly.vert[m].texCoords[1] = uToF(chunkOffset[8 + (6*m)]);
-
-					if (currentPoly.flatShade)
-						currentPoly.colorIndex = chunkOffset[7] >> 5;
-
-					currentPoly.vert[m].normal[0] = uToF(chunkOffset[21]);
-					currentPoly.vert[m].normal[1] = uToF(chunkOffset[22]);
-					currentPoly.vert[m].normal[2] = uToF(chunkOffset[23]);
-					currentPoly.vert[m].normal[3] = 0.0f;
+					recoverStandardVerts(currentPoly, m, chunkOffset, counter);
 				}
+
+				currentPoly.vert[0].normal[0] = currentPoly.vert[1].normal[0] = currentPoly.vert[2].normal[0] = uToF(chunkOffset[counter++]);
+				currentPoly.vert[0].normal[1] = currentPoly.vert[1].normal[1] = currentPoly.vert[2].normal[1] = uToF(chunkOffset[counter++]);
+				currentPoly.vert[0].normal[2] = currentPoly.vert[1].normal[2] = currentPoly.vert[2].normal[2] = uToF(chunkOffset[counter++]);
+				currentPoly.vert[0].normal[3] = currentPoly.vert[1].normal[3] = currentPoly.vert[2].normal[3] = 0.0f;
 
 				// Redundantly called, but it works...
 				currentPoly.faceNormal[0] = currentPoly.vert[2].normal[0];
@@ -658,46 +657,35 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				currentPoly.faceNormal[2] = currentPoly.vert[2].normal[2];
 				currentPoly.faceNormal[3] = 0.0f;
 
-				chunkLength = 24;
+				chunkLength = counter;
 				break;
-
+			}
 
 			// 15 word chunk, 1 vertex, per-vertex UVs & normals, face normal
 			case 0x87:  // 1000 0111
 			case 0x97:  // 1001 0111
 			case 0xd7:  // 1101 0111
 			case 0xc7:  // 1100 0111
+			{
 				// Copy over the proper vertices from the previous triangle...
 				memcpy(&currentPoly.vert[1], &lastPoly.vert[0], sizeof(polyVert));
 				memcpy(&currentPoly.vert[2], &lastPoly.vert[2], sizeof(polyVert));
 
-				// Fill in the appropriate data...
-				currentPoly.vert[0].worldCoords[0] = uToF(chunkOffset[3]);
-				currentPoly.vert[0].worldCoords[1] = uToF(chunkOffset[4]);
-				currentPoly.vert[0].worldCoords[2] = uToF(chunkOffset[5]);
-				currentPoly.vert[0].worldCoords[3] = 1.0f;
-				currentPoly.n = 3;
+				recoverStandardVerts(currentPoly, 0, chunkOffset, counter);
 
-				// chunkOffset[6] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-				currentPoly.vert[0].texCoords[0] = uToF(chunkOffset[7]);
-				currentPoly.vert[0].texCoords[1] = uToF(chunkOffset[8]);
-
-				if (currentPoly.flatShade)
-					currentPoly.colorIndex = chunkOffset[7] >> 5;
-
-				currentPoly.vert[0].normal[0] = uToF(chunkOffset[9]);
-				currentPoly.vert[0].normal[1] = uToF(chunkOffset[10]);
-				currentPoly.vert[0].normal[2] = uToF(chunkOffset[11]);
+				currentPoly.vert[0].normal[0] = uToF(chunkOffset[counter++]);
+				currentPoly.vert[0].normal[1] = uToF(chunkOffset[counter++]);
+				currentPoly.vert[0].normal[2] = uToF(chunkOffset[counter++]);
 				currentPoly.vert[0].normal[3] = 0.0f;
 
-				currentPoly.faceNormal[0] = uToF(chunkOffset[12]);
-				currentPoly.faceNormal[1] = uToF(chunkOffset[13]);
-				currentPoly.faceNormal[2] = uToF(chunkOffset[14]);
+				currentPoly.faceNormal[0] = uToF(chunkOffset[counter++]);
+				currentPoly.faceNormal[1] = uToF(chunkOffset[counter++]);
+				currentPoly.faceNormal[2] = uToF(chunkOffset[counter++]);
 				currentPoly.faceNormal[3] = 0.0f;
 
-				chunkLength = 15;
+				chunkLength = counter;
 				break;
-
+			}
 
 			// 12 word chunk, 1 vertex, per-vertex UVs
 			case 0x86:  // 1000 0110
@@ -705,22 +693,12 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			case 0xb6:  // 1011 0110
 			case 0xc6:  // 1100 0110
 			case 0xd6:  // 1101 0110
+			{
 				// Copy over the proper vertices from the previous triangle...
 				memcpy(&currentPoly.vert[1], &lastPoly.vert[0], sizeof(polyVert));
 				memcpy(&currentPoly.vert[2], &lastPoly.vert[2], sizeof(polyVert));
 
-				currentPoly.vert[0].worldCoords[0] = uToF(chunkOffset[3]);
-				currentPoly.vert[0].worldCoords[1] = uToF(chunkOffset[4]);
-				currentPoly.vert[0].worldCoords[2] = uToF(chunkOffset[5]);
-				currentPoly.vert[0].worldCoords[3] = 1.0f;
-				currentPoly.n = 3;
-
-				// chunkOffset[6] is almost always 0080, but it's 0070 for the translucent globe in fatfurwa player select
-				currentPoly.vert[0].texCoords[0] = uToF(chunkOffset[7]);
-				currentPoly.vert[0].texCoords[1] = uToF(chunkOffset[8]);
-
-				if (currentPoly.flatShade)
-					currentPoly.colorIndex = chunkOffset[7] >> 5;
+				recoverStandardVerts(currentPoly, 0, chunkOffset, counter);
 
 				// This normal could be right, but I'm not entirely sure - there is no normal in the 18 bytes!
 				currentPoly.vert[0].normal[0] = lastPoly.faceNormal[0];
@@ -734,25 +712,18 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				currentPoly.faceNormal[3] = lastPoly.faceNormal[3];
 
 				// TODO: I'm not reading 3 necessary words here (maybe face normal)
+				uint16_t unused;
+				unused = chunkOffset[counter++];
+				unused = chunkOffset[counter++];
+				unused = chunkOffset[counter++];
+				(void)unused;
 
-#if 0
-				// DEBUG
-				logerror("0x?6 : %08x (%d/%d)\n", address[k]*3*2, l, size[k]-1);
-				for (int m = 0; m < 13; m++)
-					logerror("%04x ", chunkOffset[m]);
-				logerror("\n");
-
-				for (int m = 0; m < 13; m++)
-					logerror("%3.4f ", uToF(chunkOffset[m]));
-				logerror("\n\n");
-#endif
-
-				chunkLength = 12;
+				chunkLength = counter;
 				break;
-
+			}
 			default:
 				logerror("UNKNOWN geometry CHUNK TYPE : %02x\n", chunkType);
-				chunkLength = 0;
+				chunkLength = counter;
 				break;
 			}
 
