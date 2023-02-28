@@ -336,6 +336,7 @@ void hng64_state::recoverStandardVerts(polygon& currentPoly, int m, uint16_t* ch
 	// chunkOffset_verts[ xxxx+3 ] is set to 0x70 on some 'blended' objects (fatfurwa translucent globe, buriki shadows, but not on fatfurwa shadows)
 	// this might be the alpha level, rather than the enable, although that would mean more bits in the framebuffer (it could be the zbuffer isn't
 	// CPU visible, or at least not checked?)  3D can't blend against other 3D, it just cuts.
+	// this gets enabled on one side of the pirate ship stage in sams64, why would it be set there?
 	uint16_t maybe_blend = chunkOffset_verts[counter++];
 	if (maybe_blend != 0x80)
 		currentPoly.blend = true;
