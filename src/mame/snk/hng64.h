@@ -137,6 +137,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_palette_3d(*this, "palette3d"),
 		m_paletteram(*this, "paletteram"),
 		m_vblank(*this, "VBLANK"),
 		m_maincpu(*this, "maincpu"),
@@ -184,6 +185,7 @@ public:
 	uint8_t *m_texturerom = nullptr;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<palette_device> m_palette_3d;
 	required_shared_ptr<u32> m_paletteram;
 	required_ioport m_vblank;
 
@@ -342,6 +344,7 @@ private:
 	void dl_unk_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t dl_vreg_r();
 
+	void set_single_palette_entry(int entry, uint8_t r, uint8_t g, uint8_t b);
 	void update_palette_entry(int entry);
 	void pal_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	void tcram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

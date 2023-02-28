@@ -801,8 +801,6 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 		}
 	}
 
-	pen_t const *const clut = &m_palette->pen(0);
-
 	/*
 	   Each framebuffer has enough RAM for 24 bits of data for a 512x256
 	   layer (screen is interlaced, so it doesn't really have 448 pixels
@@ -815,6 +813,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	*/
 
 	// 3d gets drawn next
+	pen_t const *const clut_3d = &m_palette_3d->pen(0);
 	if (!(m_fbcontrol[0] & 0x01))
 	{
 		// Blit the color buffer into the primary bitmap
@@ -828,24 +827,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 				uint16_t srcpix = *src;
 				if (srcpix & 0x0fff)
 				{
-					rgb_t col = clut[srcpix & 0x0fff];
-					uint8_t intensity = (srcpix & 0xf000) >> 10;
-					uint16_t r = col.r();
-					uint16_t g = col.g();
-					uint16_t b = col.b();
-
-					r = r + intensity;
-					g = g + intensity;
-					b = b + intensity;
-
-					if (r > 255)
-						r = 255;
-					if (g > 255)
-						g = 255;
-					if (b > 255)
-						b = 255;
-
-					*dst = rgb_t(r, g, b);
+					*dst = clut_3d[srcpix];
 				}
 
 				dst++;
@@ -870,7 +852,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	// would be an odd place for it, after the 'vblank' flag but...
 	uint8_t spriteblendtype = (m_tcram[0x4c / 4] >> 16) & 0x01;
 
-
+	pen_t const *const clut = &m_palette->pen(0);
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		const uint16_t *src = &m_sprite_bitmap.pix(y, cliprect.min_x);
@@ -1060,6 +1042,33 @@ WRITE_LINE_MEMBER(hng64_state::screen_vblank_hng64)
  *  Or maybe they set transition type (there seems to be a cute scaling-squares transition in there somewhere)...
  */
 
+inline void hng64_state::set_single_palette_entry(int entry, uint8_t r, uint8_t g, uint8_t b)
+{
+	m_palette->set_pen_color(entry, r, g, b);
+
+	// our code assumes the 'lighting' values from the 3D framebuffer can be 4-bit precision
+	// based on 'banding' seen in buriki reference videos.  precalculate those here to avoid
+	// having to do it in the video update function
+	//
+	// note, it is unlikely intensity is meant to be added, probably instead it should
+	// be multipled, reducing overall brightness, not increasing beyond max?
+	for (int intensity = 0; intensity < 0x10; intensity++)
+	{
+		uint16_t newr = r + (intensity << 2);
+		uint16_t newg = g + (intensity << 2);
+		uint16_t newb = b + (intensity << 2);
+
+		if (newr > 255)
+			newr = 255;
+		if (newg > 255)
+			newg = 255;
+		if (newb > 255)
+			newb = 255;
+
+		m_palette_3d->set_pen_color((intensity * 0x1000) + entry, newr, newg, newb);
+	}
+}
+
 void hng64_state::update_palette_entry(int entry)
 {
 	uint32_t data = m_paletteram[entry];
@@ -1118,7 +1127,7 @@ void hng64_state::update_palette_entry(int entry)
 		}
 	}
 
-	m_palette->set_pen_color(entry, r,g,b);
+	set_single_palette_entry(entry, r, g, b);
 }
 
 void hng64_state::pal_w(offs_t offset, uint32_t data, uint32_t mem_mask)
