@@ -813,6 +813,13 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	*/
 
 	// 3d gets drawn next
+	uint16_t palbase = 0x000;
+    if (m_fbcontrol[2] & 0x20)
+    {
+        if (!m_roadedge_3d_hack)
+            palbase = 0x800;
+    }
+
 	pen_t const *const clut_3d = &m_palette_3d->pen(0);
 	if (!(m_fbcontrol[0] & 0x01))
 	{
@@ -825,9 +832,16 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
 				uint16_t srcpix = *src;
-				if (srcpix & 0x0fff)
+				if (srcpix & 0x07ff)
 				{
-					*dst = clut_3d[srcpix];
+					if (srcpix & 0x0800)
+					{
+						*dst = alpha_blend_r32(*(uint32_t*)dst, clut_3d[(srcpix & 0x7ff) | palbase], 0x80);
+					}
+					else
+					{
+						*dst = clut_3d[(srcpix & 0x7ff) | palbase];
+					}
 				}
 
 				dst++;

@@ -333,7 +333,12 @@ void hng64_state::recoverStandardVerts(polygon& currentPoly, int m, uint16_t* ch
 	currentPoly.vert[m].worldCoords[3] = 1.0f;
 	currentPoly.n = 3;
 
-	[[maybe_unused]] uint16_t unused = chunkOffset_verts[counter++]; // chunkOffset_verts[ xxxx+3 ] is set to 0x70 on some 'blended' objects (fatfurwa translucent globe, buriki shadows, but not on fatfurwa shadows)
+	// chunkOffset_verts[ xxxx+3 ] is set to 0x70 on some 'blended' objects (fatfurwa translucent globe, buriki shadows, but not on fatfurwa shadows)
+	// this might be the alpha level, rather than the enable, although that would mean more bits in the framebuffer (it could be the zbuffer isn't
+	// CPU visible, or at least not checked?)  3D can't blend against other 3D, it just cuts.
+	uint16_t maybe_blend = chunkOffset_verts[counter++];
+	if (maybe_blend != 0x80)
+		currentPoly.blend = true;
 
 	currentPoly.vert[m].texCoords[0] = uToF(chunkOffset_verts[counter]);
 	if (currentPoly.flatShade)
@@ -477,10 +482,13 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 
 	size[2]    = threeDPointer[9];
 	size[3]    = threeDPointer[10];
-	//           ????         [11]; Used.
-	//           ????         [12]; Used.
-	//           ????         [13]; Used.
-	//           ????         [14]; Used.
+	
+	// the low 8-bits of each of these is used (or at least contains data, probably one byte for each hunk?)
+	//if (threeDPointer[11] != 0x0000) logerror("3dPointer[11] is %04x!\n", threeDPointer[11]); //           ????         [11]; Used.
+	//if (threeDPointer[12] != 0x0000) logerror("3dPointer[12] is %04x!\n", threeDPointer[12]); //           ????         [12]; Used.
+	//if (threeDPointer[13] != 0x0000) logerror("3dPointer[13] is %04x!\n", threeDPointer[13]); //           ????         [13]; Used.
+	//if (threeDPointer[14] != 0x0000) logerror("3dPointer[14] is %04x!\n", threeDPointer[14]); //           ????         [14]; Used.
+
 
 	if (threeDPointer[15] != 0x0000) logerror("3dPointer[15] is non-zero!\n");
 	if (threeDPointer[16] != 0x0000) logerror("3dPointer[16] is non-zero!\n");
@@ -556,17 +564,15 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			else
 				currentPoly.flatShade = true;
 
+			currentPoly.blend = false;
+
 			// PALETTE
 			currentPoly.palOffset = 0;
 
 			// FIXME: This isn't correct.
 			//        Buriki & Xrally need this line.  Roads Edge needs it removed.
 			//        So instead we're looking for a bit that is on for XRally & Buriki, but noone else.
-			if (m_fbcontrol[2] & 0x20)
-			{
-				if (!m_roadedge_3d_hack)
-					currentPoly.palOffset += 0x800;
-			}
+
 
 			//uint16_t explicitPaletteValue0 = ((chunkOffset[?] & 0x????) >> ?) * 0x800;
 			uint16_t explicitPaletteValue = ((chunkOffset[1] & 0x0ff0) >> 4);
@@ -1246,7 +1252,10 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 				{
 					float rIntensity = rCorrect / 16.0f;
 					uint8_t lightval = (uint8_t)rIntensity;
-					uint16_t color = ((renderData.palOffset + paletteEntry) & 0xfff) | (lightval << 12);
+					uint16_t color = ((renderData.palOffset + paletteEntry) & 0x7ff) | (lightval << 12);
+					if (renderData.blend)
+						color |= 0x800;
+
 					*colorBuffer = color;
 					*depthBuffer = z;
 				}
@@ -1301,6 +1310,7 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 	rOptions.texPageHorizOffset = p->texPageHorizOffset;
 	rOptions.texPageVertOffset = p->texPageVertOffset;
 	rOptions.colorIndex = p->colorIndex;
+	rOptions.blend = p->blend;
 
 	// Pass the render data into the rasterizer
 	hng64_poly_data& renderData = object_data().next();

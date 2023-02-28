@@ -44,6 +44,7 @@ struct polygon
 	float faceNormal[4]{};        // Normal of the face overall - for calculating visibility and flat-shading...
 	bool visible = false;                // Polygon visibility in scene
 	bool flatShade = false;              // Flat shaded polygon, no texture, no lighting
+	bool blend = false;
 
 	uint8_t texIndex = 0;             // Which texture to draw from (0x00-0x0f)
 	uint8_t tex4bpp = 0;              // How to index into the texture
@@ -86,6 +87,7 @@ struct hng64_poly_data
 	uint8_t texPageVertOffset = 0;
 	uint32_t palOffset = 0;
 	uint16_t colorIndex = 0;
+	bool blend = false;
 };
 
 class hng64_state;
