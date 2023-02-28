@@ -65,7 +65,7 @@ Line ram memory map:
                 Where bit 1 of x enables effect on playfield 2
                 Where bit 2 of x enables effect on playfield 3
                 Where bit 3 of x enables effect on playfield 4
-    0x0a00: Assumed unused.
+    0x0a00: Palette add line control ram (256 lines)
     0x0c00: Rowscroll line control ram (256 lines)
         280x:   Where bit 0 of x enables effect on playfield 1
                 Where bit 1 of x enables effect on playfield 2
@@ -139,7 +139,7 @@ Line ram memory map:
         Playfield 2 & 4 registers seem to be interleaved, playfield 2 Y zoom is stored where you would
         expect playfield 4 y zoom to be and vice versa.
 
-    0x9000: Palette add (can affect opacity) [ not emulated ]
+    0x9000: Palette add (can affect opacity)
 
     0xa000: Playfield 1 rowscroll (1 word per line, 256 lines)
     0xa200: Playfield 2 rowscroll
@@ -1288,6 +1288,7 @@ void taito_f3_state::init_alpha_blend_func()
 	m_clip_ar[pf_num] = line_tmp->clip0[y] >> 16; \
 	m_clip_bl[pf_num] = line_tmp->clip1[y] & 0xffff; \
 	m_clip_br[pf_num] = line_tmp->clip1[y] >> 16; \
+	m_pal_add[pf_num] = line_tmp->pal_add[y]; \
 }
 
 #define CULC_PIXMAP_POINTER(pf_num) \
@@ -1323,7 +1324,7 @@ void taito_f3_state::init_alpha_blend_func()
 	{ \
 		m_tval = *m_tsrc[pf_num]; \
 		if (m_tval & 0xf0) \
-			if ((this->*m_dpix_lp[pf_num][m_pval >> 4])(clut[*m_src[pf_num]])) { *dsti = m_dval; break; } \
+			if ((this->*m_dpix_lp[pf_num][m_pval >> 4])(clut[(*m_src[pf_num] + m_pal_add[pf_num]) & 0x1fff])) { *dsti = m_dval; break; } \
 	}
 
 
@@ -1725,12 +1726,12 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 	f3_playfield_line_inf *line_t = &m_pf_line_inf[pos];
 
 	int y_start, y_end, y_inc;
-	int line_base, zoom_base, col_base, pri_base, inc;
+	int line_base, zoom_base, col_base, pri_base, pal_add_base, inc;
 
 	int line_enable;
 	int colscroll = 0, x_offset = 0, line_zoom = 0;
 	u32 _y_zoom[256];
-	u16 pri = 0;
+	u16 pri = 0, pal_add = 0;
 	int bit_select = 1 << pos;
 
 	int _colscroll[256];
@@ -1745,6 +1746,7 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 		zoom_base = 0x81fe;// + (pos << 9);
 		col_base = 0x41fe + (pos << 9);
 		pri_base = 0xb1fe + (pos << 9);
+		pal_add_base = 0x91fe + (pos << 9);
 		inc = -2;
 		y_start = 255;
 		y_end = -1;
@@ -1764,6 +1766,7 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 		zoom_base = 0x8000;// + (pos << 9);
 		col_base = 0x4000 + (pos << 9);
 		pri_base = 0xb000 + (pos << 9);
+		pal_add_base = 0x9000 + (pos << 9);
 		inc = 2;
 		y_start = 0;
 		y_end = 256;
@@ -1813,6 +1816,9 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 			// Column scroll only affects playfields 2 & 3
 			if (pos >= 2 && m_line_ram[0x000 + y] & bit_select)
 				colscroll = (m_line_ram[col_base / 2] >> 0) & 0x3ff;
+
+			if (m_line_ram[0x500 + y] & bit_select)
+				pal_add = (m_line_ram[pal_add_base / 2] & 0x1ff) * 16;
 		}
 
 		if (!pri || (!m_flipscreen && y < 24) || (m_flipscreen && y > 231) ||
@@ -1847,11 +1853,13 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 		line_t->x_zoom[y] = 0x10000 - (line_zoom & 0xff00);
 		line_t->alpha_mode[y] = line_enable;
 		line_t->pri[y] = pri;
+		line_t->pal_add[y] = pal_add;
 
 		zoom_base += inc;
 		line_base += inc;
 		col_base += inc;
 		pri_base += inc;
+		pal_add_base += inc;
 		y += y_inc;
 	}
 
