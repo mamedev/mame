@@ -931,12 +931,12 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 
 			// is this 2 groups of 3 regS?
 			(m_tcram[0x0c / 4] >> 24) & 0xff, // 04 = 'blend' on tm1  
-			(m_tcram[0x0c / 4] >> 16) & 0xff, // 04 = blend all sprites? (buriki intro, text fades?)
-			(m_tcram[0x0c / 4] >> 8) & 0xff,  // 10 gets set here in some cases when blended sprites are used too (blend type against a different input layer?)
+			(m_tcram[0x0c / 4] >> 16) & 0xff, // 04 = set when fades are going on with blended sprites in buriki intro? otherwise usually 00
+			(m_tcram[0x0c / 4] >> 8) & 0xff,  // upper bit not used? value usually 2x, 4x, 5x or 6x
 			// 2nd group?
 			(m_tcram[0x0c / 4] >> 0) & 0xff, //  04 = 'blend' on tm3  (used in transitions?)
-			(m_tcram[0x10 / 4] >> 24) & 0xff,
-			(m_tcram[0x10 / 4] >> 16) & 0xff, // 10 being set seems to change sprite blend mode (maybe blend type against one input layer)
+			(m_tcram[0x10 / 4] >> 24) & 0xff, // usually (always?) 00
+			(m_tcram[0x10 / 4] >> 16) & 0xff, // upper bit not used? value usually 2x, 4x, 5x or 6x
 
 			m_tcram[0x10 / 4] & 0xffff, // unused?
 
