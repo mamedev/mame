@@ -266,6 +266,7 @@ void m68000_device::device_start()
 
 	state_add(STATE_GENPCBASE, "PC",  m_ipc).callimport();
 	state_add(STATE_GENPC,     "rPC", m_pc);
+	state_add(M68K_IR,         "IR",  m_ir);
 	state_add(STATE_GENFLAGS,  "GENFLAGS", m_sr).noshow().callexport().formatstr("%16s");
 	state_add(M68K_SR,         "SR",  m_sr).callimport();
 	for(int r = 0; r != 8; r++)
