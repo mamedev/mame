@@ -940,7 +940,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			(m_tcram[0x14 / 4] >> 16) & 0xffff,  // typically 0007 or 0001, - 0011 on ss64 ingame, 0009 on continue screen
 
 			// 0xxx ?  (often 0555 or 0fff, seen 56a, 57f too) -  register split into 2 bits - typically a bit will be 3 or 1 depending if the effect is additive / subtractive
-			// usually relate to the RGB pairings at m_tcram[0x18 / 4] & m_tcram[0x1c / 4] but m_tcram[0x20 / 4] being 1 may cause it to use the registers at m_tcram[0x28 / 4] instead?
+			// usually relate to the RGB pairings at m_tcram[0x18 / 4] & m_tcram[0x1c / 4] but m_tcram[0x24 / 4] & 1 may cause it to use the registers at m_tcram[0x28 / 4] instead?
 			(m_tcram[0x14 / 4] >> 0) & 0x3, (m_tcram[0x14 / 4] >> 2) & 0x3, (m_tcram[0x14 / 4] >> 4) & 0x3, (m_tcram[0x14 / 4] >> 6) & 0x3, (m_tcram[0x14 / 4] >> 8) & 0x3, (m_tcram[0x14 / 4] >> 10) & 0x3, (m_tcram[0x14 / 4] >> 12) & 0x3, (m_tcram[0x14 / 4] >> 14) & 0x3,
 
 			// these are used for 'fade to black' in most cases, but
@@ -948,10 +948,12 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			m_tcram[0x18 / 4],  // xRGB fade values? (roadedge attract)
 			m_tcram[0x1c / 4],  // xRGB fade values? (roadedge attract) fades on fatfurwa before buildings in intro
 
-			m_tcram[0x20 / 4],  // does this somehow relate to which set of registers are used for certain effects? (the 8 below, at 0x28 / 4 or the 2 above?) only ever seems to be 0 or 1
+			m_tcram[0x20 / 4], // unused?
+
+			// 0001 may indicate if to use the 8 below for standard fade, or those above, 0002 appears to be display disable?
+			(m_tcram[0x24 / 4] >> 16) & 0xffff, // 0002 gets set in roadedge during some transitions (layers are disabled? blacked out?) 0001 set on SNK logo in roadedge 
 
 			// some kind of bitfields, these appear related to fade mode for the registers at 0x28 / 4, set to either 3 or 2 which is additive or subtractive
-			(m_tcram[0x24 / 4] >> 16) & 0xffff, // 0002 gets set in roadedge during some transitions (layers are disabled? blacked out?) 0001 set on SNK logo in roadedge 
 			(m_tcram[0x24 / 4] >> 0) & 0x3, // 0001 gets set when in a tunnel on roadedge in 1st person mode (state isn't updated otherwise, switching back to 3rd person in a tunnel leaves it set until you flick back to 1st person)  briefly set to 3c on roadedge car select during 'no fb clear' effect?
 			(m_tcram[0x24 / 4] >> 2) & 0x3,
 			(m_tcram[0x24 / 4] >> 4) & 0x3,
