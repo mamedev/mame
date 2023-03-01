@@ -77,8 +77,8 @@ protected:
 	floppy_image_device *m_current_floppy;
 
 private:
-	output_finder<4> m_access_int_drv_out;
-	output_finder<4> m_int_drv_name_out;
+	output_finder<4> m_internal_drive_led;
+	output_finder<4> m_internal_drive_name;
 	int m_nr_drives;
 };
 

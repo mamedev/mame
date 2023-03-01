@@ -83,8 +83,8 @@ msx_slot_disk_device::msx_slot_disk_device(const machine_config &mconfig, device
 	: msx_slot_rom_device(mconfig, type, tag, owner, clock)
 	, m_floppy(*this, "fdc:%u", 0U)
 	, m_current_floppy(nullptr)
-	, m_access_int_drv_out(*this, "access_int_drv%u", 0U)
-	, m_int_drv_name_out(*this, "name_int_drv%u", 0U)
+	, m_internal_drive_led(*this, "internal_drive%u_led", 0U)
+	, m_internal_drive_name(*this, "internal_drive%u_name", 0U)
 	, m_nr_drives(nr_drives)
 {
 }
@@ -99,23 +99,23 @@ void msx_slot_disk_device::device_start()
 {
 	msx_slot_rom_device::device_start();
 
-	m_access_int_drv_out.resolve();
-	m_int_drv_name_out.resolve();
+	m_internal_drive_led.resolve();
+	m_internal_drive_name.resolve();
 }
 
 void msx_slot_disk_device::device_reset()
 {
 	msx_slot_rom_device::device_reset();
-	for (int i = 0; i < m_access_int_drv_out.size(); i++)
+	for (int i = 0; i < m_internal_drive_led.size(); i++)
 	{
-		m_int_drv_name_out[i] = m_floppy[i] ? 1 : 0;
+		m_internal_drive_name[i] = m_floppy[i] ? 1 : 0;
 		set_drive_access_led_state(i, 0);
 	}
 }
 
 void msx_slot_disk_device::set_drive_access_led_state(int drive, int led_state)
 {
-	m_access_int_drv_out[drive] = m_floppy[drive] ? 1 + led_state : 0;
+	m_internal_drive_led[drive] = m_floppy[drive] ? 1 + led_state : 0;
 }
 
 
