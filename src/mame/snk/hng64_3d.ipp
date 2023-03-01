@@ -360,7 +360,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 	/*//////////////
 	// PACKET FORMAT
 	// [0]  - 0100 ... ID
-	// [1]  - --c- ---p ---b lo--
+	// [1]  - --c- ---p o--b l---
 	//      l = use lighting
 	//      p = use dynamic palette (maybe not just this, wrong for roadedge car select where it isn't set but needs to be)
 	//      o = use dynamic texture offset (sky reflection in xrally/roadedge windows, also waterfalls?)
