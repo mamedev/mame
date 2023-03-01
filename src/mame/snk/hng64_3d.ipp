@@ -182,6 +182,7 @@ void hng64_state::setCameraTransformation(const uint16_t* packet)
 	// [10] - xxxx ... Extrinsic camera matrix
 	// [11] - xxxx ... Extrinsic camera matrix
 	// [12] - xxxx ... Extrinsic camera matrix
+	// following might be unused leftover data
 	// [13] - ???? ... ? Flips per-frame during fatfurwa 'HNG64'
 	// [14] - ???? ... ? Could be some floating-point values during buriki 'door run'
 	// [15] - ???? ... ? Same as 13 & 14
@@ -224,6 +225,7 @@ void hng64_state::setLighting(const uint16_t* packet)
 	// [7]  - ???? ... ? Seems to be another light vector ?
 	// [8]  - ???? ... ? Seems to be another light vector ?
 	// [9]  - xxxx ... Strength according to sams64_2 (in combination with vector length) [0,512]
+	// folowing could just be leftover data
 	// [10] - ???? ... ? Used in fatfurwa
 	// [11] - ???? ... ? Used in fatfurwa
 	// [12] - ???? ... ? Used in fatfurwa
@@ -255,7 +257,7 @@ void hng64_state::set3dFlags(const uint16_t* packet)
 	// [6]  - ???? ... scale?
 	// [7]  - ???? ... scale?
 	// [8]  - xx?? ... Palette offset & ??
-	// ***** below are probably NOT used, but instead just contain old data that isn't cleared from the list when this packet is used *****
+	// folowing could just be leftover data
 	// [9]  - ???? ... ? Very much used - seem to bounce around when characters are on screen
 	// [10] - ???? ... ? ''  ''
 	// [11] - ???? ... ? ''  ''
@@ -289,6 +291,7 @@ void hng64_state::setCameraProjectionMatrix(const uint16_t* packet)
 	// [11] - xxxx ... Camera projection left   - confirmed by sams64_2
 	// [12] - xxxx ... Camera projection top    - confirmed by sams64_2
 	// [13] - xxxx ... Camera projection bottom - confirmed by sams64_2
+	// folowing could just be leftover data
 	// [14] - ???? ... ? Gets data during buriki door-run
 	// [15] - ???? ... ? Gets data during buriki door-run
 	////////////*/
@@ -608,6 +611,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			// Must be a conditional enable?
 			// 0x0100 is set on the cars, but not the waterfall
 			// 0x0080 is set on the cars, and the waterfall - maybe correct?
+			// 0x0001 is set on the cars, but not the waterfall
 			if ((packet[1] & 0x0080))
 			{
 				currentPoly.texscrollx = m_texturescrollx;

@@ -920,7 +920,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			m_videoregs[0x0d]);
 
 	if (1)
-		popmessage("TC: %08x MINX(%d) MINY(%d) MAXX(%d) MAXY(%d)\nBLEND ENABLES? %02x %02x %02x | %02x %02x %02x\nUNUSED?(%04x)\n%04x\n%04x\nMASTER FADES - ADD?(%08x) - SUBTRACT?(%08x)\nUNUSED?(%08x)\nBITFIELD REGS(%04x)\nPALEFFECT_ENABLES(%d %d %d %d %d %d %d %d)\n PALFADES?(%08x %08x : %08x %08x : %08x %08x : %08x %08x)\n % 08x % 08x : % 08x % 08x % 08x % 08x",
+		popmessage("TC: %08x MINX(%d) MINY(%d) MAXX(%d) MAXY(%d)\nBLEND ENABLES? %02x %02x %02x | %02x %02x %02x\nUNUSED?(%04x)\n%04x\n(%d %d %d %d %d %d %d %d)\nMASTER FADES - FADE1?(%08x) - FADE2?(%08x)\nUNUSED?(%08x)\nBITFIELD REGS(%04x)\nPALEFFECT_ENABLES(%d %d %d %d %d %d %d %d)\n PALFADES?(%08x %08x : %08x %08x : %08x %08x : %08x %08x)\n % 08x % 08x : % 08x % 08x % 08x % 08x",
 			m_tcram[0x00 / 4], // 0007 00e4 (fatfurwa, bbust2)
 			(m_tcram[0x04 / 4] >> 16) & 0xffff, (m_tcram[0x04 / 4] >> 0) & 0xffff, // 0000 0010 (fatfurwa) 0000 0000 (bbust2, xrally)
 			(m_tcram[0x08 / 4] >> 16) & 0xffff, (m_tcram[0x08 / 4] >> 0) & 0xffff, // 0200 01b0 (fatfurwa) 0200 01c0 (bbust2, xrally)
@@ -936,17 +936,21 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 
 			m_tcram[0x10 / 4] & 0xffff, // unused?
 
+			// also seems fade mode related?
 			(m_tcram[0x14 / 4] >> 16) & 0xffff,  // typically 0007 or 0001, - 0011 on ss64 ingame, 0009 on continue screen
-			(m_tcram[0x14 / 4] >> 0) & 0xffff,   // 0xxx ?  (often 0555 or 0fff, seen 56a, 57f too)
+
+			// 0xxx ?  (often 0555 or 0fff, seen 56a, 57f too) -  register split into 2 bits - typically a bit will be 3 or 1 depending if the effect is additive / subtractive
+			// usually relate to the RGB pairings at m_tcram[0x18 / 4] & m_tcram[0x1c / 4] but m_tcram[0x20 / 4] being 1 may cause it to use the registers at m_tcram[0x28 / 4] instead?
+			(m_tcram[0x14 / 4] >> 0) & 0x3, (m_tcram[0x14 / 4] >> 2) & 0x3, (m_tcram[0x14 / 4] >> 4) & 0x3, (m_tcram[0x14 / 4] >> 6) & 0x3, (m_tcram[0x14 / 4] >> 8) & 0x3, (m_tcram[0x14 / 4] >> 10) & 0x3, (m_tcram[0x14 / 4] >> 12) & 0x3, (m_tcram[0x14 / 4] >> 14) & 0x3,
 
 			// these are used for 'fade to black' in most cases, but
 			// in xrally attract, when one image is meant to fade into another, one value increases while the other decreases
 			m_tcram[0x18 / 4],  // xRGB fade values? (roadedge attract)
 			m_tcram[0x1c / 4],  // xRGB fade values? (roadedge attract) fades on fatfurwa before buildings in intro
 
-			m_tcram[0x20 / 4],  //  unused?
+			m_tcram[0x20 / 4],  // does this somehow relate to which set of registers are used for certain effects? (the 8 below, at 0x28 / 4 or the 2 above?) only ever seems to be 0 or 1
 
-			// some kind of bitfields
+			// some kind of bitfields, these appear related to fade mode for the registers at 0x28 / 4, set to either 3 or 2 which is additive or subtractive
 			(m_tcram[0x24 / 4] >> 16) & 0xffff, // 0002 gets set in roadedge during some transitions (layers are disabled? blacked out?) 0001 set on SNK logo in roadedge 
 			(m_tcram[0x24 / 4] >> 0) & 0x3, // 0001 gets set when in a tunnel on roadedge in 1st person mode (state isn't updated otherwise, switching back to 3rd person in a tunnel leaves it set until you flick back to 1st person)  briefly set to 3c on roadedge car select during 'no fb clear' effect?
 			(m_tcram[0x24 / 4] >> 2) & 0x3,
