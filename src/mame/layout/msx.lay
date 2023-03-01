@@ -34,8 +34,8 @@ Basic display of LEDs for an MSX
 		<text string="カナ" align="1" state="2">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</text>
-<!-- This is the text from the keys but does not seem to get rendered properly.
-		<text string="عالي" align="1" state="3">
+<!-- This is the text from the key/led but does not seem to get rendered properly.
+        <text string="عالي" align="1" state="3">
 -->
 		<text string="Arabic" align="1" state="3">
 			<color red="1.0" green="1.0" blue="1.0" />
