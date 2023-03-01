@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-02-18 05:29+1100\n"
-"PO-Revision-Date: 2022-10-28 19:21+0200\n"
+"PO-Revision-Date: 2023-02-25 15:21+0100\n"
 "Last-Translator: Milan Galcik <milan.galcik@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
 "Language: sk\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Poedit 3.2\n"
+"X-Generator: Poedit 3.2.2\n"
 
 #: src/frontend/mame/ui/ui.cpp:474 src/frontend/mame/ui/ui.cpp:547
 msgid ""
@@ -2839,6 +2839,13 @@ msgid ""
 "Next device  \t\t%6$s\n"
 "Return to previous menu  \t\t%7$s"
 msgstr ""
+"Zobraziť/skryť nastavenia  \t\t%1$s\n"
+"Znížiť hodnotu  \t\t%2$s\n"
+"Zvýšiť hodnotu  \t\t%3$s\n"
+"Vrátiť pôvodnú hodnotu  \t\t%4$s\n"
+"Predchádzajúce zariadenie  \t\t%5$s\n"
+"Naseldujúce zariadenie  \t\t%6$s\n"
+"Návrat do predchádzajúceho menu  \t\t%7$s"
 
 #: src/frontend/mame/ui/analogipt.cpp:82
 msgctxt "menu-analoginput"
@@ -2849,12 +2856,12 @@ msgstr "Prispôsobenia analógového vstupu"
 #, c-format
 msgctxt "menu-analoginput"
 msgid "Press %s to show settings"
-msgstr ""
+msgstr "Stlačte %s pre zobrazenie nastavení"
 
 #: src/frontend/mame/ui/analogipt.cpp:245
 msgctxt "menu-analoginput"
 msgid "Analog Input Adjustments Help"
-msgstr ""
+msgstr "Nápoveda k prispôsobeniu analógového vstupu"
 
 #: src/frontend/mame/ui/analogipt.cpp:421
 #, c-format
@@ -5411,7 +5418,7 @@ msgstr "Klávesnica"
 #: src/emu/inpttype.ipp:874
 msgctxt "input-name"
 msgid "Show/Hide Menu"
-msgstr ""
+msgstr "Zobraziť/Skryť menu"
 
 #: src/emu/inpttype.ipp:875
 msgctxt "input-name"
@@ -5421,7 +5428,7 @@ msgstr "Použív. rozhranie - Vybrať"
 #: src/emu/inpttype.ipp:876
 msgctxt "input-name"
 msgid "UI Back"
-msgstr ""
+msgstr "Použív. rozhranie - Späť"
 
 #: src/emu/inpttype.ipp:877
 msgctxt "input-name"
@@ -5436,7 +5443,7 @@ msgstr "Použív. rozhranie - Vymazať"
 #: src/emu/inpttype.ipp:879
 msgctxt "input-name"
 msgid "UI Help"
-msgstr ""
+msgstr "Použív. rozhranie - Nápoveda"
 
 #: src/emu/inpttype.ipp:880
 msgctxt "input-name"
@@ -6547,7 +6554,7 @@ msgstr "Storno"
 #: plugins/commonui/init.lua:199
 msgctxt "plugin-commonui"
 msgid "Invalid combination entered"
-msgstr ""
+msgstr "Vložená neplatná kombinácia"
 
 #: plugins/commonui/init.lua:205
 #, lua-format
@@ -6558,15 +6565,3 @@ msgid ""
 msgstr ""
 "Vložte kombináciu alebo stlačte %s pre storno\n"
 "%s"
-
-#, c-format
-#~ msgid "Press %s to show menu"
-#~ msgstr "Pre zobrazenie menu stlačte %s"
-
-#~ msgctxt "input-name"
-#~ msgid "Config Menu"
-#~ msgstr "Konfiguračné menu"
-
-#~ msgctxt "input-name"
-#~ msgid "UI Toggle"
-#~ msgstr "Použív. rozhranie - Prepnúť"

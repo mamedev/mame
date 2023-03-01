@@ -630,7 +630,7 @@ int renderer_d3d9::initialize()
 int renderer_d3d9::pre_window_draw_check()
 {
 	// if we're in the middle of resizing, leave things alone
-	if (window().m_resize_state == RESIZE_STATE_RESIZING)
+	if (dynamic_cast<win_window_info &>(window()).m_resize_state == win_window_info::RESIZE_STATE_RESIZING)
 		return 0;
 
 	// check if shaders should be toggled
@@ -1407,30 +1407,31 @@ void renderer_d3d9::pick_best_mode()
 bool renderer_d3d9::update_window_size()
 {
 	// get the current window bounds
+	auto &win = dynamic_cast<win_window_info &>(window());
 	RECT client;
-	GetClientRectExceptMenu(dynamic_cast<win_window_info &>(window()).platform_window(), &client, window().fullscreen());
+	GetClientRectExceptMenu(win.platform_window(), &client, window().fullscreen());
 
 	// if we have a device and matching width/height, nothing to do
 	if (m_device && rect_width(&client) == m_width && rect_height(&client) == m_height)
 	{
 		// clear out any pending resizing if the area didn't change
-		if (window().m_resize_state == RESIZE_STATE_PENDING)
-			window().m_resize_state = RESIZE_STATE_NORMAL;
+		if (win.m_resize_state == win_window_info::RESIZE_STATE_PENDING)
+			win.m_resize_state = win_window_info::RESIZE_STATE_NORMAL;
 		return false;
 	}
 
 	// if we're in the middle of resizing, leave it alone as well
-	if (window().m_resize_state == RESIZE_STATE_RESIZING)
+	if (win.m_resize_state == win_window_info::RESIZE_STATE_RESIZING)
 		return false;
 
 	// set the new bounds and create the device again
 	m_width = rect_width(&client);
 	m_height = rect_height(&client);
-	if (device_create(dynamic_cast<win_window_info &>(window()).main_window()->platform_window()))
+	if (device_create(win.main_window()->platform_window()))
 		return false;
 
 	// reset the resize state to normal, and indicate we made a change
-	window().m_resize_state = RESIZE_STATE_NORMAL;
+	win.m_resize_state = win_window_info::RESIZE_STATE_NORMAL;
 	return true;
 }
 

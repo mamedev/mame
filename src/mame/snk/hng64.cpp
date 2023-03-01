@@ -1185,7 +1185,7 @@ void hng64_state::hng_map(address_map &map)
 	map(0x20190000, 0x20190037).ram().w(FUNC(hng64_state::hng64_vregs_w)).share("videoregs");
 
 	// Mixing
-	map(0x20200000, 0x20203fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
+	map(0x20200000, 0x20203fff).ram().w(FUNC(hng64_state::pal_w)).share("paletteram");
 	map(0x20208000, 0x2020805f).w(FUNC(hng64_state::tcram_w)).share("tcram");   // Transition Control
 	map(0x20208000, 0x2020805f).r(FUNC(hng64_state::tcram_r));
 
@@ -1800,13 +1800,6 @@ void hng64_state::init_hng64_reorder_gfx()
 
 void hng64_state::init_hng64()
 {
-	/* 1 meg of virtual address space for the com cpu */
-	m_com_virtual_mem = std::make_unique<uint8_t[]>(0x100000);
-	m_com_op_base     = std::make_unique<uint8_t[]>(0x10000);
-
-	m_soundram = std::make_unique<uint16_t[]>(0x200000/2);
-	m_soundram2 = std::make_unique<uint16_t[]>(0x200000/2);
-
 	init_hng64_reorder_gfx();
 }
 
@@ -2113,13 +2106,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(hng64_state::hng64_irq)
 
 void hng64_state::machine_start()
 {
+	/* 1 meg of virtual address space for the com cpu */
+	m_com_virtual_mem = std::make_unique<uint8_t[]>(0x100000);
+	m_com_op_base = std::make_unique<uint8_t[]>(0x10000);
+
+	m_soundram = std::make_unique<uint16_t[]>(0x200000 / 2);
+	m_soundram2 = std::make_unique<uint16_t[]>(0x200000 / 2);
+
 	/* set the fastest DRC options */
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions */
 	m_maincpu->add_fastram(0x00000000, 0x00ffffff, false, m_mainram);
-	m_maincpu->add_fastram(0x04000000, 0x05ffffff, true,  m_cart);
-	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, true,  m_rombase);
+	m_maincpu->add_fastram(0x04000000, 0x05ffffff, true, m_cart);
+	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, true, m_rombase);
 
 	for (int i = 0; i < 0x38 / 4; i++)
 	{
@@ -2132,6 +2132,43 @@ void hng64_state::machine_start()
 	m_comhack_timer = timer_alloc(FUNC(hng64_state::comhack_callback), this);
 
 	init_io();
+
+	save_pointer(NAME(m_com_virtual_mem), 0x100000);
+	save_pointer(NAME(m_com_op_base), 0x10000);
+	save_pointer(NAME(m_soundram), 0x200000 / 2);
+	save_pointer(NAME(m_soundram2), 0x200000 / 2);
+
+	save_item(NAME(m_fbcontrol));
+
+	save_item(NAME(m_dma_start));
+	save_item(NAME(m_dma_dst));
+	save_item(NAME(m_dma_len));
+
+	save_item(NAME(m_mcu_en));
+
+	save_item(NAME(m_activeDisplayList));
+	save_item(NAME(m_no_machine_error_code));
+
+	save_item(NAME(m_unk_vreg_toggle));
+	save_item(NAME(m_p1_trig));
+
+	save_item(NAME(m_screen_dis));
+
+	save_item(NAME(m_old_animmask));
+	save_item(NAME(m_old_animbits));
+	save_item(NAME(m_old_tileflags));
+
+	save_item(NAME(m_port7));
+	save_item(NAME(m_port1));
+	save_item(NAME(m_ex_ramaddr));
+	save_item(NAME(m_ex_ramaddr_upper));
+
+	save_item(NAME(m_irq_pending));
+
+	save_item(NAME(m_irq_level));
+
+	save_item(NAME(main_latch));
+	save_item(NAME(sound_latch));
 }
 
 TIMER_CALLBACK_MEMBER(hng64_state::comhack_callback)
@@ -2140,6 +2177,13 @@ TIMER_CALLBACK_MEMBER(hng64_state::comhack_callback)
 
 	// different network IDs give different default colours for the cars in roadedge
 	uint8_t network_id = 0x01;
+
+	// this fixes the stuck scroller text in the xrally intro (largest pink text) but prevents the inputs from working.
+	// It's probably trying to sync the scroller with another unit? however the original machines can run as singles
+	// if you loop some of the pins on the network connector back, so maybe MAME is just confused about the mode it's
+	// running in.
+	// network_id |= 0x08;
+
 
 	m_comhack[0] = m_comhack[0] | network_id;
 }
@@ -2465,6 +2509,7 @@ void hng64_state::hng64(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(hng64_state::screen_vblank_hng64));
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x1000);
+	PALETTE(config, m_palette_3d).set_format(palette_device::xRGB_888, 0x1000 * 0x10);
 
 	hng64_audio(config);
 	hng64_network(config);
@@ -2582,7 +2627,8 @@ void hng64_state::hng64_fight(machine_config &config)
 	ROM_REGION( 0x100, "eeprom", 0 ) /* EEPROMs on the I/O boards, mostly empty, currently not used by the emulation */ \
 	ROM_LOAD( "lvs-ioj-br9020f.u2", 0x000, 0x100, CRC(78b7020d) SHA1(2b8549532ef5e1e8102dbe71af55fdfb27ccbba6) ) \
 	ROM_LOAD( "lvs-igx-br9020f.u3", 0x000, 0x100, CRC(af9f4287) SHA1(6df0e35c77dbfee2fab7ff490dcd651db420e367) ) \
-	ROM_LOAD( "lvs-jam-br9020f.u3", 0x000, 0x100, CRC(dabec5d2) SHA1(19c5be89c57387d6ea563b3dc55674d0692af98e) )
+	ROM_LOAD( "lvs-jam-br9020f.u3", 0x000, 0x100, CRC(dabec5d2) SHA1(19c5be89c57387d6ea563b3dc55674d0692af98e) ) \
+	ROM_DEFAULT_BIOS( "export" )
 
 ROM_START( hng64 )
 	/* BIOS */
@@ -2930,6 +2976,13 @@ ROM_START( fatfurwa )
 	ROM_LOAD( "006sd02a.78", 0x0400000, 0x400000, CRC(f7f020c7) SHA1(b72fde4ff6384b80166a3cb67d31bf7afda750bc) )
 	ROM_LOAD( "006sd03a.79", 0x0800000, 0x400000, CRC(1a678084) SHA1(f52efb6145102d289f332d8341d89a5d231ba003) )
 	ROM_LOAD( "006sd04a.80", 0x0c00000, 0x400000, CRC(3c280a5c) SHA1(9d3fc78e18de45382878268db47ff9d9716f1505) )
+
+	/* this game does not initialize EEPROM automatically otherwise (each region requires different defaults) */
+	ROM_REGION( 0x4000, "nvram", 0 )
+	ROMX_LOAD( "default_nvram_japan",  0x00000, 0x4000, CRC(1f618d44) SHA1(c007c5f94b28b8c56c8c539d2f82336515c0ed84), ROM_BIOS(0) )
+	ROMX_LOAD( "default_nvram_usa",    0x00000, 0x4000, CRC(f139f4a5) SHA1(6f7e2fc5d902c1499f3c55f9ca2ef7becc49103b), ROM_BIOS(1) )
+	ROMX_LOAD( "default_nvram_others", 0x00000, 0x4000, CRC(bf1c3e4a) SHA1(454c6e5e505293bfdeb87d08e72420bba84c3b7b), ROM_BIOS(2) )
+	ROMX_LOAD( "default_nvram_korea",  0x00000, 0x4000, CRC(e8fb68df) SHA1(3170e7465b93319c0550f35f8906b5bdc5332eec), ROM_BIOS(3) )
 ROM_END
 
 

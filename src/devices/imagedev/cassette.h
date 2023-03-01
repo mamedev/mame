@@ -108,7 +108,7 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
-	virtual const bool use_software_list_file_extension_for_filetype() const override { return true; }
+	virtual bool use_software_list_file_extension_for_filetype() const override { return true; }
 
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override;

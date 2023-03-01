@@ -92,7 +92,6 @@ public:
 	void maciix(machine_config &config, bool nubus_bank1 = true, bool nubus_bank2 = true);
 	void maciicx(machine_config &config);
 	void macse30(machine_config &config);
-	void maciifx(machine_config &config);
 	void macii(machine_config &config, bool cpu = true, asc_device::asc_type asc_type = asc_device::asc_type::ASC,
 		   bool nubus = true, bool nubus_bank1 = true, bool nubus_bank2 = true, int woz_version = 0);
 	void maciihmu(machine_config &config);
@@ -101,7 +100,6 @@ public:
 	void init_maciifdhd();
 	void init_macse30();
 	void init_macii();
-	void init_maciifx();
 	void init_maciici();
 	void init_maciix();
 	void init_maciisi();
@@ -116,7 +114,6 @@ public:
 		MODEL_MAC_IICX,
 		MODEL_MAC_IICI,
 		MODEL_MAC_IISI,
-		MODEL_MAC_IIFX,
 		MODEL_MAC_SE30
 	};
 
@@ -217,16 +214,6 @@ private:
 
 	uint16_t mac_config_r();
 
-	uint32_t biu_r(offs_t offset, uint32_t mem_mask = ~0);
-	void biu_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	template <int N> DECLARE_WRITE_LINE_MEMBER(oss_interrupt);
-	TIMER_CALLBACK_MEMBER(oss_6015_tick);
-	uint8_t oss_r(offs_t offset);
-	void oss_w(offs_t offset, uint8_t data);
-	uint32_t buserror_r();
-	uint8_t maciifx_8010_r();
-	uint8_t maciifx_8040_r();
-
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_9_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_a_w);
 	DECLARE_WRITE_LINE_MEMBER(nubus_irq_b_w);
@@ -241,10 +228,7 @@ private:
 
 	void macii_map(address_map &map);
 	void maciici_map(address_map &map);
-	void maciifx_map(address_map &map);
 	void macse30_map(address_map &map);
-
-	uint8_t m_oss_regs[0x400]{};
 
 	int m_via2_ca1_hack = 0;
 	optional_device<screen_device> m_screen;

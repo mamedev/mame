@@ -782,14 +782,11 @@ if (_OPTIONS["osd"] == "sdl") then
 	}
 
 	if _OPTIONS["targetos"]=="windows" then
-		if _OPTIONS["with-bundled-sdl2"]~=nil then
+		if _OPTIONS["USE_LIBSDL"]~="1" then
 			configuration { "mingw*"}
 				links {
+					"SDL2main",
 					"SDL2",
-					"imm32",
-					"version",
-					"ole32",
-					"oleaut32",
 				}
 			configuration { "vs*" }
 				links {
@@ -799,41 +796,18 @@ if (_OPTIONS["osd"] == "sdl") then
 				}
 			configuration { }
 		else
-			if _OPTIONS["USE_LIBSDL"]~="1" then
-				configuration { "mingw*"}
-					links {
-						"SDL2main",
-						"SDL2",
-					}
-				configuration { "vs*" }
-					links {
-						"SDL2",
-						"imm32",
-						"version",
-					}
-				configuration { }
-			else
-				local str = backtick(sdlconfigcmd() .. " --libs | sed 's/ -lSDLmain//'")
-				addlibfromstring(str)
-				addoptionsfromstring(str)
-			end
-			configuration { "x32", "vs*" }
-				libdirs {
-					path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","x86")
-				}
-			configuration { "x64", "vs*" }
-				libdirs {
-					path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","x64")
-				}
+			local str = backtick(sdlconfigcmd() .. " --libs | sed 's/ -lSDLmain//'")
+			addlibfromstring(str)
+			addoptionsfromstring(str)
 		end
-	end
-
-	if BASE_TARGETOS=="unix" then
-		if _OPTIONS["with-bundled-sdl2"]~=nil then
-			links {
-				"SDL2",
+		configuration { "x32", "vs*" }
+			libdirs {
+				path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","x86")
 			}
-		end
+		configuration { "x64", "vs*" }
+			libdirs {
+				path.join(_OPTIONS["SDL_INSTALL_ROOT"],"lib","x64")
+			}
 	end
 
 	dofile("osd/sdl_cfg.lua")

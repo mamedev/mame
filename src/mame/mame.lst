@@ -824,7 +824,6 @@ mac2fdhd                        // 1988 Apple Macintosh II (FDHD)
 macii                           // 1987 Apple Macintosh II
 maciici                         // 1989 Apple Macintosh IIci
 maciicx                         // 1989 Apple Macintosh IIcx
-maciifx                         // 1990 Apple Macintosh IIfx
 maciihmu                        // 1987 Apple Macintosh II (w/o 68851 MMU)
 maciisi                         // 1990 Apple Macintosh IIsi
 maciix                          // 1988 Apple Macintosh IIx
@@ -840,6 +839,9 @@ macse                           // 1987 Apple Macintosh SE
 macsefd                         // 1988 Apple Macintosh SE (FDHD)
 unitron                         // 1985 Unitron
 utrn1024                        // 1986 Unitron 1024
+
+@source:apple/maciifx.cpp
+maciifx                         // 1990 Apple Macintosh IIfx
 
 @source:apple/maciivx.cpp
 maciivx                         // 1993 Apple Macintosh IIvx
@@ -16216,6 +16218,9 @@ ch2001
 @source:cxg/dominator.cpp
 scmder
 sdtor
+sgalaxy
+sgalaxya
+sgalaxyb
 
 @source:cxg/scptchess.cpp
 scptchess
@@ -16339,6 +16344,7 @@ edrandy2                        // MAD (c) 1990 Data East Corporation (World)
 edrandyj                        // MAD (c) 1990 Data East Corporation (Japan)
 joemac                          // MAG (c) 1991 Data East Corporation (Japan)
 mutantf                         // MAF (c) 1991 Data East Corporation (World)
+mutantf1                        // MAF (c) 1991 Data East Corporation (World)
 mutantf2                        // MAF (c) 1991 Data East Corporation (World)
 mutantf3                        // MAF (c) 1991 Data East Corporation (World)
 mutantf4                        // MAF (c) 1991 Data East Corporation (World)
@@ -30634,7 +30640,7 @@ npusagif                        //
 
 @source:misc/news.cpp
 news                            // "Virus"??? ((c) 1993 Poby in ROM VIRUS.4)
-newsa                           // "Jeansole / Poby
+newsa                           // "Jeansole / Poby"
 
 @source:misc/nexus3d.cpp
 acheart                         //
@@ -30709,7 +30715,7 @@ onetwoe                         // (c) 1997 Barko
 
 @source:misc/opercoin.cpp
 multibaby                       // (c) 1990 Oper Coin
-spirulo                         // (c) 19?? Oper Coin
+spirulo                         // (c) 1988 Oper Coin
 
 @source:misc/othello.cpp
 othello                         // (c) 1984 Success.
@@ -35560,6 +35566,7 @@ bsv102r                         //
 bsv103                          //
 bsv102                          //
 ffv101                          //
+ffv103                          //
 ffv104                          //
 ghv101                          //
 kpv106                          //
@@ -41496,6 +41503,7 @@ nws1580                         // Sony NEWS NWS-1580
 
 @source:sony/news_r3k.cpp
 nws3260                         // Sony NEWS NWS-3260
+nws3410                         // Sony NEWS NWS-3410
 
 @source:sony/news_r4k.cpp
 nws5000x                        // Sony NEWS NWS-5000X
@@ -42979,6 +42987,7 @@ holeland2                       // (c) 1984
 sauro                           // (c) 1987
 sauroa                          // (c) 1987
 saurob                          // (c) 1987
+sauroc                          // (c) 1987
 saurobl                         // (c) 1987 bootleg
 saurop                          // (c) 1987
 saurorr                         // (c) 1987
@@ -43349,6 +43358,7 @@ rtriv                           // (c) 198? Romar
 suprmous                        // (c) 1982 Taito
 thehole                         // bootleg
 thepit                          // (c) 1982 Zilec
+thepitc                         // (c) 1982 Centuri Inc
 thepitj                         // (c) 1982 Taito (licensed)
 thepitu1                        // (c) 1982 Centuri (licensed)
 thepitu2                        // (c) 1982 Centuri (licensed)
@@ -44638,6 +44648,9 @@ squaitsa                        // (c) 1985
 
 @source:valadon/tankbust.cpp
 tankbust                        // (c) 1985
+
+@source:vectorgraphic/vector4.cpp
+vector4                         //
 
 @source:venture/looping.cpp
 looping                         // (c) 1982 Video Games GmbH
