@@ -54,6 +54,9 @@ struct polygon
 
 	uint32_t palOffset = 0;           // The base offset where this object's palette starts.
 	uint16_t colorIndex = 0;
+
+	uint16_t texscrollx = 0;
+	uint16_t texscrolly = 0;
 };
 
 
@@ -88,6 +91,8 @@ struct hng64_poly_data
 	uint32_t palOffset = 0;
 	uint16_t colorIndex = 0;
 	bool blend = false;
+	uint16_t texscrollx = 0;
+	uint16_t texscrolly = 0;;
 };
 
 class hng64_state;
@@ -295,7 +300,9 @@ private:
 	uint16_t m_old_tileflags[4]{};
 
 	// 3d State
-	int m_paletteState3d = 0;
+	uint16_t m_texturescrollx = 0;
+	uint16_t m_texturescrolly = 0;
+	uint16_t m_paletteState3d = 0;
 	float m_projectionMatrix[16]{};
 	float m_modelViewMatrix[16]{};
 	float m_cameraMatrix[16]{};

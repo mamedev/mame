@@ -247,14 +247,15 @@ void hng64_state::set3dFlags(const uint16_t* packet)
 	/*//////////////
 	// PACKET FORMAT
 	// [0]  - 0011 ... ID
-	// [1]  - ???? ...
-	// [2]  - ???? ...
+	// [1]  - ???? ... texture scrolling x (c000 - ffff)
+	// [2]  - ???? ... texture scrolling y (c000 - ffff) 
 	// [3]  - ???? ...
 	// [4]  - ???? ...
-	// [5]  - ???? ...
-	// [6]  - ???? ...
-	// [7]  - ???? ...
+	// [5]  - ???? ... scale?
+	// [6]  - ???? ... scale?
+	// [7]  - ???? ... scale?
 	// [8]  - xx?? ... Palette offset & ??
+	// ***** below are probably NOT used, but instead just contain old data that isn't cleared from the list when this packet is used *****
 	// [9]  - ???? ... ? Very much used - seem to bounce around when characters are on screen
 	// [10] - ???? ... ? ''  ''
 	// [11] - ???? ... ? ''  ''
@@ -263,7 +264,9 @@ void hng64_state::set3dFlags(const uint16_t* packet)
 	// [14] - ???? ... ? ''  ''
 	// [15] - ???? ... ? ''  ''
 	////////////*/
-	m_paletteState3d = (packet[8] & 0xff00) >> 8;
+	m_texturescrollx = packet[1];
+	m_texturescrolly = packet[2];
+	m_paletteState3d = packet[8];
 }
 
 // Operation 0012
@@ -593,10 +596,20 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				// bbust2 has m_paletteState3d & 0x40 set, which takes the palette out of range
 				// used for 2nd car on roadedge, used for 2nd player on buriki
 				// used for buildings in fatfurwa intro and characters
-				explicitPaletteValue |= (m_paletteState3d & 0x3f) * 0x80;
+				explicitPaletteValue |= ((m_paletteState3d >>8) & 0x3f) * 0x80;
 			}
 
 			currentPoly.palOffset += explicitPaletteValue;
+
+			// These are definitely the scroll values, used on player car windows and waterfalls
+			// but if we always use them things get very messy when they're used for the waterfalls on xrally
+			// as they never get turned back off again for the objects after the waterfalls
+			// Must be a conditional enable?
+			if (0)
+			{
+				currentPoly.texscrollx = m_texturescrollx;
+				currentPoly.texscrolly = m_texturescrolly;
+			}
 
 			uint8_t chunkLength = 0;
 			int counter = 3;
@@ -1210,6 +1223,10 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 				textureS = sCorrect * 1024.0f;
 				textureT = tCorrect * 1024.0f;
 
+				textureS += (renderData.texscrolly & 0x3fff)>>4;
+				textureT += (renderData.texscrollx & 0x3fff)>>4;
+
+
 #if 1
 				// Small-Page textures
 				if (renderData.texPageSmall == 2)
@@ -1312,6 +1329,8 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 	rOptions.texPageVertOffset = p->texPageVertOffset;
 	rOptions.colorIndex = p->colorIndex;
 	rOptions.blend = p->blend;
+	rOptions.texscrollx = p->texscrollx;
+	rOptions.texscrolly = p->texscrolly;
 
 	// Pass the render data into the rasterizer
 	hng64_poly_data& renderData = object_data().next();
