@@ -13,55 +13,11 @@
 #include "screen.h"
 #include "tilemap.h"
 
-struct F3config;
-
-/* This it the best way to allow game specific kludges until the system is fully understood */
-enum {
-	/* Early F3 class games, these are not cartridge games and system features may be different */
-	RINGRAGE=0, /* D21 */
-	ARABIANM,   /* D29 */
-	RIDINGF,    /* D34 */
-	GSEEKER,    /* D40 */
-	TRSTAR,     /* D53 */
-	GUNLOCK,    /* D66 */
-	TWINQIX,
-	UNDRFIRE,   /* D67 - Heavily modified F3 hardware (different memory map) */
-	SCFINALS,
-	LIGHTBR,    /* D69 */
-
-	/* D77 - F3 motherboard proms, all following games are 'F3 package system' */
-	/* D78 I CUP */
-	KAISERKN,   /* D84 */
-	DARIUSG,    /* D87 */
-	BUBSYMPH,   /* D90 */
-	SPCINVDX,   /* D93 */
-	HTHERO95,   /* D94 */
-	QTHEATER,   /* D95 */
-	EACTION2,   /* E02 */
-	SPCINV95,   /* E06 */
-	QUIZHUHU,   /* E08 */
-	PBOBBLE2,   /* E10 */
-	GEKIRIDO,   /* E11 */
-	KTIGER2,    /* E15 */
-	BUBBLEM,    /* E21 */
-	CLEOPATR,   /* E28 */
-	PBOBBLE3,   /* E29 */
-	ARKRETRN,   /* E36 */
-	KIRAMEKI,   /* E44 */
-	PUCHICAR,   /* E46 */
-	PBOBBLE4,   /* E49 */
-	POPNPOP,    /* E51 */
-	LANDMAKR,   /* E61 */
-	RECALH,     /* prototype */
-	COMMANDW,   /* prototype */
-	TMDRILL
-};
-
 class taito_f3_state : public driver_device
 {
 public:
-	taito_f3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	taito_f3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -134,6 +90,52 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(eeprom_read);
 
 protected:
+	struct F3config;
+
+	/* This it the best way to allow game specific kludges until the system is fully understood */
+	enum {
+		/* Early F3 class games, these are not cartridge games and system features may be different */
+		RINGRAGE=0, /* D21 */
+		ARABIANM,   /* D29 */
+		RIDINGF,    /* D34 */
+		GSEEKER,    /* D40 */
+		TRSTAR,     /* D53 */
+		GUNLOCK,    /* D66 */
+		TWINQIX,
+		UNDRFIRE,   /* D67 - Heavily modified F3 hardware (different memory map) */
+		SCFINALS,
+		LIGHTBR,    /* D69 */
+
+		/* D77 - F3 motherboard proms, all following games are 'F3 package system' */
+		/* D78 I CUP */
+		KAISERKN,   /* D84 */
+		DARIUSG,    /* D87 */
+		BUBSYMPH,   /* D90 */
+		SPCINVDX,   /* D93 */
+		HTHERO95,   /* D94 */
+		QTHEATER,   /* D95 */
+		EACTION2,   /* E02 */
+		SPCINV95,   /* E06 */
+		QUIZHUHU,   /* E08 */
+		PBOBBLE2,   /* E10 */
+		GEKIRIDO,   /* E11 */
+		KTIGER2,    /* E15 */
+		BUBBLEM,    /* E21 */
+		CLEOPATR,   /* E28 */
+		PBOBBLE3,   /* E29 */
+		ARKRETRN,   /* E36 */
+		KIRAMEKI,   /* E44 */
+		PUCHICAR,   /* E46 */
+		PBOBBLE4,   /* E49 */
+		POPNPOP,    /* E51 */
+		LANDMAKR,   /* E61 */
+		RECALH,     /* prototype */
+		COMMANDW,   /* prototype */
+		TMDRILL
+	};
+
+	static const F3config f3_config_table[];
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -364,14 +366,14 @@ protected:
 	int dpix_3_0(u32 s_pix);
 	int dpix_3_1(u32 s_pix);
 	int dpix_3_2(u32 s_pix);
-	inline void dpix_1_sprite(u32 s_pix);
-	inline void dpix_bg(u32 bgcolor);
+	void dpix_1_sprite(u32 s_pix);
+	void dpix_bg(u32 bgcolor);
 	void init_alpha_blend_func();
-	inline void draw_scanlines(bitmap_rgb32 &bitmap, int xsize, s16 *draw_line_num, const f3_playfield_line_inf **line_t, const int *sprite, u32 orient, int skip_layer_num);
-	void visible_tile_check(f3_playfield_line_inf *line_t, int line, u32 x_index_fx, u32 y_index, u16 *pf_data_n);
-	void calculate_clip(int y, u16 pri, u32* clip0, u32* clip1, int *line_enable);
+	void draw_scanlines(bitmap_rgb32 &bitmap, int xsize, s16 *draw_line_num, const f3_playfield_line_inf **line_t, const int *sprite, u32 orient, int skip_layer_num);
+	void visible_tile_check(f3_playfield_line_inf *line_t, int line, u32 x_index_fx, u32 y_index, const u16 *pf_data_n);
+	void calculate_clip(int y, u16 pri, u32 &clip_in, u32 &clip_ex, int &line_enable);
 	void get_spritealphaclip_info();
-	void get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos, u16 *pf_data_n);
+	void get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos, const u16 *pf_data_n);
 	void get_vram_info(tilemap_t *vram_tilemap, tilemap_t *pixel_tilemap, int sx, int sy);
 	void scanline_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
