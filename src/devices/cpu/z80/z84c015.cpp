@@ -36,23 +36,14 @@ void z84c015_device::device_start()
 	save_item(NAME(m_mwbr));
 	save_item(NAME(m_csbr));
 	save_item(NAME(m_mcr));
-}
 
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-void z84c015_device::device_reset()
-{
 	scrp_w(0);
-
 	m_wcr = 0x00; // 0xff, then 0x00 on 16th M1
-    m_mwbr = 0xf0;
-	m_csbr |= 0x0f;
+	m_mwbr = 0xf0;
+	m_csbr = 0xff; // Must be `|= 0x0f` but keep ff for reproducible startup
 	m_mcr = 0x01;
-
-	tmpz84c015_device::device_reset();
 }
+
 
 int z84c015_device::cs0_r(u16 addr)
 {

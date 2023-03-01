@@ -30,7 +30,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	void internal_io_map(address_map &map) const;
 
