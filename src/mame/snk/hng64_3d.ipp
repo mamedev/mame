@@ -360,9 +360,10 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 	/*//////////////
 	// PACKET FORMAT
 	// [0]  - 0100 ... ID
-	// [1]  - --c- ---p ---b l---
+	// [1]  - --c- ---p ---b lo--
 	//      l = use lighting
 	//      p = use dynamic palette (maybe not just this, wrong for roadedge car select where it isn't set but needs to be)
+	//      o = use dynamic texture offset (sky reflection in xrally/roadedge windows, also waterfalls?)
 	//      b = backface culling?
 	//      c = set on objects a certain distance away (maybe optimization to disable clipping against camera?)
 	// none of these bits appear to be connected to texture size to solve the road/banner problem in xrally/roadedge
@@ -605,10 +606,17 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			// but if we always use them things get very messy when they're used for the waterfalls on xrally
 			// as they never get turned back off again for the objects after the waterfalls
 			// Must be a conditional enable?
-			if (0)
+			// 0x0100 is set on the cars, but not the waterfall
+			// 0x0080 is set on the cars, and the waterfall - maybe correct?
+			if ((packet[1] & 0x0080))
 			{
 				currentPoly.texscrollx = m_texturescrollx;
 				currentPoly.texscrolly = m_texturescrolly;
+			}
+			else
+			{
+				currentPoly.texscrollx = 0;
+				currentPoly.texscrolly = 0;
 			}
 
 			uint8_t chunkLength = 0;
