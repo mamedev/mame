@@ -222,16 +222,15 @@ Playfield tile info:
 //#define DEBUG_F3 1
 
 
-/* Game specific data, some of this can be
-removed when the software values are figured out */
-struct F3config
+// Game specific data - some of this can be removed when the software values are figured out
+struct taito_f3_state::F3config
 {
 	int name;
 	int extend;
 	int sprite_lag;
 };
 
-static const F3config f3_config_table[] =
+const taito_f3_state::F3config taito_f3_state::f3_config_table[] =
 {
 	/* Name    Extend  Lag */
 	{ RINGRAGE,  0,     2 },
@@ -931,17 +930,17 @@ inline void taito_f3_state::alpha_blend_3b_2(u32 s) { alpha_blend32_d(m_alpha_s_
 
 /*============================================================================*/
 
-int taito_f3_state::dpix_1_noalpha(u32 s_pix) { m_dval = s_pix; return 1; }
-int taito_f3_state::dpix_ret1(u32 s_pix) { return 1; }
-int taito_f3_state::dpix_ret0(u32 s_pix) { return 0; }
-int taito_f3_state::dpix_1_1(u32 s_pix) { if (s_pix) alpha_blend_1_1(s_pix); return 1; }
-int taito_f3_state::dpix_1_2(u32 s_pix) { if (s_pix) alpha_blend_1_2(s_pix); return 1; }
-int taito_f3_state::dpix_1_4(u32 s_pix) { if (s_pix) alpha_blend_1_4(s_pix); return 1; }
-int taito_f3_state::dpix_1_5(u32 s_pix) { if (s_pix) alpha_blend_1_5(s_pix); return 1; }
-int taito_f3_state::dpix_1_6(u32 s_pix) { if (s_pix) alpha_blend_1_6(s_pix); return 1; }
-int taito_f3_state::dpix_1_8(u32 s_pix) { if (s_pix) alpha_blend_1_8(s_pix); return 1; }
-int taito_f3_state::dpix_1_9(u32 s_pix) { if (s_pix) alpha_blend_1_9(s_pix); return 1; }
-int taito_f3_state::dpix_1_a(u32 s_pix) { if (s_pix) alpha_blend_1_a(s_pix); return 1; }
+inline int taito_f3_state::dpix_1_noalpha(u32 s_pix) { m_dval = s_pix; return 1; }
+inline int taito_f3_state::dpix_ret1(u32 s_pix) { return 1; }
+inline int taito_f3_state::dpix_ret0(u32 s_pix) { return 0; }
+inline int taito_f3_state::dpix_1_1(u32 s_pix) { if (s_pix) alpha_blend_1_1(s_pix); return 1; }
+inline int taito_f3_state::dpix_1_2(u32 s_pix) { if (s_pix) alpha_blend_1_2(s_pix); return 1; }
+inline int taito_f3_state::dpix_1_4(u32 s_pix) { if (s_pix) alpha_blend_1_4(s_pix); return 1; }
+inline int taito_f3_state::dpix_1_5(u32 s_pix) { if (s_pix) alpha_blend_1_5(s_pix); return 1; }
+inline int taito_f3_state::dpix_1_6(u32 s_pix) { if (s_pix) alpha_blend_1_6(s_pix); return 1; }
+inline int taito_f3_state::dpix_1_8(u32 s_pix) { if (s_pix) alpha_blend_1_8(s_pix); return 1; }
+inline int taito_f3_state::dpix_1_9(u32 s_pix) { if (s_pix) alpha_blend_1_9(s_pix); return 1; }
+inline int taito_f3_state::dpix_1_a(u32 s_pix) { if (s_pix) alpha_blend_1_a(s_pix); return 1; }
 
 int taito_f3_state::dpix_2a_0(u32 s_pix)
 {
@@ -1471,12 +1470,11 @@ void taito_f3_state::visible_tile_check(
 						f3_playfield_line_inf *line_t,
 						int line,
 						u32 x_index_fx,u32 y_index,
-						u16 *pf_data_n)
+						const u16 *pf_data_n)
 {
-	u16 *pf_base;
-
-	int alpha_mode = line_t->alpha_mode[line];
-	if (!alpha_mode) return;
+	const int alpha_mode = line_t->alpha_mode[line];
+	if (!alpha_mode)
+		return;
 
 	const u32 total_elements = m_gfxdecode->gfx(3)->elements();
 
@@ -1484,6 +1482,7 @@ void taito_f3_state::visible_tile_check(
 	const int tile_num = (((line_t->x_zoom[line] * 320 + (x_index_fx & 0xffff) + 0xffff) >> 16) + (tile_index & 0xf) + 15) >> 4;
 	tile_index >>= 4;
 
+	const u16 *pf_base;
 	if (m_flipscreen)
 	{
 		pf_base = pf_data_n + ((31 - (y_index >> 4)) << m_twidth_mask_bit);
@@ -1538,7 +1537,7 @@ void taito_f3_state::visible_tile_check(
 
 /******************************************************************************/
 
-void taito_f3_state::calculate_clip(int y, u16 pri, u32 *clip_in, u32 *clip_ex, int *line_enable)
+void taito_f3_state::calculate_clip(int y, u16 pri, u32 &clip_in, u32 &clip_ex, int &line_enable)
 {
 	const f3_spritealpha_line_inf *sa_line = &m_sa_line_inf[0];
 
@@ -1553,23 +1552,28 @@ void taito_f3_state::calculate_clip(int y, u16 pri, u32 *clip_in, u32 *clip_ex, 
 
 	s16 clipl = 0, clipr = 0x7fff;
 
-	const auto calc_clip = [&sa_line, y, &clipl, &clipr](auto p) {
-		clipl = std::max(sa_line->clip_l[p][y], clipl);
-		clipr = std::min(sa_line->clip_r[p][y], clipr);
-	};
-	const auto calc_clip_inv = [&sa_line, y, &clipl, &clipr](auto p) {
-		clipl = std::min(sa_line->clip_l[p][y], clipl);
-		clipr = std::max(sa_line->clip_r[p][y], clipr);
-	};
+	const auto calc_clip =
+		[&sa_line, y, &clipl, &clipr] (unsigned p)
+		{
+			clipl = std::max(sa_line->clip_l[p][y], clipl);
+			clipr = std::min(sa_line->clip_r[p][y], clipr);
+		};
+	const auto calc_clip_inv =
+		[&sa_line, y, &clipl, &clipr]
+		(unsigned p)
+		{
+			clipl = std::min(sa_line->clip_l[p][y], clipl);
+			clipr = std::max(sa_line->clip_r[p][y], clipr);
+		};
 
 	if (normal_planes & 0b0001) { calc_clip(0); };
 	if (normal_planes & 0b0010) { calc_clip(1); };
 	if (normal_planes & 0b0100) { calc_clip(2); };
 	if (normal_planes & 0b1000) { calc_clip(3); };
 	if (clipl > clipr)
-		*line_enable = 0;
+		line_enable = 0;
 	else
-		*clip_in = clipl | (clipr << 16);
+		clip_in = clipl | (clipr << 16);
 
 	// reset temp clip sides for the inverted/excluded window
 	clipl = 0x7fff; clipr = 0;
@@ -1578,9 +1582,9 @@ void taito_f3_state::calculate_clip(int y, u16 pri, u32 *clip_in, u32 *clip_ex, 
 	if (invert_planes & 0b0100) { calc_clip_inv(2); };
 	if (invert_planes & 0b1000) { calc_clip_inv(3); };
 	if (clipl > clipr)
-		*clip_ex = 0;
+		clip_ex = 0;
 	else
-		*clip_ex = clipl | (clipr << 16);
+		clip_ex = clipl | (clipr << 16);
 }
 
 void taito_f3_state::get_spritealphaclip_info()
@@ -1673,7 +1677,7 @@ void taito_f3_state::get_spritealphaclip_info()
 		if (sprite_clip & 0xf0)
 		{
 			int line_enable = 1;
-			calculate_clip(y, ((sprite_clip & 0x1ff) << 4), &line_t->sprite_clip_in[y], &line_t->sprite_clip_ex[y], &line_enable);
+			calculate_clip(y, ((sprite_clip & 0x1ff) << 4), line_t->sprite_clip_in[y], line_t->sprite_clip_ex[y], line_enable);
 			if (line_enable == 0)
 				line_t->sprite_clip_in[y] = 0x7fff7fff;
 		}
@@ -1691,7 +1695,7 @@ void taito_f3_state::get_spritealphaclip_info()
 }
 
 /* sx and sy are 16.16 fixed point numbers */
-void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos, u16 *pf_data_n)
+void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos, const u16 *pf_data_n)
 {
 	f3_playfield_line_inf *line_t = &m_pf_line_inf[pos];
 
@@ -1809,7 +1813,7 @@ void taito_f3_state::get_line_ram_info(tilemap_t *tmap, int sx, int sy, int pos,
 		if (pri & 0x0f00)
 		{
 			//fast path todo - remove line enable
-			calculate_clip(y, pri & 0x1ff0, &line_t->clip_in[y], &line_t->clip_ex[y], &line_enable);
+			calculate_clip(y, pri & 0x1ff0, line_t->clip_in[y], line_t->clip_ex[y], line_enable);
 		}
 		else
 		{
@@ -1956,7 +1960,7 @@ void taito_f3_state::get_vram_info(tilemap_t *vram_tilemap, tilemap_t *pixel_til
 		if (pri & 0x0f00)
 		{
 			//fast path todo - remove line enable
-			calculate_clip(y, pri & 0x1ff0, &line_t->clip_in[y], &line_t->clip_ex[y], &line_enable);
+			calculate_clip(y, pri & 0x1ff0, line_t->clip_in[y], line_t->clip_ex[y], line_enable);
 		}
 		else
 		{
