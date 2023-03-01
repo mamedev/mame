@@ -28327,6 +28327,9 @@ blocktax                        // (c)2002 TAX / Game Revival
 @source:misc/bntyhunt.cpp
 bntyhunt                        // (c) 200? GCTech Co., LTD
 
+@source:misc/brglitz.cpp
+brglitz                         // (c) 2014 Harry Levy
+
 @source:misc/buster.cpp
 buster                          // (c) 1987 Marian Electronics Ltd.
 
