@@ -186,6 +186,7 @@ protected:
 		u32 x_zoom[256]{};
 		u32 clip0[256]{};
 		u32 clip1[256]{};
+		u16 pal_add[256]{};
 	};
 
 	struct f3_spritealpha_line_inf
@@ -272,6 +273,7 @@ protected:
 	u8 *m_tsrc_s[5]{};
 	u32 m_x_count[5]{};
 	u32 m_x_zoom[5]{};
+	u16 m_pal_add[5]{};
 	std::unique_ptr<tempsprite[]> m_spritelist;
 	const tempsprite *m_sprite_end = nullptr;
 	std::unique_ptr<f3_playfield_line_inf[]> m_pf_line_inf;

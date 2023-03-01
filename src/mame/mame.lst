@@ -16218,6 +16218,9 @@ ch2001
 @source:cxg/dominator.cpp
 scmder
 sdtor
+sgalaxy
+sgalaxya
+sgalaxyb
 
 @source:cxg/scptchess.cpp
 scptchess
@@ -16341,6 +16344,7 @@ edrandy2                        // MAD (c) 1990 Data East Corporation (World)
 edrandyj                        // MAD (c) 1990 Data East Corporation (Japan)
 joemac                          // MAG (c) 1991 Data East Corporation (Japan)
 mutantf                         // MAF (c) 1991 Data East Corporation (World)
+mutantf1                        // MAF (c) 1991 Data East Corporation (World)
 mutantf2                        // MAF (c) 1991 Data East Corporation (World)
 mutantf3                        // MAF (c) 1991 Data East Corporation (World)
 mutantf4                        // MAF (c) 1991 Data East Corporation (World)
@@ -35562,6 +35566,7 @@ bsv102r                         //
 bsv103                          //
 bsv102                          //
 ffv101                          //
+ffv103                          //
 ffv104                          //
 ghv101                          //
 kpv106                          //
@@ -43350,6 +43355,7 @@ rtriv                           // (c) 198? Romar
 suprmous                        // (c) 1982 Taito
 thehole                         // bootleg
 thepit                          // (c) 1982 Zilec
+thepitc                         // (c) 1982 Centuri Inc
 thepitj                         // (c) 1982 Taito (licensed)
 thepitu1                        // (c) 1982 Centuri (licensed)
 thepitu2                        // (c) 1982 Centuri (licensed)

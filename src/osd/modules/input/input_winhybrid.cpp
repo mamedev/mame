@@ -121,12 +121,11 @@ typedef std::unique_ptr<OLECHAR, bstr_deleter> bstr_ptr;
 //  winhybrid_joystick_module
 //============================================================
 
-class winhybrid_joystick_module : public input_module_impl<device_info, osd_common_t>, public device_enum_interface
+class winhybrid_joystick_module : public input_module_impl<device_info, osd_common_t>
 {
 private:
 	std::unique_ptr<xinput_api_helper> m_xinput_helper;
 	std::unique_ptr<dinput_api_helper> m_dinput_helper;
-	std::vector<DWORD> m_xinput_deviceids;
 
 public:
 	winhybrid_joystick_module() :
@@ -166,60 +165,65 @@ public:
 		return 0;
 	}
 
-	virtual BOOL device_enum_callback(LPCDIDEVICEINSTANCE instance) override
-	{
-		// First check if this device is XInput compatible.
-		// If so, don't add it here as it'll be picked up by Xinput.
-		if (is_xinput_device(instance->guidProduct))
-		{
-			osd_printf_verbose("Skipping DirectInput for XInput compatible joystick %S.\n", instance->tszInstanceName);
-			return DIENUM_CONTINUE;
-		}
-
-		// allocate and link in a new device
-		auto devinfo = m_dinput_helper->create_device<dinput_joystick_device>(
-				*this,
-				instance,
-				&c_dfDIJoystick,
-				nullptr,
-				background_input() ? dinput_cooperative_level::BACKGROUND : dinput_cooperative_level::FOREGROUND,
-				[] (auto const &device, auto const &format) -> bool
-				{
-					// set absolute mode
-					HRESULT const result = dinput_api_helper::set_dword_property(
-							device,
-							DIPROP_AXISMODE,
-							0,
-							DIPH_DEVICE,
-							DIPROPAXISMODE_ABS);
-					if ((result != DI_OK) && (result != DI_PROPNOEFFECT))
-					{
-						osd_printf_error("DirectInput: Unable to set absolute mode for joystick.\n");
-						return false;
-					}
-					return true;
-				});
-		if (devinfo)
-			add_device(DEVICE_CLASS_JOYSTICK, std::move(devinfo));
-
-		return DIENUM_CONTINUE;
-	}
-
 	virtual void input_init(running_machine &machine) override
 	{
 		input_module_impl<device_info, osd_common_t>::input_init(machine);
 
 		bool xinput_detect_failed = false;
-		HRESULT result = get_xinput_devices();
+		std::vector<DWORD> xinput_deviceids;
+		HRESULT result = get_xinput_devices(xinput_deviceids);
 		if (result != 0)
 		{
 			xinput_detect_failed = true;
-			m_xinput_deviceids.clear();
+			xinput_deviceids.clear();
 			osd_printf_warning("XInput device detection failed. XInput won't be used. Error: 0x%X\n", uint32_t(result));
 		}
 
 		// Enumerate all the DirectInput joysticks and add them if they aren't XInput compatible
-		result = m_dinput_helper->enum_attached_devices(DI8DEVCLASS_GAMECTRL, *this);
+		result = m_dinput_helper->enum_attached_devices(
+				DI8DEVCLASS_GAMECTRL,
+				[this, &xinput_deviceids] (LPCDIDEVICEINSTANCE instance)
+				{
+					// First check if this device is XInput compatible.
+					// If so, don't add it here as it'll be picked up by Xinput.
+					auto const found = std::find(
+							xinput_deviceids.begin(),
+							xinput_deviceids.end(),
+							instance->guidProduct.Data1);
+					if (xinput_deviceids.end() != found)
+					{
+						osd_printf_verbose("Skipping DirectInput for XInput compatible joystick %S.\n", instance->tszInstanceName);
+						return DIENUM_CONTINUE;
+					}
+
+					// allocate and link in a new device
+					auto devinfo = m_dinput_helper->create_device<dinput_joystick_device>(
+							*this,
+							instance,
+							&c_dfDIJoystick,
+							nullptr,
+							background_input() ? dinput_cooperative_level::BACKGROUND : dinput_cooperative_level::FOREGROUND,
+							[] (auto const &device, auto const &format) -> bool
+							{
+								// set absolute mode
+								HRESULT const result = dinput_api_helper::set_dword_property(
+										device,
+										DIPROP_AXISMODE,
+										0,
+										DIPH_DEVICE,
+										DIPROPAXISMODE_ABS);
+								if ((result != DI_OK) && (result != DI_PROPNOEFFECT))
+								{
+									osd_printf_error("DirectInput: Unable to set absolute mode for joystick.\n");
+									return false;
+								}
+								return true;
+							});
+					if (devinfo)
+						add_device(DEVICE_CLASS_JOYSTICK, std::move(devinfo));
+
+					return DIENUM_CONTINUE;
+				});
 		if (result != DI_OK)
 			fatalerror("DirectInput: Unable to enumerate game controllers (result=%08X).\n", uint32_t(result));
 
@@ -274,28 +278,15 @@ private:
 	}
 
 	//-----------------------------------------------------------------------------
-	// Returns true if the DirectInput device is also an XInput device.
-	//-----------------------------------------------------------------------------
-	bool is_xinput_device(GUID const &pGuidProductFromDirectInput) const
-	{
-		// Check each xinput device to see if this device's vid/pid matches
-		auto const found = std::find(
-				m_xinput_deviceids.begin(),
-				m_xinput_deviceids.end(),
-				pGuidProductFromDirectInput.Data1);
-		return m_xinput_deviceids.end() != found;
-	}
-
-	//-----------------------------------------------------------------------------
 	// Enum each PNP device using WMI and check each device ID to see if it contains
 	// "IG_" (ex. "VID_045E&PID_028E&IG_00").  If it does, then it's an XInput device
 	// Unfortunately this information can not be found by just using DirectInput.
 	// Checking against a VID/PID of 0x028E/0x045E won't find 3rd party or future
 	// XInput devices.
 	//-----------------------------------------------------------------------------
-	HRESULT get_xinput_devices()
+	HRESULT get_xinput_devices(std::vector<DWORD> &xinput_deviceids)
 	{
-		m_xinput_deviceids.clear();
+		xinput_deviceids.clear();
 
 		// CoInit if needed
 		class com_helper
@@ -419,7 +410,7 @@ private:
 							dwPid = 0;
 
 						// Add the VID/PID to a list
-						m_xinput_deviceids.push_back(MAKELONG(dwVid, dwPid));
+						xinput_deviceids.push_back(MAKELONG(dwVid, dwPid));
 					}
 				}
 			}

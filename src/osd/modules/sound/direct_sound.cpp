@@ -435,12 +435,13 @@ HRESULT sound_direct_sound::dsound_init()
 	{
 		// make a format description for what we want
 		WAVEFORMATEX stream_format;
-		stream_format.wBitsPerSample    = 16;
 		stream_format.wFormatTag        = WAVE_FORMAT_PCM;
 		stream_format.nChannels         = 2;
 		stream_format.nSamplesPerSec    = m_sample_rate;
+		stream_format.wBitsPerSample    = 16;
 		stream_format.nBlockAlign       = stream_format.wBitsPerSample * stream_format.nChannels / 8;
 		stream_format.nAvgBytesPerSec   = stream_format.nSamplesPerSec * stream_format.nBlockAlign;
+		stream_format.cbSize            = 0;
 
 		// compute the buffer size based on the output sample rate
 		int audio_latency = std::max(m_audio_latency, 1);

@@ -821,24 +821,26 @@ void psychic5_state::bombsa(machine_config &config)
 
 ***************************************************************************/
 
+// Main PCB PS-8634
+// Tilemap PCB PS-8635
 ROM_START( psychic5j )
 	ROM_REGION( 0x20000, "maincpu", 0 )                     /* Main CPU */
-	ROM_LOAD( "p5d",          0x00000, 0x08000, CRC(90259249) SHA1(ac2d8dd95f6c04b6ad726136931e37dcd537e977) )
-	ROM_LOAD( "p5e",          0x10000, 0x10000, CRC(72298f34) SHA1(725be2fbf5f3622f646c0fb8e6677cbddf0b1fc2) )
+	ROM_LOAD( "4.7a",         0x00000, 0x08000, CRC(90259249) SHA1(ac2d8dd95f6c04b6ad726136931e37dcd537e977) )
+	ROM_LOAD( "5.7c",         0x10000, 0x10000, CRC(72298f34) SHA1(725be2fbf5f3622f646c0fb8e6677cbddf0b1fc2) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )                    /* Sound CPU */
-	ROM_LOAD( "p5a",          0x00000, 0x10000, CRC(6efee094) SHA1(ae2b5bf6199121520bf8428b8b160b987f5b474f) )
+	ROM_LOAD( "1.2b",         0x00000, 0x10000, CRC(6efee094) SHA1(ae2b5bf6199121520bf8428b8b160b987f5b474f) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )    /* sprite tiles */
-	ROM_LOAD( "p5b",          0x00000, 0x10000, CRC(7e3f87d4) SHA1(b8e7fa3f96d2e3937e4cb530f105bb84d5743b43) )
-	ROM_LOAD( "p5c",          0x10000, 0x10000, CRC(8710fedb) SHA1(c7e8dc6b733e4ecce37d56fc429c00ade8736ff3) )
+	ROM_LOAD( "2.4p",         0x00000, 0x10000, CRC(7e3f87d4) SHA1(b8e7fa3f96d2e3937e4cb530f105bb84d5743b43) )
+	ROM_LOAD( "3.4r",         0x10000, 0x10000, CRC(8710fedb) SHA1(c7e8dc6b733e4ecce37d56fc429c00ade8736ff3) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )    /* background tiles */
-	ROM_LOAD( "p5g",          0x00000, 0x10000, CRC(f9262f32) SHA1(bae2dc77be7024bd85f213e4da746c5903db6ea5) )
-	ROM_LOAD( "p5h",          0x10000, 0x10000, CRC(c411171a) SHA1(d5893563715ba231e42b084b88f5176bb94a4da9) )
+	ROM_LOAD( "7.2k",         0x00000, 0x10000, CRC(f9262f32) SHA1(bae2dc77be7024bd85f213e4da746c5903db6ea5) )
+	ROM_LOAD( "8.2m",         0x10000, 0x10000, CRC(c411171a) SHA1(d5893563715ba231e42b084b88f5176bb94a4da9) )
 
 	ROM_REGION( 0x08000, "gfx3", 0 )    /* foreground tiles */
-	ROM_LOAD( "p5f",          0x00000, 0x08000, CRC(04d7e21c) SHA1(6046c506bdedc233e3730f90c7897e847bec8758) )
+	ROM_LOAD( "6.5f",         0x00000, 0x08000, CRC(04d7e21c) SHA1(6046c506bdedc233e3730f90c7897e847bec8758) )
 
 	ROM_REGION( 0x08000, "proms", 0 )   /* Proms */
 	ROM_LOAD( "my10.7l",    0x000, 0x200, CRC(6a7d13c0) SHA1(2a835a4ac1acb7663d0b915d0339af9800284da6) )

@@ -654,6 +654,8 @@ void sdl_osd_interface::process_window_event(SDL_Event const &event)
 		break;
 
 	case SDL_WINDOWEVENT_FOCUS_LOST:
+		if (window == m_focus_window)
+			m_focus_window = nullptr;
 		machine().ui_input().push_window_defocus_event(window->target());
 		break;
 

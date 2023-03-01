@@ -1251,6 +1251,50 @@ void tlcs870_device::device_start()
 	m_tcx_timer[1] = timer_alloc(FUNC(tlcs870_device::tc2_cb), this);
 	m_tcx_timer[2] = timer_alloc(FUNC(tlcs870_device::tc3_cb), this);
 	m_tcx_timer[3] = timer_alloc(FUNC(tlcs870_device::tc4_cb), this);
+
+	save_item(NAME(m_prvpc));
+	save_item(NAME(m_pc));
+	save_item(NAME(m_sp));
+	save_item(NAME(m_port_out_latch));
+	save_item(NAME(m_read_input_port));
+	save_item(NAME(m_port0_cr));
+	save_item(NAME(m_port1_cr));
+	save_item(NAME(m_port6_cr));
+	save_item(NAME(m_port7_cr));
+	save_item(NAME(m_cycles));
+	save_item(NAME(m_tmppc));
+	save_item(NAME(m_addr));
+	save_item(NAME(m_F));
+	save_item(NAME(m_RBS));
+	save_item(NAME(m_IL));
+	save_item(NAME(m_EIR));
+	save_item(NAME(m_EINTCR));
+	save_item(NAME(m_ADCCR));
+	save_item(NAME(m_ADCDR));
+	save_item(NAME(m_SYSCR1));
+	save_item(NAME(m_SYSCR2));
+	save_item(NAME(m_TBTCR));
+	save_item(NAME(m_TREG1A));
+	save_item(NAME(m_TREG1B));
+	save_item(NAME(m_TC1CR));
+	save_item(NAME(m_TREG2));
+	save_item(NAME(m_TC2CR));
+	save_item(NAME(m_TREG3A));
+	save_item(NAME(m_TREG3B));
+	save_item(NAME(m_TC3CR));
+	save_item(NAME(m_TREG4));
+	save_item(NAME(m_TC4CR));
+	save_item(NAME(m_SIOCR1));
+	save_item(NAME(m_SIOCR2));
+	save_item(NAME(m_WDTCR1));
+	save_item(NAME(m_irqstate));
+	save_item(NAME(m_transfer_numbytes));
+	save_item(NAME(m_transfer_pos));
+	save_item(NAME(m_transfer_shiftreg));
+	save_item(NAME(m_transfer_shiftpos));
+	save_item(NAME(m_transfer_mode));
+	save_item(NAME(m_transmit_bits));
+	save_item(NAME(m_receive_bits));
 }
 
 
