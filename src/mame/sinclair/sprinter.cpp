@@ -138,6 +138,7 @@ protected:
 	void screen_update_txt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_update_graph(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_update_game(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u8* as_mode(u8 a, u8 b);
 	std::pair<u8, u8> lookback_scroll(u8 a, u8 b);
 
 	required_device<z84c015_device> m_maincpu;
@@ -360,22 +361,19 @@ void sprinter_state::screen_update_txt(screen_device &screen, bitmap_ind16 &bitm
 	{
 		const u16 b8 = (SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT;
 
-		u8* line1 = nullptr;
 		u8* mode = nullptr;
 		u8 attr, symb;
 		u16 *pix = &(bitmap.pix(vpos, cliprect.left()));
 		for(u16 hpos = cliprect.left(); hpos <= cliprect.right(); hpos++)
 		{
 			const u16 a16 = (SPRINT_WIDTH + hpos - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
-			if ((line1 == nullptr) || (a16 & 7) == 0)
+			if ((mode == nullptr) || (a16 & 7) == 0)
 			{
 				// 16x8 block descriptor
-				const bool do_init = line1 == nullptr;
+				const bool do_init = mode == nullptr;
 				if (do_init || ((a16 & 15) == 0))
-				{
-					line1 = m_vram + (1 + (a16 >> 4) * 2 + 0x80 * (m_rgmod & 1)) * 1024 + 0x300;
-					mode = line1 + (b8 >> 3) * 4;
-				}
+					mode = as_mode(a16 >> 4, b8 >> 3);
+
 				if (BIT(mode[0], 4))
 				{
 					if (!BIT(mode[0], 5) && (((a16 & 15) == 8) || (do_init && (a16 & 8))))
@@ -425,7 +423,6 @@ void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bi
 	for(u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
 		const u16 b8 = (SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT;
-		const u16 la = 0x300 + (b8 >> 3) * 4;
 
 		u8* mode = nullptr;
 		u16 pal, x;
@@ -437,9 +434,8 @@ void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bi
 			const u16 a16 = (SPRINT_WIDTH + hpos - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
 			if ((mode == nullptr) || ((a16 & 15) == 0))
 			{
-				const u32 line1 = (1 + (a16 >> 4) * 2 + 0x80 * (m_rgmod & 1)) * 1024;
 				// 16x8 block descriptor
-				mode = m_vram + line1 + la;
+				mode = as_mode(a16 >> 4, b8 >> 3);
 				if(!BIT(mode[0], 4))
 				{
 					pal = BIT(mode[0], 6, 2) << 8;
@@ -484,13 +480,17 @@ void sprinter_state::screen_update_game(screen_device &screen, bitmap_ind16 &bit
 
 		for(u16 hpos = cliprect.left(); hpos <= cliprect.right(); hpos++)
 		{
-			const u16 a16 = (SPRINT_WIDTH + hpos + (scroll.first << 1) - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
+			u16 a16 = (SPRINT_WIDTH + hpos + (scroll.first << 1) - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
+			if ((mode != nullptr) && BIT(mode[0], 2) && (((a16 - (scroll.first << 1)) & 15) == 0))
+			{
+				scroll = {mode[3] & 0x0f, mode[3] >> 4};
+				a16 = (SPRINT_WIDTH + hpos + (scroll.first << 1) - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
+			}
 			const u16 b8 = (SPRINT_HEIGHT + vpos + scroll.second - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT;
+
 			if (mode == nullptr)
 			{
-				const u16 la = 0x300 + (b8 >> 3) * 4;
-				const u32 line1 = (1 + (a16 >> 4) * 2 + 0x80 * (m_rgmod & 1)) * 1024;
-				mode = m_vram + line1 + la;
+				mode = as_mode(a16 >> 4, b8 >> 3);
 				pal = BIT(mode[0], 6, 2) << 8;
 				x = ((BIT(mode[0], 0, 2) << 8) | mode[1]);
 				y = mode[2];
@@ -511,22 +511,22 @@ void sprinter_state::screen_update_game(screen_device &screen, bitmap_ind16 &bit
 	}
 }
 
+u8* sprinter_state::as_mode(u8 a, u8 b)
+{
+	const u32 line1 = (1 + a * 2 + 0x80 * (m_rgmod & 1)) * 1024;
+	const u16 la = 0x300 + b * 4;
+
+	return m_vram + line1 + la;
+}
+
 std::pair<u8, u8> sprinter_state::lookback_scroll(u8 a, u8 b)
 {
-	const u32 offset = (1 + 0x80 * (m_rgmod & 1)) * 1024 + 0x300;
-	if (!a--)
+	for (auto v = b; b; b--, a = 55)
 	{
-		a = 55;
-		if(!b--)
-			b = 39;
-	}
-
-	for (; b; b--, a = 55)
-	{
-		for(; a; a--)
+		for(auto h = a; a; a--)
 		{
-			const u8* mode = m_vram + offset + a * 2 * 1024 + b * 4;
-			if (BIT(mode[0], 2))
+			const u8* mode = as_mode(h, v);
+			if (BIT(mode[0], 2) && (((h != a) && (v != b)) || ~mode[3]) )
 				return { mode[3] & 0x0f, mode[3] >> 4 };
 		}
 	}
@@ -1127,12 +1127,12 @@ void sprinter_state::update_int(bool recalculate)
 		m_ints.clear();
 		for (auto a = 0; a <= 55; a++)
 		{
-			const u8* la = m_vram + (1 + 2 * a + 0x80 * (m_rgmod & 1)) * 1024 + 0x300;
+			const u8* line1 = as_mode(a, 0);
 			for (auto b = 0; b <= 39; b++)
 			{
-				if ((*la & 0xfd) == 0xfd)
+				if ((*line1 & 0xfd) == 0xfd)
 					m_ints.push_back({b * 8 + 23, a * 16 + 112});
-				la += 4;
+				line1 += 4;
 			}
 		}
 	}
