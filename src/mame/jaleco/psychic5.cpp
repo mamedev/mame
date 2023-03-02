@@ -338,17 +338,17 @@ Notes (23-Jan-2016 AS):
 #include "screen.h"
 #include "speaker.h"
 
+#include <cassert>
 
-MACHINE_START_MEMBER(psychic5_state, psychic5)
+
+void psychic5_state::machine_start()
 {
-	membank("mainbank")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
+	// be lazy and assume banked ROM is always a power-of-two and multiple of page size
+	assert(!(m_bankrom->bytes() % 0x4000));
+	assert(!(m_bankrom->bytes() & (m_bankrom->bytes() - 1)));
 
-	save_item(NAME(m_bank_latch));
-}
-
-MACHINE_START_MEMBER(psychic5_state, bombsa)
-{
-	membank("mainbank")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
+	m_mainbank->configure_entries(0, m_bankrom->bytes() / 0x4000, m_bankrom->base(), 0x4000);
+	m_bank_mask = (m_bankrom->bytes() / 0x4000) - 1;
 
 	save_item(NAME(m_bank_latch));
 }
@@ -356,6 +356,8 @@ MACHINE_START_MEMBER(psychic5_state, bombsa)
 void psychic5_state::machine_reset()
 {
 	m_bank_latch = 0xff;
+	m_mainbank->set_entry(m_bank_latch & m_bank_mask);
+
 	flip_screen_set(0);
 }
 
@@ -369,10 +371,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(psychic5_state::scanline)
 {
 	int scanline = param;
 
-	if(scanline == 240) // vblank-out irq
+	if (scanline == 240) // vblank-out irq
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* Z80 - RST 10h - vblank */
 
-	if(scanline == 0) // sprite buffer irq
+	if (scanline == 0) // sprite buffer irq
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* Z80 - RST 08h */
 }
 
@@ -389,21 +391,12 @@ uint8_t psychic5_state::bankselect_r()
 	return m_bank_latch;
 }
 
-void psychic5_state::psychic5_bankselect_w(uint8_t data)
+void psychic5_state::bankselect_w(uint8_t data)
 {
 	if (m_bank_latch != data)
 	{
 		m_bank_latch = data;
-		membank("mainbank")->set_entry(data & 3);   /* Select 4 banks of 16k */
-	}
-}
-
-void psychic5_state::bombsa_bankselect_w(uint8_t data)
-{
-	if (m_bank_latch != data)
-	{
-		m_bank_latch = data;
-		membank("mainbank")->set_entry(data & 7);   /* Select 8 banks of 16k */
+		m_mainbank->set_entry(data & m_bank_mask);
 	}
 }
 
@@ -438,40 +431,35 @@ void psychic5_state::bombsa_flipscreen_w(uint8_t data)
 void psychic5_state::psychic5_main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
-	map(0xc000, 0xdfff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
+	map(0x8000, 0xbfff).bankr(m_mainbank);
+	map(0xc000, 0xdfff).view(m_vrambank);
 	map(0xe000, 0xefff).ram();
 	map(0xf000, 0xf000).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xf001, 0xf001).nopr().w(FUNC(psychic5_state::psychic5_coin_counter_w));
-	map(0xf002, 0xf002).rw(FUNC(psychic5_state::bankselect_r), FUNC(psychic5_state::psychic5_bankselect_w));
+	map(0xf002, 0xf002).rw(FUNC(psychic5_state::bankselect_r), FUNC(psychic5_state::bankselect_w));
 	map(0xf003, 0xf003).rw(FUNC(psychic5_state::vram_page_select_r), FUNC(psychic5_state::vram_page_select_w));
 	map(0xf004, 0xf004).noprw(); // ???
 	map(0xf005, 0xf005).nopr().w(FUNC(psychic5_state::psychic5_title_screen_w));
 	map(0xf006, 0xf1ff).noprw();
 	map(0xf200, 0xf7ff).ram().share("spriteram");
 	map(0xf800, 0xffff).ram();
-}
 
+	m_vrambank[0](0xc000, 0xcfff).ram().w(FUNC(psychic5_state::bg_videoram_w)).share(m_bg_videoram);
+	m_vrambank[0](0xd000, 0xdfff).ram();
 
-void psychic5_state::psychic5_vrambank_map(address_map &map)
-{
-	map(0x0000, 0x0fff).ram().w(FUNC(psychic5_state::bg_videoram_w)).share("bg_videoram");
-	map(0x1000, 0x1fff).ram();
+	m_vrambank[1](0xc000, 0xc000).portr("SYSTEM");
+	m_vrambank[1](0xc001, 0xc001).portr("P1");
+	m_vrambank[1](0xc002, 0xc002).portr("P2");
+	m_vrambank[1](0xc003, 0xc003).portr("DSW1");
+	m_vrambank[1](0xc004, 0xc004).portr("DSW2");
 
-	map(0x2000, 0x2000).portr("SYSTEM");
-	map(0x2001, 0x2001).portr("P1");
-	map(0x2002, 0x2002).portr("P2");
-	map(0x2003, 0x2003).portr("DSW1");
-	map(0x2004, 0x2004).portr("DSW2");
+	m_vrambank[1](0xc308, 0xc30c).ram().share(m_bg_control);
 
-	map(0x2308, 0x230c).ram().share("bg_control");
+	m_vrambank[1](0xc400, 0xc5ff).ram().w(FUNC(psychic5_state::sprite_col_w)).share(m_ps5_palette_ram_sp);
+	m_vrambank[1](0xc800, 0xc9ff).ram().w(FUNC(psychic5_state::bg_col_w)).share(m_ps5_palette_ram_bg);
+	m_vrambank[1](0xca00, 0xcbff).ram().w(FUNC(psychic5_state::tx_col_w)).share(m_ps5_palette_ram_tx);
 
-	map(0x2400, 0x25ff).ram().w(FUNC(psychic5_state::sprite_col_w)).share("palette_ram_sp");
-	map(0x2800, 0x29ff).ram().w(FUNC(psychic5_state::bg_col_w)).share("palette_ram_bg");
-	map(0x2a00, 0x2bff).ram().w(FUNC(psychic5_state::tx_col_w)).share("palette_ram_tx");
-
-	map(0x3000, 0x37ff).ram().w(FUNC(psychic5_state::fg_videoram_w)).share("fg_videoram");
-
+	m_vrambank[1](0xd000, 0xd7ff).ram().w(FUNC(psychic5_state::fg_videoram_w)).share(m_fg_videoram);
 }
 
 
@@ -493,21 +481,37 @@ void psychic5_state::psychic5_soundport_map(address_map &map)
 void psychic5_state::bombsa_main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("mainbank");
+	map(0x8000, 0xbfff).bankr(m_mainbank);
 	map(0xc000, 0xcfff).ram();
 
 	/* ports look like the other games */
 	map(0xd000, 0xd1ff).ram();
 	map(0xd000, 0xd000).w("soundlatch", FUNC(generic_latch_8_device::write)); // confirmed
 	map(0xd001, 0xd001).w(FUNC(psychic5_state::bombsa_flipscreen_w));
-	map(0xd002, 0xd002).rw(FUNC(psychic5_state::bankselect_r), FUNC(psychic5_state::bombsa_bankselect_w));
+	map(0xd002, 0xd002).rw(FUNC(psychic5_state::bankselect_r), FUNC(psychic5_state::bankselect_w));
 	map(0xd003, 0xd003).rw(FUNC(psychic5_state::vram_page_select_r), FUNC(psychic5_state::vram_page_select_w));
 	map(0xd005, 0xd005).w(FUNC(psychic5_state::bombsa_unknown_w)); // ?
 
-	map(0xd200, 0xd7ff).ram().share("spriteram");
+	map(0xd200, 0xd7ff).ram().share(m_spriteram);
 	map(0xd800, 0xdfff).ram();
 
-	map(0xe000, 0xffff).m(m_vrambank, FUNC(address_map_bank_device::amap8));
+	map(0xe000, 0xffff).view(m_vrambank);
+
+	m_vrambank[0](0xe000, 0xffff).ram().w(FUNC(psychic5_state::bg_videoram_w)).share(m_bg_videoram);
+
+	m_vrambank[1](0xe000, 0xe000).portr("SYSTEM");
+	m_vrambank[1](0xe001, 0xe001).portr("P1");
+	m_vrambank[1](0xe002, 0xe002).portr("P2");
+	m_vrambank[1](0xe003, 0xe003).portr("DSW1");
+	m_vrambank[1](0xe004, 0xe004).portr("DSW2");
+
+	m_vrambank[1](0xe308, 0xe30c).ram().share(m_bg_control);
+
+	m_vrambank[1](0xe800, 0xefff).ram().w(FUNC(psychic5_state::fg_videoram_w)).share(m_fg_videoram);
+
+	m_vrambank[1](0xf000, 0xf1ff).ram().w(FUNC(psychic5_state::sprite_col_w)).share(m_ps5_palette_ram_sp);
+	m_vrambank[1](0xf200, 0xf3ff).ram().w(FUNC(psychic5_state::bg_col_w)).share(m_ps5_palette_ram_bg);
+	m_vrambank[1](0xf400, 0xf5ff).ram().w(FUNC(psychic5_state::tx_col_w)).share(m_ps5_palette_ram_tx);
 }
 
 void psychic5_state::bombsa_sound_map(address_map &map)
@@ -523,25 +527,6 @@ void psychic5_state::bombsa_soundport_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0x80, 0x81).rw("ym2", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-}
-
-void psychic5_state::bombsa_vrambank_map(address_map &map)
-{
-	map(0x0000, 0x1fff).ram().w(FUNC(psychic5_state::bg_videoram_w)).share("bg_videoram");
-
-	map(0x2000, 0x2000).portr("SYSTEM");
-	map(0x2001, 0x2001).portr("P1");
-	map(0x2002, 0x2002).portr("P2");
-	map(0x2003, 0x2003).portr("DSW1");
-	map(0x2004, 0x2004).portr("DSW2");
-
-	map(0x2308, 0x230c).ram().share("bg_control");
-
-	map(0x3000, 0x31ff).ram().w(FUNC(psychic5_state::sprite_col_w)).share("palette_ram_sp");
-	map(0x3200, 0x33ff).ram().w(FUNC(psychic5_state::bg_col_w)).share("palette_ram_bg");
-	map(0x3400, 0x35ff).ram().w(FUNC(psychic5_state::tx_col_w)).share("palette_ram_tx");
-
-	map(0x2800, 0x2fff).ram().w(FUNC(psychic5_state::fg_videoram_w)).share("fg_videoram");
 }
 
 
@@ -727,15 +712,11 @@ void psychic5_state::psychic5(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &psychic5_state::psychic5_main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(psychic5_state::scanline), "screen", 0, 1);
 
-	ADDRESS_MAP_BANK(config, "vrambank").set_map(&psychic5_state::psychic5_vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 14, 0x2000);
-
 	Z80(config, m_audiocpu, XTAL(5'000'000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psychic5_state::psychic5_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &psychic5_state::psychic5_soundport_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));      /* Allow time for 2nd cpu to interleave */
-
-	MCFG_MACHINE_START_OVERRIDE(psychic5_state,psychic5)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -775,15 +756,11 @@ void psychic5_state::bombsa(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &psychic5_state::bombsa_main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(psychic5_state::scanline), "screen", 0, 1);
 
-	ADDRESS_MAP_BANK(config, "vrambank").set_map(&psychic5_state::bombsa_vrambank_map).set_options(ENDIANNESS_LITTLE, 8, 14, 0x2000);
-
 	Z80(config, m_audiocpu, XTAL(5'000'000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psychic5_state::bombsa_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &psychic5_state::bombsa_soundport_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
-
-	MCFG_MACHINE_START_OVERRIDE(psychic5_state,bombsa)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -824,51 +801,55 @@ void psychic5_state::bombsa(machine_config &config)
 // Main PCB PS-8634
 // Tilemap PCB PS-8635
 ROM_START( psychic5j )
-	ROM_REGION( 0x20000, "maincpu", 0 )                     /* Main CPU */
+	ROM_REGION( 0x08000, "maincpu", 0 )     // Main CPU
 	ROM_LOAD( "4.7a",         0x00000, 0x08000, CRC(90259249) SHA1(ac2d8dd95f6c04b6ad726136931e37dcd537e977) )
-	ROM_LOAD( "5.7c",         0x10000, 0x10000, CRC(72298f34) SHA1(725be2fbf5f3622f646c0fb8e6677cbddf0b1fc2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )                    /* Sound CPU */
+	ROM_REGION( 0x10000, "bankrom", 0 )
+	ROM_LOAD( "5.7c",         0x00000, 0x10000, CRC(72298f34) SHA1(725be2fbf5f3622f646c0fb8e6677cbddf0b1fc2) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sound CPU
 	ROM_LOAD( "1.2b",         0x00000, 0x10000, CRC(6efee094) SHA1(ae2b5bf6199121520bf8428b8b160b987f5b474f) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )    /* sprite tiles */
+	ROM_REGION( 0x20000, "gfx1", 0 )        // sprite tiles
 	ROM_LOAD( "2.4p",         0x00000, 0x10000, CRC(7e3f87d4) SHA1(b8e7fa3f96d2e3937e4cb530f105bb84d5743b43) )
 	ROM_LOAD( "3.4r",         0x10000, 0x10000, CRC(8710fedb) SHA1(c7e8dc6b733e4ecce37d56fc429c00ade8736ff3) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )    /* background tiles */
+	ROM_REGION( 0x20000, "gfx2", 0 )        // background tiles
 	ROM_LOAD( "7.2k",         0x00000, 0x10000, CRC(f9262f32) SHA1(bae2dc77be7024bd85f213e4da746c5903db6ea5) )
 	ROM_LOAD( "8.2m",         0x10000, 0x10000, CRC(c411171a) SHA1(d5893563715ba231e42b084b88f5176bb94a4da9) )
 
-	ROM_REGION( 0x08000, "gfx3", 0 )    /* foreground tiles */
+	ROM_REGION( 0x08000, "gfx3", 0 )        // foreground tiles
 	ROM_LOAD( "6.5f",         0x00000, 0x08000, CRC(04d7e21c) SHA1(6046c506bdedc233e3730f90c7897e847bec8758) )
 
-	ROM_REGION( 0x08000, "proms", 0 )   /* Proms */
-	ROM_LOAD( "my10.7l",    0x000, 0x200, CRC(6a7d13c0) SHA1(2a835a4ac1acb7663d0b915d0339af9800284da6) )
-	ROM_LOAD( "my09.3t",    0x200, 0x400, CRC(59e44236) SHA1(f53d99694fa5acd7cc51dd78e09f0d2ef730e7a4) )
+	ROM_REGION( 0x08000, "proms", 0 )       // PROMs
+	ROM_LOAD( "my10.7l",      0x000, 0x200, CRC(6a7d13c0) SHA1(2a835a4ac1acb7663d0b915d0339af9800284da6) )
+	ROM_LOAD( "my09.3t",      0x200, 0x400, CRC(59e44236) SHA1(f53d99694fa5acd7cc51dd78e09f0d2ef730e7a4) )
 ROM_END
 
 ROM_START( psychic5 )
-	ROM_REGION( 0x20000, "maincpu", 0 )                     /* Main CPU */
-	ROM_LOAD( "myp5d",          0x00000, 0x08000, CRC(1d40a8c7) SHA1(79b36e690ea334c066b55b1e39ceb5fe0688cd7b) )
-	ROM_LOAD( "myp5e",          0x10000, 0x10000, CRC(2fa7e8c0) SHA1(d5096ebec58329346a3292ad2da1be3742fad093) )
+	ROM_REGION( 0x08000, "maincpu", 0 )     // Main CPU
+	ROM_LOAD( "myp5d",        0x00000, 0x08000, CRC(1d40a8c7) SHA1(79b36e690ea334c066b55b1e39ceb5fe0688cd7b) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )                    /* Sound CPU */
-	ROM_LOAD( "myp5a",          0x00000, 0x10000, CRC(6efee094) SHA1(ae2b5bf6199121520bf8428b8b160b987f5b474f) )
+	ROM_REGION( 0x10000, "bankrom", 0 )
+	ROM_LOAD( "myp5e",        0x00000, 0x10000, CRC(2fa7e8c0) SHA1(d5096ebec58329346a3292ad2da1be3742fad093) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )    /* sprite tiles */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sound CPU
+	ROM_LOAD( "myp5a",        0x00000, 0x10000, CRC(6efee094) SHA1(ae2b5bf6199121520bf8428b8b160b987f5b474f) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )        // sprite tiles
 	ROM_LOAD( "p5b",          0x00000, 0x10000, CRC(7e3f87d4) SHA1(b8e7fa3f96d2e3937e4cb530f105bb84d5743b43) )
 	ROM_LOAD( "p5c",          0x10000, 0x10000, CRC(8710fedb) SHA1(c7e8dc6b733e4ecce37d56fc429c00ade8736ff3) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )    /* background tiles */
-	ROM_LOAD( "myp5g",          0x00000, 0x10000, CRC(617b074b) SHA1(7aaac9fddf5675b6698373333db3e096471d7ad6) )
-	ROM_LOAD( "myp5h",          0x10000, 0x10000, CRC(a9dfbe67) SHA1(f31f75e88f9b37d7fe5b1a1a8e0299151b729ccf) )
+	ROM_REGION( 0x20000, "gfx2", 0 )        // background tiles
+	ROM_LOAD( "myp5g",        0x00000, 0x10000, CRC(617b074b) SHA1(7aaac9fddf5675b6698373333db3e096471d7ad6) )
+	ROM_LOAD( "myp5h",        0x10000, 0x10000, CRC(a9dfbe67) SHA1(f31f75e88f9b37d7fe5b1a1a8e0299151b729ccf) )
 
-	ROM_REGION( 0x08000, "gfx3", 0 )    /* foreground tiles */
+	ROM_REGION( 0x08000, "gfx3", 0 )        // foreground tiles
 	ROM_LOAD( "p5f",          0x00000, 0x08000, CRC(04d7e21c) SHA1(6046c506bdedc233e3730f90c7897e847bec8758) )
 
-	ROM_REGION( 0x08000, "proms", 0 )   /* Proms */
-	ROM_LOAD( "my10.7l",    0x000, 0x200, CRC(6a7d13c0) SHA1(2a835a4ac1acb7663d0b915d0339af9800284da6) )
-	ROM_LOAD( "my09.3t",    0x200, 0x400, CRC(59e44236) SHA1(f53d99694fa5acd7cc51dd78e09f0d2ef730e7a4) )
+	ROM_REGION( 0x08000, "proms", 0 )       // PROMs
+	ROM_LOAD( "my10.7l",      0x000, 0x200, CRC(6a7d13c0) SHA1(2a835a4ac1acb7663d0b915d0339af9800284da6) )
+	ROM_LOAD( "my09.3t",      0x200, 0x400, CRC(59e44236) SHA1(f53d99694fa5acd7cc51dd78e09f0d2ef730e7a4) )
 ROM_END
 
 /*
@@ -941,28 +922,30 @@ Notes:
 
 
 ROM_START( bombsa )
-	ROM_REGION( 0x30000, "maincpu", ROMREGION_ERASEFF )                 /* Main CPU */
+	ROM_REGION( 0x08000, "maincpu", 0 )     // Main CPU
 	ROM_LOAD( "4.7a",         0x00000, 0x08000, CRC(0191f6a7) SHA1(10a0434abbf4be068751e65c81b1a211729e3742) )
-	/* these two fail their self-test, happens on real HW as well. */
-	ROM_LOAD( "5.7c",         0x10000, 0x08000, CRC(095c451a) SHA1(892ca84376f89640ad4d28f1e548c26bc8f72c0e) )
-	ROM_LOAD( "6.7d",         0x20000, 0x10000, CRC(89f9dc0f) SHA1(5cf6a7aade3d56bc229d3771bc4141ad0c0e8da2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )                    /* Sound CPU */
+	ROM_REGION( 0x20000, "bankrom", 0 )     // these two fail their self-test, happens on real HW as well.
+	ROM_LOAD( "5.7c",         0x00000, 0x08000, CRC(095c451a) SHA1(892ca84376f89640ad4d28f1e548c26bc8f72c0e) )
+	ROM_RELOAD(               0x08000, 0x08000 )
+	ROM_LOAD( "6.7d",         0x10000, 0x10000, CRC(89f9dc0f) SHA1(5cf6a7aade3d56bc229d3771bc4141ad0c0e8da2) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sound CPU
 	ROM_LOAD( "1.3a",         0x00000, 0x08000, CRC(92801404) SHA1(c4ff47989d355b18a909eaa88f138e2f68178ecc) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )    /* sprite tiles */
+	ROM_REGION( 0x20000, "gfx1", 0 )        // sprite tiles
 	ROM_LOAD( "2.4p",         0x00000, 0x10000, CRC(bd972ff4) SHA1(63bfb455bc0ae1d31e6f1066864ec0c8d2d0cf99) )
 	ROM_LOAD( "3.4s",         0x10000, 0x10000, CRC(9a8a8a97) SHA1(13328631202c196c9d8791cc6063048eb6be0472) )
 
-	ROM_REGION( 0x20000, "gfx2", 0 )    /* background tiles */
-	/* some corrupt 'blank' characters in these */
+	ROM_REGION( 0x20000, "gfx2", 0 )        // background tiles
+	// some corrupt 'blank' characters in these
 	ROM_LOAD( "8.2l",         0x00000, 0x10000, CRC(3391c769) SHA1(7ae7575ac81d6e0d915c279c1f57a9bc6d096bd6) )
 	ROM_LOAD( "9.2m",         0x10000, 0x10000, CRC(5b315976) SHA1(d17cc1926f926bdd88b66ea6af88dac30880e7d4) )
 
-	ROM_REGION( 0x08000, "gfx3", 0 )    /* foreground tiles */
+	ROM_REGION( 0x08000, "gfx3", 0 )        // foreground tiles
 	ROM_LOAD( "7.4f",         0x00000, 0x08000, CRC(400114b9) SHA1(db2f3ba05a2005ae0e0e7d19c8739353032cbeab) )
 
-	ROM_REGION( 0x08000, "proms", 0 )   /* Proms */
+	ROM_REGION( 0x08000, "proms", 0 )       // PROMs
 	ROM_LOAD( "82s131.7l",    0x000, 0x200, CRC(6a7d13c0) SHA1(2a835a4ac1acb7663d0b915d0339af9800284da6) )
 	ROM_LOAD( "82s137.3t",    0x200, 0x400, CRC(59e44236) SHA1(f53d99694fa5acd7cc51dd78e09f0d2ef730e7a4) )
 ROM_END
