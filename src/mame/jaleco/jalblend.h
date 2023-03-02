@@ -15,11 +15,17 @@ public:
 
 	rgb_t func(rgb_t dest, rgb_t addMe);
 	rgb_t func(rgb_t dest, rgb_t addMe, u8 alpha);
-	void drawgfx(palette_device &palette,bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-			u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
+	void drawgfx(
+			palette_device &palette, gfx_element *gfx,
+			bitmap_ind16 &dest_bmp, const rectangle &clip,
+			u32 code, u32 color,
+			bool flipx, bool flipy, int offsx, int offsy,
 			u8 transparent_color);
-	void drawgfx(palette_device &palette,bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-			u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
+	void drawgfx(
+			palette_device &palette, gfx_element *gfx,
+			bitmap_rgb32 &dest_bmp, const rectangle &clip,
+			u32 code, u32 color,
+			bool flipx, bool flipy, int offsx, int offsy,
 			u8 transparent_color);
 
 protected:
