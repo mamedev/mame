@@ -921,6 +921,8 @@ def code_find_deps(ci):
             return [DEP.aluo, expr_deps(ci[4])]
         else:
             return [DEP.aluo, expr_deps(ci[4]) | expr_deps(ci[5])]
+    elif ci[0] == "trap":
+        return [0, expr_deps(ci[1:])]
     print(ci)
     sys.exit(1)
 
@@ -1603,14 +1605,17 @@ def generate_base_code_for_microcode(ir, irmask, madr, tvn, group01):
         
     if tvn_to_ftu:
         if tvn != None:
+            code_to_sort.append(["trap", tvn])
             if type(tvn) == str:
                 code_to_sort.append(["=", R.ftu, tvn])
             else:
                 code_to_sort.append(["=", R.ftu, "c", tvn << 2])
-        elif type(macro_tvn) == str:
-            code_to_sort.append(["=", R.ftu, macro_tvn])
         else:
-            code_to_sort.append(["=", R.ftu, "c", macro_tvn << 2])
+            code_to_sort.append(["trap", macro_tvn])
+            if type(macro_tvn) == str:
+                code_to_sort.append(["=", R.ftu, macro_tvn])
+            else:
+                code_to_sort.append(["=", R.ftu, "c", macro_tvn << 2])
 
     if ird_to_ftu:
         code_to_sort.append(["=", R.ftu, R.ird])
@@ -2267,6 +2272,11 @@ def generate_source_from_code(code, gen_mode):
                     source.append("\t\tgoto %s;" % ci[1][2])
                     source.append("\telse")
                     source.append("\t\tgoto %s;" % ci[1][3])
+            elif ci[0] == "trap":
+                if type(ci[1]) == str:
+                    source.append("\tdebugger_exception_hook((%s) >> 2);" % make_expression(ci[1]))
+                else:
+                    source.append("\tdebugger_exception_hook(0x%02x);" % ci[1])
             else:
                 source.append("\t%s" % ci)
 

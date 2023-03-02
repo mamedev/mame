@@ -182,14 +182,14 @@ protected:
 class nws3410_state : public news_r3k_base_state
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }
+
 	nws3410_state(machine_config const &mconfig, device_type type, char const *tag)
 		: news_r3k_base_state(mconfig, type, tag)
 	{
 	}
 
 	void nws3410(machine_config &config);
-
-	static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }
 
 protected:
 	void nws3410_map(address_map &map);

@@ -148,7 +148,7 @@ license:CC0-1.0
 	<element name="text_lasvegas08" defstate="0"><text state="4" string="5"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_lasvegas09" defstate="0"><text state="4" string="6"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_lasvegas10a" defstate="0"><text state="4" string="TAKE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
-	<element name="text_lasvegas10b" defstate="0"><text state="4" string=" INSURANCE"><color red="0.55" green="0.6" blue="0.35" /></text></element>
+	<element name="text_lasvegas10b" defstate="0"><text state="4" string=" INSURANCE "><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_lasvegas11" defstate="0"><text state="4" string="AUDIO"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_lasvegas12" defstate="0"><text state="4" string="1"><color red="0.55" green="0.6" blue="0.35" /></text></element>
 	<element name="text_lasvegas13" defstate="0"><text state="4" string="2"><color red="0.55" green="0.6" blue="0.35" /></text></element>

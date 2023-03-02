@@ -237,9 +237,9 @@ void bsuprem_state::ay8910_w(offs_t offset, uint8_t data)
 	// a10 -> ay8910_1 A8, ay8910_2 !A9
 	// a9 ->  ay8910_1 !A9, ay8910_2 A8
 	// a8 ->  ay8910 BC2
-	if(BIT(offset, 10) != BIT(offset, 9))
+	if (BIT(offset, 10) != BIT(offset, 9))
 	{
-		if(BIT(offset, 8))
+		if (BIT(offset, 8))
 		{
 			m_psg[BIT(offset, 9)]->data_w(offset & 0xff);
 		}
@@ -273,44 +273,36 @@ void bsuprem_state::ay8910_u1_portb_w(uint8_t data)
 
 	data = (data>>4) & 0x0f;
 
-	switch(data)
+	switch (data)
 	{
 		case 0x00:
 		case 0x01:
 		case 0x02:
 		case 0x03:
 		case 0x04:
-			for(int i = 0; i < 8 ; i++)
-			{
-				m_lamps[(data*8) + i] = BIT(m_u1_porta_data, i);
-			}
+			for (int i = 0; i < 8 ; i++)
+				m_lamps[(data * 8) + i] = BIT(m_u1_porta_data, i);
 			break;
 
 		case 0x05:
-			for(int i = 0; i < 5 ; i++)
-			{
+			for (int i = 0; i < 5 ; i++)
 				m_lamps[40 + i] = BIT(m_u1_porta_data, i);
-			}
 			break;
 
 		case 0x08:
-			{
-				m_nixie[0] = m_u1_porta_data & 0x07;
-				m_nixie[1] = (m_u1_porta_data>>4) & 0x07;
-			}
+			m_nixie[0] = m_u1_porta_data & 0x07;
+			m_nixie[1] = (m_u1_porta_data >> 4) & 0x07;
 			break;
 
 		case 0x09:
-			{
-				m_nixie[2] = (m_u1_porta_data>>3) & 0x07;
-				m_nixie[3] = m_u1_porta_data & 0x07;
-			}
+			m_nixie[2] = (m_u1_porta_data >> 3) & 0x07;
+			m_nixie[3] = m_u1_porta_data & 0x07;
 			break;
 
 		case 0x0a:
 		case 0x0b:
 		case 0x0c:
-			m_digits[(0x0c - data) * 2] = patterns[(m_u1_porta_data>>4) & 0x0f];
+			m_digits[(0x0c - data) * 2] = patterns[(m_u1_porta_data >> 4) & 0x0f];
 			m_digits[((0x0c - data) * 2) + 1] = patterns[m_u1_porta_data & 0x0f];
 			break;
 	}
@@ -356,14 +348,7 @@ INTERRUPT_GEN_MEMBER(bsuprem_state::mains_irq)
 {
 	m_irq_state = !m_irq_state;
 
-	if(m_irq_state)
-	{
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-	}
-	else
-	{
-		m_maincpu->set_input_line(0, CLEAR_LINE);
-	}
+	m_maincpu->set_input_line(0, m_irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 INPUT_CHANGED_MEMBER(bsuprem_state::test_pressed)

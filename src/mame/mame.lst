@@ -824,7 +824,6 @@ mac2fdhd                        // 1988 Apple Macintosh II (FDHD)
 macii                           // 1987 Apple Macintosh II
 maciici                         // 1989 Apple Macintosh IIci
 maciicx                         // 1989 Apple Macintosh IIcx
-maciifx                         // 1990 Apple Macintosh IIfx
 maciihmu                        // 1987 Apple Macintosh II (w/o 68851 MMU)
 maciisi                         // 1990 Apple Macintosh IIsi
 maciix                          // 1988 Apple Macintosh IIx
@@ -840,6 +839,9 @@ macse                           // 1987 Apple Macintosh SE
 macsefd                         // 1988 Apple Macintosh SE (FDHD)
 unitron                         // 1985 Unitron
 utrn1024                        // 1986 Unitron 1024
+
+@source:apple/maciifx.cpp
+maciifx                         // 1990 Apple Macintosh IIfx
 
 @source:apple/maciivx.cpp
 maciivx                         // 1993 Apple Macintosh IIvx
@@ -16216,6 +16218,9 @@ ch2001
 @source:cxg/dominator.cpp
 scmder
 sdtor
+sgalaxy
+sgalaxya
+sgalaxyb
 
 @source:cxg/scptchess.cpp
 scptchess
@@ -16339,6 +16344,7 @@ edrandy2                        // MAD (c) 1990 Data East Corporation (World)
 edrandyj                        // MAD (c) 1990 Data East Corporation (Japan)
 joemac                          // MAG (c) 1991 Data East Corporation (Japan)
 mutantf                         // MAF (c) 1991 Data East Corporation (World)
+mutantf1                        // MAF (c) 1991 Data East Corporation (World)
 mutantf2                        // MAF (c) 1991 Data East Corporation (World)
 mutantf3                        // MAF (c) 1991 Data East Corporation (World)
 mutantf4                        // MAF (c) 1991 Data East Corporation (World)
@@ -35560,6 +35566,7 @@ bsv102r                         //
 bsv103                          //
 bsv102                          //
 ffv101                          //
+ffv103                          //
 ffv104                          //
 ghv101                          //
 kpv106                          //
@@ -43352,8 +43359,9 @@ suprmous                        // (c) 1982 Taito
 thehole                         // bootleg
 thepit                          // (c) 1982 Zilec
 thepitj                         // (c) 1982 Taito (licensed)
-thepitu1                        // (c) 1982 Centuri (licensed)
-thepitu2                        // (c) 1982 Centuri (licensed)
+thepitu1                        // (c) 1982 Centuri Inc (licensed)
+thepitu2                        // (c) 1982 Centuri Inc (licensed)
+thepitu3                        // (c) 1982 Centuri Inc (licensed)
 theportr                        // bootleg
 ttfitter                        // bootleg
 zaryavos                        // (c) 1983 Nova Games of Canada (prototype)
@@ -44640,6 +44648,9 @@ squaitsa                        // (c) 1985
 
 @source:valadon/tankbust.cpp
 tankbust                        // (c) 1985
+
+@source:vectorgraphic/vector4.cpp
+vector4                         //
 
 @source:venture/looping.cpp
 looping                         // (c) 1982 Video Games GmbH

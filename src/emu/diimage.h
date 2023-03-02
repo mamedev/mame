@@ -217,7 +217,7 @@ protected:
 	virtual void interface_config_complete() override;
 
 	virtual const software_list_loader &get_software_list_loader() const;
-	virtual const bool use_software_list_file_extension_for_filetype() const { return false; }
+	virtual bool use_software_list_file_extension_for_filetype() const { return false; }
 
 	image_init_result load_internal(std::string_view path, bool is_create, int create_format, util::option_resolution *create_args);
 	std::error_condition load_image_by_path(u32 open_flags, std::string_view path);

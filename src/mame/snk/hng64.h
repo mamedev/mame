@@ -18,7 +18,6 @@
 #include "screen.h"
 #include "tilemap.h"
 
-
 /////////////////
 /// 3d Engine ///
 /////////////////
@@ -32,9 +31,9 @@ struct polyVert
 	float normal[4]{};        // Normal (X Y Z 1.0)
 	float clipCoords[4]{};    // Homogeneous screen space coordinates (X Y Z W)
 
-	float light[3]{};         // The intensity of the illumination at this point
+	float light;         // The intensity of the illumination at this point
 
-	uint16_t colorIndex = 0;    // Flat shaded polygons, no texture, no lighting
+	//uint16_t colorIndex = 0;    // Flat shaded polygons, no texture, no lighting
 };
 
 struct polygon
@@ -53,8 +52,7 @@ struct polygon
 	uint8_t texPageVertOffset = 0;    // If it does use small texture pages, how far is this page vertically offset?
 
 	uint32_t palOffset = 0;           // The base offset where this object's palette starts.
-
-	uint32_t debugColor = 0;          // Will go away someday.  Used to explicitly color polygons for debugging.
+	uint16_t colorIndex = 0;
 };
 
 
@@ -86,8 +84,8 @@ struct hng64_poly_data
 	uint8_t texPageSmall = 0;
 	uint8_t texPageHorizOffset = 0;
 	uint8_t texPageVertOffset = 0;
-	int palOffset = 0;
-	int debugColor = 0;
+	uint32_t palOffset = 0;
+	uint16_t colorIndex = 0;
 };
 
 class hng64_state;
@@ -102,14 +100,14 @@ public:
 	void render_flat_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
 
 	hng64_state& state() { return m_state; }
-	bitmap_rgb32& colorBuffer3d() { return m_colorBuffer3d; }
+	bitmap_ind16& colorBuffer3d() { return m_colorBuffer3d; }
 	float* depthBuffer3d() { return m_depthBuffer3d.get(); }
 
 private:
 	hng64_state& m_state;
 
 	// (Temporarily class members - someday they will live in the memory map)
-	bitmap_rgb32 m_colorBuffer3d;
+	bitmap_ind16 m_colorBuffer3d;
 	std::unique_ptr<float[]> m_depthBuffer3d;
 };
 
@@ -139,6 +137,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_palette_3d(*this, "palette3d"),
+		m_paletteram(*this, "paletteram"),
 		m_vblank(*this, "VBLANK"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -185,6 +185,8 @@ public:
 	uint8_t *m_texturerom = nullptr;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<palette_device> m_palette_3d;
+	required_shared_ptr<u32> m_paletteram;
 	required_ioport m_vblank;
 
 private:
@@ -342,6 +344,9 @@ private:
 	void dl_unk_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t dl_vreg_r();
 
+	void set_single_palette_entry(int entry, uint8_t r, uint8_t g, uint8_t b);
+	void update_palette_entry(int entry);
+	void pal_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	void tcram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t tcram_r(offs_t offset);
 
@@ -439,20 +444,21 @@ private:
 
 	void get_tile_details(bool chain, uint16_t spritenum, uint8_t xtile, uint8_t ytile, uint8_t xsize, uint8_t ysize, bool xflip, bool yflip, uint32_t& tileno, uint16_t& pal, uint8_t &gfxregion);
 	void draw_sprites_buffer(screen_device &screen, const rectangle &cliprect);
+	void draw_sprite_line(screen_device& screen, const rectangle& cliprect, int32_t curyy, int16_t cury, int16_t xpos, int chainx, int32_t dx, int32_t dy, int ytileblock, int chaini, int currentsprite, int chainy, int xflip, int yflip, uint16_t zval, bool zsort, bool blend, bool checkerboard, uint8_t mosaic);
 
 	void drawline(bitmap_ind16& dest, bitmap_ind16& destz, const rectangle& cliprect,
-		gfx_element* gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
-		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int cury, const u8* srcdata, int32_t srcx, int32_t srcy_copy, uint32_t leftovers, int line, uint16_t &srcpix);
+		gfx_element* gfx, uint32_t code, uint32_t color, int flipy, int32_t xpos,
+		int32_t dx, int32_t dy, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int32_t ypos, const u8* srcdata, int32_t srcx, uint32_t leftovers, int line, uint16_t &srcpix);
 
 	void zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
-		gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t destx, int32_t desty,
-		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t dstheight, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int line, uint16_t &srcpix);
+		gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t xpos, int32_t ypos,
+		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int line, uint16_t &srcpix);
 
-	void transition_control(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void setCameraTransformation(const uint16_t* packet);
 	void setLighting(const uint16_t* packet);
 	void set3dFlags(const uint16_t* packet);
 	void setCameraProjectionMatrix(const uint16_t* packet);
+	void recoverStandardVerts(polygon& currentPoly, int m, uint16_t* chunkOffset_verts, int& counter);
 	void recoverPolygonBlock(const uint16_t* packet, int& numPolys);
 	void printPacket(const uint16_t* packet, int hex);
 	float uToF(uint16_t input);

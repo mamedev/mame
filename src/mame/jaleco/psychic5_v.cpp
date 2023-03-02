@@ -87,13 +87,12 @@ void psychic5_state::set_background_palette_intensity()
 
 uint8_t psychic5_state::vram_page_select_r()
 {
-	return m_ps5_vram_page;
+	return *m_vrambank.entry();
 }
 
 void psychic5_state::vram_page_select_w(uint8_t data)
 {
-	m_ps5_vram_page = data & 1;
-	m_vrambank->set_bank(data);
+	m_vrambank.select(data & 1);
 }
 
 void psychic5_state::psychic5_title_screen_w(uint8_t data)
@@ -175,7 +174,6 @@ TILE_GET_INFO_MEMBER(psychic5_state::get_fg_tile_info)
 
 void psychic5_state::video_start()
 {
-	save_item(NAME(m_ps5_vram_page));
 	save_item(NAME(m_bg_clip_mode));
 	save_item(NAME(m_palette_intensity));
 	save_item(NAME(m_sx1));
@@ -209,8 +207,9 @@ VIDEO_START_MEMBER(psychic5_state,bombsa)
 
 void psychic5_state::video_reset()
 {
+	m_vrambank.select(0);
+
 	m_bg_clip_mode = 0;
-	m_ps5_vram_page = 0;
 	m_title_screen = 0;
 	m_palette_intensity = 0;
 }
