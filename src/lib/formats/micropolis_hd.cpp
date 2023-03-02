@@ -11,12 +11,12 @@ SYNC (0xFF), head, track, sector, 256 byte data, 4 byte ECC.
 
 #include "micropolis_hd.h"
 
-static const int sectors = 32;
-static const int sector_size = 256;
+static constexpr int SECTORS = 32;
+static constexpr int SECTOR_SIZE = 256;
 
 uint64_t micropolis_mfmhd_format::chs_to_offset(int cylinder, int head, int sector)
 {
-	return ((cylinder * m_param.heads + head) * sectors + sector) * sector_size;
+	return ((cylinder * m_param.heads + head) * SECTORS + sector) * SECTOR_SIZE;
 }
 
 std::error_condition micropolis_mfmhd_format::load(chd_file *chdfile, uint16_t *trackimage, int tracksize, int cylinder, int head)
@@ -25,9 +25,9 @@ std::error_condition micropolis_mfmhd_format::load(chd_file *chdfile, uint16_t *
 		return std::error_condition(std::errc::invalid_argument);
 	if (cylinder >= m_param.cylinders || head >= m_param.heads)
 		return std::error_condition(std::errc::invalid_argument);
-	uint8_t sector_bytes[sector_size];
+	uint8_t sector_bytes[SECTOR_SIZE];
 	int pos = 0;
-	for (int sector = 0; sector < sectors; sector++) {
+	for (int sector = 0; sector < SECTORS; sector++) {
 		uint64_t offset = chs_to_offset(cylinder, head, sector);
 		std::error_condition ret = chdfile->read_bytes(offset, sector_bytes, std::size(sector_bytes));
 		if (ret)
@@ -53,8 +53,8 @@ std::error_condition micropolis_mfmhd_format::save(chd_file *chdfile, uint16_t *
 		return std::error_condition(std::errc::invalid_argument);
 	if (cylinder >= m_param.cylinders || head >= m_param.heads)
 		return std::error_condition(std::errc::invalid_argument);
-	uint8_t sector_bytes[sector_size];
-	for (int sector = 0; sector < sectors; sector++) {
+	uint8_t sector_bytes[SECTOR_SIZE];
+	for (int sector = 0; sector < SECTORS; sector++) {
 		int sector_start = tracksize * sector/32;
 		int pos = sector_start + 16;
 		while (pos++ < sector_start + 50) {
