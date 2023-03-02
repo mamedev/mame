@@ -80,6 +80,7 @@ public:
 		, m_sbc_video(*this, "video")
 		, m_s100(*this, "s100")
 		, m_centronics(*this, "centprtr")
+		, m_ppi_pc(0)
 	{ }
 
 	void vector4(machine_config &config);
