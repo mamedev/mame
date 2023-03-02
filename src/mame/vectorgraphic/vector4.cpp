@@ -78,6 +78,7 @@ public:
 		, m_romenbl(*this, "romenbl")
 		, m_sbc_video(*this, "video")
 		, m_s100(*this, "s100")
+		, m_uart0(*this, "uart0")
 	{ }
 
 	void vector4(machine_config &config);
@@ -103,6 +104,7 @@ private:
 	memory_view m_romenbl;
 	required_device<vector_sbc_video_device> m_sbc_video;
 	required_device<s100_bus_device> m_s100;
+	required_device<i8251_device> m_uart0;
 };
 
 
@@ -126,7 +128,7 @@ void vector4_state::vector4_8088mem(address_map &map)
 void vector4_state::vector4_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x01).mirror(0xff00).rw("uart0", FUNC(i8251_device::read), FUNC(i8251_device::write)); // keyboard
+	map(0x00, 0x01).mirror(0xff00).rw(m_uart0, FUNC(i8251_device::read), FUNC(i8251_device::write)); // keyboard
 	map(0x02, 0x03).mirror(0xff00).w(FUNC(vector4_state::spr_w)); // subsystem port register
 	map(0x04, 0x05).mirror(0xff00).rw("uart1", FUNC(i8251_device::read), FUNC(i8251_device::write)); // modem
 	map(0x06, 0x07).mirror(0xff00).rw("uart2", FUNC(i8251_device::read), FUNC(i8251_device::write)); // serial printer
@@ -192,14 +194,12 @@ void vector4_state::vector4(machine_config &config)
 
 	// 7200-0001 page 210 D13, D1
 	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", _2mclk/26/16));
-	i8251_device &uart0(I8251(config, "uart0", 0));
+	I8251(config, m_uart0, 0);
 	vector4_keyboard_device &v4kbd(VECTOR4_KEYBOARD(config, "rs232keyboard", 0));
-	keyboard_clock.signal_handler().set(uart0, FUNC(i8251_device::write_txc));
-	keyboard_clock.signal_handler().append(uart0, FUNC(i8251_device::write_rxc));
-	uart0.txd_handler().set(v4kbd, FUNC(vector4_keyboard_device::write_rxd));
-	v4kbd.txd_handler().set(uart0, FUNC(i8251_device::write_rxd));
-	// Missing from schematic, but jumper wire present on the board.
-	uart0.write_cts(0);
+	keyboard_clock.signal_handler().set(m_uart0, FUNC(i8251_device::write_txc));
+	keyboard_clock.signal_handler().append(m_uart0, FUNC(i8251_device::write_rxc));
+	m_uart0->txd_handler().set(v4kbd, FUNC(vector4_keyboard_device::write_rxd));
+	v4kbd.txd_handler().set(m_uart0, FUNC(i8251_device::write_rxd));
 
 	// D3
 	i8251_device &uart1(I8251(config, "uart1", 0));
@@ -240,6 +240,8 @@ void vector4_state::machine_start()
 	m_8088cpu->space(AS_PROGRAM).install_ram(0, m_ram->mask(), m_ram->size() & 0x20000, m_ram->pointer());
 	for (int bank = 0; bank < (1<<5); bank++)
 		m_rambanks[bank]->configure_entries(0, 1<<7, m_ram->pointer(), 1<<11);
+	// Missing from schematic, but jumper wire present on the board.
+	m_uart0->write_cts(0);
 }
 
 void vector4_state::machine_reset()
