@@ -468,11 +468,12 @@ void sprinter_state::screen_update_game(screen_device &screen, bitmap_ind16 &bit
 {
 	const s8 dy = 7 - (m_hold >> 4);
 	const s8 dx = (7 - (m_hold & 0x0f)) * 2;
-	const u8 b = ((SPRINT_HEIGHT + cliprect.top() - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT) >> 3;
-	const u8 a = ((SPRINT_WIDTH + cliprect.left() - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH) >> 4;
-	std::pair<u8, u8> scroll = lookback_scroll(a, b);
 	for(u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
 	{
+		const u8 b = ((SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT) >> 3;
+		const u8 a = ((SPRINT_WIDTH + cliprect.left() - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH) >> 4;
+		std::pair<u8, u8> scroll = lookback_scroll(a, b);
+
 		u8* mode = nullptr;
 		u16 pal, x;
 		u8 y;
@@ -480,33 +481,23 @@ void sprinter_state::screen_update_game(screen_device &screen, bitmap_ind16 &bit
 
 		for(u16 hpos = cliprect.left(); hpos <= cliprect.right(); hpos++)
 		{
-			u16 a16 = (SPRINT_WIDTH + hpos + (scroll.first << 1) - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
-			if ((mode != nullptr) && BIT(mode[0], 2) && (((a16 - (scroll.first << 1)) & 15) == 0))
-			{
-				scroll = {mode[3] & 0x0f, mode[3] >> 4};
-				a16 = (SPRINT_WIDTH + hpos + (scroll.first << 1) - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
-			}
 			const u16 b8 = (SPRINT_HEIGHT + vpos + scroll.second - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT;
+			const u16 a16 = (SPRINT_WIDTH + hpos + (scroll.first << 1) - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
 
-			if (mode == nullptr)
+			if (mode == nullptr || ((a16 & 15) == 0))
 			{
 				mode = as_mode(a16 >> 4, b8 >> 3);
 				pal = BIT(mode[0], 6, 2) << 8;
 				x = ((BIT(mode[0], 0, 2) << 8) | mode[1]);
 				y = mode[2];
+				if (BIT(mode[0], 2))
+					scroll = {mode[3] & 0x0f, mode[3] >> 4};
 			}
 
-			if ((BIT(mode[0], 5, 3) == 7))
+			if (BIT(mode[0], 5, 3) == 7)
 				*pix++ = 0x400 | (((mode[0] & 0x0c) == 0x0c) ? 0 : ((m_port_fe_data & 0x07) << 3) | (m_port_fe_data & 0x07));
 			else
 				*pix++ = pal + m_vram[(y + (b8 & 7)) * 1024 + x + ((a16 & 15) >> 1)];
-
-			if ((a16 & 15) == 15)
-			{
-				if (BIT(mode[0], 2))
-					scroll = {mode[3] & 0x0f, mode[3] >> 4};
-				mode = nullptr;
-			}
 		}
 	}
 }
