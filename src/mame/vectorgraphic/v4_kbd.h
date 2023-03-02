@@ -49,7 +49,7 @@ private:
 	required_device<mcs48_cpu_device> m_mcu;
 	required_device<beep_device> m_beeper;
 	required_ioport_array<12> m_keys;
-	output_finder<> m_leds;
+	output_finder<> m_led;
 
 	// output callback
 	devcb_write_line m_txd_cb;
