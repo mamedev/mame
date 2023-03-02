@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="pce" description="NEC PC-Engine cartridges">
+<softwarelist name="pce" description="NEC PC Engine HuCards">
 	<software name="1943kai">
 		<description>1943 Kai</description>
 		<year>1991</year>
