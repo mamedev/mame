@@ -335,13 +335,13 @@ Notes (23-Jan-2016 AS):
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/ymopn.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
-#include "machine/timer.h"
 
 #include <cassert>
 
@@ -506,7 +506,7 @@ void psychic5_state_base::change_palette(int offset, uint8_t* palram, int palbas
 
 void psychic5_state::change_bg_palette(int color, int lo_offs, int hi_offs)
 {
-	/* red,green,blue intensities */
+	// red,green,blue intensities
 	uint8_t const ir = pal4bit(m_palette_intensity >> 12);
 	uint8_t const ig = pal4bit(m_palette_intensity >>  8);
 	uint8_t const ib = pal4bit(m_palette_intensity >>  4);
@@ -517,24 +517,24 @@ void psychic5_state::change_bg_palette(int color, int lo_offs, int hi_offs)
 	uint8_t const lo = m_palette_ram_bg[lo_offs];
 	uint8_t const hi = m_palette_ram_bg[hi_offs];
 
-	/* red,green,blue component */
+	// red,green,blue component
 	uint8_t const r = pal4bit(lo >> 4);
 	uint8_t const g = pal4bit(lo);
 	uint8_t const b = pal4bit(hi >> 4);
 
-	/* Grey background enable */
+	// Grey background enable
 	if (m_bg_control[4] & 2)
 	{
-		uint8_t const val = (r + g + b) / 3;        /* Grey */
-		/* Just leave plain grey */
+		uint8_t const val = (r + g + b) / 3;        // Grey
+		// Just leave plain grey
 		m_palette->set_pen_color(color, m_blend->func(rgb_t(val, val, val), irgb, ix));
 	}
 	else
 	{
-		/* Seems fishy, but the title screen would be black otherwise... */
+		// Seems fishy, but the title screen would be black otherwise...
 		if (!(m_title_screen & 1))
 		{
-			/* Leave the world as-is */
+			// Leave the world as-is
 			m_palette->set_pen_color(color,m_blend->func(rgb_t(r,g,b), irgb, ix));
 		}
 	}
@@ -547,7 +547,7 @@ void psychic5_state::set_background_palette_intensity()
 	m_palette_intensity = m_palette_ram_sp[BG_PAL_INTENSITY_BU] |
 						(m_palette_ram_sp[BG_PAL_INTENSITY_RG] << 8);
 
-	/* for all of the background palette */
+	// for all of the background palette
 	for (int i = 0; i < 0x100; i++)
 		change_bg_palette(i + 0x100, i * 2, (i * 2) + 1);
 }
@@ -655,22 +655,22 @@ void bombsa_state::unknown_w(uint8_t data)
 
 TILE_GET_INFO_MEMBER(psychic5_state_base::get_bg_tile_info)
 {
-	int offs = tile_index << 1;
-	int attr = m_bg_videoram[offs + 1];
-	int code = m_bg_videoram[offs] | ((attr & 0xc0) << 2);
-	int color = attr & 0x0f;
-	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
+	int const offs = tile_index << 1;
+	int const attr = m_bg_videoram[offs + 1];
+	int const code = m_bg_videoram[offs] | ((attr & 0xc0) << 2);
+	int const color = attr & 0x0f;
+	int const flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
 	tileinfo.set(1, code, color, flags);
 }
 
 TILE_GET_INFO_MEMBER(psychic5_state_base::get_fg_tile_info)
 {
-	int offs = tile_index << 1;
-	int attr = m_fg_videoram[offs + 1];
-	int code = m_fg_videoram[offs] | ((attr & 0xc0) << 2);
-	int color = attr & 0x0f;
-	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
+	int const offs = tile_index << 1;
+	int const attr = m_fg_videoram[offs + 1];
+	int const code = m_fg_videoram[offs] | ((attr & 0xc0) << 2);
+	int const color = attr & 0x0f;
+	int const flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
 	tileinfo.set(2, code, color, flags);
 }
@@ -685,7 +685,6 @@ TILE_GET_INFO_MEMBER(psychic5_state_base::get_fg_tile_info)
 template <typename T>
 inline void psychic5_state_base::draw_sprites(T &&draw_sprite)
 {
-	/* Draw the sprites */
 	for (int offs = 0; offs < m_spriteram.bytes(); offs += 16)
 	{
 		int const attr  = m_spriteram[offs + 13];
@@ -748,13 +747,13 @@ void psychic5_state::draw_background(screen_device &screen, bitmap_rgb32 &bitmap
 	}
 	else
 	{
-		int sy1_old = m_sy1;
-		int sx1_old = m_sx1;
-		int sy2_old = m_sy2;
+		int const sy1_old = m_sy1;
+		int const sx1_old = m_sx1;
+		int const sy2_old = m_sy2;
 
-		m_sy1 = m_spriteram[11];       /* sprite 0 */
+		m_sy1 = m_spriteram[11];       // sprite 0
 		m_sx1 = m_spriteram[12];
-		m_sy2 = m_spriteram[11+128];   /* sprite 8 */
+		m_sy2 = m_spriteram[11 + 128]; // sprite 8
 
 		switch (m_bg_clip_mode)
 		{
@@ -792,34 +791,36 @@ void psychic5_state::draw_background(screen_device &screen, bitmap_rgb32 &bitmap
 
 uint32_t psychic5_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint16_t bg_scrollx = m_bg_control[0] | (m_bg_control[1] << 8);
+	uint16_t const bg_scrollx = m_bg_control[0] | (m_bg_control[1] << 8);
 	m_bg_tilemap->set_scrollx(0, bg_scrollx);
-	uint16_t bg_scrolly = m_bg_control[2] | (m_bg_control[3] << 8);
+	uint16_t const bg_scrolly = m_bg_control[2] | (m_bg_control[3] << 8);
 	m_bg_tilemap->set_scrolly(0, bg_scrolly);
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	if (m_bg_control[4] & 1)    /* Backgound enable */
+	if (m_bg_control[4] & 1)    // Backgound enable
 		draw_background(screen, bitmap, cliprect);
 	if (!(m_title_screen & 1))
 		draw_sprites([this, &bitmap, &cliprect] (auto... args) { m_blend->drawgfx(*m_palette, m_gfxdecode->gfx(0), bitmap, cliprect, args..., 15); });
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }
 
 uint32_t bombsa_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint16_t bg_scrollx = m_bg_control[0] | (m_bg_control[1] << 8);
+	uint16_t const bg_scrollx = m_bg_control[0] | (m_bg_control[1] << 8);
 	m_bg_tilemap->set_scrollx(0, bg_scrollx);
-	uint16_t bg_scrolly = m_bg_control[2] | (m_bg_control[3] << 8);
+	uint16_t const bg_scrolly = m_bg_control[2] | (m_bg_control[3] << 8);
 	m_bg_tilemap->set_scrolly(0, bg_scrolly);
-	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	if (m_bg_control[4] & 1)    /* Backgound enable */
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	if (m_bg_control[4] & 1)    // Backgound enable
 		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(m_palette->pen(0x0ff), cliprect);
 	draw_sprites([this, &bitmap, &cliprect] (auto... args) { m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, args..., 15); });
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }
 
@@ -903,10 +904,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(psychic5_state_base::scanline)
 	int const scanline = param;
 
 	if (scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   /* Z80 - RST 10h - vblank */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   // Z80 - RST 10h - vblank
 
 	if (scanline == 0) // sprite buffer irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   /* Z80 - RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   // Z80 - RST 08h
 }
 
 
@@ -930,7 +931,7 @@ void psychic5_state::main_map(address_map &map)
 	map(0xf004, 0xf004).noprw(); // ???
 	map(0xf005, 0xf005).nopr().w(FUNC(psychic5_state::title_screen_w));
 	map(0xf006, 0xf1ff).noprw();
-	map(0xf200, 0xf7ff).ram().share("spriteram");
+	map(0xf200, 0xf7ff).ram().share(m_spriteram);
 	map(0xf800, 0xffff).ram();
 
 	m_vrambank[0](0xc000, 0xcfff).ram().w(FUNC(psychic5_state::bg_videoram_w)).share(m_bg_videoram);
@@ -1019,36 +1020,39 @@ void bombsa_state::soundport_map(address_map &map)
 }
 
 
-static INPUT_PORTS_START( psychic5 )
-	PORT_START("SYSTEM")    /* system control */
+INPUT_PORTS_START( common )
+	PORT_START("SYSTEM")    // system control
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x3c, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START("P1")        /* player 1 controls */
+	PORT_START("P1")        // player 1 controls
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("P2")        /* player 2 controls */
+	PORT_START("P2")        // player 2 controls
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( psychic5 )
+	PORT_INCLUDE( common )
+
+	PORT_MODIFY("P1")       // player 1 controls
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+
+	PORT_MODIFY("P2")       // player 2 controls
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
@@ -1102,36 +1106,19 @@ static INPUT_PORTS_START( psychic5 )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( bombsa )
-	PORT_START("SYSTEM")    /* system control */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+INPUT_PORTS_START( bombsa )
+	PORT_INCLUDE( common )
 
-	PORT_START("P1")        /* player 1 control */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_MODIFY("SYSTEM")   // system control
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
+
+	PORT_MODIFY("P1")       // player 1 control
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("P2")        /* player 2 control */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_MODIFY("P2")       // player 2 control
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:8" )           // Coin_B
@@ -1161,24 +1148,24 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-	8,8,    /* 8x8 characters */
-	1024,   /* 1024 characters */
-	4,      /* 4 bits per pixel */
-	{ 0, 1, 2, 3 }, /* the four bitplanes for pixel are packed into one nibble */
+	8,8,    // 8x8 characters
+	1024,   // 1024 characters
+	4,      // 4 bits per pixel
+	{ 0, 1, 2, 3 }, // the four bitplanes for pixel are packed into one nibble
 	{ 0, 4, 8, 12, 16, 20, 24, 28 },
 	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8 },
-	32*8    /* every char takes 32 consecutive bytes */
+	32*8    // every char takes 32 consecutive bytes
 };
 
 static const gfx_layout spritelayout =
 {
-	16,16,  /* 16x16 characters */
-	1024,   /* 1024 characters */
-	4,      /* 4 bits per pixel */
-	{ 0, 1, 2, 3 }, /* the four bitplanes for pixel are packed into one nibble */
+	16,16,  // 16x16 characters
+	1024,   // 1024 characters
+	4,      // 4 bits per pixel
+	{ 0, 1, 2, 3 }, // the four bitplanes for pixel are packed into one nibble
 	{ 0, 4, 8, 12, 16, 20, 24, 28, 64*8, 64*8+4, 64*8+8, 64*8+12, 64*8+16, 64*8+20, 64*8+24, 64*8+28 },
 	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8, 32*8, 36*8, 40*8, 44*8, 48*8, 52*8, 56*8, 60*8 },
-	128*8   /* every char takes 128 consecutive bytes */
+	128*8   // every char takes 128 consecutive bytes
 };
 
 static GFXDECODE_START( gfx_psychic5 )
@@ -1196,7 +1183,7 @@ GFXDECODE_END
 
 void psychic5_state::psychic5(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(12'000'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &psychic5_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(psychic5_state::scanline), "screen", 0, 1);
@@ -1205,9 +1192,9 @@ void psychic5_state::psychic5(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psychic5_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &psychic5_state::soundport_map);
 
-	config.set_maximum_quantum(attotime::from_hz(600));      /* Allow time for 2nd cpu to interleave */
+	config.set_maximum_quantum(attotime::from_hz(600));      // Allow time for 2nd CPU to interleave
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240); // was 53.8 Hz before, assume same as Bombs Away
 	screen.set_screen_update(FUNC(psychic5_state::screen_update));
@@ -1217,7 +1204,7 @@ void psychic5_state::psychic5(machine_config &config)
 
 	JALECO_BLEND(config, m_blend, 0);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
@@ -1238,8 +1225,8 @@ void psychic5_state::psychic5(machine_config &config)
 
 void bombsa_state::bombsa(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/2); /* 6 MHz */
+	// basic machine hardware
+	Z80(config, m_maincpu, XTAL(12'000'000)/2); // 6 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &bombsa_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(bombsa_state::scanline), "screen", 0, 1);
 
@@ -1249,15 +1236,15 @@ void bombsa_state::bombsa(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240); /* Measured as: VSync 54Hz, HSync 15.25kHz */
+	screen.set_raw(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240); // Measured as: VSync 54Hz, HSync 15.25kHz
 	screen.set_screen_update(FUNC(bombsa_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bombsa);
 	PALETTE(config, m_palette).set_entries(768);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
@@ -1438,6 +1425,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1987, psychic5,  0,        psychic5, psychic5, psychic5_state, empty_init, ROT270, "Jaleco / NMK", "Psychic 5 (World)", MACHINE_SUPPORTS_SAVE ) // "Oversea's version V2.00 CHANGED BY TAMIO NAKASATO" text present in ROM, various modifications (English names, more complete attract demo etc.)
-GAME( 1987, psychic5j, psychic5, psychic5, psychic5, psychic5_state, empty_init, ROT270, "Jaleco / NMK", "Psychic 5 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bombsa,    0,        bombsa,   bombsa,   bombsa_state,   empty_init, ROT270, "Jaleco", "Bombs Away (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, psychic5,  0,        psychic5, psychic5, psychic5_state, empty_init, ROT270, "Jaleco / NMK", "Psychic 5 (World)",      MACHINE_SUPPORTS_SAVE ) // "Oversea's version V2.00 CHANGED BY TAMIO NAKASATO" text present in ROM, various modifications (English names, more complete attract demo etc.)
+GAME( 1987, psychic5j, psychic5, psychic5, psychic5, psychic5_state, empty_init, ROT270, "Jaleco / NMK", "Psychic 5 (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bombsa,    0,        bombsa,   bombsa,   bombsa_state,   empty_init, ROT270, "Jaleco",       "Bombs Away (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )
