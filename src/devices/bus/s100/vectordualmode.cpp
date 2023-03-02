@@ -90,7 +90,7 @@ TIMER_CALLBACK_MEMBER(s100_vector_dualmode_device::motor_off)
 
 bool s100_vector_dualmode_device::hdd_selected()
 {
-	return m_drive == 0 && m_hdd->get_device() && m_hdd->get_device()->exists();
+	return m_drive == 0 && m_hdd->get_device();
 }
 
 uint8_t s100_vector_dualmode_device::s100_sinp_r(offs_t offset)
