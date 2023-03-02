@@ -37,7 +37,7 @@ https://www.bitsavers.org/pdf/vectorGraphic/vector_4/7100-0001_Vector_4_Users_Ma
 
 TODO:
 - S-100 interrupts and ready
-- parallel port
+- Qume (50 pin) parallel port
 - WAIT CPU states
 - CPM-86 and MS-DOS 2.0 don't boot
 
@@ -48,6 +48,7 @@ TODO:
 #include "sbcvideo.h"
 #include "v4_kbd.h"
 
+#include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 #include "bus/s100/s100.h"
 #include "bus/s100/vectordualmode.h"
@@ -79,6 +80,8 @@ public:
 		, m_sbc_video(*this, "video")
 		, m_s100(*this, "s100")
 		, m_uart0(*this, "uart0")
+		, m_centronics(*this, "centprtr")
+		, m_ppi_pc(0)
 	{ }
 
 	void vector4(machine_config &config);
@@ -91,6 +94,9 @@ private:
 	uint8_t msc_r();
 	void msc_w(uint8_t data) { machine_reset(); }
 	void addrmap_w(offs_t offset, uint8_t data);
+	void ppi_pb_w(uint8_t data) { m_centronics->write_strobe(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE); }
+	DECLARE_WRITE_LINE_MEMBER(centronics_busy_w) { if (state) m_ppi_pc |= 1; else m_ppi_pc &= ~1; }
+	int ppi_pc_r() { return m_ppi_pc; }
 	uint8_t s100_r(offs_t offset) { return m_s100->sinp_r(offset+0x20); }
 	void s100_w(offs_t offset, uint8_t data) { m_s100->sout_w(offset+0x20, data); }
 	void machine_start() override;
@@ -105,6 +111,8 @@ private:
 	required_device<vector_sbc_video_device> m_sbc_video;
 	required_device<s100_bus_device> m_s100;
 	required_device<i8251_device> m_uart0;
+	required_device<centronics_device> m_centronics;
+	uint8_t m_ppi_pc;
 };
 
 
@@ -193,13 +201,13 @@ void vector4_state::vector4(machine_config &config)
 	pit.out_handler<0>().append_inputline(m_8088cpu, INPUT_LINE_IRQ0);
 
 	// 7200-0001 page 210 D13, D1
-	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", _2mclk/26/16));
-	I8251(config, m_uart0, 0);
 	vector4_keyboard_device &v4kbd(VECTOR4_KEYBOARD(config, "rs232keyboard", 0));
+	v4kbd.txd_handler().set(m_uart0, FUNC(i8251_device::write_rxd));
+	clock_device &keyboard_clock(CLOCK(config, "keyboard_clock", _2mclk/26/16));
 	keyboard_clock.signal_handler().set(m_uart0, FUNC(i8251_device::write_txc));
 	keyboard_clock.signal_handler().append(m_uart0, FUNC(i8251_device::write_rxc));
+	I8251(config, m_uart0, 0);
 	m_uart0->txd_handler().set(v4kbd, FUNC(vector4_keyboard_device::write_rxd));
-	v4kbd.txd_handler().set(m_uart0, FUNC(i8251_device::write_rxd));
 
 	// D3
 	i8251_device &uart1(I8251(config, "uart1", 0));
@@ -226,8 +234,15 @@ void vector4_state::vector4(machine_config &config)
 	rs232prtr.cts_handler().set(uart2, FUNC(i8251_device::write_cts));
 
 	// 7200-0001 page 110 (II 5-19), 210 D8
-	// TODO: Qume (50 pin) and Centronics (36 pin)
-	I8255A(config, "ppi");
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	CENTRONICS(config, m_centronics, centronics_devices, nullptr);
+	m_centronics->set_output_latch(cent_data_out);
+	m_centronics->busy_handler().set(FUNC(vector4_state::centronics_busy_w));
+
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pa_callback().set(cent_data_out, FUNC(output_latch_device::write));
+	ppi.out_pb_callback().set(FUNC(vector4_state::ppi_pb_w));
+	ppi.in_pc_callback().set(FUNC(vector4_state::ppi_pc_r));
 
 	SPEAKER(config, "mono").front_center();
 	sn76489_device &sn(SN76489(config, "sn", _2m));
@@ -240,6 +255,9 @@ void vector4_state::machine_start()
 	m_8088cpu->space(AS_PROGRAM).install_ram(0, m_ram->mask(), m_ram->size() & 0x20000, m_ram->pointer());
 	for (int bank = 0; bank < (1<<5); bank++)
 		m_rambanks[bank]->configure_entries(0, 1<<7, m_ram->pointer(), 1<<11);
+
+	save_item(NAME(m_ppi_pc));
+
 	// Missing from schematic, but jumper wire present on the board.
 	m_uart0->write_cts(0);
 }
