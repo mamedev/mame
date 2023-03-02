@@ -130,7 +130,7 @@ vector4_keyboard_device::vector4_keyboard_device(const machine_config &mconfig, 
 	, m_mcu(*this, "mcu")
 	, m_beeper(*this, "beeper")
 	, m_keys(*this, "Y%d", 0U)
-	, m_leds(*this, "led")
+	, m_led(*this, "led")
 	, m_txd_cb(*this)
 	, m_column(0)
 	, m_p24(0)
@@ -146,7 +146,7 @@ void vector4_keyboard_device::device_start()
 void vector4_keyboard_device::device_resolve_objects()
 {
 	m_txd_cb.resolve_safe();
-	m_leds.resolve();
+	m_led.resolve();
 }
 
 WRITE_LINE_MEMBER(vector4_keyboard_device::write_rxd)
@@ -167,7 +167,7 @@ void vector4_keyboard_device::p2_w(uint8_t data)
 		m_column = m_mcu->p1_r() & 0x0f;
 	m_p24 = BIT(data, 4);
 	m_beeper->set_state(!BIT(data, 5));
-	m_leds = BIT(data, 6);
+	m_led = BIT(data, 6);
 	m_txd_cb(BIT(data, 7));
 }
 
