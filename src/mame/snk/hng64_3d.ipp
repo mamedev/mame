@@ -339,15 +339,8 @@ void hng64_state::recoverStandardVerts(polygon& currentPoly, int m, uint16_t* ch
 	currentPoly.vert[m].worldCoords[3] = 1.0f;
 	currentPoly.n = 3;
 
-	// chunkOffset_verts[ xxxx+3 ] is set to 0x70 on some 'blended' objects (fatfurwa translucent globe, buriki shadows, but not on fatfurwa shadows)
-	// this might be the alpha level, rather than the enable, although that would mean more bits in the framebuffer (it could be the zbuffer isn't
-	// CPU visible, or at least not checked?)  3D can't blend against other 3D, it just cuts.
-	// this gets enabled on one side of the pirate ship stage in sams64, why would it be set there?
-	// it's also set on the side of the houses in the ice stage on sams64, which appear darker than usual, maybe just a default 'brightness' setting for
-	// unlit polygons?
-	uint16_t maybe_blend = chunkOffset_verts[counter++];
-	if (maybe_blend != 0x80)
-		currentPoly.blend = true;
+	// this seems to be some kind of default lighting value / brightness, probably for unlit polys? used in various places, eg side of house in ice stage of ss64, some shadows
+	[[maybe_unused]] uint16_t maybe_blend = chunkOffset_verts[counter++];
 
 	currentPoly.vert[m].texCoords[0] = uToF(chunkOffset_verts[counter]);
 	if (currentPoly.flatShade)
@@ -525,9 +518,9 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			////////////////////////////////////////////
 			// SINGLE POLY CHUNK FORMAT
 			// [0] 0000 0000 cccc cccc    0 = always 0 | c = chunk type / format of data that follows (see below)
-			// [1] tu-4 pppp pppp ssss    t = texture, always on for most games, on for the backgrounds only on sams64
+			// [1] ta-4 pppp pppp ssss    t = texture, always on for most games, on for the backgrounds only on sams64
 			//                                if not set, u,v fields of vertices are direct palette indices, used on roadedge hng64 logo animation shadows
-			//                            u = unknown, set on sams64 / buriki at times, never on racing games
+			//                            a = blend this sprite (blend might use 'lighting' level as alpha?)
 			//                            4 = 4bpp texture  p = palette?  s = texture sheet (1024 x 1024 pages)
 			// [2] S?XX *uuu -YY# uuu-    S = use 4x4 sub-texture pages?
 			//                            ? = SNK logo roadedge / bbust2 / broken banners in xrally
@@ -606,6 +599,12 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			}
 
 			currentPoly.palOffset += explicitPaletteValue;
+
+			//if (chunkOffset[1] & 0x4000)
+			//	currentPoly.palOffset = machine().rand()&0x3ff;
+
+			if (chunkOffset[1] & 0x4000)
+				currentPoly.blend = true;
 
 			// These are definitely the scroll values, used on player car windows and waterfalls
 			// but if we always use them things get very messy when they're used for the waterfalls on xrally
