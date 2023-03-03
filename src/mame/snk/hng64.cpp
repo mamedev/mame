@@ -1061,12 +1061,15 @@ void hng64_state::hng64_dualport_w(offs_t offset, uint8_t data)
 /************************************************************************************************************/
 
 /* The following is guesswork, needs confirmation with a test on the real board. */
+// every sprite is 0x20 bytes
+// 
 void hng64_state::hng64_sprite_clear_even_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t spr_offs;
 
-	spr_offs = (offset) * 0x10 * 4;
+	spr_offs = (offset) * 0x40;
+	// for one sprite
 	if(ACCESSING_BITS_16_31)
 	{
 		mspace.write_dword(0x20000000+0x00+0x00+spr_offs, 0x00000000);
@@ -1074,6 +1077,7 @@ void hng64_state::hng64_sprite_clear_even_w(offs_t offset, uint32_t data, uint32
 		mspace.write_dword(0x20000000+0x10+0x00+spr_offs, 0x00000000);
 		mspace.write_dword(0x20000000+0x18+0x00+spr_offs, 0x00000000);
 	}
+	// for another sprite
 	if(ACCESSING_BITS_8_15)
 	{
 		mspace.write_dword(0x20000000+0x00+0x20+spr_offs, 0x00000000);
@@ -1088,7 +1092,8 @@ void hng64_state::hng64_sprite_clear_odd_w(offs_t offset, uint32_t data, uint32_
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t spr_offs;
 
-	spr_offs = (offset) * 0x10 * 4;
+	spr_offs = (offset) * 0x40;
+	// for one sprite
 	if(ACCESSING_BITS_16_31)
 	{
 		mspace.write_dword(0x20000000+0x04+0x00+spr_offs, 0x00000000);
@@ -1096,6 +1101,7 @@ void hng64_state::hng64_sprite_clear_odd_w(offs_t offset, uint32_t data, uint32_
 		mspace.write_dword(0x20000000+0x14+0x00+spr_offs, 0x00000000);
 		mspace.write_dword(0x20000000+0x1c+0x00+spr_offs, 0x00000000);
 	}
+	// for another sprite
 	if(ACCESSING_BITS_0_15)
 	{
 		mspace.write_dword(0x20000000+0x04+0x20+spr_offs, 0x00000000);
@@ -2206,6 +2212,7 @@ void hng64_state::machine_reset()
 	m_fbcontrol[2] = 0x00;
 	m_fbcontrol[3] = 0x00;
 
+	clear3d();
 }
 
 /***********************************************

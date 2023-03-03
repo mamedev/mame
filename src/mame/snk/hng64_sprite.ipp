@@ -10,14 +10,14 @@
  * offset | Bits                                    | Use
  *        | 3322 2222 2222 1111 1111 11             |
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
- *   0    | yyyy yyyy yyyy yyyy xxxx xxxx xxxx xxxx | x/y position
- *   1    | YYYY YYYY YYYY YYYY XXXX XXXX XXXX XXXX | x/y zoom (*)
- *   2    | ---- Szzz zzzz zzzz ---- ---I cccc CCCC | S = set on CPU car markers above cars (in roadedge) z = Z-buffer value, i = 'Inline' chain flag, cC = x/y chain
- *   3    | ---- ---- pppp pppp ---- ---- ---- ---- | palette entry
- *   4    | mmmm -cfF aggg tttt tttt tttt tttt tttt | mosaic factor, unknown (x1), checkerboard, flip bits, blend, group?, tile number
- *   5    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
- *   6    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
- *   7    | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
+ *   0  0 | yyyy yyyy yyyy yyyy xxxx xxxx xxxx xxxx | x/y position
+ *   1  4 | YYYY YYYY YYYY YYYY XXXX XXXX XXXX XXXX | x/y zoom (*)
+ *   2  8 | ---- Szzz zzzz zzzz ---- ---I cccc CCCC | S = set on CPU car markers above cars (in roadedge) z = Z-buffer value, i = 'Inline' chain flag, cC = x/y chain
+ *   3  c | ---- ---- pppp pppp ---- ---- ---- ---- | palette entry
+ *   4 10 | mmmm -cfF aggg tttt tttt tttt tttt tttt | mosaic factor, unknown (x1), checkerboard, flip bits, blend, group?, tile number
+ *   5 14 | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
+ *   6 18 | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
+ *   7 1c | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
  *
  *  in (4) ggg seems to be either group, or priority against OTHER layers (7 being the lowest, 0 being the highest in normal situations eg most of the time in buriki)
  * 
@@ -311,8 +311,13 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 
 		/* Calculate the zoom */
 		int zoom_factor = (m_spriteregs[0] & 0x08000000) ? 0x1000 : 0x100;
-		if (!zoomx) zoomx = zoom_factor;
-		if (!zoomy) zoomy = zoom_factor;
+
+		/* Sprites after 'Fair and Square' have a zoom of 0 in sams64 for one frame, they shouldn't be seen? */
+		if (!zoomx || !zoomy)
+		{
+			currentsprite = nextsprite;
+			continue;
+		};
 
 		int32_t dx, dy;
 
