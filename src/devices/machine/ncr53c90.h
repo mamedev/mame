@@ -199,7 +199,6 @@ protected:
 	uint32_t tcounter, tcounter_mask;
 	int mode, fifo_pos, command_pos;
 	int state, xfr_phase;
-	int command_length;
 
 	int dma_dir;
 
@@ -298,16 +297,8 @@ public:
 
 	virtual void map(address_map &map) override;
 
-	virtual void conf2_w(uint8_t data) override;
-
 	uint8_t conf3_r() { return config3; }
 	void conf3_w(uint8_t data) { config3 = data; }
-
-	uint8_t conf4_r() { return config4; }
-	void conf4_w(uint8_t data) { config4 = data; }
-
-	uint8_t tcounter_hi2_r();
-	void tcount_hi2_w(uint8_t data);
 
 	void fifo_align_w(uint8_t data) { fifo_align = data; }
 
@@ -336,10 +327,7 @@ protected:
 
 private:
 	u8 config3;
-	u8 config4;
 	u8 fifo_align;
-	u8 family_id;
-	u8 revision_level;
 	busmd_t m_busmd;
 };
 
@@ -353,9 +341,33 @@ class ncr53cf94_device : public ncr53c94_device
 {
 public:
 	ncr53cf94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void map(address_map &map) override;
+
+	virtual void conf2_w(uint8_t data) override;
+
+	uint8_t conf4_r() { return config4; }
+	void conf4_w(uint8_t data) { config4 = data; }
+
+	uint8_t tcounter_hi2_r();
+	void tcount_hi2_w(uint8_t data);
+
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
+
+protected:
+	ncr53cf94_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	u8 config4;
+	u8 family_id;
+	u8 revision_level;
 };
 
-class ncr53cf96_device : public ncr53c94_device
+class ncr53cf96_device : public ncr53cf94_device
 {
 public:
 	ncr53cf96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

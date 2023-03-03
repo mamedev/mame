@@ -104,8 +104,6 @@ void ncr53c94_device::map(address_map &map)
 	ncr53c90a_device::map(map);
 
 	map(0xc, 0xc).rw(FUNC(ncr53c94_device::conf3_r), FUNC(ncr53c94_device::conf3_w));
-	map(0xd, 0xd).rw(FUNC(ncr53c94_device::conf4_r), FUNC(ncr53c94_device::conf4_w));
-	map(0xe, 0xe).rw(FUNC(ncr53c94_device::tcounter_hi2_r), FUNC(ncr53c94_device::tcount_hi2_w));
 	map(0xf, 0xf).w(FUNC(ncr53c94_device::fifo_align_w));
 }
 
@@ -113,10 +111,6 @@ uint8_t ncr53c94_device::read(offs_t offset)
 {
 	if (offset == 12)
 		return conf3_r();
-	else if (offset == 13)
-		return conf4_r();
-	else if (offset == 14)
-		return tcounter_hi2_r();
 	return ncr53c90a_device::read(offset);
 }
 
@@ -124,21 +118,44 @@ void ncr53c94_device::write(offs_t offset, uint8_t data)
 {
 	if (offset == 12)
 		conf3_w(data);
-	else if (offset == 13)
-		conf4_w(data);
-	else if (offset == 14)
-		tcount_hi2_w(data);
 	else if (offset == 15)
 		fifo_align_w(data);
 	else
 		ncr53c90a_device::write(offset, data);
 }
 
+void ncr53cf94_device::map(address_map &map)
+{
+	ncr53c94_device::map(map);
+
+	map(0xd, 0xd).rw(FUNC(ncr53cf94_device::conf4_r), FUNC(ncr53cf94_device::conf4_w));
+	map(0xe, 0xe).rw(FUNC(ncr53cf94_device::tcounter_hi2_r), FUNC(ncr53cf94_device::tcount_hi2_w));
+}
+
+uint8_t ncr53cf94_device::read(offs_t offset)
+{
+	if (offset == 13)
+		return conf4_r();
+	else if (offset == 14)
+		return tcounter_hi2_r();
+	return ncr53c94_device::read(offset);
+}
+
+void ncr53cf94_device::write(offs_t offset, uint8_t data)
+{
+	if (offset == 13)
+		conf4_w(data);
+	else if (offset == 14)
+		tcount_hi2_w(data);
+	else
+		ncr53c94_device::write(offset, data);
+}
+
 ncr53c90_device::ncr53c90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: nscsi_device(mconfig, type, tag, owner, clock)
 	, nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
 	, tm(nullptr), config(0), status(0), istatus(0), clock_conv(0), sync_offset(0), sync_period(0), bus_id(0)
-	, select_timeout(0), seq(0), tcount(0), tcounter(0), tcounter_mask(0xffff), mode(0), fifo_pos(0), command_pos(0), state(0), xfr_phase(0), command_length(0), dma_dir(0), irq(false), drq(false), test_mode(false), stepping(0)
+	, select_timeout(0), seq(0), tcount(0), tcounter(0), tcounter_mask(0xffff), mode(0), fifo_pos(0), command_pos(0), state(0), xfr_phase(0), dma_dir(0), irq(false), drq(false), test_mode(false), stepping(0)
 	, m_irq_handler(*this)
 	, m_drq_handler(*this)
 {
@@ -168,9 +185,6 @@ ncr53c94_device::ncr53c94_device(const machine_config &mconfig, const char *tag,
 ncr53c94_device::ncr53c94_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: ncr53c90a_device(mconfig, type, tag, owner, clock)
 	, config3(0)
-	, config4(0)
-	, family_id(0x02)
-	, revision_level(0x02)
 	, m_busmd(BUSMD_0)
 {
 }
@@ -180,13 +194,21 @@ ncr53c96_device::ncr53c96_device(const machine_config &mconfig, const char *tag,
 {
 }
 
+ncr53cf94_device::ncr53cf94_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: ncr53c94_device(mconfig, type, tag, owner, clock)
+	, config4(0)
+	, family_id(0x02)
+	, revision_level(0x02)
+{
+}
+
 ncr53cf94_device::ncr53cf94_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ncr53c94_device(mconfig, NCR53CF94, tag, owner, clock)
+	: ncr53cf94_device(mconfig, NCR53CF94, tag, owner, clock)
 {
 }
 
 ncr53cf96_device::ncr53cf96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ncr53c94_device(mconfig, NCR53CF96, tag, owner, clock)
+	: ncr53cf94_device(mconfig, NCR53CF96, tag, owner, clock)
 {
 }
 
@@ -213,7 +235,6 @@ void ncr53c90_device::device_start()
 	save_item(NAME(command_pos));
 	save_item(NAME(state));
 	save_item(NAME(xfr_phase));
-	save_item(NAME(command_length));
 	save_item(NAME(dma_dir));
 	save_item(NAME(irq));
 	save_item(NAME(drq));
@@ -239,7 +260,6 @@ void ncr53c90_device::device_reset()
 	seq = 0;
 	config &= 7;
 	status = 0;
-	command_length = 0;
 	istatus = 0;
 	irq = false;
 	m_irq_handler(irq);
@@ -263,7 +283,6 @@ void ncr53c90_device::reset_disconnect()
 	scsi_bus->ctrl_w(scsi_refid, 0, ~S_RST);
 
 	command_pos = 0;
-	command_length = 0;
 	memset(command, 0, sizeof(command));
 	mode = MODE_D;
 }
@@ -458,7 +477,7 @@ void ncr53c90_device::step(bool timeout)
 			// in async mode data in phase in initiator mode, tcount is decremented on ACKO, not DACK
 			if ((mode == MODE_I) && (sync_offset == 0) && ((ctrl & S_PHASE_MASK) == S_PHASE_DATA_IN))
 			{
-				LOGMASKED(LOG_FIFO, "decrement_tcounter data in async, phase %02x\n", (ctrl & S_PHASE_MASK));
+				LOGMASKED(LOG_FIFO, "decrement_tcounter data in async, phase %02x (tcounter=%d)\n", (ctrl & S_PHASE_MASK), tcounter);
 				decrement_tcounter();
 				check_drq();
 			}
@@ -518,8 +537,6 @@ void ncr53c90_device::step(bool timeout)
 		break;
 
 	case DISC_SEL_ATN_SEND_BYTE:
-		if(command_length)
-			command_length--;
 		if(c == CD_SELECT_ATN_STOP) {
 			seq = 2;
 			function_bus_complete();
@@ -533,7 +550,7 @@ void ncr53c90_device::step(bool timeout)
 		if(!(ctrl & S_REQ))
 			break;
 		if((ctrl & S_PHASE_MASK) != S_PHASE_COMMAND) {
-			if(dma_command ? (status & S_TC0) && !command_length : !fifo_pos)
+			if((!dma_command || (status & S_TC0)) && !fifo_pos)
 				seq = 4;
 			else
 				seq = 2;
@@ -550,13 +567,8 @@ void ncr53c90_device::step(bool timeout)
 		break;
 
 	case DISC_SEL_SEND_BYTE:
-		if(!dma_command && !fifo_pos)
+		if((!dma_command || (status & S_TC0)) && !fifo_pos)
 			seq = 4;
-		else if(dma_command && (status & S_TC0) && command_length) {
-			command_length--;
-			if(!command_length)
-				seq = 4;
-		}
 
 		state = DISC_SEL_WAIT_REQ;
 		step(false);
@@ -692,8 +704,6 @@ void ncr53c90_device::step(bool timeout)
 			command_pos = 0;
 			bus_complete();
 		} else {
-			if(!fifo_pos)
-				break;
 			state = INIT_XFR_SEND_PAD;
 			send_byte();
 		}
@@ -743,14 +753,12 @@ void ncr53c90_device::step(bool timeout)
 
 void ncr53c90_device::send_byte()
 {
-	if(!fifo_pos)
-		fatalerror("ncr53c90_device::send_byte - !fifo_pos\n");
-
 	state = (state & STATE_MASK) | (SEND_WAIT_SETTLE << SUB_SHIFT);
-	if((state & STATE_MASK) != INIT_XFR_SEND_PAD /*&&
-		((state & STATE_MASK) != DISC_SEL_SEND_BYTE ||
-		!(status & S_TC0) || command_length)*/)
+	if((state & STATE_MASK) != INIT_XFR_SEND_PAD) {
+		if(!fifo_pos)
+			fatalerror("ncr53c90_device::send_byte - !fifo_pos\n");
 		scsi_bus->data_w(scsi_refid, fifo_pop());
+	}
 	else
 		scsi_bus->data_w(scsi_refid, 0);
 
@@ -1243,11 +1251,8 @@ void ncr53c90_device::decrement_tcounter(int count)
 	else
 		tcounter = 0;
 
-	if (tcounter == 0 && !(status & S_TC0))
-	{
+	if (tcounter == 0)
 		status |= S_TC0;
-		command_length = fifo_pos;
-	}
 
 	check_drq();
 }
@@ -1312,10 +1317,8 @@ bool ncr53c90a_device::check_valid_command(uint8_t cmd)
 void ncr53c94_device::device_start()
 {
 	save_item(NAME(config3));
-	save_item(NAME(config4));
 
 	config3 = 0;
-	config4 = 0;
 
 	ncr53c90a_device::device_start();
 }
@@ -1323,7 +1326,6 @@ void ncr53c94_device::device_start()
 void ncr53c94_device::device_reset()
 {
 	config3 = 0;
-	config4 = 0;
 
 	ncr53c90a_device::device_reset();
 }
@@ -1387,9 +1389,9 @@ void ncr53c94_device::check_drq()
 
 		case DMA_IN: // device to memory (optionally save last remaining byte for processor)
 			if (sync_offset == 0)
-				drq_state = fifo_pos > (BIT(config3, 2) ? 1 : 0);
+				drq_state = fifo_pos > (BIT(config3, 2) || !(status & S_TC0) ? 1 : 0);
 			else
-				drq_state = !(status & S_TC0) && fifo_pos > (BIT(config3, 2) ? 1 : 0);
+				drq_state = !(status & S_TC0) && fifo_pos > 1;
 			break;
 
 		case DMA_OUT: // memory to device
@@ -1406,13 +1408,29 @@ void ncr53c94_device::check_drq()
 		ncr53c90_device::check_drq();
 }
 
-void ncr53c94_device::conf2_w(uint8_t data)
+void ncr53cf94_device::device_start()
+{
+	save_item(NAME(config4));
+
+	config4 = 0;
+
+	ncr53c94_device::device_start();
+}
+
+void ncr53cf94_device::device_reset()
+{
+	config4 = 0;
+
+	ncr53c94_device::device_reset();
+}
+
+void ncr53cf94_device::conf2_w(uint8_t data)
 {
 	tcounter_mask = (data & S2FE) ? 0xffffff : 0xffff;
 	config2 = data;
 }
 
-uint8_t ncr53c94_device::tcounter_hi2_r()
+uint8_t ncr53cf94_device::tcounter_hi2_r()
 {
 	// tcounter is 24-bit when the features bit is set, otherwise it returns the ID
 	if ((config2 & S2FE) == 0)
@@ -1422,7 +1440,7 @@ uint8_t ncr53c94_device::tcounter_hi2_r()
 	return tcounter >> 16;
 }
 
-void ncr53c94_device::tcount_hi2_w(uint8_t data)
+void ncr53cf94_device::tcount_hi2_w(uint8_t data)
 {
 	tcount = (tcount & ~uint32_t(0xff0000)) | (uint32_t(data) << 16);
 	LOG("tcount_hi2_w %02x (%s)\n", data, machine().describe_context());
