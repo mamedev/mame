@@ -3274,6 +3274,8 @@ if (BUSES["SNES"]~=null) then
 		MAME_DIR .. "src/devices/bus/snes/bsx.h",
 		MAME_DIR .. "src/devices/bus/snes/event.cpp",
 		MAME_DIR .. "src/devices/bus/snes/event.h",
+		MAME_DIR .. "src/devices/bus/snes/profighter.cpp",
+		MAME_DIR .. "src/devices/bus/snes/profighter.h",
 		MAME_DIR .. "src/devices/bus/snes/rom.cpp",
 		MAME_DIR .. "src/devices/bus/snes/rom.h",
 		MAME_DIR .. "src/devices/bus/snes/rom21.cpp",
