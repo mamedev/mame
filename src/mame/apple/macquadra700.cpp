@@ -746,7 +746,7 @@ void macquadra_state::mac_via_sync()
 uint32_t macquadra_state::rom_switch_r(offs_t offset)
 {
 	// disable the overlay
-	if (m_overlay)
+	if (m_overlay && !machine().side_effects_disabled())
 	{
 		address_space& space = m_maincpu->space(AS_PROGRAM);
 		const u32 memory_end = m_ram->size() - 1;
