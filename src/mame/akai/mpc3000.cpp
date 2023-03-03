@@ -43,7 +43,7 @@ MPCs on other hardware:
 
     MPC4000:
         CPU, LCD, panel controller: SA1110 StrongARM @ 176 MHz
-        SCSI: FAS236 (same as NCR 53C96)
+        SCSI: FAS236 (same as NCR 53CF96)
         IDE, UART, DMA controller: FPGA XC2S100-5TQ144C
         USB Host: SL811HST
         USB function controller: NET2890
