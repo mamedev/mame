@@ -343,6 +343,8 @@ void hng64_state::recoverStandardVerts(polygon& currentPoly, int m, uint16_t* ch
 	// this might be the alpha level, rather than the enable, although that would mean more bits in the framebuffer (it could be the zbuffer isn't
 	// CPU visible, or at least not checked?)  3D can't blend against other 3D, it just cuts.
 	// this gets enabled on one side of the pirate ship stage in sams64, why would it be set there?
+	// it's also set on the side of the houses in the ice stage on sams64, which appear darker than usual, maybe just a default 'brightness' setting for
+	// unlit polygons?
 	uint16_t maybe_blend = chunkOffset_verts[counter++];
 	if (maybe_blend != 0x80)
 		currentPoly.blend = true;
