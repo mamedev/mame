@@ -16344,6 +16344,7 @@ edrandy2                        // MAD (c) 1990 Data East Corporation (World)
 edrandyj                        // MAD (c) 1990 Data East Corporation (Japan)
 joemac                          // MAG (c) 1991 Data East Corporation (Japan)
 mutantf                         // MAF (c) 1991 Data East Corporation (World)
+mutantf1                        // MAF (c) 1991 Data East Corporation (World)
 mutantf2                        // MAF (c) 1991 Data East Corporation (World)
 mutantf3                        // MAF (c) 1991 Data East Corporation (World)
 mutantf4                        // MAF (c) 1991 Data East Corporation (World)
@@ -38393,7 +38394,8 @@ lemans24                        // 1997.09 Le Mans 24 (Japan)
 lostwsga                        // 1997.07 Lost World Jurassic Park
 lostwsgp                        // 1997.06 Lost World Jurassic Park (location test)
 magtruck                        // 1999.03 Magical Truck Adventure (Japan)
-oceanhun                        // 1998.09 Ocean Hunter (Japan)
+oceanhun                        // 1998.09 Ocean Hunter (Japan rev A)
+oceanhuna                       // 1998.09 Ocean Hunter (Japan)
 scud                            // 1996.12 Scud Race Twin/DX
 scudau                          // 1996.12 Scud Race Twin/DX - Australia
 scuddx                          // 1996.12 Scud Race Deluxe
@@ -43355,8 +43357,9 @@ suprmous                        // (c) 1982 Taito
 thehole                         // bootleg
 thepit                          // (c) 1982 Zilec
 thepitj                         // (c) 1982 Taito (licensed)
-thepitu1                        // (c) 1982 Centuri (licensed)
-thepitu2                        // (c) 1982 Centuri (licensed)
+thepitu1                        // (c) 1982 Centuri Inc (licensed)
+thepitu2                        // (c) 1982 Centuri Inc (licensed)
+thepitu3                        // (c) 1982 Centuri Inc (licensed)
 theportr                        // bootleg
 ttfitter                        // bootleg
 zaryavos                        // (c) 1983 Nova Games of Canada (prototype)
