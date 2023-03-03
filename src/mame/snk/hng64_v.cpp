@@ -3,6 +3,15 @@
 #include "emu.h"
 #include "hng64.h"
 
+/*
+	final mix can clearly only process 2 possibilities for any screen pixel; a 'top' and 'bottom' pixel option
+	one of those can be blended.
+	blended pixels can't be stacked (only one still appears as blended, the other becomes solid)
+
+	many examples can be found where using alpha effects just cuts holes in sprites/3D or erases other alpha
+	tilemap layers due to this
+*/
+
 #define HNG64_VIDEO_DEBUG 0
 
 
@@ -189,7 +198,7 @@ do { \
 } while (0)
 
 void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		int wraparound, uint8_t drawformat, uint8_t alpha, uint8_t mosaic, uint8_t tm)
+		int wraparound, uint8_t drawformat, uint8_t alpha, uint8_t mosaic, uint8_t tm, int splitside)
 {
 	int source_line_to_use = cliprect.min_y;
 	source_line_to_use = (source_line_to_use / (mosaic+1)) * (mosaic+1);
@@ -205,6 +214,7 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
 	{
 		// 0x1000 is set up the buriki 2nd title screen with rotating logo and in fatal fury at various times?
 		const int global_alt_scroll_register_format = m_videoregs[0x00] & 0x04000000;
+
 
 		if (global_alt_scroll_register_format) // globally selects alt scroll register layout???
 		{
@@ -255,6 +265,7 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
 		}
 		else
 		{
+
 			/* simple zoom mode? - only 4 regs? */
 			/* in this mode they can only specify the top left and middle screen points for each tilemap,
 			    this allows simple zooming, but not rotation */
@@ -293,6 +304,23 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
 				xmiddle = (m_videoram[(0x40004 + (scrollbase << 4)) / 4]); // middle screen point
 				ytopleft = (m_videoram[(0x40008 + (scrollbase << 4)) / 4]);
 				ymiddle = (m_videoram[(0x4000c + (scrollbase << 4)) / 4]); // middle screen point
+
+				if (splitside == 1)
+				{
+					xtopleft += ((m_videoregs[0x0a] >> 0) & 0xffff) << 16;
+					ytopleft += ((m_videoregs[0x0a] >> 16) & 0xffff) << 16;
+
+					xmiddle += ((m_videoregs[0x0a] >> 0) & 0xffff) << 16;
+					ymiddle += ((m_videoregs[0x0a] >> 16) & 0xffff) << 16;
+				}
+				else if (splitside == 2)
+				{
+					xtopleft += ((m_videoregs[0x9] >> 0) & 0xffff) << 16;
+					ytopleft += ((m_videoregs[0x9] >> 16) & 0xffff) << 16;
+
+					xmiddle += ((m_videoregs[0x09] >> 0) & 0xffff) << 16;
+					ymiddle += ((m_videoregs[0x09] >> 16) & 0xffff) << 16;
+				}
 			}
 
 			xinc = (xmiddle - xtopleft) / 512;
@@ -701,7 +729,26 @@ g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
 	tilemap->pixmap();
 
 	/* then do the roz copy */
-	hng64_tilemap_draw_roz_core_line(screen, bitmap, clip, tilemap, 1, get_blend_mode(tm), 0x80, mosaic, tm);
+
+	// buriki also turns on bit 0x00000002 and the effect is expected to apply to tm2 and tm3 at least (tm0/tm1 not used at this time)
+	// sams64 does not initialize bit 0x00000002 though, only 0x00000001 to 0
+	const int global_split_format = m_videoregs[0x00] & 0x00000001;
+
+	if (global_split_format)
+	{
+		clip.min_x = 256;
+		clip.max_x = 512;
+		hng64_tilemap_draw_roz_core_line(screen, bitmap, clip, tilemap, 1, get_blend_mode(tm), 0x80, mosaic, tm, 1);
+		clip.min_x = 0;
+		clip.max_x = 256;
+		hng64_tilemap_draw_roz_core_line(screen, bitmap, clip, tilemap, 1, get_blend_mode(tm), 0x80, mosaic, tm, 2);
+
+	}
+	else
+	{
+		hng64_tilemap_draw_roz_core_line(screen, bitmap, clip, tilemap, 1, get_blend_mode(tm), 0x80, mosaic, tm, 0);
+	}
+
 g_profiler.stop();
 
 }
@@ -902,7 +949,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 		popmessage("%08x %08x %08x %08x %08x", m_spriteregs[0], m_spriteregs[1], m_spriteregs[2], m_spriteregs[3], m_spriteregs[4]);
 
 	// see notes at top for more detailed info on these
-	if (0)
+	if (1)
 		popmessage("%08x %08x\nTR(%04x %04x %04x %04x)\nSB(%04x %04x %04x %04x)\n%08x %08x %08x\nSPLIT?(%04x %04x %04x %04x)\nAA(%08x %08x)\n%08x",
 			// global tilemap control regs?
 			m_videoregs[0x00], m_videoregs[0x01],
@@ -919,7 +966,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			// unused?
 			m_videoregs[0x0d]);
 
-	if (1)
+	if (0)
 		popmessage("TC: %08x MINX(%d) MINY(%d) MAXX(%d) MAXY(%d)\nBLEND ENABLES? %02x %02x %02x | %02x %02x %02x\nUNUSED?(%04x)\n%04x\nUNUSED?(%d %d)\nFor FADE1 or 1st in PALFADES group per-RGB blend modes(%d %d %d)\nFor FADE2 or 2nd in PALFADES group per-RGB blend modes(%d %d %d)\nMASTER FADES - FADE1?(%08x)\nMASTER FADES - FADE2?(%08x)\nUNUSED?(%08x)\nUNUSED?&0xfffc(%04x) DISABLE_DISPLAY(%d) ALSO USE REGS BELOW FOR MASTER FADE(%d)\nPALEFFECT_ENABLES(%d %d %d %d %d %d %d %d)\n PALFADES?(%08x %08x : %08x %08x : %08x %08x : %08x %08x)\n %08x SPRITE_BLEND_TYPE?(%08x) : %08x %08x %08x %08x",
 			m_tcram[0x00 / 4], // 0007 00e4 (fatfurwa, bbust2)
 			(m_tcram[0x04 / 4] >> 16) & 0xffff, (m_tcram[0x04 / 4] >> 0) & 0xffff, // 0000 0010 (fatfurwa) 0000 0000 (bbust2, xrally)

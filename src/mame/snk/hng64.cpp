@@ -2126,6 +2126,8 @@ void hng64_state::machine_start()
 		m_videoregs[i] = 0xdeadbeef;
 	}
 
+	m_videoregs[0] = 0x00000000;
+
 	m_irq_pending = 0;
 
 	m_3dfifo_timer = timer_alloc(FUNC(hng64_state::hng64_3dfifo_processed), this);

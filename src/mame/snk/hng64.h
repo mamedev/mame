@@ -437,7 +437,7 @@ private:
 	void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, int line);
 
 	void hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		int wraparound, uint8_t drawformat, uint8_t alpha, uint8_t mosaic, uint8_t tm);
+		int wraparound, uint8_t drawformat, uint8_t alpha, uint8_t mosaic, uint8_t tm, int splitside);
 
 	std::unique_ptr<hng64_poly_renderer> m_poly_renderer;
 
