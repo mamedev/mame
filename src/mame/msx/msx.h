@@ -31,19 +31,22 @@ public:
 	bool has_printer_port() const { return m_has_printer_port; }
 	bool has_cartslot() const { return m_has_cartslot; }
 	bool has_fdc() const { return m_has_fdc; }
-	int get_internal_drives() const { return m_internal_drives; }
+	bool has_caps_led() const { return m_has_caps_led; }
+	bool has_code_led() const { return m_has_code_led; }
 	msx_hw_def &has_cassette(bool has_cassette) { m_has_cassette = has_cassette; return *this;}
 	msx_hw_def &has_printer_port(bool has_printer_port) { m_has_printer_port = has_printer_port; return *this; }
 	msx_hw_def &has_cartslot(bool has_cartslot) { m_has_cartslot = has_cartslot; return *this; }
 	msx_hw_def &has_fdc(bool has_fdc) { m_has_fdc = has_fdc; return *this; }
-	msx_hw_def &internal_drives(int internal_drives) { m_internal_drives = internal_drives; return *this; }
+	msx_hw_def &no_caps_led() { m_has_caps_led = false; return *this; }
+	msx_hw_def &no_code_led() { m_has_code_led = false; return *this; }
 
 private:
 	bool m_has_cassette = true;
 	bool m_has_printer_port = true;
 	bool m_has_cartslot = false;
 	bool m_has_fdc = false;
-	int m_internal_drives = 0;
+	bool m_has_caps_led = true;
+	bool m_has_code_led = true;
 };
 
 class msx_state : public driver_device
@@ -68,8 +71,18 @@ protected:
 		VDP_TMS9929A
 	};
 
-	void msx_base(ay8910_type ay8910_type, machine_config &config, XTAL xtal, int cpu_divider);
-	void msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config);
+	enum region_type
+	{
+		REGION_UNKNOWN = 0,
+		REGION_INTERNATIONAL = 1,
+		REGION_JAPAN = 2,
+		REGION_KOREA = 3,
+		REGION_ARAB = 4,
+		REGION_RUSSIA = 5
+	};
+
+	void msx_base(ay8910_type ay8910_type, machine_config &config, XTAL xtal, int cpu_divider, region_type region);
+	void msx1(vdp_type vdp_type, ay8910_type ay8910_type, machine_config &config, region_type region);
 	void msx1_add_softlists(machine_config &config);
 
 	// configuration helpers
@@ -189,7 +202,6 @@ protected:
 	required_device<msx_general_purpose_port_device> m_gen_port1;
 	required_device<msx_general_purpose_port_device> m_gen_port2;
 	required_ioport_array<11> m_io_key;
-	output_finder<2> m_leds;
 	msx_hw_def m_hw_def;
 	// This is here until more direct rom dumps from kanji font roms become available.
 	bool m_kanji_fsa1fx = false;
@@ -237,6 +249,11 @@ protected:
 	u8 m_secondary_slot[4];
 	u8 m_port_c_old;
 	u8 m_keylatch;
+	output_finder<> m_caps_led;
+	output_finder<> m_caps_led_name;
+	output_finder<> m_code_led;
+	output_finder<> m_code_led_name;
+	region_type m_region;
 
 private:
 	// configuration helpers
@@ -270,7 +287,6 @@ private:
 	{
 		auto &device = add_internal_slot(config, std::forward<T>(type), std::forward<U>(tag), prim, true, sec, page, numpages, region, offset);
 		m_hw_def.has_fdc(true);
-		m_hw_def.internal_drives(device.get_nr_drives());
 		return device;
 	}
 	template <int N, typename T, typename U>
@@ -326,13 +342,13 @@ protected:
 
 	virtual void machine_start() override;
 
-	void msx2_base(ay8910_type ay8910_type, machine_config &config);
-	void msx2(ay8910_type ay8910_type, machine_config &config);
-	void msx2_pal(ay8910_type ay8910_type, machine_config &config);
-	void msx2plus_base(ay8910_type ay8910_type, machine_config &config);
-	void msx2plus(ay8910_type ay8910_type, machine_config &config);
-	void msx2plus_pal(ay8910_type ay8910_type, machine_config &config);
-	void turbor(ay8910_type ay8910_type, machine_config &config);
+	void msx2_base(ay8910_type ay8910_type, machine_config &config, region_type region);
+	void msx2(ay8910_type ay8910_type, machine_config &config, region_type region);
+	void msx2_pal(ay8910_type ay8910_type, machine_config &config, region_type region);
+	void msx2plus_base(ay8910_type ay8910_type, machine_config &config, region_type region);
+	void msx2plus(ay8910_type ay8910_type, machine_config &config, region_type region);
+	void msx2plus_pal(ay8910_type ay8910_type, machine_config &config, region_type region);
+	void turbor(ay8910_type ay8910_type, machine_config &config, region_type region);
 	void msx2_add_softlists(machine_config &config);
 	void msx2plus_add_softlists(machine_config &config);
 	void turbor_add_softlists(machine_config &config);

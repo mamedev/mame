@@ -245,7 +245,7 @@ ROM_END
 /***************************************************************************
 
   Coleco Head to Head: Electronic Basketball/Hockey/Soccer (model 2150/2160/2170)
-  * COP420 MCU label COP420L-NEZ/N
+  * COP420L MCU label COP420L-NEZ/N
   * 2-digit 7seg display, 41 other leds, 1-bit sound
 
   3 Head to Head games were released using this MCU/ROM. They play very much
@@ -1481,7 +1481,7 @@ ROM_END
 /***************************************************************************
 
   Mattel Dalla$ (J.R. handheld)
-  * COP444 MCU label COP444L-HYN/N
+  * COP444L MCU label COP444L-HYN/N
   * 8-digit 7seg display, 1-bit sound
 
   This is a board game, only the handheld device is emulated here.
@@ -2150,7 +2150,7 @@ ROM_END
 /***************************************************************************
 
   National Semiconductor COPS Pocket Assistant (CPA)
-  * COP444 MCU label COP444L-JXY/N
+  * COP444L MCU label COP444L-JXY/N
   * 8-digit 7seg display, 1-bit sound
 
   It's a programmable COP400 series MCU simulator, on a COP400 series MCU.
