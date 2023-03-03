@@ -53,7 +53,7 @@
   Sound PCB (FL0907)
    ______________________________________________
   |  ···················               ___      |
-  |                                TL7705ACP    | 
+  |                                TL7705ACP    |
   |  __________                        ___ ___  |
   | |M74HC244B1            OKI M6585->|  ||  |  |
   |              __________           |  ||  |<-M74HC244B1
@@ -158,7 +158,7 @@ ROM_START(brglitz)
 	ROM_REGION(0x02000, "maincpu", 0)
 	ROM_LOAD("bg_04_v1.3.u1",    0x00000, 0x02000, BAD_DUMP CRC(f414b736) SHA1(0280adb1de085f2774ad58872cb171a65cf85fbe)) // PIC17C43-8. Bad dump? Needs further checking
 
-	ROM_REGION(0x80400, "soundcpu", 0)
+	ROM_REGION(0x00400, "soundcpu", 0)
 	/*
 	  User ID
 	    ID0=0x0000
@@ -168,9 +168,11 @@ ROM_START(brglitz)
 	  Config Word: 0x0005
 	*/
 	ROM_LOAD("qsound47_v1.0.u1", 0x00000, 0x00400, CRC(bd3156fb) SHA1(416674ed7b24ab7da3f98b3ddff86a35b9056c1f)) // PIC16C55A
-	ROM_LOAD("glitz_a_v1.0.u3",  0x00400, 0x80000, CRC(1ba2ca2d) SHA1(04f3bf7654388011df60879c155848324b6c0321))
 
-	ROM_REGION(0x80400, "soundcpu_2", 0)
+	ROM_REGION(0x80000, "samples", 0) // EPROM near "qsound47_v1.0.u1" PIC
+	ROM_LOAD("glitz_a_v1.0.u3",  0x00000, 0x80000, CRC(1ba2ca2d) SHA1(04f3bf7654388011df60879c155848324b6c0321))
+
+	ROM_REGION(0x00400, "soundcpu_2", 0)
 	/*
 	  User ID
 	    ID0=0x0000
@@ -180,9 +182,10 @@ ROM_START(brglitz)
 	  Config Word: 0x0005
 	*/
 	ROM_LOAD("qsound54_v1.0.u2", 0x00000, 0x00400, CRC(c0b0d229) SHA1(3ecc48a31da77639a82f8a41521b2ad5e7e1450b)) // PIC16C55A
-	ROM_LOAD("m7snd_c_v1.1.u11", 0x00400, 0x80000, CRC(b283ae44) SHA1(966c80bc27890380f1e81f1c223fe240df0e9e03))
-ROM_END
 
+	ROM_REGION(0x80000, "samples_2", 0) // EPROM near "qsound54_v1.0.u2" PIC
+	ROM_LOAD("m7snd_c_v1.1.u11", 0x00000, 0x80000, CRC(b283ae44) SHA1(966c80bc27890380f1e81f1c223fe240df0e9e03))
+ROM_END
 
 } // anonymous namespace
 
