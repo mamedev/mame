@@ -284,7 +284,7 @@ license:CC0-1.0
 		<description>Olivetti Data Base Management System</description>
 		<year>1982</year>
 		<publisher>Olivetti</publisher>
-		<info name="usage" value='Boot dbms2 together with dbms; Run with > ba "dbms.bas"' />
+		<info name="usage" value="Boot dbms2 together with dbms; Run with > ba &quot;dbms.bas&quot;" />
 		<info name="serial" value="ITA-000189" />
 
 		<part name="flop1" interface="floppy_5_25"><!-- bootable (pcos 2.0h) -->
@@ -356,7 +356,7 @@ license:CC0-1.0
 		<description>OliDraw (Ita)</description>
 		<year>19??</year>
 		<publisher>Olivetti</publisher>
-		<info name="usage" value='Bootable pcos4.1a; Run with > ba "olidraw.bas" or > ba "install.bas"'/>
+		<info name="usage" value="Bootable pcos4.1a; Run with > ba &quot;olidraw.bas&quot; or > ba &quot;install.bas&quot;"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="286720">
@@ -405,7 +405,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="olitest">
-		<!-- olitest_7519913c.img is an identical img version of this disk --> 
+		<!-- olitest_7519913c.img is an identical img version of this disk -->
 		<description>OliTest</description>
 		<year>1981</year>
 		<publisher>Olivetti</publisher>
@@ -604,7 +604,7 @@ license:CC0-1.0
 	</software>
 
 <!-- Modern text adventures -->
-    
+
 	<software name="queens">
 		<!-- Also includes Two Days to Race -->
 		<description>The Queen's Footsteps (English)</description>
@@ -644,5 +644,5 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-    
+
 </softwarelist>
