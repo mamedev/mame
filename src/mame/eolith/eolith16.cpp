@@ -12,7 +12,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "eolith.h"
+#include "eolith_speedup.h"
 
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eepromser.h"
@@ -24,36 +24,38 @@
 
 namespace {
 
-class eolith16_state : public eolith_state
+class eolith16_state : public eolith_state_base
 {
 public:
 	eolith16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: eolith_state(mconfig, type, tag)
+		: eolith_state_base(mconfig, type, tag)
 		, m_special_io(*this, "SPECIAL")
+		, m_eepromoutport(*this, "EEPROMOUT")
 		, m_vram(*this, "vram", 0x20000, ENDIANNESS_BIG)
 		, m_vrambank(*this, "vrambank")
 	{
 	}
 
-	void eolith16(machine_config &config);
+	void eolith16(machine_config &config) ATTR_COLD;
 
-	void init_eolith16();
+	void init_eolith16() ATTR_COLD;
 
 protected:
-	virtual void video_start() override;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_ioport m_special_io;
+	required_ioport m_eepromoutport;
 	memory_share_creator<uint8_t> m_vram;
 	required_memory_bank m_vrambank;
 
 	void eeprom_w(uint16_t data);
 	uint16_t eolith16_custom_r();
 
-	void eolith16_palette(palette_device &palette) const;
+	void eolith16_palette(palette_device &palette) const ATTR_COLD;
 
 	uint32_t screen_update_eolith16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void eolith16_map(address_map &map);
+	void eolith16_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -121,6 +123,8 @@ INPUT_PORTS_END
 
 void eolith16_state::video_start()
 {
+	eolith_state_base::video_start();
+
 	m_vrambank->configure_entries(0, 2, memshare("vram")->ptr(), 0x10000);
 	m_vrambank->set_entry(0);
 }
