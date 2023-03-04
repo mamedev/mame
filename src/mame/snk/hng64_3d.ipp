@@ -1129,12 +1129,14 @@ void hng64_state::hng64_fbcontrol_w(offs_t offset, uint8_t data)
 // they are NOT used for buriki 'how to play' scren, which uses unhandled values in the 3d packets to reposition the fighters instead
 void hng64_state::hng64_fbscale_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	COMBINE_DATA(&m_fbscale[offset]);
+
 	if (mem_mask & 0xffff0000)
 	{
-		// NORMAL value is 3fe0
+		// NORMAL value is 3fe0 (0x400 / 2 = 0x200 = 512)
 		// ':maincpu' (8006E46C): hng64_fb_scale_x 3fe00000 ffff0000
 
-		// on xrally course select this is 39e0
+		// on xrally course select this is 39e0 (0x3a0 / 2 = 0x1d0 = 464)
 		// hng64_fb_scale_x 39e00000 ffff0000
 
 		//logerror("%s: hng64_fb_scale_x %08x %08x\n", machine().describe_context(), data, mem_mask);
@@ -1142,13 +1144,14 @@ void hng64_state::hng64_fbscale_w(offs_t offset, uint32_t data, uint32_t mem_mas
 
 	if (mem_mask & 0x0000ffff)
 	{
-		// NORMAL value is 37e0
+		// NORMAL value is 37e0  (0x380 / 2 = 0x1c0 = 448)
 		// hng64_fb_scale_y 000037e0 0000ffff
 
-		// on xrally course select this is 32e0
+		// on xrally course select this is 32e0 (0x330 / 2 = 408)
 		// hng64_fb_scale_y 000032e0 0000ffff
 
 		// during fatfurwa scaled intro it uses 2de0, although writes 37e0 in the same frame; presumably rendering takes place while it is 2de0 though
+		// 0x2e0 / 2 = 0x170 = 368    (needs to be ~287 pixels though)
 		// ':maincpu' (800667A0): hng64_fb_scale_y 00002de0 0000ffff
 		//logerror("%s: hng64_fb_scale_y %08x %08x\n", machine().describe_context(), data, mem_mask);
 	}
@@ -1156,31 +1159,34 @@ void hng64_state::hng64_fbscale_w(offs_t offset, uint32_t data, uint32_t mem_mas
 
 void hng64_state::hng64_fbscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	COMBINE_DATA(&m_fbscroll[offset]);
+
 	// this is used ingame on the samsho games, and on the car select screen in xrally (youtube video confirms position of car needs to change)
 	if (mem_mask & 0xffff0000)
 	{
-		// NORMAL value is e000
+		// NORMAL value is e000 (e0 = 224)
 		// hng64_fbscroll x e0000000 ffff0000
 
-		// on xrally course select this is e600
+		// on xrally course select this is e600  (+0600 from normal)
 		// ':maincpu' (8002327C): hng64_fbscroll x e6000000 ffff0000
 
 		// on xrally car select this is e680
 		// hng64_fbscroll x e6800000 ffff0000
-		//logerror("%s: hng64_fbscroll x %08x %08x\n", machine().describe_context(), data, mem_mask);
+		//logerror("%s: hng64_fbscroll x %08x (%d) %08x\n", machine().describe_context(), data, ((data&0x7fff0000) >> 21), mem_mask);
 	}
 
 	if (mem_mask & 0x0000ffff)
 	{
-		// NORMAL value is 1c00
+		// NORMAL value is 1c00  (1c0 = 448) /2 = 224 (midpoint y?)
 		// ':maincpu' (8006FA18): hng64_fbscroll y 00001c00 0000ffff
 
-		// on xrally course select this is 1700
-		// ':maincpu' (8002327C): hng64_fbscroll y 00001700 0000ffff
+		// on xrally course select this is 1700  (0x170 = 368)
+		// ':maincpu' (8002327C): hng64_fbscroll y 00001700 0000ffff (-0500 from normal)
 
-		// on xrally car select this is 1260
+		// on xrally car select this is 1260 (and needs to be higher up)
 		// ':maincpu' (80012820): hng64_fbscroll y 00001260 0000ffff
-		//logerror("%s: hng64_fbscroll y %08x %08x\n", machine().describe_context(), data, mem_mask);
+		// 00001a60 on screen after, not quite as high up, but higher than 1c00
+		//logerror("%s: hng64_fbscroll y %08x (%d) %08x\n", machine().describe_context(), data, (data >> 5), mem_mask);
 	}
 }
 

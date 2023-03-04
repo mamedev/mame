@@ -168,6 +168,8 @@ public:
 		m_comhack(*this, "comhack"),
 		m_fbram1(*this, "fbram1"),
 		m_fbram2(*this, "fbram2"),
+		m_fbscale(*this, "fbscale"),
+		m_fbscroll(*this, "fbscroll"),
 		m_idt7133_dpram(*this, "com_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_in(*this, "IN%u", 0U),
@@ -234,6 +236,8 @@ private:
 	required_shared_ptr<uint32_t> m_comhack;
 	required_shared_ptr<uint32_t> m_fbram1;
 	required_shared_ptr<uint32_t> m_fbram2;
+	required_shared_ptr<uint32_t> m_fbscale;
+	required_shared_ptr<uint32_t> m_fbscroll;
 
 	required_shared_ptr<uint32_t> m_idt7133_dpram;
 	//required_shared_ptr<uint8_t> m_com_mmu_mem;

@@ -870,15 +870,23 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	pen_t const *const clut_3d = &m_palette_3d->pen(0);
 	if (!(m_fbcontrol[0] & 0x01))
 	{
+		// this moves the car in the xrally selection screen the correct number of pixels to the left
+		int xscroll = (m_fbscroll[0] >> 21);
+		if (xscroll & 0x400)
+			xscroll -= 0x800;
+
+		// value is midpoint?
+		xscroll += 256;
+
 		// Blit the color buffer into the primary bitmap
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			const uint16_t *src = &m_poly_renderer->colorBuffer3d().pix(y, cliprect.min_x);
+			const uint16_t *src = &m_poly_renderer->colorBuffer3d().pix(y, 0);
 			uint32_t *dst = &bitmap.pix(y, cliprect.min_x);
 
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 			{
-				uint16_t srcpix = *src;
+				uint16_t srcpix = src[((cliprect.min_x + x) + xscroll ) & 0x1ff];
 				if (srcpix & 0x07ff)
 				{
 					if (srcpix & 0x0800)
@@ -892,7 +900,6 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 				}
 
 				dst++;
-				src++;
 			}
 		}
 	}
