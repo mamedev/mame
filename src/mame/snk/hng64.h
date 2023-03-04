@@ -336,8 +336,8 @@ private:
 	uint8_t hng64_fbcontrol_r(offs_t offset);
 	void hng64_fbcontrol_w(offs_t offset, uint8_t data);
 
-	void hng64_fbunkpair_w(offs_t offset, uint16_t data);
-	void hng64_fbscroll_w(offs_t offset, uint16_t data);
+	void hng64_fbscale_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	void hng64_fbscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
 	void hng64_fbunkbyte_w(offs_t offset, uint8_t data);
 

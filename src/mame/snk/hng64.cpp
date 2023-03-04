@@ -1202,8 +1202,8 @@ void hng64_state::hng_map(address_map &map)
 
 	// 3D framebuffer
 	map(0x30000000, 0x30000003).rw(FUNC(hng64_state::hng64_fbcontrol_r), FUNC(hng64_state::hng64_fbcontrol_w)).umask32(0xffffffff);
-	map(0x30000004, 0x30000007).w(FUNC(hng64_state::hng64_fbunkpair_w)).umask32(0xffff);
-	map(0x30000008, 0x3000000b).w(FUNC(hng64_state::hng64_fbscroll_w)).umask32(0xffff);
+	map(0x30000004, 0x30000007).w(FUNC(hng64_state::hng64_fbscale_w));
+	map(0x30000008, 0x3000000b).w(FUNC(hng64_state::hng64_fbscroll_w));
 	map(0x3000000c, 0x3000000f).w(FUNC(hng64_state::hng64_fbunkbyte_w)).umask32(0xffffffff);
 	map(0x30000010, 0x3000002f).rw(FUNC(hng64_state::hng64_fbtable_r), FUNC(hng64_state::hng64_fbtable_w)).share("fbtable");
 

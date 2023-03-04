@@ -399,13 +399,17 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 	/*//////////////
 	// PACKET FORMAT
 	// [0]  - 0100 ... ID
-	// [1]  - --c- ---p os-b l---
+	// [1]  - ---- --cp os0b l--?
 	//      l = use lighting
 	//      p = use dynamic palette (maybe not just this, wrong for roadedge car select where it isn't set but needs to be)
 	//      o = use dynamic texture offset (sky reflection in xrally/roadedge windows, also waterfalls?)
 	//      s = use dynamic scaling (hyper64 logos on xrally/roadedge)
+	//      0 = always 0?
 	//      b = backface culling?
 	//      c = set on objects a certain distance away (maybe optimization to disable clipping against camera?)
+	//      ? = roadedge: all vehicles ingame + select screen (also 3d maps on select screen), vehicle lights+windows only in attract, nothing else?
+	//          all vehicles ingame + select screen, vehicle lights+windows only in attract, NOT on vehicles between stages, nothing else?
+	//			nothing on other games?
 	// none of these bits appear to be connected to texture size to solve the road/banner problem in xrally/roadedge
 	//
 	//
@@ -640,6 +644,9 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			//if (chunkOffset[1] & 0x4000)
 			//	currentPoly.palOffset = machine().rand()&0x3ff;
 
+			//if (packet[1] & 0x0006)
+			//	currentPoly.palOffset = machine().rand()&0x3ff;
+
 			if (chunkOffset[1] & 0x4000)
 				currentPoly.blend = true;
 
@@ -870,6 +877,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				else
 					currentPoly.visible = false;
 			}
+
 
 			// BEHIND-THE-CAMERA CULL //
 			vecmatmul4(cullRay, m_modelViewMatrix, currentPoly.vert[0].worldCoords);
@@ -1105,6 +1113,8 @@ void hng64_state::hng64_fbcontrol_w(offs_t offset, uint8_t data)
 
 	   other games use either mix of 0x18 and 0x38.  bit 0x08 must prevent the framebuffer clear tho
 	   according to above table bit 0x20 is color base, but implementation for it is a hack
+	   roadedge ends up leaving 0x20 set after the car selection, which breaks ingame 3D palette if
+	   we use it as a palette base? see hack
 
 	   (3d car currently not visible on roadedge select screen due to priority issue, disable sprites to see it)
 
@@ -1114,18 +1124,64 @@ void hng64_state::hng64_fbcontrol_w(offs_t offset, uint8_t data)
 	m_fbcontrol[offset] = data;
 }
 
-void hng64_state::hng64_fbunkpair_w(offs_t offset, uint16_t data)
-{
-	// set to fixed values?
 
-	logerror("%s: hng64_fbunkpair_w (%03x) %04x\n", machine().describe_context(), offset, data);
+// the framebuffer scroll and scale registers are used in fatfurwa (intro scaling) and xrally (course select, car select)
+// they are NOT used for buriki 'how to play' scren, which uses unhandled values in the 3d packets to reposition the fighters instead
+void hng64_state::hng64_fbscale_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	if (mem_mask & 0xffff0000)
+	{
+		// NORMAL value is 3fe0
+		// ':maincpu' (8006E46C): hng64_fb_scale_x 3fe00000 ffff0000
+
+		// on xrally course select this is 39e0
+		// hng64_fb_scale_x 39e00000 ffff0000
+
+		//logerror("%s: hng64_fb_scale_x %08x %08x\n", machine().describe_context(), data, mem_mask);
+	}
+
+	if (mem_mask & 0x0000ffff)
+	{
+		// NORMAL value is 37e0
+		// hng64_fb_scale_y 000037e0 0000ffff
+
+		// on xrally course select this is 32e0
+		// hng64_fb_scale_y 000032e0 0000ffff
+
+		// during fatfurwa scaled intro it uses 2de0, although writes 37e0 in the same frame; presumably rendering takes place while it is 2de0 though
+		// ':maincpu' (800667A0): hng64_fb_scale_y 00002de0 0000ffff
+		//logerror("%s: hng64_fb_scale_y %08x %08x\n", machine().describe_context(), data, mem_mask);
+	}
 }
 
-void hng64_state::hng64_fbscroll_w(offs_t offset, uint16_t data)
+void hng64_state::hng64_fbscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	// this is used ingame on the samsho games, and on the car select screen in xrally (youtube video confirms position of car needs to change)
+	if (mem_mask & 0xffff0000)
+	{
+		// NORMAL value is e000
+		// hng64_fbscroll x e0000000 ffff0000
 
-	logerror("%s: hng64_fbscroll_w (%03x) %04x\n", machine().describe_context(), offset, data);
+		// on xrally course select this is e600
+		// ':maincpu' (8002327C): hng64_fbscroll x e6000000 ffff0000
+
+		// on xrally car select this is e680
+		// hng64_fbscroll x e6800000 ffff0000
+		//logerror("%s: hng64_fbscroll x %08x %08x\n", machine().describe_context(), data, mem_mask);
+	}
+
+	if (mem_mask & 0x0000ffff)
+	{
+		// NORMAL value is 1c00
+		// ':maincpu' (8006FA18): hng64_fbscroll y 00001c00 0000ffff
+
+		// on xrally course select this is 1700
+		// ':maincpu' (8002327C): hng64_fbscroll y 00001700 0000ffff
+
+		// on xrally car select this is 1260
+		// ':maincpu' (80012820): hng64_fbscroll y 00001260 0000ffff
+		//logerror("%s: hng64_fbscroll y %08x %08x\n", machine().describe_context(), data, mem_mask);
+	}
 }
 
 void hng64_state::hng64_fbunkbyte_w(offs_t offset, uint8_t data)
