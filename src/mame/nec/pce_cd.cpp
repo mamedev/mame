@@ -72,11 +72,26 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 #include "coreutil.h"
 #include "pce_cd.h"
 
+#define LOG_CMD            (1U <<  1)
+#define LOG_CDDA           (1U <<  2)
+#define LOG_SCSI           (1U <<  3)
+
+#define VERBOSE (LOG_GENERAL | LOG_CMD | LOG_CDDA)
+#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
+#define LOGCMD(...)     LOGMASKED(LOG_CMD, __VA_ARGS__)
+#define LOGCDDA(...)    LOGMASKED(LOG_CDDA, __VA_ARGS__)
+#define LOGSCSI(...)    LOGMASKED(LOG_SCSI, __VA_ARGS__)
+
+// 0xdd subchannel read is special and very verbose when it happens, treat differently
+#define LIVE_SUBQ_VIEW  1
 
 #define PCE_CD_CLOCK    9216000
 
 
-// TODO: it's actually a common interface with PC-8801, find actual number part
+// TODO: it's actually a common interface with PC-8801
+// cfr. src/devices/bus/pc8801/pc8801_31.cpp
 DEFINE_DEVICE_TYPE(PCE_CD, pce_cd_device, "pcecd", "PCE CD Add-on")
 
 // registers 9, e and f are known to be write only
@@ -369,7 +384,7 @@ WRITE_LINE_MEMBER( pce_cd_device::msm5205_int )
 
 void pce_cd_device::reply_status_byte(uint8_t status)
 {
-	logerror("Setting CD in reply_status_byte\n");
+	LOGSCSI("Setting CD in reply_status_byte\n");
 	m_scsi_CD = m_scsi_IO = m_scsi_REQ = 1;
 	m_scsi_MSG = 0;
 	m_message_after_status = 1;
@@ -388,15 +403,15 @@ void pce_cd_device::reply_status_byte(uint8_t status)
 /* 0x00 - TEST UNIT READY */
 void pce_cd_device::test_unit_ready()
 {
-	logerror("test unit ready\n");
+	LOGCMD("0x00 TEST UNIT READY: status send ");
 	if (m_cd_file)
 	{
-		logerror("Sending STATUS_OK status\n");
+		LOGCMD("STATUS_OK\n");
 		reply_status_byte(SCSI_STATUS_OK);
 	}
 	else
 	{
-		logerror("Sending CHECK_CONDITION status\n");
+		LOGCMD("CHECK_CONDITION\n");
 		reply_status_byte(SCSI_CHECK_CONDITION);
 	}
 }
@@ -406,7 +421,7 @@ void pce_cd_device::read_6()
 {
 	uint32_t frame = ((m_command_buffer[1] & 0x1f) << 16) | (m_command_buffer[2] << 8) | m_command_buffer[3];
 	uint32_t frame_count = m_command_buffer[4];
-	printf("%08x %08x\n",frame,frame_count);
+	LOGCMD("0x08 READ(6): frame: %08x size: %08x\n", frame, frame_count);
 
 	/* Check for presence of a CD */
 	if (!m_cd_file)
@@ -428,7 +443,7 @@ void pce_cd_device::read_6()
 	if (frame_count == 0)
 	{
 		/* Star Breaker uses this */
-		popmessage("Read Sector frame count == 0, contact MESSdev");
+		popmessage("Read Sector frame count == 0");
 		reply_status_byte(SCSI_STATUS_OK);
 	}
 	else
@@ -436,14 +451,16 @@ void pce_cd_device::read_6()
 		m_data_timer->adjust(attotime::from_hz(PCE_CD_DATA_FRAMES_PER_SECOND), 0, attotime::from_hz(PCE_CD_DATA_FRAMES_PER_SECOND));
 	}
 
-	/* TODO: correct place? */
+	// TODO: timing likely not right
 	set_irq_line(PCE_CD_IRQ_TRANSFER_READY, ASSERT_LINE);
 }
 
 /* 0xD8 - SET AUDIO PLAYBACK START POSITION (NEC) */
 void pce_cd_device::nec_set_audio_start_position()
 {
-	uint32_t  frame = 0;
+	uint32_t frame = 0;
+	const uint8_t mode = m_command_buffer[9] & 0xc0;
+	LOGCMD("0xd8 SET AUDIO PLAYBACK START POSITION (NEC): mode %02x\n", mode);
 
 	if (!m_cd_file)
 	{
@@ -452,31 +469,36 @@ void pce_cd_device::nec_set_audio_start_position()
 		return;
 	}
 
-	switch (m_command_buffer[9] & 0xC0)
+	switch (mode)
 	{
 		case 0x00:
-			popmessage("CD-DA set start mode 0x00, contact MESSdev");
+			popmessage("CD-DA set start mode 0x00");
 			frame = (m_command_buffer[3] << 16) | (m_command_buffer[4] << 8) | m_command_buffer[5];
 			break;
 		case 0x40:
 		{
-			uint8_t m,s,f;
+			uint8_t m, s, f;
 
 			m = bcd_2_dec(m_command_buffer[2]);
 			s = bcd_2_dec(m_command_buffer[3]);
 			f = bcd_2_dec(m_command_buffer[4]);
 
 			frame = f + 75 * (s + m * 60);
+			LOGCMD("MSF=%d M=%d S=%d F=%d\n", frame, m, s, f);
 			// PCE tries to be clever here and set (start of track + track pregap size) to skip the pregap
 			// (I guess it wants the TOC to have the real start sector for data tracks and the start of the pregap for audio?)
 			frame -= m_toc->tracks[m_cd_file->get_track(frame)].pregap;
 			break;
 		}
 		case 0x80:
-			frame = m_toc->tracks[ bcd_2_dec(m_command_buffer[2]) - 1 ].logframeofs;
+		{
+			const u8 track_number = bcd_2_dec(m_command_buffer[2]);
+			LOGCMD("TRACK=%d\n", track_number);
+			frame = m_toc->tracks[ track_number - 1 ].logframeofs;
 			break;
+		}
 		default:
-			popmessage("CD-DA set start mode 0xc0, contact MESSdev");
+			popmessage("CD-DA set start mode 0xc0");
 			//assert(nullptr == nec_set_audio_start_position);
 			break;
 	}
@@ -495,21 +517,33 @@ void pce_cd_device::nec_set_audio_start_position()
 //  }
 //  else
 	{
-		if (m_command_buffer[1] & 0x03)
+		const u8 play_mode = m_command_buffer[1] & 0x03;
+		LOGCMD("Play mode = %d\n", play_mode);
+		if (play_mode)
 		{
 			//m_cdda_status = PCE_CD_CDDA_PLAYING;
-			m_end_frame = m_last_frame; //get the end of the CD
+			//get the end of the CD
+			m_end_frame = m_last_frame;
+			LOGCDDA("Audio start (end of CD) current %d end %d\n", m_current_frame, m_end_frame);
 			m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
-			m_cdda_play_mode = (m_command_buffer[1] & 0x02) ? 2 : 3; // mode 2 sets IRQ at end
-			m_end_mark =  (m_command_buffer[1] & 0x02) ? 1 : 0;
+			m_cdda_play_mode = (play_mode & 0x02) ? 2 : 3; // mode 2 sets IRQ at end
+			m_end_mark = (play_mode & 0x02) ? 1 : 0;
 		}
 		else
 		{
 			//m_cdda_status = PCE_CD_CDDA_PLAYING;
-			m_end_frame = m_toc->tracks[ m_cd_file->get_track(m_current_frame) ].logframeofs + m_toc->tracks[ m_cd_file->get_track(m_current_frame) ].logframes; //get the end of THIS track
-			m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
-			m_end_mark = 0;
+			//get the end of this track
+			m_end_frame = m_toc->tracks[ m_cd_file->get_track(m_current_frame) ].logframeofs
+						+ m_toc->tracks[ m_cd_file->get_track(m_current_frame) ].logframes;
+			LOGCDDA("Audio start (end of track) current %d end %d\n", m_current_frame, m_end_frame);
+			// FIXME: fzone2 / fzone2j fails this assertion
+			if (m_end_frame > m_current_frame)
+				m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
+			//else
+			//  m_cdda->start_audio(m_current_frame, m_current_frame - m_end_frame);
+
 			m_cdda_play_mode = 3;
+			m_end_mark = 0;
 		}
 	}
 
@@ -520,7 +554,9 @@ void pce_cd_device::nec_set_audio_start_position()
 /* 0xD9 - SET AUDIO PLAYBACK END POSITION (NEC) */
 void pce_cd_device::nec_set_audio_stop_position()
 {
-	uint32_t  frame = 0;
+	uint32_t frame = 0;
+	const uint8_t mode = m_command_buffer[9] & 0xc0;
+	LOGCMD("0xd9 SET AUDIO PLAYBACK END POSITION (NEC): mode %02x\n", mode);
 
 	if (!m_cd_file)
 	{
@@ -529,53 +565,63 @@ void pce_cd_device::nec_set_audio_stop_position()
 		return;
 	}
 
-	switch (m_command_buffer[9] & 0xC0)
+
+	switch (mode)
 	{
 		case 0x00:
-			popmessage("CD-DA set end mode 0x00, contact MESSdev");
+			popmessage("CD-DA set end mode 0x00");
 			frame = (m_command_buffer[3] << 16) | (m_command_buffer[4] << 8) | m_command_buffer[5];
 			break;
 		case 0x40:
 		{
-			uint8_t m,s,f;
+			uint8_t m, s, f;
 
 			m = bcd_2_dec(m_command_buffer[2]);
 			s = bcd_2_dec(m_command_buffer[3]);
 			f = bcd_2_dec(m_command_buffer[4]);
 
 			frame = f + 75 * (s + m * 60);
-			//      if (frame >= 525) // TODO: seven seconds gap? O_o
-			//          frame -= 525;
+			LOGCMD("MSF=%d M=%d S=%d F=%d (pregap = %d)\n", frame, m, s, f, m_toc->tracks[m_cd_file->get_track(frame)].pregap);
+			// TODO: pinpoint if this needs a gap offset too
+			// frame -= m_toc->tracks[m_cd_file->get_track(frame)].pregap;
 			break;
 		}
 		case 0x80:
-			frame = m_toc->tracks[ bcd_2_dec(m_command_buffer[2]) - 1 ].logframeofs;
+		{
+			const u8 track_number = bcd_2_dec(m_command_buffer[2]);
+			LOGCMD("TRACK=%d\n", track_number);
+			frame = m_toc->tracks[ track_number - 1 ].logframeofs;
 			break;
+		}
 		default:
-			popmessage("CD-DA set end mode 0xc0, contact MESSdev");
+			popmessage("CD-DA set end mode 0xc0");
 			//assert(nullptr == nec_set_audio_start_position);
 			break;
 	}
 
 	m_end_frame = frame;
 	m_cdda_play_mode = m_command_buffer[1] & 0x03;
+	LOGCMD("Play mode = %d\n", m_cdda_play_mode);
 
 	if (m_cdda_play_mode)
 	{
 		if (m_cdda_status == PCE_CD_CDDA_PAUSED)
 		{
+			LOGCDDA("Audio unpause\n");
 			m_cdda->pause_audio(0);
 		}
 		else
 		{
+			LOGCDDA("Audio end current %d end %d\n", m_current_frame, m_end_frame);
 			//printf("%08x %08x\n",m_current_frame,m_end_frame - m_current_frame);
 			m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
-			m_end_mark = 1;
 		}
+		m_end_mark = 1;
 		m_cdda_status = PCE_CD_CDDA_PLAYING;
 	}
 	else
 	{
+		LOGCDDA("Audio stop\n");
 		m_cdda_status = PCE_CD_CDDA_OFF;
 		m_cdda->stop_audio();
 		m_end_frame = m_last_frame;
@@ -597,15 +643,19 @@ void pce_cd_device::nec_pause()
 		return;
 	}
 
+	LOGCMD("0xda PAUSE (NEC)\n");
+
 	/* If there was no cdda playing, throw an error */
 	if (m_cdda_status == PCE_CD_CDDA_OFF)
 	{
+		LOG("Issued SCSI_CHECK_CONDITION in 0xda!\n");
 		reply_status_byte(SCSI_CHECK_CONDITION);
 		return;
 	}
 
 	m_cdda_status = PCE_CD_CDDA_PAUSED;
 	m_current_frame = m_cdda->get_audio_lba();
+	LOGCDDA("Audio pause on %d LBA\n", m_current_frame);
 	m_cdda->pause_audio(1);
 	reply_status_byte(SCSI_STATUS_OK);
 }
@@ -615,6 +665,7 @@ void pce_cd_device::nec_get_subq()
 {
 	/* WP - I do not have access to chds with subchannel information yet, so I'm faking something here */
 	uint32_t msf_abs, msf_rel, track, frame;
+	//LOGCMD("0xdd READ SUBCHANNEL Q (NEC) %d\n", m_cdda_status);
 
 	if (!m_cd_file)
 	{
@@ -645,14 +696,30 @@ void pce_cd_device::nec_get_subq()
 	msf_rel = cdrom_file::lba_to_msf_alt(frame - m_cd_file->get_track_start(track));
 
 	m_data_buffer[1] = 0x01 | ((m_cd_file->get_track_type(m_cd_file->get_track(track+1)) == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x40);
-	m_data_buffer[2] = dec_2_bcd(track+1);       /* track */
-	m_data_buffer[3] = 1;                          /* index */
-	m_data_buffer[4] = dec_2_bcd((msf_rel >> 16) & 0xFF);/* M (relative) */
-	m_data_buffer[5] = dec_2_bcd((msf_rel >> 8) & 0xFF); /* S (relative) */
-	m_data_buffer[6] = dec_2_bcd(msf_rel & 0xFF);          /* F (relative) */
-	m_data_buffer[7] = dec_2_bcd((msf_abs >> 16) & 0xFF);/* M (absolute) */
-	m_data_buffer[8] = dec_2_bcd((msf_abs >> 8) & 0xFF); /* S (absolute) */
-	m_data_buffer[9] = dec_2_bcd(msf_abs & 0xFF);          /* F (absolute) */
+	// track
+	m_data_buffer[2] = dec_2_bcd(track+1);
+	// index
+	m_data_buffer[3] = 1;
+	// MSF (relative)
+	m_data_buffer[4] = dec_2_bcd((msf_rel >> 16) & 0xFF);
+	m_data_buffer[5] = dec_2_bcd((msf_rel >> 8) & 0xFF);
+	m_data_buffer[6] = dec_2_bcd(msf_rel & 0xFF);
+	// MSF (absolute)
+	m_data_buffer[7] = dec_2_bcd((msf_abs >> 16) & 0xFF);
+	m_data_buffer[8] = dec_2_bcd((msf_abs >> 8) & 0xFF);
+	m_data_buffer[9] = dec_2_bcd(msf_abs & 0xFF);
+	if(LIVE_SUBQ_VIEW)
+	{
+		const std::vector<std::string> status_types = {"standby", "pause", "play"};
+		popmessage("SUBQ - status %s type %02x|track %d index %d| MSF rel %06x MSF abs %06x\n"
+			, status_types[m_cdda_status]
+			, m_data_buffer[1]
+			, track + 1
+			, 1
+			, msf_rel
+			, msf_abs
+		);
+	}
 	m_data_buffer_size = 10;
 
 	m_data_buffer_index = 0;
@@ -665,7 +732,7 @@ void pce_cd_device::nec_get_subq()
 void pce_cd_device::nec_get_dir_info()
 {
 	uint32_t frame, msf, track = 0;
-	logerror("nec get dir info\n");
+	LOGCMD("0xde GET DIR INFO (NEC)\n");
 
 	if (!m_cd_file)
 	{
@@ -677,34 +744,38 @@ void pce_cd_device::nec_get_dir_info()
 
 	switch (m_command_buffer[1])
 	{
-		case 0x00:      /* Get first and last track numbers */
+		case 0x00:
 			m_data_buffer[0] = dec_2_bcd(1);
 			m_data_buffer[1] = dec_2_bcd(toc.numtrks);
+			LOGCMD("Get first and last track numbers => 1-%2d\n", m_data_buffer[1]);
 			m_data_buffer_size = 2;
 			break;
-		case 0x01:      /* Get total disk size in MSF format */
+		case 0x01:
 			frame = toc.tracks[toc.numtrks-1].logframeofs;
 			frame += toc.tracks[toc.numtrks-1].frames;
 			msf = cdrom_file::lba_to_msf(frame + 150);
+			LOGCMD("Get total disk size in MSF format => %06x\n", msf);
 
 			m_data_buffer[0] = (msf >> 16) & 0xFF;   /* M */
 			m_data_buffer[1] = (msf >> 8) & 0xFF;    /* S */
-			m_data_buffer[2] = msf & 0xFF;             /* F */
+			m_data_buffer[2] = msf & 0xFF;           /* F */
 			m_data_buffer_size = 3;
 			break;
-		case 0x02:      /* Get track information */
+		case 0x02:
 			if (m_command_buffer[2] == 0xAA)
 			{
 				frame = toc.tracks[toc.numtrks-1].logframeofs;
 				frame += toc.tracks[toc.numtrks-1].frames;
+				LOGCMD("Get lead-out => %06x\n", frame);
 				m_data_buffer[3] = 0x04;   /* correct? */
-			} else
+			}
+			else
 			{
 				track = std::max(bcd_2_dec(m_command_buffer[2]), 1U);
 				frame = toc.tracks[track-1].logframeofs;
+				LOGCMD("Get track info track = %d, frame = %d\n", track, frame);
 				m_data_buffer[3] = (toc.tracks[track-1].trktype == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x04;
 			}
-			logerror("track = %d, frame = %d\n", track, frame);
 			msf = cdrom_file::lba_to_msf(frame + 150);
 			m_data_buffer[0] = (msf >> 16) & 0xFF;   /* M */
 			m_data_buffer[1] = (msf >> 8) & 0xFF;    /* S */
@@ -712,6 +783,7 @@ void pce_cd_device::nec_get_dir_info()
 			m_data_buffer_size = 4;
 			break;
 		default:
+			popmessage("DIR INFO unemulated %02x", m_command_buffer[1]);
 //          assert(pce_cd_nec_get_dir_info == nullptr);  // Not implemented yet
 			break;
 	}
@@ -749,7 +821,7 @@ void pce_cd_device::handle_data_output()
 	if (m_scsi_REQ && m_scsi_ACK)
 	{
 		/* Command byte received */
-		logerror("Command byte $%02X received\n", m_cdc_data);
+		LOGSCSI("Command byte $%02X received\n", m_cdc_data);
 
 		/* Check for buffer overflow */
 		assert(m_command_buffer_index < PCE_CD_COMMAND_BUFFER_SIZE);
@@ -763,16 +835,16 @@ void pce_cd_device::handle_data_output()
 	{
 		int i = 0;
 
-		logerror("Check if command done\n");
+		LOGSCSI("Check if command done\n");
 
 		for(i = 0; m_command_buffer[0] > pce_cd_commands[i].command_byte; i++);
 
 		/* Check for unknown commands */
 		if (m_command_buffer[0] != pce_cd_commands[i].command_byte)
 		{
-			logerror("Unrecognized command: %02X\n", m_command_buffer[0]);
+			LOGSCSI("Unrecognized command: %02X\n", m_command_buffer[0]);
 			if (m_command_buffer[0] == 0x03)
-				popmessage("CD command 0x03 issued (Request Sense), contact MESSdev");
+				popmessage("CD command 0x03 issued (Request Sense)");
 		}
 		assert(m_command_buffer[0] == pce_cd_commands[i].command_byte);
 
@@ -796,7 +868,7 @@ void pce_cd_device::handle_data_input()
 		/* Command / Status byte */
 		if (m_scsi_REQ && m_scsi_ACK)
 		{
-			logerror("status sent\n");
+			LOGSCSI("status sent\n");
 			m_scsi_REQ = 0;
 			m_status_sent = 1;
 		}
@@ -806,7 +878,7 @@ void pce_cd_device::handle_data_input()
 			m_status_sent = 0;
 			if (m_message_after_status)
 			{
-				logerror("message after status\n");
+				LOGSCSI("message after status\n");
 				m_message_after_status = 0;
 				m_scsi_MSG = m_scsi_REQ = 1;
 				m_cdc_data = 0;
@@ -835,7 +907,7 @@ void pce_cd_device::handle_data_input()
 			}
 			else
 			{
-				logerror("Transfer byte %02x from offset %d %d\n",m_data_buffer[m_data_buffer_index] , m_data_buffer_index, m_current_frame);
+				LOGSCSI("Transfer byte %02x from offset %d %d\n",m_data_buffer[m_data_buffer_index] , m_data_buffer_index, m_current_frame);
 				m_cdc_data = m_data_buffer[m_data_buffer_index];
 				m_data_buffer_index++;
 				m_scsi_REQ = 1;
@@ -873,7 +945,7 @@ void pce_cd_device::update()
 	{
 		if (m_scsi_RST)
 		{
-			logerror("Performing CD reset\n");
+			LOGSCSI("Performing CD reset\n");
 			/* Reset internal data */
 			m_scsi_BSY = m_scsi_SEL = m_scsi_CD = m_scsi_IO = 0;
 			m_scsi_MSG = m_scsi_REQ = m_scsi_ATN = 0;
@@ -889,7 +961,7 @@ void pce_cd_device::update()
 	/* Check if bus can be freed */
 	if (! m_scsi_SEL && ! m_scsi_BSY && m_selected)
 	{
-		logerror("freeing bus\n");
+		LOGSCSI("freeing bus\n");
 		m_selected = 0;
 		m_scsi_CD = m_scsi_MSG = m_scsi_IO = m_scsi_REQ = 0;
 		set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, CLEAR_LINE);
@@ -901,7 +973,7 @@ void pce_cd_device::update()
 		if (! m_selected)
 		{
 			m_selected = 1;
-			logerror("Setting CD in device selection\n");
+			LOGSCSI("Setting CD in device selection\n");
 			m_scsi_BSY = m_scsi_REQ = m_scsi_CD = 1;
 			m_scsi_MSG = m_scsi_IO = 0;
 		}
@@ -944,14 +1016,31 @@ void pce_cd_device::update()
 		}
 	}
 
-	/* FIXME: presumably CD-DA needs an irq interface for this */
+	// FIXME: move this to cdda callback, buggy
 	if (m_cdda->audio_ended() && m_end_mark == 1)
 	{
+		LOGCDDA("CDDA end mark %d\n", m_cdda_play_mode & 3);
 		switch (m_cdda_play_mode & 3)
 		{
-			case 1: m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame); m_end_mark = 1; break; //play with repeat
-			case 2: set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE); m_end_mark = 0; break; //irq when finished
-			case 3: m_end_mark = 0; break; //play without repeat
+			case 1:
+			{
+				LOGCDDA(" - Play with repeat %d %d\n", m_current_frame, m_end_frame - m_current_frame);
+				m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
+				m_end_mark = 1;
+				break;
+			}
+			case 2:
+				LOGCDDA(" - IRQ when finished\n");
+				set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE);
+				m_end_mark = 0;
+				break;
+			case 3:
+				LOGCDDA(" - Play without repeat\n");
+				// fzone2 / fzone2j wants a STOP thru SUBQ command
+				m_cdda_status = PCE_CD_CDDA_OFF;
+				m_cdda->stop_audio();
+				m_end_mark = 0;
+				break;
 		}
 	}
 }
@@ -979,14 +1068,14 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::data_timer_callback)
 	if (m_data_buffer_index == m_data_buffer_size)
 	{
 		/* Read next data sector */
-		logerror("read sector %d\n", m_current_frame);
+		LOGSCSI("read sector %d\n", m_current_frame);
 		if (! m_cd_file->read_data(m_current_frame, m_data_buffer.get(), cdrom_file::CD_TRACK_MODE1))
 		{
-			logerror("Mode1 CD read failed for frame #%d\n", m_current_frame);
+			LOGSCSI("Mode1 CD read failed for frame #%d\n", m_current_frame);
 		}
 		else
 		{
-			logerror("Successfully read mode1 frame #%d\n", m_current_frame);
+			LOGSCSI("Successfully read mode1 frame #%d\n", m_current_frame);
 		}
 
 		m_data_buffer_index = 0;
@@ -999,7 +1088,7 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::data_timer_callback)
 		if (m_current_frame == m_end_frame)
 		{
 			/* We are done, disable the timer */
-			logerror("Last frame read from CD\n");
+			LOGSCSI("Last frame read from CD\n");
 			m_data_transferred = 1;
 			// data transfer is done, issue a pause
 			m_cdda_status = PCE_CD_CDDA_PAUSED;
@@ -1423,7 +1512,7 @@ void pce_cd_device::fade_register_w(uint8_t data)
 				m_adpcm_fadein_timer->adjust(attotime::never);
 				break;
 			default:
-				popmessage("CD-DA / ADPCM Fade effect mode %02x, contact MESSdev",data & 0x0f);
+				popmessage("CD-DA / ADPCM Fade effect mode %02x",data & 0x0f);
 				break;
 		}
 	}

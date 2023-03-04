@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Wilbert Pol
+// copyright-holders:Wilbert Pol, Angelo Salese
 #ifndef MAME_NEC_PCE_CD_H
 #define MAME_NEC_PCE_CD_H
 
