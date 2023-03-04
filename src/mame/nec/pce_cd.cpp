@@ -525,6 +525,7 @@ void pce_cd_device::nec_set_audio_start_position()
 			//get the end of the CD
 			m_end_frame = m_last_frame;
 			LOGCDDA("Audio start (end of CD) current %d end %d\n", m_current_frame, m_end_frame);
+			// TODO: verify this, cfr. below
 			m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
 			m_cdda_play_mode = (play_mode & 0x02) ? 2 : 3; // mode 2 sets IRQ at end
 			m_end_mark = (play_mode & 0x02) ? 1 : 0;
@@ -536,11 +537,10 @@ void pce_cd_device::nec_set_audio_start_position()
 			m_end_frame = m_toc->tracks[ m_cd_file->get_track(m_current_frame) ].logframeofs
 						+ m_toc->tracks[ m_cd_file->get_track(m_current_frame) ].logframes;
 			LOGCDDA("Audio start (end of track) current %d end %d\n", m_current_frame, m_end_frame);
-			// FIXME: fzone2 / fzone2j fails this assertion
-			if (m_end_frame > m_current_frame)
-				m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
-			//else
-			//  m_cdda->start_audio(m_current_frame, m_current_frame - m_end_frame);
+			// fzone2 / fzone2j / draculax (stage 2' pre-boss) definitely don't want this
+			// to start redbook. It's done later with 0xd9 command.
+			//if (m_end_frame > m_current_frame)
+			//	m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
 
 			m_cdda_play_mode = 3;
 			m_end_mark = 0;
@@ -610,12 +610,10 @@ void pce_cd_device::nec_set_audio_stop_position()
 			LOGCDDA("Audio unpause\n");
 			m_cdda->pause_audio(0);
 		}
-		else
-		{
-			LOGCDDA("Audio end current %d end %d\n", m_current_frame, m_end_frame);
-			//printf("%08x %08x\n",m_current_frame,m_end_frame - m_current_frame);
-			m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
-		}
+
+		LOGCDDA("Audio end current %d end %d\n", m_current_frame, m_end_frame);
+		//printf("%08x %08x\n",m_current_frame,m_end_frame - m_current_frame);
+		m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
 		m_end_mark = 1;
 		m_cdda_status = PCE_CD_CDDA_PLAYING;
 	}
@@ -1016,7 +1014,8 @@ void pce_cd_device::update()
 		}
 	}
 
-	// FIXME: move this to cdda callback, buggy
+	// handle end playback event
+	// TODO: should really be a CDDA write_line cb instead
 	if (m_cdda->audio_ended() && m_end_mark == 1)
 	{
 		LOGCDDA("CDDA end mark %d\n", m_cdda_play_mode & 3);
@@ -1024,7 +1023,8 @@ void pce_cd_device::update()
 		{
 			case 1:
 			{
-				LOGCDDA(" - Play with repeat %d %d\n", m_current_frame, m_end_frame - m_current_frame);
+				// TODO: should seek rather than be instant
+				LOGCDDA(" - Play with repeat %d %d\n", m_current_frame, m_end_frame);
 				m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
 				m_end_mark = 1;
 				break;
@@ -1036,7 +1036,7 @@ void pce_cd_device::update()
 				break;
 			case 3:
 				LOGCDDA(" - Play without repeat\n");
-				// fzone2 / fzone2j wants a STOP thru SUBQ command
+				// fzone2 / fzone2j wants a STOP thru SUBQ command during intro
 				m_cdda_status = PCE_CD_CDDA_OFF;
 				m_cdda->stop_audio();
 				m_end_mark = 0;

@@ -134,14 +134,12 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="draculax" supported="no">
+	<software name="draculax" supported="partial">
 		<description>Akumajou Dracula X - Chi no Rondo (Japan)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 	    <notes><![CDATA[
-No [redbook] repeat for in-game songs
-[redbook] plays pre-boss BGM and boss BGM in Stage 2'
-[redbook] skips first two seconds
+[redbook] skips first two seconds, offsets on repeats
 [ADPCM] streaming cuts off when saving Maria
 Richter sprite becomes all blue in some specific sections (cfr. stage 1 mermaid area, stage 2' final section, stage 4' start), generally when water is present, timing?
 Stage 4 to 4' boss fight has ugly green background (btanb)
@@ -1629,7 +1627,7 @@ Intro shows several horizontal black/transparent strips over GFXs
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final zone ii (cd)(jpn)" sha1="7721a3c2347f847bf53a61b07bb5b0aa3d039ab0"/>
+				<disk name="final zone ii (cd)(jpn)" sha1="7721a3c2347f847bf53a61b07bb5b0aa3d039ab0" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7282,7 +7280,7 @@ https://mametesters.org/view.php?id=7972
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="final zone ii (cd)(usa)" sha1="a8846a72f5eb819c6e9b6947eaa21597446f2e85"/>
+				<disk name="final zone ii (cd)(usa)" sha1="a8846a72f5eb819c6e9b6947eaa21597446f2e85" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
