@@ -148,7 +148,7 @@ TIMER_CALLBACK_MEMBER(h19_state::key_click_off)
 
 TIMER_CALLBACK_MEMBER(h19_state::bell_off)
 {
-	m_keyclickactive = false;
+	m_bellactive = false;
 
 	if (!m_keyclickactive && !m_bellactive)
 		m_beep->set_state(0);
