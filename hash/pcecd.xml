@@ -916,7 +916,7 @@ Intro shows several horizontal black/transparent strips over GFXs
 		<year>1997</year>
 		<publisher>Asia Soft Lab</publisher>
 	    <notes><![CDATA[
-[redbook] audio crashes after title screen (constant buzz)
+[redbook] audio crashes after title screen (constant buzz, keeps sending audio start/end commands)
 ]]></notes>
 		<info name="release" value="19970310"/>
 		<info name="alt_title" value="クレイジー・ホスピタル ふしぎの国の天使"/>
@@ -2773,6 +2773,7 @@ All tested stages don't draw playfield properly, timing?
 		<publisher>Hudson</publisher>
 		<notes><![CDATA[
 https://mametesters.org/view.php?id=7290
+Sets high [CD drive] transfer length (0xfc), stalls
 ]]></notes>
 		<info name="serial" value="HCD5076"/>
 		<info name="release" value="19950526"/>
@@ -3119,7 +3120,7 @@ https://mametesters.org/view.php?id=5995
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
 		<notes><![CDATA[
-https://mametesters.org/view.php?id=7791
+https://mametesters.org/view.php?id=7791 (fixed)
 ]]></notes>
 		<info name="serial" value="HECD4009"/>
 		<info name="release" value="19940915"/>
@@ -5100,6 +5101,7 @@ https://mametesters.org/view.php?id=7292
 		<publisher>Victor Entertainment</publisher>
 		<notes><![CDATA[
 https://mametesters.org/view.php?id=7293
+Sets high [CD drive] transfer length (0xfc) on FMVs, stalls
 Offset [CRTC] screen
 ]]></notes>
 		<info name="serial" value="JCCD1004"/>
@@ -6692,7 +6694,7 @@ Offset [CRTC] screen
 		<year>1990</year>
 		<publisher>Pack-In-Video</publisher>
 	    <notes><![CDATA[
-Hangs or resets after giving yes to "Is it OK?" prompt
+Hangs or resets after giving yes to "Is it OK?" prompt (fixed)
 ]]></notes>
 		<info name="serial" value="PVCD0001"/>
 		<info name="release" value="19900330"/>
