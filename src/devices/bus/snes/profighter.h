@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:
 
 #ifndef MAME_BUS_SNES_PROFIGHTER_H
 #define MAME_BUS_SNES_PROFIGHTER_H
@@ -8,20 +8,14 @@
 
 #include "snes_slot.h"
 
-#include "formats/pc_dsk.h"
-#include "imagedev/floppy.h"
-#include "machine/upd765.h"
-
 
 class sns_pro_fighter_q_device : public device_t,
 						public device_sns_cart_interface
 {
 public:
-	// construction/destruction
 	sns_pro_fighter_q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -32,11 +26,9 @@ class sns_pro_fighter_qa_device : public device_t,
 						public device_sns_cart_interface
 {
 public:
-	// construction/destruction
 	sns_pro_fighter_qa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -47,11 +39,9 @@ class sns_pro_fighter_qb_device : public device_t,
 						public device_sns_cart_interface
 {
 public:
-	// construction/destruction
 	sns_pro_fighter_qb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -62,11 +52,9 @@ class sns_pro_fighter_x_device : public device_t,
 						public device_sns_cart_interface
 {
 public:
-	// construction/destruction
 	sns_pro_fighter_x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;

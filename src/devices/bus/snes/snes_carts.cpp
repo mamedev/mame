@@ -69,8 +69,8 @@ void snes_cart(device_slot_interface &device)
 	device.option_add_internal("lorom_st10leg", SNS_LOROM_SETA10_LEG);
 	device.option_add_internal("lorom_st11leg", SNS_LOROM_SETA11_LEG);
 	// copiers
-	device.option_add_internal("profighterq",   SNS_PRO_FIGHTER_Q);
-	device.option_add_internal("profighterqa",  SNS_PRO_FIGHTER_QA);
-	device.option_add_internal("profighterqb",  SNS_PRO_FIGHTER_QB);
-	device.option_add_internal("profighterx",   SNS_PRO_FIGHTER_X);
+	device.option_add("profighterq",  SNS_PRO_FIGHTER_Q);
+	device.option_add("profighterqa", SNS_PRO_FIGHTER_QA);
+	device.option_add("profighterqb", SNS_PRO_FIGHTER_QB);
+	device.option_add("profighterx",  SNS_PRO_FIGHTER_X);
 }
