@@ -225,7 +225,7 @@ void hng64_state::setLighting(const uint16_t* packet)
 	// [7]  - ???? ... ? Seems to be another light vector ?
 	// [8]  - ???? ... ? Seems to be another light vector ?
 	// [9]  - xxxx ... Strength according to sams64_2 (in combination with vector length) [0,512]
-	// folowing could just be leftover data
+	// following could just be leftover data
 	// [10] - ???? ... ? Used in fatfurwa
 	// [11] - ???? ... ? Used in fatfurwa
 	// [12] - ???? ... ? Used in fatfurwa
@@ -257,7 +257,7 @@ void hng64_state::set3dFlags(const uint16_t* packet)
 	// [6]  - ???? ... scale?
 	// [7]  - ???? ... scale?
 	// [8]  - xx?? ... Palette offset & ??
-	// folowing could just be leftover data
+	// following could just be leftover data
 	// [9]  - ???? ... ? Very much used - seem to bounce around when characters are on screen
 	// [10] - ???? ... ? ''  ''
 	// [11] - ???? ... ? ''  ''
@@ -298,7 +298,7 @@ void hng64_state::setCameraProjectionMatrix(const uint16_t* packet)
 	// [11] - xxxx ... Camera projection left   - confirmed by sams64_2
 	// [12] - xxxx ... Camera projection top    - confirmed by sams64_2
 	// [13] - xxxx ... Camera projection bottom - confirmed by sams64_2
-	// folowing could just be leftover data
+	// following could just be leftover data
 	// [14] - ???? ... ? Gets data during buriki door-run
 	// [15] - ???? ... ? Gets data during buriki door-run
 	////////////*/
