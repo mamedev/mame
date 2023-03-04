@@ -407,7 +407,7 @@ void nmk16_state::vandyke_map(address_map &map)
 	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
 	map(0x094000, 0x097fff).ram(); // what is this?
 	map(0x09d000, 0x09d7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
-	map(0x0f0000, 0x0fffff).ram().share("mainram");
+	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share("mainram");
 }
 
 void nmk16_state::vandykeb_map(address_map &map)
@@ -427,7 +427,7 @@ void nmk16_state::vandykeb_map(address_map &map)
 	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share("bgvideoram0");
 	map(0x094000, 0x097fff).ram(); // what is this?
 	map(0x09d000, 0x09d7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share("txvideoram");
-	map(0x0f0000, 0x0fffff).ram().share("mainram");
+	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share("mainram");
 }
 
 void nmk16_state::manybloc_map(address_map &map)
