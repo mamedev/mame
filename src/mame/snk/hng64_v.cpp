@@ -911,37 +911,39 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	//uint8_t spriteblendtype = (m_tcram[0x10 / 4] >> 16) & 0x10;
 
 	// would be an odd place for it, after the 'vblank' flag but...
-	uint8_t spriteblendtype = (m_tcram[0x4c / 4] >> 16) & 0x01;
-
-	pen_t const *const clut = &m_palette->pen(0);
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	if (true)
 	{
-		const uint16_t *src = &m_sprite_bitmap.pix(y, cliprect.min_x);
-		uint32_t *dst = &bitmap.pix(y, cliprect.min_x);
+		uint8_t spriteblendtype = (m_tcram[0x4c / 4] >> 16) & 0x01;
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		pen_t const* const clut = &m_palette->pen(0);
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			uint16_t srcpix = *src;
-			if (srcpix & 0x7fff)
-			{
-				if (srcpix & 0x8000)
-				{
-					if (spriteblendtype)
-						*dst = alpha_blend_r32(*(uint32_t *)dst, clut[srcpix & 0x7fff], 0x80);
-					else
-						*dst = add_blend_r32(*dst, clut[srcpix & 0x7fff]);
-				}
-				else
-				{
-					*dst = clut[srcpix & 0x7fff];
-				}
-			}
+			const uint16_t* src = &m_sprite_bitmap.pix(y, cliprect.min_x);
+			uint32_t* dst = &bitmap.pix(y, cliprect.min_x);
 
-			dst++;
-			src++;
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			{
+				uint16_t srcpix = *src;
+				if (srcpix & 0x7fff)
+				{
+					if (srcpix & 0x8000)
+					{
+						if (spriteblendtype)
+							*dst = alpha_blend_r32(*(uint32_t*)dst, clut[srcpix & 0x7fff], 0x80);
+						else
+							*dst = add_blend_r32(*dst, clut[srcpix & 0x7fff]);
+					}
+					else
+					{
+						*dst = clut[srcpix & 0x7fff];
+					}
+				}
+
+				dst++;
+				src++;
+			}
 		}
 	}
-
 
 
 #if HNG64_VIDEO_DEBUG
@@ -1073,7 +1075,7 @@ WRITE_LINE_MEMBER(hng64_state::screen_vblank_hng64)
 }
 
 
-/* Transition Control Video Registers
+/* Transition Control Video Registers  **OUTDATED, see notes with popmessage**
  * ----------------------------------
  *
  * uint32_t | Bits                                    | Use

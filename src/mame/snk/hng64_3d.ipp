@@ -270,12 +270,9 @@ void hng64_state::set3dFlags(const uint16_t* packet)
 	m_texturescrolly = packet[2];
 	m_paletteState3d = packet[8];
 
-#if 0
-	// like all the others in here, this cleary needs to have a per-poly/model enable as it's often invalid
-	if ((packet[5] != 0x100) || (packet[6] != 0x100) || (packet[7] != 0x100))
-		printf("set 3d scale flags %04x %04x %04x\n", packet[5], packet[6], packet[7]);
-#endif
-
+	m_modelscalex = packet[5];
+	m_modelscaley = packet[6];
+	m_modelscalez = packet[7];
 }
 
 // Operation 0012
@@ -355,7 +352,7 @@ void hng64_state::setCameraProjectionMatrix(const uint16_t* packet)
 #endif
 }
 
-void hng64_state::recoverStandardVerts(polygon& currentPoly, int m, uint16_t* chunkOffset_verts, int& counter)
+void hng64_state::recoverStandardVerts(polygon& currentPoly, int m, uint16_t* chunkOffset_verts, int& counter, const uint16_t* packet)
 {
 	currentPoly.vert[m].worldCoords[0] = uToF(chunkOffset_verts[counter++]);
 	currentPoly.vert[m].worldCoords[1] = uToF(chunkOffset_verts[counter++]);
@@ -371,6 +368,26 @@ void hng64_state::recoverStandardVerts(polygon& currentPoly, int m, uint16_t* ch
 		currentPoly.colorIndex = chunkOffset_verts[counter] >> 5;
 	counter++;
 	currentPoly.vert[m].texCoords[1] = uToF(chunkOffset_verts[counter++]);
+
+
+	// set on the Hyper 64 logos for roadedge and xrally which are known to be scaled
+	// also set on the car select screen in roadedge, and the car on the stage name screen
+	// not set anywhere else?
+	//
+	// params for car select screen / stage name screen are always 0x100, which would be
+	// 'no scale' anyway, and no scaling is observed in hardware videos
+	//
+	// the m_modelscalex etc. do contain values in fatal fury intro, but not valid looking
+	// ones, so probably unrelated to how that screen is scaled
+	if (packet[1] & 0x0040)
+	{
+		currentPoly.vert[m].worldCoords[0] = (currentPoly.vert[m].worldCoords[0] * m_modelscalez) / 0x100;
+		currentPoly.vert[m].worldCoords[1] = (currentPoly.vert[m].worldCoords[1] * m_modelscaley) / 0x100;
+		currentPoly.vert[m].worldCoords[2] = (currentPoly.vert[m].worldCoords[2] * m_modelscalex) / 0x100;
+
+	//	if ((m_modelscalex != 0x100) || (m_modelscaley != 0x100) || (m_modelscalez != 0x100))
+	//		logerror("maybe using model scale %04x %04x %04x\n", m_modelscalex, m_modelscaley, m_modelscalez);
+	}
 }
 
 // Operation 0100
@@ -382,10 +399,11 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 	/*//////////////
 	// PACKET FORMAT
 	// [0]  - 0100 ... ID
-	// [1]  - --c- ---p o--b l---
+	// [1]  - --c- ---p os-b l---
 	//      l = use lighting
 	//      p = use dynamic palette (maybe not just this, wrong for roadedge car select where it isn't set but needs to be)
 	//      o = use dynamic texture offset (sky reflection in xrally/roadedge windows, also waterfalls?)
+	//      s = use dynamic scaling (hyper64 logos on xrally/roadedge)
 	//      b = backface culling?
 	//      c = set on objects a certain distance away (maybe optimization to disable clipping against camera?)
 	// none of these bits appear to be connected to texture size to solve the road/banner problem in xrally/roadedge
@@ -596,11 +614,6 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			// PALETTE
 			currentPoly.palOffset = 0;
 
-			// FIXME: This isn't correct.
-			//        Buriki & Xrally need this line.  Roads Edge needs it removed.
-			//        So instead we're looking for a bit that is on for XRally & Buriki, but noone else.
-
-
 			//uint16_t explicitPaletteValue0 = ((chunkOffset[?] & 0x????) >> ?) * 0x800;
 			uint16_t explicitPaletteValue = ((chunkOffset[1] & 0x0ff0) >> 4);
 			explicitPaletteValue = explicitPaletteValue << 3;
@@ -673,7 +686,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			{
 				for (int m = 0; m < 3; m++)
 				{
-					recoverStandardVerts(currentPoly, m, chunkOffset, counter);
+					recoverStandardVerts(currentPoly, m, chunkOffset, counter, packet);
 
 					currentPoly.vert[m].normal[0] = uToF(chunkOffset[counter++]);
 					currentPoly.vert[m].normal[1] = uToF(chunkOffset[counter++]);
@@ -700,7 +713,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 			{
 				for (int m = 0; m < 3; m++)
 				{
-					recoverStandardVerts(currentPoly, m, chunkOffset, counter);
+					recoverStandardVerts(currentPoly, m, chunkOffset, counter, packet);
 				}
 
 				currentPoly.vert[0].normal[0] = currentPoly.vert[1].normal[0] = currentPoly.vert[2].normal[0] = uToF(chunkOffset[counter++]);
@@ -728,7 +741,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				memcpy(&currentPoly.vert[1], &lastPoly.vert[0], sizeof(polyVert));
 				memcpy(&currentPoly.vert[2], &lastPoly.vert[2], sizeof(polyVert));
 
-				recoverStandardVerts(currentPoly, 0, chunkOffset, counter);
+				recoverStandardVerts(currentPoly, 0, chunkOffset, counter, packet);
 
 				currentPoly.vert[0].normal[0] = uToF(chunkOffset[counter++]);
 				currentPoly.vert[0].normal[1] = uToF(chunkOffset[counter++]);
@@ -755,7 +768,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				memcpy(&currentPoly.vert[1], &lastPoly.vert[0], sizeof(polyVert));
 				memcpy(&currentPoly.vert[2], &lastPoly.vert[2], sizeof(polyVert));
 
-				recoverStandardVerts(currentPoly, 0, chunkOffset, counter);
+				recoverStandardVerts(currentPoly, 0, chunkOffset, counter, packet);
 
 				// This normal could be right, but I'm not entirely sure - there is no normal in the 18 bytes!
 				currentPoly.vert[0].normal[0] = lastPoly.faceNormal[0];

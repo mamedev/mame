@@ -303,6 +303,10 @@ private:
 	uint16_t m_texturescrollx = 0;
 	uint16_t m_texturescrolly = 0;
 	uint16_t m_paletteState3d = 0;
+	uint16_t m_modelscalex = 0;
+	uint16_t m_modelscaley = 0;
+	uint16_t m_modelscalez = 0;
+
 	float m_projectionMatrix[16]{};
 	float m_modelViewMatrix[16]{};
 	float m_cameraMatrix[16]{};
@@ -467,7 +471,7 @@ private:
 	void setLighting(const uint16_t* packet);
 	void set3dFlags(const uint16_t* packet);
 	void setCameraProjectionMatrix(const uint16_t* packet);
-	void recoverStandardVerts(polygon& currentPoly, int m, uint16_t* chunkOffset_verts, int& counter);
+	void recoverStandardVerts(polygon& currentPoly, int m, uint16_t* chunkOffset_verts, int& counter, const uint16_t *packet);
 	void recoverPolygonBlock(const uint16_t* packet, int& numPolys);
 	void printPacket(const uint16_t* packet, int hex);
 	float uToF(uint16_t input);
