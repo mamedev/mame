@@ -269,6 +269,13 @@ void hng64_state::set3dFlags(const uint16_t* packet)
 	m_texturescrollx = packet[1];
 	m_texturescrolly = packet[2];
 	m_paletteState3d = packet[8];
+
+#if 0
+	// like all the others in here, this cleary needs to have a per-poly/model enable as it's often invalid
+	if ((packet[5] != 0x100) || (packet[6] != 0x100) || (packet[7] != 0x100))
+		printf("set 3d scale flags %04x %04x %04x\n", packet[5], packet[6], packet[7]);
+#endif
+
 }
 
 // Operation 0012
@@ -278,15 +285,15 @@ void hng64_state::setCameraProjectionMatrix(const uint16_t* packet)
 	/*//////////////
 	// PACKET FORMAT
 	// [0]  - 0012 ... ID
-	// [1]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
-	// [2]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.
-	// [3]  - ???? ... ? Contains a value
+	// [1]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.  value used is 0xffc0 ( -0x40 )  64 pixels?  not used anywhere else?
+	// [2]  - ???? ... ? Contains a value in buriki's 'how to play' - probably a projection window/offset.  value used is 0x0018            24 pixels?  not used anywhere else?
+	// [3]  - ???? ... ? Contains a value   (always? 0x0a00)
 	// [4]  - xxxx ... Camera projection Z scale
 	// [5]  - xxxx ... Camera projection near Z
 	// [6]  - xxxx ... Camera projection screen Z
-	// [7]  - xxxx ... Camera projection (?)
-	// [8]  - xxxx ... Camera projection (?)
-	// [9]  - xxxx ... Camera projection (?)
+	// [7]  - xxxx ... Camera projection (?)  (always? 0x0b10)
+	// [8]  - xxxx ... Camera projection (?)  (always? 0x0a00)
+	// [9]  - xxxx ... Camera projection (?)  (always? 0x0b00)
 	// [10] - xxxx ... Camera projection right  - confirmed by sams64_2
 	// [11] - xxxx ... Camera projection left   - confirmed by sams64_2
 	// [12] - xxxx ... Camera projection top    - confirmed by sams64_2
@@ -329,6 +336,23 @@ void hng64_state::setCameraProjectionMatrix(const uint16_t* packet)
 	m_projectionMatrix[13] = 0.0f;
 	m_projectionMatrix[14] = -((2.0f*far*near)/(far-near));
 	m_projectionMatrix[15] = 0.0f;
+
+#if 0
+	if ((packet[1] != 0x0000) || (packet[2] != 0x0000))
+		printf("camera packet[1] %04x packet[2] %04x\n", packet[1], packet[2]);
+
+	if (packet[3] != 0x0a00)
+		printf("camera packet[3] %04x\n", packet[3]);
+
+	if (packet[7] != 0x0b10)
+		printf("camera packet[7] %04x\n", packet[7]);
+
+	if (packet[8] != 0x0a00)
+		printf("camera packet[7] %04x\n", packet[8]);
+
+	if (packet[9] != 0x0b00)
+		printf("camera packet[9] %04x\n", packet[9]);
+#endif
 }
 
 void hng64_state::recoverStandardVerts(polygon& currentPoly, int m, uint16_t* chunkOffset_verts, int& counter)
