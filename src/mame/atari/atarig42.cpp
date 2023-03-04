@@ -19,7 +19,7 @@
           networked).
     
 	TODO:
-        * ASIC65 for Road Riot not quite perfect
+        * ASIC65 for Road Riot tests bad with a "TIMEOUT ERROR" for the internal ram test. Comm port and checksum test ok
         * Hook com-link board ADSP-2105 (and serial port) for roadriot and roadriota
         * Hook dual port ram and dual pcb comms for roadriotb
 
