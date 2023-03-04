@@ -9429,7 +9429,7 @@ Don't recognize the copy protection track on the Key Disk
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
 		<notes><![CDATA[
-If you fail the Budokan Family Crest identification, you only be able practice alone.
+If you fail the Budokan Family Crest identification, you will only be able to practice alone.
 ]]></notes>
 		<info name="copy_protection" value="Manual required - Budokan Family Crest identification" />
 		<info name="developer" value="Electronic Arts" />
@@ -9452,7 +9452,7 @@ If you fail the Budokan Family Crest identification, you only be able practice a
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
 		<notes><![CDATA[
-If you fail the Budokan Family Crest identification, you only be able practice alone.
+If you fail the Budokan Family Crest identification, you will only be able to practice alone.
 ]]></notes>
 		<info name="copy_protection" value="Manual required - Budokan Family Crest identification" />
 		<info name="developer" value="Electronic Arts" />
@@ -11377,7 +11377,7 @@ Works good on EGA video mode. Choosing CGA video mode the error "Packed file is 
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
 		<notes><![CDATA[
-The game freeze after choosing the characters.
+The game freezes after choosing the characters.
 ]]></notes>
 		<info name="copy_protection" value="Copy protected floppy disk track" />
 		<info name="developer" value="Atari Games" />
