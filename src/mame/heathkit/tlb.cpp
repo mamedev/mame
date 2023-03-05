@@ -65,8 +65,24 @@ Address   Description
 // Beep Frequency is 1 KHz
 #define H19_BEEP_FRQ (H19_CLOCK / 2048)
 
+DEFINE_DEVICE_TYPE(TLB, heath_terminal_logic_board_device, "heath_tlb", "Heath Terminal Logic Board");
 
-TIMER_CALLBACK_MEMBER(h19_state::key_click_off)
+heath_terminal_logic_board_device::heath_terminal_logic_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, TLB, tag, owner, clock)
+		, m_palette(*this, "palette")
+		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
+		, m_ace(*this, "ins8250")
+		, m_beep(*this, "beeper")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
+		, m_mm5740(*this, "mm5740")
+		, m_kbdrom(*this, "keyboard")
+		, m_kbspecial(*this, "MODIFIERS")
+{
+}
+
+TIMER_CALLBACK_MEMBER(heath_terminal_logic_board_device::key_click_off)
 {
 	m_keyclickactive = false;
 
@@ -74,7 +90,7 @@ TIMER_CALLBACK_MEMBER(h19_state::key_click_off)
 		m_beep->set_state(0);
 }
 
-TIMER_CALLBACK_MEMBER(h19_state::bell_off)
+TIMER_CALLBACK_MEMBER(heath_terminal_logic_board_device::bell_off)
 {
 	m_bellactive = false;
 
@@ -82,9 +98,7 @@ TIMER_CALLBACK_MEMBER(h19_state::bell_off)
 		m_beep->set_state(0);
 }
 
-
-
-void h19_state::mem_map(address_map &map)
+void heath_terminal_logic_board_device::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).mirror(0x2000).rom();
@@ -92,7 +106,7 @@ void h19_state::mem_map(address_map &map)
 	map(0xc000, 0xc7ff).mirror(0x3800).ram().share("videoram");
 }
 
-void h19_state::io_map(address_map &map)
+void heath_terminal_logic_board_device::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -101,10 +115,10 @@ void h19_state::io_map(address_map &map)
 	map(0x40, 0x47).mirror(0x18).rw(m_ace, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 	map(0x60, 0x60).mirror(0x1E).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x61, 0x61).mirror(0x1E).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x80, 0x80).mirror(0x1f).r(FUNC(h19_state::kbd_key_r));
-	map(0xa0, 0xa0).mirror(0x1f).r(FUNC(h19_state::kbd_flags_r));
-	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(h19_state::key_click_w));
-	map(0xe0, 0xe0).mirror(0x1f).w(FUNC(h19_state::bell_w));
+	map(0x80, 0x80).mirror(0x1f).r(FUNC(heath_terminal_logic_board_device::kbd_key_r));
+	map(0xa0, 0xa0).mirror(0x1f).r(FUNC(heath_terminal_logic_board_device::kbd_flags_r));
+	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(heath_terminal_logic_board_device::key_click_w));
+	map(0xe0, 0xe0).mirror(0x1f).w(FUNC(heath_terminal_logic_board_device::bell_w));
 }
 
 
@@ -121,19 +135,18 @@ void h19_state::io_map(address_map &map)
 #define KB_STATUS_KEYBOARD_STROBE_MASK 0x80
 
 
-void h19_state::machine_start()
+void heath_terminal_logic_board_device::device_start()
 {
 	save_item(NAME(m_transchar));
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_keyclickactive));
 	save_item(NAME(m_bellactive));
 
-	m_key_click_timer = timer_alloc(FUNC(h19_state::key_click_off), this);
-	m_bell_timer = timer_alloc(FUNC(h19_state::bell_off), this);
+	m_key_click_timer = timer_alloc(FUNC(heath_terminal_logic_board_device::key_click_off), this);
+	m_bell_timer = timer_alloc(FUNC(heath_terminal_logic_board_device::bell_off), this);
 }
 
-
-void h19_state::key_click_w(uint8_t data)
+void heath_terminal_logic_board_device::key_click_w(uint8_t data)
 {
 /* Keyclick - 6 mSec */
 
@@ -142,7 +155,7 @@ void h19_state::key_click_w(uint8_t data)
 	m_key_click_timer->adjust(attotime::from_msec(6));
 }
 
-void h19_state::bell_w(uint8_t data)
+void heath_terminal_logic_board_device::bell_w(uint8_t data)
 {
 /* Bell (^G) - 200 mSec */
 
@@ -168,12 +181,12 @@ ground -> A9          A1   =  B2
 ground -> A10         A0   =  B1
 
 ****************************************************************************/
-uint16_t h19_state::translate_mm5740_b(uint16_t b)
+uint16_t heath_terminal_logic_board_device::translate_mm5740_b(uint16_t b)
 {
 	return ((b & 0x100) >> 2) | ((b & 0x0c0) << 1) | (b & 0x03f);
 }
 
-uint8_t h19_state::kbd_key_r()
+uint8_t heath_terminal_logic_board_device::kbd_key_r()
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	m_strobe = false;
@@ -182,7 +195,7 @@ uint8_t h19_state::kbd_key_r()
 	return m_transchar;
 }
 
-uint8_t h19_state::kbd_flags_r()
+uint8_t heath_terminal_logic_board_device::kbd_flags_r()
 {
 	uint16_t modifiers = m_kbspecial->read();
 	uint8_t rv = modifiers & 0x7f;
@@ -204,17 +217,17 @@ uint8_t h19_state::kbd_flags_r()
 	return rv;
 }
 
-READ_LINE_MEMBER(h19_state::mm5740_shift_r)
+READ_LINE_MEMBER(heath_terminal_logic_board_device::mm5740_shift_r)
 {
 	return ((m_kbspecial->read() ^ 0x120) & 0x120) ? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(h19_state::mm5740_control_r)
+READ_LINE_MEMBER(heath_terminal_logic_board_device::mm5740_control_r)
 {
 	return ((m_kbspecial->read() ^ 0x10) & 0x10) ? ASSERT_LINE: CLEAR_LINE;
 }
 
-WRITE_LINE_MEMBER(h19_state::mm5740_data_ready_w)
+WRITE_LINE_MEMBER(heath_terminal_logic_board_device::mm5740_data_ready_w)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -226,7 +239,7 @@ WRITE_LINE_MEMBER(h19_state::mm5740_data_ready_w)
 	}
 }
 
-MC6845_UPDATE_ROW( h19_state::crtc_update_row )
+MC6845_UPDATE_ROW(heath_terminal_logic_board_device::crtc_update_row)
 {
 	if (!de)
 		return;
@@ -276,19 +289,21 @@ static const gfx_layout h19_charlayout =
 	8*16                    /* every char takes 16 bytes */
 };
 
-static GFXDECODE_START( gfx_h19 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, h19_charlayout, 0, 1 )
+static GFXDECODE_START(gfx_h19)
+	GFXDECODE_ENTRY(":tlb:chargen", 0x0000, h19_charlayout, 0, 1)
 GFXDECODE_END
 
-void h19_state::h19(machine_config &config)
+#if 0
+void heath_terminal_logic_board_device::tlb(machine_config &config)
 {
+
 	/* basic machine hardware */
 	Z80(config, m_maincpu, H19_CLOCK); // From schematics
-	m_maincpu->set_addrmap(AS_PROGRAM, &h19_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &h19_state::io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &heath_terminal_logic_board_device::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &heath_terminal_logic_board_device::io_map);
 
 	/* video hardware */
-	// TODO: make configurable, Heath offered 3 different CRTs - White, Green, Amber.
+	// TODO: make configurable, Heath offered 2 different CRTs - White, Green
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_refresh_hz(60);   // TODO- this is adjustable by dipswitch.
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
@@ -303,7 +318,7 @@ void h19_state::h19(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(h19_state::crtc_update_row));
+	m_crtc->set_update_row_callback(FUNC(heath_terminal_logic_board_device::crtc_update_row));
 	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI); // frame pulse
 
 	ins8250_device &uart(INS8250(config, "ins8250", INS8250_CLOCK));
@@ -319,9 +334,298 @@ void h19_state::h19(machine_config &config)
 	m_mm5740->x_cb<7>().set_ioport("X7");
 	m_mm5740->x_cb<8>().set_ioport("X8");
 	m_mm5740->x_cb<9>().set_ioport("X9");
-	m_mm5740->shift_cb().set(FUNC(h19_state::mm5740_shift_r));
-	m_mm5740->control_cb().set(FUNC(h19_state::mm5740_control_r));
-	m_mm5740->data_ready_cb().set(FUNC(h19_state::mm5740_data_ready_w));
+	m_mm5740->shift_cb().set(FUNC(heath_terminal_logic_board_device::mm5740_shift_r));
+	m_mm5740->control_cb().set(FUNC(heath_terminal_logic_board_device::mm5740_control_r));
+	m_mm5740->data_ready_cb().set(FUNC(heath_terminal_logic_board_device::mm5740_data_ready_w));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beep, H19_BEEP_FRQ).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
+#endif
+
+/* Input ports */
+static INPUT_PORTS_START( tlb )
+
+	PORT_START("MODIFIERS")
+	// bit 0 connects to B8 of MM5740 - low if either shift key is
+	// bit 7 is low if a key is pressed
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CapsLock")   PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Break")      PORT_CODE(KEYCODE_PAUSE)
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("OffLine")    PORT_CODE(KEYCODE_F12)       PORT_TOGGLE
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL")       PORT_CODE(KEYCODE_LCONTROL)  PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LeftShift")  PORT_CODE(KEYCODE_LSHIFT)    PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Repeat")     PORT_CODE(KEYCODE_LALT)
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RightShift") PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset")      PORT_CODE(KEYCODE_F10)
+
+	PORT_START("X1")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/")          PORT_CODE(KEYCODE_SLASH)      PORT_CHAR('/') PORT_CHAR('?')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused")
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused")
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused")
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("k_X2")
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused")
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0-pad")      PORT_CODE(KEYCODE_0_PAD)      PORT_CHAR('0')
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Dot-pad")    PORT_CODE(KEYCODE_DEL_PAD)    PORT_CHAR('.')
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter-pad")  PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(13)
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused")
+
+	PORT_START("X2")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";")          PORT_CODE(KEYCODE_COLON)      PORT_CHAR(';') PORT_CHAR(':')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\'")         PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR('\'') PORT_CHAR('"')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("{")          PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('{') PORT_CHAR('}')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return")     PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused")
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused")
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1-pad")      PORT_CODE(KEYCODE_1_PAD)      PORT_CHAR('1')
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2-pad")      PORT_CODE(KEYCODE_2_PAD)      PORT_CHAR('2')
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3-pad")      PORT_CODE(KEYCODE_3_PAD)      PORT_CHAR('3')
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused")
+
+	PORT_START("X3")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("P")          PORT_CODE(KEYCODE_P)          PORT_CHAR('p') PORT_CHAR('P')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("[")          PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('[') PORT_CHAR(']')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\\")         PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR('\\') PORT_CHAR('|')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LF")         PORT_CODE(KEYCODE_RWIN)
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL")        PORT_CODE(KEYCODE_DEL)        PORT_CHAR(UCHAR_MAMEKEY(DEL))
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused")
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4-pad")      PORT_CODE(KEYCODE_4_PAD)      PORT_CHAR('4')
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5-pad")      PORT_CODE(KEYCODE_5_PAD)      PORT_CHAR('5')
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6-pad")      PORT_CODE(KEYCODE_6_PAD)      PORT_CHAR('6')
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused")
+
+	PORT_START("X4")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0")          PORT_CODE(KEYCODE_0)          PORT_CHAR('0') PORT_CHAR(')')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-")          PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('_')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("=")          PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('=') PORT_CHAR('+')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("AccentAcute") PORT_CODE(KEYCODE_TILDE)     PORT_CHAR('`') PORT_CHAR('~')
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BS")         PORT_CODE(KEYCODE_BACKSPACE)  PORT_CHAR(8)
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("k_X1")
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7-pad")      PORT_CODE(KEYCODE_7_PAD)      PORT_CHAR('7')
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8-pad")      PORT_CODE(KEYCODE_8_PAD)      PORT_CHAR('8')
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9-pad")      PORT_CODE(KEYCODE_9_PAD)      PORT_CHAR('9')
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused")
+
+	PORT_START("X5")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1")         PORT_CODE(KEYCODE_F1)
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2")         PORT_CODE(KEYCODE_F2)
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3")         PORT_CODE(KEYCODE_F3)
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4")         PORT_CODE(KEYCODE_F4)
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5")         PORT_CODE(KEYCODE_F5)
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Erase")      PORT_CODE(KEYCODE_F6)
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Blue")       PORT_CODE(KEYCODE_F7)
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Red")        PORT_CODE(KEYCODE_F8)
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Gray")       PORT_CODE(KEYCODE_F9)
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Unused")
+
+	PORT_START("X6")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Z")          PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("X")          PORT_CODE(KEYCODE_X)          PORT_CHAR('x') PORT_CHAR('X')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C")          PORT_CODE(KEYCODE_C)          PORT_CHAR('c') PORT_CHAR('C')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("V")          PORT_CODE(KEYCODE_V)          PORT_CHAR('v') PORT_CHAR('V')
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B")          PORT_CODE(KEYCODE_B)          PORT_CHAR('b') PORT_CHAR('B')
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("N")          PORT_CODE(KEYCODE_N)          PORT_CHAR('n') PORT_CHAR('N')
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("M")          PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M')
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",")          PORT_CODE(KEYCODE_COMMA)      PORT_CHAR(',') PORT_CHAR('<')
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".")          PORT_CODE(KEYCODE_STOP)       PORT_CHAR('.') PORT_CHAR('>')
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Space")      PORT_CODE(KEYCODE_SPACE)      PORT_CHAR(' ')
+
+	PORT_START("X7")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A")          PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("S")          PORT_CODE(KEYCODE_S)          PORT_CHAR('s') PORT_CHAR('S')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D")          PORT_CODE(KEYCODE_D)          PORT_CHAR('d') PORT_CHAR('D')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F")          PORT_CODE(KEYCODE_F)          PORT_CHAR('f') PORT_CHAR('F')
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G")          PORT_CODE(KEYCODE_G)          PORT_CHAR('g') PORT_CHAR('G')
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("H")          PORT_CODE(KEYCODE_H)          PORT_CHAR('h') PORT_CHAR('H')
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("J")          PORT_CODE(KEYCODE_J)          PORT_CHAR('j') PORT_CHAR('J')
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("K")          PORT_CODE(KEYCODE_K)          PORT_CHAR('k') PORT_CHAR('K')
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("L")          PORT_CODE(KEYCODE_L)          PORT_CHAR('l') PORT_CHAR('L')
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Scroll")     PORT_CODE(KEYCODE_LWIN)
+
+	PORT_START("X8")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Q")          PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("W")          PORT_CODE(KEYCODE_W)          PORT_CHAR('w') PORT_CHAR('W')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E")          PORT_CODE(KEYCODE_E)          PORT_CHAR('e') PORT_CHAR('E')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("R")          PORT_CODE(KEYCODE_R)          PORT_CHAR('r') PORT_CHAR('R')
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("T")          PORT_CODE(KEYCODE_T)          PORT_CHAR('t') PORT_CHAR('T')
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Y")          PORT_CODE(KEYCODE_Y)          PORT_CHAR('y') PORT_CHAR('Y')
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("U")          PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("I")          PORT_CODE(KEYCODE_I)          PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("O")          PORT_CODE(KEYCODE_O)          PORT_CHAR('o') PORT_CHAR('O')
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab")        PORT_CODE(KEYCODE_TAB)        PORT_CHAR(9)
+
+	PORT_START("X9")
+	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1")          PORT_CODE(KEYCODE_1)          PORT_CHAR('1') PORT_CHAR('!')
+	PORT_BIT(0x002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2")          PORT_CODE(KEYCODE_2)          PORT_CHAR('2') PORT_CHAR('@')
+	PORT_BIT(0x004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3")          PORT_CODE(KEYCODE_3)          PORT_CHAR('3') PORT_CHAR('#')
+	PORT_BIT(0x008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4")          PORT_CODE(KEYCODE_4)          PORT_CHAR('4') PORT_CHAR('$')
+	PORT_BIT(0x010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5")          PORT_CODE(KEYCODE_5)          PORT_CHAR('5') PORT_CHAR('%')
+	PORT_BIT(0x020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6")          PORT_CODE(KEYCODE_6)          PORT_CHAR('6') PORT_CHAR('^')
+	PORT_BIT(0x040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7")          PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('&')
+	PORT_BIT(0x080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8")          PORT_CODE(KEYCODE_8)          PORT_CHAR('8') PORT_CHAR('*')
+	PORT_BIT(0x100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9")          PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR('(')
+	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc")        PORT_CODE(KEYCODE_ESC)        PORT_CHAR(27)
+
+	PORT_START("SW401")
+	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")
+	PORT_DIPSETTING(    0x01, "110")
+	PORT_DIPSETTING(    0x02, "150")
+	PORT_DIPSETTING(    0x03, "300")
+	PORT_DIPSETTING(    0x04, "600")
+	PORT_DIPSETTING(    0x05, "1200")
+	PORT_DIPSETTING(    0x06, "1800")
+	PORT_DIPSETTING(    0x07, "2000")
+	PORT_DIPSETTING(    0x08, "2400")
+	PORT_DIPSETTING(    0x09, "3600")
+	PORT_DIPSETTING(    0x0a, "4800")
+	PORT_DIPSETTING(    0x0b, "7200")
+	PORT_DIPSETTING(    0x0c, "9600")
+	PORT_DIPSETTING(    0x0d, "19200")
+	PORT_DIPNAME( 0x30, 0x00, "Parity")
+	PORT_DIPSETTING(    0x00, DEF_STR(None))
+	PORT_DIPSETTING(    0x10, "Odd")
+	PORT_DIPSETTING(    0x30, "Even")
+	PORT_DIPNAME( 0x40, 0x00, "Parity Type")
+	PORT_DIPSETTING(    0x00, DEF_STR(Normal))
+	PORT_DIPSETTING(    0x40, "Stick")
+	PORT_DIPNAME( 0x80, 0x80, "Duplex")
+	PORT_DIPSETTING(    0x00, "Half")
+	PORT_DIPSETTING(    0x80, "Full")
+
+	PORT_START("SW402") // stored at 40C8
+	PORT_DIPNAME( 0x01, 0x00, "Cursor")
+	PORT_DIPSETTING(    0x00, "Underline")
+	PORT_DIPSETTING(    0x01, "Block")
+	PORT_DIPNAME( 0x02, 0x00, "Keyclick")
+	PORT_DIPSETTING(    0x02, DEF_STR(No))
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes))
+	PORT_DIPNAME( 0x04, 0x00, "Wrap at EOL")
+	PORT_DIPSETTING(    0x00, DEF_STR(No))
+	PORT_DIPSETTING(    0x04, DEF_STR(Yes))
+	PORT_DIPNAME( 0x08, 0x00, "Auto LF on CR")
+	PORT_DIPSETTING(    0x00, DEF_STR(No))
+	PORT_DIPSETTING(    0x08, DEF_STR(Yes))
+	PORT_DIPNAME( 0x10, 0x00, "Auto CR on LF")
+	PORT_DIPSETTING(    0x00, DEF_STR(No))
+	PORT_DIPSETTING(    0x10, DEF_STR(Yes))
+	PORT_DIPNAME( 0x20, 0x00, "Mode")
+	PORT_DIPSETTING(    0x00, "VT52")
+	PORT_DIPSETTING(    0x20, "ANSI")
+	PORT_DIPNAME( 0x40, 0x00, "Keypad Shifted")
+	PORT_DIPSETTING(    0x00, DEF_STR(No))
+	PORT_DIPSETTING(    0x40, DEF_STR(Yes))
+	PORT_DIPNAME( 0x80, 0x00, "Refresh")
+	PORT_DIPSETTING(    0x00, "50Hz")
+	PORT_DIPSETTING(    0x80, "60Hz")
+INPUT_PORTS_END
+
+ROM_START( h19 )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	// Original
+	ROM_LOAD( "2732_444-46_h19code.bin", 0x0000, 0x1000, CRC(f4447da0) SHA1(fb4093d5b763be21a9580a0defebed664b1f7a7b))
+
+	ROM_REGION( 0x0800, "chargen", 0 )
+	// Original font dump
+	ROM_LOAD( "2716_444-29_h19font.bin", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
+
+	ROM_REGION( 0x1000, "keyboard", 0 )
+	// Original dump
+	ROM_LOAD( "2716_444-37_h19keyb.bin", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
+ROM_END
+
+ROM_START( super19 )
+	// Super H19 ROM
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "2732_super19_h447.bin", 0x0000, 0x1000, CRC(6c51aaa6) SHA1(5e368b39fe2f1af44a905dc474663198ab630117))
+
+	ROM_REGION( 0x0800, "chargen", 0 )
+	// Original font dump
+	ROM_LOAD( "2716_444-29_h19font.bin", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
+
+	ROM_REGION( 0x1000, "keyboard", 0 )
+	// Original dump
+	ROM_LOAD( "2716_444-37_h19keyb.bin", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
+ROM_END
+
+ROM_START( watz19 )
+	// Watzman ROM
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "watzman.bin", 0x0000, 0x1000, CRC(8168b6dc) SHA1(bfaebb9d766edbe545d24bc2b6630be4f3aa0ce9))
+
+	ROM_REGION( 0x0800, "chargen", 0 )
+	// Original font dump
+	ROM_LOAD( "2716_444-29_h19font.bin", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
+	// Watzman keyboard
+	ROM_REGION( 0x1000, "keyboard", 0 )
+	ROM_LOAD( "keybd.bin", 0x0000, 0x0800, CRC(58dc8217) SHA1(1b23705290bdf9fc6342065c6a528c04bff67b13))
+ROM_END
+
+ROM_START( ultra19 )
+	// ULTRA ROM
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "2532_h19_ultra_firmware.bin", 0x0000, 0x1000, CRC(8ad4cdb4) SHA1(d6e1fc37a1f52abfce5e9adb1819e0030bed1df3))
+
+	ROM_REGION( 0x0800, "chargen", 0 )
+	// Original font dump
+	ROM_LOAD( "2716_444-29_h19font.bin", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
+	// Watzman keyboard
+	ROM_REGION( 0x1000, "keyboard", 0 )
+	ROM_LOAD( "2716_h19_ultra_keyboard.bin", 0x0000, 0x0800, CRC(76130c92) SHA1(ca39c602af48505139d2750a084b5f8f0e662ff7))
+ROM_END
+
+
+ioport_constructor heath_terminal_logic_board_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(tlb);
+}
+
+const tiny_rom_entry *heath_terminal_logic_board_device::device_rom_region() const
+{
+	return ROM_NAME(h19);
+}
+
+void heath_terminal_logic_board_device::device_add_mconfig(machine_config &config) {
+	/* basic machine hardware */
+	Z80(config, m_maincpu, H19_CLOCK); // From schematics
+	m_maincpu->set_addrmap(AS_PROGRAM, &heath_terminal_logic_board_device::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &heath_terminal_logic_board_device::io_map);
+
+	/* video hardware */
+	// TODO: make configurable, Heath offered 2 different CRTs - White, Green
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(60);												 // TODO- this is adjustable by dipswitch.
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	screen.set_size(640, 250);
+	screen.set_visarea(0, 640 - 1, 0, 250 - 1);
+
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_h19);
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+
+	MC6845(config, m_crtc, MC6845_CLOCK);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(true);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(heath_terminal_logic_board_device::crtc_update_row));
+	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI); // frame pulse
+
+	ins8250_device &uart(INS8250(config, "ins8250", INS8250_CLOCK));
+	uart.out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
+
+	MM5740(config, m_mm5740, MM5740_CLOCK);
+	m_mm5740->x_cb<1>().set_ioport("X1");
+	m_mm5740->x_cb<2>().set_ioport("X2");
+	m_mm5740->x_cb<3>().set_ioport("X3");
+	m_mm5740->x_cb<4>().set_ioport("X4");
+	m_mm5740->x_cb<5>().set_ioport("X5");
+	m_mm5740->x_cb<6>().set_ioport("X6");
+	m_mm5740->x_cb<7>().set_ioport("X7");
+	m_mm5740->x_cb<8>().set_ioport("X8");
+	m_mm5740->x_cb<9>().set_ioport("X9");
+	m_mm5740->shift_cb().set(FUNC(heath_terminal_logic_board_device::mm5740_shift_r));
+	m_mm5740->control_cb().set(FUNC(heath_terminal_logic_board_device::mm5740_control_r));
+	m_mm5740->data_ready_cb().set(FUNC(heath_terminal_logic_board_device::mm5740_data_ready_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

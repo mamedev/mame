@@ -22,30 +22,22 @@
 #include "speaker.h"
 
 
-class h19_state : public driver_device
+class heath_terminal_logic_board_device : public device_t
 {
 public:
-	h19_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_palette(*this, "palette")
-		, m_maincpu(*this, "maincpu")
-		, m_crtc(*this, "crtc")
-		, m_ace(*this, "ins8250")
-		, m_beep(*this, "beeper")
-		, m_p_videoram(*this, "videoram")
-		, m_p_chargen(*this, "chargen")
-		, m_mm5740(*this, "mm5740")
-		, m_kbdrom(*this, "keyboard")
-		, m_kbspecial(*this, "MODIFIERS")
-	{
-	}
+  heath_terminal_logic_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void h19(machine_config &config);
+  //void tlb(machine_config &config);
+
+protected:
+  virtual ioport_constructor device_input_ports() const override;
+  virtual const tiny_rom_entry *device_rom_region() const override;
+  virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	virtual void machine_start() override;
+  virtual void device_start() override;
 
-	void mem_map(address_map &map);
+  void mem_map(address_map &map);
 	void io_map(address_map &map);
 
 	void key_click_w(uint8_t data);
@@ -83,5 +75,6 @@ private:
 	uint16_t translate_mm5740_b(uint16_t b);
 };
 
+DECLARE_DEVICE_TYPE(TLB, heath_terminal_logic_board_device)
 
 #endif // MAME_HEATHKIT_TLB_H
