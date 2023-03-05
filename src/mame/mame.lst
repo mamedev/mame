@@ -30248,9 +30248,10 @@ mosaica                         // (c) 1990 Space + Fuuki license
 
 @source:misc/mpu12wbk.cpp
 fruitstb                        // 199? Webak
-fruitstba                       // 1997 Webak
+fruitstba                       // 199? Webak
 fruitstbb                       // 1997 Webak
 fruitstbc                       // 1997 Webak
+fruitstbd                       // 1997 Webak
 
 @source:misc/mtu130.cpp
 mtu130
