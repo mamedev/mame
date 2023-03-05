@@ -9,10 +9,11 @@
 hng64_poly_renderer::hng64_poly_renderer(hng64_state& state)
 	: poly_manager<float, hng64_poly_data, 7>(state.machine())
 	, m_state(state)
-	, m_colorBuffer3d(state.m_screen->visible_area().width(), state.m_screen->visible_area().height())
 {
-	const int32_t bufferSize = state.m_screen->visible_area().width() * state.m_screen->visible_area().height();
+	const int32_t bufferSize = 512 * 512;
 	m_depthBuffer3d = std::make_unique<float[]>(bufferSize);
+	m_colorBuffer3d = std::make_unique<uint16_t[]>(bufferSize);
+
 }
 
 
@@ -926,7 +927,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 						currentPoly.vert[m].light = clipVerts[m].p[2];
 					}
 
-					const rectangle& visarea = m_screen->visible_area();
+					//const rectangle& visarea = m_screen->visible_area();
 					for (int m = 0; m < currentPoly.n; m++)
 					{
 						// Convert into normalized device coordinates...
@@ -938,12 +939,12 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 
 						// Final pixel values are garnered here :
 						float windowCoords[4];  // Mapped ndCoordinates to screen space
-						windowCoords[0] = (ndCoords[0]+1.0f) * ((float)(visarea.max_x) / 2.0f) + 0.0f;
-						windowCoords[1] = (ndCoords[1]+1.0f) * ((float)(visarea.max_y) / 2.0f) + 0.0f;
+						windowCoords[0] = (ndCoords[0]+1.0f) * ((float)(512.0f) / 2.0f) + 0.0f;
+						windowCoords[1] = (ndCoords[1]+1.0f) * ((float)(512.0f) / 2.0f) + 0.0f;
 						windowCoords[2] = (ndCoords[2]+1.0f) * 0.5f;
 
 						// Flip Y
-						windowCoords[1] = (float)visarea.max_y - windowCoords[1];
+						windowCoords[1] = (float)512.0f - windowCoords[1];
 
 						// Store the points in a list for later use...
 						currentPoly.vert[m].clipCoords[0] = windowCoords[0];
@@ -1062,14 +1063,14 @@ bool hng64_state::hng64_command3d(const uint16_t* packet)
 void hng64_state::clear3d()
 {
 	// Reset the buffers...
-	const rectangle& visarea = m_screen->visible_area();
-	for (int i = 0; i < (visarea.max_x)*(visarea.max_y); i++)
+	//const rectangle& visarea = m_screen->visible_area();
+	for (int i = 0; i < 512*512; i++)
 	{
 		m_poly_renderer->depthBuffer3d()[i] = 100.0f;
+		m_poly_renderer->colorBuffer3d()[i] = 0;
 	}
 
-	// Clear the 3d rasterizer buffer
-	m_poly_renderer->colorBuffer3d().fill(0x00000000, m_screen->visible_area());
+
 
 	m_paletteState3d = 0;
 
@@ -1311,8 +1312,8 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 	const float dt = extent.param[6].dpdx;
 
 	// Pointers to the pixel buffers
-	uint16_t* colorBuffer = &m_colorBuffer3d.pix(scanline, extent.startx);
-	float*  depthBuffer = &m_depthBuffer3d[(scanline * m_state.m_screen->visible_area().width()) + extent.startx];
+	uint16_t* colorBuffer = &m_colorBuffer3d[(scanline * 512) + extent.startx];
+	float*  depthBuffer = &m_depthBuffer3d[(scanline * 512) + extent.startx];
 
 	const uint8_t *textureOffset = &m_state.m_texturerom[renderData.texIndex * 1024 * 1024];
 
@@ -1410,8 +1411,8 @@ void hng64_poly_renderer::render_flat_scanline(int32_t scanline, const extent_t&
 	const float dz = extent.param[0].dpdx;
 
 	// Pointers to the pixel buffers
-	uint16_t* colorBuffer = &m_colorBuffer3d.pix(scanline, extent.startx);
-	float*  depthBuffer = &m_depthBuffer3d[(scanline * m_state.m_screen->visible_area().width()) + extent.startx];
+	float*  depthBuffer = &m_depthBuffer3d[(scanline * 512) + extent.startx];
+	uint16_t*  colorBuffer = &m_colorBuffer3d[(scanline * 512) + extent.startx];
 
 	// Step over each pixel in the horizontal span
 	for(int x = extent.startx; x < extent.stopx; x++)
@@ -1448,7 +1449,9 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 	hng64_poly_data& renderData = object_data().next();
 	renderData = rOptions;
 
-	const rectangle& visibleArea = m_state.m_screen->visible_area();
+	rectangle visibleArea;
+	visibleArea.set(0, 512, 0, 512);
+
 
 	if (p->flatShade)
 	{

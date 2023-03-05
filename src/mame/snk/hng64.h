@@ -92,7 +92,7 @@ struct hng64_poly_data
 	uint16_t colorIndex = 0;
 	bool blend = false;
 	uint16_t texscrollx = 0;
-	uint16_t texscrolly = 0;;
+	uint16_t texscrolly = 0;
 };
 
 class hng64_state;
@@ -107,15 +107,15 @@ public:
 	void render_flat_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
 
 	hng64_state& state() { return m_state; }
-	bitmap_ind16& colorBuffer3d() { return m_colorBuffer3d; }
 	float* depthBuffer3d() { return m_depthBuffer3d.get(); }
+	uint16_t* colorBuffer3d() { return m_colorBuffer3d.get(); }
 
 private:
 	hng64_state& m_state;
 
 	// (Temporarily class members - someday they will live in the memory map)
-	bitmap_ind16 m_colorBuffer3d;
 	std::unique_ptr<float[]> m_depthBuffer3d;
+	std::unique_ptr<uint16_t[]> m_colorBuffer3d;
 };
 
 

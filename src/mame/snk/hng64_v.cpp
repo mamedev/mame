@@ -867,43 +867,52 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
             palbase = 0x800;
     }
 
-	pen_t const *const clut_3d = &m_palette_3d->pen(0);
-	if (!(m_fbcontrol[0] & 0x01))
+	rectangle visarea = m_screen->visible_area();
+	int ysize = visarea.max_y - visarea.min_y;
+
+	if (ysize)
 	{
-		// this moves the car in the xrally selection screen the correct number of pixels to the left
-		int xscroll = (m_fbscroll[0] >> 21);
-		if (xscroll & 0x400)
-			xscroll -= 0x800;
+		int yinc = (512 << 16) / ysize;
 
-		// value is midpoint?
-		xscroll += 256;
-
-		// Blit the color buffer into the primary bitmap
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		pen_t const* const clut_3d = &m_palette_3d->pen(0);
+		if (!(m_fbcontrol[0] & 0x01))
 		{
-			const uint16_t *src = &m_poly_renderer->colorBuffer3d().pix(y, 0);
-			uint32_t *dst = &bitmap.pix(y, cliprect.min_x);
+			// this moves the car in the xrally selection screen the correct number of pixels to the left
+			int xscroll = (m_fbscroll[0] >> 21);
+			if (xscroll & 0x400)
+				xscroll -= 0x800;
 
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			// value is midpoint?
+			xscroll += 256;
+
+			// Blit the color buffer into the primary bitmap
+			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
-				uint16_t srcpix = src[((cliprect.min_x + x) + xscroll ) & 0x1ff];
-				if (srcpix & 0x07ff)
-				{
-					if (srcpix & 0x0800)
-					{
-						*dst = alpha_blend_r32(*(uint32_t*)dst, clut_3d[(srcpix & 0x7ff) | palbase], 0x80);
-					}
-					else
-					{
-						*dst = clut_3d[(srcpix & 0x7ff) | palbase];
-					}
-				}
+				int realy = (((y-cliprect.min_y) * yinc) >> 16);
 
-				dst++;
+				const uint16_t* src = &m_poly_renderer->colorBuffer3d()[((realy) & 0x1ff) * 512];
+				uint32_t* dst = &bitmap.pix(y, cliprect.min_x);
+
+				for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+				{
+					uint16_t srcpix = src[((cliprect.min_x + x) + xscroll) & 0x1ff];
+					if (srcpix & 0x07ff)
+					{
+						if (srcpix & 0x0800)
+						{
+							*dst = alpha_blend_r32(*(uint32_t*)dst, clut_3d[(srcpix & 0x7ff) | palbase], 0x80);
+						}
+						else
+						{
+							*dst = clut_3d[(srcpix & 0x7ff) | palbase];
+						}
+					}
+
+					dst++;
+				}
 			}
 		}
 	}
-
 	// Draw the sprites on top of everything
 	draw_sprites_buffer(screen, cliprect);
 
