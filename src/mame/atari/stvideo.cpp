@@ -141,7 +141,9 @@ bool v = false;
 // DE is on whole cycles of the GLUE clock as vde & hde.  Which means,
 // given that hde is on the inverted phase, that there is a delay of
 // 0.5 cycles between a hde change and the corresponding de change.
-
+//
+// hde/vde are dropped by the associated sync if they were still 1 at
+// that point.
 
 // load_d1 = 0 if !de, 1 if load
 // load_d2 = load_d1 on pixclk
@@ -179,6 +181,25 @@ bool v = false;
 // GLUE gets the 8MHz clock.
 
 /*
+
+bp a3fe
+phase 4
+[:video] [13329804.0 00a420 130820   8176 53319216 53319216  112/262 001/064 s:-- de:-v- 71Hz] res = 2 (2)     (ste only)
+[:video] [13329806.0 00a422 130852   8178 53319224 53319224  114/262 003/064 s:-- de:-v- 50Hz] res = 0 (0)
+[:video] [13329815.0 00a42c 130996   8187 53319260 53319260  123/262 012/064 s:-- de:-v- 60Hz] sync = 0 (1)    (+2 on 1/3)
+[:video] [13329818.8 00a430 131052   8190 53319274 53319274  126/262 015/064 s:-- de:-v- 50Hz] sync = 2 (0)
+[:video] [13329819.c 00a430 131072   8192 53319279 53319279  000/263 017/064 s:-- de:-v- 50Hz] hde 1
+[:video] [13329820.4 00a430 131080   8192 53319281 53319281  000/263 017/064 s:-- de:hvd 50Hz] de 1 lc=53319286 le=0
+[:video] [13329847.0 00a438 131508   8219 53319388 53319388  027/263 044/064 s:-- de:hvd 71Hz] res = 2 (2)
+[:video] [13329849.0 00a43a 131540   8221 53319396 53319396  029/263 046/064 s:-- de:hvd 50Hz] res = 0 (0)     (stop on ws2)
+[:video] [13329899.8 00a444 132348   8271 53319598 53319598  079/263 096/064 s:-- de:hvd 71Hz] res = 2 (2)
+[:video] [13329902.0 00a446 132388   8274 53319608 53319608  082/263 099/064 s:-- de:hvd 50Hz] res = 0 (0)     (right border 2/3/4, avoids 97)
+delta = cc
+
+phase 3
+
+
+
 
 phase 1:
 	left border on ste?
@@ -303,10 +324,50 @@ void st_video_device::device_start()
 
 	m_event_timer = timer_alloc(FUNC(st_video_device::timer_event), this);
 	m_de_timer    = timer_alloc(FUNC(st_video_device::de_event   ), this);
+
+	save_item(NAME(m_start_screen_time));
+	save_item(NAME(m_start_line_time));
+	save_item(NAME(m_shifter_base_x));
+	save_item(NAME(m_shifter_update_time));
+	save_item(NAME(m_prev_glue_tick));
+	save_item(NAME(m_load_current));
+	save_item(NAME(m_load_end));
+	save_item(NAME(m_ir));
+	save_item(NAME(m_rr));
+	save_item(NAME(m_adr_base));
+	save_item(NAME(m_adr_live));
+	save_item(NAME(m_hsc_base));
+	save_item(NAME(m_hdec_base));
+	save_item(NAME(m_vsc));
+	save_item(NAME(m_vdec));
+	save_item(NAME(m_shifter_y));
+	save_item(NAME(m_palette));
+	save_item(NAME(m_sync));
+	save_item(NAME(m_res));
+	save_item(NAME(m_vsync));
+	save_item(NAME(m_hsync));
+	save_item(NAME(m_vde));
+	save_item(NAME(m_hde));
+	save_item(NAME(m_de));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_pixcnt));
+	save_item(NAME(m_rdelay));
+	save_item(NAME(m_load_1));
+	save_item(NAME(m_load_2));
+	save_item(NAME(m_pixcnt_en));
+	save_item(NAME(m_reload));
+}
+
+u64 st_video_device::time_now()
+{
+	// as_ticks is not clean, so round up
+	return (machine().time().as_ticks(2*clock()) + 1) >> 1;
 }
 
 void st_video_device::next_event(u64 when)
 {
+	if(v)
+		logerror("%s next event at %d.%x\n", context(), when >> 4, when & 15);
 	// from_ticks/as_ticks is not stable, need target in the middle of the cycle
 	attotime dt = attotime::from_ticks(2*when+1, 2*clock()) - machine().time();
 	m_event_timer->adjust(dt);
@@ -323,8 +384,8 @@ void st_video_device::device_reset()
 	m_vdec = 0;
 	m_vsync = 1;
 	m_hsync = 0;
-	m_start_screen_time = m_start_line_time = machine().time().as_ticks(clock()) >> 4;
-	m_shifter_update_time = (machine().time().as_ticks(clock()) | 15) + 1;
+	m_start_screen_time = m_start_line_time = time_now() >> 4;
+	m_shifter_update_time = (time_now() | 15) + 1;
 	m_shifter_base_x = 0;
 	m_pixcnt = 4;
 	m_pixcnt_en = false;
@@ -341,6 +402,7 @@ void st_video_device::device_reset()
 	m_hde = 0;
 	m_rr[0] = m_rr[1] = m_rr[2] = m_rr[3] = 0;
 	m_ir[0] = m_ir[1] = m_ir[2] = m_ir[3] = 0;
+	m_prev_glue_tick = 1;
 
 	m_screen_bitmap.fill(0x808080);
 
@@ -401,7 +463,7 @@ void st_video_device::hsync_off(u64 glue_tick)
 
 TIMER_CALLBACK_MEMBER(st_video_device::de_event)
 {
-	u64 now = machine().time().as_ticks(clock());
+	u64 now = time_now();
 	shifter_sync(now);
 	m_de = param;
 	m_de_cb(m_de);
@@ -428,10 +490,9 @@ void st_video_device::hde_on(u64 glue_tick)
 		logerror("%s hde 1\n", context());
 	if(m_vde && !m_hde) {
 		m_hde = 1;
-		if(m_mode == 0 && !v) {
+		if(m_mode == 0) {
 			m_pixcnt_en = false;
 			m_rdelay = 0;
-			v = false;
 		}
 		next_de_event(glue_tick, 1);
 	}
@@ -493,7 +554,7 @@ void st_video_device::shifter_handle_load()
 void st_video_device::shifter_sync(u64 now)
 {
 	if(!now)
-		now = machine().time().as_ticks(clock());
+		now = time_now();
 	switch(m_res & 3) {
 	case 0: {
 		if(m_shifter_update_time & 3) {
@@ -589,20 +650,22 @@ std::string st_video_device::context(u64 now)
 {
 	static const char *const mt[3] = { "50Hz", "60Hz", "71Hz" };
 	if(!now)
-		now = machine().time().as_ticks(clock());
+		now = time_now();
 	shifter_sync(now);
 
 	u64 phase = m_phase->read();
 	u64 glue_tick = now >> 4;
-	if((now & 15) < phase)
+	if((now & 15) < phase && glue_tick)
 		glue_tick --;
 	u16 hsc = m_hsc_base + (glue_tick - m_start_line_time);
 	u16 hdec = m_hsync ? 0 : (hsc - m_hdec_base) & 127;
 
 	u64 mtick = machine().root_device().subdevice<cpu_device>("m68000")->total_cycles();
+	u32 pc = machine().root_device().subdevice<cpu_device>("m68000")->pcbase();
 
-	return util::string_format("[%s %6d %6d %6d %6d  %03d/%03d %03d/%03d s:%c%c de:%c%c%c %s]",
-							   machine().time().to_string(),
+	return util::string_format("[%s %06x %6d %6d %6d %6d  %03d/%03d %03d/%03d s:%c%c de:%c%c%c %s]",
+							   util::string_format("%08d.%x", now >> 4, now & 15),
+							   pc,
 							   now - ((m_start_screen_time << 4) | phase),
 							   glue_tick - m_start_screen_time,
 							   now >> 2,
@@ -615,22 +678,26 @@ std::string st_video_device::context(u64 now)
 							   mt[m_mode]);
 }
 
-void st_video_device::glue_determine_next_event()
+void st_video_device::glue_sync()
 {
 	static const char *const mt[3] = { "50Hz", "60Hz", "71Hz" };
-	u64 now = machine().time().as_ticks(clock());
+	u64 now = time_now();
 	shifter_sync(now);
 
 	u64 phase = m_phase->read();
-	//	logerror("now %d time %s\n", now, machine().time().to_string());
 	u64 glue_tick = now >> 4;
-	if((now & 15) < phase)
+	if((now & 15) < phase && glue_tick)
 		glue_tick --;
+
+	if(glue_tick == m_prev_glue_tick)
+		return;
+	m_prev_glue_tick = glue_tick;
+
 	u16 hsc = m_hsc_base + (glue_tick - m_start_line_time);
 	u16 hdec = m_hsync ? 0 : (hsc - m_hdec_base) & 127;
 
 	if(v)
-		logerror("%s glue sync\n", context());
+		logerror("%s glue sync tick=%d\n", context(), glue_tick);
 
 	if(hsc >= 128) {
 		if(m_mode == M_71) {
@@ -656,8 +723,6 @@ void st_video_device::glue_determine_next_event()
 				case 2: screen().configure(56*16, 501, rectangle(0, 16*(122-72), 0, 511-11-1), attotime::from_ticks(16*cycles_per_screen[m_mode], clock()).as_attoseconds()); break;
 				}
 			}
-			if(m_mode == 2)
-				v = false;
 			m_vsc = base_vsc[m_mode];
 			m_start_screen_time = glue_tick;
 			m_shifter_y = 0;
@@ -665,12 +730,73 @@ void st_video_device::glue_determine_next_event()
 		} else if(m_vsc == vsync_start[m_mode]) {
 			m_vsync = 1;
 			m_vsync_cb(1);
+			m_vde = 0;
 			m_adr_live = m_adr_base;
 		}
 
 		hsc = m_hsc_base = base_hsc[m_mode];
 		m_start_line_time = glue_tick;
 	}
+
+	switch(m_mode) {
+	case M_50:
+		if(hsc == 102) {
+			hsync_on();
+			if(m_hde)
+				hde_off(glue_tick);
+		}
+		else if(hsc == 112) {
+			hsync_off(glue_tick);
+			hdec = 1;
+			m_hdec_base = 111;
+		}
+		if(hdec == 17)
+			hde_on(glue_tick);
+		else if(hdec == 97)
+			hde_off(glue_tick);
+		break;
+
+	case M_60:
+		if(hsc == 102) {
+			hsync_on();
+			if(m_hde)
+				hde_off(glue_tick);
+		} else if(hsc == 112) {
+			hsync_off(glue_tick);
+			hdec = 1;
+			m_hdec_base = 111;
+		}
+		if(hdec == 16)
+			hde_on(glue_tick);
+		else if(hdec == 96)
+			hde_off(glue_tick);
+		break;
+
+	case M_71:
+		if(hsc == 122) {
+			hsync_on();
+			if(m_hde)
+				hde_off(glue_tick);
+		}
+		if(hdec == 4)
+			hde_on(glue_tick);
+		else if(hdec == 44)
+			hde_off(glue_tick);
+		break;
+	}
+}
+
+
+void st_video_device::glue_determine_next_event()
+{
+	u64 now = time_now();
+
+	u64 phase = m_phase->read();
+	u64 glue_tick = now >> 4;
+	if((now & 15) < phase)
+		glue_tick --;
+	u16 hsc = m_hsc_base + (glue_tick - m_start_line_time);
+	u16 hdec = m_hsync ? 0 : (hsc - m_hdec_base) & 127;
 
 	u16 hsc_next = 128;
 	u16 hdec_next = 128;
@@ -679,63 +805,37 @@ void st_video_device::glue_determine_next_event()
 	case M_50:
 		if(hsc < 102)
 			hsc_next = 102;
-		else if(hsc < 112) {
-			if(hsc == 102)
-				hsync_on();
+		else if(hsc < 112)
 			hsc_next = 112;
-		} else if(hsc == 112) {
-			hsync_off(glue_tick);
-			hdec = 1;
-			m_hdec_base = 111;
-		}
 		if(hdec < 17)
 			hdec_next = 17;
-		else if(hdec < 97) {
-			if(hdec == 17)
-				hde_on(glue_tick);
+		else if(hdec < 97)
 			hdec_next = 97;
-		} else if(hdec == 97)
-			hde_off(glue_tick);
 		break;
 
 	case M_60:
 		if(hsc < 102)
 			hsc_next = 102;
-		else if(hsc < 112) {
-			if(hsc == 102)
-				hsync_on();
+		else if(hsc < 112)
 			hsc_next = 112;
-		} else if(hsc == 112) {
-			hsync_off(glue_tick);
-			hdec = 1;
-			m_hdec_base = 111;
-		}
 		if(hdec < 16)
 			hdec_next = 16;
-		else if(hdec < 96) {
-			if(hdec == 16)
-				hde_on(glue_tick);
+		else if(hdec < 96)
 			hdec_next = 96;
-		} else if(hdec == 96)
-			hde_off(glue_tick);
 		break;
 
 	case M_71:
 		if(hsc < 122)
 			hsc_next = 122;
-		else if(hsc == 122)
-			hsync_on();
 		if(hdec < 4)
 			hdec_next = 4;
-		else if(hdec < 44) {
-			if(hdec == 4)
-				hde_on(glue_tick);
+		else if(hdec < 44)
 			hdec_next = 44;
-		} else if(hdec == 44)
-			hde_off(glue_tick);
 		break;
 	}
 
+	if(v)
+		logerror("%s next hsc %d hdec %d\n", context(), hsc_next, hdec_next);
 	hsc_next -= hsc;
 	hdec_next -= hdec;
 
@@ -745,6 +845,7 @@ void st_video_device::glue_determine_next_event()
 
 TIMER_CALLBACK_MEMBER(st_video_device::timer_event)
 {
+	glue_sync();
 	glue_determine_next_event();
 }
 
@@ -783,7 +884,7 @@ u8 st_video_device::adr_live_m_r()
 u8 st_video_device::adr_live_l_r()
 {
 	shifter_sync();
-	v = false;
+	//	v = true;
 	logerror("%s adr %06x - %06x\n", context(), m_adr_base, m_adr_live);
 	return m_adr_live;
 }
