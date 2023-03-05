@@ -65,24 +65,17 @@ Address   Description
 // Beep Frequency is 1 KHz
 #define H19_BEEP_FRQ (H19_CLOCK / 2048)
 
-DEFINE_DEVICE_TYPE(TLB, heath_terminal_logic_board_device, "heath_tlb", "Heath Terminal Logic Board");
+DEFINE_DEVICE_TYPE(TLB, heath_tlb_device, "heath_tlb", "Heath Terminal Logic Board");
+DEFINE_DEVICE_TYPE(SUPER19, heath_super19_tlb_device, "heath_super19_tlb", "Heath Terminal Logic Board");
+DEFINE_DEVICE_TYPE(WATZ, heath_watz_tlb_device, "heath_watz_tlb", "Heath Terminal Logic Board");
+DEFINE_DEVICE_TYPE(ULTRA, heath_ultra_tlb_device, "heath_ultra_tlb", "Heath Terminal Logic Board");
 
-heath_terminal_logic_board_device::heath_terminal_logic_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, TLB, tag, owner, clock)
-		, m_palette(*this, "palette")
-		, m_maincpu(*this, "maincpu")
-		, m_crtc(*this, "crtc")
-		, m_ace(*this, "ins8250")
-		, m_beep(*this, "beeper")
-		, m_p_videoram(*this, "videoram")
-		, m_p_chargen(*this, "chargen")
-		, m_mm5740(*this, "mm5740")
-		, m_kbdrom(*this, "keyboard")
-		, m_kbspecial(*this, "MODIFIERS")
+heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type = TLB)
+		: device_t(mconfig, type, tag, owner, clock), m_palette(*this, "palette"), m_maincpu(*this, "maincpu"), m_crtc(*this, "crtc"), m_ace(*this, "ins8250"), m_beep(*this, "beeper"), m_p_videoram(*this, "videoram"), m_p_chargen(*this, "chargen"), m_mm5740(*this, "mm5740"), m_kbdrom(*this, "keyboard"), m_kbspecial(*this, "MODIFIERS")
 {
 }
 
-TIMER_CALLBACK_MEMBER(heath_terminal_logic_board_device::key_click_off)
+TIMER_CALLBACK_MEMBER(heath_tlb_device::key_click_off)
 {
 	m_keyclickactive = false;
 
@@ -90,7 +83,7 @@ TIMER_CALLBACK_MEMBER(heath_terminal_logic_board_device::key_click_off)
 		m_beep->set_state(0);
 }
 
-TIMER_CALLBACK_MEMBER(heath_terminal_logic_board_device::bell_off)
+TIMER_CALLBACK_MEMBER(heath_tlb_device::bell_off)
 {
 	m_bellactive = false;
 
@@ -98,7 +91,7 @@ TIMER_CALLBACK_MEMBER(heath_terminal_logic_board_device::bell_off)
 		m_beep->set_state(0);
 }
 
-void heath_terminal_logic_board_device::mem_map(address_map &map)
+void heath_tlb_device::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).mirror(0x2000).rom();
@@ -106,7 +99,7 @@ void heath_terminal_logic_board_device::mem_map(address_map &map)
 	map(0xc000, 0xc7ff).mirror(0x3800).ram().share("videoram");
 }
 
-void heath_terminal_logic_board_device::io_map(address_map &map)
+void heath_tlb_device::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -115,10 +108,10 @@ void heath_terminal_logic_board_device::io_map(address_map &map)
 	map(0x40, 0x47).mirror(0x18).rw(m_ace, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 	map(0x60, 0x60).mirror(0x1E).w(m_crtc, FUNC(mc6845_device::address_w));
 	map(0x61, 0x61).mirror(0x1E).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x80, 0x80).mirror(0x1f).r(FUNC(heath_terminal_logic_board_device::kbd_key_r));
-	map(0xa0, 0xa0).mirror(0x1f).r(FUNC(heath_terminal_logic_board_device::kbd_flags_r));
-	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(heath_terminal_logic_board_device::key_click_w));
-	map(0xe0, 0xe0).mirror(0x1f).w(FUNC(heath_terminal_logic_board_device::bell_w));
+	map(0x80, 0x80).mirror(0x1f).r(FUNC(heath_tlb_device::kbd_key_r));
+	map(0xa0, 0xa0).mirror(0x1f).r(FUNC(heath_tlb_device::kbd_flags_r));
+	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(heath_tlb_device::key_click_w));
+	map(0xe0, 0xe0).mirror(0x1f).w(FUNC(heath_tlb_device::bell_w));
 }
 
 
@@ -134,19 +127,18 @@ void heath_terminal_logic_board_device::io_map(address_map &map)
 #define KB_STATUS_REPEAT_KEYS_MASK 0x40
 #define KB_STATUS_KEYBOARD_STROBE_MASK 0x80
 
-
-void heath_terminal_logic_board_device::device_start()
+void heath_tlb_device::device_start()
 {
 	save_item(NAME(m_transchar));
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_keyclickactive));
 	save_item(NAME(m_bellactive));
 
-	m_key_click_timer = timer_alloc(FUNC(heath_terminal_logic_board_device::key_click_off), this);
-	m_bell_timer = timer_alloc(FUNC(heath_terminal_logic_board_device::bell_off), this);
+	m_key_click_timer = timer_alloc(FUNC(heath_tlb_device::key_click_off), this);
+	m_bell_timer = timer_alloc(FUNC(heath_tlb_device::bell_off), this);
 }
 
-void heath_terminal_logic_board_device::key_click_w(uint8_t data)
+void heath_tlb_device::key_click_w(uint8_t data)
 {
 /* Keyclick - 6 mSec */
 
@@ -155,7 +147,7 @@ void heath_terminal_logic_board_device::key_click_w(uint8_t data)
 	m_key_click_timer->adjust(attotime::from_msec(6));
 }
 
-void heath_terminal_logic_board_device::bell_w(uint8_t data)
+void heath_tlb_device::bell_w(uint8_t data)
 {
 /* Bell (^G) - 200 mSec */
 
@@ -181,12 +173,12 @@ ground -> A9          A1   =  B2
 ground -> A10         A0   =  B1
 
 ****************************************************************************/
-uint16_t heath_terminal_logic_board_device::translate_mm5740_b(uint16_t b)
+uint16_t heath_tlb_device::translate_mm5740_b(uint16_t b)
 {
 	return ((b & 0x100) >> 2) | ((b & 0x0c0) << 1) | (b & 0x03f);
 }
 
-uint8_t heath_terminal_logic_board_device::kbd_key_r()
+uint8_t heath_tlb_device::kbd_key_r()
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	m_strobe = false;
@@ -195,7 +187,7 @@ uint8_t heath_terminal_logic_board_device::kbd_key_r()
 	return m_transchar;
 }
 
-uint8_t heath_terminal_logic_board_device::kbd_flags_r()
+uint8_t heath_tlb_device::kbd_flags_r()
 {
 	uint16_t modifiers = m_kbspecial->read();
 	uint8_t rv = modifiers & 0x7f;
@@ -217,17 +209,17 @@ uint8_t heath_terminal_logic_board_device::kbd_flags_r()
 	return rv;
 }
 
-READ_LINE_MEMBER(heath_terminal_logic_board_device::mm5740_shift_r)
+READ_LINE_MEMBER(heath_tlb_device::mm5740_shift_r)
 {
 	return ((m_kbspecial->read() ^ 0x120) & 0x120) ? ASSERT_LINE : CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(heath_terminal_logic_board_device::mm5740_control_r)
+READ_LINE_MEMBER(heath_tlb_device::mm5740_control_r)
 {
 	return ((m_kbspecial->read() ^ 0x10) & 0x10) ? ASSERT_LINE: CLEAR_LINE;
 }
 
-WRITE_LINE_MEMBER(heath_terminal_logic_board_device::mm5740_data_ready_w)
+WRITE_LINE_MEMBER(heath_tlb_device::mm5740_data_ready_w)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -239,7 +231,7 @@ WRITE_LINE_MEMBER(heath_terminal_logic_board_device::mm5740_data_ready_w)
 	}
 }
 
-MC6845_UPDATE_ROW(heath_terminal_logic_board_device::crtc_update_row)
+MC6845_UPDATE_ROW(heath_tlb_device::crtc_update_row)
 {
 	if (!de)
 		return;
@@ -290,17 +282,17 @@ static const gfx_layout h19_charlayout =
 };
 
 static GFXDECODE_START(gfx_h19)
-	GFXDECODE_ENTRY(":tlb:chargen", 0x0000, h19_charlayout, 0, 1)
-GFXDECODE_END
+		GFXDECODE_ENTRY(":tlb:chargen", 0x0000, h19_charlayout, 0, 1)
+				GFXDECODE_END
 
 #if 0
-void heath_terminal_logic_board_device::tlb(machine_config &config)
+void heath_tlb_device::tlb(machine_config &config)
 {
 
 	/* basic machine hardware */
 	Z80(config, m_maincpu, H19_CLOCK); // From schematics
-	m_maincpu->set_addrmap(AS_PROGRAM, &heath_terminal_logic_board_device::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &heath_terminal_logic_board_device::io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &heath_tlb_device::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &heath_tlb_device::io_map);
 
 	/* video hardware */
 	// TODO: make configurable, Heath offered 2 different CRTs - White, Green
@@ -318,7 +310,7 @@ void heath_terminal_logic_board_device::tlb(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(heath_terminal_logic_board_device::crtc_update_row));
+	m_crtc->set_update_row_callback(FUNC(heath_tlb_device::crtc_update_row));
 	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI); // frame pulse
 
 	ins8250_device &uart(INS8250(config, "ins8250", INS8250_CLOCK));
@@ -334,9 +326,9 @@ void heath_terminal_logic_board_device::tlb(machine_config &config)
 	m_mm5740->x_cb<7>().set_ioport("X7");
 	m_mm5740->x_cb<8>().set_ioport("X8");
 	m_mm5740->x_cb<9>().set_ioport("X9");
-	m_mm5740->shift_cb().set(FUNC(heath_terminal_logic_board_device::mm5740_shift_r));
-	m_mm5740->control_cb().set(FUNC(heath_terminal_logic_board_device::mm5740_control_r));
-	m_mm5740->data_ready_cb().set(FUNC(heath_terminal_logic_board_device::mm5740_data_ready_w));
+	m_mm5740->shift_cb().set(FUNC(heath_tlb_device::mm5740_shift_r));
+	m_mm5740->control_cb().set(FUNC(heath_tlb_device::mm5740_control_r));
+	m_mm5740->data_ready_cb().set(FUNC(heath_tlb_device::mm5740_data_ready_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -575,21 +567,22 @@ ROM_START( ultra19 )
 ROM_END
 
 
-ioport_constructor heath_terminal_logic_board_device::device_input_ports() const
+ioport_constructor heath_tlb_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(tlb);
 }
 
-const tiny_rom_entry *heath_terminal_logic_board_device::device_rom_region() const
+const tiny_rom_entry *heath_tlb_device::device_rom_region() const
 {
 	return ROM_NAME(h19);
 }
 
-void heath_terminal_logic_board_device::device_add_mconfig(machine_config &config) {
+void heath_tlb_device::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
 	Z80(config, m_maincpu, H19_CLOCK); // From schematics
-	m_maincpu->set_addrmap(AS_PROGRAM, &heath_terminal_logic_board_device::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &heath_terminal_logic_board_device::io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &heath_tlb_device::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &heath_tlb_device::io_map);
 
 	/* video hardware */
 	// TODO: make configurable, Heath offered 2 different CRTs - White, Green
@@ -607,7 +600,7 @@ void heath_terminal_logic_board_device::device_add_mconfig(machine_config &confi
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(heath_terminal_logic_board_device::crtc_update_row));
+	m_crtc->set_update_row_callback(FUNC(heath_tlb_device::crtc_update_row));
 	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI); // frame pulse
 
 	ins8250_device &uart(INS8250(config, "ins8250", INS8250_CLOCK));
@@ -623,11 +616,41 @@ void heath_terminal_logic_board_device::device_add_mconfig(machine_config &confi
 	m_mm5740->x_cb<7>().set_ioport("X7");
 	m_mm5740->x_cb<8>().set_ioport("X8");
 	m_mm5740->x_cb<9>().set_ioport("X9");
-	m_mm5740->shift_cb().set(FUNC(heath_terminal_logic_board_device::mm5740_shift_r));
-	m_mm5740->control_cb().set(FUNC(heath_terminal_logic_board_device::mm5740_control_r));
-	m_mm5740->data_ready_cb().set(FUNC(heath_terminal_logic_board_device::mm5740_data_ready_w));
+	m_mm5740->shift_cb().set(FUNC(heath_tlb_device::mm5740_shift_r));
+	m_mm5740->control_cb().set(FUNC(heath_tlb_device::mm5740_control_r));
+	m_mm5740->data_ready_cb().set(FUNC(heath_tlb_device::mm5740_data_ready_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, H19_BEEP_FRQ).add_route(ALL_OUTPUTS, "mono", 1.00);
+}
+
+heath_super19_tlb_device::heath_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: heath_tlb_device(mconfig, tag, owner, clock, SUPER19)
+{
+}
+
+const tiny_rom_entry *heath_super19_tlb_device::device_rom_region() const
+{
+	return ROM_NAME(super19);
+}
+
+heath_watz_tlb_device::heath_watz_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: heath_tlb_device(mconfig, tag, owner, clock, WATZ)
+{
+}
+
+const tiny_rom_entry *heath_watz_tlb_device::device_rom_region() const
+{
+	return ROM_NAME(watz19);
+}
+
+heath_ultra_tlb_device::heath_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: heath_tlb_device(mconfig, tag, owner, clock, ULTRA)
+{
+}
+
+const tiny_rom_entry *heath_ultra_tlb_device::device_rom_region() const
+{
+	return ROM_NAME(ultra19);
 }

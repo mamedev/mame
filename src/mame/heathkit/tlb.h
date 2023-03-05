@@ -22,12 +22,10 @@
 #include "speaker.h"
 
 
-class heath_terminal_logic_board_device : public device_t
+class heath_tlb_device : public device_t
 {
 public:
-  heath_terminal_logic_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-  //void tlb(machine_config &config);
+  heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type);
 
 protected:
   virtual ioport_constructor device_input_ports() const override;
@@ -75,6 +73,37 @@ private:
 	uint16_t translate_mm5740_b(uint16_t b);
 };
 
-DECLARE_DEVICE_TYPE(TLB, heath_terminal_logic_board_device)
+class heath_super19_tlb_device : public heath_tlb_device
+{
+public:
+  heath_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+  virtual const tiny_rom_entry *device_rom_region() const override;
+
+};
+
+class heath_watz_tlb_device : public heath_tlb_device
+{
+public:
+  heath_watz_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+  virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+class heath_ultra_tlb_device : public heath_tlb_device
+{
+public:
+  heath_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+  virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+DECLARE_DEVICE_TYPE(TLB, heath_tlb_device)
+DECLARE_DEVICE_TYPE(SUPER19, heath_super19_tlb_device)
+DECLARE_DEVICE_TYPE(WATZ, heath_watz_tlb_device)
+DECLARE_DEVICE_TYPE(ULTRA, heath_ultra_tlb_device)
 
 #endif // MAME_HEATHKIT_TLB_H
