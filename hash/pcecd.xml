@@ -139,7 +139,7 @@ license:CC0-1.0
 		<year>1993</year>
 		<publisher>Konami</publisher>
 	    <notes><![CDATA[
-[redbook] skips first two seconds, offsets on repeats
+[redbook] skips first two seconds, offsets on repeats, Stage 5 outro Dracula lip sync is off
 [ADPCM] streaming cuts off when saving Maria
 Richter sprite becomes all blue in some specific sections (cfr. stage 1 mermaid area, stage 2' final section, stage 4' start), generally when water is present, timing?
 Stage 4 to 4' boss fight has ugly green background (btanb)
@@ -1150,10 +1150,13 @@ Intro shows several horizontal black/transparent strips over GFXs
 		</part>
 	</software>
 
-	<software name="ddragon2">
+	<software name="ddragon2" supported="no">
 		<description>Double Dragon II - The Revenge (Japan)</description>
 		<year>1993</year>
 		<publisher>Naxat Soft</publisher>
+	    <notes><![CDATA[
+Cannot access option menu, responds to run button by returning to main menu without GFX update
+]]></notes>
 		<info name="serial" value="NXCD2010"/>
 		<info name="release" value="19930312"/>
 		<info name="alt_title" value="双載龍 ダブルドラゴンII"/>
@@ -7275,7 +7278,7 @@ Hangs or resets after giving yes to "Is it OK?" prompt (fixed)
 		<year>1990</year>
 		<publisher>Telenet Japan</publisher>
 		<notes><![CDATA[
-https://mametesters.org/view.php?id=7972
+https://mametesters.org/view.php?id=7972 (fixed)
 ]]></notes>
 		<info name="serial" value="TGXCD1008"/>
 		<info name="usage" value="CD-ROM System Card required" />

@@ -5,7 +5,13 @@
 PC Engine CD HW notes:
 
 TODO:
-- Dragon Ball Z: ADPCM dies after the first upload;
+- Rewrite SCSI to honor actual nscsi_device;
+- Remove legacy CD drive implementation and merge with PC-8801 and PC-FX, cfr. src/devices/bus/pc8801/pc8801_31.cpp
+- Split into slot options, particularly Arcade Card shouldn't really be tied together thru a Machine Configuration option;
+- Implement Game Express slot option;
+- ADPCM half/full events aren't honored (dbz, draculax), they causes hangs for no benefit if enabled;
+- verify irqs, particularly for FMV streaming not working right (gulliver, holmes Introduction);
+(old note, to move out there)
 - Dragon Slayer - The Legend of Heroes: black screen; (actually timing/raster irq)
 - Mirai Shonen Conan: dies at new game selection; (actually timing/raster irq)
 - Snatcher: black screen after Konami logo, tries set up CD-DA
@@ -85,13 +91,13 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 #define LOGSCSI(...)    LOGMASKED(LOG_SCSI, __VA_ARGS__)
 
 // 0xdd subchannel read is special and very verbose when it happens, treat differently
-#define LIVE_SUBQ_VIEW  1
+#define LIVE_SUBQ_VIEW    0
+#define LIVE_ADPCM_VIEW   0
 
 #define PCE_CD_CLOCK    9216000
 
 
-// TODO: it's actually a common interface with PC-8801
-// cfr. src/devices/bus/pc8801/pc8801_31.cpp
+// TODO: correct name, split into incremental HuCard slot devices
 DEFINE_DEVICE_TYPE(PCE_CD, pce_cd_device, "pcecd", "PCE CD Add-on")
 
 // registers 9, e and f are known to be write only
@@ -346,10 +352,19 @@ WRITE_LINE_MEMBER( pce_cd_device::msm5205_int )
 {
 	uint8_t msm_data;
 
-	//  popmessage("%08x %08x %08x %02x %02x",m_msm_start_addr,m_msm_end_addr,m_msm_half_addr,m_adpcm_status,m_adpcm_control);
-
 	if (m_msm_idle)
 		return;
+
+	if (LIVE_ADPCM_VIEW)
+	{
+		popmessage("start %08x end %08x half %08x status %02x control %02x"
+			, m_msm_start_addr
+			, m_msm_end_addr
+			, m_msm_half_addr
+			, m_adpcm_status
+			, m_adpcm_control
+		);
+	}
 
 	/* Supply new ADPCM data */
 	msm_data = (m_msm_nibble) ? (m_adpcm_ram[m_msm_start_addr] & 0x0f) : ((m_adpcm_ram[m_msm_start_addr] & 0xf0) >> 4);
