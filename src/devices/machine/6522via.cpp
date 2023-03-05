@@ -11,17 +11,6 @@
 
 **********************************************************************/
 
-/*
-  1999-Dec-22 PeT
-   vc20 random number generation only partly working
-   (reads (uninitialized) timer 1 and timer 2 counter)
-   timer init, reset, read changed
-
-  2017-Feb-15 Edstrom
-   Fixed shift registers to be more accurate, eg 50/50 duty cycle, latching
-   on correct edges and leading and trailing edges added + logging.
- */
-
 #include "emu.h"
 #include "6522via.h"
 
@@ -630,13 +619,13 @@ u8 via6522_device::read(offs_t offset)
 	{
 	case VIA_PB:
 		/* update the input */
-		if (PB_LATCH_ENABLE(m_acr) == 0)
+		if ((PB_LATCH_ENABLE(m_acr) != 0) && ((m_ifr & INT_CB1) != 0))
 		{
-			val = input_pb();
+			val = m_latch_b;
 		}
 		else
 		{
-			val = m_latch_b;
+			val = input_pb();
 		}
 
 		if (!machine().side_effects_disabled())
@@ -648,13 +637,13 @@ u8 via6522_device::read(offs_t offset)
 
 	case VIA_PA:
 		/* update the input */
-		if (PA_LATCH_ENABLE(m_acr) == 0)
+		if ((PA_LATCH_ENABLE(m_acr) != 0) && ((m_ifr & INT_CA1) != 0))
 		{
-			val = input_pa();
+			val = m_latch_a;
 		}
 		else
 		{
-			val = m_latch_a;
+			val = input_pa();
 		}
 
 		if (!machine().side_effects_disabled())
@@ -676,13 +665,13 @@ u8 via6522_device::read(offs_t offset)
 
 	case VIA_PANH:
 		/* update the input */
-		if (PA_LATCH_ENABLE(m_acr) == 0)
+		if ((PA_LATCH_ENABLE(m_acr) != 0) && ((m_ifr & INT_CA1) != 0))
 		{
-			val = input_pa();
+			val = m_latch_a;
 		}
 		else
 		{
-			val = m_latch_a;
+			val = input_pa();
 		}
 		break;
 
