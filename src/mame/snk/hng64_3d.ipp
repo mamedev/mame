@@ -1191,20 +1191,33 @@ void hng64_state::hng64_fbscroll_w(offs_t offset, uint32_t data, uint32_t mem_ma
 	}
 }
 
-void hng64_state::hng64_fbunkbyte_w(offs_t offset, uint8_t data)
+void hng64_state::hng64_fbunkbyte_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	if (offset == 0)
-	{
-		// | ---- --?x | unknown, unsetted by Buriki One and set by Fatal Fury WA, buffering mode?
-		logerror("%s: hng64_unkbyte_w (%03x) %02x\n", machine().describe_context(), offset, data);
-	}
-	else
-	{
-		logerror("%s: hng64_unkbyte_w (%03x - unexpected) %02x \n", machine().describe_context(), offset, data);
-	}
+	COMBINE_DATA(&m_fbunk[offset]);
+
+	// | ---- --?x ---- ---- ---- ---- ---- ----| unknown
+	// is 02 in most games, 03 in samsh4 games
+	// could be related to how fbscrolly is applied?
+
+	logerror("%s: hng64_unkbyte_w %08x %08x\n", machine().describe_context(), data, mem_mask);
 }
 
-// this is a table filled with 0x0? data, seems to be 16-bit values
+/*
+this is a table filled with 0x0? data, seems to be 8-bit values
+ 
+roadedge  08080808 08080808 08080808 08080808 08080808 08080808 08080707 08080909 (ingame)
+          08080808 08080808 08080808 08080808 08080808 08080808 08080808 08080808 (hyper logo)
+
+xrally    08080808 08080808 08070707 08070807 07070807 08070707 08070707 07070808 (comms screen + ingame)
+          08080808 08080808 08080808 08080808 08080808 08080808 08080808 08080808 (hyper logo)
+
+buriki    08080808 08080808 08080808 08080808 08080808 08080808 08080808 08080808
+fatfurwa  08080808 08080808 08080808 08080808 08080808 08080808 08080808 08080808
+bbust2    08080808 08080808 08080808 08080808 08080808 08080808 08080808 08080808
+
+sams64    00000000 00000000 00000000 00000000 00000000 07070000 00000000 00000000 (only inits one value to 0707?)
+sams64_2  00000000 00000000 00000000 00000000 00000000 07070000 00000000 00000000 (only inits one value to 0707?)
+*/
 uint32_t hng64_state::hng64_fbtable_r(offs_t offset, uint32_t mem_mask)
 {
 	logerror("%s: hng64_fbtable_r (%03x) (%08x)\n", machine().describe_context(), offset * 4, mem_mask);

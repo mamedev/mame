@@ -170,6 +170,7 @@ public:
 		m_fbram2(*this, "fbram2"),
 		m_fbscale(*this, "fbscale"),
 		m_fbscroll(*this, "fbscroll"),
+		m_fbunk(*this, "fbunk"),
 		m_idt7133_dpram(*this, "com_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_in(*this, "IN%u", 0U),
@@ -238,6 +239,7 @@ private:
 	required_shared_ptr<uint32_t> m_fbram2;
 	required_shared_ptr<uint32_t> m_fbscale;
 	required_shared_ptr<uint32_t> m_fbscroll;
+	required_shared_ptr<uint32_t> m_fbunk;
 
 	required_shared_ptr<uint32_t> m_idt7133_dpram;
 	//required_shared_ptr<uint8_t> m_com_mmu_mem;
@@ -343,7 +345,7 @@ private:
 	void hng64_fbscale_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	void hng64_fbscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
-	void hng64_fbunkbyte_w(offs_t offset, uint8_t data);
+	void hng64_fbunkbyte_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
 	uint32_t hng64_fbtable_r(offs_t offset, uint32_t mem_mask = ~0);
 	void hng64_fbtable_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
