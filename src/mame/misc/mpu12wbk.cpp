@@ -923,7 +923,7 @@ void mpu12wbk_state::mpu12wbk(machine_config &config)
 
 /*
   Fruit Star Bonus (Ver 8.2.00ITL)
-  Seems International version.
+  International version with English language.
 
   No MPU number, and no stickers in the CPU epoxy block.
 
@@ -955,6 +955,9 @@ ROM_START( fruitstb )
 
 	ROM_REGION( 0x0200, "proms2", 0 )
 	ROM_LOAD( "82s131.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "gal16v8_box.ic1", 0x0000, 0x0117, CRC(4c7af826) SHA1(3c78dae1606fc95292306ae5f9bd3bff4172ccf1) ) // cracked
 ROM_END
 
 /*
