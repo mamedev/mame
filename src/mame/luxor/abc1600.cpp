@@ -36,6 +36,10 @@
 
     TODO:
 
+	- systest1600
+		- chip test crashes with trap 4
+		- keyboard test fails
+		- mouse test fails
     - loadsys1 core dump (/etc/mkfs -b 1024 -v 69000 /dev/sa40)
     - short/long reset (RSTBUT)
     - CIO
@@ -1056,4 +1060,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME    FLAGS
-COMP( 1985, abc1600, 0,      0,      abc1600, abc1600, abc1600_state, empty_init, "Luxor", "ABC 1600", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, abc1600, 0,      0,      abc1600, abc1600, abc1600_state, empty_init, "Luxor", "ABC 1600", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
