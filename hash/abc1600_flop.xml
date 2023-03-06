@@ -173,8 +173,8 @@ license:CC0-1.0
 	</software>
 
 	<software name="systest">
-		<description>systest1600</description>
-		<year>198?</year>
+		<description>ABC1600 Test Program v5.0</description>
+		<year>1985</year>
 		<publisher>Luxor</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
