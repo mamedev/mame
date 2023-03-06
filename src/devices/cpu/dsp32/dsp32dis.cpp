@@ -445,7 +445,7 @@ offs_t dsp32c_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 
 			std::string condbuf = "";
 			if ((op >> 10) & 1)
-				condbuf = "if (" + std::string{ condtable[(op >> 12) & 15] } + ") ";
+				condbuf = "if (" + std::string(condtable[(op >> 12) & 15]) + ") ";
 
 			switch ((op >> 21) & 15)
 			{

@@ -297,7 +297,7 @@ void generalplus_gpl32612_game_state::nand_init(int blocksize, int blocksize_str
 	// debug to allow for easy use of unidasm.exe
 	if (0)
 	{
-		auto filename = "stripped_" + std::string{ machine().system().name };
+		auto filename = "stripped_" + std::string(machine().system().name);
 		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{

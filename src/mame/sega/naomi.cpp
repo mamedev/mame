@@ -10648,7 +10648,7 @@ void naomi_state::create_pic_from_retdat()
 			{
 				uint8_t* newregion = rgn_newregion->base();
 
-				auto filename = "picbin_" + std::string{ machine().system().name };
+				auto filename = "picbin_" + std::string(machine().system().name);
 				auto fp = fopen(filename.c_str(), "w+b");
 				if (fp)
 				{

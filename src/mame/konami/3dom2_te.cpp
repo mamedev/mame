@@ -12,6 +12,7 @@
 #include "3dom2.h"
 
 #include <cmath>
+#include <sstream>
 
 /*
     TODO:
@@ -568,7 +569,6 @@ static void write_te_reg(uint32_t &reg, uint32_t data, m2_te_device::te_reg_wmod
 	}
 }
 
-#if 0
 static std::string get_reg_name(uint32_t unit, uint32_t reg)
 {
 	static const char *gc_regs[] =
@@ -640,7 +640,7 @@ static std::string get_reg_name(uint32_t unit, uint32_t reg)
 		{
 			if (reg < sizeof(gc_regs))
 			{
-				return std::string{ "GC:" } + gc_regs[reg];
+				return std::string("GC:") + gc_regs[reg];
 			}
 			break;
 		}
@@ -652,7 +652,7 @@ static std::string get_reg_name(uint32_t unit, uint32_t reg)
 		{
 			if (reg < sizeof(es_regs))
 			{
-				return std::string{ "ES:" } + es_regs[reg];
+				return std::string("ES:") + es_regs[reg];
 			}
 			break;
 		}
@@ -668,7 +668,7 @@ static std::string get_reg_name(uint32_t unit, uint32_t reg)
 		{
 			if (reg < sizeof(db_regs))
 			{
-				return std::string{ "DB:" } + db_regs[reg];
+				return std::string("DB:") + db_regs[reg];
 			}
 			break;
 		}
@@ -676,7 +676,7 @@ static std::string get_reg_name(uint32_t unit, uint32_t reg)
 
 	return "????";
 }
-#endif
+
 //**************************************************************************
 //  TRIANGLE ENGINE DEVICE
 //**************************************************************************
@@ -818,7 +818,9 @@ void m2_te_device::write(offs_t offset, uint32_t data)
 	uint32_t reg = offset & 0x1ff;
 	te_reg_wmode wmode = static_cast<te_reg_wmode>((offset >> 9) & 3);
 
-//  logerror("%s: TE W[%.8x] (%s) %.8x\n", machine().describe_context(), 0x00040000 + (offset << 2), get_reg_name(unit, reg), data);
+	if (0) {
+		logerror("%s: TE W[%.8x] (%s) %.8x\n", machine().describe_context(), 0x00040000 + (offset << 2), get_reg_name(unit, reg), data);
+	}
 
 	switch (unit)
 	{
@@ -1138,17 +1140,17 @@ void m2_te_device::log_triangle(uint32_t flags)
 	{
 		const se_vtx &vtx = m_se.vertices[i];
 
-		std::string optional;
+		std::ostringstream optional;
 		if (flags & VTX_FLAG_SHAD)
-			optional += util::string_format(" COLR[R:%.6f G:%.6f B:%.6f A:%.6f]", vtx.r, vtx.g, vtx.b, vtx.a);
+			util::stream_format(optional, " COLR[R:%.6f G:%.6f B:%.6f A:%.6f]", vtx.r, vtx.g, vtx.b, vtx.a);
 
 		if (flags & VTX_FLAG_TEXT)
-			optional += util::string_format(" TEXT[UW:%.6f VW:%.6f]", vtx.uw, vtx.vw);
+			util::stream_format(optional, " TEXT[UW:%.6f VW:%.6f]", vtx.uw, vtx.vw);
 
 		if (flags & VTX_FLAG_PRSP)
-			optional += util::string_format(" PRSP[W:%.6f]", vtx.w);
+			util::stream_format(optional, " PRSP[W:%.6f]", vtx.w);
 
-		logerror("V%d: X:%.6f Y:%.6f%s\n", i, vtx.x, vtx.y, optional);
+		logerror("V%d: X:%.6f Y:%.6f%s\n", i, vtx.x, vtx.y, optional.str());
 	}
 }
 

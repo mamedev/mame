@@ -3173,7 +3173,7 @@ void coolridr_state::machine_start()
 
 	if (0)
 	{
-		auto filename = "expanded_" + std::string{ machine().system().name } + "_gfx";
+		auto filename = "expanded_" + std::string(machine().system().name) + "_gfx";
 		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{

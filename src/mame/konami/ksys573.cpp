@@ -2420,7 +2420,7 @@ void ksys573_state::gunmania_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 		if( !message.empty() )
 		{
-          LOG( message );
+			LOG( message );
 		}
 
 		break;
