@@ -45,6 +45,7 @@ basically the hardware is a cost reduced clone of mitchell.cpp with some bits mo
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 
@@ -62,6 +63,7 @@ public:
 	gameace_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_membank(*this, "bank1"),
 		m_fgram(*this, "fgram"),
 		m_spriteram(*this, "spriteram"),
@@ -69,7 +71,8 @@ public:
 		m_palview(*this, "palview"),
 		m_colram(*this, "colram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_ymsnd(*this, "ymsnd")
 	{
 	}
 
@@ -83,6 +86,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
 	required_memory_bank m_membank;
 	required_shared_ptr<uint8_t> m_fgram;
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -91,6 +95,7 @@ private:
 	required_shared_ptr<uint8_t> m_colram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<ym2151_device> m_ymsnd;
 
 	std::vector<uint8_t> m_paletteram;
 
@@ -260,20 +265,21 @@ void gameace_state::main_port_map(address_map &map)
 	map(0x00, 0x00).portr("DSW1");
 	map(0x02, 0x02).portr("COINS").w(FUNC(gameace_state::vidbank_w));
 	map(0x04, 0x04).portr("P2");
-	//map(0x05, 0x05).nopw();
+	map(0x05, 0x05).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x06, 0x06).portr("P1");
 	map(0x06, 0x06).w(FUNC(gameace_state::bank_w));
 	map(0x07, 0x07).portr("UNK").w(FUNC(gameace_state::palbank_w));
 }
 
-void gameace_state::sound_program_map(address_map &map) // TODO: banking and everything else
+void gameace_state::sound_program_map(address_map &map) // TODO: banking (there is data in ROM at e000 - could map plain at e000, that space isn't used, but no accesses?)
 {
 	map(0x0000, 0xbfff).rom().region("audiocpu", 0);
-	map(0xc000, 0xc000).nopw();
-	map(0xc001, 0xc001).nopr().nopw();
-	map(0xc002, 0xc002).nopw();
-	map(0xc003, 0xc003).nopw();
-	map(0xc006, 0xc006).nopr();
+	map(0xc000, 0xc001).rw(m_ymsnd, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xc002, 0xc003).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // it appears to map the oki across 2 addresses
+	map(0xc006, 0xc006).r("soundlatch", FUNC(generic_latch_8_device::read));
+
+	map(0xc00f, 0xc00f).nopr().nopw(); // checks bit 1
+
 	map(0xd000, 0xd7ff).ram();
 }
 
@@ -346,8 +352,10 @@ void gameace_state::gameace(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &gameace_state::main_port_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gameace_state::irq0_line_hold));
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 4_MHz_XTAL));
-	audiocpu.set_addrmap(AS_PROGRAM, &gameace_state::sound_program_map);
+	Z80(config, m_audiocpu, 4_MHz_XTAL);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gameace_state::sound_program_map);
+
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: all wrong
 	screen.set_refresh_hz(60);
@@ -363,7 +371,8 @@ void gameace_state::gameace(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	YM2151(config, "ym2151", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YM2151(config, m_ymsnd, 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_ymsnd->irq_handler().set_inputline(m_audiocpu, 0);
 
 	OKIM6295(config, "oki", 4_MHz_XTAL / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -499,5 +508,5 @@ void gameace_state::init_hotbody()
 } // anonymous namespace
 
 
-GAME( 1995, hotbody,  0,       gameace, hotbody, gameace_state, init_hotbody, ROT0, "Gameace", "Hot Body (set 1)", MACHINE_IS_SKELETON ) // both 1994 and 1995 strings in ROM
-GAME( 1995, hotbodya, hotbody, gameace, hotbody, gameace_state, init_hotbody, ROT0, "Gameace", "Hot Body (set 2)", MACHINE_IS_SKELETON )
+GAME( 1995, hotbody,  0,       gameace, hotbody, gameace_state, init_hotbody, ROT0, "Gameace", "Hot Body (set 1)", MACHINE_IMPERFECT_SOUND ) // both 1994 and 1995 strings in ROM
+GAME( 1995, hotbodya, hotbody, gameace, hotbody, gameace_state, init_hotbody, ROT0, "Gameace", "Hot Body (set 2)", MACHINE_NOT_WORKING ) // bad dump, no program ROM
