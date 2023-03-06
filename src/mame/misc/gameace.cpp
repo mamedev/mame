@@ -99,7 +99,6 @@ private:
 
 	void fgram_w(offs_t offset, uint8_t data);
 	void colram_w(offs_t offset, uint8_t data);
-	uint8_t rand_r();
 
 	uint8_t pal_low_r(offs_t offset, uint8_t data);
 	uint8_t pal_high_r(offs_t offset, uint8_t data);
@@ -182,11 +181,6 @@ void gameace_state::vidbank_w(uint8_t data)
 	m_videoview.select(data & 1);
 }
 
-uint8_t gameace_state::rand_r()
-{
-	return machine().rand();
-}
-
 uint8_t gameace_state::pal_low_r(offs_t offset, uint8_t data)
 {
 	return m_palette->read8(offset);
@@ -226,12 +220,13 @@ void gameace_state::main_program_map(address_map &map)
 void gameace_state::main_port_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r(FUNC(gameace_state::rand_r));
-	map(0x02, 0x02).rw(FUNC(gameace_state::rand_r), FUNC(gameace_state::vidbank_w));
-	map(0x04, 0x04).r(FUNC(gameace_state::rand_r));
+	map(0x00, 0x00).portr("DSW1");
+	map(0x02, 0x02).portr("COINS").w(FUNC(gameace_state::vidbank_w));
+	map(0x04, 0x04).portr("P2");
 	//map(0x05, 0x05).nopw();
+	map(0x06, 0x06).portr("P1");
 	map(0x06, 0x06).w(FUNC(gameace_state::bank_w));
-	map(0x07, 0x07).rw(FUNC(gameace_state::rand_r),FUNC(gameace_state::palbank_w));
+	map(0x07, 0x07).portr("UNK").w(FUNC(gameace_state::palbank_w));
 }
 
 void gameace_state::sound_program_map(address_map &map) // TODO: banking and everything else
@@ -247,25 +242,33 @@ void gameace_state::sound_program_map(address_map &map) // TODO: banking and eve
 
 
 static INPUT_PORTS_START( hotbody )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("COINS")
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("P2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+
+	PORT_START("P1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+
+	PORT_START("UNK")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
@@ -275,7 +278,7 @@ static INPUT_PORTS_START( hotbody )
 	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_LOW, "SW1:8")
 INPUT_PORTS_END
 
 
