@@ -843,14 +843,9 @@ project "lua"
 	uuid "d9e2eed1-f1ab-4737-a6ac-863700b1a5a9"
 	kind "StaticLib"
 
-	-- uncomment the options below to
-	-- compile using c++. Do the same
-	-- in lualibs.
-	-- In addition comment out the "extern "C""
-	-- in lua.hpp and do the same in luaengine.c line 47
-	--options {
-	--  "ForceCPP",
-	--}
+	options {
+		"ForceCPP",
+	}
 
 	configuration { "gmake or ninja" }
 		buildoptions_c {
@@ -910,7 +905,6 @@ end
 		MAME_DIR .. "3rdparty/lua/src/lzio.c",
 		MAME_DIR .. "3rdparty/lua/src/lauxlib.c",
 		MAME_DIR .. "3rdparty/lua/src/lbaselib.c",
-		MAME_DIR .. "3rdparty/lua/src/lbitlib.c",
 		MAME_DIR .. "3rdparty/lua/src/lcorolib.c",
 		MAME_DIR .. "3rdparty/lua/src/ldblib.c",
 		MAME_DIR .. "3rdparty/lua/src/liolib.c",
@@ -936,6 +930,16 @@ end
 project "lualibs"
 	uuid "1d84edab-94cf-48fb-83ee-b75bc697660e"
 	kind "StaticLib"
+
+	options {
+		"ForceCPP",
+	}
+
+	configuration { "gmake or ninja" }
+		buildoptions { -- Lua SQLite3, Lua filesystem and Lua zlib don't cast pointers* explicitly
+			"-Wno-error",
+			"-fpermissive",
+		}
 
 	configuration { "vs*" }
 		buildoptions {
@@ -1670,6 +1674,16 @@ project "linenoise"
 	kind (LIBTYPE)
 
 	addprojectflags()
+
+	options {
+		"ForceCPP",
+	}
+
+	configuration { "gmake or ninja" }
+		buildoptions { -- implicit pointer conversions
+			"-Wno-error",
+			"-fpermissive",
+		}
 
 	configuration { "vs*" }
 		buildoptions {

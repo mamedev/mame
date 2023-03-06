@@ -21,6 +21,7 @@
 #include <tuple>
 #include <vector>
 
+#define SOL_USING_CXX_LUA 1
 #ifdef MAME_DEBUG
 #define SOL_ALL_SAFETIES_ON 1
 #else

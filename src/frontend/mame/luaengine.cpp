@@ -39,14 +39,10 @@
 //  LUA ENGINE
 //**************************************************************************
 
-extern "C" {
-
 int luaopen_zlib(lua_State *L);
-int luaopen_lfs(lua_State *L);
+extern "C" int luaopen_lfs(lua_State *L);
 int luaopen_linenoise(lua_State *L);
 int luaopen_lsqlite3(lua_State *L);
-
-} // extern "C"
 
 
 template <typename T>
@@ -615,10 +611,11 @@ void lua_engine::initialize()
  * emu.register_before_load_settings(callback) - register callback to be run before settings are loaded
  * emu.show_menu(menu_name) - show menu by name and pause the machine
  *
- * emu.print_verbose(str) - output to stderr at verbose level
- * emu.print_error(str) - output to stderr at error level
- * emu.print_info(str) - output to stderr at info level
- * emu.print_debug(str) - output to stderr at debug level
+ * emu.print_verbose(str) - log message at verbose level
+ * emu.print_error(str) - log message at error level
+ * emu.print_warning(str) - log message at error level
+ * emu.print_info(str) - log message at info level
+ * emu.print_debug(str) - log message at debug level
  *
  * emu.device_enumerator(dev) - get device enumerator starting at arbitrary point in tree
  * emu.screen_enumerator(dev) - get screen device enumerator starting at arbitrary point in tree
@@ -688,6 +685,7 @@ void lua_engine::initialize()
 		};
 	emu["print_verbose"] = [] (const char *str) { osd_printf_verbose("%s\n", str); };
 	emu["print_error"] = [] (const char *str) { osd_printf_error("%s\n", str); };
+	emu["print_warning"] = [] (const char *str) { osd_printf_warning("%s\n", str); };
 	emu["print_info"] = [] (const char *str) { osd_printf_info("%s\n", str); };
 	emu["print_debug"] = [] (const char *str) { osd_printf_debug("%s\n", str); };
 	emu["osd_ticks"] = &osd_ticks;
@@ -1959,11 +1957,16 @@ void lua_engine::resume(int nparam)
 	lua_rawgeti(m_lua_state, LUA_REGISTRYINDEX, nparam);
 	lua_State *L = lua_tothread(m_lua_state, -1);
 	lua_pop(m_lua_state, 1);
-	int stat = lua_resume(L, nullptr, 0);
+	int nresults = 0;
+	int stat = lua_resume(L, nullptr, 0, &nresults);
 	if((stat != LUA_OK) && (stat != LUA_YIELD))
 	{
 		osd_printf_error("[LUA ERROR] in resume: %s\n", lua_tostring(L, -1));
 		lua_pop(L, 1);
+	}
+	else
+	{
+		lua_pop(L, nresults);
 	}
 	luaL_unref(m_lua_state, LUA_REGISTRYINDEX, nparam);
 }
