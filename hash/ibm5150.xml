@@ -14060,7 +14060,7 @@ Mangled dump, has no autoexec.bat or config.sys inside, choice.bat doesn't conta
 		<year>1994</year>
 		<publisher>Kixx</publisher>
 		<notes><![CDATA[
-Doesn't pass the video menu delection. Don't know if it's the copy protection check.
+Doesn't pass the video menu detection. Don't know if it's the copy protection check or an emulation problem.
 ]]></notes>
 		<info name="copy_protection" value="Copy protected floppy disk track" />
 		<part name="flop1" interface="floppy_5_25">
