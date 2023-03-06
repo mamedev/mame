@@ -814,7 +814,7 @@ static linenoiseHintsCallback *hintsCallback = NULL;
 static linenoiseFreeHintsCallback *freeHintsCallback = NULL;
 static void *hintsUserdata = NULL;
 
-static void beep() {
+static void beep(void) {
 #ifdef USE_TERMIOS
     fprintf(stderr, "\x7");
     fflush(stderr);

@@ -1678,12 +1678,6 @@ project "linenoise"
 
 	addprojectflags()
 
-	configuration { "gmake or ninja" }
-		buildoptions {
-			"-Wno-error=unused-variable",
-			"-Wno-error=strict-prototypes",
-		}
-
 	configuration { "vs*" }
 		buildoptions {
 			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
