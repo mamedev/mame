@@ -35,6 +35,11 @@ Notes:
       62256     - 32k x8 SRAM
 
 The 30 MHz XTAL (silkscreened as such on PCB) has also been seen as 15MHz on a second PCB
+
+----
+
+basically the hardware is a cost reduced clone of mitchell.cpp with some bits moved around
+
 */
 
 #include "emu.h"
@@ -93,6 +98,8 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void bank_w(uint8_t data);
 	void vidbank_w(uint8_t data);
 	void palbank_w(uint8_t data);
@@ -110,6 +117,9 @@ private:
 	void main_program_map(address_map &map);
 	void main_port_map(address_map &map);
 	void sound_program_map(address_map &map);
+
+	void decode_cpu();
+	void decode_sprites();
 };
 
 void gameace_state::machine_start()
@@ -121,10 +131,37 @@ void gameace_state::machine_start()
 	m_palview.select(0);
 }
 
+void gameace_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect)
+{
+	// very similar to mitchell.cpp, but with everything on a different byte
+	for (int offs = 0x1000 - 0x40; offs >= 0; offs -= 0x20)
+	{
+		int code = m_spriteram[offs + 0x10];
+		int sy = 255 - m_spriteram[offs + 0x11];
+		int attr = m_spriteram[offs + 0x13];
+		int color = attr & 0x0f;
+		int sx = m_spriteram[offs + 0x12] + ((attr & 0x10) << 4);
+		code += (attr & 0xe0) << 3;
+		/*
+		if (m_flipscreen)
+		{
+			sx = 496 - sx;
+			sy = 240 - sy;
+		}
+		*/
+		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+			code,
+			color,
+			0, 0,
+			sx, sy, 15);
+	}
+}
+
 
 uint32_t gameace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
@@ -281,10 +318,24 @@ static INPUT_PORTS_START( hotbody )
 	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_LOW, "SW1:8")
 INPUT_PORTS_END
 
+// note the rows are scrambled, we could reorder this in the init instead
+static const gfx_layout spritelayout =
+{
+	16,16,
+	RGN_FRAC(1,2),
+	4,
+	{ RGN_FRAC(1,2) + 4, RGN_FRAC(1,2) + 0, 4, 0},
+	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3, 32*8+0, 32*8+1, 32*8+2, 32*8+3, 33*8+0, 33*8+1, 33*8+2, 33*8+3 },
+	{ 
+		0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
+		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16
+	},
+	64*8
+};
 
 static GFXDECODE_START( gfx )
-	//GFXDECODE_ENTRY( "sprites", gfx_8x8x4_planar, , 0, 16 ) // TODO
-	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_planar, 0, 0x80 ) // just enough to see the tiles
+	GFXDECODE_ENTRY( "tiles",   0, gfx_8x8x4_planar, 0, 0x80 )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout,     0, 0x80 )
 GFXDECODE_END
 
 
@@ -303,6 +354,7 @@ void gameace_state::gameace(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
 	screen.set_visarea(8*8, 56*8-1, 8, 31*8-1);
+
 	screen.set_screen_update(FUNC(gameace_state::screen_update));
 	screen.set_palette("palette");
 
@@ -324,7 +376,7 @@ ROM_START( hotbody )
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "1.4b", 0x00000, 0x20000, CRC(87e15d1d) SHA1(648d29dbf35638639bbf2ffbcd594e455cecaed2) )
 
-	ROM_REGION( 0x40000, "sprites", 0 )
+	ROM_REGION( 0x40000, "sprites", ROMREGION_INVERT )
 	ROM_LOAD( "3.1f", 0x00000, 0x20000, CRC(680ad651) SHA1(c1e53e7ab0b39d1ab4b6769f64323759ebb976c2) )
 	ROM_LOAD( "4.2f", 0x20000, 0x20000, CRC(33d7cf7b) SHA1(8ed80382e727bee8ccfa7c24aac8b3058264c398) )
 
@@ -351,7 +403,7 @@ ROM_START( hotbodya ) // sprites and sound section ROMs match the above, tilemap
 	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "1.4b", 0x00000, 0x20000, CRC(87e15d1d) SHA1(648d29dbf35638639bbf2ffbcd594e455cecaed2) )
 
-	ROM_REGION( 0x40000, "sprites", 0 )
+	ROM_REGION( 0x40000, "sprites", ROMREGION_INVERT )
 	ROM_LOAD( "3.1f", 0x00000, 0x20000, CRC(680ad651) SHA1(c1e53e7ab0b39d1ab4b6769f64323759ebb976c2) )
 	ROM_LOAD( "4.2f", 0x20000, 0x20000, CRC(33d7cf7b) SHA1(8ed80382e727bee8ccfa7c24aac8b3058264c398) )
 
@@ -371,14 +423,13 @@ ROM_START( hotbodya ) // sprites and sound section ROMs match the above, tilemap
 	ROM_LOAD( "pal4.1d",  0x600, 0x157, NO_DUMP ) // PALCE20V8H-25PC/4
 ROM_END
 
-
-void gameace_state::init_hotbody()
+void gameace_state::decode_cpu()
 {
 	uint8_t* rom = memregion("maincpu")->base();
 	std::vector<uint8_t> buffer(0x40000);
 	memcpy(&buffer[0], rom, 0x40000);
 
-	for (int i = 0x00000; i < 0x40000; i++) // TODO: simplify this
+	for (int i = 0x00000; i < 0x40000; i++)
 	{
 		uint8_t swap_code[0x10] = { 0x0a, 0x07, 0x08, 0x05,   0x06, 0x03, 0x04, 0x01,   0x02, 0x0f, 0x00, 0x0d,   0x0e, 0x0b, 0x0c, 0x09 };
 		uint8_t swap_data[0x10] = { 0x03, 0x02, 0x01, 0x00,   0x05, 0x04, 0x07, 0x06,   0x0d, 0x0c, 0x0f, 0x0e,   0x09, 0x08, 0x0b, 0x0a };
@@ -399,6 +450,50 @@ void gameace_state::init_hotbody()
 
 		rom[i] = buffer[addr];
 	}
+}
+
+void gameace_state::decode_sprites()
+{
+	uint8_t* rom = memregion("sprites")->base();
+	std::vector<uint8_t> buffer(0x40000);
+	memcpy(&buffer[0], rom, 0x40000);
+
+	uint8_t decode_table[0x20] = {
+		                           (2<<1)+1, (2<<1),
+		                           (7<<1),   (7<<1)+1,
+		                           (0<<1)+1, (0<<1),
+		                           (5<<1),   (5<<1)+1,
+		                           (6<<1),   (6<<1)+1,
+		                           (3<<1),   (3<<1)+1,
+		                           (4<<1),   (4<<1)+1,
+		                           (1<<1),   (1<<1)+1,
+
+		                           (10<<1)+1,(10<<1),
+		                           (15<<1),  (15<<1)+1,
+								   (8<<1)+1, (8<<1),
+		                           (13<<1),  (13<<1)+1,
+		                           (14<<1),  (14<<1)+1,
+		                           (11<<1),  (11<<1)+1,
+		                           (12<<1),  (12<<1)+1,
+		                           (9<<1),   (9<<1)+1
+	                             };
+
+
+
+	for (int i = 0x00000; i < 0x40000; i++) 
+	{
+		uint8_t col = i & 0x1f;
+		uint32_t addr = decode_table[col];
+		addr = (i & 0x3ffe0) | addr;
+		rom[i] = buffer[addr];
+	}
+}
+
+
+void gameace_state::init_hotbody()
+{
+	decode_cpu();
+	decode_sprites();
 }
 
 } // anonymous namespace
