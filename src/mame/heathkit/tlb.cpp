@@ -66,12 +66,23 @@ Address   Description
 #define H19_BEEP_FRQ (H19_CLOCK / 2048)
 
 DEFINE_DEVICE_TYPE(TLB, heath_tlb_device, "heath_tlb", "Heath Terminal Logic Board");
-DEFINE_DEVICE_TYPE(SUPER19, heath_super19_tlb_device, "heath_super19_tlb", "Heath Terminal Logic Board");
-DEFINE_DEVICE_TYPE(WATZ, heath_watz_tlb_device, "heath_watz_tlb", "Heath Terminal Logic Board");
-DEFINE_DEVICE_TYPE(ULTRA, heath_ultra_tlb_device, "heath_ultra_tlb", "Heath Terminal Logic Board");
+DEFINE_DEVICE_TYPE(SUPER19, heath_super19_tlb_device, "heath_super19_tlb", "Heath Terminal Logic Board w/Super19 ROM");
+DEFINE_DEVICE_TYPE(WATZ, heath_watz_tlb_device, "heath_watz_tlb", "Heath Terminal Logic Board w/Watzman ROM");
+DEFINE_DEVICE_TYPE(ULTRA, heath_ultra_tlb_device, "heath_ultra_tlb", "Heath Terminal Logic Board w/Ultra ROM");
 
 heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type = TLB)
-		: device_t(mconfig, type, tag, owner, clock), m_palette(*this, "palette"), m_maincpu(*this, "maincpu"), m_crtc(*this, "crtc"), m_ace(*this, "ins8250"), m_beep(*this, "beeper"), m_p_videoram(*this, "videoram"), m_p_chargen(*this, "chargen"), m_mm5740(*this, "mm5740"), m_kbdrom(*this, "keyboard"), m_kbspecial(*this, "MODIFIERS")
+		: /*device_t(mconfig, type, tag, owner, clock)
+		, */rs232_port_device(mconfig, type, tag, owner, clock)
+		, m_palette(*this, "palette")
+		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
+		, m_ace(*this, "ins8250")
+		, m_beep(*this, "beeper")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
+		, m_mm5740(*this, "mm5740")
+		, m_kbdrom(*this, "keyboard")
+		, m_kbspecial(*this, "MODIFIERS")
 {
 }
 

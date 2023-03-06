@@ -14,6 +14,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"
+#include "bus/rs232/rs232.h"
 #include "machine/mm5740.h"
 #include "sound/beep.h"
 #include "video/mc6845.h"
@@ -21,8 +22,8 @@
 #include "screen.h"
 #include "speaker.h"
 
-
-class heath_tlb_device : public device_t
+class heath_tlb_device : // public device_t,
+  public rs232_port_device
 {
 public:
   heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type);
