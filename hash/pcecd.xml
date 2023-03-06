@@ -1061,6 +1061,10 @@ Intro shows several horizontal black/transparent strips over GFXs
 		<description>Dekoboko Densetsu - Hashire Wagamanma (Japan)</description>
 		<year>1990</year>
 		<publisher>Nihon Telenet</publisher>
+	    <notes><![CDATA[
+During intro black stripes appears instead of being solid yellow as background color (btanb)
+Startup count goes 3-2-1 multiple times (btanb)
+]]></notes>
 		<info name="serial" value="TJCD0013"/>
 		<info name="release" value="19901102"/>
 		<info name="alt_title" value="デコボコ伝説 走るワガマンマー"/>
@@ -1089,10 +1093,13 @@ Intro shows several horizontal black/transparent strips over GFXs
 		</part>
 	</software>
 
-	<software name="devmag1">
+	<software name="devmag1" supported="no">
 		<description>Develo Magazine Volume I (Japan)</description>
 		<year>1996</year>
 		<publisher>Tokuma Shoten</publisher>
+		<notes><![CDATA[
+Unemulated interface for development
+]]></notes>
 		<info name="serial" value="TICD-6008"/>
 		<info name="release" value="19961226"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
@@ -1104,10 +1111,13 @@ Intro shows several horizontal black/transparent strips over GFXs
 		</part>
 	</software>
 
-	<software name="devstart">
+	<software name="devstart" supported="no">
 		<description>Develo Starter Kit - Assembler (Japan)</description>
 		<year>1996</year>
 		<publisher>Tokuma Shoten</publisher>
+		<notes><![CDATA[
+Unemulated interface for development
+]]></notes>
 		<info name="serial" value="TICD-6004"/>
 		<info name="release" value="19960301"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
@@ -1119,10 +1129,13 @@ Intro shows several horizontal black/transparent strips over GFXs
 		</part>
 	</software>
 
-	<software name="devbasic">
+	<software name="devbasic" supported="no">
 		<description>Develo Starter Kit - Basic (Japan)</description>
 		<year>1996</year>
 		<publisher>Tokuma Shoten</publisher>
+		<notes><![CDATA[
+Unemulated interface for development
+]]></notes>
 		<info name="serial" value="TICD-6007"/>
 		<info name="release" value="19960910"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
@@ -1364,10 +1377,13 @@ Cannot access option menu, responds to run button by returning to main menu with
 		</part>
 	</software>
 
-	<software name="eferajil">
+	<software name="eferajil" supported="no">
 		<description>Efera &amp; Jiliora - The Emblem from Darkness (Japan)</description>
 		<year>1991</year>
 		<publisher>Brain Gray</publisher>
+	    <notes><![CDATA[
+Returns to intro when pressing start on title (player has to hold start in order to enter gameplay)
+]]></notes>
 		<info name="serial" value="BRCD1002"/>
 		<info name="release" value="19911213"/>
 		<info name="alt_title" value="エフェラ アンド ジリオラ ジ・エンブレム フロム ダークネス"/>

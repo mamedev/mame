@@ -499,10 +499,12 @@ void pce_cd_device::nec_set_audio_start_position()
 			f = bcd_2_dec(m_command_buffer[4]);
 
 			frame = f + 75 * (s + m * 60);
-			LOGCMD("MSF=%d M=%d S=%d F=%d\n", frame, m, s, f);
+			LOGCMD("MSF=%d %02d:%02d:%02d\n", frame, m, s, f);
 			// PCE tries to be clever here and set (start of track + track pregap size) to skip the pregap
-			// (I guess it wants the TOC to have the real start sector for data tracks and the start of the pregap for audio?)
-			frame -= m_toc->tracks[m_cd_file->get_track(frame)].pregap;
+			// default to 2 secs if that isn't provided
+			// cfr. draculax in-game, fzone2 / fzone2j / ddragon2 intro etc.
+			// TODO: is this a global issue and INDEX 01 with no explicit pregap is always 2 seconds in INDEX 00 like in the aforementioned examples?
+			frame -= std::max(m_toc->tracks[m_cd_file->get_track(frame)].pregap, (u32)150);
 			break;
 		}
 		case 0x80:
@@ -596,9 +598,9 @@ void pce_cd_device::nec_set_audio_stop_position()
 			f = bcd_2_dec(m_command_buffer[4]);
 
 			frame = f + 75 * (s + m * 60);
-			LOGCMD("MSF=%d M=%d S=%d F=%d (pregap = %d)\n", frame, m, s, f, m_toc->tracks[m_cd_file->get_track(frame)].pregap);
+			LOGCMD("MSF=%d %02d:%02d:%02d (pregap = %d)\n", frame, m, s, f, m_toc->tracks[m_cd_file->get_track(frame)].pregap);
 			// TODO: pinpoint if this needs a gap offset too
-			// frame -= m_toc->tracks[m_cd_file->get_track(frame)].pregap;
+			frame -= std::max(m_toc->tracks[m_cd_file->get_track(frame)].pregap, (u32)150);
 			break;
 		}
 		case 0x80:
