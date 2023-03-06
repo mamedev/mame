@@ -288,7 +288,7 @@ static int get_dir(lua_State * L)
   size_t size = LFS_MAXPATHLEN; /* initial buffer size */
   int result;
   while (1) {
-    char *path2 = realloc(path, size);
+    char *path2 = (char *)realloc(path, size);
     if (!path2) {               /* failed to allocate */
       result = pusherror(L, "get_dir realloc() failed");
       break;
@@ -1078,7 +1078,7 @@ static int push_link_target(lua_State * L)
   int tsize, size = 256;        /* size = initial buffer capacity */
   int ok = 0;
   while (!ok) {
-    char *target2 = realloc(target, size);
+    char *target2 = (char *)realloc(target, size);
     if (!target2) {             /* failed to allocate */
       break;
     }

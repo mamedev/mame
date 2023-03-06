@@ -175,7 +175,7 @@ static void vm_push_column(lua_State *L, sqlite3_stmt *vm, int idx) {
             lua_pushlstring(L, (const char*)sqlite3_column_text(vm, idx), sqlite3_column_bytes(vm, idx));
             break;
         case SQLITE_BLOB:
-            lua_pushlstring(L, sqlite3_column_blob(vm, idx), sqlite3_column_bytes(vm, idx));
+            lua_pushlstring(L, (const char*)sqlite3_column_blob(vm, idx), sqlite3_column_bytes(vm, idx));
             break;
         case SQLITE_NULL:
             lua_pushnil(L);
@@ -667,7 +667,7 @@ static int cleanupdb(lua_State *L, sdb *db) {
     top = lua_gettop(L);
     lua_pushnil(L);
     while (lua_next(L, -2)) {
-        sdb_vm *svm = lua_touserdata(L, -2); /* key: vm; val: sql text */
+        sdb_vm *svm = (sdb_vm*)lua_touserdata(L, -2); /* key: vm; val: sql text */
         cleanupvm(L, svm);
 
         lua_settop(L, top);
@@ -961,7 +961,7 @@ static void db_push_value(lua_State *L, sqlite3_value *value) {
             break;
 
         case SQLITE_BLOB:
-            lua_pushlstring(L, sqlite3_value_blob(value), sqlite3_value_bytes(value));
+            lua_pushlstring(L, (const char*)sqlite3_value_blob(value), sqlite3_value_bytes(value));
             break;
 
         case SQLITE_NULL:
@@ -1179,8 +1179,8 @@ static int collwrapper(scc *co,int l1,const void *p1,
     int res=0;
     lua_State *L=co->L;
     lua_rawgeti(L,LUA_REGISTRYINDEX,co->ref);
-    lua_pushlstring(L,p1,l1);
-    lua_pushlstring(L,p2,l2);
+    lua_pushlstring(L,(const char*)p1,l1);
+    lua_pushlstring(L,(const char*)p2,l2);
     if (lua_pcall(L,2,1,0)==0) res=(int)lua_tonumber(L,-1);
     lua_pop(L,1);
     return res;
@@ -2001,7 +2001,7 @@ static int db_close_vm(lua_State *L) {
     /* close all used handles */
     lua_pushnil(L);
     while (lua_next(L, -2)) {
-        sdb_vm *svm = lua_touserdata(L, -2); /* key: vm; val: sql text */
+        sdb_vm *svm = (sdb_vm*)lua_touserdata(L, -2); /* key: vm; val: sql text */
 
         if ((!temp || svm->temp) && svm->vm)
         {
@@ -2112,7 +2112,7 @@ static int lsqlite_open_ptr(lua_State *L) {
     int rc;
 
     luaL_checktype(L, 1, LUA_TLIGHTUSERDATA);
-    db_ptr = lua_touserdata(L, 1);
+    db_ptr = (sqlite3*)lua_touserdata(L, 1);
     /* This is the only API function that runs sqlite3SafetyCheck regardless of
      * SQLITE_ENABLE_API_ARMOR and does almost nothing (without an SQL
      * statement) */
