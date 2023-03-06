@@ -46,9 +46,6 @@ Notes:
     - verify cursor keys
     - language DIP
     - mouse
-    - MCS-48 PC:01DC - Unimplemented opcode = 75
-        - 75 = ENT0 CLK : enable CLK (unscaled_clock/3) output on T0
-        - halt Z2 when Z5 is reset, resume Z2 when Z5 executes ENT0 CLK instruction
 
 */
 
@@ -123,22 +120,23 @@ void abc99_device::abc99_z2_mem(address_map &map)
 void abc99_device::abc99_z2_io(address_map &map)
 {
 	map(0x21, 0x21).w(FUNC(abc99_device::z2_led_w));
-	map(0x30, 0x30).portr("X0").nopw();
-	map(0x31, 0x31).portr("X1").nopw();
-	map(0x32, 0x32).portr("X2").nopw();
-	map(0x33, 0x33).portr("X3").nopw();
-	map(0x34, 0x34).portr("X4").nopw();
-	map(0x35, 0x35).portr("X5").nopw();
-	map(0x36, 0x36).portr("X6").nopw();
-	map(0x37, 0x37).portr("X7").nopw();
-	map(0x38, 0x38).portr("X8").nopw();
-	map(0x39, 0x39).portr("X9").nopw();
-	map(0x3a, 0x3a).portr("X10").nopw();
-	map(0x3b, 0x3b).portr("X11").nopw();
-	map(0x3c, 0x3c).portr("X12").nopw();
-	map(0x3d, 0x3d).portr("X13").nopw();
-	map(0x3e, 0x3e).portr("X14").nopw();
-	map(0x3f, 0x3f).portr("X15").nopw();
+	map(0x30, 0x3f).nopw();
+	map(0x30, 0x30).portr("X0");
+	map(0x31, 0x31).portr("X1");
+	map(0x32, 0x32).portr("X2");
+	map(0x33, 0x33).portr("X3");
+	map(0x34, 0x34).portr("X4");
+	map(0x35, 0x35).portr("X5");
+	map(0x36, 0x36).portr("X6");
+	map(0x37, 0x37).portr("X7");
+	map(0x38, 0x38).portr("X8");
+	map(0x39, 0x39).portr("X9");
+	map(0x3a, 0x3a).portr("X10");
+	map(0x3b, 0x3b).portr("X11");
+	map(0x3c, 0x3c).portr("X12");
+	map(0x3d, 0x3d).portr("X13");
+	map(0x3e, 0x3e).portr("X14");
+	map(0x3f, 0x3f).portr("X15");
 }
 
 
@@ -159,7 +157,7 @@ void abc99_device::abc99_z5_mem(address_map &map)
 void abc99_device::device_add_mconfig(machine_config &config)
 {
 	// keyboard CPU
-	I8035(config, m_maincpu, XTAL(6'000'000)/3); // from Z5 T0 output
+	I8035(config, m_maincpu, 0); // from Z5 T0 output
 	m_maincpu->set_addrmap(AS_PROGRAM, &abc99_device::abc99_z2_mem);
 	m_maincpu->set_addrmap(AS_IO, &abc99_device::abc99_z2_io);
 	m_maincpu->p1_out_cb().set(FUNC(abc99_device::z2_p1_w));
@@ -170,11 +168,10 @@ void abc99_device::device_add_mconfig(machine_config &config)
 	// mouse CPU
 	I8035(config, m_mousecpu, XTAL(6'000'000));
 	m_mousecpu->set_addrmap(AS_PROGRAM, &abc99_device::abc99_z5_mem);
-	//m_mousecpu->p1_in_cb().set(FUNC(abc99_device::z5_p1_r));
-	//m_mousecpu->p2_out_cb().set(FUNC(abc99_device::z5_p2_w));
-	//m_mousecpu->set_t0_clk_cb(); // Z2 CLK
-	//m_mousecpu->t1_in_cb().set(FUNC(abc99_device::z5_t1_r));
-	m_mousecpu->set_disable(); // HACK fix for broken serial I/O
+	m_mousecpu->p1_in_cb().set(FUNC(abc99_device::z5_p1_r));
+	m_mousecpu->p2_out_cb().set(FUNC(abc99_device::z5_p2_w));
+	m_mousecpu->set_t0_clk_cb(I8035_Z2_TAG, FUNC(device_t::set_unscaled_clock_int));
+	m_mousecpu->t1_in_cb().set(FUNC(abc99_device::z5_t1_r));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -413,21 +410,6 @@ void abc99_device::serial_input()
 
 
 //-------------------------------------------------
-//  serial_output -
-//-------------------------------------------------
-
-void abc99_device::serial_output(int state)
-{
-	if (m_txd != state)
-	{
-		m_txd = state;
-
-		m_slot->write_rx(m_txd);
-	}
-}
-
-
-//-------------------------------------------------
 //  serial_clock -
 //-------------------------------------------------
 
@@ -447,20 +429,6 @@ TIMER_CALLBACK_MEMBER(abc99_device::scan_mouse)
 }
 
 
-//-------------------------------------------------
-//  keydown -
-//-------------------------------------------------
-
-void abc99_device::key_down(int state)
-{
-	if (m_keydown != state)
-	{
-		m_slot->keydown_w(state);
-		m_keydown = state;
-	}
-}
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -472,7 +440,9 @@ void abc99_device::key_down(int state)
 
 abc99_device::abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ABC99, tag, owner, clock),
-	abc_keyboard_interface(mconfig, *this), m_serial_timer(nullptr), m_mouse_timer(nullptr),
+	abc_keyboard_interface(mconfig, *this),
+	m_serial_timer(nullptr),
+	m_mouse_timer(nullptr),
 	m_maincpu(*this, I8035_Z2_TAG),
 	m_mousecpu(*this, I8035_Z5_TAG),
 	m_speaker(*this, "speaker"),
@@ -483,12 +453,10 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 	m_si_en(1),
 	m_so_z2(1),
 	m_so_z5(1),
-	m_keydown(0),
 	m_t1_z2(0),
 	m_t1_z5(0),
-	m_led_en(0),
-	m_reset(1),
-	m_txd(1)
+	m_led_en(1),
+	m_reset(1)
 {
 }
 
@@ -500,6 +468,7 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 void abc99_device::device_start()
 {
 	m_leds.resolve();
+
 	// allocate timers
 	m_serial_timer = timer_alloc(FUNC(abc99_device::serial_clock), this);
 	m_serial_timer->adjust(MCS48_ALE_CLOCK(XTAL(6'000'000)/3), 0, MCS48_ALE_CLOCK(XTAL(6'000'000)/3));
@@ -511,12 +480,10 @@ void abc99_device::device_start()
 	save_item(NAME(m_si_en));
 	save_item(NAME(m_so_z2));
 	save_item(NAME(m_so_z5));
-	save_item(NAME(m_keydown));
 	save_item(NAME(m_t1_z2));
 	save_item(NAME(m_t1_z5));
 	save_item(NAME(m_led_en));
 	save_item(NAME(m_reset));
-	save_item(NAME(m_txd));
 }
 
 
@@ -526,7 +493,7 @@ void abc99_device::device_start()
 
 void abc99_device::device_reset()
 {
-	// set EA lines
+	// external access
 	m_maincpu->set_input_line(MCS48_INPUT_EA, ASSERT_LINE);
 	m_mousecpu->set_input_line(MCS48_INPUT_EA, ASSERT_LINE);
 
@@ -590,10 +557,10 @@ void abc99_device::z2_p1_w(uint8_t data)
 
 	// serial output
 	m_so_z2 = BIT(data, 0);
-	serial_output(m_so_z2 && m_so_z5);
+	m_slot->write_rx(m_so_z2 && m_so_z5);
 
 	// key down
-	key_down(!BIT(data, 1));
+	m_slot->keydown_w(!BIT(data, 1));
 
 	// master T1
 	m_t1_z5 = BIT(data, 2);
@@ -635,26 +602,6 @@ uint8_t abc99_device::z2_p2_r()
 	uint8_t data = m_z14->read() << 5;
 
 	return data;
-}
-
-
-//-------------------------------------------------
-//  z2_t0_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( abc99_device::z2_t0_r )
-{
-	return 1; // 0=mouse connected, 1=no mouse
-}
-
-
-//-------------------------------------------------
-//  z2_t1_r -
-//-------------------------------------------------
-
-READ_LINE_MEMBER( abc99_device::z2_t1_r )
-{
-	return m_t1_z2;
 }
 
 
@@ -724,27 +671,17 @@ void abc99_device::z5_p2_w(uint8_t data)
 	// Z2 reset
 	int reset = BIT(data, 5);
 
-	if (!m_reset && reset)
+	if (m_reset != reset)
 	{
-		m_maincpu->reset();
+		m_maincpu->set_input_line(INPUT_LINE_RESET, reset ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	m_reset = reset;
 
 	// serial output
 	m_so_z5 = BIT(data, 6);
-	serial_output(m_so_z2 && m_so_z5);
+	m_slot->write_rx(m_so_z2 && m_so_z5);
 
 	// keyboard CPU T1
 	m_t1_z2 = BIT(data, 7);
-}
-
-
-//-------------------------------------------------
-//  z5_t1_r -
-//-------------------------------------------------
-
-uint8_t abc99_device::z5_t1_r()
-{
-	return m_t1_z5;
 }
