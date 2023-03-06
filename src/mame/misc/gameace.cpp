@@ -101,7 +101,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<ym2151_device> m_ymsnd;
 
-	std::vector<uint8_t> m_paletteram;
+	std::unique_ptr<uint8_t[]> m_paletteram;
 
 	tilemap_t *m_fg_tilemap = nullptr;
 
@@ -198,9 +198,9 @@ void gameace_state::colram_w(offs_t offset, uint8_t data)
 void gameace_state::video_start()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gameace_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-
-	m_paletteram.resize(2 * m_palette->entries());
-	m_palette->basemem().set(m_paletteram, ENDIANNESS_LITTLE, 2);
+	m_paletteram = std::make_unique<uint8_t[]>(0x1000);
+	m_palette->basemem().set(m_paletteram.get(), 0x1000, 8, ENDIANNESS_LITTLE, 2);
+	save_pointer(NAME(m_paletteram), 0x1000);
 }
 
 
@@ -252,7 +252,7 @@ void gameace_state::pal_high_w(offs_t offset, uint8_t data)
 void gameace_state::main_program_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
-	map(0x8000, 0xbfff).bankr("bank1");
+	map(0x8000, 0xbfff).bankr(m_membank);
 	map(0xc000, 0xc7ff).view(m_palview);
 	m_palview[0](0xc000, 0xc7ff).rw(FUNC(gameace_state::pal_low_r), FUNC(gameace_state::pal_low_w));
 	m_palview[1](0xc000, 0xc7ff).rw(FUNC(gameace_state::pal_high_r), FUNC(gameace_state::pal_high_w));
@@ -324,7 +324,7 @@ static INPUT_PORTS_START( hotbody )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
 	PORT_START("UNK")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION( "SW1:1,2" )
@@ -461,10 +461,11 @@ void gameace_state::decode_cpu()
 	std::vector<uint8_t> buffer(0x40000);
 	memcpy(&buffer[0], rom, 0x40000);
 
+	constexpr uint8_t swap_code[0x10] = { 0x0a, 0x07, 0x08, 0x05,   0x06, 0x03, 0x04, 0x01,   0x02, 0x0f, 0x00, 0x0d,   0x0e, 0x0b, 0x0c, 0x09 };
+	constexpr uint8_t swap_data[0x10] = { 0x03, 0x02, 0x01, 0x00,   0x05, 0x04, 0x07, 0x06,   0x0d, 0x0c, 0x0f, 0x0e,   0x09, 0x08, 0x0b, 0x0a };
+
 	for (int i = 0x00000; i < 0x40000; i++)
 	{
-		uint8_t swap_code[0x10] = { 0x0a, 0x07, 0x08, 0x05,   0x06, 0x03, 0x04, 0x01,   0x02, 0x0f, 0x00, 0x0d,   0x0e, 0x0b, 0x0c, 0x09 };
-		uint8_t swap_data[0x10] = { 0x03, 0x02, 0x01, 0x00,   0x05, 0x04, 0x07, 0x06,   0x0d, 0x0c, 0x0f, 0x0e,   0x09, 0x08, 0x0b, 0x0a };
 
 		uint8_t col = i & 0x0f;
 		uint32_t addr;
@@ -490,7 +491,7 @@ void gameace_state::decode_sprites()
 	std::vector<uint8_t> buffer(0x40000);
 	memcpy(&buffer[0], rom, 0x40000);
 
-	uint8_t decode_table[0x20] = {
+	constexpr uint8_t decode_table[0x20] = {
 		                           (2<<1)+1, (2<<1),
 		                           (7<<1),   (7<<1)+1,
 		                           (0<<1)+1, (0<<1),
