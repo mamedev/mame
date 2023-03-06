@@ -61,8 +61,10 @@ public:
 		m_fgram(*this, "fgram"),
 		m_spriteram(*this, "spriteram"),
 		m_videoview(*this, "videoview"),
+		m_palview(*this, "palview"),
 		m_colram(*this, "colram"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette")
 	{
 	}
 
@@ -80,8 +82,12 @@ private:
 	required_shared_ptr<uint8_t> m_fgram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	memory_view m_videoview;
+	memory_view m_palview;
 	required_shared_ptr<uint8_t> m_colram;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+
+	std::vector<uint8_t> m_paletteram;
 
 	tilemap_t *m_fg_tilemap = nullptr;
 
@@ -89,10 +95,16 @@ private:
 
 	void bank_w(uint8_t data);
 	void vidbank_w(uint8_t data);
+	void palbank_w(uint8_t data);
 
 	void fgram_w(offs_t offset, uint8_t data);
 	void colram_w(offs_t offset, uint8_t data);
 	uint8_t rand_r();
+
+	uint8_t pal_low_r(offs_t offset, uint8_t data);
+	uint8_t pal_high_r(offs_t offset, uint8_t data);
+	void pal_low_w(offs_t offset, uint8_t data);
+	void pal_high_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
@@ -107,6 +119,7 @@ void gameace_state::machine_start()
 	m_membank->configure_entries(0, 0x10, &rom[0x00000], 0x4000);
 	m_membank->set_entry(7);
 	m_videoview.select(0);
+	m_palview.select(0);
 }
 
 
@@ -138,16 +151,34 @@ void gameace_state::colram_w(offs_t offset, uint8_t data)
 void gameace_state::video_start()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gameace_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+
+	m_paletteram.resize(2 * m_palette->entries());
+	m_palette->basemem().set(m_paletteram, ENDIANNESS_LITTLE, 2);
 }
 
 
 void gameace_state::bank_w(uint8_t data)
 {
+	if (data & 0xf0)
+		logerror("bank_w unused bits %02x\n", data & 0xf0);
+
 	m_membank->set_entry(data & 0xf);
 }
 
+void gameace_state::palbank_w(uint8_t data)
+{
+	if (data & 0xdf)
+		logerror("palbank_w unused bits %02x\n", data & 0xdf);
+
+	m_palview.select((data & 0x20)>>5);
+}
+
+
 void gameace_state::vidbank_w(uint8_t data)
 {
+	if (data & 0xfe)
+		logerror("videbank_w unused bits %02x\n", data & 0xfe);
+
 	m_videoview.select(data & 1);
 }
 
@@ -156,11 +187,33 @@ uint8_t gameace_state::rand_r()
 	return machine().rand();
 }
 
+uint8_t gameace_state::pal_low_r(offs_t offset, uint8_t data)
+{
+	return m_palette->read8(offset);
+}
+
+uint8_t gameace_state::pal_high_r(offs_t offset, uint8_t data)
+{
+	return m_palette->read8(offset+0x800);
+}
+
+void gameace_state::pal_low_w(offs_t offset, uint8_t data)
+{
+	m_palette->write8(offset, data);
+}
+
+void gameace_state::pal_high_w(offs_t offset, uint8_t data)
+{
+	m_palette->write8(offset+0x800, data);
+}
+
 void gameace_state::main_program_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xc7ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
+	map(0xc000, 0xc7ff).view(m_palview);
+	m_palview[0](0xc000, 0xc7ff).rw(FUNC(gameace_state::pal_low_r), FUNC(gameace_state::pal_low_w));
+	m_palview[1](0xc000, 0xc7ff).rw(FUNC(gameace_state::pal_high_r), FUNC(gameace_state::pal_high_w));
 	map(0xc800, 0xcfff).ram().w(FUNC(gameace_state::colram_w)).share(m_colram);
 	map(0xd000, 0xdfff).view(m_videoview);
 	m_videoview[0](0xd000, 0xdfff).ram().w(FUNC(gameace_state::fgram_w)).share(m_fgram);
@@ -176,9 +229,9 @@ void gameace_state::main_port_map(address_map &map)
 	map(0x00, 0x00).r(FUNC(gameace_state::rand_r));
 	map(0x02, 0x02).rw(FUNC(gameace_state::rand_r), FUNC(gameace_state::vidbank_w));
 	map(0x04, 0x04).r(FUNC(gameace_state::rand_r));
-	map(0x05, 0x05).nopw();
-	map(0x07, 0x07).r(FUNC(gameace_state::rand_r)).nopw();
+	//map(0x05, 0x05).nopw();
 	map(0x06, 0x06).w(FUNC(gameace_state::bank_w));
+	map(0x07, 0x07).rw(FUNC(gameace_state::rand_r),FUNC(gameace_state::palbank_w));
 }
 
 void gameace_state::sound_program_map(address_map &map) // TODO: banking and everything else
@@ -228,7 +281,7 @@ INPUT_PORTS_END
 
 static GFXDECODE_START( gfx )
 	//GFXDECODE_ENTRY( "sprites", gfx_8x8x4_planar, , 0, 16 ) // TODO
-	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_planar, 0, 0x40 ) // just enough to see the tiles
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_planar, 0, 0x80 ) // just enough to see the tiles
 GFXDECODE_END
 
 
@@ -246,12 +299,12 @@ void gameace_state::gameace(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
-	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_visarea(8*8, 56*8-1, 8, 31*8-1);
 	screen.set_screen_update(FUNC(gameace_state::screen_update));
 	screen.set_palette("palette");
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx);
-	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x400).set_endianness(ENDIANNESS_LITTLE);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x800).set_endianness(ENDIANNESS_LITTLE);
 
 	SPEAKER(config, "mono").front_center();
 
