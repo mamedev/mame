@@ -548,6 +548,19 @@ INPUT_PORTS_END
 //  Z80DMA 0
 //-------------------------------------------------
 
+void abc1600_state::update_br()
+{
+	// disabled since this breaks the systest, should use 68000 BR line instead
+	if (!m_dmadis)
+	{
+		//m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	}
+	else
+	{
+		//m_maincpu->set_input_line(INPUT_LINE_HALT, m_dbrq0 || m_dbrq1 || m_dbrq2);
+	}
+}
+
 void abc1600_state::update_pren0(int state)
 {
 	if (m_sysfs)
@@ -580,10 +593,6 @@ void abc1600_state::update_drdy0(int state)
 	}
 }
 
-WRITE_LINE_MEMBER( abc1600_state::dbrq_w )
-{
-	m_maincpu->set_input_line(INPUT_LINE_HALT, state && m_dmadis);
-}
 
 //-------------------------------------------------
 //  Z80DMA 1
@@ -837,6 +846,9 @@ void abc1600_state::machine_start()
 	save_item(NAME(m_dmadis));
 	save_item(NAME(m_sysscc));
 	save_item(NAME(m_sysfs));
+	save_item(NAME(m_dbrq0));
+	save_item(NAME(m_dbrq1));
+	save_item(NAME(m_dbrq2));
 	save_item(NAME(m_cs7));
 	save_item(NAME(m_bus0));
 	save_item(NAME(m_csb));
@@ -900,7 +912,7 @@ void abc1600_state::abc1600(machine_config &config)
 	spec_contr_reg.q_out_cb<7>().set(FUNC(abc1600_state::sysfs_w));
 
 	Z80DMA(config, m_dma0, 64_MHz_XTAL / 16);
-	m_dma0->out_busreq_callback().set(FUNC(abc1600_state::dbrq_w));
+	m_dma0->out_busreq_callback().set(FUNC(abc1600_state::dbrq0_w));
 	m_dma0->out_bao_callback().set(m_dma1, FUNC(z80dma_device::bai_w));
 	m_dma0->in_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_mreq_r));
 	m_dma0->out_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_mreq_w));
@@ -909,7 +921,7 @@ void abc1600_state::abc1600(machine_config &config)
 	m_dma0->out_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma0_iorq_w));
 
 	Z80DMA(config, m_dma1, 64_MHz_XTAL / 16);
-	m_dma1->out_busreq_callback().set(FUNC(abc1600_state::dbrq_w));
+	m_dma1->out_busreq_callback().set(FUNC(abc1600_state::dbrq1_w));
 	m_dma1->out_bao_callback().set(m_dma2, FUNC(z80dma_device::bai_w));
 	m_dma1->in_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma1_mreq_r));
 	m_dma1->out_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma1_mreq_w));
@@ -918,7 +930,7 @@ void abc1600_state::abc1600(machine_config &config)
 	m_dma1->out_iorq_callback().set(m_mac, FUNC(abc1600_mac_device::dma1_iorq_w));
 
 	Z80DMA(config, m_dma2, 64_MHz_XTAL / 16);
-	m_dma2->out_busreq_callback().set(FUNC(abc1600_state::dbrq_w));
+	m_dma2->out_busreq_callback().set(FUNC(abc1600_state::dbrq2_w));
 	m_dma2->in_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma2_mreq_r));
 	m_dma2->out_mreq_callback().set(m_mac, FUNC(abc1600_mac_device::dma2_mreq_w));
 	m_dma2->out_ieo_callback().set(m_bus2, FUNC(abcbus_slot_device::prac_w)).exor(1);
@@ -1044,4 +1056,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME    FLAGS
-COMP( 1985, abc1600, 0,      0,      abc1600, abc1600, abc1600_state, empty_init, "Luxor", "ABC 1600", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, abc1600, 0,      0,      abc1600, abc1600, abc1600_state, empty_init, "Luxor", "ABC 1600", MACHINE_SUPPORTS_SAVE )
