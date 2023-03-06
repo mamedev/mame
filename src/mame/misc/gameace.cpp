@@ -59,6 +59,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_membank(*this, "bank1"),
 		m_fgram(*this, "fgram"),
+		m_spriteram(*this, "spriteram"),
+		m_videoview(*this, "videoview"),
 		m_colram(*this, "colram"),
 		m_gfxdecode(*this, "gfxdecode")
 	{
@@ -70,11 +72,14 @@ public:
 
 protected:
 	virtual void video_start() override;
+	virtual void machine_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
-	optional_memory_bank m_membank;
+	required_memory_bank m_membank;
 	required_shared_ptr<uint8_t> m_fgram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	memory_view m_videoview;
 	required_shared_ptr<uint8_t> m_colram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
@@ -83,6 +88,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void bank_w(uint8_t data);
+	void vidbank_w(uint8_t data);
 
 	void fgram_w(offs_t offset, uint8_t data);
 	void colram_w(offs_t offset, uint8_t data);
@@ -94,6 +100,15 @@ private:
 	void main_port_map(address_map &map);
 	void sound_program_map(address_map &map);
 };
+
+void gameace_state::machine_start()
+{
+	uint8_t* rom = memregion("maincpu")->base();
+	m_membank->configure_entries(0, 0x10, &rom[0x00000], 0x4000);
+	m_membank->set_entry(7);
+	m_videoview.select(0);
+}
+
 
 uint32_t gameace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -131,6 +146,11 @@ void gameace_state::bank_w(uint8_t data)
 	m_membank->set_entry(data & 0xf);
 }
 
+void gameace_state::vidbank_w(uint8_t data)
+{
+	m_videoview.select(data & 1);
+}
+
 uint8_t gameace_state::rand_r()
 {
 	return machine().rand();
@@ -142,7 +162,9 @@ void gameace_state::main_program_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xc7ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0xc800, 0xcfff).ram().w(FUNC(gameace_state::colram_w)).share(m_colram);
-	map(0xd000, 0xdfff).ram().w(FUNC(gameace_state::fgram_w)).share(m_fgram); // banked with sprites?
+	map(0xd000, 0xdfff).view(m_videoview);
+	m_videoview[0](0xd000, 0xdfff).ram().w(FUNC(gameace_state::fgram_w)).share(m_fgram);
+	m_videoview[1](0xd000, 0xdfff).ram().share(m_spriteram);
 	map(0xe000, 0xefff).ram();
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xffff).ram();
@@ -152,11 +174,11 @@ void gameace_state::main_port_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).r(FUNC(gameace_state::rand_r));
-	map(0x02, 0x02).r(FUNC(gameace_state::rand_r)).nopw();
+	map(0x02, 0x02).rw(FUNC(gameace_state::rand_r), FUNC(gameace_state::vidbank_w));
 	map(0x04, 0x04).r(FUNC(gameace_state::rand_r));
 	map(0x05, 0x05).nopw();
 	map(0x07, 0x07).r(FUNC(gameace_state::rand_r)).nopw();
-	map(0x06, 0x06).ram().w(FUNC(gameace_state::bank_w));
+	map(0x06, 0x06).w(FUNC(gameace_state::bank_w));
 }
 
 void gameace_state::sound_program_map(address_map &map) // TODO: banking and everything else
@@ -321,9 +343,6 @@ void gameace_state::init_hotbody()
 
 		rom[i] = buffer[addr];
 	}
-
-	m_membank->configure_entries(0, 0x10, &rom[0x00000], 0x4000);
-	m_membank->set_entry(7);
 }
 
 } // anonymous namespace
