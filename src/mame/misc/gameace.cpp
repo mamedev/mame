@@ -153,7 +153,7 @@ void gameace_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect
 			code,
 			color,
 			0, 0,
-			sx, sy, 15);
+			sx-7, sy-14, 15);
 	}
 }
 
