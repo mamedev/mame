@@ -202,7 +202,7 @@ static int cmp_range(const void *key, const void *cm)
 static int utf8_in_range(const struct utf8range *range, int num, int ch)
 {
     const struct utf8range *r =
-        bsearch(&ch, range, num, sizeof(*range), cmp_range);
+        (const struct utf8range *)bsearch(&ch, range, num, sizeof(*range), cmp_range);
 
     if (r) {
         return 1;

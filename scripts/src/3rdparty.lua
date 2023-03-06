@@ -936,9 +936,8 @@ project "lualibs"
 	}
 
 	configuration { "gmake or ninja" }
-		buildoptions { -- Lua SQLite3, Lua filesystem and Lua zlib don't cast pointers* explicitly
-			"-Wno-error",
-			"-fpermissive",
+		buildoptions {
+			"-Wno-error=unused-variable",
 		}
 
 	configuration { "vs*" }
@@ -1680,9 +1679,9 @@ project "linenoise"
 	}
 
 	configuration { "gmake or ninja" }
-		buildoptions { -- implicit pointer conversions
-			"-Wno-error",
-			"-fpermissive",
+		buildoptions {
+			"-Wno-error=unused-variable",
+			"-Wno-error=implicit-fallthrough",
 		}
 
 	configuration { "vs*" }
