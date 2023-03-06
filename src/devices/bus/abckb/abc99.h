@@ -63,20 +63,18 @@ private:
 	};
 
 	void serial_input();
-	void serial_output(int state);
 	TIMER_CALLBACK_MEMBER(serial_clock);
 	TIMER_CALLBACK_MEMBER(scan_mouse);
-	void key_down(int state);
 
 	void z2_p1_w(uint8_t data);
 	uint8_t z2_p2_r();
-	DECLARE_READ_LINE_MEMBER( z2_t0_r );
-	DECLARE_READ_LINE_MEMBER( z2_t1_r );
+	DECLARE_READ_LINE_MEMBER( z2_t0_r ) { return 1; /* 0=mouse connected, 1=no mouse */ }
+	DECLARE_READ_LINE_MEMBER( z2_t1_r ) { return m_t1_z2; }
 
 	void z2_led_w(uint8_t data);
 	uint8_t z5_p1_r();
 	void z5_p2_w(uint8_t data);
-	uint8_t z5_t1_r();
+	DECLARE_READ_LINE_MEMBER( z5_t1_r ) { return m_t1_z5; }
 
 	void abc99_z2_io(address_map &map);
 	void abc99_z2_mem(address_map &map);
@@ -96,12 +94,10 @@ private:
 	int m_si_en;
 	int m_so_z2;
 	int m_so_z5;
-	int m_keydown;
 	int m_t1_z2;
 	int m_t1_z5;
 	int m_led_en;
 	int m_reset;
-	int m_txd;
 };
 
 
