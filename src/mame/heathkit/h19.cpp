@@ -25,6 +25,7 @@
 
 #include "tlb.h"
 
+namespace {
 #define H19_CLOCK (XTAL(12'288'000) / 6)
 
 class h19_state : public driver_device
@@ -79,7 +80,7 @@ ROM_END
 
 ROM_START( ultra19 )
 ROM_END
-
+} // anonymous namespace
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY      FULLNAME                         FLAGS
 COMP( 1979, h19,     0,      0,      h19,     0,   h19_state, empty_init, "Heath Company", "Heathkit H-19",                 MACHINE_SUPPORTS_SAVE )
