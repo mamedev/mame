@@ -9,6 +9,7 @@
 #include "bus/msx/slot/ram.h"
 #include "bus/msx/slot/ram_mm.h"
 #include "bus/msx/slot/rom.h"
+#include "softlist_dev.h"
 
 using namespace msx_keyboard;
 
@@ -306,9 +307,6 @@ ROM_START(cx5m128)
 
 	ROM_REGION(0x4000, "subrom", ROMREGION_ERASEFF)
 	ROM_LOAD("cx5m128sub.rom",  0x0000, 0x2000, CRC(b17a776d) SHA1(c2340313bfda751181e8a5287d60f77bc6a2f3e6))
-
-	ROM_REGION(0x4000, "minicart", 0)
-	ROM_LOAD("yrm502.rom", 0x0000, 0x4000, CRC(5412d5dc) SHA1(30747a56f45389be76362f7fc55d673f1bff8312))
 ROM_END
 
 void msx1_v9938_state::cx5m128(machine_config &config)
@@ -324,12 +322,13 @@ void msx1_v9938_state::cx5m128(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 1, 1, "subrom");
-	add_internal_slot(config, MSX_SLOT_ROM, "minicart", 3, 1, 1, 1, "minicart"); /* YRM-502 */
+	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_MINICART, "minicart", 3, 1, msx_yamaha_minicart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000);   // 128KB Mapper RAM
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, "sfg05");
+	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, "sfg05");
 
 	m_hw_def.no_code_led();
 	msx1_v9938_pal(SND_YM2149, config, REGION_INTERNATIONAL);
+	SOFTWARE_LIST(config, "minicart_list").set_original("msx_yamaha_minicart");
 }
 
 /* MSX - Yamaha CX5MII-128 C (Canada) */
@@ -357,9 +356,6 @@ ROM_START(cx5miib)
 	ROM_REGION(0x4000, "subrom", 0)
 	// overdump?
 	ROM_LOAD("cx5mii_sub.rom",  0x0000, 0x4000, BAD_DUMP CRC(317f9bb5) SHA1(0ce800666c0d66bc2aa0b73a16f228289b9198be))
-
-	ROM_REGION(0x4000, "minicart", 0)
-	ROM_LOAD("yrm502.rom", 0x0000, 0x4000, CRC(5330fe21) SHA1(7b1798561ee1844a7d6432924fbee9b4fc591c19))
 ROM_END
 
 void msx1_v9938_state::cx5miib(machine_config &config)
@@ -375,12 +371,13 @@ void msx1_v9938_state::cx5miib(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 1, 1, "subrom");
-	add_internal_slot(config, MSX_SLOT_ROM, "minicart", 3, 1, 1, 1, "minicart"); /* YRM-502 */
+	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_MINICART, "minicart", 3, 1, msx_yamaha_minicart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x10000);   // 64KB Mapper RAM
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, "sfg05");
+	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, "sfg05");
 
 	m_hw_def.no_code_led();
 	msx1_v9938_pal(SND_YM2149, config, REGION_INTERNATIONAL);
+	SOFTWARE_LIST(config, "minicart_list").set_original("msx_yamaha_minicart");
 }
 
 /* MSX - Yamaha CX5MIIC (Canada) */
@@ -444,12 +441,13 @@ void msx1_v9938_state::y503iir(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
-	//  Mini cartridge slot in slot #3-1
+	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_MINICART, "minicart", 3, 1, msx_yamaha_minicart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  // 64KB RAM
 	// This should have a serial network interface by default
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
+	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
 
 	msx1_v9938_pal(SND_YM2149, config, REGION_RUSSIA);
+	SOFTWARE_LIST(config, "minicart_list").set_original("msx_yamaha_minicart");
 }
 
 /* MSX - Yamaha YIS503-IIR Estonian */
@@ -474,12 +472,13 @@ void msx1_v9938_state::y503iir2(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "mainrom", 0, 0, 2, "mainrom");
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
-	//  Mini cartridge slot in slot #3-1
+	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_MINICART, "minicart", 3, 1, msx_yamaha_minicart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM, "ram", 3, 2, 0, 4);  // 64KB RAM
 	// This should have a serial network interface by default
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
+	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "module", 3, 3, msx_yamaha_60pin, nullptr);
 
 	msx1_v9938_pal(SND_YM2149, config, REGION_RUSSIA);
+	SOFTWARE_LIST(config, "minicart_list").set_original("msx_yamaha_minicart");
 }
 
 } // anonymous namespace
