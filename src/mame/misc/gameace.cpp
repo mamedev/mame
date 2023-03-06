@@ -40,6 +40,10 @@ The 30 MHz XTAL (silkscreened as such on PCB) has also been seen as 15MHz on a s
 
 basically the hardware is a cost reduced clone of mitchell.cpp with some bits moved around
 
+TODO: is sound emulation complete? there's data in audio ROM at 0xe000, and while we map
+      that as ROM space in the CPU, it never appears to read there, so it could be banked
+	  lower.
+
 */
 
 #include "emu.h"
@@ -116,6 +120,8 @@ private:
 	uint8_t pal_high_r(offs_t offset, uint8_t data);
 	void pal_low_w(offs_t offset, uint8_t data);
 	void pal_high_w(offs_t offset, uint8_t data);
+
+	uint8_t unk_sound_r();
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
@@ -271,16 +277,23 @@ void gameace_state::main_port_map(address_map &map)
 	map(0x07, 0x07).portr("UNK").w(FUNC(gameace_state::palbank_w));
 }
 
-void gameace_state::sound_program_map(address_map &map) // TODO: banking (there is data in ROM at e000 - could map plain at e000, that space isn't used, but no accesses?)
+uint8_t gameace_state::unk_sound_r()
 {
-	map(0x0000, 0xbfff).rom().region("audiocpu", 0);
+	// returning bit 1 set here also causes it to read c00e, then do writes to ROM region, is it a devleopment leftover?
+	return 0x00;
+}
+
+void gameace_state::sound_program_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom().region("audiocpu", 0x0000);
 	map(0xc000, 0xc001).rw(m_ymsnd, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xc002, 0xc003).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // it appears to map the oki across 2 addresses
 	map(0xc006, 0xc006).r("soundlatch", FUNC(generic_latch_8_device::read));
 
-	map(0xc00f, 0xc00f).nopr().nopw(); // checks bit 1
+	map(0xc00f, 0xc00f).r(FUNC(gameace_state::unk_sound_r)).nopw(); // checks bit 1
 
 	map(0xd000, 0xd7ff).ram();
+	map(0xe000, 0xffff).rom().region("audiocpu", 0xe000); // maybe, there is data in ROM
 }
 
 
@@ -383,7 +396,7 @@ ROM_START( hotbody )
 	ROM_LOAD( "2.14b", 0x00000, 0x40000, CRC(4eff1b0c) SHA1(d2b443b59f50fa9013f528c18b0d38da7c938d22) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )
-	ROM_LOAD( "1.4b", 0x00000, 0x20000, CRC(87e15d1d) SHA1(648d29dbf35638639bbf2ffbcd594e455cecaed2) )
+	ROM_LOAD( "1.4b", 0x00000, 0x20000, CRC(87e15d1d) SHA1(648d29dbf35638639bbf2ffbcd594e455cecaed2) ) //
 
 	ROM_REGION( 0x40000, "sprites", ROMREGION_INVERT )
 	ROM_LOAD( "3.1f", 0x00000, 0x20000, CRC(680ad651) SHA1(c1e53e7ab0b39d1ab4b6769f64323759ebb976c2) )
@@ -405,7 +418,7 @@ ROM_START( hotbody )
 	ROM_LOAD( "pal4.1d",  0x600, 0x157, NO_DUMP ) // PALCE20V8H-25PC/4
 ROM_END
 
-ROM_START( hotbodya ) // sprites and sound section ROMs match the above, tilemap ROMs differ (maybe censored / uncensored images?)
+ROM_START( hotbody2 ) // sprites and sound section ROMs match the above, tilemap ROMs differ (maybe censored / uncensored images?)
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "2.14b", 0x00000, 0x40000, NO_DUMP ) // EPROM damaged and micro-fine wires broken
 
@@ -416,7 +429,7 @@ ROM_START( hotbodya ) // sprites and sound section ROMs match the above, tilemap
 	ROM_LOAD( "3.1f", 0x00000, 0x20000, CRC(680ad651) SHA1(c1e53e7ab0b39d1ab4b6769f64323759ebb976c2) )
 	ROM_LOAD( "4.2f", 0x20000, 0x20000, CRC(33d7cf7b) SHA1(8ed80382e727bee8ccfa7c24aac8b3058264c398) )
 
-	ROM_REGION( 0x100000, "tiles", ROMREGION_INVERT ) // seem to contain less than the other set, but still have both Hot Body and Same Same titles GFX
+	ROM_REGION( 0x100000, "tiles", ROMREGION_INVERT ) // seem to contain less than the other set, but still have both Hot Body and Same Same titles GFX, the Hot Body title set has a 'II' graphic
 	ROM_LOAD( "6.14g", 0x00000, 0x40000, CRC(e922503f) SHA1(78e64af3a5dd57a96c4a74a143e4c1f4ff917036) )
 	ROM_LOAD( "8.17g", 0x40000, 0x40000, CRC(909bd6c4) SHA1(14d2c8bb4c7ec8b375c353b0f55026db5c815986) )
 	ROM_LOAD( "5.13g", 0x80000, 0x40000, CRC(7251a305) SHA1(4a6e2ae65d909a973178f6b817f3fcc3552b9563) )
@@ -508,5 +521,5 @@ void gameace_state::init_hotbody()
 } // anonymous namespace
 
 
-GAME( 1995, hotbody,  0,       gameace, hotbody, gameace_state, init_hotbody, ROT0, "Gameace", "Hot Body (set 1)", MACHINE_IMPERFECT_SOUND ) // both 1994 and 1995 strings in ROM
-GAME( 1995, hotbodya, hotbody, gameace, hotbody, gameace_state, init_hotbody, ROT0, "Gameace", "Hot Body (set 2)", MACHINE_NOT_WORKING ) // bad dump, no program ROM
+GAME( 1995, hotbody,  0,       gameace, hotbody, gameace_state, init_hotbody, ROT0, "Gameace", "Hot Body I", 0 ) // both 1994 and 1995 strings in ROM
+GAME( 1995, hotbody2, 0,       gameace, hotbody, gameace_state, init_hotbody, ROT0, "Gameace", "Hot Body II", MACHINE_NOT_WORKING ) // bad dump, no program ROM
