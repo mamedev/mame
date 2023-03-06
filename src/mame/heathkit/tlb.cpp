@@ -296,56 +296,6 @@ static GFXDECODE_START(gfx_h19)
 		GFXDECODE_ENTRY(":tlb:chargen", 0x0000, h19_charlayout, 0, 1)
 				GFXDECODE_END
 
-#if 0
-void heath_tlb_device::tlb(machine_config &config)
-{
-
-	/* basic machine hardware */
-	Z80(config, m_maincpu, H19_CLOCK); // From schematics
-	m_maincpu->set_addrmap(AS_PROGRAM, &heath_tlb_device::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &heath_tlb_device::io_map);
-
-	/* video hardware */
-	// TODO: make configurable, Heath offered 2 different CRTs - White, Green
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
-	screen.set_refresh_hz(60);   // TODO- this is adjustable by dipswitch.
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
-	screen.set_size(640, 250);
-	screen.set_visarea(0, 640 - 1, 0, 250 - 1);
-
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_h19);
-	PALETTE(config, "palette", palette_device::MONOCHROME);
-
-	MC6845(config, m_crtc, MC6845_CLOCK);
-	m_crtc->set_screen("screen");
-	m_crtc->set_show_border_area(true);
-	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(heath_tlb_device::crtc_update_row));
-	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI); // frame pulse
-
-	ins8250_device &uart(INS8250(config, "ins8250", INS8250_CLOCK));
-	uart.out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
-
-	MM5740(config, m_mm5740, MM5740_CLOCK);
-	m_mm5740->x_cb<1>().set_ioport("X1");
-	m_mm5740->x_cb<2>().set_ioport("X2");
-	m_mm5740->x_cb<3>().set_ioport("X3");
-	m_mm5740->x_cb<4>().set_ioport("X4");
-	m_mm5740->x_cb<5>().set_ioport("X5");
-	m_mm5740->x_cb<6>().set_ioport("X6");
-	m_mm5740->x_cb<7>().set_ioport("X7");
-	m_mm5740->x_cb<8>().set_ioport("X8");
-	m_mm5740->x_cb<9>().set_ioport("X9");
-	m_mm5740->shift_cb().set(FUNC(heath_tlb_device::mm5740_shift_r));
-	m_mm5740->control_cb().set(FUNC(heath_tlb_device::mm5740_control_r));
-	m_mm5740->data_ready_cb().set(FUNC(heath_tlb_device::mm5740_data_ready_w));
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beep, H19_BEEP_FRQ).add_route(ALL_OUTPUTS, "mono", 1.00);
-}
-#endif
 
 /* Input ports */
 static INPUT_PORTS_START( tlb )
