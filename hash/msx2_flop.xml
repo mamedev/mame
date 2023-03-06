@@ -1182,10 +1182,10 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="arcusyu">
-		<description>Arcusyu - Kagerou no Jidai wo Koete (Japan)</description>
+		<description>Arcusyu - A-kusu Bangaihen (Japan)</description>
 		<year>1989</year>
 		<publisher>WolfTeam</publisher>
-		<info name="alt_title" value="あーくしゅ"/>
+		<info name="alt_title" value="あーくしゅ[アークス番外編]"/>
 		<info name="serial" value="HG13"/>
 		<info name="gtin" value="04988160920146"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -1197,10 +1197,10 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="arcusyua" cloneof="arcusyu">
-		<description>Arcusyu - Kagerou no Jidai wo Koete (Japan, alt)</description>
+		<description>Arcusyu - A-kusu Bangaihen (Japan, alt)</description>
 		<year>1989</year>
 		<publisher>WolfTeam</publisher>
-		<info name="alt_title" value="あーくしゅ"/>
+		<info name="alt_title" value="あーくしゅ[アークス番外編]"/>
 		<info name="serial" value="HG13"/>
 		<info name="gtin" value="04988160920146"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -1500,10 +1500,10 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="bshash2">
-		<description>Bishoujo Shashinkan - Moving School + Studio Cut (Japan)</description>
+		<description>Double Vision: Bishoujo Shashinkan Special! (Japan)</description>
 		<year>1987</year>
 		<publisher>Hard</publisher>
-		<info name="alt_title" value="美少女写真館ダブルヴィジョン"/>
+		<info name="alt_title" value="ダブル・ヴィジョン 美少女写真館スペシャル!"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="double vision - beauty girl photo studio (1987)(hard)(jp).dsk" size="737280" crc="35c75cf5" sha1="eb2db1da65bce9f917625157b865feaf7cac8829"/>
@@ -1570,7 +1570,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="burai">
-		<description>Burai Joukan (Japan)</description>
+		<description>BURAI Joukan (Japan)</description>
 		<year>1989</year>
 		<publisher>Riverhill Soft</publisher>
 		<info name="alt_title" value="ＢＵＲＡＩ上巻"/>
@@ -1615,7 +1615,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="buraia" cloneof="burai">
-		<description>Burai Joukan (Japan, alt)</description>
+		<description>BURAI Joukan (Japan, alt)</description>
 		<year>1989</year>
 		<publisher>Riverhill Soft</publisher>
 		<info name="alt_title" value="ＢＵＲＡＩ上巻"/>
@@ -1660,7 +1660,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="burai2">
-		<description>Burai Gekan - Kanketsu Hen (Japan)</description>
+		<description>BURAI Gekan - Kanketsu Hen (Japan)</description>
 		<year>1992</year>
 		<publisher>Brother Industries</publisher>
 		<info name="alt_title" value="ＢＵＲＡＩ下巻完結編"/>
@@ -1723,7 +1723,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="burai2a" cloneof="burai2">
-		<description>Burai II (Japan, alt)</description>
+		<description>BURAI Gekan Kanketsu-hen (Japan, alt)</description>
 		<year>1992</year>
 		<publisher>Brother Industries</publisher>
 		<info name="alt_title" value="ＢＵＲＡＩ下巻完結編"/>
@@ -2212,7 +2212,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="cresmoon">
-		<description>Crescent Moon (Japan)</description>
+		<description>Crescent Moon Girl (Japan)</description>
 		<year>1990</year>
 		<publisher>Alicesoft</publisher>
 		<info name="alt_title" value="クレセントムーンがぁる"/>
@@ -3362,7 +3362,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="ds00">
-		<description>Disc Station - Soukan Junbi-0-Go (Japan)</description>
+		<description>Disc Station - Sokan Junbi-Go (Japan)</description>
 		<year>1988</year>
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ディスクステーション創刊準備号"/>
@@ -3394,7 +3394,7 @@ The following floppies came with the machines.
 		<description>Disc Station - Dai-2-Go (Japan)</description>
 		<year>1988</year>
 		<publisher>Compile</publisher>
-		<info name="alt_title" value="ディスクステーション２号"/>
+		<info name="alt_title" value="ディスクステーション第２号"/>
 		<info name="serial" value="1A-8804"/>
 		<info name="gtin" value="049881618000041"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -8592,10 +8592,10 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="lovechas">
-		<description>Love Chaser (Japan)</description>
+		<description>Bishojo Adventure: Love Chaser (Japan)</description>
 		<year>1987</year>
 		<publisher>Champion Soft</publisher>
-		<info name="alt_title" value="美少女アドベンチャー"/>
+		<info name="alt_title" value="美少女アドベンチャー Love Chaser"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -8610,10 +8610,10 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="lovechasa" cloneof="lovechas">
-		<description>Love Chaser (Japan, alt)</description>
+		<description>Bishojo Adventure: Love Chaser (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>Champion Soft</publisher>
-		<info name="alt_title" value="美少女アドベンチャー"/>
+		<info name="alt_title" value="美少女アドベンチャー Love Chaser"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -8628,10 +8628,10 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="lovechasb" cloneof="lovechas">
-		<description>Love Chaser (Japan, alt 2)</description>
+		<description>Bishojo Adventure: Love Chaser (Japan, alt 2)</description>
 		<year>1987</year>
 		<publisher>Champion Soft</publisher>
-		<info name="alt_title" value="美少女アドベンチャー"/>
+		<info name="alt_title" value="美少女アドベンチャー Love Chaser"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -8800,6 +8800,7 @@ The following floppies came with the machines.
 		<description>Maison Ikkoku (Japan)</description>
 		<year>1987</year>
 		<publisher>Micro Cabin</publisher>
+		<info name="alt_title" value="めぞん一刻"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="maison ikkoku (1987)(micro cabin)(jp).dsk" size="737280" crc="cd393bb6" sha1="7d9b8187d103ad73b7d492d49a7f7feca1aaa2f1"/>
@@ -11294,7 +11295,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="rance">
-		<description>Rance (Japan)</description>
+		<description>Rance - Hikari wo Motomete (Japan)</description>
 		<year>1989</year>
 		<publisher>Alicesoft</publisher>
 		<info name="alt_title" value="RANCE 光をもとめて"/>
@@ -11326,7 +11327,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="rancea" cloneof="rance">
-		<description>Rance (Japan, alt)</description>
+		<description>Rance - Hikari wo Motomete (Japan, alt)</description>
 		<year>1989</year>
 		<publisher>Alicesoft</publisher>
 		<info name="alt_title" value="RANCE 光をもとめて"/>
@@ -11358,7 +11359,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="rance2">
-		<description>Rance II (Japan)</description>
+		<description>Rance II - Hangyaku no Shoujo-tachi (Japan)</description>
 		<year>1990</year>
 		<publisher>Alicesoft</publisher>
 		<info name="alt_title" value="RANCE II - 反逆の少女達"/>
@@ -11606,7 +11607,7 @@ The following floppies came with the machines.
 		<description>Record of Lodoss War - Haiiro no Majo (Japan)</description>
 		<year>1989</year>
 		<publisher>Humming Bird Soft</publisher>
-		<info name="alt_title" value="ロードス島戦記"/>
+		<info name="alt_title" value="ロードス島戦記灰色の魔女"/>
 		<info name="gtin" value="04960695134229"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Opening Disk"/>
@@ -12023,7 +12024,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="runemst3a" cloneof="runemst3">
-		<description>Rune Master III (Japan, alt)</description>
+		<description>Rune Master - Sangoku Eiketsu Den (Japan, alt)</description>
 		<year>1991</year>
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ルーンマスター三国英傑伝"/>
@@ -12046,7 +12047,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="runemst3b" cloneof="runemst3">
-		<description>Rune Master III (Japan, alt 2)</description>
+		<description>Rune Master - Sangoku Eiketsu Den (Japan, alt 2)</description>
 		<year>1991</year>
 		<publisher>Compile</publisher>
 		<info name="alt_title" value="ルーンマスター三国英傑伝"/>
@@ -12409,7 +12410,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="schwarz2">
-		<description>Schwarzschild II (Japan)</description>
+		<description>Schwarzschild II - Teikoku no Haishin (Japan)</description>
 		<year>1990</year>
 		<publisher>Kogado</publisher>
 		<info name="alt_title" value="シュヴァルツシルト II 帝國ノ背信"/>
@@ -12429,7 +12430,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="schwarz2a" cloneof="schwarz2">
-		<description>Schwarzschild II (Japan, alt)</description>
+		<description>Schwarzschild II - Teikoku no Haishin (Japan, alt)</description>
 		<year>1990</year>
 		<publisher>Kogado</publisher>
 		<info name="alt_title" value="シュヴァルツシルト II 帝國ノ背信"/>
@@ -12477,7 +12478,7 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="seikifly">
-		<description>Seikimatsu Fly Battler (Japan)</description>
+		<description>Seikimatsu Fly Battler Yashichi (Japan)</description>
 		<year>1993</year>
 		<publisher>MSX-FAN</publisher>
 		<info name="alt_title" value="世紀末FLY BATTLER弥七"/>
@@ -13564,7 +13565,7 @@ The following floppies came with the machines.
 		<description>The Tower? of Cabin - Cabin Panic (Japan)</description>
 		<year>1992</year>
 		<publisher>Micro Cabin</publisher>
-		<info name="alt_title" value="THE TOWER OF CABIN?～キャビンパニック～"/>
+		<info name="alt_title" value="THE TOWER? OF CABIN～キャビンパニック～"/>
 		<info name="serial" value="25244"/>
 		<info name="gtin" value="04988608252440"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -13592,7 +13593,7 @@ The following floppies came with the machines.
 		<description>The Tower? of Cabin - Cabin Panic (Japan, alt)</description>
 		<year>1992</year>
 		<publisher>Micro Cabin</publisher>
-		<info name="alt_title" value="THE TOWER OF CABIN?～キャビンパニック～"/>
+		<info name="alt_title" value="THE TOWER? OF CABIN～キャビンパニック～"/>
 		<info name="serial" value="25244"/>
 		<info name="gtin" value="04988608252440"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -13619,7 +13620,7 @@ The following floppies came with the machines.
 		<description>The Tower? of Cabin - Cabin Panic (Japan, alt 2)</description>
 		<year>1992</year>
 		<publisher>Micro Cabin</publisher>
-		<info name="alt_title" value="THE TOWER OF CABIN?～キャビンパニック～"/>
+		<info name="alt_title" value="THE TOWER? OF CABIN～キャビンパニック～"/>
 		<info name="serial" value="25244"/>
 		<info name="gtin" value="04988608252440"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -13680,10 +13681,10 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="tirnanog">
-		<description>Tir-nan-óg - Dana no Matsuei (Japan)</description>
+		<description>Kindan no Tou: Tir-na-nóg (Japan)</description>
 		<year>1990</year>
 		<publisher>System Soft</publisher>
-		<info name="alt_title" value="ティルナノーグ"/>
+		<info name="alt_title" value="禁断の塔ティルナノーグ"/>
 		<info name="gtin" value="04988697620113"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
@@ -13707,10 +13708,10 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="tirnanoga" cloneof="tirnanog">
-		<description>Tir-nan-óg - Dana no Matsuei (Japan, alt)</description>
+		<description>Kindan no Tou: Tir-na-nóg (Japan, alt)</description>
 		<year>1990</year>
 		<publisher>System Soft</publisher>
-		<info name="alt_title" value="ティルナノーグ"/>
+		<info name="alt_title" value="禁断の塔ティルナノーグ"/>
 		<info name="gtin" value="04988697620113"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
@@ -14588,7 +14589,7 @@ The following floppies came with the machines.
 		<description>Wizardry - Proving Grounds of Mad Overload (Japan)</description>
 		<year>1987</year>
 		<publisher>ASCII</publisher>
-		<info name="alt_title" value="ウィザードリィ"/>
+		<info name="alt_title" value="ウィザードリィ狂王の試練場"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="737280">
@@ -14608,7 +14609,7 @@ The following floppies came with the machines.
 		<description>Wizardry - Proving Grounds of Mad Overload (Japan, alt)</description>
 		<year>1987</year>
 		<publisher>ASCII</publisher>
-		<info name="alt_title" value="ウィザードリィ"/>
+		<info name="alt_title" value="ウィザードリィ狂王の試練場"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="737280">
@@ -14628,7 +14629,7 @@ The following floppies came with the machines.
 		<description>Wizardry - Proving Grounds of Mad Overload (Japan, alt 2)</description>
 		<year>1987</year>
 		<publisher>ASCII</publisher>
-		<info name="alt_title" value="ウィザードリィ"/>
+		<info name="alt_title" value="ウィザードリィ狂王の試練場"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="737280">
@@ -15230,7 +15231,7 @@ The following floppies came with the machines.
 		<description>XZR - Hakai no Guuzou (Japan)</description>
 		<year>1988</year>
 		<publisher>Telenet Japan</publisher>
-		<info name="alt_title" value="エグザイル"/>
+		<info name="alt_title" value="エグザイル破戒の偶像"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -15249,7 +15250,7 @@ The following floppies came with the machines.
 		<description>XZR - Hakai no Guuzou (Japan, alt)</description>
 		<year>1988</year>
 		<publisher>Telenet Japan</publisher>
-		<info name="alt_title" value="エグザイル"/>
+		<info name="alt_title" value="エグザイル破戒の偶像"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -15268,7 +15269,7 @@ The following floppies came with the machines.
 		<description>XZR - Hakai no Guuzou (Japan, alt 2)</description>
 		<year>1988</year>
 		<publisher>Telenet Japan</publisher>
-		<info name="alt_title" value="エグザイル"/>
+		<info name="alt_title" value="エグザイル破戒の偶像"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="737280">
@@ -15285,10 +15286,10 @@ The following floppies came with the machines.
 
 	<!-- Release contained 2 floppies and a CD. -->
 	<software name="xzr2">
-		<description>XZR II (Japan)</description>
+		<description>XZR II - Kanketsu-hen (Japan)</description>
 		<year>1988</year>
 		<publisher>Telenet Japan</publisher>
-		<info name="alt_title" value="エグザイルII"/>
+		<info name="alt_title" value="エグザイルII完結編"/>
 		<info name="gtin" value="04988624922112"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -15306,10 +15307,10 @@ The following floppies came with the machines.
 
 	<!-- Release contained 2 floppies and a CD. -->
 	<software name="xzr2a" cloneof="xzr2">
-		<description>XZR II (Japan, alt)</description>
+		<description>XZR II - Kanketsu-hen (Japan, alt)</description>
 		<year>1988</year>
 		<publisher>Telenet Japan</publisher>
-		<info name="alt_title" value="エグザイルII"/>
+		<info name="alt_title" value="エグザイルII完結編"/>
 		<info name="gtin" value="04988624922112"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
@@ -15327,10 +15328,10 @@ The following floppies came with the machines.
 
 	<!-- Release contained 2 floppies and a CD. -->
 	<software name="xzr2b" cloneof="xzr2">
-		<description>XZR II (Japan, alt 2)</description>
+		<description>XZR II - Kanketsu-hen (Japan, alt 2)</description>
 		<year>1988</year>
 		<publisher>Telenet Japan</publisher>
-		<info name="alt_title" value="エグザイルII"/>
+		<info name="alt_title" value="エグザイルII完結編"/>
 		<info name="gtin" value="04988624922112"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
