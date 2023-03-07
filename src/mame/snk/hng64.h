@@ -44,6 +44,7 @@ struct polygon
 	float faceNormal[4]{};        // Normal of the face overall - for calculating visibility and flat-shading...
 	bool visible = false;                // Polygon visibility in scene
 	bool flatShade = false;              // Flat shaded polygon, no texture, no lighting
+	bool blend = false;
 
 	uint8_t texIndex = 0;             // Which texture to draw from (0x00-0x0f)
 	uint8_t tex4bpp = 0;              // How to index into the texture
@@ -53,6 +54,9 @@ struct polygon
 
 	uint32_t palOffset = 0;           // The base offset where this object's palette starts.
 	uint16_t colorIndex = 0;
+
+	uint16_t texscrollx = 0;
+	uint16_t texscrolly = 0;
 };
 
 
@@ -86,6 +90,9 @@ struct hng64_poly_data
 	uint8_t texPageVertOffset = 0;
 	uint32_t palOffset = 0;
 	uint16_t colorIndex = 0;
+	bool blend = false;
+	uint16_t texscrollx = 0;
+	uint16_t texscrolly = 0;
 };
 
 class hng64_state;
@@ -100,15 +107,15 @@ public:
 	void render_flat_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
 
 	hng64_state& state() { return m_state; }
-	bitmap_ind16& colorBuffer3d() { return m_colorBuffer3d; }
 	float* depthBuffer3d() { return m_depthBuffer3d.get(); }
+	uint16_t* colorBuffer3d() { return m_colorBuffer3d.get(); }
 
 private:
 	hng64_state& m_state;
 
 	// (Temporarily class members - someday they will live in the memory map)
-	bitmap_ind16 m_colorBuffer3d;
 	std::unique_ptr<float[]> m_depthBuffer3d;
+	std::unique_ptr<uint16_t[]> m_colorBuffer3d;
 };
 
 
@@ -161,6 +168,9 @@ public:
 		m_comhack(*this, "comhack"),
 		m_fbram1(*this, "fbram1"),
 		m_fbram2(*this, "fbram2"),
+		m_fbscale(*this, "fbscale"),
+		m_fbscroll(*this, "fbscroll"),
+		m_fbunk(*this, "fbunk"),
 		m_idt7133_dpram(*this, "com_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_in(*this, "IN%u", 0U),
@@ -227,6 +237,9 @@ private:
 	required_shared_ptr<uint32_t> m_comhack;
 	required_shared_ptr<uint32_t> m_fbram1;
 	required_shared_ptr<uint32_t> m_fbram2;
+	required_shared_ptr<uint32_t> m_fbscale;
+	required_shared_ptr<uint32_t> m_fbscroll;
+	required_shared_ptr<uint32_t> m_fbunk;
 
 	required_shared_ptr<uint32_t> m_idt7133_dpram;
 	//required_shared_ptr<uint8_t> m_com_mmu_mem;
@@ -293,7 +306,13 @@ private:
 	uint16_t m_old_tileflags[4]{};
 
 	// 3d State
-	int m_paletteState3d = 0;
+	uint16_t m_texturescrollx = 0;
+	uint16_t m_texturescrolly = 0;
+	uint16_t m_paletteState3d = 0;
+	uint16_t m_modelscalex = 0;
+	uint16_t m_modelscaley = 0;
+	uint16_t m_modelscalez = 0;
+
 	float m_projectionMatrix[16]{};
 	float m_modelViewMatrix[16]{};
 	float m_cameraMatrix[16]{};
@@ -323,10 +342,10 @@ private:
 	uint8_t hng64_fbcontrol_r(offs_t offset);
 	void hng64_fbcontrol_w(offs_t offset, uint8_t data);
 
-	void hng64_fbunkpair_w(offs_t offset, uint16_t data);
-	void hng64_fbscroll_w(offs_t offset, uint16_t data);
+	void hng64_fbscale_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	void hng64_fbscroll_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
-	void hng64_fbunkbyte_w(offs_t offset, uint8_t data);
+	void hng64_fbunkbyte_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
 	uint32_t hng64_fbtable_r(offs_t offset, uint32_t mem_mask = ~0);
 	void hng64_fbtable_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -428,7 +447,7 @@ private:
 	void hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tm, int flags, int line);
 
 	void hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, tilemap_t *tmap,
-		int wraparound, uint8_t drawformat, uint8_t alpha, uint8_t mosaic, uint8_t tm);
+		int wraparound, uint8_t drawformat, uint8_t alpha, uint8_t mosaic, uint8_t tm, int splitside);
 
 	std::unique_ptr<hng64_poly_renderer> m_poly_renderer;
 
@@ -458,7 +477,7 @@ private:
 	void setLighting(const uint16_t* packet);
 	void set3dFlags(const uint16_t* packet);
 	void setCameraProjectionMatrix(const uint16_t* packet);
-	void recoverStandardVerts(polygon& currentPoly, int m, uint16_t* chunkOffset_verts, int& counter);
+	void recoverStandardVerts(polygon& currentPoly, int m, uint16_t* chunkOffset_verts, int& counter, const uint16_t *packet);
 	void recoverPolygonBlock(const uint16_t* packet, int& numPolys);
 	void printPacket(const uint16_t* packet, int hex);
 	float uToF(uint16_t input);
