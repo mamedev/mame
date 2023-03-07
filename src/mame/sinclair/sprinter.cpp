@@ -25,6 +25,12 @@ Hardware:
 Refs:
 	https://web.archive.org/web/20030208004427/http://www.petersplus.com/sprinter/
 
+TODO:
+- ISA memory slots
+- fully untied from Spectrum parent
+- better rendering (currently not fully discovered) in Game Configuration
+- ? detect loading Configuration by checksum, not by presents in fastram
+
 *******************************************************************************************/
 
 #include "emu.h"
