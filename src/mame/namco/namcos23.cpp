@@ -1807,7 +1807,8 @@ void namcos23_state::c435_state_set_projection_matrix_line(const uint16_t *param
 	//   line 2: 0 1 -(sy-b)/(sx/t) 0  0 -1 -(sy+b)/(sx/t) 0
 	//   line 3: 0 0 -1             c  0  0              0 sx/t
 
-	std::stringstream buf("projection matrix line:");
+	std::ostringstream buf;
+	buf << "projection matrix line:";
 	for(int i=0; i<8; i++)
 		util::stream_format(buf, " %f", f24_to_f32((param[2*i+1] << 16) | param[2*i+2]));
 	buf << "\n";
@@ -1820,7 +1821,7 @@ void namcos23_state::c435_state_set(uint16_t type, const uint16_t *param)
 	case 0x0001: c435_state_set_interrupt(param); break;
 	case 0x00c8: c435_state_set_projection_matrix_line(param); break;
 	default: {
-		std::stringstream buf;
+		std::ostringstream buf;
 		util::stream_format(buf, "WARNING: Unhandled state type %04x :", type);
 		for(int i=0; i<c435_get_state_entry_size(type); i++)
 			util::stream_format(buf, " %04x", param[i]);
@@ -2066,7 +2067,8 @@ void namcos23_state::c435_pio_w(uint16_t data)
 	}
 
 	if(!known) {
-		std::stringstream buf("c435 -");
+		std::ostringstream buf;
+		buf << "c435 -";
 		for(int i=0; i<m_c435_buffer_pos; i++)
 			util::stream_format(buf, " %04x", m_c435_buffer[i]);
 		buf << "\n";
