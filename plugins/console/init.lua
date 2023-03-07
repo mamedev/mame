@@ -43,8 +43,11 @@ function console.startplugin()
 		local ln = require('linenoise')
 		ln.setcompletion(
 			function(c, str)
+				status = str
 				yield()
-				ln.addcompletion(c, str)
+				for k, v in pairs(status) do
+					ln.addcompletion(c, v)
+				end
 			end)
 		local ret = ln.linenoise('$PROMPT')
 		if ret == nil then
@@ -191,11 +194,8 @@ function console.startplugin()
 		return curstring, strs, expr:match("([%.:%w%(%)%[%]_]-)([:%.%[%(])" .. word .. "$")
 	end
 
-	local function get_completions(line, endpos)
+	local function get_completions(line)
 		matches = {}
-		local endstr = line:sub(endpos + 1, -1)
-		line = line:sub(1, endpos)
-		endstr = endstr or ""
 		local start, word = line:match("^(.*[ \t\n\"\\'><=;:%+%-%*/%%^~#{}%(%)%[%].,])(.-)$")
 		if not start then
 			start = ""
@@ -206,16 +206,18 @@ function console.startplugin()
 
 		local str, strs, expr, sep = simplify_expression(line, word)
 		contextual_list(expr, sep, str, word, strs)
-		if #matches > 1 then
-			print("\n")
-			for k, v in pairs(matches) do
-				print(v)
-			end
-			return "\x01" .. "-1"
+		if #matches == 0 then
+			return { line }
 		elseif #matches == 1 then
-			return start .. matches[1] .. endstr .. "\x01" .. (#start + #matches[1])
+			return { start .. matches[1] }
 		end
-		return "\x01" .. "-1"
+		print("")
+		result = { }
+		for k, v in pairs(matches) do
+			print(v)
+			table.insert(result, start .. v)
+		end
+		return result
 	end
 
 	emu.register_start(function()
@@ -249,7 +251,7 @@ function console.startplugin()
 			-- ln.refresh() FIXME: how to replicate this now that the API has been removed?
 		end
 		if conth.yield then
-			conth:continue(get_completions(conth.result:match("([^\x01]*)\x01(.*)")))
+			conth:continue(get_completions(conth.result))
 			return
 		elseif conth.busy then
 			return
