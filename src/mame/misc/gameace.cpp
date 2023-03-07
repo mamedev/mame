@@ -42,7 +42,7 @@ basically the hardware is a cost reduced clone of mitchell.cpp with some bits mo
 
 TODO: is sound emulation complete? there's data in audio ROM at 0xe000, and while we map
       that as ROM space in the CPU, it never appears to read there, so it could be banked
-	  lower.
+      lower.
 
 */
 
@@ -57,6 +57,20 @@ TODO: is sound emulation complete? there's data in audio ROM at 0xe000, and whil
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+
+
+// configurable logging
+#define LOG_MEMBANK     (1U <<  1)
+#define LOG_PALBANK     (1U <<  2)
+#define LOG_VIDBANK     (1U <<  3)
+
+//#define VERBOSE (LOG_GENERAL | LOG_MEMBANK | LOG_PALBANK | LOG_VIDBANK)
+
+#include "logmacro.h"
+
+#define LOGMEMBANK(...)     LOGMASKED(LOG_MEMBANK,     __VA_ARGS__)
+#define LOGPALBANK(...)     LOGMASKED(LOG_PALBANK,     __VA_ARGS__)
+#define LOGVIDBANK(...)     LOGMASKED(LOG_VIDBANK,     __VA_ARGS__)
 
 
 namespace {
@@ -149,22 +163,22 @@ void gameace_state::draw_sprites(bitmap_ind16& bitmap, const rectangle& cliprect
 	{
 		int code = m_spriteram[offs + 0x10];
 		int sy = 255 - m_spriteram[offs + 0x11];
-		int attr = m_spriteram[offs + 0x13];
-		int color = attr & 0x0f;
+		int const attr = m_spriteram[offs + 0x13];
+		int const color = attr & 0x0f;
 		int sx = m_spriteram[offs + 0x12] + ((attr & 0x10) << 4);
 		code += (attr & 0xe0) << 3;
 		/*
 		if (m_flipscreen)
 		{
-			sx = 496 - sx;
-			sy = 240 - sy;
+		    sx = 496 - sx;
+		    sy = 240 - sy;
 		}
 		*/
 		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
 			code,
 			color,
 			0, 0,
-			sx-7, sy-14, 15);
+			sx - 7, sy - 14, 15);
 	}
 }
 
@@ -178,15 +192,15 @@ uint32_t gameace_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 TILE_GET_INFO_MEMBER(gameace_state::get_fg_tile_info)
 {
-	int code = m_fgram[tile_index*2] | (m_fgram[(tile_index*2)+1] << 8);
-	int col = m_colram[tile_index];
-	tileinfo.set(0,code,col,0);
+	int const code = m_fgram[tile_index * 2] | (m_fgram[(tile_index * 2) + 1] << 8);
+	int const col = m_colram[tile_index];
+	tileinfo.set(0, code, col, 0);
 }
 
 void gameace_state::fgram_w(offs_t offset, uint8_t data)
 {
 	m_fgram[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset/2);
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 void gameace_state::colram_w(offs_t offset, uint8_t data)
@@ -207,7 +221,7 @@ void gameace_state::video_start()
 void gameace_state::bank_w(uint8_t data)
 {
 	if (data & 0xf0)
-		logerror("bank_w unused bits %02x\n", data & 0xf0);
+		LOGMEMBANK("bank_w unused bits %02x\n", data & 0xf0);
 
 	m_membank->set_entry(data & 0xf);
 }
@@ -215,16 +229,16 @@ void gameace_state::bank_w(uint8_t data)
 void gameace_state::palbank_w(uint8_t data)
 {
 	if (data & 0xdf)
-		logerror("palbank_w unused bits %02x\n", data & 0xdf);
+		LOGPALBANK("palbank_w unused bits %02x\n", data & 0xdf);
 
-	m_palview.select((data & 0x20)>>5);
+	m_palview.select((data & 0x20) >> 5);
 }
 
 
 void gameace_state::vidbank_w(uint8_t data)
 {
 	if (data & 0xfe)
-		logerror("videbank_w unused bits %02x\n", data & 0xfe);
+		LOGVIDBANK("videbank_w unused bits %02x\n", data & 0xfe);
 
 	m_videoview.select(data & 1);
 }
@@ -236,7 +250,7 @@ uint8_t gameace_state::pal_low_r(offs_t offset, uint8_t data)
 
 uint8_t gameace_state::pal_high_r(offs_t offset, uint8_t data)
 {
-	return m_palette->read8(offset+0x800);
+	return m_palette->read8(offset + 0x800);
 }
 
 void gameace_state::pal_low_w(offs_t offset, uint8_t data)
@@ -246,7 +260,7 @@ void gameace_state::pal_low_w(offs_t offset, uint8_t data)
 
 void gameace_state::pal_high_w(offs_t offset, uint8_t data)
 {
-	m_palette->write8(offset+0x800, data);
+	m_palette->write8(offset + 0x800, data);
 }
 
 void gameace_state::main_program_map(address_map &map)
@@ -279,7 +293,7 @@ void gameace_state::main_port_map(address_map &map)
 
 uint8_t gameace_state::unk_sound_r()
 {
-	// returning bit 1 set here also causes it to read c00e, then do writes to ROM region, is it a devleopment leftover?
+	// returning bit 1 set here also causes it to read c00e, then do writes to ROM region, is it a development leftover?
 	return 0x00;
 }
 
@@ -355,7 +369,7 @@ static const gfx_layout spritelayout =
 	4,
 	{ RGN_FRAC(1,2) + 4, RGN_FRAC(1,2) + 0, 4, 0},
 	{ 0, 1, 2, 3, 8+0, 8+1, 8+2, 8+3, 32*8+0, 32*8+1, 32*8+2, 32*8+3, 33*8+0, 33*8+1, 33*8+2, 33*8+3 },
-	{ 
+	{
 		0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
 		8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16
 	},
@@ -380,7 +394,7 @@ void gameace_state::gameace(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: all wrong
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -406,7 +420,7 @@ ROM_START( hotbody )
 	ROM_LOAD( "2.14b", 0x00000, 0x40000, CRC(4eff1b0c) SHA1(d2b443b59f50fa9013f528c18b0d38da7c938d22) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )
-	ROM_LOAD( "1.4b", 0x00000, 0x20000, CRC(87e15d1d) SHA1(648d29dbf35638639bbf2ffbcd594e455cecaed2) ) //
+	ROM_LOAD( "1.4b", 0x00000, 0x20000, CRC(87e15d1d) SHA1(648d29dbf35638639bbf2ffbcd594e455cecaed2) )
 
 	ROM_REGION( 0x40000, "sprites", ROMREGION_INVERT )
 	ROM_LOAD( "3.1f", 0x00000, 0x20000, CRC(680ad651) SHA1(c1e53e7ab0b39d1ab4b6769f64323759ebb976c2) )
@@ -492,28 +506,28 @@ void gameace_state::decode_sprites()
 	memcpy(&buffer[0], rom, 0x40000);
 
 	constexpr uint8_t decode_table[0x20] = {
-		                           (2<<1)+1, (2<<1),
-		                           (7<<1),   (7<<1)+1,
-		                           (0<<1)+1, (0<<1),
-		                           (5<<1),   (5<<1)+1,
-		                           (6<<1),   (6<<1)+1,
-		                           (3<<1),   (3<<1)+1,
-		                           (4<<1),   (4<<1)+1,
-		                           (1<<1),   (1<<1)+1,
+								   (2<<1)+1, (2<<1),
+								   (7<<1),   (7<<1)+1,
+								   (0<<1)+1, (0<<1),
+								   (5<<1),   (5<<1)+1,
+								   (6<<1),   (6<<1)+1,
+								   (3<<1),   (3<<1)+1,
+								   (4<<1),   (4<<1)+1,
+								   (1<<1),   (1<<1)+1,
 
-		                           (10<<1)+1,(10<<1),
-		                           (15<<1),  (15<<1)+1,
+								   (10<<1)+1,(10<<1),
+								   (15<<1),  (15<<1)+1,
 								   (8<<1)+1, (8<<1),
-		                           (13<<1),  (13<<1)+1,
-		                           (14<<1),  (14<<1)+1,
-		                           (11<<1),  (11<<1)+1,
-		                           (12<<1),  (12<<1)+1,
-		                           (9<<1),   (9<<1)+1
-	                             };
+								   (13<<1),  (13<<1)+1,
+								   (14<<1),  (14<<1)+1,
+								   (11<<1),  (11<<1)+1,
+								   (12<<1),  (12<<1)+1,
+								   (9<<1),   (9<<1)+1
+								 };
 
 
 
-	for (int i = 0x00000; i < 0x40000; i++) 
+	for (int i = 0x00000; i < 0x40000; i++)
 	{
 		uint8_t col = i & 0x1f;
 		uint32_t addr = decode_table[col];
@@ -532,5 +546,5 @@ void gameace_state::init_hotbody()
 } // anonymous namespace
 
 
-GAME( 1995, hotbody,  0,       gameace, hotbody, gameace_state, init_hotbody, ROT0, "Gameace", "Hot Body I", 0 ) // both 1994 and 1995 strings in ROM
-GAME( 1995, hotbody2, 0,       gameace, hotbody, gameace_state, init_hotbody, ROT0, "Gameace", "Hot Body II", MACHINE_NOT_WORKING ) // bad dump, no program ROM
+GAME( 1995, hotbody,  0, gameace, hotbody, gameace_state, init_hotbody, ROT0, "Gameace", "Hot Body I",  MACHINE_SUPPORTS_SAVE ) // both 1994 and 1995 strings in ROM
+GAME( 1995, hotbody2, 0, gameace, hotbody, gameace_state, init_hotbody, ROT0, "Gameace", "Hot Body II", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump, no program ROM
