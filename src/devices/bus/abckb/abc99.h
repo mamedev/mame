@@ -26,7 +26,7 @@
 // ======================> abc99_device
 
 class abc99_device :  public device_t,
-						public abc_keyboard_interface
+					  public abc_keyboard_interface
 {
 public:
 	// construction/destruction
@@ -87,7 +87,7 @@ private:
 	required_device<i8035_device> m_maincpu;
 	required_device<i8035_device> m_mousecpu;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<r8_device> m_mouse;
+	required_device<luxor_r8_device> m_mouse;
 	required_ioport m_z14;
 	required_ioport m_cursor;
 	output_finder<11> m_leds;

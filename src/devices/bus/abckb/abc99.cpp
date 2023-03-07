@@ -61,8 +61,9 @@ Notes:
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define I8035_Z2_TAG        "z2"
-#define I8035_Z5_TAG        "z5"
+#define I8035_Z2_TAG "z2"
+#define I8035_Z5_TAG "z5"
+#define R8_TAG       "r8"
 
 
 
@@ -173,7 +174,7 @@ void abc99_device::device_add_mconfig(machine_config &config)
 	m_mousecpu->t1_in_cb().set(FUNC(abc99_device::z5_t1_r));
 
 	// mouse
-	R8(config, m_mouse, 0);
+	LUXOR_R8(config, m_mouse, 0);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
