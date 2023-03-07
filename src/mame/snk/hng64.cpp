@@ -1062,7 +1062,7 @@ void hng64_state::hng64_dualport_w(offs_t offset, uint8_t data)
 
 /* The following is guesswork, needs confirmation with a test on the real board. */
 // every sprite is 0x20 bytes
-// 
+//
 void hng64_state::hng64_sprite_clear_even_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
@@ -1097,7 +1097,7 @@ void hng64_state::hng64_sprite_clear_odd_w(offs_t offset, uint32_t data, uint32_
 	if(ACCESSING_BITS_16_31)
 	{
 		mspace.write_dword(0x20000000+0x04+0x00+spr_offs, 0x00000000);
-	//	mspace.write_dword(0x20000000+0x0c+0x00+spr_offs, 0x00000000); // erases part of the slash palette in the sams64 2nd intro when we don't want it to! (2nd slash)
+	//  mspace.write_dword(0x20000000+0x0c+0x00+spr_offs, 0x00000000); // erases part of the slash palette in the sams64 2nd intro when we don't want it to! (2nd slash)
 		mspace.write_dword(0x20000000+0x14+0x00+spr_offs, 0x00000000);
 		mspace.write_dword(0x20000000+0x1c+0x00+spr_offs, 0x00000000);
 	}
@@ -1105,7 +1105,7 @@ void hng64_state::hng64_sprite_clear_odd_w(offs_t offset, uint32_t data, uint32_
 	if(ACCESSING_BITS_0_15)
 	{
 		mspace.write_dword(0x20000000+0x04+0x20+spr_offs, 0x00000000);
-	//	mspace.write_dword(0x20000000+0x0c+0x20+spr_offs, 0x00000000); // erases part of the slash palette in the sams64 2nd intro when we don't want it to! (1st slash)
+	//  mspace.write_dword(0x20000000+0x0c+0x20+spr_offs, 0x00000000); // erases part of the slash palette in the sams64 2nd intro when we don't want it to! (1st slash)
 		mspace.write_dword(0x20000000+0x14+0x20+spr_offs, 0x00000000);
 		mspace.write_dword(0x20000000+0x1c+0x20+spr_offs, 0x00000000);
 	}

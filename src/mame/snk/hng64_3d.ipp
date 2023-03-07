@@ -251,7 +251,7 @@ void hng64_state::set3dFlags(const uint16_t* packet)
 	// PACKET FORMAT
 	// [0]  - 0011 ... ID
 	// [1]  - ???? ... texture scrolling x (c000 - ffff)
-	// [2]  - ???? ... texture scrolling y (c000 - ffff) 
+	// [2]  - ???? ... texture scrolling y (c000 - ffff)
 	// [3]  - ???? ...
 	// [4]  - ???? ...
 	// [5]  - ???? ... scale?
@@ -386,8 +386,8 @@ void hng64_state::recoverStandardVerts(polygon& currentPoly, int m, uint16_t* ch
 		currentPoly.vert[m].worldCoords[1] = (currentPoly.vert[m].worldCoords[1] * m_modelscaley) / 0x100;
 		currentPoly.vert[m].worldCoords[2] = (currentPoly.vert[m].worldCoords[2] * m_modelscalex) / 0x100;
 
-	//	if ((m_modelscalex != 0x100) || (m_modelscaley != 0x100) || (m_modelscalez != 0x100))
-	//		logerror("maybe using model scale %04x %04x %04x\n", m_modelscalex, m_modelscaley, m_modelscalez);
+	//  if ((m_modelscalex != 0x100) || (m_modelscaley != 0x100) || (m_modelscalez != 0x100))
+	//      logerror("maybe using model scale %04x %04x %04x\n", m_modelscalex, m_modelscaley, m_modelscalez);
 	}
 }
 
@@ -410,7 +410,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 	//      c = set on objects a certain distance away (maybe optimization to disable clipping against camera?)
 	//      ? = roadedge: all vehicles ingame + select screen (also 3d maps on select screen), vehicle lights+windows only in attract, nothing else?
 	//          all vehicles ingame + select screen, vehicle lights+windows only in attract, NOT on vehicles between stages, nothing else?
-	//			nothing on other games?
+	//          nothing on other games?
 	// none of these bits appear to be connected to texture size to solve the road/banner problem in xrally/roadedge
 	//
 	//
@@ -532,7 +532,7 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 
 	size[2]    = threeDPointer[9];
 	size[3]    = threeDPointer[10];
-	
+
 	// the low 8-bits of each of these is used (or at least contains data, probably one byte for each hunk?)
 	//if (threeDPointer[11] != 0x0000) logerror("3dPointer[11] is %04x!\n", threeDPointer[11]); //           ????         [11]; Used.
 	//if (threeDPointer[12] != 0x0000) logerror("3dPointer[12] is %04x!\n", threeDPointer[12]); //           ????         [12]; Used.
@@ -637,16 +637,16 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 				// bbust2 has m_paletteState3d & 0x40 set, which takes the palette out of range
 				// used for 2nd car on roadedge, used for 2nd player on buriki
 				// used for buildings in fatfurwa intro and characters
-				explicitPaletteValue |= ((m_paletteState3d >>8) & 0x3f) * 0x80;
+				explicitPaletteValue |= ((m_paletteState3d >> 8) & 0x3f) * 0x80;
 			}
 
 			currentPoly.palOffset += explicitPaletteValue;
 
 			//if (chunkOffset[1] & 0x4000)
-			//	currentPoly.palOffset = machine().rand()&0x3ff;
+			//  currentPoly.palOffset = machine().rand()&0x3ff;
 
 			//if (packet[1] & 0x0006)
-			//	currentPoly.palOffset = machine().rand()&0x3ff;
+			//  currentPoly.palOffset = machine().rand()&0x3ff;
 
 			if (chunkOffset[1] & 0x4000)
 				currentPoly.blend = true;
@@ -939,12 +939,12 @@ void hng64_state::recoverPolygonBlock(const uint16_t* packet, int& numPolys)
 
 						// Final pixel values are garnered here :
 						float windowCoords[4];  // Mapped ndCoordinates to screen space
-						windowCoords[0] = (ndCoords[0]+1.0f) * ((float)(512.0f) / 2.0f) + 0.0f;
-						windowCoords[1] = (ndCoords[1]+1.0f) * ((float)(512.0f) / 2.0f) + 0.0f;
+						windowCoords[0] = (ndCoords[0]+1.0f) * (512.0f / 2.0f) + 0.0f;
+						windowCoords[1] = (ndCoords[1]+1.0f) * (512.0f / 2.0f) + 0.0f;
 						windowCoords[2] = (ndCoords[2]+1.0f) * 0.5f;
 
 						// Flip Y
-						windowCoords[1] = (float)512.0f - windowCoords[1];
+						windowCoords[1] = 512.0f - windowCoords[1];
 
 						// Store the points in a list for later use...
 						currentPoly.vert[m].clipCoords[0] = windowCoords[0];
@@ -1204,7 +1204,7 @@ void hng64_state::hng64_fbunkbyte_w(offs_t offset, uint32_t data, uint32_t mem_m
 
 /*
 this is a table filled with 0x0? data, seems to be 8-bit values
- 
+
 roadedge  08080808 08080808 08080808 08080808 08080808 08080808 08080707 08080909 (ingame)
           08080808 08080808 08080808 08080808 08080808 08080808 08080808 08080808 (hyper logo)
 
@@ -1283,14 +1283,14 @@ void hng64_state::setIdentity(float *matrix)
 float hng64_state::uToF(uint16_t input)
 {
 	float retVal;
-	retVal = (float)((int16_t)input) / 32768.0f;
+	retVal = float(int16_t(input)) / 32768.0f;
 	return retVal;
 
 #if 0
-	if ((int16_t)input < 0)
-		retVal = (float)((int16_t)input) / 32768.0f;
+	if (int16_t(input) < 0)
+		retVal = float(int16_t(input)) / 32768.0f;
 	else
-		retVal = (float)((int16_t)input) / 32767.0f;
+		retVal = float(int16_t(input)) / 32767.0f;
 #endif
 }
 
@@ -1299,9 +1299,9 @@ void hng64_state::normalize(float* x)
 	double l2 = (x[0]*x[0]) + (x[1]*x[1]) + (x[2]*x[2]);
 	double l = sqrt(l2);
 
-	x[0] = (float)(x[0] / l);
-	x[1] = (float)(x[1] / l);
-	x[2] = (float)(x[2] / l);
+	x[0] = float(x[0] / l);
+	x[1] = float(x[1] / l);
+	x[2] = float(x[2] / l);
 }
 
 

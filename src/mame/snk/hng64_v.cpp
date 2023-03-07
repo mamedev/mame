@@ -4,12 +4,12 @@
 #include "hng64.h"
 
 /*
-	final mix can clearly only process 2 possibilities for any screen pixel; a 'top' and 'bottom' pixel option
-	one of those can be blended.
-	blended pixels can't be stacked (only one still appears as blended, the other becomes solid)
+    final mix can clearly only process 2 possibilities for any screen pixel; a 'top' and 'bottom' pixel option
+    one of those can be blended.
+    blended pixels can't be stacked (only one still appears as blended, the other becomes solid)
 
-	many examples can be found where using alpha effects just cuts holes in sprites/3D or erases other alpha
-	tilemap layers due to this
+    many examples can be found where using alpha effects just cuts holes in sprites/3D or erases other alpha
+    tilemap layers due to this
 */
 
 #define HNG64_VIDEO_DEBUG 0
@@ -382,7 +382,7 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
 			xinc2 = 0;
 			yinc2 = 0;
 		}
-		
+
 	}
 
 	uint32_t startx = xtopleft;
@@ -592,7 +592,7 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
           | 0000 0011  - road edge alt 1            | dd = global tilemap dimension selector
           | 0000 0111  - road edge alt 2            |  ? = Always Set?
           |                                         |  Z = Global Zoom Disable?
-		  |                                         |  u = bit 0 is explicitly cleared from initialized value in sams64, both bits turned on for buriki 'split' effect
+          |                                         |  u = bit 0 is explicitly cleared from initialized value in sams64, both bits turned on for buriki 'split' effect
  *   1    | oooo oooo oooo oooX ---- ---- ---- ---- | unknown - X is sometimes used (1 in demo of xrally, 0 in game) not always initialized  whole register gets set to 0xffff during mosaic bit of roadedge intro. Also buriki intro
  *        | ---- ---- ---- ---- oooo oooo oYoo oooo | unknown - untouched in sams64 games, initialized elsewhere  Y gets set to 4 at some points in xrally attract
  *   2    | xxxx xxxx xxxx xxxx ---- ---- ---- ---- | tilemap0 per layer flags
@@ -852,20 +852,20 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	   Each framebuffer has enough RAM for 24 bits of data for a 512x256
 	   layer (screen is interlaced, so it doesn't really have 448 pixels
 	   in height)
-   
+
 	   theory: 11 bit palette index (can use either half of palette)
-				1 bit 'blend'
-				4 bit 'light'
-				8 bit depth?
+	            1 bit 'blend'
+	            4 bit 'light'
+	            8 bit depth?
 	*/
 
 	// 3d gets drawn next
 	uint16_t palbase = 0x000;
-    if (m_fbcontrol[2] & 0x20)
-    {
-        if (!m_roadedge_3d_hack)
-            palbase = 0x800;
-    }
+	if (m_fbcontrol[2] & 0x20)
+	{
+		if (!m_roadedge_3d_hack)
+			palbase = 0x800;
+	}
 
 	rectangle visarea = m_screen->visible_area();
 	int ysize = visarea.max_y - visarea.min_y;
@@ -923,7 +923,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 		// this correctly allows buriki intro sprites to use regular alpha, not additive
 		// while also being correct for sams64, which wants additive, but appears to be
 		// incorrect for Fatal Fury's hit effects which want additive
-		// 
+		//
 		// the 6 regs around here have the same values in fatfur and buriki, so are unlikely
 		// to control the blend type.
 		//uint8_t spriteblendtype = (m_tcram[0x10 / 4] >> 16) & 0x10;
@@ -967,7 +967,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 		popmessage("%08x %08x %08x %08x %08x", m_spriteregs[0], m_spriteregs[1], m_spriteregs[2], m_spriteregs[3], m_spriteregs[4]);
 
 	// see notes at top for more detailed info on these
-	if (1)
+	if (0)
 		popmessage("%08x %08x\nTR(%04x %04x %04x %04x)\nSB(%04x %04x %04x %04x)\n%08x %08x %08x\nSPLIT?(%04x %04x %04x %04x)\nAA(%08x %08x)\n%08x",
 			// global tilemap control regs?
 			m_videoregs[0x00], m_videoregs[0x01],
@@ -991,7 +991,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			(m_tcram[0x08 / 4] >> 16) & 0xffff, (m_tcram[0x08 / 4] >> 0) & 0xffff, // 0200 01b0 (fatfurwa) 0200 01c0 (bbust2, xrally)
 
 			// is this 2 groups of 3 regs?
-			(m_tcram[0x0c / 4] >> 24) & 0xff, // 04 = 'blend' on tm1  
+			(m_tcram[0x0c / 4] >> 24) & 0xff, // 04 = 'blend' on tm1
 			(m_tcram[0x0c / 4] >> 16) & 0xff, // 04 = set when fades are going on with blended sprites in buriki intro? otherwise usually 00
 			(m_tcram[0x0c / 4] >> 8) & 0xff,  // upper bit not used? value usually 2x, 4x, 5x or 6x
 			// 2nd group?
@@ -1017,8 +1017,8 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 
 			m_tcram[0x20 / 4], // unused?
 
-			(m_tcram[0x24 / 4] >> 16) & 0xfffc, 
-			((m_tcram[0x24 / 4] >> 16) & 0x0002)>>1, // 0002 gets set in roadedge during some transitions (layers are disabled? blacked out?) 0001  
+			(m_tcram[0x24 / 4] >> 16) & 0xfffc,
+			((m_tcram[0x24 / 4] >> 16) & 0x0002)>>1, // 0002 gets set in roadedge during some transitions (layers are disabled? blacked out?) 0001
 			(m_tcram[0x24 / 4] >> 16) & 0x0001, // 0001 may indicate if to use the 8 below for standard fade, set on SNK logo in roadedge, in FFWA
 
 			// some kind of bitfields, these appear related to fade mode for the registers at 0x28 / 4, set to either 3 or 2 which is additive or subtractive
@@ -1064,17 +1064,17 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	    0001057f
 	*/
 
-	
-	/*
-		palette manipulation note
-	 
-		pal7 pal6 pal5 pal4 pal3 pal2 pal1 pal0  // which fade register those bits relate to?
- 		00   00   11   00   00   00   10   10    // bits in  (m_tcram[0x24 / 4] >> 0)  (set to 0c0a in this example)
 
-		an entry of 00 means palette effect not in use?
-		an entry of 11 means subtractive?
-		an entry of 10 means addition?
-		an entry of 01 means??
+	/*
+	    palette manipulation note
+
+	    pal7 pal6 pal5 pal4 pal3 pal2 pal1 pal0  // which fade register those bits relate to?
+	    00   00   11   00   00   00   10   10    // bits in  (m_tcram[0x24 / 4] >> 0)  (set to 0c0a in this example)
+
+	    an entry of 00 means palette effect not in use?
+	    an entry of 11 means subtractive?
+	    an entry of 10 means addition?
+	    an entry of 01 means??
 	*/
 
 
