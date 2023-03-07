@@ -318,6 +318,7 @@ void pce_cd_device::device_add_mconfig(machine_config &config)
 	m_msm->add_route(ALL_OUTPUTS, "^rspeaker", 0.50);
 
 	CDDA(config, m_cdda);
+	m_cdda->audio_end_cb().set(FUNC(pce_cd_device::cdda_end_mark_cb));
 	m_cdda->add_route(0, "^lspeaker", 1.00);
 	m_cdda->add_route(1, "^rspeaker", 1.00);
 }
@@ -499,7 +500,7 @@ void pce_cd_device::nec_set_audio_start_position()
 
 			const u32 pregap = m_toc->tracks[m_cd_file->get_track(frame)].pregap;
 
-			LOGCMD("MSF=%d %02d:%02d:%02d (pregap=%d)\n", frame, m, s, f, pregap);
+			LOGCMD("MSF=%d %02d:%02d:%02d (pregap = %d)\n", frame, m, s, f, pregap);
 			// PCE tries to be clever here and set (start of track + track pregap size) to skip the pregap
 			// default to 2 secs if that isn't provided
 			// cfr. draculax in-game, fzone2 / fzone2j / ddragon2 intro etc.
@@ -511,7 +512,7 @@ void pce_cd_device::nec_set_audio_start_position()
 		{
 			const u8 track_number = bcd_2_dec(m_command_buffer[2]);
 			const u32 pregap = m_toc->tracks[m_cd_file->get_track(track_number - 1)].pregap;
-			LOGCMD("TRACK=%d (pregap=%d)\n", track_number, pregap);
+			LOGCMD("TRACK=%d (pregap = %d)\n", track_number, pregap);
 			frame = m_toc->tracks[ track_number - 1 ].logframeofs;
 			// Not right for emeraldd, breaks intro lip sync
 			//frame -= std::max(pregap, (u32)150);
@@ -608,7 +609,7 @@ void pce_cd_device::nec_set_audio_stop_position()
 		{
 			const u8 track_number = bcd_2_dec(m_command_buffer[2]);
 			const u32 pregap = m_toc->tracks[m_cd_file->get_track(track_number - 1)].pregap;
-			LOGCMD("TRACK=%d (pregap=%d)\n", track_number, pregap);
+			LOGCMD("TRACK=%d (pregap = %d)\n", track_number, pregap);
 			frame = m_toc->tracks[ track_number - 1 ].logframeofs;
 			//frame -= std::max(pregap, (u32)150);
 			break;
@@ -774,9 +775,12 @@ void pce_cd_device::nec_get_dir_info()
 			msf = cdrom_file::lba_to_msf(frame + 150);
 			LOGCMD("Get total disk size in MSF format => %06x\n", msf);
 
-			m_data_buffer[0] = (msf >> 16) & 0xFF;   /* M */
-			m_data_buffer[1] = (msf >> 8) & 0xFF;    /* S */
-			m_data_buffer[2] = msf & 0xFF;           /* F */
+			// M
+			m_data_buffer[0] = (msf >> 16) & 0xFF;
+			// S
+			m_data_buffer[1] = (msf >> 8) & 0xFF;
+			// F
+			m_data_buffer[2] = msf & 0xFF;
 			m_data_buffer_size = 3;
 			break;
 		case 0x02:
@@ -795,9 +799,12 @@ void pce_cd_device::nec_get_dir_info()
 				m_data_buffer[3] = (toc.tracks[track-1].trktype == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x04;
 			}
 			msf = cdrom_file::lba_to_msf(frame + 150);
-			m_data_buffer[0] = (msf >> 16) & 0xFF;   /* M */
-			m_data_buffer[1] = (msf >> 8) & 0xFF;    /* S */
-			m_data_buffer[2] = msf & 0xFF;             /* F */
+			// M
+			m_data_buffer[0] = (msf >> 16) & 0xFF;
+			// S
+			m_data_buffer[1] = (msf >> 8) & 0xFF;
+			// F
+			m_data_buffer[2] = msf & 0xFF;
 			m_data_buffer_size = 4;
 			break;
 		default:
@@ -877,6 +884,44 @@ void pce_cd_device::handle_data_output()
 			m_scsi_REQ = 1;
 		}
 	}
+}
+
+WRITE_LINE_MEMBER(pce_cd_device::cdda_end_mark_cb)
+{
+	if (state != ASSERT_LINE)
+		return;
+
+	LOGCDDA("CDDA end mark %d\n", m_cdda_play_mode & 3);
+
+	// handle end playback event
+	if (m_end_mark == 1)
+	{
+		switch (m_cdda_play_mode & 3)
+		{
+			case 1:
+			{
+				// TODO: should seek rather than be instant
+				LOGCDDA(" - Play with repeat %d %d\n", m_current_frame, m_end_frame);
+				m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
+				m_end_mark = 1;
+				break;
+			}
+			case 2:
+				LOGCDDA(" - IRQ when finished\n");
+				set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE);
+				m_end_mark = 0;
+				break;
+			case 3:
+				LOGCDDA(" - Play without repeat\n");
+				// fzone2 / fzone2j wants a STOP thru SUBQ command during intro
+				m_cdda_status = PCE_CD_CDDA_OFF;
+				m_cdda->stop_audio();
+				m_end_mark = 0;
+				break;
+		}
+	}
+	else
+		LOGCDDA(" - No end mark encountered\n");
 }
 
 void pce_cd_device::handle_data_input()
@@ -1031,36 +1076,6 @@ void pce_cd_device::update()
 					handle_data_output();
 				}
 			}
-		}
-	}
-
-	// handle end playback event
-	// TODO: should really be a CDDA write_line cb instead
-	if (m_cdda->audio_ended() && m_end_mark == 1)
-	{
-		LOGCDDA("CDDA end mark %d\n", m_cdda_play_mode & 3);
-		switch (m_cdda_play_mode & 3)
-		{
-			case 1:
-			{
-				// TODO: should seek rather than be instant
-				LOGCDDA(" - Play with repeat %d %d\n", m_current_frame, m_end_frame);
-				m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
-				m_end_mark = 1;
-				break;
-			}
-			case 2:
-				LOGCDDA(" - IRQ when finished\n");
-				set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE);
-				m_end_mark = 0;
-				break;
-			case 3:
-				LOGCDDA(" - Play without repeat\n");
-				// fzone2 / fzone2j wants a STOP thru SUBQ command during intro
-				m_cdda_status = PCE_CD_CDDA_OFF;
-				m_cdda->stop_audio();
-				m_end_mark = 0;
-				break;
 		}
 	}
 }

@@ -214,6 +214,8 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(msm5205_int);
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
+
+	DECLARE_WRITE_LINE_MEMBER(cdda_end_mark_cb);
 };
 
 
