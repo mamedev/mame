@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Luxor ABC-99 keyboard and mouse emulation
+    Luxor ABC-99 keyboard emulation
 
 *********************************************************************/
 
@@ -13,6 +13,7 @@
 
 #include "abckb.h"
 
+#include "bus/abckb/r8.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/spkrdev.h"
 
@@ -67,11 +68,9 @@ private:
 
 	void serial_input();
 	TIMER_CALLBACK_MEMBER(serial_clock);
-	TIMER_CALLBACK_MEMBER(scan_mouse);
 
 	void z2_p1_w(uint8_t data);
 	uint8_t z2_p2_r();
-	DECLARE_READ_LINE_MEMBER( z2_t0_r ) { return 1; /* 0=mouse connected, 1=no mouse */ }
 	DECLARE_READ_LINE_MEMBER( z2_t1_r ) { return m_t1_z2; }
 
 	void z2_led_w(uint8_t data);
@@ -84,14 +83,13 @@ private:
 	void abc99_z5_mem(address_map &map);
 
 	emu_timer *m_serial_timer;
-	emu_timer *m_mouse_timer;
 
 	required_device<i8035_device> m_maincpu;
 	required_device<i8035_device> m_mousecpu;
 	required_device<speaker_sound_device> m_speaker;
+	required_device<r8_device> m_mouse;
 	required_ioport m_z14;
 	required_ioport m_cursor;
-	required_ioport m_mouseb;
 	output_finder<11> m_leds;
 
 	int m_si;

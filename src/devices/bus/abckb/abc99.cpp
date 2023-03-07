@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Luxor ABC-99 keyboard and mouse emulation
+    Luxor ABC-99 keyboard emulation
 
 *********************************************************************/
 
@@ -45,7 +45,6 @@ Notes:
 
 	- watchdog
     - language DIP
-    - mouse
 
 */
 
@@ -162,7 +161,7 @@ void abc99_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &abc99_device::abc99_z2_io);
 	m_maincpu->p1_out_cb().set(FUNC(abc99_device::z2_p1_w));
 	m_maincpu->p2_in_cb().set(FUNC(abc99_device::z2_p2_r));
-	m_maincpu->t0_in_cb().set(FUNC(abc99_device::z2_t0_r));
+	m_maincpu->t0_in_cb().set_constant(0); // mouse connected
 	m_maincpu->t1_in_cb().set(FUNC(abc99_device::z2_t1_r));
 
 	// mouse CPU
@@ -172,6 +171,9 @@ void abc99_device::device_add_mconfig(machine_config &config)
 	m_mousecpu->p2_out_cb().set(FUNC(abc99_device::z5_p2_w));
 	m_mousecpu->set_t0_clk_cb(I8035_Z2_TAG, FUNC(device_t::set_unscaled_clock_int));
 	m_mousecpu->t1_in_cb().set(FUNC(abc99_device::z5_t1_r));
+
+	// mouse
+	R8(config, m_mouse, 0);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -417,17 +419,6 @@ INPUT_PORTS_START( abc99 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
-	PORT_START("MOUSEB")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Left Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Middle Mouse Button") PORT_CODE(MOUSECODE_BUTTON3)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Right Mouse Button") PORT_CODE(MOUSECODE_BUTTON2)
-
-	PORT_START("MOUSEX")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
-
-	PORT_START("MOUSEY")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
-
 	PORT_START("J4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Keyboard Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, abc99_device, keyboard_reset, 0)
 INPUT_PORTS_END
@@ -466,16 +457,6 @@ TIMER_CALLBACK_MEMBER(abc99_device::serial_clock)
 }
 
 
-//-------------------------------------------------
-//  scan_mouse -
-//-------------------------------------------------
-
-TIMER_CALLBACK_MEMBER(abc99_device::scan_mouse)
-{
-}
-
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -488,13 +469,12 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 	device_t(mconfig, ABC99, tag, owner, clock),
 	abc_keyboard_interface(mconfig, *this),
 	m_serial_timer(nullptr),
-	m_mouse_timer(nullptr),
 	m_maincpu(*this, I8035_Z2_TAG),
 	m_mousecpu(*this, I8035_Z5_TAG),
 	m_speaker(*this, "speaker"),
+	m_mouse(*this, R8_TAG),
 	m_z14(*this, "Z14"),
 	m_cursor(*this, "CURSOR"),
-	m_mouseb(*this, "MOUSEB"),
 	m_leds(*this, "led%u", 0U),
 	m_si(1),
 	m_si_en(1),
@@ -519,8 +499,6 @@ void abc99_device::device_start()
 	// allocate timers
 	m_serial_timer = timer_alloc(FUNC(abc99_device::serial_clock), this);
 	m_serial_timer->adjust(MCS48_ALE_CLOCK(XTAL(6'000'000)/3), 0, MCS48_ALE_CLOCK(XTAL(6'000'000)/3));
-
-	m_mouse_timer = timer_alloc(FUNC(abc99_device::scan_mouse), this);
 
 	// state saving
 	save_item(NAME(m_si));
@@ -675,8 +653,8 @@ uint8_t abc99_device::z5_p1_r()
 
 	uint8_t data = 0;
 
-	// mouse buttons
-	data |= (m_mouseb->read() & 0x07) << 4;
+	// mouse
+	data |= m_mouse->read() & 0x7f;
 
 	// serial input
 	data |= m_si << 7;
