@@ -1182,10 +1182,10 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="arcusyu">
-		<description>Arcusyu - A-kusu Bangaihen (Japan)</description>
+		<description>Arcshu: Arcs Bangai-hen (Japan)</description>
 		<year>1989</year>
 		<publisher>WolfTeam</publisher>
-		<info name="alt_title" value="あーくしゅ[アークス番外編]"/>
+		<info name="alt_title" value="あーくしゅ［アークス番外編］"/>
 		<info name="serial" value="HG13"/>
 		<info name="gtin" value="04988160920146"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -1197,10 +1197,10 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="arcusyua" cloneof="arcusyu">
-		<description>Arcusyu - A-kusu Bangaihen (Japan, alt)</description>
+		<description>Arcshu: Arcs Bangai-hen (Japan, alt)</description>
 		<year>1989</year>
 		<publisher>WolfTeam</publisher>
-		<info name="alt_title" value="あーくしゅ[アークス番外編]"/>
+		<info name="alt_title" value="あーくしゅ［アークス番外編］"/>
 		<info name="serial" value="HG13"/>
 		<info name="gtin" value="04988160920146"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -13681,10 +13681,10 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="tirnanog">
-		<description>Kindan no Tou: Tir-na-nóg (Japan)</description>
+		<description>Kindan no Tou: Tir-nan-óg (Japan)</description>
 		<year>1990</year>
 		<publisher>System Soft</publisher>
-		<info name="alt_title" value="禁断の塔ティルナノーグ"/>
+		<info name="alt_title" value="禁断の塔ティル・ナ・ノーグ"/>
 		<info name="gtin" value="04988697620113"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">
@@ -13708,10 +13708,10 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="tirnanoga" cloneof="tirnanog">
-		<description>Kindan no Tou: Tir-na-nóg (Japan, alt)</description>
+		<description>Kindan no Tou: Tir-nan-óg (Japan, alt)</description>
 		<year>1990</year>
 		<publisher>System Soft</publisher>
-		<info name="alt_title" value="禁断の塔ティルナノーグ"/>
+		<info name="alt_title" value="禁断の塔ティル・ナ・ノーグ"/>
 		<info name="gtin" value="04988697620113"/>
 		<info name="usage" value="Requires a Japanese system."/>
 		<part name="flop1" interface="floppy_3_5">

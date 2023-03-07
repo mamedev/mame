@@ -20,7 +20,7 @@
  *   7 1c | ---- ---- ---- ---- ---- ---- ---- ---- | not used ??
  *
  *  in (4) ggg seems to be either group, or priority against OTHER layers (7 being the lowest, 0 being the highest in normal situations eg most of the time in buriki)
- * 
+ *
  * (*) Fatal Fury WA standard elements are 0x1000-0x1000, all the other games sets 0x100-0x100, related to the bit 27 of sprite regs 0?
  ** Sprite Global Registers
  * -----------------------
@@ -403,5 +403,5 @@ inline void hng64_state::draw_sprite_line(screen_device& screen, const rectangle
 		zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, m_gfxdecode->gfx(gfxregion), tileno, pal, xflip, yflip, xpos, ypos, dx, dy, dstwidth, 0, zval, zsort, blend, checkerboard, mosaic, mosaic_count_x, curyy, srcpix);
 		xpos += dstwidth;
 	}
-	
+
 }
