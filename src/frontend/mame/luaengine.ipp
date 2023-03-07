@@ -14,7 +14,9 @@
 
 #include "options.h"
 
-#include <lua.hpp>
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
 
 #include <cassert>
 #include <system_error>

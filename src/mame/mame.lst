@@ -18551,6 +18551,7 @@ h2hsoccerc                      // Coleco
 lafootb                         // Mattel
 lchicken                        // LJN
 lightfgt                        // Milton Bradley
+lilcomp                         // Texas Instruments
 mbaskb2                         // Mattel
 mdallas                         // Mattel
 msoccer2                        // Mattel
@@ -23021,6 +23022,7 @@ galpanise                       // 1997.04 (c) 1997 Kaneko (Europe)
 galpanisj                       // 1997.04 (c) 1997 Kaneko (Japan)
 galpanisk                       // 1997.04 (c) 1997 Kaneko (Korea)
 galpaniska                      // 1997.04 (c) 1997 Kaneko (Korea)
+galpanisu                       // 2000
 galpans2                        // 1999.?? (c) 1999 Kaneko (Europe)
 galpans2a                       // 1999.?? (c) 1999 Kaneko (Asia)
 galpans2j                       // 1999.02 (c) 1999 Kaneko (Japan)
@@ -28328,6 +28330,9 @@ blocktax                        // (c)2002 TAX / Game Revival
 @source:misc/bntyhunt.cpp
 bntyhunt                        // (c) 200? GCTech Co., LTD
 
+@source:misc/brglitz.cpp
+brglitz                         // (c) 2014 Harry Levy
+
 @source:misc/buster.cpp
 buster                          // (c) 1987 Marian Electronics Ltd.
 
@@ -29361,7 +29366,7 @@ galgame                         // (c) 1971 Computer Recreations, Inc
 
 @source:misc/gameace.cpp
 hotbody
-hotbodya
+hotbody2
 
 @source:misc/gambl186.cpp
 gambl186                        // EGD
@@ -30243,9 +30248,10 @@ mosaica                         // (c) 1990 Space + Fuuki license
 
 @source:misc/mpu12wbk.cpp
 fruitstb                        // 199? Webak
-fruitstba                       // 1997 Webak
+fruitstba                       // 199? Webak
 fruitstbb                       // 1997 Webak
 fruitstbc                       // 1997 Webak
+fruitstbd                       // 1997 Webak
 
 @source:misc/mtu130.cpp
 mtu130
@@ -39645,6 +39651,7 @@ altbeastbl2                     //
 bayrouteb1                      // (c) 1989 (protected) (bootleg)
 bayrouteb2                      // (c) 1989 (protected) (bootleg)
 beautyb                         // (c) 1991 AMT
+bloxeedbl                       //
 ddcrewbl                        //
 dduxbl                          // (c) 1989 (Datsu bootleg)
 eswatbl                         // bootleg
@@ -43111,6 +43118,7 @@ vballb                          // bootleg (of US set)
 @source:technos/wwfsstar.cpp
 wwfsstar                        // TA-0024 (c) 1989 (Europe)
 wwfsstarb                       // TA-0024 (c) 1989 (Japan)
+wwfsstarc                       // TA-0024 (c) 1989 (Canada)
 wwfsstarj                       // TA-0024 (c) 1989 (Japan)
 wwfsstaru7                      // TA-0024 (c) 1989 (US, newer)
 wwfsstaru6                      // TA-0024 (c) 1989 (US)

@@ -6890,7 +6890,7 @@ license:CC0-1.0
 	NEO-MVS PROG 4096 / NEO-MVS CHA 42G-2
 	-->
 
-	<software name="puzzldpr" cloneof="puzzledp">
+	<software name="puzzldpr">
 		<description>Puzzle De Pon! R!</description>
 		<year>1997</year>
 		<publisher>Visco</publisher>

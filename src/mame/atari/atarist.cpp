@@ -785,8 +785,13 @@ void stbook_state::lcd_control_w(uint16_t data)
 
 void st_state::cpu_space_map(address_map &map)
 {
-	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff3, 0xfffff3).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 25; }));
+	map(0xfffff5, 0xfffff5).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([this] () -> u8 { m_maincpu->set_input_line(2, CLEAR_LINE); return 26; }));
+	map(0xfffff7, 0xfffff7).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 27; }));
+	map(0xfffff9, 0xfffff9).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([this] () -> u8 { m_maincpu->set_input_line(4, CLEAR_LINE); return 28; }));
+	map(0xfffffb, 0xfffffb).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 29; }));
 	map(0xfffffd, 0xfffffd).r(m_mfp, FUNC(mc68901_device::get_vector));
+	map(0xffffff, 0xffffff).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 31; }));
 }
 
 //-------------------------------------------------
@@ -1427,8 +1432,8 @@ void st_state::st(machine_config &config)
 	m_video->set_ram(m_mainram);
 	m_video->set_mmu(m_mmu);
 	m_video->de_cb().set(m_mfp, FUNC(mc68901_device::tbi_w));
-	m_video->hsync_cb().set_inputline(m_maincpu, 2);
-	m_video->vsync_cb().set_inputline(m_maincpu, 4);
+	m_video->hsync_cb().set([this](int state) { if(state) m_maincpu->set_input_line(2, ASSERT_LINE); });
+	m_video->vsync_cb().set([this](int state) { if(state) m_maincpu->set_input_line(4, ASSERT_LINE); });
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

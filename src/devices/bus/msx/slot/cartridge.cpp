@@ -31,6 +31,7 @@ enum
 
 DEFINE_DEVICE_TYPE(MSX_SLOT_CARTRIDGE,        msx_slot_cartridge_device,        "msx_slot_cartridge",        "MSX Cartridge slot")
 DEFINE_DEVICE_TYPE(MSX_SLOT_YAMAHA_EXPANSION, msx_slot_yamaha_expansion_device, "msx_slot_yamaha_expansion", "MSX Yamaha Expansion slot")
+DEFINE_DEVICE_TYPE(MSX_SLOT_YAMAHA_MINICART,  msx_slot_yamaha_minicart_device,  "msx_slot_yamaha_minicart",  "MSX Yamaha Minicart slot")
 
 
 msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -319,6 +320,18 @@ msx_slot_yamaha_expansion_device::msx_slot_yamaha_expansion_device(const machine
 }
 
 void msx_slot_yamaha_expansion_device::device_start()
+{
+}
+
+
+
+
+msx_slot_yamaha_minicart_device::msx_slot_yamaha_minicart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: msx_slot_cartridge_device(mconfig, MSX_SLOT_YAMAHA_MINICART, tag, owner, clock)
+{
+}
+
+void msx_slot_yamaha_minicart_device::device_start()
 {
 }
 

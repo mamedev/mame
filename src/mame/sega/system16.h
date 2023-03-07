@@ -70,6 +70,7 @@ public:
 	void tturfbl(machine_config &config);
 	void altbeastbl(machine_config &config);
 	void system18(machine_config &config);
+	void bloxeedbl(machine_config &config);
 
 	void init_passsht();
 	void init_wb3bbl();
@@ -176,6 +177,7 @@ private:
 	void bayrouteb1_map(address_map &map);
 	void bayrouteb2_map(address_map &map);
 	void beautyb_map(address_map &map);
+	void bloxeedbl_map(address_map &map);
 	void ddcrewbl_map(address_map &map);
 	void dduxbl_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);

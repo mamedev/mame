@@ -20,6 +20,7 @@
 #include "bus/msx/slot/ram_mm.h"
 #include "bus/msx/slot/rom.h"
 #include "bus/msx/slot/sony08.h"
+#include "softlist_dev.h"
 
 using namespace msx_keyboard;
 
@@ -3704,11 +3705,12 @@ void msx2_state::cx7128(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
-	// mini cartridge port in slot #3-1
+	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_MINICART, "minicart", 3, 1, msx_yamaha_minicart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_unused_bits(0x80);   // 64KB Mapper RAM
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, nullptr);
+	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, nullptr);
 
 	msx2(SND_YM2149, config, REGION_JAPAN);
+	SOFTWARE_LIST(config, "minicart_list").set_original("msx_yamaha_minicart");
 }
 
 /* MSX2 - Yamaha CX7M/128 */
@@ -3719,9 +3721,6 @@ ROM_START(cx7m128)
 
 	ROM_REGION(0x4000, "subrom", 0)
 	ROM_LOAD("cx7mext.rom", 0x0000, 0x4000, BAD_DUMP CRC(4a48779c) SHA1(b8e30d604d319d511cbfbc61e5d8c38fbb9c5a33)) // needs verification
-
-	ROM_REGION(0x4000, "minicart", 0)
-	ROM_LOAD("yrm502.rom", 0x0000, 0x4000, CRC(51f7ddd1) SHA1(2a4b4a4657e3077df8a88f98210b76883d3702b1))
 ROM_END
 
 void msx2_state::cx7m128(machine_config &config)
@@ -3735,12 +3734,12 @@ void msx2_state::cx7m128(machine_config &config)
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 3, 0, 0, 1, "subrom");
-	// mini cartridge port in slot #3-1
-	add_internal_slot(config, MSX_SLOT_ROM, "minicart", 3, 1, 1, 1, "minicart");
+	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_MINICART, "minicart", 3, 1, msx_yamaha_minicart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000).set_unused_bits(0x80);   // 64KB Mapper RAM
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, "sfg05");
+	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, "sfg05");
 
 	msx2(SND_YM2149, config, REGION_JAPAN);
+	SOFTWARE_LIST(config, "minicart_list").set_original("msx_yamaha_minicart");
 }
 
 /* MSX2 - Yamaha YIS-503 III R (student) */
@@ -3810,6 +3809,7 @@ void msx2_state::yis604(machine_config &config)
 {
 	// YM2149 (in S-3527)
 	// FDC: None, 0 drives
+	// 1 Minicart slot (with Beginnner's Lesson)
 	// 2 Cartridge slots
 	// S-3527 MSX Engine
 
@@ -3817,11 +3817,12 @@ void msx2_state::yis604(machine_config &config)
 	add_internal_slot(config, MSX_SLOT_ROM, "subrom", 0, 1, 0, 1, "subrom");
 	add_cartridge_slot<1>(config, 1);
 	add_cartridge_slot<2>(config, 2);
-	// Mini cartridge slot in slot #3-1
+	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_MINICART, "minicart", 3, 1, msx_yamaha_minicart, nullptr);
 	add_internal_slot(config, MSX_SLOT_RAM_MM, "ram_mm", 3, 2, 0, 4).set_total_size(0x20000); // 128KB Mapper RAM
-	add_cartridge_slot<3>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, nullptr);
+	add_cartridge_slot<4>(config, MSX_SLOT_YAMAHA_EXPANSION, "expansion", 3, 3, msx_yamaha_60pin, nullptr);
 
 	msx2(SND_YM2149, config, REGION_JAPAN);
+	SOFTWARE_LIST(config, "minicart_list").set_original("msx_yamaha_minicart");
 }
 
 /* MSX2 - Yamaha YIS-805/128 */
