@@ -14,6 +14,7 @@
 #include "fmpac.h"
 #include "fs_sr022.h"
 #include "halnote.h"
+#include "hbi55.h"
 #include "hfox.h"
 #include "holy_quran.h"
 #include "ink.h"
@@ -79,6 +80,7 @@ void msx_cart(device_slot_interface &device, bool is_in_subslot)
 	device.option_add_internal("ec701", MSX_CART_EC701);
 	device.option_add("beepack", MSX_CART_BEEPACK);
 	device.option_add("bm_012", MSX_CART_BM_012);
+	device.option_add("hbi55", MSX_CART_HBI55);
 	device.option_add("moonsound", MSX_CART_MOONSOUND);
 	if (!is_in_subslot)
 	{
