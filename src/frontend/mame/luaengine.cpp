@@ -31,7 +31,9 @@
 #include "corestr.h"
 #include "notifier.h"
 
+#include <condition_variable>
 #include <cstring>
+#include <mutex>
 #include <thread>
 
 
@@ -57,6 +59,91 @@ struct lua_engine::devenum
 
 
 namespace {
+
+struct thread_context
+{
+private:
+	sol::object m_result;
+	std::mutex m_guard;
+	std::condition_variable m_sync;
+
+public:
+	bool m_busy = false;
+	bool m_yield = false;
+
+	bool start(char const *scr)
+	{
+		std::unique_lock<std::mutex> lock(m_guard);
+		if (m_busy)
+			return false;
+
+		std::string script(scr);
+		std::thread th(
+				[this, script = std::string(scr)] ()
+				{
+					sol::state thstate;
+					thstate.open_libraries();
+					thstate["package"]["preload"]["zlib"] = &luaopen_zlib;
+					thstate["package"]["preload"]["lfs"] = &luaopen_lfs;
+					thstate["package"]["preload"]["linenoise"] = &luaopen_linenoise;
+					sol::load_result res = thstate.load(script);
+					if (res.valid())
+					{
+						sol::protected_function func = res.get<sol::protected_function>();
+						thstate.set_function(
+								"yield",
+								[this, &thstate]()
+								{
+									std::unique_lock<std::mutex> lock(m_guard);
+									m_result = thstate["status"];
+									m_yield = true;
+									m_sync.wait(lock);
+									m_yield = false;
+									thstate["status"] = m_result;
+								});
+						auto ret = func();
+						if (ret.valid())
+						{
+							m_result = ret.get<sol::object>();
+						}
+						else
+						{
+							sol::error err = ret;
+							osd_printf_error("[LUA ERROR] in thread: %s\n", err.what());
+						}
+					}
+					else
+					{
+						sol::error err = res;
+						osd_printf_error("[LUA ERROR] when loading script for thread: %s\n", err.what());
+					}
+					m_busy = false; // FIXME: shouldn't do this when not holding the lock
+			});
+		m_busy = true;
+		m_yield = false;
+		th.detach();
+		return true;
+	}
+
+	void resume(sol::object val)
+	{
+		std::unique_lock<std::mutex> lock(m_guard);
+		if (m_yield)
+		{
+			m_result = val;
+			m_sync.notify_all();
+		}
+	}
+
+	sol::object result()
+	{
+		std::unique_lock<std::mutex> lock(m_guard);
+		if (m_busy && !m_yield)
+			return sol::lua_nil;
+		else
+			return m_result;
+	}
+};
 
 struct image_interface_formats
 {
@@ -883,70 +970,12 @@ void lua_engine::initialize()
  * thread.yield - check if thread is yielded
  */
 
-	auto thread_type = emu.new_usertype<context>("thread", sol::call_constructor, sol::constructors<sol::types<>>());
-	thread_type.set("start", [](context &ctx, const char *scr) {
-			std::string script(scr);
-			if (ctx.busy)
-				return false;
-			std::thread th([&ctx, script]() {
-					sol::state thstate;
-					thstate.open_libraries();
-					thstate["package"]["preload"]["zlib"] = &luaopen_zlib;
-					thstate["package"]["preload"]["lfs"] = &luaopen_lfs;
-					thstate["package"]["preload"]["linenoise"] = &luaopen_linenoise;
-					sol::load_result res = thstate.load(script);
-					if(res.valid())
-					{
-						sol::protected_function func = res.get<sol::protected_function>();
-						thstate["yield"] = [&ctx, &thstate]() {
-								std::mutex m;
-								std::unique_lock<std::mutex> lock(m);
-								ctx.result = thstate["status"];
-								ctx.yield = true;
-								ctx.sync.wait(lock);
-								ctx.yield = false;
-								thstate["status"] = ctx.result;
-							};
-						auto ret = func();
-						if (ret.valid())
-						{
-							const char *tmp = ret.get<const char *>();
-							if (tmp != nullptr)
-								ctx.result = tmp;
-							else
-								osd_printf_error("[LUA ERROR] in thread: return value must be string\n");
-						}
-						else
-						{
-							sol::error err = ret;
-							osd_printf_error("[LUA ERROR] in thread: %s\n", err.what());
-						}
-					}
-					else
-					{
-						sol::error err = res;
-						osd_printf_error("[LUA ERROR] when loading script for thread: %s\n", err.what());
-					}
-					ctx.busy = false;
-				});
-			ctx.busy = true;
-			ctx.yield = false;
-			th.detach();
-			return true;
-		});
-	thread_type.set("continue", [](context &ctx, const char *val) {
-			if (!ctx.yield)
-				return;
-			ctx.result = val;
-			ctx.sync.notify_all();
-		});
-	thread_type.set("result", sol::property([](context &ctx) -> std::string {
-			if (ctx.busy && !ctx.yield)
-				return "";
-			return ctx.result;
-		}));
-	thread_type.set("busy", sol::readonly(&context::busy));
-	thread_type.set("yield", sol::readonly(&context::yield));
+	auto thread_type = emu.new_usertype<thread_context>("thread", sol::call_constructor, sol::constructors<sol::types<>>());
+	thread_type.set_function("start", &thread_context::start);
+	thread_type.set_function("continue", &thread_context::resume);
+	thread_type["result"] = sol::property(&thread_context::result);
+	thread_type["busy"] = sol::readonly(&thread_context::m_busy);
+	thread_type["yield"] = sol::readonly(&thread_context::m_yield);
 
 
 /*  save_item library

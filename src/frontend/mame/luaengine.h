@@ -12,7 +12,6 @@
 
 #pragma once
 
-#include <condition_variable>
 #include <functional>
 #include <map>
 #include <memory>
@@ -159,15 +158,6 @@ private:
 		unsigned int valcount;
 		unsigned int blockcount;
 		unsigned int stride;
-	};
-
-	struct context
-	{
-		context() { busy = false; yield = false; }
-		std::string result;
-		std::condition_variable sync;
-		bool busy;
-		bool yield;
 	};
 
 	// internal state
