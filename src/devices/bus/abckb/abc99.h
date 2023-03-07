@@ -31,6 +31,9 @@ public:
 	// construction/destruction
 	abc99_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	DECLARE_CUSTOM_INPUT_MEMBER( cursor_x4_r );
+	DECLARE_CUSTOM_INPUT_MEMBER( cursor_x6_r );
+
 	DECLARE_INPUT_CHANGED_MEMBER( keyboard_reset );
 
 protected:
@@ -87,6 +90,7 @@ private:
 	required_device<i8035_device> m_mousecpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_ioport m_z14;
+	required_ioport m_cursor;
 	required_ioport m_mouseb;
 	output_finder<11> m_leds;
 
