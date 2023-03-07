@@ -13,29 +13,17 @@
 
 
 
-#include "emu.h"
-
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define R8_TAG "r8"
-
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> r8_device
+// ======================> luxor_r8_device
 
-class r8_device :  public device_t
+class luxor_r8_device :  public device_t
 {
 public:
 	// construction/destruction
-	r8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	luxor_r8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	u8 read();
 
@@ -55,23 +43,20 @@ private:
 	required_ioport m_mouse_x;
 	required_ioport m_mouse_y;
 
-	struct
-	{
-		int phase;
-		int x;
-		int y;
-		int prev_x;
-		int prev_y;
-		int xa;
-		int xb;
-		int ya;
-		int yb;
-	} m_mouse;
+	int m_phase;
+	int m_x;
+	int m_y;
+	int m_prev_x;
+	int m_prev_y;
+	int m_xa;
+	int m_xb;
+	int m_ya;
+	int m_yb;
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(R8, r8_device)
+DECLARE_DEVICE_TYPE(LUXOR_R8, luxor_r8_device)
 
 
 #endif // MAME_BUS_ABCKB_R8_H
