@@ -2065,11 +2065,11 @@ void namcos23_state::c435_pio_w(uint16_t data)
 	}
 
 	if(!known) {
-		std::string buf = "c435 -";
+		std::stringstream buf("c435 -");
 		for(int i=0; i<m_c435_buffer_pos; i++)
-			buf += util::string_format(" %04x", m_c435_buffer[i]);
-		buf += "\n";
-		logerror(buf);
+			util::stream_format(buf, " %04x", m_c435_buffer[i]);
+		buf << "\n";
+		logerror(buf.str());
 	}
 
 	m_c435_buffer_pos = 0;
