@@ -25,6 +25,8 @@ public:
 	int audio_paused();
 	int audio_ended();
 
+	auto audio_end_cb() { return m_audio_end_cb.bind(); }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -47,6 +49,8 @@ private:
 	uint32_t              m_audio_samples;
 	uint32_t              m_audio_bptr;
 	int16_t               m_audio_volume[2];
+
+	devcb_write_line m_audio_end_cb;
 };
 
 DECLARE_DEVICE_TYPE(CDDA, cdda_device)

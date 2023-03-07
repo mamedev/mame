@@ -492,26 +492,29 @@ void pce_cd_device::nec_set_audio_start_position()
 			break;
 		case 0x40:
 		{
-			uint8_t m, s, f;
-
-			m = bcd_2_dec(m_command_buffer[2]);
-			s = bcd_2_dec(m_command_buffer[3]);
-			f = bcd_2_dec(m_command_buffer[4]);
-
+			const u8 m = bcd_2_dec(m_command_buffer[2]);
+			const u8 s = bcd_2_dec(m_command_buffer[3]);
+			const u8 f = bcd_2_dec(m_command_buffer[4]);
 			frame = f + 75 * (s + m * 60);
-			LOGCMD("MSF=%d %02d:%02d:%02d\n", frame, m, s, f);
+
+			const u32 pregap = m_toc->tracks[m_cd_file->get_track(frame)].pregap;
+
+			LOGCMD("MSF=%d %02d:%02d:%02d (pregap=%d)\n", frame, m, s, f, pregap);
 			// PCE tries to be clever here and set (start of track + track pregap size) to skip the pregap
 			// default to 2 secs if that isn't provided
 			// cfr. draculax in-game, fzone2 / fzone2j / ddragon2 intro etc.
 			// TODO: is this a global issue and INDEX 01 with no explicit pregap is always 2 seconds in INDEX 00 like in the aforementioned examples?
-			frame -= std::max(m_toc->tracks[m_cd_file->get_track(frame)].pregap, (u32)150);
+			frame -= std::max(pregap, (u32)150);
 			break;
 		}
 		case 0x80:
 		{
 			const u8 track_number = bcd_2_dec(m_command_buffer[2]);
-			LOGCMD("TRACK=%d\n", track_number);
+			const u32 pregap = m_toc->tracks[m_cd_file->get_track(track_number - 1)].pregap;
+			LOGCMD("TRACK=%d (pregap=%d)\n", track_number, pregap);
 			frame = m_toc->tracks[ track_number - 1 ].logframeofs;
+			// Not right for emeraldd, breaks intro lip sync
+			//frame -= std::max(pregap, (u32)150);
 			break;
 		}
 		default:
@@ -557,7 +560,7 @@ void pce_cd_device::nec_set_audio_start_position()
 			// fzone2 / fzone2j / draculax (stage 2' pre-boss) definitely don't want this
 			// to start redbook. It's done later with 0xd9 command.
 			//if (m_end_frame > m_current_frame)
-			//	m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
+			//  m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
 
 			m_cdda_play_mode = 3;
 			m_end_mark = 0;
@@ -591,23 +594,23 @@ void pce_cd_device::nec_set_audio_stop_position()
 			break;
 		case 0x40:
 		{
-			uint8_t m, s, f;
-
-			m = bcd_2_dec(m_command_buffer[2]);
-			s = bcd_2_dec(m_command_buffer[3]);
-			f = bcd_2_dec(m_command_buffer[4]);
+			const u8 m = bcd_2_dec(m_command_buffer[2]);
+			const u8 s = bcd_2_dec(m_command_buffer[3]);
+			const u8 f = bcd_2_dec(m_command_buffer[4]);
+			const u32 pregap = m_toc->tracks[m_cd_file->get_track(frame)].pregap;
 
 			frame = f + 75 * (s + m * 60);
-			LOGCMD("MSF=%d %02d:%02d:%02d (pregap = %d)\n", frame, m, s, f, m_toc->tracks[m_cd_file->get_track(frame)].pregap);
-			// TODO: pinpoint if this needs a gap offset too
-			frame -= std::max(m_toc->tracks[m_cd_file->get_track(frame)].pregap, (u32)150);
+			LOGCMD("MSF=%d %02d:%02d:%02d (pregap = %d)\n", frame, m, s, f, pregap);
+			frame -= std::max(pregap, (u32)150);
 			break;
 		}
 		case 0x80:
 		{
 			const u8 track_number = bcd_2_dec(m_command_buffer[2]);
-			LOGCMD("TRACK=%d\n", track_number);
+			const u32 pregap = m_toc->tracks[m_cd_file->get_track(track_number - 1)].pregap;
+			LOGCMD("TRACK=%d (pregap=%d)\n", track_number, pregap);
 			frame = m_toc->tracks[ track_number - 1 ].logframeofs;
+			//frame -= std::max(pregap, (u32)150);
 			break;
 		}
 		default:

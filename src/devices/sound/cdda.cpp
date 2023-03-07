@@ -42,6 +42,8 @@ void cdda_device::device_start()
 	m_audio_bptr = 0;
 	m_disc = nullptr;
 
+	m_audio_end_cb.resolve_safe();
+
 	save_item( NAME(m_audio_playing) );
 	save_item( NAME(m_audio_pause) );
 	save_item( NAME(m_audio_ended_normally) );
@@ -174,6 +176,7 @@ void cdda_device::get_audio_data(write_stream_view &bufL, write_stream_view &buf
 			{
 				m_audio_playing = false;
 				m_audio_ended_normally = true;
+				m_audio_end_cb(ASSERT_LINE);
 			}
 
 			bufL.fill(0, sampindex);
@@ -238,5 +241,6 @@ cdda_device::cdda_device(const machine_config &mconfig, const char *tag, device_
 	, device_sound_interface(mconfig, *this)
 	, m_disc(nullptr)
 	, m_stream(nullptr)
+	, m_audio_end_cb(*this)
 {
 }
