@@ -63,7 +63,7 @@ namespace {
 struct thread_context
 {
 private:
-	sol::object m_result;
+	std::string m_result;
 	std::mutex m_guard;
 	std::condition_variable m_sync;
 
@@ -73,7 +73,7 @@ public:
 
 	bool start(char const *scr)
 	{
-		std::unique_lock<std::mutex> lock(m_guard);
+		std::unique_lock<std::mutex> caller_lock(m_guard);
 		if (m_busy)
 			return false;
 
@@ -87,6 +87,7 @@ public:
 					thstate["package"]["preload"]["lfs"] = &luaopen_lfs;
 					thstate["package"]["preload"]["linenoise"] = &luaopen_linenoise;
 					sol::load_result res = thstate.load(script);
+					std::unique_lock<std::mutex> result_lock(m_guard, std::defer_lock);
 					if (res.valid())
 					{
 						sol::protected_function func = res.get<sol::protected_function>();
@@ -94,17 +95,24 @@ public:
 								"yield",
 								[this, &thstate]()
 								{
-									std::unique_lock<std::mutex> lock(m_guard);
+									std::unique_lock<std::mutex> yield_lock(m_guard);
 									m_result = thstate["status"];
 									m_yield = true;
-									m_sync.wait(lock);
+									m_sync.wait(yield_lock);
 									m_yield = false;
 									thstate["status"] = m_result;
 								});
 						auto ret = func();
+						result_lock.lock();
 						if (ret.valid())
 						{
-							m_result = ret.get<sol::object>();
+							auto result = ret.get<std::optional<char const *> >();
+							if (!result)
+								osd_printf_error("[LUA ERROR] in thread: return value must be string\n");
+							else if (!*result)
+								m_result.clear();
+							else
+								m_result = *result;
 						}
 						else
 						{
@@ -114,10 +122,12 @@ public:
 					}
 					else
 					{
+						result_lock.lock();
 						sol::error err = res;
 						osd_printf_error("[LUA ERROR] when loading script for thread: %s\n", err.what());
 					}
-					m_busy = false; // FIXME: shouldn't do this when not holding the lock
+					assert(result_lock);
+					m_busy = false;
 			});
 		m_busy = true;
 		m_yield = false;
@@ -125,23 +135,26 @@ public:
 		return true;
 	}
 
-	void resume(sol::object val)
+	void resume(char const *val)
 	{
 		std::unique_lock<std::mutex> lock(m_guard);
 		if (m_yield)
 		{
-			m_result = val;
+			if (val)
+				m_result = val;
+			else
+				m_result.clear();
 			m_sync.notify_all();
 		}
 	}
 
-	sol::object result()
+	char const *result()
 	{
 		std::unique_lock<std::mutex> lock(m_guard);
 		if (m_busy && !m_yield)
-			return sol::lua_nil;
+			return "";
 		else
-			return m_result;
+			return m_result.c_str();
 	}
 };
 

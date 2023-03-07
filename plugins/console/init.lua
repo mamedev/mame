@@ -45,8 +45,8 @@ function console.startplugin()
 			function(c, str)
 				status = str
 				yield()
-				for k, v in pairs(status) do
-					ln.addcompletion(c, v)
+				for candidate in status:gmatch('([^\001]+)') do
+					ln.addcompletion(c, candidate)
 				end
 			end)
 		local ret = ln.linenoise('$PROMPT')
@@ -207,9 +207,9 @@ function console.startplugin()
 		local str, strs, expr, sep = simplify_expression(line, word)
 		contextual_list(expr, sep, str, word, strs)
 		if #matches == 0 then
-			return { line }
+			return line
 		elseif #matches == 1 then
-			return { start .. matches[1] }
+			return start .. matches[1]
 		end
 		print("")
 		result = { }
@@ -217,7 +217,7 @@ function console.startplugin()
 			print(v)
 			table.insert(result, start .. v)
 		end
-		return result
+		return table.concat(result, '\001')
 	end
 
 	emu.register_start(function()
