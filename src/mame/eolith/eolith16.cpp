@@ -24,11 +24,11 @@
 
 namespace {
 
-class eolith16_state : public eolith_state_base
+class eolith16_state : public eolith_e1_speedup_state_base
 {
 public:
 	eolith16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: eolith_state_base(mconfig, type, tag)
+		: eolith_e1_speedup_state_base(mconfig, type, tag)
 		, m_special_io(*this, "SPECIAL")
 		, m_eepromoutport(*this, "EEPROMOUT")
 		, m_vram(*this, "vram", 0x20000, ENDIANNESS_BIG)
@@ -123,7 +123,7 @@ INPUT_PORTS_END
 
 void eolith16_state::video_start()
 {
-	eolith_state_base::video_start();
+	eolith_e1_speedup_state_base::video_start();
 
 	m_vrambank->configure_entries(0, 2, memshare("vram")->ptr(), 0x10000);
 	m_vrambank->set_entry(0);
@@ -131,12 +131,11 @@ void eolith16_state::video_start()
 
 uint32_t eolith16_state::screen_update_eolith16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = 0; y < 204; y++)
+	for (int y = cliprect.top(); y <= std::min(cliprect.bottom(), 203); y++)
 	{
+		auto *pix = &bitmap.pix(y);
 		for (int x = 0; x < 320; x++)
-		{
-			bitmap.pix(y, x) = m_vram[(y * 320) + x] & 0xff;
-		}
+			*pix++ = m_vram[(y * 320) + x] & 0xff;
 	}
 	return 0;
 }
@@ -259,4 +258,4 @@ void eolith16_state::init_eolith16()
 } // anonymous namespace
 
 
-GAME( 1999, klondkp, 0, eolith16, eolith16, eolith16_state, init_eolith16, ROT0, "Eolith", "KlonDike+", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, klondkp, 0, eolith16, eolith16, eolith16_state, init_eolith16, ROT0, "Eolith", "KlonDike+", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

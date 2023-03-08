@@ -115,11 +115,11 @@
 
 namespace {
 
-class eolith_state : public eolith_state_base
+class eolith_state : public eolith_e1_speedup_state_base
 {
 public:
 	eolith_state(const machine_config &mconfig, device_type type, const char *tag)
-		: eolith_state_base(mconfig, type, tag)
+		: eolith_e1_speedup_state_base(mconfig, type, tag)
 		, m_soundcpu(*this, "soundcpu")
 		, m_qs1000(*this, "qs1000")
 		, m_eepromoutport(*this, "EEPROMOUT")
@@ -220,7 +220,7 @@ uint16_t eolith_state::eolith_vram_r(offs_t offset)
 
 void eolith_state::video_start()
 {
-	eolith_state_base::video_start();
+	eolith_e1_speedup_state_base::video_start();
 
 	m_vram = std::make_unique<uint16_t[]>(0x40000);
 	save_pointer(NAME(m_vram), 0x40000);
@@ -231,12 +231,11 @@ void eolith_state::video_start()
 
 uint32_t eolith_state::screen_update_eolith(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = 0; y < 240; y++)
+	for (int y = cliprect.top(); y <= std::min(cliprect.bottom(), 239); y++)
 	{
+		auto *pix = &bitmap.pix(y);
 		for (int x = 0; x < 320; x++)
-		{
-			bitmap.pix(y, x) = m_vram[(0x40000/2) * (m_buffer ^ 1) + (y * 336) + x] & 0x7fff;
-		}
+			*pix++ = m_vram[(0x40000/2) * (m_buffer ^ 1) + (y * 336) + x] & 0x7fff;
 	}
 
 	return 0;
@@ -251,7 +250,7 @@ uint32_t eolith_state::screen_update_eolith(screen_device &screen, bitmap_ind16 
 
 void eolith_state::machine_start()
 {
-	eolith_state_base::machine_start();
+	eolith_e1_speedup_state_base::machine_start();
 
 	m_led.resolve();
 
@@ -261,7 +260,7 @@ void eolith_state::machine_start()
 
 void eolith_state::machine_reset()
 {
-	eolith_state_base::machine_reset();
+	eolith_e1_speedup_state_base::machine_reset();
 
 	m_soundcpu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 }

@@ -14,7 +14,7 @@
   this could probably be done a bit better using timers
 */
 
-void eolith_state_base::speedup_read()
+void eolith_e1_speedup_state_base::speedup_read()
 {
 	/* for debug */
 	//if ((m_maincpu->pc()!=m_speedup_address) && (m_speedup_vblank!=1) )
@@ -40,8 +40,8 @@ static const struct
 
 } eolith_speedup_table[] =
 {
-	/* eolith.cpp */
-	{ "linkypip", 0x4000825c, -1,/*0x4000ABAE,*/ 240 }, // 2nd address is used on the planet cutscene between but idle skipping between levels, but seems too aggressive
+	// eolith.cpp
+	{ "linkypip", 0x4000825c, -1,/*0x4000abae,*/ 240 }, // 2nd address is used on the planet cutscene between but idle skipping between levels, but seems too aggressive
 	{ "ironfort", 0x40020854, -1, 240 },
 	{ "ironfortc",0x40020234, -1, 240 },
 	{ "hidnctch", 0x4000bba0, -1, 240 },
@@ -61,15 +61,14 @@ static const struct
 	{ "penfana",  0x4001FAb6, -1, 240 },
 	{ "candy",    0x4001990C, -1, 240 },
 	{ "hidnc2k",  0x40016824, -1, 240 },
-	/* eolith16.cpp */
+	// eolith16.cpp
 	{ "klondkp",  0x0001a046, -1, 240 },
-	/* vegaeo.cpp */
-	{ "crazywar", 0x00008cf8, -1, 240 },
-	{ nullptr, 0, 0 }
+	// vegaeo.cpp
+	{ "crazywar", 0x00008cf8, -1, 240 }
 };
 
 
-void eolith_state_base::init_speedup()
+void eolith_e1_speedup_state_base::init_speedup()
 {
 	m_speedup_address = 0;
 	m_speedup_address2 = 0;
@@ -93,7 +92,7 @@ void eolith_state_base::init_speedup()
 }
 
 /* todo, use timers instead! */
-TIMER_DEVICE_CALLBACK_MEMBER(eolith_state_base::eolith_speedup)
+TIMER_DEVICE_CALLBACK_MEMBER(eolith_e1_speedup_state_base::eolith_speedup)
 {
 	if (param == 0)
 		m_speedup_vblank = 0;
@@ -105,7 +104,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(eolith_state_base::eolith_speedup)
 		m_speedup_vblank = 1;
 }
 
-READ_LINE_MEMBER(eolith_state_base::speedup_vblank_r)
+READ_LINE_MEMBER(eolith_e1_speedup_state_base::speedup_vblank_r)
 {
 //  printf("%s:eolith speedup_read data %02x\n",machine().describe_context().c_str(), m_speedup_vblank);
 
@@ -114,7 +113,7 @@ READ_LINE_MEMBER(eolith_state_base::speedup_vblank_r)
 }
 
 // StealSee doesn't use interrupts, just the vblank
-READ_LINE_MEMBER(eolith_state_base::stealsee_speedup_vblank_r)
+READ_LINE_MEMBER(eolith_e1_speedup_state_base::stealsee_speedup_vblank_r)
 {
 	int pc = m_maincpu->pc();
 
