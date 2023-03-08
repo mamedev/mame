@@ -170,7 +170,9 @@ void eolith16_state::eolith16(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &eolith16_state::eolith16_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(eolith16_state::eolith_speedup), "screen", 0, 1);
 
-	EEPROM_93C66_8BIT(config, "eeprom");
+	EEPROM_93C66_8BIT(config, "eeprom")
+			.erase_time(attotime::from_usec(250))
+			.write_time(attotime::from_usec(250));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -258,4 +260,4 @@ void eolith16_state::init_eolith16()
 } // anonymous namespace
 
 
-GAME( 1999, klondkp, 0, eolith16, eolith16, eolith16_state, init_eolith16, ROT0, "Eolith", "KlonDike+", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, klondkp, 0, eolith16, eolith16, eolith16_state, init_eolith16, ROT0, "Eolith", "KlonDike+", MACHINE_SUPPORTS_SAVE )
