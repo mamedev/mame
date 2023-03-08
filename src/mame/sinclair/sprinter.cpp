@@ -1378,24 +1378,23 @@ u8 sprinter_state::kbd_fe_r(offs_t offset)
 {
 	u8 data = 0xff;
 
-	offset >>= 8;
-	u8 line = ~0;
+	u8 oi = offset >> 8;
 	u8 shifts = 0xff;
-	for (u8 i = 0; i < 8; i++, offset >>= 1)
+	for (u8 i = 0; i < 8; i++, oi >>= 1)
 	{
-		shifts &= m_io_line[i]->read();
-		if ((offset & 1) == 0)
-			line = i;
+		const u8 line_data = m_io_line[i]->read();
+		shifts &= line_data;
+		if ((oi & 1) == 0)
+			data &= line_data;
 	}
 
-	data = m_io_line[line]->read();
-	if ((line == 0) && BIT(~shifts, 6))
+	if (((offset & 0x0100) == 0) && BIT(~shifts, 6))
 		data &= ~0x01; // CS
 
-	if ((line == 7) && BIT(~shifts, 7))
+	if (((offset & 0x8000) == 0) && BIT(~shifts, 7))
 		data &= ~0x02; // SS
 
-	data |= (0xe0);
+	data |= 0xe0;
 	data ^= 0x40;
 
 	/* cassette input from wav */
