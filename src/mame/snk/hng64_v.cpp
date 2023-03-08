@@ -823,11 +823,11 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (int i = 0x3f; i >= 0; i--)
+		for (int i = 0x1f; i >= 0; i--)
 		{
 			for (int j = 0; j < 4; j++)
 			{
-				uint16_t pri = get_tileregs(j) & 0x3f;
+				uint16_t pri = get_tileregs(j) & 0x1f;
 
 				if (pri == i)
 					hng64_drawtilemap(screen, bitmap, cliprect, j, 0, y);
@@ -954,12 +954,12 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 		popmessage("%08x %08x %08x %08x %08x", m_spriteregs[0], m_spriteregs[1], m_spriteregs[2], m_spriteregs[3], m_spriteregs[4]);
 
 	// see notes at top for more detailed info on these
-	if (1)
+	if (0)
 		popmessage("%08x %08x\n\
-			TR0(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) UNK(%d %d) SOMETIMES_ENABLE(%d) DEPTH( %d %d %d %d %d %d (%02x))\n\
-			TR1(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) UNK(%d %d) SOMETIMES_ENABLE(%d) DEPTH( %d %d %d %d %d %d (%02x))\n\
-			TR2(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) UNK(%d %d) SOMETIMES_ENABLE(%d) DEPTH( %d %d %d %d %d %d (%02x))\n\
-			TR3(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) UNK(%d %d) SOMETIMES_ENABLE(%d) DEPTH( %d %d %d %d %d %d (%02x))\n\
+			TR0(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d %d) E(%d) U(%d) DEPTH( %d %d %d %d %d (%02x))\n\
+			TR1(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d %d) E(%d) U(%d) DEPTH( %d %d %d %d %d (%02x))\n\
+			TR2(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d %d) E(%d) U(%d) DEPTH( %d %d %d %d %d (%02x))\n\
+			TR3(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d %d) E(%d) U(%d) DEPTH( %d %d %d %d %d (%02x))\n\
 			SB(%04x %04x %04x %04x)\n\
 			%08x %08x %08x\n\
 			SPLIT?(%04x %04x %04x %04x)\n\
@@ -967,10 +967,10 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			// global tilemap control regs?
 			m_videoregs[0x00], m_videoregs[0x01],
 			// general per-tilemap regs
-			(get_tileregs(0) & 0xf000)>>12, (get_tileregs(0) & 0x0800)>>11, (get_tileregs(0) & 0x0400)>>10,(get_tileregs(0) & 0x0200)>>9,(get_tileregs(0) & 0x0100)>>8,(get_tileregs(0) & 0x0080)>>7,(get_tileregs(0) & 0x0040)>>6,(get_tileregs(0) & 0x0020)>>5,(get_tileregs(0) & 0x0010)>>4,(get_tileregs(0) & 0x0008)>>3,(get_tileregs(0) & 0x0004)>>2,(get_tileregs(0) & 0x0002)>>1,(get_tileregs(0) & 0x0001)>>0,(get_tileregs(0) & 0x003f)>>0,
-			(get_tileregs(1) & 0xf000)>>12, (get_tileregs(1) & 0x0800)>>11, (get_tileregs(1) & 0x0400)>>10,(get_tileregs(1) & 0x0200)>>9,(get_tileregs(1) & 0x0100)>>8,(get_tileregs(1) & 0x0080)>>7,(get_tileregs(1) & 0x0040)>>6,(get_tileregs(1) & 0x0020)>>5,(get_tileregs(1) & 0x0010)>>4,(get_tileregs(1) & 0x0008)>>3,(get_tileregs(1) & 0x0004)>>2,(get_tileregs(1) & 0x0002)>>1,(get_tileregs(1) & 0x0001)>>0,(get_tileregs(1) & 0x003f)>>0,
-			(get_tileregs(2) & 0xf000)>>12, (get_tileregs(2) & 0x0800)>>11, (get_tileregs(2) & 0x0400)>>10,(get_tileregs(2) & 0x0200)>>9,(get_tileregs(2) & 0x0100)>>8,(get_tileregs(2) & 0x0080)>>7,(get_tileregs(2) & 0x0040)>>6,(get_tileregs(2) & 0x0020)>>5,(get_tileregs(2) & 0x0010)>>4,(get_tileregs(2) & 0x0008)>>3,(get_tileregs(2) & 0x0004)>>2,(get_tileregs(2) & 0x0002)>>1,(get_tileregs(2) & 0x0001)>>0,(get_tileregs(2) & 0x003f)>>0,
-			(get_tileregs(3) & 0xf000)>>12, (get_tileregs(3) & 0x0800)>>11, (get_tileregs(3) & 0x0400)>>10,(get_tileregs(3) & 0x0200)>>9,(get_tileregs(3) & 0x0100)>>8,(get_tileregs(3) & 0x0080)>>7,(get_tileregs(3) & 0x0040)>>6,(get_tileregs(3) & 0x0020)>>5,(get_tileregs(3) & 0x0010)>>4,(get_tileregs(3) & 0x0008)>>3,(get_tileregs(3) & 0x0004)>>2,(get_tileregs(3) & 0x0002)>>1,(get_tileregs(3) & 0x0001)>>0,(get_tileregs(3) & 0x003f)>>0,
+			(get_tileregs(0) & 0xf000)>>12, (get_tileregs(0) & 0x0800)>>11, (get_tileregs(0) & 0x0400)>>10,(get_tileregs(0) & 0x0200)>>9,(get_tileregs(0) & 0x0100)>>8,(get_tileregs(0) & 0x0080)>>7,(get_tileregs(0) & 0x0040)>>6,(get_tileregs(0) & 0x0020)>>5,(get_tileregs(0) & 0x0010)>>4,(get_tileregs(0) & 0x0008)>>3,(get_tileregs(0) & 0x0004)>>2,(get_tileregs(0) & 0x0002)>>1,(get_tileregs(0) & 0x0001)>>0,(get_tileregs(0) & 0x001f)>>0,
+			(get_tileregs(1) & 0xf000)>>12, (get_tileregs(1) & 0x0800)>>11, (get_tileregs(1) & 0x0400)>>10,(get_tileregs(1) & 0x0200)>>9,(get_tileregs(1) & 0x0100)>>8,(get_tileregs(1) & 0x0080)>>7,(get_tileregs(1) & 0x0040)>>6,(get_tileregs(1) & 0x0020)>>5,(get_tileregs(1) & 0x0010)>>4,(get_tileregs(1) & 0x0008)>>3,(get_tileregs(1) & 0x0004)>>2,(get_tileregs(1) & 0x0002)>>1,(get_tileregs(1) & 0x0001)>>0,(get_tileregs(1) & 0x001f)>>0,
+			(get_tileregs(2) & 0xf000)>>12, (get_tileregs(2) & 0x0800)>>11, (get_tileregs(2) & 0x0400)>>10,(get_tileregs(2) & 0x0200)>>9,(get_tileregs(2) & 0x0100)>>8,(get_tileregs(2) & 0x0080)>>7,(get_tileregs(2) & 0x0040)>>6,(get_tileregs(2) & 0x0020)>>5,(get_tileregs(2) & 0x0010)>>4,(get_tileregs(2) & 0x0008)>>3,(get_tileregs(2) & 0x0004)>>2,(get_tileregs(2) & 0x0002)>>1,(get_tileregs(2) & 0x0001)>>0,(get_tileregs(2) & 0x001f)>>0,
+			(get_tileregs(3) & 0xf000)>>12, (get_tileregs(3) & 0x0800)>>11, (get_tileregs(3) & 0x0400)>>10,(get_tileregs(3) & 0x0200)>>9,(get_tileregs(3) & 0x0100)>>8,(get_tileregs(3) & 0x0080)>>7,(get_tileregs(3) & 0x0040)>>6,(get_tileregs(3) & 0x0020)>>5,(get_tileregs(3) & 0x0010)>>4,(get_tileregs(3) & 0x0008)>>3,(get_tileregs(3) & 0x0004)>>2,(get_tileregs(3) & 0x0002)>>1,(get_tileregs(3) & 0x0001)>>0,(get_tileregs(3) & 0x001f)>>0,
 			// scrollbase regs
 			(m_videoregs[0x04] >> 16) & 0xffff, (m_videoregs[0x04] >> 0) & 0xffff, (m_videoregs[0x05] >> 16) & 0xffff, (m_videoregs[0x05] >> 0) & 0xffff,
 			// initialized to fixed values?
@@ -997,20 +997,83 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 
 
 
-	if (0)
-		popmessage("TC: %08x MINX(%d) MINY(%d) MAXX(%d) MAXY(%d)\nBLEND ENABLES? %02x %02x %02x | %02x %02x %02x\nUNUSED?(%04x)\n%04x\nUNUSED?(%d %d)\nFor FADE1 or 1st in PALFADES group per-RGB blend modes(%d %d %d)\nFor FADE2 or 2nd in PALFADES group per-RGB blend modes(%d %d %d)\nMASTER FADES - FADE1?(%08x)\nMASTER FADES - FADE2?(%08x)\nUNUSED?(%08x)\nUNUSED?&0xfffc(%04x) DISABLE_DISPLAY(%d) ALSO USE REGS BELOW FOR MASTER FADE(%d)\nPALEFFECT_ENABLES(%d %d %d %d %d %d %d %d)\n PALFADES?(%08x %08x : %08x %08x : %08x %08x : %08x %08x)\n %08x SPRITE_BLEND_TYPE?(%08x) : %08x %08x %08x %08x",
+	if (1)
+		popmessage("TC: %08x MINX(%d) MINY(%d) MAXX(%d) MAXY(%d)\n\
+			MIX BITSA Nv(%d%d%d%d) P:%d B:%d Nv(%d) Al(%d) : Nv(%d) p:%d Nv(%d%d%d) b:%d Nv(%d%d)  : Nv(%d) (%d) (%d %d %d) (%d %d %d)\n\
+			MIX BITSB Nv(%d%d%d%d) P:%d B:%d Nv(%d) Al(%d) : Nv(%d) p:%d Nv(%d%d%d) b:%d Nv(%d%d)  : Nv(%d) (%d) (%d %d %d) (%d %d %d)\n\
+			UNUSED?(%04x)\n%04x\nUNUSED?(%d %d)\n\
+			For FADE1 or 1st in PALFADES group per-RGB blend modes(%d %d %d)\n\
+			For FADE2 or 2nd in PALFADES group per-RGB blend modes(%d %d %d)\n\
+			MASTER FADES - FADE1?(%08x)\nMASTER FADES - FADE2?(%08x)\n\
+			UNUSED?(%08x)\n\
+			UNUSED?&0xfffc(%04x) DISABLE_DISPLAY(%d) ALSO USE REGS BELOW FOR MASTER FADE(%d)\n\
+			PALEFFECT_ENABLES(%d %d %d %d %d %d %d %d)\n PALFADES?(%08x %08x : %08x %08x : %08x %08x : %08x %08x)\n\
+			%08x SPRITE_BLEND_TYPE?(%08x) : %08x %08x %08x %08x",
 			m_tcram[0x00 / 4], // 0007 00e4 (fatfurwa, bbust2)
 			(m_tcram[0x04 / 4] >> 16) & 0xffff, (m_tcram[0x04 / 4] >> 0) & 0xffff, // 0000 0010 (fatfurwa) 0000 0000 (bbust2, xrally)
 			(m_tcram[0x08 / 4] >> 16) & 0xffff, (m_tcram[0x08 / 4] >> 0) & 0xffff, // 0200 01b0 (fatfurwa) 0200 01c0 (bbust2, xrally)
 
 			// is this 2 groups of 3 regs?
-			(m_tcram[0x0c / 4] >> 24) & 0xff, // 04 = 'blend' on tm1
-			(m_tcram[0x0c / 4] >> 16) & 0xff, // 04 = set when fades are going on with blended sprites in buriki intro? otherwise usually 00
-			(m_tcram[0x0c / 4] >> 8) & 0xff,  // upper bit not used? value usually 2x, 4x, 5x or 6x
+			//(m_tcram[0x0c / 4] >> 24) & 0xff, // 04 = 'blend' on tm1
+			//(m_tcram[0x0c / 4] >> 16) & 0xff, // 04 = set when fades are going on with blended sprites in buriki intro? otherwise usually 00
+			//(m_tcram[0x0c / 4] >> 8) & 0xff,  // upper bit not used? value usually 2x, 4x, 5x or 6x
+			(m_tcram[0x0c / 4] >> 31) & 0x1,
+			(m_tcram[0x0c / 4] >> 30) & 0x1,
+			(m_tcram[0x0c / 4] >> 29) & 0x1,
+			(m_tcram[0x0c / 4] >> 28) & 0x1,
+			(m_tcram[0x0c / 4] >> 27) & 0x1,
+			(m_tcram[0x0c / 4] >> 26) & 0x1, // set for blends in on tm1 (pink bits on xrally etc.)
+			(m_tcram[0x0c / 4] >> 25) & 0x1,
+			(m_tcram[0x0c / 4] >> 24) & 0x1, // always set
+
+			(m_tcram[0x0c / 4] >> 23) & 0x1,
+			(m_tcram[0x0c / 4] >> 22) & 0x1, // set on POST in xrally etc.
+			(m_tcram[0x0c / 4] >> 21) & 0x1,
+			(m_tcram[0x0c / 4] >> 20) & 0x1,
+			(m_tcram[0x0c / 4] >> 19) & 0x1,
+			(m_tcram[0x0c / 4] >> 18) & 0x1, // set on some fades in buriki attract intro (related to the sprites being blended during the fade?)
+			(m_tcram[0x0c / 4] >> 17) & 0x1,
+			(m_tcram[0x0c / 4] >> 16) & 0x1,
+
+			(m_tcram[0x0c / 4] >> 15) & 0x1,
+			(m_tcram[0x0c / 4] >> 14) & 0x1,
+			(m_tcram[0x0c / 4] >> 13) & 0x1,
+			(m_tcram[0x0c / 4] >> 12) & 0x1,
+			(m_tcram[0x0c / 4] >> 11) & 0x1,
+			(m_tcram[0x0c / 4] >> 10) & 0x1,
+			(m_tcram[0x0c / 4] >> 9) & 0x1,
+			(m_tcram[0x0c / 4] >> 8) & 0x1,
+
 			// 2nd group?
-			(m_tcram[0x0c / 4] >> 0) & 0xff, //  04 = 'blend' on tm3  (used in transitions?)
-			(m_tcram[0x10 / 4] >> 24) & 0xff, // usually (always?) 00
-			(m_tcram[0x10 / 4] >> 16) & 0xff, // upper bit not used? value usually 2x, 4x, 5x or 6x
+			//(m_tcram[0x0c / 4] >> 0) & 0xff, //  04 = 'blend' on tm3  (used in transitions?)
+			//(m_tcram[0x10 / 4] >> 24) & 0xff, // usually (always?) 00
+			//(m_tcram[0x10 / 4] >> 16) & 0xff, // upper bit not used? value usually 2x, 4x, 5x or 6x
+			(m_tcram[0x0c / 4] >> 7) & 0x1,
+			(m_tcram[0x0c / 4] >> 6) & 0x1,
+			(m_tcram[0x0c / 4] >> 5) & 0x1,
+			(m_tcram[0x0c / 4] >> 4) & 0x1,
+			(m_tcram[0x0c / 4] >> 3) & 0x1, // set in POST on xrally etc.
+			(m_tcram[0x0c / 4] >> 2) & 0x1, // set on buriki when blends are used
+			(m_tcram[0x0c / 4] >> 1) & 0x1,
+			(m_tcram[0x0c / 4] >> 0) & 0x1, // always set
+
+			(m_tcram[0x10 / 4] >> 31) & 0x1,
+			(m_tcram[0x10 / 4] >> 30) & 0x1,
+			(m_tcram[0x10 / 4] >> 29) & 0x1,
+			(m_tcram[0x10 / 4] >> 28) & 0x1,
+			(m_tcram[0x10 / 4] >> 27) & 0x1,
+			(m_tcram[0x10 / 4] >> 26) & 0x1,
+			(m_tcram[0x10 / 4] >> 25) & 0x1,
+			(m_tcram[0x10 / 4] >> 24) & 0x1,
+
+			(m_tcram[0x10 / 4] >> 23) & 0x1,
+			(m_tcram[0x10 / 4] >> 22) & 0x1,
+			(m_tcram[0x10 / 4] >> 21) & 0x1,
+			(m_tcram[0x10 / 4] >> 20) & 0x1,
+			(m_tcram[0x10 / 4] >> 19) & 0x1,
+			(m_tcram[0x10 / 4] >> 18) & 0x1,
+			(m_tcram[0x10 / 4] >> 17) & 0x1,
+			(m_tcram[0x10 / 4] >> 16) & 0x1,
 
 			m_tcram[0x10 / 4] & 0xffff, // unused?
 
