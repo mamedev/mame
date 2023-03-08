@@ -43,8 +43,8 @@ Notes:
 
     TODO:
 
-	- watchdog
-    - language DIP
+	- watchdog clock
+	- output leds
 
 */
 
@@ -104,47 +104,31 @@ const tiny_rom_entry *abc99_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( abc99_z2_mem )
+//  ADDRESS_MAP( keyboard_mem )
 //-------------------------------------------------
 
-void abc99_device::abc99_z2_mem(address_map &map)
+void abc99_device::keyboard_mem(address_map &map)
 {
 	map(0x0000, 0x0fff).rom().region(I8035_Z2_TAG, 0);
 }
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( abc99_z2_io )
+//  ADDRESS_MAP( keyboard_io )
 //-------------------------------------------------
 
-void abc99_device::abc99_z2_io(address_map &map)
+void abc99_device::keyboard_io(address_map &map)
 {
-	map(0x21, 0x21).w(FUNC(abc99_device::z2_led_w));
-	map(0x30, 0x3f).nopw();
-	map(0x30, 0x30).portr("X0");
-	map(0x31, 0x31).portr("X1");
-	map(0x32, 0x32).portr("X2");
-	map(0x33, 0x33).portr("X3");
-	map(0x34, 0x34).portr("X4");
-	map(0x35, 0x35).portr("X5");
-	map(0x36, 0x36).portr("X6");
-	map(0x37, 0x37).portr("X7");
-	map(0x38, 0x38).portr("X8");
-	map(0x39, 0x39).portr("X9");
-	map(0x3a, 0x3a).portr("X10");
-	map(0x3b, 0x3b).portr("X11");
-	map(0x3c, 0x3c).portr("X12");
-	map(0x3d, 0x3d).portr("X13");
-	map(0x3e, 0x3e).portr("X14");
-	map(0x3f, 0x3f).portr("X15");
+	map(0x21, 0x21).w(FUNC(abc99_device::led_w));
+	map(0x30, 0x3f).rw(FUNC(abc99_device::key_y_r), FUNC(abc99_device::key_x_w));
 }
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( abc99_z5_mem )
+//  ADDRESS_MAP( mouse_mem )
 //-------------------------------------------------
 
-void abc99_device::abc99_z5_mem(address_map &map)
+void abc99_device::mouse_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).rom().region(I8035_Z5_TAG, 0);
 }
@@ -158,8 +142,8 @@ void abc99_device::device_add_mconfig(machine_config &config)
 {
 	// keyboard CPU
 	I8035(config, m_maincpu, 0); // from Z5 T0 output
-	m_maincpu->set_addrmap(AS_PROGRAM, &abc99_device::abc99_z2_mem);
-	m_maincpu->set_addrmap(AS_IO, &abc99_device::abc99_z2_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &abc99_device::keyboard_mem);
+	m_maincpu->set_addrmap(AS_IO, &abc99_device::keyboard_io);
 	m_maincpu->p1_out_cb().set(FUNC(abc99_device::z2_p1_w));
 	m_maincpu->p2_in_cb().set(FUNC(abc99_device::z2_p2_r));
 	m_maincpu->t0_in_cb().set_constant(0); // mouse connected
@@ -167,11 +151,14 @@ void abc99_device::device_add_mconfig(machine_config &config)
 
 	// mouse CPU
 	I8035(config, m_mousecpu, XTAL(6'000'000));
-	m_mousecpu->set_addrmap(AS_PROGRAM, &abc99_device::abc99_z5_mem);
+	m_mousecpu->set_addrmap(AS_PROGRAM, &abc99_device::mouse_mem);
 	m_mousecpu->p1_in_cb().set(FUNC(abc99_device::z5_p1_r));
 	m_mousecpu->p2_out_cb().set(FUNC(abc99_device::z5_p2_w));
 	m_mousecpu->set_t0_clk_cb(I8035_Z2_TAG, FUNC(device_t::set_unscaled_clock_int));
 	m_mousecpu->t1_in_cb().set(FUNC(abc99_device::z5_t1_r));
+
+	// watchdog
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_hz(0));
 
 	// mouse
 	LUXOR_R8(config, m_mouse, 0);
@@ -241,7 +228,7 @@ CUSTOM_INPUT_MEMBER( abc99_device::cursor_x6_r )
 	return data;
 }
 
-INPUT_PORTS_START( abc99 )
+static INPUT_PORTS_START( abc99 )
 	PORT_START("X0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PF13") PORT_CODE(KEYCODE_PRTSCR)
@@ -402,14 +389,14 @@ INPUT_PORTS_START( abc99 )
 
 	PORT_START("Z14")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("Z14:1,2,3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, "Swedish" )
+	PORT_DIPSETTING(    0x01, "US English" )
+	PORT_DIPSETTING(    0x02, "Spanish" )
+	PORT_DIPSETTING(    0x03, "Danish" )
+	PORT_DIPSETTING(    0x04, "Norwegian" )
+	PORT_DIPSETTING(    0x05, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( Unused ) )
 	PORT_DIPNAME( 0x08, 0x08, "Keyboard Program" ) PORT_DIPLOCATION("Z14:4")
 	PORT_DIPSETTING(    0x00, "Internal (8048)" )
 	PORT_DIPSETTING(    0x08, "External PROM" )
@@ -472,11 +459,14 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 	m_serial_timer(nullptr),
 	m_maincpu(*this, I8035_Z2_TAG),
 	m_mousecpu(*this, I8035_Z5_TAG),
+	m_watchdog(*this, "watchdog"),
 	m_speaker(*this, "speaker"),
 	m_mouse(*this, R8_TAG),
+	m_x(*this, "X%u", 0),
 	m_z14(*this, "Z14"),
 	m_cursor(*this, "CURSOR"),
 	m_leds(*this, "led%u", 0U),
+	m_keylatch(0),
 	m_si(1),
 	m_si_en(1),
 	m_so_z2(1),
@@ -499,9 +489,11 @@ void abc99_device::device_start()
 
 	// allocate timers
 	m_serial_timer = timer_alloc(FUNC(abc99_device::serial_clock), this);
-	m_serial_timer->adjust(MCS48_ALE_CLOCK(XTAL(6'000'000)/3), 0, MCS48_ALE_CLOCK(XTAL(6'000'000)/3));
+	attotime serial_clock = MCS48_ALE_CLOCK(m_mousecpu->get_t0_clock()); // 8333 bps
+	m_serial_timer->adjust(serial_clock, 0, serial_clock);
 
 	// state saving
+	save_item(NAME(m_keylatch));
 	save_item(NAME(m_si));
 	save_item(NAME(m_si_en));
 	save_item(NAME(m_so_z2));
@@ -542,12 +534,14 @@ void abc99_device::txd_w(int state)
 
 
 //-------------------------------------------------
-//  z2_bus_w -
+//  key_x_w -
 //-------------------------------------------------
 
-void abc99_device::z2_led_w(uint8_t data)
+void abc99_device::led_w(uint8_t data)
 {
 	if (m_led_en) return;
+
+	machine().output().set_value("led0", !BIT(data, 2));
 
 	m_leds[LED_1] = BIT(data, 0);
 	m_leds[LED_2] = BIT(data, 1);
@@ -557,6 +551,31 @@ void abc99_device::z2_led_w(uint8_t data)
 	m_leds[LED_6] = BIT(data, 5);
 	m_leds[LED_7] = BIT(data, 6);
 	m_leds[LED_8] = BIT(data, 7);
+}
+
+
+//-------------------------------------------------
+//  key_y_r -
+//-------------------------------------------------
+
+uint8_t abc99_device::key_y_r()
+{
+	return m_x[m_keylatch]->read();
+}
+
+
+//-------------------------------------------------
+//  key_x_w -
+//-------------------------------------------------
+
+void abc99_device::key_x_w(offs_t offset, uint8_t data)
+{
+	m_keylatch = offset & 0x0f;
+
+	if (m_keylatch == 14)
+	{
+		m_watchdog->watchdog_reset();
+	}
 }
 
 
@@ -592,9 +611,9 @@ void abc99_device::z2_p1_w(uint8_t data)
 	m_t1_z5 = BIT(data, 2);
 
 	// key LEDs
-	m_leds[LED_INS] = BIT(data, 3);
-	m_leds[LED_ALT] = BIT(data, 4);
-	m_leds[LED_CAPS_LOCK] = BIT(data, 5);
+	m_leds[LED_INS] = !BIT(data, 3);
+	m_leds[LED_ALT] = !BIT(data, 4);
+	m_leds[LED_CAPS_LOCK] = !BIT(data, 5);
 
 	// speaker output
 	m_speaker->level_w(!BIT(data, 6));
