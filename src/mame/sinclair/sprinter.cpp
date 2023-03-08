@@ -105,7 +105,7 @@ public:
 		, m_ldac(*this, "ldac")
 		, m_rdac(*this, "rdac")
 		, m_kbd(*this, "kbd")
-		, m_io_smb_line(*this, "SMB_LINE%u", 0U)
+		, m_io_line(*this, "IO_LINE%u", 0U)
 		, m_io_mouse(*this, "mouse_input%u", 1U)
 		, m_io_turbo(*this, "TURBO")
 		, m_palette(*this, "palette")
@@ -199,7 +199,7 @@ private:
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
 	required_device<pc_kbdc_device> m_kbd;
-	required_ioport_array<8> m_io_smb_line;
+	required_ioport_array<8> m_io_line;
 	required_ioport_array<3> m_io_mouse;
 	required_ioport m_io_turbo;
 	required_device<device_palette_interface> m_palette;
@@ -1378,72 +1378,29 @@ u8 sprinter_state::kbd_fe_r(offs_t offset)
 {
 	u8 data = 0xff;
 
-	const u8 cs_extra3 = m_io_plus0.read_safe(0x1f) & 0x1f;
-	const u8 cs_extra4 = m_io_plus1.read_safe(0x1f) & 0x1f;
-	const u8 cs_extra7 = m_io_plus2.read_safe(0x1f) & 0x1f;
-
-	const u8 ss_line0 = m_io_smb_line[0]->read();
-	const u8 ss_line1 = m_io_smb_line[1]->read();
-	const u8 ss_line2 = m_io_smb_line[2]->read();
-	const u8 ss_line3 = m_io_smb_line[3]->read();
-	const u8 ss_line4 = m_io_smb_line[4]->read();
-	const u8 ss_line5 = m_io_smb_line[5]->read();
-	const u8 ss_line6 = m_io_smb_line[6]->read();
-	const u8 ss_line7 = m_io_smb_line[7]->read();
-
-	const u8 lines = offset >> 8;
-
-	/* Caps - V */
-	if ((lines & 1) == 0)
+	offset >>= 8;
+	u8 line = ~0;
+	u8 shifts = 0xff;
+	for (u8 i = 0; i < 8; i++, offset >>= 1)
 	{
-		data &= m_io_line0->read() & ss_line0;
-		/* CAPS for extra keys */
-		if (0x1f ^ u8(cs_extra3 & cs_extra4 & cs_extra7))
-			data &= ~0x01;
+		shifts &= m_io_line[i]->read();
+		if ((offset & 1) == 0)
+			line = i;
 	}
 
-	/* A - G */
-	if ((lines & 2) == 0)
-		data &= m_io_line1->read() & ss_line1;
+	data = m_io_line[line]->read();
+	if ((line == 0) && BIT(~shifts, 6))
+		data &= ~0x01; // CS
 
-	/* Q - T */
-	if ((lines & 4) == 0)
-		data &= m_io_line2->read() & ss_line2;
+	if ((line == 7) && BIT(~shifts, 7))
+		data &= ~0x02; // SS
 
-	/* 1 - 5 */
-	if ((lines & 8) == 0)
-		data &= m_io_line3->read() & ss_line3 & cs_extra3;
-
-	/* 6 - 0 */
-	if ((lines & 16) == 0)
-		data &= m_io_line4->read() & ss_line4 & cs_extra4;
-
-	/* Y - P */
-	if ((lines & 32) == 0)
-		data &= m_io_line5->read() & ss_line5;
-
-	/* H - Enter */
-	if ((lines & 64) == 0)
-		data &= m_io_line6->read() & ss_line6;
-
-	/* B - Space */
-	if ((lines & 128) == 0)
-	{
-		data &= m_io_line7->read() & ss_line7 & cs_extra7;
-		/* SYMBOL SHIFT for extra keys */
-		if (0x1f ^ (ss_line0 & ss_line1 & ss_line2 & ss_line3
-			& ss_line4 & ss_line5 & ss_line6 & ss_line7))
-			data &= ~0x02;
-	}
-
-	data |= (0xe0); /* Set bits 5-7 - as reset above */
+	data |= (0xe0);
 	data ^= 0x40;
 
 	/* cassette input from wav */
 	if (m_cassette->input() > 0.0038 )
-	{
 		data &= ~0x40;
-	}
 
 	if (CBL_MODE)
 	{
@@ -1512,132 +1469,123 @@ INPUT_CHANGED_MEMBER(sprinter_state::turbo_changed)
 
 INPUT_PORTS_START( sprinter )
 	/* PORT_NAME =  KEY Mode    CAPS Mode    SYMBOL Mode   EXT Mode   EXT+Shift Mode   BASIC Mode  */
-	PORT_START("LINE0") /* 0xFEFE */
+	PORT_START("IO_LINE0") /* 0xFEFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPS SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)  PORT_CHAR(UCHAR_SHIFT_1) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("z    Z    :      LN       BEEP   COPY") PORT_CODE(KEYCODE_Z)      PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(':')
+	                                                                 PORT_CODE(KEYCODE_BACKSLASH)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("x    X    \xC2\xA3   EXP      INK    CLEAR") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(0xA3)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("c    C    ?      LPRINT   PAPER  CONT") PORT_CODE(KEYCODE_C)      PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR('?')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("v    V    /      LLIST    FLASH  CLS") PORT_CODE(KEYCODE_V)       PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR('/')
+	                                                                 PORT_CODE(KEYCODE_SLASH) PORT_CODE(KEYCODE_SLASH_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CS Line0")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS Line0") PORT_CODE(KEYCODE_BACKSLASH) PORT_CODE(KEYCODE_SLASH) PORT_CODE(KEYCODE_SLASH_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("LINE1") /* 0xFDFE */
+	PORT_START("IO_LINE1") /* 0xFDFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("a    A    STOP   READ      ~     NEW") PORT_CODE(KEYCODE_A)      PORT_CHAR('a') PORT_CHAR('A')// PORT_CHAR('~')
+	                                                                 PORT_CODE(KEYCODE_TILDE)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("s    S    NOT    RESTORE   |     SAVE") PORT_CODE(KEYCODE_S)     PORT_CHAR('s') PORT_CHAR('S')// PORT_CHAR('|')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("d    D    STEP   DATA      \\    DIM") PORT_CODE(KEYCODE_D)      PORT_CHAR('d') PORT_CHAR('D')// PORT_CHAR('\\')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("f    F    TO     SGN       {     FOR") PORT_CODE(KEYCODE_F)      PORT_CHAR('f') PORT_CHAR('F')// PORT_CHAR('{')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("g    G    THEN   ABS       }     GOTO") PORT_CODE(KEYCODE_G)     PORT_CHAR('g') PORT_CHAR('G')// PORT_CHAR('}')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CS Line1")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS Line1") PORT_CODE(KEYCODE_TILDE)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("LINE2") /* 0xFBFE */
+	PORT_START("IO_LINE2") /* 0xFBFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("q    Q    <=     SIN      ASN      PLOT") PORT_CODE(KEYCODE_Q)   PORT_CHAR('q') PORT_CHAR('Q')
+	                                                                 PORT_CODE(KEYCODE_HOME)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("w    W    <>     COS      ACS      DRAW") PORT_CODE(KEYCODE_W)   PORT_CHAR('w') PORT_CHAR('W')
+	                                                                 PORT_CODE(KEYCODE_INSERT)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("e    E    >=     TAN      ATN      REM") PORT_CODE(KEYCODE_E)    PORT_CHAR('e') PORT_CHAR('E')
+	                                                                 PORT_CODE(KEYCODE_END)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("r    R    <      INT      VERIFY   RUN") PORT_CODE(KEYCODE_R)    PORT_CHAR('r') PORT_CHAR('R') PORT_CHAR('<')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("t    T    >      RND      MERGE    RAND") PORT_CODE(KEYCODE_T)   PORT_CHAR('t') PORT_CHAR('T') PORT_CHAR('>')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CS Line2")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS Line2") PORT_CODE(KEYCODE_HOME) PORT_CODE(KEYCODE_INSERT) PORT_CODE(KEYCODE_END)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("LINE3") /* 0xF7FE */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1   EDIT       !    BLUE     DEF FN") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_F1)  PORT_CHAR('1') PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR('!')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2   CAPS LOCK  @    RED      FN")     PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_F2)  PORT_CHAR('2') PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHAR('@')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3   TRUE VID   #    MAGENTA  LINE")   PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_F3)  PORT_CHAR('3') PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHAR('#')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4   INV VID    $    GREEN    OPEN#")  PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_F4)  PORT_CHAR('4') PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_CHAR('$')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5   Left       %    CYAN     CLOSE#") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_F5)  PORT_CHAR('5') PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHAR('%')
+	PORT_START("IO_LINE3") /* 0xF7FE */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1   EDIT       !    BLUE     DEF FN") PORT_CODE(KEYCODE_1)       PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR('1') PORT_CHAR('!')
+	                                                       PORT_CODE(KEYCODE_F1)
+	                                                           PORT_CODE(KEYCODE_TAB)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2   CAPS LOCK  @    RED      FN")     PORT_CODE(KEYCODE_2)       PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHAR('2') PORT_CHAR('@')
+	                                                       PORT_CODE(KEYCODE_F2)
+                                                               PORT_CODE(KEYCODE_CAPSLOCK)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3   TRUE VID   #    MAGENTA  LINE")   PORT_CODE(KEYCODE_3)       PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHAR('3') PORT_CHAR('#')
+	                                                       PORT_CODE(KEYCODE_F3)
+	                                                           PORT_CODE(KEYCODE_PGUP)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4   INV VID    $    GREEN    OPEN#")  PORT_CODE(KEYCODE_4)       PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_CHAR('4') PORT_CHAR('$')
+	                                                       PORT_CODE(KEYCODE_F4)
+	                                                           PORT_CODE(KEYCODE_PGDN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5   Left       %    CYAN     CLOSE#") PORT_CODE(KEYCODE_5)       PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHAR('5') PORT_CHAR('%')
+	                                                       PORT_CODE(KEYCODE_F5)
+	                                                           PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CS Line3") PORT_CODE(KEYCODE_TAB) PORT_CODE(KEYCODE_CAPSLOCK) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_PGDN) PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS Line3")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("LINE4") /* 0xEFFE */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0   DEL        _    BLACK    FORMAT") PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_F10) PORT_CHAR('0') PORT_CHAR(UCHAR_MAMEKEY(F10)) PORT_CHAR('_')
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9   GRAPH      )             POINT")  PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_F9)  PORT_CHAR('9') PORT_CHAR(UCHAR_MAMEKEY(F9)) PORT_CHAR(')')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8   Right      (             CAT")    PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_F8)  PORT_CHAR('8') PORT_CHAR(UCHAR_MAMEKEY(F8)) PORT_CHAR('(')
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7   Up         '    WHITE    ERASE")  PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_F7)  PORT_CHAR('7') PORT_CHAR(UCHAR_MAMEKEY(F7)) PORT_CHAR('\'')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6   Down       &    YELLOW   MOVE")   PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_F6)  PORT_CHAR('6') PORT_CHAR(UCHAR_MAMEKEY(F6)) PORT_CHAR('&')
+	PORT_START("IO_LINE4") /* 0xEFFE */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0   DEL        _    BLACK    FORMAT") PORT_CODE(KEYCODE_0)       PORT_CHAR(UCHAR_MAMEKEY(F10)) PORT_CHAR('0') PORT_CHAR('_')
+	                                                       PORT_CODE(KEYCODE_F10)
+	                                                           PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9   GRAPH      )             POINT")  PORT_CODE(KEYCODE_9)       PORT_CHAR(UCHAR_MAMEKEY(F9)) PORT_CHAR('9') PORT_CHAR(')')
+	                                                       PORT_CODE(KEYCODE_F9)
+	                                                           PORT_CODE(KEYCODE_DEL)
+	                                                                      PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8   Right      (             CAT")    PORT_CODE(KEYCODE_8)       PORT_CHAR(UCHAR_MAMEKEY(F8)) PORT_CHAR('8') PORT_CHAR('(')
+	                                                       PORT_CODE(KEYCODE_F8)
+	                                                           PORT_CODE(KEYCODE_RIGHT) PORT_CODE(KEYCODE_6_PAD)
+	                                                                      PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7   Up         '    WHITE    ERASE")  PORT_CODE(KEYCODE_7)       PORT_CHAR(UCHAR_MAMEKEY(F7)) PORT_CHAR('7') PORT_CHAR('\'')
+	                                                       PORT_CODE(KEYCODE_F7)
+	                                                           PORT_CODE(KEYCODE_UP) PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6   Down       &    YELLOW   MOVE")   PORT_CODE(KEYCODE_6)       PORT_CHAR(UCHAR_MAMEKEY(F6)) PORT_CHAR('6') PORT_CHAR('&')
+	                                                       PORT_CODE(KEYCODE_F6)
+	                                                           PORT_CODE(KEYCODE_DOWN) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CS Line4") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_RIGHT) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_UP) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_DOWN) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS Line4") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("LINE5") /* 0xDFFE */
+	PORT_START("IO_LINE5") /* 0xDFFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("p    P    \"     TAB      (c)    PRINT") PORT_CODE(KEYCODE_P)    PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR('"')
+	                                                                 PORT_CODE(KEYCODE_QUOTE)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("o    O    ;      PEEK     OUT    POKE") PORT_CODE(KEYCODE_O)     PORT_CHAR('o') PORT_CHAR('O') PORT_CHAR(';')
+	                                                                 PORT_CODE(KEYCODE_COLON)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("i    I    AT     CODE     IN     INPUT") PORT_CODE(KEYCODE_I)    PORT_CHAR('i') PORT_CHAR('I')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("u    U    OR     CHR$     ]      IF") PORT_CODE(KEYCODE_U)       PORT_CHAR('u') PORT_CHAR('U')// PORT_CHAR(']')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("y    Y    AND    STR$     [      RETURN") PORT_CODE(KEYCODE_Y)   PORT_CHAR('y') PORT_CHAR('Y')// PORT_CHAR('[')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CS Line5")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS Line5") PORT_CODE(KEYCODE_QUOTE) PORT_CODE(KEYCODE_COLON)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("LINE6") /* 0xBFFE */
+	PORT_START("IO_LINE6") /* 0xBFFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD)    PORT_CHAR(13)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("l    L    =      USR      ATTR     LET") PORT_CODE(KEYCODE_L)    PORT_CHAR('l') PORT_CHAR('L') PORT_CHAR('=')
+	                                                                 PORT_CODE(KEYCODE_EQUALS)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("k    K    +      LEN      SCREEN$  LIST") PORT_CODE(KEYCODE_K)   PORT_CHAR('k') PORT_CHAR('K') PORT_CHAR('+')
+	                                                                 PORT_CODE(KEYCODE_PLUS_PAD)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("j    J    -      VAL      VAL$     LOAD") PORT_CODE(KEYCODE_J)   PORT_CHAR('j') PORT_CHAR('J') PORT_CHAR('-')
+	                                                                 PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("h    H    ^      SQR      CIRCLE   GOSUB") PORT_CODE(KEYCODE_H)  PORT_CHAR('h') PORT_CHAR('H') PORT_CHAR('^')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CS Line6")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS Line6") PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CODE(KEYCODE_PLUS_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("LINE7") /* 0x7FFE */
+	PORT_START("IO_LINE7") /* 0x7FFE */
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE)                                       PORT_CHAR(' ')
+	                                                       PORT_CODE(KEYCODE_ESC)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SYMBOL SHIFT") PORT_CODE(KEYCODE_RCONTROL) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
+	                                                       PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("m    M    .      PI       INVERSE  PAUSE") PORT_CODE(KEYCODE_M)        PORT_CHAR('m') PORT_CHAR('M') PORT_CHAR('.')
+	                                                                 PORT_CODE(KEYCODE_STOP)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("n    N    ,      INKEY$   OVER     NEXT") PORT_CODE(KEYCODE_N)         PORT_CHAR('n') PORT_CHAR('N') PORT_CHAR(',')
+	                                                                 PORT_CODE(KEYCODE_COMMA)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("b    B    *      BIN      BRIGHT   BORDER") PORT_CODE(KEYCODE_B)       PORT_CHAR('b') PORT_CHAR('B') PORT_CHAR('*')
-
-	PORT_START("NMI")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_F12)
-
-	PORT_START("CONFIG")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
-
-
-	// spec128 - modified
-	PORT_START("PLUS0") /* Spectrum+ Keys (Same as CAPS + 1-5) */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EDIT")         PORT_CODE(KEYCODE_TAB)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPS LOCK")    PORT_CODE(KEYCODE_CAPSLOCK)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TRUE VID")     PORT_CODE(KEYCODE_PGUP)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INV VID")      PORT_CODE(KEYCODE_PGDN)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cursor Left")  PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT(0x00, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("PLUS1") /* Spectrum+ Keys (Same as CAPS + 6-0) */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL")          PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("GRAPH")        PORT_CODE(KEYCODE_DEL)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cursor Right") PORT_CODE(KEYCODE_RIGHT) PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cursor Up")    PORT_CODE(KEYCODE_UP) PORT_CODE(KEYCODE_8_PAD)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cursor Down")  PORT_CODE(KEYCODE_DOWN) PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT(0x00, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("PLUS2") /* Spectrum+ Keys (Same as CAPS + SPACE and CAPS + SYMBOL) */
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK")        PORT_CODE(KEYCODE_ESC)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EXT MODE")     PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT)
-	PORT_BIT(0x1c, IP_ACTIVE_LOW, IPT_UNUSED)
-
-
-	PORT_START("SMB_LINE0")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(":")            PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("?")            PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("/")            PORT_CODE(KEYCODE_SLASH_PAD)
-	PORT_BIT(0x05, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("SMB_LINE1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("STOP")         PORT_CODE(KEYCODE_TILDE)
-	PORT_BIT(0x1e, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("SMB_LINE2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("<=")           PORT_CODE(KEYCODE_HOME)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("<>")           PORT_CODE(KEYCODE_INSERT)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(">=")           PORT_CODE(KEYCODE_END)
-	PORT_BIT(0x18, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("SMB_LINE3")
-	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("SMB_LINE4")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(")")            PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("(")            PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT(0x19, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("SMB_LINE5")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\"")           PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";")            PORT_CODE(KEYCODE_COLON)
-	PORT_BIT(0x1c, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("SMB_LINE6")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("=")            PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("+")            PORT_CODE(KEYCODE_PLUS_PAD)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("-")            PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD)
-	PORT_BIT(0x11, IP_ACTIVE_LOW, IPT_UNUSED)
-
-	PORT_START("SMB_LINE7")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".")            PORT_CODE(KEYCODE_STOP)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",")            PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("*")            PORT_CODE(KEYCODE_ASTERISK)
-	PORT_BIT(0x03, IP_ACTIVE_LOW, IPT_UNUSED)
+	                                                                 PORT_CODE(KEYCODE_ASTERISK)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CS Line7") PORT_CODE(KEYCODE_ESC) PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS Line7") PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_COMMA) PORT_CODE(KEYCODE_ASTERISK)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
 
 
 	PORT_START("mouse_input1")
@@ -1651,6 +1599,10 @@ INPUT_PORTS_START( sprinter )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
+
+
+	PORT_START("NMI")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_F11)
 
 	PORT_START("TURBO")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Turbo") PORT_CODE(KEYCODE_F12) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, sprinter_state, turbo_changed, 0)
