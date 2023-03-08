@@ -22,8 +22,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-class heath_tlb_device : // public device_t,
-  public rs232_port_device
+class heath_tlb_device : public device_t
 {
 public:
   heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type);

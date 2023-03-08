@@ -71,8 +71,7 @@ DEFINE_DEVICE_TYPE(WATZ, heath_watz_tlb_device, "heath_watz_tlb", "Heath Termina
 DEFINE_DEVICE_TYPE(ULTRA, heath_ultra_tlb_device, "heath_ultra_tlb", "Heath Terminal Logic Board w/Ultra ROM");
 
 heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type = TLB)
-		: /*device_t(mconfig, type, tag, owner, clock)
-		, */rs232_port_device(mconfig, type, tag, owner, clock)
+		: device_t(mconfig, type, tag, owner, clock)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
 		, m_crtc(*this, "crtc")
@@ -293,8 +292,8 @@ static const gfx_layout h19_charlayout =
 };
 
 static GFXDECODE_START(gfx_h19)
-		GFXDECODE_ENTRY(":tlb:chargen", 0x0000, h19_charlayout, 0, 1)
-				GFXDECODE_END
+	GFXDECODE_ENTRY(":tlb:chargen", 0x0000, h19_charlayout, 0, 1)
+GFXDECODE_END
 
 
 /* Input ports */

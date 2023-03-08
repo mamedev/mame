@@ -24,11 +24,13 @@
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"
 #include "machine/timer.h"
-
+#include "tlb.h"
 
 namespace {
 
-#define RS232_TAG "rs232"
+#define H19_CLOCK (XTAL(12'288'000) / 6)
+#define H89_CLOCK (XTAL(12'288'000) / 6)
+#define INS8250_CLOCK (XTAL(12'288'000) /4)
 
 class h89_state : public driver_device
 {
@@ -36,6 +38,8 @@ public:
 	h89_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_tlb(*this, "tlb")
+		, m_console(*this, "console")
 	{
 	}
 
@@ -43,6 +47,8 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<heath_tlb_device> m_tlb;
+	required_device<ins8250_device> m_console;
 
 	void port_f2_w(uint8_t data);
 
@@ -83,7 +89,7 @@ void h89_state::h89_io(address_map &map)
 //  map(0xd0, 0xd7)    8250 UART DCE
 //  map(0xd8, 0xdf)    8250 UART DTE - MODEM
 //  map(0xe0, 0xe7)    8250 UART DCE - LP
-	map(0xe8, 0xef).rw("ins8250", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w)); // 8250 UART console - this
+	map(0xe8, 0xef).rw("console", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w)); // 8250 UART console - this
 																								 // connects internally to a Terminal board
 																								 // that is also used in the H19. Ideally,
 																								 // the H19 code could be connected and ran
@@ -177,6 +183,7 @@ void h89_state::port_f2_w(uint8_t data)
 	m_port_f2 = data;
 }
 
+
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	// TODO - baud rate should be controlled by SW501 setting
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
@@ -187,21 +194,27 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 DEVICE_INPUT_DEFAULTS_END
 
 
+
 void h89_state::h89(machine_config & config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'288'000) / 6);
+	Z80(config, m_maincpu, H89_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &h89_state::h89_mem);
 	m_maincpu->set_addrmap(AS_IO, &h89_state::h89_io);
 
+	TLB(config, m_tlb, H19_CLOCK);
+
+	INS8250(config, m_console, INS8250_CLOCK);
+
+#if 0
 	ins8250_device &uart(INS8250(config, "ins8250", XTAL(1'843'200)));
 	uart.out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set("ins8250", FUNC(ins8250_uart_device::rx_w));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
-
 	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(h89_state::h89_irq_timer), attotime::from_hz(100));
+#endif
 }
 
 /* ROM definition */
