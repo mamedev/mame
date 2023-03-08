@@ -213,7 +213,7 @@
 #include "machine/watchdog.h"
 #include "video/avgdvg.h"
 #include "video/vector.h"
-//#include "sound/ay8910.h" // For Deset Wars
+#include "sound/ay8910.h" // for Desert Wars
 #include "sound/pokey.h"
 
 #include "speaker.h"
@@ -364,10 +364,9 @@ void bzone_state::bradley_map(address_map &map)
 	map(0x1848, 0x1850).w(FUNC(bzone_state::analog_select_w));
 }
 
-//TODO: Fix the memory map for Desert Wars
+//TODO: AY8910 hook-up isn't correct. Are there discrete sounds, too?
 void bzone_state::dsrtwars_map(address_map &map)
 {
-	map.global_mask(0x7fff);
 	map(0x0000, 0x03ff).ram();
 	map(0x0800, 0x0800).portr("IN0");
 	map(0x0a00, 0x0a00).portr("DSW0");
@@ -379,9 +378,12 @@ void bzone_state::dsrtwars_map(address_map &map)
 	map(0x1800, 0x1800).r(m_mathbox, FUNC(mathbox_device::status_r));
 	map(0x1810, 0x1810).r(m_mathbox, FUNC(mathbox_device::lo_r));
 	map(0x1818, 0x1818).r(m_mathbox, FUNC(mathbox_device::hi_r));
+	map(0x1820, 0x1821).w("aysnd", FUNC(ay8910_device::data_address_w)); // TODO: this is more complicated
+	map(0x1828, 0x1828).portr("IN3");
 	map(0x1860, 0x187f).w(m_mathbox, FUNC(mathbox_device::go_w));
 	map(0x2000, 0x2fff).ram();
 	map(0x3000, 0x7fff).rom();
+	map(0xf800, 0xffff).rom().region("maincpu", 0x8000);
 }
 
 void redbaron_state::redbaron_map(address_map &map)
@@ -639,14 +641,17 @@ void bzone_state::bradley(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bzone_state::bradley_map);
 }
 
-//TODO: Add sound hardware
 void bzone_state::dsrtwars(machine_config &config)
 {
 	bzone_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bzone_state::dsrtwars_map);
 
 	// sound hardware
-	//AY8910...
+	SPEAKER(config, "mono").front_center();
+
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1'000'000)); // unknown clock
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.85);
+	aysnd.port_a_read_callback().set_ioport("IN3");
 }
 
 void redbaron_state::redbaron(machine_config &config)
@@ -876,7 +881,7 @@ ROM_START( dsrtwars ) // Desert Wars
 	ROMX_LOAD( "300800_b_74s287.f1", 2, 0x100, CRC(276eadd5) SHA1(55718cd8ec4bcf75076d5ef0ee1ed2551e19d9ba), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
 
 	ROM_REGION( 0x800, "music", 0 )
-	ROM_LOAD( "300900_b_am27s19.b1", 0x000, 0x800, CRC(1b6e9f6f) SHA1(1ced9958021b29400e4681fbcb76228fd1b74ab9) )
+	ROM_LOAD( "300900_b_am27s19.b1", 0x000, 0x800, CRC(1b6e9f6f) SHA1(1ced9958021b29400e4681fbcb76228fd1b74ab9) ) // TODO: where's this mapped?
 ROM_END
 
 
@@ -999,13 +1004,13 @@ void bzone_state::analog_select_w(offs_t offset, uint8_t data)
  *  Game drivers
  *
  *************************************/
-//    YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT        ROT   COMPANY  FULLNAME                        FLAGS                                      LAYOUT
-GAMEL(1980, bzone,     0,        bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battle Zone (rev 2)",          MACHINE_SUPPORTS_SAVE,                     layout_bzone )
-GAMEL(1980, bzonea,    bzone,    bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battle Zone (rev 1)",          MACHINE_SUPPORTS_SAVE,                     layout_bzone )
-GAMEL(1980, bzonec,    bzone,    bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battle Zone (cocktail)",       MACHINE_SUPPORTS_SAVE|MACHINE_NO_COCKTAIL, layout_bzone )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT        ROT   COMPANY  FULLNAME                        FLAGS                                        LAYOUT
+GAMEL(1980, bzone,     0,        bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battle Zone (rev 2)",          MACHINE_SUPPORTS_SAVE,                       layout_bzone )
+GAMEL(1980, bzonea,    bzone,    bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battle Zone (rev 1)",          MACHINE_SUPPORTS_SAVE,                       layout_bzone )
+GAMEL(1980, bzonec,    bzone,    bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battle Zone (cocktail)",       MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL, layout_bzone )
 GAME( 1980, bradley,   0,        bradley,  bradley,  bzone_state,    empty_init, ROT0, "Atari", "Bradley Trainer",              MACHINE_SUPPORTS_SAVE )
-GAMEL(1980, redbaron,  0,        redbaron, redbaron, redbaron_state, empty_init, ROT0, "Atari", "Red Baron (revised hardware)", MACHINE_SUPPORTS_SAVE,                     layout_redbaron )
-GAMEL(1980, redbarona, redbaron, redbaron, redbaron, redbaron_state, empty_init, ROT0, "Atari", "Red Baron",                    MACHINE_SUPPORTS_SAVE,                     layout_redbaron )
+GAMEL(1980, redbaron,  0,        redbaron, redbaron, redbaron_state, empty_init, ROT0, "Atari", "Red Baron (revised hardware)", MACHINE_SUPPORTS_SAVE,                       layout_redbaron )
+GAMEL(1980, redbarona, redbaron, redbaron, redbaron, redbaron_state, empty_init, ROT0, "Atari", "Red Baron",                    MACHINE_SUPPORTS_SAVE,                       layout_redbaron )
 
 // Not from Atari
-GAMEL(1981, dsrtwars,  bzone,    dsrtwars, bzone,    bzone_state,    empty_init, ROT0, "bootleg (Andra S.A.)", "Desert Wars (bootleg of Battle Zone)", MACHINE_SUPPORTS_SAVE|MACHINE_NO_SOUND|MACHINE_NOT_WORKING, layout_bzone )
+GAMEL(1981, dsrtwars,  bzone,    dsrtwars, bzone,    bzone_state,    empty_init, ROT0, "bootleg (Andra S.A.)", "Desert Wars (bootleg of Battle Zone)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_bzone )
