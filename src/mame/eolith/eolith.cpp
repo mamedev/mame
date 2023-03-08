@@ -696,8 +696,8 @@ void eolith_state::eolith45(machine_config &config)
 	m_soundcpu->serial_tx_cb().set(FUNC(eolith_state::soundcpu_to_qs1000)); // Sound CPU -> QS1000 CPU serial link
 
 	EEPROM_93C66_8BIT(config, "eeprom")
-		.erase_time(attotime::from_usec(250))
-		.write_time(attotime::from_usec(250));
+			.erase_time(attotime::from_usec(250))
+			.write_time(attotime::from_usec(250));
 
 //  for testing sound sync
 //  config.m_perfect_cpu_quantum = subtag("maincpu");
