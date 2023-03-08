@@ -38,6 +38,7 @@ TODO:
 #include "beta_m.h"
 #include "spec128.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "bus/ata/atapicdr.h"
 #include "bus/ata/ataintf.h"
@@ -204,6 +205,7 @@ private:
 	required_ioport m_io_turbo;
 	required_device<device_palette_interface> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
+	tilemap_t *m_tilemap;
 	memory_region *m_rom;
 	memory_share_creator<u8> m_vram;
 	memory_share_creator<u8> m_fastram;
@@ -211,6 +213,8 @@ private:
 	memory_view m_bank_view0;
 	memory_view m_bank_view3;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+
+	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	u8 *m_dcp_location;
 	u8 m_ram_pages[0x40] = {}; // 0xc0 - 0xff
@@ -1119,6 +1123,8 @@ void sprinter_state::vram_w(offs_t offset, u8 data)
 	const u16 laddr = offset & 0x3ff;
 	const bool is_int_updated = (laddr >= 0x300) && (laddr < 0x3a0) && ((offset & 0x403) == 0x400) && (((m_vram[offset] & 0xfc) == 0xfc) || ((data & 0xfc) == 0xfc)) && (m_vram[offset] ^ data);
 	m_vram[offset] = data;
+	m_tilemap->mark_all_dirty();
+	m_gfxdecode->gfx(1)->mark_all_dirty();
 	if (is_int_updated)
 		update_int(true);
 	else if (laddr >= 0x3e0)
@@ -1354,13 +1360,34 @@ static const gfx_layout sprinter_charlayout =
 	1024 * 8         // every char takes 8 bytes
 };
 
+static const gfx_layout sprinter_tiles =
+{
+	8, 8,
+	128 * 32 * 8,
+	8,
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
+	{ STEP8(0, 1024 * 8) },
+	8 * 8
+};
+
 static GFXDECODE_START( gfx_sprinter )
 	GFXDECODE_RAM( "vram", 0x2c0, sprinter_charlayout, 0x70f, 1 )
+	GFXDECODE_RAM( "vram", 0,     sprinter_tiles,      0x100, 256 )
 GFXDECODE_END
+
+TILE_GET_INFO_MEMBER(sprinter_state::get_tile_info)
+{
+	const u8 col = tile_index % 128;
+	const u8 row = tile_index / 128;
+	tileinfo.set(1, row * 128 * 8 + col, 0, 0);
+}
 
 void sprinter_state::video_start()
 {
 	spectrum_state::video_start();
+
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sprinter_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 
 	m_contention_pattern = {};
 	init_taps();
