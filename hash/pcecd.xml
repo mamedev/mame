@@ -1169,6 +1169,8 @@ Unemulated interface for development
 		<publisher>Naxat Soft</publisher>
 	    <notes><![CDATA[
 Cannot access option menu, responds to run button by returning to main menu without GFX update
+Starting a game don't fully playback the voice sample
+Pre-stage number transitions are way too fast
 ]]></notes>
 		<info name="serial" value="NXCD2010"/>
 		<info name="release" value="19930312"/>
@@ -1508,10 +1510,13 @@ Returns to intro when pressing start on title (player has to hold start in order
 		</part>
 	</software>
 
-	<software name="f1team">
+	<software name="f1team" supported="partial">
 		<description>F1 Team Simulation Project F (Japan)</description>
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
+	    <notes><![CDATA[
+Loading is way too fast once you start a race
+]]></notes>
 		<info name="serial" value="TJCD2026"/>
 		<info name="release" value="19920904"/>
 		<info name="alt_title" value="F1チームシミュレーション PROJECT.F"/>
@@ -1587,10 +1592,14 @@ Returns to intro when pressing start on title (player has to hold start in order
 		</part>
 	</software>
 
-	<software name="faussete">
+	<software name="faussete" supported="no">
 		<description>Faussete Amour (Japan)</description>
 		<year>1993</year>
 		<publisher>Naxat Soft</publisher>
+	    <notes><![CDATA[
+Heavy input lag in Stage 2 when water displays https://youtu.be/DPeKn56Sdek [raster timing]
+Cheat: Up, up, up, down, down, down, II, II, II, I, I, I during intro for "debug menu"
+]]></notes>
 		<info name="serial" value="NXCD2017"/>
 		<info name="release" value="19930326"/>
 		<info name="alt_title" value="フォーセットアムール"/>
@@ -1729,10 +1738,14 @@ Returns to intro when pressing start on title (player has to hold start in order
 		</part>
 	</software>
 
-	<software name="fraycd">
+	<software name="fraycd" supported="partial">
 		<description>Fray CD Xak Gaiden (Japan)</description>
 		<year>1994</year>
 		<publisher>Micro Cabin</publisher>
+	    <notes><![CDATA[
+First intro screen has wrong masking
+One line off for gameplay backgrounds
+]]></notes>
 		<info name="serial" value="MCCD4005"/>
 		<info name="release" value="19940330"/>
 		<info name="alt_title" value="フレイCD -サーク外伝-"/>
@@ -2335,10 +2348,13 @@ Returns to intro when pressing start on title (player has to hold start in order
 		</part>
 	</software>
 
-	<software name="iganin">
+	<software name="iganin" supported="no">
 		<description>Iga Ninden Gaou (Japan)</description>
 		<year>1993</year>
 		<publisher>Nichibutsu</publisher>
+	    <notes><![CDATA[
+Cannot start a game, goes back to intro as soon as "press Run button" prompts
+]]></notes>
 		<info name="serial" value="NBCD3003"/>
 		<info name="release" value="19931210"/>
 		<info name="alt_title" value="伊賀忍伝 凱王"/>
@@ -2429,10 +2445,13 @@ Returns to intro when pressing start on title (player has to hold start in order
 		</part>
 	</software>
 
-	<software name="jleagt94">
+	<software name="jleagt94" supported="no">
 		<description>J. League Tremendous Soccer '94 (ACD, SCD)(Japan)</description>
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
+	    <notes><![CDATA[
+Cannot start a game, goes back to intro as soon as "press Run button" prompts
+]]></notes>
 		<info name="serial" value="HECD4017"/>
 		<info name="release" value="19941223"/>
 		<info name="alt_title" value="Jリーグ トリメンダスサッカー'94"/>
@@ -2641,7 +2660,7 @@ All tested stages don't draw playfield properly, timing?
 		</part>
 	</software>
 
-	<software name="kazekiri">
+	<software name="kazekiri" supported="yes">
 		<description>Kaze Kiri - Ninja Action (Japan)</description>
 		<year>1994</year>
 		<publisher>Naxat Soft</publisher>
@@ -3134,12 +3153,14 @@ https://mametesters.org/view.php?id=5995
 		</part>
 	</software>
 
-	<software name="madstlkr" supported="no">
+	<software name="madstlkr" supported="partial">
 		<description>Mad Stalker - Full Metal Force (Japan)</description>
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
 		<notes><![CDATA[
 https://mametesters.org/view.php?id=7791 (fixed)
+Glitchy GFX text char during intro
+Verify [redbook] lip sync and repeat (uses track mode)
 ]]></notes>
 		<info name="serial" value="HECD4009"/>
 		<info name="release" value="19940915"/>
@@ -3535,10 +3556,14 @@ https://mametesters.org/view.php?id=7292
 		</part>
 	</software>
 
-	<software name="conan">
+	<software name="conan" supported="no">
 		<description>Mirai Shonen Conan (Japan)</description>
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
+	    <notes><![CDATA[
+Very unstable on FMVs (including skip with select button)
+Crashes when "left option" is selected in main menu (with no save in [BRAM])
+]]></notes>
 		<info name="serial" value="TJCD-2022"/>
 		<info name="release" value="19920228"/>
 		<info name="alt_title" value="未来少年コナン"/>

@@ -11,15 +11,15 @@ TODO:
 - Implement Game Express slot option;
 - ADPCM half/full events aren't honored (dbz, draculax), they causes hangs for no benefit if enabled;
 - verify irqs, particularly for FMV streaming not working right (gulliver, holmes Introduction);
+- BRAM is unsafe on prolonged use of pcecd.xml games, verify;
+- Unsafe on debugger access;
 (old note, to move out there)
-- Dragon Slayer - The Legend of Heroes: black screen; (actually timing/raster irq)
-- Mirai Shonen Conan: dies at new game selection; (actually timing/raster irq)
 - Snatcher: black screen after Konami logo, tries set up CD-DA
             while transferring data? (fixed)
 - Steam Heart's: needs transfer ready irq to get past the
                  gameplay hang, don't know exactly when it should fire
 - Steam Heart's: bad ADPCM irq, dialogue is cutted due of it;
-- Unsafe on debugger access;
+
 
 =============================================================
 
@@ -921,7 +921,7 @@ WRITE_LINE_MEMBER(pce_cd_device::cdda_end_mark_cb)
 		}
 	}
 	else
-		LOGCDDA(" - No end mark encountered\n");
+		LOGCDDA(" - No end mark encountered, check me\n");
 }
 
 void pce_cd_device::handle_data_input()
