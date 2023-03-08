@@ -443,7 +443,7 @@ offs_t dsp32c_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			const char *s = sizesuffix[(op >> 31) & 1];
 			uint8_t threeop = (op >> 11) & 1;
 
-			std::string condbuf = "";
+			std::string condbuf;
 			if ((op >> 10) & 1)
 				condbuf = "if (" + std::string(condtable[(op >> 12) & 15]) + ") ";
 
