@@ -12,7 +12,7 @@
     tilemap layers due to this
 */
 
-#define HNG64_VIDEO_DEBUG 0
+#define HNG64_VIDEO_DEBUG 1
 
 
 void hng64_state::hng64_mark_all_tiles_dirty(int tilemap)
@@ -621,19 +621,6 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
     // 08e0 - fatal fury wa during transitions
     // 0940 - samurai shodown 64
     // 0880 - buriki
-
-    // Individual tilemap regs format
-    // ------------------------------
-    // mmmm dbr? ??ez zzzz
-    // m = Tilemap mosaic level [0-15] - confirmed in sams64 demo mode
-    //  -- they seem to enable mosaic at the same time as rowscroll in several cases (floor in buriki / ff)
-    //     and also on the rotating logo in buriki.. does it cause some kind of aliasing side-effect, or.. ?
-    // d = line (floor) mode - buriki, fatafurwa, some backgrounds in ss64_2
-    // b = 4bpp/8bpp (seems correct) (beast busters, samsh64, sasm64 2, xrally switch it for some screens)
-    // r = tile size (seems correct)
-    // e = tilemap enable bit according to sams64_2
-    // z = z depth/priority? tilemaps might also be affected by min / max clip values somewhere?
-    //              (debug layer on buriki has priority 0x020, which would be highest)
  */
 
 
@@ -967,12 +954,23 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 		popmessage("%08x %08x %08x %08x %08x", m_spriteregs[0], m_spriteregs[1], m_spriteregs[2], m_spriteregs[3], m_spriteregs[4]);
 
 	// see notes at top for more detailed info on these
-	if (0)
-		popmessage("%08x %08x\nTR(%04x %04x %04x %04x)\nSB(%04x %04x %04x %04x)\n%08x %08x %08x\nSPLIT?(%04x %04x %04x %04x)\nAA(%08x %08x)\n%08x",
+	if (1)
+		popmessage("%08x %08x\n\
+			TR0(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) UNK(%d %d) SOMETIMES_ENABLE(%d) DEPTH( %d %d %d %d %d %d (%02x))\n\
+			TR1(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) UNK(%d %d) SOMETIMES_ENABLE(%d) DEPTH( %d %d %d %d %d %d (%02x))\n\
+			TR2(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) UNK(%d %d) SOMETIMES_ENABLE(%d) DEPTH( %d %d %d %d %d %d (%02x))\n\
+			TR3(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) UNK(%d %d) SOMETIMES_ENABLE(%d) DEPTH( %d %d %d %d %d %d (%02x))\n\
+			SB(%04x %04x %04x %04x)\n\
+			%08x %08x %08x\n\
+			SPLIT?(%04x %04x %04x %04x)\n\
+			AA(%08x %08x)\n%08x",
 			// global tilemap control regs?
 			m_videoregs[0x00], m_videoregs[0x01],
 			// general per-tilemap regs
-			(m_videoregs[0x02] >> 16) & 0xffff, (m_videoregs[0x02] >> 0) & 0xffff, (m_videoregs[0x03] >> 16) & 0xffff, (m_videoregs[0x03] >> 0) & 0xffff,
+			(get_tileregs(0) & 0xf000)>>12, (get_tileregs(0) & 0x0800)>>11, (get_tileregs(0) & 0x0400)>>10,(get_tileregs(0) & 0x0200)>>9,(get_tileregs(0) & 0x0100)>>8,(get_tileregs(0) & 0x0080)>>7,(get_tileregs(0) & 0x0040)>>6,(get_tileregs(0) & 0x0020)>>5,(get_tileregs(0) & 0x0010)>>4,(get_tileregs(0) & 0x0008)>>3,(get_tileregs(0) & 0x0004)>>2,(get_tileregs(0) & 0x0002)>>1,(get_tileregs(0) & 0x0001)>>0,(get_tileregs(0) & 0x003f)>>0,
+			(get_tileregs(1) & 0xf000)>>12, (get_tileregs(1) & 0x0800)>>11, (get_tileregs(1) & 0x0400)>>10,(get_tileregs(1) & 0x0200)>>9,(get_tileregs(1) & 0x0100)>>8,(get_tileregs(1) & 0x0080)>>7,(get_tileregs(1) & 0x0040)>>6,(get_tileregs(1) & 0x0020)>>5,(get_tileregs(1) & 0x0010)>>4,(get_tileregs(1) & 0x0008)>>3,(get_tileregs(1) & 0x0004)>>2,(get_tileregs(1) & 0x0002)>>1,(get_tileregs(1) & 0x0001)>>0,(get_tileregs(1) & 0x003f)>>0,
+			(get_tileregs(2) & 0xf000)>>12, (get_tileregs(2) & 0x0800)>>11, (get_tileregs(2) & 0x0400)>>10,(get_tileregs(2) & 0x0200)>>9,(get_tileregs(2) & 0x0100)>>8,(get_tileregs(2) & 0x0080)>>7,(get_tileregs(2) & 0x0040)>>6,(get_tileregs(2) & 0x0020)>>5,(get_tileregs(2) & 0x0010)>>4,(get_tileregs(2) & 0x0008)>>3,(get_tileregs(2) & 0x0004)>>2,(get_tileregs(2) & 0x0002)>>1,(get_tileregs(2) & 0x0001)>>0,(get_tileregs(2) & 0x003f)>>0,
+			(get_tileregs(3) & 0xf000)>>12, (get_tileregs(3) & 0x0800)>>11, (get_tileregs(3) & 0x0400)>>10,(get_tileregs(3) & 0x0200)>>9,(get_tileregs(3) & 0x0100)>>8,(get_tileregs(3) & 0x0080)>>7,(get_tileregs(3) & 0x0040)>>6,(get_tileregs(3) & 0x0020)>>5,(get_tileregs(3) & 0x0010)>>4,(get_tileregs(3) & 0x0008)>>3,(get_tileregs(3) & 0x0004)>>2,(get_tileregs(3) & 0x0002)>>1,(get_tileregs(3) & 0x0001)>>0,(get_tileregs(3) & 0x003f)>>0,
 			// scrollbase regs
 			(m_videoregs[0x04] >> 16) & 0xffff, (m_videoregs[0x04] >> 0) & 0xffff, (m_videoregs[0x05] >> 16) & 0xffff, (m_videoregs[0x05] >> 0) & 0xffff,
 			// initialized to fixed values?
@@ -983,6 +981,21 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			m_videoregs[0x0b], m_videoregs[0x0c],
 			// unused?
 			m_videoregs[0x0d]);
+	
+    // Individual tilemap regs format
+    // ------------------------------
+    // mmmm dbr? ?Ezz zzzz
+    // m = Tilemap mosaic level [0-15] - confirmed in sams64 demo mode
+    //  -- they seem to enable mosaic at the same time as rowscroll in several cases (floor in buriki / ff)
+    //     and also on the rotating logo in buriki.. does it cause some kind of aliasing side-effect, or.. ?
+    // d = line (floor) mode - buriki, fatafurwa, some backgrounds in ss64_2
+    // b = 4bpp/8bpp (seems correct) (beast busters, samsh64, sasm64 2, xrally switch it for some screens)
+    // r = tile size (seems correct)
+    // E = tilemap enable bit according to sams64_2
+    // z = z depth/priority? tilemaps might also be affected by min / max clip values somewhere?
+    //              (debug layer on buriki has priority 0x020, which would be highest)
+
+
 
 	if (0)
 		popmessage("TC: %08x MINX(%d) MINY(%d) MAXX(%d) MAXY(%d)\nBLEND ENABLES? %02x %02x %02x | %02x %02x %02x\nUNUSED?(%04x)\n%04x\nUNUSED?(%d %d)\nFor FADE1 or 1st in PALFADES group per-RGB blend modes(%d %d %d)\nFor FADE2 or 2nd in PALFADES group per-RGB blend modes(%d %d %d)\nMASTER FADES - FADE1?(%08x)\nMASTER FADES - FADE2?(%08x)\nUNUSED?(%08x)\nUNUSED?&0xfffc(%04x) DISABLE_DISPLAY(%d) ALSO USE REGS BELOW FOR MASTER FADE(%d)\nPALEFFECT_ENABLES(%d %d %d %d %d %d %d %d)\n PALFADES?(%08x %08x : %08x %08x : %08x %08x : %08x %08x)\n %08x SPRITE_BLEND_TYPE?(%08x) : %08x %08x %08x %08x",
