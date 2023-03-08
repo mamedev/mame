@@ -113,6 +113,7 @@ abc1600_mac_device::abc1600_mac_device(const machine_config &mconfig, const char
 	m_watchdog(*this, "watchdog"),
 	m_read_tren(*this),
 	m_write_tren(*this),
+	m_rstbut(0),
 	m_boote(0),
 	m_magic(0),
 	m_task(0),
@@ -133,6 +134,7 @@ void abc1600_mac_device::device_start()
 	m_write_tren.resolve_all_safe();
 
 	// state saving
+	save_item(NAME(m_rstbut));
 	save_item(NAME(m_boote));
 	save_item(NAME(m_magic));
 	save_item(NAME(m_task));
@@ -330,7 +332,7 @@ uint8_t abc1600_mac_device::cause_r()
 
 	*/
 
-	uint8_t data = 0;
+	uint8_t data = m_rstbut;
 
 	if (!m_partst)
 	{

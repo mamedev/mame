@@ -41,13 +41,15 @@
 		- keyboard test fails
 		- mouse test fails
     - loadsys1 core dump (/etc/mkfs -b 1024 -v 69000 /dev/sa40)
-    - short/long reset (RSTBUT)
+	- crashes after reset
     - CIO
         - optimize timers!
         - port C, open drain output bit PC1 (RTC/NVRAM data)
     - connect RS-232 printer port
     - Z80 SCC/DART interrupt chain
     - [:2a:chb] - TX FIFO is full, discarding data
+		[:] SCC write 000003
+		[:2a:chb] void z80scc_channel::data_write(uint8_t): Data Register Write: 17 ' '
 
 */
 
@@ -535,11 +537,29 @@ void abc1600_state::mac_mem(address_map &map)
 //**************************************************************************
 
 //-------------------------------------------------
+//  INPUT_CHANGED_MEMBER( reset )
+//-------------------------------------------------
+
+INPUT_CHANGED_MEMBER( abc1600_state::reset )
+{
+	if (!oldval && newval)
+	{
+		machine_reset();
+	}
+
+	m_mac->rstbut_w(newval);
+}
+
+
+//-------------------------------------------------
 //  INPUT_PORTS( abc1600 )
 //-------------------------------------------------
 
 static INPUT_PORTS_START( abc1600 )
-	// inputs defined in machine/abc99.cpp
+	// keyboard inputs defined in machine/abc99.cpp
+
+	PORT_START("RESET")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, abc1600_state, reset, 0)
 INPUT_PORTS_END
 
 
@@ -873,6 +893,13 @@ void abc1600_state::machine_reset()
 
 	// clear NMI
 	m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
+
+	// reset devices
+	m_mac->reset();
+	m_maincpu->reset();
+	m_cio->reset();
+	m_scc->reset();
+	m_kb->reset();
 }
 
 

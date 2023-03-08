@@ -50,6 +50,7 @@ protected:
 
 	// abc_keyboard_interface overrides
 	virtual void txd_w(int state) override;
+	virtual void reset_w(int state) override;
 
 private:
 	enum
