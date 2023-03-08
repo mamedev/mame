@@ -42,7 +42,7 @@
 #include "formats/kc_cas.h"
 
 // from service manual
-#define KC85_3_CLOCK 1751938
+#define KC85_2_CLOCK 1751938
 #define KC85_4_CLOCK 1773447
 
 #define KC85_4_SCREEN_PIXEL_RAM_SIZE 0x04000
@@ -64,7 +64,7 @@ public:
 		, m_z80pio(*this, "z80pio")
 		, m_z80ctc(*this, "z80ctc")
 		, m_ram(*this, RAM_TAG)
-		, m_speaker(*this, "speaker")
+		, m_dac(*this, "dac")
 		, m_cassette(*this, "cassette")
 		, m_screen(*this, "screen")
 		, m_expansions(*this, {"m8", "mc", "exp"})
@@ -74,7 +74,7 @@ public:
 	required_device<z80pio_device> m_z80pio;
 	required_device<z80ctc_device> m_z80ctc;
 	required_device<ram_device> m_ram;
-	required_device<speaker_sound_device> m_speaker;
+	required_device<speaker_sound_device> m_dac;
 	required_device<cassette_image_device> m_cassette;
 	required_device<screen_device> m_screen;
 	required_device_array<kcexp_slot_device, 3> m_expansions;
@@ -110,7 +110,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pio_ardy_cb);
 	DECLARE_WRITE_LINE_MEMBER( pio_brdy_cb);
 	void pio_porta_w(uint8_t data);
-	void pio_portb_w(uint8_t data);
+	virtual void pio_portb_w(uint8_t data);
 
 	// CTC callback
 	DECLARE_WRITE_LINE_MEMBER( ctc_zc0_callback );
@@ -123,8 +123,8 @@ public:
 	void update_cassette(int state);
 	void cassette_set_motor(int motor_state);
 
-	// speaker
-	void speaker_update();
+	// sound
+	virtual void dac_update();
 
 	// defined in video/kc.cpp
 	virtual void video_start() override;
@@ -133,16 +133,16 @@ public:
 	void video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, uint8_t colour_byte, uint8_t gfx_byte);
 
 	// driver state
-	uint8_t *             m_ram_base = nullptr;
+	uint8_t *           m_ram_base = nullptr;
 	std::unique_ptr<uint8_t[]> m_video_ram{};
 	int                 m_pio_data[2]{};
 	int                 m_high_resolution = 0;
-	uint8_t               m_ardy = 0U;
-	uint8_t               m_brdy = 0U;
+	uint8_t             m_ardy = 0U;
+	uint8_t             m_brdy = 0U;
 	int                 m_kc85_blink_state = 0;
 	int                 m_k0_line = 0;
 	int                 m_k1_line = 0;
-	uint8_t               m_speaker_level = 0U;
+	uint8_t             m_dac_level = 0U;
 
 	// cassette
 	emu_timer *         m_cassette_timer = nullptr;
@@ -158,17 +158,43 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void kc85_slots(machine_config &config);
 
-	void kc85_3(machine_config &config);
-	void kc85_3_io(address_map &map);
-	void kc85_3_mem(address_map &map);
+	void kc85_2(machine_config &config);
+	void kc85_2_io(address_map &map);
+	void kc85_2_mem(address_map &map);
 };
 
 
-class kc85_4_state : public kc_state
+class kc85_3_state : public kc_state
+{
+public:
+	kc85_3_state(const machine_config &mconfig, device_type type, const char *tag)
+		: kc_state(mconfig, type, tag)
+		, m_speaker(*this, "speaker")
+	{ }
+
+	required_device<speaker_sound_device> m_speaker;
+
+	// CTC callback
+	DECLARE_WRITE_LINE_MEMBER( ctc_zc0_callback );
+
+	// PIO callback
+	void pio_portb_w(uint8_t data) override;
+
+	// sound
+	virtual void speaker_update();
+
+	// driver state
+	uint8_t		    m_speaker_level = 0U;
+
+	void kc85_3(machine_config &config);
+};
+
+
+class kc85_4_state : public kc85_3_state
 {
 public:
 	kc85_4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kc_state(mconfig, type, tag)
+		: kc85_3_state(mconfig, type, tag)
 	{ }
 
 	// defined in machine/kc.cpp
@@ -187,6 +213,13 @@ public:
 	virtual void video_start() override;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	void video_control_w(int data);
+
+	// PIO callback
+	void pio_portb_w(uint8_t data) override;
+
+	// sound
+	void dac_update() override;
+	void speaker_update() override;
 
 	// driver state
 	uint8_t               m_port_84_data = 0U;
