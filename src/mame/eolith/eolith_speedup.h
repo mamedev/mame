@@ -10,10 +10,10 @@
 #include "emupal.h"
 #include "screen.h"
 
-class eolith_state_base : public driver_device
+class eolith_e1_speedup_state_base : public driver_device
 {
 public:
-	eolith_state_base(const machine_config &mconfig, device_type type, const char *tag)
+	eolith_e1_speedup_state_base(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
