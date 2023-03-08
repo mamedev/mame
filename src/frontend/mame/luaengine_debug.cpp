@@ -151,21 +151,35 @@ public:
 	{
 	}
 
-	expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &symtable, char const *expression, int default_base)
-		: m_expression(symtable->table(), expression, default_base)
-		, m_symbols(symtable)
-	{
-	}
-
-	expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &symtable, char const *expression)
-		: m_expression(symtable->table(), expression)
-		, m_symbols(symtable)
-	{
-	}
-
 	void set_default_base(int base) { m_expression.set_default_base(base); }
-	void parse(char const *string) { m_expression.parse(string); }
-	u64 execute() { return m_expression.execute(); }
+
+	void parse(sol::this_state s, char const *string)
+	{
+		try
+		{
+			m_expression.parse(string);
+		}
+		catch (expression_error const &err)
+		{
+			sol::stack::push(s, err);
+			lua_error(s);
+		}
+	}
+
+	u64 execute(sol::this_state s)
+	{
+		try
+		{
+			return m_expression.execute();
+		}
+		catch (expression_error const &err)
+		{
+			sol::stack::push(s, err);
+			lua_error(s);
+			return 0; // unreachable - lua_error doesn't return
+		}
+	}
+
 	bool is_empty() const { return m_expression.is_empty(); }
 	char const *original_string() const { return m_expression.original_string(); }
 	std::shared_ptr<symbol_table_wrapper> const &symbols() { return m_symbols; }
@@ -203,6 +217,14 @@ void lua_engine::initialize_debug(sol::table &emu)
 		{ "o", EXPSPACE_OPDIRECT },
 		{ "m", EXPSPACE_REGION }
 	};
+
+	auto expression_error_type = emu.new_usertype<expression_error>(
+			"expression_error",
+			sol::no_constructor);
+	expression_error_type["code"] = sol::property(
+			[] (expression_error const &err) { return int(err.code()); });
+	expression_error_type["offset"] = sol::property(&expression_error::offset);
+	expression_error_type[sol::meta_function::to_string] = &expression_error::code_string;
 
 	auto symbol_table_type = emu.new_usertype<symbol_table_wrapper>(
 			"symbol_table",
@@ -287,10 +309,22 @@ void lua_engine::initialize_debug(sol::table &emu)
 
 	auto parsed_expression_type = emu.new_usertype<expression_wrapper>(
 			"parsed_expression",
-			sol::call_constructor, sol::constructors<
-				expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &),
-				expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &, char const *, int),
-				expression_wrapper(std::shared_ptr<symbol_table_wrapper> const &, char const *)>());
+			sol::call_constructor, sol::initializers(
+				[] (expression_wrapper &wrapper, std::shared_ptr<symbol_table_wrapper> const &symbols)
+				{
+					new (&wrapper) expression_wrapper(symbols);
+				},
+				[] (expression_wrapper &wrapper, sol::this_state s, std::shared_ptr<symbol_table_wrapper> const &symbols, char const *expression, int base)
+				{
+					new (&wrapper) expression_wrapper(symbols);
+					wrapper.set_default_base(base);
+					wrapper.parse(s, expression);
+				},
+				[] (expression_wrapper &wrapper, sol::this_state s, std::shared_ptr<symbol_table_wrapper> const &symbols, char const *expression)
+				{
+					new (&wrapper) expression_wrapper(symbols);
+					wrapper.parse(s, expression);
+				}));
 	parsed_expression_type.set_function("set_default_base", &expression_wrapper::set_default_base);
 	parsed_expression_type.set_function("parse", &expression_wrapper::parse);
 	parsed_expression_type.set_function("execute", &expression_wrapper::execute);

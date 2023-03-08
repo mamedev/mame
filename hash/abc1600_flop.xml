@@ -172,4 +172,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="systest">
+		<description>ABC1600 Test Program v5.0</description>
+		<year>1985</year>
+		<publisher>Luxor</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="mount1600_systest1600_bootpar.img" size="655360" crc="7111c00c" sha1="c87c5997f77b75ae969f0a401378b87c25b0dd3a"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

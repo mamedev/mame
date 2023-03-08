@@ -3953,8 +3953,9 @@ emu.parsed_expression(symbols, string, [default_base])
     Creates an expression by parsing the supplied string, looking up symbols in
     the supplied :ref:`symbol table <luareference-debug-symtable>`.  If the
     default base for interpreting integer literals is not supplied, 16 is used
-    (hexadecimal).  Raises an error if the string contains syntax errors or uses
-    undefined symbols.
+    (hexadecimal).  Raises an :ref:`expression error
+    <luareference-debug-expressionerror>` if the string contains syntax errors
+    or uses undefined symbols.
 
 Methods
 ^^^^^^^
@@ -3964,13 +3965,14 @@ expression:set_default_base(base)
     positive integer.
 expression:parse(string)
     Parse a debugger expression string.  Replaces the current contents of the
-    expression if it is not empty.  Raises an error if the string contains
-    syntax errors or uses undefined symbols.  The previous content of the
-    expression is not preserved when attempting to parse an invalid expression
-    string.
+    expression if it is not empty.  Raises an :ref:`expression error
+    <luareference-debug-expressionerror>` if the string contains syntax errors
+    or uses undefined symbols.  The previous content of the expression is not
+    preserved when attempting to parse an invalid expression string.
 expression:execute()
     Evaluates the expression, returning an unsigned integer result.  Raises an
-    error if the expression cannot be evaluated (e.g. calling a function with an
+    :ref:`expression error <luareference-debug-expressionerror>` if the
+    expression cannot be evaluated (e.g. attempting to call a function with an
     invalid number of arguments).
 
 Properties
@@ -4224,3 +4226,22 @@ watchpoint.condition (read-only)
 watchpoint.action (read-only)
     An action the debugger will run when the watchpoint is hit and the condition
     evaluates to a non-zero value.  An empty string if no action was specified.
+
+.. _luareference-debug-expressionerror:
+
+Expression error
+~~~~~~~~~~~~~~~~
+
+Wraps MAME’s ``expression_error`` class, describing an error occurring while
+parsing or executing a debugger expression.  Raised on errors when using
+:ref:`parsed expressions <luareference-debug-expression>`.  Can be converted to
+a string to provide a description of the error.
+
+Properties
+^^^^^^^^^^
+
+err.code (read-only)
+    An implementation-dependent number representing the category of error.
+    Should not be displayed to the user.
+err.offset (read-only)
+    The offset within the expression string where the error was encountered.

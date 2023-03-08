@@ -4143,6 +4143,8 @@ if (BUSES["ABCKB"]~=null) then
 		MAME_DIR .. "src/devices/bus/abckb/abc99.h",
 		MAME_DIR .. "src/devices/bus/abckb/abc800kb.cpp",
 		MAME_DIR .. "src/devices/bus/abckb/abc800kb.h",
+		MAME_DIR .. "src/devices/bus/abckb/r8.cpp",
+		MAME_DIR .. "src/devices/bus/abckb/r8.h",
 	}
 end
 

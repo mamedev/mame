@@ -29366,7 +29366,7 @@ galgame                         // (c) 1971 Computer Recreations, Inc
 
 @source:misc/gameace.cpp
 hotbody
-hotbodya
+hotbody2
 
 @source:misc/gambl186.cpp
 gambl186                        // EGD
@@ -30248,9 +30248,10 @@ mosaica                         // (c) 1990 Space + Fuuki license
 
 @source:misc/mpu12wbk.cpp
 fruitstb                        // 199? Webak
-fruitstba                       // 1997 Webak
+fruitstba                       // 199? Webak
 fruitstbb                       // 1997 Webak
 fruitstbc                       // 1997 Webak
+fruitstbd                       // 1997 Webak
 
 @source:misc/mtu130.cpp
 mtu130
@@ -39650,6 +39651,7 @@ altbeastbl2                     //
 bayrouteb1                      // (c) 1989 (protected) (bootleg)
 bayrouteb2                      // (c) 1989 (protected) (bootleg)
 beautyb                         // (c) 1991 AMT
+bloxeedbl                       //
 ddcrewbl                        //
 dduxbl                          // (c) 1989 (Datsu bootleg)
 eswatbl                         // bootleg

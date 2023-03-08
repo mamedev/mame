@@ -86,17 +86,19 @@ public:
 	};
 
 	// construction/destruction
-	expression_error(error_code code, int offset = 0, int num = 0)
-		: m_code(code),
-			m_offset(offset),
-			m_num(num) { }
+	constexpr expression_error(error_code code, int offset = 0, int num = 0)
+		: m_code(code)
+		, m_offset(offset)
+		, m_num(num)
+	{
+	}
 
 	// operators
-	operator error_code() const { return m_code; }
+	constexpr operator error_code() const { return m_code; }
 
 	// getters
-	error_code code() const { return m_code; }
-	int offset() const { return m_offset; }
+	constexpr error_code code() const { return m_code; }
+	constexpr int offset() const { return m_offset; }
 	std::string code_string() const;
 
 private:

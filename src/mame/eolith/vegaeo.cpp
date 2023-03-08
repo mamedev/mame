@@ -26,11 +26,11 @@
 
 namespace {
 
-class vegaeo_state : public eolith_state_base
+class vegaeo_state : public eolith_e1_speedup_state_base
 {
 public:
 	vegaeo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: eolith_state_base(mconfig, type, tag)
+		: eolith_e1_speedup_state_base(mconfig, type, tag)
 		, m_soundlatch(*this, "soundlatch")
 		, m_qs1000(*this, "qs1000")
 		, m_system_io(*this, "SYSTEM")
@@ -163,7 +163,7 @@ INPUT_PORTS_END
 
 void vegaeo_state::video_start()
 {
-	eolith_state_base::video_start();
+	eolith_e1_speedup_state_base::video_start();
 
 	m_vram = std::make_unique<uint8_t[]>(0x14000*2);
 	save_pointer(NAME(m_vram), 0x14000*2);
@@ -172,13 +172,13 @@ void vegaeo_state::video_start()
 
 uint32_t vegaeo_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = 0; y < 240; y++)
+	for (int y = cliprect.top(); y <= std::min(cliprect.bottom(), 239); y++)
 	{
+		auto *pix = &bitmap.pix(y);
 		for (int x = 0; x < 320; x++)
-		{
-			bitmap.pix(y, x) = m_vram[0x14000 * (m_vbuffer ^ 1) + (y * 320) + x] & 0xff;
-		}
+			*pix++ = m_vram[0x14000 * (m_vbuffer ^ 1) + (y * 320) + x] & 0xff;
 	}
+
 	return 0;
 }
 

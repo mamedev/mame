@@ -137,6 +137,9 @@ public:
 
 	template <typename... T> void set_t0_clk_cb(T &&... args) { m_t0_clk_func.set(std::forward<T>(args)...); }
 
+	u32 get_ale_clock() { return m_clock / 3 / 5; }
+	u32 get_t0_clock() { return m_clock / 3; }
+
 protected:
 	typedef void (mcs48_cpu_device::*mcs48_ophandler)();
 
