@@ -81,14 +81,16 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 #define LOG_CMD            (1U <<  1)
 #define LOG_CDDA           (1U <<  2)
 #define LOG_SCSI           (1U <<  3)
+#define LOG_SCSIXFER       (1U <<  4) // single byte transfers, verbose
 
 #define VERBOSE (LOG_GENERAL | LOG_CMD | LOG_CDDA)
 #define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
-#define LOGCMD(...)     LOGMASKED(LOG_CMD, __VA_ARGS__)
-#define LOGCDDA(...)    LOGMASKED(LOG_CDDA, __VA_ARGS__)
-#define LOGSCSI(...)    LOGMASKED(LOG_SCSI, __VA_ARGS__)
+#define LOGCMD(...)         LOGMASKED(LOG_CMD, __VA_ARGS__)
+#define LOGCDDA(...)        LOGMASKED(LOG_CDDA, __VA_ARGS__)
+#define LOGSCSI(...)        LOGMASKED(LOG_SCSI, __VA_ARGS__)
+#define LOGSCSIXFER(...)    LOGMASKED(LOG_SCSIXFER, __VA_ARGS__)
 
 // 0xdd subchannel read is special and very verbose when it happens, treat differently
 #define LIVE_SUBQ_VIEW    0
@@ -569,7 +571,9 @@ void pce_cd_device::nec_set_audio_start_position()
 	}
 
 	reply_status_byte(SCSI_STATUS_OK);
-	set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE);
+	// Definitely not here, breaks jleagt94, iganin, macr2036 "press RUN button" prompt
+	// (expects to fire an irq at the end of redbook playback thru end_mark = 2 for proper attract mode)
+	//set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE);
 }
 
 /* 0xD9 - SET AUDIO PLAYBACK END POSITION (NEC) */
@@ -649,7 +653,8 @@ void pce_cd_device::nec_set_audio_stop_position()
 	}
 
 	reply_status_byte(SCSI_STATUS_OK);
-	set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE);
+	// as above
+	//set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE);
 }
 
 /* 0xDA - PAUSE (NEC) */
@@ -970,7 +975,7 @@ void pce_cd_device::handle_data_input()
 			}
 			else
 			{
-				LOGSCSI("Transfer byte %02x from offset %d %d\n",m_data_buffer[m_data_buffer_index] , m_data_buffer_index, m_current_frame);
+				LOGSCSIXFER("Transfer byte %02x from offset %d %d\n",m_data_buffer[m_data_buffer_index] , m_data_buffer_index, m_current_frame);
 				m_cdc_data = m_data_buffer[m_data_buffer_index];
 				m_data_buffer_index++;
 				m_scsi_REQ = 1;
