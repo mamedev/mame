@@ -43506,6 +43506,9 @@ k28
 @source:tiger/k28m2.cpp
 k28m2
 
+@source:tiger/pylo.cpp
+pylo
+
 @source:tigertel/gizmondo.cpp
 gizmondo                        //
 
@@ -43840,6 +43843,15 @@ cp500                           // Prologica CP500
 
 @source:trs/vis.cpp
 vis
+
+@source:tryom/chess.cpp
+tchess
+
+@source:tryom/gammonm.cpp
+gammonm2
+
+@source:tryom/omar.cpp
+omar
 
 @source:tvgames/actions_atj2279b.cpp
 rbitgen
