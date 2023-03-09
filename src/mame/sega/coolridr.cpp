@@ -3173,10 +3173,8 @@ void coolridr_state::machine_start()
 
 	if (0)
 	{
-		FILE *fp;
-		char filename[256];
-		sprintf(filename,"expanded_%s_gfx", machine().system().name);
-		fp=fopen(filename, "w+b");
+		auto filename = "expanded_" + std::string(machine().system().name) + "_gfx";
+		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{
 			for (int i=0;i<(0x800000*8);i++)
@@ -3184,7 +3182,6 @@ void coolridr_state::machine_start()
 				fwrite((uint8_t*)m_expanded_10bit_gfx.get()+(i^1), 1, 1, fp);
 			}
 			fclose(fp);
-
 		}
 	}
 
