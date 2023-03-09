@@ -946,10 +946,10 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 
 	if (0)
 		popmessage("%08x %08x\n\
-			TR0(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d %d) E(%d) U(%d) DEPTH( %d %d %d %d %d (%02x))\n\
-			TR1(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d %d) E(%d) U(%d) DEPTH( %d %d %d %d %d (%02x))\n\
-			TR2(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d %d) E(%d) U(%d) DEPTH( %d %d %d %d %d (%02x))\n\
-			TR3(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d %d) E(%d) U(%d) DEPTH( %d %d %d %d %d (%02x))\n\
+			TR0(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d %d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
+			TR1(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d %d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
+			TR2(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d %d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
+			TR3(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d %d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
 			SB(%04x %04x %04x %04x)\n\
 			%08x %08x %08x\n\
 			SPLIT?(%04x %04x %04x %04x)\n\
@@ -974,7 +974,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	
     // Individual tilemap regs format
     // ------------------------------
-    // mmmm dbr? ?Ezz zzzz
+    // mmmm dbr? ?ELz zzzz
     // m = Tilemap mosaic level [0-15] - confirmed in sams64 demo mode
     //  -- they seem to enable mosaic at the same time as rowscroll in several cases (floor in buriki / ff)
     //     and also on the rotating logo in buriki.. does it cause some kind of aliasing side-effect, or.. ?
@@ -982,6 +982,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
     // b = 4bpp/8bpp (seems correct) (beast busters, samsh64, sasm64 2, xrally switch it for some screens)
     // r = tile size (seems correct)
     // E = tilemap enable bit according to sams64_2
+	// L = related to output layer? seems to be tied to which mixing bits are used to enable blending
     // z = z depth/priority? tilemaps might also be affected by min / max clip values somewhere?
     //              (debug layer on buriki has priority 0x020, which would be highest)
 
@@ -1012,7 +1013,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			(m_tcram[0x0c / 4] >> 29) & 0x1,
 			(m_tcram[0x0c / 4] >> 28) & 0x1,
 			(m_tcram[0x0c / 4] >> 27) & 0x1,
-			(m_tcram[0x0c / 4] >> 26) & 0x1, // set for blends in on tm1 (pink bits on xrally etc.)  in sams64 intro it expects it on tm2, but it gets applied to tm1
+			(m_tcram[0x0c / 4] >> 26) & 0x1, // set for blends in on tm1 (pink bits on xrally etc.)  (U 1 1) E(1) L(0) DEPTH (0 1 0 0 1)   in sams64 intro it expects it on tm2, but it gets applied to tm1 TM2 = U(1 1) E(1) L(0) DEPTH(1 0 1 0 1)
 			(m_tcram[0x0c / 4] >> 25) & 0x1,
 			(m_tcram[0x0c / 4] >> 24) & 0x1, // always set
 
@@ -1043,7 +1044,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			(m_tcram[0x0c / 4] >> 5) & 0x1,
 			(m_tcram[0x0c / 4] >> 4) & 0x1,
 			(m_tcram[0x0c / 4] >> 3) & 0x1, // set in POST on xrally etc.
-			(m_tcram[0x0c / 4] >> 2) & 0x1, // set on buriki when blends are used
+			(m_tcram[0x0c / 4] >> 2) & 0x1, // set on buriki when blends are used. tm0 blends on fatfurwa frontmost layer U(0 1) E(1) L(1) DEPTH ( 0 0 0 0 0 )
 			(m_tcram[0x0c / 4] >> 1) & 0x1,
 			(m_tcram[0x0c / 4] >> 0) & 0x1, // always set
 
