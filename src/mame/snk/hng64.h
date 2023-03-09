@@ -290,6 +290,8 @@ private:
 	bitmap_ind16 m_sprite_bitmap;
 	bitmap_ind16 m_sprite_zbuffer;
 
+	uint8_t m_irq_pos_half;
+	uint32_t m_raster_irq_pos[2];
 
 	uint8_t m_screen_dis = 0U;
 
@@ -335,6 +337,7 @@ private:
 	uint32_t hng64_irqc_r(offs_t offset, uint32_t mem_mask = ~0);
 	void hng64_irqc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void hng64_mips_to_iomcu_irq_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void raster_irq_pos_w(uint32_t data);
 
 	uint8_t hng64_dualport_r(offs_t offset);
 	void hng64_dualport_w(offs_t offset, uint8_t data);

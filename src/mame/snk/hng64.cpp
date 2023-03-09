@@ -984,6 +984,13 @@ uint32_t hng64_state::hng64_sysregs_r(offs_t offset, uint32_t mem_mask)
 	return m_sysregs[offset];
 }
 
+void hng64_state::raster_irq_pos_w(uint32_t data)
+{
+	m_raster_irq_pos[m_irq_pos_half] = data;
+
+	m_irq_pos_half ^= 1;
+}
+
 void hng64_state::hng64_sysregs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA (&m_sysregs[offset]);
@@ -992,15 +999,40 @@ void hng64_state::hng64_sysregs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 	if(((offset*4) & 0xff00) == 0x1100)
 		logerror("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
 #endif
+	int scanline = m_screen->vpos();
 
 	switch(offset*4)
 	{
+		/*
+		case 0x0014:
+			break;
+		case 0x001c:
+			break;
+		*/
+		case 0x100c:
+			raster_irq_pos_w(data);
+			break;
+
+		/*
+		case 0x1014:
+			break;
+		case 0x101c:
+			break;
+		case 0x106c: // also reads from this one when writing 100c regs
+			break;
+		case 0x1074:
+			break;
+		*/
 		case 0x1084: //MIPS->MCU latch port
 			m_mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
 			LOG("%s: HNG64 writing to MCU control port %08x (%08x)\n", machine().describe_context(), data, mem_mask);
 			break;
+		/*
+		case 0x108c:
+			break;
+		*/
 		default:
-			LOG("%s: HNG64 writing to SYSTEM Registers %08x %08x (%08x)\n", machine().describe_context(), offset*4, data, mem_mask);
+			logerror("%s: HNG64 writing to SYSTEM Registers %08x %08x (%08x) on scanline %d\n", machine().describe_context(), offset * 4, data, mem_mask, scanline);
 	}
 }
 
@@ -1113,8 +1145,19 @@ void hng64_state::hng64_sprite_clear_odd_w(offs_t offset, uint32_t data, uint32_
 
 void hng64_state::hng64_vregs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	LOGMASKED(LOG_DMA, "hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
+	uint32_t oldreg = m_videoregs[offset];
+
+	LOGMASKED(LOG_VREGS, "hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
 	COMBINE_DATA(&m_videoregs[offset]);
+
+	if (oldreg != m_videoregs[offset])
+	{
+		int vpos = m_screen->vpos();
+
+		if (vpos > 0)
+			m_screen->update_partial(vpos - 1);
+	}
+
 }
 
 uint16_t hng64_state::main_sound_comms_r(offs_t offset)
@@ -2098,14 +2141,29 @@ TIMER_DEVICE_CALLBACK_MEMBER(hng64_state::hng64_irq)
 {
 	int scanline = param;
 
-	switch(scanline)
+	if (!(scanline & 1)) // in reality there are half as many scanlines, as we're running in interlace mode
 	{
-		case 224*2: set_irq(0x0001);  break; // lv 0 vblank irq
-//      case 0*2:   set_irq(0x0002);  break; // lv 1
-//      case 32*2:  set_irq(0x0008);  break; // lv 2
-//      case 64*2:  set_irq(0x0008);  break; // lv 2
-		case 128*2: set_irq(0x0800);  break; // lv 11 network irq?
+		const int scanline_shifted = scanline >> 1;
+
+		switch (scanline_shifted)
+		{
+		case 224: set_irq(0x0001);  break; // lv 0 vblank irq
+//      case 32:  set_irq(0x0008);  break; // lv 2
+//      case 64:  set_irq(0x0008);  break; // lv 2
+		case 240: set_irq(0x0800);  break; // lv 11 network irq?
+
+		default:
+		{
+			// raster / timer irq, used to split tilemaps for fatfurwa floor
+			if (scanline_shifted == m_raster_irq_pos[0]+8)
+				if (scanline_shifted <224)
+					set_irq(0x0002);
+			break;
+		}
+
+		}
 	}
+
 }
 
 void hng64_state::machine_start()
@@ -2175,6 +2233,9 @@ void hng64_state::machine_start()
 
 	save_item(NAME(main_latch));
 	save_item(NAME(sound_latch));
+
+	save_item(NAME(m_irq_pos_half));
+	save_item(NAME(m_raster_irq_pos));
 }
 
 TIMER_CALLBACK_MEMBER(hng64_state::comhack_callback)
@@ -2211,6 +2272,10 @@ void hng64_state::machine_reset()
 	m_fbcontrol[1] = 0x00;
 	m_fbcontrol[2] = 0x00;
 	m_fbcontrol[3] = 0x00;
+
+	m_irq_pos_half = 0;
+	m_raster_irq_pos[0] = 0xffffffff;
+	m_raster_irq_pos[1] = 0xffffffff;
 
 	clear3d();
 }

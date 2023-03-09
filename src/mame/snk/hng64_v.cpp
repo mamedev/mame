@@ -12,7 +12,7 @@
     tilemap layers due to this
 */
 
-#define HNG64_VIDEO_DEBUG 1
+#define HNG64_VIDEO_DEBUG 0
 
 
 void hng64_state::hng64_mark_all_tiles_dirty(int tilemap)
@@ -675,22 +675,13 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	// Useful bits from the tilemap registers
 	const uint8_t mosaic = (tileregs & 0xf000) >> 12;
-	const uint8_t not_line_mode = (tileregs & 0x0800) >> 11;
 	//const uint8_t bpp = (tileregs & 0x0400) >> 10; // not used?
 	const uint8_t big = (tileregs & 0x0200) >>  9;
 	const uint8_t enable = (tileregs & 0x0040) >>  6;
 
-	// Tilemap drawing enable?
-	//
-	// Definitely used to disable tilemaps in sams64_2 demo mode
-	// and is also set on the 'debug layer' of buriki
-	// however the floor layer of fatfurwa also has it set, and that must be enabled!
-	//
-	// Speculate that floormode ignores this flag, because lines can be disabled on
-	// a per-line basis?
-	//
-	// Could also just be another priority bits with some priorities being filtered
-	if (!enable && not_line_mode)
+	// this bit is used to disable tilemaps, note on fatfurwa a raster interrupt is used to change this mid-screen, swapping between
+	// the background layers and the floor being enabled!
+	if (!enable)
 	{
 		return;
 	}
@@ -875,7 +866,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			// Blit the color buffer into the primary bitmap
 			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
-				int realy = (((y-cliprect.min_y) * yinc) >> 16);
+				int realy = (((y-visarea.min_y) * yinc) >> 16);
 
 				const uint16_t* src = &m_poly_renderer->colorBuffer3d()[((realy) & 0x1ff) * 512];
 				uint32_t* dst = &bitmap.pix(y, cliprect.min_x);
@@ -953,7 +944,6 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	if (0)
 		popmessage("%08x %08x %08x %08x %08x", m_spriteregs[0], m_spriteregs[1], m_spriteregs[2], m_spriteregs[3], m_spriteregs[4]);
 
-	// see notes at top for more detailed info on these
 	if (0)
 		popmessage("%08x %08x\n\
 			TR0(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d %d) E(%d) U(%d) DEPTH( %d %d %d %d %d (%02x))\n\
@@ -997,7 +987,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 
 
 
-	if (1)
+	if (0)
 		popmessage("TC: %08x MINX(%d) MINY(%d) MAXX(%d) MAXY(%d)\n\
 			MIX BITSA Nv(%d%d%d%d) P:%d B:%d Nv(%d) Al(%d) : Nv(%d) p:%d Nv(%d%d%d) b:%d Nv(%d%d)  : Nv(%d) (%d) (%d %d %d) (%d %d %d)\n\
 			MIX BITSB Nv(%d%d%d%d) P:%d B:%d Nv(%d) Al(%d) : Nv(%d) p:%d Nv(%d%d%d) b:%d Nv(%d%d)  : Nv(%d) (%d) (%d %d %d) (%d %d %d)\n\
@@ -1022,7 +1012,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			(m_tcram[0x0c / 4] >> 29) & 0x1,
 			(m_tcram[0x0c / 4] >> 28) & 0x1,
 			(m_tcram[0x0c / 4] >> 27) & 0x1,
-			(m_tcram[0x0c / 4] >> 26) & 0x1, // set for blends in on tm1 (pink bits on xrally etc.)
+			(m_tcram[0x0c / 4] >> 26) & 0x1, // set for blends in on tm1 (pink bits on xrally etc.)  in sams64 intro it expects it on tm2, but it gets applied to tm1
 			(m_tcram[0x0c / 4] >> 25) & 0x1,
 			(m_tcram[0x0c / 4] >> 24) & 0x1, // always set
 
@@ -1249,7 +1239,10 @@ void hng64_state::update_palette_entry(int entry)
 		//
 		// however this logic fails on fatal fury fades, as the msb is 00, indicating apply to palette entries 000-0ff but the actual
 		// palette needing the changes is 0x900 - 0x9ff (hng64 logo white flash) so there must be further ways in which this is
-		// configured
+		// configured ** NO, see below!
+		//
+		// ** this is instead meant to apply to the tm0 in fatfurwa, basically a full screen blended layer so IS being applied to the
+		// correct palettes, it's currently a blend / priority issue causing it to not show
 		uint8_t tcregion = (tcdata & 0x0f000000) >> 24;
 
 		if (tcregion == (entry >> 8))
