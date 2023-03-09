@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "pin64.h"
 
-const char* CAP_NAME = "pin64_%d.cap";
+static const char CAP_NAME[] = "pin64_%d.cap";
 
 // pin64_fileutil_t members
 
