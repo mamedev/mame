@@ -9,7 +9,8 @@ Emulation of Yamaha UCN-01.
 Converts a regular MSX cartridge slot into a Yamaha module slot.
 
 The extra pins are not connected so modules that make use of the
-video out or sound out pins would not work.
+video out or sound out pins would not work. This limitation is
+currently not emulated.
 
 */
 
