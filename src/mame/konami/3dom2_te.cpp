@@ -14,6 +14,10 @@
 #include <cmath>
 #include <sstream>
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
+
 /*
     TODO:
 
@@ -818,9 +822,7 @@ void m2_te_device::write(offs_t offset, uint32_t data)
 	uint32_t reg = offset & 0x1ff;
 	te_reg_wmode wmode = static_cast<te_reg_wmode>((offset >> 9) & 3);
 
-	if (0) {
-		logerror("%s: TE W[%.8x] (%s) %.8x\n", machine().describe_context(), 0x00040000 + (offset << 2), get_reg_name(unit, reg), data);
-	}
+	LOG("%s: TE W[%.8x] (%s) %.8x\n", machine().describe_context(), 0x00040000 + (offset << 2), get_reg_name(unit, reg), data);
 
 	switch (unit)
 	{
@@ -1150,7 +1152,7 @@ void m2_te_device::log_triangle(uint32_t flags)
 		if (flags & VTX_FLAG_PRSP)
 			util::stream_format(optional, " PRSP[W:%.6f]", vtx.w);
 
-		logerror("V%d: X:%.6f Y:%.6f%s\n", i, vtx.x, vtx.y, optional.str());
+		logerror("V%d: X:%.6f Y:%.6f%s\n", i, vtx.x, vtx.y, std::move(optional).str());
 	}
 }
 
