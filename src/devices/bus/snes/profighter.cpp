@@ -12,13 +12,14 @@
 
 
 #include "emu.h"
-
 #include "profighter.h"
+
 #include "snes_carts.h"
 
-#include "formats/pc_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/upd765.h"
+
+#include "formats/pc_dsk.h"
 
 
 DEFINE_DEVICE_TYPE(SNS_PRO_FIGHTER_Q, sns_pro_fighter_q_device, "profighterq", "Super Pro. Fighter Q (variant 1)");
