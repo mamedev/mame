@@ -1812,7 +1812,7 @@ void namcos23_state::c435_state_set_projection_matrix_line(const uint16_t *param
 	for(int i=0; i<8; i++)
 		util::stream_format(buf, " %f", f24_to_f32((param[2*i+1] << 16) | param[2*i+2]));
 	buf << "\n";
-	logerror(buf.str());
+	logerror(std::move(buf).str());
 }
 
 void namcos23_state::c435_state_set(uint16_t type, const uint16_t *param)
@@ -1826,7 +1826,7 @@ void namcos23_state::c435_state_set(uint16_t type, const uint16_t *param)
 		for(int i=0; i<c435_get_state_entry_size(type); i++)
 			util::stream_format(buf, " %04x", param[i]);
 		buf << "\n";
-		logerror(buf.str());
+		logerror(std::move(buf).str());
 		break;
 	}
 	}
@@ -2072,7 +2072,7 @@ void namcos23_state::c435_pio_w(uint16_t data)
 		for(int i=0; i<m_c435_buffer_pos; i++)
 			util::stream_format(buf, " %04x", m_c435_buffer[i]);
 		buf << "\n";
-		logerror(buf.str());
+		logerror(std::move(buf).str());
 	}
 
 	m_c435_buffer_pos = 0;
