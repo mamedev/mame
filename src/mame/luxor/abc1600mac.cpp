@@ -194,7 +194,10 @@ inline offs_t abc1600_mac_device::get_physical_offset(offs_t offset, int task, b
 	nonx = PAGE_NONX;
 	wp = PAGE_WP;
 
-	m_cause = ((offset >> 13) & 0x1f) | DMAOK;
+	if (!machine().side_effects_disabled())
+	{
+		m_cause = ((offset >> 13) & 0x1f) | DMAOK;
+	}
 
 	if (LOG && (offset != virtual_offset)) logerror("%s MAC %05x:%06x (SEGA %03x SEGD %02x PGA %03x PGD %04x NONX %u WP %u TASK %u FC %u MAGIC %u)\n",
 		machine().describe_context(), offset, virtual_offset, sega, segd, pga, page_data, nonx, wp, task, m_cpu->get_fc(), m_magic);
@@ -339,7 +342,10 @@ uint8_t abc1600_mac_device::cause_r()
 		data = 0x02 | m_cause;
 	}
 
-	m_watchdog->watchdog_reset();
+	if (!machine().side_effects_disabled())
+	{
+		m_watchdog->watchdog_reset();
+	}
 
 	return data;
 }
