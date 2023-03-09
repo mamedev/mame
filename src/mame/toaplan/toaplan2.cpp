@@ -4028,7 +4028,7 @@ void toaplan2_state::enmadaio(machine_config &config)
 void toaplan2_state::snowbro2(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 16_MHz_XTAL);
+	M68000(config, m_maincpu, 32_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan2_state::snowbro2_68k_mem);
 	m_maincpu->reset_cb().set(FUNC(toaplan2_state::toaplan2_reset));
 
@@ -4056,7 +4056,7 @@ void toaplan2_state::snowbro2(machine_config &config)
 
 	YM2151(config, "ymsnd", 27_MHz_XTAL/8).add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	OKIM6295(config, m_oki[0], 27_MHz_XTAL/10, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki[0], 16_MHz_XTAL/4, okim6295_device::PIN7_LOW);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
