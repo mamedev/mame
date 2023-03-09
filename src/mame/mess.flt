@@ -1090,6 +1090,7 @@ ti/tm990189.cpp
 tiger/gamecom.cpp
 tiger/k28.cpp
 tiger/k28m2.cpp
+tiger/pylo.cpp
 tigertel/gizmondo.cpp
 tiki/tiki100.cpp
 tomy/tomy_princ.cpp
@@ -1128,6 +1129,9 @@ trs/trs80dt1.cpp
 trs/trs80m2.cpp
 trs/trs80m3.cpp
 trs/vis.cpp
+tryom/chess.cpp
+tryom/gammonm.cpp
+tryom/omar.cpp
 tvgames/actions_atj2279b.cpp
 tvgames/elan_ep3a19a.cpp
 tvgames/elan_eu3a05.cpp
