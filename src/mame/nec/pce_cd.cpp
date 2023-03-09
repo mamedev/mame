@@ -1,16 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Angelo Salese
-/************************************************************
+/**************************************************************************************************
 
 PC Engine CD HW notes:
 
 TODO:
 - Rewrite SCSI to honor actual nscsi_device;
-- Remove legacy CD drive implementation and merge with PC-8801 and PC-FX, cfr. src/devices/bus/pc8801/pc8801_31.cpp
-- Split into slot options, particularly Arcade Card shouldn't really be tied together thru a Machine Configuration option;
+- Remove legacy CD drive implementation and merge with PC-8801 and PC-FX
+  cfr. src/devices/bus/pc8801/pc8801_31.cpp
+- Split into slot options, particularly Arcade Card shouldn't really be tied together
+  thru a Machine Configuration option;
+- verify CD read timing for edge cases marked in pcecd.xml with [SCSI];
+- ADPCM half events aren't honored (dbz, draculax), they causes hangs for no benefit if enabled.
+  In dbz, they will effectively send an half irq, game enables full irq mask and xfer done,
+  neither is sent back, more stuff requiring SCSI rewrite first?
 - Implement Game Express slot option;
-- ADPCM half/full events aren't honored (dbz, draculax), they causes hangs for no benefit if enabled;
-- verify irqs, particularly for FMV streaming not working right (gulliver, holmes Introduction);
 - BRAM is unsafe on prolonged use of pcecd.xml games, verify;
 - Unsafe on debugger access;
 (old note, to move out there)
@@ -20,8 +24,7 @@ TODO:
                  gameplay hang, don't know exactly when it should fire
 - Steam Heart's: bad ADPCM irq, dialogue is cutted due of it;
 
-
-=============================================================
+===================================================================================================
 
 CD Interface Register 0x00 - CDC status
 x--- ---- busy signal
@@ -72,7 +75,7 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 0x0d CD-DA fade-out (short)
 0x0e ADPCM fade-out (short)
 
-*************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "coreutil.h"
@@ -81,7 +84,8 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 #define LOG_CMD            (1U <<  1)
 #define LOG_CDDA           (1U <<  2)
 #define LOG_SCSI           (1U <<  3)
-#define LOG_SCSIXFER       (1U <<  4) // single byte transfers, verbose
+#define LOG_FADE           (1U <<  4)
+#define LOG_SCSIXFER       (1U <<  5) // single byte transfers, verbose
 
 #define VERBOSE (LOG_GENERAL | LOG_CMD | LOG_CDDA)
 #define LOG_OUTPUT_FUNC osd_printf_info
@@ -91,6 +95,7 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 #define LOGCDDA(...)        LOGMASKED(LOG_CDDA, __VA_ARGS__)
 #define LOGSCSI(...)        LOGMASKED(LOG_SCSI, __VA_ARGS__)
 #define LOGSCSIXFER(...)    LOGMASKED(LOG_SCSIXFER, __VA_ARGS__)
+#define LOGFADE(...)        LOGMASKED(LOG_FADE, __VA_ARGS__)
 
 // 0xdd subchannel read is special and very verbose when it happens, treat differently
 #define LIVE_SUBQ_VIEW    0
@@ -1242,11 +1247,15 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::adpcm_fadein_callback)
  *
  */
 
-// CD Interface Register 0x00 - CDC status
-// x--- ---- busy signal
-// -x-- ---- request signal
-// ---x ---- cd signal
-// ---- x--- i/o signal
+/*
+ * CD Interface Register 0x00 - CDC status
+ *
+ * x--- ---- busy signal
+ * -x-- ---- request signal
+ * ---x ---- cd signal
+ * ---- x--- i/o signal
+ *
+ */
 uint8_t pce_cd_device::cdc_status_r()
 {
 	uint8_t res = (m_cdc_status & 7);
@@ -1270,7 +1279,9 @@ void pce_cd_device::cdc_status_w(uint8_t data)
 	m_cdc_status = data;
 }
 
-// CD Interface Register 0x01 - CDC command / status / data
+/*
+ * CD Interface Register 0x01 - CDC command / status / data
+ */
 uint8_t pce_cd_device::cdc_data_r()
 {
 	return m_cdc_data;
@@ -1282,13 +1293,16 @@ void pce_cd_device::cdc_data_w(uint8_t data)
 }
 
 
-// CD Interface Register 0x02 - IRQ Mask and CD control
-// x--- ---- to SCSI ACK
-// -x-- ---- transfer ready irq
-// --x- ---- transfer done irq
-// ---x ---- BRAM irq?
-// ---- x--- ADPCM FULL irq
-// ---- -x-- ADPCM HALF irq
+/*
+ * CD Interface Register 0x02 - IRQ Mask and CD control
+ *
+ * x--- ---- to SCSI ACK
+ * -x-- ---- transfer ready irq
+ * --x- ---- transfer done irq
+ * ---x ---- BRAM irq?
+ * ---- x--- ADPCM FULL irq
+ * ---- -x-- ADPCM HALF irq
+ */
 uint8_t pce_cd_device::irq_mask_r()
 {
 	return m_irq_mask;
@@ -1301,13 +1315,16 @@ void pce_cd_device::irq_mask_w(uint8_t data)
 	set_irq_line(0, 0);
 }
 
-// CD Interface Register 0x03 - BRAM lock / CD status (read only)
-// -x-- ---- acknowledge signal
-// --x- ---- done signal
-// ---x ---- bram signal
-// ---- x--- ADPCM 2
-// ---- -x-- ADPCM 1
-// ---- --x- CDDA left/right speaker select
+/*
+ * CD Interface Register 0x03 - BRAM lock / CD status (read only)
+ *
+ * -x-- ---- acknowledge signal
+ * --x- ---- done signal
+ * ---x ---- bram signal
+ * ---- x--- ADPCM 2
+ * ---- -x-- ADPCM 1
+ * ---- --x- CDDA left/right speaker select
+ */
 uint8_t pce_cd_device::irq_status_r()
 {
 	uint8_t res = m_irq_status & 0x6e;
@@ -1319,8 +1336,11 @@ uint8_t pce_cd_device::irq_status_r()
 	return res;
 }
 
-// CD Interface Register 0x04 - CD reset
-// ---- --x- to SCSI RST
+/*
+ * CD Interface Register 0x04 - CD reset
+ *
+ * ---- --x- to SCSI RST
+ */
 uint8_t pce_cd_device::cdc_reset_r()
 {
 	return m_reset_reg;
@@ -1332,18 +1352,23 @@ void pce_cd_device::cdc_reset_w(uint8_t data)
 	m_reset_reg = data;
 }
 
-// CD Interface Register 0x05 - CD-DA Volume low 8-bit port
-// CD Interface Register 0x06 - CD-DA Volume high 8-bit port
-// TODO: port 5 also converts?
+/*
+ * CD Interface Register 0x05 - CD-DA Volume low 8-bit port
+ * CD Interface Register 0x06 - CD-DA Volume high 8-bit port
+ */
 uint8_t pce_cd_device::cdda_data_r(offs_t offset)
 {
+	// TODO: port 5 also converts?
 	uint8_t port_shift = offset ? 0 : 8;
 
 	return ((m_cdda->get_channel_volume(m_irq_status & 2) ? 0 : 1) >> port_shift) & 0xff;
 }
 
-// CD Interface Register 0x07 - BRAM unlock / CD status
-// x--- ---- Enables BRAM
+/*
+ * CD Interface Register 0x07 - BRAM unlock / CD status
+ *
+ * x--- ---- Enables BRAM
+ */
 uint8_t pce_cd_device::bram_status_r()
 {
 	uint8_t res = (m_bram_locked ? (m_bram_status & 0x7f) : (m_bram_status | 0x80));
@@ -1357,7 +1382,9 @@ void pce_cd_device::bram_unlock_w(uint8_t data)
 	m_bram_status = data;
 }
 
-// CD Interface Register 0x08 - CD data (R) / ADPCM address low (W)
+/*
+ * CD Interface Register 0x08 - CD data (R) / ADPCM address low (W)
+ */
 uint8_t pce_cd_device::cd_data_r()
 {
 	return get_cd_data_byte();
@@ -1368,13 +1395,17 @@ void pce_cd_device::adpcm_address_lo_w(uint8_t data)
 	m_adpcm_latch_address = (data & 0xff) | (m_adpcm_latch_address & 0xff00);
 }
 
-// CD Interface Register 0x09 - ADPCM address high (W)
+/*
+ * CD Interface Register 0x09 - ADPCM address high (W)
+ */
 void pce_cd_device::adpcm_address_hi_w(uint8_t data)
 {
 	m_adpcm_latch_address = (data << 8) | (m_adpcm_latch_address & 0xff);
 }
 
-// CD interface Register 0x0a - ADPCM RAM data port
+/*
+ * CD interface Register 0x0a - ADPCM RAM data port
+ */
 uint8_t pce_cd_device::adpcm_data_r()
 {
 	return get_adpcm_ram_byte();
@@ -1385,7 +1416,9 @@ void pce_cd_device::adpcm_data_w(uint8_t data)
 	set_adpcm_ram_byte(data);
 }
 
-// CD interface Register 0x0b - ADPCM DMA control
+/*
+ * CD interface Register 0x0b - ADPCM DMA control
+ */
 uint8_t pce_cd_device::adpcm_dma_control_r()
 {
 	return m_adpcm_dma_reg;
@@ -1401,27 +1434,33 @@ void pce_cd_device::adpcm_dma_control_w(uint8_t data)
 	m_adpcm_dma_reg = data;
 }
 
-// CD Interface Register 0x0c - ADPCM status
-// x--- ---- ADPCM is reading data
-// ---- x--- ADPCM playback (0) stopped (1) currently playing
-// ---- -x-- pending ADPCM data write
-// ---- ---x ADPCM playback (1) stopped (0) currently playing
+/*
+ * CD Interface Register 0x0c - ADPCM status
+ *
+ * x--- ---- ADPCM is reading data
+ * ---- x--- ADPCM playback (0) stopped (1) currently playing
+ * ---- -x-- pending ADPCM data write
+ * ---- ---x ADPCM playback (1) stopped (0) currently playing
+ */
 uint8_t pce_cd_device::adpcm_status_r()
 {
 	return m_adpcm_status;
 }
 
-// CD Interface Register 0x0d - ADPCM address control
-// x--- ---- ADPCM reset
-// -x-- ---- ADPCM play
-// --x- ---- ADPCM repeat
-// ---x ---- ADPCM set length
-// ---- x--- ADPCM set read address
-// ---- --xx ADPCM set write address
-// TODO: some games read bit 5 and want it to be low otherwise they hang,
-//       how that can cope with "repeat"?
+/*
+ * CD Interface Register 0x0d - ADPCM address control
+ *
+ * x--- ---- ADPCM reset
+ * -x-- ---- ADPCM play
+ * --x- ---- ADPCM repeat
+ * ---x ---- ADPCM set length
+ * ---- x--- ADPCM set read address
+ * ---- --xx ADPCM set write address
+ */
 uint8_t pce_cd_device::adpcm_address_control_r()
 {
+	// TODO: some games read bit 5 and want it to be low otherwise they hang
+	// how that can cope with "repeat"?
 	return m_adpcm_control;
 }
 
@@ -1453,23 +1492,23 @@ void pce_cd_device::adpcm_address_control_w(uint8_t data)
 	}
 	else if ((data & 0x40) == 0)
 	{
-		/* used by Buster Bros to cancel an in-flight sample */
+		// used by bbros to cancel an in-flight sample
 		adpcm_stop(0);
 		m_msm->reset_w(1);
 	}
 
 	m_msm_repeat = BIT(data, 5);
 
-	if (data & 0x10) //ADPCM set length
+	if (data & 0x10) // ADPCM set length
 	{
 		m_adpcm_length = m_adpcm_latch_address;
 	}
-	if (data & 0x08) //ADPCM set read address
+	if (data & 0x08) // ADPCM set read address
 	{
 		m_adpcm_read_ptr = m_adpcm_latch_address;
 		m_adpcm_read_buf = 2;
 	}
-	if ((data & 0x02) == 0x02) //ADPCM set write address
+	if ((data & 0x02) == 0x02) // ADPCM set write address
 	{
 		m_adpcm_write_ptr = m_adpcm_latch_address;
 		m_adpcm_write_buf = data & 1;
@@ -1478,31 +1517,41 @@ void pce_cd_device::adpcm_address_control_w(uint8_t data)
 	m_adpcm_control = data;
 }
 
-// CD Interface Register 0x0e - ADPCM playback rate
+/*
+ * CD Interface Register 0x0e - ADPCM playback rate
+ */
 void pce_cd_device::adpcm_playback_rate_w(uint8_t data)
 {
 	m_adpcm_clock_divider = 0x10 - (data & 0x0f);
 	m_msm->set_unscaled_clock((PCE_CD_CLOCK / 6) / m_adpcm_clock_divider);
 }
 
-// CD Interface Register 0x0f - ADPCM fade in/out register
-// ---- xxxx command setting:
-// 0x00 ADPCM/CD-DA Fade-in
-// 0x01 CD-DA fade-in
-// 0x08 CD-DA fade-out (short) ADPCM fade-in
-// 0x09 CD-DA fade-out (long)
-// 0x0a ADPCM fade-out (long)
-// 0x0c CD-DA fade-out (short) ADPCM fade-in
-// 0x0d CD-DA fade-out (short)
-// 0x0e ADPCM fade-out (short)
+/*
+ * CD Interface Register 0x0f - ADPCM fade in/out register
+ *
+ * ---- xxxx command setting:
+ * 0x00 ADPCM/CD-DA Fade-in
+ * 0x01 CD-DA fade-in
+ * 0x08 CD-DA fade-out (short) ADPCM fade-in
+ * 0x09 CD-DA fade-out (long)
+ * 0x0a ADPCM fade-out (long)
+ * 0x0c CD-DA fade-out (short) ADPCM fade-in
+ * 0x0d CD-DA fade-out (short)
+ * 0x0e ADPCM fade-out (short)
+ */
 void pce_cd_device::fade_register_w(uint8_t data)
 {
+	if (data & 0xf0)
+		LOG("fade_register_w with upper bits set! %02x\n", data);
+
 	// TODO: timers needs HW tests
 	if (m_fade_reg != data)
 	{
+		LOGFADE("Fade %01x ", data & 0xf);
 		switch (data & 0xf)
 		{
-			case 0x00: //CD-DA / ADPCM enable (100 msecs)
+			case 0x00:
+				LOGFADE("ADPCM enable (100 msecs)\n");
 				m_cdda_volume = 0.0;
 				m_cdda_fadein_timer->adjust(attotime::from_usec(100), 100);
 				m_adpcm_volume = 0.0;
@@ -1510,12 +1559,16 @@ void pce_cd_device::fade_register_w(uint8_t data)
 				m_cdda_fadeout_timer->adjust(attotime::never);
 				m_adpcm_fadeout_timer->adjust(attotime::never);
 				break;
-			case 0x01: //CD-DA enable (100 msecs)
+
+			case 0x01:
+				LOGFADE("CD-DA enable (100 msecs)\n");
 				m_cdda_volume = 0.0;
 				m_cdda_fadein_timer->adjust(attotime::from_usec(100), 100);
 				m_cdda_fadeout_timer->adjust(attotime::never);
 				break;
-			case 0x08: //CD-DA short (1500 msecs) fade out / ADPCM enable
+
+			case 0x08:
+				LOGFADE("CD-DA short (1500 msecs) fade out / ADPCM enable\n");
 				m_cdda_volume = 100.0;
 				m_cdda_fadeout_timer->adjust(attotime::from_usec(1500), 1500);
 				m_adpcm_volume = 0.0;
@@ -1523,17 +1576,21 @@ void pce_cd_device::fade_register_w(uint8_t data)
 				m_cdda_fadein_timer->adjust(attotime::never);
 				m_adpcm_fadeout_timer->adjust(attotime::never);
 				break;
-			case 0x09: //CD-DA long (5000 msecs) fade out
+
+			case 0x09:
+				LOGFADE("CD-DA short (1500 msecs) fade out / ADPCM enable\n");
 				m_cdda_volume = 100.0;
 				m_cdda_fadeout_timer->adjust(attotime::from_usec(5000), 5000);
 				m_cdda_fadein_timer->adjust(attotime::never);
 				break;
-			case 0x0a: //ADPCM long (5000 msecs) fade out
+			case 0x0a:
+				LOGFADE("ADPCM long (5000 msecs) fade out\n");
 				m_adpcm_volume = 100.0;
 				m_adpcm_fadeout_timer->adjust(attotime::from_usec(5000), 5000);
 				m_adpcm_fadein_timer->adjust(attotime::never);
 				break;
-			case 0x0c: //CD-DA short (1500 msecs) fade out / ADPCM enable
+			case 0x0c:
+				LOGFADE("CD-DA short (1500 msecs) fade out / ADPCM enable\n");
 				m_cdda_volume = 100.0;
 				m_cdda_fadeout_timer->adjust(attotime::from_usec(1500), 1500);
 				m_adpcm_volume = 0.0;
@@ -1541,12 +1598,14 @@ void pce_cd_device::fade_register_w(uint8_t data)
 				m_cdda_fadein_timer->adjust(attotime::never);
 				m_adpcm_fadeout_timer->adjust(attotime::never);
 				break;
-			case 0x0d: //CD-DA short (1500 msecs) fade out
+			case 0x0d:
+				LOGFADE("CD-DA short (1500 msecs) fade out\n");
 				m_cdda_volume = 100.0;
 				m_cdda_fadeout_timer->adjust(attotime::from_usec(1500), 1500);
 				m_cdda_fadein_timer->adjust(attotime::never);
 				break;
-			case 0x0e: //ADPCM short (1500 msecs) fade out
+			case 0x0e:
+				LOGFADE("ADPCM short (1500 msecs) fade out\n");
 				m_adpcm_volume = 100.0;
 				m_adpcm_fadeout_timer->adjust(attotime::from_usec(1500), 1500);
 				m_adpcm_fadein_timer->adjust(attotime::never);
@@ -1638,10 +1697,12 @@ void pce_cd_device::intf_w(offs_t offset, uint8_t data)
 }
 
 /*
+ *
+ * PC Engine Arcade Card emulation
+ *
+ */
 
-PC Engine Arcade Card emulation
 
-*/
 
 uint8_t pce_cd_device::acard_r(offs_t offset)
 {

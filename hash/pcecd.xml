@@ -138,7 +138,7 @@ license:CC0-1.0
 		<description>Akumajou Dracula X - Chi no Rondo (Japan)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 [redbook] skips first two seconds, offsets on repeats, Stage 5 outro Dracula lip sync is off
 [ADPCM] streaming cuts off when saving Maria
 Richter sprite becomes all blue in some specific sections (cfr. stage 1 mermaid area, stage 2' final section, stage 4' start), generally when water is present, timing?
@@ -192,7 +192,7 @@ Stage 4 to 4' boss fight has ugly green background (btanb)
 		<description>Angelus 2 - Holy Night (Japan, prototype)</description>
 		<year>19??</year>
 		<publisher>NEC</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Early unfinished reel demo
 https://www.unseen64.net/2021/01/04/angelus2-holynight-pcengine-cancelled/
 ]]></notes>
@@ -880,7 +880,7 @@ https://www.unseen64.net/2021/01/04/angelus2-holynight-pcengine-cancelled/
 		<description>Cosmic Fantasy IV - Ginga Shounen Densetsu Totsunyuu Hen (Japan)</description>
 		<year>1994</year>
 		<publisher>Nihon Telenet</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Intro shows several horizontal black/transparent strips over GFXs
 ]]></notes>
 		<info name="serial" value="TJCD4038"/>
@@ -915,7 +915,7 @@ Intro shows several horizontal black/transparent strips over GFXs
 		<description>Crazy Hospital - Fushigi no Kuni no Tenshi (Japan)</description>
 		<year>1997</year>
 		<publisher>Asia Soft Lab</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 [redbook] audio crashes after title screen (constant buzz, keeps sending audio start/end commands)
 ]]></notes>
 		<info name="release" value="19970310"/>
@@ -1061,7 +1061,7 @@ Intro shows several horizontal black/transparent strips over GFXs
 		<description>Dekoboko Densetsu - Hashire Wagamanma (Japan)</description>
 		<year>1990</year>
 		<publisher>Nihon Telenet</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 During intro black stripes appears instead of being solid yellow as background color (btanb)
 Startup count goes 3-2-1 multiple times (btanb)
 ]]></notes>
@@ -1167,7 +1167,7 @@ Unemulated interface for development
 		<description>Double Dragon II - The Revenge (Japan)</description>
 		<year>1993</year>
 		<publisher>Naxat Soft</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Cannot access option menu, responds to run button by returning to main menu without GFX update
 Starting a game don't fully playback the voice sample
 Pre-stage number transitions are way too fast
@@ -1220,6 +1220,9 @@ Pre-stage number transitions are way too fast
 		<description>Downtown Nekketsu Monogatari (Japan)</description>
 		<year>1993</year>
 		<publisher>Naxat Soft</publisher>
+		<!-- TODO: Mednafen reports "with text speed set to fast, -->
+		<!-- quickly enter and exit store and listen to ADPCM playback for glitches" -->
+		<!-- cannot repro, potentially [SCSI] timing sensitive -->
 		<info name="serial" value="NXCD2015"/>
 		<info name="release" value="19931224"/>
 		<info name="alt_title" value="ダウンタウン熱血物語"/>
@@ -1332,7 +1335,7 @@ Pre-stage number transitions are way too fast
 		<description>Dragon Ball Z - Idainaru Son Gokuu Densetsu (Japan)</description>
 		<year>1994</year>
 		<publisher>Bandai</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 [ADPCM] streaming cuts off on intro
 ]]></notes>
 		<info name="serial" value="BNCD4001"/>
@@ -1379,12 +1382,12 @@ Pre-stage number transitions are way too fast
 		</part>
 	</software>
 
-	<software name="eferajil" supported="no">
+	<software name="eferajil">
 		<description>Efera &amp; Jiliora - The Emblem from Darkness (Japan)</description>
 		<year>1991</year>
 		<publisher>Brain Gray</publisher>
-	    <notes><![CDATA[
-Returns to intro when pressing start on title (player has to hold start in order to enter gameplay)
+		<notes><![CDATA[
+Returns to intro when pressing Run button on title (player has to hold start in order to enter gameplay) (fixed)
 ]]></notes>
 		<info name="serial" value="BRCD1002"/>
 		<info name="release" value="19911213"/>
@@ -1514,7 +1517,7 @@ Returns to intro when pressing start on title (player has to hold start in order
 		<description>F1 Team Simulation Project F (Japan)</description>
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Loading is way too fast once you start a race
 ]]></notes>
 		<info name="serial" value="TJCD2026"/>
@@ -1596,7 +1599,7 @@ Loading is way too fast once you start a race
 		<description>Faussete Amour (Japan)</description>
 		<year>1993</year>
 		<publisher>Naxat Soft</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Heavy input lag in Stage 2 when water displays https://youtu.be/DPeKn56Sdek [raster timing]
 Cheat: Up, up, up, down, down, down, II, II, II, I, I, I during intro for "debug menu"
 ]]></notes>
@@ -1742,7 +1745,7 @@ Cheat: Up, up, up, down, down, down, II, II, II, I, I, I during intro for "debug
 		<description>Fray CD Xak Gaiden (Japan)</description>
 		<year>1994</year>
 		<publisher>Micro Cabin</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 First intro screen has wrong masking
 One line off for gameplay backgrounds
 ]]></notes>
@@ -1838,10 +1841,13 @@ One line off for gameplay backgrounds
 		</part>
 	</software>
 
-	<software name="yunahv">
+	<software name="yunahv" supported="no">
 		<description>Ginga Ojousama Densetsu Yuna HuVideo CD (Japan)</description>
 		<year>1995</year>
 		<publisher>Hudson</publisher>
+		<notes><![CDATA[
+Hangs on FMV playback (skippable thru Run button), [SCSI] timing sensitive
+]]></notes>
 		<info name="serial" value="HCD5078"/>
 		<info name="release" value="19950618"/>
 		<info name="alt_title" value="銀河お嬢様伝説ユナ HuVIDEO同梱再販版"/>
@@ -2352,7 +2358,7 @@ One line off for gameplay backgrounds
 		<description>Iga Ninden Gaou (Japan)</description>
 		<year>1993</year>
 		<publisher>Nichibutsu</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Cannot start a game, goes back to intro as soon as "press Run button" prompts
 ]]></notes>
 		<info name="serial" value="NBCD3003"/>
@@ -2449,7 +2455,7 @@ Cannot start a game, goes back to intro as soon as "press Run button" prompts
 		<description>J. League Tremendous Soccer '94 (ACD, SCD)(Japan)</description>
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Cannot start a game, goes back to intro as soon as "press Run button" prompts
 ]]></notes>
 		<info name="serial" value="HECD4017"/>
@@ -2628,7 +2634,7 @@ Cannot start a game, goes back to intro as soon as "press Run button" prompts
 		<description>Kakutou Haou Densetsu Algunos (Japan)</description>
 		<year>1994</year>
 		<publisher>Intec</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Intro draws black lines instead of wave-y effect
 All tested stages don't draw playfield properly, timing?
 ]]></notes>
@@ -2811,7 +2817,7 @@ All tested stages don't draw playfield properly, timing?
 		<publisher>Hudson</publisher>
 		<notes><![CDATA[
 https://mametesters.org/view.php?id=7290
-Sets high [CD drive] transfer length (0xfc), stalls
+Sets high transfer length (0xfc), stalls, [SCSI] timing sensitive
 ]]></notes>
 		<info name="serial" value="HCD5076"/>
 		<info name="release" value="19950526"/>
@@ -3122,7 +3128,7 @@ https://mametesters.org/view.php?id=7291
 		<description>Choujikuu Yousai Macross 2036 (CD, SCD)(Japan)</description>
 		<year>1992</year>
 		<publisher>NCS</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 https://mametesters.org/view.php?id=5995
 ]]></notes>
 		<info name="serial" value="NSCD2007"/>
@@ -3208,7 +3214,7 @@ Verify [redbook] lip sync and repeat (uses track mode)
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
 		<notes><![CDATA[
-https://mametesters.org/view.php?id=7292
+https://mametesters.org/view.php?id=7292 [SCSI] timing sensitive
 ]]></notes>
 		<info name="serial" value="HECD4011"/>
 		<info name="release" value="19940812"/>
@@ -3560,8 +3566,8 @@ https://mametesters.org/view.php?id=7292
 		<description>Mirai Shonen Conan (Japan)</description>
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
-	    <notes><![CDATA[
-Very unstable on FMVs (including skip with select button)
+		<notes><![CDATA[
+Very unstable on FMVs (including skip with select button) [SCSI] timing sensitive
 Crashes when "left option" is selected in main menu (with no save in [BRAM])
 ]]></notes>
 		<info name="serial" value="TJCD-2022"/>
@@ -5145,7 +5151,8 @@ Crashes when "left option" is selected in main menu (with no save in [BRAM])
 		<publisher>Victor Entertainment</publisher>
 		<notes><![CDATA[
 https://mametesters.org/view.php?id=7293
-Sets high [CD drive] transfer length (0xfc) on FMVs, stalls
+Sets high CD drive transfer length (0xfc) on FMVs, stalls, [SCSI] timing sensitive
+Abruptly stops [ADPCM] playback on title screen
 Offset [CRTC] screen
 ]]></notes>
 		<info name="serial" value="JCCD1004"/>
@@ -5166,6 +5173,8 @@ Offset [CRTC] screen
 		<publisher>Victor Entertainment</publisher>
 		<notes><![CDATA[
 https://mametesters.org/view.php?id=7294
+Sets high CD drive transfer length (0xfc) on FMVs, stalls, [SCSI] timing sensitive
+Abruptly stops [ADPCM] playback on title screen
 Offset [CRTC] screen
 ]]></notes>
 		<info name="serial" value="JCCD3012"/>
@@ -6737,7 +6746,7 @@ Offset [CRTC] screen
 		<description>Where in the World is Carmen Sandiego? (Japan)</description>
 		<year>1990</year>
 		<publisher>Pack-In-Video</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 Hangs or resets after giving yes to "Is it OK?" prompt (fixed)
 ]]></notes>
 		<info name="serial" value="PVCD0001"/>
@@ -7103,11 +7112,14 @@ Hangs or resets after giving yes to "Is it OK?" prompt (fixed)
 		</part>
 	</software>
 
-	<software name="4in1">
+	<software name="4in1" supported="partial">
 		<description>4 in 1 Super CD (USA)</description>
-		<!-- Press U R D L II at menu to access Bomberman -->
 		<year>1992</year>
 		<publisher>Hudson Soft / Red</publisher>
+		<notes><![CDATA[
+Stuck note in Gate of Thunder [SCSI] timing sensitive
+Omake: Press U R D L II at menu to access Bomberman
+]]></notes>
 		<info name="serial" value="TGXCD1026"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
@@ -7388,10 +7400,13 @@ https://mametesters.org/view.php?id=7972 (fixed)
 		</part>
 	</software>
 
-	<software name="itcame">
+	<software name="itcame" supported="no">
 		<description>It Came from the Desert (USA)</description>
 		<year>1992</year>
 		<publisher>Cinemaware</publisher>
+		<notes><![CDATA[
+Black screen after title screen and "day 1" appears [SCSI] timing sensitive
+]]></notes>
 		<info name="serial" value="TGXCD1010"/>
 		<info name="usage" value="CD-ROM System Card required" />
 		<sharedfeat name="requirement" value="cdsys"/>
@@ -7416,10 +7431,13 @@ https://mametesters.org/view.php?id=7972 (fixed)
 		</part>
 	</software>
 
-	<software name="madden">
+	<software name="madden" supported="no">
 		<description>John Madden Duo CD Football (USA)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
+		<notes><![CDATA[
+Crashes after first action, [SCSI] timing sensitive
+]]></notes>
 		<info name="serial" value="TGXCD1045"/>
 		<info name="usage" value="CD-ROM² Super System Card required" />
 		<sharedfeat name="requirement" value="scdsys"/>
@@ -7593,6 +7611,8 @@ https://mametesters.org/view.php?id=6993
 		<publisher>Sleuth Publications</publisher>
 		<notes><![CDATA[
 https://mametesters.org/view.php?id=7293
+Sets high CD drive transfer length (0xfc) on FMVs, stalls, [SCSI] timing sensitive
+Abruptly stops [ADPCM] playback on title screen
 Offset [CRTC] screen
 ]]></notes>
 		<info name="serial" value="TGXCD1011"/>
@@ -7611,6 +7631,8 @@ Offset [CRTC] screen
 		<publisher>Sleuth Publications</publisher>
 		<notes><![CDATA[
 https://mametesters.org/view.php?id=7294
+Sets high CD drive transfer length (0xfc) on FMVs, stalls, [SCSI] timing sensitive
+Abruptly stops [ADPCM] playback on title screen
 Offset [CRTC] screen
 ]]></notes>
 		<info name="serial" value="TGXCD1039"/>
@@ -7829,7 +7851,7 @@ Offset [CRTC] screen
 		<description>Hi-Leg Fantasy (GECD)(Japan)</description>
 		<year>1994</year>
 		<publisher>Game Express</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 [Game Express] title, using unemulated HW slot features
 ]]></notes>
 		<info name="serial" value="GED-1011"/>
@@ -7847,7 +7869,7 @@ Offset [CRTC] screen
 		<description>AV Tanjou (GECD)(Japan)</description>
 		<year>1995</year>
 		<publisher>Game Express</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 [Game Express] title, using unemulated HW slot features
 ]]></notes>
 		<info name="serial" value="GED-1015"/>
@@ -7864,7 +7886,7 @@ Offset [CRTC] screen
 		<description>Bishoujo Janshi Idol Pai (GECD)(Japan)</description>
 		<year>1995</year>
 		<publisher>Game Express</publisher>
-	    <notes><![CDATA[
+		<notes><![CDATA[
 [Game Express] title, using unemulated HW slot features
 ]]></notes>
 		<info name="serial" value="GED-1016"/>
