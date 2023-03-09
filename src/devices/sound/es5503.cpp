@@ -105,6 +105,7 @@ void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int ress
 	{
 		uint16_t wtsize = pOsc->wtsize - 1;
 		uint32_t altram = (*accumulator) >> resshift;
+		uint32_t fraction = (*accumulator) & ((1 << resshift) - 1);
 
 		if (altram > wtsize)
 		{
@@ -115,7 +116,7 @@ void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int ress
 			altram = 0;
 		}
 
-		*accumulator = altram << resshift;
+		*accumulator = (altram << resshift) + fraction;
 	}
 
 	// if we're in swap mode, start the partner
@@ -135,6 +136,7 @@ void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int ress
 			// preserve the phase in this case too
 			uint16_t wtsize = pOsc->wtsize - 1;
 			uint32_t altram = (*accumulator) >> resshift;
+			uint32_t fraction = (*accumulator) & ((1 << resshift) - 1);
 			if (altram > wtsize)
 			{
 				altram -= wtsize;
@@ -144,7 +146,7 @@ void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int ress
 				altram = 0;
 			}
 
-			*accumulator = altram << resshift;
+			*accumulator = (altram << resshift) + fraction;
 		}
 	}
 	// IRQ enabled for this voice?
