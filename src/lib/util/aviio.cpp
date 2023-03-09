@@ -9,9 +9,11 @@
 ***************************************************************************/
 
 #include "aviio.h"
+
+#include "strformat.h"
+
 #include "osdcomm.h"
 #include "osdfile.h"
-#include "strformat.h"
 
 #include <array>
 #include <cassert>
@@ -3569,13 +3571,13 @@ void avi_file_impl::display_chunk_recursive(avi_chunk const *container, int inde
 		bool recurse = false;
 
 		util::stream_format(std::cout, "%*schunk = %c%c%c%c, size=%X (%X)\n",
-			indent, "",
-			std::uint8_t(curchunk.type >> 0),
-			std::uint8_t(curchunk.type >> 8),
-			std::uint8_t(curchunk.type >> 16),
-			std::uint8_t(curchunk.type >> 24),
-			curchunk.size,
-			curchunk.offset);
+				indent, "",
+				std::uint8_t(curchunk.type >> 0),
+				std::uint8_t(curchunk.type >> 8),
+				std::uint8_t(curchunk.type >> 16),
+				std::uint8_t(curchunk.type >> 24),
+				curchunk.size,
+				curchunk.offset);
 
 		// certain chunks are just containers; recurse into them
 		switch (curchunk.type)
@@ -3584,10 +3586,10 @@ void avi_file_impl::display_chunk_recursive(avi_chunk const *container, int inde
 			case CHUNKTYPE_RIFF:
 			case CHUNKTYPE_LIST:
 				util::stream_format(std::cout, "%*stype = %c%c%c%c\n", indent, "",
-					std::uint8_t(curchunk.listtype >> 0),
-					std::uint8_t(curchunk.listtype >> 8),
-					std::uint8_t(curchunk.listtype >> 16),
-					std::uint8_t(curchunk.listtype >> 24));
+						std::uint8_t(curchunk.listtype >> 0),
+						std::uint8_t(curchunk.listtype >> 8),
+						std::uint8_t(curchunk.listtype >> 16),
+						std::uint8_t(curchunk.listtype >> 24));
 				recurse = true;
 				chunksize = 0;
 				break;
