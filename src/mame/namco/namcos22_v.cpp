@@ -1498,7 +1498,7 @@ void namcos22_state::simulate_slavedsp()
 				}
 				if (i < len)
 					polydata << " (...)";
-				logerror("simulate_slavedsp unknown 3d data: len=0x%x code=0x%x addr=0x%x!%s\n", len, code, index, polydata.str());
+				logerror("simulate_slavedsp unknown 3d data: len=0x%x code=0x%x addr=0x%x!%s\n", len, code, index, std::move(polydata).str());
 				return;
 			}
 		}
