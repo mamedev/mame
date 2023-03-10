@@ -911,12 +911,13 @@ Intro shows several horizontal black/transparent strips over GFXs
 		</part>
 	</software>
 
-	<software name="crazyhos" supported="no">
+	<software name="crazyhos" supported="partial">
 		<description>Crazy Hospital - Fushigi no Kuni no Tenshi (Japan)</description>
 		<year>1997</year>
 		<publisher>Asia Soft Lab</publisher>
 		<notes><![CDATA[
-[redbook] audio crashes after title screen (constant buzz, keeps sending audio start/end commands)
+[redbook] audio playback is offset during gameplay, uses a mixture of [SCSI] CD drive start/end mode commands ($40/$80)
+Goes silent on intro (btanb)
 ]]></notes>
 		<info name="release" value="19970310"/>
 		<info name="alt_title" value="クレイジー・ホスピタル ふしぎの国の天使"/>

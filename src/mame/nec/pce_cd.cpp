@@ -573,8 +573,16 @@ void pce_cd_device::nec_set_audio_stop_position()
 		{
 			const u8 track_number = bcd_2_dec(m_command_buffer[2]);
 			const u32 pregap = m_toc->tracks[m_cd_file->get_track(track_number - 1)].pregap;
-			LOGCMD("TRACK=%d (pregap = %d)\n", track_number, pregap);
+			// NB: crazyhos uses this command with track = 1 on pre-title screen intro.
+			// It's not supposed to playback anything according to real HW refs.
 			frame = m_toc->tracks[ track_number - 1 ].logframeofs;
+
+			LOGCMD("TRACK=%d (raw %02x pregap = %d frame = %d)\n"
+				, track_number
+				, m_command_buffer[2]
+				, pregap
+				, frame
+			);
 			//frame -= std::max(pregap, (u32)150);
 			break;
 		}
