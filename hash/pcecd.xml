@@ -2354,12 +2354,13 @@ Hangs on FMV playback (skippable thru Run button), [SCSI] timing sensitive
 		</part>
 	</software>
 
-	<software name="iganin" supported="no">
+	<software name="iganin" supported="partial">
 		<description>Iga Ninden Gaou (Japan)</description>
 		<year>1993</year>
 		<publisher>Nichibutsu</publisher>
 		<notes><![CDATA[
-Cannot start a game, goes back to intro as soon as "press Run button" prompts
+Cannot start a game, goes back to intro as soon as "press Run button" prompts (fixed)
+New game intro sports glitchy portraits
 ]]></notes>
 		<info name="serial" value="NBCD3003"/>
 		<info name="release" value="19931210"/>
@@ -2451,13 +2452,10 @@ Cannot start a game, goes back to intro as soon as "press Run button" prompts
 		</part>
 	</software>
 
-	<software name="jleagt94" supported="no">
+	<software name="jleagt94">
 		<description>J. League Tremendous Soccer '94 (ACD, SCD)(Japan)</description>
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
-		<notes><![CDATA[
-Cannot start a game, goes back to intro as soon as "press Run button" prompts
-]]></notes>
 		<info name="serial" value="HECD4017"/>
 		<info name="release" value="19941223"/>
 		<info name="alt_title" value="Jリーグ トリメンダスサッカー'94"/>
@@ -2666,7 +2664,7 @@ All tested stages don't draw playfield properly, timing?
 		</part>
 	</software>
 
-	<software name="kazekiri" supported="yes">
+	<software name="kazekiri">
 		<description>Kaze Kiri - Ninja Action (Japan)</description>
 		<year>1994</year>
 		<publisher>Naxat Soft</publisher>
@@ -2795,10 +2793,13 @@ All tested stages don't draw playfield properly, timing?
 		</part>
 	</software>
 
-	<software name="koseikib">
+	<software name="koseikib" supported="partial">
 		<description>KO Seiki Beast - Gaia Fukkatsu Kanketsu Hen (Japan)</description>
 		<year>1994</year>
 		<publisher>Pack-In-Video</publisher>
+	    <notes><![CDATA[
+Intro goes silent [ADPCM]
+]]></notes>
 		<info name="serial" value="PVCD4011"/>
 		<info name="release" value="19940617"/>
 		<info name="alt_title" value="KO世紀ビースト三獣士 ガイア復活 完結編"/>
@@ -2847,10 +2848,13 @@ Sets high transfer length (0xfc), stalls, [SCSI] timing sensitive
 		</part>
 	</software>
 
-	<software name="ladyphan">
+	<software name="ladyphan" supported="no">
 		<description>Lady Phantom (Japan)</description>
 		<year>1991</year>
 		<publisher>Laser Soft</publisher>
+	    <notes><![CDATA[
+Hangs after first attack turn (shoot to the foe behind the tree)
+]]></notes>
 		<info name="serial" value="TJCD1019"/>
 		<info name="release" value="19911129"/>
 		<info name="alt_title" value="レディファントム"/>
@@ -3124,12 +3128,12 @@ https://mametesters.org/view.php?id=7291
 		</part>
 	</software>
 
-	<software name="macr2036" supported="no">
+	<software name="macr2036">
 		<description>Choujikuu Yousai Macross 2036 (CD, SCD)(Japan)</description>
 		<year>1992</year>
 		<publisher>NCS</publisher>
 		<notes><![CDATA[
-https://mametesters.org/view.php?id=5995
+https://mametesters.org/view.php?id=5995 (fixed)
 ]]></notes>
 		<info name="serial" value="NSCD2007"/>
 		<info name="release" value="19920403"/>
@@ -3209,12 +3213,13 @@ Verify [redbook] lip sync and repeat (uses track mode)
 		</part>
 	</software>
 
-	<software name="popful" supported="partial">
+	<software name="popful" supported="no">
 		<description>Magical Fantasy Adventure - Popful Mail (ACD, SCD)(Japan)</description>
 		<year>1994</year>
 		<publisher>NEC Home Electronics</publisher>
 		<notes><![CDATA[
 https://mametesters.org/view.php?id=7292 [SCSI] timing sensitive
+Crashes on (skippable) new game intro, [SCSI] timing sensitive
 ]]></notes>
 		<info name="serial" value="HECD4011"/>
 		<info name="release" value="19940812"/>
@@ -7457,7 +7462,7 @@ Crashes after first action, [SCSI] timing sensitive
 		<sharedfeat name="requirement" value="cdsys"/>
 		<part name="cdrom" interface="pce_cdrom">
 			<diskarea name="cdrom">
-				<disk name="last alert (cd)(usa)" sha1="085ecab0e16b7e1f74843d14a4f8ffe36a63567d"/>
+				<disk name="last alert (cd)(usa)" sha1="085ecab0e16b7e1f74843d14a4f8ffe36a63567d" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
