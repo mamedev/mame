@@ -638,23 +638,19 @@ uint16_t hng64_state::get_scrollbase(int tm)
 int hng64_state::get_blend_mode(int tm)
 {
 	// this is based on xrally and sams64/sams64_2 use, it could be incorrect
-	// it doesn't seem to be 100% on sams64_2 select screen when the mode select circle moves down
+	// it doesn't seem to be 100% on sams64_2 select screen when the mode select circle moves down - that is a blended sprite and blended tilemap mixing in a weird way to produce a darker than expected image as there are can be no other components in said mix
 
-	// m_tcram[0x14/4] may be some additional per layer for this?
 	uint8_t blendmode = 1;
-	if ((m_tcram[0x0c / 4] & 0x04000000) && (tm == 1)) // only enable it for the 2nd tilemap right now, find other use cases!
-		blendmode = 2;
-
-
-	// the bit below also gets set for certain blending effects
-	// for example a mist effect in the long tunnel on the South America course
-	// ( https://youtu.be/9rOPkNHTmYA?t=403 6:43 )
-	// this is the only course which has this bit set (it is set all the time) and is the only course using blending
-	//
-	// the problem here however is that the tilemap used for blending has a lower tilemap priority than the background tilemap?!
-	// the bit also gets set on the buriki title screen, and how that blends is unclear even with reference footage
-	//if ((m_tcram[0x0c / 4] & 0x00000004) && (tm == 3))
-	//  blendmode = 2;
+	if ((get_tileregs(tm) & 0x0020) >> 5) // for layers with L(1)
+	{
+		if ((m_tcram[0x0c / 4] >> 2) & 0x1) 
+			blendmode = 2;
+	}
+	else // for layers with L(0)
+	{
+		if ((m_tcram[0x0c / 4] >> 26) & 0x1) 
+			blendmode = 2;
+	}
 
 	return blendmode;
 }
@@ -1013,7 +1009,8 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			(m_tcram[0x0c / 4] >> 29) & 0x1,
 			(m_tcram[0x0c / 4] >> 28) & 0x1,
 			(m_tcram[0x0c / 4] >> 27) & 0x1,
-			(m_tcram[0x0c / 4] >> 26) & 0x1, // set for blends in on tm1 (pink bits on xrally etc.)  (U 1 1) E(1) L(0) DEPTH (0 1 0 0 1)   in sams64 intro it expects it on tm2, but it gets applied to tm1 TM2 = U(1 1) E(1) L(0) DEPTH(1 0 1 0 1)
+			(m_tcram[0x0c / 4] >> 26) & 0x1, // set for blends in on tm1 (pink bits on xrally etc.)  (U 1 1) E(1) L(0) DEPTH (0 1 0 0 1)   in sams64 intro it expects it on tm2, but it gets applied to tm1 TM2 = U(1 1) E(1) L(0) DEPTH(1 0 1 0 1)  
+
 			(m_tcram[0x0c / 4] >> 25) & 0x1,
 			(m_tcram[0x0c / 4] >> 24) & 0x1, // always set
 
@@ -1044,7 +1041,8 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			(m_tcram[0x0c / 4] >> 5) & 0x1,
 			(m_tcram[0x0c / 4] >> 4) & 0x1,
 			(m_tcram[0x0c / 4] >> 3) & 0x1, // set in POST on xrally etc.
-			(m_tcram[0x0c / 4] >> 2) & 0x1, // set on buriki when blends are used. tm0 blends on fatfurwa frontmost layer U(0 1) E(1) L(1) DEPTH ( 0 0 0 0 0 )
+			(m_tcram[0x0c / 4] >> 2) & 0x1, // set on buriki when blends are used. tm0 blends on fatfurwa frontmost layer U(0 1) E(1) L(1) DEPTH ( 0 0 0 0 0 )   set on SS64 Portrait Win blend TM1 (U1 1 ) E(1) L(1) DEPT( 0 0 1 0 1) (other blend enabled here too!)
+
 			(m_tcram[0x0c / 4] >> 1) & 0x1,
 			(m_tcram[0x0c / 4] >> 0) & 0x1, // always set
 
