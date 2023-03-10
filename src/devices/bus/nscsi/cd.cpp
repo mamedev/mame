@@ -831,7 +831,7 @@ void nscsi_cdrom_apple_device::scsi_command()
 	case APPLE_PLAY_AUDIO:
 	case APPLE_PLAYBACK_CONTROL:
 		// TODO
-		[[fall_through]];
+		[[fallthrough]];
 
 	default:
 		nscsi_cdrom_device::scsi_command();
