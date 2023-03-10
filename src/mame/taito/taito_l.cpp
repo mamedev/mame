@@ -72,59 +72,45 @@ puzznici note
 #include "speaker.h"
 
 
-void taitol_state::state_register()
+void taitol_state::machine_start()
 {
 	save_item(NAME(m_last_irq_level));
 }
 
-void taitol_2cpu_state::state_register()
+void taitol_2cpu_state::machine_start()
 {
+	taitol_state::machine_start();
+
 	if (m_audio_bnk.found())
 		m_audio_bnk->configure_entries(0, m_audio_prg->bytes()/0x4000, m_audio_prg->base(), 0x4000);
-
-	taitol_state::state_register();
 }
 
-void fhawk_state::state_register()
+void fhawk_state::machine_start()
 {
+	taitol_2cpu_state::machine_start();
+
 	m_slave_bnk->configure_entries(0, m_slave_prg->bytes()/0x4000, m_slave_prg->base(), 0x4000);
-	taitol_2cpu_state::state_register();
 
 	save_item(NAME(m_slave_rombank));
 }
 
-void champwr_state::state_register()
+void champwr_state::machine_start()
 {
-	fhawk_state::state_register();
+	fhawk_state::machine_start();
 
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_data));
 }
 
-void taitol_1cpu_state::state_register()
-{
-	taitol_state::state_register();
-}
 
-
-MACHINE_START_MEMBER(taitol_state, taito_l)
-{
-	state_register();
-}
-
-void taitol_state::taito_machine_reset()
+void taitol_state::machine_reset()
 {
 	m_last_irq_level = 0;
 }
 
-void taitol_2cpu_state::taito_machine_reset()
+void fhawk_state::machine_reset()
 {
-	taitol_state::taito_machine_reset();
-}
-
-void fhawk_state::taito_machine_reset()
-{
-	taitol_2cpu_state::taito_machine_reset();
+	taitol_2cpu_state::machine_reset();
 
 	m_slave_rombank = 0;
 	m_slave_bnk->set_entry(m_slave_rombank);
@@ -132,23 +118,12 @@ void fhawk_state::taito_machine_reset()
 	m_audio_bnk->set_entry(1);
 }
 
-void champwr_state::taito_machine_reset()
+void champwr_state::machine_reset()
 {
-	fhawk_state::taito_machine_reset();
+	fhawk_state::machine_reset();
 
 	m_adpcm_pos = 0;
 	m_adpcm_data = -1;
-}
-
-void taitol_1cpu_state::taito_machine_reset()
-{
-	taitol_state::taito_machine_reset();
-}
-
-
-MACHINE_RESET_MEMBER(taitol_state, taito_l)
-{
-	taito_machine_reset();
 }
 
 
@@ -1309,9 +1284,6 @@ void fhawk_state::fhawk(machine_config &config)
 	tc0220ioc.write_4_callback().set(FUNC(taitol_state::coin_control_w));
 	tc0220ioc.read_7_callback().set_ioport("IN2");
 
-	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
-	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
-
 	/* video hardware */
 	l_system_video(config);
 
@@ -1376,9 +1348,6 @@ void taitol_2cpu_state::raimais(machine_config &config)
 
 	MB8421(config, "dpram");
 
-	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
-	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
-
 	/* video hardware */
 	l_system_video(config);
 
@@ -1419,9 +1388,6 @@ void taitol_2cpu_state::kurikint(machine_config &config)
 
 	MB8421(config, "dpram");
 
-	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
-	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
-
 	/* video hardware */
 	l_system_video(config);
 
@@ -1452,9 +1418,6 @@ void taitol_1cpu_state::base(machine_config &config)
 	TC0090LVC(config, m_main_cpu, XTAL(13'330'560)/2);    /* verified freq on pin122 of TC0090LVC cpu */
 	m_main_cpu->set_addrmap(AS_PROGRAM, &taitol_1cpu_state::plotting_map);
 	m_main_cpu->set_irq_acknowledge_callback(FUNC(taitol_state::irq_callback));
-
-	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
-	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
 	l_system_video(config);
@@ -1495,11 +1458,15 @@ void taitol_1cpu_state::puzznici(machine_config &config)
 
 void horshoes_state::machine_start()
 {
+	taitol_1cpu_state::machine_start();
+
 	save_item(NAME(m_horshoes_gfxbank));
 }
 
 void horshoes_state::machine_reset()
 {
+	taitol_1cpu_state::machine_reset();
+
 	m_horshoes_gfxbank = 0;
 }
 
@@ -1564,9 +1531,6 @@ void taitol_2cpu_state::evilston(machine_config &config)
 
 	mb8421_device &dpram(MB8421(config, "dpram"));
 	dpram.intl_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
-
-	MCFG_MACHINE_START_OVERRIDE(taitol_state, taito_l)
-	MCFG_MACHINE_RESET_OVERRIDE(taitol_state, taito_l)
 
 	/* video hardware */
 	l_system_video(config);

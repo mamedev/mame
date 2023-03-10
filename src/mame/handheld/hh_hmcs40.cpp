@@ -93,6 +93,7 @@ known chips:
  *A07     HD44868  1984, Chess King Pocket Micro Deluxe
  *A12     HD44868  1985, SciSys MK 10 / Pocket Chess
  *A14     HD44868  1985, SciSys Kasparov Plus
+ *A16     HD44868  1988, Saitek Pocket Checkers
 
   (* means undumped unless noted, @ denotes it's in this driver)
 

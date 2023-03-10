@@ -63,37 +63,34 @@ Verification still needed for the other PCBs.
 #include "emu.h"
 #include "aerofgt.h"
 
+#include "vs9209.h"
+#include "vsystem_gga.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/mb3773.h"
-#include "vs9209.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
-#include "vsystem_gga.h"
+
 #include "screen.h"
 #include "speaker.h"
 
 
-void aerofgt_state::karatblzbl_soundlatch_w(uint8_t data)
+void aerofgt_sound_cpu_state::karatblzbl_soundlatch_w(uint8_t data)
 {
 	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-uint8_t aerofgt_state::pending_command_r()
+uint8_t aerofgt_sound_cpu_state::pending_command_r()
 {
 	return m_soundlatch->pending_r();
 }
 
-void aerofgt_state::aerofgt_sh_bankswitch_w(uint8_t data)
+void aerofgt_banked_sound_state::sh_bankswitch_w(uint8_t data)
 {
 	m_soundbank->set_entry(data & 0x03);
-}
-
-void aerofgt_state::spinlbrk_sh_bankswitch_w(uint8_t data)
-{
-	m_soundbank->set_entry(data & 0x01);
 }
 
 void aerofgt_state::pspikesb_oki_banking_w(uint16_t data)
@@ -110,21 +107,21 @@ void aerofgt_state::aerfboo2_okim6295_banking_w(offs_t offset, uint16_t data, ui
 //  }
 }
 
-void aerofgt_state::aerfboot_okim6295_banking_w(uint8_t data)
+void aerofgt_sound_cpu_state::aerfboot_okim6295_banking_w(uint8_t data)
 {
 	/*bit 2 (0x4) set too?*/
 	if (data & 0x4)
 		m_okibank->set_entry(data & 0x3);
 }
 
-void aerofgt_state::karatblzbl_d7759_write_port_0_w(uint8_t data)
+void aerofgt_sound_cpu_state::karatblzbl_d7759_write_port_0_w(uint8_t data)
 {
 	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
 
-void aerofgt_state::karatblzbl_d7759_reset_w(uint8_t data)
+void aerofgt_sound_cpu_state::karatblzbl_d7759_reset_w(uint8_t data)
 {
 	m_upd7759->reset_w(BIT(data, 7));
 }
@@ -148,21 +145,21 @@ void aerofgt_state::scrolly_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	COMBINE_DATA(&m_scrolly[Layer]);
 }
 
-void aerofgt_state::pspikes_map(address_map &map)
+void aerofgt_banked_sound_state::pspikes_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x10ffff).ram(); /* work RAM */
 	map(0x200000, 0x203fff).ram().share("sprlookupram1");
-	map(0xff8000, 0xff8fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
+	map(0xff8000, 0xff8fff).ram().w(FUNC(aerofgt_banked_sound_state::vram_w<0>)).share("vram.0");
 	map(0xffc000, 0xffc3ff).writeonly().share("spriteram");
 	map(0xffd000, 0xffdfff).ram().share("rasterram");   /* bg1 scroll registers */
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfff000, 0xfff001).portr("IN0");
-	map(0xfff001, 0xfff001).w(FUNC(aerofgt_state::pspikes_palette_bank_w));
+	map(0xfff001, 0xfff001).w(FUNC(aerofgt_banked_sound_state::pspikes_palette_bank_w));
 	map(0xfff002, 0xfff003).portr("IN1");
-	map(0xfff003, 0xfff003).w(FUNC(aerofgt_state::pspikes_gfxbank_w));
-	map(0xfff004, 0xfff005).portr("DSW").w(FUNC(aerofgt_state::scrolly_w<0>));
-	map(0xfff007, 0xfff007).r(FUNC(aerofgt_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff003, 0xfff003).w(FUNC(aerofgt_banked_sound_state::pspikes_gfxbank_w));
+	map(0xfff004, 0xfff005).portr("DSW").w(FUNC(aerofgt_banked_sound_state::scrolly_w<0>));
+	map(0xfff007, 0xfff007).r(FUNC(aerofgt_banked_sound_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0xfff400, 0xfff403).w("gga", FUNC(vsystem_gga_device::write)).umask16(0x00ff);
 }
 
@@ -185,26 +182,26 @@ void aerofgt_state::pspikesb_map(address_map &map)
 	map(0xfff400, 0xfff403).nopw(); // GGA access
 }
 
-void aerofgt_state::spikes91_map(address_map &map)
+void aerofgt_sound_cpu_state::spikes91_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x100000, 0x10ffff).ram(); /* work RAM */
 	map(0x200000, 0x203fff).ram().share("sprlookupram1");
 	map(0xc04000, 0xc04001).nopw();
-	map(0xff8000, 0xff8fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
+	map(0xff8000, 0xff8fff).ram().w(FUNC(aerofgt_sound_cpu_state::vram_w<0>)).share("vram.0");
 
 	map(0xffa000, 0xffbfff).ram().share("tx_tilemap_ram");
 
 	map(0xffc000, 0xffcfff).ram().share("spriteram");
-	//map(0xffd200, 0xffd201).w(FUNC(aerofgt_state::pspikesb_gfxbank_w));
+	//map(0xffd200, 0xffd201).w(FUNC(aerofgt_sound_cpu_state::pspikesb_gfxbank_w));
 	map(0xffd000, 0xffdfff).ram().share("rasterram");   /* bg1 scroll registers */
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfff000, 0xfff001).portr("IN0");
 	map(0xfff002, 0xfff003).portr("IN1");
-	map(0xfff003, 0xfff003).w(FUNC(aerofgt_state::pspikes_gfxbank_w));
-	map(0xfff004, 0xfff005).portr("DSW").w(FUNC(aerofgt_state::scrolly_w<0>));
-	map(0xfff007, 0xfff007).r(FUNC(aerofgt_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
-	map(0xfff008, 0xfff009).w(FUNC(aerofgt_state::spikes91_lookup_w));
+	map(0xfff003, 0xfff003).w(FUNC(aerofgt_sound_cpu_state::pspikes_gfxbank_w));
+	map(0xfff004, 0xfff005).portr("DSW").w(FUNC(aerofgt_sound_cpu_state::scrolly_w<0>));
+	map(0xfff007, 0xfff007).r(FUNC(aerofgt_sound_cpu_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff008, 0xfff009).w(FUNC(aerofgt_sound_cpu_state::spikes91_lookup_w));
 }
 
 void aerofgt_state::pspikesc_map(address_map &map)
@@ -226,30 +223,30 @@ void aerofgt_state::pspikesc_map(address_map &map)
 	map(0xfff400, 0xfff403).nopw(); // GGA access
 }
 
-void aerofgt_state::kickball_map(address_map &map)
+void aerofgt_sound_cpu_state::kickball_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x10ffff).ram(); /* work RAM */
 	map(0x200000, 0x20ffff).ram().share("sprlookupram1");
-	map(0xff8000, 0xff8fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
+	map(0xff8000, 0xff8fff).ram().w(FUNC(aerofgt_sound_cpu_state::vram_w<0>)).share("vram.0");
 	map(0xffc000, 0xffc3ff).writeonly().share("spriteram");
 	map(0xffd000, 0xffdfff).ram().share("rasterram");   /* bg1 scroll registers */
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfff000, 0xfff001).portr("IN0");
-	map(0xfff001, 0xfff001).w(FUNC(aerofgt_state::pspikes_palette_bank_w));
+	map(0xfff001, 0xfff001).w(FUNC(aerofgt_sound_cpu_state::pspikes_palette_bank_w));
 	map(0xfff002, 0xfff003).portr("IN1");
-	map(0xfff003, 0xfff003).w(FUNC(aerofgt_state::kickball_gfxbank_w));
-	map(0xfff004, 0xfff005).portr("DSW").w(FUNC(aerofgt_state::scrolly_w<0>));
-	map(0xfff007, 0xfff007).r(FUNC(aerofgt_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff003, 0xfff003).w(FUNC(aerofgt_sound_cpu_state::kickball_gfxbank_w));
+	map(0xfff004, 0xfff005).portr("DSW").w(FUNC(aerofgt_sound_cpu_state::scrolly_w<0>));
+	map(0xfff007, 0xfff007).r(FUNC(aerofgt_sound_cpu_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0xfff400, 0xfff403).nopw(); // GGA access
 }
 
-void aerofgt_state::karatblz_map(address_map &map)
+void aerofgt_banked_sound_state::karatblz_map(address_map &map)
 {
 	map.global_mask(0xfffff);
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x081fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
-	map(0x082000, 0x083fff).ram().w(FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
+	map(0x080000, 0x081fff).ram().w(FUNC(aerofgt_banked_sound_state::vram_w<0>)).share("vram.0");
+	map(0x082000, 0x083fff).ram().w(FUNC(aerofgt_banked_sound_state::vram_w<1>)).share("vram.1");
 	map(0x0a0000, 0x0affff).ram().share("sprlookupram1");
 	map(0x0b0000, 0x0bffff).ram().share("sprlookupram2");
 	map(0x0c0000, 0x0cffff).ram(); /* work RAM */
@@ -257,26 +254,26 @@ void aerofgt_state::karatblz_map(address_map &map)
 	map(0x0fc000, 0x0fc7ff).ram().share("spriteram");
 	map(0x0fe000, 0x0fe7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0ff000, 0x0ff001).portr("IN0");
-	map(0x0ff000, 0x0ff000).w(FUNC(aerofgt_state::spinlbrk_flip_screen_w));
+	map(0x0ff000, 0x0ff000).w(FUNC(aerofgt_banked_sound_state::spinlbrk_flip_screen_w));
 	map(0x0ff002, 0x0ff003).portr("IN1");
-	map(0x0ff002, 0x0ff002).w(FUNC(aerofgt_state::karatblz_gfxbank_w));
+	map(0x0ff002, 0x0ff002).w(FUNC(aerofgt_banked_sound_state::karatblz_gfxbank_w));
 	map(0x0ff004, 0x0ff005).portr("IN2");
 	map(0x0ff006, 0x0ff007).portr("IN3");
 	map(0x0ff007, 0x0ff007).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0ff008, 0x0ff009).portr("DSW").w(FUNC(aerofgt_state::scrollx_w<0>));
-	map(0x0ff00b, 0x0ff00b).r(FUNC(aerofgt_state::pending_command_r));
-	map(0x0ff00a, 0x0ff00b).w(FUNC(aerofgt_state::scrolly_w<0>));
-	map(0x0ff00c, 0x0ff00d).w(FUNC(aerofgt_state::scrollx_w<1>));
-	map(0x0ff00e, 0x0ff00f).w(FUNC(aerofgt_state::scrolly_w<1>));
+	map(0x0ff008, 0x0ff009).portr("DSW").w(FUNC(aerofgt_banked_sound_state::scrollx_w<0>));
+	map(0x0ff00b, 0x0ff00b).r(FUNC(aerofgt_banked_sound_state::pending_command_r));
+	map(0x0ff00a, 0x0ff00b).w(FUNC(aerofgt_banked_sound_state::scrolly_w<0>));
+	map(0x0ff00c, 0x0ff00d).w(FUNC(aerofgt_banked_sound_state::scrollx_w<1>));
+	map(0x0ff00e, 0x0ff00f).w(FUNC(aerofgt_banked_sound_state::scrolly_w<1>));
 	map(0x0ff400, 0x0ff403).w("gga", FUNC(vsystem_gga_device::write)).umask16(0x00ff);
 }
 
-void aerofgt_state::karatblzbl_map(address_map &map)
+void aerofgt_sound_cpu_state::karatblzbl_map(address_map &map)
 {
 	map.global_mask(0xfffff);
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x081fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
-	map(0x082000, 0x083fff).ram().w(FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
+	map(0x080000, 0x081fff).ram().w(FUNC(aerofgt_sound_cpu_state::vram_w<0>)).share("vram.0");
+	map(0x082000, 0x083fff).ram().w(FUNC(aerofgt_sound_cpu_state::vram_w<1>)).share("vram.1");
 	map(0x0a0000, 0x0affff).ram().share("sprlookupram1");
 	map(0x0b0000, 0x0bffff).ram().share("sprlookupram2");
 	map(0x0c0000, 0x0cffff).ram(); /* work RAM */
@@ -284,33 +281,33 @@ void aerofgt_state::karatblzbl_map(address_map &map)
 	map(0x0fc000, 0x0fc7ff).ram().share("spriteram");
 	map(0x0fe000, 0x0fe7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0ff000, 0x0ff001).portr("IN0");
-	map(0x0ff000, 0x0ff000).w(FUNC(aerofgt_state::spinlbrk_flip_screen_w));
+	map(0x0ff000, 0x0ff000).w(FUNC(aerofgt_sound_cpu_state::spinlbrk_flip_screen_w));
 	map(0x0ff002, 0x0ff003).portr("IN1");
-	map(0x0ff002, 0x0ff002).w(FUNC(aerofgt_state::karatblz_gfxbank_w));
+	map(0x0ff002, 0x0ff002).w(FUNC(aerofgt_sound_cpu_state::karatblz_gfxbank_w));
 	map(0x0ff004, 0x0ff005).portr("IN2");
 	map(0x0ff006, 0x0ff007).portr("IN3");
-	map(0x0ff007, 0x0ff007).w(FUNC(aerofgt_state::karatblzbl_soundlatch_w));
-	map(0x0ff008, 0x0ff009).portr("DSW").w(FUNC(aerofgt_state::scrollx_w<0>));
-	map(0x0ff00b, 0x0ff00b).r(FUNC(aerofgt_state::pending_command_r));
-	map(0x0ff00a, 0x0ff00b).w(FUNC(aerofgt_state::scrolly_w<0>));
-	map(0x0ff00c, 0x0ff00d).w(FUNC(aerofgt_state::scrollx_w<1>));
-	map(0x0ff00e, 0x0ff00f).w(FUNC(aerofgt_state::scrolly_w<1>));
+	map(0x0ff007, 0x0ff007).w(FUNC(aerofgt_sound_cpu_state::karatblzbl_soundlatch_w));
+	map(0x0ff008, 0x0ff009).portr("DSW").w(FUNC(aerofgt_sound_cpu_state::scrollx_w<0>));
+	map(0x0ff00b, 0x0ff00b).r(FUNC(aerofgt_sound_cpu_state::pending_command_r));
+	map(0x0ff00a, 0x0ff00b).w(FUNC(aerofgt_sound_cpu_state::scrolly_w<0>));
+	map(0x0ff00c, 0x0ff00d).w(FUNC(aerofgt_sound_cpu_state::scrollx_w<1>));
+	map(0x0ff00e, 0x0ff00f).w(FUNC(aerofgt_sound_cpu_state::scrolly_w<1>));
 	map(0x0ff400, 0x0ff403).nopw(); // GGA access
 }
 
-void aerofgt_state::spinlbrk_map(address_map &map)
+void aerofgt_banked_sound_state::spinlbrk_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x080000, 0x080fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
-	map(0x082000, 0x082fff).ram().w(FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
+	map(0x080000, 0x080fff).ram().w(FUNC(aerofgt_banked_sound_state::vram_w<0>)).share("vram.0");
+	map(0x082000, 0x082fff).ram().w(FUNC(aerofgt_banked_sound_state::vram_w<1>)).share("vram.1");
 	map(0xff8000, 0xffbfff).ram(); /* work RAM */
 	map(0xffc000, 0xffc7ff).ram().share("spriteram");
 	map(0xffd000, 0xffd1ff).ram().share("rasterram");   /* bg1 scroll registers */
 	map(0xffe000, 0xffe7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfff000, 0xfff001).portr("IN0");
-	map(0xfff000, 0xfff000).w(FUNC(aerofgt_state::spinlbrk_flip_screen_w));
-	map(0xfff001, 0xfff001).w(FUNC(aerofgt_state::spinlbrk_gfxbank_w));
-	map(0xfff002, 0xfff003).portr("IN1").w(FUNC(aerofgt_state::scrollx_w<1>));
+	map(0xfff000, 0xfff000).w(FUNC(aerofgt_banked_sound_state::spinlbrk_flip_screen_w));
+	map(0xfff001, 0xfff001).w(FUNC(aerofgt_banked_sound_state::spinlbrk_gfxbank_w));
+	map(0xfff002, 0xfff003).portr("IN1").w(FUNC(aerofgt_banked_sound_state::scrollx_w<1>));
 	map(0xfff004, 0xfff005).portr("DSW");
 	map(0xfff007, 0xfff007).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 //  map(0xfff008, 0xfff009); - read when analog inputs are enabled
@@ -318,13 +315,13 @@ void aerofgt_state::spinlbrk_map(address_map &map)
 	map(0xfff400, 0xfff403).w("gga", FUNC(vsystem_gga_device::write)).umask16(0x00ff);
 }
 
-void aerofgt_state::turbofrc_map(address_map &map)
+void aerofgt_banked_sound_state::turbofrc_map(address_map &map)
 {
 	map.global_mask(0xfffff);
 	map(0x000000, 0x0bffff).rom();
 	map(0x0c0000, 0x0cffff).ram(); /* work RAM */
-	map(0x0d0000, 0x0d1fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
-	map(0x0d2000, 0x0d3fff).ram().w(FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
+	map(0x0d0000, 0x0d1fff).ram().w(FUNC(aerofgt_banked_sound_state::vram_w<0>)).share("vram.0");
+	map(0x0d2000, 0x0d3fff).ram().w(FUNC(aerofgt_banked_sound_state::vram_w<1>)).share("vram.1");
 	map(0x0e0000, 0x0e3fff).ram().share("sprlookupram1");
 	map(0x0e4000, 0x0e7fff).ram().share("sprlookupram2");
 	map(0x0f8000, 0x0fbfff).ram(); /* work RAM */
@@ -332,67 +329,67 @@ void aerofgt_state::turbofrc_map(address_map &map)
 	map(0x0fd000, 0x0fdfff).ram().share("rasterram");   /* bg1 scroll registers */
 	map(0x0fe000, 0x0fe7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0ff000, 0x0ff001).portr("IN0");
-	map(0x0ff001, 0x0ff001).w(FUNC(aerofgt_state::turbofrc_flip_screen_w));
-	map(0x0ff002, 0x0ff003).portr("IN1").w(FUNC(aerofgt_state::scrolly_w<0>));
-	map(0x0ff004, 0x0ff005).portr("DSW").w(FUNC(aerofgt_state::scrollx_w<1>));
-	map(0x0ff007, 0x0ff007).r(FUNC(aerofgt_state::pending_command_r));
-	map(0x0ff006, 0x0ff007).w(FUNC(aerofgt_state::scrolly_w<1>));
+	map(0x0ff001, 0x0ff001).w(FUNC(aerofgt_banked_sound_state::turbofrc_flip_screen_w));
+	map(0x0ff002, 0x0ff003).portr("IN1").w(FUNC(aerofgt_banked_sound_state::scrolly_w<0>));
+	map(0x0ff004, 0x0ff005).portr("DSW").w(FUNC(aerofgt_banked_sound_state::scrollx_w<1>));
+	map(0x0ff007, 0x0ff007).r(FUNC(aerofgt_banked_sound_state::pending_command_r));
+	map(0x0ff006, 0x0ff007).w(FUNC(aerofgt_banked_sound_state::scrolly_w<1>));
 	map(0x0ff008, 0x0ff009).portr("IN2");
-	map(0x0ff008, 0x0ff00b).w(FUNC(aerofgt_state::turbofrc_gfxbank_w));
+	map(0x0ff008, 0x0ff00b).w(FUNC(aerofgt_banked_sound_state::turbofrc_gfxbank_w));
 	map(0x0ff00c, 0x0ff00d).nopw();    /* related to bg2 (written together with the scroll registers) */
 	map(0x0ff00e, 0x0ff00e).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x0ff400, 0x0ff403).w("gga", FUNC(vsystem_gga_device::write)).umask16(0x00ff);
 }
 
-void aerofgt_state::aerofgtb_map(address_map &map)
+void aerofgt_banked_sound_state::aerofgtb_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x0c0000, 0x0cffff).ram(); /* work RAM */
-	map(0x0d0000, 0x0d1fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
-	map(0x0d2000, 0x0d3fff).ram().w(FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
+	map(0x0d0000, 0x0d1fff).ram().w(FUNC(aerofgt_banked_sound_state::vram_w<0>)).share("vram.0");
+	map(0x0d2000, 0x0d3fff).ram().w(FUNC(aerofgt_banked_sound_state::vram_w<1>)).share("vram.1");
 	map(0x0e0000, 0x0e3fff).ram().share("sprlookupram1");
 	map(0x0e4000, 0x0e7fff).ram().share("sprlookupram2");
 	map(0x0f8000, 0x0fbfff).ram(); /* work RAM */
 	map(0x0fc000, 0x0fc7ff).ram().share("spriteram");
 	map(0x0fd000, 0x0fd7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0fe000, 0x0fe001).portr("IN0");
-	map(0x0fe001, 0x0fe001).w(FUNC(aerofgt_state::turbofrc_flip_screen_w));
-	map(0x0fe002, 0x0fe003).portr("IN1").w(FUNC(aerofgt_state::scrolly_w<0>));
-	map(0x0fe004, 0x0fe005).portr("DSW1").w(FUNC(aerofgt_state::scrollx_w<1>));
-	map(0x0fe007, 0x0fe007).r(FUNC(aerofgt_state::pending_command_r));
-	map(0x0fe006, 0x0fe007).w(FUNC(aerofgt_state::scrolly_w<1>));
+	map(0x0fe001, 0x0fe001).w(FUNC(aerofgt_banked_sound_state::turbofrc_flip_screen_w));
+	map(0x0fe002, 0x0fe003).portr("IN1").w(FUNC(aerofgt_banked_sound_state::scrolly_w<0>));
+	map(0x0fe004, 0x0fe005).portr("DSW1").w(FUNC(aerofgt_banked_sound_state::scrollx_w<1>));
+	map(0x0fe007, 0x0fe007).r(FUNC(aerofgt_banked_sound_state::pending_command_r));
+	map(0x0fe006, 0x0fe007).w(FUNC(aerofgt_banked_sound_state::scrolly_w<1>));
 	map(0x0fe008, 0x0fe009).portr("DSW2");
-	map(0x0fe008, 0x0fe00b).w(FUNC(aerofgt_state::turbofrc_gfxbank_w));
+	map(0x0fe008, 0x0fe00b).w(FUNC(aerofgt_banked_sound_state::turbofrc_gfxbank_w));
 	map(0x0fe00e, 0x0fe00e).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x0fe400, 0x0fe403).w("gga", FUNC(vsystem_gga_device::write)).umask16(0x00ff);
 	map(0x0ff000, 0x0fffff).ram().share("rasterram");   /* used only for the scroll registers */
 }
 
-void aerofgt_state::aerofgt_map(address_map &map)
+void aerofgt_banked_sound_state::aerofgt_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x1a0000, 0x1a07ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x1b0000, 0x1b07ff).ram().share("rasterram");   /* used only for the scroll registers */
 	map(0x1b0800, 0x1b0801).ram(); /* tracks watchdog state */
 	map(0x1b0ff0, 0x1b0fff).ram(); /* stack area during boot */
-	map(0x1b2000, 0x1b3fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
-	map(0x1b4000, 0x1b5fff).ram().w(FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
+	map(0x1b2000, 0x1b3fff).ram().w(FUNC(aerofgt_banked_sound_state::vram_w<0>)).share("vram.0");
+	map(0x1b4000, 0x1b5fff).ram().w(FUNC(aerofgt_banked_sound_state::vram_w<1>)).share("vram.1");
 	map(0x1c0000, 0x1c7fff).ram().share("sprlookupram1");
 	map(0x1d0000, 0x1d1fff).ram().share("spriteram");
 	map(0xfef000, 0xffefff).ram(); /* work RAM */
-	map(0xffff80, 0xffff87).w(FUNC(aerofgt_state::aerofgt_gfxbank_w));
-	map(0xffff88, 0xffff89).w(FUNC(aerofgt_state::scrolly_w<0>)); /* + something else in the top byte */
-	map(0xffff90, 0xffff91).w(FUNC(aerofgt_state::scrolly_w<1>)); /* + something else in the top byte */
+	map(0xffff80, 0xffff87).w(FUNC(aerofgt_banked_sound_state::aerofgt_gfxbank_w));
+	map(0xffff88, 0xffff89).w(FUNC(aerofgt_banked_sound_state::scrolly_w<0>)); /* + something else in the top byte */
+	map(0xffff90, 0xffff91).w(FUNC(aerofgt_banked_sound_state::scrolly_w<1>)); /* + something else in the top byte */
 	map(0xffffa0, 0xffffbf).rw("io", FUNC(vs9209_device::read), FUNC(vs9209_device::write)).umask16(0x00ff);
 	map(0xffffc1, 0xffffc1).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
-void aerofgt_state::aerfboot_map(address_map &map)
+void aerofgt_sound_cpu_state::aerfboot_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x0c0000, 0x0cffff).ram(); /* work RAM */
-	map(0x0d0000, 0x0d1fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
-	map(0x0d2000, 0x0d3fff).ram().w(FUNC(aerofgt_state::vram_w<1>)).share("vram.1");
+	map(0x0d0000, 0x0d1fff).ram().w(FUNC(aerofgt_sound_cpu_state::vram_w<0>)).share("vram.0");
+	map(0x0d2000, 0x0d3fff).ram().w(FUNC(aerofgt_sound_cpu_state::vram_w<1>)).share("vram.1");
 	map(0x0e0000, 0x0e3fff).ram().share("sprlookupram1");
 	map(0x0e4000, 0x0e7fff).ram().share("sprlookupram2");
 	map(0x0f8000, 0x0fbfff).ram(); /* work RAM */
@@ -402,10 +399,10 @@ void aerofgt_state::aerfboot_map(address_map &map)
 	map(0x0fe002, 0x0fe003).portr("IN1");
 	map(0x0fe004, 0x0fe005).portr("DSW1");
 	map(0x0fe008, 0x0fe009).portr("DSW2");
-	map(0x0fe002, 0x0fe003).w(FUNC(aerofgt_state::scrolly_w<0>));
-	map(0x0fe004, 0x0fe005).w(FUNC(aerofgt_state::scrollx_w<1>));
-	map(0x0fe006, 0x0fe007).w(FUNC(aerofgt_state::scrolly_w<1>));
-	map(0x0fe008, 0x0fe00b).w(FUNC(aerofgt_state::turbofrc_gfxbank_w));
+	map(0x0fe002, 0x0fe003).w(FUNC(aerofgt_sound_cpu_state::scrolly_w<0>));
+	map(0x0fe004, 0x0fe005).w(FUNC(aerofgt_sound_cpu_state::scrollx_w<1>));
+	map(0x0fe006, 0x0fe007).w(FUNC(aerofgt_sound_cpu_state::scrolly_w<1>));
+	map(0x0fe008, 0x0fe00b).w(FUNC(aerofgt_sound_cpu_state::turbofrc_gfxbank_w));
 	map(0x0fe00e, 0x0fe00e).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x0fe010, 0x0fe011).nopw();
 	map(0x0fe012, 0x0fe013).nopw(); // MSB = watchdog?
@@ -444,68 +441,68 @@ void aerofgt_state::aerfboo2_map(address_map &map)
 	map(0x0ff000, 0x0fffff).ram().share("rasterram");   /* used only for the scroll registers */
 }
 
-void aerofgt_state::wbbc97_map(address_map &map)
+void aerofgt_sound_cpu_state::wbbc97_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
 	map(0x500000, 0x50ffff).ram(); /* work RAM */
 	map(0x600000, 0x605fff).ram().share("sprlookupram1");
 	map(0xa00000, 0xa3ffff).ram().share("bitmapram");
-	map(0xff8000, 0xff8fff).ram().w(FUNC(aerofgt_state::vram_w<0>)).share("vram.0");
+	map(0xff8000, 0xff8fff).ram().w(FUNC(aerofgt_sound_cpu_state::vram_w<0>)).share("vram.0");
 	map(0xffc000, 0xffc3ff).writeonly().share("spriteram");
 	map(0xffd000, 0xffdfff).ram().share("rasterram");   /* bg1 scroll registers */
 	map(0xffe000, 0xffefff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xfff000, 0xfff001).portr("IN0");
-	map(0xfff001, 0xfff001).w(FUNC(aerofgt_state::pspikes_palette_bank_w));
+	map(0xfff001, 0xfff001).w(FUNC(aerofgt_sound_cpu_state::pspikes_palette_bank_w));
 	map(0xfff002, 0xfff003).portr("IN1");
-	map(0xfff003, 0xfff003).w(FUNC(aerofgt_state::pspikes_gfxbank_w));
-	map(0xfff004, 0xfff005).portr("DSW").w(FUNC(aerofgt_state::scrolly_w<0>));
-	map(0xfff007, 0xfff007).r(FUNC(aerofgt_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
-	map(0xfff00e, 0xfff00f).w(FUNC(aerofgt_state::wbbc97_bitmap_enable_w));
+	map(0xfff003, 0xfff003).w(FUNC(aerofgt_sound_cpu_state::pspikes_gfxbank_w));
+	map(0xfff004, 0xfff005).portr("DSW").w(FUNC(aerofgt_sound_cpu_state::scrolly_w<0>));
+	map(0xfff007, 0xfff007).r(FUNC(aerofgt_sound_cpu_state::pending_command_r)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0xfff00e, 0xfff00f).w(FUNC(aerofgt_sound_cpu_state::wbbc97_bitmap_enable_w));
 	map(0xfff400, 0xfff403).nopw(); // GGA access
 }
 
-void aerofgt_state::sound_map(address_map &map)
+void aerofgt_banked_sound_state::sound_map(address_map &map)
 {
-	map(0x0000, 0x77ff).rom();
+	map(0x0000, 0x77ff).rom().region("audiocpu", 0);
 	map(0x7800, 0x7fff).ram();
-	map(0x8000, 0xffff).bankr("soundbank");
+	map(0x8000, 0xffff).bankr(m_soundbank);
 }
 
-void aerofgt_state::spinlbrk_sound_portmap(address_map &map)
+void aerofgt_banked_sound_state::spinlbrk_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(aerofgt_state::spinlbrk_sh_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(aerofgt_banked_sound_state::sh_bankswitch_w));
 	map(0x14, 0x14).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x18, 0x1b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 }
 
-void aerofgt_state::turbofrc_sound_portmap(address_map &map)
+void aerofgt_banked_sound_state::turbofrc_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(aerofgt_state::aerofgt_sh_bankswitch_w));
+	map(0x00, 0x00).w(FUNC(aerofgt_banked_sound_state::sh_bankswitch_w));
 	map(0x14, 0x14).rw(m_soundlatch, FUNC(generic_latch_8_device::read), FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x18, 0x1b).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 }
 
-void aerofgt_state::aerofgt_sound_portmap(address_map &map)
+void aerofgt_banked_sound_state::aerofgt_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x03).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
-	map(0x04, 0x04).w(FUNC(aerofgt_state::aerofgt_sh_bankswitch_w));
+	map(0x04, 0x04).w(FUNC(aerofgt_banked_sound_state::sh_bankswitch_w));
 	map(0x08, 0x08).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 	map(0x0c, 0x0c).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
-void aerofgt_state::aerfboot_sound_map(address_map &map)
+void aerofgt_sound_cpu_state::aerfboot_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();
-	map(0x9000, 0x9000).w(FUNC(aerofgt_state::aerfboot_okim6295_banking_w));
+	map(0x9000, 0x9000).w(FUNC(aerofgt_sound_cpu_state::aerfboot_okim6295_banking_w));
 	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
-void aerofgt_state::wbbc97_sound_map(address_map &map)
+void aerofgt_sound_cpu_state::wbbc97_sound_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
 	map(0xf000, 0xf7ff).ram();
@@ -515,30 +512,30 @@ void aerofgt_state::wbbc97_sound_map(address_map &map)
 	map(0xfc20, 0xfc20).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
-void aerofgt_state::karatblzbl_sound_map(address_map &map)
+void aerofgt_sound_cpu_state::karatblzbl_sound_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read)); //.w("soundlatch2", FUNC(generic_latch_8_device::write));
 }
 
-void aerofgt_state::karatblzbl_sound_portmap(address_map &map)
+void aerofgt_sound_cpu_state::karatblzbl_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
 	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::data_w));
-	map(0x40, 0x40).w(FUNC(aerofgt_state::karatblzbl_d7759_write_port_0_w));
-	map(0x80, 0x80).w(FUNC(aerofgt_state::karatblzbl_d7759_reset_w));
+	map(0x40, 0x40).w(FUNC(aerofgt_sound_cpu_state::karatblzbl_d7759_write_port_0_w));
+	map(0x80, 0x80).w(FUNC(aerofgt_sound_cpu_state::karatblzbl_d7759_reset_w));
 }
 
-void aerofgt_state::kickball_sound_map(address_map &map)
+void aerofgt_sound_cpu_state::kickball_sound_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
-void aerofgt_state::kickball_sound_portmap(address_map &map)
+void aerofgt_sound_cpu_state::kickball_sound_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_r), FUNC(ym3812_device::address_w));
@@ -547,7 +544,7 @@ void aerofgt_state::kickball_sound_portmap(address_map &map)
 	map(0xc0, 0xc0).w(m_soundlatch, FUNC(generic_latch_8_device::acknowledge_w));
 }
 
-void aerofgt_state::spikes91_sound_map(address_map &map)
+void aerofgt_sound_cpu_state::spikes91_sound_map(address_map &map)
 {
 	map(0x0000, 0xdfff).rom();
 	map(0xe000, 0xe001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
@@ -557,10 +554,10 @@ void aerofgt_state::spikes91_sound_map(address_map &map)
 	map(0xf800, 0xffff).ram();
 }
 
-void aerofgt_state::oki_map(address_map &map)
+void aerofgt_sound_cpu_state::oki_map(address_map &map)
 { //only for aerfboot for now
 	map(0x00000, 0x1ffff).rom();
-	map(0x20000, 0x3ffff).bankr("okibank");
+	map(0x20000, 0x3ffff).bankr(m_okibank);
 }
 
 static INPUT_PORTS_START( pspikes )
@@ -1419,49 +1416,40 @@ static GFXDECODE_START( gfx_wbbc97 )
 GFXDECODE_END
 
 
-MACHINE_START_MEMBER(aerofgt_state,common)
+void aerofgt_sound_cpu_state::machine_start()
 {
+	aerofgt_state::machine_start();
+
+	m_spikes91_lookup = 0;
+
+	save_item(NAME(m_spikes91_lookup));
 }
 
-MACHINE_START_MEMBER(aerofgt_state,aerofgt)
+void aerofgt_banked_sound_state::machine_start()
 {
-	m_soundbank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x8000);
+	aerofgt_sound_cpu_state::machine_start();
 
-	MACHINE_START_CALL_MEMBER(common);
+	m_soundbank->configure_entries(0, 4, memregion("soundbank")->base(), 0x8000);
 }
 
-MACHINE_START_MEMBER(aerofgt_state,spinlbrk)
+void aerofgt_banked_sound_state::machine_reset()
 {
-	m_soundbank->configure_entries(0, 2, memregion("audiocpu")->base()+0x8000, 0x8000);
-
-	MACHINE_START_CALL_MEMBER(common);
-}
-
-MACHINE_RESET_MEMBER(aerofgt_state,common)
-{
-}
-
-MACHINE_RESET_MEMBER(aerofgt_state,aerofgt)
-{
-	MACHINE_RESET_CALL_MEMBER(common);
+	aerofgt_sound_cpu_state::machine_reset();
 
 	m_soundbank->set_entry(0); /* needed by spinlbrk */
 }
 
-void aerofgt_state::pspikes(machine_config &config)
+void aerofgt_banked_sound_state::pspikes(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(20'000'000)/2);    /* verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_state::pspikes_map);
-	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_state::irq1_line_hold)); /* all irq vectors are the same */
+	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_banked_sound_state::pspikes_map);
+	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_banked_sound_state::irq1_line_hold)); /* all irq vectors are the same */
 
 	Z80(config, m_audiocpu, XTAL(20'000'000)/4); /* verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &aerofgt_state::turbofrc_sound_portmap);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_banked_sound_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &aerofgt_banked_sound_state::turbofrc_sound_portmap);
 	/* IRQs are triggered by the YM2610 */
-
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1469,20 +1457,20 @@ void aerofgt_state::pspikes(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8+4, 44*8+4-1, 0*8, 30*8-1);
-	screen.set_screen_update(FUNC(aerofgt_state::screen_update_pspikes));
+	screen.set_screen_update(FUNC(aerofgt_banked_sound_state::screen_update_pspikes));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pspikes);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_banked_sound_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(1);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_banked_sound_state,pspikes)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1500,18 +1488,15 @@ void aerofgt_state::pspikes(machine_config &config)
 	ymsnd.add_route(2, "rspeaker", 1.0);
 }
 
-void aerofgt_state::spikes91(machine_config &config)
+void aerofgt_sound_cpu_state::spikes91(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 20000000/2);   /* 10 MHz (?) */
-	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_state::spikes91_map);
-	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_state::irq1_line_hold)); /* all irq vectors are the same */
+	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_sound_cpu_state::spikes91_map);
+	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_sound_cpu_state::irq1_line_hold)); /* all irq vectors are the same */
 
 	Z80(config, m_audiocpu, 24000000/8); // ?
-	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::spikes91_sound_map);
-
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_sound_cpu_state::spikes91_sound_map);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
@@ -1522,7 +1507,7 @@ void aerofgt_state::spikes91(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 320-1, 0*8+4, 224+4-1);
-	screen.set_screen_update(FUNC(aerofgt_state::screen_update_spikes91));
+	screen.set_screen_update(FUNC(aerofgt_sound_cpu_state::screen_update_spikes91));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_spikes91);
@@ -1530,7 +1515,7 @@ void aerofgt_state::spikes91(machine_config &config)
 
 	//VSYSTEM_GGA(config, "gga", 0);
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_sound_cpu_state,pspikes)
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1546,9 +1531,6 @@ void aerofgt_state::pspikesb(machine_config &config)
 	M68000(config, m_maincpu, 20000000/2);   /* 10 MHz (?) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_state::pspikesb_map);
 	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_state::irq1_line_hold)); /* all irq vectors are the same */
-
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1580,19 +1562,16 @@ void aerofgt_state::pspikesb(machine_config &config)
     tile banking and sound system are different like many of the bootlegs
 */
 
-void aerofgt_state::kickball(machine_config &config)
+void aerofgt_sound_cpu_state::kickball(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(10'000'000)); // 10Mhz XTAL near 10Mhz rated CPU
-	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_state::kickball_map);
-	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_state::irq1_line_hold)); /* only IRQ1 is valid */
+	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_sound_cpu_state::kickball_map);
+	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_sound_cpu_state::irq1_line_hold)); /* only IRQ1 is valid */
 
 	Z80(config, m_audiocpu, XTAL(4'000'000));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::kickball_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &aerofgt_state::kickball_sound_portmap);
-
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_sound_cpu_state::kickball_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &aerofgt_sound_cpu_state::kickball_sound_portmap);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1600,20 +1579,20 @@ void aerofgt_state::kickball(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8+4, 44*8+4-1, 0*8, 30*8-1);
-	screen.set_screen_update(FUNC(aerofgt_state::screen_update_pspikes));
+	screen.set_screen_update(FUNC(aerofgt_sound_cpu_state::screen_update_pspikes));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_kickball);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_sound_cpu_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(1);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	//VSYSTEM_GGA(config, "gga", 0); // still accessed as if it exists, in clone hardware?
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_sound_cpu_state,pspikes)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1636,9 +1615,6 @@ void aerofgt_state::pspikesc(machine_config &config)
 	M68000(config, m_maincpu, 20000000/2);   /* 10 MHz (?) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_state::pspikesc_map);
 	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_state::irq1_line_hold)); /* all irq vectors are the same */
-
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1668,19 +1644,16 @@ void aerofgt_state::pspikesc(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void aerofgt_state::karatblz(machine_config &config)
+void aerofgt_banked_sound_state::karatblz(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 20000000/2);   /* 10 MHz (?) */
-	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_state::karatblz_map);
-	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_state::irq1_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_banked_sound_state::karatblz_map);
+	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_banked_sound_state::irq1_line_hold));
 
 	Z80(config, m_audiocpu, 8000000/2); /* 4 MHz ??? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &aerofgt_state::turbofrc_sound_portmap); /* IRQs are triggered by the YM2610 */
-
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_banked_sound_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &aerofgt_banked_sound_state::turbofrc_sound_portmap); /* IRQs are triggered by the YM2610 */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1688,7 +1661,7 @@ void aerofgt_state::karatblz(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(1*8, 45*8-1, 0*8, 30*8-1);
-	screen.set_screen_update(FUNC(aerofgt_state::screen_update_karatblz));
+	screen.set_screen_update(FUNC(aerofgt_banked_sound_state::screen_update_karatblz));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_turbofrc);
@@ -1697,16 +1670,16 @@ void aerofgt_state::karatblz(machine_config &config)
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_banked_sound_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(2);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	VSYSTEM_SPR2(config, m_spr_old[1], 0);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback));
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_banked_sound_state::aerofgt_ol2_tile_callback));
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,karatblz)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_banked_sound_state,karatblz)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1724,19 +1697,16 @@ void aerofgt_state::karatblz(machine_config &config)
 	ymsnd.add_route(2, "rspeaker", 1.0);
 }
 
-void aerofgt_state::karatblzbl(machine_config &config)
+void aerofgt_sound_cpu_state::karatblzbl(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 20000000/2);   /* 10 MHz (?) */
-	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_state::karatblzbl_map);
-	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_state::irq1_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_sound_cpu_state::karatblzbl_map);
+	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_sound_cpu_state::irq1_line_hold));
 
 	Z80(config, m_audiocpu, 8000000/2); /* 4 MHz ??? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::karatblzbl_sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &aerofgt_state::karatblzbl_sound_portmap);
-
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_sound_cpu_state::karatblzbl_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &aerofgt_sound_cpu_state::karatblzbl_sound_portmap);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1744,25 +1714,25 @@ void aerofgt_state::karatblzbl(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(1*8, 45*8-1, 0*8, 30*8-1);
-	screen.set_screen_update(FUNC(aerofgt_state::screen_update_karatblz));
+	screen.set_screen_update(FUNC(aerofgt_sound_cpu_state::screen_update_karatblz));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_turbofrc);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_sound_cpu_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(2);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	VSYSTEM_SPR2(config, m_spr_old[1], 0);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback));
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_sound_cpu_state::aerofgt_ol2_tile_callback));
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	//VSYSTEM_GGA(config, "gga", 0);
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,karatblz)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_sound_cpu_state,karatblz)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, "soundlatch2");
@@ -1779,19 +1749,16 @@ void aerofgt_state::karatblzbl(machine_config &config)
 	m_upd7759->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void aerofgt_state::spinlbrk(machine_config &config)
+void aerofgt_banked_sound_state::spinlbrk(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(20'000'000)/2); /* verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_state::spinlbrk_map);
-	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_state::irq1_line_hold)); /* there are vectors for 3 and 4 too, analog related? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_banked_sound_state::spinlbrk_map);
+	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_banked_sound_state::irq1_line_hold)); /* there are vectors for 3 and 4 too, analog related? */
 
 	Z80(config, m_audiocpu, XTAL(20'000'000)/4);   /* 5mhz verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &aerofgt_state::spinlbrk_sound_portmap); /* IRQs are triggered by the YM2610 */
-
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,spinlbrk)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_banked_sound_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &aerofgt_banked_sound_state::spinlbrk_sound_portmap); /* IRQs are triggered by the YM2610 */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1799,7 +1766,7 @@ void aerofgt_state::spinlbrk(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(1*8, 45*8-1, 0*8, 30*8-1);
-	screen.set_screen_update(FUNC(aerofgt_state::screen_update_spinlbrk));
+	screen.set_screen_update(FUNC(aerofgt_banked_sound_state::screen_update_spinlbrk));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_turbofrc);
@@ -1813,12 +1780,12 @@ void aerofgt_state::spinlbrk(machine_config &config)
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	VSYSTEM_SPR2(config, m_spr_old[1], 0);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::spinbrk_tile_callback)); // rom lookup
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_banked_sound_state::spinbrk_tile_callback)); // rom lookup
 	m_spr_old[1]->set_pritype(1);
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,spinlbrk)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_banked_sound_state,spinlbrk)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1836,19 +1803,16 @@ void aerofgt_state::spinlbrk(machine_config &config)
 	ymsnd.add_route(2, "rspeaker", 1.0);
 }
 
-void aerofgt_state::turbofrc(machine_config &config)
+void aerofgt_banked_sound_state::turbofrc(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(20'000'000)/2); /* verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_state::turbofrc_map);
-	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_state::irq1_line_hold)); /* all irq vectors are the same */
+	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_banked_sound_state::turbofrc_map);
+	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_banked_sound_state::irq1_line_hold)); /* all irq vectors are the same */
 
 	Z80(config, m_audiocpu, XTAL(5'000'000));  /* verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &aerofgt_state::turbofrc_sound_portmap); /* IRQs are triggered by the YM2610 */
-
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_banked_sound_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &aerofgt_banked_sound_state::turbofrc_sound_portmap); /* IRQs are triggered by the YM2610 */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1856,7 +1820,7 @@ void aerofgt_state::turbofrc(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 44*8-1, 0*8, 30*8-1);
-	screen.set_screen_update(FUNC(aerofgt_state::screen_update_turbofrc));
+	screen.set_screen_update(FUNC(aerofgt_banked_sound_state::screen_update_turbofrc));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_turbofrc);
@@ -1865,16 +1829,16 @@ void aerofgt_state::turbofrc(machine_config &config)
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_banked_sound_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(2);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	VSYSTEM_SPR2(config, m_spr_old[1], 0);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback));
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_banked_sound_state::aerofgt_ol2_tile_callback));
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_banked_sound_state,turbofrc)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1892,19 +1856,16 @@ void aerofgt_state::turbofrc(machine_config &config)
 	ymsnd.add_route(2, "rspeaker", 1.0);
 }
 
-void aerofgt_state::aerofgtb(machine_config &config)
+void aerofgt_banked_sound_state::aerofgtb(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 20000000/2);   /* 10 MHz (?) */
-	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_state::aerofgtb_map);
-	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_state::irq1_line_hold)); /* all irq vectors are the same */
+	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_banked_sound_state::aerofgtb_map);
+	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_banked_sound_state::irq1_line_hold)); /* all irq vectors are the same */
 
 	Z80(config, m_audiocpu, 8000000/2); /* 4 MHz ??? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &aerofgt_state::aerofgt_sound_portmap); /* IRQs are triggered by the YM2610 */
-
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_banked_sound_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &aerofgt_banked_sound_state::aerofgt_sound_portmap); /* IRQs are triggered by the YM2610 */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1912,7 +1873,7 @@ void aerofgt_state::aerofgtb(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(500)); /* wrong but improves sprite-background synchronization */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8+12, 40*8-1+12, 0*8, 28*8-1);
-	screen.set_screen_update(FUNC(aerofgt_state::screen_update_turbofrc));
+	screen.set_screen_update(FUNC(aerofgt_banked_sound_state::screen_update_turbofrc));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_turbofrc);
@@ -1921,16 +1882,16 @@ void aerofgt_state::aerofgtb(machine_config &config)
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_banked_sound_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(2);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	VSYSTEM_SPR2(config, m_spr_old[1], 0);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback));
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_banked_sound_state::aerofgt_ol2_tile_callback));
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_banked_sound_state,turbofrc)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1948,19 +1909,16 @@ void aerofgt_state::aerofgtb(machine_config &config)
 	ymsnd.add_route(2, "rspeaker", 1.0);
 }
 
-void aerofgt_state::aerofgt(machine_config &config)
+void aerofgt_banked_sound_state::aerofgt(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, XTAL(20'000'000)/2); /* verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_state::aerofgt_map);
-	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_state::irq1_line_hold)); /* all irq vectors are the same */
+	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_banked_sound_state::aerofgt_map);
+	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_banked_sound_state::irq1_line_hold)); /* all irq vectors are the same */
 
 	Z80(config, m_audiocpu, XTAL(20'000'000)/4); /* 5 MHz verified on pcb */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &aerofgt_state::aerofgt_sound_portmap); /* IRQs are triggered by the YM2610 */
-
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_banked_sound_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &aerofgt_banked_sound_state::aerofgt_sound_portmap); /* IRQs are triggered by the YM2610 */
 
 	vs9209_device &io(VS9209(config, "io", 0));
 	io.porta_input_cb().set_ioport("P1");
@@ -1980,18 +1938,18 @@ void aerofgt_state::aerofgt(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(400)); /* wrong but improves sprite-background synchronization */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
-	screen.set_screen_update(FUNC(aerofgt_state::screen_update_aerofgt));
+	screen.set_screen_update(FUNC(aerofgt_banked_sound_state::screen_update_aerofgt));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aerofgt);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
 	VSYSTEM_SPR(config, m_spr, 0);
-	m_spr->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_tile_callback));
+	m_spr->set_tile_indirect_cb(FUNC(aerofgt_banked_sound_state::aerofgt_tile_callback));
 	m_spr->set_gfx_region(2);
 	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_banked_sound_state,turbofrc)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -2009,18 +1967,15 @@ void aerofgt_state::aerofgt(machine_config &config)
 	ymsnd.add_route(2, "rspeaker", 1.0);
 }
 
-void aerofgt_state::aerfboot(machine_config &config)
+void aerofgt_sound_cpu_state::aerfboot(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 20000000/2);   /* 10 MHz (?) */
-	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_state::aerfboot_map);
-	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_state::irq1_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_sound_cpu_state::aerfboot_map);
+	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_sound_cpu_state::irq1_line_hold));
 
 	Z80(config, m_audiocpu, 8000000/2); /* 4 MHz ??? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::aerfboot_sound_map);
-
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_sound_cpu_state::aerfboot_sound_map);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -2028,7 +1983,7 @@ void aerofgt_state::aerfboot(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(500)); /* wrong but improves sprite-background synchronization */
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8+12, 40*8-1+12, 0*8, 28*8-1);
-	screen.set_screen_update(FUNC(aerofgt_state::screen_update_aerfboot));
+	screen.set_screen_update(FUNC(aerofgt_sound_cpu_state::screen_update_aerfboot));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aerfboot);
@@ -2036,7 +1991,7 @@ void aerofgt_state::aerfboot(machine_config &config)
 
 	//VSYSTEM_GGA(config, "gga", 0);
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_sound_cpu_state,turbofrc)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2045,7 +2000,7 @@ void aerofgt_state::aerfboot(machine_config &config)
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
-	m_oki->set_addrmap(0, &aerofgt_state::oki_map);
+	m_oki->set_addrmap(0, &aerofgt_sound_cpu_state::oki_map);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -2055,9 +2010,6 @@ void aerofgt_state::aerfboo2(machine_config &config)
 	M68000(config, m_maincpu, 20000000/2);   /* 10 MHz (?) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_state::aerfboo2_map);
 	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_state::irq2_line_hold));
-
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -2082,17 +2034,15 @@ void aerofgt_state::aerfboo2(machine_config &config)
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void aerofgt_state::wbbc97(machine_config &config)
+void aerofgt_sound_cpu_state::wbbc97(machine_config &config)
 {
 	/* basic machine hardware */
 	M68000(config, m_maincpu, 20000000/2);   /* 10 MHz (?) */
-	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_state::wbbc97_map);
-	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_state::irq1_line_hold)); /* all irq vectors are the same */
+	m_maincpu->set_addrmap(AS_PROGRAM, &aerofgt_sound_cpu_state::wbbc97_map);
+	m_maincpu->set_vblank_int("screen", FUNC(aerofgt_sound_cpu_state::irq1_line_hold)); /* all irq vectors are the same */
 
 	Z80(config, m_audiocpu, 8000000/2); /* 4 MHz ??? */
-	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_state::wbbc97_sound_map); /* IRQs are triggered by the YM3812 */
-	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
-	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &aerofgt_sound_cpu_state::wbbc97_sound_map); /* IRQs are triggered by the YM3812 */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -2100,7 +2050,7 @@ void aerofgt_state::wbbc97(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);
 	screen.set_visarea(0*8+14, 44*8-1+4, 0*8, 30*8-1);
-	screen.set_screen_update(FUNC(aerofgt_state::screen_update_wbbc97));
+	screen.set_screen_update(FUNC(aerofgt_sound_cpu_state::screen_update_wbbc97));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wbbc97);
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
@@ -2108,11 +2058,11 @@ void aerofgt_state::wbbc97(machine_config &config)
 	//VSYSTEM_GGA(config, "gga", 0);
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_sound_cpu_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(1);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
-	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,wbbc97)
+	MCFG_VIDEO_START_OVERRIDE(aerofgt_sound_cpu_state,wbbc97)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -2140,8 +2090,11 @@ ROM_START( pspikes )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "pspikes2.bin", 0x00000, 0x40000, CRC(ec0c070e) SHA1(4ddcc184e835a2f9d15f01aaa03734fd75fe797e) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "soundbank", 0 )    /* 128k for the audio CPU + banks */
 	ROM_LOAD( "19",           0x00000, 0x20000, CRC(7e8ed6e5) SHA1(eeb1a1e1989fad8fc1e741928422efaec0598868) )
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 32k for the audio CPU */
+	ROM_COPY( "soundbank", 0, 0x00000, 0x08000 )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "g7h",          0x000000, 0x80000, CRC(74c23c3d) SHA1(c0ac57d1f05c42556f97154ce1a08f465948546b) )
@@ -2164,8 +2117,11 @@ ROM_START( pspikesk )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "20",           0x00000, 0x40000, CRC(75cdcee2) SHA1(272a08c46c1d0989f9fbb156e28e6a7ffa9c0a53) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "soundbank", 0 )    /* 128k for the audio CPU + banks */
 	ROM_LOAD( "19",           0x00000, 0x20000, CRC(7e8ed6e5) SHA1(eeb1a1e1989fad8fc1e741928422efaec0598868) )
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 32k for the audio CPU */
+	ROM_COPY( "soundbank", 0, 0x00000, 0x08000 )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "g7h",          0x000000, 0x80000, CRC(74c23c3d) SHA1(c0ac57d1f05c42556f97154ce1a08f465948546b) )
@@ -2189,8 +2145,11 @@ ROM_START( pspikesu )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "svolly91.73", 0x00000, 0x40000, CRC(bfbffcdb) SHA1(2bba99cb6d0cb2fbb3cd1242551dd7e2c6ebef50) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "soundbank", 0 )    /* 128k for the audio CPU + banks */
 	ROM_LOAD( "19",           0x00000, 0x20000, CRC(7e8ed6e5) SHA1(eeb1a1e1989fad8fc1e741928422efaec0598868) )
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 32k for the audio CPU */
+	ROM_COPY( "soundbank", 0, 0x00000, 0x08000 )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "g7h",          0x000000, 0x80000, CRC(74c23c3d) SHA1(c0ac57d1f05c42556f97154ce1a08f465948546b) )
@@ -2210,8 +2169,11 @@ ROM_START( svolly91 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "u11.jpn",      0x00000, 0x40000, CRC(ea2e4c82) SHA1(f9cf9122499d9b1e54221fb8b6ef9c12004ca85e) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "soundbank", 0 )    /* 64k for the audio CPU + banks */
 	ROM_LOAD( "19",           0x00000, 0x20000, CRC(7e8ed6e5) SHA1(eeb1a1e1989fad8fc1e741928422efaec0598868) )
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 32k for the audio CPU */
+	ROM_COPY( "soundbank", 0, 0x00000, 0x08000 )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "g7h",          0x000000, 0x80000, CRC(74c23c3d) SHA1(c0ac57d1f05c42556f97154ce1a08f465948546b) )
@@ -2440,9 +2402,12 @@ ROM_START( spinlbrk )
 	ROM_LOAD16_BYTE( "ic93",    0x20000, 0x10000, CRC(726f4683) SHA1(65aff0548333571d47a96d4bf5a7857f12399cc7) )
 	ROM_LOAD16_BYTE( "ic94",    0x20001, 0x10000, CRC(c4385e03) SHA1(6683eed812fa8a5430125b14e8647f8e9024bbdd) )
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "soundbank", 0 )
+	ROM_LOAD( "ic118",        0x00000, 0x10000, CRC(1025f024) SHA1(3e497c74c950d2cd2a0931cf2ae9b0124d11ca6a) )
+	ROM_RELOAD(               0x10000, 0x10000 )
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 32k for the audio CPU */
 	ROM_LOAD( "ic117",        0x00000, 0x08000, CRC(625ada41) SHA1(2dd0674c68ea382431115c155afbf880f5b9deb2) )
-	ROM_LOAD( "ic118",        0x08000, 0x10000, CRC(1025f024) SHA1(3e497c74c950d2cd2a0931cf2ae9b0124d11ca6a) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "ic15",         0x000000, 0x80000, CRC(e318cf3a) SHA1(d634001a0029566ce7b8fa30075970919eb5f44e) )
@@ -2490,9 +2455,12 @@ ROM_START( spinlbrku )
 	ROM_LOAD16_BYTE( "ic93.u4", 0x20000, 0x10000, CRC(0cf73029) SHA1(e1346b759a41f9eec9536dc90671778582e595b4) )
 	ROM_LOAD16_BYTE( "ic94.u3", 0x20001, 0x10000, CRC(5cf7c426) SHA1(b201da40c4511d2845004dff72d36adbb8a4fab9) )
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "soundbank", 0 )
+	ROM_LOAD( "ic118",        0x00000, 0x10000, CRC(1025f024) SHA1(3e497c74c950d2cd2a0931cf2ae9b0124d11ca6a) )
+	ROM_RELOAD(               0x10000, 0x10000 )
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 32k for the audio CPU */
 	ROM_LOAD( "ic117",        0x00000, 0x08000, CRC(625ada41) SHA1(2dd0674c68ea382431115c155afbf880f5b9deb2) )
-	ROM_LOAD( "ic118",        0x08000, 0x10000, CRC(1025f024) SHA1(3e497c74c950d2cd2a0931cf2ae9b0124d11ca6a) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "ic15",         0x000000, 0x80000, CRC(e318cf3a) SHA1(d634001a0029566ce7b8fa30075970919eb5f44e) )
@@ -2540,9 +2508,12 @@ ROM_START( spinlbrkj )
 	ROM_LOAD16_BYTE( "j4",      0x20000, 0x10000, CRC(33e33912) SHA1(d6d052cd8dbedfd254bdf5e82ad770e4bf241777) )
 	ROM_LOAD16_BYTE( "j3",      0x20001, 0x10000, CRC(16ca61d0) SHA1(5d99a1261251412c3c758af751997fe31026c0d6) )
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "soundbank", 0 )
+	ROM_LOAD( "ic118",        0x00000, 0x10000, CRC(1025f024) SHA1(3e497c74c950d2cd2a0931cf2ae9b0124d11ca6a) )
+	ROM_RELOAD(               0x10000, 0x10000 )
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 32k for the audio CPU */
 	ROM_LOAD( "ic117",        0x00000, 0x08000, CRC(625ada41) SHA1(2dd0674c68ea382431115c155afbf880f5b9deb2) )
-	ROM_LOAD( "ic118",        0x08000, 0x10000, CRC(1025f024) SHA1(3e497c74c950d2cd2a0931cf2ae9b0124d11ca6a) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "ic15",         0x000000, 0x80000, CRC(e318cf3a) SHA1(d634001a0029566ce7b8fa30075970919eb5f44e) )
@@ -2600,9 +2571,12 @@ ROM_START( spinlbrkup ) // the labels are official Video System without numberin
 	ROM_LOAD16_BYTE( "sbp1-e.ic93",  0x20000, 0x10000, CRC(d6444d1e) SHA1(2aa80b8cf3c44e4a583b57f4a6cc673d984f3a05) )
 	ROM_LOAD16_BYTE( "sbp1-o.ic94",  0x20001, 0x10000, CRC(a3f7bd8e) SHA1(dc393b4911c6acadb97b0380db15ae5c972a3505) )
 
-	ROM_REGION( 0x18000, "audiocpu", 0 )
+	ROM_REGION( 0x20000, "soundbank", 0 )
+	ROM_LOAD( "11-14.m.bank.ic118",      0x00000, 0x10000, CRC(a1ed270b) SHA1(f513baed1f7efda3d843982e1fa4857f058e8595) ) // relatively minor differences
+	ROM_RELOAD(                          0x10000, 0x10000 )
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )
 	ROM_LOAD( "11-14-15.00.music.ic117", 0x00000, 0x08000, CRC(6b8c8f09) SHA1(d57699ea82f5e48ed8c9909a040c2fa6f988f8b3) ) // this differs quite a lot
-	ROM_LOAD( "11-14.m.bank.ic118",      0x08000, 0x10000, CRC(a1ed270b) SHA1(f513baed1f7efda3d843982e1fa4857f058e8595) ) // relatively minor differences
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "ic15",         0x000000, 0x80000, CRC(e318cf3a) SHA1(d634001a0029566ce7b8fa30075970919eb5f44e) )
@@ -2661,8 +2635,11 @@ ROM_START( karatblz )
 	ROM_LOAD16_WORD_SWAP( "rom2v3.u14", 0x00000, 0x40000, CRC(01f772e1) SHA1(f87f19a82d75839b5671f23ce14218d7b910eabc) ) // need to verify correct "region" stamped number, should this be "3v2.u14" ??
 	ROM_LOAD16_WORD_SWAP( "v1.u15",     0x40000, 0x40000, CRC(d16ee21b) SHA1(d454cdf22b72a537b9d7ae73deb8136a4f09da47) ) // chip with VideoSystem logo V and 1
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "soundbank", 0 )    /* 128k for the audio CPU + banks */
 	ROM_LOAD( "v5.u92", 0x00000, 0x20000, CRC(97d67510) SHA1(1ffd419e3dec7de1099cd5819b0309f7dd0df80e) ) // chip with VideoSystem logo V and 5
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 32k for the audio CPU */
+	ROM_COPY( "soundbank", 0x00000, 0x00000, 0x08000 )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "gha.u55", 0x00000, 0x80000, CRC(3e0cea91) SHA1(bab41715f106d364013b64649441d280bc6893cf) )
@@ -2692,8 +2669,11 @@ ROM_START( karatblzt ) // Karate Blazers, Tecmo license
 	ROM_LOAD16_WORD_SWAP( "2v2.u14",  0x00000, 0x40000, CRC(7ae17b7f) SHA1(d7916c3159e22dde56a0de750032da9ee46b3d6c) ) // 2 stamped on chip with VideoSystem logo V and 2
 	ROM_LOAD16_WORD_SWAP( "v1.u15",   0x40000, 0x40000, CRC(d16ee21b) SHA1(d454cdf22b72a537b9d7ae73deb8136a4f09da47) ) // chip with VideoSystem logo V and 1
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "soundbank", 0 )    /* 128k for the audio CPU + banks */
 	ROM_LOAD( "v5.u92", 0x00000, 0x20000, CRC(97d67510) SHA1(1ffd419e3dec7de1099cd5819b0309f7dd0df80e) ) // chip with VideoSystem logo V and 5
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 32k for the audio CPU */
+	ROM_COPY( "soundbank", 0x00000, 0x00000, 0x08000 )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "gha.u55", 0x00000, 0x80000, CRC(3e0cea91) SHA1(bab41715f106d364013b64649441d280bc6893cf) )
@@ -2723,8 +2703,11 @@ ROM_START( karatblza )
 	ROM_LOAD16_WORD_SWAP( "_v2.u14",  0x00000, 0x40000, CRC(7a78976e) SHA1(3b74b80765622b8488bdd0729ec98a2c7584cad5) ) // need to verify correct "region" stamped number
 	ROM_LOAD16_WORD_SWAP( "_v1.u15",  0x40000, 0x40000, CRC(47e410fe) SHA1(d26fc93f91ccf00856db2b7dfd0d905d87e99bd8) ) // need to verify correct "region" stamped number, is this one "1v1" ??
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "soundbank", 0 )    /* 128k for the audio CPU + banks */
 	ROM_LOAD( "v5.u92", 0x00000, 0x20000, CRC(97d67510) SHA1(1ffd419e3dec7de1099cd5819b0309f7dd0df80e) ) // chip with VideoSystem logo V and 5
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 32k for the audio CPU */
+	ROM_COPY( "soundbank", 0x00000, 0x00000, 0x08000 )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "gha.u55", 0x00000, 0x80000, CRC(3e0cea91) SHA1(bab41715f106d364013b64649441d280bc6893cf) )
@@ -2754,8 +2737,11 @@ ROM_START( karatblzu )
 	ROM_LOAD16_WORD_SWAP( "1v2.u14", 0x00000, 0x40000, CRC(202e6220) SHA1(2605511a0574cbc39fdf3d8ae27a0aa9b43345fb) ) // 1 stamped on chip with VideoSystem logo V and 2
 	ROM_LOAD16_WORD_SWAP( "v1.u15",  0x40000, 0x40000, CRC(d16ee21b) SHA1(d454cdf22b72a537b9d7ae73deb8136a4f09da47) ) // chip with VideoSystem logo V and 1
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "soundbank", 0 )    /* 128k for the audio CPU + banks */
 	ROM_LOAD( "v5.u92", 0x00000, 0x20000, CRC(97d67510) SHA1(1ffd419e3dec7de1099cd5819b0309f7dd0df80e) ) // chip with VideoSystem logo V and 5
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 32k for the audio CPU */
+	ROM_COPY( "soundbank", 0x00000, 0x00000, 0x08000 )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "gha.u55", 0x00000, 0x80000, CRC(3e0cea91) SHA1(bab41715f106d364013b64649441d280bc6893cf) )
@@ -2785,8 +2771,11 @@ ROM_START( karatblzj ) // Toushin Blazers, Tecmo license
 	ROM_LOAD16_WORD_SWAP( "2tecmo.u14",  0x00000, 0x40000, CRC(57e52654) SHA1(15939d8f7c693b9248f3dd2b2ad5fbae2c19621f) ) // need to verify correct "region" stamped number, is this one "4v2" ??
 	ROM_LOAD16_WORD_SWAP( "v1.u15",      0x40000, 0x40000, CRC(d16ee21b) SHA1(d454cdf22b72a537b9d7ae73deb8136a4f09da47) ) // chip with VideoSystem logo V and 1
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "soundbank", 0 )    /* 128k for the audio CPU + banks */
 	ROM_LOAD( "v5.u92", 0x00000, 0x20000, CRC(97d67510) SHA1(1ffd419e3dec7de1099cd5819b0309f7dd0df80e) ) // chip with VideoSystem logo V and 5
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 32k for the audio CPU */
+	ROM_COPY( "soundbank", 0x00000, 0x00000, 0x08000 )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "gha.u55", 0x00000, 0x80000, CRC(3e0cea91) SHA1(bab41715f106d364013b64649441d280bc6893cf) )
@@ -2888,8 +2877,11 @@ ROM_START( turbofrc ) // World version with no copyright notice
 	ROM_LOAD16_WORD_SWAP( "4v1.subpcb.u1", 0x40000, 0x40000, CRC(6cd5312b) SHA1(57b109fe268fb963e981c91b6d288667a3c9a665) ) // 27c2048 - located on a OR-10 SUB BOARD - 4 stamped on chip with VideoSystem logo V
 	ROM_LOAD16_WORD_SWAP( "4v3.u14",       0x80000, 0x40000, CRC(63f50557) SHA1(f8dba8c9ba412c9a67457ec31a804c57593ab20b) ) // 27c2048 - 4 stamped on chip with VideoSystem logo V
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "soundbank", 0 )    /* 128k for the audio CPU + banks */
 	ROM_LOAD( "6.u166", 0x00000, 0x20000, CRC(2ca14a65) SHA1(95f6e7b4fa7ca26872ff472d7e6fb75fd4f281d5) ) // 27c1001
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 32k for the audio CPU */
+	ROM_COPY( "soundbank", 0x00000, 0x00000, 0x08000 )
 
 	ROM_REGION( 0x0a0000, "gfx1", 0 )
 	ROM_LOAD( "lh534ggs.u94", 0x000000, 0x80000, CRC(baa53978) SHA1(7f103122dd0bf675226ccf309fba73f645e0c79b) ) // mask rom
@@ -2922,8 +2914,11 @@ ROM_START( turbofrco ) // World version with no copyright notice
 	ROM_LOAD16_WORD_SWAP( "3v1.subpcb.u1", 0x40000, 0x40000, CRC(71b6431b) SHA1(471bada4730a1a323af9b493f8c5f57c2a147f8d) ) // 27c2048 - located on a OR-10 SUB BOARD - 3 stamped on chip with VideoSystem logo V
 	ROM_LOAD16_WORD_SWAP( "3v3.u14",       0x80000, 0x40000, CRC(63f50557) SHA1(f8dba8c9ba412c9a67457ec31a804c57593ab20b) ) // 27c2048 - 3 stamped on chip with VideoSystem logo V
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "soundbank", 0 )    /* 128k for the audio CPU + banks */
 	ROM_LOAD( "6.u166", 0x00000, 0x20000, CRC(2ca14a65) SHA1(95f6e7b4fa7ca26872ff472d7e6fb75fd4f281d5) ) // 27c1001
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 32k for the audio CPU */
+	ROM_COPY( "soundbank", 0x00000, 0x00000, 0x08000 )
 
 	ROM_REGION( 0x0a0000, "gfx1", 0 )
 	ROM_LOAD( "lh534ggs.u94", 0x000000, 0x80000, CRC(baa53978) SHA1(7f103122dd0bf675226ccf309fba73f645e0c79b) ) // mask rom
@@ -2956,8 +2951,11 @@ ROM_START( turbofrcu ) // US version - need to redump 8v3.u14 to verify it's uni
 	ROM_LOAD16_WORD_SWAP( "8v1.subpcb.u1", 0x40000, 0x40000, CRC(cc324da6) SHA1(ed2eaff7351914e3ebaf925ddc01be9d44d89fa6) ) // 27c2048 - located on a OR-10 SUB BOARD - 8 stamped on chip with VideoSystem logo V
 	ROM_LOAD16_WORD_SWAP( "8v3.u14",       0x80000, 0x40000, CRC(c0a15480) SHA1(1ec99382e0a00a8167773b1d454a63cc5cd6199c) ) // 27c2048 - 8 stamped on chip with VideoSystem logo V - 0x240B:3C (vs 0x25 for other sets)
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "soundbank", 0 )    /* 128k for the audio CPU + banks */
 	ROM_LOAD( "6.u166", 0x00000, 0x20000, CRC(2ca14a65) SHA1(95f6e7b4fa7ca26872ff472d7e6fb75fd4f281d5) ) // 27c1001
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 32k for the audio CPU */
+	ROM_COPY( "soundbank", 0x00000, 0x00000, 0x08000 )
 
 	ROM_REGION( 0x0a0000, "gfx1", 0 )
 	ROM_LOAD( "lh534ggs.u94", 0x000000, 0x80000, CRC(baa53978) SHA1(7f103122dd0bf675226ccf309fba73f645e0c79b) ) // mask rom
@@ -2990,8 +2988,11 @@ ROM_START( turbofrcua ) // US version
 	ROM_LOAD16_WORD_SWAP( "7v1.subpcb.u1", 0x40000, 0x40000, CRC(d1513f96) SHA1(7acb96a44f661cd9c7561dfab0d60c993942d669) ) // 27c2048 - located on a OR-10 SUB BOARD - 7 stamped on chip with VideoSystem logo V
 	ROM_LOAD16_WORD_SWAP( "7v3.u14",       0x80000, 0x40000, CRC(63f50557) SHA1(f8dba8c9ba412c9a67457ec31a804c57593ab20b) ) // 27c2048 - 7 stamped on chip with VideoSystem logo V
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "soundbank", 0 )    /* 128k for the audio CPU + banks */
 	ROM_LOAD( "6.u166", 0x00000, 0x20000, CRC(2ca14a65) SHA1(95f6e7b4fa7ca26872ff472d7e6fb75fd4f281d5) ) // 27c1001
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 32k for the audio CPU */
+	ROM_COPY( "soundbank", 0x00000, 0x00000, 0x08000 )
 
 	ROM_REGION( 0x0a0000, "gfx1", 0 )
 	ROM_LOAD( "lh534ggs.u94", 0x000000, 0x80000, CRC(baa53978) SHA1(7f103122dd0bf675226ccf309fba73f645e0c79b) ) // mask rom
@@ -3022,8 +3023,11 @@ ROM_START( aerofgt )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "1.u4",         0x00000, 0x80000, CRC(6fdff0a2) SHA1(7cc9529b426091027aa3e23586cb7d162376c0ff) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "soundbank", 0 )    /* 128k for the audio CPU + banks */
 	ROM_LOAD( "2.153",        0x00000, 0x20000, CRC(a1ef64ec) SHA1(fa3e434738bf4e742ad68882c1e914100ce0f761) )
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 32k for the audio CPU */
+	ROM_COPY( "soundbank", 0x00000, 0x00000, 0x08000 )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "538a54.124",   0x000000, 0x80000, CRC(4d2c4df2) SHA1(f51c2b3135f0a921ac1a79e63d6878c03cb6254b) )
@@ -3045,8 +3049,11 @@ ROM_START( aerofgtb )
 	ROM_LOAD16_BYTE( "v2",                0x00000, 0x40000, CRC(5c9de9f0) SHA1(93b62c59f0bc052c6fdbd5aae292a7ab2122dfd1) )
 	ROM_LOAD16_BYTE( "v1",                0x00001, 0x40000, CRC(89c1dcf4) SHA1(41401d63049c140e4254dc791022d85c44271390) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "soundbank", 0 )    /* 128k for the audio CPU + banks */
 	ROM_LOAD( "v3",           0x00000, 0x20000, CRC(cbb18cf4) SHA1(7119a7536cf710660ff06d1e7d2879c79ef12b3d) )
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 32k for the audio CPU */
+	ROM_COPY( "soundbank", 0x00000, 0x00000, 0x08000 )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
 	ROM_LOAD( "it-19-03",     0x000000, 0x80000, CRC(85eba1a4) SHA1(5691a95d6359fdab29be0d615066370c2b856c0a) )
@@ -3074,8 +3081,11 @@ ROM_START( aerofgtc )
 	ROM_LOAD16_BYTE( "v2.149",            0x00000, 0x40000, CRC(f187aec6) SHA1(8905af34f114ae22fbfbd3ae115f19280bdd4fb3) )
 	ROM_LOAD16_BYTE( "v1.111",            0x00001, 0x40000, CRC(9e684b19) SHA1(b5e1e5b74ed9fd223c9315ee2d548e620224c102) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "soundbank", 0 )    /* 128k for the audio CPU + banks */
 	ROM_LOAD( "2.153",        0x00000, 0x20000, CRC(a1ef64ec) SHA1(fa3e434738bf4e742ad68882c1e914100ce0f761) )
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 32k for the audio CPU */
+	ROM_COPY( "soundbank", 0x00000, 0x00000, 0x08000 )
 
 	/* gfx ROMs were missing in this set, I'm using the aerofgtb ones */
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -3104,8 +3114,11 @@ ROM_START( sonicwi )
 	ROM_LOAD16_BYTE( "2.149",        0x00000, 0x40000, CRC(3d1b96ba) SHA1(941be323c0cb15e05c92b897984617b05c5cf676) )
 	ROM_LOAD16_BYTE( "1.111",        0x00001, 0x40000, CRC(a3d09f94) SHA1(a1064d659488878f5303edc2b8636312ab632a83) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_REGION( 0x20000, "soundbank", 0 )    /* 128k for the audio CPU + banks */
 	ROM_LOAD( "2.153",        0x00000, 0x20000, CRC(a1ef64ec) SHA1(fa3e434738bf4e742ad68882c1e914100ce0f761) )  // 3.156
+
+	ROM_REGION( 0x08000, "audiocpu", 0 )    /* 32k for the audio CPU */
+	ROM_COPY( "soundbank", 0x00000, 0x00000, 0x08000 )
 
 	/* gfx ROMs were missing in this set, I'm using the aerofgtb ones */
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -3232,13 +3245,13 @@ ROM_START( kickball )
 	ROM_LOAD( "kickball.3", 0x000000, 0x040000, CRC(2f3ed4c1) SHA1(4688df5d420343a935d066f3b46580b77ee77b0e) )
 ROM_END
 
-void aerofgt_state::init_banked_oki()
+void aerofgt_sound_cpu_state::init_banked_oki()
 {
 	m_okibank->configure_entries(0, 4, memregion("oki")->base() + 0x20000, 0x20000);
 }
 
 
-void aerofgt_state::init_kickball()
+void aerofgt_sound_cpu_state::init_kickball()
 {
 	// 2 lines on 1 gfx rom are swapped, why?
 	uint8_t *src = memregion("gfx2")->base();
@@ -3248,41 +3261,41 @@ void aerofgt_state::init_kickball()
 	}
 }
 
-GAME( 1990, spinlbrk,   0,         spinlbrk,   spinlbrk,  aerofgt_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1990, spinlbrku,  spinlbrk,  spinlbrk,   spinlbrku, aerofgt_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1990, spinlbrkj,  spinlbrk,  spinlbrk,   spinlbrk,  aerofgt_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1990, spinlbrkup, spinlbrk,  spinlbrk,   spinlbrk,  aerofgt_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (US, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // build date 11/15 15:00
+GAME( 1990, spinlbrk,   0,        spinlbrk,   spinlbrk,  aerofgt_banked_sound_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1990, spinlbrku,  spinlbrk, spinlbrk,   spinlbrku, aerofgt_banked_sound_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1990, spinlbrkj,  spinlbrk, spinlbrk,   spinlbrk,  aerofgt_banked_sound_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1990, spinlbrkup, spinlbrk, spinlbrk,   spinlbrk,  aerofgt_banked_sound_state, empty_init,     ROT0,   "V-System Co.",     "Spinal Breakers (US, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // build date 11/15 15:00
 
-GAME( 1991, pspikes,   0,         pspikes,    pspikes,   aerofgt_state, empty_init,      ROT0,   "Video System Co.",    "Power Spikes (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, pspikesk,  pspikes,   pspikes,    pspikes,   aerofgt_state, empty_init,      ROT0,   "Video System Co.",    "Power Spikes (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, pspikesu,  pspikes,   pspikes,    pspikes,   aerofgt_state, empty_init,      ROT0,   "Video System Co.",    "Power Spikes (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, svolly91,  pspikes,   pspikes,    pspikes,   aerofgt_state, empty_init,      ROT0,   "Video System Co.",    "Super Volley '91 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, pspikesb,  pspikes,   pspikesb,   pspikesb,  aerofgt_state, empty_init,      ROT0,   "bootleg",             "Power Spikes (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, pspikesba, pspikes,   pspikesb,   pspikesb,  aerofgt_state, empty_init,      ROT0,   "bootleg (Playmark?)", "Power Spikes (Italian bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, spikes91,  pspikes,   spikes91,   pspikes,   aerofgt_state, empty_init,      ROT0,   "bootleg",             "1991 Spikes (Italian bootleg, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // OKI M5205 not hooked up yet
-GAME( 1991, spikes91b, pspikes,   spikes91,   pspikes,   aerofgt_state, empty_init,      ROT0,   "bootleg",             "1991 Spikes (Italian bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // OKI M5205 not hooked up yet
-GAME( 1991, pspikesc,  pspikes,   pspikesc,   pspikesc,  aerofgt_state, empty_init,      ROT0,   "bootleg",             "Power Spikes (China)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, wbbc97,    0,         wbbc97,     wbbc97,    aerofgt_state, empty_init,      ROT0,   "Comad",               "Beach Festival World Championship 1997", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // based on power spikes codebase
-GAME( 1998, kickball,  0,         kickball,   pspikes,   aerofgt_state, init_kickball,   ROT0,   "Seoung Youn",    "Kick Ball", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // based on power spikes codebase, wrong priorities
+GAME( 1991, pspikes,    0,        pspikes,    pspikes,   aerofgt_banked_sound_state, empty_init,      ROT0,   "Video System Co.",    "Power Spikes (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, pspikesk,   pspikes,  pspikes,    pspikes,   aerofgt_banked_sound_state, empty_init,      ROT0,   "Video System Co.",    "Power Spikes (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, pspikesu,   pspikes,  pspikes,    pspikes,   aerofgt_banked_sound_state, empty_init,      ROT0,   "Video System Co.",    "Power Spikes (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, svolly91,   pspikes,  pspikes,    pspikes,   aerofgt_banked_sound_state, empty_init,      ROT0,   "Video System Co.",    "Super Volley '91 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, pspikesb,   pspikes,  pspikesb,   pspikesb,  aerofgt_state,              empty_init,      ROT0,   "bootleg",             "Power Spikes (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, pspikesba,  pspikes,  pspikesb,   pspikesb,  aerofgt_state,              empty_init,      ROT0,   "bootleg (Playmark?)", "Power Spikes (Italian bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, spikes91,   pspikes,  spikes91,   pspikes,   aerofgt_sound_cpu_state,    empty_init,      ROT0,   "bootleg",             "1991 Spikes (Italian bootleg, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // OKI M5205 not hooked up yet
+GAME( 1991, spikes91b,  pspikes,  spikes91,   pspikes,   aerofgt_sound_cpu_state,    empty_init,      ROT0,   "bootleg",             "1991 Spikes (Italian bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL ) // OKI M5205 not hooked up yet
+GAME( 1991, pspikesc,   pspikes,  pspikesc,   pspikesc,  aerofgt_state,              empty_init,      ROT0,   "bootleg",             "Power Spikes (China)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, wbbc97,     0,        wbbc97,     wbbc97,    aerofgt_sound_cpu_state,    empty_init,      ROT0,   "Comad",               "Beach Festival World Championship 1997", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // based on power spikes codebase
+GAME( 1998, kickball,   0,        kickball,   pspikes,   aerofgt_sound_cpu_state,    init_kickball,   ROT0,   "Seoung Youn",    "Kick Ball", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) // based on power spikes codebase, wrong priorities
 
-GAME( 1991, karatblz,   0,        karatblz,   karatblz,  aerofgt_state, empty_init,      ROT0,   "Video System Co.",                 "Karate Blazers (World, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblza,  karatblz, karatblz,   karatblz,  aerofgt_state, empty_init,      ROT0,   "Video System Co.",                 "Karate Blazers (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblzt,  karatblz, karatblz,   karatblz,  aerofgt_state, empty_init,      ROT0,   "Video System Co. (Tecmo license)", "Karate Blazers (World, Tecmo license)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblzu,  karatblz, karatblz,   karatblzu, aerofgt_state, empty_init,      ROT0,   "Video System Co.",                 "Karate Blazers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblzj,  karatblz, karatblz,   karatblz,  aerofgt_state, empty_init,      ROT0,   "Video System Co. (Tecmo license)", "Toushin Blazers (Japan, Tecmo license)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblzbl, karatblz, karatblzbl, karatblz,  aerofgt_state, empty_init,      ROT0,   "bootleg",                          "Karate Blazers (bootleg with Street Smart sound hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+GAME( 1991, karatblz,   0,        karatblz,   karatblz,  aerofgt_banked_sound_state, empty_init,      ROT0,   "Video System Co.",                 "Karate Blazers (World, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, karatblza,  karatblz, karatblz,   karatblz,  aerofgt_banked_sound_state, empty_init,      ROT0,   "Video System Co.",                 "Karate Blazers (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, karatblzt,  karatblz, karatblz,   karatblz,  aerofgt_banked_sound_state, empty_init,      ROT0,   "Video System Co. (Tecmo license)", "Karate Blazers (World, Tecmo license)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, karatblzu,  karatblz, karatblz,   karatblzu, aerofgt_banked_sound_state, empty_init,      ROT0,   "Video System Co.",                 "Karate Blazers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, karatblzj,  karatblz, karatblz,   karatblz,  aerofgt_banked_sound_state, empty_init,      ROT0,   "Video System Co. (Tecmo license)", "Toushin Blazers (Japan, Tecmo license)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, karatblzbl, karatblz, karatblzbl, karatblz,  aerofgt_sound_cpu_state,    empty_init,      ROT0,   "bootleg",                          "Karate Blazers (bootleg with Street Smart sound hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 
 // according to Gamest magazine in new revision they changed the points value of the rocks in level 6 (5.000 versus 500)
 // -> our three sets all gives 5k points, huh?
-GAME( 1991, turbofrc,   0,        turbofrc,   turbofrc,  aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (World, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // region code 4
-GAME( 1991, turbofrco,  turbofrc, turbofrc,   turbofrc,  aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // region code 3
-GAME( 1991, turbofrcu,  turbofrc, turbofrc,   turbofrc,  aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (US, set 1)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // region code 8
-GAME( 1991, turbofrcua, turbofrc, turbofrc,   turbofrc,  aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (US, set 2)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // region code 7
+GAME( 1991, turbofrc,   0,        turbofrc,   turbofrc,  aerofgt_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (World, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // region code 4
+GAME( 1991, turbofrco,  turbofrc, turbofrc,   turbofrc,  aerofgt_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // region code 3
+GAME( 1991, turbofrcu,  turbofrc, turbofrc,   turbofrc,  aerofgt_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (US, set 1)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // region code 8
+GAME( 1991, turbofrcua, turbofrc, turbofrc,   turbofrc,  aerofgt_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Turbo Force (US, set 2)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // region code 7
 
 // the tiles on these also contain an alt title 'The Final War' for both the title screen and attract logo was it ever used?
-GAME( 1992, aerofgt,    0,        aerofgt,    aerofgt,   aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Aero Fighters (World / USA + Canada / Korea / Hong Kong / Taiwan) (newer hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // this has the newer sprite chip etc. unlike all other games in this driver..
-GAME( 1992, aerofgtb,   aerofgt,  aerofgtb,   aerofgtb,  aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Aero Fighters (Taiwan / Japan, set 1)", MACHINE_SUPPORTS_SAVE ) // probably intended for Taiwan because the Japanese name is Sonic Wings (below)
-GAME( 1992, aerofgtc,   aerofgt,  aerofgtb,   aerofgtb,  aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Aero Fighters (Taiwan / Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sonicwi,    aerofgt,  aerofgtb,   aerofgtb,  aerofgt_state, empty_init,      ROT270, "Video System Co.",    "Sonic Wings (Japan)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1992, aerfboot,   aerofgt,  aerfboot,   aerofgtb,  aerofgt_state, init_banked_oki, ROT270, "bootleg",             "Aero Fighters (bootleg, set 1)",         MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
-GAME( 1992, aerfboo2,   aerofgt,  aerfboo2,   aerofgtb,  aerofgt_state, empty_init,      ROT270, "bootleg",             "Aero Fighters (bootleg, set 2)",         MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+GAME( 1992, aerofgt,    0,        aerofgt,    aerofgt,   aerofgt_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Aero Fighters (World / USA + Canada / Korea / Hong Kong / Taiwan) (newer hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // this has the newer sprite chip etc. unlike all other games in this driver..
+GAME( 1992, aerofgtb,   aerofgt,  aerofgtb,   aerofgtb,  aerofgt_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Aero Fighters (Taiwan / Japan, set 1)", MACHINE_SUPPORTS_SAVE ) // probably intended for Taiwan because the Japanese name is Sonic Wings (below)
+GAME( 1992, aerofgtc,   aerofgt,  aerofgtb,   aerofgtb,  aerofgt_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Aero Fighters (Taiwan / Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sonicwi,    aerofgt,  aerofgtb,   aerofgtb,  aerofgt_banked_sound_state, empty_init,      ROT270, "Video System Co.",    "Sonic Wings (Japan)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1992, aerfboot,   aerofgt,  aerfboot,   aerofgtb,  aerofgt_sound_cpu_state,    init_banked_oki, ROT270, "bootleg",             "Aero Fighters (bootleg, set 1)",         MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+GAME( 1992, aerfboo2,   aerofgt,  aerfboo2,   aerofgtb,  aerofgt_state,              empty_init,      ROT270, "bootleg",             "Aero Fighters (bootleg, set 2)",         MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )

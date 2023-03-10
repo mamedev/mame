@@ -81,10 +81,9 @@ void victor21_bitswaps(uint8_t *decrypt, int i)
 
 // Decrypt:
 
-#if 0
-void dump_decrypted(running_machine& machine, uint8_t* decrypt)
+[[maybe_unused]] static void dump_decrypted(running_machine& machine, uint8_t* decrypt)
 {
-	auto filename = std::string{ "dat_" } + machine.system().name;
+	auto filename = "dat_" + std::string(machine.system().name);
 	auto fp = fopen(filename.c_str(), "w+b");
 	if (fp)
 	{
@@ -92,19 +91,17 @@ void dump_decrypted(running_machine& machine, uint8_t* decrypt)
 		fclose(fp);
 	}
 }
-#endif
 
 void subsino_decrypt(running_machine& machine, void (*bitswaps)(uint8_t *decrypt, int i), const uint8_t *xors, int size)
 {
-	int i;
 	std::unique_ptr<uint8_t[]> decrypt = std::make_unique<uint8_t[]>(0x10000);
-	uint8_t* region = machine.root_device().memregion("maincpu")->base();
+	uint8_t *const region = machine.root_device().memregion("maincpu")->base();
 
-	for (i=0;i<0x10000;i++)
+	for (int i = 0; i < 0x10000; i++)
 	{
-		if (i<size)
+		if (i < size)
 		{
-			decrypt[i] = region[i]^xors[i&7];
+			decrypt[i] = region[i] ^ xors[i & 7];
 			bitswaps(decrypt.get(), i);
 		}
 		else

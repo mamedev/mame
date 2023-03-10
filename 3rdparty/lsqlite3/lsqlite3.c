@@ -31,18 +31,20 @@
 #include <assert.h>
 
 #define LUA_LIB
-#include <lua.h>
-#include <lauxlib.h>
+#include "lua.h"
+#include "lauxlib.h"
 
 #if LUA_VERSION_NUM > 501
 /*
 ** Lua 5.2
 */
-//#define lua_strlen lua_rawlen
+#ifndef lua_strlen
+#define lua_strlen lua_rawlen
+#endif
 /* luaL_typerror always used with arg at ndx == NULL */
 #define luaL_typerror(L,ndx,str) luaL_error(L,"bad argument %d (%s expected, got nil)",ndx,str)
 /* luaL_register used once, so below expansion is OK for this case */
-//#define luaL_register(L,name,reg) lua_newtable(L);luaL_setfuncs(L,reg,0)
+#define luaL_register(L,name,reg) lua_newtable(L);luaL_setfuncs(L,reg,0)
 /* luaL_openlib always used with name == NULL */
 #define luaL_openlib(L,name,reg,nup) luaL_setfuncs(L,reg,nup)
 
@@ -54,7 +56,7 @@
 #endif
 #endif
 
-#include <sqlite3.h>
+#include "sqlite3.h"
 
 /* compile time features */
 #if !defined(SQLITE_OMIT_PROGRESS_CALLBACK)
@@ -173,7 +175,7 @@ static void vm_push_column(lua_State *L, sqlite3_stmt *vm, int idx) {
             lua_pushlstring(L, (const char*)sqlite3_column_text(vm, idx), sqlite3_column_bytes(vm, idx));
             break;
         case SQLITE_BLOB:
-            lua_pushlstring(L, sqlite3_column_blob(vm, idx), sqlite3_column_bytes(vm, idx));
+            lua_pushlstring(L, (const char*)sqlite3_column_blob(vm, idx), sqlite3_column_bytes(vm, idx));
             break;
         case SQLITE_NULL:
             lua_pushnil(L);
@@ -665,7 +667,7 @@ static int cleanupdb(lua_State *L, sdb *db) {
     top = lua_gettop(L);
     lua_pushnil(L);
     while (lua_next(L, -2)) {
-        sdb_vm *svm = lua_touserdata(L, -2); /* key: vm; val: sql text */
+        sdb_vm *svm = (sdb_vm*)lua_touserdata(L, -2); /* key: vm; val: sql text */
         cleanupvm(L, svm);
 
         lua_settop(L, top);
@@ -930,6 +932,14 @@ static int db_interrupt(lua_State *L) {
     return 0;
 }
 
+static int db_db_filename(lua_State *L) {
+    sdb *db = lsqlite_checkdb(L, 1);
+    const char *db_name = luaL_checkstring(L, 2);
+    // sqlite3_db_filename may return NULL, in that case Lua pushes nil...
+    lua_pushstring(L, sqlite3_db_filename(db->db, db_name));
+    return 1;
+}
+
 /*
 ** Registering SQL functions:
 */
@@ -951,7 +961,7 @@ static void db_push_value(lua_State *L, sqlite3_value *value) {
             break;
 
         case SQLITE_BLOB:
-            lua_pushlstring(L, sqlite3_value_blob(value), sqlite3_value_bytes(value));
+            lua_pushlstring(L, (const char*)sqlite3_value_blob(value), sqlite3_value_bytes(value));
             break;
 
         case SQLITE_NULL:
@@ -1169,9 +1179,9 @@ static int collwrapper(scc *co,int l1,const void *p1,
     int res=0;
     lua_State *L=co->L;
     lua_rawgeti(L,LUA_REGISTRYINDEX,co->ref);
-    lua_pushlstring(L,p1,l1);
-    lua_pushlstring(L,p2,l2);
-    if (lua_pcall(L,2,1,0)==0) res=lua_tonumber(L,-1);
+    lua_pushlstring(L,(const char*)p1,l1);
+    lua_pushlstring(L,(const char*)p2,l2);
+    if (lua_pcall(L,2,1,0)==0) res=(int)lua_tonumber(L,-1);
     lua_pop(L,1);
     return res;
 }
@@ -1307,7 +1317,7 @@ static void db_update_hook_callback(void *user, int op, char const *dbname, char
     sdb *db = (sdb*)user;
     lua_State *L = db->L;
     int top = lua_gettop(L);
-    //lua_Number n;
+    lua_Number n;
 
     /* setup lua callback call */
     lua_rawgeti(L, LUA_REGISTRYINDEX, db->update_hook_cb);    /* get callback */
@@ -1991,7 +2001,7 @@ static int db_close_vm(lua_State *L) {
     /* close all used handles */
     lua_pushnil(L);
     while (lua_next(L, -2)) {
-        sdb_vm *svm = lua_touserdata(L, -2); /* key: vm; val: sql text */
+        sdb_vm *svm = (sdb_vm*)lua_touserdata(L, -2); /* key: vm; val: sql text */
 
         if ((!temp || svm->temp) && svm->vm)
         {
@@ -2003,6 +2013,17 @@ static int db_close_vm(lua_State *L) {
         lua_pop(L, 1);
     }
     return 0;
+}
+
+/* From: Wolfgang Oertl
+When using lsqlite3 in a multithreaded environment, each thread has a separate Lua 
+environment, but full userdata structures can't be passed from one thread to another.
+This is possible with lightuserdata, however. See: lsqlite_open_ptr().
+*/
+static int db_get_ptr(lua_State *L) {
+    sdb *db = lsqlite_checkdb(L, 1);
+    lua_pushlightuserdata(L, db->db);
+    return 1;
 }
 
 static int db_gc(lua_State *L) {
@@ -2029,7 +2050,7 @@ static int lsqlite_complete(lua_State *L) {
     return 1;
 }
 
-#ifndef WIN32
+#ifndef _WIN32
 static int lsqlite_temp_directory(lua_State *L) {
     const char *oldtemp = sqlite3_temp_directory;
 
@@ -2078,6 +2099,30 @@ static int lsqlite_open(lua_State *L) {
 
 static int lsqlite_open_memory(lua_State *L) {
     return lsqlite_do_open(L, ":memory:", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
+}
+
+/* From: Wolfgang Oertl
+When using lsqlite3 in a multithreaded environment, each thread has a separate Lua 
+environment, but full userdata structures can't be passed from one thread to another.
+This is possible with lightuserdata, however. See: db_get_ptr().
+*/
+static int lsqlite_open_ptr(lua_State *L) {
+    sqlite3 *db_ptr;
+    sdb *db;
+    int rc;
+
+    luaL_checktype(L, 1, LUA_TLIGHTUSERDATA);
+    db_ptr = (sqlite3*)lua_touserdata(L, 1);
+    /* This is the only API function that runs sqlite3SafetyCheck regardless of
+     * SQLITE_ENABLE_API_ARMOR and does almost nothing (without an SQL
+     * statement) */
+    rc = sqlite3_exec(db_ptr, NULL, NULL, NULL, NULL);
+    if (rc != SQLITE_OK)
+        luaL_argerror(L, 1, "not a valid SQLite3 pointer");
+
+    db = newdb(L); /* create and leave in stack */
+    db->db = db_ptr;
+    return 1;
 }
 
 static int lsqlite_newindex(lua_State *L) {
@@ -2188,6 +2233,7 @@ static const luaL_Reg dblib[] = {
     {"errmsg",              db_errmsg               },
     {"error_message",       db_errmsg               },
     {"interrupt",           db_interrupt            },
+    {"db_filename",         db_db_filename          },
 
     {"create_function",     db_create_function      },
     {"create_aggregate",    db_create_aggregate     },
@@ -2213,6 +2259,7 @@ static const luaL_Reg dblib[] = {
     {"execute",             db_exec                 },
     {"close",               db_close                },
     {"close_vm",            db_close_vm             },
+    {"get_ptr",             db_get_ptr              },
 
     {"__tostring",          db_tostring             },
     {"__gc",                db_gc                   },
@@ -2304,11 +2351,12 @@ static const luaL_Reg sqlitelib[] = {
     {"lversion",        lsqlite_lversion        },
     {"version",         lsqlite_version         },
     {"complete",        lsqlite_complete        },
-#ifndef WIN32
+#ifndef _WIN32
     {"temp_directory",  lsqlite_temp_directory  },
 #endif
     {"open",            lsqlite_open            },
     {"open_memory",     lsqlite_open_memory     },
+    {"open_ptr",        lsqlite_open_ptr        },
 
     {"backup_init",     lsqlite_backup_init     },
 
@@ -2329,12 +2377,6 @@ static void create_meta(lua_State *L, const char *name, const luaL_Reg *lib) {
     lua_pop(L, 1);
 }
 
-static int luaopen_sqlite3 ( lua_State * L )
-{
-	luaL_newlib(L, sqlitelib);
-	return 1;
-}
-
 LUALIB_API int luaopen_lsqlite3(lua_State *L) {
     create_meta(L, sqlite_meta, dblib);
     create_meta(L, sqlite_vm_meta, vmlib);
@@ -2345,8 +2387,8 @@ LUALIB_API int luaopen_lsqlite3(lua_State *L) {
     sqlite_ctx_meta_ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
     /* register (local) sqlite metatable */
-	//luaL_register(L, "sqlite3", sqlitelib);
-	luaL_requiref(L, "sqlite3", luaopen_sqlite3, 1);
+    luaL_register(L, "sqlite3", sqlitelib);
+
     {
         int i = 0;
         /* add constants to global table */

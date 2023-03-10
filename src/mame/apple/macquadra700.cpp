@@ -196,6 +196,8 @@ private:
 
 	uint8_t mac_5396_r(offs_t offset);
 	void mac_5396_w(offs_t offset, uint8_t data);
+	uint16_t mac_5396_dma_r(offs_t offset);
+	void mac_5396_dma_w(offs_t offset, uint16_t data);
 };
 
 void macquadra_state::field_interrupts()
@@ -744,7 +746,7 @@ void macquadra_state::mac_via_sync()
 uint32_t macquadra_state::rom_switch_r(offs_t offset)
 {
 	// disable the overlay
-	if (m_overlay)
+	if (m_overlay && !machine().side_effects_disabled())
 	{
 		address_space& space = m_maincpu->space(AS_PROGRAM);
 		const u32 memory_end = m_ram->size() - 1;
@@ -776,6 +778,26 @@ void macquadra_state::mac_5396_w(offs_t offset, uint8_t data)
 	m_ncr1->write(offset>>4, data);
 }
 
+uint16_t macquadra_state::mac_5396_dma_r(offs_t offset)
+{
+	// HACK: Extra time is necessary to avoid underrunning the FIFO at 4 MB/sec transfer rates claimed to
+	// be typical for Apple HDDs of the period.
+	// Likely due to inaccurate 68040 bus timings or wait states; DAFB documentation is clear that there is
+	// no "magic latch" like the 5380 machines use.
+	if (!machine().side_effects_disabled() && BIT(offset << 1, 18))
+		m_maincpu->adjust_icount(-4);
+
+	return m_ncr1->dma16_swap_r();
+}
+
+void macquadra_state::mac_5396_dma_w(offs_t offset, uint16_t data)
+{
+	if (!machine().side_effects_disabled() && BIT(offset << 1, 18))
+		m_maincpu->adjust_icount(-4);
+
+	m_ncr1->dma16_swap_w(data);
+}
+
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
@@ -789,7 +811,7 @@ void macquadra_state::quadra700_map(address_map &map)
 // 5000a000 = Sonic (DP83932) ethernet
 // 5000f000 = SCSI cf96, 5000f402 = SCSI #2 cf96
 	map(0x5000f000, 0x5000f0ff).rw(FUNC(macquadra_state::mac_5396_r), FUNC(macquadra_state::mac_5396_w)).mirror(0x00fc0000);
-	map(0x5000f100, 0x5000f101).rw(m_ncr1, FUNC(ncr53c94_device::dma16_swap_r), FUNC(ncr53c94_device::dma16_swap_w)).mirror(0x00fc0000);
+	map(0x5000f100, 0x5000f101).rw(FUNC(macquadra_state::mac_5396_dma_r), FUNC(macquadra_state::mac_5396_dma_w)).select(0x00fc0000);
 	map(0x5000c000, 0x5000dfff).rw(FUNC(macquadra_state::mac_scc_r), FUNC(macquadra_state::mac_scc_2_w)).mirror(0x00fc0000);
 	map(0x50014000, 0x50015fff).rw(m_easc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00fc0000);
 	map(0x5001e000, 0x5001ffff).rw(FUNC(macquadra_state::swim_r), FUNC(macquadra_state::swim_w)).mirror(0x00fc0000);
@@ -931,10 +953,7 @@ void macquadra_state::macqd700(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi1:4", mac_scsi_devices, "cdrom");
 	NSCSI_CONNECTOR(config, "scsi1:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:6", mac_scsi_devices, "harddisk");
-	// HACK: Max clock for 5394/96 is 25 MHz, but we underrun the FIFO at that speed.
-	// Likely due to inaccurate 68040 and/or NSCSI bus timings; DAFB documentation is clear that there is
-	// no "magic latch" like the 5380 machines use.
-	NSCSI_CONNECTOR(config, "scsi1:7").option_set("ncr53c96", NCR53C96).clock(50_MHz_XTAL).machine_config(
+	NSCSI_CONNECTOR(config, "scsi1:7").option_set("ncr53c96", NCR53C96).clock(50_MHz_XTAL / 2).machine_config(
 		[this] (device_t *device)
 		{
 			ncr53c96_device &adapter = downcast<ncr53c96_device &>(*device);
