@@ -1909,10 +1909,13 @@ Hangs on FMV playback (skippable thru Run button), [SCSI] timing sensitive
 		</part>
 	</software>
 
-	<software name="genchohi">
+	<software name="genchohi" supported="partial">
 		<description>Aoki Ookami to Shiroki Mejika - Genchou Hishi (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
+	    <notes><![CDATA[
+Unsupported [セーブくん] joypad slot peripheral
+]]></notes>
 		<info name="serial" value="KOCD3004"/>
 		<info name="release" value="19930930"/>
 		<info name="alt_title" value="蒼き狼と白き牝鹿 元朝秘史"/>
@@ -3573,7 +3576,7 @@ Crashes on (skippable) new game intro, [SCSI] timing sensitive
 		<year>1992</year>
 		<publisher>Nihon Telenet</publisher>
 		<notes><![CDATA[
-Very unstable on FMVs (including skip with select button) [SCSI] timing sensitive
+Very unstable on FMVs (including skip with select button) [SCSI] timing sensitive (downclock CD read speed from 75 to 60 Hz)
 Crashes when "left option" is selected in main menu (with no save in [BRAM])
 ]]></notes>
 		<info name="serial" value="TJCD-2022"/>
@@ -3844,10 +3847,13 @@ Crashes when "left option" is selected in main menu (with no save in [BRAM])
 		</part>
 	</software>
 
-	<software name="nobubufu">
+	<software name="nobubufu" supported="partial">
 		<description>Nobunaga no Yabou - Bushou Fuuunroku (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
+	    <notes><![CDATA[
+Unsupported [セーブくん] joypad slot peripheral
+]]></notes>
 		<info name="serial" value="KOCD2001"/>
 		<info name="release" value="19930227"/>
 		<info name="alt_title" value="信長の野望 武将風雲録"/>
@@ -3860,10 +3866,13 @@ Crashes when "left option" is selected in main menu (with no save in [BRAM])
 		</part>
 	</software>
 
-	<software name="nobuzenk">
+	<software name="nobuzenk" supported="partial">
 		<description>Nobunaga no Yabou - Zenkokuban (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
+	    <notes><![CDATA[
+Unsupported [セーブくん] joypad slot peripheral
+]]></notes>
 		<info name="serial" value="KOCD3005"/>
 		<info name="release" value="19931211"/>
 		<info name="alt_title" value="信長の野望・全国版"/>
@@ -4915,10 +4924,13 @@ Crashes when "left option" is selected in main menu (with no save in [BRAM])
 		</part>
 	</software>
 
-	<software name="sangoku3">
+	<software name="sangoku3" supported="partial">
 		<description>Sangokushi III (Japan)</description>
 		<year>1993</year>
 		<publisher>Koei</publisher>
+	    <notes><![CDATA[
+Unsupported [セーブくん] joypad slot peripheral
+]]></notes>
 		<info name="serial" value="KOCD3003"/>
 		<info name="release" value="19931001"/>
 		<info name="alt_title" value="三國志III"/>
