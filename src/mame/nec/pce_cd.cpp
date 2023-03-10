@@ -7,18 +7,21 @@ PC Engine CD HW notes:
 TODO:
 - Rewrite SCSI to honor actual nscsi_device;
 - Remove legacy CD drive implementation and merge with PC-8801 and PC-FX
-  cfr. src/devices/bus/pc8801/pc8801_31.cpp
+  \- cfr. src/devices/bus/pc8801/pc8801_31.cpp
 - Split into slot options, particularly Arcade Card shouldn't really be tied together
   thru a Machine Configuration option;
 - verify CD read timing for edge cases marked in pcecd.xml with [SCSI];
 - ADPCM half events aren't honored (dbz, draculax), they causes hangs for no benefit if enabled.
-  In dbz, they will effectively send an half irq, game enables full irq mask and xfer done,
-  neither is sent back, more stuff requiring SCSI rewrite first?
+  \- In dbz, they will effectively send an half irq, game enables full irq mask and xfer done,
+     neither is sent back, more stuff requiring SCSI rewrite first?
 - Implement Game Express slot option;
-- BRAM is unsafe on prolonged use of pcecd.xml games, verify;
+- BRAM is unsafe on prolonged use of pcecd.xml games, verify
+  \- tend to corrupt itself when 8 saves are already in (madoum x4, draculax, gulliver, ...);
 - Unsafe on debugger access, recheck once conversion to SCSI bus is done;
-- Audio CD player pregap don't work properly (overflows into next track for a bit with standard 2 secs discs);
-- Audio CD player rewind/fast forward don't work properly (never go past 1 minute mark, underflows);
+- Audio CD player pregap don't work properly
+  \- overflows into next track for a bit with standard 2 secs discs;
+- Audio CD player rewind/fast forward don't work properly
+  \- never go past 1 minute mark, underflows;
 (old note, to move out there)
 - Steam Heart's: needs transfer ready irq to get past the
                  gameplay hang, don't know exactly when it should fire
@@ -254,7 +257,10 @@ void pce_cd_device::late_setup()
 
 void pce_cd_device::nvram_init(nvram_device &nvram, void *data, size_t size)
 {
-	static const uint8_t init[8] = { 0x48, 0x55, 0x42, 0x4d, 0x00, 0xa0, 0x10, 0x80 };
+	// 0xa0 looks a dev left-over ...
+//  static const uint8_t init[8] = { 0x48, 0x55, 0x42, 0x4d, 0x00, 0xa0, 0x10, 0x80 };
+	// ... 0x88 is the actual value that cdsys/scdsys init thru format.
+	static const uint8_t init[8] = { 'H', 'U', 'B', 'M', 0x00, 0x88, 0x10, 0x80 };
 
 	memset(data, 0x00, size);
 	memcpy(data, init, sizeof(init));
@@ -516,8 +522,12 @@ void pce_cd_device::nec_set_audio_start_position()
 						+ m_toc->tracks[ m_cd_file->get_track(m_current_frame) ].logframes;
 
 			LOGCDDA("Audio start (end of track) current %d end %d\n", m_current_frame, m_end_frame);
-			// fzone2 / fzone2j / draculax (stage 2' pre-boss) definitely don't want this
-			// to start redbook. It's done later with 0xd9 command.
+			// Several places definitely don't want this to start redbook,
+			// It's done later with 0xd9 command.
+			// - fzone2 / fzone2j
+			// - draculax (stage 2' pre-boss)
+			// - manhole (fires this during Sunsoft logo but expects playback on successive
+			//            credit sequence instead)
 			//if (m_end_frame > m_current_frame)
 			//  m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
 
