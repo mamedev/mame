@@ -468,9 +468,11 @@ private:
 	void clear3d();
 	bool hng64_command3d(const uint16_t* packet);
 
+	void mixsprites_test(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, uint16_t priority, int y);
+
 	void get_tile_details(bool chain, uint16_t spritenum, uint8_t xtile, uint8_t ytile, uint8_t xsize, uint8_t ysize, bool xflip, bool yflip, uint32_t& tileno, uint16_t& pal, uint8_t &gfxregion);
 	void draw_sprites_buffer(screen_device &screen, const rectangle &cliprect);
-	void draw_sprite_line(screen_device& screen, const rectangle& cliprect, int32_t curyy, int16_t cury, int16_t xpos, int chainx, int32_t dx, int32_t dy, int ytileblock, int chaini, int currentsprite, int chainy, int xflip, int yflip, uint16_t zval, bool zsort, bool blend, bool checkerboard, uint8_t mosaic);
+	void draw_sprite_line(screen_device& screen, const rectangle& cliprect, int32_t curyy, int16_t cury, int16_t xpos, int chainx, int32_t dx, int32_t dy, int ytileblock, int chaini, int currentsprite, int chainy, int xflip, int yflip, uint16_t zval, bool zsort, bool blend, uint16_t group, bool checkerboard, uint8_t mosaic);
 
 	void drawline(bitmap_ind16& dest, bitmap_ind16& destz, const rectangle& cliprect,
 		gfx_element* gfx, uint32_t code, uint32_t color, int flipy, int32_t xpos,
@@ -478,7 +480,7 @@ private:
 
 	void zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
 		gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t xpos, int32_t ypos,
-		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int line, uint16_t &srcpix);
+		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, uint16_t group, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int line, uint16_t &srcpix);
 
 	void setCameraTransformation(const uint16_t* packet);
 	void setLighting(const uint16_t* packet);

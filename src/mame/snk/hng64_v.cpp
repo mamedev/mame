@@ -746,6 +746,65 @@ g_profiler.stop();
 
 }
 
+void hng64_state::mixsprites_test(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, uint16_t priority, int y)
+{
+	// this correctly allows buriki intro sprites to use regular alpha, not additive
+	// while also being correct for sams64, which wants additive, but appears to be
+	// incorrect for Fatal Fury's hit effects which want additive
+	//
+	// the 6 regs around here have the same values in fatfur and buriki, so are unlikely
+	// to control the blend type.
+	//uint8_t spriteblendtype = (m_tcram[0x10 / 4] >> 16) & 0x10;
+
+	// would be an odd place for it, after the 'vblank' flag but...
+	uint8_t spriteblendtype = (m_tcram[0x4c / 4] >> 16) & 0x01;
+	pen_t const* const spriteclut = &m_palette->pen(0);
+
+	if (true)
+	{
+		const uint16_t* spritesrc = &m_sprite_bitmap.pix(y, cliprect.min_x);
+		uint32_t* spritedst = &bitmap.pix(y, cliprect.min_x);
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			uint16_t srcpix = *spritesrc;
+			if (srcpix & 0x0fff)
+			{
+				// if ((srcpix & 0x7000) == 0x7000) // buriki jumbotron (behind all tilemaps, behind 3d) (behind tilemap prio 1b)
+				// if ((srcpix & 0x7000) == 0x6000) // people behind arena walls (above lowest tilemap, behind others, behind 3d) (behind tilemap prio 16)
+
+				//if ((srcpix & 0x7000) == 0x5000) // not used on buriki?
+				//if ((srcpix & 0x7000) == 0x4000) // character portraits on buriki select screen (still behind 3d)
+
+				//if ((srcpix & 0x7000) == 0x3000) // character names and bio (above 3D graphics) 
+
+				//if ((srcpix & 0x7000) == 0x2000) // select cursor, second system graphic, timers etc. (above ring tilemap, above 3d)
+
+				//if ((srcpix & 0x7000) == 0x1000) // credit text etc.
+				//if ((srcpix & 0x7000) == 0x0000 // not used on buriki ?
+
+				if ((srcpix & 0x7000) == priority)
+				{
+					if (srcpix & 0x8000)
+					{
+						if (spriteblendtype)
+							*spritedst = alpha_blend_r32(*(uint32_t*)spritedst, spriteclut[srcpix & 0x0fff], 0x80);
+						else
+							*spritedst = add_blend_r32(*spritedst, spriteclut[srcpix & 0x0fff]);
+					}
+					else
+					{
+						*spritedst = spriteclut[srcpix & 0x0fff];
+					}
+				}
+			}
+
+			spritedst++;
+			spritesrc++;
+		}
+
+	}
+}
 
 uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -839,6 +898,9 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 				if (pri == i)
 					hng64_drawtilemap(screen, bitmap, cliprect, j, 0, y);
 			}
+
+			if ((i&3) == 0)
+				mixsprites_test(screen, bitmap, cliprect, (i/4)<<12, y);
 		}
 	}
 
@@ -920,56 +982,16 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 				if (pri == i)
 					hng64_drawtilemap(screen, bitmap, cliprect, j, 0, y);
 			}
+
+			if ((i&3) == 0)
+				mixsprites_test(screen, bitmap, cliprect, (i/4)<<12, y);
 		}
 	}
 
 	// Draw the sprites on top of everything
 	draw_sprites_buffer(screen, cliprect);
 
-	// copy sprites into display
 
-	if (true)
-	{
-		// this correctly allows buriki intro sprites to use regular alpha, not additive
-		// while also being correct for sams64, which wants additive, but appears to be
-		// incorrect for Fatal Fury's hit effects which want additive
-		//
-		// the 6 regs around here have the same values in fatfur and buriki, so are unlikely
-		// to control the blend type.
-		//uint8_t spriteblendtype = (m_tcram[0x10 / 4] >> 16) & 0x10;
-
-		// would be an odd place for it, after the 'vblank' flag but...
-		uint8_t spriteblendtype = (m_tcram[0x4c / 4] >> 16) & 0x01;
-
-		pen_t const* const clut = &m_palette->pen(0);
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-		{
-			const uint16_t* src = &m_sprite_bitmap.pix(y, cliprect.min_x);
-			uint32_t* dst = &bitmap.pix(y, cliprect.min_x);
-
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-			{
-				uint16_t srcpix = *src;
-				if (srcpix & 0x7fff)
-				{
-					if (srcpix & 0x8000)
-					{
-						if (spriteblendtype)
-							*dst = alpha_blend_r32(*(uint32_t*)dst, clut[srcpix & 0x7fff], 0x80);
-						else
-							*dst = add_blend_r32(*dst, clut[srcpix & 0x7fff]);
-					}
-					else
-					{
-						*dst = clut[srcpix & 0x7fff];
-					}
-				}
-
-				dst++;
-				src++;
-			}
-		}
-	}
 
 
 #if HNG64_VIDEO_DEBUG
