@@ -16,64 +16,13 @@ TODO:
   neither is sent back, more stuff requiring SCSI rewrite first?
 - Implement Game Express slot option;
 - BRAM is unsafe on prolonged use of pcecd.xml games, verify;
-- Unsafe on debugger access;
+- Unsafe on debugger access, recheck once conversion to SCSI bus is done;
+- Audio CD player pregap don't work properly (overflows into next track for a bit with standard 2 secs discs);
+- Audio CD player rewind/fast forward don't work properly (never go past 1 minute mark, underflows);
 (old note, to move out there)
-- Snatcher: black screen after Konami logo, tries set up CD-DA
-            while transferring data? (fixed)
 - Steam Heart's: needs transfer ready irq to get past the
                  gameplay hang, don't know exactly when it should fire
 - Steam Heart's: bad ADPCM irq, dialogue is cutted due of it;
-
-===================================================================================================
-
-CD Interface Register 0x00 - CDC status
-x--- ---- busy signal
--x-- ---- request signal
----x ---- cd signal
----- x--- i/o signal
-
-CD Interface Register 0x03 - BRAM lock / CD status
--x-- ---- acknowledge signal
---x- ---- done signal
----x ---- bram signal
----- x--- ADPCM 2
----- -x-- ADPCM 1
----- --x- CDDA left/right speaker select
-
-CD Interface Register 0x05 - CD-DA Volume low 8-bit port
-
-CD Interface Register 0x06 - CD-DA Volume high 8-bit port
-
-CD Interface Register 0x07 - BRAM unlock / CD status
-x--- ---- Enables BRAM
-
-CD Interface Register 0x0c - ADPCM status
-x--- ---- ADPCM is reading data
----- x--- ADPCM playback (0) stopped (1) currently playing
----- -x-- pending ADPCM data write
----- ---x ADPCM playback (1) stopped (0) currently playing
-
-CD Interface Register 0x0d - ADPCM address control
-x--- ---- ADPCM reset
--x-- ---- ADPCM play
---x- ---- ADPCM repeat
----x ---- ADPCM set length
----- x--- ADPCM set read address
----- --xx ADPCM set write address
-(note: some games reads bit 5 and wants it to be low otherwise they hangs, surely NOT an ADPCM repeat flag read because it doesn't make sense)
-
-CD Interface Register 0x0e - ADPCM playback rate
-
-CD Interface Register 0x0f - ADPCM fade in/out register
----- xxxx command setting:
-0x00 ADPCM/CD-DA Fade-in
-0x01 CD-DA fade-in
-0x08 CD-DA fade-out (short) ADPCM fade-in
-0x09 CD-DA fade-out (long)
-0x0a ADPCM fade-out (long)
-0x0c CD-DA fade-out (short) ADPCM fade-in
-0x0d CD-DA fade-out (short)
-0x0e ADPCM fade-out (short)
 
 **************************************************************************************************/
 
@@ -549,11 +498,13 @@ void pce_cd_device::nec_set_audio_start_position()
 		LOGCMD("Play mode = %d\n", play_mode);
 		if (play_mode)
 		{
-			//m_cdda_status = PCE_CD_CDDA_PLAYING;
-			//get the end of the CD
+			// Required by audio CD player
+			// (will keep skipping tracks over and over, never sends an audio end command)
+			m_cdda_status = PCE_CD_CDDA_PLAYING;
 			m_end_frame = m_last_frame;
+
 			LOGCDDA("Audio start (end of CD) current %d end %d\n", m_current_frame, m_end_frame);
-			// TODO: verify this, cfr. below
+
 			m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
 			m_cdda_play_mode = (play_mode & 0x02) ? 2 : 3; // mode 2 sets IRQ at end
 			m_end_mark = (play_mode & 0x02) ? 1 : 0;
@@ -561,9 +512,9 @@ void pce_cd_device::nec_set_audio_start_position()
 		else
 		{
 			//m_cdda_status = PCE_CD_CDDA_PLAYING;
-			//get the end of this track
 			m_end_frame = m_toc->tracks[ m_cd_file->get_track(m_current_frame) ].logframeofs
 						+ m_toc->tracks[ m_cd_file->get_track(m_current_frame) ].logframes;
+
 			LOGCDDA("Audio start (end of track) current %d end %d\n", m_current_frame, m_end_frame);
 			// fzone2 / fzone2j / draculax (stage 2' pre-boss) definitely don't want this
 			// to start redbook. It's done later with 0xd9 command.
@@ -572,6 +523,10 @@ void pce_cd_device::nec_set_audio_start_position()
 
 			m_cdda_play_mode = 3;
 			m_end_mark = 0;
+
+			// snatcher requires that the irq is sent here
+			// otherwise it will hang on title screen
+			set_irq_line(PCE_CD_IRQ_TRANSFER_DONE, ASSERT_LINE);
 		}
 	}
 
@@ -739,7 +694,7 @@ void pce_cd_device::nec_get_subq()
 	m_data_buffer[9] = dec_2_bcd(msf_abs & 0xFF);
 	if(LIVE_SUBQ_VIEW)
 	{
-		const std::vector<std::string> status_types = {"standby", "pause", "play"};
+		const std::vector<std::string> status_types = {"standby", "play", "pause"};
 		popmessage("SUBQ - status %s type %02x|track %d index %d| MSF rel %06x MSF abs %06x\n"
 			, status_types[m_cdda_status]
 			, m_data_buffer[1]
