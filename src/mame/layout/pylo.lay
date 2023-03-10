@@ -398,7 +398,7 @@ license:CC0-1.0
 		<element ref="switch_game" inputtag="IN.0" inputmask="0x0e" inputraw="yes"><bounds xc="28" y="46.5" width="14.21" height="4.9" /></element>
 
 		<element ref="black"><bounds x="38" y="49" width="24" height="8" /></element>
-		<group ref="digits"><bounds x="40" y="50.25" width="20" height="5.5" /><orientation rotate="180" /></group>
+		<group ref="digits"><bounds x="40" yc="53" width="20" height="5.75" /><orientation rotate="180" /></group>
 
 	</view>
 </mamelayout>

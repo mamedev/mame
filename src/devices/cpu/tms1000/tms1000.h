@@ -25,13 +25,15 @@
      K1  5 |           | 24 R3
      K2  6 |           | 23 R2
      K4  7 |  TMS1000  | 22 R1
-     K8  8 |  TMS1070  | 21 R0
+     K8  8 |           | 21 R0
    INIT  9 |           | 20 Vss
      O7 10 |           | 19 OSC2
      O6 11 |           | 18 OSC1
      O5 12 |           | 17 O0
      O4 13 |           | 16 O1
      O3 14 |___________| 15 O2
+
+  note: TMS1070 is same as TMS1000, except pins 20 and 21 are swapped.
 
             ____   ____                      ____   ____
      R8  1 |*   \_/    | 48 R7        R8  1 |*   \_/    | 48 NC

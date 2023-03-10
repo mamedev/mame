@@ -2559,7 +2559,7 @@ WRITE_LINE_MEMBER(lilcomp_state::write_sk)
 	if (state == m_sk)
 		return;
 
-	// SK: trigger power off after a short delay
+	// SK: trigger power off after a short delay (since it also toggles at boot)
 	m_power_timer->adjust(state ? attotime::from_msec(100) : attotime::never);
 	m_sk = state;
 }
