@@ -793,7 +793,7 @@ void nscsi_cdrom_apple_device::scsi_command()
 				cdrom_track = 0xaa;
 			}
 
-			scsi_cmdbuf[pos++] = 0;
+			scsi_cmdbuf[pos++] = track;
 			scsi_cmdbuf[pos++] = cdrom->get_adr_control(cdrom_track);
 
 			u32 tstart = cdrom->get_track_start(cdrom_track);
