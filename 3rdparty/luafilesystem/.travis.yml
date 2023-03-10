@@ -1,31 +1,32 @@
 language: c
 
-env:
-  global:
-    - LUAROCKS=2.2.0-rc1
-  matrix:
-    - LUA=lua5.1
-    - LUA=lua5.2
-    - LUA=lua5.3
-    - LUA=luajit
+sudo: false
 
-branches:
-  only:
-    - master
+env:
+  - LUA="lua 5.1"
+  - LUA="lua 5.2"
+  - LUA="lua 5.3"
+  - LUA="luajit 2.1"
 
 before_install:
-  - bash .travis/setup_lua.sh
-  - sudo pip install cpp-coveralls
+  - pip install --user cpp-coveralls hererocks
+  - hererocks env --$LUA --luarocks latest
+  - export PATH="$PWD/env/bin:$PATH"
+  - luarocks install lua-path 
+  - luarocks install dkjson
+  - luarocks install luacov
+  # install luacov-coveralls, but avoid installing luafilesystem
+  - luarocks install luacov-coveralls --server=https://luarocks.org/dev --deps-mode=none
 
 install:
-  - sudo luarocks make rockspecs/luafilesystem-cvs-3.rockspec CFLAGS="-O2 -fPIC -ftest-coverage -fprofile-arcs" LIBFLAG="-shared --coverage"
+  - luarocks make CFLAGS="-O2 -fPIC -ftest-coverage -fprofile-arcs" LIBFLAG="-shared --coverage"
 
-script: 
-  - cd tests
-  - sudo lua test.lua
+script:
+  - lua -lluacov tests/test.lua
 
 after_success:
-  - coveralls -b .. -r .. -E usr
+  - coveralls -b . -i src --dump c.report.json
+  - luacov-coveralls -j c.report.json -v
 
 notifications:
   email:

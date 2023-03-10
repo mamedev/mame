@@ -57,6 +57,7 @@ ToDo: verify QS1000 hook-up
 */
 
 #include "emu.h"
+
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/gen_latch.h"
@@ -64,6 +65,7 @@ ToDo: verify QS1000 hook-up
 //#include "machine/smartmed.h"
 #include "machine/i2cmem.h"
 #include "sound/qs1000.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -104,16 +106,16 @@ public:
 	{
 	}
 
-	void ghosteo(machine_config &config);
-	void touryuu(machine_config &config);
-	void bballoon(machine_config &config);
+	void ghosteo(machine_config &config) ATTR_COLD;
+	void touryuu(machine_config &config) ATTR_COLD;
+	void bballoon(machine_config &config) ATTR_COLD;
 
-	void init_touryuu();
-	void init_bballoon();
+	void init_touryuu() ATTR_COLD;
+	void init_bballoon() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -146,8 +148,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(s3c2410_i2c_scl_w );
 	DECLARE_READ_LINE_MEMBER(s3c2410_i2c_sda_r );
 	DECLARE_WRITE_LINE_MEMBER(s3c2410_i2c_sda_w );
-	void bballoon_map(address_map &map);
-	void touryuu_map(address_map &map);
+	void bballoon_map(address_map &map) ATTR_COLD;
+	void touryuu_map(address_map &map) ATTR_COLD;
 };
 
 

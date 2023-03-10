@@ -276,7 +276,7 @@ void dominator_state::galaxy(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &dominator_state::galaxy_map);
 
-	PWM_DISPLAY(config.replace(), m_display).set_size(8, 8);
+	m_display->set_size(8, 8);
 	config.set_default_layout(layout_cxg_galaxy);
 }
 

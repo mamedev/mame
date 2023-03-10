@@ -60,11 +60,12 @@
 
   TODO:
   - it runs too fast due to missing clock divider emulation in TMS70C46
-  - external ram cartridge
+  - external ram cartridge (HM6264LFP-15 + coin battery)
   - DOCK-BUS interface and peripherals, compatible with both TI-74 and TI-95
     * CI-7 cassette interface
     * PC-324 thermal printer
     (+ old Hexbus devices can be connected via a converter cable)
+  - verify ti74(d12) rom label
 
 ***************************************************************************/
 
@@ -597,7 +598,15 @@ ROM_START( ti74 )
 	ROM_LOAD( "c70009.ic2", 0x0000, 0x1000, CRC(55a2f7c0) SHA1(530e3de42f2e304c8f4805ad389f38a459ec4e33) ) // internal cpu rom
 
 	ROM_REGION( 0x8000, "system", 0 )
-	ROM_LOAD( "hn61256pc93.ic1", 0x0000, 0x8000, CRC(019aaa2f) SHA1(04a1e694a49d50602e45a7834846de4d9f7d587d) ) // system rom, banked
+	ROM_LOAD( "1060281-101_hn61256pd12.ic1", 0x0000, 0x8000, CRC(019aaa2f) SHA1(04a1e694a49d50602e45a7834846de4d9f7d587d) ) // system rom, banked
+ROM_END
+
+ROM_START( ti74a )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "c70009.ic2", 0x0000, 0x1000, CRC(55a2f7c0) SHA1(530e3de42f2e304c8f4805ad389f38a459ec4e33) ) // internal cpu rom
+
+	ROM_REGION( 0x8000, "system", 0 )
+	ROM_LOAD( "001060281-1_hn61256pc93.ic1", 0x0000, 0x8000, CRC(499b69d1) SHA1(ba333959bd047ac18f461066816c4d56fe73de85) ) // system rom, banked
 ROM_END
 
 
@@ -606,12 +615,13 @@ ROM_START( ti95 )
 	ROM_LOAD( "c70011.ic2", 0x0000, 0x1000, CRC(b4d0a5c1) SHA1(3ff41946d014f72220a88803023b6a06d5086ce4) ) // internal cpu rom
 
 	ROM_REGION( 0x8000, "system", 0 )
-	ROM_LOAD( "hn61256pc95.ic1", 0x0000, 0x8000, CRC(c46d29ae) SHA1(c653f08590dbc28241a9f5a6c2541641bdb0208b) ) // system rom, banked
+	ROM_LOAD( "01060281-11_hn61256pc95.ic1", 0x0000, 0x8000, CRC(c46d29ae) SHA1(c653f08590dbc28241a9f5a6c2541641bdb0208b) ) // system rom, banked
 ROM_END
 
 } // anonymous namespace
 
 
-//    YEAR  NAME  PARENT CMP MACHINE  INPUT  CLASS       INIT        COMPANY              FULLNAME          FLAGS
-COMP( 1985, ti74, 0,      0, ti74,    ti74,  ti74_state, empty_init, "Texas Instruments", "TI-74 Basicalc", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1986, ti95, 0,      0, ti95,    ti95,  ti74_state, empty_init, "Texas Instruments", "TI-95 Procalc",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
+COMP( 1985, ti74,  0,      0,      ti74,    ti74,  ti74_state, empty_init, "Texas Instruments", "TI-74 Basicalc (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1985, ti74a, ti74,   0,      ti74,    ti74,  ti74_state, empty_init, "Texas Instruments", "TI-74 Basicalc (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1986, ti95,  0,      0,      ti95,    ti95,  ti74_state, empty_init, "Texas Instruments", "TI-95 Procalc", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

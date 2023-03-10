@@ -58,6 +58,9 @@ void st_mmu_device::device_start()
 	save_item(NAME(m_fdc_drq));
 	save_item(NAME(m_hdc_drq));
 	save_item(NAME(m_dma_no_error));
+
+	// Electra demo shows reset does not reconfigure ram
+	m_memcfg = 0;
 }
 
 void st_mmu_device::device_reset()
@@ -68,7 +71,6 @@ void st_mmu_device::device_reset()
 	m_sector_count = 0;
 	m_block_count = 0;
 	m_fifo_index = 0;
-	m_memcfg = 0;
 	m_fdc_drq = false;
 	m_hdc_drq = false;
 	m_dma_no_error = true;

@@ -73,14 +73,12 @@ protected:
 	void add_drive_mconfig(machine_config &config, bool double_sided);
 	void set_drive_access_led_state(int drive, int led_state);
 
-	optional_device<floppy_connector> m_floppy0;
-	optional_device<floppy_connector> m_floppy1;
-	optional_device<floppy_connector> m_floppy2;
-	optional_device<floppy_connector> m_floppy3;
-	floppy_image_device *m_floppy;
+	optional_device_array<floppy_connector, 4> m_floppy;
+	floppy_image_device *m_current_floppy;
 
 private:
-	output_finder<4> m_access_int_drv_out;
+	output_finder<4> m_internal_drive_led;
+	output_finder<4> m_internal_drive_name;
 	int m_nr_drives;
 };
 

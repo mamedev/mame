@@ -43,6 +43,8 @@ public:
 	auto in_tren2_cb() { return m_read_tren[2].bind(); }
 	auto out_tren2_cb() { return m_write_tren[2].bind(); }
 
+	void rstbut_w(int state) { m_rstbut = state; }
+
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
@@ -120,6 +122,7 @@ private:
 	devcb_read8::array<3> m_read_tren;
 	devcb_write8::array<3> m_write_tren;
 
+	bool m_rstbut = 0;
 	bool m_boote = 0;
 	bool m_magic = 0;
 	int m_task = 0;

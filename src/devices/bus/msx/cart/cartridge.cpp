@@ -32,6 +32,7 @@
 #include "superloderunner.h"
 #include "super_swangi.h"
 #include "yamaha.h"
+#include "yamaha_ucn01.h"
 
 #include "bus/msx/slot/cartridge.h"
 
@@ -80,6 +81,7 @@ void msx_cart(device_slot_interface &device, bool is_in_subslot)
 	device.option_add("beepack", MSX_CART_BEEPACK);
 	device.option_add("bm_012", MSX_CART_BM_012);
 	device.option_add("moonsound", MSX_CART_MOONSOUND);
+	device.option_add("ucn01", MSX_CART_UCN01);
 	if (!is_in_subslot)
 	{
 		device.option_add("slotexp", MSX_CART_SLOTEXPANDER);
@@ -95,4 +97,9 @@ void msx_yamaha_60pin(device_slot_interface &device, bool is_in_subslot)
 {
 	device.option_add("sfg01", MSX_CART_SFG01);
 	device.option_add("sfg05", MSX_CART_SFG05);
+}
+
+void msx_yamaha_minicart(device_slot_interface &device, bool is_in_subslot)
+{
+	device.option_add_internal("nomapper", MSX_CART_NOMAPPER);
 }

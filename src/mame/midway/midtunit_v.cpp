@@ -1015,7 +1015,6 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 
 	if (m_log_json)
 	{
-		char hex_buf[11];
 		rapidjson::StringBuffer s;
 		rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(s);
 		emu_file json(m_log_path, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -1031,13 +1030,13 @@ void midtunit_video_device::log_bitmap(int command, int bpp, bool Skip)
 		writer.Key("DMAState");
 		writer.StartObject();
 
-		sprintf(hex_buf, "0x%08x", raw_offset);
+		auto hex_buf = util::string_format("0x%08x", raw_offset);
 		writer.Key("MemoryAddress");
-		writer.String(hex_buf);
+		writer.String(hex_buf.c_str());
 
-		sprintf(hex_buf, "0x%08x", m_dma_state.offset >> 3);
+		hex_buf = util::string_format("0x%08x", m_dma_state.offset >> 3);
 		writer.Key("ROMSourceOffsetByte");
-		writer.String(hex_buf);
+		writer.String(hex_buf.c_str());
 
 		writer.Key("ROMSourceOffsetBit");
 		writer.Int(m_dma_state.offset & 7);

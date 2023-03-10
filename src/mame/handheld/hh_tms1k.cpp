@@ -121,8 +121,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
  @MP2110   TMS1370   1980, Gakken Invader/Tandy Fire Away
  @MP2139   TMS1370   1981, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
  @MP2726   TMS1040   1979, Tomy Break Up
- *MP2787   TMS1040?  1980, Bandai Race Time (? note: VFD-capable)
- *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
+ *MP2787   TMS1070   1980, Bandai Race Time
+ *MP2788   TMS1070   1980, Bandai Flight Time
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
  @MP3200   TMS1000   1978, Parker Brothers Electronic Master Mind
  @MP3201   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A)

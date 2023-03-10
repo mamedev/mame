@@ -149,7 +149,6 @@ static const gfx_layout tiles16x16x4_layout =
 	16 * 16 * 4
 };
 
-/*
 static const gfx_layout tiles8x8x4_layout =
 {
     8,8,
@@ -160,12 +159,12 @@ static const gfx_layout tiles8x8x4_layout =
     { STEP8(0,32) },
     16 * 16
 };
-*/
 
 static GFXDECODE_START( gfx_bloodbro_ms )
 	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x100, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x4_layout, 0x000, 32 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4_layout, 0x000, 32 )
+	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8x4_layout, 0x000, 32 )
 GFXDECODE_END
 
 
@@ -243,20 +242,20 @@ ROM_START( bloodbrom )
 	// dumper's note: ROMs [bb4b1, bb4b2, bb4b3, bb4b4] and [bb4a1, bb4a2, bb4a3, bb4a4] have a strange setup
 	// with pins 32, 31 and 30 soldered together and pin 2 connected between all four chips,
 	// while the sockets are for 28 pin chips (with 27C512 silkscreened on the PCB behind the chips)
-	ROM_REGION( 0x80000, "gfx1", 0 ) // on one of the MOD 4/3 boards
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT ) // on one of the MOD 4/3 boards
 	ROM_LOAD32_BYTE( "4-3-a_bb4a1.ic17",  0x00003, 0x20000, CRC(499c91db) SHA1(bd7142a311a4f3e606f8a31aafc0b504f3d5a2e4) )
 	ROM_LOAD32_BYTE( "4-3-a_bb4a2.ic16",  0x00002, 0x20000, CRC(e8f87153) SHA1(f4147c971d1c66e7c6133c6318357ced7e30e217) )
 	ROM_LOAD32_BYTE( "4-3-a_bb4a3.ic15",  0x00001, 0x20000, CRC(13b888f2) SHA1(7a53f78f22a09fe4db45c36bf3912ad379deca64) )
 	ROM_LOAD32_BYTE( "4-3-a_bb4a4.ic14",  0x00000, 0x20000, CRC(19bc0508) SHA1(01c4eb570dc7ba9401085012d23bdb865df78029) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 ) // on another MOD 4/3 board
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_INVERT ) // on another MOD 4/3 board
 	ROM_LOAD32_BYTE( "4-3-b_bb4b1.ic17",  0x00003, 0x20000, CRC(aa86ae59) SHA1(c15a78eaaca36bebd3261cb2c4a2c232b967a135) )
 	ROM_LOAD32_BYTE( "4-3-b_bb4b2.ic16",  0x00002, 0x20000, CRC(f25dd182) SHA1(eff29970c7b898744b08a151f9e17b68ce77e78d) )
 	ROM_LOAD32_BYTE( "4-3-b_bb4b3.ic15",  0x00001, 0x20000, CRC(3efcb6aa) SHA1(0a162285d08e171e946147e0725db879643ae113) )
 	ROM_LOAD32_BYTE( "4-3-b_bb4b4.ic14",  0x00000, 0x20000, CRC(6b5254fa) SHA1(1e9e3096e5f29554fb8f8cb0df0e5157f940f8c9) )
 
-	// ROMs for frontmost tile layer (text) //TODO: Fix ROM loading
-	ROM_REGION( 0x80000, "gfx3", 0 ) // on another MOD 4/3 board
+	// ROMs for frontmost tile layer (text)
+	ROM_REGION( 0x20000, "gfx3", ROMREGION_INVERT ) // on another MOD 4/3 board
 	ROM_LOAD32_BYTE( "4-3_bb401.ic17",    0x00003, 0x08000, CRC(07e12bd2) SHA1(33977f97f0c1a45055f6f8cb06294b2eb3c27acc) ) // 27256
 	ROM_LOAD32_BYTE( "4-3_bb402.ic16",    0x00002, 0x08000, CRC(eca374ea) SHA1(4da5b876ccc9a7ac64f129ef18da521a56a022e0) ) // 27256
 	ROM_LOAD32_BYTE( "4-3_bb403.ic15",    0x00001, 0x08000, CRC(d77b84d3) SHA1(baa7d3175e42c3872682ca3080e8d07ce3f5e43b) ) // 27256

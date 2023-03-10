@@ -48,7 +48,8 @@ abc_keyboard_port_device::abc_keyboard_port_device(const machine_config &mconfig
 	device_single_card_slot_interface<abc_keyboard_interface>(mconfig, *this),
 	m_out_rx_handler(*this),
 	m_out_trxc_handler(*this),
-	m_out_keydown_handler(*this), m_card(nullptr)
+	m_out_keydown_handler(*this),
+	m_card(nullptr)
 {
 }
 
@@ -65,6 +66,20 @@ void abc_keyboard_port_device::device_start()
 	m_out_rx_handler.resolve_safe();
 	m_out_trxc_handler.resolve_safe();
 	m_out_keydown_handler.resolve_safe();
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void abc_keyboard_port_device::device_reset()
+{
+	if (m_card)
+	{
+		m_card->reset_w(ASSERT_LINE);
+		m_card->reset_w(CLEAR_LINE);
+	}
 }
 
 

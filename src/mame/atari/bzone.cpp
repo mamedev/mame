@@ -213,6 +213,7 @@
 #include "machine/watchdog.h"
 #include "video/avgdvg.h"
 #include "video/vector.h"
+#include "sound/ay8910.h" // for Desert Wars
 #include "sound/pokey.h"
 
 #include "speaker.h"
@@ -363,6 +364,28 @@ void bzone_state::bradley_map(address_map &map)
 	map(0x1848, 0x1850).w(FUNC(bzone_state::analog_select_w));
 }
 
+//TODO: AY8910 hook-up isn't correct. Are there discrete sounds, too?
+void bzone_state::dsrtwars_map(address_map &map)
+{
+	map(0x0000, 0x03ff).ram();
+	map(0x0800, 0x0800).portr("IN0");
+	map(0x0a00, 0x0a00).portr("DSW0");
+	map(0x0c00, 0x0c00).portr("DSW1");
+	map(0x1000, 0x1000).w(FUNC(bzone_state::bzone_coin_counter_w));
+	map(0x1200, 0x1200).w("avg", FUNC(avg_device::go_w));
+	map(0x1400, 0x1400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x1600, 0x1600).w("avg", FUNC(avg_device::reset_w));
+	map(0x1800, 0x1800).r(m_mathbox, FUNC(mathbox_device::status_r));
+	map(0x1810, 0x1810).r(m_mathbox, FUNC(mathbox_device::lo_r));
+	map(0x1818, 0x1818).r(m_mathbox, FUNC(mathbox_device::hi_r));
+	map(0x1820, 0x1821).w("aysnd", FUNC(ay8910_device::data_address_w)); // TODO: this is more complicated
+	map(0x1828, 0x1828).portr("IN3");
+	map(0x1860, 0x187f).w(m_mathbox, FUNC(mathbox_device::go_w));
+	map(0x2000, 0x2fff).ram();
+	map(0x3000, 0x7fff).rom();
+	map(0xf800, 0xffff).rom().region("maincpu", 0x8000);
+}
+
 void redbaron_state::redbaron_map(address_map &map)
 {
 	map.global_mask(0x7fff);
@@ -370,7 +393,7 @@ void redbaron_state::redbaron_map(address_map &map)
 	map(0x0800, 0x0800).portr("IN0");
 	map(0x0a00, 0x0a00).portr("DSW0");
 	map(0x0c00, 0x0c00).portr("DSW1");
-	map(0x1000, 0x1000).nopw();        /* coin out - Manual states this is "Coin Counter" */
+	map(0x1000, 0x1000).nopw();        // coin out - Manual states this is "Coin Counter"
 	map(0x1200, 0x1200).w("avg", FUNC(avg_device::go_w));
 	map(0x1400, 0x1400).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x1600, 0x1600).w("avg", FUNC(avg_device::reset_w));
@@ -378,8 +401,8 @@ void redbaron_state::redbaron_map(address_map &map)
 	map(0x1802, 0x1802).portr("IN4");
 	map(0x1804, 0x1804).r("mathbox", FUNC(mathbox_device::lo_r));
 	map(0x1806, 0x1806).r("mathbox", FUNC(mathbox_device::hi_r));
-	map(0x1808, 0x1808).w(FUNC(redbaron_state::redbaron_joysound_w));  /* and select joystick pot also */
-	map(0x180a, 0x180a).nopw();                /* sound reset, yet todo */
+	map(0x1808, 0x1808).w(FUNC(redbaron_state::redbaron_joysound_w));  // and select joystick pot also
+	map(0x180a, 0x180a).nopw();                // sound reset, yet to do
 	map(0x180c, 0x180c).nopr().w(FUNC(redbaron_state::earom_control_w));
 	map(0x1810, 0x181f).rw("pokey", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x1820, 0x185f).rw(FUNC(redbaron_state::earom_read), FUNC(redbaron_state::earom_write));
@@ -482,7 +505,7 @@ static INPUT_PORTS_START( redbaron )
 	BZONEIN0
 
 	PORT_START("DSW0")
-	/* See the table above if you are really interested */
+	// See the table above if you are really interested
 	PORT_DIPNAME( 0xff, 0xfd, DEF_STR( Coinage ) ) PORT_DIPLOCATION("M10:1,2,3,4,5,6,7,8")
 	PORT_DIPSETTING(    0xfd, DEF_STR( Normal ) )
 
@@ -509,26 +532,26 @@ static INPUT_PORTS_START( redbaron )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	/* IN3 - the real machine reads either the X or Y axis from this port */
-	/* Instead, we use the two fake 5 & 6 ports and bank-switch the proper */
-	/* value based on the lsb of the byte written to the sound port */
+	/* IN3 - the real machine reads either the X or Y axis from this port.
+	   Instead, we use the two fake 5 & 6 ports and bank-switch the proper
+	   value based on the lsb of the byte written to the sound port */
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
 
-	PORT_START("IN4")   /* Misc controls */
+	PORT_START("IN4")   // Misc controls
 	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 
-	/* These 2 are fake - they are bank-switched from reads to IN3 */
-	/* Red Baron doesn't seem to use the full 0-255 range. */
-	PORT_START("FAKE1") /* IN5 */
+	// These 2 are fake - they are bank-switched from reads to IN3
+	// Red Baron doesn't seem to use the full 0-255 range.
+	PORT_START("FAKE1") // IN5
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(64,192) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
-	PORT_START("FAKE2") /* IN6 */
+	PORT_START("FAKE2") // IN6
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(64,192) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
@@ -560,13 +583,13 @@ static INPUT_PORTS_START( bradley )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Magnification Toggle") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("AN0")   /* analog 0 = turret rotation */
+	PORT_START("AN0")   // analog 0 = turret rotation
 	PORT_BIT( 0xff, 0x88, IPT_AD_STICK_X ) PORT_MINMAX(0x48,0xc8) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
-	PORT_START("AN1")   /* analog 1 = turret elevation */
+	PORT_START("AN1")   // analog 1 = turret elevation
 	PORT_BIT( 0xff, 0x86, IPT_AD_STICK_Y ) PORT_MINMAX(0x46,0xc6) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
-	PORT_START("AN2")   /* analog 2 = shell firing range hack removed, now uses Z */
+	PORT_START("AN2")   // analog 2 = shell firing range hack removed, now uses Z
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE
 
 	BZONEADJ
@@ -581,14 +604,14 @@ INPUT_PORTS_END
 
 void bzone_state::bzone_base(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, BZONE_MASTER_CLOCK / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bzone_state::bzone_map);
 	m_maincpu->set_periodic_int(FUNC(bzone_state::bzone_interrupt), attotime::from_hz(BZONE_CLOCK_3KHZ / 12));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	VECTOR(config, "vector");
 	SCREEN(config, m_screen, SCREEN_TYPE_VECTOR);
 	m_screen->set_refresh_hz(BZONE_CLOCK_3KHZ / 12 / 6);
@@ -600,7 +623,7 @@ void bzone_state::bzone_base(machine_config &config)
 	avg.set_vector("vector");
 	avg.set_memory(m_maincpu, AS_PROGRAM, 0x2000);
 
-	/* Drivers */
+	// Drivers
 	MATHBOX(config, m_mathbox, 0);
 }
 
@@ -608,7 +631,7 @@ void bzone_state::bzone(machine_config &config)
 {
 	bzone_base(config);
 
-	/* sound hardware */
+	// sound hardware
 	bzone_audio(config);
 }
 
@@ -618,20 +641,33 @@ void bzone_state::bradley(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bzone_state::bradley_map);
 }
 
+void bzone_state::dsrtwars(machine_config &config)
+{
+	bzone_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bzone_state::dsrtwars_map);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1'000'000)); // unknown clock
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.85);
+	aysnd.port_a_read_callback().set_ioport("IN3");
+}
+
 void redbaron_state::redbaron(machine_config &config)
 {
 	bzone_base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &redbaron_state::redbaron_map);
 
 	ER2055(config, m_earom);
 
-	/* video hardware */
+	// video hardware
 	m_screen->set_refresh_hz(BZONE_CLOCK_3KHZ / 12 / 4);
 	m_screen->set_visarea(0, 520, 0, 400);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	pokey_device &pokey(POKEY(config, "pokey", 1500000));
@@ -671,7 +707,7 @@ Rom Component Equivalents & Locations:
 
 */
 
-ROM_START( bzone ) /* Analog Vec Gen A035742-02 */
+ROM_START( bzone ) // Analog Vec Gen A035742-02
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "036414-02.e1",  0x5000, 0x0800, CRC(13de36d5) SHA1(40e356ddc5c042bc1ce0b71f51e8b6de72daf1e4) )
 	ROM_LOAD( "036413-01.h1",  0x5800, 0x0800, CRC(5d9d9111) SHA1(42638cff53a9791a0f18d316f62a0ea8eea4e194) )
@@ -679,15 +715,15 @@ ROM_START( bzone ) /* Analog Vec Gen A035742-02 */
 	ROM_LOAD( "036411-01.k1",  0x6800, 0x0800, CRC(ad281297) SHA1(54c5e06b2e69eb731a6c9b1704e4340f493e7ea5) )
 	ROM_LOAD( "036410-01.lm1", 0x7000, 0x0800, CRC(0b7bfaa4) SHA1(33ae0f68b4e2eae9f3aecbee2d0b29003ce460b2) )
 	ROM_LOAD( "036409-01.n1",  0x7800, 0x0800, CRC(1e14e919) SHA1(448fab30535e6fad7e0ab4427bc06bbbe075e797) )
-	/* Vector Generator ROMs */
+	// Vector Generator ROMs
 	ROM_LOAD( "036422-01.bc3", 0x3000, 0x0800, CRC(7414177b) SHA1(147d97a3b475e738ce00b1a7909bbd787ad06eda) )
 	ROM_LOAD( "036421-01.a3",  0x3800, 0x0800, CRC(8ea8f939) SHA1(b71e0ab0e220c3e64dc2b094c701fb1a960b64e4) )  // 036421-01e.a3 same contents
 
-	/* AVG PROM */
+	// AVG PROM
 	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "036408-01.k7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
-	/* Mathbox PROMs */
+	// Mathbox PROMs
 	ROM_REGION( 0x20, "user2", 0 )
 	ROM_LOAD( "036174-01.b1",   0x0000, 0x0020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) )
 
@@ -701,7 +737,7 @@ ROM_START( bzone ) /* Analog Vec Gen A035742-02 */
 ROM_END
 
 
-ROM_START( bzonea ) /* Analog Vec Gen A035742-02 */
+ROM_START( bzonea ) // Analog Vec Gen A035742-02
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "036414-01.e1",  0x5000, 0x0800, CRC(efbc3fa0) SHA1(6d284fab34b09dde8aa0df7088711d4723f07970) )
 	ROM_LOAD( "036413-01.h1",  0x5800, 0x0800, CRC(5d9d9111) SHA1(42638cff53a9791a0f18d316f62a0ea8eea4e194) )
@@ -709,15 +745,15 @@ ROM_START( bzonea ) /* Analog Vec Gen A035742-02 */
 	ROM_LOAD( "036411-01.k1",  0x6800, 0x0800, CRC(ad281297) SHA1(54c5e06b2e69eb731a6c9b1704e4340f493e7ea5) )
 	ROM_LOAD( "036410-01.lm1", 0x7000, 0x0800, CRC(0b7bfaa4) SHA1(33ae0f68b4e2eae9f3aecbee2d0b29003ce460b2) )
 	ROM_LOAD( "036409-01.n1",  0x7800, 0x0800, CRC(1e14e919) SHA1(448fab30535e6fad7e0ab4427bc06bbbe075e797) )
-	/* Vector Generator ROMs */
+	// Vector Generator ROMs
 	ROM_LOAD( "036422-01.bc3", 0x3000, 0x0800, CRC(7414177b) SHA1(147d97a3b475e738ce00b1a7909bbd787ad06eda) )
 	ROM_LOAD( "036421-01.a3",  0x3800, 0x0800, CRC(8ea8f939) SHA1(b71e0ab0e220c3e64dc2b094c701fb1a960b64e4) )  // 036421-01e.a3 same contents
 
-	/* AVG PROM */
+	// AVG PROM
 	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "036408-01.k7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
-	/* Mathbox PROMs */
+	// Mathbox PROMs
 	ROM_REGION( 0x20, "user2", 0 )
 	ROM_LOAD( "036174-01.b1",   0x0000, 0x0020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) )
 
@@ -731,7 +767,7 @@ ROM_START( bzonea ) /* Analog Vec Gen A035742-02 */
 ROM_END
 
 
-ROM_START( bzonec ) /* cocktail version */
+ROM_START( bzonec ) // cocktail version
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "bz1g4800",   0x4800, 0x0800, CRC(e228dd64) SHA1(247c788b4ccadf6c1e9201ad4f31d55c0036ff0f) )
 	ROM_LOAD( "bz1f5000",   0x5000, 0x0800, CRC(dddfac9a) SHA1(e6f2761902e1ffafba437a1117e9ba40f116087d) )
@@ -740,15 +776,15 @@ ROM_START( bzonec ) /* cocktail version */
 	ROM_LOAD( "bz1c6800",   0x6800, 0x0800, CRC(5adc64bd) SHA1(4574e4fe375d4ab3151a988235efa11e8744e2c6) )
 	ROM_LOAD( "bz1b7000",   0x7000, 0x0800, CRC(ed8a860e) SHA1(316a3c4870ba44bb3e9cb9fc5200eb081318facf) )
 	ROM_LOAD( "bz1a7800",   0x7800, 0x0800, CRC(04babf45) SHA1(a59da5ff49fc398ca4a948e28f05250af776b898) )
-	/* Vector Generator ROMs */
+	// Vector Generator ROMs
 	ROM_LOAD( "036422-01.bc3",  0x3000, 0x0800, CRC(7414177b) SHA1(147d97a3b475e738ce00b1a7909bbd787ad06eda) )  // bz3a3000
 	ROM_LOAD( "bz3b3800",   0x3800, 0x0800, CRC(76cf57f6) SHA1(1b8f3fcd664ed04ce60d94fdf27e56b20d52bdbd) )
 
-	/* AVG PROM */
+	// AVG PROM
 	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "036408-01.k7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
-	/* Mathbox PROMs */
+	// Mathbox PROMs
 	ROM_REGION( 0x20, "user2", 0 )
 	ROM_LOAD( "036174-01.b1",   0x0000, 0x0020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) )
 
@@ -772,15 +808,15 @@ ROM_START( bradley )
 	ROM_LOAD( "btk1.bin",   0x6800, 0x0800, CRC(f5c2904e) SHA1(f2cbf720c4f5ce0fc912dbc2f0445cb2c51ffac1) )
 	ROM_LOAD( "btlm.bin",   0x7000, 0x0800, CRC(7d0313bf) SHA1(17e3d8df62b332cf889133f1943c8f27308df027) )
 	ROM_LOAD( "btn1.bin",   0x7800, 0x0800, CRC(182c8c64) SHA1(511af60d86551291d2dc28442970b4863c62624a) )
-	/* Vector Generator ROMs */
+	// Vector Generator ROMs
 	ROM_LOAD( "btb3.bin",   0x3000, 0x0800, CRC(88206304) SHA1(6a2e2ff35a929acf460f244db7968f3978b1d239) )
 	ROM_LOAD( "bta3.bin",   0x3800, 0x0800, CRC(d669d796) SHA1(ad606882320cd13612c7962d4718680fe5a35dd3) )
 
-	/* AVG PROM */
+	// AVG PROM
 	ROM_REGION( 0x100, "avg:prom", 0 )
 	ROM_LOAD( "036408-01.k7",   0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
 
-	/* Mathbox PROMs */
+	// Mathbox PROMs
 	ROM_REGION( 0x20, "user2", 0 )
 	ROM_LOAD( "036174-01.b1",   0x0000, 0x0020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) )
 
@@ -793,8 +829,63 @@ ROM_START( bradley )
 	ROMX_LOAD( "036180-01.f1", 2, 0x100, CRC(276eadd5) SHA1(55718cd8ec4bcf75076d5ef0ee1ed2551e19d9ba), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
 ROM_END
 
+/* Desert Wars uses a separate sound board with an AY-3-8910 and one EPROM.
+   The PCB is labeled as "ANDRA S.A. 300900-A".
+   ____________________________________________________________
+  |      __________                           __________      |
+  |     |SN74LS175N                          |_74LS00PC|      |
+  |                    _____________________                  |
+  |      __________   | ·················· |         ___      |
+  |     |SN74LS175N   | ····CONNECTOR····· |        |  |      |
+  |                   |____________________|        | <-74LS138PC
+  |                                                 |__|      |
+  |  _____________________                                 __ |
+  | | AY-3-8910          |        __________  __________  | | |
+  | |                    |       |SN74LS240N||_74LS00PC|  |_| |
+  | |____________________|                                    |
+  |                                                           |
+  |   __________  __________                                  |
+  |  |_74LS74AN| |_CD4040BE|      _____________               |
+  |                              |EPROM 2716  |               |
+  |   __________                 |            |               |
+  |  |_74LS00PC|                 |____________|               |
+  |                                                           |
+  |___________________________________________________________|
+*/
+ROM_START( dsrtwars ) // Desert Wars
+	ROM_REGION( 0x8800, "maincpu", 0 )
+	ROM_LOAD( "300600_b.e1",       0x5000, 0x0800, CRC(13de36d5) SHA1(40e356ddc5c042bc1ce0b71f51e8b6de72daf1e4) )
+	ROM_LOAD( "300600_b.h1",       0x5800, 0x0800, CRC(5d9d9111) SHA1(42638cff53a9791a0f18d316f62a0ea8eea4e194) )
+	ROM_LOAD( "300600_b_dxc.j1",   0x6000, 0x0800, CRC(8d45383f) SHA1(704c2a5fefc109fd79d28b870bdf83f82b89ffdc) )
+	ROM_LOAD( "300600_b_kx.k1",    0x6800, 0x0800, CRC(6e481957) SHA1(920d28641058a6c79e1b16d9bab66ffddd87d903) )
+	ROM_LOAD( "300600_b.m1",       0x7000, 0x0800, CRC(ace7fbc8) SHA1(52e923aface37fcaf959b2506d186c8e3bf45bb9) )
+	ROM_LOAD( "300600_b_n10.n1",   0x7800, 0x1000, CRC(bb2f8479) SHA1(996253b5ce4d300eaf2c0960bb48b9a7d375256c) ) // 2532
+	// Vector Generator ROMs
+	ROM_LOAD( "300600_b_gen_b.b3", 0x3000, 0x0800, CRC(9a25b1d4) SHA1(092fbc0d86f71a08881f8ff33793e8077236a57f) )
+	ROM_LOAD( "300600_b_gen_a.a3", 0x3800, 0x0800, CRC(909550da) SHA1(a7a1c48c470e53088f0b6e8393d5fee38e8e8892) )
 
-/* Red Barron
+	// AVG PROM
+	ROM_REGION( 0x100, "avg:prom", 0 )
+	ROM_LOAD( "300600_b_vr_74s287.k7", 0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) )
+
+	// Mathbox PROMs
+	ROM_REGION( 0x020, "user2", 0 )
+	ROM_LOAD( "300800_b_am27s19.b1", 0x000, 0x020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) )
+
+	ROM_REGION32_BE( 0x400, "user3", 0 )
+	ROMX_LOAD( "300800_b_74s287.m1", 0, 0x100, CRC(2af82e87) SHA1(3816835a9ccf99a76d246adf204989d9261bb065), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "300800_b_74s287.l1", 0, 0x100, CRC(b31f6e24) SHA1(ce5f8ca34d06a5cfa0076b47400e61e0130ffe74), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+	ROMX_LOAD( "300800_b_74s287.k1", 1, 0x100, CRC(8119b847) SHA1(c4fbaedd4ce1ad6a4128cbe902b297743edb606a), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "300800_b_74s287.j1", 1, 0x100, CRC(09f5a4d5) SHA1(d6f2ac07ca9ee385c08831098b0dcaf56808993b), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+	ROMX_LOAD( "300800_b_74s287.h1", 2, 0x100, CRC(823b61ae) SHA1(d99a839874b45f64e14dae92a036e47a53705d16), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
+	ROMX_LOAD( "300800_b_74s287.f1", 2, 0x100, CRC(276eadd5) SHA1(55718cd8ec4bcf75076d5ef0ee1ed2551e19d9ba), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
+
+	ROM_REGION( 0x800, "music", 0 )
+	ROM_LOAD( "300900_b_am27s19.b1", 0x000, 0x800, CRC(1b6e9f6f) SHA1(1ced9958021b29400e4681fbcb76228fd1b74ab9) ) // TODO: where's this mapped?
+ROM_END
+
+
+/* Red Baron
 
 For the Analog Vec Gen A035742 PCB:
 
@@ -817,26 +908,26 @@ Program rom locations as same as redbarona listed below
 */
 
 
-ROM_START( redbaron ) /* Analog Vec Gen A035742-02 Rev. C+ */
+ROM_START( redbaron ) // Analog Vec Gen A035742-02 Rev. C+
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "037587-01.fh1", 0x4800, 0x0800, CRC(60f23983) SHA1(7a9e5380bf49bf50a2d8ab0e0bd1ba3ac8efde24) ) /* == 037001-1E + 036999-1E */
+	ROM_LOAD( "037587-01.fh1", 0x4800, 0x0800, CRC(60f23983) SHA1(7a9e5380bf49bf50a2d8ab0e0bd1ba3ac8efde24) ) // == 037001-1E + 036999-1E
 	ROM_CONTINUE(              0x5800, 0x0800 )
 	ROM_LOAD( "037000-01.e1",  0x5000, 0x0800, CRC(69bed808) SHA1(27d99efc74113cdcbbf021734b8a5a5fdb78c04c) )
 	ROM_LOAD( "036998-01.j1",  0x6000, 0x0800, CRC(d1104dd7) SHA1(0eab47cb45ede9dcc4dd7498dcf3a8d8194460b4) )
 	ROM_LOAD( "036997-01.k1",  0x6800, 0x0800, CRC(7434acb4) SHA1(c950c4c12ab556b5051ad356ab4a0ed6b779ba1f) )
 	ROM_LOAD( "036996-01.lm1", 0x7000, 0x0800, CRC(c0e7589e) SHA1(c1aedc95966afffd860d7e0009d5a43e8b292036) )
 	ROM_LOAD( "036995-01.n1",  0x7800, 0x0800, CRC(ad81d1da) SHA1(8bd66e5f34fc1c75f31eb6b168607e52aa3aa4df) )
-	/* Vector Generator ROMs */
+	// Vector Generator ROMs
 	ROM_LOAD( "037006-01.bc3", 0x3000, 0x0800, CRC(9fcffea0) SHA1(69b76655ee75742fcaa0f39a4a1cf3aa58088343) )
 	ROM_LOAD( "037007-01.a3",  0x3800, 0x0800, CRC(60250ede) SHA1(9c48952bd69863bee0c6dce09f3613149e0151ef) )
 
-	/* AVG PROM */
+	// AVG PROM
 	ROM_REGION( 0x100, "avg:prom", 0 )
-	ROM_LOAD( "036408-01.k7", 0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) ) /* 74S287N or compatible bprom like the 82S129 */
+	ROM_LOAD( "036408-01.k7", 0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) ) // 74S287N or compatible bprom like the 82S129
 
-	/* Mathbox PROMs */
+	// Mathbox PROMs
 	ROM_REGION( 0x20, "user2", 0 )
-	ROM_LOAD( "036174-01.a1", 0x0000, 0x0020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) ) /* 74S288 or compatible bprom like the 82S123 */
+	ROM_LOAD( "036174-01.a1", 0x0000, 0x0020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) ) // 74S288 or compatible bprom like the 82S123
 
 	ROM_REGION32_BE( 0x400, "user3", 0 )
 	ROMX_LOAD( "036175-01.e1", 0, 0x100, CRC(2af82e87) SHA1(3816835a9ccf99a76d246adf204989d9261bb065), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
@@ -846,12 +937,12 @@ ROM_START( redbaron ) /* Analog Vec Gen A035742-02 Rev. C+ */
 	ROMX_LOAD( "036179-01.k1", 2, 0x100, CRC(823b61ae) SHA1(d99a839874b45f64e14dae92a036e47a53705d16), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
 	ROMX_LOAD( "036180-01.l1", 2, 0x100, CRC(276eadd5) SHA1(55718cd8ec4bcf75076d5ef0ee1ed2551e19d9ba), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
 
-	/* Address decoding PROM (located on the AUX PCB) - currently not used */
+	// Address decoding PROM (located on the AUX PCB) - currently not used
 	ROM_REGION( 0x20, "prom", 0 )
-	ROM_LOAD( "036464-01.a5", 0x0000, 0x0020, CRC(42875b18) SHA1(10ba29f3c8c8e581eb275a85574c746272ebb865) ) /* 74S288 or compatible bprom like the 82S123 */
+	ROM_LOAD( "036464-01.a5", 0x0000, 0x0020, CRC(42875b18) SHA1(10ba29f3c8c8e581eb275a85574c746272ebb865) ) // 74S288 or compatible bprom like the 82S123
 ROM_END
 
-ROM_START( redbarona ) /* Analog Vec Gen A035742-02 */
+ROM_START( redbarona ) // Analog Vec Gen A035742-02
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "037001-01e.e1",  0x4800, 0x0800, CRC(b9486a6a) SHA1(76cf42569c4ef0a2ad7171e3c766c1a815a62a0e) )
 	ROM_LOAD( "037000-01e.fh1", 0x5000, 0x0800, CRC(69bed808) SHA1(27d99efc74113cdcbbf021734b8a5a5fdb78c04c) )
@@ -860,17 +951,17 @@ ROM_START( redbarona ) /* Analog Vec Gen A035742-02 */
 	ROM_LOAD( "036997-01e.lm1", 0x6800, 0x0800, CRC(7434acb4) SHA1(c950c4c12ab556b5051ad356ab4a0ed6b779ba1f) )
 	ROM_LOAD( "036996-01e.n1",  0x7000, 0x0800, CRC(c0e7589e) SHA1(c1aedc95966afffd860d7e0009d5a43e8b292036) )
 	ROM_LOAD( "036995-01e.p1",  0x7800, 0x0800, CRC(ad81d1da) SHA1(8bd66e5f34fc1c75f31eb6b168607e52aa3aa4df) )
-	/* Vector Generator ROMs */
+	// Vector Generator ROMs
 	ROM_LOAD( "037006-01e.bc3", 0x3000, 0x0800, CRC(9fcffea0) SHA1(69b76655ee75742fcaa0f39a4a1cf3aa58088343) )
 	ROM_LOAD( "037007-01e.a3",  0x3800, 0x0800, CRC(60250ede) SHA1(9c48952bd69863bee0c6dce09f3613149e0151ef) )
 
-	/* AVG PROM */
+	// AVG PROM
 	ROM_REGION( 0x100, "avg:prom", 0 )
-	ROM_LOAD( "036408-01.k7", 0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) ) /* 74S287N or compatible bprom like the 82S129 */
+	ROM_LOAD( "036408-01.k7", 0x0000, 0x0100, CRC(5903af03) SHA1(24bc0366f394ad0ec486919212e38be0f08d0239) ) // 74S287N or compatible bprom like the 82S129
 
-	/* Mathbox PROMs */
+	// Mathbox PROMs
 	ROM_REGION( 0x20, "user2", 0 )
-	ROM_LOAD( "036174-01.a1", 0x0000, 0x0020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) ) /* 74S288 or compatible bprom like the 82S123 */
+	ROM_LOAD( "036174-01.a1", 0x0000, 0x0020, CRC(8b04f921) SHA1(317b3397482f13b2d1bc21f296d3b3f9a118787b) ) // 74S288 or compatible bprom like the 82S123
 
 	ROM_REGION32_BE( 0x400, "user3", 0 )
 	ROMX_LOAD( "036175-01.e1", 0, 0x100, CRC(2af82e87) SHA1(3816835a9ccf99a76d246adf204989d9261bb065), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
@@ -880,9 +971,9 @@ ROM_START( redbarona ) /* Analog Vec Gen A035742-02 */
 	ROMX_LOAD( "036179-01.k1", 2, 0x100, CRC(823b61ae) SHA1(d99a839874b45f64e14dae92a036e47a53705d16), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(3))
 	ROMX_LOAD( "036180-01.l1", 2, 0x100, CRC(276eadd5) SHA1(55718cd8ec4bcf75076d5ef0ee1ed2551e19d9ba), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(3))
 
-	/* Address decoding PROM (located on the AUX PCB) - currently not used */
+	// Address decoding PROM (located on the AUX PCB) - currently not used
 	ROM_REGION( 0x20, "prom", 0 )
-	ROM_LOAD( "036464-01.a5", 0x0000, 0x0020, CRC(42875b18) SHA1(10ba29f3c8c8e581eb275a85574c746272ebb865) ) /* 74S288 or compatible bprom like the 82S123 */
+	ROM_LOAD( "036464-01.a5", 0x0000, 0x0020, CRC(42875b18) SHA1(10ba29f3c8c8e581eb275a85574c746272ebb865) ) // 74S288 or compatible bprom like the 82S123
 ROM_END
 
 
@@ -913,10 +1004,13 @@ void bzone_state::analog_select_w(offs_t offset, uint8_t data)
  *  Game drivers
  *
  *************************************/
+//    YEAR  NAME       PARENT    MACHINE   INPUT     CLASS           INIT        ROT   COMPANY  FULLNAME                        FLAGS                                        LAYOUT
+GAMEL(1980, bzone,     0,        bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battle Zone (rev 2)",          MACHINE_SUPPORTS_SAVE,                       layout_bzone )
+GAMEL(1980, bzonea,    bzone,    bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battle Zone (rev 1)",          MACHINE_SUPPORTS_SAVE,                       layout_bzone )
+GAMEL(1980, bzonec,    bzone,    bzone,    bzone,    bzone_state,    empty_init, ROT0, "Atari", "Battle Zone (cocktail)",       MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL, layout_bzone )
+GAME( 1980, bradley,   0,        bradley,  bradley,  bzone_state,    empty_init, ROT0, "Atari", "Bradley Trainer",              MACHINE_SUPPORTS_SAVE )
+GAMEL(1980, redbaron,  0,        redbaron, redbaron, redbaron_state, empty_init, ROT0, "Atari", "Red Baron (revised hardware)", MACHINE_SUPPORTS_SAVE,                       layout_redbaron )
+GAMEL(1980, redbarona, redbaron, redbaron, redbaron, redbaron_state, empty_init, ROT0, "Atari", "Red Baron",                    MACHINE_SUPPORTS_SAVE,                       layout_redbaron )
 
-GAMEL(1980, bzone,     0,        bzone,    bzone,    bzone_state,    empty_init,   ROT0, "Atari", "Battle Zone (rev 2)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
-GAMEL(1980, bzonea,    bzone,    bzone,    bzone,    bzone_state,    empty_init,   ROT0, "Atari", "Battle Zone (rev 1)",          MACHINE_SUPPORTS_SAVE, layout_bzone )
-GAMEL(1980, bzonec,    bzone,    bzone,    bzone,    bzone_state,    empty_init,   ROT0, "Atari", "Battle Zone (cocktail)",       MACHINE_SUPPORTS_SAVE|MACHINE_NO_COCKTAIL, layout_bzone )
-GAME( 1980, bradley,   0,        bradley,  bradley,  bzone_state,    empty_init,  ROT0, "Atari", "Bradley Trainer",              MACHINE_SUPPORTS_SAVE )
-GAMEL(1980, redbaron,  0,        redbaron, redbaron, redbaron_state, empty_init,   ROT0, "Atari", "Red Baron (Revised Hardware)", MACHINE_SUPPORTS_SAVE, layout_redbaron )
-GAMEL(1980, redbarona, redbaron, redbaron, redbaron, redbaron_state, empty_init,   ROT0, "Atari", "Red Baron",                    MACHINE_SUPPORTS_SAVE, layout_redbaron )
+// Not from Atari
+GAMEL(1981, dsrtwars,  bzone,    dsrtwars, bzone,    bzone_state,    empty_init, ROT0, "bootleg (Andra S.A.)", "Desert Wars (bootleg of Battle Zone)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_bzone )

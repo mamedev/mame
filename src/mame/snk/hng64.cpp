@@ -1061,13 +1061,15 @@ void hng64_state::hng64_dualport_w(offs_t offset, uint8_t data)
 /************************************************************************************************************/
 
 /* The following is guesswork, needs confirmation with a test on the real board. */
+// every sprite is 0x20 bytes
+//
 void hng64_state::hng64_sprite_clear_even_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t spr_offs;
 
-	spr_offs = (offset) * 0x10 * 4;
-
+	spr_offs = (offset) * 0x40;
+	// for one sprite
 	if(ACCESSING_BITS_16_31)
 	{
 		mspace.write_dword(0x20000000+0x00+0x00+spr_offs, 0x00000000);
@@ -1075,6 +1077,7 @@ void hng64_state::hng64_sprite_clear_even_w(offs_t offset, uint32_t data, uint32
 		mspace.write_dword(0x20000000+0x10+0x00+spr_offs, 0x00000000);
 		mspace.write_dword(0x20000000+0x18+0x00+spr_offs, 0x00000000);
 	}
+	// for another sprite
 	if(ACCESSING_BITS_8_15)
 	{
 		mspace.write_dword(0x20000000+0x00+0x20+spr_offs, 0x00000000);
@@ -1089,19 +1092,20 @@ void hng64_state::hng64_sprite_clear_odd_w(offs_t offset, uint32_t data, uint32_
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t spr_offs;
 
-	spr_offs = (offset) * 0x10 * 4;
-
+	spr_offs = (offset) * 0x40;
+	// for one sprite
 	if(ACCESSING_BITS_16_31)
 	{
 		mspace.write_dword(0x20000000+0x04+0x00+spr_offs, 0x00000000);
-		mspace.write_dword(0x20000000+0x0c+0x00+spr_offs, 0x00000000);
+	//  mspace.write_dword(0x20000000+0x0c+0x00+spr_offs, 0x00000000); // erases part of the slash palette in the sams64 2nd intro when we don't want it to! (2nd slash)
 		mspace.write_dword(0x20000000+0x14+0x00+spr_offs, 0x00000000);
 		mspace.write_dword(0x20000000+0x1c+0x00+spr_offs, 0x00000000);
 	}
+	// for another sprite
 	if(ACCESSING_BITS_0_15)
 	{
 		mspace.write_dword(0x20000000+0x04+0x20+spr_offs, 0x00000000);
-		mspace.write_dword(0x20000000+0x0c+0x20+spr_offs, 0x00000000);
+	//  mspace.write_dword(0x20000000+0x0c+0x20+spr_offs, 0x00000000); // erases part of the slash palette in the sams64 2nd intro when we don't want it to! (1st slash)
 		mspace.write_dword(0x20000000+0x14+0x20+spr_offs, 0x00000000);
 		mspace.write_dword(0x20000000+0x1c+0x20+spr_offs, 0x00000000);
 	}
@@ -1198,9 +1202,9 @@ void hng64_state::hng_map(address_map &map)
 
 	// 3D framebuffer
 	map(0x30000000, 0x30000003).rw(FUNC(hng64_state::hng64_fbcontrol_r), FUNC(hng64_state::hng64_fbcontrol_w)).umask32(0xffffffff);
-	map(0x30000004, 0x30000007).w(FUNC(hng64_state::hng64_fbunkpair_w)).umask32(0xffff);
-	map(0x30000008, 0x3000000b).w(FUNC(hng64_state::hng64_fbscroll_w)).umask32(0xffff);
-	map(0x3000000c, 0x3000000f).w(FUNC(hng64_state::hng64_fbunkbyte_w)).umask32(0xffffffff);
+	map(0x30000004, 0x30000007).w(FUNC(hng64_state::hng64_fbscale_w)).share("fbscale");
+	map(0x30000008, 0x3000000b).w(FUNC(hng64_state::hng64_fbscroll_w)).share("fbscroll");
+	map(0x3000000c, 0x3000000f).w(FUNC(hng64_state::hng64_fbunkbyte_w)).share("fbunk");
 	map(0x30000010, 0x3000002f).rw(FUNC(hng64_state::hng64_fbtable_r), FUNC(hng64_state::hng64_fbtable_w)).share("fbtable");
 
 	map(0x30100000, 0x3015ffff).rw(FUNC(hng64_state::hng64_fbram1_r), FUNC(hng64_state::hng64_fbram1_w)).share("fbram1");  // 3D Display Buffer A
@@ -2126,6 +2130,8 @@ void hng64_state::machine_start()
 		m_videoregs[i] = 0xdeadbeef;
 	}
 
+	m_videoregs[0] = 0x00000000;
+
 	m_irq_pending = 0;
 
 	m_3dfifo_timer = timer_alloc(FUNC(hng64_state::hng64_3dfifo_processed), this);
@@ -2206,6 +2212,7 @@ void hng64_state::machine_reset()
 	m_fbcontrol[2] = 0x00;
 	m_fbcontrol[3] = 0x00;
 
+	clear3d();
 }
 
 /***********************************************

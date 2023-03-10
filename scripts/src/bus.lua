@@ -1947,6 +1947,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx/cart/super_swangi.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/yamaha.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/yamaha.h",
+		MAME_DIR .. "src/devices/bus/msx/cart/yamaha_ucn01.cpp",
+		MAME_DIR .. "src/devices/bus/msx/cart/yamaha_ucn01.h",
 		MAME_DIR .. "src/devices/bus/msx/softcard/softcard.cpp",
 		MAME_DIR .. "src/devices/bus/msx/softcard/softcard.h",
 	}
@@ -3274,6 +3276,8 @@ if (BUSES["SNES"]~=null) then
 		MAME_DIR .. "src/devices/bus/snes/bsx.h",
 		MAME_DIR .. "src/devices/bus/snes/event.cpp",
 		MAME_DIR .. "src/devices/bus/snes/event.h",
+		MAME_DIR .. "src/devices/bus/snes/profighter.cpp",
+		MAME_DIR .. "src/devices/bus/snes/profighter.h",
 		MAME_DIR .. "src/devices/bus/snes/rom.cpp",
 		MAME_DIR .. "src/devices/bus/snes/rom.h",
 		MAME_DIR .. "src/devices/bus/snes/rom21.cpp",
@@ -4141,6 +4145,8 @@ if (BUSES["ABCKB"]~=null) then
 		MAME_DIR .. "src/devices/bus/abckb/abc99.h",
 		MAME_DIR .. "src/devices/bus/abckb/abc800kb.cpp",
 		MAME_DIR .. "src/devices/bus/abckb/abc800kb.h",
+		MAME_DIR .. "src/devices/bus/abckb/r8.cpp",
+		MAME_DIR .. "src/devices/bus/abckb/r8.h",
 	}
 end
 

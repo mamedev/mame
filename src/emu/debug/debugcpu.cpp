@@ -675,7 +675,7 @@ void device_debug::exception_hook(int exception)
 		if (matched)
 		{
 			m_device.machine().debugger().cpu().set_execution_stopped();
-			m_device.machine().debugger().console().printf("Stopped on exception (CPU '%s', exception %X, PC=%X)\n", m_device.tag(), exception, m_state->pcbase());
+			m_device.machine().debugger().console().printf("Stopped on exception (CPU '%s', exception %X, PC=%s)\n", m_device.tag(), exception, m_state->state_string(STATE_GENPCBASE));
 			compute_debug_flags();
 		}
 	}
@@ -701,7 +701,7 @@ void device_debug::exception_hook(int exception)
 				if (debugcpu.is_stopped())
 				{
 					debugcpu.set_execution_stopped();
-					m_device.machine().debugger().console().printf("Stopped at exception point %X (CPU '%s', PC=%X)\n", ep.m_index, m_device.tag(), exception, m_state->pcbase());
+					m_device.machine().debugger().console().printf("Stopped at exception point %X (CPU '%s', PC=%s)\n", ep.m_index, m_device.tag(), m_state->state_string(STATE_GENPCBASE));
 					compute_debug_flags();
 				}
 				break;
