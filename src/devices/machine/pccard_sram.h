@@ -70,6 +70,31 @@ private:
 	required_ioport m_switches;
 };
 
+class pccard_mitsubishi_sram_device : public pccard_sram_device
+{
+protected:
+	pccard_mitsubishi_sram_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_image_interface overrides
+	virtual image_init_result call_load() override;
+	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
+	virtual void call_unload() override;
+
+private:
+	required_shared_ptr<uint16_t> m_sram;
+};
+
+class pccard_mitsubishi_mf31m1_lycat01_device : public pccard_mitsubishi_sram_device
+{
+public:
+	// construction/destruction
+	pccard_mitsubishi_mf31m1_lycat01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+private:
+	void memory_map(address_map &map);
+};
+
 class pccard_centennial_sram_device : public pccard_sram_device
 {
 protected:
@@ -133,6 +158,7 @@ private:
 };
 
 // device type definition
+DECLARE_DEVICE_TYPE(PCCARD_SRAM_MITSUBISHI_1M, pccard_mitsubishi_mf31m1_lycat01_device)
 DECLARE_DEVICE_TYPE(PCCARD_SRAM_CENTENNIAL_1M, pccard_centennial_sl01m_15_11194_device)
 DECLARE_DEVICE_TYPE(PCCARD_SRAM_CENTENNIAL_2M, pccard_centennial_sl02m_15_11194_device)
 DECLARE_DEVICE_TYPE(PCCARD_SRAM_CENTENNIAL_4M, pccard_centennial_sl04m_15_11194_device)
