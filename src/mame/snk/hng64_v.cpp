@@ -394,7 +394,26 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
 
 	// we have the scroll values for the current line, draw
 
-	pen_t const *const clut = &m_palette->pen(0);
+	pen_t* clut;
+
+	// allow one of the 2 pairs of fade values to be used (complete guess!)
+	if ((get_tileregs(tm) & 0x0080) >> 7)
+	{
+		// which one depends on target layer? (also complete guess!)
+		if (get_tileregs(tm) & 0x0020)
+		{
+			clut = (pen_t*)&m_palette_fade0->pen(0);
+		}
+		else
+		{
+			clut = (pen_t*)&m_palette_fade1->pen(0);
+		}
+	}
+	else
+	{
+		clut = (pen_t*)&m_palette->pen(0);
+	}
+
 	bitmap_ind8 &priority_bitmap = screen.priority();
 	bitmap_rgb32 &destbitmap = dest;
 	const bitmap_ind16 &srcbitmap = tmap->pixmap();
@@ -940,16 +959,17 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 	if (0)
 		popmessage("%08x %08x %08x %08x %08x", m_spriteregs[0], m_spriteregs[1], m_spriteregs[2], m_spriteregs[3], m_spriteregs[4]);
 
-	if (0)
+	
+	if (1)
 		popmessage("%08x %08x\n\
-			TR0(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d %d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
-			TR1(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d %d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
-			TR2(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d %d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
-			TR3(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d %d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
+			TR0(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
+			TR1(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
+			TR2(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
+			TR3(MO(%01x) NL(%d) BPP(%d) TSIZE(%d) U(%d) F(%d) E(%d) L(%d) DEPTH( %d %d %d %d %d (%02x))\n\
 			SB(%04x %04x %04x %04x)\n\
 			%08x %08x %08x\n\
 			SPLIT?(%04x %04x %04x %04x)\n\
-			AA(%08x %08x)\n%08x",
+			AA(%08x %08x)\n%08x\n",
 			// global tilemap control regs?
 			m_videoregs[0x00], m_videoregs[0x01],
 			// general per-tilemap regs
@@ -966,18 +986,20 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			// Auto Animation registers
 			m_videoregs[0x0b], m_videoregs[0x0c],
 			// unused?
-			m_videoregs[0x0d]);
+			m_videoregs[0x0d]
+		);
 	
     // Individual tilemap regs format
     // ------------------------------
-    // mmmm dbr? ?ELz zzzz
+    // mmmm dbr? FELz zzzz
     // m = Tilemap mosaic level [0-15] - confirmed in sams64 demo mode
     //  -- they seem to enable mosaic at the same time as rowscroll in several cases (floor in buriki / ff)
     //     and also on the rotating logo in buriki.. does it cause some kind of aliasing side-effect, or.. ?
     // d = line (floor) mode - buriki, fatafurwa, some backgrounds in ss64_2
     // b = 4bpp/8bpp (seems correct) (beast busters, samsh64, sasm64 2, xrally switch it for some screens)
     // r = tile size (seems correct)
-    // E = tilemap enable bit according to sams64_2
+	// F = allow fade1 or fade2 to apply? (complete guess!)
+	// E = tilemap enable bit according to sams64_2
 	// L = related to output layer? seems to be tied to which mixing bits are used to enable blending
     // z = z depth/priority? tilemaps might also be affected by min / max clip values somewhere?
     //              (debug layer on buriki has priority 0x020, which would be highest)
@@ -991,7 +1013,8 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			UNUSED?(%04x)\n%04x\nUNUSED?(%d %d)\n\
 			For FADE1 or 1st in PALFADES group per-RGB blend modes(%d %d %d)\n\
 			For FADE2 or 2nd in PALFADES group per-RGB blend modes(%d %d %d)\n\
-			MASTER FADES - FADE1?(%08x)\nMASTER FADES - FADE2?(%08x)\n\
+			MASTER FADES - FADE1?(%08x)\n\
+			MASTER FADES - FADE2?(%08x)\n\
 			UNUSED?(%08x)\n\
 			UNUSED?&0xfffc(%04x) DISABLE_DISPLAY(%d) ALSO USE REGS BELOW FOR MASTER FADE(%d)\n\
 			PALEFFECT_ENABLES(%d %d %d %d %d %d %d %d)\n PALFADES?(%08x %08x : %08x %08x : %08x %08x : %08x %08x)\n\
@@ -1199,6 +1222,157 @@ inline void hng64_state::set_single_palette_entry(int entry, uint8_t r, uint8_t 
 {
 	m_palette->set_pen_color(entry, r, g, b);
 
+	if (true)
+	{
+		uint32_t rgbfade = m_tcram[0x18 / 4];
+		int r_fadeval = (rgbfade >> 16) & 0xff;
+		int g_fadeval = (rgbfade >> 8) & 0xff;
+		int b_fadeval = (rgbfade >> 0) & 0xff;
+
+		uint8_t r_mode = (m_tcram[0x14 / 4] >> 10) & 0x3;
+		uint8_t g_mode = (m_tcram[0x14 / 4] >> 8) & 0x3;
+		uint8_t b_mode = (m_tcram[0x14 / 4] >> 6) & 0x3;
+
+		int r_new = r;
+		int g_new = g;
+		int b_new = b;
+
+		switch (r_mode)
+		{
+		case 0x00:
+		case 0x02:
+			break;
+
+		case 0x01: // additive
+			r_new = r_new + r_fadeval;
+			if (r_new > 255)
+				r_new = 255;
+			break;
+
+		case 0x03: // subtractive
+			r_new = r_new - r_fadeval;
+			if (r_new < 0)
+				r_new = 0;
+			break;
+		}
+
+		switch (g_mode)
+		{
+		case 0x00:
+		case 0x02:
+			break;
+
+		case 0x01: // additive
+			g_new = g_new + g_fadeval;
+			if (g_new > 255)
+				g_new = 255;
+			break;
+
+		case 0x03: // subtractive
+			g_new = g_new - g_fadeval;
+			if (g_new < 0)
+				g_new = 0;
+			break;
+		}
+
+		switch (b_mode)
+		{
+		case 0x00:
+		case 0x02:
+			break;
+
+		case 0x01: // additive
+			b_new = b_new + b_fadeval;
+			if (b_new > 255)
+				b_new = 255;
+			break;
+
+		case 0x03: // subtractive
+			b_new = b_new - b_fadeval;
+			if (b_new < 0)
+				b_new = 0;
+			break;
+		}
+
+		m_palette_fade0->set_pen_color(entry, r_new, g_new, b_new);
+	}
+
+	if (true)
+	{
+		uint32_t rgbfade = 	m_tcram[0x1c / 4];
+		int r_fadeval = (rgbfade >> 16) & 0xff;
+		int g_fadeval = (rgbfade >> 8) & 0xff;
+		int b_fadeval = (rgbfade >> 8) & 0xff;
+
+		uint8_t r_mode = (m_tcram[0x14 / 4] >> 4) & 0x3;
+		uint8_t g_mode = (m_tcram[0x14 / 4] >> 2) & 0x3;
+		uint8_t b_mode = (m_tcram[0x14 / 4] >> 0) & 0x3;
+
+		int r_new = r;
+		int g_new = g;
+		int b_new = b;
+
+		switch (r_mode)
+		{
+		case 0x00:
+		case 0x02:
+			break;
+
+		case 0x01: // additive
+			r_new = r_new + r_fadeval;
+			if (r_new > 255)
+				r_new = 255;
+			break;
+
+		case 0x03: // subtractive
+			r_new = r_new - r_fadeval;
+			if (r_new < 0)
+				r_new = 0;
+			break;
+		}
+
+		switch (g_mode)
+		{
+		case 0x00:
+		case 0x02:
+			break;
+
+		case 0x01: // additive
+			g_new = g_new + g_fadeval;
+			if (g_new > 255)
+				g_new = 255;
+			break;
+
+		case 0x03: // subtractive
+			g_new = g_new - g_fadeval;
+			if (g_new < 0)
+				g_new = 0;
+			break;
+		}
+
+		switch (b_mode)
+		{
+		case 0x00:
+		case 0x02:
+			break;
+
+		case 0x01: // additive
+			b_new = b_new + b_fadeval;
+			if (b_new > 255)
+				b_new = 255;
+			break;
+
+		case 0x03: // subtractive
+			b_new = b_new - b_fadeval;
+			if (b_new < 0)
+				b_new = 0;
+			break;
+		}
+
+		m_palette_fade1->set_pen_color(entry, r_new, g_new, b_new);
+	}
+
+
 	// our code assumes the 'lighting' values from the 3D framebuffer can be 4-bit precision
 	// based on 'banding' seen in buriki reference videos.  precalculate those here to avoid
 	// having to do it in the video update function
@@ -1341,7 +1515,7 @@ void hng64_state::tcram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		}
 	}
 
-	if (offset == (0x24 / 4))
+	if ((offset == (0x24 / 4)) || (offset == (0x14 / 4)) || (offset == (0x18 / 4)) || (offset == (0x1c / 4)))
 	{
 		// lazy, just update the lot
 		uint32_t new_data = hng64_tcram[offset];

@@ -2581,6 +2581,8 @@ void hng64_state::hng64(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(hng64_state::screen_vblank_hng64));
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x1000);
+	PALETTE(config, m_palette_fade0).set_format(palette_device::xRGB_888, 0x1000);
+	PALETTE(config, m_palette_fade1).set_format(palette_device::xRGB_888, 0x1000);
 	PALETTE(config, m_palette_3d).set_format(palette_device::xRGB_888, 0x1000 * 0x10);
 
 	hng64_audio(config);

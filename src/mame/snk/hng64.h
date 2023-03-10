@@ -144,6 +144,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_palette_fade0(*this, "palette0"),
+		m_palette_fade1(*this, "palette1"),
 		m_palette_3d(*this, "palette3d"),
 		m_paletteram(*this, "paletteram"),
 		m_vblank(*this, "VBLANK"),
@@ -195,6 +197,8 @@ public:
 	uint8_t *m_texturerom = nullptr;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<palette_device> m_palette_fade0;
+	required_device<palette_device> m_palette_fade1;
 	required_device<palette_device> m_palette_3d;
 	required_shared_ptr<u32> m_paletteram;
 	required_ioport m_vblank;
