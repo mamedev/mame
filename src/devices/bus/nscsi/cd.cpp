@@ -713,7 +713,7 @@ bool nscsi_cdrom_sgi_device::scsi_command_done(uint8_t command, uint8_t length)
 	}
 }
 
-enum sgi_apple_command_e : uint8_t {
+enum apple_scsi_command_e : uint8_t {
 	APPLE_READ_TOC         = 0xc1,
 	APPLE_READ_SUB_CHANNEL = 0xc2,
 	APPLE_READ_HEADER      = 0xc3,
