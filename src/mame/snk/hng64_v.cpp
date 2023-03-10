@@ -827,9 +827,10 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 		}
 	}
 
+	// tilemaps with 'priority' 0x10 - 0x1f are always behind the 3d?
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (int i = 0x1f; i >= 0; i--)
+		for (int i = 0x1f; i >= 0x10; i--)
 		{
 			for (int j = 0; j < 4; j++)
 			{
@@ -906,6 +907,22 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			}
 		}
 	}
+
+	// tilemaps with 'priority' 0x00 - 0x0f are always above the 3d? - could bit 0x10 really be a 'relative to 3d' bit, rather than a 'relative to other tilemaps' bit?
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		for (int i = 0x0f; i >= 0x00; i--)
+		{
+			for (int j = 0; j < 4; j++)
+			{
+				uint16_t pri = get_tileregs(j) & 0x1f;
+
+				if (pri == i)
+					hng64_drawtilemap(screen, bitmap, cliprect, j, 0, y);
+			}
+		}
+	}
+
 	// Draw the sprites on top of everything
 	draw_sprites_buffer(screen, cliprect);
 
