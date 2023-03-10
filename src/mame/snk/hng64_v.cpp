@@ -396,10 +396,12 @@ void hng64_state::hng64_tilemap_draw_roz_core_line(screen_device &screen, bitmap
 
 	pen_t* clut;
 
-	// allow one of the 2 pairs of fade values to be used (complete guess!)
+	// allow one of the 2 pairs of fade values to be used (complete guess! but fatfurwa turns this bit on whenever it wants to do a fade effect and off when it's done)
 	if ((get_tileregs(tm) & 0x0080) >> 7)
 	{
 		// which one depends on target layer? (also complete guess!)
+		// (buriki intro suggests this is wrong, it should be fading tilemaps to black on the discipline name screens with a full subtractive blend, but picks the wrong register?
+		//  as we're already using this to decide which layer we're on for blending, it's probably not got a double use)
 		if (get_tileregs(tm) & 0x0020)
 		{
 			clut = (pen_t*)&m_palette_fade0->pen(0);
@@ -1257,160 +1259,85 @@ WRITE_LINE_MEMBER(hng64_state::screen_vblank_hng64)
  *  Or maybe they set transition type (there seems to be a cute scaling-squares transition in there somewhere)...
  */
 
+
+
+inline void hng64_state::set_palette_entry_with_faderegs(int entry, uint8_t r, uint8_t g, uint8_t b, uint32_t rgbfade, uint8_t r_mode, uint8_t g_mode, uint8_t b_mode, palette_device *palette)
+{
+
+	int r_fadeval = (rgbfade >> 16) & 0xff;
+	int g_fadeval = (rgbfade >> 8) & 0xff;
+	int b_fadeval = (rgbfade >> 0) & 0xff;
+
+	int r_new = r;
+	int g_new = g;
+	int b_new = b;
+
+	switch (r_mode)
+	{
+	case 0x00:
+	case 0x02:
+		break;
+
+	case 0x01: // additive
+		r_new = r_new + r_fadeval;
+		if (r_new > 255)
+			r_new = 255;
+		break;
+
+	case 0x03: // subtractive
+		r_new = r_new - r_fadeval;
+		if (r_new < 0)
+			r_new = 0;
+		break;
+	}
+
+	switch (g_mode)
+	{
+	case 0x00:
+	case 0x02:
+		break;
+
+	case 0x01: // additive
+		g_new = g_new + g_fadeval;
+		if (g_new > 255)
+			g_new = 255;
+		break;
+
+	case 0x03: // subtractive
+		g_new = g_new - g_fadeval;
+		if (g_new < 0)
+			g_new = 0;
+		break;
+	}
+
+	switch (b_mode)
+	{
+	case 0x00:
+	case 0x02:
+		break;
+
+	case 0x01: // additive
+		b_new = b_new + b_fadeval;
+		if (b_new > 255)
+			b_new = 255;
+		break;
+
+	case 0x03: // subtractive
+		b_new = b_new - b_fadeval;
+		if (b_new < 0)
+			b_new = 0;
+		break;
+	}
+
+	palette->set_pen_color(entry, r_new, g_new, b_new);
+}
+
 inline void hng64_state::set_single_palette_entry(int entry, uint8_t r, uint8_t g, uint8_t b)
 {
 	m_palette->set_pen_color(entry, r, g, b);
 
-	if (true)
-	{
-		uint32_t rgbfade = m_tcram[0x18 / 4];
-		int r_fadeval = (rgbfade >> 16) & 0xff;
-		int g_fadeval = (rgbfade >> 8) & 0xff;
-		int b_fadeval = (rgbfade >> 0) & 0xff;
-
-		uint8_t r_mode = (m_tcram[0x14 / 4] >> 10) & 0x3;
-		uint8_t g_mode = (m_tcram[0x14 / 4] >> 8) & 0x3;
-		uint8_t b_mode = (m_tcram[0x14 / 4] >> 6) & 0x3;
-
-		int r_new = r;
-		int g_new = g;
-		int b_new = b;
-
-		switch (r_mode)
-		{
-		case 0x00:
-		case 0x02:
-			break;
-
-		case 0x01: // additive
-			r_new = r_new + r_fadeval;
-			if (r_new > 255)
-				r_new = 255;
-			break;
-
-		case 0x03: // subtractive
-			r_new = r_new - r_fadeval;
-			if (r_new < 0)
-				r_new = 0;
-			break;
-		}
-
-		switch (g_mode)
-		{
-		case 0x00:
-		case 0x02:
-			break;
-
-		case 0x01: // additive
-			g_new = g_new + g_fadeval;
-			if (g_new > 255)
-				g_new = 255;
-			break;
-
-		case 0x03: // subtractive
-			g_new = g_new - g_fadeval;
-			if (g_new < 0)
-				g_new = 0;
-			break;
-		}
-
-		switch (b_mode)
-		{
-		case 0x00:
-		case 0x02:
-			break;
-
-		case 0x01: // additive
-			b_new = b_new + b_fadeval;
-			if (b_new > 255)
-				b_new = 255;
-			break;
-
-		case 0x03: // subtractive
-			b_new = b_new - b_fadeval;
-			if (b_new < 0)
-				b_new = 0;
-			break;
-		}
-
-		m_palette_fade0->set_pen_color(entry, r_new, g_new, b_new);
-	}
-
-	if (true)
-	{
-		uint32_t rgbfade = 	m_tcram[0x1c / 4];
-		int r_fadeval = (rgbfade >> 16) & 0xff;
-		int g_fadeval = (rgbfade >> 8) & 0xff;
-		int b_fadeval = (rgbfade >> 8) & 0xff;
-
-		uint8_t r_mode = (m_tcram[0x14 / 4] >> 4) & 0x3;
-		uint8_t g_mode = (m_tcram[0x14 / 4] >> 2) & 0x3;
-		uint8_t b_mode = (m_tcram[0x14 / 4] >> 0) & 0x3;
-
-		int r_new = r;
-		int g_new = g;
-		int b_new = b;
-
-		switch (r_mode)
-		{
-		case 0x00:
-		case 0x02:
-			break;
-
-		case 0x01: // additive
-			r_new = r_new + r_fadeval;
-			if (r_new > 255)
-				r_new = 255;
-			break;
-
-		case 0x03: // subtractive
-			r_new = r_new - r_fadeval;
-			if (r_new < 0)
-				r_new = 0;
-			break;
-		}
-
-		switch (g_mode)
-		{
-		case 0x00:
-		case 0x02:
-			break;
-
-		case 0x01: // additive
-			g_new = g_new + g_fadeval;
-			if (g_new > 255)
-				g_new = 255;
-			break;
-
-		case 0x03: // subtractive
-			g_new = g_new - g_fadeval;
-			if (g_new < 0)
-				g_new = 0;
-			break;
-		}
-
-		switch (b_mode)
-		{
-		case 0x00:
-		case 0x02:
-			break;
-
-		case 0x01: // additive
-			b_new = b_new + b_fadeval;
-			if (b_new > 255)
-				b_new = 255;
-			break;
-
-		case 0x03: // subtractive
-			b_new = b_new - b_fadeval;
-			if (b_new < 0)
-				b_new = 0;
-			break;
-		}
-
-		m_palette_fade1->set_pen_color(entry, r_new, g_new, b_new);
-	}
-
+	set_palette_entry_with_faderegs(entry, r, g, b, m_tcram[0x18 / 4], (m_tcram[0x14 / 4] >> 10) & 0x3, (m_tcram[0x14 / 4] >> 8) & 0x3, (m_tcram[0x14 / 4] >> 6) & 0x3, m_palette_fade0);
+	set_palette_entry_with_faderegs(entry, r, g, b, m_tcram[0x1c / 4], (m_tcram[0x14 / 4] >> 4) & 0x3, (m_tcram[0x14 / 4] >> 2) & 0x3, (m_tcram[0x14 / 4] >> 0) & 0x3, m_palette_fade1);
 
 	// our code assumes the 'lighting' values from the 3D framebuffer can be 4-bit precision
 	// based on 'banding' seen in buriki reference videos.  precalculate those here to avoid
@@ -1431,7 +1358,11 @@ inline void hng64_state::set_single_palette_entry(int entry, uint8_t r, uint8_t 
 		if (newb > 255)
 			newb = 255;
 
-		m_palette_3d->set_pen_color((intensity * 0x1000) + entry, newr, newg, newb);
+		//m_palette_3d->set_pen_color((intensity * 0x1000) + entry, newr, newg, newb);
+		// always use 1nd fade register for 3D (very unlikely!) (allows 3d to flash correctly in sams64 how to play, but applies wrong fade register on 3d in buriki discipline intro screens, assuming those are meant to be blacked out this way)
+		set_palette_entry_with_faderegs((intensity * 0x1000) + entry, newr, newg, newb, m_tcram[0x18 / 4], (m_tcram[0x14 / 4] >> 10) & 0x3, (m_tcram[0x14 / 4] >> 8) & 0x3, (m_tcram[0x14 / 4] >> 6) & 0x3, m_palette_3d);
+		// always use 2nd fade register for 3D (very unlikely!)
+		//set_palette_entry_with_faderegs((intensity * 0x1000) + entry, newr, newg, newb, m_tcram[0x1c / 4], (m_tcram[0x14 / 4] >> 4) & 0x3, (m_tcram[0x14 / 4] >> 2) & 0x3, (m_tcram[0x14 / 4] >> 0) & 0x3, m_palette_3d);
 	}
 }
 

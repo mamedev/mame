@@ -370,6 +370,7 @@ private:
 	void dl_unk_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t dl_vreg_r();
 
+	void set_palette_entry_with_faderegs(int entry, uint8_t r, uint8_t g, uint8_t b, uint32_t rgbfade, uint8_t r_mode, uint8_t g_mode, uint8_t b_mode, palette_device *palette);
 	void set_single_palette_entry(int entry, uint8_t r, uint8_t g, uint8_t b);
 	void update_palette_entry(int entry);
 	void pal_w(offs_t offset, uint32_t data, uint32_t mem_mask);
