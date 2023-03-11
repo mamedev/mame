@@ -8,6 +8,8 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/msx/ctrl/ctrl.h"
 #include "bus/msx/slot/cartridge.h"
+#include "bus/msx/slot/minicart.h"
+#include "bus/msx/slot/module.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "machine/buffer.h"

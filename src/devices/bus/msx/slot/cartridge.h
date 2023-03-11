@@ -1,5 +1,37 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
+/***************************************************************************
+
+ MSX cartridge slot
+
+ Cartridge edge connector (double-sided):
+    /CS2 -  2  1 - /CS1
+  /SLTSL -  4  3 - /CS12
+   /RFSH -  6  5 - reserved
+    /INT -  8  7 - /WAIT
+ /BUSDIR - 10  9 - /M1
+   /MREQ - 12 11 - /IORQ
+     /RD - 14 13 - /WR
+reserved - 16 15 - /RESET
+     A15 - 18 17 - A9
+     A10 - 20 19 - A11
+      A6 - 22 21 - A7
+      A8 - 24 23 - A12
+     A13 - 26 25 - A14
+      A0 - 28 27 - A1
+      A2 - 30 29 - A3
+      A4 - 32 31 - A5
+      D0 - 34 33 - D1
+      D2 - 36 35 - D3
+      D4 - 38 37 - D5
+      D6 - 40 39 - D7
+   CLOCK - 42 41 - GND
+     SW1 - 44 43 - GND
+     SW2 - 46 45 - +5V
+    +12V - 48 47 - +5V
+    -12V - 50 49 - SOUNDIN
+
+ ***************************************************************************/
 #ifndef MAME_BUS_MSX_SLOT_CARTRIDGE_H
 #define MAME_BUS_MSX_SLOT_CARTRIDGE_H
 
@@ -12,8 +44,6 @@
 
 
 DECLARE_DEVICE_TYPE(MSX_SLOT_CARTRIDGE,        msx_slot_cartridge_device)
-DECLARE_DEVICE_TYPE(MSX_SLOT_YAMAHA_EXPANSION, msx_slot_yamaha_expansion_device)
-DECLARE_DEVICE_TYPE(MSX_SLOT_YAMAHA_MINICART,  msx_slot_yamaha_minicart_device)
 
 
 class msx_cart_interface;
@@ -48,36 +78,6 @@ protected:
 	msx_cart_interface *m_cartridge;
 
 	static int get_cart_type(const u8 *rom, u32 length);
-};
-
-
-
-class msx_slot_yamaha_expansion_device : public msx_slot_cartridge_device
-{
-public:
-	msx_slot_yamaha_expansion_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	virtual const char *image_interface() const noexcept override { return "msx_yamaha_60pin"; }
-	virtual const char *image_type_name() const noexcept override { return "cartridge60pin"; }
-	virtual const char *image_brief_type_name() const noexcept override { return "cart60p"; }
-
-protected:
-	virtual void device_start() override;
-};
-
-
-
-class msx_slot_yamaha_minicart_device : public msx_slot_cartridge_device
-{
-public:
-	msx_slot_yamaha_minicart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	virtual const char *image_interface() const noexcept override { return "msx_yamaha_minicart"; }
-	virtual const char *image_type_name() const noexcept override { return "yamahaminicart"; }
-	virtual const char *image_brief_type_name() const noexcept override { return "mini"; }
-
-protected:
-	virtual void device_start() override;
 };
 
 
