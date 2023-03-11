@@ -1332,9 +1332,9 @@ void pce_cd_device::cdc_reset_w(uint8_t data)
 uint8_t pce_cd_device::cdda_data_r(offs_t offset)
 {
 	// TODO: port 5 also converts?
-	uint8_t port_shift = offset ? 0 : 8;
+	uint8_t port_shift = offset ? 8 : 0;
 
-	return (m_cdda->get_channel_volume((m_irq_status & 2) ? 0 : 1) >> port_shift) & 0xff;
+	return (m_cdda->get_channel_sample((m_irq_status & 2) ? 0 : 1) >> port_shift) & 0xff;
 }
 
 /*
