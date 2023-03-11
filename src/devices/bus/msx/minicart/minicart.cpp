@@ -13,7 +13,7 @@ DEFINE_DEVICE_TYPE(MSX_SLOT_YAMAHA_MINICART,  msx_slot_yamaha_minicart_device,  
 
 
 msx_slot_yamaha_minicart_device::msx_slot_yamaha_minicart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: msx_slot_cartridge_device(mconfig, MSX_SLOT_YAMAHA_MINICART, tag, owner, clock)
+	: msx_slot_cartridge_base_device(mconfig, MSX_SLOT_YAMAHA_MINICART, tag, owner, clock)
 {
 }
 

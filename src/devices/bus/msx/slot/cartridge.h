@@ -41,19 +41,14 @@ reserved - 16 15 - /RESET
 #include "imagedev/cartrom.h"
 
 
-DECLARE_DEVICE_TYPE(MSX_SLOT_CARTRIDGE, msx_slot_cartridge_device)
-
-
 class msx_cart_interface;
 
-class msx_slot_cartridge_device : public device_t
+class msx_slot_cartridge_base_device : public device_t
 								, public device_cartrom_image_interface
 								, public device_slot_interface
 								, public msx_internal_slot_interface
 {
 public:
-	msx_slot_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
 	auto irq_handler() { return m_irq_handler.bind(); }
 
 	virtual image_init_result call_load() override;
@@ -67,22 +62,20 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq_out);
 
 protected:
-	msx_slot_cartridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	msx_slot_cartridge_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 
 	devcb_write_line m_irq_handler;
 	msx_cart_interface *m_cartridge;
-
-	static int get_cart_type(const u8 *rom, u32 length);
 };
 
 
 
 class msx_cart_interface : public device_interface
 {
-	friend class msx_slot_cartridge_device;
+	friend class msx_slot_cartridge_base_device;
 
 public:
 	// This is called after loading cartridge contents and allows the cartridge
@@ -104,14 +97,14 @@ protected:
 	const char *get_feature(std::string_view feature_name) { return m_exp ? m_exp->get_feature(feature_name) : nullptr; }
 	bool is_loaded_through_softlist() { return m_exp ? m_exp->loaded_through_softlist() : false; }
 	DECLARE_WRITE_LINE_MEMBER(irq_out);
-	msx_slot_cartridge_device *parent_slot() const { return m_exp; }
+	msx_slot_cartridge_base_device *parent_slot() const { return m_exp; }
 	address_space &memory_space() const;
 	address_space &io_space() const;
 	cpu_device &maincpu() const;
 	memory_view::memory_view_entry *page(int i) { return m_page[i]; }
 
 private:
-	msx_slot_cartridge_device *m_exp;
+	msx_slot_cartridge_base_device *m_exp;
 	memory_view::memory_view_entry *m_page[4];
 };
 
