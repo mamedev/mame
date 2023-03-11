@@ -37,9 +37,7 @@
     TODO:
 
 	- systest1600
-		- chip test crashes with trap 4
-		- keyboard test fails
-		- mouse test fails
+		- chip test fails
     - loadsys1 core dump (/etc/mkfs -b 1024 -v 69000 /dev/sa40)
 	- crashes after reset
     - CIO

@@ -12,6 +12,11 @@
 #include "3dom2.h"
 
 #include <cmath>
+#include <sstream>
+
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 /*
     TODO:
@@ -568,8 +573,7 @@ static void write_te_reg(uint32_t &reg, uint32_t data, m2_te_device::te_reg_wmod
 	}
 }
 
-#if 0
-static const char *get_reg_name(uint32_t unit, uint32_t reg)
+static std::string get_reg_name(uint32_t unit, uint32_t reg)
 {
 	static const char *gc_regs[] =
 	{
@@ -634,30 +638,25 @@ static const char *get_reg_name(uint32_t unit, uint32_t reg)
 		"ESCapData",
 	};
 
-	static char buffer[128];
-
 	switch (unit)
 	{
 		case 0:
 		{
 			if (reg < sizeof(gc_regs))
 			{
-				sprintf(buffer, "GC:%s", gc_regs[reg]);
-				return buffer;
+				return std::string("GC:") + gc_regs[reg];
 			}
 			break;
 		}
 		case 1:
 		{
-			sprintf(buffer, "SE:????");
-			return buffer;
+			return "SE:????";
 		}
 		case 2:
 		{
 			if (reg < sizeof(es_regs))
 			{
-				sprintf(buffer, "ES:%s", es_regs[reg]);
-				return buffer;
+				return std::string("ES:") + es_regs[reg];
 			}
 			break;
 		}
@@ -665,8 +664,7 @@ static const char *get_reg_name(uint32_t unit, uint32_t reg)
 		{
 //          if (reg < sizeof(tm_regs))
 			{
-				sprintf(buffer, "TM:????");
-				return buffer;
+				return "TM:????";
 			}
 			break;
 		}
@@ -674,8 +672,7 @@ static const char *get_reg_name(uint32_t unit, uint32_t reg)
 		{
 			if (reg < sizeof(db_regs))
 			{
-				sprintf(buffer, "DB:%s", db_regs[reg]);
-				return buffer;
+				return std::string("DB:") + db_regs[reg];
 			}
 			break;
 		}
@@ -683,7 +680,7 @@ static const char *get_reg_name(uint32_t unit, uint32_t reg)
 
 	return "????";
 }
-#endif
+
 //**************************************************************************
 //  TRIANGLE ENGINE DEVICE
 //**************************************************************************
@@ -825,7 +822,7 @@ void m2_te_device::write(offs_t offset, uint32_t data)
 	uint32_t reg = offset & 0x1ff;
 	te_reg_wmode wmode = static_cast<te_reg_wmode>((offset >> 9) & 3);
 
-//  logerror("%s: TE W[%.8x] (%s) %.8x\n", machine().describe_context(), 0x00040000 + (offset << 2), get_reg_name(unit, reg), data);
+	LOG("%s: TE W[%.8x] (%s) %.8x\n", machine().describe_context(), 0x00040000 + (offset << 2), get_reg_name(unit, reg), data);
 
 	switch (unit)
 	{
@@ -1143,26 +1140,19 @@ void m2_te_device::log_triangle(uint32_t flags)
 
 	for (uint32_t i = 0; i < 3; ++i)
 	{
-		char s[64];
-		char t[64];
-		char p[64];
-
-		s[0] = '\0';
-		t[0] = '\0';
-		p[0] = '\0';
-
 		const se_vtx &vtx = m_se.vertices[i];
 
+		std::ostringstream optional;
 		if (flags & VTX_FLAG_SHAD)
-			sprintf(s, "COLR[R:%.6f G:%.6f B:%.6f A:%.6f]", vtx.r, vtx.g, vtx.b, vtx.a);
+			util::stream_format(optional, " COLR[R:%.6f G:%.6f B:%.6f A:%.6f]", vtx.r, vtx.g, vtx.b, vtx.a);
 
 		if (flags & VTX_FLAG_TEXT)
-			sprintf(t, "TEXT[UW:%.6f VW:%.6f]", vtx.uw, vtx.vw);
+			util::stream_format(optional, " TEXT[UW:%.6f VW:%.6f]", vtx.uw, vtx.vw);
 
 		if (flags & VTX_FLAG_PRSP)
-			sprintf(p, "PRSP[W:%.6f]", vtx.w);
+			util::stream_format(optional, " PRSP[W:%.6f]", vtx.w);
 
-		logerror("V%d: X:%.6f Y:%.6f %s %s %s\n", i, vtx.x, vtx.y, s, t, p);
+		logerror("V%d: X:%.6f Y:%.6f%s\n", i, vtx.x, vtx.y, std::move(optional).str());
 	}
 }
 

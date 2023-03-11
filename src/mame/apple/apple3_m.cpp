@@ -1123,6 +1123,12 @@ TIMER_CALLBACK_MEMBER(apple3_state::scanend_cb)
 	m_via[1]->write_pb6(1);
 
 	m_scanstart->adjust(m_screen->time_until_pos((scanline+1) % 224, 0));
+
+	// check for ctrl-reset
+	if ((m_kbspecial->read() & 0x88) == 0x88)
+	{
+		m_maincpu->reset();
+	}
 }
 
 READ_LINE_MEMBER(apple3_state::ay3600_shift_r)

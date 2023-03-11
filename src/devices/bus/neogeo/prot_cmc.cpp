@@ -723,9 +723,9 @@ void cmc_prot_device::cmc50_m1_decrypt(uint8_t* romcrypt, uint32_t romcrypt_size
 	memcpy(rom2,rom, 0x10000);
 	memcpy(rom2 + 0x10000, rom, 0x80000);
 
-	#if 0
+	if (0)
 	{
-		auto filename = std::string{ machine().system().name } + "_m1.dump";
+		auto filename = std::string(machine().system().name) + "_m1.dump";
 		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{
@@ -733,12 +733,10 @@ void cmc_prot_device::cmc50_m1_decrypt(uint8_t* romcrypt, uint32_t romcrypt_size
 			fclose(fp);
 		}
 	}
-	#endif
 
-
-	#if 0
+	if (0)
 	{
-		auto filename = std::string{ machine().system().name } + "_m1extra.dump";
+		auto filename = std::string(machine().system().name) + "_m1extra.dump";
 		auto fp = fopen(filename.c_str(), "w+b");
 		if (fp)
 		{
@@ -746,5 +744,4 @@ void cmc_prot_device::cmc50_m1_decrypt(uint8_t* romcrypt, uint32_t romcrypt_size
 			fclose(fp);
 		}
 	}
-	#endif
 }
