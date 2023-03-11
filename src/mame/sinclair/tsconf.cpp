@@ -198,6 +198,7 @@ void tsconf_state::machine_reset()
 {
 	m_frame_irq_timer->adjust(attotime::never);
 	m_scanline_irq_timer->adjust(attotime::never);
+	m_int_mask = 0;
 
 	m_bank0_rom.select(0);
 

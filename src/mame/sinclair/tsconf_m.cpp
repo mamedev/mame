@@ -747,36 +747,35 @@ void tsconf_state::tsconf_spi_miso_w(u8 data)
 
 IRQ_CALLBACK_MEMBER(tsconf_state::irq_vector)
 {
-	u8 vector = m_int_queue.front();
-	m_int_queue.pop_front();
+	u8 vector = 0xff;
+	if (m_int_mask & 1)
+		m_int_mask &= ~1;
+	else if (m_int_mask & 2)
+	{
+		m_int_mask &= ~2;
+		vector = 0xfd;
+	}
+	else if (m_int_mask & 4)
+	{
+		m_int_mask &= ~4;
+		vector = 0xfb;
+	}
 
-	if (m_int_queue.empty())
+	if (!m_int_mask)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
-	else if (vector == 0xfd)
-		m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
 
 	return vector;
 }
 
-void tsconf_state::irq_on(u8 vector)
+TIMER_CALLBACK_MEMBER(tsconf_state::irq_on)
 {
-	if (m_int_queue.empty())
-	{
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-		m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
-	}
-	if (vector == 0xfd)
-		m_irq_off_timer->adjust(attotime::never);
-
-	if (vector == 0xff)
-		m_int_queue.push_front(vector);
-	else
-		m_int_queue.push_back(vector);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
 }
 
 TIMER_CALLBACK_MEMBER(tsconf_state::irq_off)
 {
-	m_int_queue.clear();
+	m_int_mask = 0;
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
@@ -784,15 +783,10 @@ void tsconf_state::update_frame_timer()
 {
 	u16 vpos = OFFS_512(VS_INT_L);
 	u16 hpos = m_regs[HS_INT];
-	if (vpos <= 319 && hpos <= 223)
-	{
-		attotime at = m_screen->time_until_pos(vpos, hpos << 1);
-		if (at >= m_screen->frame_period())
-			at = attotime::zero;
-		m_frame_irq_timer->adjust(at);
-	}
-	else
-		m_frame_irq_timer->adjust(attotime::never);
+	attotime at = (BIT(m_regs[INT_MASK], 0) && vpos <= 319 && hpos <= 223) ? m_screen->time_until_pos(vpos, hpos << 1) : m_screen->time_until_pos(0, 0);
+	if (at >= m_screen->frame_period())
+		at = attotime::zero;
+	m_frame_irq_timer->adjust(at);
 
 	m_gfx_y_frame_offset = -get_screen_area().top();
 }
@@ -806,22 +800,29 @@ INTERRUPT_GEN_MEMBER(tsconf_state::tsconf_vblank_interrupt)
 void tsconf_state::dma_ready(int line)
 {
 	if (BIT(m_regs[INT_MASK], 4))
-		irq_on(0xfb);
+	{
+		m_int_mask |= 4;
+		m_irq_on_timer->adjust(attotime::zero);
+	}
 }
 
 TIMER_CALLBACK_MEMBER(tsconf_state::irq_frame)
 {
 	if (BIT(m_regs[INT_MASK], 0))
-		irq_on(0xff);
+		m_int_mask |= 1;
+	m_irq_on_timer->adjust(attotime::zero);
 }
 
 TIMER_CALLBACK_MEMBER(tsconf_state::irq_scanline)
 {
+	if (BIT(m_regs[INT_MASK], 1))
+	{
+		m_int_mask |= 2;
+		m_irq_on_timer->adjust(attotime::zero);
+	}
+
 	u16 screen_vpos = m_screen->vpos();
 	m_scanline_irq_timer->adjust(m_screen->time_until_pos(screen_vpos + 1));
-	if (BIT(m_regs[INT_MASK], 1))
-		irq_on(0xfd);
-
 	m_screen->update_now();
 	for (const auto &[reg, val] : m_scanline_delayed_regs_update)
 	{
