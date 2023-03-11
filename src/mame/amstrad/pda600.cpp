@@ -451,7 +451,7 @@ TIMER_CALLBACK_MEMBER(pda600_state::csio_clk_timer)
 	if (m_pen_shift < 48)
 	{
 		m_maincpu->cks_w(0);
-		m_maincpu->rxs_w(BIT(m_pen_data[m_pen_shift / 8], m_pen_shift & 7));
+		m_maincpu->rxs_cts1_w(BIT(m_pen_data[m_pen_shift / 8], m_pen_shift & 7));
 		m_maincpu->cks_w(1);
 		m_pen_shift++;
 
@@ -462,7 +462,7 @@ TIMER_CALLBACK_MEMBER(pda600_state::csio_clk_timer)
 
 			// A delay is added after each byte to allow the maincpu to read the transmitted data
 			if (!(m_pen_shift & 7))
-				delay += attotime::from_usec(50);
+				delay += attotime::from_usec(150);
 
 			m_csio_clk_timer->adjust(delay);
 		}
