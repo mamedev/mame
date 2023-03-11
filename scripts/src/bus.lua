@@ -1951,6 +1951,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx/cart/super_swangi.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/yamaha_ucn01.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/yamaha_ucn01.h",
+		MAME_DIR .. "src/devices/bus/msx/minicart/minicart.cpp",
+		MAME_DIR .. "src/devices/bus/msx/minicart/minicart.h",
 		MAME_DIR .. "src/devices/bus/msx/module/module.cpp",
 		MAME_DIR .. "src/devices/bus/msx/module/module.h",
 		MAME_DIR .. "src/devices/bus/msx/module/yamaha.cpp",

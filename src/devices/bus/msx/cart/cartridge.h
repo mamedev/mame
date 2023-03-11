@@ -7,7 +7,6 @@
 
 
 void msx_cart(device_slot_interface &device, bool is_in_subslot);
-void msx_yamaha_minicart(device_slot_interface &device, bool is_in_subslot); // 30 pin mini cartridge slot as found in some yamaha machines
 
 
 #endif // MAME_BUS_MSX_CART_CARTRIDGE_H

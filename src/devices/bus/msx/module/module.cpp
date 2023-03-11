@@ -4,8 +4,6 @@
 #include "emu.h"
 #include "yamaha.h"
 
-#include "bus/msx/slot/cartridge.h"
-
 
 // Several yamaha machines had 60 pin expansion slots. Most pinouts of these slots was
 // exactly the same as the regular 50 pin cartridge slots. The lowest 10 pins include

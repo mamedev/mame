@@ -87,9 +87,3 @@ void msx_cart(device_slot_interface &device, bool is_in_subslot)
 	}
 	device.option_add("softcard", MSX_CART_SOFTCARD);
 }
-
-
-void msx_yamaha_minicart(device_slot_interface &device, bool is_in_subslot)
-{
-	device.option_add_internal("nomapper", MSX_CART_NOMAPPER);
-}
