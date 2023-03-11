@@ -76,6 +76,7 @@ using util::BIT;
 #include "cpu/i960/i960dis.h"
 #include "cpu/ibm1800/ibm1800d.h"
 #include "cpu/ie15/ie15dasm.h"
+#include "cpu/interdata16/dasm16.h"
 #include "cpu/jaguar/jagdasm.h"
 #include "cpu/ks0164/ks0164d.h"
 #include "cpu/lc57/lc57d.h"
@@ -484,6 +485,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "ibm1130",         be, -1, []() -> util::disasm_interface * { return new ibm1130_disassembler; } },
 	{ "ibm1800",         be, -1, []() -> util::disasm_interface * { return new ibm1800_disassembler; } },
 	{ "ie15",            le,  0, []() -> util::disasm_interface * { return new ie15_disassembler; } },
+	{ "interdata16",     be,  0, []() -> util::disasm_interface * { return new interdata16_disassembler; } },
 	{ "jaguardsp",       be,  0, []() -> util::disasm_interface * { return new jaguar_disassembler(jaguar_disassembler::variant::DSP); } },
 	{ "jaguargpu",       be,  0, []() -> util::disasm_interface * { return new jaguar_disassembler(jaguar_disassembler::variant::GPU); } },
 	{ "konami",          be,  0, []() -> util::disasm_interface * { return new konami_disassembler; } },
