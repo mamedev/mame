@@ -195,9 +195,13 @@ void kc_state::kc85_2(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+	SPEAKER(config, "outl").front_left();
+	SPEAKER(config, "outr").front_right();
 	SPEAKER_SOUND(config, m_dac);
 	m_dac->set_levels(64, kc85_speaker_levels);
 	m_dac->add_route(ALL_OUTPUTS, "mono", 0.5);
+	SPEAKER_SOUND(config, m_tapeout_left).add_route(ALL_OUTPUTS, "outl", 0.25);
+	SPEAKER_SOUND(config, m_tapeout_right).add_route(ALL_OUTPUTS, "outr", 0.25);
 
 	kc85_slots(config);
 
@@ -244,10 +248,14 @@ void kc85_3_state::kc85_3(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+	SPEAKER(config, "outl").front_left();
+	SPEAKER(config, "outr").front_right();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.125);
 	SPEAKER_SOUND(config, m_dac);
 	m_dac->set_levels(64, kc85_speaker_levels);
 	m_dac->add_route(ALL_OUTPUTS, "mono", 0.5);
+	SPEAKER_SOUND(config, m_tapeout_left).add_route(ALL_OUTPUTS, "outl", 0.25);
+	SPEAKER_SOUND(config, m_tapeout_right).add_route(ALL_OUTPUTS, "outr", 0.25);
 
 	kc85_slots(config);
 
@@ -293,10 +301,14 @@ void kc85_4_state::kc85_4(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+	SPEAKER(config, "outl").front_left();
+	SPEAKER(config, "outr").front_right();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.125);
 	SPEAKER_SOUND(config, m_dac);
 	m_dac->set_levels(32, kc85_4_speaker_levels);
 	m_dac->add_route(ALL_OUTPUTS, "mono", 0.5);
+	SPEAKER_SOUND(config, m_tapeout_left).add_route(ALL_OUTPUTS, "outl", 0.25);
+	SPEAKER_SOUND(config, m_tapeout_right).add_route(ALL_OUTPUTS, "outr", 0.25);
 
 	kc85_slots(config);
 

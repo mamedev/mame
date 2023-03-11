@@ -705,6 +705,7 @@ WRITE_LINE_MEMBER( kc_state::ctc_zc0_callback )
 	{
 		m_k0_line^=1;
 		dac_update();
+		tapeout_update();
 	}
 }
 
@@ -715,6 +716,7 @@ WRITE_LINE_MEMBER( kc85_3_state::ctc_zc0_callback )
 		m_k0_line^=1;
 		dac_update();
 		speaker_update();
+		tapeout_update();
 	}
 }
 
@@ -725,6 +727,7 @@ WRITE_LINE_MEMBER( kc_state::ctc_zc1_callback)
 	{
 		m_k1_line^=1;
 		dac_update();
+		tapeout_update();
 
 		// K1 line is also cassette output
 		m_cassette->output((m_k1_line & 1) ? +1 : -1);
@@ -769,6 +772,12 @@ void kc_state::dac_update()
 void kc85_4_state::dac_update()
 {
 	m_dac->level_w((m_k0_line + m_k1_line) * m_dac_level);
+}
+
+void kc_state::tapeout_update()
+{
+	m_tapeout_left->level_w(m_k0_line);
+	m_tapeout_right->level_w(m_k1_line);
 }
 
 /* keyboard callback */

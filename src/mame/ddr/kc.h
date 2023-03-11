@@ -64,6 +64,8 @@ public:
 		, m_z80pio(*this, "z80pio")
 		, m_z80ctc(*this, "z80ctc")
 		, m_ram(*this, RAM_TAG)
+		, m_tapeout_left(*this, "tapel")
+		, m_tapeout_right(*this, "taper")
 		, m_dac(*this, "dac")
 		, m_cassette(*this, "cassette")
 		, m_screen(*this, "screen")
@@ -74,6 +76,8 @@ public:
 	required_device<z80pio_device> m_z80pio;
 	required_device<z80ctc_device> m_z80ctc;
 	required_device<ram_device> m_ram;
+	required_device<speaker_sound_device> m_tapeout_left;
+	required_device<speaker_sound_device> m_tapeout_right;
 	required_device<speaker_sound_device> m_dac;
 	required_device<cassette_image_device> m_cassette;
 	required_device<screen_device> m_screen;
@@ -125,6 +129,7 @@ public:
 
 	// sound
 	virtual void dac_update();
+	void tapeout_update();
 
 	// defined in video/kc.cpp
 	virtual void video_start() override;
