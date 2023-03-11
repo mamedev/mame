@@ -4,6 +4,33 @@
 
 Sprinter Sp2000 (Peters Plus Ltd)
 
+Hardware:
+- CPU                   Z84C15 (21MHz/3.5MHz)
+- RAM                   4Mb (64Mb)
+- Fast RAM              64Kb
+- ROM                   256Kb
+- Video RAM             256Kb (512Kb)
+- FDD controller        WD1793
+- Support FDD:          3,5" disk (1.44Mb/720Kb) / 5,25" disk (720Kb)
+- CMOS                  DALLAS
+- HDD controller        IDE/AT
+- Keyboard controler    101key/AT
+- Mouse controller      MS-Mouse
+- Slots                 ISA-8
+- Audio out             AY-3-8910 (in PLD), Stereo 8 bit (16 bit)
+- Video out             TV, CGA analog monitor, RGB
+- Graphic mode          320x256x256, 640x256x16, Spectrum standard screen
+- Text mode             80x32x16
+
+Refs:
+	https://web.archive.org/web/20030208004427/http://www.petersplus.com/sprinter/
+
+TODO:
+- ISA memory slots
+- fully untied from Spectrum parent
+- better rendering (currently not fully discovered) in Game Configuration
+- ? detect loading Configuration by checksum, not by presents in fastram
+
 *******************************************************************************************/
 
 #include "emu.h"
@@ -11,6 +38,7 @@ Sprinter Sp2000 (Peters Plus Ltd)
 #include "beta_m.h"
 #include "spec128.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "bus/ata/atapicdr.h"
 #include "bus/ata/ataintf.h"
@@ -19,7 +47,7 @@ Sprinter Sp2000 (Peters Plus Ltd)
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/z80/tmpz84c015.h"
+#include "cpu/z80/z84c015.h"
 #include "machine/ds128x.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -78,6 +106,7 @@ public:
 		, m_ldac(*this, "ldac")
 		, m_rdac(*this, "rdac")
 		, m_kbd(*this, "kbd")
+		, m_io_line(*this, "IO_LINE%u", 0U)
 		, m_io_mouse(*this, "mouse_input%u", 1U)
 		, m_io_turbo(*this, "TURBO")
 		, m_palette(*this, "palette")
@@ -116,8 +145,11 @@ protected:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_update_txt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_update_graph(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_update_game(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u8* as_mode(u8 a, u8 b);
+	std::pair<u8, u8> lookback_scroll(u8 a, u8 b);
 
-	required_device<tmpz84c015_device> m_maincpu;
+	required_device<z84c015_device> m_maincpu;
 
 private:
 
@@ -145,6 +177,7 @@ private:
 	u8 dcp_r(offs_t offset);
 	void dcp_w(offs_t offset, u8 data);
 
+	u8 cs_r(offs_t offset);
 	u8 ram_r(offs_t offset);
 	void ram_w(offs_t offset, u8 data);
 	void vram_w(offs_t offset, u8 data);
@@ -156,6 +189,7 @@ private:
 	u8 &accel_buffer(u8 idx);
 	void update_accel_buffer(u8 idx, u8 data);
 
+	u8 kbd_fe_r(offs_t offset);
 	void on_kbd_data(int state);
 	void do_cpu_wait(bool is_io = false);
 
@@ -166,10 +200,13 @@ private:
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
 	required_device<pc_kbdc_device> m_kbd;
+	required_ioport_array<8> m_io_line;
 	required_ioport_array<3> m_io_mouse;
 	required_ioport m_io_turbo;
 	required_device<device_palette_interface> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
+	tilemap_t *m_tilemap;
+	memory_region *m_rom;
 	memory_share_creator<u8> m_vram;
 	memory_share_creator<u8> m_fastram;
 	memory_bank_creator m_bank0_fastram;
@@ -177,14 +214,17 @@ private:
 	memory_view m_bank_view3;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 
+	TILE_GET_INFO_MEMBER(get_tile_info);
+
 	u8 *m_dcp_location;
 	u8 m_ram_pages[0x40] = {}; // 0xc0 - 0xff
 	u16 m_pages[4] = {}; // internal state for faster calculations
 
 	bool m_z80_m1;
-	u16 m_timer_overlap;
 	std::list<std::pair<u16, u16>> m_ints;
 
+	u8 m_conf;
+	bool m_conf_loading;
 	bool m_starting;
 	bool m_dos; // 0-on, 1-off
 	bool m_cash_on;
@@ -232,6 +272,13 @@ private:
 
 void sprinter_state::update_memory()
 {
+	if (m_conf_loading && m_starting)
+	{
+		m_bank_view0.disable();
+		m_bank_view3.disable();
+		return;
+	}
+
 	const bool pre_rom = m_rom_sys || m_cash_on;
 	const bool pre_cash = !m_cash_on;
 	if (!pre_rom && pre_cash)
@@ -296,10 +343,7 @@ void sprinter_state::update_memory()
 
 void sprinter_state::update_cpu()
 {
-	double clock = m_maincpu->clock();
-	m_maincpu->set_clock(X_SP / ((m_turbo && m_turbo_hard) ? 2 : 12)); // 1 - 21MHz, 0 - 3.5MHz
-	clock /= m_maincpu->clock();
-	m_timer_overlap /= clock;
+	m_maincpu->set_clock_scale((m_turbo && m_turbo_hard) ? 6 : 1); // 1 - 21MHz, 0 - 3.5MHz
 }
 
 void sprinter_state::sprinter_palette(palette_device &palette) const
@@ -310,8 +354,13 @@ void sprinter_state::sprinter_palette(palette_device &palette) const
 
 u32 sprinter_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	screen_update_graph(screen, bitmap, cliprect);
-	screen_update_txt(screen, bitmap, cliprect);
+	if (m_conf)
+		screen_update_game(screen, bitmap, cliprect);
+	else
+	{
+		screen_update_graph(screen, bitmap, cliprect);
+		screen_update_txt(screen, bitmap, cliprect);
+	}
 
 	return 0;
 }
@@ -325,22 +374,19 @@ void sprinter_state::screen_update_txt(screen_device &screen, bitmap_ind16 &bitm
 	{
 		const u16 b8 = (SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT;
 
-		u8* line1 = nullptr;
 		u8* mode = nullptr;
 		u8 attr, symb;
 		u16 *pix = &(bitmap.pix(vpos, cliprect.left()));
 		for(u16 hpos = cliprect.left(); hpos <= cliprect.right(); hpos++)
 		{
 			const u16 a16 = (SPRINT_WIDTH + hpos - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
-			if ((line1 == nullptr) || (a16 & 7) == 0)
+			if ((mode == nullptr) || (a16 & 7) == 0)
 			{
 				// 16x8 block descriptor
-				const bool do_init = line1 == nullptr;
+				const bool do_init = mode == nullptr;
 				if (do_init || ((a16 & 15) == 0))
-				{
-					line1 = m_vram + (1 + (a16 >> 4) * 2 + 0x80 * (m_rgmod & 1)) * 1024 + 0x300;
-					mode = line1 + (b8 >> 3) * 4;
-				}
+					mode = as_mode(a16 >> 4, b8 >> 3);
+
 				if (BIT(mode[0], 4))
 				{
 					if (!BIT(mode[0], 5) && (((a16 & 15) == 8) || (do_init && (a16 & 8))))
@@ -391,25 +437,24 @@ void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bi
 	{
 		const u16 b8 = (SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT;
 
-		u8* line1 = nullptr;
 		u8* mode = nullptr;
 		u16 pal, x;
 		u8 y;
 		u16 *pix = &(bitmap.pix(vpos, cliprect.left()));
+
 		for(u16 hpos = cliprect.left(); hpos <= cliprect.right(); hpos++)
 		{
 			const u16 a16 = (SPRINT_WIDTH + hpos - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
-			if ((line1 == nullptr) || ((a16 & 15) == 0))
+			if ((mode == nullptr) || ((a16 & 15) == 0))
 			{
 				// 16x8 block descriptor
-				line1 = m_vram + (1 + (a16 >> 4) * 2 + 0x80 * (m_rgmod & 1)) * 1024 + 0x300;
-				mode = line1 + (b8 >> 3) * 4;
+				mode = as_mode(a16 >> 4, b8 >> 3);
 				if(!BIT(mode[0], 4))
 				{
 					pal = BIT(mode[0], 6, 2) << 8;
 					x = (BIT(mode[0], 0, 4) << 6) | (BIT(mode[1], 0, 3) << 3);
 					y = BIT(mode[1], 3, 5) << 3;
-					if (BIT(mode[2], 2))
+					if (BIT(mode[2], 2)) // lowres
 					{
 						x += 4 * BIT(mode[2], 0);
 						y += 4 * BIT(mode[2], 1);
@@ -431,15 +476,81 @@ void sprinter_state::screen_update_graph(screen_device &screen, bitmap_ind16 &bi
 	}
 }
 
+ // Game Config - used in Thunder in the Deep
+void sprinter_state::screen_update_game(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const s8 dy = 7 - (m_hold >> 4);
+	const s8 dx = (7 - (m_hold & 0x0f)) * 2;
+	for(u16 vpos = cliprect.top(); vpos <= cliprect.bottom(); vpos++)
+	{
+		const u8 b = ((SPRINT_HEIGHT + vpos - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT) >> 3;
+		const u8 a = ((SPRINT_WIDTH + cliprect.left() - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH) >> 4;
+		std::pair<u8, u8> scroll = lookback_scroll(a, b);
+
+		u8* mode = nullptr;
+		u16 pal, x;
+		u8 y;
+		u16 *pix = &(bitmap.pix(vpos, cliprect.left()));
+
+		for(u16 hpos = cliprect.left(); hpos <= cliprect.right(); hpos++)
+		{
+			u16 a16 = (SPRINT_WIDTH + hpos + (scroll.first << 1) - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
+			if ((mode != nullptr) && BIT(mode[0], 2) && (((a16 - (scroll.first << 1)) & 15) == 0))
+			{
+				scroll = {mode[3] & 0x0f, mode[3] >> 4};
+				a16 = (SPRINT_WIDTH + hpos + (scroll.first << 1) - SPRINT_BORDER_LEFT - dx) % SPRINT_WIDTH;
+			}
+			const u16 b8 = (SPRINT_HEIGHT + vpos + scroll.second - SPRINT_BORDER_TOP - dy) % SPRINT_HEIGHT;
+
+			if (mode == nullptr)
+			{
+				mode = as_mode(a16 >> 4, b8 >> 3);
+				pal = BIT(mode[0], 6, 2) << 8;
+				x = ((BIT(mode[0], 0, 2) << 8) | mode[1]);
+				y = mode[2];
+			}
+
+			if ((BIT(mode[0], 5, 3) == 7))
+				*pix++ = 0x400 | (((mode[0] & 0x0c) == 0x0c) ? 0 : ((m_port_fe_data & 0x07) << 3) | (m_port_fe_data & 0x07));
+			else
+				*pix++ = pal + m_vram[(y + (b8 & 7)) * 1024 + x + ((a16 & 15) >> 1)];
+
+			if ((a16 & 15) == 15)
+			{
+				if (BIT(mode[0], 2))
+					scroll = {mode[3] & 0x0f, mode[3] >> 4};
+				mode = nullptr;
+			}
+		}
+	}
+}
+
+u8* sprinter_state::as_mode(u8 a, u8 b)
+{
+	const u32 line1 = (1 + a * 2 + 0x80 * (m_rgmod & 1)) * 1024;
+	const u16 la = 0x300 + b * 4;
+
+	return m_vram + line1 + la;
+}
+
+std::pair<u8, u8> sprinter_state::lookback_scroll(u8 a, u8 b)
+{
+	for (auto v = b; b; b--, a = 55)
+	{
+		for(auto h = a; a; a--)
+		{
+			const u8* mode = as_mode(h, v);
+			if (BIT(mode[0], 2) && (h != a) && (v != b))
+				return { mode[3] & 0x0f, mode[3] >> 4 };
+		}
+	}
+
+	return { 0, 0 };
+}
+
 u8 sprinter_state::dcp_r(offs_t offset)
 {
 	if (m_starting) m_starting = 0;
-	if ((offset & 0xfe) == 0xee)
-	{
-		// TODO ee, ef z84 internal ports must be handled by cpu which is not implemented yet.
-		LOGIO("Skipped IO read %04X\n", offset);
-		return 0;
-	}
 
 	if (!machine().side_effects_disabled())
 	{
@@ -504,13 +615,7 @@ u8 sprinter_state::dcp_r(offs_t offset)
 		break;
 
 	case 0x40:
-		data = spectrum_ula_r(offset);
-		if (CBL_MODE)
-		{
-			data &= ~0xa0;
-			data |= (m_screen->vpos() >= (SPRINT_BORDER_TOP + SPRINT_SCREEN_YSIZE)) << 5;
-			data |= (CBL_INT_ENA ? (m_cbl_cnt ^ m_cbl_wa) : m_cbl_cnt) & 0x80;
-		}
+		data = kbd_fe_r(offset);
 		break;
 
 	case 0x52: // AY8910
@@ -555,12 +660,8 @@ u8 sprinter_state::dcp_r(offs_t offset)
 
 void sprinter_state::dcp_w(offs_t offset, u8 data)
 {
-	if (((offset & 0xfe) == 0xee) || m_starting)
-	{
-		// see: dcp_r
-		LOGIO("Skipped IO write %04X = %02x\n", offset, data);
+	if (m_starting)
 		return;
-	}
 
 	do_cpu_wait(true);
 
@@ -630,6 +731,15 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		break;
 	case 0x2b: // HDD2 - primary
 		m_ata_selected = 0;
+		break;
+	case 0x2e:
+		if (m_conf)
+			machine().schedule_hard_reset();
+		else
+		{
+			m_conf_loading = 1;
+			machine().schedule_soft_reset();
+		}
 		break;
 
 	case 0x88:
@@ -918,17 +1028,41 @@ void sprinter_state::update_accel_buffer(u8 idx, u8 data)
 	}
 }
 
+u8 sprinter_state::cs_r(offs_t offset)
+{
+	u8 data = 0xff;
+	if (m_maincpu->cs0_r(offset))
+		data = m_rom->as_u8((0x0c << 14) + offset);
+	else if (m_maincpu->cs1_r(offset))
+		data = m_fastram.target()[offset];
+
+	return data;
+}
+
 u8 sprinter_state::ram_r(offs_t offset)
 {
-	const u8 bank = offset >> 14;
-	return ((m_pages[bank] & 0xf0) == 0x50)
-		? m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)]
-		: reinterpret_cast<u8 *>(m_bank_ram[bank]->base())[offset & 0x3fff];
+	if (m_conf_loading && m_starting)
+		return cs_r(offset);
+	else
+	{
+		const u8 bank = offset >> 14;
+		return ((m_pages[bank] & 0xf0) == 0x50)
+			? m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)]
+			: reinterpret_cast<u8 *>(m_bank_ram[bank]->base())[offset & 0x3fff];
+	}
 }
 
 void sprinter_state::ram_w(offs_t offset, u8 data)
 {
-	if (m_skip_write)
+	if (m_conf_loading && m_starting)
+	{
+		m_conf_loading = 0;
+		m_ram_pages[0x2e] = m_maincpu->cs1_r(0x1000) ? 0x41 : 0x00;
+		m_conf = m_maincpu->cs1_r(0x1000);
+		machine().schedule_soft_reset();
+		return;
+	}
+	else if (m_skip_write)
 	{
 		m_skip_write = false;
 		return;
@@ -989,6 +1123,8 @@ void sprinter_state::vram_w(offs_t offset, u8 data)
 	const u16 laddr = offset & 0x3ff;
 	const bool is_int_updated = (laddr >= 0x300) && (laddr < 0x3a0) && ((offset & 0x403) == 0x400) && (((m_vram[offset] & 0xfc) == 0xfc) || ((data & 0xfc) == 0xfc)) && (m_vram[offset] ^ data);
 	m_vram[offset] = data;
+	m_tilemap->mark_all_dirty();
+	m_gfxdecode->gfx(1)->mark_all_dirty();
 	if (is_int_updated)
 		update_int(true);
 	else if (laddr >= 0x3e0)
@@ -1006,12 +1142,12 @@ void sprinter_state::update_int(bool recalculate)
 		m_ints.clear();
 		for (auto a = 0; a <= 55; a++)
 		{
-			const u8* la = m_vram + (1 + 2 * a + 0x80 * (m_rgmod & 1)) * 1024 + 0x300;
+			const u8* line1 = as_mode(a, 0);
 			for (auto b = 0; b <= 39; b++)
 			{
-				if ((*la & 0xfd) == 0xfd)
+				if ((*line1 & 0xfd) == 0xfd)
 					m_ints.push_back({b * 8 + 23, a * 16 + 112});
-				la += 4;
+				line1 += 4;
 			}
 		}
 	}
@@ -1112,7 +1248,8 @@ void sprinter_state::machine_start()
 	save_item(NAME(m_ram_pages));
 	save_item(NAME(m_pages));
 	save_item(NAME(m_z80_m1));
-	save_item(NAME(m_timer_overlap));
+	save_item(NAME(m_conf));
+	save_item(NAME(m_conf_loading));
 	save_item(NAME(m_starting));
 	save_item(NAME(m_dos));
 	save_item(NAME(m_cash_on));
@@ -1153,8 +1290,8 @@ void sprinter_state::machine_start()
 	m_beta->enable();
 
 	// reconfigure ROMs
-	memory_region *rom = memregion("maincpu");
-	m_bank_rom[0]->configure_entries(0, rom->bytes() / 0x4000, rom->base(), 0x4000);
+	m_rom = memregion("maincpu");
+	m_bank_rom[0]->configure_entries(0, m_rom->bytes() / 0x4000, m_rom->base(), 0x4000);
 	m_bank0_fastram->configure_entries(0, m_fastram.bytes() / 0x4000, m_fastram.target(), 0x4000);
 	for (auto i = 0; i < 4; i++)
 		m_bank_ram[i]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
@@ -1174,12 +1311,13 @@ void sprinter_state::machine_start()
 	m_port_y   = 0x00; // c4
 	m_rgmod    = 0x00; // c5
 	m_hold     = 0x77; // cb
+	m_conf_loading = 1;
+	m_conf = 0;
 }
 
 void sprinter_state::machine_reset()
 {
 	m_cbl_timer->adjust(attotime::never);
-	m_timer_overlap = 0;
 
 	spectrum_128_state::machine_reset();
 
@@ -1222,13 +1360,34 @@ static const gfx_layout sprinter_charlayout =
 	1024 * 8         // every char takes 8 bytes
 };
 
+static const gfx_layout sprinter_tiles =
+{
+	8, 8,
+	128 * 32 * 8,
+	8,
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
+	{ STEP8(0, 1024 * 8) },
+	8 * 8
+};
+
 static GFXDECODE_START( gfx_sprinter )
 	GFXDECODE_RAM( "vram", 0x2c0, sprinter_charlayout, 0x70f, 1 )
+	GFXDECODE_RAM( "vram", 0,     sprinter_tiles,      0x100, 256 )
 GFXDECODE_END
+
+TILE_GET_INFO_MEMBER(sprinter_state::get_tile_info)
+{
+	const u8 col = tile_index % 128;
+	const u8 row = tile_index / 128;
+	tileinfo.set(1, row * 128 * 8 + col, 0, 0);
+}
 
 void sprinter_state::video_start()
 {
 	spectrum_state::video_start();
+
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sprinter_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 
 	m_contention_pattern = {};
 	init_taps();
@@ -1240,6 +1399,43 @@ static void sprinter_ata_devices(device_slot_interface &device)
 {
 	device.option_add("hdd", IDE_HARDDISK);
 	device.option_add("cdrom", ATAPI_CDROM);
+}
+
+u8 sprinter_state::kbd_fe_r(offs_t offset)
+{
+	u8 data = 0xff;
+
+	u8 oi = offset >> 8;
+	u8 shifts = 0xff;
+	for (u8 i = 0; i < 8; i++, oi >>= 1)
+	{
+		const u8 line_data = m_io_line[i]->read();
+		shifts &= line_data;
+		if ((oi & 1) == 0)
+			data &= line_data;
+	}
+
+	if (((offset & 0x0100) == 0) && BIT(~shifts, 6))
+		data &= ~0x01; // CS
+
+	if (((offset & 0x8000) == 0) && BIT(~shifts, 7))
+		data &= ~0x02; // SS
+
+	data |= 0xe0;
+	data ^= 0x40;
+
+	/* cassette input from wav */
+	if (m_cassette->input() > 0.0038 )
+		data &= ~0x40;
+
+	if (CBL_MODE)
+	{
+		data &= ~0xa0;
+		data |= (m_screen->vpos() >= (SPRINT_BORDER_TOP + SPRINT_SCREEN_YSIZE)) << 5;
+		data |= (CBL_INT_ENA ? (m_cbl_cnt ^ m_cbl_wa) : m_cbl_cnt) & 0x80;
+	}
+
+	return data;
 }
 
 void sprinter_state::on_kbd_data(int state)
@@ -1255,40 +1451,25 @@ void sprinter_state::on_kbd_data(int state)
 
 void sprinter_state::do_cpu_wait(bool is_io)
 {
-	const u8 count = is_io ? 4 : 3;
 	if ((m_turbo && m_turbo_hard))
 	{
+		u8 count = is_io ? 4 : 3;
 		const u8 over = m_maincpu->total_cycles() % count;
-		m_timer_overlap += count + (over ? (count - over) : 0);
-	}
-	const s32 allowed = std::min<s32>(m_timer_overlap, m_maincpu->cycles_remaining() - count);
-	if (allowed > 0)
-	{
-		m_maincpu->adjust_icount(-allowed);
-		m_timer_overlap -= allowed;
+		count = count + (over ? (count - over) : 0);
+		m_maincpu->adjust_icount(-count);
 	}
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_on)
 {
-	const attotime to = attotime::from_hz(3.5_MHz_XTAL / 32);
-	const attotime now = m_maincpu->cycles_to_attotime(m_timer_overlap);
-	if (m_timer_overlap < 10)
-	{
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-		m_irq_off_timer->adjust(to);
-		update_int(false);
-	}
-	else if (now < to)
-		m_irq_on_timer->adjust(now);
-	else
-		update_int(false);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
+	update_int(false);
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_off)
 {
-	m_maincpu->set_input_line(0, CLEAR_LINE);
-	update_int(false);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
@@ -1300,7 +1481,7 @@ TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
 	if (CBL_INT_ENA && !(m_cbl_cnt & 0x7f))
 	{
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-		m_irq_off_timer->enable(false);
+		m_irq_off_timer->adjust(attotime::never);
 	}
 }
 
@@ -1313,7 +1494,125 @@ INPUT_CHANGED_MEMBER(sprinter_state::turbo_changed)
 }
 
 INPUT_PORTS_START( sprinter )
-	PORT_INCLUDE( spec128 )
+	/* PORT_NAME =  KEY Mode    CAPS Mode    SYMBOL Mode   EXT Mode   EXT+Shift Mode   BASIC Mode  */
+	PORT_START("IO_LINE0") /* 0xFEFE */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPS SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)  PORT_CHAR(UCHAR_SHIFT_1) PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("z    Z    :      LN       BEEP   COPY") PORT_CODE(KEYCODE_Z)      PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(':')
+	                                                                 PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("x    X    \xC2\xA3   EXP      INK    CLEAR") PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(0xA3)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("c    C    ?      LPRINT   PAPER  CONT") PORT_CODE(KEYCODE_C)      PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR('?')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("v    V    /      LLIST    FLASH  CLS") PORT_CODE(KEYCODE_V)       PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR('/')
+	                                                                 PORT_CODE(KEYCODE_SLASH) PORT_CODE(KEYCODE_SLASH_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CS Line0")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS Line0") PORT_CODE(KEYCODE_BACKSLASH) PORT_CODE(KEYCODE_SLASH) PORT_CODE(KEYCODE_SLASH_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IO_LINE1") /* 0xFDFE */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("a    A    STOP   READ      ~     NEW") PORT_CODE(KEYCODE_A)      PORT_CHAR('a') PORT_CHAR('A')// PORT_CHAR('~')
+	                                                                 PORT_CODE(KEYCODE_TILDE)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("s    S    NOT    RESTORE   |     SAVE") PORT_CODE(KEYCODE_S)     PORT_CHAR('s') PORT_CHAR('S')// PORT_CHAR('|')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("d    D    STEP   DATA      \\    DIM") PORT_CODE(KEYCODE_D)      PORT_CHAR('d') PORT_CHAR('D')// PORT_CHAR('\\')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("f    F    TO     SGN       {     FOR") PORT_CODE(KEYCODE_F)      PORT_CHAR('f') PORT_CHAR('F')// PORT_CHAR('{')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("g    G    THEN   ABS       }     GOTO") PORT_CODE(KEYCODE_G)     PORT_CHAR('g') PORT_CHAR('G')// PORT_CHAR('}')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CS Line1")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS Line1") PORT_CODE(KEYCODE_TILDE)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IO_LINE2") /* 0xFBFE */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("q    Q    <=     SIN      ASN      PLOT") PORT_CODE(KEYCODE_Q)   PORT_CHAR('q') PORT_CHAR('Q')
+	                                                                 PORT_CODE(KEYCODE_HOME)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("w    W    <>     COS      ACS      DRAW") PORT_CODE(KEYCODE_W)   PORT_CHAR('w') PORT_CHAR('W')
+	                                                                 PORT_CODE(KEYCODE_INSERT)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("e    E    >=     TAN      ATN      REM") PORT_CODE(KEYCODE_E)    PORT_CHAR('e') PORT_CHAR('E')
+	                                                                 PORT_CODE(KEYCODE_END)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("r    R    <      INT      VERIFY   RUN") PORT_CODE(KEYCODE_R)    PORT_CHAR('r') PORT_CHAR('R') PORT_CHAR('<')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("t    T    >      RND      MERGE    RAND") PORT_CODE(KEYCODE_T)   PORT_CHAR('t') PORT_CHAR('T') PORT_CHAR('>')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CS Line2")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS Line2") PORT_CODE(KEYCODE_HOME) PORT_CODE(KEYCODE_INSERT) PORT_CODE(KEYCODE_END)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IO_LINE3") /* 0xF7FE */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1   EDIT       !    BLUE     DEF FN") PORT_CODE(KEYCODE_1)       PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR('1') PORT_CHAR('!')
+	                                                       PORT_CODE(KEYCODE_F1)
+	                                                           PORT_CODE(KEYCODE_TAB)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2   CAPS LOCK  @    RED      FN")     PORT_CODE(KEYCODE_2)       PORT_CHAR(UCHAR_MAMEKEY(F2)) PORT_CHAR('2') PORT_CHAR('@')
+	                                                       PORT_CODE(KEYCODE_F2)
+                                                               PORT_CODE(KEYCODE_CAPSLOCK)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3   TRUE VID   #    MAGENTA  LINE")   PORT_CODE(KEYCODE_3)       PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHAR('3') PORT_CHAR('#')
+	                                                       PORT_CODE(KEYCODE_F3)
+	                                                           PORT_CODE(KEYCODE_PGUP)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4   INV VID    $    GREEN    OPEN#")  PORT_CODE(KEYCODE_4)       PORT_CHAR(UCHAR_MAMEKEY(F4)) PORT_CHAR('4') PORT_CHAR('$')
+	                                                       PORT_CODE(KEYCODE_F4)
+	                                                           PORT_CODE(KEYCODE_PGDN)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5   Left       %    CYAN     CLOSE#") PORT_CODE(KEYCODE_5)       PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHAR('5') PORT_CHAR('%')
+	                                                       PORT_CODE(KEYCODE_F5)
+	                                                           PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CS Line3") PORT_CODE(KEYCODE_TAB) PORT_CODE(KEYCODE_CAPSLOCK) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_PGDN) PORT_CODE(KEYCODE_LEFT) PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS Line3")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IO_LINE4") /* 0xEFFE */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0   DEL        _    BLACK    FORMAT") PORT_CODE(KEYCODE_0)       PORT_CHAR(UCHAR_MAMEKEY(F10)) PORT_CHAR('0') PORT_CHAR('_')
+	                                                       PORT_CODE(KEYCODE_F10)
+	                                                           PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9   GRAPH      )             POINT")  PORT_CODE(KEYCODE_9)       PORT_CHAR(UCHAR_MAMEKEY(F9)) PORT_CHAR('9') PORT_CHAR(')')
+	                                                       PORT_CODE(KEYCODE_F9)
+	                                                           PORT_CODE(KEYCODE_DEL)
+	                                                                      PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8   Right      (             CAT")    PORT_CODE(KEYCODE_8)       PORT_CHAR(UCHAR_MAMEKEY(F8)) PORT_CHAR('8') PORT_CHAR('(')
+	                                                       PORT_CODE(KEYCODE_F8)
+	                                                           PORT_CODE(KEYCODE_RIGHT) PORT_CODE(KEYCODE_6_PAD)
+	                                                                      PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7   Up         '    WHITE    ERASE")  PORT_CODE(KEYCODE_7)       PORT_CHAR(UCHAR_MAMEKEY(F7)) PORT_CHAR('7') PORT_CHAR('\'')
+	                                                       PORT_CODE(KEYCODE_F7)
+	                                                           PORT_CODE(KEYCODE_UP) PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6   Down       &    YELLOW   MOVE")   PORT_CODE(KEYCODE_6)       PORT_CHAR(UCHAR_MAMEKEY(F6)) PORT_CHAR('6') PORT_CHAR('&')
+	                                                       PORT_CODE(KEYCODE_F6)
+	                                                           PORT_CODE(KEYCODE_DOWN) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CS Line4") PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_RIGHT) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_UP) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_DOWN) PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS Line4") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IO_LINE5") /* 0xDFFE */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("p    P    \"     TAB      (c)    PRINT") PORT_CODE(KEYCODE_P)    PORT_CHAR('p') PORT_CHAR('P') PORT_CHAR('"')
+	                                                                 PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("o    O    ;      PEEK     OUT    POKE") PORT_CODE(KEYCODE_O)     PORT_CHAR('o') PORT_CHAR('O') PORT_CHAR(';')
+	                                                                 PORT_CODE(KEYCODE_COLON)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("i    I    AT     CODE     IN     INPUT") PORT_CODE(KEYCODE_I)    PORT_CHAR('i') PORT_CHAR('I')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("u    U    OR     CHR$     ]      IF") PORT_CODE(KEYCODE_U)       PORT_CHAR('u') PORT_CHAR('U')// PORT_CHAR(']')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("y    Y    AND    STR$     [      RETURN") PORT_CODE(KEYCODE_Y)   PORT_CHAR('y') PORT_CHAR('Y')// PORT_CHAR('[')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CS Line5")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS Line5") PORT_CODE(KEYCODE_QUOTE) PORT_CODE(KEYCODE_COLON)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IO_LINE6") /* 0xBFFE */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD)    PORT_CHAR(13)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("l    L    =      USR      ATTR     LET") PORT_CODE(KEYCODE_L)    PORT_CHAR('l') PORT_CHAR('L') PORT_CHAR('=')
+	                                                                 PORT_CODE(KEYCODE_EQUALS)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("k    K    +      LEN      SCREEN$  LIST") PORT_CODE(KEYCODE_K)   PORT_CHAR('k') PORT_CHAR('K') PORT_CHAR('+')
+	                                                                 PORT_CODE(KEYCODE_PLUS_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("j    J    -      VAL      VAL$     LOAD") PORT_CODE(KEYCODE_J)   PORT_CHAR('j') PORT_CHAR('J') PORT_CHAR('-')
+	                                                                 PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("h    H    ^      SQR      CIRCLE   GOSUB") PORT_CODE(KEYCODE_H)  PORT_CHAR('h') PORT_CHAR('H') PORT_CHAR('^')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CS Line6")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS Line6") PORT_CODE(KEYCODE_EQUALS) PORT_CODE(KEYCODE_MINUS) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CODE(KEYCODE_PLUS_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IO_LINE7") /* 0x7FFE */
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE)                                       PORT_CHAR(' ')
+	                                                       PORT_CODE(KEYCODE_ESC)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SYMBOL SHIFT") PORT_CODE(KEYCODE_RCONTROL) PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL)) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
+	                                                       PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("m    M    .      PI       INVERSE  PAUSE") PORT_CODE(KEYCODE_M)        PORT_CHAR('m') PORT_CHAR('M') PORT_CHAR('.')
+	                                                                 PORT_CODE(KEYCODE_STOP)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("n    N    ,      INKEY$   OVER     NEXT") PORT_CODE(KEYCODE_N)         PORT_CHAR('n') PORT_CHAR('N') PORT_CHAR(',')
+	                                                                 PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("b    B    *      BIN      BRIGHT   BORDER") PORT_CODE(KEYCODE_B)       PORT_CHAR('b') PORT_CHAR('B') PORT_CHAR('*')
+	                                                                 PORT_CODE(KEYCODE_ASTERISK)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CS Line7") PORT_CODE(KEYCODE_ESC) PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SS Line7") PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_COMMA) PORT_CODE(KEYCODE_ASTERISK)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED)
+
 
 	PORT_START("mouse_input1")
 	PORT_BIT(0xff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(30)
@@ -1327,8 +1626,13 @@ INPUT_PORTS_START( sprinter )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
 
+
+	PORT_START("NMI")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NMI") PORT_CODE(KEYCODE_F11)
+
 	PORT_START("TURBO")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Turbo") PORT_CODE(KEYCODE_F12) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, sprinter_state, turbo_changed, 0)
+	PORT_BIT(0xfe, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 void sprinter_state::sprinter(machine_config &config)
@@ -1338,7 +1642,7 @@ void sprinter_state::sprinter(machine_config &config)
 
 	m_ram->set_default_size("64M");
 
-	TMPZ84C015(config.replace(), m_maincpu, X_SP / 12); // 3.5MHz default
+	Z84C015(config.replace(), m_maincpu, X_SP / 12); // 3.5MHz default
 	m_maincpu->set_m1_map(&sprinter_state::map_fetch);
 	m_maincpu->set_memory_map(&sprinter_state::map_mem);
 	m_maincpu->set_io_map(&sprinter_state::map_io);
@@ -1352,9 +1656,9 @@ void sprinter_state::sprinter(machine_config &config)
 	PALETTE(config, "palette", FUNC(sprinter_state::sprinter_palette), 256 * 8);
 
 	PC_KBDC(config, m_kbd, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
-	m_kbd->out_data_cb().set(m_maincpu, FUNC(tmpz84c015_device::rxa_w)); // KBD_DATR
-	m_kbd->out_clock_cb().set(m_maincpu, FUNC(tmpz84c015_device::rxca_w)); // KBD_CLKR
-	m_kbd->out_clock_cb().append(m_maincpu, FUNC(tmpz84c015_device::txca_w));
+	m_kbd->out_data_cb().set(m_maincpu, FUNC(z84c015_device::rxa_w)); // KBD_DATR
+	m_kbd->out_clock_cb().set(m_maincpu, FUNC(z84c015_device::rxca_w)); // KBD_CLKR
+	m_kbd->out_clock_cb().append(m_maincpu, FUNC(z84c015_device::txca_w));
 	m_kbd->out_clock_cb().append(FUNC(sprinter_state::on_kbd_data));
 
 	m_maincpu->set_clk_trg<0>(X_SP / 48);
@@ -1365,11 +1669,11 @@ void sprinter_state::sprinter(machine_config &config)
 	m_rs232.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
 	m_rs232.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
 	m_rs232.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
-	m_rs232.rxd_handler().set(m_maincpu, FUNC(tmpz84c015_device::rxb_w)); // MOUSE_D
+	m_rs232.rxd_handler().set(m_maincpu, FUNC(z84c015_device::rxb_w)); // MOUSE_D
 	m_maincpu->out_txdb_callback().set("rs232", FUNC(rs232_port_device::write_txd)); // TXDB
-	m_maincpu->zc_callback<0>().set(m_maincpu, FUNC(tmpz84c015_device::rxcb_w)); // CLK_COM1
-	m_maincpu->zc_callback<0>().append(m_maincpu, FUNC(tmpz84c015_device::txcb_w));
-	m_maincpu->zc_callback<2>().set(m_maincpu, FUNC(tmpz84c015_device::trg3));
+	m_maincpu->zc_callback<0>().set(m_maincpu, FUNC(z84c015_device::rxcb_w)); // CLK_COM1
+	m_maincpu->zc_callback<0>().append(m_maincpu, FUNC(z84c015_device::txcb_w));
+	m_maincpu->zc_callback<2>().set(m_maincpu, FUNC(z84c015_device::trg3));
 
 	DS12885(config, m_rtc, XTAL(32'768)); // should be DS12887A
 	ATA_INTERFACE(config, m_ata[0]).options(sprinter_ata_devices, "hdd", "hdd", false);
