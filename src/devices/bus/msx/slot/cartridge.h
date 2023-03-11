@@ -38,12 +38,10 @@ reserved - 16 15 - /RESET
 #pragma once
 
 #include "slot.h"
-#include "bus/msx/cart/cartridge.h"
-#include "bus/msx/module/module.h"
 #include "imagedev/cartrom.h"
 
 
-DECLARE_DEVICE_TYPE(MSX_SLOT_CARTRIDGE,        msx_slot_cartridge_device)
+DECLARE_DEVICE_TYPE(MSX_SLOT_CARTRIDGE, msx_slot_cartridge_device)
 
 
 class msx_cart_interface;

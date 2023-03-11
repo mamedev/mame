@@ -3,6 +3,7 @@
 #include "emu.h"
 #include "yamaha_ucn01.h"
 #include "bus/msx/slot/module.h"
+#include "bus/msx/module/module.h"
 
 /*
 Emulation of Yamaha UCN-01.
