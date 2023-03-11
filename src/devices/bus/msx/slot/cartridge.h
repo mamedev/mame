@@ -7,6 +7,7 @@
 
 #include "slot.h"
 #include "bus/msx/cart/cartridge.h"
+#include "bus/msx/module/module.h"
 #include "imagedev/cartrom.h"
 
 

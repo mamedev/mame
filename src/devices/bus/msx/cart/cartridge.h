@@ -7,7 +7,6 @@
 
 
 void msx_cart(device_slot_interface &device, bool is_in_subslot);
-void msx_yamaha_60pin(device_slot_interface &device, bool is_in_subslot);   // 60 pin expansion slots as found in yamaha machines
 void msx_yamaha_minicart(device_slot_interface &device, bool is_in_subslot); // 30 pin mini cartridge slot as found in some yamaha machines
 
 
