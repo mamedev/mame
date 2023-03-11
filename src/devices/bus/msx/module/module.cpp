@@ -2,7 +2,7 @@
 // copyright-holders:Wilbert Pol
 #include "emu.h"
 #include "module.h"
-#include "yamaha.h"
+#include "sfg.h"
 
 
 namespace bus::msx::module::slotoptions {

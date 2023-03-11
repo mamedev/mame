@@ -7,7 +7,7 @@ Yamaha SFG01/SFG05 emulation
 **************************************************************************/
 
 #include "emu.h"
-#include "yamaha.h"
+#include "sfg.h"
 
 #include "bus/midi/midi.h"
 #include "speaker.h"
