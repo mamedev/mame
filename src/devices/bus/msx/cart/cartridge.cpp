@@ -45,7 +45,7 @@ void msx_cart(device_slot_interface &device, bool is_in_subslot)
 	using namespace bus::msx::cart;
 	msx_cart_disk_register_options(device);
 	msx_cart_ram_register_options(device);
-	device.option_add_internal(slotoptions::ARC,            MSX_CART_ARC);
+	device.option_add_internal(slotoptions::ARC,             MSX_CART_ARC);
 	device.option_add_internal(slotoptions::ASCII8,          MSX_CART_ASCII8);
 	device.option_add_internal(slotoptions::ASCII8_SRAM,     MSX_CART_ASCII8_SRAM);
 	device.option_add_internal(slotoptions::ASCII16,         MSX_CART_ASCII16);
