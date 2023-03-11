@@ -63,7 +63,7 @@ protected:
 		CLK_RX = 2
 	};
 
-	enum class ClockMode {
+	enum class clock_mode {
 		INTERNAL_ASYNC,
 		INTERNAL_ASYNC_OUT,
 		EXTERNAL_ASYNC,
@@ -113,7 +113,7 @@ protected:
 	int eri_int, rxi_int, txi_int, tei_int;
 
 	int tx_state, rx_state, tx_bit, rx_bit, clock_state, tx_parity, rx_parity, ext_clock_counter;
-	ClockMode clock_mode;
+	clock_mode clock_mode;
 	bool clock_value, ext_clock_value, rx_value;
 
 	uint8_t rdr, tdr, smr, scr, ssr, brr, rsr, tsr;
