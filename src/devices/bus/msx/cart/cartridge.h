@@ -22,7 +22,7 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 protected:
-	static int get_cart_type(const u8 *rom, u32 length);
+	static char const *const get_cart_type(const u8 *rom, u32 length);
 };
 
 #endif // MAME_BUS_MSX_CART_CARTRIDGE_H

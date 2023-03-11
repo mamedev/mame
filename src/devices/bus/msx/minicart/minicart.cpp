@@ -4,10 +4,17 @@
 #include "minicart.h"
 #include "bus/msx/cart/nomapper.h"
 
+
+namespace bus::msx::minicart::slotoptions {
+char const *const NOMAPPER = "nomapper";
+}
+
 void msx_yamaha_minicart(device_slot_interface &device, bool is_in_subslot)
 {
-	device.option_add_internal("nomapper", MSX_CART_NOMAPPER);
+	using namespace bus::msx::minicart::slotoptions;
+	device.option_add_internal(NOMAPPER, MSX_CART_NOMAPPER);
 }
+
 
 DEFINE_DEVICE_TYPE(MSX_SLOT_YAMAHA_MINICART,  msx_slot_yamaha_minicart_device,  "msx_slot_yamaha_minicart",  "MSX Yamaha Minicart slot")
 
@@ -23,5 +30,6 @@ void msx_slot_yamaha_minicart_device::device_start()
 
 std::string msx_slot_yamaha_minicart_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	return software_get_default_slot("nomapper");
+	using namespace bus::msx::minicart::slotoptions;
+	return software_get_default_slot(NOMAPPER);
 }

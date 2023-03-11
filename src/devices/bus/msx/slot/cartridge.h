@@ -57,7 +57,7 @@ public:
 	virtual const char *image_interface() const noexcept override { return "msx_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "mx1,bin,rom"; }
 
-	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override = 0;
 
 	DECLARE_WRITE_LINE_MEMBER(irq_out);
 

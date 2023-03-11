@@ -28,6 +28,7 @@
 #include "ram.h"
 #include "rtype.h"
 #include "slotexpander.h"
+#include "slotoptions.h"
 #include "softcard.h"
 #include "superloderunner.h"
 #include "super_swangi.h"
@@ -41,120 +42,56 @@ DEFINE_DEVICE_TYPE(MSX_SLOT_CARTRIDGE, msx_slot_cartridge_device, "msx_slot_cart
 
 void msx_cart(device_slot_interface &device, bool is_in_subslot)
 {
+	using namespace bus::msx::cart;
 	msx_cart_disk_register_options(device);
 	msx_cart_ram_register_options(device);
-	device.option_add_internal("arc", MSX_CART_ARC);
-	device.option_add_internal("ascii8", MSX_CART_ASCII8);
-	device.option_add_internal("ascii8_sram", MSX_CART_ASCII8_SRAM);
-	device.option_add_internal("ascii16", MSX_CART_ASCII16);
-	device.option_add_internal("ascii16_sram", MSX_CART_ASCII16_SRAM);
-	device.option_add_internal("cross_blaim", MSX_CART_CROSSBLAIM);
-	device.option_add_internal("dooly", MSX_CART_DOOLY);
-	device.option_add_internal("easispeech", MSX_CART_EASISPEECH);
-	device.option_add_internal("fmpac", MSX_CART_FMPAC);
-	device.option_add_internal("fs_sr022", MSX_CART_FS_SR022);
-	device.option_add_internal("gamemaster2", MSX_CART_GAMEMASTER2);
-	device.option_add_internal("halnote", MSX_CART_HALNOTE);
-	device.option_add_internal("hfox", MSX_CART_HFOX);
-	device.option_add_internal("holy_quran", MSX_CART_HOLY_QURAN);
-	device.option_add_internal("ink", MSX_CART_INK);
-	device.option_add_internal("kanji", MSX_CART_KANJI);
-	device.option_add_internal("keyboard_master", MSX_CART_KEYBOARD_MASTER);
-	device.option_add_internal("konami", MSX_CART_KONAMI);
-	device.option_add_internal("konami_scc", MSX_CART_KONAMI_SCC);
-	device.option_add_internal("korean_80in1", MSX_CART_KOREAN_80IN1);
-	device.option_add_internal("korean_90in1", MSX_CART_KOREAN_90IN1);
-	device.option_add_internal("korean_126in1", MSX_CART_KOREAN_126IN1);
-	device.option_add_internal("majutsushi", MSX_CART_MAJUTSUSHI);
-	device.option_add_internal("msxaud_fsca1", MSX_CART_MSX_AUDIO_FSCA1);
-	device.option_add_internal("msxaud_hxmu900", MSX_CART_MSX_AUDIO_HXMU900);
-	device.option_add_internal("msxaud_nms1205", MSX_CART_MSX_AUDIO_NMS1205);
-	device.option_add_internal("msxdos2j", MSX_CART_MSXDOS2J);
-	device.option_add_internal("msxdos2e", MSX_CART_MSXDOS2E);
-	device.option_add_internal("msxwrite", MSX_CART_MSXWRITE);
-	device.option_add_internal("nomapper", MSX_CART_NOMAPPER);
-	device.option_add_internal("rtype", MSX_CART_RTYPE);
-	device.option_add_internal("sound_snatcher", MSX_CART_SOUND_SNATCHER);
-	device.option_add_internal("sound_sdsnatch", MSX_CART_SOUND_SDSNATCHER);
-	device.option_add_internal("super_swangi", MSX_CART_SUPER_SWANGI);
-	device.option_add_internal("superloderunner", MSX_CART_SUPERLODERUNNER);
-	device.option_add_internal("synthesizer", MSX_CART_SYNTHESIZER);
-	device.option_add_internal("ec701", MSX_CART_EC701);
-	device.option_add("beepack", MSX_CART_BEEPACK);
-	device.option_add("bm_012", MSX_CART_BM_012);
-	device.option_add("moonsound", MSX_CART_MOONSOUND);
-	device.option_add("ucn01", MSX_CART_UCN01);
+	device.option_add_internal(slotoptions::ARC,            MSX_CART_ARC);
+	device.option_add_internal(slotoptions::ASCII8,          MSX_CART_ASCII8);
+	device.option_add_internal(slotoptions::ASCII8_SRAM,     MSX_CART_ASCII8_SRAM);
+	device.option_add_internal(slotoptions::ASCII16,         MSX_CART_ASCII16);
+	device.option_add_internal(slotoptions::ASCII16_SRAM,    MSX_CART_ASCII16_SRAM);
+	device.option_add_internal(slotoptions::CROSS_BLAIM,     MSX_CART_CROSSBLAIM);
+	device.option_add_internal(slotoptions::DOOLY,           MSX_CART_DOOLY);
+	device.option_add_internal(slotoptions::EASISPEECH,      MSX_CART_EASISPEECH);
+	device.option_add_internal(slotoptions::FMPAC,           MSX_CART_FMPAC);
+	device.option_add_internal(slotoptions::FS_SR022,        MSX_CART_FS_SR022);
+	device.option_add_internal(slotoptions::GAMEMASTER2,     MSX_CART_GAMEMASTER2);
+	device.option_add_internal(slotoptions::HALNOTE,         MSX_CART_HALNOTE);
+	device.option_add_internal(slotoptions::HFOX,            MSX_CART_HFOX);
+	device.option_add_internal(slotoptions::HOLY_QURAN,      MSX_CART_HOLY_QURAN);
+	device.option_add_internal(slotoptions::INK,             MSX_CART_INK);
+	device.option_add_internal(slotoptions::KANJI,           MSX_CART_KANJI);
+	device.option_add_internal(slotoptions::KEYBOARD_MASTER, MSX_CART_KEYBOARD_MASTER);
+	device.option_add_internal(slotoptions::KONAMI,          MSX_CART_KONAMI);
+	device.option_add_internal(slotoptions::KONAMI_SCC,      MSX_CART_KONAMI_SCC);
+	device.option_add_internal(slotoptions::KOREAN_80IN1,    MSX_CART_KOREAN_80IN1);
+	device.option_add_internal(slotoptions::KOREAN_90IN1,    MSX_CART_KOREAN_90IN1);
+	device.option_add_internal(slotoptions::KOREAN_126IN1,   MSX_CART_KOREAN_126IN1);
+	device.option_add_internal(slotoptions::MAJUSTUSHI,      MSX_CART_MAJUTSUSHI);
+	device.option_add_internal(slotoptions::MSXAUD_FSCA1,    MSX_CART_MSX_AUDIO_FSCA1);
+	device.option_add_internal(slotoptions::MSXAUD_HXMU900,  MSX_CART_MSX_AUDIO_HXMU900);
+	device.option_add_internal(slotoptions::MSXAUD_NMS1205,  MSX_CART_MSX_AUDIO_NMS1205);
+	device.option_add_internal(slotoptions::MSXDOS2J,        MSX_CART_MSXDOS2J);
+	device.option_add_internal(slotoptions::MSXDOS2E,        MSX_CART_MSXDOS2E);
+	device.option_add_internal(slotoptions::MSXWRITE,        MSX_CART_MSXWRITE);
+	device.option_add_internal(slotoptions::NOMAPPER,        MSX_CART_NOMAPPER);
+	device.option_add_internal(slotoptions::RTYPE,           MSX_CART_RTYPE);
+	device.option_add_internal(slotoptions::SOUND_SNATCHER,  MSX_CART_SOUND_SNATCHER);
+	device.option_add_internal(slotoptions::SOUND_SDSNATCH,  MSX_CART_SOUND_SDSNATCHER);
+	device.option_add_internal(slotoptions::SUPER_SWANGI,    MSX_CART_SUPER_SWANGI);
+	device.option_add_internal(slotoptions::SUPERLODERUNNER, MSX_CART_SUPERLODERUNNER);
+	device.option_add_internal(slotoptions::SYNTHESIZER,     MSX_CART_SYNTHESIZER);
+	device.option_add_internal(slotoptions::EC701,           MSX_CART_EC701);
+	device.option_add(slotoptions::BEEPACK,   MSX_CART_BEEPACK);
+	device.option_add(slotoptions::BM_012,    MSX_CART_BM_012);
+	device.option_add(slotoptions::MOONSOUND, MSX_CART_MOONSOUND);
+	device.option_add(slotoptions::UCN01,     MSX_CART_UCN01);
+	device.option_add(slotoptions::SOFTCARD,  MSX_CART_SOFTCARD);
 	if (!is_in_subslot)
 	{
-		device.option_add("slotexp", MSX_CART_SLOTEXPANDER);
+		device.option_add(slotoptions::SLOTEXP, MSX_CART_SLOTEXPANDER);
 	}
-	device.option_add("softcard", MSX_CART_SOFTCARD);
 }
-
-
-enum
-{
-	NOMAPPER = 0,
-	ASCII8,
-	ASCII8_SRAM,
-	ASCII16,
-	ASCII16_SRAM,
-	CROSSBLAIM,
-	GAMEMASTER2,
-	KOREAN_80IN1,
-	KOREAN_90IN1,
-	KOREAN_126IN1,
-	FMPAC,
-	RTYPE,
-	KONAMI,
-	KONAMI_SCC,
-	SUPERLODERUNNER,
-	MAJUTSUSHI,
-	DISK_ROM,
-	SYNTHESIZER,
-	MSXDOS2
-};
-
-
-static const struct
-{
-	int        pcb_id;
-	const char *slot_option;
-} slot_list[] =
-{
-	{ NOMAPPER, "nomapper" },
-	{ ASCII8, "ascii8" },
-	{ ASCII8_SRAM, "ascii8_sram" },
-	{ ASCII16, "ascii16" },
-	{ ASCII16_SRAM, "ascii16_sram" },
-	{ CROSSBLAIM, "cross_blaim" },
-	{ GAMEMASTER2, "gamemaster2" },
-	{ KOREAN_80IN1, "korean_80in1" },
-	{ KOREAN_90IN1, "korean_90in1" },
-	{ KOREAN_126IN1, "korean_126in1" },
-	{ FMPAC, "fmpac" },
-	{ RTYPE, "rtype" },
-	{ KONAMI, "konami" },
-	{ KONAMI_SCC, "konami_scc" },
-	{ SUPERLODERUNNER, "superloderunner" },
-	{ MAJUTSUSHI, "majutsushi" },
-	{ DISK_ROM, "disk_rom" },
-	{ SYNTHESIZER, "synthesizer" },
-	{ MSXDOS2, "msxdos2" }
-};
-
-
-static const char *msx_cart_get_slot_option(int type)
-{
-	for (auto & elem : slot_list)
-	{
-		if (elem.pcb_id == type)
-			return elem.slot_option;
-	}
-
-	return slot_list[0].slot_option;
-}
-
 
 
 msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -164,11 +101,9 @@ msx_slot_cartridge_device::msx_slot_cartridge_device(const machine_config &mconf
 
 std::string msx_slot_cartridge_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
+	using namespace bus::msx::cart;
 	if (hook.image_file())
 	{
-		const char *slot_string = "nomapper";
-		int type = NOMAPPER;
-
 		// Check if there's some mapper related information in the hashfiles
 		std::string extrainfo;
 		if (hook.hashfile_extrainfo(extrainfo))
@@ -176,74 +111,68 @@ std::string msx_slot_cartridge_device::get_default_card_software(get_default_car
 			int extrainfo_type = -1;
 			if (1 == sscanf(extrainfo.c_str(), "%d", &extrainfo_type))
 			{
-				static const struct {int extrainfo; int mapper;} extrainfo_map[] = {
-					//{ 0, NOMAPPER },
-					{ 1, MSXDOS2 },
-					{ 2, KONAMI_SCC },
-					{ 3, KONAMI },
-					{ 4, ASCII8 },
-					{ 5, ASCII16 },
-					{ 6, GAMEMASTER2 },
-					{ 7, ASCII8_SRAM },
-					{ 8, ASCII16_SRAM },
-					{ 9, RTYPE },
-					{ 10, MAJUTSUSHI },
-					{ 11, FMPAC },
-					{ 12, SUPERLODERUNNER },
-					{ 13, SYNTHESIZER },
-					{ 14, CROSSBLAIM },
-					{ 15, DISK_ROM },
-					{ 16, KOREAN_80IN1 },
-					{ 17, KOREAN_126IN1 }
+				static const struct {int extrainfo; char const *const mapper;} extrainfo_map[] = {
+					{ 0, slotoptions::NOMAPPER },
+					{ 1, slotoptions::MSXDOS2E },
+					{ 2, slotoptions::KONAMI_SCC },
+					{ 3, slotoptions::KONAMI },
+					{ 4, slotoptions::ASCII8 },
+					{ 5, slotoptions::ASCII16 },
+					{ 6, slotoptions::GAMEMASTER2 },
+					{ 7, slotoptions::ASCII8_SRAM },
+					{ 8, slotoptions::ASCII16_SRAM },
+					{ 9, slotoptions::RTYPE },
+					{ 10, slotoptions::MAJUSTUSHI },
+					{ 11, slotoptions::FMPAC },
+					{ 12, slotoptions::SUPERLODERUNNER },
+					{ 13, slotoptions::SYNTHESIZER },
+					{ 14, slotoptions::CROSS_BLAIM },
+					{ 16, slotoptions::KOREAN_80IN1 },
+					{ 17, slotoptions::KOREAN_126IN1 }
 				};
 
 				for (auto & elem : extrainfo_map)
 				{
 					if (elem.extrainfo == extrainfo_type)
 					{
-						type = elem.mapper;
+						return std::string(elem.mapper);
 					}
 				}
 			}
 		}
 
-		if (type == NOMAPPER)
+		// Not identified through hashfile, try automatic detection
+		u64 length;
+		if (hook.image_file()->length(length))
 		{
-			// Not identified through hashfile, try automatic detection
-			u64 length;
-			hook.image_file()->length(length); // FIXME: check error return, guard against excessively large files
-			std::vector<u8> rom(length);
-			size_t actual;
-			hook.image_file()->read(&rom[0], length, actual); // FIXME: check error return or read returning short
-			type = get_cart_type(&rom[0], length);
+			osd_printf_warning("[%s] Error getting cartridge ROM length\n", tag());
+			return std::string(slotoptions::NOMAPPER);
 		}
-
-		if (type > NOMAPPER)
+		length = std::min<u64>(length, 4 * 1024 * 1024);
+		std::vector<u8> rom(length);
+		size_t actual;
+		if (hook.image_file()->read(&rom[0], length, actual))
 		{
-			slot_string = msx_cart_get_slot_option(type);
+			osd_printf_warning("[%s] Error reading from file\n", tag());
+			return std::string(slotoptions::NOMAPPER);
 		}
-
-		return std::string(slot_string);
+		return std::string(get_cart_type(&rom[0], length));
 	}
-	return software_get_default_slot("nomapper");
+	return software_get_default_slot(bus::msx::cart::slotoptions::NOMAPPER);
 }
 
 
-int msx_slot_cartridge_device::get_cart_type(const u8 *rom, u32 length)
+char const *const msx_slot_cartridge_device::get_cart_type(const u8 *rom, u32 length)
 {
-	if (length < 0x2000)
-	{
-		return -1;
-	}
-
+	using namespace bus::msx::cart;
 	if (length < 0x10000)
 	{
-		return NOMAPPER;
+		return slotoptions::NOMAPPER;
 	}
 
 	if ((rom[0x10] == 'Y') && (rom[0x11] == 'Z') && (length > 0x18000))
 	{
-		return GAMEMASTER2;
+		return slotoptions::GAMEMASTER2;
 	}
 
 	int kon4 = 0, kon5 = 0, asc8 = 0, asc16 = 0;
@@ -287,10 +216,10 @@ int msx_slot_cartridge_device::get_cart_type(const u8 *rom, u32 length)
 
 	if (std::max(kon4, kon5) > std::max(asc8, asc16))
 	{
-		return (kon5 > kon4) ? KONAMI_SCC : KONAMI;
+		return (kon5 > kon4) ? slotoptions::KONAMI_SCC : slotoptions::KONAMI;
 	}
 	else
 	{
-		return (asc8 > asc16) ? ASCII8 : ASCII16;
+		return (asc8 > asc16) ? slotoptions::ASCII8 : slotoptions::ASCII16;
 	}
 }

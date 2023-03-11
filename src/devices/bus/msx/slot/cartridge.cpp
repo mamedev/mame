@@ -96,11 +96,6 @@ WRITE_LINE_MEMBER(msx_slot_cartridge_base_device::irq_out)
 	m_irq_handler(state);
 }
 
-std::string msx_slot_cartridge_base_device::get_default_card_software(get_default_card_software_hook &hook) const
-{
-	return software_get_default_slot("nomapper");
-}
-
 
 msx_cart_interface::msx_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "msxcart")
