@@ -50,46 +50,45 @@ Vector | Offset | Default Source                 | Link Reg         | Default Pr
 
 */
 
-// currently causes the Leapster to put an unhandled interrupt exception string in RAM
-// at 0x03000800
+void arcompact_device::take_irq(int vector)
+{
+	set_pc(m_INTVECTORBASE + vector * 8);
+	m_irq_pending &= ~(1 << vector);
+	debugreg_clear_ZZ();
+	standard_irq_callback_member(*this, 0);
+}
+
 void arcompact_device::check_interrupts()
 {
-	int vector = 8;
+	int vector = -1;
 
-	if (vector < 3)
+	for (int i = 3; i < 32; i++)
 	{
-		fatalerror("check_interrupts called for vector < 3 (these are special exceptions)");
+		if ((m_irq_pending >> i) & 1)
+		{
+			vector = i;
+		}
 	}
 
-	if (m_irq_pending)
+	if (vector > 0)
 	{
-		if (m_status32 & 0x00000002) // & 0x04 = level2, & 0x02 = level1
+		int level = ((m_AUX_IRQ_LEV >> vector) & 1) + 1;
+
+		logerror("HACK/TEST IRQ vector %02x level %d\n", vector, level);
+
+		if ((level == 1) && (m_status32 & 0x00000002))
 		{
-			int level = ((m_AUX_IRQ_LEV >> vector) & 1) + 1;
-
-			logerror("HACK/TEST IRQ\n");
-
-			if (level == 1)
-			{
-				m_regs[REG_ILINK1] = m_pc;
-				m_status32_l1 = m_status32;
-				m_AUX_IRQ_LV12 |= 0x00000001;
-			}
-			else if (level == 2)
-			{
-				m_regs[REG_ILINK2] = m_pc;
-				m_status32_l2 = m_status32;
-				m_AUX_IRQ_LV12 |= 0x00000002;
-			}
-			else
-			{
-				fatalerror("illegal IRQ level\n");
-			}
-
-			set_pc(m_INTVECTORBASE + vector * 8);
-			m_irq_pending = 0;
-			debugreg_clear_ZZ();
-			standard_irq_callback_member(*this, 0);
+			m_regs[REG_ILINK1] = m_pc;
+			m_status32_l1 = m_status32;
+			m_AUX_IRQ_LV12 |= 0x00000001;
+			take_irq(vector);
+		}
+		else if ((level == 2) && (m_status32 & 0x00000004))
+		{
+			m_regs[REG_ILINK2] = m_pc;
+			m_status32_l2 = m_status32;
+			m_AUX_IRQ_LV12 |= 0x00000002;
+			take_irq(vector);
 		}
 	}
 }
