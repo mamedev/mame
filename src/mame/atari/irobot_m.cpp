@@ -385,13 +385,14 @@ void irobot_state::load_oproms()
 /* Init mathbox (only called once) */
 void irobot_state::init_irobot()
 {
+	load_oproms();
+
 	for (int i = 0; i < 16; i++)
 	{
-		m_irmb_stack[i] = nullptr;
+		m_irmb_stack[i] = &m_mbops[0];
 		m_irmb_regs[i] = 0;
 	}
 	m_irmb_latch = 0;
-	load_oproms();
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(irobot_state::irobot_irmb_done_callback)
