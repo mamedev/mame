@@ -51,6 +51,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cass(*this, "cassette"),
 		m_cart(*this, "cartslot"),
+		m_keyboard(*this, "IN%u", 0U),
 		m_last_state(0)
 	{ }
 
@@ -60,6 +61,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<generic_slot_device> m_cart;
+	required_ioport_array<10> m_keyboard;
 	void cass_conf_w(uint8_t data);
 	void keys_w(uint8_t data);
 	uint8_t keys_hi_r();
@@ -106,7 +108,6 @@ void pv2000_state::keys_w(uint8_t data)
 uint8_t pv2000_state::keys_hi_r()
 {
 	uint8_t data = 0;
-	char kbdrow[6];
 
 	switch ( m_keyb_column )
 	{
@@ -119,8 +120,7 @@ uint8_t pv2000_state::keys_hi_r()
 	case 6:
 	case 7:
 	case 8:
-		sprintf(kbdrow,"IN%d",m_keyb_column);
-		data = ioport( kbdrow )->read() >> 4;
+		data = m_keyboard[m_keyb_column]->read() >> 4;
 	}
 
 	return data;
@@ -130,7 +130,6 @@ uint8_t pv2000_state::keys_hi_r()
 uint8_t pv2000_state::keys_lo_r()
 {
 	uint8_t data = 0;
-	char kbdrow[6];
 
 	logerror("%s: pv2000_keys_r\n", machine().describe_context() );
 
@@ -146,8 +145,7 @@ uint8_t pv2000_state::keys_lo_r()
 	case 7:
 	case 8:
 	case 9:
-		sprintf(kbdrow,"IN%d",m_keyb_column);
-		data = ioport( kbdrow )->read() & 0x0f;
+		data = m_keyboard[m_keyb_column]->read() & 0x0f;
 	}
 
 	return 0xf0 | data;
@@ -331,17 +329,15 @@ WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 	if ( m_keyb_column == 0x0f )
 	{
 		/* Check if a key is pressed */
-		uint8_t key_pressed;
-
-		key_pressed = ioport( "IN0" )->read()
-			| ioport( "IN1" )->read()
-			| ioport( "IN2" )->read()
-			| ioport( "IN3" )->read()
-			| ioport( "IN4" )->read()
-			| ioport( "IN5" )->read()
-			| ioport( "IN6" )->read()
-			| ioport( "IN7" )->read()
-			| ioport( "IN8" )->read();
+		uint8_t key_pressed = m_keyboard[0]->read()
+			| m_keyboard[1]->read()
+			| m_keyboard[2]->read()
+			| m_keyboard[3]->read()
+			| m_keyboard[4]->read()
+			| m_keyboard[5]->read()
+			| m_keyboard[6]->read()
+			| m_keyboard[7]->read()
+			| m_keyboard[8]->read();
 
 		if ( key_pressed && m_key_pressed != key_pressed )
 			m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);

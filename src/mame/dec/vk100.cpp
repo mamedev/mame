@@ -186,7 +186,8 @@ public:
 		m_hardcopy_led(*this, "hardcopy_led"),
 		m_l1_led(*this, "l1_led"),
 		m_l2_led(*this, "l2_led"),
-		m_vg_timer(nullptr)
+		m_vg_timer(nullptr),
+		m_col_array(*this, "COL%X", 0U)
 		//m_i8251_rx_timer(nullptr),
 		//m_i8251_tx_timer(nullptr),
 		//m_i8251_sync_timer(nullptr)
@@ -273,7 +274,7 @@ private:
 	uint8_t m_vgGO; // activated on next SYNC pulse after EXEC
 	uint8_t m_ACTS;
 	uint8_t m_ADSR;
-	ioport_port* m_col_array[16];
+	required_ioport_array<16> m_col_array;
 };
 
 // vram access functions:
@@ -961,13 +962,6 @@ void vk100_state::machine_start()
 	m_vgGO = 0;
 	m_ACTS = 1;
 	m_ADSR = 1;
-	char kbdcol[8];
-	// look up all 16 tags 'the slow way' but only once on reset
-	for (int i = 0; i < 16; i++)
-	{
-		sprintf(kbdcol,"COL%X", i);
-		m_col_array[i] = ioport(kbdcol);
-	}
 
 	m_vg_timer = timer_alloc(FUNC(vk100_state::execute_vg), this);
 	// TODO: figure out the best way to bring up the i8251 timers
