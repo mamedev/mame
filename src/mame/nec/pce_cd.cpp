@@ -22,6 +22,7 @@ TODO:
   \- overflows into next track for a bit with standard 2 secs discs;
 - Audio CD player rewind/fast forward don't work properly
   \- never go past 1 minute mark, underflows;
+- Fader feature is sketchy and unchecked against real HW;
 (old note, to move out there)
 - Steam Heart's: needs transfer ready irq to get past the
                  gameplay hang, don't know exactly when it should fire
@@ -36,10 +37,10 @@ TODO:
 #define LOG_CMD            (1U <<  1)
 #define LOG_CDDA           (1U <<  2)
 #define LOG_SCSI           (1U <<  3)
-#define LOG_FADE           (1U <<  4)
+#define LOG_FADER          (1U <<  4)
 #define LOG_SCSIXFER       (1U <<  5) // single byte transfers, verbose
 
-#define VERBOSE (LOG_GENERAL | LOG_CMD | LOG_CDDA)
+#define VERBOSE (LOG_GENERAL | LOG_CMD | LOG_CDDA | LOG_FADER)
 #define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
@@ -47,7 +48,7 @@ TODO:
 #define LOGCDDA(...)        LOGMASKED(LOG_CDDA, __VA_ARGS__)
 #define LOGSCSI(...)        LOGMASKED(LOG_SCSI, __VA_ARGS__)
 #define LOGSCSIXFER(...)    LOGMASKED(LOG_SCSIXFER, __VA_ARGS__)
-#define LOGFADE(...)        LOGMASKED(LOG_FADE, __VA_ARGS__)
+#define LOGFADER(...)       LOGMASKED(LOG_FADER, __VA_ARGS__)
 
 // 0xdd subchannel read is special and very verbose when it happens, treat differently
 #define LIVE_SUBQ_VIEW    0
@@ -528,6 +529,8 @@ void pce_cd_device::nec_set_audio_start_position()
 			// - draculax (stage 2' pre-boss)
 			// - manhole (fires this during Sunsoft logo but expects playback on successive
 			//            credit sequence instead)
+			// TODO: audio CD player also expects this to issue a CDDA pause_audio(1) on "fade out" button trigger
+			// otherwise it will playback the very next track
 			//if (m_end_frame > m_current_frame)
 			//  m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
 
@@ -1334,6 +1337,7 @@ uint8_t pce_cd_device::cdda_data_r(offs_t offset)
 	// TODO: port 5 also converts?
 	uint8_t port_shift = offset ? 8 : 0;
 
+	// TODO: clamp over channel output_gain (audio CD player "fade out")
 	return (m_cdda->get_channel_sample((m_irq_status & 2) ? 0 : 1) >> port_shift) & 0xff;
 }
 
@@ -1500,7 +1504,7 @@ void pce_cd_device::adpcm_playback_rate_w(uint8_t data)
 }
 
 /*
- * CD Interface Register 0x0f - ADPCM fade in/out register
+ * CD Interface Register 0x0f - CD-DA/ADPCM fader in/out register
  *
  * ---- xxxx command setting:
  * 0x00 ADPCM/CD-DA Fade-in
@@ -1520,11 +1524,11 @@ void pce_cd_device::fade_register_w(uint8_t data)
 	// TODO: timers needs HW tests
 	if (m_fade_reg != data)
 	{
-		LOGFADE("Fade %01x ", data & 0xf);
+		LOGFADER("Fader %01x ", data & 0xf);
 		switch (data & 0xf)
 		{
 			case 0x00:
-				LOGFADE("ADPCM enable (100 msecs)\n");
+				LOGFADER("ADPCM/CD-DA enable (100 msecs)\n");
 				m_cdda_volume = 0.0;
 				m_cdda_fadein_timer->adjust(attotime::from_usec(100), 100);
 				m_adpcm_volume = 0.0;
@@ -1534,14 +1538,14 @@ void pce_cd_device::fade_register_w(uint8_t data)
 				break;
 
 			case 0x01:
-				LOGFADE("CD-DA enable (100 msecs)\n");
+				LOGFADER("CD-DA enable (100 msecs)\n");
 				m_cdda_volume = 0.0;
 				m_cdda_fadein_timer->adjust(attotime::from_usec(100), 100);
 				m_cdda_fadeout_timer->adjust(attotime::never);
 				break;
 
 			case 0x08:
-				LOGFADE("CD-DA short (1500 msecs) fade out / ADPCM enable\n");
+				LOGFADER("CD-DA short (1500 msecs) fade out / ADPCM enable\n");
 				m_cdda_volume = 100.0;
 				m_cdda_fadeout_timer->adjust(attotime::from_usec(1500), 1500);
 				m_adpcm_volume = 0.0;
@@ -1551,19 +1555,21 @@ void pce_cd_device::fade_register_w(uint8_t data)
 				break;
 
 			case 0x09:
-				LOGFADE("CD-DA short (1500 msecs) fade out / ADPCM enable\n");
+				LOGFADER("CD-DA long (5000 msecs) fade out\n");
 				m_cdda_volume = 100.0;
 				m_cdda_fadeout_timer->adjust(attotime::from_usec(5000), 5000);
 				m_cdda_fadein_timer->adjust(attotime::never);
 				break;
+
 			case 0x0a:
-				LOGFADE("ADPCM long (5000 msecs) fade out\n");
+				LOGFADER("ADPCM long (5000 msecs) fade out\n");
 				m_adpcm_volume = 100.0;
 				m_adpcm_fadeout_timer->adjust(attotime::from_usec(5000), 5000);
 				m_adpcm_fadein_timer->adjust(attotime::never);
 				break;
+
 			case 0x0c:
-				LOGFADE("CD-DA short (1500 msecs) fade out / ADPCM enable\n");
+				LOGFADER("CD-DA short (1500 msecs) fade out / ADPCM enable\n");
 				m_cdda_volume = 100.0;
 				m_cdda_fadeout_timer->adjust(attotime::from_usec(1500), 1500);
 				m_adpcm_volume = 0.0;
@@ -1571,18 +1577,21 @@ void pce_cd_device::fade_register_w(uint8_t data)
 				m_cdda_fadein_timer->adjust(attotime::never);
 				m_adpcm_fadeout_timer->adjust(attotime::never);
 				break;
+
 			case 0x0d:
-				LOGFADE("CD-DA short (1500 msecs) fade out\n");
+				LOGFADER("CD-DA short (1500 msecs) fade out\n");
 				m_cdda_volume = 100.0;
 				m_cdda_fadeout_timer->adjust(attotime::from_usec(1500), 1500);
 				m_cdda_fadein_timer->adjust(attotime::never);
 				break;
+
 			case 0x0e:
-				LOGFADE("ADPCM short (1500 msecs) fade out\n");
+				LOGFADER("ADPCM short (1500 msecs) fade out\n");
 				m_adpcm_volume = 100.0;
 				m_adpcm_fadeout_timer->adjust(attotime::from_usec(1500), 1500);
 				m_adpcm_fadein_timer->adjust(attotime::never);
 				break;
+
 			default:
 				popmessage("CD-DA / ADPCM Fade effect mode %02x",data & 0x0f);
 				break;
