@@ -175,7 +175,7 @@ WRITE_LINE_MEMBER( e0516_device::clk_w )
 		// command
 		m_reg_latch <<= 1;
 		m_reg_latch |= m_dio;
-		m_reg_latch & 0x0f;
+		m_reg_latch &= 0x0f;
 
 		if (m_bits_left == 0)
 		{
