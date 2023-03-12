@@ -63,7 +63,7 @@ protected:
 		CLK_RX = 2
 	};
 
-	enum class clock_mode {
+	enum class clock_mode_t {
 		INTERNAL_ASYNC,
 		INTERNAL_ASYNC_OUT,
 		EXTERNAL_ASYNC,
@@ -113,7 +113,7 @@ protected:
 	int eri_int, rxi_int, txi_int, tei_int;
 
 	int tx_state, rx_state, tx_bit, rx_bit, clock_state, tx_parity, rx_parity, ext_clock_counter;
-	clock_mode clock_mode;
+	clock_mode_t clock_mode;
 	bool clock_value, ext_clock_value, rx_value;
 
 	uint8_t rdr, tdr, smr, scr, ssr, brr, rsr, tsr;
@@ -121,8 +121,9 @@ protected:
 
 	std::string last_clock_message;
 
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	void device_start() override;
+	void device_reset() override;
+	void device_post_load() override;
 
 	TIMER_CALLBACK_MEMBER(sync_tick);
 
