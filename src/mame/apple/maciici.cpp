@@ -109,7 +109,6 @@ private:
 
 	void rbv_reset();
 	void rbv_recalc_irqs();
-	uint32_t rbv_ramdac_r();
 	void rbv_ramdac_w(offs_t offset, uint32_t data);
 	uint8_t rbv_r(offs_t offset);
 	void rbv_w(offs_t offset, uint8_t data);
@@ -414,11 +413,6 @@ WRITE_LINE_MEMBER(maciici_state::mac_rbv_vbl)
 	{
 		rbv_recalc_irqs();
 	}
-}
-
-uint32_t maciici_state::rbv_ramdac_r()
-{
-	return 0;
 }
 
 void maciici_state::rbv_ramdac_w(offs_t offset, uint32_t data)
