@@ -177,7 +177,7 @@ void tsconf_state::video_start()
 	m_ts_tilemap[TM_TILES1]->set_transparent_pen(0);
 
 	m_frame_irq_timer = timer_alloc(FUNC(tsconf_state::irq_frame), this);
-	m_line_irq_timer = timer_alloc(FUNC(tsconf_state::irq_scanline), this);
+	m_scanline_irq_timer = timer_alloc(FUNC(tsconf_state::irq_scanline), this);
 }
 
 void tsconf_state::machine_start()
@@ -196,6 +196,10 @@ void tsconf_state::machine_start()
 
 void tsconf_state::machine_reset()
 {
+	m_frame_irq_timer->adjust(attotime::never);
+	m_scanline_irq_timer->adjust(attotime::never);
+	m_int_mask = 0;
+
 	m_bank0_rom.select(0);
 
 	m_glukrs->disable();
@@ -247,6 +251,7 @@ void tsconf_state::tsconf(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tsconf_state::tsconf_mem);
 	m_maincpu->set_addrmap(AS_IO, &tsconf_state::tsconf_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &tsconf_state::tsconf_switch);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(tsconf_state::irq_vector));
 
 	m_maincpu->set_vblank_int("screen", FUNC(tsconf_state::tsconf_vblank_interrupt));
 
