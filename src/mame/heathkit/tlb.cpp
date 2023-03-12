@@ -72,6 +72,7 @@ DEFINE_DEVICE_TYPE(ULTRA, heath_ultra_tlb_device, "heath_ultra_tlb", "Heath Term
 
 heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type = TLB)
 		: device_t(mconfig, type, tag, owner, clock)
+		, write_sd(*this)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
 		, m_crtc(*this, "crtc")
@@ -84,6 +85,13 @@ heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *ta
 		, m_kbspecial(*this, "MODIFIERS")
 {
 }
+
+void heath_tlb_device::setLoopBack(bool on)
+{
+
+
+}
+
 
 TIMER_CALLBACK_MEMBER(heath_tlb_device::key_click_off)
 {
@@ -139,10 +147,11 @@ void heath_tlb_device::io_map(address_map &map)
 
 void heath_tlb_device::device_start()
 {
-	save_item(NAME(m_transchar));
+	/*save_item(NAME(m_transchar));
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_keyclickactive));
-	save_item(NAME(m_bellactive));
+	save_item(NAME(m_bellactive));*/
+	m_strobe = m_keyclickactive = m_bellactive = false;
 
 	m_key_click_timer = timer_alloc(FUNC(heath_tlb_device::key_click_off), this);
 	m_bell_timer = timer_alloc(FUNC(heath_tlb_device::bell_off), this);
@@ -537,8 +546,21 @@ const tiny_rom_entry *heath_tlb_device::device_rom_region() const
 	return ROM_NAME(h19);
 }
 
+void heath_tlb_device::serial_out_b(uint8_t data)
+{
+	write_sd(data);
+}
+
+WRITE_LINE_MEMBER(heath_tlb_device::cb1_w)
+{
+	m_ace->rx_w(state);
+}
+
 void heath_tlb_device::device_add_mconfig(machine_config &config)
 {
+
+	write_sd.resolve_safe();
+
 	/* basic machine hardware */
 	Z80(config, m_maincpu, H19_CLOCK); // From schematics
 	m_maincpu->set_addrmap(AS_PROGRAM, &heath_tlb_device::mem_map);
@@ -565,6 +587,7 @@ void heath_tlb_device::device_add_mconfig(machine_config &config)
 
 	ins8250_device &uart(INS8250(config, "ins8250", INS8250_CLOCK));
 	uart.out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
+	uart.out_tx_callback().set(FUNC(heath_tlb_device::serial_out_b));
 
 	MM5740(config, m_mm5740, MM5740_CLOCK);
 	m_mm5740->x_cb<1>().set_ioport("X1");

@@ -27,6 +27,13 @@ class heath_tlb_device : public device_t
 public:
   heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type);
 
+  // interface routines
+  auto pb4_callback() { return write_sd.bind(); }
+  DECLARE_WRITE_LINE_MEMBER(cb1_w);
+
+  void setLoopBack(bool on);
+
+
 protected:
   virtual ioport_constructor device_input_ports() const override;
   virtual const tiny_rom_entry *device_rom_region() const override;
@@ -54,7 +61,10 @@ private:
 	emu_timer *m_key_click_timer = nullptr;
 	emu_timer *m_bell_timer = nullptr;
 
-	required_device<palette_device> m_palette;
+  devcb_write_line write_sd;
+  void serial_out_b(uint8_t data);
+
+  required_device<palette_device> m_palette;
 	required_device<cpu_device>     m_maincpu;
 	required_device<mc6845_device>  m_crtc;
 	required_device<ins8250_device> m_ace;

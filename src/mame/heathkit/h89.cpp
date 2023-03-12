@@ -206,6 +206,9 @@ void h89_state::h89(machine_config & config)
 
 	INS8250(config, m_console, INS8250_CLOCK);
 
+	m_console->out_tx_callback().set(m_tlb, FUNC(heath_tlb_device::cb1_w));
+
+	m_tlb->pb4_callback().set("console", FUNC(ins8250_uart_device::rx_w));
 #if 0
 	ins8250_device &uart(INS8250(config, "ins8250", XTAL(1'843'200)));
 	uart.out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
