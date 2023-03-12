@@ -3302,7 +3302,7 @@ void cp1610_cpu_device::execute_run()
 			else if (m_intr_pending)
 			{
 				/* PSHR R7 */
-				standard_irq_callback(CP1610_INT_INTR);
+				standard_irq_callback(CP1610_INT_INTR, m_r[7]);
 				m_write_intak(m_r[6]);
 				cp1610_writemem16(m_r[6],m_r[7]);
 				m_r[6]++;
@@ -3313,7 +3313,7 @@ void cp1610_cpu_device::execute_run()
 			else if (m_intrm_pending && m_intr_enabled)
 			{
 				/* PSHR R7 */
-				standard_irq_callback(CP1610_INT_INTRM);
+				standard_irq_callback(CP1610_INT_INTRM, m_r[7]);
 				m_write_intak(m_r[6]);
 				cp1610_writemem16(m_r[6],m_r[7]);
 				m_r[6]++;

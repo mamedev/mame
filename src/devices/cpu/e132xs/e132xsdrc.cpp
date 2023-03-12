@@ -65,7 +65,7 @@ inline void hyperstone_device::ccfunc_print()
 
 inline void hyperstone_device::ccfunc_standard_irq_callback()
 {
-	standard_irq_callback(m_core->arg0);
+	standard_irq_callback(m_core->arg0, m_core->global_regs[0]);
 }
 
 static void cfunc_unimplemented(void *param)

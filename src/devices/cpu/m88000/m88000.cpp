@@ -219,11 +219,11 @@ void mc88100_device::execute_run()
 		// interrupt check
 		if (m_int_state && !(m_cr[PSR] & PSR_IND))
 		{
-			exception(E_INTERRUPT);
-
 			// notify debugger
 			if (machine().debug_flags & DEBUG_FLAG_ENABLED)
-				debug()->interrupt_hook(INPUT_LINE_IRQ0);
+				debug()->interrupt_hook(INPUT_LINE_IRQ0, m_fip);
+
+			exception(E_INTERRUPT);
 		}
 
 		// update shadow registers

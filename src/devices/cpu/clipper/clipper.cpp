@@ -184,7 +184,7 @@ void clipper_device::execute_run()
 	if (m_nmi)
 	{
 		// acknowledge non-maskable interrupt
-		standard_irq_callback(INPUT_LINE_NMI);
+		standard_irq_callback(INPUT_LINE_NMI, m_pc);
 
 		LOGMASKED(LOG_EXCEPTION, "non-maskable interrupt\n");
 		m_pc = intrap(EXCEPTION_INTERRUPT_BASE, m_pc);
@@ -197,7 +197,7 @@ void clipper_device::execute_run()
 		if ((m_ivec & IVEC_LEVEL) <= SSW(IL))
 		{
 			// acknowledge interrupt
-			standard_irq_callback(INPUT_LINE_IRQ0);
+			standard_irq_callback(INPUT_LINE_IRQ0, m_pc);
 
 			m_pc = intrap(EXCEPTION_INTERRUPT_BASE + m_ivec * 8, m_pc);
 

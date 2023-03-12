@@ -69,6 +69,7 @@ void arcompact_device::check_interrupts()
 
 			logerror("HACK/TEST IRQ\n");
 
+			standard_irq_callback(level, m_pc);
 			if (level == 1)
 			{
 				m_regs[REG_ILINK1] = m_pc;
@@ -89,7 +90,6 @@ void arcompact_device::check_interrupts()
 			set_pc(m_INTVECTORBASE + vector * 8);
 			m_irq_pending = 0;
 			debugreg_clear_ZZ();
-			standard_irq_callback_member(*this, 0);
 		}
 	}
 }
