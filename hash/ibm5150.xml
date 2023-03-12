@@ -7655,9 +7655,10 @@ Punts with "PLEASE USE ORIGINAL DISK ONLY.", unemulated protection
 		<description>4D Boxing (USA)</description>
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="version" value="1.0" />
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Distinctive Software" />
 		<info name="region" value="USA" />
+		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="4D Boxing (US) [Electronic Arts] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="9c28c0c8" sha1="5b324abec67baa90a44c04bb9cc82ba50f4fb962"/>
@@ -7674,9 +7675,10 @@ Punts with "PLEASE USE ORIGINAL DISK ONLY.", unemulated protection
 		<description>4D Sports Boxing (Europe)</description>
 		<year>1991</year>
 		<publisher>Mindscape International</publisher>
-		<info name="version" value="1.0" />
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Distinctive Software" />
 		<info name="region" value="Europe" />
+		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="4D Sports Boxing (Euro) [Mindscape] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="08fe612c" sha1="55a47b3da60cc4962b536a177c8b091feeea6b1a"/>
@@ -7688,9 +7690,10 @@ Punts with "PLEASE USE ORIGINAL DISK ONLY.", unemulated protection
 		<description>4D Sports Boxing (Europe, alt)</description>
 		<year>1991</year>
 		<publisher>Mindscape International</publisher>
-		<info name="version" value="1.0" />
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Distinctive Software" />
 		<info name="region" value="Europe" />
+		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="4D Sports Boxing (Europe) (3.5'').img" size="737280" crc="a464aacf" sha1="6f7b2171faedb74c8f328795cef72e348182b477"/>
@@ -8030,6 +8033,7 @@ Corrupt graphics on [CGA]
 		<description>Advanced Dungeons &amp; Dragons - Death Knights of Krynn (5.25", v1.00)</description>
 		<year>1991</year>
 		<publisher>SSI</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="SSI" />
 		<info name="version" value="1.00" />
 		<part name="flop1" interface="floppy_5_25">
@@ -8048,6 +8052,7 @@ Corrupt graphics on [CGA]
 		<description>Advanced Dungeons &amp; Dragons - Death Knights of Krynn (3.5", v1.00)</description>
 		<year>1991</year>
 		<publisher>SSI</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="SSI" />
 		<info name="version" value="1.00" />
 		<part name="flop1" interface="floppy_3_5">
@@ -8061,6 +8066,7 @@ Corrupt graphics on [CGA]
 		<description>Advanced Dungeons &amp; Dragons - Death Knights of Krynn (3.5", v1.10)</description>
 		<year>1992</year>
 		<publisher>SSI</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="SSI" />
 		<info name="version" value="1.10" />
 		<part name="flop1" interface="floppy_3_5">
@@ -8074,6 +8080,7 @@ Corrupt graphics on [CGA]
 		<description>Advanced Dungeons &amp; Dragons - DragonStrike (v1.2)</description>
 		<year>1990</year>
 		<publisher>SSI</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Westwood Associates" />
 		<info name="version" value="1.2" />
 		<part name="flop1" interface="floppy_5_25">
@@ -8102,6 +8109,7 @@ Corrupt graphics on [CGA]
 		<description>Advanced Dungeons &amp; Dragons - DragonStrike (v1.0)</description>
 		<year>1990</year>
 		<publisher>SSI</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Westwood Associates" />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_5_25">
@@ -8130,6 +8138,7 @@ Corrupt graphics on [CGA]
 		<description>Advanced Dungeons &amp; Dragons - DragonStrike (v1.1)</description>
 		<year>1990</year>
 		<publisher>SSI</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Westwood Associates" />
 		<info name="version" value="1.1" />
 		<part name="flop1" interface="floppy_5_25">
@@ -8181,6 +8190,7 @@ Corrupt graphics on [CGA]
 		<description>Advanced Dungeons &amp; Dragons - Pool of Radiance (5.25")</description>
 		<year>1988</year>
 		<publisher>SSI</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="SSI" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -8203,6 +8213,7 @@ Corrupt graphics on [CGA]
 		<description>Advanced Dungeons &amp; Dragons - Pool of Radiance (3.5")</description>
 		<year>1988</year>
 		<publisher>SSI</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="version" value="1.2" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
@@ -8266,6 +8277,7 @@ Corrupt graphics on [CGA]
 		<description>Advanced Dungeons &amp; Dragons - War of the Lance</description>
 		<year>1990</year>
 		<publisher>SSI</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="SSI" />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_5_25">
@@ -8297,6 +8309,7 @@ Corrupt graphics on [CGA]
 		<description>Airborne Ranger</description>
 		<year>1988</year>
 		<publisher>Microprose</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Airborne Ranger (USA) (3.5'').img" size="737280" crc="d8495223" sha1="af09811b6d3d66fc913c24285331dea78f819785"/>
@@ -8347,6 +8360,7 @@ Corrupt graphics on [CGA]
 		<description>Altered Destiny (5.25")</description>
 		<year>1990</year>
 		<publisher>Accolade</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="Accolade" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -8394,6 +8408,7 @@ Corrupt graphics on [CGA]
 		<description>Altered Destiny (5.25", older)</description>
 		<year>1990</year>
 		<publisher>Accolade</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="Accolade" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -8441,6 +8456,7 @@ Corrupt graphics on [CGA]
 		<description>Altered Destiny (3.5")</description>
 		<year>1990</year>
 		<publisher>Accolade</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="Accolade" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -8468,6 +8484,7 @@ Corrupt graphics on [CGA]
 		<description>The Amazing Spider-Man</description>
 		<year>1990</year>
 		<publisher>Paragon Software</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Oxford Digital" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -8654,6 +8671,7 @@ Missing copy protection track
 		<description>Astérix: Operation Getafix (UK)</description>
 		<year>1990</year>
 		<publisher>Coktel Vision</publisher>
+		<info name="copy_protection" value="Manual - Colour chart required" />
 		<info name="developer" value="Coktel Vision" />
 		<info name="distributor" value="System 4" />
 		<!--Bad dump - floppy disk with saved game file [ASTERIX.INF] -->
@@ -8668,6 +8686,7 @@ Missing copy protection track
 		<description>Astérix: El Golpe del Menhir (Astérix y Operacion Menhir) (Spain, System 4 release)</description>
 		<year>1990</year>
 		<publisher>Coktel Vision</publisher>
+		<info name="copy_protection" value="Manual - Colour chart required" />
 		<info name="developer" value="Coktel Vision" />
 		<info name="distributor" value="System 4" />
 		<!--Bad dump - floppy disk with saved game file [ASTERIX.INF] -->
@@ -8750,6 +8769,7 @@ Missing copy protection track
 		<description>Baby Jo in "Going Home"</description>
 		<year>1991</year>
 		<publisher>Loriciel</publisher>
+		<info name="copy_protection" value="Copy protected floppy disk track" />
 		<info name="developer" value="Loriciel" />
 		<info name="version" value="1.03 08/92" />
 		<part name="flop1" interface="floppy_3_5">
@@ -8799,6 +8819,7 @@ Prompts inserting a disc 3 which is undumped?
 		<description>Bad Blood (5.25")</description>
 		<year>1990</year>
 		<publisher>Origin Systems</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Origin Systems" />
 		<info name="version" value="2.3" />
 		<part name="flop1" interface="floppy_5_25">
@@ -8831,9 +8852,9 @@ Prompts inserting a disc 3 which is undumped?
 		<description>Bad Blood (3.5")</description>
 		<year>1990</year>
 		<publisher>Origin Systems</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Origin Systems" />
 		<info name="version" value="2.3" />
-		<info name="developer" value="Images Software" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Program-Intro Disk" />
 			<dataarea name="flop" size = "737280">
@@ -9255,6 +9276,7 @@ Stage 1 "nice outfit" has an extremely short [buzzer] pitch sound that should be
 		<description>Bloodwych (USA)</description>
 		<year>1991</year>
 		<publisher>Konami</publisher>
+		<info name="copy_protection" value="Manual - Code sheet required" />
 		<info name="developer" value="Mirrorsoft" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
@@ -9267,6 +9289,7 @@ Stage 1 "nice outfit" has an extremely short [buzzer] pitch sound that should be
 		<description>Bloodwych (Quest &amp; Glory compilation) (Europe)</description>
 		<year>1991</year>
 		<publisher>Ubi Soft</publisher>
+		<info name="copy_protection" value="Manual - Code sheet required" />
 		<info name="developer" value="Mirrorsoft" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
@@ -9280,6 +9303,7 @@ Stage 1 "nice outfit" has an extremely short [buzzer] pitch sound that should be
 		<description>The Blues Brothers</description>
 		<year>1991</year>
 		<publisher>Titus</publisher>
+		<info name="copy_protection" value="Copy protected floppy disk track" />
 		<info name="developer" value="Titus" />
 		<part name="flop1" interface="floppy_3_5">
 			<!-- Copy-protected key disk -->
@@ -9932,6 +9956,7 @@ Hangs after few seconds of gameplay
 		<description>The Colonel's Bequest (5.25")</description>
 		<year>1989</year>
 		<publisher>Sierra On-Line</publisher>
+		<info name="copy_protection" value="Misty Acres Plantation map with fingerprints required" />
 		<info name="developer" value="Sierra On-Line" />
 		<info name="version" value="1.000.046" />
 		<part name="flop1" interface="floppy_5_25">
@@ -9990,6 +10015,7 @@ Hangs after few seconds of gameplay
 		<description>The Colonel's Bequest (3.5")</description>
 		<year>1989</year>
 		<publisher>Sierra On-Line</publisher>
+		<info name="copy_protection" value="Misty Acres Plantation map with fingerprints required" />
 		<info name="developer" value="Sierra On-Line" />
 		<info name="version" value="1.000.046" />
 		<part name="flop1" interface="floppy_3_5">
@@ -10395,6 +10421,7 @@ Hangs after few seconds of gameplay
 		<description>The Cycles: International Grand Prix Racing (5.25")</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="Distinctive Software" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk" />
@@ -10414,6 +10441,7 @@ Hangs after few seconds of gameplay
 		<description>The Cycles: International Grand Prix Racing (3.5")</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="Distinctive Software" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
@@ -16077,6 +16105,7 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<description>Star Control (5.25")</description>
 		<year>1990</year>
 		<publisher>Accolade</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="Toys for Bob" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
@@ -16094,6 +16123,7 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<description>Star Control (3.5")</description>
 		<year>1990</year>
 		<publisher>Accolade</publisher>
+		<info name="copy_protection" value="Codewheel required" />
 		<info name="developer" value="Toys for Bob" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
@@ -16364,6 +16394,7 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<description>4D Sports Driving (5.25", Europe)</description>
 		<year>1991</year>
 		<publisher>Mindscape</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Distinctive Software" />
 		<info name="version" value="1.1 (Feb 25 1991)" />
 		<part name="flop1" interface="floppy_5_25">
@@ -16392,6 +16423,7 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<description>4D Sports Driving (3.5", Europe)</description>
 		<year>1991</year>
 		<publisher>Mindscape</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Distinctive Software" />
 		<info name="version" value="1.1 (Feb 25 1991)" />
 		<part name="flop1" interface="floppy_3_5">
@@ -16410,6 +16442,7 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<description>Stunts (5.25", USA)</description>
 		<year>1991</year>
 		<publisher>Brøderbund Software</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Distinctive Software" />
 		<info name="version" value="1.1 (Feb 12 1991)" />
 		<part name="flop1" interface="floppy_5_25">
@@ -16438,6 +16471,7 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<description>Stunts (3.5", USA)</description>
 		<year>1991</year>
 		<publisher>Brøderbund Software</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Distinctive Software" />
 		<info name="version" value="1.1 (Feb 12 1991)" />
 		<part name="flop1" interface="floppy_3_5">
@@ -16578,6 +16612,7 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<description>Super Tetris (5.25")</description>
 		<year>1991</year>
 		<publisher>Spectrum Holobyte</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Sphere" />
 		<info name="version" value="version 1.0" />
 		<part name="flop1" interface="floppy_5_25">
@@ -16596,6 +16631,7 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<description>Super Tetris (3.5")</description>
 		<year>1991</year>
 		<publisher>Spectrum Holobyte</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Sphere" />
 		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_3_5">
@@ -16675,6 +16711,7 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 		<description>Teenage Mutant Hero Turtles: The Coin-Op!</description>
 		<year>1991</year>
 		<publisher>Image Works</publisher>
+		<info name="copy_protection" value="Manual - Code sheet required" />
 		<info name="developer" value="Konami" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
@@ -16696,6 +16733,7 @@ Gin King and Cribbage King: prints "packet file is corrupt" after selection in b
 Disk 1 has a modified OEM ID and accessed file stamp
 ]]></notes>
 		<info name="alt_title" value="Tortugas Ninjas" />
+		<info name="copy_protection" value="Manual - Code sheet required" />
 		<info name="developer" value="Konami" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
@@ -16728,6 +16766,7 @@ Disk 1 has a modified OEM ID and accessed file stamp
 		<year>1990</year>
 		<publisher>MCM</publisher>
 		<info name="alt_title" value="Tortugas Ninjas" />
+		<info name="copy_protection" value="Manual - Code sheet required" />
 		<info name="developer" value="Konami" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />
@@ -16763,6 +16802,7 @@ Disk 1 has a modified OEM ID and accessed file stamp
 Disk 1 has a modified "go.bat" file
 ]]></notes>
 		<info name="alt_title" value="Tortugas Ninjas" />
+		<info name="copy_protection" value="Manual - Code sheet required" />
 		<info name="developer" value="Konami" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 &amp; 2" />
@@ -17186,6 +17226,7 @@ ibmpcjr: unsupported, "program too big to fit in memory"
 		<description>TV Sports Basketball (5.25", UK, VGA version)</description>
 		<year>1990</year>
 		<publisher>Cinemaware</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="TVS BasketBall (UK) [Cinemaware] [1990] [5.25DD] [VGA Disk 1 of 2].img" size="368640" crc="3fddbc38" sha1="358f09f1c1b96f5f72775257ee32ea898e10cd59"/>
@@ -17202,6 +17243,7 @@ ibmpcjr: unsupported, "program too big to fit in memory"
 		<description>TV Sports Basketball (5.25", UK, EGA/TANDY version)</description>
 		<year>1990</year>
 		<publisher>Cinemaware</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="TVS BasketBall (UK) [Cinemaware] [1990] [5.25DD] [EGA-Tandy Disk 1 of 2].img" size="368640" crc="e9c5f52c" sha1="a873b6044e9526f0f6e18ef541aee1f3dc2a7586"/>
@@ -17218,6 +17260,7 @@ ibmpcjr: unsupported, "program too big to fit in memory"
 		<description>TV Sports Basketball (3.5", USA, VGA version)</description>
 		<year>1990</year>
 		<publisher>Cinemaware</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="TVS BasketBall (USA) [Cinemaware] [1990] [3.5DD] [VGA Disk 1 of 1].img" size="737280" crc="4749a24f" sha1="ecc52dcb80eab1bc03b18dd98fe860f2e10830dd"/>
@@ -17229,6 +17272,7 @@ ibmpcjr: unsupported, "program too big to fit in memory"
 		<description>TV Sports Basketball (3.5", USA, EGA/TANDY version)</description>
 		<year>1990</year>
 		<publisher>Cinemaware</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="TVS BasketBall (USA) [Cinemaware] [1990] [3.5DD] [EGA-Tandy Disk 1 of 1].img" size="737280" crc="047e2e5a" sha1="002bf754975b1d7ad472b139e77e036e7053a7ae"/>
@@ -17428,6 +17472,7 @@ ibmpcjr: unsupported, "program too big to fit in memory"
 		<description>Wings of Fury</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
+		<info name="copy_protection" value="Manual required" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Wings of Fury (1989)(Broderbund Software).dsk" size="737280" crc="6bd8681a" sha1="43d1e493afb80b25949c5208cd1f7085b40529ef"/>
@@ -17574,6 +17619,7 @@ Black screen, incomplete dump? Has autoexec.bat without command.com, requires to
 		<description>WWF Wrestlemania</description>
 		<year>1991</year>
 		<publisher>Ocean Software</publisher>
+		<info name="copy_protection" value="Copy Protection Card required" />
 		<info name="developer" value="Twilight" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
