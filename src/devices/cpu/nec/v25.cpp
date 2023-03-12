@@ -258,7 +258,7 @@ void v25_common_device::nec_interrupt(unsigned int_num, int /*INTSOURCES*/ sourc
 				logerror("%06x: BRKS executed with no decryption table\n",PC());
 			break;
 		case INT_IRQ:   /* get vector */
-			int_num = standard_irq_callback(0);
+			int_num = standard_irq_callback(0, PC());
 			break;
 		default:
 			break;

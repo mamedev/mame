@@ -144,8 +144,8 @@ uint32_t xavix2_device::execute_input_lines() const noexcept
 u32 xavix2_device::check_interrupt(u32 cpc)
 {
 	if(m_int_line && ((m_hr[4] & F_I) || m_wait)) {
-		standard_irq_callback(0);
 		m_ilr1 = m_wait ? cpc + 1 : cpc;
+		standard_irq_callback(0, m_ilr1);
 		m_wait = false;
 		m_ei_count = 0;
 		m_if1 = m_hr[4];
