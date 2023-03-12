@@ -77,7 +77,7 @@ void pce_cd_device::regs_map(address_map &map)
 	map(0x0c, 0x0c).r(FUNC(pce_cd_device::adpcm_status_r));
 	map(0x0d, 0x0d).rw(FUNC(pce_cd_device::adpcm_address_control_r), FUNC(pce_cd_device::adpcm_address_control_w));
 	map(0x0e, 0x0e).w(FUNC(pce_cd_device::adpcm_playback_rate_w));
-	map(0x0f, 0x0f).w(FUNC(pce_cd_device::fade_register_w));
+	map(0x0f, 0x0f).w(FUNC(pce_cd_device::fader_control_w));
 }
 
 pce_cd_device::pce_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -211,7 +211,7 @@ void pce_cd_device::device_start()
 	save_item(NAME(m_adpcm_status));
 	save_item(NAME(m_adpcm_latch_address));
 	save_item(NAME(m_adpcm_control));
-	save_item(NAME(m_fade_reg));
+	save_item(NAME(m_fader_ctrl));
 	save_item(NAME(m_adpcm_dma_reg));
 }
 
@@ -524,16 +524,19 @@ void pce_cd_device::nec_set_audio_start_position()
 
 			LOGCDDA("Audio start (end of track) current %d end %d\n", m_current_frame, m_end_frame);
 			// Several places definitely don't want this to start redbook,
-			// It's done later with 0xd9 command.
+			// it's done later with 0xd9 command.
 			// - fzone2 / fzone2j
 			// - draculax (stage 2' pre-boss)
 			// - manhole (fires this during Sunsoft logo but expects playback on successive
 			//            credit sequence instead)
-			// TODO: audio CD player also expects this to issue a CDDA pause_audio(1) on "fade out" button trigger
-			// otherwise it will playback the very next track
 			//if (m_end_frame > m_current_frame)
 			//  m_cdda->start_audio(m_current_frame, m_end_frame - m_current_frame);
 
+			// These ones additionally wants a CDDA pause issued:
+			// - audio CD player ("fade out" button trigger, otherwise will playback the
+			//                    very next track at the end of the sequence)
+			// - ppersia (picking up sword in stage 1, cancels then restarts redbook BGM)
+			m_cdda->pause_audio(1);
 			m_cdda_play_mode = 3;
 			m_end_mark = 0;
 
@@ -1507,7 +1510,7 @@ void pce_cd_device::adpcm_playback_rate_w(uint8_t data)
  * CD Interface Register 0x0f - CD-DA/ADPCM fader in/out register
  *
  * ---- xxxx command setting:
- * 0x00 ADPCM/CD-DA Fade-in
+ * 0x00 ADPCM/CD-DA fade-in
  * 0x01 CD-DA fade-in
  * 0x08 CD-DA fade-out (short) ADPCM fade-in
  * 0x09 CD-DA fade-out (long)
@@ -1516,13 +1519,13 @@ void pce_cd_device::adpcm_playback_rate_w(uint8_t data)
  * 0x0d CD-DA fade-out (short)
  * 0x0e ADPCM fade-out (short)
  */
-void pce_cd_device::fade_register_w(uint8_t data)
+void pce_cd_device::fader_control_w(uint8_t data)
 {
 	if (data & 0xf0)
-		LOG("fade_register_w with upper bits set! %02x\n", data);
+		LOG("fader_control_w with upper bits set! %02x\n", data);
 
 	// TODO: timers needs HW tests
-	if (m_fade_reg != data)
+	if (m_fader_ctrl != data)
 	{
 		LOGFADER("Fader %01x ", data & 0xf);
 		switch (data & 0xf)
@@ -1597,7 +1600,7 @@ void pce_cd_device::fade_register_w(uint8_t data)
 				break;
 		}
 	}
-	m_fade_reg = data;
+	m_fader_ctrl = data;
 }
 
 TIMER_CALLBACK_MEMBER(pce_cd_device::clear_ack)
