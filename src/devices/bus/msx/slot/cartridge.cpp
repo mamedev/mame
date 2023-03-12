@@ -34,7 +34,6 @@ void msx_slot_cartridge_base_device::device_start()
 
 image_init_result msx_slot_cartridge_base_device::call_load()
 {
-	printf("msx_slot_cartridge_base_device::call_load()\n");
 	if (m_cartridge)
 	{
 		if (!loaded_through_softlist())
