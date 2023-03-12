@@ -230,6 +230,7 @@ WRITE_LINE_MEMBER( nmc9306_device::cs_w )
 					write(m_address, m_data);
 					break;
 				}
+				break;
 
 			case ERASE:
 				if (m_state == STATE_ERASE)
