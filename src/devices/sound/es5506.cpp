@@ -97,7 +97,7 @@ Ensoniq OTIS - ES5505                                            Ensoniq OTTO - 
 
 ***********************************************************************************************/
 
-#define LOG_SERIAL              (1 << 1)
+#define LOG_SERIAL              (1U << 1)
 
 #define VERBOSE                 0
 #include "logmacro.h"
