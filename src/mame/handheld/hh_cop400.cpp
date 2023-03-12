@@ -2559,7 +2559,7 @@ WRITE_LINE_MEMBER(lilcomp_state::write_sk)
 	if (state == m_sk)
 		return;
 
-	// SK: trigger power off after a short delay
+	// SK: trigger power off after a short delay (since it also toggles at boot)
 	m_power_timer->adjust(state ? attotime::from_msec(100) : attotime::never);
 	m_sk = state;
 }
@@ -2577,7 +2577,7 @@ static INPUT_PORTS_START( lilcomp )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POWER_OFF )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Go")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Code 5")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN.2") // L2 port G
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Code 1")

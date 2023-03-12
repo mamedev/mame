@@ -2890,11 +2890,13 @@ if CPUS["Z180"] then
 		MAME_DIR .. "src/devices/cpu/z180/z180ed.hxx",
 		MAME_DIR .. "src/devices/cpu/z180/z180fd.hxx",
 		MAME_DIR .. "src/devices/cpu/z180/z180op.hxx",
+		MAME_DIR .. "src/devices/cpu/z180/z180xy.hxx",
 		MAME_DIR .. "src/devices/cpu/z180/z180ops.h",
 		MAME_DIR .. "src/devices/cpu/z180/z180tbl.h",
-		MAME_DIR .. "src/devices/cpu/z180/z180xy.hxx",
 		MAME_DIR .. "src/devices/cpu/z180/z180asci.cpp",
 		MAME_DIR .. "src/devices/cpu/z180/z180asci.h",
+		MAME_DIR .. "src/devices/cpu/z180/z180csio.cpp",
+		MAME_DIR .. "src/devices/cpu/z180/z180csio.h",
 	}
 end
 
@@ -3775,4 +3777,14 @@ end
 if opt_tool(CPUS, "NOVA") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nova/novadasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nova/novadasm.h")
+end
+
+--------------------------------------------------
+-- Interdata Series 16, disassembler only
+--@src/devices/cpu/interdata16/interdata16.h,CPUS["INTERDATA16"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "INTERDATA16") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/interdata16/dasm16.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/interdata16/dasm16.h")
 end

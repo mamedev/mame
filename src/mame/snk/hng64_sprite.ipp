@@ -148,7 +148,7 @@ inline void hng64_state::drawline(bitmap_ind16 & dest, bitmap_ind16 & destz, con
 
 inline void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, const rectangle &cliprect,
 		gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int32_t xpos, int32_t ypos,
-		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int curyy, uint16_t &srcpix)
+		int32_t dx, int32_t dy, uint32_t dstwidth, uint32_t trans_pen, uint32_t zval, bool zrev, bool blend, uint16_t group, bool checkerboard, uint8_t mosaic, uint8_t &mosaic_count_x, int curyy, uint16_t &srcpix)
 {
 	// use pen usage to optimize
 	code %= gfx->elements();
@@ -165,6 +165,8 @@ inline void hng64_state::zoom_transpen(bitmap_ind16 &dest, bitmap_ind16 &destz, 
 
 	if (blend)
 		color |= 0x8000;
+
+	color |= group;
 
 	assert(dest.valid());
 	assert(dest.cliprect().contains(cliprect));
@@ -287,6 +289,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 		ypos = util::sext(ypos, 10);
 
 		bool blend = (m_spriteram[(currentsprite * 8) + 4] & 0x00800000);
+		uint16_t group = (m_spriteram[(currentsprite * 8) + 4] & 0x00700000) >> 8;
 		bool checkerboard = (m_spriteram[(currentsprite * 8) + 4] & 0x04000000);
 		uint8_t mosaic = (m_spriteram[(currentsprite * 8) + 4] & 0xf0000000) >> 28;
 
@@ -368,7 +371,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 				int used_ysource_pos = full_srcpix_y2 >> 16;
 				int ytilebbb = used_ysource_pos / 0x10;
 				int use_tile_line = used_ysource_pos & 0xf;
-				draw_sprite_line(screen, cliprect, use_tile_line, ypos, xpos, chainx, dx, dy, ytilebbb, chaini, currentsprite, chainy, xflip, yflip, zval, zsort, blend, checkerboard, mosaic);
+				draw_sprite_line(screen, cliprect, use_tile_line, ypos, xpos, chainx, dx, dy, ytilebbb, chaini, currentsprite, chainy, xflip, yflip, zval, zsort, blend, group, checkerboard, mosaic);
 			}
 			ypos++;
 		}
@@ -378,7 +381,7 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 }
 
 
-inline void hng64_state::draw_sprite_line(screen_device& screen, const rectangle& cliprect, int32_t curyy, int16_t ypos, int16_t xpos, int chainx, int32_t dx, int32_t dy, int ytileblock, int chaini, int currentsprite, int chainy, int xflip, int yflip, uint16_t zval, bool zsort, bool blend, bool checkerboard, uint8_t mosaic)
+inline void hng64_state::draw_sprite_line(screen_device& screen, const rectangle& cliprect, int32_t curyy, int16_t ypos, int16_t xpos, int chainx, int32_t dx, int32_t dy, int ytileblock, int chaini, int currentsprite, int chainy, int xflip, int yflip, uint16_t zval, bool zsort, bool blend, uint16_t group, bool checkerboard, uint8_t mosaic)
 {
 	uint32_t srcpix_x = 0;
 	uint16_t srcpix = 0;
@@ -400,7 +403,7 @@ inline void hng64_state::draw_sprite_line(screen_device& screen, const rectangle
 		uint8_t gfxregion;
 
 		get_tile_details(chaini, currentsprite, xdrw, ytileblock, chainx, chainy, xflip, yflip, tileno, pal, gfxregion);
-		zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, m_gfxdecode->gfx(gfxregion), tileno, pal, xflip, yflip, xpos, ypos, dx, dy, dstwidth, 0, zval, zsort, blend, checkerboard, mosaic, mosaic_count_x, curyy, srcpix);
+		zoom_transpen(m_sprite_bitmap, m_sprite_zbuffer, cliprect, m_gfxdecode->gfx(gfxregion), tileno, pal, xflip, yflip, xpos, ypos, dx, dy, dstwidth, 0, zval, zsort, blend, group, checkerboard, mosaic, mosaic_count_x, curyy, srcpix);
 		xpos += dstwidth;
 	}
 

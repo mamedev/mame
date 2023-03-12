@@ -801,12 +801,12 @@ void sh2_device::sh2_exception(const char *message, int irqline)
 		{
 			if(m_vecmd == true)
 			{
-				vector = standard_irq_callback(irqline);
+				vector = standard_irq_callback(irqline, m_sh2_state->pc);
 				LOG("SH-2 exception #%d (external vector: $%x) after [%s]\n", irqline, vector, message);
 			}
 			else
 			{
-				standard_irq_callback(irqline);
+				standard_irq_callback(irqline, m_sh2_state->pc);
 				vector = 64 + irqline/2;
 				LOG("SH-2 exception #%d (autovector: $%x) after [%s]\n", irqline, vector, message);
 			}

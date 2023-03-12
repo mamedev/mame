@@ -1564,10 +1564,11 @@ spacduel0                       // 136006           (c) 1980
 spacduel1                       // 136006           (c) 1980
 
 @source:atari/bzone.cpp
-bradley                         // ??           (c) 1980
+bradley                         // ??               (c) 1980
 bzone                           // 0364xx           (c) 1980
 bzonea                          // 0364xx           (c) 1980
 bzonec                          // 0364xx           (c) 1980
+dsrtwars                        // bootleg          (c) 1981
 redbaron                        // 036995-037007    (c) 1980
 redbarona                       // 036995-037007    (c) 1980
 
@@ -18890,6 +18891,7 @@ phpball                         // Tomy
 playmaker                       // Tiger Electronics
 qfire                           // Electroplay
 quizwizc                        // Coleco
+racetime                        // Bandai
 raisedvl                        // Entex
 scruiser                        // US Games
 simon                           // Milton Bradley
@@ -43424,6 +43426,7 @@ spellba                         //
 
 @source:ti/ti74.cpp
 ti74                            // 1985 TI-74
+ti74a                           // 1985 TI-74
 ti95                            // 1986 TI-95
 
 @source:ti/ti85.cpp
@@ -43504,6 +43507,9 @@ k28
 
 @source:tiger/k28m2.cpp
 k28m2
+
+@source:tiger/pylo.cpp
+pylo
 
 @source:tigertel/gizmondo.cpp
 gizmondo                        //
@@ -43839,6 +43845,15 @@ cp500                           // Prologica CP500
 
 @source:trs/vis.cpp
 vis
+
+@source:tryom/chess.cpp
+tchess
+
+@source:tryom/gammonm.cpp
+gammonm2
+
+@source:tryom/omar.cpp
+omar
 
 @source:tvgames/actions_atj2279b.cpp
 rbitgen

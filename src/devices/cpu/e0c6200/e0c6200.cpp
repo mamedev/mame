@@ -156,6 +156,8 @@ void e0c6200_cpu_device::device_reset()
 
 void e0c6200_cpu_device::do_interrupt()
 {
+	standard_irq_callback(m_irq_id, m_pc);
+
 	// interrupt handling takes 13* cycles, plus 1 extra if cpu was halted
 	// *: 12.5 on E0C6200A, does the cpu osc source change polarity or something?
 	m_icount -= 13;
@@ -168,8 +170,6 @@ void e0c6200_cpu_device::do_interrupt()
 
 	// page 1 of the current bank
 	m_pc = (m_pc & 0x1000) | 0x100 | m_irq_vector;
-
-	standard_irq_callback(m_irq_id);
 }
 
 device_memory_interface::space_config_vector e0c6200_cpu_device::memory_space_config() const

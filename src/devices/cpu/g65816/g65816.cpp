@@ -589,6 +589,7 @@ void g65816_device::g65816i_set_reg_p(unsigned value)
 
 void g65816_device::g65816i_interrupt_hardware(unsigned vector)
 {
+	standard_irq_callback(0, g65816_get_pc());
 	if (FLAG_E)
 	{
 		CLK(7);
@@ -598,7 +599,6 @@ void g65816_device::g65816i_interrupt_hardware(unsigned vector)
 		g65816i_set_flag_i(IFLAG_SET);
 		REGISTER_PB = 0;
 		g65816i_jump_16(g65816i_read_16_vector(vector));
-		standard_irq_callback(0);
 	}
 	else
 	{
@@ -610,7 +610,6 @@ void g65816_device::g65816i_interrupt_hardware(unsigned vector)
 		g65816i_set_flag_i(IFLAG_SET);
 		REGISTER_PB = 0;
 		g65816i_jump_16(g65816i_read_16_vector(vector));
-		standard_irq_callback(0);
 	}
 }
 
@@ -641,6 +640,7 @@ void g65816_device::g65816i_interrupt_software(unsigned vector)
 
 void g65816_device::g65816i_interrupt_nmi()
 {
+	standard_irq_callback(G65816_LINE_NMI, g65816_get_pc());
 	if (FLAG_E)
 	{
 		CLK(7);

@@ -1085,7 +1085,7 @@ void mc68hc11_cpu_device::check_irq_lines()
 {
 	if( m_irq_state[MC68HC11_IRQ_LINE]!=CLEAR_LINE && (!(m_ccr & CC_I)) )
 	{
-		uint16_t pc_vector;
+		standard_irq_callback(MC68HC11_IRQ_LINE, m_pc);
 
 		if(m_wait_state == 0)
 		{
@@ -1096,12 +1096,11 @@ void mc68hc11_cpu_device::check_irq_lines()
 			PUSH8(REG_B);
 			PUSH8(m_ccr);
 		}
-		pc_vector = READ16(0xfff2);
+		uint16_t pc_vector = READ16(0xfff2);
 		SET_PC(pc_vector);
 		m_ccr |= CC_I; //irq taken, mask the flag
 		if(m_wait_state == 1) { m_wait_state = 2; }
 		if(m_stop_state == 1) { m_stop_state = 2; }
-		standard_irq_callback(MC68HC11_IRQ_LINE);
 	}
 
 	/* check timers here */
@@ -1135,7 +1134,7 @@ void mc68hc11_cpu_device::check_irq_lines()
 
 	if( m_irq_state[MC68HC11_RTI_LINE]!=CLEAR_LINE && (!(m_ccr & CC_I)) && m_tmsk2 & 0x40)
 	{
-		uint16_t pc_vector;
+		standard_irq_callback(MC68HC11_RTI_LINE, m_pc);
 
 		if(m_wait_state == 0)
 		{
@@ -1146,18 +1145,17 @@ void mc68hc11_cpu_device::check_irq_lines()
 			PUSH8(REG_B);
 			PUSH8(m_ccr);
 		}
-		pc_vector = READ16(0xfff0);
+		uint16_t pc_vector = READ16(0xfff0);
 		SET_PC(pc_vector);
 		m_ccr |= CC_I; //irq taken, mask the flag
 		if(m_wait_state == 1) { m_wait_state = 2; }
 		if(m_stop_state == 1) { m_stop_state = 2; }
-		standard_irq_callback(MC68HC11_RTI_LINE);
 		m_irq_state[MC68HC11_RTI_LINE] = CLEAR_LINE; // auto-ack irq
 	}
 
 	if( m_irq_state[MC68HC11_TOC1_LINE]!=CLEAR_LINE && (!(m_ccr & CC_I)) && m_tmsk1 & 0x80)
 	{
-		uint16_t pc_vector;
+		standard_irq_callback(MC68HC11_TOC1_LINE, m_pc);
 
 		if(m_wait_state == 0)
 		{
@@ -1168,12 +1166,11 @@ void mc68hc11_cpu_device::check_irq_lines()
 			PUSH8(REG_B);
 			PUSH8(m_ccr);
 		}
-		pc_vector = READ16(0xffe8);
+		uint16_t pc_vector = READ16(0xffe8);
 		SET_PC(pc_vector);
 		m_ccr |= CC_I; //irq taken, mask the flag
 		if(m_wait_state == 1) { m_wait_state = 2; }
 		if(m_stop_state == 1) { m_stop_state = 2; }
-		standard_irq_callback(MC68HC11_TOC1_LINE);
 		m_irq_state[MC68HC11_TOC1_LINE] = CLEAR_LINE; // auto-ack irq
 	}
 

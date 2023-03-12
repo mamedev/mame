@@ -1311,6 +1311,9 @@ void hng64_state::normalize(float* x)
 
 void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid)
 {
+	if ((scanline > 511) | (scanline < 0))
+		return;
+
 	// Pull the parameters out of the extent structure
 	float z = extent.param[0].start;
 	float w = extent.param[1].start;
@@ -1325,15 +1328,15 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 	const float dt = extent.param[6].dpdx;
 
 	// Pointers to the pixel buffers
-	uint16_t* colorBuffer = &m_colorBuffer3d[(scanline * 512) + extent.startx];
-	float*  depthBuffer = &m_depthBuffer3d[(scanline * 512) + extent.startx];
+	uint16_t* colorBuffer = &m_colorBuffer3d[(scanline * 512)];
+	float*  depthBuffer = &m_depthBuffer3d[(scanline * 512)];
 
 	const uint8_t *textureOffset = &m_state.m_texturerom[renderData.texIndex * 1024 * 1024];
 
 	// Step over each pixel in the horizontal span
 	for(int x = extent.startx; x < extent.stopx; x++)
 	{
-		if (z < *depthBuffer)
+		if (z < depthBuffer[x & 511])
 		{
 			// Multiply back through by w for everything that was interpolated perspective-correctly
 			const float sCorrect = s / w;
@@ -1400,8 +1403,8 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 					if (renderData.blend)
 						color |= 0x800;
 
-					*colorBuffer = color;
-					*depthBuffer = z;
+					colorBuffer[x & 511] = color;
+					depthBuffer[x & 511] = z;
 				}
 			}
 		}
@@ -1411,35 +1414,32 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 		light += dlight;
 		s += ds;
 		t += dt;
-
-		colorBuffer++;
-		depthBuffer++;
 	}
 }
 
 void hng64_poly_renderer::render_flat_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid)
 {
+	if ((scanline > 511) | (scanline < 0))
+		return;
+
 	// Pull the parameters out of the extent structure
 	float z = extent.param[0].start;
 	const float dz = extent.param[0].dpdx;
 
 	// Pointers to the pixel buffers
-	float*  depthBuffer = &m_depthBuffer3d[(scanline * 512) + extent.startx];
-	uint16_t*  colorBuffer = &m_colorBuffer3d[(scanline * 512) + extent.startx];
+	float*  depthBuffer = &m_depthBuffer3d[(scanline * 512)];
+	uint16_t*  colorBuffer = &m_colorBuffer3d[(scanline * 512)];
 
 	// Step over each pixel in the horizontal span
 	for(int x = extent.startx; x < extent.stopx; x++)
 	{
-		if (z < *depthBuffer)
+		if (z < depthBuffer[x & 511])
 		{
-			*colorBuffer = renderData.palOffset + renderData.colorIndex;
-			*depthBuffer = z;
+			colorBuffer[x & 511] = renderData.palOffset + renderData.colorIndex;
+			depthBuffer[x & 511] = z;
 		}
 
 		z += dz;
-
-		colorBuffer++;
-		depthBuffer++;
 	}
 }
 

@@ -80,10 +80,13 @@ public:
 		m_bus0i(*this, BUS0I_TAG),
 		m_bus0x(*this, BUS0X_TAG),
 		m_bus1(*this, BUS1_TAG),
-		m_bus2(*this, BUS2_TAG)
+		m_bus2(*this, BUS2_TAG),
+		m_kb(*this, ABC_KEYBOARD_PORT_TAG)
 	{ }
 
 	void abc1600(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER( reset );
 
 private:
 	required_device<m68008_device> m_maincpu;
@@ -105,6 +108,7 @@ private:
 	required_device<abcbus_slot_device> m_bus0x;
 	required_device<abcbus_slot_device> m_bus1;
 	required_device<abcbus_slot_device> m_bus2;
+	required_device<abc_keyboard_port_device> m_kb;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

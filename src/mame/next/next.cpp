@@ -277,13 +277,12 @@ bool const next_state::dma_has_saved[0x20] = {
 	false, false, false, false, false, false, false, false,
 };
 
-const char *next_state::dma_name(int slot)
+std::string next_state::dma_name(int slot)
 {
-	static char buf[32];
 	if(dma_targets[slot])
 		return dma_targets[slot];
-	sprintf(buf, "<%02x>", slot);
-	return buf;
+
+	return util::string_format("<%02x>", slot);
 }
 
 void next_state::dma_drq_w(int slot, bool state)
@@ -458,8 +457,7 @@ uint32_t next_state::dma_regs_r(offs_t offset)
 		break;
 	}
 
-	const char *name = dma_name(slot);
-	logerror("dma_regs_r %s:%d %08x (%08x)\n", name, reg, res, maincpu->pc());
+	logerror("dma_regs_r %s:%d %08x (%08x)\n", dma_name(slot), reg, res, maincpu->pc());
 
 	return res;
 }
@@ -469,9 +467,7 @@ void next_state::dma_regs_w(offs_t offset, uint32_t data)
 	int slot = offset >> 2;
 	int reg = offset & 3;
 
-	const char *name = dma_name(slot);
-
-	logerror("dma_regs_w %s:%d %08x (%08x)\n", name, reg, data, maincpu->pc());
+	logerror("dma_regs_w %s:%d %08x (%08x)\n", dma_name(slot), reg, data, maincpu->pc());
 	switch(reg) {
 	case 0:
 		dma_slots[slot].start = data;
@@ -494,10 +490,8 @@ uint32_t next_state::dma_ctrl_r(offs_t offset)
 	int slot = offset >> 2;
 	int reg = offset & 3;
 
-	const char *name = dma_name(slot);
-
 	if(maincpu->pc() != 0x409bb4e)
-		logerror("dma_ctrl_r %s:%d %02x (%08x)\n", name, reg, dma_slots[slot].state, maincpu->pc());
+		logerror("dma_ctrl_r %s:%d %02x (%08x)\n", dma_name(slot), reg, dma_slots[slot].state, maincpu->pc());
 
 	return reg ? 0 : dma_slots[slot].state << 24;
 }
@@ -506,8 +500,7 @@ void next_state::dma_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int slot = offset >> 2;
 	int reg = offset & 3;
-	const char *name = dma_name(slot);
-	logerror("dma_ctrl_w %s:%d %08x @ %08x (%08x)\n", name, reg, data, mem_mask, maincpu->pc());
+	logerror("dma_ctrl_w %s:%d %08x @ %08x (%08x)\n", dma_name(slot), reg, data, mem_mask, maincpu->pc());
 	if(!reg) {
 		if(ACCESSING_BITS_16_23)
 			dma_do_ctrl_w(slot, data >> 16);
@@ -518,7 +511,7 @@ void next_state::dma_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 void next_state::dma_do_ctrl_w(int slot, uint8_t data)
 {
-	const char *name = dma_name(slot);
+	const auto name = dma_name(slot);
 #if 0
 	logerror("dma_ctrl_w %s %02x (%08x)\n", name, data, maincpu->pc());
 

@@ -49,6 +49,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	devcb_write_line m_out_rx_handler;
 	devcb_write_line m_out_trxc_handler;
@@ -62,6 +63,7 @@ class abc_keyboard_interface : public device_interface
 {
 public:
 	virtual void txd_w(int state) { }
+	virtual void reset_w(int state) { }
 
 protected:
 	// construction/destruction

@@ -835,7 +835,7 @@ void upd7810_device::upd7810_take_irq()
 	{
 		/* acknowledge external IRQ */
 		if (irqline)
-			standard_irq_callback(irqline);
+			standard_irq_callback(irqline, PC);
 		SP--;
 		WM( SP, PSW );
 		SP--;
@@ -896,7 +896,7 @@ void upd7801_device::upd7810_take_irq()
 	{
 		/* acknowledge external IRQ */
 		if (irqline)
-			standard_irq_callback(irqline);
+			standard_irq_callback(irqline, PC);
 		SP--;
 		WM( SP, PSW );
 		SP--;

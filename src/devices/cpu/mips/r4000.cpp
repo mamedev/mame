@@ -1113,7 +1113,7 @@ void r4000_base_device::cpu_exception(u32 exception, u16 const vector)
 			u32 const iphw = CAUSE & SR & CAUSE_IPHW;
 
 			if (iphw)
-				debug()->interrupt_hook(22 - count_leading_zeros_32((iphw - 1) & ~iphw));
+				debug()->interrupt_hook(22 - count_leading_zeros_32((iphw - 1) & ~iphw), m_pc);
 		}
 	}
 	else

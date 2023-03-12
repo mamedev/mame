@@ -2206,11 +2206,11 @@ void m68000_musashi_device::m68ki_exception_interrupt(u32 int_level)
 
 	/* Inform the device than an interrupt is taken */
 	if(m_interrupt_mixer)
-		standard_irq_callback(int_level);
+		standard_irq_callback(int_level, m_pc);
 	else
 		for(int i=0; i<3; i++)
 			if(int_level & (1<<i))
-				standard_irq_callback(i);
+				standard_irq_callback(i, m_pc);
 
 	/* Acknowledge the interrupt by reading the cpu space. */
 	/* We require the handlers for autovector to return the correct
