@@ -664,12 +664,12 @@ int hng64_state::get_blend_mode(int tm)
 	uint8_t blendmode = 1;
 	if ((get_tileregs(tm) & 0x0020) >> 5) // for layers with L(1)
 	{
-		if ((m_tcram[0x0c / 4] >> 2) & 0x1) 
+		if ((m_tcram[0x0c / 4] >> 2) & 0x1)
 			blendmode = 2;
 	}
 	else // for layers with L(0)
 	{
-		if ((m_tcram[0x0c / 4] >> 26) & 0x1) 
+		if ((m_tcram[0x0c / 4] >> 26) & 0x1)
 			blendmode = 2;
 	}
 
@@ -778,7 +778,7 @@ void hng64_state::mixsprites_test(screen_device& screen, bitmap_rgb32& bitmap, c
 				//if ((srcpix & 0x7000) == 0x5000) // not used on buriki?
 				//if ((srcpix & 0x7000) == 0x4000) // character portraits on buriki select screen (still behind 3d)
 
-				//if ((srcpix & 0x7000) == 0x3000) // character names and bio (above 3D graphics) 
+				//if ((srcpix & 0x7000) == 0x3000) // character names and bio (above 3D graphics)
 
 				//if ((srcpix & 0x7000) == 0x2000) // select cursor, second system graphic, timers etc. (above ring tilemap, above 3d)
 
@@ -1073,7 +1073,7 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 			(m_tcram[0x0c / 4] >> 29) & 0x1,
 			(m_tcram[0x0c / 4] >> 28) & 0x1,
 			(m_tcram[0x0c / 4] >> 27) & 0x1,
-			(m_tcram[0x0c / 4] >> 26) & 0x1, // set for blends in on tm1 (pink bits on xrally etc.)  (U 1 1) E(1) L(0) DEPTH (0 1 0 0 1)   in sams64 intro it expects it on tm2, but it gets applied to tm1 TM2 = U(1 1) E(1) L(0) DEPTH(1 0 1 0 1)  
+			(m_tcram[0x0c / 4] >> 26) & 0x1, // set for blends in on tm1 (pink bits on xrally etc.)  (U 1 1) E(1) L(0) DEPTH (0 1 0 0 1)   in sams64 intro it expects it on tm2, but it gets applied to tm1 TM2 = U(1 1) E(1) L(0) DEPTH(1 0 1 0 1)
 
 			(m_tcram[0x0c / 4] >> 25) & 0x1,
 			(m_tcram[0x0c / 4] >> 24) & 0x1, // always set

@@ -1005,9 +1005,9 @@ void hng64_state::hng64_sysregs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 	{
 		/*
 		case 0x0014:
-			break;
+		    break;
 		case 0x001c:
-			break;
+		    break;
 		*/
 		case 0x100c:
 			raster_irq_pos_w(data);
@@ -1015,13 +1015,13 @@ void hng64_state::hng64_sysregs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 
 		/*
 		case 0x1014:
-			break;
+		    break;
 		case 0x101c:
-			break;
+		    break;
 		case 0x106c: // also reads from this one when writing 100c regs
-			break;
+		    break;
 		case 0x1074:
-			break;
+		    break;
 		*/
 		case 0x1084: //MIPS->MCU latch port
 			m_mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
@@ -1029,7 +1029,7 @@ void hng64_state::hng64_sysregs_w(offs_t offset, uint32_t data, uint32_t mem_mas
 			break;
 		/*
 		case 0x108c:
-			break;
+		    break;
 		*/
 		default:
 			logerror("%s: HNG64 writing to SYSTEM Registers %08x %08x (%08x) on scanline %d\n", machine().describe_context(), offset * 4, data, mem_mask, scanline);
@@ -1145,19 +1145,20 @@ void hng64_state::hng64_sprite_clear_odd_w(offs_t offset, uint32_t data, uint32_
 
 void hng64_state::hng64_vregs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	uint32_t oldreg = m_videoregs[offset];
-
 	LOGMASKED(LOG_VREGS, "hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
-	COMBINE_DATA(&m_videoregs[offset]);
 
-	if (oldreg != m_videoregs[offset])
+	uint32_t newval = m_videoregs[offset];
+	COMBINE_DATA(&newval);
+
+	if (newval != m_videoregs[offset])
 	{
 		int vpos = m_screen->vpos();
 
 		if (vpos > 0)
 			m_screen->update_partial(vpos - 1);
-	}
 
+		m_videoregs[offset] = newval;
+	}
 }
 
 uint16_t hng64_state::main_sound_comms_r(offs_t offset)
