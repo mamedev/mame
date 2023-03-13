@@ -1352,8 +1352,8 @@ void hng64_poly_renderer::render_texture_scanline(int32_t scanline, const extent
 				textureS = sCorrect * 1024.0f;
 				textureT = tCorrect * 1024.0f;
 
-				textureS += (renderData.texscrolly & 0x3fff)>>4;
-				textureT += (renderData.texscrollx & 0x3fff)>>4;
+				textureS += (renderData.texscrolly & 0x3fff)>>5;
+				textureT += (renderData.texscrollx & 0x3fff)>>5;
 
 
 #if 1
