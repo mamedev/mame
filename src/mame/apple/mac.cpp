@@ -47,6 +47,9 @@
 
 #include "formats/ap_dsk35.h"
 
+
+namespace {
+
 #define C15M (15.6672_MHz_XTAL)
 #define C7M  (C15M/2)
 
@@ -113,6 +116,10 @@ public:
 
 	model_t m_model;
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via1;
@@ -128,9 +135,6 @@ private:
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<rtc3430042_device> m_rtc;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	uint32_t m_overlay = 0;
 
 	uint32_t m_via2_vbl = 0;
@@ -139,7 +143,6 @@ private:
 
 	emu_timer *m_overlay_timeout = nullptr;
 	TIMER_CALLBACK_MEMBER(overlay_timeout_func);
-	uint32_t rom_switch_r(offs_t offset);
 
 	int m_adb_irq_pending = 0;
 	int m_screen_buffer = 0;
@@ -356,18 +359,6 @@ void mac_state::set_memory_overlay(int overlay)
 	}
 }
 
-uint32_t mac_state::rom_switch_r(offs_t offset)
-{
-	// disable the overlay
-	if (m_overlay)
-	{
-		set_memory_overlay(0);
-	}
-
-	// printf("rom_switch_r: offset %08x ROM_size -1 = %08x, masked = %08x\n", offset, m_rom_size-1, offset & ((m_rom_size - 1)>>2));
-
-	return m_rom_ptr[offset & ((m_rom_size - 1) >> 2)];
-}
 
 /* *************************************************************************
  * SCSI
@@ -1275,10 +1266,12 @@ ROM_START( macse30 )
 	ROM_LOAD( "se30vrom.uk6", 0x000000, 0x002000, CRC(b74c3463) SHA1(584201cc67d9452b2488f7aaaf91619ed8ce8f03) )
 ROM_END
 
-/*    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS      INIT                COMPANY           FULLNAME */
-COMP( 1987, macii,     0,        0,      macii,    macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II",  MACHINE_SUPPORTS_SAVE )
+} // anonymous namespace
+
+//    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT    CLASS      INIT                COMPANY           FULLNAME
+COMP( 1987, macii,     0,        0,      macii,    macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II",                 MACHINE_SUPPORTS_SAVE )
 COMP( 1987, maciihmu,  macii,    0,      maciihmu, macadb,  mac_state, init_macii,         "Apple Computer", "Macintosh II (w/o 68851 MMU)", MACHINE_SUPPORTS_SAVE )
-COMP( 1988, mac2fdhd,  0,        0,      maciihd,  macadb,  mac_state, init_maciifdhd,     "Apple Computer", "Macintosh II (FDHD)",  MACHINE_SUPPORTS_SAVE )
-COMP( 1988, maciix,    mac2fdhd, 0,      maciix,   macadb,  mac_state, init_maciix,        "Apple Computer", "Macintosh IIx",  MACHINE_SUPPORTS_SAVE )
-COMP( 1989, macse30,   mac2fdhd, 0,      macse30,  macadb,  mac_state, init_macse30,       "Apple Computer", "Macintosh SE/30",  MACHINE_SUPPORTS_SAVE )
-COMP( 1989, maciicx,   mac2fdhd, 0,      maciicx,  macadb,  mac_state, init_maciicx,       "Apple Computer", "Macintosh IIcx",  MACHINE_SUPPORTS_SAVE )
+COMP( 1988, mac2fdhd,  0,        0,      maciihd,  macadb,  mac_state, init_maciifdhd,     "Apple Computer", "Macintosh II (FDHD)",          MACHINE_SUPPORTS_SAVE )
+COMP( 1988, maciix,    mac2fdhd, 0,      maciix,   macadb,  mac_state, init_maciix,        "Apple Computer", "Macintosh IIx",                MACHINE_SUPPORTS_SAVE )
+COMP( 1989, macse30,   mac2fdhd, 0,      macse30,  macadb,  mac_state, init_macse30,       "Apple Computer", "Macintosh SE/30",              MACHINE_SUPPORTS_SAVE )
+COMP( 1989, maciicx,   mac2fdhd, 0,      maciicx,  macadb,  mac_state, init_maciicx,       "Apple Computer", "Macintosh IIcx",               MACHINE_SUPPORTS_SAVE )

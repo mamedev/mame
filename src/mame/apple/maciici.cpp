@@ -75,7 +75,10 @@ public:
 
 	void maciici(machine_config &config);
 	void maciisi(machine_config &config);
-	void maciici_map(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_device<m68030_device> m_maincpu;
@@ -94,9 +97,6 @@ private:
 	required_device<palette_device> m_palette;
 	optional_device<rtc3430042_device> m_rtc;
 	optional_device<egret_device> m_egret;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	emu_timer *m_6015_timer = nullptr;
 	emu_timer *m_scanline_timer = nullptr;
@@ -150,6 +150,8 @@ private:
 	WRITE_LINE_MEMBER(via_out_cb2_iisi);
 
 	uint32_t rom_switch_r(offs_t offset);
+
+	void maciici_map(address_map &map);
 
 	u16 scc_r(offs_t offset)
 	{
@@ -728,15 +730,15 @@ void maciici_state::via_out_b(uint8_t data)
 	//  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 	m_macadb->mac_adb_newaction((data & 0x30) >> 4);
 
-	m_rtc->ce_w((data & 0x04) >> 2);
-	m_rtc->data_w(data & 0x01);
-	m_rtc->clk_w((data >> 1) & 0x01);
+	m_rtc->ce_w(BIT(data, 2));
+	m_rtc->data_w(BIT(data, 0));
+	m_rtc->clk_w(BIT(data, 1));
 }
 
 void maciici_state::via_out_b_iisi(uint8_t data)
 {
-	m_egret->set_via_full((data & 0x10) ? 1 : 0);
-	m_egret->set_sys_session((data & 0x20) ? 1 : 0);
+	m_egret->set_via_full(BIT(data, 4));
+	m_egret->set_sys_session(BIT(data, 5));
 }
 
 WRITE_LINE_MEMBER(maciici_state::via_out_cb2)

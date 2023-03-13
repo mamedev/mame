@@ -131,7 +131,7 @@ public:
 			});
 		m_busy = true;
 		m_yield = false;
-		th.detach();
+		th.detach(); // FIXME: this is unsafe as the thread function modifies members of the object
 		return true;
 	}
 
@@ -323,7 +323,7 @@ public:
 					self.state.state_entries().end(),
 					[&symbol] (std::unique_ptr<device_state_entry> const &v) { return !std::strcmp(v->symbol(), symbol); }));
 		if (self.state.state_entries().end() != found)
-			return stack::push_reference(L, **found);
+			return stack::push_reference(L, std::cref(**found));
 		else
 			return stack::push(L, lua_nil);
 	}
@@ -351,7 +351,7 @@ public:
 					self.image.formatlist().end(),
 					[&name] (std::unique_ptr<image_device_format> const &v) { return v->name() == name; }));
 		if (self.image.formatlist().end() != found)
-			return stack::push_reference(L, **found);
+			return stack::push_reference(L, std::cref(**found));
 		else
 			return stack::push(L, lua_nil);
 	}
@@ -379,7 +379,7 @@ public:
 					self.options.plugins().end(),
 					[&name] (plugin_options::plugin const &p) { return p.m_name == name; }));
 		if (self.options.plugins().end() != found)
-			return stack::push_reference(L, *found);
+			return stack::push_reference(L, std::cref(*found));
 		else
 			return stack::push(L, lua_nil);
 	}
