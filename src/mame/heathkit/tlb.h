@@ -25,16 +25,16 @@
 class heath_tlb_device : public device_t
 {
 public:
-  heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type);
+  heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
   // interface routines
-  auto pb4_callback() { return write_sd.bind(); }
+  auto serial_data_callback() { return write_sd.bind(); }
   DECLARE_WRITE_LINE_MEMBER(cb1_w);
-
-  void setLoopBack(bool on);
-
+  void init();
 
 protected:
+  heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
   virtual ioport_constructor device_input_ports() const override;
   virtual const tiny_rom_entry *device_rom_region() const override;
   virtual void device_add_mconfig(machine_config &config) override;

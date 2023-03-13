@@ -45,6 +45,8 @@ public:
 
 	void h89(machine_config &config);
 
+	void init();
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<heath_tlb_device> m_tlb;
@@ -59,6 +61,10 @@ private:
 	void h89_mem(address_map &map);
 };
 
+void h89_state::init()
+{
+	m_tlb->init();
+}
 
 void h89_state::h89_mem(address_map &map)
 {
@@ -202,22 +208,25 @@ void h89_state::h89(machine_config & config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &h89_state::h89_mem);
 	m_maincpu->set_addrmap(AS_IO, &h89_state::h89_io);
 
+	INS8250(config, m_console, INS8250_CLOCK);
+#if 1
 	TLB(config, m_tlb, H19_CLOCK);
 
-	INS8250(config, m_console, INS8250_CLOCK);
 
 	m_console->out_tx_callback().set(m_tlb, FUNC(heath_tlb_device::cb1_w));
 
-	m_tlb->pb4_callback().set("console", FUNC(ins8250_uart_device::rx_w));
-#if 0
+	m_tlb->serial_data_callback().set("console", FUNC(ins8250_uart_device::rx_w));
+#else
+#define RS232_TAG "rs232"
+
 	ins8250_device &uart(INS8250(config, "ins8250", XTAL(1'843'200)));
 	uart.out_tx_callback().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
 	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set("ins8250", FUNC(ins8250_uart_device::rx_w));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
-	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(h89_state::h89_irq_timer), attotime::from_hz(100));
 #endif
+	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(h89_state::h89_irq_timer), attotime::from_hz(100));
 }
 
 /* ROM definition */
@@ -237,4 +246,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY      FULLNAME        FLAGS */
-COMP( 1979, h89,  0,      0,      h89,     h89,   h89_state, empty_init, "Heath Company", "Heathkit H89", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1979, h89,  0,      0,      h89,     h89,   h89_state, init, "Heath Company", "Heathkit H89", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

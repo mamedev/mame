@@ -70,7 +70,12 @@ DEFINE_DEVICE_TYPE(SUPER19, heath_super19_tlb_device, "heath_super19_tlb", "Heat
 DEFINE_DEVICE_TYPE(WATZ, heath_watz_tlb_device, "heath_watz_tlb", "Heath Terminal Logic Board w/Watzman ROM");
 DEFINE_DEVICE_TYPE(ULTRA, heath_ultra_tlb_device, "heath_ultra_tlb", "Heath Terminal Logic Board w/Ultra ROM");
 
-heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type = TLB)
+heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: heath_tlb_device(mconfig, TLB, tag, owner, clock)
+{
+}
+
+heath_tlb_device::heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, type, tag, owner, clock)
 		, write_sd(*this)
 		, m_palette(*this, "palette")
@@ -85,13 +90,6 @@ heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *ta
 		, m_kbspecial(*this, "MODIFIERS")
 {
 }
-
-void heath_tlb_device::setLoopBack(bool on)
-{
-
-
-}
-
 
 TIMER_CALLBACK_MEMBER(heath_tlb_device::key_click_off)
 {
@@ -147,14 +145,14 @@ void heath_tlb_device::io_map(address_map &map)
 
 void heath_tlb_device::device_start()
 {
-	/*save_item(NAME(m_transchar));
-	save_item(NAME(m_strobe));
-	save_item(NAME(m_keyclickactive));
-	save_item(NAME(m_bellactive));*/
-	m_strobe = m_keyclickactive = m_bellactive = false;
 
 	m_key_click_timer = timer_alloc(FUNC(heath_tlb_device::key_click_off), this);
 	m_bell_timer = timer_alloc(FUNC(heath_tlb_device::bell_off), this);
+}
+
+void heath_tlb_device::init()
+{
+	m_strobe = m_keyclickactive = m_bellactive = false;
 }
 
 void heath_tlb_device::key_click_w(uint8_t data)
@@ -216,9 +214,6 @@ uint8_t heath_tlb_device::kbd_flags_r()
 	{
 		rv |= KB_STATUS_SHIFT_KEYS_MASK;
 	}
-
-	// invert offline switch
-	rv ^= KB_STATUS_ONLINE_KEY_MASK;
 
 	if (!m_strobe)
 	{
@@ -429,7 +424,7 @@ static INPUT_PORTS_START( tlb )
 	PORT_BIT(0x200, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Esc")        PORT_CODE(KEYCODE_ESC)        PORT_CHAR(27)
 
 	PORT_START("SW401")
-	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")
+	PORT_DIPNAME( 0x0f, 0x0c, "Baud Rate")          PORT_DIPLOCATION("SW401:1,2,3,4")
 	PORT_DIPSETTING(    0x01, "110")
 	PORT_DIPSETTING(    0x02, "150")
 	PORT_DIPSETTING(    0x03, "300")
@@ -443,40 +438,40 @@ static INPUT_PORTS_START( tlb )
 	PORT_DIPSETTING(    0x0b, "7200")
 	PORT_DIPSETTING(    0x0c, "9600")
 	PORT_DIPSETTING(    0x0d, "19200")
-	PORT_DIPNAME( 0x30, 0x00, "Parity")
+	PORT_DIPNAME( 0x30, 0x00, "Parity")              PORT_DIPLOCATION("SW401:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR(None))
 	PORT_DIPSETTING(    0x10, "Odd")
 	PORT_DIPSETTING(    0x30, "Even")
-	PORT_DIPNAME( 0x40, 0x00, "Parity Type")
+	PORT_DIPNAME( 0x40, 0x00, "Parity Type")         PORT_DIPLOCATION("SW401:7")
 	PORT_DIPSETTING(    0x00, DEF_STR(Normal))
 	PORT_DIPSETTING(    0x40, "Stick")
-	PORT_DIPNAME( 0x80, 0x80, "Duplex")
+	PORT_DIPNAME( 0x80, 0x80, "Duplex")              PORT_DIPLOCATION("SW401:8")
 	PORT_DIPSETTING(    0x00, "Half")
 	PORT_DIPSETTING(    0x80, "Full")
 
 	PORT_START("SW402") // stored at 40C8
-	PORT_DIPNAME( 0x01, 0x00, "Cursor")
+	PORT_DIPNAME( 0x01, 0x00, "Cursor")             PORT_DIPLOCATION("SW402:1")
 	PORT_DIPSETTING(    0x00, "Underline")
 	PORT_DIPSETTING(    0x01, "Block")
-	PORT_DIPNAME( 0x02, 0x00, "Keyclick")
+	PORT_DIPNAME( 0x02, 0x00, "Keyclick")           PORT_DIPLOCATION("SW402:2")
 	PORT_DIPSETTING(    0x02, DEF_STR(No))
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes))
-	PORT_DIPNAME( 0x04, 0x00, "Wrap at EOL")
+	PORT_DIPNAME( 0x04, 0x00, "Wrap at EOL")        PORT_DIPLOCATION("SW402:3")
 	PORT_DIPSETTING(    0x00, DEF_STR(No))
 	PORT_DIPSETTING(    0x04, DEF_STR(Yes))
-	PORT_DIPNAME( 0x08, 0x00, "Auto LF on CR")
+	PORT_DIPNAME( 0x08, 0x00, "Auto LF on CR")      PORT_DIPLOCATION("SW402:4")
 	PORT_DIPSETTING(    0x00, DEF_STR(No))
 	PORT_DIPSETTING(    0x08, DEF_STR(Yes))
-	PORT_DIPNAME( 0x10, 0x00, "Auto CR on LF")
+	PORT_DIPNAME( 0x10, 0x00, "Auto CR on LF")      PORT_DIPLOCATION("SW402:5")
 	PORT_DIPSETTING(    0x00, DEF_STR(No))
 	PORT_DIPSETTING(    0x10, DEF_STR(Yes))
-	PORT_DIPNAME( 0x20, 0x00, "Mode")
+	PORT_DIPNAME( 0x20, 0x00, "Mode")               PORT_DIPLOCATION("SW402:6")
 	PORT_DIPSETTING(    0x00, "VT52")
 	PORT_DIPSETTING(    0x20, "ANSI")
-	PORT_DIPNAME( 0x40, 0x00, "Keypad Shifted")
+	PORT_DIPNAME( 0x40, 0x00, "Keypad Shifted")     PORT_DIPLOCATION("SW402:7")
 	PORT_DIPSETTING(    0x00, DEF_STR(No))
 	PORT_DIPSETTING(    0x40, DEF_STR(Yes))
-	PORT_DIPNAME( 0x80, 0x00, "Refresh")
+	PORT_DIPNAME( 0x80, 0x00, "Refresh")            PORT_DIPLOCATION("SW402:8")
 	PORT_DIPSETTING(    0x00, "50Hz")
 	PORT_DIPSETTING(    0x80, "60Hz")
 INPUT_PORTS_END
@@ -609,7 +604,7 @@ void heath_tlb_device::device_add_mconfig(machine_config &config)
 }
 
 heath_super19_tlb_device::heath_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: heath_tlb_device(mconfig, tag, owner, clock, SUPER19)
+		: heath_tlb_device(mconfig, SUPER19, tag, owner, clock)
 {
 }
 
@@ -619,7 +614,7 @@ const tiny_rom_entry *heath_super19_tlb_device::device_rom_region() const
 }
 
 heath_watz_tlb_device::heath_watz_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: heath_tlb_device(mconfig, tag, owner, clock, WATZ)
+		: heath_tlb_device(mconfig, WATZ, tag, owner, clock)
 {
 }
 
@@ -629,7 +624,7 @@ const tiny_rom_entry *heath_watz_tlb_device::device_rom_region() const
 }
 
 heath_ultra_tlb_device::heath_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: heath_tlb_device(mconfig, tag, owner, clock, ULTRA)
+		: heath_tlb_device(mconfig, ULTRA, tag, owner, clock)
 {
 }
 
