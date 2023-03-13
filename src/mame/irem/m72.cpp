@@ -3555,14 +3555,14 @@ ROM_END
 
 /*
 
-There is known to exist a version of Air Duel on a M72-C top board with the following ROM configuration:
+A version of Air Duel is known to exist on an M72-C top board with the following ROM configuration:
 
 AD C-H0-A through AD C-H3-A & AD L0-A through AD L3-A
 AD C-00-A, AD C-01-A, AD C-10-A, AD C-11-A, AD C-20-A, AD C-21-A, AD C-30-A, AD C-31-A
 AD C-V0-A & AD C-V1-A
 AD C-PR-A MCU at IC1
 
-unknown if this version is just a half sized ROM version of a current set or a set ment for a different region.
+unknown whether this version is just a half-sized ROM configuration of a current set or a set meant for a different region.
 
 */
 ROM_START( airduelm72 )

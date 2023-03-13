@@ -31,35 +31,37 @@ Sound CPU: ( 6809 )
 6000-6000 Sound latch read
 8000-ffff ROM
 
+
 NOTES:
-The main 6502 CPU is a custom one. The differences with a regular 6502 is as follows:
-- Extra opcode ( $4b00 ), which I think reads an external port. VBlank IRQ is on bit 1 ( 0x02 ).
-- Reset, IRQ and NMI vectors are moved.
 
-Also, there was some protection circuitry which is now emulated.
+The main 6502 CPU is a DECO CPU-16.  Also, there was some protection
+circuitry which is now emulated.
 
-(Note (15/jun/09): CPU is actually a DECO CPU-16, used mostly by the liberate.c games -AS)
+The background tiles had a very ugly encoding.  It was so ugly that our
+decode gfx routine will not be able to decode it without a little help.
+So thats why gfx_expand() is there.  Many thanks to Phil Stroffolino,
+who figured out the encoding.
 
-The bootleg version patched the ROM to get rid of the extra opcode ( bootlegs
-used a regular 6502 ), the vectors hardcoded in place, and also had the
-protection cracked.
+If the second player obtains a high score, the game always reads the 2P
+inputs for entering initials, even on upright cabinets that lack these
+inputs, making it impossible for the second player to enter their
+initials.  Data East released an update for the EEPROM at location 16A
+on the top PCB (CZ00-6A) to fix this bug.  They also suggested wiring
+the 1P controls to the 2P inputs to work around the issue.  The updated
+EEPROM has not been dumped.
 
-The background tiles had a very ugly encoding. It was so ugly that our
-decode gfx routine will not be able to decode it without some little help.
-So thats why exprraid_gfx_expand() is there. Many thanks to Phil
-Stroffolino, who figured out the encoding.
-
-There's an undumped CZ00-6A program ROM update which fixes a bug which makes it impossible for
-player 2 in a two player game to enter initials into the high score table with dips set for an
-upright cabinet.
 
 NOTES ON THE BOOTLEGS:
 
-1st bootleg set expects to read vblank status from 0x3800, country warning
-sign has been defaced by the bootleggers
+The bootleg version patched the ROM to get rid of the extra opcode
+(bootlegs used a regular 6502), the vectors hard-coded in place, and
+also had the protection cracked.
 
-2nd bootleg set expects to read vblank status from 0xFFC0, country warning
-sign is intact, however Credit is spelt incorrectly.
+1st bootleg set expects to read vblank status from 0x3800, country
+warning sign has been defaced by the bootleggers
+
+2nd bootleg set expects to read vblank status from 0xFFC0, country
+warning sign is intact, however Credit is spelt incorrectly.
 
 
 Stephh's notes (based on the games M6502 code and some tests) :
@@ -207,7 +209,6 @@ Stephh's notes (based on the games M6502 code and some tests) :
     but also in a different way than 'wexpressb2' as reads from 0x2801
     occur when you lose a life but also on "shoot" stages).
 
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -225,16 +226,6 @@ Stephh's notes (based on the games M6502 code and some tests) :
 #include "tilemap.h"
 
 
-// configurable logging
-#define LOG_PROT (1U << 1)
-
-//#define VERBOSE (LOG_GENERAL | LOG_PROT)
-
-#include "logmacro.h"
-
-#define LOGPROT(...) LOGMASKED(LOG_PROT, __VA_ARGS__)
-
-
 namespace {
 
 class exprraid_state : public driver_device
@@ -247,27 +238,26 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
+		m_tilemaprom(*this, "bgtilemap"),
 		m_main_ram(*this, "main_ram"),
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"),
-		m_tilerom(*this, "bgtiles2")
+		m_colorram(*this, "colorram")
 	{ }
 
-	void exprraid(machine_config &config);
-	void wexpressb2(machine_config &config);
-	void wexpressb3(machine_config &config);
+	void exprraid(machine_config &config) ATTR_COLD;
+	void wexpressb2(machine_config &config) ATTR_COLD;
+	void wexpressb3(machine_config &config) ATTR_COLD;
 
-	void gfx_expand();
-	void init_wexpressb();
+	void gfx_expand() ATTR_COLD;
+	void init_wexpressb() ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_deco16);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi);
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	// devices
@@ -278,11 +268,11 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	// memory pointers
+	required_region_ptr<uint8_t> m_tilemaprom;
 	required_shared_ptr<uint8_t> m_main_ram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	required_region_ptr<uint8_t> m_tilerom;
 
 	// protection
 	uint8_t m_prot_value = 0U;
@@ -308,11 +298,11 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void master_io_map(address_map &map);
-	void master_map(address_map &map);
-	void slave_map(address_map &map);
-	void wexpressb2_master_map(address_map &map);
-	void wexpressb3_master_map(address_map &map);
+
+	void master_map(address_map &map) ATTR_COLD;
+	template <offs_t Addr> void wexpressb_map(address_map &map) ATTR_COLD;
+	void master_io_map(address_map &map) ATTR_COLD;
+	void slave_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -356,18 +346,17 @@ void exprraid_state::scrolly_w(offs_t offset, uint8_t data)
 
 TILE_GET_INFO_MEMBER(exprraid_state::get_bg_tile_info)
 {
+	int const sx = tile_index % 32;
+	int const sy = tile_index / 32;
+
 	int quadrant = 0;
-
-	int sx = tile_index % 32;
-	int sy = tile_index / 32;
-
 	if (sx >= 16) quadrant++;
 	if (sy >= 16) quadrant += 2;
 
 	int const offs = (sy % 16) * 16 + (sx % 16) + (m_bg_index[quadrant] & 0x3f) * 0x100;
 
-	int const data = m_tilerom[offs];
-	int const attr = m_tilerom[offs + 0x4000];
+	int const data = m_tilemaprom[offs];
+	int const attr = m_tilemaprom[offs + 0x4000];
 	int const bank = (2 * (attr & 0x03) + ((data & 0x80) >> 7)) + 2;
 	int const code = data & 0x7f;
 	int const color = (attr & 0x18) >> 3;
@@ -385,15 +374,6 @@ TILE_GET_INFO_MEMBER(exprraid_state::get_fg_tile_info)
 	int const color = (attr & 0x10) >> 4;
 
 	tileinfo.set(0, code, color, 0);
-}
-
-void exprraid_state::video_start()
-{
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(exprraid_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(exprraid_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-
-	m_bg_tilemap->set_scroll_rows(2);
-	m_fg_tilemap->set_transparent_pen(0);
 }
 
 void exprraid_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -416,7 +396,8 @@ void exprraid_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipy = !flipy;
 		}
 
-		m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+		m_gfxdecode->gfx(1)->transpen(
+				bitmap, cliprect,
 				code, color,
 				flipx, flipy,
 				sx, sy, 0);
@@ -424,7 +405,8 @@ void exprraid_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		// double height
 		if (attr & 0x10)
 		{
-			m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
+			m_gfxdecode->gfx(1)->transpen(
+					bitmap, cliprect,
 					code + 1, color,
 					flipx, flipy,
 					sx, sy + (flip_screen() ? -16 : 16), 0);
@@ -441,8 +423,6 @@ uint32_t exprraid_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-// machine
 
 /*****************************************************************************************/
 // Emulate DECO 291 protection (for original express raider, code is cracked on the bootleg)
@@ -486,7 +466,7 @@ void exprraid_state::prot_data_w(uint8_t data)
 			break;
 
 		default:
-			LOGPROT("Unknown protection write: %x at %s\n", data, machine().describe_context());
+			logerror("Unknown protection write: %x at %s\n", data, machine().describe_context());
 	}
 }
 
@@ -495,15 +475,16 @@ void exprraid_state::int_clear_w(uint8_t data)
 	m_maincpu->set_input_line(DECO16_IRQ_LINE, CLEAR_LINE);
 }
 
+
 void exprraid_state::master_map(address_map &map)
 {
-	map(0x0000, 0x05ff).ram().share(m_main_ram);
-	map(0x0600, 0x07ff).ram().share(m_spriteram);
-	map(0x0800, 0x0bff).ram().w(FUNC(exprraid_state::videoram_w)).share(m_videoram);
-	map(0x0c00, 0x0fff).ram().w(FUNC(exprraid_state::colorram_w)).share(m_colorram);
+	map(0x0000, 0x05ff).ram().share("main_ram");
+	map(0x0600, 0x07ff).ram().share("spriteram");
+	map(0x0800, 0x0bff).ram().w(FUNC(exprraid_state::videoram_w)).share("videoram");
+	map(0x0c00, 0x0fff).ram().w(FUNC(exprraid_state::colorram_w)).share("colorram");
 	map(0x1800, 0x1800).portr("DSW0");
-	map(0x1801, 0x1801).portr("IN1");  // Controls
-	map(0x1802, 0x1802).portr("IN2");  // Coins
+	map(0x1801, 0x1801).portr("IN1");    // 1P controls, start buttons
+	map(0x1802, 0x1802).portr("IN2");    // 2P controls, coins
 	map(0x1803, 0x1803).portr("DSW1");
 	map(0x2000, 0x2000).w(FUNC(exprraid_state::int_clear_w));
 	map(0x2001, 0x2001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -518,18 +499,12 @@ void exprraid_state::master_map(address_map &map)
 	map(0x4000, 0xffff).rom();
 }
 
-void exprraid_state::wexpressb2_master_map(address_map &map)
+template <offs_t Addr>
+void exprraid_state::wexpressb_map(address_map &map)
 {
 	master_map(map);
 
-	map(0x3800, 0x3800).portr("IN0");
-}
-
-void exprraid_state::wexpressb3_master_map(address_map &map)
-{
-	master_map(map);
-
-	map(0xffc0, 0xffc0).portr("IN0");
+	map(Addr, Addr).portr("IN0");
 }
 
 void exprraid_state::master_io_map(address_map &map)
@@ -559,10 +534,10 @@ INPUT_CHANGED_MEMBER(exprraid_state::coin_inserted_nmi)
 }
 
 static INPUT_PORTS_START( exprraid )
-	PORT_START("IN0")   // 0x3800
+	PORT_START("IN0")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
-	PORT_START("DSW0")  // 0x1800
+	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW0", 0x10, EQUALS, 0x10)
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW0", 0x10, EQUALS, 0x10)
@@ -592,7 +567,7 @@ static INPUT_PORTS_START( exprraid )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW1:8" )
 
-	PORT_START("IN1")   // 0x1801
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
@@ -602,7 +577,7 @@ static INPUT_PORTS_START( exprraid )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("IN2")   // 0x1802
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
@@ -612,7 +587,7 @@ static INPUT_PORTS_START( exprraid )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state, coin_inserted_deco16, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state, coin_inserted_deco16, 0)
 
-	PORT_START("DSW1")  // 0x1803
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x03, "3" )
@@ -635,7 +610,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( exprboot )
 	PORT_INCLUDE( exprraid )
-	PORT_MODIFY("IN2")  // 0x1802
+
+	PORT_MODIFY("IN2")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state, coin_inserted_nmi, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state, coin_inserted_nmi, 0)
 INPUT_PORTS_END
@@ -693,19 +669,25 @@ static const gfx_layout tile2 =
 static GFXDECODE_START( gfx_exprraid )
 	GFXDECODE_ENTRY( "chars",   0x00000, charlayout,   128, 2 )
 	GFXDECODE_ENTRY( "sprites", 0x00000, spritelayout,  64, 8 )
-	GFXDECODE_ENTRY( "bgtiles1", 0x00000, tile1,          0, 4 )
-	GFXDECODE_ENTRY( "bgtiles1", 0x00000, tile2,          0, 4 )
-	GFXDECODE_ENTRY( "bgtiles1", 0x04000, tile1,          0, 4 )
-	GFXDECODE_ENTRY( "bgtiles1", 0x04000, tile2,          0, 4 )
-	GFXDECODE_ENTRY( "bgtiles1", 0x08000, tile1,          0, 4 )
-	GFXDECODE_ENTRY( "bgtiles1", 0x08000, tile2,          0, 4 )
-	GFXDECODE_ENTRY( "bgtiles1", 0x0c000, tile1,          0, 4 )
-	GFXDECODE_ENTRY( "bgtiles1", 0x0c000, tile2,          0, 4 )
+	GFXDECODE_ENTRY( "bgtiles", 0x00000, tile1,          0, 4 )
+	GFXDECODE_ENTRY( "bgtiles", 0x00000, tile2,          0, 4 )
+	GFXDECODE_ENTRY( "bgtiles", 0x04000, tile1,          0, 4 )
+	GFXDECODE_ENTRY( "bgtiles", 0x04000, tile2,          0, 4 )
+	GFXDECODE_ENTRY( "bgtiles", 0x08000, tile1,          0, 4 )
+	GFXDECODE_ENTRY( "bgtiles", 0x08000, tile2,          0, 4 )
+	GFXDECODE_ENTRY( "bgtiles", 0x0c000, tile1,          0, 4 )
+	GFXDECODE_ENTRY( "bgtiles", 0x0c000, tile2,          0, 4 )
 GFXDECODE_END
 
 
 void exprraid_state::machine_start()
 {
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(exprraid_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(exprraid_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_bg_tilemap->set_scroll_rows(2);
+	m_fg_tilemap->set_transparent_pen(0);
+
 	save_item(NAME(m_prot_value));
 	save_item(NAME(m_bg_index));
 }
@@ -759,15 +741,16 @@ void exprraid_state::wexpressb2(machine_config &config)
 {
 	exprraid(config);
 
-	M6502(config.replace(), m_maincpu, 1'500'000);        // 1.5 MHz ???
-	m_maincpu->set_addrmap(AS_PROGRAM, &exprraid_state::wexpressb2_master_map);
+	M6502(config.replace(), m_maincpu, 1'500'000);      // 1.5 MHz ???
+	m_maincpu->set_addrmap(AS_PROGRAM, &exprraid_state::wexpressb_map<0x3800>);
 }
 
 void exprraid_state::wexpressb3(machine_config &config)
 {
-	wexpressb2(config);
+	exprraid(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &exprraid_state::wexpressb3_master_map);
+	M6502(config.replace(), m_maincpu, 1'500'000);      // 1.5 MHz ???
+	m_maincpu->set_addrmap(AS_PROGRAM, &exprraid_state::wexpressb_map<0xffc0>);
 }
 
 
@@ -796,13 +779,13 @@ ROM_START( exprraid )
 	ROM_LOAD( "cz11.13k", 0x20000, 0x8000, CRC(b7418335) SHA1(e9d08ee651b9221c371e2629a757bceca7b6192b) )
 	ROM_LOAD( "cz10.11k", 0x28000, 0x8000, CRC(2f611978) SHA1(fb60be573184d2af1dfdd543e68eeec53f2788f2) )
 
-	ROM_REGION( 0x20000, "bgtiles1", 0 )
+	ROM_REGION( 0x20000, "bgtiles", 0 )
 	ROM_LOAD( "cz04.8e", 0x00000, 0x8000, CRC(643a1bd3) SHA1(b23631d96cb413808f65f3ebe8fe6539b6140606) )
 	// Save 0x08000-0x0ffff to expand the previous so we can decode the thing
 	ROM_LOAD( "cz05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )
 	ROM_LOAD( "cz06.8h", 0x18000, 0x8000, CRC(b9bb448b) SHA1(84974b1f3a5b58cd427d874f805a6dd9244c1101) )
 
-	ROM_REGION( 0x8000, "bgtiles2", 0 )
+	ROM_REGION( 0x8000, "bgtilemap", 0 )
 	ROM_LOAD( "cz03.12f", 0x0000, 0x8000, CRC(6ce11971) SHA1(16bfa69b3ad02253e81c8110c9b840be03952790) )
 
 	ROM_REGION( 0x0400, "proms", 0 ) // All 4 PROMs are Fujitsu MB7114 or compatible
@@ -835,13 +818,13 @@ ROM_START( exprraidu )
 	ROM_LOAD( "cz11.13k", 0x20000, 0x8000, CRC(b7418335) SHA1(e9d08ee651b9221c371e2629a757bceca7b6192b) )
 	ROM_LOAD( "cz10.11k", 0x28000, 0x8000, CRC(2f611978) SHA1(fb60be573184d2af1dfdd543e68eeec53f2788f2) )
 
-	ROM_REGION( 0x20000, "bgtiles1", 0 )
+	ROM_REGION( 0x20000, "bgtiles", 0 )
 	ROM_LOAD( "cz04.8e", 0x00000, 0x8000, CRC(643a1bd3) SHA1(b23631d96cb413808f65f3ebe8fe6539b6140606) )
 	// Save 0x08000-0x0ffff to expand the previous so we can decode the thing
 	ROM_LOAD( "cz05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )
 	ROM_LOAD( "cz06.8h", 0x18000, 0x8000, CRC(b9bb448b) SHA1(84974b1f3a5b58cd427d874f805a6dd9244c1101) )
 
-	ROM_REGION( 0x8000, "bgtiles2", 0 )
+	ROM_REGION( 0x8000, "bgtilemap", 0 )
 	ROM_LOAD( "cz03.12f", 0x0000, 0x8000, CRC(6ce11971) SHA1(16bfa69b3ad02253e81c8110c9b840be03952790) )
 
 	ROM_REGION( 0x0400, "proms", 0 ) // All 4 PROMs are Fujitsu MB7114 or compatible
@@ -874,13 +857,13 @@ ROM_START( exprraidi ) // PCB manufactured in Italy by Gecas under Data East lic
 	ROM_LOAD( "cz11.13k", 0x20000, 0x8000, CRC(b7418335) SHA1(e9d08ee651b9221c371e2629a757bceca7b6192b) )
 	ROM_LOAD( "cz10.11k", 0x28000, 0x8000, CRC(2f611978) SHA1(fb60be573184d2af1dfdd543e68eeec53f2788f2) )
 
-	ROM_REGION( 0x20000, "bgtiles1", 0 )
+	ROM_REGION( 0x20000, "bgtiles", 0 )
 	ROM_LOAD( "cz04.8e", 0x00000, 0x8000, CRC(643a1bd3) SHA1(b23631d96cb413808f65f3ebe8fe6539b6140606) )
 	// Save 0x08000-0x0ffff to expand the previous so we can decode the thing
 	ROM_LOAD( "cz05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )
 	ROM_LOAD( "cz06.8h", 0x18000, 0x8000, CRC(b9bb448b) SHA1(84974b1f3a5b58cd427d874f805a6dd9244c1101) )
 
-	ROM_REGION( 0x8000, "bgtiles2", 0 )
+	ROM_REGION( 0x8000, "bgtilemap", 0 )
 	ROM_LOAD( "cz03.12f", 0x0000, 0x8000, CRC(6ce11971) SHA1(16bfa69b3ad02253e81c8110c9b840be03952790) )
 
 	ROM_REGION( 0x0400, "proms", 0 ) // All 4 PROMs are Fujitsu MB7114 or compatible
@@ -913,13 +896,13 @@ ROM_START( wexpress )
 	ROM_LOAD( "cz11.13k", 0x20000, 0x8000, CRC(b7418335) SHA1(e9d08ee651b9221c371e2629a757bceca7b6192b) )
 	ROM_LOAD( "cz10.11k", 0x28000, 0x8000, CRC(2f611978) SHA1(fb60be573184d2af1dfdd543e68eeec53f2788f2) )
 
-	ROM_REGION( 0x20000, "bgtiles1", 0 )
+	ROM_REGION( 0x20000, "bgtiles", 0 )
 	ROM_LOAD( "cy04.8e", 0x00000, 0x8000, CRC(f2e93ff0) SHA1(2e631966e1fa0b2699aa782b589d36801072ba03) )
 	// Save 0x08000-0x0ffff to expand the previous so we can decode the thing
 	ROM_LOAD( "cy05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )
 	ROM_LOAD( "cy06.8h", 0x18000, 0x8000, CRC(c3a56de5) SHA1(aefc516c6c69b12291c0bda03729910181a91a17) )
 
-	ROM_REGION( 0x8000, "bgtiles2", 0 )
+	ROM_REGION( 0x8000, "bgtilemap", 0 )
 	ROM_LOAD( "cy03.12f", 0x0000, 0x8000, CRC(242e3e64) SHA1(4fa8e93ef055bfdbe3bd619c53bf2448e1b832f0) )
 
 	ROM_REGION( 0x0400, "proms", 0 ) // All 4 PROMs are Fujitsu MB7114 or compatible
@@ -952,13 +935,13 @@ ROM_START( wexpressb1 )
 	ROM_LOAD( "cz11.13k", 0x20000, 0x8000, CRC(b7418335) SHA1(e9d08ee651b9221c371e2629a757bceca7b6192b) )
 	ROM_LOAD( "cz10.11k", 0x28000, 0x8000, CRC(2f611978) SHA1(fb60be573184d2af1dfdd543e68eeec53f2788f2) )
 
-	ROM_REGION( 0x20000, "bgtiles1", 0 )
+	ROM_REGION( 0x20000, "bgtiles", 0 )
 	ROM_LOAD( "cy04.8e", 0x00000, 0x8000, CRC(f2e93ff0) SHA1(2e631966e1fa0b2699aa782b589d36801072ba03) )
 	// Save 0x08000-0x0ffff to expand the previous so we can decode the thing
 	ROM_LOAD( "cy05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )
 	ROM_LOAD( "cy06.8h", 0x18000, 0x8000, CRC(c3a56de5) SHA1(aefc516c6c69b12291c0bda03729910181a91a17) )
 
-	ROM_REGION( 0x8000, "bgtiles2", 0 )
+	ROM_REGION( 0x8000, "bgtilemap", 0 )
 	ROM_LOAD( "cy03.12f", 0x0000, 0x8000, CRC(242e3e64) SHA1(4fa8e93ef055bfdbe3bd619c53bf2448e1b832f0) )
 
 	ROM_REGION( 0x0400, "proms", 0 ) // All 4 PROMs are Fujitsu MB7114 or compatible
@@ -991,13 +974,13 @@ ROM_START( wexpressb2 )
 	ROM_LOAD( "cz11.13k", 0x20000, 0x8000, CRC(b7418335) SHA1(e9d08ee651b9221c371e2629a757bceca7b6192b) )
 	ROM_LOAD( "cz10.11k", 0x28000, 0x8000, CRC(2f611978) SHA1(fb60be573184d2af1dfdd543e68eeec53f2788f2) )
 
-	ROM_REGION( 0x20000, "bgtiles1", 0 )
+	ROM_REGION( 0x20000, "bgtiles", 0 )
 	ROM_LOAD( "cy04.8e", 0x00000, 0x8000, CRC(f2e93ff0) SHA1(2e631966e1fa0b2699aa782b589d36801072ba03) )
 	// Save 0x08000-0x0ffff to expand the previous so we can decode the thing
 	ROM_LOAD( "cy05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )
 	ROM_LOAD( "cy06.8h", 0x18000, 0x8000, CRC(c3a56de5) SHA1(aefc516c6c69b12291c0bda03729910181a91a17) )
 
-	ROM_REGION( 0x8000, "bgtiles2", 0 )
+	ROM_REGION( 0x8000, "bgtilemap", 0 )
 	ROM_LOAD( "cy03.12f", 0x0000, 0x8000, CRC(242e3e64) SHA1(4fa8e93ef055bfdbe3bd619c53bf2448e1b832f0) )
 
 	ROM_REGION( 0x0400, "proms", 0 ) // All 4 PROMs are Fujitsu MB7114 or compatible
@@ -1026,16 +1009,16 @@ ROM_START( wexpressb3 )
 	ROM_LOAD( "cz11.13k", 0x20000, 0x8000, CRC(b7418335) SHA1(e9d08ee651b9221c371e2629a757bceca7b6192b) )
 	ROM_LOAD( "cz10.11k", 0x28000, 0x8000, CRC(2f611978) SHA1(fb60be573184d2af1dfdd543e68eeec53f2788f2) )
 
-	ROM_REGION( 0x20000, "bgtiles1", 0 )
+	ROM_REGION( 0x20000, "bgtiles", 0 )
 	ROM_LOAD( "cy04.8e", 0x00000, 0x8000, CRC(f2e93ff0) SHA1(2e631966e1fa0b2699aa782b589d36801072ba03) )
 	// Save 0x08000-0x0ffff to expand the previous so we can decode the thing
 	ROM_LOAD( "cy05.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )
 	ROM_LOAD( "cy06.8h", 0x18000, 0x8000, CRC(c3a56de5) SHA1(aefc516c6c69b12291c0bda03729910181a91a17) )
 
-	ROM_REGION( 0x8000, "bgtiles2", 0 )
+	ROM_REGION( 0x8000, "bgtilemap", 0 )
 	ROM_LOAD( "3.12f", 0x0000, 0x8000, CRC(242e3e64) SHA1(4fa8e93ef055bfdbe3bd619c53bf2448e1b832f0) )
 
-	ROM_REGION( 0x0400, "proms", 0 ) /* Proms Weren't Present In This Set, Using the One from the Other */
+	ROM_REGION( 0x0400, "proms", 0 ) // PROMs weren't present in this set, using the one from the other
 	ROM_LOAD( "cy-17.5b", 0x0000, 0x0100, CRC(da31dfbc) SHA1(ac476440864f538918f7bef2e1db82fd19195f89) ) // red
 	ROM_LOAD( "cy-16.6b", 0x0100, 0x0100, CRC(51f25b4c) SHA1(bfcca57613fbb22919e00db1f6a8c7ca50faa60b) ) // green
 	ROM_LOAD( "cy-15.7b", 0x0200, 0x0100, CRC(a6168d7f) SHA1(0c7b31adcd764ce2631c3fb5c1a968b01f65e741) ) // blue
@@ -1046,15 +1029,15 @@ ROM_END
 void exprraid_state::gfx_expand()
 {
 	// Expand the background ROM so we can use regular decode routines
-	uint8_t *gfx = memregion("bgtiles1")->base();
+	uint8_t *const gfx = memregion("bgtiles")->base();
 	int offs = 0x10000 - 0x1000;
 
 	for (int i = 0x8000 - 0x1000; i >= 0; i-= 0x1000)
 	{
-		memcpy(&(gfx[offs]), &(gfx[i]), 0x1000);
+		memcpy(&gfx[offs], &gfx[i], 0x1000);
 		offs -= 0x1000;
 
-		memcpy(&(gfx[offs]), &(gfx[i]), 0x1000);
+		memcpy(&gfx[offs], &gfx[i], 0x1000);
 		offs -= 0x1000;
 	}
 }
@@ -1079,10 +1062,11 @@ void exprraid_state::init_wexpressb()
 } // anonymous namespace
 
 
-GAME( 1986, exprraid,   0,        exprraid,   exprraid, exprraid_state, gfx_expand,      ROT0, "Data East Corporation", "Express Raider (World, Rev 4)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, exprraidu,  exprraid, exprraid,   exprraid, exprraid_state, gfx_expand,      ROT0, "Data East USA",         "Express Raider (US, rev 5)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1986, exprraidi,  exprraid, exprraid,   exprraid, exprraid_state, gfx_expand,      ROT0, "Data East Corporation", "Express Raider (Italy)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wexpress,   exprraid, exprraid,   exprraid, exprraid_state, gfx_expand,      ROT0, "Data East Corporation", "Western Express (Japan, rev 4)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wexpressb1, exprraid, exprraid,   exprraid, exprraid_state, init_wexpressb,  ROT0, "bootleg",               "Western Express (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wexpressb2, exprraid, wexpressb2, exprboot, exprraid_state, gfx_expand,      ROT0, "bootleg",               "Western Express (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, wexpressb3, exprraid, wexpressb3, exprboot, exprraid_state, gfx_expand,      ROT0, "bootleg",               "Western Express (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
+//    year  name        parent    machine     input     class           init            rot   company                  description                        flags
+GAME( 1986, exprraid,   0,        exprraid,   exprraid, exprraid_state, gfx_expand,     ROT0, "Data East Corporation", "Express Raider (World, Rev 4)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, exprraidu,  exprraid, exprraid,   exprraid, exprraid_state, gfx_expand,     ROT0, "Data East USA",         "Express Raider (US, rev 5)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1986, exprraidi,  exprraid, exprraid,   exprraid, exprraid_state, gfx_expand,     ROT0, "Data East Corporation", "Express Raider (Italy)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wexpress,   exprraid, exprraid,   exprraid, exprraid_state, gfx_expand,     ROT0, "Data East Corporation", "Western Express (Japan, rev 4)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wexpressb1, exprraid, exprraid,   exprraid, exprraid_state, init_wexpressb, ROT0, "bootleg",               "Western Express (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wexpressb2, exprraid, wexpressb2, exprboot, exprraid_state, gfx_expand,     ROT0, "bootleg",               "Western Express (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, wexpressb3, exprraid, wexpressb3, exprboot, exprraid_state, gfx_expand,     ROT0, "bootleg",               "Western Express (bootleg set 3)", MACHINE_SUPPORTS_SAVE )
