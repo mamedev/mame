@@ -348,6 +348,6 @@ void h8s2245_device::mstpcr_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		if(mstpcr & 0x2000) message << " timer16";
 		if(mstpcr & 0x4000) message << " dtc";
 		message << "\n";
-		logerror(message.str());
+		logerror(std::move(message).str());
 	}
 }
