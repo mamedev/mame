@@ -47,7 +47,7 @@ do \
 	uint32_t srcdata = (SOURCE); \
 	if (xdrawpos <= cliprect.right() && xdrawpos >= cliprect.left()) \
 	{ \
-		if (zval <= (DESTZ)) \
+		if (zval < (DESTZ)) \
 		{ \
 			if (srcdata != trans_pen) \
 			{ \
