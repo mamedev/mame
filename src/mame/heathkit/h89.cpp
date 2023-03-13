@@ -28,6 +28,8 @@
 
 namespace {
 
+#define USE_TLB 0
+
 #define H19_CLOCK (XTAL(12'288'000) / 6)
 #define H89_CLOCK (XTAL(12'288'000) / 6)
 #define INS8250_CLOCK (XTAL(12'288'000) /4)
@@ -38,8 +40,10 @@ public:
 	h89_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+#if USE_TLB
 		, m_tlb(*this, "tlb")
 		, m_console(*this, "console")
+#endif
 	{
 	}
 
@@ -49,8 +53,10 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
+#if USE_TLB
 	required_device<heath_tlb_device> m_tlb;
 	required_device<ins8250_device> m_console;
+#endif
 
 	void port_f2_w(uint8_t data);
 
@@ -63,7 +69,9 @@ private:
 
 void h89_state::init()
 {
+#if USE_TLB
 	m_tlb->init();
+#endif
 }
 
 void h89_state::h89_mem(address_map &map)
@@ -95,11 +103,19 @@ void h89_state::h89_io(address_map &map)
 //  map(0xd0, 0xd7)    8250 UART DCE
 //  map(0xd8, 0xdf)    8250 UART DTE - MODEM
 //  map(0xe0, 0xe7)    8250 UART DCE - LP
+#if USE_TLB
 	map(0xe8, 0xef).rw("console", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w)); // 8250 UART console - this
 																								 // connects internally to a Terminal board
 																								 // that is also used in the H19. Ideally,
 																								 // the H19 code could be connected and ran
 																								 // as a separate thread.
+#else
+	map(0xe8, 0xef).rw("ins8250", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w)); // 8250 UART console - this
+																								 // connects internally to a Terminal board
+																								 // that is also used in the H19. Ideally,
+																								 // the H19 code could be connected and ran
+																								 // as a separate thread.
+#endif
 //  map(0xf0, 0xf1)        // ports defined on the H8 - on the H89, access to these addresses causes a NMI
 	map(0xf2, 0xf2).w(FUNC(h89_state::port_f2_w)).portr("SW501");
 //  map(0xf3, 0xf3)        // ports defined on the H8 - on the H89, access to these addresses causes a NMI
@@ -189,7 +205,8 @@ void h89_state::port_f2_w(uint8_t data)
 	m_port_f2 = data;
 }
 
-
+#if USE_TLB
+#else
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	// TODO - baud rate should be controlled by SW501 setting
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
@@ -198,7 +215,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
-
+#endif
 
 
 void h89_state::h89(machine_config & config)
@@ -208,8 +225,8 @@ void h89_state::h89(machine_config & config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &h89_state::h89_mem);
 	m_maincpu->set_addrmap(AS_IO, &h89_state::h89_io);
 
+#if USE_TLB
 	INS8250(config, m_console, INS8250_CLOCK);
-#if 1
 	TLB(config, m_tlb, H19_CLOCK);
 
 
@@ -246,4 +263,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY      FULLNAME        FLAGS */
-COMP( 1979, h89,  0,      0,      h89,     h89,   h89_state, init, "Heath Company", "Heathkit H89", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1979, h89,  0,      0,      h89,     h89,   h89_state, init, "Heath Company", "Heathkit H89", MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
