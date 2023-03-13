@@ -131,7 +131,7 @@ void h8_timer8_channel_device::update_tcr()
 						tcr & TCR_CMIEA ? 'a' : '-',
 						tcr & TCR_OVIE  ? 'o' : '-');
 
-	logerror(message.str());
+	logerror(std::move(message).str());
 }
 
 uint8_t h8_timer8_channel_device::tcsr_r()
