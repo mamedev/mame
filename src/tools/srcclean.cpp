@@ -1007,7 +1007,6 @@ void cpp_cleaner::output_character(char32_t ch)
 	{
 	case parse_state::DEFAULT:
 	case parse_state::TOKEN:
-	case parse_state::CHARACTER_CONSTANT:
 	case parse_state::NUMERIC_CONSTANT:
 		if (BASIC_LATIN_LAST < ch)
 		{
@@ -1019,6 +1018,7 @@ void cpp_cleaner::output_character(char32_t ch)
 	case parse_state::LINE_COMMENT:
 		break;
 	case parse_state::STRING_CONSTANT:
+	case parse_state::CHARACTER_CONSTANT:
 		if (CYRILLIC_SUPPLEMENT_LAST < ch)
 		{
 			++m_non_ascii;
