@@ -1413,7 +1413,7 @@ ROM_END
   Canon Palmtronic MD-8 (Multi 8) / Canon Canola MD 810
   * PCB label: Canon EHI-0115-03
   * TMS1070 MCU label TMC1079 (die label: 1070B, 1079A)
-  * 2-line cyan VFD, each 9-digit 7seg + 1 custom (label 20-ST-22)
+  * cyan VFD Futaba 20-ST-22, 2-line 9-digit 7seg + 1 custom
 
   The only difference between MD-8 and MD 810 is the form factor. The latter
   is a tabletop calculator.

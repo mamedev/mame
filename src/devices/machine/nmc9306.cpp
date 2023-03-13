@@ -203,7 +203,7 @@ WRITE_LINE_MEMBER( nmc9306_device::cs_w )
 					if (m_state == STATE_WRITE)
 					{
 						LOG("NMC9306 WRAL\n");
-						for (int address = 0; address < 16; address++) 
+						for (int address = 0; address < 16; address++)
 						{
 							write(address, m_data);
 						}
@@ -214,7 +214,7 @@ WRITE_LINE_MEMBER( nmc9306_device::cs_w )
 					if (m_state == STATE_ERASE)
 					{
 						LOG("NMC9306 ERAL\n");
-						for (int address = 0; address < 16; address++) 
+						for (int address = 0; address < 16; address++)
 						{
 							erase(address);
 						}
@@ -228,7 +228,6 @@ WRITE_LINE_MEMBER( nmc9306_device::cs_w )
 				{
 					LOG("NMC9306 WRITE %u:%04x\n", m_address, m_data);
 					write(m_address, m_data);
-					break;
 				}
 				break;
 
@@ -237,8 +236,8 @@ WRITE_LINE_MEMBER( nmc9306_device::cs_w )
 				{
 					LOG("NMC9306 ERASE %u\n", m_address);
 					erase(m_address);
-					break;
 				}
+				break;
 			}
 
 			m_state = STATE_IDLE;
@@ -382,7 +381,7 @@ WRITE_LINE_MEMBER( nmc9306_device::sk_w )
 
 	case STATE_DUMMY_OUT:
 		m_do = 0;
-		
+
 		LOG("NMC9306 Dummy Bit OUT %u\n", m_do);
 
 		m_state = STATE_DATA_OUT;

@@ -17,6 +17,9 @@ The user interface resembles CompuChess. At the "L" prompt, enter level (1-8).
 At "bP", press A for new game, B for empty board, C to continue. At "0", press
 1-4 for an opening book, or 5 to select one at random.
 
+BTANB:
+- it locks up after pressing CE while it's thinking
+
 *******************************************************************************/
 
 #include "emu.h"

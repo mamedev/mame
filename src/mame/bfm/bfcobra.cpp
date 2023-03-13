@@ -2533,13 +2533,9 @@ void bfcobjam_state::aux_upd7759_w(uint8_t data)
 	if( m_aux_upd7759 )
 	{
 		m_aux_upd7759->set_rom_bank((data>>2)&3);
-
 		m_aux_upd7759->port_w((data>>4)&0xf);
-
 		m_aux_upd7759->md_w(1);
-
 		m_aux_upd7759->reset_w(BIT(data, 0));
-
 		m_aux_upd7759->start_w(!BIT(data, 1));
 	}
 }
