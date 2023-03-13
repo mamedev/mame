@@ -6,7 +6,7 @@
 #pragma once
 
 #include "bus/msx/slot/cartridge.h"
-#include "msx_audio_kb.h"
+#include "bus/msx/cart/msx_audio_kb.h"
 #include "sound/ymopm.h"
 #include "machine/ym2148.h"
 
