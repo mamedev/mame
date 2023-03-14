@@ -1777,8 +1777,12 @@ static auto const &texlayout_xoffset_4(std::integer_sequence<uint32_t, Values...
 	return s_values;
 }
 
-static const uint32_t texlayout_yoffset_4[1024] = { STEP1024(0,4096) };
-
+template <uint32_t... Values>
+static auto const &texlayout_yoffset_4(std::integer_sequence<uint32_t, Values...>)
+{
+	static constexpr uint32_t const s_values[sizeof...(Values)] = { (Values * 4096)... };
+	return s_values;
+}
 
 static const gfx_layout hng64_1024x1024x8_texlayout =
 {
@@ -1793,17 +1797,18 @@ static const gfx_layout hng64_1024x1024x8_texlayout =
 	texlayout_yoffset
 };
 
+// it appears that 4bpp tiles can only be in the top 1024 part of this as indexing is the same as 8bpp?
 static const gfx_layout hng64_1024x1024x4_texlayout =
 {
-	1024, 1024,
+	1024, 2048,
 	RGN_FRAC(1,1),
 	4,
 	{ 0,1,2,3 },
 	EXTENDED_XOFFS,
 	EXTENDED_YOFFS,
-	1024*1024*4,
+	1024*2048*4,
 	texlayout_xoffset_4(std::make_integer_sequence<uint32_t, 1024>()),
-	texlayout_yoffset_4
+	texlayout_yoffset_4(std::make_integer_sequence<uint32_t, 2048>())
 };
 
 
