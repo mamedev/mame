@@ -326,14 +326,10 @@ void hng64_state::draw_sprites_buffer(screen_device& screen, const rectangle& cl
 		// skip the lowest sprite priority depending on the zsort mode
 		// it was previously assumed the default buffer fill would take care of this
 		// but unless there's a sign bit, the roadedge name entry screen disagrees as it
-		// requires a higher/lower or equal check on the sprite draw, not just higher/lower
+		// requires a >= check on the sprite draw, not >
+		//
+		// for the non-zsort/zrev case, fatfurywa char selectappears requires <, not <=
 		if (zsort && (zval == 0))
-		{
-			currentsprite = nextsprite;
-			continue;
-		}
-
-		if (!zsort && (zval == 0x7ff))
 		{
 			currentsprite = nextsprite;
 			continue;
