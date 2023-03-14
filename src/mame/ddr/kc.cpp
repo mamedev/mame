@@ -155,36 +155,30 @@ void kc_state::kc85_slots(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("kc_cass");
 }
 
-
-void kc_state::kc85_2(machine_config &config)
+void kc_state::kc85_base(machine_config &config, uint32_t clock)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, KC85_2_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &kc_state::kc85_2_mem);
-	m_maincpu->set_addrmap(AS_IO, &kc_state::kc85_2_io);
+	Z80(config, m_maincpu, clock);
 	m_maincpu->set_daisy_config(kc85_daisy_chain);
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	Z80PIO(config, m_z80pio, KC85_2_CLOCK);
+	Z80PIO(config, m_z80pio, clock);
 	m_z80pio->out_int_callback().set_inputline(m_maincpu, 0);
 	m_z80pio->in_pa_callback().set(FUNC(kc_state::pio_porta_r));
 	m_z80pio->out_pa_callback().set(FUNC(kc_state::pio_porta_w));
 	m_z80pio->out_ardy_callback().set(FUNC(kc_state::pio_ardy_cb));
 	m_z80pio->in_pb_callback().set(FUNC(kc_state::pio_portb_r));
-	m_z80pio->out_pb_callback().set(FUNC(kc_state::pio_portb_w));
 	m_z80pio->out_brdy_callback().set(FUNC(kc_state::pio_brdy_cb));
 
-	Z80CTC(config, m_z80ctc, KC85_2_CLOCK);
+	Z80CTC(config, m_z80ctc, clock);
 	m_z80ctc->intr_callback().set_inputline(m_maincpu, 0);
-	m_z80ctc->zc_callback<0>().set(FUNC(kc_state::ctc_zc0_callback));
 	m_z80ctc->zc_callback<1>().set(FUNC(kc_state::ctc_zc1_callback));
 	m_z80ctc->zc_callback<2>().set(FUNC(kc_state::video_toggle_blink_state));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(28'375'160)/2, 908, 0, 320, 312, 0, 256);
-	m_screen->set_screen_update(FUNC(kc_state::screen_update));
 	m_screen->set_palette("palette");
 	TIMER(config, "scantimer").configure_scanline(FUNC(kc_state::kc_scanline), "screen", 0, 1);
 
@@ -198,128 +192,67 @@ void kc_state::kc85_2(machine_config &config)
 	SPEAKER(config, "outl").front_left();
 	SPEAKER(config, "outr").front_right();
 	SPEAKER_SOUND(config, m_dac);
-	m_dac->set_levels(64, kc85_speaker_levels);
 	m_dac->add_route(ALL_OUTPUTS, "mono", 0.5);
 	SPEAKER_SOUND(config, m_tapeout_left).add_route(ALL_OUTPUTS, "outl", 0.25);
 	SPEAKER_SOUND(config, m_tapeout_right).add_route(ALL_OUTPUTS, "outr", 0.25);
 
 	kc85_slots(config);
+}
 
-	/* internal ram */
+void kc_state::kc85_2_3(machine_config &config, uint32_t clock)
+{
+      	kc85_base(config, KC85_2_CLOCK);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &kc_state::kc85_2_mem);
+	m_maincpu->set_addrmap(AS_IO, &kc_state::kc85_2_io);
+
+	m_screen->set_screen_update(FUNC(kc_state::screen_update));
+
+	m_dac->set_levels(64, kc85_speaker_levels);
+
 	RAM(config, m_ram).set_default_size("16K");
+}
+
+void kc_state::kc85_2(machine_config &config)
+{
+	kc85_2_3(config, KC85_2_CLOCK);
+
+	m_z80pio->out_pb_callback().set(FUNC(kc_state::pio_portb_w));
+	m_z80ctc->zc_callback<0>().set(FUNC(kc_state::ctc_zc0_callback));
 }
 
 void kc85_3_state::kc85_3(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, KC85_2_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &kc_state::kc85_2_mem);
-	m_maincpu->set_addrmap(AS_IO, &kc_state::kc85_2_io);
-	m_maincpu->set_daisy_config(kc85_daisy_chain);
+	kc85_2_3(config, KC85_2_CLOCK);
 
-	config.set_maximum_quantum(attotime::from_hz(60));
-
-	Z80PIO(config, m_z80pio, KC85_2_CLOCK);
-	m_z80pio->out_int_callback().set_inputline(m_maincpu, 0);
-	m_z80pio->in_pa_callback().set(FUNC(kc_state::pio_porta_r));
-	m_z80pio->out_pa_callback().set(FUNC(kc_state::pio_porta_w));
-	m_z80pio->out_ardy_callback().set(FUNC(kc_state::pio_ardy_cb));
-	m_z80pio->in_pb_callback().set(FUNC(kc_state::pio_portb_r));
 	m_z80pio->out_pb_callback().set(FUNC(kc85_3_state::pio_portb_w));
-	m_z80pio->out_brdy_callback().set(FUNC(kc_state::pio_brdy_cb));
-
-	Z80CTC(config, m_z80ctc, KC85_2_CLOCK);
-	m_z80ctc->intr_callback().set_inputline(m_maincpu, 0);
 	m_z80ctc->zc_callback<0>().set(FUNC(kc85_3_state::ctc_zc0_callback));
-	m_z80ctc->zc_callback<1>().set(FUNC(kc_state::ctc_zc1_callback));
-	m_z80ctc->zc_callback<2>().set(FUNC(kc_state::video_toggle_blink_state));
 
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(28'375'160)/2, 908, 0, 320, 312, 0, 256);
-	m_screen->set_screen_update(FUNC(kc_state::screen_update));
-	m_screen->set_palette("palette");
-	TIMER(config, "scantimer").configure_scanline(FUNC(kc_state::kc_scanline), "screen", 0, 1);
-
-	PALETTE(config, "palette", FUNC(kc_state::kc85_palette), KC85_PALETTE_SIZE);
-
-	kc_keyboard_device &keyboard(KC_KEYBOARD(config, "keyboard", XTAL(4'000'000)));
-	keyboard.out_wr_callback().set(FUNC(kc_state::keyboard_cb));
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER(config, "outl").front_left();
-	SPEAKER(config, "outr").front_right();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.125);
-	SPEAKER_SOUND(config, m_dac);
-	m_dac->set_levels(64, kc85_speaker_levels);
-	m_dac->add_route(ALL_OUTPUTS, "mono", 0.5);
-	SPEAKER_SOUND(config, m_tapeout_left).add_route(ALL_OUTPUTS, "outl", 0.25);
-	SPEAKER_SOUND(config, m_tapeout_right).add_route(ALL_OUTPUTS, "outr", 0.25);
-
-	kc85_slots(config);
-
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("16K");
 }
 
 void kc85_4_state::kc85_4(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, KC85_4_CLOCK);
+	kc85_base(config, KC85_4_CLOCK);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &kc85_4_state::kc85_4_mem);
 	m_maincpu->set_addrmap(AS_IO, &kc85_4_state::kc85_4_io);
-	m_maincpu->set_daisy_config(kc85_daisy_chain);
-	config.set_maximum_quantum(attotime::from_hz(60));
 
-	Z80PIO(config, m_z80pio, KC85_4_CLOCK);
-	m_z80pio->out_int_callback().set_inputline(m_maincpu, 0);
-	m_z80pio->in_pa_callback().set(FUNC(kc_state::pio_porta_r));
-	m_z80pio->out_pa_callback().set(FUNC(kc_state::pio_porta_w));
-	m_z80pio->out_ardy_callback().set(FUNC(kc_state::pio_ardy_cb));
-	m_z80pio->in_pb_callback().set(FUNC(kc_state::pio_portb_r));
 	m_z80pio->out_pb_callback().set(FUNC(kc85_4_state::pio_portb_w));
-	m_z80pio->out_brdy_callback().set(FUNC(kc_state::pio_brdy_cb));
-
-	Z80CTC(config, m_z80ctc, KC85_4_CLOCK);
-	m_z80ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_z80ctc->zc_callback<0>().set(FUNC(kc85_3_state::ctc_zc0_callback));
-	m_z80ctc->zc_callback<1>().set(FUNC(kc_state::ctc_zc1_callback));
-	m_z80ctc->zc_callback<2>().set(FUNC(kc_state::video_toggle_blink_state));
 
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(28'375'160)/2, 908, 0, 320, 312, 0, 256);
 	m_screen->set_screen_update(FUNC(kc85_4_state::screen_update));
-	m_screen->set_palette("palette");
-	TIMER(config, "scantimer").configure_scanline(FUNC(kc85_4_state::kc_scanline), "screen", 0, 1);
 
-	PALETTE(config, "palette", FUNC(kc85_4_state::kc85_palette), KC85_PALETTE_SIZE);
-
-	kc_keyboard_device &keyboard(KC_KEYBOARD(config, "keyboard", XTAL(4'000'000)));
-	keyboard.out_wr_callback().set(FUNC(kc_state::keyboard_cb));
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER(config, "outl").front_left();
-	SPEAKER(config, "outr").front_right();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.125);
-	SPEAKER_SOUND(config, m_dac);
 	m_dac->set_levels(32, kc85_4_speaker_levels);
-	m_dac->add_route(ALL_OUTPUTS, "mono", 0.5);
-	SPEAKER_SOUND(config, m_tapeout_left).add_route(ALL_OUTPUTS, "outl", 0.25);
-	SPEAKER_SOUND(config, m_tapeout_right).add_route(ALL_OUTPUTS, "outr", 0.25);
 
-	kc85_slots(config);
-
-	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K");
 }
 
 void kc85_4_state::kc85_5(machine_config &config)
 {
 	kc85_4(config);
-	/* internal ram */
+
 	m_ram->set_default_size("256K");
 }
 
