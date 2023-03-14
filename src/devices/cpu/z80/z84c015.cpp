@@ -44,31 +44,6 @@ void z84c015_device::device_start()
 	m_mcr = 0x01;
 }
 
-
-int z84c015_device::cs0_r(u16 addr)
-{
-	int cs0 = BIT(~m_mcr, 0);
-	if (!cs0)
-	{
-		const u8 at = BIT(addr, 12, 4);
-		cs0 = ((m_csbr & 0x0f) >= at) && (at >= 0);
-    }
-
-    return cs0;
-}
-
-int z84c015_device::cs1_r(u16 addr)
-{
-    int cs1 = BIT(~m_mcr, 1);
-    if (!cs1)
-    {
-		const u8 at = BIT(addr, 12, 4);
-		cs1 = ((m_csbr >> 4) >= at) && (at > (m_csbr & 0x0f));
-    }
-
-    return cs1;
-}
-
 u8 z84c015_device::scdp_r()
 {
 	if (m_scrp < 0x04)

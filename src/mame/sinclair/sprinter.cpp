@@ -131,6 +131,8 @@ protected:
 	void map_mem(address_map &map);
 	void map_fetch(address_map &map);
 	u8 m1_r(offs_t offset);
+	bool cs0_r(u16 addr);
+	bool cs1_r(u16 addr);
 
 	void init_taps();
 
@@ -1028,12 +1030,36 @@ void sprinter_state::update_accel_buffer(u8 idx, u8 data)
 	}
 }
 
+bool sprinter_state::cs0_r(u16 addr)
+{
+	bool cs0 = m_maincpu->cs0_r() & 1;
+	if (!cs0)
+	{
+		const u8 at = BIT(addr, 12, 4);
+		cs0 = ((m_maincpu->csbr_r() & 0x0f) >= at) && (at >= 0);
+    }
+
+    return cs0;
+}
+
+bool sprinter_state::cs1_r(u16 addr)
+{
+    bool cs1 = m_maincpu->cs1_r() & 1;
+    if (!cs1)
+    {
+		const u8 at = BIT(addr, 12, 4);
+		cs1 = ((m_maincpu->csbr_r() >> 4) >= at) && (at > (m_maincpu->csbr_r() & 0x0f));
+    }
+
+    return cs1;
+}
+
 u8 sprinter_state::cs_r(offs_t offset)
 {
 	u8 data = 0xff;
-	if (m_maincpu->cs0_r(offset))
+	if (cs0_r(offset))
 		data = m_rom->as_u8((0x0c << 14) + offset);
-	else if (m_maincpu->cs1_r(offset))
+	else if (cs1_r(offset))
 		data = m_fastram.target()[offset];
 
 	return data;
@@ -1057,8 +1083,8 @@ void sprinter_state::ram_w(offs_t offset, u8 data)
 	if (m_conf_loading && m_starting)
 	{
 		m_conf_loading = 0;
-		m_ram_pages[0x2e] = m_maincpu->cs1_r(0x1000) ? 0x41 : 0x00;
-		m_conf = m_maincpu->cs1_r(0x1000);
+		m_ram_pages[0x2e] = cs1_r(0x1000) ? 0x41 : 0x00;
+		m_conf = cs1_r(0x1000);
 		machine().schedule_soft_reset();
 		return;
 	}

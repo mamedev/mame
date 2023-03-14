@@ -23,9 +23,9 @@ class z84c015_device : public tmpz84c015_device
 public:
 	z84c015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
 
-    // As z80 doesn't implements A lines, addr must be supplied
-    int cs0_r(u16 addr);
-    int cs1_r(u16 addr);
+    int cs0_r() { return BIT(~m_mcr, 0); }
+    int cs1_r() { return BIT(~m_mcr, 1); }
+	int csbr_r() { return m_csbr; }
 
 protected:
 	// device-level overrides
