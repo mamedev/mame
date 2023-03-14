@@ -83,10 +83,6 @@ public:
 	required_device<screen_device> m_screen;
 	required_device_array<kcexp_slot_device, 3> m_expansions;
 
-	// defined in machine/kc.cpp
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	// modules read/write
 	uint8_t expansion_read(offs_t offset);
 	void expansion_write(offs_t offset, uint8_t data);
@@ -100,6 +96,13 @@ public:
 	void expansion_e000_w(offs_t offset, uint8_t data);
 	uint8_t expansion_io_read(offs_t offset);
 	void expansion_io_write(offs_t offset, uint8_t data);
+
+	void kc85_2(machine_config &config);
+
+protected:
+	// defined in machine/kc.cpp
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 	// bankswitch
 	virtual void update_0x00000();
@@ -163,9 +166,8 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	void kc85_slots(machine_config &config);
 
-        void kc85_base(machine_config &config, uint32_t clock);
-        void kc85_2_3(machine_config &config, uint32_t clock);
-	void kc85_2(machine_config &config);
+	void kc85_base(machine_config &config, uint32_t clock);
+	void kc85_2_3(machine_config &config, uint32_t clock);
 	void kc85_2_io(address_map &map);
 	void kc85_2_mem(address_map &map);
 };
@@ -184,6 +186,9 @@ public:
 	// CTC callback
 	DECLARE_WRITE_LINE_MEMBER( ctc_zc0_callback );
 
+	void kc85_3(machine_config &config);
+
+protected:
 	// PIO callback
 	void pio_portb_w(uint8_t data) override;
 
@@ -192,8 +197,6 @@ public:
 
 	// driver state
 	uint8_t		    m_speaker_level = 0U;
-
-	void kc85_3(machine_config &config);
 };
 
 
@@ -204,6 +207,10 @@ public:
 		: kc85_3_state(mconfig, type, tag)
 	{ }
 
+	void kc85_4(machine_config &config);
+	void kc85_5(machine_config &config);
+
+protected:
 	// defined in machine/kc.cpp
 	virtual void machine_reset() override;
 
@@ -232,8 +239,6 @@ public:
 	uint8_t               m_port_84_data = 0U;
 	uint8_t               m_port_86_data = 0U;
 	uint8_t *             m_display_video_ram = 0U;
-	void kc85_4(machine_config &config);
-	void kc85_5(machine_config &config);
 	void kc85_4_io(address_map &map);
 	void kc85_4_mem(address_map &map);
 };
