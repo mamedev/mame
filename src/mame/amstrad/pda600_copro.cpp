@@ -352,11 +352,11 @@ void pda600_copro_device::received_byte(u8 byte)
 	{
 		if (0)
 		{
-			std::string tmp = "";
+			std::ostringstream tmp;
 			for (auto b : m_buf)
-				tmp += util::string_format("%02X ", b);
+				util::stream_format(tmp, "%02X ", b);
 
-			logerror("%s\n", tmp);
+			logerror("%s\n", std::move(tmp).str());
 		}
 
 		u8 checksum = 0;

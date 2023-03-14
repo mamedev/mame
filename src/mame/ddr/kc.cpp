@@ -13,12 +13,12 @@
 
 ******************************************************************************/
 
-/* Core includes */
 #include "emu.h"
 #include "kc.h"
 
 #include "machine/input_merger.h"
 #include "softlist_dev.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -201,7 +201,7 @@ void kc_state::kc85_base(machine_config &config, uint32_t clock)
 
 void kc_state::kc85_2_3(machine_config &config, uint32_t clock)
 {
-      	kc85_base(config, KC85_2_CLOCK);
+	kc85_base(config, KC85_2_CLOCK);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &kc_state::kc85_2_mem);
 	m_maincpu->set_addrmap(AS_IO, &kc_state::kc85_2_io);
@@ -239,7 +239,7 @@ void kc85_4_state::kc85_4(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &kc85_4_state::kc85_4_io);
 
 	m_z80pio->out_pb_callback().set(FUNC(kc85_4_state::pio_portb_w));
-	m_z80ctc->zc_callback<0>().set(FUNC(kc85_3_state::ctc_zc0_callback));
+	m_z80ctc->zc_callback<0>().set(FUNC(kc85_4_state::ctc_zc0_callback));
 
 	m_screen->set_screen_update(FUNC(kc85_4_state::screen_update));
 
@@ -309,7 +309,7 @@ ROM_START(kc85_5)
 	ROMX_LOAD("caos43e.855", 0x2000, 0x2000, CRC(b66fc6c3) SHA1(521ac2fbded4148220f8af2d5a5ab99634364079), ROM_BIOS(1))
 ROM_END
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY, FULLNAME, FLAGS
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY                                               FULLNAME           FLAGS
 COMP( 1987, kc85_2, 0,      0,      kc85_2,  kc85,  kc_state,     empty_init, u8"VEB Mikroelektronik \"Wilhelm Pieck\" Mühlhausen", "HC900 / KC 85/2", MACHINE_NOT_WORKING)
 COMP( 1987, kc85_3, kc85_2, 0,      kc85_3,  kc85,  kc85_3_state, empty_init, u8"VEB Mikroelektronik \"Wilhelm Pieck\" Mühlhausen", "KC 85/3",         MACHINE_NOT_WORKING)
 COMP( 1989, kc85_4, kc85_2, 0,      kc85_4,  kc85,  kc85_4_state, empty_init, u8"VEB Mikroelektronik \"Wilhelm Pieck\" Mühlhausen", "KC 85/4",         MACHINE_NOT_WORKING)

@@ -10,47 +10,30 @@
 
 #pragma once
 
-/* Devices */
-#include "imagedev/cassette.h"
-#include "machine/ram.h"
-#include "machine/timer.h"
-
-// Components
-#include "cpu/z80/z80.h"
-#include "machine/z80daisy.h"
-#include "machine/z80ctc.h"
-#include "machine/z80pio.h"
-#include "machine/ram.h"
 #include "kc_keyb.h"
-#include "machine/rescap.h"
-#include "sound/spkrdev.h"
-#include "emupal.h"
-#include "screen.h"
 
 // Devices
-#include "imagedev/cassette.h"
-#include "imagedev/snapquik.h"
-
-// Expansions
+#include "bus/kc/d002.h"
+#include "bus/kc/d004.h"
 #include "bus/kc/kc.h"
 #include "bus/kc/ram.h"
 #include "bus/kc/rom.h"
-#include "bus/kc/d002.h"
-#include "bus/kc/d004.h"
+#include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
+#include "machine/ram.h"
+#include "machine/rescap.h"
+#include "machine/timer.h"
+#include "machine/z80ctc.h"
+#include "machine/z80daisy.h"
+#include "machine/z80pio.h"
+#include "sound/spkrdev.h"
 
 // Formats
 #include "formats/kc_cas.h"
 
-// from service manual
-#define KC85_2_CLOCK 1751938
-#define KC85_4_CLOCK 1773447
-
-#define KC85_4_SCREEN_PIXEL_RAM_SIZE 0x04000
-#define KC85_4_SCREEN_COLOUR_RAM_SIZE 0x04000
-
-#define KC85_PALETTE_SIZE 24
-#define KC85_SCREEN_WIDTH 320
-#define KC85_SCREEN_HEIGHT 256
+#include "emupal.h"
+#include "screen.h"
 
 // cassette input polling frequency
 #define KC_CASSETTE_TIMER_FREQUENCY attotime::from_hz(44100)
@@ -72,6 +55,20 @@ public:
 		, m_expansions(*this, {"m8", "mc", "exp"})
 	{ }
 
+	void kc85_2(machine_config &config) ATTR_COLD;
+
+protected:
+	// from service manual
+	static inline constexpr uint32_t KC85_2_CLOCK = 1'751'938;
+	static inline constexpr uint32_t KC85_4_CLOCK = 1'773'447;
+
+	static inline constexpr unsigned KC85_4_SCREEN_PIXEL_RAM_SIZE = 0x04000;
+	static inline constexpr unsigned KC85_4_SCREEN_COLOUR_RAM_SIZE = 0x04000;
+
+	static inline constexpr unsigned KC85_PALETTE_SIZE = 24;
+	static inline constexpr unsigned KC85_SCREEN_WIDTH = 320;
+	static inline constexpr unsigned KC85_SCREEN_HEIGHT = 256;
+
 	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_z80pio;
 	required_device<z80ctc_device> m_z80ctc;
@@ -82,6 +79,28 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<screen_device> m_screen;
 	required_device_array<kcexp_slot_device, 3> m_expansions;
+
+	// driver state
+	uint8_t *           m_ram_base = nullptr;
+	std::unique_ptr<uint8_t[]> m_video_ram{};
+	int                 m_pio_data[2]{};
+	int                 m_high_resolution = 0;
+	uint8_t             m_ardy = 0U;
+	uint8_t             m_brdy = 0U;
+	int                 m_kc85_blink_state = 0;
+	int                 m_k0_line = 0;
+	int                 m_k1_line = 0;
+	uint8_t             m_dac_level = 0U;
+
+	// cassette
+	emu_timer *         m_cassette_timer = nullptr;
+	emu_timer *         m_cassette_oneshot_timer = nullptr;
+	int                 m_astb = 0;
+	int                 m_cassette_in = 0;
+
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	// modules read/write
 	uint8_t expansion_read(offs_t offset);
@@ -96,13 +115,6 @@ public:
 	void expansion_e000_w(offs_t offset, uint8_t data);
 	uint8_t expansion_io_read(offs_t offset);
 	void expansion_io_write(offs_t offset, uint8_t data);
-
-	void kc85_2(machine_config &config);
-
-protected:
-	// defined in machine/kc.cpp
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	// bankswitch
 	virtual void update_0x00000();
@@ -134,42 +146,23 @@ protected:
 	virtual void dac_update();
 	void tapeout_update();
 
-	// defined in video/kc.cpp
-	virtual void video_start() override;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER( video_toggle_blink_state );
 	void video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, uint8_t colour_byte, uint8_t gfx_byte);
 
-	// driver state
-	uint8_t *           m_ram_base = nullptr;
-	std::unique_ptr<uint8_t[]> m_video_ram{};
-	int                 m_pio_data[2]{};
-	int                 m_high_resolution = 0;
-	uint8_t             m_ardy = 0U;
-	uint8_t             m_brdy = 0U;
-	int                 m_kc85_blink_state = 0;
-	int                 m_k0_line = 0;
-	int                 m_k1_line = 0;
-	uint8_t             m_dac_level = 0U;
-
-	// cassette
-	emu_timer *         m_cassette_timer = nullptr;
-	emu_timer *         m_cassette_oneshot_timer = nullptr;
-	int                 m_astb = 0;
-	int                 m_cassette_in = 0;
-
-	void kc85_palette(palette_device &palette) const;
+	void kc85_palette(palette_device &palette) const ATTR_COLD;
 	TIMER_CALLBACK_MEMBER(kc_cassette_oneshot_timer);
 	TIMER_CALLBACK_MEMBER(kc_cassette_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(kc_scanline);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
-	void kc85_slots(machine_config &config);
 
-	void kc85_base(machine_config &config, uint32_t clock);
-	void kc85_2_3(machine_config &config, uint32_t clock);
-	void kc85_2_io(address_map &map);
-	void kc85_2_mem(address_map &map);
+	void kc85_slots(machine_config &config) ATTR_COLD;
+	void kc85_base(machine_config &config, uint32_t clock) ATTR_COLD;
+	void kc85_2_3(machine_config &config, uint32_t clock) ATTR_COLD;
+
+	void kc85_2_mem(address_map &map) ATTR_COLD;
+	void kc85_2_io(address_map &map) ATTR_COLD;
 };
 
 
@@ -181,22 +174,22 @@ public:
 		, m_speaker(*this, "speaker")
 	{ }
 
+	void kc85_3(machine_config &config) ATTR_COLD;
+
+protected:
 	required_device<speaker_sound_device> m_speaker;
+
+	// driver state
+	uint8_t         m_speaker_level = 0U;
 
 	// CTC callback
 	DECLARE_WRITE_LINE_MEMBER( ctc_zc0_callback );
 
-	void kc85_3(machine_config &config);
-
-protected:
 	// PIO callback
 	void pio_portb_w(uint8_t data) override;
 
 	// sound
 	virtual void speaker_update();
-
-	// driver state
-	uint8_t		    m_speaker_level = 0U;
 };
 
 
@@ -207,12 +200,17 @@ public:
 		: kc85_3_state(mconfig, type, tag)
 	{ }
 
-	void kc85_4(machine_config &config);
-	void kc85_5(machine_config &config);
+	void kc85_4(machine_config &config) ATTR_COLD;
+	void kc85_5(machine_config &config) ATTR_COLD;
 
 protected:
-	// defined in machine/kc.cpp
-	virtual void machine_reset() override;
+	// driver state
+	uint8_t               m_port_84_data = 0U;
+	uint8_t               m_port_86_data = 0U;
+	uint8_t *             m_display_video_ram = 0U;
+
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 	virtual void update_0x04000() override;
 	virtual void update_0x08000() override;
@@ -223,8 +221,6 @@ protected:
 	void kc85_4_86_w(uint8_t data);
 	void kc85_4_84_w(uint8_t data);
 
-	// defined in video/kc.cpp
-	virtual void video_start() override;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	void video_control_w(int data);
 
@@ -235,12 +231,8 @@ protected:
 	void dac_update() override;
 	void speaker_update() override;
 
-	// driver state
-	uint8_t               m_port_84_data = 0U;
-	uint8_t               m_port_86_data = 0U;
-	uint8_t *             m_display_video_ram = 0U;
-	void kc85_4_io(address_map &map);
-	void kc85_4_mem(address_map &map);
+	void kc85_4_mem(address_map &map) ATTR_COLD;
+	void kc85_4_io(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_DDR_KC_H
