@@ -593,9 +593,37 @@ void kc_state::pio_portb_w(uint8_t data)
 
 	update_0x08000();
 
-	/* 16 speaker levels */
-	m_speaker_level = (data>>1) & 0x0f;
+	// KC 85/2..3: 5-bit DAC
+	m_dac_level = (~data & 0x1f)>>1;
+	dac_update();
+}
 
+void kc85_3_state::pio_portb_w(uint8_t data)
+{
+	m_pio_data[1] = data;
+
+	update_0x08000();
+
+	// KC 85/2..3: 5-bit DAC
+	m_dac_level = (~data & 0x1f);
+	dac_update();
+}
+
+void kc85_4_state::pio_portb_w(uint8_t data)
+{
+	// reset tone flip-flops
+	if (((m_pio_data[1] & 1) == 1) & ((data & 1) == 0)) {
+		m_k0_line = 0;
+		m_k1_line = 0;
+	}
+
+	m_pio_data[1] = data;
+
+	update_0x08000();
+
+	// KC 85/4: 4-bit DAC
+	m_dac_level = (~data & 0x1e)>>1;
+	dac_update();
 	speaker_update();
 }
 
@@ -676,7 +704,19 @@ WRITE_LINE_MEMBER( kc_state::ctc_zc0_callback )
 	if (state)
 	{
 		m_k0_line^=1;
+		dac_update();
+		tapeout_update();
+	}
+}
+
+WRITE_LINE_MEMBER( kc85_3_state::ctc_zc0_callback )
+{
+	if (state)
+	{
+		m_k0_line^=1;
+		dac_update();
 		speaker_update();
+		tapeout_update();
 	}
 }
 
@@ -686,12 +726,12 @@ WRITE_LINE_MEMBER( kc_state::ctc_zc1_callback)
 	if (state)
 	{
 		m_k1_line^=1;
-		speaker_update();
+		dac_update();
+		tapeout_update();
 
 		// K1 line is also cassette output
 		m_cassette->output((m_k1_line & 1) ? +1 : -1);
 	}
-
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(kc_state::kc_scanline)
@@ -714,10 +754,30 @@ TIMER_DEVICE_CALLBACK_MEMBER(kc_state::kc_scanline)
 	}
 }
 
-void kc_state::speaker_update()
+void kc85_3_state::speaker_update()
 {
-	/* this might not be correct, the range might be logarithmic and not linear! */
-	m_speaker->level_w(m_k0_line ? (m_speaker_level | (m_k1_line ? 0x01 : 0)) : 0);
+	m_speaker->level_w(m_k0_line);
+}
+
+void kc85_4_state::speaker_update()
+{
+	m_speaker->level_w(m_dac_level ? m_k0_line : 0);
+}
+
+void kc_state::dac_update()
+{
+	m_dac->level_w((m_k0_line + m_k1_line) * m_dac_level);
+}
+
+void kc85_4_state::dac_update()
+{
+	m_dac->level_w((m_k0_line + m_k1_line) * m_dac_level);
+}
+
+void kc_state::tapeout_update()
+{
+	m_tapeout_left->level_w(m_k0_line);
+	m_tapeout_right->level_w(m_k1_line);
 }
 
 /* keyboard callback */
