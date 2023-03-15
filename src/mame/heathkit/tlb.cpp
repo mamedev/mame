@@ -51,6 +51,8 @@ Address   Description
 
 ****************************************************************************/
 
+#include "emu.h"
+
 #include "tlb.h"
 
 // Standard H19 used a 2.048 MHz clock
@@ -65,29 +67,29 @@ Address   Description
 // Beep Frequency is 1 KHz
 #define H19_BEEP_FRQ (H19_CLOCK / 2048)
 
-DEFINE_DEVICE_TYPE(TLB, heath_tlb_device, "heath_tlb", "Heath Terminal Logic Board");
-DEFINE_DEVICE_TYPE(SUPER19, heath_super19_tlb_device, "heath_super19_tlb", "Heath Terminal Logic Board w/Super19 ROM");
-DEFINE_DEVICE_TYPE(WATZ, heath_watz_tlb_device, "heath_watz_tlb", "Heath Terminal Logic Board w/Watzman ROM");
-DEFINE_DEVICE_TYPE(ULTRA, heath_ultra_tlb_device, "heath_ultra_tlb", "Heath Terminal Logic Board w/Ultra ROM");
+DEFINE_DEVICE_TYPE(HEATH_TLB, heath_tlb_device, "heath_tlb", "Heath Terminal Logic Board");
+DEFINE_DEVICE_TYPE(HEATH_SUPER19, heath_super19_tlb_device, "heath_super19_tlb", "Heath Terminal Logic Board w/Super19 ROM");
+DEFINE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device, "heath_watz_tlb", "Heath Terminal Logic Board w/Watzman ROM");
+DEFINE_DEVICE_TYPE(HEATH_ULTRA, heath_ultra_tlb_device, "heath_ultra_tlb", "Heath Terminal Logic Board w/Ultra ROM");
 
 heath_tlb_device::heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: heath_tlb_device(mconfig, TLB, tag, owner, clock)
+		: heath_tlb_device(mconfig, HEATH_TLB, tag, owner, clock)
 {
 }
 
 heath_tlb_device::heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, type, tag, owner, clock)
-		, write_sd(*this)
-		, m_palette(*this, "palette")
-		, m_maincpu(*this, "maincpu")
-		, m_crtc(*this, "crtc")
-		, m_ace(*this, "ins8250")
-		, m_beep(*this, "beeper")
-		, m_p_videoram(*this, "videoram")
-		, m_p_chargen(*this, "chargen")
-		, m_mm5740(*this, "mm5740")
-		, m_kbdrom(*this, "keyboard")
-		, m_kbspecial(*this, "MODIFIERS")
+		:	device_t(mconfig, type, tag, owner, clock),
+			m_write_sd(*this),
+			m_palette(*this, "palette"),
+			m_maincpu(*this, "maincpu"),
+			m_crtc(*this, "crtc"),
+			m_ace(*this, "ins8250"),
+			m_beep(*this, "beeper"),
+			m_p_videoram(*this, "videoram"),
+			m_p_chargen(*this, "chargen"),
+			m_mm5740(*this, "mm5740"),
+			m_kbdrom(*this, "keyboard"),
+			m_kbspecial(*this, "MODIFIERS")
 {
 }
 
@@ -122,8 +124,8 @@ void heath_tlb_device::io_map(address_map &map)
 	map(0x00, 0x00).mirror(0x1f).portr("SW401");
 	map(0x20, 0x20).mirror(0x1f).portr("SW402");
 	map(0x40, 0x47).mirror(0x18).rw(m_ace, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
-	map(0x60, 0x60).mirror(0x1E).w(m_crtc, FUNC(mc6845_device::address_w));
-	map(0x61, 0x61).mirror(0x1E).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x60, 0x60).mirror(0x1e).w(m_crtc, FUNC(mc6845_device::address_w));
+	map(0x61, 0x61).mirror(0x1e).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x80, 0x80).mirror(0x1f).r(FUNC(heath_tlb_device::kbd_key_r));
 	map(0xa0, 0xa0).mirror(0x1f).r(FUNC(heath_tlb_device::kbd_flags_r));
 	map(0xc0, 0xc0).mirror(0x1f).w(FUNC(heath_tlb_device::key_click_w));
@@ -132,28 +134,32 @@ void heath_tlb_device::io_map(address_map &map)
 
 
 // Keyboard encoder masks
-#define KB_ENCODER_KEY_VALUE_MASK 0x7f
-#define KB_ENCODER_CONTROL_KEY_MASK 0x80
+static constexpr uint8_t KB_ENCODER_KEY_VALUE_MASK = 0x7f;
+static constexpr uint8_t KB_ENCODER_CONTROL_KEY_MASK = 0x80;
 
 // Keyboard flag masks
-#define KB_STATUS_SHIFT_KEYS_MASK 0x01
-#define KB_STATUS_CAPS_LOCK_MASK  0x02
-#define KB_STATUS_BREAK_KEY_MASK  0x04
-#define KB_STATUS_ONLINE_KEY_MASK 0x08
-#define KB_STATUS_REPEAT_KEYS_MASK 0x40
-#define KB_STATUS_KEYBOARD_STROBE_MASK 0x80
+static constexpr uint8_t KB_STATUS_SHIFT_KEYS_MASK = 0x01;
+static constexpr uint8_t KB_STATUS_CAPS_LOCK_MASK = 0x02;
+static constexpr uint8_t KB_STATUS_BREAK_KEY_MASK = 0x04;
+static constexpr uint8_t KB_STATUS_ONLINE_KEY_MASK = 0x08;
+static constexpr uint8_t KB_STATUS_REPEAT_KEYS_MASK = 0x40;
+static constexpr uint8_t KB_STATUS_KEYBOARD_STROBE_MASK = 0x80;
+
+void heath_tlb_device::device_resolve_objects()
+{
+
+	m_write_sd.resolve_safe();
+}
 
 void heath_tlb_device::device_start()
 {
+
+	m_strobe = m_keyclickactive = m_bellactive = false;
 
 	m_key_click_timer = timer_alloc(FUNC(heath_tlb_device::key_click_off), this);
 	m_bell_timer = timer_alloc(FUNC(heath_tlb_device::bell_off), this);
 }
 
-void heath_tlb_device::init()
-{
-	m_strobe = m_keyclickactive = m_bellactive = false;
-}
 
 void heath_tlb_device::key_click_w(uint8_t data)
 {
@@ -544,7 +550,7 @@ const tiny_rom_entry *heath_tlb_device::device_rom_region() const
 
 void heath_tlb_device::serial_out_b(uint8_t data)
 {
-	write_sd(data);
+	m_write_sd(data);
 }
 
 WRITE_LINE_MEMBER(heath_tlb_device::cb1_w)
@@ -555,7 +561,6 @@ WRITE_LINE_MEMBER(heath_tlb_device::cb1_w)
 void heath_tlb_device::device_add_mconfig(machine_config &config)
 {
 
-	write_sd.resolve_safe();
 
 	/* basic machine hardware */
 	Z80(config, m_maincpu, H19_CLOCK); // From schematics
@@ -605,7 +610,7 @@ void heath_tlb_device::device_add_mconfig(machine_config &config)
 }
 
 heath_super19_tlb_device::heath_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: heath_tlb_device(mconfig, SUPER19, tag, owner, clock)
+		: heath_tlb_device(mconfig, HEATH_SUPER19, tag, owner, clock)
 {
 }
 
@@ -615,7 +620,7 @@ const tiny_rom_entry *heath_super19_tlb_device::device_rom_region() const
 }
 
 heath_watz_tlb_device::heath_watz_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: heath_tlb_device(mconfig, WATZ, tag, owner, clock)
+		: heath_tlb_device(mconfig, HEATH_WATZ, tag, owner, clock)
 {
 }
 
@@ -625,7 +630,7 @@ const tiny_rom_entry *heath_watz_tlb_device::device_rom_region() const
 }
 
 heath_ultra_tlb_device::heath_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: heath_tlb_device(mconfig, ULTRA, tag, owner, clock)
+		: heath_tlb_device(mconfig, HEATH_ULTRA, tag, owner, clock)
 {
 }
 

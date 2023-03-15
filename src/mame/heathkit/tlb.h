@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"
 #include "bus/rs232/rs232.h"
@@ -25,30 +24,35 @@
 class heath_tlb_device : public device_t
 {
 public:
-  heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	heath_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-  // interface routines
-  auto serial_data_callback() { return write_sd.bind(); }
-  DECLARE_WRITE_LINE_MEMBER(cb1_w);
-  void init();
+	// interface routines
+	auto serial_data_callback() { return m_write_sd.bind(); }
+
+	DECLARE_WRITE_LINE_MEMBER(cb1_w);
 
 protected:
-  heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	heath_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-  virtual ioport_constructor device_input_ports() const override;
-  virtual const tiny_rom_entry *device_rom_region() const override;
-  virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_resolve_objects() override;
 
 private:
-  virtual void device_start() override;
 
-  void mem_map(address_map &map);
+	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
 	void key_click_w(uint8_t data);
 	void bell_w(uint8_t data);
 	uint8_t kbd_key_r();
 	uint8_t kbd_flags_r();
+	uint16_t translate_mm5740_b(uint16_t b);
+
+	void serial_out_b(uint8_t data);
+
 	DECLARE_READ_LINE_MEMBER(mm5740_shift_r);
 	DECLARE_READ_LINE_MEMBER(mm5740_control_r);
 	DECLARE_WRITE_LINE_MEMBER(mm5740_data_ready_w);
@@ -61,10 +65,9 @@ private:
 	emu_timer *m_key_click_timer = nullptr;
 	emu_timer *m_bell_timer = nullptr;
 
-  devcb_write_line write_sd;
-  void serial_out_b(uint8_t data);
+	devcb_write_line m_write_sd;
 
-  required_device<palette_device> m_palette;
+	required_device<palette_device> m_palette;
 	required_device<cpu_device>     m_maincpu;
 	required_device<mc6845_device>  m_crtc;
 	required_device<ins8250_device> m_ace;
@@ -80,40 +83,39 @@ private:
 	bool     m_keyclickactive;
 	bool     m_bellactive;
 
-	uint16_t translate_mm5740_b(uint16_t b);
 };
 
 class heath_super19_tlb_device : public heath_tlb_device
 {
 public:
-  heath_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	heath_super19_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-  virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 };
 
 class heath_watz_tlb_device : public heath_tlb_device
 {
 public:
-  heath_watz_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	heath_watz_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-  virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class heath_ultra_tlb_device : public heath_tlb_device
 {
 public:
-  heath_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	heath_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-  virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
-DECLARE_DEVICE_TYPE(TLB, heath_tlb_device)
-DECLARE_DEVICE_TYPE(SUPER19, heath_super19_tlb_device)
-DECLARE_DEVICE_TYPE(WATZ, heath_watz_tlb_device)
-DECLARE_DEVICE_TYPE(ULTRA, heath_ultra_tlb_device)
+DECLARE_DEVICE_TYPE(HEATH_TLB, heath_tlb_device)
+DECLARE_DEVICE_TYPE(HEATH_SUPER19, heath_super19_tlb_device)
+DECLARE_DEVICE_TYPE(HEATH_WATZ, heath_watz_tlb_device)
+DECLARE_DEVICE_TYPE(HEATH_ULTRA, heath_ultra_tlb_device)
 
 #endif // MAME_HEATHKIT_TLB_H

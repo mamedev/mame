@@ -321,7 +321,6 @@ heathkit/et3400.cpp
 heathkit/h19.cpp
 heathkit/h8.cpp
 heathkit/h89.cpp
-heathkit/tlb.cpp
 hec2hrp/hec2hrp.cpp
 hegenerglaser/academy.cpp
 hegenerglaser/amsterdam.cpp

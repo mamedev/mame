@@ -20,11 +20,13 @@
 ****************************************************************************/
 
 #include "emu.h"
+
+#include "tlb.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"
 #include "machine/timer.h"
-#include "tlb.h"
 
 namespace {
 
@@ -46,8 +48,6 @@ public:
 
 	void h89(machine_config &config);
 
-	void init();
-
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<heath_tlb_device> m_tlb;
@@ -62,10 +62,6 @@ private:
 	void h89_mem(address_map &map);
 };
 
-void h89_state::init()
-{
-	m_tlb->init();
-}
 
 void h89_state::h89_mem(address_map &map)
 {
@@ -196,7 +192,7 @@ void h89_state::h89(machine_config & config)
 	m_maincpu->set_addrmap(AS_IO, &h89_state::h89_io);
 
 	INS8250(config, m_console, INS8250_CLOCK);
-	TLB(config, m_tlb, H19_CLOCK);
+	HEATH_TLB(config, m_tlb, H19_CLOCK);
 
 	m_console->out_tx_callback().set(m_tlb, FUNC(heath_tlb_device::cb1_w));
 
@@ -221,4 +217,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY      FULLNAME        FLAGS */
-COMP( 1979, h89,  0,      0,      h89,     h89,   h89_state, init, "Heath Company", "Heathkit H89", MACHINE_IS_INCOMPLETE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+COMP( 1979, h89,  0,      0,      h89,     h89,   h89_state, empty_init, "Heath Company", "Heathkit H89", MACHINE_NOT_WORKING)
